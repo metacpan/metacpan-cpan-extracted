@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2004 Javier Gutierrez <jgutierrez@tap3edit.com>. 
+# Copyright (c) 2004 Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>
 # All rights reserved. This program is free software; you can redistribute 
 # it and/or modify it under the same terms as Perl itself.
-# http://www.tap3edit.com
 #  
 # Deletes the Camel attachments of a TAP file.
 #  

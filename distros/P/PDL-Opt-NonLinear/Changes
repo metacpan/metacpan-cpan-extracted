@@ -1,0 +1,24 @@
+Revision history for Perl extension PDL::Opt::NonLinear
+
+0.05  Thu Aug 16 00:00:00 2018
+
+  * Improve build process.
+
+0.04  Thu Aug 03 00:00:00 2018
+
+  * Adjust indexin operations introduced in PDL v2.014 2015-10-12
+    (full support of 64bit indexing operations using 64bit PDL_Indx
+    data type).
+
+0.03  Fri Aug 18 00:00:00 2007
+
+  * ASA fixes (64bit arch)
+  * new Makefile.PL (opti library automatically built and linked)
+
+0.02  Wed Sep 21 16:16:15 2005
+
+  * add PDL.pm in prerequities (Makefile.PL)
+
+0.01  Sat Sep 17 17:13:24 2005
+
+  * Initial release

@@ -3,6 +3,12 @@
 Tk::SMListbox - Sortable Multicolumn Listbox with arrows in headers 
     indicating sort order.
 
+=head1 AUTHOR
+
+Jim Turner
+
+Tk::MListbox authors:  Hans Jorgen Helgesen, hans_helgesen@hotmail.com (from March 2000: hans.helgesen@novit.no)
+
 =head1 SYNOPSIS
 
 use Tk::SMListbox;
@@ -19,7 +25,7 @@ Sorting is done by clicking on one of the column headings in the
 widget. The first click will sort the data with the selected column as 
 key, a new click will reverse the sort order.
 
-=head1 Examples
+=head1 EXAMPLES
 
 my $table = $w->Scrolled('SMListbox'
 
@@ -29,29 +35,31 @@ my $table = $w->Scrolled('SMListbox'
 
         -relief => 'sunken',
 
-        -sortable => 1,
+        -sortable => 1,   #USER CAN SORT BY COLUMN BY CLICKING ON THE COLUMN HEADER BUTTON.
 
         -selectmode => 'extended',
 
-        -showallsortcolumns => 1,
+        -showallsortcolumns => 1,  #SHOW SORT DIRECTION ARROW ON ALL SORTED COLUMNS.
 
         -takefocus => 1,
 
         -borderwidth => 1,
 
-        -columns => [
+        -fillcolumn => 1,   #IF WINDOW RESIZED, EXPAND COLUMN 1 ("Name") TO FILL THE EXTRA SPACE.
 
-            [-text => 'D', -width => 3, -comparecommand => sub { $_[1] cmp $_[0]}],
+        -columns => [    #COLUMN WIDTH, SORT FUNCTIONS, HEADER BUTTON INFORMATION, ETC.:
 
-            [-text => 'Name', -width => 25,],
+            [-text => '~D', -width => 3, -comparecommand => sub { $_[1] cmp $_[0] } ],
 
-            [-text => 'Perm.', -width => 10,],
+            [-text => '~Name', -width => 25 ],
 
-            [-text => 'Owner:Group', -width => 14,],
+            [-text => '~Perm.', -width => 10 ],
 
-            [-text => 'Size', -width => 8, -comparecommand => sub { $_[1] <=> $_[0]}],
+            [-text => '~Owner:Group', -width => 14 ],
 
-            [-text => 'Date/Time', -width => 15,],
+            [-text => '~Size', -width => 8, -comparecommand => sub { $_[1] <=> $_[0] } ],
+
+            [-text => 'Date/~Time', -width => 15, -reversearrow => 1, -comparecommand => sub { $_[1] cmp $_[0] }],
 
         ]
 
@@ -60,16 +68,6 @@ my $table = $w->Scrolled('SMListbox'
                 -expand => 'yes',
 
         );
-
-=head1 AUTHOR
-
-Jim Turner
-
-Tk::MListbox authors:  Hans Jorgen Helgesen, hans_helgesen@hotmail.com (from March 2000: hans.helgesen@novit.no)
-
-=head1 SEE ALSO
-
-L<Tk::MListbox> L<Tk::Listbox>
 
 =head1 STANDARD OPTIONS
 
@@ -82,12 +80,12 @@ B<-yscrollcommand> B<-font> B<-highlightthickness> B<-setgrid>
 
 =over 4
 
-=item -columns => I<list>
+=item B<-columns> => I<list>
 
 Defines the columns in the widget. Each element in the list 
 describes a column. See the B<COLUMNS> section below.
 
-=item -configurecommand => I<callback>
+=item B<-configurecommand> => I<callback>
 
 The -configurecommand callback will be called whenever the layout of the
 widget has changed due to user interaction. That is, the user changes the
@@ -98,67 +96,138 @@ This option is useful if the application wants to store the widget layout
 for later retrieval. The widget layout can be obtained by the callback
 by calling the method columnPackInfo().
 
-=item -moveable => I<boolean>
+=item B<-fillcolumn> => I<index>
+
+Specify the index number of a column that will expand to fill any new 
+space opened up by dragging the window to a larger size.  All other 
+columns maintain their current widths unless changed by the user 
+dragging a column separator.  Otherwise all columns maintain their 
+sizes and the extra space is unused (if no column specified here).
+Default: -1 (no column expands horizontally).  All columns always 
+expand vertically though.  The same column keeps it's expansion 
+privilege even if user rearranges their positions.
+
+=item B<-focuscolumn> => I<index>
+
+Specify the column to receive the input focus when the SMListbox 
+receives focus.  This is useful if the first column is not the one 
+of primary interest to the user, since only one column will 
+show the active row cursor because the underlying Tk::Listbox 
+widgets only show the active row cursor when they have the focus.  
+
+NOTE:  none of this applies if B<-nocolumnfocus> is set, which 
+also has the side effect of disabling most keyboard bindings on 
+the SMListbox.  Default:  I<0> (The first column will get the 
+focus and show the active row cursor (usually an I<underline>).
+
+=item B<-headerbackground> => I<color>
+
+Specify a different background color for the top ("header") row.
+Default:  B<-background> or parent window's background.
+ 
+=item B<-headerforeground> => I<color>
+
+Specify a different foreground color for the top ("header") row.
+Default:  B<-foreground> or parent window's foreground.
+ 
+=item B<-moveable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to move
 the columns by dragging the column headers. B<0> disables this
-function.
+function.  Default:  B<1>.
 
-Default: B<1>
+=item B<-nocolumnfocus> => I<boolean>
 
-=item -resizeable => I<boolean>
+Prevents the SMListbox widget from giving the keyboard focus to 
+a specific column.  The net effect of this option being set is 
+that the widget itself takes focus, but many keyboard bindings 
+will not work, namely selecting rows with the spacebar.  
+Default:  I<0> (Take focus normally and give the 
+focus to one of the column listboxes under the hood so that 
+row-based keyboard bindings will all work properly).  To have 
+the SMListbox widget itself be skipped in the focus order, set 
+B<-takefocus> to I<0>.
+
+=item B<-resizeable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to resize
 the columns by dragging the column separators. B<0> disables 
-this function.
-
-Default: B<1>
+this function.  Default:  B<1>.
 
 Note that you can also specify -resizeable on a column
 by column basis. See the B<COLUMNS> section below.
 
-=item -selectmode => I<string>
+=item B<-selectmode> => I<string>
 
 Should be "single", "browse", "multiple", or "extended".
+Default:  B<"browse">.  See L<Tk::Listbox>.
 
-Default is "browse". See L<Tk::Listbox>.
-
-=item -separatorcolor => I<string>
+=item B<-separatorcolor> => I<string>
 
 Specifies the color of the separator lines 
 (the vertical lines that separates the columns). 
-
-Default: B<black>
+Default:  B<black>.
 
 Note that you can also specify -separatorcolor on a column
 by column basis. See the B<COLUMNS> section below.
 
-=item -separatorwidth => I<integer>
+=item B<-separatorwidth> => I<integer>
 
 Specifies the width in pixels of the separator lines 
 (the vertical lines that separates the columns). 
-
-Default: B<1>
+Default:  B<1>.
 
 Note that you can also specify -separatorwidth on a column
 by column basis. See the B<COLUMNS> section below.
 
-=item -sortable => I<boolean>
+=item B<-sortable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to sort
 the data by clicking column headings. B<0> disables this function.
-
-Default: B<1>
+Default:  B<1>.
 
 Note that you can also specify -sortable on a column
 by column basis. See I<COLUMNS> below.
 
 =back
 
+=head1 WIDGET SPECIFIC, COLUMN-SPECIFIC OPTIONS
+
+=over 4
+
+=item B<-comparecmd> => I<callback>
+
+Specifies a callback to use when sorting the SMListbox with this
+column as key. The callback will be called with two scalar arguments,
+each a value from this particular column. The callback should 
+return an integer less than, equal to, or greater than 0, depending
+on how the tow arguments are ordered. If for example the column
+should be sorted by numerical value:
+
+    -comparecommand => sub { $_[0] <=> $_[1]}
+
+Default:  B<sub { $_[0] cmp $_[1] }>  #(Ascending by string)
+
+=item B<-reversearrow> => 0 | 1
+
+New option (not included with the old Tk::MListbox) that 
+causes the up / down direction of the sort arrow in the 
+column header that shows the direction the sorted-by 
+column is currently sorted.  Default:  B<0> (zero): (Up-arrow) 
+if sorted in ascending order, Down-arrow if in 
+descending order.  Setting to 1 reverses this.  This is 
+often necessary to show desired results, ie. if the sort 
+function is reversed, such as:  sub { $_[1] cmp $_[0] } 
+
+=back
+
 =head1 SMListbox COLUMN CONFIGURATION
 
-The SMListbox widget is a collection of I<MLColumn> widgets. 
-Each MLColumn contains a Listbox, a heading and the separator bar.
+NOTE:  See also the additional options described in the previous 
+section "WIDGET SPECIFIC COLUMN-SPECIFIC OPTIONS".
+
+The SMListbox widget is a collection of I<SMLColumn> widgets. 
+Each SMLColumn contains a Listbox, a heading and the separator bar.
 The columns are created and maintained through the -columns 
 option or the column methods of the widget. The columns are indexed
 from 0 and up. Initially, column 0 is the leftmost column of the
@@ -168,7 +237,7 @@ are to call columnInsert(), columnDelete() or configure(-column).
 
 Each column has its own set of options which might be passed to 
 SMListbox::configure(-columns), SMListbox::insert(),
-SMListbox::columnConfigure() or MLColumn::configure().
+SMListbox::columnConfigure() or SMLColumn::configure().
 
 The following code snippets are all equal:
 
@@ -195,66 +264,76 @@ The following code snippets are all equal:
 All column methods expects one or two column indices as arguments.
 The column indices might be an integer (between 0 and the number
 of columns minus one), 'end' for the last column, or a reference
-to the MLColumn widget (obtained by calling SMListbox->columnGet() 
+to the SMLColumn widget (obtained by calling SMListbox->columnGet() 
 or by storing the return value from SMListbox->columnInsert()).
 
 =head1 WIDGET METHODS
 
 =over 4
 
-=item $sml->compound([left|right|top|bottom])
+=item $sml->B<compound>(I<[left|right|top|bottom]>)
 
 Gets / sets the side of the column header that the 
 ascending / descending arrow is to appear (left, right, top, 
-bottom), default is "right".
+bottom).  Default:  I<"right">.
 
-=item $sml->focusColumn([index])
+=item $sml->B<focusColumn>([index])
 
 Gets or sets the index of the column whose listbox is to receive 
 the keyboard focus when the SMListbox widget receives keyboard 
-focus and using JWT's HACKED Listbox widget.  This is useful 
-so that the "underline" will show on the element the keyboard 
-cursor is on when navigating the widget using the Control-
-Up and Down arrow keys to make multiple selections in "Extended" 
+focus.  This is useful so that the I<"underline"> will show on the 
+element the keyboard cursor is on when navigating the widget using 
+the Up and Down arrow keys to make multiple selections in "Extended" 
 mode using the keyboard.  The first (leftmost) column listbox 
 gets the focus by default, but this option allows a different 
 column to get the keyboard focus, if a different column has 
 better, ie. wider and easier to see text values.  This is 
 because the underline only appears under non-blank text, rather 
-than the width of the column.  Requires version 2 or higher.
+than the width of the column, and only when the underlying 
+Tk::Listbox itself has the focus.  Requires version 2 or higher.
 
-=item $sml->getSortOrder() 
+NOTE:  none of this applies if B<-nocolumnfocus> is set, which 
+also has the side effect of disabling most keyboard bindings on 
+the SMListbox.  
+
+=item $sml->B<getSortOrder>() 
 
 returns an array that is in the same format accepted by the 
 $smListBox->sort method.  The 1st element is 
 either true for descending sort, false for assending.  
 Subsequent elements represent the column indices of one or 
 more columns by which the data is sorted.
+Default (if nothing previously set):  B<(0, 0)>.
 
-=item $sml->setButtonHeight([pady])
+=item $hml->B<setSortOrder>(I<descending>, I<columnindex>...) 
+
+Sets the default sort order and columns to sort without actually 
+sorting.  The arguments are the same as the sort() function.
+
+=item $sml->B<setButtonHeight>([I<pady>])
 
 Sets (alters) the "-pady" value for the header buttons.  
 Should be called AFTER all columns have been created.  
 Requires version 2 or higher.
 
-=item $sml->showallsortcolumns([1|0])
+=item $sml->B<showallsortcolumns>([I<1|0>])
 
 Gets or sets whether a sort direction arrow is to be displayed 
 on each column involved in the sorting or just the 1st 
-(primary sort).  Default is 0 (false) - show arrow only on the 
+(primary sort).  Default:  B<0> (false) - show arrow only on the 
 primary sort column.
 
-=item $sml->bindColumns(I<sequence>,I<callback>)
+=item $sml->B<bindColumns>(I<sequence>,I<callback>)
 
 Adds the binding to all column headers in the widget. See the section
 BINDING EVENTS TO SMListbox below.
 
-=item $sml->bindRows(I<sequence>,I<callback>)
+=item $sml->B<bindRows>(I<sequence>,I<callback>)
 
 Adds the binding to all listboxes in the widget. See the section
 BINDING EVENTS TO SMListbox below.
 
-=item $sml->bindSeparators(I<sequence>,I<callback>)
+=item $sml->B<bindSeparators>(I<sequence>,I<callback>)
 
 Adds the binding to all separators in the widget. See the section
 BINDING EVENTS TO SMListbox below.
@@ -268,16 +347,16 @@ in the SMListbox widget)
 
 =over 4
 
-=item $sml->columnConfigure(I<index>,I<option>=>I<value>...)
+=item $sml->B<columnConfigure>(I<index>,I<option>=>I<value>...)
 
 Set option values for a specific column.
 Equal to $sml->columnGet(I<index>)->configure(...).
 
 The following column options are supported:
 
-=item
+=over 4
 
--comparecommand => I<callback>
+=item B<-comparecommand> => I<callback>
 
 Specifies a callback to use when sorting the SMListbox with this
 column as key. The callback will be called with two scalar arguments,
@@ -290,44 +369,44 @@ should be sorted by numerical value:
 
 The default is to sort the columns alphabetically.
 
-=item
-
--text => I<string>
+=item B<-text> => I<string>
 
 Specifies the text to be used in the heading button of the column.
 
-=item
-
--resizeable => I<boolean>
+=item B<-resizeable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to resize
 this column by dragging the separator. B<0> disables this function.
+Default:  B<1>.
 
-Default: B<1>
+=item B<-separatorcolor> => I<string>
 
-=item
+Specifies the color of the separator line.  Default:  B<black>.
 
--separatorcolor => I<string>
+=item B<-separatorwidth> => I<integer>
 
-Specifies the color of the separator line, default is B<black>.
+Specifies the width of the separator line in pixels.  Default:  B<1>.
 
-=item
-
--separatorwidth => I<integer>
-
-Specifies the width of the separator line in pixels. Default is B<1>.
-
-=item
-
--sortable => I<boolean>
+=item B<-sortable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to sort
 the data by clicking this column's heading. B<0> disables this 
-function.
+function.  Default:  B<1>.
 
-Default: B<1>
+=item B<-reversearrow> => 0 | 1
 
-=item $sml->columnDelete(I<first>,I<last>)
+New option (not included with the old Tk::MListbox) that 
+causes the up / down direction of the sort arrow in the 
+column header that shows the direction the sorted-by 
+column is currently sorted.  Default:  B<0> (zero) - (Up-arrow 
+if sorted in ascending order, Down-arrow if in 
+descending order.  Setting to 1 reverses this.  This is 
+often necessary to show desired results, ie. if the sort 
+function is reversed, such as:  sub { $_[1] cmp $_[0] } 
+
+=back
+
+=item $sml->B<columnDelete>(I<first>,I<last>)
 
 If I<last> is omitted, deletes column I<first>. If I<last> is
 specified, deletes all columns from I<first> to I<last>, inclusive.
@@ -336,13 +415,13 @@ All previous column indices greater than I<last> (or I<first> if
 I<last> is omitted) are decremented by the number of columns 
 deleted.
 
-=item $sml->columnGet(I<first>,I<last>)
+=item $sml->B<columnGet>(I<first>,I<last>)
 
-If I<last> is not specified, returns the MLColumn widget specified by I<first>.
+If I<last> is not specified, returns the SMLColumn widget specified by I<first>.
 If both I<first> and I<last> are specified, returns an array containing all
 columns from I<first> to I<last>.
 
-=item $sml->columnHide(I<first>,I<last>)
+=item $sml->B<columnHide>(I<first>,I<last>)
 
 If I<last> is omitted, hides column I<first>. If I<last> is
 specified, hides all columns from I<first> to I<last>, inclusive.
@@ -353,11 +432,11 @@ and the column indices remain the same.
 
 See also the columnShow() method below.
 
-=item $sml->columnIndex(I<index>)
+=item $sml->B<columnIndex>(I<index>)
 
 Returns an integer index for the column specifed by I<index>.
 
-=item $sml->columnInsert(I<index>,I<option>=>I<value>...)
+=item $sml->B<columnInsert>(I<index>,I<option>=>I<value>...)
 
 Creates a new column in the SMListbox widget. The column will 
 get the index specified by I<index>. If I<index> is 'end', the
@@ -368,11 +447,11 @@ If column I<index> exists, the new column will be placed
 to the B<left> of this column. All previous column indices 
 equal to or greater than I<index> will be incremented by one.
 
-Returns the newly created MLColumn widget.
+Returns the newly created SMLColumn widget.
 
 (See the columnConfigure() method above for details on column options).
 
-=item $sml->columnPack(I<array>)
+=item $sml->B<columnPack>(I<array>)
 
 Repacks all columns in the SMListbox widget according to the 
 specification in I<array>. Each element in I<array> is a string
@@ -384,7 +463,7 @@ Columns not specified in I<array> will be hidden.
 This method is most useful if used together with the 
 columnPackInfo() method.
 
-=item $sml->columnPackInfo
+=item $sml->B<columnPackInfo>()
 
 Returns an array describing the current layout of the SMListbox
 widget. Each element of the array is a string on the format
@@ -395,7 +474,7 @@ in the returned array represents the leftmost column.
 This method may be used in conjunction with columnPack() to save
 and restore the column configuration. 
 
-=item $sml->columnShow(I<index>,I<option>=>I<value>)
+=item $sml->B<columnShow>(I<index>,I<option>=>I<value>)
 
 Shows a hidden column (see the columnHide() method above). 
 The column to show is specified by I<index>.
@@ -404,16 +483,12 @@ By default, the column is pack'ed at the rigthmost end of the
 SMListbox widget. This might be overridden by specifying one of
 the following options:
 
-=item 
-
--after => I<index>
+=item B<-after> => I<index>
 
 Place the column B<after> (to the right of) the column specified
 by I<index>.
 
-=item 
-
--before => I<index>
+=item B<-before> => I<index>
 
 Place the column B<before> (to the left of) the column specified
 by I<index>.
@@ -429,14 +504,14 @@ arguments. See L<Tk::Listbox> for a description of row indices.
 
 =over 4
 
-=item $sml->delete(I<first>,I<last>)
+=item $sml->B<delete>(I<first>,I<last>)
 
 Deletes one or more row elements of the SMListbox. I<First> and I<last>
 are indices specifying the first and last elements in the range to 
 delete. If I<last> isn't specified it defaults to I<first>, 
 i.e. a single element is deleted. 
 
-=item $sml->get(I<first>,I<last>)
+=item $sml->B<get>(I<first>,I<last>)
 
 If I<last> is omitted, returns the content of the SMListbox row
 indicated by I<first>. If I<last> is specified, the command returns
@@ -446,7 +521,7 @@ I<first> and I<last>.
 The returned elements are all array references. The referenced
 arrays contains one element for each column of the SMListbox.
 
-=item $sml->getRow(I<index>)
+=item $sml->B<getRow>(I<index>)
 
 In scalar context, returns the value of column 0 in the SMListbox
 row specified by I<index>. In list context, returns the content
@@ -462,11 +537,11 @@ The following two code snippets are equal:
    2. @row=@{($sml->get(0))[0]};
 
 
-=item $sml->sort(I<descending>, I<columnindex>...)
+=item $sml->B<sort>(I<descending>, I<columnindex>...)
 
 Sorts the content of the SMListbox. If I<descending> is a B<true> 
-value, the sort order will be descending. The default is ascending
-sort.
+value, the sort order will be descending.  Default is  B<0> - ascending
+sort on B<first> column (0).
 
 If I<columnindex> is specified, the sort will be done with the 
 specified column as key. You can specify as many I<columnindex>
@@ -496,23 +571,23 @@ In stead of the ordinary bind, the following methods should be used:
 
 =over 4
 
-=item $sml->bind(I<sequence>,I<callback>)
+=item $sml->B<bind>(I<sequence>,I<callback>)
 
-Synonym for $sml->bindRows(I<sequence>,I<callback>).
+Synonym for $sml->B<bindRows>(I<sequence>,I<callback>).
 
-=item $sml->bindRows(I<sequence>,I<callback>)
+=item $sml->B<bindRows>(I<sequence>,I<callback>)
 
-Synonym for $sml->bindSubwidgets('listbox',I<sequence>,I<callback>)
+Synonym for $sml->B<bindSubwidgets>('listbox',I<sequence>,I<callback>)
 
-=item $sml->bindColumns(I<sequence>,I<callback>)
+=item $sml->B<bindColumns>(I<sequence>,I<callback>)
 
-Synonym for $sml->bindSubwidgets('heading',I<sequence>,I<callback>)
+Synonym for $sml->B<bindSubwidgets>('heading',I<sequence>,I<callback>)
 
-=item $sml->bindSeparators(I<sequence>,I<callback>)
+=item $sml->B<bindSeparators>(I<sequence>,I<callback>)
 
-Synonym for $sml->bindSubwidgets('separator',I<sequence>,I<callback>)
+Synonym for $sml->B<bindSubwidgets>('separator',I<sequence>,I<callback>)
 
-=item $sml->bindSubwidgets(I<subwidget>,I<sequence>,I<callback>)
+=item $sml->B<bindSubwidgets>(I<subwidget>,I<sequence>,I<callback>)
 
 Adds the binding specified by I<sequence> and I<callback> to all subwidgets
 of the given type (should be 'listbox', 'heading' or 'separator'). 
@@ -544,6 +619,16 @@ current binding for sequence is destroyed, leaving sequence unbound.
 An empty string is returned.
 
 An empty string is returned in all other cases.
+
+=back
+
+=head1 KEYWORDS
+
+smlistbox, mlistbox, listbox, widget
+
+=head1 SEE ALSO
+
+L<Tk::MListbox> L<Tk::Listbox>
 
 =cut
 
@@ -595,58 +680,67 @@ An empty string is returned in all other cases.
 ##
 ## This module contains four classes. Of the four MListbox is
 ## is the only one intended for standalone use, the other three:
-## CListbox, MLColumn, HButton are accessible as Subwidgets, but
+## SMCListbox, SMLColumn, SMHButton are accessible as Subwidgets, but
 ## not intended to be used in any other way other than as 
 ## components of MListbox
 ##
 ##############################################################################
-## CListbox is similar to an ordinary listbox, but with the following 
+## SMCListbox is similar to an ordinary listbox, but with the following 
 ## differences:
 ## - Calls an -updatecommand whenever something happens to it.
 ## - Horizontal scanning is disabled, calls -xscancommand to let parent widget
 ##   handle this.
 
 {
-	package Tk::CListbox;
+	package Tk::SMListbox::SMCListbox;
 	use base qw(Tk::Derived Tk::Listbox);
 
-	Tk::Widget->Construct('CListbox');
+	Tk::Widget->Construct('SMCListbox');
 
 	sub Populate {
 		my ($w, $args) = @_;
 		$w->SUPER::Populate($args);
 		$w->ConfigSpecs(
-				-background    => [qw/SELF background Background/, $Tk::NORMAL_BG],
-				-foreground    => [qw/SELF foreground Foreground/, $Tk::NORMAL_FG],
 				-updatecommand => ['CALLBACK'],
 				-xscancommand  => ['CALLBACK'],
 		);
 	}
 
-	sub selectionSet {
+	sub selectionSet {   #JWT:NOTE:Callback->can() EATS 1ST ARGUMENT, SO WE MUST *NOT* SHIFT @_!!!
 		my ($w) = @_;
 		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::selectionSet'),@_);
 	}
+
 	sub selectionClear {
-		my ($w)=@_;
+		my ($w) = @_;
 		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::selectionClear'),@_);
 	}
+
 	sub selectionAnchor {
-		my ($w)=@_;
+		my ($w) = @_;
 		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::selectionAnchor'),@_);
 	}
+
 	sub activate {
-		my ($w)=@_;
+		my ($w) = @_;
 		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::activate'),@_);
 	}
+
 	sub see {
-		my ($w)=@_;
+		my ($w) = @_;
 		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::see'),@_);
 	}
+
 	sub yview {
-		my ($w)=@_;
-		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::yview'),@_);     
+#?		my ($w) = @_;
+#?		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::yview'),@_);     
+		my ($w) = @_;  #JWT:NOTE:Callback->can() EATS 1ST ARGUMENT, SO WE MUST *NOT* SHIFT @_!!!
+		@args = @_;
+		shift @args;   #JWT:NOTE:WE DO SHIFT THE MODULE OFF BEFORE CALLING yview, ETC. DIRECTLY!
+		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::yview'),@_);
+		$w->Tk::Listbox::yview  unless (@args);   #JWT:REQUIRED BY _yscrollCallback!
 	}
+
 	sub scan {
 		my ($w,$type,$x,$y) = @_;
 		# Disable horizontal scanning.
@@ -658,23 +752,28 @@ An empty string is returned in all other cases.
 		);
 		$w->Callback(-xscancommand=>$type,$x);
 	}
+
 	sub SpaceSelect
 	{
-		my $w = shift;
-		eval { $w->Tk::Listbox::SpaceSelect(@_); };
-		return  unless ($@);
-		$w->BeginSelect(@_);
+		my ($w) = @_;
+		eval { shift; $w->Tk::Listbox::SpaceSelect(@_); };
+	}
+
+	sub CtrlPriorNext
+	{
+		my ($w) = @_;
+		$w->Callback(-updatecommand=>$w->can('Tk::Listbox::CtrlPriorNext'),@_);
 	}
 }
 
 ##############################################################################
-## HButton is like an ordinary Button, but with an addition option:
+## SMHButton is like an ordinary Button, but with an addition option:
 ## -pixelwidth
 ## The new configure method makes sure the pixelwidth is always retained.
 {
-	package Tk::HButton;
+	package Tk::SMListbox::SMHButton;
 	use base qw(Tk::Derived Tk::Button);   
-	Tk::Widget->Construct('HButton');
+	Tk::Widget->Construct('SMHButton');
 
 	sub Populate {
 		my ($w, $args) = @_;
@@ -701,24 +800,26 @@ An empty string is returned in all other cases.
 }
 
 ###############################################################################
-## MLColumn implements a single column in the SMListbox. MLColumn is a composite
-## containing a heading (an HButton), a listbox (CListbox) and a frame which  
+## SMLColumn implements a single column in the SMListbox. SMLColumn is a composite
+## containing a heading (an SMHButton), a listbox (SMCListbox) and a frame which  
 ## frame which serves as a draggable separator 
 {
-	package Tk::MLColumn;
+	package Tk::SMListbox::SMLColumn;
 	use base qw(Tk::Frame);
-	Tk::Widget->Construct('MLColumn');
+	Tk::Widget->Construct('SMLColumn');
 
 	sub Populate {
 		my ($w, $args) = @_;
 		my $undln = delete($args->{'-underline'});
 		$w->SUPER::Populate($args);
+		my $hdrBG = $args->{'-headerbackground'} || $args->{'-background'} || undef;
+		my $hdrFG = $args->{'-headerforeground'} || $args->{'-foreground'} || undef;
 
-		## MLColumn Components
+		## SMLColumn Components
 		## $sep - separator - Frame
-		## $hdr - heading    - HButton
+		## $hdr - heading    - SMHButton
 		## $f   - frame     - Frame    
-		## $lb  - listbox   - CListbox
+		## $lb  - listbox   - SMCListbox
 
 		my $sep = $w->Component(
 				Frame   => 'separator',
@@ -732,64 +833,68 @@ An empty string is returned in all other cases.
 
 		my $f = $w->Component(
 				Frame => "frame"
-		)->pack(qw/-side left -anchor e -fill y -expand 1/);
+		)->pack(qw/-side left -anchor n -fill both -expand 1/);
 
 		my $hdr;		if (defined $undln) { 
 		
-			$hdr = $f->HButton(
+			$hdr = $f->SMHButton(
 					-takefocus=>0,
 					-padx=>0,
 					-width=>1,
 					-borderwidth=>2,
 					-underline=>$undln,
 					-highlightthickness=>0
-			)->pack(qw/-side top -anchor n -fill x/);
-		} else 
-		
-		{
-			$hdr = $f->HButton(
+			)->pack(qw/-side top -anchor n -fill x -expand 0/);
+		} else {
+			$hdr = $f->SMHButton(
 					-takefocus=>0,
 					-padx=>0,
 					-width=>1,
 					-borderwidth=>2,
 					-highlightthickness=>0
-			)->pack(qw/-side top -anchor n -fill x/);
+			)->pack(qw/-side top -anchor n -fill x -expand 0/);
 		}
 		$w->Advertise("heading" => $hdr);
 
-		my $lb = $f->CListbox(
+		my $lb = $f->SMCListbox(
 				-highlightthickness=>0,
 				-relief=>'flat',
 				-bd=>0,
 				-exportselection=>0,
-				-takefocus=>0
+				-takefocus=>0,
+#DECIDED TO LEAVE UNDERLINED:				-activestyle => 'dotbox',
 		)->pack(qw/-side top -anchor n -expand 1 -fill both/);
 		$w->Advertise("listbox" => $lb);
 
 		$w->Delegates (DEFAULT => $lb);
 
-
-
+		my $bgWidgets = $hdrBG ? [$f, $lb] : [$f, $hdr, $lb];
+		my $fgWidgets = $hdrFG ? [$f, $lb] : [$f, $hdr, $lb];
 		$w->ConfigSpecs(
-				-background     => [[$f, $hdr, $lb], 
-				qw/background Background/, $Tk::NORMAL_BG],
+#				-background     => [[$f, $hdr, $lb], 
+				-background     => [$bgWidgets,
+						qw/background Background/, $Tk::NORMAL_BG],
 				-comparecommand => ['CALLBACK', undef, undef,
-				sub{$_[0] cmp $_[1]}],
+						sub{$_[0] cmp $_[1]}],
 				-configurecommand => ['CALLBACK'],
 
 				-font           => [[$hdr, $lb], qw/font Font/, undef],
-				-foreground     => [[$hdr, $lb],
-				qw/foreground Foreground/, $Tk::NORMAL_FG],
+#				-foreground     => [[$hdr, $lb],
+				-foreground     => [$fgWidgets,
+						qw/foreground Foreground/, $Tk::NORMAL_FG],
+				-headerbackground => [qw/PASSIVE headerBackground HeaderBackground/, $hdrBG],
+				-headerforeground => [qw/PASSIVE headerForeground HeaderForeground/, $hdrFG],
 				-separatorwidth => [{-width => $sep}, 
-				qw/separatorWidth Separator 1/],
+						qw/separatorWidth Separator 1/],
 				-separatorcolor => [{-background => $sep}, 
-				qw/sepaatorColor Separator black/],
+						qw/sepaatorColor Separator black/],
 				-resizeable     => [qw/METHOD resizeable Resizeable 1/],
 				-sortable       => [qw/PASSIVE sortable Sortable 1/],
 				-text           => [$hdr],
 				-compound       => [[$hdr], 'compound', 'compound', 'right'],
 				-updatecommand  => [$lb],
 				-textwidth      => [{-width => [$lb, $hdr]}],
+				-reversearrow   => [qw/PASSIVE reversearrow reversearrow 0/],
 				DEFAULT         => [$lb]
 		);
 		$w->ConfigAlias(
@@ -797,10 +902,12 @@ An empty string is returned in all other cases.
 				-width      => '-textwidth'
 		);
 
+		$hdr->configure('-background' => $hdrBG)  if ($hdrBG);
+		$hdr->configure('-foreground' => $hdrFG)  if ($hdrFG);
 	}
 
 ######################################################################
-## MLColumn Configuration methods (call via configure/cget). 
+## SMLColumn Configuration methods (call via configure/cget). 
 ######################################################################
 
 	sub resizeable {
@@ -813,8 +920,7 @@ An empty string is returned in all other cases.
 	}
 
 	sub compare {
-		my ($w,$a,$b) = @_;
-		$w->Callback(-comparecommand => $a, $b);
+		shift->Callback(-comparecommand => $_[0], $_[1]);
 	}
 
 	sub setWidth {
@@ -829,7 +935,7 @@ An empty string is returned in all other cases.
 	}
 
 ######################################################################
-## MLColumn Private  methods (Do not depend on these methods being present)
+## SMLColumn Private  methods (Do not depend on these methods being present)
 ######################################################################
 
 	sub _setButtonHeight {
@@ -844,7 +950,7 @@ An empty string is returned in all other cases.
 		$w->setWidth($w->pointerx - $w->rootx);
 	}
 
-} ## END PRELOADING OF MLColumn
+} ## END PRELOADING OF SMLColumn
 
 ######################################################################
 ## Package: Tk::SMListbox
@@ -859,7 +965,7 @@ package Tk::SMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '2.1';
+$VERSION = '2.12';
 
 use Tk;
 
@@ -928,16 +1034,25 @@ sub ClassInit {
 	$mw->bind($class,'<Control-slash>','_selectAll');
 	$mw->bind($class,'<Control-backslash>','_deselectAll');
 	$mw->bind($class,'<FocusIn>','focus');
+	$mw->bind($class,'<Escape>', '_Cancel'); 
+	$mw->bind($class, '<Home>',  ['_chgView','xview','moveto',0]);
+	$mw->bind($class, '<End>',   ['_chgView','xview','moveto',1]);
+	$mw->bind($class, '<Prior>',  ['_chgView','yview','scroll',-1,'pages']);
+	$mw->bind($class, '<Next>',   ['_chgView','yview','scroll',1,'pages']);
+	$mw->bind($class, '<Control-Prior>', ['CtrlPriorNext',-1]);
+	$mw->bind($class, '<Control-Next>', ['CtrlPriorNext',1]);
+ $mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
+ $mw->bind($class,'<Select>',['SpaceSelect',Ev('index','active')]);
 
 	my $downArrowBits = pack("b10"x10,
 			"..........",
 			"..........",
 			"..........",
 			".#########",
-	"..#######.",
-	"...#####..",
-	"....###...",
-	".....#....",
+			"..#######.",
+			"...#####..",
+			"....###...",
+			".....#....",
 			"..........",
 			".........."
 	);
@@ -948,10 +1063,10 @@ sub ClassInit {
 			"..........",
 			".....#....",
 			"....###...",
-	"...#####..",
-	"..#######.",
-	".#########",
-	"..........",
+			"...#####..",
+			"..#######.",
+			".#########",
+			"..........",
 			".........."
 	);
 	$mw->DefineBitmap('uparrow' => 10,10, $upArrowBits);
@@ -996,7 +1111,7 @@ sub Populate {
 
 #    $w->SUPER::Populate($args);   
 
-	$w->{'_columns'} = [];          ## Array of MLColumn objects 
+	$w->{'_columns'} = [];          ## Array of SMLColumn objects 
 	$w->{'_sortcol'} = -1;          ## Column used for sorting
 	$w->{'_sortcolumns'} = [];
 	$w->{'_sort_descending'} = 0;   ## Flag for ascending/desc. sort order
@@ -1015,12 +1130,16 @@ sub Populate {
 		$font = "Helvetica -12 bold";
 	}
 
+	my $hdr = $w->Subwidget('heading');
+
 	$w->ConfigSpecs(
-			-background        => [qw/METHOD background Background/, $TK::NORMAL_BG ],
+			-background        => [qw/METHOD background Background/, $Tk::NORMAL_BG ],
 			-columns           => [qw/METHOD/],
 			-configurecommand  => [qw/CALLBACK/],
 			-font              => [qw/METHOD font Font/, $font],
 			-foreground        => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG ],
+			-headerbackground  => [qw/METHOD background Background/, $Tk::NORMAL_BG ],
+			-headerforeground  => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG ],
 			-height            => [qw/METHOD height Height 10/],
 			-moveable          => [qw/PASSIVE moveable Moveable 1/],
 			-resizeable        => [qw/METHOD resizeable Resizeable 1/],
@@ -1031,6 +1150,7 @@ sub Populate {
 			-compound          => [qw/METHOD compound compound right/],
 			-showallsortcolumns      => [qw/METHOD showallsortcolumns showallsortcolumns 0/],
 			-jwtlistboxhack    => [qw/PASSIVE jwtlistboxhack jwtlistboxhack 0/],
+			-fillcolumn        => [qw/PASSIVE fillcolumn fillColumn -1/],
 			-focuscolumn       => [qw/PASSIVE focuscolumn focusColumn -1/],
 			-nocolumnfocus     => [qw/PASSIVE nocolumnfocus nocolumnfocus 0/],
 			-separatorcolor    => [qw/METHOD separatorColor Separator black/],
@@ -1057,6 +1177,14 @@ sub getSortOrder {   #JWT:  ADDED THIS METHOD TO FETCH HOW THE LIST IS SORTED!
 
 	my @l = scalar(@{$w->{'_sortcolumns'}}) ? @{$w->{'_sortcolumns'}} : (0);
 	return ($w->{'_sort_descending'}||0, @l);
+}
+
+sub setSortOrder {   #JWT:  ADDED THIS METHOD TO FETCH HOW THE LIST IS SORTED!
+	my $w = shift;
+	my ($sOrder, @sColumns) = @_;
+
+	$w->{'_sort_descending'} = $sOrder;
+	$w->{'_sortcolumns'} = [@sColumns]  if (defined $sColumns[0]);
 }
 
 ######################################################################
@@ -1100,6 +1228,8 @@ sub columns {
 
 sub font              { shift->_configureColumns('-font', @_) }
 sub foreground        { shift->_configureColumns('-foreground', @_) }
+sub headerbackground  { shift->_configureColumns('-headerbackground', @_);  }
+sub headerforeground  { shift->_configureColumns('-headerforeground', @_);  }
 sub height            { shift->_configureColumns('-height', @_) }
 sub resizeable        { shift->_configureColumns('-resizeable', @_) }
 sub selectbackground  { shift->_configureColumns('-selectbackground', @_) }
@@ -1126,14 +1256,17 @@ sub showallsortcolumns {    #JWT:  ADDED THIS METHOD TO ALLOW USER TO DYNAMICALL
 		return $w->{'-showallsortcolumns'};
 	}
 }
-sub focusColumn {    #JWT:ALLOW A SPECIFIED COLUMN'S LISTBOX GET FOCUS SO THAT KEYBOARD CURSOR "UNDERSCORE" MAY BECOME (MORE) VISIBLE:
+sub columnFocus {    #JWT:ALLOW A SPECIFIED COLUMN'S LISTBOX GET FOCUS SO THAT KEYBOARD CURSOR "UNDERSCORE" MAY BECOME (MORE) VISIBLE:
 	my $w = shift;	
 
 	if ($w->cget('-nocolumnfocus') != 1 && scalar(@_) > 0) { 
-		$w->{'-focuscolumn'} = $_[0]  if ($_[0] =~ /\d/o);
+		$w->{Configure}{'-focuscolumn'} = $_[0]  if ($_[0] =~ /\d/o);
 	} else {
-		return $w->{'-focuscolumn'};
+		return $w->{Configure}{'-focuscolumn'};
 	}
+}
+sub focusColumn {    #JWT:DEPRECIATED:USE columnFocus!
+	return shift->columnFocus(@_)
 }
 sub setButtonHeight {  #JWT:ALLOW USER TO SET HEIGHT OF BUTTONS (-pady):
 	my $w = shift;
@@ -1212,7 +1345,7 @@ sub _bindSubwidgets {
 	my @args = ('_bindCallback', $callback);
 	foreach (@{$w->{'_columns'}}) {
 		my $sw = $_->Subwidget($subwidget);
-		if ($sw->class ne "CListbox") {
+		if ($sw->class ne "SMCListbox") {
 			$sw->Tk::bind($sequence, [$w => @args, $sw, $col++]);
 		} else {
 			$sw->Tk::bind($sequence, [$w => @args, $sw, $col++, Ev('y')]);
@@ -1222,15 +1355,14 @@ sub _bindSubwidgets {
 	return '';
 }
 
-## handles config options that should be propagated to all MLColumn 
+## handles config options that should be propagated to all SMLColumn 
 ## subwidgets. Using the DEFAULT setting in ConfigSpecs would be one 
 ## idea, but the pane subwidget is also a child, and Pane will not 
 ## be able to handle many of the options being passed to this method.
 
 sub _configureColumns {
 	my ($w, $option, $value) = @_;
-	return $w->{Configure}{$option}
-	unless $value;
+	return $w->{Configure}{$option}  unless $value;
 
 	foreach (@{$w->{'_columns'}}) {
 		$_->configure("$option" => $value);
@@ -1240,6 +1372,12 @@ sub _configureColumns {
 sub _cntrlEnd  { shift->_firstVisible->Cntrl_End; }
 
 sub _cntrlHome { shift->_firstVisible->Cntrl_Home; }
+
+sub _chgView { 
+	my ($w, $fn, @args) = @_;
+	my $code = "\$w->$fn('".join("','",@args)."')";
+	eval $code;
+}
 
 sub _dataExtend {
 	my ($w, $el) = @_;
@@ -1302,7 +1440,7 @@ sub _dragOrSort {
 	$tl->geometry(sprintf("%dx%d+%d+%d",
 	$h->width, $h->height, $h->rootx, $y_pos));
 
-	my $b=$tl->HButton
+	my $b=$tl->SMHButton
 	(map{defined($_->[4]) ? ($_->[0]=>$_->[4]) : ()} $h->configure)
 	->pack(-expand=>1,-fill=>'both');
 
@@ -1361,13 +1499,13 @@ sub _extendUpDown {
 }
 
 ## Many of the methods in this package are very similar in that they
-## delagate calls to the MLColumn widgets. Because widgets can be
+## delagate calls to the SMLColumn widgets. Because widgets can be
 ## be moved around (repacked) and hidden (packForget), any
 ## one widget may not be the "best" to be delegating calls to. The
 ## _columns variable holds an array of the columns but the order of 
 ## this array does not correspond to the order in which they might 
 ## by displayed, therefore this method is used to return the first
-## "visible" or packed MLColumn. RCS Note: It might be reasonable to
+## "visible" or packed SMLColumn. RCS Note: It might be reasonable to
 ## make this a public method as it could conceivably useful to someone
 ## who might want to subclass this widget or use their own bindings.
 sub _firstVisible {
@@ -1391,7 +1529,7 @@ sub _getEntryFromY {
 }
 
 ## Used to distribute method calls which would otherwise be called for
-## for one CListbox (Within a column), Each CListbox is a modified 
+## for one SMCListbox (Within a column), Each SMCListbox is a modified 
 ## Listbox whose methods end up passing the code and arguments that need
 ## to be called to this method where they are invoked for each column
 ## It's an interesting, although complex, interaction and it's worth 
@@ -1399,6 +1537,7 @@ sub _getEntryFromY {
 
 sub _motion    { shift->_firstVisible->Motion(@_) }
 sub _selectAll { shift->_firstVisible->SelectAll; }
+sub _Cancel { shift->_firstVisible->Cancel; }
 
 sub _selectionUpdate {
 	my ($w, $code, $l, @args) = @_;
@@ -1408,7 +1547,10 @@ sub _selectionUpdate {
 			&$code($_->Subwidget("listbox"), @args);
 		}
 	} else {
-		&$code($w->{'_columns'}->[0]->Subwidget("listbox"));
+#?		&$code($w->{'_columns'}->[0]->Subwidget("listbox"));
+		foreach (@{$w->{'_columns'}}) {
+			&$code($_->Subwidget("listbox"));
+		}
 	}
 }
 
@@ -1435,8 +1577,10 @@ sub _upDown { shift->_firstVisible->UpDown(@_) }
 sub _ctrlupDown   #JWT:TAKE ADVANTAGE OF PERSONAL LISTBOX HACK TO ALLOW MULTIPLE SELECTIONS IN "BROWSE" MODE VIA KEYBOARD (Ctrl-Up, Ctrl-Down, and Spacebar):
 {
 	my $w = shift;
-	if (defined($w->{'-jwtlistboxhack'}) && $w->{'-jwtlistboxhack'} == 1) {
-		$w->_firstVisible->Tk::Listbox::CtrlUpDown(@_);
+	if (defined($w->{Configure}{'-jwtlistboxhack'}) && $w->{Configure}{'-jwtlistboxhack'} == 1) {
+no warnings;
+		eval { $w->_firstVisible->Tk::Listbox::CtrlUpDown(@_); };
+use warnings;
 	} else {
 		$w->_firstVisible->UpDown(@_);
 	}
@@ -1471,21 +1615,22 @@ sub _yscrollCallback  {
 ## Activate a row
 sub activate { shift->_firstVisible->activate(@_)}
 
-## JWT:If using JWT's HACKED listbox, give one of them the focus SO WE CAN SEE THE 
-## UNDERLINED CURSOR when traversing via Ctrl-UpArrow|DownArrow!:
-
 sub focus
 {
-	my $w = shift;	
+	my $w = shift;
+
 	if (!$w->cget('-takefocus')) { 
 		$w->focusNext->focus(@_)  if (defined $w->focusNext);
-	} elsif (defined($w->{'-jwtlistboxhack'}) && $w->{'-jwtlistboxhack'} == 1 && $w->cget('-nocolumnfocus') != 1) { 
-		my $c = (defined($w->{'-focuscolumn'}) && $w->{'-focuscolumn'} >= 0)
-				? $w->columnGet($w->{'-focuscolumn'})  #User specified which one to get focus.
-				: $w->_firstVisible;                   #Default to 1st one visible if user did not pick one.
-		$c->Subwidget("listbox")->Tk::Listbox::focus(@_)  if (defined $c);
 	} else {
-		$w->Tk::focus(@_);
+		my $c = (defined($w->{Configure}{'-focuscolumn'}) && $w->{Configure}{'-focuscolumn'} >= 0)
+				? $w->columnGet($w->{Configure}{'-focuscolumn'})  #User specified which one to get focus.
+				: $w->_firstVisible; 
+                  #Default to 1st one visible if user did not pick one.
+		if (defined($c) && $w->cget('-nocolumnfocus') != 1) {
+			$c->Subwidget("listbox")->focus(@_)  if (defined $c);
+		} else {
+			$w->Tk::focus(@_);
+		}
 	}
 }
 
@@ -1525,12 +1670,12 @@ sub columnHide {
 	$last = $first unless defined $last;
 
 	for (my $i=$w->columnIndex($first); $i<=$w->columnIndex($last); $i++) {
-		$w->columnGet($i)->packForget;
+		eval { $w->columnGet($i)->packForget; };
 	}
 }
 
 ## Converts a column index to a numeric index. $index might be a number,
-## 'end' or a reference to a MLColumn widget (see columnGet). Note that
+## 'end' or a reference to a SMLColumn widget (see columnGet). Note that
 ## the index return by this method may not match up with it's current
 ## visual location due to columns being moved around
 
@@ -1545,7 +1690,7 @@ sub columnIndex {
 		}
 	} 
 
-	if (ref($index) eq "Tk::MLColumn") {
+	if (ref($index) eq "Tk::SMListbox::SMLColumn") {
 		foreach (0..$#{$w->{'_columns'}}) {
 			if ($index eq $w->{'_columns'}->[$_]) {
 				return $_;
@@ -1590,10 +1735,10 @@ sub columnInsert {
 	my %opts = ();
 
 	## Copy these options from the megawidget.
-	foreach (qw/-background -foreground -font -height 
+	foreach (qw/-background -foreground -headerbackground -headerforeground -font -height 
 			-resizeable -selectbackground -selectforeground 
 			-selectborderwidth -selectmode -separatorcolor
-			-separatorwidth -sortable -textwidth/) 
+			-separatorwidth -sortable -textwidth -reversearrow/) 
 	{
 		$opts{$_} = $w->cget($_) if defined $w->cget($_);
 	}
@@ -1606,15 +1751,17 @@ sub columnInsert {
 		$hotchar = $2;
 		$opts{'-underline'} = length($1);  #Cause the hotkey to be underlined in the column header button.
 	}
-	my $c = $w->Subwidget("pane")->MLColumn(%opts,       #Create the new column:
+	my $c = $w->Subwidget("pane")->SMLColumn(%opts,       #Create the new column:
 			-yscrollcommand  =>  [ $w => '_yscrollCallback'],
 			-configurecommand => [ $w => 'Callback', '-configurecommand', $w],
 			-xscancommand =>     [ $w => 'xscan' ],
 			-updatecommand =>    [ $w => '_selectionUpdate']
 	);
-	unless ($index || defined $w->{'-jwtlistboxhack'} || $w->cget('-nocolumnfocus') == 1)   { #JWT:If 1st column (now that we've created a listbox), see if we're using JWT's HACKED listbox:
+	unless ($index || defined $w->{Configure}{'-jwtlistboxhack'} || $w->cget('-nocolumnfocus') == 1)   { #JWT:If 1st column (now that we've created a listbox), see if we're using JWT's HACKED listbox:
+no warnings;
 		eval { $c->Subwidget("listbox")->Tk::Listbox::CtrlUpDown(0); };
-		$w->{'-jwtlistboxhack'} = $@ ? 0 : 1;  #eval succeeds if using JWT's hacked listbox!
+use warnings;
+		$w->{Configure}{'-jwtlistboxhack'} = $@ ? 0 : 1;  #eval succeeds if using JWT's hacked listbox!
 	}
 	## RCS: Review this later - questionable implementation
 	## Fill the new column with empty values, making sure all columns have
@@ -1693,14 +1840,17 @@ sub columnPackInfo {
 sub columnShow {
 	my ($w, $index, %args) = @_;
 
+	my $numericIndex = $w->columnIndex($index);
 	my $c = $w->columnGet($index);
-	my @packopts = (-anchor=>'w',-side=>'left',-fill=>'both');
+	my @packopts = ($numericIndex == $w->{Configure}{'-fillcolumn'})
+			? (-anchor=>'w',-side=>'left',-fill=>'both',-expand=>1)
+			: (-anchor=>'w',-side=>'left',-fill=>'both');
 	if (defined($args{'-before'})) {
 		push (@packopts, '-before'=>$w->columnGet($args{'-before'}));
 	} elsif (defined($args{'-after'})) {
 		push (@packopts, '-after'=>$w->columnGet($args{'-after'}));
 	}
-	$c->pack(@packopts);
+	eval { $c->pack(@packopts); };
 }
 
 sub curselection { shift->_firstVisible->curselection(@_)}
@@ -1744,7 +1894,6 @@ sub index { shift->_firstVisible->index(@_)}
 sub insert {
 	my ($w, $index, @data) = @_;
 	my ($rownum, $colnum);
-
 	my $rowcnt = $#data;
 
 	# Insert data into one column at a time, calling $listbox->insert
@@ -1786,6 +1935,8 @@ sub selectionAnchor   { shift->_firstVisible->selectionAnchor(@_)}
 sub selectionClear    { shift->_firstVisible->selectionClear(@_)}
 sub selectionIncludes { shift->_firstVisible->selectionIncludes(@_)}
 sub selectionSet      { shift->_firstVisible->selectionSet(@_)}
+sub SpaceSelect       { shift->_firstVisible->SpaceSelect(@_)}
+sub CtrlPriorNext     { shift->_firstVisible->CtrlPriorNext(@_)}
 sub size              { shift->_firstVisible->size(@_)}
 
 sub sort {
@@ -1809,7 +1960,7 @@ sub sort {
 	map {$_=$w->columnIndex($_)} @indexes;
 # This works on Solaris, but not on Linux???
 # Store the -comparecommand for each row in a local array. In the sort,
-# the store command is called directly in stead of via the MLColumn
+# the store command is called directly in stead of via the SMLColumn
 # subwidget. This saves a lot of callbacks and function calls.
 #
 # my @cmp_subs = map {$_->cget(-comparecommand)} @{$w->{'_columns'}};
@@ -1860,7 +2011,7 @@ sub sort {
 
 # Replace data with the new, sorted list.
 	$w->delete(0,'end');
-	$w->insert(0,@data);
+	$w->insert('end',@data);
 
 	my @new_selection = ();
 	foreach (0..$#data) {
@@ -1876,10 +2027,20 @@ sub sort {
 	$w->Unbusy; #(-recurse=>1);
 	if ($w->{'-showallsortcolumns'}) {
 		for (my $i=0;$i<=$#indexes;$i++) {   #UNCOMMENT TO SHOW ALL SORTED COLUMNS:
-			$w->{'_columns'}->[$indexes[$i]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
+#			$w->{'_columns'}->[$indexes[$i]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
+			if ($w->{'_columns'}->[$indexes[$i]]->cget('-reversearrow') == 1) {
+				$w->{'_columns'}->[$indexes[$i]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'uparrow' : 'downarrow'));
+			} else {
+				$w->{'_columns'}->[$indexes[$i]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
+			}
 		}
 	} else {
-		$w->{'_columns'}->[$indexes[0]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
+#		$w->{'_columns'}->[$indexes[0]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
+		if ($w->{'_columns'}->[$indexes[0]]->cget('-reversearrow') == 1) {
+			$w->{'_columns'}->[$indexes[0]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'uparrow' : 'downarrow'));
+		} else {
+			$w->{'_columns'}->[$indexes[0]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
+		}
 	}
 }
 

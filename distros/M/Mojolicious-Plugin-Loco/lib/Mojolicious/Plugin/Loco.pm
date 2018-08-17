@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Loco 0.005;
+package Mojolicious::Plugin::Loco 0.006;
 
 # ABSTRACT: launch a web browser; easy local GUI
 
@@ -11,36 +11,42 @@ use Mojo::Util qw(hmac_sha1_sum steady_time);
 
 sub register {
     my ($self, $app, $o) = @_;
-    my %conf = (
+    my $conf = {
+        config_key   => 'loco',
         entry        => '/',
         initial_wait => 15,
         final_wait   => 3,
         api_path     => '/hb/',
-        %$o
-    );
+        %$o,
+    };
+    if (my $loco = $conf->{config_key}) {
+        unless (my $ac = $app->config($loco)) {
+            $app->config($loco, $conf);
+        }
+        else {
+            %$ac = (%$conf, %$ac);
+            $conf = $ac;
+        }
+    }
+
     my $api =
-      Mojo::Path->new($conf{api_path})->leading_slash(1)->trailing_slash(1);
+      Mojo::Path->new($conf->{api_path})->leading_slash(1)->trailing_slash(1);
     my ($init_path, $hb_path, $js_path) =
       map { $api->merge($_)->to_string } qw(init hb heartbeat.js);
 
-    my %_settable = ();
-    ++$_settable{$_} for qw(initial_wait final_wait);
     $app->helper(
-        'loco.conf' => sub {
+        'loco.config' => sub {
             my $c = shift;
 
             # Hash
-            return \%conf unless @_;
+            return $conf unless @_;
 
             # Get
-            return $conf{ $_[0] } unless @_ > 1 || ref $_[0];
+            return $conf->{ $_[0] } unless @_ > 1 || ref $_[0];
 
             # Set
             my $values = ref $_[0] ? $_[0] : {@_};
-            for (keys %$values) {
-                delete $values->{$_} unless $_settable{$_};
-            }
-            @conf{ keys %$values } = values %$values;
+            @{$conf}{ keys %$values } = values %$values;
             return $c;
         }
     );
@@ -92,24 +98,24 @@ sub register {
     $app->hook(
         before_server_start => sub {
             my ($server, $app) = @_;
-            return if $conf{browser_launched}++;
+            return if $conf->{browser_launched}++;
             my ($url) = map {
                 my $u = Mojo::URL->new($_);
                 $u->host($u->host =~ s![*]!localhost!r);
             } @{ $server->listen };
 
-            my $_test = $conf{_test_browser_launch};
+            my $_test = $conf->{_test_browser_launch};
 
             # no explicit port means this is coming from UserAgent
             return
               unless ($url->port || $_test);
 
-            $conf{seed} = my $seed =
+            $conf->{seed} = my $seed =
               _make_csrf($app, $$ . steady_time . rand . 'x');
 
             $url->path($init_path)->query(s => $seed);
 
-            my $cmd = $conf{browser} // open_browser_cmd();
+            my $cmd = $conf->{browser} // open_browser_cmd();
             unless ($cmd) {
                 die "Cannot find browser to execute"
                   unless defined $cmd;
@@ -142,7 +148,7 @@ sub register {
                     waitpid($pid, 0);
                 }
             }
-            _reset_timer($conf{initial_wait});
+            _reset_timer($conf->{initial_wait});
         }
     );
 
@@ -150,9 +156,9 @@ sub register {
         before_routes => sub {
             my $c = shift;
             $c->validation->csrf_token('')
-              if ($conf{seed} || !$c->session->{'loco.id'});
+              if ($conf->{seed} || !$c->session->{'loco.id'});
         }
-    ) unless $conf{allow_other_sessions};
+    ) unless $conf->{allow_other_sessions};
 
     $app->helper(
         'loco.id' => sub {
@@ -169,12 +175,12 @@ sub register {
             my $seed = $c->param('s') // '' =~ s/[^0-9a-f]//gr;
 
             if (length($seed) >= 40
-                && $seed eq ($conf{seed} // ''))
+                && $seed eq ($conf->{seed} // ''))
             {
-                delete $conf{seed};
+                delete $conf->{seed};
                 $c->loco->id(1);
             }
-            $c->redirect_to($conf{entry});
+            $c->redirect_to($conf->{entry});
         }
     );
 
@@ -194,7 +200,7 @@ sub register {
                     info    => 'unexpected origin'
                 );
             }
-            _reset_timer($conf{final_wait});
+            _reset_timer($conf->{final_wait});
             $c->render(json => { h => ++$hcount });
 
             #    return $c->helpers->reply->not_found()

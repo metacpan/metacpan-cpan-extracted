@@ -6,6 +6,31 @@
 # -----------------------------------------------------------------------------
 # Ver. |   Date   | Recent changes (for complete history see file Changes)
 # -----+----------+------------------------------------------------------------
+# 2.02  2018/08/15  * Fixed a few typos in documentation.
+#                   * Added support for IDL4 struct inheritance defined by the
+#                     Building Block Extended Data-Types:
+#                     In case of STRUCT, the first SUBORDINATES element of may
+#                     be a reference to a further STRUCT node instead of the
+#                     reference to quintuplet. In this case, the first element
+#                     indicates the IDL4 parent struct type of the current
+#                     struct.  The function isnode() can be used for detecting
+#                     this case. The support for IDL4 struct inheritance is
+#                     implemented in sub Parse_File_i case $kw eq 'struct'.
+#                   * In sub is_elementary_type return early on undefined
+#                     $tdesc.
+#                   * In sub info check for valid $currfile and @infilename
+#                     before accessing $infilename[$currfile].
+#                   * In sub error avoid code duplication by reusing the
+#                     implemenation of sub info.
+#                   * In sub dump_symbols_internal handling of METHOD, pop
+#                     @arg only if @arg is non empty and $arg[-1] contains
+#                     the exception list.  We need these extra tests because
+#                     METHODs in VALUETYPEs do not have an exception list as
+#                     the last element of the SUBORDINATES.
+#                   * In sub dump_symbols_internal handling of REMARK nodes,
+#                     on calling sub dump_comment swap elements of anonymous
+#                     constructed array: $name comes first, then $subord.
+#                     (COMMENT nodes use the same layout.)
 # 2.01  2018/01/23  * Fixed parsing of named argument values in sub
 #                     parse_annotation_app:  At case
 #                       @$argref && $argref->[0] eq '('
@@ -94,11 +119,11 @@ CORBA::IDLtree - OMG IDL to symbol tree translator
 
 =head1 VERSION
 
-Version 2.01
+Version 2.02 pre-release
 
 =cut
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 =head1 SYNOPSIS
 
@@ -184,6 +209,11 @@ Each member representative node is a quintuplet consisting
 of (C<TYPE>, C<NAME>, <dimref>, C<ANNOTATIONS>, C<COMMENT>).
 The <dimref> is a reference to a list of dimension numbers,
 or is 0 if no dimensions were given.
+In case of STRUCT, the first element may be a reference to a
+further STRUCT node instead of the reference to quintuplet.
+In this case, the first element indicates the IDL4 parent
+struct type of the current struct. The function isnode() can
+be used for detecting this case.
 
 =item UNION
 
@@ -205,7 +235,7 @@ For C<DEFAULT>, both the C<NAME> and the C<SUBORDINATES> are unused.
 =item ENUM
 
 Reference to an array describing the enum value literals.
-Each element in the aray is a reference to a triplet
+Each element in the array is a reference to a triplet
 (three element array): The first element in the triplet is
 the enum literal value.  The second element is a reference
 to an array of annotations as described in the C<ANNOTATIONS>
@@ -236,7 +266,7 @@ defining node (that is, a nested sequence definition.)
 Bounded strings are treated as a special case of sequence.
 They are represented as references to a node that has
 C<BOUNDED_STRING> or C<BOUNDED_WSTRING> as the type ID, the bound
-number in the C<NAM>E, and the C<SUBORDINATES> element is unused.
+number in the C<NAME>, and the C<SUBORDINATES> element is unused.
 
 =item CONST
 
@@ -966,7 +996,7 @@ our @annoDefs = (
 # defined by the entry in @annoDefs.  If the user omitted the value of the
 # parameter then the default as specified by the entry in @annoDefs is
 # filled in.
-my @annotations = ();   
+my @annotations = ();
 
 {
     # general symbol cache class, used for include file cache and
@@ -1247,6 +1277,11 @@ sub is_elementary_type {
     # Returns the type index of an elementary type,
     # or 0 if the type is not elementary.
     my $tdesc = shift;                 # argument: a type descriptor
+    unless (defined $tdesc) {
+        error("CORBA::IDLtree::is_elementary_type called on undefined tdesc"
+              . Carp::longmess());
+        return 0;
+    }
     my $recurse_into_typedef = 0;      # optional argument
     if (@_) {
         $recurse_into_typedef = shift;
@@ -2871,11 +2906,22 @@ sub Parse_File_i {
             push @namestack, $name;
             push @annostack, $anno;
             push @cmntstack, $cmnt;
-            if (shift @arg ne '{') {
+            @struct = ();
+            my $nxt = shift @arg;
+            if ($type == STRUCT && $nxt eq ':') {
+                my $parent_type = shift @arg;
+                my $parent = parse_type($parent_type, \@arg, $symbols);
+                if (isnode($parent) && $parent->[TYPE] == STRUCT) {
+                    push @struct, $parent;
+                } else {
+                    error "expecting a struct type as parent of $name";
+                }
+                $nxt = shift @arg;
+            }
+            if ($nxt ne '{') {
                 error "expecting '{'";
                 next;
             }
-            @struct = ();
             if (@arg) {
                 if ($arg[0] eq '}' or
                         parse_members($symbols, \@arg, \@struct) == 1) {
@@ -3358,6 +3404,7 @@ sub require_end_of_stmt {
 sub isnode {
     my $node_ref = shift;
 
+    ref($node_ref) or return 0;
     ref($node_ref) eq "ARRAY" && defined($node_ref->[TYPE]) or return 0;
     if ($node_ref->[TYPE] >= BOOLEAN
         && $node_ref->[TYPE] < NUMBER_OF_TYPES) {
@@ -3655,14 +3702,17 @@ sub find_node_i {
 
 sub info {
     my $message = shift;
-    warn ($infilename[$currfile]  . " line " . $line_number[$currfile]
+    if ($currfile >= 0 && $currfile < scalar(@infilename)) {
+        warn ($infilename[$currfile]  . " line " . $line_number[$currfile]
                   . ": $message\n");
+    } else {
+        warn($message . "\n");
+    }
 }
 
 sub error {
     my $message = shift;
-    warn ($infilename[$currfile]  . " line " . $line_number[$currfile]
-                  . ": $message\n");
+    info($message);
     $n_errors++;
 }
 
@@ -3779,7 +3829,7 @@ sub is_a {
     my $dimref = $$origtype_and_dim[1];
     return 0 if $dimref && @{$dimref};
 
-    # no, recursivly check basetype
+    # no, recursively check basetype
     return is_a($$origtype_and_dim[0], $typeid);
 }
 
@@ -4318,7 +4368,18 @@ sub dump_symbols_internal {
         } else {
             $rettype = dstypeof($t);
         }
-        my @exc_list = @{pop @arg};
+        my @exc_list;
+        if (@arg) {
+            my $lastarg = $arg[$#arg];
+            unless (ref($lastarg) eq "ARRAY") {
+                die("CORBA::IDLtree::dump_symbols_internal error at METHOD "
+                    . $name . " last arg ($global_idlfile)\n");
+            }
+            my @last = @{$lastarg};
+            if (scalar(@last) != 3 || ref($last[NAME])) {
+                @exc_list = @{pop @arg};
+            }
+        }
         dsdent($rettype . " $name (");
         if (@arg) {
             unless ($#arg == 0) {
@@ -4493,7 +4554,7 @@ sub dump_symbols_internal {
                 }
                 $dsindentlevel++;
             } elsif ($type == REMARK) {
-                dump_comment [ $suboref, $name ];
+                dump_comment [ $name, $suboref ];
             } else {
                 foreach (@{$suboref}) {
                     $name .= '[' . $_ . ']';
@@ -4506,7 +4567,7 @@ sub dump_symbols_internal {
     } elsif ($type == INTERFACE_FWD) {
         dsdent "interface $name";
     } elsif ($type == REMARK) {
-        dump_comment [ $subord, $name ];
+        dump_comment [ $name, $subord ];
         return $status;
     } else {
         my $ttext;

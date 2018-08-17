@@ -28,8 +28,19 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::stat" : "0",
+            "Getopt::Long" : "0",
+            "I18N::Langinfo" : "0",
+            "IPC::Cmd" : "0",
             "Module::Build::Tiny" : "0.035",
-            "perl" : "5.008_001"
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Time::Local" : "0",
+            "parent" : "0",
+            "perl" : "5.010_001"
          }
       },
       "develop" : {
@@ -39,6 +50,11 @@
             "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.001001"
          }
       },
       "test" : {
@@ -51,7 +67,7 @@
    "provides" : {
       "App::dategrep" : {
          "file" : "lib/App/dategrep.pm",
-         "version" : "2.03"
+         "version" : "2.05"
       },
       "App::dategrep::Date" : {
          "file" : "lib/App/dategrep/Date.pm"
@@ -83,7 +99,7 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "2.03",
+   "version" : "2.05",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>",

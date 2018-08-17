@@ -1,0 +1,18 @@
+AUTO_FILTER with Template::Alloy is great because you don't 
+need to worry about escaping dangerous variables  - [% dangerous %]
+
+This makes it easier to avoid XSS.
+
+It isn't quite a panacea though.  When you specify a filter that
+overrides the default 'auto filter'.
+
+[% multi_line | html_line_break %]
+
+That means you need to re-apply the html filter if necessary.
+
+[% multi_line | html | html_line_break %]
+
+If you need to avoid the html escaping, then apply the 'none' filter
+which does what it says on the tin.
+
+[% safe_formatted_html | none %]

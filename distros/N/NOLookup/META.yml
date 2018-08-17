@@ -29,5 +29,5 @@ requires:
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '1.10'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

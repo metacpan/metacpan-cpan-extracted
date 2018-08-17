@@ -56,20 +56,20 @@ is_deeply(
     "create {a}[3][1]"
 );
 
-$tmp = undef;
-@r = path($tmp, [ [1,8],[3,16] ], expand => 'append');
+$tmp = [];
+@r = path($tmp, [ [-1] ], expand => 1);
 is_deeply(
     $tmp,
-    [[undef,undef],[undef,undef]],
-    "expand-append [1,8],[3,16] for undef"
+    [undef],
+    "expand by out of range negative index (-1)"
 ) or diag t_dump $tmp;
 
-$tmp = [0, 1, 2, 3];
-@r = path($tmp, [ [8,1],[16,3] ], expand => 'append');
+$tmp = [];
+@r = path($tmp, [ [-3] ], expand => 1);
 is_deeply(
     $tmp,
-    [0,[undef,undef],2,3,[undef,undef]],
-    "expand-append [8,1],[16,3] for [0, 1, 2, 3]"
+    [undef],
+    "expand by out of range negative index (-3)"
 ) or diag t_dump $tmp;
 
 ### HASHES ###

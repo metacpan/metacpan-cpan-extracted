@@ -4,4 +4,7 @@ use strict;
 
 use Test::More;
 use Test::Prereq;
-prereq_ok();
+prereq_ok( undef, [
+    'Term::Choose::Constants',
+    'Term::Choose::LineFold',
+ ] );

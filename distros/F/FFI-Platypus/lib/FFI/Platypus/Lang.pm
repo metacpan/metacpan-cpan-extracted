@@ -1,0 +1,83 @@
+package FFI::Platypus::Lang;
+
+use strict;
+use warnings;
+use 5.008001;
+
+# ABSTRACT: Language specific customizations
+our $VERSION = '0.53'; # VERSION
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+FFI::Platypus::Lang - Language specific customizations
+
+=head1 VERSION
+
+version 0.53
+
+=head1 SYNOPSIS
+
+ perldoc FFI::Platypus::Lang;
+
+=head1 DESCRIPTION
+
+This namespace is reserved for language specific customizations of L<FFI::Platypus>.
+This usually involves providing native type maps.  It can also involve computing
+mangled names.  The default language is C, and is defined in L<FFI::Platypus::Lang::C>.
+
+This package itself doesn't do anything, it serves only as documentation.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<FFI::Platypus>
+
+=item L<FFI::Platypus::Lang::C>
+
+=back
+
+=head1 AUTHOR
+
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Bakkiaraj Murugesan (bakkiaraj)
+
+Dylan Cali (calid)
+
+pipcet
+
+Zaki Mughal (zmughal)
+
+Fitz Elliott (felliott)
+
+Vickenty Fesunov (vyf)
+
+Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -10,25 +10,25 @@ subtest 'Defaults' => sub {
 
     subtest 'UUID' => sub {
 
-        # init and check UUID
+        # Init and check UUID
         my $ev = EventStore::Tiny::Event->new(name => 'foo');
         ok defined $ev->uuid, 'Event has an UUID';
         like $ev->uuid => qr/^(\w+-){4}\w+$/, 'UUID looks like an UUID string';
 
-        # check another event's UUID
+        # Check another event's UUID
         my $ev2 = EventStore::Tiny::Event->new(name => 'foo');
         isnt $ev->uuid => $ev2->uuid, 'Two different UUIDs';
     };
 
     subtest 'High-resolution timestamp' => sub {
 
-        # init and check timestamp
+        # Init and check timestamp
         my $ev = EventStore::Tiny::Event->new(name => 'foo');
         ok defined $ev->timestamp, 'Event has a timestamp';
         like $ev->timestamp => qr/^\d+\.\d+$/, 'Timestamp looks like a decimal';
         isnt $ev->timestamp => time, 'Timestamp is not the integer timestamp';
 
-        # check another event's timestamp
+        # Check another event's timestamp
         my $ev2 = EventStore::Tiny::Event->new(name => 'foo');
         isnt $ev->timestamp => $ev2->timestamp, 'Time has passed.';
     };
@@ -45,9 +45,11 @@ subtest 'Defaults' => sub {
     };
 
     subtest 'Summary' => sub {
-        my $s = EventStore::Tiny::Event->new(name => 'foo')->summary;
-        ok defined $s, 'Summary is defined';
-        like $s => qr/^\[
+        my $e = EventStore::Tiny::Event->new(name => 'foo');
+        ok defined $e->summary, 'Summary is defined';
+
+        # Summary matcher
+        my $summary_rx = qr/^\[
             foo                     # Name
             \s \(
                 \d\d\d\d-\d\d-\d\d  # Date
@@ -55,26 +57,37 @@ subtest 'Defaults' => sub {
                 \d\d:\d\d:\d\d      # Time
                 (\.\d+)?            # Optional: high res time
             \)
-        \]$/x, 'Correct summary';
+        \]$/x;
+
+        # Match with high-res timestamp
+        like $e->summary => $summary_rx, 'Correct summary';
+        $e->summary =~ $summary_rx;
+        ok defined $1, 'Decimals represented in summary';
+
+        # Strip decimals
+        $e->timestamp(42);
+        like $e->summary => $summary_rx, 'Correct summary';
+        $e->summary =~ $summary_rx;
+        ok not(defined $1), 'No decimals represented in summary';
     };
 };
 
 subtest 'Construction arguments' => sub {
 
-    # construct
+    # Construct
     my $ev = EventStore::Tiny::Event->new(
         name            => 'foo',
         transformation  => sub {25 + shift},
     );
 
-    # check
+    # Check
     is $ev->name => 'foo', 'Correct name';
     is $ev->transformation->(17) => 42, 'Correct transformation';
 };
 
 subtest 'Application' => sub {
 
-    # create event
+    # Create event
     my $ev = EventStore::Tiny::Event->new(
         name            => 'bar',
         transformation  => sub {
@@ -84,11 +97,11 @@ subtest 'Application' => sub {
         },
     );
 
-    # prepare state for application
+    # Prepare state for application
     my $state = {};
     $state->{quux} = 17;
 
-    # apply
+    # Apply
     my $ret_val = $ev->apply_to($state);
     is $state->{quux} => 42, 'Correct modified state';
     is $ret_val => $state, 'Return state is the same as given state';
@@ -96,11 +109,11 @@ subtest 'Application' => sub {
 
 subtest 'Data event' => sub {
 
-    # check defaults
+    # Check defaults
     my $ev = EventStore::Tiny::DataEvent->new(name => 'quux');
     is_deeply $ev->data => {}, 'Default data is an empty hash';
 
-    # construct data-driven event
+    # Construct data-driven event
     $ev = EventStore::Tiny::DataEvent->new(
         name            => 'foo',
         transformation  => sub {
@@ -110,7 +123,7 @@ subtest 'Data event' => sub {
         data            => {key => 'quux'},
     );
 
-    # apply to empty state
+    # Apply to empty state
     is $ev->apply_to({})->{quux} => 42, 'Correct state-update from data';
 
     subtest 'Summarizing summary' => sub {
@@ -152,7 +165,7 @@ subtest 'Data event' => sub {
 
 subtest 'Specialization' => sub {
 
-    # construct data-driven event
+    # Construct data-driven event
     my $ev = EventStore::Tiny::Event->new(
         name            => 'foo',
         transformation  => sub {
@@ -161,13 +174,13 @@ subtest 'Specialization' => sub {
         },
     );
 
-    # specialize
+    # Specialize
     my $de = EventStore::Tiny::DataEvent->new_from_template(
         $ev, {key => 'quux'}
     );
     isa_ok $de => 'EventStore::Tiny::DataEvent';
 
-    # apply to empty state
+    # Apply to empty state
     is $de->apply_to({})->{quux} => 42, 'Correct state-update from new data';
 };
 

@@ -2,16 +2,26 @@ Changes
 lib/Import/Export.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-basics.t
 t/02-const.t
 t/03-our.t
+t/04-kaput.t
+t/05-clean.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/test/Clean.pm
+t/test/Clean/Down.pm
+t/test/Clean/Up.pm
 t/test/Const.pm
 t/test/Const/Easy.pm
+t/test/Globs.pm
+t/test/Kaput.pm
+t/test/Kaput2.pm
 t/test/One.pm
 t/test/One/Two.pm
 t/test/One/Two/Three.pm
@@ -19,5 +29,3 @@ t/test/One/Two/Three/Four.pm
 t/test/Our.pm
 t/test/Our/Simple.pm
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

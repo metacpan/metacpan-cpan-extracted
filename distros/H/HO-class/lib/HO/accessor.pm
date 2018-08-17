@@ -1,7 +1,7 @@
   package HO::accessor
 # ++++++++++++++++++++
 ; use strict; use warnings;
-our $VERSION='0.04';
+our $VERSION='0.051';
 
 ; use Class::ISA
 ; require Carp
@@ -31,89 +31,113 @@ our $VERSION='0.04';
     )
 
 ; our %ro_accessor =
-    ( '$' => sub { my ($n,$i) = @_
-                 ; return sub (){ Carp::confess("Not a class method '$n'.")
-                     unless ref($_[0]); shift()->[$i] }
+    ( '$' => sub { my ($n,$class) = @_
+                 ; my $idx = HO::accessor::_value_of($class, "_$n")
+                 ; return sub ()
+                     { Carp::confess("Not a class method '$n'.")
+                         unless ref($_[0])
+                     ; $_[0]->[$idx]
+                     }
                  }
-    , '@' => sub { my ($n,$i) = @_
-                 ; return sub { my ($obj,$idx) = @_
+    , '@' => sub { my ($n,$class) = @_
+                 ; my $ai = HO::accessor::_value_of($class, "_$n")
+                 ; return sub
+                     { my ($obj,$idx) = @_
                      ; if(@_==1)
-                        {return @{$obj->[$i]}}
+                        { return @{$obj->[$ai]}
+                        }
                        else
-                        {return $obj->[$i]->[$idx]}
+                        { return $obj->[$ai]->[$idx]
+                        }
                  }}
-    , '%' => sub { my ($n,$i) = @_
-                 ; return sub { my ($obj,$key) = @_
-                 ; (@_==1) ? {%{$obj->[$i]}}
-                           : $obj->[$i]->{$key}
-                 }}
+    , '%' => sub { my ($n,$class) = @_
+                 ; my $idx = HO::accessor::_value_of($class, "_$n")
+                 ; return sub
+                     { my ($obj,$key) = @_
+                     ; (@_==1) ? {%{$obj->[$idx]}}
+                               : $obj->[$idx]->{$key}
+                     }
+                 }
     )
 
 ; our %rw_accessor =
-    ( '$' => sub { my ($n,$i) = @_
-                 ; return sub { my ($obj,$val) = @_
-                     ; return $obj->[$i] if @_==1
-                     ; $obj->[$i] = $val
+    ( '$' => sub { my ($n,$class) = @_
+                 ; my $idx = HO::accessor::_value_of($class, "_$n")
+                 ; return sub
+                     { my ($obj,$val) = @_
+                     ; Carp::confess("Not a class method '$n'.")
+                         unless ref($obj)
+                     ; return $obj->[$idx] if @_==1
+                     ; $obj->[$idx] = $val
                      ; return $obj
-                 }}
-    , '@' => sub { my ($n,$i) = @_
+                     }
+                 }
+    , '@' => sub { my ($n,$class) = @_
+                 ; my $ai = HO::accessor::_value_of($class, "_$n")
                  ; return sub
                      { my ($obj,$idx,$val) = @_
-                     ; Carp::confess("Not a class method '$n'.") unless ref $obj
+                     ; Carp::confess("Not a class method '$n'.")
+                         unless ref $obj
                      ; if(@_==1) # get values
                          { # etwas mehr Zugriffsschutz da keine Ref
                            # einfache Anwendung in bool Kontext
-                         ; return @{$obj->[$i]}
+                         ; return @{$obj->[$ai]}
                          }
                        elsif(@_ == 2)
                          { unless(ref $idx eq 'ARRAY')
-                             {  return $obj->[$i]->[$idx]     # get one index
+                             {  return $obj->[$ai]->[$idx]     # get one index
                              }
                            else
-                             { $obj->[$i] = $idx                 # set complete array
+                             { $obj->[$ai] = $idx                 # set complete array
                              ; return $obj
                              }
                          }
                        elsif(@_==3)
                          { if(ref($idx))
-                 { if($val eq '<')
-                                 { $$idx = shift @{$obj->[$i]} }
+                             { if($val eq '<')
+                                 { $$idx = shift @{$obj->[$ai]}
+                                 }
                                elsif($val eq '>')
-                                 { $$idx = pop @{$obj->[$i]} }
+                                 { $$idx = pop @{$obj->[$ai]}
+                                 }
                                else
                                  { if(@$val == 0)
-                        { @$idx = splice(@{$obj->[$i]}) }
+                                     { @$idx = splice(@{$obj->[$ai]})
+                                     }
                                    elsif(@$val == 1)
-                                    { @$idx = splice(@{$obj->[$i]},$val->[0]); }
+                                     { @$idx = splice(@{$obj->[$ai]},$val->[0]);
+                                     }
                                    elsif(@$val == 2)
-                                    { @$idx = splice(@{$obj->[$i]},$val->[0],$val->[1]); }
+                                     { @$idx = splice(@{$obj->[$ai]},$val->[0],$val->[1]);
+                                     }
                                  }
                              }
                             elsif($idx eq '<')
-                             { push @{$obj->[$i]}, $val
+                             { push @{$obj->[$ai]}, $val
                              }
                             elsif($idx eq '>')
-                             { unshift @{$obj->[$i]}, $val
+                             { unshift @{$obj->[$ai]}, $val
                              }
                             else
-                             { $obj->[$i]->[$idx] = $val     # set one index
+                             { $obj->[$ai]->[$idx] = $val     # set one index
                              }
                           ; return $obj
                           }
                      }
                  }
-    , '%' => sub { my ($n,$i) = @_
+    , '%' => sub { my ($n,$class) = @_
+                 ; my $idx = HO::accessor::_value_of($class, "_$n")
                  ; return sub { my ($obj,$key) = @_
                  ; if(@_==1)
-                     { return $obj->[$i] # for a hash an reference is easier to handle
+                     { return $obj->[$idx] # for a hash an reference is easier to handle
                      }
                    elsif(@_==2)
                      { if(ref($key) eq 'HASH')
-                         { $obj->[$i] = $key
+                         { $obj->[$idx] = $key
                          ; return $obj
                          }
                         else
-                         { return $obj->[$i]->{$key}
+                         { return $obj->[$idx]->{$key}
                          }
                      }
                    else
@@ -121,7 +145,7 @@ our $VERSION='0.04';
                      ; my @kv = @_
                      ; while(@kv)
                          { my ($k,$v) = splice(@kv,0,2)
-                         ; $obj->[$i]->{$k} = $v
+                         ; $obj->[$idx]->{$k} = $v
                          }
                      ; return $obj
                      }
@@ -142,7 +166,7 @@ our $VERSION='0.04';
     { my ($package,$ac,$init,$new) = @_
     ; $ac   ||= []
 
-    ; my $caller = $HO::accessor::class || caller
+    ; my $caller = $HO::accessor::class || CORE::caller
 
     ; die "HO::accessor::import already called for class $caller."
         if $classes{$caller}
@@ -151,6 +175,7 @@ our $VERSION='0.04';
 
     ; my @build = reverse Class::ISA::self_and_super_path($caller)
     ; my @constructor
+    ; my @class_accessors
 
     ; my $count=0
     ; foreach my $class (@build)
@@ -163,15 +188,11 @@ our $VERSION='0.04';
                 { Carp::carp("Unknown property type '$type', in setup for class $caller.")
                 ; $proto=sub{undef}
                 }
-            ; if($accessors{$class}{$accessor})
-                { $constructor[$accessors{$class}{$accessor}->()] = $proto
-                }
-              else
-                { my $val=$count
-                ; my $acc=sub {$val}
-                ; $accessors{$class}{$accessor}=$acc
-                ; $constructor[$acc->()] = $proto
-                }
+            ; my $val=$count
+            ; my $acc=sub {$val}
+            ; push @class_accessors, $accessor
+            ; $accessors{$caller}{$accessor}=$acc
+            ; $constructor[$acc->()] = $proto
             ; $count++
             }
         }
@@ -194,8 +215,7 @@ our $VERSION='0.04';
                   }
           }
 
-      ; my %acc=@{$classes{$caller}}
-      ; foreach my $acc (keys %acc)
+      ; foreach my $acc (@class_accessors)
           { *{"${caller}::${acc}"}=$accessors{$caller}{$acc}
           }
       }
@@ -222,45 +242,7 @@ our $VERSION='0.04';
 # Package Function
 ; sub _value_of
     { my ($class,$accessorname) = @_
-    ; my @classes = Class::ISA::self_and_super_path($class)
-    ; foreach my $c (@classes)
-        { if(defined($accessors{$c}{$accessorname}))
-            { #warn $accessorname.": ".$accessors{$c}{$accessorname}->()
-            ; return $accessors{$c}{$accessorname}->()
-            }
-        }
-    ; die "Accessor $accessorname is unknown for class $class."
-    }
-
-#########################
-# this functions defines
-# accessors
-#########################
-; sub ro
-    { my ($name,$idx,$type,$class) = @_
-    ; return $ro_accessor{$type}->($name,$idx,$class)
-    }
-
-; sub rw
-    { my ($name,$idx,$type,$class) = @_; #warn "$name,$idx,$type,$class"
-    ; return $rw_accessor{$type}->($name,$idx,$class)
-    }
-
-; sub method
-    { my ($idx,$cdx) = @_
-    ; if(defined $cdx)
-        { return sub
-            { my $self = shift
-            ; return $self->[$idx] ? $self->[$idx]->($self,@_)
-                                   : $self->[$cdx]->($self,@_)
-            }
-        }
-      else
-        { return sub
-             { my $self = shift
-             ; return $self->[$cdx]->($self,@_)
-             }
-        }
+    ; return $accessors{$class}{$accessorname}->()
     }
 
 ; 1

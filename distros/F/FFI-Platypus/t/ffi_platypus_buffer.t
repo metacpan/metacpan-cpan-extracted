@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 use utf8;
-use open ':std', ':encoding(utf8)';
-use Test::More tests => 2;
+# see https://github.com/Perl5-FFI/FFI-Platypus/issues/85
+use if $^O ne 'MSWin32' || $] >= 5.018, 'open', ':std', ':encoding(utf8)';
+use Test::More;
 use Encode qw( decode );
 use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
 
 subtest simple => sub {
-  plan tests => 3;
   my $orig = 'me grimlock king';
   my($ptr, $size) = scalar_to_buffer($orig);
   ok $ptr, "ptr = $ptr";
@@ -17,7 +17,6 @@ subtest simple => sub {
 };
 
 subtest unicode => sub {
-  plan tests => 3;
   my $orig = 'привет';
   my($ptr, $size) = scalar_to_buffer($orig);
   ok $ptr, "ptr = $ptr";
@@ -26,3 +25,4 @@ subtest unicode => sub {
   is $scalar, 'привет', "scalar = $scalar";
 };
 
+done_testing;

@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 package Plack::Middleware::LogStderr;
-$Plack::Middleware::LogStderr::VERSION = '0.002';
+$Plack::Middleware::LogStderr::VERSION = '1.000';
 # ABSTRACT: Everything printed to STDERR sent to psgix.logger or other logger
 # KEYWORDS: plack middleware errors logging environment I/O handle stderr
 
 use parent 'Plack::Middleware';
 
-use Plack::Util::Accessor qw/logger callback tie_callback capture_callback no_tie log_level log_level_capture no_warnings/;
+use Plack::Util::Accessor qw/logger callback tie_callback capture_callback no_tie log_level log_level_capture/;
 use Scalar::Util ();
 use Capture::Tiny 'capture_stderr';
 
@@ -41,7 +41,7 @@ sub call {
     my ($stderr, @app) = capture_stderr {
         my ($app, $err);
 
-        tie *STDERR, 'Plack::Middleware::LogStderr::Handle2Logger', $stderr_logger, $self->no_warnings
+        tie *STDERR, 'Plack::Middleware::LogStderr::Handle2Logger', $stderr_logger
             unless $self->no_tie ;
 
         eval {
@@ -98,13 +98,12 @@ sub __isa_coderef {
 
 package # hide from PAUSE
     Plack::Middleware::LogStderr::Handle2Logger;
-our $VERSION = '0.001';
+our $VERSION = '1.000';
 # ABSTRACT: Tie File Handle to a logger
-use warnings::register;
 
 sub TIEHANDLE {
-    my ($pkg, $logger, $no_warnings) = @_;
-    return bless {logger => $logger, no_warnings => $no_warnings}, $pkg;
+    my ($pkg, $logger) = @_;
+    return bless {logger => $logger}, $pkg;
 }
 sub PRINT {
     my ($self, @msg) = @_;
@@ -119,17 +118,16 @@ sub PRINTF {
 ## if something tries to reopen FILEHANDLE just return true -- noop
 sub OPEN {
     my ($self) = @_;
-    if (warnings::enabled() && !$self->{no_warnings}) {
-        warnings::warn("open called on tied handle Handle2Logger");
-    }
     return 1;
 }
 ## if something tries to set BINMODE -- noop
 sub BINMODE {
     my ($self) = @_;
-    if (warnings::enabled() && !$self->{no_warnings}) {
-        warnings::warn("binmode called on tied handle Handle2Logger");
-    }
+    return undef;
+}
+
+sub FILENO {
+    my ($self) = @_;
     return undef;
 }
 
@@ -148,7 +146,7 @@ Plack::Middleware::LogStderr - Everything printed to STDERR sent to psgix.logger
 
 =head1 VERSION
 
-version 0.002
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -251,12 +249,6 @@ The benefit of this is all output sent to C<STDERR> is in order.
 The drawback is all C<STDERR> output created during a request is grouped
 together as one message and logged together after the request has finished
 processesing.
-
-=head2 C<no_warnings>
-
-By default when C<STDERR> is tied the package will emit a warning if OPEN or BINMODE
-is called on the tied handle.  Using C<no_warnings> will silence the warnings.
-Very useful if you are using warnings fatal all.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,5 @@
 use Test::More;
-use Acme::InputRecordSeparatorIsRegexp;
+use Acme::InputRecordSeparatorIsRegexp 'open';
 use strict;
 use warnings;
 
@@ -9,9 +9,8 @@ for ('AAA'..'ZZZ') {
     $yy .= sprintf "%d:%s", $i++, $_;
 }
 
-my $fh = Acme::InputRecordSeparatorIsRegexp->open( 
-    '1.3|T.4|E....D', '<', \$yy);
-ok($fh, 'Acme::InputRecordSeparatorIsRegexp::open ok to memory handle');
+my $z = open(my $fh, "<:irs(1.3|T.4|E....D)", \$yy);
+ok($z && $fh, 'Acme::InputRecordSeparatorIsRegexp::open ok to memory handle');
 ok(tied(*$fh), 'return tied handle');
 
 my (@tell, @seek);
@@ -39,6 +38,3 @@ while (@seek) {
 }
 
 done_testing();
-
-
-

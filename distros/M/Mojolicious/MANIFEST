@@ -38,10 +38,6 @@ lib/Mojo/IOLoop/resources/server.crt
 lib/Mojo/IOLoop/resources/server.key
 lib/Mojo/IOLoop/Server.pm
 lib/Mojo/IOLoop/Stream.pm
-lib/Mojo/IOLoop/Stream/HTTPClient.pm
-lib/Mojo/IOLoop/Stream/HTTPServer.pm
-lib/Mojo/IOLoop/Stream/WebSocketClient.pm
-lib/Mojo/IOLoop/Stream/WebSocketServer.pm
 lib/Mojo/IOLoop/Subprocess.pm
 lib/Mojo/IOLoop/TLS.pm
 lib/Mojo/JSON.pm
@@ -229,7 +225,6 @@ t/mojo/request_cgi.t
 t/mojo/response.t
 t/mojo/roles.t
 t/mojo/signatures.t
-t/mojo/streams.t
 t/mojo/subprocess.t
 t/mojo/template.t
 t/mojo/templates/exception.mt

@@ -1,0 +1,9 @@
+This code is released using App::mbtiny so your development approach is:
+
+  cpanm --installdeps .
+  prove -l t
+
+and to produce a distdir or dist respectively,
+
+  mbtiny build
+  mbtiny dist

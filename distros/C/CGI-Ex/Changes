@@ -1,3 +1,8 @@
+2.47
+    2018-08-16
+        * Replace mechanism for setting cookies via meta tags with JavaScript equivalent (thanks to Garth Hill, Dillan Hildebrand, Alfredo Cabrera, Matt Swensen)
+        * Test added for the replacement JavaScript mechanism of setting cookies
+
 2.46
     2018-07-24
         * Skip replace validation types in CGI::Ex::Validate when the corresponding form key's value is undef (thanks to Matt Devey)

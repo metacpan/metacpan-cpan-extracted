@@ -50,6 +50,12 @@
          }
       }
    },
+   "provides" : {
+      "TextFileParser" : {
+         "file" : "lib/TextFileParser.pm",
+         "version" : "0.204"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -57,7 +63,7 @@
          "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=TextFileParser"
       }
    },
-   "version" : "0.202",
+   "version" : "0.204",
    "x_contributors" : [
       "Balaji Ramasubramanian <balaji.ramasubramanian@gmail.com>"
    ],

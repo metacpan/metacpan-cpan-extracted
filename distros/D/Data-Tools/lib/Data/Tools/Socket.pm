@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

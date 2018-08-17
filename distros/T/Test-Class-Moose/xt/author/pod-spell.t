@@ -42,6 +42,7 @@ Etheridge
 Executor
 Extensibility
 Gregory
+Harald
 HasTimeReport
 Haye
 Heady
@@ -50,6 +51,7 @@ Instance
 Jack
 Jeremy
 Jonathan
+Jörg
 Karen
 Krieg
 Larry

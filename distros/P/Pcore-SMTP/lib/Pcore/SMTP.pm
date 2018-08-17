@@ -1,7 +1,7 @@
-package Pcore::SMTP v0.5.9;
+package Pcore::SMTP v0.6.1;
 
 use Pcore -dist, -const, -class, -res;
-use Pcore::AE::Handle qw[:TLS_CTX];
+use Pcore::Handle qw[:TLS_CTX];
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref is_plain_coderef];
 use Pcore::Util::Data qw[from_b64 to_b64];
 use Pcore::Util::Text qw[encode_utf8];
@@ -52,7 +52,7 @@ const our $STATUS_REASON => {
 };
 
 sub sendmail ( $self, @ ) {
-    my $cb1 = is_plain_coderef $_[-1] ? pop : undef;
+    my $cb = is_plain_coderef $_[-1] ? pop : undef;
 
     my %args = (
         from     => undef,
@@ -74,205 +74,115 @@ sub sendmail ( $self, @ ) {
     $args{cc}  = [ $args{cc} ]  if defined $args{cc}  && !is_plain_arrayref $args{cc};
     $args{bcc} = [ $args{bcc} ] if defined $args{bcc} && !is_plain_arrayref $args{bcc};
 
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+    if ( defined wantarray ) {
+        my $res = _sendmail( $self, \%args );
 
-    my $cb = sub ( $h, $res ) {
-        $h->destroy;
+        return $cb ? $cb->($res) : $res;
+    }
+    else {
+        Coro::async_pool(
+            sub {
+                my $res = _sendmail(@_);
 
-        $rouse_cb ? $cb1 ? $rouse_cb->( $cb1->($res) ) : $rouse_cb->($res) : $cb1 ? $cb1->($res) : ();
+                $cb->($res) if $cb;
+
+                return;
+            },
+            $self,
+            \%args
+        );
 
         return;
-    };
-
-    Pcore::AE::Handle->new(
-        connect          => 'smtp://' . $self->{host} . q[:] . $self->{port},
-        connect_timeout  => $self->{timeout},
-        timeout          => $self->{timeout},
-        persistent       => 0,
-        tls_ctx          => $self->{tls_ctx},
-        on_connect_error => sub ( $h, $reason ) {
-            $cb->( $h, res [ 500, $reason ] );
-
-            return;
-        },
-        on_error => sub ( $h, $fatal, $reason ) {
-            $cb->( $h, res [ 500, $reason ] );
-
-            return;
-        },
-        on_connect => sub ( $h, $host, $port, $retry ) {
-            $h->starttls('connect') if $self->{tls};
-
-            # read handshake response
-            $self->_read_response(
-                $h,
-                sub ($res) {
-
-                    # HANDSHAKE error
-                    if ( !$res ) {
-                        $cb->( $h, $res );
-                    }
-
-                    # HANDSHAKE ok
-                    else {
-
-                        # EHLO
-                        $self->_EHLO(
-                            $h,
-                            sub ($ehlo) {
-
-                                # EHLO error
-                                if ( !$ehlo ) {
-                                    $cb->( $h, $ehlo );
-                                }
-
-                                # EHLO ok
-                                else {
-
-                                    # AUTH
-                                    $self->_AUTH(
-                                        $h,
-                                        $ehlo->{ext}->{AUTH},
-                                        sub ($auth) {
-
-                                            # AUTH error
-                                            if ( !$auth ) {
-                                                $cb->( $h, $auth );
-                                            }
-
-                                            # AUTH ok
-                                            else {
-
-                                                # MAIL
-                                                $self->_MAIL_FROM(
-                                                    $h,
-                                                    $args{from} // $self->{username},
-                                                    sub ($mail) {
-
-                                                        # MAIL error
-                                                        if ( !$mail ) {
-                                                            $cb->( $h, $mail );
-                                                        }
-
-                                                        # MAIL ok
-                                                        else {
-
-                                                            # RCPT
-                                                            $self->_RCPT_TO(
-                                                                $h,
-                                                                [ defined $args{to} ? $args{to}->@* : (), defined $args{cc} ? $args{cc}->@* : (), defined $args{bcc} ? $args{bcc}->@* : () ],
-                                                                sub ($rcpt) {
-
-                                                                    # RCPT error
-                                                                    if ( !$rcpt ) {
-                                                                        $cb->( $h, $rcpt );
-                                                                    }
-
-                                                                    # RCPT ok
-                                                                    else {
-
-                                                                        # DATA
-                                                                        $self->_DATA(
-                                                                            $h,
-                                                                            \%args,
-                                                                            sub ($data) {
-
-                                                                                # DATA error
-                                                                                if ( !$data ) {
-                                                                                    $cb->( $h, $data );
-                                                                                }
-
-                                                                                # DATA ok
-                                                                                else {
-
-                                                                                    # QUIT
-                                                                                    $self->_QUIT(
-                                                                                        $h,
-                                                                                        sub($quit) {
-
-                                                                                            # quit status is not checked
-                                                                                            $cb->( $h, $quit );
-
-                                                                                            return;
-                                                                                        }
-                                                                                    );
-                                                                                }
-
-                                                                                return;
-                                                                            }
-                                                                        );
-                                                                    }
-
-                                                                    return;
-                                                                }
-                                                            );
-                                                        }
-
-                                                        return;
-                                                    }
-                                                );
-                                            }
-
-                                            return;
-                                        }
-                                    );
-                                }
-
-                                return;
-                            }
-                        );
-                    }
-
-                    return;
-                }
-            );
-
-            return;
-        },
-    );
-
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
-}
-
-sub _EHLO ( $self, $h, $cb ) {
-    $h->push_write(qq[EHLO localhost.localdomain$CRLF]);
-
-    $self->_read_response(
-        $h,
-        sub ($res) {
-            my $data;
-
-            if ($res) {
-                for my $line ( $res->{data}->@* ) {
-                    if ( $line =~ s[\A([[:upper:]\d]+)\s?][]sm ) {
-                        $res->{ext}->{$1} = $line;
-                    }
-                    else {
-                        push $data->@*, $line;
-                    }
-                }
-
-                $res->{data} = $data;
-            }
-
-            $cb->($res);
-
-            return;
-        }
-    );
+    }
 
     return;
 }
 
-sub _AUTH ( $self, $h, $mechanisms, $cb ) {
+sub _sendmail ( $self, $args ) {
+    my $h = P->handle(
+        [ $self->{host}, $self->{port} ],
+        timeout => $self->{timeout},
+        tls_ctx => $self->{tls_ctx},
+    );
+
+    $h->starttls if $self->{tls};
+
+    my $res;
+
+    # handshake
+    ( $res = $self->_read_response($h) ) or return $res;
+
+    # EHLO
+    ( $res = $self->_EHLO($h) ) or return $res;
+
+    # AUTH
+    ( $res = $self->_AUTH( $h, $res->{ext}->{AUTH} ) ) or return $res;
+
+    # MAIL_FROM
+    ( $res = $self->_MAIL_FROM( $h, $args->{from} // $self->{username} ) ) or return $res;
+
+    # RCPT_TO
+    ( $res = $self->_RCPT_TO( $h, [ defined $args->{to} ? $args->{to}->@* : (), defined $args->{cc} ? $args->{cc}->@* : (), defined $args->{bcc} ? $args->{bcc}->@* : () ] ) ) or return $res;
+
+    # DATA
+    ( $res = $self->_DATA( $h, $args ) ) or return $res;
+
+    # QUIT
+    return $self->_QUIT($h);
+}
+
+sub _read_response ( $self, $h ) {
+    my $status;
+    my $data = [];
+
+    while () {
+        my $line = $h->readline($CRLF);
+
+        return res [ $h->{status}, $h->{reason} ] if !$line;
+
+        $line->$* =~ s[\A(\d{3})(.?)][]sm;
+
+        $status = $1;
+
+        my $more = $2 eq q[-];
+
+        push $data->@*, $line->$*;
+
+        # response finished
+        last if !$more;
+    }
+
+    return res [ $status, $STATUS_REASON ], $data;
+}
+
+sub _EHLO ( $self, $h ) {
+    $h->write(qq[EHLO localhost.localdomain$CRLF]);
+
+    my $res = $self->_read_response($h);
+
+    if ($res) {
+        my $data;
+
+        for my $line ( $res->{data}->@* ) {
+            if ( $line =~ s[\A([[:upper:]\d]+)\s?][]sm ) {
+                $res->{ext}->{$1} = $line;
+            }
+            else {
+                push $data->@*, $line;
+            }
+        }
+
+        $res->{data} = $data;
+    }
+
+    return $res;
+}
+
+sub _AUTH ( $self, $h, $mechanisms ) {
 
     # NOTE partially stolen from Net::SMTP
 
-    if ( !$mechanisms ) {
-        $cb->( res [ 500, $STATUS_REASON ] );
-
-        return;
-    }
+    return res [ 500, $STATUS_REASON ] if !$mechanisms;
 
     my $sasl = Authen::SASL->new(
         mechanism => $mechanisms,
@@ -292,20 +202,12 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
             # $client mechanism failed, so we need to exclude this mechanism from list
             my $failed_mechanism = $client->mechanism;
 
-            if ( !defined $failed_mechanism ) {
-                $cb->( res [ 500, $STATUS_REASON ] );
-
-                return;
-            }
+            return res [ 500, $STATUS_REASON ] if !defined $failed_mechanism;
 
             $mechanisms =~ s/\b\Q$failed_mechanism\E\b//sm;
 
             # no auth mechanisms left
-            if ( $mechanisms !~ /\S/sm ) {
-                $cb->( res [ 500, $STATUS_REASON ] );
-
-                return;
-            }
+            return res [ 500, $STATUS_REASON ] if $mechanisms !~ /\S/sm;
 
             $sasl->mechanism($mechanisms);
         }
@@ -318,213 +220,173 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
         $str = $client->client_start;
     }
 
-    my $cmd = sub ($cmd) {
-        my $sub = __SUB__;
+    my $cmd = 'AUTH ' . $client->mechanism . ( defined $str and length $str ? q[ ] . to_b64 $str, q[] : q[] );
 
-        $h->push_write( $cmd . $CRLF );
+    while () {
+        $h->write( $cmd . $CRLF );
 
-        $self->_read_response(
-            $h,
-            sub ($res) {
-                if ( $res || $res != 334 ) {
-                    $cb->($res);
-                }
-                else {
-                    $sub->( to_b64 $client->client_step( from_b64 $res->{data}->[0] ), q[] );
-                }
+        my $res = $self->_read_response($h);
 
-                return;
-            }
-        );
-
-        return;
-    };
-
-    $cmd->( 'AUTH ' . $client->mechanism . ( defined $str and length $str ? q[ ] . to_b64 $str, q[] : q[] ) );
+        if ( $res || $res != 334 ) {
+            return $res;
+        }
+        else {
+            $cmd = to_b64 $client->client_step( from_b64 $res->{data}->[0] ), q[];
+        }
+    }
 
     return;
 }
 
-sub _MAIL_FROM ( $self, $h, $from, $cb ) {
-    $h->push_write(qq[MAIL FROM:<$from>$CRLF]);
+sub _MAIL_FROM ( $self, $h, $from ) {
+    $h->write(qq[MAIL FROM:<$from>$CRLF]);
 
-    $self->_read_response( $h, $cb );
-
-    return;
+    return $self->_read_response($h);
 }
 
-sub _RCPT_TO ( $self, $h, $to, $cb ) {
-    my $cmd = sub ($addr) {
-        my $sub = __SUB__;
+sub _RCPT_TO ( $self, $h, $to ) {
+    while () {
+        my $addr = shift $to->@*;
 
-        $h->push_write(qq[RCPT TO:<$addr>$CRLF]);
+        $h->write(qq[RCPT TO:<$addr>$CRLF]);
 
-        $self->_read_response(
-            $h,
-            sub ($res) {
+        my $res = $self->_read_response($h);
 
-                # RCPT error
-                if ( !$res ) {
-                    $res->{error} = $addr;
+        # RCPT error
+        if ( !$res ) {
+            $res->{error} = $addr;
 
-                    $cb->($res);
-                }
-
-                # RCPT ok, next
-                elsif ( $to->@* ) {
-                    $sub->( shift $to->@* );
-                }
-
-                # RCPT ok, last
-                else {
-                    $cb->($res);
-                }
-
-                return;
-            }
-        );
-
-        return;
-    };
-
-    $cmd->( shift $to->@* );
-
-    return;
-}
-
-sub _DATA ( $self, $h, $args, $cb ) {
-    state $send_headers = sub ( $h, $args ) {
-        my $buf;
-
-        $buf .= qq[From: $args->{from}$CRLF] if $args->{from};
-
-        $buf .= qq[Reply-To: $args->{reply_to}$CRLF] if $args->{reply_to};
-
-        $buf .= qq[To: @{[ join q[, ], $args->{to}->@* ]}$CRLF] if $args->{to};
-
-        $buf .= qq[Cc: @{[ join q[, ], $args->{cc}->@* ]}$CRLF] if $args->{cc};
-
-        $buf .= 'Subject: ' . encode_utf8 $args->{subject} . $CRLF if defined $args->{subject};
-
-        $buf .= join( $CRLF, $args->{headers}->@* ) . $CRLF if $args->{headers} && $args->{headers}->@*;
-
-        my $boundary;
-
-        if ( defined $args->{body} && is_plain_arrayref $args->{body} ) {
-            $boundary = P->random->bytes_hex(64);
-
-            $buf .= qq[MIME-Version: 1.0$CRLF];
-
-            $buf .= qq[Content-Type: multipart/mixed; BOUNDARY="$boundary"$CRLF];
+            return $res;
         }
 
-        $buf .= $CRLF;
+        # RCPT ok, next
+        next if $to->@*;
 
-        $h->push_write($buf);
+        # RCPT ok, last
+        return $res;
+    }
 
-        return $boundary;
-    };
+    return;
+}
 
-    state $send_body = sub ( $h, $args, $boundary ) {
-        my $buf;
+sub _DATA ( $self, $h, $args ) {
+    $h->write(qq[DATA$CRLF]);
 
-        if ( defined $args->{body} ) {
-            if ( !is_ref $args->{body} ) {
-                $buf .= encode_utf8 $args->{body};
-            }
-            elsif ( is_plain_scalarref $args->{body} ) {
-                $buf .= encode_utf8 $args->{body}->$*;
-            }
-            elsif ( is_plain_arrayref $args->{body} ) {
-                state $pack_mime = sub ( $boundary, $headers, $body ) {
-                    my $part = '--' . $boundary . $CRLF;
+    my $res = $self->_read_response($h);
 
-                    $part .= join( $CRLF, map { encode_utf8 $_} $headers->@* ) . $CRLF if defined $headers;
+    return $res if $res != 354;
 
-                    $part .= 'Content-Transfer-Encoding: base64' . $CRLF;
+    # send headers
+    my $buf;
 
-                    $part .= $CRLF;
+    $buf .= qq[From: $args->{from}$CRLF] if $args->{from};
 
-                    $part .= to_b64 encode_utf8 $body->$*;
+    $buf .= qq[Reply-To: $args->{reply_to}$CRLF] if $args->{reply_to};
 
-                    $part .= $CRLF;
+    $buf .= qq[To: @{[ join q[, ], $args->{to}->@* ]}$CRLF] if $args->{to};
 
-                    $part .= '--' . $boundary . $CRLF;
+    $buf .= qq[Cc: @{[ join q[, ], $args->{cc}->@* ]}$CRLF] if $args->{cc};
 
-                    return \$part;
-                };
+    $buf .= 'Subject: ' . encode_utf8 $args->{subject} . $CRLF if defined $args->{subject};
 
-                for my $part ( $args->{body}->@* ) {
-                    next if !defined $part;
+    $buf .= join( $CRLF, $args->{headers}->@* ) . $CRLF if $args->{headers} && $args->{headers}->@*;
 
-                    if ( !is_ref $part || is_plain_scalarref $part ) {
-                        $buf .= $pack_mime->( $boundary, undef, is_plain_scalarref $part ? $part : \$part )->$*;
-                    }
-                    elsif ( is_plain_arrayref $part) {
-                        if ( !is_ref $part->[0] ) {
-                            my $headers = [    #
-                                qq[Content-Type: @{[P->path($part->[0])->mime_type]}; name="$part->[0]"],
-                                qq[Content-Disposition: attachment; filename="$part->[0]"],
-                            ];
+    my $boundary;
 
-                            $buf .= $pack_mime->( $boundary, $headers, is_plain_scalarref $part->[1] ? $part->[1] : \$part->[1] )->$*;
-                        }
-                        else {
-                            $buf .= $pack_mime->( $boundary, $part->[0], is_plain_scalarref $part->[1] ? $part->[1] : \$part->[1] )->$*;
-                        }
+    if ( defined $args->{body} && is_plain_arrayref $args->{body} ) {
+        $boundary = P->random->bytes_hex(64);
+
+        $buf .= qq[MIME-Version: 1.0$CRLF];
+
+        $buf .= qq[Content-Type: multipart/mixed; BOUNDARY="$boundary"$CRLF];
+    }
+
+    $buf .= $CRLF;
+
+    $h->write($buf);
+
+    # send body
+    $buf = q[];
+
+    if ( defined $args->{body} ) {
+        if ( !is_ref $args->{body} ) {
+            $buf .= encode_utf8 $args->{body};
+        }
+        elsif ( is_plain_scalarref $args->{body} ) {
+            $buf .= encode_utf8 $args->{body}->$*;
+        }
+        elsif ( is_plain_arrayref $args->{body} ) {
+            state $pack_mime = sub ( $boundary, $headers, $body ) {
+                my $part = '--' . $boundary . $CRLF;
+
+                $part .= join( $CRLF, map { encode_utf8 $_} $headers->@* ) . $CRLF if defined $headers;
+
+                $part .= 'Content-Transfer-Encoding: base64' . $CRLF;
+
+                $part .= $CRLF;
+
+                $part .= to_b64 encode_utf8 $body->$*;
+
+                $part .= $CRLF;
+
+                $part .= '--' . $boundary . $CRLF;
+
+                return \$part;
+            };
+
+            for my $part ( $args->{body}->@* ) {
+                next if !defined $part;
+
+                if ( !is_ref $part || is_plain_scalarref $part ) {
+                    $buf .= $pack_mime->( $boundary, undef, is_plain_scalarref $part ? $part : \$part )->$*;
+                }
+                elsif ( is_plain_arrayref $part) {
+                    if ( !is_ref $part->[0] ) {
+                        my $headers = [    #
+                            qq[Content-Type: @{[P->path($part->[0])->mime_type]}; name="$part->[0]"],
+                            qq[Content-Disposition: attachment; filename="$part->[0]"],
+                        ];
+
+                        $buf .= $pack_mime->( $boundary, $headers, is_plain_scalarref $part->[1] ? $part->[1] : \$part->[1] )->$*;
                     }
                     else {
-                        die q[Invalid ref type];
+                        $buf .= $pack_mime->( $boundary, $part->[0], is_plain_scalarref $part->[1] ? $part->[1] : \$part->[1] )->$*;
                     }
                 }
-            }
-            else {
-                die q[Invalid ref type];
+                else {
+                    die q[Invalid ref type];
+                }
             }
         }
-
-        if ( defined $buf ) {
-            $buf =~ s/\x0A[.]/\x0A../smg;
-
-            $buf .= $CRLF;
+        else {
+            die q[Invalid ref type];
         }
+    }
 
-        $buf .= qq[.$CRLF];
+    if ( defined $buf ) {
+        $buf =~ s/\x0A[.]/\x0A../smg;
 
-        $h->push_write($buf);
+        $buf .= $CRLF;
+    }
 
-        return;
-    };
+    $buf .= qq[.$CRLF];
 
-    $h->push_write(qq[DATA$CRLF]);
+    $h->write($buf);
 
-    $self->_read_response(
-        $h,
-        sub ($res) {
-            if ( $res != 354 ) {
-                $cb->($res);
-            }
-            else {
-                my $boundary = $send_headers->( $h, $args );
-
-                $send_body->( $h, $args, $boundary );
-
-                $self->_read_response( $h, $cb );
-            }
-
-            return;
-        }
-    );
-
-    return;
+    return $self->_read_response($h);
 }
 
-sub _RSET ( $self, $h, $cb ) {
-    $h->push_write(qq[RSET$CRLF]);
+sub _QUIT ( $self, $h ) {
+    $h->write(qq[QUIT$CRLF]);
 
-    $self->_read_response( $h, $cb );
+    # do not read QUIT response
+    return res [ 221, $STATUS_REASON ];
+}
 
-    return;
+sub _RSET ( $self, $h ) {
+    $h->write(qq[RSET$CRLF]);
+
+    return $self->_read_response($h);
 }
 
 sub _VRFY ( $self, $h, $email, $cb ) {
@@ -534,56 +396,9 @@ sub _VRFY ( $self, $h, $email, $cb ) {
 }
 
 sub _NOOP ( $self, $h, $cb ) {
-    $h->push_write(qq[NOOP$CRLF]);
+    $h->write(qq[NOOP$CRLF]);
 
-    $self->_read_response( $h, $cb );
-
-    return;
-}
-
-sub _QUIT ( $self, $h, $cb ) {
-    $h->push_write(qq[QUIT$CRLF]);
-
-    # do not wait for QUIT response
-    $h->destroy;
-
-    $cb->( res [ 221, $STATUS_REASON ] );
-
-    return;
-}
-
-sub _read_response ( $self, $h, $cb ) {
-    my $data = [];
-
-    $h->on_read( sub ($h) {
-        $h->unshift_read(
-            line => $CRLF,
-            sub ( $h, $line, $eol ) {
-                $line =~ s[\A(\d{3})(.?)][]sm;
-
-                my $status = $1;
-
-                my $more = $2 eq q[-];
-
-                push $data->@*, $line;
-
-                # response finished
-                if ( !$more ) {
-
-                    # remove wathcher
-                    $h->on_read;
-
-                    $cb->( res [ $status, $STATUS_REASON ], $data );
-                }
-
-                return;
-            }
-        );
-
-        return;
-    } );
-
-    return;
+    return $self->_read_response($h);
 }
 
 1;
@@ -593,20 +408,16 @@ sub _read_response ( $self, $h, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 54                   | * Subroutine "sendmail" with high complexity score (35)                                                        |
-## |      | 395                  | * Subroutine "_DATA" with high complexity score (30)                                                           |
+## |    3 | 145, 147             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 181                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 272                  | Subroutines::ProhibitExcessComplexity - Subroutine "_DATA" with high complexity score (29)                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 522                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 530                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 536                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 386                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 392                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 398                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 531                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 564, 566             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 393                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 57                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

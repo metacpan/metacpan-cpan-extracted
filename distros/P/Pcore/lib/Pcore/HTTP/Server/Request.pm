@@ -12,20 +12,20 @@ use overload    #
   },
   fallback => undef;
 
-has _server   => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], required => 1 );
-has _h        => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'],   required => 1 );
-has _cb       => ();    # rouse callback
-has env       => ();    # ( is => 'ro', isa => HashRef, required => 1 );
-has data      => ();
+has _server => ( required => 1 );    # InstanceOf ['Pcore::HTTP::Server']
+has _h      => ( required => 1 );    # InstanceOf ['Pcore::Handle']
+has _cb     => ( required => 1 );    # rouse callback
+has env     => ( required => 1 );
+has data    => ();
 has keepalive => ();
 
-has is_websocket_connect_request => ( is => 'lazy' );    # ( is => 'lazy', isa => Bool, init_arg => undef );
+has is_websocket_connect_request => ( is => 'lazy' );
 
-has _response_status => 0;                               # ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
-has _auth            => ();                              # ( is => 'ro', isa => Object, init_arg => undef );    # request authentication result
+has _response_status => 0;
+has _auth            => ();          # request authentication result
 
-const our $HTTP_SERVER_RESPONSE_STARTED  => 1;           # headers written
-const our $HTTP_SERVER_RESPONSE_FINISHED => 2;           # body written
+const our $HTTP_SERVER_RESPONSE_STARTED  => 1;    # headers written
+const our $HTTP_SERVER_RESPONSE_FINISHED => 2;    # body written
 
 # const our $CONTENT_TYPE_HTML       => 1;
 # const our $CONTENT_TYPE_TEXT       => 2;

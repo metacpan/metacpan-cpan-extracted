@@ -1,10 +1,3 @@
-#  Copyright (c) 1990 The Regents of the University of California.
-#  Copyright (c) 1994-1997 Sun Microsystems, Inc.
-#  See the file "license.terms" for information on usage and redistribution
-#  of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-#
-#
-
 =head1 NAME
 
 Tk::HListbox - Tk Listbox widget supporting images and text entries, Tk::HList based drop-in replacement for Tk::Listbox.
@@ -32,20 +25,20 @@ See L<Tk::options> for details of the standard options.
 
 =item Name: B<Entries>
 
-Entries are added to HListbox vertically as rows, one per row (line) 
+Entries (rows) are added to HListbox vertically as rows, one per row (line) 
 using either the B<insert> method or inserting into a tied array.
 Entries can be either a text string (just like a standard L<Tk::Listbox> 
-entry, an image (a L<Tk::Photo> object), or a hashref containing options 
-specifying both, along with any other desired L<Tk::HList>-valid options.
-Example:  $listbox->insert('end', {-image => $image, -text => 'string'});
-Other interesting options include:
+entry), an image (a L<Tk::Photo> object), or a hashref containing options 
+specifying both, along with any other desired L<Tk::HList>-valid I<options> 
+(see below).  Example:  $listbox->insert('end', {-image => $image, -text => 'string'});
+Options for the referenced hash include:
 
 =over 4
 
 =item B<-hidden> => 1 | 0 
 
-Specifies whether or not the entry should be visible or hidden (0 (false) 
-for visible, 1 (true) for hidden) (default 0 - visible).
+Specifies whether or not the entry should be visible or hidden:  (0 (false) 
+for visible, 1 (true) for hidden).  Default:  0 - visible.
 
 =item B<-indicatoritemtype> => 'image'
 
@@ -53,27 +46,62 @@ Specify an "indicator" image
 
 =item B<-indicatorimage => $image
 
-Special image to be displayed next to entry.
+Special image to be displayed next to entry (in addition to any other image 
+specified in the entry).
+
+=item B<-itemtype>
+
+Specifies the type of display item of this entry.  Can be I<"text">, I<"image">, or 
+I<"imagetext">.  Default:  Whatever is specified, if anything, for the widget, 
+(see B<-itemtype> under B<WIDGET OPTIONS> below).  If not specified there, 
+then the default is I<"text">, though I<"imagetext"> allows for either 
+or both an image or text.
 
 =item B<-textanchor> => 'n', 's', 'e', 'w'
 
-Side of text the IMAGE is displayed on.  (Default: 'e' (East))
-
-=item B<-anchor> => 'e', 'w'
-
-Left or Right-justification of entry (Default: 'e')
+Side of text the IMAGE is displayed on.  Default: I<'w'> (West / left, ie. image 
+before text)
 
 =item B<-style> => $ImageStyleObject
 
-Use an HList Style object (see Tk::ItemStyle and Tk::DItem)
+Use an already-defined HList B<ItemStyle> object (see Tk::ItemStyle and Tk::DItem)
 
-=item B<-sort>, B<-user> => 'value'
+=item B<-sort> => 'value', B<-user> => 'value'
 
-These options not passed to functions, but retained with data, useful for saving info with an entry for one's own use.
+Specifies user-specific data to be kept stored with the entry but not displayed.  
+Such data would most likely be a string, but could be a reference to pretty much 
+anything.  Tk::HMListbox makes use of the B<-sort> field for user-control of 
+column sorting, refer to it's documentation for examples.
 
-For example, one could put text in a I<-sort> option of say, an image-only entry and then retrieve it in a sort function like "sort { $a->{-sort} cmp $b->{-sort} }".
+=item B<-text> $string
+
+Specifies a "text" entry.  $string represents the text to be displayed in the entry.
+
+These options are not passed to functions, but retained with data, useful for saving info 
+with an entry for one's own use.
+
+For example, one could put text in a I<-sort> option of say, an image-only entry and then retrieve 
+it in a sort function like "sort { $a->{-sort} cmp $b->{-sort} }".
+
+Any other option, other than these or the standard applicable widget options, such as B<-background>, 
+etc. are treated as "Style" options and sent to the default B<ItemStyle> for the data type.  
+NOTE:  Under the current implementation any "Style" options supplied with an entry will be applied to 
+ALL entries of that "type" (ie. "image", "imagetext", or "text") in the listbox.  To force a specific 
+entry to have a different "style", define an B<ItemStyle> object and use the B<-style> option.
 
 =back
+
+=item Name: B<activeForeground>
+
+=item Class: B<activeForeground>
+
+=item Switch: B<-activeforeground>
+
+Specifies an alternate color for the foreground of the "active" entry (the one the text 
+cursor is on).  This entry is also shown with a hashed box around it.  
+The "activebackground" color, however, is always fixed as the same color as the 
+the widget's background.  
+Default:  same color as the widget's foreground color.
 
 =item Name:	B<browsecmd>
 
@@ -102,7 +130,10 @@ entry by double-clicking it or pressing the Return key.
 
 Specifies the desired height for the window, in number of characters.
 If zero or less, then the desired height for the window is based on 
-the default for HList, which seems to be about 7 lines.
+the default for HList, which seems to be about 7 lines.  WARNING:  This 
+is NOT accurate, ie. specifying a -height of 8 will typically display 
+about 6-6 1/2 rows of text in the default font.  Sorry, but this is a 
+bug in the underlying Tk::HList widget.
 
 =item Name:	B<indicator>
 
@@ -149,6 +180,24 @@ to unset a variable in use as a -listvariable may fail without error.
 The listvariable reference is "TIEd" to the HListbox widget just as if one 
 has done: "tie @listvariable, 'Tk::HListbox', $HListboxwidget, (ReturnType => 'index);" 
 immediately after defining $HListboxwidget using the "tie @array" feature. 
+
+=item Name:	B<selectBackground>
+
+=item Class:	B<SelectBackground>
+
+=item Switch:	B<-selectbackground>
+
+Specifies an alternate background color for item(s) currently "selected".  
+Default:  a slightly brighter shade of the widget's current background color.
+
+=item Name:	B<selectForeground>
+
+=item Class:	B<SelectForeground>
+
+=item Switch:	B<-selectforeground>
+
+Specifies an alternate foreground color for item(s) currently "selected".  
+Default:  the widget's current foreground color.
 
 =item Name:	B<selectMode>
 
@@ -341,6 +390,13 @@ I<first>, i.e. a single element is deleted.
 Given the text of an entry, return the index of the first 
 entry whose text matches the string, or I<<undef>> if no matches.
 
+=item I<$listbox>-E<gt>B<fixPalette>()
+
+Under certain situations, changing the color theme via $mainwin->setPalette(...) 
+does not always update do to the myriad of subwidgets and color options 
+supported.  Calling this method should fully update everything in the widget 
+that have not been individually set by the user.  
+
 =item I<$listbox>-E<gt>B<get>(I<first, >?I<last>?)
 
 If I<last> is omitted, returns the contents of the listbox
@@ -376,9 +432,9 @@ of elements in the listbox (not the index of the last element).
 
 =item I<$listbox>-E<gt>B<insert>(I<index, >?I<element, element, ...>?)
 
-Inserts zero or more new elements in the list just before the
+Inserts zero or more new elements (entries) in the list just before the
 element given by I<index>.  If I<index> is specified as
-B<end> then the new elements are added to the end of the
+B<"end"> then the new elements are added to the end of the
 list.  Returns an empty string.  If the I<index> is not "end", 
 the list will be automatically inserted in reverse order so that 
 the entire list is inserted in the proper order before the 
@@ -1087,9 +1143,11 @@ use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
 use vars qw($VERSION @Selection $Prev $tixIndicatorArmed);
-$VERSION = '2.1';
+$VERSION = '2.2';
 
 Tk::Widget->Construct('HListbox');
+
+my $bummer = ($^O =~ /MSWin/) ? 1 : 0;
 
 sub ClassInit
 {
@@ -1128,33 +1186,25 @@ sub ClassInit
 		$w->yview('scroll',1,'pages');
 		$w->activate('@0,0');
  });
-#x	$mw->bind($class, '<Control-Prior>', ['Tk::HList::xview','scroll',-1, 'pages']);  #JWT:DIFFERENT FROM Listbox!:
-#x	$mw->bind($class, '<Control-Next>', ['Tk::HList::xview','scroll',1, 'pages']);
 	$mw->bind($class, '<Control-Prior>', ['CtrlPriorNext',-1]);  #JWT:DIFFERENT FROM Listbox!:
 	$mw->bind($class, '<Control-Next>', ['CtrlPriorNext',1]);
  # <Home> and <End> defined in XscrollBind
-#	$mw->bind($class, '<Home>',  ['Tk::HList::xview','moveto',0]);
-#	$mw->bind($class, '<End>',   ['Tk::HList::xview','moveto',1]);
 	$mw->bind($class, '<Control-Home>','Cntrl_Home');
- $mw->bind($class,'<Shift-Control-Home>',['DataExtend',0]);
+	$mw->bind($class,'<Shift-Control-Home>',['DataExtend',0]);
 	$mw->bind($class, '<Control-End>','Cntrl_End');
- $mw->bind($class,'<Shift-Control-End>',['DataExtend','end']);
- $mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
- $mw->bind($class,'<Select>',['BeginSelect',Ev('index','active')]);
+	$mw->bind($class,'<Shift-Control-End>',['DataExtend','end']);
+	$mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
+	$mw->bind($class,'<Select>',['BeginSelect',Ev('index','active')]);
 
- $mw->bind($class,'<Shift-space>',['ShiftSpace',Ev('index','active')]);  #JWT:ADDED 20091020!
- $mw->bind($class,'<Shift-Select>',['BeginExtend',Ev('index','active')]);  #JWT:ADDED 20091020!
+	$mw->bind($class,'<Shift-space>',['ShiftSpace',Ev('index','active')]);  #JWT:ADDED 20091020!
+	$mw->bind($class,'<Shift-Select>',['BeginExtend',Ev('index','active')]);  #JWT:ADDED 20091020!
 	$mw->bind($class, '<Escape>', 'Cancel');
 	$mw->bind($class, '<Control-slash>','SelectAll');
 	$mw->bind($class, '<Control-backslash>','Cntrl_backslash');
  # Additional Tk bindings that aren't part of the Motif look and feel:
- $mw->bind($class,'<2>',['scan','mark',Ev('x'),Ev('y')]);
- $mw->bind($class,'<B2-Motion>',['scan','dragto',Ev('x'),Ev('y')]);
- $mw->bind($class,'<Return>', ['InvokeCommand']);
-#x	$mw->bind($class, '<Prior>',  ['Tk::HList::yview','scroll',-1,'pages']);
-#x	$mw->bind($class, '<Next>',   ['Tk::HList::yview','scroll',1,'pages']);
-#	$mw->bind($class, '<Left>', ['Tk::HList::xview','scroll',-1, 'pages']);
-#	$mw->bind($class, '<Right>', ['Tk::HList::xview','scroll',1, 'pages']);
+	$mw->bind($class,'<2>',['scan','mark',Ev('x'),Ev('y')]);
+	$mw->bind($class,'<B2-Motion>',['scan','dragto',Ev('x'),Ev('y')]);
+	$mw->bind($class,'<Return>', ['InvokeCommand']);
 	$mw->MouseWheelBind($class); # XXX Both needed?
 	$mw->YMouseWheelBind($class);
 
@@ -1164,10 +1214,15 @@ sub ClassInit
 sub Populate {
 	my ($w, $args) = @_;
 
+	$w->toplevel->bind('<<setPalette>>' => [$w => 'fixPalette']);
+	$w->{Configure}{'-font'} = $args->{'-font'}   #MUST ACTUALLY SET THE HList "DEFAULT" FONT FOR BOTH PLATFORMS!:
+			|| ($bummer ? "{MS Sans Serif} 8" : "Helvetica -12 bold");
 	$w->SUPER::Populate($args);
 	$w->ConfigSpecs(
-			-background    => [qw/SELF background Background/, $Tk::NORMAL_BG],
-			-foreground    => [qw/SELF foreground Foreground/, $Tk::NORMAL_FG],
+			-background    => [qw/METHOD background Background/, $Tk::NORMAL_BG],
+			-foreground    => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG],
+			-activeforeground => [qw/METHOD activeForeground ActiveForeground/, $Tk::NORMAL_FG],
+			-selectforeground => [qw/METHOD selectForeground SelectForeground/, $Tk::NORMAL_FG],
 			-updatecommand => ['CALLBACK'],
 			-xscancommand  => ['CALLBACK'],
 			-parent        => [qw/SELF parent parent/, undef],
@@ -1175,13 +1230,201 @@ sub Populate {
 			-indicatorcmd  => ['CALLBACK'],
 			-activestyle   => [qw/PASSIVE activeStyle ActiveStyle underline/],  #CURRENTLY IGNORED.
 			-listvariable  => [qw/PASSIVE listVariable Variable undef/],
-			-state         => [qw/PASSIVE  state   State    normal/],
+			-state         => [qw/METHOD state   State normal/],
+			-font          => [qw/METHOD font    Font/],
 	);
 
 	#EMULATE "-listvariable" USING THE TIE FEATURE:
 	if (defined($args->{-listvariable}) && ref($args->{-listvariable})) {
 		tie @{$args->{-listvariable}}, 'Tk::HListbox', $w, (ReturnType => 'index');
 	}
+
+	my $Palette = $w->Palette;
+	foreach my $tp (qw/text image imagetext/) {   #CREATE "DEFAULT" STYLES FOR EACH itemtype:
+		$w->{"_style$tp"} = $w->ItemStyle($tp);
+		$w->{"_style$tp"}->configure('-activebackground' => $Palette->{'background'})  if ($Palette->{'background'});
+		$w->{"_style$tp"}->configure('-font' => $w->{Configure}{'-font'})  if ($tp ne 'image');
+	}
+	$w->configure('-activeforeground' => $args->{'-activeforeground'})  if ($args->{'-activeforeground'});
+	$w->configure('-selectforeground' => $args->{'-selectforeground'})  if ($args->{'-selectforeground'});
+}
+
+sub fixPalette {     #WITH OUR setPalette, WE CAN CATCH PALETTE CHANGES AND ADJUST EVERYTHING ACCORDINGLY!:
+	my $w = shift;   #WE STILL PROVIDE THIS AS A USER-CALLABLE METHOD FOR THOSE WHO ARE NOT.
+	my $Palette = $w->Palette;
+
+	$w->configure('-background' => $Palette->{'background'});
+	$w->configure('-foreground' => $Palette->{'foreground'});
+}
+
+sub background {
+	my $w = shift;
+	my $val = shift;
+	return $w->{Configure}{'-background'}  unless (defined($val) && $val);
+
+	my $dfltBG = $w->toplevel->cget('-background');
+	my $force = shift || 0;
+	#ALLOW BACKGROUND CHANGE IF FORCE OR VALUE APPEARS TO BE USER-SET:
+	$w->{'_backgroundset'} = 0  if ($force || $val !~ /^${dfltBG}$/i);
+	## Ensure that the base Frame, pane and columns (if any) get set
+	unless ($w->{'_backgroundset'}) {
+		Tk::configure($w, "-background", $val);
+		$w->{Configure}{'-background'} = $val;
+		foreach my $tp (qw/text image imagetext/) {
+			$w->{"_style$tp"}->configure('-background' => $val, '-activebackground' => $val);
+		}
+		$w->{'_backgroundset'} = 1  unless ($w->{'_statechg'} || $val =~ /^${dfltBG}$/i);
+	}
+}
+
+#PBM. IS THAT IF USER SETS A CUSTOM COLOR, WE WANT TO KEEP THAT THRU BOTH STATE AND PALETTE CHANGES,
+#OTHERWISE, WE WANT TO PROPERLY CHANGE WHEN EITHER STATE OR PALETTE CHANGES, EVEN IF PALETTE CHANGES 
+#WHILE THE STATE IS DISABLED!:
+sub foreground {   #THIS CODE IS UGLY AS CRAP, BUT NECESSARY TO ACTUALLY WORK:
+	my $w = shift;
+	my $val = shift;
+	return $w->{Configure}{'-foreground'}  unless (defined($val) && $val);
+
+	my $dfltFG = $w->toplevel->cget('-foreground');
+	my $force = shift || 0;
+	#ALLOW FOREGROUND CHANGE IF FORCE OR VALUE APPEARS TO BE USER-SET:
+	my $palettechg = ($val =~ /^${dfltFG}$/i) ? 1 : 0;
+	my $disabled = ($w->{Configure}{'-state'} =~ /d/o) ? 1 : 0;
+	my $allowed = 0;
+	if ($force || $w->{'_statechg'}) {
+		$allowed = 1;   #IF FORCE OR WE'RE CHANGING "STATE":
+	} elsif ($w->{'_foregroundset'}) {
+		$allowed = 1  unless ($palettechg);  #FROZEN, ALLOW USER, BUT NOT setPalette TO CHANGE:
+	} elsif (!$disabled || !$palettechg) {
+		$allowed = 1    #NOT FROZEN, ALLOW setPalette IF ENABLED:
+	}
+	## Ensure that the base Frame, pane and columns (if any) get set
+	if ($allowed) {   #FG ALLOWED TO BE CHANGED:
+		if ($disabled) {  #FORCE TO DISABLED FG, IF DISABLED:
+			my $Palette = $w->Palette;
+			unless ($w->{'_foreground'} || $w->{'_statechg'}) {
+				$w->{'_foreground'} = $val;  #NEED TO GET HERE, SINCE STARTED DISABLED & WE DIDN'T HAVE IT YET!
+				$w->{'_foregroundset'} = $val;
+			}
+			$val = $Palette->{'disabledForeground'};
+		}
+		Tk::configure($w, "-foreground", $val);
+		$w->{Configure}{'-foreground'} = $val;
+		foreach my $tp (qw/text image imagetext/) {
+			$w->{"_style$tp"}->configure('-foreground' => $val);
+		}
+		#WE MUST CONSIDER UPDATING ACTIVE AND SELECT FOREGROUND IF CHANGING STATES OR PALETTES:
+		$w->{'_propogateFG'} = 1;
+		$w->configure('-activeforeground' => $val)  if ($w->{'_statechg'} || !$w->{'_activeforegroundset'});
+		$w->configure('-selectforeground' => $val)  unless ($w->{'_statechg'});
+		$w->{'_propogateFG'} = 0;
+
+		#FREEZE THE FG (IF ENABLED AND NOT SET BY PALETTE & NOT CHANGING "STATE":
+		$w->{'_foregroundset'} = $val  if (!$disabled && !$palettechg && !$w->{'_statechg'});
+	} else {   #NOT ALLOWED TO BE CHANGED: MUST RESET TO "FROZEN" FG, SINCE TK'S ALREADY "CHANGED" IT INTERNALLY:
+		if ($w->{'_foregroundset'}) {
+			Tk::configure($w, "-foreground", $w->{'_foregroundset'});
+			$w->{Configure}{'-foreground'} = $w->{'_foregroundset'};
+		} elsif ($palettechg && $disabled) {  #IF WE'RE NOT "FROZEN" AND WE'RE DISABLED, SAVE NEW PALLETTE-SET FG FOR RESTORATION WHEN ENABLED:
+			$w->{'_foreground'} = $val;
+		}
+	}
+}
+
+sub selectforeground {
+	my ($w, $val) = @_;
+	return $w->{Configure}{'-selectforeground'}  unless (defined($val) && $val);
+
+	my $dfltFG = $w->toplevel->cget('-foreground');
+	my $palettechg = ($val =~ /^${dfltFG}$/i) ? 1 : 0;
+	my $disabled = ($w->{Configure}{'-state'} =~ /d/o) ? 1 : 0;
+	my $allowed = 0;
+	if ($w->{'_selectforegroundset'}) {
+		$allowed = 1  unless ($w->{'_propogateFG'} || $palettechg);  #FROZEN, ALLOW USER, BUT NOT setPalette TO CHANGE:
+	} else {
+		$allowed = 1;    #NOT FROZEN, ALLOW setPalette IF ENABLED:
+	}
+	if ($allowed) {
+		Tk::configure($w, "-selectforeground", $val);
+		$w->{Configure}{'-selectforeground'} = $val;
+		foreach my $tp (qw/text image imagetext/) {
+			$w->{"_style$tp"}->configure('-selectforeground' => $val);
+		}
+		$w->{'_selectforegroundset'} = $val  unless ($disabled || $palettechg
+				|| $w->{'_statechg'} || $w->{'_propogateFG'});
+	} else {   #NOT ALLOWED TO BE CHANGED: MUST RESET TO "FROZEN" FG, SINCE TK'S ALREADY "CHANGED" IT INTERNALLY:
+		if ($w->{'_selectforegroundset'}) {
+			Tk::configure($w, "-selectforeground", $w->{'_selectforegroundset'});
+			$w->{Configure}{'-selectforeground'} = $w->{'_selectforegroundset'};
+		}
+	}
+}
+
+sub activeforeground {
+	my ($w, $val) = @_;
+	return $w->{Configure}{'-activeforeground'}  unless (defined($val) && $val);
+
+	#RESTORE PREV. "NORMAL" A-FG IF SAVED && EITHER STATE OR PALETTE IS CHANGIN' && STATE IS NORMAL:
+	$val = $w->{'_activeforeground'}  if ($w->{'_activeforeground'} 
+			&& ($w->{'_statechg'}) && $w->{Configure}{'-state'} !~ /d/o);
+
+	my $dfltFG = $w->toplevel->cget('-foreground');
+	#SAVE THE NEW "NORMAL" VALUE UNLESS WE'RE DISABLED OR USER PREV. SET OR B|W (WE THINK setPalette SET IT:
+	$w->{'_activeforeground'} = $val  unless ($w->{Configure}{'-state'} =~ /d/o
+			|| $w->{'_activeforegroundset'} || $val =~ /^${dfltFG}$/i);
+
+	$w->{Configure}{'-activeforeground'} = $val;
+	foreach my $tp (qw/text imagetext/) {
+		$w->{"_style$tp"}->configure('-activeforeground' => $val);  #UPDATE ALL ENTRIES TO MATCH:
+	}
+
+	#FREEZE THE CURRENT A-FG IF WE'RE NOT JUST CHANGING STATES AND WE'RE NOT DISABLED AND  IT'S NOT B|W MEANING setPalette'S CHANGIN IT AND WE'RE NOT THE INITIAL SETTING:
+	$w->{'_activeforegroundset'} = 1  unless ($w->{Configure}{'-state'} =~ /d/o
+			|| $val =~ /^${dfltFG}$/i || $w->{'_statechg'} || $w->{'_propogateFG'});
+}
+
+sub font {  #SINCE WE CREATE "DEFAULT" STYLES FOR FG/BG PURPOSES, WE MUST SET THE FONT THERE TOO!:
+	my ($w, $val) = @_;
+
+	return $w->{Configure}{'-font'} || undef  unless (defined($val) && $val);
+
+	$w->{Configure}{'-font'} = $val;
+	foreach my $tp (qw/text imagetext/) {
+		$w->{"_style$tp"}->configure('-font' => $val);
+	}
+}
+
+sub state {  #SINCE HList DOESN'T SUPPORT STATES (NORMAL, DISABLED), WE MUST HANDLE IT MANUALLY:
+	my ($w, $val) = @_;
+
+	return $w->{Configure}{'-state'} || undef  unless (defined($val) && $val);
+
+	#THE STUPID HList WIDGET IS BROKEN: WON'T TAKE STATE CHANGE?!  $w->Tk::HList::configure('-state' => $val);
+	#SO WE HAVE TO "EMULATE" IT OURSELVES MANUALLY - GRRRRRRRR!:
+	return  if ($val eq $w->{'_prevstate'});  #DON'T DO TWICE IN A ROW!
+
+	$w->{'_statechg'} = 1;
+	if ($val =~ /d/o) {               #WE'RE DISABLING (SAVE CURRENT ENABLED STATUS STUFF, THEN DISABLE USER-INTERACTION):
+		my $Palette = $w->Palette;
+
+		$w->{Configure}{'-state'} = 'normal';
+		@{$w->{'_savesel'}} = $w->curselection;   #SAVE & CLEAR THE CURRENT SELECTION, FOCUS STATUS & COLORS:
+		eval { $w->selectionClear(0, 'end'); };
+		$w->{'_takesfocus'} = $w->cget('-takefocus');
+		$w->{'_foreground'} = $w->cget('-foreground');  #SAVE CURRENT (ENABLED) FG COLOR!
+		$w->{Configure}{'-state'} = $val;
+		$w->configure('-foreground' => $Palette->{'disabledForeground'});  #SET FG TO DISABLEDFG.
+		$w->configure('-takefocus' => 0);
+	} elsif ($w->{'_prevstate'}) {    #WE'RE ENABLING (RESTORE PREV. ENABLED STUFF AND REALLOW USER-INTERACTION):
+		$w->{Configure}{'-state'} = $val;
+		$w->selectionSet(@{$w->{'_savesel'}})  if (ref $w->{'_savesel'});  #RESTORE SELECTED LIST.
+		my $fg = $w->{'_foreground'};
+		$fg ||= $w->toplevel->cget('-foreground');
+		$w->configure('-foreground' => $fg)  if ($fg);  #RESTORE FG COLOR.
+		$w->configure('-takefocus' => ($w->{'_takesfocus'} =~ /\d/o) ? $w->{'_takesfocus'} : 1);
+	}
+	$w->{'_prevstate'} = $w->{Configure}{'-state'};
+	$w->{'_statechg'} = 0;
 }
 
 sub selection {
@@ -1198,6 +1441,7 @@ sub selection {
 sub selectionSet {   #THIS SHOULD TAKE HList "ENTRIES":
 	my ($w) = shift;
 
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 	return  unless (defined($_[0]) && $_[0] =~ /\S/o);
 	my @args = @_;
 	for (my $i=0;$i<=$#args;$i++) {
@@ -1214,7 +1458,6 @@ sub selectionSet {   #THIS SHOULD TAKE HList "ENTRIES":
 		push (@range, $ent)  unless ($w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent));
 	}
 	if ($range[0] =~ /\S/o) {
-#		$w->Tk::HList::anchorSet($range[0])  if (scalar(@_) == 1);
 		if ($#range < 2) {
 			$w->Tk::HList::selectionSet(@range);
 		} else {
@@ -1227,6 +1470,7 @@ sub selectionSet {   #THIS SHOULD TAKE HList "ENTRIES":
 
 sub selectionClear {
 	my ($w) = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	my $active = $w->index('active');
 	my @range = $w->getEntryList(@_);
@@ -1236,6 +1480,7 @@ sub selectionClear {
 }
 
 sub anchorSet {  #HList's "anchor" is it's (active) cursor, so we use a "virtual anchor" for ours.
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 	return  unless (defined($_[1]) && $_[1] =~ /\S/o);
 
 	my $ent = $_[0]->getEntry($_[1]);
@@ -1248,10 +1493,14 @@ sub anchorClear {
 }
 
 sub selectionAnchor {  #SET THE SELECTION ANCHOR (Listbox's version of HList's "anchorSet" function:
+	return  if (!defined($_[0]) || $_[0]->{Configure}{'-state'} =~ /d/o);
+
 	$_[0]->anchorSet($_[1]);
 }
 sub activate {    #HListbox "anchor" == Listbox "active"!
 	my ($w) = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
+
 	my @v = @_;
 	my $ent = $w->getEntry($v[0]);
 	$w->Tk::HList::anchorSet($ent)
@@ -1260,7 +1509,7 @@ sub activate {    #HListbox "anchor" == Listbox "active"!
 
 sub curselection { 
 	my $v = $_[0]->info('selection');
-	unless (defined $v) {
+	unless (defined($v)) {
 		return wantarray ? () : undef;
 	}
 	my $vcnt = 0;
@@ -1308,6 +1557,7 @@ sub yview {
 sub SpaceSelect   #JWT:THIS WORKS SLIGHTLY DIFFERENT THAN NORMAL LISTBOX B/C THE ONLY WAY IN AN HList TO SHOW THE CURSOR ON AN ITEM IS TO "SELECT" IT.
 {
 	my $w = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	$w->BeginSelect(@_);
 	$w->Callback(-indicatorcmd => $_[0])  if ($w->cget('-indicator') && $w->indicator('exists', $w->getEntry($_[0])));
@@ -1348,6 +1598,7 @@ sub get {
 
 sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 	my ($c, $index, @data) = @_;
+	return ''  if ($c->{Configure}{'-state'} =~ /d/o);
 
 	# The listbox might get resized after insert/delete, which is a 
 	# behaviour we don't like....
@@ -1358,25 +1609,24 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 		@atIndexArgs = ('-at', $c->index($index));
 		@data = reverse @data;     #WE HAVE TO REVERSE THE LIST BEING ADDED IF THE INDEX IS NOT "end"!
 	}
-	my (@addArgs, @childData, $extraOpsHash, @dataParts, @indicatorOps, %styleOps, $haveStyle, $hideit);
+	my (@addArgs, @childData, @indicatorOps, %styleOps, $haveStyle, $hideit, $dataAlreadyPushed);
 	for (my $i=0;$i<=$#data;$i++) {
 		@addArgs = ();
 		@childData = ();
-		$extraOpsHash = {};
-		
 		@indicatorOps = ();
 		%styleOps = ();
 		$haveStyle = 0;
 		$hideit = 0;
+		$dataAlreadyPushed = 0;
 		if (defined($data[$i]) && $data[$i] ne '') {
 			if ($data[$i] =~ /^Tk\:\:.*HASH\(.+\)$/o && $itemType =~ /^image/o) {   #WE HAVE AN IMAGE:
 				@addArgs = ('-itemtype', $itemType, '-image', $data[$i]);
 			} elsif (ref($data[$i]) =~ /HASH/o) {    #WE HAVE A HASHREF (PBLY IMAGE+TEXT) OR ADDITIONAL HList OPTIONS:
 				@addArgs = ('-itemtype', $data[$i]->{'-itemtype'}||$itemType);
 				foreach my $op (keys %{$data[$i]}) {  #PUT EACH OBJECT IN IT'S PROPER BUCKET:
-					if ($op =~ /^\-(?:data|state)$/o) {  # => addchild(@childData)
+					if ($op =~ /^\-state$/o) {  # => addchild(@childData)
 						push @childData, $op, $data[$i]->{$op};
-					} elsif ($op =~ /^\-(?:text|itemtype|image|underline)$/o) {  # => ItemCreate(@addArgs)
+					} elsif ($op =~ /^\-(?:text|image|underline)$/o) {  # => ItemCreate(@addArgs)
 						push @addArgs, $op, $data[$i]->{$op};
 					} elsif ($op =~ /^\-style$/o) {  # => ItemCreate(@addArgs)
 						push @addArgs, $op, $data[$i]->{$op};
@@ -1390,31 +1640,32 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 						}
 					} elsif ($op =~ /^\-hidden$/o) {
 						$hideit = $data[$i]->{$op};
-					} elsif ($op !~ /^\-(?:user|sort)/o) {    #DATA OPTIONS WE WISH TO RETAIN BUT ARE NOT VALID FOR USE IN CREATING OBJECTS:
+					} elsif ($op !~ /^\-(?:user|sort|itemtype)/o) {    #DATA OPTIONS WE WISH TO RETAIN BUT ARE NOT VALID FOR USE IN CREATING OBJECTS:
 						$styleOps{$op} = $data[$i]->{$op};
 					}
 				}
 			} else {  #WE JUST HAVE A TRADITIONAL TEXT STRING TO DISPLAY:
 				@addArgs = ('-itemtype', 'text', '-text', $data[$i]);
+				push @childData, '-data', $data[$i];
+				$dataAlreadyPushed = 1;
+				$data[$i]->{'-itemtype'} = 'text';
 			}
-			push @childData, '-data', $data[$i];
+			push @childData, '-data', $data[$i]  unless ($dataAlreadyPushed);
 		} else {      #WE HAVE NOTHING, ADD A SPACE SO IT'LL DISPLAY PROPERLY!
 			@addArgs = ('-itemtype', 'text', '-text', ' ');
 			push @childData, '-data', ' ';
+			$data[$i]->{'-itemtype'} = 'text';
 		}
 		push @childData, @atIndexArgs  if ($#atIndexArgs >= 0);
-		my $child = $c->addchild("", @childData);    #CREATE "CHILD".
+
+		my $child = $c->addchild('', @childData);    #CREATE "CHILD".
 		unless ($haveStyle && $haveStyle =~ /^Tk::ItemStyle/o) {  #WE ALSO HAVE AN ItemStyle, TRY RECONFIGURING IT:
-			if (keys(%styleOps) > 0) {   #WE HAVE "STYLE" OPTIONS, FILL IN ANY MISSING W/LISTBOX-WIDE OPTIONS AS DEFAULTS:
-				#THIS IS NEEDED B/C "-refwindow" DOESN'T SEEM TO DO WHAT IT SAYS:
-				#CHGD TO NEXT 20180704 TO PREVENT ERROR IF itemtype==image:  foreach my $style (qw(-background -foreground -fg -selectforeground)) {
-				foreach my $style (qw(-background -foreground -fg -selectforeground)) {
-					$styleOps{$style} ||= $c->cget($style);
-				}
-				$styleOps{'-font'} ||= $c->cget('-font')  if ($itemType =~ /text/o);
-				push @addArgs, '-style', $c->ItemStyle(($data[$i]->{'-itemtype'}||$itemType), '-refwindow' => $c, %styleOps);
-			}
+			my $tp = $data[$i]->{'-itemtype'} || $itemType;
+			#NOTE:  STYLE STAYS THAT WAY FOR ALL SUBSEQUENT ROWS, BUT MUST DO B/C jfm4 NEEDS THIS!!:
+			$c->{"_style$tp"}->configure(%styleOps)  if (keys(%styleOps) > 0);
+			push @addArgs, '-style', $c->{"_style$tp"};
 		}
+
 		$c->itemCreate($child, 0, @addArgs);    #CREATE THE ENTRY:
 		if (@indicatorOps) {
 			$c->indicator('create', $child, @indicatorOps);   #WE HAVE AN "INDICATOR" IMAGE, CREATE IT TOO:
@@ -1426,6 +1677,7 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 
 sub delete {        #DELETE ONE OR MORE ITEMS FROM THE LIST:
 	my $w = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	my $first = $_[0];
 	my $last = defined($_[1]) ? $_[1] : $first;
@@ -1453,7 +1705,8 @@ sub findIndex {    #FIND THE INDEX THAT MATCHES
 	while ($next =~ /\S/o) {
 		if ($w->info('exists', $next) && !$w->info('hidden', $next)) {
 			$item = $w->info('data', $next);
-			return $pos  if (((ref($item) && defined($item->{-text})) ? $item->{-text} : $item) eq $itemSaught);
+			return $pos  if (defined($item) && ((ref($item) 
+					&& defined($item->{-text})) ? $item->{-text} : $item) eq $itemSaught);
 			++$pos;
 		}
 		$next = $w->info('next', $next);
@@ -1486,7 +1739,8 @@ sub getEntry {    #GIVEN A VALID LISTBOX "INDEX", RETURN THE EQUIVALENT HList "E
 		$next = $w->info('next', $next);
 	}
 	unless (defined($next) && $next =~ /\S/o) {
-		return ($next0) ? $w->nearest($next0) : undef;
+		eval { return ($next0) ? $w->nearest($next0) : undef; };
+		return undef  if ($@);
 	}
 	return $next;
 }
@@ -1559,6 +1813,7 @@ sub Cntrl_End {
 
 sub DataExtend {    #USER PRESSED Shift-Ctrl-Home/End, SELECT FROM ANCHOR TO TOP OR BOTTOM RESPECTIVELY:
 	my ($w, $el) = @_;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	my $active = $w->index('active');
 	my $indx = $w->index($el);
@@ -1579,6 +1834,7 @@ sub DataExtend {    #USER PRESSED Shift-Ctrl-Home/End, SELECT FROM ANCHOR TO TOP
 
 sub SelectAll {
 	my $w = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	if ($w->cget('-selectmode') =~ /^(?:single|browse)/) { 
 		$w->selectionClear(0,'end');
@@ -1593,6 +1849,8 @@ sub SelectAll {
 
 sub Cntrl_backslash {
 	my $w = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
+
 	my $Ev = $w->XEvent;
 
 	$w->selectionClear(0,'end');
@@ -1602,11 +1860,13 @@ sub Cntrl_backslash {
 
 sub Button1    #USER PRESSED LEFT MOUSE-BUTTON or SPACEBAR
 {
+	return  if ($_[0]->{Configure}{'-state'} =~ /d/o);
 	$_[0]->BeginSelect(@_);	
 }
 
 sub DoubleButton1    #USER DOUBLE-CLICKED LEFT MOUSE-BUTTON (has already done a single click)
 {
+	return  if ($_[0]->{Configure}{'-state'} =~ /d/o);
 	$_[0]->InvokeCommand;
 	$_[0]->selectionClear('0','end');
 	$_[0]->selectionSet($_[0]->index('active'));
@@ -1615,12 +1875,14 @@ sub DoubleButton1    #USER DOUBLE-CLICKED LEFT MOUSE-BUTTON (has already done a 
 
 sub ShiftButton1   #JWT:NOT SURE WHERE THIS IS BOUND, BUT IS *DOES* GET CALLED & IS NEEDED:
 {
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 	$_[0]->BeginExtend(@_);	
 }
 
 {
 	my $lastItem;
 	sub Button1Motion {
+		return  if ($_[0]->{Configure}{'-state'} =~ /d/o);
 		my $Ev = $_[0]->XEvent;
 
 		return unless defined $Ev;
@@ -1761,7 +2023,8 @@ sub UpDown   #USER PRESSED AN UP OR DOWN ARROW KEY:
 	my $active = $w->index('active');
 	my $ent = $w->getEntry($active);
 	while ( 1 ) { 
-		$ent = $w->info($spec, $ent);
+		eval {$ent = $w->info($spec, $ent); };
+		last if ($@);
 		last unless( defined $ent );
 		next if( $w->entrycget($ent, '-state') eq 'disabled' );
 		next if( $w->info('hidden', $ent) );
@@ -1794,7 +2057,10 @@ sub UpDown   #USER PRESSED AN UP OR DOWN ARROW KEY:
 
 sub selectionIncludes {
 	return 0 unless ($_[0]->index($_[1]) =~ /\d/o);
-	return $_[0]->Tk::HList::selectionIncludes($_[0]->getEntry($_[1]));
+
+	my $res = 0;
+	eval { $res = $_[0]->Tk::HList::selectionIncludes($_[0]->getEntry($_[1])); };
+	$res ||= 0;
 }
 
 sub itemconfigure {   #SET OPTIONS ON INDIVIDUAL ITEMS:
@@ -1802,7 +2068,7 @@ sub itemconfigure {   #SET OPTIONS ON INDIVIDUAL ITEMS:
 	my $entry = $w->getEntry(shift);
 	if (defined $_[0]) {
 		my $opt = shift;
-		if ($opt =~ /^\-(?:style|text|itemtype|image|underline)$/o) {   #THESE OPTIONS CAN BE DIRECTLY CONFIGURED:
+		if ($opt =~ /^\-(?:style|text|itemtype|image|underline|showimage|showtext|bitmap)$/o) {   #THESE OPTIONS CAN BE DIRECTLY CONFIGURED:
 			return $w->itemConfigure($entry, 0, $opt, @_);
 		} else {    #OTHER OPTIONS MUST BE CONFIGURED IN AN HList "ItemStyle" OBJECT:
 			my @ops = ($opt, @_);
@@ -2516,4 +2782,3 @@ sub bbox
 1
 
 __END__
-

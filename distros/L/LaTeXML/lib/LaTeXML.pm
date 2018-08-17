@@ -29,7 +29,7 @@ use LaTeXML::Util::ObjectDB;
 use LaTeXML::Post::Scan;
 use vars qw($VERSION);
 # This is the main version of LaTeXML being claimed.
-use version; our $VERSION = version->declare("0.8.2");
+use version; our $VERSION = version->declare("0.8.3");
 use LaTeXML::Version;
 # Derived, more informative version numbers
 our $FULLVERSION = "LaTeXML version $LaTeXML::VERSION"
@@ -210,6 +210,7 @@ sub convert {
   my $latexml = $$self{latexml};
   $latexml->withState(sub {
       my ($state) = @_;    # Sandbox state
+      $$state{status} = {};
       $state->pushDaemonFrame;
       $state->assignValue('_authlist', $$opts{authlist}, 'global');
       $state->assignValue('REMOTE_REQUEST', (!$$opts{local}), 'global');
@@ -237,7 +238,7 @@ sub convert {
           } else {    # Default is XML
             $dom = $latexml->convertDocument($digested);
           }
-          }); }
+      }); }
     alarm(0);
     1;
   };
@@ -255,7 +256,6 @@ sub convert {
       my ($state) = @_;    # Remove current state frame
       $$opts{searchpaths} = $state->lookupValue('SEARCHPATHS'); # save the searchpaths for post-processing
       $state->popDaemonFrame;
-      $$state{status} = {};
   });
   if ($LaTeXML::UNSAFE_FATAL) {
     # If the conversion hit an unsafe fatal, we need to reinitialize
@@ -277,6 +277,8 @@ sub convert {
     my $log = $self->flush_log;
     $serialized = $dom if ($$opts{format} eq 'dom');
     $serialized = $dom->toString if ($dom && (!defined $serialized));
+    # Using the Core::Document::serialize_aux, so need an explicit encode into bytes
+    $serialized = Encode::encode('UTF-8', $serialized) if $serialized;
 
     return { result => $serialized, log => $log, status => $$runtime{status}, status_code => $$runtime{status_code} }; }
   else {
@@ -296,7 +298,12 @@ sub convert {
 
   # 3 If desired, post-process
   my $result = $dom;
-  if ($$opts{post} && $dom && $dom->documentElement) {
+  if ($$opts{post} && $dom) {
+    if (!$dom->documentElement) {
+      # Make a completely empty document have at least one element for post-processing
+      # important for utility features such as packing .zip archives for output
+      $$dom{document}->setDocumentElement($$dom{document}->createElement("document"));
+    }
     $result = $self->convert_post($dom);
   }
   # 4 Clean-up: undo everything we sandboxed
@@ -314,16 +321,21 @@ sub convert {
   # 5.1 Serialize the XML/HTML result (or just return the Perl object, if requested)
   undef $serialized;
   if ((defined $result) && ref($result) && (ref($result) =~ /^(:?LaTe)?XML/)) {
-    if (($$opts{format} =~ 'x(ht)?ml') || ($$opts{format} eq 'jats')) {
-      $serialized = $result->toString(1); }
+    if (($$opts{format} =~ /x(ht)?ml/) || ($$opts{format} eq 'jats')) {
+      $serialized = $result->toString(1);
+      if (ref($result) eq 'LaTeXML::Core::Document') {
+        # NOTE that we are serializing here via LaTeXML's Document::serialize_aux
+        # which has NOT been encoded into bytes, so we need an explicit encode before printing/returning
+        $serialized = Encode::encode('UTF-8', $serialized) if $serialized;
+    } }
     elsif ($$opts{format} =~ /^html/) {
-      if (ref($result) =~ '^LaTeXML::(Post::)?Document$') {    # Special for documents
+      if (ref($result) =~ /^LaTeXML::(Post::)?Document$/) {    # Special for documents
         $serialized = $result->getDocument->toStringHTML; }
       else {                                                   # Regular for fragments
         do {
           local $XML::LibXML::setTagCompression = 1;
           $serialized = $result->toString(1);
-          } } }
+        } } }
     elsif ($$opts{format} eq 'dom') {
       $serialized = $result; } }
   else { $serialized = $result; }                              # Compressed case
@@ -464,6 +476,9 @@ sub convert_post {
         elsif ($fmt eq 'mathtex') {
           require LaTeXML::Post::TeXMath;
           push(@mprocs, LaTeXML::Post::TeXMath->new(%PostOPS)); }
+        elsif ($fmt eq 'mathlex') {
+          require LaTeXML::Post::LexMath;
+          push(@mprocs, LaTeXML::Post::LexMath->new(%PostOPS)); }
       }
       ###    $keepXMath  = 0 unless defined $keepXMath;
       ### OR is $parallelmath ALWAYS on whenever there's more than one math processor?
@@ -478,50 +493,13 @@ sub convert_post {
       require LaTeXML::Post::XSLT;
       my $parameters = { LATEXML_VERSION => "'$LaTeXML::VERSION'" };
       my @searchpaths = ('.', $DOCUMENT->getSearchPaths);
+      # store these for the XSLT; XSLT Processor will copy resources where needed.
       foreach my $css (@{ $$opts{css} }) {
-        if (pathname_is_url($css)) {    # external url ? no need to copy
-          print STDERR "Using CSS=$css\n" if $verbosity > 0;
-          push(@{ $$parameters{CSS} }, $css); }
-        elsif (my $csssource = pathname_find($css, types => ['css'], paths => [@searchpaths],
-            installation_subdir => 'style')) {
-          print STDERR "Using CSS=$csssource\n" if $verbosity > 0;
-          my $cssdest = pathname_absolute($css, pathname_directory($$opts{destination}));
-          $cssdest .= '.css' unless $cssdest =~ /\.css$/;
-          warn "CSS source $csssource is same as destination!" if $csssource eq $cssdest;
-          pathname_copy($csssource, $cssdest) if ($$opts{local} || ($$opts{whatsout} =~ /^archive/)); # TODO: Look into local copying carefully
-          push(@{ $$parameters{CSS} }, $cssdest); }
-        else {
-          warn "Couldn't find CSS file $css in paths " . join(',', @searchpaths) . "\n";
-          push(@{ $$parameters{CSS} }, $css); } }    # but still put the link in!
-
+        push(@{ $$parameters{CSS} }, $css); }
       foreach my $js (@{ $$opts{javascript} }) {
-        if (pathname_is_url($js)) {                  # external url ? no need to copy
-          print STDERR "Using JAVASCRIPT=$js\n" if $verbosity > 0;
-          push(@{ $$parameters{JAVASCRIPT} }, $js); }
-        elsif (my $jssource = pathname_find($js, types => ['js'], paths => [@searchpaths],
-            installation_subdir => 'style')) {
-          print STDERR "Using JAVASCRIPT=$jssource\n" if $verbosity > 0;
-          my $jsdest = pathname_absolute($js, pathname_directory($$opts{destination}));
-          $jsdest .= '.js' unless $jsdest =~ /\.js$/;
-          warn "Javascript source $jssource is same as destination!" if $jssource eq $jsdest;
-          pathname_copy($jssource, $jsdest) if ($$opts{local} || ($$opts{whatsout} =~ /^archive/)); #TODO: Local handling
-          push(@{ $$parameters{JAVASCRIPT} }, $jsdest); }
-        else {
-          warn "Couldn't find Javascript file $js in paths " . join(',', @searchpaths) . "\n";
-          push(@{ $$parameters{JAVASCRIPT} }, $js);
-        }
-      }    # but still put the link in!
+        push(@{ $$parameters{JAVASCRIPT} }, $js); }
       if ($$opts{icon}) {
-        if (my $iconsrc = pathname_find($$opts{icon}, paths => [$DOCUMENT->getSearchPaths])) {
-          print STDERR "Using icon=$iconsrc\n" if $verbosity > 0;
-          my $icondest = pathname_absolute($$opts{icon}, pathname_directory($$opts{destination}));
-          pathname_copy($iconsrc, $icondest) if ($$opts{local} || ($$opts{whatsout} =~ /^archive/));
-          $$parameters{ICON} = $icondest; }
-        else {
-          warn "Couldn't find ICON " . $$opts{icon} . " in paths " . join(',', @searchpaths) . "\n";
-          $$parameters{ICON} = $$opts{icon};
-        }
-      }
+        $$parameters{ICON} = $$opts{icon}; }
       if (!defined $$opts{timestamp}) { $$opts{timestamp}       = localtime(); }
       if ($$opts{timestamp})          { $$parameters{TIMESTAMP} = "'" . $$opts{timestamp} . "'"; }
       # Now add in the explicitly given XSLT parameters
@@ -556,7 +534,7 @@ sub convert_post {
   my @postdocs;
   my $latexmlpost = LaTeXML::Post->new(verbosity => $verbosity || 0);
   my $post_eval_return = eval {
-   local $SIG{'ALRM'} = sub { die "Fatal:conversion:post-processing timed out.\n" };
+    local $SIG{'ALRM'} = sub { die "Fatal:conversion:post-processing timed out.\n" };
     alarm($$opts{timeout});
     @postdocs = $latexmlpost->ProcessChain($DOCUMENT, @procs);
     alarm(0);
@@ -569,14 +547,14 @@ sub convert_post {
     $$runtime{status_code} = 3;
     $@ = 'Fatal:conversion:unknown ' . $@ unless $@ =~ /^\n?\S*Fatal:/s;
     print STDERR $@;
-    undef @postdocs; # Empty document for fatals, for sanity's sake
+    undef @postdocs;    # Empty document for fatals, for sanity's sake
   }
 
   # Finalize by arranging any manifests and packaging the output.
   # If our format requires a manifest, create one
   if (($$opts{whatsout} =~ /^archive/) && ($format !~ /^x?html|xml/)) {
     require LaTeXML::Post::Manifest;
-    my $manifest_maker = LaTeXML::Post::Manifest->new(db => $DB, format => $format, %PostOPS);
+    my $manifest_maker = LaTeXML::Post::Manifest->new(db => $DB, format => $format, log=>$$opts{log}, %PostOPS);
     $manifest_maker->process(@postdocs); }
   # Archives: when a relative --log is requested, write to sandbox prior packing
   if ($$opts{log} && ($$opts{whatsout} =~ /^archive/) && (!pathname_is_absolute($$opts{log}))) {
@@ -603,7 +581,7 @@ sub convert_post {
   # Merge postprocessing and main processing reports
   ### HACKY until we use a single Core::State object, we'll just "wing it" for status messages:
   my $post_status = $latexmlpost->getStatusMessage;
-  if ($post_status ne $$runtime{status}) { # Just so that we avoid double "No problem" reporting
+  if ($post_status ne $$runtime{status}) {    # Just so that we avoid double "No problem" reporting
     $$runtime{status} .= "\n" . $post_status;
   }
   $$runtime{status_code} = max($$runtime{status_code}, $latexmlpost->getStatusCode);
@@ -634,9 +612,9 @@ sub new_latexml {
   my $latexml = LaTeXML::Core->new(preload => [@pre], searchpaths => [@{ $$opts{paths} }],
     graphicspaths   => ['.'],
     verbosity       => $$opts{verbosity}, strict => $$opts{strict},
-    includeComments => $$opts{comments},
+    includecomments => $$opts{comments},
     inputencoding   => $$opts{inputencoding},
-    includeStyles   => $$opts{includestyles},
+    includestyles   => $$opts{includestyles},
     documentid      => $$opts{documentid},
     nomathparse     => $$opts{nomathparse},                           # Backwards compatibility
     mathparse       => $$opts{mathparse});

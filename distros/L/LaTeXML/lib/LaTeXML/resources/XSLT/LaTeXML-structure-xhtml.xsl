@@ -23,9 +23,9 @@
     exclude-result-prefixes = "ltx f func exsl">
 
   <!-- whether to split index lists into two columns -->
-  <xsl:param name="twocolumn-indexlist"></xsl:param>
+  <xsl:param name="USE_TWOCOLUMN_INDEX"></xsl:param>
   <!-- whether to split glossary lists into two columns -->
-  <xsl:param name="twocolumn-glossarylist"></xsl:param>
+  <xsl:param name="USE_TWOCOLUMN_GLOSSARY"></xsl:param>
 
   <!-- ======================================================================
        Document Structure
@@ -40,6 +40,15 @@
                              ltx:subsubsection ltx:paragraph ltx:subparagraph
                              ltx:bibliography ltx:appendix ltx:index ltx:glossary
                              ltx:slide ltx:sidebar"/>
+
+  <xsl:template match="ltx:tag[@role]"/>
+
+  <!-- Don't display tags; they're in the title -->
+  <xsl:template match="ltx:document/ltx:tags  | ltx:part/ltx:tags | ltx:chapter/ltx:tags
+                       | ltx:section/ltx:tags | ltx:subsection/ltx:tags | ltx:subsubsection/ltx:tags
+                       | ltx:paragraph/ltx:tags | ltx:subparagraph/ltx:tags
+                       | ltx:bibliography/ltx:tags | ltx:appendix/ltx:tags | ltx:index/ltx:tags | ltx:glossary/ltx:tags
+                       | ltx:sidebar/ltx:tags | ltx:slide/ltx:tags"/>
 
   <xsl:template match="ltx:document  | ltx:part | ltx:chapter
                        | ltx:section | ltx:subsection | ltx:subsubsection
@@ -146,6 +155,7 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:keywords"/>
   <xsl:template match="ltx:keywords">
     <xsl:param name="context"/>
     <xsl:text>&#x0A;</xsl:text>
@@ -176,6 +186,7 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:classification"/>
   <xsl:template match="ltx:classification">
     <xsl:param name="context"/>
     <xsl:text>&#x0A;</xsl:text>
@@ -289,9 +300,10 @@
     </func:result>
   </func:function>
 
+  <xsl:preserve-space elements="ltx:title"/>
   <xsl:template match="ltx:title">
     <xsl:param name="context"/>
-    <!-- Skip title, if the parent has a titlepage! -->
+    <!-- Skip title, if the parent has a titlepage, or if writing a cv! -->
     <xsl:if test="not(parent::*/child::ltx:titlepage)">    
       <xsl:text>&#x0A;</xsl:text>
       <!-- In html5, could have wrapped in hgroup, but that was deprecated -->
@@ -324,7 +336,7 @@
   </xsl:template>
 
   <xsl:template match="ltx:title" mode="classes">
-    <xsl:apply-imports/>
+    <xsl:apply-templates select="." mode="base-classes"/>
     <xsl:text> </xsl:text>
     <xsl:value-of select="concat('ltx_title_',local-name(..))"/>
   </xsl:template>
@@ -426,6 +438,34 @@
 
   <xsl:strip-space elements="ltx:creator ltx:contact"/>
 
+  <xsl:template match="ltx:creator[@role='cv']">
+      <div class="flex-grid">
+      <div class="col-25">
+        <h1 class="author-name">
+          <xsl:value-of select="ltx:contact[@role='firstname']" />
+          <xsl:text> </xsl:text>
+          <xsl:value-of select="ltx:contact[@role='familyname']" />
+        </h1>
+        <h3 class="author-title">
+          <xsl:apply-templates select="ltx:contact[@role='position']/ltx:inline-block" />
+        </h3>
+      </div>
+      <div class="col-25">
+      </div>
+      <div class="col-50">
+        <h4 class="author-contact">
+          <xsl:apply-templates select="ltx:contact[@role='address']" />
+          <br class="ltx_break"/>
+          <xsl:apply-templates select="ltx:contact[@role='mobile']" />
+          <br class="ltx_break"/>
+          <xsl:apply-templates select="ltx:contact[@role='email']" />
+          <br class="ltx_break"/>
+          <xsl:apply-templates select="ltx:contact[@role='homepage']" />
+       </h4>
+      </div>
+    </div>
+  </xsl:template>
+
   <xsl:template match="ltx:creator"/>
 
   <!-- Format an author 'inline' as part of an author block -->
@@ -472,6 +512,7 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:personname"/>
   <xsl:template match="ltx:personname">
     <xsl:param name="context"/>
     <xsl:text>&#x0A;</xsl:text>
@@ -504,6 +545,7 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:contact"/>
   <xsl:template match="ltx:contact[@role='address' or @role='affiliation']">
     <xsl:param name="context"/>
     <xsl:text>&#x0A;</xsl:text>
@@ -549,7 +591,7 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="ltx:contact[@role='dedicatory']">
+  <xsl:template match="ltx:contact[@role='dedicatory' or @role='mobile']">
     <xsl:param name="context"/>
     <xsl:text>&#x0A;</xsl:text>
     <xsl:element name="span" namespace="{$html_ns}">
@@ -575,6 +617,7 @@
   <xsl:template match="*|/" mode="auto-toc"/>
 
   <!-- only place the date & subtitle within the title treatment -->
+  <xsl:preserve-space elements="ltx:date"/>
   <xsl:template match="ltx:date"/>
 
   <xsl:template match="ltx:date" mode="intitle">
@@ -596,6 +639,7 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:subtitle"/>
   <xsl:template match="ltx:subtitle"/>
 
   <!-- NOTE: Probably should support font, punct, etc, right? -->
@@ -619,6 +663,7 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:toctitle"/>
   <xsl:template match="ltx:toctitle"/>
 
   <!-- ======================================================================
@@ -630,7 +675,7 @@
   <xsl:template match="ltx:indexlist">
     <xsl:param name="context"/>
     <xsl:choose>
-      <xsl:when test="$twocolumn-indexlist and not(ancestor::ltx:indexlist)">
+      <xsl:when test="$USE_TWOCOLUMN_INDEX and not(ancestor::ltx:indexlist)">
         <xsl:apply-templates select="." mode="twocolumn">
           <xsl:with-param name="context" select="$context"/>
         </xsl:apply-templates>
@@ -693,6 +738,7 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:indexrefs"/>
   <xsl:template match="ltx:indexrefs">
     <xsl:param name="context"/>
     <xsl:element name="span" namespace="{$html_ns}">
@@ -720,7 +766,7 @@
   <xsl:template match="ltx:glossarylist">
     <xsl:param name="context"/>
     <xsl:choose>
-      <xsl:when test="$twocolumn-glossarylist">
+      <xsl:when test="$USE_TWOCOLUMN_GLOSSARY">
         <xsl:apply-templates select="." mode="twocolumn">
           <xsl:with-param name="context" select="$context"/>
         </xsl:apply-templates>
@@ -790,5 +836,6 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:preserve-space elements="ltx:glossaryphrase"/>
   <xsl:template match="ltx:glossaryphrase[@role='acronym']"/>
 </xsl:stylesheet>

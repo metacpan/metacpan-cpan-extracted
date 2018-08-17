@@ -2,11 +2,13 @@
 # Copyright (C) 2011-2012, 2014-2015 Rocky Bernstein <rocky@cpan.org>
 use strict; use warnings;
 use rlib '../../..';
-use Devel::Trepan::DB::LineCache; # for map_file
+use Devel::Trepan::DB::LineCache; # for map_file and getline
 use Devel::Trepan::Complete;
 
 package Devel::Trepan::CmdProcessor;
 use English qw( -no_match_vars );
+
+my $have_deparse = eval q(use B::DeparseTree::Fragment; use Devel::Trepan::Deparse; 1);
 
 sub frame_complete($$;$)
 {
@@ -17,7 +19,7 @@ sub frame_complete($$;$)
     Devel::Trepan::Complete::complete_token(\@ary, $prefix);
 }
 
-sub print_stack_entry()
+sub print_stack_entry
 {
     my ($self, $frame, $i, $prefix, $opts) = @_;
     $opts->{maxstack} = 1e9 unless defined $opts->{maxstack};
@@ -25,11 +27,11 @@ sub print_stack_entry()
     local $LIST_SEPARATOR = ', ';
 
     # Get the file name.
-    my $file = $self->canonic_file($frame->{file});
-    $file = '??' unless defined $file;
+    my $canonic_file = $self->canonic_file($frame->{file});
+    $canonic_file = '??' unless defined $canonic_file;
 
     # Put in a filename header if short is off.
-    $file = ($file eq '-e') ? $file : "file `$file'" unless $opts->{short};
+    my $file = ($canonic_file eq '-e') ? $canonic_file : "file `$canonic_file'" unless $opts->{short};
 
     my $not_last_frame = $i != ($self->{stack_size}-1);
     my $s = '';
@@ -82,6 +84,34 @@ sub print_stack_entry()
             $self->msg("\t" . $file_line);
         }
     }
+    if ($opts->{source}) {
+        my $line  = getline($canonic_file, $lineno, $opts);
+        $self->msg($line) if $line;
+    }
+
+
+    if ($opts->{deparse} && $have_deparse && $addr) {
+	my $funcname = $not_last_frame ? $frame->{fn} : "DB::DB";
+	my $int_addr = $addr;
+        $int_addr =~ s/\s+$//g;
+	no warnings 'portable';
+	$int_addr = hex($int_addr);
+	my ($op_info) = deparse_offset($funcname, $int_addr);
+	if ($op_info) {
+	    if ($i != 0) {
+		# All frames except the current frame we need to
+		# back up the op_info;
+		$op_info = get_prev_addr_info($op_info);
+	    }
+	    my $extract_texts = extract_node_info($op_info);
+	    if ($extract_texts) {
+		pmsg($self, join("\n", @$extract_texts))
+	    } else {
+		pmsg($self, $op_info->{text});
+	    }
+	}
+    }
+
 }
 
 sub print_stack_trace_from_to($$$$$)
@@ -99,17 +129,28 @@ sub print_stack_trace($$$)
 {
     my ($self, $frames, $opts)=@_;
     $opts ||= {maxstack=>1e9, count=>1e9};
-    # $opts  = DEFAULT_STACK_TRACE_SETTINGS.merge(opts);
+    my $start = 0;
+    my $n     = scalar @{$frames};
     my $halfstack = $opts->{maxstack} / 2;
-    my $n         = scalar @{$frames};
-    $n            = $opts->{count} if $opts->{count} < $n;
+
+    my $count = $opts->{count};
+    if ($count < 0) {
+	$start = $n + $count;
+	$count = $n;
+    } elsif ($count < $n) {
+	$n = $count;
+	$halfstack = $n;
+    }
+
+    # $opts  = DEFAULT_STACK_TRACE_SETTINGS.merge(opts);
+    $n            = $count if $opts->{count} < $n;
     if ($n > ($halfstack * 2)) {
-        $self->print_stack_trace_from_to(0, $halfstack-1, $frames, $opts);
+        $self->print_stack_trace_from_to($start, $halfstack-1, $frames, $opts);
         my $msg = sprintf "... %d levels ...",  ($n - $halfstack*2);
         $self->msg($msg);
         $self->print_stack_trace_from_to($n - $halfstack, $n-1, $frames, $opts);
     } else {
-        $self->print_stack_trace_from_to(0, $n-1, $frames, $opts);
+        $self->print_stack_trace_from_to($start, $n-1, $frames, $opts);
     }
 }
 

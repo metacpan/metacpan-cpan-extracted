@@ -1,0 +1,42 @@
+[% title = 'TT2 Play Area' %]
+<div class="navbar">
+    <a href="/">TT2 Play Area</a>
+    [% IF examples %]
+    <div class="dropdown">
+        <button class="dropbtn">Examples</button>
+        <div class="dropdown-content">
+          <div class="row">
+            <div class="column">
+            [% FOR example IN examples %]
+                <a href="/example/[% example.name %]">[% example.title %]</a>
+            [% END %]
+            </div>
+          </div>
+        </div>
+    </div>
+    <a class="tt2" href="#" title="Process the template and see the source it generates"><span class="hotkey">R</span>un</a>
+    <a class="view" href="#" title="Load the html produced by processing the template (may fire XSS)">View</a>
+    <a class="clear" href="#" title="Clear the Template and Variables"><span class="hotkey">C</span>lear</a>
+    <form id="engines" method="post">
+    [% FOR engine IN engine_list.keys.sort %]
+        <label>[% engine_list.$engine.name %]<input type="checkbox" name="engine" value="[% engine %]" [% IF engine_list.$engine.selected %]checked[% END %]></label>
+    [% END %]
+    </form>
+[% END %]
+</div>
+<p>[% IF example_data.blurb %][% example_data.blurb %][% ELSE %]Welcome to the Template::Toolkit play area[% END %]</p>
+<div class="core">
+    <div class="tt">
+        <h2><span class="hotkey">T</span>emplate</h2>
+        <textarea id="editor">[% tt | html %]</textarea>
+    </div>
+    <div class="variables">
+        <h2><span class="hotkey">V</span>ariables</h2>
+        <textarea id="variables">[% variables | html %]</textarea>
+    </div>
+    <div class="results">
+        <h2>Results</h2>
+        <div id="results">
+        </div>
+    </div>
+</div>

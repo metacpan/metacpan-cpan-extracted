@@ -7,11 +7,11 @@ use_ok 'EventStore::Tiny';
 
 subtest 'Registration' => sub {
 
-    # no events registered at the beginning
+    # No events registered at the beginning
     my $est = EventStore::Tiny->new;
     is_deeply $est->event_names => [], 'No events stored at the beginning';
 
-    # register a simple event
+    # Register a simple event
     $est->register_event(AnswerGiven => sub {
         my ($state, $data) = @_;
         $state->{answer} = $data->{answer};
@@ -21,14 +21,14 @@ subtest 'Registration' => sub {
 
 subtest 'Storing an event' => sub {
 
-    # prepare
+    # Prepare
     my $est = EventStore::Tiny->new;
     $est->register_event(AnswerGiven => sub {
         my ($state, $data) = @_;
         $state->{answer} = $data->{answer};
     });
 
-    # try to store unknown event
+    # Try to store unknown event
     eval {
         $est->store_event(UnknownEvent => {throw => 'exception plx'});
         fail 'No exception thrown';
@@ -36,25 +36,25 @@ subtest 'Storing an event' => sub {
     like $@ => qr/Unknown event: UnknownEvent!/,
         'Correct exception for unknown event';
 
-    # store an event
+    # Store an event
     is $est->events->size => 0, 'No events';
     $est->store_event(AnswerGiven => {answer => 42});
     is $est->events->size => 1, 'One event after addition';
 
-    # test if it's the right event
+    # Test if it's the right event
     is $est->events->apply_to->{answer} => 42, 'Correct event added';
 };
 
 subtest 'Snapshot' => sub {
 
-    # register test events
+    # Register test events
     my $est = EventStore::Tiny->new;
     $est->register_event(TestEvent => sub {
         my ($state, $data) = @_;
         $state->{foo} += $data->{foo};
     });
 
-    # insert test events
+    # Insert test events
     $est->store_event(TestEvent => {foo => $_}) for qw(17 25 42);
 
     subtest 'Unspecified snapshot' => sub {
@@ -80,27 +80,27 @@ subtest 'Snapshot' => sub {
 
             subtest $subtest_name => sub {
 
-                # create a correct snapshot
+                # Create a correct snapshot
                 my $sep_ts = $est->events->events->[$i]->timestamp;
                 my $correct_sn = EventStore::Tiny::Snapshot->new(
                     state       => $est->events->before($sep_ts)->apply_to,
                     timestamp   => $sep_ts,
                 );
 
-                # verify
+                # Verify
                 ok $est->is_correct_snapshot($correct_sn), 'Verified';
             };
         }
 
         subtest 'Incorrect' => sub {
 
-            # create an incorrect snapshot
+            # Create an incorrect snapshot
             my $incorrect_sn = EventStore::Tiny::Snapshot->new(
                 state       => {xnorfzt => 666},
                 timestamp   => $est->events->events->[1]->timestamp,
             );
 
-            # verify
+            # Verify
             ok not($est->is_correct_snapshot($incorrect_sn)), 'Not verified';
         };
     };

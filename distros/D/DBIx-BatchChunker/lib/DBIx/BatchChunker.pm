@@ -1,18 +1,18 @@
 package DBIx::BatchChunker;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.91';
+our $VERSION   = '0.92';
 
 use Moo;
 
 use CLDR::Number;
 
-use Types::Standard        qw( Str Num Bool HashRef CodeRef InstanceOf );
+use Types::Standard        qw( Any Item Str Num Bool Undef ArrayRef HashRef CodeRef InstanceOf Tuple Maybe Optional slurpy );
 use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt PositiveOrZeroNum );
 use Type::Utils;
 
 use Data::Float;
-use List::Util        1.33 (qw( min max sum any ));  # has any/all/etc.
+use List::Util        1.33 (qw( min max sum any first ));  # has any/all/etc.
 use POSIX                   qw( ceil );
 use Scalar::Util            qw( blessed weaken );
 use Term::ProgressBar 2.14;                          # with silent option
@@ -30,7 +30,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -107,14 +107,19 @@ If L</single_rows> is also enabled, then each chunk is wrapped in a transaction 
 coderef is called for each row in the chunk.  In this case, the coderef is passed a
 Result object instead of the chunk ResultSet.
 
+Note that whether L</single_rows> is enabled or not, the coderef execution is encapsulated
+in DBIC's retry logic, so any failures will re-connect and retry the coderef.  Because of
+this, any changes you make within the coderef should be idempotent, or should at least be
+able to skip over any already-processed rows.
+
 =head3 Active DBI Processing
 
-If an L</sth> (DBI statement handle object) is passed without a L</coderef>, the statement
+If an L</stmt> (DBI statement handle args) is passed without a L</coderef>, the statement
 handle is merely executed on each iteration with the start and end IDs.  It is assumed
 that the SQL for the statement handle contains exactly two placeholders for a C<BETWEEN>
 clause.  For example:
 
-    my $update_sth = $dbh->prepare_cached(q{
+    my $update_stmt = q{
     UPDATE
         accounts a
         JOIN account_updates au USING (account_id)
@@ -127,33 +132,46 @@ clause.  For example:
 
 The C<BETWEEN> clause should, of course, match the IDs being used in the loop.
 
+The statement is ran with L</dbi_connector> for retry protection.  Therefore, the
+statement should also be idempotent.
+
 =head3 Query DBI Processing
 
-If both a L</sth> and a L</coderef> are passed, the statement handle is executed.  Like
-the L</Active DBI Processing> mode, the SQL for the statement handle should contain
-exactly two placeholders for a C<BETWEEN> clause.  Then the C<$sth> is passed to the
-coderef.  It's up to the coderef to extract data from the executed statement handle, and
-do something with it.
+If both a L</stmt> and a L</coderef> are passed, the statement handle is prepared and
+executed.  Like the L</Active DBI Processing> mode, the SQL for the statement should
+contain exactly two placeholders for a C<BETWEEN> clause.  Then the C<$sth> is passed to
+the coderef.  It's up to the coderef to extract data from the executed statement handle,
+and do something with it.
 
 If C<single_rows> is enabled, each chunk is wrapped in a transaction and the coderef is
 called for each row in the chunk.  In this case, the coderef is passed a hashref of the
 row instead of the executed C<$sth>, with lowercase alias names used as keys.
 
+Note that in both cases, the coderef execution is encapsulated in a L<DBIx::Connector::Retry>
+call to either C<run> or C<txn> (using L</dbi_connector>), so any failures will
+re-connect and retry the coderef.  Because of this, any changes you make within the
+coderef should be idempotent, or should at least be able to skip over any
+already-processed rows.
+
 =head3 DIY Processing
 
-If a L</coderef> is passed but neither a C<sth> nor a C<rs> are passed, then the
+If a L</coderef> is passed but neither a C<stmt> nor a C<rs> are passed, then the
 multiplier loop does not touch the database.  The coderef is merely passed the start and
 end IDs for each chunk.  It is expected that the coderef will run through all database
 operations using those start and end points.
 
+It's still valid to include L</min_stmt>, L</max_stmt>, and/or L</count_stmt> in the
+constructor to enable features like L<max ID recalculation|/process_past_max> or
+L<chunk resizing|/min_chunk_percent>.
+
 =head3 TL;DR Version
 
-    $sth                             = Active DBI Processing
-    $sth + $coderef                  = Query DBI Processing  | $bc->$coderef($executed_sth)
-    $sth + $coderef + single_rows=>1 = Query DBI Processing  | $bc->$coderef($row_hashref)
-    $rs  + $coderef                  = DBIC Processing       | $bc->$coderef($chunk_rs)
-    $rs  + $coderef + single_rows=>1 = DBIC Processing       | $bc->$coderef($result)
-           $coderef                  = DIY Processing        | $bc->$coderef($start, $end)
+    $stmt                             = Active DBI Processing
+    $stmt + $coderef                  = Query DBI Processing  | $bc->$coderef($executed_sth)
+    $stmt + $coderef + single_rows=>1 = Query DBI Processing  | $bc->$coderef($row_hashref)
+    $rs   + $coderef                  = DBIC Processing       | $bc->$coderef($chunk_rs)
+    $rs   + $coderef + single_rows=>1 = DBIC Processing       | $bc->$coderef($result)
+            $coderef                  = DIY Processing        | $bc->$coderef($start, $end)
 
 =head1 ATTRIBUTES
 
@@ -188,66 +206,177 @@ has rsc => (
     required  => 0,
 );
 
-=head2 DBI Processing Attributes
+=head3 dbic_retry_opts
 
-=head3 min_sth
+A hashref of DBIC retry options.  These options control how retry protection works within
+DBIC.  So far, there are two supported options:
 
-=head3 max_sth
+    max_attempts  = Number of times to retry
+    retry_handler = Coderef that returns true to continue to retry or false to re-throw
+                    the last exception
 
-L<DBI> statement handles.  When executed, these statements should each return a single
-value (to be used by L<DBI/fetchrow_array>), either the minimum or maximum ID that will be
-affected by the DB changes.  These are used by L</calculate_ranges>.  Required if using
-either type of DBI Processing.
+The default is to use DBIC's built-in retry options, the same way L<DBIx::Class::Storage::DBI/dbh_do>
+does it, which will retry once if the DB connection was disconnected.  If you specify any
+options, even a blank hashref, BatchChunker will fill in a default C<max_attempts> of 10,
+and an always-true C<retry_handler>.  This is similar to L<DBIx::Connector::Retry>'s
+defaults.
+
+Under the hood, these are options that are passed to the as-yet-undocumented
+L<DBIx::Class::Storage::BlockRunner>.  The C<retry_handler> has access to the same
+BlockRunner object (passed as its only argument) and its methods/accessors, such as C<storage>,
+C<failed_attempt_count>, and C<last_exception>.
 
 =cut
 
-has min_sth => (
+has dbic_retry_opts => (
     is       => 'ro',
-    isa      => InstanceOf['DBI::st'],
+    isa      => HashRef,
+    required => 0,
+    lazy     => 1,
+    builder  => 1,
+);
+
+sub _build_dbic_retry_opts {
+    my $self = shift;
+
+    return {
+        # the default from DBIC
+        retry_handler => sub {
+            $_[0]->failed_attempt_count == 1 && !$_[0]->storage->connected
+        },
+    };
+}
+
+sub _dbic_block_runner {
+    my ($self, $method, $coderef) = @_;
+
+    # A very light wrapper around BlockRunner.  No need to load BlockRunner, since DBIC
+    # loads it in before us if we're using this method.
+    DBIx::Class::Storage::BlockRunner->new(
+        # in case they are not defined with a custom dbic_retry_opts
+        max_attempts  => 10,
+        retry_handler => sub { 1 },
+
+        # never overrides the important ones below
+        %{ $self->dbic_retry_opts },
+
+        storage  => $self->dbic_storage,
+        wrap_txn => ($method eq 'txn' ? 1 : 0),
+    )->run($coderef);
+}
+
+=head2 DBI Processing Attributes
+
+=head3 dbi_connector
+
+A L<DBIx::Connector::Retry> object.  Instead of L<DBI> statement handles, this is the
+recommended way for BatchChunker to interface with the DBI, as it handles retries on
+failures.  The connection mode used is whatever default is set within the object.
+
+Required for DBI Processing, unless L</dbic_storage> is specified.
+
+=cut
+
+has dbi_connector => (
+    is       => 'ro',
+    isa      => InstanceOf['DBIx::Connector::Retry'],
     required => 0,
 );
 
-has max_sth => (
+=head3 dbic_storage
+
+A DBIC storage object, as an alternative for L</dbi_connector>.  There may be times when
+you want to run plain DBI statements, but are still using DBIC.  In these cases, you
+don't have to create a L<DBIx::Connector::Retry> object to run those statements.
+
+This uses a BlockRunner object for retry protection, so the options in
+L</dbic_retry_opts> would apply here.
+
+Required for DBI Processing, unless L</dbi_connector> is specified.
+
+=cut
+
+has dbic_storage => (
     is       => 'ro',
-    isa      => InstanceOf['DBI::st'],
+    isa      => InstanceOf['DBIx::Class::Storage::DBI'],
     required => 0,
 );
 
-=head3 sth
+=head3 min_stmt
+
+=head3 max_stmt
+
+SQL statement strings or an arrayref of parameters for L<DBI/selectrow_array>.
+
+When executed, these statements should each return a single value, either the minimum or
+maximum ID that will be affected by the DB changes.  These are used by
+L</calculate_ranges>.  Required if using either type of DBI Processing.
+
+=cut
+
+my $SQLStringOrSTHArgs_type = Type::Utils::declare(
+    name       => 'SQLStringOrSTHArgs',
+    # Allow an SQL string, an optional hashref/undef, and any number of strings/undefs
+    parent     => Tuple->parameterize(Str, Optional[Maybe[HashRef]], slurpy ArrayRef[Maybe[Str]]),
+    coercion   => sub { $_ = [ $_ ] if Str->check($_); $_ },
+    message    => sub { 'Must be either an SQL string or an arrayref of parameters for $sth creation (SQL + hashref/undef + binds)' },
+);
+
+has min_stmt => (
+    is       => 'ro',
+    isa      => $SQLStringOrSTHArgs_type,
+    required => 0,
+    coerce   => 1,
+);
+
+has max_stmt => (
+    is       => 'ro',
+    isa      => $SQLStringOrSTHArgs_type,
+    required => 0,
+    coerce   => 1,
+);
+
+=head3 stmt
+
+A SQL statement string or an arrayref of parameters for L<DBI/prepare> + binds.
 
 If using L</Active DBI Processing> (no coderef), this is a L<do-able|DBI/do> statement
-handle (usually DML like C<INSERT/UPDATE/DELETE>).  If using L</Query DBI Processing>
-(with coderef), this is a passive DQL (C<SELECT>) statement handle.
+(usually DML like C<INSERT/UPDATE/DELETE>).  If using L</Query DBI Processing> (with
+coderef), this is a passive DQL (C<SELECT>) statement.
 
-In either case, the statement should contain C<BETWEEN> placeholders (one for the
-beginning and one for the end of the range), as it will be executed with the start/end ID
-points.
+In either case, the statement should contain C<BETWEEN> placeholders, which will be
+executed with the start/end ID points.  If there are already bind placeholders in the
+arrayref, then make sure the C<BETWEEN> bind points are last on the list.
 
 Required for DBI Processing.
 
 =cut
 
-has sth => (
+has stmt => (
     is       => 'ro',
-    isa      => InstanceOf['DBI::st'],
+    isa      => $SQLStringOrSTHArgs_type,
     required => 0,
+    coerce   => 1,
 );
 
-=head3 count_sth
+=head3 count_stmt
 
-A C<SELECT COUNT> statement handle.  Like L</sth>, it should contain C<BETWEEN>
-placeholders.  In fact, the SQL should look exactly like the L</sth> query, except with
-C<COUNT(*)> instead of the column list.
+A C<SELECT COUNT> SQL statement string or an arrayref of parameters for
+L<DBI/selectrow_array>.
+
+Like L</stmt>, it should contain C<BETWEEN> placeholders.  In fact, the SQL should look
+exactly like the L</stmt> query, except with C<COUNT(*)> instead of the column list.
 
 Used only for L</Query DBI Processing>.  Optional, but recommended for
 L<chunk resizing|/min_chunk_percent>.
 
 =cut
 
-has count_sth => (
+has count_stmt => (
     is       => 'ro',
-    isa      => InstanceOf['DBI::st'],
+    isa      => $SQLStringOrSTHArgs_type,
     required => 0,
+    coerce   => 1,
 );
 
 =head2 Progress Bar Attributes
@@ -322,8 +451,8 @@ Boolean.  If turned on, displays timing stats on each chunk, as well as total nu
 has debug => (
     is       => 'rw',
     isa      => Bool,
-    required => 1,
-    default  => sub { 0 },
+    required => 0,
+    default  => 0,
 );
 
 =head2 Common Attributes
@@ -359,11 +488,11 @@ The coderef that will be called either on each chunk or each row, depending on h
 L</single_rows> is set.  The first input is always the BatchChunker object.  The rest
 vary depending on the processing mode:
 
-    $sth + $coderef                  = Query DBI Processing  | $bc->$coderef($executed_sth)
-    $sth + $coderef + single_rows=>1 = Query DBI Processing  | $bc->$coderef($row_hashref)
-    $rs  + $coderef                  = DBIC Processing       | $bc->$coderef($chunk_rs)
-    $rs  + $coderef + single_rows=>1 = DBIC Processing       | $bc->$coderef($result)
-           $coderef                  = DIY Processing        | $bc->$coderef($start, $end)
+    $stmt + $coderef                  = Query DBI Processing  | $bc->$coderef($executed_sth)
+    $stmt + $coderef + single_rows=>1 = Query DBI Processing  | $bc->$coderef($row_hashref)
+    $rs   + $coderef                  = DBIC Processing       | $bc->$coderef($chunk_rs)
+    $rs   + $coderef + single_rows=>1 = DBIC Processing       | $bc->$coderef($result)
+            $coderef                  = DIY Processing        | $bc->$coderef($start, $end)
 
 The loop does not monitor the return values from the coderef.
 
@@ -382,7 +511,7 @@ has coderef => (
 The amount of rows to be processed in each loop.
 
 Default is 1000 rows.  This figure should be sized to keep per-chunk processing time
-at around 10 seconds.  If this is too large, rows may lock for too long.  If it's too
+at around 15 seconds.  If this is too large, rows may lock for too long.  If it's too
 small, processing may be unnecessarily slow.
 
 =cut
@@ -390,8 +519,8 @@ small, processing may be unnecessarily slow.
 has chunk_size => (
     is       => 'ro',
     isa      => PositiveInt,
-    required => 1,
-    default  => sub { 1000 },
+    required => 0,
+    default  => 1000,
 );
 
 =head3 target_time
@@ -405,7 +534,8 @@ size is grossly inaccurate to the workload, you could end up with several chunks
 beginning causing long-lasting locks before the runtime targeting reduces them down to a
 reasonable size.
 
-Default is 0, which turns off runtime targeting.
+Default is 15 seconds.  Set this to zero to turn off runtime targeting.  (This was
+previously defaulted to off prior to v0.92.)
 
 =cut
 
@@ -413,7 +543,7 @@ has target_time => (
     is       => 'ro',
     isa      => PositiveOrZeroNum,
     required => 0,
-    default  => sub { 0 },
+    default  => 15,
 );
 
 =head3 sleep
@@ -421,10 +551,11 @@ has target_time => (
 The number of seconds to sleep after each chunk.  It uses L<Time::HiRes>'s version, so
 fractional numbers are allowed.
 
-Default is 0, but it is highly recommended to turn this on (say, 5 to 10 seconds) for
-really long one-off DB operations, especially if a lot of disk I/O is involved.  Without
-this, there's a chance that the slaves will have a hard time keeping up, and/or the
-master won't have enough processing power to keep up with standard load.
+Default is 0, which is fine for most operations.  But, it is highly recommended to turn
+this on (say, 5 to 10 seconds) for really long one-off DB operations, especially if a lot
+of disk I/O is involved.  Without this, there's a chance that the slaves will have a hard
+time keeping up, and/or the master won't have enough processing power to keep up with
+standard load.
 
 This will increase the overall processing time of the loop, so try to find a balance
 between the two.
@@ -434,15 +565,15 @@ between the two.
 has 'sleep' => (
     is       => 'ro',
     isa      => PositiveOrZeroNum,
-    required => 1,
-    default  => sub { 0 },
+    required => 0,
+    default  => 0,
 );
 
 =head3 process_past_max
 
 Boolean that controls whether to check past the L</max_id> during the loop.  If the loop
 hits the end point, it will run another maximum ID check in the DB, and adjust C<max_id>
-accordingly.  If it somehow cannot run a DB check (no L</rs> or L</max_sth> available,
+accordingly.  If it somehow cannot run a DB check (no L</rs> or L</max_stmt> available,
 for example), the last chunk will check all the way to C<$DB_MAX_ID>.
 
 This is useful if the entire table is expected to be processed, and you don't want to
@@ -459,8 +590,8 @@ something lower.
 has process_past_max => (
     is       => 'ro',
     isa      => Bool,
-    required => 1,
-    default  => sub { 0 },
+    required => 0,
+    default  => 0,
 );
 
 =head3 single_rows
@@ -481,8 +612,8 @@ Used only by L</DBIC Processing> and L</Query DBI Processing>.
 has single_rows => (
     is       => 'ro',
     isa      => Bool,
-    required => 1,
-    default  => sub { 0 },
+    required => 0,
+    default  => 0,
 );
 
 =head3 min_chunk_percent
@@ -503,8 +634,7 @@ if L</sleep> is enabled.
 If this needs to be disabled, set this to 0.  The maximum chunk percentage does not have
 a setting and is hard-coded at C<< 100% + min_chunk_percent >>.
 
-Used only by L</DBIC Processing> and L</Query DBI Processing>.  For the latter,
-L</count_sth> is also required to enable chunk resizing.
+If DBIC processing isn't used, L</count_stmt> is also required to enable chunk resizing.
 
 =cut
 
@@ -517,8 +647,8 @@ has min_chunk_percent => (
         inlined    => sub { undef, qq($_ >= 0 && $_ <= 1) },
         message    => sub { 'Must be a number between 0 and 1' },
     ),
-    required => 1,
-    default  => sub { 0.5 },
+    required => 0,
+    default  => 0.5,
 );
 
 =head3 min_id
@@ -686,6 +816,81 @@ around BUILDARGS => sub {
         $args{id_name} = ($rs->result_source->primary_columns)[0];
         $args{rsc}     = $rs->get_column( $args{id_name} );
     }
+    $rsc = $args{rsc};
+
+    # Auto-add dbic_storage, if available
+    if (!$args{dbic_storage} && ($rs || $rsc)) {
+        $args{dbic_storage} = $rs ? $rs->result_source->storage : $rsc->_resultset->result_source->storage;
+    }
+
+    # Find something to use as a dbi_connector, if it doesn't already exist
+    my @old_attrs = qw< sth min_sth max_sth count_sth >;
+    my @new_attrs = map { my $k = $_; $k =~ s/sth$/stmt/; $k } @old_attrs;
+    my $example_key = first { $args{$_} } @old_attrs;
+    if ($example_key && !$args{dbi_connector}) {
+        warn join "\n",
+            'The sth/*_sth options are now considered legacy usage in DBIx::BatchChunker.  Because there is no',
+            'way to re-acquire the password, any attempt to reconnect will fail.  Please use dbi_connector and',
+            'stmt/*_stmt instead for reconnection support.',
+            ''
+        ;
+
+        # NOTE: There was a way to monkey-patch _connect to use $dbh->clone, but I've considered it
+        # too intrusive of a solution to use.  Better to demand that the user switch to the new
+        # attributes, but have something that still works in most cases.
+
+        # Attempt to build some sort of Connector object
+        require DBIx::Connector::Retry;
+        my $dbh = $args{$example_key}->{Database};
+
+        my $conn = DBIx::Connector::Retry->new(
+            connect_info => [
+                join(':', 'dbi', $dbh->{Driver}{Name}, $dbh->{Name}),
+                $dbh->{Username},
+                '',  # XXX: Can't acquire the password
+                # Sane %attr defaults on the off-chance that it actually re-connects
+                { AutoCommit => 1, RaiseError => 1 },
+            ],
+
+            # Do not disconnect on DESTROY.  The $dbh might still be used post-run.
+            disconnect_on_destroy => 0,
+        );
+
+        # Pretend $conn->_connect was called and store our pre-existing $dbh
+        $conn->{_pid} = $$;
+        $conn->{_tid} = threads->tid if $INC{'threads.pm'};
+        $conn->{_dbh} = $dbh;
+        $conn->driver;
+
+        $args{dbi_connector} = $conn;
+    }
+
+    # Handle legacy options for sth/*_sth
+    foreach my $old_attr (grep { $args{$_} } @old_attrs) {
+        my $new_attr = $old_attr;
+        $new_attr =~ s/sth$/stmt/;
+
+        my $sth = delete $args{$old_attr};
+        $args{$new_attr} ||= [ $sth->{Statement} ];
+    }
+
+    # Now check to make sure dbi_connector is available for DBI processing
+    die 'DBI processing requires a dbi_connector or dbic_storage attribute!' if (
+        !($args{dbi_connector} || $args{dbic_storage}) &&
+        (first { $args{$_} } @new_attrs)
+    );
+
+    # Other sanity checks
+    die 'Range calculations requires one of these attr sets: rsc, rs, or dbi_connector|dbic_storage + min_stmt + max_stmt' unless (
+        $args{rsc} ||
+        ($args{min_stmt} && $args{max_stmt})
+    );
+
+    die 'Block execution requires one of these attr sets: dbi_connector|dbic_storage + stmt, rs + coderef, or coderef' unless (
+        $args{stmt} ||
+        ($args{rs} && $args{coderef}) ||
+        $args{coderef}
+    );
 
     $class->$next( %args );
 };
@@ -736,13 +941,14 @@ sub construct_and_execute {
 =head2 calculate_ranges
 
     my $batch_chunker = DBIx::BatchChunker->new(
-        rsc     => $account_rsc,  # a ResultSetColumn
+        rsc      => $account_rsc,    # a ResultSetColumn
         ### OR ###
-        rs      => $account_rs,   # a ResultSet
-        id_name => 'account_id',  # can be looked up if not provided
+        rs       => $account_rs,     # a ResultSet
+        id_name  => 'account_id',    # can be looked up if not provided
         ### OR ###
-        min_sth => $min_sth,      # a DBI statement handle
-        max_sth => $max_sth,      # ditto
+        dbi_connector => $conn,      # DBIx::Connector::Retry object
+        min_stmt      => $min_stmt,  # a SQL statement or DBI $sth args
+        max_stmt      => $max_stmt,  # ditto
 
         ### Optional but recommended ###
         id_name      => 'account_id',  # will also be added into the progress bar title
@@ -757,7 +963,7 @@ sub construct_and_execute {
     my $has_data_to_process = $batch_chunker->calculate_ranges;
 
 Given a L<DBIx::Class::ResultSetColumn>, L<DBIx::Class::ResultSet>, or L<DBI> statement
-handle set, this method calculates the min/max IDs of those objects.  It fills in the
+argument set, this method calculates the min/max IDs of those objects.  It fills in the
 L</min_id> and L</max_id> attributes, based on the ID data, and then returns 1.
 
 If either of the min/max statements don't return any ID data, this method will return 0.
@@ -766,14 +972,6 @@ If either of the min/max statements don't return any ID data, this method will r
 
 sub calculate_ranges {
     my $self = shift;
-
-    # Figure out how we're going to get min/max
-    unless (
-        $self->rsc ||  # will also auto-create one from $self->rs
-        ($self->min_sth && $self->max_sth)
-    ) {
-        die 'Need at least a ResultSetColumn, ResultSet, or min/max statement handles to calculate ranges!';
-    }
 
     my $column_name = $self->id_name || '';
     $column_name =~ s/^\w+\.//;
@@ -787,21 +985,45 @@ sub calculate_ranges {
 
     # Actually run the statements
     my ($min_id, $max_id);
-    if (my $rsc = $self->rsc) {
-        $min_id = $rsc->min;
-        $progress->update(1);
-        $max_id = $rsc->max;
-        $progress->update(2);
+    if ($self->rsc) {
+        $self->_dbic_block_runner( run => sub {
+            # In case the sub is retried
+            $progress->update(0);
+
+            $min_id = $self->rsc->min;
+            $progress->update(1);
+
+            $max_id = $self->rsc->max;
+            $progress->update(2);
+        });
+    }
+    elsif ($self->dbic_storage) {
+        $self->_dbic_block_runner( run => sub {
+            my $dbh = $self->dbic_storage->dbh;
+
+            # In case the sub is retried
+            $progress->update(0);
+
+            ($min_id) = $dbh->selectrow_array(@{ $self->min_stmt });
+            $progress->update(1);
+
+            ($max_id) = $dbh->selectrow_array(@{ $self->max_stmt });
+            $progress->update(2);
+        });
     }
     else {
-        my ($min_sth, $max_sth) = ($self->min_sth, $self->max_sth);
-        $min_sth->execute;
-        ($min_id) = $min_sth->fetchrow_array;
-        $progress->update(1);
+        $self->dbi_connector->run(sub {
+            my $dbh = $_;
 
-        $max_sth->execute;
-        ($max_id) = $max_sth->fetchrow_array;
-        $progress->update(2);
+            # In case the sub is retried
+            $progress->update(0);
+
+            ($min_id) = $dbh->selectrow_array(@{ $self->min_stmt });
+            $progress->update(1);
+
+            ($max_id) = $dbh->selectrow_array(@{ $self->max_stmt });
+            $progress->update(2);
+        });
     }
 
     # Set the ranges and return
@@ -818,22 +1040,24 @@ sub calculate_ranges {
     my $batch_chunker = DBIx::BatchChunker->new(
         # ...other attributes for calculate_ranges...
 
-        sth       => $do_sth,       # INSERT/UPDATE/DELETE $sth with BETWEEN placeholders
+        dbi_connector => $conn,          # DBIx::Connector::Retry object
+        stmt          => $do_stmt,       # INSERT/UPDATE/DELETE $stmt with BETWEEN placeholders
         ### OR ###
-        sth       => $select_sth,   # SELECT $sth with BETWEEN placeholders
-        count_sth => $count_sth,    # SELECT COUNT $sth to be used for min_chunk_percent; optional
-        coderef   => $coderef,      # called code that does the actual work
+        dbi_connector => $conn,          # DBIx::Connector::Retry object
+        stmt          => $select_stmt,   # SELECT $stmt with BETWEEN placeholders
+        count_stmt    => $count_stmt,    # SELECT COUNT $stmt to be used for min_chunk_percent; optional
+        coderef       => $coderef,       # called code that does the actual work
         ### OR ###
-        rs        => $account_rs,   # base ResultSet, which gets filtered with -between later on
-        id_name   => 'account_id',  # can be looked up if not provided
-        coderef   => $coderef,      # called code that does the actual work
+        rs      => $account_rs,          # base ResultSet, which gets filtered with -between later on
+        id_name => 'account_id',         # can be looked up if not provided
+        coderef => $coderef,             # called code that does the actual work
         ### OR ###
-        coderef   => $coderef,      # DIY database work; just pass the $start/$end IDs
+        coderef => $coderef,             # DIY database work; just pass the $start/$end IDs
 
         ### Optional but recommended ###
-        sleep             => 5,    # number of seconds to sleep each chunk; defaults to 0
+        sleep             => 0.25, # number of seconds to sleep each chunk; defaults to 0
         process_past_max  => 1,    # use this if processing the whole table
-        single_rows       => 1,    # does $coderef get a single $row or the whole $chunk_rs / $sth
+        single_rows       => 1,    # does $coderef get a single $row or the whole $chunk_rs / $stmt
         min_chunk_percent => 0.25, # minimum row count of chunk size percentage; defaults to 0.5 (or 50%)
         target_time       => 15,   # target runtime for dynamic chunk size scaling; default is off
 
@@ -860,21 +1084,6 @@ More details can be found in the L</Processing Modes> and L</ATTRIBUTES> section
 
 sub execute {
     my $self = shift;
-
-    # Figure out the method to use
-    my $coderef = $self->coderef;
-    my ($sth, $count_sth, $rs, $id_name);
-    if    ($self->sth) {
-        $sth       = $self->sth;
-        $count_sth = $self->count_sth;
-    }
-    elsif ($self->rs && $coderef) {
-        $rs      = $self->rs;
-        $id_name = $self->id_name;
-    }
-    elsif (!$coderef) {
-        die 'Need at least a statement handle, ResultSet + CodeRef, or CodeRef to run through the loop!';
-    }
 
     my $count;
     if (defined $self->min_id && defined $self->max_id) {
@@ -915,64 +1124,8 @@ sub execute {
 
         next unless $self->_process_past_max_checker;
 
-        if ($sth) {
-            ### DML statement handle
-
-            # Figure out if the row count is worth the work
-            if ($count_sth) {
-                $count_sth->execute(@$ls{qw< start end >});
-                ($ls->{chunk_count}) = $count_sth->fetchrow_array;
-            }
-
-            next unless $self->_chunk_count_checker;
-
-            # Execute the DQL/DML statement handle
-            $sth->execute(@$ls{qw< start end >});
-
-            if ($coderef) {
-                if ($self->single_rows) {
-                    # Transactional work
-                    my $dbh = $sth->{Database};
-
-                    $dbh->begin_work;
-                    while (my $row = $sth->fetchrow_hashref('NAME_lc')) { $self->$coderef($row) }
-                    $dbh->commit;
-                }
-                else {
-                    # Bulk work
-                    $self->$coderef($sth);
-                    $sth->finish;
-                }
-            }
-        }
-        elsif ($rs && $coderef) {
-            ### ResultSet with coderef
-
-            my $chunk_rs = $rs->search({
-                $id_name => { -between => [@$ls{qw< start end >}] },
-            });
-
-            # Figure out if the row count is worth the work
-            $ls->{chunk_count} = $chunk_rs->count;
-            next unless $self->_chunk_count_checker;
-
-            if ($self->single_rows) {
-                # Transactional work
-                $rs->result_source->schema->txn_do( sub {
-                    while (my $row = $chunk_rs->next) { $self->$coderef($row) }
-                });
-            }
-            else {
-                # Bulk work
-                $self->$coderef($chunk_rs);
-            }
-        }
-        else {
-            ### Something a bit more free-form
-
-            next unless $self->_chunk_count_checker;
-            $self->$coderef(@$ls{qw< start end >});
-        }
+        # The actual DB processing
+        next unless $self->_process_block;
 
         # Record the time quickly
         $ls->{prev_runtime} = time - $ls->{timer};
@@ -1005,6 +1158,146 @@ sub execute {
 
 =head1 PRIVATE METHODS
 
+=head2 _process_block
+
+Runs the DB work and passes it to the coderef.  Its return value determines whether the
+block should be processed or not.
+
+=cut
+
+sub _process_block {
+    my ($self) = @_;
+
+    my $ls      = $self->_loop_state;
+    my $conn    = $self->dbi_connector;
+    my $coderef = $self->coderef;
+    my $rs      = $self->rs;
+
+    # Figure out if the row count is worth the work
+    my $chunk_rs;
+    my $count_stmt = $self->count_stmt;
+    if ($count_stmt && $self->dbic_storage) {
+        $self->_dbic_block_runner( run => sub {
+            ($self->_loop_state->{chunk_count}) = $self->dbic_storage->dbh->selectrow_array(
+                @$count_stmt,
+                (@$count_stmt == 1 ? undef : ()),
+                @$ls{qw< start end >},
+            );
+        });
+    }
+    elsif ($count_stmt) {
+        ($ls->{chunk_count}) = $conn->run(sub {
+            $_->selectrow_array(
+                @$count_stmt,
+                (@$count_stmt == 1 ? undef : ()),
+                @$ls{qw< start end >},
+            );
+        });
+    }
+    elsif ($rs) {
+        $chunk_rs = $rs->search({
+            $self->id_name => { -between => [@$ls{qw< start end >}] },
+        });
+
+        $self->_dbic_block_runner( run => sub {
+            $self->_loop_state->{chunk_count} = $chunk_rs->count;
+        });
+    }
+
+    return unless $self->_chunk_count_checker;
+
+    # NOTE: Try to minimize the amount of closures by using $self as much as possible
+    # inside coderefs.
+
+    # Do the work
+    if (my $stmt = $self->stmt) {
+        ### Statement handle
+        my @prepare_args = @$stmt > 2 ? @$stmt[0..1] : @$stmt;
+        my @execute_args = (
+            (@$stmt > 2 ? @$stmt[2..$#$stmt] : ()),
+            @$ls{qw< start end >},
+        );
+
+        if ($self->single_rows && $coderef) {
+            # Transactional work
+            if ($self->dbic_storage) {
+                $self->_dbic_block_runner( txn => sub {
+                    $self->_loop_state->{timer} = time;  # reset timer on retries
+
+                    my $sth = $self->dbic_storage->dbh->prepare(@prepare_args);
+                    $sth->execute(@execute_args);
+
+                    while (my $row = $sth->fetchrow_hashref('NAME_lc')) { $self->coderef->($self, $row) }
+                });
+            }
+            else {
+                $conn->txn(sub {
+                    $self->_loop_state->{timer} = time;  # reset timer on retries
+
+                    my $sth = $_->prepare(@prepare_args);
+                    $sth->execute(@execute_args);
+
+                    while (my $row = $sth->fetchrow_hashref('NAME_lc')) { $self->coderef->($self, $row) }
+                });
+            }
+        }
+        else {
+            # Bulk work (or DML)
+            if ($self->dbic_storage) {
+                $self->_dbic_block_runner( run => sub {
+                    $self->_loop_state->{timer} = time;  # reset timer on retries
+
+                    my $sth = $self->dbic_storage->dbh->prepare(@prepare_args);
+                    $sth->execute(@execute_args);
+
+                    $self->coderef->($self, $sth) if $self->coderef;
+                });
+            }
+            else {
+                $conn->run(sub {
+                    $self->_loop_state->{timer} = time;  # reset timer on retries
+
+                    my $sth = $_->prepare(@prepare_args);
+                    $sth->execute(@execute_args);
+
+                    $self->coderef->($self, $sth) if $self->coderef;
+                });
+            }
+        }
+    }
+    elsif ($rs && $coderef) {
+        ### ResultSet with coderef
+
+        if ($self->single_rows) {
+            # Transactional work
+            $self->_dbic_block_runner( txn => sub {
+                # reset timer/$rs on retries
+                $self->_loop_state->{timer} = time;
+                $chunk_rs->reset;
+
+                while (my $row = $chunk_rs->next) { $self->coderef->($self, $row) }
+            });
+        }
+        else {
+            # Bulk work
+            $self->_dbic_block_runner( run => sub {
+                # reset timer/$rs on retries
+                $self->_loop_state->{timer} = time;
+                $chunk_rs->reset;
+
+                $self->coderef->($self, $chunk_rs);
+            });
+        }
+    }
+    else {
+        ### Something a bit more free-form
+
+        $self->$coderef(@$ls{qw< start end >});
+    }
+
+    return 1;
+}
+
 =head2 _process_past_max_checker
 
 Checks to make sure the current endpoint is actually the end, by checking the database.
@@ -1022,8 +1315,8 @@ sub _process_past_max_checker {
     return 1 unless $self->process_past_max;
     return 1 unless $ls->{end} > $self->max_id;
 
-    # No checks for DIY, of course
-    unless ($self->rsc || $self->max_sth) {
+    # No checks for DIY, if they didn't include a max_stmt
+    unless ($self->rsc || $self->max_stmt) {
         # There's no way to size this, so skip past the max as one block
         $ls->{end} = $ls->{max_end};
         return 1;
@@ -1033,12 +1326,19 @@ sub _process_past_max_checker {
     $progress->message('Reached end; re-checking max ID') if $self->debug;
     my $new_max_id;
     if (my $rsc = $self->rsc) {
-        $new_max_id = $rsc->max;
+        $self->_dbic_block_runner( run => sub {
+            $new_max_id = $rsc->max;
+        });
+    }
+    elsif ($self->dbic_storage) {
+        $self->_dbic_block_runner( run => sub {
+            ($new_max_id) = $self->dbic_storage->dbh->selectrow_array(@{ $self->max_stmt });
+        });
     }
     else {
-        my $max_sth = $self->max_sth;
-        $max_sth->execute;
-        ($new_max_id) = $max_sth->fetchrow_array;
+        ($new_max_id) = $self->dbi_connector->run(sub {
+            $_->selectrow_array(@{ $self->max_stmt });
+        });
     }
     $ls->{timer} = time;  # the above query shouldn't impact runtimes
 

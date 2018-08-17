@@ -11,3 +11,4 @@ dist.ini
 lib/Yandex/Geo.pm
 lib/Yandex/Geo/Company.pm
 t/lib/Yandex/Geo/Company.t
+t/samples/one.json

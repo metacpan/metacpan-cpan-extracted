@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # Copyright (C) 2015, 2018 Rocky Bernstein <rocky@cpan.org>
 package Devel::Trepan::Deparse;
-our $VERSION='3.0.0';
+our $VERSION='3.1.0';
 use Exporter;
 use warnings; use strict;
 

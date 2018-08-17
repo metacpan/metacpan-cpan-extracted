@@ -2,7 +2,7 @@
 # PODNAME: Test::Rail::Parser
 
 package Test::Rail::Parser;
-$Test::Rail::Parser::VERSION = '0.041';
+$Test::Rail::Parser::VERSION = '0.043';
 use strict;
 use warnings;
 use utf8;
@@ -55,16 +55,18 @@ sub new {
         'result_options'        => delete $opts->{'result_options'},
         'result_custom_options' => delete $opts->{'result_custom_options'},
         'test_bad_status'       => delete $opts->{'test_bad_status'},
+        'max_tries'             => delete $opts->{'max_tries'} || 1,
     };
 
     confess("plan passed, but no run passed!")
       if !$tropts->{'run'} && $tropts->{'plan'};
 
     #Allow natural confessing from constructor
-    my $tr = TestRail::API->new(
-        $tropts->{'apiurl'},   $tropts->{'user'}, $tropts->{'pass'},
-        $tropts->{'encoding'}, $tropts->{'debug'}
-    );
+    #Force-on POST redirects for maximum compatibility
+    my $tr =
+      TestRail::API->new( $tropts->{'apiurl'}, $tropts->{'user'},
+        $tropts->{'pass'}, $tropts->{'encoding'}, $tropts->{'debug'}, 1,
+        $tropts->{max_tries} );
     $tropts->{'testrail'} = $tr;
     $tr->{'browser'}      = $tropts->{'browser'}
       if defined( $tropts->{'browser'} );    #allow mocks
@@ -335,8 +337,9 @@ sub new {
       $tr->getTestResultFieldByName( $tropts->{'step_results'},
         $tropts->{'project_id'} )
       if defined $tropts->{'step_results'};
-    confess("Invalid step results name '$sr_name' passed.")
-      if ref $tropts->{'step_results'} ne 'HASH' && $sr_name;
+    confess(
+        "Invalid step results value '$sr_name' passed. Check the spelling and confirm that your project can use the '$sr_name' custom result field."
+    ) if ref $tropts->{'step_results'} ne 'HASH' && $sr_name;
 
     $self->{'tr_opts'} = $tropts;
     $self->{'errors'}  = 0;
@@ -567,7 +570,11 @@ sub EOFCallback {
     $status = $self->{'global_status'} if $self->{'global_status'};
 
     #Notify user about bad plan a bit better, supposing we haven't bailed
-    if ( !$self->is_good_plan() && !$self->{'is_bailout'} ) {
+    if (   !$self->is_good_plan()
+        && !$self->{'is_bailout'}
+        && defined $self->tests_run
+        && defined $self->tests_planned )
+    {
         $self->{'raw_output'} .=
             "\n# ERROR: Bad plan.  You ran "
           . $self->tests_run
@@ -614,7 +621,7 @@ sub EOFCallback {
 sub planCallback {
     my ($plan) = @_;
     my $self = $plan->{'parser'};
-    $self->{raw_output} .= $plan->as_string;
+    $self->{raw_output} .= $plan->as_string if $plan->as_string;
 }
 
 sub _set_result {
@@ -627,7 +634,7 @@ sub _set_result {
 
     print "# Attempting to find case by title '"
       . $test_name
-      . " in run $run_id'...\n";
+      . "' in run $run_id...\n";
     $tc =
       $self->{'tr_opts'}->{'testrail'}->getTestByName( $run_id, $test_name );
     if ( !defined($tc) || ( reftype($tc) || 'undef' ) ne 'HASH' ) {
@@ -741,7 +748,7 @@ Test::Rail::Parser - Upload your TAP results to TestRail
 
 =head1 VERSION
 
-version 0.041
+version 0.043
 
 =head1 DESCRIPTION
 
@@ -802,6 +809,8 @@ Get the TAP Parser ready to talk to TestRail, and register a bunch of callbacks 
 =item B<encoding> - STRING (optional): Character encoding of TAP to be parsed and the various inputs parameters for the parser.  Defaults to UTF-8, see L<Encode::Supported> for a list of supported encodings.
 
 =item B<test_bad_status> - STRING (optional): 'internal' name of whatever status you want to mark compile failures & no plan + no assertion tests.
+
+=item B<max_tries> - INTEGER (optional): number of times to try failing requests.  Defaults to 1 (don't re-try).
 
 =back
 
@@ -899,12 +908,12 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
-and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+The development version is on github at L<http://https://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://https://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by George S. Baugh.
+This software is copyright (c) 2018 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

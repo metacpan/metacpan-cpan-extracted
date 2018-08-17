@@ -4,7 +4,7 @@ Yandex::Geo - Performs queries using Yandex Maps Company Search API
 
 # VERSION
 
-version 0.02
+version 0.07
 
 # DESCRIPTION
 

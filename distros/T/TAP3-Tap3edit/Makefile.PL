@@ -4,7 +4,7 @@ use inc::Module::Install;
 
 name('TAP3-Tap3edit');
 abstract('Decodes, modifies and encodes TAP 3 files');
-author('Javier Gutierrez <jgutierrez@tap3edit.com>');
+author('Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>');
 version_from('lib/TAP3/Tap3edit.pm');
 license('perl');
 
@@ -21,5 +21,5 @@ check_nmake();      # check and download nmake.exe for Win32
 &Meta->write;
 &Makefile->write;
 
-# &WriteAll;
+&WriteAll;
 

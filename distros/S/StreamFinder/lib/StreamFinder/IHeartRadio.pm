@@ -245,9 +245,8 @@ package StreamFinder::IHeartRadio;
 use strict;
 use warnings;
 use LWP::UserAgent ();
-use vars qw(@ISA @EXPORT $VERSION);
+use vars qw(@ISA @EXPORT);
 
-our $VERSION = '1.00';
 our $DEBUG = 0;
 
 require Exporter;

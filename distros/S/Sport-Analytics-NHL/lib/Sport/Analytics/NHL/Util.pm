@@ -78,6 +78,13 @@ An expansion of List::MoreUtils::uniq function that filters the items not only b
 
  uniq @list == my_uniq { $_ } @list
 
+=item C<normalize_string>
+
+Performs a string cleanup: replaces multiple whitespaces with one, trims edge whitespaces and converts the string to upper-case.
+
+ Argument: the string
+ Returns: the normalize string
+
 =back
 
 =cut
@@ -88,6 +95,7 @@ our @EXPORT = qw(
 	fill_broken
 	get_seconds
 	my_uniq
+	normalize_string
 );
 
 sub debug ($) {
@@ -182,6 +190,18 @@ sub my_uniq (&@) {
 	my $func = shift;
 	my %seen = ();
 	grep {! $seen{$func->($_)}++} @_;
+}
+
+sub normalize_string ($) {
+
+	my $string = shift;
+
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	$string =~ s/\s+/ /g;
+	$string = uc $string;
+
+	$string;
 }
 
 =head1 AUTHOR

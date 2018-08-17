@@ -1,0 +1,22 @@
+requires "Carp" => "0";
+requires "Cwd" => "0";
+requires "Exporter" => "0";
+requires "File::Spec" => "0";
+requires "Pod::Usage" => "0";
+requires "Text::CSV" => "0";
+requires "YAML::Tiny" => "0";
+requires "Yandex::Geo" => "0";
+requires "Yandex::Geo::Company" => "0";
+requires "feature" => "0";
+requires "strict" => "0";
+requires "utf8" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Data::Dumper" => "0";
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

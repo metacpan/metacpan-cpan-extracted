@@ -22,7 +22,7 @@ name: OpenOffice-OODoc-InsertDocument
 provides:
   OpenOffice::OODoc::InsertDocument:
     file: lib/OpenOffice/OODoc/InsertDocument.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   List::Util: '0'
   OpenOffice::OODoc: '0'
@@ -32,7 +32,7 @@ requires:
   warnings: '0'
 resources:
   repository: git://gitlab.com/mintlab/perl-openoffice-oodoc-insertdocument.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Wesley Schwengle <gitlab@opperschaap.net>'
   - 'Wesley Schwengle <wesley@schwengle.net>'

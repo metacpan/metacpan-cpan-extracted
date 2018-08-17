@@ -14,3 +14,9 @@ Revision history for Sport::Analytics::NHL
 
 1.30	Fri Aug 03 21:02:15 PDT 2018
 	Added report normalizing
+
+1.31	Sun Aug  5 16:27:00 PDT 2018
+	Fixed the bug in t/405 that was calling retrieve in a way that crashes in Storable v3.00 and above
+
+1.40	Sun Aug 12 21:24:10 PDT 2018
+	Added database population and fixed a few bugs in 1.31. New features in 1.40 will require MongoDB.

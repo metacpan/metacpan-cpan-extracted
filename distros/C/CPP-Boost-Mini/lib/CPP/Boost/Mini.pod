@@ -7,7 +7,7 @@ CPP::Boost::Mini - C++ Boost library (no perl interface).
 =head1 DESCRIPTION
 
 Includes libraries: 
-callable_traits compatibility config container container_hash conversion core crc disjoint_sets hof integer io logic
+callable_traits compatibility config container container_hash conversion core crc disjoint_sets hof preprocessor integer io logic uuid
 
 =head1 SYNOPSIS
 

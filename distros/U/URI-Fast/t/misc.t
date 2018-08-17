@@ -8,19 +8,19 @@ subtest 'XSUB(undef)' => sub{
     ok no_warnings{ decode undef }, 'decode';
     ok no_warnings{ uri_split undef }, 'uri_split';
     ok no_warnings{ uri undef }, 'uri';
-    ok no_warnings{ uri->set_scheme(undef) }, 'set_scheme';
+    ok no_warnings{ uri->scheme(undef) }, 'set_scheme';
+    ok no_warnings{ uri->frag(undef) }, 'set_frag';
+    ok no_warnings{ uri->usr(undef) }, 'set_usr';
+    ok no_warnings{ uri->pwd(undef) }, 'set_pwd';
+    ok no_warnings{ uri->host(undef) }, 'set_host';
+    ok no_warnings{ uri->port(undef) }, 'set_port';
     ok no_warnings{ uri->set_auth(undef) }, 'set_auth';
     ok no_warnings{ uri->set_path(undef) }, 'set_path';
     ok no_warnings{ uri->set_path_array(undef) }, 'set_path_array';
     ok no_warnings{ uri->set_query(undef) }, 'set_query';
-    ok no_warnings{ uri->set_frag(undef) }, 'set_frag';
-    ok no_warnings{ uri->set_usr(undef) }, 'set_usr';
-    ok no_warnings{ uri->set_pwd(undef) }, 'set_pwd';
-    ok no_warnings{ uri->set_host(undef) }, 'set_host';
-    ok no_warnings{ uri->set_port(undef) }, 'set_port';
     ok no_warnings{ uri->set_param('foo', [], undef) }, 'set_param(s,[],u)';
     ok no_warnings{ uri->set_param('foo', ['foo'], undef) }, 'set_param(s,[s],u)';
-    ok no_warnings{ uri->update_query_keyset({}, undef) }, 'update_query_keyset';
+    ok no_warnings{ uri->query_keyset({}, undef) }, 'update_query_keyset';
   };
 
   subtest 'croaks' => sub{

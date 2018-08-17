@@ -1,0 +1,21 @@
+requires "CGI::Compile" => "0";
+requires "CGI::Emulate::PSGI" => "0";
+requires "File::Find::Rule" => "0";
+requires "Getopt::Long" => "0";
+requires "Plack::App::CGIBin" => "0";
+requires "Plack::Builder" => "0";
+requires "Plack::Runner" => "0";
+requires "Pod::Usage" => "0";
+requires "perl" => "5.006";
+requires "strict" => "0";
+requires "warnings" => "0";
+recommends "Net::Rendezvous::Publish" => "0";
+
+on 'test' => sub {
+  requires "perl" => "5.006";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.006";
+};

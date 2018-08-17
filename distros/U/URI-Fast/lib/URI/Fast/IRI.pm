@@ -27,4 +27,6 @@ programming language system itself.
 
 =cut
 
+sub clone { URI::Fast::IRI->new($_[0]) }
+
 1;

@@ -19,6 +19,7 @@ use Sport::Analytics::NHL::Errors;
 use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'Sport::Analytics::NHL::DB';
 use Sport::Analytics::NHL::Merger;
 use Sport::Analytics::NHL::Normalizer;
+use Sport::Analytics::NHL::Populator;
 use Sport::Analytics::NHL::Report;
 use Sport::Analytics::NHL::Scraper;
 use Sport::Analytics::NHL::Test;
@@ -33,7 +34,7 @@ Sport::Analytics::NHL - Crawl data from NHL.com and put it into a database
 
 =head1 VERSION
 
-Version 1.31
+Version 1.40
 
 =cut
 
@@ -41,7 +42,7 @@ our @EXPORT = qw(
 	hdb_version
 );
 
-our $VERSION = "1.31";
+our $VERSION = "1.40";
 
 =head1 SYNOPSIS
 
@@ -215,6 +216,20 @@ Arguments:
  * The list of game ids
 
 Returns: the location of the normalized storable(s). The JSON would be in the same directory.
+
+=item C<populate>
+
+Populates the Mongo DB from the normalized boxscores. Normalizes the boxscore if necessary and if requested.
+
+
+Arguments:
+ * The options hashref -
+   - same options as normalize() (q.v.) plus:
+   - no_normalize: don't normalize files if required
+   - renormalize: force normalizing.
+ * The list of the normalized game ids
+
+Returns: the list of inserted game's ids.
 
 =back
 
@@ -411,7 +426,7 @@ sub compile_file ($$$$) {
 	}
 	my $storable = $file;
 	$storable =~ s/\.([a-z]+)$/.storable/i;
-	if (!$opts->{force} && -f $storable && -M $storable < -M $file) {
+	if (!$opts->{force} && ! $opts->{recompile} && -f $storable && -M $storable < -M $file) {
 		print STDERR "File $storable already exists, skipping\n";
 		return $storable;
 	}
@@ -505,7 +520,7 @@ sub merge ($$@) {
 		}
 		my $path = get_game_path_from_id($game_id, $opts->{data_dir});
 		my $merged = "$path/$MERGED_FILE";
-		if (! $opts->{force} && -f $merged) {
+		if (! $opts->{force} && ! $opts->{remerge} && -f $merged) {
 			print STDERR "Merged file $merged already exists, skipping\n";
 			push(@storables, $merged);
 			next;
@@ -614,7 +629,7 @@ sub normalize ($$@) {
 		$repeat++;
 		my $path = get_game_path_from_id($game_id);
 		my $normalized = "$path/$NORMALIZED_FILE";
-		if (! $opts->{force} && -f $normalized) {
+		if (! $opts->{force} && ! $opts->{renormalize} && -f $normalized) {
 			print STDERR "Normalized file $normalized already exists, skipping\n";
 			push(@storables, $normalized);
 			next;
@@ -646,6 +661,7 @@ sub normalize ($$@) {
 			if ($@) {
 				unlink $merged[0];
 				goto REPEAT if ! $repeat;
+				die $@;
 			}
 			verbose "Ran $TEST_COUNTER->{Curr_Test} tests";
 			$TEST_COUNTER->{Curr_Test} = 0;
@@ -653,10 +669,58 @@ sub normalize ($$@) {
 		debug "Storing $normalized";
 		my $json = JSON->new()->pretty(1)->allow_nonref->convert_blessed;
 		write_file($json->encode($boxscore), "$path/$NORMALIZED_JSON");
-		store($boxscore, $normalized);
+#			unless $0 =~ /\.t/ && $path !~ /tmp/;
+		store $boxscore, $normalized;
 		push(@storables, $normalized);
 	}
 	return @storables;
+}
+
+sub populate ($$@) {
+
+	my $self = shift;
+	my $opts = shift;
+	my @game_ids = @_;
+
+	my @db_game_ids = ();
+
+	if (! $self->{db}) {
+		print "You need Mongo DB to populate.\n";
+		return ();
+	}
+	for my $game_id (@game_ids) {
+		if (defined $DEFAULTED_GAMES{$game_id})	{
+			print STDERR "Skipping defaulted game $game_id\n";
+			next;
+		}
+		my $db_game = $self->{db}->get_collection('games')->find_one({_id => $game_id+0});
+		if ($db_game && ! $opts->{force}) {
+			print STDERR "Game $game_id already present in the database\n";
+			push(@db_game_ids, $game_id);
+			next;
+		}
+		my $path = get_game_path_from_id($game_id);
+		my $normalized = "$path/$NORMALIZED_FILE";
+		if ($opts->{no_normalize} && ! -f $normalized) {
+			print STDERR "No normalized file and no normalize option specified, skipping\n";
+			next;
+		}
+		$self->normalize($opts, $game_id) if ! -f $normalized || $opts->{renormalize};
+		if (! $normalized) {
+			print STDERR "Error normalizing file $normalized, skipping\n";
+			next;
+		}
+		my $boxscore = retrieve $normalized;
+		if (! $boxscore) {
+			print STDERR "Couldn't retrieve the normalized file, skipping\n";
+			next;
+		}
+		$opts->{no_norm} = 1;
+		$opts->{repopulate} = $db_game ? 1 : 0;
+		my $db_game_id = populate_db($boxscore, $opts);
+		push(@db_game_ids, $db_game_id);
+	}
+	@db_game_ids;
 }
 
 =head1 AUTHOR

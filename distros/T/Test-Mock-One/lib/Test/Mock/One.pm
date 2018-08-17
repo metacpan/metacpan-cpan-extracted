@@ -4,7 +4,7 @@ use strict;
 
 # ABSTRACT: Mock the world with one object
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 our $AUTOLOAD;
 
@@ -134,7 +134,7 @@ Test::Mock::One - Mock the world with one object
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

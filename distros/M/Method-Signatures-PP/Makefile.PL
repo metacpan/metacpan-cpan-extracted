@@ -8,5 +8,5 @@ use 5.010;
 WriteMakefile(
   NAME => 'Method::Signatures::PP',
   VERSION_FROM => 'lib/Method/Signatures/PP.pm',
-  PREREQ_PM => { PPR => 0 },
+  PREREQ_PM => { Babble => '0.090001', 'Import::Into' => 0, Moo => 2 },
 );

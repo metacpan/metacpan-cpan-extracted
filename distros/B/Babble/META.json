@@ -1,0 +1,86 @@
+{
+   "abstract" : "EXPERIMENTAL Babel-like for perl",
+   "author" : [
+      "Matt S Trout (mst) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Babble",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.023"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "Mu" : "0",
+            "PPR" : "0.000021",
+            "strictures" : "2"
+         }
+      }
+   },
+   "provides" : {
+      "App::sigfix" : {
+         "file" : "lib/App/sigfix.pm",
+         "version" : "0.001001"
+      },
+      "Babble" : {
+         "file" : "lib/Babble.pm",
+         "version" : "0.090003"
+      },
+      "Babble::Filter" : {
+         "file" : "lib/Babble/Filter.pm"
+      },
+      "Babble::Grammar" : {
+         "file" : "lib/Babble/Grammar.pm"
+      },
+      "Babble::Match" : {
+         "file" : "lib/Babble/Match.pm"
+      },
+      "Babble::Plugin::CoreSignatures" : {
+         "file" : "lib/Babble/Plugin/CoreSignatures.pm"
+      },
+      "Babble::Plugin::DefinedOr" : {
+         "file" : "lib/Babble/Plugin/DefinedOr.pm"
+      },
+      "Babble::Plugin::PostfixDeref" : {
+         "file" : "lib/Babble/Plugin/PostfixDeref.pm"
+      },
+      "Babble::Plugin::SKT" : {
+         "file" : "lib/Babble/Plugin/SKT.pm"
+      },
+      "Babble::Plugin::State" : {
+         "file" : "lib/Babble/Plugin/State.pm"
+      },
+      "Babble::Plugin::SubstituteAndReturn" : {
+         "file" : "lib/Babble/Plugin/SubstituteAndReturn.pm"
+      },
+      "Babble::PluginChain" : {
+         "file" : "lib/Babble/PluginChain.pm"
+      },
+      "Babble::SubMatch" : {
+         "file" : "lib/Babble/SubMatch.pm"
+      },
+      "Babble::SymbolGenerator" : {
+         "file" : "lib/Babble/SymbolGenerator.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.090003",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

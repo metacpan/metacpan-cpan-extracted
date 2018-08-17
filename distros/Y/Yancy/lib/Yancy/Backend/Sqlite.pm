@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.005';
+our $VERSION = '1.007';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -106,6 +106,8 @@ our $VERSION = '1.005';
 #pod =cut
 
 use Mojo::Base '-base';
+use Role::Tiny qw( with );
+with 'Yancy::Backend::Role::Sync';
 use Scalar::Util qw( looks_like_number blessed );
 use Text::Balanced qw( extract_bracketed );
 BEGIN {
@@ -303,7 +305,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.005
+version 1.007
 
 =head1 SYNOPSIS
 

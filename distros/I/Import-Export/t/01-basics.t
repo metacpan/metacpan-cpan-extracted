@@ -5,6 +5,9 @@ use One;
 use One::Two;
 use One::Two::Three;
 use One::Two::Three::Four;
+use Globs qw/all/;
+
+is(zzx(), 'Hello World');
 
 is(One->new->one, 'Hello World');
 

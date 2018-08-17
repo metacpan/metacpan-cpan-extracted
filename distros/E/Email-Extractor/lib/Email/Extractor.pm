@@ -1,5 +1,5 @@
 package Email::Extractor;
-$Email::Extractor::VERSION = '0.01';
+$Email::Extractor::VERSION = '0.03';
 
 # ABSTRACT: Fast email crawler
 
@@ -8,6 +8,7 @@ use HTML::Encoding 'encoding_from_html_document';
 use List::Compare;
 use List::Util qw(uniq);
 use Email::Find;
+use Email::Valid;
 use Mojo::DOM;
 
 use Email::Extractor::Utils qw[:ALL];
@@ -16,7 +17,10 @@ use Email::Extractor::Utils qw[:ALL];
 sub new {
     my ( $class, %param ) = @_;
     $param{ua} = LWP::UserAgent->new;
+    $param{timeout} = 20 if !defined $param{timeout};
+    $param{ua}->timeout( $param{timeout} );
     $param{only_lang} = 'ru' if !defined $param{only_lang};
+    $Email::Extractor::Utils::Verbose = 1 if $param{verbose};
     bless {%param}, $class;
 }
 
@@ -25,23 +29,31 @@ sub search_until_attempts {
     my ( $self, $uri, $attempts ) = @_;
 
     $attempts = 10 if !defined $attempts;
+    my $emails = $self->get_emails_from_uri($uri);
+
     my $links_checked = 1;
-    my $a             = $self->get_emails_from_uri($uri);
+    print "No emails found on specified url\n"
+      if ( !@$emails && $self->{verbose} );
+    return $emails if @$emails;
 
-    return $a if @$a;
+    my $urls = $self->extract_contact_links;
 
-    while ( !@$a && $links_checked <= $attempts )
-    {    # but no more than 10 iterations
+    print "Contact links found: " . scalar @$urls . "\n"
+      if ( @$urls && $self->{verbose} );
+    print "No contact links found\n" if ( !@$urls && $self->{verbose} );
+    return if !@$urls;
 
-        my $urls = $crawler->extract_contact_links;
-        for my $u (@$urls) {
-            $a = $crawler->get_emails_from_uri($u);
-            $links_checked++;
-        }
+    for my $u (@$urls) {
+
+        $emails = $self->get_emails_from_uri($u);
+        $links_checked++;
+        $self->{last_attempts} = $links_checked;
+        return $emails if @$emails;
+        return $emails if ( $links_checked >= $attempts );
     }
 
-    $self->{last_attempts} = $links_checked;
-    return $a;
+    return $emails;    # can be empty array
+
 }
 
 
@@ -52,6 +64,11 @@ sub get_emails_from_uri {
     my $text = load_addr_to_str($addr);
     $self->{last_text} =
       $text;    # store html in memory to speed up further search
+    return $self->_get_emails_from_text($text);
+}
+
+sub _get_emails_from_text {
+    my ( $self, $text ) = @_;
     my $finder = Email::Find->new(
         sub {
             my ( $email, $orig_email ) = @_;
@@ -60,6 +77,16 @@ sub get_emails_from_uri {
     );
     $finder->find( \$text );
     @emails = uniq @emails;
+
+    # remove values that passes email validation but in fact are not emails
+    # L<Email::Extractor/get_exceptions>
+    @emails = grep { !isin( $_, $self->get_exceptions ) } @emails;
+
+    # MX record checking
+    @emails =
+      grep { defined Email::Valid->address( -address => $_, -mxcheck => 1 ) }
+      @emails;
+
     return \@emails;
 }
 
@@ -68,8 +95,11 @@ sub extract_contact_links {
     my ( $self, $text ) = @_;
 
     $text = $self->{last_text} if !defined $text;
+    return if !defined $text;
 
     my $all_links = find_all_links($text);
+    return if ( !@$all_links );
+
     $self->{last_all_links} = $all_links;
 
     # TO-DO: do not remove links on social networks since there can be email too
@@ -87,11 +117,11 @@ sub extract_contact_links {
     if ( $self->{only_lang} ) {
         my $contacts_loc = $self->contacts->{ $self->{only_lang} };
         push @potential_contact_links,
-          @{ find_links_by_text( $text, $contacts_loc ) };
+          @{ find_links_by_text( $text, $contacts_loc, 1 ) };
     }
     else {
         for my $c ( @{ $self->contacts } ) {
-            my $res = find_links_by_text( $text, $c );
+            my $res = find_links_by_text( $text, $c, 1 );
             push @potential_contact_links, @$res;
         }
     }
@@ -122,11 +152,18 @@ sub contacts {
 
 sub url_with_contacts {
     return qw/
+      contact
       contacts
       kontaktyi
       kontakty
+      kontakti
       about
       /;
+}
+
+
+sub get_exceptions {
+    return [ '!--Rating@Mail.ru' ];
 }
 
 
@@ -165,11 +202,11 @@ Email::Extractor - Fast email crawler
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
-    my $crawler = Email::Extractor->new( only_language => 'ru' );
+    my $crawler = Email::Extractor->new( only_language => 'ru', timeout => 30 );
     
     $crawler->search_until_attempts('https://example.com' , 5);
 
@@ -204,23 +241,28 @@ Constructor
 Params:
 
     only_lang - array of languages to check, by default is C<ru>
+    timeout   - timeout of each request in seconds, by default is C<20>
 
 =head2 search_until_attempts
 
-Search for email until number of search_until_attempts
+Search for email until specified number of GET requests
+
+    my $emails = $crawler->search_until_attempts( $uri, 5 );
+
+Return C<ARRAYREF> or C<undef> if no emails found
 
 =head2 get_emails_from_uri
 
 High-level function uses L<Email::Find>
 
-Found all emails in html page
+Found all emails (regexp accoding RFC 822 standart) in html page
 
     $emails = $crawler->get_emails_from_uri('https://example.com');
     $emails = $crawler->get_emails_from_uri('user/test.html');
 
 Function can accept http(s) uri or file paths both
 
-Return C<ARRAYREF>
+Return C<ARRAYREF> (can be empty)
 
 =head2 extract_contact_links
 
@@ -254,7 +296,7 @@ Veriables for debug:
     $self->{non_contact_links}  # links assumed not contained company contacts
     $self->{last_uri}
 
-Return C<ARRAYREF>
+Return C<ARRAYREF> or C<undef> if no contact links found
 
 =head2 contacts
 
@@ -265,6 +307,14 @@ Return hash with contacts word in different languages
 =head2 url_with_contacts
 
 Return array of words that may contain contact url
+
+    perl -Ilib -E "use Email::Extractor; use Data::Dumper; print Dumper Email::Extractor::url_with_contacts();"
+
+=head2 get_exceptions
+
+Return array of addresses that L<Email::Find> consider as email but in fact it is no
+
+    perl -Ilib -E "use Email::Extractor; use Data::Dumper; print Dumper Email::Extractor::exceptions();"
 
 =head2 get_encoding
 
@@ -282,6 +332,8 @@ If called without parametes it return encoding of last text loaded by function l
 Return hash with contacts word in different languages
 
     perl -Ilib -E "use Email::Extractor; use Data::Dumper; print Dumper Email::Extractor::contacts();"
+
+Links checked in uppercase and lowecase also
 
 =head2 get_encoding
 

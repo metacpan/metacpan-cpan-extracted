@@ -798,8 +798,8 @@ package Tk::JBrowseEntry;
 
 BEGIN
 {
-	use vars qw($VERSION $haveHListbox $haveJSetPalette);
-	$VERSION = '5.20';
+	use vars qw($VERSION $haveHListbox);
+	$VERSION = '5.21';
 
 	use strict;
 	use Carp;
@@ -808,8 +808,6 @@ BEGIN
 	eval 'use Tk::HMListbox; $haveHListbox = ($Tk::HListbox::VERSION >= 2.1) ? 1 : 0; 1';
 	use base qw(Tk::Frame);
 };
-
-eval 'require "setPalette.pl"; $haveJSetPalette = 1; 1';
 
 Construct Tk::Widget 'JBrowseEntry';
 
@@ -2522,9 +2520,14 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 		{
 			$txtbg = 'lightgray';
 		}
-		elsif ($w->cget('-colorstate') =~ /^(?:2|dark|readonlydark)$/io || !$haveJSetPalette)
+		elsif ($w->cget('-colorstate') =~ /^(?:2|dark|readonlydark)$/io
+				|| !defined $Tk::Widget::TwilightThreshold)  #DEFINED IF USING OUR MODIFIED "setPalette.pl"!
 		{
 			$txtfg = ($txtbg eq $entry->cget('-readonlybackground')) ? 'gray30' : 'black';
+		}
+		elsif ($bummer)  #WINDOWS SETPALETTE DOESN'T "SHADE" THE READONLY TEXT FIELD BG, SO WE NEED TO MAKE FG LOOK DIFFERENT FROM NORMAL STATE!:
+		{
+			$txtfg = ($txtfg =~ /black/io) ? 'gray30' : 'lightgray';
 		}
 		$txtfg = $w->{'-textreadonlyforeground'}  if ($w->{'-textreadonlyforeground'});
 		$txtbg = $w->{'-textreadonlybackground'}  if ($w->{'-textreadonlybackground'});

@@ -5,43 +5,51 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
-
-use Carp qw(verbose); # makes carp() cluck and croak() confess
-
-sub _warn {
-  if ($_[-1] =~ /\n$/s) {
-    my $arg = pop @_;
-    $arg =~ s/(.*)( at .*? line .*?\n$)/$1/s;
-    push @_, $arg;
-  }
-  warn &Carp::longmess;
-}
-
-sub _die {
-  die @_ if ref($_[0]);
-  if ($_[-1] =~ /\n$/s) {
-    my $arg = pop @_;
-    $arg =~ s/(.*)( at .*? line .*?\n$)/$1/s;
-    push @_, $arg;
-  }
-  die &Carp::longmess;
-}
-
-my %OLD_SIG;
+our $VERSION = '0.16';
+$VERSION =~ tr/_//d;
 
 BEGIN {
-  @OLD_SIG{qw(__DIE__ __WARN__)} = @SIG{qw(__DIE__ __WARN__)};
-  $SIG{__DIE__} = \&_die;
-  $SIG{__WARN__} = \&_warn;
+  require Carp;
+  $Carp::CarpInternal{ +__PACKAGE__ }++;
 }
 
-END {
-  @SIG{qw(__DIE__ __WARN__)} = @OLD_SIG{qw(__DIE__ __WARN__)};
+use constant CHOMP_DOT => $Carp::VERSION < 1.25;
+
+sub _warn { warn &_longmess }
+
+sub _die { die ref $_[0] ? @_ : &_longmess }
+
+sub _longmess {
+  if (CHOMP_DOT && $_[-1] =~ /\.\n\z/) {
+    my $arg = pop @_;
+    $arg =~ s/\.\n\z/\n/;
+    push @_, $arg;
+  }
+  my $mess = &Carp::longmess;
+  $mess =~ s/( at .*?\n)\1/$1/s;    # Suppress duplicate tracebacks
+  $mess;
+}
+
+my @HOOKS = qw(__DIE__ __WARN__);
+my %OLD_SIG;
+
+sub import {
+  my $class = shift;
+  return if $OLD_SIG{$class};
+  @{ $OLD_SIG{$class} }{ @HOOKS, 'Verbose' } = (@SIG{@HOOKS}, $Carp::Verbose);
+
+  @SIG{@HOOKS} = ($class->can('_die'), $class->can('_warn'));
+  $Carp::Verbose = 'verbose';    # makes carp() cluck and croak() confess
+}
+
+sub unimport {
+  my $class = shift;
+  return unless $OLD_SIG{$class};
+  no if "$]" <= 5.008008, 'warnings' => 'uninitialized';
+  (@SIG{@HOOKS}, $Carp::Verbose) = @{ delete $OLD_SIG{$class} }{ @HOOKS, 'Verbose' };
 }
 
 1;
-__END__
 
 =encoding utf8
 
@@ -53,8 +61,7 @@ Carp::Always - Warns and dies noisily with stack backtraces
 
   use Carp::Always;
 
-makes every C<warn()> and C<die()> complains loudly in the calling package 
-and elsewhere. More often used on the command line:
+Often used on the command line:
 
   perl -MCarp::Always script.pl
 
@@ -80,19 +87,39 @@ looks:
           main::f('undef') called at -e line 2
           main::g() called at -e line 2
 
-In the implementation, the C<Carp> module does
+In the implementation, the L<Carp> module does
 the heavy work, through C<longmess()>. The
 actual implementation sets the signal hooks
-C<$SIG{__WARN__}> and C<$SIG{__DIE__}> to
+L<$SIG{__WARN__}|perlvar/%SIG> and L<$SIG{__DIE__}|perlvar/%SIG> to
 emit the stack backtraces.
 
-Oh, by the way, C<carp> and C<croak> when requiring/using
-the C<Carp> module are also made verbose, behaving
-like C<cluck> and C<confess>, respectively.
+Also, all uses of C<carp> and C<croak> are made verbose,
+behaving like C<cluck> and C<confess>.
 
-=head2 EXPORT
+=head1 METHODS
 
-Nothing at all is exported.
+L<Carp::Always> implements the following methods.
+
+=head2 import
+
+  Carp::Always->import()
+
+Enables L<Carp::Always>. Also triggered by statements like
+
+  use Carp::Always;
+  use Carp::Always 0.14;
+
+but not by
+
+  use Carp::Always ();    # does not invoke import()
+
+=head2 unimport
+
+  Carp::Always->unimport();
+
+Disables L<Carp::Always>. Also triggered with
+
+  no Carp::Always;
 
 =head1 ACKNOWLEDGMENTS
 
@@ -101,63 +128,46 @@ of L<Acme::JavaTrace> by Sébastien Aperghis-Tramoni.
 Sébastien also has a newer module called
 L<Devel::SimpleTrace> with the same code and fewer flame
 comments on docs. The pruning of the uselessly long
-docs of this module were prodded by Michael Schwern.
+docs of this module was prodded by Michael Schwern.
 
 Schwern and others told me "the module name stinked" -
 it was called C<Carp::Indeed>. After thinking long
-and not getting nowhere, I went with nuffin's suggestion
+and getting nowhere, I went with nuffin's suggestion
 and now it is called C<Carp::Always>. 
-C<Carp::Indeed> which is now deprecate
-lives in its own distribution (which won't go anywhere
-but will stay there as a redirection to this module).
 
 =head1 SEE ALSO
 
-=over 4
-
-=item *
-
 L<Carp>
-
-=item *
 
 L<Acme::JavaTrace> and L<Devel::SimpleTrace>
 
-=item *
-
 L<Carp::Always::Color>
-
-=item *
 
 L<Carp::Source::Always>
 
-=back
+L<Devel::Confess>
 
-Please report bugs via CPAN RT 
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Carp-Always.
+L<Carp::Always::SyntaxHighlightSource> and L<Carp::Always::DieOnly>
 
 =head1 BUGS
-
-Every (un)deserving module has its own pet bugs.
 
 =over 4
 
 =item *
 
 This module does not play well with other modules which fusses
-around with C<warn>, C<die>, C<$SIG{'__WARN__'}>,
-C<$SIG{'__DIE__'}>.
+around with C<warn>, C<die>, C<$SIG{__WARN__}>, C<$SIG{__DIE__}>.
 
 =item *
 
 Test scripts are good. I should write more of these.
 
-=item *
-
-I don't know if this module name is still a bug as it was
-at the time of C<Carp::Indeed>.
-
 =back
+
+Please report bugs via GitHub
+L<https://github.com/aferreira/cpan-Carp-Always/issues>
+
+Backlog in CPAN RT: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Always>
 
 =head1 AUTHOR
 
@@ -165,7 +175,7 @@ Adriano Ferreira, E<lt>ferreira@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2013 by Adriano R. Ferreira
+Copyright (C) 2005-2013, 2018 by Adriano Ferreira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

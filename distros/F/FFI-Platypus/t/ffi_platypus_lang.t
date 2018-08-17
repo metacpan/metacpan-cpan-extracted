@@ -1,51 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More;
+use FFI::Platypus::Lang;
 use FFI::CheckLib;
 use FFI::Platypus;
 
-my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 'libtest';
-
-subtest C => sub {
-  plan tests => 4;
-
-  my $ffi = FFI::Platypus->new;
-  $ffi->lib($libtest);
-
-  eval { $ffi->type('int') };
-  is $@, '', 'int is an okay type';
-  eval { $ffi->type('foo_t') };
-  isnt $@, '', 'foo_t is not an okay type';
-  note $@;
-  eval { $ffi->type('sint16') };
-  is $@, '', 'sint16 is an okay type';
-
-  is $ffi->find_symbol('UnMangled::Name(int i)'), undef, 'unable to find unmangled name';
-
-};
-
-subtest ASM => sub {
-  plan tests => 4;
-
-  my $ffi = FFI::Platypus->new(lang => 'ASM');
-  $ffi->lib($libtest);
-
-  eval { $ffi->type('int') };
-  isnt $@, '', 'int is not an okay type';
-  note $@;
-  eval { $ffi->type('foo_t') };
-  isnt $@, '', 'foo_t is not an okay type';
-  note $@;
-  eval { $ffi->type('sint16') };
-  is $@, '', 'sint16 is an okay type';
-
-  is $ffi->find_symbol('UnMangled::Name(int i)'), undef, 'unable to find unmangled name';
-
-};
+my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
 
 subtest 'Foo constructor' => sub {
-  plan tests => 6;
-
   my $ffi = FFI::Platypus->new(lang => 'Foo');
   $ffi->lib($libtest);
   
@@ -65,8 +27,6 @@ subtest 'Foo constructor' => sub {
 };
 
 subtest 'Foo attribute' => sub {
-  plan tests => 6;
-
   my $ffi = FFI::Platypus->new;
   $ffi->lib($libtest);
   $ffi->lang('Foo');
@@ -97,6 +57,8 @@ subtest 'MyLang::Roger' => sub {
   is $ffi->sizeof('foo_t'), 4, 'sizeof foo_t = 4';
 
 };
+
+done_testing;
 
 package
   MyLang::Roger;
@@ -135,3 +97,4 @@ sub mangler
     defined $mangle{$_[0]} ? $mangle{$_[0]} : $_[0];
   };
 }
+

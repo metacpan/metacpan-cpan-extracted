@@ -4,15 +4,16 @@ author:
   - 'Jason Terry <oaxlin@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300025, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Log-Scrubber
 requires:
-  Carp: 0
-  Clone: 0
-version: 0.15
+  Carp: '0'
+  Clone: '0'
+version: '0.16'
+x_serialization_backend: 'YAML::Tiny version 1.64'

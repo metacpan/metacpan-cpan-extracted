@@ -14,6 +14,7 @@ do { my $x = {
                                       'JSON::Validator' => '2.05',
                                       'Mojolicious' => '7.79',
                                       'Mojolicious::Plugin::OpenAPI' => '1.28',
+                                      'Role::Tiny' => '0',
                                       'Scalar::Util' => '0',
                                       'Sys::Hostname' => '0',
                                       'Text::Balanced' => '0',

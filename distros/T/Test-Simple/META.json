@@ -47,7 +47,7 @@
          "url" : "http://github.com/Test-More/test-more/"
       }
    },
-   "version" : "1.302138",
+   "version" : "1.302140",
    "x_breaks" : {
       "Log::Dispatch::Config::TestLog" : "<= 0.02",
       "Net::BitTorrent" : "<= 0.052",
@@ -71,6 +71,6 @@
       "Test::UseAllModules" : ">= 0.12, <= 0.14",
       "Test::Wrapper" : "<= v0.3.0"
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

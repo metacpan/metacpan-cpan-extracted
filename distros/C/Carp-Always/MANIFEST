@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+LICENSE
 
 t/001use.t
 t/010simple.t
@@ -9,6 +10,5 @@ t/098pod-coverage.t
 t/099pod.t
 
 lib/Carp/Always.pm
-
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

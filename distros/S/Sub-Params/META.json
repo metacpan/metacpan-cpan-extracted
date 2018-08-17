@@ -1,0 +1,56 @@
+{
+   "abstract" : "Handle function arguments",
+   "author" : [
+      "Branislav Zahradnik <branislav.zahradnik@gooddata.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sub-Params",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Hash::Util" : "0",
+            "Ref::Util" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gooddata/perl-sub-params/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gooddata/perl-sub-params.git",
+         "web" : "https://github.com/gooddata/perl-sub-params"
+      }
+   },
+   "version" : "v1.0.0"
+}

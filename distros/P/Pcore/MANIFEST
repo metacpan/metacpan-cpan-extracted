@@ -18,6 +18,7 @@ lib/Pcore/API/GitHub.pm
 lib/Pcore/API/IPPool.pm
 lib/Pcore/API/PAUSE.pm
 lib/Pcore/API/Proxy.pm
+lib/Pcore/API/S3.pm
 lib/Pcore/API/SCM.pm
 lib/Pcore/API/SCM/Const.pm
 lib/Pcore/API/SCM/Git.pm
@@ -40,6 +41,8 @@ lib/Pcore/App/Controller/API.pm
 lib/Pcore/App/Controller/Index.pm
 lib/Pcore/App/Controller/Static.pm
 lib/Pcore/App/Router.pm
+lib/Pcore/CDN.pm
+lib/Pcore/CDN/Bucket.pm
 lib/Pcore/Core/CLI.pm
 lib/Pcore/Core/CLI/Arg.pm
 lib/Pcore/Core/CLI/Cmd.pm
@@ -171,6 +174,7 @@ lib/Pcore/Util/Scalar.pm
 lib/Pcore/Util/Sys.pm
 lib/Pcore/Util/Sys/ForkTmpl.pm
 lib/Pcore/Util/Sys/Proc.pm
+lib/Pcore/Util/Sys/Proc1.pm
 lib/Pcore/Util/Term.pm
 lib/Pcore/Util/Term/Progress.pm
 lib/Pcore/Util/Term/Progress/Indicator.pm

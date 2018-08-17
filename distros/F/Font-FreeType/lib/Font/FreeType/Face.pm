@@ -98,13 +98,20 @@ Only available with Freetype 2.1.5 or newer.
 
 Iterates through all the characters in the font, and calls I<code-ref>
 for each of them in turn.  Glyphs which don't correspond to Unicode
-characters are ignored.  There is currently no facility for iterating
-over all glyphs.
+characters are ignored.
 
 Each time your callback code is called, C<$_> will be set to a
 L<Font::FreeType::Glyph|Font::FreeType::Glyph> object for the current glyph.
 For an example see the program I<list-characters.pl> provided in the
 distribution.
+
+=item foreach_glyph(I<code-ref>)
+
+Iterates through all the glyphs in the font, and calls I<code-ref>
+for each of them in turn.
+
+Each time your callback code is called, C<$_> will be set to a
+L<Font::FreeType::Glyph|Font::FreeType::Glyph> object for the current glyph.
 
 =item glyph_from_char(I<character>, I<fallback = 0>)
 

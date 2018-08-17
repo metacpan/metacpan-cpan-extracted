@@ -45,6 +45,9 @@ cmp_deeply(
                     config => superhashof({
                         'Dist::Zilla::Role::TestRunner' => ignore,  # changes over time
                         # maybe Dist::Zilla::Plugin::MakeMaker::Awesome
+                        'Dist::Zilla::Plugin::MakeMaker::Fallback' => {
+                            skip_release_testing => 0,
+                        },
                     }),
                     name => 'MakeMaker::Fallback',
                     version => Dist::Zilla::Plugin::MakeMaker::Fallback->VERSION,

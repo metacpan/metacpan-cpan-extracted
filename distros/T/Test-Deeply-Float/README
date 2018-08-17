@@ -3,8 +3,8 @@ NAME
     with tolerance
 
 VERSION
-    This document describes version 0.001 of Test::Deeply::Float (from Perl
-    distribution Test-Deeply-Float), released on 2018-08-07.
+    This document describes version 0.002 of Test::Deeply::Float (from Perl
+    distribution Test-Deeply-Float), released on 2018-08-11.
 
 SYNOPSIS
      use Test::More; # exports is_deeply(), etc
@@ -19,6 +19,8 @@ SYNOPSIS
      $Test::Deeply::Float::EPSILON = 1e-9; # default is 1e-6
 
 DESCRIPTION
+    Deprecation notice: Deprecated in favor of Test::DataCmp.
+
     This module exports "is_deeply_float()" which is just like Test::More's
     "is_deeply()", except that when comparing two numbers (ints or floats) a
     tolerance is allowed to work around floating point rounding problem.
@@ -41,10 +43,20 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Based on Test::More's "is_deeply()".
+    Test::DataCmp.
 
-    Test::Number::Delta and Test::Deep's "num()" can also compare floats
-    with tolerance, but not in data structures.
+    Code is based on Test::More's "is_deeply()".
+
+    To compare two floats with tolerance, you can simply do "abs($n1 - $n2)
+    < $epsilon" or use one of several modules on CPAN, e.g.
+    Number::Tolerant. For testing, there are Test::Number::Delta,
+    Test::Approximate.
+
+    To compare two data structures with tolerant float comparison, there is
+    also Test::Deep (see "num()") with its several extensions e.g.
+    Test::Approximate, Test::Deep::NumberTolerant, Test::Deep::Fuzzy. Note
+    that you need (or: able) to specify the point(s) in the data structure
+    where you want to perform the tolerant comparison at.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

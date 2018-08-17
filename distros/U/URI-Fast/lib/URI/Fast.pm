@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.39';
+our $XS_VERSION = our $VERSION = '0.41';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -18,48 +18,23 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(
   uri iri uri_split
-  encode url_encode
-  decode url_decode
+  encode uri_encode url_encode
+  decode uri_decode url_decode
 );
 
 require URI::Fast::IRI;
 
-use overload '""' => sub{ $_[0]->to_string },
-             'eq' => sub{ $_[0]->compare($_[1]) };
-
-sub uri { URI::Fast->new($_[0]) }
-sub iri { URI::Fast::IRI->new_iri($_[0]) }
-
-# Aliases
-sub as_string  { goto \&to_string }
-sub url_encode { goto \&encode    }
-sub url_decode { goto \&decode    }
-
-# Build a simple accessor for basic attributes
-foreach my $attr (qw(scheme usr pwd host port frag)) {
-  my $s = "set_$attr";
-  my $g = "get_$attr";
-
-  *{__PACKAGE__ . "::$attr"} = sub {
-    if (@_ == 2) {
-      $_[0]->$s( $_[1] );
-    }
-
-    if (defined wantarray) {
-      return $_[0]->$g();
-    }
-  };
-}
+use overload 'eq' => sub{ $_[0]->compare($_[1]) };
 
 sub auth {
   my ($self, $val) = @_;
 
   if (@_ == 2) {
     if (ref $val) {
-      $self->set_usr($val->{usr}   || '');
-      $self->set_pwd($val->{pwd}   || '');
-      $self->set_host($val->{host} || '');
-      $self->set_port($val->{port} || '');
+      $self->usr($val->{usr}   || '');
+      $self->pwd($val->{pwd}   || '');
+      $self->host($val->{host} || '');
+      $self->port($val->{port} || '');
     }
     else {
       $self->set_auth($val);
@@ -119,10 +94,6 @@ sub query_keys {
   keys %{ $_[0]->get_query_keys };
 }
 
-sub query_keyset {
-  $_[0]->update_query_keyset($_[1], $_[2] || '&');
-}
-
 sub param {
   my ($self, $key, $val, $sep) = @_;
   $sep ||= '&';
@@ -165,7 +136,7 @@ sub _cmp ($$) {
 
 sub compare {
   my ($self, $other) = @_;
-  $other = uri $other;
+  $other = uri($other);
 
   return unless _cmp($self->scheme, $other->scheme)
     && _cmp($self->usr,  $other->usr)
@@ -195,6 +166,62 @@ sub compare {
   }
 
   return 1;
+}
+
+#-------------------------------------------------------------------------------
+# Relativism
+#-------------------------------------------------------------------------------
+sub relative {
+  my ($self, $base) = @_;
+  my $rel = uri("$self");
+
+  my $rpath = $self->path;
+  ($_, $_, my $bpath) = uri_split("$base");
+
+  if ($bpath =~ m|/$| && $rpath eq $bpath) {
+    $rel->path('./');
+  }
+  else {
+    # Ensure both paths begin with '/'
+    $rpath = "/$rpath" unless $rpath =~ m|^/|;
+    $bpath = "/$bpath" unless $bpath =~ m|^/|;
+
+    # Remove common leading path segments
+    my ($idx, $brk) = (1, 0);
+
+    # Scan for matching segments
+    while (1) {
+      # Locate the next delimiter
+      $brk = index($rpath, '/', $idx);
+
+      last if $brk < 0;                           # not found
+      last if $brk != index($bpath, '/', $idx);   # no match: different segment lengths
+      last if substr($rpath, $idx, $brk - $idx)   # no match: segments have different string values
+           ne substr($bpath, $idx, $brk - $idx);
+
+      $idx = $brk + 1;                            # move past delimiter
+    }
+
+    # $idx now matches the slash after the common prefix; remove path contents
+    # up to that point.
+    substr($rpath, 0, $idx) = '';
+    substr($bpath, 0, $idx) = '';
+
+    # Add ../ for each remaining base path segment
+    while ($bpath =~ m|/|gc) {
+      $rpath = "../$rpath";
+    }
+
+    # An empty path becomes ./
+    $rpath ||= './';
+
+    $rel->path($rpath);
+  }
+
+  $rel->clear_scheme;
+  $rel->clear_auth;
+
+  return $rel;
 }
 
 =encoding UTF8
@@ -238,6 +265,10 @@ Subroutines are exported on demand.
 
 Accepts a URI string, minimally parses it, and returns a C<URI::Fast> object.
 
+Note: passing a C<URI::Fast> instance to this routine will cause the object to
+be interpolated into a string (via L</to_string>), effectively creating a clone
+of the original C<URI::Fast> object.
+
 =head2 iri
 
 Similar to L</uri>, but returns a C<URI::Fast::IRI> object. A C<URI::Fast::IRI>
@@ -248,7 +279,7 @@ be percent-encoded when modified.
 
 Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
-=head2 encode/decode/url_encode/url_decode
+=head2 encode/decode/uri_encode/uri_decode
 
 See L</ENCODING>.
 
@@ -370,8 +401,13 @@ parameter to C<undef> deletes the parameter from the URI.
   my @value_list   = $uri->param('foo');   # foo appears twice
   my $value_scalar = $uri->param('foo');   # croaks; expected single value but foo has multiple
 
-  # Delete 'foo'
-  $uri->param('foo', undef);
+  # Delete parameter
+  $uri->param('foo', undef); # deletes foo
+
+  # Ambiguous cases
+  $uri->param('foo', '');  # foo=
+  $uri->param('foo', '0'); # foo=0
+  $uri->param('foo', ' '); # foo=%20
 
 Both '&' and ';' are treated as separators for key/value parameters when
 parsing the query string. An optional third parameter explicitly selects the
@@ -446,6 +482,44 @@ overloaded.
 Compares the URI to another, returning true if the URIs are equivalent.
 Overloads the C<eq> operator.
 
+=head2 clone
+
+Sugar for:
+
+  my $uri = uri '...';
+  my $clone = uri $uri;
+
+=head2 absolute
+
+Builds an absolute URI from a relative URI and a base URI string.
+Adheres as strictly as possible to the rules for resolving a target URI in
+L<RFC3986 section 5.2|https://www.rfc-editor.org/rfc/rfc3986.txt>. Returns a new
+L<URI::Fast> object representing the absolute, merged URI.
+
+  my $uri = uri('some/path')->absolute('http://www.example.com/fnord');
+  $uri->to_string; # "http://www.example.com/fnord/some/path"
+
+=head2 relative
+
+Builds a relative URI using a second URI (either a C<URI::Fast> object or a
+string) as a base. Unlike L<URI/rel>, ignores differences in domain and scheme
+assumes the caller wishes to adopt the base URL's instead. Aside from that difference,
+it's behavior should mimic L<URI/rel>'s.
+
+  my $uri = uri('http://example.com/foo/bar')->relative('http://example.com/foo');
+  $uri->to_string; # "foo/bar"
+
+  my $uri = uri('http://example.com/foo/bar/')->relative('http://example.com/foo');
+  $uri->to_string; # "foo/bar/"
+
+=head2 normalize
+
+Similar to L<URI/canonical>, performs a minimal normalization on the URI. Only
+generic normalization described in the rfc is performed; no scheme-specific
+normalization is done. Specifically, the scheme and host members are converted
+to lower case, dot segments are collapsed in the path, and any percent-encoded
+characters in the URI are converted to upper case.
+
 =head1 ENCODING
 
 C<URI::Fast> tries to do the right thing in most cases with regard to reserved
@@ -476,6 +550,13 @@ non-ASCII characters are decoded but reserved characters are not. When
 returning a list or reference of the deconstructed field, individual values are
 decoded of both reserved and non-ASCII characters.
 
+=head2 '+' vs '%20'
+
+Although no longer part of the standard, C<+> is commonly used as the encoded
+space character (rather than C<%20>); it I<is> still official to the
+C<application/x-www-form-urlencoded> type, and is treated as a space by
+L</decode>.
+
 =head2 encode
 
 Percent-encodes a string for use in a URI. By default, both reserved and UTF-8
@@ -496,13 +577,18 @@ Decodes a percent-encoded string.
 
   my $decoded = URI::Fast::decode($some_string);
 
-=head2 url_encode
+=head2 uri_encode
 
-=head2 url_decode
+=head2 uri_decode
 
 These are aliases of L</encode> and L</decode>, respectively. They were added
 to make L<BLUEFEET|https://metacpan.org/author/BLUEFEET> happy after he made
 fun of me for naming L</encode> and L</decode> too generically.
+
+In fact, these were originally aliased as C<url_encode> and C<url_decode>, but
+due to some pedantic whining on the part of
+L<BGRIMM|https://metacpan.org/author/BGRIMM>, they have been renamed to
+C<uri_encode> and C<uri_decode>.
 
 =head1 SPEED
 
@@ -510,15 +596,9 @@ See L<URI::Fast::Benchmarks>.
 
 =head1 FUTURE PLANS
 
+Some thoughts on future development for this module.
+
 =over
-
-=item Zero-copy strategy for parsing and updating query string
-
-L</uri> does a single, fast pass over the input string and copies portions into
-the struct members. Some compound fields, such as the query and path, are only
-parsed as needed. Switching to a zero-copy strategy could make the initial pass
-faster, reduce time spent zeroing out the struct, and make better use of the
-cache.
 
 =item Support for arbitrary binary data in query string
 
@@ -540,9 +620,9 @@ possible and croaks loudly otherwise.
 
 The de facto standard.
 
-=item L<Panda::URI>
+=item L<RFC 3986|https://www.rfc-editor.org/rfc/rfc3986.txt>
 
-Written in C++ and purportedly very fast, but appears to only support Linux.
+The official standard.
 
 =back
 
@@ -564,13 +644,19 @@ fun of me for naming certain methods too generically.
 
 =item Aran Deltac (BLUEFEET)
 
+=item Ben Grimm (BGRIMM)
+
 =item Dave Hubbard (DAVEH)
 
 =item James Messrie
 
+=item Martin Locklear
+
 =item Randal Schwartz (MERLYN)
 
 =item Sara Siegal (SSIEGAL)
+
+=item Tim Vroom (VROOM)
 
 =back
 

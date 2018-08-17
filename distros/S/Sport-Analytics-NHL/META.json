@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sport-Analytics-NHL",
    "prereqs" : {
@@ -60,7 +60,7 @@
    "provides" : {
       "Sport::Analytics::NHL" : {
          "file" : "lib/Sport/Analytics/NHL.pm",
-         "version" : "1.31"
+         "version" : "1.40"
       },
       "Sport::Analytics::NHL::Config" : {
          "file" : "lib/Sport/Analytics/NHL/Config.pm"
@@ -80,6 +80,9 @@
       "Sport::Analytics::NHL::Normalizer" : {
          "file" : "lib/Sport/Analytics/NHL/Normalizer.pm"
       },
+      "Sport::Analytics::NHL::Populator" : {
+         "file" : "lib/Sport/Analytics/NHL/Populator.pm"
+      },
       "Sport::Analytics::NHL::Report" : {
          "file" : "lib/Sport/Analytics/NHL/Report.pm"
       },
@@ -97,6 +100,9 @@
       },
       "Sport::Analytics::NHL::Report::PL" : {
          "file" : "lib/Sport/Analytics/NHL/Report/PL.pm"
+      },
+      "Sport::Analytics::NHL::Report::Player" : {
+         "file" : "lib/Sport/Analytics/NHL/Report/Player.pm"
       },
       "Sport::Analytics::NHL::Report::RO" : {
          "file" : "lib/Sport/Analytics/NHL/Report/RO.pm"
@@ -118,6 +124,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.31",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.40",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: http://github.com/memowe/EventStore-Tiny/issues
   repository: http://github.com/memowe/EventStore-Tiny
-version: '0.41'
+version: '0.43'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

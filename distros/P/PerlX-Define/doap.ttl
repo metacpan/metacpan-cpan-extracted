@@ -1,0 +1,81 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Define/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [ doap-deps:on "Keyword::Simple"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Define>;
+	doap:created         "2018-08-09"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/PerlX-Define>;
+	doap:homepage        <https://metacpan.org/release/PerlX-Define>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "PerlX-Define";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Define/v_0-100>, <http://purl.org/NET/cpan-uri/dist/PerlX-Define/v_0-101>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-perlx-define>;
+	];
+	doap:shortdesc       "cute syntax for defining constants".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Define/v_0-100>
+	a                    doap:Version;
+	rdfs:label           "First stand-alone release";
+	dc:identifier        "PerlX-Define-0.100"^^xsd:string;
+	dc:issued            "2018-08-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Split from Moops.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use namespace::clean to wipe away the define keyword after it's been used.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better describe how this differs from constant.pm.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Correctly report line and file where a constant was defined in any error messages from eval.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Define-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Define/v_0-101>
+	a                    doap:Version;
+	dc:identifier        "PerlX-Define-0.101"^^xsd:string;
+	dc:issued            "2018-08-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Spell `-cleanee` correctly.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Don't need Test::Modern; Test::More is sufficient.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Define-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

@@ -1,0 +1,7 @@
+{
+    "engines": ["tt2", "alloy_html"],
+    "title": "Attribute encoding",
+    "blurb": "Encoding data for HTML attributes can be interesting."
+}
+
+

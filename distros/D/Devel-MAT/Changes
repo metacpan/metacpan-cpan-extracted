@@ -1,5 +1,9 @@
 Revision history for Devel-MAT
 
+0.39    2018-08-09 13:37:24
+        [BUGFIXES]
+         * Fix unit test script for now-removed tool file (RT125994)
+
 0.38    2018-08-02 17:47:44
         [CHANGES]
          * Improvements to 'pmat-diff'

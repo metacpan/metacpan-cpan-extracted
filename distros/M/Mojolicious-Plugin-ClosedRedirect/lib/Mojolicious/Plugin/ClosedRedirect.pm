@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare url_unescape quote/;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # TODO: Support domain whitelisting, like
 #       https://github.com/sdsdkkk/safe_redirect
@@ -23,9 +23,18 @@ sub register {
   };
 
   # Set secrets
+  my $secrets;
   if ($param->{secrets} && ref $param->{secrets} eq 'ARRAY') {
     $plugin->secrets($param->{secrets});
+    $secrets = $param->{secrets};
+  }
+
+  # Get secrets from application
+  else {
+    $secrets = $app->secrets;
   };
+
+  my ($log, $plugins) = ($app->log, $app->plugins);
 
   # Establish 'close_redirect_to' helper
   $app->helper(
@@ -41,7 +50,7 @@ sub register {
       $url->path->canonicalize;
 
       # Get the first plugin secret or the first application secret
-      my $secret = $plugin->secrets->[0] // $app->secrets->[0];
+      my $secret = $secrets->[0];
 
       # Calculate check
       my $url_check =
@@ -82,7 +91,6 @@ sub register {
       return $c->rendered($res->is_redirect ? () : 302);
     }
   );
-
 
   # Add validation check
   # Alternatively make this a filter instead
@@ -141,11 +149,8 @@ sub register {
 
             my $url_check;
 
-            # Use application secrets
-            my @secrets = $plugin->secrets->[0] ? @{$plugin->secrets} : @{$app->secrets};
-
             # Check all secrets
-            foreach (@secrets) {
+            foreach (@$secrets) {
 
               # Calculate check
               $url_check =
@@ -170,13 +175,13 @@ sub register {
       $err //= 'Redirect is invalid';
 
       # Emit hook
-      $app->plugins->emit_hook(
+      $plugins->emit_hook(
         on_open_redirect_attack => ( $name, $return_url, $err )
       );
 
       # Warn in log
       # Prevents log-injection attack
-      $app->log->warn(
+      $log->warn(
         "Open Redirect Attack - $err: URL for " .
           quote($name) . ' is ' . quote($return_url)
         );
@@ -356,7 +361,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2016-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

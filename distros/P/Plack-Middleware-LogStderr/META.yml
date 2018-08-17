@@ -27,10 +27,9 @@ requires:
   parent: '0'
   strict: '0'
   warnings: '0'
-  warnings::register: '0'
 resources:
   homepage: https://github.com/amalek215/Plack-Middleware-LogStderr
   repository: https://github.com/amalek215/Plack-Middleware-LogStderr.git
-version: '0.002'
+version: '1.000'
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.69'

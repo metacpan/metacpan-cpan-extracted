@@ -26,9 +26,10 @@ DefParameterType('GraphixDimension', sub {
     my ($gullet) = @_;
     if ($gullet->ifNext(T_OTHER('!'))) {
       $gullet->readToken();
-      Dimension(0); }
+      undef; }    # essentially: let other dimensions determine size.
     else {
-      $gullet->readDimension; } });
+      $gullet->readDimension; } },
+  optional => 1);
 
 DefConstructor('\scalebox{}[] Digested',
   "<ltx:inline-block angle='#angle' width='#width' height='#height' depth='#depth'"
@@ -190,7 +191,7 @@ DefConstructor('\graphicspath DirectoryList', sub {
       my $path = pathname_absolute(pathname_canonical(ToString($dir)));
       push(@paths, $path);
       PushValue(GRAPHICSPATHS => $path); }
-    return (path => [@paths]); });
+    return (paths => [@paths]); });
 
 # Basically, we're transforming the graphics options into graphicx format.
 DefMacro('\includegraphics OptionalMatch:* [][] Semiverbatim',

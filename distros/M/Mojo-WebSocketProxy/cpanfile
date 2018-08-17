@@ -17,12 +17,13 @@ on configure => sub {
     requires 'ExtUtils::MakeMaker', '7.1101';
 };
 
-on build => sub {
+on test => sub {
+    requires 'Path::Tiny';
     requires 'Test::Mojo';
     requires 'Test::Simple', '0.44';
     requires 'Test::Fatal';
     requires 'Test::MockModule';
     requires 'Test::MockObject';
-    requires 'Test::More';
+    requires 'Test::More', '0.98';
     requires 'Test::TCP';
 };

@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.041';
+$TestRail::API::VERSION = '0.043';
 
 use 5.010;
 
@@ -26,12 +26,13 @@ use List::Util 1.33;
 use Encode ();
 
 sub new {
-    state $check = compile( ClassName, Str, Str, Str,
-        Optional [ Maybe [Str] ],
-        Optional [ Maybe [Bool] ],
-        Optional [ Maybe [Bool] ]
+    state $check = compile( ClassName, Str,
+        Str, Str,
+        Optional [ Maybe [Str] ],  Optional [ Maybe [Bool] ],
+        Optional [ Maybe [Bool] ], Optional [ Maybe [Int] ]
     );
-    my ( $class, $apiurl, $user, $pass, $encoding, $debug, $do_post_redirect )
+    my ( $class, $apiurl, $user, $pass, $encoding, $debug, $do_post_redirect,
+        $max_tries )
       = $check->(@_);
 
     die("Invalid URI passed to constructor") if !is_uri($apiurl);
@@ -53,7 +54,9 @@ sub new {
         browser         => new LWP::UserAgent(
             keep_alive => 10,
         ),
-        do_post_redirect => $do_post_redirect
+        do_post_redirect => $do_post_redirect,
+        max_tries        => $max_tries // 1,
+        retry_delay      => 5,
     };
 
     #Allow POST redirects
@@ -130,6 +133,8 @@ sub _doRequest {
     );
     my ( $self, $path, $method, $data ) = $check->(@_);
 
+    $self->{num_tries}++;
+
     my $req = clone $self->{'default_request'};
     $method //= 'GET';
 
@@ -150,7 +155,7 @@ sub _doRequest {
     $req->header(
         "Content-Type" => "application/json; charset=" . $self->{'encoding'} );
 
-    my $response = $self->{'browser'}->request($req);
+    my $response = eval { $self->{'browser'}->request($req) };
 
     #Uncomment to generate mocks
     #use Data::Dumper;
@@ -161,15 +166,46 @@ sub _doRequest {
     #print $fh "\n\n}\n\n";
     #close $fh;
 
+    if ($@) {
+
+        #LWP threw an ex, probably a timeout
+        if ( $self->{num_tries} >= $self->{max_tries} ) {
+            $self->{num_tries} = 0;
+            confess "Failed to satisfy request after $self->{num_tries} tries!";
+        }
+        cluck
+          "WARNING: TestRail API request failed due to timeout, or other LWP fatal condition, re-trying request...\n";
+        sleep $self->{retry_delay} if $self->{retry_delay};
+        goto &_doRequest;
+    }
+
     return $response if !defined($response);    #worst case
+
     if ( $response->code == 403 ) {
-        cluck "ERROR: Access Denied.";
-        return -403;
+        confess "ERROR 403: Access Denied: " . $response->content;
     }
+    if ( $response->code == 401 ) {
+        confess "ERROR 401: Authentication failed: " . $response->content;
+    }
+
     if ( $response->code != 200 ) {
-        cluck "ERROR: Arguments Bad: " . $response->content;
-        return -int( $response->code );
+
+        #LWP threw an ex, probably a timeout
+        if ( $self->{num_tries} >= $self->{max_tries} ) {
+            $self->{num_tries} = 0;
+            cluck "ERROR: Arguments Bad? (got code "
+              . $response->code . "): "
+              . $response->content;
+            return -int( $response->code );
+        }
+        cluck "WARNING: TestRail API request failed (got code "
+          . $response->code
+          . "), re-trying request...\n";
+        sleep $self->{retry_delay} if $self->{retry_delay};
+        goto &_doRequest;
+
     }
+    $self->{num_tries} = 0;
 
     try {
         return $coder->decode( $response->content );
@@ -1355,7 +1391,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.041
+version 0.043
 
 =head1 SYNOPSIS
 
@@ -1371,9 +1407,8 @@ It is by no means exhaustively implementing every TestRail API function.
 
 =head1 IMPORTANT
 
-All the methods aside from the constructor should not die, but return a false value upon failure.
-When the server is not responsive, expect a -500 response, and retry accordingly.
-I recommend using the excellent L<Attempt> module for this purpose.
+All the methods aside from the constructor should not die, but return a false value upon failure (see exceptions below).
+When the server is not responsive, expect a -500 response, and retry accordingly by setting the num_tries parameter in the constructor.
 
 Also, all *ByName methods are vulnerable to duplicate naming issues.  Try not to use the same name for:
 
@@ -1385,6 +1420,8 @@ Also, all *ByName methods are vulnerable to duplicate naming issues.  Try not to
     * configurations
 
 To do so will result in the first of said item found being returned rather than an array of possibilities to choose from.
+
+There are two exceptions to this, in the case of 401 and 403 responses, as these failing generally mean your program has no chance of success anyways.
 
 =head1 CONSTRUCTOR
 
@@ -1406,6 +1443,8 @@ Creates new C<TestRail::API> object.
 
 =item BOOLEAN C<DO_POST_REDIRECT> (optional) - Follow redirects on POST requests (most add/edit/delete calls are POSTs).  Default false.
 
+=item INTEGER C<MAX_TRIES> (optional) - Try requests up to X number of times if they fail with anything other than 401/403.  Useful with flaky external authenticators, or timeout issues.  Default 1.
+
 =back
 
 Returns C<TestRail::API> object if login is successful.
@@ -1422,6 +1461,15 @@ Does not do above checks if debug is passed.
 =head2 B<debug>
 
 Accessors for these parameters you pass into the constructor, in case you forget.
+
+=head2 B<retry_delay>
+
+There is no getter/setter for this parameter, but it is worth mentioning.
+This is the number of seconds to wait between failed request retries when max_retries > 1.
+
+    #Do something other than the default of 5s, like spam the server mercilessly
+    $tr->{retry_delay} = 0;
+    ...
 
 =head1 USER METHODS
 
@@ -2700,7 +2748,7 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar Neil Bowers
+=for stopwords Mohammad S Anwar Neil Bowers Ryan Sherer
 
 =over 4
 
@@ -2712,16 +2760,20 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 Neil Bowers <neil@bowers.com>
 
+=item *
+
+Ryan Sherer <ryan.sherer@cpanel.net>
+
 =back
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
-and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+The development version is on github at L<http://https://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://https://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by George S. Baugh.
+This software is copyright (c) 2018 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

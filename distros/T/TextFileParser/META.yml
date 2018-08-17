@@ -17,6 +17,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: TextFileParser
+provides:
+  TextFileParser:
+    file: lib/TextFileParser.pm
+    version: '0.204'
 requires:
   Exception::Class: '0'
   Exporter: '0'
@@ -26,7 +30,7 @@ requires:
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=TextFileParser
-version: '0.202'
+version: '0.204'
 x_contributors:
   - 'Balaji Ramasubramanian <balaji.ramasubramanian@gmail.com>'
 x_generated_by_perl: v5.18.2

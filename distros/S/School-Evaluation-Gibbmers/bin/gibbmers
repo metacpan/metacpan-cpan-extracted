@@ -1,0 +1,452 @@
+#!/usr/bin/env perl
+# No guarantee given, use at own risk and will
+# PODNAME: gibbmers
+# ABSTRACT: create an evaluation poll over local network
+use Mojolicious::Lite;
+use Mojo::Cache;
+use Mojo::Server::Daemon;
+
+use School::Evaluation::Gibbmers; # stub module at the moment
+use YAML::Tiny;
+use File::ShareDir 'dist_file';
+use IO::Interface::Simple;
+
+# include modules located in local lib
+#use lib "lib";
+use School::Evaluation::Gibbmers::Chart;
+
+# load config
+my $conf_file = '';
+if (-f 'gibbmers.conf.yml') {
+    $conf_file = 'gibbmers.conf.yml';
+}
+elsif (-f 'share/gibbmers.conf.yml') {
+    $conf_file = 'share/gibbmers.conf.yml';
+}
+else {
+    #$conf_file = '/etc/gibbmers.conf.yml';
+    $conf_file = dist_file('School-Evaluation-Gibbmers',
+                           'gibbmers.conf.yml');
+}
+my $yaml = YAML::Tiny->read( $conf_file );
+my $config = $yaml->[0];
+
+# define global variables for configurable parameters
+my $encryption_key = $config->{encryption_key};
+my $cache_slots    = $config->{cache_slots};
+my $public_dir     = $config->{data_dir};
+my $port           = $config->{port};
+my $set_cookie     = $config->{set_cookie};
+my $q1             = $config->{'1personal_intrest_html'};
+my $q2             = $config->{'2question_html'};
+my $q3             = $config->{'3question_html'};
+my $q4             = $config->{'4question_html'};
+my $q5             = $config->{'5question_html'};
+
+# setup mojo password
+app->secrets([$encryption_key]);
+
+# this cache will hold all the data during a poll
+my $cache = Mojo::Cache->new(max_keys => $cache_slots);
+
+# we'll need this for cookies later
+$cache->set('startutime' => time() );
+
+# we count how many participants voted
+$cache->set('poll_count' => 0 );
+my $poll_count;
+
+# replace static-public path for sharing data and images
+${app->static->paths}[0] = $public_dir;
+unless (-d $public_dir) {
+    app->log->debug("Data directory not found. Creating $public_dir");
+    mkdir $public_dir;
+}
+
+# data structure:      # topic   # value    # interests
+$cache->set(poll =>
+             {   Teilnehmer    => { 1    => [ 0, 0, 0 ],
+                                    2    => [ 0, 0, 0 ],
+                                    3    => [ 0, 0, 0 ],
+                                    4    => [ 0, 0, 0 ],
+                 },
+                 Unterlagen    => { 1    => [ 0, 0, 0 ],
+                                    2    => [ 0, 0, 0 ],
+                                    3    => [ 0, 0, 0 ],
+                                    4    => [ 0, 0, 0 ],
+                 },
+                 Klasse        => { 1    => [ 0, 0, 0 ],
+                                    2    => [ 0, 0, 0 ],
+                                    3    => [ 0, 0, 0 ],
+                                    4    => [ 0, 0, 0 ],
+                 },
+                 Lehrperson    => { 1    => [ 0, 0, 0 ],
+                                    2    => [ 0, 0, 0 ],
+                                    3    => [ 0, 0, 0 ],
+                                    4    => [ 0, 0, 0 ],
+                 },
+              });
+
+my @interfaces = IO::Interface::Simple->interfaces;
+for my $if (@interfaces) {
+    if ( $if !~ /^vmnet/ ) {
+        app->log->info("possible interface $if:\t" . $if->address);
+    }
+}
+
+# gets called for every request
+under sub {
+
+    my $self = shift;
+
+# MACHTE PROBLEME AUF GIBBIX
+#    # maybe we can use some of the info to protect against spamming
+#    my $request_ip              = $self->tx->remote_address;
+#    my $original_remote_address = $self->tx->original_remote_address;
+#    my $local_address           = $self->tx->local_address;
+#    my $local_port              = $self->tx->local_port;
+#    my $remote_port             = $self->tx->remote_port;
+#    use Data::Dumper::Names;
+#    print Dumper(   $request_ip,
+#                    $original_remote_address,
+#                    $local_address,
+#                    $local_port,
+#                    $remote_port
+#                );
+
+    return 1;
+
+};
+
+# start page with menu links
+get '/' => {template => 'root'};
+
+# page with questions in a form to fill out
+# for clients
+get '/form' => sub {
+    my $self = shift;
+    $self->stash(q1 => $q1, q2 => $q2, q3 => $q3, q4 => $q4, q5 => $q5);
+} => 'form';
+
+# page triggered by the form-page
+# evaluate what clients said
+get '/vote' => sub {
+
+    my $self = shift;
+
+    #my $client_ip = $self->tx->remote_address;
+    #$self->app->log->debug("Hello $client_ip ");
+
+#    if ($cache->get($client_ip)) {
+#        $self->stash( message => "Sie haben bereits teilgenommen!" );
+#        return $self->render;
+        # EXIT and render
+#    }
+
+#    $cache->set($client_ip => 1);
+
+    if ($set_cookie) {
+        # denie multiple voting by cookie
+        my $cookie_name = 'voted_' . $cache->get('startutime');
+        unless ($self->cookie($cookie_name)) {
+            $self->cookie($cookie_name => 1, { expires  => time + 3600 });
+        }
+        else {
+            $self->stash( message => "Sie haben bereits teilgenommen!" );
+            return $self->render;
+            # EXIT and render
+        }
+    }
+
+    my $interest   = $self->param('interest');
+    my $Teilnehmer = $self->param('Teilnehmer');
+    my $Unterlagen = $self->param('Unterlagen');
+    my $Klasse     = $self->param('Klasse');
+    my $Lehrperson = $self->param('Lehrperson');
+
+    # only one decimal number allowed per argument
+    unless (       $interest =~ /^\d$/
+             and $Teilnehmer =~ /^\d$/
+             and $Unterlagen =~ /^\d$/
+             and $Klasse     =~ /^\d$/
+             and $Lehrperson =~ /^\d$/
+           ) {
+        $self->stash( message => "Kappa" );
+        return $self->render;
+        # EXIT and render
+    }
+
+    my $poll = $cache->get('poll');
+
+    foreach my $topic (keys %{$poll}) {
+        $poll->{$topic}{$Teilnehmer}[$interest-1]++
+            if($topic eq 'Teilnehmer');
+        $poll->{$topic}{$Unterlagen}[$interest-1]++
+            if($topic eq 'Unterlagen');
+        $poll->{$topic}{$Klasse}[$interest-1]++
+            if($topic eq 'Klasse');
+        $poll->{$topic}{$Lehrperson}[$interest-1]++
+            if($topic eq 'Lehrperson');
+    }
+
+    #use Data::Dumper;
+    #print Dumper($poll);
+
+    $cache->set('poll' => $poll);
+    $cache->set('poll_updated' => 1);
+
+    # every vote counts! (and is counted...)
+    $poll_count = $cache->get('poll_count');
+    $poll_count++;
+    $cache->set('poll_count' => $poll_count);
+
+    $self->stash( message => "Danke für die Teilnahme!" );
+        
+} => 'vote'; # template call
+
+# page to collect the results
+# best used after all clients have sent data
+# will create pictures on the harddrive
+get '/poll' => sub {
+
+    my $self = shift;
+
+    if ($cache->get('poll_updated')) {
+
+        $cache->set('poll_updated' => 0);
+        $self->app->log->debug("Creating charts due to new data.");
+        my $poll = $cache->get('poll');
+
+        foreach my $topic (keys %{$poll}) {
+            my $chart = School::Evaluation::Gibbmers::Chart->new();
+            
+            $chart->set_1bad_sizes($poll->{$topic}->{1});
+            $chart->set_2mid_sizes($poll->{$topic}->{2});
+            $chart->set_3hig_sizes($poll->{$topic}->{3});
+            $chart->set_4sup_sizes($poll->{$topic}->{4});
+
+            $chart->render_chart(   "Auswertung $topic",
+                                    "$public_dir/$topic.png",
+                                );
+        }
+    }
+    $self->stash( poll_count => $cache->get('poll_count') );
+    $self->stash(q2 => $q2, q3 => $q3, q4 => $q4, q5 => $q5);
+
+} => 'poll';
+
+my $daemon = Mojo::Server::Daemon->new(
+    app    => app,
+    listen => ["http://*:$port"]
+    );
+$daemon->run;
+#app->start;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gibbmers - create an evaluation poll over local network
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+This is an executable script, not a library.
+If you start the script, a small webdeamon will run on your local machine:
+
+ ./gibbmers
+
+Depending on your network configuration, others and yourself should be able to connect to your local machine with a webbrowser on the url:
+
+ http:$machine_ip:8443
+
+=head1 WARNINGS
+
+This is an early release.
+Currently the app is only in German.
+
+=head1 AUTHOR
+
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Boris Däppen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+@@ layouts/main.html.ep
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Gibbmers</title>
+<style type="text/css">
+body {
+  margin: 0;
+  padding: 0;
+}
+header {
+  background-color: #e6e6e6;
+  opacity: 0.8;
+  width: 100%;
+  height: 80px;
+  top: 0;
+  position: fixed;
+  z-index: 9;
+}
+section {
+  position: absolute;
+  margin-top: 100px;
+  z-index: 1;
+}
+article {
+  margin: 4% auto;
+  width: 50%;
+}
+footer {
+  background-color: #e6e6e6;
+  opacity: 0.8;
+  width: 100%;
+  bottom: 0;
+  position: fixed;
+  z-index: 8;
+}
+a:link { color: #000000; text-decoration: none}
+a:visited { color: #000000; text-decoration: none}
+a:hover { color: #3366CC; text-decoration: underline}
+a:active { color: #000000; text-decoration: none}
+.imagedesc {
+  font-size: small;
+}
+#author {
+  float: right;
+}
+</style>
+</head>
+<body>
+ <header>
+  <h1>Gibbmers Unterrichtsauswertung</h1>
+ </header>
+ <%= content %>
+ <footer><a href="https://github.com/borisdaeppen/School-Evaluation-Gibbmers">This is Opensource</a><span id="author">© Boris Däppen</span></footer>
+</body>
+</html>
+
+@@ root.html.ep
+% layout 'main';
+ <section id="main">
+  <article>
+   <ul>
+    <li><a href="/form">Fragebogen</li>
+    <li><a href="/poll">Auswertung</li>
+   </ul>
+  </article>
+ </section>
+
+@@ vote.html.ep
+% layout 'main';
+ <section id="main">
+  <article>
+   <%= $message %>
+  </article>
+ </section>
+
+@@ poll.html.ep
+% layout 'main';
+ <section id="main">
+  <article>
+   Anzahl Stimmen: <%= $poll_count %>
+  </article>
+  <article>
+   <div class="imagedesc"><%== $q2 %></div>
+   <img src="Teilnehmer.png" alt="Selbsteinschätzung">
+  </article>
+  <article>
+   <div class="imagedesc"><%== $q3 %></div>
+   <img src="Unterlagen.png" alt="Modulunterlagen">
+  </article>
+  <article>
+   <div class="imagedesc"><%== $q4 %></div>
+   <img src="Klasse.png" alt="Klassenklima">
+  </article>
+  <article>
+   <div class="imagedesc"><%== $q5 %></div>
+   <img src="Lehrperson.png" alt="Lehrperson">
+  </article>
+ </section>
+
+@@ form.html.ep
+% layout 'main';
+ <section id="main">
+  <article>
+   <form action="/vote">
+   
+   <h2>Frage 1</h2>
+   <p>
+   <%== $q1 %>
+   </p>
+   <p>
+    <input type="radio" name="interest" value="1">wenig
+    <input type="radio" name="interest" value="2">mittel
+    <input type="radio" name="interest" value="3">viel
+   </p>
+   
+   <h2>Frage 2</h2>
+   <p>
+   <%== $q2 %>
+   </p>
+   <p>
+    <input type="radio" name="Teilnehmer" value="1">schlecht
+    <input type="radio" name="Teilnehmer" value="2">naja
+    <input type="radio" name="Teilnehmer" value="3">gut
+    <input type="radio" name="Teilnehmer" value="4">super
+   </p>
+   
+   <h2>Frage 3</h2>
+   <p>
+   <%== $q3 %>
+   </p>
+   <p>
+    <input type="radio" name="Unterlagen" value="1">schlecht
+    <input type="radio" name="Unterlagen" value="2">naja
+    <input type="radio" name="Unterlagen" value="3">gut
+    <input type="radio" name="Unterlagen" value="4">super
+   </p>
+   
+   <h2>Frage 4</h2>
+   <p>
+   <%== $q4 %>
+   </p>
+   <p>
+    <input type="radio" name="Klasse" value="1">schlecht
+    <input type="radio" name="Klasse" value="2">naja
+    <input type="radio" name="Klasse" value="3">gut
+    <input type="radio" name="Klasse" value="4">super
+   </p>
+   
+   <h2>Frage 5</h2>
+   <p>
+   <%== $q5 %>
+   </p>
+   <p>
+    <input type="radio" name="Lehrperson" value="1">schlecht
+    <input type="radio" name="Lehrperson" value="2">naja
+    <input type="radio" name="Lehrperson" value="3">gut
+    <input type="radio" name="Lehrperson" value="4">super
+   </p>
+   <br />
+   <input type="submit" value="Submit">
+  </article>
+ </section>
+</form> 

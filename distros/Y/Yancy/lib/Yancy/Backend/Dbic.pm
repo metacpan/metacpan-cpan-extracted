@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.005';
+our $VERSION = '1.007';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -103,6 +103,8 @@ our $VERSION = '1.005';
 #pod =cut
 
 use Mojo::Base '-base';
+use Role::Tiny qw( with );
+with 'Yancy::Backend::Role::Sync';
 use Scalar::Util qw( looks_like_number blessed );
 use Mojo::Loader qw( load_class );
 
@@ -289,7 +291,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.005
+version 1.007
 
 =head1 SYNOPSIS
 

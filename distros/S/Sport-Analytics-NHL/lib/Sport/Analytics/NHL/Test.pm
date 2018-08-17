@@ -280,6 +280,18 @@ Tests the normalized roster of a team
 
 Tests the normalized boxscore's teams
 
+=item C<test_bio>
+
+Tests the player's bio and draft data retrieved from the NHL website
+
+=item C<test_career>
+
+Tests the player's career data retrieved from the NHL website and amended with the preserved errata.
+
+=item C<test_player_report>
+
+Calls test_bio() and test_career() to test the player report from the NHL website. Executes presence, syntactic and sanity value checks.
+
 =back
 
 =cut
@@ -294,6 +306,7 @@ our @EXPORT = qw(
 	test_header test_periods test_officials test_teams test_events
 	test_boxscore test_merged_boxscore
 	test_consistency test_normalized_boxscore
+	test_player_report
 	$TEST_COUNTER
 	$EVENT $BOXSCORE $PLAYER $TEAM
 );
@@ -378,7 +391,7 @@ sub my_test ($@) {
 		my_die($MESSAGE);
 	}
 	use warnings FATAL => 'all';
-	debug "ok_$TEST_COUNTER->{Curr_Test} - $_[-1]" if $0 =~ /\.t$/;
+	debug "ok_$TEST_COUNTER->{Curr_Test} - $_[-1]" if $IS_AUTHOR && $0 =~ /\.t$/;
 }
 
 sub my_like ($$$) { my_test(sub { no warnings 'uninitialized'; $_[0] =~ $_[1]  }, @_) }
@@ -1182,6 +1195,7 @@ sub test_arranged_events ($) {
 	my $boxscore = shift;
 
 	my $gp = scalar @{$boxscore->{periods}};
+	$gp += $boxscore->{so} || 0 if $gp == 4;
 	my_is($boxscore->{events}[-1]{type}, 'GEND', 'gend at the end');
 	my_is($boxscore->{events}[-2]{type}, 'PEND', 'pend penultimate');
 	my_is(scalar(grep{$_->{type} eq 'PSTR'} @{$boxscore->{events}}), $gp, "$gp pstr");
@@ -1240,6 +1254,115 @@ sub test_normalized_boxscore ($) {
 	test_normalized_teams($boxscore);
 	test_normalized_events($boxscore);
 	test_arranged_events($boxscore);
+}
+
+sub test_bio ($) {
+
+	my $report = shift;
+
+	test_player_id($report->{_id}, 'report player id ok');
+	test_name($report->{name}, 'report playername ok');
+	test_position($report->{position}, 'report position ok');
+	my_like($report->{number},    qr/^\d{1,2}$/,     "number $report->{number} ok") if defined $report->{number};
+	my_like($report->{height},    qr/^\d+$/,         "height $report->{height} ok") if defined $report->{height};
+	my_like($report->{weight},    qr/^\d+$/,         "weight $report->{weight} ok") if defined $report->{weight};;
+	my_like($report->{shoots},    qr/^L|R$/,         "shoots $report->{shoots} ok");
+	my_like($report->{birthdate}, qr/^\-?\d+$/,      "birthdate $report->{birthdate} ok");
+	my_like($report->{city},      qr/^\S.*\S/,       "city $report->{city} ok");
+	my_like($report->{state},     qr/^\w\w$/,        "state $report->{state} ok");
+	my_like($report->{country},   qr/^\S.*\S/,       "country $report->{country} ok");
+	my_like($report->{active},    qr/^(0|1)$/,       "active $report->{active} ok");
+	my_like($report->{rookie},    qr/^(0|1)$/,       "active $report->{rookie} ok");
+	test_team_id($report->{team}, "name $report->{team} ok") if $report->{active};
+	my_like($report->{pick}, qr/^\d{1,3}$/, "pick $report->{pick} ok");
+	if ($report->{pick} == $UNDRAFTED_PICK) {
+		my_is($report->{undrafted}, 1, 'player is undrafted');
+	}
+	else {
+		test_team_id($report->{draftteam}, "draftteam $report->{draftteam} ok");
+		my_like($report->{draftyear}, qr/^\d{4}$/, "year $report->{draftyear} ok");
+		my_like($report->{round}, qr/^\d{1,2}$/, "round $report->{round} ok")
+	}
+}
+
+sub test_career ($) {
+
+	my $report = shift;
+	my $n_career = $report->{career};
+
+	for my $stage (@{$n_career}) {
+		for my $season (@{$stage}) {
+			if ($season->{season} ne 'total' && $season->{league} ne 'bogus') {
+				next unless $season->{league} eq 'NHL';
+				my_ok($season->{start} > 1890 && $season->{start} < $CURRENT_SEASON + 1, "Valid start $season->{start}");
+				my_ok($season->{end}   > 1890 && $season->{end}   < $CURRENT_SEASON + 2, "Valid end   $season->{end}");
+				next unless length($season->{gp});
+				my_ok($season->{gp}  < 100,  "reasonable gp  $season->{gp}") if length($season->{gp});
+				if ($report->{position} eq 'G') {
+					my_ok($season->{w}   < 80, "reasonable w $season->{w}")
+						if length($season->{w});
+					my_ok($season->{l}   < 80, "reasonable l $season->{l}")
+						if length($season->{l});
+					my_ok($season->{t}   < 80, "reasonable t $season->{t}")
+						if length($season->{t});
+					my_ok($season->{ot}   < 80, "reasonable ot $season->{ot}")
+						if $season->{ot} && length($season->{ot});
+					my_ok($season->{so}   < 50, "reasonable so $season->{so}")
+						if length($season->{so});
+					my_ok($season->{ga}   < 500, "reasonable ga $season->{ga}")
+						if length($season->{ga});
+				}
+				else {
+					my_ok($season->{g}   < 200,  "reasonable g   $season->{g}")
+						if length($season->{g});
+					my_ok($season->{a}   < 200,  "reasonable a   $season->{a}")
+						if length($season->{a});
+					my_ok($season->{pim} < 1000, "reasonable pim $season->{pim}")
+						if length($season->{pim});
+				}
+				if ($season->{league} eq 'NHL' && $season->{start} >= 1988) {
+					if ($report->{position} eq 'G') {
+						if (length($season->{gp}) && $season->{gp}) {
+							my_ok($season->{gaa} < 200,   "reasonable gaa $season->{gaa}");
+							my_ok($season->{'sv%'} <= 1,  "reasonable sv\% $season->{'sv%'}");
+							my_ok($season->{sa} < 5000,   "reasonable sa $season->{sa}");
+							my_ok($season->{min} < 10000, "reasonable min $season->{min}");
+						}
+					}
+					else {
+						my_ok($season->{gwg} < 50,   "reasonable gwg $season->{gwg}");
+						my_ok($season->{shg} < 20,   "reasonable shg $season->{shg}");
+						my_ok($season->{ppg} < 50,   "reasonable ppg $season->{ppg}");
+						my_ok($season->{s}   < 1000, "reasonable s   $season->{s}")
+							if length($season->{s});
+						my_ok(
+							$season->{'s%'} >= 0 && $season->{'s%'} <= 100,
+							"reasonable s\%  $season->{'s%'}"
+						) if $season->{s};
+						my_like($season->{'+/-'}, qr/^\-?\d+$/, "reasonable +\/- $season->{'+/-'}")
+							if length($season->{'+/-'});
+					}
+				}
+			}
+			else {
+				next if $season->{league} eq 'bogus';
+				my_is($season->{team}, 'NHL TOTALS', "valid $season->{team} pseudo team");
+				my_ok($season->{career_start} >= $FIRST_SEASON && $season->{career_start} <= $CURRENT_SEASON,
+					  "Valid career_start $season->{career_start}");
+				my_ok($season->{career_end}   >= $FIRST_SEASON && $season->{career_end}   <= $CURRENT_SEASON,
+					  "Valid career_end   $season->{career_end}");
+				my_is($season->{league}, 'NHL', 'only NHL totals are available');
+			}
+		}
+	}
+}
+
+sub test_player_report ($) {
+
+	my $report = shift;
+
+	test_bio($report);
+	test_career($report);
 }
 
 END {

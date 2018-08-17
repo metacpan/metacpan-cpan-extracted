@@ -1,5 +1,8 @@
 Revision history for RT-Extension-InlineAudioVideoAttachments
 
+0.05 2018-08-10
+ - Fix malformed html
+
 0.04 2018-05-24
  - Readd preload=metadata attribute
 

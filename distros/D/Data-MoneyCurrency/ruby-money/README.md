@@ -88,6 +88,9 @@ Money.from_amount(5, "TND") == Money.new(5000, "TND") # 5 TND
 some_code_to_setup_exchange_rates
 Money.new(1000, "USD").exchange_to("EUR") == Money.new(some_value, "EUR")
 
+# Swap currency
+Money.new(1000, "USD").with_currency("EUR") == Money.new(1000, "EUR")
+
 # Formatting (see Formatting section for more options)
 Money.new(100, "USD").format #=> "$1.00"
 Money.new(100, "GBP").format #=> "£1.00"
@@ -119,15 +122,15 @@ below.
 
 ``` ruby
 curr = {
-  :priority        => 1,
-  :iso_code        => "USD",
-  :iso_numeric     => "840",
-  :name            => "United States Dollar",
-  :symbol          => "$",
-  :subunit         => "Cent",
-  :subunit_to_unit => 100,
-  :separator       => ".",
-  :delimiter       => ","
+  priority:            1,
+  iso_code:            "USD",
+  iso_numeric:         "840",
+  name:                "United States Dollar",
+  symbol:              "$",
+  subunit:             "Cent",
+  subunit_to_unit:     100,
+  decimal_mark:        ".",
+  thousands_separator: ","
 }
 
 Money::Currency.register(curr)
@@ -142,8 +145,8 @@ The pre-defined set of attributes includes:
 - `:symbol` the currency symbol (UTF-8 encoded)
 - `:subunit` the name of the fractional monetary unit
 - `:subunit_to_unit` the proportion between the unit and the subunit
-- `:separator` character between the whole and fraction amounts
-- `:delimiter` character between each thousands place
+- `:decimal_mark` character between the whole and fraction amounts
+- `:thousands_separator` character between each thousands place
 
 All attributes except `:iso_code` are optional. Some attributes, such as
 `:symbol`, are used by the Money class to print out a representation of the
@@ -312,16 +315,17 @@ def marshal_dump; end
 The following example implements an `ActiveRecord` store to save exchange rates to a database.
 
 ```ruby
-# DB columns :from[String], :to[String], :rate[Float]
+# rails g model exchange_rate from:string to:string rate:float
 
+# for Rails 5 replace ActiveRecord::Base with ApplicationRecord
 class ExchangeRate < ActiveRecord::Base
   def self.get_rate(from_iso_code, to_iso_code)
-    rate = find_by(:from => from_iso_code, :to => to_iso_code)
+    rate = find_by(from: from_iso_code, to: to_iso_code)
     rate.present? ? rate.rate : nil
   end
 
   def self.add_rate(from_iso_code, to_iso_code, rate)
-    exrate = find_or_initialize_by(:from => from_iso_code, :to => to_iso_code)
+    exrate = find_or_initialize_by(from: from_iso_code, to: to_iso_code)
     exrate.rate = rate
     exrate.save!
   end
@@ -378,61 +382,73 @@ implementations.
 - [russian_central_bank](https://github.com/rmustafin/russian_central_bank)
 - [money-uphold-bank](https://github.com/subvisual/money-uphold-bank)
 
+## Formatting
+
+There are several formatting rules for when `Money#format` is called. For more information, check out the [formatting module source](https://github.com/RubyMoney/money/blob/master/lib/money/money/formatter.rb), or read the latest release's [rdoc version](http://www.rubydoc.info/gems/money/Money/Formatter).
+
+If you wish to format money according to the EU's [Rules for expressing monetary units](http://publications.europa.eu/code/en/en-370303.htm#position) in either English, Irish, Latvian or Maltese:
+
+```ruby
+m = Money.new('123', :gbp) # => #<Money fractional:123 currency:GBP>
+m.format(symbol: m.currency.to_s + ' ') # => "GBP 1.23"
+```
+
 ## Ruby on Rails
 
 To integrate money in a Rails application use [money-rails](https://github.com/RubyMoney/money-rails).
 
 For deprecated methods of integrating with Rails, check [the wiki](https://github.com/RubyMoney/money/wiki).
 
-## I18n
+## Localization
 
-If you want thousands seperator and decimal mark to be same across all
-currencies this can be defined in your `I18n` translation files.
+In order to localize formatting you can use `I18n` gem:
 
-In an rails application this may look like:
+```ruby
+Money.locale_backend = :i18n
+```
+
+With this enabled a thousands seperator and a decimal mark will get looked up in your `I18n` translation files. In a Rails application this may look like:
 
 ```yml
 # config/locale/en.yml
 en:
   number:
-    format:
-      delimiter: ","
-      separator: "."
-  # or
-  number:
     currency:
       format:
         delimiter: ","
         separator: "."
+  # falling back to
+  number:
+    format:
+      delimiter: ","
+      separator: "."
 ```
 
 For this example `Money.new(123456789, "SEK").format` will return `1,234,567.89
-kr` which otherwise will return `1 234 567,89 kr`.
+kr` which otherwise would have returned `1 234 567,89 kr`.
 
-If you wish to disable this feature:
+This will work seamlessly with [rails-i18n](https://github.com/svenfuchs/rails-i18n) gem that already has a lot of locales defined.
+
+If you wish to disable this feature and use defaults instead:
+
 ``` ruby
-Money.use_i18n = false
+Money.locale_backend = nil
 ```
+
+## Collection
+
+In case you're working with collections of `Money` instances, have a look at [money-collection](https://github.com/RubyMoney/money-collection)
+for improved performance and accuracy.
 
 ### Troubleshooting
 
-If you get a runtime error such as:
+If you don't have some locale and don't want to get a runtime error such as:
 
     I18n::InvalidLocale: :en is not a valid locale
 
 Set the following:
 ``` ruby
 I18n.enforce_available_locales = false
-```
-
-## Formatting
-
-There are several formatting rules for when `Money#format` is called. For more information, check out the [formatting module source](https://github.com/RubyMoney/money/blob/master/lib/money/money/formatting.rb), or read the latest release's [rdoc version](http://www.rubydoc.info/gems/money/Money/Formatting).
-
-If you wish to format money according to the EU's [Rules for expressing monetary units](http://publications.europa.eu/code/en/en-370303.htm#position) in either English, Irish, Latvian or Maltese:
-```ruby
-m = Money.new('123', :gbp) # => #<Money fractional:123 currency:GBP>
-m.format( symbol: m.currency.to_s + ' ') # => "GBP 1.23"
 ```
 
 ## Heuristics

@@ -2,6 +2,7 @@
 use Mojolicious::Lite;
 use Test::Mojo;
 use Test::More;
+use Test::Memory::Cycle;
 use Mojo::Util qw/url_escape/;
 
 app->secrets(['abcdefghijklmnopqrstuvwxyz']);
@@ -86,6 +87,10 @@ $t->get_ok('/signed?fwd=' . url_escape($base) . '#haha')
   ->status_is(302)
   ->header_is('Location', 'http://example.com/?name=test#age');
 
+{
+  local $SIG{__WARN__} = sub { };
+  memory_cycle_ok($app);
+};
 
 done_testing;
 __END__

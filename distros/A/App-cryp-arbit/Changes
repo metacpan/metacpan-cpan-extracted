@@ -1,3 +1,11 @@
+0.006   2018-08-11 (PERLANCAR)
+
+	- Add option: --usd-rate (e.g. to assume specific rates when showing
+          profit report).
+
+        - [ux] Only log fiat conversion rate once per new value.
+
+
 0.005   2018-08-07 (PERLANCAR)
 
 	- Turn on LOG_ADD_TIMESTAMP by default.

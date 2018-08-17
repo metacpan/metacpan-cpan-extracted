@@ -1,0 +1,18 @@
+0.004   2018-08-13 (PERLANCAR)
+
+	- Add participants: Data::Cmp::Numeric, Data::Cmp::StrOrNumeric.
+
+
+0.003   2018-08-12 (PERLANCAR)
+
+	- Add participants: Data::Comparator, Data::Diff.
+
+
+0.002   2018-08-12 (PERLANCAR)
+
+	- Include module name for Test::Deep::NoTest.
+
+
+0.001   2018-08-11 (PERLANCAR)
+
+        - First release.

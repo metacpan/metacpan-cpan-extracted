@@ -9,6 +9,7 @@ install:
   - cp lib\PkgConfig.pm script\pkg-config.pl
   - cp lib\PkgConfig.pm script\ppkg-config
   - perl gen_multi_tests.pl
+  - cpanm --notest --quiet pp
 
 build: off
 

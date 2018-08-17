@@ -5,7 +5,7 @@ use FindBin;
 use lib $FindBin::Bin.'/../bin';
 require 'testrail-report';
 
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 17;
 use Capture::Tiny qw{capture_merged};
 
 use lib $FindBin::Bin.'/lib';
@@ -50,6 +50,12 @@ is($matches,1,"Attempts to spawn work: testsuite name");
 ($out,(undef,$code)) = capture_merged {TestRail::Bin::Report::run('browser' => $Test::LWP::UserAgent::TestRailMock::mockObject, 'args' => \@args)};
 is($code, 0, "Exit code OK when doing autoclose");
 like($out,qr/closing plan/i,"Run closure reported to user");
+
+#Test that the max_tries option works
+@args = (qw{--apiurl http://testrail.local --user test@fake.fake --password fake --project TestProject --run FinalRun --plan FinalPlan --config testConfig --max_tries 2 t/no_such_test.tap});
+($out,(undef,$code)) = capture_merged {TestRail::Bin::Report::run('browser' => $Test::LWP::UserAgent::TestRailMock::mockObject, 'args' => \@args)};
+is($code, 0, "Exit code OK ");
+like($out,qr/re-trying request/i,"Re-try attepmt reported to user");
 
 #Test that help works
 @args = qw{--help};

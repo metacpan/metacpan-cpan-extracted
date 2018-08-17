@@ -6,16 +6,25 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "schmorp.h"
+#if !defined mg_findext
+# define mg_findext(sv,type,vtbl) mg_find (sv, type)
+#endif
 
 #include <stddef.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <limits.h>
 #include <fcntl.h>
 #include <sched.h>
+
+#if HAVE_SYS_MKDEV_H
+# include <sys/mkdev.h>
+#elif HAVE_SYS_SYSMACROS_H
+# include <sys/sysmacros.h>
+#endif
 
 #if _POSIX_MEMLOCK || _POSIX_MEMLOCK_RANGE || _POSIX_MAPPED_FILES
 # include <sys/mman.h>
@@ -23,7 +32,8 @@
 
 /* the incompetent fool that created musl keeps __linux__, refuses
  * to implement any linux standard apis, and also has no way to test
- * for his broken iplementation. on't complain if this fails for you.
+ * for his broken iplementation. don't complain to me if this fails
+ * for you.
  */
 #if __linux__ && (defined __GLIBC__ || defined __UCLIBC__)
 # include <linux/fs.h>
@@ -105,6 +115,37 @@
 
 /*****************************************************************************/
 
+#include "config.h"
+
+#if HAVE_ST_XTIMENSEC
+# define ATIMENSEC PL_statcache.st_atimensec
+# define MTIMENSEC PL_statcache.st_mtimensec
+# define CTIMENSEC PL_statcache.st_ctimensec
+#elif HAVE_ST_XTIMESPEC
+# define ATIMENSEC PL_statcache.st_atim.tv_nsec
+# define MTIMENSEC PL_statcache.st_mtim.tv_nsec
+# define CTIMENSEC PL_statcache.st_ctim.tv_nsec
+#else
+# define ATIMENSEC 0
+# define MTIMENSEC 0
+# define CTIMENSEC 0
+#endif
+
+#include "schmorp.h"
+
+#if HAVE_EVENTFD
+# include <sys/eventfd.h>
+#endif
+
+#if HAVE_TIMERFD
+# include <sys/timerfd.h>
+#endif
+
+#if HAVE_RLIMITS
+  #include <sys/time.h>
+  #include <sys/resource.h>
+#endif
+
 typedef SV SV8; /* byte-sv, used for argument-checking */
 typedef int aio_rfd; /* read file desriptor */
 typedef int aio_wfd; /* write file descriptor */
@@ -120,7 +161,6 @@ static HV *aio_stash, *aio_req_stash, *aio_grp_stash, *aio_wd_stash;
 
 #define EIO_NO_WRAPPERS 1
 
-#include "libeio/config.h"
 #include "libeio/eio.h"
 
 static int req_invoke    (eio_req *req);
@@ -146,10 +186,6 @@ static void req_destroy  (eio_req *grp);
 # endif
 #endif
 
-/* defines all sorts of constants to 0 unless they are already defined */
-/* also provides const_iv_ and const_niv_ macros for them */
-#include "def0.h"
-
 #ifndef makedev
 # define makedev(maj,min) (((maj) << 8) | (min))
 #endif
@@ -160,9 +196,115 @@ static void req_destroy  (eio_req *grp);
 # define minor(dev) ((dev) & 0xff)
 #endif
 
+/* solaris has a non-posix/unix compliant PAGESIZE that breaks compilation */
+#ifdef __sun
+# undef PAGESIZE
+#endif
+
 #if PAGESIZE <= 0
 # define PAGESIZE sysconf (_SC_PAGESIZE)
 #endif
+
+/*****************************************************************************/
+
+#if !_POSIX_MAPPED_FILES
+# define mmap(addr,length,prot,flags,fd,offs) (errno = ENOSYS, (void *)-1)
+# define munmap(addr,length)                  EIO_ENOSYS ()
+#endif
+
+#if !_POSIX_MEMORY_PROTECTION
+# define mprotect(addr,len,prot)              EIO_ENOSYS ()
+#endif
+
+#if !MREMAP_MAYMOVE
+# define mremap(old_address,old_size,new_size,flags,new_address) (errno = ENOSYS, (void *)-1)
+#endif
+
+#define FOREIGN_MAGIC PERL_MAGIC_ext
+
+static int ecb_cold
+mmap_free (pTHX_ SV *sv, MAGIC *mg)
+{
+  int old_errno = errno;
+  munmap (mg->mg_ptr, (size_t)mg->mg_obj);
+  errno = old_errno;
+
+  mg->mg_obj = 0; /* just in case */
+
+  SvREADONLY_off (sv);
+
+  if (SvPVX (sv) != mg->mg_ptr)
+    croak ("ERROR: IO::AIO::mmap-mapped scalar changed location, detected");
+
+  SvCUR_set (sv, 0);
+  SvPVX (sv) = 0;
+  SvOK_off (sv);
+
+  return 0;
+}
+
+static MGVTBL mmap_vtbl = {
+  0, 0, 0, 0, mmap_free
+};
+
+static int ecb_cold
+sysfree_free (pTHX_ SV *sv, MAGIC *mg)
+{
+  free (mg->mg_ptr);
+  mg->mg_obj = 0; /* just in case */
+
+  SvREADONLY_off (sv);
+
+  if (SvPVX (sv) != mg->mg_ptr)
+    croak ("ERROR: IO::AIO mapped scalar changed location, detected");
+
+  SvCUR_set (sv, 0);
+  SvPVX (sv) = 0;
+  SvOK_off (sv);
+
+  return 0;
+}
+
+static MGVTBL sysfree_vtbl = {
+  0, 0, 0, 0, sysfree_free
+};
+
+/*****************************************************************************/
+
+/* helper: set scalar to foreign ptr with custom free */
+static void
+sv_set_foreign (SV *sv, const MGVTBL *const vtbl, void *addr, IV length)
+{
+  sv_force_normal (sv);
+
+  /* we store the length in mg_obj, as namlen is I32 :/ */
+  sv_magicext (sv, 0, FOREIGN_MAGIC, vtbl, (char *)addr, 0)
+    ->mg_obj = (SV *)length;
+
+  SvUPGRADE (sv, SVt_PV); /* nop... */
+
+  if (SvLEN (sv))
+    Safefree (SvPVX (sv));
+
+  SvPVX (sv) = (char *)addr;
+  SvCUR_set (sv, length);
+  SvLEN_set (sv, 0);
+  SvPOK_only (sv);
+}
+
+static void
+sv_clear_foreign (SV *sv)
+{
+  /* todo: iterate over magic and only free ours, but of course */
+  /* the perl5porters will call that (correct) behaviour buggy */
+  sv_unmagic (sv, FOREIGN_MAGIC);
+}
+
+/*****************************************************************************/
+
+/* defines all sorts of constants to 0 unless they are already defined */
+/* also provides const_iv_ and const_niv_ macros for them */
+#include "def0.h"
 
 /*****************************************************************************/
 
@@ -592,6 +734,30 @@ req_invoke (eio_req *req)
             }
             break;
 
+          case EIO_SLURP:
+            {
+              if (req->result >= 0)
+                {
+                  /* if length was originally not known, we steal the malloc'ed memory */
+                  if (req->flags & EIO_FLAG_PTR2_FREE)
+                    {
+                      req->flags &= ~EIO_FLAG_PTR2_FREE;
+                      sv_set_foreign (req->sv2, &sysfree_vtbl, req->ptr2, req->result);
+                    }
+                  else
+                    {
+                      SvCUR_set (req->sv2, req->result);
+                      *SvEND (req->sv2) = 0;
+                      SvPOK_only (req->sv2);
+                    }
+
+                  SvSETMAGIC (req->sv2);
+                }
+
+              PUSHs (sv_result);
+            }
+            break;
+
           case EIO_CUSTOM:
             if (req->feed == fiemap)
               {
@@ -747,44 +913,6 @@ reinit (void)
 
 /*****************************************************************************/
 
-#if !_POSIX_MAPPED_FILES
-# define mmap(addr,length,prot,flags,fd,offs) EIO_ENOSYS ()
-# define munmap(addr,length)                  EIO_ENOSYS ()
-#endif
-
-#if !_POSIX_MEMORY_PROTECTION
-# define mprotect(addr,len,prot)              EIO_ENOSYS ()
-#endif
-
-#define MMAP_MAGIC PERL_MAGIC_ext
-
-static int ecb_cold
-mmap_free (pTHX_ SV *sv, MAGIC *mg)
-{
-  int old_errno = errno;
-  munmap (mg->mg_ptr, (size_t)mg->mg_obj);
-  errno = old_errno;
-
-  mg->mg_obj = 0; /* just in case */
-
-  SvREADONLY_off (sv);
-
-  if (SvPVX (sv) != mg->mg_ptr)
-    croak ("ERROR: IO::AIO::mmap-mapped scalar changed location, detected");
-
-  SvCUR_set (sv, 0);
-  SvPVX (sv) = 0;
-  SvOK_off (sv);
-
-  return 0;
-}
-
-static MGVTBL mmap_vtbl = {
-  0, 0, 0, 0, mmap_free
-};
-
-/*****************************************************************************/
-
 static SV *
 get_cb (SV *cb_sv)
 {
@@ -887,6 +1015,23 @@ req_set_fh_or_path (aio_req req, int type_path, int type_fh, SV *fh_or_path)
     }
 }
 
+/*****************************************************************************/
+
+static void
+ts_set (struct timespec *ts, NV value)
+{
+  ts->tv_sec  = value;
+  ts->tv_nsec = (value - ts->tv_sec) * 1e9;
+}
+
+static NV
+ts_get (const struct timespec *ts)
+{
+  return ts->tv_sec + ts->tv_nsec * 1e-9;
+}
+
+/*****************************************************************************/
+
 XS(boot_IO__AIO) ecb_cold;
 
 MODULE = IO::AIO                PACKAGE = IO::AIO
@@ -927,6 +1072,8 @@ BOOT:
     const_niv (MADV_DONTNEED  , POSIX_MADV_DONTNEED)
 
     /* the second block will be 0 when missing */
+    const_iv (O_ACCMODE)
+
     const_iv (O_RDONLY)
     const_iv (O_WRONLY)
     const_iv (O_RDWR)
@@ -996,6 +1143,75 @@ BOOT:
     const_iv (MAP_HUGETLB)
     const_iv (MAP_STACK)
 
+    const_iv (MREMAP_MAYMOVE)
+    const_iv (MREMAP_FIXED)
+
+    const_iv (F_DUPFD_CLOEXEC)
+
+    const_iv (MSG_CMSG_CLOEXEC)
+    const_iv (SOCK_CLOEXEC)
+
+    const_iv (F_OFD_GETLK)
+    const_iv (F_OFD_SETLK)
+    const_iv (F_OFD_GETLKW)
+
+    const_iv (FIFREEZE)
+    const_iv (FITHAW)
+    const_iv (FITRIM)
+    const_iv (FICLONE)
+    const_iv (FICLONERANGE)
+    const_iv (FIDEDUPERANGE)
+
+    const_iv (FS_IOC_GETFLAGS)
+    const_iv (FS_IOC_SETFLAGS)
+    const_iv (FS_IOC_GETVERSION)
+    const_iv (FS_IOC_SETVERSION)
+    const_iv (FS_IOC_FIEMAP)
+    const_iv (FS_IOC_FSGETXATTR)
+    const_iv (FS_IOC_FSSETXATTR)
+    const_iv (FS_IOC_SET_ENCRYPTION_POLICY)
+    const_iv (FS_IOC_GET_ENCRYPTION_PWSALT)
+    const_iv (FS_IOC_GET_ENCRYPTION_POLICY)
+
+    const_iv (FS_KEY_DESCRIPTOR_SIZE)
+
+    const_iv (FS_SECRM_FL)
+    const_iv (FS_UNRM_FL)
+    const_iv (FS_COMPR_FL)
+    const_iv (FS_SYNC_FL)
+    const_iv (FS_IMMUTABLE_FL)
+    const_iv (FS_APPEND_FL)
+    const_iv (FS_NODUMP_FL)
+    const_iv (FS_NOATIME_FL)
+    const_iv (FS_DIRTY_FL)
+    const_iv (FS_COMPRBLK_FL)
+    const_iv (FS_NOCOMP_FL)
+    const_iv (FS_ENCRYPT_FL)
+    const_iv (FS_BTREE_FL)
+    const_iv (FS_INDEX_FL)
+    const_iv (FS_JOURNAL_DATA_FL)
+    const_iv (FS_NOTAIL_FL)
+    const_iv (FS_DIRSYNC_FL)
+    const_iv (FS_TOPDIR_FL)
+    const_iv (FS_FL_USER_MODIFIABLE)
+
+    const_iv (FS_XFLAG_REALTIME)
+    const_iv (FS_XFLAG_PREALLOC)
+    const_iv (FS_XFLAG_IMMUTABLE)
+    const_iv (FS_XFLAG_APPEND)
+    const_iv (FS_XFLAG_SYNC)
+    const_iv (FS_XFLAG_NOATIME)
+    const_iv (FS_XFLAG_NODUMP)
+    const_iv (FS_XFLAG_RTINHERIT)
+    const_iv (FS_XFLAG_PROJINHERIT)
+    const_iv (FS_XFLAG_NOSYMLINKS)
+    const_iv (FS_XFLAG_EXTSIZE)
+    const_iv (FS_XFLAG_EXTSZINHERIT)
+    const_iv (FS_XFLAG_NODEFRAG)
+    const_iv (FS_XFLAG_FILESTREAM)
+    const_iv (FS_XFLAG_DAX)
+    const_iv (FS_XFLAG_HASATTR)
+
     const_iv (FIEMAP_FLAG_SYNC)
     const_iv (FIEMAP_FLAG_XATTR)
     const_iv (FIEMAP_FLAGS_COMPAT)
@@ -1015,6 +1231,22 @@ BOOT:
     const_iv (SPLICE_F_NONBLOCK)
     const_iv (SPLICE_F_MORE)
     const_iv (SPLICE_F_GIFT)
+
+    const_iv (EFD_CLOEXEC)
+    const_iv (EFD_NONBLOCK)
+    const_iv (EFD_SEMAPHORE)
+
+    const_iv (CLOCK_REALTIME)
+    const_iv (CLOCK_MONOTONIC)
+    const_iv (CLOCK_BOOTTIME)
+    const_iv (CLOCK_REALTIME_ALARM)
+    const_iv (CLOCK_BOOTTIME_ALARM)
+
+    const_iv (TFD_NONBLOCK)
+    const_iv (TFD_CLOEXEC)
+
+    const_iv (TFD_TIMER_ABSTIME)
+    const_iv (TFD_TIMER_CANCEL_ON_SET)
 
     /* these are libeio constants, and are independent of gendef0 */
     const_eio (SEEK_SET)
@@ -1038,6 +1270,12 @@ BOOT:
     const_eio (FALLOC_FL_PUNCH_HOLE)
     const_eio (FALLOC_FL_COLLAPSE_RANGE)
     const_eio (FALLOC_FL_ZERO_RANGE)
+    const_eio (FALLOC_FL_INSERT_RANGE)
+    const_eio (FALLOC_FL_UNSHARE_RANGE)
+
+    const_eio (RENAME_NOREPLACE)
+    const_eio (RENAME_EXCHANGE)
+    const_eio (RENAME_WHITEOUT)
 
     const_eio (READDIR_DENTS)
     const_eio (READDIR_DIRS_FIRST)
@@ -1402,6 +1640,32 @@ aio_stat (SV8 *fh_or_path, SV *callback = &PL_sv_undef)
         REQ_SEND;
 }
 
+void
+st_xtime ()
+	ALIAS:
+           st_atime = 1
+           st_mtime = 2
+           st_ctime = 4
+           st_xtime = 7
+	PPCODE:
+        EXTEND (SP, 3);
+        if (ix & 1) PUSHs (newSVnv (PL_statcache.st_atime + 1e-9 * ATIMENSEC));
+        if (ix & 2) PUSHs (newSVnv (PL_statcache.st_mtime + 1e-9 * MTIMENSEC));
+        if (ix & 4) PUSHs (newSVnv (PL_statcache.st_ctime + 1e-9 * CTIMENSEC));
+
+void
+st_xtimensec ()
+	ALIAS:
+           st_atimensec = 1
+           st_mtimensec = 2
+           st_ctimensec = 4
+           st_xtimensec = 7
+	PPCODE:
+        EXTEND (SP, 3);
+        if (ix & 1) PUSHs (newSViv (ATIMENSEC));
+        if (ix & 2) PUSHs (newSViv (MTIMENSEC));
+        if (ix & 4) PUSHs (newSViv (CTIMENSEC));
+
 UV
 major (UV dev)
 	ALIAS:
@@ -1534,6 +1798,22 @@ aio_link (SV8 *oldpath, SV8 *newpath, SV *callback = &PL_sv_undef)
 }
 
 void
+aio_rename2 (SV8 *oldpath, SV8 *newpath, int flags = 0, SV *callback = &PL_sv_undef)
+	PPCODE:
+{
+        eio_wd wd2 = 0;
+	dREQ;
+	
+        req->type = EIO_RENAME;
+        req_set_path1 (req, oldpath);
+        req_set_path (req, newpath, &req->sv2, &req->sv4, &wd2, &req->ptr2);
+        req->int2 = flags;
+        req->int3 = (long)wd2;
+	
+	REQ_SEND;
+}
+
+void
 aio_mknod (SV8 *pathname, int mode, UV dev, SV *callback = &PL_sv_undef)
 	PPCODE:
 {
@@ -1548,7 +1828,7 @@ aio_mknod (SV8 *pathname, int mode, UV dev, SV *callback = &PL_sv_undef)
 }
 
 void
-aio_mtouch (SV8 *data, IV offset = 0, SV *length = &PL_sv_undef, int flags = 0, SV *callback = &PL_sv_undef)
+aio_mtouch (SV8 *data, IV offset = 0, SV *length = &PL_sv_undef, int flags = -1, SV *callback = &PL_sv_undef)
         ALIAS:
            aio_mtouch = EIO_MTOUCH
            aio_msync  = EIO_MSYNC
@@ -1557,6 +1837,9 @@ aio_mtouch (SV8 *data, IV offset = 0, SV *length = &PL_sv_undef, int flags = 0, 
         STRLEN svlen;
         char *svptr = SvPVbyte (data, svlen);
         UV len = SvUV (length);
+
+        if (flags < 0)
+          flags = ix == EIO_MSYNC ? EIO_MS_SYNC : 0;
 
         if (offset < 0)
           offset += svlen;
@@ -1642,6 +1925,44 @@ aio_fiemap (SV *fh, off_t start, SV *length, U32 flags, SV *count, SV *callback 
 #endif
 
 	REQ_SEND;
+}
+
+void
+aio_slurp (SV *pathname, off_t offset, UV length, SV8 *data, SV *callback = &PL_sv_undef)
+        PPCODE:
+{
+        char *svptr = 0;
+
+        sv_clear_foreign (data);
+
+        if (length) /* known length, directly read into scalar */
+          {
+            if (!SvPOK (data) || SvLEN (data) >= SvCUR (data))
+              svptr = sv_grow (data, length + 1);
+            else if (SvCUR (data) < length)
+              croak ("length outside of scalar, and cannot grow");
+            else
+              svptr = SvPVbyte_nolen (data);
+          }
+
+        {
+          dREQ;
+
+          req->type = EIO_SLURP;
+          req_set_path1 (req, pathname);
+          req->offs = offset;
+          req->size = length;
+          req->sv2  = SvREFCNT_inc (data);
+          req->ptr2 = svptr;
+
+          if (!SvREADONLY (data))
+            {
+              SvREADONLY_on (data);
+              req->flags |= FLAG_SV2_RO_OFF;
+            }
+
+          REQ_SEND;
+        }
 }
 
 void
@@ -1788,31 +2109,17 @@ sendfile (aio_wfd ofh, aio_rfd ifh, off_t offset, size_t count)
 void
 mmap (SV *scalar, STRLEN length, int prot, int flags, SV *fh = &PL_sv_undef, off_t offset = 0)
 	PPCODE:
-        sv_unmagic (scalar, MMAP_MAGIC);
+        sv_clear_foreign (scalar);
 {
         int fd = SvOK (fh) ? s_fileno_croak (fh, flags & PROT_WRITE) : -1;
         void *addr = (void *)mmap (0, length, prot, flags, fd, offset);
 	if (addr == (void *)-1)
 	  XSRETURN_NO;
 
-        sv_force_normal (scalar);
-
-        /* we store the length in mg_obj, as namlen is I32 :/ */
-        sv_magicext (scalar, 0, MMAP_MAGIC, &mmap_vtbl, (char *)addr, 0)
-          ->mg_obj = (SV *)length;
-
-	SvUPGRADE (scalar, SVt_PV); /* nop... */
+        sv_set_foreign (scalar, &mmap_vtbl, addr, length);
 
 	if (!(prot & PROT_WRITE))
 	  SvREADONLY_on (scalar);
-
-        if (SvLEN (scalar))
-          Safefree (SvPVX (scalar));
-
-	SvPVX (scalar) = (char *)addr;
-	SvCUR_set (scalar, length);
-	SvLEN_set (scalar, 0);
-	SvPOK_only (scalar);
 
         XSRETURN_YES;
 }
@@ -1820,7 +2127,37 @@ mmap (SV *scalar, STRLEN length, int prot, int flags, SV *fh = &PL_sv_undef, off
 void
 munmap (SV *scalar)
 	CODE:
-        sv_unmagic (scalar, MMAP_MAGIC);
+        sv_clear_foreign (scalar);
+
+SV *
+mremap (SV *scalar, STRLEN new_length, int flags = MREMAP_MAYMOVE, IV new_address = 0)
+	CODE:
+{
+        MAGIC *mg = mg_findext (scalar, FOREIGN_MAGIC, &mmap_vtbl);
+        void *new;
+
+        if (!mg || SvPVX (scalar) != mg->mg_ptr)
+          croak ("IO::AIO::mremap: scalar not mapped by IO::AIO::mmap or improperly modified");
+
+        new = mremap (mg->mg_ptr, (size_t)mg->mg_obj, new_length, flags, (void *)new_address);
+
+        RETVAL = &PL_sv_no;
+
+        if (new != (void *)-1)
+          {
+            RETVAL = new == (void *)mg->mg_ptr
+              ? newSVpvn ("0 but true", 10)
+              : &PL_sv_yes;
+
+            mg->mg_ptr = (char *)new;
+            mg->mg_obj = (SV *)new_length;
+
+            SvPVX (scalar) = mg->mg_ptr;
+            SvCUR_set (scalar, new_length);
+          }
+}
+	OUTPUT:
+        RETVAL
 
 int
 madvise (SV *scalar, STRLEN offset = 0, SV *length = &PL_sv_undef, IV advice_or_prot)
@@ -1960,6 +2297,151 @@ pipe2 (int flags = 0)
             PUSHs (newmortalFH (fd[0], O_RDONLY));
             PUSHs (newmortalFH (fd[1], O_WRONLY));
           }
+}
+
+void
+eventfd (unsigned int initval = 0, int flags = 0)
+	PPCODE:
+{
+	int fd;
+#if HAVE_EVENTFD
+        fd = eventfd (initval, flags);
+#else
+        fd = (errno = ENOSYS, -1);
+#endif
+	
+        XPUSHs (newmortalFH (fd, O_RDWR));
+}
+
+void
+timerfd_create (int clockid, int flags = 0)
+	PPCODE:
+{
+	int fd;
+#if HAVE_TIMERFD
+        fd = timerfd_create (clockid, flags);
+#else
+        fd = (errno = ENOSYS, -1);
+#endif
+	
+        XPUSHs (newmortalFH (fd, O_RDWR));
+}
+
+void
+timerfd_settime (SV *fh, int flags, NV interval, NV value)
+	PPCODE:
+{
+        int fd = s_fileno_croak (fh, 0);
+#if HAVE_TIMERFD
+	int res;
+        struct itimerspec its, ots;
+
+        ts_set (&its.it_interval, interval);
+        ts_set (&its.it_value   , value);
+        res = timerfd_settime (fd, flags, &its, &ots);
+
+        if (!res)
+          {
+            EXTEND (SP, 2);
+            PUSHs (newSVnv (ts_get (&ots.it_interval)));
+            PUSHs (newSVnv (ts_get (&ots.it_value)));
+          }
+#else
+        errno = ENOSYS;
+#endif
+}
+
+void
+timerfd_gettime (SV *fh)
+	PPCODE:
+{
+        int fd = s_fileno_croak (fh, 0);
+#if HAVE_TIMERFD
+	int res;
+        struct itimerspec ots;
+        res = timerfd_gettime (fd, &ots);
+
+        if (!res)
+          {
+            EXTEND (SP, 2);
+            PUSHs (newSVnv (ts_get (&ots.it_interval)));
+            PUSHs (newSVnv (ts_get (&ots.it_value)));
+          }
+#else
+        errno = ENOSYS;
+#endif
+}
+
+UV
+get_fdlimit ()
+	CODE:
+#if HAVE_RLIMITS
+        struct rlimit rl;
+        if (0 == getrlimit (RLIMIT_NOFILE, &rl))
+	  XSRETURN_UV (rl.rlim_cur == RLIM_INFINITY ? (UV)-1 : rl.rlim_cur);
+#endif
+        XSRETURN_UNDEF;
+	OUTPUT:
+        RETVAL
+
+void
+min_fdlimit (UV limit = 0x7fffffffU)
+	CODE:
+{
+#if HAVE_RLIMITS
+        struct rlimit rl;
+        rlim_t orig_rlim_max;
+        UV bit;
+
+        if (0 != getrlimit (RLIMIT_NOFILE, &rl))
+          goto fail;
+
+        if (rl.rlim_cur == RLIM_INFINITY)
+          XSRETURN_YES;
+
+        orig_rlim_max = rl.rlim_max == RLIM_INFINITY ? ((rlim_t)0)-1 : rl.rlim_max;
+
+        if (rl.rlim_cur < limit)
+          {
+            rl.rlim_cur = limit;
+
+            if (rl.rlim_max < rl.rlim_cur && rl.rlim_max != RLIM_INFINITY)
+              rl.rlim_max = rl.rlim_cur;
+          }
+
+        if (0 == setrlimit (RLIMIT_NOFILE, &rl))
+          XSRETURN_YES;
+
+        if (errno == EPERM)
+          {
+            /* setlimit failed with EPERM - maybe we can't raise the hardlimit, or maybe */
+            /* our limit overflows a system-wide limit */
+            /* try an adaptive algorithm, but do not lower the hardlimit */
+            rl.rlim_max = 0;
+            for (bit = 0x40000000U; bit; bit >>= 1)
+              {
+                rl.rlim_max |= bit;
+                rl.rlim_cur = rl.rlim_max;
+
+                /* nevr decrease the hard limit */
+                if (rl.rlim_max < orig_rlim_max)
+                  break;
+
+                if (0 != setrlimit (RLIMIT_NOFILE, &rl))
+                  rl.rlim_max &= ~bit; /* too high, remove bit again */
+              }
+
+            /* now, raise the soft limit to the max permitted */
+            if (0 == getrlimit (RLIMIT_NOFILE, &rl))
+              {
+                rl.rlim_cur = rl.rlim_max;
+                if (0 == setrlimit (RLIMIT_NOFILE, &rl))
+                  errno = EPERM;
+              }
+	  }
+#endif
+        fail:
+        XSRETURN_UNDEF;
 }
 
 void _on_next_submit (SV *cb)

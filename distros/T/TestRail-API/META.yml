@@ -30,28 +30,28 @@ name: TestRail-API
 provides:
   App::Prove::Plugin::TestRail:
     file: lib/App/Prove/Plugin/TestRail.pm
-    version: '0.041'
+    version: '0.043'
   Test::Rail::Harness:
     file: lib/Test/Rail/Harness.pm
-    version: '0.041'
+    version: '0.043'
   Test::Rail::Parser:
     file: lib/Test/Rail/Parser.pm
-    version: '0.041'
+    version: '0.043'
   TestRail::API:
     file: lib/TestRail/API.pm
-    version: '0.041'
+    version: '0.043'
   TestRail::Utils:
     file: lib/TestRail/Utils.pm
-    version: '0.041'
+    version: '0.043'
   TestRail::Utils::Find:
     file: lib/TestRail/Utils/Find.pm
-    version: '0.041'
+    version: '0.043'
   TestRail::Utils::Lock:
     file: lib/TestRail/Utils/Lock.pm
-    version: '0.041'
+    version: '0.043'
   TestRail::Utils::Results:
     file: lib/TestRail/Utils/Results.pm
-    version: '0.041'
+    version: '0.043'
 requires:
   Carp: '0'
   Clone: '0'
@@ -88,11 +88,12 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TestRail-API
+  bugtracker: https://github.com/teodesian/TestRail-Perl/issues
   homepage: https://github.com/teodesian/TestRail-Perl
-  repository: git://github.com/teodesian/TestRail-Perl.git
-version: '0.041'
+  repository: https://github.com/teodesian/TestRail-Perl.git
+version: '0.043'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Neil Bowers <neil@bowers.com>'
+  - 'Ryan Sherer <ryan.sherer@cpanel.net>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

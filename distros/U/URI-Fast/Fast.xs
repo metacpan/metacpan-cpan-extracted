@@ -1,5 +1,4 @@
 #define PERL_NO_GET_CONTEXT
-
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -11,7 +10,7 @@
  *
  -----------------------------------------------------------------------------*/
 
-// permitted characters
+// Permitted characters
 #define URI_CHARS_AUTH          "!$&'()*+,;:=@"
 #define URI_CHARS_PATH          "!$&'()*+,;:=@/"
 #define URI_CHARS_PATH_SEGMENT  "!$&'()*+,;:=@"
@@ -20,13 +19,13 @@
 #define URI_CHARS_FRAG          ":@?/"
 #define URI_CHARS_USER          "!$&'()*+,;="
 
-// return uri_t* from blessed pointer ref
-#define URI(obj) ((uri_t*) SvIV(SvRV( (obj) )))
+// Returns the uri_t* referenced by the blessed URI::Fast object in the SV ref.
+// Croaks if the SV does not point to a URI::Fast object.
+#define URI(obj) \
+  (((sv_isobject(obj) && sv_derived_from(obj, "URI::Fast")) ? NULL : croak("error")), \
+    ((uri_t*) SvIV(SvRV((obj)))))
 
-// expands to member reference
-#define URI_MEMBER(obj, member) (URI(obj)->member)
-
-// size constants
+// Size constants
 #define URI_SIZE_scheme 32UL
 #define URI_SIZE_usr    32UL
 #define URI_SIZE_pwd    32UL
@@ -36,47 +35,62 @@
 #define URI_SIZE_query  64UL
 #define URI_SIZE_frag   32UL
 
-// enough to fit all pieces + 3 chars for separators (2 colons + @)
+// Enough to fit all pieces + 3 chars for separators (2 colons + @)
 #define URI_SIZE_auth (3 + URI_SIZE_usr + URI_SIZE_pwd + URI_SIZE_host + URI_SIZE_port)
 
-// returns the size of the member in bytes
+// Returns the size of the member in bytes
 #define URI_SIZE(member) (URI_SIZE_##member)
 
-// defines a clearer method
+// Defines a clearer method
 #define URI_SIMPLE_CLEARER(member) \
 static void clear_##member(pTHX_ SV *uri) { \
-  str_clear(aTHX_ URI_MEMBER(uri, member)); \
+  str_clear(aTHX_ URI(uri)->member); \
 }
+
+// Returns a (non-mortal) SV from a uri_str_t
+#define URI_STR_2SV(str) (newSVpvn((str)->length == 0 ? "" : (str)->string, (str)->length))
 
 // Defines a setter method that accepts an unencoded value, encodes it,
 // ignoring characters in string 'allowed', and copies the encoded value into
 // slot 'member'.
 #define URI_SIMPLE_SETTER(member, allowed) \
-static void set_##member(pTHX_ SV *uri, SV *sv_value) { \
-  SvGETMAGIC(sv_value); \
-  if (SvOK(sv_value)) { \
+static void set_##member(pTHX_ SV *sv_uri, SV *sv_value) { \
+  uri_t *uri = URI(sv_uri); \
+  if (is_defined(aTHX_ sv_value)) { \
     size_t len_value, len_enc; \
     const char *value = SvPV_const(sv_value, len_value); \
     char enc[len_value * 3 + 1]; \
-    len_enc = uri_encode(value, len_value, enc, allowed, URI_MEMBER(uri, is_iri)); \
-    str_set(aTHX_ URI_MEMBER(uri, member), enc, len_enc); \
+    len_enc = uri_encode(value, len_value, enc, allowed, uri->is_iri); \
+    str_set(aTHX_ uri->member, enc, len_enc); \
   } \
   else { \
-    str_clear(aTHX_ URI_MEMBER(uri, member)); \
+    str_clear(aTHX_ uri->member); \
   } \
 }
 
-// Defines a getter method that returns the raw, encoded value of the member slot.
+// Defines a getter method that returns the raw, encoded value of the member
+// slot. If the object is an IRI, decodes utf8 characters from hex sequences if
+// present.
 #define URI_RAW_GETTER(member) \
-static SV* get_raw_##member(pTHX_ SV *uri) { \
-  uri_str_t *str = URI_MEMBER(uri, member); \
-  return newSVpvn(str->length == 0 ? "" : str->string, str->length); \
+static SV* get_raw_##member(pTHX_ SV *sv_uri) { \
+  uri_t *uri = URI(sv_uri); \
+  uri_str_t *str = uri->member; \
+  if (uri->is_iri) { \
+    if (str->length == 0) return newSVpvn("", 0); \
+    char decoded[ str->length + 1 ]; \
+    size_t len = uri_decode_utf8(str->string, str->length, decoded); \
+    SV *out = newSVpvn(decoded, len); \
+    sv_utf8_decode(out); \
+    return out; \
+  } else { \
+    return URI_STR_2SV(str); \
+  } \
 }
 
 // Defines a getter method that returns the decoded value of the member slot.
 #define URI_SIMPLE_GETTER(member) \
 static SV* get_##member(pTHX_ SV *uri) { \
-  uri_str_t *str = URI_MEMBER(uri, member); \
+  uri_str_t *str = URI(uri)->member; \
   if (str->length == 0) return newSVpvn("", 0); \
   char decoded[ str->length + 1 ]; \
   size_t len = uri_decode(str->string, str->length, decoded, ""); \
@@ -90,7 +104,7 @@ static SV* get_##member(pTHX_ SV *uri) { \
 // characters encoded.
 #define URI_COMPOUND_GETTER(member) \
 static SV* get_##member(pTHX_ SV *uri) { \
-  uri_str_t *str = URI_MEMBER(uri, member); \
+  uri_str_t *str = URI(uri)->member; \
   if (str->length == 0) return newSVpvn("", 0); \
   char decoded[ str->length + 1 ]; \
   size_t len = uri_decode_utf8(str->string, str->length, decoded); \
@@ -98,6 +112,17 @@ static SV* get_##member(pTHX_ SV *uri) { \
   sv_utf8_decode(out); \
   return out; \
 }
+
+// Warns out info about a uri_str_t
+#define URI_STR_DEBUG(str) \
+  (warn( \
+    "STRING< chunk=%lu, allocated=%lu, length=%lu, string='%.*s' >\n", \
+    str->chunk, \
+    str->allocated, \
+    str->length, \
+    str->length, \
+    str->string \
+  )); \
 
 /*
  * Allocate memory with Newx if it's
@@ -124,6 +149,22 @@ static SV* get_##member(pTHX_ SV *uri) { \
  * Utilities
  -----------------------------------------------------------------------------*/
 
+// Returns true if the SV is defined. Gets magic before evaluating the
+// definedness of the SV.
+static
+bool is_defined(pTHX_ SV *sv) {
+  SvGETMAGIC(sv);
+  return SvOK(sv) ? 1 : 0;
+}
+
+// Returns true if the SV is an RV. Gets magic before evaluating.
+static
+bool is_ref(pTHX_ SV *sv) {
+  SvGETMAGIC(sv);
+  return SvROK(sv) ? 1 : 0;
+}
+
+// Replacement for strspn that is length-aware
 static
 size_t strnspn(const char *s, size_t s_len, const char *c)
 {
@@ -131,6 +172,7 @@ size_t strnspn(const char *s, size_t s_len, const char *c)
   return s_len < res ? s_len : res;
 }
 
+// Replacement for strcspn that is length-aware
 static
 size_t strncspn(const char *s, size_t s_len, const char *c)
 {
@@ -138,6 +180,8 @@ size_t strncspn(const char *s, size_t s_len, const char *c)
   return s_len < res ? s_len : res;
 }
 
+// Returns true if char c is in char* set. It is up to the caller to ensure
+// that *set is nul-terminated.
 static inline
 bool char_in_str(const char c, const char *set) {
   size_t i;
@@ -190,6 +234,49 @@ typedef struct {
 #define str_len(str) ((str)->length)
 #define str_get(str) (str_len(str) == 0 ? "" : (const char*)str->string)
 
+// Searchs str for occurences of string *find. It is up to the caller to ensure
+// that *find is at least len chars long. Returns -1 if not found.
+static
+int str_index(pTHX_ uri_str_t *str, const char *find, size_t len) {
+  size_t i, j;
+  bool found = 0;
+
+  for (i = 0; i < str->length; ++i) {
+    for (j = 0; j < len; ++j) {
+      if (str->string[i + j] != find[j]) {
+        goto STRCHR;
+      }
+    }
+
+    found = 1;
+
+    STRCHR:
+    ;
+  }
+
+  if (found) {
+    return i;
+  } else {
+    return -1;
+  }
+}
+
+// Truncates the string from the right-most occurence of r_char by setting that
+// index to nul. Does not zero out the rest of the string.
+static
+void str_rtrim(pTHX_ uri_str_t *str, const char r_char) {
+  size_t i;
+  for (i = str->length; i > 0; --i) {
+    if (str->string[i - 1] == r_char) {
+      str->string[i - 1] = '\0';
+      str->length = i - 1;
+      break;
+    }
+  }
+}
+
+// Sets str to the first len chars of value. Reallocates another block of
+// memory to fit it if necessary.
 static
 void str_set(pTHX_ uri_str_t *str, const char *value, size_t len) {
   size_t allocate = str->chunk * (((len + 1) / str->chunk) + 1);
@@ -214,6 +301,8 @@ void str_set(pTHX_ uri_str_t *str, const char *value, size_t len) {
   }
 }
 
+// Appends the first len chars of value to str, allocating more memory if
+// necessary.
 static
 void str_append(pTHX_ uri_str_t *str, const char *value, size_t len) {
   if (str->string == NULL) {
@@ -235,22 +324,38 @@ void str_append(pTHX_ uri_str_t *str, const char *value, size_t len) {
   }
 }
 
+// Zeroes out the contents of str. Does not release memory.
 static
 void str_clear(pTHX_ uri_str_t *str) {
   str_set(aTHX_ str, NULL, 0);
 }
 
+// Copies the contents of from into to. Does not clear to first, but will set
+// the terminating nul and length.
 static
-uri_str_t* str_new(pTHX_ size_t alloc_size) {
-  uri_str_t *str;
-  Newx(str, 1, uri_str_t);
+void str_copy(pTHX_ uri_str_t *from, uri_str_t *to) {
+  str_set(aTHX_ to, from->string, from->length);
+}
+
+// Initializes a uri_str_t.
+static
+void str_init(pTHX_ uri_str_t *str, size_t alloc_size) {
   str->chunk = alloc_size;
   str->allocated = 0;
   str->length = 0;
   str->string = NULL;
+}
+
+// Allocates and initializes a new uri_str_t.
+static
+uri_str_t* str_new(pTHX_ size_t alloc_size) {
+  uri_str_t *str;
+  Newx(str, 1, uri_str_t);
+  str_init(aTHX_ str, alloc_size);
   return str;
 }
 
+// Release an allocated uri_str_t and free's its contents.
 static
 void str_free(pTHX_ uri_str_t *str) {
   if (str->string != NULL) {
@@ -444,15 +549,16 @@ size_t uri_decode_utf8(const char *in, size_t len, char *out) {
 
 // EOT (end of theft)
 
+/*
+ * External API for encode/decode.
+ */
 static
 SV* encode(pTHX_ SV *in, SV *sv_allowed) {
   size_t ilen, olen, alen;
   const char *allowed;
   SV* out;
 
-  SvGETMAGIC(in);
-
-  if (!SvOK(in)) {
+  if (!is_defined(aTHX_ in)) {
     return newSVpvn("", 0);
   }
 
@@ -478,9 +584,7 @@ SV* decode(pTHX_ SV *in) {
   const char *src;
   SV *out;
 
-  SvGETMAGIC(in);
-
-  if (!SvOK(in)) {
+  if (!is_defined(aTHX_ in)) {
     return newSVpvn("", 0);
   }
 
@@ -529,6 +633,9 @@ typedef struct {
   const char *source;
 } uri_query_scanner_t;
 
+// Initializes a uri_query_scanner_t with input string *source of at least
+// length characters. It is the caller's responsibility to ensure the lifetime
+// of source matches the lifetime of the scanner.
 void query_scanner_init(
     uri_query_scanner_t *scanner,
     const char *source,
@@ -540,6 +647,7 @@ void query_scanner_init(
   scanner->cursor = 0;
 }
 
+// Returns true if the scanner has reached the end of the input string.
 static
 int query_scanner_done(uri_query_scanner_t *scanner) {
   return scanner->cursor >= scanner->length;
@@ -552,7 +660,8 @@ int query_scanner_done(uri_query_scanner_t *scanner) {
 static
 void query_scanner_next(uri_query_scanner_t *scanner, uri_query_token_t *token) {
   size_t brk;
-  const char sep[4] = {'&', ';', '=', '\0'};
+  const char key_sep[4] = {'&', ';', '=', '\0'};
+  const char val_sep[4] = {'&', ';', '\0'};
 
 SCAN_KEY:
   if (scanner->cursor >= scanner->length) {
@@ -566,7 +675,7 @@ SCAN_KEY:
   brk = strncspn(
     &scanner->source[ scanner->cursor ],
     scanner->length - scanner->cursor,
-    sep
+    key_sep
   );
 
   // Set key members in token struct
@@ -582,7 +691,7 @@ SCAN_KEY:
     ++scanner->cursor;
 
     // Find the end of the value
-    brk = strncspn(&scanner->source[ scanner->cursor ], scanner->length - scanner->cursor, sep);
+    brk = strncspn(&scanner->source[ scanner->cursor ], scanner->length - scanner->cursor, val_sep);
 
     // Set the value and token type
     token->value = &scanner->source[ scanner->cursor ];
@@ -717,15 +826,15 @@ void uri_scan(pTHX_ uri_t *uri, const char *src, size_t len) {
     // Authority section following scheme must be separated by //
     if (idx + 1 < len && src[idx] == '/' && src[idx + 1] == '/') {
       idx += 2;
+
+      // Authority
+      brk = strncspn(&src[idx], len - idx, "/?#");
+      uri_scan_auth(aTHX_ uri, &src[idx], brk);
+
+      if (brk > 0) {
+        idx += brk;
+      }
     }
-  }
-
-  // Authority
-  brk = strncspn(&src[idx], len - idx, "/?#");
-  uri_scan_auth(aTHX_ uri, &src[idx], brk);
-
-  if (brk > 0) {
-    idx += brk;
   }
 
   // path
@@ -879,13 +988,14 @@ SV* get_auth(pTHX_ SV *uri_obj) {
 }
 
 static
-SV* split_path(pTHX_ SV* uri) {
+SV* split_path(pTHX_ SV* sv_uri) {
+  uri_t *uri = URI(sv_uri);
   size_t len, segment_len, brk, idx = 0;
   AV* arr = newAV();
   SV* tmp;
 
-  const char *str = str_get(URI_MEMBER(uri, path));
-  len = str_len(URI_MEMBER(uri, path));
+  const char *str = uri->path->string;
+  len = uri->path->length;
 
   if (len > 0) {
     if (str[0] == '/') {
@@ -913,9 +1023,10 @@ SV* split_path(pTHX_ SV* uri) {
 }
 
 static
-SV* get_query_keys(pTHX_ SV* uri) {
-  const char *query = str_get(URI_MEMBER(uri, query));
-  size_t klen, qlen = str_len(URI_MEMBER(uri, query));
+SV* get_query_keys(pTHX_ SV* sv_uri) {
+  uri_str_t *str_query = URI(sv_uri)->query;
+  const char *query = str_query->string;
+  size_t klen, qlen = str_query->length;
   HV* out = newHV();
   uri_query_scanner_t scanner;
   uri_query_token_t token;
@@ -934,16 +1045,17 @@ SV* get_query_keys(pTHX_ SV* uri) {
 }
 
 static
-SV* query_hash(pTHX_ SV* uri) {
+SV* query_hash(pTHX_ SV *sv_uri) {
+  uri_t *uri = URI(sv_uri);
   SV *tmp, **refval;
   AV *arr;
   HV *out = newHV();
-  const char *query = str_get(URI_MEMBER(uri, query));
-  size_t qlen = str_len(URI_MEMBER(uri, query)), klen, vlen;
+  size_t klen, vlen;
+
   uri_query_scanner_t scanner;
   uri_query_token_t token;
 
-  query_scanner_init(&scanner, query, qlen);
+  query_scanner_init(&scanner, uri->query->string, uri->query->length);
 
   while (!query_scanner_done(&scanner)) {
     query_scanner_next(&scanner, &token);
@@ -979,18 +1091,17 @@ SV* query_hash(pTHX_ SV* uri) {
 }
 
 static
-SV* get_param(pTHX_ SV* uri, SV* sv_key) {
-  int is_iri = URI_MEMBER(uri, is_iri);
-  const char *query = str_get(URI_MEMBER(uri, query));
+SV* get_param(pTHX_ SV* sv_uri, SV* sv_key) {
+  uri_t *uri = URI(sv_uri);
+  size_t klen, vlen, elen;
   const char *key;
-  size_t qlen = str_len(URI_MEMBER(uri, query)), klen, vlen, elen;
   uri_query_scanner_t scanner;
   uri_query_token_t token;
   AV* out = newAV();
   SV* value;
 
   // Read key to search
-  if (!SvTRUE(sv_key)) {
+  if (!is_defined(aTHX_ sv_key)) {
     croak("get_param: expected key to search");
   }
   else {
@@ -1006,9 +1117,9 @@ SV* get_param(pTHX_ SV* uri, SV* sv_key) {
   }
 
   char enc_key[(klen * 3) + 2];
-  elen = uri_encode(key, klen, enc_key, ":@?/", is_iri);
+  elen = uri_encode(key, klen, enc_key, ":@?/", uri->is_iri);
 
-  query_scanner_init(&scanner, query, qlen);
+  query_scanner_init(&scanner, uri->query->string, uri->query->length);
 
   while (!query_scanner_done(&scanner)) {
     query_scanner_next(&scanner, &token);
@@ -1044,47 +1155,51 @@ URI_SIMPLE_SETTER(pwd,    URI_CHARS_USER);
 URI_SIMPLE_SETTER(host,   URI_CHARS_HOST);
 
 static
-void set_port(pTHX_ SV *uri_obj, SV *sv_value) {
-  if (!SvTRUE(sv_value)) {
-    str_clear(aTHX_ URI_MEMBER(uri_obj, port));
+void set_port(pTHX_ SV *sv_uri, SV *sv_value) {
+  uri_t *uri = URI(sv_uri);
+  if (!is_defined(aTHX_ sv_value)) {
+    str_clear(aTHX_ uri->port);
     return;
   }
 
   size_t vlen, i;
   const char *value = SvPV_const(sv_value, vlen);
-  str_set(aTHX_ URI_MEMBER(uri_obj, port), value, vlen);
+  str_set(aTHX_ uri->port, value, vlen);
 }
 
 static
-void set_auth(pTHX_ SV *uri_obj, SV *sv_value) {
-  str_clear(aTHX_ URI_MEMBER(uri_obj, usr));
-  str_clear(aTHX_ URI_MEMBER(uri_obj, pwd));
-  str_clear(aTHX_ URI_MEMBER(uri_obj, host));
-  str_clear(aTHX_ URI_MEMBER(uri_obj, port));
+void set_auth(pTHX_ SV *sv_uri, SV *sv_value) {
+  uri_t *uri = URI(sv_uri);
 
-  if (SvTRUE(sv_value)) {
+  str_clear(aTHX_ uri->usr);
+  str_clear(aTHX_ uri->pwd);
+  str_clear(aTHX_ uri->host);
+  str_clear(aTHX_ uri->port);
+
+  if (is_defined(aTHX_ sv_value)) {
     size_t vlen;
     const char *value = SvPV_const(sv_value, vlen);
 
     // auth isn't stored as an individual field, so encode to local array and rescan
     char auth[URI_SIZE_auth];
-    size_t len = uri_encode(value, vlen, (char*) &auth, URI_CHARS_AUTH, URI_MEMBER(uri_obj, is_iri));
+    size_t len = uri_encode(value, vlen, (char*) &auth, URI_CHARS_AUTH, uri->is_iri);
 
-    uri_scan_auth(aTHX_ URI(uri_obj), auth, len);
+    uri_scan_auth(aTHX_ uri, auth, len);
   }
 }
 
 static
-void set_path_array(pTHX_ SV *uri_obj, SV *sv_path) {
+void set_path_array(pTHX_ SV *sv_uri, SV *sv_path) {
+  uri_t *uri = URI(sv_uri);
   SV **refval, *tmp;
   AV *av_path;
   size_t i, av_idx, seg_len;
   const char *seg;
-  uri_str_t *path = URI_MEMBER(uri_obj, path);
+  uri_str_t *path = uri->path;
 
   str_clear(aTHX_ path);
 
-  if (!SvTRUE(sv_path)) {
+  if (!is_defined(aTHX_ sv_path)) {
     return;
   }
 
@@ -1101,10 +1216,10 @@ void set_path_array(pTHX_ SV *uri_obj, SV *sv_path) {
     // Fetch next segment
     refval = av_fetch(av_path, (SSize_t) i, 0);
     if (refval == NULL) continue;
-    if (!SvTRUE(*refval)) continue;
+    if (!is_defined(aTHX_ *refval)) continue;
 
     // Copy value over
-    if (SvTRUE(*refval)) {
+    if (is_defined(aTHX_ *refval)) {
       seg = SvPV_nomg_const(*refval, seg_len);
 
       // Convert octets to utf8 if necessary
@@ -1115,7 +1230,7 @@ void set_path_array(pTHX_ SV *uri_obj, SV *sv_path) {
       }
 
       char out[seg_len * 3];
-      size_t out_len = uri_encode(seg, seg_len, out, URI_CHARS_PATH_SEGMENT, URI_MEMBER(uri_obj, is_iri));
+      size_t out_len = uri_encode(seg, seg_len, out, URI_CHARS_PATH_SEGMENT, uri->is_iri);
 
       str_append(aTHX_ path, out, out_len);
     }
@@ -1123,8 +1238,8 @@ void set_path_array(pTHX_ SV *uri_obj, SV *sv_path) {
 }
 
 static
-void update_query_keyset(pTHX_ SV *uri, SV *sv_key_set, SV *sv_separator) {
-  int    is_iri = URI_MEMBER(uri, is_iri);
+void update_query_keyset(pTHX_ SV *sv_uri, SV *sv_key_set, SV *sv_separator) {
+  uri_t  *uri = URI(sv_uri);
   HE     *ent;
   HV     *keys, *enc_keys;
   I32    iterlen, i, klen;
@@ -1132,19 +1247,17 @@ void update_query_keyset(pTHX_ SV *uri, SV *sv_key_set, SV *sv_separator) {
   bool   copy;
   char   *key;
   size_t off = 0;
-  uri_str_t *query = URI_MEMBER(uri, query);
+  uri_str_t *query = uri->query;
   uri_str_t *dest  = str_new(aTHX_ URI_SIZE_query);
 
   size_t slen = 1;
-  const char *separator = SvTRUE(sv_separator) ? SvPV_const(sv_separator, slen) : "&";
+  const char *separator = is_defined(aTHX_ sv_separator) ? SvPV_const(sv_separator, slen) : "&";
 
   uri_query_scanner_t scanner;
   uri_query_token_t   token;
 
   // Validate reference parameters
-  SvGETMAGIC(sv_key_set);
-
-  if (!SvROK(sv_key_set) || SvTYPE(SvRV(sv_key_set)) != SVt_PVHV) {
+  if (!is_ref(aTHX_ sv_key_set) || SvTYPE(SvRV(sv_key_set)) != SVt_PVHV) {
     croak("set_query_keys: expected hash ref");
   }
 
@@ -1163,9 +1276,9 @@ void update_query_keyset(pTHX_ SV *uri, SV *sv_key_set, SV *sv_separator) {
     SvGETMAGIC(val);
 
     char enc_key[(3 * klen) + 1];
-    klen = uri_encode(key, klen, enc_key, ":@?/", is_iri);
+    klen = uri_encode(key, klen, enc_key, ":@?/", uri->is_iri);
 
-    hv_store(enc_keys, enc_key, klen * (is_iri ? -1 : 1), val, 0);
+    hv_store(enc_keys, enc_key, klen * (uri->is_iri ? -1 : 1), val, 0);
   }
 
   // Begin building the new query string from the existing one. As each key is
@@ -1178,12 +1291,12 @@ void update_query_keyset(pTHX_ SV *uri, SV *sv_key_set, SV *sv_separator) {
     query_scanner_next(&scanner, &token);
     if (token.type == DONE) continue;
 
-    // Use the encrypted keys hash to decide whether to copy this key (and
+    // Use the encoded keys hash to decide whether to copy this key (and
     // value if present) over to dest. If the key exists, skip. It will be
     // added to the filtered query string last.
     copy = 1;
-    if (hv_exists(enc_keys, token.key, token.key_length * (is_iri ? -1 : 1))) {
-      refval = hv_fetch(enc_keys, token.key, token.key_length * (is_iri ? -1 : 1), 0);
+    if (hv_exists(enc_keys, token.key, token.key_length * (uri->is_iri ? -1 : 1))) {
+      refval = hv_fetch(enc_keys, token.key, token.key_length * (uri->is_iri ? -1 : 1), 0);
       // NULL shouldn't be possible since this is guarded with hv_exists, but
       // perlguts, amirite?
       copy = refval == NULL || SvTRUE(*refval);
@@ -1227,38 +1340,35 @@ void update_query_keyset(pTHX_ SV *uri, SV *sv_key_set, SV *sv_separator) {
   }
 
   str_free(aTHX_ query);
-  URI_MEMBER(uri, query) = dest;
+  uri->query = dest;
 }
 
 static
-void set_param(pTHX_ SV *uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
-  int is_iri = URI_MEMBER(uri, is_iri);
+void set_param(pTHX_ SV *sv_uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
+  uri_t *uri = URI(sv_uri);
   const char *strval;
   size_t vlen, reflen, av_idx, i = 0, off = 0;
   AV *av_values;
   SV **refval;
-  uri_str_t *query = URI_MEMBER(uri, query);
   uri_str_t *dest = str_new(aTHX_ URI_SIZE_query);
   uri_query_scanner_t scanner;
   uri_query_token_t token;
 
   size_t slen = 1;
-  const char *separator = SvTRUE(sv_separator) ? SvPV_const(sv_separator, slen) : "&";
+  const char *separator = is_defined(aTHX_ sv_separator) ? SvPV_const(sv_separator, slen) : "&";
 
   // Build encoded key string
-  if (!SvTRUE(sv_key)) {
+  if (!is_defined(aTHX_ sv_key)) {
     croak("set_param: expected key");
   }
 
   size_t klen;
   const char *key = SvPV_const(sv_key, klen);
   char enc_key[(3 * klen) + 1];
-  klen = uri_encode(key, strlen(key), enc_key, ":@?/", is_iri);
+  klen = uri_encode(key, strlen(key), enc_key, ":@?/", uri->is_iri);
 
   // Get array of values to set
-  SvGETMAGIC(sv_values);
-
-  if (!SvROK(sv_values) || SvTYPE(SvRV(sv_values)) != SVt_PVAV) {
+  if (!is_ref(aTHX_ sv_values) || SvTYPE(SvRV(sv_values)) != SVt_PVAV) {
     croak("set_param: expected array of values");
   }
 
@@ -1267,7 +1377,7 @@ void set_param(pTHX_ SV *uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
 
   // Begin building the new query string from the existing one, skipping
   // keys (and their values, if any) matching sv_key.
-  query_scanner_init(&scanner, str_get(query), str_len(query));
+  query_scanner_init(&scanner, uri->query->string, uri->query->length);
 
   while (!query_scanner_done(&scanner)) {
     query_scanner_next(&scanner, &token);
@@ -1305,7 +1415,7 @@ void set_param(pTHX_ SV *uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
     // Fetch next value from the array
     refval = av_fetch(av_values, (SSize_t) i, 0);
     if (refval == NULL) break;
-    if (!SvTRUE(*refval)) break;
+    if (!is_defined(aTHX_ *refval)) break;
 
     // Add separator if needed to separate pairs
     if (off > 0) {
@@ -1324,13 +1434,13 @@ void set_param(pTHX_ SV *uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
     strval = SvPV_const(*refval, reflen);
 
     char tmp[reflen * 3];
-    vlen = uri_encode(strval, reflen, tmp, ":@?/", is_iri);
+    vlen = uri_encode(strval, reflen, tmp, ":@?/", uri->is_iri);
     str_append(aTHX_ dest, tmp, vlen);
     off += vlen;
   }
 
-  str_free(aTHX_ query);
-  URI_MEMBER(uri, query) = dest;
+  str_free(aTHX_ uri->query);
+  uri->query = dest;
 }
 
 /*------------------------------------------------------------------------------
@@ -1338,10 +1448,10 @@ void set_param(pTHX_ SV *uri, SV *sv_key, SV *sv_values, SV *sv_separator) {
  -----------------------------------------------------------------------------*/
 
 static
-SV* to_string(pTHX_ SV* uri_obj) {
+SV* to_string(pTHX_ SV *uri_obj) {
   uri_t *uri = URI(uri_obj);
   SV *out = newSVpvn("", 0);
-  SV *auth = get_auth(aTHX_ uri_obj);
+  SV *auth = sv_2mortal(get_raw_auth(aTHX_ uri_obj));
 
   if (uri->is_iri) {
     SvUTF8_on(out);
@@ -1359,7 +1469,7 @@ SV* to_string(pTHX_ SV* uri_obj) {
   }
 
   if (SvTRUE(auth)) {
-    sv_catsv(out, sv_2mortal(auth));
+    sv_catsv(out, auth);
 
     // When the authority section is present, any path must be separated from
     // the authority section by a forward slash
@@ -1384,29 +1494,31 @@ SV* to_string(pTHX_ SV* uri_obj) {
 }
 
 static
-void explain(pTHX_ SV* uri_obj) {
-  printf("scheme: %s\n",  str_get(URI_MEMBER(uri_obj, scheme)));
+void explain(pTHX_ SV* sv_uri) {
+  uri_t *uri = URI(sv_uri);
+  printf("scheme: %s\n",  uri->scheme->string);
   printf("auth:\n");
-  printf("  -usr: %s\n",  str_get(URI_MEMBER(uri_obj, usr)));
-  printf("  -pwd: %s\n",  str_get(URI_MEMBER(uri_obj, pwd)));
-  printf("  -host: %s\n", str_get(URI_MEMBER(uri_obj, host)));
-  printf("  -port: %s\n", str_get(URI_MEMBER(uri_obj, port)));
-  printf("path: %s\n",    str_get(URI_MEMBER(uri_obj, path)));
-  printf("query: %s\n",   str_get(URI_MEMBER(uri_obj, query)));
-  printf("frag: %s\n",    str_get(URI_MEMBER(uri_obj, frag)));
+  printf("  -usr: %s\n",  uri->usr->string);
+  printf("  -pwd: %s\n",  uri->pwd->string);
+  printf("  -host: %s\n", uri->host->string);
+  printf("  -port: %s\n", uri->port->string);
+  printf("path: %s\n",    uri->path->string);
+  printf("query: %s\n",   uri->query->string);
+  printf("frag: %s\n",    uri->frag->string);
 }
 
 static
-void debug(pTHX_ SV* uri_obj) {
-  warn("scheme: %s\n",  str_get(URI_MEMBER(uri_obj, scheme)));
+void debug(pTHX_ SV* sv_uri) {
+  uri_t *uri = URI(sv_uri);
+  warn("scheme: %s\n",  uri->scheme->string);
   warn("auth:\n");
-  warn("  -usr: %s\n",  str_get(URI_MEMBER(uri_obj, usr)));
-  warn("  -pwd: %s\n",  str_get(URI_MEMBER(uri_obj, pwd)));
-  warn("  -host: %s\n", str_get(URI_MEMBER(uri_obj, host)));
-  warn("  -port: %s\n", str_get(URI_MEMBER(uri_obj, port)));
-  warn("path: %s\n",    str_get(URI_MEMBER(uri_obj, path)));
-  warn("query: %s\n",   str_get(URI_MEMBER(uri_obj, query)));
-  warn("frag: %s\n",    str_get(URI_MEMBER(uri_obj, frag)));
+  warn("  -usr: %s\n",  uri->usr->string);
+  warn("  -pwd: %s\n",  uri->pwd->string);
+  warn("  -host: %s\n", uri->host->string);
+  warn("  -port: %s\n", uri->port->string);
+  warn("path: %s\n",    uri->path->string);
+  warn("query: %s\n",   uri->query->string);
+  warn("frag: %s\n",    uri->frag->string);
 }
 
 static
@@ -1461,8 +1573,8 @@ SV* new(pTHX_ const char* class, SV* uri_str, int is_iri) {
 }
 
 static
-void DESTROY(pTHX_ SV *uri_obj) {
-  uri_t *uri = (uri_t*) SvIV(SvRV(uri_obj));
+void DESTROY(pTHX_ SV *sv_uri) {
+  uri_t *uri = URI(sv_uri);
   str_free(aTHX_ uri->scheme);
   str_free(aTHX_ uri->usr);
   str_free(aTHX_ uri->pwd);
@@ -1477,87 +1589,346 @@ void DESTROY(pTHX_ SV *uri_obj) {
 /*
  * Extras
  */
+
+/*
+ * Splits a uri string into its component sections: scheme, authority, path,
+ * query, fragment. Pushes those values directly onto the results stack.
+ */
 static
-void uri_split(pTHX_ SV* uri) {
-  const char* src;
-  size_t idx = 0;
-  size_t brk = 0;
-  size_t len;
-
-  if (!SvTRUE(uri)) {
-    src = "";
-    len = 0;
-  }
-  else {
-    src = SvPV_nomg_const(uri, len);
-
-    if (!DO_UTF8(uri)) {
-      uri = sv_2mortal(newSVpvn(src, len));
-      sv_utf8_encode(uri);
-      src = SvPV_const(uri, len);
-    }
-  }
-
+void uri_split(pTHX_ SV *uri) {
   dXSARGS;
   sp = mark;
 
-  // Scheme
-  brk = strcspn(&src[idx], ":/@?#");
-  if (brk > 0 && strncmp(&src[idx + brk], "://", 3) == 0) {
-    XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
-    idx += brk + 3;
+  // If the object has already been parsed, there is no need to reparse it.
+  if (sv_isobject(uri) && sv_derived_from(uri, "URI::Fast")) {
+    XPUSHs(sv_2mortal(get_scheme(aTHX_ uri)));
+    XPUSHs(sv_2mortal(get_auth(aTHX_ uri)));
+    XPUSHs(sv_2mortal(get_path(aTHX_ uri)));
+    XPUSHs(sv_2mortal(get_query(aTHX_ uri)));
+    XPUSHs(sv_2mortal(get_frag(aTHX_ uri)));
+  }
+  // The object is defined and not a reference
+  else if (SvOK(uri) && !SvROK(uri)) {
+    const char *src;
+    size_t idx = 0;
+    size_t brk = 0;
+    size_t len;
 
-    // Authority
-    brk = strcspn(&src[idx], "/?#");
+    if (!SvTRUE(uri)) {
+      src = "";
+      len = 0;
+    }
+    else {
+      src = SvPV_nomg_const(uri, len);
+
+      if (!DO_UTF8(uri)) {
+        uri = sv_2mortal(newSVpvn(src, len));
+        sv_utf8_encode(uri);
+        src = SvPV_const(uri, len);
+      }
+    }
+
+    // Scheme
+    brk = strcspn(&src[idx], ":/@?#");
+
+    if (brk > 0 && src[idx + brk] == ':') {
+      XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
+      idx += brk + 1;
+
+      // Authority section following scheme must be separated by //
+      if (idx + 1 < len && src[idx] == '/' && src[idx + 1] == '/') {
+        idx += 2;
+
+        // Authority
+        brk = strcspn(&src[idx], "/?#");
+
+        if (brk > 0) {
+          XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
+          idx += brk;
+        }
+        else {
+          XPUSHs(sv_2mortal(newSVpvn("", 0)));
+        }
+      }
+    }
+    else {
+      XPUSHs(&PL_sv_undef);
+      XPUSHs(&PL_sv_undef);
+    }
+
+    // path
+    brk = strcspn(&src[idx], "?#");
     if (brk > 0) {
       XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
       idx += brk;
     } else {
-      XPUSHs(sv_2mortal(newSVpvn("",0)));
+      XPUSHs(sv_2mortal(newSVpvn("", 0)));
     }
-  }
-  else {
-    XPUSHs(&PL_sv_undef);
-    XPUSHs(&PL_sv_undef);
-  }
 
-  // path
-  brk = strcspn(&src[idx], "?#");
-  if (brk > 0) {
-    XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
-    idx += brk;
-  } else {
-    XPUSHs(sv_2mortal(newSVpvn("", 0)));
-  }
-
-  // query
-  if (src[idx] == '?') {
-    ++idx; // skip past ?
-    brk = strcspn(&src[idx], "#");
-    if (brk > 0) {
-      XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
-      idx += brk;
+    // query
+    if (src[idx] == '?') {
+      ++idx; // skip past ?
+      brk = strcspn(&src[idx], "#");
+      if (brk > 0) {
+        XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
+        idx += brk;
+      } else {
+        XPUSHs(sv_2mortal(newSVpvn("", 0)));
+      }
     } else {
       XPUSHs(&PL_sv_undef);
     }
-  } else {
-    XPUSHs(&PL_sv_undef);
-  }
 
-  // fragment
-  if (src[idx] == '#') {
-    ++idx; // skip past #
-    brk = len - idx;
-    if (brk > 0) {
-      XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
+    // fragment
+    if (src[idx] == '#') {
+      ++idx; // skip past #
+      brk = len - idx;
+      if (brk > 0) {
+        XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
+      } else {
+        XPUSHs(sv_2mortal(newSVpvn("", 0)));
+      }
     } else {
       XPUSHs(&PL_sv_undef);
     }
-  } else {
-    XPUSHs(&PL_sv_undef);
   }
 
   PUTBACK;
+}
+
+/*
+ * Collapses dotted segments in a path string based on the rules defined in RFC
+ * 3986 section 5.2.
+ */
+static
+void remove_dot_segments(pTHX_ uri_str_t *out, const char *path, size_t len) {
+  if (len == 0) {
+    return;
+  }
+
+  size_t brk, idx = 0;
+  char in[len];
+  Copy(path, in, len + 1, char);
+
+  while (idx < len) {
+    // in begins with "./" or "../": ignore prefix completely
+    if (strncmp(&in[idx], "./", 2) == 0) {
+      idx += 2;
+    }
+    else if (strncmp(&in[idx], "../", 3) == 0) {
+      idx += 3;
+    }
+
+    // in begins with /./: replace with /
+    else if (strncmp(&in[idx], "/./", 3) == 0) {
+      idx += 2; // inc to the final / in /./ instead of editing the buffer
+    }
+
+    // in begins with /. and . is a complete segment: replace with /
+    else if (strncmp(&in[idx], "/.", 2) == 0 && idx + 2 == len) {
+      idx += 1;
+      in[idx] = '/';
+    }
+
+    // in begins with /../: replace with /, remove final segment from out
+    else if (strncmp(&in[idx], "/../", 4) == 0) {
+      idx += 3; // inc to the final / in /./ instead of editing the buffer
+      str_rtrim(aTHX_ out, '/');
+    }
+
+    // in begins with /.. and .. is a complete $in segment: replace with /, remove final segment from out
+    else if (strncmp(&in[idx], "/..", 3) == 0 && idx + 3 == len) {
+      idx += 2;
+      in[idx] = '/';
+      str_rtrim(aTHX_ out, '/');
+    }
+
+    // in is "." or "..": done
+    else if ((in[idx] == '.' && idx + 1 == len)
+          || (in[idx] == '.' && in[idx + 1] == '.' && idx + 2 == len)) {
+      break;
+    }
+
+    // else copy everything up to but not including the next '/' from in to out
+    else {
+      if (in[idx] == '/') {
+        brk = minnum(len - idx, 1 + strncspn(&in[idx + 1], len - idx, "/"));
+      }
+      else {
+        brk = strncspn(&in[idx], len - idx, "/");
+      }
+
+      str_append(aTHX_ out, &in[idx], brk);
+      idx += brk;
+    }
+  }
+}
+
+/*------------------------------------------------------------------------------
+ * Absolution
+ *
+ * As defined in https://www.rfc-editor.org/rfc/rfc3986.txt section 5.2
+ *----------------------------------------------------------------------------*/
+static
+void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
+  uri_t *rel    = URI(sv_uri);
+  uri_t *base   = URI(sv_base);
+  uri_t *target = URI(sv_target);
+
+  // Relative URIs may begin with // to indicate an authority section without a
+  // scheme, which is illegal in standard URI syntax (authority may only come
+  // after a scheme, which is required, separated by //). This workaround helps
+  // the parser along by identifying the authority section as such.
+  if (rel->scheme->length == 0
+   && rel->host->length == 0
+   && rel->path->length >= 2
+   && strncmp(rel->path->string, "//", 2) == 0)
+  {
+    SV *fixed = newSVpvn("x:", 2);
+    sv_catsv(fixed, sv_2mortal(to_string(aTHX_ sv_uri)));
+
+    SV *sv_tmp = sv_2mortal(new(aTHX_ "URI::Fast", sv_2mortal(fixed), 0));
+    rel = URI(sv_tmp);
+
+    str_clear(aTHX_ rel->scheme);
+  }
+
+  if (rel->scheme->length != 0) {
+    remove_dot_segments(aTHX_ target->path, rel->path->string, rel->path->length);
+    str_copy(aTHX_ rel->scheme, target->scheme);
+    str_copy(aTHX_ rel->usr,    target->usr);
+    str_copy(aTHX_ rel->pwd,    target->pwd);
+    str_copy(aTHX_ rel->host,   target->host);
+    str_copy(aTHX_ rel->port,   target->port);
+    str_copy(aTHX_ rel->query,  target->query);
+  }
+  else {
+    if (rel->usr->length > 0 || rel->host->length > 0) {
+      remove_dot_segments(aTHX_ target->path, rel->path->string, rel->path->length);
+      str_copy(aTHX_ rel->usr,    target->usr);
+      str_copy(aTHX_ rel->pwd,    target->pwd);
+      str_copy(aTHX_ rel->host,   target->host);
+      str_copy(aTHX_ rel->port,   target->port);
+      str_copy(aTHX_ rel->query,  target->query);
+    }
+    else {
+      if (rel->path->length == 0) {
+        str_copy(aTHX_ base->path, target->path);
+
+        if (rel->query->length != 0) {
+          str_copy(aTHX_ rel->query, target->query);
+        } else {
+          str_copy(aTHX_ base->query, target->query);
+        }
+      }
+      else {
+        if (rel->path->string[0] == '/') {
+          remove_dot_segments(aTHX_ target->path, rel->path->string, rel->path->length);
+        }
+        else {
+          uri_str_t *merged = str_new(aTHX_ rel->path->length + base->path->length);
+
+          if (base->scheme->length > 0 && base->path->length == 0) {
+            str_append(aTHX_ merged, "/", 1);
+            str_append(aTHX_ merged, rel->path->string, rel->path->length);
+          }
+          else {
+            if (str_index(aTHX_ base->path, "/", 1) >= 0) {
+              // truncate base path at right-most /, inclusive
+              str_append(aTHX_ merged, base->path->string, base->path->length);
+              str_rtrim(aTHX_ merged, '/');
+            } else {
+              // if there is no / in the base path, truncate it completely
+            }
+
+            str_append(aTHX_ merged, "/", 1);
+            str_append(aTHX_ merged, rel->path->string, rel->path->length);
+          }
+
+          remove_dot_segments(aTHX_ target->path, merged->string, merged->length);
+          str_free(aTHX_ merged);
+        }
+
+        str_copy(aTHX_ rel->query, target->query);
+      }
+
+      str_copy(aTHX_ base->usr,  target->usr);
+      str_copy(aTHX_ base->pwd,  target->pwd);
+      str_copy(aTHX_ base->host, target->host);
+      str_copy(aTHX_ base->port, target->port);
+    }
+
+    str_copy(aTHX_ base->scheme, target->scheme);
+  }
+
+  str_copy(aTHX_ rel->frag, target->frag);
+}
+
+/*
+ * Uppercases a 3-digit hex sequence, if present, in the first 3 indices of
+ * *buf. It is the caller's responsibility to ensure that *buf is at least 3
+ * chars in length.
+ */
+static inline
+bool uc_hex_3ch(pTHX_ char *buf) {
+  if (buf[0] != '%') return 0;
+  buf[1] = toUPPER(buf[1]);
+  buf[2] = toUPPER(buf[2]);
+  return 1;
+}
+
+/*
+ * Uppercases 3-character hex codes over an entire uri_str_t.
+ */
+static inline
+void uc_hex(pTHX_ uri_str_t *str) {
+  size_t i = 0;
+  while (i < str->length) {
+    if (i + 2 < str->length && uc_hex_3ch(aTHX_ &str->string[i]) == 1) {
+      i += 3;
+    } else {
+      ++i;
+    }
+  }
+}
+
+/*
+ * Performs minimal normalization. Scheme and hostname are lower cased. All
+ * members are scanned for lower case percent-encoded sequences.
+ */
+static
+void normalize(pTHX_ SV *uri_obj) {
+  uri_t *uri = URI(uri_obj);
+  size_t i;
+
+  // (6.2.2.1) lower case scheme
+  for (i = 0; i < uri->scheme->length; ++i) {
+    uri->scheme->string[i] = toLOWER(uri->scheme->string[i]);
+  }
+
+  // (6.2.2.1) lower case hostname
+  for (i = 0; i < uri->host->length; ++i) {
+    uri->host->string[i] = toLOWER(uri->host->string[i]);
+  }
+
+  // (6.2.2) remove dot segments from path
+  uri_str_t *tmp = str_new(aTHX_ uri->path->length);
+  remove_dot_segments(aTHX_ tmp, uri->path->string, uri->path->length);
+  str_free(aTHX_ uri->path);
+  uri->path = tmp;
+
+  // (6.2.2.1) upper case hex codes in each section of the uri
+  uc_hex(aTHX_ uri->scheme);
+  uc_hex(aTHX_ uri->query);
+  uc_hex(aTHX_ uri->path);
+  uc_hex(aTHX_ uri->host);
+  uc_hex(aTHX_ uri->port);
+  uc_hex(aTHX_ uri->frag);
+  uc_hex(aTHX_ uri->usr);
+  uc_hex(aTHX_ uri->pwd);
+
+  // TODO (6.2.2.2) decode any percent-encoded sequences decoding to unreserved
+  // characters.
 }
 
 
@@ -1565,29 +1936,35 @@ MODULE = URI::Fast  PACKAGE = URI::Fast
 
 PROTOTYPES: DISABLE
 
-VERSIONCHECK: ENABLE
+FALLBACK: TRUE
 
 #-------------------------------------------------------------------------------
 # URL-encoding
 #-------------------------------------------------------------------------------
 SV* encode(in, ...)
   SV *in
-    PREINIT:
-      SV *temp = NULL;
-    CODE:
-      if (items > 1) {
-        temp = ST(1);
-      }
-      RETVAL = encode(aTHX_ in, temp);
-    OUTPUT:
-      RETVAL
+  ALIAS:
+    uri_encode = 1
+    url_encode = 2
+  PREINIT:
+    SV *temp = NULL;
+  CODE:
+    if (items > 1) {
+      temp = ST(1);
+    }
+    RETVAL = encode(aTHX_ in, temp);
+  OUTPUT:
+    RETVAL
 
 SV* decode(in)
   SV* in
-    CODE:
-      RETVAL = decode(aTHX_ in);
-    OUTPUT:
-      RETVAL
+  ALIAS:
+    uri_decode = 1
+    url_decode = 2
+  CODE:
+    RETVAL = decode(aTHX_ in);
+  OUTPUT:
+    RETVAL
 
 #-------------------------------------------------------------------------------
 # Constructors and destructors
@@ -1595,16 +1972,14 @@ SV* decode(in)
 SV* new(class, uri_str)
   const char* class
   SV* uri_str
+  ALIAS:
+    new_iri = 1
   CODE:
-    RETVAL = new(aTHX_ class, uri_str, 0);
-  OUTPUT:
-    RETVAL
-
-SV* new_iri(class, uri_str)
-  const char* class;
-  SV* uri_str
-  CODE:
-    RETVAL = new(aTHX_ "URI::Fast::IRI", uri_str, 1);
+    if (ix == 1) {
+      RETVAL = new(aTHX_ "URI::Fast::IRI", uri_str, 1);
+    } else {
+      RETVAL = new(aTHX_ class, uri_str, 0);
+    }
   OUTPUT:
     RETVAL
 
@@ -1612,6 +1987,28 @@ void DESTROY(uri_obj)
   SV* uri_obj
   CODE:
     DESTROY(aTHX_ uri_obj);
+
+SV* uri(...)
+  ALIAS:
+    iri   = 1
+    clone = 2
+  PREINIT:
+    SV *str;
+  CODE:
+    if (items > 0) {
+      if (sv_isobject(ST(0)) && sv_derived_from(ST(0), "URI::Fast")) {
+        str = sv_2mortal(to_string(aTHX_ ST(0)));
+      } else {
+        str = ST(0);
+      }
+    }
+    else {
+      str = sv_2mortal(newSVpvn("", 0));
+    }
+
+    RETVAL = new(aTHX_ (ix == 1) ? "URI::Fast::IRI" : "URI::Fast", str, (ix == 1) ? 1 : 0);
+  OUTPUT:
+    RETVAL
 
 
 #-------------------------------------------------------------------------------
@@ -1728,16 +2125,10 @@ SV* raw_port(uri_obj)
   OUTPUT:
     RETVAL
 
-#-------------------------------------------------------------------------------
-# Decoding getters
-#-------------------------------------------------------------------------------
-SV* get_scheme(uri_obj)
-  SV *uri_obj
-  CODE:
-    RETVAL = get_scheme(aTHX_ uri_obj);
-  OUTPUT:
-    RETVAL
 
+#-------------------------------------------------------------------------------
+# Compound getters
+#-------------------------------------------------------------------------------
 SV* get_path(uri_obj)
   SV *uri_obj
   CODE:
@@ -1752,41 +2143,6 @@ SV* get_query(uri_obj)
   OUTPUT:
     RETVAL
 
-SV* get_frag(uri_obj)
-  SV *uri_obj
-  CODE:
-    RETVAL = get_frag(aTHX_ uri_obj);
-  OUTPUT:
-    RETVAL
-
-SV* get_usr(uri_obj)
-  SV *uri_obj
-  CODE:
-    RETVAL = get_usr(aTHX_ uri_obj);
-  OUTPUT:
-    RETVAL
-
-SV* get_pwd(uri_obj)
-  SV *uri_obj
-  CODE:
-    RETVAL = get_pwd(aTHX_ uri_obj);
-  OUTPUT:
-    RETVAL
-
-SV* get_host(uri_obj)
-  SV *uri_obj
-  CODE:
-    RETVAL = get_host(aTHX_ uri_obj);
-  OUTPUT:
-    RETVAL
-
-SV* get_port(uri_obj)
-  SV *uri_obj
-  CODE:
-    RETVAL = get_port(aTHX_ uri_obj);
-  OUTPUT:
-    RETVAL
-
 SV* get_auth(uri_obj)
   SV *uri_obj
   CODE:
@@ -1794,10 +2150,6 @@ SV* get_auth(uri_obj)
   OUTPUT:
     RETVAL
 
-
-#-------------------------------------------------------------------------------
-# Compound getters
-#-------------------------------------------------------------------------------
 SV* split_path(uri)
   SV* uri
   CODE:
@@ -1829,14 +2181,8 @@ SV* get_param(uri, sv_key)
 
 
 #-------------------------------------------------------------------------------
-# Setters
+# Compound setters
 #-------------------------------------------------------------------------------
-void set_scheme(uri_obj, value)
-  SV *uri_obj
-  SV *value
-  CODE:
-    set_scheme(aTHX_ uri_obj, value);
-
 void set_auth(uri_obj, value)
   SV *uri_obj
   SV *value
@@ -1861,36 +2207,6 @@ void set_query(uri_obj, value)
   CODE:
     set_query(aTHX_ uri_obj, value);
 
-void set_frag(uri_obj, value)
-  SV *uri_obj
-  SV *value
-  CODE:
-    set_frag(aTHX_ uri_obj, value);
-
-void set_usr(uri_obj, value)
-  SV *uri_obj
-  SV *value
-  CODE:
-    set_usr(aTHX_ uri_obj, value);
-
-void set_pwd(uri_obj, value)
-  SV *uri_obj
-  SV *value
-  CODE:
-    set_pwd(aTHX_ uri_obj, value);
-
-void set_host(uri_obj, value)
-  SV *uri_obj
-  SV *value
-  CODE:
-    set_host(aTHX_ uri_obj, value);
-
-void set_port(uri_obj, value)
-  SV *uri_obj
-  SV *value
-  CODE:
-    set_port(aTHX_ uri_obj, value);
-
 void set_param(uri, sv_key, sv_values, sv_separator)
   SV *uri
   SV *sv_key
@@ -1899,20 +2215,104 @@ void set_param(uri, sv_key, sv_values, sv_separator)
   CODE:
     set_param(aTHX_ uri, sv_key, sv_values, sv_separator);
 
-void update_query_keyset(uri, sv_key_set, sv_separator)
-  SV *uri
+void query_keyset(self, sv_key_set, ...)
+  SV *self
   SV *sv_key_set
-  SV *sv_separator
   CODE:
-    update_query_keyset(aTHX_ uri, sv_key_set, sv_separator);
+    SV *sv_separator = items > 2 ? ST(2) : sv_2mortal(newSVpvn("&", 1));
+    update_query_keyset(aTHX_ self, sv_key_set, sv_separator);
+
+
+#-------------------------------------------------------------------------------
+# Unified accessors
+#-------------------------------------------------------------------------------
+SV* scheme(self, ...)
+  SV *self
+  CODE:
+    if (items > 1) set_scheme(aTHX_ self, ST(1));
+    RETVAL = get_scheme(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
+SV* usr(self, ...)
+  SV *self
+  CODE:
+    if (items > 1) set_usr(aTHX_ self, ST(1));
+    RETVAL = get_usr(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
+SV* pwd(self, ...)
+  SV *self
+  CODE:
+    if (items > 1) set_pwd(aTHX_ self, ST(1));
+    RETVAL = get_pwd(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
+SV* host(self, ...)
+  SV *self
+  CODE:
+    if (items > 1) set_host(aTHX_ self, ST(1));
+    RETVAL = get_host(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
+SV* port(self, ...)
+  SV *self
+  CODE:
+    if (items > 1) set_port(aTHX_ self, ST(1));
+    RETVAL = get_port(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
+SV* frag(self, ...)
+  SV *self
+  CODE:
+    if (items > 1) set_frag(aTHX_ self, ST(1));
+    RETVAL = get_frag(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
 
 #-------------------------------------------------------------------------------
 # Extras
 #-------------------------------------------------------------------------------
-SV* to_string(uri_obj)
-  SV* uri_obj
+SV* to_string(self, ...)
+  SV *self
+  ALIAS:
+    as_string = 1
+  OVERLOAD:
+    to_string \"\"
   CODE:
-    RETVAL = to_string(aTHX_ uri_obj);
+    RETVAL = to_string(aTHX_ self);
+  OUTPUT:
+    RETVAL
+
+SV* normalize(uri)
+  SV *uri
+  ALIAS:
+    canonical = 1
+  CODE:
+    normalize(aTHX_ uri);
+  OUTPUT:
+    uri
+
+SV* absolute(uri, base)
+  SV *uri
+  SV *base
+  PREINIT:
+    SV *sv_target;
+  CODE:
+    sv_target = new(aTHX_ "URI::Fast", sv_2mortal(newSVpvn("", 0)), 0);
+
+    if (!sv_isobject(base) || !sv_derived_from(base, "URI::Fast")) {
+      absolute(aTHX_ sv_target, uri, sv_2mortal(new(aTHX_ "URI::Fast", base, 0)));
+    } else {
+      absolute(aTHX_ sv_target, uri, base);
+    }
+
+    RETVAL = sv_target;
   OUTPUT:
     RETVAL
 

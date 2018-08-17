@@ -11,22 +11,22 @@ use cPanel::TaskQueue                ();
 use cPanel::TaskQueue::Scheduler     ();
 use cPanel::TaskQueue::PluginManager ();
 use Getopt::Long;
-use Unix::PID                      0.21;
-use POSIX                            ();
-use File::Spec                       ();
+use Unix::PID 0.21;
+use POSIX      ();
+use File::Spec ();
 
 main() unless caller;
 
 sub main {
-    my $queue_dir  = '.';
-    my $qname      = 'main';
+    my $queue_dir = '.';
+    my $qname     = 'main';
     my $sname;
     my $plugindirs = [];
     my $namespaces = [];
     my $plugins    = [];
     my $logfile;
 
-    handle_config_file( 'taskqueue.cfg' );
+    handle_config_file('taskqueue.cfg');
 
     GetOptions(
         'dir=s',        \$queue_dir,
@@ -42,8 +42,8 @@ sub main {
     die "Missing plugin directories.\n" unless @{$plugindirs};
 
     # Make directories absolute.
-    $plugindirs = [ map {  File::Spec->rel2abs( $_ ) } @{$plugindirs} ];
-    $queue_dir = File::Spec->rel2abs( $queue_dir );
+    $plugindirs = [ map { File::Spec->rel2abs($_) } @{$plugindirs} ];
+    $queue_dir = File::Spec->rel2abs($queue_dir);
 
     unshift @INC, @{$plugindirs} if @{$plugindirs};
     $sname = $qname unless defined $sname;
@@ -51,26 +51,28 @@ sub main {
     # Default wait time is a tradeoff:
     #   - smaller number is more responsive at picking up new tasks
     #   - larger number uses less CPU while waiting for something to happen.
-    my $wait_time = 30;
+    my $wait_time  = 30;
     my $is_running = 1;
-    my $pidobj = Unix::PID->new({ use_open3 => 0 });
-    my $pid_file = $queue_dir . '/taskqueued.pid';
+    my $pidobj     = Unix::PID->new( { use_open3 => 0 } );
+    my $pid_file   = $queue_dir . '/taskqueued.pid';
 
     $SIG{'HUP'} = sub { $is_running = 0; };
     $SIG{'CHLD'} = \&reaper;
 
     # Daemon startup
     print "==> TaskQueue Processing Daemon started\n";
-    exit if ( my $pid = fork() ); # Background myself.
+    exit if ( my $pid = fork() );    # Background myself.
     die "Failed to fork TaskQueue Processing Daemon\n" unless defined $pid;
+
     # In order to remove the race condition, we need to test again after the fork.
     # This use of Unix::PID removes the race condition when creating the pidfile.
-    if ( !$pidobj->pid_file_no_unlink( $pid_file ) ) {
+    if ( !$pidobj->pid_file_no_unlink($pid_file) ) {
         print "TaskQueue Processing Daemon already running, exiting.\n";
         exit 0;
     }
+
     # Finish launching daemon.
-    chdir( '/');
+    chdir('/');
     POSIX::setsid();
     $logfile ||= "$queue_dir/${qname}_error.log";
     open( STDOUT, '>>', $logfile ) or die "Unable to open log file '$logfile': $!\n";
@@ -78,24 +80,28 @@ sub main {
 
     load_plugins( $plugindirs, $namespaces, $plugins );
 
-    my $queue = cPanel::TaskQueue->new({
-        name => $qname,
-        state_dir => $queue_dir,
-        max_running => 1,
-    });
-    my $sched = cPanel::TaskQueue::Scheduler->new({
-        name => $qname,
-        state_dir => $queue_dir,
-    });
+    my $queue = cPanel::TaskQueue->new(
+        {
+            name        => $qname,
+            state_dir   => $queue_dir,
+            max_running => 1,
+        }
+    );
+    my $sched = cPanel::TaskQueue::Scheduler->new(
+        {
+            name      => $qname,
+            state_dir => $queue_dir,
+        }
+    );
 
     my $retry_count = 0;
 
     # Processing loop
     # Each pass thru the loop will process one task (if any are available)
     #   - if any scheduled tasks are ready to go into the queue, we do that first
-    while ( $is_running ) {
+    while ($is_running) {
         eval {
-            $sched->process_ready_tasks( $queue );
+            $sched->process_ready_tasks($queue);
             if ( $queue->has_work_to_do() ) {
                 $queue->process_next_task();
             }
@@ -108,18 +114,19 @@ sub main {
             }
             $retry_count = 0;
         };
-        if ( $@ ) {
+        if ($@) {
             warn "Exception detected: $@";
             if ( $retry_count++ > 5 ) {
                 warn "Maximum exception count reached. Shutting down taskqueued.";
                 last;
             }
+
             # pause to allow situation to recover
             sleep 15;
         }
     }
 
-    unlink $pid_file if $$ == $pidobj->get_pid_from_pidfile( $pid_file ) || !$pidobj->is_pidfile_running( $pid_file );
+    unlink $pid_file if $$ == $pidobj->get_pid_from_pidfile($pid_file) || !$pidobj->is_pidfile_running($pid_file);
 
     exit 0;
 }
@@ -140,10 +147,10 @@ sub reaper {
 }
 
 sub load_plugins {
-    my ($plugindirs, $namespaces, $plugins) = @_;
+    my ( $plugindirs, $namespaces, $plugins ) = @_;
     if ( @{$plugins} ) {
         foreach my $modname ( @{$plugins} ) {
-            cPanel::TaskQueue::PluginManager::load_plugin_by_name( $modname );
+            cPanel::TaskQueue::PluginManager::load_plugin_by_name($modname);
         }
     }
     else {
@@ -160,7 +167,7 @@ sub handle_config_file {
         $config = $1;
         shift @ARGV;
     }
-    unshift @ARGV, config_file( $config ) if -e $config;
+    unshift @ARGV, config_file($config) if -e $config;
 }
 
 sub config_file {

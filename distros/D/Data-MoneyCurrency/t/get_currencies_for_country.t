@@ -1,5 +1,4 @@
 #!perl -T
-use 5.006;
 use strict;
 use warnings;
 use utf8;
@@ -12,7 +11,6 @@ binmode STDERR, ":encoding(UTF-8)";
 binmode Test::More->builder->output, ":encoding(UTF-8)";
 binmode Test::More->builder->failure_output, ":encoding(UTF-8)"; 
 binmode Test::More->builder->todo_output, ":encoding(UTF-8)";
-
 
 is_deeply(get_currencies_for_country('fr'), ['eur'], 'Test France');
 is_deeply(get_currencies_for_country('us'), ['usd'], 'Test USA');

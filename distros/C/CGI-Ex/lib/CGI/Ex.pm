@@ -25,7 +25,7 @@ our ($VERSION,
 use base qw(Exporter);
 
 BEGIN {
-    $VERSION               = '2.46';
+    $VERSION               = '2.47';
     $PREFERRED_CGI_MODULE  ||= 'CGI';
     @EXPORT = ();
     @EXPORT_OK = qw(get_form
@@ -357,7 +357,7 @@ sub set_cookie {
     my $cookie = "" . $obj->cookie(%$args);
 
     if ($self->content_typed) {
-        print "<meta http-equiv=\"Set-Cookie\" content=\"$cookie\" />\n";
+        print "<script>document.cookie = '$cookie'</script>\n";
     } else {
         if (my $r = $self->apache_request) {
             if ($self->is_mod_perl_1) {

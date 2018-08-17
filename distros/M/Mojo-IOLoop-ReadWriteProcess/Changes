@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.23 2018-08-14T07:25:56Z
+
+   - Add prctl syscall codes for ppc64le and aarch64
+   - Full test suite now runs only on travis
+
 0.22 2018-08-07T13:29:57Z
 
    - Disable experimental shared tests by default

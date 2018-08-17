@@ -42,22 +42,22 @@ sub new {
     'global');
   $state->assignValue(STRICT => (defined $options{strict} ? $options{strict} : 0),
     'global');
-  $state->assignValue(INCLUDE_COMMENTS => (defined $options{includeComments} ? $options{includeComments} : 1),
+  $state->assignValue(INCLUDE_COMMENTS => (defined $options{includecomments} ? $options{includecomments} : 1),
     'global');
   $state->assignValue(DOCUMENTID => (defined $options{documentid} ? $options{documentid} : ''),
     'global');
   $state->assignValue(SEARCHPATHS => [map { pathname_absolute(pathname_canonical($_)) }
-        @{ $options{searchpaths} || [] }],
+        '.', @{ $options{searchpaths} || [] }],
     'global');
   $state->assignValue(GRAPHICSPATHS => [map { pathname_absolute(pathname_canonical($_)) }
         @{ $options{graphicspaths} || [] }], 'global');
-  $state->assignValue(INCLUDE_STYLES => $options{includeStyles} || 0, 'global');
+  $state->assignValue(INCLUDE_STYLES => $options{includestyles} || 0, 'global');
   $state->assignValue(PERL_INPUT_ENCODING => $options{inputencoding}) if $options{inputencoding};
   $state->assignValue(NOMATHPARSE => $options{nomathparse} || 0, 'global');
   return bless { state => $state,
     nomathparse => $options{nomathparse} || 0,
     preload => $options{preload},
-    }, $class; }
+  }, $class; }
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # High-level API.
@@ -65,9 +65,9 @@ sub new {
 sub convertAndWriteFile {
   my ($self, $file) = @_;
   $file =~ s/\.tex$//;
-  my $dom = $self->convertFile($file);
-  $dom->toFile("$file.xml", 1) if $dom;
-  return $dom; }
+  my $doc = $self->convertFile($file);
+  $doc->getDocument->toFile("$file.xml", 1) if $doc;
+  return $doc; }
 
 sub convertFile {
   my ($self, $file) = @_;
@@ -89,7 +89,7 @@ sub showProfile {
   return
     $self->withState(sub {
       LaTeXML::Core::Definition::showProfile();    # Show profile (if any)
-      }); }
+    }); }
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Mid-level API.
@@ -116,12 +116,15 @@ sub digestFile {
   }
   else {
     $request =~ s/\.\Q$MODE_EXTENSION{$mode}\E$//;
-    if (my $pathname = pathname_find($request, types => [$MODE_EXTENSION{$mode}, ''])) {
+    if (my $pathname = pathname_find($request, types => [$MODE_EXTENSION{$mode}, ''],
+        paths => $$self{state}->lookupValue('SEARCHPATHS'))) {
       $request = $pathname;
       ($dir, $name, $ext) = pathname_split($request); }
     else {
       $self->withState(sub {
-          Fatal('missing_file', $request, undef, "Can't find $mode file $request"); }); } }
+          Fatal('missing_file', $request, undef, "Can't find $mode file $request",
+            LaTeXML::Package::maybeReportSearchPaths()
+          ); }); } }
   return
     $self->withState(sub {
       my ($state) = @_;
@@ -158,6 +161,7 @@ sub finishDigestion {
   my @stuff   = ();
   while ($stomach->getGullet->getMouth->hasMoreInput) {
     push(@stuff, $stomach->digestNextBody); }
+  # Note that \end{document} will generally handle these cases as a Warning
   if (my $env = $state->lookupValue('current_environment')) {
     Error('expected', "\\end{$env}", $stomach,
       "Input ended while environment $env was open"); }
@@ -196,9 +200,10 @@ sub convertDocument {
       if (my $paths = $state->lookupValue('SEARCHPATHS')) {
         if ($state->lookupValue('INCLUDE_COMMENTS')) {
           $document->insertPI('latexml', searchpaths => join(',', @$paths)); } }
-      foreach my $preload (@{ $$self{preload} }) {
+      foreach my $preload_by_reference (@{ $$self{preload} }) {
+        my $preload = $preload_by_reference; # copy preload value, as we want to preserve the hash as-is, for (potential) future daemon calls
         next if $preload =~ /\.pool$/;
-        my $options = undef;                                 # Stupid perlcritic policy
+        my $options = undef;                 # Stupid perlcritic policy
         if ($preload =~ s/^\[([^\]]*)\]//) { $options = $1; }
         if ($preload =~ s/\.cls$//) {
           $document->insertPI('latexml', class => $preload, ($options ? (options => $options) : ())); }
@@ -216,7 +221,7 @@ sub convertDocument {
           $rule->rewrite($document, $document->getDocument->documentElement); }
         NoteEnd("Rewriting"); }
 
-      LaTeXML::MathParser->new()->parseMath($document) unless $$self{nomathparse};
+      LaTeXML::MathParser->new(lexematize => $state->lookupValue('LEXEMATIZE_MATH'))->parseMath($document) unless $$self{nomathparse};
       NoteBegin("Finalizing");
       my $xmldoc = $document->finalize();
       NoteEnd("Finalizing");
@@ -310,7 +315,7 @@ Creates a new LaTeXML object for transforming TeX files into XML.
  strict     : If true, undefined control sequences and
               invalid document constructs give fatal
               errors, instead of warnings.
- includeComments : If false, comments will be excluded
+ includecomments : If false, comments will be excluded
               from the result document.
  preload    : an array of modules to preload
  searchpath : an array of paths to be searched for Packages

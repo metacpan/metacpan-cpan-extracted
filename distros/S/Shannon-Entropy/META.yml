@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Import::Export: '0.04'
+  Import::Export: '0.08'
   perl: '5.006'
-version: '1.000000'
+version: '1.010101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,13 +2,9 @@
 use strict;
 use warnings;
 
-BEGIN {
-  our @INC;
-  unshift(@INC, '../../lib', '../lib');
-};
-
 use Test::More;
 use Test::Mojo;
+use Test::Output;
 
 use Mojolicious::Lite;
 use Mojo::ByteStream 'b';
@@ -18,17 +14,32 @@ my $app = $t->app;
 
 $app->plugin('Util::Endpoint');
 
+my ($level, $msg);
+$app->log->on(
+  message => sub {
+    (my $l2, $level, $msg) = @_;
+  });
+
 my $endpoint_host = 'endpoi.nt';
 
 # Set endpoint
 my $r_test = $app->routes->route('/test');
-$r_test->endpoint('test1' =>
-		    {
-		      host   => $endpoint_host,
-		      scheme => 'https'
-		    });
+$r_test->endpoint(
+  'test1' =>
+    {
+      host   => $endpoint_host,
+      scheme => 'https'
+    });
 
 $r_test->route('/fun')->name('fun');
+
+
+# Test redefinition
+my $lev = $app->log->level;
+$app->log->level('debug');
+ok($app->routes->route('/nothing')->endpoint('test1'), 'Route is returned');
+is($msg, 'Route endpoint "test1" already defined', 'Log level correct');
+$app->log->level($lev);
 
 is($app->endpoint('test1'),
    "https://$endpoint_host/test",
@@ -65,6 +76,16 @@ is($app->endpoint('test3', {var1 => 'c', var2 => 'd'}),
    'http://'.$endpoint_host.'/test?a=c&b=d',
    'endpoint 6');
 
+
+$app->routes->route('/define')->endpoint('testport' => {
+  port => '6666',
+  host   => $endpoint_host,
+});
+
+is($app->endpoint('testport'),
+   "http://endpoi.nt:6666/define",
+   'endpoint 1');
+
 $r_test = $app->routes->route('/suggest');
 $r_test->endpoint(test4 => {
 		      host => $endpoint_host,
@@ -90,6 +111,7 @@ is($app->endpoint('test4' => {
                   }),
    'http://'.$endpoint_host.'/suggest?q=simpsons',
    'endpoint 10');
+
 
 my $acct    = 'acct:akron@sojolicio.us';
 my $btables = 'hmm&bobby=tables';
@@ -215,6 +237,7 @@ is($app->endpoint('test10' => { try => 'Akron', '?' => undef}),
    'http://grimms-abenteuer.de/test?q=Akron',
    'Define by string');
 
+
 # Test with placeholders
 my $r_test_2 = $app->routes->route('/:placeholder');
 $r_test_2->endpoint('check');
@@ -305,7 +328,7 @@ $r_test = $app->routes->route('/test2');
 my $r_test2 = $r_test->route('/:fine');
 my $r_test3 = $r_test2->route('/peter-*huhu');
 my $r_test4 = $r_test3->route('/#all');
-my $r_test5 = $r_test4->route('/(*hui)', hui => qr{\d+});
+my $r_test5 = $r_test4->route('/*hui', hui => qr{\d+});
 
 $r_test5->endpoint('test-wildcards' =>
 		    {

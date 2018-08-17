@@ -5,7 +5,9 @@ use File::Spec::Functions 'file_name_is_absolute';
 use Mojo::IOLoop;
 use Mojo::Promise;
 
-use constant DEBUG => $ENV{MOJO_REDIS_DEBUG};
+use constant DEBUG                     => $ENV{MOJO_REDIS_DEBUG};
+use constant CONNECT_TIMEOUT           => $ENV{MOJO_REDIS_CONNECT_TIMEOUT} || 10;
+use constant SENTINELS_CONNECT_TIMEOUT => $ENV{MOJO_REDIS_SENTINELS_CONNECT_TIMEOUT} || CONNECT_TIMEOUT;
 
 has encoding => sub { Carp::confess('encoding is required in constructor') };
 has ioloop   => sub { Carp::confess('ioloop is required in constructor') };
@@ -47,21 +49,14 @@ sub _connect {
   my $self = shift;
   return $self if $self->{id};    # Connecting
 
-  $self->protocol->on_message($self->_parse_message_cb);
-  my $url  = $self->url;
-  my $db   = $url->path->[0];
-  my %args = (address => $url->host || 'localhost');
-
-  if (file_name_is_absolute $args{address}) {
-    $args{path} = delete $args{address};
-  }
-  else {
-    $args{port} = $url->port || 6379;
-  }
+  my $url = $self->{master_url} || $self->url;
+  return $self->_discover_master if !$self->{master_url} and $url->query->param('sentinel');
 
   Scalar::Util::weaken($self);
+  delete $self->{master_url};     # Make sure we forget master_url so we can reconnect
+  $self->protocol->on_message($self->_parse_message_cb);
   $self->{id} = $self->ioloop->client(
-    \%args,
+    $self->_connect_args($url, {port => 6379, timeout => CONNECT_TIMEOUT}),
     sub {
       return unless $self;
       my ($loop, $err, $stream) = @_;
@@ -73,8 +68,8 @@ sub _connect {
       $stream->on(error => $close_cb);
       $stream->on(read  => $self->_on_read_cb);
 
-      unshift @{$self->{write}}, [$self->_encode(SELECT => $db)]            if length $db;
-      unshift @{$self->{write}}, [$self->_encode(AUTH   => $url->password)] if length $url->password;
+      unshift @{$self->{write}}, [$self->_encode(SELECT => $url->path->[0])] if length $url->path->[0];
+      unshift @{$self->{write}}, [$self->_encode(AUTH   => $url->password)]  if length $url->password;
       $self->{stream} = $stream;
       $self->emit('connect');
       $self->_write;
@@ -82,6 +77,59 @@ sub _connect {
   );
 
   warn "[@{[$self->_id]}] CONNECTING $url (blocking=@{[$self->_loop_is_singleton ? 0 : 1]})\n" if DEBUG;
+  return $self;
+}
+
+sub _connect_args {
+  my ($self, $url, $defaults) = @_;
+  my %args = (address => $url->host || 'localhost');
+
+  if (file_name_is_absolute $args{address}) {
+    $args{path} = delete $args{address};
+  }
+  else {
+    $args{port} = $url->port || $defaults->{port};
+  }
+
+  $args{timeout} = $defaults->{timeout} || CONNECT_TIMEOUT;
+  return \%args;
+}
+
+sub _discover_master {
+  my $self      = shift;
+  my $url       = $self->url->clone;
+  my $sentinels = $url->query->every_param('sentinel');
+  my $timeout   = $url->query->param('sentinel_connect_timeout') || SENTINELS_CONNECT_TIMEOUT;
+
+  $url->host_port(shift @$sentinels);
+  $self->url->query->param(sentinel => [@$sentinels, $url->host_port]);    # Round-robin sentinel list
+  $self->protocol->on_message($self->_parse_message_cb);
+  $self->{id} = $self->ioloop->client(
+    $self->_connect_args($url, {port => 16379, timeout => $timeout}),
+    sub {
+      my ($loop, $err, $stream) = @_;
+      return unless $self;
+      return $self->_discover_master if $err;
+
+      $stream->timeout(0);
+      $stream->on(close => sub { $self->_discover_master unless $self->{master_url} });
+      $stream->on(error => sub { $self->_discover_master });
+      $stream->on(read  => $self->_on_read_cb);
+
+      $self->{stream} = $stream;
+      unshift @{$self->{write}}, [$self->_encode(AUTH => $url->password)] if length $url->password;
+      $self->write_p(SENTINEL => 'get-master-addr-by-name' => $self->url->host)->then(sub {
+        my $host_port = shift;
+        delete $self->{id};
+        return $self->_discover_master unless ref $host_port and @$host_port == 2;
+        $self->{master_url} = $self->url->clone->host($host_port->[0])->port($host_port->[1]);
+        $self->{stream}->close;
+        $self->_connect;
+      })->catch(sub { $self->_discover_master });
+    }
+  );
+
+  warn "[@{[$self->_id]}] SENTINEL DISCOVERY $url (blocking=@{[$self->_loop_is_singleton ? 0 : 1]})\n" if DEBUG;
   return $self;
 }
 

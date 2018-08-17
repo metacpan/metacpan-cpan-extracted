@@ -115,6 +115,9 @@ subtest autodetect_fork => sub {
 
 
 subtest subreaper => sub {
+  plan skip_all => "Skipped unless TEST_SUBREAPER is set"
+    unless $ENV{TEST_SUBREAPER};
+
   my $fired;
   my $status;
   my $orphans;
@@ -195,6 +198,10 @@ subtest subreaper => sub {
 };
 
 subtest subreaper_bash => sub {
+
+  plan skip_all => "Skipped unless TEST_SUBREAPER is set"
+    unless $ENV{TEST_SUBREAPER};
+
   my $fired;
   my $status;
   my $orphans;

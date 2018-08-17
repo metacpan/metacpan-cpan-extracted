@@ -4,6 +4,7 @@ examples/glyph-outline.pl
 examples/glyph-to-eps.pl
 examples/glyph-to-svg.pl
 examples/list-characters.pl
+examples/list-glyphs.pl
 examples/magick.pl
 examples/render-glyph.pl
 FreeType.xs
@@ -33,9 +34,11 @@ t/data/0041.8.8.600.600.0.pgm
 t/data/5x7.bdf
 t/data/5x7.fnt
 t/data/bdf_bitmaps.txt
+t/data/bdf_glyphs.txt
 t/data/copyright.txt
 t/data/OldStandard-Bold.otf
 t/data/Vera.ttf
+t/data/vera_characters.txt
 t/data/vera_glyphs.txt
 TODO
 typemap

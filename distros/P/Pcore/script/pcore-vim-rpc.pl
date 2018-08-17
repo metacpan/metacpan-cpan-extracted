@@ -3,59 +3,33 @@
 package main v0.1.0;
 
 use Pcore;
-use Pcore::AE::Handle;
 use Pcore::Util::Data qw[from_json to_json];
 use Pcore::Util::Text qw[decode_utf8 encode_utf8];
 use Pcore::Src::File;
 
-my $HDL = {};
-my $ID;
-
 my $cv = AE::cv;
 
-AnyEvent::Socket::tcp_server( '127.0.0.1', 55_555, \&on_accept );
+AnyEvent::Socket::tcp_server( '127.0.0.1', 55_555, Coro::unblock_sub { on_accept(@_) } );
 
 $cv->recv;
 
 sub on_accept ( $fh, $host, $port ) {
-    Pcore::AE::Handle->new(
-        fh         => $fh,
-        on_connect => sub ( $h, @ ) {
-            my $id = ++$ID;
+    my $h = P->handle($fh);
 
-            $h->{id} = $id;
+    while () {
+        my $msg = $h->read_line($LF);
 
-            $HDL->{$id} = $h;
+        last if !$msg;
 
-            $h->on_error( sub {
-                delete $HDL->{$id};
+        # decode message, ignore invalid json
+        eval { $msg = from_json $msg->$*; 1; } or last;
 
-                return;
-            } );
+        my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // q[] );
 
-            $h->on_read( sub ($h) {
-                $h->unshift_read(
-                    line => sub ( $h, $msg, $eol ) {
+        last if !$cmd || !main->can($cmd);
 
-                        # decode message, ignore invalid json
-                        eval { $msg = from_json $msg; 1; } or return;
-
-                        my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // q[] );
-
-                        return if !$cmd || !main->can($cmd);
-
-                        main->$cmd( $h, $msg->[0], $msg->[1] );
-
-                        return;
-                    }
-                );
-
-                return;
-            } );
-
-            return;
-        }
-    );
+        main->$cmd( $h, $msg->[0], $msg->[1] );
+    }
 
     return;
 }
@@ -89,7 +63,7 @@ sub CMD_src ( $self, $h, $id, $args ) {
         }
     ];
 
-    $h->push_write( $json->$* );
+    $h->write($json);
 
     return;
 }

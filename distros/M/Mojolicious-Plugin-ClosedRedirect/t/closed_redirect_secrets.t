@@ -3,6 +3,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 use Test::More;
 use Mojo::Util qw/url_escape/;
+use Test::Memory::Cycle;
 
 app->secrets(['123']);
 
@@ -47,6 +48,9 @@ $t->get_ok('/signed?fwd=' . url_escape($signed))
 # Rolling secrets!
 app->secrets(['456', '123']);
 
+# Reload plugin so secrets are in effect
+plugin 'ClosedRedirect';
+
 my $signed2 = $app->close_redirect_to('myname');
 isnt($signed, $signed2, 'Secrets differ');
 
@@ -57,6 +61,11 @@ $t->get_ok('/signed?fwd=' . url_escape($signed))
 $t->get_ok('/signed?fwd=' . url_escape($signed2))
   ->status_is(302)
   ->header_is('Location', $pure);
+
+{
+  local $SIG{__WARN__} = sub { };
+  memory_cycle_ok(app);
+};
 
 done_testing;
 __END__

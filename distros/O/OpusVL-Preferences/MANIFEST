@@ -39,9 +39,13 @@ lib/auto/OpusVL/FB11X/Preferences/root/templates/preferences/index.tt
 lib/auto/OpusVL/FB11X/Preferences/root/templates/preferences/pick_object.tt
 lib/auto/OpusVL/FB11X/Preferences/root/templates/preferences/values.tt
 lib/auto/OpusVL/Preferences/Schema/sql/MySQL/deploy/1/001-auto.sql
+lib/auto/OpusVL/Preferences/Schema/sql/MySQL/upgrade/1-2/001-auto.sql
 lib/auto/OpusVL/Preferences/Schema/sql/PostgreSQL/deploy/1/001-auto.sql
+lib/auto/OpusVL/Preferences/Schema/sql/PostgreSQL/upgrade/1-2/001-auto.sql
 lib/auto/OpusVL/Preferences/Schema/sql/SQLite/deploy/1/001-auto.sql
+lib/auto/OpusVL/Preferences/Schema/sql/SQLite/upgrade/1-2/001-auto.sql
 lib/auto/OpusVL/Preferences/Schema/sql/_source/deploy/1/001-auto.yml
+lib/auto/OpusVL/Preferences/Schema/sql/_source/deploy/2/001-auto.yml
 t/00-load.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

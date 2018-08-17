@@ -1,0 +1,9 @@
+Changes
+lib/Sub/Params.pm
+Makefile.PL
+MANIFEST			This list of files
+LICENSE
+README.pod
+t/sub-params.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

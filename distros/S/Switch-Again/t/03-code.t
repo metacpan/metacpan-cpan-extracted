@@ -15,9 +15,8 @@ my $switch = switch
 
 my $test = $switch->(1);
 is($test, 'truth');
-$test = $switch->(0);
+my $test = $switch->(0);
 is($test, 'lie');
 $test = $switch->(2);
 is($test, 'unknown');
-
 done_testing();

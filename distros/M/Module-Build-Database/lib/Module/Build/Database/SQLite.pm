@@ -33,7 +33,7 @@ use Cwd qw/abs_path/;
 
 use strict;
 use warnings;
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 __PACKAGE__->add_property(database_options => default => { name => "unknown" });
 __PACKAGE__->add_property(_tmp_db_dir         => default => "" );

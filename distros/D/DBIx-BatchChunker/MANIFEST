@@ -1,12 +1,13 @@
-CHANGES
 examples/basic.pl
 lib/DBIx/BatchChunker.pm
-LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
-README.md
-t/dbh-dbic.t
+t/construct.t
+t/dbh-dbic_storage.t
+t/dbh-legacy.t
+t/dbh.t
+t/dbic.t
 t/lib/CDTest.pm
 t/lib/CDTest/Schema.pm
 t/lib/CDTest/Schema/Result/Artist.pm
@@ -14,12 +15,8 @@ t/lib/CDTest/Schema/Result/ArtworkToArtist.pm
 t/lib/CDTest/Schema/Result/CD.pm
 t/lib/CDTest/Schema/Result/CDArtwork.pm
 t/lib/CDTest/Schema/Result/CDToProducer.pm
-t/lib/CDTest/Schema/Result/Collection.pm
-t/lib/CDTest/Schema/Result/Encoded.pm
-t/lib/CDTest/Schema/Result/Event.pm
 t/lib/CDTest/Schema/Result/Genre.pm
 t/lib/CDTest/Schema/Result/Image.pm
-t/lib/CDTest/Schema/Result/LinerNote.pm
 t/lib/CDTest/Schema/Result/Lyric.pm
 t/lib/CDTest/Schema/Result/LyricVersion.pm
 t/lib/CDTest/Schema/Result/Producer.pm
@@ -27,5 +24,12 @@ t/lib/CDTest/Schema/Result/Tag.pm
 t/lib/CDTest/Schema/Result/Track.pm
 t/lib/CDTest/Schema/Result/Year2000CD.pm
 t/lib/sqlite.sql
+xt/boilerplate.t
+xt/changes.t
+xt/compiles.t
+xt/pod-coverage.t
+xt/pod.t
+xt/strict.t
+xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

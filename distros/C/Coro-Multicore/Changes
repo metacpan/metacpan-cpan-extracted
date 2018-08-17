@@ -5,6 +5,16 @@ TODO: idle timeout, like IO::AIO
 TODO: add examples
 TODO: mysql perlmulticore more to do
 
+1.01 Tue Aug 14 18:52:05 CEST 2018
+	- attempt to port to strawberry perl, but it has too many broken functions
+          (non-working malloc, overrides setjmp with nonexistant PerlProc_setjmp etc.).
+	- do not require custom config for pthread on win32.
+        - usleep on some bsds does not support a time > 1e6, so use sleep+usleep :/
+
+1.0  Sun Aug 12 23:55:33 CEST 2018
+	- bump to 1.0, works in production for me.
+	- experimental fix for perl configs where JMPENV_JUMP requires THX.
+
 0.03 Thu Jan 18 17:43:14 CET 2018
 	- further USE_SOCKETS_AS_HANDLES fixes (Z59).
         - vastly improved documentation.

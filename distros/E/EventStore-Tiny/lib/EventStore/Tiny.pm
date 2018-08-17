@@ -17,7 +17,7 @@ use Data::Compare; # Exports Compare()
 $Storable::Deparse  = 1;
 $Storable::Eval     = 1;
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 use Class::Tiny {
     registry        => sub {{}},
@@ -79,20 +79,31 @@ sub init_state {
 
 sub snapshot {
     my ($self, $timestamp) = @_;
-    my $state = $self->init_state;
 
     # Work on latest timestamp if not specified
     $timestamp //= $self->events->last_timestamp;
     my $es = $self->events->before($timestamp);
 
     # Check if the cached snapshot can be used
+    my $state;
     my $cached_sn = $self->_cached_snapshot;
     if (defined $cached_sn and $cached_sn->timestamp <= $timestamp) {
-        $state  = clone $cached_sn->state;
-        $es     = $es->after($cached_sn->timestamp);
+
+        # Calculate what still needs to be applied
+        $es = $es->after($cached_sn->timestamp);
+
+        # Nothing? Great!
+        return EventStore::Tiny::Snapshot->new(
+            state       => clone($self->_cached_snapshot->state),
+            timestamp   => $self->_cached_snapshot->timestamp,
+        ) if $es->size == 0;
+
+        # Still something? Start here
+        $state = clone $cached_sn->state;
     }
 
     # Calculate snapshot
+    $state //= $self->init_state;
     my $snapshot = EventStore::Tiny::Snapshot->new(
         state       => $es->apply_to($state, $self->logger),
         timestamp   => $es->last_timestamp // 0,
@@ -135,7 +146,7 @@ EventStore::Tiny - A minimal event sourcing framework.
 
 =begin html
 
-<p style="line-height: 190%">
+<p>
 
 <a href="https://badge.fury.io/pl/EventStore-Tiny">
     <img alt="CPAN version" src="https://badge.fury.io/pl/EventStore-Tiny.svg"></a>
@@ -148,7 +159,7 @@ EventStore::Tiny - A minimal event sourcing framework.
 <a href="http://cpants.cpanauthors.org/dist/EventStore-Tiny">
     <img alt="CPANTS kwalitee score" src="https://cpants.cpanauthors.org/dist/EventStore-Tiny.png"></a>
 
-<br>
+<br><br>
 
 <a href="http://www.cpantesters.org/distro/E/EventStore-Tiny.html?distmat=1">
     <img alt="CPAN testers reports" src="https://img.shields.io/badge/testers-reports-blue.svg"></a>

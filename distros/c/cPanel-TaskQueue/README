@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution cPanel-TaskQueue,
-version 0.850:
+version 0.900:
 
   Manage a FIFO queue of tasks to perform.
 

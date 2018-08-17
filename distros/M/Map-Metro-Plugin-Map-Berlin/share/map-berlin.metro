@@ -502,7 +502,7 @@ Schloßstr.
 1001,1025,1026,1002|Gesundbrunnen|Bornholmer Str.
 8|Gesundbrunnen|Pankstr.
 2|Gleisdreieck|Bülowstr.
-1|Gleisdreieck|Kurfürstenstr.
+1,3|Gleisdreieck|Kurfürstenstr.
 7|Gneisenaustr.|Mehringdamm
 1041|Greifswalder Str.|Landsberger Allee
 1008,1085|Greifswalder Str.|Prenzlauer Allee
@@ -513,7 +513,7 @@ Schloßstr.
 1046|Grünau|Eichwalde
 1009|Grünbergallee|Altglienicke
 1045|Grünbergallee|Flughafen Berlin-Schönefeld
-1|Görlitzer Bhf.|Kottbusser Tor
+1,3|Görlitzer Bhf.|Kottbusser Tor
 9|Güntzelstr.|Berliner Str.
 1003|Hackescher Markt|Alexanderplatz
 1003,1005,1007,1009|Hackescher Markt|Friedrichstr.
@@ -521,7 +521,7 @@ Schloßstr.
 1046|Halensee|Hohenzollerndamm
 1041|Halensee|Westkreuz
 6|Hallesches Tor|Kochstr.
-1|Hallesches Tor|Möckernbrücke
+1,3|Hallesches Tor|Möckernbrücke
 9|Hansaplatz|Zoologischer Garten
 7|Haselhorst|Zitadelle
 1003,1005,1007,1009|Hauptbahnhof|Bellevue
@@ -574,10 +574,10 @@ Schloßstr.
 6|Kochstr.|Stadtmitte
 7|Konstanzer Str.|Adenauerplatz
 8|Kottbusser Tor|Moritzplatz
-1|Kottbusser Tor|Prinzenstr.
+1,3|Kottbusser Tor|Prinzenstr.
 9|Kurfürstendamm|Spichernstr.
 1|Kurfürstendamm|Uhlandstr.
-1|Kurfürstenstr.|Nollendorfplatz
+1,3|Kurfürstenstr.|Nollendorfplatz
 6|Kurt-Schumacher-Platz|Scharnweberstr.
 1046,1045|Köllnische Heide|Baumschulenweg
 1047|Köllnische Heide|Neukölln
@@ -616,7 +616,7 @@ Schloßstr.
 2|Mohrenstr.|Potsdamer Platz
 8|Moritzplatz|Heinrich-Heine-Str.
 2|Märkisches Museum|Spittelmarkt
-1|Möckernbrücke|Gleisdreieck
+1,3|Möckernbrücke|Gleisdreieck
 7|Möckernbrücke|Yorckstr.
 1008|Mühlenbeck-Mönchsmühle|Schönfließ
 6|Naturkundemuseum|Schwartzkopffstr.
@@ -668,7 +668,7 @@ Schloßstr.
 1041|Prenzlauer Allee|Greifswalder Str.
 1008,1085|Prenzlauer Allee|Schönhauser Allee
 1025,1026,1002|Priesterweg|Südkreuz
-1|Prinzenstr.|Hallesches Tor
+1,3|Prinzenstr.|Hallesches Tor
 1003|Rahnsdorf|Friedrichshagen
 1007|Raoul-Wallenberg-Str.|Marzahn
 7|Rathaus Neukölln|Hermannplatz
@@ -693,7 +693,7 @@ Schloßstr.
 1002|Schichauweg|Buckower Chaussee
 5|Schillingstr.|Strausberger Platz
 1001|Schlachtensee|Mexikoplatz
-1|Schlesisches Tor|Görlitzer Bhf.
+1,3|Schlesisches Tor|Görlitzer Bhf.
 9|Schloßstr.|Rathaus Steglitz
 1025|Schulzendorf|Heiligensee
 6|Schwartzkopffstr.|Reinickendorfer Str.
@@ -757,7 +757,7 @@ Schloßstr.
 1007|Wannsee|Griebnitzsee
 1001|Wannsee|Nikolassee
 1003,1005,1007,1009|Warschauer Str.|Ostbahnhof
-1|Warschauer Str.|Schlesisches Tor
+1,3|Warschauer Str.|Schlesisches Tor
 5|Weberwiese|Frankfurter Tor
 1041|Wedding|Gesundbrunnen
 6|Wedding|Leopoldplatz

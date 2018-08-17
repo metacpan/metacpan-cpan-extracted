@@ -60,6 +60,12 @@ my $version = $App::Greple::VERSION;
 greple - extensible grep with lexical expression and region handling
 
 
+=head1 VERSION
+
+
+Version 8.2901
+
+
 =head1 SYNOPSIS
 
 
@@ -95,13 +101,14 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --format LABEL=...   define line number and file name format
   FILE
     --glob=glob          glob target files
-    --chdir              change directory before search
+    --chdir=dir          change directory before search
     --readlist           get filenames from stdin
   COLOR
     --color=when         use terminal color (auto, always, never)
     --nocolor            same as --color=never
     --colormap=color     R, G, B, C, M, Y etc.
     --colorful           use default multiple colors
+    --colorindex=flags   color index method: Ascend/Descend/Block/Random
     --ansicolor=s        ANSI color 16, 256 or 24bit
     --[no]256            same as --ansicolor 256 or 16
     --regioncolor        use different color for inside/outside regions
@@ -177,6 +184,7 @@ my $opt_color = 'auto';
 my $opt_ansicolor = '256';
 my @opt_colormap;
 my $opt_colorful = 1;
+my $opt_colorindex = '';
 my @opt_face;
 my $opt_uniqcolor;
 my $opt_random;
@@ -280,9 +288,13 @@ my @optargs = (
     'colormap|cm=s'      => \@opt_colormap,
     'nocolor|no-color'   => sub { $opt_color = 'never' },
     'colorful!'          => \$opt_colorful,
+    'colorindex|ci=s'    => \$opt_colorindex,
     'face=s'             => \@opt_face,
     'uniqcolor|uc!'      => \$opt_uniqcolor,
-    'random!'            => \$opt_random,
+    'random!'            => sub {
+	if ($_[1]) { $opt_colorindex .= 'R' }
+	else       { $opt_colorindex =~ s/R//gi }
+    },
     'ansicolor=s'        => \$opt_ansicolor,
     '256!'               => sub { $opt_ansicolor = $_[1] ? '256' : '16' },
     'regioncolor|rc!'    => \$opt_regioncolor,
@@ -348,7 +360,7 @@ binmode STDERR, ":encoding(utf8)";
 
 require Getopt::Long;
 my $parser = new Getopt::Long::Parser
-    config => [ qw(bundling no_getopt_compat) ] ;
+    config => [ qw(bundling no_getopt_compat no_ignore_case) ] ;
 sub configure_getopt { $parser->configure(@_) }
 
 configure_getopt qw(debug) if $ENV{DEBUG_GETOPT};
@@ -421,7 +433,7 @@ if ($opt_man or $opt_show or $opt_path) {
     my @bucket = $rcloader->buckets;
     if (@bucket and not default_module($bucket[-1])) {
 	my $mod = $bucket[-1]->title;
-	my @perldocopt = $opt_show ? '-m' : $opt_path ? '-l' : () ;
+	my @perldocopt = $opt_show ? '-m' : $opt_path ? '-ml' : () ;
 	my $jp = first { -x "$_/perldocjp" } split /:/, $ENV{PATH};
 	my $perldoc = $jp ? "perldocjp" : "perldoc";
 	$ENV{PERL5LIB} = join ':', @INC;
@@ -494,11 +506,11 @@ for ([ \@opt_r,  FLAG_REGEX | FLAG_COOK | FLAG_REQUIRED ],
 {
     my($opt, $flag) = @$_;
     $pat_holder->append({ flag => $FLAG_BASE | $flag, type => 'pattern' },
-			@$opt) if @$opt;
+			@$opt)->optimize() if @$opt;
 }
 
 ##
-## set $count_must, $count_need and $opt_alow
+## set $count_must, $count_need and $opt_allow
 ##
 my $count_must = 0;
 my $count_need;
@@ -686,9 +698,12 @@ my $uniq_color = new UniqIndex
     ignore_case => $opt_i;
 
 sub dump_uniqcolor {
-    my $list = $uniq_color->list;
+    my $list  = $uniq_color->list;
+    my $count = $uniq_color->count;
     for my $i (0 .. $#{ $list }) {
-	warn sprintf "%d %s\n", $i, index_color($i, $list->[$i]);
+	warn sprintf("%3d (%3d) %s\n",
+		     $i, $count->[$i],
+		     index_color($i, $list->[$i]));
     }
 }
 
@@ -933,10 +948,11 @@ sub open_nextfile {
     my $file;
     while (defined($file = shift(@ARGV)) ||
 	   defined($file = $opt_readlist && read_stdin)) {
+	$file = decode 'utf8', $file unless utf8::is_utf8 $file;
 	$file =~ s/\n+$//;
 
 	if (0) {}
-	elsif ($file =~ /^http:\/\//) {
+	elsif ($file =~ /^https?:\/\//) {
 	    open(STDIN, '-|') || exec("w3m -dump $file") || die "w3m: $!\n";
 	}
 	else {
@@ -947,7 +963,7 @@ sub open_nextfile {
 	}
 
 	if (my @filters = $filter_d->get_filters($file)) {
-	    push_input_filter(@filters);
+	    push_input_filter({ &FILELABEL => $file }, @filters);
 	}
 
 	if ($file_code eq 'binary') {
@@ -996,7 +1012,11 @@ sub grep_data {
     $splicer->($grep->result_ref) if $splicer;
 
     if ($opt_l) {
-	print "$current_file\n" if $matched;
+	if ($matched) {
+	    print $current_file;
+	    printf ":%d", scalar $grep->blocks if $opt_c;
+	    print "\n";
+	}
     }
     elsif ($opt_c) {
 	print "$current_file:" if $need_filename;
@@ -1004,7 +1024,9 @@ sub grep_data {
     }
     elsif (@{$grep->result_ref}) {
 	# open output filter
-	@opt_of && push_output_filter(\*STDOUT, @opt_of);
+	@opt_of && push_output_filter(
+	    { &FILEALBEL => $current_file },
+	    \*STDOUT, @opt_of);
 	display_result($grep);
 	@opt_of && recover_stdout;
     }
@@ -1021,6 +1043,18 @@ sub grep_data {
     $matched;
 }
 
+package Indexer {
+    sub new {
+	my $class = shift;
+	my $obj = { @_ };
+	bless $obj, $class;
+    }
+    sub index   { shift->{index}->() }
+    sub reset   { shift->{reset}->() }
+    sub block   { shift->{block}     }
+    sub reverse { shift->{reverse}   }
+}
+
 sub display_result {
     my $grep = shift;
     my $file = $grep->{filename};
@@ -1031,6 +1065,23 @@ sub display_result {
 
     my $need_blockend =
 	$opt_blockend || $opt_p || $opt_A || $opt_B || @opt_block;
+
+    # --colorindex
+    my $indexer = do {
+	my %ci = map { uc $_ => 1 } $opt_colorindex =~ /\w/g;
+	if ($ci{A} or $ci{D}) {
+	    my $i = 0;
+	    new Indexer
+		index => sub { $i++ },
+		reset => sub { $i = 0 },
+		block => $ci{B},
+		reverse => $ci{D};
+	}
+	elsif ($ci{R}) {
+	    new Indexer index => sub { int rand @colors };
+	}
+	else { undef }
+    };
 
     my $line = 1;
     my $lastpos = 0;
@@ -1068,6 +1119,13 @@ sub display_result {
 	}
 	and print "\n";
 
+	if ($indexer) {
+	    $indexer->reset if $indexer->block;
+	    for ($indexer->reverse ? reverse @$result : @$result) {
+		$_->[2] = $indexer->index;
+	    }
+	}
+
 	my $mark = "\001";
 	for my $matched (reverse @$result) {
 	    my($ms, $me, $pi) = @$matched;
@@ -1084,12 +1142,8 @@ sub display_result {
 		}
 	    }
 
-	    # --random
-	    if ($opt_random) {
-		$pi = rand(@colors);
-	    }
 	    # --uniqcolor
-	    elsif ($opt_uniqcolor) {
+	    if ($opt_uniqcolor) {
 		$pi = $uniq_color->index($s);
 	    }
 
@@ -1176,8 +1230,9 @@ number of required patterns.  So
     greple '+foo bar baz'
 
 commands implicitly set the option C<--need 1>, and consequently print
-all lines including `foo'.  If you want to search lines which includes
-either or both of `bar' and `baz', use like this:
+all lines including `foo'.  In other words, it makes other patterns
+optional.  If you want to search lines which includes either or both
+of `bar' and `baz', use like this:
 
     greple '+foo bar baz' --need 2
     greple '+foo bar baz' --need +1
@@ -1275,7 +1330,7 @@ like this:
 Also B<dig> module implements more complex search.  It can be used
 simple as this:
 
-    greple -Mdig --dig .
+    greple -Mdig pattern --dig .
 
 but this command finally translated into following option list.
 
@@ -1283,7 +1338,7 @@ but this command finally translated into following option list.
         -type f ! -name .* ! -name *,v ! -name *~ 
         ! -iname *.jpg ! -iname *.jpeg ! -iname *.gif ! -iname *.png 
         ! -iname *.tar ! -iname *.tbz  ! -iname *.tgz ! -iname *.pdf 
-        -print --
+        -print -- pattern
 
 
 =head1 OPTIONS
@@ -1749,8 +1804,39 @@ When single pattern is specified, first color in colormap is used for
 the pattern.  If multiple patterns and multiple colors are specified,
 each patterns are colored with corresponding colors cyclically.
 
-Option B<--regioncolor>, B<--uniqcolor> and B<--random> change this
-behavior.
+Option B<--regioncolor>, B<--uniqcolor> and B<--colorindex> change
+this behavior.
+
+=item B<--colorindex>=I<spec>, B<--ci>=I<spec>
+
+Specify color index method by combination of spec characters.
+Meaningful combinations are B<A>, B<D>, B<AB>, B<DB> and B<R>.
+
+=over 4
+
+=item A (Ascending)
+
+Apply different color sequentially according to the order of
+appearance.
+
+=item D (Descending)
+
+Apply different color sequentially according to the reversed order of
+appearance.
+
+=item B (Block)
+
+Reset sequential index on every block.
+
+=item R (Random)
+
+Apply random color.
+
+=back
+
+=item B<--random>
+
+Shortcut for B<--colorindex=R>.
 
 =item B<--ansicolor>=I<16>|I<256>|I<24bit>
 
@@ -1784,11 +1870,6 @@ When used with option B<-i>, color is selected in case-insensitive
 fashion.  If you want case-insensitive match and case-sensitive color
 selection, indicate insensitiveness in the pattern rather than command
 option (e.g. 'I<(?i)pattern>').
-
-=item B<--random>
-
-Use random selected color to display matched string each time.
-Disabled by default.
 
 =item B<--face>=[-+]I<effect>
 
@@ -1958,7 +2039,7 @@ Interestingly enough, above example
 
 produces output, as a matter of fact.  Think of the situation
 searching, say, C<' PATTERN '> with this condition.  Matched area
-includes surrounding spaces, and meets the both condition partially.
+includes surrounding spaces, and satisfies both conditions partially.
 This match does not occur when option B<--strict> is given, either.
 
 =back
@@ -2539,4 +2620,4 @@ it under the same terms as Perl itself.
 #  LocalWords:  struct sockaddr blockend icode euc shiftjis sjis zcat
 #  LocalWords:  ocode gunzip gpg FILELABEL substr eval misc unicode
 #  LocalWords:  GREPLEOPTS shellwords Katakana builtin pgp autoload
-#  LocalWords:  ENV App ARGV mg Kazumasa Utashiro github
+#  LocalWords:  ENV App ARGV mg Kazumasa Utashiro github colorindex

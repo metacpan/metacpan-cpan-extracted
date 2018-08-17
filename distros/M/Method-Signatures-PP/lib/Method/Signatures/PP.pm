@@ -2,78 +2,50 @@ package Method::Signatures::PP;
 
 use strict;
 use warnings;
-use re 'eval';
-use Filter::Util::Call;
-use PPR;
+use Import::Into;
+use Moo;
 
-our $VERSION = '0.000004'; # v0.0.4
+our $VERSION = '0.000005'; # v0.0.5
 
 $VERSION = eval $VERSION;
 
-our $Statement_Start;
-
-our @Found;
-
-my $grammar = qr{
-  (?(DEFINE)
-    (?<PerlKeyword>
-      (?{ local $Statement_Start = pos() })
-      method (?&PerlOWS)
-      (?&PerlIdentifier) (?&PerlOWS)
-      (?: (?&kw_balanced_parens) (?&PerlOWS) )?+
-      (?&PerlBlock) (?&PerlOWS)
-      (?{ push @Found, [ $Statement_Start, pos() - $Statement_Start ] })
-    )
-    (?<kw_balanced_parens>
-      \( (?: [^()]++ | (?&kw_balanced_parens) )*+ \)
-    )
-  )
-  $PPR::GRAMMAR
-}x;
-
 sub import {
-  my $done = 0;
-  filter_add(sub {
-    return 0 if $done++;
-    1 while filter_read();
-    #warn "CODE >>>\n$_<<<";
-    if (defined(my $mangled = mangle($_))) {
-      $_ = $mangled;
-    }
-    return 1;
-  });
+  Babble::Filter->import::into(1, __PACKAGE__);
 }
 
-sub mangle {
-  my ($code) = @_;
-  local @Found;
-  unless ($code =~ /\A (?&PerlDocument) \Z $grammar/x) {
-    warn "Failed to parse file; expect complication errors, sorry.\n";
-    return undef;
-  }
-  my $offset = 0;
-  foreach my $case (@Found) {
-    my ($start, $len) = @$case;
-    $start += $offset;
-    my $stmt = substr($code, $start, $len);
-    die "Whit?"
-      unless my @match = $stmt =~ m{
-        \A
-        method ((?&PerlOWS))
-        ((?&PerlIdentifier)) ((?&PerlOWS))
-        (?: ((?&kw_balanced_parens)) ((?&PerlOWS)) )?+
-        ((?&PerlBlock)) ((?&PerlOWS))
-        $grammar
-      }x;
-    my ($ws0, $name, $ws1, $sig, $ws2, $block, $ws3) = @match;
-    my $sigcode = $sig ? " my $sig = \@_;" : '';
-    $block =~ s{^\{}{\{my \$self = shift;${sigcode}};
-    my $replace = "sub${ws0}${name}${ws1}${block}${ws3}";
-    substr($code, $start, $len) = $replace;
-    $offset += length($replace) - $len;
-  }
-  #warn "FINAL >>>\n$_<<<";
-  return $code;
+sub extend_grammar {
+  my ($self, $g) = @_;
+  $g->add_rule(MethodDeclaration => 
+    'method(?&PerlOWS)(?:(?&PerlIdentifier)(?&PerlOWS))?+'
+    .'(?:(?&PerlParenthesesList))?+'
+    .'(?&PerlOWS) (?&PerlBlock)'
+  );
+  $g->augment_rule(SubroutineDeclaration => '(?&PerlMethodDeclaration)');
+}
+
+sub transform_to_plain {
+  my ($self, $top) = @_;
+  $top->remove_use_statement('Function::Parameters');
+  $top->remove_use_statement('Method::Signatures::PP');
+  $top->remove_use_statement('Method::Signatures::Simple');
+  $top->each_match_within(MethodDeclaration => [
+      [ kw => 'method' ],
+      [ name => '(?&PerlOWS)(?:(?&PerlIdentifier)(?&PerlOWS))?+' ],
+      [ sig => '(?:(?&PerlParenthesesList))?+' ],
+      [ rest => '(?&PerlOWS) (?&PerlBlock)' ],
+    ] => sub {
+      my ($m) = @_;
+      my ($kw, $sig, $rest) = @{$m->submatches}{qw(kw sig rest)};
+      $kw->replace_text('sub');
+      my $sig_text = $sig->text;
+      my $front = 'my $self = shift; '
+                  .($sig_text ? "my ${sig_text} = \@_; ": '');
+      $rest->transform_text(sub { s/^(\s*)\{/${1}{ ${front}/ });
+      unless (($m->subtexts('name'))[0]) {
+        $rest->transform_text(sub { s/$/;/ });
+      }
+      $sig->replace_text('');
+  });
 }
 
 1;
@@ -146,19 +118,13 @@ So, for the moment, you are strongly advised to not use this module while
 developing code, and instead use L<Function::Parameters> if you have a not
 completely ancient perl and L<Method::Signatures::Simple> if you're still
 back in the stone age banging rocks together, and to then switch your 'use'
-line to this module for fatpacking/shipping/etc. - I may yet come up with
-a better solution to this and/or beg Damian for help doing so, but at the
-time of writing I can offer no guarantees.
+line to this module for fatpacking/shipping/etc. - and since this code now
+uses L<Babble>, to create a .pmc you can run:
 
-Note that L<PPR> requires perl 5.10 and as such so does this module. However,
-if you need to support older perls, you can
+  perl -MBabble::Filter=Method::Signatures::PP -0777 -pe babble \
+    lib/MyFile.pm >lib/MyFile.pmc
 
-    use Method::Signatures::PP::Compile;
-
-which uses ingy's L<Module::Compile> to generate a .pmc file that should run
-fine on whatever version of perl the rest of your code requires. This will
-likely be rewritten to use a slightly less lunatic compilation mechanism in
-later releases.
+(or even use -pi -e on a built distdir)
 
 =head1 AUTHOR
 

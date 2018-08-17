@@ -1,0 +1,27 @@
+---
+abstract: 'Handle TauStation GCT datetimes'
+author:
+  - 'Carl Franks <github@tauhead.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Calendar-TauStation
+requires:
+  Carp: '0'
+  DateTime::Duration: '0'
+  DateTime::Format::Builder: '0'
+  POSIX: '0'
+  parent: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/fireartist/DateTime-Calendar-TauStation
+  repository: https://github.com/fireartist/DateTime-Calendar-TauStation.git
+version: '1.182260'
+x_serialization_backend: 'YAML::Tiny version 1.73'

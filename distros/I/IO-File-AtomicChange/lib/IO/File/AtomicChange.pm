@@ -3,13 +3,12 @@ package IO::File::AtomicChange;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use base qw(IO::File);
 use Carp;
 use File::Temp qw(:mktemp);
 use File::Copy;
-use File::Sync;
 
 sub new {
     my $class = shift;
@@ -66,7 +65,7 @@ sub _closed {
 
 sub close {
     my ($self, $die) = @_;
-    File::Sync::fsync($self) or croak "fsync: $!";
+    $self->sync() or croak "sync: $!";
     unless ($self->_closed(1)) {
         if ($self->SUPER::close()) {
 

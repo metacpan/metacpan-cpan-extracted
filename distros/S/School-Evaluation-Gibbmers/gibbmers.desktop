@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=gibbmers
+Comment=School Evaluation
+Terminal=true
+Exec=/usr/bin/gibbmers
+Icon=/usr/share/icons/gibbmers48x48.png
+Type=Application
+Categories=System;

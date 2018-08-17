@@ -137,7 +137,7 @@ license: L<https://creativecommons.org/publicdomain/zero/1.0/>.
 */
 
 #define PERL_MULTICORE_MAJOR 1 /* bumped on incompatible changes */
-#define PERL_MULTICORE_MINOR 0 /* bumped on every change */
+#define PERL_MULTICORE_MINOR 1 /* bumped on every change */
 
 #if PERL_MULTICORE_DISABLE
 
@@ -191,7 +191,11 @@ perl_multicore_init (void)
   else
     {
       /* create a new one with a dummy nop implementation */
+      #ifdef NEWSV
       SV *api_sv = NEWSV (0, sizeof (*perl_multicore_api));
+      #else
+      SV *api_sv = newSV (   sizeof (*perl_multicore_api));
+      #endif
       SvCUR_set (api_sv, sizeof (*perl_multicore_api));
       SvPOK_only (api_sv);
       perl_multicore_api = (struct perl_multicore_api *)SvPVX (api_sv);
@@ -209,3 +213,4 @@ END_EXTERN_C
 #endif
 
 #endif
+

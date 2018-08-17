@@ -183,6 +183,7 @@ use Data::Dumper;
 our %REPORT_TYPES = (
 	BS => 'json',
 	PB => 'json',
+	Player => 'json',
 	PL => 'html',
 	RO => 'html',
 	GS => 'html',

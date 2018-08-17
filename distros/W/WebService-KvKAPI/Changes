@@ -1,5 +1,10 @@
 Revision history for Webservice-KvKAPI
 
+0.006     2018-08-13 11:41:07Z
+
+    * Change from Moose to Moo
+    * Remove unneeded dependency (MooseX::Log::Log4perl).
+
 0.005     2018-08-02 09:50:48Z
 
     * Allow more search options with the CLI script

@@ -3,3 +3,8 @@ Revision history for Import-Export
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.04    2018-08-10
+        Test coverage 100% + add option to clean namespace
+
+0.08    2018-08-14
+        Require latest version of namespace::clean, update POD with import example.

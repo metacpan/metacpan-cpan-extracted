@@ -49,7 +49,7 @@ use PPIx::Regexp::Token::Whitespace		();
 use PPIx::Regexp::Util qw{ __is_ppi_regexp_element __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -530,19 +530,6 @@ sub ppi_document {
     return PPI::Document->new( \"$self->{find}" );
 }
 
-sub prior {
-    my ( $self, $method, @args ) = @_;
-    $self->_deprecation_notice( method => 'prior',
-	'prior_significant_token()' );
-    defined $method or return $self->{prior_significant_token};
-    $self->{prior_significant_token}->can( $method )
-	or confess 'Programming error - ',
-	    ( ref $self->{prior_significant_token} ||
-		$self->{prior_significant_token} ),
-	    ' does not support method ', $method;
-    return $self->{prior_significant_token}->$method( @args );
-}
-
 sub prior_significant_token {
     my ( $self, $method, @args ) = @_;
     defined $method or return $self->{prior_significant_token};
@@ -745,6 +732,8 @@ sub tokens {
 #	This method returns true if the deprecation is in progress. In
 #	fact it returns the deprecation level.
 
+=begin comment
+
 {
 
     my %deprecate = (
@@ -772,19 +761,17 @@ sub tokens {
 	return;
     }
 
-=begin comment
-
     sub _deprecation_in_progress {
 	my ( $self, $type, $name ) = @_;
 	$deprecate{$type} or return;
 	return $deprecate{$type}{$name};
     }
 
+}
+
 =end comment
 
 =cut
-
-}
 
 sub _remainder {
     my ( $self ) = @_;
@@ -1599,29 +1586,6 @@ C<undef> is returned.
 
 This method makes a PPI document out of the remainder of the string, and
 returns it.
-
-=head2 prior
-
- $tokenizer->prior( 'can_be_quantified' )
-    and print "The prior token can be quantified.\n";
-
-This method is deprecated in favor of
-L<prior_significant_tokrn()|/prior_significant_token>. As of version [%%
-next_version %%] it is a fatal error to call it. Six months after the
-release of this version it will be removed.  I am not sure I need to put
-this though a deprecation cycle, given that this method is documented as
-not being part of the public interface, but I choose to err on the side
-of caution.
-
-This method calls the named method on the most-recently-instantiated
-significant token, and returns the result. Any arguments subsequent to
-the method name will be passed to the method.
-
-Because this method is designed to be used within the tokenizing system,
-it will die horribly if the named method does not exist.
-
-If called with no arguments at all the most-recently-instantiated
-significant token is returned.
 
 =head2 prior_significant_token
 

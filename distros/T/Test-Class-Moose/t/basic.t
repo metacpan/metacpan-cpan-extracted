@@ -1,6 +1,7 @@
-#!/usr/bin/env perl
+use strict;
+use warnings;
 
-use lib 'lib', 't/lib';
+use lib 't/lib';
 
 use Test2::API qw( intercept );
 use Test2::V0;
@@ -227,7 +228,7 @@ subtest_streamed(
                             call subevents => array {
                                 event Exception => sub {
                                     call error => match
-                                      qr{\Qforced die at t\E.\Qbasic.t\E.+}s;
+                                      qr{\Qforced die at \E.*\Qbasic.t\E.+}s;
                                 };
                                 event Plan => sub {
                                     call max => 0;

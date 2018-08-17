@@ -23,7 +23,7 @@ cgi_this - export the current directory as if it were a cgi-bin
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ This feature requires the L<Net::Rendezvous::Publish> module and the appropriate
 backend for your operating system, both available from CPAN. If one
 of them cannot be found, a warning message will be displayed.
 
-=item cgi-bin
+=item --cgi-bin
 
 Include the C</cgi-bin> directory in the URL of your scripts. For the cozy
 legacy feeling.

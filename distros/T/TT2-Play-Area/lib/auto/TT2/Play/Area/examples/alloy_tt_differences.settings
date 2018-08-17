@@ -1,0 +1,6 @@
+{
+    "engines": ["tt2", "alloy", "alloy_html"],
+    "title": "Template::Alloy compatibility",
+    "blurb": "Template::Alloy has some subtle differences to TT2"
+}
+

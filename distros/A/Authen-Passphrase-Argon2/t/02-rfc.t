@@ -16,4 +16,8 @@ is($from->as_rfc2307, '{ARGON2}$argon2id$v=19$m=32768,t=3,p=1$YWJjZGVmZzEyMw$FmP
 is($from->match('0'), '');
 is($from->match('abc'), 1);
 
+eval{ Authen::Passphrase::Argon2->from_rfc2307('{KARGON2}$argon2id$v=19$m=32768,t=3,p=1$YWJjZGVmZzEyMw$FmPc1Fhq0MKi1wcuQ1v4ow'); };
+like($@, qr/invalid Argon2 RFC2307/, 'kaput');
+
+
 done_testing();

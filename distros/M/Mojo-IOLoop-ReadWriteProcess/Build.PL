@@ -23,6 +23,7 @@ my %args = (
     },
 
     requires => {
+        'IPC::SharedMem' => '0',
         'Mojolicious' => '7.24',
     },
 

@@ -1,0 +1,17 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/PerlX/Define.pm
+t/01basic.t
+t/02constants.t
+t/03errlocations.t

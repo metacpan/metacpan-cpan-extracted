@@ -1,3 +1,6 @@
+0.14 2018-08-11
+        - Remove memory leak in validator check.
+
 0.13 2017-06-15
         - Added relative redirect method.
 

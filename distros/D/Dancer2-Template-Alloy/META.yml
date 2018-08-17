@@ -1,0 +1,38 @@
+---
+abstract: 'Template::Alloy engine for Dancer2'
+author:
+  - 'James Raspass <j.raspass@cv-library.co.uk>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-Alloy
+provides:
+  Dancer2::Template::Alloy:
+    file: lib/Dancer2/Template/Alloy.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Dancer2::Core::Role::Template: '0'
+  Moo: '0'
+  Template::Alloy: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cv-library/Dancer2-Template-Alloy/issues
+  repository: git://github.com/cv-library/Dancer2-Template-Alloy.git
+version: '0.002'
+x_contributors:
+  - 'Colin Newell <c.newell@cv-library.co.uk>'
+  - 'Colin Newell <colin.newell@gmail.com>'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.73'

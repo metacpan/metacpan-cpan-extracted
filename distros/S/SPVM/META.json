@@ -1,7 +1,7 @@
 {
    "abstract" : "Fast array and numeric operation, and provide easy way to C/C++ Binding",
    "author" : [
-      "A. U. Thor <kimoto@sakura.ne.jp>"
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
@@ -35,5 +35,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.0365"
+   "version" : "0.0366"
 }

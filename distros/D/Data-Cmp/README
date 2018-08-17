@@ -1,0 +1,161 @@
+NAME
+    Data::Cmp - Compare two data structures, return -1/0/1 like cmp
+
+VERSION
+    This document describes version 0.005 of Data::Cmp (from Perl
+    distribution Data-Cmp), released on 2018-08-13.
+
+SYNOPSIS
+     use Data::Cmp qw(cmp_data);
+
+     cmp_data(["one", "two", "three"],
+              ["one", "two", "three"]); # => 0
+
+     cmp_data(["one", "two" , "three"],
+              ["one", "two2", "three"]); # => -1
+
+     cmp_data(["one", "two", "three"],
+              ["one", "TWO", "three"]); # => 1
+
+     # hash/array is not "comparable" with scalar
+     cmp_data(["one", "two", {}],
+              ["one", "two", "three"]); # => 2
+
+    Sort data structures (of similar structures):
+
+     my @arrays = (["c"], ["b"], ["a", "b"], ["a"], ["a","c"]);
+     my @sorted = sort { cmp_data($a, $b) } @arrays; # => (["a"], ["a","b"], ["a","c"], ["b"], ["c"])
+
+DESCRIPTION
+    This relatively lightweight (no non-core dependencies, under 100 lines
+    of code) module offers the "cmp_data" function that, like Perl's "cmp",
+    returns -1/0/1 value. In addition to that, it can also return 2 if the
+    two data structures differ but there is no sensible notion of which one
+    is "greater than" the other.
+
+    This module can handle circular structure.
+
+    The following are the rules of comparison used by "cmp_data()":
+
+    *   Two undefs are the same
+
+         cmp_data(undef, undef); # 0
+
+    *   A defined value is greater than undef
+
+         cmp_data(undef, 0); # -1
+
+    *   Two non-reference scalars are compared string-wise using Perl's cmp
+
+         cmp_data("a", "A"); # 1
+         cmp_data(10, 9);    # -1
+
+    *   A reference and non-reference are different
+
+         cmp_data([], 0); # 2
+
+    *   Two references that are of different types are different
+
+         cmp_data([], {}); # 2
+
+    *   Blessed references that are blessed into different packages are
+        different
+
+         cmp_data(bless([], "foo"), bless([], "bar")); # 2
+         cmp_data(bless([], "foo"), bless([], "foo")); # 0
+
+    *   Two array references are compared element by element (unless an
+        array has been seen, see last rule)
+
+         cmp_data(["a","b","c"], ["a","b","c"]); #  0
+         cmp_data(["a","b","c"], ["a","b","d"]); # -1
+         cmp_data(["a","d","c"], ["a","b","e"]); #  1
+
+    *   A longer arrayref is greater than its shorter subset
+
+         cmp_data(["a","b"], ["a"]); # 1
+
+    *   Two hash references are compared key by key (unless an array has
+        been seen, see last rule)
+
+         cmp_data({k1=>"a", k2=>"b", k3=>"c"}, {k1=>"a", k2=>"b", k3=>"d"}); # 0
+         cmp_data({k1=>"a", k2=>"b", k3=>"c"}, {k1=>"a", k2=>"b", k3=>"c"}); # 1
+
+    *   When two hash references share a common subset of pairs but have
+        non-common pairs, the greater hashref is the one that has more
+        non-common pairs
+
+        If the number of non-common pairs are the same, they are just
+        different.
+
+         cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>""});                #  1
+         cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>"});         #  2
+         cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>", k7=>""}); # -1
+
+    *   All other types of references (i.e. non-hash, non-array) are the
+        same only if their address is
+
+         cmp_data(\1, \1); # 2
+         my $ref = \1; cmp_data($ref, $ref); # 0
+
+    *   A seen (hash or array) reference is no longer recursed, it's
+        compared by address (see previous rule)
+
+         my $ary1 = [1]; push @$ary1, $ary1;
+         my $ary2 = [1]; push @$ary2, $ary2;
+         my $ary3 = [1]; push @$ary3, $ary1;
+         cmp_data($ary1, $ary2); # 1
+         cmp_data($ary1, $ary3); # 0
+
+FUNCTIONS
+  cmp_data
+    Usage:
+
+     cmp_data($d1, $d2) => -1/0/1/2
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Cmp>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Data-Cmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Cmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other variants of Data::Cmp: Data::Cmp::Numeric,
+    Data::Cmp::StrOrNumeric, Data::Cmp::Custom (allows custom actions and
+    comparison routines), Data::Cmp::Diff (generates diff structure instead
+    of just returning -1/0/1/2), Data::Cmp::Diff::Perl (generates diff in
+    the form of Perl code).
+
+    Modules that just return boolean result ("same or different"):
+    Data::Compare, Test::Deep::NoTest (offers flexibility or approximate or
+    custom comparison).
+
+    Modules that return some kind of "diff" data: Data::Comparator,
+    Data::Diff.
+
+    Of course, to check whether two structures are the same you can also
+    serialize each one then compare the serialized strings/bytes. There are
+    many modules for serialization: JSON, YAML, Sereal, Data::Dumper,
+    Storable, Data::Dmp, just to name a few.
+
+    Test modules that do data structure comparison: Test::DataCmp (test
+    module based on Data::Cmp::Custom), Test::More ("is_deeply()"),
+    Test::Deep, Test2::Tools::Compare.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

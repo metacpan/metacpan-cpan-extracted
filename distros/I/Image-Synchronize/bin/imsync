@@ -1,0 +1,1219 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+require 5.004;
+
+our $VERSION = '1.0';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Carp;
+use Getopt::Long qw(:config auto_version);
+use Image::Synchronize;
+use Path::Class qw(file);
+use Pod::Usage;
+
+my %cmd_options = ( fastscan => 1, recurse => 1 );
+
+# option --version is added automatically because of the configuration
+# options on the "use Getopt::Long" statement
+GetOptions(
+           \%cmd_options,
+           'cameraid|camera-id=s%',
+           'clearlog|clear-log',
+           'exportgpx|export-gpx:s',
+           'fastscan|fast-scan=i',
+           'follow=s@',
+           'force+',
+           'help|?',
+           'location=s%',
+           'logfile|log-file=s',
+           'man',
+           'modify!',
+           'offsetspath|offsets-path=s',
+           'recurse!',
+           'removebackups|remove-backups',
+           'removeourtags|remove-our-tags',
+           'reportlevel|report-level:1',
+           'restoreoriginals|restore-originals',
+           'summertime=s',
+           'time=s%',
+           'unsafe',
+           'verbose:1',
+           'wintertime=s',
+           'workingdirectory|working-directory=s'
+) or pod2usage(2);
+
+if ( $cmd_options{help} or $cmd_options{man} ) {
+  pod2usage(
+    {
+      -exitval  => 0,
+      -verbose  => 99,
+      -sections => +
+        "NAME|SYNOPSIS|SUMMARY|OPTIONS|ARGUMENTS|AUTHOR|LICENSE AND COPYRIGHT",
+    }
+  ) if $cmd_options{help};
+  pod2usage(
+    {
+      -exitval  => 0,
+      -verbose  => 99,
+      -noperldoc => 1,
+    }
+  ) if $cmd_options{man};
+}
+
+@ARGV = ('.') unless scalar @ARGV;
+
+my $ims = Image::Synchronize->new(%cmd_options);
+$ims->process(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+  imsync - Synchronize image files' file system modification timestamps
+
+=head1 SYNOPSIS
+
+  # report but don't modify
+  imsync
+  imsync --cameraid IMG_1234.JPG=MyCamera    # camera ID adjustment
+  imsync --time IMG_1234.JPG=+10m6s          # camera offset adjustment
+  imsync --time IMG_1234.JPG=14:22:46        # time adjustment
+  imsync --location IMG_1234.JPG=52.54,-11.7 # location adjustment
+
+  # modify as needed, and report
+  imsync --modify
+
+=head1 SUMMARY
+
+  imsync [options] [path_patterns]
+
+This application can synchronize filesystem modification times of
+images and movies created by one or more cameras, based on information
+embedded in the files and on adjustments provided by the user.  It can
+also synchronize times of related files based on information from the
+image files that they are related to and on information provided by
+the user.  Additionally, it can geotag images and movies, based on
+information extracted from GPX files.
+
+Start by calling it without any arguments in the directory holding the
+images of interest.  By default it reports what its inspection of the
+files yielded but does not modify any files (except for writing to log
+file I<imsync.log>).
+
+=head1 OPTIONS
+
+  --cameraid FILE=ID  Specify the camera ID for a file.  Can also be
+                   written as --camera-id.
+  --clearlog       Clear the progress log before writing to it.
+  --exportgpx [FILE]  Export image geographical locations to this file.
+                   If no file is specified, then uses export.gpx.
+                   Can also be written as --export-gpx.
+  --fastscan N     Sets the speed of information extraction from
+                   files, from 0 through 2.  Higher numbers mean
+                   faster processing, but may miss some relevant
+                   information.  Defaults to 1.  Is passed on to the
+                   Image::ExifTool backend.  Can also be written as
+                   --fast-scan.
+  --follow FILE    Be as verbose as possible for the indicated file.
+  --force          Inject missing tags also when modification time is
+                   already correct.
+  --help, -?       Briefly explains how to use this application.
+                   See also --man.
+  --location TGT=LOC  Copy the GPS location LOC to target TGT.
+  --logfile FILE   File to log to.  Can also be written as --log-file.
+  --man            Like --help but with more information.
+  --modify         Modify files as needed.  The opposite (and default)
+                   is --no-modify, which reports but does not modify.
+  --norecurse      Do not process subdirectories.  The opposite (and
+                   default) is to recursively process subdirectories,
+                   too.  Can also be written as --no-recurse.
+  --offsetspath FILE  File to read camera timezone offsets from and
+                   write updated ones to.  Defaults to
+                   .imsync-cameraoffsets.yaml in the current or home
+                   directories.  Can be written as --offsets-path.
+  --recurse        Process subdirectories, too.  This is the default.
+                   Use --no-recurse to not process subdirectories.
+  --removebackups  Remove backup files.  Can also be written
+                   as --remove-backups.
+  --removeourtags  Remove embedded tags that were added by this
+                   application.  Can be written as --remove-our-tags.
+  --reportlevel N  Sets the level of detail of the final report.
+                   Can also be written as --report-level.
+  --restoreoriginals  Restore original files from backups.  Can also
+                   be written as --restore-originals.
+  --summertime FILE  The FILE's camera switched from Standard to
+                   Daylight Savings Time just before that FILE.
+  --time FILE=TIME  Specify the target time or offset for a file.
+                   Can be specified multiple times.
+  --unsafe         Don't create backup files, and delete the log file.
+  --verbose N      Sets the verbosity level, which is a combination of
+                   bitflags (up to 31).
+  --wintertime FILE  The FILE's camera switched from Daylight Savings
+                   to Standard Time just before that FILE.
+  --working-directory DIR  Changes to the specified working directory
+                   first.
+
+Option names can be abbreviated as long as they remain unique.  For
+example, C<--reportlevel> can be abbreviated all the way down to
+C<--rep>, because no other option begins with that prefix.
+
+=head1 ARGUMENTS
+
+The arguments are zero or more path name patterns that identify files
+and directories to process.  Wildcard C<*> matches any number of
+characters, and wildcard C<?> matches a single character.  If no
+arguments are specified, then the current directory is processed.
+
+=head1 OPTION DETAILS
+
+Some options involve a value that identifies files.  The following
+methods to identify files are supported, but not all options support
+all methods.
+
+=over
+
+=item * by partial path name.
+
+A file matches if the file's path name ends with the given text.
+
+=item * by timestamp.
+
+A file matches if the file's embedded creation timestamp (tag
+I<CreateDate>) corresponds to the given timestamp.
+
+The timestamp must include a date and a time, and may include a time
+zone offset designation.  Here are two examples (in ISO 8601 format)
+that indicate the same instant of time:
+
+  2015-09-17T22:14:33+01:00
+  2015-09-17T21:14:33Z
+
+Here are some other legal timestamps:
+
+  2015:09:17 22:14:33+01             (same as previous)
+  2015:09:17 22:14:33                (Exif timestamp format)
+  2015-09-17T13:44
+  2015-09-17T13
+  2015:09:17T13:03
+
+The date and time must be separated by a capital C<T> or by a single
+whitespace character.  If you use the whitespace character, then
+enclose the entire option in double quotes, othertwise the whitespace
+is interpreted as a separator between different argument values.
+
+The date must include 3 numbers (year, month, day), all separated by a
+dash C<-> or all by a colon C<:>.
+
+The time must include at least one and up to three numbers (hour,
+minute, second), separated by a colon C<:>.  Omitted final components
+are assumed equal to 0.
+
+The time zone offset designation, if specified, must follow the
+date/time specification without any intervening other text or
+whitespace.  It consists of only the capital letter C<Z>, or else of a
+plus C<+>, minus C<−> (Unicode character U+2212, may be displayed
+badly if your viewing application is not configured to display UTF-8),
+or dash C<->, followed by at least one and up to three numbers (hour,
+minute, second), separated by a colon C<:>.  Omitted final components
+are assumed equal to 0.  The C<Z> indicates a timezone offset equal to
+0, i.e., UTC.
+
+If no time zone offset is specified, then the one according to the
+time zone rules of the current system is assumed.
+
+=item * by time range.
+
+A file matches if the file's creation timestamp is within the
+specified time range.
+
+The time range consists of two timestamps (as described above)
+separated by a solidus C</>.  The second timestamp may omit the date,
+which is then assumed equal to that of the first timestamp.  Likewise
+for the timezone offset.  Here are some examples:
+
+  2001-02-03T04:05:06+07:00/2009-10-11T12:13:14
+  2017-07-05T06/09:17:22
+
+The second example covers the period from 06:00:00 through 09:17:22 on
+July 5th, 2017, in the local timezone.
+
+=back
+
+Which of these methods are supported is mentioned for each of the
+options.
+
+Here begins a detailed description of all command-line options.  In
+those descriptions, I<image file> means a file containing a single
+image (picture) or multiple images (movie) and having an embedded
+creation timestamp.
+
+=head2 --cameraid
+
+  --cameraid FILE=ID
+  --camera-id FILE=ID
+
+Specifies the camera ID to associate with a target file C<FILE>, if
+the camera ID that imsync proposed is not appropriate somehow.
+
+C<FILE> may be a partial path name, or a timestamp, or a time range,
+and identifies the files with which to associate the camera ID.
+
+C<ID> is the camera ID to associate with the files, instead of the
+default camera ID which depends on several embedded tags.  Whitespace
+at the beginning or end of the ID is ignored, and the ID must not be
+empty.
+
+If the file gets modified (L</--modify>), then the specified camera ID
+is embedded in it (with our own I<XMP:CameraID> tag).
+
+=head2 --clearlog
+
+  --clearlog
+  --clear-log
+
+Says to clear the previous contents of the progress log, if any,
+before writing the first message to it.  If this option is not
+specified, then the previous contents of the progress log are retained
+and the new log messages are appended to it.
+
+=head2 --exportgpx
+
+  --exportgpx
+  --exportgpx FILE
+
+Also written C<--export-gpx>.
+
+Exports to the specified file (or I<export.gpx> by default) the
+geographical position and time of all inspected files for which that
+information is available.  Import the GPX file into a geographical
+application to see where the pictures were taken.
+
+=head2 --fastscan
+
+  --fastscan N
+  --fast-scan N
+
+Sets the speed of information extraction from files, from 0 through 2.
+Higher numbers mean faster processing, but may miss some relevant
+information.  Defaults to 1.  Corresponds to option FastScan in
+L<Image::ExifTool/Options>.
+
+=head2 --follow
+
+  --follow FILE
+
+Make logging be as verbose as possible for the target C<FILE>.
+C<FILE> may be a partial file name, a timestamp, or a timestamp range.
+See also L</--verbose>.
+
+=head2 --force
+
+  --force
+  --force --force
+
+This application is reluctant to modify files.  If no C<--force> is
+applied, then a file is deemed to need modification only if one or
+more of the following are true:
+
+=over
+
+=item
+
+the file's filesystem modification timestamp needs adjustment.
+
+=item
+
+an explicit time (L</--time>) or location (L</--location>) is
+specified for the image file
+
+=item
+
+the file's GPS position needs adjustment, and the I<XMP:TimeSource>
+tag is present and not equal to C<GPS> (i.e., the existing GPS
+position was not embedded directly by a GPS receiver attached to the
+camera).
+
+=back
+
+Use C<--force> to override that reluctance, or C<--force --force> for
+even more force.
+
+With a single C<--force>, the file is updated even if only tags within
+the following group need adjustment: I<XMP:CameraID>,
+I<DateTimeOriginal>, I<XMP:DateTimeOriginal>, I<XMP:ImsyncVersion>,
+I<XMP:TimeSource>.
+
+With two C<--force>, the GPS position is updated even if the
+I<XMP:TimeSource> tag is not present or is equal to C<GPS>.  This
+means the original GPS position that was embedded by a GPS receiver
+attached to the camera is lost.
+
+=head2 --help
+
+  --help
+  -?
+
+Prints a message briefly explaining the options and arguments of this
+program, then exits.  See also L</--man>.
+
+=head2 --location
+
+  --location TGT=LOC
+
+Copies the location information indicated by C<LOC> to target C<TGT>,
+if the location (if any) proposed by imsync is not appropriate
+somehow.
+
+The target may be identified by a partial file name, a timestamp, or a
+timestamp range.
+
+The location may be identified by a partial file name or a location
+specification.  If it is a partial file name then it must match only a
+single file, and then that files's location is copied to the target.
+
+The location specification consists of the latitude and longitude in
+(optionally signed) decimal degrees, and optionally the altitude in
+meters above sea level, separated by commas.  North latitudes, East
+longitudes, and altitudes above sea level may be prefixed by a plus
+sign C<+>; South latitudes, West longitudes, and altitudes below sea
+level must be prefixed by a dash C<->.
+
+=head2 --logfile
+
+  --logfile FILE
+  --log-file FILE
+
+Specifies the file to write the log messages to (in addition to
+printing them to standard output).  If not set, then I<imsync.log>
+is used.
+
+=head2 --man
+
+  --man
+
+Like C<--help>, but provides much more information about the
+application.
+
+=head2 --modify
+
+  --modify
+
+Modify files as needed.  If not set, or if its opposite C<--no-modify>
+(or C<--nomodify>) is specified, then the indicated file changes are
+reported but the files aren't modified.
+
+=head2 --norecurse
+
+  --norecurse
+  --no-recurse
+
+Says to process the files in the specified directories (if any) but
+not those in any subdirectories of those specified directories.  The
+opposite (and default) is C<--recurse>, which says to recursively
+process subdirectories, too.
+
+=head2 --offsetspath
+
+  --offsetspath FILE
+  --offsets-path FILE
+
+Specifies the file for camera timezone offsets.  Such offsets are read
+from the file when the application begins, and updated ones are
+written to the file (if C<--modify> is specified).
+
+Defaults to I<.imsync-cameraoffsets.yaml> in the current working
+directory.  If no such file exists, and if the C<HOME> environment
+variable is set, then uses a file by the same name in the directory
+read from the C<HOME> environment variable.
+
+=head2 --recurse
+
+  --recurse
+
+Process subdirectories, too.  This is the default.  The opposite is
+C<--norecurse>.
+
+=head2 --removebackups
+
+  --removebackups
+  --remove-backups
+
+This application only modifies a file if a backup of it exists.  The
+backup has the same name, with I<_original> appended to it.  This
+option requests deletion of the backup files indicated by the
+arguments.  The application then does nothing else.
+
+If you want to remove all backup files in or below a folder, then
+specify that folder.  If you want to remove a particular backup file,
+then specify a pattern that matches its name, including the
+I<_original> suffix.  See also L</--restoreoriginals>.
+
+=head2 --removeourtags
+
+  --removeourtags
+  --remove-our-tags
+
+Remove the embedded tags that were added by previous runs of this
+application.
+
+The following tags are only removed if I<XMP:TimeSource> is set and
+has a value other than C<GPS>: I<GPSLongitude>, I<GPSLatitude>,
+I<GPSAltitude>, I<GPSDateTime>, I<GPSDateStamp>, I<GPSTimeStamp>.
+
+The following tags are always removed: I<XMP:CameraID>,
+I<XMP:ImsyncVersion>, I<XMP:TimeSource>.
+
+The I<XMP:DateTimeOriginal> and I<DateTimeOriginal> tags are not
+removed, because we cannot be sure that they were created by a
+previous run of this application.
+
+=head2 --reportlevel
+
+  --reportlevel LEVEL
+  --report-level LEVEL
+
+Sets the detail level for the final report:
+
+0 suppresses the final report.
+
+1 reports only about files for which a change is indicated.
+
+2 reports all files (that weren't skipped), even those for which no
+change is indicated.
+
+3 is like 2, but also display all camera timezone offsets.
+
+=head2 --restoreoriginals
+
+  --restoreoriginals
+  --restore-originals
+
+Restores original files from backup files.
+
+If you want to restore from all backup files in or below a folder,
+then specify that folder.  If you want to restore from a particular
+backup file, then specify a pattern that matches that backup file's
+name, including the I<_original> suffix.  See also
+L</--deleteoriginals>.
+
+=head2 --summertime
+
+  --summertime FILE
+
+This specifies that the clock of the camera that recorded the C<FILE>
+was shifted forward by one hour (just) before that file was recorded.
+Use this when the camera clock switches from Standard Time to Daylight
+Savings Time.
+
+C<FILE> may be a partial path name, or a timestamp, or a time range.
+If it is a time range that matches multiple files, then the effect is
+as if only the first file matched.
+
+The opposite is L</--wintertime>.
+
+=head2 --time
+
+ --time FILE=TIME
+
+Specifies the target time or time offset or camera timezone offset for
+one or more target files, if the time proposed by imsync is not
+appropriate somehow.
+
+C<FILE> may be a partial path name, or a timestamp, or a time range.
+
+C<TIME> may be a timestamp or a time only or an offset or a partial
+path name.
+
+If C<TIME> is a time only, then it must be a clock time with hours,
+minutes, and optionally seconds, separated by colons, similar to
+
+  17:22
+  17:22:43
+
+This clock time is combined with a date such that the combined
+timestamp is at most 12 hours before or after the target file's
+embedded I<CreateDate> -- so this only works if the target file has an
+embedded I<CreateDate>.  This is convenient if you wish to specify a
+precise target timestamp close to the I<CreateDate>.
+
+If C<TIME> is an offset then it must be either an optionally signed
+number or else be similar to
+
+  +2y50d2h16m5s
+
+where the number before C<y> is the number of years (of 365 days), and
+likewise C<d> for days, C<h> for hours, C<m> for minutes, and C<s> for
+seconds.  All of these components and the sign are optional, but any
+that do appear must appear in the given order.  Here are some other
+examples:
+
+  3d10s             (for plus 3 days and 10 seconds)
+  -10d              (for minus 10 days)
+
+The specified offset is interpreted relative to the embedded creation
+time of the file (tag I<CreateDate>), so this only works if the file
+has that embedded tag.
+
+If C<TIME> is a partial path name, and if there is only a single file
+among the processed ones that matches that partial path name, then the
+I<initial> C<DateTimeOriginal> (from before imsync ran) of that single
+file is the target time for the target files.
+
+=head2 --unsafe
+
+  --unsafe
+
+Says to not create backup files before modifying original files.  If
+modifying the original files fails, then there are no backup files to
+restore the original files from.  If the program reaches its natural
+end, then the log file is deleted.
+
+=head2 --verbose
+
+  --verbose LEVEL
+
+Sets the verbosity level.  It defaults to 0.  Higher levels (up to 31)
+yield more verbose progress reporting.
+
+=head2 --version
+
+  --version
+
+Prints a message identifying the versions of this application,
+L<GetOpt::Long>, and L<Perl>.
+
+=head2 --wintertime
+
+  --wintertime FILE
+
+This specifies that the clock of the camera that recorded the file was
+shifted backward by one hour (just) before that file was recorded.
+Use this when the camera clock switched from Daylight Savings Time to
+Standard Time.
+
+C<FILE> may be a partial path name, or a timestamp, or a time range.
+If it is a time range that matches multiple images, then the effect is
+as if only the first image matched.
+
+The opposite is L</--summertime>.
+
+=head2 --workingdirectory
+
+  --working-directory DIR
+  --workingdirectory DIR
+
+Change the working directory to C<DIR> before starting processing.
+
+=head1 DESCRIPTION
+
+This application can synchronize filesystem modification times of
+images and movies created by one or more cameras, and times of related
+files, based on information provided by the user and on information
+embedded in other processed images by the same cameras.  Additionally,
+it can geotag images and movies, based on information extracted from
+GPX files.
+
+Information embedded in image and movie files is extracted, modified,
+or added using L<Image::ExifTool>, so if that module cannot access
+tags embedded in some file, then neither can this application.  Names
+of embedded tags that are mentioned below are as recognized by that
+module.
+
+Several passes are made over all relevant files:
+
+=over
+
+=item 1. Inspect
+
+During the first pass, all selected files are inspected for relevant
+information, but are not modified, because we may be able to use
+information from a later image to synchronize the time of an earlier
+image, but we can't tell until we've inspected all files.
+
+Relevant properties are noted, and files that provide too little
+information are omitted from further consideration.
+
+=item 2. GPX
+
+During the second pass, GPS times and locations are extracted from all
+detected GPX files.
+
+=item 3. Determine
+
+During the third pass, the target time and (if possible) location is
+determined for all remaining files.  The time and location are based
+on information found during the first two passes.
+
+The target timestamp for each file is based on information in that
+file and (where useful) in other files recorded by a camera with the
+same camera ID, or in other files with the same file number.
+
+=item 4. Modify
+
+If file modification is requested (L</--modify>), then during the
+fourth pass the files are adjusted as needed to give them their target
+time and location.
+
+=back
+
+Progress for each pass is shown in a progress bar (if the application
+is run interactively).  The progress bar advances whenever another
+file has been processed, so if processing a file takes a long time,
+then the progress bar may appear to be stuck.  Progress messages are
+logged, with configurable verbosity (L</--verbose>).  In the end, a
+configurable report is displayed (L</--report-level>), indicating the
+target time and other information of interest for relevant files.
+
+=head2 Camera ID
+
+Images from multiple cameras may be processed in a single run.  The
+cameras' internal clocks may each show a different time because they
+haven't been set correctly or because they slowly drift away from the
+correct time or because they've been configured for different time
+zones, so a time zone offset detected for one camera is no good for
+another camera.  We must associate offsets with specific cameras,
+which means we must identify the camera.
+
+Most cameras embed the camera's make and model (tags I<Make> and
+I<Model>) in the images.  Some also embed a camera serial number (tag
+I<SerialNumber>) in the image files.  If these properties aren't all
+absent or empty, then their combined values, separated by pipe symbols
+C<|>, constitute the (preferred) I<camera ID>.  Camera timezones are
+registered for each camera ID separately.
+
+If none of the make, model, and serial number are embedded in an image
+file, then the fallback camera ID may be used.  The fallback camera ID
+is derived from the file name by (1) omitting the directory part, (2)
+omitting the file name extension, (3) replacing any sequence of digits
+by the length of that sequence, and (4) prefixing a question mark
+C<?>.  For example, the fallback camera ID of file
+I<vacationpics/IMG220_5532.JPG> is C<?IMG3_4>.
+
+If a file has no make/model/serial number from which to produce a
+preferred camera ID, then it may get the preferred camera ID of other
+image files for which the fallback camera ID is the same as the
+fallback camera ID of the file, if there is only a single preferred
+camera ID associated with that fallback camera ID during the current
+run.
+
+Multiple cameras may end up associated with the same camera ID if the
+camera identifying information isn't unique, for example if two
+cameras have the same brand and type and do not include a serial
+number in the images.  In that case, a distinct camera ID may be
+assigned to the images manually, using the L</--camera-id>
+command-line option.
+
+The camera ID is embedded in the images (our own tag I<XMP:CameraID>)
+if the images are modified (L</--modify>), so that you don't need to
+specify it again if the image is processed again using this
+application later.
+
+=head2 Camera Timezone
+
+We need to know the difference between the times reported by the
+cameras' clocks (which produced the timestamps embedded in the images)
+and Coordinated Universal Time (UTC), so that we can synchronize image
+times between different cameras and we can assign locations based on
+GPS tracks.  The cameras' clocks may each show a different time
+because of time zone differences and clock drift.  Many (especially
+older) image files contain no embedded timezone information at all.
+
+The I<camera timezone offset> is the difference between the time zone
+of the camera's clock (including any clock drift) and UTC.  If the
+embedded timestamp says 17:24:33 and the corresponding UTC time is
+15:23:11, then the camera timezone is +02:01:22.
+
+The camera timezone information is valuable: If one has been found for
+one image, then it can be applied to other images from the same camera
+as well.
+
+If the first image processed for a particular camera ID has no
+timezone information in its embedded timestamps, then its embedded
+timestamps are assumed to have been recorded in the local timezone
+that was appropriate for that date and time on the system where the
+current application is running.  When other images for the same camera
+ID are processed later, then at least one camera timezone offset is
+already known for that camera ID and can be reused.
+
+Use L</--time> to set a different target time for an image if needed.
+This defines a camera offset for the associated camera, which can be
+used to deduce a target time for other images taken by the same
+camera.  You need to specify only a single L</--time> for a given
+camera, until the associated camera offset is no longer correct (e.g.,
+because of clock drift).
+
+=head3 Camera Timezone Offsets File
+
+At the start of the run, camera timezone offset information is read
+from the I<camera timezone offsets file>.  The additional camera
+timezone information that is gathered during the run is merged into
+the preloaded information and gets written to the same file again (if
+L</--modify> is specified).  If the L</--offsets-path> command-line
+option is specified, then its value identifies the camera timezone
+offsets file.  Otherwise, if there is a file called
+I<.imsync-cameraoffsets.yaml> in the current working directory, then
+that is the file to use.  And if that file doesn't exist, then the
+same file in the user's home directory (as determined by the C<HOME>
+environment variable) is used.
+
+The information is written to the file in L<YAML|http://www.yaml.org>
+format.  It consists of a single map of which the keys are the camera
+IDs.  The corresponding values are maps, of which the keys are
+timestamps in the camera's timezone and the values are camera timezone
+offsets that are valid from the time indicated by the key.  Here is an
+example:
+
+    ---
+    CameraID1:
+      2017-06-22T15:57:01: +0:00
+    CameraID2:
+      2017-06-19T14:08:22: +1:05:46
+    CameraID3:
+      2017-06-20T00:15:54: +4:00
+      2017-06-23T05:21:25: +2:00
+      2017-06-25T13:44:12: +2:00
+
+From the cameras with camera IDs C<CameraID1> and C<CameraID2>, only a
+single image or movie each has been processed so far.  The camera with
+camera ID C<CameraID3> has produced multiple image files, of which the
+ones from the first until just before the second timestamp were in
+timezone UTC+4:00, and the ones from the second through the last
+timestamps were in timezone UTC+2:00.
+
+For each camera ID, the first and last included timestamps are
+associated with the oldest and youngest image files recorded by that
+camera and processed by the current application.
+
+=head3 Image Files with Embedded Timestamps in UTC
+
+The embedded timestamps in most image files show the camera clock
+time, which is usually in or near the local timezone.  However, some
+image files (such as Apple QuickTime files) have embedded timestamps
+that are supposed to be in the UTC timezone, regardless of the local
+timezone.  They aren't always, because many cameras don't know what
+timezone they're in and so don't know what the time in UTC is.  In any
+case, timestamps embedded in supposedly-UTC image files may be
+relative to a different timezone than timestamps embedded in other
+image files recorded by the same camera.
+
+This means that it is convenient to treat supposedly-UTC image files
+as if they are recorded by a different camera than the local-timezone
+image files taken by that camera, otherwise the camera timezone offset
+keeps switching to and fro between the local timezone and UTC when
+both types of image files from the same camera are mixed.
+
+To this end, supposedly-UTC image files get an extra C<|U> appended to
+their automatically determined L<camera ID|/Camera ID>.  If the camera
+ID for a local-timezone image file is C<Brand|Model|SerialNumber>,
+then the camera ID for a supposedly-UTC image file by that same camera
+is C<Brand|Model|SerialNumber|U>.
+
+=head2 GPS Fix Lag
+
+An image recording device such as a smartphone that incorporates a GPS
+receiver can embed a GPS time and location into an image file when
+that file is created.  That GPS location/time is the one obtained most
+recently, which may already be a few seconds old when the image is
+recorded.  I call the difference between the time of the GPS fix and
+the time at which the image was recorded the I<GPS fix lag>.  If the
+GPS timestamp is used as is to calculate the camera timezone offset,
+then that timezone offset will be off by a few seconds because of the
+GPS fix lag, and the error may vary from one image to the next.
+
+Fortunately, devices incorporating a GPS receiver know the time very
+accurately, so the difference between their true camera timezone
+offset and UTC should be an exact multiple of 15 minutes, because all
+official time zones in use around the world are like that.
+
+If the image has an embedded GPS timestamp already, and that timestamp
+is not marked as having been added by an earlier run of the current
+application (see L</TimeSource>), and the deduced camera timezone
+offset differs less than 2 minutes from a multiple of 15 minutes, then
+that multiple of 15 minutes is used as the camera timezone offset
+instead.
+
+For example, if an image has the following embedded timestamps
+
+  GPSDateTime = 2015-03-17T14:15:16
+  CreateDate  = 2015-03-17T11:15:23
+
+then the nearest multiple-of-15-minutes timezone offset is -3:00:00
+and the GPS fix lag is 7 seconds.
+
+=head2 Custom Times
+
+If the absolute target time proposed for an image file by the current
+application is incorrect, then there are several ways to adjust it.
+
+=over
+
+=item
+
+Use the L</--time> command-line option to specify the desired target
+time, or the amount by which to correct the proposed target time, or
+another file from which to copy the timestamp.
+
+=item
+
+Use the L</--summertime> or L</--wintertime> command-line options to
+adjust the proposed target time by exactly one hour.
+
+=item
+
+Manually adjust the camera timezone offsets file (L</Camera Timezone
+Offsets File>).
+
+=back
+
+=head2 TimeSource
+
+The current application can tell from the I<XMP:TimeSource> tag what
+the source of the embedded location information and I<GPSDateTime> (if
+any) is, because the current application adds such a tag when it
+modifies an image file.  The tag gets one of the following values:
+
+=over
+
+=item GPS
+
+There was already a I<GPSDateTime> (and presumably a location) in the
+image file when the current application first processed that file.
+The current application does not change the target timestamp or
+location, except perhaps if L</--time> or L<--force --force|/--force>
+is specified for that file.
+
+=item User
+
+The user provided the target timestamp through the L</--time>
+command-line option.  The current application does not change the
+target timestamp (unless another C<--time> is specified for the same
+file), but can change the location if a different GPX file is
+provided.
+
+=item Other
+
+The target timestamp was based on a camera timezone offset.  The
+current application may change both the target timestamp and the
+location.
+
+=back
+
+If there is a I<GPSDateTime> but no I<XMP:TimeSource>, then the file
+is treated as if I<XMP:TimeSource> is C<GPS>.
+
+=head2 Target Timestamps
+
+The I<target timestamp> is the timestamp that is going to be assigned
+to the file.
+
+If a time is specified for the file through the L</--time>
+command-line option, then that time is used as the file's target time.
+
+Otherwise, if a L<camera timezone offset|/Camera Timezone> is
+specified for the file through the C<--time> command-line option, and
+if the file contains an emedded creation timestamp (tag
+I<CreateDate>), then the target time is the creation timestamp
+relative to the timezone indicated by the camera timezone offset.
+
+Otherwise, if the file contains a GPS timestamp (tag I<GPSDateTime>),
+then its target time is based on that (but see L</GPS Fix Lag>).
+
+Otherwise, if camera timezone offsets are already known for that
+camera's L<camera id|/Camera ID>, then the relevant camera timezone
+offset is applied to the file's embedded creation timestamp to find
+the target time.
+
+Otherwise, if the file has an embedded original timestamp (tag
+I<DateTimeOriginal>), then it is used as the target time.
+
+Otherwise, if the file has an embedded creation timestamp (tag
+I<CreateDate>), then it is used as the target time.
+
+Otherwise, the file is considered not to be a regular image file, and
+is marked for later processing after all regular image files have been
+processed.  See L</File Numbers>.
+
+=head2 File Numbers
+
+If the name of a file (excluding any directory part and excluding the
+file name extension) contains any digits, then the last consecutive
+sequence of digits defines the I<file number>.  For example, if the
+file name is I<DSC1234.JPG>, then the file number is 1234.  If the
+file name is I<Q5422_5376.TXT>, then the file number is 5376.  If a
+target timestamp cannot be found for a file using the method outlined
+above, then a target timestamp can be copied for it from another file
+with the same file number.  In this way, non-image files end up near
+the corresponding image files in the same directory, when sorted by
+their file system modification timestamp.
+
+If there is more than one file with the same file number and with a
+target timestamp, then the one "closest" to the current file in the
+file system is chosen to donate its target timestamp.
+
+=head2 Locations
+
+The current application can set or modify location information
+embedded in an image file.
+
+If the location information already embedded in an image file wasn't
+put there by the current application (tag I<XMP:TimeSource> is absent
+or has value C<GPS>), then the current application doesn't change it,
+except perhaps if L<--force --force|/--force> is specified.  In most
+cases that information will have been produced by a GPS receiver
+incorporated into the image recording device, so it is hardly possible
+to improve that location information.
+
+L<GPX|https://en.wikipedia.org/wiki/GPS_Exchange_Format> files can
+contain location information for multiple time intervals.  If a GPX
+file is processed together with some image files, and if the target
+time of one of the image files is within the time period covered by
+one of the tracks from a GPX file, then the current application
+calculates a location for the target time and associates that with the
+image file.
+
+If there are multiple GPX tracks that cover the target time, then the
+track from the GPX file closest (in the file system) to the image file
+is used.
+
+If there are no suitable GPX tracks, then a location can be manually
+specified for an image file using the L</--location> command line
+option.
+
+=head2 Modification
+
+Each file's relevant properties deduced during the 'Determine' phase
+are compared with the original values deduced during the 'Inspect'
+phase.  If some of the properties have changed, then modification of
+the file may be indicated.
+
+If L</--force> is not specified, then modification is indicated if the
+deduced file modification timestamp differs from the original one.
+
+Modification is then also indicated if the GPS position has changed by
+at least 1 meter, but only if the original GPS position was provided
+by the current application (as shown by the I<XMP:TimeSource> tag
+being set and unequal to C<GPS>).  We refer to such a GPS position as
+I<flexible>.  We do not want to lightly lose the GPS position embedded
+in the file by the original camera.
+
+If C<--force> is specified, then modification is also indicated if any
+of I<XMP:CameraID>, I<DateTimeOriginal>, I<XMP:ImsyncVersion>, or
+I<XMP:TimeSource> differ from the original ones.
+
+If C<--force --force> is specified, then modification is also
+indicated if the GPS position has changed by at least 1 meter and is
+not flexible.
+
+If modification is indicated, then the file only gets modified if
+L</--modify> is specified.  Without that option, the proposed
+modifications are reported but not applied.
+
+If the file does get modified, then all of the changed tags are
+updated, but the GPS position only if it is flexible or if L<--force
+--force> is specified.  If the file gets modified and already had a
+GPS position but no I<XMP:TimeSource> yet, then it gets an
+I<XMP:TimeSource> equal to C<GPS>.  If the GPS position is new and was
+specified through L</--location>, then I<XMP:TimeSource> gets the
+value C<User>.  If the GPS location was obtained from a GPX file, then
+the tag gets the value C<Other>.
+
+=head2 Backups
+
+If a file (other than the log file and the camera offsets file) is
+going to be modified, then imsync creates a backup of it first, if no
+backup already exists.  The backup has the same name but with
+I<_original> appended to it.  If the backup cannot be created then the
+original file is not modified.
+
+Additionally, the L<Image::ExifTool> module that imsync uses to write
+the image tags creates a temporary backup file before modifying any
+tags, and deletes that backup file if no problems were detected, but
+the author of that module recommends backing up your files anyway.
+
+If you're satisfied that the modification was a success, then you can
+delete the backup that imsync created, either manually or using the
+L</--removebackups> option.  Use the L</--restoreoriginals> option to
+restore original files from backups.
+
+If you want to skip creation of backup files by imsync, and rely on
+the temporary backups created by L<Image::ExifTool>, then use the
+L</--unsafe> option.
+
+=head2 Logging
+
+Progress messages are printed to the standard output stream and are
+appended to a log file.  The default log file is I<imsync.log> in
+the current working directory, but a different file can be specified
+using the L</--logfile> command-line option.
+
+If the log file already exists at the beginning of the run, then use
+the L</--clearlog> command-line option if you want its previous
+contents to be removed.  Otherwise the progress messages from the
+current run are appended to the existing contents.
+
+If the L</--unsafe> option is used, then the log is deleted if the
+application reaches its natural end.  If there is a serious problem
+that prevents the application from completing its task, then the log
+remains.
+
+=head2 Verbosity
+
+The L</--verbose> and L</--follow> command-line options determine how
+verbose the logging is, except for the final report which is governed
+by L</--reportlevel> insead.
+
+With no C<--verbose>, or with C<--verbose 1>, summary information is
+printed.
+
+To print original details of all inspected files, add 2.
+
+To print details of the determination of final values only for files
+for which a change is indicated, add 4.
+
+To print details of the determination of final values for all files,
+add 8.
+
+To print all imported camera offsets, add 16.
+
+If you want to see the most verbose information but only for
+particular files, then use the C<--follow> command-line option to
+identify the files of interest.  Progress messages for those files are
+printed as if the verbosity level is infinitely large, regardless of
+the verbosity level set through C<--verbose>.
+
+=head2 Report
+
+By default, the files that require a modification are listed in the
+report.  If you want to report on all files, then specify
+L</--reportlevel 2>.  If you want no report at all, then specify
+C<--reportlevel 0>.
+
+The report looks something like this:
+
+  GEOMPF Cm Target Time               M Offset   c Offset File
+  ------|--|-------------------------|----------|--------|--------
+  -=-*-0 SO 2017-06-22T00:33:02+02:00 s  -29d7h.        0 DSC03741.JPG
+  -*+*-0 AP 2017-06-22T14:23:35+02:00 s -28d17h.      +2h IMG_0095.JPG
+
+The GEOMPF field shows what happens if C<--modify> is specified, to,
+respectively, (G) the embedded GPS timestamp (tag I<GPSDateTime>), (E)
+the embedded original timestamp (tag I<DateTimeOriginal>), (O) various
+embedded tags not covered by the other categories, (M) the file system
+modification time, and (P) the embedded GPS position (tags
+I<GPSLatitude>, I<GPSLongitude>, and possibly I<GPSAltitude>).  The F
+column shows what level of L</--force> is needed to modify the file (0
+means no C<--force>, 1 means C<--force>, and 2 means C<--force
+--force>).  In the other columns, a C<-> means the tag remains absent.
+A C<=> means the tag exists and its value remains unchanged.  A C<*>
+means the tag's value is modified.  A C<+> means the tag is added, A
+C<!> means the tag is removed.
+
+The Cm field identifies the camera ID with an abbreviation that is
+explained in a table printed before the report.
+
+The target time field shows, well, the target time, in ISO8601 format
+including the timezone, if known.
+
+The M Offset field shows what time offset is added to the file system
+modification timestamp, in units of years (y), days (d), hours (h),
+minutes (m), and seconds (s).  If the value had to be truncated to fit
+in the available space, then it ends in a period (C<.>).  For example,
+C<-37d2h> means I<exactly> -37 days and 2 hours, and C<-37d2h.> means
+the value was truncated from an amount slightly larger than that.
+
+The letter at the beginning of the M Offset field says what the source
+of the target time was, according to a table printed before the report.
+
+The c Offset field shows the difference between the target time and
+the embedded creation time of the image, formatted similarly to the
+offset in the M Offset field.  For example, C<+2h> means the target
+time is exactly 2 hours later than the embedded creation time.
+
+The File field identifies the file, including just as much of the
+directory part of the name as is needed to make the file name unique
+within the collection of files that were processed.
+
+=head2 Export GPX
+
+The location information from (or for) the processed files can be
+exported to a GPX file, even if file modification (L</--modify>) is
+not requested.  In this way you can verify the positions in a mapping
+tool and only embed the locations in the image files when you're
+satisfied they are correct.  Use the L</--exportgpx> option to request
+export of location information to a file.  If you specify a file name
+after the option, then the information is exported to the named file.
+Otherwise, the information is exported to file I<export.gpx> in the
+current working directory.
+
+=head1 EXIT STATUS
+
+The current application returns 0 if it detects nothing left to change
+for the inspected image files, 1 if it identified additional changes
+to make for one or more image files, and 2 if there was a severe
+problem that prevented it from completing.
+
+=head1 CONFIGURATION
+
+The current application reads and writes a L</Camera Timezone Offsets
+File> that contains information (in L<YAML|http://www.yaml.org>
+format) about how the camera clocks run compared to Coordinated
+Universal Time (UTC).  If there is a file
+I<.imsync-cameraoffsets.yaml> in the current working directory, then
+it is used as the camera timezone offsets file.  Otherwise, a file by
+that same name in the user's home directory (as determined by the
+C<HOME> environment variable) is used.
+
+=head1 DEPENDENCIES
+
+This application uses the following non-core Perl modules:
+
+=over
+
+=item
+
+L<IO::Interactive>
+
+=item
+
+L<Image::ExifTool> version 10.14 or up
+
+=item
+
+L<Path::Class>
+
+=item
+
+L<Path::Iterator::Rule>
+
+=item
+
+L<Term::ProgressBar>
+
+=item
+
+L<XML::Twig>
+
+=item
+
+L<YAML::Any>
+
+=back
+
+=head1 AUTHOR
+
+Louis Strous E<lt>LS@quae.nlE<gt>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2018 Louis Strous.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

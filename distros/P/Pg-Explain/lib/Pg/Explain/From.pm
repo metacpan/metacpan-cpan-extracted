@@ -9,11 +9,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 0.76
+Version 0.77
 
 =cut
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,30 @@ sub make_node_from {
 
     $new_node->add_extra_info( 'Index Cond: ' . $struct->{ 'Index Cond' } ) if $struct->{ 'Index Cond' };
     $new_node->add_extra_info( 'Filter: ' . $struct->{ 'Filter' } )         if $struct->{ 'Filter' };
+    if ( $struct->{ 'Node Type' } eq 'Sort' ) {
+        if ( 'ARRAY' eq ref $struct->{ 'Sort Key' } ) {
+            $new_node->add_extra_info( 'Sort Key: ' . join( ', ', @{ $struct->{ 'Sort Key' } } ) );
+        }
+        if ( $struct->{ 'Sort Method' } ) {
+            $new_node->add_extra_info(
+                sprintf 'Sort Method: %s %s: %dkB',
+                $struct->{ 'Sort Method' }, $struct->{ 'Sort Space Type' }, $struct->{ 'Sort Space Used' }
+            );
+        }
+    }
+    my @buf_info = ();
+    for my $buf_block ( qw(Shared Local Temp) ) {
+        my @buf_block_info = ();
+        for my $buf_read ( qw(Hit Read Dirtied Written) ) {
+            my $key = "$buf_block $buf_read Blocks";    # Shared Hit Blocks
+            push @buf_block_info, sprintf '%s=%d', lc $buf_read, $struct->{ $key }    # hit=12345
+                if defined $struct->{ $key }
+                and $struct->{ $key } =~ m{\A\d+\z}
+                and $struct->{ $key } > 0;
+        }
+        push @buf_info, join ' ', lc $buf_block, @buf_block_info if @buf_block_info;
+    }
+    $new_node->add_extra_info( 'Buffers: ' . join ', ', @buf_info ) if @buf_info;
 
     if ( $struct->{ 'Plans' } ) {
         my @plans;

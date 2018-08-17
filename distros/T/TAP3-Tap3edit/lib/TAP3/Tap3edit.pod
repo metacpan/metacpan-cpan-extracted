@@ -1,7 +1,7 @@
 =head1 NAME
 
   TAP3::Tap3edit - TAP3, RAP and NRTRDE files Encode/Decode library
-  http://www.tap3edit.com
+  https://github.com/tap3edit/TAP3-Tap3edit
 
 =head1 SYNOPSYS
 
@@ -198,20 +198,19 @@ Dump the tree of the complete TAP file. You can see the complete structure of th
 
 =head1 REQUIRED MODULES
 
-L<Convert::ASN1>. A patched version fixing a problem with files with indefinite length can be found here: http://www.tap3edit.com/en_0_2_download.php
+L<Convert::ASN1>
 
 =head1 SEE ALSO
 
-Examples: http://www.tap3edit.com/en_3_1_examples.php
-Other TAP3 tools: http://www.tap3edit.com/en_4_1_tools.php
+https://github.com/tap3edit
 
 =head1 AUTHOR
 
-Javier Gutierrez <jgutierrez at tap3edit dot com> or http://www.tap3edit.com/en_0_3_contact.html
+Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2012 Javier Gutierrez. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright (c) 2004-2018 Javier Gutierrez. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 This program contains TAP and RAP ASN.1 Specifications. The ownership of the TAP/RAP ASN.1 Specifications belongs to the GSM MoU Association (http://www.gsm.org) and should be used under following conditions:
 

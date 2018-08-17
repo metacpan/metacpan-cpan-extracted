@@ -34,12 +34,6 @@
          }
       }
    },
-   "provides" : {
-      "HO::class" : {
-         "file" : "lib/HO/class.pm",
-         "version" : "0.073"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://github.com/giftnuss/p5-ho-class/tree/master",
@@ -48,6 +42,6 @@
          "url" : "git://github.com/giftnuss/p5-ho-class.git"
       }
    },
-   "version" : "0.073",
+   "version" : "0.074",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

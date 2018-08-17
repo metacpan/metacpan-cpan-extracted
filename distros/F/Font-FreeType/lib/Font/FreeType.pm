@@ -2,7 +2,7 @@ package Font::FreeType;
 use warnings;
 use strict;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 require DynaLoader;
 our @ISA = qw( DynaLoader );
@@ -139,6 +139,16 @@ module and so will be available once you do C<use Font::FreeType>.
 =item FT_LOAD_DEFAULT
 
 The same as doing nothing special.
+
+=item FT_LOAD_COMPUTE_METRICS
+
+Compute glyph metrics from the glyph data, without
+the use of bundled metrics tables (for example, the 'hdmx' table in
+TrueType fonts).  This flag is mainly used by font validating or
+font editing applications, which need to ignore, verify, or edit
+those tables.
+
+This option is only available with FreeType 2.6.1 or newer.
 
 =item FT_LOAD_CROP_BITMAP
 

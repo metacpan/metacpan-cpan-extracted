@@ -4591,7 +4591,9 @@ typedef OP* (CPERLscope(*Perl_check_t)) (pTHX_ OP*);
 
 #ifdef HAS_QUAD
 # ifdef U64TYPE
-#  define WIDEST_UTYPE U64TYPE
+#  ifndef WIDEST_UTYPE
+#   define WIDEST_UTYPE U64TYPE
+#  endif
 # else
 #  define WIDEST_UTYPE Quad_t
 # endif

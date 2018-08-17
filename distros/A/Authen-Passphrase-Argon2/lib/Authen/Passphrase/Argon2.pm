@@ -11,30 +11,31 @@ use Syntax::Construct qw( ?<> /a );
 
 use parent 'Authen::Passphrase';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our (%salts, %hashes, @argons);
 BEGIN {
 	@argons = (
-		['salt'], 
-		[qw/cost 3/], 
+		['salt'],
+		[qw/cost 3/],
 		[qw/factor 32M/],
 		[qw/parallelism 1/],
 		[qw/size 16/]
 	);
 	%salts = (
 		salt => sub {
-			$_[0] =~ m#\A[\x00-\xff]*\z#
+			$_[0] = $salts{salt_random}() if "$_[0]" eq 'random';
+			$_[0] =~ m#\A[\x00-\xff]{6}.*\z#
 				or croak sprintf("%s is not a valid raw salt", $_[0]);
 			$_[0];
 		},
 		salt_hex => sub {
-			$_[0] =~ m#\A(?:[0-9A-Fa-f]{2})+\z#
-				or croak sprintf "'%s' is not a valid hash hex", $_[0];
-			pack("H*", $_[0]);
+			$_[0] = $salts{salt}($_[0]);
+			unpack("H*", $_[0]);
 		},
 		salt_base64 => sub {
-			decode_base64($_[0]);
+			$_[0] = $salts{salt}($_[0]);
+			encode_base64($_[0]);
 		},
 		salt_random => sub {
 			Data::GUID->new->as_string;
@@ -42,108 +43,101 @@ BEGIN {
 	);
 	%hashes = (
 		hash => sub {
-			$_[0] =~ m#\A[\x00-\xff]*\z#
-				or croak sprintf "not a valid raw hash - %s", $_[0];
-			"$_[0]";
+			$_[0] =~ m/^
+				\$argon2id
+				\$v=\d+
+				\$m=(?<factor>\d+),
+				t=(?<cost>\d+),
+				p=(?<parallelism>\d+)
+				\$
+			/ax or croak sprintf "not a valid raw hash - %s", $_[0];
+			("$_[0]", %+);
 		},
 		hash_base64 => sub {
-			decode_base64($_[0]);
+			($_[0]) = $hashes{hash}($_[0]);
+			encode_base64($_[0]);
 		},
 		hash_hex => sub {
-			$_[0] =~ m#\A(?:[0-9A-Fa-f]{2})+\z#
-				or croak sprintf "'%s' is not a valid hash hex", $_[0];
-			pack("H*", $_[0]);
+			($_[0]) = $hashes{hash}($_[0]);
+			unpack("H*", $_[0]);
 		}
 	);
 }
 
 sub new {
-	my ($class, %args) = (shift, (scalar @_ > 1 ? @_ : %{$_[0]}));
-	
+	my ($class, %args) = (shift, (scalar @_ == 1 ? %{$_[0]} : @_));
+
 	my $self = bless({ algorithm => 'Argon2' }, $class);
-	
-	$args{crypt} = delete $args{passphrase} || $args{crypt};
 
-	exists $args{$_} and ! $self->{salt}
-		&& do { $self->{salt} = $salts{$_}->($args{$_}) }
-		|| croak sprintf "salt specified redundantly - %s", $_
-	foreach (keys %salts);
+	$args{crypt} = delete $args{passphrase} if $args{passphrase};
 
-	exists $args{"stored_$_"} and do { $args{"hash_$_"} = delete $args{crypt} } 
-		&& last
-	foreach(qw/hash base64 hex/);
-	
-	unless ($args{crypt}) { exists $args{$_} and ! $self->{crypt} 
-		&& do { $self->{crypt} = $hashes{$_}->($args{$_}) } 
-		|| croak sprintf "hash specified redundantly - %s", $_
-	foreach (keys %hashes); }	
-	
-	$self->{$_->[0]} = $self->{$_->[0]} 
-		|| $args{$_->[0]} 
-		|| $_->[1] 
+	exists $args{$_} ? ! $self->{salt}
+		? do { $self->{salt} = $salts{$_}->($args{$_}) }
+		: croak sprintf "salt specified redundantly - %s", $_
+	: next foreach (keys %salts);
+
+	foreach (qw/hash base64 hex/) {
+		if (exists $args{"stored_$_"}) {
+			($args{"hash_$_"}) = delete $args{crypt};
+			last;
+		}
+	}
+
+	$self->{$_->[0]} = $self->{$_->[0]}
+		|| $args{$_->[0]}
+		|| $_->[1]
 	foreach @argons;
-	
-	$self->{crypt} 
-		or $args{crypt} 
-		&& do { $self->{crypt} = $self->_hash_of($args{crypt}) }
-		|| croak "crypt not specified";
-	
+
+	unless ($args{crypt}) {
+		exists $args{$_} ? ! $self->{crypt}
+			? $self->$_($args{$_})
+		 	: croak sprintf "hash specified redundantly - %s", $_
+		: next foreach (keys %hashes);
+	} else {
+		$self->{crypt} = $self->_hash_of($args{crypt});
+	}
+
 	return $self;
 }
 
 sub match {
 	my ($self, $passphrase) = @_;
-	
+
 	return argon2id_verify($self->{crypt}, $passphrase);
 }
 
 sub from_crypt {
 	my ($self, $crypt, $info) = (@_, {});
-
-	croak "invalid Argon2 crypt format"
-		unless $crypt =~ m/^
-			\$argon2id
-			\$v=\d+
-			\$m=(?<factor>\d+),
-			t=(?<cost>\d+),
-			p=(?<parallelism>\d+)
-			\$
-		/ax;
-
-	return $self->new(%{ $info }, %+,  passphrase => $crypt);
+	return $self->new(%{ $info }, 'passphrase', $hashes{hash}($crypt));
 }
 
 sub from_rfc2307 {
 	my ( $class, $rfc2307, $info) = (@_, {});
-	
+
 	croak "invalid Argon2 RFC2307 format" unless $rfc2307 =~ m/^{ARGON2}(.*)$/;
-	
+
 	return $class->from_crypt($1, $info);
 }
 
 sub as_crypt {
 	my ($self, $val) = @_;
-	
-	$self->{crypt} = $self->_hash_of($val) if $val;
-	
+
+	$self->{crypt} = $self->_hash_of($val) if defined $val;
+
 	return $self->{crypt};
 }
 
 sub as_hex {
-	my ($self, $val) = @_;
-	
-	return $self->hash_hex($val);
+	goto &hash_hex;
 }
 
 sub as_base64 {
-	my ($self, $val) = @_;
-	
-	return $self->hash_base64($val);
+	goto &hash_base64;
 }
 
 sub as_rfc2307 {
 	my ($self, $val) = @_;
-	
+
 	return '{ARGON2}' . $self->as_crypt($val);
 }
 
@@ -155,53 +149,39 @@ sub algorithm {
 
 sub salt {
 	my($self, $val) = @_;
-	
-	$self->{salt} = $salts{salt}->($val) if $val;
-	
-	return $self->{salt};
+	$self->{salt} = $salts{salt}($val) if $val;
+	$self->{salt};
 }
 
 sub salt_hex {
 	my($self, $val) = @_;
-	
-	$self->{salt} = $salts{salt_hex}->($val) if $val;
-	
-	return unpack("H*", $self->{salt});
+	$salts{salt_hex}($self->salt($val ? pack("H*", $val) : ()));
 }
 
 sub salt_base64 {
 	my($self, $val) = @_;
-	
-	$self->{salt} = $salts{salt_base64}->($val) if $val;
-	
-	return encode_base64($self->{salt});
+	$salts{salt_base64}($self->salt($val ? decode_base64($val) : ()));
 }
 
 sub hash {
 	my($self, $val) = @_;
-	
-	return $self->as_crypt($val);
+	return $val ? $self->as_crypt($hashes{hash}($val)) : $self->{crypt};
 }
 
 sub hash_hex {
 	my($self, $val) = @_;
-	
-	return unpack("H*", $self->as_crypt($val));
+	return $hashes{hash_hex}($self->as_crypt($val ? pack("H*", $val) : ()));
 }
 
 sub hash_base64 {
 	my($self, $val) = @_;
-	
-	return encode_base64($self->as_crypt($val));
+	return $hashes{hash_base64}($self->as_crypt($val ? decode_base64($val) : ()));
 }
 
 sub _hash_of {
 	my ($self, $pass, @params) = @_;
-
 	return $pass if ($pass =~ m/\$argon2/);
-
-	!$self->{$_->[0]} && croak "$_ not set" or push @params, $self->{$_->[0]} for @argons; 
-
+	!$self->{$_->[0]} ? croak "$_->[0] not set" : push @params, $self->{$_->[0]} for @argons;
 	return argon2id_pass($pass, @params);
 }
 
@@ -215,7 +195,7 @@ Authen::Passphrase::Argon2 - Store and check password using Argon2
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 

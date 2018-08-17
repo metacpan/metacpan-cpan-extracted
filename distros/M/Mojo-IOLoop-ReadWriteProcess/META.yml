@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.22'
+    version: '0.23'
   Mojo::IOLoop::ReadWriteProcess::CGroup:
     file: lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm
   Mojo::IOLoop::ReadWriteProcess::CGroup::v1:
@@ -81,13 +81,15 @@ provides:
   Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Shared/Semaphore.pm
 requires:
+  IPC::SharedMem: '0'
   Mojolicious: '7.24'
 resources:
   bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
   repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.22'
+version: '0.23'
 x_contributors:
   - 'Ettore Di Giacinto <mudler@gentoo.org>'
   - 'Ettore Di Giacinto <mudler@users.noreply.github.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

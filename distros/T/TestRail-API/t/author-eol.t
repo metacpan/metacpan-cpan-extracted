@@ -60,6 +60,7 @@ my @files = (
     't/lock_data/lockmealso.test',
     't/lock_data/lockmetoo.test',
     't/lock_data/sortalockme.test',
+    't/no_such_test.tap',
     't/notests.test',
     't/pass.test',
     't/release-cpan-changes.t',

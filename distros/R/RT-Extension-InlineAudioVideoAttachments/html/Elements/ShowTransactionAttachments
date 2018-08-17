@@ -266,7 +266,7 @@ my $render_attachment = sub {
                 . $m->interp->apply_escapes( $filename, 'u', 'h' );
 
         $m->out(
-            qq{<audio controls preload="metadata">><source src="$url" type="$content_type">} .
+            qq{<audio controls preload="metadata"><source src="$url" type="$content_type">} .
             loc('Your browser does not support the audio tag.') .
             qq{</audio>}
         );
@@ -291,7 +291,7 @@ my $render_attachment = sub {
                 . $m->interp->apply_escapes( $filename, 'u', 'h' );
 
         $m->out(
-            qq{<video controls preload="metadata"> style="max-width: 100%;"><source src="$url" type="$content_type">} .
+            qq{<video controls preload="metadata" style="max-width: 100%;"><source src="$url" type="$content_type">} .
             loc('Your browser does not support the video tag.') .
             qq{</video>}
         );

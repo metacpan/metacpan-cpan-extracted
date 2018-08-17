@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-08-07'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-08-11'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ cryp-arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.005 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-08-07.
+This document describes version 0.006 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-08-11.
 
 =head1 SYNOPSIS
 
@@ -85,6 +85,9 @@ filled for too long):
 To get profit report:
 
  % cryp-arbit profit-report
+
+ # Use specified USD spot rates (e.g. USD/IDR=14500, USD/THB=33.25)
+ % cryp-arbit profit-report --usd-rate IDR=14500 --usd-rate THB=33.25
 
 For other subcommands, use C<cryp-arbit --help> or see the documentation.
 
@@ -151,13 +154,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -206,7 +207,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -626,6 +627,23 @@ Strategy is implemented in a `App::cryp::arbit::Strategy::*` perl module.
 
 =item B<--time-start>=I<s>
 
+=item B<--usd-rate>=I<s>%
+
+Set USD rates.
+
+Example:
+
+    --usd-rate IDR=14500 --usd-rate THB=33.25
+
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--usd-rates-json>=I<s>
+
+Set USD rates (JSON-encoded).
+
+See C<--usd-rate>.
+
 =back
 
 =head1 COMPLETION
@@ -748,6 +766,7 @@ List of available configuration parameters:
  detail (see --detail)
  time_end (see --time-end)
  time_start (see --time-start)
+ usd_rates (see --usd-rate)
 
 =head1 ENVIRONMENT
 

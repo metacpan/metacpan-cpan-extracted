@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Scheduler;
-$cPanel::TaskQueue::Scheduler::VERSION = '0.850';
+$cPanel::TaskQueue::Scheduler::VERSION = '0.900';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 
@@ -205,7 +205,7 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         local $/;
         my ( $magic, $version, $meta ) = $self->_serializer()->load($fh);
 
-        $self->throw("Not a recognized TaskQueue Scheduler state file.\n")   unless defined $magic   and $magic   eq $FILETYPE;
+        $self->throw("Not a recognized TaskQueue Scheduler state file.\n")   unless defined $magic   and $magic eq $FILETYPE;
         $self->throw("Invalid version of TaskQueue Scheduler state file.\n") unless defined $version and $version eq $CACHE_VERSION;
 
         # Next id should continue increasing.
@@ -374,7 +374,7 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         };
         my $ex = $@;
         $guard->update_file() if $count && $guard;
-        $self->throw( $ex ) if $ex;
+        $self->throw($ex) if $ex;
 
         return $count;
     }
@@ -402,15 +402,15 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         };
         my $ex = $@;
         $guard->update_file() if @ids;
-        $self->throw( $ex ) if $ex;
+        $self->throw($ex) if $ex;
 
         return @ids;
     }
 
     sub delete_all_tasks {
         my ($self) = @_;
-        my $guard = $self->{disk_state}->synch();
-        my $count = @{ $self->{time_queue} };
+        my $guard  = $self->{disk_state}->synch();
+        my $count  = @{ $self->{time_queue} };
         $self->{time_queue} = [];
         $guard->update_file() if $count;
 
@@ -428,11 +428,7 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
 
         $self->{disk_state}->synch();
 
-        return [
-            map {
-                { time => $_->{time}, task => $_->{task}->clone() }
-            } @{ $self->{time_queue} }
-        ];
+        return [ map { { time => $_->{time}, task => $_->{task}->clone() } } @{ $self->{time_queue} } ];
     }
 
     # ---------------------------------------------------------------

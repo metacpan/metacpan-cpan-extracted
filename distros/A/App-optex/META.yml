@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   App::optex:
     file: lib/App/optex.pm
-    version: v0.2.0
+    version: v0.2.1
   App::optex::Tmpfile:
     file: lib/App/optex/Tmpfile.pm
   App::optex::debug:
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex/issues
   homepage: https://github.com/kaz-utashiro/optex
   repository: git://github.com/kaz-utashiro/optex.git
-version: v0.2
+version: v0.2.1
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

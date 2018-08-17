@@ -1,5 +1,5 @@
 use Test::More;
-use Acme::InputRecordSeparatorIsRegexp;
+use Acme::InputRecordSeparatorIsRegexp 'open','autochomp';
 use strict;
 use warnings;
 
@@ -21,11 +21,43 @@ open my $xx, '>', 't/test09.txt';
 print $xx $yy;
 close $xx;
 
-my $fh = Acme::InputRecordSeparatorIsRegexp->open( 
-    '\r\n|\r|\n', '<', 't/test09.txt',
-    { maxrecsize => 100, autochomp => 1 } );
-ok($fh, 'Acme::InputRecordSeparatorIsRegexp::open ok');
+my $z = open my $fh, "<:irs(\r\n|\r|\n)", "t/test09.txt";
+ok($z && $fh, 'Acme::InputRecordSeparatorIsRegexp::open ok');
 ok(tied(*$fh), 'return tied handle');
+
+ok(!(tied *$fh)->autochomp(), 'autochomp is off');
+ok(!autochomp(tied *$fh), 'autochomp get function');
+ok(!autochomp($fh), 'autochomp get function');
+
+(tied *$fh)->autochomp(1);
+ok((tied *$fh)->autochomp(), 'autochomp is on');
+
+autochomp(tied *$fh, 0);
+ok(!autochomp(tied $fh), 'autochomp set function');
+autochomp($fh, 1);
+ok(autochomp(tied *$fh), 'autochomp set function');
+ok(autochomp($fh), 'autochomp set function');
+ok(autochomp(*$fh), 'autochomp set function');
+
+open my $f1, "<", "t/test09.txt";
+my $line = <$f1>;
+ok($line =~ m<$/$>, 'line from regular fh contains line ending');
+ok(!tied *$f1, "f1 is regular filehandle");
+my $z1 = autochomp($f1);
+ok(defined($z1) && $z1==0, 'can call autochomp on regular filehandle');
+ok(!tied *$f1, "f1 is still regular fh after get autochomp");
+$line = <$f1>;
+ok($line =~ m<$/$>, 'line from regular fh still contains line ending');
+my $z2 = autochomp($f1,1);
+ok(defined($z2) && $z2==0, 'autochomp called on regular filehandle');
+ok(tied *$f1, "set autochomp on regular fh ties it to this package");
+$line = <$f1>;
+ok($line !~ m<$/$>, 'line from autochomped fh does not contain line ending');
+
+
+
+
+
 
 my (@tell, @seek);
 

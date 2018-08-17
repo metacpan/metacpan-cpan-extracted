@@ -1,10 +1,10 @@
-package Pcore::PgSQL v0.19.6;
+package Pcore::PgSQL v0.20.1;
 
 use Pcore -dist, -class;
 
 has data_dir => ( is => 'ro', isa => Str, required => 1 );
 
-sub run ( $self, $cb ) {
+sub run ( $self ) {
     my $db_dir = "$self->{data_dir}/db/";
 
     # create and prepare data dir
@@ -31,11 +31,11 @@ sub run ( $self, $cb ) {
 
         chown $uid, $uid, $pwfile or die;
 
-        my $res = P->sys->run_proc( [ 'su', 'postgres', '-c', "initdb --encoding UTF8 --no-locale -U postgres --pwfile $pwfile -D $db_dir" ] );
+        my $proc = P->sys->run_proc1( [ 'su', 'postgres', '-c', "initdb --encoding UTF8 --no-locale -U postgres --pwfile $pwfile -D $db_dir" ] )->wait;
 
         unlink $pwfile or 1;
 
-        exit 3 if !$res;
+        exit 3 if !$proc;
 
         P->file->write_text(
             "$db_dir/pg_hba.conf",
@@ -58,16 +58,7 @@ sub run ( $self, $cb ) {
     chown $uid, $uid, '/var/run/postgresql/' or die;
 
     # run server
-    P->sys->run_proc(
-        [ 'su', 'postgres', '-c', "postgres -D $db_dir" ],
-        on_finish => sub ($proc) {
-            $cb->($proc);
-
-            return;
-        }
-    );
-
-    return;
+    return P->sys->run_proc1( [ 'su', 'postgres', '-c', "postgres -D $db_dir" ] )->wait;
 }
 
 sub is_empty ($self) {

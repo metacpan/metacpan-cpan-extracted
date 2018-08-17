@@ -11,6 +11,6 @@ is $redis->db->connection->url->host, '/tmp/redis.sock', 'host';
 is $redis->db->connection->url->port, undef,             'port';
 
 $redis->db->connection->_connect;
-is_deeply $args, {path => '/tmp/redis.sock'}, 'connect args';
+is_deeply $args, {path => '/tmp/redis.sock', timeout => 10}, 'connect args';
 
 done_testing;

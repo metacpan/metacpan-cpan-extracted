@@ -19,10 +19,12 @@ use Digest::SHA1;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
+
+              data_tools_set_file_io_encoding
 
               file_save
               file_load
@@ -97,19 +99,41 @@ our %EXPORT_TAGS = (
                    
                    );
             
+##############################################################################
+
+my $FILE_IO_ENCODING;
+my $FILE_IO_BINMODE;
+
+sub data_tools_set_file_io_encoding
+{
+  $FILE_IO_ENCODING = shift;
+  $FILE_IO_BINMODE  = uc $FILE_IO_ENCODING eq ':RAW' ? 1 : 0;
+}
 
 ##############################################################################
 
 sub file_load
 {
   my $fn  = shift; # file name
-  my $opt = shift;
+  my $opt = shift || {};
+  
+  if( ref( $fn ) eq 'HASH' )
+    {
+    $opt = $fn;
+    hash_uc_ipl( $opt );
+    $fn = $opt->{ 'FNAME' } || $opt->{ 'FILE_NAME' };
+    }
+  else
+    {  
+    hash_uc_ipl( $opt );
+    }
   
   my $i;
-  my $encoding = $opt->{ 'encoding' } || $opt->{ 'ENCODING' };
+  my $encoding = $opt->{ 'ENCODING' } || $FILE_IO_ENCODING;
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
   open( $i, "<" . $mopt, $fn ) or return undef;
+  binmode( $i ) if $opt->{ ':RAW' } || $FILE_IO_BINMODE;
   local $/ = undef;
   my $s = <$i>;
   close $i;
@@ -119,13 +143,25 @@ sub file_load
 sub file_load_ar
 {
   my $fn  = shift; # file name
-  my $opt = shift;
+  my $opt = shift || {};
+
+  if( ref( $fn ) eq 'HASH' )
+    {
+    $opt = $fn;
+    hash_uc_ipl( $opt );
+    $fn = $opt->{ 'FNAME' } || $opt->{ 'FILE_NAME' };
+    }
+  else
+    {  
+    hash_uc_ipl( $opt );
+    }
   
   my $i;
-  my $encoding = $opt->{ 'encoding' } || $opt->{ 'ENCODING' };
+  my $encoding = $opt->{ 'ENCODING' } || $FILE_IO_ENCODING;
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
   open( $i, "<" . $mopt, $fn ) or return undef;
+  binmode( $i ) if $opt->{ ':RAW' } || $FILE_IO_BINMODE;
   my @all = <$i>;
   close $i;
   return \@all;
@@ -134,9 +170,22 @@ sub file_load_ar
 sub file_save
 {
   my $fn = shift; # file name
+  
+  my $opt = {};
+  if( ref( $fn ) eq 'HASH' )
+    {
+    $opt = $fn;
+    hash_uc_ipl( $opt );
+    $fn = $opt->{ 'FNAME' } || $opt->{ 'FILE_NAME' };
+    }
+
+  my $encoding = $opt->{ 'ENCODING' } || $FILE_IO_ENCODING;
+  my $mopt;
+  $mopt = ":encoding($encoding)" if $encoding;
 
   my $o;
-  open( $o, ">:encoding(UTF-8)", $fn ) or return 0;
+  open( $o, ">" . $mopt, $fn ) or return 0;
+  binmode( $o ) if $opt->{ ':RAW' } || $FILE_IO_BINMODE;
   print $o @_;
   close $o;
   return 1;
@@ -699,10 +748,20 @@ INIT  { __url_escapes_init(); }
 
   # --------------------------------------------------------------------------
 
-  my $res     = file_save( $file_name, 'file content here' );
-  my $content = file_load( $file_name );
+  data_tools_set_file_io_encoding( 'UTF-8' ); # all file IO will use UTF-8
+  data_tools_set_file_io_encoding( ':RAW' );  # all file IO will use binary data
 
-  my $content_arrayref = file_load_ar( $file_name );
+  my $res  = file_save( $file_name, 'file content here' );
+  my $data = file_load( $file_name );
+
+  my $data_arrayref = file_load_ar( $file_name );
+  
+  # for specific charset encoding and because of backward compatibility:
+
+  my $res  = file_save( { FILE_NAME => $file_name, ENCODING => 'UTF-8' }, 'data' );
+  my $data = file_load( { FILE_NAME => $file_name, ENCODING => 'UTF-8' } );
+
+  my $data_arrayref = file_load_ar( { FILE_NAME => $fname, ENCODING => 'UTF-8' } );
 
   # --------------------------------------------------------------------------
 

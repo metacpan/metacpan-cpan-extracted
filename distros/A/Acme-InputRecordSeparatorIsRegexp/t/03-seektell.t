@@ -1,5 +1,5 @@
 use Test::More;
-use Acme::InputRecordSeparatorIsRegexp;
+use Acme::InputRecordSeparatorIsRegexp 'open';
 use strict;
 use warnings;
 
@@ -11,13 +11,12 @@ for ('AAA'..'ZZZ') {
 close $xx;   # t/test03.txt is about 150K
 
 $! = 0;
-my $xh = Acme::InputRecordSeparatorIsRegexp->open( qr/qwer/, '<', 't/bogus-file.qwer' );
-ok(!$xh, 'open fail for bogus file');
+my $z = open(my $xh, "<:irs(qwer)", "t/bogus-file.qwer");
+ok(!$z, 'open fail for bogus file');
 ok($!, '$! set on bad open');
 
-my $fh = Acme::InputRecordSeparatorIsRegexp->open( 
-    qr/1.3|T.4|E....D/s, '<', 't/test03.txt' );
-ok($fh, 'Acme::InputRecordSeparatorIsRegexp::open ok');
+$z = open my $fh, "<:irs(1.3|T.4|E....D)", "t/test03.txt";
+ok($z, 'Acme::InputRecordSeparatorIsRegexp::open ok');
 ok(tied(*$fh), 'return tied handle');
 
 my (@tell, @seek);

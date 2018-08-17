@@ -48,7 +48,7 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitLoopOnHash" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitLoopOnHash.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/xsawyerx/perl-critic-policy-variables-prohibitlooponhash"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_authority" : "cpan:XSAWYERX",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

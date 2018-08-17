@@ -1,18 +1,18 @@
 package WebService::KvKAPI::Spoof;
-our $VERSION = '0.005';
-use Moose;
+our $VERSION = '0.006';
+use Moo;
 
 # ABSTRACT: Enable spoof mode on the KvK API
 
 extends 'WebService::KvKAPI';
 
-override '_search' =>  sub {
-    my ($self, $params) = @_;
+around '_search' =>  sub {
+    my ($orig, $self, $params) = @_;
     return $self->api_call('CompaniesTest_GetCompaniesBasicV2', $params);
 };
 
-override '_profile' =>  sub {
-    my ($self, $params) = @_;
+around '_profile' =>  sub {
+    my ($orig, $self, $params) = @_;
     return $self->api_call('CompaniesTest_GetCompaniesExtendedV2', $params);
 };
 
@@ -30,7 +30,7 @@ WebService::KvKAPI::Spoof - Enable spoof mode on the KvK API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

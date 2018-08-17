@@ -1,5 +1,13 @@
 Revision history for Perl module TestRail::API
 
+0.043 2018-6-16 TEODESIAN
+    - Better error messaging when bad custom result fields are configured in Test::Rail::Parser
+
+0.042 2018-04-30 TEODESIAN
+    - Fix uninitialized value warning when no plan (or steps) are emitted
+    - Die on HTTP 401/403, we likely will never recover from this
+    - Add ability to re-try failed requests in TestRail::API, App::Prove::Plugin::TestRail and testrail-report
+
 0.041 2017-06-06 TEODESIAN
     - Fix MCE usage issue with confusion based on array -> hash inputs in TestRail::Utils::Find
     - Fix issue where Test plans were not recorded in the raw output of a case.

@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: Declarative interface to FFI::Platypus
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 
 our $ffi    = {};
@@ -174,7 +174,7 @@ FFI::Platypus::Declare - Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 0.50
+version 0.53
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,32 @@
 Revision history for CORBA-IDLtree
 
+2.02    2018/08/15
+        * Fixed a few typos in documentation.
+        * Added support for IDL4 struct inheritance defined by the
+          Building Block Extended Data-Types:
+          In case of STRUCT, the first SUBORDINATES element of may
+          be a reference to a further STRUCT node instead of the
+          reference to quintuplet. In this case, the first element
+          indicates the IDL4 parent struct type of the current
+          struct.  The function isnode() can be used for detecting
+          this case. The support for IDL4 struct inheritance is
+          implemented in sub Parse_File_i case $kw eq 'struct'.
+        * In sub is_elementary_type return early on undefined
+          $tdesc.
+        * In sub info check for valid $currfile and @infilename
+          before accessing $infilename[$currfile].
+        * In sub error avoid code duplication by reusing the
+          implemenation of sub info.
+        * In sub dump_symbols_internal handling of METHOD, pop
+          @arg only if @arg is non empty and $arg[-1] contains
+          the exception list.  We need these extra tests because
+          METHODs in VALUETYPEs do not have an exception list as
+          the last element of the SUBORDINATES.
+        * In sub dump_symbols_internal handling of REMARK nodes,
+          on calling sub dump_comment swap elements of anonymous
+          constructed array: $name comes first, then $subord.
+          (COMMENT nodes use the same layout.)
+
 2.01    2018/01/23
         * Fixed parsing of named argument values in sub
           parse_annotation_app:  At case

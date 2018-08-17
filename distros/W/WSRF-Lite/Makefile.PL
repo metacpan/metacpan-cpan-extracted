@@ -7,7 +7,7 @@ all_from 'lib/WSRF/Lite.pm';
 author 'Mark Mc Keown <Mark.McKeown@manchester.ac.uk>';
 abstract 'Implementation of WSRF';
 license 'perl';
-version '0.8.3.2';
+version '0.8.3.4';
 
 # add some requires for modules that dont properly specify dependencies
 requires 'Params::Validate'   => '0.91';

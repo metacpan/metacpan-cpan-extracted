@@ -15,10 +15,6 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: HO-class
-provides:
-  HO::class:
-    file: lib/HO/class.pm
-    version: '0.073'
 requires:
   Class::ISA: '0.20'
   Package::Subroutine: '0.022000'
@@ -26,5 +22,5 @@ requires:
 resources:
   homepage: http://github.com/giftnuss/p5-ho-class/tree/master
   repository: git://github.com/giftnuss/p5-ho-class.git
-version: '0.073'
+version: '0.074'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

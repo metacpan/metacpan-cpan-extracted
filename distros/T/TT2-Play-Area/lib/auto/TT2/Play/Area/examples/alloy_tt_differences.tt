@@ -1,0 +1,21 @@
+TT2 and Template::Alloy using TT2 syntax are largely compatible.
+
+There are some subtle differences however.  The main one that's a
+problem when it comes to preventing XSS is the precedence of operators.
+
+Specifically what happens when using || and a filter.
+
+TT2 figures out the result of the expression, then applies the filter.
+Template::Alloy ends up applying the filter to the right hand side thing,
+not the result of the expression.  This means you generally need to use
+brackets when dealing with Templay::Alloy and filters.
+
+a||b | html     [% a || b | html %]
+(a||b) | html   [% (a || b) | html %]
+a||'N/A' | html [% a || 'N/A' | html %]
+
+Also note that the implict filter doesn't get knocked out when
+using auto_filter when not using brackets causing a double encoding
+when you evaluate the second item.
+
+b||c | html     [% b || c | html %]

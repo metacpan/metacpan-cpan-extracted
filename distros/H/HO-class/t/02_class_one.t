@@ -21,7 +21,7 @@ isa_ok($obj,'THO::one');
 
 is($obj->ro_scalar,undef,'ro scalar default is undef');
 is_deeply([$obj->ro_array],[],'ro array default is empty list');
-is_deeply($obj->ro_hash,{},'ro hash dafult is empty list');
+is_deeply($obj->ro_hash,{},'ro hash default is empty list');
 is($obj->rw_scalar,undef,'rw scalar default is undef');
 is_deeply([$obj->rw_array],[],'rw array default is empty list');
 is_deeply($obj->rw_hash,{},'rw hash dafult is empty list');

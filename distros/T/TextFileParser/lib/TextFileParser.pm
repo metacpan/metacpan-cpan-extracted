@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-package TextFileParser 0.202;
+package TextFileParser 0.204;
 
 # ABSTRACT: an extensible Perl class to parse any text file by specifying grammar in derived classes.
 
@@ -78,12 +78,12 @@ sub __open_file {
     open my $fh, "<$fname"
         or throw_cant_open error => "Error while opening file $fname";
     $self->{__filehandle} = $fh;
-    $self->{__size} = (stat $fname)[7];
+    $self->{__size}       = ( stat $fname )[7];
 }
 
 sub __read_file_handle {
     my $self = shift;
-    my $fh = $self->{__filehandle};
+    my $fh   = $self->{__filehandle};
     $self->__init_read_fh;
     while (<$fh>) {
         $self->lines_parsed( $self->lines_parsed + 1 );
@@ -163,19 +163,37 @@ TextFileParser - an extensible Perl class to parse any text file by specifying g
 
 =head1 VERSION
 
-version 0.202
+version 0.204
 
 =head1 SYNOPSIS
 
     use TextFileParser;
 
-    my $parser = new TextFileParser;
+    my $parser = TextFileParser->new();
     $parser->read(shift @ARGV);
     print $parser->get_records, "\n";
 
 The above code reads a text file and prints the content to C<STDOUT>.
 
-Here's another parser which is derived from C<TextFileParser> as the base class. See how simple it is to make your own parser.
+=head1 DESCRIPTION
+
+This class can be used to parse any arbitrary text file format.
+
+C<TextFileParser> does all operations like C<open> file, C<close> file, line-count, and storage/deletion/retrieval of records. Future versions are expected to include progress-bar support. All these software features are file-format independent and can be re-used in parsing any text file format. Thus derived classes of C<TextFileParser> will be able to take advantage of these features without having to re-write the code again.
+
+The L<Examples|/"EXAMPLES"> section describes how one could use inheritance to build a parser.
+
+=head1 EXAMPLES
+
+The following examples should illustrate the use of inheritance to parse various types of text file formats.
+
+=head2 Basic principle
+
+Derived classes simply need to override one method : C<save_record>. With the help of that any arbitrary file format can be read. C<save_record> should interpret the format of the text and store it in some form by calling C<SUPER::save_record>. The C<main::> program will then use the records and create an appropriate data structure with it.
+
+=head2 Example 1 : A simple CSV Parser
+
+We will write a parser for a simple CSV file that reads each line and stores the records as array references.
 
     package CSVParser;
     use parent 'TextFileParser';
@@ -187,20 +205,69 @@ Here's another parser which is derived from C<TextFileParser> as the base class.
         $self->SUPER::save_record(\@fields);
     }
 
-That's it! Every line will be saved as an array reference containing the elements. Now in C<main::> you can write the following.
+That's it! Now in C<main::> you can write the following.
 
     use CSVParser;
     
-    my $a_parser = new CSVParser;
-    $a_parser->read(shift @ARGV);
+    my $csvp = CSVParser->new();
+    $csvp->read(shift @ARGV);
 
-The call to C<read> method calls the C<save_record> method internally. The overridden C<save_record> method from C<CSVParser> package is automatically called.
+=head3 Error checking
 
-=head1 DESCRIPTION
+It is easy to add any error checks using exceptions. One of the easiest ways to do this is to C<use L<Exception::Class>>.
 
-This class can be used to parse any arbitrary text file format. C<TextFileParser> does all operations like C<open> file, C<close> file, and line-count. Future versions are expected to include progress-bar support. All these can be re-used in parsing any other text file format. Thus derived classes of C<TextFileParser> will be able to take advantage of these features without having to re-write the code again.
+    package CSVParser;
+    use Exception::Class (
+        'CSVParser::Error', 
+        'CSVParser::TooManyFields' => {
+            isa => 'CSVParser::Error',
+        },
+    );
+    
+    use parent 'TextFileParser';
 
-Any drived class of C<TextFileParser> simply needs to override one single method : C<save_record>. In this way, any format of text file can be parsed without having to re-write code that is already included in this class.
+    sub save_record {
+        my ($self, $line) = @_;
+        chomp $line;
+        my (@fields) = split /,/, $line;
+        my $self->{__csv_header} = \@fields if not scalar($self->get_records);
+        CSVParser::TooManyFields->throw(error => "Too many fields on " . $self->lines_parsed)
+            if scalar(@fields) > scalar(@{$self->{__csv_header}});
+        $self->SUPER::save_record(\@fields);
+    }
+
+The C<TextFileParser> class will close all filehandles automatically as soon as an exception is thrown from C<save_record>. You can then catch the exception in C<main::> by C<use>ing C<L<Try::Tiny>>.
+
+=head2 Example 2 : Multi-line records
+
+Many text file formats have some way to indicate line-continuation. In BASH and many other interpreted shell languages, a line continuation is indicated with a trailing back-slash (\). In SPICE syntax if a line starts with a C<'+'> character then it is to be treated as a continuation of the previous line.
+
+To illustrate multi-line records we will write a derived class that simply joins the lines in a SPICE file and stores them as records.
+
+    package SPICELineJoiner;
+    use parent 'TextFileParser'l
+
+    sub save_record {
+        my ($self, $line) = @_;
+        $line = ($line =~ /^[+]\s*/) ? $self->__combine_with_last_record($line) : $line;
+        $self->SUPER::save_record( $line );
+    }
+
+    sub __combine_with_last_record {
+        my ($self, $line) = @_;
+        $line =~ s/^[+]\s*//;
+        my $last_rec = $self->pop_record;
+        chomp $last_rec;
+        return $last_rec . ' ' . $line;
+    }
+
+=head3 Making roles instead
+
+Line-continuation is a classic feature which is common to many different formats. If each syntax grammar generates a new class, one could potentially have to re-write code for line-continuation for each syntax or grammar. Instead it would be good to somehow re-use only the ability to join continued lines, but leave the actual syntax recognition to actual class that understands the syntax.
+
+But if we separate this functionality into a class of its own line we did above with C<SPICELineJoiner>, then it gives an impression that we can now create an object of C<SPICELineJoiner>. But in reality an object of this class would have not have much functionality and is therefore limited.
+
+This is where L<roles|Role::Tiny> are very useful.
 
 =head1 METHODS
 
@@ -208,7 +275,7 @@ Any drived class of C<TextFileParser> simply needs to override one single method
 
 Takes no arguments. Returns a blessed reference of the object.
 
-    my $pars = new TextFileParser;
+    my $pars = TextFileParser->new();
 
 This C<$pars> variable will be used in examples below.
 
@@ -238,25 +305,13 @@ Takes no arguments. Returns the number of lines last parsed.
 
     print $pars->lines_parsed, " lines were parsed\n";
 
-This is also very useful for error message generation. See example under L<Synopsis|/SYNOPSIS>.
+This is also very useful for error message generation.
 
 =head2 save_record
 
-Takes exactly one argument which can be anything: C<SCALAR>, or C<ARRAYREF>, or C<HASHREF> or anything else meaningful. This method is automatically called by C<read> method for each line, which in the C<TextFileParser> class is simply saving string records of each line.
+Takes exactly one argument which can be anything: C<SCALAR>, or C<ARRAYREF>, or C<HASHREF> or anything else meaningful. The important thing to remember is that exactly one record is saved per call. So if more than one argument are passed, everything after the first argument is ignored. And if no arguments are passed, then C<undef> is stored as a record.
 
-This method can be overridden in derived classes. An overriding method definition might call C<SUPER::save_record> passing it a modified record. Here's an example of a parser that reads multi-line files: if a line starts with a C<'+'> character then it is to be treated as a continuation of the previous line.
-
-    package MultilineParser;
-    use parent 'TextFileParser';
-
-    sub save_record {
-        my ($self, $line) = @_;
-        return $self->SUPER::save_record($line) if $line !~ /^[+]\s*/;
-        $line =~ s/^[+]\s*//;
-        my $last_rec = $self->pop_record;
-        chomp $last_rec;
-        $self->SUPER::save_record( $last_rec . ' ' . $line );
-    }
+In an application that uses a text parser, you will most-likely never call this method directly. It is automatically called within C<read> for each line. In this base class C<TextFileParser>, C<save_record> is simply called with a string containing the line text. Derived classes can decide to store records in a different form. See L<Inheritance examples|/"EXAMPLES"> for examples on how C<save_record> could be overridden for other text file formats.
 
 =head2 get_records
 
@@ -281,17 +336,6 @@ Takes no arguments and pops the last saved record.
     $uc_last = uc $last_rec;
     $pars->save_record($uc_last);
 
-=head1 AUTHOR
-
-Balaji Ramasubramanian <balajiram@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Balaji Ramasubramanian.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
@@ -302,5 +346,16 @@ rt.cpan.org>.
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 AUTHOR
+
+Balaji Ramasubramanian <balajiram@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Balaji Ramasubramanian.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

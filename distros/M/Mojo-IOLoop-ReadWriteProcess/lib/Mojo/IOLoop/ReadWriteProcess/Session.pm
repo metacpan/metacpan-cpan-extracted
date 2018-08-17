@@ -151,15 +151,16 @@ sub _get_prctl_syscall {
     ? 172
     : $machine eq "x86_64"  ? 157
     : $machine eq "sparc64" ? 147
-    : $machine eq "ppc"     ? 171
-    : $machine eq "ia64"    ? 1170
-    : $machine eq "alpha"   ? 348
-    : $machine eq "arm"     ? 0x900000 + 172
-    : $machine eq "avr32"   ? 148
-    : $machine eq "mips"    ? 4000 + 192
-    : $machine eq "mips64"  ? 5000 + 153
-    : $machine eq "xtensa"  ? 130
-    :                         undef;
+    : $machine eq "aarch64" ? 167
+    : ($machine eq "ppc" || $machine eq "ppc64le") ? 171
+    : $machine eq "ia64"   ? 1170
+    : $machine eq "alpha"  ? 348
+    : $machine eq "arm"    ? 0x900000 + 172
+    : $machine eq "avr32"  ? 148
+    : $machine eq "mips"   ? 4000 + 192
+    : $machine eq "mips64" ? 5000 + 153
+    : $machine eq "xtensa" ? 130
+    :                        undef;
 
   unless (defined $prctl_call) {
     delete @INC{

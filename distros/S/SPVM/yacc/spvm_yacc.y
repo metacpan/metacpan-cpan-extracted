@@ -16,21 +16,33 @@
   #include "spvm_list.h"
 %}
 
-%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF CONST
-%token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE CROAK VAR_NAME INTERFACE ISA
-%token <opval> SWITCH CASE DEFAULT EVAL WEAKEN PRECOMPILE DEREF BACKSLASH
-%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT AMPERSAND
+%token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE 
+%token <opval> DESCRIPTOR CONST
+%token <opval> IF ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT EVAL
+%token <opval> NAME VAR_NAME CONSTANT
+%token <opval> RETURN WEAKEN CROAK NEW
+%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
+%token <opval> AMPERSAND
 
-%type <opval> grammar opt_statements statements statement my_var field if_statement else_statement array_init
-%type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop isa
-%type <opval> opt_assignable_terms assignable_terms assignable_term args arg opt_args use declaration_in_package declarations_in_package term logical_term relative_term
-%type <opval> enumeration_values enumeration_value weaken_field package_var invocant list_assignable_terms
-%type <opval> type field_name sub_name package anon_package declarations_in_grammar opt_enumeration_values array_type ref_type
-%type <opval> for_statement while_statement expression opt_declarations_in_grammar var anon_sub deref ref
-%type <opval> field_access array_access convert_type enumeration new_object basic_type array_length declaration_in_grammar
-%type <opval> switch_statement case_statement default_statement array_type_with_length const_array_type
-%type <opval> ';' opt_descriptors opt_colon_descriptors descriptors type_or_void normal_statement normal_statement_for_end eval_block
-
+%type <opval> grammar
+%type <opval> opt_packages packages package anon_package package_block
+%type <opval> opt_declarations declarations declaration
+%type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
+%type <opval> sub anon_sub opt_args args arg invocant has use our
+%type <opval> opt_descriptors descriptors
+%type <opval> opt_statements statements statement normal_statement if_statement else_statement 
+%type <opval> for_statement while_statement switch_statement case_statement default_statement
+%type <opval> block eval_block
+%type <opval> expression
+%type <opval> unop binop
+%type <opval> call_sub
+%type <opval> array_access field_access weaken_field convert_type array_length 
+%type <opval> deref ref
+%type <opval> new array_init isa
+%type <opval> my_var var
+%type <opval> term opt_normal_terms normal_terms normal_term logical_term relative_term
+%type <opval> field_name sub_name
+%type <opval> type basic_type array_type array_type_with_length const_array_type ref_type  type_or_void
 
 %right <opval> ASSIGN SPECIAL_ASSIGN
 %left <opval> OR
@@ -41,7 +53,8 @@
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> MULTIPLY DIVIDE REMAINDER
-%right <opval> NOT '~' '@' SCALAR UMINUS
+%nonassoc <opval> ISA
+%right <opval> NOT '~' '@' SCALAR UMINUS REF DEREF
 %nonassoc <opval> INC DEC
 %nonassoc <opval> ')'
 %left <opval> ARROW
@@ -51,19 +64,18 @@
 %%
 
 grammar
-  : opt_declarations_in_grammar
+  : opt_packages
     {
       $$ = SPVM_OP_build_grammar(compiler, $1);
-
       compiler->op_grammar = $$;
     }
 
-opt_declarations_in_grammar
+opt_packages
   :	/* Empty */
     {
       $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
-  |	declarations_in_grammar
+  |	packages
     {
       if ($1->id == SPVM_OP_C_ID_LIST) {
         $$ = $1;
@@ -75,8 +87,8 @@ opt_declarations_in_grammar
       }
     }
   
-declarations_in_grammar
-  : declarations_in_grammar declaration_in_grammar
+packages
+  : packages package
     {
       SPVM_OP* op_list;
       if ($1->id == SPVM_OP_C_ID_LIST) {
@@ -90,35 +102,42 @@ declarations_in_grammar
       
       $$ = op_list;
     }
-  | declaration_in_grammar
-
-declaration_in_grammar
-  : package
-
-use
-  : USE basic_type ';'
-    {
-      $$ = SPVM_OP_build_use(compiler, $1, $2);
-    }
+  | package
 
 package
-  : PACKAGE basic_type opt_colon_descriptors package_block
+  : PACKAGE basic_type package_block
     {
-      $$ = SPVM_OP_build_package(compiler, $1, $2, $4, $3);
+      $$ = SPVM_OP_build_package(compiler, $1, $2, $3, NULL);
+    }
+  | PACKAGE basic_type ':' opt_descriptors package_block
+    {
+      $$ = SPVM_OP_build_package(compiler, $1, $2, $5, $4);
     }
 
 anon_package
-  : PACKAGE opt_colon_descriptors package_block
+  : PACKAGE package_block
     {
-      $$ = SPVM_OP_build_package(compiler, $1, NULL, $3, $2);
+      $$ = SPVM_OP_build_package(compiler, $1, NULL, $2, NULL);
+    }
+  | PACKAGE ':' opt_descriptors package_block
+    {
+      $$ = SPVM_OP_build_package(compiler, $1, NULL, $4, $3);
     }
 
-opt_declarations_in_package
+package_block
+  : '{' opt_declarations '}'
+    {
+      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, $1->file, $1->line);
+      SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, $2);
+      $$ = op_class_block;
+    }
+
+opt_declarations
   :	/* Empty */
     {
       $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
-  |	declarations_in_package
+  |	declarations
     {
       if ($1->id == SPVM_OP_C_ID_LIST) {
         $$ = $1;
@@ -129,8 +148,8 @@ opt_declarations_in_package
       }
     }
 
-declarations_in_package
-  : declarations_in_package declaration_in_package
+declarations
+  : declarations declaration
     {
       SPVM_OP* op_list;
       if ($1->id == SPVM_OP_C_ID_LIST) {
@@ -144,22 +163,26 @@ declarations_in_package
       
       $$ = op_list;
     }
-  | declaration_in_package
+  | declaration
 
-declaration_in_package
-  : field
+declaration
+  : has
   | sub
   | enumeration
-  | package_var ';'
-  | use;
+  | our ';'
+  | use
   | anon_sub
 
-package_block
-  : '{' opt_declarations_in_package '}'
+use
+  : USE basic_type ';'
     {
-      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, $1->file, $1->line);
-      SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, $2);
-      $$ = op_class_block;
+      $$ = SPVM_OP_build_use(compiler, $1, $2);
+    }
+
+enumeration
+  : ENUM enumeration_block
+    {
+      $$ = SPVM_OP_build_enumeration(compiler, $1, $2);
     }
 
 enumeration_block 
@@ -218,129 +241,16 @@ enumeration_value
       $$ = SPVM_OP_build_enumeration_value(compiler, $1, $3);
     }
 
-opt_statements
-  :	/* Empty */
+our
+  : OUR var ':' type
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-    }
-  |	statements
-    {
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        $$ = $1;
-      }
-      else {
-        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-        $$ = op_list;
-      }
-    }
-    
-statements
-  : statements statement 
-    {
-      SPVM_OP* op_list;
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        op_list = $1;
-      }
-      else {
-        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-      }
-      SPVM_OP_insert_child(compiler, op_list, op_list->last, $2);
-      
-      $$ = op_list;
-    }
-  | statement
-
-statement
-  : normal_statement
-  | if_statement
-  | for_statement
-  | while_statement
-  | block
-  | switch_statement
-  | case_statement
-  | default_statement
-  | eval_block
-
-block 
-  : '{' opt_statements '}'
-    {
-      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, $1->file, $1->line);
-      SPVM_OP_insert_child(compiler, op_block, op_block->last, $2);
-      $$ = op_block;
+      $$ = SPVM_OP_build_our(compiler, $2, $4);
     }
 
-normal_statement
-  : assignable_term ';'
-  | expression ';'
-  | ';'
-    {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, $1->file, $1->line);
-    }
-
-normal_statement_for_end
-  : assignable_term
-  | expression
-
-for_statement
-  : FOR '(' normal_statement term ';' normal_statement_for_end ')' block
-    {
-      $$ = SPVM_OP_build_for_statement(compiler, $1, $3, $4, $6, $8);
-    }
-
-while_statement
-  : WHILE '(' term ')' block
-    {
-      $$ = SPVM_OP_build_while_statement(compiler, $1, $3, $5);
-    }
-
-switch_statement
-  : SWITCH '(' assignable_term ')' block
-    {
-      $$ = SPVM_OP_build_switch_statement(compiler, $1, $3, $5);
-    }
-
-case_statement
-  : CASE assignable_term ':'
-    {
-      $$ = SPVM_OP_build_case_statement(compiler, $1, $2);
-    }
-
-default_statement
-  : DEFAULT ':'
-
-if_statement
-  : IF '(' term ')' block else_statement
-    {
-      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
-      
-      // if is wraped with block to allow the following syntax
-      //  if (my $var = 3) { ... }
-      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, $1->file, $1->line);
-      SPVM_OP_insert_child(compiler, op_block, op_block->last, op_if);
-      
-      $$ = op_block;
-    }
-
-else_statement
-  : /* NULL */
-    {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, compiler->cur_file, compiler->cur_line);
-    };
-  | ELSE block
-    {
-      $$ = $2;
-    }
-  | ELSIF '(' term ')' block else_statement
-    {
-      $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
-    }
-
-field
+has
   : HAS field_name ':' opt_descriptors type ';'
     {
-      $$ = SPVM_OP_build_field(compiler, $1, $2, $4, $5);
+      $$ = SPVM_OP_build_has(compiler, $1, $2, $4, $5);
     }
 
 sub
@@ -365,449 +275,6 @@ anon_sub
        $$ = SPVM_OP_build_sub(compiler, $2, op_sub_name, $4, $6, $1, NULL);
      }
 
-enumeration
-  : ENUM enumeration_block
-    {
-      $$ = SPVM_OP_build_enumeration(compiler, $1, $2);
-    }
-
-my_var
-  : MY var ':' type
-    {
-      $$ = SPVM_OP_build_my(compiler, $1, $2, $4);
-    }
-  | MY var
-    {
-      $$ = SPVM_OP_build_my(compiler, $1, $2, NULL);
-    }
-
-package_var
-  : OUR var ':' type
-    {
-      $$ = SPVM_OP_build_package_var(compiler, $2, $4);
-    }
-
-opt_assignable_terms
-  :	/* Empty */
-    {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-    }
-  |	assignable_terms
-    {
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        $$ = $1;
-      }
-      else {
-        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-        $$ = op_list;
-      }
-    }
-    
-assignable_terms
-  : assignable_terms ',' assignable_term
-    {
-      SPVM_OP* op_list;
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        op_list = $1;
-      }
-      else {
-        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-      }
-      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
-      
-      $$ = op_list;
-    }
-  | assignable_terms ',' list_assignable_terms
-    {
-      SPVM_OP* op_list;
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        op_list = $1;
-      }
-      else {
-        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-      }
-      
-      if ($3->id == SPVM_OP_C_ID_LIST) {
-        SPVM_OP* op_term = $3->first;
-        while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
-          SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term);
-          SPVM_OP_insert_child(compiler, op_list, op_list->last, op_term);
-          op_term = op_stab;
-        }
-      }
-      else {
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
-      }
-      
-      $$ = op_list;
-    }
-  | assignable_terms ','
-    {
-      $$ = $1;
-    }
-  | list_assignable_terms
-    {
-      $$ = $1;
-    }
-  | assignable_term
-    {
-      $$ = $1;
-    }
-
-list_assignable_terms
-  : '(' assignable_terms ')'
-    {
-      $$ = $2;
-    }
-    
-array_length
-  : '@' assignable_term
-    {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
-      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $2);
-    }
-  | '@' '{' assignable_term '}'
-    {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
-      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
-    }
-  | SCALAR '@' assignable_term
-    {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
-      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
-    }
-  | SCALAR '@' '{' assignable_term '}'
-    {
-      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
-      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
-    }
-
-deref
-  : DEREF var
-    {
-      $$ = SPVM_OP_build_deref(compiler, $1, $2);
-    }
-  | DEREF '{' var '}'
-    {
-      $$ = SPVM_OP_build_deref(compiler, $1, $3);
-    }
-
-ref
-  : BACKSLASH var
-    {
-      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
-      $$ = SPVM_OP_build_ref(compiler, op_ref, $2);
-    }
-  | BACKSLASH '{' var '}'
-    {
-      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
-      $$ = SPVM_OP_build_ref(compiler, op_ref, $3);
-    }
-
-term
-  : assignable_term
-  | relative_term
-  | logical_term
-  | isa
-  | '(' term ')'
-    {
-      $$ = $2;
-    }
-
-assignable_term
-  : var
-  | CONSTANT
-    {
-      $$ = SPVM_OP_build_constant(compiler, $1);
-    }
-  | UNDEF
-  | call_sub
-  | field_access
-  | array_access
-  | convert_type
-  | new_object
-  | array_init
-  | array_length
-  | my_var
-  | binop
-  | unop
-  | ref
-  | deref
-
-expression
-  : LAST
-  | NEXT
-  | RETURN {
-      $$ = SPVM_OP_build_return(compiler, $1, NULL);
-    }
-  | RETURN assignable_term
-    {
-      $$ = SPVM_OP_build_return(compiler, $1, $2);
-    }
-  | CROAK
-    {
-      $$ = SPVM_OP_build_croak(compiler, $1, NULL);
-    }
-  | CROAK assignable_term
-    {
-      $$ = SPVM_OP_build_croak(compiler, $1, $2);
-    }
-  | field_access ASSIGN assignable_term
-    {
-      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
-    }
-  | array_access ASSIGN assignable_term
-    {
-      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
-    }
-  | weaken_field
-
-isa
-  : term ISA type
-    {
-      $$ = SPVM_OP_build_isa(compiler, $2, $1, $3);
-    }
-
-new_object
-  : NEW basic_type
-    {
-      $$ = SPVM_OP_build_new_object(compiler, $1, $2, NULL);
-    }
-  | NEW array_type_with_length
-    {
-      $$ = SPVM_OP_build_new_object(compiler, $1, $2, NULL);
-    }
-  | NEW array_type '{' opt_assignable_terms '}'
-    {
-      $$ = SPVM_OP_build_new_object(compiler, $1, $2, $4);
-    }
-  | anon_package
-    {
-      // New
-      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, $1->file, $1->line);
-
-      $$ = SPVM_OP_build_new_object(compiler, op_new, $1, NULL);
-    }
-  | anon_sub
-    {
-      // Package
-      SPVM_OP* op_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE, $1->file, $1->line);
-      
-      // Create class block
-      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, $1->file, $1->line);
-      SPVM_OP* op_list_declarations = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP_insert_child(compiler, op_list_declarations, op_list_declarations->last, $1);
-      SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, op_list_declarations);
-      
-      // Build package
-      SPVM_OP_build_package(compiler, op_package, NULL, op_class_block, NULL);
-      
-      // New
-      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, $1->file, $1->line);
-      
-      $$ = SPVM_OP_build_new_object(compiler, op_new, op_package, NULL);
-    }
-
-array_init
-  : '[' opt_assignable_terms ']'
-    {
-      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
-      $$ = SPVM_OP_build_array_init(compiler, op_array_init, $2);
-    }
-
-convert_type
-  : '(' type ')' assignable_term
-    {
-      SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, $2->file, $2->line);
-      $$ = SPVM_OP_build_convert(compiler, op_convert, $2, $4);
-    }
-
-field_access
-  : assignable_term ARROW '{' field_name '}'
-    {
-      $$ = SPVM_OP_build_field_access(compiler, $1, $4);
-    }
-  | field_access '{' field_name '}'
-    {
-      $$ = SPVM_OP_build_field_access(compiler, $1, $3);
-    }
-  | array_access '{' field_name '}'
-    {
-      $$ = SPVM_OP_build_field_access(compiler, $1, $3);
-    }
-
-weaken_field
-  : WEAKEN field_access
-    {
-      $$ = SPVM_OP_build_weaken_field(compiler, $1, $2);
-    }
-
-unop
-  : '+' assignable_term %prec UMINUS
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PLUS, $1->file, $1->line);
-      $$ = SPVM_OP_build_unop(compiler, op, $2);
-    }
-  | '-' assignable_term %prec UMINUS
-    {
-      SPVM_OP* op_negate = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEGATE, $1->file, $1->line);
-      $$ = SPVM_OP_build_unop(compiler, op_negate, $2);
-    }
-  | INC assignable_term
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_INC, $1->file, $1->line);
-      $$ = SPVM_OP_build_unop(compiler, op, $2);
-    }
-  | assignable_term INC
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_INC, $2->file, $2->line);
-      $$ = SPVM_OP_build_unop(compiler, op, $1);
-    }
-  | DEC assignable_term
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_DEC, $1->file, $1->line);
-      $$ = SPVM_OP_build_unop(compiler, op, $2);
-    }
-  | assignable_term DEC
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_DEC, $2->file, $2->line);
-      $$ = SPVM_OP_build_unop(compiler, op, $1);
-    }
-  | '~' assignable_term
-    {
-      $$ = SPVM_OP_build_unop(compiler, $1, $2);
-    }
-
-binop
-  : assignable_term '+' assignable_term
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ADD, $2->file, $2->line);
-      $$ = SPVM_OP_build_binop(compiler, op, $1, $3);
-    }
-  | assignable_term '-' assignable_term
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUBTRACT, $2->file, $2->line);
-      $$ = SPVM_OP_build_binop(compiler, op, $1, $3);
-    }
-  | assignable_term '.' assignable_term
-    {
-      $$ = SPVM_OP_build_concat(compiler, $2, $1, $3);
-    }
-  | assignable_term MULTIPLY assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | assignable_term DIVIDE assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | assignable_term REMAINDER assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | assignable_term BIT_XOR assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | assignable_term AMPERSAND assignable_term %prec BIT_AND
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | assignable_term BIT_OR assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | assignable_term SHIFT assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | my_var ASSIGN assignable_term
-    {
-      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
-    }
-  | var ASSIGN assignable_term
-    {
-      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
-    }
-  | var SPECIAL_ASSIGN assignable_term
-    {
-      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
-    }
-  | '(' assignable_term ')'
-    {
-      $$ = $2;
-    }
-  | deref ASSIGN assignable_term
-    {
-      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
-    }
-
-relative_term
-  : assignable_term REL assignable_term
-    {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-
-logical_term
-  : term OR term
-    {
-      $$ = SPVM_OP_build_or(compiler, $2, $1, $3);
-    }
-  | term AND term
-    {
-      $$ = SPVM_OP_build_and(compiler, $2, $1, $3);
-    }
-  | NOT term
-    {
-      $$ = SPVM_OP_build_not(compiler, $1, $2);
-    }
-
-array_access
-  : assignable_term ARROW '[' assignable_term ']'
-    {
-      $$ = SPVM_OP_build_array_access(compiler, $1, $4);
-    }
-  | array_access '[' assignable_term ']'
-    {
-      $$ = SPVM_OP_build_array_access(compiler, $1, $3);
-    }
-  | field_access '[' assignable_term ']'
-    {
-      $$ = SPVM_OP_build_array_access(compiler, $1, $3);
-    }
-
-call_sub
-  : sub_name '(' opt_assignable_terms  ')'
-    {
-      $$ = SPVM_OP_build_call_sub(compiler, NULL, $1, $3);
-    }
-  | basic_type ARROW sub_name '(' opt_assignable_terms  ')'
-    {
-      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
-    }
-  | basic_type ARROW sub_name
-    {
-      SPVM_OP* op_assignable_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_assignable_terms);
-    }
-  | assignable_term ARROW sub_name '(' opt_assignable_terms ')'
-    {
-      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
-    }
-  | assignable_term ARROW sub_name
-    {
-      SPVM_OP* op_assignable_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_assignable_terms);
-    }
-  | assignable_term ARROW '(' opt_assignable_terms ')'
-    {
-      SPVM_OP* op_sub_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
-      $$ = SPVM_OP_build_call_sub(compiler, $1, op_sub_name, $4);
-    }
-  
 opt_args
   :	/* Empty */
     {
@@ -883,23 +350,6 @@ invocant
       $$ = SPVM_OP_build_arg(compiler, $1, $3);
     }
 
-opt_colon_descriptors
-  :	/* Empty */
-    {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-    }
-  |	':' descriptors
-    {
-      if ($2->id == SPVM_OP_C_ID_LIST) {
-        $$ = $2;
-      }
-      else {
-        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $2->file, $2->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $2);
-        $$ = op_list;
-      }
-    }
-
 opt_descriptors
   :	/* Empty */
     {
@@ -933,6 +383,564 @@ descriptors
       $$ = op_list;
     }
   | DESCRIPTOR
+
+opt_statements
+  :	/* Empty */
+    {
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+    }
+  |	statements
+    {
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        $$ = $1;
+      }
+      else {
+        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+        $$ = op_list;
+      }
+    }
+    
+statements
+  : statements statement 
+    {
+      SPVM_OP* op_list;
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $2);
+      
+      $$ = op_list;
+    }
+  | statement
+
+statement
+  : normal_statement
+  | if_statement
+  | for_statement
+  | while_statement
+  | block
+  | switch_statement
+  | case_statement
+  | default_statement
+  | eval_block
+
+normal_statement
+  : normal_term ';'
+    {
+      $$ = $1;
+    }
+  | expression ';'
+    {
+      $$ = $1;
+    }
+  | ';'
+    {
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, compiler->cur_file, compiler->cur_line);
+    }
+
+for_statement
+  : FOR '(' term ';' term ';' term ')' block
+    {
+      $$ = SPVM_OP_build_for_statement(compiler, $1, $3, $5, $7, $9);
+    }
+
+while_statement
+  : WHILE '(' term ')' block
+    {
+      $$ = SPVM_OP_build_while_statement(compiler, $1, $3, $5);
+    }
+
+switch_statement
+  : SWITCH '(' normal_term ')' block
+    {
+      $$ = SPVM_OP_build_switch_statement(compiler, $1, $3, $5);
+    }
+
+case_statement
+  : CASE normal_term ':'
+    {
+      $$ = SPVM_OP_build_case_statement(compiler, $1, $2);
+    }
+
+default_statement
+  : DEFAULT ':'
+
+if_statement
+  : IF '(' term ')' block else_statement
+    {
+      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+      
+      // if is wraped with block to allow the following syntax
+      //  if (my $var = 3) { ... }
+      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, $1->file, $1->line);
+      SPVM_OP_insert_child(compiler, op_block, op_block->last, op_if);
+      
+      $$ = op_block;
+    }
+
+else_statement
+  : /* NULL */
+    {
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, compiler->cur_file, compiler->cur_line);
+    };
+  | ELSE block
+    {
+      $$ = $2;
+    }
+  | ELSIF '(' term ')' block else_statement
+    {
+      $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+    }
+
+block 
+  : '{' opt_statements '}'
+    {
+      SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, $1->file, $1->line);
+      SPVM_OP_insert_child(compiler, op_block, op_block->last, $2);
+      $$ = op_block;
+    }
+
+eval_block
+  : EVAL block
+    {
+      $$ = SPVM_OP_build_eval(compiler, $1, $2);
+    }
+
+expression
+  : LAST
+  | NEXT
+  | RETURN {
+      $$ = SPVM_OP_build_return(compiler, $1, NULL);
+    }
+  | RETURN normal_term
+    {
+      $$ = SPVM_OP_build_return(compiler, $1, $2);
+    }
+  | CROAK
+    {
+      $$ = SPVM_OP_build_croak(compiler, $1, NULL);
+    }
+  | CROAK normal_term
+    {
+      $$ = SPVM_OP_build_croak(compiler, $1, $2);
+    }
+  | field_access ASSIGN normal_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+  | array_access ASSIGN normal_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+  | weaken_field
+
+opt_normal_terms
+  :	/* Empty */
+    {
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+    }
+  |	normal_terms
+    {
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        $$ = $1;
+      }
+      else {
+        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+        $$ = op_list;
+      }
+    }
+    
+term
+  : normal_term
+  | relative_term
+  | logical_term
+  | isa
+  | '(' term ')'
+    {
+      $$ = $2;
+    }
+
+normal_term
+  : var
+  | CONSTANT
+    {
+      $$ = SPVM_OP_build_constant(compiler, $1);
+    }
+  | UNDEF
+  | call_sub
+  | field_access
+  | array_access
+  | convert_type
+  | new
+  | array_init
+  | array_length
+  | my_var
+  | binop
+  | unop
+  | ref
+  | deref
+
+normal_terms
+  : normal_terms ',' normal_term
+    {
+      SPVM_OP* op_list;
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+      
+      $$ = op_list;
+    }
+  | normal_terms ',' '(' normal_terms ')'
+    {
+      SPVM_OP* op_list;
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      
+      if ($4->id == SPVM_OP_C_ID_LIST) {
+        SPVM_OP* op_term = $4->first;
+        while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
+          SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term);
+          SPVM_OP_insert_child(compiler, op_list, op_list->last, op_term);
+          op_term = op_stab;
+        }
+      }
+      else {
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $4);
+      }
+      
+      $$ = op_list;
+    }
+  | normal_terms ','
+    {
+      $$ = $1;
+    }
+  | '(' normal_terms ')'
+    {
+      $$ = $2;
+    }
+  | normal_term
+    {
+      $$ = $1;
+    }
+
+unop
+  : '+' normal_term %prec UMINUS
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PLUS, $1->file, $1->line);
+      $$ = SPVM_OP_build_unop(compiler, op, $2);
+    }
+  | '-' normal_term %prec UMINUS
+    {
+      SPVM_OP* op_negate = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEGATE, $1->file, $1->line);
+      $$ = SPVM_OP_build_unop(compiler, op_negate, $2);
+    }
+  | INC normal_term
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_INC, $1->file, $1->line);
+      $$ = SPVM_OP_build_unop(compiler, op, $2);
+    }
+  | normal_term INC
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_INC, $2->file, $2->line);
+      $$ = SPVM_OP_build_unop(compiler, op, $1);
+    }
+  | DEC normal_term
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_DEC, $1->file, $1->line);
+      $$ = SPVM_OP_build_unop(compiler, op, $2);
+    }
+  | normal_term DEC
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_DEC, $2->file, $2->line);
+      $$ = SPVM_OP_build_unop(compiler, op, $1);
+    }
+  | '~' normal_term
+    {
+      $$ = SPVM_OP_build_unop(compiler, $1, $2);
+    }
+
+binop
+  : normal_term '+' normal_term
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ADD, $2->file, $2->line);
+      $$ = SPVM_OP_build_binop(compiler, op, $1, $3);
+    }
+  | normal_term '-' normal_term
+    {
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUBTRACT, $2->file, $2->line);
+      $$ = SPVM_OP_build_binop(compiler, op, $1, $3);
+    }
+  | normal_term '.' normal_term
+    {
+      $$ = SPVM_OP_build_concat(compiler, $2, $1, $3);
+    }
+  | normal_term MULTIPLY normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | normal_term DIVIDE normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | normal_term REMAINDER normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | normal_term BIT_XOR normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | normal_term AMPERSAND normal_term %prec BIT_AND
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | normal_term BIT_OR normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | normal_term SHIFT normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+  | my_var ASSIGN normal_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+  | var ASSIGN normal_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+  | var SPECIAL_ASSIGN normal_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+  | '(' normal_term ')'
+    {
+      $$ = $2;
+    }
+  | deref ASSIGN normal_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+
+new
+  : NEW basic_type
+    {
+      $$ = SPVM_OP_build_new(compiler, $1, $2, NULL);
+    }
+  | NEW array_type_with_length
+    {
+      $$ = SPVM_OP_build_new(compiler, $1, $2, NULL);
+    }
+  | NEW array_type '{' opt_normal_terms '}'
+    {
+      $$ = SPVM_OP_build_new(compiler, $1, $2, $4);
+    }
+  | anon_package
+    {
+      // New
+      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, $1->file, $1->line);
+
+      $$ = SPVM_OP_build_new(compiler, op_new, $1, NULL);
+    }
+  | anon_sub
+    {
+      // Package
+      SPVM_OP* op_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE, $1->file, $1->line);
+      
+      // Create class block
+      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, $1->file, $1->line);
+      SPVM_OP* op_list_declarations = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP_insert_child(compiler, op_list_declarations, op_list_declarations->last, $1);
+      SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, op_list_declarations);
+      
+      // Build package
+      SPVM_OP_build_package(compiler, op_package, NULL, op_class_block, NULL);
+      
+      // New
+      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, $1->file, $1->line);
+      
+      $$ = SPVM_OP_build_new(compiler, op_new, op_package, NULL);
+    }
+
+array_init
+  : '[' opt_normal_terms ']'
+    {
+      SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_array_init(compiler, op_array_init, $2);
+    }
+
+convert_type
+  : '(' type ')' normal_term
+    {
+      SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, $2->file, $2->line);
+      $$ = SPVM_OP_build_convert(compiler, op_convert, $2, $4);
+    }
+
+array_access
+  : normal_term ARROW '[' normal_term ']'
+    {
+      $$ = SPVM_OP_build_array_access(compiler, $1, $4);
+    }
+  | array_access '[' normal_term ']'
+    {
+      $$ = SPVM_OP_build_array_access(compiler, $1, $3);
+    }
+  | field_access '[' normal_term ']'
+    {
+      $$ = SPVM_OP_build_array_access(compiler, $1, $3);
+    }
+
+call_sub
+  : sub_name '(' opt_normal_terms  ')'
+    {
+      $$ = SPVM_OP_build_call_sub(compiler, NULL, $1, $3);
+    }
+  | basic_type ARROW sub_name '(' opt_normal_terms  ')'
+    {
+      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
+    }
+  | basic_type ARROW sub_name
+    {
+      SPVM_OP* op_normal_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_normal_terms);
+    }
+  | normal_term ARROW sub_name '(' opt_normal_terms ')'
+    {
+      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
+    }
+  | normal_term ARROW sub_name
+    {
+      SPVM_OP* op_normal_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_normal_terms);
+    }
+  | normal_term ARROW '(' opt_normal_terms ')'
+    {
+      SPVM_OP* op_sub_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
+      $$ = SPVM_OP_build_call_sub(compiler, $1, op_sub_name, $4);
+    }
+
+field_access
+  : normal_term ARROW '{' field_name '}'
+    {
+      $$ = SPVM_OP_build_field_access(compiler, $1, $4);
+    }
+  | field_access '{' field_name '}'
+    {
+      $$ = SPVM_OP_build_field_access(compiler, $1, $3);
+    }
+  | array_access '{' field_name '}'
+    {
+      $$ = SPVM_OP_build_field_access(compiler, $1, $3);
+    }
+
+weaken_field
+  : WEAKEN field_access
+    {
+      $$ = SPVM_OP_build_weaken_field(compiler, $1, $2);
+    }
+
+array_length
+  : '@' normal_term
+    {
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $2);
+    }
+  | '@' '{' normal_term '}'
+    {
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
+    }
+  | SCALAR '@' normal_term
+    {
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
+    }
+  | SCALAR '@' '{' normal_term '}'
+    {
+      SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
+    }
+
+deref
+  : DEREF var
+    {
+      $$ = SPVM_OP_build_deref(compiler, $1, $2);
+    }
+  | DEREF '{' var '}'
+    {
+      $$ = SPVM_OP_build_deref(compiler, $1, $3);
+    }
+
+ref
+  : REF var
+    {
+      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
+      $$ = SPVM_OP_build_ref(compiler, op_ref, $2);
+    }
+  | REF '{' var '}'
+    {
+      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
+      $$ = SPVM_OP_build_ref(compiler, op_ref, $3);
+    }
+
+relative_term
+  : normal_term REL normal_term
+    {
+      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+    }
+
+isa
+  : term ISA type
+    {
+      $$ = SPVM_OP_build_isa(compiler, $2, $1, $3);
+    }
+
+logical_term
+  : term OR term
+    {
+      $$ = SPVM_OP_build_or(compiler, $2, $1, $3);
+    }
+  | term AND term
+    {
+      $$ = SPVM_OP_build_and(compiler, $2, $1, $3);
+    }
+  | NOT term
+    {
+      $$ = SPVM_OP_build_not(compiler, $1, $2);
+    }
+
+my_var
+  : MY var ':' type
+    {
+      $$ = SPVM_OP_build_my(compiler, $1, $2, $4);
+    }
+  | MY var
+    {
+      $$ = SPVM_OP_build_my(compiler, $1, $2, NULL);
+    }
+
+var
+  : VAR_NAME
+    {
+      $$ = SPVM_OP_build_var(compiler, $1);
+    }
 
 type
   : basic_type
@@ -1025,15 +1033,14 @@ const_array_type
     }
 
 array_type_with_length
-  : basic_type '[' assignable_term ']'
+  : basic_type '[' normal_term ']'
     {
       $$ = SPVM_OP_build_array_type(compiler, $1, $3);
     }
-  | array_type '[' assignable_term ']'
+  | array_type '[' normal_term ']'
     {
       $$ = SPVM_OP_build_array_type(compiler, $1, $3);
     }
-
 
 type_or_void
   : type
@@ -1044,17 +1051,5 @@ type_or_void
 
 field_name : NAME
 sub_name : NAME
-
-var
-  : VAR_NAME
-    {
-      $$ = SPVM_OP_build_var(compiler, $1);
-    }
-
-eval_block
-  : EVAL block
-    {
-      $$ = SPVM_OP_build_eval(compiler, $1, $2);
-    }
 
 %%

@@ -8,7 +8,7 @@ package CGI::Ex::Validate;
 use strict;
 use Carp qw(croak);
 
-our $VERSION  = '2.46';
+our $VERSION  = '2.47';
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;

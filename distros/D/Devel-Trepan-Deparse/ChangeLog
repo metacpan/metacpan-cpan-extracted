@@ -1,6 +1,72 @@
+2018-08-12  rocky <rb@dustyfeet.com>
+
+	* admin/how-to-make-a-release.md, lib/Devel/Trepan/Deparse.pm: Get
+	ready for release 3.1.0
+
+2018-07-15  rocky <rocky@cpan.org>
+
+	* Build.PL: To simplify we need at least B::DeparseTree 3.4.0
+
+2018-07-15  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Simplify
+
+2018-07-03  rocky <rocky@cpan.org>
+
+	* Build.PL: Bump min B::DeparseTree version
+
+2018-07-03  rocky <rb@dustyfeet.com>
+
+	* MANIFEST.SKIP, lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/CmdProcessor/Command/{Deval.pm =>
+	Deval.pm-notyet}, t/data/deparse.right: Fix up stack handling and
+	correct testing
+
+2018-06-27  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Add --previous.
+	Handle frames better
+
+2018-06-26  rocky <rocky@cpan.org>
+
+	* circle.yml: Remove CircleCI 1.0
+
+2018-06-25  rocky <rocky@cpan.org>
+
+	* .circleci/config.yml, MANIFEST.SKIP,
+	admin/how-to-make-a-release.md: Convert to using CircleCI 2.0 Need to fix up tests though...
+
+2018-06-16  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Document -f
+	option
+
+2018-06-14  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Add deparse -f
+	option as a workaround
+
+2018-06-14  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: More small
+	tweaks
+
+2018-06-14  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Minor fixes
+
+2018-06-09  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Small bugs
+
 2018-06-04  rocky <rocky@cpan.org>
 
-	* Build.PL, t/data/deparse.right: Revise for current B::DeparseTree
+	* lib/Devel/Trepan/Deparse.pm: Update doc
+
+2018-06-04  rocky <rocky@cpan.org>
+
+	* Build.PL, MANIFEST.SKIP, NEWS, t/data/deparse.right: Revise for
+	current B::DeparseTree
 
 2018-05-25  rocky <rocky@cpan.org>
 

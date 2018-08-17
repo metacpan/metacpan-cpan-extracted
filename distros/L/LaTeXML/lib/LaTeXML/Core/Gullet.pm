@@ -32,7 +32,7 @@ sub new {
   my ($class) = @_;
   return bless {
     mouth => undef, mouthstack => [], pushback => [], autoclose => 1, pending_comments => []
-    }, $class; }
+  }, $class; }
 
 #**********************************************************************
 # Start reading tokens from a new Mouth.
@@ -130,48 +130,46 @@ sub readingFromMouth {
 
 # User feedback for where something (error?) occurred.
 sub getLocator {
-  my ($self, $long) = @_;
+  my ($self) = @_;
   my $mouth = $$self{mouth};
   my $i     = 0;
-  while ((defined $mouth) && (($$mouth{source} || '') eq 'Anonymous String')
+  while ((defined $mouth) && (!defined $$mouth{source})
     && ($i < scalar(@{ $$self{mouthstack} }))) {
     $mouth = $$self{mouthstack}[$i++][0]; }
-  my $loc = (defined $mouth ? $mouth->getLocator($long) : '');
-  if (!$loc || $long) {
-    $loc .= show_pushback($$self{pushback}) if $long;
-    foreach my $frame (@{ $$self{mouthstack} }) {
-      my $ml = $$frame[0]->getLocator($long);
-      $loc .= ' ' . $ml if $ml;
-      last if $loc && !$long;
-      $loc .= show_pushback($$frame[1]) if $long; } }
-  return $loc; }
+  my $loc = (defined $mouth ? $mouth->getLocator : undef);
+  return $loc if defined $loc;
+  foreach my $frame (@{ $$self{mouthstack} }) {
+    my $ml = $$frame[0]->getLocator;
+    return $ml if defined $ml; } }
 
 sub getSource {
   my ($self) = @_;
   my $source = defined $$self{mouth} && $$self{mouth}->getSource;
-  if (!$source) {
+  if (!defined($source)) {
     foreach my $frame (@{ $$self{mouthstack} }) {
       $source = $$frame[0]->getSource;
-      last if $source; } }
+      last if defined($source); } }
   return $source; }
 
 sub getSourceMouth {
   my ($self) = @_;
   my $mouth = $$self{mouth};
   my $source = defined $mouth && $mouth->getSource;
-  if (!$source || ($source eq "Anonymous String")) {
+  if (!defined($source)) {
     foreach my $frame (@{ $$self{mouthstack} }) {
       $mouth  = $$frame[0];
       $source = $mouth->getSource;
-      last if $source && $source ne "Anonymous String"; } }
+      last if defined($source); } }
   return $mouth; }
 
 # Handy message generator when we didn't get something expected.
 sub showUnexpected {
   my ($self) = @_;
-  my $token = $self->readToken;
-  my $message = ($token ? "Next token is " . Stringify($token) : "Input is empty");
-  unshift(@{ $$self{pushback} }, $token);    # Unread
+  my $message = "Input is empty";
+  if (my $token = $self->readToken) {
+    $message = "Next token is " . Stringify($token);
+    unshift(@{ $$self{pushback} }, $token);
+  }
   return $message; }
 
 sub show_pushback {
@@ -263,7 +261,7 @@ sub readXToken {
     elsif ($cc == CC_MARKER) {
       LaTeXML::Core::Definition::stopProfiling($token, 'expand'); }
     # Note: special-purpose lookup in State, for efficiency
-    elsif (defined($defn = LaTeXML::Core::State::lookupExpandable($STATE, $token))) {
+    elsif (defined($defn = LaTeXML::Core::State::lookupExpandable($STATE, $token, $toplevel))) {
       local $LaTeXML::CURRENT_TOKEN = $token;
       if (my $r = $defn->invoke($self)) {
         unshift(@{ $$self{pushback} },
@@ -308,6 +306,13 @@ sub readNonSpace {
   } while (defined $token && $$token[1] == CC_SPACE);    # Inline ->getCatcode!
   return $token; }
 
+sub readXNonSpace {
+  my ($self) = @_;
+  my $token;
+  do { $token = $self->readXToken(0);
+  } while (defined $token && $$token[1] == CC_SPACE);    # Inline ->getCatcode!
+  return $token; }
+
 sub skipSpaces {
   my ($self) = @_;
   my $tok = $self->readNonSpace;
@@ -344,11 +349,12 @@ our @balanced_interesting_cc = (
   0, 0, 1);
 
 sub readBalanced {
-  my ($self) = @_;
+  my ($self, $expanded) = @_;
   my @tokens = ();
   my ($token, $level) = (undef, 1);
+  my $startloc = $self->getLocator;
   # Inlined readToken (we'll keep comments in the result)
-  while ($token = shift(@{ $$self{pushback} }) || $$self{mouth}->readToken()) {
+  while ($token = ($expanded ? $self->readXToken(0, 1) : $self->readToken())) {
     my $cc = $$token[1];
     if (!$balanced_interesting_cc[$cc]) {
       push(@tokens, $token); }
@@ -361,6 +367,12 @@ sub readBalanced {
       push(@tokens, $token); }
     elsif ($cc == CC_MARKER) {
       LaTeXML::Core::Definition::stopProfiling($token, 'expand'); } }
+  if ($level > 0) {
+ # TODO: The current implementation has a limitation where if the balancing end is in a different mouth,
+ #       it will not be recognized.
+    Error('expected', "}", $self, "Gullet->readBalanced ran out of input in an unbalanced state.",
+      "started at $startloc");
+  }
   return Tokens(@tokens); }
 
 sub ifNext {
@@ -819,7 +831,7 @@ sub readInternalMuGlue {
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 
@@ -858,7 +870,7 @@ Is this public? Clears all inputs.
 
 =item C<< $gullet->getLocator; >>
 
-Returns a string describing the current location in the input stream.
+Returns an object describing the current location in the input stream.
 
 =back
 
@@ -963,7 +975,7 @@ and return the value.  Returns undef if the next token isn't such a register.
 =item C<< $number = $gullet->readNumber; >>
 
 Read a L<LaTeXML::Common::Number> according to TeX's rules of the various things that
-can be used as a numerical value. 
+can be used as a numerical value.
 
 =item C<< $dimension = $gullet->readDimension; >>
 

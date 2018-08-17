@@ -26,9 +26,7 @@ $ENV{HOCKEYDB_DATA_DIR} = 't/tmp/data';
 system(qw(mkdir -p t/tmp/));
 system(qw(cp -a t/data t/tmp/));
 $ENV{HOCKEYDB_NODB} = 1;
-#use Data::Dumper;
-#print Dumper \%ENV;
-#exit;
+
 my $nhl = Sport::Analytics::NHL->new();
 my $storable = ($nhl->merge({}, 201120010))[0];
 

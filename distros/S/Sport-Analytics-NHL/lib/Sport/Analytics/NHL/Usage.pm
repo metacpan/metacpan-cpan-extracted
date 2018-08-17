@@ -104,6 +104,16 @@ our %OPTS = (
 			description => 'Compile file even if storable is present',
 		}
 	],
+	normalize => [
+		{
+			long => 'no-normalize',
+			description => 'Do not normalize file even if storable is absent',
+		},
+		{
+			long => 'renormalize',
+			description => 'Compile file even if storable is present',
+		}
+	],
 	misc     => [
 		{
 			short       => 'f', long => 'force',

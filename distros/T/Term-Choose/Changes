@@ -1,6 +1,15 @@
 Revision history for Term::Choose
 
 
+1.625   2018-08-15
+        - Fixed syntax error in "Term::Choose::Win23".
+
+1.624   2018-08-14
+        - Undo "1.623".
+
+1.623   2018-08-14
+        - Added methods 'hide_cursor', 'show_cursor'.
+
 1.622   2018-08-08
         - Fixed minor typo in the pod. [GH #2 manwar]
 

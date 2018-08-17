@@ -134,8 +134,14 @@ for example L<Mojolicious> application.
 
 =head1 DESCRIPTION
 
-L<Mojo::Redis::Cache> provides a simple interface for caching data in the Redis
-database.
+L<Mojo::Redis::Cache> provides a simple interface for caching data in the
+Redis database. There is no "check if exists", "get" or "set" methods in this
+class. Instead, both L</compute_p> and L</memoize_p> will fetch the value
+from Redis, if the given compute function / method has been called once, and
+the cached data is not expired.
+
+If you need to check if the value exists, then you can manually look up the
+the key using L<Mojo::Redis::Database/exists>.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -176,10 +182,10 @@ Prefix for the cache key.
 
 =head2 redis
 
-  $conn = $self->connection;
-  $self = $self->connection(Mojo::Redis::Connection->new);
+  $conn = $self->redis;
+  $self = $self->redis(Mojo::Redis->new);
 
-Holds a L<Mojo::Redis> object used to create the connections to talk with Redis.
+Holds a L<Mojo::Redis> object used to create the connection to talk with Redis.
 
 =head2 refresh
 
@@ -199,23 +205,36 @@ Holds a callback used to serialize before storing the data in Redis.
 
 =head2 compute_p
 
+  $promise = $self->compute_p($key => $expire => $compute_function);
   $promise = $self->compute_p($key => $expire => sub { return "data" });
   $promise = $self->compute_p($key => $expire => sub { return Mojo::Promise->new });
 
-This method will get/set data in the Redis cache. C<$key> will be prefixed by
-L</namespace> resulting in "namespace:some-key". C<$expire> is the number of
-seconds before the cache should expire, and will default to L</default_expire> unless
-passed in. The last argument is a callback used to calculate cached value.
+This method will store the return value from the C<$compute_function> the
+first time it is called and pass the same value to L<Mojo::Promise/then>.
+C<$compute_function> will not be called the next time, if the C<$key> is
+still present in Redis, but instead the cached value will be passed on to
+L<Mojo::Promise/then>.
+
+C<$key> will be prefixed by L</namespace> resulting in "namespace:some-key".
+C<$expire> is the number of seconds before the cache should expire, and will
+default to L</default_expire> unless passed in. The last argument is a
+callback used to calculate cached value.
 
 =head2 memoize_p
 
   $promise = $self->memoize_p($obj, $method_name, \@args, $expire);
   $promise = $self->memoize_p($class, $method_name, \@args, $expire);
 
-This method can be used to memoize the return value from a given C<$method_name>
-called on an object or class. The key in the redis cache will become:
+L</memoize_p> behaves the same way as L</compute_p>, but has a convenient
+interface for calling methods on an object. One of the benefits is that you
+do not have to come up with your own cache key. This method is pretty much
+the same as:
 
-  join ":", $self->namespace, "@M", ref($obj), $method_name, serialize(\@args);
+  $promise = $self->compute_p(
+    join(":", $self->namespace, "@M", ref($obj), $method_name, serialize(\@args)),
+    $expire,
+    sub { return $obj->$method_name(@args) }
+  );
 
 C<$expire> is the number of seconds before the cache should expire, and will
 default to L</default_expire> unless passed in.

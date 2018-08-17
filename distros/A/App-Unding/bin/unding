@@ -28,9 +28,9 @@ INIT {
     $old_state = join "", <DATA>; # slurp
 }
 
-##########################################
-# handle special case for App::FatPacker #
-##########################################
+######################################################
+# --fatinit / handle special case for App::FatPacker #
+######################################################
 
 # print this file, fatpacked to STDOUT
 if( defined $ARGV[0] and $ARGV[0] eq '--fatinit') {
@@ -55,6 +55,19 @@ if( defined $ARGV[0] and $ARGV[0] eq '--fatinit') {
         print STDERR "You need to install App::FatPacker to use this feature\n";
         exit 1;
     }
+}
+
+#################
+# --init option #
+#################
+
+if( defined $ARGV[0] and $ARGV[0] eq '--init') {
+        my $cwd = getcwd;
+        my $exe = abs_path($0);
+        copy ($exe, $cwd);
+        print STDERR "Copied $exe to $cwd for you.\n";
+        print STDERR "Use your new local copy.\n";
+        exit 0;
 }
 
 #########################################
@@ -92,11 +105,7 @@ if (      # decrypt (no arg given) but nothing stored
 if ( defined $ARGV[0] ) {
     if (not -w $0) {
         print STDERR "Write permissons on script needed.\n";
-        my $cwd = getcwd;
-        my $exe = abs_path($0);
-        copy ($exe, $cwd);
-        print STDERR "Copied $exe to $cwd for you.\n";
-        print STDERR "Use your new local copy.\n";
+        print STDERR "Use $0 --init or --fatinit to create a local copy.\n";
         exit 1;
     }
     if (not length($old_state) < 2) {
@@ -109,6 +118,7 @@ if ( defined $ARGV[0] ) {
         	open(TTY, "</dev/tty") or die $!;
         }
         ReadLine(0, *TTY);
+        close(TTY);
     }
 }
 
@@ -133,9 +143,9 @@ if($^O eq 'MSWin32') {
 else {
 	open(TTY, "</dev/tty") or die $!;
 }
-ReadMode('noecho', *TTY);
+ReadMode('noecho', *TTY)  unless ($^O eq 'MSWin32');
 my $password = ReadLine(0, *TTY);
-ReadMode('restore', *TTY);
+ReadMode('restore', *TTY) unless ($^O eq 'MSWin32');
 close(TTY);
 print STDERR "\n";
 
@@ -160,9 +170,9 @@ if ( defined $ARGV[0] ) {
 	else {
 		open(TTY, "</dev/tty") or die $!;
 	}
-    ReadMode('noecho', *TTY);
+    ReadMode('noecho', *TTY)  unless ($^O eq 'MSWin32');
     my $password_retyped = ReadLine(0, *TTY);
-    ReadMode('restore', *TTY);
+    ReadMode('restore', *TTY) unless ($^O eq 'MSWin32');
     close(TTY);
     print STDERR "\n";
 
@@ -213,7 +223,7 @@ unding - dark magic, encrypted wallet
 
 =head1 VERSION
 
-version 0.009
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -239,10 +249,9 @@ In all cases you must enter a password.
 =head1 SETUP
 
 Since this script needs write access on it self (yes!), it's best you copy it to your local directory before using.
-It will do this automatically for you, if it is in writing context and doesn't have the permissions necessary.
-But if you want to do it manually, this is how you do it in C<bash>:
+You can explicitly do this via the C<--init> option:
 
- cp $(which unding) .
+ unding --init
 
 If you want to take this script with you (e.g. on a flash drive) and run it on different machines (e.g. for looking at your encrypted secrets), you might also want to take  all module dependencies with you.
 You can create a copy of this script which includes all needed modules inside itself.
@@ -276,6 +285,12 @@ This is an early release. Use it at your own risk.
 =item *
 
 After encryption, the script does not delete the original file. You have to do this yourself. This may be considered a feature, since it might prevent loss of data.
+
+=item *
+
+Under Windows your password input is visible!
+As soon there is a technical solution, of how to hide the password on Windows, it will be implemented.
+Patches welcome.
 
 =back
 

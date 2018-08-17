@@ -1,29 +1,33 @@
 {
-   "abstract" : "Manage database patches in the style of Module::Build.",
+   "abstract" : "unknown",
    "author" : [
-      "Brian Duggan <brian.duggan@nasa.gov>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
    "name" : "Module-Build-Database",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Copy::Recursive" : "0",
-            "IO::Socket::INET" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -32,45 +36,15 @@
             "File::Copy::Recursive" : "0",
             "File::ShareDir" : "0",
             "File::Which" : "0",
+            "IO::Socket::INET" : "0",
             "List::MoreUtils" : "0",
             "Path::Class" : "0",
             "Sub::Exporter" : "0",
-            "blib" : "0",
-            "perl" : "v5.10.0"
+            "Test::More" : "0",
+            "blib" : "0"
          }
       }
    },
-   "provides" : {
-      "Module::Build::Database" : {
-         "file" : "lib/Module/Build/Database.pm",
-         "version" : "0.57"
-      },
-      "Module::Build::Database::Helpers" : {
-         "file" : "lib/Module/Build/Database/Helpers.pm",
-         "version" : "0.57"
-      },
-      "Module::Build::Database::PostgreSQL" : {
-         "file" : "lib/Module/Build/Database/PostgreSQL.pm",
-         "version" : "0.57"
-      },
-      "Module::Build::Database::PostgreSQL::Templates" : {
-         "file" : "lib/Module/Build/Database/PostgreSQL/Templates.pm",
-         "version" : "0.57"
-      },
-      "Module::Build::Database::SQLite" : {
-         "file" : "lib/Module/Build/Database/SQLite.pm",
-         "version" : "0.57"
-      },
-      "Test::MBD" : {
-         "file" : "lib/Test/MBD.pm",
-         "version" : "0.57"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
-   },
-   "version" : "0.57"
+   "version" : "0.58"
 }

@@ -1,0 +1,39 @@
+---
+abstract: 'DBIx::Connector with block retry support'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  DBD::SQLite: '1.29'
+  ExtUtils::MakeMaker: '0'
+  Path::Class: '0'
+  Test2::Bundle::More: '0'
+  Test2::Tools::Compare: '0'
+  Test2::Tools::Exception: '0'
+  Test2::Tools::Explain: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Connector-Retry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Connector: '0.56'
+  Moo: '2.00'
+  Scalar::Util: '0'
+  Types::Common::Numeric: '1.00'
+  Types::Standard: '1.00'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/DBIx-Connector-Retry/issues
+  homepage: https://github.com/GrantStreetGroup/DBIx-Connector-Retry
+  repository: https://github.com/GrantStreetGroup/DBIx-Connector-Retry.git
+version: '0.90'
+x_authority: cpan:GSG

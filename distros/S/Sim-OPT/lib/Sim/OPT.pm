@@ -66,7 +66,7 @@ report newretrieve newreport
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
 );
 
-$VERSION = '0.73.57';
+$VERSION = '0.73.61';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -352,7 +352,7 @@ sub fromsweep_toopt # IT CONVERTS THE ORIGINAL OPT'S BLOCKS SEARCH FORMAT IN A T
 	# IT HAS TO BE CALLED THIS WAY: fromsweep_toopt(@sweep);
 }
 
-sub convcaseseed # IT ADEQUATES THE POINT OF ATTACHMENT OF EACH BLOCK TO THE FACT THAT THE LISTS CONSTITUING THEM ARE THREE, JOINED.
+sub convcaseseed # IT ADEQUATES THE POINT OF ATTACHMENT OF EACH BLOCK TO THE FACT THAT THE LISTS CONSTITUTING THEM ARE THREE, JOINED.
 {
 	my $ref = shift;
 	my %hash = %{$ref};
@@ -885,7 +885,7 @@ sub callblocks # IT CALLS THE SEARCH ON BLOCKS.
 	deffiles( $blockdata );
 }
 	
-sub deffiles # IT DEFINED THE FILES TO BE CALLED. 
+sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 {
 	my $swap = shift;
 	my %dat = %{$swap};
@@ -1347,9 +1347,9 @@ Sim::OPT.
 
 =head1 DESCRIPTION
 
-Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Some of Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module seeks for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphingchange module, manipulates chosen parameters in the configuration files (constituted by text files) describing models for simulation programs, recognizing variables by position. The Sim::OPT::Parcoord3d module converts 2D parallel coordinates plots in Autolisp instructions for obtaining 3D plots as Autocad drawings. The Sim::OPT::Modish module alters the shading values calculated with the ESP-r simulation platform in order to take into account the solar reflections from obstructions.
+Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Some of Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module seeks for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphingchange module, manipulates chosen parameters in the configuration files (constituted by text files) describing models for simulation programs, recognizing variables by position. The Sim::OPT::Parcoord3d module converts 2D parallel coordinates plots in Autolisp instructions for obtaining 3D plots as Autocad drawings. The Sim::OPT::Modish module, which alters the shading values calculated with the ESP-r simulation platform in order to take into account the solar reflections from obstructions, is no more included in this distribution, because a modificed version of it has been included in the ESP-r distribution, available at the address http://www.esru.strath.ac.uk/Programs/ESP-r.htm.
 
-The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform. A working knowledge of ESP-r (http://www.esru.strath.ac.uk/Programs/ESP-r.htm) is necessary to use those functionalities.
+The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform. A working knowledge of ESP-r is necessary to use those functionalities.
 
 To install Sim::OPT, the command <cpanm Sim::OPT> has to be issued as a superuser. Sim::OPT can then be loaded through the command <use Sim::OPT> in a Perl repl. But to ease the launch, the batch file "opt" (which can be found packed in the "optw.tar.gz" file in "examples" folder in this distribution) may be copied in a work directory and the command <opt> may be issued. That command will call OPT with the settings specified in the configuration file. When launched, Sim::OPT will ask the path to that file, which must contain a suitable description of the operations to be accomplished and point to an existing simulation model.
 

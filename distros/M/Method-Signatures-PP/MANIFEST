@@ -1,6 +1,5 @@
 Changes
 lib/Method/Signatures/PP.pm
-lib/Method/Signatures/PP/Compile.pm
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files

@@ -1,5 +1,8 @@
 Revision history for HO-class
 
+0.074 - 2018-08-17
+* let accessors use the index defined by new constructor
+
 0.073 - 2018-07-22
 * improve abstract method testing (DOES was missing in perl 5.8)
 

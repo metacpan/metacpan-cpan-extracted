@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Piccadilly;
 
-$Map::Tube::London::Line::Piccadilly::VERSION   = '1.17';
+$Map::Tube::London::Line::Piccadilly::VERSION   = '1.22';
 $Map::Tube::London::Line::Piccadilly::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Piccadilly - London Tube Map: Piccadilly Line.
 
 =head1 VERSION
 
-Version 1.17
+Version 1.22
 
 =head1 DESCRIPTION
 
@@ -80,75 +80,77 @@ London Tube Map: Piccadilly Line.
 
 =over 2
 
-=item * The station "Uxbridge" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Hillingdon" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Ickenham" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Ruislip" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Ruislip Manor" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Eastcode" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Rayners Lane" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
-
-=item * The station "Ealing Common" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
-
 =item * The station "Acton Town" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
-
-=item * The station "Turnham Green" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
-
-=item * The station "Hammersmith" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+          L<District Line|Map::Tube::London::Line::District>
 
 =item * The station "Barons Court" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Ealing Common" is also part of
+          L<District Line|Map::Tube::London::Line::District>
 
 =item * The station "Earl's Court" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Eastcote" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Finsbury Park" is also part of
+          L<Victoria Line|Map::Tube::London::Line::Victoria>
 
 =item * The station "Gloucester Road" is also part of
-          L<District Line|Map::Tube::London::Line::District>
-        | L<Circle Line|Map::Tube::London::Line::Circle>.
-
-=item * The station "South Kensington" is also part of
-          L<District Line|Map::Tube::London::Line::District>
-        | L<Circle Line|Map::Tube::London::Line::Circle>.
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
 
 =item * The station "Green Park" is also part of
           L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>.
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
 
-=item * The station "Picadilly Circus" is also part of
-          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>.
+=item * The station "Hammersmith" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
 
-=item * The station "Leicester Square" is also part of
-          L<Northern Line|Map::Tube::London::Line::Northern>.
+=item * The station "Hillingdon" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
 =item * The station "Holborn" is also part of
-          L<Central Line|Map::Tube::London::Line::Central>.
+          L<Central Line|Map::Tube::London::Line::Central>
+
+=item * The station "Ickenham" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
 =item * The station "King's Cross St. Pancras" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
 
-=item * The station "Finsbury Park" is also part of
-          L<Victoria Line|Map::Tube::London::Line::Victoria>.
+=item * The station "Leicester Square" is also part of
+          L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Piccadilly Circus" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "Rayners Lane" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Ruislip" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Ruislip Manor" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "South Kensington" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Turnham Green" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Uxbridge" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
 =back
 

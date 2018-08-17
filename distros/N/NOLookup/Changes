@@ -1,9 +1,15 @@
 Revision history for Perl extension NOLookup
 
+1.11 2018-08-09
+
+     - Handle case that holder info is missing when using the Norid
+       public whois service, whilst it may be available when using the
+       restricted registrarwhois service, which is for registrars
+       only.
+
 1.10 2017-08-22
      - Intialize size to get rid of an unitialized warning
      - Added new JSON keys 'orgform' and 'maalform'
-     
 
 1.9  2017-06-09
      - Version syntax fix, require perl version at least 5.18.0

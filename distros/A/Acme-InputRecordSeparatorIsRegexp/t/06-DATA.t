@@ -3,7 +3,7 @@ use Acme::InputRecordSeparatorIsRegexp;
 use strict;
 use warnings;
 
-tie *DAT, 'Acme::InputRecordSeparatorIsRegexp', *DATA, '1.3|T.4|E...D';
+tie *DAT, 'Acme::InputRecordSeparatorIsRegexp', *DATA, '1.43|T.44|E...XD';
 ok(tied(*DAT), 'return tied handle');
 
 my (@tell, @seek);
@@ -13,8 +13,8 @@ while (<DAT>) {
     push @seek, $_;
     push @tell, tell(DAT);
     if (@seek > 1) {
-	ok( $seek[-2] =~ /1.3$/ || $seek[-2] =~ /T.4$/ || 
-	    $seek[-2] =~ /E....D$/, 'correct line ending' )
+	ok( $seek[-2] =~ /1.43$/ || $seek[-2] =~ /T.44$/ || 
+	    $seek[-2] =~ /E....XD$/, 'correct line ending' )
 	    or diag $seek[-2], "\n\n", $seek[-1],
 	    "\n\n", length($seek[-2]),"\t",length($seek[-1]);
     }
@@ -23,9 +23,11 @@ while (<DAT>) {
 # don't close
 
 while (@seek) {
+    my ($s,$t);
     my $i = int(rand(@seek));
-    my $t = splice @tell, $i, 1;
-    my $s = splice @seek, $i, 1;
+    $t = splice @tell, $i, 1;
+    $s = splice @seek, $i, 1;
+
     seek(DAT, $t, 0);
     my $u = readline(DAT);
 

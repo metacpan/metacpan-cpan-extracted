@@ -1,10 +1,11 @@
 {
    "abstract" : "Perl extension for comparing XML documents.",
    "author" : [
-      "Shlomi Fish <shlomif@cpan.org>"
+      "Shlomi Fish <shlomif@cpan.org>",
+      "Chris Prather <chris.prather@tamarou.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +42,7 @@
             "Digest::MD5" : "0",
             "Encode" : "0",
             "XML::Parser" : "0",
-            "perl" : "5.012",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -59,40 +60,44 @@
    "provides" : {
       "XML::SemanticDiff" : {
          "file" : "lib/XML/SemanticDiff.pm",
-         "version" : "1.0006"
+         "version" : "1.0007"
       },
       "XML::SemanticDiff::BasicHandler" : {
          "file" : "lib/XML/SemanticDiff/BasicHandler.pm",
-         "version" : "1.0006"
+         "version" : "1.0007"
       },
       "XML::SemanticDiff::PathFinder" : {
          "file" : "lib/XML/SemanticDiff.pm",
-         "version" : "1.0006"
+         "version" : "1.0007"
       },
       "XML::SemanticDiff::PathFinder::Obj" : {
          "file" : "lib/XML/SemanticDiff.pm",
-         "version" : "1.0006"
+         "version" : "1.0007"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-xml-semanticdiff@rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff"
+         "web" : "https://github.com/shlomif/perl-XML-SemanticDiff/issues"
       },
       "homepage" : "http://metacpan.org/release/XML-SemanticDiff",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shlomif/perl-XML-SemanticDiff.git",
+         "url" : "git://github.com/shlomif/perl-XML-SemanticDiff.git",
          "web" : "https://github.com/shlomif/perl-XML-SemanticDiff"
       }
    },
-   "version" : "1.0006",
+   "version" : "1.0007",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026001"
+         "version" : "5.022001"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PruneFiles",
+            "name" : "PruneFiles",
+            "version" : "6.012"
+         },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
@@ -102,17 +107,17 @@
                }
             },
             "name" : "@Filter/TestMoreDoneTesting",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Filter/AutoPrereqs",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/ExecDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -128,27 +133,27 @@
                }
             },
             "name" : "@Filter/GatherDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/ManifestSkip",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/MetaYAML",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/PruneCruft",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Filter/Readme",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -163,37 +168,32 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/ShareDir",
-            "version" : "6.010"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Filter/Authority",
-            "version" : "1.009"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
             "name" : "@Filter/CheckChangesHasContent",
-            "version" : "0.010"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/ConfirmRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/Manifest",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -203,20 +203,20 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.010"
+                        "version" : "6.012"
                      }
                   ],
                   "include_underscores" : 0
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
                   "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 1,
-                  "meta_noindex" : 1
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
-                  "version" : "0.004"
+                  "Module::Metadata" : "1.000027",
+                  "version" : "0.006"
                }
             },
             "name" : "@Filter/MetaProvides::Package",
@@ -225,7 +225,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@Filter/MetaResources",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuild",
@@ -235,33 +235,33 @@
                }
             },
             "name" : "@Filter/ModuleBuild",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@Filter/PkgVersion",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Filter/PodCoverageTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodVersion",
             "name" : "@Filter/PodVersion",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : 0,
+                  "bail_out_on_fail" : "0",
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "t/00-compile.t",
@@ -278,7 +278,7 @@
                }
             },
             "name" : "@Filter/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
@@ -329,7 +329,7 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Filter/TestRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -418,7 +418,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "Support",
-                        "version" : "1.007"
+                        "version" : "1.010"
                      }
                   ]
                }
@@ -429,89 +429,73 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
-            "version" : "6.010"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.010"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "runtime",
-                  "type" : "requires"
-               }
-            },
-            "name" : "Runtime",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.010"
+            "version" : "6.012"
          }
       ],
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : 0
+            "is_trial" : "0"
          },
-         "version" : "6.010"
+         "version" : "6.012"
       }
    },
-   "x_authority" : "cpan:SHLOMIF",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.22.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

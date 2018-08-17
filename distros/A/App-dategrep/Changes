@@ -1,5 +1,14 @@
 Revision history for Perl module App::dategrep
 
+2.05 2018-08-09T13:57:07Z
+
+  - List core dependencies
+
+2.04 2018-08-08T14:36:43Z
+
+  - Require perl 5.10.1
+  - Add %H:%M for --from and --to
+
 2.03 2018-08-07T21:07:42Z
 
   - use LC_ALL in tests

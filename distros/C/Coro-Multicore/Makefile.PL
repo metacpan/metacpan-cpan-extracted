@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 use Coro::MakeMaker;
 
-use Canary::Stability Coro::Multicore => 1;
+use Canary::Stability Coro::Multicore => 1, 5.008009;
 
 if ($^O eq "MSWin32") {
    # configuration on windows is hardcoded - as always
@@ -10,25 +10,14 @@ if ($^O eq "MSWin32") {
 
 ***
 *** Your platform is not standards compliant. To get this module working, you need to
-*** download and install win32 pthread (http://sourceware.org/pthreads-win32/)
-*** in /gtk/{lib,include}
-*** also, the windows SDK is expected to be installed in /sdk
-*** and visual C is expected to be installed in /vc98
-***
-*** Alternatively, set the INC and LIBS environment variables
-*** accordingly before running Makefile.PL, or you can
-*** pass INC and LIBS arguments to Makefile.PL itself.
+*** have the win32 pthread library (http://sourceware.org/pthreads-win32/) and
+*** the windows sdk or equivalent.
 ***
 
 EOF
 
-   if ($Config{cc} =~ /(?:^|\\|\/)gcc(?:|.*\.exe)$/) {
-      $INC  = "$ENV{INC} -I/gtk/include";
-      $LIBS = ["$ENV{LIBS} -L/gtk/lib -lpthreadGC2"];
-   } else {
-      $INC  = "$ENV{INC} -I/sdk/include -I/vc98/include -I/gtk/include";
-      $LIBS = ["$ENV{LIBS} -L/gtk/lib -lpthreadVC2"];
-   }
+   $INC  = "$ENV{INC}";
+   $LIBS = ["$ENV{LIBS} -lpthread"];
 
 } else {
 

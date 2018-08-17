@@ -1,8 +1,0 @@
-^(_|,,|\.#|\+\+)
-^Build$
-^blib
-~$
-^\{arch\}
-\.arch-ids
-\.bak$
-\.tar.gz(.sig)?$

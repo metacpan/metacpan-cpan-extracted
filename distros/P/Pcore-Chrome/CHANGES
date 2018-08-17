@@ -1,3 +1,8 @@
+v0.4.2 2018-08-15T21:15:33Z
+ - ported to run_proc1
+ - contrib removed
+ - refactored
+
 v0.4.1 2018-08-03T23:54:24Z
  - Pcore::HTTP refactoring
 

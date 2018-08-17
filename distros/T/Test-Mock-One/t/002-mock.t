@@ -10,7 +10,6 @@ use Test::Deep;
 use Test::Mock::One;
 use Test::Mock::Two qw(:all);
 use Test::Mock::Testsuite;
-use DateTime;
 
 
 {

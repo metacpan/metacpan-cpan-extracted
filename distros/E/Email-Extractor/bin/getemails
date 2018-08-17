@@ -3,13 +3,17 @@
 # ABSTRACT: command line utility that return emails from file or url
 
 package getemails;
-$getemails::VERSION = '0.01';
+$getemails::VERSION = '0.03';
 
 
 use strict;
 use warnings;
 use Email::Extractor;
+use feature 'say';
 use Data::Dumper;
+
+use Pod::Usage qw(pod2usage);
+pod2usage() unless @ARGV >= 1;
 
 my $params = {
     uri            => $ARGV[0],
@@ -17,31 +21,14 @@ my $params = {
     verbose        => $ARGV[2]
 };
 
-die 'No uri specified' unless defined $params->{uri} && length $params->{uri};
+# warn Dumper $params;
 
-my $crawler = Email::Extractor->new();
-my $a       = $crawler->get_emails_from_uri( $params->{uri} );
-
-print "No emails found on specified url\n" if ( !@$a && $params->{verbose} );
-
-my $links_checked = 1;
-
-if ( $params->{check_contacts} ) {
-
-    while ( !@$a && $links_checked <= 10 ) {    # but no more than 10 iterations
-
-        my $urls = $crawler->extract_contact_links;
-        for my $u (@$urls) {
-            $a = $crawler->get_emails_from_uri($u);
-            $links_checked++;
-        }
-    }
-
-}
-
-print "$_\n" for (@$a);
-
-print "Links checked: " . $links_checked . "\n" if ( $params->{verbose} );
+my $crawler = Email::Extractor->new( verbose => $params->{verbose} );
+my $a =
+  $crawler->search_until_attempts( $params->{uri}, $params->{check_contacts} );
+print "$_\n" for @$a;
+print "Links checked sum-total: " . $crawler->{last_attempts} . "\n"
+  if ( $params->{verbose} && $params->{check_contacts} > 1 );
 
 1;
 
@@ -57,7 +44,7 @@ getemails - command line utility that return emails from file or url
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -66,9 +53,11 @@ version 0.01
 
 second parameter is to check or not to check contact links
 
-v - verbose
+You can set this number to any integer and it will set value of $attempts at L<Email::Extractor/search_until_attempts>
 
-By default it checks contact links in all languages
+v - verbose mode
+
+By default it checks contact links in all available languages at L<Email::Extractor/contacts>
 
 =head1 AUTHOR
 

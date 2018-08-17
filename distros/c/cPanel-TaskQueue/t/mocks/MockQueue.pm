@@ -9,7 +9,7 @@ sub new {
 }
 
 sub queue_task {
-    my ($self, $task) = @_;
+    my ( $self, $task ) = @_;
 
     push @{$self}, $task;
     return $task->uuid;

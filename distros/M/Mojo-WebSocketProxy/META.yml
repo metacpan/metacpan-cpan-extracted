@@ -7,12 +7,13 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Path::Tiny: '0'
   Test::CheckDeps: '0.010'
   Test::Fatal: '0'
   Test::MockModule: '0'
   Test::MockObject: '0'
   Test::Mojo: '0'
-  Test::More: '0.94'
+  Test::More: '0.98'
   Test::Simple: '0.44'
   Test::TCP: '0'
   perl: '5.014000'
@@ -42,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Mojo-WebSocketProxy/issues
   repository: git://github.com/binary-com/perl-Mojo-WebSocketProxy.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'YAML::Tiny version 1.66'

@@ -2,16 +2,10 @@ Revision history for IO::AIO
 
 TODO: scandir - some dirs mostly contain subdirs - invert logic?
 TODO: aio_cptree/mvtree
-TODO: reduce condvar fairness: schedule hot-cache-threads first?
 TODO: vmsplice? (http://kerneltrap.org/node/6505 http://lwn.net/Articles/178199/)
-TODO: aio_fcntl, at least for file-locking
-TODO: aio_mincore?
-TODO: getxattr etc.?
-TODO: F_DUPFD_CLOEXEC
+TODO: getxattr, setxattr, listxattr, removexattr etc.?
 TODO: emulation for splice?
-TODO: eio_mmap|mlock|munmap|splice...
 TODO: syncfs/sync windows:
-TODO: F_SETPIPE_SZ, F_GETPIPE_SZ
 TODO: posix_fallocate when flags=0
 http://stackoverflow.com/questions/65170/how-to-get-name-associated-with-open-handle/5286888#5286888
 http://blogs.msdn.com/b/adioltean/archive/2005/04/16/408947.aspx
@@ -22,22 +16,78 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa364963%28v=vs.85%29.as
 http://msdn.microsoft.com/en-us/library/windows/desktop/aa364996%28v=vs.85%29.aspx
 http://msdn.microsoft.com/en-us/library/windows/desktop/aa364994%28v=vs.85%29.aspx
 TODO: extra socket/tcp constants &c?
-TODO: getrandom, GRND_NONBLOCK, GRND_NONBLOCK
 TODO: http://lwn.net/Articles/593918/ SHMEM_SET_SEALS, SHMEM_GET_SEALS, SEAL_SHRINK, SEAL_GROW, SEAL_WRITE, int memfd_create(const char *name, u64 size, u64 flags);, MFD_CLOEXEC, int fd = open("/tmp", O_RDWR | O_TMPFILE | O_EXCL, S_IRWXU);
-TODO: O_TMPFILE
-TODO: FALLOC_FL_COLLAPSE_RANGE
-TODO: FALLOC_FL_ZERO_RANGE
-TODO: renameat RENAME_EXCHANGE, RENAME_NOREPLACE, RENAME_EXCHANGE
-TODO: fcntl F_GETLKP/F_SETLKP/F_SETLKPW, http://lwn.net/Articles/586904/
-TODO: flink + AT_EMPTY_PATH
 TODO: name_to_handle_At + open_by_handle_at = clone fds
 TODO: lchown
+TODO: mount/umount2/MS_* flags
 
 TODO: rewrite rmtree et al. to support working directories (also speed them up)
 TODO: maybe IO::AIO leaks fds when requests are cancelled? maybe initialise result to -1?
 TODO: aio_wd should use O_PATH on linux, due to lacking O_SEARCH (http://comments.gmane.org/gmane.linux.file-systems/33611)
       http://www.openwall.com/lists/musl/2013/02/23/4
-TODO: aio_fcntl/ioctl test.
+TODO: maybe copy some hacks from PerlIOStdio_invalidate_fileno for faster close on certain platforms
+TODO: copy_file_range, copy_file_range
+TODO: FIDEDUPERANGE, file_ioctl.c
+TODO: mincore
+TODO: SOCK_CLOEXEc etc.
+TODO: unlinkat flags, linkat flags, statat, renameat2 flags
+TODO: https://kernelnewbies.org/Linux_4.11
+TODO: define useful rules for [[$wd, $path], $path] &c and implement them
+TODO: https://github.com/coreutils/coreutils/blob/master/src/stat.c maybe IO::AIO::FSID
+TODO: mlock2, MLOCK_ONFAULT
+TODO: dup3, pipe2, accept4
+
+4.54 Tue Aug 14 13:54:48 CEST 2018
+	- include sys/mkdev.h or sys/sysmacros.h if available.
+        - further tweaks to configure invocation for systems requiring --rpath.
+        - no longer rely on custom paths on win32 platforms.
+        - try to work around buggy PAGESIZE macro on solaris.
+
+4.53 Tue Aug 14 11:27:50 CEST 2018
+	- add $Config{libs} to LIBS for configure, to work around systems
+          with broken library dependencies (... openbsd).
+
+4.52 Sun Aug 12 08:09:45 CEST 2018
+	- config.h.in was missing in distribution.
+
+4.51 Sun Aug 12 07:24:14 CEST 2018
+	- complete rework of the autoconf framework: IO::AIO now uses its own
+          config.h, separate from libeio, and tries to test the actual perl
+          environment, not the standard system environment.
+        - provide nanosecond-accracy stat time accessors for both perl and IO::AIO
+          stat functions.
+	- removed non-portable C++ syntax from eio.c.
+        - try to fix readdir tests on cygwin spuriously failing.
+
+4.5  Wed Aug  1 00:23:55 CEST 2018
+	- aio_mtouch touch all pages as requested, not just the first page in most cases.
+        - new function: IO::AIO::mremap, linux-specific mremap, with constants MREMAP_MAYMOVE
+          and MREMAP_FIXED.
+        - add O_ACCMODE.
+	- add (undocumented) MSG_CMSG_CLOEXEC and SOCK_CLOEXEC constants.
+
+4.4   Tue Feb 20 07:54:12 CET 2018
+	- new aio_slurp request.
+        - add (experimental) IO::AIO::eventfd and timerfd* function.
+	- add (experimental) IO::AIO::get_fdlimit and IO::AIO::min_fdlimit.
+        - point out that aio_copy overwrites existing files.
+        - removed filesystem magic number table from aio_statvfs docs as
+          statvfs doesn't actually return this info at all (statfs does).
+        - add a bunch of (mostly linux-specific) constants for use in ioctls
+          (see aio_ioctl docs).
+        - treescan now has a proper manpage and useful --help output.
+        - new option --sync in treescan, to sync everything in a subtree.
+        - changed default for aio_msync flags to MSYNC_SYNC.
+        - document offset/length behaviour of mprotect/madvise.
+        - support linux's renameat2 (via aio_rename2).
+        - add aio_rename2, an aio_rename with flags.
+        - add F_DUPPFD_CLOEXEC, F_OFD_[SG]ETLKW? constants.
+        - add FALLOC_FL_INSERT_RANGE, FALLOC_FL_UNSHARE_RANGE.
+        - (libeio) use posix_close if available.
+        - (libeio) internal close() calls no longer disturb errno.
+        - add IO:AIO::FALLOC_FL_UNSHARE.
+        - update schmorp.h for removal of USE_SOCKETS_AS_HANDLES
+          and better eventfd detection.
 
 4.34  Sun May  1 19:18:24 CEST 2016
 	- def0.h was not properly generated during previous release, causing

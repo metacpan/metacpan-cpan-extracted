@@ -1,3 +1,9 @@
+0.43    2018-08-17
+    - Improve earlier/later substream performance
+    - Improve cache usage performance
+
+0.42    (DISCARDED)
+
 0.41    2018-08-06
     - Add a summary method to event classes
 

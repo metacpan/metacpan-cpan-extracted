@@ -70,6 +70,6 @@
 ^scratch\/
 ^URI-Fast-
 ^readme.PL
-^bench
-^internals
+^bench.PL
+^internals.PL
 ^Fast.(bs|c|o)

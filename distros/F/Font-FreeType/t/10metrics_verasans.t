@@ -126,16 +126,16 @@ subtest "bounding box" => sub {
 # don't have corresponding Unicode characters and for some reason aren't
 # reported by this, and another 2 which have Unicode characters but no glyphs.
 # The expected Unicode codes and names of the glyphs are in a text file.
-# TODO - how can we iterate over the whole lot?
-my $glyph_list_filename = catfile($data_dir, 'vera_glyphs.txt');
-open my $glyph_list, '<', $glyph_list_filename
+
+my $character_list_filename = catfile($data_dir, 'vera_characters.txt');
+open my $character_list, '<', $character_list_filename
   or die "error opening file for list of glyphs: $!";
 
 BEGIN { $Tests += 256*2 + 1 }
 $vera->foreach_char(sub {
-    die "shouldn't be any argumetns passed in" unless @_ == 0;
-    my $line = <$glyph_list>;
-    die "not enough characters in listing file '$glyph_list_filename'"
+    die "shouldn't be any arguments passed in" unless @_ == 0;
+    my $line = <$character_list>;
+    die "not enough characters in listing file '$character_list_filename'"
       unless defined $line;
     chomp $line;
     my ($unicode, $name) = split ' ', $line;
@@ -143,6 +143,27 @@ $vera->foreach_char(sub {
     is($_->char_code, $unicode,
        "glyph $unicode char code in foreach_char()");
     is($_->name, $name, "glyph $unicode name in foreach_char()");
+});
+is(scalar <$character_list>, undef, "we aren't missing any glyphs");
+
+# Test iterating over all the glyphs.  268*3 tests.
+
+my $glyph_list_filename = catfile($data_dir, 'vera_glyphs.txt');
+open my $glyph_list, '<', $glyph_list_filename
+  or die "error opening file for list of glyphs: $!";
+
+BEGIN { $Tests += 268*3 + 1 }
+$vera->foreach_glyph(sub {
+    die "shouldn't be any arguments passed in" unless @_ == 0;
+    my $line = <$glyph_list>;
+    die "not enough characters in listing file '$glyph_list_filename'"
+      unless defined $line;
+    chomp $line;
+    my ($index, $unicode, $name) = split ' ', $line;
+    is($_->index, $index, "glyph $index index in foreach_glyph()");
+    is($_->char_code || "0", $unicode,
+       "glyph $index char code in foreach_glyph()");
+    is($_->name, $name, "glyph $index name in foreach_glyph()");
 });
 is(scalar <$glyph_list>, undef, "we aren't missing any glyphs");
 

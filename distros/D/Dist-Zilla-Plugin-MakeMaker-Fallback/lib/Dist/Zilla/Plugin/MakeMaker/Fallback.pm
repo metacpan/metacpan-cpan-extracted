@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.026-8-gdfb070a
+package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.027-3-g555f2ab
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Generate a Makefile.PL containing a warning for legacy users
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain legacy ancient backcompat
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::MakeMaker::Awesome' => { -version => '0.26' };
@@ -15,6 +15,11 @@ use List::Util 'first';
 use version;
 use namespace::autoclean;
 
+has skip_release_testing => (
+    is => 'ro',
+    isa => 'Bool',
+);
+
 around dump_config => sub
 {
     my ($orig, $self) = @_;
@@ -22,6 +27,7 @@ around dump_config => sub
 
     my $data = {
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
+        skip_release_testing => ($self->skip_release_testing ? 1 : 0),
     };
     $config->{+__PACKAGE__} = $data if keys %$data;
 
@@ -130,7 +136,7 @@ sub test
 {
     my $self = shift;
 
-    if ($ENV{RELEASE_TESTING})
+    if ($ENV{RELEASE_TESTING} and not $self->skip_release_testing)
     {
         # we are either performing a 'dzil test' with RELEASE_TESTING set, or
         # a 'dzil release' -- the Build.PL plugin will run tests with extra
@@ -226,6 +232,8 @@ __PACKAGE__->meta->make_immutable;
 #pod testing variables B<unset> (C<AUTHOR_TESTING>, C<RELEASE_TESTING>). This is to
 #pod weed out test issues that only manifest under these conditions (for example:
 #pod bad test count, conditional module loading).
+#pod You can prevent this extra testing from happening by setting C<skip_release_testing = 1>
+#pod in your configuration or F<dist.ini>.
 #pod
 #pod =head1 ACKNOWLEDGEMENTS
 #pod
@@ -259,7 +267,7 @@ Dist::Zilla::Plugin::MakeMaker::Fallback - Generate a Makefile.PL containing a w
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -330,6 +338,8 @@ plugin, C<dzil test --release> or C<dzil release> will run tests with extra
 testing variables B<unset> (C<AUTHOR_TESTING>, C<RELEASE_TESTING>). This is to
 weed out test issues that only manifest under these conditions (for example:
 bad test count, conditional module loading).
+You can prevent this extra testing from happening by setting C<skip_release_testing = 1>
+in your configuration or F<dist.ini>.
 
 =head1 ACKNOWLEDGEMENTS
 

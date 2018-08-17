@@ -46,7 +46,18 @@ my @path = qw(th is mojo dir wil l never-ever exist);
 my $app = Mojolicious->new(home => Mojo::Home->new(@path));
 is $app->home, path(@path), 'right home directory';
 
+# Config override
 my $t = Test::Mojo->new('MojoliciousTest');
+ok !$t->app->config->{config_override}, 'no override';
+ok !$t->app->config->{foo},             'no value';
+$t = Test::Mojo->new('MojoliciousTest', {foo => 'bar'});
+ok $t->app->config->{config_override}, 'override';
+is $t->app->config->{foo}, 'bar', 'right value';
+$t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
+ok $t->app->config->{config_override}, 'override';
+is $t->app->config->{foo}, 'baz', 'right value';
+
+$t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something',
@@ -633,19 +644,19 @@ $t->get_ok('/side_effects/index')->status_is(404)
 $t->get_ok('/side_effects-test/index')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('pass');
 
-# Connection already closed
+# Transaction already destroyed
 eval { Mojolicious::Controller->new->finish };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval {
   Mojolicious::Controller->new->on(finish => sub { });
 };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Controller->new->req };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Controller->new->res };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 eval { Mojolicious::Controller->new->send('whatever') };
-like $@, qr/Connection already closed/, 'right error';
+like $@, qr/Transaction already destroyed/, 'right error';
 
 # Abstract methods
 eval { Mojolicious::Plugin->register };

@@ -1,7 +1,7 @@
 /*
  * libeio implementation
  *
- * Copyright (c) 2007,2008,2009,2010,2011,2012,2013,2016 Marc Alexander Lehmann <libeio@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010,2011,2012,2013,2016,2017 Marc Alexander Lehmann <libeio@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -203,11 +203,15 @@ static void eio_destroy (eio_req *req);
   symlink (const char *old, const char *neu)
   {
     #if WINVER >= 0x0600
-      if (CreateSymbolicLink (neu, old, 1))
-        return 0;
+      int flags;
 
-      if (CreateSymbolicLink (neu, old, 0))
-        return 0;
+      /* This tries out all combinations of SYMBOLIC_LINK_FLAG_DIRECTORY
+       * and SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE,
+       * with directory first.
+       */
+      for (flags = 3; flags >= 0; --flags)
+        if (CreateSymbolicLink (neu, old, flags))
+          return 0;
     #endif
 
     return EIO_ERRNO (ENOENT, -1);
@@ -229,6 +233,7 @@ static void eio_destroy (eio_req *req);
 
 #else
 
+  #include <sys/ioctl.h>
   #include <sys/time.h>
   #include <sys/select.h>
   #include <unistd.h>
@@ -297,6 +302,11 @@ static void eio_destroy (eio_req *req);
 # endif
 #endif
 
+#if HAVE_RENAMEAT2
+# include <sys/syscall.h>
+# include <linux/fs.h>
+#endif
+
 #ifndef D_TYPE
 # define D_TYPE(de) 0
 #endif
@@ -314,8 +324,18 @@ static void eio_destroy (eio_req *req);
 
 /* used for readlink etc. */
 #ifndef PATH_MAX
-# define PATH_MAX 4096
+# define PATH_MAX 0
 #endif
+
+#ifndef O_CLOEXEC
+  #define O_CLOEXEC 0
+#endif
+
+#ifndef EIO_PATH_MIN
+# define EIO_PATH_MIN 8160
+#endif
+
+#define EIO_PATH_MAX (PATH_MAX <= EIO_PATH_MIN ? EIO_PATH_MIN : PATH_MAX)
 
 /* buffer size for various temporary buffers */
 #define EIO_BUFSIZE 65536
@@ -538,6 +558,21 @@ int eio_poll (void)
 
 /*****************************************************************************/
 /* work around various missing functions */
+
+#if HAVE_POSIX_CLOSE && !__linux
+# define eio__close(fd) posix_close (fd, 0)
+#else
+# define eio__close(fd) close (fd)
+#endif
+
+/* close() without disturbing errno */
+static void
+silent_close (int fd)
+{
+  int saved_errno = errno;
+  eio__close (fd);
+  errno = saved_errno;
+}
 
 #ifndef HAVE_UTIMES
 
@@ -926,9 +961,9 @@ eio__mtouch (eio_req *req)
 
     if (addr < end)
       if (flags & EIO_MT_MODIFY) /* modify */
-        do { *((volatile sig_atomic_t *)addr) |= 0; } while ((addr += page) < len && !EIO_CANCELLED (req));
+        do { *((volatile sig_atomic_t *)addr) |= 0; } while ((addr += page) < end && !EIO_CANCELLED (req));
       else
-        do { *((volatile sig_atomic_t *)addr)     ; } while ((addr += page) < len && !EIO_CANCELLED (req));
+        do { *((volatile sig_atomic_t *)addr)     ; } while ((addr += page) < end && !EIO_CANCELLED (req));
   }
 
   return 0;
@@ -972,15 +1007,15 @@ eio__realpath (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
   if (!*rel)
     return -1;
 
-  res = etp_tmpbuf_get (tmpbuf, PATH_MAX * 3);
+  res = etp_tmpbuf_get (tmpbuf, EIO_PATH_MAX * 3);
 #ifdef _WIN32
   if (_access (rel, 4) != 0)
     return -1;
 
-  symlinks = GetFullPathName (rel, PATH_MAX * 3, res, 0);
+  symlinks = GetFullPathName (rel, EIO_PATH_MAX * 3, res, 0);
 
   errno = ENAMETOOLONG;
-  if (symlinks >= PATH_MAX * 3)
+  if (symlinks >= EIO_PATH_MAX * 3)
     return -1;
 
   errno = EIO;
@@ -990,8 +1025,8 @@ eio__realpath (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
   return symlinks;
 
 #else
-  tmp1 = res  + PATH_MAX;
-  tmp2 = tmp1 + PATH_MAX;
+  tmp1 = res  + EIO_PATH_MAX;
+  tmp2 = tmp1 + EIO_PATH_MAX;
 
 #if 0 /* disabled, the musl way to do things is just too racy */
 #if __linux && defined(O_NONBLOCK) && defined(O_NOATIME)
@@ -1002,9 +1037,9 @@ eio__realpath (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
     if (fd >= 0)
       {
         sprintf (tmp1, "/proc/self/fd/%d", fd);
-        req->result = readlink (tmp1, res, PATH_MAX);
+        req->result = readlink (tmp1, res, EIO_PATH_MAX);
         /* here we should probably stat the open file and the disk file, to make sure they still match */
-        close (fd);
+        eio__close (fd);
 
         if (req->result > 0)
           goto done;
@@ -1025,7 +1060,7 @@ eio__realpath (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
       
       if (wd == EIO_CWD)
         {
-          if (!getcwd (res, PATH_MAX))
+          if (!getcwd (res, EIO_PATH_MAX))
             return -1;
 
           len = strlen (res);
@@ -1082,7 +1117,7 @@ eio__realpath (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
         res [len + 1] = 0;
 
         /* now check if it's a symlink */
-        linklen = readlink (tmpbuf->ptr, tmp1, PATH_MAX);
+        linklen = readlink (tmpbuf->ptr, tmp1, EIO_PATH_MAX);
 
         if (linklen < 0)
           {
@@ -1098,7 +1133,7 @@ eio__realpath (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
             int rellen = strlen (rel);
 
             errno = ENAMETOOLONG;
-            if (linklen + 1 + rellen >= PATH_MAX)
+            if (linklen + 1 + rellen >= EIO_PATH_MAX) /* also catch linklen >= EIO_PATH_MAX */
               return -1;
 
             errno = ELOOP;
@@ -1372,7 +1407,7 @@ eio__scandir (eio_req *req, etp_worker *self)
         dirp = fdopendir (fd);
 
         if (!dirp)
-          close (fd);
+          silent_close (fd);
       }
     else
       dirp = opendir (req->ptr1);
@@ -1648,7 +1683,7 @@ eio__wd_open_sync (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
 eio_wd
 eio_wd_open_sync (eio_wd wd, const char *path)
 {
-  struct etp_tmpbuf tmpbuf = { };
+  struct etp_tmpbuf tmpbuf = { 0 };
   wd = eio__wd_open_sync (&tmpbuf, wd, path);
   free (tmpbuf.ptr);
 
@@ -1661,13 +1696,26 @@ eio_wd_close_sync (eio_wd wd)
   if (wd != EIO_INVALID_WD && wd != EIO_CWD)
     {
       #if HAVE_AT
-      close (wd->fd);
+      eio__close (wd->fd);
       #endif
       free (wd);
     }
 }
 
 #if HAVE_AT
+
+static int
+eio__renameat2 (int olddirfd, const char *oldpath, int newdirfd, const char *newpath, unsigned int flags)
+{
+#if HAVE_RENAMEAT2
+  return syscall (SYS_renameat2, olddirfd, oldpath, newdirfd, newpath, flags);
+#else
+  if (flags)
+    return EIO_ENOSYS ();
+
+  return renameat (olddirfd, oldpath, newdirfd, newpath);
+#endif
+}
 
 /* they forgot these */
 
@@ -1681,7 +1729,7 @@ eio__truncateat (int dirfd, const char *path, off_t length)
     return fd;
 
   res = ftruncate (fd, length);
-  close (fd);
+  silent_close (fd);
   return res;
 }
 
@@ -1695,9 +1743,8 @@ eio__statvfsat (int dirfd, const char *path, struct statvfs *buf)
     return fd;
 
   res = fstatvfs (fd, buf);
-  close (fd);
+  silent_close (fd);
   return res;
-
 }
 
 #endif
@@ -1715,11 +1762,39 @@ eio__statvfsat (int dirfd, const char *path, struct statvfs *buf)
         {					\
           errno       = ENOMEM;			\
           req->result = -1;			\
-          break;				\
+          goto alloc_fail;			\
         }					\
     }
 
 /*****************************************************************************/
+
+static void
+eio__slurp (int fd, eio_req *req)
+{
+  req->result = fd;
+
+  if (fd < 0)
+    return;
+
+  if (req->offs < 0 || !req->size) /* do we need the size? */
+    {
+      off_t size = lseek (fd, 0, SEEK_END);
+
+      if (req->offs < 0)
+        req->offs += size;
+
+      if (!req->size)
+        req->size = size - req->offs;
+    }
+
+  ALLOC (req->size);
+  req->result = pread (fd, req->ptr2, req->size, req->offs);
+
+  silent_close (fd);
+
+alloc_fail:
+  ;
+}
 
 int ecb_cold
 eio_init (void (*want_poll)(void), void (*done_poll)(void))
@@ -1827,6 +1902,7 @@ eio_execute (etp_worker *self, eio_req *req)
       case EIO_CHMOD:     req->result = fchmodat  (dirfd, req->ptr1, (mode_t)req->int2, 0); break;
       case EIO_TRUNCATE:  req->result = eio__truncateat (dirfd, req->ptr1, req->offs); break;
       case EIO_OPEN:      req->result = openat    (dirfd, req->ptr1, req->int1, (mode_t)req->int2); break;
+      case EIO_SLURP:     eio__slurp (  openat    (dirfd, req->ptr1, O_RDONLY | O_CLOEXEC), req); break;
 
       case EIO_UNLINK:    req->result = unlinkat  (dirfd, req->ptr1, 0); break;
       case EIO_RMDIR:     /* complications arise because "." cannot be removed, so we might have to expand */
@@ -1834,17 +1910,28 @@ eio_execute (etp_worker *self, eio_req *req)
                              ? rmdir (req->wd->str)
                              : unlinkat  (dirfd, req->ptr1, AT_REMOVEDIR); break;
       case EIO_MKDIR:     req->result = mkdirat   (dirfd, req->ptr1, (mode_t)req->int2); break;
-      case EIO_RENAME:    /* complications arise because "." cannot be renamed, so we might have to expand */
-                          req->result = req->wd && SINGLEDOT (req->ptr1)
-                             ? rename (req->wd->str, req->ptr2)
-                             : renameat (dirfd, req->ptr1, WD2FD ((eio_wd)req->int3), req->ptr2); break;
+      case EIO_RENAME:    req->result = eio__renameat2 (
+                            dirfd,
+                            /* complications arise because "." cannot be renamed, so we might have to expand */
+                            req->wd && SINGLEDOT (req->ptr1) ? req->wd->str : req->ptr1,
+                            WD2FD ((eio_wd)req->int3),
+                            req->ptr2,
+                            req->int2
+                          );
+                          break;
       case EIO_LINK:      req->result = linkat    (dirfd, req->ptr1, WD2FD ((eio_wd)req->int3), req->ptr2, 0); break;
       case EIO_SYMLINK:   req->result = symlinkat (req->ptr1, dirfd, req->ptr2); break;
       case EIO_MKNOD:     req->result = mknodat   (dirfd, req->ptr1, (mode_t)req->int2, (dev_t)req->offs); break;
-      case EIO_READLINK:  ALLOC (PATH_MAX);
-                          req->result = readlinkat (dirfd, req->ptr1, req->ptr2, PATH_MAX); break;
       case EIO_STATVFS:   ALLOC (sizeof (EIO_STRUCT_STATVFS));
                           req->result = eio__statvfsat (dirfd, req->ptr1, (EIO_STRUCT_STATVFS *)req->ptr2); break;
+      case EIO_READLINK:  ALLOC (EIO_PATH_MAX);
+                          req->result = readlinkat (dirfd, req->ptr1, req->ptr2, EIO_PATH_MAX);
+                          if (req->result == EIO_PATH_MAX)
+                            {
+                              req->result = -1;
+                              errno = ENAMETOOLONG;
+                            }
+                          break;
       case EIO_UTIME:
       case EIO_FUTIME:
         {
@@ -1879,18 +1966,25 @@ eio_execute (etp_worker *self, eio_req *req)
       case EIO_CHMOD:     req->result = chmod     (path     , (mode_t)req->int2); break;
       case EIO_TRUNCATE:  req->result = truncate  (path     , req->offs); break;
       case EIO_OPEN:      req->result = open      (path     , req->int1, (mode_t)req->int2); break;
+      case EIO_SLURP:     eio__slurp (  open      (path     , O_RDONLY | O_CLOEXEC), req); break;
 
       case EIO_UNLINK:    req->result = unlink    (path     ); break;
       case EIO_RMDIR:     req->result = rmdir     (path     ); break;
       case EIO_MKDIR:     req->result = mkdir     (path     , (mode_t)req->int2); break;
-      case EIO_RENAME:    req->result = rename    (path     , req->ptr2); break;
+      case EIO_RENAME:    req->result = req->int2 ? EIO_ENOSYS () : rename (path, req->ptr2); break;
       case EIO_LINK:      req->result = link      (path     , req->ptr2); break;
       case EIO_SYMLINK:   req->result = symlink   (path     , req->ptr2); break;
       case EIO_MKNOD:     req->result = mknod     (path     , (mode_t)req->int2, (dev_t)req->offs); break;
-      case EIO_READLINK:  ALLOC (PATH_MAX);
-                          req->result = readlink  (path, req->ptr2, PATH_MAX); break;
       case EIO_STATVFS:   ALLOC (sizeof (EIO_STRUCT_STATVFS));
                           req->result = statvfs   (path     , (EIO_STRUCT_STATVFS *)req->ptr2); break;
+      case EIO_READLINK:  ALLOC (EIO_PATH_MAX);
+                          req->result = readlink (path, req->ptr2, EIO_PATH_MAX);
+                          if (req->result == EIO_PATH_MAX)
+                            {
+                              req->result = -1;
+                              errno = ENAMETOOLONG;
+                            }
+                          break;
 
       case EIO_UTIME:
       case EIO_FUTIME:
@@ -1935,7 +2029,7 @@ eio_execute (etp_worker *self, eio_req *req)
       case EIO_FCHMOD:    req->result = fchmod    (req->int1, (mode_t)req->int2); break;
       case EIO_FTRUNCATE: req->result = ftruncate (req->int1, req->offs); break;
 
-      case EIO_CLOSE:     req->result = close     (req->int1); break;
+      case EIO_CLOSE:     req->result = eio__close (req->int1); break;
       case EIO_DUP2:      req->result = dup2      (req->int1, req->int2); break;
       case EIO_SYNC:      req->result = 0; sync (); break;
       case EIO_FSYNC:     req->result = fsync     (req->int1); break;
@@ -1983,6 +2077,7 @@ eio_execute (etp_worker *self, eio_req *req)
         break;
     }
 
+alloc_fail:
   req->errorno = errno;
 }
 
@@ -2243,6 +2338,11 @@ eio_req *eio_symlink (const char *path, const char *new_path, int pri, eio_cb cb
 eio_req *eio_rename (const char *path, const char *new_path, int pri, eio_cb cb, void *data)
 {
   return eio__2path (EIO_RENAME, path, new_path, pri, cb, data);
+}
+
+eio_req *eio_slurp (const char *path, void *buf, size_t length, off_t offset, int pri, eio_cb cb, void *data)
+{
+  REQ (EIO_SLURP); PATH; req->offs = offset; req->size = length; req->ptr2 = buf; SEND;
 }
 
 eio_req *eio_custom (void (*execute)(eio_req *), int pri, eio_cb cb, void *data)

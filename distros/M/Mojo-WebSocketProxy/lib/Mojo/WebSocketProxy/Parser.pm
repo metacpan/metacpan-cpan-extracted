@@ -3,7 +3,7 @@ package Mojo::WebSocketProxy::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';    ## VERSION
+our $VERSION = '0.11';    ## VERSION
 
 sub parse_req {
     my ($c, $req_storage) = @_;

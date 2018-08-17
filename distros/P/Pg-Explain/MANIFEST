@@ -51,6 +51,8 @@ t/14-json-plans/5.expect
 t/14-json-plans/5.json
 t/14-json-plans/6.expect
 t/14-json-plans/6.json
+t/14-json-plans/7.expect
+t/14-json-plans/7.json
 t/15-yaml-plans.t
 t/15-yaml-plans/1.expect
 t/15-yaml-plans/1.yaml
@@ -66,6 +68,8 @@ t/15-yaml-plans/6.expect
 t/15-yaml-plans/6.yaml
 t/15-yaml-plans/7.expect
 t/15-yaml-plans/7.yaml
+t/15-yaml-plans/8.expect
+t/15-yaml-plans/8.yaml
 t/16-ctes.t
 t/16-ctes/1-text.expect
 t/16-ctes/1-text.plan
@@ -175,3 +179,4 @@ t/plans/25-plan
 t/34-parallel-index-only-scan.t
 t/33-parallel-index-scan.t
 t/32-parallel-index-scan-backward.t
+t/35-sort-mode-and-buffers-from-json.t

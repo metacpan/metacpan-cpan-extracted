@@ -344,6 +344,26 @@ SQL equivalent :
   # No Prepare Statement :
   UPDATE my_users SET first_name='Achmad Yusri', last_name='Afandi' WHERE id = 2;
 
+=head2 update - with simple
+
+  use CellBIS::SQL::Abstract
+  my $sql_abstract = CellBIS::SQL::Abstract->new;
+
+  my $table_name = 'my_users'; # Table name.
+  my $col_val = {
+    'first_name' => 'Achmad Yusri',
+    'last_name' => 'Afandi'
+  };
+  my $clause = {
+    where => 'id = 2'
+  };
+  my $update = $sql_abstract->update($table_name, $col_val, $clause);
+
+SQL equivalent :
+
+  # No Prepare Statement :
+  UPDATE my_users SET first_name='Achmad Yusri', last_name='Afandi' WHERE id = 2;
+
 =head2 delete
 
   use CellBIS::SQL::Abstract

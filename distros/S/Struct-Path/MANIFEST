@@ -3,7 +3,6 @@ lib/Struct/Path.pm
 Makefile.PL
 MANIFEST			This list of files
 README
-TODO
 t/00-load.t
 t/_common.pm
 t/implicit_step.t

@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use Struct::Path qw(path);
 
@@ -19,6 +19,16 @@ is_deeply($got, 'test', "Replace entire thing (scalar) via assign opt") ||
 $got = [ 'original' ];
 path($got, [], assign => 'test');
 is_deeply($got, 'test', "Replace entire thing (array) via assign opt") ||
+    diag t_dump $got;
+
+$got = [];
+path($got, [[-3]], assign => 'test');
+is_deeply($got, [], "Out of range, nostrict, noexpand") ||
+    diag t_dump $got;
+
+$got = [];
+path($got, [[-3]], assign => 'test', expand => 1);
+is_deeply($got, ['test'], "Out of range, nostrict, expand") ||
     diag t_dump $got;
 
 $got = 42;

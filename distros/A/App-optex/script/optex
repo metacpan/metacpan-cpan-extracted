@@ -186,7 +186,7 @@ warn "$abs_name: exec $target_name @ARGV\n" if $debug;
 ##
 my $status = system $target_name, @ARGV;
 
-exit(defined $exit_code ? $exit_code : $status >> 8);
+exit($exit_code // ( $status >> 8 ));
 
 ######################################################################
 

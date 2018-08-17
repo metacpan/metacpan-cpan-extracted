@@ -1,4 +1,3 @@
-build-distribution.sh
 build.xml
 client-scripts/README
 client-scripts/sample_WS-Security_client.pl
@@ -28,21 +27,18 @@ inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-installer.pl
 lib/WSRF/Lite.pm
 lib/WSRF/SSLDaemon.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
-preForkContainer.pl
 README
 SContainer.pl
 t/001_load.t
 test/client_test.pl
 test/README
 test/signature_checker.pl
-test/TestingCanOnlyProveTheExistenceOfBugs
 test/wsrftest.pl
 modules.tar
 TODO

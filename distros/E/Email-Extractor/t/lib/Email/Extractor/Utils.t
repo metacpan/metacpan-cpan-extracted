@@ -6,13 +6,25 @@ use Test::Exception;
 BEGIN { use_ok( 'Email::Extractor::Utils', qw(:ALL) ); }
 
 subtest "looks_like_url" => sub {
-    ok !looks_like_url('some str'),          'str not url';
+    ok !looks_like_url('some str'), 'str not url';
+
     ok looks_like_url('http://fabmarkt.ru'), 'http url';
     is 'http://fabmarkt.ru', looks_like_url('http://fabmarkt.ru'),
       'http url return self';
+
     ok looks_like_url('https://fabmarkt.ru'), 'https url';
     is 'https://fabmarkt.ru', looks_like_url('https://fabmarkt.ru'),
       'https url return self';
+
+    ok looks_like_url('http://www.dns-shop.ru/'),
+      'http url with trailing slash';
+    is 'http://www.dns-shop.ru/', looks_like_url('http://www.dns-shop.ru/'),
+      'http url with trailing return self';
+
+    ok looks_like_url('https://www.dns-shop.ru/'),
+      'https url with trailing slash';
+    is 'https://www.dns-shop.ru/', looks_like_url('https://www.dns-shop.ru/'),
+      'https url with trailing return self';
 };
 
 subtest "looks_like_rel_link" => sub {

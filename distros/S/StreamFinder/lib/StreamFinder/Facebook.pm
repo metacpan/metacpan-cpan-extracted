@@ -232,9 +232,8 @@ package StreamFinder::Facebook;
 use strict;
 use warnings;
 use LWP::UserAgent ();
-use vars qw(@ISA @EXPORT $VERSION);
+use vars qw(@ISA @EXPORT);
 
-our $VERSION = '1.00';
 our $DEBUG = 0;
 
 require Exporter;
@@ -273,8 +272,8 @@ sub new
 	$self->{'id'} = $1  if ($url =~ m#\/(\d+)\/?$#);
 	$self->{'artist'} = $1  if ($url =~ m#\/(\w+)\/videos#);
 	$self->{'title'} = 'Facebook';
-	$_ = `youtube-dl --username $fbid --password $fbpw --get-url --get-thumbnail -f mp4 $url`;
-	print STDERR "--cmd=facebook-dl --username $fbid --password $fbpw --get-url --get-thumbnail -f mp4 $url=\n"  if ($DEBUG);
+	$_ = `youtube-dl --username "$fbid" --password "$fbpw" --get-url --get-thumbnail -f mp4 "$url"`;
+	print STDERR "--cmd=facebook-dl --username \"$fbid\" --password \"$fbpw\" --get-url --get-thumbnail -f mp4 \"$url\"=\n"  if ($DEBUG);
 	my @urls = split(/\r?\n/);
 	while (@urls && $urls[0] !~ m#\:\/\/#o) {
 		shift @urls;

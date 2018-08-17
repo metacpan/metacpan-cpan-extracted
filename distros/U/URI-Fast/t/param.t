@@ -92,6 +92,18 @@ subtest 'param' => sub{
           $uri->param('foo', 'blah', $sep);
           is $uri->query, "bar=bat${sep}foo=blah", 'expected query value';
         };
+
+        subtest 'set: empty string' => sub {
+          is uri->param('foo', ''), '', 'expected param value';
+        };
+
+        subtest 'set: zero' => sub {
+          is uri->param('foo', '0'), '0', 'expected param value';
+        };
+
+        subtest 'set: space' => sub {
+          is uri->param('foo', ' '), ' ', 'expected param value';
+        };
       };
     };
   }

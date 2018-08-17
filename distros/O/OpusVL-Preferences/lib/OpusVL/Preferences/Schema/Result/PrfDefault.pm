@@ -116,13 +116,13 @@ __PACKAGE__->add_columns
 	display_mask =>
 	{
 		data_type   => 'varchar',
-		is_nullable => 0,
+		is_nullable => 1,
         default_value => '(.*)',
 	},
 	mask_char =>
 	{
 		data_type   => 'varchar',
-		is_nullable => 0,
+		is_nullable => 1,
         default_value => '*',
 	},
 );

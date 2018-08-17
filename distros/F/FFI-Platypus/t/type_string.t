@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More;
 use FFI::CheckLib;
 use FFI::Platypus::Declare
   'string', 'int', 'void',
   ['string(10)' => 'string_10'],
   ['string(5)'  => 'string_5'];
 
-lib find_lib lib => 'test', symbol => 'f0', libpath => 'libtest';
+lib find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
 
 attach 'string_matches_foobarbaz'     => [string] => int;
 attach 'string_return_foobarbaz'      => []       => string;
@@ -61,3 +61,5 @@ my $closure_fixed = closure { $save = $_[0] };
 set_closure_fixed($closure_fixed);
 call_closure("zero one  two  three");
 is $save, "zero ", "save=zero ";
+
+done_testing;

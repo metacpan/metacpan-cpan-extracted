@@ -30,7 +30,7 @@ use Encode qw(is_utf8 encode);
 #  Perl, Visual Basic, Java, tcl; something (comments?) is not recognized, but what?
 
 RequireResource('ltx-listings.css');
-
+RequirePackage('textcomp');
 #======================================================================
 # Top-level listings commands
 #======================================================================
@@ -44,12 +44,12 @@ our $EMPTY_CATTABLE = LaTeXML::Core::State->new(catcodes => 'none');
 
 DefMacro('\lstinline OptionalKeyVals:LST', sub {
     my ($gullet, $keyvals) = @_;
-    # get opening delim from gullet, before cattable swap,
-    # in case token was already peeked for the optional args!
+    $STATE->getStomach->bgroup;    # To localize activation
+    lstActivate($keyvals);         # But do BEFORE reading arg, since some options screw things up.
+                                   # get opening delim from gullet, before cattable swap,
+                                   # in case token was already peeked for the optional args!
     my $init = $gullet->readToken;
     my $body = listingsReadRawString($gullet, (Equals($init, T_BEGIN) ? T_END : $init));
-    $STATE->getStomach->bgroup;    # To localize activation
-    lstActivate($keyvals);
     return (
       @{ LookupValue('LISTINGS_PREAMBLE_BEFORE') },
       lstProcessInline($body),
@@ -77,7 +77,7 @@ sub lstProcessInline {
 
 DefConstructor('\@listings@inline {}',
   "<ltx:text class='ltx_lstlisting' _noautoclose='1'>#1</ltx:text>",
-  reversion => '\lstinline#{1}');
+  reversion => '\lstinline{#1}');
 
 # Not a regular environment, since we're going to read the body verbatim!
 DefMacroI(T_CS('\begin{lstlisting}'), 'OptionalKeyVals:LST', sub {
@@ -98,6 +98,7 @@ DefMacro('\lstinputlisting OptionalKeyVals:LST Semiverbatim', sub {
     return lstProcessDisplay($file, $text); });
 
 NewCounter('lstlisting', 'document', idprefix => 'LST');
+DefMacro('\ext@lstlisting', 'lol');
 AssignValue(LISTINGS_DATA_COUNTER => 0);
 
 # Defining new listing environments
@@ -107,13 +108,14 @@ DefPrimitive('\lstnewenvironment {}[Number][]{}{}', sub {
     DefMacroI(T_CS("\\begin{$name}"), LaTeXML::Package::convertLaTeXArgs($n, $opt), sub {
         my ($gullet, @args) = @_;
         $STATE->getStomach->bgroup;
-        PushValue(LISTINGS_POSTAMBLE => LaTeXML::Core::Definition::Expandable::substituteTokens($end, @args));
+        PushValue(LISTINGS_POSTAMBLE => $end->substituteParameters(@args));
         # This will typically have \lstset, equivalent of lstActivate
-        Digest(Tokens(LaTeXML::Core::Definition::Expandable::substituteTokens($start, @args)));
+        Digest($start->substituteParameters(@args));
         my $text = listingsReadRawLines($gullet, $name);
         return lstProcessDisplay(lstGetTokens('name'), $text); });
 });
 
+# Return 2 lists: body, trailer
 sub lstProcessBlock {
   my ($name, $text) = @_;
   # store the data to be placed in the listing
@@ -121,15 +123,16 @@ sub lstProcessBlock {
   AssignValue('LISTINGS_DATA_COUNTER' => $c,    'global');
   AssignValue('LISTINGS_DATA_' . $c   => $text, 'global');
   return (
-    @{ LookupValue('LISTINGS_PREAMBLE_BEFORE') },
-    Invocation(T_CS('\@@listings@block'), $c, lstProcess('block', $text)),
-    @{ LookupValue('LISTINGS_POSTAMBLE') },
-    T_END); }
+    [@{ LookupValue('LISTINGS_PREAMBLE_BEFORE') },
+      Invocation(T_CS('\@@listings@block'), $c, lstProcess('block', $text))],
+    [@{ LookupValue('LISTINGS_POSTAMBLE') },
+      T_END]); }
 
 sub lstProcessDisplay {
   my ($name, $text) = @_;
   # Hmm.. should locally define \lstname to be either name or the file...
-  my @body = (lstProcessBlock($name, $text));
+  my ($body, $trailer) = lstProcessBlock($name, $text);
+  my @body = @$body;
   # Figure out whether the display is numbered, or has a caption or titles.
   my @caption = ();
   my ($numbered, $labelled, $caption, $x);
@@ -153,6 +156,7 @@ sub lstProcessDisplay {
     else {
       push(@body, $caption); } }
 
+  push(@body, @$trailer);
   # We go a bit (a bit too far?) to try to treat this as a separate Para level object
   # (if with captions or titled),
   # or as an in-block item (within a logical paragraph)
@@ -171,10 +175,10 @@ sub lstProcessDisplay {
 DefMacro('\lstlisting@makecaption[]{}',
   '\def\@captype{lstlisting}'
     . '\@@add@caption@counters'
-    . '\@@toccaption{\format@toctitle@{lstlisting}{\ifx.#1.#2\else#1\fi}}'
-    . '\@@caption{\format@title@{lstlisting}{#2}}');
+    . '\@@toccaption{\lx@format@toctitle@@{lstlisting}{\ifx.#1.#2\else#1\fi}}'
+    . '\@@caption{\lx@format@title@@{lstlisting}{#2}}');
 DefMacroI('\fnum@lstlisting', undef, '\lstlistingname\nobreakspace\thelstlisting');
-DefMacro('\format@title@lstlisting{}', '\@tag[][: ]{\fnum@lstlisting}#1');
+DefMacro('\format@title@lstlisting{}', '\lx@tag[][: ]{\fnum@lstlisting}#1');
 
 DefMacro('\lstlisting@maketitle{}',
   '\@@toccaption{#1}'
@@ -186,7 +190,10 @@ DefMacro('\lstlisting@maketoctitle{}',
 # Numbered form,  with caption
 # \@listings <classes> <formatted>
 DefConstructor('\@listings {}',
-  "<ltx:float role='listing' xml:id='#id' refnum='#refnum' class='ltx_lstlisting'>#1</ltx:float>",
+  "<ltx:float inlist='lol' xml:id='#id' class='ltx_lstlisting'>"
+    . "#tags"
+    . "#1"
+    . "</ltx:float>",
   beforeDigest => sub { DefMacroI('\@captype', undef, 'lstlisting'); },
   afterDigest => sub {
     my ($stomach, $whatsit) = @_;
@@ -195,7 +202,10 @@ DefConstructor('\@listings {}',
 # Unnumbered form, but with caption
 # \@listings <classes> <formatted>
 DefConstructor('\@@listings {}',
-  "<ltx:float role='listing' xml:id='#id' class='ltx_lstlisting'>#1</ltx:float>",
+  "<ltx:float xml:id='#id' class='ltx_lstlisting'>"
+    . "#tags"
+    . "#1"
+    . "</ltx:float>",
   properties => sub { RefStepID('lstlisting'); },
   beforeDigest => sub { DefMacroI('\@captype', undef, 'lstlisting'); },
   afterDigest => sub {
@@ -212,7 +222,7 @@ DefConstructor('\@@listings@block {} {}',
     if (is_utf8($listings_data)) {
       $listings_data = encode('UTF-8', $listings_data);
     }
-    my $data = encode_base64($listings_data);
+    my $data = encode_base64($listings_data, '');    # NO linebreaking!
     $whatsit->setProperties(data => $data, datamimetype => 'text/plain', dataencoding => 'base64'); });
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -222,11 +232,23 @@ DefConstructor('\@@listings@block {} {}',
 # Note that this does NOT balance groups, even if $until is '}'!
 sub listingsReadRawString {
   my ($gullet, $until) = @_;
+  # NOTE that this normally does NOT balance {, but DOES within mathescape'd $
+  # Moreover, neither escapechar nor escapeinside have this effect!
+  # I'd swear this is a bug that became a feature.
+  my $SAVESTATE  = $STATE;
+  my $mathescape = lstGetBoolean('mathescape');
   local $STATE = $EMPTY_CATTABLE;
+  my $inmath = 0;
   my @tokens = ();
   while (defined(my $token = $gullet->readToken())) {
     last if $until and $token->getString eq $until->getString;
-    push(@tokens, $token); }
+    if ($mathescape && ($token->getString eq '$')) {
+      if ($inmath) { $inmath = 0; $STATE = $EMPTY_CATTABLE; }
+      else { $inmath = 1; $STATE = $SAVESTATE; } }
+    if ($inmath && $token->equals(T_BEGIN)) {
+      push(@tokens, T_BEGIN, $gullet->readBalanced->unlist, T_END); }
+    else {
+      push(@tokens, $token); } }
   while (@tokens && $tokens[-1]->getCatcode == CC_SPACE) {    # Remove trailing space
     pop(@tokens); }
   return ToString(Tokens(@tokens)); }
@@ -259,28 +281,31 @@ sub listingsReadRawFile {
   return $text; }
 
 #======================================================================
+our $lst_charmapping = { '#' => T_CS('\#'), '$' => T_CS('\textdollar'), '&' => T_CS('\&'),
+  "'" => T_CS('\textquoteright'),
+  '*' => T_CS('\textasteriskcentered'),
+  # ??  '-'=>$-$ ??
+  '<' => T_CS('\textless'),        '>' => T_CS('\textgreater'), '\\' => T_CS('\textbackslash'),
+  '^' => T_CS('\textasciicircum'), '_' => T_CS('\textunderscore'),
+  '`' => T_CS('\textquoteleft'),
+  '{' => T_CS('\textbraceleft'),   '}' => T_CS('\textbraceright'), '%' => T_CS('\%'),
+  '|' => T_CS('\textbar'),
+  '~' => T_CS('\textasciitilde'),
+};
+
 # Note that listings.sty uses a couple of textcomp characters
 # (\textquotesingle, \textasciigrave)
 # when the upquote option is used.
-# However, we haven't mapped those to anything useful, anyway...
-our %lst_charmapping = ('#' => T_CS('\#'), '$' => T_CS('\textdollar'), '&' => T_CS('\&'),
-  ## "'"=>T_CS('\textquotesingle'),
-  "'" => Tokens(T_CS('\char'), T_OTHER('3'), T_OTHER('9')),
-  '*' => T_CS('\textasteriskcentered'),
-  # ??  '-'=>$-$ ??
-  '<' => T_CS('\textless'), '>' => T_CS('\textgreater'), '\\' => T_CS('\textbackslash'),
-  '^' => T_CS('\textasciicircum'), '_' => T_CS('\textunderscore'),
-  ### '`'=>T_CS('\textasciigrave'),
-  '`' => T_OTHER(UTF(0x60)),
-  '{' => T_CS('\textbraceleft'), '}' => T_CS('\textbraceright'), '%' => T_CS('\%'),
-  '|' => T_CS('\textbar'),
-  '~' => T_CS('\textasciitilde'),
-);
+our $lst_charmapping_upquote = {
+  %$lst_charmapping,
+  "'" => T_CS('\textquotesingle'),
+  '`' => T_CS('\textasciigrave') };
 
 sub lstRescan {
   my ($tokens) = @_;
+  my $mapping = (lstGetBoolean('upquote') ? $lst_charmapping_upquote : $lst_charmapping);
   return (defined $tokens
-    ? Tokens(map { $lst_charmapping{ $_->getString } || $_ } $tokens->unlist)
+    ? Tokens(map { ($_->getCatcode == CC_OTHER ? $$mapping{ $_->getString } || $_ : $_) } $tokens->unlist)
     : undef); }
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -320,8 +345,7 @@ sub lstActivate {
         $val = LookupValue('KEYVAL@LST@' . $key . '@default') unless $val;
         # Done for effect.
         Digest(Tokens($cs, ($val ? $val->unlist : Tokens()), T_CS('\end'))); }
-      AssignValue('LST@' . $key => $val);
-    } }
+      AssignValue('LST@' . $key => $val); } }
   return; }
 
 #----------------------------------------------------------------------
@@ -516,10 +540,10 @@ sub lstAddDelimiter {
     my $oldclass = $class;
     $class = $class . ToString($open) . ToString($close); # Create an artificial class for this delimiter.
     my $openTeX = ($styleTeX
-      ? ($invisible ? $styleTeX : Tokens($styleTeX->unlist, lstRescan($open)))
-      : ($invisible ? () : lstRescan($open)));
-    my $closeTeX = ($invisible ? () : lstRescan($close));
-    lstSetClassStyle($class, undef, begin => $openTeX, end => $closeTeX,    #end => lstRescan($close),
+      ? ($invisible ? $styleTeX : Tokens($styleTeX->unlist, $open))
+      : ($invisible ? () : $open));
+    my $closeTeX = ($invisible ? () : $close);
+    lstSetClassStyle($class, undef, begin => $openTeX, end => $closeTeX,
       class => $oldclass, cssclass => $cssclass);
     # NOT DONE:
     #   invisibility of the whole delimited expression
@@ -781,7 +805,7 @@ DefKeyVal('LST', 'nolol',   '', 'true');       # Ignorable
 
 DefMacroI('\lstlistlistingname', undef, 'Listings');
 DefConstructorI('\lstlistoflistings', undef,
-  "<ltx:TOC role='listings' select='role:listing' name='#name'/>",
+  "<ltx:TOC lists='lol' scope='global'><ltx:title>#name</ltx:title></ltx:TOC>",
   properties => sub { (
       name => DigestIf('\lstlistlistingname')); });
 
@@ -959,7 +983,8 @@ DefMacro('\lst@@escapechar Until:\end', sub {
     if ($escape) {
       my $escapere = lstRegexp($escape);
       LookupValue('LST_DELIMITERS')->{$escape} = { open => $escapere, close => $escapere, class => 'evaluate', escape => 1 };
-      LookupValue('LST_CLASSES')->{evaluate}{eval} = 1; }
+      LookupValue('LST_CLASSES')->{evaluate}{eval} = 1;
+      delete LookupValue('LST_CHARACTERS')->{letter}{$escapere}; }
     return; });
 DefKeyVal('LST', 'escapeinside', '');
 DefMacro('\lst@@escapeinside Until:\end', '\ifx.#1.\else\lst@@escapeinside@#1\end\fi');
@@ -1012,12 +1037,8 @@ DefPrimitive('\@lstdefinelanguage []{}[]{} SkipSpaces RequiredKeyVals:LST []', s
     if ($dialect && $dialect->unlist) {
       $dialect = uc(ToString($dialect)); $dialect =~ s/\s+//g;
       $name .= '$' . $dialect; }
-    AssignValue($name => LaTeXML::Core::KeyVals->new('LST',
-        [(@base ? (language => Tokens(@base)) : ()),
-          $keyvals->getPairs],
-        open  => T_OTHER('['), close  => T_OTHER(']'),
-        punct => T_OTHER(','), assign => T_OTHER('=')),
-      'global'); });
+    $keyvals->setValue('language', Tokens(@base)) if @base;    # Probably don't need to clone, first?
+    AssignValue($name => $keyvals, 'global'); });
 
 # Seems to use <language>$<dialect> as the naming scheme.
 DefPrimitive('\lstalias []{} []{}', sub {
@@ -1026,7 +1047,7 @@ DefPrimitive('\lstalias []{} []{}', sub {
     return; });
 
 # keywords (keywordstyle in section 4.6)
-DefKeyVal('LST', 'keywordprefix', '');               #  ???
+DefKeyVal('LST', 'keywordprefix', '');                         #  ???
 DefKeyVal('LST', 'keywords',      'Semiverbatim');
 DefMacro('\lst@@keywords [Number] Until:\end', sub {
     lstSetClassWords(lstClassName('keywords', $_[1]), $_[2]); });
@@ -1164,14 +1185,13 @@ sub lstProcess {
   my $letter_re = join('', sort keys %{ $$characters{letter} });
   my $digit_re  = join('', sort keys %{ $$characters{digit} });
   local $LaTeXML::ID_RE = (LookupValue('LST@TEXCS') ? "\\\\?" : '') . "[$letter_re][$letter_re$digit_re]*";
-
   local $LaTeXML::DELIM_RE = join('|', map { $$delimiters{$_}{open} } sort keys %$delimiters);
   local $LaTeXML::ESCAPE_RE = join('|', map { $$delimiters{$_}{open} }
       grep { $$delimiters{$_}{escape} } sort keys %$delimiters);
-  local $LaTeXML::QUOTED_RE = undef;
+  local $LaTeXML::QUOTED_RE = "\\\\\\\\";    # start w/ backslashed backslash?
   local $LaTeXML::SPACE = (lstGetBoolean('showspaces') ? T_CS('\@lst@visible@space') : T_CS("~"));
   local $LaTeXML::CASE_SENSITIVE = lstGetBoolean('sensitive');
-  if (!$LaTeXML::CASE_SENSITIVE) {    # Clunky, but until know, we don't know
+  if (!$LaTeXML::CASE_SENSITIVE) {           # Clunky, but until know, we don't know
     foreach my $word (keys %$words) {
       $$words{ uc($word) } = $$words{$word}; } }
 
@@ -1253,7 +1273,7 @@ sub lstProcess_internal {
           my ($string, $close) = ($1, $2);
           my @l = split("\n", $string . $close);    # This is the only(?) potentially multiline block
           $LaTeXML::linenum += scalar(@l) - 1 if @l > 2;    # So adjust line & column
-          lstProcessPush(Tokenize($string)); } }
+          lstProcessPush(TokenizeBalanced($string)); } }
       # Others become tricky because the contents of the string, comment etc may need to be processed
       # including matching _some_ delimited expressions!
       #   escaped constructs are always matched.
@@ -1279,7 +1299,7 @@ sub lstProcess_internal {
       my @tokens    = map { lstRescan($_) } Explode($word);                               # rescan??
       if (my $indexname = $$words{$lookup}{index} || lstClassProperty($classname, 'index')) { # Should be indexed?
         if (my $index = $indexname && $$classes{$indexname}) {
-          lstProcessPush($$index{begin}->unlist, T_BEGIN, @tokens, T_END); } }
+          lstProcessPush(lstRescan($$index{begin})->unlist, T_BEGIN, @tokens, T_END); } }
       lstProcessPush(($classname ? (lstClassBegin($classname), @tokens, lstClassEnd($classname))
           : @tokens)); }
 
@@ -1323,10 +1343,26 @@ sub lstProcess_internal {
       $LaTeXML::colnum += length($1); }
     else {
       if ($LaTeXML::listing =~ s/^(.)//s) {    # Anything else, just pass through.
-        lstProcessPush($lst_charmapping{$1} || T_OTHER($1)); }
+        lstProcessPush(lstRescan(T_OTHER($1))); }
       $LaTeXML::colnum++; }
   }
   return; }
+
+# Perversely guarantee that the tokenization is balanced to avoid peculiar bugs in bad TeX
+sub TokenizeBalanced {
+  my ($string) = @_;
+  my $tokens = Tokenize($string);
+  my @toks =
+    my $level = 0;
+  foreach my $t ($tokens->unlist) {
+    if    (T_BEGIN->equals($t)) { $level++; }
+    elsif (T_END->equals($t))   { $level--; } }
+  if ($level != 0) {    # Probably doesn't work all the time, but let's try
+    my @toks = $tokens->unlist;
+    while ($level > 0) { push(@toks, T_END); $level--; }
+    while ($level < 0) { unshift(@toks, T_BEGIN); $level--; }
+    $tokens = Tokens(@toks); }
+  return $tokens; }
 
 DefConstructor('\@listingKeyword Semiverbatim {}',
   "?#class(<ltx:text class='ltx_lst_#class' _noautoclose='1'>#2</ltx:text>)(#2)",
@@ -1356,8 +1392,7 @@ sub lstClassBegin {
     if (my $css = $$class{cssclass}) {
       $classes{$css} = 1; }
     if (my $begin = $$class{begin}) {
-      #      push(@open,$begin->unlist); }
-      unshift(@open, $begin->unlist); }
+      unshift(@open, lstRescan($begin)->unlist); }
     $classname = $$class{class}; }
   return (T_BEGIN, T_CS('\@listingGroup'),
     T_BEGIN, T_OTHER(join(' ', map { 'ltx_lst_' . $_ } sort keys %classes)), T_END,
@@ -1368,7 +1403,7 @@ sub lstClassEnd {
   my @close = ();
   while (my $class = $classname && LookupValue('LST_CLASSES')->{$classname}) {
     if (my $end = $$class{end}) {
-      push(@close, $end->unlist); }
+      push(@close, lstRescan($end)->unlist); }
     $classname = $$class{class}; }
   return (@close, T_END, T_END); }
 
@@ -1379,9 +1414,10 @@ sub lstClassProperty {
       ? $$class{$property}
       : lstClassProperty($$class{class}, $property))); }
 
-DefConstructor('\@lst@startline{}',  "<ltx:listingline>#1");
+DefConstructor('\@lst@startline{}', "<ltx:listingline xml:id='#id'>#1",
+  properties => sub { RefStepID('lstnumber'); });
 DefConstructor('\@lst@endline',      "</ltx:listingline>");
-DefConstructor('\@lst@linenumber{}', "<ltx:tag>#1</ltx:tag>");
+DefConstructor('\@lst@linenumber{}', "<ltx:tags><ltx:tag>#1</ltx:tag></ltx:tags>");
 
 DefConstructor('\@lst@visible@space', "\x{2423}");
 
@@ -1454,4 +1490,3 @@ lstLoadConfiguration();
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 1;
-

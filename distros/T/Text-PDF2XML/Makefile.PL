@@ -4,7 +4,7 @@ name        'Text-PDF2XML';
 abstract    'Convert PDF to XML';
 author      'Joerg Tiedemann';
 license     'gpl';
-version     '0.2.5';
+version     '0.2.7';
 
 include     'Module::AutoInstall';
 
@@ -15,6 +15,7 @@ requires 'Getopt::Std' => 0;
 requires 'FindBin'     => 0;
 
 recommends 'File::ShareDir' => 0;
+recommends 'Lingua::Identify::Blacklists' => '0.04';
 
 requires_external_bin 'java';
 # pdftotext is not required anymore but recommended ....

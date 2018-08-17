@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.50 2018-08-16
+
+* Document yurei_moji and bad_kanji
+
 0.48 2017-12-24
 
 * kana2romaji now uses hyphens for chouon with ve_type => wapuro

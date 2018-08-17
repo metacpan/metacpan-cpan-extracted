@@ -26,8 +26,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "parent" => 0,
     "strict" => 0,
-    "warnings" => 0,
-    "warnings::register" => 0
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "HTTP::Request::Common" => 0,
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "if" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,8 +55,7 @@ my %FallbackPrereqs = (
   "if" => 0,
   "parent" => 0,
   "strict" => 0,
-  "warnings" => 0,
-  "warnings::register" => 0
+  "warnings" => 0
 );
 
 

@@ -11,3 +11,9 @@ BEGIN {
 }
 
 diag( "Testing Acme::InputRecordSeparatorIsRegexp $Acme::InputRecordSeparatorIsRegexp::VERSION, Perl $], $^X" );
+
+if ($] < 5.010000) {
+    diag "readline on this package is sloooow for Perl $]. ",
+        "Please be patient with some of these tests.";
+}
+

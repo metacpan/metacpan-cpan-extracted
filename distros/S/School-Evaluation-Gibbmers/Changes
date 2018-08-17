@@ -1,0 +1,8 @@
+Revision history for School-Evaluation-Gibbmers
+ 
+0.002     2018-08-15 09:20:48+02:00 Europe/Zurich
+ - use File::ShareDir to properly package configuration file
+ - created stub School::Evaluation::Gibbmers for cpan indexing
+
+0.001     2018-08-13 11:20:50+02:00 Europe/Zurich
+ - initial release to cpan

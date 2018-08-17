@@ -9,15 +9,6 @@ use ExtUtils::MakeMaker 7.1101;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "WebSocket proxy for JSON-RPC 2.0 server",
   "AUTHOR" => "binary.com <BINARY\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Test::Fatal" => 0,
-    "Test::MockModule" => 0,
-    "Test::MockObject" => 0,
-    "Test::Mojo" => 0,
-    "Test::More" => "0.94",
-    "Test::Simple" => "0.44",
-    "Test::TCP" => 0
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.1101"
   },
@@ -44,10 +35,17 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Path::Tiny" => 0,
     "Test::CheckDeps" => "0.010",
-    "Test::More" => "0.94"
+    "Test::Fatal" => 0,
+    "Test::MockModule" => 0,
+    "Test::MockObject" => 0,
+    "Test::Mojo" => 0,
+    "Test::More" => "0.98",
+    "Test::Simple" => "0.44",
+    "Test::TCP" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,13 +65,14 @@ my %FallbackPrereqs = (
   "Job::Async" => 0,
   "MojoX::JSON::RPC" => 0,
   "Mojolicious" => "7.29",
+  "Path::Tiny" => 0,
   "Scalar::Util" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::Fatal" => 0,
   "Test::MockModule" => 0,
   "Test::MockObject" => 0,
   "Test::Mojo" => 0,
-  "Test::More" => "0.94",
+  "Test::More" => "0.98",
   "Test::Simple" => "0.44",
   "Test::TCP" => 0,
   "Unicode::Normalize" => "1.25",

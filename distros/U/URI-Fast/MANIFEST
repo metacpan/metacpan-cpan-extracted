@@ -9,6 +9,7 @@ MANIFEST
 MANIFEST.SKIP
 ppport.h
 README.pod
+t/abs.t
 t/basics.t
 t/compare.t
 t/encoding.t
@@ -16,10 +17,13 @@ t/ipv.t
 t/iri.t
 t/memory.t
 t/misc.t
+t/normalize.t
 t/param.t
 t/parsing.t
 t/path.t
 t/query_keyset.t
+t/rel.t
+t/split.t
 t/test.t
 t/tied.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

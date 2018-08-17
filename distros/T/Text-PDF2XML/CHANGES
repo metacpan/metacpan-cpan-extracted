@@ -1,5 +1,14 @@
 
+* v0.2.7 Sat Jul  1 21:25:09 EEST 2017
 
+- added an ugly workaround to find java 1.6 for pdfxtk
+
+* v0.2.6 Thu Jan  9 16:10:29 CET 2014
+
+- integrated language detection (-d)
+- language filter using language detection (-D lang)
+
+* v0.2.5
 
 - merge paragraph heuristics for putting unfinished sentences together
 - better approach for finding word boundaries based on

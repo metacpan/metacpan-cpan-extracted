@@ -1,0 +1,13 @@
+---
+# System
+port: 8443
+encryption_key: 'This is not secure...'
+cache_slots: 30
+data_dir: '/tmp/Gibbmers'
+set_cookie: 1
+# Questions
+1personal_intrest_html: "Wie stark haben Sie an dem Fach ein <b>persönliches</b> Interesse (unabhängig von anderen Faktoren, wie Unterlagen oder Lehrperson)?"
+2question_html: "Wie gross ist <b>Ihr Einsatz</b> für das Fach (Aufmerksamkeit im Unterricht und bei Aufgaben, Arbeiten ausserhalb der Schule)?"
+3question_html: "Wie geeignet sind <b>Modulunterlagen / Fallbeispiel</b> für den Unterricht? Wie finden Sie diese?"
+4question_html: "Wie steht es um den Klassengeist? Unterstützen Sie sich gegenseitig? Ist der Umgang respektvoll? Wie ist die <b>Stimmung</b> in der Klasse?"
+5question_html: "Wie beurteilen Sie die <b>Unterstützung</b> im Lernprozess durch die Lehrperson?"

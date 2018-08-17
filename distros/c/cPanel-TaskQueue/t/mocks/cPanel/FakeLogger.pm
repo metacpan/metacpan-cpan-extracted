@@ -17,32 +17,31 @@ sub reset_msgs {
 
 sub get_msgs {
     my ($self) = @_;
-    return @{$self->{msgs}};
+    return @{ $self->{msgs} };
 }
-
 
 sub throw {
     my $self = shift;
-    push @{$self->{msgs}}, "throw: @_";
+    push @{ $self->{msgs} }, "throw: @_";
     die @_;
 }
 
 sub warn {
     my $self = shift;
-    push @{$self->{msgs}}, "warn: @_";
+    push @{ $self->{msgs} }, "warn: @_";
     return;
 }
 
 sub info {
     my $self = shift;
-    push @{$self->{msgs}}, "info: @_";
+    push @{ $self->{msgs} }, "info: @_";
     return;
 }
 
 sub notify {
     my $self = shift;
     my $subj = shift;
-    push @{$self->{msgs}}, "notify: [$subj] @_";
+    push @{ $self->{msgs} }, "notify: [$subj] @_";
 }
 
 1;

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.622';
+our $VERSION = '1.625';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -15,16 +15,16 @@ use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
 
 no warnings 'utf8';
 
-my $Plugin_Package;
+my $Plugin;
 
 BEGIN {
     if ( $^O eq 'MSWin32' ) {
         require Term::Choose::Win32;
-        $Plugin_Package = 'Term::Choose::Win32';
+        $Plugin = 'Term::Choose::Win32';
     }
     else {
         require Term::Choose::Linux;
-        $Plugin_Package = 'Term::Choose::Linux';
+        $Plugin = 'Term::Choose::Linux';
     }
 }
 
@@ -39,7 +39,7 @@ sub new {
         $self->__validate_and_add_options( $opt );
     }
     $self->{backup_opt} = { defined $opt ? %$opt : () };
-    $self->{plugin} = $Plugin_Package->new();
+    $self->{plugin} = $Plugin->new();
     return $self;
 }
 
@@ -201,7 +201,7 @@ sub __get_key {
 sub choose {      #hae
     if ( ref $_[0] ne 'Term::Choose' ) {
         #return Term::Choose->new()->__choose( @_ );
-        return __choose( bless( { plugin => $Plugin_Package->new() }, 'Term::Choose' ), @_ );
+        return __choose( bless( { plugin => $Plugin->new() }, 'Term::Choose' ), @_ );
     }
     my $self = shift;
     return $self->__choose( @_ ); # 1 backup_self
@@ -1099,7 +1099,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.622
+Version 1.625
 
 =cut
 

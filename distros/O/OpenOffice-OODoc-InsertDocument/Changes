@@ -1,5 +1,9 @@
 Revision history for OpenOffice::OODoc::InsertDocument
 
+0.03  2018-08-09 18:56Z VANHOESEL
+
+      - Apply surrounding parent-style-name
+
 0.02  2018-08-01 14:46Z VANHOESEL
 
       - Fix Styling issues

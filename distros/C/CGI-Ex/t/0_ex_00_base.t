@@ -8,7 +8,7 @@
 
 use vars qw($test_stdout @ISA);
 use strict;
-use Test::More tests => 73;
+use Test::More tests => 75;
 
 sub TIEHANDLE { bless [], __PACKAGE__ }
 sub PRINT {
@@ -58,6 +58,17 @@ if (eval { require Tie::Handle }) {
     local @ISA = qw(Tie::Handle);
     my $old_out = select STDOUT;
 
+    {
+        local *STDOUT;
+        tie *STDOUT, __PACKAGE__;
+
+        local $ENV{'CONTENT_TYPED'} = 0;
+        is($cgix->set_cookie(name => 'test', value => 1), "Set-Cookie: test=1; path=/\r\n", 'Got correct Set-Cookie header');
+
+        local $ENV{'CONTENT_TYPED'} = 1;
+        is($cgix->set_cookie(name => 'test', value => 0), "<script>document.cookie = 'test=0; path=/'</script>\n", 'Got correct cookie js due to headers printing earlier');
+    }
+
     foreach ([[]                             => "Content-Type: text/html\r\n\r\n"],
              [['text/html']                  => "Content-Type: text/html\r\n\r\n"],
              [['text/html', '']              => "Content-Type: text/html\r\n\r\n"],
@@ -93,7 +104,7 @@ if (eval { require Tie::Handle }) {
     select $old_out;
 } else {
   SKIP: {
-      skip("Can't test print_content_type", 10);
+      skip("Can't test print_content_type", 12);
   };
 }
 

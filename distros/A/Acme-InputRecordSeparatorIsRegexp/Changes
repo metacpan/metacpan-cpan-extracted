@@ -11,3 +11,8 @@ Revision history for Acme-InputRecordSeparatorIsRegexp
 	<v5.14 compatibility changes in t/01
 	bug fix to allow look-behinds to be used sometimes
 
+0.04	2018-08-13
+	Custom  open  function which support  :irs(REGEXP)  layer to set
+	record separator. Previous functionality of  open  function is retired.
+	Support  autochomp  and  input_record_separator  functions on arbitrary
+	filehandles, possibly tie-ing them to this package as a side-effect.

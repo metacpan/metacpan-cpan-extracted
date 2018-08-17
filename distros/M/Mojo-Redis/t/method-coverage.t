@@ -13,47 +13,35 @@ my @classes = qw(Mojo::Redis::Database Mojo::Redis::PubSub);
 my (%doc, %skip);
 
 $skip{method}{$_} = 1 for qw(auth hscan quit monitor migrate pubsub scan select shutdown sscan sync swapdb wait zscan);
-$skip{group}{$_}  = 1 for qw(cluster);
 
 $methods = $methods->map(sub {
   $doc{$_->{'data-name'}} = [
     trim($_->at('.summary')->text),
     join(', ', map { $_ = trim($_); /^\w/ ? "\$$_" : $_ } grep {/\w/} split /[\n\r]+/, $_->at('.args')->text)
   ];
-  return [$_->{'data-group'}, $_->{'data-name'}];
+  return $_->{'data-name'};
 });
 
 METHOD:
-for my $t (sort { "@$a" cmp "@$b" } @$methods) {
-  my $method = $t->[1];
-  $method =~ s![\s-]!_!g;
+for my $command (sort { $a cmp $b } @$methods) {
+  my $method = $command;
+  $method =~ s!\s.*$!!g;
 
-  if ($skip{method}{$t->[1]}) {
-    note "Skipping @$t";
-    next METHOD;
-  }
-  if ($skip{group}{$t->[0]}) {
-    local $TODO = sprintf 'Add Mojo::Redis::%s', ucfirst $t->[0];
-    ok 0, "group not implemented: $t->[0]" if $skip{group}{$t->[0]}++ == 1;
+  if ($skip{method}{$method}) {
+    note "Skipping $method";
     next METHOD;
   }
 
-  $method = 'client'   if $method =~ /^client_/;
-  $method = 'command'  if $method =~ /^command_/;
-  $method = 'config'   if $method =~ /^config_/;
-  $method = 'debug'    if $method =~ /^debug_/;
   $method = 'listen'   if $method =~ /subscribe$/;
-  $method = 'memory'   if $method =~ /^memory_/;
   $method = 'unlisten' if $method =~ /unsubscribe$/;
-  $method = 'script'   if $method =~ /^script_/;
 
 REDIS_CLASS:
   for my $class (@classes) {
     next REDIS_CLASS unless $class->can($method) or $class->can("${method}_p");
-    ok 1, "$class can $method (@$t)";
+    ok 1, "$class can $method ($command)";
     next METHOD;
   }
-  ok 0, "not implemented: $method (@$t)";
+  ok 0, "not implemented: $method ($command)";
 }
 
 if (open my $SRC, '<', $INC{'Mojo/Redis/Database.pm'}) {

@@ -25,10 +25,10 @@ libeio/eio.h
 libeio/eio.c
 libeio/etp.c
 libeio/libeio.m4
-libeio/config.h.in
 
 configure.ac
 configure
+config.h.in
 autogen.sh
 
 typemap

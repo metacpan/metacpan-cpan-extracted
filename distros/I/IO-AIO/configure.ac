@@ -1,6 +1,6 @@
 AC_INIT
 AC_CONFIG_SRCDIR([libeio/eio.h])
-AC_CONFIG_HEADERS([libeio/config.h])
+AC_CONFIG_HEADERS([config.h])
 
 AC_PREREQ(2.60)
 AC_USE_SYSTEM_EXTENSIONS
@@ -9,4 +9,160 @@ AC_PROG_CC
 
 m4_include([libeio/libeio.m4])
 
+# for these to work, you need to run autoheader in IO::AIO, not libeio :(
+
+AC_CACHE_CHECK(for set/getrlimit, ac_cv_rlimits, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/time.h>
+#include <sys/resource.h>
+int res;
+int main (void)
+{
+   struct rlimit srl;
+   srl.rlim_cur = srl.rlim_max = RLIM_INFINITY;
+   res = getrlimit (RLIMIT_NOFILE, &srl);
+   res = setrlimit (RLIMIT_NOFILE, &srl);
+   return 0;
+}
+]])],ac_cv_rlimits=yes,ac_cv_rlimits=no)])
+test $ac_cv_rlimits = yes && AC_DEFINE(HAVE_RLIMITS, 1, setrlimit/getrlimit is available)
+
+dnl at least uclibc defines _POSIX_ADVISORY_INFO without *any* of the required
+dnl functionality actually being present. ugh.
+AC_CACHE_CHECK(for posix_madvise, ac_cv_posix_madvise, [AC_LINK_IFELSE([AC_LANG_SOURCE([
+#include <sys/mman.h>
+int main (void)
+{
+   int res = posix_madvise ((void *)0, (size_t)0, POSIX_MADV_NORMAL);
+   int a = POSIX_MADV_SEQUENTIAL;
+   int b = POSIX_MADV_RANDOM;
+   int c = POSIX_MADV_WILLNEED;
+   int d = POSIX_MADV_DONTNEED;
+   return 0;
+}
+])],ac_cv_posix_madvise=yes,ac_cv_posix_madvise=no)])
+test $ac_cv_posix_madvise = yes && AC_DEFINE(HAVE_POSIX_MADVISE, 1, posix_madvise(2) is available)
+
+AC_CACHE_CHECK(for posix_fadvise, ac_cv_posix_fadvise, [AC_LINK_IFELSE([AC_LANG_SOURCE([
+#define _XOPEN_SOURCE 600
+#include <fcntl.h>
+int main (void)
+{
+   int res = posix_fadvise ((int)0, (off_t)0, (off_t)0, POSIX_FADV_NORMAL);
+   int a = POSIX_FADV_SEQUENTIAL;
+   int b = POSIX_FADV_NOREUSE;
+   int c = POSIX_FADV_RANDOM;
+   int d = POSIX_FADV_WILLNEED;
+   int e = POSIX_FADV_DONTNEED;
+   return 0;
+}
+])],ac_cv_posix_fadvise=yes,ac_cv_posix_fadvise=no)])
+test $ac_cv_posix_fadvise = yes && AC_DEFINE(HAVE_POSIX_FADVISE, 1, posix_fadvise(2) is available)
+
+dnl lots of linux specifics
+AC_CHECK_HEADERS([linux/fs.h linux/fiemap.h])
+
+dnl glibc major/minor macros
+AC_CHECK_HEADERS([sys/sysmacros.h])
+
+dnl solaris major/minor
+AC_CHECK_HEADERS([sys/mkdev.h])
+
+AC_CACHE_CHECK([for splice, vmsplice and tee], ac_cv_linux_splice, [AC_LINK_IFELSE([AC_LANG_SOURCE([
+#include <fcntl.h>
+int main (void)
+{
+   ssize_t res;
+   res = splice ((int)0, (loff_t)0, (int)0, (loff_t *)0, (size_t)0, SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE);
+   res = tee ((int)0, (int)0, (size_t)0, SPLICE_F_NONBLOCK);
+   res = vmsplice ((int)0, (struct iovec *)0, 0, SPLICE_F_NONBLOCK | SPLICE_F_GIFT);
+   return 0;
+}
+])],ac_cv_linux_splice=yes,ac_cv_linux_splice=no)])
+test $ac_cv_linux_splice = yes && AC_DEFINE(HAVE_LINUX_SPLICE, 1, splice/vmsplice/tee(2) are available)
+
+AC_CACHE_CHECK(for pipe2, ac_cv_pipe2, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <fcntl.h>
+#include <unistd.h>
+int res;
+int main (void)
+{
+   res = pipe2 (0, 0);
+   return 0;
+}
+]])],ac_cv_pipe2=yes,ac_cv_pipe2=no)])
+test $ac_cv_pipe2 = yes && AC_DEFINE(HAVE_PIPE2, 1, pipe2(2) is available)
+
+AC_CACHE_CHECK(for eventfd, ac_cv_eventfd, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/eventfd.h>
+int res;
+int main (void)
+{
+   res = eventfd (1, EFD_CLOEXEC | EFD_NONBLOCK);
+   return 0;
+}
+]])],ac_cv_eventfd=yes,ac_cv_eventfd=no)])
+test $ac_cv_eventfd = yes && AC_DEFINE(HAVE_EVENTFD, 1, eventfd(2) is available)
+
+AC_CACHE_CHECK(for timerfd, ac_cv_timerfd, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/timerfd.h>
+int res;
+int main (void)
+{
+   struct itimerspec its;
+   res = timerfd_create (CLOCK_REALTIME, TFD_CLOEXEC | TFD_NONBLOCK);
+   res = timerfd_settime (res, TFD_TIMER_ABSTIME /*| TFD_TIMER_CANCEL_ON_SET*/, &its, 0);
+   res = timerfd_gettime (res, &its);
+   return 0;
+}
+]])],ac_cv_timerfd=yes,ac_cv_timerfd=no)])
+test $ac_cv_timerfd = yes && AC_DEFINE(HAVE_TIMERFD, 1, timerfd_*(2) are available)
+
+AC_CACHE_CHECK(for copy_file_range, ac_cv_copy_file_range, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <unistd.h>
+#include <sys/syscall.h>
+/*#include <linux/copy.h>*/
+int res;
+int main (void)
+{
+   /*res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, COPY_FR_REFLINK | COPY_FR_DEDUP | COPY_FR_COPY);*/
+   res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, 0);
+   return 0;
+}
+]])],ac_cv_copy_file_range=yes,ac_cv_copy_file_range=no)])
+test $ac_cv_copy_file_range = yes && AC_DEFINE(HAVE_COPY_FILE_RANGE, 1, copy_file_range(2) is available)
+
+AC_CACHE_CHECK(for st_xtimensec, ac_cv_xtimensec, [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int res;
+int main (void)
+{
+   return PL_statcache.st_atimensec
+        + PL_statcache.st_mtimensec
+        + PL_statcache.st_ctimensec;
+   return 0;
+}
+]])],ac_cv_xtimensec=yes,ac_cv_xtimensec=no)])
+test $ac_cv_xtimensec = yes && AC_DEFINE(HAVE_ST_XTIMENSEC, 1, stat nanosecond access by st_xtimensec)
+
+AC_CACHE_CHECK(for st_xtimespec, ac_cv_xtimespec, [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int res;
+int main (void)
+{
+   return PL_statcache.st_atim.tv_nsec
+        + PL_statcache.st_mtim.tv_nsec
+        + PL_statcache.st_ctim.tv_nsec;
+}
+]])],ac_cv_xtimespec=yes,ac_cv_xtimespec=no)])
+test $ac_cv_xtimespec = yes && AC_DEFINE(HAVE_ST_XTIMESPEC, 1, stat nanosecond access by st_xtimespec)
+
+# apparently, True64 uses st_u[amc]time, aix uses at_[amc]time_n and apple uses st_[amc,birth]timespec?
+
 AC_OUTPUT
+

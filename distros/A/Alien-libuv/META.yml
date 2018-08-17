@@ -36,7 +36,7 @@ no_index:
 provides:
   Alien::libuv:
     file: lib/Alien/libuv.pm
-    version: '1.004'
+    version: '1.005'
 requires:
   Alien::Base: '1.00'
   base: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/genio/Alien-libuv/issues
   homepage: https://github.com/genio/Alien-libuv
   repository: https://github.com/genio/Alien-libuv.git
-version: '1.004'
+version: '1.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -97,7 +97,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
-          inherit_version: '1'
+          inherit_version: '0'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
@@ -121,12 +121,9 @@ x_Dist_Zilla:
       name: '@Starter/License'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
-      config:
-        Dist::Zilla::Role::FileWatcher:
-          version: '0.006'
-      name: '@Starter/ReadmeAnyFromPod'
-      version: '0.163250'
+      class: Dist::Zilla::Plugin::Pod2Readme
+      name: '@Starter/Pod2Readme'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Starter/ExecDir'
@@ -162,12 +159,16 @@ x_Dist_Zilla:
       name: '@Starter/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::MakeMaker
+      class: Dist::Zilla::Plugin::MakeMaker::Awesome
       config:
+        Dist::Zilla::Plugin::MakeMaker:
+          make_path: make
+          version: '6.012'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-      name: '@Starter/MakeMaker'
-      version: '6.012'
+          version: '6.012'
+      name: '@Starter/MakeMaker::Awesome'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Starter/Manifest'
@@ -305,7 +306,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.004
+          tag: v1.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -5,7 +5,7 @@ use warnings;
 use File::ShareDir qw( dist_dir );
 use File::Spec;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 sub get
 {
@@ -25,7 +25,7 @@ sub get
     };
   }
   
-  $config->{$name};
+  defined $name ? $config->{$name} : $config;
 }
 
 1;
@@ -42,7 +42,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 0.50
+version 0.53
 
 =head1 AUTHOR
 

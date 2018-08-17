@@ -1,7 +1,9 @@
 # ABSTRACT: Performs queries using Yandex Maps Company Search API
 
 package Yandex::Geo;
-$Yandex::Geo::VERSION = '0.02';
+$Yandex::Geo::VERSION = '0.07';
+use strict;
+use warnings;
 
 
 use LWP::UserAgent;
@@ -116,7 +118,7 @@ Yandex::Geo - Performs queries using Yandex Maps Company Search API
 
 =head1 VERSION
 
-version 0.02
+version 0.07
 
 =head1 DESCRIPTION
 

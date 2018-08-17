@@ -1,10 +1,10 @@
 {
    "abstract" : "Warns and dies noisily with stack backtraces",
    "author" : [
-      "Adriano R. Ferreira <ferreira@cpan.org>"
+      "Adriano Ferreira <ferreira@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132830",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Base" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -32,17 +30,36 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.18",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Carp" : "0"
+            "Carp" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aferreira/cpan-Carp-Always/issues"
+      },
       "repository" : {
-         "url" : "http://github.com/aferreira/cpan-Carp-Always"
+         "type" : "git",
+         "url" : "git://github.com/aferreira/cpan-Carp-Always.git",
+         "web" : "https://github.com/aferreira/cpan-Carp-Always"
       }
    },
-   "version" : "0.13"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

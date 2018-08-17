@@ -11,21 +11,21 @@ Pcore::PDF - non-blocking HTML to PDF converter
         max_threads => 4,
     });
 
-    my $cv = AE::cv;
+    # blocking mode, blocks only current coroutine
+    my $res = $pdf->generate_pdf($html);
 
+    # non-blocking mode
     $pdf->generate_pdf($html, sub ($res) {
         if (!$res) {
             say $res;
         }
         else {
 
-            # $res->{data}->{pdf} contains ScalarRef to generated PDF content
+            # $res->{data} contains ScalarRef to generated PDF content
         }
 
         return;
     });
-
-    $cv->recv;
 
 # DESCRIPTION
 
@@ -39,13 +39,13 @@ Generate PDF from HTML templates, using princexml.
 
 - max\_threads
 
-    Maximum number of princexml processes. Under Windows this value is always `1`, under linux default value is `4`.
+    Maximum number of princexml processes. Default value is `4`.
 
 # METHODS
 
-- generate\_pdf( $self, $html, $cb )
+- generate\_pdf( $self, $html, $cb = undef )
 
-    Generates PDF from `$html` template. Call `$cb->($result)` on finish, where `$result` is a standard Pcore API result object, see [Pcore::Util::Result](https://metacpan.org/pod/Pcore::Util::Result) documentation for details.
+    Generates PDF from `$html` template. `$result` is a standard Pcore API result object, see [Pcore::Util::Result](https://metacpan.org/pod/Pcore::Util::Result) documentation for details.
 
 # SEE ALSO
 

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Alex Malek"
   ],
   "dist_name" => "Plack-Middleware-LogStderr",
-  "dist_version" => "0.002",
+  "dist_version" => "1.000",
   "license" => "perl",
   "module_name" => "Plack::Middleware::LogStderr",
   "recursive_test_files" => 1,
@@ -30,8 +30,7 @@ my %module_build_args = (
     "Scalar::Util" => 0,
     "parent" => 0,
     "strict" => 0,
-    "warnings" => 0,
-    "warnings::register" => 0
+    "warnings" => 0
   },
   "test_requires" => {
     "HTTP::Request::Common" => 0,

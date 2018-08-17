@@ -3,7 +3,9 @@ abstract: 'Run large database changes safely'
 author:
   - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
+  Class::Load: '0'
   DBIx::Class: '0'
+  DBIx::Connector::Retry: '0'
   ExtUtils::MakeMaker: '0'
   Path::Class: '0'
   Scalar::Util: '0'
@@ -30,17 +32,18 @@ requires:
   DBI: '0'
   Data::Float: '0'
   List::Util: '1.33'
-  Moo: '2.00'
+  Moo: '2.000002'
   Scalar::Util: '0'
   Term::ProgressBar: '2.14'
   Type::Utils: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.00'
   namespace::clean: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues
   homepage: https://github.com/GrantStreetGroup/DBIx-BatchChunker
   repository: https://github.com/GrantStreetGroup/DBIx-BatchChunker.git
-version: '0.91'
+version: '0.92'
 x_authority: cpan:GSG
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

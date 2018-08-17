@@ -110,19 +110,6 @@ is_deeply $res,
     },
     'It should return error response if action does not exist';
 
-$t = $t->send_ok({json => 'not_json'})->message_ok;
-$res = decode_json_utf8($t->message->[1]);
-is_deeply $res,
-    {
-    'error' => {
-        'code'    => 'BadRequest',
-        'message' => 'The application sent an invalid request.'
-    },
-    'debug'    => 1,
-    'msg_type' => 'error'
-    },
-    'It should return error response if bad request';
-
 $t = $t->send_ok({json => {some_action1 => 1}})->message_ok;
 $res = decode_json_utf8($t->message->[1]);
 ok $res->{some_action1}, 'Should return success';

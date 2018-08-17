@@ -1,5 +1,4 @@
 package XML::SemanticDiff::BasicHandler;
-our $AUTHORITY = 'cpan:SHLOMIF';
 
 use strict;
 use warnings;
@@ -165,7 +164,7 @@ XML::SemanticDiff::BasicHandler - Default handler class for XML::SemanticDiff
 
 =head1 VERSION
 
-version 1.0006
+version 1.0007
 
 =head1 SYNOPSIS
 
@@ -185,7 +184,7 @@ Please run perldoc XML::SemanticDiff for more information.
 
 =head1 VERSION
 
-version 1.0006
+version 1.0007
 
 =head1 IMPLEMENTED METHODS (FOR INTERNAL USE)
 
@@ -212,13 +211,23 @@ under the same terms as Perl itself.
 
 XML::SemanticDiff
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Shlomi Fish <shlomif@cpan.org>
 
+=item *
+
+Chris Prather <chris.prather@tamarou.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2001 by Kim Hampton.
+This software is copyright (c) 2001 by Kip Hampton.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -226,9 +235,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff> or by
-email to
-L<bug-xml-semanticdiff@rt.cpan.org|mailto:bug-xml-semanticdiff@rt.cpan.org>.
+L<https://github.com/shlomif/perl-XML-SemanticDiff/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -242,7 +249,7 @@ feature.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc XML::SemanticDiff
+  perldoc XML::SemanticDiff::BasicHandler
 
 =head2 Websites
 
@@ -257,7 +264,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/XML-SemanticDiff>
+L<https://metacpan.org/release/XML-SemanticDiff>
 
 =item *
 
@@ -293,14 +300,6 @@ L<http://cpanratings.perl.org/d/XML-SemanticDiff>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/XML-SemanticDiff>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -311,7 +310,7 @@ L<http://cpants.cpanauthors.org/dist/XML-SemanticDiff>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/X/XML-SemanticDiff>
 
@@ -347,6 +346,6 @@ from your repository :)
 
 L<https://github.com/shlomif/perl-XML-SemanticDiff>
 
-  git clone https://github.com/shlomif/perl-XML-SemanticDiff.git
+  git clone git://github.com/shlomif/perl-XML-SemanticDiff.git
 
 =cut

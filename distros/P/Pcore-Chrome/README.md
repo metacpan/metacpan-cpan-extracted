@@ -6,7 +6,7 @@ Pcore::Chrome
 
     use Pcore::Chrome;
 
-    my $chrome = Pcore::Chrome->new->run(
+    my $chrome = Pcore::Chrome->new(
         host      => '127.0.0.1',     # chrome --remote-debugging-address
         port      => 9222,            # chrome --remote-debugging-port
         bin       => undef,           # chrome binary path

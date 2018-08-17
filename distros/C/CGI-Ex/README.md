@@ -2,6 +2,8 @@
 
 CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
+[![master](https://travis-ci.org/ljepson/CGI-Ex.svg?branch=master)](https://travis-ci.org/ljepson/CGI-Ex)
+
 # CGI::Ex SYNOPSIS
 
     ### You probably don't want to use CGI::Ex directly

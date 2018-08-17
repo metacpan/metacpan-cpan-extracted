@@ -17,7 +17,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION
 use strict;
 use Exporter;
 
-$VERSION   = '2.46';
+$VERSION   = '2.47';
 @ISA       = qw(Exporter);
 @EXPORT    = qw(dex dex_warn dex_text dex_html ctrace dex_trace);
 @EXPORT_OK = qw(dex dex_warn dex_text dex_html ctrace dex_trace debug caller_trace);

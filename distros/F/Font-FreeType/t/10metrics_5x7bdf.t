@@ -89,7 +89,7 @@ my $glyph_list_filename = catfile($data_dir, 'bdf_glyphs.txt');
 open my $glyph_list, '<', $glyph_list_filename
   or die "error opening file for list of glyphs: $!";
 $bdf->foreach_char(sub {
-    die "shouldn't be any argumetns passed in" unless @_ == 0;
+    die "shouldn't be any arguments passed in" unless @_ == 0;
     my $line = <$glyph_list>;
     die "not enough characters in listing file '$glyph_list_filename'"
       unless defined $line;

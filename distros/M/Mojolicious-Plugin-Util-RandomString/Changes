@@ -1,3 +1,7 @@
+0.07 2018-08-10
+        - Fix memory leak in random_string
+          (RT #125981; ether).
+
 0.06 2016-03-03
         - Update to recent version of Session::Token.
 
@@ -9,11 +13,11 @@
 
 0.03 2014-01-25
         - Improved test suite.
-	- Fixed IOLoop-bug (sri, akron).
+        - Fixed IOLoop-bug (sri, akron).
 
 0.02 2013-05-27
         - Establish helper only once.
 
 0.01 2013-05-26
         - Initial release on GitHub.
-	- Initial release to CPAN.
+        - Initial release to CPAN.

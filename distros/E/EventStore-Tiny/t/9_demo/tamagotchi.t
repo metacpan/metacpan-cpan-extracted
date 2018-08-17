@@ -14,14 +14,14 @@ my $user;
 
 subtest 'User handling' => sub {
 
-    # create
+    # Create
     my $anne    = $tama_sto->add_user('Anne');
     my $bob     = $tama_sto->add_user('Bob');
     $user = $bob;
 
     subtest 'Creation' => sub {
 
-        # check IDs from creation
+        # Check IDs from creation
         is $anne => 0, 'Correct first user ID';
         is $bob  => 1, 'Correct second user ID';
 
@@ -29,7 +29,7 @@ subtest 'User handling' => sub {
             is $tama_sto->_event_store->events->size => 2,
                 '2 events recorded';
 
-            # first user
+            # First user
             my $add_anne = $tama_sto->_event_store->events->events->[0];
             isa_ok $add_anne => 'EventStore::Tiny::DataEvent';
             is $add_anne->name => 'UserAdded', 'Correct event type';
@@ -38,7 +38,7 @@ subtest 'User handling' => sub {
                 user_name   => 'Anne',
             }, 'Correct event data';
 
-            # second user
+            # Second user
             my $add_bob  = $tama_sto->_event_store->events->events->[1];
             isa_ok $add_bob => 'EventStore::Tiny::DataEvent';
             is $add_bob->name => 'UserAdded', 'Correct event type';
@@ -48,7 +48,7 @@ subtest 'User handling' => sub {
             }, 'Correct event data';
         };
 
-        # check state after creation
+        # Check state after creation
         is_deeply $tama_sto->data => {
             users => {
                 $anne   => {id => $anne, name => 'Anne'},
@@ -57,7 +57,7 @@ subtest 'User handling' => sub {
         }, 'Correct state after user creation';
     };
 
-    # rename
+    # Rename
     $tama_sto->rename_user($bob, 'Bill');
     my $bill = $bob;
 
@@ -67,7 +67,7 @@ subtest 'User handling' => sub {
             is $tama_sto->_event_store->events->size => 3,
                 'Three events recorded';
 
-            # check event data
+            # Check event data
             my $rename = $tama_sto->_event_store->events->events->[2];
             isa_ok $rename => 'EventStore::Tiny::DataEvent';
             is $rename->name => 'UserRenamed', 'Correct event type';
@@ -77,7 +77,7 @@ subtest 'User handling' => sub {
             }, 'Correct event data';
         };
 
-        # check state after renaming
+        # Check state after renaming
         is_deeply $tama_sto->data => {
             users => {
                 $anne   => {id => $anne, name => 'Anne'},
@@ -86,7 +86,7 @@ subtest 'User handling' => sub {
         }, 'Correct state after user creation';
     };
 
-    # remove
+    # Remove
     $tama_sto->remove_user($anne);
 
     subtest 'Removal' => sub {
@@ -95,7 +95,7 @@ subtest 'User handling' => sub {
             is $tama_sto->_event_store->events->size => 4,
                 'Four events recorded';
 
-            # check event data
+            # Check event data
             my $removal = $tama_sto->_event_store->events->events->[3];
             isa_ok $removal => 'EventStore::Tiny::DataEvent';
             is $removal->name => 'UserRemoved', 'Correct event type';
@@ -104,7 +104,7 @@ subtest 'User handling' => sub {
             }, 'Correct event data';
         };
 
-        # check state after removal
+        # Check state after removal
         is_deeply $tama_sto->data => {
             users => {
                 $bill => {id => $bill, name => 'Bill'},
@@ -119,14 +119,14 @@ subtest 'Tamagotchi' => sub {
 
     subtest 'Creation' => sub {
 
-        # check id from construction
+        # Check id from construction
         is $tama => 0, 'Correct first tamagotchi ID';
 
         subtest 'Events' => sub {
             is $tama_sto->_event_store->events->size => 5,
                 '5 events recorded';
 
-            # check event data
+            # Check event data
             my $add_tama = $tama_sto->_event_store->events->events->[4];
             isa_ok $add_tama => 'EventStore::Tiny::DataEvent';
             is $add_tama->name => 'TamagotchiAdded', 'Correct event type';
@@ -136,7 +136,7 @@ subtest 'Tamagotchi' => sub {
             }, 'Correct event data';
         };
 
-        # check state after creation
+        # Check state after creation
         is_deeply $tama_sto->data => {
             users => {$user => {id => $user, name => 'Bill'}},
             tamas => {$tama => {
@@ -147,7 +147,7 @@ subtest 'Tamagotchi' => sub {
         }, 'Correct state after tamagotchi creation';
     };
 
-    # feed (+0), age (-30), feed (+20)
+    # Feed (+0), age (-30), feed (+20)
     $tama_sto->feed_tamagotchi($tama);
     $tama_sto->age_tamagotchi($tama);
     $tama_sto->feed_tamagotchi($tama);
@@ -158,7 +158,7 @@ subtest 'Tamagotchi' => sub {
             is $tama_sto->_event_store->events->size => 8,
                 '8 events recorded';
 
-            # check event data
+            # Check event data
             my ($feed1, $age, $feed2) = @{$tama_sto->_event_store
                 ->events->events}[5, 6, 7];
             isa_ok $_ => 'EventStore::Tiny::DataEvent'
@@ -171,7 +171,7 @@ subtest 'Tamagotchi' => sub {
             is $feed2->name => 'TamagotchiFed', 'Correct event type';
         };
 
-        # check state after daily routine
+        # Check state after daily routine
         is_deeply $tama_sto->data => {
             users => {$user => {id => $user, name => 'Bill'}},
             tamas => {$tama => {
@@ -182,7 +182,7 @@ subtest 'Tamagotchi' => sub {
         }, 'Correct state after tamagotchi daily routine';
     };
 
-    # murder
+    # Murder
     $tama_sto->die_tamagotchi($tama);
 
     subtest 'Death' => sub {
@@ -191,14 +191,14 @@ subtest 'Tamagotchi' => sub {
             is $tama_sto->_event_store->events->size => 9,
                 '9 events recorded';
 
-            # check event data
+            # Check event data
             my $murder = $tama_sto->_event_store->events->events->[8];
             isa_ok $murder => 'EventStore::Tiny::DataEvent';
             is $murder->name => 'TamagotchiDied', 'Correct event type';
             is_deeply $murder->data => {tama_id => $tama}, 'Correct event data';
         };
 
-        # check state after murder
+        # Check state after murder
         is_deeply $tama_sto->data => {
             users => {$user => {id => $user, name => 'Bill'}},
             tamas => {},

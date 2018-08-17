@@ -236,16 +236,25 @@ will force the affected worker to be restarted after a timeout. This timeout
 defaults to C<30> seconds and can be extended with the attribute
 L<Mojo::Server::Prefork/"heartbeat_timeout"> if your application requires it.
 
-=head2 What does "Connection already closed" mean?
+=head2 What does "Transaction already destroyed" mean?
 
 This error message usually appears after waiting for the results of a
 non-blocking operation for longer periods of time, because the underlying
 connection has been closed in the meantime and the value of the attribute
 L<Mojolicious::Controller/"tx"> is no longer available. While there might not be
-a way to prevent the connection from getting closed, you can also avoid this
+a way to prevent the connection from getting closed, you can try to avoid this
 error message by keeping a reference to the transaction object that is not
-weakened. The helper L<Mojolicious::Plugin::DefaultHelpers/"delay"> will do this
-automatically for you.
+weakened.
+
+  # Keep a strong reference to the transaction object
+  my $tx = $c->render_later->tx;
+  $c->ua->get_p('https://mojolicious.org')->then(sub {
+    $c->render(text => 'Visited mojolicious.org');
+  })->catch(sub {
+    my $err = shift;
+    $tx;
+    $c->reply->exception($err);
+  });
 
 =head1 MORE
 

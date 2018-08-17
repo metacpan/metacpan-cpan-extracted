@@ -17,13 +17,13 @@ has backlog      => 0;    # ( is => 'ro', isa => Maybe [PositiveOrZeroInt], defa
 has so_no_delay  => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
 has so_keepalive => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
 
-has server_tokens         => "Pcore-HTTP-Server/$Pcore::VERSION";    # ( is => 'ro', isa => Maybe [Str] );
-has keepalive_timeout     => 60;                                     # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - disable keepalive
-has client_header_timeout => 60;                                     # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
-has client_body_timeout   => 60;                                     # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
-has client_max_body_size  => 0;                                      # 0 - do not check
+has server_tokens         => qq[Pcore-HTTP-Server/$Pcore::VERSION];    # ( is => 'ro', isa => Maybe [Str] );
+has keepalive_timeout     => 60;                                       # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - disable keepalive
+has client_header_timeout => 60;                                       # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
+has client_body_timeout   => 60;                                       # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
+has client_max_body_size  => 0;                                        # 0 - do not check
 
-has _listen_socket => ();                                            # ( is => 'ro', isa => Object, init_arg => undef );
+has _listen_socket => ();                                              # ( is => 'ro', isa => Object, init_arg => undef );
 
 # TODO implement shutdown and graceful shutdown
 
@@ -134,7 +134,7 @@ sub _on_accept ( $self, $fh, $host, $port ) {
         # payload too large
         return $self->return_xxx( $h, 413 ) if $self->{client_max_body_size} && $self->{client_max_body_size} > $env->{CONTENT_LENGTH};
 
-        $data = $h->readchunk( $env->{CONTENT_LENGTH}, timeout => $self->{client_body_timeout} );
+        $data = $h->read_chunk( $env->{CONTENT_LENGTH}, timeout => $self->{client_body_timeout} );
 
         # HTTP body read error
         if ( !$data ) {

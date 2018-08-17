@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Metropolitan;
 
-$Map::Tube::London::Line::Metropolitan::VERSION   = '1.17';
+$Map::Tube::London::Line::Metropolitan::VERSION   = '1.22';
 $Map::Tube::London::Line::Metropolitan::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Metropolitan - London Tube Map: Metropolitan Line.
 
 =head1 VERSION
 
-Version 1.17
+Version 1.22
 
 =head1 DESCRIPTION
 
@@ -62,31 +62,73 @@ London Tube Map: Metropolitan Line.
 =over 2
 
 =item * The station "Aldgate" is also part of
-          L<Circle Line|Map::Tube::London::Line::Circle>.
-
-=item * The station "Liverpool Street" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<Central Line|Map::Tube::London::Line::Central>.
-
-=item * The station "Wembley Park" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
-
-=item * The station "Finchley Road" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
+          L<Circle Line|Map::Tube::London::Line::Circle>
 
 =item * The station "Baker Street" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
         | L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
+
+=item * The station "Barbican" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Eastcote" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Euston Square" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Farringdon" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Finchley Road" is also part of
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
+
+=item * The station "Great Portland Street" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Hillingdon" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Ickenham" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
 
 =item * The station "King's Cross St. Pancras" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>.
+        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "Liverpool Street" is also part of
+          L<Central Line|Map::Tube::London::Line::Central>
+        | L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Moorgate" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Rayners Lane" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Ruislip" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Ruislip Manor" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Uxbridge" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Wembley Park" is also part of
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
 
 =back
 

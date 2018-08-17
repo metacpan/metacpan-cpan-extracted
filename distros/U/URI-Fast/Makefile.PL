@@ -7,14 +7,14 @@ use ExtUtils::MakeMaker;
 my $OPTIMIZE = $ENV{DEBUG} ? '-g -O1' : ($ENV{OPTIMIZE} || '-O2');
 
 sub MY::postamble {
-  return <<EOS;
+  return qq{
 
 misc : readme distcheck manifest
 
 release : test misc dist
 \tcpan-upload \$(DISTVNAME).tar.gz
 
-EOS
+};
 }
 
 WriteMakefile(

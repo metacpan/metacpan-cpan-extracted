@@ -1,6 +1,33 @@
 Revision history for Term::Form
 
 
+0.500   2018-08-08
+        - The only non-core dependency is now "Term::Choose" if not MSWin32 OS.
+
+0.321_08   2018-08-08
+        - Developer release.
+
+0.321_07   2018-08-06
+        - Developer release.
+
+0.321_06   2018-08-05
+        - Developer release.
+
+0.321_05   2018-08-03
+        - Developer release.
+
+0.321_04   2018-07-31
+        - Developer release.
+
+0.321_03   2018-07-31
+        - Developer release.
+
+0.321_02   2018-07-30
+        - Developer release.
+
+0.321_01   2018-07-29
+        - Developer release.
+
 0.321   2018-07-20
         - Stringify gcstring explicitly.
         - Update constants Win32.

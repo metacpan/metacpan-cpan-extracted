@@ -1,0 +1,63 @@
+{
+   "abstract" : "create an evaluation poll over local network",
+   "author" : [
+      "Boris D\u00e4ppen <bdaeppen.perl@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "School-Evaluation-Gibbmers",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Chart::Clicker" : "0",
+            "Chart::Clicker::Context" : "0",
+            "Chart::Clicker::Data::DataSet" : "0",
+            "Chart::Clicker::Data::Marker" : "0",
+            "Chart::Clicker::Data::Series::Size" : "0",
+            "Chart::Clicker::Drawing::ColorAllocator" : "0",
+            "Chart::Clicker::Renderer::Bubble" : "0",
+            "File::ShareDir" : "0",
+            "Geometry::Primitive::Circle" : "0",
+            "Geometry::Primitive::Rectangle" : "0",
+            "Graphics::Color::RGB" : "0",
+            "IO::Interface::Simple" : "0",
+            "Mojo::Cache" : "0",
+            "Mojo::Server::Daemon" : "0",
+            "Mojolicious::Lite" : "0",
+            "YAML::Tiny" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Script" : "1.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://gitlab.com/borisdaeppen/School-Evaluation-Gibbmers",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/borisdaeppen/School-Evaluation-Gibbmers.git"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.22.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

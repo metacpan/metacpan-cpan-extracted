@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Ctrl;
-$cPanel::TaskQueue::Ctrl::VERSION = '0.850';
+$cPanel::TaskQueue::Ctrl::VERSION = '0.900';
 use warnings;
 use strict;
 
@@ -436,7 +436,7 @@ sub convert_state_files {
         return;
     }
     my $new_serial = $format{$fmt};
-    eval "use $new_serial;";  ## no critic(ProhibitStringyEval)
+    eval "use $new_serial;";    ## no critic(ProhibitStringyEval)
     die "Unable to load serializer module '$new_serial': $@" if $@;
     _convert_a_state_file( $queue, $new_serial );
     _convert_a_state_file( $sched, $new_serial );
@@ -466,9 +466,10 @@ sub _convert_a_state_file {
 sub display_queue_info {
     my ( $ctrl, $fh, $queue, $sched, @args ) = @_;
     print $fh "Current TaskQueue Information\n";
-    my $description = $ctrl->{serial}
-                    ? "$ctrl->{serial} (".$format{lc $ctrl->{serial}}.")"
-                    : 'default';
+    my $description =
+      $ctrl->{serial}
+      ? "$ctrl->{serial} (" . $format{ lc $ctrl->{serial} } . ")"
+      : 'default';
     print $fh "Serializer:     $description\n";
     print $fh "TaskQueue file: ", $queue->_state_file(), "\n";
     print $fh "Scheduler file: ", $sched->_state_file(), "\n";
@@ -510,7 +511,7 @@ sub process_one_step {
 sub flush_scheduled_tasks {
     my ( $ctrl, $fh, $queue, $sched, @args ) = @_;
     my @ids = $sched->flush_all_tasks();
-    if(@ids) {
+    if (@ids) {
         print $fh scalar(@ids), " tasks flushed\n";
     }
     else {
@@ -523,13 +524,13 @@ sub delete_unprocessed_tasks {
     my ( $ctrl, $fh, $queue, $sched, @args ) = @_;
     @args = qw/waiting scheduled/ unless @args;
     my $count = 0;
-    if( _any_is( 'scheduled', @args ) ) {
+    if ( _any_is( 'scheduled', @args ) ) {
         $count += $sched->delete_all_tasks();
     }
-    if( _any_is( 'waiting', @args ) ) {
+    if ( _any_is( 'waiting', @args ) ) {
         $count += $queue->delete_all_unprocessed_tasks();
     }
-    if($count) {
+    if ($count) {
         print $fh "$count tasks deleted\n";
     }
     else {

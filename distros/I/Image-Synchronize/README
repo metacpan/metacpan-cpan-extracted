@@ -1,0 +1,69 @@
+Image-Synchronize version 1.0
+==============================
+
+This package provides the imsync perl script and auxiliary perl
+modules.  imsync can put image and associated non-image files on a
+common timeline and can geotag images based on GPX files.
+
+imsync is a console application.  You run it from a command shell and
+configure it by specifying command options and arguments.
+
+The default usage is to execute
+
+  imsync
+
+in the directory holding the files of interest.  This inspects the
+files and reports proposed modifications but does not modify any files
+(except for writing the progress log called imsync.log).  If you are
+happy with the proposed modifications, then execute
+
+  imsync --modify
+
+to rerun and this time apply the proposed modifications.  If you are
+not happy with the proposed modifications, then there are other
+command line options for tweaking the operation.
+
+Execute
+
+  imsync --help
+
+for basic help.  Execute
+
+  imsync --man
+
+for more detailed help.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Interactive
+
+  Image::ExifTool> version 10.14 or up
+
+  Path::Class
+
+  Path::Iterator::Rule
+
+  Term::ProgressBar
+
+  XML::Twig
+
+  YAML::Any
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018 by Louis Strous
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.2 or,
+at your option, any later version of Perl 5 you may have available.

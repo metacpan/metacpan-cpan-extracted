@@ -2,7 +2,7 @@
 
 
 package Email::Extractor::Utils;
-$Email::Extractor::Utils::VERSION = '0.01';
+$Email::Extractor::Utils::VERSION = '0.03';
 use strict;
 use warnings;
 use feature 'say';
@@ -15,6 +15,7 @@ use File::Slurp qw(read_file);
 use File::Basename;    # fileparse
 use Regexp::Common qw /URI/;
 use LWP::UserAgent;
+use LWPx::TimedHTTP qw(:autoinstall);
 use Mojo::DOM;
 
 require Exporter;
@@ -33,6 +34,7 @@ our @EXPORT_OK = qw(
   drop_anchor_links
   remove_query_params
   remove_external_links
+  isin
 );
 our %EXPORT_TAGS = ( 'ALL' => [@EXPORT_OK] );
 
@@ -44,6 +46,33 @@ our $Assets = [
     'PNG', 'svg',  'doc', 'docx', 'ppt', 'odt',  'rtf',  'ppt'
 ];
 
+# Loads url and measure timings
+
+sub _load_url_verbose {
+    my $addr = shift;
+    my $ua   = LWP::UserAgent->new;
+    my $resp = $ua->get($addr);       # HTTP::Response
+
+    my @headers = qw/
+      Client-Request-Dns-Time
+      Client-Request-Connect-Time
+      Client-Request-Transmit-Time
+      Client-Response-Server-Time
+      Client-Response-Receive-Time
+      /;
+
+    my $msg;
+    for my $h (@headers) {
+        my $prm = ( split( '-', $h ) )[2];
+        $msg .= ' ' . $prm . ' : ' . $resp->header($h) . "\n"
+          if defined $resp->header($h);
+    }
+
+    say $msg if $Verbose;
+    say $resp->status_line if ( $resp->is_error && $Verbose );
+    return $resp->content;
+}
+
 
 sub load_addr_to_str {
     my $addr = shift;
@@ -52,15 +81,13 @@ sub load_addr_to_str {
 
         if ( looks_like_url($addr) ) {
 
-            say "$addr: is url" if ($Verbose);
-            my $ua   = LWP::UserAgent->new;
-            my $resp = $ua->get($addr);       # HTTP::Response
-            return $resp->content;
+            say "$addr: is url" if $Verbose;
+            _load_url_verbose($addr);
 
         }
         else {
 
-            say "$addr: is file" if ($Verbose);
+            say "$addr: is file" if $Verbose;
             my $file_uri = get_file_uri($addr);
 
             if ( looks_like_file($file_uri) ) {
@@ -92,11 +119,11 @@ sub get_file_uri {
 sub looks_like_url {
     my $string = shift;
     my $regexp = qr($RE{URI}{HTTP}{-scheme=>qr/https?/}{-keep});
+
     if ( $string =~ $regexp ) {
 
-        # warn "$1 $2 $3 $4 $5 $6 $7 $8";
-        return $7 if defined $7;
-        return $1 if defined $1;
+        # return $7 if defined $7;
+        return $1;
     }
     else {
         return 0;
@@ -208,13 +235,42 @@ sub find_all_links {
 
 
 sub find_links_by_text {
-    my ( $html, $a_text ) = @_;
-    my $dom = Mojo::DOM->new($html);
+    my ( $html, $a_text, $upper_lower_case_flag ) = @_;
+    my $dom = Mojo::DOM->new($html);    # Mojo::Collection of Mojo::DOM
 
-# Mojo::Collection of Mojo::DOM
 # return $dom->find('a')->grep('text' => $a_text)->map(attr => 'href')->to_array;
     return $dom->find('a')->grep( sub { $_->text eq $a_text } )
-      ->map( attr => 'href' )->to_array;
+      ->map( attr => 'href' )->to_array
+      if !defined $upper_lower_case_flag;
+
+    # TO-DO: fix lc/uc issue is case of non-ascii characters
+
+# warn Dumper $crawler->extract_contact_links('<a href="/some_link" title="">Контакты</a>');
+# warn Dumper $crawler->extract_contact_links('<a href="/some_link" title="">контакты</a>');
+# warn Dumper $crawler->extract_contact_links('<a href="/some_link" title="">КОНТАКТЫ</a>');
+
+# https://stackoverflow.com/questions/3399129/compare-two-strings-regardless-of-case-size-in-perl
+    use utf8;
+    if ($upper_lower_case_flag) {
+        return $dom->find('a')->grep(
+            sub {
+                lc $_->text eq lc $a_text;
+            }
+        )->map( attr => 'href' )->to_array;
+    }
+
+}
+
+
+sub isin($$) {
+    my ( $val, $array_ref ) = @_;
+
+    return 0 unless $array_ref && defined $val;
+    for my $v (@$array_ref) {
+        return 1 if $v eq $val;
+    }
+
+    return 0;
 }
 
 1;
@@ -231,13 +287,13 @@ Email::Extractor::Utils - Set of functions that can be useful when building web 
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
   use Email::Extractor::Utils qw( looks_like_url looks_like_file get_file_uri load_addr_to_str )
   # or use Email::Extractor::Utils qw[:ALL];
-  Email::Extractor::Utils::Verbose = 1;
+  $Email::Extractor::Utils::Verbose = 1;
   
   my $text = load_addr_to_str($url);
 
@@ -261,6 +317,8 @@ Function can accept http(s) uri or file paths both
 dies if no such file
 
 return $resp->content even if no such url
+
+If verbose mode enabled prints time of request
 
 Can be used in tests when you need to mock http requests also
 
@@ -351,6 +409,8 @@ Return C<ARRAYREF>
 
 =head2 find_links_by_text
 
+    find_links_by_text($html, $a_text, <$upper_lower_case_flag> )
+
 Find all C<a> tags containing particular text and return href values
 
 If no search text specified return all links
@@ -360,6 +420,14 @@ Currently is not used in L<Email::Extractor> project since it has unexpected beh
 Return C<ARRAYREF>
 
 TO-DO: try to implement this method with L<HTML::LinkExtor>
+
+=head2 isin($str, $arrayref)
+
+    isin( $val, $array_ref )
+
+Check is C<$str> contained in C<$arrayref>
+
+Return true/false.
 
 =head1 DESCRIPTION
 

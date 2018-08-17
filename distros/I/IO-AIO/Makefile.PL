@@ -11,28 +11,23 @@ if ($^O eq "MSWin32") {
 
 ***
 *** Your platform is not standards compliant. To get this module working, you need to
-*** download and install win32 pthread (http://sourceware.org/pthreads-win32/)
-*** in /gtk/{lib,include}
-*** also, the windows SDK is expected to be installed in /sdk
-*** and visual C is expected to be installed in /vc98
-***
-*** Alternatively, set the INC and LIBS environment variables
-*** accordingly before running Makefile.PL, or you can
-*** pass INC and LIBS arguments to Makefile.PL itself.
+*** download and install win32 pthread (http://sourceware.org/pthreads-win32/).
 ***
 
 EOF
 
-   if ($Config{cc} =~ /(?:^|\\|\/)gcc(?:|.*\.exe)$/) {
-      $INC  = "$ENV{INC} -I/gtk/include";
-      $LIBS = ["$ENV{LIBS} -L/gtk/lib -lpthreadGC2"];
-   } else {
-      $INC  = "$ENV{INC} -I/sdk/include -I/vc98/include -I/gtk/include";
-      $LIBS = ["$ENV{LIBS} -L/gtk/lib -lpthreadVC2"];
+   if(0){
+      if ($Config{cc} =~ /(?:^|\\|\/)gcc(?:|.*\.exe)$/) {
+         $INC  = "$ENV{INC} -I/gtk/include";
+         $LIBS = ["$ENV{LIBS} -L/gtk/lib -lpthreadGC2"];
+      } else {
+         $INC  = "$ENV{INC} -I/sdk/include -I/vc98/include -I/gtk/include";
+         $LIBS = ["$ENV{LIBS} -L/gtk/lib -lpthreadVC2"];
+      }
    }
 
-   open my $fh, ">libeio/config.h"
-      or die "libeio/config.h: $!";
+   open my $fh, ">config.h"
+      or die "config.h: $!";
    print $fh <<EOF;
 EOF
 
@@ -63,10 +58,11 @@ EOF
       $ENV{MAKE}     = $Config{make};
       $ENV{SHELL}    = $Config{sh};
       $ENV{CC}       = $Config{cc};
-      $ENV{CPPFLAGS} = $Config{cppflags};
+      $ENV{CPPFLAGS} = "$Config{cppflags} -I$Config{archlibexp}/CORE";
       $ENV{CFLAGS}   = $Config{ccflags};
-      $ENV{LDFLAGS}  = $Config{ldflags};
+      $ENV{LDFLAGS}  = "$Config{ldflags} $Config{ccdlflags}";
       $ENV{LINKER}   = $Config{ld}; # nonstandard
+      $ENV{LIBS}     = "-L$Config{archlibexp}/CORE -L$Config{privlibexp} -lperl $Config{libs}";
 
       system $ENV{SHELL}, -c => "./configure --prefix \Q$Config{prefixexp}\E"
          and exit $? >> 8;
@@ -100,7 +96,7 @@ my $mm = MM->new({
        SUFFIX	=> '.gz',
     },
     depend => {
-       "AIO.c" => "schmorp.h libeio/eio.h libeio/xthread.h libeio/etp.c libeio/eio.c libeio/config.h",
+       "AIO.c" => "schmorp.h libeio/eio.h libeio/xthread.h libeio/etp.c libeio/eio.c config.h",
     },
     NAME         => "IO::AIO",
     VERSION_FROM => "AIO.pm",
@@ -114,7 +110,7 @@ my $mm = MM->new({
     PREREQ_PM => {
        "common::sense" => 0,
     },
-    clean        => { FILES => "libeio/config.h libeio/config.log libeio/config.status" },
+    clean        => { FILES => "config.h libeio/config.h libeio/config.log libeio/config.status" },
 });
 
 $mm->flush;

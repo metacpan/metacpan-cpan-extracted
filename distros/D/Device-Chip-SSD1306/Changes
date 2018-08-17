@@ -1,5 +1,13 @@
 Revision history for Device-Chip-SSD1306
 
+0.06    2018-08-08 18:01:23
+        [CHANGES]
+         * Add a ->draw_blit method for rendering bitmaps onto the framebuffer
+         * Support configuring the X- or Y-axis flipping in hardware
+
+        [BUGFIXES]
+         * Fix accidental Y-axis flip in display initialisation code
+
 0.05    2018-08-05 13:48:14
         [CHANGES]
          * Support the 0.49inch 64x32 module

@@ -1,4 +1,12 @@
-#define PERL_NO_GET_CONTEXT
+/* most win32 perls are beyond fixing, requiring dTHX */
+/* even for ISO-C functions such as malloc. avoid! avoid! avoid! */
+/* and fail to define numerous symbols, but still overrwide them */
+/* with non-working versions (e.g. setjmp). */
+#ifdef _WIN32
+/*# define PERL_CORE 1 fixes some, breaks others */
+#else
+# define PERL_NO_GET_CONTEXT
+#endif
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -12,8 +20,9 @@
 #include "xthread.h"
 
 #ifdef _WIN32
-  typedef char sigset_t;
-  #define pthread_sigmask(mode,new,old)
+  #ifndef sigset_t
+    #define sigset_t int
+  #endif
 #endif
 
 #ifndef SvREFCNT_dec_NN
@@ -116,7 +125,7 @@ X_THREAD_PROC(thread_proc)
   PERL_SET_CONTEXT (perl_thx);
 
   {
-    dTHX; /* inefficient, we already have perl_thx, but I see no better way */
+    dTHXa (perl_thx);
     dJMPENV;
     struct tctx *ctx;
     int catchret;
@@ -248,7 +257,10 @@ pmapi_acquire (void)
   pthread_sigmask (SIG_SETMASK, &cursigset, 0);
 
   if (jeret)
-    JMPENV_JUMP (jeret);
+    {
+      dTHX;
+      JMPENV_JUMP (jeret);
+    }
 }
 
 static void
@@ -350,6 +362,11 @@ void
 sleep (NV seconds)
 	CODE:
         perlinterp_release ();
-        usleep (seconds * 1e6);
+	{
+          int nsec = seconds;
+          if (nsec) sleep (nsec);
+          nsec = (seconds - nsec) * 1e9;
+          if (nsec) usleep (nsec);
+        }
         perlinterp_acquire ();
 

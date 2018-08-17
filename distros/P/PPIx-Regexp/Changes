@@ -1,3 +1,7 @@
+0.062		2018-08-12	T. R. Wyant
+    Remove tokenizer method prior(). This is the last step in its
+    deprecation.
+
 0.061		2018-07-09	T. R. Wyant
     Only standalone graphemes and non-characters allowed as delimiters
     starting with Perl 5.29.0.

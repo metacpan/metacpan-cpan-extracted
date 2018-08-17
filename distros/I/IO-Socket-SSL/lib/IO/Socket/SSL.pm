@@ -13,7 +13,7 @@
 
 package IO::Socket::SSL;
 
-our $VERSION = '2.058';
+our $VERSION = '2.059';
 
 use IO::Socket;
 use Net::SSLeay 1.46;
@@ -1435,6 +1435,7 @@ sub stop_SSL {
 	delete ${*$self}{_SSL_object};
 	${*$self}{'_SSL_opened'} = 0;
 	delete $SSL_OBJECT{$ssl};
+	delete $CREATED_IN_THIS_THREAD{$ssl};
 	untie(*$self);
     }
 
@@ -2506,6 +2507,7 @@ sub new {
 		Net::SSLeay::BIO_free($bio);
 		if ( $crl ) {
 		    Net::SSLeay::X509_STORE_add_crl(Net::SSLeay::CTX_get_cert_store($ctx), $crl);
+		    Net::SSLeay::X509_CRL_free($crl);
 		} else {
 		    return IO::Socket::SSL->error("Invalid certificate revocation list");
 		}

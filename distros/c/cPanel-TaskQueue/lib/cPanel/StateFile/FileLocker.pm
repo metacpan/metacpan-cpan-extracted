@@ -1,5 +1,5 @@
 package cPanel::StateFile::FileLocker;
-$cPanel::StateFile::FileLocker::VERSION = '0.850';
+$cPanel::StateFile::FileLocker::VERSION = '0.900';
 #use warnings;
 use strict;
 use Fcntl ();

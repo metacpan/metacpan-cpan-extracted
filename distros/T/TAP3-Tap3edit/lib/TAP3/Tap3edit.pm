@@ -1,10 +1,8 @@
-# Package Tap3edit (http://www.tap3edit.com)
+# Package Tap3edit (https://github.com/tap3edit/TAP3-Tap3edit)
 # designed to decode, modify and encode Roaming GSM TAP/RAP/
 # NRT files
 # 
-# $Id: Tap3edit.pm,v 1.14 2012/05/11 00:47:07 javier Exp $
-# 
-# Copyright (c) 2004-2012 Javier Gutierrez. All rights 
+# Copyright (c) 2004-2018 Javier Gutierrez. All rights 
 # reserved.
 # This program is free software; you can redistribute 
 # it and/or modify it under the same terms as Perl itself.
@@ -48,7 +46,7 @@ use Carp;
 BEGIN {
 	use Exporter;
 	our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-	$VERSION = "0.33";
+	$VERSION = "0.34";
 }
 
 
@@ -497,6 +495,11 @@ sub _get_file_version
 	##
 	## 4. According to what is found we set the file_type, version and release.
 	## 
+
+    if (!defined $file_type) {
+		$self->{error}="Unknown File format. Cannot decode.";
+		croak $self->error();
+    }
 
 	if ($file_type eq "TAP" or $file_type eq "NOT") {
 		if (! $release or ! $version ) {

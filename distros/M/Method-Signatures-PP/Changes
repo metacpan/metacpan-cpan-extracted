@@ -1,5 +1,9 @@
 Revision history for Method-Signatures-PP
 
+0.000005 - 2018-08-16
+  - port to Babble, which means we're depending on and using Moo anyway,
+    but hey!
+
 0.000004 - 2018-05-25
   - remove Moo from the test because we don't want it as a dep.
     I'm an idiot.

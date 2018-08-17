@@ -80,11 +80,11 @@ sub setNode {
   return; }
 
 sub getLocator {
-  my ($self, @args) = @_;
+  my ($self) = @_;
   if (my $box = $self->getNodeBox($$self{node})) {
-    return $box->getLocator(@args); }
+    return $box->getLocator; }
   else {
-    return 'EOF?'; } }    # well?
+    return; } }    # well?
 
 # Get the element at (or containing) the current insertion point.
 sub getElement {
@@ -116,6 +116,15 @@ sub getFirstChildElement {
       $n = $n->nextSibling; }
     return $n; }
   return; }
+
+# get the second element node (if any) in $node
+sub getSecondChildElement {
+  my ($self, $node) = @_;
+  my $first_child = $self->getFirstChildElement($node);
+  my $second_child = $first_child && $first_child->nextSibling;
+  while ($second_child && $second_child->nodeType != XML_ELEMENT_NODE) {
+      $second_child = $second_child->nextSibling; }
+  return $second_child; }
 
 # Find the nodes according to the given $xpath expression,
 # the xpath is relative to $node (if given), otherwise to the document node.
@@ -167,29 +176,40 @@ sub canContainIndirect {
 # This model therefor includes information from the Schema, as well as
 # autoOpen information that may be introduced in binding files.
 # [Thus it should NOT be modifying the Model object, which may cover several documents in Daemon]
+# $imodel{$tag}{$child} => $open means if in $tag, to open $child, we must first open $open
 sub computeIndirectModel {
   my ($self) = @_;
   my $model  = $$self{model};
   my $imodel = {};
   # Determine any indirect paths to each descendent via an `autoOpen-able' tag.
+  local %::OPENABILITY = ();
+  foreach my $tag ($model->getTags) {
+    my $x;
+    if (($x = $STATE->lookupMapping('TAG_PROPERTIES', $tag)) && ($x = $$x{autoOpen})) {
+      $::OPENABILITY{$tag} = ($x =~ /^\d*\.\d*$/ ? $x : 1); }
+    else {
+      $::OPENABILITY{$tag} = 0; } }
   foreach my $tag ($model->getTags) {
     local %::DESC = ();
-    computeIndirectModel_aux($model, $tag, '');
-    $$imodel{$tag} = {%::DESC}; }
+    computeIndirectModel_aux($model, $tag, '', 1);
+    foreach my $kid (sort keys %::DESC) {
+      my $best = 0;    # Find best path to $kid.
+      foreach my $start (sort keys %{ $::DESC{$kid} }) {
+        if (($tag ne $kid) && ($tag ne $start) && ($::DESC{$kid}{$start} > $best)) {
+          $$imodel{$tag}{$kid} = $start; $best = $::DESC{$kid}{$start}; } } } }
   # PATCHUP
   if ($$model{permissive}) {    # !!! Alarm!!!
     $$imodel{'#Document'}{'#PCDATA'} = 'ltx:p'; }
   return $imodel; }
 
 sub computeIndirectModel_aux {
-  my ($model, $tag, $start) = @_;
+  my ($model, $tag, $start, $desirability) = @_;
   my $x;
   foreach my $kid ($model->getTagContents($tag)) {
-    next if $::DESC{$kid};      # already seen
-    $::DESC{$kid} = $start if $start;
-    if (($kid ne '#PCDATA') && ($x = $STATE->lookupMapping('TAG_PROPERTIES', $kid)) && $$x{autoOpen}) {
-      computeIndirectModel_aux($model, $kid, $start || $kid); }
-  }
+    next if $::DESC{$kid}{$start};    # Already solved
+    $::DESC{$kid}{$start} = $desirability if $start;
+    if (($kid ne '#PCDATA') && ($x = $::OPENABILITY{$kid})) {
+      computeIndirectModel_aux($model, $kid, $start || $kid, $desirability * $x); } }
   return; }
 
 sub canContainSomehow {
@@ -346,7 +366,9 @@ sub finalize_rec {
   my ($self, $node) = @_;
   my $model               = $$self{model};
   my $qname               = $model->getNodeQName($node);
-  my $declared_font       = $LaTeXML::FONT;
+  # _standalone_font is typically for metadata that gets extracted out of context
+  my $declared_font       = ($node->getAttribute('_standalone_font')
+			     ? LaTeXML::Common::Font->textDefault : $LaTeXML::FONT);
   my $desired_font        = $LaTeXML::FONT;
   my %pending_declaration = ();
   if (my $comment = $node->getAttribute('_pre_comment')) {
@@ -872,7 +894,7 @@ sub getInsertionContext {
 # This will move up the tree (closing auto-closable elements),
 # or down (inserting auto-openable elements), as needed.
 sub find_insertion_point {
-  my ($self, $qname) = @_;
+  my ($self, $qname, $has_opened) = @_;
   $self->closeText_internal;    # Close any current text node.
   my $cur_qname = $$self{model}->getNodeQName($$self{node});
   my $inter;
@@ -883,9 +905,14 @@ sub find_insertion_point {
   elsif (($inter = $self->canContainIndirect($cur_qname, $qname))
     && ($inter ne $qname) && ($inter ne $cur_qname)) {
     $self->openElement($inter, font => $self->getNodeFont($$self{node}));
-    return $self->find_insertion_point($qname); }    # And retry insertion (should work now).
-  else {                                             # Now we're getting more desparate...
-        # Check if we can auto close some nodes, and _then_ insert the $qname.
+    return $self->find_insertion_point($qname, $inter); }    # And retry insertion (should work now).
+  elsif ($has_opened) {    # out of options if already inside an auto-open chain
+    Error('malformed', $qname, $self,
+      ($qname eq '#PCDATA' ? $qname : '<' . $qname . '>') . " failed auto-open through <$has_opened> at inadmissible <$cur_qname>",
+      "Currently in " . $self->getInsertionContext());
+    return $$self{node}; }    # But we'll do it anyway, unless Error => Fatal.
+  else {                      # Now we're getting more desparate...
+                              # Check if we can auto close some nodes, and _then_ insert the $qname.
     my ($node, $closeto) = ($$self{node});
     while (($node->nodeType != XML_DOCUMENT_NODE) && $self->canAutoClose($node)) {
       my $parent = $node->parentNode;
@@ -893,11 +920,12 @@ sub find_insertion_point {
         $closeto = $node; last; }
       $node = $parent; }
     if ($closeto) {
+      my $closeto_qname = $$self{model}->getNodeQName($closeto);
       $self->closeNode_internal($closeto);             # Close the auto closeable nodes.
       return $self->find_insertion_point($qname); }    # Then retry, possibly w/auto open's
     else {                                             # Didn't find a legit place.
       Error('malformed', $qname, $self,
-        ($qname eq '#PCDATA' ? $qname : '<' . $qname . '>') . " isn't allowed here",
+        ($qname eq '#PCDATA' ? $qname : '<' . $qname . '>') . " isn't allowed in <$cur_qname>",
         "Currently in " . $self->getInsertionContext());
       return $$self{node}; } } }                       # But we'll do it anyway, unless Error => Fatal.
 
@@ -909,10 +937,8 @@ sub getInsertionCandidates {
   $first = $first->parentNode if $first && $first->getType == XML_TEXT_NODE;
   my $isCapture = $first && ($first->localname || '') eq '_Capture_';
   push(@nodes, $first) if $first && $first->getType != XML_DOCUMENT_NODE && !$isCapture;
-  # This includes the CHILDREN of the current node.
-  # Is this correct? perhaps for attribute, less obviously correct for an element
-###  $node = $node->lastChild if $node && $node->hasChildNodes;
-  while ($node && ($node->nodeType != XML_DOCUMENT_NODE)) {
+  # Collect previous siblings, if node is a text node.
+  if ($node->getType == XML_TEXT_NODE) {
     my $n = $node;
     while ($n) {
       if (($n->localname || '') eq '_Capture_') {
@@ -920,6 +946,14 @@ sub getInsertionCandidates {
       else {
         push(@nodes, $n); }
       $n = $n->previousSibling; }
+    $node = $node->parentNode; }
+  # Now collect (element) node & ancestors
+  while ($node && ($node->nodeType != XML_DOCUMENT_NODE)) {
+    my $n = $node;
+    if (($node->localname || '') eq '_Capture_') {
+      push(@nodes, element_nodes($node)); }
+    else {
+      push(@nodes, $node); }
     $node = $node->parentNode; }
   push(@nodes, $first) if $isCapture;
   return @nodes; }
@@ -1135,7 +1169,8 @@ sub autoCollapseChildren {
     $self->setNodeFont($node, $self->getNodeFont($c));
     $self->removeNode($c);
     foreach my $gc ($c->childNodes) {
-      $node->appendChild($gc); }
+      $node->appendChild($gc);
+      $self->recordNodeIDs($node); }
     # Merge the attributes from the child onto $node
     foreach my $attr ($c->attributes()) {
       if ($attr->nodeType == XML_ATTRIBUTE_NODE) {
@@ -1400,6 +1435,19 @@ sub setNodeFont {
   if ($node->nodeType == XML_ELEMENT_NODE) {
     $node->setAttribute(_font => $fontid); }
   # otherwise, probably just ignorable?
+  return; }
+
+# Possibly a sign of a design flaw; Set the node's font & all children that HAD the same font.
+sub mergeNodeFontRec {
+  my ($self, $node, $font) = @_;
+  return unless ref $font;    # ?
+  my $oldfont = $self->getNodeFont($node);
+  my %props   = $oldfont->purestyleChanges($font);
+  my @nodes   = ($node);
+  while (my $n = shift(@nodes)) {
+    if ($n->nodeType == XML_ELEMENT_NODE) {
+      $self->setNodeFont($n, $self->getNodeFont($n)->merge(%props));
+      push(@nodes, $n->childNodes); } }
   return; }
 
 sub getNodeFont {

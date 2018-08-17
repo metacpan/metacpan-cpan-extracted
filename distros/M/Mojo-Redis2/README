@@ -2,7 +2,7 @@ NAME
     Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
 
 VERSION
-    0.31
+    0.32
 
 DESCRIPTION
     Mojo::Redis2 is a pure-Perl non-blocking I/O Redis <http://redis.io>
@@ -81,16 +81,12 @@ SYNOPSIS
       get '/' => sub {
         my $c = shift;
 
-        $c->delay(
-          sub {
-            my ($delay) = @_;
-            $c->redis->get('some:message', $delay->begin);
-          },
-          sub {
-            my ($delay, $err, $message) = @_;
-            $c->render(json => { error => $err, message => $message });
-          },
-        );
+        my $tx = $c->render_later->tx;
+        $c->redis->get('some:message', sub {
+          my ($redis, $err, $message) = @_;
+          $c->render(json => { error => $err, message => $message });
+          undef $tx;
+        });
       };
 
       app->start;

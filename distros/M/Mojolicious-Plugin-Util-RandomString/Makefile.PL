@@ -10,7 +10,8 @@ WriteMakefile(
   ABSTRACT     => 'Generate Secure Random Strings for Mojolicious',
   VERSION_FROM => 'lib/Mojolicious/Plugin/Util/RandomString.pm',
   BUILD_REQUIRES => {
-    'Test::More' => 0
+    'Test::More' => 0,
+    'Test::Memory::Cycle' => '1.06'
   },
   PREREQ_PM => {
     'Mojolicious' => '3.93',

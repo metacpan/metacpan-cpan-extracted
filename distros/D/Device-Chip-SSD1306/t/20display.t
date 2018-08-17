@@ -55,6 +55,7 @@ my $chip = Device::Chip::SSD1306->new;
    $chip->draw_hline( 0, 31, 2 );
    $chip->draw_vline( 2, 0, 31 );
    $chip->draw_pixel( 8, 8 );
+   $chip->draw_blit( 12, 16, ( " # #", "# # " ) x 4 );
 
    undef @output;
    $chip->refresh->get;
@@ -64,8 +65,10 @@ my $chip = Device::Chip::SSD1306->new;
       '0404ff' . '04'x(32-3),
       # page 1 - all of column 2, plus row 0, column 8
       '0000ff0000000000' . '01' . '00'x23,
-      # pages 2 and 3 - all of column 2
-      ( '0000ff' . '00'x29 ) x 2,
+      # page 2 - all of column 2 then checkerboard at 12..15
+      '0000ff' . '00'x9 . 'aa55aa55' . '00'x16,
+      # page 3 - all of column 2
+      '0000ff' . '00'x29,
       # pages 4 to 7 - no output
    );
    is_deeply( \@output,

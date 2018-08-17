@@ -286,3 +286,12 @@ Revision history for Debug-Easy
         However, you can assign a socket to a filehandle and restore that.
 
         A new version was started due to this drastic change.
+
+2.01    June 13, 2018
+
+        Whoops, Ok, take 2.  The loglevel now shows.  Sorry about that.
+
+2.02    August 10, 2018
+
+        Fixed the DateTime error on object destroy.  It wasn't catestrophic for
+        your code, but it made logs messy.

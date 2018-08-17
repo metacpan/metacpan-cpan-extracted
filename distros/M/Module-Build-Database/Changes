@@ -1,5 +1,11 @@
 Revision history for Module-Build-Database
 
+0.58   Wed Aug 15 18:54:07 PDT 2018
+       Do not strip schema in dump (Kat Tipton)
+       Fix tests (Randall Sindlinger)
+       Fixes for unix_socket_dir (Randall Sindlinger)
+       Fixes for travis (Graham Ollis)
+
 0.57   Tue Mar 24 21:04:25 EDT 2015
        Fixes for test failures. 
 

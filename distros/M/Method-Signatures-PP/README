@@ -65,19 +65,13 @@ DESCRIPTION
     while developing code, and instead use Function::Parameters if you have
     a not completely ancient perl and Method::Signatures::Simple if you're
     still back in the stone age banging rocks together, and to then switch
-    your 'use' line to this module for fatpacking/shipping/etc. - I may yet
-    come up with a better solution to this and/or beg Damian for help doing
-    so, but at the time of writing I can offer no guarantees.
+    your 'use' line to this module for fatpacking/shipping/etc. - and since
+    this code now uses Babble, to create a .pmc you can run:
 
-    Note that PPR requires perl 5.10 and as such so does this module.
-    However, if you need to support older perls, you can
+      perl -MBabble::Filter=Method::Signatures::PP -0777 -pe babble \
+        lib/MyFile.pm >lib/MyFile.pmc
 
-        use Method::Signatures::PP::Compile;
-
-    which uses ingy's Module::Compile to generate a .pmc file that should
-    run fine on whatever version of perl the rest of your code requires.
-    This will likely be rewritten to use a slightly less lunatic compilation
-    mechanism in later releases.
+    (or even use -pi -e on a built distdir)
 
 AUTHOR
      mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>

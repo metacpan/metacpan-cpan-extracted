@@ -4,13 +4,19 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Symbol;
+use Carp;
+use IO::Handle;
+require Exporter;
+our @ISA = 'Exporter';
+our @EXPORT_OK = ('open','autochomp','input_record_separator');
+our %EXPORT_TAGS = ( all =>  [ @EXPORT_OK ] );
 
 BEGIN {
     no strict 'refs';
     *{ 'Acme::IRSRegexp' . "::" } = \*{ __PACKAGE__ . "::" };
 }
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub TIEHANDLE {
     my ($pkg, @opts) = @_;
@@ -19,7 +25,8 @@ sub TIEHANDLE {
 	$handle = Symbol::gensym;
     } else {
 	my $fh = *{shift @opts};
-	open $handle, '<&+', $fh;
+        # will fail if open for $fh failed, but that's not important
+	eval { CORE::open $handle, '<&+', $fh };
     }
     my $rs = shift @opts;
     my %opts = @opts;
@@ -36,16 +43,69 @@ sub TIEHANDLE {
     return $self;
 }
 
+sub open (*;$@) {
+    no strict 'refs';        # or else bareword file handles will break
+    my (undef,$mode,$expr,@list) = @_;
+    if (!defined $_[0]) {
+        $_[0] = Symbol::gensym;
+    }
+    my $glob = $_[0];
+    if (!ref($glob) && $glob !~ /::/) {
+        $glob = join("::",caller(0) || "", $glob);
+        print STDERR "new glob is $glob\n";
+    }
+
+    if ($mode && index($mode,":irs(") >= 0) {
+        my $irs = "";
+        my $p0 = index($mode,":irs(");
+        my $p1 = $p0 + 5;
+        my $nest = 1;
+        while ($nest) {
+            my $c = eval { substr($mode,$p1++,1) };
+            if ($@ || !defined($c)) {
+                carp "Argument list not closed for PerlIO layer \"$irs\"";
+                return;
+            }
+            if ($c eq "\\") {
+                $c .= substr($mode,$p1++,1);
+            }
+            if ($c eq "(") { $nest++ }
+            if ($c eq ")") { $nest-- }
+            if ($nest) { $irs .= $c; }
+        }
+        substr($mode,$p0,length($irs)+6, "");
+        my $z = @list ? CORE::open *$glob, $mode, $expr, @list
+                      : CORE::open *$glob, $mode, $expr;
+        tie *$glob, __PACKAGE__, *$glob, $irs;
+        return $z;
+    }
+    if (@list) {
+        return CORE::open(*$glob,$mode,$expr,@list);
+    } elsif ($expr) {
+        return CORE::open(*$glob,$mode,$expr);
+    } elsif ($mode) {
+        return CORE::open(*$glob,$mode);
+    } else {
+        return CORE::open(*$glob);
+    }
+}
+
 sub _compile_rs {
     my $self = shift;
     my $rs = $self->{rs};
 
     my $q = eval { my @q = split /(?<=${rs})/,""; 1 };
     if ($q) {
-	$self->{rsc} = qr/(?<=${rs})/;
+	$self->{rsc} = qr/(?<=${rs})/s;
+        if ($rs =~ /\?\^\w*m/) {
+            $self->{rsc} = qr/(?<=${rs})/ms;
+        }
 	$self->{can_use_lookbehind} = 1;
     } else {
-	$self->{rsc} = qr/(.*?(?:${rs}))/;
+	$self->{rsc} = qr/(.*?(?:${rs}))/s;
+        if ($rs =~ /\?\^\w*m/) {
+            $self->{rsc} = qr/(.*?(?:${rs}))/ms;
+        }
 	$self->{can_use_lookbehind} = 0;
     }
     return;
@@ -147,16 +207,6 @@ sub OPEN {
 	$self->_clear_buffer;
     }
     return $z;
-}
-
-sub input_record_separator {
-    my $self = shift;
-    if (@_) {
-	$self->{rs} = shift;
-	delete $self->{can_use_lookbehind};
-    }
-    $self->_compile_rs;
-    return $self->{rs};
 }
 
 sub FILENO {
@@ -285,7 +335,7 @@ sub SEEK {
 
 sub TELL {
     my $self = shift;
-    # virtual cursor position is actual position on the filehandle
+    # virtual cursor position is actual position on the file handle
     # minus the length of any buffered data
     my $tell = tell $self->{handle};
     $tell -= length($self->{buffer});
@@ -293,19 +343,68 @@ sub TELL {
     return $tell;
 }
 
-sub open {
-    shift if $_[0] eq __PACKAGE__;
-    my ($regex, $mode, @args) = @_;
-    my %opts;
-    if (@args && ref $args[-1] eq 'HASH') {
-	%opts = %{pop @args};
+
+no warnings 'redefine';
+sub IO::Handle::input_record_separator {
+    my $self = shift;
+    if (ref($self) eq 'GLOB' || ref(\$self) eq 'GLOB') {
+        if (tied(*$self)) {
+            if (ref(tied(*$self)) eq __PACKAGE__) {
+                return input_record_separator($self,@_);
+            }
+            my $z = eval { (tied *$self)->input_record_separator(@_) };
+            if ($@) {
+                carp "input_record_separator is not supported on tied handle";
+            }
+            return $z;
+        }
+        if (!@_) { return $/ }
+        $self = tie *$self, __PACKAGE__, $self, quotemeta($/);
+        return input_record_separator($self,@_);
+    } else {
+        carp "input to input_record_separator was not a handle";
+        return;
     }
-    my $fh = Symbol::gensym;
-    my $hh;
-    my $z = CORE::open $hh, $mode, @args;
-    return if !$z;
-    tie *$fh, __PACKAGE__, $hh, $regex, %opts;
-    return $fh;
+}
+
+
+sub input_record_separator {
+    my $self = shift;
+    if (ref($self) eq 'GLOB' || ref(\$self) eq 'GLOB') {
+        if (!tied *$self) {
+            if (!@_) {
+                return IO::Handle::input_record_separator(*$self);
+            }
+            $self = tie *$self, __PACKAGE__, $self, quotemeta($/);
+        } else {
+            $self = tied *$self;
+        }
+    }
+    if (@_) {
+	$self->{rs} = shift;
+	delete $self->{can_use_lookbehind};
+    }
+    $self->_compile_rs;
+    return $self->{rs};
+}
+
+sub autochomp {
+    my $self = shift;
+    if (ref($self) eq 'GLOB' || ref(\$self) eq 'GLOB') {
+        if (!tied *$self) {
+            if (!@_) {
+                return 0;
+            }
+            $self = tie *$self, __PACKAGE__, $self, quotemeta($/);
+        } else {
+            $self = tied *$self;
+        }
+    }
+    my $val = $self->{autochomp} || 0;
+    if (@_) {
+        $self->{autochomp} = 0+!!$_[0];
+    }
+    return 0+$val;
 }
 
 sub chomp {
@@ -331,7 +430,7 @@ Acme::InputRecordSeparatorIsRegexp - awk doesn't have to be better at something.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -347,6 +446,11 @@ Version 0.03
     # tie-then-open
     tie *{$fh=Symbol::gensym}, 'Acme::IRSRegExp', qr/\r\n|[\r\n]/;
     open $fh, '<', 'file-with-ambiguous-line-endings';
+    $line = <$fh>;
+
+    # import open function and use :irs layer
+    use Acme::InputRecordSeparatorIsRegexp 'open';
+    open my $fh, '<:irs(\r\n|\r|\n)', 'ambiguous.txt';
     $line = <$fh>;
 
 =head1 DESCRIPTION
@@ -368,7 +472,7 @@ A common use case for this module is to read a text file
 that you don't know whether it uses Unix (C<\n>), 
 Windows/DOS (C<\r\n>), or Mac (C<\r>) style line-endings, 
 or even if it might contain all three. To properly parse
-this file, you could tie its filehandle to this package with
+this file, you could tie its file handle to this package with
 the appropriate regular expression:
 
     my $fh = Symbol::gensym;
@@ -401,29 +505,101 @@ where C<$record_sep_regexp> is a string or a C<Regexp> object
 L<< C<qr/.../>|"Quote and quote-like operators"/perlop >> notation)
 containing the regular expression
 you want to use for a file's line endings. Also see the convenience
-method L<"open"> for an alternate way to obtain a filehandle with
+method L<"open"> for an alternate way to obtain a file handle with
 the features of this package.
 
-=head1 METHODS
+=head1 FUNCTIONS
 
 =head2 open
 
-   my $tied_handle = Acme::InputRecordSeparatorIsRegexp->open(
-	$record_separator_regexp, $mode, @openargs);
+Another way of using this package to attach a regular expression
+to the input record separator of a file handle, available since
+v0.04,  is to import this package's C<open> function and to
+specify an C<:irs(...)> layer.
 
-Convenience method to open a file, returning a tied filehandle
-that will read and return records separated according the given regular
-expression. Returns C<undef> and sets C<$!> on error.
-C<%tie_opts> if any, are included in the call to 
-C<tie *HANDLE, 'Acme::InputRecordSeparatorIsRegexp'>.
+   use Acme::InputRecordSeparatorIsRegexp 'open';
+   $result = open FILEHANDLE, "<:irs(REGEXP)", EXPR
+   $result = open FILEHANDLE, "<:irs(REGEXP)", EXPR, LIST
+   $result = open FILEHANDLE, "<:irs(REGEXP)", REFERENCE
+
+   $result = open my $fh, "<:irs(\r|\n|\r\n)", "ambiguous-line-endings.txt"
+
+The C<:irs(...)> layer may be combined with other layers.
+
+   open my $fh, "<:encoding(UTF-16):irs(\R)", "ambiguous.txt"
+
+=head2 autochomp
+
+Returns the current setting, or sets the C<autochomp> attribute
+of a file handle associated with this package. When the
+C<autochomp> attribute of the file handle is enabled, any lines
+read from the file handle through the C<readline> function
+or C<< <> >> operator will be returned with the (custom) line
+endings automatically removed.
+
+    use Acme::InputRecordSeparatorIsRegexp 'open','autochomp';
+    open my $fh, "<:irs(\R)", 'ambiguous.txt';
+    autochomp($fh,1);           # enable autochomp
+    my $is_autochomped = autochomp($fh);
+    autochomp(tied(*$fh), 0);   # disable
+
+This function can also be called as a method on the I<tied>
+file handle.
+
+    (tied *$fh)->autochomp(1);  # enable
+    $fh->autochomp(0);          # not OK, must use tied handle
+
+Enabling C<autochomp> with this function on a regular file handle
+will tie the file handle into this package using the current
+value of C<$/> as the handle's record separator. If you are
+just looking for autochomp functionality and don't care about
+applying regular expressions to determine line endings, this
+function provides an (inefficient) way to do that to
+arbitrary file handles.
+
+The default attribute value is false.
 
 =head2 input_record_separator
 
-    my $rs = (tied *$fh)->input_record_separator();
-    (tied *$fh)->input_record_separator($new_record_separator);
+Returns the current setting, or changes the setting, of a file handle's
+input record separator, I<including file handles that have not
+already been tied to this package>. This overcomes a limitation
+in L<IO::Handle::input_record_separator|IO::Handle/"METHODS">
+where input record separators are not supported on a per-filehandle
+basis.
 
-Get or set the input record separator used for this tied filehandle.
-The argument, if provided, can be a string or a C<Regexp> object.
+With no arguments, returns the input record separator associated
+with the file handle. For regular file handles, this is always
+the current value of L<< C<$/>|perlvar/"$INPUT_RECORD_SEPARATOR" >>.
+
+    use Acme::InputRecordSeperatorIsRegexp ':all';
+
+    open my $fh_reg, "<", "some_text_file";
+    open my $fh_pkg, "<:irs(\d)", "some_text_file";
+
+    $rs = $fh_reg->input_record_separator;    #   "\n"
+    $rs = input_record_separator($fh_reg);    #   "\n"
+    $rs = $fh_pkg->input_record_separator;    #   '\d'
+    $rs = input_record_separator($fh_pkg);    #   '\d'
+
+With two or more arguments, sets the input record separator for
+the file handle as the regular expression indicated by the second
+argument (any argument after the second is ignored). For regular
+file handles, a side effect is that the file handle will be tied 
+to this package
+
+    print ref(tied *$fh_reg);        #   ""
+    $fh_reg->input_record_separator(qr/\r\n|\r|\n/);
+    print ref(tied *$fh_reg);        #   "Acme::InputRecordSeparatorIsRegexp"
+
+If you are just looking for the functionality of setting different
+input record separators on different file handles but don't care about
+applying regular expressions to determine line endings, this function
+provides an (inefficient) way to do that for arbitrary file handles.
+Note that the argument to set the input record separator is treated
+as a regular expression, so apply C<quotemeta> to it as necessary.
+
+=head1 METHODS
 
 =head2 chomp
 
@@ -437,22 +613,10 @@ expression instead of C<$/>. Like the builtin C<chomp>,
 returns the total number of characters removed from
 all its arguments. See also L<"autochomp">.
 
-=head2 autochomp
-
-    my $ac = (tied *$fh)->autochomp;
-    (tied *$fh)->autochomp($boolean);
-
-Gets or sets the autochomp attribute of the filehandle.
-If this attribute is set to a true value, readline 
-operations on this filehandle will return records with
-the record separators removed.
-
-The default value of this attribute is false.
-
 =head1 INTERNALS
 
 In unusual circumstances, you may be interested in some of the
-internals of the tied filehandle object. You can set the values
+internals of the tied file handle object. You can set the values
 of these internals by passing additional arguments to the
 C<tie> statement or passing a hash reference to this package's 
 L<"open"> function, for example:
@@ -464,9 +628,9 @@ L<"open"> function, for example:
 
 The amount of data, in bytes, to read from the input stream at
 a time. For performance reasons, this should be at least a few kilobytes.
-For the module to work correctly, it should also be much larger
+B<For the module to work correctly, it should also be much larger
 than the length of any sequence of characters that could be construed
-as a line ending.
+as a line ending.>
 
 =head1 ALIAS
 
@@ -475,6 +639,17 @@ C<Acme::InputRecordSeparatorIsRegexp>, allowing you to write
 
     use Acme::InputRecordSeparatorIsRegexp;
     tie *$fh, 'Acme::IRSRegexp', 
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item not suitable for streamed input handles, where it is not
+practical for this module to read ahead on the input stream
+
+=item readline is slooooow on Perl v5.8 or earlier
+
+=back
 
 =head1 AUTHOR
 
@@ -486,15 +661,17 @@ Because this package must often pre-fetch input to determine where
 a line-ending is, it is generally not appropriate to apply this
 package to C<STDIN> or other terminal-like input.
 
-Changing C<$/> will have no affect on a filehandle that has
+Changing C<$/> will have no affect on a file handle that has
 already been tied to this package.
 
 Calling L<< C<chomp>|"chomp"/perlfunc >> on a return value from this
 package will operate with C<$/>, B<not> with the regular expression
-associated with the tied filehandle.
+associated with the tied file handle.
 
-Please report any bugs or feature requests to C<bug-tie-handle-regexpirs at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-InputRecordSeparatorIsRegexp>.  I will be notified, and then you'll
+Please report any bugs or feature requests to 
+C<bug-tie-handle-regexpirs at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-InputRecordSeparatorIsRegexp>.  
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -533,7 +710,7 @@ L<perlvar>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Marty O'Brien.
+Copyright 2013-2018 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -574,7 +751,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-members
+tied object members
 
     handle           => *
     buffered_records => []
@@ -639,10 +816,6 @@ test data:
     join a sequence of integers, split on 120|12|345|
     join a sequence of integers, split on 12|120|345|
 
-TO DO:
+TODO
 
-_X_ let  rs  be a real regexp
-    implement autochomp method
-	implement chomp first
-	call chomp on results as you return them
-    implement chomp method
+    test, doc, release can_use_lookbehind

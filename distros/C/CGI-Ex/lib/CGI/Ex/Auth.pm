@@ -19,7 +19,7 @@ use Digest::MD5 qw(md5_hex);
 use CGI::Ex;
 use Carp qw(croak);
 
-$VERSION = '2.46';
+$VERSION = '2.47';
 
 ###----------------------------------------------------------------###
 

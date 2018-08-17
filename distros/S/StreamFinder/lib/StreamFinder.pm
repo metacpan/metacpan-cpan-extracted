@@ -2,6 +2,18 @@
 
 StreamFinder - Fetch actual raw streamable URLs from various radio-station websites.
 
+=head1 INSTALLATION
+
+	To install this module, run the following commands:
+
+	perl Makefile.PL
+
+	make
+
+	make test
+
+	make install
+
 =head1 AUTHOR
 
 This module is Copyright (C) 2017 by
@@ -26,9 +38,9 @@ file.
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
 
-    my $firstStream = $station->get();
+	my $firstStream = $station->get();
 
-    print "First Stream URL=$firstStream\n";
+	print "First Stream URL=$firstStream\n";
 
 	my $url = $station->getURL();
 
@@ -146,7 +158,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 
 =item $station->B<getImageURL>()
 
-Returns the url for the station's "cover art" banner image.
+Returns the url for the station's "cover art" banner image, if any.
 
 =item $station->B<getImageData>()
 
@@ -243,13 +255,13 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Radionomy Tunein IHeartRadio Youtube Reciva Facebook));
+my @supported_mods = (qw(Radionomy IHeartRadio Youtube Reciva Facebook));
 my %haveit;
 
 foreach my $module (@supported_mods)
@@ -272,8 +284,6 @@ sub new
 		return new StreamFinder::Facebook($url);
 	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart\.com\/#) {
 		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp');
-	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {
-		return new StreamFinder::Tunein($url);
 	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
 		return new StreamFinder::Reciva($url);
 	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {

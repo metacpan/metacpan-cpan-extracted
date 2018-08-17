@@ -1,5 +1,15 @@
 Revision history for OpusVL-Preferences
 
+0.33      2018-08-10 11:32:36+01:00 Europe/London
+
+  * Created deployment for nullable fields
+
+0.32      2018-08-10 10:32:36+01:00 Europe/London
+
+  * Fixed display mask and mask char. Both fields are nullable. Mask char is
+    only required if display mask is set.
+  * Display mask and mask char no longer get set to zero if not provided.
+
 0.31      2018-07-18 14:21:39+01:00 Europe/London
 
   * Boolean fields have blank first option in search mode

@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Task;
-$cPanel::TaskQueue::Task::VERSION = '0.850';
+$cPanel::TaskQueue::Task::VERSION = '0.900';
 use strict;
 
 #use warnings;

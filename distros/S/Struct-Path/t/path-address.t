@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 use Struct::Path qw(path);
 
@@ -273,6 +273,21 @@ do {
 
     is($_, 'must remain unchanged', 'Default var ($_) locality check');
 };
+
+# test opts provided via %_
+@r = path({}, [ sub { push @{$_[0]}, $_{opts} } ], assign => "foo", deref => 1, paths => 1);
+is_deeply(
+    \@r,
+    [
+        [{
+            'paths' => 1,
+            'deref' => 1,
+            'assign' => 'foo'
+        }],
+        'foo'
+    ],
+    "opts provided via %_"
+) || diag t_dump \@r;
 
 # original structure must remain unchanged
 ok($frozen_s eq freeze($s_mixed));

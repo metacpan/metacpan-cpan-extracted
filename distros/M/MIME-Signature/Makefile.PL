@@ -26,9 +26,9 @@ WriteMakefile(
         'HTML::Entities' => 0,
         'HTML::Parser'   => 0,
         'MIME::Parser'   => 0,
+        'Path::Tiny'     => 0,
     },
     TEST_REQUIRES => {
-        'Path::Tiny' => 0,
         'Test::More' => 0,
     },
     dist => {

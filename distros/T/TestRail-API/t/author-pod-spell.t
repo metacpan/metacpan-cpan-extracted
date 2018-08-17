@@ -37,6 +37,8 @@ Plugin
 Prove
 Rail
 Results
+Ryan
+Sherer
 TESTSUITE
 TODO
 Test
@@ -126,6 +128,7 @@ neil
 parseConfig
 perfile
 planCallback
+ryan
 stepResult
 teodesian
 testCallback

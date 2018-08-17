@@ -10,7 +10,7 @@ use Carp ();
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG} || 0;
 use constant DEFAULT_PORT => 6379;
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 my $PROTOCOL_CLASS = do {
   my $class = $ENV{MOJO_REDIS_PROTOCOL}
@@ -198,7 +198,7 @@ sub _error {
   return if $self->{destroy};
   return $self->_requeue($c)->_connect($c) unless defined $err;
   return $self->emit(error => $err) unless @$waiting;
-  return $self->$_($err, undef) for grep {$_} map { $_->[0] } @$waiting;
+  $self->$_($err, undef) for grep {$_} map { $_->[0] } @$waiting;
 }
 
 sub _execute {
@@ -340,44 +340,27 @@ Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
 
 =head1 VERSION
 
-0.31
+0.34
 
 =head1 DESCRIPTION
 
 L<Mojo::Redis2> is a pure-Perl non-blocking I/O L<Redis|http://redis.io>
 driver for the L<Mojolicious> real-time framework.
 
-=over
+L<Mojo::Redis2> has not been maintained for a while, and it has some design
+flaws that makes it hard to work with. All of this and more is taken care of in
+L<Mojo::Redis>.
 
-Redis is an open source, BSD licensed, advanced key-value cache and store.
-It is often referred to as a data structure server since keys can contain
-strings, hashes, lists, sets, sorted sets, bitmaps and hyperloglogs.
-- L<http://redis.io>.
+Want to take over L<Mojo::Redis2>? Contact me on github and I'll let you have it.
 
-=back
+I encourage everyone to have a look at L<Mojo::Redis>, and I discourage any new
+codebase from using L<Mojo::Redis2>.
 
-Features:
+=over 2
 
-=over 4
+=item * L<https://github.com/jhthorsen/mojo-redis/issues?utf8=%E2%9C%93&q=is%3Aclosed>
 
-=item * Blocking support
-
-L<Mojo::Redis2> support blocking methods. NOTE: Calling non-blocking and
-blocking methods are supported on the same object, but might create a new
-connection to the server.
-
-=item * Error handling that makes sense
-
-L<Mojo::Redis> was unable to report back errors that was bound to an operation.
-L<Mojo::Redis2> on the other hand always make sure each callback receive an
-error message on error.
-
-=item * One object for different operations
-
-L<Mojo::Redis> had only one connection, so it could not do more than on
-blocking operation on the server side at the time (such as BLPOP,
-SUBSCRIBE, ...). This object creates new connections pr. blocking operation
-which makes it easier to avoid "blocking" bugs.
+=item * L<https://github.com/jhthorsen/mojo-redis2/issues>
 
 =back
 
@@ -433,16 +416,12 @@ the same Redis server. It will also re-use the same connection when you
   get '/' => sub {
     my $c = shift;
 
-    $c->delay(
-      sub {
-        my ($delay) = @_;
-        $c->redis->get('some:message', $delay->begin);
-      },
-      sub {
-        my ($delay, $err, $message) = @_;
-        $c->render(json => { error => $err, message => $message });
-      },
-    );
+    my $tx = $c->render_later->tx;
+    $c->redis->get('some:message', sub {
+      my ($redis, $err, $message) = @_;
+      $c->render(json => { error => $err, message => $message });
+      undef $tx;
+    });
   };
 
   app->start;

@@ -4,13 +4,8 @@ use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 
 my $module_name = 'DBIx::BatchChunker';
-
-my $dist_name = $module_name;
-$dist_name =~ s/::/-/g;
-
-my $module_file = $module_name;
-$module_file =~ s{::}{/}g;
-$module_file = "lib/$module_file.pm";
+my $module_file = 'lib/DBIx/BatchChunker.pm';
+my $dist_name   = 'DBIx-BatchChunker';
 
 # Standard boilerplate WriteMakefile args
 my %WriteMakefileArgs = (
@@ -19,9 +14,9 @@ my %WriteMakefileArgs = (
     VERSION_FROM  => $module_file,
     ABSTRACT_FROM => $module_file,
     AUTHOR        => 'Grant Street Group <developers@grantstreet.com>',
-
-    # The recommended choice by Larry Wall and crew
     LICENSE       => 'artistic_2',
+
+    MIN_PERL_VERSION => '5.8.1',
 
     # Use a sane version of EUMM that supports *_REQUIRES
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '6.64' },
@@ -45,6 +40,7 @@ my %WriteMakefileArgs = (
         x_authority => 'cpan:GSG',
     },
 
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES => "$dist_name-*" },
     test  => { TESTS => 't/*.t' },
 );
@@ -55,7 +51,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM     => {
         # Start from "scan-perl-prereqs --pretty lib"
 
-        'Moo'                    => '2.00',  # sane minimum baseline
+        'Moo'                    => '2.000002',  # bypass the default=>0 + required=>1 bug
         'CLDR::Number'           => 0,
         'Types::Standard'        => '1.00',  # sane minimum baseline
         'Types::Common::Numeric' => 0,
@@ -78,7 +74,9 @@ my %WriteMakefileArgs = (
         'Test2::Tools::Explain'   => 0,
         'Scalar::Util'            => 0,
 
+        'Class::Load' => 0,
         'DBIx::Class' => 0,
+        'DBIx::Connector::Retry' => 0,
         'Path::Class' => 0,
     },
 );
@@ -89,11 +87,44 @@ $WriteMakefileArgs{META_MERGE}{no_index} = { directory => [qw< examples >] };
 # Other prereqs not in *_REQUIRES
 $WriteMakefileArgs{META_MERGE}{prereqs} = {
     runtime => {
-        # Even though we require it in the tests, this is still optional for the module
         suggests => {
+            # Even though we require it in the tests, this is still optional for the module
             'DBIx::Class' => 0,
+
+            # This is only "required" if DBI processing is used
+            'DBIx::Connector::Retry' => 0,
         },
     },
 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# Custom Makefile additions
+package MY;
+
+sub postamble {
+    my $self = shift;
+    return join("\n",
+        '# The first line works around https://github.com/naturalist/pod-markdown-github/issues/7',
+        'devdeps :',
+        "\t".'cpanm --notest Pod::Markdown::Github',
+        "\t".'cpanm --with-develop --installdeps .',
+        '',
+        'readme :',
+        "\t".'$(PERLRUN) -MPod::Readme -e "Pod::Readme->new( input_file => \'$(VERSION_FROM)\', translate_to_file => \'README\',    translation_class => \'Pod::Simple::Text\'     )->run"',
+        "\t".'$(PERLRUN) -MPod::Readme -e "Pod::Readme->new( input_file => \'$(VERSION_FROM)\', translate_to_file => \'README.md\', translation_class => \'Pod::Markdown::Github\' )->run"',
+        '',
+        'prove :',
+        "\t".'prove -lr t/',
+        '',
+        'authorprove :',
+        "\t".'AUTHOR_TESTING=1 prove -lr t/ xt/',
+        '',
+        'authortest :: TEST_FILES += xt/*.t',
+        'authortest :: FULLPERLRUN := AUTHOR_TESTING=1 $(FULLPERLRUN)',
+        'authortest :: test',
+        '',
+        'predist :: devdeps manifest readme authorprove',
+    );
+}
+

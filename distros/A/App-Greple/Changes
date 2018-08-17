@@ -1,5 +1,43 @@
 Revision history for Perl application 'greple'.
 
+8.2901 2018-08-16T05:40:16Z
+
+    - Support https: as well as http:
+
+8.29 2018-08-03T23:41:24Z
+
+    - Deprecate --seqcolor and introduce --colorindex option.
+
+8.2801 2018-08-02T02:26:37Z
+
+    - Fix bug in Filter.pm.
+
+8.27 2018-07-22T15:30:44Z
+
+    - Introduce --seqcolor, --sc option.
+
+8.26 2018-06-26T06:24:12Z
+
+    - Pass filename to filter functions.
+
+8.2502 2018-06-25T08:24:14Z
+
+    - Decode utf8 file name from stdin.
+
+8.2501 2018-06-24T06:41:36Z
+
+    - Print matched count when -c is used with -l option.
+    - Add -do for default debug info.
+    - Use -ml option with perldoc to print module path.
+
+8.24 2018-06-10T02:20:36Z
+
+    - Update -Mdebug module.
+    - Implement --stat option in -Msubst module.
+    - Add no_ignore_case option to Getopt::Long.
+    - Modify -Mdig spec to accept multiple directories and find option.
+    - Option --dm with --uc prints hit count of patterns.
+
 8.2306 2018-04-11T01:39:31Z
 
     - Fixed bug in Grep.pm.

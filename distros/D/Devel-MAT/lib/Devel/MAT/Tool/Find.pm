@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use constant CMD => "find";
 use constant CMD_DESC => "List SVs matching given criteria";

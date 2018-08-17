@@ -26,7 +26,7 @@ This list shall expand as the release grows.
 
 
 our $CURRENT_SEASON = 2018;
-our $CURRENT_STAGE  = $PLAYOFF;
+our $CURRENT_STAGE  = $REGULAR;
 
 our $IS_AUTHOR = 0;
 
@@ -44,12 +44,15 @@ our @EXPORT = qw(
 	$CURRENT_SEASON $CURRENT_STAGE $DATA_DIR
 	$IS_AUTHOR
 	$MERGED_FILE $NORMALIZED_FILE $SUMMARIZED_FILE $NORMALIZED_JSON
+	$DEFAULT_PLAYERFILE_EXPIRATION
 );
 
-our $MERGED_FILE = 'merged.storable';
+our $MERGED_FILE     = 'merged.storable';
 our $NORMALIZED_FILE = 'normalized.storable';
 our $NORMALIZED_JSON = 'normalized.json';
 our $SUMMARIZED_FILE = 'SUMMARIZED';
+
+our $DEFAULT_PLAYERFILE_EXPIRATION = 57600;
 
 1;
 

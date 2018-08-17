@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.622';
+our $VERSION = '1.625';
 
 use Exporter qw( import );
 
@@ -12,6 +12,7 @@ our @EXPORT_OK = qw( table_char_width );
 
 # *) filtered away with: $s =~ s/\p{Space}/ /; $s =~ s/\p{C}//;
 # else range commented out default to 1
+# test with gnome-terminal - ambiguous characters set to narrow
 
 
 sub table_char_width { [
@@ -100,8 +101,8 @@ sub table_char_width { [
  [0x00c62, 0x00c63, 0],
  [0x00c81, 0x00c81, 0], #   Kannada                                 Range: 0C80–0CFF
  [0x00cbc, 0x00cbc, 0],
- [0x00cbf, 0x00cbf, 0], # ###
- [0x00cc6, 0x00cc6, 0], # ###
+ [0x00cbf, 0x00cbf, 0],
+ [0x00cc6, 0x00cc6, 0],
  [0x00ccc, 0x00ccd, 0],
  [0x00ce2, 0x00ce3, 0],
  [0x00d00, 0x00d01, 0], #   Malayalam                               Range: 0D00–0D7F
@@ -142,7 +143,7 @@ sub table_char_width { [
  [0x0109d, 0x0109d, 0],
                         #   Georgian                                Range: 10A0–10FF
  [0x01100, 0x0115f, 2], #   Hangul Jamo                             Range: 1100–11FF
- [0x01160, 0x011ff, 0], # ###
+ [0x01160, 0x011ff, 0],
  [0x0135d, 0x0135f, 0], #   Ethiopic                                Range: 1200–137F
                         #   Ethiopic Supplement                     Range: 1380–139F
                         #   Cherokee                                Range: 13A0–13FF
@@ -279,10 +280,10 @@ sub table_char_width { [
                         #                                           Range: 2FE0-2FEF    not_assigned
  [0x02ff0, 0x03029, 2], #   Ideographic Description Character       Range: 2FF0–2FFF
                         #   CJK Symbols and Punctuation             Range: 3000–303F
- [0x0302a, 0x0302d, 0], # ###
+ [0x0302a, 0x0302d, 0],
  [0x0302e, 0x0303e, 2],
  [0x03040, 0x03096, 2], #   Hiragana                                Range: 3040–309F
- [0x03099, 0x0309a, 0], # ###
+ [0x03099, 0x0309a, 0],
  [0x0309b, 0x03247, 2],
                         #   Katakana                                Range: 30A0–30FF
                         #   Bopomofo                                Range: 3100–312F
@@ -345,7 +346,7 @@ sub table_char_width { [
  [0x0abe8, 0x0abe8, 0],
  [0x0abed, 0x0abed, 0],
  [0x0ac00, 0x0d7af, 2], #   Hangul Syllables                        Range: AC00–D7AF
-#[0x0d7b0, 0x0d7ff, 1], #   Hangul Jamo Extended-B                  Range: D7B0–D7FF ###
+#[0x0d7b0, 0x0d7ff, 1], #   Hangul Jamo Extended-B                  Range: D7B0–D7FF
 #[0x0d800, 0x0dbff, 0], #*) High Surrogate Area                     Range: D800-DBFF    non_print
 #[0x0dc00, 0x0dfff, 0], #*) Low Surrogate Area                      Range: DC00-DFFF    non_print
                         #   Private Use Area                        Range: E000-F8FF    private
@@ -487,7 +488,7 @@ sub table_char_width { [
                         #                                           Range: 11B00-11BFF  not_assigned
  [0x11c30, 0x11c36, 0], #   Bhaiksuki                               Range: 11C00–11C6F
  [0x11c38, 0x11c3d, 0],
- [0x11c3f, 0x11c3f, 0], # ###
+ [0x11c3f, 0x11c3f, 0],
  [0x11c92, 0x11ca7, 0], #   Marchen                                 Range: 11C70–11CBF
  [0x11caa, 0x11cb0, 0],
  [0x11cb2, 0x11cb3, 0],

@@ -4,7 +4,7 @@ package Test::Class::Moose;
 
 use 5.10.0;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 use Moose 2.0000;
 use Carp;
@@ -159,10 +159,43 @@ sub import {
     if ( my $parent = ( delete $args{parent} || delete $args{extends} ) ) {
         my @parents = 'ARRAY' eq ref $parent ? @$parent : $parent;
         $caller->meta->superclasses(@parents);
+        unless ( $caller->isa(__PACKAGE__) ) {
+            croak( _bad_parents_error($caller) );
+        }
     }
     else {
         $caller->meta->superclasses(__PACKAGE__);
     }
+}
+
+sub _bad_parents_error {
+    my $class = shift;
+
+    my @ancestors = $class->meta->linearized_isa;
+
+    # The first element is always $class
+    shift @ancestors;
+
+    my $me = "The $class class";
+    if ( scalar @ancestors == 1 ) {
+        return "$me inherits from $ancestors[0] which does not inherit from "
+          . __PACKAGE__;
+    }
+
+    my $heritage;
+    if ( scalar @ancestors == 2 ) {
+        $heritage .= join ' and ', @ancestors;
+    }
+    else {
+        my $last = pop @ancestors;
+        $heritage .= join ', ', @ancestors;
+        $heritage .= ", and $last";
+    }
+
+    return
+        "$me has $heritage as ancestors "
+      . "but none of these classes inherit from "
+      . __PACKAGE__;
 }
 
 sub _tcm_make_test_class_instances {
@@ -222,7 +255,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 
@@ -369,7 +402,8 @@ run does not match the plan.
 
 =head2 Inheriting from another Test::Class::Moose class
 
-List it as the C<extends> in the import list.
+List it as the C<extends> in the import list. If the base class does not use
+(or extend) Test::Class::Moose, then a compile-time error is thrown.
 
  package TestsFor::Some::Class::Subclass;
  use Test::Class::Moose extends => 'TestsFor::Some::Class';
@@ -585,12 +619,14 @@ See the docs for L<Test::Class::Moose::Runner> for details on running your
 test suite. If you'd like to get up and running quickly, here's a very simple
 test file you can use:
 
- use Test::Class::Moose::Load 't/lib';
- use Test::Class::Moose::Runner;
- Test::Class::Moose::Runner->new->runtests;
+ use Test::Class::Moose::CLI;
+ Test::Class::Moose::CLI->new_with_options->run;
 
 Put this in a file like F<t/run-test-class.t>. When you run it with prove it
 will load all the test classes defined in F<t/lib> and run them sequentially.
+
+See the documentation for L<Test::Class::Moose::CLI> on the options you can
+pass when running tests.
 
 =head2 Skipping Classes and Methods
 
@@ -896,7 +932,7 @@ for you, see L<Test::Class::Moose::Role::AutoUse> in this distribution.
 =item *
 
 The L<Test::Class::Moose::Config> class's C<args> method is now
-deprecated. was a holdover from when Test::Class::Moose was both a parent
+deprecated. This was a holdover from when Test::Class::Moose was both a parent
 class for your test classes and the test class runner.
 
 =back
@@ -918,7 +954,7 @@ L<Test::Class::Moose::Runner> to run your test classes.
 
 =item *
 
-The C<Test::Class::Moose::Role::Paralllel> role has been removed. This has not
+The C<Test::Class::Moose::Role::Parallel> role has been removed. This has not
 done anything except issue a warning since version 0.55.
 
 =back
@@ -978,7 +1014,8 @@ L<Test::Class::Moose::Report> and L<Test::Class::Moose::Report::Method>.
 
 =item *
 
-Removed the long-deprecated TCM::Report::Method->add_to_plan method.
+Removed the long-deprecated C<<
+Test::Class::Moose::Report::Method->add_to_plan method >>.
 
 =back
 
@@ -1151,7 +1188,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge Larry Leszczynski mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
+=for stopwords Andy Jack Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Harald Jörg Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge Larry Leszczynski mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
 
 =over 4
 
@@ -1178,6 +1215,10 @@ Doug Bell <madcityzen@gmail.com>
 =item *
 
 Gregory Oschwald <goschwald@maxmind.com>
+
+=item *
+
+Harald Jörg <Harald.Joerg@arcor.de>
 
 =item *
 
@@ -1255,7 +1296,7 @@ Udo Oji <Velti@signor.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2017 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2018 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

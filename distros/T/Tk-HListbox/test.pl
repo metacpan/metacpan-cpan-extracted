@@ -126,7 +126,7 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 	#ADD SOME ITEMS (IMAGE+TEXT) TO OUR LISTBOX THE TRADITIONAL WAY:
 		my @list = ( 
 			{-image => $licon, -text => 'a'},
-			{-image => $wicon, -text => 'bbbbbbbbbbbbbbbbbbbB', -foreground => '#0000FF', -anchor=>'e' },
+			{-image => $wicon, -text => 'bbbbbbbbbbbbbbbbbbbB', -foreground => '#0000FF' },
 			{-text => 'c', -image => $licon},
 			{-text => 'd:image & indicator!', -image => $licon, -indicatoritemtype, 'image', -indicatorimage => $wicon},
 			{-image => $licon, -text => 'e'},

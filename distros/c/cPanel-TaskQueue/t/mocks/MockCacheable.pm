@@ -7,12 +7,12 @@ our $VERSION = '0.0.3';
 
 sub new {
     my $class = shift;
-    return bless { save_called=>0, load_called=>0 }, $class;
+    return bless { save_called => 0, load_called => 0 }, $class;
 }
 
 sub load_from_cache {
     my $self = shift;
-    my $fh = shift;
+    my $fh   = shift;
 
     $self->{load_called}++;
     $self->{data} = <$fh>;
@@ -20,7 +20,7 @@ sub load_from_cache {
 
 sub save_to_cache {
     my $self = shift;
-    my $fh = shift;
+    my $fh   = shift;
 
     $self->{save_called}++;
     print $fh "Save string: @{[ @$self{'save_called', 'load_called'} ]}";

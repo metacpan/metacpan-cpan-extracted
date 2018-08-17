@@ -23,6 +23,7 @@ test_env();
 $ENV{HOCKEYDB_DATA_DIR} = 't/tmp/data';
 system(qw(mkdir -p t/tmp/));
 system(qw(cp -a t/data t/tmp/));
+system('find t/tmp -name "*.storable" -delete');
 $ENV{HOCKEYDB_NODB} = 1;
 $ENV{HOCKEYDB_DEBUG} = 0;
 my $nhl = Sport::Analytics::NHL->new();

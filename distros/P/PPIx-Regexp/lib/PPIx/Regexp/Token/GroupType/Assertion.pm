@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 
 {
 	my $expl_nla	= 'Negative look-ahead assertion';

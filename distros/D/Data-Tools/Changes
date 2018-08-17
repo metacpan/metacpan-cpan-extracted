@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::Tools
 
+1.18 2018-08-10
+
+    - added data_tools_set_file_io_encoding()
+    - fixed various file IO encoding issues
+
 1.17 2018-08-07
 
     - str_num_comma() can accept second argument--padding symbol or string

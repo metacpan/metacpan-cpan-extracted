@@ -1,7 +1,7 @@
 ---
 abstract: 'Fast array and numeric operation, and provide easy way to C/C++ Binding'
 author:
-  - 'A. U. Thor <kimoto@sakura.ne.jp>'
+  - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -18,4 +18,4 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.0365'
+version: '0.0366'

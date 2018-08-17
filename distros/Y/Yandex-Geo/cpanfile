@@ -1,17 +1,17 @@
 requires "Carp" => "0";
+requires "Class::Tiny" => "0";
 requires "Geo::JSON" => "0";
 requires "JSON::XS" => "0";
 requires "LWP::UserAgent" => "0";
-requires "Object::Tiny" => "0";
 requires "URI" => "0";
 requires "URI::Escape" => "0";
+requires "strict" => "0";
 requires "utf8" => "0";
+requires "warnings" => "0";
 
 on 'test' => sub {
   requires "File::Slurp" => "0";
   requires "Test::More" => "0";
-  requires "strict" => "0";
-  requires "warnings" => "0";
 };
 
 on 'configure' => sub {

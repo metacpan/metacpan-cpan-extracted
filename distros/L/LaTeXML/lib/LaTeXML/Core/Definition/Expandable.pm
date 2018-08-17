@@ -31,21 +31,19 @@ sub new {
       "Expansion is " . ToString($expansion)) unless $expansion->isBalanced;
     # If expansion is Tokens, and no arguments, we're a "trivial macro"
     if (!$parameters) {
-      $trivexpansion = Tokens(substituteTokens($expansion)); }
+      $trivexpansion = $expansion->substituteParameters(); }
   }
   return bless { cs => $cs, parameters => $parameters, expansion => $expansion,
     trivial_expansion => $trivexpansion,
-    locator           => "from " . $source->getLocator(-1),
-    isProtected       => $STATE->getPrefix('protected'),
+    locator           => $source->getLocator,
+    isProtected       => $traits{protected} || $STATE->getPrefix('protected'),
+    isOuter           => $traits{outer} || $STATE->getPrefix('outer'),
+    isLong            => $traits{long} || $STATE->getPrefix('long'),
     isExpandable      => 1,
     %traits }, $class; }
 
 sub isExpandable {
   return 1; }
-
-sub isProtected {
-  my ($self) = @_;
-  return $$self{isProtected}; }
 
 sub getExpansion {
   my ($self) = @_;
@@ -57,8 +55,8 @@ sub getExpansion {
 # Expand the expandable control sequence. This should be carried out by the Gullet.
 sub invoke {
   my ($self, $gullet) = @_;
-  # shortcut for "trivial" macros; but this bypasses tracing & profiling!!!!
-  if (my $triv = $$self{trivial_expansion}) {
+  # shortcut for "trivial" macros; but only if not tracing & profiling!!!!
+  if (my $triv = (!$STATE->lookupValue('TRACINGMACROS')) && $$self{trivial_expansion}) {
     return $triv; }
   else {
     return $self->doInvocation($gullet, $self->readArguments($gullet)); } }
@@ -88,7 +86,7 @@ sub doInvocation {
       print STDERR "\n" . $self->tracingCSName
         . ' -> ' . tracetoString($expansion) . "\n";
       print STDERR $self->tracingArgs(@targs) . "\n" if @args;
-      @result = substituteTokens($expansion, @targs); } }
+      @result = $expansion->substituteParameters(@targs)->unlist; } }
   else {
     if (ref $expansion eq 'CODE') {
       my $t;
@@ -101,13 +99,13 @@ sub doInvocation {
         &$expansion($gullet, @args); }
     else {
       # but for tokens, make sure args are proper Tokens (lists)
-      @result = substituteTokens($expansion,
+      @result = $expansion->substituteParameters(
         map { $_ && (($r = ref $_) && ($r eq 'LaTeXML::Core::Tokens')
             ? $_
             : ($r && ($r eq 'LaTeXML::Core::Token')
               ? Tokens($_)
               : Tokens(Revert($_)))) }
-          @args); } }
+          @args)->unlist; } }
   # Getting exclusive requires dubious Gullet support!
   push(@result, T_MARKER($profiled)) if $profiled;
   return [@result]; }
@@ -117,23 +115,6 @@ sub tracetoString {
   my ($tokens) = @_;
   return join('', map { ($_->getCatcode == CC_CS ? $_->getString . ' ' : $_->getString) }
       $tokens->unlist); }
-
-# NOTE: Assumes $tokens is a Tokens list of Token's and each arg either undef or also Tokens
-# Using inline accessors on those assumptions
-sub substituteTokens {
-  my ($tokens, @args) = @_;
-  my @in     = @{$tokens};    # ->unlist
-  my @result = ();
-  while (@in) {
-    my $token;
-    if (($token = shift(@in))->[1] != CC_PARAM) {    # Non '#'; copy it
-      push(@result, $token); }
-    elsif (($token = shift(@in))->[1] != CC_PARAM) {    # Not multiple '#'; read arg.
-      if (my $arg = $args[ord($$token[0]) - ord('0') - 1]) {
-        push(@result, @$arg); } }                       # ->unlist, assuming it's a Tokens() !!!
-    else {                                              # Duplicated '#', copy 2nd '#'
-      push(@result, $token); } }
-  return @result; }
 
 sub equals {
   my ($self, $other) = @_;

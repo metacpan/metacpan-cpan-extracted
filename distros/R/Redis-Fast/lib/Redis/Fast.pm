@@ -2,7 +2,7 @@ package Redis::Fast;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.21';
+    our $VERSION = '0.22';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -496,7 +496,7 @@ Redis::Fast - Perl binding for Redis database
     ## Die if you can't after that
     my $redis = Redis::Fast->new(reconnect => 60, every => 500_000);
 
-    ## Try each 100ms upto 2 seconds (every is in microseconds)
+    ## Try each 100ms up to 2 seconds (every is in microseconds)
     my $redis = Redis::Fast->new(reconnect => 2, every => 100_000);
 
     ## Disable the automatic utf8 encoding => much more performance

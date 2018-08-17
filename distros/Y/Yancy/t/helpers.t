@@ -78,13 +78,19 @@ my ( $backend_url, $backend, %items ) = init_backend(
     ],
 );
 
-local $ENV{MOJO_LOG_LEVEL} = 'error';
 
 my $t = Test::Mojo->new( 'Yancy', {
     backend => $backend_url,
     collections => $collections,
     read_schema => 1,
 } );
+# We must still set the envvar so Test::Mojo doesn't reset it to "fatal"
+$t->app->log->level( $ENV{MOJO_LOG_LEVEL} = 'error' );
+
+# do not log to std(out,err)
+open my $logfh, '>', \my $logbuf;
+$t->app->log->handle( $logfh );
+
 $t->app->yancy->filter->add( foobar => sub { 'foobar' } );
 $backend = $t->app->yancy->backend;
 
@@ -122,6 +128,7 @@ subtest 'set' => sub {
         is blessed $@->[0], 'JSON::Validator::Error' or diag explain $@;
         my $message = $@->[0]{message};
         my $path = $@->[0]{path};
+        ; print explain $t->app->log->history;
         is $t->app->log->history->[-1][1], 'error',
             'error message is logged at error level';
         like $t->app->log->history->[-1][2], qr{Error validating item with ID "$set_id" in collection "people": $message \($path\)},

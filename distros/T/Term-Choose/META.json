@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-Choose",
    "no_index" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.622",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.625",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

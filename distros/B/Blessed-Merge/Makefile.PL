@@ -22,7 +22,7 @@ WriteMakefile(
     	'Scalar::Util' => '0',
 		'Carp' => '0',
 		'Combine::Keys' => '0.09',	
-		'Import::Export' => '0.04',
+		'Import::Export' => '0.06',
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Blessed-Merge-*' },

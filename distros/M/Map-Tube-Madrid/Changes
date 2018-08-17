@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.14  2018-08-16
+      - Updated dependency on Map::Tube v3.55.
+
 0.13  2018-07-17
       - Added package Map::Tube::Madrid::Line::L1
       - Added map image for Line L1.

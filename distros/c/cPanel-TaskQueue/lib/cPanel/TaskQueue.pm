@@ -1,5 +1,5 @@
 package cPanel::TaskQueue;
-$cPanel::TaskQueue::VERSION = '0.850';
+$cPanel::TaskQueue::VERSION = '0.900';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 
@@ -105,11 +105,11 @@ my $taskqueue_uuid = 'TaskQueue';
 
 # Class-wide definition of the valid processors
 my %valid_processors;
-END { undef %valid_processors } # case CPANEL-10871 to avoid a SEGV during global destruction
+END { undef %valid_processors }    # case CPANEL-10871 to avoid a SEGV during global destruction
 
 {
-   my $FILETYPE      = 'TaskQueue';    # Identifier at the beginning of the state file
-   my $CACHE_VERSION = 3;              # Cache file version number.
+    my $FILETYPE      = 'TaskQueue';    # Identifier at the beginning of the state file
+    my $CACHE_VERSION = 3;              # Cache file version number.
 
     # State File
     #
@@ -407,8 +407,9 @@ END { undef %valid_processors } # case CPANEL-10871 to avoid a SEGV during globa
 
             if ( $self->_add_task_to_waiting_queue($task) ) {
                 push @uuids, $task->uuid();
-            } else {
-                push @uuids, undef; # failed task
+            }
+            else {
+                push @uuids, undef;    # failed task
             }
         }
 
@@ -718,7 +719,8 @@ END { undef %valid_processors } # case CPANEL-10871 to avoid a SEGV during globa
     }
 
     sub _get_task_processor_for_task_or_throw {
-        my($self, $task) = @_;
+        my ( $self, $task ) = @_;
+
         # Validate the incoming task.
         # It must be a command we recognize, have valid parameters, and not be a duplicate.
         my $proc = _get_task_processor($task);
@@ -744,6 +746,7 @@ END { undef %valid_processors } # case CPANEL-10871 to avoid a SEGV during globa
         my $guard = $self->{disk_state}->synch();
 
         $self->_add_task_to_waiting_queue($task) or return;
+
         # Changes to the queue are complete, save to disk.
         $guard->update_file();
 
@@ -849,20 +852,21 @@ END { undef %valid_processors } # case CPANEL-10871 to avoid a SEGV during globa
 
         # Separate deferred tasks from non-deferred tasks.
         my @defer;
-        my @proc;
         foreach my $task ( @{ $self->{deferral_queue} } ) {
             if ( _get_task_processor($task)->is_task_deferred( $task, $self->{defer_obj} ) ) {
                 push @defer, $task;
             }
             else {
 
+                $self->_process_overrides($task);
+                next if $self->_is_duplicate_command($task);
+
                 # move 'no longer deferred' tasks in reverse order to processing list
-                unshift @proc, $task;
+                unshift @{ $self->{queue_waiting} }, $task;
             }
         }
 
         # update queues
-        $self->{queue_waiting} = [ @proc, @{ $self->{queue_waiting} } ] if @proc;
         $self->{deferral_queue} = \@defer;
         return;
     }

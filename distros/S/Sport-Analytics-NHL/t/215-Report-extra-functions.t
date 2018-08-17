@@ -20,8 +20,7 @@ $report->process();
 $report->build_resolve_cache();
 
 isa_ok($report->{resolve_cache}, 'HASH');
-#use Data::Dumper;
-#print Dumper [keys %{$report->{resolve_cache}}];
+
 my $p = 0;
 
 for my $team (keys %{$report->{resolve_cache}}) {

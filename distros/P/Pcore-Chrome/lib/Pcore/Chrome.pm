@@ -1,50 +1,45 @@
-package Pcore::Chrome v0.4.1;
+package Pcore::Chrome v0.4.2;
 
-use Pcore -dist, -const, -class;
+use Pcore -dist, -class, -res;
 use Pcore::Chrome::Tab;
 use Pcore::Util::Scalar qw[is_plain_coderef];
 use Pcore::Util::Data qw[from_json];
 
-has host => '127.0.0.1';
-has port => 9222;
+has bin           => ();
+has host          => '127.0.0.1';
+has port          => 9222;
+has user_data_dir => sub { P->file->tempdir };
+has useragent     => ();
 
-has user_data_dir => ();
-has _proc         => ();
-
-const our $DEFAULT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36';
+has _proc => ();
 
 # https://chromedevtools.github.io/devtools-protocol/tot/
 
 sub DESTROY ( $self ) {
 
     # term process group
-    kill '-TERM', $self->{_proc}->{pid} if $self->{_proc};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+    kill '-TERM', $self->{_proc}->{pid} if defined $self->{_proc};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
     return;
 }
 
-sub run ( $self, @args ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
+# TODO use ping instead of timeout
+around new => sub ( $orig, $self, %args ) {
     $args{bin} ||= $MSWIN ? "$ENV{'ProgramFiles(x86)'}/Google/Chrome/Application/chrome.exe" : '/usr/bin/google-chrome';
 
-    $args{host} ||= '127.0.0.1';
+    my $user_args = delete $args{args};
 
-    $args{port} ||= ( P->net->get_free_port( $args{host} ) // die q[Error get free port] );
+    $self = $self->$orig(%args);
 
-    my $useragent = !exists $args{useragent} ? $DEFAULT_USERAGENT : $args{useragent};
+    $self->{host} ||= '127.0.0.1';
 
-    $self->{user_data_dir} = $args{user_data_dir} // P->file->tempdir;
+    $self->{port} ||= ( P->net->get_free_port( $args{host} ) or die q[Error get free port] );
 
     my $cmd = [
         qq["$args{bin}"],
 
-        "--remote-debugging-address=$args{host}",
-        "--remote-debugging-port=$args{port}",
+        "--remote-debugging-address=$self->{host}",
+        "--remote-debugging-port=$self->{port}",
 
         '--disable-background-networking',
         '--disable-client-side-phishing-detection',
@@ -76,13 +71,13 @@ sub run ( $self, @args ) {
         '--no-sandbox',
 
         # user agent
-        defined $useragent ? qq[--user-agent="$useragent"] : (),
+        defined $self->{useragent} ? qq[--user-agent="$self->{useragent}"] : (),
 
         # headless mode
         $args{headless} || !$MSWIN ? ( '--headless', '--disable-gpu' ) : (),
 
         # user args
-        $args{args} ? $args{args}->@* : (),
+        $user_args ? $user_args->@* : (),
 
         # open "about:blank" by default
         'about:blank',
@@ -91,69 +86,41 @@ sub run ( $self, @args ) {
         !$MSWIN ? '2>/dev/null' : (),
     ];
 
-    P->sys->run_proc(
-        join( q[ ], $cmd->@* ),
-        win32_create_no_window => 1,
-        on_ready               => sub ($proc) {
-            $self->{_proc} = $proc;
+    $self->{_proc} = P->sys->run_proc1( join( q[ ], $cmd->@* ), win32_create_no_window => 1 );
 
-            $self->{host} = $args{host};
-            $self->{port} = $args{port};
+    Coro::AnyEvent::sleep( $args{timeout} // 3 );
 
-            # wait for chrome
-            $proc->{timer} = AE::timer $args{timeout} // 3, 0, sub {
-                delete $proc->{timer};
+    return $self;
+};
 
-                $rouse_cb ? $cb ? $rouse_cb->( $cb->($self) ) : $rouse_cb->($self) : $cb ? $cb->($self) : ();
-
-                return;
-            };
-
-            return;
-        },
-    );
-
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
-}
-
-sub get_tabs ( $self, $cb ) {
-    P->http->get(
+sub tabs ( $self ) {
+    return P->http->get(
         "http://$self->{host}:$self->{port}/json",
         sub ($res) {
+            say dump $res;
+
             my $tabs = from_json $res->{data};
 
             for my $tab ( $tabs->@* ) {
                 $tab = bless { chrome => $self, id => $tab->{id} }, 'Pcore::Chrome::Tab';
             }
 
-            $cb->( $self, $tabs );
-
-            return;
+            return res 200, $tabs;
         }
     );
-
-    return;
 }
 
-sub new_tab ( $self, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my $url = $args[0] ? "?$args[0]" : q[?about:blank];
-
-    P->http->get(
-        "http://$self->{host}:$self->{port}/json/new$url",
+sub new_tab ( $self, $url = undef ) {
+    return P->http->get(
+        "http://$self->{host}:$self->{port}/json/new?" . ( $url // 'about:blank' ),
         sub ($res) {
             my $data = from_json $res->{data};
 
             my $tab = bless { chrome => $self, id => $data->{id} }, 'Pcore::Chrome::Tab';
 
-            $cb->( $self, $tab );
-
-            return;
+            return $tab;
         }
     );
-
-    return;
 }
 
 1;
@@ -163,7 +130,7 @@ sub new_tab ( $self, @args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 82                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 77                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -180,7 +147,7 @@ Pcore::Chrome
 
     use Pcore::Chrome;
 
-    my $chrome = Pcore::Chrome->new->run(
+    my $chrome = Pcore::Chrome->new(
         host      => '127.0.0.1',     # chrome --remote-debugging-address
         port      => 9222,            # chrome --remote-debugging-port
         bin       => undef,           # chrome binary path

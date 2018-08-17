@@ -6,11 +6,12 @@ use lib "$FindBin::Bin/lib";
 
 #Test things we can only mock, because the API doesn't support them.
 
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 18;
 use TestRail::API;
 use Test::LWP::UserAgent::TestRailMock;
 use Scalar::Util qw{reftype};
-use Capture::Tiny qw{capture};
+use Capture::Tiny qw{capture capture_stderr};
+use Test::Fatal;
 
 my $browser = $Test::LWP::UserAgent::TestRailMock::mockObject;
 my $tr = TestRail::API->new('http://hokum.bogus','fake','fake',undef,1);
@@ -51,3 +52,26 @@ is($res,-404,"Can't close plan that doesn't exist");
 # Test case type method
 my $ct = $tr->getCaseTypeByName("Automated");
 is($ct->{'id'},1,"Can get case type by name");
+
+#Test #142
+$tr = TestRail::API->new('http://locked.out','fake','fake',undef,1);
+$tr->{'browser'} = $browser;
+$tr->{'debug'} = 0;
+
+like( exception { $tr->getUsers() } , qr/stay out you red menace/i, "API dies on bad auth");
+
+$tr = TestRail::API->new('http://locked.out/worse','fake','fake',undef,1);
+$tr->{'browser'} = $browser;
+$tr->{'debug'} = 0;
+
+like( exception { $tr->getUsers() } , qr/could not find pants/i, "API dies on no auth or auth backend failure");
+
+$tr = TestRail::API->new('http://bork.bork','fake','fake',undef,1,undef,2);
+$tr->{'browser'} = $browser;
+$tr->{'debug'} = 0;
+$tr->{retry_delay} = 0;
+
+my $rc;
+my $oot = capture_stderr { $rc = $tr->getUsers() };
+like ($oot,qr/re-trying request/i, "Tried twice to make the call work");
+is($rc,-500,"Right code returned when re-tries run out");

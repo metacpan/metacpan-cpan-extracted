@@ -5,7 +5,7 @@ Mojolicious::Plugin::Loco - launch a web browser; easy local GUI
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -61,13 +61,17 @@ This module is currently experimental; the API may change without notice.
 
 =head1 OPTIONS
 
+=head2 config_key
+
+Key of the configuration hash (C<app-E<gt>config>) containing plugin option values.  Default is C<'loco'>.  If false, then C<app-E<gt>config> is not consulted.
+
 =head2 initial_wait
 
-How many seconds for the server to wait for the initial browser window to finish loading before giving up and shutting down.  Zero means wait forever.  Default is 15.  Settable from L</loco-E<gt>conf> as long as you do it before server start.
+How many seconds for the server to wait for the initial browser window to finish loading before giving up and shutting down.  Zero means wait forever.  Default is 15.
 
 =head2 final_wait
 
-How many seconds for the server to wait after the last browser window ceases communicating before shutting down (we do not rely on C<window.unload>).  Default is 3.  Settable from L</loco-E<gt>conf>.
+How many seconds for the server to wait after the last browser window ceases communicating before shutting down (we do not rely on C<window.unload>).  Default is 3.
 
 Since javascript timer events from backgrounded/hidden tabs/windows are typically throttled in current browsers, reducing this below 2 will most likely make the application terminate prematurely if all windows are hidden or minimized.
 
@@ -93,14 +97,15 @@ Read L</"SECURITY CONSIDERATIONS"> if you think you might want to set this.
 
 =head1 HELPERS
 
-=head2 loco->conf
+=head2 loco->config
 
 Get or set plugin configuration L<options|/OPTIONS>.  Note that most values are only meaningful prior to server start so changing them thereafter won't affect anything.
 
-  $c->loco->conf                       # -> full hash of settings
-  $c->loco->conf('final_wait')         # -> 3
-  $c->loco->conf(final_wait => 200)    # -> $c, sets final_wait
-  $c->loco->conf({final_wait => 200})  # -> same
+  $c->loco->config                         # -> full hash of settings
+  $c->loco->config('final_wait')           # -> 3
+  $c->loco->config(final_wait => 200)      # -> $c, sets final_wait
+  $c->loco->config({final_wait => 200})    # -> same
+  app->config('loco')->{final_wait} = 200  # same effect if config_key not changed
 
 =head2 loco->id
 
@@ -208,9 +213,9 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 register
 
-  $plugin->register(Mojolicious->new, entry => '/');
+  $plugin->register($app, entry => '/', initial_wait => 15);
 
-Register plugin in L<Mojolicious> application.
+Register plugin in L<Mojolicious> application.  Key-value pairs give default L<option|/OPTIONS> values for this application.  Everything other than L</config_key> may be overridden in the L<application configuration|Mojolicious#config>.
 
 =head1 SEE ALSO
 

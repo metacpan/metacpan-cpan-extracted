@@ -10,6 +10,7 @@ my @files = (
     'lib/String/Interpolate/RE.pm',
     't/00-compile.t',
     't/00-load.t',
+    't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/format.t',
     't/interp.t',

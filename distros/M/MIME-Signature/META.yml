@@ -4,7 +4,6 @@ author:
   - 'Martin H. Sluka <fany@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Path::Tiny: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -23,8 +22,9 @@ requires:
   HTML::Entities: '0'
   HTML::Parser: '0'
   MIME::Parser: '0'
+  Path::Tiny: '0'
   perl: '5.014'
 resources:
   homepage: https://github.com/fany/MIME-Signature
-version: '0.11'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

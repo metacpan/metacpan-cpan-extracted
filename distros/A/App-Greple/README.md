@@ -2,6 +2,10 @@
 
 greple - extensible grep with lexical expression and region handling
 
+# VERSION
+
+Version 8.2901
+
 # SYNOPSIS
 
 **greple** \[**-M**_module_\] \[ **-options** \] pattern \[ file... \]
@@ -36,13 +40,14 @@ greple - extensible grep with lexical expression and region handling
       --format LABEL=...   define line number and file name format
     FILE
       --glob=glob          glob target files
-      --chdir              change directory before search
+      --chdir=dir          change directory before search
       --readlist           get filenames from stdin
     COLOR
       --color=when         use terminal color (auto, always, never)
       --nocolor            same as --color=never
       --colormap=color     R, G, B, C, M, Y etc.
       --colorful           use default multiple colors
+      --colorindex=flags   color index method: Ascend/Descend/Block/Random
       --ansicolor=s        ANSI color 16, 256 or 24bit
       --[no]256            same as --ansicolor 256 or 16
       --regioncolor        use different color for inside/outside regions
@@ -128,8 +133,9 @@ number of required patterns.  So
     greple '+foo bar baz'
 
 commands implicitly set the option `--need 1`, and consequently print
-all lines including \`foo'.  If you want to search lines which includes
-either or both of \`bar' and \`baz', use like this:
+all lines including \`foo'.  In other words, it makes other patterns
+optional.  If you want to search lines which includes either or both
+of \`bar' and \`baz', use like this:
 
     greple '+foo bar baz' --need 2
     greple '+foo bar baz' --need +1
@@ -219,7 +225,7 @@ like this:
 Also **dig** module implements more complex search.  It can be used
 simple as this:
 
-    greple -Mdig --dig .
+    greple -Mdig pattern --dig .
 
 but this command finally translated into following option list.
 
@@ -227,7 +233,7 @@ but this command finally translated into following option list.
         -type f ! -name .* ! -name *,v ! -name *~ 
         ! -iname *.jpg ! -iname *.jpeg ! -iname *.gif ! -iname *.png 
         ! -iname *.tar ! -iname *.tbz  ! -iname *.tgz ! -iname *.pdf 
-        -print --
+        -print -- pattern
 
 # OPTIONS
 
@@ -661,8 +667,35 @@ or `(?<c>\w)\g{c}`.
     the pattern.  If multiple patterns and multiple colors are specified,
     each patterns are colored with corresponding colors cyclically.
 
-    Option **--regioncolor**, **--uniqcolor** and **--random** change this
-    behavior.
+    Option **--regioncolor**, **--uniqcolor** and **--colorindex** change
+    this behavior.
+
+- **--colorindex**=_spec_, **--ci**=_spec_
+
+    Specify color index method by combination of spec characters.
+    Meaningful combinations are **A**, **D**, **AB**, **DB** and **R**.
+
+    - A (Ascending)
+
+        Apply different color sequentially according to the order of
+        appearance.
+
+    - D (Descending)
+
+        Apply different color sequentially according to the reversed order of
+        appearance.
+
+    - B (Block)
+
+        Reset sequential index on every block.
+
+    - R (Random)
+
+        Apply random color.
+
+- **--random**
+
+    Shortcut for **--colorindex=R**.
 
 - **--ansicolor**=_16_|_256_|_24bit_
 
@@ -696,11 +729,6 @@ or `(?<c>\w)\g{c}`.
     fashion.  If you want case-insensitive match and case-sensitive color
     selection, indicate insensitiveness in the pattern rather than command
     option (e.g. '_(?i)pattern_').
-
-- **--random**
-
-    Use random selected color to display matched string each time.
-    Disabled by default.
 
 - **--face**=\[-+\]_effect_
 
@@ -852,7 +880,7 @@ or `(?<c>\w)\g{c}`.
 
     produces output, as a matter of fact.  Think of the situation
     searching, say, `' PATTERN '` with this condition.  Matched area
-    includes surrounding spaces, and meets the both condition partially.
+    includes surrounding spaces, and satisfies both conditions partially.
     This match does not occur when option **--strict** is given, either.
 
 ## CHARACTER CODE

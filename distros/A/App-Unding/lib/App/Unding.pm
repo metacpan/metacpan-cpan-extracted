@@ -1,5 +1,5 @@
 package App::Unding;
-$App::Unding::VERSION = '0.009';
+$App::Unding::VERSION = '0.012';
 use strict;
 use warnings;
 # Autor: Boris Däppen, 2018
@@ -11,6 +11,8 @@ use v5.6.0;
 
 # THIS IS A STUB MODULE FOR CPAN INDEXING
 # https://www.perl.com/article/how-to-upload-a-script-to-cpan/
+
+1;
 
 __END__
 
@@ -24,7 +26,7 @@ App::Unding - dark magic, encrypted wallet
 
 =head1 VERSION
 
-version 0.009
+version 0.012
 
 =head1 SYNOPSIS
 

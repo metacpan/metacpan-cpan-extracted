@@ -4,11 +4,11 @@ Email::Extractor - Fast email crawler
 
 # VERSION
 
-version 0.01
+version 0.03
 
 # SYNOPSIS
 
-    my $crawler = Email::Extractor->new( only_language => 'ru' );
+    my $crawler = Email::Extractor->new( only_language => 'ru', timeout => 30 );
     
     $crawler->search_until_attempts('https://example.com' , 5);
 
@@ -43,23 +43,28 @@ Constructor
 Params:
 
     only_lang - array of languages to check, by default is C<ru>
+    timeout   - timeout of each request in seconds, by default is C<20>
 
 ## search\_until\_attempts
 
-Search for email until number of search\_until\_attempts
+Search for email until specified number of GET requests
+
+    my $emails = $crawler->search_until_attempts( $uri, 5 );
+
+Return `ARRAYREF` or `undef` if no emails found
 
 ## get\_emails\_from\_uri
 
 High-level function uses [Email::Find](https://metacpan.org/pod/Email::Find)
 
-Found all emails in html page
+Found all emails (regexp accoding RFC 822 standart) in html page
 
     $emails = $crawler->get_emails_from_uri('https://example.com');
     $emails = $crawler->get_emails_from_uri('user/test.html');
 
 Function can accept http(s) uri or file paths both
 
-Return `ARRAYREF`
+Return `ARRAYREF` (can be empty)
 
 ## extract\_contact\_links
 
@@ -93,7 +98,7 @@ Veriables for debug:
     $self->{non_contact_links}  # links assumed not contained company contacts
     $self->{last_uri}
 
-Return `ARRAYREF`
+Return `ARRAYREF` or `undef` if no contact links found
 
 ## contacts
 
@@ -104,6 +109,14 @@ Return hash with contacts word in different languages
 ## url\_with\_contacts
 
 Return array of words that may contain contact url
+
+    perl -Ilib -E "use Email::Extractor; use Data::Dumper; print Dumper Email::Extractor::url_with_contacts();"
+
+## get\_exceptions
+
+Return array of addresses that [Email::Find](https://metacpan.org/pod/Email::Find) consider as email but in fact it is no
+
+    perl -Ilib -E "use Email::Extractor; use Data::Dumper; print Dumper Email::Extractor::exceptions();"
 
 ## get\_encoding
 
@@ -121,6 +134,8 @@ If called without parametes it return encoding of last text loaded by function l
 Return hash with contacts word in different languages
 
     perl -Ilib -E "use Email::Extractor; use Data::Dumper; print Dumper Email::Extractor::contacts();"
+
+Links checked in uppercase and lowecase also
 
 ## get\_encoding
 

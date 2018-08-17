@@ -1,0 +1,45 @@
+[% USE JSON %]
+<style>
+script {
+    display: block;
+    font-family: monospace;
+}
+</style>
+
+<p>
+Simply putting in TT variables into JSON generally isn't a good idea.
+</p>
+
+<pre>
+var some_string = "[% some_string %]";
+</pre>
+
+<p>
+The JSON plugin allows you to embed variables into javascript easily enough
+so that things don't get garbled.  Note that it provides the quotes as necessary.
+</p>
+
+<pre>
+var bad = "[% some_string.json %]";
+var some_string = [% some_string.json %];
+var a_number = [% a_number.json %];
+</pre>
+
+<script>
+console.log([% malicious.json %]);
+</script>
+
+<p>
+A simple way to prevent &lt;/script&gt; tags from breaking the flow of the
+json is to replace the &lt; with an escaped version of the character.  That
+preserves the string in javascript, while preventing the browser from
+reading it as the end of the script tag.
+</p>
+<p>
+Note the use of \unnnnn rather than \xnn.  This is because we still want
+it to be valid JSON as well as valid javascript.
+</p>
+
+<pre>
+console.log([% malicious.json.replace('<','\u003c') %]);
+</pre>

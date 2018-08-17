@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.023';
+our $VERSION = '2.025';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -387,7 +387,7 @@ sub run {
 
                 TABLE: while ( 1 ) {
 
-                    my ( $join, $union, $subquery, $db_setting ) = ( '  Join', '  Union', '  SQ', '  DB settings' );
+                    my ( $join, $union, $subquery, $db_setting ) = ( '  Join', '  Union', '  select from (SQ)', '  DB settings' );
                     my $hidden = $db_string;
                     my $table;
                     if ( $sf->{redo_table} ) {
@@ -699,7 +699,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.023
+Version 2.025
 
 =head1 DESCRIPTION
 

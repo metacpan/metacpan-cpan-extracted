@@ -52,11 +52,12 @@
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Getopt::Long" : "0",
-            "Moose" : "0",
-            "MooseX::Log::Log4perl" : "0",
+            "Moo" : "0",
             "OpenAPI::Client" : "0.17",
             "Pod::Usage" : "0",
             "Try::Tiny" : "0",
+            "Type::Tiny::Class" : "0",
+            "Types::Standard" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -80,11 +81,11 @@
    "provides" : {
       "WebService::KvKAPI" : {
          "file" : "lib/WebService/KvKAPI.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "WebService::KvKAPI::Spoof" : {
          "file" : "lib/WebService/KvKAPI/Spoof.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -95,7 +96,7 @@
          "web" : "https://gitlab.com/mintlab/webservice-kvkapi"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_contributors" : [
       "Wesley Schwengle <wesley@schwengle.net>"
    ],

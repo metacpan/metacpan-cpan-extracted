@@ -1,37 +1,588 @@
-Tk::HMListbox Module 3.00
+NAME
+    Tk::HMListbox - Sortable Multicolumn HListbox (allowing icons, along
+    with text) with arrows in headers indicating sort order.
 
-Tk::HMListbox is a derivitive of Tk::SMListbox that adds the 
-ability to include images, as well as text, as supported by the 
-underlying HList widget.  The main physical difference between 
-Tk::HMListbox and Tk::SMListbox is that it is derived from HList.  However, 
-the purpose of this widget is to provide a drop-in Tk::HList-based 
-replacement for Tk::SMListbox and Tk::MListbox, hence the interface is 
-designed to match that of Tk::SMListbox while providing most of the 
-features of Tk::HList.
+AUTHOR
+    Jim Turner
 
-Tk::HMListbox supportsall the options provided by Tk::SMListbox, but 
-adds the "-itemtype" column-configuration option.
-Tk::HListbox lets the user create multi-column Listboxes with images 
-(icons) either in lieu of or along with text strings as selectable 
-options.  One can also mix columns containing text, images, or both 
-in the same HMListbox.
+    (c) 2015, Jim Turner under the same license that Perl 5 itself is. All
+    rights reserved.
 
-Tk::HListbox is scrollable and supports the Scrolled() method.
+    Tk::SMListbox author: me
 
-I created Tk::HMListbox (a replacement for Tk::SMListbox and Tk::MListbox) 
-in order to add a column of tiny icons in my "jfm4" file manager application.  
-I also felt that such a widget would be useful to others, seeing that 
-nothing other than Tk::HList currently exists for creating a list of 
-selectable images, but which could be used in an existing application 
-that uses Tk::SMListbox or Tk::MListbox.
+    Tk::HListbox author: me
 
-test.pl is a very simple file browser for unix/windows.
+    Tk::MListbox authors: Hans Jorgen Helgesen, hans_helgesen@hotmail.com
+    (from March 2000: hans.helgesen@novit.no)
 
-To install, type
+SYNOPSIS
+    use Tk::HMListbox;
 
-	$ perl Makefile.PL
-	$ make
-	$ make test
-	$ make install
+    $hml = $parent->HMListbox (<options>);
 
-Tk::HMListbox.pm contains pod documentation.
+DESCRIPTION
+    Tk::HMListbox is a derivitive of my Tk::SMListbox (and thus Tk::MListbox
+    that uses Tk::HListbox (instead of Tk::Listbox, as used by the latter
+    two) which was done to allow for image icons to be included in columns
+    along with the traditional text strings. I created both of these
+    Tk::H*Listbox widgets in order to include a column of tiny file-type
+    icons, in addition to the other file attribute columns in my JFM4
+    Perl/Tk-based file-manager application. Tk::HMListbox is designed to
+    work as a drop-in replacement for either Tk::SMListbox or Tk::MListbox,
+    maintaining backward-compatability with both.
+
+    Sorting is done by clicking on one of the column headings in the widget.
+    The first click will sort the data with the selected column as key, a
+    new click will reverse the sort order.
+
+EXAMPLES
+    my $table = $w->Scrolled('HMListbox'
+
+            -scrollbars => 'se', 
+
+            -height => 12,
+
+            -relief => 'sunken',
+
+            -sortable => 1,   #USER CAN SORT BY COLUMN BY CLICKING ON THE COLUMN HEADER BUTTON.
+
+            -selectmode => 'extended',
+
+            -showallsortcolumns => 1,  #SHOW SORT DIRECTION ARROW ON ALL SORTED COLUMNS.
+
+            -takefocus => 1,
+
+            -borderwidth => 1,
+
+            -fillcolumn => 1,   #IF WINDOW RESIZED, EXPAND COLUMN 1 ("Name") TO FILL THE EXTRA SPACE.
+
+            -columns => [    #COLUMN WIDTH, SORT FUNCTIONS, HEADER BUTTON INFORMATION, ETC.:
+
+                [-itemtype => 'imagetext', -text => '~D', -width => 4, 
+                    -comparecmd => sub { $_[0]->{'-sort'} cmp $_[1]->{'-sort'} } ],
+
+                [-text => '~Name', -width => 25 ],
+
+                [-text => '~Perm.', -width => 10 ],
+
+                [-text => '~Owner:Group', -width => 14 ],
+
+                [-text => '~Size', -width => 8 ],
+
+                [-text => 'Date/~Time', -width => 15, -reversearrow => 1, -comparecommand => sub { $_[1] cmp $_[0] }],
+
+            ]
+
+            )->pack(
+
+                    -expand => 'yes',
+
+            );
+
+STANDARD OPTIONS
+    -background -foreground -relief -takefocus -borderwidth -heigh
+    -selectbackground -cursor -highlightbackground -selectborderwidth
+    -xscrollcommand -exportselection -highlightcolor -selectforeground
+    -yscrollcommand -font -highlightthickness -setgrid
+
+WIDGET SPECIFIC OPTIONS
+    -columns => *list*
+        Defines the columns in the widget. Each element in the list
+        describes a column. See the COLUMNS section below.
+
+    -configurecommand => *callback*
+        The -configurecommand callback will be called whenever the layout of
+        the widget has changed due to user interaction. That is, the user
+        changes the width of a column by dragging the separator, or moves a
+        column by dragging the column header.
+
+        This option is useful if the application wants to store the widget
+        layout for later retrieval. The widget layout can be obtained by the
+        callback by calling the method columnPackInfo().
+
+    -fillcolumn => *index*
+        Specify the index number of a column that will expand to fill any
+        new space opened up by dragging the window to a larger size. All
+        other columns maintain their current widths unless changed by the
+        user dragging a column separator. Otherwise all columns maintain
+        their sizes and the extra space is unused (if no column specified
+        here). Default: -1 (no column expands horizontally). All columns
+        always expand vertically though. The same column keeps it's
+        expansion privilege even if user rearranges their positions.
+
+    -focuscolumn => *index*
+        DEPRECIATED: Sets the index of the column whose listbox is to
+        receive the keyboard focus when the HMListbox widget receives
+        keyboard focus. This is a holdover from Tk::SMListbox, where it is
+        useful to better display the active element cursor due to the fact
+        that it depends on Tk::Listbox, which does not display the active
+        element (usually underlined) unless the listbox itself has the
+        focus. This allows the programmer to specify a colum other than the
+        first one, ie, if the main column of interest to the user is not the
+        first one.
+
+        Tk::HMListbox depends instead on Tk::HListbox, which does display
+        the active element without specifically being focused making it
+        unnecessary to designate a specific widget to show the active
+        cursor, so therefore all column listboxes show the active element
+        regardless of which has the focus and Tk::HListbox can assign the
+        first column (the default if this isn't specified here) the focus
+        and everything displays properly.
+
+        NOTE: none of this applies if -nocolumnfocus is set, which also has
+        the side effect of disabling most keyboard bindings on the
+        HMListbox. Default: *0* (First column listbox gets focus).
+
+    -headerbackground => *color*
+        Specify a different background color for the top ("header") row.
+        Default: -background or parent window's background.
+
+    -headerforeground => *color*
+        Specify a different foreground color for the top ("header") row.
+        Default: -foreground or parent window's foreground.
+
+    -moveable => *boolean*
+        A value of 1 indicates that it is okay for the user to move the
+        columns by dragging the column headers. 0 disables this function.
+        Default: 1.
+
+    -nocolumnfocus => *boolean*
+        Prevents the HMListbox widget from giving the keyboard focus to a
+        specific column. In HMListbox, it doesn't matter which column
+        receives the focus (the default without setting -focuscolumn is that
+        the first column normally gets the focus when the HMListbox widgets
+        receives keyboard focus). The net effect of this option being set is
+        that the widget itself takes focus, but many keyboard bindings will
+        not work, namely selecting rows with the spacebar. Default: *0*
+        (Take focus normally and give the focus to one of the column
+        listboxes under the hood so that row-based keyboard bindings will
+        all work properly). To have the HMListbox widget itself be skipped
+        in the focus order, set -takefocus to *0*.
+
+    -resizeable => *boolean*
+        A value of 1 indicates that it is okay for the user to resize the
+        columns by dragging the column separators. 0 disables this function.
+        Default: 1.
+
+        Note that you can also specify -resizeable on a column by column
+        basis. See the COLUMNS section below.
+
+    -selectmode => *string*
+        Should be "single", "browse", "multiple", or "extended". Default:
+        "browse". See Tk::HListbox.
+
+    -separatorcolor => *string*
+        Specifies the color of the separator lines (the vertical lines that
+        separates the columns). Default: black.
+
+        Note that you can also specify -separatorcolor on a column by column
+        basis. See the COLUMNS section below.
+
+    -separatorwidth => *integer*
+        Specifies the width in pixels of the separator lines (the vertical
+        lines that separates the columns). Default: 1.
+
+        Note that you can also specify -separatorwidth on a column by column
+        basis. See the COLUMNS section below.
+
+    -sortable => *boolean*
+        A value of 1 indicates that it is okay for the user to sort the data
+        by clicking column headings. 0 disables this function. Default: 1.
+
+        Note that you can also specify -sortable on a column by column
+        basis. See *COLUMNS* below.
+
+WIDGET SPECIFIC, COLUMN-SPECIFIC OPTIONS
+    -comparecmd => *callback*
+        Specifies a callback to use when sorting the HMListbox with this
+        column as key. The callback will be called with two scalar
+        arguments, each a value from this particular column. The callback
+        should return an integer less than, equal to, or greater than 0,
+        depending on how the tow arguments are ordered. If for example the
+        column should be sorted by numerical value:
+
+            -comparecommand => sub { $_[0] <=> $_[1]}
+
+        Default: sub { $_[0] cmp $_[1] } #(Ascending by string) NOTE: If the
+        column data is images or hashrefs (both text and images or contains
+        additional cell-specific options, then one should specify a
+        component of that hash to sort by, ie. the special "-sort" key is
+        handy, then one can sort using something like:
+
+                sub { $_[0]->{'-sort'} cmp $_[1]->{'-sort'} } or maybe:
+
+                sub { $_[0]->{'-text'} cmp $_[1]->{'-text'} }
+
+    -itemtype => "text" | "imagetext"
+        New option (not included with Tk::SMListbox or Tk::MListbox) that
+        permits a column to contain either images and or text in it's
+        entries. Valid values are "text" and "imagetext". Default: "text".
+
+    -reversearrow => 0 | 1
+        New option (not included with the old Tk::MListbox) that causes the
+        up / down direction of the sort arrow in the column header that
+        shows the direction the sorted-by column is currently sorted.
+        Default: 0 (zero): (Up-arrow) if sorted in ascending order,
+        Down-arrow if in descending order. Setting to 1 reverses this. This
+        is often necessary to show desired results, ie. if the sort function
+        is reversed, such as: sub { $_[1] cmp $_[0] }
+
+HMListbox COLUMN CONFIGURATION
+    NOTE: See also the additional options described in the previous section
+    "WIDGET SPECIFIC COLUMN-SPECIFIC OPTIONS".
+
+    The HMListbox widget is a collection of *HMLColumn* widgets. Each
+    HMLColumn contains a HListbox, a heading and the separator bar. The
+    columns are created and maintained through the -columns option or the
+    column methods of the widget. The columns are indexed from 0 and up.
+    Initially, column 0 is the leftmost column of the widget. The column
+    indices are not changed when the columns are moved or hidden. The only
+    ways to change the column indices are to call columnInsert(),
+    columnDelete() or configure(-column).
+
+    Each column has its own set of options which might be passed to
+    HMListbox::configure(-columns), HMListbox::insert(),
+    HMListbox::columnConfigure() or HMLColumn::configure().
+
+    The following code snippets are all equal:
+
+    1. my $hml=$mw->HMListbox(-columns=>[[-text=>'Heading1', -sortable=>0],
+    [-text=>'Heading2']]);
+
+    2. my $hml=$mw->HMListbox; $hml->columnInsert(0,-text=>'Heading1',
+    -sortable=>0); $hml->columnInsert(0,-text=>'Heading2');
+
+    3. my $hml=$mw->HMListbox; $c=$hml->columnInsert(0,-text=>'Heading1');
+    $hml->columnInsert(0,-text=>'Heading2'); $c->configure(-sortable=>0);
+
+    4. my $hml=$mw->HMListbox; $hml->columnInsert(0,-text=>'Heading1');
+    $hml->columnInsert(0,-text=>'Heading2');
+    $hml->columnConfigure(0,-sortable=>0);
+
+    (See the columnConfigure() method below for details on column options).
+
+    All column methods expects one or two column indices as arguments. The
+    column indices might be an integer (between 0 and the number of columns
+    minus one), 'end' for the last column, or a reference to the HMLColumn
+    widget (obtained by calling HMListbox->columnGet() or by storing the
+    return value from HMListbox->columnInsert()).
+
+WIDGET METHODS
+    $hml->compound(*[left|right|top|bottom]*)
+        Gets / sets the side of the column header that the ascending /
+        descending arrow is to appear (left, right, top, bottom). Default:
+        *"right"*.
+
+    $hml->focusColumn(*[index]*)
+        DEPRECIATED: Gets or sets the index of the column whose listbox is
+        to receive the keyboard focus when the HMListbox widget receives
+        keyboard focus. This is a holdover from Tk::SMListbox, where it is
+        useful to better display the active element cursor due to the fact
+        that it depends on Tk::Listbox, which does not display the active
+        element (usually underlined) unless the listbox itself has the
+        focus. This allows the programmer to specify a colum other than the
+        first one, ie, if the main column of interest to the user is not the
+        first one.
+
+        Tk::HMListbox depends instead on Tk::HListbox, which does display
+        the active element without specifically being focused making it
+        unnecessary to designate a specific widget to show the active
+        cursor, so therefore all column listboxes show the active element
+        regardless of which has the focus and Tk::HListbox can assign the
+        first column (the default if this isn't specified here) the focus
+        and everything displays properly.
+
+        NOTE: none of this applies if -nocolumnfocus is set, which also has
+        the side effect of disabling most keyboard bindings on the
+        HMListbox.
+
+    $hml->getSortOrder()
+        Returns an array that is in the same format accepted by the
+        $smListBox->sort method. The 1st element is either true for
+        descending sort, false for assending. Subsequent elements represent
+        the column indices of one or more columns by which the data is
+        sorted. Default (if nothing previously set): (0, 0).
+
+    $hml->setSortOrder(*descending*, *columnindex*...)
+        Sets the default sort order and columns to sort without actually
+        sorting. The arguments are the same as the sort() function.
+
+    $hml->setButtonHeight([*pady*])
+        Sets (alters) the "-pady" value for the header buttons. Should be
+        called AFTER all columns have been created. Requires version 2 or
+        higher.
+
+    $hml->showallsortcolumns([*1|0*])
+        Gets or sets whether a sort direction arrow is to be displayed on
+        each column involved in the sorting or just the 1st (primary sort).
+        Default: 0 (false) - show arrow only on the primary sort column.
+
+    $hml->bindColumns(*sequence*,*callback*)
+        Adds the binding to all column headers in the widget. See the
+        section BINDING EVENTS TO HMListbox below.
+
+    $hml->bindRows(*sequence*,*callback*)
+        Adds the binding to all listboxes in the widget. See the section
+        BINDING EVENTS TO HMListbox below.
+
+    $hml->bindSeparators(*sequence*,*callback*)
+        Adds the binding to all separators in the widget. See the section
+        BINDING EVENTS TO HMListbox below.
+
+  COLUMN METHODS
+    (Methods for accessing and manipulating individual columns in the
+    HMListbox widget)
+
+    $hml->columnConfigure(*index*,*option*=>*value*...)
+        Set option values for a specific column. Equal to
+        $hml->columnGet(*index*)->configure(...).
+
+        The following column options are supported:
+
+        -comparecommand => *callback*
+            Specifies a callback to use when sorting the HMListbox with this
+            column as key. The callback will be called with two scalar
+            arguments, each a value from this particular column. The
+            callback should return an integer less than, equal to, or
+            greater than 0, depending on how the tow arguments are ordered.
+            If for example the column should be sorted by numerical value:
+
+                -comparecommand => sub { $_[0] <=> $_[1]}
+
+            Default: sub { $_[0] cmp $_[1] } #(Ascending by string) NOTE: If
+            the column data is images or hashrefs (both text and images or
+            contains additional cell-specific options, then one should
+            specify a component of that hash to sort by, ie. the special
+            "-sort" key is handy, then one can sort using something like:
+
+                    sub { $_[0]->{'-sort'} cmp $_[1]->{'-sort'} } or maybe:
+
+                    sub { $_[0]->{'-text'} cmp $_[1]->{'-text'} }
+
+        -text => *string*
+            Specifies the text to be used in the heading button of the
+            column.
+
+        -resizeable => *boolean*
+            A value of 1 indicates that it is okay for the user to resize
+            this column by dragging the separator. 0 disables this function.
+            Default: 1.
+
+        -separatorcolor => *string*
+            Specifies the color of the separator line. Default: black.
+
+        -separatorwidth => *integer*
+            Specifies the width of the separator line in pixels. Default: 1.
+
+        -sortable => *boolean*
+            A value of 1 indicates that it is okay for the user to sort the
+            data by clicking this column's heading. 0 disables this
+            function. Default: 1.
+
+        -itemtype => "text" | "imagetext"
+            New option (not included with Tk::SMListbox or Tk::MListbox)
+            that permits a column to contain either images and or text in
+            it's entries. Valid values are "text" and "imagetext". Default:
+            "text".
+
+        -reversearrow => 0 | 1
+            New option (not included with the old Tk::MListbox) that causes
+            the up / down direction of the sort arrow in the column header
+            that shows the direction the sorted-by column is currently
+            sorted. Default: 0 (zero) - (Up-arrow if sorted in ascending
+            order, Down-arrow if in descending order. Setting to 1 reverses
+            this. This is often necessary to show desired results, ie. if
+            the sort function is reversed, such as: sub { $_[1] cmp $_[0] }
+
+    $hml->columnDelete(*first*,*last*)
+        If *last* is omitted, deletes column *first*. If *last* is
+        specified, deletes all columns from *first* to *last*, inclusive.
+
+        All previous column indices greater than *last* (or *first* if
+        *last* is omitted) are decremented by the number of columns deleted.
+
+    $hml->columnGet(*first*,*last*)
+        If *last* is not specified, returns the HMLColumn widget specified
+        by *first*. If both *first* and *last* are specified, returns an
+        array containing all columns from *first* to *last*.
+
+    $hml->columnHide(*first*,*last*)
+        If *last* is omitted, hides column *first*. If *last* is specified,
+        hides all columns from *first* to *last*, inclusive.
+
+        Hiding a column is equal to calling
+        $hml->columnGet(*index*)->packForget. The column is not deleted, all
+        data are still available, and the column indices remain the same.
+
+        See also the columnShow() method below.
+
+    $hml->columnIndex(*index*)
+        Returns an integer index for the column specifed by *index*.
+
+    $hml->columnInsert(*index*,*option*=>*value*...)
+        Creates a new column in the HMListbox widget. The column will get
+        the index specified by *index*. If *index* is 'end', the new
+        column's index will be one more than the previous highest column
+        index.
+
+        If column *index* exists, the new column will be placed to the left
+        of this column. All previous column indices equal to or greater than
+        *index* will be incremented by one.
+
+        Returns the newly created HMLColumn widget.
+
+        (See the columnConfigure() method above for details on column
+        options).
+
+    $hml->columnPack(*array*)
+        Repacks all columns in the HMListbox widget according to the
+        specification in *array*. Each element in *array* is a string on the
+        format index:width. *index* is a column index, *width* defines the
+        columns width in pixels (may be omitted). The columns are packed
+        left to right in the order specified by by *array*. Columns not
+        specified in *array* will be hidden.
+
+        This method is most useful if used together with the
+        columnPackInfo() method.
+
+    $hml->columnPackInfo()
+        Returns an array describing the current layout of the HMListbox
+        widget. Each element of the array is a string on the format
+        index:width (see columnPack() above). Only indices of columns that
+        are currently shown (not hidden) will be returned. The first element
+        in the returned array represents the leftmost column.
+
+        This method may be used in conjunction with columnPack() to save and
+        restore the column configuration.
+
+    $hml->columnShow(*index*,*option*=>*value*)
+        Shows a hidden column (see the columnHide() method above). The
+        column to show is specified by *index*.
+
+        By default, the column is pack'ed at the rigthmost end of the
+        HMListbox widget. This might be overridden by specifying one of the
+        following options:
+
+    -after => *index*
+        Place the column after (to the right of) the column specified by
+        *index*.
+
+    -before => *index*
+        Place the column before (to the left of) the column specified by
+        *index*.
+
+  ROW METHODS
+    (Methods for accessing and manipulating rows of data)
+
+    Many of the methods for HMListbox take one or more indices as arguments.
+    See Tk::HListbox for a description of row indices.
+
+    $hml->delete(*first*,*last*)
+        Deletes one or more row elements of the HMListbox. *First* and
+        *last* are indices specifying the first and last elements in the
+        range to delete. If *last* isn't specified it defaults to first,
+        i.e. a single element is deleted.
+
+    $hml->get(*first*,*last*)
+        If *last* is omitted, returns the content of the HMListbox row
+        indicated by *first*. If *last* is specified, the command returns a
+        list whose elements are all of the listbox rows between *first* and
+        *last*.
+
+        The returned elements are all array references. The referenced
+        arrays contains one element for each column of the HMListbox.
+
+    $hml->getRow(*index*)
+        In scalar context, returns the value of column 0 in the HMListbox
+        row specified by *index*. In list context, returns the content of
+        all columns in the row as an array.
+
+        This method is provided for convenience, since retrieving a single
+        row with the get() method might produce some ugly code.
+
+        The following two code snippets are equal:
+
+           1. @row=$hml->getRow(0);
+
+           2. @row=@{($hml->get(0))[0]};
+
+    $hml->sort(*descending*, *columnindex*...)
+        Sorts the content of the HMListbox. If *descending* is a true value,
+        the sort order will be descending. Default is 0 - ascending sort on
+        first column (0).
+
+        If *columnindex* is specified, the sort will be done with the
+        specified column as key. You can specify as many *columnindex*
+        arguments as you wish. Sorting is done on the first column, then on
+        the second, etc...
+
+        The default is to sort the data on all columns of the listbox, with
+        column 0 as the first sort key, column 1 as the second, etc.
+
+OTHER LISTBOX METHODS
+    Most other Tk::HListbox methods works for the HMListbox widget. This
+    includes the methods activate, cget, curselection, index, nearest, see,
+    selectionXXX, size, xview, yview.
+
+    See Tk::HListbox
+
+BINDING EVENTS TO HMLISTBOX
+    Calling $hml->bind(...) probably makes little sense, since the call does
+    not specify whether the binding should apply to the listbox, the header
+    button or the separator line between each column.
+
+    In stead of the ordinary bind, the following methods should be used:
+
+    $hml->bind(*sequence*,*callback*)
+        Synonym for $hml->bindRows(*sequence*,*callback*).
+
+    $hml->bindRows(*sequence*,*callback*)
+        Synonym for $hml->bindSubwidgets('listbox',*sequence*,*callback*)
+
+    $hml->bindColumns(*sequence*,*callback*)
+        Synonym for $hml->bindSubwidgets('heading',*sequence*,*callback*)
+
+    $hml->bindSeparators(*sequence*,*callback*)
+        Synonym for $hml->bindSubwidgets('separator',*sequence*,*callback*)
+
+    $hml->bindSubwidgets(*subwidget*,*sequence*,*callback*)
+        Adds the binding specified by *sequence* and *callback* to all
+        subwidgets of the given type (should be 'listbox', 'heading' or
+        'separator').
+
+        The binding is stored in the widget, and if you create a new column
+        by calling $hml->columnInsert(), all bindings created by
+        $hml->bindSubwidgets() are automatically copied to the new column.
+
+        The callback is called with the HMListbox widget as first argument,
+        and the index of the column where the event occured as the second
+        argument.
+
+        NOTE that $hml->bindSubwidgets() does not support all of Tk's
+        callback formats. The following are supported:
+
+             \&subname
+             sub { code }
+             [ \&subname, arguments...]
+             [ sub { code }, arguments...]
+
+        If *sequence* is undefined, then the return value is a list whose
+        elements are all the sequences for which there exist bindings for
+        *subwidget*.
+
+        If *sequence* is specified without *callback*, then the callback
+        currently bound to sequence is returned, or an empty string is
+        returned if there is no binding for sequence.
+
+        If *sequence* is specified, and *callback* is an empty string, then
+        the current binding for sequence is destroyed, leaving sequence
+        unbound. An empty string is returned.
+
+        An empty string is returned in all other cases.
+
+KEYWORDS
+    hmlistbox, smlistbox, mlistbox, listbox, hlist, widget
+
+SEE ALSO
+    Tk::SMListbox Tk::MListbox Tk::HListbox
+

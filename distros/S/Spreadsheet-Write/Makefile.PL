@@ -3,6 +3,7 @@ WriteMakefile(
     'NAME'          => 'Spreadsheet::Write',
     'VERSION_FROM'  => 'lib/Spreadsheet/Write.pm',
     'PREREQ_PM'     => {
+        'Excel::Writer::XLSX'       => '0.98',
         'Spreadsheet::WriteExcel'   => '2.15',
         'Text::CSV'                 => '1.18',
     },

@@ -3,6 +3,101 @@
 # inspired by treescan by Jamie Lokier <jamie@imbolc.ucc.ie>
 # about 40% faster than the original version (on my fs and raid :)
 
+=head1 NAME
+
+treescan - scan directory trees, list dirs/files, stat, sync, grep
+
+=head1 SYNOPSIS
+
+   treescan [OPTION...] [PATH...]
+
+      -q, --quiet    do not print list of files/directories
+      -0, --print0   use null character instead of newline to separate names
+      -s, --stat     call stat on every entry, to get stat data into cache
+      -d, --dirs     only list dirs
+      -f, --files    only list files
+      -p, --progress regularly print progress to stderr
+          --sync     open/fsync/close every entry
+      -g, --grep=RE  only list files that match the gibven perl RegEx
+
+=head1 DESCRIPTION
+
+The F<treescan> command scans directories and their contents
+recursively. By default it lists all files and directories (with trailing
+C</>), but it can optionally do various other things.
+
+If no paths are given, F<treescan> will use C<.>, the current directory.
+
+=head2 OPTIONS
+
+=over 4
+
+=item -q, --quiet
+
+By default, F<treescan> prints the full paths of all directories or files
+it finds. This option disables printing of filenames completely. This is
+useful if you want to run F<treescan> solely for its side effects, such as
+pulling C<stat> data into memory.
+
+=item -0, --print0
+
+Instead of using newlines, use null characters after each filename. This
+is useful to avoid quoting problems when piping the result into other
+programs (for example, GNU F<grep>, F<xargs> and so on all have options to
+deal with this).
+
+=item -s, --stat
+
+Normally, F<treescan> will use heuristics to avoid most C<stat> calls,
+which is what makes it so fast. This option forces it to C<stat> every file.
+
+This is only useful for the side effect of pulling the C<stat> data into
+the cache. If your disk cache is big enough, it will be filled with
+file meta data after F<treescan> is done, which can speed up subsequent
+commands considerably. Often, you can run F<treescan> in parallel with
+other directory-scanning programs to speed them up.
+
+=item -d, --dirs
+
+Only lists directories, not file paths. This is useful if you quickly want
+a list of directories and their subdirectories.
+
+=item -f, --files
+
+Only list files, not directories. This is useful if you want to operate on
+all files in a hierarchy, and the directories would ony get in the way.
+
+=item -p, --progress
+
+Regularly print some progress information to standard error. This is
+useful to get some progress information on long running tasks. Since
+the progress is printed to standard error, you can pipe the output of
+F<treescan> into other programs as usual.
+
+=item --sync
+
+The C<--sync> option can be used to make sure all the files/dirs in a tree
+are sync'ed to disk. For example this could be useful after unpacking an
+archive, to make sure the files hit the disk before deleting the archive
+file itself.
+
+=item -g, --grep=RE
+
+This applies a perl regular expression (see the L<perlre> manpage) to all paths that would normally be printed
+and will only print matching paths.
+
+The regular expression uses an C</s> (single line) modifier by default, so
+newlines are matched by C<.>.
+
+=back
+
+=head1 AUTHOR
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://home.schmorp.de/
+
+=cut
+
 use common::sense;
 use Getopt::Long;
 use Time::HiRes ();
@@ -12,8 +107,8 @@ our $VERSION = $IO::AIO::VERSION;
 
 Getopt::Long::Configure ("bundling", "no_ignore_case", "require_order", "auto_help", "auto_version");
 
-my ($opt_silent, $opt_print0, $opt_stat, $opt_nodirs,
-    $opt_nofiles, $opt_grep, $opt_progress);
+my ($opt_silent, $opt_print0, $opt_stat, $opt_nodirs, $opt_help,
+    $opt_nofiles, $opt_grep, $opt_progress, $opt_sync);
 
 GetOptions
    "quiet|q"    => \$opt_silent,
@@ -23,7 +118,18 @@ GetOptions
    "files|f"    => \$opt_nodirs,
    "grep|g=s"   => \$opt_grep,
    "progress|p" => \$opt_progress,
+   "sync"       => \$opt_sync,
+   "help"       => \$opt_help,
    or die "Usage: try $0 --help";
+
+if ($opt_help) {
+   require Pod::Usage;
+
+   Pod::Usage::pod2usage (
+      -verbose => 1,
+      -exitval => 0,
+   );
+}
 
 @ARGV = "." unless @ARGV;
 
@@ -59,8 +165,7 @@ sub scan {
       printf STDERR "\r%d dirs (%g/s) %d files (%g/s) %d stats (%g/s)       ",
              $n_dirs, $n_dirs / $d,
              $n_files, $n_files / $d,
-             $n_stats, $n_stats / $d
-         if $opt_progress;
+             $n_stats, $n_stats / $d;
    }
 
    aioreq_pri -1;
@@ -80,6 +185,15 @@ sub scan {
 
             aio_lstat [$wd, $_] for @$files;
             $n_stats += @$files;
+         };
+      }
+
+      if ($opt_sync) {
+         aio_wd $path, sub {
+            my $wd = shift;
+
+            aio_pathsync [$wd, $_] for @$files;
+            aio_pathsync $wd;
          };
       }
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.622';
+our $VERSION = '1.625';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -263,8 +263,6 @@ sub __get_term_size {
     }
     return $width - WIDTH_CURSOR, $height;
 }
-
-
 
 
 sub __get_cursor_position {

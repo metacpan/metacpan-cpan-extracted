@@ -6,21 +6,19 @@ use rlib '../../../..';
 
 use warnings; no warnings 'redefine';
 use B;
-use B::DeparseTree;
-use B::DeparseTree::Printer; # qw(short_str);
 use Data::Printer;
+use 5.010;
 
 package Devel::Trepan::CmdProcessor::Command::Deparse;
 
+use B::DeparseTree::Fragment;
+use Devel::Trepan::Deparse;
+use Devel::Trepan::DB::LineCache;
 
 use Scalar::Util qw(looks_like_number);
 use English qw( -no_match_vars );
 use Getopt::Long qw(GetOptionsFromArray);
 Getopt::Long::Configure("pass_through");
-
-use B::DeparseTree::Fragment;
-use Devel::Trepan::Deparse;
-use Devel::Trepan::DB::LineCache;
 
 use constant CATEGORY   => 'data';
 use constant SHORT_HELP => 'Deparse source code via B::DeparseTree';
@@ -32,6 +30,9 @@ use constant NEED_STACK => 0;
 use Devel::Trepan::CmdProcessor::Command qw(@CMD_ISA @CMD_VARS set_name);
 
 use strict;
+# require 64-bit since we may have 64-bit hexadecimal-numbers as
+# addresses
+no warnings 'portable';
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Devel::Trepan::CmdProcessor::Command);
@@ -64,6 +65,7 @@ B::DeparseTree options:
     -l  | --line        Add '# line' comment
           --offsets     show all offsets
     -a  | --address     Add 'OP addresses in '# line' comment
+    -f  | --function    Set function to look up offset
     -p  | --parent <n>  Show parent text to level <n>
     -q  | --quote       Expand double-quoted strings
     -d  | --debug       Show debug information
@@ -111,33 +113,18 @@ sub parse_options($$)
     my $opts = {};
     my $result =
 	&GetOptionsFromArray($args,
-			     'h|help'      => \$opts->{'help'},
-			     't|tree'      => \$opts->{'tree'},
-			     'l|line'      => \$opts->{'line'},
-			     'offsets'     => \$opts->{'offsets'},
-			     'p|parent:i'  => \$opts->{'parent'},
-			     'a|address'   => \$opts->{'address'},
-			     'q|quote'     => \$opts->{'quote'},
-			     'debug'       => \$opts->{'debug'}
+			     'h|help'        => \$opts->{'help'},
+			     't|tree'        => \$opts->{'tree'},
+			     'l|line'        => \$opts->{'line'},
+			     'offsets'       => \$opts->{'offsets'},
+			     'p|parent:i'    => \$opts->{'parent'},
+			     'P|previous'    => \$opts->{'previous'},
+			     'a|address'     => \$opts->{'address'},
+			     'f|function:s'  => \$opts->{'function'},
+			     'q|quote'       => \$opts->{'quote'},
+			     'debug'         => \$opts->{'debug'}
         );
     $opts;
-}
-
-# Elide string with ... if it is too long, and
-# show control characters in string.
-sub short_str($;$) {
-    my ($str, $maxwidth) = @_;
-    $maxwidth ||= 20;
-
-    if (length($str) > $maxwidth) {
-	my $chop = $maxwidth - 3;
-	$str = substr($str, 0, $chop) . '...' . substr($str, -$chop);
-    }
-    $str =~ s/\cK/\\cK/g;
-    $str =~ s/\f/\\f/g;
-    $str =~ s/\n/\\n/g;
-    $str =~ s/\t/\\t/g;
-    return $str
 }
 
 sub address_options($$$)
@@ -181,18 +168,34 @@ sub run($$)
 	return;
     }
 
-    my $filename = $proc->{list_filename};
-    my $frame    = $proc->{frame};
-    my $funcname = $proc->{frame}{fn};
+    # Get frame information
+    my $have_frame = exists($proc->{frame_index});
+    my ($frame_num, $frame, $funcname, $filename, $pkg);
+    if ($have_frame) {
+	$frame_num = $proc->{frame_index};
+	my $is_last = $frame_num == $proc->{stack_size}-1;
+	$frame     = $proc->{frame};
+	$filename  = $frame->{file};
+	unless ($is_last) {
+	    $funcname  = $frame->{fn};
+	} else {
+	    $funcname = "DB::DB";
+	}
+	$pkg  = $frame->{pkg};
+    }
+
+    $funcname = $options->{'function'} if $options->{'function'};
+
     my $addr;
     my $want_runtime_position = 0;
-    my $want_prev_position = exists($proc->{frame_index}) && ($proc->{frame_index} != 0);
+    my $want_prev_position = $have_frame &&
+	($frame_num != 0) || $options->{'previous'};
     if (scalar @args == 0) {
 	# Use function if there is one. Otherwise use
 	# the current file.
-	if ($proc->{stack_size} > 0 && $funcname) {
+	if ($have_frame) {
 	    $want_runtime_position = 1;
-	    $addr = $proc->{op_addr};
+	    $addr = $frame->{addr};
 	}
     } elsif (scalar @args <= 2) {
 	if ($args[0] =~ /^@?(0x[0-9a-fA-F]+)/) {
@@ -223,14 +226,14 @@ sub run($$)
 
     if ($options->{'tree'} || $options->{'offsets'}) {
 	my $deparse = B::DeparseTree->new();
-	if ($funcname eq "DB::DB") {
-	    $funcname = "main::main";
-	}
+	# if ($funcname eq "DB::DB") {
+	#     $funcname = "main::main";
+	# }
 	$deparse->coderef2info(\&$funcname);
 	if ($options->{'tree'}) {
 	    Data::Printer::p $deparse->{optree};
 	} elsif ($options->{'offsets'}) {
-	    my @addrs = sort keys %{$deparse->{optree}}, "\n";
+	    my @addrs = sort keys %{$deparse->{optree}};
 	    @addrs = map sprintf("0x%x", $_), @addrs;
 	    my $msg = columnize_addrs($proc, \@addrs);
 	    $proc->section("Addresses in $funcname");
@@ -251,7 +254,7 @@ sub run($$)
 	if ($addr) {
 	    my $op_info = deparse_offset($funcname, $addr);
 	    if (!$op_info) {
-		$proc->errmsg(sprintf("Can't find info for op at 0x%x", $addr));
+		$proc->errmsg(sprintf("Can't find info for op at 0x%x in $funcname", $addr));
 		return;
 	    }
 	    if ($want_prev_position) {
@@ -349,10 +352,11 @@ sub run($$)
 		$deparse_opts .= ('-' . substr($deparse_opts, 0, 1))
 	    }
 	}
-	if (!-r $filename) {
+	if ($filename && !-r $filename) {
 	    $proc->errmsg("No readable perl script: " . $filename)
 	} else {
-	    my $cmd="$EXECUTABLE_NAME  -MO=DeparseTree,-sC,$options $filename";
+	    my $deparse_opts = '';
+	    my $cmd="$EXECUTABLE_NAME  -MO=DeparseTree,-sC,$deparse_opts $filename";
 	    $text = `$cmd 2>&1`;
 	    if ($? >> 8 == 0) {
 		pmsg($proc, $text, 0);
@@ -380,6 +384,7 @@ unless (caller) {
 	pkg  => __PACKAGE__,
 	addr => $$root_cv,
     };
+    $proc->{frame_index} = 0;
     $proc->{stack_size} = 1,
     $cmd->run([$NAME]);
     print '-' x 30, "\n";

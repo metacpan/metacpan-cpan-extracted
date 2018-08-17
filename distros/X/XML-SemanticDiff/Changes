@@ -1,5 +1,8 @@
 Revision history for Perl module XML::SemanticDiff
 
+1.0007 2018-07-31
+    - Drop minimum perl back down to 5.8
+
 1.0006 2017-09-27
     - Fixed bug: https://rt.cpan.org/Public/Bug/Display.html?id=84546
       where the code was failing to find the difference in this scenario

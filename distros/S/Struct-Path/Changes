@@ -1,5 +1,11 @@
 Revision history for Struct-Path
 
+0.82    2018-08-15
+        - craches fixed for expand out-of range negative array indexes
+        - expand-append experimental subopt removed
+        - expand lists smoothly for out of range negative indexes (experimental)
+        - opts passed to hooks via %_
+
 0.81    2018-01-10
         - path(): resolve negative array indexes in paths
 

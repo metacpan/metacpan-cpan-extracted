@@ -650,6 +650,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -720,6 +721,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE}'
@@ -972,6 +974,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1109,7 +1120,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1262,6 +1273,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -2008,7 +2020,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers libeio/config.h"
+ac_config_headers="$ac_config_headers config.h"
 
 
 
@@ -4034,7 +4046,7 @@ int main (void)
    size_t count = 2;
    ssize_t res;
 #if __linux
-   res = sendfile (fd, fd, offset, count);
+   res = sendfile (fd, fd, &offset, count);
 #elif __FreeBSD__
    res = sendfile (fd, fd, offset, count, 0, &offset, 0);
 #elif __hpux
@@ -4169,7 +4181,7 @@ else
 #include <sys/prctl.h>
 int main (void)
 {
-  char name = "test123";
+  char *name = "test123";
   int res = prctl (PR_SET_NAME, (unsigned long)name, 0, 0, 0);
 }
 
@@ -4187,6 +4199,108 @@ $as_echo "$ac_cv_prctl_set_name" >&6; }
 test $ac_cv_prctl_set_name = yes &&
 $as_echo "#define HAVE_PRCTL_SET_NAME 1" >>confdefs.h
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for posix_close" >&5
+$as_echo_n "checking for posix_close... " >&6; }
+if ${ac_cv_posix_close+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <unistd.h>
+int res;
+int main (void)
+{
+   res = posix_close (0, 0); /* we do not need any flags */
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_posix_close=yes
+else
+  ac_cv_posix_close=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_posix_close" >&5
+$as_echo "$ac_cv_posix_close" >&6; }
+test $ac_cv_posix_close = yes &&
+$as_echo "#define HAVE_POSIX_CLOSE 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for renameat2" >&5
+$as_echo_n "checking for renameat2... " >&6; }
+if ${ac_cv_renameat2+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <linux/fs.h>
+int res;
+int main (void)
+{
+   res = syscall (SYS_renameat2, 0, 0, 0, 0, RENAME_EXCHANGE | RENAME_NOREPLACE);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_renameat2=yes
+else
+  ac_cv_renameat2=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_renameat2" >&5
+$as_echo "$ac_cv_renameat2" >&6; }
+test $ac_cv_renameat2 = yes &&
+$as_echo "#define HAVE_RENAMEAT2 1" >>confdefs.h
+
+
+
+
+# for these to work, you need to run autoheader in IO::AIO, not libeio :(
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for set/getrlimit" >&5
+$as_echo_n "checking for set/getrlimit... " >&6; }
+if ${ac_cv_rlimits+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/time.h>
+#include <sys/resource.h>
+int res;
+int main (void)
+{
+   struct rlimit srl;
+   srl.rlim_cur = srl.rlim_max = RLIM_INFINITY;
+   res = getrlimit (RLIMIT_NOFILE, &srl);
+   res = setrlimit (RLIMIT_NOFILE, &srl);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_rlimits=yes
+else
+  ac_cv_rlimits=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_rlimits" >&5
+$as_echo "$ac_cv_rlimits" >&6; }
+test $ac_cv_rlimits = yes &&
+$as_echo "#define HAVE_RLIMITS 1" >>confdefs.h
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for posix_madvise" >&5
@@ -4273,6 +4387,32 @@ fi
 done
 
 
+for ac_header in sys/sysmacros.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/sysmacros.h" "ac_cv_header_sys_sysmacros_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_sysmacros_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_SYSMACROS_H 1
+_ACEOF
+
+fi
+
+done
+
+
+for ac_header in sys/mkdev.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/mkdev.h" "ac_cv_header_sys_mkdev_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_mkdev_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_MKDEV_H 1
+_ACEOF
+
+fi
+
+done
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for splice, vmsplice and tee" >&5
 $as_echo_n "checking for splice, vmsplice and tee... " >&6; }
 if ${ac_cv_linux_splice+:} false; then :
@@ -4306,8 +4446,6 @@ test $ac_cv_linux_splice = yes &&
 $as_echo "#define HAVE_LINUX_SPLICE 1" >>confdefs.h
 
 
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pipe2" >&5
 $as_echo_n "checking for pipe2... " >&6; }
 if ${ac_cv_pipe2+:} false; then :
@@ -4339,6 +4477,176 @@ $as_echo "$ac_cv_pipe2" >&6; }
 test $ac_cv_pipe2 = yes &&
 $as_echo "#define HAVE_PIPE2 1" >>confdefs.h
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for eventfd" >&5
+$as_echo_n "checking for eventfd... " >&6; }
+if ${ac_cv_eventfd+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/eventfd.h>
+int res;
+int main (void)
+{
+   res = eventfd (1, EFD_CLOEXEC | EFD_NONBLOCK);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_eventfd=yes
+else
+  ac_cv_eventfd=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_eventfd" >&5
+$as_echo "$ac_cv_eventfd" >&6; }
+test $ac_cv_eventfd = yes &&
+$as_echo "#define HAVE_EVENTFD 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for timerfd" >&5
+$as_echo_n "checking for timerfd... " >&6; }
+if ${ac_cv_timerfd+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/timerfd.h>
+int res;
+int main (void)
+{
+   struct itimerspec its;
+   res = timerfd_create (CLOCK_REALTIME, TFD_CLOEXEC | TFD_NONBLOCK);
+   res = timerfd_settime (res, TFD_TIMER_ABSTIME /*| TFD_TIMER_CANCEL_ON_SET*/, &its, 0);
+   res = timerfd_gettime (res, &its);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_timerfd=yes
+else
+  ac_cv_timerfd=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_timerfd" >&5
+$as_echo "$ac_cv_timerfd" >&6; }
+test $ac_cv_timerfd = yes &&
+$as_echo "#define HAVE_TIMERFD 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for copy_file_range" >&5
+$as_echo_n "checking for copy_file_range... " >&6; }
+if ${ac_cv_copy_file_range+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <unistd.h>
+#include <sys/syscall.h>
+/*#include <linux/copy.h>*/
+int res;
+int main (void)
+{
+   /*res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, COPY_FR_REFLINK | COPY_FR_DEDUP | COPY_FR_COPY);*/
+   res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, 0);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_copy_file_range=yes
+else
+  ac_cv_copy_file_range=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_copy_file_range" >&5
+$as_echo "$ac_cv_copy_file_range" >&6; }
+test $ac_cv_copy_file_range = yes &&
+$as_echo "#define HAVE_COPY_FILE_RANGE 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for st_xtimensec" >&5
+$as_echo_n "checking for st_xtimensec... " >&6; }
+if ${ac_cv_xtimensec+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int res;
+int main (void)
+{
+   return PL_statcache.st_atimensec
+        + PL_statcache.st_mtimensec
+        + PL_statcache.st_ctimensec;
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_xtimensec=yes
+else
+  ac_cv_xtimensec=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_xtimensec" >&5
+$as_echo "$ac_cv_xtimensec" >&6; }
+test $ac_cv_xtimensec = yes &&
+$as_echo "#define HAVE_ST_XTIMENSEC 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for st_xtimespec" >&5
+$as_echo_n "checking for st_xtimespec... " >&6; }
+if ${ac_cv_xtimespec+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int res;
+int main (void)
+{
+   return PL_statcache.st_atim.tv_nsec
+        + PL_statcache.st_mtim.tv_nsec
+        + PL_statcache.st_ctim.tv_nsec;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_xtimespec=yes
+else
+  ac_cv_xtimespec=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_xtimespec" >&5
+$as_echo "$ac_cv_xtimespec" >&6; }
+test $ac_cv_xtimespec = yes &&
+$as_echo "#define HAVE_ST_XTIMESPEC 1" >>confdefs.h
+
+
+# apparently, True64 uses st_u[amc]time, aix uses at_[amc]time_n and apple uses st_[amc,birth]timespec?
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5012,7 +5320,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "libeio/config.h") CONFIG_HEADERS="$CONFIG_HEADERS libeio/config.h" ;;
+    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -5356,4 +5664,5 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
+
 

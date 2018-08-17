@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Documentation and tools for using Platypus with the C programming language
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 
 sub native_type_map
@@ -27,7 +27,7 @@ FFI::Platypus::Lang::C - Documentation and tools for using Platypus with the C p
 
 =head1 VERSION
 
-version 0.50
+version 0.53
 
 =head1 SYNOPSIS
 

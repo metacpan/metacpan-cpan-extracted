@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.55  2018-08-09T18:00:00+00:00
+      - Documented the newly added attribute "bgcolor".
+
 3.54  2018-07-31T10:50:00+00:00
       - Added optional attribute 'bgcolor' for map background color.
 

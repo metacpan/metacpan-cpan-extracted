@@ -1,7 +1,9 @@
 NAME
+
     Net::LastFM - A simple interface to the Last.fm API
 
 SYNOPSIS
+
       my $lastfm = Net::LastFM->new(
           api_key    => 'XXX',
           api_secret => 'YYY',
@@ -12,23 +14,27 @@ SYNOPSIS
       );
 
 DESCRIPTION
+
     The module provides a simple interface to the Last.fm API. To use this
-    module, you must first sign up at <http://www.last.fm/api> to receive an
+    module, you must first sign up at http://www.last.fm/api to receive an
     API key and secret.
 
-    You can then make requests on the API - most of the requests are signed.
-    You pass in a hash of paramters and a data structure mirroring the
-    response is returned.
+    You can then make requests on the API - most of the requests are
+    signed. You pass in a hash of paramters and a data structure mirroring
+    the response is returned.
 
     This module confesses if there is an error.
 
 METHODS
-  request
+
+ request
+
     This makes an unsigned request:
 
       my $data = $lastfm->request( method => 'auth.gettoken' );
 
-  request_signed
+ request_signed
+
     This makes a signed request:
 
       my $data = $lastfm->request_signed(
@@ -36,7 +42,8 @@ METHODS
           user   => 'lglb',
       );
 
-  create_http_request
+ create_http_request
+
     If you want to integrate this module into another HTTP framework, this
     method will simple create an unsigned HTTP::Request object:
 
@@ -44,7 +51,8 @@ METHODS
           method => 'auth.gettoken'
       );
 
-  create_http_request_signed
+ create_http_request_signed
+
     If you want to integrate this module into another HTTP framework, this
     method will simple create a signed HTTP::Request object:
 
@@ -54,12 +62,15 @@ METHODS
       );
 
 AUTHOR
+
     Leon Brocard <acme@astray.com>
 
 COPYRIGHT
+
     Copyright (C) 2008-9, Leon Brocard.
 
 LICENSE
-    This module is free software; you can redistribute it or modify it under
-    the same terms as Perl itself.
+
+    This module is free software; you can redistribute it or modify it
+    under the same terms as Perl itself.
 

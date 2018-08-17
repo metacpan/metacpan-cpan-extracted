@@ -35,6 +35,20 @@ Commonly used routines that are specific to the Sport::Analytics::NHL ecosystem.
 
 Provides global variable $DB that can be used to store the MongoDB handle.
 
+=head1 GLOBAL VARIABLES
+
+=over 2
+
+=item $DB
+
+This global exported variable is used to hold an instance of a MongoDB connection.
+
+=item $CACHES
+
+This global exported hash reference is used to hold various information for caching purposes
+
+=back
+
 =head1 FUNCTIONS
 
 =over 2
@@ -175,7 +189,7 @@ Find games already scraped into the filesystem and returns the game ids of them.
 =cut
 
 our @EXPORT = qw(
-	$DB
+	$DB $CACHES
 	parse_nhl_game_id parse_our_game_id
 	resolve_team get_games_for_dates
 	get_season_from_date get_start_stop_date str3time
@@ -186,10 +200,12 @@ our @EXPORT = qw(
 	vocabulary_lookup normalize_penalty
 	is_noplay_event
 	set_roster_positions set_player_stat fix_playergoals
+	create_player_id_hash
 	print_events
 );
 
 our $DB;
+our $CACHES = {};
 
 sub parse_nhl_game_id ($) {
 
@@ -748,8 +764,37 @@ sub print_events ($) {
 	my $events = shift;
 
 	for (@{$events}) {
+		$_->{t} = -1 unless exists $_->{t};
+		$_->{ts} ||= get_seconds($_->{time});
 		print "$_->{period}\t$_->{t}\t$_->{ts}\t$_->{type}\n";
 	}
+}
+
+=over 4
+
+=item C<create_player_id_hash>
+
+Creates a hash of player ids from the boxscore as keys and references to their stat entries as values
+
+ Argument: the boxscore
+ Returns: the hash of player ids
+
+=back
+
+=cut
+
+sub create_player_id_hash ($) {
+
+	my $boxscore = shift;
+
+	my $player_ids;
+	for my $t (0,1) {
+		my $team = $boxscore->{teams}[$t];
+		for my $player (@{$team->{roster}}) {
+			$player_ids->{$player->{_id}} = \$player;
+		}
+	}
+	$player_ids;
 }
 
 1;

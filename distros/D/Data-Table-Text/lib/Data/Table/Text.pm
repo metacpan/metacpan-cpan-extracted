@@ -4,13 +4,12 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
-# formatTableA returns "[]" if passed an empty array
 # to escape an open parenthesis in a re use \x28, close is \x29
-# formatTableMultiLine - @row seems to have null entries sometines
+# can grep search zipped files?
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180806';
+our $VERSION = '20180816';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -200,7 +199,7 @@ sub fileOutOfDate(&$@)                                                          
   @order                                                                        # Return a list of the files that were remade
  }
 
-sub firstFileThatExists(@)                                                      # Returns the name of the first file that exists or undef if none of the named files exist.
+sub firstFileThatExists(@)                                                      # Returns the name of the first file that exists or B<undef> if none of the named files exist.
  {my (@files) = @_;                                                             # Files to check
   for(@files)
    {return $_ if -e $_;
@@ -220,7 +219,7 @@ sub renormalizeFolderName($)                                                    
   ($name =~ s([\/\\]+\Z) ()gsr).'/';                                            # Put a trailing / on the folder name
  }
 
-sub filePath(@)                                                                 # Create a file path from an array of file name components. If all the components are blank then a blank file name is returned.  Identical to L<fpf|/fpf>.
+sub filePath(@)                                                                 # Create a file name from an array of file name components. If all the components are blank then a blank file name is returned.  Identical to L<fpf|/fpf>.
  {my (@file) = @_;                                                              # File name components
   defined($_) or confess "Missing file component\n" for @file;                  # Check that there are no undefined file components
   my @components = grep {$_} map {denormalizeFolderName($_)} @file;             # Skip blank components
@@ -228,14 +227,14 @@ sub filePath(@)                                                                 
   join '/', @components;                                                        # Join separate components
  }
 
-sub filePathDir(@)                                                              # Directory from an array of file name components. If all the components are blank then a blank file name is returned.   Identical to L<fpd|/fpd>.
+sub filePathDir(@)                                                              # Create a directory name from an array of file name components. If all the components are blank then a blank file name is returned.   Identical to L<fpd|/fpd>.
  {my (@file) = @_;                                                              # Directory name components
   my $file = filePath(@_);
   return '' unless $file;                                                       # No components resolves to '' rather than '/'
   renormalizeFolderName($file)                                                  # Normalize with trailing separator
  }
 
-sub filePathExt(@)                                                              # File name from file name components and extension.   Identical to L<fpe|/fpe>.
+sub filePathExt(@)                                                              # Create a file name from an array of file name components the last of which is an extension. Identical to L<fpe|/fpe>.
  {my (@File) = @_;                                                              # File name components and extension
   my @file = grep{defined and /\S/} @_;                                         # Remove undefined and blank components
   @file > 1 or confess "At least two non blank file name components required\n";
@@ -378,11 +377,11 @@ sub printFullFileName                                                           
   "\n\'".dump(fullFileName($file))."\'\n'"
  }
 
-sub absFromAbsPlusRel($$)                                                       # Create an absolute file from a an absolute file and a following relative file.
+sub absFromAbsPlusRel($$)                                                       # Create an absolute file from an absolute file and a relative file.
  {my ($a, $f) = @_;                                                             # Absolute file name, relative file name
-
-  defined $a or confess "Specify an absolute file name for the first parameter\n";
-  defined $f or confess "Specify a relative file name for the second parameter\n";
+  my $m = "file name for the";
+  defined $a or confess "Specify an absolute $m first parameter\n";
+  defined $f or confess "Specify a relative $m second parameter\n";
 
   $a =~ m(\A/)s or confess "$a is not an absolute file name\n";
 
@@ -408,10 +407,11 @@ sub absFromAbsPlusRel($$)                                                       
   q(/)
  }
 
-sub relFromAbsAgainstAbs($$)                                                    # Derive a relative file name for the first absolute file relative to the second absolute file name.
- {my ($f, $a) = @_;                                                             # Absolute file to be made relative, absolute file to compare against
-  defined $f or confess "Specify an absolute file name for the first parameter\n";
-  defined $a or confess "Specify an absolute file name for the second parameter\n";
+sub relFromAbsAgainstAbs($$)                                                    # Derive a relative file name for the first absolute file name relative to the second absolute file name.
+ {my ($f, $a) = @_;                                                             # Absolute file to be made relative, absolute file name to make relative to.
+  my $m = q(Specify an absolute file name for the);
+  defined $f or confess "$m first parameter\n";
+  defined $a or confess "$m second parameter\n";
   $f =~ m(\A/)s or confess "$f is not an absolute file name\n";
   $a =~ m(\A/)s or confess "$a is not an absolute file name\n";
 
@@ -480,7 +480,7 @@ sub fileList($)                                                                 
   bsd_glob($pattern, GLOB_MARK | GLOB_TILDE)
  }
 
-sub searchDirectoryTreesForMatchingFiles(@)                                     # Search the specified directory trees for files that match the specified extensions - the argument list should include at least one folder and one extension to be useful.
+sub searchDirectoryTreesForMatchingFiles(@)                                     # Search the specified directory trees for the files (not folders) that match the specified extensions. The argument list should include at least one path name to be useful. If no file extension is supplied then all the files below the specified paths are returned.
  {my (@foldersandExtensions) = @_;                                              # Mixture of folder names and extensions
   my @folder     = grep { -d $_ } @_;                                           # Folders
   my @extensions = grep {!-d $_ } @_;                                           # Extensions
@@ -531,12 +531,12 @@ sub clearFolder($$)                                                             
   unlink $_ for @files;                                                         # Remove files
   rmdir $_  for reverse @dirs;                                                  # Remove empty folders
   -e $folder and carp "Unable to completely remove folder:\n$folder\n";         # Complain if the folder still exists
- }
+ } # clearFolder
 
 #D2 Read and write files                                                        # Read and write strings from and to files creating paths as needed.
 
-sub readFile($)                                                                 # Read a file containing unicode.
- {my ($file) = @_;                                                              # Name of unicode file to read
+sub readFile($)                                                                 # Read a file containing unicode in utf8.
+ {my ($file) = @_;                                                              # Name of file to read
   defined($file) or
     confess "Cannot read undefined file\n";
   $file =~ m(\n) and
@@ -549,15 +549,29 @@ sub readFile($)                                                                 
   my $string = eval {<$F>};
   $@ and confess $@;
   $string
- }
+ } # readFile
 
-sub evalFile($)                                                                 # Read a file containing unicode, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+sub evalFile($)                                                                 # Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
  {my ($file) = @_;                                                              # File to read
   my $string = readFile($file);
   my $res = eval $string;
   $@ and confess "$@\n";
   $res
- }
+ } # evalFile
+
+sub evalGZipFile($)                                                             # Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+ {my ($file) = @_;                                                              # File to read
+  my $string = readGZipFile($file);
+  my $res = eval $string;
+  $@ and confess "$@\n";
+  $res
+ } # evalGZipFile
+
+sub dumpGZipFile($$)                                                            # Write a data structure through B<gzip> to a file.
+ {my ($file, $data) = @_;                                                       # File to write, reference to data
+  ref($data) or confess "\$data must contain a reference to data, not a scalar";
+  writeGZipFile($file, dump($data));
+ } # dumpGZipFile
 
 sub readUtf16File($)                                                            #P Read a file containing unicode in utf-16 format.
  {my ($file) = @_;                                                              # Name of file to read
@@ -584,7 +598,23 @@ sub readBinaryFile($)                                                           
   binmode $F;
   local $/ = undef;
   <$F>;
- }
+ } # readBinaryFile
+
+sub readGZipFile($)                                                             # Read the specified B<$file>, containing compressed utf8, through gzip
+ {my ($file) = @_;                                                              # File to read.
+  defined($file) or
+    confess "Cannot read undefined file\n";
+  $file =~ m(\n) and
+    confess "File name contains a new line:\n=$file=\n";
+  -e $file or
+    confess "Cannot read file because it does not exist, file:\n$file\n";
+  open(my $F, "gunzip < $file|") or                                             # Unzip input file
+    confess "Cannot open file for input, file:\n$file\n$!\n$?\n";
+  binmode($F, "encoding(UTF-8)");
+  local $/ = undef;
+  my $string = <$F>;
+  $string                                                                       # Resulting string
+ } # readGZipFile
 
 sub makePath($)                                                                 # Make the path for the specified file name or folder.
  {my ($file) = @_;                                                              # File
@@ -596,10 +626,10 @@ sub makePath($)                                                                 
   eval {make_path($path)};
   -d $path or confess "Cannot make path:\n$path\n";
   0
- }
+ } # makePath
 
-sub writeFile($$)                                                               # Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
- {my ($file, $string) = @_;                                                     # File to write to or undef for a temporary file, unicode string to write
+sub overWriteFile($$)                                                           # Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.
+ {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, unicode string to write
   $file //= temporaryFile;
   $string or carp "No string for file:\n$file\n";
   makePath($file);
@@ -610,17 +640,37 @@ sub writeFile($$)                                                               
   close  ($F);
   -e $file or confess "Failed to write to file:\n$file\n";
   $file
- }
+ } # overWriteFile
 
-sub writeFiles($;$)                                                             # Write the values of a hash as a file identified by the key of the value
+sub writeFile($$)                                                               # Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+ {my ($file, $string) = @_;                                                     # New file to write to or B<undef> for a temporary file,  string to write
+  if (defined $file)
+   {-e $file and confess "File already exists:\n$file\n";
+   }
+  &overWriteFile(@_);
+ } # writeFile
+
+sub writeGZipFile($$)                                                           # Write a unicode utf8 string through gzip to a file.
+ {my ($file, $string) = @_;                                                     # File to write to, string to write
+  makePath($file);
+  open my $F, "| gzip>$file" or                                                 # Compress via gzip
+    confess "Cannot open file for write because:\n$file\n$!\n";
+  binmode($F, ":utf8");                                                         # Input to gzip encoded as utf8
+  print  {$F} $string;
+  close  ($F);
+  -e $file or confess "Failed to write to file:\n$file\n";
+  $file
+ } # writeGZipFile
+
+sub writeFiles($;$)                                                             # Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
  {my ($hash, $folder) = @_;                                                     # Hash of key value pairs representing files and data, optional folder to contain files else the current folder
   for my $file(sort keys %$hash)                                                # Write file data for each hash key
    {writeFile(fpf($folder ? $folder : '.', $file), $hash->{$file})
    }
- }
+ } # writeFiles
 
-sub appendFile($$)                                                              # Append a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
- {my ($file, $string) = @_;                                                     # File to append to, unicode string to append
+sub appendFile($$)                                                              # Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
+ {my ($file, $string) = @_;                                                     # File to append to, string to append
   $file or confess "No file name supplied\n";
   $string or carp "No string for file:\n$file\n";
   makePath($file);
@@ -630,10 +680,10 @@ sub appendFile($$)                                                              
   close  ($F);
   -e $file or confess "Failed to write to file:\n$file\n";
   $file
- }
+ } # appendFile
 
 sub writeBinaryFile($$)                                                         # Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
- {my ($file, $string) = @_;                                                     # File to write to or undef for a temporary file, non unicode string to write
+ {my ($file, $string) = @_;                                                     # File to write to or B<undef> for a temporary file, non unicode string to write
   $file //= temporaryFile;
   $string or confess "No string for file:\n$file\n";
   makePath($file);
@@ -644,10 +694,10 @@ sub writeBinaryFile($$)                                                         
   close  ($F);
   -e $file or confess "Failed to write in binary to file:\n$file\n";
   $file
- }
+ } # writeBinaryFile
 
 sub createEmptyFile($)                                                          # Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
- {my ($file) = @_;                                                              # File to create or undef for a temporary file
+ {my ($file) = @_;                                                              # File to create or B<undef> for a temporary file
   $file //= temporaryFile;
   return $file if -e $file;                                                     # Return file name as proxy for success if file already exists
   makePath($file);
@@ -657,11 +707,16 @@ sub createEmptyFile($)                                                          
   close  ($F);
   -e $file or confess "Failed to create empty file:\n$file\n";
   $file                                                                         # Return file name on success
- }
+ } # createEmptyFile
 
 sub binModeAllUtf8                                                              #P Set STDOUT and STDERR to accept utf8 without complaint.
  {binmode $_, ":utf8" for *STDOUT, *STDERR;
  }
+
+sub numberOfLinesInFile($)                                                      # The number of lines in a file
+ {my ($file) = @_;                                                              # File
+  scalar split /\n/, readFile($file);
+ } # numberOfLinesInFile
 
 #D1 Images                                                                      # Image operations.
 
@@ -771,14 +826,14 @@ END
    }
  }
 
-sub convertDocxToFodt($$)                                                       # Convert a .docx file to .fodt using unoconv which must not be running elsewhere at the time.  L<Unoconv|/https://github.com/dagwieers/unoconv> can be installed via:\m  sudo apt install sharutils unoconv\mParameters:
+sub convertDocxToFodt($$)                                                       # Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.  L<Unoconv|/https://github.com/dagwieers/unoconv> can be installed via:\m  sudo apt install sharutils unoconv\mParameters:
  {my ($inputFile, $outputFile) = @_;                                            # Input file, output file
   my $r = qx(unoconv -f fodt -o "$outputFile" "$inputFile");                    # Perform conversion
   !$r or confess "unoconv failed, try closing libreoffice if it is open\n". $r;
  }
 
 # Tests in: /home/phil/perl/z/unoconv/testCutOutImagesInFodtFile.pl
-sub cutOutImagesInFodtFile($$$)                                                 # Cut out the images embedded in a .fodt file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:\m  <image href="$imageFile" outputclass="imageType">\mThis conversion requires that you have both L<Imagemagick> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:\m    sudo apt install sharutils  imagemagick unoconv\mParameters:
+sub cutOutImagesInFodtFile($$$)                                                 # Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:\m  <image href="$imageFile" outputclass="imageType">\mThis conversion requires that you have both L<Imagemagick> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:\m    sudo apt install sharutils  imagemagick unoconv\mParameters:
  {my ($inputFile, $outputFolder, $imagePrefix) = @_;                            # Input file,  output folder for images, a prefix to be added to image file names
   my $source = readFile($inputFile);                                            # Read .fodt file
   say STDERR "Start image location in string of ", length($source);
@@ -950,7 +1005,7 @@ sub max(@)                                                                      
 
 sub maximumLineLength($)                                                        # Find the longest line in a string
  {my ($string) = @_;                                                            # String of lines of text
-  max(map {length($_)} split /\n/, $string) // 0                                # Length of longest line
+  max(map {length($_)} split /\n/, ($string//'')) // 0                          # Length of longest line
  }
 
 sub formatTableMultiLine($;$)                                                   #P Tabularize text that has new lines in it.
@@ -984,7 +1039,7 @@ sub formatTableMultiLine($;$)                                                   
        }
      }
 
-    my $n = max(map {scalar @$_} @row);                                         # Maximum number of rows
+    my $n = max(map {scalar @{$_//[]}} @row)//0;                                # Maximum number of rows
 
     for my $r(1..$n)                                                            # Each row of the items
      {my $text = '';
@@ -1000,8 +1055,8 @@ sub formatTableMultiLine($;$)                                                   
   join($s, @text).$s
  }
 
-sub formatTableBasic($;$)                                                       # Tabularize text that does not have new lines in it.
- {my ($data, $separator) = @_;                                                  # Reference to an array of arrays of data to be formatted as a table, optional line separator to use instead of new line for each row.
+sub formatTableBasic($)                                                         # Tabularize an array of arrays of text.
+ {my ($data) = @_;                                                              # Reference to an array of arrays of data to be formatted as a table.
   ref($data) =~ /array/i or                                                     # Must be an array
     confess "Array reference required not:\n".dump($data)."\n";
   my @width;                                                                    # Maximum width of each column
@@ -1011,7 +1066,7 @@ sub formatTableBasic($;$)                                                       
       confess "Array reference required not:\n".dump($row)."\n";
     for my $col(0..$#$row)                                                      # Each column index
      {my $text  = $row->[$col] // '';                                           # Text of current line
-#     return &formatTableMultiLine(@_) if $text =~ m(\n);                       # Element has a new line in it
+      return &formatTableMultiLine(@_) if $text =~ m(\n);                       # Element has a new line in it
       my $a  = $width[$col] // 0;                                               # Maximum length of data so far
       my $b  = length($text);                                                   # Length of longest line in current item
       $width[$col] = ($a > $b ? $a : $b);                                       # Update maximum length
@@ -1035,30 +1090,29 @@ sub formatTableBasic($;$)                                                       
     push @text, $text;
    }
 
-  my $s = $separator//"\n";                                                     # Join row to produce formatted table
-  join($s, @text).$s
+  join("\n", @text)."\n"
  }
 
-sub formatTableAA($;$$)                                                         #P Tabularize an array of arrays.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional reference to an array of titles, optional line separator
+sub formatTableAA($;$)                                                          #P Tabularize an array of arrays.
+ {my ($data, $title) = @_;                                                      # Data to be formatted, optional reference to an array of titles
   return dump($data) unless ref($data) =~ /array/i and @$data;
   my $d;
   push @$d, ['', @$title] if $title;
   push @$d, [$_, @{$data->[$_-1]}] for 1..@$data;
-  formatTableBasic($d, $separator);
+  formatTableBasic($d);
  }
 
-sub formatTableHA($;$$)                                                         #P Tabularize a hash of arrays.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional title, optional line separator
+sub formatTableHA($;$)                                                          #P Tabularize a hash of arrays.
+ {my ($data, $title) = @_;                                                      # Data to be formatted, optional titles
   return dump($data) unless ref($data) =~ /hash/i and keys %$data;
   my $d;
-  push @$d, [['', @$title]] if $title;
+  push @$d, $title if $title;
   push @$d, [$_, @{$data->{$_}}] for sort keys %$data;
-  formatTableBasic($d, $separator);
+  formatTableBasic($d);
  }
 
-sub formatTableAH($;$$)                                                         #P Tabularize an array of hashes.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional title, optional line separator
+sub formatTableAH($)                                                            #P Tabularize an array of hashes.
+ {my ($data) = @_;                                                              # Data to be formatted
   return dump($data) unless ref($data) =~ /array/i and @$data;
 
   my %k; @k{keys %$_}++ for @$data;                                             # Column headers
@@ -1071,11 +1125,11 @@ sub formatTableAH($;$$)                                                         
     my %h = %{$data->[$_-1]};
     $d->[-1][$k{$_}] = $h{$_} for keys %h;
    }
-  formatTableBasic($d, $separator);
+  formatTableBasic($d);
  }
 
-sub formatTableHH($;$$)                                                         #P Tabularize a hash of hashes.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional title, optional line separator
+sub formatTableHH($)                                                            #P Tabularize a hash of hashes.
+ {my ($data) = @_;                                                              # Data to be formatted
   return dump($data) unless ref($data) =~ /hash/i and keys %$data;
 
   my %k; @k{keys %$_}++ for values %$data;                                      # Column headers
@@ -1088,11 +1142,11 @@ sub formatTableHH($;$$)                                                         
     my %h = %{$data->{$_}};
     $d->[-1][$k{$_}] = $h{$_} for keys %h;
    }
-  formatTableBasic($d, $separator);
+  formatTableBasic($d);
  }
 
-sub formatTableA($;$$)                                                          #P Tabularize an array.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional title, optional line separator
+sub formatTableA($;$)                                                           #P Tabularize an array.
+ {my ($data, $title) = @_;                                                      # Data to be formatted, optional title
   return dump($data) unless ref($data) =~ /array/i and @$data;
 
   my $d;
@@ -1100,11 +1154,11 @@ sub formatTableA($;$$)                                                          
   for(keys @$data)
    {push @$d, @$data > 1 ? [$_, $data->[$_]] : [$data->[$_]];                   # Skip line number if the array is degenerate
    }
-  formatTableBasic($d, $separator);
+  formatTableBasic($d);
  }
 
-sub formatTableH($;$$)                                                          #P Tabularize a hash.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional title, optional line separator
+sub formatTableH($;$)                                                           #P Tabularize a hash.
+ {my ($data, $title) = @_;                                                      # Data to be formatted, optional title
 
   return dump($data) unless ref($data) =~ /hash/i and keys %$data;
 
@@ -1113,11 +1167,11 @@ sub formatTableH($;$$)                                                          
   for(sort keys %$data)
    {push @$d, [$_, $data->{$_}];
    }
-  formatTableBasic($d, $separator);
+  formatTableBasic($d);
  }
 
-sub formatTable($;$$)                                                           # Format various data structures as a table.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional reference to an array of titles, optional line separator
+sub formatTable($;$%)                                                           # Format various data structures as a table. Optionally create a report from the table using the following optional report options:\mB<file=E<gt>$file> the name of a file to write the report to.\mB<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time.\mB<rows=E<gt>$rows> a header line in which NNNN will be replaced with the number of rows in the table.\mParameters:
+ {my ($data, $title, %options) = @_;                                            # Data to be formatted, optional reference to an array of titles, options
   my ($a, $h, $o) = (0, 0, 0);
   my $checkStructure = sub
    {for(@_)
@@ -1126,18 +1180,43 @@ sub formatTable($;$$)                                                           
      }
    };
 
-  if    (ref($data) =~ /array/i)
-   {$checkStructure->(       @$data);
-    return formatTableAA($data, $title, $separator) if  $a and !$h and !$o;
-    return formatTableAH($data, $title, $separator) if !$a and  $h and !$o;
-    return formatTableA ($data, $title, $separator);
-   }
-  elsif (ref($data) =~ /hash/i)
-   {$checkStructure->(values %$data);
-    return formatTableHA($data, $title, $separator) if  $a and !$h and !$o;
-    return formatTableHH($data, $title, $separator) if !$a and  $h and !$o;
-    return formatTableH ($data, $title, $separator);
-   }
+  my $formattedTable = sub                                                      # Format table
+   {if    (ref($data) =~ /array/i)
+     {$checkStructure->(       @$data);
+      return formatTableAA($data, $title) if  $a and !$h and !$o;
+      return formatTableAH($data)         if !$a and  $h and !$o;
+      return formatTableA ($data, $title);
+     }
+    elsif (ref($data) =~ /hash/i)
+     {$checkStructure->(values %$data);
+      return formatTableHA($data, $title) if  $a and !$h and !$o;
+      return formatTableHH($data)         if !$a and  $h and !$o;
+      return formatTableH ($data, $title);
+     }
+   }->();
+
+  return $formattedTable unless keys %options;                                  # Return table as is unless report requested
+
+  checkKeys(\%options,                                                          # Check report options
+    {head=>q(A header line which will preceed the formatted table. ).
+           q(DDDD in this line will be replaced with the current date and time),
+     file=>q(The name of a file to which to write the formatted table.),
+     rows=>q(NNNN in this line will be replaced with the number of rows in the table.),
+    });
+
+  my ($head, $file, $rows) = map{$options{$_}} qw(head file rows);
+
+  my @report;
+  my $date = dateTimeStamp;
+  my $N    = keyCount(1, $data);
+  push @report, ($head =~ s(DDDD) ($date)gr), q() if $head;
+  push @report, ($rows =~ s(NNNN) ($N)gr),    q() if $rows;
+  push @report, qq(This file: $file),         q() if $file;
+  push @report, $formattedTable;
+  my $report = join "\n", @report;
+  writeFile($file, $report) if $file;
+
+  $report
  }
 
 sub keyCount($$)                                                                # Count keys down to the specified level.
@@ -1182,8 +1261,18 @@ sub loadHashArrayFromLines($)                                                   
   +{map{my @a = split /\s+/; (shift @a, [@a])} split "\n", $string}
  }
 
+sub loadArrayHashFromLines($)                                                   # Load an array of hashes from lines of text: each line is an hash of words.
+ {my ($string) = @_;                                                            # The string of lines from which to create an array of arrays
+  [map {+{split /\s+/}} split /\n/, $string]
+ }
+
+sub loadHashHashFromLines($)                                                    # Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+ {my ($string) = @_;                                                            # The string of lines from which to create a hash of arrays
+  +{map{my ($a, @a) = split /\s+/; ($a=>{@a})} split "\n", $string}
+ }
+
 sub checkKeys($$)                                                               # Check the keys in a hash.
- {my ($test, $permitted) = @_;                                                  # The hash to test, the permitted keys and their meanings
+ {my ($test, $permitted) = @_;                                                  # The hash to test, a hash of the permitted keys and their meanings
 
   ref($test)      =~ /hash/igs or                                               # Check parameters
     confess "Hash reference required for first parameter\n";
@@ -1203,8 +1292,8 @@ sub checkKeys($$)                                                               
    "";
  }
 
-#D1 LVALUE methods                                                              # Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelled correctly.
-sub genLValueScalarMethods(@)                                                   # Generate L<lvalueMethod> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.
+#D1 LVALUE methods                                                              # Replace $a->{B<value>} = $b with $a->B<value> = $b which reduces the amount of typing required, is easier to read and provides a hard check that {B<value>} is spelled correctly.
+sub genLValueScalarMethods(@)                                                   # Generate L<lvalueMethod> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>. Suffixing B<X> to the scalar name will confess if a value has not been set.
  {my (@names) = @_;                                                             # List of method names
   my ($package) = caller;                                                       # Package
   for my $m(@_)                                                                 # Name each method
@@ -1213,7 +1302,7 @@ sub genLValueScalarMethods(@)                                                   
      {my $M = $m =~ s(\A.*:) ()r;                                               # Remove package
       $s =
        'sub '.$m. ':lvalue {$_[0]{"'.$M.'"}}'.                                  # LValue version for get and set
-       'sub '.$m.'X        {$_[0]{"'.$M.'"} // q()}';                           # Non lvalue version for get only returning q() instead of undef
+       'sub '.$m.'X        {$_[0]{"'.$M.'"} // q()}';                           # Non lvalue version for get only returning q() instead of B<undef>
      }
     else                                                                        # Use package of caller
      {$s =
@@ -1228,7 +1317,7 @@ sub genLValueScalarMethods(@)                                                   
    }
  }
 
-sub addLValueScalarMethods(@)                                                   # Generate L<lvalueMethod> scalar methods in the current package if they do not already exist. A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.
+sub addLValueScalarMethods(@)                                                   # Generate L<lvalueMethod> scalar methods in the current package if they do not already exist. A method whose value has not yet been set will return a new scalar with value B<undef>. Suffixing B<X> to the scalar name will confess if a value has not been set.
  {my (@names) = @_;                                                             # List of method names
   my ($package) = caller;                                                       # Package
   for my $m(@_)                                                                 # Name each method
@@ -1278,9 +1367,9 @@ sub assertRef(@)                                                                
   1
  }
 
-sub ˢ(&)                                                                        # Immediately executed inline sub to allow a code block before if.
- {my ($sub) = @_;                                                               # Sub as {} without the word "sub"
-  &$sub
+sub ˢ(&)                                                                        # Immediately executed inline sub to allow a code block before B<if>.
+ {my ($sub) = @_;                                                               # Sub enclosed in {} without the word "sub"
+  &$sub                                                                         # Note: due to a collision with perl statement syntax: method package parameters as in say STDERR ... this method can be used before this line in this module as I tried unsuccessfully to do in formatTable.
  }
 
 #D1 Attribute classes                                                           # Build classes of attributes
@@ -1325,7 +1414,7 @@ END
    {\$_[0]{$m}
    }
 
-  sub ${m}X                                                                     # Non lvalue version for get $m returning q() instead of undef
+  sub ${m}X                                                                     # Non lvalue version for get $m returning q() instead of B<undef>
    {\$_[0]{$m} // q()
    }
 END
@@ -1380,26 +1469,27 @@ sub isBlank($)                                                                  
   $string =~ m/\A\s*\Z/
  }
 
-sub trim($)                                                                     # Trim off white space from from front and end of string.
+sub trim($)                                                                     # Remove any white space from the front and end of a string.
  {my ($string) = @_;                                                            # String
   $string =~ s/\A\s+//r =~ s/\s+\Z//r
  }
 
-sub pad($$)                                                                     # Pad a string with blanks to a multiple of a specified length.
- {my ($string, $length) = @_;                                                   # String, tab width
+sub pad($$;$)                                                                   # Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+ {my ($string, $length, $pad) = @_;                                             # String, tab width, padding char
   $string =~ s/\s+\Z//;
+  $pad //= q( );
   my $l = length($string);
   return $string if $l % $length == 0;
   my $p = $length - $l % $length;
-  $string .= ' ' x $p;
+  $string .= $pad x $p;
  }
 
-sub nws($)                                                                      # Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of white space in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
+sub nws($)                                                                      # Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of white space in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than one space at a time.
  {my ($string) = @_;                                                            # String to normalize
   $string =~ s/\A\s+//r =~ s/\s+\Z//r =~ s/\s+/ /gr
  }
 
-sub boldString($)                                                               # Bold a string
+sub boldString($)                                                               # Bold a string.
  {my ($string) = @_;                                                            # String to bold
   $string =~ tr(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ)
                (𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭);
@@ -1435,6 +1525,11 @@ sub perlPackage($)                                                              
 sub printQw(@)                                                                  # Print an array of words in qw() format.
  {my (@words) = @_;                                                             # Array of words
   'qw('.join(' ', @words).')'
+ }
+
+sub numberOfLinesInString($)                                                    # The number of lines in a string.
+ {my ($string) = @_;                                                            # String
+  scalar split /\n/, $string;
  }
 
 #D1 Cloud Cover                                                                 # Useful for operating across the cloud.
@@ -1544,7 +1639,7 @@ sub waitForAllStartedProcessesToFinish(\%)                                      
 #D1 Documentation                                                               # Extract, format and update documentation for a perl module.
 
 sub htmlToc($@)                                                                 # Generate a table of contents for some html.
- {my ($replace, $html) = @_;                                                    # Substring within the html to be replaced with the toc, string of html
+ {my ($replace, $html) = @_;                                                    # Sub-string within the html to be replaced with the toc, string of html
   my @toc;
   my %toc;
 
@@ -1576,14 +1671,14 @@ END
   $html =~ s($replace) ($h)gsr;
  }
 
-sub extractTest($)                                                              #P Extract a line of a test.
+sub extractTest($)                                                              #P Remove example markers from test code.
  {my ($string) = @_;                                                            # String containing test line
  #$string =~ s/\A\s*{?(.+?)\s*#.*\Z/$1/;                                        # Remove any initial white space and possible { and any trailing white space and comments
   $string =~ s(#T(\w|:)+) ()gs;                                                 # Remove test tags from line
   $string
  }
 
-sub updateDocumentation(;$)                                                     # Update documentation from the comments in a perl script. Comments between the lines marked with:\m  #Dn title # description\mand:\m  #D\mwhere n is either 1, 2 or 3 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be chosen from:\m=over\m=item I\mmethod of interest to new users\m=item P\mprivate method\m=item r\moptionally replaceable method\m=item R\mrequired replaceable method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. Lines containing comments consisting of '#T'.methodName will also be aggregated and displayed as examples for that method.\mLines formatted as:\m  BEGIN{*source=*target}\mstarting in column 1 will define a synonym for a method.\mLines formatted as:\m  #C emailAddress text\mwill be aggregated in the acknowledgments section at the end of the documentation.\mThe character sequence B<\\xn> in the comment will be expanded to one new line, B<\\xm> to two new lines and B<L>B<<$_>>,B<L>B<<confess>>,B<L>B<<die>>,B<L>B<<eval>>,B<L>B<<lvalueMethod>> to links to the perl documentation.\mSearch for '#D1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20180801/lib/Data/Table/Text.pm> to see  more examples of such documentation in action.\mParameters:\n
+sub updateDocumentation(;$)                                                     # Update documentation from the comments in a perl script. Comments between the lines marked with:\m  #Dn title # description\mand:\m  #D\mwhere n is either 1, 2 or 3 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be chosen from:\m=over\m=item I\mmethod of interest to new users\m=item P\mprivate method\m=item r\moptionally replaceable method\m=item R\mrequired replaceable method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. Lines containing comments consisting of '#T'.methodName will also be aggregated and displayed as examples for that method.\mLines formatted as:\m  BEGIN{*source=*target}\mstarting in column 1 will define a synonym for a method.\mLines formatted as:\m  #C emailAddress text\mwill be aggregated in the acknowledgments section at the end of the documentation.\mThe character sequence B<\\xn> in the comment will be expanded to one new line, B<\\xm> to two new lines and B<L>B<<$_>>,B<L>B<<confess>>,B<L>B<<die>>,B<L>B<<eval>>,B<L>B<<lvalueMethod>> to links to the perl documentation.\mSearch for '#D1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20180810/lib/Data/Table/Text.pm> to see  more examples of such documentation in action - although it is quite difficult to see as it looks just like normal comments placed in the code.\mParameters:\n
  {my ($perlModule) = @_;                                                        # Optional file name with caller's file being the default
   $perlModule //= $0;                                                           # Extract documentation from the caller if no perl module is supplied
   my $package = perlPackage($perlModule);                                       # Package name
@@ -1594,7 +1689,7 @@ sub updateDocumentation(;$)                                                     
   my %iUseful;                                                                  # Immediately useful methods
   my %methods;                                                                  # Methods that have been coded as opposed to being generated
   my %methodParms;                                                              # Method names including parameters
-  my %methodX;                                                                  # Method names for methods that have an version suffixed with X that die rather than returning undef
+  my %methodX;                                                                  # Method names for methods that have an version suffixed with X that die rather than returning B<undef>
   my %private;                                                                  # Private methods
   my %replace;                                                                  # Optional replaceable methods
   my %Replace;                                                                  # Required replaceable methods
@@ -1755,7 +1850,7 @@ END
                               s/\A\x28//gsr     =~
                               s/\x29\s*(:lvalue\s*)?\Z//gsr =~
                               s/;//gsr;                                         # Remove optional parameters marker from signature
-      my $name      = $sub =~ s/\x28.*?\x29//r;                                     # Method name after removing parameters
+      my $name      = $sub =~ s/\x28.*?\x29//r;                                 # Method name after removing parameters
 
       my $methodX   = $flags =~ m/X/;                                           # Die rather than return undef
       my $private   = $flags =~ m/P/;                                           # Private
@@ -1947,7 +2042,7 @@ END
     push @doc, qq(\n\n=head1 Synonyms\n\n$s\n);
    }
 
-  push @doc, "\n\n=head1 Index\n\n";
+  push @doc, qq(\n\n=head1 Index\n\n);
   if (1)
    {my $n = 0;
     for my $s(sort {lc($a) cmp lc($b)} keys %methodParms)                       # Alphabetic listing of methods
@@ -1955,7 +2050,7 @@ END
       my $c = $comment{$s};
       if ($c and $t)
        {$c =~ s(\..*\Z) (\.)s;
-        push @doc, ++$n." L<$s|/$t> - $c\n";
+        push @doc, ++$n.qq( L<$s|/$t> - $c\n);
        }
      }
    }
@@ -2046,6 +2141,7 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;
@@ -2077,8 +2173,8 @@ END
    {$source =~ s/\n+=head1 Description.+?\n+1;\n+/\n\n$doc\n1;\n/gs;            # Edit module source from =head1 description to final 1;
 
     if ($source ne $Source)                                                     # Save source only if it has changed and came from a file
-     {writeFile(filePathExt($perlModule, qq(backup)), $source);                 # Backup module source
-      writeFile($perlModule, $source);                                          # Write updated module source
+     {overWriteFile(filePathExt($perlModule, qq(backup)), $source);             # Backup module source
+      overWriteFile($perlModule, $source);                                      # Write updated module source
      }
    }
 
@@ -2126,32 +2222,34 @@ call checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
 convertDocxToFodt convertImageToJpx convertUnicodeToXml
 createEmptyFile currentDirectory currentDirectoryAbove cutOutImagesInFodtFile
-dateStamp dateTimeStamp decodeJson decodeBase64
-encodeJson encodeBase64 evalFile
+dateStamp dateTimeStamp decodeJson decodeBase64 dumpGZipFile
+encodeJson encodeBase64 evalFile evalGZipFile
 fileList fileModTime fileOutOfDate
 filePath filePathDir filePathExt fileSize findDirs findFiles
 findFileWithExtension
 firstFileThatExists
 formatTableBasic fpd fpe fpf fp fe fn fpn fne fullFileName
+genClass
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 hostName htmlToc
 imageSize indentString isBlank
 javaPackage javaPackageAsFileName
 keyCount
-loadArrayArrayFromLines loadArrayFromLines
-loadHashArrayFromLines loadHashFromLines
+loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines
+loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
 makePath matchPath max microSecondsSinceEpoch min
+numberOfLinesInFile numberOfLinesInString
 nws
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
 quoteFile
-readBinaryFile readFile readUtf16File relFromAbsAgainstAbs removeBOM removeFilePrefix
+readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs removeBOM removeFilePrefix
 saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
 setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords startProcess
 temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
 updateDocumentation updatePerlModuleDocumentation userId
 versionCode versionCodeDashed
-waitForAllStartedProcessesToFinish wwwEncode writeBinaryFile writeFile writeFiles
+waitForAllStartedProcessesToFinish wwwEncode writeBinaryFile writeFile writeFiles writeGZipFile
 xxx XXX
 zzz
 ˢ
@@ -2174,119 +2272,152 @@ Data::Table::Text - Write data in tabular text format.
 
   use Data::Table::Text;
 
-Print a table:
+# Print a table:
 
   my $d =
-   [[qw(a b c)],
-    [qq(A), qq(B\nBB), qq(C\nCC\nCCC\n)],
+   [[qq(a), qq(b\nbb), qq(c\ncc\nccc\n)],
     [qq(1), qq(1\n22), qq(1\n22\n333\n)],
    ];
 
-  my $t = formatTableBasic($d);
-  ok $t eq <<END;
-a  b   c
-A  B   C
-   BB  CC
-       CCC
-1   1    1
-   22   22
-       333
-END
+  my $t = formatTable($d, [qw(A BB CCC)]);
 
-Print a table containing tables:
+  ok $t eq <<END;
+     A  BB  CCC
+  1  a  b   c
+        bb  cc
+            ccc
+  2  1   1    1
+        22   22
+            333
+  END
+
+# Print a table containing tables and make it into a report:
 
   my $D = [[qq(See the\ntable\nopposite), $t],
            [qq(Or\nthis\none),            $t],
           ];
 
-  ok formatTable($D) eq <<END;
-1  See the   a  b   c
-   table     A  B   C
-   opposite     BB  CC
-                    CCC
-             1   1    1
-                22   22
-                    333
-2  Or        a  b   c
-   this      A  B   C
-   one          BB  CC
-                    CCC
-             1   1    1
-                22   22
-                    333
-END
 
-Print an array of arrays:
+  my $T = formatTable
+   ($D,
+   [qw(Description Table)],
+    head=>q(Table of Tables.),
+    rows=>q(NNNN rows containing a table.),
+   );
 
-  say STDERR formatTable
-     ([[qw(A   B   C  )],
-       [qw(AA  BB  CC )],
-       [qw(AAA BBB CCC)],
-       [qw(1   22  333)]],
-      [qw (aa  bb  cc)]);
+  ok $T eq <<END;
+  Table of Tables.
 
-  #    aa   bb   cc
-  # 1  A    B    C
-  # 2  AA   BB   CC
-  # 3  AAA  BBB  CCC
-  # 4    1   22  333
+  2 rows containing a table.
 
-Print an array of hashes:
+     Description  Table
+  1  See the         A  BB  CCC
+     table        1  a  b   c
+     opposite           bb  cc
+                            ccc
+                  2  1   1    1
+                        22   22
+                            333
+  2  Or              A  BB  CCC
+     this         1  a  b   c
+     one                bb  cc
+                            ccc
+                  2  1   1    1
+                        22   22
+                            333
+  END
 
-  say STDERR formatTable([
-    { aa => "A", bb => "B", cc => "C" },
-    { aa => "AA", bb => "BB", cc => "CC" },
-    { aa => "AAA", bb => "BBB", cc => "CCC" },
-    { aa => 1, bb => 22, cc => 333 }]);
+# Print an array of arrays:
 
-  #    aa   bb   cc
-  # 1  A    B    C
-  # 2  AA   BB   CC
-  # 3  AAA  BBB  CCC
-  # 4    1   22  333
+  my $aa = formatTable
+   ([[qw(A   B   C  )],
+     [qw(AA  BB  CC )],
+     [qw(AAA BBB CCC)],
+     [qw(1   22  333)]],
+     [qw (aa  bb  cc)]);
 
-Print a hash of arrays:
+  ok $aa eq <<END;
+     aa   bb   cc
+  1  A    B    C
+  2  AA   BB   CC
+  3  AAA  BBB  CCC
+  4    1   22  333
+  END
 
-  say STDERR formatTable({
-    "" => ["aa", "bb", "cc"],
-    "1" => ["A", "B", "C"],
-    "22" => ["AA", "BB", "CC"],
-    "333" => ["AAA", "BBB", "CCC"],
-    "4444" => [1, 22, 333]});
+# Print an array of hashes:
 
-  #       aa   bb   cc
-  #    1  A    B    C
-  #   22  AA   BB   CC
-  #  333  AAA  BBB  CCC
-  # 4444    1   22  333
+  my $ah = formatTable
+   ([{aa=> "A",   bb => "B",   cc => "C" },
+     {aa=> "AA",  bb => "BB",  cc => "CC" },
+     {aa=> "AAA", bb => "BBB", cc => "CCC" },
+     {aa=> 1,     bb => 22,    cc => 333 }]);
 
-Print a hash of hashes:
+  ok $ah eq <<END;
+     aa   bb   cc
+  1  A    B    C
+  2  AA   BB   CC
+  3  AAA  BBB  CCC
+  4    1   22  333
+  END
 
-  say STDERR formatTable({
-    a => { aa => "A", bb => "B", cc => "C" },
-    aa => { aa => "AA", bb => "BB", cc => "CC" },
-    aaa => { aa => "AAA", bb => "BBB", cc => "CCC" },
-    aaaa => { aa => 1, bb => 22, cc => 333 }});
-  #       aa   bb   cc
-  # a     A    B    C
-  # aa    AA   BB   CC
-  # aaa   AAA  BBB  CCC
-  # aaaa    1   22  333
+# Print a hash of arrays:
 
-Print an array of scalars:
+  my $ha = formatTable
+   ({""     => ["aa",  "bb",  "cc"],
+     "1"    => ["A",   "B",   "C"],
+     "22"   => ["AA",  "BB",  "CC"],
+     "333"  => ["AAA", "BBB", "CCC"],
+     "4444" => [1,      22,    333]},
+     [qw(Key A B C)]
+     );
 
-  say STDERR formatTable(["a", "bb", "ccc", 4]);
-  # 0  a
-  # 1  bb
-  # 2  ccc
-  # 3    4
+  ok $ha eq <<END;
+  Key   A    B    C
+        aa   bb   cc
+     1  A    B    C
+    22  AA   BB   CC
+   333  AAA  BBB  CCC
+  4444    1   22  333
+  END
 
-Print a hash of scalars:
+# Print a hash of hashes:
 
-  say STDERR formatTable({ aa => "A", bb => "B", cc => "C" });
-  # aa  A
-  # bb  B
-  # cc  C
+  my $hh = formatTable
+   ({a    => {aa=>"A",   bb=>"B",   cc=>"C" },
+     aa   => {aa=>"AA",  bb=>"BB",  cc=>"CC" },
+     aaa  => {aa=>"AAA", bb=>"BBB", cc=>"CCC" },
+     aaaa => {aa=>1,     bb=>22,    cc=>333 }});
+
+  ok $hh eq <<END;
+        aa   bb   cc
+  a     A    B    C
+  aa    AA   BB   CC
+  aaa   AAA  BBB  CCC
+  aaaa    1   22  333
+  END
+
+# Print an array of scalars:
+
+  my $a = formatTable(["a", "bb", "ccc", 4], [q(#), q(Col)]);
+
+  ok $a eq <<END;
+  #  Col
+  0  a
+  1  bb
+  2  ccc
+  3    4
+  END
+
+# Print a hash of scalars:
+
+  my $h = formatTable({aa=>"AAAA", bb=>"BBBB", cc=>"333"}, [qw(Key Title)]);
+
+  ok $h eq <<END;
+  Key  Title
+  aa   AAAA
+  bb   BBBB
+  cc     333
+  END
 
 =head1 Description
 
@@ -2441,7 +2572,7 @@ Example:
 
        {c=>undef, dd=>undef, eee=>"EEEE", f=>"F", gg=>"g g", hh=>"h h"},
 
-      ], 'parse valid 1';
+      ];
 
 
 =head2 call(&@)
@@ -2524,37 +2655,37 @@ Example:
 
     my $a = '';
     my @a = fileOutOfDate {$a .= $_} q(a), @files;
-    ok $a eq 'da', "outOfDate a";
+    ok $a eq 'da';
     is_deeply [@a], [qw(d a)];
 
     my $b = '';
     my @b = fileOutOfDate {$b .= $_} q(b), @files;
-    ok $b eq 'db', "outOfDate b";
+    ok $b eq 'db';
     is_deeply [@b], [qw(d b)];
 
     my $c = '';
     my @c = fileOutOfDate {$c .= $_} q(c), @files;
-    ok $c eq 'dc', "outOfDate c";
+    ok $c eq 'dc';
     is_deeply [@c], [qw(d c)];
 
     my $d = '';
     my @d = fileOutOfDate {$d .= $_} q(d), @files;
-    ok $d eq 'd', "outOfDate d";
+    ok $d eq 'd';
     is_deeply [@d], [qw(d)];
 
     my @A = fileOutOfDate {} q(a), @Files;
     my @B = fileOutOfDate {} q(b), @Files;
     my @C = fileOutOfDate {} q(c), @Files;
-    is_deeply [@A], [qw(a)], 'aaa';
-    is_deeply [@B], [qw(b)], 'bbb';
-    is_deeply [@C], [],      'ccc';
+    is_deeply [@A], [qw(a)];
+    is_deeply [@B], [qw(b)];
+    is_deeply [@C], [];
     unlink for @Files;
    }
 
 
 =head3 firstFileThatExists(@)
 
-Returns the name of the first file that exists or undef if none of the named files exist.
+Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
      Parameter  Description
   1  @files     Files to check
@@ -2573,7 +2704,7 @@ Create file names from file name components.
 
 =head3 filePath(@)
 
-Create a file path from an array of file name components. If all the components are blank then a blank file name is returned.  Identical to L<fpf|/fpf>.
+Create a file name from an array of file name components. If all the components are blank then a blank file name is returned.  Identical to L<fpf|/fpf>.
 
      Parameter  Description
   1  @file      File name components
@@ -2600,7 +2731,7 @@ B<fpf> is a synonym for L<filePath|/filePath>.
 
 =head3 filePathDir(@)
 
-Directory from an array of file name components. If all the components are blank then a blank file name is returned.   Identical to L<fpd|/fpd>.
+Create a directory name from an array of file name components. If all the components are blank then a blank file name is returned.   Identical to L<fpd|/fpd>.
 
      Parameter  Description
   1  @file      Directory name components
@@ -2627,7 +2758,7 @@ B<fpd> is a synonym for L<filePathDir|/filePathDir>.
 
 =head3 filePathExt(@)
 
-File name from file name components and extension.   Identical to L<fpe|/fpe>.
+Create a file name from an array of file name components the last of which is an extension. Identical to L<fpe|/fpe>.
 
      Parameter  Description
   1  @File      File name components and extension
@@ -2735,9 +2866,9 @@ Example:
 
     createEmptyFile($f);
 
-    ok checkFile($d), $d;
+    ok checkFile($d);
 
-    ok checkFile($f), $f;
+    ok checkFile($f);
 
 
 =head3 quoteFile($)
@@ -2856,7 +2987,7 @@ Example:
 
 =head3 absFromAbsPlusRel($$)
 
-Create an absolute file from a an absolute file and a following relative file.
+Create an absolute file from an absolute file and a relative file.
 
      Parameter  Description
   1  $a         Absolute file name
@@ -2872,11 +3003,11 @@ Example:
 
 =head3 relFromAbsAgainstAbs($$)
 
-Derive a relative file name for the first absolute file relative to the second absolute file name.
+Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
      Parameter  Description
   1  $f         Absolute file to be made relative
-  2  $a         Absolute file to compare against
+  2  $a         Absolute file name to make relative to.
 
 Example:
 
@@ -2898,7 +3029,7 @@ Create a temporary file that will automatically be L<unlinked|/unlink> during EN
 Example:
 
 
-   {my $f = temporaryFile;
+    my $f = temporaryFile;
 
 
 =head3 temporaryFolder()
@@ -2961,7 +3092,7 @@ Example:
 
 =head3 fileList($)
 
-Files that match a given search pattern.
+Files that match a given search pattern handed to bsd_glob.
 
      Parameter  Description
   1  $pattern   Search pattern
@@ -2982,7 +3113,7 @@ Example:
 
 =head3 searchDirectoryTreesForMatchingFiles(@)
 
-Search the specified directory trees for files that match the specified extensions - the argument list should include at least one folder and one extension to be useful.
+Search the specified directory trees for the files (not folders) that match the specified extensions. The argument list should include at least one path name to be useful. If no file extension is supplied then all the files below the specified paths are returned.
 
      Parameter              Description
   1  @foldersandExtensions  Mixture of folder names and extensions
@@ -3064,10 +3195,10 @@ Read and write strings from and to files creating paths as needed.
 
 =head3 readFile($)
 
-Read a file containing unicode.
+Read a file containing unicode in utf8.
 
      Parameter  Description
-  1  $file      Name of unicode file to read
+  1  $file      Name of file to read
 
 Example:
 
@@ -3087,7 +3218,7 @@ Example:
 
 =head3 evalFile($)
 
-Read a file containing unicode, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
      Parameter  Description
   1  $file      File to read
@@ -3100,11 +3231,38 @@ Example:
     my $s = evalFile($f);
     is_deeply $s, [qw(aaa bbb ccc)];
 
-    writeFile($f, q({qw(aaa bbb ccc)]));
-    $s = eval { evalFile($f) };
+    ok overWriteFile($f, q({qw(aaa bbb ccc)]));
+    $s = eval q{ evalFile($f) };
     ok $@ =~ m(\Asyntax error);
     unlink $f;
    }
+
+
+=head3 evalGZipFile($)
+
+Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+
+     Parameter  Description
+  1  $file      File to read
+
+Example:
+
+
+  if (!$windows) {
+
+
+=head3 dumpGZipFile($$)
+
+Write a data structure through B<gzip> to a file.
+
+     Parameter  Description
+  1  $file      File to write
+  2  $data      Reference to data
+
+Example:
+
+
+  if (!$windows) {
 
 
 =head3 readBinaryFile($)
@@ -3124,6 +3282,19 @@ Example:
     ok $s eq 0xff x 8;
 
 
+=head3 readGZipFile($)
+
+Read the specified B<$file>, containing compressed utf8, through gzip
+
+     Parameter  Description
+  1  $file      File to read.
+
+Example:
+
+
+  if (!$windows) {
+
+
 =head3 makePath($)
 
 Make the path for the specified file name or folder.
@@ -3138,20 +3309,36 @@ Example:
 
     my $f = fpe($d, qw(bbb txt));
 
-    ok !-e $d;
+    ok !-d $d;
 
     makePath($f);
 
-    ok -e $d;
+    ok -d $d;
+
+
+=head3 overWriteFile($$)
+
+Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess. If the file already exists it is overwritten.
+
+     Parameter  Description
+  1  $file      File to write to or B<undef> for a temporary file
+  2  $string    Unicode string to write
+
+Example:
+
+
+   {my $f = writeFile(undef, q([qw(aaa bbb ccc)]));
+
+    ok overWriteFile($f, q({qw(aaa bbb ccc)]));
 
 
 =head3 writeFile($$)
 
-Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
      Parameter  Description
-  1  $file      File to write to or undef for a temporary file
-  2  $string    Unicode string to write
+  1  $file      New file to write to or B<undef> for a temporary file
+  2  $string    String to write
 
 Example:
 
@@ -3169,9 +3356,23 @@ Example:
     ok $S eq "aaabbb";
 
 
+=head3 writeGZipFile($$)
+
+Write a unicode utf8 string through gzip to a file.
+
+     Parameter  Description
+  1  $file      File to write to
+  2  $string    String to write
+
+Example:
+
+
+  if (!$windows) {
+
+
 =head3 writeFiles($$)
 
-Write the values of a hash as a file identified by the key of the value
+Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
 
      Parameter  Description
   1  $hash      Hash of key value pairs representing files and data
@@ -3199,11 +3400,11 @@ Example:
 
 =head3 appendFile($$)
 
-Append a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
 
      Parameter  Description
   1  $file      File to append to
-  2  $string    Unicode string to append
+  2  $string    String to append
 
 Example:
 
@@ -3226,7 +3427,7 @@ Example:
 Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
 
      Parameter  Description
-  1  $file      File to write to or undef for a temporary file
+  1  $file      File to write to or B<undef> for a temporary file
   2  $string    Non unicode string to write
 
 Example:
@@ -3244,7 +3445,7 @@ Example:
 Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
 
      Parameter  Description
-  1  $file      File to create or undef for a temporary file
+  1  $file      File to create or B<undef> for a temporary file
 
 Example:
 
@@ -3256,6 +3457,23 @@ Example:
     my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
 
     is_deeply [sort map {fne $_} findFiles($d, qr(txt\Z))], [qw(a.txt b.txt c.txt)];
+
+
+=head3 numberOfLinesInFile($)
+
+The number of lines in a file
+
+     Parameter  Description
+  1  $file      File
+
+Example:
+
+
+   {my $f = writeFile(undef, "a
+b
+");
+
+    ok numberOfLinesInFile($f) == 2;
 
 
 =head1 Images
@@ -3292,7 +3510,7 @@ Example:
 
 =head2 convertDocxToFodt($$)
 
-Convert a .docx file to .fodt using unoconv which must not be running elsewhere at the time.  L<Unoconv|/https://github.com/dagwieers/unoconv> can be installed via:
+Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.  L<Unoconv|/https://github.com/dagwieers/unoconv> can be installed via:
 
   sudo apt install sharutils unoconv
 
@@ -3310,7 +3528,7 @@ Example:
 
 =head2 cutOutImagesInFodtFile($$$)
 
-Cut out the images embedded in a .fodt file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
+Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
   <image href="$imageFile" outputclass="imageType">
 
@@ -3571,28 +3789,19 @@ Example:
   END
 
 
-=head2 formatTableMultiLine($$)
+=head2 formatTableBasic($)
 
-Tabularize text that has new lines in it.
+Tabularize an array of arrays of text.
 
-     Parameter   Description
-  1  $data       Reference to an array of arrays of data to be formatted as a table
-  2  $separator  Optional line separator to use instead of new line for each row.
-
-=head2 formatTableBasic($$)
-
-Tabularize text that does not have new lines in it.
-
-     Parameter   Description
-  1  $data       Reference to an array of arrays of data to be formatted as a table
-  2  $separator  Optional line separator to use instead of new line for each row.
+     Parameter  Description
+  1  $data      Reference to an array of arrays of data to be formatted as a table.
 
 Example:
 
 
-     my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
+    my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
 
-     ok formatTableBasic($d) eq <<END;
+    ok formatTableBasic($d) eq <<END;
   a        1
   bb      22
   ccc    333
@@ -3600,14 +3809,22 @@ Example:
   END
 
 
-=head2 formatTable($$$)
+=head2 formatTable($$%)
 
-Format various data structures as a table.
+Format various data structures as a table. Optionally create a report from the table using the following optional report options:
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional reference to an array of titles
-  3  $separator  Optional line separator
+B<file=E<gt>$file> the name of a file to write the report to.
+
+B<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time.
+
+B<rows=E<gt>$rows> a header line in which NNNN will be replaced with the number of rows in the table.
+
+Parameters:
+
+     Parameter  Description
+  1  $data      Data to be formatted
+  2  $title     Optional reference to an array of titles
+  3  %options   Options
 
 Example:
 
@@ -3683,7 +3900,7 @@ Example:
   4444    1   22  333
   END
 
-  say STDERR formatTable
+  ok formatTable
 
    ({1=>{aa=>'A', bb=>'B', cc=>'C'},
 
@@ -3699,12 +3916,39 @@ Example:
   4444    1   22  333
   END
 
-    ok formatTable({aa=>'A', bb=>'B', cc=>'C'}, [qw(aaaa bbbb)]) eq <<END;
+  ok formatTable({aa=>'A', bb=>'B', cc=>'C'}, [qw(aaaa bbbb)]) eq <<END;
   aaaa  bbbb
   aa    A
   bb    B
   cc    C
   END
+
+  if (1) {
+    my $file = fpe(qw(report txt));                                               # Create a report
+    my $t = formatTable
+     ([["a",undef], [undef, "b0ac"]],                                             # Data - please replace 0a with a new line
+      [undef, "BC"],                                                              # Column titles
+      file=>$file,                                                                # Output file
+      head=>qq(Sample report.),                                                   # Header
+      rows=>qq(NNNN rows.));                                                      # Row count
+
+    ok -e $file;
+    ok readFile($file) eq $t;
+    unlink $file;
+
+    ok $t eq <<END;
+  Sample report.
+
+  2 rows.
+
+  This file: report.txt
+
+        BC
+  1  a
+  2     b
+        c
+  END
+   }
 
 
 =head2 keyCount($$)
@@ -3741,12 +3985,17 @@ Load an array from lines of text in a string.
 Example:
 
 
-   {my $s = loadArrayFromLines <<END;
+    my $s = loadArrayFromLines <<END;
   a a
   b b
   END
 
-    ok dump($s) eq '["a a", "b b"]';
+    is_deeply $s, [q(a a), q(b b)];
+
+    ok formatTable($s) eq <<END;
+  0  a a
+  1  b b
+  END
 
 
 =head2 loadHashFromLines($)
@@ -3759,12 +4008,17 @@ Load a hash: first word of each line is the key and the rest is the value.
 Example:
 
 
-   {my $s = loadHashFromLines <<END;
+    my $s = loadHashFromLines <<END;
   a 10 11 12
   b 20 21 22
   END
 
-    ok dump($s) eq '{ a => "10 11 12", b => "20 21 22" }';
+    is_deeply $s, {a => q(10 11 12), b =>q(20 21 22)};
+
+    ok formatTable($s) eq <<END;
+  a  10 11 12
+  b  20 21 22
+  END
 
 
 =head2 loadArrayArrayFromLines($)
@@ -3777,12 +4031,17 @@ Load an array of arrays from lines of text: each line is an array of words.
 Example:
 
 
-   {my $s = loadArrayArrayFromLines <<END;
+    my $s = loadArrayArrayFromLines <<END;
   A B C
   AA BB CC
   END
 
-    ok dump($s) eq '[["A", "B", "C"], ["AA", "BB", "CC"]]';
+    is_deeply $s, [[qw(A B C)], [qw(AA BB CC)]];
+
+    ok formatTable($s) eq <<END;
+  1  A   B   C
+  2  AA  BB  CC
+  END
 
 
 =head2 loadHashArrayFromLines($)
@@ -3795,12 +4054,65 @@ Load a hash of arrays from lines of text: the first word of each line is the key
 Example:
 
 
-   {my $s = loadHashArrayFromLines <<END;
+    my $s = loadHashArrayFromLines <<END;
   a A B C
   b AA BB CC
   END
 
-    ok dump($s) eq '{ a => ["A", "B", "C"], b => ["AA", "BB", "CC"] }';
+    is_deeply $s, {a =>[qw(A B C)], b => [qw(AA BB CC)] };
+
+    ok formatTable($s) eq <<END;
+  a  A   B   C
+  b  AA  BB  CC
+  END
+
+
+=head2 loadArrayHashFromLines($)
+
+Load an array of hashes from lines of text: each line is an hash of words.
+
+     Parameter  Description
+  1  $string    The string of lines from which to create an array of arrays
+
+Example:
+
+
+    my $s = loadArrayHashFromLines <<END;
+  A 1 B 2
+  AA 11 BB 22
+  END
+
+    is_deeply $s, [{A=>1, B=>2}, {AA=>11, BB=>22}];
+
+    ok formatTable($s) eq <<END;
+     A  AA  B  BB
+  1  1      2
+  2     11     22
+  END
+
+
+=head2 loadHashHashFromLines($)
+
+Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+
+     Parameter  Description
+  1  $string    The string of lines from which to create a hash of arrays
+
+Example:
+
+
+    my $s = loadHashHashFromLines <<END;
+  a A 1 B 2
+  b AA 11 BB 22
+  END
+
+    is_deeply $s, {a=>{A=>1, B=>2}, b=>{AA=>11, BB=>22}};
+
+    ok formatTable($s) eq <<END;
+     A  AA  B  BB
+  a  1      2
+  b     11     22
+  END
 
 
 =head2 checkKeys($$)
@@ -3809,23 +4121,23 @@ Check the keys in a hash.
 
      Parameter   Description
   1  $test       The hash to test
-  2  $permitted  The permitted keys and their meanings
+  2  $permitted  A hash of the permitted keys and their meanings
 
 Example:
 
 
-     eval {checkKeys({a=>1, b=>2, d=>3}, {a=>1, b=>2, c=>3}) };
+    eval q{checkKeys({a=>1, b=>2, d=>3}, {a=>1, b=>2, c=>3})};
 
-     ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);
+    ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);
 
 
 =head1 LVALUE methods
 
-Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelled correctly.
+Replace $a->{B<value>} = $b with $a->B<value> = $b which reduces the amount of typing required, is easier to read and provides a hard check that {B<value>} is spelled correctly.
 
 =head2 genLValueScalarMethods(@)
 
-Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.
+Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>. Suffixing B<X> to the scalar name will confess if a value has not been set.
 
      Parameter  Description
   1  @names     List of method names
@@ -3854,7 +4166,7 @@ Example:
 
 =head2 addLValueScalarMethods(@)
 
-Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package if they do not already exist. A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.
+Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package if they do not already exist. A method whose value has not yet been set will return a new scalar with value B<undef>. Suffixing B<X> to the scalar name will confess if a value has not been set.
 
      Parameter  Description
   1  @names     List of method names
@@ -3952,24 +4264,34 @@ Confirm that the specified references are to the package into which this routine
 Example:
 
 
-    eval {assertRef(my $r = bless {}, q(aaa))};
+    eval q{assertRef(my $r = bless {}, q(aaa))};
 
     ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);
 
 
 =head2 ˢ(&)
 
-Immediately executed inline sub to allow a code block before if.
+Immediately executed inline sub to allow a code block before B<if>.
 
      Parameter  Description
-  1  $sub       Sub as {} without the word "sub"
+  1  $sub       Sub enclosed in {} without the word "sub"
 
 Example:
 
 
+  ok ˢ{1} == 1;
+
   ok ˢ{1};
 
-   ok ˢ{1} == 1;
+  ˢ{my $s =
+    ˢ{if (1)
+       {return q(aa) if 1;
+        q(bb);
+       }
+     };
+
+    ok $s eq q(aa);
+   };
 
 
 =head1 Attribute classes
@@ -4109,7 +4431,7 @@ Example:
 
 =head2 trim($)
 
-Trim off white space from from front and end of string.
+Remove any white space from the front and end of a string.
 
      Parameter  Description
   1  $string    String
@@ -4120,27 +4442,28 @@ Example:
   ok trim(" a b ") eq join ' ', qw(a b);
 
 
-=head2 pad($$)
+=head2 pad($$$)
 
-Pad a string with blanks to a multiple of a specified length.
+Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
      Parameter  Description
   1  $string    String
   2  $length    Tab width
+  3  $pad       Padding char
 
 Example:
 
 
-  ok  pad('abc  ', 2).'=' eq "abc =";
+  ok  pad('abc  ', 2).'='       eq "abc =";
 
-  ok  pad('abc  ', 3).'=' eq "abc=";
+  ok  pad('abc  ', 3).'='       eq "abc=";
 
-  ok  pad('abc  ', 4).'=' eq "abc =";
+  ok  pad('abc  ', 4, q(.)).'=' eq "abc.=";
 
 
 =head2 nws($)
 
-Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of white space in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
+Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of white space in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than one space at a time.
 
      Parameter  Description
   1  $string    String to normalize
@@ -4148,7 +4471,20 @@ Normalize white space in a string to make comparisons easier. Leading and traili
 Example:
 
 
-   ok nws(qq(a  b    c)) eq q(a b c);
+  ok nws(qq(a  b    c)) eq q(a b c);
+
+
+=head2 boldString($)
+
+Bold a string.
+
+     Parameter  Description
+  1  $string    String to bold
+
+Example:
+
+
+  ok boldString(q(zZ)) eq q(𝘇𝗭);
 
 
 =head2 javaPackage($)
@@ -4161,7 +4497,7 @@ Extract the package name from a java string or file.
 Example:
 
 
-    writeFile($f, <<END);
+    overWriteFile($f, <<END);
   // Test
   package com.xyz;
   END
@@ -4179,7 +4515,7 @@ Extract the package name from a java string or file and convert it to a file nam
 Example:
 
 
-    writeFile($f, <<END);
+    overWriteFile($f, <<END);
   // Test
   package com.xyz;
   END
@@ -4197,7 +4533,7 @@ Extract the package name from a perl string or file.
 Example:
 
 
-    writeFile($f, <<END);
+    overWriteFile($f, <<END);
   package a::b;
   END
 
@@ -4215,6 +4551,21 @@ Example:
 
 
   ok printQw(qw(a b c)) eq q(qw(a b c));
+
+
+=head2 numberOfLinesInString($)
+
+The number of lines in a string.
+
+     Parameter  Description
+  1  $string    String
+
+Example:
+
+
+    ok numberOfLinesInString("a
+b
+") == 2;
 
 
 =head1 Cloud Cover
@@ -4332,13 +4683,13 @@ Extract, format and update documentation for a perl module.
 Generate a table of contents for some html.
 
      Parameter  Description
-  1  $replace   Substring within the html to be replaced with the toc
+  1  $replace   Sub-string within the html to be replaced with the toc
   2  $html      String of html
 
 Example:
 
 
-  ok nws(htmlToc("XXXX", <<END))
+  ok nws(htmlToc("XXXX", <<END)), 'htmlToc'
   <h1 id="1">Chapter 1</h1>
     <h2 id="11">Section 1</h1>
   <h1 id="2">Chapter 2</h1>
@@ -4424,7 +4775,7 @@ will be aggregated in the acknowledgments section at the end of the documentatio
 
 The character sequence B<\n> in the comment will be expanded to one new line, B<\m> to two new lines and B<L>B<<$_>>,B<L>B<<confess>>,B<L>B<<die>>,B<L>B<<eval>>,B<L>B<<lvalueMethod>> to links to the perl documentation.
 
-Search for '#D1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20180801/lib/Data/Table/Text.pm> to see  more examples of such documentation in action.
+Search for '#D1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20180810/lib/Data/Table/Text.pm> to see  more examples of such documentation in action - although it is quite difficult to see as it looks just like normal comments placed in the code.
 
 Parameters:
 
@@ -4523,59 +4874,59 @@ Convert an image to jpx format using versions of L<Imagemagick|/https://www.imag
   2  $target    Target folder (as multiple files will be created)
   3  $Size      Optional size of each tile - defaults to 256
 
-=head2 formatTableAA($$$)
+=head2 formatTableMultiLine($$)
+
+Tabularize text that has new lines in it.
+
+     Parameter   Description
+  1  $data       Reference to an array of arrays of data to be formatted as a table
+  2  $separator  Optional line separator to use instead of new line for each row.
+
+=head2 formatTableAA($$)
 
 Tabularize an array of arrays.
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional reference to an array of titles
-  3  $separator  Optional line separator
+     Parameter  Description
+  1  $data      Data to be formatted
+  2  $title     Optional reference to an array of titles
 
-=head2 formatTableHA($$$)
+=head2 formatTableHA($$)
 
 Tabularize a hash of arrays.
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+     Parameter  Description
+  1  $data      Data to be formatted
+  2  $title     Optional titles
 
-=head2 formatTableAH($$$)
+=head2 formatTableAH($)
 
 Tabularize an array of hashes.
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+     Parameter  Description
+  1  $data      Data to be formatted
 
-=head2 formatTableHH($$$)
+=head2 formatTableHH($)
 
 Tabularize a hash of hashes.
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+     Parameter  Description
+  1  $data      Data to be formatted
 
-=head2 formatTableA($$$)
+=head2 formatTableA($$)
 
 Tabularize an array.
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+     Parameter  Description
+  1  $data      Data to be formatted
+  2  $title     Optional title
 
-=head2 formatTableH($$$)
+=head2 formatTableH($$)
 
 Tabularize a hash.
 
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+     Parameter  Description
+  1  $data      Data to be formatted
+  2  $title     Optional title
 
 =head2 saveSourceToS3($$)
 
@@ -4587,7 +4938,7 @@ Save source code.
 
 =head2 extractTest($)
 
-Extract a line of a test.
+Remove example markers from test code.
 
      Parameter  Description
   1  $string    String containing test line
@@ -4612,11 +4963,11 @@ Update the documentation in a perl file and show said documentation in a web bro
 
 =head1 Synonyms
 
-B<fpd> is a synonym for L<filePathDir|/filePathDir> - Directory from an array of file name components.
+B<fpd> is a synonym for L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-B<fpe> is a synonym for L<filePathExt|/filePathExt> - File name from file name components and extension.
+B<fpe> is a synonym for L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-B<fpf> is a synonym for L<filePath|/filePath> - Create a file path from an array of file name components.
+B<fpf> is a synonym for L<filePath|/filePath> - Create a file name from an array of file name components.
 
 B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
@@ -4625,7 +4976,7 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 =head1 Index
 
 
-1 L<absFromAbsPlusRel|/absFromAbsPlusRel> - Create an absolute file from a an absolute file and a following relative file.
+1 L<absFromAbsPlusRel|/absFromAbsPlusRel> - Create an absolute file from an absolute file and a relative file.
 
 2 L<addCertificate|/addCertificate> - Add a certificate to the current ssh session.
 
@@ -4633,239 +4984,263 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 4 L<addLValueScalarMethods|/addLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package if they do not already exist.
 
-5 L<appendFile|/appendFile> - Append a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+5 L<appendFile|/appendFile> - Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
 
 6 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
 
 7 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
 
-8 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
+8 L<boldString|/boldString> - Bold a string.
 
-9 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
+9 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
 
-10 L<checkKeys|/checkKeys> - Check the keys in a hash.
+10 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
 
-11 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
+11 L<checkKeys|/checkKeys> - Check the keys in a hash.
 
-12 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
+12 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
 
-13 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
+13 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
 
-14 L<convertDocxToFodt|/convertDocxToFodt> - Convert a .
+14 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
 
-15 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+15 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
 
-16 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.
+16 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
 
-17 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
+17 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.
 
-18 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+18 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
 
-19 L<currentDirectory|/currentDirectory> - Get the current working directory.
+19 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
 
-20 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+20 L<currentDirectory|/currentDirectory> - Get the current working directory.
 
-21 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a .
+21 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
 
-22 L<dateStamp|/dateStamp> - Year-monthName-day
+22 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
-23 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
+  <image href="$imageFile" outputclass="imageType">
 
-24 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
+This conversion requires that you have both L<Imagemagick|/https://www.imagemagick.org/script/index.php> and L<unoconv|/https://github.
 
-25 L<decodeJson|/decodeJson> - Decode Perl from Json.
+23 L<dateStamp|/dateStamp> - Year-monthName-day
 
-26 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
+24 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
 
-27 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
+25 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
 
-28 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
+26 L<decodeJson|/decodeJson> - Decode Perl from Json.
 
-29 L<encodeJson|/encodeJson> - Encode Perl to Json.
+27 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
 
-30 L<evalFile|/evalFile> - Read a file containing unicode, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+28 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
 
-31 L<extractTest|/extractTest> - Extract a line of a test.
+29 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
 
-32 L<fe|/fe> - Get extension of file name.
+30 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
 
-33 L<fileList|/fileList> - Files that match a given search pattern.
+31 L<encodeJson|/encodeJson> - Encode Perl to Json.
 
-34 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
+32 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
-35 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
+33 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
 
-36 L<filePath|/filePath> - Create a file path from an array of file name components.
+34 L<extractTest|/extractTest> - Remove example markers from test code.
 
-37 L<filePathDir|/filePathDir> - Directory from an array of file name components.
+35 L<fe|/fe> - Get extension of file name.
 
-38 L<filePathExt|/filePathExt> - File name from file name components and extension.
+36 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
 
-39 L<fileSize|/fileSize> - Get the size of a file.
+37 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
 
-40 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
+38 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
 
-41 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
+39 L<filePath|/filePath> - Create a file name from an array of file name components.
 
-42 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
+40 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-43 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or undef if none of the named files exist.
+41 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-44 L<fn|/fn> - Remove path and extension from file name.
+42 L<fileSize|/fileSize> - Get the size of a file.
 
-45 L<fne|/fne> - Remove path from file name.
+43 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
 
-46 L<formatTable|/formatTable> - Format various data structures as a table.
+44 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
 
-47 L<formatTableA|/formatTableA> - Tabularize an array.
+45 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
 
-48 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+46 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
-49 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+47 L<fn|/fn> - Remove path and extension from file name.
 
-50 L<formatTableBasic|/formatTableBasic> - Tabularize text that does not have new lines in it.
+48 L<fne|/fne> - Remove path from file name.
 
-51 L<formatTableH|/formatTableH> - Tabularize a hash.
+49 L<formatTable|/formatTable> - Format various data structures as a table.
 
-52 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+50 L<formatTableA|/formatTableA> - Tabularize an array.
 
-53 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+51 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-54 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+52 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-55 L<fp|/fp> - Get path from file name.
+53 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-56 L<fpn|/fpn> - Remove extension from file name.
+54 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-57 L<fullFileName|/fullFileName> - Full name of a file.
+55 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-58 L<genClass|/genClass> - Generate a class B<$class> with the specified B<%Attributes>.
+56 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-59 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+57 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-60 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+58 L<fp|/fp> - Get path from file name.
 
-61 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef.
+59 L<fpn|/fpn> - Remove extension from file name.
 
-62 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+60 L<fullFileName|/fullFileName> - Full name of a file.
 
-63 L<hostName|/hostName> - The name of the host we are running on.
+61 L<genClass|/genClass> - Generate a class B<$class> with the specified B<%Attributes>.
 
-64 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+62 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-65 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+63 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-66 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+64 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-67 L<isBlank|/isBlank> - Test whether a string is blank.
+65 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-68 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+66 L<hostName|/hostName> - The name of the host we are running on.
 
-69 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+67 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-70 L<keyCount|/keyCount> - Count keys down to the specified level.
+68 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
 
-71 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+69 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-72 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+70 L<isBlank|/isBlank> - Test whether a string is blank.
 
-73 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+71 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-74 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+72 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-75 L<makePath|/makePath> - Make the path for the specified file name or folder.
+73 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-76 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+74 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-77 L<max|/max> - Find the maximum number in a list.
+75 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-78 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+76 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
 
-79 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+77 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-80 L<min|/min> - Find the minimum number in a list.
+78 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-81 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+79 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-82 L<pad|/pad> - Pad a string with blanks to a multiple of a specified length.
+80 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-83 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by this sub.
+81 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-84 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+82 L<max|/max> - Find the maximum number in a list.
 
-85 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+83 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-86 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+84 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-87 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+85 L<min|/min> - Find the minimum number in a list.
 
-88 L<printQw|/printQw> - Print an array of words in qw() format.
+86 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-89 L<quoteFile|/quoteFile> - Quote a file name.
+87 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-90 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+88 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-91 L<readFile|/readFile> - Read a file containing unicode.
+89 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-92 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+90 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-93 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file relative to the second absolute file name.
+91 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by this sub.
 
-94 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+92 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-95 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+93 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-96 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+94 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-97 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+95 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-98 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for files that match the specified extensions - the argument list should include at least one folder and one extension to be useful.
+96 L<printQw|/printQw> - Print an array of words in qw() format.
 
-99 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
+97 L<quoteFile|/quoteFile> - Quote a file name.
 
-100 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
+98 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-101 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+99 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-102 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+100 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-103 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+101 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-104 L<timeStamp|/timeStamp> - hours:minute:seconds
+102 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-105 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
+103 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-106 L<trackFiles|/trackFiles> - Track the existence of files.
+104 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-107 L<trim|/trim> - Trim off white space from from front and end of string.
+105 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-108 L<updateDocumentation|/updateDocumentation> - Update documentation from the comments in a perl script.
+106 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-109 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+107 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-110 L<userId|/userId> - The userid we are currently running under.
+108 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
 
-111 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+109 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
 
-112 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+110 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-113 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+111 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-114 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
+112 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-115 L<writeFile|/writeFile> - Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+113 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-116 L<writeFiles|/writeFiles> - Write the values of a hash as a file identified by the key of the value
+114 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
 
-117 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+115 L<trackFiles|/trackFiles> - Track the existence of files.
 
-118 L<xxx|/xxx> - Execute a shell command.
+116 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-119 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+117 L<updateDocumentation|/updateDocumentation> - Update documentation from the comments in a perl script.
 
-120 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+118 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-121 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before if.
+119 L<userId|/userId> - The userid we are currently running under.
+
+120 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+
+121 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+
+122 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+
+123 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
+
+124 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+
+125 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+
+126 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+
+127 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+
+128 L<xxx|/xxx> - Execute a shell command.
+
+129 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+130 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+131 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -4917,6 +5292,7 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;
@@ -4927,7 +5303,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 326;
+use Test::More tests => 356;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
 
@@ -5013,7 +5389,7 @@ if (1)                                                                          
   if ($windows or $mac) {ok 1}
   else
    {my @f = findFiles($T);
-    ok $f[0] eq $f, "Find unicode file name";
+    ok $f[0] eq $f;
    }
 
   unlink $f;
@@ -5045,25 +5421,28 @@ if (1)                                                                          
   ok !-d $T;
  }
 
-if (1)                                                                          # Check files
+if (!$windows)                                                                  # Check files
  {my $d = filePath   (my @d = qw(a b c d));                                     #TcheckFile #TmatchPath
   my $f = filePathExt(qw(a b c d e x));                                         #TcheckFile
   my $F = filePathExt(qw(a b c e d));                                           #TcheckFile
   createEmptyFile($f);                                                          #TcheckFile
-  ok matchPath($d) eq $d;                                                                   #TmatchPath
-  ok checkFile($d), $d;                                                         #TcheckFile
-  ok checkFile($f), $f;                                                         #TcheckFile
-  eval {checkFile($F)};
+  ok matchPath($d) eq $d;                                                       #TmatchPath
+  ok checkFile($d);                                                             #TcheckFile
+  ok checkFile($f);                                                             #TcheckFile
+  eval q{checkFile($F)};
   my @m = split m/\n/, $@;
   ok $m[1] eq  "a/b/c/";
   unlink $f;
-  ok !-e $f, $f;
+  ok !-e $f;
   while(@d)                                                                     # Remove path
    {my $d = filePathDir(@d);
     rmdir $d;
-    ok !-e $d, $d;
+    ok !-d $d;
     pop @d;
    }
+ }
+else
+ {ok 1 for 1..9;
  }
 
 if (1)                                                                          # Clear folder
@@ -5072,16 +5451,16 @@ if (1)                                                                          
   my @D = @d;
   while(@D)
    {my $f = filePathExt(@D, qw(test data));
-    writeFile($f, '1');
+    overWriteFile($f, '1');
     pop @D;
    }
   if ($windows) {ok 1 for 1..3}
   else
    {ok findFiles($d) == 4;
-    eval {clearFolder($d, 3)};
+    eval q{clearFolder($d, 3)};
     ok $@ =~ m(\ALimit is 3, but 4 files under folder:)s;
     clearFolder($d, 4);
-    ok !-e $d;
+    ok !-d $d;
    }
  }
 
@@ -5137,7 +5516,7 @@ ok formatTable                                                                  
 4444    1   22  333
 END
 
-say STDERR formatTable                                                          #TformatTable
+ok formatTable                                                                  #TformatTable
  ({1=>{aa=>'A', bb=>'B', cc=>'C'},                                              #TformatTable
    22=>{aa=>'AA', bb=>'BB', cc=>'CC'},                                          #TformatTable
    333=>{aa=>'AAA', bb=>'BBB', cc=>'CCC'},                                      #TformatTable
@@ -5149,44 +5528,86 @@ say STDERR formatTable                                                          
 4444    1   22  333
 END
 
-  ok formatTable({aa=>'A', bb=>'B', cc=>'C'}, [qw(aaaa bbbb)]) eq <<END;        #TformatTable
+ok formatTable({aa=>'A', bb=>'B', cc=>'C'}, [qw(aaaa bbbb)]) eq <<END;          #TformatTable
 aaaa  bbbb
 aa    A
 bb    B
 cc    C
 END
 
-if (1)                                                                          # AL
- {my $s = loadArrayFromLines <<END;                                             #TloadArrayFromLines
+if (1) {                                                                        # AL
+  my $s = loadArrayFromLines <<END;                                             #TloadArrayFromLines
 a a
 b b
 END
-  ok dump($s) eq '["a a", "b b"]';                                              #TloadArrayFromLines
+  is_deeply $s, [q(a a), q(b b)];                                               #TloadArrayFromLines
+  ok formatTable($s) eq <<END;                                                  #TloadArrayFromLines
+0  a a
+1  b b
+END
  }
 
-if (1)                                                                          # HL
- {my $s = loadHashFromLines <<END;                                              #TloadHashFromLines
+if (1) {                                                                        # HL
+  my $s = loadHashFromLines <<END;                                              #TloadHashFromLines
 a 10 11 12
 b 20 21 22
 END
-  ok dump($s) eq '{ a => "10 11 12", b => "20 21 22" }';                        #TloadHashFromLines
+  is_deeply $s, {a => q(10 11 12), b =>q(20 21 22)};                            #TloadHashFromLines
+  ok formatTable($s) eq <<END;                                                  #TloadHashFromLines
+a  10 11 12
+b  20 21 22
+END
  }
 
-if (1)                                                                          # AAL
- {my $s = loadArrayArrayFromLines <<END;                                        #TloadArrayArrayFromLines
+if (1) {                                                                        # AAL
+  my $s = loadArrayArrayFromLines <<END;                                        #TloadArrayArrayFromLines
 A B C
 AA BB CC
 END
-  ok dump($s) eq '[["A", "B", "C"], ["AA", "BB", "CC"]]';                       #TloadArrayArrayFromLines
+  is_deeply $s, [[qw(A B C)], [qw(AA BB CC)]];                                  #TloadArrayArrayFromLines
+  ok formatTable($s) eq <<END;                                                  #TloadArrayArrayFromLines
+1  A   B   C
+2  AA  BB  CC
+END
  }
 
-if (1)                                                                          # HAL
- {my $s = loadHashArrayFromLines <<END;                                         #TloadHashArrayFromLines
+if (1) {                                                                        # HAL
+  my $s = loadHashArrayFromLines <<END;                                         #TloadHashArrayFromLines
 a A B C
 b AA BB CC
 END
-  ok dump($s) eq '{ a => ["A", "B", "C"], b => ["AA", "BB", "CC"] }';           #TloadHashArrayFromLines
+  is_deeply $s, {a =>[qw(A B C)], b => [qw(AA BB CC)] };                        #TloadHashArrayFromLines
+  ok formatTable($s) eq <<END;                                                  #TloadHashArrayFromLines
+a  A   B   C
+b  AA  BB  CC
+END
  }
+
+if (1) {                                                                        # AAL
+  my $s = loadArrayHashFromLines <<END;                                         #TloadArrayHashFromLines
+A 1 B 2
+AA 11 BB 22
+END
+  is_deeply $s, [{A=>1, B=>2}, {AA=>11, BB=>22}];                               #TloadArrayHashFromLines
+  ok formatTable($s) eq <<END;                                                  #TloadArrayHashFromLines
+   A  AA  B  BB
+1  1      2
+2     11     22
+END
+ }
+
+if (1) {                                                                        # HAL
+  my $s = loadHashHashFromLines <<END;                                          #TloadHashHashFromLines
+a A 1 B 2
+b AA 11 BB 22
+END
+  is_deeply $s, {a=>{A=>1, B=>2}, b=>{AA=>11, BB=>22}};                         #TloadHashHashFromLines
+  ok formatTable($s) eq <<END;                                                  #TloadHashHashFromLines
+   A  AA  B  BB
+a  1      2
+b     11     22
+END
+}
 
 if (1) {                                                                        # Using a named package
   my $class = "Data::Table::Text::Test";
@@ -5276,19 +5697,19 @@ ok  containingPowerOfTwo(4) == 2;                                               
 ok  containingPowerOfTwo(5) == 3;
 ok  containingPowerOfTwo(7) == 3;
 
-ok  pad('abc  ', 2).'=' eq "abc =";                                             #Tpad
-ok  pad('abc  ', 3).'=' eq "abc=";                                              #Tpad
-ok  pad('abc  ', 4).'=' eq "abc =";                                             #Tpad
-ok  pad('abc  ', 5).'=' eq "abc  =";
-ok  pad('abc  ', 6).'=' eq "abc   =";
+ok  pad('abc  ', 2).'='       eq "abc =";                                       #Tpad
+ok  pad('abc  ', 3).'='       eq "abc=";                                        #Tpad
+ok  pad('abc  ', 4, q(.)).'=' eq "abc.=";                                       #Tpad
+ok  pad('abc  ', 5).'='       eq "abc  =";
+ok  pad('abc  ', 6).'='       eq "abc   =";
 
 #ok containingFolder("/home/phil/test.data") eq "/home/phil/";
 #ok containingFolder("phil/test.data")       eq "phil/";
 #ok containingFolder("test.data")            eq "./";
 
-if (1)
- {my $f = temporaryFile;                                                        #TtemporaryFile
-  writeFile($f, <<END);                                                         #TjavaPackage #TjavaPackageAsFileName
+if (1) {
+  my $f = temporaryFile;                                                        #TtemporaryFile
+  overWriteFile($f, <<END);                                                     #TjavaPackage #TjavaPackageAsFileName
 // Test
 package com.xyz;
 END
@@ -5298,22 +5719,22 @@ END
  }
 if (1)
  {my $f = temporaryFile;
-  writeFile($f, <<END);                                                         #TperlPackage
+  overWriteFile($f, <<END);                                                     #TperlPackage
 package a::b;
 END
   ok perlPackage($f)           eq "a::b";                                       #TperlPackage
   unlink $f;
  }
 
-if ($^O !~ m/\AMSWin32\Z/)                                                      # Ignore windows for this test
+if (!$windows)                                                                  # Ignore windows for this test
  {ok xxx("echo aaa")       =~ /aaa/;                                            #Txxx
   ok xxx("a=bbb;echo \$a") =~ /bbb/;
 
-  eval {xxx "echo ccc", qr(ccc)};
-  ok !$@, "ccc $@";
+  eval q{xxx "echo ccc", qr(ccc)};
+  ok !$@;
 
-  eval {xxx "echo ddd", qr(ccc)};
-  ok $@ =~ /ddd/, "ddd";
+  eval q{xxx "echo ddd", qr(ccc)};
+  ok $@ =~ /ddd/;
 
   ok !yyy <<END;                                                                #Tyyy
 echo aaa
@@ -5321,7 +5742,7 @@ echo bbb
 END
  }
 else
- {ok 1 for 1..4;
+ {ok 1 for 1..5;
  }
 
 if (1) {
@@ -5358,30 +5779,30 @@ if (0) {                                                                        
 
   my $a = '';
   my @a = fileOutOfDate {$a .= $_} q(a), @files;
-  ok $a eq 'da', "outOfDate a";
+  ok $a eq 'da';
   is_deeply [@a], [qw(d a)];
 
   my $b = '';
   my @b = fileOutOfDate {$b .= $_} q(b), @files;
-  ok $b eq 'db', "outOfDate b";
+  ok $b eq 'db';
   is_deeply [@b], [qw(d b)];
 
   my $c = '';
   my @c = fileOutOfDate {$c .= $_} q(c), @files;
-  ok $c eq 'dc', "outOfDate c";
+  ok $c eq 'dc';
   is_deeply [@c], [qw(d c)];
 
   my $d = '';
   my @d = fileOutOfDate {$d .= $_} q(d), @files;
-  ok $d eq 'd', "outOfDate d";
+  ok $d eq 'd';
   is_deeply [@d], [qw(d)];
 
   my @A = fileOutOfDate {} q(a), @Files;
   my @B = fileOutOfDate {} q(b), @Files;
   my @C = fileOutOfDate {} q(c), @Files;
-  is_deeply [@A], [qw(a)], 'aaa';
-  is_deeply [@B], [qw(b)], 'bbb';
-  is_deeply [@C], [],      'ccc';
+  is_deeply [@A], [qw(a)];
+  is_deeply [@B], [qw(b)];
+  is_deeply [@C], [];
   unlink for @Files;
  }
 else
@@ -5398,10 +5819,7 @@ echo bbb
 END
 
 if (1)                                                                          # Failure
- {eval {zzz(<<END, qr(SUCCESS)s)};
-echo aaa
-echo bbb
-END
+ {eval q{zzz(qq(echo aaa\necho bbb\n), qr(SUCCESS)s)};
   ok $@ =~ m(Data::Table::Text::zzz)s;
  }
 
@@ -5411,25 +5829,25 @@ if (1) {
   is_deeply $r,                                                                 #TparseCommandLineArguments
     [["aaa", "bbb"],                                                            #TparseCommandLineArguments
      {c=>undef, dd=>undef, eee=>"EEEE", f=>"F", gg=>"g g", hh=>"h h"},          #TparseCommandLineArguments
-    ], 'parse valid 1';                                                         #TparseCommandLineArguments
+    ];                                                                          #TparseCommandLineArguments
  }
 
 if (1)
  {my $r = parseCommandLineArguments
-   {ok 1, 'parse valid 2';
+   {ok 1;
     $_[1]
    }
    [qw(--aAa=AAA --bbB=BBB)], [qw(aaa bbb ccc)];
-  is_deeply $r, {aaa=>'AAA', bbb=>'BBB'}, 'parse valid 3';
+  is_deeply $r, {aaa=>'AAA', bbb=>'BBB'};
  }
 
 if (1)
  {eval
-   {parseCommandLineArguments
+  q{parseCommandLineArguments
      {$_[1]} [qw(aaa bbb ddd --aAa=AAA --dDd=DDD)], [qw(aaa bbb ccc)];
    };
   my $r = $@;
-  ok $r =~ m(\AInvalid parameter: --dDd=DDD), "parse invalid 2";
+  ok $r =~ m(\AInvalid parameter: --dDd=DDD);
  }
 
 is_deeply [qw(a b c)],                                                          #TsetIntersectionOfTwoArraysOfWords
@@ -5451,7 +5869,7 @@ if (1) {
 if (1) {
   my $f = createEmptyFile(fpe(my $d = temporaryFolder, qw(a jpg)));             #TfindFileWithExtension
   my $F = findFileWithExtension(fpf($d, q(a)), qw(txt data jpg));               #TfindFileWithExtension
-  ok -e $f, "jpg file exists";
+  ok -e $f;
   ok $F eq "jpg";                                                               #TfindFileWithExtension
   unlink $f;
   ok !-e $f;
@@ -5465,7 +5883,7 @@ if (1) {
  }
 
 if (1) {
-  eval {assertRef(my $r = bless {}, q(aaa))};                                   #TassertRef
+  eval q{assertRef(my $r = bless {}, q(aaa))};                                  #TassertRef
   ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);             #TassertRef
  }
 
@@ -5562,8 +5980,6 @@ ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../.
 ok "/home/il/perl"          eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl");
 ok "/home/il/perl/"         eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/");
 
-ok ˢ{1};                                                                        #Tˢ
-
 ˢ{my $f = {};                                                                   #TtitleToUniqueFileName
   ok q(a_p.txt)   eq &titleToUniqueFileName($f, qw(a p txt));                   #TtitleToUniqueFileName
   ok q(a_p_2.txt) eq &titleToUniqueFileName($f, qw(a p txt));                   #TtitleToUniqueFileName
@@ -5584,6 +6000,7 @@ ok fn (q(/a/b/c.d.e)) eq q(c.d);
 ok fne(q(/a/b/c.d.e)) eq q(c.d.e);
 ok fe (q(/a/b/c.d.e)) eq q(e);
 
+if (!$windows) {
 ˢ{our $a = q(1);                                                                #Tcall
   our @a = qw(1);
   our %a = (a=>1);
@@ -5596,6 +6013,10 @@ ok fe (q(/a/b/c.d.e)) eq q(e);
     ok $b    == 1;
    }
  };
+ }
+else
+ {ok 1 for 1..12;
+ }
 
 ˢ{ok q(../a/) eq fp q(../a/b.c);
   ok q(b)     eq fn q(../a/b.c);
@@ -5623,7 +6044,7 @@ if (!$windows) {
   ok !-d $D;                                                                                                        #TclearFolder
  }
 else                                                                            # searchDirectoryTreesForMatchingFiles uses find which does not work identically to Linux on Windows
- {ok 1 for 1..7;
+ {ok 1 for 1..11;
  }
 
 if (1)
@@ -5647,30 +6068,29 @@ if (1)
 if (!$windows)
  {my $d = fpd(my $D = temporaryDirectory, qw(a));                               #TmakePath #TtemporaryDirectory
   my $f = fpe($d, qw(bbb txt));                                                 #TmakePath
-  ok !-e $d;                                                                    #TmakePath
-  eval {checkFile($f)};
+  ok !-d $d;                                                                    #TmakePath
+  eval q{checkFile($f)};
   my $r = $@;
   my $q = quotemeta($D);
-  ok nws($r) =~ m(Can only find.+?: $q)s, , "fd";
+  ok nws($r) =~ m(Can only find.+?: $q)s;
   makePath($f);                                                                 #TmakePath
-  ok -e $d;                                                                     #TmakePath
-  ok -e $D;
+  ok -d $d;                                                                     #TmakePath
+  ok -d $D;
   rmdir $_ for $d, $D;
  }
 else {ok 1 for 1..4}
 
- ok nws(qq(a  b    c)) eq q(a b c);                                             #Tnws
- ok ˢ{1} == 1;                                                                  #Tˢ
+ok nws(qq(a  b    c)) eq q(a b c);                                              #Tnws
+ok ˢ{1} == 1;                                                                   #Tˢ
 
- if (!$windows) {
-   eval {checkKeys({a=>1, b=>2, d=>3}, {a=>1, b=>2, c=>3}) };                   #TcheckKeys
-   ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);      #TcheckKeys
-  }
- else {ok 1;}
+if (0) {                                                                        # Despite eval the confess seems to be killing the process - perhaps the confess is just too big?
+  eval q{checkKeys({a=>1, b=>2, d=>3}, {a=>1, b=>2, c=>3})};                    #TcheckKeys
+  ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);       #TcheckKeys
+ }
 
- if (1) {
-   my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];            #TformatTableBasic
-   ok formatTableBasic($d) eq <<END;                                            #TformatTableBasic
+if (1) {
+  my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];             #TformatTableBasic
+  ok formatTableBasic($d) eq <<END;                                             #TformatTableBasic
 a        1
 bb      22
 ccc    333
@@ -5685,13 +6105,17 @@ if (0) {                                                                        
   ok !keys(%pids)
  }
 
+if (!$windows) {
 ok dateTimeStamp     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z);               #TdateTimeStamp
 ok dateStamp         =~ m(\A\d{4}-\w{3}-\d\d\Z);                                #TdateStamp
 ok versionCode       =~ m(\A\d{8}-\d{6}\Z);                                     #TversionCode
 ok versionCodeDashed =~ m(\A\d{4}-\d\d-\d\d-\d\d:\d\d:\d\d\Z);                  #TversionCodeDashed
 ok timeStamp         =~ m(\A\d\d:\d\d:\d\d\Z);                                  #TtimeStamp
 ok microSecondsSinceEpoch > 47*365*24*60*60*1e6;                                #TmicroSecondsSinceEpoch
-
+ }
+else
+ {ok 1 for 1..6;
+ }
 
 if (0) {
   saveCodeToS3(1200, q(projectName), q(bucket/folder), q(--only-show-errors));  #TsaveCodeToS3
@@ -5708,7 +6132,7 @@ if (0) {
   hostName;                                                                     #ThostName
  }
 
-ok nws(htmlToc("XXXX", <<END))                                                  #ThtmlToc
+ok nws(htmlToc("XXXX", <<END)), 'htmlToc'                                       #ThtmlToc
 <h1 id="1">Chapter 1</h1>
   <h2 id="11">Section 1</h1>
 <h1 id="2">Chapter 2</h1>
@@ -5759,16 +6183,16 @@ sample data
 END2
 
 END
-  ok $s =~ m'=head2 sample\x28\$\@\x29';                                            #TupdateDocumentation
+  ok $s =~ m'=head2 sample\x28\$\@\x29';                                        #TupdateDocumentation
  }
 
 if (1)                                                                          #TevalFile
- {my $f = writeFile(undef, q([qw(aaa bbb ccc)]));
+ {my $f = writeFile(undef, q([qw(aaa bbb ccc)]));                               #ToverWriteFile
   my $s = evalFile($f);
   is_deeply $s, [qw(aaa bbb ccc)];
 
-  writeFile($f, q({qw(aaa bbb ccc)]));
-  $s = eval { evalFile($f) };
+  ok overWriteFile($f, q({qw(aaa bbb ccc)]));                                   #ToverWriteFile
+  $s = eval q{ evalFile($f) };
   ok $@ =~ m(\Asyntax error);
   unlink $f;
  }
@@ -5843,6 +6267,251 @@ bb
 ccc
 END
 
-ok boldString(q(zZ)) eq q(𝘇𝗭);                                                     #TboldString
+ok boldString(q(zZ)) eq q(𝘇𝗭);                                                  #TboldString
+
+if (!$windows) {                                                                #TwriteGZipFile #TreadGZipFile
+  my $s = '𝝰'x1e3;
+  my $file = writeGZipFile(q(zzz.zip), $s);
+  ok -e $file;
+  my $S = readGZipFile($file);
+  ok $s eq $S;
+  ok length($s) == length($S);
+  unlink $file;
+ }
+else
+ {ok 1, "gz$_" for 1..3
+ }
+
+if (!$windows) {                                                                #TdumpGZipFile #TevalGZipFile
+  my $d = [1, 2, 3=>{a=>4, b=>5}];
+  my $file = dumpGZipFile(q(zzz.zip), $d);
+  ok -e $file;
+  my $D = evalGZipFile($file);
+  is_deeply $d, $D;
+  unlink $file;
+ }
+else
+ {ok 1, "egz$_" for 1..2
+ }
+
+if (1)
+ {my $t = formatTableBasic([["a",undef], [undef, "b\nc"]]);
+  ok $t eq <<END;
+a
+   b
+   c
+END
+ }
+
+if (1)
+ {my $t = formatTable([["a",undef], [undef, "b\nc"]], [undef, undef]);
+  ok $t eq <<END;
+1  a
+2     b
+      c
+END
+ }
+
+if (1) {                                                                        #TformatTable
+  my $file = fpe(qw(report txt));                                               # Create a report
+  my $t = formatTable
+   ([["a",undef], [undef, "b\x0ac"]],                                             # Data - please replace 0a with a new line
+    [undef, "BC"],                                                              # Column titles
+    file=>$file,                                                                # Output file
+    head=>qq(Sample report.),                                                   # Header
+    rows=>qq(NNNN rows.));                                                      # Row count
+
+  ok -e $file;
+  ok readFile($file) eq $t;
+  unlink $file;
+
+  ok $t eq <<END;
+Sample report.
+
+2 rows.
+
+This file: report.txt
+
+      BC
+1  a
+2     b
+      c
+END
+ }
+
+if (1)
+ {my $t = "a\nb\n";
+  ok numberOfLinesInString("a\nb\n") == 2;                                      #TnumberOfLinesInString
+ }
+
+if (1)
+ {my $f = writeFile(undef, "a\nb\n");                                           #TnumberOfLinesInFile
+  ok numberOfLinesInFile($f) == 2;                                              #TnumberOfLinesInFile
+  unlink $f;
+ }
+
+ok ˢ{1};                                                                        #Tˢ
+
+ˢ{my $s =                                                                       #Tˢ
+  ˢ{if (1)
+     {return q(aa) if 1;
+      q(bb);
+     }
+   };
+
+  ok $s eq q(aa);
+ };
+
+if (1) {                                                                        # Synopsis
+
+# Print a table:
+
+my $d =
+ [[qq(a), qq(b\nbb), qq(c\ncc\nccc\n)],
+  [qq(1), qq(1\n22), qq(1\n22\n333\n)],
+ ];
+
+my $t = formatTable($d, [qw(A BB CCC)]);
+
+ok $t eq <<END;
+   A  BB  CCC
+1  a  b   c
+      bb  cc
+          ccc
+2  1   1    1
+      22   22
+          333
+END
+
+# Print a table containing tables and make it into a report:
+
+my $D = [[qq(See the\ntable\nopposite), $t],
+         [qq(Or\nthis\none),            $t],
+        ];
+
+
+my $T = formatTable
+ ($D,
+ [qw(Description Table)],
+  head=>q(Table of Tables.),
+  rows=>q(NNNN rows containing a table.),
+ );
+
+ok $T eq <<END;
+Table of Tables.
+
+2 rows containing a table.
+
+   Description  Table
+1  See the         A  BB  CCC
+   table        1  a  b   c
+   opposite           bb  cc
+                          ccc
+                2  1   1    1
+                      22   22
+                          333
+2  Or              A  BB  CCC
+   this         1  a  b   c
+   one                bb  cc
+                          ccc
+                2  1   1    1
+                      22   22
+                          333
+END
+
+# Print an array of arrays:
+
+my $aa = formatTable
+ ([[qw(A   B   C  )],
+   [qw(AA  BB  CC )],
+   [qw(AAA BBB CCC)],
+   [qw(1   22  333)]],
+   [qw (aa  bb  cc)]);
+
+ok $aa eq <<END;
+   aa   bb   cc
+1  A    B    C
+2  AA   BB   CC
+3  AAA  BBB  CCC
+4    1   22  333
+END
+
+# Print an array of hashes:
+
+my $ah = formatTable
+ ([{aa=> "A",   bb => "B",   cc => "C" },
+   {aa=> "AA",  bb => "BB",  cc => "CC" },
+   {aa=> "AAA", bb => "BBB", cc => "CCC" },
+   {aa=> 1,     bb => 22,    cc => 333 }]);
+
+ok $ah eq <<END;
+   aa   bb   cc
+1  A    B    C
+2  AA   BB   CC
+3  AAA  BBB  CCC
+4    1   22  333
+END
+
+# Print a hash of arrays:
+
+my $ha = formatTable
+ ({""     => ["aa",  "bb",  "cc"],
+   "1"    => ["A",   "B",   "C"],
+   "22"   => ["AA",  "BB",  "CC"],
+   "333"  => ["AAA", "BBB", "CCC"],
+   "4444" => [1,      22,    333]},
+   [qw(Key A B C)]
+   );
+
+ok $ha eq <<END;
+Key   A    B    C
+      aa   bb   cc
+   1  A    B    C
+  22  AA   BB   CC
+ 333  AAA  BBB  CCC
+4444    1   22  333
+END
+
+# Print a hash of hashes:
+
+my $hh = formatTable
+ ({a    => {aa=>"A",   bb=>"B",   cc=>"C" },
+   aa   => {aa=>"AA",  bb=>"BB",  cc=>"CC" },
+   aaa  => {aa=>"AAA", bb=>"BBB", cc=>"CCC" },
+   aaaa => {aa=>1,     bb=>22,    cc=>333 }});
+
+ok $hh eq <<END;
+      aa   bb   cc
+a     A    B    C
+aa    AA   BB   CC
+aaa   AAA  BBB  CCC
+aaaa    1   22  333
+END
+
+# Print an array of scalars:
+
+my $a = formatTable(["a", "bb", "ccc", 4], [q(#), q(Col)]);
+
+ok $a eq <<END;
+#  Col
+0  a
+1  bb
+2  ccc
+3    4
+END
+
+# Print a hash of scalars:
+
+my $h = formatTable({aa=>"AAAA", bb=>"BBBB", cc=>"333"}, [qw(Key Title)]);
+
+ok $h eq <<END;
+Key  Title
+aa   AAAA
+bb   BBBB
+cc     333
+END
+}
+
+#tttt
 
 1

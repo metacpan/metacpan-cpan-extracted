@@ -16,41 +16,78 @@ STANDARD OPTIONS
 
 WIDGET-SPECIFIC OPTIONS
     Name: Entries
-        Entries are added to HListbox vertically as rows, one per row (line)
-        using either the insert method or inserting into a tied array.
-        Entries can be either a text string (just like a standard
-        Tk::Listbox entry, an image (a Tk::Photo object), or a hashref
+        Entries (rows) are added to HListbox vertically as rows, one per row
+        (line) using either the insert method or inserting into a tied
+        array. Entries can be either a text string (just like a standard
+        Tk::Listbox entry), an image (a Tk::Photo object), or a hashref
         containing options specifying both, along with any other desired
-        Tk::HList-valid options. Example: $listbox->insert('end', {-image =>
-        $image, -text => 'string'}); Other interesting options include:
+        Tk::HList-valid *options* (see below). Example:
+        $listbox->insert('end', {-image => $image, -text => 'string'});
+        Options for the referenced hash include:
 
         -hidden => 1 | 0
-            Specifies whether or not the entry should be visible or hidden
-            (0 (false) for visible, 1 (true) for hidden) (default 0 -
-            visible).
+            Specifies whether or not the entry should be visible or hidden:
+            (0 (false) for visible, 1 (true) for hidden). Default: 0 -
+            visible.
 
         -indicatoritemtype => 'image'
             Specify an "indicator" image
 
         -indicatorimage = $image
-            Special image to be displayed next to entry.
+            Special image to be displayed next to entry (in addition to any
+            other image specified in the entry).
+
+        -itemtype
+            Specifies the type of display item of this entry. Can be
+            *"text"*, *"image"*, or *"imagetext"*. Default: Whatever is
+            specified, if anything, for the widget, (see -itemtype under
+            WIDGET OPTIONS below). If not specified there, then the default
+            is *"text"*, though *"imagetext"* allows for either or both an
+            image or text.
 
         -textanchor => 'n', 's', 'e', 'w'
-            Side of text the IMAGE is displayed on. (Default: 'e' (East))
-
-        -anchor => 'e', 'w'
-            Left or Right-justification of entry (Default: 'e')
+            Side of text the IMAGE is displayed on. Default: *'w'* (West /
+            left, ie. image before text)
 
         -style => $ImageStyleObject
-            Use an HList Style object (see Tk::ItemStyle and Tk::DItem)
+            Use an already-defined HList ItemStyle object (see Tk::ItemStyle
+            and Tk::DItem)
 
-        -sort, -user => 'value'
-            These options not passed to functions, but retained with data,
-            useful for saving info with an entry for one's own use.
+        -sort => 'value', -user => 'value'
+            Specifies user-specific data to be kept stored with the entry
+            but not displayed. Such data would most likely be a string, but
+            could be a reference to pretty much anything. Tk::HMListbox
+            makes use of the -sort field for user-control of column sorting,
+            refer to it's documentation for examples.
+
+        -text $string
+            Specifies a "text" entry. $string represents the text to be
+            displayed in the entry.
+
+            These options are not passed to functions, but retained with
+            data, useful for saving info with an entry for one's own use.
 
             For example, one could put text in a *-sort* option of say, an
             image-only entry and then retrieve it in a sort function like
             "sort { $a->{-sort} cmp $b->{-sort} }".
+
+            Any other option, other than these or the standard applicable
+            widget options, such as -background, etc. are treated as "Style"
+            options and sent to the default ItemStyle for the data type.
+            NOTE: Under the current implementation any "Style" options
+            supplied with an entry will be applied to ALL entries of that
+            "type" (ie. "image", "imagetext", or "text") in the listbox. To
+            force a specific entry to have a different "style", define an
+            ItemStyle object and use the -style option.
+
+    Name: activeForeground
+    Class: activeForeground
+    Switch: -activeforeground
+        Specifies an alternate color for the foreground of the "active"
+        entry (the one the text cursor is on). This entry is also shown with
+        a hashed box around it. The "activebackground" color, however, is
+        always fixed as the same color as the the widget's background.
+        Default: same color as the widget's foreground color.
 
     Name: browsecmd
     Class: BrowseCmd
@@ -71,6 +108,9 @@ WIDGET-SPECIFIC OPTIONS
         Specifies the desired height for the window, in number of
         characters. If zero or less, then the desired height for the window
         is based on the default for HList, which seems to be about 7 lines.
+        WARNING: This is NOT accurate, ie. specifying a -height of 8 will
+        typically display about 6-6 1/2 rows of text in the default font.
+        Sorry, but this is a bug in the underlying Tk::HList widget.
 
     Name: indicator
     Class: Indicator
@@ -109,6 +149,19 @@ WIDGET-SPECIFIC OPTIONS
         if one has done: "tie @listvariable, 'Tk::HListbox',
         $HListboxwidget, (ReturnType => 'index);" immediately after defining
         $HListboxwidget using the "tie @array" feature.
+
+    Name: selectBackground
+    Class: SelectBackground
+    Switch: -selectbackground
+        Specifies an alternate background color for item(s) currently
+        "selected". Default: a slightly brighter shade of the widget's
+        current background color.
+
+    Name: selectForeground
+    Class: SelectForeground
+    Switch: -selectforeground
+        Specifies an alternate foreground color for item(s) currently
+        "selected". Default: the widget's current foreground color.
 
     Name: selectMode
     Class: SelectMode
@@ -247,6 +300,13 @@ WIDGET METHODS
         Given the text of an entry, return the index of the first entry
         whose text matches the string, or *<undef*> if no matches.
 
+    *$listbox*->fixPalette()
+        Under certain situations, changing the color theme via
+        $mainwin->setPalette(...) does not always update do to the myriad of
+        subwidgets and color options supported. Calling this method should
+        fully update everything in the widget that have not been
+        individually set by the user.
+
     *$listbox*->get(*first, *?*last*?)
         If *last* is omitted, returns the contents of the listbox element
         indicated by *first*, or an empty string if *first* refers to a
@@ -274,9 +334,9 @@ WIDGET METHODS
         in the listbox (not the index of the last element).
 
     *$listbox*->insert(*index, *?*element, element, ...*?)
-        Inserts zero or more new elements in the list just before the
-        element given by *index*. If *index* is specified as end then the
-        new elements are added to the end of the list. Returns an empty
+        Inserts zero or more new elements (entries) in the list just before
+        the element given by *index*. If *index* is specified as "end" then
+        the new elements are added to the end of the list. Returns an empty
         string. If the *index* is not "end", the list will be automatically
         inserted in reverse order so that the entire list is inserted in the
         proper order before the element currently identified by the *index*.

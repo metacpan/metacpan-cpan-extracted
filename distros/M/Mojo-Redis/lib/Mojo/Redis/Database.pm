@@ -2,43 +2,44 @@ package Mojo::Redis::Database;
 use Mojo::Base -base;
 
 our @BASIC_COMMANDS = (
-  'append',           'bgrewriteaof',      'bgsave',      'bitcount',
-  'bitfield',         'bitop',             'bitpos',      'client',
-  'config',           'command',           'dbsize',      'debug',
-  'decr',             'decrby',            'del',         'dump',
-  'echo',             'eval',              'evalsha',     'exists',
-  'expire',           'expireat',          'flushall',    'flushdb',
-  'geoadd',           'geohash',           'geopos',      'geodist',
-  'georadius',        'georadiusbymember', 'get',         'getbit',
-  'getrange',         'getset',            'hdel',        'hexists',
-  'hget',             'hgetall',           'hincrby',     'hincrbyfloat',
-  'hkeys',            'hlen',              'hmget',       'hmset',
-  'hset',             'hsetnx',            'hstrlen',     'hvals',
-  'info',             'incr',              'incrby',      'incrbyfloat',
-  'keys',             'lastsave',          'lindex',      'linsert',
-  'llen',             'lpop',              'lpush',       'lpushx',
-  'lrange',           'lrem',              'lset',        'ltrim',
-  'memory',           'mget',              'move',        'mset',
-  'msetnx',           'object',            'persist',     'pexpire',
-  'pexpireat',        'pttl',              'pfadd',       'pfcount',
-  'pfmerge',          'ping',              'psetex',      'publish',
-  'randomkey',        'rename',            'renamenx',    'role',
-  'rpop',             'rpoplpush',         'rpush',       'rpushx',
-  'restore',          'sadd',              'save',        'scard',
-  'script',           'sdiff',             'sdiffstore',  'set',
-  'setbit',           'setex',             'setnx',       'setrange',
-  'sinter',           'sinterstore',       'sismember',   'slaveof',
-  'slowlog',          'smembers',          'smove',       'sort',
-  'spop',             'srandmember',       'srem',        'strlen',
-  'sunion',           'sunionstore',       'time',        'touch',
-  'ttl',              'type',              'unlink',      'xadd',
-  'xrange',           'xrevrange',         'xlen',        'xread',
-  'xreadgroup',       'xpending',          'zadd',        'zcard',
-  'zcount',           'zincrby',           'zinterstore', 'zlexcount',
-  'zpopmax',          'zpopmin',           'zrange',      'zrangebylex',
-  'zrangebyscore',    'zrank',             'zrem',        'zremrangebylex',
-  'zremrangebyrank',  'zremrangebyscore',  'zrevrange',   'zrevrangebylex',
-  'zrevrangebyscore', 'zrevrank',          'zscore',      'zunionstore',
+  'append',           'bgrewriteaof', 'bgsave',            'bitcount',
+  'bitfield',         'bitop',        'bitpos',            'client',
+  'cluster',          'config',       'command',           'dbsize',
+  'debug',            'decr',         'decrby',            'del',
+  'dump',             'echo',         'eval',              'evalsha',
+  'exists',           'expire',       'expireat',          'flushall',
+  'flushdb',          'geoadd',       'geohash',           'geopos',
+  'geodist',          'georadius',    'georadiusbymember', 'get',
+  'getbit',           'getrange',     'getset',            'hdel',
+  'hexists',          'hget',         'hgetall',           'hincrby',
+  'hincrbyfloat',     'hkeys',        'hlen',              'hmget',
+  'hmset',            'hset',         'hsetnx',            'hstrlen',
+  'hvals',            'info',         'incr',              'incrby',
+  'incrbyfloat',      'keys',         'lastsave',          'lindex',
+  'linsert',          'llen',         'lpop',              'lpush',
+  'lpushx',           'lrange',       'lrem',              'lset',
+  'ltrim',            'memory',       'mget',              'move',
+  'mset',             'msetnx',       'object',            'persist',
+  'pexpire',          'pexpireat',    'pttl',              'pfadd',
+  'pfcount',          'pfmerge',      'ping',              'psetex',
+  'publish',          'randomkey',    'readonly',          'readwrite',
+  'rename',           'renamenx',     'role',              'rpop',
+  'rpoplpush',        'rpush',        'rpushx',            'restore',
+  'sadd',             'save',         'scard',             'script',
+  'sdiff',            'sdiffstore',   'set',               'setbit',
+  'setex',            'setnx',        'setrange',          'sinter',
+  'sinterstore',      'sismember',    'slaveof',           'slowlog',
+  'smembers',         'smove',        'sort',              'spop',
+  'srandmember',      'srem',         'strlen',            'sunion',
+  'sunionstore',      'time',         'touch',             'ttl',
+  'type',             'unlink',       'xadd',              'xrange',
+  'xrevrange',        'xlen',         'xread',             'xreadgroup',
+  'xpending',         'zadd',         'zcard',             'zcount',
+  'zincrby',          'zinterstore',  'zlexcount',         'zpopmax',
+  'zpopmin',          'zrange',       'zrangebylex',       'zrangebyscore',
+  'zrank',            'zrem',         'zremrangebylex',    'zremrangebyrank',
+  'zremrangebyscore', 'zrevrange',    'zrevrangebylex',    'zrevrangebyscore',
+  'zrevrank',         'zscore',       'zunionstore',
 );
 
 our @BLOCKING_COMMANDS = ('blpop', 'brpop', 'brpoplpush', 'bzpopmax', 'bzpopmin');
@@ -403,6 +404,16 @@ Run a "CLIENT" command on the server. C<@args> can be:
 =back
 
 See L<https://redis.io/commands#server> for more information.
+
+=head2 cluster
+
+  $res     = $self->cluste3r(@args);
+  $self    = $self->cluste3r(@args, sub { my ($self, $err, $res) = @_ });
+  $promise = $self->cluste3r_p(@args);
+
+Used to execute cluster commands.
+
+See L<https://redis.io/commands#cluster> for more information.
 
 =head2 command
 
@@ -1167,6 +1178,26 @@ See L<https://redis.io/commands/publish> for more information.
 Return a random key from the keyspace.
 
 See L<https://redis.io/commands/randomkey> for more information.
+
+=head2 readonly
+
+  $res     = $self->readonly();
+  $self    = $self->readonly(, sub { my ($self, $res) = @_ });
+  $promise = $self->readonly_p();
+
+Enables read queries for a connection to a cluster slave node.
+
+See L<https://redis.io/commands/readonly> for more information.
+
+=head2 readwrite
+
+  $res     = $self->readwrite();
+  $self    = $self->readwrite(, sub { my ($self, $res) = @_ });
+  $promise = $self->readwrite_p();
+
+Disables read queries for a connection to a cluster slave node.
+
+See L<https://redis.io/commands/readwrite> for more information.
 
 =head2 rename
 

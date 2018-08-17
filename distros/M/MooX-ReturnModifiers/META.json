@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-ReturnModifiers",
    "no_index" : {
@@ -41,5 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "1.000000",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

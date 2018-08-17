@@ -1,5 +1,5 @@
 ---
-abstract: 'Modular Perl Debugger (akin to Ruby "Trepanning" Debuggers).'
+abstract: 'Modular Perl Debugger (akin to Python "Trepanning" Debuggers).'
 author:
   - 'Rocky Bernstein <rocky@cpan.org>'
 build_requires:
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4211'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,6 +37,7 @@ requires:
   Digest::SHA: '0'
   File::HomeDir: '0.54'
   Getopt::Long: '2.36'
+  Marpa::R2: '4'
   PadWalker: '0'
   Pod::Text: '3.13'
   Scalar::Util: '0'
@@ -47,5 +48,5 @@ requires:
 resources:
   bugtracker: https://github.com/rocky/Perl-Devel-Trepan/issues
   license: http://opensource.org/licenses/gpl-license.php
-version: '0.74'
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

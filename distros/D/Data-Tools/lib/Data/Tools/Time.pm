@@ -14,7 +14,7 @@ use Exporter;
 use Carp;
 use Data::Tools;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

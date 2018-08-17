@@ -1,80 +1,53 @@
---- #YAML:1.0
-name: Babble
-version: 0.07
+---
+abstract: 'EXPERIMENTAL Babel-like for perl'
 author:
-  - Gergely Nagy <algernon@bonehunter.rulez.org>
-abstract: RSS Feed Aggregator and Blog engine
-license: gpl
-requires:
-  Date::Manip: 0
-  perl: 5.6.0
-recommends:
-  Config::IniFiles: 0
-  DBI: 0
-  Data::Dumper: 0
-  LWP::UserAgent: 0
-  Mail::Box: 0
-  Storable: 0
-  Template: 0
-  Text::Iconv: 0
-  XML::OPML: 0
-  XML::RSS: 0
+  - 'Matt S Trout (mst) <mst@shadowcat.co.uk>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Babble
 provides:
+  App::sigfix:
+    file: lib/App/sigfix.pm
+    version: '0.001001'
   Babble:
     file: lib/Babble.pm
-    version: 0.07
-  Babble::Cache:
-    file: lib/Babble/Cache.pm
-  Babble::Cache::Class::Hash:
-    file: lib/Babble/Cache/Class/Hash.pm
-  Babble::Cache::Dumper:
-    file: lib/Babble/Cache/Dumper.pm
-  Babble::Cache::Storable:
-    file: lib/Babble/Cache/Storable.pm
-  Babble::DataSource:
-    file: lib/Babble/DataSource.pm
-  Babble::DataSource::DBI:
-    file: lib/Babble/DataSource/DBI.pm
-  Babble::DataSource::FlatFile:
-    file: lib/Babble/DataSource/FlatFile.pm
-  Babble::DataSource::Mail:
-    file: lib/Babble/DataSource/Mail.pm
-  Babble::DataSource::OPML:
-    file: lib/Babble/DataSource/OPML.pm
-  Babble::DataSource::RSS:
-    file: lib/Babble/DataSource/RSS.pm
-  Babble::Document:
-    file: lib/Babble/Document.pm
-  Babble::Document::Collection:
-    file: lib/Babble/Document/Collection.pm
-  Babble::Encode:
-    file: lib/Babble/Encode.pm
-  Babble::Output:
-    file: lib/Babble/Output.pm
-  Babble::Output::RSS:
-    file: lib/Babble/Output/RSS.pm
-  Babble::Output::TTk:
-    file: lib/Babble/Output/TTk.pm
-  Babble::Processors:
-    file: lib/Babble/Processors.pm
-  Babble::Processors::Extra:
-    file: lib/Babble/Processors/Extra.pm
-  Babble::Theme:
-    file: lib/Babble/Theme.pm
-  Babble::Theme::XML:
-    file: lib/Babble/Theme/XML.pm
-  Babble::Theme::advogato:
-    file: lib/Babble/Theme/advogato.pm
-  Babble::Theme::planet:
-    file: lib/Babble/Theme/planet.pm
-  Babble::Theme::planet_gray:
-    file: lib/Babble/Theme/planet_gray.pm
-  Babble::Theme::sidebar:
-    file: lib/Babble/Theme/sidebar.pm
-  Babble::Transport:
-    file: lib/Babble/Transport.pm
-  Babble::Transport::LWP:
-    file: lib/Babble/Transport/LWP.pm
-  Babble::Utils:
-    file: lib/Babble/Utils.pm
-generated_by: Module::Build version 0.24
+    version: '0.090003'
+  Babble::Filter:
+    file: lib/Babble/Filter.pm
+  Babble::Grammar:
+    file: lib/Babble/Grammar.pm
+  Babble::Match:
+    file: lib/Babble/Match.pm
+  Babble::Plugin::CoreSignatures:
+    file: lib/Babble/Plugin/CoreSignatures.pm
+  Babble::Plugin::DefinedOr:
+    file: lib/Babble/Plugin/DefinedOr.pm
+  Babble::Plugin::PostfixDeref:
+    file: lib/Babble/Plugin/PostfixDeref.pm
+  Babble::Plugin::SKT:
+    file: lib/Babble/Plugin/SKT.pm
+  Babble::Plugin::State:
+    file: lib/Babble/Plugin/State.pm
+  Babble::Plugin::SubstituteAndReturn:
+    file: lib/Babble/Plugin/SubstituteAndReturn.pm
+  Babble::PluginChain:
+    file: lib/Babble/PluginChain.pm
+  Babble::SubMatch:
+    file: lib/Babble/SubMatch.pm
+  Babble::SymbolGenerator:
+    file: lib/Babble/SymbolGenerator.pm
+requires:
+  Module::Runtime: '0'
+  Moo: '2'
+  Mu: '0'
+  PPR: '0.000021'
+  strictures: '2'
+version: '0.090003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

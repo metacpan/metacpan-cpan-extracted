@@ -2,7 +2,7 @@
 # ABSTRACT: Perform batch operations on test results, and analyze the same.
 
 package TestRail::Utils::Results;
-$TestRail::Utils::Results::VERSION = '0.041';
+$TestRail::Utils::Results::VERSION = '0.043';
 use strict;
 use warnings;
 
@@ -47,7 +47,7 @@ TestRail::Utils::Results - Perform batch operations on test results, and analyze
 
 =head1 VERSION
 
-version 0.041
+version 0.043
 
 =head1 FUNCTIONS
 
@@ -74,12 +74,12 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
-and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
+The development version is on github at L<http://https://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://https://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by George S. Baugh.
+This software is copyright (c) 2018 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

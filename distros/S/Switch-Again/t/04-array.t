@@ -17,14 +17,16 @@ my $switch = switch(
 	}
 );
 my $val = $switch->([qw/a b c d/]);
+=pod
 is ($val, 1);
 $val = $switch->([{ a => 'b', c => 'd' }]);
 is ($val, 2);
 $val = $switch->([['a'], ['b'], ['c']]);
 is ($val, 3);
+=cut
 $val = $switch->('d');
 is ($val, 4);
-
+=pod
 $val = switch([qw/a b c d/], 
 	[qw/a b c d/] => sub {
 		return 1;
@@ -44,5 +46,5 @@ $val = $switch->([['a'], ['b'], ['c']]);
 is ($val, 3);
 $val = $switch->('d');
 is ($val, 4);
-
+=cut
 done_testing();

@@ -1,3 +1,9 @@
+v0.6.1 2018-08-10T02:28:12Z
+ - Pcore::AE::Handle removed
+
+v0.6.0 2018-08-08T20:18:12Z
+ - ported to Pcore::Handle
+
 v0.5.9 2018-06-07T09:48:44Z
  - core event ported to the PP class system
  - error handling fixed

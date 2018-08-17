@@ -52,8 +52,7 @@ sub new {
   my $internalparser = LaTeXML::MathGrammar->new();
   Fatal("expected", "MathGrammar", undef,
     "Compilation of Math Parser grammar failed") unless $internalparser;
-
-  my $self = bless { internalparser => $internalparser }, $class;
+  my $self = bless { internalparser => $internalparser, lexematize => $options{lexematize} }, $class;
   return $self; }
 
 sub parseMath {
@@ -119,7 +118,7 @@ sub cleanupScripts {
         # Now, replace each ref to the script application by an application to a ref to the script.
         foreach my $ref (@refs) {
           $document->replaceTree(['ltx:XMApp', {%attr}, $scriptref], $ref); }
-      } } }
+  } } }
   return; }
 
 sub getQName {
@@ -253,6 +252,12 @@ sub parse {
   foreach my $n ($document->findnodes("descendant-or-self::*[\@xml:id]", $xnode)) {
     my $id = $n->getAttribute('xml:id');
     $LaTeXML::MathParser::IDREFS{$id} = $n; }
+  if ($$self{lexematize}) {
+    my $lexeme_form = $self->node_to_lexeme_full($xnode);
+    $lexeme_form =~ s/^\s+//;
+    $lexeme_form =~ s/\s+$//;
+    $xnode->parentNode->setAttribute('lexemes', $lexeme_form);
+  }
   if (my $result = $self->parse_rec($xnode, 'Anything,', $document)) {
     # Add text representation to the containing Math element.
     my $p = $xnode->parentNode;
@@ -275,10 +280,15 @@ sub parse {
       # but the replacement my have been replaced as well!
       while (my $reprepid = $$LaTeXML::MathParser::LOSTNODES{$repid}) {
         $repid = $reprepid; }
-      foreach my $n ($document->findnodes("descendant-or-self::ltx:XMRef[\@idref='$id']", $p)) {
-        $document->setAttribute($n, idref => $repid); } }
-
-    $p->setAttribute('text', text_form($result)); }
+      if ($document->findnodes("descendant-or-self::*[\@xml:id='$id']")
+        && !$document->findnodes("descendant-or-self::*[\@xml:id='$repid']")) {
+        # Do nothing if the node never actually got replaced (parse ultimately failed?)
+      }
+      else {
+        foreach my $n ($document->findnodes("descendant-or-self::ltx:XMRef[\@idref='$id']", $p)) {
+          $document->setAttribute($n, idref => $repid); } } }
+    $p->setAttribute('text', text_form($result));
+  }
   return; }
 
 my %TAG_FEEDBACK = ('ltx:XMArg' => 'a', 'ltx:XMWrap' => 'w');    # [CONSTANT]
@@ -287,6 +297,7 @@ my %TAG_FEEDBACK = ('ltx:XMArg' => 'a', 'ltx:XMWrap' => 'w');    # [CONSTANT]
 sub parse_rec {
   my ($self, $node, $rule, $document) = @_;
   $self->parse_children($node, $document);
+
   # This will only handle 1 layer nesting (successfully?)
   # Note that this would have been found by the top level xpath,
   # but we've got to worry about node identity: the parent is being rebuilt
@@ -397,6 +408,7 @@ sub filter_hints {
   my $prev             = undef;
   my $pending_comments = '';
   my $pending_space    = 0.0;
+  my $pending_phantom  = undef;
   # Filter the nodes, watching for XMHint's and Comments.
   foreach my $node (@nodes) {
     my $type = $node->nodeType;
@@ -416,28 +428,46 @@ sub filter_hints {
     elsif (getQName($node) eq 'ltx:XMHint') {    # If a Hint node?
       if (my $width = $node->getAttribute('width')) {
         if (my $pts = getXMHintSpacing($width)) {
+          my $ph = ($node->getAttribute('name') || '') =~ /phantom$/;
           if ($prev) {
             my $s = $prev->getAttribute('_space') || 0.0;
-            $prev->setAttribute(_space => $s + $pts); }
+            my $p = $prev->getAttribute('_phantom');
+            $prev->setAttribute(_space => $s + $pts);
+            $prev->setAttribute(_phantom => $p || $ph); }
           else {
-            $pending_space += $pts; } } } }
-    else {                                       # Some other element.
+            $pending_space += $pts;
+            $pending_phantom = $ph; } } }
+      # If XMHint is referenced??
+      # Really shouldn't happen, but if XMHint is in XMWrap, it may end up with id....?
+      if (my $id = $node->getAttribute('xml:id')) {
+        if ($document->findnodes("descendant-or-self::ltx:XMRef[\@idref='$id']")) {
+          push(@prefiltered, $node); $prev = $node; } } }
+    # Don't store stuff on APPLYOP, since they tend to disappear.
+    elsif ((getQName($node) eq 'ltx:XMTok') && (($node->getAttribute('role') || '') eq 'APPLYOP')) {
+###      push(@prefiltered, $node); $prev = $node; }    # Keep it.
+      push(@prefiltered, $node); }    # Keep it, but don't step $prev
+    else {                            # Some other element.
       if ($pending_comments) {
         $node->setAttribute(_pre_comment => $pending_comments);
         $pending_comments = ''; }
       if ($pending_space) {
         $node->setAttribute(lpadding =>
             LaTeXML::Common::Dimension::attributeformat($pending_space * 65536));
-        $pending_space = 0.0; }
+        $node->setAttribute(_phantom => $pending_phantom);
+        $pending_space   = 0.0;
+        $pending_phantom = undef; }
       push(@prefiltered, $node); $prev = $node; }    # Keep it.
   }
+  # if $pending_space > 0, should store as rpadding on last element?
   my @filtered = ();
-  # Filter through the pre-filtered nodes looking for large rpadding.
+  # Filter through the pre-filtered nodes looking for large rpadding to convert to virtual PUNCT.
+  # But we'll assume that phantoms do NOT get converted to PUNCT ?
   foreach my $node (@prefiltered) {
     push(@filtered, $node);
     if (my $s = $node->getAttribute('_space')) {
       $node->removeAttribute('_space');
-      if (($s >= $HINT_PUNCT_THRESHOLD) && (($node->getAttribute('role') || '') ne 'PUNCT')) {
+      if ((!$node->getAttribute('_phantom'))
+        && ($s >= $HINT_PUNCT_THRESHOLD) && (($node->getAttribute('role') || '') ne 'PUNCT')) {
         # Create a new Punctuation node (XMTok) from the wide space
         # I'm leary that this is a safe way to create an XML node that's NOT in the tree, but...
         my $p = $node->parentNode;
@@ -631,7 +661,7 @@ sub parse_single {
     my $box = $document->getNodeBox($mathnode);
     print STDERR "\n" . ('=' x 60) .
       "\nParsing formula \"" . ToString($box) . "\""
-      . "\n from " . $box->getLocator
+      . "\n from " . ToString($box->getLocator)
       . "\n == \"" . join(' ', map { node_string($_, $document) } @nodes) . "\""
       . "\n == " . ToString($mathnode)
       . "\n"; }
@@ -640,7 +670,8 @@ sub parse_single {
     $result = $nodes[0] || Absent(); }
   else {
     # Now do the actual parse.
-    ($result, $unparsed) = $self->parse_internal($rule, @nodes); }
+    ($result, $unparsed) = $self->parse_internal($rule, @nodes);
+  }
 
   # Failure? No result or uparsed lexemes remain.
   # NOTE: Should do script hack??
@@ -657,6 +688,77 @@ sub parse_single {
       print STDERR "\n=>" . printNode($result) . "\n" . ('=' x 60) . "\n"; }
     return $result; } }
 
+use Data::Dumper;
+
+sub node_to_lexeme {
+  my ($self, $node) = @_;
+  my $lexeme   = getTokenMeaning($node);
+  my $qname    = getQName($node);
+  my $document = $LaTeXML::MathParser::DOCUMENT;
+  $lexeme = '' unless defined $lexeme;
+  if (my $font = $node->getAttribute('_font')) {
+    my $font_spec = $document->decodeFont($font);
+    if (my %declarations = $font_spec && $font_spec->relativeTo(LaTeXML::Common::Font->textDefault)) {
+      my @to_add             = ();
+      my $font_pending       = $declarations{font} || {};
+      my $properties_pending = $$font_pending{properties} || {};
+      foreach my $attr (qw(family series shape)) {
+        if (my $value = $$properties_pending{$attr}) {
+          push @to_add, $value; } }
+      if (@to_add) {
+        $lexeme = join("-", sort(@to_add)) . "-" . $lexeme; } } }
+  if (my $role = $self->getGrammaticalRole($node)) {
+    if ($role ne 'UNKNOWN') {
+      $lexeme = $role . ":" . $lexeme; } }
+
+  $lexeme =~ s/\s//g;
+  return $lexeme;
+}
+
+sub node_to_lexeme_full {
+  my ($self, $unrealized_node) = @_;
+  my $node = realizeXMNode($unrealized_node);
+  my $tag  = getQName($node);
+  if ($tag eq 'ltx:XMHint') { return ""; }    # just skip XMHints, they don't contain lexemes
+  my $role = p_getAttribute($node, 'role');
+  if (($tag =~ /^ltx:XM(Tok|Text)$/) || ($role && ($tag !~ 'ltx:XM(Dual|App|Arg|Wrap|ath)'))) {
+# Elements that directly represent a lexeme, or intended operation with a syntactic role (such as a postscript),
+# can proceed to building the lexeme from the leaf node.
+    return $self->node_to_lexeme($node);
+  } else {
+# Elements that do not have a role and are intermediate "may" need an argument wrapper, so that arguments
+# remain unambiguous. For instance a `\frac{a}{b}` has clear argument structure to be preserved.
+    my ($mark_start, $mark_end) = ('', '');
+    if ($tag ne 'ltx:XMath') {
+      if ($role) {
+        $mark_start = "$role:start ";
+        $mark_end   = "$role:end";
+      } else {
+        if ($tag eq 'ltx:XMArg') {
+          $mark_start = "ARG:start ";
+          $mark_end   = "ARG:end";
+        }
+      }
+    }
+    my $lexemes = $mark_start;
+    if ($tag eq 'ltx:XMDual') {
+      $lexemes .= $self->node_to_lexeme_full($LaTeXML::MathParser::DOCUMENT->getSecondChildElement($node));
+    } else {
+      my @child_nodes = element_nodes($node);
+      # skip through single child wrappers (don't serialize)
+      while (scalar(@child_nodes) == 1 && getQName($child_nodes[0]) =~ /^ltx:XM(Arg|Wrap)$/) {
+        @child_nodes = element_nodes($child_nodes[0])
+      }
+      foreach my $child (@child_nodes) {
+        my $child_lexeme = $self->node_to_lexeme_full($child);
+        $lexemes .= $child_lexeme . ' ' if $child_lexeme;
+      }
+    }
+    $lexemes .= $mark_end;
+    return $lexemes;
+  }
+}
+
 sub parse_internal {
   my ($self, $rule, @nodes) = @_;
   #------------
@@ -664,12 +766,16 @@ sub parse_internal {
   local $LaTeXML::MathParser::LEXEMES = {};
   my $i       = 0;
   my $lexemes = '';
+
   foreach my $node (@nodes) {
+    # This is a parser-specific lexeme, but it is not (yet) identical to the serialized lexeme by
+    # ->node_to_lexeme, which is currently experimental
     my $role = $self->getGrammaticalRole($node);
     my $text = getTokenMeaning($node);
     $text = 'Unknown' unless defined $text;
     my $lexeme = $role . ":" . $text . ":" . ++$i;
     $lexeme =~ s/\s//g;
+
     $$LaTeXML::MathParser::LEXEMES{$lexeme} = $node;
     $lexemes .= ' ' . $lexeme; }
 
@@ -787,7 +893,7 @@ sub text_form {
   return $text; }
 
 my %PREFIX_ALIAS = (    # [CONSTANT]
-  SUPERSCRIPTOP => '^', SUBSCRIPTOP => '_', times          => => '*',
+  SUPERSCRIPTOP => '^', SUBSCRIPTOP => '_', times          => '*',
   'equals'      => '=', 'less-than' => '<', 'greater-than' => '>',
   'less-than-or-equals' => '<=', 'greater-than-or-equals' => '>=',
   'much-less-than'      => '<<', 'much-greater-than'      => '>>',
@@ -991,7 +1097,7 @@ sub CatSymbols {
       else {
         foreach my $r ($doc->findnodes("descendant-or-self::ltx:XMRef[\@idref='$id']")) {
           $doc->removeNode($r); } }    # ? Hopefully this is safe.
-    } }
+  } }
   return $new; }
 
 # Some handy shorthands.
@@ -1454,7 +1560,7 @@ sub MaybeFunction {
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 
@@ -1503,7 +1609,7 @@ C<$op> to the nodes C<@args>.
 =item C<< $node = ApplyDelimited($op,@stuff); >>
 
 Create a new C<XMApp> node representing the application of the node
-C<$op> to the arguments found in C<@stuff>.  C<@stuff> are 
+C<$op> to the arguments found in C<@stuff>.  C<@stuff> are
 delimited arguments in the sense that the leading and trailing nodes
 should represent open and close delimiters and the arguments are
 separated by punctuation nodes.

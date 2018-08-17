@@ -30,7 +30,7 @@ Query the Hoststatus of an OpenNebula host.
 =cut
 
 package Net::OpenNebula::Host;
-$Net::OpenNebula::Host::VERSION = '0.311.0';
+$Net::OpenNebula::Host::VERSION = '0.313.0';
 use version;
 
 use Net::OpenNebula::RPC;

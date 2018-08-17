@@ -59,7 +59,7 @@ my $builder = Module::Build->new(
         'Devel::Callsite'                   => '0.08',
 	'Devel::Trepan'                     => '0.73',
         'rlib'                              => '0.02',
-        'B::DeparseTree'                    => '3.2.0',
+        'B::DeparseTree'                    => '3.4.0',
         'Data::Printer'                     => '0.40',
     },
     sign                => ($ENV{PERL_MB_NOSIGN} ? 0 : 1),

@@ -19,7 +19,7 @@ WriteMakefile(
 	},
 	PREREQ_PM => {
 		'Authen::Passphrase' => '0.008',
-		'Crype::Argon2' => '0.005',
+		'Crypt::Argon2' => '0.005',
 		'Mime::Base64' => 0,
 		'Data::GUID' => '0.049',
 		'Carp' => 0,

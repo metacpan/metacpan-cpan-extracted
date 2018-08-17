@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.48
-corresponding to git commit L<2b735cdf07ab42c23dda568c12efb95bcf0a78c4|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/2b735cdf07ab42c23dda568c12efb95bcf0a78c4> made on Sun Dec 24 18:06:09 2017 +0900.
+This document describes Lingua::JA::Moji version 0.50
+corresponding to git commit L<98af863a76470c4f63745726a52518bcfbc53f30|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/98af863a76470c4f63745726a52518bcfbc53f30> made on Fri Aug 17 14:31:28 2018 +0900.
 
 =head1 説明
 
@@ -1106,6 +1106,10 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
+幽霊文字（実際には存在しない漢字）。L<https://www.wdic.org/w/WDIC/%E5%B9%BD%E9%9C%8A%E6%96%87%E5%AD%97>ご参照ください。こちらのページの典拠不詳・典拠不明・同定不能の字です。
+
+
+
 
 
 
@@ -1115,6 +1119,11 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
     use Lingua::JA::Moji 'bad_kanji';
+
+
+
+否定的な意味（病名、不愉快な物、軽率の意味など）の漢字。
+L<https://www.lemoda.net/japanese/offensive-kanji/index.html>。
 
 
 
@@ -1364,7 +1373,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2017
+2008-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

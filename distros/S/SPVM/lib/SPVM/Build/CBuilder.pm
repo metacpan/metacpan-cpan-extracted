@@ -7,7 +7,6 @@ use Carp 'croak', 'confess';
 use SPVM::Build::Util;
 
 use ExtUtils::CBuilder;
-use Config;
 use File::Copy 'move';
 use File::Path 'mkpath';
 use DynaLoader;
@@ -147,30 +146,28 @@ sub create_shared_lib {
   my $config_file = "$input_config_dir/$package_base_name.config";
   
   # Config
-  my $build_setting;
+  my $build_config;
   if (-f $config_file) {
-    $build_setting = do $config_file
+    $build_config = do $config_file
       or confess "Can't parser $config_file: $!$@";
   }
   else {
-    $build_setting = SPVM::Build::Util::default_build_setting;
+    $build_config = SPVM::Build::Util::new_default_build_config;
   }
   
-  # CBuilder settings
-  my $include_dirs = [@{$build_setting->get_include_dirs}];
-  my $extra_compiler_flags = [@{$build_setting->get_extra_compiler_flags}];
-  my $extra_linker_flags = [@{$build_setting->get_extra_linker_flags}];
-  my $conifg = {%{$build_setting->get_config}};
+  # CBuilder configs
+  my $ccflags = $build_config->get_ccflags;
+  my $ldflags = $build_config->get_ldflags;
   
   # Default include path
-  my $env_header_include_dir = $INC{"SPVM/Build.pm"};
-  $env_header_include_dir =~ s/\.pm$//;
-  $env_header_include_dir .= '/include';
-  push @$include_dirs, $env_header_include_dir;
-  push @$include_dirs, $input_src_dir;
+  $build_config->add_ccflags("-I$input_src_dir");
+
+  # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
+  # and overwrite user configs
+  my $config = $build_config->to_hash;
   
   # Compile source files
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $conifg);
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
   my $object_files = [];
   for my $src_file (@$src_files) {
     # Object file
@@ -188,13 +185,9 @@ sub create_shared_lib {
     $cbuilder->compile(
       source => $src_file,
       object_file => $object_file,
-      include_dirs => $include_dirs,
-      extra_compiler_flags => join(' ', @$extra_compiler_flags),
     );
     push @$object_files, $object_file;
   }
-  
-  my $dlext = $Config{dlext};
   
   my $cfunc_names = [];
   for my $sub_name (@$sub_names) {
@@ -215,7 +208,6 @@ sub create_shared_lib {
     objects => $object_files,
     package_name => $package_name,
     dl_func_list => $cfunc_names,
-    extra_linker_flags => join(' ', @$extra_linker_flags),
   );
   
 

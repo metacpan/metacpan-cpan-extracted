@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.10.0;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 use Moose::Role;
 with 'Test::Class::Moose::Role::HasTimeReport';
@@ -51,7 +51,7 @@ Test::Class::Moose::Role::Reporting - Reporting gathering role
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 
@@ -123,7 +123,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2017 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2018 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

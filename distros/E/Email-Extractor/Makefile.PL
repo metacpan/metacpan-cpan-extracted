@@ -23,26 +23,30 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "Data::Dumper" => 0,
     "Email::Find" => 0,
+    "Email::Valid" => 0,
     "Exporter" => 0,
     "File::Basename" => 0,
     "File::Slurp" => 0,
     "File::Spec" => 0,
     "HTML::Encoding" => 0,
     "LWP::UserAgent" => 0,
+    "LWPx::TimedHTTP" => 0,
     "List::Compare" => 0,
     "List::Util" => 0,
     "Mojo::DOM" => 0,
+    "Pod::Usage" => 0,
     "Regexp::Common" => 0,
     "URI::URL" => 0,
     "feature" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/lib/Email/*.t t/lib/Email/Extractor/*.t"
   }
@@ -54,21 +58,25 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "Data::Dumper" => 0,
   "Email::Find" => 0,
+  "Email::Valid" => 0,
   "Exporter" => 0,
   "File::Basename" => 0,
   "File::Slurp" => 0,
   "File::Spec" => 0,
   "HTML::Encoding" => 0,
   "LWP::UserAgent" => 0,
+  "LWPx::TimedHTTP" => 0,
   "List::Compare" => 0,
   "List::Util" => 0,
   "Mojo::DOM" => 0,
+  "Pod::Usage" => 0,
   "Regexp::Common" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "URI::URL" => 0,
   "feature" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

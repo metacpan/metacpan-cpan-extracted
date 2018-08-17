@@ -13,6 +13,7 @@ t/06-DATA.t
 t/07-memory.t
 t/08-chomp.t
 t/09-autochomp.t
+t/10-input-record-separator.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

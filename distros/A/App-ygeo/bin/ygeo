@@ -1,0 +1,89 @@
+#!perl
+
+# ABSTRACT: command line utility based on Yandex::Geo that prints data to csv
+
+package ygeo;
+$ygeo::VERSION = '0.02';
+
+
+use strict;
+use warnings;
+use Cwd;
+use File::Spec;
+use utf8;
+
+use feature 'say';
+
+use App::ygeo;
+use App::ygeo::yaml qw(
+  data_from_first_valid_cfg
+  create_cfg
+);
+
+use Pod::Usage;
+pod2usage() unless @ARGV >= 1;
+pod2usage() if ( defined $ARGV[0] && $ARGV[0] eq '--help' );
+
+my @config_files =
+  ( File::Spec->catfile( getcwd(), '.ygeo' ), $ENV{"HOME"} . '/.ygeo' );
+
+my @required_keys = qw/apikey city/;
+my $params = data_from_first_valid_cfg( \@config_files, \@required_keys );
+$params = create_cfg( $config_files[0], @required_keys ) unless $params;
+
+my $text         = $ARGV[0];
+my $city         = $ARGV[1] || $params->{city} || 'ROV';
+my $results      = $ARGV[2] || 500;
+my $csv_filename = $ARGV[0] . '.csv';
+
+utf8::decode($text);
+
+my $ygeo = App::ygeo->new( apikey => $params->{apikey}, city => $city );
+$ygeo->get_and_print( text => $text, results_limit => $results, verbose => 1 );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ygeo - command line utility based on Yandex::Geo that prints data to csv
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+    ygeo "автомойки самообслуживания" ROV 25
+
+1st positional argument is text to search 
+
+2nd positional argument (optional) is IATA city code (see L<Yandex::Geo/get> and L<Yandex::Geo/cities_bbox> for more info). If no specified ygeo will take city from cfg.
+
+3rd positional argument (optional) is number of results to return. By default: 500
+
+=head1 DESCRIPTION
+
+Command line utility that do search via Yandex Maps Company Search API in specified city and prints result in csv file
+
+By default it:
+
+    prints maximum 500 companies (API restriction)
+
+    looks for apikey and city in C<.ygeo> file. C<.ygeo> config has yaml syntax. Firsty it search C<.ygeo> file in current directory, then in home directory
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

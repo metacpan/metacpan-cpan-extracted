@@ -8,7 +8,7 @@ use warnings;
 # LICENSE: This file is covered by the EUPL license, please see the
 # LICENSE file in this repository for more information
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use OpenOffice::OODoc;
 
@@ -96,6 +96,8 @@ sub insertDocument {
             { $oodoc_dest_document->getStyleAttributes($style_element) }->{references} || {};
     };
 
+    $style_attributes->{style} = { $oodoc_dest_text_style->getAttributes() };
+
     foreach my $style_name ( values %$transliteration_map ) {
 
         next if $style_name =~ /T\d+/;
@@ -104,11 +106,13 @@ sub insertDocument {
             $oodoc_dest_document->textStyle($style_name)
             or
             $oodoc_dest_document->createStyle( $style_name =>
-                'class'                        => 'text',
-                'display-name'                 => "Default",
-                'family'                       => 'paragraph',
-                'next'                         => 'Text_20_body',
-                'parent'                       => 'Heading',
+                'class'        => 'text',
+                'display-name' => "Default",
+                'family'       => 'paragraph',
+                'parent'       =>
+                    $style_attributes->{style}->{'style:parent-style-name'}
+                    ||
+                    'Standard',
             )
             or
             next;
@@ -234,7 +238,7 @@ OpenOffice::OODoc::InsertDocument - Insert, merge or append OpenOffice::OODoc ob
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -271,8 +275,6 @@ Inserts a OODoc document at location.
 If there is any style associated with the C<$oodoc_element>, than that will be
 used for styling the document to be inserted. Otherwise, it will use default
 body styles instead.
-
-=head1 CAVEAT
 
 =head1 AUTHOR
 

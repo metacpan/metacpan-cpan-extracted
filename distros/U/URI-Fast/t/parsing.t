@@ -35,6 +35,15 @@ subtest 'param' => sub{
   is uri('?=')->param('foo'), undef, 'query w/ = but w/o key or value';
   is uri('???')->param('??'), undef, 'multiple question marks';
   is uri('?food=bard&foo=bar')->param('foo'), 'bar', 'substring match';
+
+  subtest 'edge cases' => sub{
+    subtest 'bad input: unencoded = in query param value' => sub{
+      my $q = '?url=http%3A%2F%2Fwww.example.com%2Fsome%2Fpath%3Fencparam=fnord&foo=bar';
+      my $u = uri $q;
+      is scalar($u->param('url')), 'http://www.example.com/some/path?encparam=fnord', 'invalid param';
+      is scalar($u->param('foo')), 'bar', 'valid param';
+    };
+  };
 };
 
 subtest 'query_hash' => sub{

@@ -1,4 +1,4 @@
-dnl openbsd in it's neverending brokenness requires stdint.h for intptr_t,
+dnl openbsd in its neverending brokenness requires stdint.h for intptr_t,
 dnl but that header isn't very portable...
 AC_CHECK_HEADERS([stdint.h sys/syscall.h sys/prctl.h])
 
@@ -81,7 +81,7 @@ int main (void)
    size_t count = 2;
    ssize_t res;
 #if __linux
-   res = sendfile (fd, fd, offset, count);
+   res = sendfile (fd, fd, &offset, count);
 #elif __FreeBSD__
    res = sendfile (fd, fd, offset, count, 0, &offset, 0);
 #elif __hpux
@@ -136,72 +136,33 @@ AC_CACHE_CHECK(for prctl_set_name, ac_cv_prctl_set_name, [AC_LINK_IFELSE([AC_LAN
 #include <sys/prctl.h>
 int main (void)
 {
-  char name[] = "test123";
+  char *name = "test123";
   int res = prctl (PR_SET_NAME, (unsigned long)name, 0, 0, 0);
 }
 ])],ac_cv_prctl_set_name=yes,ac_cv_prctl_set_name=no)])
 test $ac_cv_prctl_set_name = yes && AC_DEFINE(HAVE_PRCTL_SET_NAME, 1, prctl(PR_SET_NAME) is available)
 
-dnl #############################################################################
-dnl # these checks exist for the benefit of IO::AIO
-
-dnl at least uclibc defines _POSIX_ADVISORY_INFO without *any* of the required
-dnl functionality actually being present. ugh.
-AC_CACHE_CHECK(for posix_madvise, ac_cv_posix_madvise, [AC_LINK_IFELSE([AC_LANG_SOURCE([
-#include <sys/mman.h>
-int main (void)
-{
-   int res = posix_madvise ((void *)0, (size_t)0, POSIX_MADV_NORMAL);
-   int a = POSIX_MADV_SEQUENTIAL;
-   int b = POSIX_MADV_RANDOM;
-   int c = POSIX_MADV_WILLNEED;
-   int d = POSIX_MADV_DONTNEED;
-   return 0;
-}
-])],ac_cv_posix_madvise=yes,ac_cv_posix_madvise=no)])
-test $ac_cv_posix_madvise = yes && AC_DEFINE(HAVE_POSIX_MADVISE, 1, posix_madvise(2) is available)
-
-AC_CACHE_CHECK(for posix_fadvise, ac_cv_posix_fadvise, [AC_LINK_IFELSE([AC_LANG_SOURCE([
-#define _XOPEN_SOURCE 600
-#include <fcntl.h>
-int main (void)
-{
-   int res = posix_fadvise ((int)0, (off_t)0, (off_t)0, POSIX_FADV_NORMAL);
-   int a = POSIX_FADV_SEQUENTIAL;
-   int b = POSIX_FADV_NOREUSE;
-   int c = POSIX_FADV_RANDOM;
-   int d = POSIX_FADV_WILLNEED;
-   int e = POSIX_FADV_DONTNEED;
-   return 0;
-}
-])],ac_cv_posix_fadvise=yes,ac_cv_posix_fadvise=no)])
-test $ac_cv_posix_fadvise = yes && AC_DEFINE(HAVE_POSIX_FADVISE, 1, posix_fadvise(2) is available)
-
-dnl lots of linux specifics
-AC_CHECK_HEADERS([linux/fs.h linux/fiemap.h])
-
-AC_CACHE_CHECK([for splice, vmsplice and tee], ac_cv_linux_splice, [AC_LINK_IFELSE([AC_LANG_SOURCE([
-#include <fcntl.h>
-int main (void)
-{
-   ssize_t res;
-   res = splice ((int)0, (loff_t)0, (int)0, (loff_t *)0, (size_t)0, SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE);
-   res = tee ((int)0, (int)0, (size_t)0, SPLICE_F_NONBLOCK);
-   res = vmsplice ((int)0, (struct iovec *)0, 0, SPLICE_F_NONBLOCK | SPLICE_F_GIFT);
-   return 0;
-}
-])],ac_cv_linux_splice=yes,ac_cv_linux_splice=no)])
-test $ac_cv_linux_splice = yes && AC_DEFINE(HAVE_LINUX_SPLICE, 1, splice/vmsplice/tee(2) are available)
-
-AC_CACHE_CHECK(for pipe2, ac_cv_pipe2, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
-#include <fcntl.h>
+AC_CACHE_CHECK(for posix_close, ac_cv_posix_close, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <unistd.h>
 int res;
 int main (void)
 {
-   res = pipe2 (0, 0);
+   res = posix_close (0, 0); /* we do not need any flags */
    return 0;
 }
-]])],ac_cv_pipe2=yes,ac_cv_pipe2=no)])
-test $ac_cv_pipe2 = yes && AC_DEFINE(HAVE_PIPE2, 1, pipe2(2) is available)
+]])],ac_cv_posix_close=yes,ac_cv_posix_close=no)])
+test $ac_cv_posix_close = yes && AC_DEFINE(HAVE_POSIX_CLOSE, 1, posix_close(2) is available)
+
+AC_CACHE_CHECK(for renameat2, ac_cv_renameat2, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <linux/fs.h>
+int res;
+int main (void)
+{
+   res = syscall (SYS_renameat2, 0, 0, 0, 0, RENAME_EXCHANGE | RENAME_NOREPLACE);
+   return 0;
+}
+]])],ac_cv_renameat2=yes,ac_cv_renameat2=no)])
+test $ac_cv_renameat2 = yes && AC_DEFINE(HAVE_RENAMEAT2, 1, renameat2(2) is available)
 

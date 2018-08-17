@@ -68,11 +68,11 @@ sub _server_ready {
     print "   $proto://$host:$port/\n";
 
     my @files =
-        map { s/^$self->{root}//; $_ } File::Find::Rule->file->name('*.pl')->in( $self->{root} );
+        map { s{^\Q$self->{root}\E/?}{}; $_ } File::Find::Rule->file->name('*.pl','*.cgi')->in( $self->{root} );
 
     if (@files) {
         print "\nFound the following scripts:\n";
-        print "    $proto://$host:$port/" . ( $self->{"cgi-bin"} ? "cgi-bin" : "" ) . "/$_\n"
+        print "    $proto://$host:$port/" . ( $self->{"cgi-bin"} ? "cgi-bin/" : "" ) . "$_\n"
             for @files;
     }
 
@@ -110,7 +110,7 @@ App::CGIThis - Export the current directory like a cgi-bin
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

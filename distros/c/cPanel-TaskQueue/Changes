@@ -1,6 +1,6 @@
 Revision history for cPanel-TaskQueue
 
-0.850     2018-01-18 16:24:40+00:00 UTC
+0.900     2018-08-15 14:31:59+00:00 UTC
      - Correct deferral logic to clear tags when a task completes
      - Correct flawed load logic relating to resuming after pause.
 0.700    2014-10-15 16:37:12 America/Chicago

@@ -1,57 +1,57 @@
 {
    "abstract" : "Get currency information for different currencies",
    "author" : [
-      "Ed Freyfogle <edf@opencagedata.com>"
+      "edf <edf@opencagedata.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "mit"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-MoneyCurrency",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::Exception" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "0",
             "JSON" : "0",
+            "JSON::XS" : "0",
+            "Pod::Coverage" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Warn" : "0",
             "Types::Serialiser" : "0",
-            "perl" : "5.006"
+            "perl" : "5.012"
          }
+      }
+   },
+   "provides" : {
+      "Data::MoneyCurrency" : {
+         "file" : "lib/Data/MoneyCurrency.pm",
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "https://github.com/OpenCageData/perl5-Data-MoneyCurrency",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Flimm/perl5-Data-MoneyCurrency.git",
-         "web" : "https://github.com/Flimm/perl5-Data-MoneyCurrency"
+         "url" : "https://github.com/OpenCageData/perl5-Data-MoneyCurrency.git",
+         "web" : "https://github.com/OpenCageData/perl5-Data-MoneyCurrency"
       }
    },
-   "version" : "0.03",
-   "x_bugtracker" : {
-      "web" : "https://github.com/Flimm/perl5-Data-MoneyCurrency/issues"
-   },
-   "x_homepage" : "https://github.com/Flimm/perl5-Data-MoneyCurrency"
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.03"
 }
+

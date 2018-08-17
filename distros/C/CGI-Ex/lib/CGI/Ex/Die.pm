@@ -23,7 +23,7 @@ use CGI::Ex;
 use CGI::Ex::Dump qw(debug ctrace dex_html);
 
 BEGIN {
-  $VERSION = '2.46';
+  $VERSION = '2.47';
   $SHOW_TRACE = 0      if ! defined $SHOW_TRACE;
   $IGNORE_EVAL = 0     if ! defined $IGNORE_EVAL;
   $EXTENDED_ERRORS = 1 if ! defined $EXTENDED_ERRORS;

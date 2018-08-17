@@ -17,21 +17,21 @@ my %WriteMakefileArgs = (
   "NAME" => "Yandex::Geo",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Class::Tiny" => 0,
     "Geo::JSON" => 0,
     "JSON::XS" => 0,
     "LWP::UserAgent" => 0,
-    "Object::Tiny" => 0,
     "URI" => 0,
     "URI::Escape" => 0,
-    "utf8" => 0
+    "strict" => 0,
+    "utf8" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Slurp" => 0,
-    "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/lib/Yandex/Geo/*.t"
   }
@@ -40,11 +40,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Class::Tiny" => 0,
   "File::Slurp" => 0,
   "Geo::JSON" => 0,
   "JSON::XS" => 0,
   "LWP::UserAgent" => 0,
-  "Object::Tiny" => 0,
   "Test::More" => 0,
   "URI" => 0,
   "URI::Escape" => 0,

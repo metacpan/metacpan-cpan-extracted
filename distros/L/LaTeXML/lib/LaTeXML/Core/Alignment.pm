@@ -234,8 +234,7 @@ sub beAbsorbed {
   # but (ATM) we've only got sensible boxes for the cells.
   &{ $$self{openContainer} }($document, ($attr ? %$attr : ()));
   foreach my $row (@{ $$self{rows} }) {
-    &{ $$self{openRow} }($document, 'xml:id' => $$row{id},
-      refnum => $$row{refnum}, frefnum => $$row{frefnum}, rrefnum => $$row{rrefnum});
+    &{ $$self{openRow} }($document, 'xml:id' => $$row{id}, tags => $$row{tags});
     if (my $before = $$row{before}) {
       map { $document->absorb($_) } @$before; }
     foreach my $cell (@{ $$row{columns} }) {
@@ -291,6 +290,13 @@ sub beAbsorbed {
 # However, math alignments, and those with expected structure (eg. eqnarray)
 # should generally NOT have rows & columns collapsed --- except the last row!
 
+# Also note the inconsistency between TeX & HTML's table models regarding spans.
+# \multicolumn creates a cell that covers a certain number of columns
+# which are then omitted from the LaTeX AND the HTML.
+# OTOH, \multirow creates a cell which overlaps following rows!
+# The & is still needed to allocate the cells in those rows.
+# And in fact they need not even be empty! TeX will just pile them up!
+# However, in HTML the spanned rows ARE omitted!
 sub normalizeAlignment {
   my ($self) = @_;
   return if $$self{normalized};
@@ -314,24 +320,39 @@ sub normalizeAlignment {
           if (my $nr = $$ccol{rowspan}) {    # If this spanned column has rowspan
             $$col{rowspan} = $nr; } } }      # copy rowspan to initial column
       if (($nr = $$col{rowspan} || 1) > 1) {    # If this column spans rows
+        my $nr_orig = $nr;
         my $nc = $$col{colspan} || 1;
         # Mark all spanned columns in following rows as skipped.
         for (my $ii = $i + 1 ; $ii < $i + $nr ; $ii++) {
-          if (my $rrow = $rows[$ii]) {
+          # Prescan the columns to make sure they're empty!
+          my $rowempty = 1;
+          my $rrow     = $rows[$ii];
+          if ($rrow) {
+            for (my $jj = $j ; $jj < $j + $nc ; $jj++) {
+              if (my $ccol = $$rrow{columns}[$jj]) {
+                if (!$$ccol{empty}) {
+                  $rowempty = 0; } } } }
+          if (!$rrow || !$rowempty) {
+            # Prescan the columns to make sure they're empty!
+            $nr = $$col{rowspan} = $ii - $i;
+            Info('unexpected', 'rowspan', undef,
+              "Rowspan in cell($i,$j) covers non-empty cells; truncating."); }
+          elsif ($rrow) {
             for (my $jj = $j ; $jj < $j + $nc ; $jj++) {
               if (my $ccol = $$rrow{columns}[$jj]) {
                 $$ccol{skipped}    = 1;
-                $$ccol{rowspanned} = $i; } } } }    # note that this column is spanned by row $i
-            # And, if the last (skipped) columns have a bottom border, copy that to the rowspanned col
+                $$ccol{rowspanned} = $i; } } }    # note that this column is spanned by row $i
+        }
+        # And, if the last (skipped) columns have a bottom border, copy that to the rowspanned col
         if (my $rrow = $rows[$i + $nr - 1]) {
           my $sborder = '';
           for (my $jj = $j ; $jj < $j + $nc ; $jj++) {
             if (my $ccol = $$rrow{columns}[$jj]) {
               my $border = $$ccol{border} || '';
-              $border =~ s/[^bB]//g;    # mask all but bottom border
+              $border =~ s/[^bB]//g;              # mask all but bottom border
               $sborder = $border unless $sborder; } }
           $$col{border} .= $sborder if $sborder; }
-      } } }
+  } } }
 
 #  if (!$ismath) {                       # Best not to do this in math? At least not in equationgroups!
 # Now scan for and remove empty rows & columns
@@ -412,7 +433,7 @@ sub normalizeAlignment {
                   ? (@preserve, $$next{boxes}->unlist) : @preserve); }
             }    # Now, remove the column
             $$row{columns} = [grep { $_ ne $col } @{ $$row{columns} }];
-          } } } }
+    } } } }
   }
   $$self{normalized} = 1;
   return; }
@@ -551,8 +572,8 @@ sub alignment_regroup_rows {
     my @cells = $document->findnodes('ltx:td', $rows[0]);
     # Non header cells, done.
     last if scalar(grep { (!$_->getAttribute('thead')) } @cells);
-    push(@heads, shift(@rows));
     my $line = scalar(@heads);
+    push(@heads, shift(@rows));
     $maxreach = max($maxreach, map { ($_->getAttribute('rowspan') || 0) + $line } @cells); }
   if ($maxreach > scalar(@heads)) {    # rowspan crossed over thead boundary!
     unshift(@rows, @heads); @heads = (); }
@@ -562,7 +583,7 @@ sub alignment_regroup_rows {
     my @cells = $document->findnodes('ltx:td', $rows[-1]);
     # Non header cells, done.
     last if scalar(grep { (!$_->getAttribute('thead')) } @cells);
-    push(@foots, pop(@rows)); }
+    unshift(@foots, pop(@rows)); }
   $document->wrapNodes('ltx:thead', @heads) if @heads;
   $document->wrapNodes('ltx:tbody', @rows)  if @rows;
   $document->wrapNodes('ltx:tfoot', @foots) if @foots;
@@ -632,7 +653,7 @@ sub collect_alignment_rows {
         $rows[$r + $sr][$c + $cs - 1]{r} = $rb; }
       for (my $sc = 0 ; $sc < $cs ; $sc++) {
         $rows[$r + $rs - 1][$c + $sc]{b} = $bb; }
-    } }
+  } }
 
   # Now, do some border massaging...
   for (my $r = 0 ; $r < $nrows ; $r++) {
@@ -700,7 +721,7 @@ sub classify_alignment_cell {
           $class .= 'm' unless $class eq 'm'; }
         else {
           $class .= '?' unless $class; }
-      } } }
+  } } }
   $class = 'mx' if $class && (($class =~ /^((m|i)t)+(m|i)?$/) || ($class =~ /^(t(m|i))+t?$/));
   return $class || '_'; }
 
@@ -841,6 +862,11 @@ sub alignment_test_headers {
     print STDERR "header content too much longer than data content\n"
       if $LaTeXML::Core::Alignment::DEBUG;
     return; }
+  # Or if a header cell has "large" content?
+  if ($headlength >= 1000) {    # Or if a header cell has "large" content?
+    print STDERR "header content too large\n"
+      if $LaTeXML::Core::Alignment::DEBUG;
+    return; }
 
   print STDERR "Succeeded with $nhead headers\n" if $LaTeXML::Core::Alignment::DEBUG;
   return @heads; }
@@ -902,7 +928,7 @@ sub alignment_max_content_length {
   foreach my $j (($from .. $to)) {
     my $l = 0;
     foreach my $cell (@{ $::TABLINES[$j] }) {
-      $l += $$cell{content_length}; }
+      $l += $$cell{content_length} || 0; }
     $length = $l if $l > $length; }
   return $length; }
 
@@ -917,9 +943,9 @@ sub alignment_max_content_length {
 #    mx=>{'_'=>0.1, m=>0.2, i=>0.2, t=>0.2, '?'=>0.2, mx=>0.0});
 
 my %cell_class_diff = (    # [CONSTANT]
-  '_' => { '_' => 0.0, m => 0.05, i => 0.05, t => 0.05, '?' => 0.05, mx => 0.05 },
-  m => { '_' => 0.05, m => 0.0, i => 0.1, mx => 0.2 },
-  i => { '_' => 0.05, m => 0.1, i => 0.0, mx => 0.2 },
+  '_' => { '_' => 0.0,  m => 0.05, i => 0.05, t  => 0.05, '?' => 0.05, mx => 0.05 },
+  m   => { '_' => 0.05, m => 0.0,  i => 0.1,  mx => 0.2 },
+  i   => { '_' => 0.05, m => 0.1,  i => 0.0,  mx => 0.2 },
   t   => { '_' => 0.05, t   => 0.0, mx => 0.2 },
   '?' => { '_' => 0.05, '?' => 0.0, mx => 0.2 },
   mx  => { '_' => 0.05, m   => 0.2, i  => 0.2, t => 0.2, '?' => 0.2, mx => 0.0 });
@@ -942,6 +968,9 @@ sub alignment_compare {
   while (@cells1 && @cells2) {
     my $cell1 = shift(@cells1);
     my $cell2 = shift(@cells2);
+    # Annoying test avoids warnings if cells inconsistent; likely due to incorrect row/col spans
+    next if grep { !defined $$cell1{$_} } qw(content_class r l t b);
+    next if grep { !defined $$cell2{$_} } qw(content_class r l t b);
     #    $diff += 0.5 if (($$cell1{align}||'') ne ($$cell2{align}||''))
     $diff += 0.75 if (($$cell1{align} || '') ne ($$cell2{align} || ''))
       && ($$cell1{content_class} ne '_') && ($$cell2{content_class} ne '_');

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4214'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,9 +23,9 @@ provides:
     file: lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Auto_Subcmd/Deparse.pm
   Devel::Trepan::Deparse:
     file: lib/Devel/Trepan/Deparse.pm
-    version: v3.0.0
+    version: v3.1.0
 requires:
-  B::DeparseTree: v3.2.0
+  B::DeparseTree: v3.4.0
   Data::Printer: '0.40'
   Devel::Callsite: '0.08'
   Devel::Trepan: '0.73'
@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/rocky/p5-Devel-Trepan-Deparse/issues
   license: http://opensource.org/licenses/gpl-license.php
   repository: http://github.com/rocky/p5-Devel-Trepan-Deparse
-version: v3.0.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v3.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

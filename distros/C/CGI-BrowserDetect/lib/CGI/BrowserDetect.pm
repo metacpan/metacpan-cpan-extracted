@@ -1,54 +1,38 @@
 package CGI::BrowserDetect;
-
-use 5.006;
-use strict;
-use warnings;
-
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use base qw/HTTP::BrowserDetect/;
-
-=head1 NAME
-
-CGI::BrowserDetect - Browser Detect
-
-=head1 VERSION
-
-Version 0.02
-
-=cut
-
-our $VERSION = '0.02';
 
 sub new {
 	my $pkg = shift;
 	my $count = scalar @_;
-	
-	my %args = $count == 2 
-			? (HTTP_USER_AGENT => shift, HTTP_ACCEPT_LANGUAGE => shift) 
-			: $count == 1 
+
+	my %args = $count == 2
+			? (HTTP_USER_AGENT => shift, HTTP_ACCEPT_LANGUAGE => shift)
+			: $count == 1
 				? (HTTP_USER_AGENT => shift)
 					: @_;
 
 	my $self = $pkg->SUPER::new($args{HTTP_USER_AGENT});
-	
+
 	if ($args{HTTP_ACCEPT_LANGUAGE}) {
 		$self->{accept_language} = $args{HTTP_ACCEPT_LANGUAGE};
 		($self->{_lang}, $self->{_cnty}) = $self->{accept_language} =~ /([a-z]{2})\-([A-Z]{2})/;
 	}
+
 	return $self;
 }
 
 sub detect {
 	my ($self, @want) = @_;
-	my %provide;
-
-	$self->$_ && do { $provide{$_} = $self->$_ } for @want;
-
+	my %provide = map {
+		$self->$_ ? ( $_ => $self->$_ ) : ()
+	} @want;
 	return wantarray ? %provide : \%provide;
 }
 
 sub device_type {
 	my ($self) = @_;
-	
+
 	return $self->mobile
 		? 'mobile'
 		: $self->tablet
@@ -56,7 +40,7 @@ sub device_type {
 			: 'computer';
 }
 
-sub lang { language(@_); }
+sub lang { language(@_); } # backward comp
 
 sub language {
 	my ($self) = @_;
@@ -64,7 +48,7 @@ sub language {
 	return $language || $self->{_lang};
 }
 
-sub cnty { country(@_); }
+sub cnty { country(@_); } # backwards
 
 sub country {
 	my ($self) = @_;
@@ -73,6 +57,18 @@ sub country {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+CGI::BrowserDetect - Browser Detect
+
+=head1 VERSION
+
+Version 0.03
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -83,6 +79,7 @@ Perhaps a little code snippet.
 	use CGI::BrowserDetect;
 
 	my $ua = CGI::BrowserDetect->new($ENV{HTTP_USER_AGENT}, $ENV{HTTP_ACCEPT_LANGUAGE});
+
 	...
 
 	my $hash = $ua->detect(qw/os browser type language country/);
@@ -100,7 +97,7 @@ return the type of device
 
 =head2 lang
 
-return the language if not found in HTTP_USER_AGENT using HTTP_ACCEPT_LANGUAGE 
+return the language if not found in HTTP_USER_AGENT using HTTP_ACCEPT_LANGUAGE
 
 =head2 cnty
 
@@ -122,8 +119,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc CGI::BrowserDetect
-
+	perldoc CGI::BrowserDetect
 
 You can also look for information at:
 
@@ -194,4 +190,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of CGI::BrowserDetect
+

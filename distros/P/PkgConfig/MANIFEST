@@ -1,5 +1,6 @@
 .appveyor.yml
 .travis.yml
+.yath.rc
 Changes
 gen_multi_tests.pl
 ignore.txt
@@ -632,6 +633,7 @@ t/file_path.t
 t/gh36.t
 t/lib/PkgConfig/Capture.pm
 t/lib/PkgConfig/Path.pm
+t/par_packer.t
 t/pcfiledir.t
 t/perl_version.t
 t/PkgConfigTest.pm

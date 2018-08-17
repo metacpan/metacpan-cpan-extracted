@@ -1,8 +1,9 @@
 package Import::Export;
 
 use Carp;
+use namespace::clean ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
 our %EX;
 
@@ -15,17 +16,28 @@ our %EXTYPE = (
 );
 
 sub import {
-	my ($pkg) = shift;
+	my ($pkg, $options, $caller) = (shift, {}, caller());
 	return unless my @export = @_;
+	Carp::croak('define your %EX export hash')
+		unless (%EX) = %{"${pkg}::EX"};
 
-	%EX = %{"${pkg}::EX"} or Carp::croak('define your %EX export hash');
+	$options = pop @export if ref $export[-1];
+	$caller = $options->{-caller} if exists $options->{-caller};
+	my @exported = export($pkg, $caller, @export);
 
-	my $caller = caller();
-	export($pkg, $caller, @export);
+	$options->{clean} and "$options->{clean}" eq "import"
+		? namespace::clean->clean_subroutines( # sub import { p->import(@export, { clean => 'import' }) }
+			$caller,
+			@exported
+		)
+		: namespace::clean->import(  # use p @export, { clean => 1 }
+			-cleanee => $caller,
+			@exported
+		);
 }
 
 sub export {
-	my ($pkg, $caller) = (shift, shift);
+	my ($pkg, $caller, @exported) = (shift, shift);
 	while (my $ex = shift) {
 		my $type;
 		if ( ! $EX{$ex} ) {
@@ -38,11 +50,13 @@ sub export {
 		}
 
 		$type = ($ex =~ s/^(\W)//) ? $1 : "&";
-		$pkg->can($type) and next;
+		$caller->can($ex) and next;
 
-		my $exporting = $EXTYPE{$type} or Carp::croak("Cant export symbol $ex");
+		my $exporting = $EXTYPE{$type} or Carp::croak("Cant export symbol $type");
 		*{"${caller}::${ex}"} = $exporting->($pkg, $ex);
+		push @exported, $ex;
 	}
+	return @exported;
 }
 
 sub _export_code { \&{"$_[0]::$_[1]"} }
@@ -51,13 +65,17 @@ sub _export_array { \@{"$_[0]::$_[1]"} }
 sub _export_hash { \%{"$_[0]::$_[1]"} }
 sub _export_glob { *{"$_[0]::$_[1]"} }
 
+1;
+
+__END__
+
 =head1 NAME
 
 Import::Export - Exporting
 
 =head1 VERSION
 
-Version 0.04
+Version 0.08
 
 =cut
 
@@ -82,7 +100,23 @@ Quick summary of what the module does.
 
 	.....
 
-	use One qw/one/;
+	use One qw/one/ { clean => 1 };
+
+	.....
+
+	package Lost
+
+	sub import {
+		...
+		require Found;
+		Found->import(qw/all/, { clean => 'import', -caller => $caller });
+		...
+	}
+
+
+=head2 import
+
+=head2 export
 
 =head1 AUTHOR
 
@@ -166,4 +200,3 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Import::Export

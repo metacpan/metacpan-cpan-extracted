@@ -29,12 +29,11 @@ requires:
   Term::Choose::LineFold: '1.607'
   Term::Choose::Linux: '1.607'
   Term::Choose::Win32: '1.607'
-  Unicode::GCString: '0'
   parent: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.321'
+version: '0.500'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

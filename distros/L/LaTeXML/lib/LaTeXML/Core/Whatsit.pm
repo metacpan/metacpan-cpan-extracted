@@ -23,6 +23,7 @@ use strict;
 use warnings;
 use LaTeXML::Global;
 use LaTeXML::Common::Object;
+use LaTeXML::Common::Locator;
 use LaTeXML::Common::Error;
 use LaTeXML::Core::Token;
 use LaTeXML::Core::Tokens;
@@ -33,7 +34,7 @@ use base qw(LaTeXML::Core::Box);
 
 # Specially recognized (some required?) properties:
 #  font    : The font object
-#  locator : a locator string, where in the source this whatsit was created
+#  locator : a locator object, where in the source this whatsit was created
 #  isMath  : whether this is a math object
 #  id
 #  body
@@ -50,41 +51,9 @@ sub isMath {
   my ($self) = @_;
   return $$self{properties}{isMath}; }
 
-sub getFont {
-  my ($self) = @_;
-  return $$self{properties}{font}; }    # and if undef ????
-
-sub setFont {
-  my ($self, $font) = @_;
-  $$self{properties}{font} = $font;
-  return; }
-
-sub getLocator {
-  my ($self) = @_;
-  return $$self{properties}{locator}; }
-
 sub getProperty {
   my ($self, $key) = @_;
   return $$self{properties}{$key}; }
-
-sub getProperties {
-  my ($self) = @_;
-  return %{ $$self{properties} }; }
-
-sub getPropertiesRef {
-  my ($self) = @_;
-  return $$self{properties}; }
-
-sub setProperty {
-  my ($self, $key, $value) = @_;
-  $$self{properties}{$key} = $value;
-  return; }
-
-sub setProperties {
-  my ($self, %props) = @_;
-  while (my ($key, $value) = each %props) {
-    $$self{properties}{$key} = $value if defined $value; }
-  return; }
 
 sub getArg {
   my ($self, $n) = @_;
@@ -111,6 +80,7 @@ sub setBody {
   $$self{properties}{trailer} = $trailer;
   # And copy any otherwise undefined properties from the trailer
   if ($trailer) {
+    $$self{properties}{locator} = LaTeXML::Common::Locator->newRange($self->getLocator, $trailer->getLocator);
     my %trailerhash = $trailer->getProperties;
     foreach my $prop (keys %trailerhash) {
       $$self{properties}{$prop} = $trailer->getProperty($prop) unless defined $$self{properties}{$prop}; } }
@@ -144,7 +114,7 @@ sub revert {
       @tokens = &$spec($self, $self->getArgs); }
     else {
       if (defined $spec) {
-        @tokens = LaTeXML::Core::Definition::Expandable::substituteTokens($spec, map { Tokens(Revert($_)) } $self->getArgs)
+        @tokens = $spec->substituteParameters(map { Tokens(Revert($_)) } $self->getArgs)->unlist
           if $spec ne ''; }
       else {
         my $alias = ($LaTeXML::REVERT_RAW ? undef : $defn->getAlias);

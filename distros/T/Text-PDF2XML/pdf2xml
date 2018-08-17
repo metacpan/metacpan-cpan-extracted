@@ -14,13 +14,15 @@ pdf2xml - extract text from PDF files and wraps it in XML
 =head1 OPTIONS
 
  -c ............. split strings into character sequences before finding words
+ -d ............. detect language for each paragraph
+ -D lang ........ ignore all paragraphs that do not match language <lang>
  -h ............. skip de-hypenation (keep hyphenated words)
  -H ............. max heap size for Java VM
  -J path ........ path to Java
  -l lexicon ..... provide a list of words or a text in the target language
  -L ............. skip lowercasing (which is switched on by default)
  -m ............. skip merging character sequences (not recommended)
- -M ............. skip paragraph mergong heuristics
+ -M ............. skip paragraph merging heuristics
  -r ............. skip 'pdftotext -raw'
  -x ............. skip standard 'pdftotext'
  -X ............. use pdfXtk to convert to XHTML (default)
@@ -46,11 +48,7 @@ pdf2xml tries to combine the output of several conversion tools in order to impr
 
 =head1 TODO
 
-This is quite slow and loading Apache Tika for each conversion is not very efficient. Using the server mode of Apache Tika would be a solution.
-
-Character merging heuristics are very simple. Using the longest string forming a valid word from the vocabulary may lead to many incorrect words in context for some languages. Also, the implementation of the merging procedure is probably not the most efficient one.
-
-De-hyphenation heuristics could also be improved. The problem is to keep it as language-independent as possible.
+This is quite slow and loading Apache Tika for each conversion is not very efficient. Using the server mode of Apache Tika would be a solution or inline-Java and direct calls to external libraries.
 
 =head1 SEE ALSO
 
@@ -81,14 +79,15 @@ use File::Temp qw /tempfile/;
 
 
 use vars qw($opt_c $opt_h $opt_H $opt_J $opt_L $opt_l $opt_m $opt_r 
-            $opt_T $opt_x $opt_v $opt_X $opt_M);
+            $opt_T $opt_x $opt_v $opt_X $opt_M $opt_d $opt_D);
 use Getopt::Std;
-getopts('chH:J:Ll:mrTxXv');
+getopts('chH:J:Ll:mrTxXvMdD:');
 
 # home of shared data (where Apache Tika should be)
 
 my $SHARED_HOME;
 eval{ 
+    require Lingua::Identify::Blacklists;
     require File::ShareDir; 
     $SHARED_HOME = File::ShareDir::dist_dir('Text-PDF2XML'); 
 };
@@ -113,6 +112,7 @@ my $PDF2TEXT       = `which pdftotext`;chomp($PDF2TEXT);
 my $LONGEST_WORD = undef;
 my $SPLIT_CHAR_IF_NECESSARY = 0;
 my $SPLIT_CHAR              = $opt_c;
+
 
 # we require recent versions of pdftotext developed by 
 # The Poppler Developers - http://poppler.freedesktop.org
@@ -232,7 +232,7 @@ sub xml_start{
     my $p = shift;
     ## delay printing paragraph boundaries
     ## in order to merge if necessary
-    if ($opt_M || $_[0] ne 'p'){
+    if ($_[0] ne 'p'){
 	if ($p->{OPEN_PARA}){
 	    $writer->endTag('p');
 	    $p->{OPEN_PARA} = 0;
@@ -274,7 +274,27 @@ sub xml_end{
 	    push(@words,@tok);
 	}
 
+	my $text = join(' ',@words);
+	my $lang = undef;
+	if (@words && ($opt_d || $opt_D) ){
+	    $lang = Lingua::Identify::Blacklists::identify( lc( $text ));
+	    # print STDERR "language detected: ",$lang,"\n";
+	    if ($opt_D && ($lang ne $opt_D)){
+		$_[0]->{STRING} = '';
+		@words = ();
+	    }
+	}
+
 	if (@words){
+	    ## if the new text is in a different language 
+	    ## --> close previous paragraph if necessary
+	    if ($_[0]->{OPEN_PARA}){
+		if ($lang ne $_[0]->{OPEN_PARA_LANG}){
+		    $writer->endTag('p');
+		    $_[0]->{OPEN_PARA}=0;
+		}
+	    }
+
 	    ## check if there is an open paragraph
 	    ## merge heuristics: if the first word starts
 	    ##  with a lower-cased letter --> merge!
@@ -282,21 +302,34 @@ sub xml_end{
 	    if ($_[0]->{OPEN_PARA}){
 		unless ($words[0]=~/^\p{Ll}/){
 		    $writer->endTag('p');
-		    $writer->startTag('p');
+		    if ($lang && $opt_d){
+			$writer->startTag('p',lang => $lang);
+		    }
+		    else{
+			$writer->startTag('p');
+		    }
 		}
 		else{
 		    $writer->characters(' ');
 		}
 	    }
 	    else{
-		$writer->startTag('p');
+		if ($lang && $opt_d){
+		    $writer->startTag('p',lang => $lang);
+		}
+		else{
+		    $writer->startTag('p');
+		}
 	    }
-	    $writer->characters( join(' ',@words) );
-	    $_[0]->{OPEN_PARA} = 1;
-	    if ($words[-1]=~/[.?!]$/){
-		$_[0]->{OPEN_PARA} = 0;
+	    $writer->characters( $text );
+	    unless ($opt_M){
+		$_[0]->{OPEN_PARA_LANG} = $lang if ($lang);
+		$_[0]->{OPEN_PARA} = 1;
+		if ($words[-1]=~/[.?!]$/){
+		    $_[0]->{OPEN_PARA} = 0;
+		}
 	    }
-	    unless ($_[0]->{OPEN_PARA} || $opt_M){
+	    unless ($_[0]->{OPEN_PARA}){
 		$writer->endTag('p');
 	    }
 	    $_[0]->{STRING} = '';
@@ -304,7 +337,7 @@ sub xml_end{
     }
     ## delay closing paragraphs
     ## (in case we want to merge with previous one)
-    if ($opt_M || $_[1] ne 'p'){
+    if ($_[1] ne 'p'){
 	if ($_[0]->{OPEN_PARA}){
 	    $writer->endTag('p');
 	    $_[0]->{OPEN_PARA} = 0;
@@ -342,8 +375,33 @@ sub run_pdfxtk{
     my @jars = grep { /\.jar/ } readdir($dh);
     closedir $dh;
     my $CLASSPATH = join( ':', map { $_=$SHARED_HOME.'/lib/pdfxtk/'.$_ } @jars );
+
+    ## need Java 1.6 openjdk
+    ## ugly way of finding java-1.6, assumes that java installed in /usr/lib/jvm
+    my $JAVA16 = $JAVA;
+    my $version = `$JAVA16 -version`;
+    if ($version!~/java version "1\.6\./){
+	my @java = glob '/usr/lib/jvm/jre-1.6.*openjdk*/bin/java';
+	unless (@java){
+	    @java = glob '/usr/lib/jvm/java-1.6.*openjdk*/bin/java';
+	    unless (@java){
+		@java = glob '/usr/lib/jvm/java-1.6.*/bin/java';
+	    }
+	}
+	if (@java){
+	    $JAVA16 = $java[0];
+	}
+	else{
+	    print STDERR "pdfxtk does not work with recent versions of Java!\n";
+	    print STDERR "It is tested with Java 1.6.0 openjdk.\n";
+	    print STDERR "Use flag -J to specify the Java version in case the script fails!\n";
+	}
+    }
+    ## ---------------------------
+
+    # print STDERR "$JAVA16 -Xmx $JAVA_HEAP_SIZE -cp $CLASSPATH at.ac.tuwien.dbai.pdfwrap.ProcessFile $pdf_file $out_file\n";
     my $pid = open2(undef, undef, 
-		    $JAVA,
+		    $JAVA16,
 		    '-Xmx'.$JAVA_HEAP_SIZE,
 		    '-cp',$CLASSPATH,
 		    'at.ac.tuwien.dbai.pdfwrap.ProcessFile',

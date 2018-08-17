@@ -36,6 +36,6 @@
          "web" : "https://github.com/ljepson/CGI-Ex"
       }
    },
-   "version" : "2.46",
+   "version" : "2.47",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

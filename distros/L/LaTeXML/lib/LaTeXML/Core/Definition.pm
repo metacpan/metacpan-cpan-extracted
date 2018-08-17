@@ -39,6 +39,12 @@ sub getCSName {
   my ($self) = @_;
   return (defined $$self{alias} ? $$self{alias} : $$self{cs}->getCSName); }
 
+# NOTE: Need to clean up alias; really should already be Token (or Tokens?)
+# and is not always a CS!
+sub getCSorAlias {
+  my ($self) = @_;
+  return (defined $$self{alias} ? T_CS($$self{alias}) : $$self{cs}); }
+
 sub isExpandable {
   return 0; }
 
@@ -47,6 +53,35 @@ sub isRegister {
 
 sub isPrefix {
   return 0; }
+
+# The following come from flags, but probably(?) only make sense for Expandable (macros)
+# and furthermore, only isProtected is used for anything significant.
+sub isProtected {
+  my ($self) = @_;
+  return $$self{isProtected}; }
+
+sub setIsProtected {
+  my ($self) = @_;
+  $$self{isProtected} = 1;
+  return; }
+
+sub isOuter {
+  my ($self) = @_;
+  return $$self{isOuter}; }
+
+sub setIsOuter {
+  my ($self) = @_;
+  $$self{isOuter} = 1;
+  return; }
+
+sub isLong {
+  my ($self) = @_;
+  return $$self{isLong}; }
+
+sub setIsLong {
+  my ($self) = @_;
+  $$self{isLong} = 1;
+  return; }
 
 sub getLocator {
   my ($self) = @_;
@@ -79,12 +114,6 @@ sub toString {
   my ($self) = @_;
   return ($$self{parameters}
     ? ToString($$self{cs}) . ' ' . ToString($$self{parameters}) : ToString($$self{cs})); }
-
-# Return the Tokens that would invoke the given definition with arguments.
-sub invocation {
-  my ($self, @args) = @_;
-  my $params = $self->getParameters;
-  return ($$self{cs}, ($params ? $params->revertArguments(@args) : ())); }
 
 #======================================================================
 # Tracing support

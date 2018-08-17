@@ -10,15 +10,16 @@ use Scalar::Util qw{reftype};
 use TestRail::API;
 use Test::LWP::UserAgent::TestRailMock;
 use Test::Rail::Parser;
-use Test::More 'tests' => 124;
+use Test::More 'tests' => 126;
 use Test::Fatal qw{exception};
 use Test::Deep qw{cmp_deeply};
-use Capture::Tiny qw{capture};
+use Capture::Tiny qw{capture capture_stderr};
 
 #Same song and dance as in TestRail-API.t
 my $apiurl = $ENV{'TESTRAIL_API_URL'};
 my $login  = $ENV{'TESTRAIL_USER'};
 my $pw     = $ENV{'TESTRAIL_PASSWORD'};
+my $step_results = $ENV{'TESTRAIL_STEP_RESULTS'};
 my $is_mock = (!$apiurl && !$login && !$pw);
 
 ($apiurl,$login,$pw) = ('http://testrail.local','teodesian@cpan.org','fake') if $is_mock;
@@ -51,6 +52,7 @@ my $opts = {
     'run'                 => 'TestingSuite',
     'project'             => 'TestProject',
     'merge'               => 1,
+    'step_results'        => $step_results,
 };
 
 my $res = exception { $tap = Test::Rail::Parser->new($opts) };
@@ -591,3 +593,26 @@ $opts->{'sections'} = [];
 
 $res = exception { $tap = Test::Rail::Parser->new($opts) };
 is($res,undef,"TR Parser runs all the way through when spawning configurations");
+
+$fcontents = "
+todo_pass.test ..
+ok 1 - STORAGE TANKS SEARED #TODO todo pass
+# goo
+Bail out!  #YOLO
+";
+undef $opts->{'source'};
+$opts->{'tap'} = $fcontents;
+
+#Issue 143
+my $warns = capture_stderr { $tap = Test::Rail::Parser->new($opts) };
+is($warns, '', "No warnings parsing TAP with undef plans");
+
+#Issue 140
+$fcontents = "
+todo_pass.test ..
+";
+undef $opts->{'source'};
+$opts->{'tap'} = $fcontents;
+
+$warns = capture_stderr { $tap = Test::Rail::Parser->new($opts) };
+is($warns, '', "No warnings parsing TAP with NOTESTS");

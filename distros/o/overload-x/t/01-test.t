@@ -1,0 +1,32 @@
+use Test::More;
+
+use overload::x qw/all/;
+my $obj = bless { a => 1 }, 'TestObj';
+my ($one, $two, $three) = @{$obj x n(3)};
+is($one->{a}, 1);
+is($two->{a}, 1);
+is($three->{a}, 1);
+$one->{a} = 2;
+$two->{a} = 3;
+$three->{a} = 4;
+is($one->{a}, 2);
+is($two->{a}, 3);
+is($three->{a}, 4);
+
+my ($one, $two, $three) = x(3, $obj);
+is($one->{a}, 1);
+is($two->{a}, 1);
+is($three->{a}, 1);
+$one->{a} = 2;
+$two->{a} = 3;
+$three->{a} = 4;
+is($one->{a}, 2);
+is($two->{a}, 3);
+is($three->{a}, 4);
+my $strings = 'shhh' x n(5);
+is_deeply($strings, ['shhh', 'shhh', 'shhh', 'shhh', 'shhh']);
+$strings = x(5, 'shhh');
+is_deeply($strings, ['shhh', 'shhh', 'shhh', 'shhh', 'shhh']);
+my @strings = x(5, 'shhh');
+is_deeply(\@strings, ['shhh', 'shhh', 'shhh', 'shhh', 'shhh']);
+done_testing;

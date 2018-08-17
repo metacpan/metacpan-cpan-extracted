@@ -9,9 +9,15 @@ use FindBin;
 use File::Copy;
 use File::Which;
 use File::Spec::Functions;
+use LaTeXML::Post;
+use LaTeXML::Post::MathML::Presentation;
+use LaTeXML::Post::XMath;
+use Config;
+
 use base qw(Exporter);
 #  @Test::More::EXPORT);
 our @EXPORT = (qw(&latexml_ok &latexml_tests),
+  qw(&process_domstring &process_xmlfile &is_strings),
   @Test::More::EXPORT);
 my $kpsewhich = which($ENV{LATEXML_KPSEWHICH} || 'kpsewhich');    # [CONFIGURATION]
 # Note that this is a singlet; the same Builder is shared.
@@ -27,30 +33,43 @@ sub latexml_tests {
   else {
     my @dir_contents = sort readdir($DIR);
     my $t;
-    my @core_tests   = map { (($t = $_) =~ s/\.tex$//  ? ($t) : ()); } @dir_contents;
-    my @daemon_tests = map { (($t = $_) =~ s/\.spec$// ? ($t) : ()); } @dir_contents;
+    my @core_tests   = map { (($t = $_) =~ s/\.tex$//      ? ($t) : ()); } @dir_contents;
+    my @post_tests   = map { (($t = $_) =~ s/-post\.xml$// ? ($t) : ()); } @dir_contents;
+    my @daemon_tests = map { (($t = $_) =~ s/\.spec$//     ? ($t) : ()); } @dir_contents;
     closedir($DIR);
+    # (try to) predict how many subtests there will be.
+    # (this helps the report when the latexml crashes completely)
+    plan tests => (1
+        + scalar(@core_tests)
+        + scalar(@post_tests)
+        + 3 * scalar(@daemon_tests) - ($directory =~ /runtimes/ ? 2 : 0));    # !!
     if (eval { use_ok("LaTeXML::Core"); }) {
     SKIP: {
         my $requires = $options{requires} || {};    # normally a hash: test=>[files...]
-        if (!ref $requires) {                       # scalar== filename required by ALL
-          check_requirements("$directory/", $requires);    # may SKIP:
-          $requires = {}; }                                # but turn to normal, empty set
-        elsif ($$requires{'*'}) {
-          check_requirements("$directory/", $$requires{'*'}); }
-
+        $requires = { '*' => $requires } unless ref $requires;    # scalar== filename required by ALL
+        ## Carry out any TeX conversion tests
         foreach my $name (@core_tests) {
           my $test = "$directory/$name";
         SKIP: {
             skip("No file $test.xml", 1) unless (-f "$test.xml");
-            next unless check_requirements($test, $$requires{$name});
+            next unless check_requirements($test, 1, $$requires{'*'}, $$requires{$name});
             latexml_ok("$test.tex", "$test.xml", $test); } }
+        # Carry out any post-processing tests
+        foreach my $name (@post_tests) {
+          my $test = "$directory/$name";
+        SKIP: {
+            skip("No file $test.xml and/or $test-post.xml", 1)
+              unless ((-f "$test.xml") && (-f "$test-post.xml"));
+            next unless check_requirements($test, 1, $$requires{'*'}, $$requires{$name});
+            latexmlpost_ok("$test.tex", "$test-post.xml", $test); } }
+        # Carry out any daemon tests.
         foreach my $name (@daemon_tests) {
           my $test = "$directory/$name";
         SKIP: {
             skip("No file $test.xml and/or $test.status", 1)
               unless ((-f "$test.xml") && (-f "$test.status"));
-            next unless check_requirements($test, $$requires{$name});
+            my $ntests = ($directory =~ /runtimes/ ? 1 : 3);
+            next unless check_requirements($test, $ntests, $$requires{'*'}, $$requires{$name});
             daemon_ok($test, $directory, $options{generate});
           } } } }
     else {
@@ -58,14 +77,16 @@ sub latexml_tests {
   return done_testing(); }
 
 sub check_requirements {
-  my ($test, $reqmts) = @_;
-  foreach my $reqmt (!$reqmts ? () : (ref $reqmts ? @$reqmts : $reqmts)) {
-    if (($kpsewhich && (`"$kpsewhich" $reqmt`)) || (pathname_find($reqmt))) { }
-    else {
-      my $message = "Missing requirement $reqmt for $test";
-      diag("Skip: $message");
-      skip($message, 1);
-      return 0; } }
+  my ($test, $ntests, @reqmts) = @_;
+  foreach my $reqmts (@reqmts) {
+    next unless defined $reqmts;
+    foreach my $reqmt (!$reqmts ? () : (ref $reqmts ? @$reqmts : $reqmts)) {
+      if (($kpsewhich && (`"$kpsewhich" $reqmt`)) || (pathname_find($reqmt))) { }
+      else {
+        my $message = "Missing requirement $reqmt for $test";
+        diag("Skip: $message");
+        skip($message, $ntests);
+        return 0; } } }
   return 1; }
 
 sub do_fail {
@@ -84,11 +105,17 @@ sub latexml_ok {
     if (my $xmlstrings = process_xmlfile($xmlpath, $name)) {
       return is_strings($texstrings, $xmlstrings, $name); } } }
 
+sub latexmlpost_ok {
+  my ($xmlpath, $postxmlpath, $name) = @_;
+  if (my $texstrings = postprocess_xmlfile($xmlpath, $name)) {
+    if (my $xmlstrings = process_xmlfile($postxmlpath, $name)) {
+      return is_strings($texstrings, $xmlstrings, $name); } } }
+
 # These return the list-of-strings form of whatever was requested, if successful,
 # otherwise undef; and they will have reported the failure
 sub process_texfile {
   my ($texpath, $name) = @_;
-  my $latexml = eval { LaTeXML::Core->new(preload => [], searchpaths => [], includeComments => 0,
+  my $latexml = eval { LaTeXML::Core->new(preload => [], searchpaths => [], includecomments => 0,
       verbosity => -2); };
   if (!$latexml) {
     do_fail($name, "Couldn't instanciate LaTeXML: " . @!); return; }
@@ -99,12 +126,27 @@ sub process_texfile {
     else {
       return process_dom($dom, $name); } } }
 
+sub postprocess_xmlfile {
+  my ($xmlpath, $name) = @_;
+  my $xmath = LaTeXML::Post::XMath->new();
+  return do_fail($name, "Couldn't instanciate LaTeXML::Post::XMath") unless $xmath;
+  $xmath->setParallel(LaTeXML::Post::MathML::Presentation->new());
+  my @procs = ($xmath);
+  my $latexmlpost = LaTeXML::Post->new(verbosity => -1);
+  return do_fail($name, "Couldn't instanciate LaTeXML::Post:") unless $latexmlpost;
+
+  my ($doc) = $latexmlpost->ProcessChain(
+    LaTeXML::Post::Document->newFromFile("$name.xml", validate => 1),
+    @procs);
+  return do_fail($name, "Couldn't process $name.xml") unless $doc;
+  return process_dom($doc, $name); }
+
 sub process_dom {
   my ($xmldom, $name) = @_;
   # We want the DOM to be BOTH indented AND canonical!!
   my $domstring =
     eval { my $string = $xmldom->toString(1);
-    my $parser = XML::LibXML->new(load_ext_dtd=>0, validation=>0, keep_blanks=>1);
+    my $parser = XML::LibXML->new(load_ext_dtd => 0, validation => 0, keep_blanks => 1);
     $parser->parse_string($string)->toStringC14N(0); };
   if (!$domstring) {
     do_fail($name, "Couldn't convert dom to string: " . $@); return; }
@@ -114,7 +156,7 @@ sub process_dom {
 sub process_xmlfile {
   my ($xmlpath, $name) = @_;
   my $domstring =
-    eval { my $parser = XML::LibXML->new(load_ext_dtd=>0, validation=>0, keep_blanks=>1);
+    eval { my $parser = XML::LibXML->new(load_ext_dtd => 0, validation => 0, keep_blanks => 1);
     $parser->parse_file($xmlpath)->toStringC14N(0); };
   if (!$domstring) {
     do_fail($name, "Could not convert file $xmlpath to string: " . $@); return; }
@@ -178,7 +220,11 @@ sub daemon_ok {
     ['xsltparameter',      'LATEXML_VERSION:TEST'],
     ['nocomments',         '']);
 
-  my $invocation = catfile($FindBin::Bin, '..', 'blib', 'script', 'latexmlc') . ' ';
+  my $latexmlc = catfile($FindBin::Bin, '..', 'blib', 'script', 'latexmlc');
+  $latexmlc =~ s/^\.\///;
+  my $path_to_perl = $Config{perlpath};
+
+  my $invocation = $path_to_perl . " " . join(" ", map { ("-I", $_) } @INC) . " " . $latexmlc . ' ';
   my $timed = undef;
   foreach my $opt (@$opts) {
     if ($$opt[0] eq 'timeout') {    # Ensure .opt timeout takes precedence
@@ -188,9 +234,9 @@ sub daemon_ok {
   }
   $invocation .= " 2>$localname.test.status ";
   if (!$generate) {
-    chdir($dir);
-    is(system($invocation), 0, "latexmlc invocation for test $localname");
-    chdir($current_dir);
+    pathname_chdir($dir);
+    is(system($invocation), 0, "latexmlc invocation for test $localname: $invocation yeilded $!");
+    pathname_chdir($current_dir);
     # Compare the just generated $base.test.xml to the previous $base.xml
     if (my $teststrings = process_xmlfile("$base.test.xml", $base)) {
       if (my $xmlstrings = process_xmlfile("$base.xml", $base)) {
@@ -206,9 +252,9 @@ sub daemon_ok {
   else {
     #TODO: Skip 3 tests
     print STDERR "$invocation\n";
-    chdir($dir);
+    pathname_chdir($dir);
     system($invocation);
-    chdir($current_dir);
+    pathname_chdir($current_dir);
     move("$base.test.xml",    "$base.xml")    if -e "$base.test.xml";
     move("$base.test.status", "$base.status") if -e "$base.test.status";
   }

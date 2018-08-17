@@ -25,6 +25,22 @@ CREATE TABLE "producer" (
 
 CREATE UNIQUE INDEX "prod_name" ON "producer" ("name");
 
+CREATE TABLE "cd" (
+  "cdid" INTEGER PRIMARY KEY NOT NULL,
+  "artist" integer NOT NULL,
+  "title" varchar(100) NOT NULL,
+  "year" varchar(100) NOT NULL,
+  "genreid" integer,
+  FOREIGN KEY ("artist") REFERENCES "artist"("artistid") ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY ("genreid") REFERENCES "genre"("genreid") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE INDEX "cd_idx_artist" ON "cd" ("artist");
+
+CREATE INDEX "cd_idx_genreid" ON "cd" ("genreid");
+
+CREATE UNIQUE INDEX "cd_artist_title" ON "cd" ("artist", "title");
+
 CREATE TABLE "track" (
   "trackid" INTEGER PRIMARY KEY NOT NULL,
   "cd" integer NOT NULL,
@@ -40,26 +56,6 @@ CREATE INDEX "track_idx_cd" ON "track" ("cd");
 CREATE UNIQUE INDEX "track_cd_position" ON "track" ("cd", "position");
 
 CREATE UNIQUE INDEX "track_cd_title" ON "track" ("cd", "title");
-
-CREATE TABLE "cd" (
-  "cdid" INTEGER PRIMARY KEY NOT NULL,
-  "artist" integer NOT NULL,
-  "title" varchar(100) NOT NULL,
-  "year" varchar(100) NOT NULL,
-  "genreid" integer,
-  "single_track" integer,
-  FOREIGN KEY ("artist") REFERENCES "artist"("artistid") ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY ("single_track") REFERENCES "track"("trackid") ON DELETE CASCADE,
-  FOREIGN KEY ("genreid") REFERENCES "genre"("genreid") ON DELETE SET NULL ON UPDATE CASCADE
-);
-
-CREATE INDEX "cd_idx_artist" ON "cd" ("artist");
-
-CREATE INDEX "cd_idx_single_track" ON "cd" ("single_track");
-
-CREATE INDEX "cd_idx_genreid" ON "cd" ("genreid");
-
-CREATE UNIQUE INDEX "cd_artist_title" ON "cd" ("artist", "title");
 
 CREATE TABLE "lyrics" (
   "lyric_id" INTEGER PRIMARY KEY NOT NULL,
@@ -138,4 +134,4 @@ CREATE INDEX "artwork_to_artist_idx_artist_id" ON "artwork_to_artist" ("artist_i
 CREATE INDEX "artwork_to_artist_idx_artwork_cd_id" ON "artwork_to_artist" ("artwork_cd_id");
 
 CREATE VIEW "year2000cds" AS
-    SELECT cdid, artist, title, year, genreid, single_track FROM cd WHERE year = "2000";
+    SELECT cdid, artist, title, year, genreid FROM cd WHERE year = '2000';

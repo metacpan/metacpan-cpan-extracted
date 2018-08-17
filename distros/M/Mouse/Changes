@@ -1,5 +1,12 @@
 Revision history for Mouse
 
+v2.5.6 2018-08-13T22:47:57Z
+    - Revert "Warn if accessors overwrite methods/functions" for now; it may cause crashes in perl 5.28.0 (#94)
+
+v2.5.5 2018-08-13T15:41:32Z
+    - Warn if accessors overwrite methods/functions (ybrliiu #86, #90, #93)
+    - Fix for threads and XS; use newSVpvs instead of newSVpvs_share (sergeykolychev #92)
+
 v2.5.4 2018-05-05T03:43:55Z
     - Follow Devel::PPPort 3.42 (#87)
 

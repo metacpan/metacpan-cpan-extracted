@@ -1,0 +1,17 @@
+HTML attributes with no quotes are generally a bad idea,
+certainly when using arbitrary data.
+
+<a href=/test?param=[% a | html %] title=[% title | html %]>Test link</a>
+
+Single quotes generally aren't expected either.
+
+<a href='/test?param=[% a | html %]' title='[% title | html %]'>Test link</a>
+
+The filtering methods generally expect attributes to be enclosed within double
+quotes, and so double quotes rather than single quotes are escaped.
+
+<a data="[% data | html %]" href="/test?param=[% a | html %]" title="[% title | html %]">Test link</a>
+
+This is also true for uri encoding.
+
+<a href="/someurl?val=[% data | uri %]">some link</a>

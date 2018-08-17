@@ -1,56 +1,74 @@
 =head1 NAME
 
-Spreadsheet::Write - Simplified writer for CSV or XLS (MS Excel'97) files
+Spreadsheet::Write - Writer for spreadsheet files (CSV, XLS, XLSX, ...)
 
 =head1 SYNOPSIS
 
-    # EXCEL spreadsheet
+Basic usage:
 
     use Spreadsheet::Write;
 
-    my $h=Spreadsheet::Write->new(
-        file    => 'spreadsheet.xls',
-        format  => 'xls',
-        sheet   => 'Products',
+    my $sp=Spreadsheet::Write->new(file => 'test.xlsx');
+
+    $sp->addrow('hello','world');
+
+    $sp->close();
+
+More possibilities:
+
+    use Spreadsheet::Write;
+
+    my $sp=Spreadsheet::Write->new(
+        file    => $ARGV[0],        # eg. test.xls, test.xlsx, or test.csv
+        sheet   => 'Test Data',
         styles  => {
-            money   => '($#,##0_);($#,##0)',
+            money   => {
+                format      => '$#,##0.00;-$#,##0.00',
+            },
+            bright  => {
+                font_weight => 'bold',
+                font_color  => 'blue',
+                font_style  => 'italic',
+            },
         },
     );
 
-    $h->addrow('foo',{
-        content         => 'bar',
-        type            => 'number',
-        style           => 'money',
-        font_weight     => 'bold',
-        font_color      => 42,
-        bg_color        => 'gray',
-        font_face       => 'Times New Roman',
-        font_size       => 20,
-        align           => 'center',
-        valign          => 'vcenter',
-        font_decoration => 'strikeout',
-        font_style      => 'italic',
-    });
-    $h->addrow('foo2','bar2');
-    $h->freeze(1,0);
-
-    # CSV file
-
-    use Spreadsheet::Write;
-
-    my $h=Spreadsheet::Write->new(
-        file        => 'file.csv',
-        encoding    => 'iso8859',
+    $sp->addrow(
+        'col1',
+        { content => [ 'col2', 'col3', 'col4' ], style => 'bright' },
+        { content => 'col5', bg_color => 'gray' },
+        'col6',
     );
-    die $h->error() if $h->error;
-    $h->addrow('foo','bar');
+
+    $sp->freeze(1,0);
+
+    $sp->addrow(
+        { content => [ 1, 1.23, 123.45, -234.56 ], style => 'money' },
+    );
+
+    my @data=(
+        [ qw(1 2 3 4) ],
+        [ qw(a s d f) ],
+        [ qw(z x c v b) ],
+        # ...
+    );
+
+    foreach my $row (@data) {
+        $sp->addrow({ style => 'ntext', content => $row });
+    }
+
+    $sp->close();
 
 =head1 DESCRIPTION
 
 C<Spreadsheet::Write> writes files in CSV, XLS (Microsoft Excel 97),
-and potentially other formats. It is especially suitable for building
-various dumps and reports where rows are built in sequence, one after
-another.
+XLSX (Microsoft Excel 2007), and other formats if their drivers
+exist. It is especially suitable for building various dumps and reports
+where rows are built in sequence, one after another.
+
+The same calling format and options can be used with any output file
+format. Unsupported options are ignored where possible allowing for easy
+run-time selection of the output format by file name.
 
 =head1 METHODS
 
@@ -64,7 +82,7 @@ require 5.008_009;
 use strict;
 use IO::File;
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 sub version {
     return $VERSION;
@@ -86,7 +104,7 @@ following are valid:
 
     file        filename of the new spreadsheet or an IO handle (mandatory)
     encoding    encoding of output file (optional, csv format only)
-    format      format of spreadsheet - 'csv', 'xls', or 'auto' (default)
+    format      format of spreadsheet - 'csv', 'xls', 'xlsx', or 'auto' (default)
     sheet       Sheet name (optional, not supported by some formats)
     styles      Defines cell formatting shortcuts (optional)
 
@@ -145,6 +163,7 @@ sub new(@) {
     my $implementation={
         csv     => 'WriteCSV',
         xls     => 'WriteXLS',
+        xlsx    => 'WriteXLSX',
     }->{lc $format};
 
     $implementation ||
@@ -240,7 +259,7 @@ override style definitions.
 Example:
 
     my $sp=Spreadsheet::Write->new(
-        file        => 'employees.xls',
+        file        => 'employees.xlsx',
         styles      => {
             header => { font_weight => 'bold' },
         },

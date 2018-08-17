@@ -53,11 +53,22 @@ CONSTRUCTOR
 
        $chip = Device::Chip::SSD1306->new(
           model => $model,
+          ...
        )
 
     Returns a new Device::Chip::SSD1306 driver instance for the given model
     name, which must be one of the models listed in "DEVICE MODELS". If no
     model option is chosen, the default of SSD1306-128x64 will apply.
+
+    In addition to model, the following named options may also be passed:
+
+    xflip => BOOL
+
+    yflip => BOOL
+
+      If true, the order of columns or rows respectively will be reversed
+      by the hardware. In particular, if both are true, this inverts the
+      orientation of the display, if it is mounted upside-down.
 
 METHODS
 
@@ -134,6 +145,28 @@ DRAWING METHODS
     Draw a vertical line in the given $x column, between the rows $y1 and
     $y2 (inclusive). If the fourth argument is false, the pixels will be
     cleared instead of set.
+
+ draw_blit
+
+       $chip->draw_blit( $x, $y, @lines )
+
+    Draws a bitmap pattern by copying the data given in lines, starting at
+    the given position.
+
+    Each value in @lines should be a string giving a horizontal line of
+    bitmap data, each character corresponding to a single pixel of the
+    display. Pixels corresponding to a spaces will be left alone, a hyphen
+    will be cleared, and any other character (for example a #) will be set.
+
+    For example, to draw an upward-pointing arrow:
+
+       $chip->draw_blit( 20, 40,
+          "   #  ",
+          "   ## ",
+          "######",
+          "######",
+          "   ## ",
+          "   #  " );
 
  refresh
 

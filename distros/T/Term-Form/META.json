@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Term-Form",
    "no_index" : {
@@ -43,7 +43,6 @@
             "Term::Choose::LineFold" : "1.607",
             "Term::Choose::Linux" : "1.607",
             "Term::Choose::Win32" : "1.607",
-            "Unicode::GCString" : "0",
             "parent" : "0",
             "perl" : "5.008003",
             "strict" : "0",
@@ -59,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-Form"
       }
    },
-   "version" : "0.321",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.500",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

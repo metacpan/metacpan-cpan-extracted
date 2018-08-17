@@ -1,0 +1,21 @@
+<a href="[% link | html %]?value=[% value | uri %]">
+
+Note that uri encoding only escapes double quotes, not single, so you
+need to have your attributes encoded in double quotes.
+
+Also note that encoding a whole link is generally the wrong thing to do.
+
+Otherwise the structural characters that make up a url (/?&#) will end encoded
+making the link useless.
+
+[% SET full_link = link _ '?value=' _ value %]
+<a href="[% full_link | uri %]">Useless</a>
+
+Note that there is also a TT plugin for generating urls which may be useful
+if you have lots of variations on the same url.  A common scenario where
+that is useful is on page urls.
+
+[% USE url('/dosomething', kw='test', user='one') %]
+
+<a href="[% url(page = 1) %]">Page 1</a>
+<a href="[% url(page = 2) %]">Page 2</a>

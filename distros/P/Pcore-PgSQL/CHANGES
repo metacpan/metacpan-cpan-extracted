@@ -1,3 +1,13 @@
+v0.20.1 2018-08-13T19:25:19Z
+ - Docker base image changed from "softvisio/pcore:v0.72.3" to
+   "softvisio/pcore:v0.72.4"
+
+v0.20.0 2018-08-13T19:12:43Z
+ - ported to run_proc1
+ - postgis wrapper added
+ - Docker base image changed from "softvisio/pcore:v0.71.0" to
+   "softvisio/pcore:v0.72.3"
+
 v0.19.6 2018-07-11T09:13:02Z
  - Docker base image changed from "softvisio/pcore:v0.69.0" to
    "softvisio/pcore:v0.71.0"

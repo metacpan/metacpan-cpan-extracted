@@ -1,3 +1,12 @@
+0.007     2018-08-17 08:32:29+03:00 Asia/Jerusalem
+
+    * Fix for reference aliasing syntax. (foreach \my %hash...)
+      Thanks, Ahmed Abdrabo!
+    * Fix edge case of empty for with function.
+      (for Class->method($foo);)
+    * Made slightly faster by avoiding an isa() call.
+      Thanks, Jader Dias!
+
 0.006     2018-07-13 15:48:29+03:00 Asia/Jerusalem
 
     * Fix for variable attributes (my Dog $pet (%foo)).

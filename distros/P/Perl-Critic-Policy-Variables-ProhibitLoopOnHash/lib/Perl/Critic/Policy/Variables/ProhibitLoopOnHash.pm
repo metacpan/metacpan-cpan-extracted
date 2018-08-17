@@ -1,7 +1,7 @@
 package Perl::Critic::Policy::Variables::ProhibitLoopOnHash;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Don't write loops on hashes, only on keys and values of hashes
-$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.006';
+$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.007';
 use strict;
 use warnings;
 use parent 'Perl::Critic::Policy';
@@ -24,9 +24,8 @@ sub applies_to { 'PPI::Token::Word' }
 sub violates {
     my ($self, $elem) = @_;
 
-    $elem->isa('PPI::Token::Word')
-        and first { $elem eq $_ } qw< for foreach >
-        or  return ();
+    first { $elem eq $_ } qw< for foreach >
+        or return ();
 
     # This is how we do it:
     # * First, we clear out scoping (like "my" for "foreach my ...")
@@ -41,6 +40,43 @@ sub violates {
     # This was originally written as: $elem->snext_sibling or return
     $elem->parent && $elem->parent->isa('PPI::Statement::Expression')
         and return;
+
+    # for \my %foo
+    if ( !$elem->snext_sibling ) {
+        my $next = $elem->next_token;
+
+        # exhaust spaces
+        $next = $next->next_token
+            while $next->isa('PPI::Token::Whitespace');
+
+        # skip the \
+        if ( $next eq '\\' ) {
+            $elem = $next->next_token;
+        }
+    }
+
+    # for Class->method($foo)
+    # PPI::Document
+    #   PPI::Statement::Compound
+    #     PPI::Token::Word    'for'
+    #   PPI::Token::Whitespace        ' '
+    #   PPI::Statement
+    #     PPI::Token::Word    'Class'
+    #     PPI::Token::Operator        '->'
+    #     PPI::Token::Word    'method'
+    #     PPI::Structure::List        ( ... )
+    #       PPI::Statement::Expression
+    #         PPI::Token::Symbol      '$foo'
+    #     PPI::Token::Structure       ';'
+    if ( !$elem->snext_sibling && $elem->next_token) {
+        # exhaust spaces
+        $elem = $elem->next_token
+            while $elem->next_token->isa('PPI::Token::Whitespace');
+
+        # just move to next token and continue from there
+        $elem->next_token
+            and $elem = $elem->next_token;
+    }
 
     # for my $foo (%hash)
     # we simply skip the "my"
@@ -80,6 +116,7 @@ sub violates {
                 and $elem = $elem->snext_sibling;
         } else {
             # for keys %hash
+            # for Class->method($foo)
         }
     }
 
@@ -156,7 +193,7 @@ Perl::Critic::Policy::Variables::ProhibitLoopOnHash - Don't write loops on hashe
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our (%generator, %setting, %default, %param);
 our $read_config;
@@ -41,28 +41,28 @@ sub register {
       # Create generators by param
       foreach (keys %param) {
 
-	# Named generator
-	if (ref $param{$_} && ref $param{$_} eq 'HASH') {
+        # Named generator
+        if (ref $param{$_} && ref $param{$_} eq 'HASH') {
 
-	  next if $created{$_};
+          next if $created{$_};
 
-	  # Construct object
-	  unless ($generator{$_} = Session::Token->new(
-	    %{ $param{$_} }
-	  )) {
+          # Construct object
+          unless ($generator{$_} = Session::Token->new(
+            %{ $param{$_} }
+          )) {
 
-	    # Unable to construct object
-	    $mojo->log->fatal(qq!Unable to create generator for "$_"!);
-	    next;
-	  };
-	  $setting{$_} = { %{$param{$_}} };
-	  $created{$_} = 1;
-	}
+            # Unable to construct object
+            $mojo->log->fatal(qq!Unable to create generator for "$_"!);
+            next;
+          };
+          $setting{$_} = { %{$param{$_}} };
+          $created{$_} = 1;
+        }
 
-	# Default parameter
-	else {
-	  $default{$_} = $param{$_};
-	};
+        # Default parameter
+        else {
+          $default{$_} = $param{$_};
+        };
       };
 
       # Plugin registered
@@ -70,7 +70,7 @@ sub register {
 
       # Create default generator
       unless (exists $generator{default}) {
-	$generator{default} = Session::Token->new( %default );
+        $generator{default} = Session::Token->new( %default );
       };
     });
 
@@ -78,7 +78,7 @@ sub register {
   # Establish 'random_string' helper
   $mojo->helper(
     random_string => sub {
-      shift;
+      my $c = shift;
       my $gen = $_[0];
 
       # One tick for loop until the plugin is registered
@@ -87,14 +87,14 @@ sub register {
       # Generate from generator
       unless ($_[1]) {
 
-	# Generator doesn't exist
-	if ($gen && !exists $generator{$gen}) {
-	  $mojo->log->warn(qq!RandomString generator "$gen" is unknown!);
-	  return '';
-	};
+        # Generator doesn't exist
+        if ($gen && !exists $generator{$gen}) {
+          $c->app->log->warn(qq!RandomString generator "$gen" is unknown!);
+          return '';
+        };
 
-	# Get from generator
-	return $generator{$gen || 'default'}->get;
+        # Get from generator
+        return $generator{$gen || 'default'}->get;
       };
 
       # Overwrite default configuration
@@ -105,11 +105,11 @@ sub register {
 
       # Overwrite specific configuration
       if ($setting{ $gen }) {
-	return Session::Token->new( %{ $setting{ $gen } } , @_)->get;
+        return Session::Token->new( %{ $setting{ $gen } } , @_)->get;
       };
 
       # Generator is unknown
-      $mojo->log->warn(qq!RandomString generator "$gen" is unknown!);
+      $c->app->log->warn(qq!RandomString generator "$gen" is unknown!);
       return '';
     }
   ) unless exists $mojo->renderer->helpers->{random_string};
@@ -256,7 +256,7 @@ L<Session::Token>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

@@ -1,0 +1,30 @@
+---
+abstract: 'Handle function arguments'
+author:
+  - 'Branislav Zahradnik <branislav.zahradnik@gooddata.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Params
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  Hash::Util: '0'
+  Ref::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/gooddata/perl-sub-params/issues
+  repository: git://github.com/gooddata/perl-sub-params.git
+version: v1.0.0

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
@@ -120,11 +120,26 @@ my %MODELS = (
 
    $chip = Device::Chip::SSD1306->new(
       model => $model,
+      ...
    )
 
 Returns a new C<Device::Chip::SSD1306> driver instance for the given model
 name, which must be one of the models listed in L</DEVICE MODELS>. If no model
 option is chosen, the default of C<SSD1306-128x64> will apply.
+
+In addition to C<model>, the following named options may also be passed:
+
+=over 4
+
+=item xflip => BOOL
+
+=item yflip => BOOL
+
+If true, the order of columns or rows respectively will be reversed by the
+hardware. In particular, if both are true, this inverts the orientation of
+the display, if it is mounted upside-down.
+
+=back
 
 =cut
 
@@ -139,6 +154,9 @@ sub new
       or croak "Unrecognised model $args{model}";
 
    $self->{$_} = $modelargs->{$_} for keys %$modelargs;
+
+   defined $args{$_} and $self->{$_} = $args{$_}
+      for qw( xflip yflip );
 
    return $self;
 }
@@ -228,8 +246,8 @@ sub init
       ->then( sub { $self->send_cmd( CMD_SET_DISPLAY_START | 0 ) })
       ->then( sub { $self->send_cmd( CMD_SET_CHARGEPUMP,   0x14 ) })
       ->then( sub { $self->send_cmd( CMD_SET_ADDR_MODE,    MODE_HORIZONTAL ) })
-      ->then( sub { $self->send_cmd( CMD_SET_SEGMENT_REMAP | 1 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_COM_SCAN_DIR  | 0 ) })
+      ->then( sub { $self->send_cmd( CMD_SET_SEGMENT_REMAP | ( $self->{xflip} ? 1 : 0 ) ) })
+      ->then( sub { $self->send_cmd( CMD_SET_COM_SCAN_DIR  | ( $self->{yflip} ? 1<<3 : 0 ) ) })
       ->then( sub { $self->send_cmd( CMD_SET_COM_PINS,     $self->{set_com_pins_arg} ) })
       ->then( sub { $self->send_cmd( CMD_SET_CONTRAST,     0x9F ) })
       ->then( sub { $self->send_cmd( CMD_SET_PRECHARGE,    ( 0x0f << 4 ) | ( 1 ) ) })
@@ -395,6 +413,57 @@ sub draw_vline
    $self->{display_dirty} |= ( 1 << int( $_ / 8 ) ) for $y1 .. $y2;
    $self->{display_dirty_xlo} = $x if $self->{display_dirty_xlo} > $x;
    $self->{display_dirty_xhi} = $x if $self->{display_dirty_xhi} < $x;
+}
+
+=head2 draw_blit
+
+   $chip->draw_blit( $x, $y, @lines )
+
+Draws a bitmap pattern by copying the data given in lines, starting at the
+given position.
+
+Each value in C<@lines> should be a string giving a horizontal line of bitmap
+data, each character corresponding to a single pixel of the display. Pixels
+corresponding to a spaces will be left alone, a hyphen will be cleared, and
+any other character (for example a C<#>) will be set.
+
+For example, to draw an upward-pointing arrow:
+
+   $chip->draw_blit( 20, 40,
+      "   #  ",
+      "   ## ",
+      "######",
+      "######",
+      "   ## ",
+      "   #  " );
+
+=cut
+
+sub draw_blit
+{
+   my $self = shift;
+   my ( $x0, $y, @lines ) = @_;
+
+   my $display = $self->{display};
+
+   for( ; @lines; $y++ ) {
+      my @pixels = split m//, shift @lines;
+      @pixels or next;
+
+      my $x = $x0;
+      for( ; @pixels; $x++ ) {
+         my $p = shift @pixels;
+
+         $p eq " " ? next :
+         $p eq "-" ? ( $display->[$y][$x] = 0 ) :
+                     ( $display->[$y][$x] = 1 );
+      }
+      $x--;
+
+      $self->{display_dirty} |= ( 1 << int( $y / 8 ) );
+      $self->{display_dirty_xlo} = $x0 if $self->{display_dirty_xlo} > $x0;
+      $self->{display_dirty_xhi} = $x  if $self->{display_dirty_xhi} < $x;
+   }
 }
 
 =head2 refresh

@@ -1,7 +1,7 @@
 package App::cryp::arbit;
 
-our $DATE = '2018-08-07'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-08-11'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -169,6 +169,22 @@ _
     },
 );
 
+our %arg_usd_rates = (
+    usd_rates => {
+        summary => 'Set USD rates',
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'usd_rate',
+        schema => ['hash*', each_key=>["str*", match=>qr/\A[A-Z]{3}\z/], each_value=>'float*'],
+        description => <<'_',
+
+Example:
+
+    --usd-rate IDR=14500 --usd-rate THB=33.25
+
+_
+    },
+);
+
 our $db_schema_spec = {
     component_name => 'cryp_arbit',
     latest_v => 1,
@@ -309,6 +325,8 @@ sub _exchange_catalog {
     $xcat;
 }
 
+# to only show currency rate in log when they are different from last log
+my %rate_mem;
 sub _convert_to_usd {
     require Finance::Currency::FiatX;
 
@@ -316,11 +334,19 @@ sub _convert_to_usd {
 
     my $dbh = $r->{_stash}{dbh};
 
-    my $fxres  = Finance::Currency::FiatX::get_spot_rate(
+    my $fxres;
+    if ($r->{args}{usd_rates} && $r->{args}{usd_rates}{$cur}) {
+        $fxres = [200, "OK (user-set)", {rate=>1 / $r->{args}{usd_rates}{$cur}}];
+    } else {
+        $fxres = Finance::Currency::FiatX::get_spot_rate(
         dbh => $dbh, from => $cur, to => 'USD', type => 'sell');
-    die "Couldn't get conversion rate from $cur to USD: $fxres->[0] - $fxres->[1]"
-        unless $fxres->[0] == 200 || $fxres->[0] == 304;
-    log_info "Currency conversion rate for $cur/USD: %s", $fxres;
+        die "Couldn't get conversion rate from $cur to USD: $fxres->[0] - $fxres->[1]"
+            unless $fxres->[0] == 200 || $fxres->[0] == 304;
+    }
+    if (!$rate_mem{$cur} || $rate_mem{$cur} != $fxres->[2]{rate}) {
+        log_info "Using currency conversion rate for $cur/USD: %s", $fxres;
+        $rate_mem{$cur} = $fxres->[2]{rate};
+    }
 
     $r->{_stash}{fx}{$cur} = $fxres;
 
@@ -1412,6 +1438,7 @@ $SPEC{get_profit_report} = {
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
         },
+        %arg_usd_rates,
     },
 };
 sub get_profit_report {
@@ -1584,7 +1611,7 @@ App::cryp::arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.005 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-08-07.
+This document describes version 0.006 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-08-11.
 
 =head1 SYNOPSIS
 
@@ -1949,6 +1976,14 @@ Arguments ('*' denotes required arguments):
 =item * B<time_end> => I<date>
 
 =item * B<time_start> => I<date>
+
+=item * B<usd_rates> => I<hash>
+
+Set USD rates.
+
+Example:
+
+ --usd-rate IDR=14500 --usd-rate THB=33.25
 
 =back
 

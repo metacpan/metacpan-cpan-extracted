@@ -1,25 +1,33 @@
 package WebService::KvKAPI;
-use Moose;
+use Moo;
 
 # ABSTRACT: Query the Dutch Chamber of Commerence (KvK) API
+#
+# This code has an EUPL license. Please see the LICENSE file in this repo for
+# more information.
 
-our $VERSION = '0.005';
-use namespace::autoclean;
-use OpenAPI::Client 0.17;
+our $VERSION = '0.006';
+
 use Carp;
+use OpenAPI::Client 0.17;
 use Try::Tiny;
+use Type::Tiny::Class;
+use Types::Standard qw(Str);
+use namespace::autoclean;
 
-with 'MooseX::Log::Log4perl';
+my $_type_open_api = Type::Tiny::Class->new(
+    class => "OpenAPI::Client",
+);
 
 has api_key => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
 has client => (
     is      => 'ro',
-    isa     => 'OpenAPI::Client',
+    isa     => $_type_open_api,
     lazy    => 1,
     builder => '_build_open_api_client',
 );
@@ -127,7 +135,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

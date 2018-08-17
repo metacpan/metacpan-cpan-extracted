@@ -2,7 +2,7 @@ package Pcore::Core::Event::Listener::Pipe::smtp;
 
 use Pcore -class, -ansi;
 use Pcore::SMTP;
-use Pcore::AE::Handle qw[:TLS_CTX];
+use Pcore::Handle qw[:TLS_CTX];
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_ref];
 
@@ -75,7 +75,6 @@ sub sendlog ( $self, $ev ) {
             bcc      => $self->{bcc},
             subject  => $self->{_tmpl}->render( 'subject', $ev )->$*,
             body     => $body,
-            sub ($res) {return}
         );
     }
 

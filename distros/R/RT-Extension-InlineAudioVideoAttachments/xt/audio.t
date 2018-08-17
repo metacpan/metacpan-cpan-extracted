@@ -39,4 +39,4 @@ $m->click('SubmitTicket');
 is($m->status, 200, "Request successful");
 
 $m->content_contains("Download $audio_name", 'Page has file name');
-$m->content_like(qr{<audio controls><source src="Attachment/\d+/\d+/$audio_name" type="audio/mpeg">Your browser does not support the audio tag.</audio>}, 'Audio can be watched in HTML5 player');
+$m->content_like(qr{<audio controls preload="metadata"><source src="Attachment/\d+/\d+/$audio_name" type="audio/mpeg">Your browser does not support the audio tag.</audio>}, 'Audio can be heard in HTML5 player');

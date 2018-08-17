@@ -1,5 +1,12 @@
 Revision history for PkgConfig
 
+0.21026 2018-08-15
+  - promote to production
+
+0.20026_01 2018-08-15
+  - Fix bug where Strawberry Perl PAR::Packer packed PkgConfig.pm
+    could die on startup (gh#45, gh#44 SLAFFAN++)
+
 0.19026 2017-11-21
   - Fix requirements for optional Perl::MinimumVersion test
 

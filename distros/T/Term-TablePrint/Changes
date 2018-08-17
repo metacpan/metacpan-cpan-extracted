@@ -1,6 +1,24 @@
 Revision history for Term::TablePrint
 
 
+0.075   2018-08-14
+        - Don't hide the cursor if OS is Win32.
+        - "Term::Choose": minimum version "1.624".
+
+
+0.074   2018-08-14
+        - Use OS specific clear_screen and hide_cursor.
+        - "Term::Choose": minimum version "1.623".
+
+0.073   2018-08-13
+        - Little code changes.
+
+0.072   2018-08-13
+        - "Term::TablePrint" has now its own pure Perl progress bar module.
+
+0.071   2018-08-11
+        - Make "Term::ProgressBar" optional so that "Term::TablePrint" can be used as a pure Perl module.
+
 0.070   2018-08-07
         - The Insert key goes back 25 pages, the Delete key goes forward 25 pages.
         - "Term::Choose": minimum version "1.621".

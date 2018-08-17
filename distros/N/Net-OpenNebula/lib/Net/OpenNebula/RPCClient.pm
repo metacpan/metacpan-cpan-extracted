@@ -3,7 +3,7 @@ use warnings;
 
 # packge the DummyLogger together with the RPCClient package
 package Net::OpenNebula::DummyLogger; ## no critic
-$Net::OpenNebula::DummyLogger::VERSION = '0.311.0';
+$Net::OpenNebula::DummyLogger::VERSION = '0.313.0';
 sub new {
     my $that = shift;
     my $proto = ref($that) || $that;
@@ -23,7 +23,7 @@ use strict 'refs';
 
 
 package Net::OpenNebula::RPCClient;
-$Net::OpenNebula::RPCClient::VERSION = '0.311.0';
+$Net::OpenNebula::RPCClient::VERSION = '0.313.0';
 
 use RPC::XML;
 use RPC::XML::Client;

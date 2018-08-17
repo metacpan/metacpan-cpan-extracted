@@ -33,6 +33,7 @@ use LaTeXML::Core::MuGlue;
 # Extra objects typically used in Bindings
 use LaTeXML::Core::Alignment;
 use LaTeXML::Core::Array;
+use LaTeXML::Core::KeyVal;
 use LaTeXML::Core::KeyVals;
 use LaTeXML::Core::Pair;
 use LaTeXML::Core::PairList;
@@ -87,8 +88,7 @@ our @EXPORT = (qw(&DefAutoload &DefExpandable
   qw(&DefColor &DefColorModel &LookupColor),
 
   # Support for structured/argument readers
-  qw(&ReadParameters &DefParameterType  &DefColumnType
-    &DefKeyVal &GetKeyVal &GetKeyVals),
+  qw(&ReadParameters &DefParameterType  &DefColumnType),
 
   # Access to State
   qw(&LookupValue &AssignValue
@@ -126,6 +126,8 @@ our @EXPORT = (qw(&DefAutoload &DefExpandable
   @LaTeXML::Common::Float::EXPORT,
   @LaTeXML::Common::Dimension::EXPORT,
   @LaTeXML::Common::Glue::EXPORT,
+  @LaTeXML::Core::KeyVal::EXPORT,
+  @LaTeXML::Core::KeyVals::EXPORT,
   @LaTeXML::Core::MuDimension::EXPORT,
   @LaTeXML::Core::MuGlue::EXPORT,
   @LaTeXML::Core::Pair::EXPORT,
@@ -199,7 +201,10 @@ sub parseParameters {
     if ($p =~ s/^(\{([^\}]*)\})\s*//) {
       my ($spec, $inner_spec) = ($1, $2);
       my $inner = ($inner_spec ? parseParameters($inner_spec, $for) : undef);
-      push(@params, LaTeXML::Core::Parameter->new('Plain', $spec, extra => [$inner])); }
+      # If single inner spec is optional, make whole thing optional
+      my $opt = $inner && (scalar(@$inner) == 1) && $$inner[0]{optional};
+      push(@params, LaTeXML::Core::Parameter->new('Plain', $spec, extra => [$inner],
+          optional => $opt)); }
     elsif ($p =~ s/^(\[([^\]]*)\])\s*//) {    # Ditto for Optional
       my ($spec, $inner_spec) = ($1, $2);
       if ($inner_spec =~ /^Default:(.*)$/) {
@@ -412,33 +417,6 @@ sub ReadParameters {
   my $parm = parseParameters($spec, $for);
   return ($parm ? $parm->readArguments($gullet, $for) : ()); }
 
-# This new declaration allows you to define the type associated with
-# the value for specific keys.
-sub DefKeyVal {
-  my ($keyset, $key, $type, $default) = @_;
-  my $paramlist = LaTeXML::Package::parseParameters($type || "{}", "KeyVal $key in set $keyset");
-  if (scalar(@$paramlist) != 1) {
-    Warn('unexpected', 'keyval', $key,
-      "Too many parameters in keyval $key (in set $keyset); taking only first", $paramlist); }
-  my $parameter = $$paramlist[0];
-  AssignValue('KEYVAL@' . $keyset . '@' . $key              => $parameter);
-  AssignValue('KEYVAL@' . $keyset . '@' . $key . '@default' => Tokenize($default))
-    if defined $default;
-  return; }
-
-# These functions allow convenient access to KeyVal objects within constructors.
-# Access the value associated with a given key.
-# Can use in constructor: eg. <foo attrib='&GetKeyVal(#1,'key')'>
-sub GetKeyVal {
-  my ($keyval, $key) = @_;
-  return (defined $keyval) && $keyval->getValue($key); }
-
-# Access the entire hash.
-# Can use in constructor: <foo %&GetKeyVals(#1)/>
-sub GetKeyVals {
-  my ($keyval) = @_;
-  return (defined $keyval ? $keyval->getKeyVals : {}); }
-
 # Merge the current font with the style specifications
 sub MergeFont {
   my (@kv) = @_;
@@ -551,7 +529,7 @@ sub CleanURL {
 #======================================================================
 
 my $parameter_options = {    # [CONSTANT]
-  nargs => 1, reversion => 1, optional => 1, novalue => 1,
+  nargs        => 1, reversion   => 1, optional => 1, novalue => 1,
   beforeDigest => 1, afterDigest => 1,
   semiverbatim => 1, undigested  => 1 };
 
@@ -620,9 +598,12 @@ sub NewCounter {
   DefMacroI(T_CS("\\the$ctr"), undef, sub {
       ExplodeText(CounterValue($ctr)->valueOf); },
     scope => 'global');
+  if (!LookupDefinition(T_CS("\\p\@$ctr"))) {
+    DefMacroI(T_CS("\\p\@$ctr"), undef, Tokens(), scope => 'global'); }
   my $prefix = $options{idprefix};
   AssignValue('@ID@prefix@' . $ctr => $prefix, 'global') if $prefix;
-  $prefix = LookupValue('@ID@prefix@' . $ctr) || CleanID($ctr) unless $prefix;
+  $prefix = LookupValue('@ID@prefix@' . $ctr) || $ctr unless $prefix;
+  $prefix = CleanID($prefix);
   if (defined $prefix) {
     if (my $idwithin = $options{idwithin} || $within) {
       DefMacroI(T_CS("\\the$ctr\@ID"), undef,
@@ -686,7 +667,8 @@ sub StepCounter {
 
 # HOW can we retract this?
 sub RefStepCounter {
-  my ($ctr, $noreset) = @_;
+  my ($type, $noreset) = @_;
+  my $ctr = LookupMapping('counter_for_type', $type) || $type;
   StepCounter($ctr, $noreset);
   my $iddef = $STATE->lookupDefinition(T_CS("\\the$ctr\@ID"));
   my $has_id = $iddef && ((!defined $iddef->getParameters) || ($iddef->getParameters->getNumArgs == 0));
@@ -694,32 +676,21 @@ sub RefStepCounter {
   DefMacroI(T_CS('\@currentlabel'), undef, T_CS("\\the$ctr"), scope => 'global');
   DefMacroI(T_CS('\@currentID'), undef, T_CS("\\the$ctr\@ID"), scope => 'global') if $has_id;
 
-###  my $id      = $has_id && ToString(Digest($idtokens));
-  #  my $id      = $has_id && ToString(DigestLiteral($idtokens));
   my $id = $has_id && ToString(DigestLiteral(T_CS("\\the$ctr\@ID")));
 
-  #  my $refnum  = ToString(Digest(T_CS("\\the$ctr")));
-  #  my $frefnum = ToString(Digest(Invocation(T_CS('\lx@fnum@@'),$ctr)));
-  #  my $rrefnum  = ToString(Digest(Invocation(T_CS('\lx@refnum@@'),$ctr)));
-
-  my $refnum    = DigestText(T_CS("\\the$ctr"));
-  my $frefnum   = DigestText(Invocation(T_CS('\lx@fnum@@'), $ctr));
-  my $rrefnum   = DigestText(Invocation(T_CS('\lx@refnum@@'), $ctr));
-  my $s_refnum  = ToString($refnum);
-  my $s_frefnum = ToString($frefnum);
-  my $s_rrefnum = ToString($rrefnum);
+  my $refnum = DigestText(T_CS("\\the$ctr"));
+  my $tags = Digest(Invocation(T_CS('\lx@make@tags'), $type));
   # Any scopes activated for previous value of this counter (& any nested counters) must be removed.
   # This may also include scopes activated for \label
   deactivateCounterScope($ctr);
   # And install the scope (if any) for this reference number.
   AssignValue(current_counter => $ctr, 'local');
-  AssignValue('scopes_for_counter:' . $ctr => [$ctr . ':' . $s_refnum], 'local');
-  $STATE->activateScope($ctr . ':' . $s_refnum);
-  return (refnum => $refnum,
-    ($frefnum && (!$refnum || ($s_frefnum ne $s_refnum)) ? (frefnum => $frefnum) : ()),
-    ($rrefnum && ($frefnum ? ($s_rrefnum ne $s_frefnum) : (!$refnum || ($s_rrefnum ne $s_refnum)))
-      ? (rrefnum => $rrefnum) : ()),
-    ($has_id ? (id => $id) : ())); }
+  my $scope = $ctr . ':' . ToString($refnum);
+  AssignValue('scopes_for_counter:' . $ctr => [$scope], 'local');
+  $STATE->activateScope($scope);
+  return (
+    ($tags   ? (tags => $tags) : ()),
+    ($has_id ? (id   => $id)   : ())); }
 
 sub deactivateCounterScope {
   my ($ctr) = @_;
@@ -732,7 +703,8 @@ sub deactivateCounterScope {
 
 # For UN-numbered units
 sub RefStepID {
-  my ($ctr) = @_;
+  my ($type) = @_;
+  my $ctr = LookupMapping('counter_for_type', $type) || $type;
   my $unctr = "UN$ctr";
   StepCounter($unctr);
   DefMacroI(T_CS("\\\@$ctr\@ID"), undef,
@@ -767,7 +739,7 @@ sub GenerateID {
     my $ancestor = $document->findnode('ancestor::*[@xml:id][1]', $node)
       || $document->getDocument->documentElement;
     ## Old versions don't like $ancestor->getAttribute('xml:id');
-    my $ancestor_id = $ancestor && $ancestor->getAttributeNS("http://www.w3.org/XML/1998/namespace", 'id');
+    my $ancestor_id = $ancestor && $ancestor->getAttributeNS($LaTeXML::Common::XML::XML_NS, 'id');
     # If we've got no $ancestor_id, then we've got no $ancestor (no document yet!),
     # or $ancestor IS the root element (but without an id);
     # If we also have no $prefix, we'll end up with an illegal id (just digits)!!!
@@ -800,15 +772,17 @@ sub Expand {
 
 sub Invocation {
   my ($token, @args) = @_;
-  if (my $defn = $STATE->lookupDefinition((ref $token ? $token : T_CS($token)))) {
-    return Tokens($defn->invocation(@args)); }
+  $token = (ref $token ? $token : T_CS($token));
+  # Note: $token may have been \let to another defn!
+  if (my $defn = $STATE->lookupDefinition($token)) {
+    my $params = $defn->getParameters;
+    return Tokens($token, ($params ? $params->revertArguments(@args) : ())); }
   else {
     Error('undefined', $token, undef,
       "Can't invoke " . Stringify($token) . "; it is undefined");
     DefConstructorI($token, convertLaTeXArgs(scalar(@args), 0),
       sub { LaTeXML::Core::Stomach::makeError($_[0], 'undefined', $token); });
     return Tokens($token, map { (T_BEGIN, $_->unlist, T_END) } @args); } }
-##    return Tokens(); } }
 
 sub RawTeX {
   my ($text) = @_;
@@ -818,7 +792,7 @@ sub RawTeX {
   my $savedcc = $STATE->lookupCatcode('@');
   $STATE->assignCatcode('@' => CC_LETTER);
 
-  $stomach->getGullet->readingFromMouth(LaTeXML::Core::Mouth->new($text), sub {
+  $stomach->getGullet->readingFromMouth(LaTeXML::Core::Mouth->new($text, fordefinitions => 1), sub {
       my ($gullet) = @_;
       my $token;
       while ($token = $gullet->readXToken(0)) {
@@ -829,7 +803,8 @@ sub RawTeX {
   return; }
 
 sub StartSemiverbatim {
-  $STATE->beginSemiverbatim(@_);
+  my (@chars) = @_;
+  $STATE->beginSemiverbatim(@chars);
   return; }
 
 sub EndSemiverbatim {
@@ -923,7 +898,8 @@ sub DefExpandable {
 # Define a Macro: Essentially an alias for DefExpandable
 # For convenience, the $expansion can be a string which will be tokenized.
 my $macro_options = {    # [CONSTANT]
-  scope => 1, locked => 1, mathactive => 1 };
+  scope     => 1, locked => 1, mathactive => 1,
+  protected => 1, outer  => 1, long       => 1 };
 
 sub DefMacro {
   my ($proto, $expansion, %options) = @_;
@@ -1022,12 +998,12 @@ sub IfCondition {
 
 # Used only for regular \newif type conditions
 sub SetCondition {
+  my ($if, $value, $scope) = @_;
   my ($defn, $test);
-  my ($if, $value) = @_;
   # We'll accept any conditional \ifxxx, providing it takes no arguments
   if (($defn = $STATE->lookupDefinition($if)) && (($$defn{conditional_type} || '') eq 'if')
     && !$defn->getParameters) {
-    Let($if, ($value ? T_CS('\iftrue') : T_CS('\iffalse'))) }
+    Let($if, ($value ? T_CS('\iftrue') : T_CS('\iffalse')), $scope) }
   else {
     Error('expected', 'conditional', $STATE->getStomach,
       "Expected a conditional defined by \\newif, got '" . ToString($if) . "'"); }
@@ -1046,7 +1022,8 @@ my $primitive_options = {    # [CONSTANT]
   isPrefix => 1, scope => 1, mode => 1, font => 1,
   requireMath  => 1, forbidMath  => 1,
   beforeDigest => 1, afterDigest => 1,
-  bounded => 1, locked => 1, alias => 1 };
+  bounded => 1, locked => 1, alias => 1,
+  outer => 1, long => 1 };
 
 sub DefPrimitive {
   my ($proto, $replacement, %options) = @_;
@@ -1075,7 +1052,8 @@ sub DefPrimitiveI {
       afterDigest => flatten($options{afterDigest},
         ($mode ? (sub { $_[0]->endMode($mode) })
           : ($bounded ? (sub { $_[0]->egroup; }) : ()))),
-
+      outer    => $options{outer},
+      long     => $options{long},
       isPrefix => $options{isPrefix}),
     $options{scope});
   AssignValue(ToString($cs) . ":locked" => 1) if $options{locked};
@@ -1135,7 +1113,6 @@ sub LookupRegister {
 
 sub LookupDimension {
   my ($cs) = @_;
-  my $defn;
   $cs = T_CS($cs) unless ref $cs;
   if (my $defn = $STATE->lookupDefinition($cs)) {
     if ($defn->isRegister) {    # Easy (and proper) case.
@@ -1190,7 +1167,8 @@ my $constructor_options = {    # [CONSTANT]
   alias        => 1, reversion   => 1, sizer           => 1, properties     => 1,
   nargs        => 1,
   beforeDigest => 1, afterDigest => 1, beforeConstruct => 1, afterConstruct => 1,
-  captureBody  => 1, scope       => 1, bounded         => 1, locked         => 1 };
+  captureBody  => 1, scope       => 1, bounded         => 1, locked         => 1,
+  outer => 1, long => 1 };
 
 sub inferSizer {
   my ($sizer, $reversion) = @_;
@@ -1228,7 +1206,9 @@ sub DefConstructorI {
       reversion       => $options{reversion},
       sizer           => inferSizer($options{sizer}, $options{reversion}),
       captureBody     => $options{captureBody},
-      properties      => $options{properties} || {}),
+      properties      => $options{properties} || {},
+      outer           => $options{outer},
+      long            => $options{long}),
     $options{scope});
   AssignValue(ToString($cs) . ":locked" => 1) if $options{locked};
   return; }
@@ -1578,8 +1558,10 @@ sub DefEnvironmentI {
       ->new(T_CS("\\begin{$name}"), $paramlist, $replacement,
       beforeDigest => flatten(($options{requireMath} ? (sub { requireMath($name); }) : ()),
         ($options{forbidMath} ? (sub { forbidMath($name); }) : ()),
-        ($mode ? (sub { $_[0]->beginMode($mode); })
-          : (sub { $_[0]->bgroup; })),
+        sub { $_[0]->bgroup; },
+        sub { my $b = LookupValue('@environment@' . $name . '@atbegin');
+          ($b ? Digest(@$b) : ()); },
+        ($mode ? (sub { $_[0]->setMode($mode); }) : ()),
         sub { AssignValue(current_environment => $name);
           DefMacroI('\@currenvir', undef, $name); },
         ($options{font} ? (sub { MergeFont(%{ $options{font} }); }) : ()),
@@ -1591,23 +1573,31 @@ sub DefEnvironmentI {
       afterConstruct => flatten($options{afterConstruct}, sub { $STATE->popFrame; }),
       nargs          => $options{nargs},
       captureBody    => 1,
-      properties => $options{properties} || {},
+      properties     => $options{properties} || {},
       (defined $options{reversion} ? (reversion => $options{reversion}) : ()),
       (defined $sizer ? (sizer => $sizer) : ()),
       ), $options{scope});
   $STATE->installDefinition(LaTeXML::Core::Definition::Constructor
       ->new(T_CS("\\end{$name}"), "", "",
-      beforeDigest => flatten($options{beforeDigestEnd}),
-      afterDigest  => flatten($options{afterDigest},
+      beforeDigest => flatten($options{beforeDigestEnd},
+        sub { my $e = LookupValue('@environment@' . $name . '@atend');
+          ($e ? Digest(@$e) : ()); },
+      ),
+      afterDigest => flatten($options{afterDigest},
         sub { my $env = LookupValue('current_environment');
-          Error('unexpected', "\\end{$name}", $_[0],
-            "Can't close environment $name",
-            "Current are "
-              . join(', ', $STATE->lookupStackedValues('current_environment')))
-            unless $env && $name eq $env;
+          if (!$env || ($name ne $env)) {
+            my @lines = ();
+            my $nf    = $STATE->getFrameDepth;
+            for (my $f = 0 ; $f <= $nf ; $f++) {    # Get currently open environments & locators
+              if (my $e = $STATE->isValueBound('current_environment', $f)
+                && $STATE->valueInFrame('current_environment', $f)) {
+                my $locator = ToString($STATE->valueInFrame('groupInitiatorLocator', $f));
+                push(@lines, $e . ' ' . $locator); } }
+            Error('unexpected', "\\end{$name}", $_[0],
+              "Can't close environment $name;", "Current are:", @lines); }
           return; },
-        ($mode ? (sub { $_[0]->endMode($mode); })
-          : (sub { $_[0]->egroup; }))),
+        sub { $_[0]->egroup; },
+      ),
       ), $options{scope});
   # For the uncommon case opened by \csname env\endcsname
   $STATE->installDefinition(LaTeXML::Core::Definition::Constructor
@@ -1647,7 +1637,7 @@ sub DefEnvironmentI {
 
 # Specify the properties of a Node tag.
 my $tag_options = {    # [CONSTANT]
-  autoOpen => 1, autoClose => 1, afterOpen => 1, afterClose => 1,
+  autoOpen          => 1, autoClose          => 1, afterOpen => 1, afterClose => 1,
   'afterOpen:early' => 1, 'afterClose:early' => 1,
   'afterOpen:late'  => 1, 'afterClose:late'  => 1 };
 my $tag_prepend_options = {    # [CONSTANT]
@@ -1710,8 +1700,8 @@ sub RegisterDocumentNamespace {
 # should we assume a raw type can be processed if being read from within a raw type????
 # yeah, that sounds about right...
 my %definition_name = (    # [CONSTANT]
-  sty => 'package', cls => 'class', clo => 'class options',
-  'cnf' => 'configuration', 'cfg' => 'configuration',
+  sty   => 'package',              cls   => 'class', clo => 'class options',
+  'cnf' => 'configuration',        'cfg' => 'configuration',
   'ldf' => 'language definitions', 'def' => 'definitions', 'dfu' => 'definitions');
 
 sub pathname_is_raw {
@@ -1752,8 +1742,10 @@ sub FindFile_aux {
   if (defined LookupValue($file . '_contents')) {
     return $file; }
   if (pathname_is_absolute($file)) {    # And if we've got an absolute path,
-    return $file if -f $file;           # No need to search, just check if it exists.
-    return; }                           # otherwise we're never going to find it.
+    if (!$options{noltxml}) {
+      return $file . '.ltxml' if -f ($file . '.ltxml'); }    # No need to search, just check if it exists.
+    return $file if -f $file;    # No need to search, just check if it exists.
+    return; }                    # otherwise we're never going to find it.
   elsif (pathname_is_nasty($file)) {    # If it is a nasty filename, we won't touch it.
     return; }                           # we DO NOT want to pass this to kpathse or such!
 
@@ -1911,7 +1903,7 @@ sub loadTeXDefinitions {
     AssignValue($request . '_loaded' => 1, 'global'); }
 
   my $stomach = $STATE->getStomach;
-  # Note that we are reading definitions (and recursive input is assumed also defintions)
+  # Note that we are reading definitions (and recursive input is assumed also definitions)
   my $was_interpreting = LookupValue('INTERPRETING_DEFINITIONS');
   # And that if we're interpreting this TeX file of definitions,
   # we probably should interpret any TeX files IT loads.
@@ -1991,8 +1983,8 @@ my $processoptions_options = {    # [CONSTANT]
 sub ProcessOptions {
   my (%options) = @_;
   CheckOptions("ProcessOptions", $processoptions_options, %options);
-  my $name = $STATE->lookupDefinition(T_CS('\@currname')) && ToString(Digest(T_CS('\@currname')));
-  my $ext  = $STATE->lookupDefinition(T_CS('\@currext'))  && ToString(Digest(T_CS('\@currext')));
+  my $name = $STATE->lookupDefinition(T_CS('\@currname')) && ToString(Expand(T_CS('\@currname')));
+  my $ext  = $STATE->lookupDefinition(T_CS('\@currext'))  && ToString(Expand(T_CS('\@currext')));
   my @declaredoptions = @{ LookupValue('@declaredoptions') };
   my @curroptions = @{ (defined($name) && defined($ext)
         && LookupValue('opt@' . $name . '.' . $ext)) || [] };
@@ -2062,7 +2054,7 @@ sub ExecuteOptions {
 sub resetOptions {
   AssignValue('@declaredoptions', []);
   Let('\default@ds',
-    (ToString(Digest(T_CS('\@currext'))) eq 'cls'
+    (ToString(Expand(T_CS('\@currext'))) eq 'cls'
       ? '\OptionNotUsed' : '\@unknownoptionerror'));
   return; }
 
@@ -2073,8 +2065,8 @@ sub AddToMacro {
   # Needs error checking!
   my $defn = $STATE->lookupDefinition($cs);
   if (!defined $defn || !$defn->isExpandable) {
-    Error('unexpected', $cs, $STATE->getStomach->getGullet,
-      ToString($cs) . " is not an expandable control sequence"); }
+    Warn('unexpected', $cs, $STATE->getStomach->getGullet,
+      ToString($cs) . " is not an expandable control sequence", "Ignoring addition"); }
   else {
     DefMacroI($cs, undef, Tokens($defn->getExpansion->unlist,
         map { $_->unlist } map { (ref $_ ? $_ : TokenizeInternal($_)) } @tokens),
@@ -2095,8 +2087,8 @@ sub InputDefinitions {
   $name =~ s/^\s*//; $name =~ s/\s*$//;
   CheckOptions("InputDefinitions ($name)", $inputdefinitions_options, %options);
 
-  my $prevname = $options{handleoptions} && $STATE->lookupDefinition(T_CS('\@currname')) && ToString(Digest(T_CS('\@currname')));
-  my $prevext = $options{handleoptions} && $STATE->lookupDefinition(T_CS('\@currext')) && ToString(Digest(T_CS('\@currext')));
+  my $prevname = $options{handleoptions} && $STATE->lookupDefinition(T_CS('\@currname')) && ToString(Expand(T_CS('\@currname')));
+  my $prevext = $options{handleoptions} && $STATE->lookupDefinition(T_CS('\@currext')) && ToString(Expand(T_CS('\@currext')));
 
   # This file will be treated somewhat as if it were a class
   # IF as_class is true
@@ -2112,7 +2104,7 @@ sub InputDefinitions {
   if ($options{options} && scalar(@{ $options{options} })) {
     if (my $prevoptions = LookupValue($filename . '_loaded_with_options')) {
       my $curroptions = join(',', @{ $options{options} });
-      Error('unexpected', 'options', $STATE->getStomach->getGullet,
+      Info('unexpected', 'options', $STATE->getStomach->getGullet,
         "Option clash for file $filename with options '$curroptions'",
         "previously loaded with '$prevoptions'") unless $curroptions eq $prevoptions; } }
   if (my $file = FindFile($filename, type => $options{type},
@@ -2142,21 +2134,22 @@ sub InputDefinitions {
       if $options{options};
 
     my ($fdir, $fname, $ftype) = pathname_split($file);
-    if ($ftype eq 'ltxml') {
-      loadLTXML($filename, $file); }    # Perl module.
-    else {
-      loadTeXDefinitions($filename, $file); }
     if ($options{handleoptions}) {
-      Digest(T_CS('\\' . $name . '.' . $astype . '-h@@k'));
-      DefMacroI('\@currname', undef, Tokens(Explode($prevname))) if $prevname;
-      DefMacroI('\@currext',  undef, Tokens(Explode($prevext)))  if $prevext;
       # Add an appropriately faked entry into \@filelist
       my ($d, $n, $e) = ($fdir, $fname, $ftype);    # If ftype is ltxml, reparse to get sty/cls!
       ($d, $n, $e) = pathname_split(pathname_concat($d, $n)) if $e eq 'ltxml';    # Fake it???
       my @p = ($STATE->lookupDefinition(T_CS('\@filelist'))
         ? Expand(T_CS('\@filelist'))->unlist : ());
       my @n = Explode($e ? $n . '.' . $e : $n);
-      DefMacroI('\@filelist', undef, (@p ? Tokens(@p, T_OTHER(','), @n) : Tokens(@n)));
+      DefMacroI('\@filelist', undef, (@p ? Tokens(@p, T_OTHER(','), @n) : Tokens(@n))); }
+    if ($ftype eq 'ltxml') {
+      loadLTXML($filename, $file); }                                              # Perl module.
+    else {
+      loadTeXDefinitions($filename, $file); }
+    if ($options{handleoptions}) {
+      Digest(T_CS('\\' . $name . '.' . $astype . '-h@@k'));
+      DefMacroI('\@currname', undef, Tokens(Explode($prevname))) if $prevname;
+      DefMacroI('\@currext',  undef, Tokens(Explode($prevext)))  if $prevext;
       resetOptions(); }    # And reset options afterwards, too.
     return $file; }
   elsif (!$options{noerror}) {
@@ -2190,23 +2183,30 @@ sub RequirePackage {
   # We'll usually disallow raw TeX, unless the option explicitly given, or globally set.
   $options{notex} = 1
     if !defined $options{notex} && !LookupValue('INCLUDE_STYLES') && !$options{noltxml};
-  InputDefinitions($package, type => $options{type} || 'sty', handleoptions => 1,
+  my $success = InputDefinitions($package, type => $options{type} || 'sty', handleoptions => 1,
     # Pass classes options if we have NONE!
     withoptions => !($options{options} && @{ $options{options} }),
     %options);
+  maybeRequireDependencies($package, $options{type} || 'sty') unless $success;
   return; }
 
 my $loadclass_options = {    # [CONSTANT]
-  options => 1, withoptions => 1, after => 1 };
+  options => 1, withoptions => 1, after => 1, notex => 1 };
 
 sub LoadClass {
   my ($class, %options) = @_;
+  $options{notex} = 1
+    if !defined $options{notex} && !LookupValue('INCLUDE_STYLES') && !$options{noltxml};
+
   $class = ToString($class) if ref $class;
   CheckOptions("LoadClass ($class)", $loadclass_options, %options);
   #  AssignValue(class_options => [$options{options} ? @{ $options{options} } : ()]);
   PushValue(class_options => ($options{options} ? @{ $options{options} } : ()));
+  if (my $op = $options{options}) {
+    # ? Expand {\zap@space#2 \@empty}%
+    DefMacroI('\@classoptionslist', undef, join(',', @$op)); }
   # Note that we'll handle errors specifically for this case.
-  if (my $success = InputDefinitions($class, type => 'cls', notex => 1, handleoptions => 1, noerror => 1,
+  if (my $success = InputDefinitions($class, type => 'cls', notex => $options{notex}, handleoptions => 1, noerror => 1,
       %options)) {
     return $success; }
   else {
@@ -2226,6 +2226,7 @@ sub LoadClass {
       "Anticipate undefined macros or environments",
       maybeReportSearchPaths());
     if (my $success = InputDefinitions($alternate, type => 'cls', noerror => 1, handleoptions => 1, %options)) {
+      maybeRequireDependencies($class, 'cls');
       return $success; }
     else {
       Fatal('missing_file', $alternate . '.cls.ltxml', $STATE->getStomach->getGullet,
@@ -2242,6 +2243,42 @@ sub LoadPool {
       "Can't find binding for pool $pool (installation error)",
       maybeReportSearchPaths());
     return; } }
+
+# Somewhat an act of desperation in contexts like arXiv
+# where we may have a bunch of random styles & classes that load other packages
+# whose macros are then expected to be present.
+# We scan the source for \RequirePackage & \usepackage and load the ones that have bindings.
+# This is almost safe: the packages may only be loaded unconditionally, and we don't notice that!
+sub maybeRequireDependencies {
+  my ($file, $type) = @_;
+  if (my $path = FindFile($file, type => $type, noltxml => 1)) {
+    local $/ = undef;
+    my $IN;
+    if (open($IN, '<', $path)) {
+      my $code = <$IN>;
+      close($IN);
+      my @packages = ();
+      my %dups     = ();
+      my $collect  = sub {
+        my ($packages, $options) = @_;
+        foreach my $p (split(/\s*,\s*/, $packages)) {
+          if (!$dups{$p} && !LookupValue($p . '.sty.ltxml_loaded')) {
+            push(@packages, [$p, $options]); $dups{$p} = 1; } } };
+      # Yes, Regexps on TeX code! Ugh!!! Well, this is an act of desperation anyway :>
+      $code =~ s/%[^\n]*\n//gs;    # strip comments
+      $code =~ s/\\RequirePackage\s*(?:\[([^\]]*)\])?\s*\{([^\}]*)\}/ &$collect($2,$1); /xegs;
+      # Ugh. \usepackage, too
+      $code =~ s/\\usepackage\s*(?:\[([^\]]*)\])?\s*\{([^\}]*)\}/ &$collect($2,$1); /xegs;
+
+      Info('dependencies', 'dependencies', undef,
+        "Loading dependencies for $path: " . join(',', map { $$_[0]; } @packages)) if @packages;
+      foreach my $pair (@packages) {
+        my ($package, $options) = @$pair;
+        if (FindFile($package, type => 'sty', notex => 1)) {
+          RequirePackage($package, ($options ? (options => [split(/\s*,\s*/, $options)]) : ())); } } }
+    else {
+      Warn('I/O', 'read', undef, "Couldn't open $path to scan dependencies", $!); } }
+  return; }
 
 sub AtBeginDocument {
   my (@operations) = @_;
@@ -2525,7 +2562,7 @@ sub ProcessPendingResources {
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 
@@ -2721,7 +2758,7 @@ For C<XUntil>, tokens are expanded as they are matched and accumulated.
 =item C<UntilBrace>
 
 X<UntilBrace>
-Reads tokens until the next open brace C<{>.  
+Reads tokens until the next open brace C<{>.
 This corresponds to the peculiar TeX construct C<\def\foo#{...>.
 
 =item C<Match:I<match(|match)*> | Keyword:>I<match(|match)*>>
@@ -2950,7 +2987,7 @@ or I<cannot> appear, in math mode.
 
 =item C<beforeDigest=E<gt>I<code>($stomach)>
 
-supplies a hook to execute during digestion 
+supplies a hook to execute during digestion
 just before the main part of the primitive is executed
 (and before any arguments have been read).
 The I<code> should either return nothing (return;)
@@ -3008,7 +3045,7 @@ specifies if it is not allowed to change this value.
 
 =item C<setter=E<gt>I<code>($value,@args)>
 
-By default I<value> is stored in the State's Value table under a name concatenating the 
+By default I<value> is stored in the State's Value table under a name concatenating the
 control sequence and argument values.  These options allow other means of fetching and
 storing the value.
 
@@ -3183,7 +3220,7 @@ have already been separated; useful for definitions from within code.
 
 X<DefMath>
 A common shorthand constructor; it defines a control sequence that creates a mathematical object,
-such as a symbol, function or operator application.  
+such as a symbol, function or operator application.
 The options given can effectively create semantic macros that contribute to the eventual
 parsing of mathematical content.
 In particular, it generates an XMDual using the replacement I<tex> for the presentation.
@@ -3624,7 +3661,7 @@ or C<I<code>($gullet)> which would yeild tokens to be expanded.
 This operation is useful for style files loaded with C<--preload> or document specific
 customization files (ie. ending with C<.latexml>); normally the contents would be executed
 before LaTeX and other style files are loaded and thus can be overridden by them.
-By deferring the evaluation to begin-document time, these contents can override those style files. 
+By deferring the evaluation to begin-document time, these contents can override those style files.
 This is likely to only be meaningful for LaTeX documents.
 
 =item C<AtEndDocument(I<@stuff>)>
@@ -3907,7 +3944,7 @@ document can take place.
 X<DefRewrite>X<DefMathRewrite>
 These two declarations define document rewrite rules that are applied to the
 document tree after it has been constructed, but before math parsing, or
-any other postprocessing, is done.  The I<%specification> consists of a 
+any other postprocessing, is done.  The I<%specification> consists of a
 sequence of key/value pairs with the initial specs successively narrowing the
 selection of document nodes, and the remaining specs indicating how
 to modify or replace the selected nodes.
@@ -4052,14 +4089,6 @@ I<proto> is the prototype for the pattern, analogous to the pattern
 used for other definitions, except that macro being defined is a single character.
 The I<expansion> is a string specifying what it should expand into,
 typically more verbose column specification.
-
-=item C<DefKeyVal(I<keyset>, I<key>, I<type>, I<default>); >
-
-X<DefKeyVal>
-Defines a keyword I<key> used in keyval arguments for the set I<keyset>.
-If I<type> is given, it defines the type of value that must be supplied,
-such as C<'Dimension'>.  If I<default> is given, that value will be used
-when I<key> is used without an equals and explicit value in a keyvals argument.
 
 =back
 

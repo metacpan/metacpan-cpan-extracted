@@ -105,7 +105,7 @@ sub finish {
   my $self = shift;
 
   # WebSocket
-  my $tx = $self->tx || Carp::croak 'Connection already closed';
+  my $tx = $self->tx || Carp::croak 'Transaction already destroyed';
   $tx->finish(@_) and return $tx->established ? $self : $self->rendered(101)
     if $tx->is_websocket;
 
@@ -136,7 +136,7 @@ sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
 sub on {
   my ($self, $name, $cb) = @_;
-  my $tx = $self->tx || Carp::croak 'Connection already closed';
+  my $tx = $self->tx || Carp::croak 'Transaction already destroyed';
   $self->rendered(101) if $tx->is_websocket && !$tx->established;
   return $tx->on($name => sub { shift; $self->$cb(@_) });
 }
@@ -226,8 +226,8 @@ sub rendered {
   return $self;
 }
 
-sub req { (shift->tx || Carp::croak 'Connection already closed')->req }
-sub res { (shift->tx || Carp::croak 'Connection already closed')->res }
+sub req { (shift->tx || Carp::croak 'Transaction already destroyed')->req }
+sub res { (shift->tx || Carp::croak 'Transaction already destroyed')->res }
 
 sub respond_to {
   my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
@@ -256,7 +256,7 @@ sub respond_to {
 
 sub send {
   my ($self, $msg, $cb) = @_;
-  my $tx = $self->tx || Carp::croak 'Connection already closed';
+  my $tx = $self->tx || Carp::croak 'Transaction already destroyed';
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());
@@ -431,9 +431,10 @@ L<Mojolicious::Routes::Match> object.
 
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note that
-this reference is usually weakened, so the object needs to be referenced
-elsewhere as well when you're performing non-blocking operations and the
-underlying connection might get closed early.
+this reference is usually weakened to protect you from hard to detect memory
+leaks. So the object needs to be referenced elsewhere as well when you're
+performing non-blocking operations and the underlying connection might get
+closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;
@@ -737,6 +738,7 @@ Get L<Mojo::Message::Request> object from L</"tx">.
   my $req = $c->tx->req;
 
   # Extract request information
+  my $id     = $c->req->request_id;
   my $method = $c->req->method;
   my $url    = $c->req->url->to_abs;
   my $info   = $c->req->url->to_abs->userinfo;

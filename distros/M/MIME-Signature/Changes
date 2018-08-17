@@ -1,7 +1,13 @@
 Revision history for MIME-Signature
 
-0.11    2018-08-08 06:54
-        Tried to make that more CPAN tester friendly.
+0.15	2018-08-08 16:31
+	Tests should also work when RELEASE_TESTING is off.
 
-0.1     2018-08-07 19:28
-        First version, released on an unsuspecting world.
+0.14	2018-08-08 15:19
+	Added dependency for Path::Tiny.
+
+0.11	2018-08-08 06:54
+	Tried to make that more CPAN tester friendly.
+
+0.1	2018-08-07 19:28
+	First version, released on an unsuspecting world.

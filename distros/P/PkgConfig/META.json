@@ -4,7 +4,7 @@
       "M. Nunberg <mnunberg@haskalah.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,7 @@
    "provides" : {
       "PkgConfig" : {
          "file" : "lib/PkgConfig.pm",
-         "version" : "0.19026"
+         "version" : "0.21026"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.19026",
-   "x_serialization_backend" : "JSON::PP version 2.96"
+   "version" : "0.21026",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

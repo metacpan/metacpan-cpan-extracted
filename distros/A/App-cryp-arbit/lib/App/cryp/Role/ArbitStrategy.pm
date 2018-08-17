@@ -1,7 +1,7 @@
 package App::cryp::Role::ArbitStrategy;
 
-our $DATE = '2018-08-07'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-08-11'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,7 +28,7 @@ App::cryp::Role::ArbitStrategy - Role for arbitration strategy module
 
 =head1 VERSION
 
-This document describes version 0.005 of App::cryp::Role::ArbitStrategy (from Perl distribution App-cryp-arbit), released on 2018-08-07.
+This document describes version 0.006 of App::cryp::Role::ArbitStrategy (from Perl distribution App-cryp-arbit), released on 2018-08-11.
 
 =head1 DESCRIPTION
 

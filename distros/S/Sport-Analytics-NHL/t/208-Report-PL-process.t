@@ -18,7 +18,6 @@ my $report;
 $report = Sport::Analytics::NHL::Report::PL->new({
 	file => 't/data/2011/0002/0010/PL.html',
 });
-#$BOXSCORE = $report;
 isa_ok($report, 'Sport::Analytics::NHL::Report::PL');
 $report->process();
 test_boxscore($report, {pl => 1});

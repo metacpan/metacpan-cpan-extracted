@@ -1,5 +1,20 @@
 Revision history for Map::Tube::London
 
+1.22  2018-08-13
+      - Updated section NOTE for the line "Northern".
+
+1.21  2018-08-12
+      - Updated section NOTE for the line "Piccadilly".
+
+1.20  2018-08-11
+      - Updated section NOTE for the line "Overground".
+
+1.19  2018-08-10
+      - Updated dependency on Map::Tube v3.55.
+
+1.18  2018-08-08
+      - Updated section NOTE for the line "Metropolitan".
+
 1.17  2018-08-07
       - Updated section NOTE for the line "Jubilee".
 

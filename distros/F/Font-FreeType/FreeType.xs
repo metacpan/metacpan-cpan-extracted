@@ -145,6 +145,9 @@ const static QefFT2_Uv_Const qefft2_uv_const[] =
 #if QEFFT2_FT_AT_LEAST(2,1,3)
     QEFFT2_CONSTANT(FT_LOAD_NO_AUTOHINT)
 #endif
+#if QEFFT2_FT_AT_LEAST(2,6,1)
+    QEFFT2_CONSTANT(FT_LOAD_COMPUTE_METRICS)
+#endif
     QEFFT2_CONSTANT(FT_RENDER_MODE_NORMAL)
 #if QEFFT2_FT_AT_LEAST(2,1,4)
     QEFFT2_CONSTANT(FT_RENDER_MODE_LIGHT)
@@ -898,6 +901,28 @@ qefft2_face_foreach_char (Font_FreeType_Face face, SV *code)
             LEAVE;
 
             char_code = FT_Get_Next_Char(face, char_code, &glyph_idx);
+        }
+
+
+void
+qefft2_face_foreach_glyph (Font_FreeType_Face face, SV *code)
+    PREINIT:
+        FT_UInt glyph_idx;
+    CODE:
+        for (glyph_idx  = 0 ; glyph_idx < face->num_glyphs ; glyph_idx++) {
+            dSP;
+            ENTER;
+            SAVETMPS;
+
+            PUSHMARK(SP);
+            SAVESPTR(DEFSV);
+            DEFSV = sv_2mortal(make_glyph(SvRV(ST(0)), 0, 0, glyph_idx));
+            PUTBACK;
+
+            call_sv(code, G_VOID | G_DISCARD);
+
+            FREETMPS;
+            LEAVE;
         }
 
 

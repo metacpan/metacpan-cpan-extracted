@@ -50,9 +50,47 @@ SKIP: {
       $uri->param({foo => ['bar', 'baz']});
       $uri->frag('foo');
 
-      my $str = "$uri";
+      my $s1 = "$uri";
+      my $s2 = $uri->to_string;
+      my $s3 = $uri->as_string;
+    } 'combined';
 
-    }, 'combined';
+
+    no_leaks_ok {
+      my $base = 'http://a/b/c/d;p?q';
+
+      my @tests = (
+        ["g"       , "http://a/b/c/g"],
+        ["./g"     , "http://a/b/c/g"],
+        ["g/"      , "http://a/b/c/g/"],
+        ["/g"      , "http://a/g"],
+        ["//g"     , "http://g"],
+        ["?y"      , "http://a/b/c/d;p?y"],
+        ["g?y"     , "http://a/b/c/g?y"],
+        ["#s"      , "http://a/b/c/d;p?q#s"],
+        ["g#s"     , "http://a/b/c/g#s"],
+        ["g?y#s"   , "http://a/b/c/g?y#s"],
+        [";x"      , "http://a/b/c/;x"],
+        ["g;x"     , "http://a/b/c/g;x"],
+        ["g;x?y#s" , "http://a/b/c/g;x?y#s"],
+        [""        , "http://a/b/c/d;p?q"],
+        ["."       , "http://a/b/c/"],
+        ["./"      , "http://a/b/c/"],
+        [".."      , "http://a/b/"],
+        ["../"     , "http://a/b/"],
+        ["../g"    , "http://a/b/g"],
+        ["../.."   , "http://a/"],
+        ["../../"  , "http://a/"],
+        ["../../g" , "http://a/g"],
+      );
+
+      foreach my $test (@tests) {
+        my ($rel, $exp) = @$test;
+        my $abs = uri($rel)->absolute(uri($base));
+      }
+
+      my $uri = uri('some/path')->absolute('http://www.example.com/fnord');
+    } 'absolute';
   };
 };
 

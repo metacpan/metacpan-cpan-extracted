@@ -8,11 +8,10 @@ use Test::Builder;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.98';
-$VERSION = eval $VERSION;      ## no critic (BuiltinFunctions::ProhibitStringyEval)
+our $VERSION = '1.302073';
 
 
-#line 74
+#line 73
 
 sub import {
     my($class) = shift;
@@ -31,7 +30,8 @@ sub import {
 
     $test->plan(@_);
 
-    $class->export_to_level( 1, $class, @imports );
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    $class->Exporter::import(@imports);
 }
 
 sub _strip_imports {

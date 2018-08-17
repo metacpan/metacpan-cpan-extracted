@@ -15,7 +15,7 @@ cPanel::TaskQueue::Scheduler - Priority queue of Tasks to Queue at some time in 
     $sched->schedule_task( 'edit_quota fred 0', {delay_seconds=>60} );
 
     # ... some time later ...
-    # This processing loop is a it more complicated than the one for just
+    # This processing loop is a bit more complicated than the one for just
     # the TaskQueue.
     while (1) {
         eval {

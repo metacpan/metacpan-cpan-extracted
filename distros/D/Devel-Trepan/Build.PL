@@ -34,7 +34,7 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Devel-Trepan-*', 'tmp*', '*.got'  ],
     create_makefile_pl  => 'passthrough',
     dist_abstract       =>
-    'Modular Perl Debugger (akin to Ruby "Trepanning" Debuggers).',
+    'Modular Perl Debugger (akin to Python "Trepanning" Debuggers).',
     dist_author         => 'Rocky Bernstein <rocky@cpan.org>',
     dist_version_from   => 'lib/Devel/Trepan/Version.pm',
     license             => 'gpl',
@@ -88,6 +88,7 @@ my $builder = Module::Build->new(
 	'File::HomeDir'                     => 0.54,
         'Getopt::Long'                      => '2.36',
         'Digest::SHA'                       => 0,
+        'Marpa::R2'                         => 4.000,
         'PadWalker'                         => 0,
         'Pod::Text'                         => 3.13,
         'Scalar::Util'                      => 0,

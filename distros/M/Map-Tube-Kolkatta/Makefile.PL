@@ -26,20 +26,20 @@ WriteMakefile(
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
         'File::ShareDir'       => '1.114',
-        'Map::Tube'            => '3.53',
+        'Map::Tube'            => '3.55',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Kolkatta-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Kolkatta'           => { file => 'lib/Map/Tube/Kolkatta.pm',         version => '0.22' },
-            'Map::Tube::Kolkatta::Line::L1' => { file => 'lib/Map/Tube/Kolkatta/Line/L1.pm', version => '0.22' },
-            'Map::Tube::Kolkatta::Line::L2' => { file => 'lib/Map/Tube/Kolkatta/Line/L2.pm', version => '0.22' },
-            'Map::Tube::Kolkatta::Line::L3' => { file => 'lib/Map/Tube/Kolkatta/Line/L3.pm', version => '0.22' },
-            'Map::Tube::Kolkatta::Line::L4' => { file => 'lib/Map/Tube/Kolkatta/Line/L4.pm', version => '0.22' },
-            'Map::Tube::Kolkatta::Line::L5' => { file => 'lib/Map/Tube/Kolkatta/Line/L5.pm', version => '0.22' },
-            'Map::Tube::Kolkatta::Line::L6' => { file => 'lib/Map/Tube/Kolkatta/Line/L6.pm', version => '0.22' },
+            'Map::Tube::Kolkatta'           => { file => 'lib/Map/Tube/Kolkatta.pm',         version => '0.23' },
+            'Map::Tube::Kolkatta::Line::L1' => { file => 'lib/Map/Tube/Kolkatta/Line/L1.pm', version => '0.23' },
+            'Map::Tube::Kolkatta::Line::L2' => { file => 'lib/Map/Tube/Kolkatta/Line/L2.pm', version => '0.23' },
+            'Map::Tube::Kolkatta::Line::L3' => { file => 'lib/Map/Tube/Kolkatta/Line/L3.pm', version => '0.23' },
+            'Map::Tube::Kolkatta::Line::L4' => { file => 'lib/Map/Tube/Kolkatta/Line/L4.pm', version => '0.23' },
+            'Map::Tube::Kolkatta::Line::L5' => { file => 'lib/Map/Tube/Kolkatta/Line/L5.pm', version => '0.23' },
+            'Map::Tube::Kolkatta::Line::L6' => { file => 'lib/Map/Tube/Kolkatta/Line/L6.pm', version => '0.23' },
         },
         resources => {
             repository => {

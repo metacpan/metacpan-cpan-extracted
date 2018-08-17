@@ -1,0 +1,62 @@
+NAME
+
+    TT2::Play::Area - Simple site to allow playing with TT2 syntax and
+    built in plugins.
+
+VERSION
+
+    version 0.001
+
+DESCRIPTION
+
+    This is a mini site for testing Template Toolkit 2 and Template::Alloy
+    rendering in a similar way to sites like jsFiddle. It provides a pane
+    for editing the template, and a pane for providing the variables to
+    pass it (in JSON).
+
+    Currently supported 'engines' are,
+
+      * Template (TT2)
+
+      * Template::Alloy
+
+      * Template::Alloy (using AUTO_FILTER html)
+
+    On the front end jQuery and CodeMirror are used to provide the UI.
+
+RUNNING
+
+    The site is automatically built into a docker container on quay.io so
+    if you simply want to spin it up the quickest way is to,
+
+        docker run -d -p5000:5000 quay.io/colinnewell/tt2-play-area:latest
+
+    This will expose it on port 5000 on localhost, so you should be able to
+    browse to http://localhost:5000.
+
+    Alternatively, if you've installed the module from CPAN then you can
+    run it using plackup like this,
+
+        plackup `which tt2-play-area.psgi`
+
+    Note that if you run with starman you need to use the --preload-app
+    option otherwise you will get 403 errors when trying to process the
+    templates because the CSRF prevention mechanism gets in the way.
+
+    Or if you checkout the github repo like this,
+
+        cpanm --installdeps .
+        plackup -I lib bin/tt2-play-area.psgi
+
+AUTHOR
+
+    Colin Newell <colin.newell@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Colin Newell.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

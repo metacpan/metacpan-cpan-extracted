@@ -28,7 +28,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.00';
+    our $VERSION = '2.02';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -54,7 +54,6 @@ for (my $count = 0 ; $count < scalar(@Levels) ; $count++) {
 
 our $PARENT = $$; # This needs to be defined at the very beginning before new
 my ($SCRIPTNAME, $SCRIPTPATH, $suffix) = fileparse($0);
-our $TIMEZONE    = DateTime::TimeZone->new(name => 'local');
 
 =head1 NAME
 
@@ -342,19 +341,19 @@ sub new {
         'Prefix'             => '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] ',
         'DEBUGMAX-Prefix'    => '%Date% %Time% %Benchmark% %Loglevel%[%Module%][%Lines%] ',
         'Filename'           => '[' . colored(['magenta'], $filename) . ']',
+        'TIMEZONE'           => DateTime::TimeZone->new(name => 'local'),
         'ANSILevel'          => {
-            'ERR'      => colored(['white on_red'],        '[ ERROR ]'),
-            'WARN'     => colored(['black on_yellow'],     '[WARNING]'),
-            'NOTICE'   => colored(['yellow'],              '[NOTICE ]'),
-            'INFO'     => colored(['black on_white'],      '[ INFO  ]'),
-            'DEBUG'    => colored(['bold green'],          '[ DEBUG ]'),
-            'DEBUGMAX' => colored(['bold black on_green'], '[DEBUGMX]'),
+            'ERR'      => colored(['white on_red'],        '[ ERROR  ]'),
+            'WARN'     => colored(['black on_yellow'],     '[WARNING ]'),
+            'NOTICE'   => colored(['yellow'],              '[ NOTICE ]'),
+            'INFO'     => colored(['black on_white'],      '[  INFO  ]'),
+            'DEBUG'    => colored(['bold green'],          '[ DEBUG  ]'),
+            'DEBUGMAX' => colored(['bold black on_green'], '[DEBUGMAX]'),
         },
-        @_
     };
 
     # This pretty much makes all hash keys uppercase
-    my @Keys = (keys %{$self});
+    my @Keys = (keys %{$self}); # Hash is redefined on the fly, so get the list before
     foreach my $Key (@Keys) {
         my $upper = uc($Key);
         if ($Key ne $upper) {
@@ -370,6 +369,12 @@ sub new {
             $self->{$upper} = uc($self->{$upper});
         }
     } ## end foreach my $Key (@Keys)
+    { # This makes sure the user overrides actually override
+        my %params = (@_);
+        foreach my $Key (keys %params) {
+            $self->{uc($Key)} = $params{$Key};
+        }
+    }
 
     # This instructs the ANSIColor library to turn off coloring,
     # if the Color attribute is set to zero.
@@ -378,12 +383,12 @@ sub new {
         # If COLOR is FALSE, then clear color data from ANSILEVEL, as these were
         # defined before color was turned off.
         $self->{'ANSILEVEL'} = {
-            'ERR'      => '[ ERROR ]',
-            'WARN'     => '[WARNING]',
-            'NOTICE'   => '[NOTICE ]',
-            'INFO'     => '[ INFO  ]',
-            'DEBUG'    => '[ DEBUG ]',
-            'DEBUGMAX' => '[DEBUGMX]',
+            'ERR'      => '[ ERROR  ]',
+            'WARN'     => '[WARNING ]',
+            'NOTICE'   => '[ NOTICE ]',
+            'INFO'     => '[  INFO  ]',
+            'DEBUG'    => '[ DEBUG  ]',
+            'DEBUGMAX' => '[DEBUGMAX]',
         };
         $self->{'DATESTAMP'} = '%date%';
         $self->{'TIMESTAMP'} = '%time%';
@@ -540,7 +545,8 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $sline      = shift;
     my $shortsub   = shift;
 
-    my $dt       = DateTime->now('time_zone' => $TIMEZONE);
+    my $timezone = $self->{'TIMEZONE'} || DateTime::TimeZone->new(name => 'local');
+    my $dt       = DateTime->now('time_zone' => $timezone);
     my $Date     = $dt->ymd();
     my $Time     = $dt->hms();
     my $prefix   = $self->{$level . '-PREFIX'} . '';    # A copy not a pointer
@@ -555,7 +561,7 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     }
 
     $prefix =~ s/\%PID\%/$$/g;
-    $prefix =~ s/\%Loglevel\%/$self->{'ANSILevel'}->{$level}/g;
+    $prefix =~ s/\%Loglevel\%/$self->{'ANSILEVEL'}->{$level}/g;
     $prefix =~ s/\%Lines\%/$cline/g;
     $prefix =~ s/\%Lastline\%/$sline/g;
     $prefix =~ s/\%Subroutine\%/$shortsub/g;

@@ -1,0 +1,5 @@
+{
+    "engines": ["alloy_html"],
+    "title": "AUTO_FILTER",
+    "blurb": "Template::Alloy's AUTO_FILTER setting"
+}

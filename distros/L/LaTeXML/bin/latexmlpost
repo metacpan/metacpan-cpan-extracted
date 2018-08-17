@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # /=====================================================================\ #
 # |  latexmlpost                                                        | #
 # | post processing conversion program                                  | #
@@ -118,8 +118,9 @@ GetOptions("quiet" => sub { $verbosity--; },
   # So, need to separate multiple transformations from the combination.
   # However, IF combining, then will need to support a id/ref mechanism.
   #        "mathml|mml!"  =>\$mathml,
-  "mathimages"                  => sub { addMathFormat('images'); },
-  "nomathimages"                => sub { removeMathFormat('images'); },
+  "mathimages"   => sub { addMathFormat('images'); },
+  "nomathimages" => sub { removeMathFormat('images'); },
+  "mathimagemagnification=s"    => \$mathimagemag,
   "mathsvg"                     => sub { addMathFormat('svg'); },
   "nomathsvg"                   => sub { removeMathFormat('svg'); },
   "linelength=i"                => \$linelength,
@@ -136,6 +137,8 @@ GetOptions("quiet" => sub { $verbosity--; },
   "nokeepXMath"                 => sub { removeMathFormat('XMath'); },
   "mathtex"                     => sub { addMathFormat('mathtex'); },
   "nomathtex"                   => sub { removeMathFormat('mathtex'); },
+  "mathlex"                     => sub { addMathFormat('mathlex'); },
+  "nomathlex"                   => sub { removeMathFormat('mathlex'); },
   # For graphics: vaguely similar issues, but more limited.
   # includegraphics images (eg. ps) can be converted to webimages (eg.png)
   # picture/pstricks images can be converted to png or possibly svg.
@@ -155,6 +158,9 @@ my $xmlfile = shift(@ARGV);
 if ($xmlfile ne '-') {
   $xmlfile .= '.xml' unless -f $xmlfile;
   xError("The input file \"$xmlfile\" was not found") unless -f $xmlfile; }
+
+if (@ARGV) {
+  xError("Extra unrecognized arguments " . join(' ', @ARGV)); }
 
 if (defined $defaultcss) {    # must have been unset
   warn "--defaultcss & --nodefaultcss are obsolete;"
@@ -254,6 +260,15 @@ elsif ($format eq 'jats') {
   $picimages  = 1 unless defined $picimages;
   $is_html    = 0;
   $stylesheet = "LaTeXML-jats.xsl" if !defined $stylesheet; }
+elsif ($format eq 'tei') {
+  $extension = 'xml' unless defined $extension;
+  # Add pMML FIRST, unless already there, or was disabled.
+  # note that MathImages can supply altimg attributes
+  maybeAddMathFormat('pmml');
+  $dographics = 1 unless defined $dographics;
+  $picimages  = 1 unless defined $picimages;
+  $is_html    = 0;
+  $stylesheet = "LaTeXML-tei.xsl" if !defined $stylesheet; }
 elsif ($format eq 'xml') {
   $extension = 'xml' unless defined $extension; }
 else {
@@ -382,6 +397,9 @@ if (!$prescan) {
       elsif ($fmt eq 'mathtex') {
         require LaTeXML::Post::TeXMath;
         push(@mprocs, LaTeXML::Post::TeXMath->new(%OPTIONS)); }
+      elsif ($fmt eq 'mathlex') {
+        require LaTeXML::Post::LexMath;
+        push(@mprocs, LaTeXML::Post::LexMath->new(%OPTIONS)); }
     }
     my $main = shift(@mprocs);
     $main->setParallel(@mprocs);
@@ -394,45 +412,13 @@ if (!$prescan) {
     my @searchpaths = ('.',
       (grep { -d $_ } reverse(@paths)),
       $DOCUMENT->getSearchPaths);
+    # store these for the XSLT; XSLT Processor will copy resources where needed.
     foreach my $css (@css) {
-      if (pathname_is_url($css)) {    # external url ? no need to copy
-        print STDERR "Using CSS=$css\n" if $verbosity > 0;
-        push(@{ $$parameters{CSS} }, $css); }
-      elsif (my $csssource = pathname_find($css, types => ['css'], paths => [@searchpaths],
-          installation_subdir => 'resources/CSS')) {
-        print STDERR "Using CSS=$csssource\n" if $verbosity > 0;
-        my $cssdest = pathname_absolute($css, pathname_directory($destination));
-        $cssdest .= '.css' unless $cssdest =~ /\.css$/;
-        warn "CSS source $csssource is same as destination!" if $csssource eq $cssdest;
-        pathname_copy($csssource, $cssdest);
-        push(@{ $$parameters{CSS} }, $cssdest); }
-      else {
-        warn "Couldn't find CSS file $css in paths " . join(',', @searchpaths) . "\n";
-        push(@{ $$parameters{CSS} }, $css); } }    # but still put the link in!
+      push(@{ $$parameters{CSS} }, $css); }
     foreach my $js (@javascript) {
-      if (pathname_is_url($js)) {                  # external url ? no need to copy
-        print STDERR "Using JAVASCRIPT=$js\n" if $verbosity > 0;
-        push(@{ $$parameters{JAVASCRIPT} }, $js); }
-      elsif (my $jssource = pathname_find($js, types => ['js'], paths => [@searchpaths],
-          installation_subdir => 'resources/javascript')) {
-        print STDERR "Using JAVASCRIPT=$jssource\n" if $verbosity > 0;
-        my $jsdest = pathname_absolute($js, pathname_directory($destination));
-        $jsdest .= '.js' unless $jsdest =~ /\.js$/;
-        warn "Javascript source $jssource is same as destination!" if $jssource eq $jsdest;
-        pathname_copy($jssource, $jsdest);
-        push(@{ $$parameters{JAVASCRIPT} }, $jsdest); }
-      else {
-        warn "Couldn't find Javascript file $js in paths " . join(',', @searchpaths) . "\n";
-        push(@{ $$parameters{JAVASCRIPT} }, $js); } }    # but still put the link in!
+      push(@{ $$parameters{JAVASCRIPT} }, $js); }
     if ($icon) {
-      if (my $iconsrc = pathname_find($icon, paths => [$DOCUMENT->getSearchPaths])) {
-        print STDERR "Using icon=$iconsrc\n" if $verbosity > 0;
-        my $icondest = pathname_absolute($icon, pathname_directory($destination));
-        pathname_copy($iconsrc, $icondest);
-        $$parameters{ICON} = $icondest; }
-      else {
-        warn "Couldn't find ICON $icon in paths " . join(',', @searchpaths) . "\n";
-        $$parameters{ICON} = $icon; } }
+      $$parameters{ICON} = $icon; }
     if (!defined $timestamp) {
       $timestamp = localtime(); }
     if ($timestamp) {
@@ -595,6 +581,8 @@ latexmlpost [options] I<xmlfile>
                          representation (default is to remove)
  --mathtex               adds TeX annotation to parallel markup
  --nomathtex             disables the above (default)
+ --mathlex               adds linguistic lexeme annotation to parallel markup
+ --nomathlex             disables the above (default)
  --plane1                use plane-1 unicode for symbols
                          (default, if needed)
  --noplane1              do not use plane-1 unicode
@@ -958,7 +946,16 @@ repeated to provide several mappings, with the earlier formats preferred.
 If the I<desttype> is omitted, it specifies copying files of type I<sourcetype>, unchanged.
 
 The default settings is equivalent to having supplied the options:
-  svg png gif jpg jpeg eps.png ps.png ai.png pdf.png
+
+  --graphicsmap=svg
+  --graphicsmap=png
+  --graphicsmap=gif
+  --graphicsmap=jpg
+  --graphicsmap=jpeg
+  --graphicsmap=eps.png
+  --graphicsmap=ps.png
+  --graphicsmap=ai.png
+  --graphicsmap=pdf.png
 
 The first formats are preferred and used unchanged, while the latter
 ones are converted to png.

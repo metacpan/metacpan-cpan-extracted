@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util qw/blessed/;
 use Mojo::URL;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 # Todo: Support alternative bases for https-paths
 # Todo: Update to https://tools.ietf.org/html/rfc6570
@@ -27,8 +27,8 @@ sub register {
 
       # Endpoint already defined
       if (exists $endpoints{$name}) {
-	$mojo->log->debug(qq{Route endpoint "$name" already defined});
-	return $route;
+        $mojo->log->debug(qq{Route endpoint "$name" already defined});
+        return $route;
       };
 
       $param //= {};
@@ -53,40 +53,40 @@ sub register {
 
       # Define endpoint by string
       unless (ref $values) {
-	return ($endpoints{$name} = Mojo::URL->new($values));
+        return ($endpoints{$name} = Mojo::URL->new($values));
       }
 
       # Define endpoint by Mojo::URL
       elsif (blessed $values && $values->isa('Mojo::URL')) {
-	return ($endpoints{$name} = $values->clone);
+        return ($endpoints{$name} = $values->clone);
       };
 
       # Set values
       my %values = (
-	$c->isa('Mojolicious::Controller') ? %{$c->stash} : %{$c->defaults},
-	format => undef,
-	%$values
+        $c->isa('Mojolicious::Controller') ? %{$c->stash} : %{$c->defaults},
+        format => undef,
+        %$values
       );
 
       # Endpoint undefined
       unless (defined $endpoints{$name}) {
 
-	# Named route
-	if ($name !~ m!^([^:]+:)?/?/!) {
-	  return $c->url_for($name)->to_abs->to_string;
-	};
+        # Named route
+        if ($name !~ m!^([^:]+:)?/?/!) {
+          return $c->url_for($name)->to_abs->to_string;
+        };
 
-	# Interpolate string
-	return _interpolate($name, \%values, $values);
+        # Interpolate string
+        return _interpolate($name, \%values, $values);
       };
 
       # Return interpolated string
       if (blessed $endpoints{$name} && $endpoints{$name}->isa('Mojo::URL')) {
-	return _interpolate(
-	  $endpoints{$name}->to_abs->to_string,
-	  \%values,
-	  $values
-	);
+        return _interpolate(
+          $endpoints{$name}->to_abs->to_string,
+          \%values,
+          $values
+        );
       };
 
       # The following is based on url_for of Mojolicious::Controller
@@ -94,8 +94,8 @@ sub register {
       # Get match object
       my $match;
       unless ($match = $c->match) {
-	$match = Mojolicious::Routes::Match->new(get => '/');
-	$match->root($c->app->routes);
+        $match = Mojolicious::Routes::Match->new(get => '/');
+        $match->root($c->app->routes);
       };
 
       # Base
@@ -111,10 +111,11 @@ sub register {
       # Set parameters to url
       $url->scheme($param->{scheme}) if $param->{scheme};
       $url->port($param->{port}) if $param->{port};
+
       if ($param->{host}) {
-	$url->host($param->{host});
-	$url->port(undef) unless $param->{port};
-	$url->scheme('http') unless $url->scheme;
+        $url->host($param->{host});
+        $url->port(undef) unless $param->{port};
+        $url->scheme('http') unless $url->scheme;
       };
 
       # Clone query
@@ -129,36 +130,36 @@ sub register {
       # Interpolate path
       my @parts;
       while ($r) {
-	my $p = '';
-	foreach my $part (@{$r->pattern->tree}) {
-	  my $t = $part->[0];
+        my $p = '';
+        foreach my $part (@{$r->pattern->tree}) {
+          my $t = $part->[0];
 
-	  # Slash
-	  if ($t eq 'slash') {
-	    $p .= '/';
-	  }
+          # Slash
+          if ($t eq 'slash') {
+            $p .= '/';
+          }
 
-	  # Text
-	  elsif ($t eq 'text') {
-	    $p .= $part->[1];
-	  }
+          # Text
+          elsif ($t eq 'text') {
+            $p .= $part->[1];
+          }
 
-	  # Various wildcards
-	  elsif ($t =~ m/^(?:wildcard|placeholder|relaxed)$/) {
-	    if (exists $values{$part->[1]}) {
-	      $p .= $values{$part->[1]};
-	    }
-	    else {
-	      $p .= '{' . $part->[1] . '}';
-	    };
-	  };
-	};
+          # Various wildcards
+          elsif ($t =~ m/^(?:wildcard|placeholder|relaxed)$/) {
+            if (exists $values{$part->[1]}) {
+              $p .= $values{$part->[1]};
+            }
+            else {
+              $p .= '{' . $part->[1] . '}';
+            };
+          };
+        };
 
-	# Prepend to path array
-	unshift(@parts, $p);
+        # Prepend to path array
+        unshift(@parts, $p);
 
-	# Go up one level till root
-	$r = $r->parent;
+        # Go up one level till root
+        $r = $r->parent;
       };
 
       # Set path
@@ -166,8 +167,8 @@ sub register {
 
       # Fix trailing slash
       $path->trailing_slash(1)
-	if (!$name || $name eq 'current')
-	  && $req->url->path->trailing_slash;
+        if (!$name || $name eq 'current')
+        && $req->url->path->trailing_slash;
 
       # Make path absolute
       my $base_path = $base->path;
@@ -188,7 +189,7 @@ sub register {
       # Get all endpoints
       my %endpoint_hash;
       foreach (keys %endpoints) {
-	$endpoint_hash{$_} = $c->endpoint($_);
+        $endpoint_hash{$_} = $c->endpoint($_);
       };
 
       # Return endpoint hash
@@ -230,12 +231,12 @@ sub _interpolate {
 
       # Delete specific parameters
       for ($endpoint) {
-	if (s/(?<=[\&\?])[^\}][^=]*?=\{$val\??\}//g) {
-	  s/([\?\&])\&*/$1/g;
-	  s/\&$//g;
-	};
-	s/^([^\?]+?)([\/\.])\{$val\??\}\2/$1$2/g;
-	s/^([^\?]+?)\{$val\??\}/$1/g;
+        if (s/(?<=[\&\?])[^\}][^=]*?=\{$val\??\}//g) {
+          s/([\?\&])\&*/$1/g;
+          s/\&$//g;
+        };
+        s/^([^\?]+?)([\/\.])\{$val\??\}\2/$1$2/g;
+        s/^([^\?]+?)\{$val\??\}/$1/g;
       };
     };
 
@@ -246,7 +247,7 @@ sub _interpolate {
 
   # Ignore optional placeholders
   if (exists $param->{'?'} &&
-	!defined $param->{'?'}) {
+        !defined $param->{'?'}) {
     for ($endpoint) {
       s/(?<=[\&\?])[^\}][^=]*?=\{[^\?\}]+?\?\}//g or last;
       s/([\?\&])\&*/$1/g;
@@ -447,7 +448,7 @@ L<Viacheslav Tykhanovskyi|https://github.com/vti>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

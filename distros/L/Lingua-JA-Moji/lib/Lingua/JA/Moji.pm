@@ -6,7 +6,7 @@ require Exporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.48';
+our $VERSION = '0.50';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;

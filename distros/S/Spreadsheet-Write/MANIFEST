@@ -7,9 +7,11 @@ README
 lib/Spreadsheet/Write.pm
 lib/Spreadsheet/Write/WriteCSV.pm
 lib/Spreadsheet/Write/WriteXLS.pm
+lib/Spreadsheet/Write/WriteXLSX.pm
 t/all_tests.t
 t/tlib/Common.pm
 t/tlib/WriteCSVTest.pm
 t/tlib/WriteXLSTest.pm
+t/tlib/WriteXLSXTest.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

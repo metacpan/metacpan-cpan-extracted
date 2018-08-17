@@ -1,5 +1,7 @@
 Revision history for StreamFinder
 
-0.01    Date/time
+1.00    Date/time
         First version, released on an unsuspecting world.
-
+1.01    2018/08/10
+        - Fixed issue with some Facebook videos on Youtube.
+        - Removed Tunein as a valid site (can no longer extract streams).

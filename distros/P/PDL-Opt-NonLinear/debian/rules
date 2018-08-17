@@ -1,0 +1,85 @@
+#!/usr/bin/make -f
+#-*- makefile -*-
+
+#export DH_VERBOSE=1
+export DH_COMPAT=4
+
+PACKAGE=$(shell dh_listpackages)
+
+ifndef PERL
+PERL = /usr/bin/perl
+endif
+
+ifndef DESTDIR
+DESTDIR=..
+endif
+
+TMP     =`pwd`/debian/$(PACKAGE)
+DOCDIR   = $(TMP)/usr/share/doc/pdl-opt-nonlinear
+
+#OPTIMIZE = -O3 -march=athlon-xp -mmmx -msse -msse2 -mfpmath=sse
+OPTIMIZE = -O3 -mtune=k8
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+OPTIMIZE += -g
+endif
+
+clean:
+	dh_testdir
+	dh_testroot
+	-rm -f build-stamp
+	-$(MAKE) realclean
+	dh_clean
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+	$(PERL) Makefile.PL INSTALLDIRS=vendor
+	$(MAKE) all OPTIMIZE="$(OPTIMIZE)"
+	touch build-stamp
+
+
+install: 
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	$(MAKE) install PREFIX=$(TMP)/usr
+
+	find $(TMP) \( -name '*.pm' -o -name '*.pl' \) -print0 | xargs --null --no-run-if-empty \
+	  $(PERL) -i -pe '$$_ = "#!/usr/bin/perl$$1\n" if m|^#!.*/perl(.*)$$|;'
+
+#	install -d $(DOCDIR)/examples
+#	cp -ra eg/* $(DOCDIR)/examples
+#	chmod a-x $(DOCDIR)/examples/*
+#	find $(DOCDIR)/examples -type f -print0 | xargs --null --no-run-if-empty \
+#	  $(PERL) -i -pe '$$_ = "#!/usr/bin/perl$$1\n" if m|^#!.*/perl(.*)$$|;'
+#	-gzip -9rf $(DOCDIR)/examples
+	-cd debian; find -type d -empty -exec rmdir \{} \;
+
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs README
+	dh_installman
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_perl 
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb --destdir=$(DESTDIR)
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

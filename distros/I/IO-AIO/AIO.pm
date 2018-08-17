@@ -1,6 +1,6 @@
 =head1 NAME
 
-IO::AIO - Asynchronous Input/Output
+IO::AIO - Asynchronous/Advanced Input/Output
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,10 @@ not well-supported or restricted (GNU/Linux doesn't allow them on normal
 files currently, for example), and they would only support aio_read and
 aio_write, so the remaining functionality would have to be implemented
 using threads anyway.
+
+In addition to asynchronous I/O, this module also exports some rather
+arcane interfaces, such as C<madvise> or linux's C<splice> system call,
+which is why the C<A> in C<AIO> can also mean I<advanced>.
 
 Although the module will work in the presence of other (Perl-) threads,
 it is currently not reentrant in any way, so use appropriate locking
@@ -169,18 +173,19 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.34;
+   our $VERSION = 4.54;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
                      aio_scandir aio_symlink aio_readlink aio_realpath aio_fcntl aio_ioctl
                      aio_sync aio_fsync aio_syncfs aio_fdatasync aio_sync_file_range
                      aio_pathsync aio_readahead aio_fiemap aio_allocate
-                     aio_rename aio_link aio_move aio_copy aio_group
+                     aio_rename aio_rename2 aio_link aio_move aio_copy aio_group
                      aio_nop aio_mknod aio_load aio_rmtree aio_mkdir aio_chown
                      aio_chmod aio_utime aio_truncate
                      aio_msync aio_mtouch aio_mlock aio_mlockall
                      aio_statvfs
+                     aio_slurp
                      aio_wd);
 
    our @EXPORT = (@AIO_REQ, qw(aioreq_pri aioreq_nice));
@@ -189,7 +194,7 @@ BEGIN {
                        nreqs nready npending nthreads
                        max_poll_time max_poll_reqs
                        sendfile fadvise madvise
-                       mmap munmap munlock munlockall);
+                       mmap munmap mremap munlock munlockall);
 
    push @AIO_REQ, qw(aio_busy); # not exported
 
@@ -231,6 +236,7 @@ documentation.
    aio_readlink $pathname, $callback->($link)
    aio_realpath $pathname, $callback->($path)
    aio_rename $srcpath, $dstpath, $callback->($status)
+   aio_rename2 $srcpath, $dstpath, $flags, $callback->($status)
    aio_mkdir $pathname, $mode, $callback->($status)
    aio_rmdir $pathname, $callback->($status)
    aio_readdir $pathname, $callback->($entries)
@@ -250,7 +256,7 @@ documentation.
    aio_fdatasync $fh, $callback->($status)
    aio_sync_file_range $fh, $offset, $nbytes, $flags, $callback->($status)
    aio_pathsync $pathname, $callback->($status)
-   aio_msync $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
+   aio_msync $scalar, $offset = 0, $length = undef, flags = MS_SYNC, $callback->($status)
    aio_mtouch $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
    aio_mlock $scalar, $offset = 0, $length = undef, $callback->($status)
    aio_mlockall $flags, $callback->($status)
@@ -274,11 +280,14 @@ documentation.
    IO::AIO::nreqs
    IO::AIO::nready
    IO::AIO::npending
+   $nfd = IO::AIO::get_fdlimit [EXPERIMENTAL]
+   IO::AIO::min_fdlimit $nfd [EXPERIMENTAL]
 
    IO::AIO::sendfile $ofh, $ifh, $offset, $count
    IO::AIO::fadvise $fh, $offset, $len, $advice
    IO::AIO::mmap $scalar, $length, $prot, $flags[, $fh[, $offset]]
    IO::AIO::munmap $scalar
+   IO::AIO::mremap $scalar, $new_length, $flags[, $new_address]
    IO::AIO::madvise $scalar, $offset, $length, $advice
    IO::AIO::mprotect $scalar, $offset, $length, $protect
    IO::AIO::munlock $scalar, $offset = 0, $length = undef
@@ -398,7 +407,7 @@ your system are, as usual, C<0>):
 
 C<O_ASYNC>, C<O_DIRECT>, C<O_NOATIME>, C<O_CLOEXEC>, C<O_NOCTTY>, C<O_NOFOLLOW>,
 C<O_NONBLOCK>, C<O_EXEC>, C<O_SEARCH>, C<O_DIRECTORY>, C<O_DSYNC>,
-C<O_RSYNC>, C<O_SYNC>, C<O_PATH>, C<O_TMPFILE>, and C<O_TTY_INIT>.
+C<O_RSYNC>, C<O_SYNC>, C<O_PATH>, C<O_TMPFILE>, C<O_TTY_INIT> and C<O_ACCMODE>.
 
 
 =item aio_close $fh, $callback->($status)
@@ -443,8 +452,8 @@ Perl's C<sysseek> can be made though, although I would naively assume they
 =item aio_write $fh,$offset,$length, $data,$dataoffset, $callback->($retval)
 
 Reads or writes C<$length> bytes from or to the specified C<$fh> and
-C<$offset> into the scalar given by C<$data> and offset C<$dataoffset>
-and calls the callback without the actual number of bytes read (or -1 on
+C<$offset> into the scalar given by C<$data> and offset C<$dataoffset> and
+calls the callback with the actual number of bytes transferred (or -1 on
 error, just like the syscall).
 
 C<aio_read> will, like C<sysread>, shrink or grow the C<$data> scalar to
@@ -512,7 +521,7 @@ together in a hurry to improve benchmark numbers) tend to be rather buggy
 on many systems, this implementation tries to work around some known bugs
 in Linux and FreeBSD kernels (probably others, too), but that might fail,
 so you really really should check the return value of C<aio_sendfile> -
-fewre bytes than expected might have been transferred.
+fewer bytes than expected might have been transferred.
 
 
 =item aio_readahead $fh,$offset,$length, $callback->($retval)
@@ -526,8 +535,8 @@ and bytes are read up to the next page boundary greater than or equal to
 (off-set+length). C<aio_readahead> does not read beyond the end of the
 file. The current file offset of the file is left unchanged.
 
-If that syscall doesn't exist (likely if your OS isn't Linux) it will be
-emulated by simply reading the data, which would have a similar effect.
+If that syscall doesn't exist (likely if your kernel isn't Linux) it will
+be emulated by simply reading the data, which would have a similar effect.
 
 
 =item aio_stat  $fh_or_path, $callback->($status)
@@ -553,6 +562,9 @@ behaviour).
 C<S_IFMT>, C<S_IFIFO>, C<S_IFCHR>, C<S_IFBLK>, C<S_IFLNK>, C<S_IFREG>,
 C<S_IFDIR>, C<S_IFWHT>, C<S_IFSOCK>, C<IO::AIO::major $dev_t>,
 C<IO::AIO::minor $dev_t>, C<IO::AIO::makedev $major, $minor>.
+
+To access higher resolution stat timestamps, see L<SUBSECOND STAT TIME
+ACCESS>.
 
 Example: Print the length of F</etc/passwd>:
 
@@ -606,91 +618,6 @@ Example: stat C</wd> and dump out the data if successful.
       fsid    => 1810
    }
 
-Here is a (likely partial - send me updates!) list of fsid values used by
-Linux - it is safe to hardcode these when C<$^O> is C<linux>:
-
-   0x0000adf5 adfs
-   0x0000adff affs
-   0x5346414f afs
-   0x09041934 anon-inode filesystem
-   0x00000187 autofs
-   0x42465331 befs
-   0x1badface bfs
-   0x42494e4d binfmt_misc
-   0x9123683e btrfs
-   0x0027e0eb cgroupfs
-   0xff534d42 cifs
-   0x73757245 coda
-   0x012ff7b7 coh
-   0x28cd3d45 cramfs
-   0x453dcd28 cramfs-wend (wrong endianness)
-   0x64626720 debugfs
-   0x00001373 devfs
-   0x00001cd1 devpts
-   0x0000f15f ecryptfs
-   0x00414a53 efs
-   0x0000137d ext
-   0x0000ef53 ext2/ext3/ext4
-   0x0000ef51 ext2
-   0xf2f52010 f2fs
-   0x00004006 fat
-   0x65735546 fuseblk
-   0x65735543 fusectl
-   0x0bad1dea futexfs
-   0x01161970 gfs2
-   0x47504653 gpfs
-   0x00004244 hfs
-   0xf995e849 hpfs
-   0x00c0ffee hostfs
-   0x958458f6 hugetlbfs
-   0x2bad1dea inotifyfs
-   0x00009660 isofs
-   0x000072b6 jffs2
-   0x3153464a jfs
-   0x6b414653 k-afs
-   0x0bd00bd0 lustre
-   0x0000137f minix
-   0x0000138f minix 30 char names
-   0x00002468 minix v2
-   0x00002478 minix v2 30 char names
-   0x00004d5a minix v3
-   0x19800202 mqueue
-   0x00004d44 msdos
-   0x0000564c novell
-   0x00006969 nfs
-   0x6e667364 nfsd
-   0x00003434 nilfs
-   0x5346544e ntfs
-   0x00009fa1 openprom
-   0x7461636F ocfs2
-   0x00009fa0 proc
-   0x6165676c pstorefs
-   0x0000002f qnx4
-   0x68191122 qnx6
-   0x858458f6 ramfs
-   0x52654973 reiserfs
-   0x00007275 romfs
-   0x67596969 rpc_pipefs
-   0x73636673 securityfs
-   0xf97cff8c selinux
-   0x0000517b smb
-   0x534f434b sockfs
-   0x73717368 squashfs
-   0x62656572 sysfs
-   0x012ff7b6 sysv2
-   0x012ff7b5 sysv4
-   0x01021994 tmpfs
-   0x15013346 udf
-   0x00011954 ufs
-   0x54190100 ufs byteswapped
-   0x00009fa2 usbdevfs
-   0x01021997 v9fs
-   0xa501fcf5 vxfs
-   0xabba1974 xenfs
-   0x012ff7b4 xenix
-   0x58465342 xfs
-   0x012fd16d xia
-
 =item aio_utime $fh_or_path, $atime, $mtime, $callback->($status)
 
 Works like perl's C<utime> function (including the special case of $atime
@@ -737,11 +664,13 @@ space, or C<IO::AIO::FALLOC_FL_PUNCH_HOLE | IO::AIO::FALLOC_FL_KEEP_SIZE>,
 to deallocate a file range.
 
 IO::AIO also supports C<FALLOC_FL_COLLAPSE_RANGE>, to remove a range
-(without leaving a hole) and C<FALLOC_FL_ZERO_RANGE>, to zero a range (see
-your L<fallocate(2)> manpage).
+(without leaving a hole), C<FALLOC_FL_ZERO_RANGE>, to zero a range,
+C<FALLOC_FL_INSERT_RANGE> to insert a range and C<FALLOC_FL_UNSHARE_RANGE>
+to unshare shared blocks (see your L<fallocate(2)> manpage).
 
 The file system block size used by C<fallocate> is presumably the
-C<f_bsize> returned by C<statvfs>.
+C<f_bsize> returned by C<statvfs>, but different filesystems and filetypes
+can dictate other limitations.
 
 If C<fallocate> isn't available or cannot be emulated (currently no
 emulation will be attempted), passes C<-1> and sets C<$!> to C<ENOSYS>.
@@ -810,6 +739,22 @@ natively, the case C<[$wd, "."]> as C<$srcpath> is specialcased - instead
 of failing, C<rename> is called on the absolute path of C<$wd>.
 
 
+=item aio_rename2 $srcpath, $dstpath, $flags, $callback->($status)
+
+Basically a version of C<aio_rename> with an additional C<$flags>
+argument. Calling this with C<$flags=0> is the same as calling
+C<aio_rename>.
+
+Non-zero flags are currently only supported on GNU/Linux systems that
+support renameat2. Other systems fail with C<ENOSYS> in this case.
+
+The following constants are available (missing ones are, as usual C<0>),
+see renameat2(2) for details:
+
+C<IO::AIO::RENAME_NOREPLACE>, C<IO::AIO::RENAME_EXCHANGE>
+and C<IO::AIO::RENAME_WHITEOUT>.
+
+
 =item aio_mkdir $pathname, $mode, $callback->($status)
 
 Asynchronously mkdir (create) a directory and call the callback with
@@ -850,10 +795,10 @@ flags will also be passed to the callback, possibly modified):
 
 =item IO::AIO::READDIR_DENTS
 
-When this flag is off, then the callback gets an arrayref consisting of
-names only (as with C<aio_readdir>), otherwise it gets an arrayref with
-C<[$name, $type, $inode]> arrayrefs, each describing a single directory
-entry in more detail.
+Normally the callback gets an arrayref consisting of names only (as
+with C<aio_readdir>). If this flag is set, then the callback gets an
+arrayref with C<[$name, $type, $inode]> arrayrefs, each describing a
+single directory entry in more detail:
 
 C<$name> is the name of the entry.
 
@@ -863,9 +808,9 @@ C<IO::AIO::DT_UNKNOWN>, C<IO::AIO::DT_FIFO>, C<IO::AIO::DT_CHR>, C<IO::AIO::DT_D
 C<IO::AIO::DT_BLK>, C<IO::AIO::DT_REG>, C<IO::AIO::DT_LNK>, C<IO::AIO::DT_SOCK>,
 C<IO::AIO::DT_WHT>.
 
-C<IO::AIO::DT_UNKNOWN> means just that: readdir does not know. If you need to
-know, you have to run stat yourself. Also, for speed reasons, the C<$type>
-scalars are read-only: you can not modify them.
+C<IO::AIO::DT_UNKNOWN> means just that: readdir does not know. If you need
+to know, you have to run stat yourself. Also, for speed/memory reasons,
+the C<$type> scalars are read-only: you must not modify them.
 
 C<$inode> is the inode number (which might not be exact on systems with 64
 bit inode numbers and 32 bit perls). This field has unspecified content on
@@ -886,12 +831,14 @@ short names are tried first.
 =item IO::AIO::READDIR_STAT_ORDER
 
 When this flag is set, then the names will be returned in an order
-suitable for stat()'ing each one. That is, when you plan to stat()
-all files in the given directory, then the returned order will likely
-be fastest.
+suitable for stat()'ing each one. That is, when you plan to stat() most or
+all files in the given directory, then the returned order will likely be
+faster.
 
-If both this flag and C<IO::AIO::READDIR_DIRS_FIRST> are specified, then
-the likely dirs come first, resulting in a less optimal stat order.
+If both this flag and C<IO::AIO::READDIR_DIRS_FIRST> are specified,
+then the likely dirs come first, resulting in a less optimal stat order
+for stat'ing all entries, but likely a more optimal order for finding
+subdirectories.
 
 =item IO::AIO::READDIR_FOUND_UNKNOWN
 
@@ -903,10 +850,41 @@ C<$type>'s are known, which can be used to speed up some algorithms.
 =back
 
 
+=item aio_slurp $pathname, $offset, $length, $data, $callback->($status)
+
+Opens, reads and closes the given file. The data is put into C<$data>,
+which is resized as required.
+
+If C<$offset> is negative, then it is counted from the end of the file.
+
+If C<$length> is zero, then the remaining length of the file is
+used. Also, in this case, the same limitations to modifying C<$data> apply
+as when IO::AIO::mmap is used, i.e. it must only be modified in-place
+with C<substr>. If the size of the file is known, specifying a non-zero
+C<$length> results in a performance advantage.
+
+This request is similar to the older C<aio_load> request, but since it is
+a single request, it might be more efficient to use.
+
+Example: load F</etc/passwd> into C<$passwd>.
+
+   my $passwd;
+   aio_slurp "/etc/passwd", 0, 0, $passwd, sub {
+      $_[0] >= 0
+         or die "/etc/passwd: $!\n";
+
+      printf "/etc/passwd is %d bytes long, and contains:\n", length $passwd;
+      print $passwd;
+   };
+   IO::AIO::flush;
+
+
 =item aio_load $pathname, $data, $callback->($status)
 
 This is a composite request that tries to fully load the given file into
 memory. Status is the same as with aio_read.
+
+Using C<aio_slurp> might be more efficient, as it is a single request.
 
 =cut
 
@@ -936,6 +914,8 @@ sub aio_load($$;$) {
 Try to copy the I<file> (directories not supported as either source or
 destination) from C<$srcpath> to C<$dstpath> and call the callback with
 a status of C<0> (ok) or C<-1> (error, see C<$!>).
+
+Existing destination files will be truncated.
 
 This is a composite request that creates the destination file with
 mode 0200 and copies the contents of the source file into it using
@@ -1055,7 +1035,7 @@ efficiently separate the entries of directory C<$path> into two sets of
 names, directories you can recurse into (directories), and ones you cannot
 recurse into (everything else, including symlinks to directories).
 
-C<aio_scandir> is a composite request that creates of many sub requests_
+C<aio_scandir> is a composite request that generates many sub requests.
 C<$maxreq> specifies the maximum number of outstanding aio requests that
 this function generates. If it is C<< <= 0 >>, then a suitable default
 will be chosen (currently 4).
@@ -1250,6 +1230,31 @@ So in general, you should only use these calls for things that do
 other processes), although if you are careful and know what you are doing,
 you still can.
 
+The following constants are available (missing ones are, as usual C<0>):
+
+C<F_DUPFD_CLOEXEC>,
+
+C<F_OFD_GETLK>, C<F_OFD_SETLK>, C<F_OFD_GETLKW>,
+
+C<FIFREEZE>, C<FITHAW>, C<FITRIM>, C<FICLONE>, C<FICLONERANGE>, C<FIDEDUPERANGE>.
+
+C<FS_IOC_GETFLAGS>, C<FS_IOC_SETFLAGS>, C<FS_IOC_GETVERSION>, C<FS_IOC_SETVERSION>,
+C<FS_IOC_FIEMAP>.
+
+C<FS_IOC_FSGETXATTR>, C<FS_IOC_FSSETXATTR>, C<FS_IOC_SET_ENCRYPTION_POLICY>,
+C<FS_IOC_GET_ENCRYPTION_PWSALT>, C<FS_IOC_GET_ENCRYPTION_POLICY>, C<FS_KEY_DESCRIPTOR_SIZE>.
+
+C<FS_SECRM_FL>, C<FS_UNRM_FL>, C<FS_COMPR_FL>, C<FS_SYNC_FL>, C<FS_IMMUTABLE_FL>,
+C<FS_APPEND_FL>, C<FS_NODUMP_FL>, C<FS_NOATIME_FL>, C<FS_DIRTY_FL>,
+C<FS_COMPRBLK_FL>, C<FS_NOCOMP_FL>, C<FS_ENCRYPT_FL>, C<FS_BTREE_FL>,
+C<FS_INDEX_FL>, C<FS_JOURNAL_DATA_FL>, C<FS_NOTAIL_FL>, C<FS_DIRSYNC_FL>, C<FS_TOPDIR_FL>,
+C<FS_FL_USER_MODIFIABLE>.
+
+C<FS_XFLAG_REALTIME>, C<FS_XFLAG_PREALLOC>, C<FS_XFLAG_IMMUTABLE>, C<FS_XFLAG_APPEND>,
+C<FS_XFLAG_SYNC>, C<FS_XFLAG_NOATIME>, C<FS_XFLAG_NODUMP>, C<FS_XFLAG_RTINHERIT>,
+C<FS_XFLAG_PROJINHERIT>, C<FS_XFLAG_NOSYMLINKS>, C<FS_XFLAG_EXTSIZE>, C<FS_XFLAG_EXTSZINHERIT>,
+C<FS_XFLAG_NODEFRAG>, C<FS_XFLAG_FILESTREAM>, C<FS_XFLAG_DAX>, C<FS_XFLAG_HASATTR>,
+
 =item aio_sync $callback->($status)
 
 Asynchronously call sync and call the callback when finished.
@@ -1327,7 +1332,7 @@ sub aio_pathsync($;$) {
    $grp
 }
 
-=item aio_msync $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
+=item aio_msync $scalar, $offset = 0, $length = undef, flags = MS_SYNC, $callback->($status)
 
 This is a rather advanced IO::AIO call, which only works on mmap(2)ed
 scalars (see the C<IO::AIO::mmap> function, although it also works on data
@@ -1339,8 +1344,8 @@ It calls the C<msync> function of your OS, if available, with the memory
 area starting at C<$offset> in the string and ending C<$length> bytes
 later. If C<$length> is negative, counts from the end, and if C<$length>
 is C<undef>, then it goes till the end of the string. The flags can be
-a combination of C<IO::AIO::MS_ASYNC>, C<IO::AIO::MS_INVALIDATE> and
-C<IO::AIO::MS_SYNC>.
+either C<IO::AIO::MS_ASYNC> or C<IO::AIO::MS_SYNC>, plus an optional
+C<IO::AIO::MS_INVALIDATE>.
 
 =item aio_mtouch $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
 
@@ -1433,10 +1438,11 @@ C<IO::AIO::FIEMAP_EXTENT_DATA_INLINE>, C<IO::AIO::FIEMAP_EXTENT_DATA_TAIL>,
 C<IO::AIO::FIEMAP_EXTENT_UNWRITTEN>, C<IO::AIO::FIEMAP_EXTENT_MERGED> or
 C<IO::AIO::FIEMAP_EXTENT_SHARED>.
 
-At the time of this writing (Linux 3.2), this requets is unreliable unless
+At the time of this writing (Linux 3.2), this request is unreliable unless
 C<$count> is C<undef>, as the kernel has all sorts of bugs preventing
-it to return all extents of a range for files with large number of
-extents. The code works around all these issues if C<$count> is undef.
+it to return all extents of a range for files with a large number of
+extents. The code (only) works around all these issues if C<$count> is
+C<undef>.
 
 =item aio_group $callback->(...)
 
@@ -1559,8 +1565,8 @@ pathname string doesn't change, so will point to the new directory (or
 nowhere at all), while the directory fd, if available on the system,
 will still point to the original directory. Most functions accepting a
 pathname will use the directory fd on newer systems, and the string on
-older systems. Some functions (such as realpath) will always rely on the
-string form of the pathname.
+older systems. Some functions (such as C<aio_realpath>) will always rely on
+the string form of the pathname.
 
 So this functionality is mainly useful to get some protection against
 C<chdir>, to easily get an absolute path out of a relative path for future
@@ -1962,7 +1968,7 @@ blocks, and a bad way to reduce concurrency because it is inexact: Better
 use an C<aio_group> together with a feed callback.
 
 Its main use is in scripts without an event loop - when you want to stat
-a lot of files, you can write somehting like this:
+a lot of files, you can write something like this:
 
    IO::AIO::max_outstanding 32;
 
@@ -2009,6 +2015,76 @@ but not yet processed by poll_cb).
 
 =back
 
+=head3 SUBSECOND STAT TIME ACCESS
+
+Both C<aio_stat>/C<aio_lstat> and perl's C<stat>/C<lstat> functions can
+generally find access/modification and change times with subsecond time
+accuracy of the system supports it, but perl's built-in functions only
+return the integer part.
+
+The following functions return the timestamps of the most recent
+stat with subsecond precision on most systems and work both after
+C<aio_stat>/C<aio_lstat> and perl's C<stat>/C<lstat> calls. Their return
+value is only meaningful after a successful C<stat>/C<lstat> call, or
+during/after a successful C<aio_stat>/C<aio_lstat> callback.
+
+This is similar to the L<Time::HiRes> C<stat> functions, but can return
+full resolution without rounding and work with standard perl C<stat>,
+alleviating the need to call the special C<Time::HiRes> functions, which
+do not act like their perl counterparts.
+
+On operating systems or file systems where subsecond time resolution is
+not supported or could not be detected, a fractional part of C<0> is
+returned, so it is always safe to call these functions.
+
+=over 4
+
+=item $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime
+
+Return the access, modication or change time, respectively, including
+fractional part. Due to the limited precision of floating point, the
+accuracy on most platforms is only a bit better than milliseconds for
+times around now - see the I<nsec> function family, below, for full
+accuracy.
+
+=item ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtime
+
+Returns access, modification and change time all in one go, and maybe more
+times in the future version.
+
+=item $nanoseconds = IO::AIO::st_atimensec, IO::AIO::st_mtimensec, IO::AIO::st_ctimensec
+
+Return the fractional access, modifcation or change time, in nanoseconds,
+as an integer in the range C<0> to C<999999999>.
+
+=item ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtimensec
+
+Like the functions above, but returns all three times in one go (and maybe
+more in future versions).
+
+=back
+
+Example: print the high resolution modification time of F</etc>, using
+C<stat>, and C<IO::AIO::aio_stat>.
+
+   if (stat "/etc") {
+      printf "stat(/etc) mtime: %f\n", IO::AIO::st_mtime;
+   }
+
+   IO::AIO::aio_stat "/etc", sub {
+      $_[0]
+         and return;
+
+      printf "aio_stat(/etc) mtime: %d.%09d\n", (stat _)[9], IO::AIO::st_mtimensec;
+   };
+
+   IO::AIO::flush;
+
+Output of the awbove on my system, showing reduced and full accuracy:
+
+   stat(/etc) mtime: 1534043702.020808
+   aio_stat(/etc) mtime: 1534043702.020807792
+
 =head3 MISCELLANEOUS FUNCTIONS
 
 IO::AIO implements some functions that are useful when you want to use
@@ -2017,6 +2093,31 @@ some "Advanced I/O" function not available to in Perl, without going the
 counterpart.
 
 =over 4
+
+=item $numfd = IO::AIO::get_fdlimit
+
+This function is I<EXPERIMENTAL> and subject to change.
+
+Tries to find the current file descriptor limit and returns it, or
+C<undef> and sets C<$!> in case of an error. The limit is one larger than
+the highest valid file descriptor number.
+
+=item IO::AIO::min_fdlimit [$numfd]
+
+This function is I<EXPERIMENTAL> and subject to change.
+
+Try to increase the current file descriptor limit(s) to at least C<$numfd>
+by changing the soft or hard file descriptor resource limit. If C<$numfd>
+is missing, it will try to set a very high limit, although this is not
+recommended when you know the actual minimum that you require.
+
+If the limit cannot be raised enough, the function makes a best-effort
+attempt to increase the limit as much as possible, using various
+tricks, while still failing. You can query the resulting limit using
+C<IO::AIO::get_fdlimit>.
+
+If an error occurs, returns C<undef> and sets C<$!>, otherwise returns
+true.
 
 =item IO::AIO::sendfile $ofh, $ifh, $offset, $count
 
@@ -2043,7 +2144,12 @@ ENOSYS, otherwise the return value of C<posix_fadvise>.
 Simply calls the C<posix_madvise> function (see its
 manpage for details). The following advice constants are
 available: C<IO::AIO::MADV_NORMAL>, C<IO::AIO::MADV_SEQUENTIAL>,
-C<IO::AIO::MADV_RANDOM>, C<IO::AIO::MADV_WILLNEED>, C<IO::AIO::MADV_DONTNEED>.
+C<IO::AIO::MADV_RANDOM>, C<IO::AIO::MADV_WILLNEED>,
+C<IO::AIO::MADV_DONTNEED>.
+
+If C<$offset> is negative, counts from the end. If C<$length> is negative,
+the remaining length of the C<$scalar> is used. If possible, C<$length>
+will be reduced to fit into the C<$scalar>.
 
 On systems that do not implement C<posix_madvise>, this function returns
 ENOSYS, otherwise the return value of C<posix_madvise>.
@@ -2055,6 +2161,10 @@ $scalar (see its manpage for details). The following protect
 constants are available: C<IO::AIO::PROT_NONE>, C<IO::AIO::PROT_READ>,
 C<IO::AIO::PROT_WRITE>, C<IO::AIO::PROT_EXEC>.
 
+If C<$offset> is negative, counts from the end. If C<$length> is negative,
+the remaining length of the C<$scalar> is used. If possible, C<$length>
+will be reduced to fit into the C<$scalar>.
+
 On systems that do not implement C<mprotect>, this function returns
 ENOSYS, otherwise the return value of C<mprotect>.
 
@@ -2064,15 +2174,19 @@ Memory-maps a file (or anonymous memory range) and attaches it to the
 given C<$scalar>, which will act like a string scalar. Returns true on
 success, and false otherwise.
 
-The only operations allowed on the scalar are C<substr>/C<vec> that don't
-change the string length, and most read-only operations such as copying it
-or searching it with regexes and so on.
+The scalar must exist, but its contents do not matter - this means you
+cannot use a nonexistant array or hash element. When in doubt, C<undef>
+the scalar first.
+
+The only operations allowed on the mmapped scalar are C<substr>/C<vec>,
+which don't change the string length, and most read-only operations such
+as copying it or searching it with regexes and so on.
 
 Anything else is unsafe and will, at best, result in memory leaks.
 
 The memory map associated with the C<$scalar> is automatically removed
-when the C<$scalar> is destroyed, or when the C<IO::AIO::mmap> or
-C<IO::AIO::munmap> functions are called.
+when the C<$scalar> is undef'd or destroyed, or when the C<IO::AIO::mmap>
+or C<IO::AIO::munmap> functions are called on it.
 
 This calls the C<mmap>(2) function internally. See your system's manual
 page for details on the C<$length>, C<$prot> and C<$flags> parameters.
@@ -2119,6 +2233,29 @@ Example:
 =item IO::AIO::munmap $scalar
 
 Removes a previous mmap and undefines the C<$scalar>.
+
+=item IO::AIO::mremap $scalar, $new_length, $flags = MREMAP_MAYMOVE[, $new_address = 0]
+
+Calls the Linux-specific mremap(2) system call. The C<$scalar> must have
+been mapped by C<IO::AIO::mmap>, and C<$flags> must currently either be
+C<0> or C<IO::AIO::MREMAP_MAYMOVE>.
+
+Returns true if successful, and false otherwise. If the underlying mmapped
+region has changed address, then the true value has the numerical value
+C<1>, otherwise it has the numerical value C<0>:
+
+   my $success = IO::AIO::mremap $mmapped, 8192, IO::AIO::MREMAP_MAYMOVE
+      or die "mremap: $!";
+
+   if ($success*1) {
+      warn "scalar has chanegd address in memory\n";
+   }
+
+C<IO::AIO::MREMAP_FIXED> and the C<$new_address> argument are currently
+implemented, but not supported and might go away in a future version.
+
+On systems where this call is not supported or is not emulated, this call
+returns falls and sets C<$!> to C<ENOSYS>.
 
 =item IO::AIO::munlock $scalar, $offset = 0, $length = undef
 
@@ -2178,6 +2315,91 @@ C<$flags> is non-zero, fails with C<ENOSYS>.
 Please refer to L<pipe2(2)> for more info on the C<$flags>, but at the
 time of this writing, C<IO::AIO::O_CLOEXEC>, C<IO::AIO::O_NONBLOCK> and
 C<IO::AIO::O_DIRECT> (Linux 3.4, for packet-based pipes) were supported.
+
+Example: create a pipe race-free w.r.t. threads and fork:
+
+   my ($rfh, $wfh) = IO::AIO::pipe2 IO::AIO::O_CLOEXEC
+      or die "pipe2: $!\n";
+
+=item $fh = IO::AIO::eventfd [$initval, [$flags]]
+
+This is a direct interface to the Linux L<eventfd(2)> system call. The
+(unhelpful) defaults for C<$initval> and C<$flags> are C<0> for both.
+
+On success, the new eventfd filehandle is returned, otherwise returns
+C<undef>. If the eventfd syscall is missing, fails with C<ENOSYS>.
+
+Please refer to L<eventfd(2)> for more info on this call.
+
+The following symbol flag values are available: C<IO::AIO::EFD_CLOEXEC>,
+C<IO::AIO::EFD_NONBLOCK> and C<IO::AIO::EFD_SEMAPHORE> (Linux 2.6.30).
+
+Example: create a new eventfd filehandle:
+
+   $fh = IO::AIO::eventfd 0, IO::AIO::O_CLOEXEC
+      or die "eventfd: $!\n";
+
+=item $fh = IO::AIO::timerfd_create $clockid[, $flags]
+
+This is a direct interface to the Linux L<timerfd_create(2)> system call. The
+(unhelpful) default for C<$flags> is C<0>.
+
+On success, the new timerfd filehandle is returned, otherwise returns
+C<undef>. If the eventfd syscall is missing, fails with C<ENOSYS>.
+
+Please refer to L<timerfd_create(2)> for more info on this call.
+
+The following C<$clockid> values are
+available: C<IO::AIO::CLOCK_REALTIME>, C<IO::AIO::CLOCK_MONOTONIC>
+C<IO::AIO::CLOCK_CLOCK_BOOTTIME> (Linux 3.15)
+C<IO::AIO::CLOCK_CLOCK_REALTIME_ALARM> (Linux 3.11) and
+C<IO::AIO::CLOCK_CLOCK_BOOTTIME_ALARM> (Linux 3.11).
+
+The following C<$flags> values are available (Linux
+2.6.27): C<IO::AIO::TFD_NONBLOCK> and C<IO::AIO::TFD_CLOEXEC>.
+
+Example: create a new timerfd and set it to one-second repeated alarms,
+then wait for two alarms:
+
+   my $fh = IO::AIO::timerfd_create IO::AIO::CLOCK_BOOTTIME, IO::AIO::TFD_CLOEXEC
+      or die "timerfd_create: $!\n";
+
+   defined IO::AIO::timerfd_settime $fh, 0, 1, 1
+      or die "timerfd_settime: $!\n";
+
+   for (1..2) {
+      8 == sysread $fh, my $buf, 8
+         or die "timerfd read failure\n";
+
+      printf "number of expirations (likely 1): %d\n",
+         unpack "Q", $buf;
+   }
+
+=item ($cur_interval, $cur_value) = IO::AIO::timerfd_settime $fh, $flags, $new_interval, $nbw_value
+
+This is a direct interface to the Linux L<timerfd_settime(2)> system
+call. Please refer to its manpage for more info on this call.
+
+The new itimerspec is specified using two (possibly fractional) second
+values, C<$new_interval> and C<$new_value>).
+
+On success, the current interval and value are returned (as per
+C<timerfd_gettime>). On failure, the empty list is returned.
+
+The following C<$flags> values are
+available: C<IO::AIO::TFD_TIMER_ABSTIME> and
+C<IO::AIO::TFD_TIMER_CANCEL_ON_SET>.
+
+See C<IO::AIO::timerfd_create> for a full example.
+
+=item ($cur_interval, $cur_value) = IO::AIO::timerfd_gettime $fh
+
+This is a direct interface to the Linux L<timerfd_gettime(2)> system
+call. Please refer to its manpage for more info on this call.
+
+On success, returns the current values of interval and value for the given
+timerfd (as potentially fractional second values). On failure, the empty
+list is returned.
 
 =back
 
@@ -2253,6 +2475,15 @@ will also result in any undefined (by POSIX) behaviour.
 
 =back
 
+=head2 LINUX-SPECIFIC CALLS
+
+When a call is documented as "linux-specific" then this means it
+originated on GNU/Linux. C<IO::AIO> will usually try to autodetect the
+availability and compatibility of such calls regardless of the platform
+it is compiled on, so platforms such as FreeBSD which often implement
+these calls will work. When in doubt, call them and see if they fail wth
+C<ENOSYS>.
+
 =head2 MEMORY USAGE
 
 Per-request usage:
@@ -2274,7 +2505,18 @@ structures (usually around 16k-128k, depending on the OS).
 
 =head1 KNOWN BUGS
 
-Known bugs will be fixed in the next release.
+Known bugs will be fixed in the next release :)
+
+=head1 KNOWN ISSUES
+
+Calls that try to "import" foreign memory areas (such as C<IO::AIO::mmap>
+or C<IO::AIO::aio_slurp>) do not work with generic lvalues, such as
+non-created hash slots or other scalars I didn't think of. It's best to
+avoid such and either use scalar variables or making sure that the scalar
+exists (e.g. by storing C<undef>) and isn't "funny" (e.g. tied).
+
+I am not sure anything can be done about this, so this is considered a
+known issue, rather than a bug.
 
 =head1 SEE ALSO
 

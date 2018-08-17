@@ -28,11 +28,11 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.81
+Version 0.82
 
 =cut
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ conflicts for paths like '/a/0/c', where C<0> may be an array index or a key
 for hash (depends on passed structure). This is vital in some cases, for
 example, when one need to define exact path in structure, but unable to
 validate it's schema or when structure itself doesn't yet exist (see
-option C<expand> for L</path> for example).
+option C<expand> for L</path>).
 
 =head1 EXPORT
 
@@ -78,21 +78,21 @@ Nothing is exported by default.
 
 =head1 ADDRESSING SCHEME
 
-Path is a list of 'steps', each represents nested level in structure.
+Path is a list of 'steps', each represents nested level in the structure.
 
 Arrayref as a step stands for ARRAY and must contain desired items indexes or
 be empty (means "all items"). Sequence for indexes define result sequence.
 
 Hashref represent HASH and may contain keys C<K>, C<R> or be empty. C<K> may
-contain list of desired keys, C<R> must contain list of regular
+contain list of desired keys, C<R> must contain list of compiled regular
 expressions. Empty hash or empty list for C<K> means all keys. Sequence in C<K>
 and C<R> lists define result sequence. C<K> have higher priority than C<R>.
 
 Coderef step is a hook - subroutine which may filter and/or modify
 structure. Path as first argument and a stack (arrayref) of refs to traversed
-subsstructures as second passed to it when executed, C<$_> set to current
-substructure. Some true (match) value or false (doesn't match) value expected
-as output.
+substructures as second passed to it when executed, C<$_> set to current
+substructure, C<$_{opts}> contains passed options. Some true (match) value or
+false (doesn't match) value expected as output.
 
 Sample:
 
@@ -102,8 +102,8 @@ Sample:
         sub { exists $_->{bar} }    # third step
     ];
 
-Struct::Path intentionally designed to be machine-friendly. See frontend
-L<Struct::Path::PerlStyle> for human friendly path definition.
+Struct::Path designed to be machine-friendly. See L<Struct::Path::PerlStyle>
+or L<Struct::Path::JsonPointer> for human friendly path definition.
 
 =head1 SUBROUTINES
 
@@ -155,9 +155,7 @@ sub list_paths($;@) {
     my (@out, $path, $ref);
     my $depth = defined $opts{depth} ? $opts{depth} : -1;
 
-    while (@stack) {
-        ($path, $ref) = splice @stack, 0, 2;
-
+    while (($path, $ref) = splice @stack, 0, 2) {
         if (ref ${$ref} eq 'HASH' and @{$path} != $depth and keys %{${$ref}}) {
             map { unshift @stack, [@{$path}, {K => [$_]}], \${$ref}->{$_} }
                 reverse sort keys %{${$ref}};
@@ -194,11 +192,10 @@ Delete specified by path items from structure.
 
 Dereference result items.
 
-=item expand C<< <"append"|true|false> >>
+=item expand C<< <true|false> >>
 
 Expand structure if specified in path items doesn't exist. All newly created
-items initialized by C<undef>. Arrays will be growed smoothly if C<append> as
-value used (experimental).
+items initialized by C<undef>.
 
 =item paths C<< <true|false> >>
 
@@ -230,9 +227,7 @@ sub path($$;@) {
     my ($items, @next, $steps, $refs, @types);
 
     for my $step (@{$path}) {
-        while (@level) {
-            ($steps, $refs) = splice @level, 0, 2;
-
+        while (($steps, $refs) = splice @level, 0, 2) {
             if (ref $step eq 'ARRAY') {
                 if (ref ${$refs->[-1]} ne 'ARRAY') {
                     croak "ARRAY expected on step #$sc, got " . ref ${$refs->[-1]}
@@ -250,14 +245,21 @@ sub path($$;@) {
                         croak "[$_] doesn't exist, step #$sc" if ($opts{strict});
                         next;
                     }
-                    $_ += @{${$refs->[-1]}} if ($_ < 0); # resolve negative index
-                    $_ = @{${$refs->[-1]}} if ($opts{expand} and
-                        $_ > @{${$refs->[-1]}} and $opts{expand} eq 'append');
+
+                    if ($_ < 0) {
+                        if (@{${$refs->[-1]}} < abs($_)) {
+                            # expand smoothly for out of range negative indexes
+                            $_ = @{${$refs->[-1]}};
+                        } else {
+                            $_ += @{${$refs->[-1]}};
+                        }
+                    }
+
                     push @next, [@{$steps}, [$_]], [@{$refs}, \${$refs->[-1]}->[$_]];
                 }
 
                 if ($opts{delete} and $sc == $#{$path}) {
-                    map { splice(@{${$refs->[-1]}}, $_, 1) if ($_ <= $#{${$refs->[-1]}}) }
+                    map { splice(@{${$refs->[-1]}}, $_, 1) if ($_ < @{${$refs->[-1]}}) }
                         reverse sort @{$items};
                 }
             } elsif (ref $step eq 'HASH') {
@@ -299,6 +301,7 @@ sub path($$;@) {
                 }
             } elsif (ref $step eq 'CODE') {
                 local $_ = ${$refs->[-1]};
+                local $_{opts} = \%opts;
                 $step->($steps, $refs) and push @next, $steps, $refs;
             } else {
                 croak "Unsupported thing in the path, step #$sc";
@@ -310,14 +313,15 @@ sub path($$;@) {
     }
 
     my @out;
-    while (@level) {
-        ($path, $refs) = splice @level, 0, 2;
+    while (($path, $refs) = splice @level, 0, 2) {
         ${$refs->[-1]} = $opts{assign} if (exists $opts{assign});
+
         if ($opts{stack}) {
             map { $_ = ${$_} } @{$refs} if ($opts{deref});
         } else {
             $refs = $opts{deref} ? ${pop @{$refs}} : pop @{$refs};
         }
+
         push @out, ($opts{paths} ? ($path, $refs) : $refs);
     }
 
@@ -367,6 +371,7 @@ sub path_delta($$) {
         } else {
             croak "Unsupported thing in the path, step #$i";
         }
+
         $i++;
     }
 
@@ -425,7 +430,7 @@ L<Data::Diver> L<Data::DPath> L<Data::DRef> L<Data::Focus> L<Data::Hierarchy>
 L<Data::Nested> L<Data::PathSimple> L<Data::Reach> L<Data::Spath> L<JSON::Path>
 L<MarpaX::xPathLike> L<Sereal::Path> L<Data::Find>
 
-L<Struct::Diff> L<Struct::Path::PerlStyle>
+L<Struct::Diff> L<Struct::Path::PerlStyle> L<Struct::Path::JsonPointer>
 
 =head1 LICENSE AND COPYRIGHT
 

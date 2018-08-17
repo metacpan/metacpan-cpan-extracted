@@ -1,0 +1,47 @@
+NAME
+
+    Dancer2::Template::Alloy - Template Alloy engine for Dancer2
+
+VERSION
+
+    version 0.002
+
+SYNOPSIS
+
+    To use this engine you may configure Dancer2 via "config.yml":
+
+        template: "alloy"
+
+    Most configuration possible when creating a new instance of a
+    Template::Alloy object can be passed via the configuration.
+
+        template: "alloy"
+        engines:
+          template:
+            AUTO_FILTER: html
+
+    The following variables are defaulted, they can be overriden.
+
+      * ABSOLUTE
+
+      Defaulted to 1.
+
+      * ENCODING
+
+      Pulled from Dancer2 charset.
+
+      * INCLUDE_PATH
+
+      Pointed to the Dancer2 views.
+
+AUTHOR
+
+    James Raspass <j.raspass@cv-library.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by CV-Library Ltd.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

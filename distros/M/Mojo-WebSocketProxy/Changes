@@ -1,5 +1,14 @@
 Revision history for Perl module Mojo::WebSocketProxy
 
+0.11      2018-08-15 13:03:25+08:00 Asia/Manila
+    - Fix test dependencies (switching from build phase,) adding Path::Tiny.
+
+0.10      2018-08-14 12:40:37+08:00 Asia/Manila
+    - Censor messages failing JSON decoding on Dispatcher::open_connection(),
+      moving these from error logging to debug logging to prevent leaking
+      private information, as well as dropping the WebSocket connection
+      entirely.
+
 0.09      2018-08-01 10:09:57+08:00 Asia/Manila
     - Fix character encoding issues on Dispatcher::open_connection() due
       to Mojo::Transaction::WebSockets emitting JSON-decoded `message` events;

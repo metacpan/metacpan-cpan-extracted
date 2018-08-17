@@ -521,7 +521,7 @@ sub merge_me ($$;$$) {
 		$_    ne 'name'
 		&& $_ ne 'decision'
 		&& defined $rp_event->{$_}
-		&& (! defined $bs_event->{$_})
+		&& (! defined $bs_event->{$_} || $bs_event->{$_} eq 'XX' || $bs_event->{$_} =~ /^unk$/i)
 		&& $rp_event->{$_} ne 'XX' && $rp_event->{$_} !~ /^Unk/i
 	} keys %{$rp_event}];
 	push(@{$fields}, 'stopreason') if $rp_event->{stopreason};

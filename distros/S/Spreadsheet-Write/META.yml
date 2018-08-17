@@ -20,7 +20,8 @@ no_index:
     - t
     - inc
 requires:
+  Excel::Writer::XLSX: '0.98'
   Spreadsheet::WriteExcel: '2.15'
   Text::CSV: '1.18'
   perl: '5.008009'
-version: '1.01'
+version: '1.03'

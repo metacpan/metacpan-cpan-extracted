@@ -5,7 +5,6 @@ requires "Scalar::Util" => "0";
 requires "parent" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
-requires "warnings::register" => "0";
 
 on 'build' => sub {
   requires "Module::Build" => "0.28";

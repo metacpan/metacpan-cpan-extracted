@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.54';
+$Map::Tube::VERSION   = '3.55';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.54
+Version 3.55
 
 =cut
 
@@ -544,12 +544,16 @@ sub get_map_data {
 
 The L<Map::Tube::Plugin::Graph> plugin adds the support to generate the entire map
 or map for a particular line as base64 encoded string (png image).
+As of C<Map::Tube> v3.54 or above, you can now set the background color explicitly.
 
     use strict; use warnings;
     use MIME::Base64;
     use Map::Tube::London;
 
     my $tube = Map::Tube::London->new;
+
+    # Optionally, you can override the default background color.
+    $tube->bgcolor("gray");
 
     # Entire map image
     my $name = $tube->name;

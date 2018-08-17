@@ -59,7 +59,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.65'; # our $VERSION = '';
+$VERSION = '0.69'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH          
@@ -1541,6 +1541,7 @@ sub translate
 		
 my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -1628,6 +1629,7 @@ sub translate_surfaces
 					
 				my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -1717,6 +1719,7 @@ $printthis";
 
 				my $printthis = 
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -1811,6 +1814,7 @@ sub rotate_surface
 		{
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -1969,6 +1973,7 @@ sub translate_vertices
 		
 		my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2053,6 +2058,7 @@ sub shift_vertices
 				
 				my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2096,6 +2102,7 @@ $printthis";
 			{
 				my $printthis = 
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2186,6 +2193,7 @@ sub rotate    # generic zone rotation
 		
 		my $printthis = 
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2416,6 +2424,7 @@ sub reassign_construction
 		
 		my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2492,6 +2501,7 @@ sub change_thickness
 
 
                 my $printthis = "prj $launchline<<YYY
+b
 b
 e
 a
@@ -2688,6 +2698,7 @@ sub obs_modify
 			
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2746,6 +2757,7 @@ $printthis"; say  "\$printthis : " . dump( $printthis );
 
 			my $printthis = 
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2785,6 +2797,7 @@ $printthis";
 			my $alternative = $alternatives[ $countstep - 1 ];          
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2826,6 +2839,7 @@ $printthis";
 			
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2906,6 +2920,7 @@ YYY
 
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -2945,6 +2960,7 @@ $printthis";
 												
 			my $printthis = #THIS IS WHAT HAPPEN INSIDE SUB KEEP_SOME_OBSTRUCTIONS
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -3004,10 +3020,12 @@ sub recalculateish
 	
 	say $tee "Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	
+	my $printthis;
 	if ( $whatto eq "y" )
 	{
-	  my $printthis =
+	  $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 f
@@ -3022,17 +3040,14 @@ a
 -
 YYY
 ";
-	  unless ($exeonfiles eq "n") 
-	  { 
-		print `$printthis`;
-	  }
 	}
 	elsif ( $whatto eq "noins" )
 	{
 	  foreach my $el ( @things )
 	  {
-		my $printthis =
+		$printthis =
 "prj $launchline<<YYY
+b
 m
 c
 f
@@ -3054,11 +3069,14 @@ y
 -
 YYY
 ";
-	    unless ($exeonfiles eq "n") 
-	    { 
-		  print `$printthis`;
-	    }
+	    
 	  }
+	}
+
+
+	unless ($exeonfiles eq "n") 
+	{ 
+      print `$printthis`;
 	}
 
 	print $tee "
@@ -3626,6 +3644,7 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 			{
 				my $printthis =
 "prj $launchline<<YYY
+b
 m
 e
 c
@@ -3673,6 +3692,7 @@ $printthis";
 				{
 					my $printthis =
 "prj $launchline<<YYY
+b
 m
 e
 c
@@ -3723,6 +3743,7 @@ $printthis";
 		{
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 e
 c
@@ -3764,6 +3785,7 @@ $printthis";
 		{
 			MY $printthis =
 "prj $launchline<<YYY
+b
 m
 e
 c
@@ -4166,6 +4188,7 @@ sub apply_constraints
 	
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -4217,6 +4240,7 @@ YYY
 	
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -4248,6 +4272,7 @@ c
 YYY
 
 prj $launchline<<YYY
+b
 m
 c
 a
@@ -4296,6 +4321,7 @@ YYY
 			{
 				my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 e
 c
@@ -4332,6 +4358,7 @@ YYY
 			{
 				my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 e
 c
@@ -4384,6 +4411,7 @@ YYY
 			{
 				my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 e
 c
@@ -4415,6 +4443,7 @@ YYY
 			{
 				my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 e
 c
@@ -4446,6 +4475,7 @@ YYY
 			{
 				my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 e
 c
@@ -4607,6 +4637,7 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 						{
 							my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -4703,6 +4734,7 @@ sub warp #
 		{
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -4801,6 +4833,7 @@ $printthis";
 
 			my $printthis =
 "prj $launchline<<YYY
+b
 m
 c
 a
@@ -4874,6 +4907,7 @@ sub export_toenergyplus
 	
 	my $printthis =
 "prj $launchline<<YYY
+b
 
 o
 g
@@ -5065,6 +5099,11 @@ YYY
 				{ 
 					print `$printthis`;
 				}
+			}
+			else
+			{
+				say $tee "NO .mod.shda FILE HERE. STOPPING.";
+				die;
 			}
 		}
 	}
@@ -5715,6 +5754,7 @@ sub change_groundreflectance
 	
 	my $printthis =
 "prj $launchline<<YYY
+b
 m
 b
 d
@@ -6309,6 +6349,7 @@ sub apply_loopcontrol_changes
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 j
 
@@ -6378,6 +6419,7 @@ sub apply_flowcontrol_changes
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
+b
 m
 l
 

@@ -15,15 +15,15 @@ use Getopt::Long;
 main() unless caller;
 
 sub main {
-    my $queue_dir  = '.';
-    my $qname      = 'main';
+    my $queue_dir = '.';
+    my $qname     = 'main';
     my $sname;
     my $plugindirs = [];
     my $namespaces = [];
     my $plugins    = [];
     my $logfile;
 
-    handle_config_file( 'taskqueue.cfg' );
+    handle_config_file('taskqueue.cfg');
 
     GetOptions(
         'dir=s',        \$queue_dir,
@@ -32,7 +32,7 @@ sub main {
         'plugindir=s@', \$plugindirs,
         'namespace=s@', \$namespaces,
         'plugin=s@',    \$plugins,
-        'logfile=s',    \$logfile,     # keep config file compatible between tools.
+        'logfile=s',    \$logfile,      # keep config file compatible between tools.
     );
 
     $namespaces = [ 'cPanel::TaskProcessors', ] unless @{$namespaces};
@@ -42,18 +42,22 @@ sub main {
 
     load_plugins( $plugindirs, $namespaces, $plugins );
 
-    my $queue = cPanel::TaskQueue->new({
-        name => $qname,
-        state_dir => $queue_dir,
-        max_running => 1,
-    });
-    my $sched = cPanel::TaskQueue::Scheduler->new({
-        name => $qname,
-        state_dir => $queue_dir,
-    });
+    my $queue = cPanel::TaskQueue->new(
+        {
+            name        => $qname,
+            state_dir   => $queue_dir,
+            max_running => 1,
+        }
+    );
+    my $sched = cPanel::TaskQueue::Scheduler->new(
+        {
+            name      => $qname,
+            state_dir => $queue_dir,
+        }
+    );
 
     eval {
-        my $cnt = $sched->process_ready_tasks( $queue );
+        my $cnt = $sched->process_ready_tasks($queue);
         print "$cnt scheduled tasks moved to queue.\n" if $cnt;
         if ( $queue->has_work_to_do() ) {
             $queue->process_next_task();
@@ -71,10 +75,10 @@ sub main {
 }
 
 sub load_plugins {
-    my ($plugindirs, $namespaces, $plugins) = @_;
+    my ( $plugindirs, $namespaces, $plugins ) = @_;
     if ( @{$plugins} ) {
         foreach my $modname ( @{$plugins} ) {
-            cPanel::TaskQueue::PluginManager::load_plugin_by_name( $modname );
+            cPanel::TaskQueue::PluginManager::load_plugin_by_name($modname);
         }
     }
     else {
@@ -91,7 +95,7 @@ sub handle_config_file {
         $config = $1;
         shift @ARGV;
     }
-    unshift @ARGV, config_file( $config ) if -e $config;
+    unshift @ARGV, config_file($config) if -e $config;
 }
 
 sub config_file {

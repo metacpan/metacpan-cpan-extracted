@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %dots;
 BEGIN {
@@ -25,7 +25,7 @@ BEGIN {
 }
 
 sub import {
-	open FH, "<$0" or print "Cannot read '$0'\n" and exit;
+	open FH, "<$0";
 
 	my $reg = $_[1] 
 		? qr/(.*)\1^\s*use\s+Acme::DotDotGone\s+($_[1]);\n/
@@ -72,11 +72,11 @@ __END__
 
 =head1 NAME
 
-Acme::DotDotGone - The great new Acme::DotDotGone!
+Acme::DotDotGone - dot dot gone
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

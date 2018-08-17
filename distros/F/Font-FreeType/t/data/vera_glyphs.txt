@@ -1,256 +1,268 @@
-0020	space
-0021	exclam
-0022	quotedbl
-0023	numbersign
-0024	dollar
-0025	percent
-0026	ampersand
-0027	quotesingle
-0028	parenleft
-0029	parenright
-002a	asterisk
-002b	plus
-002c	comma
-002d	hyphen
-002e	period
-002f	slash
-0030	zero
-0031	one
-0032	two
-0033	three
-0034	four
-0035	five
-0036	six
-0037	seven
-0038	eight
-0039	nine
-003a	colon
-003b	semicolon
-003c	less
-003d	equal
-003e	greater
-003f	question
-0040	at
-0041	A
-0042	B
-0043	C
-0044	D
-0045	E
-0046	F
-0047	G
-0048	H
-0049	I
-004a	J
-004b	K
-004c	L
-004d	M
-004e	N
-004f	O
-0050	P
-0051	Q
-0052	R
-0053	S
-0054	T
-0055	U
-0056	V
-0057	W
-0058	X
-0059	Y
-005a	Z
-005b	bracketleft
-005c	backslash
-005d	bracketright
-005e	asciicircum
-005f	underscore
-0060	grave
-0061	a
-0062	b
-0063	c
-0064	d
-0065	e
-0066	f
-0067	g
-0068	h
-0069	i
-006a	j
-006b	k
-006c	l
-006d	m
-006e	n
-006f	o
-0070	p
-0071	q
-0072	r
-0073	s
-0074	t
-0075	u
-0076	v
-0077	w
-0078	x
-0079	y
-007a	z
-007b	braceleft
-007c	bar
-007d	braceright
-007e	asciitilde
-00a0	nonbreakingspace
-00a1	exclamdown
-00a2	cent
-00a3	sterling
-00a4	currency
-00a5	yen
-00a6	brokenbar
-00a7	section
-00a8	dieresis
-00a9	copyright
-00aa	ordfeminine
-00ab	guillemotleft
-00ac	logicalnot
-00ad	sfthyphen
-00ae	registered
-00af	macron
-00b0	degree
-00b1	plusminus
-00b2	twosuperior
-00b3	threesuperior
-00b4	acute
-00b5	mu
-00b6	paragraph
-00b7	periodcentered
-00b8	cedilla
-00b9	onesuperior
-00ba	ordmasculine
-00bb	guillemotright
-00bc	onequarter
-00bd	onehalf
-00be	threequarters
-00bf	questiondown
-00c0	Agrave
-00c1	Aacute
-00c2	Acircumflex
-00c3	Atilde
-00c4	Adieresis
-00c5	Aring
-00c6	AE
-00c7	Ccedilla
-00c8	Egrave
-00c9	Eacute
-00ca	Ecircumflex
-00cb	Edieresis
-00cc	Igrave
-00cd	Iacute
-00ce	Icircumflex
-00cf	Idieresis
-00d0	Eth
-00d1	Ntilde
-00d2	Ograve
-00d3	Oacute
-00d4	Ocircumflex
-00d5	Otilde
-00d6	Odieresis
-00d7	multiply
-00d8	Oslash
-00d9	Ugrave
-00da	Uacute
-00db	Ucircumflex
-00dc	Udieresis
-00dd	Yacute
-00de	Thorn
-00df	germandbls
-00e0	agrave
-00e1	aacute
-00e2	acircumflex
-00e3	atilde
-00e4	adieresis
-00e5	aring
-00e6	ae
-00e7	ccedilla
-00e8	egrave
-00e9	eacute
-00ea	ecircumflex
-00eb	edieresis
-00ec	igrave
-00ed	iacute
-00ee	icircumflex
-00ef	idieresis
-00f0	eth
-00f1	ntilde
-00f2	ograve
-00f3	oacute
-00f4	ocircumflex
-00f5	otilde
-00f6	odieresis
-00f7	divide
-00f8	oslash
-00f9	ugrave
-00fa	uacute
-00fb	ucircumflex
-00fc	udieresis
-00fd	yacute
-00fe	thorn
-00ff	ydieresis
-0106	Cacute
-0107	cacute
-010C	Ccaron
-010D	ccaron
-0111	dcroat
-011E	Gbreve
-011F	gbreve
-0130	Idotaccent
-0131	dotlessi
-0141	Lslash
-0142	lslash
-0152	OE
-0153	oe
-015E	Scedilla
-015F	scedilla
-0160	Scaron
-0161	scaron
-0178	Ydieresis
-017D	Zcaron
-017E	zcaron
-0192	florin
-02C6	circumflex
-02C7	caron
-02D8	breve
-02D9	dotaccent
-02DA	ring
-02DB	ogonek
-02DC	tilde
-02DD	hungarumlaut
-03A9	Omega
-03C0	pi
-2013	endash
-2014	emdash
-2018	quoteleft
-2019	quoteright
-201A	quotesinglbase
-201C	quotedblleft
-201D	quotedblright
-201E	quotedblbase
-2020	dagger
-2021	daggerdbl
-2022	bullet
-2026	ellipsis
-2030	perthousand
-2039	guilsinglleft
-203A	guilsinglright
-20AC	Euro
-2122	trademark
-2202	partialdiff
-2206	Delta
-220F	product
-2211	summation
-2212	minus
-2215	fraction
-2219	periodcentered
-221A	radical
-221E	infinity
-222B	integral
-2248	approxequal
-2260	notequal
-2264	lessequal
-2265	greaterequal
-25CA	lozenge
-FB01	fi
-FB02	fl
+0	0	.notdef
+1	0	.null
+2	0	nonmarkingreturn
+3	32	space
+4	33	exclam
+5	34	quotedbl
+6	35	numbersign
+7	36	dollar
+8	37	percent
+9	38	ampersand
+10	39	quotesingle
+11	40	parenleft
+12	41	parenright
+13	42	asterisk
+14	43	plus
+15	44	comma
+16	45	hyphen
+17	46	period
+18	47	slash
+19	48	zero
+20	49	one
+21	50	two
+22	51	three
+23	52	four
+24	53	five
+25	54	six
+26	55	seven
+27	56	eight
+28	57	nine
+29	58	colon
+30	59	semicolon
+31	60	less
+32	61	equal
+33	62	greater
+34	63	question
+35	64	at
+36	65	A
+37	66	B
+38	67	C
+39	68	D
+40	69	E
+41	70	F
+42	71	G
+43	72	H
+44	73	I
+45	74	J
+46	75	K
+47	76	L
+48	77	M
+49	78	N
+50	79	O
+51	80	P
+52	81	Q
+53	82	R
+54	83	S
+55	84	T
+56	85	U
+57	86	V
+58	87	W
+59	88	X
+60	89	Y
+61	90	Z
+62	91	bracketleft
+63	92	backslash
+64	93	bracketright
+65	94	asciicircum
+66	95	underscore
+67	96	grave
+68	97	a
+69	98	b
+70	99	c
+71	100	d
+72	101	e
+73	102	f
+74	103	g
+75	104	h
+76	105	i
+77	106	j
+78	107	k
+79	108	l
+80	109	m
+81	110	n
+82	111	o
+83	112	p
+84	113	q
+85	114	r
+86	115	s
+87	116	t
+88	117	u
+89	118	v
+90	119	w
+91	120	x
+92	121	y
+93	122	z
+94	123	braceleft
+95	124	bar
+96	125	braceright
+97	126	asciitilde
+98	196	Adieresis
+99	197	Aring
+100	199	Ccedilla
+101	201	Eacute
+102	209	Ntilde
+103	214	Odieresis
+104	220	Udieresis
+105	225	aacute
+106	224	agrave
+107	226	acircumflex
+108	228	adieresis
+109	227	atilde
+110	229	aring
+111	231	ccedilla
+112	233	eacute
+113	232	egrave
+114	234	ecircumflex
+115	235	edieresis
+116	237	iacute
+117	236	igrave
+118	238	icircumflex
+119	239	idieresis
+120	241	ntilde
+121	243	oacute
+122	242	ograve
+123	244	ocircumflex
+124	246	odieresis
+125	245	otilde
+126	250	uacute
+127	249	ugrave
+128	251	ucircumflex
+129	252	udieresis
+130	8224	dagger
+131	176	degree
+132	162	cent
+133	163	sterling
+134	167	section
+135	8226	bullet
+136	182	paragraph
+137	223	germandbls
+138	174	registered
+139	169	copyright
+140	8482	trademark
+141	180	acute
+142	168	dieresis
+143	8800	notequal
+144	198	AE
+145	216	Oslash
+146	8734	infinity
+147	177	plusminus
+148	8804	lessequal
+149	8805	greaterequal
+150	165	yen
+151	181	mu
+152	8706	partialdiff
+153	8721	summation
+154	8719	product
+155	960	pi
+156	8747	integral
+157	170	ordfeminine
+158	186	ordmasculine
+159	937	Omega
+160	230	ae
+161	248	oslash
+162	191	questiondown
+163	161	exclamdown
+164	172	logicalnot
+165	8730	radical
+166	402	florin
+167	8776	approxequal
+168	8710	Delta
+169	171	guillemotleft
+170	187	guillemotright
+171	8230	ellipsis
+172	160	nonbreakingspace
+173	192	Agrave
+174	195	Atilde
+175	213	Otilde
+176	338	OE
+177	339	oe
+178	8211	endash
+179	8212	emdash
+180	8220	quotedblleft
+181	8221	quotedblright
+182	8216	quoteleft
+183	8217	quoteright
+184	247	divide
+185	9674	lozenge
+186	255	ydieresis
+187	376	Ydieresis
+188	8725	fraction
+189	164	currency
+190	8249	guilsinglleft
+191	8250	guilsinglright
+192	64257	fi
+193	64258	fl
+194	8225	daggerdbl
+195	183	periodcentered
+196	8218	quotesinglbase
+197	8222	quotedblbase
+198	8240	perthousand
+199	194	Acircumflex
+200	202	Ecircumflex
+201	193	Aacute
+202	203	Edieresis
+203	200	Egrave
+204	205	Iacute
+205	206	Icircumflex
+206	207	Idieresis
+207	204	Igrave
+208	211	Oacute
+209	212	Ocircumflex
+210	210	Ograve
+211	218	Uacute
+212	219	Ucircumflex
+213	217	Ugrave
+214	305	dotlessi
+215	710	circumflex
+216	732	tilde
+217	175	macron
+218	728	breve
+219	729	dotaccent
+220	730	ring
+221	184	cedilla
+222	733	hungarumlaut
+223	731	ogonek
+224	711	caron
+225	321	Lslash
+226	322	lslash
+227	352	Scaron
+228	353	scaron
+229	381	Zcaron
+230	382	zcaron
+231	166	brokenbar
+232	208	Eth
+233	240	eth
+234	221	Yacute
+235	253	yacute
+236	222	Thorn
+237	254	thorn
+238	8722	minus
+239	215	multiply
+240	185	onesuperior
+241	178	twosuperior
+242	179	threesuperior
+243	188	onequarter
+244	189	onehalf
+245	190	threequarters
+246	286	Gbreve
+247	287	gbreve
+248	304	Idotaccent
+249	350	Scedilla
+250	351	scedilla
+251	262	Cacute
+252	263	cacute
+253	268	Ccaron
+254	269	ccaron
+255	273	dcroat
+256	173	sfthyphen
+257	8729	periodcentered
+258	8364	Euro
+259	0	c6459
+260	0	c6460
+261	0	c6461
+262	0	c6462
+263	0	c6463
+264	0	c6466
+265	0	c6467
+266	0	c6468
+267	0	c6469

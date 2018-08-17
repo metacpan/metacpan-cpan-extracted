@@ -6,5 +6,6 @@ use LaTeXML::Util::Test;
 
 latexml_tests("t/expansion",
 	      requires=>{meaning=>'t1enc.def',
-                         ifthen=>'ifthen.sty'});
-
+                   ifthen=>'ifthen.sty',
+                   textcase=>'textcase.sty',
+                   etoolbox=>'etoolbox.sty'});

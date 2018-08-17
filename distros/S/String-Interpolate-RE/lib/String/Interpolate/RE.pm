@@ -9,7 +9,7 @@ use Carp;
 use Exporter qw[ import ];
 our @EXPORT_OK = qw( strinterp );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 ## no critic (ProhibitAccessOfPrivateData)
 
@@ -51,12 +51,12 @@ sub _strinterp {
     my $fmt = $opt->{fmt};
 
     $_[0] =~ s{
-               \$                # find a literal dollar sign
-              (                  # followed by either
-               {(\w+)(?:$fmt)?}  #  a variable name in curly brackets ($2)
-                                 #  and an optional sprintf format
-               |                 # or
-                (\w+)            #   a bareword ($3)
+               \$                    # find a literal dollar sign
+              (                      # followed by either
+               \{ (\w+)(?:$fmt)? \}  #  a variable name in curly brackets ($2)
+                                     #  and an optional sprintf format
+               |                     # or
+                (\w+)                #   a bareword ($3)
               )
             }{
               my $t = defined $4 ? $4 : $2;
@@ -141,7 +141,7 @@ String::Interpolate::RE - interpolate variables into strings using regular expre
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

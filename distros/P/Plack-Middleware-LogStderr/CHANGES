@@ -1,10 +1,28 @@
 ==================================================
-Changes from 2017-07-31 00:00:00 +0000 to present.
+Changes from 2017-08-08 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2018-07-31 15:33:49 +0000
+version 1.000 at 2018-08-08 13:32:12 +0000
 ------------------------------------------
+
+  Change: d6a472ca79adfc5c9465251b2cb81034bd152b20
+  Author: Alex Malek <amalek@gmail.com>
+  Date : 2018-08-08 09:27:35 +0000
+
+    new version 
+
+  Change: eba8e6b337ce40abb8ca1c3cf108ee398779b39e
+  Author: Alex Malek <amalek@gmail.com>
+  Date : 2018-08-08 09:26:12 +0000
+
+    remove warnings harness, bump version 
+
+  Change: f110229f54ea567c1346d254625d06391c235fd2
+  Author: Alex Malek <amalek@gmail.com>
+  Date : 2018-08-08 09:20:15 +0000
+
+    add FILENO method 
 
   Change: 3d04e7d07e471120c7347d832281f7ad7a52c46c
   Author: Alex Malek <amalek@gmail.com>

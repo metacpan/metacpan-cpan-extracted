@@ -6,7 +6,7 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 
 our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup );
@@ -59,7 +59,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 0.50
+version 0.53
 
 =head1 SYNOPSIS
 

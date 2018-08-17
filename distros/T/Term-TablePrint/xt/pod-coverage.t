@@ -6,5 +6,6 @@ use Test::More;
 use Test::Pod::Coverage;
 use Pod::Coverage;
 
-
-all_pod_coverage_ok( { private => [ qr/^[A-Z]/, qr/^_/ ] });
+plan tests => 1;
+pod_coverage_ok( 'Term::TablePrint' );
+#all_pod_coverage_ok( { private => [ qr/^[A-Z]/, qr/^_/ ] });

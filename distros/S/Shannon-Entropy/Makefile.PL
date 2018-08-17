@@ -18,7 +18,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-    	'Import::Export' => '0.04',
+    	'Import::Export' => '0.08',
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Shannon-Entropy-*' },

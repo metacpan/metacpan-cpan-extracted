@@ -145,8 +145,12 @@ elements:
         attributes:
           class: form-control
         label: Mask Character
+        constraints:
+          - type: Required
+            when:
+              field: display_mask
 
-  - type: Submit                                                                
+  - type: Submit
     name: submit
     value: Save
     attributes:

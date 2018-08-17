@@ -5,7 +5,7 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More;
 use FFI::CheckLib;
 use FFI::Platypus::Declare
   'double', 'void', 'int', 'size_t',
@@ -14,7 +14,7 @@ use FFI::Platypus::Declare
   ['double []' => 'double_a2'],
   ['(double)->double' => 'double_c'];
 
-lib find_lib lib => 'test', symbol => 'f0', libpath => 'libtest';
+lib find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
 
 attach [double_add => 'add'] => [double, double] => double;
 attach [double_inc => 'inc'] => [double_p, double] => double_p;
@@ -67,14 +67,12 @@ set_closure($closure);
 is do { no warnings; call_closure(2.5) }, 0, 'call_closure(2.5) = 0';
 
 subtest 'custom type input' => sub {
-  plan tests => 2;
   custom_type type1 => { native_type => 'double', perl_to_native => sub { is $_[0], 1.25; $_[0]+0.25 } };
   attach [double_add => 'custom_add'] => ['type1',double] => double;
   is custom_add(1.25,2.5), 4, 'custom_add(1.25,2.5) = 4';
 };
 
 subtest 'custom type output' => sub {
-  plan tests => 2;
   custom_type type2 => { native_type => 'double', native_to_perl => sub { is $_[0], 2.0; $_[0]+0.25 } };
   attach [double_add => 'custom_add2'] => [double,double] => 'type2';
   is custom_add2(1,1), 2.25, 'custom_add2(1,1) = 2.25';
@@ -83,3 +81,4 @@ subtest 'custom type output' => sub {
 attach [pointer_is_null => 'closure_pointer_is_null'] => ['()->void'] => int;
 is closure_pointer_is_null(), 1, 'closure_pointer_is_null() = 1';
 
+done_testing;

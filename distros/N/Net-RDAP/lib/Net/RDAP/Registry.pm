@@ -12,11 +12,6 @@ use vars qw($UA $REGISTRY);
 use strict;
 
 #
-# in case we need to download something
-#
-$UA = Net::RDAP::UA->new;
-
-#
 # cache to avoid touching the file system if we don't need to
 #
 $REGISTRY = {};
@@ -298,6 +293,8 @@ sub load_registry {
 		if ($mirror) {
 			my $request = GET($url);
 			$request->header('If-Modified-Since' => HTTP::Date::time2str($stat->mtime)) if ($stat);
+
+			$UA = Net::RDAP::UA->new if (!$UA);
 
 			my $response = $UA->request($request);
 

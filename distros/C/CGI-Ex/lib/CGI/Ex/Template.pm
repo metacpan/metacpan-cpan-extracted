@@ -25,7 +25,7 @@ use vars qw($VERSION
             $VOBJS
             );
 
-$VERSION = '2.46';
+$VERSION = '2.47';
 
 ### install true symbol table aliases that can be localized
 *QR_PRIVATE        = *Template::Alloy::QR_PRIVATE;

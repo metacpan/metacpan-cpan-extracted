@@ -178,7 +178,7 @@ use Module::Build::Database::PostgreSQL::Templates;
 use Module::Build::Database::Helpers qw/do_system verify_bin info debug/;
 use strict;
 use warnings;
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 __PACKAGE__->add_property(database_options    => default => { name => "foo", schema => "bar" });
 __PACKAGE__->add_property(database_extensions => default => { postgis => 0 } );
@@ -417,9 +417,6 @@ sub _dump_base_sql {
         and $_ !~ /^CREATE SCHEMA $database_schema;$/
         and $_ !~ /^SET (search_path|lock_timeout)/
     } @lines;
-    for (@lines) {
-        /alter table/i and s/$database_schema\.//;
-    }
     file($outfile)->spew(join '', @lines);
     if (@lines > 0 && !-s $outfile) {
         die "# Unable to write to $outfile";

@@ -13,7 +13,7 @@ use curry;
 
 use MojoX::JSON::RPC::Client;
 
-our $VERSION = '0.09';    ## VERSION
+our $VERSION = '0.11';    ## VERSION
 
 __PACKAGE__->register_type('jsonrpc');
 

@@ -30,7 +30,7 @@ for grep { $_ ne 'all' } keys %EXPORT_TAGS;
 @EXPORT_OK = @{$EXPORT_TAGS{all}};
 @EXPORT = qw(scrubber_init);
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 ###----------------------------------------------------------------###
 
@@ -243,6 +243,16 @@ sub scrubber_remove_signal {
     }
 }
 
+sub _die_signal {
+    @_ = scrubber @_;
+    defined $_SDATA->{'SIG'}{'__DIE__'}{'old'} && $_SDATA->{'SIG'}{'__DIE__'}{'old'} ne '' ? $_SDATA->{'SIG'}{'__DIE__'}{'old'}->(@_) : CORE::die(@_);
+}
+
+sub _warn_signal {
+    @_ = scrubber @_;
+    defined $_SDATA->{'SIG'}{'__WARN__'}{'old'} && $_SDATA->{'SIG'}{'__WARN__'}{'old'} ne '' ? $_SDATA->{'SIG'}{'__WARN__'}{'old'}->(@_) : CORE::warn(@_);
+};
+
 sub _scrubber_enable_signal {
     return if ! $_SDATA->{'enabled'};
     foreach ( @_ ) {
@@ -250,19 +260,8 @@ sub _scrubber_enable_signal {
         next if defined $SIG{$sig_name} && defined $_SDATA->{'SIG'}{$sig_name}{'scrubber'} && $SIG{$sig_name} eq $_SDATA->{'SIG'}{$sig_name}{'scrubber'};
 
         $_SDATA->{'SIG'}{$sig_name}{'old'} = $SIG{$sig_name};
-
-        if ($sig_name eq '__WARN__') {
-            $_SDATA->{'SIG'}{$sig_name}{'scrubber'} = sub {
-                            @_ = scrubber @_;
-                            defined $_SDATA->{'SIG'}{$sig_name}{'old'} && $_SDATA->{'SIG'}{$sig_name}{'old'} ne '' ? $_SDATA->{'SIG'}{$sig_name}{'old'}->(@_) : CORE::warn(@_);
-                        };
-        }
-        if ($sig_name eq '__DIE__') {
-            $_SDATA->{'SIG'}{$sig_name}{'scrubber'} = sub {
-                            @_ = scrubber @_;
-                            defined $_SDATA->{'SIG'}{$sig_name}{'old'} && $_SDATA->{'SIG'}{$sig_name}{'old'} ne '' ? $_SDATA->{'SIG'}{$sig_name}{'old'}->(@_) : CORE::die(@_);
-                        };
-        }
+        $_SDATA->{'SIG'}{$sig_name}{'scrubber'} = \&_warn_signal if $sig_name eq '__WARN__';
+        $_SDATA->{'SIG'}{$sig_name}{'scrubber'} = \&_die_signal if $sig_name eq '__DIE__';
 
         $SIG{$sig_name} = $_SDATA->{'SIG'}{$sig_name}{'scrubber'};
     }

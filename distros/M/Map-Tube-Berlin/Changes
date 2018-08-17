@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+0.17  2018-08-11
+	- data changes:
+	  - U3 now to Warschauer Str.
+
 0.16  2017-12-09
 	- data changes:
 	  - "Fahrplanwechsel": various changes, e.g. new "Ostkreuzkurve"

@@ -1,12 +1,12 @@
 package Spreadsheet::Write::WriteXLS;
-
-use 5.008;
-use base qw'Spreadsheet::Write';
+use strict;
+use warnings;
 
 use Spreadsheet::WriteExcel;
 
-sub new
-{
+use base qw'Spreadsheet::Write';
+
+sub new {
 	my ($class, %args) = @_;
 	my $self = bless {}, $class;
 
@@ -19,14 +19,12 @@ sub new
 	return $self;
 }
 
-sub _prepare
-{
+sub _prepare {
 	my $self = shift;
 	my $worksheet = $self->{'_WORKSHEET'};
 	my $workbook  = $self->{'_WORKBOOK'};
 
-	if(!$worksheet)
-	{
+	if(!$worksheet) {
 		$self->{'_FH'}->binmode();
 		$workbook = Spreadsheet::WriteExcel->new($self->{'_FH'});
 		$self->{'_WORKBOOK'} = $workbook;
@@ -38,16 +36,14 @@ sub _prepare
 	return $self;
 }
 
-sub freeze (@)
-{
+sub freeze (@) {
 	my $self=shift;
 	$self->_open() || return undef;
 	$self->{'_WORKSHEET'}->freeze_panes(@_);
 	return $self;
 }
 
-sub close
-{
+sub close {
 	my $self=shift;
 
 	return if $self->{'_CLOSED'};
@@ -62,26 +58,22 @@ sub close
 	return $self;
 }
 
-sub _format_cache($$)
-{
+sub _format_cache($$) {
 	my ($self, $format) = @_;
 
 	my $cache_key='';
-	foreach my $key (sort keys %$format)
-	{
+	foreach my $key (sort keys %$format) {
 		$cache_key .= $key . $format->{$key};
 	}
 
-	if(exists($self->{'_FORMAT_CACHE'}->{$cache_key}))
-	{
+	if(exists($self->{'_FORMAT_CACHE'}->{$cache_key})) {
 		return $self->{'_FORMAT_CACHE'}->{$cache_key};
 	}
 
 	return $self->{'_FORMAT_CACHE'}->{$cache_key} = $self->{'_WORKBOOK'}->add_format(%$format);
 }
 
-sub addsheet ($$)
-{
+sub addsheet ($$) {
 	my ($self,$name)=@_;
 
 	$self->_open() || return undef;
@@ -94,8 +86,7 @@ sub addsheet ($$)
 	return $self;
 }
 
-sub _add_prepared_row
-{
+sub _add_prepared_row {
 	my $self = shift;
 
 	my $worksheet = $self->{'_WORKSHEET'};
@@ -103,11 +94,7 @@ sub _add_prepared_row
 	my $row       = $self->{'_WORKBOOK_ROW'};
 	my $col       = 0;
 
-    scalar(@_) < 256 ||
-        die "Excel'97 back-end does not support rows 256 elements or longer";
-
-	for(my $i=0; $i<scalar(@_); $i++)
-	{
+	for(my $i=0; $i<scalar(@_); $i++) {
 		my %props = %{ $_[$i] };
 		my $value = $props{'content'};
 
@@ -115,10 +102,8 @@ sub _add_prepared_row
 		my $props = \%props;
 
 		my %format;
-		if(%props)
-		{
-			if(my $stylelist = $props->{'style'})
-			{
+		if(%props) {
+			if(my $stylelist = $props->{'style'}) {
                 $stylelist=[$stylelist] unless ref $stylelist;
 
                 foreach my $style (ref $stylelist ? @$stylelist : ($stylelist)) {
@@ -135,56 +120,43 @@ sub _add_prepared_row
                 }
 			}
 
-			if ($props->{'font_weight'} eq 'bold')
-			{
+			if(defined $props->{'font_weight'} && $props->{'font_weight'} eq 'bold') {
 				$format{'bold'} = 1;
 			}
-			if ($props->{'font_style'} eq 'italic')
-			{
+			if(defined $props->{'font_style'} && $props->{'font_style'} eq 'italic') {
 				$format{'italic'} = 1;
 			}
-			if ($props->{'font_decoration'} =~ m'underline')
-			{
+			if(defined $props->{'font_decoration'} && $props->{'font_decoration'} =~ m'underline') {
 				$format{'underline'} = 1;
 			}
-			if ($props->{'font_decoration'} =~ m'strikeout')
-			{
+			if(defined $props->{'font_decoration'} && $props->{'font_decoration'} =~ m'strikeout') {
 				$format{'font_strikeout'} = 1;
 			}
-			if (defined $props->{'font_color'})
-			{
+			if(defined $props->{'font_color'}) {
 				$format{'color'} = $props->{'font_color'};
 			}
-            if (defined $props->{'bg_color'})
-            {
+            if (defined $props->{'bg_color'}) {
                 $format{'bg_color'} = $props->{'bg_color'};
             }
-			if (defined $props->{'font_face'})
-			{
+			if (defined $props->{'font_face'}) {
 				$format{'font'}=$props->{'font_face'};
 			}
-			if (defined $props->{'font_size'})
-			{
+			if (defined $props->{'font_size'}) {
 				$format{'size'}=$props->{'font_size'};
 			}
-			if (defined $props->{'align'})
-			{
+			if (defined $props->{'align'}) {
 				$format{'align'}=$props->{'align'};
 			}
-			if (defined $props->{'valign'})
-			{
+			if (defined $props->{'valign'}) {
 				$format{'valign'}=$props->{'valign'};
 			}
-			if (defined $props->{'format'})
-			{
+			if (defined $props->{'format'}) {
 				$format{'num_format'} = $props->{'format'};
 			}
-			if (defined $props->{'width'})
-			{
+			if (defined $props->{'width'}) {
 				$worksheet->set_column($col,$col,$props->{'width'});
 			}
-            if (defined $props->{'comment'} && length($props->{'comment'}))
-            {
+            if (defined $props->{'comment'} && length($props->{'comment'})) {
                 $worksheet->write_comment($row,$col,$props->{'comment'});
             }
 		}
@@ -192,7 +164,7 @@ sub _add_prepared_row
 		my @params = ($row, $col++, $value);
 		push @params, $self->_format_cache(\%format) if keys %format;
 
-		my $type = lc $props->{'type'} || 'auto';
+		my $type = lc ($props->{'type'} || 'auto');
 		if    ($type eq 'auto')      { $worksheet->write(@params); }
 		elsif ($type eq 'string')    { $worksheet->write_string(@params); }
 		elsif ($type eq 'text')      { $worksheet->write_string(@params); }
@@ -200,8 +172,7 @@ sub _add_prepared_row
 		elsif ($type eq 'blank')     { $worksheet->write_blank(@params); }
 		elsif ($type eq 'formula')   { $worksheet->write_formula(@params); }
 		elsif ($type eq 'url')       { $worksheet->write_url(@params); }
-		else
-		{
+		else {
 			warn "Unknown cell type $type";
 			$worksheet->write(@params);
 		}

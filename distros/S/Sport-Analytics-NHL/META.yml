@@ -16,7 +16,7 @@ name: Sport-Analytics-NHL
 provides:
   Sport::Analytics::NHL:
     file: lib/Sport/Analytics/NHL.pm
-    version: '1.31'
+    version: '1.40'
   Sport::Analytics::NHL::Config:
     file: lib/Sport/Analytics/NHL/Config.pm
   Sport::Analytics::NHL::DB:
@@ -29,6 +29,8 @@ provides:
     file: lib/Sport/Analytics/NHL/Merger.pm
   Sport::Analytics::NHL::Normalizer:
     file: lib/Sport/Analytics/NHL/Normalizer.pm
+  Sport::Analytics::NHL::Populator:
+    file: lib/Sport/Analytics/NHL/Populator.pm
   Sport::Analytics::NHL::Report:
     file: lib/Sport/Analytics/NHL/Report.pm
   Sport::Analytics::NHL::Report::BH:
@@ -41,6 +43,8 @@ provides:
     file: lib/Sport/Analytics/NHL/Report/GS.pm
   Sport::Analytics::NHL::Report::PL:
     file: lib/Sport/Analytics/NHL/Report/PL.pm
+  Sport::Analytics::NHL::Report::Player:
+    file: lib/Sport/Analytics/NHL/Report/Player.pm
   Sport::Analytics::NHL::Report::RO:
     file: lib/Sport/Analytics/NHL/Report/RO.pm
   Sport::Analytics::NHL::Scraper:
@@ -81,5 +85,5 @@ requires:
   boolean: v0.28.4
   experimental: '0.016'
   parent: '0'
-version: '1.31'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

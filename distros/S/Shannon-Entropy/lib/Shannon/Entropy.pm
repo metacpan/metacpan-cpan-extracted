@@ -8,7 +8,7 @@ use Import::Export;
 
 use base qw/Import::Export/;
 
-our $VERSION = '1.000000';
+our $VERSION = '1.010101';
 
 our %EX = (
 	entropy => [qw/all/]
@@ -16,7 +16,7 @@ our %EX = (
 
 sub entropy {
 	my ($entropy, $len, $p, %t) = (0, length($_[0]));
-	return ((map { $p = $_/$len; $entropy -= $p * log $p } (map { $t{$_}++ } split '', $_[0]) && values %t) and $entropy / log 2);
+	return (map { $p = $_/$len; $entropy -= $p * log $p } (map { $t{$_}++ } split '', $_[0]) ? values %t : () and $entropy / log 2);
 }
 
 =head1 NAME
@@ -25,7 +25,7 @@ Shannon::Entropy - Calculate the Shannon entropy H of a given input string.
 
 =head1 VERSION
 
-Version 1.000000
+Version 1.010101
 
 =cut
 
@@ -37,6 +37,8 @@ Calculate the Shannon entropy H of a given input string.
 
 	entropy('1223334444'); # 1.8464393446710154
 	entropy('0123456789abcdef'); # 4
+
+=head2 entropy
 
 =head1 AUTHOR
 
@@ -80,7 +82,7 @@ L<http://search.cpan.org/dist/Shannon-Entropy/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2018 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -15,7 +15,7 @@ configure_requires:
   Module::Build: '0.3601'
   perl: '5.008001'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/Perl5-FFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/Perl5-FFI/FFI-Platypus.git
-version: '0.50'
+version: '0.53'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'
@@ -47,5 +47,6 @@ x_contributors:
   - 'Shlomi Fish (shlomif)'
   - 'Damyan Ivanov'
   - 'Ilya Pavlov (Ilya33)'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

@@ -7,10 +7,10 @@ use EventStore::Tiny;
 use File::Temp qw(tmpnam);
 use Storable;
 
-# prepare a test event store
+# Prepare a test event store
 my $es = EventStore::Tiny->new(logger => undef);
 
-# prepare events
+# Prepare events
 $es->register_event(FooTested => sub {
     my ($state, $data) = @_;
     $state->{$data->{name}} = 17;
@@ -31,7 +31,7 @@ sub test_events {
     my ($name, $store) = @_;
     subtest "$name events" => sub {
 
-    # test resulting events
+    # Test resulting events
     is $es->events->size => 3, 'Got 3 events';
     my $e1 = $es->events->events->[0];
     is $e1->name => 'FooTested', 'Correct first event name';
@@ -46,23 +46,23 @@ sub test_events {
     is_deeply $e3->data => {quux => 666},
         'Correct third event data';
 
-    # test resulting state
+    # Test resulting state
     is_deeply $es->snapshot->state => {
         test_field  => 42,
         quux        => 666,
     }, 'Correct state data after event application';
 }}
 
-# test prepared events
+# Test prepared events
 test_events(Prepared => $es);
 
-# store and load roundtrip
+# Store and load roundtrip
 my $tmp_fn = tmpnam;
 $es->store_to_file($tmp_fn);
 my $nes = EventStore::Tiny->new_from_file($tmp_fn);
 isa_ok $nes => 'EventStore::Tiny';
 
-# test loaded events
+# Test loaded events
 test_events(Loaded => $nes);
 
 done_testing;

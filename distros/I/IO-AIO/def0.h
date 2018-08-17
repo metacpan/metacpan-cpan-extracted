@@ -48,6 +48,9 @@
 #ifndef POSIX_MADV_DONTNEED
 #define POSIX_MADV_DONTNEED 0
 #endif
+#ifndef O_ACCMODE
+#define O_ACCMODE 0
+#endif
 #ifndef O_RDONLY
 #define O_RDONLY 0
 #endif
@@ -228,6 +231,186 @@
 #ifndef MAP_STACK
 #define MAP_STACK 0
 #endif
+#ifndef MREMAP_MAYMOVE
+#define MREMAP_MAYMOVE 0
+#endif
+#ifndef MREMAP_FIXED
+#define MREMAP_FIXED 0
+#endif
+#ifndef F_DUPFD_CLOEXEC
+#define F_DUPFD_CLOEXEC 0
+#endif
+#ifndef MSG_CMSG_CLOEXEC
+#define MSG_CMSG_CLOEXEC 0
+#endif
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC 0
+#endif
+#ifndef F_OFD_GETLK
+#define F_OFD_GETLK 0
+#endif
+#ifndef F_OFD_SETLK
+#define F_OFD_SETLK 0
+#endif
+#ifndef F_OFD_GETLKW
+#define F_OFD_GETLKW 0
+#endif
+#ifndef FIFREEZE
+#define FIFREEZE 0
+#endif
+#ifndef FITHAW
+#define FITHAW 0
+#endif
+#ifndef FITRIM
+#define FITRIM 0
+#endif
+#ifndef FICLONE
+#define FICLONE 0
+#endif
+#ifndef FICLONERANGE
+#define FICLONERANGE 0
+#endif
+#ifndef FIDEDUPERANGE
+#define FIDEDUPERANGE 0
+#endif
+#ifndef FS_IOC_GETFLAGS
+#define FS_IOC_GETFLAGS 0
+#endif
+#ifndef FS_IOC_SETFLAGS
+#define FS_IOC_SETFLAGS 0
+#endif
+#ifndef FS_IOC_GETVERSION
+#define FS_IOC_GETVERSION 0
+#endif
+#ifndef FS_IOC_SETVERSION
+#define FS_IOC_SETVERSION 0
+#endif
+#ifndef FS_IOC_FIEMAP
+#define FS_IOC_FIEMAP 0
+#endif
+#ifndef FS_IOC_FSGETXATTR
+#define FS_IOC_FSGETXATTR 0
+#endif
+#ifndef FS_IOC_FSSETXATTR
+#define FS_IOC_FSSETXATTR 0
+#endif
+#ifndef FS_IOC_SET_ENCRYPTION_POLICY
+#define FS_IOC_SET_ENCRYPTION_POLICY 0
+#endif
+#ifndef FS_IOC_GET_ENCRYPTION_PWSALT
+#define FS_IOC_GET_ENCRYPTION_PWSALT 0
+#endif
+#ifndef FS_IOC_GET_ENCRYPTION_POLICY
+#define FS_IOC_GET_ENCRYPTION_POLICY 0
+#endif
+#ifndef FS_KEY_DESCRIPTOR_SIZE
+#define FS_KEY_DESCRIPTOR_SIZE 0
+#endif
+#ifndef FS_SECRM_FL
+#define FS_SECRM_FL 0
+#endif
+#ifndef FS_UNRM_FL
+#define FS_UNRM_FL 0
+#endif
+#ifndef FS_COMPR_FL
+#define FS_COMPR_FL 0
+#endif
+#ifndef FS_SYNC_FL
+#define FS_SYNC_FL 0
+#endif
+#ifndef FS_IMMUTABLE_FL
+#define FS_IMMUTABLE_FL 0
+#endif
+#ifndef FS_APPEND_FL
+#define FS_APPEND_FL 0
+#endif
+#ifndef FS_NODUMP_FL
+#define FS_NODUMP_FL 0
+#endif
+#ifndef FS_NOATIME_FL
+#define FS_NOATIME_FL 0
+#endif
+#ifndef FS_DIRTY_FL
+#define FS_DIRTY_FL 0
+#endif
+#ifndef FS_COMPRBLK_FL
+#define FS_COMPRBLK_FL 0
+#endif
+#ifndef FS_NOCOMP_FL
+#define FS_NOCOMP_FL 0
+#endif
+#ifndef FS_ENCRYPT_FL
+#define FS_ENCRYPT_FL 0
+#endif
+#ifndef FS_BTREE_FL
+#define FS_BTREE_FL 0
+#endif
+#ifndef FS_INDEX_FL
+#define FS_INDEX_FL 0
+#endif
+#ifndef FS_JOURNAL_DATA_FL
+#define FS_JOURNAL_DATA_FL 0
+#endif
+#ifndef FS_NOTAIL_FL
+#define FS_NOTAIL_FL 0
+#endif
+#ifndef FS_DIRSYNC_FL
+#define FS_DIRSYNC_FL 0
+#endif
+#ifndef FS_TOPDIR_FL
+#define FS_TOPDIR_FL 0
+#endif
+#ifndef FS_FL_USER_MODIFIABLE
+#define FS_FL_USER_MODIFIABLE 0
+#endif
+#ifndef FS_XFLAG_REALTIME
+#define FS_XFLAG_REALTIME 0
+#endif
+#ifndef FS_XFLAG_PREALLOC
+#define FS_XFLAG_PREALLOC 0
+#endif
+#ifndef FS_XFLAG_IMMUTABLE
+#define FS_XFLAG_IMMUTABLE 0
+#endif
+#ifndef FS_XFLAG_APPEND
+#define FS_XFLAG_APPEND 0
+#endif
+#ifndef FS_XFLAG_SYNC
+#define FS_XFLAG_SYNC 0
+#endif
+#ifndef FS_XFLAG_NOATIME
+#define FS_XFLAG_NOATIME 0
+#endif
+#ifndef FS_XFLAG_NODUMP
+#define FS_XFLAG_NODUMP 0
+#endif
+#ifndef FS_XFLAG_RTINHERIT
+#define FS_XFLAG_RTINHERIT 0
+#endif
+#ifndef FS_XFLAG_PROJINHERIT
+#define FS_XFLAG_PROJINHERIT 0
+#endif
+#ifndef FS_XFLAG_NOSYMLINKS
+#define FS_XFLAG_NOSYMLINKS 0
+#endif
+#ifndef FS_XFLAG_EXTSIZE
+#define FS_XFLAG_EXTSIZE 0
+#endif
+#ifndef FS_XFLAG_EXTSZINHERIT
+#define FS_XFLAG_EXTSZINHERIT 0
+#endif
+#ifndef FS_XFLAG_NODEFRAG
+#define FS_XFLAG_NODEFRAG 0
+#endif
+#ifndef FS_XFLAG_FILESTREAM
+#define FS_XFLAG_FILESTREAM 0
+#endif
+#ifndef FS_XFLAG_DAX
+#define FS_XFLAG_DAX 0
+#endif
+#ifndef FS_XFLAG_HASATTR
+#define FS_XFLAG_HASATTR 0
+#endif
 #ifndef FIEMAP_FLAG_SYNC
 #define FIEMAP_FLAG_SYNC 0
 #endif
@@ -281,4 +464,40 @@
 #endif
 #ifndef SPLICE_F_GIFT
 #define SPLICE_F_GIFT 0
+#endif
+#ifndef EFD_CLOEXEC
+#define EFD_CLOEXEC 0
+#endif
+#ifndef EFD_NONBLOCK
+#define EFD_NONBLOCK 0
+#endif
+#ifndef EFD_SEMAPHORE
+#define EFD_SEMAPHORE 0
+#endif
+#ifndef CLOCK_REALTIME
+#define CLOCK_REALTIME 0
+#endif
+#ifndef CLOCK_MONOTONIC
+#define CLOCK_MONOTONIC 0
+#endif
+#ifndef CLOCK_BOOTTIME
+#define CLOCK_BOOTTIME 0
+#endif
+#ifndef CLOCK_REALTIME_ALARM
+#define CLOCK_REALTIME_ALARM 0
+#endif
+#ifndef CLOCK_BOOTTIME_ALARM
+#define CLOCK_BOOTTIME_ALARM 0
+#endif
+#ifndef TFD_NONBLOCK
+#define TFD_NONBLOCK 0
+#endif
+#ifndef TFD_CLOEXEC
+#define TFD_CLOEXEC 0
+#endif
+#ifndef TFD_TIMER_ABSTIME
+#define TFD_TIMER_ABSTIME 0
+#endif
+#ifndef TFD_TIMER_CANCEL_ON_SET
+#define TFD_TIMER_CANCEL_ON_SET 0
 #endif

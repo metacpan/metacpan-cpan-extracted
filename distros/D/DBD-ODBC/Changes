@@ -5,6 +5,13 @@ use strict;
 
 DBD::ODBC::Changes - Log of significant changes to the DBD::ODBC
 
+1.59 2018-08-10
+
+  [BUG FIXES]
+
+  git issue 8. Setting odbc_utf8_on didn't work properly. Thanks to David Wheeler for
+  reporting and helping to debug.
+
 1.58 2018-03-01
 
   [MISCELLANEOUS]

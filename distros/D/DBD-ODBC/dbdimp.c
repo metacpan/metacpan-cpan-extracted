@@ -6871,18 +6871,18 @@ static int post_connect(
     /* odbc_utf8_on */
     {
         SV **svp;
-        IV column_display_size_value;
+        IV utf8_on_value;
 
         DBD_ATTRIB_GET_IV(
             attr, "odbc_utf8_on",
             strlen("odbc_utf8_on"),
-            svp, column_display_size_value);
+            svp, utf8_on_value);
         if (svp) {
-            imp_dbh->odbc_utf8_on = 0;
+            imp_dbh->odbc_utf8_on = utf8_on_value;
             if (DBIc_TRACE(imp_dbh, CONNECTION_TRACING, 0, 0))
                 TRACE1(imp_dbh,
                        "    Setting UTF8_ON to %d\n",
-                       (int)column_display_size_value);
+                       (int)utf8_on_value);
             /* delete odbc_utf8_on so we don't see it again via STORE */
             (void)hv_delete((HV*)SvRV(attr), "odbc_utf8_on",
                             strlen("odbc_utf8_on"), G_DISCARD);

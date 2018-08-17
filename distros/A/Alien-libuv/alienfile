@@ -2,40 +2,24 @@ use alienfile;
 use Config;
 
 sub WINVER() {
-    return undef unless $^O eq 'MSWin32';
+    # we're already bailing in the Makefile.PL on any version < 6
     my $ver;
     my $err = do {
         local $@;
         eval { require Win32; $ver = Win32::GetOSName(); 1; };
         $@;
     };
-    $ver = 'Win10' unless $ver; # just pick one if we couldn't find it
-    if ($err) {
-        warn "We had an error grabbing the Win32 OS Name: $err";
-    }
+    # if we're unable to determine a version, just go with 0x0603
+    return '0x0603' if $err || !$ver;
 
-    my $err_msg = "This version of Windows is no longer supported. See: ";
-    $err_msg .= "https://github.com/libuv/libuv/blob/v1.x/SUPPORTED_PLATFORMS.md";
-
-    if ($ver =~ /^Win(?:Win32s|95|98|Me|NT4|NT3\.51|HomeSvr)/) {
-        warn $err_msg;
-        exit(1);
-    }
-    if ($ver =~ /^Win(?:200[038]|XP\/\.NET|Vista)/) {
-        warn $err_msg. "\nBut we'll attempt a build anyway.";
-    }
-    return '0x0500' if $ver =~ /^Win2000/;
-    return '0x0501' if $ver =~ /^WinXP\/\.Net/;
-    return '0x0502' if $ver =~ /^Win2003/;
     return '0x0600' if $ver =~ /^Win(?:Vista|2008)/;
     return '0x0601' if $ver =~ /^Win7/;
     return '0x0603' if $ver =~ /^Win8\.1/;
     return '0x0602' if $ver =~ /^Win8/;
-    return '0x0A00' if $ver =~ /^Win10/;
-    return '0x0A00' if $ver =~ /^Win(?:2012|2014|2016)/; # not sure here
-
-    warn "We couldn't determine the version of Windows you're on.";
-    return undef;
+    return '0x0603';
+    # no point in telling it about Win10 as it's all a lie at this point anyway
+    # return '0x0A00' if $ver =~ /^Win10/;
+    # return '0x0A00' if $ver =~ /^Win(?:2012|2014|2016)/; # not sure here
 }
 
 configure { requires 'Alien::Build::Plugin::Build::Make' => '0.01' };

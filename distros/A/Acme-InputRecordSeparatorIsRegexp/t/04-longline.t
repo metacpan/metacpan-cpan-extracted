@@ -1,5 +1,5 @@
 use Test::More;
-use Acme::InputRecordSeparatorIsRegexp;
+use Acme::InputRecordSeparatorIsRegexp 'open';
 use strict;
 use warnings;
 
@@ -21,10 +21,9 @@ open my $xx, '>', 't/test04.txt';
 print $xx $yy;
 close $xx;
 
-my $fh = Acme::InputRecordSeparatorIsRegexp->open( 
-    '\r\n|\r|\n', '<', 't/test04.txt',
-    { maxrecsize => 100 } );
-ok($fh, 'Acme::InputRecordSeparatorIsRegexp::open ok');
+my $z = open(my $fh, "<:irs(\r\n|\r|\n)", "t/test04.txt");
+(tied *$fh)->{maxrecsize} = 100;
+ok($z, 'Acme::InputRecordSeparatorIsRegexp::open ok');
 ok(tied(*$fh), 'return tied handle');
 
 my (@tell, @seek);

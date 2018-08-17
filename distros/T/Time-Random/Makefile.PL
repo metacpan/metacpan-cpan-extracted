@@ -16,7 +16,8 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
-    },
+        'Time::Piece' => '0',
+	},
     PREREQ_PM => {
         'Time::Piece'	=> '0',
         'Import::Export' => '0.04',

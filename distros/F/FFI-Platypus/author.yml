@@ -87,7 +87,14 @@ pod_spelling_system:
     - shlomif
     - seg
     - pthreads
-
+    - UNIXen
+    - dlclose
+    - dlerror
+    - dlopen
+    - dlsym
+    - libdl
+    - or'd
+    - customizations
 
 pod_coverage:
   skip: 0

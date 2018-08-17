@@ -7,7 +7,7 @@ use File::Temp qw(tempfile);
 use EventStore::Tiny;
 use EventStore::Tiny::DataEvent;
 
-# prepare test "file handle"
+# Prepare test "file handle"
 package TestFileHandle;
 use Class::Tiny {history => sub {[]}};
 sub print {push @{shift->history}, shift}
@@ -18,11 +18,11 @@ package main;
 subtest 'Default logger' => sub {
     my $print_target = TestFileHandle->new;
 
-    # prepare logger
+    # Prepare logger
     use_ok 'EventStore::Tiny::Logger';
     my $logger = EventStore::Tiny::Logger->new(print_target => $print_target);
 
-    # log a dummy event type (shouldn't happen)
+    # Log a dummy event type (shouldn't happen)
     subtest 'Dummy event type' => sub {
 
         $logger->log_event(EventStore::Tiny::Event->new(
@@ -34,7 +34,7 @@ subtest 'Default logger' => sub {
             'Correct event type string representation logged';
     };
 
-    # log a dummy event
+    # Log a dummy event
     subtest 'Dummy event' => sub {
         $logger->log_event(EventStore::Tiny::DataEvent->new(
             name => 'TestEventStored',
@@ -50,17 +50,17 @@ subtest 'Default logger' => sub {
 
         subtest 'Method call' => sub {
 
-            # generate
+            # Generate
             my $log_cb = $logger->log_cb;
             is ref($log_cb) => 'CODE', 'Subroutine reference generated';
 
-            # log a dummy event
+            # Log a dummy event
             $log_cb->(EventStore::Tiny::DataEvent->new(
                 name => 'TestEventStored',
                 data => {foo => 1, bar => 2},
             ));
 
-            # test
+            # Test
             is $print_target->length => 3, 'Correct event history size';
             my $log_str = $print_target->history->[2];
             is $log_str => "TestEventStored: { bar => 2, foo => 1 }\n",
@@ -69,18 +69,18 @@ subtest 'Default logger' => sub {
 
         subtest 'Package subroutine call' => sub {
 
-            # generate
+            # Generate
             my $log_cb = EventStore::Tiny::Logger->log_cb(
                 print_target => $print_target
             );
 
-            # log a dummy event
+            # Log a dummy event
             $log_cb->(EventStore::Tiny::DataEvent->new(
                 name => 'TestEventStored',
                 data => {bar => 2, baz => 3},
             ));
 
-            # test
+            # Test
             is $print_target->length => 4, 'Correct event history size';
             my $log_str = $print_target->history->[3];
             is $log_str => "TestEventStored: { bar => 2, baz => 3 }\n",
@@ -90,24 +90,24 @@ subtest 'Default logger' => sub {
 
     subtest 'Default logging target STDOUT' => sub {
 
-        # redirect STDOUT
+        # Redirect STDOUT
         my ($tmp_fh, $tmp_fn) = tempfile;
         select $tmp_fh;
 
-        # create without print target
+        # Create without print target
         my $logger = EventStore::Tiny::Logger->new;
 
-        # log a dummy event
+        # Log a dummy event
         $logger->log_event(EventStore::Tiny::DataEvent->new(
             name => 'TestEventStored',
             data => {baz => 17, quux => 42},
         ));
 
-        # restore STDOUT
+        # Restore STDOUT
         select STDOUT;
         close $tmp_fh;
 
-        # check results in temporary file
+        # Check results in temporary file
         open $tmp_fh, '<', $tmp_fn or die "Couldn't open $tmp_fn: $!\n";
         my $tmp = do {local $/; <$tmp_fh>};
         is $tmp => "TestEventStored: { baz => 17, quux => 42 }\n",
@@ -120,12 +120,12 @@ subtest 'Integration' => sub {
 
     subtest 'Direct event application logging' => sub {
 
-        # prepare logger
+        # Prepare logger
         my $logger = EventStore::Tiny::Logger->new(print_target => $print_target);
 
         subtest 'Event Type' => sub {
 
-            # prepare event
+            # Prepare event
             my $event = EventStore::Tiny::Event->new(
                 name            => 'Foo',
                 transformation  => sub {shift->{foo} = 42},
@@ -150,7 +150,7 @@ subtest 'Integration' => sub {
 
         subtest 'Data Event' => sub {
 
-            # prepare
+            # Prepare
             my $event = EventStore::Tiny::DataEvent->new(
                 name            => 'Bar',
                 data            => {add => 2},
@@ -179,7 +179,7 @@ subtest 'Integration' => sub {
         };
     };
 
-    # prepare integration into event store
+    # Prepare integration into event store
     $print_target = TestFileHandle->new;
     my $es = EventStore::Tiny->new(
         logger => EventStore::Tiny::Logger->log_cb(
@@ -187,12 +187,12 @@ subtest 'Integration' => sub {
         ),
     );
 
-    # log and apply a dummy event
+    # Log and apply a dummy event
     $es->register_event(TestEventStored => sub {});
     $es->store_event(TestEventStored => {x => 'y', p => 'q'});
     $es->snapshot;
 
-    # test
+    # Test
     is $print_target->length => 1, 'Correct event history size';
     my $log_str = $print_target->history->[0];
     is $log_str => "TestEventStored: { p => \"q\", x => \"y\" }\n",
@@ -200,7 +200,7 @@ subtest 'Integration' => sub {
 
     subtest 'Update logger' => sub {
 
-        # prepare new logger
+        # Prepare new logger
         my $tmp_print_target = TestFileHandle->new;
         my $logger = EventStore::Tiny::Logger->log_cb(
             print_target => $tmp_print_target,
@@ -208,20 +208,20 @@ subtest 'Integration' => sub {
 
         subtest 'Update' => sub {
 
-            # inject
+            # Inject
             $es->logger($logger);
 
-            # add another event
+            # Add another event
             $es->store_event(TestEventStored => {x => 'q', p => 'y'});
             $es->snapshot;
 
-            # old logger unchanged
+            # Old logger unchanged
             is $print_target->length => 1, 'Correct old history size';
             my $log_str = $print_target->history->[0];
             is $log_str => "TestEventStored: { p => \"q\", x => \"y\" }\n",
                 'Correct event string representation logged';
 
-            # new logger changed
+            # New logger changed
             is $tmp_print_target->length => 1, 'Correct new history size';
             my $tmp_log_str = $tmp_print_target->history->[0];
             is $tmp_log_str => "TestEventStored: { p => \"y\", x => \"q\" }\n",
@@ -230,16 +230,16 @@ subtest 'Integration' => sub {
 
         subtest 'Remove' => sub {
 
-            # remove
+            # Remove
             $es->logger(undef);
 
-            # old logger unchanged
+            # Old logger unchanged
             is $print_target->length => 1, 'Correct old history size';
             my $log_str = $print_target->history->[0];
             is $log_str => "TestEventStored: { p => \"q\", x => \"y\" }\n",
                 'Correct event string representation logged';
 
-            # new logger changed
+            # New logger changed
             is $tmp_print_target->length => 1, 'Correct new history size';
             my $tmp_log_str = $tmp_print_target->history->[0];
             is $tmp_log_str => "TestEventStored: { p => \"y\", x => \"q\" }\n",

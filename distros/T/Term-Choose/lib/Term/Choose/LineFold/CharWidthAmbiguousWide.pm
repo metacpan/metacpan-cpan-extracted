@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.622';
+our $VERSION = '1.625';
 
 use Exporter qw( import );
 
@@ -12,6 +12,7 @@ our @EXPORT_OK = qw( table_char_width );
 
 # *) filtered away with: $s =~ s/\p{Space}/ /; $s =~ s/\p{C}//;
 # else range commented out default to 1
+# test with gnome-terminal - ambiguous characters set to wide
 
 
 sub table_char_width { [

@@ -33,5 +33,3 @@ Inserts a OODoc document at location.
 If there is any style associated with the `$oodoc_element`, than that will be
 used for styling the document to be inserted. Otherwise, it will use default
 body styles instead.
-
-# CAVEAT

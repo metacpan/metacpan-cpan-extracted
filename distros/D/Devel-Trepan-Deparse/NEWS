@@ -1,4 +1,11 @@
-4.0.0 06/04/2018 MF
+3.1.0 08/12/2018
+- Fix up stack handling and correct testing
+- Add --previous option on deparse command
+- handle Callstack Frames  better
+- add -f | --function option
+- Minor fixes
+
+3.0.0 06/04/2018 MF
 
 - Revise for B::DeparseTree 3.2.0.
 - Much better interface and deparse options now

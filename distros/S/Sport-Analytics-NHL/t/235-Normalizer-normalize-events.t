@@ -58,7 +58,6 @@ for my $event (@{$boxscore->{events}}) {
 	TEST_EVENT:
 	for ($event->{type}) {
 		when ('GOAL') {
-#			print "R $round R2 $repeat_2\n";
 			Sport::Analytics::NHL::Normalizer::normalize_goal_event($event) unless $repeat_2;
 			for my $field (qw(en player1 player2 gwg penaltyshot)) {
 				like($event->{$field}, qr/^0|1|(\d{7})$/, "goal $field ok")

@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.17';
+our $VERSION = '1.20';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -131,10 +131,11 @@ sub new {
 	}
 
 	@{ $self->{results} } = grep {
-		my $d
-		  = ( $_->departure // $_->arrival )
-		  ->subtract_datetime( $self->{datetime} );
-		not $d->is_negative and $d->in_units('minutes') < $self->{lookahead}
+		my $d = ( $_->departure // $_->arrival );
+		my $sd = $_->sched_departure // $_->sched_arrival // $d;
+		$d  = $d->subtract_datetime( $self->{datetime} );
+		$sd = $sd->subtract_datetime( $self->{datetime} );
+		not $d->is_negative and $sd->in_units('minutes') < $self->{lookahead}
 	} @{ $self->{results} };
 
 	@{ $self->{results} }
@@ -575,7 +576,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.17
+version 1.20
 
 =head1 DESCRIPTION
 
@@ -607,7 +608,8 @@ IRIS base url, defaults to C<< http://iris.noncd.db.de/iris-tts/timetable >>.
 
 =item B<lookahead> => I<int>
 
-Compute only results which are less than I<int> minutes in the future.
+Compute only results which are scheduled less than I<int> minutes in the
+future.
 Default: 180 (3 hours).
 
 Note that the DeutscheBahn IRIS backend only provides schedules up to four to

@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Net-OpenNebula,
-version 0.311.0:
+version 0.313.0:
 
   Access OpenNebula RPC via Perl.
 
-This software is Copyright (c) 2017 by Jan Gehring.
+This software is Copyright (c) 2018 by Jan Gehring.
 
 This is free software, licensed under:
 

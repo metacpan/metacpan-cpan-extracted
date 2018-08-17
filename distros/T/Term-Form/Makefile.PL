@@ -52,7 +52,6 @@ WriteMakefile(
         'Term::Choose::Linux'     => '1.607',
         'Term::Choose::Win32'     => '1.607',
         'Term::Choose::Constants' => '1.607',
-        'Unicode::GCString'       => 0,
         %prereqs_os_specific,
     },
     dist  => {

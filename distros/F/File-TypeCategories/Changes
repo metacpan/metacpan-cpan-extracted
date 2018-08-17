@@ -1,5 +1,11 @@
 Revision history for File-TypeCategories
 
+0.07   2018-08-12
+        Updating for release of version 0.07
+        Fixning dependencies (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.06   2016-11-20
         Updating for release of version 0.06
         Skipping processing dir if it doesn't exist (Ivan Wills)

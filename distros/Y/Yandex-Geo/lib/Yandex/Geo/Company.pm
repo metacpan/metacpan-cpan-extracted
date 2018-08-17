@@ -1,17 +1,36 @@
 # ABSTRACT: Convenient representation of company from Yandex Maps
 
 package Yandex::Geo::Company;
-$Yandex::Geo::Company::VERSION = '0.02';
+$Yandex::Geo::Company::VERSION = '0.07';
+use strict;
+use warnings;
 
 
-use Object::Tiny qw{ name phones links url vk address postalCode };
+use Class::Tiny
+  qw{ id name shortName phones postalCode address url vk instagram links longitude latitude };
 use JSON::XS;
+
+
+sub properties {
+
+    # my $self = shift;
+    return {
+        # set => [ sort keys $self ],
+        all => [
+            qw{ id name shortName phones postalCode address url vk instagram links longitude latitude }
+        ],
+        string => [
+            qw/id name shortName url address postalCode vk instagram longitude latitude/
+        ],
+        array => [qw/phones links/]    # real properties in capital case
+    };
+}
 
 
 sub from_geo_json {
     my $feature_collection = shift;
 
-    my @res;
+    my @result;
 
     for my $f ( @{ $feature_collection->features } ) {
 
@@ -19,17 +38,26 @@ sub from_geo_json {
 
         my $h = {};
 
-        for (qw/id name shortName url address postalCode/) {
+        for ( @{ __PACKAGE__->properties->{string} } ) {
             $h->{$_} = $company_meta->{$_};
         }
 
         push @{ $h->{phones} }, $_->{formatted}
           for ( @{ $company_meta->{Phones} } );
         push @{ $h->{links} }, $_->{href} for ( @{ $company_meta->{Links} } );
+
         my $vk_link =
           ( grep { $_->{aref} eq '#vkontakte' } @{ $company_meta->{Links} } )
           [0];
         $h->{vk} = $vk_link->{href} if defined $vk_link;
+
+        my $inst_link =
+          ( grep { $_->{aref} eq '#instagram' } @{ $company_meta->{Links} } )
+          [0];
+        $h->{instagram} = $inst_link->{href} if defined $inst_link;
+
+        $h->{longitude} = $f->geometry->coordinates->[1];
+        $h->{latitude}  = $f->geometry->coordinates->[0];
 
         my $company_obj = __PACKAGE__->new(%$h);
 
@@ -55,7 +83,7 @@ sub from_json {
         my $company_meta = $f->{properties}{CompanyMetaData};
         my $h            = {};
 
-        for (qw/id name shortName url address postalCode/) {
+        for ( @{ __PACKAGE__->properties->{string} } ) {
             $h->{$_} = $company_meta->{$_};
         }
 
@@ -76,6 +104,26 @@ sub from_json {
 
 }
 
+
+sub to_array {
+    my ( $self, $separator ) = @_;
+
+    $separator = "\n" unless defined $separator;
+    my @res;
+
+    for my $p ( @{ properties()->{all} } ) {
+
+        if ( ref( $self->$p ) eq 'ARRAY' ) {
+            $self->$p( join( $separator, @{ $self->$p } ) );
+        }
+
+        push @res, $self->$p;
+
+    }
+
+    return \@res;
+}
+
 1;
 
 __END__
@@ -90,7 +138,7 @@ Yandex::Geo::Company - Convenient representation of company from Yandex Maps
 
 =head1 VERSION
 
-version 0.02
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -104,38 +152,78 @@ It has following properties:
     url         # website of company, type = string
     phones      # company numbers, type = arrayref
     links       # links to pages on social networks, type = arrayref
-    vk          # link to vk, type = arrayref
+    vk          # link to vk, type = string
     address     # location, type = str
     postalCode  # postal code, type = str (6 digits)
 
 Also, this class implements two methods: from_json and from_geo_json
 
-E.g. if you make a query
+If you make a query
 
     my $yndx_geo = Yandex::Geosearch->new( apikey => 'f33a4523-6c94-48df-9b41-5c5c6f250e98');
     my $res = $yndx_geo->get(text => 'макетные мастерские', only_city => 'ROV');
 
-    Yandex::Geo::Company::from_json( $res->to_json )
-    
-    and
-    
-    Yandex::Geo::Company::from_geo_json( $res )
-    
-    do the same.
+and process C<$res>
+
+    Yandex::Geo::Company->from_json( $res->to_json )
+
+and
+
+    Yandex::Geo::Company->from_geo_json( $res )
+
+do the same.
+
+=head2 properties
+
+    Yandex::Geo::Company::properties();
+
+Detailed info about L<Yandex::Geo::Company> properties
+
+Return hashref with following keys:
+
+    set     - list if all set properties names, regardless of type, in alphabetic order
+    all     - list if all available properties names, regardless of type, in alphabetic order
+    string  - list of all properties names with type = string
+    array   - list of all properties names with type = ARRAY
 
 =head2 from_geo_json
 
-Accept Geo::JSON::FeatureCollection and return array of Yandex::Geo::Company
+Accept L<Geo::JSON::FeatureCollection>  as C<$json> and return array of L<Yandex::Geo::Company> objects
 
     Yandex::Geo::Company::from_geo_json($json);
 
 =head2 from_json
 
-Parse regular json to arrayref of Yandex::Geo::Company objects
+Parse regular json to arrayref of L<Yandex::Geo::Company> objects
+
+    Yandex::Geo::Company::from_json($json);
+
+=head2 to_array
+
+    $y_company->to_array;  # $y_company is L<Yandex::Geo::Company> object
+    $y_company->to_array("\n");
+
+Serialize object data to arrayref.
+
+Can be useful when inserting data via modules like L<Text::CSV>
+
+Sequence is according to L<Yandex::Geo::Company/properties> C<{all}>
+
+Array properties like C<phones, links> are serialized, each element on new string
 
 =head1 NAME
 
 Yandex::Geo::Company
+
+=head1 SYNOPSYS
+
+    use Yandex::Geo::Company;
+    my $a = Yandex::Geo::Company->new ( name => 'Test LLC' );
+    warn $a->name;   # 'Test LLC'
+    warn $a->foo;    # Can't locate object method "foo" via package "Yandex::Geo::Company"
+    
+    Yandex::Geo::Company::from_json( $res->to_json )
+    Yandex::Geo::Company::from_geo_json( $res )
 
 =head1 AUTHOR
 

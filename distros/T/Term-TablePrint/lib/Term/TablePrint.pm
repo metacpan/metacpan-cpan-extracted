@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.070';
+our $VERSION = '0.075';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -13,13 +13,11 @@ use Carp         qw( carp croak );
 use List::Util   qw( sum );
 use Scalar::Util qw( looks_like_number );
 
-use Term::ProgressBar qw();
-
-use Term::Choose            qw( choose );
-use Term::Choose::Constants qw( :screen );
-use Term::Choose::LineFold  qw( line_fold cut_to_printwidth print_columns );
-use Term::Choose::Util      qw( term_size insert_sep unicode_sprintf );
-
+use Term::Choose                  qw( choose );
+use Term::Choose::Constants       qw( :screen );
+use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose::Util            qw( term_size insert_sep unicode_sprintf );
+use Term::TablePrint::ProgressBar qw();
 
 
 sub new {
@@ -37,8 +35,8 @@ sub new {
 
 
 sub DESTROY {
-    #my ( $self ) = @_;
-    print SHOW_CURSOR;
+    my ( $self ) = @_;
+    print SHOW_CURSOR if $^O ne 'MSWin32';
 }
 
 
@@ -128,7 +126,8 @@ sub print_table {
     else {
         $self->{idx_last_row} = $#$table_ref;
     }
-    print HIDE_CURSOR;
+    local $| = 1;
+    print HIDE_CURSOR if $^O ne 'MSWin32';
     my $col_idxs = [];
     if ( $self->{choose_columns}  ) {
         $col_idxs = $self->__choose_columns( $table_ref->[0] );
@@ -142,8 +141,10 @@ sub print_table {
         $a_ref = $table_ref;
     }
     $self->{binray_regexp} = qr/[\x00-\x08\x0B-\x0C\x0E-\x1F]/;
+    $self->{show_progress} = 0;
     if ( $self->{progress_bar} ) {
-#        print 'Computing: ...' . "\n";
+        print CLEAR_SCREEN if $^O ne 'MSWin32';
+        print 'Computing:';
         $self->{show_progress} = int @$a_ref * @{$a_ref->[0]} / $self->{progress_bar};
     }
     $self->__calc_col_width( $a_ref );
@@ -162,7 +163,7 @@ sub print_table {
             }
         }
     }
-    print SHOW_CURSOR;
+    print SHOW_CURSOR if $^O ne 'MSWin32';
 }
 
 
@@ -173,7 +174,7 @@ sub __win_size_dependet_code {
     if ( ! defined $w_cols ) {
         return;
     }
-    my ( $list, $table_w ) = $self->_col_to_avail_col_width( $a_ref, $w_cols );
+    my ( $list, $table_w ) = $self->__col_to_avail_col_width( $a_ref, $w_cols, $term_w );
     my @header;
     if ( length $self->{prompt} ) {
         @header = ( $self->{prompt} );
@@ -312,19 +313,17 @@ sub __print_single_row {
 sub __calc_col_width {
     my ( $self, $a_ref ) = @_;
     my $show_progress = $self->{show_progress} >= 2 ? 1 : 0; #
-    my $total = $self->{idx_last_row} + 1;    #
-    my $next_update = 0;                      #
-    my $c = 0;                                #
-    my $progress;                             #
-    if ( $show_progress ) {                   #
-        local $| = 1;                         #
-        print CLEAR_SCREEN;                   #
-        $progress = Term::ProgressBar->new( { #
-            name => 'Computing',              #
-            count => $total,                  #
-            remove => 1 } );                  #
-        $progress->minor( 0 );                #
-    }                                         #
+    my $total = $self->{idx_last_row} + 1;                   #
+    my $next_update = 0;                                     #
+    my $c = 0;                                               #
+    my $progress;                                            #
+    if ( $show_progress ) {                                  #
+        $progress = Term::TablePrint::ProgressBar->new( {    #
+            term_width => ( term_size() )[0],                #
+            name       => 'Computing',                       #
+            count      => $total,                            #
+        } );                                                 #
+    }                                                        #
     $self->{longest_col_name} = 0;
     $self->{w_cols} = [ ( 1 ) x @{$a_ref->[0]} ];
     my $normal_row = 0;
@@ -433,21 +432,19 @@ sub __calc_avail_col_width {
 }
 
 
-sub _col_to_avail_col_width {
-    my ( $self, $a_ref, $w_cols ) = @_;
-    my $total = $self->{idx_last_row} + 1;    #
-    my $next_update = 0;                      #
-    my $c = 0;                                #
-    my $progress;                             #
-    if ( $self->{show_progress} ) {           #
-        local $| = 1;                         #
-        print CLEAR_SCREEN;                   #
-        $progress = Term::ProgressBar->new( { #
-            name => 'Computing',              #
-            count => $total,                  #
-            remove => 1 } );                  #
-        $progress->minor( 0 );                #
-    }
+sub __col_to_avail_col_width {
+    my ( $self, $a_ref, $w_cols, $term_w ) = @_;
+    my $total = $self->{idx_last_row} + 1;                #
+    my $next_update = 0;                                  #
+    my $c = 0;                                            #
+    my $progress;                                         #
+    if ( $self->{show_progress} ) {                       #
+        $progress = Term::TablePrint::ProgressBar->new( { #
+            term_width => $term_w,                        #
+            name       => 'Computing',                    #
+            count      => $total,                         #
+        } );                                              #
+    }                                                     #
     my $tab;
     if ( $self->{grid} ) {
         $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
@@ -608,7 +605,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.070
+Version 0.075
 
 =cut
 

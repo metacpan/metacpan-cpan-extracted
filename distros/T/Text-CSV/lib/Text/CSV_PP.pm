@@ -12,7 +12,7 @@ use Exporter ();
 use vars qw($VERSION @ISA @EXPORT_OK);
 use Carp;
 
-$VERSION = '1.95';
+$VERSION = '1.96';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(csv);
 
@@ -51,6 +51,7 @@ my $ERRORS = {
 
         # Syntax errors
         1500 => "PRM - Invalid/unsupported arguments(s)",
+        1501 => "PRM - The key attribute is passed as an unsupported type",
 
         # Parse errors
         2010 => "ECR - QUO char inside quotes followed by CR not part of EOL",
@@ -196,6 +197,8 @@ my %def_attr = (
     escape_null			=> 1,
     keep_meta_info		=> 0,
     verbatim			=> 0,
+    formula			=> 0,
+    undef_str			=> undef,
     types			=> undef,
     callbacks			=> undef,
 
@@ -209,12 +212,15 @@ my %def_attr = (
     _COLUMN_NAMES		=> undef,
     _BOUND_COLUMNS		=> undef,
     _AHEAD			=> undef,
+
+    ENCODING			=> undef,
 );
 
 my %attr_alias = (
     quote_always		=> "always_quote",
     verbose_diag		=> "diag_verbose",
     quote_null			=> "escape_null",
+    escape			=> "escape_char",
     );
 
 my $last_new_error = Text::CSV_PP->SetDiag(0);
@@ -222,15 +228,15 @@ my $last_error;
 
 # NOT a method: is also used before bless
 sub _unhealthy_whitespace {
-    my $self = shift;
-    $_[0] or return 0; # no checks needed without allow_whitespace
+    my ($self, $aw) = @_;
+    $aw or return 0; # no checks needed without allow_whitespace
 
     my $quo = $self->{quote};
     defined $quo && length ($quo) or $quo = $self->{quote_char};
     my $esc = $self->{escape_char};
 
-    (defined $quo && $quo =~ m/^[ \t]/) || (defined $esc && $esc =~ m/^[ \t]/) and
-        return 1002;
+    defined $quo && $quo =~ m/^[ \t]/ and return 1002;
+    defined $esc && $esc =~ m/^[ \t]/ and return 1002;
 
     return 0;
     }
@@ -250,24 +256,21 @@ sub _check_sanity {
 #                "', ESC: '", DPeek ($esc),"'");
 
     # sep_char should not be undefined
-    if (defined $sep && $sep ne "") {
-        length ($sep) > 16                and return 1006;
-        $sep =~ m/[\r\n]/                and return 1003;
-        }
-    else {
-                                            return 1008;
-        }
+    $sep ne ""         or  return 1008;
+    length ($sep) > 16     and return 1006;
+    $sep =~ m/[\r\n]/      and return 1003;
+
     if (defined $quo) {
-        defined $sep && $quo eq $sep        and return 1001;
-        length ($quo) > 16                and return 1007;
-        $quo =~ m/[\r\n]/                and return 1003;
+        $quo eq $sep        and return 1001;
+        length ($quo) > 16  and return 1007;
+        $quo =~ m/[\r\n]/   and return 1003;
         }
     if (defined $esc) {
-        defined $sep && $esc eq $sep        and return 1001;
-        $esc =~ m/[\r\n]/                and return 1003;
+        $esc eq $sep        and return 1001;
+        $esc =~ m/[\r\n]/   and return 1003;
         }
     if (defined $eol) {
-        length ($eol) > 16                and return 1005;
+        length ($eol) > 16  and return 1005;
         }
 
     return _unhealthy_whitespace ($self, $self->{allow_whitespace});
@@ -301,6 +304,10 @@ sub new {
         $attr{quote_char} = delete $attr{quote};
         $quote_aliased = 1;
         }
+    exists $attr{formula_handling} and
+        $attr{formula} = delete $attr{formula_handling};
+    exists $attr{formula} and
+        $attr{formula} = _supported_formula (undef, $attr{formula});
     for (keys %attr) {
         if (m/^[a-z]/ && exists $def_attr{$_}) {
             # uncoverable condition false
@@ -312,7 +319,7 @@ sub new {
         $attr{auto_diag} and error_diag ();
         return;
         }
-    if ($sep_aliased and defined $attr{sep_char}) {
+    if ($sep_aliased) {
         my @b = unpack "U0C*", $attr{sep_char};
         if (@b > 1) {
             $attr{sep} = $attr{sep_char};
@@ -376,9 +383,12 @@ my %_cache_id = ( # Only expose what is accessed from within PM
     quote_binary		=> 32,
     escape_null			=> 31,
     decode_utf8			=> 35,
+    _has_ahead			=> 30,
     _has_hooks			=> 36,
     _is_bound			=> 26,	# 26 .. 29
-    strict   			=> 58,
+    formula			=> 38,
+    strict   			=> 42,
+    undef_str  		=> 46,
     );
 
 my %_hidden_cache_id = qw(
@@ -386,7 +396,6 @@ my %_hidden_cache_id = qw(
     eol_len		12
     eol_is_cr		13
     quo_len		16
-    _has_ahead		30
     has_error_input		34
 );
 
@@ -401,8 +410,7 @@ sub _set_attr_C {
     defined $val or $val = 0;
     utf8::decode ($val);
     $self->{$name} = $val;
-    $ec = _check_sanity ($self) and
-        croak ($self->SetDiag ($ec));
+    $ec = _check_sanity ($self) and croak ($self->SetDiag ($ec));
     $self->_cache_set ($_cache_id{$name}, $val);
     }
 
@@ -460,7 +468,11 @@ sub quote {
 
 sub escape_char {
     my $self = shift;
-    @_ and $self->_set_attr_C ("escape_char", shift);
+    if (@_) {
+        my $ec = shift;
+        $self->_set_attr_C ("escape_char", $ec);
+        $ec or $self->_set_attr_X ("escape_null", 0);
+        }
     $self->{escape_char};
     }
 
@@ -555,6 +567,31 @@ sub strict {
     $self->{strict};
     }
 
+sub _supported_formula {
+    my ($self, $f) = @_;
+    defined $f or return 5;
+    $f =~ m/^(?: 0 | none    )$/xi ? 0 :
+    $f =~ m/^(?: 1 | die     )$/xi ? 1 :
+    $f =~ m/^(?: 2 | croak   )$/xi ? 2 :
+    $f =~ m/^(?: 3 | diag    )$/xi ? 3 :
+    $f =~ m/^(?: 4 | empty | )$/xi ? 4 :
+    $f =~ m/^(?: 5 | undef   )$/xi ? 5 : do {
+	$self ||= "Text::CSV_PP";
+	$self->SetDiag (1500);
+	croak "formula-handling '$f' is not supported\n";
+	};
+    }
+
+sub formula {
+    my $self = shift;
+    @_ and $self->_set_attr_N ("formula", _supported_formula ($self, shift));
+    [qw( none die croak diag empty undef )]->[_supported_formula ($self, $self->{formula})];
+    }
+sub formula_handling {
+    my $self = shift;
+    $self->formula (@_);
+    }
+
 sub decode_utf8 {
     my $self = shift;
     @_ and $self->_set_attr_X ("decode_utf8", shift);
@@ -617,6 +654,16 @@ sub verbatim {
     my $self = shift;
     @_ and $self->_set_attr_X ("verbatim", shift);
     $self->{verbatim};
+    }
+
+sub undef_str {
+    my $self = shift;
+    if (@_) {
+        my $v = shift;
+        $self->{undef_str} = defined $v ? "$v" : undef;
+        $self->_cache_set ($_cache_id{undef_str}, $self->{undef_str});
+        }
+    $self->{undef_str};
     }
 
 sub auto_diag {
@@ -683,7 +730,9 @@ sub callbacks {
                 : @_ % 2 == 0                    ? { @_ }
                 : croak ($self->SetDiag (1004));
             foreach my $cbk (keys %$cb) {
-                (!ref $cbk && $cbk =~ m/^[\w.]+$/) && ref $cb->{$cbk} eq "CODE" or
+                # A key cannot be a ref. That would be stored as the *string
+                # 'SCALAR(0x1f3e710)' or 'ARRAY(0x1a5ae18)'
+                $cbk =~ m/^[\w.]+$/ && ref $cb->{$cbk} eq "CODE" or
                     croak ($self->SetDiag (1004));
                 }
             exists $cb->{error}        and $hf |= 0x01;
@@ -708,15 +757,17 @@ sub error_diag {
     my $self = shift;
     my @diag = (0 + $last_new_error, $last_new_error, 0, 0, 0);
 
+    # Docs state to NEVER use UNIVERSAL::isa, because it will *never* call an
+    # overridden isa method in any class. Well, that is exacly what I want here
     if ($self && ref $self && # Not a class method or direct call
-         $self->isa (__PACKAGE__) && defined $self->{_ERROR_DIAG}) {
+        UNIVERSAL::isa ($self, __PACKAGE__) && exists $self->{_ERROR_DIAG}) {
         $diag[0] = 0 + $self->{_ERROR_DIAG};
         $diag[1] =     $self->{_ERROR_DIAG};
         $diag[2] = 1 + $self->{_ERROR_POS} if exists $self->{_ERROR_POS};
         $diag[3] =     $self->{_RECNO};
         $diag[4] =     $self->{_ERROR_FLD} if exists $self->{_ERROR_FLD};
 
-        $diag[0] && $self && $self->{callbacks} && $self->{callbacks}{error} and
+        $diag[0] && $self->{callbacks} && $self->{callbacks}{error} and
             return $self->{callbacks}{error}->(@diag);
         }
 
@@ -890,13 +941,25 @@ sub header {
         }
 
     defined $args{detect_bom}         or $args{detect_bom}         = 1;
-    defined $args{munge_column_names} or $args{munge_column_names} = "lc";
     defined $args{set_column_names}   or $args{set_column_names}   = 1;
+    defined $args{munge_column_names} or $args{munge_column_names} = "lc";
 
-    defined $args{sep_set} && ref $args{sep_set} eq "ARRAY" and
+    # Reset any previous leftovers
+    $self->{_RECNO}        = 0;
+    $self->{_AHEAD}        = undef;
+    $self->{_COLUMN_NAMES} = undef if $args{set_column_names};
+    $self->{_BOUND_COLUMNS}    = undef if $args{set_column_names};
+    $self->_cache_set($_cache_id{'_has_ahead'}, 0);
+
+    if (defined $args{sep_set}) {
+        ref $args{sep_set} eq "ARRAY" or
+        croak ($self->SetDiag (1500, "sep_set should be an array ref"));
         @seps =  @{$args{sep_set}};
+    }
 
+    $^O eq "MSWin32" and binmode $fh;
     my $hdr = <$fh>;
+    # check if $hdr can be empty here, I don't think so
     defined $hdr && $hdr ne "" or croak ($self->SetDiag (1010));
 
     my %sep;
@@ -920,6 +983,11 @@ sub header {
         elsif ($hdr =~ s/^\x0e\xfe\xff//)     { $enc = "scsu"       }
         elsif ($hdr =~ s/^\xfb\xee\x28//)     { $enc = "bocu-1"     }
         elsif ($hdr =~ s/^\x84\x31\x95\x33//) { $enc = "gb-18030"   }
+        elsif ($hdr =~ s/^\x{feff}//)         { $enc = ""           }
+
+        $self->{ENCODING} = uc $enc;
+
+        $hdr eq "" and croak ($self->SetDiag (1010));
 
         if ($enc) {
             if ($enc =~ m/([13]).le$/) {
@@ -928,22 +996,40 @@ sub header {
                 $hdr .= "\0" x $l;
                 read $fh, $x, $l;
                 }
-            $enc = ":encoding($enc)";
-            binmode $fh, $enc;
+            if ($enc ne "utf-8") {
+               require Encode;
+               $hdr = Encode::decode ($enc, $hdr);
+               }
+            binmode $fh, ":encoding($enc)";
             }
         }
+
+    my ($ahead, $eol);
+    if ($hdr =~ s/^([^\r\n]+)([\r\n]+)([^\r\n].+)\z/$1/s) {
+        $eol   = $2;
+        $ahead = $3;
+    }
 
     $args{munge_column_names} eq "lc" and $hdr = lc $hdr;
     $args{munge_column_names} eq "uc" and $hdr = uc $hdr;
 
     my $hr = \$hdr; # Will cause croak on perl-5.6.x
-    open my $h, "<$enc", $hr;
+    open my $h, "<", $hr or croak ($self->SetDiag (1010));
+
     my $row = $self->getline ($h) or croak;
     close $h;
 
-    my @hdr = @$row   or  croak ($self->SetDiag (1010));
+    if ($ahead) { # Must be after getline, which creates the cache
+        $self->_cache_set ($_cache_id{_has_ahead}, 1);
+        $self->{_AHEAD} = $ahead;
+        $eol =~ m/^\r([^\n]|\z)/ and $self->eol ($eol);
+        }
+
+    my @hdr = @$row;
     ref $args{munge_column_names} eq "CODE" and
-        @hdr = map { $args{munge_column_names}->($_) } @hdr;
+        @hdr = map { $args{munge_column_names}->($_)       } @hdr;
+    ref $args{munge_column_names} eq "HASH" and
+        @hdr = map { $args{munge_column_names}->{$_} || $_ } @hdr;
     my %hdr = map { $_ => 1 } @hdr;
     exists $hdr{""}   and croak ($self->SetDiag (1012));
     keys %hdr == @hdr or  croak ($self->SetDiag (1013));
@@ -986,7 +1072,6 @@ sub getline_hr {
 
 sub getline_hr_all {
     my ( $self, $io, @args ) = @_;
-    my %hr;
 
     unless ( $self->{_COLUMN_NAMES} ) {
         croak $self->SetDiag( 3002 );
@@ -1000,8 +1085,9 @@ sub getline_hr_all {
 sub say {
     my ($self, $io, @f) = @_;
     my $eol = $self->eol;
-    defined $eol && $eol ne "" or $self->eol ($\ || $/);
-    my $state = $self->print ($io, @f);
+    $eol eq "" and $self->eol ($\ || $/);
+    # say ($fh, undef) does not propage actual undef to print ()
+    my $state = $self->print ($io, @f == 1 && !defined $f[0] ? undef : @f);
     $self->eol ($eol);
     return $state;
     }
@@ -1084,7 +1170,8 @@ sub fragment {
             or croak ($self->SetDiag (2013));
         $to ||= $from;
         $to eq "*" and ($to, $eod) = ($from, 1);
-        $from <= 0 || $to <= 0 || $to < $from and croak ($self->SetDiag (2013));
+        # $to cannot be <= 0 due to regex and ||=
+        $from <= 0 || $to < $from and croak ($self->SetDiag (2013));
         $r[$_] = 1 for $from .. $to;
         }
 
@@ -1125,25 +1212,36 @@ sub _csv_attr {
     $enc =~ m/^[-\w.]+$/ and $enc = ":encoding($enc)";
 
     my $fh;
-    my $cls = 0;        # If I open a file, I have to close it
-    my $in  = delete $attr{in}  || delete $attr{file} or croak $csv_usage;
-    my $out = delete $attr{out} || delete $attr{file};
+    my $sink = 0;
+    my $cls  = 0;  # If I open a file, I have to close it
+    my $in   = delete $attr{in}  || delete $attr{file} or croak $csv_usage;
+    my $out  = exists $attr{out} && !$attr{out} ? \"skip"
+        : delete $attr{out} || delete $attr{file};
 
     ref $in eq "CODE" || ref $in eq "ARRAY" and $out ||= \*STDOUT;
 
+    $in && $out && !ref $in && !ref $out and croak join "\n" =>
+       qq{Cannot use a string for both in and out. Instead use:},
+       qq{ csv (in => csv (in => "$in"), out => "$out");\n};
+
     if ($out) {
-        $in or croak $csv_usage;        # No out without in
-        if ((ref $out and ref $out ne "SCALAR") or "GLOB" eq ref \$out) {
+        if ((ref $out and "SCALAR" ne ref $out) or "GLOB" eq ref \$out) {
             $fh = $out;
+            }
+        elsif (ref $out and "SCALAR" eq ref $out and defined $$out and $$out eq "skip") {
+            delete $attr{out};
+            $sink = 1;
             }
         else {
             open $fh, ">", $out or croak "$out: $!";
             $cls = 1;
             }
-        $enc and binmode $fh, $enc;
-        unless (defined $attr{eol}) {
-            my @layers = eval { PerlIO::get_layers ($fh) };
-            $attr{eol} = (grep m/crlf/ => @layers) ? "\n" : "\r\n";
+        if ($fh) {
+            $enc and binmode $fh, $enc;
+            unless (defined $attr{eol}) {
+                my @layers = eval { PerlIO::get_layers ($fh) };
+                $attr{eol} = (grep m/crlf/ => @layers) ? "\n" : "\r\n";
+                }
             }
         }
 
@@ -1168,11 +1266,14 @@ sub _csv_attr {
         open $fh, "<$enc", $in or croak "$in: $!";
         $cls = 1;
         }
-    $fh or croak qq{No valid source passed. "in" is required};
+    $fh || $sink or croak qq{No valid source passed. "in" is required};
 
     my $hdrs = delete $attr{headers};
     my $frag = delete $attr{fragment};
     my $key  = delete $attr{key};
+    my $kh   = delete $attr{keep_headers}      ||
+          delete $attr{keep_column_names}      ||
+          delete $attr{kh};
 
     my $cbai = delete $attr{callbacks}{after_in}    ||
                delete $attr{after_in}               ||
@@ -1207,7 +1308,11 @@ sub _csv_attr {
         );
     defined $fltr && !ref $fltr && exists $fltr{$fltr} and
         $fltr = { 0 => $fltr{$fltr} };
+    ref $fltr eq "CODE" and $fltr = { 0 => $fltr };
     ref $fltr eq "HASH" or $fltr = undef;
+
+    exists $attr{formula} and
+	$attr{formula} = _supported_formula (undef, $attr{formula});
 
     defined $attr{auto_diag}   or $attr{auto_diag}   = 1;
     defined $attr{escape_null} or $attr{escape_null} = 0;
@@ -1220,10 +1325,12 @@ sub _csv_attr {
         fh   => $fh,
         cls  => $cls,
         in   => $in,
+        sink => $sink,
         out  => $out,
         enc  => $enc,
         hdrs => $hdrs,
         key  => $key,
+        kh   => $kh,
         frag => $frag,
         fltr => $fltr,
         cbai => $cbai,
@@ -1249,7 +1356,7 @@ sub csv {
         $hdrs = "auto";
         }
 
-    if ($c->{out}) {
+    if ($c->{out} && !$c->{sink}) {
         if (ref $in eq "CODE") {
             my $hdr = 1;
             while (my $row = $in->($csv)) {
@@ -1293,18 +1400,29 @@ sub csv {
         return 1;
         }
 
+    my @row1;
     if (defined $c->{hd_s} || defined $c->{hd_b} || defined $c->{hd_m} || defined $c->{hd_c}) {
         my %harg;
         defined $c->{hd_s} and $harg{set_set}            = $c->{hd_s};
         defined $c->{hd_d} and $harg{detect_bom}         = $c->{hd_b};
         defined $c->{hd_m} and $harg{munge_column_names} = $hdrs ? "none" : $c->{hd_m};
         defined $c->{hd_c} and $harg{set_column_names}   = $hdrs ? 0      : $c->{hd_c};
-        $csv->header ($fh, \%harg);
+        @row1 = $csv->header ($fh, \%harg);
         my @hdr = $csv->column_names;
         @hdr and $hdrs ||= \@hdr;
         }
 
-    my $key = $c->{key} and $hdrs ||= "auto";
+    if ($c->{kh}) {
+        ref $c->{kh} eq "ARRAY" or croak ($csv->SetDiag (1501, "1501 - PRM"));
+        $hdrs ||= "auto";
+        }
+
+    my $key = $c->{key};
+    if ($key) {
+        ref $key and croak ($csv->SetDiag (1501, "1501 - PRM"));
+        $hdrs ||= "auto";
+        }
+
     $c->{fltr} && grep m/\D/ => keys %{$c->{fltr}} and $hdrs ||= "auto";
     if (defined $hdrs) {
         if (!ref $hdrs) {
@@ -1329,6 +1447,7 @@ sub csv {
             my $cr = $hdrs;
             $hdrs  = [ map {  $cr->($hdr{$_} || $_) } @$h ];
             }
+        $c->{kh} and $hdrs and @{$c->{kh}} = @$hdrs;
         }
 
     if ($c->{fltr}) {
@@ -1365,16 +1484,24 @@ sub csv {
         : # aoa
             $frag ? $csv->fragment ($fh, $frag)
                   : $csv->getline_all ($fh);
-    $ref or Text::CSV_PP->auto_diag;
+    if ($ref) {
+        @row1 && !$c->{hd_c} && !ref $hdrs and unshift @$ref, \@row1;
+        }
+    else {
+        Text::CSV_PP->auto_diag;
+        }
     $c->{cls} and close $fh;
     if ($ref and $c->{cbai} || $c->{cboi}) {
-        foreach my $r (@{$ref}) {
+        # Default is ARRAYref, but with key =>, you'll get a hashref
+        foreach my $r (ref $ref eq "ARRAY" ? @{$ref} : values %{$ref}) {
             local %_;
             ref $r eq "HASH" and *_ = $r;
             $c->{cbai} and $c->{cbai}->($csv, $r);
             $c->{cboi} and $c->{cboi}->($csv, $r);
             }
         }
+
+    $c->{sink} and return;
 
     defined wantarray or
         return csv (%{$c->{attr}}, in => $ref, headers => $hdrs, %{$c->{attr}});
@@ -1398,12 +1525,8 @@ sub _setup_ctx {
 
     my $ctx;
     if ($self->{_CACHE}) {
-        $ctx = $self->{_CACHE};
+        %$ctx = %{$self->{_CACHE}};
     } else {
-        $ctx ||= {};
-        # $ctx->{self}  = $self;
-        $ctx->{pself} = ref $self || $self;
-
         $ctx->{sep} = ',';
         if (defined $self->{sep_char}) {
             $ctx->{sep} = $self->{sep_char};
@@ -1451,6 +1574,14 @@ sub _setup_ctx {
             }
         }
 
+        $ctx->{undef_flg} = 0;
+        if (defined $self->{undef_str}) {
+            $ctx->{undef_str} = $self->{undef_str};
+            $ctx->{undef_flg} = 3 if utf8::is_utf8($self->{undef_str});
+        } else {
+            $ctx->{undef_str} = undef;
+        }
+
         if (defined $self->{_types}) {
             $ctx->{types} = $self->{_types};
             $ctx->{types_len} = length($ctx->{types});
@@ -1476,15 +1607,19 @@ sub _setup_ctx {
             allow_loose_quotes allow_loose_escapes
             allow_unquoted_escape allow_whitespace blank_is_undef
             empty_is_undef verbatim auto_diag diag_verbose
-            keep_meta_info
+            keep_meta_info formula
         /) {
             $ctx->{$_} = defined $self->{$_} ? $self->{$_} : 0;
         }
         for (qw/quote_space escape_null quote_binary/) {
             $ctx->{$_} = defined $self->{$_} ? $self->{$_} : 1;
         }
+        if ($ctx->{escape_char} eq "\0") {
+            $ctx->{escape_null} = 0;
+        }
+
         # FIXME: readonly
-        $self->{_CACHE} = $ctx;
+        %{$self->{_CACHE}} = %$ctx;
     }
 
     $ctx->{utf8} = 0;
@@ -1507,10 +1642,10 @@ sub _setup_ctx {
             : $ctx->{eol} =~ /\A[\015|\012]/ ? 0 : 1
         : 0;
 
-    if ($ctx->{sep_len} and _is_valid_utf8($ctx->{sep})) {
+    if ($ctx->{sep_len} and $ctx->{sep_len} > 1 and _is_valid_utf8($ctx->{sep})) {
         $ctx->{utf8} = 1;
     }
-    if ($ctx->{quo_len} and _is_valid_utf8($ctx->{quo})) {
+    if ($ctx->{quo_len} and $ctx->{quo_len} > 1 and _is_valid_utf8($ctx->{quo})) {
         $ctx->{utf8} = 1;
     }
 
@@ -1533,6 +1668,9 @@ sub _cache_set {
         $cache->{quo} = $value;
         $cache->{quo_len} = 0;
     }
+    elsif ($key eq '_has_ahead') {
+        $cache->{has_ahead} = $value;
+    }
     elsif ($key eq '_has_hooks') {
         $cache->{has_hooks} = $value;
     }
@@ -1552,8 +1690,17 @@ sub _cache_set {
         $cache->{quo_len} = $len == 1 ? 0 : $len;
     }
     elsif ($key eq 'eol') {
-        $cache->{eol} = $value if length($value);
+        $cache->{eol} = $value if defined($value);
         $cache->{eol_is_cr} = $value eq "\015" ? 1 : 0;
+    }
+    elsif ($key eq 'undef_str') {
+        if (defined $value) {
+            $cache->{undef_str} = $value;
+            $cache->{undef_flg} = 3 if utf8::is_utf8($value);
+        } else {
+            $cache->{undef_str} = undef;
+            $cache->{undef_flg} = 0;
+        }
     }
     else {
         $cache->{$key} = $value;
@@ -1576,7 +1723,7 @@ sub _cache_diag {
     for (qw/
         binary decode_utf8 allow_loose_escapes allow_loose_quotes
         allow_whitespace always_quote quote_empty quote_space
-        escape_null quote_binary auto_diag diag_verbose strict
+        escape_null quote_binary auto_diag diag_verbose formula strict
         has_error_input blank_is_undef empty_is_undef has_ahead
         keep_meta_info verbatim has_hooks eol_is_cr eol_len
     /) {
@@ -1650,13 +1797,13 @@ sub __combine {
     if(!defined $quot or $quot eq "\0"){ $quot = ''; }
 
     my $re_esc;
-    if ($quot ne '') {
-      $re_esc = $self->{_re_comb_escape}->{$quot}->{$esc} ||= qr/(\Q$quot\E|\Q$esc\E)/;
-    } else {
-      $re_esc = $self->{_re_comb_escape}->{$quot}->{$esc} ||= qr/(\Q$esc\E)/;
+    if ($esc ne '' and $esc ne "\0") {
+      if ($quot ne '') {
+        $re_esc = $self->{_re_comb_escape}->{$quot}->{$esc} ||= qr/(\Q$quot\E|\Q$esc\E)/;
+      } else {
+        $re_esc = $self->{_re_comb_escape}->{$quot}->{$esc} ||= qr/(\Q$esc\E)/;
+      }
     }
-
-    my $re_sp  = $self->{_re_comb_sp}->{$sep}->{$quote_space} ||= ( $quote_space ? qr/[\s\Q$sep\E]/ : qr/[\Q$sep\E]/ );
 
     my $bound = 0;
     my $n = @$fields - 1;
@@ -1682,40 +1829,66 @@ sub __combine {
 
         my $value = $$v_ref;
 
-        unless (defined $value) {
-            push @results, '';
+        if (!defined $value) {
+            if ($ctx->{undef_str}) {
+                if ($ctx->{undef_flg}) {
+                    $ctx->{utf8} = 1;
+                    $ctx->{binary} = 1;
+                }
+                push @results, $ctx->{undef_str};
+            } else {
+                push @results, '';
+            }
             next;
         }
-        elsif ( !$binary ) {
-            $binary = 1 if utf8::is_utf8 $value;
+
+        if ( substr($value, 0, 1) eq '=' && $ctx->{formula} ) {
+            $value = $self->_formula($ctx, $value, $i);
+            if (!defined $value) {
+                push @results, '';
+                next;
+            }
         }
 
-        if (!$binary and $value =~ /[^\x09\x20-\x7E]/) {
-            # an argument contained an invalid character...
-            $self->{_ERROR_INPUT} = $value;
-            $self->SetDiag(2110);
-            return 0;
-        }
-
-        $must_be_quoted = 0;
+        $must_be_quoted = $ctx->{always_quote} ? 1 : 0;
         if ($value eq '') {
             $must_be_quoted++ if $ctx->{quote_empty} or ($check_meta && $self->is_quoted($i));
         }
         else {
-            if($value =~ s/$re_esc/$esc$1/g and $quot ne ''){
-                $must_be_quoted++;
-            }
-            if($value =~ /$re_sp/){
-                $must_be_quoted++;
+
+            if (utf8::is_utf8 $value) {
+                $ctx->{utf8} = 1;
+                $ctx->{binary} = 1;
             }
 
-            if( $binary and $ctx->{escape_null} ){
+            $must_be_quoted++ if $check_meta && $self->is_quoted($i);
+
+            if (!$must_be_quoted and $quot ne '') {
                 use bytes;
-                $must_be_quoted++ if ( $value =~ s/\0/${esc}0/g || ($ctx->{quote_binary} && $value =~ /[\x00-\x1f\x7f-\xa0]/) );
+                $must_be_quoted++ if
+                    ($value =~ /\Q$quot\E/) ||
+                    ($sep ne '' and $sep ne "\0" and $value =~ /\Q$sep\E/) ||
+                    ($esc ne '' and $esc ne "\0" and $value =~ /\Q$esc\E/) ||
+                    ($ctx->{quote_binary} && $value =~ /[\x00-\x1f\x7f-\xa0]/) ||
+                    ($ctx->{quote_space} && $value =~ /[\x09\x20]/);
+            }
+
+            if (!$ctx->{binary} and $value =~ /[^\x09\x20-\x7E]/) {
+                # an argument contained an invalid character...
+                $self->{_ERROR_INPUT} = $value;
+                $self->SetDiag(2110);
+                return 0;
+            }
+
+            if ($re_esc) {
+                $value =~ s/($re_esc)/$esc$1/g;
+            }
+            if ($ctx->{escape_null}) {
+                $value =~ s/\0/${esc}0/g;
             }
         }
 
-        if($ctx->{always_quote} or $must_be_quoted or ($check_meta && $self->is_quoted($i))){
+        if ($must_be_quoted) {
             $value = $quot . $value . $quot;
         }
         push @results, $value;
@@ -1724,6 +1897,37 @@ sub __combine {
     $$dst = join($sep, @results) . ( defined $ctx->{eol} ? $ctx->{eol} : '' );
 
     return 1;
+}
+
+sub _formula {
+    my ($self, $ctx, $value, $i) = @_;
+
+    my $fa = $ctx->{formula} or return;
+    if ($fa == 1) { die "Formulas are forbidden\n" }
+    if ($fa == 2) { die "Formulas are forbidden\n" } # XS croak behaves like PP's "die"
+
+    if ($fa == 3) {
+        my $rec = '';
+        if ($ctx->{recno}) {
+            $rec = sprintf " in record %lu", $ctx->{recno} + 1;
+        }
+        my $field = '';
+        my $column_names = $self->{_COLUMN_NAMES};
+        if (ref $column_names eq 'ARRAY' and @$column_names >= $i - 1) {
+            my $column_name = $column_names->[$i - 1];
+            $field = sprintf " (column: '%.100s')", $column_name if defined $column_name;
+        }
+        warn sprintf("Field %d%s%s contains formula '%s'\n", $i, $field, $rec, $value);
+        return $value;
+    }
+
+    if ($fa == 4) {
+        return '';
+    }
+    if ($fa == 5) {
+        return undef;
+    }
+    return;
 }
 
 sub print {
@@ -1756,6 +1960,7 @@ sub __parse { # cx_xsParse
     my ($self, $fields, $fflags, $src, $useIO) = @_;
 
     my $ctx = $self->_setup_ctx;
+
     my $state = $self->___parse($ctx, $fields, $fflags, $src, $useIO);
     if ($state and ($ctx->{has_hooks} || 0) & HOOK_AFTER_PARSE) {
         $self->_hook(after_parse => $fields);
@@ -1809,6 +2014,7 @@ sub ___parse { # cx_c_xsParse
                 $self->{_EOF} = 1;
             }
         }
+        %{$self->{_CACHE}} = %$ctx;
 
         if ($fflags) {
             if ($ctx->{keep_meta_info}) {
@@ -1817,6 +2023,8 @@ sub ___parse { # cx_c_xsParse
                 undef $fflags;
             }
         }
+    } else {
+        %{$self->{_CACHE}} = %$ctx;
     }
 
     if ($result and $ctx->{types}) {
@@ -1871,11 +2079,12 @@ LOOP:
             # new field
             if (!$v_ref) {
                 if ($ctx->{is_bound}) {
-                    $v_ref = $self->__bound_field($ctx, $fnum++, 0);
+                    $v_ref = $self->__bound_field($ctx, $fnum, 0);
                 } else {
                     $value = '';
                     $v_ref = \$value;
                 }
+                $fnum++;
                 return unless $v_ref;
                 $ctx->{flag} = 0;    
                 $ctx->{fld_idx}++;
@@ -1917,7 +2126,7 @@ RESTART:
                 } else {
                     # ,1,"foo, 3",,bar,
                     #   ^        ^    ^
-                    $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                    $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                     $v_ref = undef;
                     $waitingForField = 1;
                 }
@@ -1951,14 +2160,14 @@ RESTART:
                     if (!defined $c2) { # EOF
                         # ,1,"foo, 3"
                         #            ^
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         return 1;
                     }
 
                     if (defined $c2 and defined $sep and $c2 eq $sep) {
                         # ,1,"foo, 3",,bar,\r\n
                         #            ^
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         $v_ref = undef;
                         $waitingForField = 1;
                         next;
@@ -1966,7 +2175,7 @@ RESTART:
                     if (defined $c2 and ($c2 eq "\012" or (defined $eol and $c2 eq $eol))) { # FIXME: EOLX
                         # ,1,"foo, 3",,"bar"\n
                         #                   ^
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         return 1;
                     }
 
@@ -1999,7 +2208,7 @@ RESTART:
                         if ($ctx->{eol_is_cr}) {
                             # ,1,"foo, 3"\r
                             #            ^
-                            $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                            $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                             return 1;
                         }
 
@@ -2007,7 +2216,7 @@ RESTART:
                         if (defined $c3 and $c3 eq "\012") {
                             # ,1,"foo, 3"\r\n
                             #              ^
-                            $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                            $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                             return 1;
                         }
 
@@ -2018,7 +2227,7 @@ RESTART:
                             $self->__set_eol_is_cr($ctx);
                             $ctx->{used}--;
                             $ctx->{has_ahead} = 1;
-                            $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                            $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                             return 1;
                         }
 
@@ -2180,7 +2389,7 @@ RESTART:
 
                     # ,1,"foo\n 3",,bar
                     #                  ^
-                    $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                    $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                     return 1;
                 }
             }
@@ -2215,7 +2424,7 @@ RESTART:
                         $self->__set_eol_is_cr($ctx);
                         $ctx->{used}--;
                         $ctx->{has_ahead} = 1;
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         return 1;
                     }
 
@@ -2239,7 +2448,7 @@ RESTART:
                     if ($ctx->{eol_is_cr}) {
                         # ,1,"foo\n 3",,bar\r
                         #                  ^
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         return 1;
                     }
 
@@ -2247,7 +2456,7 @@ RESTART:
                     if (defined $c2 and $c2 eq "\012") { # \r is not optional before EOLX!
                         # ,1,"foo\n 3",,bar\r\n
                         #                    ^
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         return 1;
                     }
 
@@ -2258,7 +2467,7 @@ RESTART:
                         $self->__set_eol_is_cr($ctx);
                         $ctx->{used}--;
                         $ctx->{has_ahead} = 1;
-                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+                        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
                         return 1;
                     }
 
@@ -2314,11 +2523,12 @@ RESTART:
             # new field
             if (!$v_ref) {
                 if ($ctx->{is_bound}) {
-                    $v_ref = $self->__bound_field($ctx, $fnum++, 0);
+                    $v_ref = $self->__bound_field($ctx, $fnum, 0);
                 } else {
                     $value = '';
                     $v_ref = \$value;
                 }
+                $fnum++;
                 return unless $v_ref;
                 $ctx->{flag} = 0;
                 $ctx->{fld_idx}++;
@@ -2346,7 +2556,7 @@ RESTART:
     }
 
     if ($v_ref) {
-        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag});
+        $self->__push_value($ctx, $v_ref, $fields, $fflags, $ctx->{flag}, $fnum);
     }
     return 1;
 }
@@ -2393,6 +2603,7 @@ sub __set_eol_is_cr {
     $ctx->{eol} = "\015";
     $ctx->{eol_is_cr} = 1;
     $ctx->{eol_len} = 1;
+    %{$self->{_CACHE}} = %$ctx;
 
     $self->{eol} = $ctx->{eol};
 }
@@ -2468,8 +2679,13 @@ sub __is_whitespace {
 }
 
 sub __push_value { # AV_PUSH (part of)
-    my ($self, $ctx, $v_ref, $fields, $fflags, $flag) = @_;
+    my ($self, $ctx, $v_ref, $fields, $fflags, $flag, $fnum) = @_;
     utf8::encode($$v_ref) if $ctx->{utf8};
+    if ($ctx->{formula} && $$v_ref && substr($$v_ref, 0, 1) eq '=') {
+        my $value = $self->_formula($ctx, $$v_ref, $fnum);
+        push @$fields, defined $value ? $value : undef;
+        return;
+    }
     if (
         (!defined $$v_ref or $$v_ref eq '') and
         ($ctx->{empty_is_undef} or (!($flag & IS_QUOTED) and $ctx->{blank_is_undef}))
@@ -2723,8 +2939,8 @@ is to  B<not>  pass L<C<eol>|/eol> in the parser  (it accepts C<\n>, C<\r>,
 B<and> C<\r\n> by default) and then
 
  my $csv = Text::CSV_PP->new ({ binary => 1 });
- open my $io, "<", $file or die "$file: $!";
- while (my $row = $csv->getline ($io)) {
+ open my $fh, "<", $file or die "$file: $!";
+ while (my $row = $csv->getline ($fh)) {
      my @fields = @$row;
      }
 
@@ -2735,6 +2951,8 @@ The old(er) way of using global file handles is still supported
 =head2 Unicode
 
 Unicode is only tested to work with perl-5.8.2 and up.
+
+See also L</BOM>.
 
 The simplest way to ensure the correct encoding is used for  in- and output
 is by either setting layers on the filehandles, or setting the L</encoding>
@@ -2777,17 +2995,38 @@ For complete control over encoding, please use L<Text::CSV::Encoded>:
  # combine () and print () accept UTF8 marked data
  # parse () and getline () return UTF8 marked data
 
+=head2 BOM
+
+BOM  (or Byte Order Mark)  handling is available only inside the L</header>
+method.   This method supports the following encodings: C<utf-8>, C<utf-1>,
+C<utf-32be>, C<utf-32le>, C<utf-16be>, C<utf-16le>, C<utf-ebcdic>, C<scsu>,
+C<bocu-1>, and C<gb-18030>. See L<Wikipedia|https://en.wikipedia.org/wiki/Byte_order_mark>.
+
+If a file has a BOM, the easiest way to deal with that is
+
+ my $aoh = csv (in => $file, detect_bom => 1);
+
+All records will be encoded based on the detected BOM.
+
+This implies a call to the  L</header>  method,  which defaults to also set
+the L</column_names>. So this is B<not> the same as
+
+ my $aoh = csv (in => $file, headers => "auto");
+
+which only reads the first record to set  L</column_names>  but ignores any
+meaning of possible present BOM.
+
 =head1 METHODS
 
-This whole section is also taken from Text::CSV_XS.
+This section is taken from Text::CSV_XS.
 
-=head2 version ()
+=head2 version
 
 (Class method) Returns the current module version.
 
-=head2 new (\%attr)
+=head2 new
 
-(Class method) Returns a new instance of Text::CSV_PP. The attributes
+(Class method) Returns a new instance of class Text::CSV_PP. The attributes
 are described by the (optional) hash ref C<\%attr>.
 
  my $csv = Text::CSV_PP->new ({ attributes ... });
@@ -2870,7 +3109,7 @@ it acts as an alias to L<C<quote_char>|/quote_char>.
 =head3 escape_char
 
  my $csv = Text::CSV_PP->new ({ escape_char => "\\" });
-         $csv->escape_char (undef);
+         $csv->escape_char (":");
  my $c = $csv->escape_char;
 
 The character to  escape  certain characters inside quoted fields.  This is
@@ -2888,6 +3127,9 @@ C<escape_char>,  the  C<escape_char> will still be the double-quote (C<">).
 If instead you want to escape the  L<C<quote_char>|/quote_char> by doubling
 it you will need to also change the  C<escape_char>  to be the same as what
 you have changed the L<C<quote_char>|/quote_char> to.
+
+Setting C<escape_char> to <undef> or C<""> will disable escaping completely
+and is greatly discouraged. This will also disable C<escape_null>.
 
 The escape character can not be equal to the separation character.
 
@@ -2914,6 +3156,72 @@ so setting C<< { binary => 1 } >> is still a wise option.
 
 If this attribute is set to C<1>, any row that parses to a different number
 of fields than the previous row will cause the parser to throw error 2014.
+
+=head3 formula_handling
+
+=head3 formula
+
+ my $csv = Text::CSV_PP->new ({ formula => "none" });
+         $csv->formula ("none");
+ my $f = $csv->formula;
+
+This defines the behavior of fields containing I<formulas>. As formulas are
+considered dangerous in spreadsheets, this attribute can define an optional
+action to be taken if a field starts with an equal sign (C<=>).
+
+For purpose of code-readability, this can also be written as
+
+ my $csv = Text::CSV_PP->new ({ formula_handling => "none" });
+         $csv->formula_handling ("none");
+ my $f = $csv->formula_handling;
+
+Possible values for this attribute are
+
+=over 2
+
+=item none
+
+Take no specific action. This is the default.
+
+ $csv->formula ("none");
+
+=item die
+
+Cause the process to C<die> whenever a leading C<=> is encountered.
+
+ $csv->formula ("die");
+
+=item croak
+
+Cause the process to C<croak> whenever a leading C<=> is encountered.  (See
+L<Carp>)
+
+ $csv->formula ("croak");
+
+=item diag
+
+Report position and content of the field whenever a leading  C<=> is found.
+The value of the field is unchanged.
+
+ $csv->formula ("diag");
+
+=item empty
+
+Replace the content of fields that start with a C<=> with the empty string.
+
+ $csv->formula ("empty");
+ $csv->formula ("");
+
+=item undef
+
+Replace the content of fields that start with a C<=> with C<undef>.
+
+ $csv->formula ("undef");
+ $csv->formula (undef);
+
+=back
+
+All other values will give a warning and then fallback to C<diag>.
 
 =head3 decode_utf8
 
@@ -3148,7 +3456,7 @@ By default,  all "unsafe" bytes inside a string cause the combined field to
 be quoted.  By setting this attribute to C<0>, you can disable that trigger
 for bytes >= C<0x7F>.
 
-=head3 escape_null or quote_null (deprecated)
+=head3 escape_null
 
  my $csv = Text::CSV_PP->new ({ escape_null => 1 });
          $csv->escape_null (0);
@@ -3159,7 +3467,21 @@ you to treat the  C<NULL>  byte as a simple binary character in binary mode
 (the C<< { binary => 1 } >> is set).  The default is true.  You can prevent
 C<NULL> escapes by setting this attribute to C<0>.
 
+When the C<escape_char> attribute is set to undefined,  this attribute will
+be set to false.
+
+The default setting will encode "=\x00=" as
+
+ "="0="
+
+With C<escape_null> set, this will result in
+
+ "=\x00="
+
 The default when using the C<csv> function is C<false>.
+
+For backward compatibility reasons,  the deprecated old name  C<quote_null>
+is still recognized.
 
 =head3 keep_meta_info
 
@@ -3190,6 +3512,21 @@ record (unless quotation was added because of other reasons).
  $csv->keep_meta_info (11);
  $csv->print (*STDOUT, \@row);
  # 1,,"", ," ",f,"g","h""h",help,"help"
+
+=head3 undef_str
+
+ my $csv = Text::CSV_PP->new ({ undef_str => "\\N" });
+         $csv->undef_str (undef);
+ my $s = $csv->undef_str;
+
+This attribute optionally defines the output of undefined fields. The value
+passed is not changed at all, so if it needs quotation, the quotation needs
+to be included in the value of the attribute.  Use with caution, as passing
+a value like  C<",",,,,""">  will for sure mess up your output. The default
+for this attribute is C<undef>, meaning no special treatment.
+
+This attribute is useful when exporting  CSV data  to be imported in custom
+loaders, like for MySQL, that recognize special sequences for C<NULL> data.
 
 =head3 verbatim
 
@@ -3268,6 +3605,7 @@ is equivalent to
      quote_binary          => 1,
      keep_meta_info        => 0,
      verbatim              => 0,
+     undef_str             => undef,
      types                 => undef,
      callbacks             => undef,
      });
@@ -3304,11 +3642,11 @@ in classes that use or extend Text::CSV_PP.
 
 =head2 print
 
- $status = $csv->print ($io, $colref);
+ $status = $csv->print ($fh, $colref);
 
 Similar to  L</combine> + L</string> + L</print>,  but much more efficient.
 It expects an array ref as input  (not an array!)  and the resulting string
-is not really  created,  but  immediately  written  to the  C<$io>  object,
+is not really  created,  but  immediately  written  to the  C<$fh>  object,
 typically an IO handle or any other object that offers a L</print> method.
 
 For performance reasons  C<print>  does not create a result string,  so all
@@ -3323,22 +3661,31 @@ as arguments to the method call:
  $csv->bind_columns (\($foo, $bar));
  $status = $csv->print ($fh, undef);
 
+A short benchmark
+
+ my @data = ("aa" .. "zz");
+ $csv->bind_columns (\(@data));
+
+ $csv->print ($fh, [ @data ]);   # 11800 recs/sec
+ $csv->print ($fh,  \@data  );   # 57600 recs/sec
+ $csv->print ($fh,   undef  );   # 48500 recs/sec
+
 =head2 say
 
- $status = $csv->say ($io, $colref);
+ $status = $csv->say ($fh, $colref);
 
 Like L<C<print>|/print>, but L<C<eol>|/eol> defaults to C<$\>.
 
 =head2 print_hr
 
- $csv->print_hr ($io, $ref);
+ $csv->print_hr ($fh, $ref);
 
 Provides an easy way  to print a  C<$ref>  (as fetched with L</getline_hr>)
 provided the column names are set with L</column_names>.
 
 It is just a wrapper method with basic parameter checks over
 
- $csv->print ($io, [ map { $ref->{$_} } $csv->column_names ]);
+ $csv->print ($fh, [ map { $ref->{$_} } $csv->column_names ]);
 
 =head2 combine
 
@@ -3360,12 +3707,12 @@ of L</combine>, whichever was called more recently.
 
 =head2 getline
 
- $colref = $csv->getline ($io);
+ $colref = $csv->getline ($fh);
 
 This is the counterpart to  L</print>,  as L</parse>  is the counterpart to
-L</combine>:  it parses a row from the C<$io>  handle using the L</getline>
-method associated with C<$io>  and parses this row into an array ref.  This
-array ref is returned by the function or C<undef> for failure.  When C<$io>
+L</combine>:  it parses a row from the C<$fh>  handle using the L</getline>
+method associated with C<$fh>  and parses this row into an array ref.  This
+array ref is returned by the function or C<undef> for failure.  When C<$fh>
 does not support C<getline>, you are likely to hit errors.
 
 When fields are bound with L</bind_columns> the return value is a reference
@@ -3375,27 +3722,27 @@ The L</string>, L</fields>, and L</status> methods are meaningless again.
 
 =head2 getline_all
 
- $arrayref = $csv->getline_all ($io);
- $arrayref = $csv->getline_all ($io, $offset);
- $arrayref = $csv->getline_all ($io, $offset, $length);
+ $arrayref = $csv->getline_all ($fh);
+ $arrayref = $csv->getline_all ($fh, $offset);
+ $arrayref = $csv->getline_all ($fh, $offset, $length);
 
-This will return a reference to a list of L<getline ($io)|/getline> results.
+This will return a reference to a list of L<getline ($fh)|/getline> results.
 In this call, C<keep_meta_info> is disabled.  If C<$offset> is negative, as
-with C<splice>, only the last  C<abs ($offset)> records of C<$io> are taken
+with C<splice>, only the last  C<abs ($offset)> records of C<$fh> are taken
 into consideration.
 
 Given a CSV file with 10 lines:
 
  lines call
  ----- ---------------------------------------------------------
- 0..9  $csv->getline_all ($io)         # all
- 0..9  $csv->getline_all ($io,  0)     # all
- 8..9  $csv->getline_all ($io,  8)     # start at 8
- -     $csv->getline_all ($io,  0,  0) # start at 0 first 0 rows
- 0..4  $csv->getline_all ($io,  0,  5) # start at 0 first 5 rows
- 4..5  $csv->getline_all ($io,  4,  2) # start at 4 first 2 rows
- 8..9  $csv->getline_all ($io, -2)     # last 2 rows
- 6..7  $csv->getline_all ($io, -4,  2) # first 2 of last  4 rows
+ 0..9  $csv->getline_all ($fh)         # all
+ 0..9  $csv->getline_all ($fh,  0)     # all
+ 8..9  $csv->getline_all ($fh,  8)     # start at 8
+ -     $csv->getline_all ($fh,  0,  0) # start at 0 first 0 rows
+ 0..4  $csv->getline_all ($fh,  0,  5) # start at 0 first 5 rows
+ 4..5  $csv->getline_all ($fh,  4,  2) # start at 4 first 2 rows
+ 8..9  $csv->getline_all ($fh, -2)     # last 2 rows
+ 6..7  $csv->getline_all ($fh, -4,  2) # first 2 of last  4 rows
 
 =head2 getline_hr
 
@@ -3404,7 +3751,7 @@ to have rows returned as hashrefs.  You must call L</column_names> first to
 declare your column names.
 
  $csv->column_names (qw( code name price description ));
- $hr = $csv->getline_hr ($io);
+ $hr = $csv->getline_hr ($fh);
  print "Price for $hr->{name} is $hr->{price} EUR\n";
 
 L</getline_hr> will croak if called before L</column_names>.
@@ -3413,30 +3760,35 @@ Note that  L</getline_hr>  creates a hashref for every row and will be much
 slower than the combined use of L</bind_columns>  and L</getline> but still
 offering the same ease of use hashref inside the loop:
 
- my @cols = @{$csv->getline ($io)};
+ my @cols = @{$csv->getline ($fh)};
  $csv->column_names (@cols);
- while (my $row = $csv->getline_hr ($io)) {
+ while (my $row = $csv->getline_hr ($fh)) {
      print $row->{price};
      }
 
 Could easily be rewritten to the much faster:
 
- my @cols = @{$csv->getline ($io)};
+ my @cols = @{$csv->getline ($fh)};
  my $row = {};
  $csv->bind_columns (\@{$row}{@cols});
- while ($csv->getline ($io)) {
+ while ($csv->getline ($fh)) {
      print $row->{price};
      }
 
-Your mileage may vary for the size of the data and the number of rows.
+Your mileage may vary for the size of the data and the number of rows. With
+perl-5.14.2 the comparison for a 100_000 line file with 14 rows:
+
+            Rate hashrefs getlines
+ hashrefs 1.00/s       --     -76%
+ getlines 4.15/s     313%       --
 
 =head2 getline_hr_all
 
- $arrayref = $csv->getline_hr_all ($io);
- $arrayref = $csv->getline_hr_all ($io, $offset);
- $arrayref = $csv->getline_hr_all ($io, $offset, $length);
+ $arrayref = $csv->getline_hr_all ($fh);
+ $arrayref = $csv->getline_hr_all ($fh, $offset);
+ $arrayref = $csv->getline_hr_all ($fh, $offset, $length);
 
-This will return a reference to a list of   L<getline_hr ($io)|/getline_hr>
+This will return a reference to a list of   L<getline_hr ($fh)|/getline_hr>
 results.  In this call, L<C<keep_meta_info>|/keep_meta_info> is disabled.
 
 =head2 parse
@@ -3461,7 +3813,7 @@ supposed to croak and set error 1500.
 This function tries to implement RFC7111  (URI Fragment Identifiers for the
 text/csv Media Type) - http://tools.ietf.org/html/rfc7111
 
- my $AoA = $csv->fragment ($io, $spec);
+ my $AoA = $csv->fragment ($fh, $spec);
 
 In specifications,  C<*> is used to specify the I<last> item, a dash (C<->)
 to indicate a range.   All indices are C<1>-based:  the first row or column
@@ -3473,7 +3825,7 @@ disjointed  cell-based combined selection  might return rows with different
 number of columns making the use of hashes unpredictable.
 
  $csv->column_names ("Name", "Age");
- my $AoH = $csv->fragment ($io, "col=3;8");
+ my $AoH = $csv->fragment ($fh, "col=3;8");
 
 If the L</after_parse> callback is active,  it is also called on every line
 parsed and skipped before the fragment.
@@ -3554,14 +3906,14 @@ Set the "keys" that will be used in the  L</getline_hr>  calls.  If no keys
 L</column_names> accepts a list of scalars  (the column names)  or a single
 array_ref, so you can pass the return value from L</getline> too:
 
- $csv->column_names ($csv->getline ($io));
+ $csv->column_names ($csv->getline ($fh));
 
 L</column_names> does B<no> checking on duplicates at all, which might lead
 to unexpected results.   Undefined entries will be replaced with the string
 C<"\cAUNDEF\cA">, so
 
  $csv->column_names (undef, "", "name", "name");
- $hr = $csv->getline_hr ($io);
+ $hr = $csv->getline_hr ($fh);
 
 Will set C<< $hr->{"\cAUNDEF\cA"} >> to the 1st field,  C<< $hr->{""} >> to
 the 2nd field, and C<< $hr->{name} >> to the 4th field,  discarding the 3rd
@@ -3580,6 +3932,11 @@ Parse the CSV header and set L<C<sep>|/sep>, column_names and encoding.
  $csv->header ($fh, { detect_bom => 1, munge_column_names => "lc" });
 
 The first argument should be a file handle.
+
+This method resets some object properties,  as it is supposed to be invoked
+only once per file or stream.  It will leave attributes C<column_names> and
+C<bound_columns> alone of setting column names is disabled. Reading headers
+on previously process objects might fail on perl-5.8.0 and older.
 
 Assuming that the file opened for parsing has a header, and the header does
 not contain problematic characters like embedded newlines,   read the first
@@ -3649,10 +4006,17 @@ Supported encodings from BOM are: UTF-8, UTF-16BE, UTF-16LE, UTF-32BE,  and
 UTF-32LE. BOM's also support UTF-1, UTF-EBCDIC, SCSU, BOCU-1,  and GB-18030
 but L<Encode> does not (yet). UTF-7 is not supported.
 
-The encoding is set using C<binmode> on C<$fh>.
+If a supported BOM was detected as start of the stream, it is stored in the
+abject attribute C<ENCODING>.
+
+ my $enc = $csv->{ENCODING};
+
+The encoding is used with C<binmode> on C<$fh>.
 
 If the handle was opened in a (correct) encoding,  this method will  B<not>
-alter the encoding, as it checks the leading B<bytes> of the first line.
+alter the encoding, as it checks the leading B<bytes> of the first line. In
+case the stream starts with a decode BOM (C<U+FEFF>), C<{ENCODING}> will be
+C<""> (empty) instead of the default C<undef>.
 
 =item munge_column_names
 
@@ -3664,10 +4028,23 @@ to lower case.
 
 The following values are available:
 
-  lc   - lower case
-  uc   - upper case
-  none - do not change
-  \&cb - supply a callback
+  lc     - lower case
+  uc     - upper case
+  none   - do not change
+  \%hash - supply a mapping
+  \&cb   - supply a callback
+
+Literal:
+
+ $csv->header ($fh, { munge_column_names => "none" });
+
+Hash:
+
+ $csv->header ($fh, { munge_column_names => { foo => "sombrero" });
+
+if a value does not exist, the original value is used unchanged
+
+Callback:
 
  $csv->header ($fh, { munge_column_names => sub { fc } });
  $csv->header ($fh, { munge_column_names => sub { "column_".$col++ } });
@@ -3683,6 +4060,8 @@ The default is to set the instances column names using  L</column_names> if
 the method is successful,  so subsequent calls to L</getline_hr> can return
 a hash. Disable setting the header can be forced by using a false value for
 this option.
+
+As described in L</return value> above, content is lost in scalar context.
 
 =back
 
@@ -3721,7 +4100,7 @@ C<3006>.  If you pass more than there are fields to return,  the content of
 the remaining references is left untouched.
 
  $csv->bind_columns (\$code, \$name, \$price, \$description);
- while ($csv->getline ($io)) {
+ while ($csv->getline ($fh)) {
      print "The price of a $name is \x{20ac} $price\n";
      }
 
@@ -3734,10 +4113,11 @@ If no arguments are passed at all, L</bind_columns> will return the list of
 current bindings or C<undef> if no binds are active.
 
 Note that in parsing with  C<bind_columns>,  the fields are set on the fly.
-That implies that if the third field  of a row  causes an error,  the first
-two fields already have been assigned the values of the current row,  while
-the rest of the fields will still hold the values of the previous row.
-If you want the parser to fail in these cases, use the L<C<strict>|/strict> attribute.
+That implies that if the third field of a row causes an error  (or this row
+has just two fields where the previous row had more),  the first two fields
+already have been assigned the values of the current row, while the rest of
+the fields will still hold the values of the previous row.  If you want the
+parser to fail in these cases, use the L<C<strict>|/strict> attribute.
 
 =head2 eof
 
@@ -3956,7 +4336,7 @@ Use to reset the diagnostics if you are dealing with errors.
 
 =head1 FUNCTIONS
 
-This whole section is also taken from Text::CSV_XS.
+This section is also taken from Text::CSV_XS.
 
 =head2 csv
 
@@ -4047,6 +4427,15 @@ where, in the absence of the C<out> attribute, this is a shortcut to
 
 =head3 out
 
+ csv (in => $aoa, out => "file.csv");
+ csv (in => $aoa, out => $fh);
+ csv (in => $aoa, out =>   STDOUT);
+ csv (in => $aoa, out =>  *STDOUT);
+ csv (in => $aoa, out => \*STDOUT);
+ csv (in => $aoa, out => \my $data);
+ csv (in => $aoa, out =>  undef);
+ csv (in => $aoa, out => \"skip");
+
 In output mode, the default CSV options when producing CSV are
 
  eol       => "\r\n"
@@ -4055,7 +4444,8 @@ The L</fragment> attribute is ignored in output mode.
 
 C<out> can be a file name  (e.g.  C<"file.csv">),  which will be opened for
 writing and closed when finished,  a file handle (e.g. C<$fh> or C<FH>),  a
-reference to a glob (e.g. C<\*STDOUT>), or the glob itself (e.g. C<*STDOUT>).
+reference to a glob (e.g. C<\*STDOUT>),  the glob itself (e.g. C<*STDOUT>),
+or a reference to a scalar (e.g. C<\my $data>).
 
  csv (in => sub { $sth->fetch },            out => "dump.csv");
  csv (in => sub { $sth->fetchrow_hashref }, out => "dump.csv",
@@ -4065,6 +4455,18 @@ When a code-ref is used for C<in>, the output is generated  per invocation,
 so no buffering is involved. This implies that there is no size restriction
 on the number of records. The C<csv> function ends when the coderef returns
 a false value.
+
+If C<out> is set to a reference of the literal string C<"skip">, the output
+will be suppressed completely,  which might be useful in combination with a
+filter for side effects only.
+
+ my %cache;
+ csv (in    => "dump.csv",
+      out   => \"skip",
+      on_in => sub { $cache{$_[1][1]}++ });
+
+Currently,  setting C<out> to any false value  (C<undef>, C<"">, 0) will be
+equivalent to C<\"skip">.
 
 =head3 encoding
 
@@ -4087,7 +4489,8 @@ C<detect_bom> can be abbreviated to C<bom>.
 
 This is the same as setting L<C<encoding>|/encoding> to C<"auto">.
 
-Note that as L</header> is invoked, its default is to also set the headers.
+Note that as the method  L</header> is invoked,  its default is to also set
+the headers.
 
 =head3 headers
 
@@ -4219,6 +4622,26 @@ will return
         }
     }
 
+The C<key> attribute can be combined with L<C<headers>|/headers> for C<CSV>
+date that has no header line, like
+
+ my $ref = csv (
+     in      => "foo.csv",
+     headers => [qw( c_foo foo bar description stock )],
+     key     =>     "c_foo",
+     );
+
+=head3 keep_headers
+
+When using hashes,  keep the column names into the arrayref passed,  so all
+headers are available after the call in the original order.
+
+ my $aoh = csv (in => "file.csv", keep_headers => \my @hdr);
+
+This attribute can be abbreviated to C<kh> or passed as C<keep_column_names>.
+
+This attribute implies a default of C<auto> for the C<headers> attribute.
+
 =head3 fragment
 
 Only output the fragment as defined in the L</fragment> method. This option
@@ -4243,12 +4666,42 @@ to detect and set L<C<sep_char>|/sep_char> with the given set.
 
 C<sep_set> can be abbreviated to C<seps>.
 
-Note that as L</header> is invoked, its default is to also set the headers.
+Note that as the  L</header> method is invoked,  its default is to also set
+the headers.
 
 =head3 set_column_names
 
 If  C<set_column_names> is passed,  the method L</header> is invoked on the
 opened stream with all arguments meant for L</header>.
+
+If C<set_column_names> is passed as a false value, the content of the first
+row is only preserved if the output is AoA:
+
+With an input-file like
+
+ bAr,foo
+ 1,2
+ 3,4,5
+
+This call
+
+ my $aoa = csv (in => $file, set_column_names => 0);
+
+will result in
+
+ [[ "bar", "foo"     ],
+  [ "1",   "2"       ],
+  [ "3",   "4",  "5" ]]
+
+and
+
+ my $aoa = csv (in => $file, set_column_names => 0, munge => "none");
+
+will result in
+
+ [[ "bAr", "foo"     ],
+  [ "1",   "2"       ],
+  [ "3",   "4",  "5" ]]
 
 =head2 Callbacks
 
@@ -4392,25 +4845,26 @@ but only feature the L</csv> function.
 =item filter
 
 This callback can be used to filter records.  It is called just after a new
-record has been scanned.  The callback accepts a hashref where the keys are
-the index to the row (the field number, 1-based) and the values are subs to
-return a true or false value.
+record has been scanned.  The callback accepts a:
+
+=over 2
+
+=item hashref
+
+The keys are the index to the row (the field name or field number, 1-based)
+and the values are subs to return a true or false value.
 
  csv (in => "file.csv", filter => {
             3 => sub { m/a/ },       # third field should contain an "a"
             5 => sub { length > 4 }, # length of the 5th field minimal 5
             });
 
- csv (in => "file.csv", filter => "not_blank");
- csv (in => "file.csv", filter => "not_empty");
- csv (in => "file.csv", filter => "filled");
+ csv (in => "file.csv", filter => { foo => sub { $_ > 4 }});
 
 If the keys to the filter hash contain any character that is not a digit it
 will also implicitly set L</headers> to C<"auto">  unless  L</headers>  was
 already passed as argument.  When headers are active, returning an array of
 hashes, the filter is not applicable to the header itself.
-
- csv (in => "file.csv", filter => { foo => sub { $_ > 4 }});
 
 All sub results should match, as in AND.
 
@@ -4435,7 +4889,26 @@ evaluates to false. To always accept, end with truth:
 
  filter => { 2 => sub { $_ = uc; 1 }}
 
-B<Predefined filters>
+=item coderef
+
+ csv (in => "file.csv", filter => sub { $n++; 0; });
+
+If the argument to C<filter> is a coderef,  it is an alias or shortcut to a
+filter on column 0:
+
+ csv (filter => sub { $n++; 0 });
+
+is equal to
+
+ csv (filter => { 0 => sub { $n++; 0 });
+
+=item filter-name
+
+ csv (in => "file.csv", filter => "not_blank");
+ csv (in => "file.csv", filter => "not_empty");
+ csv (in => "file.csv", filter => "filled");
+
+These are predefined filters
 
 Given a file like (line numbers prefixed for doc purpose only):
 
@@ -4489,6 +4962,8 @@ This filter rejects all lines that I<not> have at least one field that does
 not evaluate to the empty string.
 
 With the given example data, this filter would skip lines 2 through 8.
+
+=back
 
 =back
 
@@ -4563,6 +5038,8 @@ a 53% speedup.
 
 This section is also taken from Text::CSV_XS.
 
+Still under construction ...
+
 If an error occurs,  C<< $csv->error_diag >> can be used to get information
 on the cause of the failure. Note that for speed reasons the internal value
 is never cleared on success,  so using the value returned by L</error_diag>
@@ -4628,7 +5105,6 @@ And below should be the complete list of error codes that can be returned:
 
 =item *
 1001 "INI - sep_char is equal to quote_char or escape_char"
-X<1001>
 
 The  L<separation character|/sep_char>  cannot be equal to  L<the quotation
 character|/quote_char> or to L<the escape character|/escape_char>,  as this
@@ -4636,7 +5112,6 @@ would invalidate all parsing rules.
 
 =item *
 1002 "INI - allow_whitespace with escape_char or quote_char SP or TAB"
-X<1002>
 
 Using the  L<C<allow_whitespace>|/allow_whitespace>  attribute  when either
 L<C<quote_char>|/quote_char> or L<C<escape_char>|/escape_char>  is equal to
@@ -4644,7 +5119,6 @@ C<SPACE> or C<TAB> is too ambiguous to allow.
 
 =item *
 1003 "INI - \r or \n in main attr not allowed"
-X<1003>
 
 Using default L<C<eol>|/eol> characters in either L<C<sep_char>|/sep_char>,
 L<C<quote_char>|/quote_char>,   or  L<C<escape_char>|/escape_char>  is  not
@@ -4652,76 +5126,69 @@ allowed.
 
 =item *
 1004 "INI - callbacks should be undef or a hashref"
-X<1004>
 
 The L<C<callbacks>|/Callbacks>  attribute only allows one to be C<undef> or
 a hash reference.
 
 =item *
 1005 "INI - EOL too long"
-X<1005>
 
 The value passed for EOL is exceeding its maximum length (16).
 
 =item *
 1006 "INI - SEP too long"
-X<1006>
 
 The value passed for SEP is exceeding its maximum length (16).
 
 =item *
 1007 "INI - QUOTE too long"
-X<1007>
 
 The value passed for QUOTE is exceeding its maximum length (16).
 
 =item *
 1008 "INI - SEP undefined"
-X<1008>
 
 The value passed for SEP should be defined and not empty.
 
 =item *
 1010 "INI - the header is empty"
-X<1010>
 
 The header line parsed in the L</header> is empty.
 
 =item *
 1011 "INI - the header contains more than one valid separator"
-X<1011>
 
 The header line parsed in the  L</header>  contains more than one  (unique)
 separator character out of the allowed set of separators.
 
 =item *
 1012 "INI - the header contains an empty field"
-X<1012>
 
 The header line parsed in the L</header> is contains an empty field.
 
 =item *
 1013 "INI - the header contains nun-unique fields"
-X<1013>
 
 The header line parsed in the  L</header>  contains at least  two identical
 fields.
 
 =item *
 1014 "INI - header called on undefined stream"
-X<1014>
 
 The header line cannot be parsed from an undefined sources.
 
 =item *
 1500 "PRM - Invalid/unsupported argument(s)"
-X<1500>
 
 Function or method called with invalid argument(s) or parameter(s).
 
 =item *
+1501 "PRM - The key attribute is passed as an unsupported type"
+
+The C<key> attribute is of an unsupported type.
+
+=item *
 2010 "ECR - QUO char inside quotes followed by CR not part of EOL"
-X<2010>
 
 When  L<C<eol>|/eol>  has  been  set  to  anything  but the  default,  like
 C<"\r\t\n">,  and  the  C<"\r">  is  following  the   B<second>   (closing)
@@ -4730,7 +5197,6 @@ not make up the L<C<eol>|/eol> sequence, this is an error.
 
 =item *
 2011 "ECR - Characters after end of quoted field"
-X<2011>
 
 Sequences like C<1,foo,"bar"baz,22,1> are not allowed. C<"bar"> is a quoted
 field and after the closing double-quote, there should be either a new-line
@@ -4738,7 +5204,6 @@ sequence or a separation character.
 
 =item *
 2012 "EOF - End of data in parsing input stream"
-X<2012>
 
 Self-explaining. End-of-file while inside parsing a stream. Can happen only
 when reading from streams with L</getline>,  as using  L</parse> is done on
@@ -4746,46 +5211,39 @@ strings that are not required to have a trailing L<C<eol>|/eol>.
 
 =item *
 2013 "INI - Specification error for fragments RFC7111"
-X<2013>
 
 Invalid specification for URI L</fragment> specification.
 
 =item *
 2014 "ENF - Inconsistent number of fields"
-X<2014>
 
 Inconsistent number of fields under strict parsing.
 
 =item *
 2021 "EIQ - NL char inside quotes, binary off"
-X<2021>
 
 Sequences like C<1,"foo\nbar",22,1> are allowed only when the binary option
 has been selected with the constructor.
 
 =item *
 2022 "EIQ - CR char inside quotes, binary off"
-X<2022>
 
 Sequences like C<1,"foo\rbar",22,1> are allowed only when the binary option
 has been selected with the constructor.
 
 =item *
 2023 "EIQ - QUO character not allowed"
-X<2023>
 
 Sequences like C<"foo "bar" baz",qu> and C<2023,",2008-04-05,"Foo, Bar",\n>
 will cause this error.
 
 =item *
 2024 "EIQ - EOF cannot be escaped, not even inside quotes"
-X<2024>
 
 The escape character is not allowed as last character in an input stream.
 
 =item *
 2025 "EIQ - Loose unescaped escape"
-X<2025>
 
 An escape character should escape only characters that need escaping.
 
@@ -4794,7 +5252,6 @@ L</allow_loose_escape>.
 
 =item *
 2026 "EIQ - Binary character inside quoted field, binary off"
-X<2026>
 
 Binary characters are not allowed by default.    Exceptions are fields that
 contain valid UTF-8,  that will automatically be upgraded if the content is
@@ -4802,7 +5259,6 @@ valid UTF-8. Set L<C<binary>|/binary> to C<1> to accept binary data.
 
 =item *
 2027 "EIQ - Quoted field not terminated"
-X<2027>
 
 When parsing a field that started with a quotation character,  the field is
 expected to be closed with a quotation character.   When the parsed line is
@@ -4810,75 +5266,57 @@ exhausted before the quote is found, that field is not terminated.
 
 =item *
 2030 "EIF - NL char inside unquoted verbatim, binary off"
-X<2030>
 
 =item *
 2031 "EIF - CR char is first char of field, not part of EOL"
-X<2031>
 
 =item *
 2032 "EIF - CR char inside unquoted, not part of EOL"
-X<2032>
 
 =item *
 2034 "EIF - Loose unescaped quote"
-X<2034>
 
 =item *
 2035 "EIF - Escaped EOF in unquoted field"
-X<2035>
 
 =item *
 2036 "EIF - ESC error"
-X<2036>
 
 =item *
 2037 "EIF - Binary character in unquoted field, binary off"
-X<2037>
 
 =item *
 2110 "ECB - Binary character in Combine, binary off"
-X<2110>
 
 =item *
 2200 "EIO - print to IO failed. See errno"
-X<2200>
 
 =item *
 3001 "EHR - Unsupported syntax for column_names ()"
-X<3001>
 
 =item *
 3002 "EHR - getline_hr () called before column_names ()"
-X<3002>
 
 =item *
 3003 "EHR - bind_columns () and column_names () fields count mismatch"
-X<3003>
 
 =item *
 3004 "EHR - bind_columns () only accepts refs to scalars"
-X<3004>
 
 =item *
 3006 "EHR - bind_columns () did not pass enough refs for parsed fields"
-X<3006>
 
 =item *
 3007 "EHR - bind_columns needs refs to writable scalars"
-X<3007>
 
 =item *
 3008 "EHR - unexpected error in bound fields"
-X<3008>
 
 =item *
 3009 "EHR - print_hr () called before column_names ()"
-X<3009>
 
 =item *
 3010 "EHR - print_hr () called with invalid arguments"
-X<3010>
 
 =back
 

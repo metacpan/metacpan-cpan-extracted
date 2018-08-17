@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Created by create_map_tube_xml.pl 0.02 (part of BBBike)-->
+<!--Created by create_map_tube_xml.pl 0.03 (part of BBBike)-->
 <tube name="Berlin Metro">
   <lines>
     <line id="S1" name="S1" color="#DD6CA6"/>
@@ -107,7 +107,7 @@
     <station id="S196" name="Frohnau" line="S1" link="S195,S197"/>
     <station id="S307" name="Gehrenseestr." line="S75" link="S264,S308"/>
     <station id="S152" name="Gesundbrunnen" line="S1,S2,S25,S26,S41/S42,U8" link="S029,S095,S151,S153,S189,S190"/>
-    <station id="S008" name="Gleisdreieck" line="U1,U2" link="S007,S009,S041,S042"/>
+    <station id="S008" name="Gleisdreieck" line="U1,U2,U3" link="S007,S009,S041,S042"/>
     <station id="S120" name="Gneisenaustr." line="U7" link="S087,S119"/>
     <station id="S203" name="Greifswalder Str." line="S41/S42,S8,S85" link="S202,S204"/>
     <station id="S114" name="Grenzallee" line="U7" link="S113,S115"/>
@@ -115,12 +115,12 @@
     <station id="S265" name="Grunewald" line="S7" link="S175,S212"/>
     <station id="S271" name="Grünau" line="S46,S8,S85" link="S270,S272"/>
     <station id="S283" name="Grünbergallee" line="S45,S9" link="S282,S284"/>
-    <station id="S003" name="Görlitzer Bhf." line="U1" link="S002,S004"/>
+    <station id="S003" name="Görlitzer Bhf." line="U1,U3" link="S002,S004"/>
     <station id="S168" name="Güntzelstr." line="U9" link="S015,S124"/>
     <station id="S240" name="Hackescher Markt" line="S3,S5,S7,S9" link="S033,S090"/>
     <station id="S133" name="Halemweg" line="U7" link="S132,S134"/>
     <station id="S211" name="Halensee" line="S41/S42,S46" link="S210,S212"/>
-    <station id="S006" name="Hallesches Tor" line="U1,U6" link="S005,S007,S087,S088"/>
+    <station id="S006" name="Hallesches Tor" line="U1,U3,U6" link="S005,S007,S087,S088"/>
     <station id="S167" name="Hansaplatz" line="U9" link="S043,S166"/>
     <station id="S137" name="Haselhorst" line="U7" link="S136,S138"/>
     <station id="S078" name="Hauptbahnhof" line="S3,S5,S7,S9,U55" link="S077,S090,S241"/>
@@ -163,10 +163,10 @@
     <station id="S034" name="Klosterstr." line="U2" link="S033,S035"/>
     <station id="S088" name="Kochstr." line="U6" link="S006,S038"/>
     <station id="S126" name="Konstanzer Str." line="U7" link="S017,S127"/>
-    <station id="S004" name="Kottbusser Tor" line="U1,U8" link="S003,S005,S144,S145"/>
+    <station id="S004" name="Kottbusser Tor" line="U1,U3,U8" link="S003,S005,S144,S145"/>
     <station id="S026" name="Krumme Lanke" line="U3" link="S025"/>
     <station id="S012" name="Kurfürstendamm" line="U1,U9" link="S011,S013,S015,S043"/>
-    <station id="S009" name="Kurfürstenstr." line="U1" link="S008,S010"/>
+    <station id="S009" name="Kurfürstenstr." line="U1,U3" link="S008,S010"/>
     <station id="S100" name="Kurt-Schumacher-Platz" line="U6" link="S099,S101"/>
     <station id="S306" name="Köllnische Heide" line="S45,S46,S47" link="S115,S275"/>
     <station id="S311" name="Königs Wusterhausen" line="S46" link="S310"/>
@@ -199,7 +199,7 @@
     <station id="S039" name="Mohrenstr." line="U2" link="S038,S040"/>
     <station id="S145" name="Moritzplatz" line="U8" link="S004,S146"/>
     <station id="S035" name="Märkisches Museum" line="U2" link="S034,S036"/>
-    <station id="S007" name="Möckernbrücke" line="U1,U7" link="S006,S008,S087,S121"/>
+    <station id="S007" name="Möckernbrücke" line="U1,U3,U7" link="S006,S008,S087,S121"/>
     <station id="S279" name="Mühlenbeck-Mönchsmühle" line="S8" link="S278,S280"/>
     <station id="S092" name="Naturkundemuseum" line="U6" link="S091,S093"/>
     <station id="S162" name="Nauener Platz" line="U9" link="S096,S154"/>
@@ -240,7 +240,7 @@
     <station id="S040" name="Potsdamer Platz" line="S1,S2,S25,S26,U2" link="S039,S041,S076,S186"/>
     <station id="S202" name="Prenzlauer Allee" line="S41/S42,S8,S85" link="S029,S203"/>
     <station id="S222" name="Priesterweg" line="S2,S25,S26" link="S209,S221,S297"/>
-    <station id="S005" name="Prinzenstr." line="U1" link="S004,S006"/>
+    <station id="S005" name="Prinzenstr." line="U1,U3" link="S004,S006"/>
     <station id="S231" name="Rahnsdorf" line="S3" link="S230,S232"/>
     <station id="S261" name="Raoul-Wallenberg-Str." line="S7" link="S260,S262"/>
     <station id="S117" name="Rathaus Neukölln" line="U7" link="S116,S118"/>
@@ -266,7 +266,7 @@
     <station id="S294" name="Schichauweg" line="S2" link="S293,S295"/>
     <station id="S057" name="Schillingstr." line="U5" link="S033,S058"/>
     <station id="S176" name="Schlachtensee" line="S1" link="S175,S177"/>
-    <station id="S002" name="Schlesisches Tor" line="U1" link="S001,S003"/>
+    <station id="S002" name="Schlesisches Tor" line="U1,U3" link="S001,S003"/>
     <station id="S172" name="Schloßstr." line="U9" link="S171,S173"/>
     <station id="S226" name="Schulzendorf" line="S25" link="S225,S227"/>
     <station id="S093" name="Schwartzkopffstr." line="U6" link="S092,S094"/>
@@ -313,7 +313,7 @@
     <station id="S194" name="Waidmannslust" line="S1,S26" link="S161,S195"/>
     <station id="S171" name="Walther-Schreiber-Platz" line="U9" link="S170,S172"/>
     <station id="S174" name="Wannsee" line="S1,S7" link="S175,S266"/>
-    <station id="S001" name="Warschauer Str." line="S3,S5,S7,S9,U1" link="S002,S206,S207,S239"/>
+    <station id="S001" name="Warschauer Str." line="S3,S5,S7,S9,U1,U3" link="S002,S206,S207,S239"/>
     <station id="S309" name="Wartenberg" line="S75" link="S308"/>
     <station id="S059" name="Weberwiese" line="U5" link="S058,S060"/>
     <station id="S095" name="Wedding" line="S41/S42,U6" link="S094,S096,S152,S164"/>

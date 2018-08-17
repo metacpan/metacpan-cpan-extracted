@@ -3,11 +3,12 @@ abstract: 'Generate Secure Random Strings for Mojolicious'
 author:
   - 'Nils Diewald'
 build_requires:
+  Test::Memory::Cycle: '1.06'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,5 +25,5 @@ requires:
 resources:
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/Akron/Mojolicious-Plugin-Util-RandomString
-version: '0.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

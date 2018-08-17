@@ -15,7 +15,7 @@ use RunTests;
 # run 'dzil test'
 #   - only Build test run; make test is not; environment variables not set
 # run 'dzil test --release'
-#   - Build test and make test aer both run; variables are set properly
+#   - Build test and make test are both run; variables are set properly
 
 {
     package BuildMunger;

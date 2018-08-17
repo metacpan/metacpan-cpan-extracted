@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Overground;
 
-$Map::Tube::London::Line::Central::VERSION   = '1.17';
+$Map::Tube::London::Line::Central::VERSION   = '1.22';
 $Map::Tube::London::Line::Central::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Overground - London Tube Map: London Overground Line.
 
 =head1 VERSION
 
-Version 1.17
+Version 1.22
 
 =encoding utf8
 
@@ -119,56 +119,77 @@ London Tube Map: London Overground Line.
 
 =item * The station "Barking" is also part of
           L<District Line|Map::Tube::London::Line::District>
-        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>.
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
 
 =item * The station "Blackhorse Road" is also part of
-          L<Victoria Line|Map::Tube::London::Line::Victoria>.
+          L<Victoria Line|Map::Tube::London::Line::Victoria>
 
-=item * The station "Willesden Junction" is also part of
-          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>.
-
-=item * The station "Queen's Park" is also part of
-          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>.
+=item * The station "Canada Water" is also part of
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
 
 =item * The station "Euston" is also part of
           L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>.
-
-=item * The station "Shepherd's Bush" is also part of
-          L<Central Line|Map::Tube::London::Line::Central>.
-
-=item * The station "Kensington (Olympia)" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
-
-=item * The station "West Brompton" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
 
 =item * The station "Gunnersbury" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+          L<District Line|Map::Tube::London::Line::District>
 
-=item * The station "Clapham High Street" is also part of
-          L<Northern Line|Map::Tube::London::Line::Northern>.
+=item * The station "Harlesden" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
 
-=item * The station "Canada Water" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
+=item * The station "Harrow & Wealdstone" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "Highbury & Islington" is also part of
+          L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "Kensal Green" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "Kensington (Olympia)" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Kenton" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "North Wembley" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "Richmond" is also part of
+          L<District Line|Map::Tube::London::Line::District>
 
 =item * The station "Shadwell" is also part of
-          L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>.
+          L<DLR Line|Map::Tube::London::Line::DLR>
+
+=item * The station "Shepherd's Bush" is also part of
+          L<Central Line|Map::Tube::London::Line::Central>
+
+=item * The station "South Kenton" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "Stonebridge Park" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "Stratford" is also part of
+          L<Central Line|Map::Tube::London::Line::Central>
+        | L<DLR Line|Map::Tube::London::Line::DLR>
+        | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
+
+=item * The station "Wembley Central" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+
+=item * The station "West Brompton" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "West Hampstead" is also part of
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
 
 =item * The station "Whitechapel" is also part of
           L<District Line|Map::Tube::London::Line::District>
-        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>.
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
 
-=item * The station "Highbury & Islington" is also part of
-          L<Victoria Line|Map::Tube::London::Line::Victoria>.
-
-=item * The station "Stratford" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<Central Line|Map::Tube::London::Line::Central>
-        | L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>.
-
-=item * The station "West Hampstead" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
+=item * The station "Willesden Junction" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
 
 =back
 

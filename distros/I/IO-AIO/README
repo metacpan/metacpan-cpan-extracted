@@ -1,5 +1,5 @@
 NAME
-    IO::AIO - Asynchronous Input/Output
+    IO::AIO - Asynchronous/Advanced Input/Output
 
 SYNOPSIS
      use IO::AIO;
@@ -56,6 +56,10 @@ DESCRIPTION
     files currently, for example), and they would only support aio_read and
     aio_write, so the remaining functionality would have to be implemented
     using threads anyway.
+
+    In addition to asynchronous I/O, this module also exports some rather
+    arcane interfaces, such as "madvise" or linux's "splice" system call,
+    which is why the "A" in "AIO" can also mean *advanced*.
 
     Although the module will work in the presence of other (Perl-) threads,
     it is currently not reentrant in any way, so use appropriate locking
@@ -175,6 +179,7 @@ FUNCTIONS
        aio_readlink $pathname, $callback->($link)
        aio_realpath $pathname, $callback->($path)
        aio_rename $srcpath, $dstpath, $callback->($status)
+       aio_rename2 $srcpath, $dstpath, $flags, $callback->($status)
        aio_mkdir $pathname, $mode, $callback->($status)
        aio_rmdir $pathname, $callback->($status)
        aio_readdir $pathname, $callback->($entries)
@@ -194,7 +199,7 @@ FUNCTIONS
        aio_fdatasync $fh, $callback->($status)
        aio_sync_file_range $fh, $offset, $nbytes, $flags, $callback->($status)
        aio_pathsync $pathname, $callback->($status)
-       aio_msync $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
+       aio_msync $scalar, $offset = 0, $length = undef, flags = MS_SYNC, $callback->($status)
        aio_mtouch $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
        aio_mlock $scalar, $offset = 0, $length = undef, $callback->($status)
        aio_mlockall $flags, $callback->($status)
@@ -218,11 +223,14 @@ FUNCTIONS
        IO::AIO::nreqs
        IO::AIO::nready
        IO::AIO::npending
+       $nfd = IO::AIO::get_fdlimit [EXPERIMENTAL]
+       IO::AIO::min_fdlimit $nfd [EXPERIMENTAL]
 
        IO::AIO::sendfile $ofh, $ifh, $offset, $count
        IO::AIO::fadvise $fh, $offset, $len, $advice
        IO::AIO::mmap $scalar, $length, $prot, $flags[, $fh[, $offset]]
        IO::AIO::munmap $scalar
+       IO::AIO::mremap $scalar, $new_length, $flags[, $new_address]
        IO::AIO::madvise $scalar, $offset, $length, $advice
        IO::AIO::mprotect $scalar, $offset, $length, $protect
        IO::AIO::munlock $scalar, $offset = 0, $length = undef
@@ -334,8 +342,8 @@ FUNCTIONS
 
         "O_ASYNC", "O_DIRECT", "O_NOATIME", "O_CLOEXEC", "O_NOCTTY",
         "O_NOFOLLOW", "O_NONBLOCK", "O_EXEC", "O_SEARCH", "O_DIRECTORY",
-        "O_DSYNC", "O_RSYNC", "O_SYNC", "O_PATH", "O_TMPFILE", and
-        "O_TTY_INIT".
+        "O_DSYNC", "O_RSYNC", "O_SYNC", "O_PATH", "O_TMPFILE", "O_TTY_INIT"
+        and "O_ACCMODE".
 
     aio_close $fh, $callback->($status)
         Asynchronously close a file and call the callback with the result
@@ -375,8 +383,8 @@ FUNCTIONS
     aio_write $fh,$offset,$length, $data,$dataoffset, $callback->($retval)
         Reads or writes $length bytes from or to the specified $fh and
         $offset into the scalar given by $data and offset $dataoffset and
-        calls the callback without the actual number of bytes read (or -1 on
-        error, just like the syscall).
+        calls the callback with the actual number of bytes transferred (or
+        -1 on error, just like the syscall).
 
         "aio_read" will, like "sysread", shrink or grow the $data scalar to
         offset plus the actual number of bytes read.
@@ -443,7 +451,7 @@ FUNCTIONS
         rather buggy on many systems, this implementation tries to work
         around some known bugs in Linux and FreeBSD kernels (probably
         others, too), but that might fail, so you really really should check
-        the return value of "aio_sendfile" - fewre bytes than expected might
+        the return value of "aio_sendfile" - fewer bytes than expected might
         have been transferred.
 
     aio_readahead $fh,$offset,$length, $callback->($retval)
@@ -457,7 +465,7 @@ FUNCTIONS
         read beyond the end of the file. The current file offset of the file
         is left unchanged.
 
-        If that syscall doesn't exist (likely if your OS isn't Linux) it
+        If that syscall doesn't exist (likely if your kernel isn't Linux) it
         will be emulated by simply reading the data, which would have a
         similar effect.
 
@@ -483,6 +491,9 @@ FUNCTIONS
         "S_IFMT", "S_IFIFO", "S_IFCHR", "S_IFBLK", "S_IFLNK", "S_IFREG",
         "S_IFDIR", "S_IFWHT", "S_IFSOCK", "IO::AIO::major $dev_t",
         "IO::AIO::minor $dev_t", "IO::AIO::makedev $major, $minor".
+
+        To access higher resolution stat timestamps, see "SUBSECOND STAT
+        TIME ACCESS".
 
         Example: Print the length of /etc/passwd:
 
@@ -534,91 +545,6 @@ FUNCTIONS
               fsid    => 1810
            }
 
-        Here is a (likely partial - send me updates!) list of fsid values
-        used by Linux - it is safe to hardcode these when $^O is "linux":
-
-           0x0000adf5 adfs
-           0x0000adff affs
-           0x5346414f afs
-           0x09041934 anon-inode filesystem
-           0x00000187 autofs
-           0x42465331 befs
-           0x1badface bfs
-           0x42494e4d binfmt_misc
-           0x9123683e btrfs
-           0x0027e0eb cgroupfs
-           0xff534d42 cifs
-           0x73757245 coda
-           0x012ff7b7 coh
-           0x28cd3d45 cramfs
-           0x453dcd28 cramfs-wend (wrong endianness)
-           0x64626720 debugfs
-           0x00001373 devfs
-           0x00001cd1 devpts
-           0x0000f15f ecryptfs
-           0x00414a53 efs
-           0x0000137d ext
-           0x0000ef53 ext2/ext3/ext4
-           0x0000ef51 ext2
-           0xf2f52010 f2fs
-           0x00004006 fat
-           0x65735546 fuseblk
-           0x65735543 fusectl
-           0x0bad1dea futexfs
-           0x01161970 gfs2
-           0x47504653 gpfs
-           0x00004244 hfs
-           0xf995e849 hpfs
-           0x00c0ffee hostfs
-           0x958458f6 hugetlbfs
-           0x2bad1dea inotifyfs
-           0x00009660 isofs
-           0x000072b6 jffs2
-           0x3153464a jfs
-           0x6b414653 k-afs
-           0x0bd00bd0 lustre
-           0x0000137f minix
-           0x0000138f minix 30 char names
-           0x00002468 minix v2
-           0x00002478 minix v2 30 char names
-           0x00004d5a minix v3
-           0x19800202 mqueue
-           0x00004d44 msdos
-           0x0000564c novell
-           0x00006969 nfs
-           0x6e667364 nfsd
-           0x00003434 nilfs
-           0x5346544e ntfs
-           0x00009fa1 openprom
-           0x7461636F ocfs2
-           0x00009fa0 proc
-           0x6165676c pstorefs
-           0x0000002f qnx4
-           0x68191122 qnx6
-           0x858458f6 ramfs
-           0x52654973 reiserfs
-           0x00007275 romfs
-           0x67596969 rpc_pipefs
-           0x73636673 securityfs
-           0xf97cff8c selinux
-           0x0000517b smb
-           0x534f434b sockfs
-           0x73717368 squashfs
-           0x62656572 sysfs
-           0x012ff7b6 sysv2
-           0x012ff7b5 sysv4
-           0x01021994 tmpfs
-           0x15013346 udf
-           0x00011954 ufs
-           0x54190100 ufs byteswapped
-           0x00009fa2 usbdevfs
-           0x01021997 v9fs
-           0xa501fcf5 vxfs
-           0xabba1974 xenfs
-           0x012ff7b4 xenix
-           0x58465342 xfs
-           0x012fd16d xia
-
     aio_utime $fh_or_path, $atime, $mtime, $callback->($status)
         Works like perl's "utime" function (including the special case of
         $atime and $mtime being undef). Fractional times are supported if
@@ -659,11 +585,14 @@ FUNCTIONS
         IO::AIO::FALLOC_FL_KEEP_SIZE", to deallocate a file range.
 
         IO::AIO also supports "FALLOC_FL_COLLAPSE_RANGE", to remove a range
-        (without leaving a hole) and "FALLOC_FL_ZERO_RANGE", to zero a range
-        (see your fallocate(2) manpage).
+        (without leaving a hole), "FALLOC_FL_ZERO_RANGE", to zero a range,
+        "FALLOC_FL_INSERT_RANGE" to insert a range and
+        "FALLOC_FL_UNSHARE_RANGE" to unshare shared blocks (see your
+        fallocate(2) manpage).
 
         The file system block size used by "fallocate" is presumably the
-        "f_bsize" returned by "statvfs".
+        "f_bsize" returned by "statvfs", but different filesystems and
+        filetypes can dictate other limitations.
 
         If "fallocate" isn't available or cannot be emulated (currently no
         emulation will be attempted), passes -1 and sets $! to "ENOSYS".
@@ -717,6 +646,21 @@ FUNCTIONS
         natively, the case "[$wd, "."]" as $srcpath is specialcased -
         instead of failing, "rename" is called on the absolute path of $wd.
 
+    aio_rename2 $srcpath, $dstpath, $flags, $callback->($status)
+        Basically a version of "aio_rename" with an additional $flags
+        argument. Calling this with "$flags=0" is the same as calling
+        "aio_rename".
+
+        Non-zero flags are currently only supported on GNU/Linux systems
+        that support renameat2. Other systems fail with "ENOSYS" in this
+        case.
+
+        The following constants are available (missing ones are, as usual
+        0), see renameat2(2) for details:
+
+        "IO::AIO::RENAME_NOREPLACE", "IO::AIO::RENAME_EXCHANGE" and
+        "IO::AIO::RENAME_WHITEOUT".
+
     aio_mkdir $pathname, $mode, $callback->($status)
         Asynchronously mkdir (create) a directory and call the callback with
         the result code. $mode will be modified by the umask at the time the
@@ -748,10 +692,10 @@ FUNCTIONS
         modified):
 
         IO::AIO::READDIR_DENTS
-            When this flag is off, then the callback gets an arrayref
-            consisting of names only (as with "aio_readdir"), otherwise it
+            Normally the callback gets an arrayref consisting of names only
+            (as with "aio_readdir"). If this flag is set, then the callback
             gets an arrayref with "[$name, $type, $inode]" arrayrefs, each
-            describing a single directory entry in more detail.
+            describing a single directory entry in more detail:
 
             $name is the name of the entry.
 
@@ -762,9 +706,9 @@ FUNCTIONS
             "IO::AIO::DT_LNK", "IO::AIO::DT_SOCK", "IO::AIO::DT_WHT".
 
             "IO::AIO::DT_UNKNOWN" means just that: readdir does not know. If
-            you need to know, you have to run stat yourself. Also, for speed
-            reasons, the $type scalars are read-only: you can not modify
-            them.
+            you need to know, you have to run stat yourself. Also, for
+            speed/memory reasons, the $type scalars are read-only: you must
+            not modify them.
 
             $inode is the inode number (which might not be exact on systems
             with 64 bit inode numbers and 32 bit perls). This field has
@@ -786,12 +730,13 @@ FUNCTIONS
         IO::AIO::READDIR_STAT_ORDER
             When this flag is set, then the names will be returned in an
             order suitable for stat()'ing each one. That is, when you plan
-            to stat() all files in the given directory, then the returned
-            order will likely be fastest.
+            to stat() most or all files in the given directory, then the
+            returned order will likely be faster.
 
             If both this flag and "IO::AIO::READDIR_DIRS_FIRST" are
             specified, then the likely dirs come first, resulting in a less
-            optimal stat order.
+            optimal stat order for stat'ing all entries, but likely a more
+            optimal order for finding subdirectories.
 
         IO::AIO::READDIR_FOUND_UNKNOWN
             This flag should not be set when calling "aio_readdirx".
@@ -800,14 +745,46 @@ FUNCTIONS
             flag therefore indicates that all $type's are known, which can
             be used to speed up some algorithms.
 
+    aio_slurp $pathname, $offset, $length, $data, $callback->($status)
+        Opens, reads and closes the given file. The data is put into $data,
+        which is resized as required.
+
+        If $offset is negative, then it is counted from the end of the file.
+
+        If $length is zero, then the remaining length of the file is used.
+        Also, in this case, the same limitations to modifying $data apply as
+        when IO::AIO::mmap is used, i.e. it must only be modified in-place
+        with "substr". If the size of the file is known, specifying a
+        non-zero $length results in a performance advantage.
+
+        This request is similar to the older "aio_load" request, but since
+        it is a single request, it might be more efficient to use.
+
+        Example: load /etc/passwd into $passwd.
+
+           my $passwd;
+           aio_slurp "/etc/passwd", 0, 0, $passwd, sub {
+              $_[0] >= 0
+                 or die "/etc/passwd: $!\n";
+
+              printf "/etc/passwd is %d bytes long, and contains:\n", length $passwd;
+              print $passwd;
+           };
+           IO::AIO::flush;
+
     aio_load $pathname, $data, $callback->($status)
         This is a composite request that tries to fully load the given file
         into memory. Status is the same as with aio_read.
+
+        Using "aio_slurp" might be more efficient, as it is a single
+        request.
 
     aio_copy $srcpath, $dstpath, $callback->($status)
         Try to copy the *file* (directories not supported as either source
         or destination) from $srcpath to $dstpath and call the callback with
         a status of 0 (ok) or -1 (error, see $!).
+
+        Existing destination files will be truncated.
 
         This is a composite request that creates the destination file with
         mode 0200 and copies the contents of the source file into it using
@@ -834,8 +811,8 @@ FUNCTIONS
         you cannot recurse into (everything else, including symlinks to
         directories).
 
-        "aio_scandir" is a composite request that creates of many sub
-        requests_ $maxreq specifies the maximum number of outstanding aio
+        "aio_scandir" is a composite request that generates many sub
+        requests. $maxreq specifies the maximum number of outstanding aio
         requests that this function generates. If it is "<= 0", then a
         suitable default will be chosen (currently 4).
 
@@ -910,6 +887,36 @@ FUNCTIONS
         (network, other processes), although if you are careful and know
         what you are doing, you still can.
 
+        The following constants are available (missing ones are, as usual
+        0):
+
+        "F_DUPFD_CLOEXEC",
+
+        "F_OFD_GETLK", "F_OFD_SETLK", "F_OFD_GETLKW",
+
+        "FIFREEZE", "FITHAW", "FITRIM", "FICLONE", "FICLONERANGE",
+        "FIDEDUPERANGE".
+
+        "FS_IOC_GETFLAGS", "FS_IOC_SETFLAGS", "FS_IOC_GETVERSION",
+        "FS_IOC_SETVERSION", "FS_IOC_FIEMAP".
+
+        "FS_IOC_FSGETXATTR", "FS_IOC_FSSETXATTR",
+        "FS_IOC_SET_ENCRYPTION_POLICY", "FS_IOC_GET_ENCRYPTION_PWSALT",
+        "FS_IOC_GET_ENCRYPTION_POLICY", "FS_KEY_DESCRIPTOR_SIZE".
+
+        "FS_SECRM_FL", "FS_UNRM_FL", "FS_COMPR_FL", "FS_SYNC_FL",
+        "FS_IMMUTABLE_FL", "FS_APPEND_FL", "FS_NODUMP_FL", "FS_NOATIME_FL",
+        "FS_DIRTY_FL", "FS_COMPRBLK_FL", "FS_NOCOMP_FL", "FS_ENCRYPT_FL",
+        "FS_BTREE_FL", "FS_INDEX_FL", "FS_JOURNAL_DATA_FL", "FS_NOTAIL_FL",
+        "FS_DIRSYNC_FL", "FS_TOPDIR_FL", "FS_FL_USER_MODIFIABLE".
+
+        "FS_XFLAG_REALTIME", "FS_XFLAG_PREALLOC", "FS_XFLAG_IMMUTABLE",
+        "FS_XFLAG_APPEND", "FS_XFLAG_SYNC", "FS_XFLAG_NOATIME",
+        "FS_XFLAG_NODUMP", "FS_XFLAG_RTINHERIT", "FS_XFLAG_PROJINHERIT",
+        "FS_XFLAG_NOSYMLINKS", "FS_XFLAG_EXTSIZE", "FS_XFLAG_EXTSZINHERIT",
+        "FS_XFLAG_NODEFRAG", "FS_XFLAG_FILESTREAM", "FS_XFLAG_DAX",
+        "FS_XFLAG_HASATTR",
+
     aio_sync $callback->($status)
         Asynchronously call sync and call the callback when finished.
 
@@ -955,7 +962,7 @@ FUNCTIONS
 
         Passes 0 when everything went ok, and -1 on error.
 
-    aio_msync $scalar, $offset = 0, $length = undef, flags = 0,
+    aio_msync $scalar, $offset = 0, $length = undef, flags = MS_SYNC,
     $callback->($status)
         This is a rather advanced IO::AIO call, which only works on
         mmap(2)ed scalars (see the "IO::AIO::mmap" function, although it
@@ -967,8 +974,8 @@ FUNCTIONS
         memory area starting at $offset in the string and ending $length
         bytes later. If $length is negative, counts from the end, and if
         $length is "undef", then it goes till the end of the string. The
-        flags can be a combination of "IO::AIO::MS_ASYNC",
-        "IO::AIO::MS_INVALIDATE" and "IO::AIO::MS_SYNC".
+        flags can be either "IO::AIO::MS_ASYNC" or "IO::AIO::MS_SYNC", plus
+        an optional "IO::AIO::MS_INVALIDATE".
 
     aio_mtouch $scalar, $offset = 0, $length = undef, flags = 0,
     $callback->($status)
@@ -1064,11 +1071,11 @@ FUNCTIONS
         "IO::AIO::FIEMAP_EXTENT_UNWRITTEN", "IO::AIO::FIEMAP_EXTENT_MERGED"
         or "IO::AIO::FIEMAP_EXTENT_SHARED".
 
-        At the time of this writing (Linux 3.2), this requets is unreliable
+        At the time of this writing (Linux 3.2), this request is unreliable
         unless $count is "undef", as the kernel has all sorts of bugs
-        preventing it to return all extents of a range for files with large
-        number of extents. The code works around all these issues if $count
-        is undef.
+        preventing it to return all extents of a range for files with a
+        large number of extents. The code (only) works around all these
+        issues if $count is "undef".
 
     aio_group $callback->(...)
         This is a very special aio request: Instead of doing something, it
@@ -1187,8 +1194,8 @@ FUNCTIONS
     nowhere at all), while the directory fd, if available on the system,
     will still point to the original directory. Most functions accepting a
     pathname will use the directory fd on newer systems, and the string on
-    older systems. Some functions (such as realpath) will always rely on the
-    string form of the pathname.
+    older systems. Some functions (such as "aio_realpath") will always rely
+    on the string form of the pathname.
 
     So this functionality is mainly useful to get some protection against
     "chdir", to easily get an absolute path out of a relative path for
@@ -1549,7 +1556,7 @@ FUNCTIONS
         inexact: Better use an "aio_group" together with a feed callback.
 
         Its main use is in scripts without an event loop - when you want to
-        stat a lot of files, you can write somehting like this:
+        stat a lot of files, you can write something like this:
 
            IO::AIO::max_outstanding 32;
 
@@ -1588,11 +1595,97 @@ FUNCTIONS
         Returns the number of requests currently in the pending state
         (executed, but not yet processed by poll_cb).
 
+   SUBSECOND STAT TIME ACCESS
+    Both "aio_stat"/"aio_lstat" and perl's "stat"/"lstat" functions can
+    generally find access/modification and change times with subsecond time
+    accuracy of the system supports it, but perl's built-in functions only
+    return the integer part.
+
+    The following functions return the timestamps of the most recent stat
+    with subsecond precision on most systems and work both after
+    "aio_stat"/"aio_lstat" and perl's "stat"/"lstat" calls. Their return
+    value is only meaningful after a successful "stat"/"lstat" call, or
+    during/after a successful "aio_stat"/"aio_lstat" callback.
+
+    This is similar to the Time::HiRes "stat" functions, but can return full
+    resolution without rounding and work with standard perl "stat",
+    alleviating the need to call the special "Time::HiRes" functions, which
+    do not act like their perl counterparts.
+
+    On operating systems or file systems where subsecond time resolution is
+    not supported or could not be detected, a fractional part of 0 is
+    returned, so it is always safe to call these functions.
+
+    $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime
+        Return the access, modication or change time, respectively,
+        including fractional part. Due to the limited precision of floating
+        point, the accuracy on most platforms is only a bit better than
+        milliseconds for times around now - see the *nsec* function family,
+        below, for full accuracy.
+
+    ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtime
+        Returns access, modification and change time all in one go, and
+        maybe more times in the future version.
+
+    $nanoseconds = IO::AIO::st_atimensec, IO::AIO::st_mtimensec,
+    IO::AIO::st_ctimensec
+        Return the fractional access, modifcation or change time, in
+        nanoseconds, as an integer in the range 0 to 999999999.
+
+    ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtimensec
+        Like the functions above, but returns all three times in one go (and
+        maybe more in future versions).
+
+    Example: print the high resolution modification time of /etc, using
+    "stat", and "IO::AIO::aio_stat".
+
+       if (stat "/etc") {
+          printf "stat(/etc) mtime: %f\n", IO::AIO::st_mtime;
+       }
+
+       IO::AIO::aio_stat "/etc", sub {
+          $_[0]
+             and return;
+
+          printf "aio_stat(/etc) mtime: %d.%09d\n", (stat _)[9], IO::AIO::st_mtimensec;
+       };
+
+       IO::AIO::flush;
+
+    Output of the awbove on my system, showing reduced and full accuracy:
+
+       stat(/etc) mtime: 1534043702.020808
+       aio_stat(/etc) mtime: 1534043702.020807792
+
    MISCELLANEOUS FUNCTIONS
     IO::AIO implements some functions that are useful when you want to use
     some "Advanced I/O" function not available to in Perl, without going the
     "Asynchronous I/O" route. Many of these have an asynchronous "aio_*"
     counterpart.
+
+    $numfd = IO::AIO::get_fdlimit
+        This function is *EXPERIMENTAL* and subject to change.
+
+        Tries to find the current file descriptor limit and returns it, or
+        "undef" and sets $! in case of an error. The limit is one larger
+        than the highest valid file descriptor number.
+
+    IO::AIO::min_fdlimit [$numfd]
+        This function is *EXPERIMENTAL* and subject to change.
+
+        Try to increase the current file descriptor limit(s) to at least
+        $numfd by changing the soft or hard file descriptor resource limit.
+        If $numfd is missing, it will try to set a very high limit, although
+        this is not recommended when you know the actual minimum that you
+        require.
+
+        If the limit cannot be raised enough, the function makes a
+        best-effort attempt to increase the limit as much as possible, using
+        various tricks, while still failing. You can query the resulting
+        limit using "IO::AIO::get_fdlimit".
+
+        If an error occurs, returns "undef" and sets $!, otherwise returns
+        true.
 
     IO::AIO::sendfile $ofh, $ifh, $offset, $count
         Calls the "eio_sendfile_sync" function, which is like
@@ -1619,6 +1712,10 @@ FUNCTIONS
         "IO::AIO::MADV_RANDOM", "IO::AIO::MADV_WILLNEED",
         "IO::AIO::MADV_DONTNEED".
 
+        If $offset is negative, counts from the end. If $length is negative,
+        the remaining length of the $scalar is used. If possible, $length
+        will be reduced to fit into the $scalar.
+
         On systems that do not implement "posix_madvise", this function
         returns ENOSYS, otherwise the return value of "posix_madvise".
 
@@ -1628,6 +1725,10 @@ FUNCTIONS
         constants are available: "IO::AIO::PROT_NONE", "IO::AIO::PROT_READ",
         "IO::AIO::PROT_WRITE", "IO::AIO::PROT_EXEC".
 
+        If $offset is negative, counts from the end. If $length is negative,
+        the remaining length of the $scalar is used. If possible, $length
+        will be reduced to fit into the $scalar.
+
         On systems that do not implement "mprotect", this function returns
         ENOSYS, otherwise the return value of "mprotect".
 
@@ -1636,15 +1737,20 @@ FUNCTIONS
         the given $scalar, which will act like a string scalar. Returns true
         on success, and false otherwise.
 
-        The only operations allowed on the scalar are "substr"/"vec" that
-        don't change the string length, and most read-only operations such
-        as copying it or searching it with regexes and so on.
+        The scalar must exist, but its contents do not matter - this means
+        you cannot use a nonexistant array or hash element. When in doubt,
+        "undef" the scalar first.
+
+        The only operations allowed on the mmapped scalar are
+        "substr"/"vec", which don't change the string length, and most
+        read-only operations such as copying it or searching it with regexes
+        and so on.
 
         Anything else is unsafe and will, at best, result in memory leaks.
 
         The memory map associated with the $scalar is automatically removed
-        when the $scalar is destroyed, or when the "IO::AIO::mmap" or
-        "IO::AIO::munmap" functions are called.
+        when the $scalar is undef'd or destroyed, or when the
+        "IO::AIO::mmap" or "IO::AIO::munmap" functions are called on it.
 
         This calls the "mmap"(2) function internally. See your system's
         manual page for details on the $length, $prot and $flags parameters.
@@ -1686,6 +1792,30 @@ FUNCTIONS
 
     IO::AIO::munmap $scalar
         Removes a previous mmap and undefines the $scalar.
+
+    IO::AIO::mremap $scalar, $new_length, $flags = MREMAP_MAYMOVE[,
+    $new_address = 0]
+        Calls the Linux-specific mremap(2) system call. The $scalar must
+        have been mapped by "IO::AIO::mmap", and $flags must currently
+        either be 0 or "IO::AIO::MREMAP_MAYMOVE".
+
+        Returns true if successful, and false otherwise. If the underlying
+        mmapped region has changed address, then the true value has the
+        numerical value 1, otherwise it has the numerical value 0:
+
+           my $success = IO::AIO::mremap $mmapped, 8192, IO::AIO::MREMAP_MAYMOVE
+              or die "mremap: $!";
+
+           if ($success*1) {
+              warn "scalar has chanegd address in memory\n";
+           }
+
+        "IO::AIO::MREMAP_FIXED" and the $new_address argument are currently
+        implemented, but not supported and might go away in a future
+        version.
+
+        On systems where this call is not supported or is not emulated, this
+        call returns falls and sets $! to "ENOSYS".
 
     IO::AIO::munlock $scalar, $offset = 0, $length = undef
         Calls the "munlock" function, undoing the effects of a previous
@@ -1740,6 +1870,90 @@ FUNCTIONS
         time of this writing, "IO::AIO::O_CLOEXEC", "IO::AIO::O_NONBLOCK"
         and "IO::AIO::O_DIRECT" (Linux 3.4, for packet-based pipes) were
         supported.
+
+        Example: create a pipe race-free w.r.t. threads and fork:
+
+           my ($rfh, $wfh) = IO::AIO::pipe2 IO::AIO::O_CLOEXEC
+              or die "pipe2: $!\n";
+
+    $fh = IO::AIO::eventfd [$initval, [$flags]]
+        This is a direct interface to the Linux eventfd(2) system call. The
+        (unhelpful) defaults for $initval and $flags are 0 for both.
+
+        On success, the new eventfd filehandle is returned, otherwise
+        returns "undef". If the eventfd syscall is missing, fails with
+        "ENOSYS".
+
+        Please refer to eventfd(2) for more info on this call.
+
+        The following symbol flag values are available:
+        "IO::AIO::EFD_CLOEXEC", "IO::AIO::EFD_NONBLOCK" and
+        "IO::AIO::EFD_SEMAPHORE" (Linux 2.6.30).
+
+        Example: create a new eventfd filehandle:
+
+           $fh = IO::AIO::eventfd 0, IO::AIO::O_CLOEXEC
+              or die "eventfd: $!\n";
+
+    $fh = IO::AIO::timerfd_create $clockid[, $flags]
+        This is a direct interface to the Linux timerfd_create(2) system
+        call. The (unhelpful) default for $flags is 0.
+
+        On success, the new timerfd filehandle is returned, otherwise
+        returns "undef". If the eventfd syscall is missing, fails with
+        "ENOSYS".
+
+        Please refer to timerfd_create(2) for more info on this call.
+
+        The following $clockid values are available:
+        "IO::AIO::CLOCK_REALTIME", "IO::AIO::CLOCK_MONOTONIC"
+        "IO::AIO::CLOCK_CLOCK_BOOTTIME" (Linux 3.15)
+        "IO::AIO::CLOCK_CLOCK_REALTIME_ALARM" (Linux 3.11) and
+        "IO::AIO::CLOCK_CLOCK_BOOTTIME_ALARM" (Linux 3.11).
+
+        The following $flags values are available (Linux 2.6.27):
+        "IO::AIO::TFD_NONBLOCK" and "IO::AIO::TFD_CLOEXEC".
+
+        Example: create a new timerfd and set it to one-second repeated
+        alarms, then wait for two alarms:
+
+           my $fh = IO::AIO::timerfd_create IO::AIO::CLOCK_BOOTTIME, IO::AIO::TFD_CLOEXEC
+              or die "timerfd_create: $!\n";
+
+           defined IO::AIO::timerfd_settime $fh, 0, 1, 1
+              or die "timerfd_settime: $!\n";
+
+           for (1..2) {
+              8 == sysread $fh, my $buf, 8
+                 or die "timerfd read failure\n";
+
+              printf "number of expirations (likely 1): %d\n",
+                 unpack "Q", $buf;
+           }
+
+    ($cur_interval, $cur_value) = IO::AIO::timerfd_settime $fh, $flags,
+    $new_interval, $nbw_value
+        This is a direct interface to the Linux timerfd_settime(2) system
+        call. Please refer to its manpage for more info on this call.
+
+        The new itimerspec is specified using two (possibly fractional)
+        second values, $new_interval and $new_value).
+
+        On success, the current interval and value are returned (as per
+        "timerfd_gettime"). On failure, the empty list is returned.
+
+        The following $flags values are available:
+        "IO::AIO::TFD_TIMER_ABSTIME" and "IO::AIO::TFD_TIMER_CANCEL_ON_SET".
+
+        See "IO::AIO::timerfd_create" for a full example.
+
+    ($cur_interval, $cur_value) = IO::AIO::timerfd_gettime $fh
+        This is a direct interface to the Linux timerfd_gettime(2) system
+        call. Please refer to its manpage for more info on this call.
+
+        On success, returns the current values of interval and value for the
+        given timerfd (as potentially fractional second values). On failure,
+        the empty list is returned.
 
 EVENT LOOP INTEGRATION
     It is recommended to use AnyEvent::AIO to integrate IO::AIO
@@ -1799,6 +2013,14 @@ EVENT LOOP INTEGRATION
         Calling it at any time will also result in any undefined (by POSIX)
         behaviour.
 
+  LINUX-SPECIFIC CALLS
+    When a call is documented as "linux-specific" then this means it
+    originated on GNU/Linux. "IO::AIO" will usually try to autodetect the
+    availability and compatibility of such calls regardless of the platform
+    it is compiled on, so platforms such as FreeBSD which often implement
+    these calls will work. When in doubt, call them and see if they fail wth
+    "ENOSYS".
+
   MEMORY USAGE
     Per-request usage:
 
@@ -1818,7 +2040,17 @@ EVENT LOOP INTEGRATION
     structures (usually around 16k-128k, depending on the OS).
 
 KNOWN BUGS
-    Known bugs will be fixed in the next release.
+    Known bugs will be fixed in the next release :)
+
+KNOWN ISSUES
+    Calls that try to "import" foreign memory areas (such as "IO::AIO::mmap"
+    or "IO::AIO::aio_slurp") do not work with generic lvalues, such as
+    non-created hash slots or other scalars I didn't think of. It's best to
+    avoid such and either use scalar variables or making sure that the
+    scalar exists (e.g. by storing "undef") and isn't "funny" (e.g. tied).
+
+    I am not sure anything can be done about this, so this is considered a
+    known issue, rather than a bug.
 
 SEE ALSO
     AnyEvent::AIO for easy integration into event loops, Coro::AIO for a

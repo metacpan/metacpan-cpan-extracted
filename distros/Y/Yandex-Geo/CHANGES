@@ -1,10 +1,96 @@
 ==================================================
-Changes from 2017-07-26 00:00:00 +0000 to present.
+Changes from 2017-08-16 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.02 at 2018-07-26 13:48:12 +0000
+version 0.07 at 2018-08-16 13:21:06 +0000
 -----------------------------------------
+
+  Change: d893d50ff9a2f75ef365845a150d44a575ff1d71
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-08-16 16:20:54 +0000
+
+    Fixed masks earlier declaration in same scope issue 
+
+  Change: 49c73f37a8dca2312bb4774bca72478fc33da33b
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-08-16 16:17:21 +0000
+
+    Fixed to_array function 
+
+  Change: ea89a7458d75a10eaaff75e9d06829f08844bafa
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-08-15 23:16:18 +0000
+
+    Added longitude latitude values 
+
+  Change: 29b48038d55046df174e8b10848572eb6536239b
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-08-15 22:36:30 +0000
+
+    Added test for from_geo_json method 
+
+  Change: cbc36c36eb98211c9bd9f2d5e7b370947743fc07
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-08-15 21:41:05 +0000
+
+    Added new properties method 
+
+  Change: 58f38fcbc0134cae6bcd01e034c905aa9ab11881
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-08-15 21:01:13 +0000
+
+    Updated pod of Yandex::Geo::Company 
+
+  Change: a9bc73aaf087414119c7280421cb5bdc6735f71a
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-29 14:35:42 +0000
+
+    Fixed misprint 
+
+  Change: cb2a40384870a93d20c00307013a60b5e74822a7
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-29 14:34:44 +0000
+
+    Fixed pod 
+
+  Change: fdd4a1592bc41ce9dd89836df0879d538fa867e6
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-29 14:32:38 +0000
+
+    Changed version to 0.04 
+
+  Change: 1ac898ec2d7250578b6b0454e794e225a8c19d98
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2018-07-29 14:31:08 +0000
+
+    Merge pull request #1 from manwar/add-strict-warnings-pragma
+
+    Added strict/warnings pragma as suggested by CPANTS. 
+
+  Change: 0930c1c831ed35c45f1a923134d469fa9a7051be
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2018-07-29 14:30:53 +0000
+
+    Merge branch 'master' into add-strict-warnings-pragma 
+
+  Change: 1aa098ba606d5b1cf501d9c3bb45df4c7d3fe779
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-29 14:25:57 +0000
+
+    Updated README.md 
+
+  Change: 943afe35afc2b10d0786bd2d438337691758c115
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-27 06:28:46 +0000
+
+    Added to_array method 
+
+  Change: 429a56d70e87edd3037d4642fc09cdf3f9dbd64b
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-07-26 17:30:16 +0000
+
+    Added strict/warnings pragma as suggested by CPANTS. 
 
   Change: 67aeeb1216142d5be81b88ca98c6fd734d9b56ac
   Author: Pavel Serikov <pavelsr@cpan.org>

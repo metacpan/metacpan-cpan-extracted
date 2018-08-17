@@ -227,11 +227,11 @@ package StreamFinder::Youtube;
 
 use strict;
 use warnings;
+use URI::Escape;
 use LWP::UserAgent ();
 use WWW::YouTube::Download;
-use vars qw(@ISA @EXPORT $VERSION);
+use vars qw(@ISA @EXPORT);
 
-our $VERSION = '1.00';
 our $DEBUG = 0;
 
 require Exporter;
@@ -248,8 +248,7 @@ sub new
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 		}
-	}	
-
+	}
 	my $self = {};
 	return undef  unless ($url);
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
@@ -265,11 +264,25 @@ sub new
 			eval "\$metadata{$name} = \$self->{'client'}->get_$name(\$url);";
 		}
 	}
+	else    #SOME FB-SHARED VIDEOS HAVE EXTRA JUNK IN 'EM, WHICH MUST BE STRIPPED OFF HERE FOR SOME REASON:
+	{
+		my $urlsrc = $url;
+		$urlsrc =~ s#attribution\_link.+?watch#watch#;
+		$urlsrc = uri_unescape($urlsrc);
+		eval "\$meta_data = \$self->{'client'}->prepare_download(\$urlsrc);";
+		if ($meta_data) {
+			foreach my $name (qw(video_id title user)) {
+				eval "\$metadata{$name} = \$self->{'client'}->get_$name(\$urlsrc);";
+			}
+		}
+	}
 	$self->{'id'} = $metadata{'video_id'};
 	$self->{'title'} = $metadata{'title'};
 	$self->{'artist'} = $metadata{'user'};
-	$_ = `youtube-dl --get-url --get-thumbnail -f mp4 $url`;
-	print STDERR "--cmd=youtube-dl --get-url --get-thumbnail -f mp4 $url=\n"  if ($DEBUG);
+	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."=\n"  if ($DEBUG);
+
+	$_ = `youtube-dl --get-url --get-thumbnail -f mp4 "$url"`;
+	print STDERR "--cmd=youtube-dl --get-url --get-thumbnail -f mp4 \"$url\"=\n"  if ($DEBUG);
 	my @urls = split(/\r?\n/);
 	while (@urls && $urls[0] !~ m#\:\/\/#o) {
 		shift @urls;

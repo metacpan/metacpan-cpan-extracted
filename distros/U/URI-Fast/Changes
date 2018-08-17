@@ -1,3 +1,20 @@
+0.41 2018-08-15
+-bugfix: small memory leak in to_string when there is no authority section present
+-bugfix: to_string did not properly encode authority section in some cases
+-new method: absolute($base)
+-new method: normalize (like URI->canonical)
+-new method: relative($base)
+-optimization: aliases moved to XS
+-optimization: overload of to_string moved to XS
+-optimization: shorthand constructors (uri, iri) moved to XS
+-optimization: simple unified accessors moved to XS
+
+0.40 2018-08-08
+-bugfix: gracefully handle incorrectly encoded query strings with unencoded '=' not following a key
+-bugfix: param and query incorrectly unset single parameters when passed a falsey value (credit: vroom)
+-documentation: clarify handling of '+' in decode
+-new method: clone() as an alias for uri() (credit: merlyn)
+
 0.39 2018-07-22
 -behavior: no size limit on member string sizes
 -bugfix: encode and decode no longer emit a warning when passed undef

@@ -203,6 +203,28 @@ sub generateResourcePathname {
   $doc->cacheStore($counter, $n);
   return pathname_make(dir => $subdir, name => $name, type => $type); }
 
+# Get a list [class,classoptions, oldstyle],[package,packageoptions],...]
+# The options are strings
+sub find_documentclass_and_packages {
+  my ($self, $doc) = @_;
+  my ($class, $classoptions, $oldstyle, @packages);
+  foreach my $pi ($doc->findnodes(".//processing-instruction('latexml')")) {
+    my $data  = $pi->textContent;
+    my $entry = {};
+    while ($data =~ s/\s*([\w\-\_]*)=([\"\'])(.*?)\2//) {
+      $$entry{$1} = $3; }
+    if ($$entry{class}) {
+      $class        = $$entry{class};
+      $classoptions = $$entry{options} || 'onecolumn';
+      $oldstyle     = $$entry{oldstyle}; }
+    elsif ($$entry{package}) {
+      push(@packages, [$$entry{package}, $$entry{options} || '']); }
+  }
+  if (!$class) {
+    Warn('expected', 'class', undef, "No document class found; using article");
+    $class = 'article'; }
+  return ([$class, $classoptions, $oldstyle], @packages); }
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 package LaTeXML::Post::MathProcessor;
 use strict;
@@ -463,9 +485,14 @@ sub associateNode {
     $node->setAttribute('_sourced' => 1);
     $iscontainer = scalar(element_nodes($node)); }
   my $sourcenode = $currentnode;
-  # If the generated node is a "container" (non-token!), use the container as source
+  # If the generated node is a "container" (non-token!), use the containing XMDual as source
   if ($iscontainer) {
-    if (my $container = $document->findnode('ancestor-or-self::ltx:XMDual[1]', $sourcenode)) {
+    my $sid = $sourcenode->getAttribute('xml:id');
+    # But ONLY if that XMDual is the "direct" parent, or is parent of XRef that points to $current
+    if (my $container = $document->findnode('parent::ltx:XMDual[1]', $sourcenode)
+      || ($sid &&
+        $document->findnode("ancestor-or-self::ltx:XMDual[ltx:XMRef[\@idref='$sid']][1]",
+          $sourcenode))) {
       $sourcenode = $container; } }
   # If the current node is appropriately visible, use it.
   elsif ($currentnode->getAttribute(($ispresentation ? '_cvis' : '_pvis'))) { }
@@ -476,8 +503,9 @@ sub associateNode {
     if ($q eq 'ltx:XMTok') { }
     elsif ($q eq 'ltx:XMApp') {
       ($op) = element_nodes($op);
-      if ($document->getQName($op) eq 'ltx:XMRef') {
-        $op = $document->realizeXMNode($op); } }
+      $q = $document->getQName($op) || 'unknown'; }    # get "real" operator
+    if ($q eq 'ltx:XMRef') {
+      $op = $document->realizeXMNode($op); }
     if ($op && !$op->getAttribute('_pvis')) {
       $sourcenode = $op; }
     else {
@@ -513,7 +541,7 @@ sub shownode {
   if ($ref eq 'ARRAY') {
     my ($tag, $attr, @children) = @$node;
     return "\n" . ('  ' x $level)
-      . '[' . $tag . ',{' . join(',', map { $_ . '=>' . $$attr{$_} } sort keys %$attr) . '},'
+      . '[' . $tag . ',{' . join(',', map { $_ . '=>' . ($$attr{$_} || '') } sort keys %$attr) . '},'
       . join(',', map { shownode($_, $level + 1) } @children) . ']'; }
   elsif ($ref =~ /^XML/) {
     return $node->toString; }
@@ -534,14 +562,36 @@ sub addCrossrefs {
   my $selfs_map  = $$self{convertedIDs};
   my $others_map = $$otherprocessor{convertedIDs};
   my $xrefids    = $$self{crossreferencing_ids};
-  foreach my $xid (keys %$selfs_map) {    # For each Math id that $self converted
-    if (my $other_ids = $$others_map{$xid}) {    # Did $other also convert those ids?
+  my $backref    = {};
+  foreach my $id (keys %$selfs_map) {
+    foreach my $t (@{ $$selfs_map{$id} }) {
+      $$backref{$t} = $id; } }
+  foreach my $xid (keys %$selfs_map) {    # For each XMath id that $self converted
+    my $other_ids = $$others_map{$xid};    # the ids where $xid ended up in $other processor
+    if (!$other_ids) {
+      # But If this node didn't directly end up in $other, try to find alternative
+      # Typically happens when a "visible" node doesn't have visible representation in other format!
+      # So, see if an ancestor got mapped.
+      if (my $mapped = $$selfs_map{$xid}) {
+        foreach my $mid (@$mapped) {
+          if (my $node = $doc->findNodeByID($mid)) {
+            my ($parent, $pid, $xpid) = ($node, undef, undef);
+            while (($parent = $parent->parentNode)
+              && ($parent->nodeType == XML_ELEMENT_NODE)      # in case we hit Document
+              && (!($pid = $parent->getAttribute('xml:id'))
+                || !($xpid = $$backref{$pid})
+                || !$$others_map{$xpid})) { }
+            if ($xpid) {
+              $other_ids = $$others_map{$xpid}; } } } } }
+    if ($other_ids) {                                         # Hopefully, we've got the targets, now
       my $xref_id = $$other_ids[0];
-      if (scalar(@$other_ids) > 1) {             # Find 1st in document order! (order is cached)
+      if (scalar(@$other_ids) > 1) {    # Find 1st in document order! (order is cached)
         ($xref_id) = sort { $$xrefids{$a} <=> $$xrefids{$b} } @$other_ids; }
       foreach my $id (@{ $$selfs_map{$xid} }) {    # look at each node $self created from $xid
         if (my $node = $doc->findNodeByID($id)) {    # If we find a node,
-          $self->addCrossref($node, $xref_id); } } } }    # add a crossref from it to $others's node
+          $self->addCrossref($node, $xref_id); } } }    # }    # add a crossref from it to $others's nod
+    else {
+  } }
   return; }
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -553,7 +603,7 @@ use LaTeXML::Util::Pathname;
 use LaTeXML::Util::Radix;
 use DB_File;
 use Unicode::Normalize;
-use LaTeXML::Post;                                        # to import error handling...
+use LaTeXML::Post;    # to import error handling...
 use LaTeXML::Common::Error;
 use base qw(LaTeXML::Common::Object);
 our $NSURI = "http://dlmf.nist.gov/LaTeXML";
@@ -607,6 +657,7 @@ sub new_internal {
 sub newFromFile {
   my ($class, $source, %options) = @_;
   $options{source} = $source;
+  $source = pathname_find($source, paths => $$class{searchpaths}) if ref $class;
   if (!$options{sourceDirectory}) {
     my ($dir, $name, $ext) = pathname_split($source);
     $options{sourceDirectory} = $dir || '.'; }
@@ -1250,14 +1301,14 @@ sub trimChildNodes {
   elsif (!ref $node) {
     return ($node); }
   elsif (my @children = $node->childNodes) {
-    if ($children[0]->nodeType == XML_TEXT_NODE) {
+    if ($children[0] && $children[0]->nodeType == XML_TEXT_NODE) {
       my $s = $children[0]->data;
       $s =~ s/^\s+//;
       if ($s) {
         $children[0]->setData($s); }
       else {
         shift(@children); } }
-    if ($children[-1]->nodeType == XML_TEXT_NODE) {
+    if ($children[-1] && $children[-1]->nodeType == XML_TEXT_NODE) {
       my $s = $children[-1]->data;
       $s =~ s/\s+$//;
       if ($s) {
@@ -1302,18 +1353,32 @@ sub findNodeByID {
   my $node = $$self{idcache}{$id};
   return $$self{idcache}{$id}; }
 
+# If $branch given, should be 'content' or 'presentation'
 sub realizeXMNode {
-  my ($self, $node) = @_;
-  if ($self->getQName($node) eq 'ltx:XMRef') {
+  my ($self, $node, $branch) = @_;
+  if ($branch) {
+    while ($node) {
+      my $qname = $self->getQName($node);
+      if ($qname eq 'ltx:XMRef') {
+        my $id = $node->getAttribute('idref');
+        if (my $realnode = $self->findNodeByID($id)) {
+          $node = $realnode; }
+        else {
+          Fatal('expected', 'id', undef, "Cannot find a node with xml:id='$id'");
+          return; } }
+      elsif ($qname eq 'ltx:XMDual') {
+        my ($content, $presentation) = element_nodes($node);
+        $node = ($branch eq 'content' ? $content : $presentation); }
+      else {
+        return $node; } } }
+  elsif ($self->getQName($node) eq 'ltx:XMRef') {
     my $id = $node->getAttribute('idref');
     if (my $realnode = $self->findNodeByID($id)) {
-      #print STDERR "REALIZE $id => $realnode\n";
       return $realnode; }
     else {
       Fatal('expected', 'id', undef, "Cannot find a node with xml:id='$id'");
       return; } }
-  else {
-    return $node; } }
+  return $node; }
 
 sub uniquifyID {
   my ($self, $baseid, $suffix) = @_;
@@ -1380,11 +1445,13 @@ sub adjust_latexml_doctype {
 sub cacheLookup {
   my ($self, $key) = @_;
   $self->openCache;
+  $key = Encode::encode_utf8($key) if $key;
   return $$self{cache}{$key}; }
 
 sub cacheStore {
   my ($self, $key, $value) = @_;
   $self->openCache;
+  $key = Encode::encode_utf8($key) if $key;
   if (defined $value) {
     $$self{cache}{$key} = $value; }
   else {

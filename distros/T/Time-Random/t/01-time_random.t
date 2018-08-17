@@ -17,17 +17,26 @@ for (1..100) {
 
 is (scalar keys %unique > 90, 1, '100 unique');
 
+my %okay = (
+	'18-07-18 13:54:57' => 1,
+	'18-07-18 13:54:56' => 1,
+	'18-07-18 13:54:55' => 1,	
+);
+
 my $random = time_random(
 	from => '1531922094',
 	to => '1531922097',
 	strftime => '%y-%m-%d %H:%M:%S'
 );
 
-my %okay = (
-	'18-07-18 13:54:57' => 1,
-	'18-07-18 13:54:56' => 1,
-	'18-07-18 13:54:55' => 1,	
-);
+is($okay{$random}, 1, 'expected value');
+
+my $hash = time_random({
+	from => '1531922094',
+	to => '1531922097',
+	strftime => '%y-%m-%d %H:%M:%S'
+});
+
 is($okay{$random}, 1, 'expected value');
 
 my $st = time_random(

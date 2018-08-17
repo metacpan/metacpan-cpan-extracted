@@ -1,0 +1,21 @@
+bin/imsync
+Changes
+lib/Image/Synchronize.pm
+lib/Image/Synchronize/CameraOffsets.pm
+lib/Image/Synchronize/GpsPositionCollection.pm
+lib/Image/Synchronize/GroupedInfo.pm
+lib/Image/Synchronize/Logger.pm
+lib/Image/Synchronize/ProgressBar.pm
+lib/Image/Synchronize/Timerange.pm
+lib/Image/Synchronize/Timestamp.pm
+Makefile.PL
+MANIFEST
+README
+t/Image-Synchronize-CameraOffsets.t
+t/Image-Synchronize-GpsPositionCollection.t
+t/Image-Synchronize-Logger.t
+t/Image-Synchronize-Timerange.t
+t/Image-Synchronize-Timestamp.t
+t/Image-Synchronize.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

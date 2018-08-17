@@ -14,6 +14,7 @@ use strict;
 use warnings;
 use LaTeXML::Global;
 use LaTeXML::Common::Object;
+use LaTeXML::Common::Locator;
 use LaTeXML::Common::Error;
 use LaTeXML::Core::Token;
 use LaTeXML::Core::Tokens;
@@ -34,7 +35,7 @@ sub create {
     $options{shortsource} = "$name.$ext";
     return $class->new($options{content}, %options); }
   elsif ($source =~ s/^literal://) {    # we've supplied literal data
-    $options{source} = "Literal String " . substr($source, 0, 10) unless defined $options{source};
+    $options{source} = ''; # the source does not have a corresponding file name
     return $class->new($source, %options); }
   elsif (!defined $source) {
     return $class->new('', %options); }
@@ -48,8 +49,8 @@ sub create {
 sub new {
   my ($class, $string, %options) = @_;
   $string               = q{}                unless defined $string;
-  $options{source}      = "Anonymous String" unless defined $options{source};
-  $options{shortsource} = "String"           unless defined $options{shortsource};
+  #$options{source}      = "Anonymous String" unless defined $options{source};
+  #$options{shortsource} = "String"           unless defined $options{shortsource};
   my $self = bless { source => $options{source},
     shortsource    => $options{shortsource},
     fordefinitions => ($options{fordefinitions} ? 1 : 0),
@@ -72,8 +73,9 @@ sub initialize {
   $$self{chars}  = [];
   $$self{nchars} = 0;
   if ($$self{notes}) {
+    my $source = defined($$self{source}) ? ($$self{source} || 'Literal String') : 'Anonymous String';
     $$self{note_message} = "Processing " . ($$self{fordefinitions} ? "definitions" : "content")
-      . " " . $$self{source};
+      . " " . $source;
     NoteBegin($$self{note_message}); }
   if ($$self{fordefinitions}) {
     $$self{saved_at_cc}            = $STATE->lookupCatcode('@');
@@ -159,24 +161,20 @@ sub stringify {
 
 #**********************************************************************
 sub getLocator {
-  my ($self, $length) = @_;
-  my ($l, $c) = ($$self{lineno}, $$self{colno});
-  if ($length && ($length < 0)) {
-    return "at $$self{shortsource}; line $l col $c"; }
-  elsif ($length && (defined $l || defined $c)) {
-    my $msg   = "at $$self{source}; line $l col $c";
-    my $chars = $$self{chars};
-    if (my $n = $$self{nchars}) {
-      $c = $n - 1 if $c >= $n;
-      my $c0 = ($c > 50      ? $c - 40 : 0);
-      my $cm = ($c < 1       ? 0       : $c - 1);
-      my $cn = ($n - $c > 50 ? $c + 40 : $n - 1);
-      my $p1 = ($c0 <= $cm ? join('', @$chars[$c0 .. $cm]) : ''); chomp($p1);
-      my $p2 = ($c <= $cn  ? join('', @$chars[$c .. $cn])  : ''); chomp($p2);
-      $msg .= "\n  " . $p1 . "\n  " . (' ' x ($c - $c0)) . '^' . ' ' . $p2; }
-    return $msg; }
+  my ($self) = @_;
+  my ($l, $c, $lstart, $cstart) = ($$self{lineno}, $$self{colno});
+  #Deyan: Upgrade message to XPointer style
+  my $nc = $$self{nchars} - 1;    #There is always a weird (end of line?) char that gets counted
+  if ((defined $c) && ($c >= $nc)) {
+    $lstart = $l;
+    $cstart = $c - $nc; }
   else {
-    return "at $$self{source}; line $l col $c"; } }
+    #Very rough and dirty approximation, not to be relied on.
+    #One would need to keep all line lengths to properly establish the start and end
+    # or just remember the initial char of the token's position
+    $lstart = $l - 1;
+    $cstart = $nc - $c; }
+  return LaTeXML::Common::Locator->new($$self{source}, $lstart, $cstart, $l, $c); }
 
 sub getSource {
   my ($self) = @_;
@@ -193,17 +191,17 @@ sub handle_escape {    # Read control sequence
   # Knuth, p.46 says that Newlines are converted to spaces,
   # Bit I believe that he does NOT mean within control sequences
   my $cs = "\\" . $ch;    # I need this standardized to be able to lookup tokens (A better way???)
-  if ($cc == CC_LETTER) { # For letter, read more letters for csname.
+  if ((defined $cc) && ($cc == CC_LETTER)) {    # For letter, read more letters for csname.
     while ((($ch, $cc) = getNextChar($self)) && $ch && ($cc == CC_LETTER)) {
       $cs .= $ch; }
     $$self{colno}--; }
-  if ($cc == CC_SPACE) {    # We'll skip whitespace here.
+  if ((defined $cc) && ($cc == CC_SPACE)) {     # We'll skip whitespace here.
     while ((($ch, $cc) = getNextChar($self)) && $ch && ($cc == CC_SPACE)) { }
     $$self{colno}-- if ($$self{colno} < $$self{nchars}); }
-  if ($cc == CC_EOL) {      # If we've got an EOL
-                            # if in \read mode, leave the EOL to be turned into a T_SPACE
+  if ((defined $cc) && ($cc == CC_EOL)) {       # If we've got an EOL
+        # if in \read mode, leave the EOL to be turned into a T_SPACE
     if (($STATE->lookupValue('PRESERVE_NEWLINES') || 0) > 1) { }
-    else {                  # else skip it.
+    else {    # else skip it.
       getNextChar($self);
       $$self{colno}-- if ($$self{colno} < $$self{nchars}); } }
   return T_CS($cs); }
@@ -222,7 +220,7 @@ sub handle_space {
   my ($self) = @_;
   my ($ch, $cc);
   # Skip any following spaces!
-  while ((($ch, $cc) = getNextChar($self)) && $ch && (($cc == CC_SPACE) || ($cc == CC_EOL))) { }
+  while ((($ch, $cc) = getNextChar($self)) && (defined $ch) && (($cc == CC_SPACE) || ($cc == CC_EOL))) { }
   $$self{colno}-- if ($$self{colno} < $$self{nchars});
   return T_SPACE; }
 
@@ -279,6 +277,7 @@ sub readToken {
       $$self{colno} = 0;
       my $line = $self->getNextLine;
       if (!defined $line) {    # Exhausted the input.
+        $$self{at_eof} = 1;
         $$self{chars}  = [];
         $$self{nchars} = 0;
         return; }
@@ -293,13 +292,14 @@ sub readToken {
 
       # Sneak a comment out, every so often.
       if ((($$self{lineno} % 25) == 0) && $STATE->lookupValue('INCLUDE_COMMENTS')) {
-        return T_COMMENT("**** $$self{shortsource} Line $$self{lineno} ****"); }
+        return T_COMMENT("**** " . ($$self{shortsource} || 'String') . " Line $$self{lineno} ****"); }
     }
     # ==== Extract next token from line.
     my ($ch, $cc) = getNextChar($self);
-    my $token = $DISPATCH[$cc];
+    my $token = (defined $cc ? $DISPATCH[$cc] : undef);
     $token = &$token($self, $ch) if ref $token eq 'CODE';
     return $token if defined $token;    # Else, repeat till we get something or run out.
+
   }
   return; }
 
@@ -318,7 +318,7 @@ sub readTokens {
   return Tokens(@tokens); }
 
 #**********************************************************************
-# Read a raw lines; there are so many variants of how it should end,
+# Read a raw line; there are so many variants of how it should end,
 # that the Mouth API is left as simple as possible.
 # Alas: $noread true means NOT to read a new line, but only return
 # the remainder of the current line, if any. This is useful when combining
@@ -335,6 +335,7 @@ sub readRawLine {
   else {
     $line = $self->getNextLine;
     if (!defined $line) {
+      $$self{at_eof} = 1;
       $$self{chars} = []; $$self{nchars} = 0; $$self{colno} = 0; }
     else {
       $$self{lineno}++;
@@ -344,6 +345,10 @@ sub readRawLine {
   $line =~ s/\s*$//s if defined $line;    # Is this right?
   return $line; }
 
+sub isEOL {
+  my ($self) = @_;
+  return $$self{colno} >= $$self{nchars};
+}
 #======================================================================
 1;
 
@@ -389,7 +394,7 @@ Returns the next L<LaTeXML::Core::Token> from the source.
 
 Returns whether there is more data to read.
 
-=item C<< $string = $mouth->getLocator($long); >>
+=item C<< $string = $mouth->getLocator; >>
 
 Return a description of current position in the source, for reporting errors.
 

@@ -42,7 +42,7 @@ sub new {
 sub start {
     my ($self) = @_;
     if ($self->{pid} = fork) {
-        for (1 .. 10) {
+        for (1 .. 50) {
             Time::HiRes::sleep .1;
             last unless $self->{-port};
             

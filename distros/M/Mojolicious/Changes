@@ -1,4 +1,28 @@
 
+7.93  2018-08-11
+  - Improved Test::Mojo to accept Mojo::File objects pointing to application
+    scripts and to override configurations more consistently.
+
+7.92  2018-08-09
+  - This release reverts the addition of stream classes (added in 7.83), which
+    have unfortunately resulted in many Mojolicious applications becoming
+    unstable. While there are no known exploits yet, we've chosen to err on the
+    side of cautiousness and will classify this as a security issue.
+
+7.91  2018-08-09
+  - Fixed a bug in Mojo::IOLoop::Stream where is_readable could not be called
+    after a timeout event.
+
+7.90  2018-08-08
+  - Deprecated expect_close attribute in Mojo::Content.
+  - Removed deprecated delay helper from Mojolicious::Plugin::DefaultHelpers.
+  - Changed error message for destroyed transactions from
+    "Connection already closed" to "Transaction already destroyed".
+  - Fixed a race condition in Mojo::UserAgent where closing connections could
+    sometimes end up being reused.
+  - Fixed an RFC 7230 compliance problem where HTTP/1.1 responses were sometimes
+    incomplete.
+
 7.89  2018-08-06
   - Mojolicious has a new logo!
 

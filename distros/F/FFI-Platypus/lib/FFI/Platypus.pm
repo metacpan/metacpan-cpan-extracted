@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -423,14 +423,14 @@ sub find_symbol
 
   foreach my $path (@{ $self->{lib} })
   {
-    my $handle = do { no warnings; $self->{handles}->{$path||0} } || FFI::Platypus::dl::dlopen($path);
+    my $handle = do { no warnings; $self->{handles}->{$path||0} } || FFI::Platypus::DL::dlopen($path, FFI::Platypus::DL::RTLD_PLATYPUS_DEFAULT());
     unless($handle)
     {
-      warn "error loading $path: ", FFI::Platypus::dl::dlerror()
+      warn "error loading $path: ", FFI::Platypus::DL::dlerror()
         if $ENV{FFI_PLATYPUS_DLERROR};
       next;
     }
-    my $address = FFI::Platypus::dl::dlsym($handle, $self->{mangler}->($name));
+    my $address = FFI::Platypus::DL::dlsym($handle, $self->{mangler}->($name));
     if($address)
     {
       $self->{handles}->{$path||0} = $handle;
@@ -438,7 +438,7 @@ sub find_symbol
     }
     else
     {
-      FFI::Platypus::dl::dlclose($handle) unless $self->{handles}->{$path||0};
+      FFI::Platypus::DL::dlclose($handle) unless $self->{handles}->{$path||0};
     }
   }
   return;
@@ -449,16 +449,37 @@ sub package
 {
   my($self, $module, $modlibname) = @_;
 
-  require FFI::Platypus::ShareConfig;  
-  my @dlext = @{ FFI::Platypus::ShareConfig->get("config_dlext") };
-
   ($module, $modlibname) = caller() unless defined $modlibname;  
   my @modparts = split /::/, $module;
   my $modfname = $modparts[-1];
   my $modpname = join('/',@modparts);
   my $c = @modparts;
   $modlibname =~ s,[\\/][^\\/]+$,, while $c--;    # Q&D basename
+
+  {
+    my @maybe = (
+      "$modlibname/auto/$modpname/$modfname.txt",
+      "$modlibname/../arch/auto/$modpname/$modfname.txt",
+    );
+    foreach my $file (@maybe)
+    {
+      if(-f $file)
+      {
+        open my $fh, '<', $file;
+        my $line = <$fh>;
+        close $fh;
+        if($line =~ /^FFI::Build\@(.*)$/)
+        {
+          $self->lib("$modlibname/$1");
+          return $self;
+        }
+      }
+    }
+  }
   
+  require FFI::Platypus::ShareConfig;  
+  my @dlext = @{ FFI::Platypus::ShareConfig->get("config_dlext") };
+
   foreach my $dlext (@dlext)
   {
     my $file = "$modlibname/auto/$modpname/$modfname.$dlext";
@@ -514,7 +535,7 @@ sub DESTROY
   foreach my $handle (values %{ $self->{handles} })
   {
     next unless $handle;
-    FFI::Platypus::dl::dlclose($handle);
+    FFI::Platypus::DL::dlclose($handle);
   }
   delete $self->{handles};
 }
@@ -529,7 +550,7 @@ sub _have_pm
 
 package FFI::Platypus::Function;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 use overload '&{}' => sub {
   my $ffi = shift;
@@ -550,7 +571,7 @@ use overload '&{}' => sub {
   sub { $self->{code}->(@_) };
 };
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 sub new
 {
@@ -579,13 +600,13 @@ sub get_data
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 sub new
 {
@@ -679,7 +700,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.50
+version 0.53
 
 =head1 SYNOPSIS
 

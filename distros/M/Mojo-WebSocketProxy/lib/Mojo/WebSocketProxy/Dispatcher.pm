@@ -17,7 +17,7 @@ use Scalar::Util qw(blessed);
 
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
 
-our $VERSION = '0.09';     ## VERSION
+our $VERSION = '0.11';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
@@ -66,9 +66,12 @@ sub open_connection {
             # Incoming data will be JSON-formatted text, as a Unicode string.
             # We normalize the entire string before decoding.
             my $normalized_msg = Unicode::Normalize::NFC($msg);
-            my $args = eval { decode_json_utf8($normalized_msg) };
-            $log->error("JSON decoding $normalized_msg failed: $@") if $@;
-            on_message($c, $args);
+            if (my $args = eval { decode_json_utf8($normalized_msg) }) {
+                on_message($c, $args);
+            } else {
+                $c->finish(1007 => 'Malformed JSON');
+                $log->debug(qq{JSON decoding failed for "$normalized_msg": $@});
+            }
         });
 
     $c->on(

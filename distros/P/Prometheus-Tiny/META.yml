@@ -3,6 +3,8 @@ abstract: 'A tiny Prometheus client'
 author:
   - 'Rob N ★ <robn@robn.io>'
 build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -20,7 +22,7 @@ resources:
   bugtracker: https://github.com/robn/Prometheus-Tiny/issues
   homepage: https://github.com/robn/Prometheus-Tiny
   repository: https://github.com/robn/Prometheus-Tiny.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -163,7 +165,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

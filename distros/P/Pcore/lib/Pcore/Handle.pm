@@ -3,7 +3,7 @@ package Pcore::Handle;
 use Pcore -const, -class, -export;
 use Pcore::Util::CA;
 use HTTP::Parser::XS qw[];
-use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
 use AnyEvent::Socket qw[];
 use Errno qw[];
 use IO::Socket::SSL qw[$SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE SSL_VERIFY_NONE SSL_VERIFY_PEER];
@@ -182,7 +182,7 @@ around new => sub ( $orig, $self, $connect, @args ) {
 sub so_no_delay ( $self, $val ) {
     $self->{so_no_delay} = $val;
 
-    setsockopt $self->{fh}, Socket::IPPROTO_TCP(), Socket::TCP_NODELAY(), int $val or die $!;
+    setsockopt $self->{fh}, Socket::IPPROTO_TCP(), Socket::TCP_NODELAY(), $val;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
     return;
 }
@@ -190,7 +190,7 @@ sub so_no_delay ( $self, $val ) {
 sub so_oobinline ( $self, $val ) {
     $self->{so_oobinline} = $val;
 
-    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_OOBINLINE(), int $val or die $!;
+    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_OOBINLINE(), $val or die $!;
 
     return;
 }
@@ -198,7 +198,7 @@ sub so_oobinline ( $self, $val ) {
 sub so_keepalive ( $self, $val ) {
     $self->{so_keepalive} = $val;
 
-    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_KEEPALIVE(), int $val or die $!;
+    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_KEEPALIVE(), $val or die $!;
 
     return;
 }
@@ -272,11 +272,21 @@ sub read ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomon
     return \delete( $self->{rbuf} );
 }
 
+# $args{timeout}
+# $args{read_size}
+sub read_eof ( $self, %args ) {
+    if ($self) {
+        while ( $self->_read( $args{read_size}, $args{timeout} ) ) { }
+    }
+
+    return \delete( $self->{rbuf} );
+}
+
 # returns: undef or buffer ref
 # $args{timeout}
 # $args{read_size}
 # TODO on_read???
-sub readline ( $self, $eol, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+sub read_line ( $self, $eol, %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
     while () {
@@ -312,7 +322,7 @@ sub readline ( $self, $eol, %args ) {    ## no critic qw[Subroutines::ProhibitBu
 # $args{timeout}
 # $args{read_size}
 # $args{on_read}->($buf_ref, $total_bytes_read), returns total bytes or undef if error
-sub readchunk ( $self, $length, %args ) {
+sub read_chunk ( $self, $length, %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
     if ( $args{on_read} ) {
@@ -362,14 +372,41 @@ sub readchunk ( $self, $length, %args ) {
 sub write ( $self, $buf, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
+    my $buf_ref;
+
+    if ( is_plain_scalarref $buf) {
+        if ( utf8::is_utf8 $buf->$* ) {
+            my $tmp_buf = $buf->$*;
+
+            utf8::encode $tmp_buf;
+
+            $buf_ref = \$tmp_buf;
+        }
+        else {
+            $buf_ref = $buf;
+        }
+    }
+    else {
+        if ( utf8::is_utf8 $buf ) {
+            my $tmp_buf = $buf;
+
+            utf8::encode $tmp_buf;
+
+            $buf_ref = \$tmp_buf;
+        }
+        else {
+            $buf_ref = \$buf;
+        }
+    }
+
     my $total_bytes;
-    my $size = length $buf;
     my $ofs  = 0;
+    my $size = length $buf_ref->$*;
 
     while () {
         return if !$self;
 
-        my $bytes = syswrite $self->{fh}, $buf, $size, $ofs;
+        my $bytes = syswrite $self->{fh}, $buf_ref->$*, $size, $ofs;
 
         if ( defined $bytes ) {
             $total_bytes += $bytes;
@@ -447,7 +484,9 @@ sub starttls ( $self, %args ) {
     return;
 }
 
-sub disconnect ( $self ) {
+sub close ( $self ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    CORE::close $self->{fh};
+
     undef $self->{fh};
 
     $self->_set_status( $HANDLE_STATUS_SOCKET_ERROR, 'Disconnected' );
@@ -455,7 +494,11 @@ sub disconnect ( $self ) {
     return;
 }
 
-sub shutdown ( $self ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+sub shutdown ( $self, $type = 2 ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    CORE::shutdown $self->{fh}, $type;
+
+    undef $self->{fh};
+
     $self->_set_status( $HANDLE_STATUS_SOCKET_ERROR, 'Disconnected' );
 
     return;
@@ -498,7 +541,7 @@ sub set_protocol_error ( $self, $reason = undef ) {
 sub read_http_req_headers ( $self, %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
-    my $buf_ref = $self->readline( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+    my $buf_ref = $self->read_line( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
     my $env = {};
 
@@ -527,7 +570,7 @@ sub read_http_req_headers ( $self, %args ) {
 sub read_http_res_headers ( $self, %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
-    my $buf_ref = $self->readline( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+    my $buf_ref = $self->read_line( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
     $buf_ref->$* .= $CRLF x 2;
 
@@ -624,7 +667,7 @@ sub read_http_chunked_data ( $self, %args ) {
     my $total_bytes_read = 0;
 
     while () {
-        my $length = $self->readline( $CRLF, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+        my $length = $self->read_line( $CRLF, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
         # invalid chunk length
         if ( $length->$* =~ /([^[:xdigit:]])/sm ) {
@@ -655,7 +698,7 @@ sub read_http_chunked_data ( $self, %args ) {
                 return $args{on_read} ? $total_bytes_read : \$buf;
             }
 
-            my $headers_buf_ref = $self->readline( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+            my $headers_buf_ref = $self->read_line( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
             # parse and update trailing headers
             if ( $args{headers} ) {
@@ -699,7 +742,7 @@ sub read_http_chunked_data ( $self, %args ) {
                 return if !$args{on_read_len}->( $length, $total_bytes_read + $length );
             }
 
-            my $chunk = $self->readchunk( $length + 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+            my $chunk = $self->read_chunk( $length + 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
             substr $chunk->$*, -2, 2, q[];
 
@@ -724,11 +767,13 @@ sub read_http_chunked_data ( $self, %args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 620                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
+## |    3 | 487                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named subroutine "close"                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 681                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 663                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 348                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    3 | 724                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 358                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

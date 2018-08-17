@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.025    2018-08-13
+        - Removed "Term::ProgressBar" from the dependencies since "Term::TablePrint" has now its own progress bar module.
+        - Minimum version "Term::TablePrint" is "0.072".
+
+2.024    2018-08-11
+        - Add "Term::ProgressBar" to the dependencies (because "Term::ProgressBar" is now optional in "Term::TablePrint").
+
 2.023    2018-08-07
         - The Insert key goes back 25 pages, the Delete key goes forward 25 pages.
         - Minimum version "Term::Choose" is "1.621".

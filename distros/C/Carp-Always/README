@@ -1,4 +1,4 @@
-Carp-Always version 0.11
+Carp-Always version 0.16
 ========================
 
 Carp::Always can be used to make a script complain loudly
@@ -8,24 +8,23 @@ with stack traces when warn()ing or die()ing.
 
 
 Perl has Carp which is a module as old as Perl 5. It has
-an option to print errors (from the perspective of caller) 
+an option to print errors (from the perspective of caller)
 with stack backtrace. With a few lines of codes, this module
 illustrates how to make warn() and die() noisy as well.
 
 This module was written as a reaction to Acme::JavaTrace by
-Sébastien Aperghis-Tramoni. I didn't know Sébastien or
-or understood its humor at the time. That and more was 
-pointed by Robert Rothenberg at CPAN ratings. But the module
+SÃ©bastien Aperghis-Tramoni. At the time I didn't know SÃ©bastien or
+or understood his humor. But the module
 idea stood and lives to help you out with debugging your code.
 
 INSTALLATION
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  perl Makefile.PL
+  make
+  make test
+  make install
 
 DEPENDENCIES
 
@@ -33,13 +32,11 @@ This module requires these other modules and libraries:
 
   Carp
 
-but that is a core Perl module. 
+but that is a core Perl module.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2013 by Ferreira
+Copyright (C) 2005-2013, 2018 by Adriano Ferreira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-

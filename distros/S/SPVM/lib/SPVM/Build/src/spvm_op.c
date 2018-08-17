@@ -707,7 +707,7 @@ SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_term_condi
   return op_condition;
 }
 
-SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, SPVM_OP* op_statement_init, SPVM_OP* op_term_condition, SPVM_OP* op_term_increment, SPVM_OP* op_block_statements) {
+SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, SPVM_OP* op_term_init, SPVM_OP* op_term_condition, SPVM_OP* op_term_increment, SPVM_OP* op_block_statements) {
   
   // Loop
   SPVM_OP* op_loop = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOOP, op_for->file, op_for->line);
@@ -727,7 +727,7 @@ SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, S
   SPVM_OP* op_loop_increment = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOOP_INCREMENT, op_for->file, op_for->line);
   SPVM_OP_insert_child(compiler, op_loop_increment, op_loop_increment->last, op_term_increment);
   
-  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_statement_init);
+  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_term_init);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_block_statements);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_loop_increment);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_condition);
@@ -743,7 +743,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   SPVM_OP* op_loop = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOOP, op_while->file, op_while->line);
   
   // Init statement. This is null.
-  SPVM_OP* op_statement_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, op_while->file, op_while->line);
+  SPVM_OP* op_term_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, op_while->file, op_while->line);
   
   // Condition
   SPVM_OP* op_condition = SPVM_OP_build_condition(compiler, op_term_condition, 1);
@@ -762,7 +762,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   SPVM_OP* op_loop_increment = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOOP_INCREMENT, op_while->file, op_while->line);
   SPVM_OP_insert_child(compiler, op_loop_increment, op_loop_increment->last, op_term_increment);
   
-  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_statement_init);
+  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_term_init);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_block_statements);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_loop_increment);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_condition);
@@ -820,7 +820,7 @@ SPVM_OP* SPVM_OP_build_array_length(SPVM_COMPILER* compiler, SPVM_OP* op_array_l
   return op_array_length;
 }
 
-SPVM_OP* SPVM_OP_build_new_object(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM_OP* op_type, SPVM_OP* op_list_elements) {
+SPVM_OP* SPVM_OP_build_new(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM_OP* op_type, SPVM_OP* op_list_elements) {
   
   SPVM_OP_insert_child(compiler, op_new, op_new->last, op_type);
   
@@ -1252,10 +1252,9 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           SPVM_yyerror_format(compiler, "Invalid package descriptor %s at %s line %d\n", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_package->file, op_package->line);
       }
     }
-  }
-  
-  if (duplicate_descriptors > 1) {
-    SPVM_yyerror_format(compiler, "Invalid descriptor combination at %s line %d\n", op_list_descriptors->file, op_list_descriptors->line);
+    if (duplicate_descriptors > 1) {
+      SPVM_yyerror_format(compiler, "Invalid descriptor combination at %s line %d\n", op_list_descriptors->file, op_list_descriptors->line);
+    }
   }
   
   // Divide declarations to field, sub, enum, package variable, use
@@ -1519,7 +1518,7 @@ SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_v
   return op_var;
 }
 
-SPVM_OP* SPVM_OP_build_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type) {
   
   SPVM_OP* op_package_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE_VAR, op_var->file, op_var->line);
   SPVM_PACKAGE_VAR* package_var = SPVM_PACKAGE_VAR_new(compiler);
@@ -1568,7 +1567,7 @@ const char* SPVM_OP_get_var_name(SPVM_COMPILER* compiler, SPVM_OP* op_var) {
   return name;
 }
 
-SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_name_field, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_name_field, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
 
   // Build OP
   SPVM_OP_insert_child(compiler, op_field, op_field->last, op_name_field);

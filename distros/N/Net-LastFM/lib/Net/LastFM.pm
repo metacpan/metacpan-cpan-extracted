@@ -1,11 +1,11 @@
 package Net::LastFM;
+$Net::LastFM::VERSION = '0.36';
 use Moose;
 use MooseX::StrictConstructor;
 use Digest::MD5 qw(md5_hex);
 use JSON::XS::VersionOneAndTwo;
 use LWP::UserAgent;
 use URI::QueryParam;
-our $VERSION = '0.34';
 
 has 'api_key' => (
     is       => 'rw',
@@ -45,7 +45,7 @@ sub create_http_request {
     }
     $uri->query_param( 'format', 'json' );
 
-    return HTTP::Request->new( 'GET', $uri );
+    return HTTP::Request->new( 'POST', $uri );
 }
 
 sub create_http_request_signed {

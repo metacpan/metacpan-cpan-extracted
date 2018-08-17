@@ -2,8 +2,8 @@ NAME
     App::cryp::arbit - Cryptocurrency arbitrage utility
 
 VERSION
-    This document describes version 0.005 of App::cryp::arbit (from Perl
-    distribution App-cryp-arbit), released on 2018-08-07.
+    This document describes version 0.006 of App::cryp::arbit (from Perl
+    distribution App-cryp-arbit), released on 2018-08-11.
 
 SYNOPSIS
     Please see included script cryp-arbit.
@@ -358,6 +358,14 @@ FUNCTIONS
     *   time_end => *date*
 
     *   time_start => *date*
+
+    *   usd_rates => *hash*
+
+        Set USD rates.
+
+        Example:
+
+         --usd-rate IDR=14500 --usd-rate THB=33.25
 
     Returns an enveloped result (an array).
 

@@ -29,7 +29,7 @@ With this module you can access the OpenNebula XML-RPC service.
 =cut
 
 package Net::OpenNebula;
-$Net::OpenNebula::VERSION = '0.311.0';
+$Net::OpenNebula::VERSION = '0.313.0';
 use Net::OpenNebula::RPCClient;
 push our @ISA , qw(Net::OpenNebula::RPCClient);
 
@@ -168,6 +168,15 @@ sub get_images {
                                [ int => -1 ], # range start
                                [ int => -1 ], # range end
                                );
+}
+
+sub create_cluster {
+   my ($self, $name) = @_;
+
+   my $new = Net::OpenNebula::Cluster->new(rpc => $self, data => undef);
+   $new->create($name);
+
+   return $new;
 }
 
 sub create_vm {

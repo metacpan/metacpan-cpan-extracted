@@ -34,7 +34,7 @@ my $DEFCOLOR      = 'black';      # [CONSTANT]
 my $DEFBACKGROUND = 'white';      # [CONSTANT]
 my $DEFOPACITY    = '1';          # [CONSTANT]
 my $DEFENCODING   = 'OT1';        # [CONSTANT]
-my $DEFLANGUAGE   = 'en';
+my $DEFLANGUAGE   = undef;
 
 sub DEFSIZE { return $STATE->lookupValue('NOMINAL_FONT_SIZE') || 10; }
 
@@ -94,11 +94,11 @@ my %font_family = (
   # some ams fonts
   cmmib => { family => 'italic', series   => 'bold' },
   cmbsy => { family => 'symbol', series   => 'bold' },
-  msa   => { family => 'symbol', encoding => 'AMSA' },
-  msb   => { family => 'symbol', encoding => 'AMSB' },
+  msa   => { family => 'symbol', encoding => 'AMSa' },
+  msb   => { family => 'symbol', encoding => 'AMSb' },
   # Are these really the same?
-  msx => { family => 'symbol', encoding => 'AMSA' },
-  msy => { family => 'symbol', encoding => 'AMSB' },
+  msx => { family => 'symbol', encoding => 'AMSa' },
+  msy => { family => 'symbol', encoding => 'AMSb' },
 );
 
 # Maps the "series code" to an abstract font series name
@@ -160,7 +160,7 @@ sub decodeFontname {
     if (my $ffam = lookupFontFamily($fam)) { map { $props{$_} = $$ffam{$_} } keys %$ffam; }
     if (my $fser = lookupFontSeries($ser)) { map { $props{$_} = $$fser{$_} } keys %$fser; }
     if (my $fsh  = lookupFontShape($shp))  { map { $props{$_} = $$fsh{$_} } keys %$fsh; }
-    $size = 1 unless defined $size;
+    $size = 1 unless $size;    # Yes, also if 0, "" (from regexp)
     $size = $at if defined $at;
     $size *= $scaled if defined $scaled;
     $props{size} = $size;
@@ -418,14 +418,6 @@ sub font_match_xpaths {
 # # Presumably a text font is "sticky", if used in math?
 # sub isSticky { return 1; }
 
-sub mergePurestyle {
-  my ($font, $other) = @_;
-  return $font->merge(
-    size       => $other->getSize,
-    color      => $other->getColor,
-    background => $other->getBackground,
-    opacity    => $other->getOpacity,
-    mathstyle  => $other->getMathstyle); }
 #======================================================================
 our %mathstylesize = (display => 1, text => 1,
   script => 0.7, scriptscript => 0.5);
@@ -601,6 +593,9 @@ sub merge {
     $mathstyle = $fracstylemap{ $mathstyle            || 'display' };
     $size      = $stylescale * $stylesize{ $mathstyle || 'display' }; }
 
+  if ($options{emph}) {
+    $shape = ($shape eq 'italic' ? 'upright' : 'italic'); }
+
   my $newfont = (ref $self)->new_internal($family, $series, $shape, $size,
     $color, $bg, $opacity,
     $encoding,  $language,
@@ -648,6 +643,47 @@ sub specialize {
   return (ref $self)->new_internal($family, $series, $shape, $size,
     $color, $bg, $opacity,
     $encoding, $language, $mathstyle, $force); }
+
+# A special form of merge when copying/moving nodes to a new context,
+# particularly math which become scripts or such.
+our %mathstylestep = (
+  display      => { display => 0,  text => 1,  script => 2,  scriptscript => 3 },
+  text         => { display => -1, text => 0,  script => 1,  scriptscript => 2 },
+  script       => { display => -2, text => -1, script => 0,  scriptscript => 1 },
+  scriptscript => { display => -3, text => -2, script => -1, scriptscript => 0 });
+our %stepmathstyle = (
+  display => { -3 => 'display', -2 => 'display', -1 => 'display',
+    0 => 'display', 1 => 'text', 2 => 'script', 3 => 'scriptscript' },
+  text => { -3 => 'display', -2 => 'display', -1 => 'display',
+    0 => 'text', 1 => 'script', 2 => 'scriptscript', 3 => 'scriptscript' },
+  script => { -3 => 'display', -2 => 'display', -1 => 'text',
+    0 => 'script', 1 => 'scriptscript', 2 => 'scriptscript', 3 => 'scriptscript' },
+  scriptscript => { -3 => 'display', -2 => 'text', -1 => 'script',
+    0 => 'scriptscript', 1 => 'scriptscript', 2 => 'scriptscript', 3 => 'scriptscript' });
+
+sub purestyleChanges {
+  my ($self, $other) = @_;
+  my $mathstyle      = $self->getMathstyle;
+  my $othermathstyle = $other->getMathstyle;
+  return (
+    scale      => $other->getSize / $self->getSize,
+    color      => $other->getColor,
+    background => $other->getBackground,
+    opacity    => $other->getOpacity,                 # should multiply or replace?
+    ($mathstyle && $othermathstyle
+      ? (mathstylestep => $mathstylestep{$mathstyle}{$othermathstyle})
+      : ()),
+    ); }
+
+sub mergePurestyle {
+  my ($self, %stylechanges) = @_;
+  my $new = $self->new_internal(@$self);
+  $$new[3] = $$self[3] * $stylechanges{scale} if $stylechanges{scale};
+  $$new[4] = $stylechanges{color}             if $stylechanges{color};
+  $$new[5] = $stylechanges{background}        if $stylechanges{background};
+  $$new[6] = $stylechanges{opacity}           if $stylechanges{opacity};
+  $$new[9] = $stepmathstyle{ $$self[9] }{ $stylechanges{mathstylestep} } if $stylechanges{mathstylestep};
+  return new; }
 
 #**********************************************************************
 1;

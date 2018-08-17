@@ -22,36 +22,59 @@
 # DESCRIPTION
 
 [Net::RDAP](https://metacpan.org/pod/Net::RDAP) provides an interface to the Registration Data Access
-Protocol (RDAP). RDAP is a replacement for Whois.
+Protocol (RDAP).
+
+RDAP is gradually replacing Whois as the preferred way of obtainining
+information about Internet resources (IP addresses, autonymous system
+numbers, and domain names). As of writing, RDAP is quite well-supported
+by Regional Internet Registries (who are responsible for the allocation
+of IP addresses and AS numbers) but is still being rolled out among
+domain name registries and registrars.
 
 [Net::RDAP](https://metacpan.org/pod/Net::RDAP) does all the hard work of determining the correct
 server to query ([Net::RDAP::Registry](https://metacpan.org/pod/Net::RDAP::Registry) is an interface to the
-IANA registries), querying the server ([Net::RDAP::UA](https://metacpan.org/pod/Net::RDAP::UA) is an
-RDAP HTTP user agent), and parsing the response
+IANA registry of RDAP services), querying the server ([Net::RDAP::UA](https://metacpan.org/pod/Net::RDAP::UA)
+is an RDAP HTTP user agent), and parsing the response
 ([Net::RDAP::Object](https://metacpan.org/pod/Net::RDAP::Object) and its submodules provide access to the data
-returned by the server).
+returned by the server). As such, it provides a single unified
+interface to information about all unique Internet identifiers.
 
 # METHODS
 
-        $rdap = Net::RDAP->new;
+## Constructor
+
+        $rdap = Net::RDAP->new(%OPTIONS);
 
 Constructor method, returns a new object.
+
+Supported options:
+
+- `use_cache` - if true, copies of RDAP responses are stored on
+disk, and are updated if the copy on the server is more up-to-date.
+This behaviour is disabled by default and must be explicitly enabled.
+- `debug` - if true, tells [Net::RDAP::UA](https://metacpan.org/pod/Net::RDAP::UA) to print all HTTP
+requests and responses to `STDERR`.
+
+## Domain Lookup
 
         $object = $rdap->domain($domain);
 
 This method returns a [Net::RDAP::Object::Domain](https://metacpan.org/pod/Net::RDAP::Object::Domain) object containing
 information about the domain name referenced by `$domain`.
+
 `$domain` must be a [Net::DNS::Domain](https://metacpan.org/pod/Net::DNS::Domain) object. The domain may be
 either a "forward" domain (such as `example.com`) or a "reverse"
 domain (such as `168.192.in-addr.arpa`).
 
-If no RDAP service can be found, or an error occurs, then `undef` is
-returned.
+If there was an error, this method will return a [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error).
+
+## IP Lookup
 
         $object = $rdap->ip($ip);
 
 This method returns a [Net::RDAP::Object::IPNetwork](https://metacpan.org/pod/Net::RDAP::Object::IPNetwork) object containing
 information about the resource referenced by `$ip`.
+
 `$ip` must be a [Net::IP](https://metacpan.org/pod/Net::IP) object and can represent any of the
 following:
 
@@ -60,27 +83,32 @@ following:
 - An IPv6 address (e.g. `2001:DB8::42:1`);
 - An IPv6 CIDR range (e.g. `2001:DB8::/32`).
 
-If no RDAP service can be found, or an error occurs, then `undef` is
-returned.
+If there was an error, this method will return a [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error).
+
+## AS Number Lookup
 
         $object = $rdap->autnum($autnum);
 
 This method returns a [Net::RDAP::Object::Autnum](https://metacpan.org/pod/Net::RDAP::Object::Autnum) object containing
 information about the autonymous system referenced by `$autnum`.
+
 `$autnum` must be a [Net::ASN](https://metacpan.org/pod/Net::ASN) object.
 
-If no RDAP service can be found, or an error occurs, then `undef` is
-returned.
+If there was an error, this method will return a [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error).
+
+## Directly Fetching Known Resources
 
         $object = $rdap->fetch($url);
+
         $object = $rdap->fetch($link);
+
         $object = $rdap->fetch($object);
 
-The first and second forms of this method fetch the resource
-identified by `$url` or `$link` (which must be either a [URI](https://metacpan.org/pod/URI) or
-[Net::RDAP::Link](https://metacpan.org/pod/Net::RDAP::Link) object), and return a [Net::RDAP::Object](https://metacpan.org/pod/Net::RDAP::Object)
-object (assuming that the resource is a valid RDAP response). This
-is used internally by `query()` but is also available for when
+The first and second forms of the `fetch()` method retrieve the
+resource identified by `$url` or `$link` (which must be either a
+[URI](https://metacpan.org/pod/URI) or [Net::RDAP::Link](https://metacpan.org/pod/Net::RDAP::Link) object), and return a [Net::RDAP::Object](https://metacpan.org/pod/Net::RDAP::Object)
+object (assuming that the server returns a valid RDAP response). This
+method is used internally by `query()` but is also available for when
 you need to directly fetch a resource without using the IANA
 registry, such as for nameserver or entity queries.
 
@@ -103,6 +131,26 @@ example:
                 # $nameserver is now fully populated
         }
 
+In order for this form to work, the object must have a `self` link:
+[Net::RDAP](https://metacpan.org/pod/Net::RDAP) will auto-create one for objects that don't have one if it
+can.
+
+## RDAP User Agent
+
+        # access the user agent
+        $ua = $rdap->ua;
+
+        # specify a cookie jar
+        $rdap->ua->cookie_jar('/tmp/cookies.txt');
+
+        # specify a proxy
+        $rdap->ua->proxy([qw(http https)], 'https://proxy.example.com');
+
+You can access the [Net::RDAP::UA](https://metacpan.org/pod/Net::RDAP::UA) object used to communicate with RDAP
+servers using the `ua()` method. This allows you to configure additional
+HTTP features such as a file to store cookies, proxies, custom user-agent
+strings, etc.
+
 # HOW TO CONTRIBUTE
 
 [Net::RDAP](https://metacpan.org/pod/Net::RDAP) is a work-in-progress; if you would like to help, the
@@ -119,6 +167,7 @@ RDAP-related modules that all work together. They are:
     - [Net::RDAP::Event](https://metacpan.org/pod/Net::RDAP::Event)
     - [Net::RDAP::ID](https://metacpan.org/pod/Net::RDAP::ID)
     - [Net::RDAP::Object](https://metacpan.org/pod/Net::RDAP::Object), and its submodules:
+        - [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error)
         - [Net::RDAP::Object::Autnum](https://metacpan.org/pod/Net::RDAP::Object::Autnum)
         - [Net::RDAP::Object::Domain](https://metacpan.org/pod/Net::RDAP::Object::Domain)
         - [Net::RDAP::Object::Entity](https://metacpan.org/pod/Net::RDAP::Object::Entity)
@@ -126,9 +175,11 @@ RDAP-related modules that all work together. They are:
         - [Net::RDAP::Object::Nameserver](https://metacpan.org/pod/Net::RDAP::Object::Nameserver)
     - [Net::RDAP::Remark](https://metacpan.org/pod/Net::RDAP::Remark), and its submodule:
         - [Net::RDAP::Notice](https://metacpan.org/pod/Net::RDAP::Notice)
+- [Net::RDAP::EPPStatusMap](https://metacpan.org/pod/Net::RDAP::EPPStatusMap)
 - [Net::RDAP::Registry](https://metacpan.org/pod/Net::RDAP::Registry)
 - [Net::RDAP::Link](https://metacpan.org/pod/Net::RDAP::Link)
 - [Net::RDAP::UA](https://metacpan.org/pod/Net::RDAP::UA)
+- [Net::RDAP::Values](https://metacpan.org/pod/Net::RDAP::Values)
 
 # DEPENDENCIES
 
@@ -147,6 +198,7 @@ RDAP-related modules that all work together. They are:
 - [Net::IP](https://metacpan.org/pod/Net::IP)
 - [URI](https://metacpan.org/pod/URI)
 - [vCard](https://metacpan.org/pod/vCard)
+- [XML::LibXML](https://metacpan.org/pod/XML::LibXML)
 
 # REFERENCES
 

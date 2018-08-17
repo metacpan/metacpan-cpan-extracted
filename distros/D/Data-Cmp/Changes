@@ -1,0 +1,33 @@
+0.005    2018-08-13 (PERLANCAR)
+
+         - No functional changes.
+
+         - Documentation and optimization.
+
+
+0.004    2018-08-11 (PERLANCAR)
+
+         - New modules: Data::Cmp::Numeric, Data::Cmp::StrOrNumeric.
+
+         - Some optimizations.
+
+
+0.003    2018-08-11 (PERLANCAR)
+
+         - No functional changes.
+
+         - [doc] Some wording and formatting fixes, example tweak.
+
+
+0.002    2018-08-11 (PERLANCAR)
+
+         - [REMOVED] Remove all options and make Data::Cmp minimalist. Separate
+           comparison routine that has options to another module/distribution
+           (Data::Cmp::Custom).
+
+         - [doc] Document comparison rules.
+
+
+0.001    2018-08-10 (PERLANCAR)
+
+         - First release.

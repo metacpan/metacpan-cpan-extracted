@@ -3,15 +3,12 @@ abstract: 'change content of a file atomically'
 author:
   - 'HIROSE Masaaki <hirose31 _at_ gmail.com>'
 build_requires:
-  Devel::Cover: 0
-  ExtUtils::MakeMaker: 6.36
   FindBin: 0
-  Test::More: 0
+  Test::More: 0.96
 configure_requires:
-  CPAN::Meta: 0
-  ExtUtils::MakeMaker: 6.36
+  Module::Build::Tiny: 0.039
 dynamic_config: 0
-generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.130880'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,22 +16,30 @@ meta-spec:
 name: IO-File-AtomicChange
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
 provides:
   IO::File::AtomicChange:
     file: lib/IO/File/AtomicChange.pm
-    version: 0.05
+    version: 0.07
 requires:
   File::Copy: 0
-  File::Sync: 0
   File::Temp: 0
-  IO::File: 0
+  IO: 1.39
   POSIX: 0
   Path::Class: 0
   Time::HiRes: 0
+  perl: 5.008005
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/hirose31/IO-File-AtomicChange.git
-version: 0.05
+  bugtracker: https://github.com/hirose31/IO-File-AtomicChange/issues
+  homepage: https://github.com/hirose31/IO-File-AtomicChange
+  repository: https://github.com/hirose31/IO-File-AtomicChange.git
+version: 0.07
+x_contributors:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'Shoichi Kaji <skaji@outlook.com>'
+x_serialization_backend: 'YAML::Tiny version 1.56'

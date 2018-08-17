@@ -1,6 +1,10 @@
 package Dist::Zilla::Plugin::FFI::CheckLib;
-$Dist::Zilla::Plugin::FFI::CheckLib::VERSION = '0.002001';
-use strict; use warnings;
+
+use strict;
+use warnings;
+
+# ABSTRACT: FFI::CheckLib alternative to Dist::Zilla::Plugin::CheckLib
+our $VERSION = '1.01'; # VERSION
 
 use Moose;
 with
@@ -16,6 +20,7 @@ my @list_options = qw/
   libpath
   symbol
   systempath
+  verify
 /;
 sub mvp_multivalue_args { @list_options }
 
@@ -110,7 +115,9 @@ sub _munge_file {
       [ 
         $_ => @stuff > 1 ? ('[ ' . join(', ', @stuff) . ' ]') : $stuff[0]
       ] : ()
-  } @list_options, ( $self->recursive ? 'recursive' : () );
+  } grep !/^verify$/, @list_options, ( $self->recursive ? 'recursive' : () );
+
+  my @verify = map { s/^\|//; $_ } $self->verify;
 
   $file->content(
       substr($orig_content, 0, $pos)
@@ -118,7 +125,8 @@ sub _munge_file {
     . ' ' . ($self->VERSION || '<self>') . "\n"
     . "use FFI::CheckLib;\n"
     . "check_lib_or_exit(\n"
-    . join('', map {; ' 'x4 . $_->[0] . ' => ' . $_->[1] . ",\n" } @options )
+    . join('', map {; ' 'x2 . $_->[0] . ' => ' . $_->[1] . ",\n" } @options )
+    . (@verify ? join("\n", map { ' 'x2 . $_ } 'verify => sub {', (map { ' 'x2 . $_ } @verify), '},')."\n" : '')
     . ");\n\n"
     . substr($orig_content, $pos)
   );
@@ -130,30 +138,34 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dist::Zilla::Plugin::FFI::CheckLib - FFI::CheckLib alternative to Dist::Zilla::Plugin::CheckLib
+
+=head1 VERSION
+
+version 1.01
 
 =head1 SYNOPSIS
 
 In your F<dist.ini>:
 
-    [FFI::CheckLib]
-    lib = zmq
+ [FFI::CheckLib]
+ lib = zmq
 
 =head1 DESCRIPTION
 
 This is a L<Dist::Zilla> plugin that modifies the F<Makefile.PL> or
-F<Build.PL> in your distribution to check for a dynamic library L<FFI::Raw> (or
+F<Build.PL> in your distribution to check for a dynamic library L<FFI::Platypus> (or
 similar) can access; uses L<FFI::CheckLib> to perform the check.
 
 If the library is not available, the program exits with a status of zero,
 which will result in a NA result on a CPAN test reporter.
 
-Derived from L<Dist::Zilla::Plugin::CheckLib> (see L</AUTHOR>) -- look there
-for non-FFI applications.
-
-=for Pod::Coverage mvp_multivalue_args register_prereqs munge_files setup_installer
+This module is adapted directly from Dist::Zilla::Plugin::CheckLib, copyright (c) 2014 by Karen Etheridge (CPAN: ETHER).
+Look there for XS modules.
 
 =head1 CONFIGURATION OPTIONS
 
@@ -187,6 +199,24 @@ recursively.
 
 Defaults to false.
 
+=head2 C<verify>
+
+The verify function body to use.  For each usage, is one line of the function
+body.  You can prefix with the pipe C<|> character to get proper indentation.
+
+ verify = | my($name, $libpath) = @_;
+ verify = | my $ffi = FFI::Platypus->new;
+ verify = | $ffi->lib($libpath);
+ verify = | my $f = $ffi->function('foo_version', [] => 'int');
+ verify = | if($f) {
+ verify = |   return $f->call() >= 500; # we accept version 500 or better
+ verify = | } else {
+ verify = |   return;
+ verify = | }
+
+If you use any modules, such as L<FFI::Platypus> in this example, be sure that
+you declare them as configure requires.
+
 =head1 SEE ALSO
 
 =over 4
@@ -207,10 +237,13 @@ L<Devel::AssertOS> and L<Dist::Zilla::Plugin::AssertOS>
 
 =head1 AUTHOR
 
-Ported to L<FFI::CheckLib> by Jon Portnoy <avenj@cobaltirc.org>
+Original author: Jon Portnoy
 
-This module is adapted directly from L<Dist::Zilla::Plugin::CheckLib>,
-copyright (c) 2014 by Karen Etheridge (CPAN: ETHER).
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Jon Portnoy.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

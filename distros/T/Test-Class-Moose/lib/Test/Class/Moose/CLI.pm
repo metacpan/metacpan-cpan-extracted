@@ -4,7 +4,7 @@ package Test::Class::Moose::CLI;
 
 use 5.10.0;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 use Moose 2.0000;
 use Carp;
@@ -28,7 +28,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 
@@ -55,9 +55,16 @@ This class allows you to pass the following command-line options:
 =head2 --classes
 
 This should be the full name of one a class that you want to run (rather than
-running classes). You can also pass a path to the class. Any leading C<t/lib/>
-part of the path will be stripped, and the rest will be transformed from a
-path to a module name. You can pass this option more than once.
+running classes).
+
+You can also pass a path to a single class. Any leading C<t/lib/> part of the
+path will be stripped, and the rest will be transformed from a path to a
+module name.
+
+Finally, you can pass a path to a directory. It will be searched for F<.pm>
+files and each of those files will be loaded as a test class.
+
+You can pass this option more than once.
 
 =head2 --methods
 
@@ -169,7 +176,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2017 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2018 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

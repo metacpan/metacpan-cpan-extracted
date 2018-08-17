@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.2.1 2018-08-17T04:38:31Z
+
+    - Declare MSWin32 as unsupported.
+
 v0.2 2018-07-01T02:09:04Z
 
     - Add --exit option.

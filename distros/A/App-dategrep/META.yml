@@ -6,8 +6,19 @@ build_requires:
   Test::MockTime: '0'
   Test::Output: '0'
 configure_requires:
+  Carp: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::stat: '0'
+  Getopt::Long: '0'
+  I18N::Langinfo: '0'
+  IPC::Cmd: '0'
   Module::Build::Tiny: '0.035'
-  perl: 5.008_001
+  POSIX: '0'
+  Pod::Usage: '0'
+  Time::Local: '0'
+  parent: '0'
+  perl: 5.010_001
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.1, CPAN::Meta::Converter version 2.150005'
 license: gpl
@@ -28,7 +39,7 @@ no_index:
 provides:
   App::dategrep:
     file: lib/App/dategrep.pm
-    version: '2.03'
+    version: '2.05'
   App::dategrep::Date:
     file: lib/App/dategrep/Date.pm
   App::dategrep::Iterator:
@@ -41,11 +52,13 @@ provides:
     file: lib/App/dategrep/Iterators.pm
   App::dategrep::Strptime:
     file: lib/App/dategrep/Strptime.pm
+requires:
+  perl: '5.001001'
 resources:
   bugtracker: https://github.com/mdom/dategrep/issues
   homepage: https://github.com/mdom/dategrep
   repository: git://github.com/mdom/dategrep.git
-version: '2.03'
+version: '2.05'
 x_contributors:
   - 'Mario Domgoergen <mario@domgoergen.com>'
   - 'Mario Domgoergen <mdom@taz.de>'

@@ -3,3 +3,5 @@ Revision history for CGI-BrowserDetect
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03    2018-08-11
+        Improve test coverage

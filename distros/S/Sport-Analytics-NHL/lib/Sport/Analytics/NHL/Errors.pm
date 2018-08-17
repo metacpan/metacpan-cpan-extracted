@@ -15,6 +15,7 @@ our @EXPORT = qw(
 	%NAME_TYPOS %NAME_VARIATIONS %REVERSE_NAME_TYPOS
 	%SPECIAL_EVENTS %FORCED_PUSH
 	%MISSING_EVENTS %MISSING_COACHES %MISSING_PLAYERS
+	%MISSING_PLAYER_INFO
 
 	$INCOMPLETE $REPLICA $NO_EVENTS $UNSYNCHED $BROKEN
 );
@@ -172,6 +173,7 @@ our %BROKEN_EVENTS = (
 		198820689 => {  5 => { player2 => 8446637 }, 6 => { player2 => 8446637 }, },
 		198920567 => { 26 => { player1 => 8450167 }},
 		201021015 => { 345 => {en => 1}},
+		201321046 => { 302 => -1 },
 		201621152 => { 9 => { assist2 => 8475209, assists => [8474141,8475209] }},
 		201621165 => { 43 => { player1 => 8465009, assists => [ 8478443, 8476374]}}
 	},
@@ -277,6 +279,7 @@ our %BROKEN_EVENTS = (
 			on_ice => [ [], [], ],
 			special => 1, en => 0, gwg => 0,
 		} },
+		201321046 => { 295 => 0 },
 		201321139 => {
 			13 => { on_ice => [ [51,89,57,19,84,30], [8,19,88,7,61,31] ]},
 		},
@@ -1472,6 +1475,25 @@ our %MISSING_PLAYERS = (
 		],
 		[],
 	],
+);
+
+our %MISSING_PLAYER_INFO = (
+        8452484 => {
+                height => q{5' 11"},
+                weight => 175,
+        },
+        8462118 => {
+                number => 10,
+        },
+        8452019 => {
+                number => 18,
+        },
+        8459424 => {
+                number => 44,
+        },
+        8470615 => {
+                city => q{Quebec City},
+        },
 );
 
 =head1 NAME

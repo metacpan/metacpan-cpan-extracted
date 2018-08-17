@@ -34,6 +34,8 @@ unless (defined $postg && -d $postg) {
 
 my @pg_version;
 
+my $pg_unix_socket_dir_param_name;
+
 if($scratch_db_server && $test_db_server) {
 
     if($Module::Build::Database::PostgreSQL::Bin{Psql}  eq '/bin/false') {
@@ -65,6 +67,14 @@ if($scratch_db_server && $test_db_server) {
     if ($pg_version[0]==8 && $pg_version[1] < 4) {
         plan skip_all => "postgres version must be >= 8.4"
     }
+
+    #pg changed the unix_socket_directory parameter name in 9.3, but Red Hat backports to 9.0
+    #See http://dba.stackexchange.com/questions/50135#50714
+
+    ($pg_unix_socket_dir_param_name) = `$Module::Build::Database::PostgreSQL::Bin{Postgres} --describe-config` =~
+        /^\W*(unix_socket_director(y|ies)\b)/m or die;
+
+    note "pg is using server parameter: $pg_unix_socket_dir_param_name";
 }
 
 plan qw/no_plan/;
@@ -119,11 +129,7 @@ if($test_db_server) {
     sysok("$Module::Build::Database::PostgreSQL::Bin{Initdb} -D $dbdir");
 
     open my $fp, ">> $dbdir/postgresql.conf" or die $!;
-    if ($pg_version[1] > 2) {
-        print {$fp} qq[unix_socket_directories = '$dbdir'\n];
-    } else  {
-        print {$fp} qq[unix_socket_directory = '$dbdir'\n];
-    }
+    print {$fp} qq[$pg_unix_socket_dir_param_name = '$dbdir'\n];
     close $fp or die $!;
 
     sysok(qq[$Module::Build::Database::PostgreSQL::Bin{Pgctl} -t 120 -o "-h ''" -w start]);

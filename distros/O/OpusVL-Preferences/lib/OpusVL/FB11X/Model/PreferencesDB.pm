@@ -47,7 +47,7 @@ OpusVL::FB11X::Model::PreferencesDB - FB11 model for preferences DB
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 AUTHOR
 

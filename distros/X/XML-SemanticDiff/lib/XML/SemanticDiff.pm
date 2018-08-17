@@ -1,12 +1,11 @@
 package XML::SemanticDiff;
-our $AUTHORITY = 'cpan:SHLOMIF';
 
 use strict;
 use warnings;
 
-use 5.012;
+use 5.008;
 
-our $VERSION = '1.0006';
+our $VERSION = '1.0007';
 
 use XML::Parser;
 
@@ -223,7 +222,6 @@ sub compare {
 1;
 
 package XML::SemanticDiff::PathFinder;
-our $AUTHORITY = 'cpan:SHLOMIF';
 
 foreach my $func (qw(StartTag EndTag Text StartDocument EndDocument PI))
 {
@@ -237,7 +235,6 @@ foreach my $func (qw(StartTag EndTag Text StartDocument EndDocument PI))
 }
 
 package XML::SemanticDiff::PathFinder::Obj;
-our $AUTHORITY = 'cpan:SHLOMIF';
 
 use strict;
 
@@ -459,7 +456,7 @@ XML::SemanticDiff - Perl extension for comparing XML documents.
 
 =head1 VERSION
 
-version 1.0006
+version 1.0007
 
 =head1 SYNOPSIS
 
@@ -485,7 +482,7 @@ hashrefs where each hashref describes a single difference between the two docs.
 
 =head1 VERSION
 
-version 1.0006
+version 1.0007
 
 =head1 METHODS
 
@@ -641,13 +638,23 @@ the same terms as Perl itself.
 
 perl(1).
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Shlomi Fish <shlomif@cpan.org>
 
+=item *
+
+Chris Prather <chris.prather@tamarou.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2001 by Kim Hampton.
+This software is copyright (c) 2001 by Kip Hampton.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -655,9 +662,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff> or by
-email to
-L<bug-xml-semanticdiff@rt.cpan.org|mailto:bug-xml-semanticdiff@rt.cpan.org>.
+L<https://github.com/shlomif/perl-XML-SemanticDiff/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -686,7 +691,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/XML-SemanticDiff>
+L<https://metacpan.org/release/XML-SemanticDiff>
 
 =item *
 
@@ -722,14 +727,6 @@ L<http://cpanratings.perl.org/d/XML-SemanticDiff>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/XML-SemanticDiff>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -740,7 +737,7 @@ L<http://cpants.cpanauthors.org/dist/XML-SemanticDiff>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/X/XML-SemanticDiff>
 
@@ -776,6 +773,6 @@ from your repository :)
 
 L<https://github.com/shlomif/perl-XML-SemanticDiff>
 
-  git clone https://github.com/shlomif/perl-XML-SemanticDiff.git
+  git clone git://github.com/shlomif/perl-XML-SemanticDiff.git
 
 =cut

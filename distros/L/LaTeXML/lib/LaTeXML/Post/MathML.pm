@@ -155,8 +155,8 @@ sub addCrossref {
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 sub realize {
-  my ($node) = @_;
-  return (ref $node) ? $LaTeXML::Post::DOCUMENT->realizeXMNode($node) : $node; }
+  my ($node, $branch) = @_;
+  return (ref $node) ? $LaTeXML::Post::DOCUMENT->realizeXMNode($node, $branch) : $node; }
 
 # For a node that is a (possibly embellished) operator,
 # find the underlying role.
@@ -459,6 +459,9 @@ sub pmml_internal {
       my %styleattr = %{ ($style && ($needsmathstyle
             ? $stylemap{$ostyle}{$style}
             : $stylemap2{$ostyle}{$style})) || {} };
+      # And also check for stray attributes that maybe aren't really style, like href?
+      if (my $href = $node->getAttribute('href')) {
+        $styleattr{href} = $href; }
       $result = ['m:mstyle', {%styleattr}, $result] if keys %styleattr;
       return $result; } }
   elsif ($tag eq 'ltx:XMTok') {
@@ -647,7 +650,7 @@ sub pmml_infix {
     my $arg1 = realize(shift(@args));
     if (($role eq 'ADDOP')
       && (getQName($arg1) eq 'ltx:XMApp')
-      && (getOperatorRole((element_nodes($arg1))[0]) eq $role)) {
+      && ((getOperatorRole((element_nodes($arg1))[0]) || 'none') eq $role)) {
       push(@items, pmml_unrow(pmml($arg1))); }
     else {
       push(@items, pmml($arg1)); }
@@ -809,10 +812,12 @@ sub stylizeContent {
   if ($variant
     && ($plane1 || $plane1hack)
     && ($mapping = ($plane1hack ? $plane1hack{$variant} : $plane1map{$variant}))) {
-    my @c = map { $$mapping{$_} } split(//, $text || '');
+    my @c = map { $$mapping{$_} } split(//, (defined $text ? $text : ''));
     if (!grep { !defined $_ } @c) {    # Only if ALL chars in the token could be mapped... ?????
       $text = join('', @c);
       $variant = ($plane1hack && ($variant =~ /^bold/) ? 'bold' : undef); } }
+  # Other attributes that should be copied?
+  my $href = ($iselement ? $item->getAttribute('href') : $attr{href});
   return ($text,
     ($variant ? (mathvariant => $variant) : ()),
     ($size ? ($stretchyhack
@@ -823,7 +828,8 @@ sub stylizeContent {
     ($bgcolor  ? (mathbackground => $bgcolor)           : ()),
     ($opacity  ? (style          => "opacity:$opacity") : ()),    # ???
     ($stretchy ? (stretchy       => $stretchy)          : ()),
-    ($class    ? (class          => $class)             : ())
+    ($class    ? (class          => $class)             : ()),
+    ($href     ? (href           => $href)              : ()),
     ); }
 
 # These are the strings that should be known as fences in a normal operator dictionary.
@@ -1030,6 +1036,7 @@ sub pmml_script_decipher {
   # We'll fold them together they seem to be on the appropriate levels
   # Keep from having multiple scripts when $loc is stack!!!
   while (1) {
+    $base = realize($base, 'presentation');
     last unless getQName($base) eq 'ltx:XMApp';
     my ($xop, $xbase, $xscript) = element_nodes($base);
     last unless (getQName($xop) eq 'ltx:XMTok');
@@ -1161,11 +1168,9 @@ sub cmml_internal {
   elsif ($tag eq 'ltx:XMArray') {
     return &{ lookupContent('Array', $node->getAttribute('role'), $node->getAttribute('meaning')) }($node); }
   elsif ($tag eq 'ltx:XMText') {
-    return ['m:mtext', {},
-      $LaTeXML::Post::MATHPROCESSOR->convertXMTextContent($LaTeXML::Post::DOCUMENT, 1,
-        $node->childNodes)]; }
+    return cmml_decoratedSymbol($node); }
   else {
-    return ['m:mtext', {}, $node->textContent]; } }
+    return cmml_decoratedSymbol($node); } }
 
 # Convert the contents of a node, which normally should contain a single child.
 # It may be empty (assumed to be an error),
@@ -1183,12 +1188,19 @@ sub cmml_contents {
 
 sub cmml_unparsed {
   my (@nodes) = @_;
+  my @results = ();
+  foreach my $node (@nodes) {
+    # Deal with random, unknown symbols, but still record association.
+    if ((getQName($node) eq 'ltx:XMTok')
+      && (($node->getAttribute('role') || 'UNKNOWN') eq 'UNKNOWN')) {
+      my $result = ['m:csymbol', { cd => 'unknown' }, $node->textContent];
+      $LaTeXML::Post::MATHPROCESSOR->associateNode($result, $node);
+      push(@results, $result); }
+    else {
+      push(@results, cmml($node)); } }
   return ['m:cerror', {},
     ['m:csymbol', { cd => 'ambiguous' }, 'fragments'],
-    map { ((getQName($_) eq 'ltx:XMTok') && (($_->getAttribute('role') || 'UNKNOWN') eq 'UNKNOWN')
-        ? ['m:csymbol', { cd => 'unknown' }, $_->textContent]
-        : cmml($_)) }
-      @nodes]; }
+    @results]; }
 
 # Or csymbol if there's some kind of "defining" attribute?
 sub cmml_ci {
@@ -1207,7 +1219,12 @@ sub cmml_ci {
 # but we format its contents as pmml
 sub cmml_decoratedSymbol {
   my ($item) = @_;
-  return ['m:ci', {}, pmml($item)]; }
+  # Presumably, if we're claiming this blob has "meaning", we should just get a csymbol
+  if (my $meaning = (ref $item) && $item->getAttribute('meaning')) {
+    my $cd = $item->getAttribute('omcd') || 'latexml';
+    return ['m:csymbol', { cd => $cd }, $meaning]; }
+  else {    # Otherwise, wrap as needed
+    return ['m:ci', {}, pmml($item)]; } }
 
 # Return the NOT of the argument.
 sub cmml_not {
@@ -1232,7 +1249,13 @@ sub cmml_shared {
 # Given an XMath node, convert to cmml share form
 sub cmml_share {
   my ($node) = @_;
-  return ['m:share', { href => '#' . $node->getAttribute('fragid') . $LaTeXML::Post::MATHPROCESSOR->IDSuffix }]; }
+  my $fragid = $node->getAttribute('fragid');
+  if ($fragid) {
+    return ['m:share', { href => '#' . $fragid . $LaTeXML::Post::MATHPROCESSOR->IDSuffix }]; }
+  else {    # No fragid should be error/warning or something???
+    Warn('expected', 'fragid', $node,
+      "Shared node is missing fragid");
+    return ['m:share']; } }
 
 sub cmml_or_compose {
   my ($operators, @args) = @_;
@@ -1330,7 +1353,7 @@ DefMathML('Apply:?:?', sub {
     my ($op, @args) = @_;
     return ['m:apply', {}, cmml($op), map { cmml($_) } @args]; });
 DefMathML('Apply:COMPOSEOP:?', \&pmml_infix, undef);
-DefMathML("Token:DIFFOP:?",    \&pmml_mo,    undef);
+DefMathML("Token:DIFFOP:?", sub { pmml_mo($_[0], rpadding => '-2.5pt'); }, undef);
 DefMathML("Apply:DIFFOP:?", sub {
     my ($op, @args) = @_;
     return ['m:mrow', {}, map { pmml($_) } $op, @args]; },

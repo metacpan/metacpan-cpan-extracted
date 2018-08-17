@@ -4,56 +4,39 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.09';
+our $VERSION = '1.000000';
 
 use Exporter 'import';
 
 our @EXPORT = qw/return_modifiers/;
 our @EXPORT_OK = qw/return_modifiers return_has return_with return_around return_extends return_before return_after/;
 
-our $moo_modifiers;
-BEGIN { $moo_modifiers = [qw/has with around extends before after/] }
-
 sub return_modifiers {
-    my %modifiers = ();
-    $_[1] ||= $moo_modifiers; # ???
-    for ( @{ $_[1] } ) {
-        unless ( $modifiers{$_} = $_[0]->can($_) ) {
-            croak "Can't find method <$_> in <$_[0]>";
-        }
-    }
-    return $_[2] ? \%modifiers : %modifiers;
+	my %modifiers = ();
+	$_[1] ||= [qw/has with around extends before after/];
+	for ( @{ $_[1] } ) {
+		unless ( $modifiers{$_} = $_[0]->can($_) ) {
+			croak "Can't find method <$_> in <$_[0]>";
+		}
+	}
+	return $_[2] ? \%modifiers : %modifiers;
 }
 
-sub return_has {
-    my %mod = return_modifiers( $_[0], [qw/has/] );
-    return $mod{has};
-}
+sub return_has {return_modifiers($_[0], [qw/has/], 1)->{has}}
 
-sub return_with {
-    my %mod = return_modifiers( $_[0], [qw/with/] );
-    return $mod{with};
-}
+sub return_with {return_modifiers($_[0], [qw/with/], 1)->{with}}
 
-sub return_around {
-    my %mod = return_modifiers( $_[0], [qw/around/] );
-    return $mod{around};
-}
+sub return_after {return_modifiers($_[0], [qw/after/], 1)->{after}}
 
-sub return_extends {
-    my %mod = return_modifiers( $_[0], [qw/extends/] );
-    return $mod{extends};
-}
+sub return_before {return_modifiers($_[0], [qw/before/], 1)->{before}}
 
-sub return_before {
-    my %mod = return_modifiers( $_[0], [qw/before/] );
-    return $mod{before};
-}
+sub return_around {return_modifiers($_[0], [qw/around/], 1)->{around}}
 
-sub return_after {
-    my %mod = return_modifiers( $_[0], [qw/after/] );
-    return $mod{after};
-}
+sub return_extends {return_modifiers($_[0], [qw/extends/], 1)->{extends}}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -61,35 +44,35 @@ MooX::ReturnModifiers - Returns Moo Modifiers as a Hash
 
 =head1 VERSION
 
-Version 0.09
+Version 1.000000
 
 =head1 SYNOPSIS
 
-    use MooX::ReturnModifiers;
+	use MooX::ReturnModifiers;
 
-    sub import {
-        my $target = caller;
-        my %modifiers = return_modifiers($target);
-    
-        ...
-        $modifers{has}->();
-        $modifers{with}->();
-        $modifers{extends}->();
-        $modifers{around}->();
-        $modifers{before}->();
-        $modifers{after}->();
-    }
+	sub import {
+		my $target = caller;
+		my %modifiers = return_modifiers($target);
 
-    .... OR ......
+		...
+		$modifers{has}->();
+		$modifers{with}->();
+		$modifers{extends}->();
+		$modifers{around}->();
+		$modifers{before}->();
+		$modifers{after}->();
+	}
 
-    use MooX::ReturnModifiers qw/return_has/
-    
-    sub import {
-        my $target = caller;
-        my $has = return_has($target);
-    
-        $has->( .... );
-    }
+	.... OR ......
+
+	use MooX::ReturnModifiers qw/return_has/
+
+	sub import {
+		my $target = caller;
+		my $has = return_has($target);
+
+		$has->( .... );
+	}
 
 
 =head1 EXPORT
@@ -98,39 +81,39 @@ Version 0.09
 
 Return a list of Moo modifers. You can optionally pass your own ArrayRef of keys as the second argument.
 
-    my %modifiers = return_modifiers($target, [qw/has/]);
+	my %modifiers = return_modifiers($target, [qw/has/]);
 
-    ....
+	....
 
-    #    (
-    #       has => sub { ... }
-    #    )
+	#	(
+	#	   has => sub { ... }
+	#	)
 
 =head2 EXPORT OK
 
 =head2 return_has
 
-    my $has = return_has($target);
+	my $has = return_has($target);
 
 =head2 return_extends
 
-    my $extends = return_extends($target);
+	my $extends = return_extends($target);
 
 =head2 return_with
 
-    my $with = return_with($target);
+	my $with = return_with($target);
 
 =head2 return_around
 
-    my $around = return_around($target);
+	my $around = return_around($target);
 
 =head2 return_before
 
-    my $before = return_before($target);
+	my $before = return_before($target);
 
 =head2 return_after
 
-    my $after = return_after($target);
+	my $after = return_after($target);
 
 =head1 AUTHOR
 
@@ -146,7 +129,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc MooX::ReturnModifiers
+	perldoc MooX::ReturnModifiers
 
 You can also look for information at:
 
@@ -214,7 +197,4 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 =cut
-
-1;    # End of MooX::ReturnModifiers

@@ -21,7 +21,7 @@
     xmlns:func  = "http://exslt.org/functions"
     xmlns:f     = "http://dlmf.nist.gov/LaTeXML/functions"
     xmlns:xhtml = "http://www.w3.org/1999/xhtml"
-    extension-element-prefixes="func f"
+    extension-element-prefixes="func f exsl string date"
     exclude-result-prefixes = "ltx f func string">
 
   <!-- ALL CAPS parameters are intended to be passed in;
@@ -409,6 +409,9 @@
       <xsl:with-param name="extra_style" select="string($extra_style)"/>
     </xsl:call-template>
     <xsl:apply-templates select="." mode="add_RDFa"/>
+    <xsl:if test="@xml:lang">
+      <xsl:apply-templates select="@xml:lang" mode="copy-attribute"/>
+    </xsl:if>
   </xsl:template>
       
   <!-- Add a class attribute value to the current html element
@@ -419,7 +422,10 @@
        * content passed in via the parameter $extra_classes.
 
        HOOKS: 
-       (1) define template with mode="classes", possibly calling <xsl:apply-imports/>
+       (1) override by defining a more specific template with mode="classes"
+       that applies templates with mode="base-classes".
+       [ <xsl:apply-imports/> would be more elegant, but Xalan apparently doesn't
+       see an IMPORTED template that calls <xsl:apply-imports/> ???]
        (2) pass in parameter $extra_classes
   -->
   <xsl:template name="add_classes">
@@ -428,7 +434,7 @@
       <xsl:with-param name="name" select="'class'"/>
       <xsl:with-param name="value">
         <xsl:apply-templates select="." mode="classes"/>
-        <xsl:if test="$extra_classes">
+        <xsl:if test="$extra_classes and ($extra_classes != '')">
           <xsl:text> </xsl:text>
           <xsl:value-of select="$extra_classes"/>
         </xsl:if>
@@ -437,6 +443,10 @@
   </xsl:template>
 
   <xsl:template match="*" mode="classes">
+    <xsl:apply-templates select="." mode="base-classes"/>
+  </xsl:template>
+
+  <xsl:template match="*" mode="base-classes">
     <xsl:value-of select="concat('ltx_',local-name(.))"/>
     <xsl:if test="@class">
       <xsl:value-of select="concat(' ',@class)"/> <!--Whatever strings that were given! -->
@@ -472,7 +482,8 @@
        the same CSS property; there's no combining here (yet?).   
 
        HOOKS: 
-       (1) define template with mode="styling", possibly calling <xsl:apply-imports/>
+       (1) override by defining a more specific template with mode="classes"
+       that applies templates with mode="base-styling".
        (2) pass in parameter $extra_style
   -->
   <xsl:template name="add_style">
@@ -489,6 +500,10 @@
   </xsl:template>
 
   <xsl:template match="*" mode="styling">
+    <xsl:apply-templates select="." mode="base-styling"/>
+  </xsl:template>
+
+  <xsl:template match="*" mode="base-styling">
     <xsl:if test="@fontsize">
       <xsl:value-of select="concat('font-size:',@fontsize,';')"/>
     </xsl:if>

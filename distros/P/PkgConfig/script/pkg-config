@@ -20,7 +20,7 @@ package
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.19026';
+our $VERSION = '0.21026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -270,12 +270,21 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
     require Config;
     if($Config::Config{myuname} =~ /strawberry-perl/)
     {
-        my($vol, $dir, $file) = File::Spec->splitpath($^X);
-        my @dirs = File::Spec->splitdir($dir);
-        splice @dirs, -3;
-        my $path = (File::Spec->catdir($vol, @dirs, qw( c lib pkgconfig )));
-        $path =~ s{\\}{/}g;
-        @DEFAULT_SEARCH_PATH = $path;
+        #  handle PAR::Packer executables which have $^X eq "perl.exe"
+        if ($ENV{PAR_0})
+        {
+            my $path = $ENV{PAR_TEMP};
+            $path =~ s{\\}{/}g;
+            @DEFAULT_SEARCH_PATH = ($path);
+        }
+        else {
+            my($vol, $dir, $file) = File::Spec->splitpath($^X);
+            my @dirs = File::Spec->splitdir($dir);
+            splice @dirs, -3;
+            my $path = (File::Spec->catdir($vol, @dirs, qw( c lib pkgconfig )));
+            $path =~ s{\\}{/}g;
+            @DEFAULT_SEARCH_PATH = $path;
+        }
     }
     
     my @reg_paths;
@@ -327,9 +336,9 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
         );
     }
     
-    # See caveats above for Strawberry
+    # See caveats above for Strawberry and PAR::Packer
     require Config;
-    if($Config::Config{myuname} =~ /strawberry-perl/)
+    if(not $ENV{PAR_0} and $Config::Config{myuname} =~ /strawberry-perl/)
     {
         my($vol, $dir, $file) = File::Spec->splitpath($^X);
         my @dirs = File::Spec->splitdir($dir);
@@ -1752,6 +1761,8 @@ Other contributors include:
 =item Gregor Herrmann
 
 =item Ilya Pavlov (ILUX, Ilya33)
+
+=item Shawn Laffan (SLAFFAN, shawnlaffan)
 
 =back
 

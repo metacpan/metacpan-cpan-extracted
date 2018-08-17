@@ -1,5 +1,5 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.001';
+$Prometheus::Tiny::VERSION = '0.002';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
@@ -63,6 +63,15 @@ sub format {
       } sort keys %{$self->{metrics}{$name}}),
     )
   } sort keys %names;
+}
+
+sub psgi {
+  my ($self) = @_;
+  return sub {
+    my ($env) = @_;
+    return [ 405, [], [] ] unless $env->{REQUEST_METHOD} eq 'GET';
+    return [ 200, [ 'Content-Type' => 'text/plain' ], [ $self->format ] ];
+  };
 }
 
 1;
@@ -165,6 +174,26 @@ A shortcut for
     my $metrics = $prom->format
 
 Output the stored metrics, values, help text and types in the L<Prometheus exposition format|https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md>.
+
+=head2 psgi
+
+    use Plack::Builder
+    builder {
+      mount "/metrics" => $prom->psgi;
+    };
+
+Returns a simple PSGI app that, when hooked up to a web server and called, will
+return formatted metrics for Prometheus. This is little more than a wrapper
+around C<format>, namely:
+
+    sub app {
+      my $env = shift;
+      return [ 200, [ 'Content-Type' => 'text/plain' ], [ $prom->format ] ];
+    }
+
+This is just a convenience; if you already have a web server or you want to
+ship metrics via some other means (eg the Node Exporter's textfile collector),
+just use C<format>.
 
 =head1 SUPPORT
 

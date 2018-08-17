@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use FFI::Platypus::Memory qw( malloc free );
-use Test::More tests => 8;
+use Test::More;
 
 do {
   package
@@ -17,8 +17,6 @@ do {
 };
 
 subtest 'integer accessor' => sub {
-  plan tests => 8;
-
   my $foo = Foo1->new( first => 1, second => 2 );
   isa_ok $foo, 'Foo1';
   
@@ -49,7 +47,7 @@ do {
   use FFI::Platypus::Record;
   
   my $ffi = FFI::Platypus->new;
-  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 'libtest');
+  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 't/ffi');
   
   record_layout($ffi, qw(
     uint8 red
@@ -64,8 +62,6 @@ do {
 };
 
 subtest 'values match in C' => sub {
-  plan tests => 4;
-
   my $color = Color->new(
     red   => 50,
     green => 100,
@@ -115,15 +111,13 @@ do {
   ));
   
   my $ffi = FFI::Platypus->new;
-  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 'libtest');
+  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 't/ffi');
   
   $ffi->attach(["align_get_$_" => "get_$_"] => [ 'record(Foo2)' ] => $_)
     for qw( uint8 sint8 uint16 sint16 uint32 sint32 uint64 sint64 float double opaque );
 };
 
 subtest 'complex alignment' => sub {
-  plan tests => 15;
-  
   my $foo = Foo2->new;
   isa_ok $foo, 'Foo2';
 
@@ -171,8 +165,6 @@ subtest 'complex alignment' => sub {
 };
 
 subtest 'same name' => sub {
-  plan tests => 1;
-
   eval {
     package
       Foo3;
@@ -224,22 +216,19 @@ do {
   ));
   
   my $ffi = FFI::Platypus->new;
-  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 'libtest');
+  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 't/ffi');
   
   $ffi->attach(["align_array_get_$_" => "get_$_"] => [ 'record(Foo4)' ] => "${_}[3]" )
     for qw( uint8 sint8 uint16 sint16 uint32 sint32 uint64 sint64 float double opaque );
 };
 
 subtest 'array alignment' => sub {
-  plan tests => 14;
-
   my $foo = Foo4->new;
   isa_ok $foo, 'Foo4';
 
   foreach my $bits (qw( 8 16 32 64 ))
   {
     subtest "unsigned $bits integer" => sub {
-      plan tests => 4;
       my $acc1 = "uint$bits";
       my $acc2 = "get_uint$bits";
       $foo->$acc1([1,2,3]);
@@ -251,7 +240,6 @@ subtest 'array alignment' => sub {
     };
     
     subtest "signed $bits integer" => sub {
-      plan tests => 4;
       my $acc1 = "sint$bits";
       my $acc2 = "get_sint$bits";
       $foo->$acc1([-1,2,-3]);
@@ -266,7 +254,6 @@ subtest 'array alignment' => sub {
   foreach my $type (qw( float double ))
   {
     subtest $type => sub {
-      plan tests => 5;
       $foo->$type([1.5,undef,-1.5]);
       is_deeply $foo->$type, [1.5,0.0,-1.5], "$type = 1.5,0,-1.5";
       is $foo->$type(0), 1.5;
@@ -278,7 +265,6 @@ subtest 'array alignment' => sub {
   }
 
   subtest 'opaque' => sub {
-    plan tests => 6;
     my $ptr1 = malloc 32;
     my $ptr2 = malloc 64;
 
@@ -316,7 +302,7 @@ do {
   ));
   
   my $ffi = FFI::Platypus->new;
-  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 'libtest');
+  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 't/ffi');
   
   $ffi->attach( 
     [align_string_get_value => 'get_value'] => ['record(Foo5)'] => 'string',
@@ -328,8 +314,6 @@ do {
 };
 
 subtest 'string ro' => sub {
-  plan tests => 8;
-
   my $foo = Foo5->new;
   isa_ok $foo, 'Foo5';
 
@@ -363,14 +347,12 @@ do {
   ));
 
   my $ffi = FFI::Platypus->new;
-  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 'libtest');
+  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 't/ffi');
 
   $ffi->attach([align_fixed_get_value=>'get_value'] => ['record(Foo6)'] => 'string');
 };
 
 subtest 'fixed string' => sub {
-  plan tests => 6;
-
   my $foo = Foo6->new;
   isa_ok $foo, 'Foo6';
 
@@ -399,7 +381,7 @@ do {
   ));
 
   my $ffi = FFI::Platypus->new;
-  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 'libtest');
+  $ffi->find_lib(lib => 'test', symbol => 'f0', libpath => 't/ffi');
 
   $ffi->attach(
     [align_string_get_value => 'get_value'] =>
@@ -409,8 +391,6 @@ do {
 };
 
 subtest 'string rw' => sub {
-  plan tests => 7;
-
   my $foo = Foo7->new;
   isa_ok $foo, 'Foo7';
 
@@ -426,3 +406,5 @@ subtest 'string rw' => sub {
   is $foo->value, "starscream!!!", "foo.value = starscream!!!";
   is $foo->get_value, 'starscream!!!', 'foo.get_value = starscream!!!';
 };
+
+done_testing;

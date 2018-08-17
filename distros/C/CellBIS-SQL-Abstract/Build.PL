@@ -19,7 +19,7 @@ my %module_build_args = (
     "Achmad Yusri Afandi <yusrideb\@cpan.org>"
   ],
   "dist_name" => "CellBIS-SQL-Abstract",
-  "dist_version" => "0.8",
+  "dist_version" => "1.1",
   "license" => "artistic_2",
   "module_name" => "CellBIS::SQL::Abstract",
   "recursive_test_files" => 1,

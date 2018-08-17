@@ -1,9 +1,9 @@
-package Pcore::PDF v0.4.8;
+package Pcore::PDF v0.5.3;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
 use Pcore::Util::Data qw[to_json from_json];
-use Pcore::Util::Scalar qw[is_plain_scalarref];
+use Pcore::Util::Scalar qw[weaken is_plain_scalarref];
 
 const our $PAGE_SIZE => {
     A0        => '841 x 1189 mm',
@@ -38,13 +38,13 @@ const our $PAGE_SIZE => {
     Tabloid   => '279.4 x 431.8 mm',
 };
 
-has bin => ( is => 'ro', isa => 'Str', default => 'prince', isa => Str );
-has max_threads => ( is => 'ro', isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
-has page_size => ( is => 'ro', isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
+has bin         => 'princexml';
+has max_threads => 4;
+has page_size   => $PAGE_SIZE->{A4};
 
-has _threads => ( is => 'ro', isa => Int, default => 0, init_arg => undef );
-has _proc  => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
-has _queue => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
+has _threads => 0;
+has _queue   => ();
+has _signal  => sub { Coro::Signal->new };
 
 # NOTE job config example
 # {   input => {
@@ -95,17 +95,45 @@ has _queue => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => 
 #     'job-resource-count' => 1,
 # };
 
-sub generate_pdf ( $self, $html, $cb ) {
-    push $self->{_queue}->@*, [ $html, $cb ];
+sub DESTROY ($self) {
+    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
 
-    if ($MSWIN) {
-        $self->_generate_mswin;
-    }
-    else {
-        $self->_generate_linux;
+        # finish threads
+        $self->{_signal}->broadcast;
+
+        # finish tasks
+        while ( my $task = shift $self->{_queue}->@* ) {
+            $task->[1]->( res 500 );
+        }
     }
 
     return;
+}
+
+sub generate_pdf ( $self, $html, $cb = undef ) {
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+
+    my $on_finish = sub ($res) {
+        if ($rouse_cb) {
+            $rouse_cb->( $cb ? $cb->($res) : $res );
+        }
+        else {
+            $cb->($res) if $cb;
+        }
+
+        return;
+    };
+
+    push $self->{_queue}->@*, [ $html, $on_finish ];
+
+    if ( $self->{_signal}->awaited ) {
+        $self->{_signal}->send;
+    }
+    elsif ( $self->{_threads} < $self->{max_threads} ) {
+        $self->_run_thread;
+    }
+
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub remove_logo ( $self, $pdf_ref ) {
@@ -131,127 +159,61 @@ sub remove_logo ( $self, $pdf_ref ) {
     return;
 }
 
-sub _generate_mswin ( $self ) {
-    return if $self->{_threads} >= 1;             # $self->{max_threads};
-
-    return unless my $task = shift $self->{_queue}->@*;
-
-    my $cb = $task->[1];
+sub _run_thread ($self) {
+    weaken $self;
 
     $self->{_threads}++;
 
-    P->sys->run_proc(
-        [ $self->bin, '-' ],
-        stdin    => 1,
-        stdout   => 1,
-        on_ready => sub ($proc) {
-            $proc->{stdin}->push_write( $task->[0]->$* );
+    Coro::async_pool {
+        my $proc;
 
-            $proc->{stdin}->push_shutdown;
+        while () {
+          REDO:
+            last if !$self;
 
-            return;
-        },
-        on_finish => sub ($proc) {
-            $cb->( res 200, { pdf => \$proc->{stdout} } );
+            if ( my $task = shift $self->{_queue}->@* ) {
+                undef $proc if defined $proc && !$proc->is_active;
 
-            $self->{_threads}--;
+                $proc //= $self->_get_proc;
 
-            $self->_generate_mswin;
+                $task->[1]->( $self->_run_task( $task, $proc ) );
 
-            return;
+                goto REDO;
+            }
+
+            $self->{_signal}->wait;
         }
-    );
 
-    return;
-}
-
-sub _generate_linux ( $self ) {
-    return unless $self->{_queue}->@*;
-
-    return if !$self->{_proc}->@* && $self->{_threads} >= $self->{max_threads};
-
-    $self->_get_proc( sub($proc) {
-        return if !$proc;
-
-        my $task = shift $self->{_queue}->@*;
-
-        if ( !$task ) {
-            push $self->{_proc}->@*, $proc;
-        }
-        else {
-            $self->_run_task( $proc, $task );
-        }
+        $self->{_threads}--;
 
         return;
-    } );
+    };
+
+    Coro::cede;
 
     return;
 }
 
-sub _get_proc ( $self, $cb ) {
-    if ( my $proc = shift $self->{_proc}->@* ) {
-        $cb->($proc);
-    }
+sub _get_proc ($self) {
+    my $proc = P->sys->run_proc1( [ $self->{bin}, '--control' ], stdin => 1, stdout => 1, stderr => 1 );
 
-    if ( $self->{_threads} >= $self->{max_threads} ) {
-        $cb->(undef);
+    undef $proc->{child_stdout};
+    undef $proc->{child_stderr};
 
-        return;
-    }
+    my $line = $proc->{stdout}->read_line("\n");
 
-    $self->{_threads}++;
+    my ( $tag, $len ) = split /\s/sm, $line->$*, 2;
 
-    P->sys->run_proc(
-        [ $self->bin, '--control' ],
-        stdin    => 1,
-        stdout   => 1,
-        stderr   => 1,
-        on_ready => sub ($proc) {
-            $proc->stdout->on_read( sub ($h) {
-                $h->unshift_read(
-                    line => sub ( $h, $line, $eol ) {
-                        my ( $tag, $len ) = split /\s/sm, $line, 2;
+    die q[princexml protocol error: no version] if !$len;
 
-                        if ( !$len ) {
-                            die q[princexml protocol error: no version];
-                        }
-                        else {
-                            $h->unshift_read(
-                                chunk => $len + 1,
-                                sub ( $h, $data ) {
-                                    chop $data;
+    my $data = $proc->{stdout}->read_chunk( $len + 1 );
 
-                                    $h->on_read(undef);
+    chop $data->$*;
 
-                                    $cb->($proc);
-
-                                    return;
-                                }
-                            );
-                        }
-
-                        return;
-                    }
-                );
-
-                return;
-            } );
-
-            return;
-        },
-        on_finish => sub ($proc) {
-            $self->{_threads}--;
-
-            return;
-        }
-    );
-
-    return;
+    return $proc;
 }
 
-sub _run_task ( $self, $proc, $task ) {
-    my $cb = $task->[1];
-
+sub _run_task ( $self, $task, $proc ) {
     my ( $job, $resources );
 
     if ( is_plain_scalarref $task->[0] ) {
@@ -266,93 +228,46 @@ sub _run_task ( $self, $proc, $task ) {
     $job->{'job-resource-count'} = $resources ? scalar $resources->@* : 0;
 
     # write job
-    my $json = to_json($job)->$*;
+    my $json = to_json $job;
 
-    $proc->stdin->push_write( 'job ' . length($json) . $LF . $json . $LF );
+    $proc->{stdin}->write( 'job ' . length( $json->$* ) . $LF . $json->$* . $LF );
 
     if ($resources) {
         for my $resource ( $resources->@* ) {
-            $proc->stdin->push_write( 'dat ' . length( $resource->$* ) . $LF . $resource->$* . $LF );
+            $proc->{stdin}->write( 'dat ' . length( $resource->$* ) . $LF . $resource->$* . $LF );
         }
     }
 
-    my $on_finish = sub ( $status, $reason, $pdf_ref = undef, $log_ref = undef ) {
-        $proc->stdout->on_read(undef);
+    my $line = $proc->{stdout}->read_line("\n");
 
-        my $res = res [ $status, $reason ], { pdf => $pdf_ref, log => $log_ref };
+    # protocol error, connection closed
+    return res 500 if !$line;
 
-        $cb->($res);
+    my ( $tag, $len ) = split /\s/sm, $line->$*, 2;
 
-        push $self->{_proc}->@*, $proc;
+    # protocol error
+    return res 500 if !$len;
 
-        $self->_generate_linux;
+    my $data = $proc->{stdout}->read_chunk( $len + 1 );
 
-        return;
-    };
+    chop $data->$*;
 
-    $proc->stdout->on_read( sub ($h) {
+    # protocol error
+    return res [ 500, $data->$* ] if $tag eq 'err';
 
-        # read pdf
-        $h->unshift_read(
-            line => sub ( $h, $line, $eol ) {
-                my ( $tag, $len ) = split /\s/sm, $line, 2;
+    # read log
+    $line = $proc->{stdout}->read_line("\n");
 
-                if ( !$len ) {
-                    $on_finish->( 500, q[princexml protocol error: no version] );
-                }
-                else {
-                    $h->unshift_read(
-                        chunk => $len + 1,
-                        sub ( $h, $data ) {
-                            chop $data;
+    my ( $tag1, $len1 ) = split /\s/sm, $line->$*, 2;
 
-                            # protocol error
-                            if ( $tag eq 'err' ) {
-                                $on_finish->( 500, $data );
-                            }
+    # protocol error
+    return res 500 if !$len1;
 
-                            # read log
-                            else {
-                                my $pdf_ref = \$data;
+    my $log = $proc->{stdout}->read_chunk( $len1 + 1 );
 
-                                $h->unshift_read(
-                                    line => sub ( $h, $line, $eol ) {
-                                        my ( $tag1, $len1 ) = split /\s/sm, $line, 2;
+    chop $log->$*;
 
-                                        if ( !$len1 ) {
-                                            $on_finish->( 500, q[princexml protocol error: no version] );
-                                        }
-                                        else {
-                                            $h->unshift_read(
-                                                chunk => $len1 + 1,
-                                                sub ( $h, $data ) {
-                                                    chop $data;
-
-                                                    $on_finish->( 200, 'OK', $pdf_ref, [ split /\n/sm, $data ] );
-
-                                                    return;
-                                                }
-                                            );
-                                        }
-
-                                        return;
-                                    }
-                                );
-                            }
-
-                            return;
-                        }
-                    );
-                }
-
-                return;
-            }
-        );
-
-        return;
-    } );
-
-    return;
+    return res 200, $data, log => $log;
 }
 
 1;
@@ -363,9 +278,9 @@ sub _run_task ( $self, $proc, $task ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 373                  | * Link L<Pcore::Util::Result> on line 430 does not specify text                                                |
-## |      | 373                  | * Link L<Pcore::Util::Result> on line 440 does not specify text                                                |
-## |      | 373                  | * Link L<Pcore> on line 438 does not specify text                                                              |
+## |      | 288                  | * Link L<Pcore::Util::Result> on line 345 does not specify text                                                |
+## |      | 288                  | * Link L<Pcore::Util::Result> on line 355 does not specify text                                                |
+## |      | 288                  | * Link L<Pcore> on line 353 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -387,21 +302,21 @@ Pcore::PDF - non-blocking HTML to PDF converter
         max_threads => 4,
     });
 
-    my $cv = AE::cv;
+    # blocking mode, blocks only current coroutine
+    my $res = $pdf->generate_pdf($html);
 
+    # non-blocking mode
     $pdf->generate_pdf($html, sub ($res) {
         if (!$res) {
             say $res;
         }
         else {
 
-            # $res->{data}->{pdf} contains ScalarRef to generated PDF content
+            # $res->{data} contains ScalarRef to generated PDF content
         }
 
         return;
     });
-
-    $cv->recv;
 
 =head1 DESCRIPTION
 
@@ -417,7 +332,7 @@ Path to F<princexml> executable. Mandatory attribute.
 
 =item max_threads
 
-Maximum number of princexml processes. Under Windows this value is always C<< 1 >>, under linux default value is C<< 4 >>.
+Maximum number of princexml processes. Default value is C<< 4 >>.
 
 =back
 
@@ -425,9 +340,9 @@ Maximum number of princexml processes. Under Windows this value is always C<< 1 
 
 =over
 
-=item generate_pdf( $self, $html, $cb )
+=item generate_pdf( $self, $html, $cb = undef )
 
-Generates PDF from C<< $html >> template. Call C<< $cb->($result) >> on finish, where C<< $result >> is a standard Pcore API result object, see L<Pcore::Util::Result> documentation for details.
+Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API result object, see L<Pcore::Util::Result> documentation for details.
 
 =back
 

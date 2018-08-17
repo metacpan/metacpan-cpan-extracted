@@ -1,5 +1,5 @@
 This archive contains the distribution TextFileParser,
-version 0.202:
+version 0.204:
 
   an extensible Perl class to parse any text file by specifying grammar in derived classes.
 

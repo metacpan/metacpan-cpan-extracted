@@ -1,5 +1,5 @@
 package Test::Mock::Two;
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 use warnings;
 use strict;
 
@@ -96,7 +96,7 @@ Test::Mock::Two - Inspection module for Test::Mock::One
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

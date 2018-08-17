@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -55,6 +53,6 @@
          "web" : "https://github.com/jhthorsen/mojo-redis2"
       }
    },
-   "version" : "0.31",
+   "version" : "0.34",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

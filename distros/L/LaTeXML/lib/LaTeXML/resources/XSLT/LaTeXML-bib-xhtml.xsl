@@ -21,7 +21,7 @@
     exclude-result-prefixes = "ltx f">
 
   <!-- whether to split bibliography lists into two columns -->
-  <xsl:param name="twocolumn-biblist"></xsl:param>
+  <xsl:param name="USE_TWOCOLUMN_BIB"></xsl:param>
 
   <!-- ======================================================================
        Bibliography
@@ -32,10 +32,18 @@
        so we pretty much ignore the $context switches.
        See the CONTEXT discussion in LaTeXML-common -->
 
+  <xsl:preserve-space elements="ltx:surname ltx_givenname ltx:lineage
+				ltx:bib-title ltx:bib-subtitle ltx:bib-key
+				ltx:bib-type ltx:bib-date ltx:bib-publisher
+				ltx:bib-organization ltx:bib-place ltx:bib-part
+				ltx:bib-edition ltx:bib-status ltx:bib-identifier
+				ltx:bib-reviewe ltx:bib-links ltx:bib-language
+				ltx:bib-url ltx:bib-extract ltx:bib-note ltx:bib-data"/>
+
   <xsl:template match="ltx:biblist">
     <xsl:param name="context"/>
     <xsl:choose>
-      <xsl:when test="$twocolumn-biblist">
+      <xsl:when test="$USE_TWOCOLUMN_BIB">
         <xsl:apply-templates select="." mode="twocolumns">
           <xsl:with-param name="context" select="$context"/>
         </xsl:apply-templates>
@@ -83,7 +91,20 @@
       <xsl:apply-templates select="." mode="begin">
         <xsl:with-param name="context" select="$context"/>
       </xsl:apply-templates>
-      <xsl:apply-templates>
+
+      <xsl:choose>
+        <xsl:when test='ltx:tags/ltx:tag[not(@role)]'>
+          <xsl:apply-templates select='ltx:tags/ltx:tag[not(@role)]'>
+            <xsl:with-param name="context" select="$context"/>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:when test='ltx:tags/ltx:tag[@role = "refnum"]'>
+          <xsl:apply-templates select='ltx:tags/ltx:tag[@role = "refnum"]'>
+            <xsl:with-param name="context" select="$context"/>
+          </xsl:apply-templates>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:apply-templates select='ltx:bibblock'>
         <xsl:with-param name="context" select="$context"/>
       </xsl:apply-templates>
       <xsl:apply-templates select="." mode="end">
@@ -94,7 +115,7 @@
 
   <!-- potential future parameterization?
        choose which bibtag is used to display? -->
-  <xsl:template match="ltx:bibitem/ltx:bibtag[@role='refnum']">
+  <xsl:template match="ltx:bibitem/ltx:tags/ltx:tag[@role='refnum']">
     <xsl:param name="context"/>
     <xsl:element name="span" namespace="{$html_ns}">
         <xsl:call-template name="add_id"/>
@@ -112,8 +133,6 @@
       </xsl:apply-templates>
     </xsl:element>
   </xsl:template>
-
-  <xsl:template match="ltx:bibtag"/>
 
   <!-- By default, I suppose, this should generate a span,
        but if you want openbib, use css: .ltx_bibblock{display:block;} -->

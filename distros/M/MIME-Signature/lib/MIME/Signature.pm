@@ -3,7 +3,7 @@ package MIME::Signature;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.15';
 
 use Carp qw(croak);
 use Encode qw(decode encode encode_utf8);
@@ -277,7 +277,7 @@ sub append {
     $entity;
 }
 
-__END__
+my $version_pod = <<'=cut';
 
 =head1 NAME
 
@@ -285,7 +285,18 @@ MIME::Signature - appends signature to mail messages
 
 =head1 VERSION
 
-Version 0.01
+Version 0.15
+
+=cut
+
+# borrowed from tinita, see https://www.perlmonks.org/?node_id=562735
+sub __test_version {
+    my $v = __PACKAGE__->VERSION;
+    return 1 if $version_pod =~ m/^Version \Q$v\E$/m;
+    return;
+}
+
+__END__
 
 =head1 SYNOPSIS
 

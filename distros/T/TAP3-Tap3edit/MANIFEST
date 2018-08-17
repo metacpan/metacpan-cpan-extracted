@@ -2,19 +2,48 @@ ChangeLog			History
 examples/tap3edit_camel_remover
 examples/tap3edit_display
 examples/tap3edit_get_info
-inc/parent.pm
-inc/Test/More.pm
-inc/Test/Builder.pm
-inc/Test/Builder/Module.pm
+inc/File/Temp.pm
+inc/Module/Install.pm
 inc/Module/Install/Base.pm
-inc/Module/Install/Include.pm
 inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install.pm
-inc/PerlIO.pm
+inc/Module/Install/WriteAll.pm
+inc/parent.pm
+inc/Scalar/Util.pm
+inc/Test/Builder.pm
+inc/Test/Builder/Formatter.pm
+inc/Test/Builder/IO/Scalar.pm
+inc/Test/Builder/Module.pm
+inc/Test/Builder/TodoDiag.pm
+inc/Test/More.pm
+inc/Test2/API.pm
+inc/Test2/API/Context.pm
+inc/Test2/API/Instance.pm
+inc/Test2/API/Stack.pm
+inc/Test2/Event/Bail.pm
+inc/Test2/Event/Diag.pm
+inc/Test2/Event/Exception.pm
+inc/Test2/Event/Note.pm
+inc/Test2/Event/Ok.pm
+inc/Test2/Event/Plan.pm
+inc/Test2/Event/Skip.pm
+inc/Test2/Event/Subtest.pm
+inc/Test2/Event/Waiting.pm
+inc/Test2/Hub.pm
+inc/Test2/Hub/Interceptor.pm
+inc/Test2/Hub/Interceptor/Terminator.pm
+inc/Test2/Hub/Subtest.pm
+inc/Test2/IPC.pm
+inc/Test2/IPC/Driver/Files.pm
+inc/Test2/Util.pm
+inc/Test2/Util/ExternalMeta.pm
+inc/Test2/Util/HashBase.pm
+inc/Test2/Util/Trace.pm
+lib/TAP3/Spec/NRT0201.asn	Specification NRT2.01
 lib/TAP3/Spec/RAP0101.asn	Specification RAP1.1
 lib/TAP3/Spec/RAP0102.asn	Specification RAP1.2
 lib/TAP3/Spec/RAP0103.asn	Specification RAP1.3
@@ -28,11 +57,10 @@ lib/TAP3/Spec/TAP0309.asn	Specification TAP3.9
 lib/TAP3/Spec/TAP0310.asn	Specification TAP3.10
 lib/TAP3/Spec/TAP0311.asn	Specification TAP3.11
 lib/TAP3/Spec/TAP0312.asn	Specification TAP3.12
-lib/TAP3/Spec/NRT0201.asn	Specification NRT2.01
 lib/TAP3/Tap3edit.pm		TAP3::Tap3edit Module
 lib/TAP3/Tap3edit.pod		TAP3::Tap3edit Documentation
 Makefile.PL			Writes the makefile
 MANIFEST			This file
 META.yml
-README				Read this first!
+README.md
 t/TAP3-Tap3edit.t

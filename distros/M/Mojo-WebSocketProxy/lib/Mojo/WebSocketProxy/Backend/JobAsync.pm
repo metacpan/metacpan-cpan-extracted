@@ -12,7 +12,7 @@ use Job::Async;
 
 use Log::Any qw($log);
 
-our $VERSION = '0.09';    ## VERSION
+our $VERSION = '0.11';    ## VERSION
 
 __PACKAGE__->register_type('job_async');
 

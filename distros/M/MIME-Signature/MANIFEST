@@ -32,6 +32,7 @@ t/sigs/ascii
 t/sigs/lines
 t/sigs/testsig
 t/sigs/utf8
+t/version.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

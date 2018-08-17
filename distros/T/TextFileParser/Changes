@@ -1,5 +1,11 @@
 Revision history for TextFileParser
 
+0.204     2018-08-08 20:37:32-07:00 America/Los_Angeles
+  - Removed use of indirect method notation in POD
+
+0.203     2018-08-08 17:43:11-07:00 America/Los_Angeles
+  - Clearer documentation
+
 0.202     2018-08-08 00:03:52-07:00 America/Los_Angeles
   - Added bugtracking info to POD
 

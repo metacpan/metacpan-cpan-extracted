@@ -14,11 +14,10 @@ use overload    #
 has chrome => ( required => 1 );
 has id     => ( required => 1 );
 
-has listen => ();    # HashRef
+has listen => ();    # {method => callback} hook
 
-has _ws      => ();  # ( is => 'ro', isa => InstanceOf ['Pcore::WebSocket::raw'], init_arg => undef );
-has _cb      => ();  # ( is => 'ro', isa => HashRef,                                        init_arg => undef );
-has _conn_cb => ();  # ( is => 'ro', isa => ArrayRef,                                       init_arg => undef );
+has _ws => ();       # websocket connection
+has _cb => ();       # { msgid => callback }
 
 our $_MSG_ID = 0;
 
@@ -28,93 +27,57 @@ sub new_tab ( $self, @args ) {
     return;
 }
 
-sub close ( $self, $cb = undef ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms NamingConventions::ProhibitAmbiguousNames]
-    return P->http->get(
-        "http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/close/$self->{id}",
-        sub ($res) {
-            return $cb ? $cb->( $self, $res ) : ( $self, $res );
-        }
-    );
+sub close ( $self ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms NamingConventions::ProhibitAmbiguousNames]
+    return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/close/$self->{id}");
 }
 
-sub activate ( $self, $cb = undef ) {
-    return P->http->get(
-        "http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/activate/$self->{id}",
-        sub ($res) {
-            return $cb ? $cb->( $self, $res ) : ( $self, $res );
-        }
-    );
+sub activate ( $self ) {
+    return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/activate/$self->{id}");
 }
 
 sub _cmd ( $self, $cmd, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+    my $h = $self->{_ws} // $self->_connect;
 
-    my %args = @args;
+    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
 
     my $id = $_MSG_ID++;
 
-    $self->{_cb}->{$id} = [ $self, $cb ] if $cb;
+    my $rouse_cb;
 
-    my $send = sub {
-        $self->{_ws}->send_text( to_json {
-            id     => $id,
-            method => $cmd,
-            params => \%args,
-        } );
+    if ( defined wantarray ) {
+        $rouse_cb = Coro::rouse_cb;
 
-        return;
-    };
-
-    if ( $self->{_ws} ) {
-        $send->();
-    }
-    else {
-        $self->_connect( sub {
-            $send->();
+        $self->{_cb}->{$id} = sub ( $res ) {
+            $rouse_cb->( $cb ? $cb->($res) : $res );
 
             return;
-        } );
+        };
+    }
+    elsif ($cb) {
+        $self->{_cb}->{$id} = $cb;
     }
 
-    return;
+    $self->{_ws}->send_text( to_json {
+        id     => $id,
+        method => $cmd,
+        params => {@args},
+    } );
+
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
-sub _connect ( $self, $cb ) {
-    push $self->{_conn_cb}->@*, $cb;
-
-    return if $self->{_conn_cb}->@* > 1;
-
+sub _connect ( $self ) {
     weaken $self;
 
-    my $c;
-
-    $c = Pcore::WebSocket::raw->new(
+    my $h = Pcore::WebSocket::raw->connect(
+        "ws://$self->{chrome}->{host}:$self->{chrome}->{port}/devtools/page/$self->{id}",
+        connect_timeout  => 1000,
         max_message_size => 0,
         compression      => 0,
-        on_connect       => sub ( $ws, $headers ) {
-            undef $c;
+        on_disconnect    => sub ( $ws ) {
+            return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
-            $self->{_ws} = $ws;
-
-            # call callbacks
-            if ( my $callbacks = delete $self->{_conn_cb} ) {
-                for my $cb ( $callbacks->@* ) {
-                    $cb->();
-                }
-            }
-
-            return;
-        },
-        on_disconnect => sub ( $ws, $status ) {
-            undef $c;
             undef $self->{_ws};
-
-            # on_connect_error call callbacks
-            if ( my $callbacks = delete $self->{_conn_cb} ) {
-                for my $cb ( $callbacks->@* ) {
-                    $cb->();
-                }
-            }
 
             # call pending callbacks
             if ( my $callbacks = delete $self->{_cb} ) {
@@ -130,12 +93,12 @@ sub _connect ( $self, $cb ) {
 
             if ( exists $msg->{id} ) {
                 if ( my $cb = delete $self->{_cb}->{ $msg->{id} } ) {
-                    $cb->[1]->( $cb->[0], $msg->{result} );
+                    $cb->( $msg->{result} );
                 }
             }
             elsif ( $msg->{method} ) {
                 if ( my $cb = $self->{listen}->{ $msg->{method} } ) {
-                    $cb->( $self, $msg->{method}, $msg->{params} );
+                    $cb->( $msg->{method}, $msg->{params} );
                 }
             }
             else {
@@ -146,26 +109,22 @@ sub _connect ( $self, $cb ) {
         },
     );
 
-    $c->connect(
-        "ws://$self->{chrome}->{host}:$self->{chrome}->{port}/devtools/page/$self->{id}",
-        connect_timeout => 1000,
-        tls_ctx         => undef,
-    );
+    $self->{_ws} = $h;
 
-    return;
+    return $h;
 }
 
-sub get_cookies ( $self, $cb ) {
-    $self->(
-        'Network.getCookies',
-        sub ( $tab, $data ) {
-            $cb->( $tab, $tab->convert_cookies( $data->{cookies} ) );
+sub get_cookies ( $self, $cb = undef ) {
+    weaken $self;
 
-            return;
+    return $self->(
+        'Network.getCookies',
+        sub ( $data ) {
+            my $cookies = defined $self ? $self->convert_cookies( $data->{cookies} ) : undef;
+
+            return $cb ? $cb->($cookies) : $cookies;
         }
     );
-
-    return;
 }
 
 sub convert_cookies ( $self, $chrome_cookies ) {

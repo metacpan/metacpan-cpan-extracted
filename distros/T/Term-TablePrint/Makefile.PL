@@ -34,11 +34,8 @@ WriteMakefile(
         'Exporter'                => 0,
         'List::Util'              => 0,
         'Scalar::Util'            => 0,
-        'Term::Choose'            => '1.621',
-        'Term::Choose::Constants' => '1.621',
-        'Term::Choose::LineFold'  => '1.621',
+        'Term::Choose'            => '1.624',
         'Term::Choose::Util'      => '0.066',
-        'Term::ProgressBar'       => 0,
     },
     dist  => {
         COMPRESS => 'gzip',

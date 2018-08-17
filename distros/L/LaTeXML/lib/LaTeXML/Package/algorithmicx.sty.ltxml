@@ -22,29 +22,47 @@ Let('\lx@orig@algorithmic', '\algorithmic');
 DefMacro('\algorithmic', '\lx@setup@algorithmicx\lx@orig@algorithmic');
 DefPrimitive('\lx@setup@algorithmicx', sub {
     ResetCounter('ALG@line');
+    # If we are not within an algorithm environment, step the counter for its id's
+    if (!grep { $_ eq 'algorithm'; } $STATE->lookupStackedValues('current_environment')) {
+      RefStepID('algorithm'); }
     Let('\list',    '\lx@algorithmicx@beginlist');
     Let('\endlist', '\lx@algorithmicx@endlist');
     Let('\item',    '\lx@algorithmicx@item');
     Let('\hfill',   '\lx@algorithmicx@hfill');
 });
 
-DefConstructor('\lx@algorithmicx@beginlist{}{}', "<ltx:listing>");
+# IGNORE \list 1st arg (we'll handle counter stepping in \item)
+DefMacro('\lx@algorithmicx@beginlist{}{}', '\lx@algorithmicx@beginlist@{#2}');
+DefConstructor('\lx@algorithmicx@beginlist@{}', "<ltx:listing>");
 
 DefConstructor('\lx@algorithmicx@endlist', "</ltx:listing>",
   beforeConstruct => sub { $_[0]->maybeCloseElement('ltx:listingline'); });
 
+# Empty lines still get an \item, but they're followed by \nointerlineskip!
+# We do NOT want to generate a listingline in those cases.
+# (but this seems a little brittle?)
+DefMacro('\lx@algorithmicx@item []',
+  '\@ifnextchar\nointerlineskip{}{\lx@algorithmicx@@item}');
+
 # This imitates \item; just opens the ltx:listingline, but somebody's got to close it.
-DefConstructor('\lx@algorithmicx@item OptionalUndigested',
-  "<ltx:listingline xml:id='#id' refnum='#refnum' itemsep='#itemsep'>"
-    . "?&defined(#frefnum)(<ltx:tag>#frefnum</ltx:tag>)(?&defined(#refnum)(<ltx:tag>#refnum</ltx:tag>))",
+DefConstructor('\lx@algorithmicx@@item',
+  "<ltx:listingline xml:id='#id' itemsep='#itemsep'>"
+    . "#tags",
   properties => sub {
-    my $frefnum = Digest(T_CS('\ALG@step'));
-    my $refnum  = Digest(T_CS('\theALG@line'));
-    my $id      = Digest(T_CS('\theALG@line@ID'));
-    (id => $id, refnum => $refnum, frefnum => $frefnum); },
+    my $step = Digest(T_BEGIN, T_CS('\ALG@step'), T_END);    # returns formatted line number
+    my $id   = Digest(T_CS('\theALG@line@ID'));
+    my $tags = Digest(T_BEGIN,
+      T_CS('\def'), T_CS('\fnum@ALG@line'), T_BEGIN, Tokens(Revert($step)), T_END,
+      Invocation(T_CS('\lx@make@tags'), T_OTHER('ALG@line')),
+      T_END);
+
+    (id => $id, tags => $tags); },
   beforeConstruct => sub { $_[0]->maybeCloseElement('ltx:listingline'); });
 
-NewCounter('ALG@line', 'algorithm', idprefix => 'l');    # Assuming we're inside an {algorithm}!
+# Ideally, these appear within an algorithm environment, and we'd like to number lines within it.
+# BUT algorithm package isn't required, so define it here!
+NewCounter('algorithm', undef,       idprefix => 'alg');
+NewCounter('ALG@line',  'algorithm', idprefix => 'l');     # Assuming we're inside an {algorithm}!
 
 # Hopefully this will only get used for right justifying a comment;
 # the ltx:text should autoclose at end of line?

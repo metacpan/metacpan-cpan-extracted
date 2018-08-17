@@ -1,0 +1,41 @@
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+RequirePackage('keyval');
+
+#======================================================================
+# Tests of various constructors using KeyVals.
+#======================================================================
+DefKeyVal('foo', 'path', 'Semiverbatim');
+DefKeyVal('foo', 'height', '');
+DefKeyVal('foo', 'width', '');
+
+# Testing simple use of keys;
+#   attribute is just list of key-value pairs.
+DefConstructor('\KVsimple OptionalKeyVals:foo',
+  "<ltx:graphics graphic='none' options='#1'/>");
+
+# Testing more complex use of keys;
+#   individual attributes are obtained from specific keys.
+DefConstructor('\KVcomplex OptionalKeyVals:foo',
+"<ltx:graphics graphic='none' imagewidth='&GetKeyVal(#1,width)' imageheight='&GetKeyVal(#1,height)'/>");
+
+# Testing use in an environment.
+DefEnvironment('{KVenv} OptionalKeyVals:foo',
+  "<ltx:text width='&GetKeyVal(#1,width)' height='&GetKeyVal(#1,height)'>#body</ltx:text>");
+
+# Testing structured use of keys; map an XML structure to the keys (eg. for amsrefs)
+DefEnvironment('{KVstruct} OptionalKeyVals:foo',
+  "<ltx:text>"
+    . "?&GetKeyVal(#1,width)(<ltx:text>Width: &GetKeyVal(#1,width)</ltx:text>)"
+    . "<ltx:text>\\&</ltx:text>"
+    . "?&GetKeyVal(#1,height)(<ltx:text>Height: &GetKeyVal(#1,height)</ltx:text>)"
+    . "#body</ltx:text>");
+
+# Testing automatic conversion of keys to text
+DefConstructor('\KVauto RequiredKeyVals:foo', "<ltx:text>#1</ltx:text>");
+
+#======================================================================
+1;

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Template::Alloy engine for Dancer2",
+   "author" : [
+      "James Raspass <j.raspass@cv-library.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Template-Alloy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2::Core::Role::Template" : "0",
+            "Moo" : "0",
+            "Template::Alloy" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Template::Alloy" : {
+         "file" : "lib/Dancer2/Template/Alloy.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cv-library/Dancer2-Template-Alloy/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cv-library/Dancer2-Template-Alloy.git",
+         "web" : "https://github.com/cv-library/Dancer2-Template-Alloy"
+      }
+   },
+   "version" : "0.002",
+   "x_contributors" : [
+      "Colin Newell <c.newell@cv-library.co.uk>",
+      "Colin Newell <colin.newell@gmail.com>",
+      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

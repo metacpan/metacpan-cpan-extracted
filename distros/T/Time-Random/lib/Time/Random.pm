@@ -1,14 +1,28 @@
 package Time::Random;
-
-use 5.006;
-use strict;
-use warnings;
-use base 'Import::Export';
+use 5.006; use strict; use warnings; our $VERSION = '0.05';
 use Time::Piece;
-
+use base 'Import::Export';
 our %EX = (
 	time_random => [qw/all/],
 );
+
+sub time_random {
+	my %args = scalar @_ == 1 ? %{ $_[0] } : @_;
+	$args{$_} = $args{$_} 
+		? $args{strptime} 
+			? Time::Piece->strptime($args{$_}, $args{strptime})->epoch
+			: ref $args{$_}
+				? $args{$_}->epoch()
+				: $args{$_}
+		: $_ eq 'to' ? time : ($args{to} - int(rand(86400)))
+	foreach qw/to from/;
+	$args{time} = gmtime($args{to} - int(rand($args{to} - $args{from}))); 
+	$args{strftime} ? $args{time}->strftime($args{strftime}) : $args{time};
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -16,11 +30,9 @@ Time::Random - Generate a random time in time.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =cut
-
-our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -45,26 +57,9 @@ our $VERSION = '0.02';
 
 =head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
-
 =head2 time_random
-
+ 
 =cut
-
-sub time_random {
-	my %args = scalar @_ == 1 ? %{ $_[0] } : @_;
-	$args{$_} = $args{$_} 
-		? $args{strptime} 
-			? Time::Piece->strptime($args{$_}, $args{strptime})->epoch
-			: ref $args{$_}
-				? $args{$_}->epoch()
-				: $args{$_}
-		: $_ eq 'to' ? time() : $args{to} - int(rand($args{to} - 86400))
-	foreach qw/to from/;
-	do { $args{time} = gmtime($args{to} - int(rand($args{to} - $args{from}))) } && $args{strftime} 
-		? $args{time}->strftime($args{strftime}) 
-		: $args{time};
-}
 
 =head1 AUTHOR
 
@@ -151,4 +146,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Time::Random
+

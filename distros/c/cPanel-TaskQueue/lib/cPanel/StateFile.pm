@@ -1,5 +1,5 @@
 package cPanel::StateFile;
-$cPanel::StateFile::VERSION = '0.850';
+$cPanel::StateFile::VERSION = '0.900';
 use strict;
 
 #use warnings;
@@ -25,7 +25,7 @@ my $pkg = __PACKAGE__;
 {
 
     package DefaultLogger;
-$DefaultLogger::VERSION = '0.850';
+$DefaultLogger::VERSION = '0.900';
 sub new {
         my ($class) = @_;
         return bless {}, $class;
@@ -142,7 +142,7 @@ sub import {
     {
 
         package cPanel::StateFile::Guard;
-$cPanel::StateFile::Guard::VERSION = '0.850';
+$cPanel::StateFile::Guard::VERSION = '0.900';
 sub new {
             my ( $class, $args_ref ) = @_;
             $pkg->throw('Args parameter must be a hash reference.') unless 'HASH' eq ref $args_ref;

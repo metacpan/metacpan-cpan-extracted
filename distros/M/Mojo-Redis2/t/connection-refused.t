@@ -8,17 +8,20 @@ my $port = Mojo::IOLoop::Server->generate_port;
 my $redis = Mojo::Redis2->new(url => "redis://127.0.42.123:$port");
 my ($err, $res);
 
+my $got = 0;
 Mojo::IOLoop->delay(
   sub {
     my ($delay) = @_;
-    $redis->get(foo => $delay->begin);
+    $redis->get(foo => $delay->begin) for (0 .. 2);
   },
   sub {
     (my $delay, $err, $res) = @_;
+    $got = @_;
     Mojo::IOLoop->stop;
   },
 );
 Mojo::IOLoop->start;
+is $got, 7, 'all ops completed';
 
 is eval { $redis->get('foo'); 1 }, undef, 'get failed';
 my $e = $@;

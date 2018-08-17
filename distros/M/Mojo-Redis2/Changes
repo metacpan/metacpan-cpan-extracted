@@ -1,21 +1,33 @@
 Revision history for perl distribution Mojo-Redis2
+
+0.34 2018-08-17T00:00:48+0200
+ - Fix invalid Makefile.PL
+
+0.33 2018-08-16T23:49:55+0200
+ - Mention Mojo::Redis as an alternative #23
+
+0.32 2018-08-13T17:25:51-04:00
+ - Fix bug where not all outstanding callbacks would be processed in case of an error. #42
+   - Contributor: Ben Wilber
+ - Fix test failure from using removed delay helper in example and test. #45
+
 0.31 2018-01-24T02:10:25-05:00
  - Fix for timing issue where object is destroyed before read completes. #19, #34
  - Fix erroneous shift() of waiting queue when receiving messages. #38
-   Contributor: Boris Blinov
+   - Contributor: Boris Blinov
 
 0.30 2017-12-05T21:03:44-0500
  - Check version of redis in tests and skip tests of unsupported functions. #31
-   Contributor: Mike Magowan
+   - Contributor: Mike Magowan
  - Fix bgrewriteaof backend test to wait for background processes to complete. #32
-   Contributor: Mike Magowan
+   - Contributor: Mike Magowan
  - Add scripting support with methods eval and evalsha. #33
-   Contributor: Mike Magowan
+   - Contributor: Mike Magowan
 
 0.29 2017-11-19T20:16:11-0500
  - Prevent forked processes from terminating the Mojo::Redis2::Server test
    server when they destroy the object. #29
-   Contributor: Dan Book
+   - Contributor: Dan Book
 
 0.28 2017-11-11T09:59:37+0800
  - Fix monkey_patch() usage
@@ -25,7 +37,7 @@ Revision history for perl distribution Mojo-Redis2
 0.27 2017-10-09T12:50:29+0200
  - Add new methods: bitcount, bitop bitpos, hincrbyfloat, incrbyfloat, pexpire,
    pexpireat, psetex, pttl, zlexcount, zrangebylex, zremrangebylex and zrevrangebylex. #25
-   Contributor: Mike Magowan
+   - Contributor: Mike Magowan
 
 0.26 2016-06-04T13:09:20+0200
  - Fix missing POD and removed code that is not in use #18
@@ -33,14 +45,14 @@ Revision history for perl distribution Mojo-Redis2
 0.25 2016-06-04T13:01:53+0200
  - Enable tests to run in OS X
  - Add Mojo::Redis2::Cursor and support for scan, hscan, sscan, zscan #18
-   Contributor: Andre Parker
+   - Contributor: Andre Parker
 
 0.24 2015-07-18T08:19:34+0200
  - Mark t/connection-refused.t as TODO, since it fail because of i18n
 
 0.23 2015-07-16T09:32:21+0200
  - Fix Mojo::Redis2::Server need to bind to 127.0.0.1 and not localhost #12
-   Issues arise when ::1 and 127.0.0.1 is set to "localhost" in /etc/hosts
+   - Issues arise when ::1 and 127.0.0.1 is set to "localhost" in /etc/hosts
 
 0.22 2015-07-15T08:22:37+0200
  - Remove "tcp-keepalive" as default config parameter from Mojo::Redis2::Server

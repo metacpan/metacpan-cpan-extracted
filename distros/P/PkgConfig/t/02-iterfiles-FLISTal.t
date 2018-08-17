@@ -10,9 +10,9 @@ plan skip_all => 'skip long running tests on ActiveState PPM build'
   if $ENV{ACTIVESTATE_PPM_BUILD};
 
 my $flist = [qw(
-t/data/usr/share/pkgconfig/xorg-sgml-doctools.pc
-t/data/usr/share/pkgconfig/xproto.pc
-t/data/usr/share/pkgconfig/xtrans.pc
+t/data/usr/lib/pkgconfig/python2.6/gst-python-0.10.pc
+t/data/usr/lib/pkgconfig/python2.5/pygtk-2.0.pc
+t/data/usr/lib/pkgconfig/python2.5/gst-python-0.10.pc
 )];
 
 PkgConfigTest::run_exists_test($flist, __FILE__);

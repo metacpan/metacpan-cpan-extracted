@@ -112,37 +112,42 @@ sub lookup {
     close $sock;
     $text = Encode::decode('UTF-8', $text);
 
+    #print STDERR "text: $text\n";
+    
     # Parse whois and map values into the self object.
     $self->_parse($text);
 
     if ($text =~ m/\nDomain Information\n/) {
-	# If a domain name, or a domain handle, is looked up,
-	# the whois server also returns also the holder info as a second block.
-	# The below code parses the domain and holder info and
+	
+	# If a domain name, or a domain handle, is looked up, the
+	# whois server may also return the holder info as a second
+	# block. The below code parses the domain and holder info and
 	# returns the data in separate objects.
 	#
-
-	#print STDERR "DOMAIN INFO with holder contact info FOUND: $query\n";
 	
-	# Domain info is first block, holder contact info is second block,
-	# split the text and make two objects
+	# Domain info is first block. Holder contact info is second
+	# block, but only if the full (but limited) registrarwhois
+	# service is used. Split the text and make two objects.
 	
 	my ($dmy, $dtxt, $htxt) = split ('NORID Handle', $text);
 
+	my $holder_whois;
 	my $domain_whois = NOLookup::Whois::WhoisLookup->new;
-	my $holder_whois = NOLookup::Whois::WhoisLookup->new;
 
 	#print STDERR "\n------\nparse domain text: '$dtxt'\n";
 	$domain_whois->_parse("\nNORID Handle" . $dtxt);
 
-	#print STDERR "\n------\nparse holder text: '$htxt'\n";
-	$holder_whois->_parse("\nNORID Handle" . $htxt);
-	
+	if ($htxt) {
+	    $holder_whois = NOLookup::Whois::WhoisLookup->new;
+	    #print STDERR "\n------\nparse holder text: '$htxt'\n";
+	    $holder_whois->_parse("\nNORID Handle" . $htxt);
+	}
 	#print STDERR "self  : ", Dumper $self;
 	#print STDERR "domain whois: ", Dumper $domain_whois;
-	#print STDERR "holder whois: ", Dumper $holder_whois;
+	#print STDERR "holder whois: ", Dumper $holder_whois if $holder_whois;
 
 	return $self, $domain_whois, $holder_whois;
+
     } 
 
     if ($text =~ m/\nHosts matching the search parameter\n/) {

@@ -11,7 +11,7 @@ use Mojo::WebSocketProxy::Dispatcher;
 # Other backend types may be available; we default to 'jsonrpc' in the code below
 use Mojo::WebSocketProxy::Backend::JSONRPC;
 
-our $VERSION = '0.09';    ## VERSION
+our $VERSION = '0.11';    ## VERSION
 
 sub register {
     my ($self, $app, $config) = @_;

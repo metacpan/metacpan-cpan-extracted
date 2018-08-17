@@ -2,8 +2,8 @@
 
 package Test::Deeply::Float;
 
-our $DATE = '2018-08-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.006;
 use strict;
@@ -346,7 +346,7 @@ Test::Deeply::Float - Test equality of data structure, compare numbers with tole
 
 =head1 VERSION
 
-This document describes version 0.001 of Test::Deeply::Float (from Perl distribution Test-Deeply-Float), released on 2018-08-07.
+This document describes version 0.002 of Test::Deeply::Float (from Perl distribution Test-Deeply-Float), released on 2018-08-11.
 
 =head1 SYNOPSIS
 
@@ -362,6 +362,8 @@ To customize tolerance level:
  $Test::Deeply::Float::EPSILON = 1e-9; # default is 1e-6
 
 =head1 DESCRIPTION
+
+B<Deprecation notice:> Deprecated in favor of L<Test::DataCmp>.
 
 This module exports C<is_deeply_float()> which is just like L<Test::More>'s
 C<is_deeply()>, except that when comparing two numbers (ints or floats) a
@@ -389,10 +391,19 @@ feature.
 
 =head1 SEE ALSO
 
-Based on L<Test::More>'s C<is_deeply()>.
+L<Test::DataCmp>.
 
-L<Test::Number::Delta> and L<Test::Deep>'s C<num()> can also compare floats with
-tolerance, but not in data structures.
+Code is based on L<Test::More>'s C<is_deeply()>.
+
+To compare two floats with tolerance, you can simply do C<< abs($n1 - $n2) <
+$epsilon >> or use one of several modules on CPAN, e.g. L<Number::Tolerant>. For
+testing, there are L<Test::Number::Delta>, L<Test::Approximate>.
+
+To compare two data structures with tolerant float comparison, there is also
+L<Test::Deep> (see C<num()>) with its several extensions e.g.
+L<Test::Approximate>, L<Test::Deep::NumberTolerant>, L<Test::Deep::Fuzzy>. Note
+that you need (or: able) to specify the point(s) in the data structure where you
+want to perform the tolerant comparison at.
 
 =head1 AUTHOR
 

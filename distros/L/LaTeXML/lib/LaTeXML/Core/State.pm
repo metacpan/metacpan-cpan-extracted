@@ -92,7 +92,9 @@ sub new {
     catcode => {}, mathcode => {}, sfcode => {}, lccode => {}, uccode => {}, delcode => {},
     undo => [{ _FRAME_LOCK_ => 1 }], prefixes => {}, status => {},
     stomach => $options{stomach}, model => $options{model} }, $class;
-  $$self{value}{VERBOSITY} = [0];
+  # Note that "100" is hardwired into TeX, The Program!!!
+  $$self{value}{MAX_ERRORS} = [100];
+  $$self{value}{VERBOSITY}  = [0];
   $options{catcodes} = 'standard' unless defined $options{catcodes};
   if ($options{catcodes} =~ /^(standard|style)/) {
     # Setup default catcodes.
@@ -108,16 +110,20 @@ sub new {
   $$self{value}{SPECIALS} = [['^', '_', '@', '~', '&', '$', '#', "'"]];
   if ($options{catcodes} eq 'style') {
     $$self{catcode}{'@'} = [CC_LETTER]; }
-  $$self{mathcode} = {};
-  $$self{sfcode}   = {};
-  $$self{lccode}   = {};
-  $$self{uccode}   = {};
-  $$self{delcode}  = {};
+  $$self{mathcode}            = {};
+  $$self{sfcode}              = {};
+  $$self{lccode}              = {};
+  $$self{uccode}              = {};
+  $$self{delcode}             = {};
+  $$self{tracing_definitions} = {};
   return $self; }
 
 sub assign_internal {
   my ($self, $table, $key, $value, $scope) = @_;
   $scope = ($$self{prefixes}{global} ? 'global' : 'local') unless defined $scope;
+  if (exists $$self{tracing_definitions}{$key}) {
+    print STDERR "ASSIGN $key in $table " . ($scope ? "($scope)" : '') . " => " .
+      (ref $value ? $value->stringify : $value) . "\n"; }
   if ($scope eq 'global') {
     # Remove bindings made in all frames down-to & including the next lower locked frame
     my $frame;
@@ -237,7 +243,7 @@ sub valueInFrame {
   $frame = 0 unless defined $frame;
   my $p = 0;
   for (my $f = 0 ; $f < $frame ; $f++) {
-    $p += $$self{undo}[$f]{value}{$key}; }
+    $p += $$self{undo}[$f]{value}{$key} || 0; }
   return $$self{value}{$key}[$p]; }
 
 #======================================================================
@@ -451,12 +457,12 @@ sub installDefinition {
   my $token = $definition->getCS;
   my $cs = ($LaTeXML::Core::Token::PRIMITIVE_NAME[$$token[1]] || $$token[0]);
   if ($self->lookupValue("$cs:locked") && !$LaTeXML::Core::State::UNLOCKED) {
-    if (my $s = $self->getStomach->getGullet->getSource) {
-      # report if the redefinition seems to come from document source
-      if ((($s eq "Anonymous String") || ($s =~ /\.(tex|bib)$/))
-        && ($s !~ /\.code\.tex$/)) {
-        Info('ignore', $cs, $self->getStomach, "Ignoring redefinition of $cs"); }
-      return; } }
+    my $s = $self->getStomach->getGullet->getSource;
+    # report if the redefinition seems to come from document source
+    if (((!defined($s)) || ($s =~ /\.(tex|bib)$/))
+      && ($s !~ /\.code\.tex$/)) {
+      Info('ignore', $cs, $self->getStomach, "Ignoring redefinition of $cs"); }
+    return; }
   assign_internal($self, 'meaning', $cs => $definition, $scope);
   return; }
 

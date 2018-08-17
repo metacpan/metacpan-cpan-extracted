@@ -73,8 +73,6 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 0, size => 100 },
   "genreid",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
-  "single_track",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -185,26 +183,6 @@ __PACKAGE__->might_have(
   "CDTest::Schema::Result::LinerNote",
   { "foreign.liner_id" => "self.cdid" },
   { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 single_track
-
-Type: belongs_to
-
-Related object: L<CDTest::Schema::Result::Track>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  "single_track",
-  "CDTest::Schema::Result::Track",
-  { trackid => "single_track" },
-  {
-    is_deferrable => 0,
-    join_type     => "LEFT",
-    on_delete     => "CASCADE",
-    on_update     => "NO ACTION",
-  },
 );
 
 =head2 tags

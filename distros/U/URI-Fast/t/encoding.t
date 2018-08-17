@@ -24,11 +24,19 @@ subtest 'basics' => sub{
 
   is URI::Fast::encode(undef), "", "encode: undef";
   is URI::Fast::decode(undef), "", "decode: undef";
+
+  is URI::Fast::decode('%3f'), '?', 'decode: lower cased hex values';
 };
 
 subtest 'negative path' => sub {
   is URI::Fast::decode("foo %"), "foo %", "terminal %";
   is URI::Fast::decode("% foo"), "% foo", "leading %";
+};
+
+subtest 'aliases' => sub{
+  my $enc = URI::Fast::encode($reserved);
+  is $enc, URI::Fast::uri_encode($reserved), 'uri_encode';
+  is URI::Fast::decode($enc), URI::Fast::uri_decode($enc), 'uri_encode';
 };
 
 subtest 'utf8' => sub{
@@ -45,6 +53,8 @@ subtest 'utf8' => sub{
   ok !utf8::is_utf8(URI::Fast::encode($u)), 'encode: result is not flagged utf8';
 
   is URI::Fast::decode($a), $u, 'decode';
+
+  is URI::Fast::decode(lc $a), $u, 'decode lower case';
 
   ok my $uri = uri($url), 'ctor';
 

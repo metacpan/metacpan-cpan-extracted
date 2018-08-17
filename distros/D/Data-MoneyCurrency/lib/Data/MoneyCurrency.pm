@@ -1,6 +1,5 @@
 package Data::MoneyCurrency;
 
-use 5.006;
 use strict;
 use warnings;
 use utf8;
@@ -17,62 +16,9 @@ use Data::Dumper;
 
 my $rh_currency_for_country = {};
 
-=encoding utf8
 
-=head1 NAME
+our $VERSION = '0.04';
 
-Data::MoneyCurrency - Get currency information for different currencies
-
-=head1 VERSION
-
-Version 0.03
-
-=cut
-
-our $VERSION = '0.03';
-
-
-=head1 SYNOPSIS
-
-Get currency information for different currencies.
-
-    use Data::MoneyCurrency qw(get_currency);
-
-    my $currency = get_currency(currency => 'usd');
-    # $currency = {
-    #    # ...
-    # }
-    my $currency = get_currency(country => 'fr');
-    # $currency = {
-    #   # ...
-    # }
-
-This uses some data found in in the Ruby library
-L<money|https://github.com/RubyMoney/money/tree/master/config>, but it has no
-dependency on it, the relevant data files are already included.
-
-=head1 EXPORT
-
-=head1 SUBROUTINES/METHODS
-
-=head2 get_currency
-
-Takes hash of arguments, and returns a reference to hash containing information
-about that currency (character strings), or undef if the currency or the
-country is not recognised. Pass either 'currency' or 'country' as the only key
-of the hash of arguments, with the currency code or the ISO 3166-2 country code
-respectively.
-
-    my $currency = get_currency(currency => 'usd');
-    # $currency = {
-    #    # ...
-    # }
-    my $currency = get_currency(country => 'fr');
-    # $currency = {
-    #   # ...
-    # }
-
-=cut
 
 my $rh_currency_iso; # contains character strings
 
@@ -232,7 +178,7 @@ my $rh_currencies_for_country = {
     lk => ['lkr'],
     lr => ['lrd'],
     ls => ['lsl'],
-    lt => ['ltl'],
+    lt => ['eur'],
     lu => ['eur'],
     lv => ['eur'],
     ly => ['lyd'],
@@ -322,15 +268,6 @@ my $rh_currencies_for_country = {
     zm => ['zmk']
 };
 
-=head2 get_currencies_for_country
-
-Takes one argument, a country code in ISO 3166-1 format, and returns a
-reference to an array of strings that are currency codes.
-
-    my $rv = get_currencies_for_country('fr');
-    # $rv = ["eur"];
-
-=cut
 
 sub get_currencies_for_country {
     croak "get_currency received no arguments" if @_ == 0;
@@ -345,12 +282,84 @@ sub get_currencies_for_country {
     return;
 }
 
+
+1; # End of Data::MoneyCurrency
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MoneyCurrency
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+Get currency information for different currencies.
+
+    use Data::MoneyCurrency qw(get_currency);
+
+    my $currency = get_currency(currency => 'usd');
+    # $currency = {
+    #    # ...
+    # }
+    my $currency = get_currency(country => 'fr');
+    # $currency = {
+    #   # ...
+    # }
+
+This uses some data found in in the Ruby library
+L<money|https://github.com/RubyMoney/money/tree/master/config>, but it has no
+dependency on it, the relevant data files are already included.
+
+=head1 NAME
+
+Data::MoneyCurrency - Get currency information for different currencies
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 EXPORT
+
+=head1 SUBROUTINES/METHODS
+
+=head2 get_currency
+
+Takes hash of arguments, and returns a reference to hash containing information
+about that currency (character strings), or undef if the currency or the
+country is not recognised. Pass either 'currency' or 'country' as the only key
+of the hash of arguments, with the currency code or the ISO 3166-2 country code
+respectively.
+
+    my $currency = get_currency(currency => 'usd');
+    # $currency = {
+    #    # ...
+    # }
+    my $currency = get_currency(country => 'fr');
+    # $currency = {
+    #   # ...
+    # }
+
+=head2 get_currencies_for_country
+
+Takes one argument, a country code in ISO 3166-1 format, and returns a
+reference to an array of strings that are currency codes.
+
+    my $rv = get_currencies_for_country('fr');
+    # $rv = ["eur"];
+
 =head1 AUTHOR
 
 David D Lowe, C<< <daviddlowe.flimm at gmail.com> >>
 
 =head1 BUGS
-
 
 Please report any bugs or feature requests through the web interface at
 L<https://github.com/Flimm/perl5-Data-MoneyCurrency/issues>.
@@ -371,15 +380,22 @@ L<https://metacpan.org/pod/Data::MoneyCurrency>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
 This is licensed under the MIT license, and includes code from the
 RubyMoney/Money module, which is also licensed under the MIT license.
 
-=cut
+=head1 AUTHOR
 
-1; # End of Data::MoneyCurrency
+edf <edf@opencagedata.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Opencage Data Limited.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -22,6 +22,6 @@ resources:
   bugtracker: https://github.com/CellBIS/CellBIS-SQL-Abstract/issues
   homepage: https://metacpan.org/pod/CellBIS::SQL::Abstract
   repository: git://github.com/CellBIS/CellBIS-SQL-Abstract.git
-version: '0.8'
+version: '1.1'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

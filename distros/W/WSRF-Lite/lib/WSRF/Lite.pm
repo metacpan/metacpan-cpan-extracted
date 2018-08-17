@@ -72,7 +72,7 @@ use strict;
 use vars qw{ $VERSION };
 
 BEGIN {
-	$VERSION = '0.8.3.3';
+	$VERSION = '0.8.3.4';
 }
 
 # WSRF uses WS-Address headers in the SOAP Header - by default

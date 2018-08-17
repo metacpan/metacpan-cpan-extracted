@@ -13,10 +13,22 @@ Revision history for Perl extension Tk::SMListbox.
 2.01	Thu Oct 22
 	- Fixed small bug in the focus() function to ensure that the 
 	  widget properly takes focus.
-2.1	Thu Apr 30, 2015
+2.10	Thu Apr 30, 2015
 	- Fixed bug in columnDelete() when only a single column value passed.
 	- Fixed bug where sometimes more than one column showed sort arrow.
 	- Fixed bindCallback reference in columnInsert() to _bindCallback
 	  (MListbox bug#60812).
 	- Added -nocolumnfocus option to prevent first listbox from showing the 
 	  focused "______" when using my "hacked" Tk::Listbox widget.
+2.11	Not released.
+2.12 Th Aug 2, 2018
+	- Backported several options from Tk::HMListbox:  -fillcolumn, 
+	  -headerforeground, -headerbackground, and -reversearrow.
+	- Backported setSortOrder() function from Tk::HMListbox.
+	- Fixed broken -focuscolumn option.
+	- Renamed internal packages to prevent potential conflicts with 
+	  Tk::MListbox.
+	- Massively cleaned up and updated docs.
+	- The usual code cleanups.
+	- Tk::SMListbox should now be fully compatable w/Tk::HMListbox, 
+	  except for using standard Tk::Listboxes instead of Tk::HListboxes.

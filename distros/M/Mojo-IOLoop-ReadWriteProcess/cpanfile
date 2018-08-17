@@ -1,4 +1,5 @@
 requires 'Mojolicious', '7.24';
+requires 'IPC::SharedMem';
 
 on configure => sub {
     requires 'Module::Build';

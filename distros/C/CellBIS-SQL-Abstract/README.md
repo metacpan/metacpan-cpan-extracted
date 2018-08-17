@@ -15,11 +15,15 @@ perl Makefile.PL
 make && make test
 make install && make clean
 ```
+
 with `cpan` command :
+
 ```bash
 cpan -i CellBIS::SQL::Abstract
 ```
+
 with `cpanm` command :
+
 ```bash
 cpanm CellBIS::SQL::Abstract
 ```

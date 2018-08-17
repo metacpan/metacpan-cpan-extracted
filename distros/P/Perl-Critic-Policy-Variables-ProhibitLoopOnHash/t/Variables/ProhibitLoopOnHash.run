@@ -28,7 +28,7 @@ print for %{$hash};
 print for %{ something() };
 print foreach %hash;
 
-# name reference variation
+## name reference variation
 ## failures 8
 ## cut
 
@@ -110,3 +110,13 @@ for my Foo::Bar $foo (@bar) { }
 
 # fails
 for my Foo::Bar $foo (%bar) { }
+
+## name Reference Aliasing
+## failures 0
+## cut
+foreach \my %hash (@array_of_hash_references) {}
+
+## name Empty postfix loop
+## failures 0
+## cut
+for Class->method($foo);

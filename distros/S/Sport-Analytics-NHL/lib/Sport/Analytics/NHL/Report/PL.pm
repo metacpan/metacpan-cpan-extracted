@@ -855,6 +855,7 @@ sub skip_event ($$) {
 	my $self = shift;
 	my $event = shift;
 
+	return 1 if $BROKEN_EVENTS{$self->{_id}} && defined $BROKEN_EVENTS{$self->{_id}}->{$event->{id}} && $BROKEN_EVENTS{$self->{_id}}->{$event->{id}} == 0;
 	return 1 if $event && $event->{period} > 11;
 	return 1 if
 		($event->{type} eq 'PEND' || $event->{type} eq 'PSTR') &&
@@ -906,8 +907,6 @@ sub read_playbyplay ($) {
 		$self->{head}[-1]++;
 	} until ($self->{events}[-1]{type} eq 'GEND' || $gend);
 	$self->fill_broken_events();
-	$self->add_game_end() unless $self->{events}[-1]{type} eq 'GEND';
-	die "No gend" unless $self->{events}[-1]{type} eq 'GEND';
 }
 
 sub normalize ($$) {

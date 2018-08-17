@@ -1,15 +1,10 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-$|++;
-
-BEGIN {
-  our @INC;
-  unshift(@INC, '../../lib', '../lib');
-};
 
 use Test::More;
 use Test::Mojo;
+use Test::Memory::Cycle;
 
 use Mojolicious::Lite;
 
@@ -185,6 +180,9 @@ $app->helper(
   }
 );
 
+# Check for memory cycle (Bug #125981)
+memory_cycle_ok($app);
+
 ok($r = $app->test_random_string, 'Base26 can be generated');
 like($r, $TEST_RE{base26}, 'Base26 string has correct alphabet');
 
@@ -212,7 +210,5 @@ $t->get_ok('/path2')->content_like($TEST_RE{base26});
 $t->get_ok('/path2')->content_like($TEST_RE{base26});
 $t->get_ok('/path3')->content_like($TEST_RE{full});
 $t->get_ok('/path3')->content_like($TEST_RE{full});
-
-
 
 done_testing;

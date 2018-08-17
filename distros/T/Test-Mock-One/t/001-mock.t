@@ -6,7 +6,7 @@ use Test::Exception;
 use Test::Deep;
 
 use Test::Mock::One;
-use DateTime;
+use Data::Dumper;
 
 {
     eval "use List::Util 1.33";
@@ -21,7 +21,7 @@ use DateTime;
     my $mock = Test::Mock::One->new(
         foo  => 'bar',
         bar  => 1,
-        time => DateTime->now(),
+        time => Data::Dumper->new([]),
         deep => { foo => 'inside' },
         code => sub {
             return "this is code: " . shift;
@@ -47,7 +47,7 @@ use DateTime;
 
     cmp_deeply($mock->ArrayRef, [qw(foo bar baz)], "Array ref dealing");
     cmp_deeply($mock->HashRef, { foo => 'bar' }, "Hash ref dealing");
-    isa_ok($mock->time, 'DateTime', "is a date time object");
+    isa_ok($mock->time, 'Data::Dumper', "is a Data::Dumper object");
 
     $rv = $mock->yep->baz->diaz;
     ok(UNIVERSAL::isa($rv, 'Test::Mock::One'), "Just keep calling");

@@ -8,7 +8,7 @@ package Devel::MAT::Graph;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Struct::Dumb 0.07 'readonly_struct';
 

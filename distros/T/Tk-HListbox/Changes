@@ -25,3 +25,35 @@ Revision history for Perl extension Tk::HListbox.
 	  it work.
 	  * Fixed get() function to work like Tk::Listbox->get() and FAIL if 
 	  no arguments (indices) given.
+2.2	  Tue Jul 31, 2018
+	- * Made "-state => 'disabled'" actually work.  Pbm. is that the 
+	  underlying HList widget does NOT support disabling, so we had to 
+	  manually emulate the feature by removing focusability, changing 
+	  the foreground color, disable selecting items, etc. and then the 
+	  ability to restore previous state when re-enabled, in order to 
+	  work like a normal Tk::Listbox.
+	- * Fixed issues involving setting background & foreground colors 
+	  and allow taking advantage of our custom setPalette.pl module to 
+	  properly render the "active element"'s background.
+	  Color options should now work more like they do in Tk::Listbox.
+	- * Added fixPalette() function for the rare cases it doesn't.weq
+	- * Added -showimage, -showtext, and -bitmap options to the 
+	  itemconfigure() function to be directly handled without it having 
+	  to create an itemStyle, as these are supported in the Tk::DItem docs.
+	- * Added -activeforeground, -selectforeground, and -selectbackground 
+	  options.
+	- * Fixed potential issue of improperly inserting text-only entries 
+	  specified in hashref format, where either the wrong itemtype was 
+	  being used causing an error, or the "-data" structure was being 
+	  duplicated.
+	- * Made -font option actually work.  Default is "{MS Sans Serif} 8" on 
+	  M$-Windows and "Helvetica -12 bold" otherwise, the defaults used by 
+	  Tk::Listbox and Tk::HMListbox.
+	- * REGRESSION:  Due to the color-related changes above, other style options 
+	  applied to individual entries are actually applied to all entries of 
+	  that type, ie. all "imagetext", or all "text", etc. entries in the list.
+	  To apply custom style options to individual entries now, one must define 
+	  a custom ItemStyle, due to the fact that to get the color optinos to work 
+	  properly, we now create a "default ItemStyle" for each of the three valid 
+	  "type"s and style options are applied to those (unless a 
+	  "-style => $customItemStyle" is specified for the entry).

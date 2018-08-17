@@ -7,7 +7,7 @@ use Config;
 use File::Basename 'dirname', 'basename';
 use File::Path 'mkpath';
 
-use SPVM::Build::Setting;
+use SPVM::Build::Config;
 
 # SPVM::Build::tUtil is used from Makefile.PL
 # so this module must be wrote as pure per script, not contain XS and don't use any other SPVM modules except for SPVM::Build::Config.
@@ -164,22 +164,120 @@ sub convert_package_name_to_shared_lib_dir {
   return $shared_lib_dir;
 }
 
-sub default_build_setting {
-  my $build_setting = SPVM::Build::Setting->new;
+sub new_default_build_config {
+  my $build_config = SPVM::Build::Config->new;
   
-  $build_setting->add_extra_compiler_flag('-std=c99');
-
+  # Use default config
+  my $default_config = {%Config};
+  $build_config->replace_all_config($default_config);
+  
+  # Default include path
+  my $env_header_include_dir = $INC{"SPVM/Build/Util.pm"};
+  $env_header_include_dir =~ s/\/Util\.pm$//;
+  $env_header_include_dir .= '/include';
+  $build_config->add_ccflags("-I$env_header_include_dir");
+  
+  # C99
+  $build_config->set_std('c99');
+  
+  # Optimize
+  $build_config->set_optimize('-O3');
+  
   # I want to print warnings, but if gcc version is different, can't suppress no needed warning message.
   # so I dicide not to print warning in release version
   if ($ENV{SPVM_TEST_ENABLE_WARNINGS}) {
-    $build_setting->add_extra_compiler_flag("-Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable");
+    $build_config->add_ccflags("-Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable");
   }
   
-  # Config
-  $build_setting->set_config(optimize => '-O3');
-  
-  return $build_setting;
+  return $build_config;
 }
 
 1;
+
+=head1 NAME
+
+SPVM::Build::Util - Build Utilities
+
+B<Create defaulgt build config>
+
+  use SPVM::Build::Util;
+
+  my $build_config = SPVM::Build::Util::new_default_build_config();
+
+  $build_config->set_optimize('-O3');
+  
+
+B<Add Build shared library make rule in Makefile.PL>
+
+  sub MY::postamble {
+
+    my $make_rule = '';
+    
+    # Native compile make rule
+    $make_rule .= SPVM::Build::Util::create_make_rule_native('Foo');
+    
+    # Precompile make rule
+    $make_rule .= SPVM::Build::Util::create_make_rule_precompile('Foo');
+    
+    return $make_rule;
+  }
+
+=head1 DESCRIPTION
+
+SPVM::Build::Util is building utilities.
+
+=head1 FUNCTIONS
+
+=head2 new_default_build_config
+  
+  my $build_config = SPVM::Build::Util::new_default_build_config;
+
+Create defaulgt build config. This is L<SPVM::Build::Config> object.
+
+This function is used in native config file.
+
+  # Foo.native/Foo.config
+  use strict;
+  use warnings;
+
+  use SPVM::Build::Util;
+
+  my $build_config = SPVM::Build::Util::new_default_build_config();
+
+  $build_config->set_config(optimize => '-O2');
+
+  $build_config;
+
+=head2 create_make_rule_native
+
+Create native compile make rule.
+
+This is used in Makefile.PL of your distributed module.
+  
+  # Makefile.PL
+  sub MY::postamble {
+
+    my $make_rule = '';
+    
+    # Native compile make rule
+    $make_rule .= SPVM::Build::Util::create_make_rule_native('Foo');
+    
+    return $make_rule;
+  }
+
+=head2 create_make_rule_precompile
+
+Create precompile make rule.
+
+This is used in Makefile.PL of your distributed module.
+
+  sub MY::postamble {
+
+    my $make_rule = '';
+    
+    # Precompile make rule
+    $make_rule .= SPVM::Build::Util::create_make_rule_precompile('Foo');
+    
+    return $make_rule;
+  }
 

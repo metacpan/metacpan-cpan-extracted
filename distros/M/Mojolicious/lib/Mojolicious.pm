@@ -65,7 +65,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.89';
+our $VERSION  = '7.93';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -828,6 +828,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 Every major release of L<Mojolicious> has a code name, these are the ones that
 have been used in the past.
+
+8.0, C<Supervillain> (U+1F9B9)
 
 7.0, C<Doughnut> (U+1F369)
 

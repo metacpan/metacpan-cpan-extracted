@@ -3,3 +3,18 @@ Revision history for Perl extension Tk::HMListbox.
 3.00  Mon May 25, 2015
 	- original version; Derived from Tk::SMListbox,
 	  created by h2xs 1.23 with options -X -n Tk::SMListbox
+3.10  Tue Jul 31, 2018
+	- Added -headerbackground and -headerforeground config. options.
+	- Added -fillcolumn option to specify the index of a column that 
+	  should expand automatically to fill the additional screen 
+	  realestate that results from expanding the width of the main 
+	  widget.  If not specified the old behaviour of all columns 
+	  remaining fixed width unless the separator is dragged by the user.
+	- Depreciated used of -focuscolumn, though it still works, it 
+	  appears to no longer have any functionally-useful purpose.
+	  This is a carryover from Tk::SMListbox, where it still has 
+	  usefulness.  See the updated docs.
+	- Fixed a potential issue with -reversearrow and sorting.
+	- Renamed internal packages to prevent potential conflicts with 
+	  Tk::MListbox.
+	- Cleaned up and updated docs along with the usual code cleanups.

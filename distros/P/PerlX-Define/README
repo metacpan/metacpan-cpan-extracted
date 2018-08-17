@@ -1,0 +1,65 @@
+NAME
+    PerlX::Define - cute syntax for defining constants
+
+SYNOPSIS
+       use v5.12;
+       use strict;
+       use warnings;
+   
+       package MyMaths {
+          use PerlX::Define;
+          define PI = 3.2;
+       }
+
+DESCRIPTION
+    PerlX::Define is a yet another module for defining constants.
+
+    Differences from constant.pm:
+
+    *   Cute syntax.
+
+        Like constant.pm, constants get defined at compile time, not run time.
+
+    *   Requires Perl 5.12 or above.
+
+        If you're lucky enough to be able to free yourself from the shackles
+        of supporting decade-old versions of Perl, PerlX::Define is your
+        friend.
+
+    *   Only supports scalar constants.
+
+        List constants are rarely useful.
+
+        Your constant can of course be a reference to an array or hash, but
+        this module doesn't attempt to make the referred-to structure read
+        only.
+
+    *   Doesn't try to handle some of the things constant.pm does like
+        declaring constants using fully-qualified names, or defining constants
+        pointing at magic scalars.
+
+    Prior to version 0.100, PerlX::Define was bundled with Moops.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Define>.
+
+SEE ALSO
+    constant.
+
+    Moops.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014, 2018 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

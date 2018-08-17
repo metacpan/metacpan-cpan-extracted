@@ -1,10 +1,9 @@
 use ExtUtils::MakeMaker;
-my $mm = $ExtUtils::MakeMaker::VERSION;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-WriteMakefile(
-    INSTALLDIRS      => ( $] >= 5.012 ? 'site' : 'perl' ),
+my %WriteMakefileArgs = (
+    INSTALLDIRS      => ( "$]" >= 5.011 ? 'site' : 'perl' ),
     ABSTRACT_FROM    => 'lib/CGI.pod',
     VERSION_FROM     => 'lib/CGI.pm',
     NAME             => 'CGI',
@@ -47,27 +46,42 @@ WriteMakefile(
         ZIP      => '/usr/bin/zip',
         ZIPFLAGS => '-rl'
     },
-    (
-        $mm < 6.46
-        ? ()
-        : (
-            META_MERGE => {
-                'meta-spec' => { version => 2 },
-                requires    => { perl    => '5.008001' },
-                resources   => {
-                    license    => 'http://dev.perl.org/licenses/',
-                    homepage   => 'https://metacpan.org/module/CGI',
-                    repository => {
-                        url  => 'https://github.com/leejo/CGI.pm',
-                        web  => 'https://github.com/leejo/CGI.pm',
-                        type => 'git',
-                    },
-                    bugtracker => {
-                        web => 'https://github.com/leejo/CGI.pm/issues',
-                    }
-                },
-                no_index => { directory => [qw/t/] },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        requires    => { perl    => '5.008001' },
+        resources   => {
+            license    => 'http://dev.perl.org/licenses/',
+            homepage   => 'https://metacpan.org/module/CGI',
+            repository => {
+                url  => 'https://github.com/leejo/CGI.pm',
+                web  => 'https://github.com/leejo/CGI.pm',
+                type => 'git',
             },
-        )
-    ),
+            bugtracker => {
+                web => 'https://github.com/leejo/CGI.pm/issues',
+            }
+        },
+        no_index => { directory => [qw/t/] },
+    },
 );
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.64) } ) {
+	my $req = delete $WriteMakefileArgs{'TEST_REQUIRES'};
+	@{ $WriteMakefileArgs{'BUILD_REQUIRES'} }{ keys %$req } = values %$req;
+}
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.5503) } ) {
+	my $req = delete $WriteMakefileArgs{'BUILD_REQUIRES'};
+	@{ $WriteMakefileArgs{'PREREQ_PM'} }{ keys %$req } = values %$req;
+}
+
+delete $WriteMakefileArgs{'MIN_PERL_VERSION'}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.48) };
+
+delete $WriteMakefileArgs{'META_MERGE'}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.46) };
+
+delete $WriteMakefileArgs{'LICENSE'}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.31) };
+
+WriteMakefile(%WriteMakefileArgs);

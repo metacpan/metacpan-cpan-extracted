@@ -1,5 +1,11 @@
 Revision history for Data-MoneyCurrency
 
+0.04    Wed Aug 15 07:20:01 CDT
+        update ruby-money config
+        switch to dzil for packaging/release
+        remove use 5.006;
+        fix lt/EUR mapping
+
 0.03    Mon 26 Jun 14:36:07 UTC 2017
         update ruby-money config, no code changes
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Import::Export;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw/Import::Export/;
 
@@ -15,12 +15,15 @@ our %EX = (
 
 sub unique_array {
 	my (@dataset, %u);
-	@dataset = grep { !$u{$_} && do { $u{$_} = 1 } && $_ } aoaoaoa(@_);
+	@dataset = grep { 
+		my $k = ref $_ ? $_ + 0 : $_;
+		!$u{$k} && do { $u{$k} = 1; $_ } 
+	} _aoaoaoa(@_);
 	return wantarray ? @dataset : \@dataset;
 }
 
-sub aoaoaoa {
-	return map { ref $_ eq 'ARRAY' ? aoaoaoa(@{ $_ }) : $_ } @_;
+sub _aoaoaoa {
+	return map { ref $_ eq 'ARRAY' ? _aoaoaoa(@{ $_ }) : $_ } @_;
 }
 
 1;
@@ -31,7 +34,7 @@ Array::Merge::Unique - Merge those arrays uniquely
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -57,9 +60,6 @@ Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
 Please report any bugs or feature requests to C<bug-array-merge-unique at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Array-Merge-Unique>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
@@ -89,7 +89,6 @@ L<http://cpanratings.perl.org/d/Array-Merge-Unique>
 L<http://search.cpan.org/dist/Array-Merge-Unique/>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 

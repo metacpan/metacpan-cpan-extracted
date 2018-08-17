@@ -1,0 +1,37 @@
+Artistic_2
+Changes
+Config.pl
+debian/changelog
+debian/control
+debian/copyright
+debian/rules
+Makefile.PL
+MANIFEST			This list of files
+nonlinear.pd
+opti_lib/ASA-LICENSE
+opti_lib/asa.c
+opti_lib/asa.h
+opti_lib/asa_usr.c
+opti_lib/asa_usr_asa.h
+opti_lib/box9903.f
+opti_lib/cgfam.f
+opti_lib/cgsearch.f
+opti_lib/daxpy.f
+opti_lib/de.h
+opti_lib/de36.c
+opti_lib/dhc.c
+opti_lib/dnrm2.f
+opti_lib/dxpy.f
+opti_lib/gencan.f
+opti_lib/hooke.c
+opti_lib/lbfgs.f
+opti_lib/lbfgsb.f
+opti_lib/milalonga.f
+opti_lib/spg.f
+opti_lib/tensor.f
+opti_lib/tn.f
+README
+t/1.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Opt/NonLinear.pm           mod=PDL::Opt::NonLinear pd=nonlinear.pd (added by pdlpp_mkgen)

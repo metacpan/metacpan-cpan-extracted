@@ -1,0 +1,44 @@
+0.20	- 2018-08-16
+    * Start inline documentation
+    * Support configuration
+    * Add -I/--index
+    * Add --verbose meaning
+    * Add --list-colors
+
+0.10	- 2018-08-15
+    * Allow bold variants for colors
+    * Start of -B implementation
+
+0.09	- 2018-08-10
+    * Header for unified diff
+
+0.08	- 2018-08-02
+    * Implement -b
+    * Implement -Z
+    * Implement -i
+
+0.07	- 2018-07-30
+    * Add --utf8
+    * Add git integration example
+
+0.06	- 2018-07-20
+    * Reset colors before newlines
+    * Add --utf-8
+    * Add git integration example
+
+0.05	- 2018-07-09
+    * Add unified diff (-u, -u0)
+    * Complete the usage message
+
+0.04	- 2018-07-06
+    * Put it all in git and on github
+
+0.03	- 2018-07-06
+    * Add color options (--pink, --reverse, --old=C, --new=C, --bg=C)
+    * Add Unicode indicators (--fancy)
+
+0.02	- 2018-05-15
+    * Add --no-color
+
+0.01	- 2018-05-14
+    * Initial version

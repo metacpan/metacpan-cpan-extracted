@@ -95,6 +95,6 @@ my @expect_zro = qw(__three _one _three _two new three);
 is_deeply(\@methods_zro,\@expect_zro,"expected methods");
 
 my @methods_on = sort( findsubs Package::Subroutine:: 'HOB::on' );
-my @expect_on = qw(new one);
+my @expect_on = qw(__three _one _three _two new one);
 is_deeply(\@methods_on,\@expect_on,"expected methods");
 

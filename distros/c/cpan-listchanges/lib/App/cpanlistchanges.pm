@@ -2,7 +2,7 @@ package App::cpanlistchanges;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Algorithm::Diff;
 use CPAN::DistnameInfo;
@@ -87,12 +87,9 @@ sub show_changes {
 
     my $get_changes = sub {
         my $version = shift;
-        my $html = $self->get("http://search.cpan.org/dist/$info->{dist}-$version");
-        $html =~ s/&#(\d+);/chr $1/eg; # search.cpan.org seems to encode all filenames
-        $html =~ m!<a href="(/src/[^"]+)">(Change.*?)</a>!i or return;
-
-        my($url, $filename) = ($1, $2);
-        return $self->get("http://cpansearch.perl.org$1");
+        return $self->get(
+            "https://fastapi.metacpan.org/source/$info->{cpanid}/$info->{dist}-$version/Changes"
+        );
     };
 
     my $new_changes = $get_changes->($to);
