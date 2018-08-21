@@ -1,9 +1,10 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
 use Test::More;
 
 use File::Find;
-
-use warnings;
-use strict;
 
 # Test all of the modules to make sure that a simple "use Module"
 # won't result in a crash.
@@ -16,6 +17,7 @@ sub add_to_files {
     return unless -f $_;
     return unless $_ =~ /\.pm$/;
     push @files, $File::Find::name;
+    return;
 }
 
 plan tests => scalar @files;
@@ -51,3 +53,5 @@ TODO: {
         ok($file);
     }
 }
+
+1;

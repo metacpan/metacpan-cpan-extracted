@@ -3,8 +3,8 @@ package PDF::Builder::Lite;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 BEGIN {
 
@@ -85,7 +85,7 @@ sub mediabox {
     } else {
         $self->{'api'}->mediabox($x1,$y1);
     }
-    $self;
+    return $self;
 }
 
 =item $pdf->saveas($file)
@@ -277,7 +277,7 @@ Saves the state of the page.
 sub savestate {
     my $self = shift;
 
-    $self->{'gfx'}->save();
+    return $self->{'gfx'}->save();
 }
 
 =item $pdf->restorestate()
@@ -289,7 +289,7 @@ Restores the state of the page.
 sub restorestate {
     my $self = shift;
 
-    $self->{'gfx'}->restore();
+    return $self->{'gfx'}->restore();
 }
 
 =item $pdf->egstate($egs)
@@ -627,7 +627,7 @@ sub textstart {
     my $self = shift;
 
     $self->{'gfx'}->textstart();
-    returnb$self;
+    return $self;
 }
 
 =item $pdf->textfont($fontobj, $size)

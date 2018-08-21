@@ -1,0 +1,34 @@
+---
+abstract: 'Prohibit writing an postfix loop with no statement'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-ValuesAndExpressions-ProhibitEmptyPostfixLoop
+provides:
+  Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyPostfixLoop:
+    file: lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitEmptyPostfixLoop.pm
+    version: '0.001'
+requires:
+  Perl::Critic: '1.126'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitemptypostfixloop
+  repository: git://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitemptypostfixloop.git
+version: '0.001'
+x_authority: cpan:XSAWYERX
+x_serialization_backend: 'YAML::Tiny version 1.73'

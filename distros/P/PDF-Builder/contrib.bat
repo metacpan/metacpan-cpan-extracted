@@ -4,8 +4,9 @@ echo === do not erase examples/ PDF files yet... they are used here
 
 echo == combine_pdfs.pl
 contrib\combine_pdfs.pl examples\011_open_update.BASE.pdf examples\012_pages.pdf examples\011_open_update.UPDATED.pdf ./combined.pdf
-echo === output to combined.pdf 12 pages: Hello World, sequence 1 9 2..8 pages,
+echo === output to combined.pdf 15 pages: Hello World, sequence i ii iii 1 9 2..8 pages,
 echo ===                                  Hello World and Hello World (2)
+echo === note different page sizes used
 
 echo == pdf-debug.pl
 contrib\pdf-debug.pl combined.pdf

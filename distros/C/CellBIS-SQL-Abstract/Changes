@@ -1,5 +1,10 @@
 Revision history for perl distribution CellBIS-SQL-Abstract
 
+1.2       2018-08-21 04:48:50+08:00 Asia/Makassar
+          - Allow generate SQL Query insert with empty value.
+          - fixed bug "if operator" in "CellBIS::SQL::Abstract::Table"
+            on sub "create_colAttr"
+
 1.1       2018-08-17 04:47:54+08:00 Asia/Makassar
           Improve method "update" on "Abstract.pm"
           for support use argument with hashref datatype

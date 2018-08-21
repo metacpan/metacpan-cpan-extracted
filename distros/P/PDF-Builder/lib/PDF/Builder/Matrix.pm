@@ -13,8 +13,8 @@ package PDF::Builder::Matrix;
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -31,6 +31,7 @@ sub new {
         push(@{$self}, [@{$_}]);
     }
     bless $self, $type;
+    return $self;
 }
 
 sub transpose {

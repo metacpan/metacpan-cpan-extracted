@@ -1,9 +1,27 @@
 ==================================================
-Changes from 2016-07-21 00:00:00 +0000 to present.
+Changes from 2016-08-20 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.9 at 2018-07-21 01:17:48 +0000
+version 6.0 at 2018-08-20 20:29:07 +0000
+----------------------------------------
+
+  Change: e58dcf2f190a1db3e1e10f8799b67c7f9a8abcc4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-27 17:45:25 +0000
+
+    Fix a bug in conditional checks for index age when no date is found in the
+    index name 
+
+  Change: f6e05fcf90fa575f5e5b5ccafb0bf94667ef9bd5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-23 14:31:41 +0000
+
+    New es_local_index_meta() function to allow looking up the timestamp field
+    in es-search.pl much easier and more straight-forward. 
+
+----------------------------------------
+version 5.9 at 2018-07-21 01:10:38 +0000
 ----------------------------------------
 
   Change: 9b00c64735a21b74223fddcde44fff74772efd17
@@ -459,171 +477,6 @@ version 5.1 at 2016-11-16 02:30:42 +0000
     App::ElasticSearch::Utilities::Connection handles JSON error documents *
     Fix case sensitivity bug in the --top option of es-search.pl 
 
-----------------------------------------
-version 5.0 at 2016-08-19 03:50:24 +0000
-----------------------------------------
-
-  Change: a8d6911a4ae7238dd564d4235a35c52528adb19a
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 20:50:24 +0000
-
-    Documentation re-generated for 5.0 release. 
-
-  Change: 94a5189553fb6c070f2156b4e1fd173745cbb81e
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 18:03:47 +0000
-
-    VersionHacks now works on x.0 releases.
-
-    Previous releases failed to compare the string of the version because Perl
-    was helpfully casting '5.0' to '5' as the key in the vhacks hashes. This is
-    now solved by assembling a version string. 
-
-  Change: 3c58599fc9972fdaefeb9b14e62a15d711a68a03
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 17:49:59 +0000
-
-    es-graphite-dynamic.pl collector compatibility.
-
-    Allow this to be called from diamond or collectd as a script collector with
-    prefix overrides. 
-
-  Change: 6437ab2119af9051d1ab14eff40ef90c4bb0442f
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 17:23:21 +0000
-
-    Preparing for 5.0 release.
-
-    Added es_pass_exec() feature to allow for storing passwords in keychains or
-    password vaults instead of the command line or a plaintext file.
-
-    Extensive documentation updates to cover everything the module does and how
-    the arguments work with examples where required. 
-
-  Change: fd13349f01f6312272b0a78a90141ce057d29715
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 13:38:00 +0000
-
-    Hook basic auth and protocol into App::ElasticSearch::Utilities.
-
-    The basic auth handler uses the monkey patching tweak by redefining
-    LWP::UserAgent::get_basic_credentials() to call the
-    App::ElasticSearch::Utilities::es_basic_auth() function. This makes the
-    whole code base cleaner as we don't have to bother with authentication
-    **unless** the server requires it.
-
-    Authentication is resolved by looking at the username/password specified by
-    --http-username and --http-password, then by the YAML config files
-    (/etc/es-utils.yaml, ~/.es-utils.yaml), then using the netrc files, then as
-    a last ditch, prompting the user for the password on the CLI.
-
-    If CLI::Helpers v1.1 or greater is installed, the password prompts will
-    disable echo and not perform ReadLine magic.
-
-    HTPS is supported via the --proto option. Strict host verification is the
-    default. Dear lord, please stop with the setting host verify 'false'. This
-    is why we can't have nice things. I'm not supporting that option at this
-    time, or ever. Fix your certificates, TYVM. 
-
-  Change: f54615b587f3ce92eef515814c043e838bace5c4
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 10:44:52 +0000
-
-    Fix insanity with determining the version number with a string eval(). 
-
-  Change: ee3cbbe270018c532f566483e4684c3637150957
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-18 10:33:59 +0000
-
-    Merge branch 'feature/use_lwp' into pre5.0 
-
-  Change: db7cb5b5327162f53cb640cee36d6eb0e7583685
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-17 20:26:49 +0000
-
-    Docs updated for the --with element in es-search.pl 
-
-  Change: 6c14ac9a079e5fc9d5e11ce98dfd58925226282f
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-17 20:25:00 +0000
-
-    Added --with <agg>:<field>:<size> to es-search.pl
-
-    Sub-aggregations using --with are now supported to help make more sense out
-    of the data from --top. 
-
-  Change: bad8827e666ede37f828d066496446abffcbf106
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-17 20:01:35 +0000
-
-    Starting the Basic Auth pass through bits. 
-
-  Change: 10ed9d4341b44f51c9875e6f83b5761654ef5d8a
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-17 17:03:59 +0000
-
-    App::ElasticSearch::Utilities::HTTPRequest added.
-
-    There are a few places where a standard HTTP::Request object, or even an
-    HTTP::Request::JSON objects will barf on the payloads that we need to send
-    to Elasticsearch. A::ES::U::HTTPRequest subclasses HTTP::Request and
-    overrides the new() and content() methods.
-
-    * new() - Adds the Accept: application/json header.
-
-    * content() - Handle how perl datastructures are encoded in the body.
-
-    * HASH: Hashes are JSON encoded
-
-    * ARRAY: Array elements are encoded as json and then those are
-
-    joined together with "\n" (think the /_bulk API)
-
-    * Non-reference Scalars: passed as is, you know what you're doing.
-
-    * Everything else: discarded, generates a warning
-
-    The '_cat' API passes JSON back when you tell it you can read that, so
-    updated the es_indices() function to handle the JSON resulting from the
-    _cat call using the new A::ES::U::HTTPRequest object. 
-
-  Change: 3cf2c13f87a911b88c02297ecbf280f456e61bf3
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-08-03 17:26:08 +0000
-
-    Working version of the toolkit using LWP::UserAgent instead of
-    Hijk/Elastijk 
-
-  Change: 176290d6ed44dba88db43eb5a3541fd981fca602
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-07-31 22:31:41 +0000
-
-    Use the App::ElasticSearch::Utilities::Connection object instead of
-    Hijk/Elastijk. Start migration to Ref::Util 
-
-  Change: d5a78e1db33abe3d83ca86e1b178f1fdd5b519eb
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-07-31 22:30:07 +0000
-
-    Connection class to abstract the HTTP bits from this module. 
-
-  Change: 2eea122cf0732ac98c6f50ae67377ad0d538592a
-  Author: Daniel Ostermeier <daniel.ostermeier@gmail.com>
-  Date : 2016-06-20 10:52:55 +0000
-
-
-  Change: e0b4d0e7fdf03cabab9f5b78406b1726c994a69a
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-05-04 15:21:12 +0000
-
-    Handle nested objects in the --show option. 
-
-  Change: 6049eeb58495a2aa7dfcaffae876a2ae6e478958
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-07 14:20:28 +0000
-
-    Version Numbers Updated 
-
 =================================================
-Plus 56 releases after 2016-07-21 00:00:00 +0000.
+Plus 57 releases after 2016-08-20 00:00:00 +0000.
 =================================================

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Selenium/ActionChains.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'Selenium/CanStartBinary/FindBinary.pm',
     'Selenium/CanStartBinary/ProbePort.pm',
     'Selenium/Chrome.pm',
+    'Selenium/Edge.pm',
     'Selenium/Firefox.pm',
     'Selenium/Firefox/Binary.pm',
     'Selenium/Firefox/Profile.pm',
@@ -33,6 +34,7 @@ my @module_files = (
     'Selenium/Remote/WebElement.pm',
     'Selenium/Waiter.pm',
     'Test/Selenium/Chrome.pm',
+    'Test/Selenium/Edge.pm',
     'Test/Selenium/Firefox.pm',
     'Test/Selenium/InternetExplorer.pm',
     'Test/Selenium/PhantomJS.pm',

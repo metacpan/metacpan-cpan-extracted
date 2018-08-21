@@ -1,7 +1,8 @@
-use Test::More tests => 40;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More tests => 40;
 
 use PDF::Builder::Basic::PDF::String;
 
@@ -201,3 +202,5 @@ $string = PDF::Builder::Basic::PDF::String->from_pdf('(\000\000\000' . "\x5c\x5c
 is($string->as_pdf(),
    '<0000005C00000000>',
    q{[RT #63918] Incorrect handling of literal backslashes 2/2});
+
+1;

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.125';
+$Config::Model::VERSION = '2.126';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -182,6 +182,11 @@ around BUILDARGS => sub {
 # keep this as a separate sub from BUILD. So user can call it before
 # creating Config::Model object
 sub initialize_log4perl {
+    if (ref $_[0]) {
+        # may be called as $self-> initialize_log4perl
+        shift;
+    }
+
     my %args = @_;
 
     my $log4perl_syst_conf_file = path('/etc/log4config-model.conf');
@@ -1834,7 +1839,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.125
+version 2.126
 
 =head1 SYNOPSIS
 

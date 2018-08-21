@@ -1,0 +1,78 @@
+NAME
+
+    Syntax::Keyword::Dynamically - dynamically change the value of a
+    variable
+
+SYNOPSIS
+
+       use Syntax::Keyword::Dynamically;
+    
+       my $logger = ...;
+    
+       sub operate
+       {
+          dynamically $logger->level = LOG_DEBUG;
+    
+          do_things();
+       }
+
+DESCRIPTION
+
+    This module provides a syntax plugin that implements a single keyword,
+    dynamically, which alters the behaviour of a scalar assignment
+    operation. Syntactically and semantically it is similar to the built-in
+    perl keyword local, but is implemented somewhat differently to give two
+    key advantages over regular local:
+
+      * You can dynamically assign to lvalue functions and accessors.
+
+      * You can dynamically assign to regular lexical variables.
+
+    Semantically, the behaviour can be considered equivalent to
+
+       {
+          my $old = $VAR;
+          $VAR = "new value";
+    
+          ...
+    
+          $VAR = $old;
+       }
+
+    Except that the old value will also be restored in the case of
+    exceptions, goto, next/last/redo or similar ways to leave the
+    controlling block scope.
+
+KEYWORDS
+
+ dynamically
+
+       {
+          dynamically LVALUE = EXPR;
+          ...
+       }
+
+    The dynamically keyword modifies the behaviour of the following
+    expression. which must be a scalar assignemnt. Before the new value is
+    assigned to the lvalue, its current value is captured and stored
+    internally within the Perl interpreter. When execution leaves the
+    controlling block for whatever reason, as part of block scope cleanup
+    the saved value is restored.
+
+    The LVALUE may be any kind of expression that allows normal scalar
+    assignment; lexical or package scalar variables, elements of arrays or
+    hashes, or the result of calling an :value function or method.
+
+    If the LVALUE has any GET magic associated with it (including a FETCH
+    method of a tied scalar) then this will be executed exactly once when
+    the dynamically expression is evaluated.
+
+    If the LVALUE has any SET magic associated with it (including a STORE
+    method of a tied scalar) then this will be executed exactly once when
+    the dynamically expression is evaluated, and again a second time when
+    the controlling scope is unwound.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

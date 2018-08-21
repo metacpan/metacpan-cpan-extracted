@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
 
 use IO::File;

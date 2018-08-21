@@ -1,6 +1,12 @@
 
 Release history for Types-Bool
 
+2.98012   2018-08-18 17:41:20-07:00 America/Los_Angeles
+
+    - Rename BOOL_CORE to BOOL_PACKAGE
+    - Make BOOL_PACKAGE exportable
+    - Rearrange POD sections
+
 2.98011   2018-05-14 18:19:25-07:00 America/Los_Angeles
 
     - Detach Types::Bool and the implementation package for booleans

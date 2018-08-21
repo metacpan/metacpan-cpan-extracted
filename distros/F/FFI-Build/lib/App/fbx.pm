@@ -8,7 +8,7 @@ use Cwd qw( getcwd );
 use File::Basename qw( basename dirname );
 
 # ABSTRACT: Command line interface to FFI::Build
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub main
@@ -75,7 +75,7 @@ App::fbx - Command line interface to FFI::Build
 
 =head1 VERSION
 
-version 0.03
+version 0.07
 
 =head1 SYNOPSIS
 

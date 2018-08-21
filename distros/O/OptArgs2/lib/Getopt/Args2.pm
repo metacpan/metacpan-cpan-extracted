@@ -4,7 +4,7 @@ sub Getopt::Args2::STYLE_NORMAL  { 2 }
 sub Getopt::Args2::STYLE_FULL    { 3 }
 
 package Getopt::Args2::Mo;
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 BEGIN {
 #<<< do not perltidy
@@ -23,7 +23,7 @@ use overload
   '""'     => 'as_string',
   fallback => 1;
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 sub new {
     my $proto = shift;
@@ -56,7 +56,7 @@ use warnings;
 use Getopt::Args2::Mo;
 use Carp ();
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 sub result {
     my $self = shift;
@@ -67,21 +67,30 @@ sub croak {
     my $self   = shift;
     my $result = Getopt::Args2::Result->new(@_);
 
-    {
-        # Internal packages we don't want to see for user-related errors
-        local @Getopt::Args2::Util::CARP_NOT = (
-            qw/
-              Getopt::Args2
-              Getopt::Args2::Arg
-              Getopt::Args2::Cmd
-              Getopt::Args2::Opt
-              Getopt::Args2::Util
-              /
-        );
+    # Internal packages we don't want to see for user-related errors
+    local (
+        @Getopt::Args2::CARP_NOT,      @Getopt::Args2::Arg::CARP_NOT,
+        @Getopt::Args2::Cmd::CARP_NOT, @Getopt::Args2::Fallback::CARP_NOT,
+        @Getopt::Args2::Opt::CARP_NOT, @Getopt::Args2::Mo::CARP_NOT,
+        @Getopt::Args2::Util::CARP_NOT,
+    );
 
-        # Carp::croak has a bug when first argument is a reference
-        Carp::croak( '', $result );
-    }
+    @Getopt::Args2::CARP_NOT         = @Getopt::Args2::Arg::CARP_NOT =
+      @Getopt::Args2::Cmd::CARP_NOT  = @Getopt::Args2::Fallback::CARP_NOT =
+      @Getopt::Args2::Opt::CARP_NOT  = @Getopt::Args2::Mo::CARP_NOT =
+      @Getopt::Args2::Util::CARP_NOT = (
+        qw/
+          Getopt::Args2
+          Getopt::Args2::Arg
+          Getopt::Args2::Cmd
+          Getopt::Args2::Opt
+          Getopt::Args2::Mo
+          Getopt::Args2::Util
+          /
+      );
+
+    # Carp::croak has a bug when first argument is a reference
+    Carp::croak( '', $result );
 }
 
 1;
@@ -91,7 +100,7 @@ use strict;
 use warnings;
 use Getopt::Args2::Mo;
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 has cmd => (
     is       => 'rw',
@@ -134,8 +143,17 @@ my %arg2getopt = (
 
 sub BUILD {
     my $self = shift;
-    $self->fallback( Getopt::Args2::Fallback->new( %{ $self->fallback } ) )
-      if $self->fallback;
+    if ( my $fb = $self->fallback ) {
+        Getopt::Args2::Util->croak( 'Arg::FallbackHashRef',
+            'fallback must be a HASH ref' )
+          unless 'HASH' eq ref $fb;
+
+        $self->fallback(
+            Getopt::Args2::Fallback->new(
+                %$fb, required => $self->required,
+            )
+        );
+    }
 }
 
 sub name_comment {
@@ -159,7 +177,7 @@ use strict;
 use warnings;
 use Getopt::Args2::Mo;
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 extends 'Getopt::Args2::Arg';
 
@@ -172,7 +190,7 @@ use strict;
 use warnings;
 use Getopt::Args2::Mo;
 
-our $VERSION = '0.0.10';
+our $VERSION = '0.0.11';
 
 has alias => ( is => 'ro', );
 
@@ -307,17 +325,7 @@ use Getopt::Args2::Mo;
 use List::Util qw/max/;
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '0.0.10';
-
-sub BUILD {
-    my $self = shift;
-
-    unless ( $self->name ) {
-        ( my $x = $self->class ) =~ s/.*://;
-        $x =~ s/_/-/g;
-        $self->name($x);
-    }
-}
+our $VERSION = '0.0.11';
 
 has abbrev => ( is => 'rw', );
 
@@ -338,7 +346,14 @@ has comment => (
 
 has hidden => ( is => 'ro', );
 
-has name => ( is => 'rw', );
+has name => (
+    is      => 'rw',
+    default => sub {
+        ( my $x = shift->class ) =~ s/.*://;
+        $x =~ s/_/-/g;
+        $x;
+    },
+);
 
 has optargs => ( is => 'rw', );
 
@@ -584,7 +599,7 @@ use Getopt::Long qw/GetOptionsFromArray/;
 use Exporter qw/import/;
 use Getopt::Args2::Mo;
 
-our $VERSION   = '0.0.10';
+our $VERSION   = '0.0.11';
 our @EXPORT    = (qw/arg class_optargs cmd opt optargs subcmd/);
 our @EXPORT_OK = (qw/usage/);
 
@@ -700,6 +715,31 @@ sub class_optargs {
 
         while ( my $try = shift @args ) {
             my $result;
+
+            if ( $try->isa eq 'SubCmd' ) {
+                if ( my $new_arg = $try->fallback ) {
+                    $try = $new_arg;
+                }
+                elsif ( $try->required ) {
+                    push(
+                        @errors,
+                        Getopt::Args2::Util->result(
+                            'Parse::SubCmdRequired', $cmd->usage
+                        )
+                    );
+                    last OPTARGS;
+                }
+                elsif (@$source) {
+                    push(
+                        @errors,
+                        Getopt::Args2::Util->result(
+                            'Parse::UnknownSubCmd', $cmd->usage
+                        )
+                    );
+                    last OPTARGS;
+                }
+            }
+
             if (@$source) {
 
                 push(
@@ -886,7 +926,7 @@ Getopt::Args2 - command-line argument and option processor
 
 =head1 VERSION
 
-0.0.10 (2018-06-26)
+0.0.11 (2018-08-18)
 
 =head1 SYNOPSIS
 

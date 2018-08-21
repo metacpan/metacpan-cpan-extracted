@@ -66,6 +66,5 @@ t/data/static/useVERSION.pm
 t/data/use_lib.pl
 t/rt90869.t
 t/Utils.pm
-wip/scan_dlls.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

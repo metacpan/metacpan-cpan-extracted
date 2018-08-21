@@ -17,6 +17,11 @@ use App::Cmd::Tester;
 use App::Cme ;
 use Config::Model qw/initialize_log4perl/;
 
+# work around a problem in IO::TieCombine (used by App::Cmd::Tester)
+# to avoid messing up output of stderr of tested command (See
+# ACHTUNG!! notes in IO::TieCombine doc)
+$\ = '';
+
 if ( $^O !~ /linux|bsd|solaris|sunos/ ) {
     plan skip_all => "Test with system() in build systems don't work well on this OS ($^O)";
 }
@@ -254,7 +259,7 @@ foreach my $test ( @script_tests) {
 
         file_contents_like $conf_file->stringify, $test->{test},
             "updated MY_HOSTID with script" ,{ encoding => 'UTF-8' };
-        is($ok->stderr.'', $test->{stderr} || '', 'check "'.$test->{label}.'" stderr content' );
+        is($ok->stderr.'', $test->{stderr} || '', 'run "'.$test->{label}.'" stderr content' );
         is($ok->stdout.'', $test->{stdout} || '', 'run "'.$test->{label}.'": stdout content' );
     };
 }

@@ -1,7 +1,8 @@
-use Test::More tests => 52;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 52;
 
 use PDF::Builder;
 
@@ -102,3 +103,5 @@ is($artbox[0], 0, 'Artbox LLX');
 is($artbox[1], 0, 'Artbox LLY');
 is($artbox[2], 70, 'Artbox URX');
 is($artbox[3], 80, 'Artbox URY');
+
+1;

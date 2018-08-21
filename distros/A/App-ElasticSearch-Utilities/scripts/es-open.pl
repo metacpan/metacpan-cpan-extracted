@@ -45,7 +45,7 @@ es-open.pl - Open any closed indices matching your paramters.
 
 =head1 VERSION
 
-version 5.9
+version 6.0
 
 =head1 SYNOPSIS
 

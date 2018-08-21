@@ -1,5 +1,11 @@
 Revision history for Data-MoneyCurrency
 
+0.06    So 19 Aug 2018 10:13:23 MDT
+        fixing mismatch of version number between .pm and dist.ini, no code changes
+
+0.05    Fr 17 Aug 2018 08:42:44 CDT
+        trying to solve ShareDir install issues, no code changes
+
 0.04    Wed Aug 15 07:20:01 CDT
         update ruby-money config
         switch to dzil for packaging/release

@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "plenigo GmbH"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "plenigo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Always" : "0.13",
+            "Crypt::JWT" : "0.022",
+            "Data::UUID" : "1.221",
+            "JSON" : "2.97001",
+            "Moo" : "2.003004",
+            "REST::Client" : "273",
+            "Throwable" : "0.200013",
+            "perl" : "5.010",
+            "strict" : "1",
+            "warnings" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/plenigo/plenigo_php_sdk.git",
+         "web" : "https://github.com/plenigo/plenigo_php_sdk"
+      }
+   },
+   "version" : "2.0003",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

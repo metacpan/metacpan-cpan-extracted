@@ -1,7 +1,8 @@
-use Test::More tests => 4;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 4;
 
 use PDF::Builder;
 
@@ -24,3 +25,5 @@ $object = $pdf->{'pdf'}->read_objnum(11, 0);
 
 ok($object,
    q{Read a number from an object stream});
+
+1;

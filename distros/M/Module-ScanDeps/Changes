@@ -1,3 +1,22 @@
+1.25  2018-08-18
+
+- Merge pull request #2 from shawnlaffan/master, thanx Shawn!
+  
+  continue scanning one-liners when use if, autouse or >5.010 found
+
+- Fix how data obtained from compiling or executing a file 
+  is incorporated (_info2rv).
+
+  Sanitize all pathnames to use slash (instead of backslash):
+  - members of @INC
+  - keys and values of %INC
+  - members of @dl_shared_objects
+  This should make stripping @INC prefixes finally work.
+
+- Add %Preload rule for FFI::Platypus
+
+- Add bugtracker to META.yml
+
 1.24  2017-06-28
 
 - Merge pull request from Salvador Fandiño (salva), thx!

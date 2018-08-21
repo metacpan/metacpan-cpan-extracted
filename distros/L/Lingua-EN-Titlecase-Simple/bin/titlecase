@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use 5.008001; use strict; use warnings; use utf8;
+
+use Lingua::EN::Titlecase::Simple;
+
+use open qw( :encoding(UTF-8) :std );
+use Getopt::Std 'getopts';
+
+getopts 'f', \my %opt;
+
+while ( readline ) {
+	$_ = lc if $opt{'f'};
+	print titlecase( $_ ), "\n";
+}

@@ -3,20 +3,18 @@ package PDF::Builder::Page;
 use base 'PDF::Builder::Basic::PDF::Pages';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use POSIX qw(floor);
-
-use PDF::Builder::Content;
-use PDF::Builder::Content::Text;
+use Scalar::Util qw(weaken);
 
 use PDF::Builder::Basic::PDF::Utils;
+use PDF::Builder::Content;
+use PDF::Builder::Content::Text;
 use PDF::Builder::Util;
-
-use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -43,7 +41,7 @@ sub new {
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
-    $self;
+    return $self;
 }
 
 =item $page = PDF::Builder::Page->coerce($pdf, $pdfpage)
@@ -71,7 +69,7 @@ sub update {
     my ($self) = @_;
 
     $self->{' apipdf'}->out_obj($self);
-    $self;
+    return $self;
 }
 
 =item $page->mediabox($w,$h)
@@ -261,6 +259,7 @@ sub fixcontents {
     if (ref($self->{'Contents'}) !~ /Array$/) {
         $self->{'Contents'} = PDFArray($self->{'Contents'});
     }
+    return;
 }
 
 sub content {
@@ -288,6 +287,7 @@ sub addcontent {
 
     $self->fixcontents();
     $self->{'Contents'}->add_elements(@objs);
+    return;
 }
 
 sub precontent {
@@ -295,6 +295,7 @@ sub precontent {
 
     $self->fixcontents();
     unshift(@{$self->{'Contents'}->val()}, @objs);
+    return;
 }
 
 =item $gfx = $page->gfx($prepend)
@@ -470,15 +471,14 @@ sub resource {
     }
 }
 
-sub ship_out
-{
+sub ship_out {
     my ($self, $pdf) = @_;
 
     $pdf->ship_out($self);
     if (defined $self->{'Contents'}) {
         $pdf->ship_out($self->{'Contents'}->elementsof());
     }
-    $self;
+    return $self;
 }
 
 sub outobjdeep {
@@ -488,7 +488,7 @@ sub outobjdeep {
         $self->{" $k"} = undef;
         delete($self->{" $k"});
     }
-    $self->SUPER::outobjdeep(@opts);
+    return $self->SUPER::outobjdeep(@opts);
 }
 
 =back

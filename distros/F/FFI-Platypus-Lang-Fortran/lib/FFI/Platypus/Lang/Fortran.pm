@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FFI::Platypus::Lang::Fortran::ConfigData;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -245,13 +245,15 @@ Perl:
  
  print "${r} + ${i}i\n";
 
-B<Discussion>: More recent versions of C<libffi> support complex types, 
-but they are not supported by L<FFI::Platypus> yet.  There is a work 
-around, however, at least for complex types passes as arguments.  They 
-are really two just two C<real*4> or C<real*8> types joined together 
-like an array or record of two elements.  Thus we can pass in a complex 
-type to a Fortran subroutine as an array of two floating points.  Take 
-care though, as this technique DOES NOT work for return types.
+B<Discussion>: More recent versions of C<libffi> and L<FFI::Platypus>
+support complex types, but not pointers to complex types, so they
+aren't (yet) much use when calling Fortran, which is pass by reference.
+There is a work  around, however, at least for complex types passes as 
+arguments.  They are really two just two C<real*4> or C<real*8> types
+joined together like an array or record of two elements.  Thus we can
+pass in a complex type to a Fortran subroutine as an array of two
+floating points.  Take  care though, as this technique DOES NOT work
+for return types.
 
 From my research, some Fortran compilers pass in the return address of 
 the return value as the first argument for functions that return a 

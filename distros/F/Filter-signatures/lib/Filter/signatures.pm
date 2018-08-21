@@ -3,7 +3,7 @@ use strict;
 use Filter::Simple;
 
 use vars '$VERSION';
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 =head1 NAME
 
@@ -62,7 +62,7 @@ A better hotfix is to upgrade to Perl 5.20 or higher and use the native
 signatures support there. No other code change is needed, as this module will
 disable its functionality when it is run on a Perl supporting signatures.
 
-=head2 Parentheses in default assignments
+=head2 Parentheses in default expresisons
 
 Ancient versions of Perl before version 5.10 do not have recursive regular
 expressions. These will not be able to properly handle statements such
@@ -73,6 +73,28 @@ as
 
 The hotfix is to rewrite these function signatures to not use parentheses. The
 better approach is to upgrade to Perl 5.20 or higher.
+
+=head2 Regular expression matches in default expressions
+
+To keep the argument parser simple, the parsing of regular expressions has been
+omitted. For Perl below 5.10, you cannot use regular expressions as default
+expressions. For higher Perl versions, this means that parentheses, curly braces
+and commas need to be explicitly escaped with a backslash when used as
+default expressions:
+
+    sub foo( $x = /,/ ) { # WRONG!
+    sub foo( $x = /\,/ ) { # GOOD!
+
+    sub foo( $x = /[(]/ ) { # WRONG!
+    sub foo( $x = /[\(]/ ) { # GOOD!
+
+The hotfix is to rewrite these default expressions with explicitly quoted
+commas, parentheses and curly braces. The better approach is to upgrade to
+Perl 5.20 or higher.
+
+=head2 Subroutine attributes
+
+Subroutine attributes are currently not supported at all.
 
 =head2 Line Numbers
 
@@ -134,10 +156,37 @@ sub kill_comment {
 sub parse_argument_list {
     my( $name, $arglist, $whitespace ) = @_;
     (my $args=$arglist) =~ s!^\(\s*(.*)\s*\)!$1!s;
-    my @args = map { kill_comment($_) } map { s!^\s*!!; s!\s*$!!; $_}
-        $args =~ m!((?:[^,$;]+|\Q$;\E.{4}\Q$;\E)+)!sg; # a most simple argument parser
+
+    my @args;
+    # A not so simple argument parser, but still good enough for < 5.10:
+    # We want to split on the outermost commas, so we find the position of these
+    # commas by replacing everything inside parentheses and curly brackets with
+    # whitespace. Then we have the positions of the relevant commas and can extract
+    # the arguments from that. Not elegant but works everywhere:
+    if( length $args ) {
+        my $splitlist = $args;
+        my $repl = " " x length $;;
+        $splitlist =~ s!\Q$;\E.{4}\Q$;\E!$repl    $repl!sg; # remove all string placeholders
+        1 while ($splitlist =~ s!\\.!  !g);                 # unquote all the things
+        #warn $splitlist;
+        1 while ($splitlist =~ s!(\([^(){}]*\)|\{[^(){}]*\})!" " x length($1)!ge); # Now, remove all nested parentheses stuff
+        #warn $splitlist;
+        my @argument_positions;
+        while( $splitlist =~ /,/g ) {
+            push @argument_positions, pos($splitlist);
+        };
+        push @argument_positions, length( $splitlist )+1;
+        my $lastpos = 0;
+        @args = map { kill_comment($_) } map { s!^\s*!!; s!\s*$!!; $_}
+                   map { my $r = substr $args, $lastpos, $_-$lastpos-1;
+                         #warn "$lastpos:$_:$r";
+                         $lastpos=$_;
+                         $r
+                   } @argument_positions
+                   ;
+    };
     my $res;
-    # Adjust how man newlines we gobble
+    # Adjust how many newlines we gobble
     $whitespace ||= '';
     #warn "[[$whitespace$args]]";
     my $padding = () = (($whitespace . $args) =~ /\n/smg);
@@ -175,7 +224,7 @@ sub parse_argument_list {
 
         # Make sure we return undef as the last statement of our initialization
         # See t/07*
-        push @defaults, "();" if @defaults;
+        push @defaults, "();" if @args;
 
         $res = sprintf 'sub %s { my (%s)=@_;%s%s', $name, join(",", @args), join( "" , @defaults), "\n" x $padding;
         # die sprintf("Too many arguments for subroutine at %s line %d.\n", (caller)[1, 2]) unless @_ <= 2
@@ -205,29 +254,31 @@ if( $] >= 5.010 ) {
     no warnings 'redefine';
     eval <<'PERL_5010_onwards';
 sub transform_arguments {
-        # This should also support
-        # sub foo($x,$y,@) { ... }, throwing away additional arguments
-        # Named or anonymous subs
     # We also want to handle arbitrarily deeply nested balanced parentheses here
         no warnings 'uninitialized';
 
-    # For Perl 5.10 onwards we have nice recursive patterns and comments
-        s{\bsub(\s*) #1
-           (\w*) #2
-           (\s*) #3
+        s{\bsub(\s*)       #1
+           (\w*)           #2
+           (\s*)           #3
            \(
-           (\s*) #4
-           (     #5
+           (\s*)           #4
+           (               #5
                 (          #6
                    (?:
-                     (?>[^()]+)
+                     \\.            # regex escapes and references
                      |
-                     \(\s*
-                         (?6)? # recurse for parentheses
-                     \s*\)
-                     )
+                     \(
+                         (?6)?      # recurse for parentheses
+                     \)
+                     |
+                     \{
+                         (?6)?      # recurse for curly brackets
+                     \}
+                     |
+                     (?>[^\\\(\)\{\}]+) # other stuff
+                     )+
                 )*
-             \@?
+             \@?                    # optional slurpy discard argument at the end
            )
            (\s*)\)
            (\s*)\{}{
@@ -243,7 +294,7 @@ sub import {
     my( $class, $scope ) = @_;
 # Guard against double-installation of our scanner
     if( $scope and $scope eq 'global' ) {
-        
+
         my $scan; $scan = sub {
             my( $self, $filename ) = @_;
 
@@ -323,6 +374,9 @@ rest are welcome.
 =head1 SEE ALSO
 
 L<perlsub/Signatures>
+
+L<App::sigfix>, which transforms your source code directly between
+the different notations without employing a source filter
 
 L<signatures> - a module that doesn't use a source filter but optree
 modification instead

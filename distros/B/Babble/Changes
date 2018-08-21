@@ -1,5 +1,11 @@
 Revision history for Babble
 
+0.090006
+          - Work around regexp engine weirditude on 5.18+
+0.090005
+          - Sigify anonymous as well as named subroutines
+0.090004
+          - Add sigify plugin
 0.090003
           - Fix postderef to actually remove experimental lines
 0.090002

@@ -1,5 +1,6 @@
 .perltidyrc
 .ship.conf
+.travis.yml
 Changes
 cpanfile
 lib/App/tt.pm

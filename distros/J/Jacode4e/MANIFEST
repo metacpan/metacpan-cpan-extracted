@@ -65,6 +65,7 @@ t/0011_option_input_layout.t
 t/0012_option_output_shifting.t
 t/0013_option_space.t
 t/0014_option_geta.t
+t/0015_option_override_mapping.t
 t/0020_cp932_multicoded.t
 t/0021_cp932_vs_utf8_test.t
 t/0117_cp932_vs_cp932x.t

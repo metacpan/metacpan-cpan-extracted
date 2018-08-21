@@ -1,5 +1,5 @@
 name = PDF-Builder
-version = 3.006
+version = 3.010
 author  = Phil Perry <phil4597@catskilltech.com>
 license = LGPL_2_1
 copyright_holder = Phil Perry
@@ -13,16 +13,17 @@ repository.type = git
 format = %-9v %{yyyy-MM-dd}d
 
 [Prereqs]
-perl = v5.8.5
+perl = v5.16.0
 Compress::Zlib = 1.0
-Font::TTF = 0
+Font::TTF = 1.04
 
 [Prereqs / TestRequires]
 Test::Exception = 0
-Test::Memory::Cycle = 0
+Test::Memory::Cycle = 1.0
 
-[OSPrereqs / MSWin32]
-Win32::TieRegistry = 0
+#[OSPrereqs / MSWin32]
+#Win32::TieRegistry = 0
+#MacPerl = 0
 
 [GatherDir]
 include_dotfiles = 1

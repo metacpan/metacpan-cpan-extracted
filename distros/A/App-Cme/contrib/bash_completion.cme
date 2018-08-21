@@ -10,6 +10,8 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
+global_options='--force-load --create --trace --quiet --file --verbose --canonical'
+
 _cme_models()
 {
    MODELS=$(perl -MConfig::Model::Lister -e'print Config::Model::Lister::models;')
@@ -40,7 +42,7 @@ _cme_cmd_run()
         var=$( perl -E 'my @v; while(<>) { push  @v, /\$(\w+)/g }; my %map = map { ($_ => 1)} @v; print map { "$_= " } sort keys %map;' $script);
         COMPREPLY=( $( compgen -W "$var" -- $cur ) )
     elif [[ $prev != '-list' ]]; then
-        COMPREPLY=( $( compgen -W "-arg -doc" -- $cur ) )
+        COMPREPLY=( $( compgen -W "--arg --doc --commit --no-commit --cat $global_options" -- $cur ) )
     fi
 }
 
@@ -61,8 +63,6 @@ _cme()
     COMPREPLY=()
     _get_comp_words_by_ref -n : cur prev
 
-    global_options='-force-load -create -trace -quiet -file'
-
     if [[ $COMP_CWORD -eq 1 ]] ; then
         _cme_commands
     elif _cme_handle_cmd_arg; then
@@ -71,34 +71,37 @@ _cme()
         _cme_appli
     elif ! _cme_handle_app_arg; then
         case $prev in
-            -ui)
+            --ui)
                 COMPREPLY=( $( compgen -W 'tk curses shell' -- $cur ) )
             ;;
-           -dumptype)
+           --dumptype)
                 COMPREPLY=( $( compgen -W 'full preset custom' -- $cur ) )
             ;;
-           -model-dir|-root-dir|-fuse-dir)
+           --format)
+                COMPREPLY=( $( compgen -W 'yaml json perl cml' -- $cur ) )
+            ;;
+           --model-dir|-root-dir|-fuse-dir)
                 _filedir -d
             ;;
-           -file)
+           --file)
                 _filedir
             ;;
              *)
             case ${COMP_WORDS[1]} in
                 check)
-                   COMPREPLY=( $( compgen -W "$global_options -strict" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --strict" -- $cur ) )
                 ;;
                 dump)
-                   COMPREPLY=( $( compgen -W "$global_options -dumptype" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --dumptype --format" -- $cur ) )
                 ;;
                 edit)
-                   COMPREPLY=( $( compgen -W "$global_options -ui -open-item" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --ui --open-item" -- $cur ) )
                 ;;
                 fix)
-                   COMPREPLY=( $( compgen -W "$global_options -from -filter" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --from --filter" -- $cur ) )
                 ;;
                 fusefs)
-                   COMPREPLY=( $( compgen -W "$global_options -fuse-dir -dfuse -dir-char" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --fuse-dir --dfuse --dir-char" -- $cur ) )
                 ;;
                 migrate)
                    COMPREPLY=( $( compgen -W "$global_options" -- $cur ) )
@@ -108,17 +111,14 @@ _cme()
                 ;;
                 # modify completion could be much more elaborate...
                 modify)
-                   COMPREPLY=( $( compgen -W "$global_options -save -backup -format -verbose" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --save --backup --format" -- $cur ) )
                 ;;
                 run)
-                   COMPREPLY=( $( compgen -W "$global_options -doc -cat -nc --no-commit -verbose" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --doc --cat --no-commit" -- $cur ) )
 				;;
                 search)
-                   COMPREPLY=( $( compgen -W "$global_options -search -narrow-search" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options --search --narrow-search" -- $cur ) )
 				;;
-				edit)
-                   COMPREPLY=( $( compgen -W "$global_options -open-item" -- $cur ) )
-                ;;
             esac
         esac
     fi

@@ -5,11 +5,30 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
 
-# basic language word-splitting routines for PDF::Builder.
-# This is currently all that is supported. Not language-specific.
+=head1 NAME
+
+PDF::Builder::Content::Hyphenate_basic - Simple hyphenation capability
+
+=head1 SYNOPSIS
+
+These are internal routines that are somewhat experimental, and may (or may
+not) be extended in the future. They are called from various Content routines
+that take long strings of text and split them into fixed-length lines.
+
+Words are split to fill the line most completely, without regard to widows and
+orphans, long runs of hyphens at the right edge, "rivers" of space flowing
+through a paragraph, and other problems. Also, only simple splitting is done
+(not actually I<words>), on a simple, language-independent basis. No dictionary 
+or rules-based splitting is currently done.
+
+This functionality may well be replaced by "hooks" to call language-specific
+word-splitting rules, as well as worrying about the appearance of the results
+(such as Knuth-Plass).
+
+=cut
 
 # Main entry. Returns array of left portion of word (and -) to stick on end of
 # sentence (may be empty) and remaining (right) portion of word to go on next

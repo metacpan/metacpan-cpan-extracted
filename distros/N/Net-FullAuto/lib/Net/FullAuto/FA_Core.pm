@@ -1587,7 +1587,8 @@ sub test_for_amazon_ec2 {
 
    if ($^O eq 'linux' || $^O eq 'freebsd') {
       if ((-e "/etc/system-release-cpe") &&
-            (-1<index `cat /etc/system-release-cpe`,'amazon:linux')) {
+            ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
+            (-1<index `cat /etc/system-release-cpe`,'amazon_linux'))) {
          $main::amazon{'ami'}='';
          $main::system_type='ami';
       } elsif ((-e "/etc/os-release") &&
@@ -12118,7 +12119,8 @@ sub check_for_amazon_localhost {
 
    if ($^O eq 'linux') {
       if ((-e '/etc/system-release-cpe') &&
-            (-1<index `cat /etc/system-release-cpe`,'amazon:linux')) {
+            ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
+            (-1<index `cat /etc/system-release-cpe`,'amazon_linux'))) {
          return ['ami',get_amazon_external_ip()];
       } elsif ((-e '/etc/os-release') &&
             (-1<index `cat /etc/os-release`,'ubuntu')) {

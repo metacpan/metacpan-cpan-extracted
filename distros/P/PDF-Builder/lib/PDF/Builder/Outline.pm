@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -97,6 +97,7 @@ sub fix_outline {
     $self->first();
     $self->last();
     $self->count();
+    return;
 }
 
 =item $otl->title($text)

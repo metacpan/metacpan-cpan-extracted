@@ -1,0 +1,526 @@
+See also Changes_2018 (and beyond) and Changes files for further change logs.
+See also Changes-ver_2 for changes released for PDF::API2, and incorporated
+into PDF::Builder.
+
+3.009     2017-11-27  
+
+   lib/PDF/Builder.pm fix minor POD glitches, t/00-all-usable.t fix behavior
+     when Graphics::TIFF not installed (skip *_GT use tests).
+
+3.008     2017-11-26  
+
+   examples/ShowFont.pl added to list out many font file glyphs.
+     examples.bat, examples/README, examples/examples.output updated.
+
+   lib/PDF/Builder.pm [ref RT 121912/#67 and also RT 41971/#5] fix outlines 
+     method (thanks to "futuramedium"). Update test case into an example, and
+     add to examples.bat, MANIFEST, examples/README, examples/examples.output,
+     and (new) examples/055_outlines and examples/resources/samples_55.pdf.
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Resource/BaseFont.pm, 
+     lib/PDF/Builder/Resource/Font/SynFont.pm, examples/021_synfonts
+     [ref RT 120048/#47] fixes for synthetic fonts (via "futuramedium"). Some 
+     items carried over to new issues #79 and #81, and this one closed. 
+     021_synfonts make cleaner selection of what to run (which font types,
+     which fonts within a type, which variants).
+
+   lib/PDF/Builder.pm [ref RT 122393/#72] further work on diagnosing reported
+     problem. If this was actually a PDF::API2/Builder problem at one time, and 
+     not simply a corrupted local font issue, it has apparently been cleared 
+     up. Documented supported CJK names and aliases in Builder's POD.
+
+   lib/PDF/Builder/Annotation.pm, examples/040_annotation, 
+     examples/041_annot_fileattach (new), examples/resources/pod2htmd.temp 
+     (new), examples/resources/sample.txt (new), MANIFEST, DEPRECATED, 
+     examples.bat, examples/README, examples/examples.output, t/annotate.t 
+     [ref RT 117942/#41] (thanks to Johan Vromans). 
+     Extensions to annotation methods plus new file attachment annotation code 
+     contributed by Johan. There are still some minor glitches in the behavior, 
+     including the "border" specification not working, and inconsistent icon
+     size, so I'm leaving the issue open for now. Also, the annotation pdfile() 
+     method has been deprecated and replaced by pdf_file().
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm (new),
+     lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm (new), MANIFEST,
+     KNOWN_INCOMP, t/tiff.t, lib/PDF/Builder/Resource/XObject/Image/TIFF.pm,
+     lib/PDF/Builder/Lite.pm [ref RT 118047/#42] (thanks to Jeffrey Ratcliffe).
+     Use Jeffrey's Graphics::TIFF wrapper around libtiff.a to simplify and
+     correct many bugs in TIFF support. As libtiff.a is not available on all
+     systems, add this as an extension (_GT modules) and have Builder.pm
+     select which one to use (preferably the new Graphics::TIFF-using version,
+     with fallback to the old pure Perl version, which has not been fixed). 
+     This can be overridden (force old version) with the -nouseGT option (see 
+     t/tiff.t).
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm,
+     lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm,
+     lib/PDF/Builder/Basic/PDF/File.pm [ref RT 84665/#2] updates and fixes
+     while working on TIFF G3/G4 compression bug.
+
+3.007     2017-09-26
+
+   Makefile.PL add missing prerequisite Test::Memory::Cycle.
+
+3.006     2017-09-23
+
+   lib/PDF/Builder/Page.pm POD glitch reported by Kwalitee fixed.
+
+   lib/PDF/Builder.pm update history to mention Text::PDF origin (requested
+     by SPROUT)
+
+   lib/PDF/Builder/Win32.pm, examples/027_winfont moved to examples/Windows.
+     examples/README, examples/examples.output, examples.bat, Makefile.PL, 
+     MANIFEST updated. The Windows-specific code in Win32.pm has not worked 
+     since at least Windows 7, and the demo doesn't do anything particularly 
+     useful. Rather than erasing the code, it is still available if you 
+     actually use it (move Win32.pm back to Builder/ and install 
+     Win32::Tie::Registry), and you can look at it for examples of Windows 
+     Registry access.
+
+   Makefile.PL cleanup and rearrangement (thanks to Johan Vromans). Note that
+     the Perl minimum has been upped from 5.8.5 to 5.8.6, for better UTF-8
+     support, and a number of prereqs found in CORE have been removed. Still
+     unresolved is the best way (and whether) to put $VERSION in all .pl and
+     .pm files, or just Builder.pm, and the associated build process. Also
+     under discussion is how to indicate when a file was last updated -- is
+     there a better way than $LAST_UPDATE? It is provided as a local variable
+     in case anyone wants to access it in their code.
+
+   examples/020_corefonts and examples/021_synfonts [ref #68, CTS 9] updated 
+     "@fonts" list to "@planes" to clarify that these fonts are 256 character 
+     planes of part of a font's glyph list. Also updated 
+     lib/PDF/Builder/Resource/Font.pm to document the automap() method, and 
+     lib/PDF/Builder.pm to mention that UTF-8 cannot be used in corefonts and 
+     psfonts (at least, non-CID fonts). PS (Type 1) fonts may use automap(), 
+     although such fonts are usually (non-CID) limited to 256 glyphs. In that 
+     case, automap() will return nothing for the extended planes.
+
+   lib/PDF/Builder.pm and lib/PDF/Builder/Resource/Font.pm update comments 
+     (POD) on character encoding (per Johan Vromans).
+
+   lib/PDF/Builder/Content/Hyphenate_basic.pm in basic hyphenation, split word 
+     with SHY (soft hyphen) instead of -, so a screen reader or other text 
+     scraper or resizable display knows it can omit the hyphen when gluing a 
+     word back together. A SHY is supposed to display as a normal hyphen -.
+
+   lib/PDF/Builder/Resource/XObject/Image/TIFF.pm (reported by Ivan Middleton)
+     [ref RT 15730, Rejected] the BlackIs1 DecodeParm hash member was misspelled
+     as Blackls1 (el instead of EYE). BlackIs1 has been added, and Blackls1 is 
+     now DEPRECATED. It will be removed some time after July 2018, so please 
+     update your code if you use it. The original bug report also stated that 
+     the value of this member /may/ be the reverse of what it should be, so 
+     further corrections to the code /may/ be necessary in the future.
+
+   lib/PDF/Builder.pm (per Johan Vromans) add $VERSION to Builder.pm so that
+     a developer can run PDF::Builder directly from git.
+
+   Please read the DEPRECATED file (new) for a list of deprecated names and
+     interfaces which will disappear at some time in the future!
+
+   The build process has been modified to ensure that all text (non-binary) 
+     files are now "Unix style" (LF for end-of-line) per Jeffrey Ratcliffe. 
+     Before, some text files were "DOS style" (CRLF for end-of-line), which 
+     caused problems for tools used by some Linux-based developers. DOS-only 
+     files, such as .bat files, have been left in DOS style.
+
+   lib/PDF/Builder.pm the default /Producer PDF tag had the producer's operating
+     system in the string, which led to different PDF file lengths depending on 
+     which OS a PDF was produced on. This has been changed to a URL for the 
+     support area for this product. Of course, you can always override the 
+     Producer (and Creator) tags with whatever strings you want (see the info() 
+     call).
+
+   t-tests.bat (per Johan Vromans and Jeffrey Ratcliffe) add some comments on
+     ways to run t tests in various situations.
+
+   examples/012_pages insert pages i-iii in front of other pages, to show how
+     (for instance) a Table of Contents could be inserted after writing the 
+     rest of the document.
+
+   examples/ font display utilities change Unicode formatting to U+nnnn and
+     align character description text under character box.
+
+   examples/021_psfonts added to display Type1 fonts (.pfa, .pfb glyph files
+     and .afm, .pfm metrics files).
+
+3.005     2017-07-16
+
+   Some minor POD cleanups (missing > brackets) and fix VERSION in .pm files.
+   Otherwise no code changes. Some build cleanup.
+
+3.004     2017-07-12
+
+   updates to official CPAN release (2.033) included:
+
+    - [RT #120756] Eliminate a warning for an ambiguous call to
+      CORE::open (first reported by Abdelbaki Brahmia). fix already in
+      lib/PDF/Builder/Basic/PDF/File.pm
+
+    - [RT #121832] fix t/resources/sample-xrefstm.pdf
+            NOTE: STILL DOES NOT SEEM TO WORK
+
+   Hyphenate_en.pm changed to Hyphenate_basic.pm, and scope of built-in
+   hyphenation reduced somewhat.
+
+   Prepare for release as PDF::Builder on GitHub and CPAN.
+
+   All modules restore VERSION line to library format, and add $LAST_UPDATE to
+   show when last time the module was manually edited. The $VERSION seen in a
+   CPAN distribution will be the normal overall version, while $LAST_UPDATE
+   will be the last time that the module was touched (changed). Many modules not
+   previously updated with Perl formatting and POD cleanup were cleaned up, and 
+   given $LAST_UPDATE of 3.004. The change of API2 to Builder and the addition 
+   of $LAST_UPDATE by themselves did not change $LAST_UPDATE to 3.004.
+
+3.003     2017-05-01   (revised: change API2 references to Builder)
+
+   updates to official CPAN release (currently 2.032 in-progress) included
+   no updates to official CPAN release since 2.031 (in 3.001)
+
+   There are a number of changes to code, which /may/ have a negative effect on
+   poorly written code (i.e., produce different results), but are believed not 
+   to affect properly written code. These are the removal of "~time()" from 
+   resource names, the enabling of save() and restore() for "text" objects, and
+   settings being returned by certain text and graphics calls during a setting
+   call. See additional information below.
+
+   lib/PDF/Builder/Resource/CIDFont/TrueType.pm
+   lib/PDF/Builder/Resource/Font/BdFont.pm
+   lib/PDF/Builder/Resource/Font/CoreFont.pm
+   lib/PDF/Builder/Resource/Font/Postscript.pm [ref RT #105579 and #113084 (were
+     open)] remove ~time() from font resource names. It appears to be 
+     unnecessary, and made PDFs non-deterministic (two runs with the same input 
+     had different output), making output comparisons difficult for developers.
+     Commented out lines containing ~time(), so they can be restored easily.
+     **Please report any problems which appear to be resource name collisions**
+     General syntax and POD cleanup of those modules, including in BdFont.pm
+     giving a better prefix than "pdfkey()pdfkey()".
+
+   lib/PDF/Builder/Content.pm general code cleanup, some POD improvements.
+     Cleaned up advancewidth() method (redundant code) and clarified options.
+     Split out methods text_center(), text_right(), text_justified(),
+       text_fill_left(), text_fill_center(), text_fill_right(),
+       text_fill_justified(), paragraph(), section(), and textlabel() into
+       lib/PDF/Builder/Content/Text.pm. This was an already-existing stub with
+       only a new() method [ref RT #98540 (was rejected)].
+   lib/PDF/Builder/Resource/XObject/Form/Hybrid.pm needed to add Content::Text
+     to the "use base" list.
+
+   lib/PDF/Builder/Content/Text.pm 
+   
+     Document (in the POD) paragraph(), section(), and textlabel(). These were 
+     undocumented "developer methods". Also improve the code and add options to 
+     indent/outdent paragraphs and add space between them. Authors were already 
+     using at least the textlabel() method, and some may have already been 
+     using paragraph() and section().
+
+     Method text_left() added as an alias for Content.pm's text(), and 
+     text_fill() added as alias for text_fill_left().
+
+     [ref RT #98546 (was open)] text_fill_justified() add option 
+     -last_align => 'left' (default), 'center', or 'right' to not 
+     stretch last line. 
+
+     [ref RT #98546 (was open)] general improvements to justified text. Instead
+     of stretching/squeezing with hscale(), wordspace() and charspace() are
+     used to fit the line. If this isn't enough, hscale() will be used as
+     a last resort (as it severely distorts the characters).
+
+     [ref RT #98548 (was rejected)] added preliminary code for line splitting
+     (word hyphenation). This currently splits on soft hyphens, after runs of
+     digits or ASCII letters, after certain punctuation, and within camelCase
+     text. It does NOT yet split up normal words (still looking for a good
+     algorithm to do that). /lib/PDF/Builder/Content/Hyphenate_en.pm added, is
+     intended for English language line splitting (other languages could be
+     added, including specific versions of English). THIS CODE, IN ITS CURRENT
+     STATE, IS EXPERIMENTAL AND SHOULD NOT BE USED FOR PRODUCTION. IT MAY
+     CHANGE CONSIDERABLY OVER TIME.
+
+   examples/Content.pl split out examples/ContentText.pl to reflect change
+     in organization. Update ContentText.pl to reflect new material.
+
+   examples/BarCode.pl added to print out the eleven 1D barcodes supported by 
+     PDF::Builder. There are many more out there (especially UPC variants) that
+     it would be nice to add. Plus, there are 2D and QR codes to do. Two
+     (currently empty) subdirectories added under 
+     PDF::Builder::Resource::XObject::Form for future 2D and QR additions.
+     We would appreciate if someone could check that the produced barcodes are
+     correct, and if there are limits on the character set and length of the
+     data that should be implemented in the code. For example, the samples for
+     code 3 of 9 and code 3 of 9 with full ASCII and check digit look like 
+     they might be the same, and EAN-128's text is left justified rather than
+     centered. CODE 128 C doesn't seem to work with all numbers (count 2n).
+
+     All in all, we would advise against using the barcodes until they have
+     been verified. Their behavior is just too odd to be comfortable that
+     they are correctly drawn, particularly adjacent bars apparently merging 
+     (and separating) as you zoom in and out.
+
+   lib/PDF/Builder/Page.pm  [ref RT #98576 (was rejected), CTS 7] clarify the 
+     interactions among multiple graphics and/or multiple text objects on one 
+     page. While PDF::Builder does keep the settings separate (e.g., one 
+     object's linewidth does not affect another object's linewidth), output (to 
+     a stream) is for an entire object at a time (in the order that the graphics
+     and text objects were defined). PDF, in turn, has essentially one graphics 
+     + text state, and the state at the end of one stream becomes the entry 
+     state for the next stream. Also, many graphics attributes affect text 
+     output. See the updated POD for more information.
+
+   lib/PDF/Builder/Content.pm  [ref CTS 7] clarify what is saved and restored
+     in the graphics state with the save() and restore() methods. Note that 
+     even though the text state uses many graphics attributes (linewidth, 
+     linedash, etc.), the save() and restore() methods /were/ ignored (no-ops) 
+     on text objects. Now save() and restore() are enabled for "text" objects. 
+     See the updated POD for more information.
+
+   lib/PDF/Builder/Content.pm
+   lib/PDF/Builder/Util.pm
+   lib/PDF/Builder/Resource/Font/SynFont.pm [ref RT #98576 (was rejected)] add
+     caution that Math::Trig::deg2rad() treats 360 degrees as 0! It cannot be
+     used for closed loops such as circles and ellipses (sweep 0 to 360).
+
+   lib/PDF/Builder/Basic/PDF/File.pm  minor code cleanup (adding parens to fns).
+
+   lib/PDF/Builder.pm
+   lib/PDF/Builder/Content.pm
+   lib/PDF/Builder/Resource/ExtGState.pm
+   lib/PDF/Builder/Resource/XObject/Image.pm
+   lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm  deprecated methods 
+     (renamed or absorbed into other methods) get warning messages output.
+     General syntax and POD cleanup of those modules.
+   lib/PDF/Builder/Resource/XObject/Image.pm
+   lib/PDF/Builder/Resource/XObject/Image/GD.pm
+   lib/PDF/Builder/Resource/XObject/Image/GIF.pm
+   lib/PDF/Builder/Resource/XObject/Image/JPEG.pm
+   lib/PDF/Builder/Resource/XObject/Image/PNG.pm
+   lib/PDF/Builder/Resource/XObject/Image/PNM.pm
+   lib/PDF/Builder/Resource/XObject/Image/TIFF.pm  update to remove use of
+     deprecated methods. General syntax and POD cleanup of those modules.
+   t/content.t remove meterlimit and hspace tests to avoid deprecated messages
+
+   lib/PDF/Builder/Content.pm  
+   lib/PDF/Builder/Content/Text.pm [ref RT #98543 (was rejected)] clarify that 
+     most public methods now (if they didn't already) return $self, permitting 
+     chaining of calls and more consistent behavior. There are some 37 calls
+     which return specified values (other than the content object) under at
+     least some circumstances. The POD has been updated to reflect these 
+     changes.
+    
+     * linewidth(), linecap(), linejoin(), miterlimit(), and flatness()
+     now return the current setting if called with no arguments, and continue 
+     to return $self otherwise, permitting chaining.
+     * Since linedash() is a legal call (for a solid line), linedash(-1) is used
+     to return the current setting (array of a dash pattern anonymous array 
+     and the offset). $self is returned otherwise, permitting chaining.
+     * strokecolor() and fillcolor() return the current setting (array) if 
+     called with no arguments, otherwise return $self (to permit chaining). 
+     This is a minor change from old usage, if you were /setting/ a fill or 
+     stroke color and immediately reading back the result /in the same call/.
+
+     There does not appear to be a consistent way to synchronize settings
+     changes between ExtGState and Content. Line width, line cap style, line
+     join style, miter limit, dash pattern, and flatness can be set in both
+     Content and ExtGState, but since they affect different contexts, there is
+     no apparent way to transfer a setting from Content to ExtGState or 
+     vice-versa. Anyway, be careful about mixing ways of making settings 
+     changes.
+
+     Keep in mind the way that graphical and text operations are output to PDF,
+     and how PDF in turn processes these streams. Anything that returns the
+     "current graphics state" (including text state) may not quite match up 
+     with what PDF's rendering engine is actually using at that moment, due to 
+     the exact order of operations (as well as Content vs. ExtGState changes).
+     All changes to one object (text or graphics) should be processed in order,
+     but remember that all of one object will be output first, and then all of
+     the next object, and so on.
+
+     Finally, I decided that it was important to have the value-returning
+     text functions (charspace, wordspace, hspace, lead, render, rise) behave 
+     in a similar manner to the value-returning graphics functions. Therefore, 
+     these functions have been changed to only return their current value when 
+     no argument is given, and to return $self when they are used to set the 
+     value. The (new) value is no longer returned when it is set, but that is
+     not expected to be a major use of the functions.
+
+   lib/PDF/Builder/Content.pm  
+     Document discrepancy in formimage(), where the scale(s) needed are quite
+     different for images (e.g., JPEG) and barcodes. Images are scaled in 
+     pixels, and naturally display as approximately 1 point square, while
+     barcodes are already scaled in points, so you want a scale of approximately
+     1. Multiplying by the "image" width and height within formimage() works
+     great for true images, but way overscales barcodes, requiring them to be
+     manually scaled down by 1/width and 1/height. So, formimage() does not
+     multiply by the original image height and width, leaving that to the user
+     to do in the call (no code change). 
+
+     Fix bug in advancewidth(), where %opts were not being handled correctly.
+
+   examples/*
+     add use strict and warnings, minor code cleanup. Change graphics context
+     calls to textlabel() to text context. In most examples, needed to check
+     for undefined Unicode points so as not to get "undefined value" errors.
+     021_synfonts fix to page titles (fix font name).
+
+     two examples (022 truefonts with UTF-8 diacritic and 023 CJK fonts) are
+     now considered to be working properly (see README).
+
+   /
+     add examples.bat (Windows) to run everything in the examples/ directory.
+     Note this is a HUGE amount of output!
+
+     add contrib.bat (Windows) to run everything in the contrib/ directory.
+     This needs to be run after examples.bat, as it uses several PDFs from
+     examples run.
+
+3.002     2017-03-21   (revised: change API2 references to Builder)
+
+   updates to official CPAN release (currently 2.032 in-progress) included
+   no updates to official CPAN release since 2.031 (in 3.001)
+
+   lib/PDF/Builder.pm
+   lib/PDF/Builder/Page.pm  [ref RT #98547] (was open) add %option -compress to
+     new() call:  $pdf = PDF::Builder->new(-compress => 'none');. This is the
+     equivalent of the old $pdf = PDF::Builder->new(); and
+                           $pdf->{'forcecompress'} = 0;  calls. 
+     This turns off "compressFlate" for debugging purposes, so you can edit
+     the PDF file and see the actual output (uncompressed form). The default
+     value is 'flate'. The internal value (forcecompress) is now 'none' or
+     'flate', so any code accessing this value should be updated. 0 and >0
+     values are still handled by PDF::Builder (as none or flate).
+     open_scalar() call can also use -compress option.
+   t/*.t tests that set 'forcecompress' to 0 have been updated to the new
+     -compress flag.
+
+   lib/PDF/Builder/Basic/PDF/Pages.pm  Where is the code for rebuild_tree()? It 
+     appears to be a dummy stub. Added warning in POD not to use, and opened 
+     bug CTS 3.
+
+   examples/* have been updated and the code cleaned up. Several broken
+     examples have been fixed. 024_bmpfonts has been renamed to 024_bdffonts
+     (bitmap distribution format) to better reflect its purpose and reduce
+     confusion about what it does. All examples retested with 3.002. All font
+     listings should now be ordered top to bottom 0x to Fx.
+   lib/PDF/Builder/Win32.pm  enumwinfonts() not working (CTS 4).
+
+   contrib/text2pdf.pl [ref RT #87859] (was open) "hankivy"'s updated text2pdf 
+     utility further enhanced and added to the distribution.
+
+   lib/PDF/Builder/Basic/PDF/File.pm  open() call changed to CORE::open() to
+     stop error during certain operations.
+
+   lib/PDF/Builder.pm  method synfont() was missing $basefont parameter
+
+   lib/PDF/Builder/Resource/Font/CoreFont/bankgothic.pm incorrectly named method
+     fontdata() renamed to data() for code consistency.
+
+   lib/PDF/Builder.pm
+   lib/PDF/Builder/Basic/PDF/File.pm
+   lib/PDF/Builder/Basic/PDF/Pages.pm
+   lib/PDF/Builder/Resource/Font/SynFont.pm  minor code style and POD cleanup.
+
+   t-tests.bat added (Windows) to run all t tests for mass testing
+
+   lib/PDF/Builder/Util.pm  documented paper_size() call, add str2dim(), did
+                         some general cleanup of POD
+
+3.001     2017-01-30   (revised: change API2 references to Builder)
+
+based on CPAN release 2.029     2016-10-09
+updated to CPAN release 2.030   2016-10-13, but VERSION left at 2.029 in files
+  (it's questionable whether it's good to bump up the VERSION in a file unless 
+   the file has changed -- you can argue it both ways: show that a file has NOT
+   missed an update, versus last version that the file changed at; I prefer
+   the latter)
+updated to CPAN release 2.031   2016-01-26
+
+Content:
+
+   t/content.t  [ref RT #98574] (was resolved) add some comments, pie() test 
+     that depends on fixes to Content.pm, correct Bogen comment. Add many more
+     fillcolor() and strokecolor() tests. Add nl(0) and nl(width) tests. Add
+     linedash test for hash argument list.
+
+   examples/  restore old set of examples. These were internal developer test
+     cases, and provide some useful sample code, even though some of them are 
+     not currently operational (it's on my to-do list). See the README file 
+     for the status of known problems.
+
+     Also include my demo program Content.pl, to demonstrate the calls in the
+     Content.pm module.
+
+   lib/PDF/Builder/Resource/PaperSizes.pm  [ref RT #98551] (was resolved) add 
+     many more useful sizes (see code for full list). These additional paper 
+     sizes were removed by the version 2 maintainer.
+
+   additional syntax cleanup:
+     lib/PDF/Builder.pm
+     lib/PDF/Builder/Win32.pm
+     lib/PDF/Builder/Basic/PDF/File.pm
+     lib/PDF/Builder/Resource/XObject/Image/TIFF.pm  and TIFF/File.pm
+
+   lib/PDF/Builder/Resource/Font/BdFont.pm fix typo in error message.
+     additional syntax cleanup.
+
+   lib/PDF/Builder/Util.pm  *HexValues() calls, pad with '0' to minimum length
+     (silent error). Document that if wrong number of hex digits, silently 
+     ignore the extra digits. Correct grammar in a comment. Additional 
+     syntax cleanup.
+
+   lib/PDF/Builder/Content.pm  extensively updated:
+
+     [ref RT #98545] (was rejected) formimage() permit 0, 1, or 2 scale factors 
+       (add separate X and Y scales)
+
+     [ref RT #98572] (was rejected) 
+       render() restrict argument to 0..7 (int)
+       arctocurve() renamed to _arctocurve()
+       add POD for many calls, especially text_* methods
+       general reordering of sections (POD)
+
+     fontset() renamed to _fontset()
+     textpos2() renamed to _textpos2()
+     metaStart() renamed to _metaStart()
+     metaEnd() renamed to _metaEnd()
+
+     rearrange tests in _makecolor() to clarify and prevent certain errors, 
+       add _clamp() to silently force numeric values to be within a given
+       range (e.g., gray value 0.0 .. 1.0).
+
+     [ref RT #98541] (was open) if bogen() is given a radius that is too small, 
+       silently increase to minimum size (half the distance between the points).
+       Also check that the two points are distinct and that the initial radius 
+       size is positive. Clarify the POD as to which arc is drawn and where its 
+       endpoint is. Fix many edge case bugs.
+
+     [ref RT #98538] (was open) arc/pie couldn't cross 0 degrees. gave 
+       _arctocurve() an optional direction parameter (default: 
+       0=counterclockwise sweep) and split the arc at 0 degrees. Also add 
+       detection of 0 or negative length radii for curves, or 0 degrees of 
+       sweep (start angle = end angle). Restrict angles to 0..360 range.
+
+       *** NOTE *** These functions have always been ambiguous in their
+         definition. If you gave an arc or pie sweep from 60 to 30, did you 
+         mean a clockwise 30 degree arc, or a counterclockwise 330 degree arc? 
+         The addition of a direction parameter (pie, arc) clarifies your intent,
+         but may result in different arcs than before (requiring an explicit 1).
+         I considered setting the default direction based on the shorter arc 
+         length probably intended, and whether it crossed the 0 degree line, 
+         but adding a parameter was much simpler and easier to understand.
+
+     [ref RT #98576] (was rejected) comments on "spline" nomenclature
+
+     legacy grayscale, RGB, CMYK (1, 3, or 4 numbers 0-1 range) now checks that
+       these are numbers between 0 and 1 (no message if changed).
+
+     [ref RT #98535] (was rejected) restore nl(width) capability. This was
+       recently removed (approximately 2.026) because it had never been
+       properly implemented (was treated as nl(0)).
+       
+     [ref RT #98550] (was rejected) update cr()'s POD to better explain how
+       it works.
+
+     [ref RT #98544] (resolved) Update POD for linedash() to clarify how to
+       use a hash pattern. Note that arbitrary dash/gap pattern lengths are
+       permitted, as is an offset into the pattern.
+
+(see Changes-ver_2 for changes to PDF::API2 up through 2.031)

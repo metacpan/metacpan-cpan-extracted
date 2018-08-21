@@ -1,7 +1,8 @@
-use Test::More tests => 4;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 4;
 
 use PDF::Builder::Basic::PDF::Filter::RunLengthDecode;
 
@@ -28,3 +29,5 @@ is($filter->outfilt($in, 1),
 is($filter->infilt($out),
    $in,
    q{RunLengthDecode test string with EOD marker is decoded correctly});
+
+1;

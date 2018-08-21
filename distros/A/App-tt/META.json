@@ -3,14 +3,14 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-tt",
    "no_index" : {
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -37,6 +35,11 @@
             "JSON::XS" : "3.00",
             "perl" : "5.010001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -46,9 +49,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/app-tt",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/app-tt.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/app-tt.git",
+         "web" : "https://github.com/jhthorsen/app-tt"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

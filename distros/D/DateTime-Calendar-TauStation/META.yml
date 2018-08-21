@@ -23,5 +23,5 @@ requires:
 resources:
   homepage: https://github.com/fireartist/DateTime-Calendar-TauStation
   repository: https://github.com/fireartist/DateTime-Calendar-TauStation.git
-version: '1.182260'
+version: '1.182290'
 x_serialization_backend: 'YAML::Tiny version 1.73'

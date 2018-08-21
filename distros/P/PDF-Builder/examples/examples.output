@@ -139,6 +139,8 @@ to see when the resulting PDFs are displayed.
    1 page with sample diacritic spanning 3 letters (UTF-8 input)
 
 023_cjkfonts   (requires installation of CJK font package by Adobe Reader)
+ Note that in some cases the Latin text example uses fixed pitch Latin
+   characters, while in others it uses proportional fonts.
  Ming  Ming-Bold Ming-Italic Ming-BoldItalic
   023_cjkfonts.Ming*.pdf
    127 pages 15x10 char grid + 1 page Latin text
@@ -160,6 +162,8 @@ to see when the resulting PDFs are displayed.
 024_bdffonts  codec.bdf  (sample input)   BUGGY!
   024_pdffonts.codec.pdf
    190 pages 1 bitmapped char each, 1 page 16x16 char grid
+   appears to be Latin-1 character set, characters 32 (space) through 255 (y-umlaut)
+   eventually will get around to putting in a proper one-page grid (currently filled blocks)
 
 025_unifonts
  (fails with error messages about a bad UTF-8 character)
@@ -169,6 +173,8 @@ to see when the resulting PDFs are displayed.
    9 pages of labeled UTF character grids (16x16)
 
 030_colorspecs
+ Note that RGB and L*a*b colors get brighter and brighter as the values 
+   increase, while CMYK colors get darker and darker as the values increase.
   030_colorspaces.pdf
  RGB colorspace (16 pages)   16x16 colored dots 0..Fx0..F with x constant per pg
  RGB colorspace with Gamma 2.2 (16 pages)    same layout
@@ -186,22 +192,26 @@ to see when the resulting PDFs are displayed.
 
 040_annotation
   040_annotation.pdf 
-   1 page two annotations, one open (R/W), one closed (R/O)
-   you will be prompted by Reader to save changes (if wrote to open)
+   1 page two annotations, one initially open, one initially closed
+   you will be prompted by Reader to save changes (if wrote to either)
 
 041_annot_fileattach
   041_annot_fileattach.pdf 
    1 page six annotations, two small attached (embedded files) with a 
-   variety of icons.
+   variety of icons. if you click on an openable icon, you will be
+   prompted to save your changes when you exit.
 
 050_pagelabels
   050_pagelabels.pdf
-   26 pages with a variety of thumbnail labels in Reader
+   26 pages with a variety of thumbnail labels in Reader. your reader should
+   display the indicated page label (on displayed page) on the thumbnail
+   page display on the scrollbar thumb.
 
 055_outlines
   055_outlines_sample_55.pdf
    12 pages (like 012_pages output) with three bookmarks (outlines) to logical
-   pages 1 ("i"), 4 ("1"), and 11 ("7").
+   pages 1 ("i"), 4 ("1"), and 11 ("7"). you may need to click on your reader's
+   bookmark icon to display the list of bookmarks available.
 
 060_transparency
   060_transparency.pdf
@@ -265,7 +275,8 @@ ContentText.pl
              two ways to see separation of paragraphs
    pg 9: show use of textlabel() options. shows dot for starting x,y point,
            with default (left), right, centered justification. show text at
-           45 degree angles, single and triple underline. show auto underline,             extra word and character spacing, condensed text (hscale), and 
+           45 degree angles, single and triple underline. show auto underline,
+           extra word and character spacing, condensed text (hscale), and 
            render mode 1 (outline/stroke only)
    pg 10: Latin-1 text, default text fill (left justified), no hyphenation
             same, but allow hyphenation (soft and hard hyphens, happens to only

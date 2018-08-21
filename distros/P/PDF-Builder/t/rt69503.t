@@ -1,7 +1,8 @@
-use Test::More tests => 2;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More tests => 2;
 
 use PDF::Builder;
 
@@ -32,3 +33,5 @@ $output = $pdf->stringify();
 like($output,
      qr/OpenAction \[ \d+ 0 R \/Fit \]/,
      q{-firstpage accepts a page object});
+
+1;

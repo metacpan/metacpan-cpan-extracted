@@ -2,8 +2,14 @@
 
 use strict;
 use warnings;
-use 5.008006;
+use 5.016000;
 use ExtUtils::MakeMaker 6.5503;
+
+# EVERY RELEASE: check https://www.cpan.org/src/ "First release in each branch
+#   of Perl" (NOT "Latest releases in each branch of Perl"!) and subtract 
+#   6 years to get date of oldest release, and then go one release before that. 
+#   Update the required Perl minimum here and in .perl-version, dist.ini[.old], 
+#   and .travis.yml, and commit to repository.
 
 # for future consideration
 #my $master  = 'lib/PDF/Builder.pm';
@@ -14,13 +20,13 @@ my %WriteMakefileArgs =
  NAME		=> "PDF::Builder",
  DISTNAME       => "PDF-Builder",
 # VERSION	 => $version,
- VERSION        => "3.009",
+ VERSION        => "3.010",
 # ABSTRACT_FROM	 => $master,
  ABSTRACT       => "Facilitates the creation and modification of PDF files",
 
  AUTHOR		=> 'Phil Perry <phil4597@catskilltech.com>',
  LICENSE	=> "lgpl",
- MIN_PERL_VERSION	=> 5.008006,
+ MIN_PERL_VERSION	=> 5.016000,
  INSTALLDIRS	=> "site",
 
  CONFIGURE_REQUIRES => {
@@ -38,8 +44,9 @@ my %WriteMakefileArgs =
  PREREQ_PM => {
     "Compress::Zlib" => 1.0,
     "Font::TTF" => 1.04,
-    #"Graphics::TIFF" => 0,    use if possible, but don't make mandatory
-    # found in CORE, so no need to explicitly list
+    # === "optional prerequisites", used if present, but not mandatory
+    #"Graphics::TIFF" => 0,
+    # === found in CORE, so no need to explicitly list
     #"utf8" => 0,
     #"File::Temp" => 0,
     #"File::Basename" => 0,
@@ -53,11 +60,23 @@ my %WriteMakefileArgs =
     #"POSIX" => 0
   },
 
-# META_MERGE => {
-#    resources => {
-#	homepage => "https://www.catskilltech.com",
-#    },
-# },
+  META_MERGE        => {
+
+    "meta-spec" => { version => 2 },
+
+    resources => {
+
+      homepage => "https://www.catskilltech.com",
+
+      repository => {
+          type => 'git',
+          url => 'git://github.com/PhilterPaper/Perl-PDF-Builder.git',
+          web => 'https://github.com/PhilterPaper/Perl-PDF-Builder',
+      },
+
+    },
+
+  },
 
 );
 

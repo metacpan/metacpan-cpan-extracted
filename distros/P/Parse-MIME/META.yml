@@ -3,30 +3,29 @@ abstract: 'Parse mime-types, match against media ranges'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  File::Basename: 0
-  File::Find: 0
-  File::Temp: 0
-  JSON::XS: 0
-  List::Util: 0
-  Test::More: 0
-  constant: 0
-  lib: 0
+  JSON::PP: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Parse-MIME
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Exporter: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Exporter: '0'
+  perl: '5.006'
 resources:
-  bugtracker: http://github.com/ap/Parse-MIME/issues
-  homepage: http://github.com/ap/Parse-MIME
-  repository: git://github.com/ap/Parse-MIME
-version: 1.003
+  bugtracker: https://github.com/ap/Parse-MIME/issues
+  repository: git://github.com/ap/Parse-MIME.git
+version: '1.005'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2018
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

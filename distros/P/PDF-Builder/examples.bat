@@ -7,10 +7,12 @@ perl examples\020_textrise
 perl examples\020_textunderline
 echo === 021_psfonts needs T1 glyph and metrics files (not included)
 echo     here, assuming metrics file (.afm or .pfm) is in same directory
-perl examples\021_psfonts \T1fonts\URWPalladioL-Roma.pfb
+perl examples\021_psfonts \Users\Phil\T1fonts\URWPalladioL-Roma.pfb
 perl examples\021_synfonts
 perl examples\022_truefonts C:\WINDOWS\fonts\times.ttf
 perl examples\022_truefonts_diacrits_utf8 C:\WINDOWS\fonts\tahoma.ttf
+echo === 023 to display the PDFs, you may need to install East Asian fonts
+echo ===     for your browser
 perl examples\023_cjkfonts
 echo === 024 needs a sample BDF font (not included with distribution)
 perl examples\024_bdffonts ..\work-PDF-Builder\codec\codec.bdf
@@ -27,6 +29,7 @@ perl examples\050_pagelabels
 perl examples\055_outlines
 perl examples\060_transparency
 perl examples\BarCode.pl
+perl examples\Bspline.pl
 perl examples\Content.pl
 perl examples\ContentText.pl
 perl examples\ShowFont.pl Helvetica

@@ -36,7 +36,8 @@ WriteMakefile1(
           url  => 'git://github.com/rschupp/Module-ScanDeps.git',
           web  => 'https://github.com/rschupp/Module-ScanDeps',
         },
-        MailingList => 'par@perl.org',
+        MailingList => 'mailto:par@perl.org',
+        bugtracker => { web => 'https://rt.cpan.org/Dist/Display.html?Queue=Module-ScanDeps' },
       },
       no_index => {
         package => [qw( Module::ScanDeps::Cache Module::ScanDeps::DataFeed )],

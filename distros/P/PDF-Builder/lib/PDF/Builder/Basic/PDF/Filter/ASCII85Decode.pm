@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Filter';
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -17,31 +17,31 @@ PDF::Builder::Basic::PDF::Filter::ASCII85Decode - compress and uncompress stream
 sub outfilt {
     my ($self, $str, $isend) = @_;
 
-    my ($res, $i, $j, $b, @c);
+    my ($res, $i, $j, $bb, @c);
 
     if (exists $self->{'outcache'} and $self->{'outcache'} ne "") {
         $str = $self->{'outcache'} . $str;
         $self->{'outcache'} = "";
     }
     for ($i = 0; $i + 4 <= length($str); $i += 4) {
-        $b = unpack("N", substr($str, $i, 4));
-        if ($b == 0) {
+        $bb = unpack("N", substr($str, $i, 4));
+        if ($bb == 0) {
             $res .= "z";
             next;
         }
         for ($j = 0; $j < 4; $j++) {
-            $c[$j] = $b - int($b / 85) * 85 + 33; $b /= 85;
+            $c[$j] = $bb - int($bb / 85) * 85 + 33; $bb /= 85;
         }
-        $res .= pack("C5", $b + 33, reverse @c);
+        $res .= pack("C5", $bb + 33, reverse @c);
         $res .= "\n" if $i % 60 == 56;
     }
     if      ($isend && $i < length($str)) {
         $str = substr($str, $i);
-        $b = unpack("N", $str . ("\000" x (4 - length($str))));
+        $bb = unpack("N", $str . ("\000" x (4 - length($str))));
         for ($j = 0; $j < 4; $j++) {
-            $c[$j] = $b - int($b / 85) * 85 + 33; $b /= 85;
+            $c[$j] = $bb - int($bb / 85) * 85 + 33; $bb /= 85;
         }
-        push @c, $b + 33;
+        push @c, $bb + 33;
         $res .= substr(pack("C5", reverse @c), 0, length($str) + 1) . '~>';
     } elsif ($isend) {
         $res .= '~>';
@@ -55,7 +55,7 @@ sub outfilt {
 sub infilt {
     my ($self, $str, $isend) = @_;
 
-    my ($res, $i, $j, @c, $b, $num);
+    my ($res, $i, $j, @c, $bb, $num);
     $num = 0;
     if (exists($self->{'incache'}) && $self->{'incache'} ne "") {
         $str = $self->{'incache'} . $str;
@@ -64,7 +64,7 @@ sub infilt {
     $str =~ s/(\r|\n)\n?//og;
     for ($i = 0; $i < length($str); $i += 5) {
         last if $isend and substr($str, $i, 6) eq '~>';
-        $b = 0;
+        $bb = 0;
         if      (substr($str, $i, 1) eq "z") {
             $i -= 4;
             $res .= pack("N", 0);
@@ -78,10 +78,10 @@ sub infilt {
         }
 
         for ($j = 0; $j < 5; $j++) {
-            $b *= 85;
-            $b += $c[$j] - 33;
+            $bb *= 85;
+            $bb += $c[$j] - 33;
         }
-        $res .= substr(pack("N", $b), 0, 4 - $num);
+        $res .= substr(pack("N", $bb), 0, 4 - $num);
     }
     if (!$isend && $i > length($str)) {
         $self->{'incache'} = substr($str, $i - 5);

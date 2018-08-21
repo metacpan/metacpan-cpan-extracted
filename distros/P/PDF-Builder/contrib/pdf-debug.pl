@@ -1,12 +1,11 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
-
 use PDF::Builder::Basic::PDF::File;
+
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 my $file = shift(@ARGV);
 unless ($file) {
@@ -29,16 +28,14 @@ unless ($command) {
     print "To view a cross-reference dictionary (with optional offset in bytes):\n";
     print "$0 <file.pdf> xref [offset]\n";
     print "\n";
-}
-elsif ($command eq 'xref') {
+} elsif ($command eq 'xref') {
     my $location = shift(@ARGV);
     $location = $pdf->{' xref_position'} unless defined $location;
     my $object = $pdf->readxrtr($location);
     print "XRef at $location\n";
     print '--------' . ('-' x length($location)) . "\n";
     _print_obj($object);
-}
-elsif ($command eq 'obj') {
+} elsif ($command eq 'obj') {
     my $id = shift(@ARGV);
     die "Missing required object number" unless $id and $id =~ /^[0-9]+$/;
     my $generation = shift(@ARGV) || 0;
@@ -48,16 +45,14 @@ elsif ($command eq 'obj') {
     print "Object $id";
     unless (ref($location)) {
         print " (file position $location)\n";
-    }
-    else {
+    } else {
         my ($obj_num, $obj_idx) = @$location;
         print " (object stream $obj_num index $obj_idx)\n";
     }
     print '-------' . ('-' x length($id)) . "\n";
     unless ($object) {
         print "[Unable to read object]\n";
-    }
-    else {
+    } else {
         _print_obj($object);
     }
 }
@@ -66,24 +61,19 @@ sub _print_obj {
     my $object = shift();
     if ($object->isa('PDF::Builder::Basic::PDF::Dict')) {
         print _obj_dictionary($object);
-    }
-    elsif ($object->isa('PDF::Builder::Basic::PDF::Array')) {
+    } elsif ($object->isa('PDF::Builder::Basic::PDF::Array')) {
         print _obj_array($object) . "\n";
-    }
-    elsif ($object->isa('PDF::Builder::Basic::PDF::Name') or
+    } elsif ($object->isa('PDF::Builder::Basic::PDF::Name') or
            $object->isa('PDF::Builder::Basic::PDF::Number') or
            $object->isa('PDF::Builder::Basic::PDF::String')) {
         if ($object->val() =~ /^[[:print:]]+$/) {
             print $object->val() . "\n";
-        }
-        else {
+        } else {
             print $object->as_pdf() . "\n";
         }
-    }
-    elsif ($object->isa('PDF::Builder::Basic::PDF::Null')) {
+    } elsif ($object->isa('PDF::Builder::Basic::PDF::Null')) {
         print "<Null>\n"
-    }
-    else {
+    } else {
         print "[" . ref($object) . "]\n";
     }
 
@@ -94,14 +84,13 @@ sub _print_obj {
         eval { $object->read_stream(1) };
         if ($@) {
             print "[Stream could not be read or decoded]\n";
-        }
-        elsif ($ENV{'FORCE'} or $object->{' stream'} =~ /^[[:print:]\s]*$/) {
+        } elsif ($ENV{'FORCE'} or $object->{' stream'} =~ /^[[:print:]\s]*$/) {
             print $object->{' stream'} . "\n";
-        }
-        else {
+        } else {
             print "[Stream contains non-printable characters.  Set environment FORCE=1 to show the stream anyway.]\n";
         }
     }
+    return;
 }
 
 sub _obj_reference {
@@ -119,42 +108,33 @@ sub _obj_dictionary {
             if ($object->{$key}->isa('PDF::Builder::Basic::PDF::Array')) {
                 $data->{$key} = _obj_array($object->{$key}, $indent + 1);
                 chomp $data->{$key};
-            }
-            elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Dict')) {
+            } elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Dict')) {
                 if ($object->{$key}->{' objnum'}) {
                     $data->{$key} = '<Object ' . $object->{$key}->{' objnum'} . ($object->{$key}->{' objgen'} ? ' ' . $object->{$key}->{' objgen'} : '') . '>';
-                }
-                else {
+                } else {
                     unless (scalar grep { $_ !~ /^ / } keys %{$object->{$key}}) {
                         $data->{$key} = '<Empty Dictionary>';
-                    }
-                    else {
+                    } else {
                         $data->{$key} = "\n" . _obj_dictionary($object->{$key}, $indent + 1);
                         chomp $data->{$key};
                     }
                 }
-            }
-            elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Name') or
+            } elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Name') or
                    $object->{$key}->isa('PDF::Builder::Basic::PDF::Number') or
                    $object->{$key}->isa('PDF::Builder::Basic::PDF::String')) {
                 if ($object->{$key}->val() =~ /^[[:print:]]+$/) {
                     $data->{$key} = $object->{$key}->val();
-                }
-                else {
+                } else {
                     $data->{$key} = $object->{$key}->as_pdf();
                 }
-            }
-            elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Null')) {
+            } elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Null')) {
                 $data->{$key} = '<Null>';
-            }
-            elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Objind') and $object->{$key}->{' objnum'}) {
+            } elsif ($object->{$key}->isa('PDF::Builder::Basic::PDF::Objind') and $object->{$key}->{' objnum'}) {
                 $data->{$key} = '<Object ' . $object->{$key}->{' objnum'} . ($object->{$key}->{' objgen'} ? ' ' . $object->{$key}->{' objgen'} : '') . '>';
-            }
-            else {
+            } else {
                 $data->{$key} = '[' . ref($object->{$key}) . ']';
             }
-        }
-        else {
+        } else {
             $data->{$key} = $object->{$key};
         }
     }
@@ -186,43 +166,34 @@ sub _obj_array {
     foreach my $element ($object->elements()) {
         unless (ref($element)) {
             push @elements, $element;
-        }
-        else {
+        } else {
             if ($element->isa('PDF::Builder::Basic::PDF::Array')) {
                 push @elements, _obj_array($element, $indent + 1);
-            }
-            elsif ($element->isa('PDF::Builder::Basic::PDF::Dict')) {
+            } elsif ($element->isa('PDF::Builder::Basic::PDF::Dict')) {
                 if ($element->{' objnum'}) {
                     push @elements, '<Object ' . $element->{' objnum'} . ($element->{' objgen'} ? ' ' . $element->{' objgen'} : '') . '>';
-                }
-                else {
+                } else {
                     unless (scalar grep { $_ !~ /^ / } keys %$element) {
                         push @elements, "<Empty Dictionary>";
-                    }
-                    else {
+                    } else {
                         $is_complex = 1;
                         push @elements, "Dictionary: \n" . _obj_dictionary($element, $indent + 1);
                         chomp $elements[-1];
                     }
                 }
-            }
-            elsif ($element->isa('PDF::Builder::Basic::PDF::Name') or
+            } elsif ($element->isa('PDF::Builder::Basic::PDF::Name') or
                    $element->isa('PDF::Builder::Basic::PDF::Number') or
                    $element->isa('PDF::Builder::Basic::PDF::String')) {
                 if ($element->val() =~ /^[[:print:]]+$/) {
                     push @elements, $element->val();
-                }
-                else {
+                } else {
                     push @elements, $element->as_pdf();
                 }
-            }
-            elsif ($element->isa('PDF::Builder::Basic::PDF::Null')) {
+            } elsif ($element->isa('PDF::Builder::Basic::PDF::Null')) {
                 push @elements, '<Null>';
-            }
-            elsif ($element->isa('PDF::Builder::Basic::PDF::Objind') and $element->{' objnum'}) {
+            } elsif ($element->isa('PDF::Builder::Basic::PDF::Objind') and $element->{' objnum'}) {
                 push @elements, '<Object ' . $element->{' objnum'} . ($element->{' objgen'} ? ' ' . $element->{' objgen'} : '') . '>';
-            }
-            else {
+            } else {
                 push @elements, '[' . ref($element) . ']';
             }
         }
@@ -230,8 +201,7 @@ sub _obj_array {
     my $value;
     unless ($is_complex) {
         $value = '[ ' . join(' ', @elements) . ' ]';
-    }
-    else {
+    } else {
         $value = "\n";
         foreach my $element (@elements) {
             $value .= ' ' x ($indent * 4) if $indent;

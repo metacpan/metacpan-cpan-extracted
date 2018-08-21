@@ -36,7 +36,7 @@ package Lingua::EN::NameParse::Grammar;
 use strict;
 use warnings;
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 
 # Rules that define valid orderings of a names components
@@ -624,7 +624,7 @@ q{
 # passed to the 'new' method.
 
 
-my $given_name_min_2 = q{ given_name : given_name_standard  };
+my $given_name_min_2 = q{ given_name :/[A-Z]{2,} / | split_given_name  };
 
 # Joe, Jo-Anne ...
 my $given_name_min_3 =

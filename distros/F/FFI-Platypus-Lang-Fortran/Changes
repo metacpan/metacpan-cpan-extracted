@@ -1,5 +1,10 @@
 Revision history for Perl module FFI::Platypus::Lang::Fortran
 
+0.08 2018-08-20 05:15:43 -0400
+  - Moved repository to Perl5-FFI GitHub org
+  - Moved FFI::Build::File::Fortran from FFI-Build into this dist
+  - FFI::Build is now a dependency for this dist
+
 0.07 Thu Mar 12, 2015
   - Updated distribution meta to include links to correct issue
     tracker and VCS

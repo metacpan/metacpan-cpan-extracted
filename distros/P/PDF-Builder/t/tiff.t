@@ -1,11 +1,15 @@
-use Test::More tests => 11;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 11;
 
 use PDF::Builder;
 
 # Filename 3 tests
+# tests 1 and 3 will mention TIFF_GT if Graphics::TIFF is installed and
+# usable, otherwise they will display just TIFF. you can use this information
+# if you are not sure about the status of Graphics::TIFF.
 
 my $pdf = PDF::Builder->new('-compress' => 'none');
 
@@ -141,3 +145,5 @@ is($example, $expected, 'lzw (converted to flate)');
 unlink $pdfout, $tiff;
 
 ##############################################################
+
+1;

@@ -13,10 +13,10 @@ sub new
   unlink 'config.log' if -e 'config.log';  
   my $f77_config = $class->_f77_config;
 
-  $args{ffi_libtest_dir} = [ 'libtest' ];
-  push @{ $args{ffi_libtest_dir} }, 'libtest/f90'
+  $args{ffi_libtest_dir} = [ 't/ffi' ];
+  push @{ $args{ffi_libtest_dir} }, 't/ffi/f90'
     if which($f77_config->{f90});
-  push @{ $args{ffi_libtest_dir} }, 'libtest/f95'
+  push @{ $args{ffi_libtest_dir} }, 't/ffi/f95'
     if which($f77_config->{f95});
   
   my $self = $class->SUPER::new(%args);
@@ -48,13 +48,27 @@ sub new
   $type{'double precision'} = $type{real_8} = 'double';
   $type{'real_4'} = $type{'real'} = 'float';
   
+  ## these are the correct platypus types, but since
+  ## pointers to complex types aren't supported yet,
+  ## there isn't much point.  The array workaround is
+  ## the current recommendation.
+  #if(eval { $ffi->type('complex' => 'foo1'); 1 })
+  #{
+  #  $type{'complex'} = $type{'complex_8'} = 'complex';
+  #}
+  #
+  #if(eval { $ffi->type('complex_double' => 'foo2'); 1 })
+  #{
+  #  $type{'double complex'} = $type{'complex_16'} = 'complex_double';
+  #}
+  #
+  #if(eval { $ffi->type('long double' => 'foo3'); 1 })
+  #{
+  #  $type{'real_16'} = 'long double';
+  #}
+  
   # TODO:
-  #  COMPLEX         = { float, float }
-  #  COMPLEX*8       = { float, float }
-  #  DOUBLE COMPLEX  = { double, double }
-  #  COMPLEX*16      = { double, double }
   #  COMPLEX*32      = { long double, long double }
-  #  REAL*16         = long double
   
   $self->config_data(
     type => \%type,

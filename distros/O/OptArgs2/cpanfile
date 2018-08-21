@@ -1,9 +1,7 @@
 #!perl
 on configure => sub {
-    requires 'File::Spec'                         => 0;
-    requires 'Module::Build'                      => '0.4004';
-    requires 'Module::Build::Pluggable'           => 0;
-    requires 'Module::Build::Pluggable::CPANfile' => '0.05';
+    requires 'File::Spec'          => 0;
+    requires 'ExtUtils::MakeMaker' => '6.17';
 };
 
 on runtime => sub {
@@ -17,7 +15,7 @@ on runtime => sub {
 };
 
 on test => sub {
-    requires 'IO::Capture::Stdout'     => 0;
-    requires 'POSIX'                   => 0;
-    requires 'Test2::Bundle::Extended' => 0;
+    requires 'IO::Capture::Stdout' => 0;
+    requires 'POSIX'               => 0;
+    requires 'Test2::V0'           => 0;
 };

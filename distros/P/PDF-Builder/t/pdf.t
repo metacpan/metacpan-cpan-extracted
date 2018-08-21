@@ -1,7 +1,8 @@
-use Test::More tests => 12;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 12;
 
 use PDF::Builder;
 
@@ -92,3 +93,4 @@ $pdf->pageLabel(0, { -prefix => 'Test' });
 like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), with prefix});
 
+1;

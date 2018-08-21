@@ -1,5 +1,11 @@
 Revision history for Perl extension Text::WordDiff.
 
+0.09  2018-08-21T03:21:47
+      - Fixed a typo, thanks to gregor herrmann of the Debian project.
+      - Update project metadata: The Perl Shop is now project
+        maintainer, distribution homepage is now on MetaCPAN, and the
+        project now includes an appropriate LICENSE file.
+
 0.08  2011-10-19T22:08:34Z
       - Control and punctuation characters are now treated as standalone
         chunks rather than as part of the words the preceed them. This makes

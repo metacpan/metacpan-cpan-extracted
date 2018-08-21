@@ -1,0 +1,43 @@
+Pod::Readme::Brief
+
+This module creates a brief README from a POD document (presumably the
+main module of a distribution) with just the information relevant to the
+audience who would even look inside such a README: non-Perl people. This
+is intended as a sensible boilerplate generated README, unlike the usual
+tick-the-box approaches that do not actually help anyone (such as just
+converting the entire documentation of the the main module to text, or
+putting in just the name and abstract of the distribution).
+
+The following information goes into such a README:
+
+* The "NAME" of the module
+
+* The content of the "DESCRIPTION" section
+
+* Simple installation instructions
+
+* The content of the "LICENSE" section
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

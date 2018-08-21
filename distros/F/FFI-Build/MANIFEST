@@ -13,9 +13,6 @@ corpus/basic.cxx
 corpus/basic.foo
 corpus/ffi_build/project-cxx/foo1.cxx
 corpus/ffi_build/project-cxx/foo2.cpp
-corpus/ffi_build/project-fortran/add1.f
-corpus/ffi_build/project-fortran/add2.f90
-corpus/ffi_build/project-fortran/add3.f95
 corpus/ffi_build/project1/foo1.c
 corpus/ffi_build/project1/foo2.c
 corpus/ffi_build/project2/bar.c
@@ -25,7 +22,6 @@ corpus/ffi_build_file_c/include/myfoo.h
 corpus/ffi_build_file_cxx/foo1.cxx
 corpus/ffi_build_file_cxx/foo2.cpp
 corpus/ffi_build_file_cxx/include/myfoo.h
-corpus/ffi_build_file_fortran/add.f
 corpus/ffi_build_mm/lb1/hello.fbx
 corpus/ffi_build_mm/lb1/hello1.c
 corpus/ffi_build_mm/lb1/hello2.c
@@ -43,7 +39,6 @@ lib/FFI/Build.pm
 lib/FFI/Build/File/Base.pm
 lib/FFI/Build/File/C.pm
 lib/FFI/Build/File/CXX.pm
-lib/FFI/Build/File/Fortran.pm
 lib/FFI/Build/File/Library.pm
 lib/FFI/Build/File/Object.pm
 lib/FFI/Build/MM.pm
@@ -55,7 +50,6 @@ t/ffi_build.t
 t/ffi_build_file_base.t
 t/ffi_build_file_c.t
 t/ffi_build_file_cxx.t
-t/ffi_build_file_fortran.t
 t/ffi_build_file_library.t
 t/ffi_build_file_object.t
 t/ffi_build_mm.t

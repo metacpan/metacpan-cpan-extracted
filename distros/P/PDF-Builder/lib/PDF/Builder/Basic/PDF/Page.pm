@@ -17,8 +17,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
 use PDF::Builder::Basic::PDF::Utils;
@@ -77,7 +77,7 @@ sub new
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
-    $self;
+    return $self;
 }
 
 =head2 $p->add($str)
@@ -109,7 +109,7 @@ sub add {
     }
 
     $strm->{' stream'} .= $str;
-    $self;
+    return $self;
 }
 
 =head2 $p->ship_out($pdf)
@@ -125,7 +125,7 @@ sub ship_out {
     if (defined $self->{'Contents'}) { 
 	$pdf->ship_out($self->{'Contents'}->elementsof()); 
     }
-    $self;
+    return $self;
 }
 
 1;

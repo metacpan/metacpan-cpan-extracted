@@ -274,8 +274,8 @@ sub create_colAttr {
     }
     
     if (exists $attr->{is_null}) {
-      $data .= 'NOT NULL ' if $attr->{is_null} eq 0;
-      $data .= 'NULL ' if $attr->{is_null} eq 1;
+      $data .= 'NOT NULL ' unless $attr->{is_null};
+      $data .= 'NULL ' if $attr->{is_null} == 1;
     }
     else {
       $data .= 'NOT NULL ';

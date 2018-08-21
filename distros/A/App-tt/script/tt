@@ -29,67 +29,16 @@ $SIG{__DIE__} = sub { Carp::confess($_[0]) }
 
 $ENV{TIMETRACKER_MIN_TIME} ||= 300;
 
-sub cmd_analyze {
-  my $self      = shift;
-  my $recursive = ref $_[0] ? shift : undef;
-  my $since     = shift || 'last month';
-  my $dir       = shift || File::Spec->curdir;
-  my $user      = qx(git config user.name) || getpwuid $<;
-  my $log       = $recursive || {};
-
-  if (-d File::Spec->catdir($dir, '.git')) {
-    my $project = basename(abs_path $dir);
-    local $ENV{GIT_DIR} = File::Spec->catdir($dir, '.git');
-    open my $GIT, '-|', qw( git reflog --all ), "--author=$user", "--pretty=format:%ci %s",
-      "--since=$since"
-      or die $!;
-    while (<$GIT>) {
-      my ($ts, $description) = /^(\S+.\S+)\s(.*)/ or die "Invalid input: $_";
-      my $tag
-        = $description =~ /^\W*([A-Z]{2,}-[0-9]+)/ ? $1 : $description =~ /(\#\d+)/ ? $1 : $project;
-      $ts = $self->_from_iso_8601($ts);
-      next if $ts->hour < 5;    # should not work in the middle of the night
-      $description =~ s!^\s*\+[\d:]+\s+!!;    # $ts hopefully in localtime
-      my $event = $log->{$ts->ymd} ||= {stop => $ts};
-      $event->{start}       = $ts if $ts <= $event->{stop};
-      $event->{description} = $description;
-      $event->{project}     = $project;
-      $event->{tags}{$tag}  = 1;
-    }
-    return if $recursive;
-  }
-  else {
-    opendir(my $DH, $dir) or die "$dir: $!";
-    while (my $i = readdir $DH) {
-      $self->cmd_analyze($log, $since, File::Spec->catdir($dir, $i))
-        if -d File::Spec->catdir($dir, $i, '.git');
-    }
-  }
-
-  for my $event (sort { $a->{start} <=> $b->{start} } values %$log) {
-    my $tags = join ',', keys %{$event->{tags}};
-    $self->_say(
-      "%s\t%s\t%s\t%s\t%s",
-      $event->{start}->datetime,
-      $event->{stop}->datetime,
-      $event->{project}, $event->{description}, $tags
-    );
-  }
-}
-
 sub cmd_edit {
   my $self = shift;
-  my $doit = grep {/^--no-dry-run$/} @_;
-  my $dir  = readlink($self->_root) || $self->_root;
-  my $code = '';
-  my ($date, @files);
+  my $dir = readlink($self->_root) || $self->_root;
+  my ($code, $date, @files) = ('');
 
   if (@_ and -f $_[0]) {
     return $self->_edit_with_editor($_[0]);
   }
   elsif (-t STDIN) {
-    $date = $self->_date_arg(@_);
-    $code = sub { print "$_{file}\n"; };
+    1;    # edit last entry
   }
   else {
     $code .= $_ while <STDIN>;
@@ -104,21 +53,20 @@ sub cmd_edit {
       return if $date and not /$date/;
       my $f     = abs_path $_;
       my $event = decode_json(_slurp($f));
-      local %_ = (file => $f, date => $1, doit => $doit, file => $f, hms => $2, project => $3);
+      local %_ = (date => $1, file => $f, hms => $2, project => $3);
       $event->{tags} ||= [];
-      push @files, $f if $date and (!$self->project or $event->{project} eq $self->project);
-      $self->$code($event) or return;
+      push @files, $f if !$self->project or $event->{project} eq $self->project;
+      return unless $code and $self->$code($event);
       my $trc_file
         = abs_path($self->_trc_path($event->{project}, $self->_from_iso_8601($event->{start})));
-      return unless $doit;
       $self->_fill_duration($event);
       _spurt(encode_json($event) => $trc_file);
       unlink $f or die "rm $f: $!" if $f ne $trc_file;
     }
   }, $dir;
 
-  if (@files == 1) {
-    return $self->_edit_with_editor($files[0]);
+  if (@files == 1 or !$code) {
+    return $self->_edit_with_editor(+(sort { $b cmp $a } @files)[0]);
   }
 
   return 0;
@@ -199,7 +147,7 @@ sub cmd_log {
     ($pl, @log) = $self->$group_by(@log);
   }
 
-  for my $event (@log) {
+  for my $event (sort { $a->{start} <=> $b->{start} } @log) {
     my $start = $event->{start};
     $self->_say(
       "%3s %2s %02s:%02s  %5s  %-${pl}s  %s", $start->month,
@@ -280,8 +228,9 @@ sub cmd_start {
   $self->_set_now(@args);
   $self->project($args[0]) if $args[0] and $args[0] =~ /^[A-Za-z0-9-]+$/;
   $self->project(basename(Cwd::getcwd)) if -d '.git' and !$self->project;
-  $trc_file = $self->_trc_path($self->project, $self->_now);
+  return $self->cmd_help('start') unless $self->project;
 
+  $trc_file = $self->_trc_path($self->project, $self->_now);
   warn "[APP_TT] start $trc_file\n" if DEBUG;
 
   if (!$self->project) {
@@ -389,22 +338,6 @@ sub _edit_with_editor {
   _spurt(encode_json($event) => $trc_file);
 
   return 0;
-}
-
-sub _date_arg {
-  my ($self, @args) = @_;
-  my $yesterday = $self->_now - 86400;
-  my @ymd       = map { $yesterday->$_ } qw(year mon mday);
-  my $fmt       = '%02s%02s%02s';
-
-  for (@args) {
-    if (/^\d+$/) {
-      return $_ if /^\d{8}$/;
-      return sprintf $fmt, @ymd[0, 1], $_ if /^\d{1,2}$/;
-    }
-  }
-
-  return sprintf $fmt, @ymd;
 }
 
 sub _diag {

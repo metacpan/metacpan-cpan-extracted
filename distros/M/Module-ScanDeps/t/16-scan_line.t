@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 7;
 use Module::ScanDeps qw/scan_line/;
 
 {
@@ -30,5 +30,38 @@ eval {
   scan_line($chunk);
 };
 is($@,'');
+}
+
+{  #  use 5.010 in one-liners was only returning feature.pm (actually, 5.9.5 or higher)
+  my $chunk = 'use 5.010; use MyModule::PlaceHolder1;';
+  my @got = scan_line($chunk);
+  #diag @got;
+  my @expected = sort ('feature.pm', 'MyModule/PlaceHolder1.pm');
+  is_deeply (\@expected, [sort @got], 'got more than just feature.pm when "use 5.010" in one-liner');
+}
+
+{  #  use 5.009 in one-liners should not return feature.pm
+  my $chunk = 'use 5.009; use MyModule::PlaceHolder1;';
+  my @got = scan_line($chunk);
+  #diag @got;
+  my @expected = sort ('MyModule/PlaceHolder1.pm');
+  is_deeply (\@expected, [sort @got], 'did not get feature.pm when "use 5.009" in one-liner');
+}
+
+
+{  #  avoid early return when pragma is found in one-liners
+  my $chunk = 'use if 1, MyModule::PlaceHolder2; use MyModule::PlaceHolder1;';
+  my @got = scan_line($chunk);
+  #diag @got;
+  my @expected = sort ('if.pm', 'MyModule/PlaceHolder1.pm', 'MyModule/PlaceHolder2.pm');
+  is_deeply (\@expected, [sort @got], 'if-pragma used in one-liner');
+}
+
+{  #  avoid early return when pragma is found in one-liners
+  my $chunk = 'use autouse "MyModule::PlaceHolder2"; use MyModule::PlaceHolder1;';
+  my @got = scan_line($chunk);
+  #diag @got;
+  my @expected = sort ('autouse.pm', 'MyModule/PlaceHolder1.pm', 'MyModule/PlaceHolder2.pm');
+  is_deeply (\@expected, [sort @got], 'autouse pragma used in one-liner');
 }
 

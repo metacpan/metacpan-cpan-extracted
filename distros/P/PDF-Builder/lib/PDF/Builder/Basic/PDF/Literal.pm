@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 
 use strict;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter;
 use PDF::Builder::Basic::PDF::Name;
@@ -70,8 +70,9 @@ sub outobjdeep {
     } else {
         $fh->print($self->{'-literal'}); # next is endobj which has the final cr
     }
+    return;
 }
 
-sub val { $_[0]; }
+sub val { return $_[0]; }
 
 1;

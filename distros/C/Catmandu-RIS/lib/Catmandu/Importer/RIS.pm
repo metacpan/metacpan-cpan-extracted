@@ -1,5 +1,7 @@
 package Catmandu::Importer::RIS;
 
+our $VERSION = '0.11';
+
 use namespace::clean;
 use Catmandu::Sane;
 use Catmandu::Importer::CSV;

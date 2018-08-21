@@ -1,11 +1,15 @@
+.DS_Store
 Build.PL
 Changes
 eg/diff.css
+lib/.DS_Store
+lib/Text/.DS_Store
 lib/Text/Diff/HTML.pm
-Makefile.PL
+LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 t/base.t
 t/pod.t
+Makefile.PL
+META.yml
+META.json

@@ -1,5 +1,19 @@
 Revision history for FFI-Build
 
+0.07      2018-08-20 10:52:27 -0400
+  - Workaround for compilers with space
+
+0.06      2018-08-20 08:57:30 -0400
+  - Fix test
+
+0.05      2018-08-20 05:17:36 -0400
+  - Removed FFI::Build::File::Fortran, which is now part of the
+    FFI-Platypus-Lang-Fortran dist
+
+0.04      2018-08-19 12:56:54 -0400
+  - When `cc -MM` or `c++ -MM` fails for computing dependencies, fall back
+    on just the .c file being the dependency.
+
 0.03      2018-08-16 04:03:09 -0400
   - Fix for test failure on cygwin + MSWin32
   - Additional diagnostics for Fortran build test

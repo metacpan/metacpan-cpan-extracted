@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
 package String::Tagged::Terminal;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use base qw( String::Tagged );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ C<String::Tagged::Terminal> - format terminal output using C<String::Tagged>
     ->append( "Hello my name is " )
     ->append_tagged( $name, bold => 1, fgindex => 4 );
 
- print $st->build_terminal . "\n";
+ $st->say_to_terminal;
 
 =head1 DESCRIPTION
 
@@ -105,7 +105,7 @@ L<String::Tagged|String::Tagged/METHODS>.
 
 =head2 build_terminal
 
-   $str = $st->build_terminal
+   $str = $st->build_terminal( %opts )
 
 Returns a string containing terminal escape sequences mixed with string
 content to render the string to a terminal.
@@ -114,11 +114,24 @@ As this string will contain literal terminal control escape sequences, care
 should be taken when passing it around, printing it for debugging purposes, or
 similar.
 
+Takes the following additional named options:
+
+=over 4
+
+=item no_color
+
+If true, the C<fgindex> and C<bgindex> attributes will be ignored. This has
+the result of performing some formatting using the other attributes, but not
+setting colours.
+
+=back
+
 =cut
 
 sub build_terminal
 {
    my $self = shift;
+   my %opts = @_;
 
    my $ret = "";
    my %pen;
@@ -204,7 +217,8 @@ sub build_terminal
       }
 
       $ret .= $s;
-   });
+   },
+      ( $opts{no_color} ? ( except => [qw( fgindex bgindex )] ) : () ) );
 
    $ret .= "\e[m" if %pen;
 
@@ -239,6 +253,50 @@ sub as_formatting
          bgindex => sub { bg => Convert::Color::XTerm->new( $_[1] ) },
       },
    );
+}
+
+=head2 print_to_terminal
+
+   $str->print_to_terminal( $fh )
+
+Prints the string to the terminal by building a terminal escape string then
+printing it to the given IO handle (or C<STDOUT> if not supplied).
+
+This method will pass the value of the C<NO_COLOR> environment variable to the
+underlying L</build_terminal> method call, meaning if that has a true value
+then colouring tags will be ignored, yielding a monochrome output. This
+follows the suggestion of L<http://no-color.org/>.
+
+=cut
+
+sub print_to_terminal
+{
+   my $self = shift;
+   my ( $fh ) = @_;
+
+   $fh //= \*STDOUT;
+
+   $fh->print( $self->build_terminal( no_color => $ENV{NO_COLOR} ) );
+}
+
+=head2 say_to_terminal
+
+   $str->say_to_terminal( $fh )
+
+Prints the string to the terminal as per L</print_to_terminal>, followed by a
+linefeed.
+
+=cut
+
+sub say_to_terminal
+{
+   my $self = shift;
+   my ( $fh ) = @_;
+
+   $fh //= \*STDOUT;
+
+   $self->print_to_terminal( $fh );
+   $fh->say;
 }
 
 =head1 TODO

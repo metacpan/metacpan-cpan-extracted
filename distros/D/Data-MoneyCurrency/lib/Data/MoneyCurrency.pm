@@ -1,3 +1,4 @@
+# ABSTRACT: Get information for different currencies
 package Data::MoneyCurrency;
 
 use strict;
@@ -17,7 +18,7 @@ use Data::Dumper;
 my $rh_currency_for_country = {};
 
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 
 my $rh_currency_iso; # contains character strings
@@ -293,11 +294,11 @@ __END__
 
 =head1 NAME
 
-Data::MoneyCurrency
+Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -318,13 +319,9 @@ This uses some data found in in the Ruby library
 L<money|https://github.com/RubyMoney/money/tree/master/config>, but it has no
 dependency on it, the relevant data files are already included.
 
-=head1 NAME
-
-Data::MoneyCurrency - Get currency information for different currencies
-
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 EXPORT
 

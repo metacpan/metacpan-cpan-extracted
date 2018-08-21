@@ -1,6 +1,6 @@
 NAME
 
-Lingua::EN::NameParse - extract the components of a person or couples full name, presented as a text string
+Lingua::EN::NameParse - extract the components of a person or couples full name, from free form text 
 
 SYNOPSIS
 
@@ -10,7 +10,6 @@ SYNOPSIS
     my %args =
     (
         auto_clean      => 1,
-        force_case      => 1,
         lc_prefix       => 1,
         initials        => 3,
         allow_reversed  => 1,
@@ -18,34 +17,57 @@ SYNOPSIS
         extended_titles => 0
     );
 
-    my $name =  Lingua::EN::NameParse->new(%args);
+    my $name = Lingua::EN::NameParse->new(%args);
 
-    $error = $name->parse("MR AC DE SILVA");
+    $error = $name->parse("Estate Of Lt Col AB Van Der Heiden (Hold Mail)");
+    unless ( $error )    
+    {
+        print($name->report);
+        
+            Case all             : Estate Of Lt Col AB Van Der Heiden (Hold Mail)
+            Case all reversed    : Van Der Heiden, Lt Col AB
+            Salutation           : Dear Friend
+            Type                 : Mr_A_Smith
+            Parsing Error        : 0
+            Error description :  : 
+            Parsing Warning      : 1
+            Warning description  : ;non_matching text found : (Hold Mail)
+            
+            COMPONENTS
+            initials_1           : AB
+            non_matching         : (Hold Mail)
+            precursor            : Estate Of
+            surname_1            : Van Der Heiden
+            title_1              : Lt Col        
+    
+        %name_comps = $name->components;
+        $surname = $name_comps{surname_1}; 
 
-    %name_comps = $name->components;
-    $surname = $name_comps{surname_1}; # De Silva
+        $correct_casing = $name->case_all; 
 
-    $correct_casing = $name->case_all; # Mr AC de Silva
+        $correct_casing = $name->case_all_reversed ; 
 
-    $correct_casing = $name->case_all_reversed ; # de Silva, AC
-
-    $good_name = &clean("Bad Na9me   "); # "Bad Name"
- 
-    $salutation = $name->salutation(salutation => 'Dear',sal_default => 'Friend')); # Dear Mr de Silva
-
-    %my_properties = $name->properties;
-    $number_surnames = $my_properties{number}; # 1
-    $bad_input = $my_properties{non_matching};
-
-    $name->report; # create a report listing all information about the parsed name
+        $salutation = $name->salutation(salutation => 'Dear',sal_default => 'Friend')); 
+        
+        $good_name = clean("Bad Na9me   "); # "Bad Name"
+  
+        %my_properties = $name->properties;
+        $number_surnames = $my_properties{number}; # 1
+    }
+    
 
     $lc_prefix = 0;
-    $correct_case = &case_surname("DE SILVA-MACNAY",$lc_prefix); # De Silva-MacNay
-
+    $correct_case = case_surname("DE SILVA-MACNAY",$lc_prefix); # A stand alone function, returns: De Silva-MacNay
+    
+    $error = $name->parse("MR AS & D.E. DE LA MARE");
+    %my_properties = $name->properties;
+    $number_surnames = $my_properties{number}; # 2
+    
 
 DESCRIPTION
 
-This module takes as input a person or persons name in
+
+This module takes as input one person's name or a couples names in
 free format text such as,
 
     Mr AB & M/s CD MacNay-Smith
@@ -53,14 +75,15 @@ free format text such as,
     Estate Of The Late Lieutenant Colonel AB Van Der Heiden
 
 and attempts to parse it. If successful, the name is broken
-down into components and useful functions can be performed like :
+down into components and useful functions can be performed such as :
 
-- converting upper or lower case values to name case (Mr AB MacNay   )
-- creating a personalised greeting or salutation     (Dear Mr MacNay )
-- extracting the names individual components         (Mr,AB,MacNay   )
-- determining the type of format the name is in      (Mr_A_Smith     )
+   converting upper or lower case values to name case (Mr AB MacNay   )
+   creating a personalised greeting or salutation     (Dear Mr MacNay )
+   extracting the names individual components         (Mr,AB,MacNay   )
+   determining the type of format the name is in      (Mr_A_Smith     )
 
-If the name cannot be parsed you have the option of cleaning the name
+
+If the name(s) cannot be parsed you have the option of cleaning the name(s)
 of bad characters, or extracting any portion that was parsed and the
 portion that failed.
 

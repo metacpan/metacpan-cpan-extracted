@@ -27,6 +27,15 @@ SYNOPSIS
     start on rewriting Syntax::Keyword::Try). For an example of an external
     plugin, see Method::Signatures::PP.
 
+    Not for 'normal' use but still interesting, ::Sigify attempts to
+    convert simple @_ unrolls into signatures - best used on its own,
+    followed by applying App::sigfix if you need the 5.22-5.26
+    oldsignatures style.
+
+REPOSITORY
+
+    http://github.com/shadow-dot-cat/Babble/
+
 AUTHOR
 
     Matt S Trout (mst) <mst@shadowcat.co.uk>

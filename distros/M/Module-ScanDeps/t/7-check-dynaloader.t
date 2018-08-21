@@ -7,6 +7,7 @@ use Config ();
 use Module::ScanDeps;
 use DynaLoader;
 use File::Temp;
+use Data::Dumper;
 
 plan skip_all => "No dynamic loading available in your version of perl"
     unless $Config::Config{usedl};
@@ -29,49 +30,53 @@ foreach my $module (@dyna_mods)
     my $modfname = defined &DynaLoader::mod2fname ? DynaLoader::mod2fname(\@modparts) : $modparts[-1];
     my $auto_path = join('/', 'auto', @modparts, "$modfname.$Config::Config{dlext}");
 
-    check_bundle_path($module, $auto_path, ".pl", <<"...",
-use $module;
-1;
-...
+    check_bundle_path($module, $auto_path, 
         sub { scan_deps(
                 files   => [ $_[0] ],
                 recurse => 0);
-        }
-    );
-    check_bundle_path($module, $auto_path, ".pm", <<"...",
-package Bar;
+        },
+        ".pl", <<"...",
 use $module;
 1;
 ...
+    );
+    check_bundle_path($module, $auto_path,
         sub { scan_deps_runtime(
                 files   => [ $_[0] ],
                 recurse => 0,
                 compile => 1);
-        }
+        },
+        ".pm", <<"...",
+package Bar;
+use $module;
+1;
+...
     );
-    check_bundle_path($module, $auto_path, ".pl", <<"...",
+    check_bundle_path($module, $auto_path, 
+        sub { scan_deps_runtime(
+                files   => [ $_[0] ],
+                recurse => 0,
+                execute => 1);
+        },
+        ".pl", <<"...",
 # no way in hell can this detected by static analysis :)
 my \$req = join("", qw( r e q u i r e ));
 eval "\$req $module";
 exit(0);
 ...
+    );
+    check_bundle_path($module, $auto_path, 
         sub { scan_deps_runtime(
                 files   => [ $_[0] ],
                 recurse => 0,
-                execute => 1);
-        }
-    );
-    check_bundle_path($module, $auto_path, ".pl", <<"...",
+                execute => [ $module ]);
+        },
+        ".pl", <<"...",
 # no way in hell can this detected by static analysis :)
 my \$req = join("", qw( r e q u i r e ));
 eval "\$req \$_" foreach \@ARGV;
 exit(0);
 ...
-        sub { scan_deps_runtime(
-                files   => [ $_[0] ],
-                recurse => 0,
-                execute => [ $module ]);
-        }
     );
 }
 
@@ -79,19 +84,25 @@ exit(0);
 
 # NOTE: check_bundle_path runs 2 tests
 sub check_bundle_path {
-    my ($module, $auto_path, $suffix, $code, $scan) = @_;
+    my ($module, $auto_path, $scan, $suffix, $source) = @_;
 
     my ($fh, $filename) = File::Temp::tempfile( UNLINK => 1, SUFFIX => $suffix );
-    print $fh $code, "\n" or die $!;
+    print $fh $source, "\n" or die $!;
     close $fh;
 
     my $rv = $scan->($filename);
+    my $line = (caller())[2];
+
     my ( $entry ) =  grep { /^\Q$auto_path\E$/ } keys %$rv;
-    ok( $entry, "$module: found some key that looks like it pulled in its shared lib (auto_path=$auto_path)" );
+    ok($entry,
+       "check_bundle_path:$line: $module: ".
+       "found some key that looks like it pulled in its shared lib (auto_path=$auto_path)\n".
+       Dumper($rv));
 
     # Actually we accept anything that ends with $auto_path.
-    ok($rv->{$entry}->{file} =~ m{/\Q$auto_path\E$}, 
-       "$module: the full bundle path we got ($rv->{$entry}->{file}) looks legit" );
+    ok($rv->{$entry}{file} =~ m{/\Q$auto_path\E$}, 
+       "check_bundle_path:$line: $module: ".
+       "the full bundle path we got \"$rv->{$entry}{file}\" looks legit");
 }
 
 

@@ -1,0 +1,41 @@
+---
+abstract: 'EXPERIMENTAL Automatic Babble substitution in Dist::Zilla'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Babble
+provides:
+  Dist::Zilla::Plugin::Babble:
+    file: lib/Dist/Zilla/Plugin/Babble.pm
+    version: '0.001'
+requires:
+  Babble::PluginChain: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  List::Util: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Perl: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Babble
+  repository: git://github.com/Leont/dist-zilla-plugin-babble.git
+version: '0.001'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

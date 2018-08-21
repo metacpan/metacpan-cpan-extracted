@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.11";
+our $VERSION = "1.0.12";
 
 # for reading in configs
 use File::Slurp;
@@ -379,7 +379,7 @@ sub setup_databases {
 	my ($dsn, $dbh, $db_name, $sth, $exists, $safe_to_modify);
 
 	# try to make the connection
-	$dsn = qq{DBI:mysql:database=information_schema;host=}.$self->{options}{'database-server'}.qq{;port=3306;mysql_socket=/tmp/mysql.sock};
+	$dsn = qq{DBI:mysql:database=information_schema;host=}.$self->{options}{'database-server'}.qq{;port=3306};
 	$dbh = DBI->connect($dsn, $self->{options}{'db-username'}, $self->{options}{'db-password'},{ PrintError => 1, RaiseError=>1, mysql_enable_utf8=>8 });
 	$dbh->{LongReadLen} = 1000000;
 

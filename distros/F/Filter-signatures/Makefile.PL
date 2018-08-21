@@ -154,7 +154,7 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://github.com/Corion/Filter-signatures)
+[![Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://travis-ci.org/Corion/filter-signatures)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );

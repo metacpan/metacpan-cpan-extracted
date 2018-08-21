@@ -34,4 +34,5 @@ pages :
   - { title: List,        path: /list        }
   - { title: Tags,        path: /tags        }
   - { title: Categories,  path: /categories  }
+  - { title: Sections,    path: /sections    }
   - { title: Authors,     path: /authors     }

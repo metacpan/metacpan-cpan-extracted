@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '5.9'; # VERSION
+our $VERSION = '6.0'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -56,6 +56,7 @@ use Sub::Exporter -setup => {
         es_delete_index
         es_optimize_index
         es_apply_index_settings
+        es_local_index_meta
     )],
     groups => {
         config  => [qw(es_globals)],
@@ -516,7 +517,7 @@ sub es_indices {
 
             if ($args{older} && defined $DEF{DAYS}) {
                 my $days_old = es_index_days_old( $index );
-                if (defined $days_old && $days_old < $DEF{DAYS}) {
+                if (!defined $days_old || $days_old < $DEF{DAYS}) {
                     next;
                 }
             }
@@ -822,6 +823,26 @@ sub def {
 }
 
 
+sub es_local_index_meta {
+    my ($key,$name_or_base) = @_;
+
+    if( exists $_GLOBALS{meta} ) {
+        my $meta = $_GLOBALS{meta};
+        my @search = ( $name_or_base );
+        push @search, es_index_strip_date( $name_or_base );
+        push @search, es_index_bases($name_or_base);
+
+        foreach my $check ( @search ) {
+            if( exists $meta->{$check} && exists $meta->{$check}{$key} ) {
+                return $meta->{$check}{$key};
+            }
+        }
+    }
+
+
+    return;
+}
+
 
 
 1;
@@ -838,7 +859,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 5.9
+version 6.0
 
 =head1 SYNOPSIS
 
@@ -1043,6 +1064,33 @@ Returns a hashref
 =head2 def('key')
 
 Exposes Definitions grabbed by options parsing
+
+=head2 es_local_index_meta(key => 'base' || 'index')
+
+Fetch meta-data from the local config file, i.e. C<~/.es-utils.yaml>.
+
+Format is:
+
+    ---
+    meta:
+      index_name:
+        key: value
+      index_basename:
+        key: value
+
+The most specific version is searched first, followed by the index stripped of
+it's date, and then on through all the bases discovered with
+C<es_index_bases()>.
+
+This is used by the C<es-search.pl> utility to do lookups of the B<timestamp>
+field it needs to sort documents, i.e.:
+
+    ---
+    meta:
+      logstash:
+        timestamp: '@timestamp'
+      bro:
+        timestamp: 'timestamp'
 
 =head1 ARGS
 

@@ -1,7 +1,8 @@
-use Test::More tests => 7;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 7;
 
 use PDF::Builder::Basic::PDF::Filter::ASCIIHexDecode;
 
@@ -53,3 +54,5 @@ my $actual_bytes = join(' ', map { ord } split //, PDF::Builder::Basic::PDF::Fil
 is($actual_bytes,
    $expected_bytes,
    q{ASCIIHexDecode handles odd numbers of characters correctly});
+
+1;

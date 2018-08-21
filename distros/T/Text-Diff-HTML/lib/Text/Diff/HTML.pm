@@ -5,7 +5,7 @@ use vars qw(@ISA $VERSION);
 use HTML::Entities;
 use Text::Diff (); # Just to be safe.
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 @ISA = qw(Text::Diff::Unified);
 
 sub file_header {
@@ -211,6 +211,8 @@ L<bug-Text-Diff-HTML@rt.cpan.org|mailto:bug-Text-Diff-HTML@rt.cpan.org>.
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
+
+Currently maintained by the developers of The Perl Shop <tps@cpan.org>.
 
 =head1 Copyright and License
 

@@ -45,23 +45,23 @@
    "provides" : {
       "App::PS1" : {
          "file" : "lib/App/PS1.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Daemon" : {
          "file" : "lib/App/PS1/Daemon.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Branch" : {
          "file" : "lib/App/PS1/Plugin/Branch.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Date" : {
          "file" : "lib/App/PS1/Plugin/Date.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Directory" : {
          "file" : "lib/App/PS1/Plugin/Directory.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Env" : {
          "file" : "lib/App/PS1/Plugin/Env.pm",
@@ -69,27 +69,27 @@
       },
       "App::PS1::Plugin::Face" : {
          "file" : "lib/App/PS1/Plugin/Face.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Node" : {
          "file" : "lib/App/PS1/Plugin/Node.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Perl" : {
          "file" : "lib/App/PS1/Plugin/Perl.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Processes" : {
          "file" : "lib/App/PS1/Plugin/Processes.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Ruby" : {
          "file" : "lib/App/PS1/Plugin/Ruby.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "App::PS1::Plugin::Uptime" : {
          "file" : "lib/App/PS1/Plugin/Uptime.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -104,6 +104,6 @@
          "url" : "http://github.com/ivanwills/App-PS1"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

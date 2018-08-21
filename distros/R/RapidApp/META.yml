@@ -73,7 +73,6 @@ requires:
   DBIx::Class::Schema::Loader: 0.07049
   DBIx::Class::Schema::Loader::DBI: 0
   DBIx::Class::Schema::Loader::Table: 0
-  DBIx::Class::_Util: 0
   Data::Dumper: 2.131
   Data::Dumper::Concise: 2.020
   Data::Printer: 0
@@ -168,7 +167,7 @@ resources:
   bugtracker: https://github.com/vanstyn/RapidApp/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/RapidApp.git
-version: 1.3101
+version: 1.3102
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
   - 'Torsten Raudssus <torsten@raudss.us>'

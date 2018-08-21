@@ -101,3 +101,7 @@ Revision history for Perl extension Lingua::EN::Sentence.
 	set the default character set to en_US.UTF-8
 	added example/demo.pl script
 	
+0.31 Aug 19 2018
+    Declared min version of Perl. Fix for RT bug #124686 
+	
+	

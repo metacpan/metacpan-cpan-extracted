@@ -25,6 +25,18 @@ CREATE TABLE [user] (
 );
 INSERT INTO [user] VALUES(0,'(system)','System User',null,null,1,1,1);
 
+DROP TABLE IF EXISTS [section];
+CREATE TABLE [section] (
+  [id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  [name] varchar(64) NOT NULL,
+  [description] varchar(1024) DEFAULT NULL,
+  [parent_id] INTEGER DEFAULT NULL,
+  
+  FOREIGN KEY ([parent_id]) REFERENCES [section] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
+);
+DROP INDEX IF EXISTS [unique_subsection];
+CREATE UNIQUE INDEX [unique_subsection] ON [section] ([parent_id],[name]);
+
 
 DROP TABLE IF EXISTS [post];
 CREATE TABLE [post] (
@@ -38,6 +50,7 @@ CREATE TABLE [post] (
   [author_id] INTEGER NOT NULL,
   [creator_id] INTEGER NOT NULL,
   [updater_id] INTEGER NOT NULL,
+  [section_id] INTEGER DEFAULT NULL,
   [published] BOOLEAN NOT NULL DEFAULT 0,
   [publish_ts] datetime DEFAULT NULL,
   [size] INTEGER DEFAULT NULL,
@@ -46,9 +59,10 @@ CREATE TABLE [post] (
   [summary] text default NULL,
   [body] text default '',
   
-  FOREIGN KEY ([author_id]) REFERENCES [user]              ([id])   ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY ([creator_id]) REFERENCES [user]             ([id])   ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY ([updater_id]) REFERENCES [user]             ([id])   ON DELETE RESTRICT ON UPDATE CASCADE
+  FOREIGN KEY ([author_id])  REFERENCES [user]    ([id]) ON DELETE RESTRICT    ON UPDATE CASCADE,
+  FOREIGN KEY ([creator_id]) REFERENCES [user]    ([id]) ON DELETE RESTRICT    ON UPDATE CASCADE,
+  FOREIGN KEY ([updater_id]) REFERENCES [user]    ([id]) ON DELETE RESTRICT    ON UPDATE CASCADE,
+  FOREIGN KEY ([section_id]) REFERENCES [section] ([id]) ON DELETE SET DEFAULT ON UPDATE CASCADE
   
 );
 
@@ -116,3 +130,27 @@ CREATE TABLE [hit] (
   
   FOREIGN KEY ([post_id])   REFERENCES [post] ([id])    ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+DROP TABLE IF EXISTS [trk_section_posts];
+CREATE TABLE         [trk_section_posts] (
+  [id]            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  [section_id]    INTEGER NOT NULL,
+  [post_id]       INTEGER NOT NULL,
+  [depth]         INTEGER NOT NULL,
+  
+  FOREIGN KEY ([section_id]) REFERENCES [section] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY ([post_id])    REFERENCES [post] ([id])    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP TABLE IF EXISTS [trk_section_sections];
+CREATE TABLE         [trk_section_sections] (
+  [id]            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  [section_id]    INTEGER NOT NULL,
+  [subsection_id] INTEGER NOT NULL,
+  [depth]         INTEGER NOT NULL,
+  
+  FOREIGN KEY ([section_id])    REFERENCES [section] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY ([subsection_id]) REFERENCES [section] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
+);
+

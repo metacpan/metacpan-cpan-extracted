@@ -2,9 +2,9 @@ package Test::Class::Moose::Role::CLI;
 
 # ABSTRACT: Role for command line argument handling and extra CLI features
 
-use 5.10.0;
+use 5.010000;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -319,7 +319,7 @@ Test::Class::Moose::Role::CLI - Role for command line argument handling and extr
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 

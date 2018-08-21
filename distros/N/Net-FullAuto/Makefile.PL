@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000408';
+our $VERSION='1.0000413';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -286,9 +286,12 @@ if ($ARGV[0]=~/\.pem/) {
    push @{$amazon{argv}},$ARGV[0];
 }
 our $system_type='';
+# Bullet Proof Test for AWS EC2
+# wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1
 if ($^O eq 'linux' || $^O eq 'freebsd') {
    if ((-e "/etc/system-release-cpe") &&
-         (-1<index `cat /etc/system-release-cpe`,'amazon:linux')) {
+         ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
+         (-1<index `cat /etc/system-release-cpe`,'amazon_linux'))) {
 
       # Manual Setup Amazon AMI host before CPAN:
       #
@@ -4631,6 +4634,8 @@ END
                         $ver=$file;
                         $ver=~s/_.*$//;
                         $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
+                        $pre="/usr/local/BerkeleyDB.$ver";
+                        $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
                         next;
                      }
                   } else {
@@ -4680,6 +4685,8 @@ END
                         $ver=$file;
                         $ver=~s/_.*$//;
                         $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
+                        $pre="/usr/local/BerkeleyDB.$ver";
+                        $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
                         next;
                      }
                   } else {

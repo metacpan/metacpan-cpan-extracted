@@ -3,8 +3,13 @@ package PDF::Builder::Util;
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+
+# note: $a and $b are "Magic variables" according to perlcritic, and so it
+# has conniptions over using them as variable names (even with "my"). so, I
+# changed most of the single letter names to double letters (r,g,b -> rr,gg,bb
+# etc.)
 
 BEGIN {
     use Encode qw(:all);
@@ -53,7 +58,7 @@ BEGIN {
         namecolor namecolor_cmyk namecolor_lab optInvColor defineColor
         dofilter unfilter
         nameByUni uniByName initNameTable defineName
-        page_size
+        page_size  getPaperSizes
         str2dim
     );
 
@@ -199,8 +204,8 @@ sub cRGB8 {
 }
 
 sub RGBtoLUM {
-    my ($r, $g, $b) = @_;
-    return $r * 0.299 + $g * 0.587 + $b * 0.114;
+    my ($rr, $gg, $bb) = @_;
+    return $rr * 0.299 + $gg * 0.587 + $bb * 0.114;
 }
 
 sub RGBasCMYK {
@@ -212,7 +217,7 @@ sub RGBasCMYK {
 
 sub HSVtoRGB {
     my ($h,$s,$v) = @_;
-    my ($r,$g,$b, $i, $f, $p, $q, $t);
+    my ($rr,$gg,$bb, $i, $f, $p, $q, $t);
 
     if ($s == 0) {
         # achromatic (grey)
@@ -228,32 +233,32 @@ sub HSVtoRGB {
     $t = $v * (1 - $s * ( 1 - $f ));
 
     if      ($i < 1) {
-        $r = $v;
-        $g = $t;
-        $b = $p;
+        $rr = $v;
+        $gg = $t;
+        $bb = $p;
     } elsif ($i < 2) {
-        $r = $q;
-        $g = $v;
-        $b = $p;
+        $rr = $q;
+        $gg = $v;
+        $bb = $p;
     } elsif ($i < 3) {
-        $r = $p;
-        $g = $v;
-        $b = $t;
+        $rr = $p;
+        $gg = $v;
+        $bb = $t;
     } elsif ($i < 4) {
-        $r = $p;
-        $g = $q;
-        $b = $v;
+        $rr = $p;
+        $gg = $q;
+        $bb = $v;
     } elsif ($i < 5) {
-        $r = $t;
-        $g = $p;
-        $b = $v;
+        $rr = $t;
+        $gg = $p;
+        $bb = $v;
     } else {
-        $r = $v;
-        $g = $p;
-        $b = $q;
+        $rr = $v;
+        $gg = $p;
+        $bb = $q;
     }
 
-    return ($r, $g, $b);
+    return ($rr, $gg, $bb);
 }
 
 sub RGBquant {
@@ -274,12 +279,12 @@ sub RGBquant {
 }
 
 sub RGBtoHSV {
-    my ($r,$g,$b) = @_;
+    my ($rr,$gg,$bb) = @_;
 
     my ($h,$s,$v, $min, $max, $delta);
 
-    $min = mMin($r, $g, $b);
-    $max = mMax($r, $g, $b);
+    $min = mMin($rr, $gg, $bb);
+    $max = mMax($rr, $gg, $bb);
 
     $v = $max;
     $delta = $max - $min;
@@ -292,12 +297,12 @@ sub RGBtoHSV {
         return ($h,$s,$v);
     }
 
-    if      ( $r == $max ) {
-        $h = ($g - $b) / $delta;
-    } elsif ( $g == $max ) {
-        $h = 2 + ($b - $r) / $delta;
+    if      ( $rr == $max ) {
+        $h = ($gg - $bb) / $delta;
+    } elsif ( $gg == $max ) {
+        $h = 2 + ($bb - $rr) / $delta;
     } else {
-        $h = 4 + ($r - $g) / $delta;
+        $h = 4 + ($rr - $gg) / $delta;
     }
     $h *= 60;
     if ($h < 0) {
@@ -307,13 +312,13 @@ sub RGBtoHSV {
 }
 
 sub RGBtoHSL {
-    my ($r,$g,$b) = @_;
+    my ($rr,$gg,$bb) = @_;
 
     my ($h,$s,$v, $l, $min, $max, $delta);
 
-    $min = mMin($r, $g, $b);
-    $max = mMax($r, $g, $b);
-    ($h, $s, $v) = RGBtoHSV($r, $g, $b);
+    $min = mMin($rr, $gg, $bb);
+    $max = mMax($rr, $gg, $bb);
+    ($h, $s, $v) = RGBtoHSV($rr, $gg, $bb);
     $l = ($max + $min) / 2.0;
     $delta = $max - $min;
     if ($delta < 0.00000000001) {
@@ -329,7 +334,7 @@ sub RGBtoHSL {
 }
 
 sub HSLtoRGB {
-    my($h,$s,$l, $r,$g,$b, $p1, $p2) = @_;
+    my($h,$s,$l, $rr,$gg,$bb, $p1, $p2) = @_;
 
     if ($l <= 0.5) {
         $p2 = $l * (1 + $s);
@@ -338,19 +343,19 @@ sub HSLtoRGB {
     }
     $p1 = 2 * $l - $p2;
     if ($s < 0.0000000000001) {
-        $r = $g = $b = $l;
+        $rr = $gg = $bb = $l;
     } else {
-        $r = RGBquant($p1, $p2, $h + 120);
-        $g = RGBquant($p1, $p2, $h);
-        $b = RGBquant($p1, $p2, $h - 120);
+        $rr = RGBquant($p1, $p2, $h + 120);
+        $gg = RGBquant($p1, $p2, $h);
+        $bb = RGBquant($p1, $p2, $h - 120);
     }
-    return ($r,$g,$b);
+    return ($rr,$gg,$bb);
 }
 
 sub optInvColor {
-    my ($r,$g,$b) = @_;
+    my ($rr,$gg,$bb) = @_;
 
-    my $ab = (0.2 * $r) + (0.7 * $g) + (0.1 * $b);
+    my $ab = (0.2 * $rr) + (0.7 * $gg) + (0.1 * $bb);
 
     if ($ab > 0.45) {
         return(0,0,0);
@@ -360,8 +365,8 @@ sub optInvColor {
 }
 
 sub defineColor {
-    my ($name, $mx, $r,$g,$b) = @_;
-    $colors{$name} ||= [ map {$_ / $mx} ($r,$g,$b) ];
+    my ($name, $mx, $rr,$gg,$bb) = @_;
+    $colors{$name} ||= [ map {$_ / $mx} ($rr,$gg,$bb) ];
     return $colors{$name};
 }
 
@@ -372,27 +377,27 @@ sub rgbHexValues {
     # if <3 digits, pad with '0' (silent error)
     # if not 3n digits, ignore extras (silent error)
     # if >12 digits, ignore extras (silent error)
-    my ($r,$g,$b);
+    my ($rr,$gg,$bb);
     while (length($name) < 4) { $name .= '0'; }
     if      (length($name) < 5) {  # zb. #fa4,          #cf0
-        $r = hex(substr($name, 1, 1)) / 0xf;
-        $g = hex(substr($name, 2, 1)) / 0xf;
-        $b = hex(substr($name, 3, 1)) / 0xf;
+        $rr = hex(substr($name, 1, 1)) / 0xf;
+        $gg = hex(substr($name, 2, 1)) / 0xf;
+        $bb = hex(substr($name, 3, 1)) / 0xf;
     } elsif (length($name) < 8) {  # zb. #ffaa44,       #ccff00
-        $r = hex(substr($name, 1, 2)) / 0xff;
-        $g = hex(substr($name, 3, 2)) / 0xff;
-        $b = hex(substr($name, 5, 2)) / 0xff;
+        $rr = hex(substr($name, 1, 2)) / 0xff;
+        $gg = hex(substr($name, 3, 2)) / 0xff;
+        $bb = hex(substr($name, 5, 2)) / 0xff;
     } elsif (length($name) < 11) { # zb. #fffaaa444,    #cccfff000
-        $r = hex(substr($name, 1, 3)) / 0xfff;
-        $g = hex(substr($name, 4, 3)) / 0xfff;
-        $b = hex(substr($name, 7, 3)) / 0xfff;
+        $rr = hex(substr($name, 1, 3)) / 0xfff;
+        $gg = hex(substr($name, 4, 3)) / 0xfff;
+        $bb = hex(substr($name, 7, 3)) / 0xfff;
     } else {                      # zb. #ffffaaaa4444,  #ccccffff0000
-        $r = hex(substr($name, 1, 4)) / 0xffff;
-        $g = hex(substr($name, 5, 4)) / 0xffff;
-        $b = hex(substr($name, 9, 4)) / 0xffff;
+        $rr = hex(substr($name, 1, 4)) / 0xffff;
+        $gg = hex(substr($name, 5, 4)) / 0xffff;
+        $bb = hex(substr($name, 9, 4)) / 0xffff;
     }
 
-    return ($r,$g,$b);
+    return ($rr,$gg,$bb);
 }
 
 # convert 4n (n=1..4) hex digits to CMYK 0-1 values
@@ -469,27 +474,27 @@ sub labHexValues {
     # if <3 digits, pad with '0' (silent error)
     # if not 3n digits, ignore extras (silent error)
     # if >12 digits, ignore extras (silent error)
-    my ($l,$a,$b);
+    my ($ll,$aa,$bb);
     while (length($name) < 4) { $name .= '0'; }
     if      (length($name) < 5) {
-        $l =  100*hex(substr($name, 1, 1)) / 0xf;
-        $a = (200*hex(substr($name, 2, 1)) / 0xf) - 100;
-        $b = (200*hex(substr($name, 3, 1)) / 0xf) - 100;
+        $ll =  100*hex(substr($name, 1, 1)) / 0xf;
+        $aa = (200*hex(substr($name, 2, 1)) / 0xf) - 100;
+        $bb = (200*hex(substr($name, 3, 1)) / 0xf) - 100;
     } elsif (length($name) < 8) {
-        $l =  100*hex(substr($name, 1, 2)) / 0xff;
-        $a = (200*hex(substr($name, 3, 2)) / 0xff) - 100;
-        $b = (200*hex(substr($name, 5, 2)) / 0xff) - 100;
+        $ll =  100*hex(substr($name, 1, 2)) / 0xff;
+        $aa = (200*hex(substr($name, 3, 2)) / 0xff) - 100;
+        $bb = (200*hex(substr($name, 5, 2)) / 0xff) - 100;
     } elsif (length($name) < 11) {
-        $l =  100*hex(substr($name, 1, 3)) / 0xfff;
-        $a = (200*hex(substr($name, 4, 3)) / 0xfff) - 100;
-        $b = (200*hex(substr($name, 7, 3)) / 0xfff) - 100;
+        $ll =  100*hex(substr($name, 1, 3)) / 0xfff;
+        $aa = (200*hex(substr($name, 4, 3)) / 0xfff) - 100;
+        $bb = (200*hex(substr($name, 7, 3)) / 0xfff) - 100;
     } else {
-        $l =  100*hex(substr($name, 1, 4)) / 0xffff;
-        $a = (200*hex(substr($name, 5, 4)) / 0xffff) - 100;
-        $b = (200*hex(substr($name, 9, 4)) / 0xffff) - 100;
+        $ll =  100*hex(substr($name, 1, 4)) / 0xffff;
+        $aa = (200*hex(substr($name, 5, 4)) / 0xffff) - 100;
+        $bb = (200*hex(substr($name, 9, 4)) / 0xffff) - 100;
     }
 
-    return ($l,$a,$b);
+    return ($ll,$aa,$bb);
 }
 
 sub namecolor {
@@ -553,30 +558,30 @@ sub namecolor_lab {
         return floats5(labHexValues($name));
     } elsif ($name =~ /^#/) {     # rgb spec.
         my ($h,$s,$v) = RGBtoHSV(rgbHexValues($name));
-        my $a = cos(deg2rad($h)) * $s * 100;
-        my $b = sin(deg2rad($h)) * $s * 100;
-        my $l = 100 * $v;
-        return floats5($l,$a,$b);
+        my $aa = cos(deg2rad($h)) * $s * 100;
+        my $bb = sin(deg2rad($h)) * $s * 100;
+        my $ll = 100 * $v;
+        return floats5($ll,$aa,$bb);
     } elsif ($name =~ /^!/) {     # hsv spec.
         # fake conversion
         my ($h,$s,$v) = hsvHexValues($name);
-        my $a = cos(deg2rad($h)) * $s * 100;
-        my $b = sin(deg2rad($h)) * $s * 100;
-        my $l = 100 * $v;
-        return floats5($l,$a,$b);
+        my $aa = cos(deg2rad($h)) * $s * 100;
+        my $bb = sin(deg2rad($h)) * $s * 100;
+        my $ll = 100 * $v;
+        return floats5($ll,$aa,$bb);
     } elsif ($name =~ /^&/) {     # hsl spec.
         my ($h,$s,$v) = hsvHexValues($name);
-        my $a = cos(deg2rad($h)) * $s * 100;
-        my $b = sin(deg2rad($h)) * $s * 100;
+        my $aa = cos(deg2rad($h)) * $s * 100;
+        my $bb = sin(deg2rad($h)) * $s * 100;
         ($h,$s,$v) = RGBtoHSV(HSLtoRGB($h,$s,$v));
-        my $l = 100 * $v;
-        return floats5($l,$a,$b);
+        my $ll = 100 * $v;
+        return floats5($ll,$aa,$bb);
     } else {                      # or it is a ref ?
         my ($h,$s,$v) = RGBtoHSV(@{$name || [0.5,0.5,0.5]});
-        my $a = cos(deg2rad($h)) * $s * 100;
-        my $b = sin(deg2rad($h)) * $s * 100;
-        my $l = 100 * $v;
-        return floats5($l,$a,$b);
+        my $aa = cos(deg2rad($h)) * $s * 100;
+        my $bb = sin(deg2rad($h)) * $s * 100;
+        my $ll = 100 * $v;
+        return floats5($ll,$aa,$bb);
     }
 }
 

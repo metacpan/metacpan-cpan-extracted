@@ -1,7 +1,8 @@
-use Test::More tests => 7;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 7;
 
 use PDF::Builder;
 
@@ -41,3 +42,5 @@ $text = $page->text();
          qr{A font size is required},
          q{Call to text without a set font size returns an informative error});
 }
+
+1;

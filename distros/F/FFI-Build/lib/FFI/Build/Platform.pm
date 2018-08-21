@@ -11,7 +11,7 @@ use File::Temp ();
 use Capture::Tiny ();
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub new
@@ -106,7 +106,12 @@ sub library_prefix
 
 sub cc
 {
-  shift->{config}->{cc};
+  # TODO: cc could include flags "cc --some-flag" so we should really parse
+  # the first element of cc to be our cc, and push the rest into cflags.
+  my $cc = shift->{config}->{cc};
+  $cc =~ s/^\s+//;
+  $cc =~ s/\s+$//;
+  $cc;
 }
 
 
@@ -374,7 +379,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.03
+version 0.07
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,14 @@
 Revision history for Parse-MIME
 
+1.005 Mon 20 Aug 2018
+	- No functional changes
+	- Actual 5.6 compatibility
+
+1.004 Sun 19 Aug 2018
+	- No functional changes
+	- Tests powered by JSON::PP instead of JSON::XS
+	- Simplified tests with fewer dependencies
+
 1.003 Sat 10 Jan 2015
 	- No functional changes
 	- No longer contains INSTALL file with install-as-root instructions

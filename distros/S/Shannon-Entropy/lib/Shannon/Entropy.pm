@@ -8,7 +8,7 @@ use Import::Export;
 
 use base qw/Import::Export/;
 
-our $VERSION = '1.010101';
+our $VERSION = '1.101010';
 
 our %EX = (
 	entropy => [qw/all/]
@@ -25,7 +25,7 @@ Shannon::Entropy - Calculate the Shannon entropy H of a given input string.
 
 =head1 VERSION
 
-Version 1.010101
+Version 1.101010
 
 =cut
 

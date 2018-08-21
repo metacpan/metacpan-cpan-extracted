@@ -10,7 +10,7 @@ SYNOPSIS
         ->append( "Hello my name is " )
         ->append_tagged( $name, bold => 1, fgindex => 4 );
     
-     print $st->build_terminal . "\n";
+     $st->say_to_terminal;
 
 DESCRIPTION
 
@@ -62,7 +62,7 @@ METHODS
 
  build_terminal
 
-       $str = $st->build_terminal
+       $str = $st->build_terminal( %opts )
 
     Returns a string containing terminal escape sequences mixed with string
     content to render the string to a terminal.
@@ -71,12 +71,39 @@ METHODS
     care should be taken when passing it around, printing it for debugging
     purposes, or similar.
 
+    Takes the following additional named options:
+
+    no_color
+
+      If true, the fgindex and bgindex attributes will be ignored. This has
+      the result of performing some formatting using the other attributes,
+      but not setting colours.
+
  as_formatting
 
        $fmt = $st->as_formatting
 
     Returns a new String::Tagged instance tagged with
     String::Tagged::Formatting standard tags.
+
+ print_to_terminal
+
+       $str->print_to_terminal( $fh )
+
+    Prints the string to the terminal by building a terminal escape string
+    then printing it to the given IO handle (or STDOUT if not supplied).
+
+    This method will pass the value of the NO_COLOR environment variable to
+    the underlying "build_terminal" method call, meaning if that has a true
+    value then colouring tags will be ignored, yielding a monochrome
+    output. This follows the suggestion of http://no-color.org/.
+
+ say_to_terminal
+
+       $str->say_to_terminal( $fh )
+
+    Prints the string to the terminal as per "print_to_terminal", followed
+    by a linefeed.
 
 TODO
 

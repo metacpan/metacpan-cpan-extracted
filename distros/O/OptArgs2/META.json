@@ -1,11 +1,10 @@
 {
-   "abstract" : "command-line argument and option processor",
+   "abstract" : "CLI argument and option processing",
    "author" : [
       "Mark Lawrence <nomad@null.net>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
-   "keywords" : [],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -15,6 +14,10 @@
    },
    "name" : "OptArgs2",
    "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
       "package" : [
          "OptArgs2::Arg",
          "OptArgs2::Cmd",
@@ -23,21 +26,26 @@
          "OptArgs2::Opt",
          "OptArgs2::Result",
          "OptArgs2::Util",
-         "Getopt::Args2::Result"
+         "Getopt::Args2::Arg",
+         "Getopt::Args2::Cmd",
+         "Getopt::Args2::Fallback",
+         "Getopt::Args2::Mo",
+         "Getopt::Args2::Opt",
+         "Getopt::Args2::Result",
+         "Getopt::Args2::Util"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build::Pluggable::CPANfile" : "0.05"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "File::Spec" : "0",
-            "Module::Build" : "0.4004",
-            "Module::Build::Pluggable" : "0",
-            "Module::Build::Pluggable::CPANfile" : "0.05"
+            "ExtUtils::MakeMaker" : "6.17",
+            "ExtUtils::MakeMaker::CPANfile" : "0.08",
+            "File::Spec" : "0"
          }
       },
       "runtime" : {
@@ -55,23 +63,18 @@
          "requires" : {
             "IO::Capture::Stdout" : "0",
             "POSIX" : "0",
-            "Test2::Bundle::Extended" : "0"
+            "Test2::V0" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/mlawren/p5-OptArgs2/issues"
-      },
-      "homepage" : "https://github.com/mlawren/p5-OptArgs2",
-      "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
-      ],
+      "bugtracker" : {},
       "repository" : {
-         "url" : "git://github.com/mlawren/p5-OptArgs2.git"
+         "type" : "git",
+         "url" : "ssh://git@github.com/mlawren/p5-OptArgs2.git"
       }
    },
-   "version" : "v0.0.10",
+   "version" : "v0.0.11",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

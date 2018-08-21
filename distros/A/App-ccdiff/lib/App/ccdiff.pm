@@ -1,6 +1,6 @@
 package App::ccdiff;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 use strict;
 use warnings
@@ -79,28 +79,30 @@ C<--utf-8> is in effect, it will show the Unicode character name(s).
 
 This is a debugging option, so invisible characters can still be "seen".
 
-C<--verbose> accepts an optional verbosity-level, but no specific behavior for
-these have not yet been defined.
+C<--verbose> accepts an optional verbosity-level. On level 2 and up, all
+horizontal changes get left-and-right markers inserted to enable seeing the
+location of the ZERO WIDTH or invisible characters.
 
-=item --color -c
+=item --markers -m
 
-Use colors to show differences. As this is the default, use C<--no-color> or
-C<--fancy> to use markers instead of color indicators.
+Use markers under each changed character in change-chunks.
 
-C<--no-color> is especially useful if the terminal does not support colors,
-or if you want to copy/paste the output to (ASCII) mail.
+C<--markers> is especially useful if the terminal does not support colors, or
+if you want to copy/paste the output to (ASCII) mail. See also C<--ascii>
+
+=item --ascii -a
+
+Use (colored) ASCII indicators instead of Unicode. The default indicators are
+Unicode characters that stand out better.
+
+For the positional indicators, I did consider using U+034e (COMBINING UPWARDS
+ARROW BELOW), but as most terminals are probably unable to show it due to line
+height changes, I did not pursue the idea.
 
 =item --pink -p
 
 Change the default C<red> for deleted text to the color closest to pink that
 is supported by L<Term::ANSIColor>: C<magenta>.
-
-=item --fancy -f
-
-Use (colored) Unicode indicators under changed text instead of the default C<^>.
-
-I did consider using U+034e (COMBINING UPWARDS ARROW BELOW), but as most
-terminals are probably unable to show it, I did not pursue the idea.
 
 =item --reverse -r
 
@@ -174,7 +176,7 @@ in this order:
 and evaluated in that order. Any options specified in a file later in that
 chain will overwrite previously set options.
 
-Option files are only read and evaluated if it is not empty and not writeable
+Option files are only read and evaluated if it is not empty and not writable
 by others than the owner.
 
 The syntax of the file is one option per line. where leading and trailing
@@ -189,13 +191,20 @@ Between parens is the corresponding command-line option.
 
 =over 2
 
-=item color (-c)
+=item markers (-m)
 
- color   : true
+ markers : false
 
-defines if colors should be used. The default is to use colors. The C<-c>
-command line option will toggle the option when set from a configuration
-file.
+defines if markers should be used under changed characters. The default is to
+use colors only. The C<-m> command line option will toggle the option when set
+from a configuration file.
+
+=item ascii (-a)
+
+ ascii   : false
+
+defines to use ASCII markers instead of Unicode markers. The default is to use
+Unicode markers.
 
 =item reverse (-r)
 
@@ -203,7 +212,7 @@ file.
 
 defines if changes are displayed as foreground-color over background-color
 or background-color over foreground-color. The default is C<false>, so it will
-color the changes withe the appropriate color (C<new> or C<old>) over the
+color the changes with the appropriate color (C<new> or C<old>) over the
 default background color.
 
 =item new (--new)
@@ -328,7 +337,7 @@ H.Merijn Brand
  Copyright (C) 2018-2018 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
-the same terms as Perl itself.
+the same terms as The Artistic License 2.0.
 
 =for elvis
 :ex:se gw=75|color guide #ff0000:

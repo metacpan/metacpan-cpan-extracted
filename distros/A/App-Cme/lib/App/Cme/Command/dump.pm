@@ -10,7 +10,7 @@
 # ABSTRACT: Dump the configuration of an application
 
 package App::Cme::Command::dump ;
-$App::Cme::Command::dump::VERSION = '1.028';
+$App::Cme::Command::dump::VERSION = '1.029';
 use strict;
 use warnings;
 use 5.10.1;
@@ -104,7 +104,7 @@ App::Cme::Command::dump - Dump the configuration of an application
 
 =head1 VERSION
 
-version 1.028
+version 1.029
 
 =head1 SYNOPSIS
 

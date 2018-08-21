@@ -5,10 +5,8 @@ lib/Text/WordDiff.pm
 lib/Text/WordDiff/ANSIColor.pm
 lib/Text/WordDiff/HTML.pm
 lib/Text/WordDiff/HTMLTwoLines.pm
-Makefile.PL
+LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 t/ansicolor.t
 t/base.t
@@ -17,3 +15,6 @@ t/data/right.txt
 t/html.t
 t/htmltwolines.t
 t/pod.t
+Makefile.PL
+META.yml
+META.json

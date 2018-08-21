@@ -2,9 +2,9 @@
 use 5.005;
 
 package Types::Bool;
-$Types::Bool::VERSION = '2.98011';
+$Types::Bool::VERSION = '2.98012';
 
-# ABSTRACT: Booleans as objects for Perl
+# ABSTRACT: An interface to booleans as objects for Perl
 
 BEGIN {
 
@@ -44,7 +44,7 @@ BEGIN {
     *new = sub { bless \( my $dummy = $_[1] ? 1 : 0 ), $_[0] }
       unless __PACKAGE__->can('new');
 
-    $Types::Bool::Impl::VERSION = '2.98011'
+    $Types::Bool::Impl::VERSION = '2.98012'
       unless $Types::Bool::Impl::VERSION;
 }
 
@@ -55,13 +55,13 @@ use Scalar::Util ();
 use constant true  => Types::Bool::Impl->new(1);
 use constant false => Types::Bool::Impl->new(0);
 
-use constant BOOL_CORE => ref true;
+use constant BOOL_PACKAGE => ref true;
 
-sub is_bool ($) { Scalar::Util::blessed( $_[0] ) and $_[0]->isa(BOOL_CORE) }
+sub is_bool ($) { Scalar::Util::blessed( $_[0] ) and $_[0]->isa(BOOL_PACKAGE) }
 
 sub to_bool ($) { $_[0] ? true : false }
 
-@Types::Bool::EXPORT_OK = qw(true false is_bool to_bool);
+@Types::Bool::EXPORT_OK = qw(true false is_bool to_bool BOOL_PACKAGE);
 
 BEGIN {
     if ( "$]" < 5.008003 ) {    # Inherit from Exporter (if needed)

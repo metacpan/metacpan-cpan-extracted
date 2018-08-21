@@ -1,4 +1,6 @@
-#!perl
+#!/usr/bin/perl
+use warnings;
+use strict;
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
@@ -13,3 +15,5 @@ use Test::More;
 use Test::Pod 1.41;
 
 all_pod_files_ok();
+
+1;

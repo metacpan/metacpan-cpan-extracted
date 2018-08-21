@@ -7,8 +7,8 @@ use warnings;
 
 no warnings 'uninitialized';
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -83,13 +83,13 @@ sub usesLib {
 
 sub handle_generic {
     my ($self, $pdf, $tif) = @_;
-    my ($i, $stripcount, $buffer);
+    my ($stripcount, $buffer);
 
     $self->filters('FlateDecode');
 
     $stripcount = $tif->{'object'}->NumberOfStrips();
     $buffer = '';
-    for $i (0 .. $stripcount - 1) {
+    for my $i (0 .. $stripcount - 1) {
         $buffer .= $tif->{'object'}->ReadEncodedStrip($i, -1);
     }
 
@@ -111,7 +111,7 @@ sub handle_generic {
 
 sub handle_ccitt {
     my ($self, $pdf, $tif) = @_;
-    my ($i, $stripcount);
+    my ($stripcount);
 
     $self->{' nofilt'} = 1;
     $self->{'Filter'} = PDFArray(PDFName('CCITTFaxDecode'));
@@ -144,7 +144,7 @@ sub handle_ccitt {
         die "Chunked CCITT G3/G4 TIFF not supported.";
     } else {
 	$stripcount = $tif->{'object'}->NumberOfStrips();
-	for $i (0 .. $stripcount - 1) {
+	for my $i (0 .. $stripcount - 1) {
             $self->{' stream'} .= $tif->{'object'}->ReadRawStrip($i, -1);
 	}
         # if bit fill order in data is opposite of PDF spec (Lsb2Msb), need to 
@@ -153,8 +153,8 @@ sub handle_ccitt {
 	# a 256-entry lookup table could probably do just as well and build
 	# up the replacement string rather than constantly substr'ing.
 	if ($tif->{'fillOrder'} == 2) { # Lsb first, PDF is Msb
-	    my ($j, $oldByte, $newByte);
-	    for $j ( 0 .. length($self->{' stream'}) ) {
+	    my ($oldByte, $newByte);
+	    for my $j ( 0 .. length($self->{' stream'}) ) {
 	        # swapping j-th byte of stream
 		$oldByte = ord(substr($self->{' stream'}, $j, 1));
 		if ($oldByte eq 0 || $oldByte eq 255) { next; }

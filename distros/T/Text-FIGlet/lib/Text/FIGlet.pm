@@ -1,7 +1,7 @@
 package Text::FIGlet;
 use strict;
 use vars qw'$VERSION %RE';
-$VERSION = '2.19.3';           #Actual code version: 2.19.1
+$VERSION = '2.19.4';           #Actual code version: 2.19.1
 
                                #~50us penalty w/ 2 constant calls for 5.005
 use constant PRIVb => 0xF0000; #Map neg chars into Unicode's private area

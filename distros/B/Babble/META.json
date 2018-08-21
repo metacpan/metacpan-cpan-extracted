@@ -41,7 +41,7 @@
       },
       "Babble" : {
          "file" : "lib/Babble.pm",
-         "version" : "0.090003"
+         "version" : "0.090006"
       },
       "Babble::Filter" : {
          "file" : "lib/Babble/Filter.pm"
@@ -64,6 +64,9 @@
       "Babble::Plugin::SKT" : {
          "file" : "lib/Babble/Plugin/SKT.pm"
       },
+      "Babble::Plugin::Sigify" : {
+         "file" : "lib/Babble/Plugin/Sigify.pm"
+      },
       "Babble::Plugin::State" : {
          "file" : "lib/Babble/Plugin/State.pm"
       },
@@ -81,6 +84,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.090003",
+   "version" : "0.090006",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

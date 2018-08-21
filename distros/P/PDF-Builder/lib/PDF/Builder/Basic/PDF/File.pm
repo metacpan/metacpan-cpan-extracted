@@ -16,8 +16,8 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -317,6 +317,7 @@ sub release {
             $item = undef;
         }
     }
+    return;
 } # end of release()
 
 =head2 $p->append_file()
@@ -349,13 +350,14 @@ sub append_file {
     }
     $tdict->{'Size'} = $self->{'Size'};
 
-    foreach my $key (grep { $_ !~ m/^\s/ } keys %$self) {
+    foreach my $key (grep { $_ !~ m/^\s/ } keys %$self) { 
         $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
     }
 
     $fh->seek($self->{' epos'}, 0);
     $self->out_trailer($tdict, $self->{' update'});
     close $self->{' OUTFILE'};
+    return;
 } # end of append_file()
 
 =head2 $p->out_file($fname)
@@ -423,7 +425,7 @@ sub close_file {
     $tdict->{'Size'} = $self->{'Size'} || PDFNum(1);
     $tdict->{'Prev'} = PDFNum($self->{' loc'}) if $self->{' loc'};
     if ($self->{' update'}) {
-        foreach my $key (grep ($_ !~ m/^[\s\-]/, keys %$self)) {
+        foreach my $key (grep ($_ !~ m/^[\s\-]/, keys %$self)) { ## no critic
             $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
         }
 
@@ -863,6 +865,7 @@ sub free_obj {
     push @{$self->{' free'}}, $objind;
     $self->{' objects'}{$objind->uid()}[2] = 1;
     $self->out_obj($objind);
+    return;
 }
 
 =head2 $p->remove_obj($objind)
@@ -878,8 +881,8 @@ sub remove_obj {
     delete $self->{' objects'}{$objind->uid()};
     delete $self->{' outlist_cache'}{$objind};
     delete $self->{' printed_cache'}{$objind};
-    @{$self->{' outlist'}} = grep($_ ne $objind, @{$self->{' outlist'}});
-    @{$self->{' printed'}} = grep($_ ne $objind, @{$self->{' printed'}});
+    @{$self->{' outlist'}} = grep($_ ne $objind, @{$self->{' outlist'}}); ## no critic
+    @{$self->{' printed'}} = grep($_ ne $objind, @{$self->{' printed'}}); ## no critic
     $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} = undef
         if $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} eq $objind;
 
@@ -1113,6 +1116,7 @@ sub _unpack_xref_stream {
     return unpack('n', $data)       if $width == 2;
     return unpack('N', "\x00$data") if $width == 3;
     return unpack('N', $data)       if $width == 4;
+    return unpack('Q', $data)       if $width == 8; # added 4/2/2018 PDF 1.5+?
 
     die "Invalid column width: $width";
 }
@@ -1323,6 +1327,7 @@ sub out_trailer {
     $fh->print("trailer\n");
     $tdict->outobjdeep($fh, $self);
     $fh->print("\nstartxref\n$tloc\n%%EOF\n");
+    return;
 } # end of out_trailer()
 
 =head2 PDF::Builder::Basic::PDF::File->_new()

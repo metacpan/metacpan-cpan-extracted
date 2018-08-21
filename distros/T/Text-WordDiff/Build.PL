@@ -18,9 +18,9 @@ my $build = Module::Build->new(
     },
     meta_merge => {
         resources => {
-            homepage   => 'http://search.cpan.org/dist/Text-WordDiff/',
-            bugtracker => 'http://github.com/theory/test-xpath/issues/',
-            repository => 'http://github.com/theory/test-xpath/tree/',
+            homepage   => 'https://metacpan.org/release/Text-WordDiff',
+            bugtracker => 'https://github.com/ThePerlShop/text-worddiff/issues',
+            repository => 'https://github.com/ThePerlShop/text-worddiff',
         }
     },
 );

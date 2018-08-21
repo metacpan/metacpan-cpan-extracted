@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.6.7 2018/08/19 00:00:00
+  - support OVERRIDE_MAPPING
+  - created by INABA Hitoshi
+
 2.13.6.6 2018/07/25 00:00:00
   - support jef9p
   - created by INABA Hitoshi

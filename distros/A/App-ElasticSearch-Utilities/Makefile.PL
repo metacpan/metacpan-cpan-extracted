@@ -82,7 +82,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "5.9",
+  "VERSION" => "6.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

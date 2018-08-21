@@ -2,9 +2,9 @@ package Test::Class::Moose::CLI;
 
 # ABSTRACT: Use this in your tcm.t script for a drop-in runner tool
 
-use 5.10.0;
+use 5.010000;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 use Moose 2.0000;
 use Carp;
@@ -28,7 +28,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 

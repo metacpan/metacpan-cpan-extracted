@@ -1,0 +1,32 @@
+---
+abstract: 'HTML::FormFu modules for working with GCT (Galactic Time Coordinated) datetimes and durations from the online game Tau Station'
+author:
+  - 'Carl Franks <github@tauhead.com>'
+build_requires:
+  DateTime::Calendar::TauStation: '0'
+  DateTime::Duration::TauStation: '0'
+  HTML::FormFu: '0'
+  Test::More: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FormFu-TauStation
+requires:
+  DateTime::Format::TauStation: '1.182290'
+  HTML::FormFu::Constants: '0'
+  HTML::FormFu::Constraint: '0'
+  HTML::FormFu::Deflator: '0'
+  HTML::FormFu::Inflator: '0'
+  Moose: '0'
+  strict: '0'
+resources:
+  homepage: https://github.com/fireartist/HTML-FormFu-TauStation
+  repository: https://github.com/fireartist/HTML-FormFu-TauStation.git
+version: '1.182322'
+x_serialization_backend: 'YAML::Tiny version 1.73'

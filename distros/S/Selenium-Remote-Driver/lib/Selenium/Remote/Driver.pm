@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.28';
+$Selenium::Remote::Driver::VERSION = '1.29';
 use strict;
 use warnings;
 
@@ -325,6 +325,9 @@ sub DEMOLISH {
 
 # We install an 'around' because we can catch more exceptions this way
 # than simply wrapping the explicit croaks in _execute_command.
+# @args should be fed to the handler to provide context
+# return_value could be assigned from the handler if we want to allow the
+# error_handler to handle the errors
 
 around '_execute_command' => sub {
     my $orig = shift;
@@ -337,7 +340,7 @@ around '_execute_command' => sub {
     }
     catch {
         if ($self->has_error_handler) {
-            $self->error_handler->($self,$_);
+            $return_value = $self->error_handler->($self,$_,@args);
         }
         else {
             croak $_;
@@ -478,15 +481,16 @@ sub _request_new_session {
 
     #Delete compatibility layer when using drivers directly
     if ($self->isa('Selenium::Firefox')) {
-        delete $args->{capabilities};
-        delete $args->{extra_capabilities};
+        if ( exists $args->{capabilities} && exists $args->{capabilities}->{alwaysMatch} ) {
+            delete $args->{capabilities}->{alwaysMatch}->{browserName};
+            delete $args->{capabilities}->{alwaysMatch}->{browserVersion};
+            delete $args->{capabilities}->{alwaysMatch}->{platformName};
+        }
     }
 
-    # geckodriver has not yet implemented the GET /status endpoint
-    # https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette/WebDriver/status
-    if (! $self->isa('Selenium::Firefox')) {
-        $self->remote_conn->check_status();
-    }
+    # Get actual status
+    $self->remote_conn->check_status();
+
     # command => 'newSession' to fool the tests of commands implemented
     # TODO: rewrite the testing better, this is so fragile.
     my $resource_new_session = {
@@ -1743,7 +1747,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 
@@ -2035,49 +2039,57 @@ not part of the browser-related desired capabilities.
 =back
 
 Output:
-Remote Driver object
+
+Selenium::Remote::Driver object
 
 Usage:
-my $driver = Selenium::Remote::Driver->new;
-or
-my $driver = Selenium::Remote::Driver->new('browser_name' => 'firefox',
-                                           'platform'     => 'MAC');
-or (for Firefox 47 or lower on Selenium 3+)
-my $driver = Selenium::Remote::Driver->new('browser_name' => 'firefox',
-                                           'platform'     => 'MAC',
-                                           'extra_capabilities' => {
-                                                'marionette' => \0,
-                                          });
-or
-my $driver = Selenium::Remote::Driver->new('remote_server_addr' => '10.10.1.1',
-                                           'port'               => '2222',
-                                           'auto_close'         => 0);
-or
-my $driver = Selenium::Remote::Driver->new('browser_name' =>'chrome',
-                                           'extra_capabilities' => {
-                                               'chromeOptions' => {
-                                                   'args'  => [
-                                                       'window-size=1260,960',
-                                                       'incognito'
-                                                   ],
-                                                   'prefs' => {
-                                                       'session' => {
-                                                           'restore_on_startup' => 4,
-                                                           'urls_to_restore_on_startup' => [
+
+    my $driver = Selenium::Remote::Driver->new;
+
+    #or
+    my $driver = Selenium::Remote::Driver->new('browser_name' => 'firefox',
+                                               'platform'     => 'MAC');
+
+    #or (for Firefox 47 or lower on Selenium 3+)
+    my $driver = Selenium::Remote::Driver->new('browser_name' => 'firefox',
+                                               'platform'     => 'MAC',
+                                               'extra_capabilities' => {
+                                                    'marionette' => \0,
+                                              });
+
+    #or
+    my $driver = Selenium::Remote::Driver->new('remote_server_addr' => '10.10.1.1',
+                                               'port'               => '2222',
+                                               'auto_close'         => 0);
+
+    #or
+    my $driver = Selenium::Remote::Driver->new('browser_name' =>'chrome',
+                                               'extra_capabilities' => {
+                                                   'chromeOptions' => {
+                                                       'args'  => [
+                                                           'window-size=1260,960',
+                                                           'incognito'
+                                                       ],
+                                                       'prefs' => {
+                                                           'session' => {
+                                                               'restore_on_startup' => 4,
+                                                               'urls_to_restore_on_startup' => [
+                                                                   'http://www.google.com',
+                                                                   'http://docs.seleniumhq.org'
+                                                               ]},
+                                                           'first_run_tabs' => [
                                                                'http://www.google.com',
                                                                'http://docs.seleniumhq.org'
-                                                           ]},
-                                                       'first_run_tabs' => [
-                                                           'http://www.google.com',
-                                                           'http://docs.seleniumhq.org'
-                                                       ]
+                                                           ]
+                                                       }
                                                    }
-                                               }
-                                           });
-or
-my $driver = Selenium::Remote::Driver->new('proxy' => {'proxyType' => 'manual', 'httpProxy' => 'myproxy.com:1234'});
-or
-my $driver = Selenium::Remote::Driver->new('default_finder' => 'css');
+                                               });
+
+    #or
+    my $driver = Selenium::Remote::Driver->new('proxy' => {'proxyType' => 'manual', 'httpProxy' => 'myproxy.com:1234'});
+
+    #or
+    my $driver = Selenium::Remote::Driver->new('default_finder' => 'css');
 
 =head3 error_handler
 
@@ -2101,9 +2113,10 @@ already-instantiated driver:
     # (we will croak about the exception)
     $driver->clear_error_handler;
 
-Your error handler will receive two arguments: the first argument is
+Your error handler will receive three arguments: the first argument is
 the C<$driver> object itself, and the second argument is the exception
-message and stack trace in one multiline string.
+message and stack trace in one multiline string.  The final argument(s) are the
+argument array to the command just executed.
 
 B<N.B.>: If you set your own error handler, you are entirely
 responsible for handling webdriver exceptions, _including_ croaking
@@ -3555,7 +3568,7 @@ Aditya Ivaturi <ivaturi@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Eric Johnson Gabor Szabo Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Max O'Cull Michael Prokop Peter Mottram (SysPete) Phil Kania Mitchell Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal
+=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Eric Johnson Gabor Szabo Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Max O'Cull Michael Prokop Peter Mottram (SysPete) Phil Kania Mitchell Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yves Lavoie
 
 =over 4
 
@@ -3710,6 +3723,10 @@ Vishwanath Janmanchi <jvishwanath@gmail.com>
 =item *
 
 Viťas Strádal <vitas@matfyz.cz>
+
+=item *
+
+Yves Lavoie <ylavoie@yveslavoie.com>
 
 =back
 

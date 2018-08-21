@@ -1,5 +1,8 @@
 Revision history for Open-This
 
+0.000009  2018-08-20 19:33:14Z
+    - Parse path/to/file::sub_name()
+
 0.000008  2018-06-18 18:37:05Z
     - Don't use /usr/bin/env in shebang
 

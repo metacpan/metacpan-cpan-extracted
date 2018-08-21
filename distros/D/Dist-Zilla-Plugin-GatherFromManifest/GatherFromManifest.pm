@@ -1,12 +1,12 @@
 package Dist::Zilla::Plugin::GatherFromManifest;
 
-# $Id: GatherFromManifest.pm 57 2018-05-07 06:10:28Z stro $
+# $Id: GatherFromManifest.pm 59 2018-08-21 00:43:49Z stro $
 
 use strict;
 use warnings;
 
 BEGIN {
-  $Dist::Zilla::Plugin::GatherFromManifest::VERSION = '1.003';
+  $Dist::Zilla::Plugin::GatherFromManifest::VERSION = '1.004';
 }
 
 =head1 NAME
@@ -15,7 +15,7 @@ Dist::Zilla::Plugin::GatherFromManifest - gather all files from MANIFEST
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,6 @@ directory.  See the L<description block in GatherDir documentation|Dist::Zilla::
 
 use Moose;
 use Moose::Autobox;
-#use MooseX::Types::Path::Class qw(Dir File);
 use Dist::Zilla::Types qw(Path);
 
 with 'Dist::Zilla::Role::FileGatherer';
@@ -71,7 +70,7 @@ use ExtUtils::Manifest;
 use File::Find::Rule;
 use File::HomeDir;
 use File::Spec;
-use Path::Class;
+use Path::Tiny;
 
 use namespace::autoclean;
 
@@ -101,14 +100,14 @@ Overridden method implementing gathering functionality.
 sub gather_files {
     my ($self) = @_;
 
-    my $manifest = $self->zilla->root->file( $self->manifest );
+    my $manifest = Path::Tiny::path($self->zilla->root)->child( $self->manifest );
     unless (-f $manifest) {
         $self->log_fatal("Cannot read manifest file: ", $manifest);
     }
 
     my $root = "" . $self->root;
     $root =~ s{^~([\\/])}{File::HomeDir->my_home . $1}ex;
-    $root = Path::Class::dir($root);
+    $root = Path::Tiny::path($root)->stringify;
 
     $manifest = File::Spec->catdir($root, $manifest);
 
@@ -122,7 +121,7 @@ sub gather_files {
     for my $file (@files) {
         (my $newname = $file->name) =~ s{\A\Q$root\E[\\/]}{}gx;
         $newname = File::Spec->catdir($self->prefix, $newname) if $self->prefix;
-        $newname = Path::Class::dir($newname)->as_foreign('Unix')->stringify;
+        $newname = Path::Tiny::path($newname)->stringify;
 
         $file->name($newname);
         $self->add_file($file);

@@ -79,7 +79,6 @@ my %WriteMakefileArgs = (
     "DBIx::Class::Schema::Loader" => "0.07049",
     "DBIx::Class::Schema::Loader::DBI" => 0,
     "DBIx::Class::Schema::Loader::Table" => 0,
-    "DBIx::Class::_Util" => 0,
     "Data::Dumper" => "2.131",
     "Data::Dumper::Concise" => "2.020",
     "Data::Printer" => 0,
@@ -182,7 +181,7 @@ my %WriteMakefileArgs = (
     "inc::Module::Install" => "1.08",
     "utf8" => 0
   },
-  "VERSION" => "1.3101",
+  "VERSION" => "1.3102",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t t/unit/*.t"
   }
@@ -239,7 +238,6 @@ my %FallbackPrereqs = (
   "DBIx::Class::Schema::Loader" => "0.07049",
   "DBIx::Class::Schema::Loader::DBI" => 0,
   "DBIx::Class::Schema::Loader::Table" => 0,
-  "DBIx::Class::_Util" => 0,
   "Data::Dumper" => "2.131",
   "Data::Dumper::Concise" => "2.020",
   "Data::Printer" => 0,

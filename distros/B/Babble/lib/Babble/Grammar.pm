@@ -32,7 +32,9 @@ lazy grammar_regexp => sub {
   return $base_re unless @parts;
   my $define_block = join "\n", '(?(DEFINE)', '', @parts, '', ')';
   use re 'eval';
-  return qr{${define_block} ${base_re}}x;
+  # For reasons I don't understand, this stringify is required (RT #126285)
+  my $final_re = "${define_block} ${base_re}";
+  return qr{$final_re}x;
 };
 
 sub _rule_name {

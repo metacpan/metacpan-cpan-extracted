@@ -1,7 +1,8 @@
-use Test::More tests => 3;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More tests => 3;
 
 use PDF::Builder;
 
@@ -16,3 +17,5 @@ like($pdf->stringify(), qr{/ViewerPreferences << [^>]*?/Duplex /DuplexFlipLongEd
 $pdf = PDF::Builder->new();
 $pdf->preferences(-duplexflipshortedge => 1);
 like($pdf->stringify(), qr{/ViewerPreferences << [^>]*?/Duplex /DuplexFlipShortEdge}, q{Duplex => DuplexFlipShortEdge});
+
+1;

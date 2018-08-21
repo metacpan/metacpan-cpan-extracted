@@ -1,5 +1,5 @@
 package DateTime::Calendar::TauStation;
-$DateTime::Calendar::TauStation::VERSION = '1.182260';
+$DateTime::Calendar::TauStation::VERSION = '1.182290';
 use strict;
 use vars qw ( $SECS_2_UNITS @EXPORT_OK );
 

@@ -1,7 +1,8 @@
-use Test::More tests => 116;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 116;
 
 use PDF::Builder;
 
@@ -214,3 +215,5 @@ is($mediabox[0], 0, 'PaperSizes LLX (36x36)');
 is($mediabox[1], 0, 'PaperSizes LLY (36x36)');
 is($mediabox[2], 2592, 'PaperSizes URX (36x36)');
 is($mediabox[3], 2592, 'PaperSizes URY (36x36)');
+
+1;

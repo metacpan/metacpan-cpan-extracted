@@ -28,6 +28,8 @@ foreach my $char (@{$data->{'char2'}}) {
     my $page = $pdf->page();
     $page->mediabox('A4'); # 595,842
 
+    my $txt = $page->text();
+    my $font = $pdf->corefont('Helvetica');
     my $gfx = $page->gfx();
     print "C: $char->{'NAME'} ($char->{'ENCODING'})\n";
     my @bbx = @{$char->{'BBX'}};
@@ -42,7 +44,13 @@ foreach my $char (@{$data->{'char2'}}) {
     next unless $y;
     my $x = 8*length($stream)/$y;
 
-    my $img = qq|q $x 0 0 $y 50 50 cm
+    # moved from 50 50 (lower left of page) to 100 760 (upper left)
+    # with CHR(nn) inserted (temporarily)
+      $txt->translate(20, 760);
+      $txt->font($font, 10);
+      $txt->fillcolor('black');
+      $txt->text("CHR(".$char->{'ENCODING'}.")");
+    my $img = qq|q $x 0 0 $y 100 760 cm
 BI
 /Interpolate false/Decode [1 0]/H $y/W $x/BPC 1/CS/G
 ID $stream

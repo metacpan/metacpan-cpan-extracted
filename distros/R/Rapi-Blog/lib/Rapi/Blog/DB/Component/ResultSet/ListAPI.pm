@@ -12,12 +12,15 @@ use URI::Escape qw/uri_escape uri_unescape/;
 sub _api_param_arg_order { undef; }
 sub _get_api_param_arg_order { (shift)->_api_param_arg_order(@_) // [qw/search/] } 
 
-
 sub _api_default_params  { undef; }
 sub _get_api_default_params {
   my $params = (shift)->_api_default_params(@_) || {};
   { page => 1, limit => 500, %$params }
 }
+
+# This setting allows for identifying a specific string value as 'undef' since
+# strings are all we have to work with in URLs
+sub _api_params_undef_map {{}};
 
 
 # get/set accessor:
@@ -57,6 +60,10 @@ sub _list_api_params {
     # return correct/valid limit and page params (abundance of caution)
     $P{limit} = 500 unless ($P{limit} && $P{limit} =~ /^\d+$/);
     $P{page}  = 1   unless ($P{page}  && $P{page}  =~ /^\d+$/);
+    
+    # Translate placeholder values meant to be 'undef' into undef:
+    my $uMap = $self->_api_params_undef_map;
+    ($P{$_} && $P{$_} eq $uMap->{$_}) and $P{$_} = undef for (keys %$uMap);
     
     $self->{attrs}{___list_api_params} = \%P;
   }
@@ -160,6 +167,10 @@ sub _list_api {
 sub _to_query_string {
   my $self = shift;
   my %params = (ref($_[0]) eq 'HASH') ? %{ $_[0] } : @_; # <-- arg as hash or hashref
+
+  # Translate undef values back to their placeholder string values:
+  my $uMap = $self->_api_params_undef_map;
+  (exists $params{$_} && ! defined $params{$_}) and $params{$_} = $uMap->{$_} for (keys %$uMap);
 
   # remove params already at their default values in order to provide a cleaner url:
   my $defaults = $self->_get_api_default_params;

@@ -1,0 +1,19 @@
+Changes
+cpanfile
+GNU-AGPL-3.0.txt
+lib/Meta.pm
+lib/plenigo/AccessRightsManager.pm
+lib/plenigo/CheckoutHelper.pm
+lib/plenigo/CompanySettingsManager.pm
+lib/plenigo/Configuration.pm
+lib/plenigo/CustomersManager.pm
+lib/plenigo/Ex.pm
+lib/plenigo/LoginManager.pm
+lib/plenigo/Product.pm
+lib/plenigo/ProductsManager.pm
+lib/plenigo/RestClient.pm
+Makefile.PL
+MANIFEST			This list of files
+Readme.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

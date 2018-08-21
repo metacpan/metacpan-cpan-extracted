@@ -7,8 +7,7 @@ WriteMakefile(
     'VERSION_FROM'	=> 'lib/Lingua/EN/Sentence.pm', # finds $VERSION
     'PREREQ_PM'    =>
     {
-        'utf8'      => 1.09,
-        'warnings'  => 1.12,
+        'warnings'  => 1.12
       },    
     'AUTHOR'        => 'Shlomo Yona, Kim Ryan',
     'LICENSE'       => 'perl',

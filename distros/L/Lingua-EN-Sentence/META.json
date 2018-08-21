@@ -26,6 +26,7 @@
       },
       "runtime" : {
          "requires" : {
+            "perl" : "5.1",
             "warnings" : "1.12"
          }
       }
@@ -33,7 +34,7 @@
    "provides" : {
       "Lingua::EN::Sentence" : {
          "file" : "lib/Lingua/EN/Sentence.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "url" : "https://github.com/kimryan/Lingua-EN-Sentence"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

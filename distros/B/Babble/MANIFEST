@@ -15,6 +15,7 @@ lib/Babble/Plugin/CoreSignatures.pm
 lib/Babble/Plugin/DefinedOr.pm
 lib/Babble/Plugin/PostfixDeref.pm
 lib/Babble/Plugin/SKT.pm
+lib/Babble/Plugin/Sigify.pm
 lib/Babble/Plugin/State.pm
 lib/Babble/Plugin/SubstituteAndReturn.pm
 lib/Babble/PluginChain.pm
@@ -24,6 +25,7 @@ script/sigfix
 t/plugin-coresignatures.t
 t/plugin-definedor.t
 t/plugin-postfixderef.t
+t/plugin-sigify.t
 t/plugin-skt.t
 t/plugin-state.t
 t/plugin-substituteandreturn.t

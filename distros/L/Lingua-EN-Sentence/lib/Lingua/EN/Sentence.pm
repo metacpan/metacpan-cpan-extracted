@@ -30,7 +30,7 @@ list of abbreviations (built in and given).
 Certain well know exceptions, such as abbreviations, may cause incorrect
 segmentations. But some of them are already integrated into this code and are
 being taken care of. Still, if you see that there are words causing the
-get_sentences() to fail, you can add those to the module, so it notices them.
+get_sentences function to fail, you can add those to the module, so it notices them.
 
 =head1 ALGORITHM
 
@@ -40,7 +40,7 @@ a set of rules which decide when an end-of-sentence is justified and when it's a
 mistake. In case of a mistake, the end-of-sentence mark is removed.
 
 What are such mistakes? Cases of abbreviations, for example. I have a list of
-such abbreviations (Please see `Acronym/Abbreviations list' section), and more
+such abbreviations (Please see public globals belwo for a list), and more
 general rules (for example, the abbreviations 'i.e.' and '.e.g.' need not to be
 in the list as a special rule takes care of all single letter abbreviations).
 
@@ -69,7 +69,7 @@ need to bother with acronyms consisting of single letters and dots
 (e.g. "U.S.A."), as these are found automatically. Note also that acronyms
 are searched for on a case insensitive basis.
 
-Please see`Acronym/Abbreviations list' section for the abbreviations already
+Please see 'Acronym/Abbreviations list' section for the abbreviations already
 supported by this module.
 
 =item get_acronyms( )
@@ -144,10 +144,14 @@ Shlomo Yona shlomo@cs.haifa.ac.il
 
 Currently being maintained by Kim Ryan, kimryan at CPAN d o t org
 
-=head1 COPYRIGHT
+
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2001-2016 Shlomo Yona. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
@@ -183,7 +187,7 @@ use vars qw/$VERSION @ISA @EXPORT_OK $EOS $LOC $AP $P $PAP @ABBREVIATIONS/;
 use Carp qw/cluck/;
 use English;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 our $LOC;
 if ($OSNAME ne 'android') {

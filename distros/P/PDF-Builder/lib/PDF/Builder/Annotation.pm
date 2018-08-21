@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -48,7 +48,7 @@ sub outobjdeep {
         $self->{" $k"} = undef;
         delete($self->{" $k"});
     }
-    $self->SUPER::outobjdeep(@opts);
+    return $self->SUPER::outobjdeep(@opts);
 }
 
 # ============== start of annotation types =======================
@@ -251,7 +251,8 @@ sub text {
     $self->{'T'} = PDFStr($opts{'-text'}) if exists $opts{'-text'};
 
     # Icon Name will be ignored if there is an AP.
-    my $icon = $opts{'-icon'} if exists $opts{'-icon'};
+    my $icon;  # perlcritic doesn't want 2 lines combined
+    $icon = $opts{'-icon'} if exists $opts{'-icon'};
     $self->{'Name'} = PDFName($icon) if $icon && !ref($icon); # icon name
     # Set the icon appearance
     $self->icon_appearance($icon, %opts) if $icon;
@@ -337,6 +338,10 @@ just the file name.
 =back
 
 =cut
+
+# TBD it is possible to specify different files for DOS, Mac, Unix
+#     (see PDF 1.7 7.11.4.2). This might solve problem of different line
+#     ends, at the cost of 3 copies of each file.
 
 sub file_attachment {
     my ($self, $file, %opts) = @_;
@@ -747,7 +752,8 @@ sub icon_appearance {
 
     return unless $self->{'Subtype'}->val() eq 'FileAttachment';
 
-    my @r = @{$opts{'-rect'}} if defined $opts{'-rect'};
+    my @r;  # perlcritic doesn't want 2 lines combined
+    @r = @{$opts{'-rect'}} if defined $opts{'-rect'};
     # number of parameters should be 4, checked above (rect method)
 
     # Handle custom icon type 'None' and icon reference.

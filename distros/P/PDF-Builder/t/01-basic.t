@@ -1,7 +1,8 @@
-use Test::More tests => 7;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 7;
 
 use PDF::Builder;
 
@@ -48,3 +49,5 @@ $pdf = PDF::Builder->open('t/resources/sample.pdf');
 isa_ok($pdf,
        'PDF::Builder',
        q{PDF::Builder->open() returns a PDF::Builder object});
+
+1;

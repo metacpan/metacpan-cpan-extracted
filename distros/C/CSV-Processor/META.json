@@ -1,0 +1,53 @@
+{
+   "abstract" : "Set of different methods that adds new columns in csv files",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CSV-Processor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Email::Extractor" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "Pod::Usage" : "0",
+            "Regexp::Common" : "0",
+            "Text::AutoCSV" : "0",
+            "Text::CSV" : "0",
+            "feature" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

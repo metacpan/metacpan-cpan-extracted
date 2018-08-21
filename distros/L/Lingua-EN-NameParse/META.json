@@ -39,11 +39,11 @@
    "provides" : {
       "Lingua::EN::NameParse" : {
          "file" : "lib/Lingua/EN/NameParse.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "Lingua::EN::NameParse::Grammar" : {
          "file" : "lib/Lingua/EN/NameParse/Grammar.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/kimryan/Lingua-EN-NameParse"
       }
    },
-   "version" : "1.36",
+   "version" : "1.37",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

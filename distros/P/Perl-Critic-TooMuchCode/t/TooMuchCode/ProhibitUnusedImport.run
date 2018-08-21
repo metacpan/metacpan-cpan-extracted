@@ -1,3 +1,10 @@
+## name vars pragma
+## failures 0
+## cut
+
+use vars qw(%foo);
+print 42;
+
 ## name Data::Dumper;
 ## failures 1
 ## cut

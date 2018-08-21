@@ -1,0 +1,227 @@
+#!/perl
+
+#ABSTRACT: join all csv files in folder into one and remove duplicates
+
+package csvjoin;
+$csvjoin::VERSION = '1.01';
+
+
+# TO-DO: move business logic to CSV::Processor or separate module and write tests
+
+use strict;
+use warnings;
+
+# use Regexp::Common;
+use Getopt::Long qw(:config auto_help);
+use feature 'say';
+use Carp;
+use Cwd;
+use Pod::Usage;
+use Text::CSV;
+use File::Slurp;
+use List::Util qw(uniq);
+use CSV::Processor;
+
+$SIG{__DIE__} = sub {
+    Carp::longmess( $_[0] );
+};
+
+my %opts;
+GetOptions(
+    "d|dir=s"   => \$opts{dir},
+    "i|in=s"    => \$opts{unique_column},
+    "j|join=s"  => \$opts{join_column},
+    "f|file=s"  => \$opts{out_file},
+    "v|verbose" => \$opts{verbose}
+) or die("Error in command line arguments\n");
+
+# pod2usage("No obligatory option --in specified\n") unless defined $opts{file};
+# say "Verbose mode enabled" if $opts{verbose};
+
+# defaults
+$opts{dir} = getcwd unless defined $opts{dir};
+say "Reading all csv files in dir " . $opts{dir} if $opts{verbose};
+opendir my $dir, $opts{dir} or die "Cannot open directory: $opts{dir} : $!";
+my @files = grep { $_ =~ m/\.csv$/ } readdir $dir;
+no warnings 'utf8';
+say "Found files: " . join( ', ', @files );
+use warnings 'utf8';
+closedir $dir;
+
+$opts{unique_column} = 'ID' unless defined $opts{unique_column};
+say "Looking for unique data in " . $opts{unique_column} if $opts{verbose};
+
+$opts{join_column} = 'SOURCE'     unless defined $opts{join_column};
+$opts{out_file}    = 'unique.csv' unless defined $opts{out_file};
+say "Unique results will be written in "
+  . $opts{out_file}
+  . ", joined column is "
+  . $opts{join_column}
+  if $opts{verbose};
+
+my @new_files;
+for my $f (@files) {
+    my $bot = CSV::Processor->new( in_file => $f, prefix => 'csvuniq_' );
+    $bot->add_same( $opts{unique_column}, $opts{join_column}, value => $f )
+      ;    # add source = filename column to each file
+    push @new_files, 'csvuniq_' . $f;
+}
+
+# `touch $opts{out_file}`;
+
+my $buffer_file = 'joined.csv';
+
+# Combine to single file considering first string as header
+for my $i ( 0 .. $#new_files ) {
+    my $lines_ref = read_file( $new_files[$i], array_ref => 1 );
+    my $header = shift @$lines_ref;
+    append_file( $buffer_file, [$header] ) if ( $i eq 0 );
+    append_file( $buffer_file, @$lines_ref );
+    unlink $new_files[$i];
+}
+
+my $csv = Text::AutoCSV->new( in_file => $buffer_file );
+$csv->read();
+my $nb_rows = $csv->get_nb_rows();
+my @cols    = $csv->get_fields_names();
+my @ids     = $csv->get_values( $opts{unique_column} );
+@ids = uniq @ids;
+
+# say "Found unique ids:\n".join(  "\n", @ids ) if $opts{verbose};
+my @data_in_new_csv;
+
+my $repeated_records = 0;
+
+for my $id (@ids) {
+
+    my $found_ar = $csv->search( $opts{unique_column}, $id );
+    my $row_hr = $csv->get_row_hr( $found_ar->[0] );
+
+    if ( scalar @$found_ar > 1 ) {
+
+        say "Duplicate found : " . $opts{unique_column} . " : " . $id
+          if $opts{verbose};
+        $repeated_records++;
+
+        my @a;
+        for my $row_number (@$found_ar) {
+            push @a, $csv->get_cell( $row_number, $opts{join_column} );
+        }
+
+        $row_hr->{ $opts{join_column} } = join( ',', @a )
+
+    }
+
+    push @data_in_new_csv, $row_hr;
+
+}
+
+unlink $buffer_file;
+
+$csv = Text::CSV->new() or die "Cannot use CSV: " . Text::CSV->error_diag();
+$csv->eol("\012");
+$csv->sep_char(";");
+open my $fh, ">:encoding(utf8)", $opts{out_file} or die "$opts{out_file}: $!";
+$csv->column_names(@cols);
+$csv->print_hr( $fh, $_ ) for @data_in_new_csv;
+close $fh or die "$opts{out_file}: $!";
+
+say "Total records in : " . $nb_rows                 if $opts{verbose};
+say "Total records out : " . scalar @data_in_new_csv if $opts{verbose};
+say "Repeated records : " . $repeated_records        if $opts{verbose};
+my $duplicates = $nb_rows - scalar @data_in_new_csv;
+say "Total duplicates : " . $duplicates if $opts{verbose};
+
+my $percentage = ( $duplicates / $nb_rows ) * 100;
+printf( "CSV reduce percentage : %.2f \n", $percentage ) if $opts{verbose};
+
+# Text::AutoCSV: error: illegal call while read is in progress, would lead to infinite recursion
+
+# $csv->set_walker_hr(sub {
+#     my $hr = shift;
+#     my $found_ar = $csv->search( $opts{unique_column}, $hr->{ $opts{unique_column} } );
+#     my $row_hr = $csv->get_row_hr( $found_ar->[0] );
+#
+#     if ( scalar @$found_ar > 1 ) {
+#         my @a;
+#         for my $row_number ( @$found_ar ) {
+#             push @a, $csv->get_cell($row_number, $opts{unique_column});
+#         }
+#         $row_hr->{ $opts{join_column} } = join ( ',' , @a)
+#     }
+#
+#     return $hr;
+# });
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csvjoin - join all csv files in folder into one and remove duplicates
+
+=head1 VERSION
+
+version 1.01
+
+=head1 SYNOPSIS
+
+    csvjoin -d </user/pavel/csv> -i <in_column_name_or_index> -o <column name to store source> -v
+
+<in_column_name_or_index> could be column name if csv has header or just row number.
+
+In case of using row number please make sure that csv column structure is same
+
+Read csv files without subdirectories
+
+All available options:
+
+    -d | --dir      name of directory to process. by default is cwd
+    -i | --in       number or name of column, data from which will be checked for unique, by default is id or first column
+    -j | --join     number or name of column where data is different and where it is needed to join values 
+    -f | --file     name of output file, by default is unique.csv
+    -v | --verbose  verbose mode
+
+Examples of usage:
+
+    csvjoin
+    csvjoin -i 2
+    csvjoin ---in ID -v
+
+=head1 DESCRIPTION
+
+CLI tool that makes one csv with unique data from all csv in current folder
+
+Removes duplicates in csv file assuming that one column could be different ( content in this column will be joined )
+
+Criteria that records are same is same field C<ID>. However you can pass your own column names
+
+NOW WORKS FINE ONLY FOR NAMED CSV FILES AND ON LINUX SYSTEMS
+
+=head1 SIMILAR PACKAGES
+
+See more: 
+
+L<Text::CSV>
+L<Text::CSV_XS> 
+L<Text::CSV::Simple> 
+L<Tie::CSV_File>
+L<Text::CSV::Merge>
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

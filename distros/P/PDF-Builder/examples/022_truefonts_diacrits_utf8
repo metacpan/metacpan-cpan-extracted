@@ -3,8 +3,6 @@
 # given one or more .TTF files on the command line, display their contents:
 # 256 bytes in one single-byte encoding, plus some sample UTF-8 text.
 # -e encoding (default is latin1) SINGLE BYTE ONLY!
-# note that use of -file in new() leaves the PDF in THIS directory, not the
-#   one with the 022_truefonts_diacrits_utf8 file!
 
 use strict;
 use warnings;
@@ -28,7 +26,7 @@ my $LoremIpsum = qq|Sed ut perspici\x{0361}atis.|;  # times.ttf includes
 # "use utf8" says to interpret string as UTF-8
 my $encoding = 'latin1';
 
-my ($fn, $pdf, $f1, $f2, $gfx, $text, $x, $y, $yp, $page);
+my ($pdf, $f1, $f2, $gfx, $text, $y, $page);
 
 GetOptions(
     "encode|e=s" => \$encoding,
@@ -37,7 +35,7 @@ GetOptions(
 # loop through command line list of font file names
 die "Need at least one TTF file name on command line!\n" if !scalar(@ARGV);
 
-foreach $fn (@ARGV) {
+foreach my $fn (@ARGV) {
     if (!-r $fn) {
 	print "$fn cannot be read. Skipping...\n\n";
 	next;
@@ -47,7 +45,7 @@ foreach $fn (@ARGV) {
     $myName =~ s/\.[ot]tf$//i;  # remove .ttf/.otf (any case)
 
     $pdf = PDF::Builder->new(-compress => $compress,
-	                  -file => basename($0).'.'.$myName.".pdf");
+	                  -file => $0.'.'.$myName.".pdf");
 
     $f1 = $pdf->corefont('Helvetica', -encode => 'latin1');
     $f2 = $pdf->corefont('Helvetica-Bold', -encode => 'latin1');
@@ -82,11 +80,11 @@ foreach $fn (@ARGV) {
         my $u = $font->underlineposition*$fx/1000;
 
 	# loop through rows (yp growing from bottom)
-        foreach $yp (0..15) {
+        foreach my $yp (0..15) {
 	    $y = 15 - $yp; # grow y from top to bottom instead
             print STDERR ".";
 	    # loop through columns left to right
-            foreach $x (0..15) {
+            foreach my $x (0..15) {
                 $txt->translate(50+($sx*$x),50+($sy*$y));
 		my $ci = $yp*16 + $x;
 		my $c  = chr($ci);

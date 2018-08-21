@@ -3,7 +3,6 @@ Alien::FFI
 Config::AutoConf
 ExtUtils::F77
 FFI::CheckLib
-File::ShareDir
 JSON::PP
 Module::Build
 PkgConfig

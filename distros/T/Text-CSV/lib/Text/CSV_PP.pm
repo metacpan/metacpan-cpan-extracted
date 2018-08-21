@@ -5,14 +5,14 @@ package Text::CSV_PP;
 # Text::CSV_PP - Text::CSV_XS compatible pure-Perl module
 #
 ################################################################################
-require 5.005;
+require 5.006001;
 
 use strict;
 use Exporter ();
 use vars qw($VERSION @ISA @EXPORT_OK);
 use Carp;
 
-$VERSION = '1.96';
+$VERSION = '1.97';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(csv);
 

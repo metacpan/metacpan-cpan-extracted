@@ -84,7 +84,7 @@ if (processCMD(@ARGV)) {
 #  shiftjis  UCS-2BE  UCS-2LE  UTF-16  UTF-16BE  UTF-16LE  UTF-32  UTF-32BE  
 #  UTF-32LE  UTF-7  utf-8-strict  utf8   and probably others
 
-my ($i, $base, $x, $y, $pdf, $fn, $fnM, $ec, $f1, $yp);
+my ($i, $base, $y, $pdf, $fn, $fnM, $f1);
 
 # should have same number of entries each in @gns, @mns, @ecs
 # loop through list of font names (glyph file names)
@@ -102,7 +102,7 @@ for ($i=0; $i<scalar @gns; $i++) {
     $base =~ s#\.pf[ab]$##i;
 
     # at least one page for each encoding 
-    foreach $ec (split / /, $ecs[$i]) {
+    foreach my $ec (split / /, $ecs[$i]) {
 	
         $pdf = PDF::Builder->new(-compress => $compress);
         $f1 = $pdf->corefont('Helvetica');  # for various labels
@@ -131,8 +131,8 @@ for ($i=0; $i<scalar @gns; $i++) {
 	    # for plane 1+ ($flight > 0) check if any characters in it
 	    if ($flight > 0) {
 		my $flag = 0; # no character found yet
-                foreach $yp (0..15) {
-                    foreach $x (0..15) {  
+                foreach my $yp (0..15) {
+                    foreach my $x (0..15) {  
 		        my $ci = $yp*16 + $x;  # 0..255 value
 			# always seems to be something at
 			# ci = 32 (U=0020, space)
@@ -173,10 +173,10 @@ for ($i=0; $i<scalar @gns; $i++) {
 
 	    # draw grid of characters and information
 	    # yp character row value (0..F T to B)
-            foreach $yp (0..15) {
+            foreach my $yp (0..15) {
 		$y = 15 - $yp;  # y vertical (row) position T to B
                 print STDERR ".";
-                foreach $x (0..15) {  # x horizontal (column) position L to R
+                foreach my $x (0..15) {  # x horizontal (column) position L to R
                     $txt->translate($gLLx+($sx*$x),$gLLy+($sy*$y));
 		    my $ci = $yp*16 + $x;  # 0..255 value
 		    my $c  = chr($ci);
@@ -227,56 +227,66 @@ exit;
 # consider a -p flag like -m, but for glyph files
 # would look for glyph file, push path+token instead of just token
 sub usage {
-   print "\n021_psfonts [flags_1] glyph_file [flags_2] glyph_file [flags_2]...\n\n";
-   print "flags_1 --\n";
-   print "  -m  metrics files paths\n";
-   print "     : or ; separated directories specifying where to look for font\n";
-   print "     metrics files. If relative paths (not starting with /), they are\n";
-   print "     relative to the glyph file being processed if @ prepended, else\n";
-   print "     (no @) relative to the current directory. The default metrics\n";
-   print "     path string is just @./ (glyph file's directory). Entries will\n";
-   print "     apply to following glyph file names until a new -m. The paths\n";
-   print "     are not used if a -M or -N flag is given for a glyph file.\n";
-   print "  -e  encodings list\n";
-   print "     latin1 latin2 etc. Default is latin1. Any name with characters\n";
-   print "     other than A-Za-z0-9- is assumed to be a glyph file name or\n";
-   print "     another flag (if starts with -). Entries will apply to the\n";
-   print "     following glyph file names until a new -e.\n\n";
-   print "glyph_file --\n";
-   print "  a .pfa or .pfb extension T1 (PS) glyph file (with path)\n\n";
-   print "flags_2 --\n";
-   print "  -m  metrics files paths\n";
-   print "     as in flags_1, but replaces whatever existed before. Note that\n";
-   print "     the new path list takes effect at the next glyph file, not the\n";
-   print "     previously-given one.\n";
-   print "  -e  encodings list\n";
-   print "     as in flags_1, but replaces whatever existed before. Note that\n";
-   print "     the new encoding list takes effect at the next glyph file, not\n";
-   print "     the previously-given one.\n";
-   print "  -M  metrics file path and name\n";
-   print "     an absolute (starting with /) or relative (to the glyph file path\n";
-   print "     if starts with @, otherwise relative to the current directory)\n"; 
-   print "     path and name. This overrides the -m path list for this ONE\n";
-   print "     glyph file. Normally, -M is needed only when the file name\n";
-   print "     differs between the glyph and metrics files, which is unusual,\n";
-   print "     or you don't want to list this path in -m, or perhaps you have\n";
-   print "     only one glyph file to display and want to give the exact metrics\n";
-   print "     file path and name. It must come IMMEDIATELY AFTER the glyph file\n";
-   print "     it pertains to, and applies only to that one glyph file.\n";
-   print "  -N\n";
-   print "     there is no metrics file for the preceeding glyph file. It must\n";
-   print "     come IMMEDIATELY AFTER the glyph file it pertains to, and applies\n";
-   print "     only to that one glyph file.\n\n";
-   print "Going through glyph file names, the complete path, name, and extension\n";
-   print "  must be given for each (no wildcards). The base name and extension\n";
-   print "  are case-sensitive. If a -M or -N flag is not given, the program\n";
-   print "  will search for the metrics file (.afm or .pfm) using each metrics\n";
-   print "  file path entry appended to the glyph file path, the base name of\n";
-   print "  the glyph file, and each extension .afm and .pfm are tried (in that\n";
-   print "  order for a .pfa glyph file, and in the reverse order for a .pfb\n";
-   print "  glyph file). Matching of extensions is case-insensitive, even on\n";
-   print "  Linux systems (e.g., times-roman.AFM is considered a match for\n";
-   print "  times-roman.pfb).\n\n";
+  my $message = <<"END_OF_TEXT";
+
+021_psfonts [flags_1] glyph_file [flags_2] glyph_file [flags_2]...
+
+flags_1 --
+  -m  metrics files paths
+     : or ; separated directories specifying where to look for font
+     metrics files. If relative paths (not starting with /), they are
+     relative to the glyph file being processed if @ prepended, else
+     (no @) relative to the current directory. The default metrics
+     path string is just @./ (glyph file's directory). Entries will
+     apply to following glyph file names until a new -m. The paths
+     are not used if a -M or -N flag is given for a glyph file.
+  -e  encodings list
+     latin1 latin2 etc. Default is latin1. Any name with characters
+     other than A-Za-z0-9- is assumed to be a glyph file name or
+     another flag (if starts with -). Entries will apply to the
+     following glyph file names until a new -e.
+
+glyph_file --
+  a .pfa or .pfb extension T1 (PS) glyph file (with path)
+
+flags_2 --
+  -m  metrics files paths
+     as in flags_1, but replaces whatever existed before. Note that
+     the new path list takes effect at the next glyph file, not the
+     previously-given one.
+  -e  encodings list
+     as in flags_1, but replaces whatever existed before. Note that
+     the new encoding list takes effect at the next glyph file, not
+     the previously-given one.
+  -M  metrics file path and name
+     an absolute (starting with /) or relative (to the glyph file path
+     if starts with @, otherwise relative to the current directory)
+     path and name. This overrides the -m path list for this ONE
+     glyph file. Normally, -M is needed only when the file name
+     differs between the glyph and metrics files, which is unusual,
+     or you don't want to list this path in -m, or perhaps you have
+     only one glyph file to display and want to give the exact metrics
+     file path and name. It must come IMMEDIATELY AFTER the glyph file
+     it pertains to, and applies only to that one glyph file.
+  -N
+     there is no metrics file for the preceeding glyph file. It must
+     come IMMEDIATELY AFTER the glyph file it pertains to, and applies
+     only to that one glyph file.
+
+Going through glyph file names, the complete path, name, and extension
+  must be given for each (no wildcards). The base name and extension
+  are case-sensitive. If a -M or -N flag is not given, the program
+  will search for the metrics file (.afm or .pfm) using each metrics
+  file path entry appended to the glyph file path, the base name of
+  the glyph file, and each extension .afm and .pfm are tried (in that
+  order for a .pfa glyph file, and in the reverse order for a .pfb
+  glyph file). Matching of extensions is case-insensitive, even on
+  Linux systems (e.g., times-roman.AFM is considered a match for
+  times-roman.pfb).
+
+END_OF_TEXT
+   print $message;
+   return;
 }
 
 # fill the glyph, metrics, and encoding arrays from the command line

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -65,7 +65,7 @@ sub _look_for_font {
         return ({%{$data}});
     }
 
-    eval "require 'PDF/Builder/Resource/CIDFont/CJKFont/$fname.data'";
+    eval "require 'PDF/Builder/Resource/CIDFont/CJKFont/$fname.data'"; ## no critic
     unless ($@) {
         return({%{$fonts->{$fname}}});
     } else {
@@ -78,7 +78,7 @@ sub _look_for_cmap {
 
     $fname =~ s/[^a-z0-9]+//gi;
     return ({%{$cmap->{$fname}}}) if defined $cmap->{$fname};
-    eval "require \"PDF/Builder/Resource/CIDFont/CMap/$fname.cmap\"";
+    eval "require \"PDF/Builder/Resource/CIDFont/CMap/$fname.cmap\""; ## no critic
     unless ($@) {
         return({%{$cmap->{$fname}}});
     } else {
@@ -211,7 +211,7 @@ sub outobjdeep {
         }
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
 }
 
 BEGIN {

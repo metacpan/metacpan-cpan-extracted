@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Font::CoreFont::georgia;
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 =head1 NAME

@@ -1,0 +1,107 @@
+# Example mapping how to map MARC input to the RIS format
+# 
+# Installation:
+#
+#   $ cpanm Catmandu::RIS Catmandu::MARC
+#
+# Usage:
+#
+#   # To execute the coversion
+#   $ catmandu convert MARC to RIS --fix marc2ris.fix < camel.usmarc
+#
+#   # To see/debug the mapping
+#   $ catmandu convert MARC to YAML --fix marc2ris.fix < camel.usmarc
+#
+# Using: http://cordes.ca/repos/waves2ris/marc2ris.pl as starting
+# point for the mapping
+
+# record type
+marc_map(LDR/6-6,TY)
+lookup("TY","record_type.csv", sep_char:',', default: 'GEN') 
+
+# author
+marc_map("100ab", AU.$append, join: ",")
+marc_map("700ab", AU.$append, join: ",")
+replace_all(AU.*,"[\.,]$","")
+
+# editor
+marc_map("110ab", ED.$append, join: ",")
+marc_map("111ab", ED.$append, join: ",")
+marc_map("710ab", ED.$append, join: ",")
+marc_map("711ab", ED.$append, join: ",")
+replace_all(ED.*,"[\.,]$","")
+
+# Title
+marc_map(245ab,TI)
+replace_all(TI," *[/:;.]$","")
+
+# Series Title
+marc_map("210a",T2)
+replace_all(T2," *[/:;.]$","")
+
+# ISBN/ISSN
+marc_map("020a",SN.$append)
+marc_map("022a",SN.$append)
+replace_all(SN.*," .*","")
+
+# CallNo
+marc_map("050ab",AV.$append,join: " ")
+
+# Dewey
+marc_map("082a2",U1.$append,join: " ")
+
+# Publication information
+marc_map(260a,CY.$append)
+replace_all(CY.*," *[\.;:/,]+$","")
+
+marc_map(260b,PB.$append)
+replace_all(PB.*," *[\.;:/,]+$","")
+
+marc_map(260c,PY.$append)
+replace_all(PY.*," *[\.;:/,]+$","")
+
+# Keywords
+marc_map(600,KW.$append,join:" ")
+marc_map(610,KW.$append,join:" ")
+marc_map(611,KW.$append,join:" ")
+marc_map(630,KW.$append,join:" ")
+marc_map(651,KW.$append,join:" ")
+marc_map(653,KW.$append,join:" ")
+marc_map(654,KW.$append,join:" ")
+marc_map(655,KW.$append,join:" ")
+marc_map(656,KW.$append,join:" ")
+marc_map(657,KW.$append,join:" ")
+marc_map(658,KW.$append,join:" ")
+replace_all(KW.*," *[\.;:/,]+$","")
+
+# Notes
+marc_map("500",N1.$append)
+marc_map("501",N1.$append)
+marc_map("502",N1.$append)
+marc_map("504",N1.$append)
+marc_map("505",N1.$append)
+marc_map("506",N1.$append)
+marc_map("507",N1.$append)
+marc_map("508",N1.$append)
+marc_map("510",N1.$append)
+marc_map("511",N1.$append)
+marc_map("513",N1.$append)
+marc_map("514",N1.$append)
+marc_map("515",N1.$append)
+marc_map("516",N1.$append)
+marc_map("518",N1.$append)
+marc_map("521",N1.$append)
+marc_map("524",N1.$append)
+marc_map("525",N1.$append)
+marc_map("526",N1.$append)
+marc_map("530",N1.$append)
+marc_map("533",N1.$append)
+marc_map("534",N1.$append)
+marc_map("535",N1.$append)
+join_field(N1,"; ")
+
+# Abstract
+marc_map("520ab",AB)
+
+remove_field(record)
+remove_field(_id)

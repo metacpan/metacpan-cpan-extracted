@@ -12,7 +12,7 @@ use English qw/ -no_match_vars /;
 use Path::Tiny;
 use Term::ANSIColor qw/color/;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub branch {
     my ($self, $options) = @_;
@@ -56,8 +56,13 @@ sub branch {
         $max_branch_width = 60;
     }
     if ( length $branch > $max_branch_width ) {
-        $branch = substr $branch, 0, $max_branch_width;
-        $branch .= '...';
+        if ( $options->{summarize} ) {
+            $branch =~ s{^(\w)(?:[^/]+)/}{$1/};
+        }
+        if ( length $branch > $max_branch_width ) {
+            $branch = substr $branch, 0, $max_branch_width;
+            $branch .= '...';
+        }
     }
 
     my ($len, $status) = status($type);
@@ -124,7 +129,7 @@ App::PS1::Plugin::Branch - Adds the current branch to prompt
 
 =head1 VERSION
 
-This documentation refers to App::PS1::Plugin::Branch version 0.06.
+This documentation refers to App::PS1::Plugin::Branch version 0.07.
 
 =head1 SYNOPSIS
 

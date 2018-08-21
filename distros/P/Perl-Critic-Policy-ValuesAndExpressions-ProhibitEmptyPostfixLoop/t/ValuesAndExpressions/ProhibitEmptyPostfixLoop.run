@@ -1,0 +1,93 @@
+## name Normal for loops
+## failures 0
+## cut
+for my $foo ( @{ $bar->{baz}{quux} } ) {
+for my $violation (@$by_severity) {
+
+## name Documentation example 1
+## failures 0
+## cut
+
+do_something($_)
+    for @items;
+
+$_++ for @items;
+
+## name Documentation example 2
+## failures 2
+## cut
+
+do_something($_);
+    for @items;
+
+$_++; for @items;
+
+## name Default postfix loop
+## failures 0
+## cut
+
+print for @array;
+print split //, foreach @{$array};
+
+## name Empty postfix loop on array
+## failures 2
+## cut
+
+for @array;
+foreach @array;
+
+## name Empty postfix loop on arrayref
+## failures 2
+## cut
+
+for @{$array};
+foreach @{$array};
+
+## name Empty postfix loop on function
+## failures 2
+## cut
+
+for func();
+foreach func();
+
+## name Empty postfix loop on function with ref
+## failures 2
+## cut
+
+for @{ func() };
+foreach @{ func() };
+
+## name Empty postfix loop on class method
+## failures 2
+## cut
+
+for Class->method();
+foreach Class->method();
+
+## name Empty postfix loop on object method with ref
+## failures 2
+## cut
+
+for @{ $foo->method() };
+foreach @{ $foo->method() };
+
+## name Empty postfix loop on class method
+## failures 2
+## cut
+
+for Class->method();
+foreach Class->method();
+
+## name Empty postfix loop on object method with ref
+## failures 2
+## cut
+
+for @{ $foo->method() };
+foreach @{ $foo->method() };
+
+## name Empty postfix loop on object method with incorrect ref
+## failures 2
+## cut
+
+for %{ $foo->method() };
+foreach %{ $foo->method() };

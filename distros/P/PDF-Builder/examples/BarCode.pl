@@ -1,13 +1,16 @@
+#!/usr/bin/perl
 # exercise BarCode.pm as much as possible
 # outputs BarCode.pdf
 # author: Phil M Perry
 # information from http://www.keyence.com/ss/products/auto_id/barcode_lecture/
+#                  https://www.scandit.com/types-barcodes-choosing-right-barcode/
+#                        contains examples to check against
 
 use warnings;
 use strict;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -22,7 +25,9 @@ use PDF::Builder;
 my $compress = 'flate';  # compressed streams
 #my $compress = 'none';  # no stream compression, for debugging
 
-my $PDFname = 'BarCode.pdf';
+my $PDFname = $0;
+   $PDFname =~ s/\..*$//;  # remove extension
+   $PDFname .= '.pdf';     # add new extension
 my $globalX = 0; 
 my $globalY = 0;
 
@@ -54,15 +59,20 @@ $scale = 1;  # formimage scaling factor
 #    UPC not supported
 # alphabet: 0..9
 # length: 12 digits UPC-A (1+5+5+1) or 8 digits UPC-E (1+6+1)
+#     scandit says -E is 6 digits... need to check
 # should have longer left guard, center (UPC-A), and right guard bars
+# $content = '234567899992';
 
 # ----------------------------------------------------
 # 1. Codabar
 # alphabet: 0..9 - $ / . + (codabar.pm also allows : )
 # length: unlimited, manually add start and stop characters
+#   scandit says max 16 plus 4 start/stop characters
 # 4 bars + 3 gaps per character + 1 narrow, 2 widths narrow and wide (2x)
 # start and stop characters any one or two of A B C D a b c d
 # note that codabar.pm uppercases start and stop characters, may be error!
+# variants: Codeabar, Ames Code, NW-7, Monarch, Code 2 of 7, 
+#           Rationalized Codabar, ANSI/AIM BC3-1995, USD-4
 @cellLoc = makeCellLoc(0, 0);
 @cellSize = (170, 131); 
 $grfx->save();
@@ -77,7 +87,8 @@ $text->fillcolor('black');
 $text->lead(15);
 
 $type = 'Codabar';
-$content = 'A32134567890123B';  # len 16 includes start/stop chars, encode=16
+##$content = 'A32134567890123B';  # len 16 includes start/stop chars, encode=16
+$content = 'A23342453D';  # not like scandit example, and start/stop chars gone
 $barcode = $pdf->xo_codabar(
     -code => $content,
     -zone => $bar_height,
@@ -165,7 +176,8 @@ $text->fillcolor('black');
 $text->lead(15);
 
 $type = 'Code 128 B';
-$content = 'Test Of '.$type;
+##$content = 'Test Of '.$type;
+$content = 'Count01234567 :';  # does NOT match scandit example!
 $barcode = $pdf->xo_code128(
     -code => $content,
     -zone => $bar_height,
@@ -274,7 +286,7 @@ drawCaption([$type], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 6. Code 3 of 9
+# 6. Code 3 of 9 (aka Code39)
 # alphabet: 0..9 A..Z _ sp - $ / . + %
 # length: up to 43
 # narrow bar/gap and wide bar/gap (3 to 5.3 times wider) 1 character is 9 bars
@@ -294,7 +306,8 @@ $text->fillcolor('black');
 $text->lead(15);
 
 $type = 'Code 3 of 9';
-$content = 'Test '.$type;  # 3 of 9 will uppercase this
+##$content = 'Test '.$type;  # 3 of 9 will uppercase this
+$content = 'ABC 123';  # does NOT match scandit example!
 $barcode = $pdf->xo_3of9(
     -code => $content,
     -zone => $bar_height,
@@ -315,7 +328,7 @@ drawCaption([$type], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 7. Code 3 of 9 with check digit
+# 7. Code 3 of 9 with check digit (aka Code39)
 # alphabet: 0..9 A..Z _ sp - $ / . + %
 # length: up to 43
 # narrow bar/gap and wide bar/gap (3 to 5.3 times wider) 1 character is 9 bars
@@ -356,7 +369,7 @@ drawCaption([$type.' check digit'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 8. Code 3 of 9 with check digit
+# 8. Code 3 of 9 with check digit (aka Code39)
 # alphabet: 0..9 A..Z _ sp - $ / . + %
 # length: up to 43
 # narrow bar/gap and wide bar/gap (3 to 5.3 times wider) 1 character is 9 bars
@@ -397,7 +410,7 @@ drawCaption([$type.' full ASCII'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 9. Code 3 of 9 full ASCII with check digit
+# 9. Code 3 of 9 full ASCII with check digit (aka Code39)
 # alphabet: full ASCII x00..x7F
 # length: up to 43
 # narrow bar/gap and wide bar/gap (3 to 5.3 times wider) 1 character is 9 bars
@@ -438,9 +451,17 @@ drawCaption([$type.' fASC chkd'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
+# Code 93  (not supported) 
+# alphabet: full ASCII x00..x7F
+# $content = 'CODE93';
+# ----------------------------------------------------
+
+# ----------------------------------------------------
 #    Code EAN (EAN-8) not supported
+# variants: EAN-8, EAN-13, JAN-13, ISBN, ISSN
 # alphabet: 0..9
-# length: 8   4+4  (4+3 & chkdig)
+# length: 13   chkdig + 6 + 6
+#          8   4+4  (4+3 & chkdig)
 # should have longer left guard, center, and right guard bars
 # narrow bar width .26 to .66mm (.33mm preferred)
 # bar height (guard bars/text) 18.29 to 45.72mm (22.86mm preferred)
@@ -468,7 +489,8 @@ $text->fillcolor('black');
 $text->lead(15);
 
 $type = 'Code EAN-13';
-$content = '9123456789013';
+##$content = '9123456789013';
+$content = '1325764098273';  # does NOT match scandit example!
 $barcode = $pdf->xo_ean13(
     -code => $content,
     -zone => $bar_height,
@@ -489,8 +511,8 @@ drawCaption([$type.' w/ prefix'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 11. Code Interleaved 2 of 5
-# alphabet: 0..9
+# 11. Code Interleaved 2 of 5 (aka ITF)
+# alphabet: 0..9  (scandit says "full ASCII set")
 # length: even (2n) number of digits
 # NOTE: Industrial 2 of 5, Matrix 2 of 5, COOP 2 of 5, and IATA barcodes
 #       are variations on this barcode, but not equal to it!
@@ -509,7 +531,8 @@ $text->fillcolor('black');
 $text->lead(15);
 
 $type = 'Code Int 2 of 5';
-$content = '0123456789';
+##$content = '0123456789';
+$content = '01234565';  # looks pretty close to scandit example
 $barcode = $pdf->xo_2of5int(
     -code => $content,
     -zone => $bar_height,
@@ -528,6 +551,48 @@ $grfx->formimage($barcode, centerbc($barcode, @cellSize, @base), $scale);
 drawCaption([$type], 'LC');
 
 $grfx->restore();
+
+# ----------------------------------------------------
+# GS1 DATABAR  (not supported) 
+# alphabet: ?
+# variants = GS1 DataBar   Omnidirectional, Truncated, Stacked, 
+#                          Stacked Omnidirectional, Expanded, Expanded Stacked
+# $content = ?
+# ----------------------------------------------------
+
+# ----------------------------------------------------
+# MS1 PLESSEY  (not supported)  aka Modified Plessey
+# alphabet: ?
+# $content = '01234567897';
+# ----------------------------------------------------
+
+# ---- 2D bar codes ----------------------------------
+# QR CODE  (not supported) 
+# alphabet: ?
+# variants: numeric, alphanumeric, byte/binary, Kanji
+# $content = ?
+# ----------------------------------------------------
+
+# ----------------------------------------------------
+# DATAMATRIX CODE  (not supported) 
+# alphabet: ?
+# variants: Micro-Datamatrix
+# $content = ?
+# ----------------------------------------------------
+
+# ----------------------------------------------------
+# PDF417  (not supported) 
+# alphabet: ?
+# variants: Truncated PDF417
+# $content = ?
+# ----------------------------------------------------
+
+# ----------------------------------------------------
+# AZTEC  (not supported) 
+# alphabet: ?
+# variants: Truncated PDF417
+# $content = ?
+# ----------------------------------------------------
 
 # ----------------------------------------------------
 $pdf->saveas($PDFname);
@@ -549,6 +614,7 @@ sub colors {
   $grfx->fillcolor($color);
   $text->strokecolor($color);
   $text->fillcolor($color);
+  return;
 }
 
 # ---------------------------------------
@@ -573,6 +639,7 @@ sub greenLine {
     $grfx->poly($points[$i],$points[$i+1], $points[$i],$points[$i+1]);
   }
   $grfx->stroke();
+  return;
 }
 
 # ---------------------------------------
@@ -587,6 +654,7 @@ sub nextPage {
   $text->font($font, 10);
   $text->fillcolor('black');
   $text->text_center($pageNo); # prefill page number before any other content
+  return;
 }
 
 # ---------------------------------------
@@ -605,6 +673,7 @@ sub makeCell {
  #$text->linewidth(1);
  #$text->rect($cellLocX,$cellLocY, $cellSizeW,$cellSizeH);
  #$text->clip(1);
+  return;
 }
 
 # ---------------------------------------
@@ -633,7 +702,7 @@ sub drawAxes {
   	      $axisOffset[0]+0+0, $axisOffset[1]+75+0, 
  	      $axisOffset[0]+0+2, $axisOffset[1]+75-2);
   $grfx->stroke();
-
+  return;
 }
 
 # ---------------------------------------
@@ -660,7 +729,7 @@ sub drawLabels {
   # Y axis label
   $text->distance(-75-2+0-4, 0+3+75+2);
   $text->text($Ylabel);
-
+  return;
 }
 
 # ---------------------------------------
@@ -681,11 +750,14 @@ sub drawCaption {
     $width = max($width, $text->advancewidth($_));
   }
 
-  for ($i=0, $y=20; $i<@captions; $i++, $y+=13) {
+  $y=20; # to mollify perlcritic
+  for ($i=0; $i<@captions; $i++) {
     # $just = LC
     $text->translate($cellLoc[0]+$cellSize[0]/2-$width/2, $cellLoc[1]-$y);
     $text->text($captions[$i]);
+    $y+=13; # to shut up perlcritic
   }
+  return;
 }
 
 # ---------------------------------------

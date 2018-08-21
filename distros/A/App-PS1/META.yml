@@ -17,40 +17,40 @@ name: App-PS1
 provides:
   App::PS1:
     file: lib/App/PS1.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Daemon:
     file: lib/App/PS1/Daemon.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Branch:
     file: lib/App/PS1/Plugin/Branch.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Date:
     file: lib/App/PS1/Plugin/Date.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Directory:
     file: lib/App/PS1/Plugin/Directory.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Env:
     file: lib/App/PS1/Plugin/Env.pm
     version: '0.02'
   App::PS1::Plugin::Face:
     file: lib/App/PS1/Plugin/Face.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Node:
     file: lib/App/PS1/Plugin/Node.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Perl:
     file: lib/App/PS1/Plugin/Perl.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Processes:
     file: lib/App/PS1/Plugin/Processes.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Ruby:
     file: lib/App/PS1/Plugin/Ruby.pm
-    version: '0.06'
+    version: '0.07'
   App::PS1::Plugin::Uptime:
     file: lib/App/PS1/Plugin/Uptime.pm
-    version: '0.06'
+    version: '0.07'
 recommends:
   Term::Colour256: '0'
   Term::Size::Any: '0'
@@ -67,5 +67,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-PS1
   license: http://dev.perl.org/licenses/
   repository: http://github.com/ivanwills/App-PS1
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

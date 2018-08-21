@@ -11,7 +11,7 @@ use File::Path ();
 use FFI::Build::File::Object;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub accept_suffix
@@ -103,7 +103,8 @@ sub _deps
   {
     print $out;
     print $err;
-    die "error computing dependencies for $self";
+    warn "error computing dependencies for $self";
+    return ($self->path);
   }
   else
   {
@@ -128,7 +129,7 @@ FFI::Build::File::C - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 0.03
+version 0.07
 
 =head1 SYNOPSIS
 

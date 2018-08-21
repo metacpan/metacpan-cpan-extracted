@@ -4,13 +4,13 @@
       "Reini Urban <rurban@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.3004, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Cpanel-JSON-XS",
    "no_index" : {
@@ -48,7 +48,7 @@
          "url" : "https://github.com/rurban/Cpanel-JSON-XS"
       }
    },
-   "version" : "4.04",
+   "version" : "4.05",
    "x_contributors" : [
       "Ashley Willis <ashleyw@cpan.org>",
       "Daniel Dragan <bulk88@hotmail.com>",
@@ -73,5 +73,5 @@
       "Sergey Aleynikov <sergey.aleynikov@gmail.com>",
       "Syohei Yoshida <syohex@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001_04"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

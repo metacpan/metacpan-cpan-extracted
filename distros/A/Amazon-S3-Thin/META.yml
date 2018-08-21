@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +26,17 @@ no_index:
 provides:
   Amazon::S3::Thin:
     file: lib/Amazon/S3/Thin.pm
-    version: '0.16'
-  Amazon::S3::Thin::SignerV2:
-    file: lib/Amazon/S3/Thin/SignerV2.pm
+    version: '0.21'
+  Amazon::S3::Thin::Credentials:
+    file: lib/Amazon/S3/Thin/Credentials.pm
+  Amazon::S3::Thin::Resource:
+    file: lib/Amazon/S3/Thin/Resource.pm
+  Amazon::S3::Thin::Signer::V2:
+    file: lib/Amazon/S3/Thin/Signer/V2.pm
+  Amazon::S3::Thin::Signer::V4:
+    file: lib/Amazon/S3/Thin/Signer/V4.pm
 requires:
+  AWS::Signature4: '0'
   Digest::HMAC_SHA1: '0'
   Digest::MD5: '0'
   Encode: '0'
@@ -37,14 +44,18 @@ requires:
   LWP::UserAgent: '0'
   MIME::Base64: '0'
   URI::Escape: '0'
-  perl: '5.008001'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/DQNEO/Amazon-S3-Thin/issues
   homepage: https://github.com/DQNEO/Amazon-S3-Thin
   repository: git://github.com/DQNEO/Amazon-S3-Thin.git
-version: '0.16'
+version: '0.21'
 x_contributors:
-  - 'Timothy Appnel <tim@appnel.com>'
-  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Bob Showalter <showaltb@gmail.com>'
   - 'Bob Stockdale <bstockdale@zappos.com>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
   - 'DQNEO <dqneoo@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Timothy Appnel <tim@appnel.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

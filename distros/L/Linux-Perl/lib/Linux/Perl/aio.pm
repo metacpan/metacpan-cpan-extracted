@@ -41,10 +41,23 @@ take a bit more work.
 use strict;
 use warnings;
 
-use Linux::Perl ();
-use Linux::Perl::TimeSpec ();
+use Linux::Perl;
+use Linux::Perl::EasyPack;
+use Linux::Perl::TimeSpec;
 
-use constant io_event_sizeof => 32;    #4 x uint64_t
+my ($io_event_keys_ar, $io_event_pack, $io_event_size);
+
+BEGIN {
+    my @_io_event_src = (
+        data => 'Q',
+        obj  => 'Q',
+        res  => 'q',
+        res2 => 'q',
+    );
+
+    ($io_event_keys_ar, $io_event_pack) = Linux::Perl::EasyPack::split_pack_list(@_io_event_src);
+    $io_event_size = length pack $io_event_pack;
+}
 
 =head1 METHODS
 
@@ -65,11 +78,11 @@ sub new {
         $class = Linux::Perl::ArchLoader::get_arch_module($class);
     }
 
-    my $context = pack $class->_context_template();
+    my $context = pack 'Q';
 
     Linux::Perl::call( $class->NR_io_setup(), 0 + $nr_events, $context );
 
-    $context = $class->unpack_context($context);
+    $context = unpack 'Q', $context;
 
     return bless \$context, $class;
 }
@@ -118,13 +131,8 @@ for struct C<iocb>. (cf. F<include/linux/aio_abi.h>)
 
 sub create_control {
     my $self = shift;
-    my $class = ref $self;
 
-    my $rcolon = rindex($class, ':');
-
-    substr($class, $rcolon - 1, 0) = '::Control';
-
-    return $class->new(@_);
+    return Linux::Perl::aio::Control->new(@_);
 }
 
 =head2 $num = I<OBJ>->submit( CTRL1, CTRL2, .. )
@@ -183,7 +191,7 @@ sub getevents {
         die '$max_events must be >0!';
     }
 
-    my $buf = "\0" x ( $max_events * io_event_sizeof() );
+    my $buf = "\0" x ( $max_events * $io_event_size );
 
     my $evts = Linux::Perl::call(
         $self->NR_io_getevents(),
@@ -196,9 +204,9 @@ sub getevents {
 
     my @events;
     for my $idx ( 0 .. ( $evts - 1 ) ) {
-        my @data = unpack $self->io_event_pack(), substr( $buf, $idx * io_event_sizeof(), io_event_sizeof() );
+        my @data = unpack $io_event_pack, substr( $buf, $idx * $io_event_size, $io_event_size );
         my %event;
-        @event{ $self->io_event_keys() } = @data;
+        @event{ @$io_event_keys_ar } = @data;
         push @events, \%event;
     }
 
@@ -216,6 +224,9 @@ sub DESTROY {
 #----------------------------------------------------------------------
 
 package Linux::Perl::aio::Control;
+
+use Linux::Perl::EasyPack;
+use Linux::Perl::Endian;
 
 =encoding utf-8
 
@@ -242,6 +253,8 @@ L<Linux::Perl::aio>’s C<create_control()> method.
 
 =cut
 
+use Linux::Perl::Pointer ();
+
 use constant {
     _RWF_HIPRI  => 1,
     _RWF_DSYNC  => 2,
@@ -264,6 +277,45 @@ use constant {
 
     _IOCB_FLAG_RESFD => 1,
 };
+
+my ($iocb_keys_ar, $iocb_pack);
+
+BEGIN {
+    my @_iocb_src = (
+        data => 'Q',    #aio_data
+
+        (
+            Linux::Perl::Endian::SYSTEM_IS_BIG_ENDIAN()
+            ? (
+                rw_flags => 'L',
+                key => 'L',
+            )
+            : (
+                key => 'L',
+                rw_flags => 'L',
+            )
+        ),
+
+        lio_opcode => 'S',
+        reqprio    => 's',
+        fildes     => 'L',
+
+        #Would be a P, but we grab the P and do some byte arithmetic on it
+        #for the case of a buffer_offset.
+        buf => 'Q',
+
+        nbytes => 'Q',
+
+        offset => 'q',
+
+        reserved2 => 'x8',
+
+        flags => 'L',
+        resfd => 'L',
+    );
+
+    ($iocb_keys_ar, $iocb_pack) = Linux::Perl::EasyPack::split_pack_list(@_iocb_src);
+}
 
 =head1 METHODS
 
@@ -307,7 +359,7 @@ sub new {
         $opts{'resfd'} = $args{'eventfd'};
     }
 
-    my $buf_ptr = $class->unpack_pointer( pack 'P', $$buf_sr );
+    my $buf_ptr = Linux::Perl::Pointer::get_address($$buf_sr);
 
     my $buffer_offset = $opts{'buffer_offset'} || 0;
 
@@ -326,13 +378,13 @@ sub new {
 
     $opts{'buf'} = $buf_ptr;
 
-    $_ ||= 0 for @opts{ $class->iocb_keys() };
+    $_ ||= 0 for @opts{ @$iocb_keys_ar };
 
-    my $packed = pack $class->iocb_pack(), @opts{ $class->iocb_keys() };
+    my $packed = pack $iocb_pack, @opts{ @$iocb_keys_ar };
     my $ptr = pack 'P', $packed;
 
     #We need $packed not to be garbage-collected.
-    return bless [ \$packed, $buf_sr, $ptr, $class->unpack_pointer($ptr) ], $class;
+    return bless [ \$packed, $buf_sr, $ptr, unpack( Linux::Perl::Pointer::UNPACK_TMPL(), $ptr) ], $class;
 }
 
 =head2 $sref = I<OBJ>->buffer_sr()

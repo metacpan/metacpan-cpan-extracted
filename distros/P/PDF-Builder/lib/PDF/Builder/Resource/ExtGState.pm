@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -390,7 +390,7 @@ sub outobjdeep {
         $self->{" $k"} = undef;
         delete($self->{" $k"});
     }
-    $self->SUPER::outobjdeep(@opts);
+    return $self->SUPER::outobjdeep(@opts);
 }
 
 =back

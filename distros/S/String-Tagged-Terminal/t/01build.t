@@ -103,4 +103,14 @@ sub is_unqq
       'Neighbouring colour tags behave' );
 }
 
+# no_color
+{
+   my $st = String::Tagged::Terminal->new( "abcde" );
+   $st->apply_tag( 0, 3, under => 1 );
+   $st->apply_tag( 2, 3, fgindex => 2 );
+
+   is_unqq( $st->build_terminal( no_color => 1 ), "\e[4mabc\e[mde",
+      'no_color option surpresses fgindex but not under' );
+}
+
 done_testing;

@@ -18,6 +18,7 @@ my $builder = My::ModuleBuild->new(
   configure_requires => {
     'Module::Build'      => 0.38,
     'Module::Build::FFI' => '0.22',
+    'FFI::Platypus'      => '0.22',
     'File::Which'   => 0,
   },
   build_requires => {
@@ -29,17 +30,20 @@ my $builder = My::ModuleBuild->new(
     'FFI::CheckLib' => 0,
     'File::Which'   => 0,
     'Module::Build::FFI' => '0.22',
+    'FFI::Build'    => '0.04',
   },
   requires => {
     'perl'          => '5.008001',
     'FFI::Platypus' => '0.22',
     'File::Which'   => 0,
     'Module::Build::FFI' => '0.22',
+    'FFI::Build'    => '0.04',
   },
   meta_merge => {
     resources  => {
-      repository => "http://github.com/plicease/FFI-Platypus-Lang-Fortran",
-      bugtracker => "http://github.com/plicease/FFI-Platypus-Lang-Fortran/issues",
+      repository => "http://github.com/Perl5-FFI/FFI-Platypus-Lang-Fortran",
+      bugtracker => "http://github.com/Perl5-FFI/FFI-Platypus-Lang-Fortran/issues",
+      x_IRC => "irc://irc.perl.org/#native",
     },
     no_index => {
       directory => [ 'examples' ],
@@ -54,21 +58,21 @@ $builder->add_to_cleanup(qw(
   examples/*.so
   examples/*.dylib
   examples/*.bundle
-  libtest/*.o
-  libtest/*.obj
-  libtest/*.so
-  libtest/*.dylib
-  libtest/*.bundle
-  libtest/90/*.o
-  libtest/90/*.obj
-  libtest/90/*.so
-  libtest/90/*.dylib
-  libtest/90/*.bundle
-  libtest/95/*.o
-  libtest/95/*.obj
-  libtest/95/*.so
-  libtest/95/*.dylib
-  libtest/95/*.bundle
+  t/ffi/*.o
+  t/ffi/*.obj
+  t/ffi/*.so
+  t/ffi/*.dylib
+  t/ffi/*.bundle
+  t/ffi/90/*.o
+  t/ffi/90/*.obj
+  t/ffi/90/*.so
+  t/ffi/90/*.dylib
+  t/ffi/90/*.bundle
+  t/ffi/95/*.o
+  t/ffi/95/*.obj
+  t/ffi/95/*.so
+  t/ffi/95/*.dylib
+  t/ffi/95/*.bundle
   FFI-Platypus-Lang-Fortran-*
   config.log
 ));

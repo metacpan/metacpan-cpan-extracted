@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Config;
+use FFI::Build::Platform;
 use Test::More tests => 1;
 BEGIN {
   my @modules;
@@ -89,3 +90,6 @@ foreach my $module (@modules)
 
 spacer;
 
+diag(FFI::Build::Platform->diag);
+
+spacer;

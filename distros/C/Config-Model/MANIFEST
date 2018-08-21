@@ -115,6 +115,7 @@ t/hash_with_data_migration.t
 t/include.t
 t/instance.t
 t/iterator.t
+t/lib/Config/Model/Backend/Mini.pm
 t/lib/Config/Model/models/Master.pl
 t/lib/DummyNode.pm
 t/lib/dump_load_model.pl

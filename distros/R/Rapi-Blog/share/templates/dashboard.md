@@ -56,6 +56,14 @@
       <h1>New Post</h1>
       <i class="fa fa-5x fa-plus-square"></i>
     </a>
+    
+    <a 
+      href="#!/adm/main/db/db_section" 
+      class="thumbnail tile tile-200 tile-maroon fa-links"
+    >
+       <h1>Sections</h1>
+       <i class="fa fa-5x fa-sitemap"></i>
+    </a>
 
      <a 
        href="#!/adm/main/db/db_category" 

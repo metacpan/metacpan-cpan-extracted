@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - 'plenigo GmbH'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: plenigo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp::Always: '0.13'
+  Crypt::JWT: '0.022'
+  Data::UUID: '1.221'
+  JSON: '2.97001'
+  Moo: '2.003004'
+  REST::Client: '273'
+  Throwable: '0.200013'
+  perl: '5.010'
+  strict: '1'
+  warnings: '1'
+resources:
+  repository: https://github.com/plenigo/plenigo_php_sdk.git
+version: '2.0003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Any;
-$Config::Model::Backend::Any::VERSION = '2.125';
+$Config::Model::Backend::Any::VERSION = '2.126';
 use Carp;
 use strict;
 use warnings;
@@ -129,18 +129,22 @@ sub associates_comments_with_data {
 }
 
 sub write_global_comment {
+    goto &write_global_comments;
+}
+
+sub write_global_comments {
     my $self = shift;
     my ($ioh, $cc);
     if (ref($_[0])) {
         my ($package, $filename, $line) = caller;
-        $logger->warn("write_global_comment: io_handle parameter is deprecated ($filename: $line)");
+        $logger->warn("write_global_comments: io_handle parameter is deprecated ($filename: $line)");
         ($ioh, $cc) = @_;
     }
     else {
         ( $cc ) = @_;
     }
 
-    croak "write_global_comment: no comment char specified" unless $cc;
+    croak "write_global_comments: no comment char specified" unless $cc;
 
     # no need to mention 'cme list' if current application is found
     my $app = $self->node->instance->application ;
@@ -209,7 +213,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.125
+version 2.126
 
 =head1 SYNOPSIS
 

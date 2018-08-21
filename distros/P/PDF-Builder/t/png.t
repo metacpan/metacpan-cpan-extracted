@@ -1,7 +1,8 @@
-use Test::More tests => 6;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 6;
 
 use PDF::Builder;
 
@@ -39,3 +40,5 @@ close $fh;
 $pdf = PDF::Builder->new();
 eval { $pdf->image_png('t/resources/this.file.does.not.exist') };
 ok($@, q{Fail fast if the requested file doesn't exist});
+
+1;

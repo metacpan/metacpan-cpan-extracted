@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyThing;
-$Config::Model::AnyThing::VERSION = '2.125';
+$Config::Model::AnyThing::VERSION = '2.126';
 use Mouse;
 
 # FIXME: must cleanup warp mechanism to implement this
@@ -327,7 +327,7 @@ Config::Model::AnyThing - Base class for configuration tree item
 
 =head1 VERSION
 
-version 2.125
+version 2.126
 
 =head1 SYNOPSIS
 
@@ -459,7 +459,7 @@ contains the key or the index to get the changed parameter.
 
 =item note
 
-information about the change. Mandatory of neither old or new value are defined.
+information about the change. Mandatory when neither old or new value are defined.
 
 =item really
 

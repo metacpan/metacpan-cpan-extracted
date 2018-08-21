@@ -1,0 +1,17 @@
+Changes
+cpanfile
+lib/Set/Hash/Keys.pm
+Makefile.PL
+MANIFEST
+README.md
+META.json
+META.yml
+t/00-load.t
+t/01-new.t
+t/01-set_hash.t
+t/02-union.t
+t/03-intersection.t
+t/04-difference.t
+t/05-exclusive.t
+t/06-symmetrical.t
+t/07-overloading.t

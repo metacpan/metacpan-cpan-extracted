@@ -1,6 +1,6 @@
 package Map::Tube::NYC::Line::IRTLexingtonAvenue;
 
-$Map::Tube::NYC::Line::IRTLexingtonAvenue::VERSION   = '0.58';
+$Map::Tube::NYC::Line::IRTLexingtonAvenue::VERSION   = '0.59';
 $Map::Tube::NYC::Line::IRTLexingtonAvenue::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::NYC::Line::IRTLexingtonAvenue - NYC Subway Map: IRT Lexington Avenue 
 
 =head1 VERSION
 
-Version 0.58
+Version 0.59
 
 =head1 DESCRIPTION
 

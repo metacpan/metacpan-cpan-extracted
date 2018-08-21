@@ -14,10 +14,15 @@ meta-spec:
   version: '1.4'
 name: Perl-Critic-TooMuchCode
 provides:
+  Perl::Critic::Policy::TooMuchCode::ProhibitExcessiveColons:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitExcessiveColons.pm
+    version: '0.01'
   Perl::Critic::Policy::TooMuchCode::ProhibitLargeBlock:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeBlock.pm
   Perl::Critic::Policy::TooMuchCode::ProhibitLargeTryBlock:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeTryBlock.pm
+  Perl::Critic::Policy::TooMuchCode::ProhibitUnnecessaryScalarKeyword:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnnecessaryScalarKeyword.pm
   Perl::Critic::Policy::TooMuchCode::ProhibitUnnecessaryUTF8Pragma:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnnecessaryUTF8Pragma.pm
   Perl::Critic::Policy::TooMuchCode::ProhibitUnusedConstant:
@@ -29,13 +34,13 @@ provides:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
   Perl::Critic::TooMuchCode:
     file: lib/Perl/Critic/TooMuchCode.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   List::Util: '1.50'
   PPIx::Utils: '0'
   Perl::Critic: '0'
 resources:
   repository: https://github.com/gugod/Perl-Critic-TooMuchCode.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: '1'

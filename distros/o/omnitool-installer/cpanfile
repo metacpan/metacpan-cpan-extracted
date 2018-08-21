@@ -52,7 +52,7 @@ requires 'YAML::Syck', '1.26';
 
 requires 'Crypt::PBKDF2', '0.161520';
 
-requires 'WWW::Scraper::ISBN::GoogleBooks_Driver','0.30';
+suggests 'WWW::Scraper::ISBN::GoogleBooks_Driver','0.30';
 
 requires 'LWP::Protocol::https','6.07';
 

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Patch for RT33513.",
+   "author" : [
+      "Matthaeus Kiem <cuer2s@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Win32-Console-PatchForRT33513",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Win32::Console" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kuerbis/Win32/Console/PatchForRT33513.git",
+         "web" : "https://github.com/kuerbis/Win32/Console/PatchForRT33513"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

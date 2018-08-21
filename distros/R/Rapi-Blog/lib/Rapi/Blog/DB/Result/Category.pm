@@ -37,8 +37,47 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9R1QEXzoBCbh4hJhMmAztw
 
 use RapidApp::Util ':all';
+use Rapi::Blog::Util;
 
 __PACKAGE__->load_components('+Rapi::Blog::DB::Component::SafeResult');
+
+sub insert {
+  my $self = shift;
+  my $columns = shift;
+  
+  if(my $User = Rapi::Blog::Util->get_User) {
+    die usererr "Create Category: PERMISSION DENIED" if ($User->id && !$User->admin);
+  }
+  
+  $self->set_inflated_columns($columns) if $columns;
+  
+  $self->next::method
+}
+
+sub update {
+  my $self = shift;
+  my $columns = shift;
+  
+  if(my $User = Rapi::Blog::Util->get_User) {
+    die usererr "Update Category: PERMISSION DENIED" if ($User->id && !$User->admin);
+  }
+  
+  $self->set_inflated_columns($columns) if $columns;
+
+  $self->next::method
+}
+
+
+sub delete {
+  my $self = shift;
+  
+  if(my $User = Rapi::Blog::Util->get_User) {
+    die usererr "Delete Category: PERMISSION DENIED" if ($User->id && !$User->admin);
+  }
+  
+  $self->next::method(@_)
+}
+
 
 sub posts_count {
   my $self = shift;

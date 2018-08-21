@@ -1,8 +1,9 @@
-use Test::More tests => 2;
-my $test_count = 2;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 2;
+my $test_count = 2;
 
 use PDF::Builder;
 
@@ -29,3 +30,5 @@ SKIP: {
     like($font->{'Name'}->val(), qr/^De/,
 	 q{Font has the expected name});
 }
+
+1;

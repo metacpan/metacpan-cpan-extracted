@@ -1,4 +1,4 @@
-Build.PL
+.readme_from
 Changes
 cpanfile
 error
@@ -6,11 +6,11 @@ example/demo
 example/simple
 lib/Getopt/Args2.pm
 lib/OptArgs2.pm
-MANIFEST			This list of files
-t/OptArgs2.t
-TODO
 Makefile.PL
+MANIFEST			This list of files
 README
-LICENSE
-META.yml
-META.json
+t/OptArgs2.t
+t/subcommand.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

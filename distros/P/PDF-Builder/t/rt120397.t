@@ -1,3 +1,7 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
 use Test::More;
 
 use PDF::Builder::Basic::PDF::File;
@@ -85,3 +89,5 @@ is($remainder, '(string)',
    q{Remainder doesn't get lost});
 
 done_testing();
+
+1;

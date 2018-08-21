@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use OptArgs2;
-use Test2::Bundle::Extended;
+use Test2::V0;
 
 like dies {
     opt one => (

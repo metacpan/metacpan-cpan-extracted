@@ -128,9 +128,14 @@ sub replace_data_value_insert_no_pre_st {
   my $self = shift;
   my ($data_value) = @_;
 
-  my @data = @{$data_value};
-  my @result
-    = map { $_ =~ qr/(date|datetime|now|NOW)/ ? $_ : "'" . $_ . "'" } @data;
+  my @data   = @{$data_value};
+  my @result = map {
+    $_ =~ qr/(date|datetime|now|NOW)/    # for match date/datetime function
+      ? $_                               # if defined
+        ? '\'' . $_ . '\''               # true condition
+        : ""                             # false condition
+      : "'" . $_ . "'"                   # if not date function.
+  } @data;
   @result = grep (defined, @result);
   return @result;
 }

@@ -18,7 +18,7 @@ provides:
     version: '0.001001'
   Babble:
     file: lib/Babble.pm
-    version: '0.090003'
+    version: '0.090006'
   Babble::Filter:
     file: lib/Babble/Filter.pm
   Babble::Grammar:
@@ -33,6 +33,8 @@ provides:
     file: lib/Babble/Plugin/PostfixDeref.pm
   Babble::Plugin::SKT:
     file: lib/Babble/Plugin/SKT.pm
+  Babble::Plugin::Sigify:
+    file: lib/Babble/Plugin/Sigify.pm
   Babble::Plugin::State:
     file: lib/Babble/Plugin/State.pm
   Babble::Plugin::SubstituteAndReturn:
@@ -49,5 +51,5 @@ requires:
   Mu: '0'
   PPR: '0.000021'
   strictures: '2'
-version: '0.090003'
+version: '0.090006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

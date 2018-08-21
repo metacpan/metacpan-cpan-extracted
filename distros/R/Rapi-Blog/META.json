@@ -49,10 +49,11 @@
             "Plack::Middleware::ConditionalGET" : "0",
             "Pod::Find" : "0",
             "Pod::Usage" : "0",
-            "RapidApp" : "1.3004",
+            "RapidApp" : "1.3101",
             "RapidApp::Builder" : "0",
             "RapidApp::Module::DbicPropPage" : "0",
             "RapidApp::Module::DbicRowDV" : "0",
+            "RapidApp::Module::Tree" : "0",
             "RapidApp::Template::AccessStore" : "0",
             "RapidApp::Util" : "0",
             "RapidApp::Util::Role::ModelDBIC" : "0",
@@ -89,6 +90,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.0101"
+   "version" : "1.0200"
 }
 

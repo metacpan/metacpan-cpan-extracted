@@ -4,7 +4,7 @@
       "Eric Chernoff"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "mit"
    ],
@@ -87,10 +87,12 @@
             "Term::ReadKey" : "2.37",
             "Try::Tiny" : "0.24",
             "WWW::Mechanize" : "1.86",
-            "WWW::Scraper::ISBN::GoogleBooks_Driver" : "0.30",
             "YAML::Syck" : "1.26",
             "perl" : "5.022001",
             "utf8" : "1.17"
+         },
+         "suggests" : {
+            "WWW::Scraper::ISBN::GoogleBooks_Driver" : "0.30"
          }
       },
       "test" : {
@@ -102,7 +104,7 @@
    "provides" : {
       "omnitool::installer" : {
          "file" : "lib/omnitool/installer.pm",
-         "version" : "v1.0.11"
+         "version" : "v1.0.12"
       }
    },
    "release_status" : "stable",
@@ -116,11 +118,13 @@
          "web" : "https://github.com/ericschernoff/omnitool-installer"
       }
    },
-   "version" : "1.0.11",
+   "version" : "1.0.12",
    "x_contributors" : [
       "Eric Chernoff <echernof@cisco.com>",
+      "Eric Chernoff <eric@vps200921.vps.ovh.ca>",
       "Eric Chernoff <ericschernoff@gmail.com>",
       "root <root@www.omnitool.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

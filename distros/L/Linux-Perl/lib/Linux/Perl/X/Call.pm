@@ -8,7 +8,11 @@ use parent 'Linux::Perl::X::Base';
 sub _new {
     my ($class, $num, $error) = @_;
 
-    return $class->SUPER::_new("System call $num failed: $error");
+    return $class->SUPER::_new(
+        "System call $num failed: $error",
+        call_number => $num,
+        error => $error,
+    );
 }
 
 1;

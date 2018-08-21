@@ -35,6 +35,8 @@ Each family of system calls lives in its own namespace under C<Linux::Perl>:
 
 =item * L<Linux::Perl::uname>
 
+=item * L<Linux::Perl::getdents>
+
 =back
 
 The distribution contains a number of other modules, none of which is
@@ -60,14 +62,14 @@ The following platforms are supported:
 
 =item * x86_64 (i.e., 64-bit Intel/AMD)
 
-This is probably the only platform that will foreseeably receive substantial
-testing during development.
-
-=item * i386 (32-bit Intel/AMD)
+=item * arm (e.g., Raspberry Pi)
 
 =back
 
-Support for adding new platforms is usually trivial; just send a pull request.
+Note that a 64-bit Perl is assumed/required.
+
+Support for adding new platforms just involves adding new modules with the
+necessary constants to the distribution.
 
 =cut
 
@@ -76,7 +78,7 @@ use warnings;
 
 use Linux::Perl::X ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 sub call {
     local $!;

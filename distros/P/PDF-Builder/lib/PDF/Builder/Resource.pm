@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Util qw(pdfkey);
 use PDF::Builder::Basic::PDF::Utils; # PDFName
@@ -74,7 +74,7 @@ sub outobjdeep {
 
     delete $self->{' api'};
     delete $self->{' apipdf'};
-    $self->SUPER::outobjdeep($fh, $pdf, %options);
+    return $self->SUPER::outobjdeep($fh, $pdf, %options);
 }
 
 =back

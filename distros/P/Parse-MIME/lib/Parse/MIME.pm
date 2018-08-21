@@ -1,12 +1,11 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Parse::MIME;
-$Parse::MIME::VERSION = '1.003';
-# ABSTRACT: Parse mime-types, match against media ranges
 
-use Exporter 'import';
+our $VERSION = '1.005';
+
+use Exporter ();
+our @ISA = 'Exporter';
 our @EXPORT_OK = qw(
 	&parse_mime_type &parse_media_range &parse_media_range_list 
 	&fitness_and_quality_parsed &quality_parsed &quality
@@ -128,10 +127,6 @@ __END__
 
 Parse::MIME - Parse mime-types, match against media ranges
 
-=head1 VERSION
-
-version 1.003
-
 =head1 SYNOPSIS
 
  use Parse::MIME qw( best_match );
@@ -221,7 +216,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
+This software is copyright (c) 2018 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

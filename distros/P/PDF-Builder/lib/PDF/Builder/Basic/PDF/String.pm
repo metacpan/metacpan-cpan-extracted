@@ -17,8 +17,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -179,7 +179,7 @@ sub val {
     return $_[0]->{'val'};
 }
 
-=head2 $->as_pdf()
+=head2 $s->as_pdf()
 
 Returns the string formatted for output as PDF for PDF File object $pdf.
 
@@ -217,6 +217,7 @@ sub outobjdeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
     $fh->print($self->as_pdf($pdf));
+    return;
 }
 
 1;

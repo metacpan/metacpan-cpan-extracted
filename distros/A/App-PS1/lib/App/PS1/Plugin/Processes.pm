@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 1;
 
@@ -22,7 +22,7 @@ App::PS1::Plugin::Processes - Running processes to prompt
 
 =head1 VERSION
 
-This documentation refers to App::PS1::Plugin::Processes version 0.06.
+This documentation refers to App::PS1::Plugin::Processes version 0.07.
 
 =head1 SYNOPSIS
 

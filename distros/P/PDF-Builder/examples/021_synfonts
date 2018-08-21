@@ -35,7 +35,7 @@ my $sx = 33;
 my $sy = 45;
 my $fx = 20;
 
-my ($fn, $ci, $x, $y, $yp, $k);
+my ($ci, $y, $k);
 
 my (@font_list, @short_name, @T1_metrics);
 # core
@@ -108,7 +108,7 @@ if ($type == 3) {
 
 my ($metrics, $sname);
 # outer loop, one file each for Times-Roman, Times-Italic, etc.
-foreach $fn (@font_list) {
+foreach my $fn (@font_list) {
     $fn =~ s/~/ /g; # restore name
     if ($type == 3) {
       # Type1 also has metrics file
@@ -152,12 +152,11 @@ foreach $fn (@font_list) {
       # TrueType can't use automap. Need to get to glyphs beyond basic encoding
       @planes = ($fn1);   
     }
-    my $varNum = 0;
 
     print STDERR "  ".(scalar @variants)." variants of font, each up to ".
                       (scalar @planes)." page(s)\n";
 
-    foreach $varNum ( 0 .. $#variants ) {
+    foreach my $varNum ( 0 .. $#variants ) {
 	# 4 or so variants requested per font
 	$k = $variants[$varNum];
 
@@ -168,8 +167,8 @@ foreach $fn (@font_list) {
 
 	    # check if there is anything to be shown in this plane ($fnt)
 	    my $flag = 0; # no character found yet
-	    foreach $yp (0..15) {
-		foreach $x (0..15) {
+	    foreach my $yp (0..15) {
+		foreach my $x (0..15) {
 		    $ci = $yp*16 + $x;  # 0..255 value
 		    # always seems to be something at
 		    # ci = 32 (U+0020, space)
@@ -194,20 +193,21 @@ foreach $fn (@font_list) {
                 $txt->font($font, $fx);
 
             my $txt2 = $page->text();
+	    my $xname;
 
                 $txt2->translate(50,800);
                 $txt2->font($f1, 20);
 		if (defined $font->fontname()) {
-		    $x = $font->fontname();
+		    $xname = $font->fontname();
 		} else {
-		    $x = $sname;
+		    $xname = $sname;
 		}
 		if (defined $font->name()) {
 		    $y = $font->name();
 		} else {
 		    $y = '??????';
 		}
-                $txt2->text("font='$x / $y'");
+                $txt2->text("font='$xname / $y'");
 
                 $txt2->translate(50,780);
 		$txt2->font($f1, 15);
@@ -224,9 +224,9 @@ foreach $fn (@font_list) {
             print STDERR ".";  # one . per page
 	    # draw grid of characters and information
 	    # yp character row value (increasing)
-            foreach $yp (0 .. 15) {
+            foreach my $yp (0 .. 15) {
 		$y = 15 - $yp;  # y vertical (row) position T to B
-                foreach $x (0 .. 15) {
+                foreach my $x (0 .. 15) {
                     $txt->translate(50+($sx*$x), 50+($sy*$y));
 		    $ci = $yp*16 + $x;
 		    my $c  = chr($ci);

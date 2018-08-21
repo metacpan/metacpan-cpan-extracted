@@ -1,8 +1,9 @@
 package Catmandu::Exporter::RIS;
 
+our $VERSION = '0.11';
+
 use namespace::clean;
 use Catmandu::Sane;
-use Encode qw(encode_utf8);
 use Moo;
 
 with 'Catmandu::Exporter';
@@ -22,7 +23,6 @@ sub add {
             $vals = [$vals] unless ref $vals;
             for my $val (@$vals) {
                 $val = substr($val, 255) if length($val) > 255 && $tag =~ $SMALL_TAG;
-                $val = encode_utf8($val);
                 print $fh "$tag  - $val\r\n";
             }
         }
@@ -30,6 +30,12 @@ sub add {
 
     print $fh "ER  - \r\n";
 }
+
+1;
+
+__END__
+
+=pod
 
 =head1 NAME
 
@@ -71,5 +77,3 @@ fields and values as a string or array reference.
 L<Catmandu::Exporter>
 
 =cut
-
-1;

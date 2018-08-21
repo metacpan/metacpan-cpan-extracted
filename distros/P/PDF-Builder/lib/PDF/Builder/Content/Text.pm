@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content';
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -356,8 +356,8 @@ sub _text_fill_line {
     # don't split on non-breaking space (required blank).
     my @txt = split(/\x20/, $text);
     my @line = ();
-    local $";
-    $"=' ';
+    local $";  # intent is that reset of separator ($") is local to block
+    $"=' ';   ## no critic
     my $lastWord = '';  # the one that didn't quite fit
     my $overflowed = 0;
 

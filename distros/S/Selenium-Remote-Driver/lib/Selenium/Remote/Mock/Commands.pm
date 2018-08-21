@@ -1,5 +1,5 @@
 package Selenium::Remote::Mock::Commands;
-$Selenium::Remote::Mock::Commands::VERSION = '1.28';
+$Selenium::Remote::Mock::Commands::VERSION = '1.29';
 # ABSTRACT: utility class to mock Selenium::Remote::Commands
 
 use strict;
@@ -51,7 +51,7 @@ Selenium::Remote::Mock::Commands - utility class to mock Selenium::Remote::Comma
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 DESCRIPTION
 

@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/oalders/open-this/issues
   homepage: https://github.com/oalders/open-this
   repository: https://github.com/oalders/open-this.git
-version: '0.000008'
+version: '0.000009'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -67,7 +67,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -122,7 +122,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200009'
+      version: '1.200011'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -426,7 +426,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000008
+          tag: v0.000009
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

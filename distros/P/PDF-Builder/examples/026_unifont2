@@ -36,7 +36,7 @@ my $sx = 33;
 my $sy = 45;
 my $fx = 20;
 
-my ($uf, $x, $y);
+my ($uf);
 
 my @label = ();
 $label[   0] = '0000 - 00FF Basic Latin (ASCII) and Latin-1';
@@ -78,8 +78,8 @@ foreach my $block (0,1,2,3,4,5,0x26,0x27,0xf0) {
 
     # character is Unicode $block*256 + $y*16 + $x (0..255), arranged in grid
     # 00 at upper left to FF in lower right
-    foreach $y (0..15) {      # row T to B
-        foreach $x (0..15) {  # column L to R
+    foreach my $y (0..15) {      # row T to B
+        foreach my $x (0..15) {  # column L to R
 	    # character (no bounding box)
             $text->textlabel($leftcol+($sx*$x), $toprow-($sy*$y), $uf, $fx, pack('U',$block*256+$y*16+$x));
 	    # label (Unicode name) below, at a slant to fit horizontally

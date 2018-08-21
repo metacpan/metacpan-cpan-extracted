@@ -56,7 +56,7 @@ my $txt3 = <<'CLEAN';
 ┣━┛┣━┫┣━┛┣╸ ┣┳┛
 ╹  ╹ ╹╹  ┗━╸╹┗╸
 CLEAN
-eq_or_diff(~~$font->figify(-A=>'Paper'), $txt3, 'CLEAN TOIlet');
+eq_or_diff(scalar $font->figify(-A=>'Paper'), $txt3, 'CLEAN TOIlet');
 
 
 #4 Wrapped TOIlet
@@ -66,7 +66,7 @@ my $txt4 = <<'WRAP';
 ┣━┫┣╸ ┃  ┃  ┃ ┃   ┃╻┃┃ ┃┣┳┛┃   ┃┃
 ╹ ╹┗━╸┗━╸┗━╸┗━┛   ┗┻┛┗━┛╹┗╸┗━╸╺┻┛
 WRAP
-my $out = ~~$font->figify(-A=>'Hello World',-w=>240);
+my $out = scalar $font->figify(-A=>'Hello World',-w=>240);
 eq_or_diff($out, $txt4, 'TOIlet WRAP');
 
 

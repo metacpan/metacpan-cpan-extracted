@@ -4,8 +4,6 @@
 # 256 bytes in one single-byte encoding, plus all glyphs in font by CId,
 # and some sample ASCII text.
 # -e encoding  (default is latin1) SINGLE BYTE ONLY!
-# note that use of -file in new() leaves the PDF in THIS directory, not the
-#   one with the 022_truefonts file!
 
 use strict;
 use warnings;
@@ -24,7 +22,7 @@ my $sx = 33;
 my $sy = 45;
 my $fx = 20;
 
-my ($fn, $gfx, $tx, $pdf, $page, $f1, $f2, $x, $y, $xp, $yp);
+my ($gfx, $tx, $pdf, $page, $f1, $f2, $y);
 
 my $LoremIpsum=q|Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.|;
 
@@ -37,7 +35,7 @@ GetOptions(
 # loop through command line list of font file names
 die "Need at least one TTF file name on command line!\n" if !scalar(@ARGV);
 
-foreach $fn (@ARGV) {
+foreach my $fn (@ARGV) {
     if (!-r $fn) {
         print "$fn cannot be read. Skipping...\n\n";
         next;
@@ -47,7 +45,7 @@ foreach $fn (@ARGV) {
     $myName =~ s/\.[to]tf$//i;  # remove .ttf/.otf (any case)
 
     $pdf = PDF::Builder->new(-compress => $compress, 
-                          -file => basename($0).'.'.$myName.".pdf");
+                          -file => $0.'.'.$myName.".pdf");
 
     $f1 = $pdf->corefont('Helvetica', -encode => 'latin1');
     $f2 = $pdf->corefont('Helvetica-Bold', -encode => 'latin1');
@@ -86,7 +84,7 @@ foreach $fn (@ARGV) {
 	    $y = 15 - $yp; # grow y from top to bottom instead
             print STDERR ".";
 	    # loop through columns left to right
-            foreach $x (0..15) {
+            foreach my $x (0..15) {
                 $txt->translate(50+($sx*$x),50+($sy*$y));
 		my $ci = $yp*16 + $x;
 		my $c  = chr($ci);
@@ -146,10 +144,10 @@ foreach $fn (@ARGV) {
         #delete $gfx->{'Filter'};
 
 	# loop through y coordinates of rows 15 rows of 10 columns)
-	foreach $yp (0 .. 14) {
+	foreach my $yp (0 .. 14) {
 	    my $y = 750 - $yp*50;
 	    # loop through x coordinates of columns
-	    foreach $xp (1 .. 10) {
+	    foreach my $xp (1 .. 10) {
 		my $x = $xp * 50;
                 my $xo = shift(@cids);  # 0, 1, 2,...
                 $gfx->save();

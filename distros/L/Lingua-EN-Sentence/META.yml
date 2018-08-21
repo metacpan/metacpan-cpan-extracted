@@ -16,11 +16,12 @@ name: Lingua-EN-Sentence
 provides:
   Lingua::EN::Sentence:
     file: lib/Lingua/EN/Sentence.pm
-    version: '0.30'
+    version: '0.31'
 requires:
+  perl: '5.1'
   warnings: '1.12'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kimryan/Lingua-EN-Sentence
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

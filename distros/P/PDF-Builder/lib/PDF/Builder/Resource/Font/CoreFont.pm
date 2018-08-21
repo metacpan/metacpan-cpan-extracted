@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use File::Basename;
 
@@ -60,7 +60,7 @@ sub _look_for_font {
     my $fname = shift;
 
     ## return %{$fonts->{$fname}} if defined $fonts->{$fname};
-    eval "require PDF::Builder::Resource::Font::CoreFont::$fname; ";
+    eval "require PDF::Builder::Resource::Font::CoreFont::$fname; "; ## no critic
     unless($@) {
         my $class = "PDF::Builder::Resource::Font::CoreFont::$fname";
         $fonts->{$fname} = deep_copy($class->data());
@@ -82,11 +82,11 @@ sub deep_copy {
     my $this = shift;
 
     if      (not ref $this) {
-        $this;
+        return $this;
     } elsif (ref $this eq "ARRAY") {
-        [map &deep_copy($_), @$this];
+        return [map &deep_copy($_), @$this];   ## no critic
     } elsif (ref $this eq "HASH") {
-        +{map { $_ => &deep_copy($this->{$_}) } keys %$this};
+        return +{map { $_ => &deep_copy($this->{$_}) } keys %$this};
     } elsif (ref $this eq "CODE") {
         # Can't deep copy code refs
         return $this;
@@ -102,7 +102,7 @@ sub new {
     my %opts = ();
 
     if (-f $name) {
-        eval "require '$name'; ";
+        eval "require '$name'; "; ## no critic
         $name = basename($name,'.pm');
     }
     my $lookname = lc($name);
@@ -183,6 +183,7 @@ sub loadallfonts {
     ]) {
         _look_for_font($f);
     }
+    return;
 }
 
 #    andalemono

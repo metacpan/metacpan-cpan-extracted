@@ -9,8 +9,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -55,7 +55,7 @@ sub readppmheader {
 
   $rc = read($gr, $in, 3);
 
-  if (!defined($rc) or $rc != 3) {
+  if (!defined($rc) || $rc != 3) {
     $info{'error'} = 'Read error or EOF';
     return \%info;
   }
@@ -79,7 +79,7 @@ sub readppmheader {
 
     while (1) {
       $rc = read($gr, $in, 1, length($in));
-      if (!defined($rc) or $rc != 1) {
+      if (!defined($rc) || $rc != 1) {
         $info{'error'} = 'Read error or EOF';
         return \%info;
       }

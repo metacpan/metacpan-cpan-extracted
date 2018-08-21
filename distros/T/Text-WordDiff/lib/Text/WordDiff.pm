@@ -6,7 +6,7 @@ use Algorithm::Diff ();
 use IO::File;
 use Carp;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 # _Mastering Regular Expressions_, p. 132.
 my $BEGIN_WORD = $] >= 5.006
@@ -270,7 +270,7 @@ into Text::CharDiff!).
 Now, I acknowledge that there are localization issues with this approach. In
 particular, it will fail with Chinese, Japanese, and Korean text, as these
 languages don't put non-word characters between words. Ideally, Test::WordDiff
-would then split on every charaters (since a single character often equals a
+would then split on every character (since a single character often equals a
 word), but such is not the case when the C<utf8> flag is set on a string.
 For example, This simple script:
 
@@ -583,6 +583,8 @@ L<bug-Text-WordDiff@rt.cpan.org|mailto:bug-Text-WordDiff@rt.cpan.org>.
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
+
+Currently maintained by the developers of The Perl Shop <tps@cpan.org>.
 
 =head1 Copyright and License
 

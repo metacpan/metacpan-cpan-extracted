@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use Syntax::Keyword::Dynamically;
+
+subtest "package variable" => sub {
+   our $pvar = "old";
+
+   {
+      dynamically $pvar = "new";
+      is( $pvar, "new", 'new value within scope' );
+   }
+   is( $pvar, "old", 'value restored after block leave' );
+
+   eval {
+      dynamically $pvar = "before die";
+      die "oops\n";
+   };
+   is( $pvar, "old", 'value restored after eval die' );
+};
+
+subtest "lexical variable" => sub {
+   my $lvar = "old";
+
+   {
+      dynamically $lvar = "new";
+      is( $lvar, "new", 'new value within scope' );
+   }
+   is( $lvar, "old", 'value restored after block leave' );
+
+   eval {
+      dynamically $lvar = "before die";
+      die "oops\n";
+   };
+   is( $lvar, "old", 'value restored after eval die' );
+};
+
+subtest "array element" => sub {
+   my @arr = qw( a old c );
+
+   {
+      dynamically $arr[1] = "new";
+      is( $arr[1], "new", 'new value within scope' );
+   }
+   is( $arr[1], "old", 'value restored after block leave' );
+};
+
+subtest "hash element" => sub {
+   my %hash = ( key => "old" );
+
+   {
+      dynamically $hash{key} = "new";
+      is( $hash{key}, "new", 'new value within scope' );
+   }
+   is( $hash{key}, "old", 'value restored after block leave' );
+};
+
+my $value;
+sub func :lvalue { $value }
+subtest "lvalue function" => sub {
+
+   func = "old";
+   {
+      dynamically func = "new";
+      is( $value, "new", 'new value within scope' );
+   }
+   is( $value, "old", 'value restored after block leave' );
+};
+
+subtest "lvalue accessor" => sub {
+
+   main->func = "old";
+   {
+      dynamically main->func = "new";
+      is( $value, "new", 'new value within scope' );
+   }
+   is( $value, "old", 'value restored after block leave' );
+};
+
+done_testing;

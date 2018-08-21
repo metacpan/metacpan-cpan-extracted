@@ -1,3 +1,7 @@
+0.04
+        - ProhibitUnusedImport: ignore all pragmas.
+        - add: ProhibitExcessiveColons
+
 0.03
         - add: ProhibitLargeBlock
         - add: ProhibitLargeTryBlock

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.125';
+$Config::Model::Value::VERSION = '2.126';
 use 5.10.1;
 
 use Mouse;
@@ -996,7 +996,7 @@ sub run_code_set_on_value {
             if ($@) {
                 Config::Model::Exception::Model->throw(
                     object  => $self,
-                    message => "Eval of code failed : $@"
+                    message => "Eval of assert or warning code failed : $@"
                 );
             }
             return $invert ^ $ret;
@@ -1077,6 +1077,7 @@ sub apply_fix {
     if ( $_ ne $$value_r ) {
         $fix_logger->info( $self->location . ": fix changed value from '$$value_r' to '$_'" );
         $self->_store_fix( $$value_r, $_, $msg );
+        $$value_r = $_; # so chain of fixes work
     }
     else {
         $fix_logger->info( $self->location . ": fix did not change value '$$value_r'" );
@@ -1886,7 +1887,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.125
+version 2.126
 
 =head1 SYNOPSIS
 

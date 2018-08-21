@@ -16,7 +16,7 @@ my @cand = (
 
 push @cand, map {
   (my $orig = $_->[0]) =~ s/^my \$foo = sub/sub foo/;
-  s/^my \$foo = do //, s/sub {/sub foo {/ for (my $expect = $_->[1]);
+  s/^my \$foo = do //, s/sub \{/sub foo {/ for (my $expect = $_->[1]);
   [ $orig, $expect ],
 } @cand;
 

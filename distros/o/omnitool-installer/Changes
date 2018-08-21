@@ -32,6 +32,8 @@ Revision history for Perl extension omnitool-installer
 
    - Add dependency to Net::Server::SS::PreFork for Starman
 
+1.0.12 2018-08-19T17:42:32Z
+
 1.0.11 2018-07-11T18:58:39Z
 
 1.0.10 2018-02-23T01:57:53Z

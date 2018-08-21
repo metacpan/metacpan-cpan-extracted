@@ -1,4 +1,8 @@
 Revision history for Perl CPAN module Lingua::En::NameParse
+1.37 18 Aug 2018
+    Allow case_all_reverse to work with name type of 'John' (thanks to Hugh S. Myers for reporting this)
+    Fixed github issue for EdwardsMike, 2 letter surname not correctly parsed
+    Renamed github repo to HumanNameParser
 
 1.36 15  Jul 2016
     Added religious title Rev (for Reverand  RT bug #116080

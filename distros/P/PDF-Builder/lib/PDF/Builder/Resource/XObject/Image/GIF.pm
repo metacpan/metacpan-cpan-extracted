@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -65,7 +65,7 @@ sub unInterlace {
         $idx++;
     }
 
-    $self->{' stream'} = join('', @result);
+    return $self->{' stream'} = join('', @result);
 }
 
 sub deGIF {

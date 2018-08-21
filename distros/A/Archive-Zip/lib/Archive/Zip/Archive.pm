@@ -14,7 +14,7 @@ use Encode qw(encode_utf8 decode_utf8);
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.60';
+    $VERSION = '1.62';
     @ISA     = qw( Archive::Zip );
 }
 
@@ -26,6 +26,7 @@ use Archive::Zip qw(
 );
 
 our $UNICODE;
+our $UNTAINT = qr/\A(.+)\z/;
 
 # Note that this returns undef on read errors, else new zip object.
 
@@ -185,6 +186,8 @@ sub extractMember {
         $dirName = File::Spec->catpath($volumeName, $dirName, '');
     } else {
         $name = $member->fileName();
+        if ((my $ret = _extractionNameIsSafe($name))
+            != AZ_OK) { return $ret; }
         ($dirName = $name) =~ s{[^/]*$}{};
         $dirName = Archive::Zip::_asLocalName($dirName);
         $name    = Archive::Zip::_asLocalName($name);
@@ -218,6 +221,8 @@ sub extractMemberWithoutPaths {
     unless ($name) {
         $name = $member->fileName();
         $name =~ s{.*/}{};    # strip off directories, if any
+        if ((my $ret = _extractionNameIsSafe($name))
+            != AZ_OK) { return $ret; }
         $name = Archive::Zip::_asLocalName($name);
     }
     my $rc = $member->extractToFileNamed($name, @_);
@@ -725,7 +730,7 @@ sub _findEndOfCentralDirectory {
 # you have bigger problems than this.
 sub _untaintDir {
     my $dir = shift;
-    $dir =~ m/\A(.+)\z/s;
+    $dir =~ m/$UNTAINT/s;
     return $1;
 }
 
@@ -772,7 +777,8 @@ sub addTree {
     if ($^O eq 'MSWin32' && $Archive::Zip::UNICODE) {
         $root = Win32::GetANSIPathName($root);
     }
-    File::Find::find($wanted, $root);
+    # File::Find will not untaint unless you explicitly pass the flag and regex pattern.
+    File::Find::find({ wanted => $wanted, untaint => 1, untaint_pat => $UNTAINT }, $root);
 
     my $rootZipName = _asZipDirName($root, 1);    # with trailing slash
     my $pattern = $rootZipName eq './' ? '^' : "^\Q$rootZipName\E";
@@ -827,6 +833,37 @@ sub addTreeMatching {
     return $self->addTree($root, $dest, $matcher, $compressionLevel);
 }
 
+# Check if one of the components of a path to the file or the file name
+# itself is an already existing symbolic link. If yes then return an
+# error. Continuing and writing to a file traversing a link posseses
+# a security threat, especially if the link was extracted from an
+# attacker-supplied archive. This would allow writing to an arbitrary
+# file. The same applies when using ".." to escape from a working
+# directory. <https://bugzilla.redhat.com/show_bug.cgi?id=1591449>
+sub _extractionNameIsSafe {
+    my $name = shift;
+    my ($volume, $directories) = File::Spec->splitpath($name, 1);
+    my @directories = File::Spec->splitdir($directories);
+    if (grep '..' eq $_, @directories) {
+        return _error(
+            "Could not extract $name safely: a parent directory is used");
+    }
+    my @path;
+    my $path;
+    for my $directory (@directories) {
+        push @path, $directory;
+        $path = File::Spec->catpath($volume, File::Spec->catdir(@path), '');
+        if (-l $path) {
+            return _error(
+                "Could not extract $name safely: $path is an existing symbolic link");
+        }
+        if (!-e $path) {
+            last;
+        }
+    }
+    return AZ_OK;
+}
+
 # $zip->extractTree( $root, $dest [, $volume] );
 #
 # $root and $dest are Unix-style.
@@ -861,6 +898,8 @@ sub extractTree {
         $fileName =~ s{$pattern}{$dest};       # in Unix format
                                                # convert to platform format:
         $fileName = Archive::Zip::_asLocalName($fileName, $volume);
+        if ((my $ret = _extractionNameIsSafe($fileName))
+            != AZ_OK) { return $ret; }
         my $status = $member->extractToFileNamed($fileName);
         return $status if $status != AZ_OK;
     }

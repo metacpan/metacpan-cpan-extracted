@@ -26,6 +26,7 @@ sub mark {
     } else {
         $t->text($pdf->pages());  # current page number 1, 2, 3,...
     }
+    return;
 }
 
 # create pages 1 - 8

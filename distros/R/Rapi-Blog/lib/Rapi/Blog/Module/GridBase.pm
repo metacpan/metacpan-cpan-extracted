@@ -66,11 +66,18 @@ around 'get_add_edit_form_items' => sub {
     unless($self->ResultSource->schema->resultset('Category')->count > 0) {
       @items = grep { ($_->{name}||'') ne 'categories' } @items;
     }
+    
+    # Actually check to see if there are any Sections, and if 
+    # there are not, don't present the editor
+    unless($self->ResultSource->schema->resultset('Section')->count > 0) {
+      @items = grep { ($_->{name}||'') ne 'section' } @items;
+    }
+  
   
     my @sets = (
     
       $self->_collect_to_fieldset(
-        \@items, [qw/name title categories author ts published/], {
+        \@items, [qw/name title section categories author ts published/], {
           width => 410,
           title => 'Attributes',
           labelWidth => 70

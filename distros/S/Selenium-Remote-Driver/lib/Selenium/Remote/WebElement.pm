@@ -1,5 +1,5 @@
 package Selenium::Remote::WebElement;
-$Selenium::Remote::WebElement::VERSION = '1.28';
+$Selenium::Remote::WebElement::VERSION = '1.29';
 # ABSTRACT: Representation of an HTML Element used by Selenium Remote Driver
 
 use strict;
@@ -43,6 +43,15 @@ has 'driver' => (
     required => 1,
     handles => [qw(_execute_command)],
 );
+
+
+sub child {
+    return $_[0]->{driver}->find_child_element(@_);
+}
+
+sub children {
+    return $_[0]->{driver}->find_child_elements(@_);
+}
 
 
 sub click {
@@ -329,7 +338,7 @@ Selenium::Remote::WebElement - Representation of an HTML Element used by Seleniu
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 DESCRIPTION
 
@@ -396,6 +405,12 @@ spec|https://www.w3.org/TR/webdriver/#elements> strictly dictates the
 exact behavior.
 
 =head1 FUNCTIONS
+
+=head2 child(selector, method)
+
+=head2 children(selector, method)
+
+Alias to Selenium::Remote::Driver::find_child_element and find_child_elements, respectively.
 
 =head2 click
 

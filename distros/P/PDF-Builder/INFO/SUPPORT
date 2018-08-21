@@ -1,0 +1,37 @@
+
+PDF::Builder is a fork (July, 2017) of the popular PDF::API2 Perl 
+software for PDF creation and manipulation. 
+
+Why does it start with version 3.004? The owner of PDF::API2 requested 
+that the name of the fork be changed from API2 to something else to 
+avoid confusion. The author of Builder had originally offered this
+software as another version of API2, and had already jumped the version
+from 2.xxx (API2) to 3.xxx (now Builder) and had made three releases
+(served from the catskilltech.com website). Rather than reset to 1.000, 
+it seemed cleaner just to continue with the 3.xxx version.
+
+Currently, PDF::Builder source is hosted on GitHub
+(https://github.com/PhilterPaper/Perl-PDF-Builder), with the Perl
+installable module download offered on CPAN (PDF::Builder).
+
+Please raise issues (bug reports, etc.) on GitHub, under the "issues" tab,
+with label "bugs". Feature Requests should be labeled "enhancement". The 
+maintainer will close (and tag as appropriate) resolved or rejected issues. 
+Please do NOT use the CPAN RT ticket system -- it is not being regularly 
+monitored by the owner.
+
+General discussions not pertaining to a specific issue (bug) may be
+conducted on the forum at https://www.catskilltech.com/forum/index.html
+in the PDF::Builder/General Discussions board. Alternately, use the "general
+discussion" label under the GitHub system. 
+
+If you do not have a CPAN or GitHub account with which to open a ticket,
+you can use my Contact form at the above forum URL. Look for a link "Post
+without Account". This is provided as a convenience for those lacking a
+GitHub ID (for submitting an issue) and only need it on an occasional
+basis. If you end up using it regularly, I will have to ask you to open
+a GitHub account so that you can post directly. Please indicate whether
+you are trying to post a ticket (issue) for GitHub, an entry to a thread 
+(or are starting a new thread) in the forum, or something else.
+
+

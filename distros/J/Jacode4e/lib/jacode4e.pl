@@ -1,5 +1,5 @@
 package jacode4e;
-$VERSION = '2.13.6.6';
+$VERSION = '2.13.6.7';
 ######################################################################
 #
 # jacode4e - jacode.pl-like program for enterprise
@@ -54,17 +54,20 @@ $VERSION = '2.13.6.6';
 #     %option
 #       The options you can specify are as follows:
 #
-#       key mnemonic     value means
+#       key mnemonic      value means
 #       -----------------------------------------------------------------------
-#       INPUT_LAYOUT     input record layout by 'S' and 'D' sequence
-#                        'S' means one char as SBCS, 'D' means one char as DBCS
-#                        default is 'S'
-#       OUTPUT_SHIFTING  true means use output shift code, false means not use
-#                        default is false
-#       SPACE            output space code in DBCS/MBCS
-#                        default is U+3000 in Unicode
-#       GETA             output geta code in DBCS/MBCS
-#                        default is U+3013 in Unicode
+#       INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
+#                         'S' means one char as SBCS, 'D' means one char as DBCS
+#                         default is 'S'
+#       OUTPUT_SHIFTING   true means use output shift code, false means not use
+#                         default is false
+#       SPACE             output space code in DBCS/MBCS
+#                         default is U+3000 in Unicode
+#       GETA              output geta code in DBCS/MBCS
+#                         default is U+3013 in Unicode
+#       OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
+#                         { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
+#                         (CAUTION! override also SPACE option)
 #       -----------------------------------------------------------------------
 #
 # SAMPLE
@@ -73,14 +76,15 @@ $VERSION = '2.13.6.6';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   require 'jacode4e.pl';
-#   jacode4e::VERSION('2.13.6.6');
+#   jacode4e::VERSION('2.13.6.7');
 #   while (<>) {
 #       $return =
 #       jacode4e::convert(\$_, 'cp932x', 'cp00930', {
-#           'INPUT_LAYOUT'    => 'SSSDDDSSDDSDSD',
-#           'OUTPUT_SHIFTING' => 0,
-#           'SPACE'           => "\x81\xA2",
-#           'GETA'            => "\x81\xA1",
+#           'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
+#           'OUTPUT_SHIFTING'  => 0,
+#           'SPACE'            => "\x81\xA2",
+#           'GETA'             => "\x81\xA1",
+#           'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
 #       });
 #       print $_;
 #   }
@@ -596,75 +600,86 @@ END
     # Other all are not so.
 
     'cp932x' => {
-        'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef    },
-        'set_ctype' => sub { q!!                                                                               },
-        'getc'      => sub { s!^((?:\x9C\x5A)?[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $tr{'utf8jp'}{'cp932x'}{$Knowledge_Base_Article_ID_170559_prb_conversion_problem_between_shift_jis_and_unicode{$1}||$1};},
-        'putc'      => sub { local $^W;                                        $tr{'cp932x'}{'utf8jp'}{$_[0]}; },
+        'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef },
+        'set_ctype' => sub { q!! },
+        'getoct'    => sub { s!^((?:\x9C\x5A)?[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'cp932x'}{$Knowledge_Base_Article_ID_170559_prb_conversion_problem_between_shift_jis_and_unicode{$_[0]}||$_[0]} },
+        'putc'      => sub { local $^W; $tr{'cp932x'}{'utf8jp'}{$_[0]} },
     },
     'cp932' => {
-        'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef    },
-        'set_ctype' => sub { q!!                                                                               },
-        'getc'      => sub { s!^([\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $tr{'utf8jp'}{'cp932'}{$Knowledge_Base_Article_ID_170559_prb_conversion_problem_between_shift_jis_and_unicode{$1}||$1};},
-        'putc'      => sub { local $^W;                                        $tr{'cp932'}{'utf8jp'}{$_[0]};  },
+        'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef },
+        'set_ctype' => sub { q!! },
+        'getoct'    => sub { s!^([\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'cp932'}{$Knowledge_Base_Article_ID_170559_prb_conversion_problem_between_shift_jis_and_unicode{$_[0]}||$_[0]} },
+        'putc'      => sub { local $^W; $tr{'cp932'}{'utf8jp'}{$_[0]} },
     },
     'sjis2004' => {
-        'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef    },
-        'set_ctype' => sub { q!!                                                                               },
-        'getc'      => sub { s!^([\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $tr{'utf8jp'}{'sjis2004'}{$1};},
-        'putc'      => sub { local $^W;                                       $tr{'sjis2004'}{'utf8jp'}{$_[0]};},
+        'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef },
+        'set_ctype' => sub { q!! },
+        'getoct'    => sub { s!^([\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'sjis2004'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'sjis2004'}{'utf8jp'}{$_[0]} },
     },
     'cp00930' => {
-        'get_ctype' => sub { s!^\x0F!! ? 'SBCS' :     s!^\x0E!! ? 'DBCS' : undef                               },
-        'set_ctype' => sub { {'SBCS'=>"\x0F",         'DBCS'=>"\x0E",    }->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'cp00930'}{$1   };},
-        'putc'      => sub { local $^W;                                        $tr{'cp00930'}{'utf8jp'}{$_[0]};},
+        'get_ctype' => sub { s!^\x0F!! ? 'SBCS' : s!^\x0E!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x0F", 'DBCS'=>"\x0E", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'cp00930'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'cp00930'}{'utf8jp'}{$_[0]} },
     },
     'keis78' => {
-        'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef                           },
-        'set_ctype' => sub { {'SBCS'=>"\x0A\x41",     'DBCS'=>"\x0A\x42",}->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'keis78'}{$1   }; },
-        'putc'      => sub { local $^W;                                        $tr{'keis78'}{'utf8jp'}{$_[0]}; },
+        'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x0A\x41", 'DBCS'=>"\x0A\x42", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!;                                   $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'keis78'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'keis78'}{'utf8jp'}{$_[0]} },
     },
     'keis83' => {
-        'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef                           },
-        'set_ctype' => sub { {'SBCS'=>"\x0A\x41",     'DBCS'=>"\x0A\x42",}->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'keis83'}{$1   }; },
-        'putc'      => sub { local $^W;                                        $tr{'keis83'}{'utf8jp'}{$_[0]}; },
+        'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x0A\x41", 'DBCS'=>"\x0A\x42", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'keis83'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'keis83'}{'utf8jp'}{$_[0]} },
     },
     'keis90' => {
-        'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef                           },
-        'set_ctype' => sub { {'SBCS'=>"\x0A\x41",     'DBCS'=>"\x0A\x42",}->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'keis90'}{$1   }; },
-        'putc'      => sub { local $^W;                                        $tr{'keis90'}{'utf8jp'}{$_[0]}; },
+        'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x0A\x41", 'DBCS'=>"\x0A\x42", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'keis90'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'keis90'}{'utf8jp'}{$_[0]} },
     },
     'jef' => {
-        'get_ctype' => sub { s!^\x29!! ? 'SBCS' :     s!^[\x28\x38]!! ? 'DBCS' : undef                         },
-        'set_ctype' => sub { {'SBCS'=>"\x29",         'DBCS'=>"\x28",    }->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'jef'}{$1   };    },
-        'putc'      => sub { local $^W;                                        $tr{'jef'}{'utf8jp'}{$_[0]};    },
+        'get_ctype' => sub { s!^\x29!! ? 'SBCS' : s!^[\x28\x38]!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x29", 'DBCS'=>"\x28", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'jef'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'jef'}{'utf8jp'}{$_[0]} },
     },
     'jef9p' => {
-        'get_ctype' => sub { s!^\x29!! ? 'SBCS' :     s!^[\x28\x38]!! ? 'DBCS' : undef                         },
-        'set_ctype' => sub { {'SBCS'=>"\x29",         'DBCS'=>"\x38",    }->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'jef'}{$1   };    },
-        'putc'      => sub { local $^W;                                        $tr{'jef'}{'utf8jp'}{$_[0]};    },
+        'get_ctype' => sub { s!^\x29!! ? 'SBCS' : s!^[\x28\x38]!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x29", 'DBCS'=>"\x38", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'jef'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'jef'}{'utf8jp'}{$_[0]} },
     },
     'jipsj' => {
-        'get_ctype' => sub { s!^\x1A\x71!! ? 'SBCS' : s!^\x1A\x70!! ? 'DBCS' : undef                           },
-        'set_ctype' => sub { {'SBCS'=>"\x1A\x71",     'DBCS'=>"\x1A\x70",}->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'jipsj'}{$1   };  },
-        'putc'      => sub { local $^W;                                        $tr{'jipsj'}{'utf8jp'}{$_[0]};  },
+        'get_ctype' => sub { s!^\x1A\x71!! ? 'SBCS' : s!^\x1A\x70!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x1A\x71", 'DBCS'=>"\x1A\x70", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'jipsj'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'jipsj'}{'utf8jp'}{$_[0]} },
     },
     'jipse' => {
-        'get_ctype' => sub { s!^\x3F\x76!! ? 'SBCS' : s!^\x3F\x75!! ? 'DBCS' : undef                           },
-        'set_ctype' => sub { {'SBCS'=>"\x3F\x76",     'DBCS'=>"\x3F\x75",}->{$_[0]}                            },
-        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'jipse'}{$1   };  },
-        'putc'      => sub { local $^W;                                        $tr{'jipse'}{'utf8jp'}{$_[0]};  },
+        'get_ctype' => sub { s!^\x3F\x76!! ? 'SBCS' : s!^\x3F\x75!! ? 'DBCS' : undef },
+        'set_ctype' => sub { {'SBCS'=>"\x3F\x76", 'DBCS'=>"\x3F\x75", }->{$_[0]} },
+        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'jipse'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'jipse'}{'utf8jp'}{$_[0]} },
     },
     'utf8' => {
-        'get_ctype' => sub { m!^[\x00-\x7F\xFE\xFF]! ? 'SBCS' : m!^[^\x00-\x7F\xFE\xFF]! ? 'DBCS' : undef      },
-        'set_ctype' => sub { q!!                                                                               },
-        'getc'      => sub { s!^(
+        'get_ctype' => sub { m!^[\x00-\x7F\xFE\xFF]! ? 'SBCS' : m!^[^\x00-\x7F\xFE\xFF]! ? 'DBCS' : undef },
+        'set_ctype' => sub { q!! },
+        'getoct'    => sub { s!^(
             [\x00-\x7F]               |
             \xC3\xA6\xCC\x80          | # U+00E6+0300
             \xC9\x94\xCC\x80          | # U+0254+0300
@@ -695,14 +710,16 @@ END
             [\xE0-\xEF][\x80-\xBF]{2} |
             [\xF0-\xF7][\x80-\xBF]{3} |
             [\x00-\xFF]
-        )!!xs;                                                                 $tr{'utf8jp'}{'utf8'}{$1};      },
-        'putc'      => sub { local $^W;                                        $tr{'utf8'}{'utf8jp'}{$_[0]};   },
+        )!!xs; $1 },
+        'getc'      => sub { local $^W; $tr{'utf8jp'}{'utf8'}{$_[0]} },
+        'putc'      => sub { local $^W; $tr{'utf8'}{'utf8jp'}{$_[0]} },
     },
     'utf8jp' => {
-        'get_ctype' => sub { m!^\xF3\xB0(?:[\x80-\x82][\x80-\xBF]|\x83[\x80-\xBE])! ? 'SBCS' : 'DBCS'          },
-        'set_ctype' => sub { q!!                                                                               },
-        'getc'      => sub { s!^(\xF3[\xB0-\xB5][\x80-\xBF][\x80-\xBF]|[\x00-\xFF])!!;               $1;       },
-        'putc'      => sub {                                                                         $_[0];    },
+        'get_ctype' => sub { m!^\xF3\xB0(?:[\x80-\x82][\x80-\xBF]|\x83[\x80-\xBE])! ? 'SBCS' : 'DBCS' },
+        'set_ctype' => sub { q!! },
+        'getoct'    => sub { s!^(\xF3[\xB0-\xB5][\x80-\xBF][\x80-\xBF]|[\x00-\xFF])!!; $1; },
+        'getc'      => sub { $_[0] },
+        'putc'      => sub { $_[0] },
     },
 );
 
@@ -717,6 +734,7 @@ sub convert {
     my $last_ctype      = undef;
     my $output          = '';
     my $count           = 0;
+    $option->{'OVERRIDE_MAPPING'} ||= {};
 
     if (ref($_[0]) ne 'SCALAR') {
         die "@{[__FILE__]} \$_[0] isn't scalar reference\n";
@@ -759,27 +777,43 @@ sub convert {
             $last_ctype = $ctype;
         }
 
-        my $char = $_{$INPUT_encoding}{'getc'}->(($ctype eq 'DBCS') ? qr<[\x00-\xFF]{2}> : qr<[\x00-\xFF]>);
-        if (defined($char) and ($char eq "\xF3\xB0\x84\x80")) {
-            if (defined $option->{'SPACE'}) {
-                $output .= $option->{'SPACE'};
+        my $input_octets = $_{$INPUT_encoding}{'getoct'}->(($ctype eq 'DBCS') ? qr<[\x00-\xFF]{2}> : qr<[\x00-\xFF]>);
+        if (defined $input_octets) {
+            if (defined $option->{'OVERRIDE_MAPPING'}{$input_octets}) {
+                $output .= $option->{'OVERRIDE_MAPPING'}{$input_octets};
             }
             else {
-                $output .= $_{$OUTPUT_encoding}{'putc'}->($char);
-            }
-        }
-        else {
-            my $digital_octets = $_{$OUTPUT_encoding}{'putc'}->($char);
-            if (not defined ($digital_octets) or ($digital_octets eq '')) {
-                if (defined $option->{'GETA'}) {
-                    $output .= $option->{'GETA'};
+                my $char = $_{$INPUT_encoding}{'getc'}->($input_octets);
+                if (not defined $char) {
+                    if (defined $option->{'GETA'}) {
+                        $output .= $option->{'GETA'};
+                    }
+                    else {
+                        $output .= $_{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
+                    }
+                }
+                elsif ($char eq "\xF3\xB0\x84\x80") {
+                    if (defined $option->{'SPACE'}) {
+                        $output .= $option->{'SPACE'};
+                    }
+                    else {
+                        $output .= $_{$OUTPUT_encoding}{'putc'}->($char);
+                    }
                 }
                 else {
-                    $output .= $_{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
+                    my $output_octets = $_{$OUTPUT_encoding}{'putc'}->($char);
+                    if (not defined ($output_octets) or ($output_octets eq '')) {
+                        if (defined $option->{'GETA'}) {
+                            $output .= $option->{'GETA'};
+                        }
+                        else {
+                            $output .= $_{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
+                        }
+                    }
+                    else {
+                        $output .= $output_octets;
+                    }
                 }
-            }
-            else {
-                $output .= $digital_octets;
             }
         }
 
@@ -850,14 +884,17 @@ jacode4e - jacode.pl-like program for enterprise
     %option
       The options you can specify are as follows:
  
-      key mnemonic     value means
+      key mnemonic      value means
       -----------------------------------------------------------------------
-      INPUT_LAYOUT     input record layout by 'S' and 'D' sequence
-                       'S' means one char as SBCS, 'D' means one char as DBCS
-      OUTPUT_SHIFTING  true means use output shift code, false means not use
-                       default is false
-      SPACE            output space code in DBCS/MBCS
-      GETA             output geta code in DBCS/MBCS
+      INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
+                        'S' means one char as SBCS, 'D' means one char as DBCS
+      OUTPUT_SHIFTING   true means use output shift code, false means not use
+                        default is false
+      SPACE             output space code in DBCS/MBCS
+      GETA              output geta code in DBCS/MBCS
+      OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
+                        { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
+                        (CAUTION! override also SPACE option)
       -----------------------------------------------------------------------
 
 =head1 SAMPLE
@@ -865,14 +902,15 @@ jacode4e - jacode.pl-like program for enterprise
   use FindBin;
   use lib "$FindBin::Bin/lib";
   require 'jacode4e.pl';
-  jacode4e::VERSION('2.13.6.6');
+  jacode4e::VERSION('2.13.6.7');
   while (<>) {
       $return =
       jacode4e::convert(\$_, 'cp932x', 'cp00930', {
-          'INPUT_LAYOUT'    => 'SSSDDDSSDDSDSD',
-          'OUTPUT_SHIFTING' => 0,
-          'SPACE'           => "\x81\xA2",
-          'GETA'            => "\x81\xA1",
+          'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
+          'OUTPUT_SHIFTING'  => 0,
+          'SPACE'            => "\x81\xA2",
+          'GETA'             => "\x81\xA1",
+          'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
       });
       print $_;
   }

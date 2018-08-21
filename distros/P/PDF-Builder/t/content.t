@@ -1,7 +1,8 @@
-use Test::More tests => 70;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 71;
 
 use PDF::Builder;
 
@@ -386,15 +387,26 @@ $gfx->curve(100, 200, 125, 250, 144, 288);
 $gfx->stroke();
 like($pdf->stringify, qr/72 144 m 100 200 125 250 144 288 c S/, q{curve});
 
-# Spline
+# qbSpline
 
 $pdf = PDF::Builder->new('-compress' => 'none');
 $gfx = $pdf->page->gfx();
 
 $gfx->move(30, 60);
-$gfx->spline(90, 120, 150, 180);
+$gfx->qbspline(90, 120, 150, 180);
 $gfx->stroke();
-like($pdf->stringify, qr/30 60 m 70 100 110 140 150 180 c S/, q{spline});
+like($pdf->stringify, qr/30 60 m 70 100 110 140 150 180 c S/, q{qbspline});
+
+# bSpline
+
+$pdf = PDF::Builder->new('-compress' => 'none');
+$gfx = $pdf->page->gfx();
+my @points = (20,40, 70,50, 115,40, 145,35, 145,45, 115,40, 70,5);
+
+$gfx->move(30, 60);
+$gfx->bspline(\@points);
+$gfx->stroke();
+like($pdf->stringify, qr/30 60 m 30 60 m 22.547 60.065 15.476 45.923 20 40 c 30.316 26.494 53.006 50.181 70 50 c 85.364 49.837 99.918 42.93 115 40 c 124.95 38.067 137.27 28.448 145 35 c 147.54 37.154 147.54 42.846 145 45 c 137.27 51.552 124.28 44.069 115 40 c 97.597 32.372 81.677 19.99 70 5 c S/, q{bspline});
 
 # Arc (with move)
 
@@ -674,3 +686,5 @@ $gfx = $pdf->page->gfx();
 
 $gfx->nl(300);
 like($pdf->stringify, qr/T\* \[-3000\] TJ/, q{nl(300)});
+
+1;

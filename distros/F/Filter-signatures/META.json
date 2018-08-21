@@ -51,7 +51,7 @@
          "web" : "https://github.com/Corion/filter-signatures"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.5503'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +22,9 @@ no_index:
 requires:
   Compress::Zlib: '1'
   Font::TTF: '1.04'
-  perl: '5.008006'
-version: '3.009'
+  perl: '5.016'
+resources:
+  homepage: https://www.catskilltech.com
+  repository: git://github.com/PhilterPaper/Perl-PDF-Builder.git
+version: '3.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

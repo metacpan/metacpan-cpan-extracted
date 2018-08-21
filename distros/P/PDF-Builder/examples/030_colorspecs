@@ -166,8 +166,10 @@ foreach my $base ('gray', 'grey') {
 	if ($end < $start) { $start = $end = $i; } else { $end = $i; }
     }
     # have $start and $end indices in @cols. rewrite them
-    for ($i=$start, $j=0; $i<=$end; $i++, $j++) {
+    $j=0; # so perlcritic won't moan about comma expressions in for!
+    for ($i=$start; $i<=$end; $i++) {
 	$cols[$i] = $base.$j;
+	$j++; # to mollify perlcritic
     }
 }
 

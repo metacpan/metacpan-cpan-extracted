@@ -1,7 +1,8 @@
-use Test::More tests => 2;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More tests => 2;
 
 use PDF::Builder;
 
@@ -18,3 +19,5 @@ $pdf = PDF::Builder->new('-compress' => 'none');
 $egs = $pdf->egstate();
 $egs->renderingintent('Perceptual');
 like($pdf->stringify, qr{<< /Type /ExtGState /Name /[\w]+ /RI /Perceptual >>}, 'renderingintent');
+
+1;

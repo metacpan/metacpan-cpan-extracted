@@ -15,8 +15,8 @@ package PDF::Builder::Basic::PDF::Objind;
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -79,10 +79,10 @@ Creates a new indirect object
 sub new {
     my ($class) = @_;
 
-    bless {}, ref $class || $class;
+    return bless {}, ref $class || $class;
 }
 
-=head2 uid()
+=head2 $UID = $r->uid()
 
 Returns a Unique id for this object, creating one if it didn't have one before
 
@@ -90,6 +90,7 @@ Returns a Unique id for this object, creating one if it didn't have one before
 
 sub uid {
     $_[0]->{' uid'} || ($_[0]->{' uid'} = $uidc++);
+    return $_[0]->{' uid'};
 }
 
 =head2 $r->release()
@@ -128,9 +129,10 @@ sub release {
             release($item);
         }
     }
+    return;
 }
 
-=head2 $r->val()
+=head2 $value = $r->val()
 
 Returns the value of this object or reads the object and then returns
 its value.
@@ -143,7 +145,12 @@ subroutine otherwise we could be in for a very deep loop!
 sub val {
     my ($self) = @_;
 
-    $self->{' parent'}->read_obj(@_)->val() unless $self->{' realised'};
+   #$self->{' parent'}->read_obj(@_)->val() unless $self->{' realised'};
+    if ($self->{' realised'}) {
+	    return $self->{' realised'};
+    } else {
+	    return $self->{' parent'}->read_obj(@_)->val();
+    }
 }
 
 =head2 $r->realise()
@@ -153,10 +160,23 @@ Makes sure that the object is fully read in, etc.
 =cut
 
 sub realise {
-    $_[0]->{' realised'}? $_[0]: $_[0]->{' objnum'}? $_[0]->{' parent'}->read_obj(@_): $_[0];
+   #$_[0]->{' realised'}? $_[0]: $_[0]->{' objnum'}? $_[0]->{' parent'}->read_obj(@_): $_[0];
+    my ($self) = $_[0];
+
+    if ($self->{' realised'}) {
+	    return $self;
+    } else {
+	    if ($self->{' objnum'}) {
+		    return $self->{' parent'}->read_obj(@_);
+	    } else {
+		    return $self;
+	    }
+    }
 }
 
-=head2 $r->outobjdeep($fh, $pdf)
+=head2 $v = $r->outobjdeep($fh, $pdf, %opts)
+
+=head2 $v = $r->outobjdeep($fh, $pdf)
 
 If you really want to output this object, then you need to read it first.
 This also means that all direct subclasses must subclass this method, or they 
@@ -167,7 +187,12 @@ will loop forever!
 sub outobjdeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf, %opts) unless $self->{' realised'};
+   #$self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf, %opts) unless $self->{' realised'};
+    if ($self->{' realised'}) {
+	    return $self->{' realised'};
+    } else {
+	    return $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf, %opts);
+    }
 }
 
 =head2 $r->outobj($fh)
@@ -185,9 +210,10 @@ sub outobj {
     } else {
         $self->outobjdeep($fh, $pdf, %opts);
     }
+    return;
 }
 
-=head2 $r->elementsof()
+=head2 $s = $r->elementsof()
 
 Abstract superclass function filler. Returns self here but should return
 something more useful if an array.
@@ -204,7 +230,7 @@ sub elementsof {
     }
 }
 
-=head2 $r->empty()
+=head2 $s = $r->empty()
 
 Empties all content from this object to free up memory or to be read to pass
 the object into the free list. Simplistically undefs all instance variables
@@ -222,7 +248,7 @@ sub empty {
     return $self;
 }
 
-=head2 $r->merge($objind)
+=head2 $o = $r->merge($objind)
 
 This merges content information into an object reference placeholder.
 This occurs when an object reference is read before the object definition
@@ -243,7 +269,7 @@ sub merge {
         weaken $self->{$k} if $k eq 'Parent';	
     }
     $self->{' realised'} = 1;
-    bless $self, ref($other);
+    return bless $self, ref($other);
 }
 
 =head2 $r->is_obj($pdf)

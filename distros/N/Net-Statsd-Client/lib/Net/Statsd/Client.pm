@@ -3,7 +3,7 @@ use Moo;
 use Sub::Quote;
 
 # ABSTRACT: Send data to StatsD / Graphite
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Etsy::StatsD 1.001;
@@ -68,23 +68,27 @@ sub update {
 sub timing_ms {
   my ($self, $metric, $time, $sample_rate) = @_;
   $metric = "$self->{prefix}$metric";
+  $sample_rate = $self->{sample_rate} unless defined $sample_rate;
   $self->{statsd}->timing($metric, $time, $sample_rate);
 }
 
 sub gauge {
   my ($self, $metric, $value, $sample_rate) = @_;
   $metric = "$self->{prefix}$metric";
+  $sample_rate = $self->{sample_rate} unless defined $sample_rate;
   $self->{statsd}->send({ $metric => "$value|g" }, $sample_rate);
 }
 
 sub set_add {
   my ($self, $metric, $value, $sample_rate) = @_;
   $metric = "$self->{prefix}$metric";
+  $sample_rate = $self->{sample_rate} unless defined $sample_rate;
   $self->{statsd}->send({ $metric => "$value|s" }, $sample_rate);
 }
 
 sub timer {
   my ($self, $metric, $sample_rate) = @_;
+  $sample_rate = $self->{sample_rate} unless defined $sample_rate;
 
   return Net::Statsd::Client::Timer->new(
     statsd => $self,
@@ -108,7 +112,7 @@ Net::Statsd::Client - Send data to StatsD / Graphite
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 

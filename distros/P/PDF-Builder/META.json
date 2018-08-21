@@ -4,7 +4,7 @@
       "Phil Perry <phil4597@catskilltech.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Compress::Zlib" : "1",
             "Font::TTF" : "1.04",
-            "perl" : "5.008006"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -45,6 +45,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.009",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "resources" : {
+      "homepage" : "https://www.catskilltech.com",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PhilterPaper/Perl-PDF-Builder.git",
+         "web" : "https://github.com/PhilterPaper/Perl-PDF-Builder"
+      }
+   },
+   "version" : "3.010",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

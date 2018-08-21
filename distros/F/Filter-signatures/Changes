@@ -1,3 +1,10 @@
+0.15 2018-08-19
+    + Add mention of App::sigfix and Babble
+    + Document that only a reduced set of regular expression matches is
+      correctly parsed in default expressions
+    + Correctly parse do {} blocks in default expressions
+    + Correctly parse function parameters in case of nested functions and blocks
+
 0.14 2018-07-26
     + Add code and documentation on how to load this module from the command
       line. This is mostly intended to give you a way to do a quick fix for

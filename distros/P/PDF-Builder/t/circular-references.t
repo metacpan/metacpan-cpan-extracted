@@ -1,8 +1,9 @@
-use Test::More;
-use Test::Exception;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More;
+use Test::Exception;
 
 use PDF::Builder;
 use Scalar::Util qw(isweak);
@@ -39,3 +40,5 @@ ok(isweak($pdf->{'pagestack'}->[1]),
 lives_ok(sub { $pdf->stringify() }, 'Font added inside a block is still present on save');
 
 done_testing();
+
+1;

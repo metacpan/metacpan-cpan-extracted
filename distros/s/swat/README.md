@@ -20,21 +20,13 @@ Web testinfg framework consuming [Outthentic::DSL](https://github.com/melezhik/o
 * Swat is a web application oriented test framework, this means that it equips you with all you need for a web test development
 and yet it's not burdened by many other "generic" things that you probably won't ever use.
 
-* Swat does not carry all heavy load on it's shoulders, with the help of it's "elder brother" - curl
+* Swat does not carry all heavy load on its shoulders, with the help of its "elder brother" - curl
 swat makes a http requests in a smart way. This means if you know and love curl swat might be easy way to go.
-Swat just passes all curl related parameter as is to curl and let curl do it's job.
+Swat just passes all curl related parameter as is to curl and let curl do its job.
 
 * Swat is a text oriented tool, for good or for bad it does not provide any level of http DOM or xpath hacking ( _but_ see  [process http responses](#process-http-responses) section ). It does not even try to decouple http headers from a body. Actually _it just returns you a text_ where you can find and grep in old good unix way. Does this sound suspiciously simple? I believe that most of things could be tested in a simple way.
 
 * Swat is extendable by writing custom perl code, this is where you may add desired complexity to your test stories. Check out swat API for details. 
-
-* And finally swat relies on prove as internal test runner - this has many, many good results:
-
-    * swat transparently passes all it's arguments to prove which makes it simple to adjust swat runner behavior in a prove way
-
-    * swat tests might be easily embedded as unit tests into a cpan distributions.
-
-    * test reports are emitted in a TAP format which is portable and easy to read.
 
 Ok, now I hope you are ready to dive into swat tutorial! :)
 
@@ -71,8 +63,8 @@ Swat leverages Unix file system to build an _analogy_ for these things:
 
 _HTTP resource is just a directory_. You have to create a directory to define a http resource:
 
-    mkdir foo/
-    mkdir -p bar/baz
+    $ mkdir foo/
+    $ mkdir -p bar/baz
 
 This code defines two http resources for your application - '/foo/' and '/bar/baz'
 
@@ -80,9 +72,9 @@ This code defines two http resources for your application - '/foo/' and '/bar/ba
 
 _HTTP method is just a file_. You have to create a file to define a http method.
 
-    touch foo/get.txt
-    touch foo/put.txt
-    touch bar/baz/post.txt
+    $ touch foo/get.txt
+    $ touch foo/put.txt
+    $ touch bar/baz/post.txt
 
 Obviously \`http methods' files should be located at \`http resource' directories.
 
@@ -107,14 +99,14 @@ You need to define hostname or ip address to send request to.
 
 Just write it up to a special file  called \`host' and swat will use it.
 
-    echo 'app.local' > host
+    $ echo 'app.local' > host
     
-
 As swat makes http requests with the help of curl, the host name should be compliant with curl requirements, this
 for example means you may define a http schema or port here:
 
-    echo 'https://app.local' >> host
-    echo 'app.local:8080' >> host
+    $ echo 'https://app.local' > host
+
+    $ echo 'app.local:8080' > host
 
 ## HTTP Response
 
@@ -124,8 +116,8 @@ Swat does this with the help so called _check lists_, check lists are defined at
 
 Check list is just a list of expressions a response should match. It might be a set of plain strings or regular expressions:
 
-    echo 200 OK > foo/get.txt
-    echo 'Hello I am foo' >> foo/get.txt
+    $ echo 200 OK > foo/get.txt
+    $ echo 'Hello I am foo' >> foo/get.txt
 
 The code above defines two checks for response from \`GET /foo':
 
@@ -135,7 +127,7 @@ The code above defines two checks for response from \`GET /foo':
 You may add some regular expressions checks as well:
 
     # for example check if we got something like 'date':
-    echo 'regexp: \d\d\d\d-\d\d-\d\d' >> foo/get.txt
+    $ echo 'regexp: \d\d\d\d-\d\d-\d\d' >> foo/get.txt
 
 # Bringing all together
 
@@ -159,42 +151,57 @@ From the file system point of view swat story is a:
 ## Swat Project
 
 Swat project is a bunch of a related swat stories kept under a single directory. This directory is called _project root directory_.
-The project root directory name could be any, swat just searches for swat story files in it and then "execute" found stories.
-See [swat runner](#swat-runner) section for full explanation of this process.
+The project root contains swat scenarios or stories to be parsed and executed by swat utility. See [swat runner](#swat-runner) section 
+for full explanation of this process.
 
 This is an example swat project layout:
 
     $ tree my/swat/project
       my/swat/project
       |--- host
-      |----FOO
-      |-----|----BAR
+      |--- get.txt
+      |----foo
+      |-----|----bar
       |           |---- post.txt
-      |--- FOO
+      |--- baz
             |--- get.txt
 
     3 directories, 3 files
 
-When you ask swat to execute swat stories you have to point it a project root directory or \`cd' to it and run swat without arguments:
 
-    swat my/swat/project
+This project contains 3 swat stories:
 
-    # or
+- GET /
+- POST foo/bar
+- POST baz
 
-    cd my/swat/project && swat
+Default swat story is story executed swat by default, this is `$project_root/GET`:
 
-Note, that project root directory path will be removed from http resources paths during execution:
+    $ swat # will execute GET / story
 
-* GET  /FOO
-* POST /FOO/BAR
+You may set default story using `-t` option:
 
-Also notice that if you pass first argument ( which is project root directory ) to swat client, then the second argument _could be_ a hostname ( in case you don't want to use one defined at host file or you do not have one ):
+    $ swat -t foo/bar/POST
 
-      # inside project root directory 
-      swat ./ 127.0.0.1
+Or by setting `path` variable inside swat.ini file:
 
-      # outside of project root directory 
-      swat /path/to/project/root/directory/ 127.0.0.1
+    $ echo path=baz/POST >> swat.ini
+
+You define hostname to run request against by command line argument:
+
+    $ swat $project_root $hostname
+
+For example:
+
+    $ swat . 127.0.0.1
+
+Or by setting via host file:
+
+    $ echo 'app.local:8080' > host
+
+If you don't defined project root explicitly, swat assume this as current working directory.
+
+    $ swat # run `GET /' story inside current working directory
 
 Follow [swat client](#swat-client) section for full explanation of swat client command line API.
 
@@ -339,7 +346,15 @@ Following is the list of swat variables you may define at swat ini files, it cou
 
 ## swat variables
 
-Swat variables define swat  basic configuration, like logging mode, prove runner settings, etc. Here is the list:
+Swat variables define swat  basic configuration, like default story, debug mode, etc. Here is the list:
+
+* `path` - defines default story
+
+Example:
+
+    # define default story as GET => foo/
+    path=foo/GET    
+
 
 * `skip_story` - skip story, default value is \`0'. Set to \`1' if you want skip store for some reasons.
 
@@ -359,8 +374,6 @@ For example:
     * in case of bad http status code returns (  0 or >= 400 ) a proper swat assert fails
     * settings ignore\_http\_err to \`1' only makes a warning in case of bad http status code and does not trigger assert failure 
 
-* `prove_options` - prove options to be passed to prove runner,  default value is \`-v`. See [Prove settings](#prove-settings) section.
-
 * `debug` - enable swat debugging
 
     * Increasing debug value results in more low level information appeared at output
@@ -371,7 +384,7 @@ For example:
 
 * `debug_bytes` - number of bytes of http response to be dumped out when debug is on. default value is \`500'.
 
-* `match_l` - in TAP output truncate matching strings to {match_l} bytes;  default value is \`40'.
+* `match_l` - in report output truncate matching strings to {match_l} bytes;  default value is \`40'.
 
 * `swat_purge_cache` - remove swat cache files at the end of test run; default value is `\0' ( do not remove ).
 
@@ -419,7 +432,7 @@ This is the list of helpful variables  you may use in swat ini files:
 
 Swat try to find swat ini files at these locations ( listed in order )
 
-* **~/swat.ini** * home directory
+* **~/swat.ini** - home directory
 
 * **$project\_root\_directory/swat.ini** -  project root directory
 
@@ -770,6 +783,14 @@ You may live \`meta.txt' empty file or add some useful description to be printed
         This is my cool story. 
         Take a look at this!
 
+To run meta story you define story as `path/META`, for example:
+
+    swat -t META # run meta story defined in the project root directory
+
+    swat -t foo/META # run meta story defined in the foo/ folder
+
+    echo META > swat.ini # the same as the first but via swat.ini file
+
 How one could use meta stories?
 
 Meta stories are just _containers_ for other downstream stories. Usually one defines some downstream
@@ -816,38 +837,11 @@ Runner consequentially goes several phases:
 
 ## A compilation phase.
 
-Stories are converted into perl test files \*.t ( compilation phase ) and saved into temporary directory.
+Stories are converted into perl test files \*.swat ( compilation phase ) and saved into temporary directory.
 
 ## An execution phase.
 
-[Prove](https://metacpan.org/pod/distribution/Test-Harness/bin/prove) utility recursively executes
-test files under temporary directory and thus gives a final suite execution status.
-
-So after all swat project is just perl test project with \*.t files inside, the difference is that
-while with common test project \*.t files _are created by user_, in outthentic project \*.t files _are generated_
-by story files.
-
-
-# TAP
-
-Swat produces output in [TAP](https://testanything.org/) format, that means you may use your favorite tap parsers to bring result to
-another test / reporting systems, follow TAP documentation to get more on this.
-
-Here is example for converting swat tests into JUNIT format:
-
-    swat --prove '--formatter TAP::Formatter::JUnit'
-
-# Prove settings
-
-Swat utilize [prove utility](http://search.cpan.org/perldoc?prove) to run tests, 
-all prove related parameters could be passed via \`--prove' option to prove runner.
-
-Here are some examples:
-
-    swat --prove -Q # don't show anythings unless test summary
-
-    swat --prove '-q -s' # run prove tests in random and quite mode
-
+TODO:
 
 # Suite configuration
 
@@ -871,9 +865,9 @@ There are two type of configuration files are supported:
 
 There is no special magic behind ini files, except this should be [Config Tiny](https://metacpan.org/pod/Config::Tiny) compliant configuration file.
 
-Or you can choose YAML format for suite configuration by using \`--yaml' parameter:
+Or you can choose YAML format for suite configuration by using `--yaml` parameter:
 
-    $ swat --ini /etc/suites/foo.yaml
+    $ swat --yaml /etc/suites/foo.yaml
 
     $ cat /etc/suites/foo.yaml
 
@@ -882,8 +876,8 @@ Or you can choose YAML format for suite configuration by using \`--yaml' paramet
       bar : 2
 
 
-Unless user sets path to configuration file explicitly by \`--ini' or \'--yaml' swat runner looks for the 
-files named suite.ini and _then_ ( if suite.ini is not found ) for suite.yaml at the current working directory.
+Unless user sets path to configuration file explicitly by `--ini` or `--yaml` swat runner looks for the 
+files named suite.ini and _then_ ( if not found ) looks for the file named suite.yaml at the current working directory.
 
 If configuration file is passed and read a related configuration data is accessible via config() function, for example in story.pm file:
 
@@ -904,12 +898,6 @@ If configuration file is passed and read a related configuration data is accessi
     * Set this 1 if you want to disable color output in swat test report. 
 
     * By default this setting is off.
-
-* output_mod - setting TAP output mode
-
-    * \`cpanparty' - format output for cpanparty service
-
-    * `\default' - this is default value, no formatting at all 
 
 # Swat client
 
@@ -943,13 +931,9 @@ In case host parameter is missing , swat tries to read it up from \`host' file. 
 
 List of swat command line parameters:
 
-* **--prove|prove-opts** - sets prove parameters
-
-See [prove settings](prove-settings)
-
 * **-t|--test**
 
-Sets a distinct sub sets of stories to execute, see [Running subset of stories](#Running-subset-of-stories)
+Sets a certain swat story to executed, see [Running none default swat story](#running-none-default-swat-story)
 
 * **--ini** - suite configuration ini file path
 
@@ -961,30 +945,18 @@ See [suite configuration](#suite-configuration) section for details.
 
 Override the value for swat debug variable, see [swat variables](#swat-variables) section:
 
-    debug=1 swat --debug 2 # set debug to 2
+    swat --debug 2 # set debug to 2
 
-# Running subset of stories
+# Running none default swat story
 
-Use \`-t' options to execute a subset of swat stories:
+Use \`-t' options to execute specific swat story, you should use `$http_resource/$http_method`
+syntax, for example:
 
-    # run `FOO/*' stories
-    swat example/my-app 127.0.0.1 -t FOO/
+    # run `POST foo/bar' story
+    swat example/my-app 127.0.0.1 -t foo/bar/POST
 
-* \`-t' option should point to a resource(s) path and be relative to the project root directory 
-
-* \`-t' option should not contain extension part - \`.txt'
-
-* it is possible to use more than one \`t' options
-
-For example:
-
-    -t FOO/BAR -t BAR -t FOO/BAZ  
-
-* Or even path more than one argument for -t parameter:
-
-For example:
-
-    -t FOO/BAR FOO/BAZ BAR
+    # run `META /' story
+    swat example/my-app 127.0.0.1 -t META
 
 # Examples
 
@@ -994,20 +966,25 @@ There is plenty of examples at ./examples directory
 
 [Aleksei Melezhik](mailto:melezhik@gmail.com)
 
-# Home Page
-
-http://swatpm.org
-
 # See also
 
-* [Sparrow](https://github.com/melezhik/sparrow) - outthentic suites manager.
+* [Sparrow](https://github.com/melezhik/sparrow) - Swat and Outthentic plugins manager.
 
-* [Outthentic](https://github.com/melezhik/outthentic) - generic testing, reporting, monitoring framework consuming Outthentic::DSL.
+* [Outthentic](https://github.com/melezhik/outthentic) - Multipurpose scenarios framework.
 
-* [Outthentic::DSL](https://github.com/melezhik/outthentic-dsl) - Outthentic::DSL specification.
+# Swat version 0.2.0 BREAKING CHANGES
 
+As with version 0.2.0 swat removes the usage of prove ( Test::More, Test::Harness modules ), there
+are consequences of that:
 
-* Perl prove, TAP, Test::More
+* swat reports is no longer a TAP
+
+* tests do not get run recursively, rewrite your tests scenarios to use modules to run your test sets
+
+* `-t` command line parameter now defines a single swat story rather than a subset of stories, it should follow 
+`$http_resource/$http_method` notation
+
+* to run meta story, you should use path=http_resource/META or -t http_resource/META options.
 
 # Thanks
 

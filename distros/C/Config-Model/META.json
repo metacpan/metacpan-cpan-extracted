@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Model",
    "prereqs" : {
@@ -98,8 +98,8 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.125",
+   "version" : "2.126",
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

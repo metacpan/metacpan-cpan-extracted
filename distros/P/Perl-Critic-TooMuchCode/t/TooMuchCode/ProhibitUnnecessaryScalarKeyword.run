@@ -1,0 +1,6 @@
+## name simple
+## failures 1
+## cut
+
+my @a = (1..30);
+my $n = scalar @n;

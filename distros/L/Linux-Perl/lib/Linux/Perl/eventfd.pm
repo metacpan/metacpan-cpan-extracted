@@ -39,6 +39,7 @@ use Linux::Perl::Constants::Fcntl;
 use Linux::Perl::Endian;
 
 use constant {
+    flag_SEMAPHORE => 1,
     PERL_CAN_64BIT => !!do { local $@; eval { pack 'Q', 1 } },
 };
 

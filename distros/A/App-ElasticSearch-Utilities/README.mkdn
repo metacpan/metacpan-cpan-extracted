@@ -4,7 +4,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 # VERSION
 
-version 5.9
+version 6.0
 
 # SYNOPSIS
 
@@ -205,6 +205,33 @@ Returns a hashref
 ## def('key')
 
 Exposes Definitions grabbed by options parsing
+
+## es\_local\_index\_meta(key => 'base' || 'index')
+
+Fetch meta-data from the local config file, i.e. `~/.es-utils.yaml`.
+
+Format is:
+
+    ---
+    meta:
+      index_name:
+        key: value
+      index_basename:
+        key: value
+
+The most specific version is searched first, followed by the index stripped of
+it's date, and then on through all the bases discovered with
+`es_index_bases()`.
+
+This is used by the `es-search.pl` utility to do lookups of the **timestamp**
+field it needs to sort documents, i.e.:
+
+    ---
+    meta:
+      logstash:
+        timestamp: '@timestamp'
+      bro:
+        timestamp: 'timestamp'
 
 # ARGS
 

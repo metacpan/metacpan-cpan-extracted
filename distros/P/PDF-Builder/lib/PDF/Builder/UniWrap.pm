@@ -3,8 +3,8 @@ package PDF::Builder::UniWrap;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ BEGIN {
 
     use Encode qw(:all);
 
-    use 5.008;
+   #use 5.008;  as of 3.010, 5.16 is the minimum
     use base 'Exporter';
 
     use Unicode::UCD;
@@ -34,10 +34,10 @@ my %classified;
 my $procedural_self;
 my $txt;
 
-use constant PROHIBITED => 0;
-use constant INDIRECT   => 1;
-use constant DIRECT     => 2;
-use constant REQUIRED   => 3;
+use constant PROHIBITED => 0;  ## no critic
+use constant INDIRECT   => 1;  ## no critic
+use constant DIRECT     => 2;  ## no critic
+use constant REQUIRED   => 3;  ## no critic
 
 my @CLASSES = qw{ OP CL QU GL NS EX SY IS PR PO NU AL ID IN HY BA BB B2 ZW CM };
 my %BREAK_TABLE = (
@@ -79,6 +79,7 @@ sub new {
     $self->{'widthfunc'} ||= 1;
 
     bless($self, ref($pkg) || $pkg);
+    return $self;
 }
 
 # This attempts to identify the on-screen length of a given character.
@@ -140,7 +141,7 @@ sub text_properties {
     my @characters = split(//, $text);
     my @classifications = map { $self->lb_class($_) } @characters;
 
-    class_properties(@classifications);
+    return class_properties(@classifications);
 }
 
 # Returns a list of breaking properties for the provided breaking classes
@@ -271,7 +272,7 @@ sub find_breaks {
         $pos += $lengths[$i];
     }
 
-    push(@breakpoints, $#lengths) if $breakpoints[$#breakpoints] < $#lengths;
+    push(@breakpoints, $#lengths) if $breakpoints[-1] < $#lengths;
 
     print STDERR "find_breaks: returning breakpoints " . join(":", @breakpoints) . "\n" if $DEBUG;
 

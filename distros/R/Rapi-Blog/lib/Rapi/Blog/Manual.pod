@@ -194,11 +194,12 @@ which is available in templates via the C<[% scaffold %]> template variable.
 
 =head1 Taxonomies
 
-As of the current version of L<Rapi::Blog>, besides B<Author>, there are two other general purpose, built-in 
-(i.e. defined by the default database schema) taxonomies, 
-B<Tags> and B<Categories>. Both of these operate as C<many-to-many> links, meaning Posts can have
-multiple Tags and be in multiple Categories. The difference between the two is the manner in which
-they are set in the admin interface:
+As of the current version of L<Rapi::Blog>, besides B<Author>, there are three other general purpose, 
+built-in (i.e. defined by the default database schema) taxonomies, B<Tags>, B<Categories> and 
+B<Sections>. B<Tags> and B<Categories> operate as C<many-to-many> links, meaning Posts can have 
+multiple Tags and be in multiple Categories, with the difference between them being the manner in 
+which they are set in the admin interface (see below), and B<Sections> are single FK relationships, 
+meaning a Post can be in exactly one Section (or none).
 
 =head2 Tags
 
@@ -212,6 +213,20 @@ is seen a new Tag row (which is a first class object) is created automatically.
 Categories must be setup in advance and then can be selected when created or editing a Post. When no
 Category rows exist, the category selector/field is not shown on Post add/edit screens, meaning if you
 don't want to use Categories, just don't create any.
+
+=head2 Sections
+
+Like Categories, Sections must be set up in advance and are also not required. If you don't create 
+any sections, the selector/field will not be shown when creating Posts. Unlike Catagories and Tags
+whith are many-to-many, Sections are single relationships so a Post can only have one Section. 
+However, Sections can be divided into a hierarchy of parent/child sections, meaning a given Section
+may be a sub-section of another, which in turn may be a sub-section, and so on (currently depth is
+limited to 10 levels by rule, and circular references are not allowed). While sub-sections may be 
+defined, this is also not required, and all Sections could be created on the top-level (i.e. not 
+setting any parents). 
+
+These choices are are left intentionally ambiguous to give maximum flexibility to the user/scaffold 
+to use the taxonomies they want, and not use the ones the don't want.
 
 
 =head1 TEMPLATE DIRECTIVES

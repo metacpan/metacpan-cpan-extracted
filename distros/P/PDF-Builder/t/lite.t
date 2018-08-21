@@ -1,7 +1,8 @@
-use Test::More tests => 10;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 10;
 
 use PDF::Builder::Lite;
 
@@ -42,3 +43,5 @@ $pdf = PDF::Builder::Lite->new();
 my $egstate = $pdf->create_egs();
 is(ref($egstate), 'PDF::Builder::Resource::ExtGState',
    q{create_egs returns an extended graphics state object instead of dying});
+
+1;

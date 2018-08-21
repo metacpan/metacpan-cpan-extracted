@@ -1,0 +1,72 @@
+{
+   "abstract" : "Prohibit writing an postfix loop with no statement",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-ValuesAndExpressions-ProhibitEmptyPostfixLoop",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "1.126",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyPostfixLoop" : {
+         "file" : "lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitEmptyPostfixLoop.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitemptypostfixloop"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitemptypostfixloop.git",
+         "web" : "https://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitemptypostfixloop"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:XSAWYERX",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

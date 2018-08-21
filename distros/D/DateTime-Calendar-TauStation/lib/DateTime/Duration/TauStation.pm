@@ -1,5 +1,5 @@
 package DateTime::Duration::TauStation;
-$DateTime::Duration::TauStation::VERSION = '1.182260';
+$DateTime::Duration::TauStation::VERSION = '1.182290';
 use strict;
 
 use Carp;

@@ -2,9 +2,9 @@ package Test::Class::Moose::Executor::Sequential;
 
 # ABSTRACT: Execute tests sequentially
 
-use 5.10.0;
+use 5.010000;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 use Moose 2.0000;
 use Carp;
@@ -27,7 +27,7 @@ Test::Class::Moose::Executor::Sequential - Execute tests sequentially
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =for Pod::Coverage Tags Tests runtests
 

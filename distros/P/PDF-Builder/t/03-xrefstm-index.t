@@ -1,7 +1,8 @@
-use Test::More tests => 3;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 3;
 
 use PDF::Builder;
 
@@ -20,3 +21,5 @@ $object = $pdf->{'pdf'}->read_objnum(12, 0);
 
 ok($object,
    q{Read the low object from an indexed object stream});
+
+1;

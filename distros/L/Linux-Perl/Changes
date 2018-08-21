@@ -1,5 +1,15 @@
 Revision history for Perl module Linux::Perl
 
+0.07 Sat Aug 18 2018
+- Fix MANIFEST
+
+0.06 Sat Aug 18 2018
+- Add getrandom
+- Give Linux::Perl::X::Call the “call_number” and “error” properties.
+
+0.05 Sun May 27 2018
+- Support arm (Raspberry Pi)
+
 0.04 Thu Apr 19 2018
 - Make unsupported case in tests print system call numbers in CPAN Testers.
 

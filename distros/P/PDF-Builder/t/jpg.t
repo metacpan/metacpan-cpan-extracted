@@ -1,7 +1,8 @@
-use Test::More tests => 3;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 3;
 
 use PDF::Builder;
 
@@ -21,3 +22,5 @@ like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 $pdf = PDF::Builder->new();
 eval { $pdf->image_jpeg('t/resources/this.file.does.not.exist') };
 ok($@, q{Fail fast if the requested file doesn't exist});
+
+1;

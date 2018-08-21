@@ -1,0 +1,17 @@
+Lexical-TypeTiny
+================
+
+Created:      2018-08-20
+Home page:    <https://metacpan.org/release/Lexical-TypeTiny>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Lexical-TypeTiny>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2018-08-20
+
+ [ Documentation ]
+ - Mention problems with threaded Perl in pod.
+
+ [ Packaging ]
+ - Hide Type::Tiny package from PAUSE indexer.
+
+0.001	2018-08-20	Initial release

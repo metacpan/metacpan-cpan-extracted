@@ -112,6 +112,10 @@
     background-color: #ff0097;
 }
 
+.metro .tile.tile-maroon {
+    background-color: maroon;
+}
+
 .metro .tile.tile-medium {
   height: 150px;
   width: 150px;

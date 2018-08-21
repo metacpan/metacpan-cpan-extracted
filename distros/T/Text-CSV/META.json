@@ -37,7 +37,8 @@
          "requires" : {
             "IO::Handle" : "0",
             "Test::Harness" : "0",
-            "Test::More" : "0.71"
+            "Test::More" : "0.71",
+            "perl" : "5.006001"
          }
       }
    },
@@ -53,6 +54,6 @@
          "url" : "https://github.com/makamaka/Text-CSV"
       }
    },
-   "version" : "1.96",
+   "version" : "1.97",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

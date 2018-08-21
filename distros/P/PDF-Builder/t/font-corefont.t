@@ -1,8 +1,9 @@
-use Test::More;
-use Test::Exception;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More;
+use Test::Exception;
 
 use PDF::Builder;
 
@@ -20,3 +21,5 @@ foreach my $font (qw(bankgothic courier courierbold courierboldoblique
 }
 
 done_testing();
+
+1;

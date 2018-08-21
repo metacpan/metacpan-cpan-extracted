@@ -1,0 +1,9 @@
+Revision history for App-Git-Info
+
+0.0.2       2018-08-21
+    - Fix "git info info"
+        - App::Rad does not seem too suitable for writing modulinos
+        (see https://perlmaven.com/modulino-both-script-and-module ).
+
+0.0.1       2018-08-21
+    - First version, released on an unsuspecting world

@@ -27,7 +27,6 @@ my %WriteMakefileArgs = (
     "lib/FFI/Build/File/Base.pm"    => "\$(INST_LIB)/FFI/Build/File/Base.pm",
     "lib/FFI/Build/File/C.pm"       => "\$(INST_LIB)/FFI/Build/File/C.pm",
     "lib/FFI/Build/File/CXX.pm"     => "\$(INST_LIB)/FFI/Build/File/CXX.pm",
-    "lib/FFI/Build/File/Fortran.pm" => "\$(INST_LIB)/FFI/Build/File/Fortran.pm",
     "lib/FFI/Build/File/Library.pm" => "\$(INST_LIB)/FFI/Build/File/Library.pm",
     "lib/FFI/Build/File/Object.pm"  => "\$(INST_LIB)/FFI/Build/File/Object.pm",
     "lib/FFI/Build/MM.pm"           => "\$(INST_LIB)/FFI/Build/MM.pm",
@@ -43,7 +42,7 @@ my %WriteMakefileArgs = (
     "FFI::Platypus" => "0.51",
     "Test::More"    => "0.94"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.07",
   "test"    => {
     "TESTS" => "t/*.t"
     }

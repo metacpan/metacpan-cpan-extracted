@@ -1,7 +1,8 @@
-use Test::More tests => 1;
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+use Test::More tests => 1;
 
 use PDF::Builder;
 
@@ -20,3 +21,5 @@ eval {
     $container_pdf->importPageIntoForm($empty_page_pdf, 1);
 };
 ok(!$@, q{Calling importPageIntoForm using an empty page doesn't result in a crash});
+
+1;

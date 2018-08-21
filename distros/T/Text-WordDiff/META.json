@@ -1,22 +1,23 @@
 {
    "abstract" : "Track changes between documents",
    "author" : [
-      "David E. Wheeler <david@justatheory.com>"
+      "David E. Wheeler <david@justatheory.com>",
+      "Currently maintained by the developers of The Perl Shop <tps@cpan.org>."
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-WordDiff",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Spec" : 0,
+            "File::Spec" : "0",
             "Module::Build" : "0.2701",
             "Test::More" : "0.17"
          }
@@ -32,45 +33,45 @@
          },
          "requires" : {
             "Algorithm::Diff" : "1.19",
-            "HTML::Entities" : 0,
-            "Term::ANSIColor" : 0
+            "HTML::Entities" : "0",
+            "Term::ANSIColor" : "0"
          }
       }
    },
    "provides" : {
       "Text::WordDiff" : {
          "file" : "lib/Text/WordDiff.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Text::WordDiff::ANSIColor" : {
          "file" : "lib/Text/WordDiff/ANSIColor.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Text::WordDiff::Base" : {
-         "file" : "lib/Text/WordDiff.pm",
-         "version" : 0
+         "file" : "lib/Text/WordDiff.pm"
       },
       "Text::WordDiff::HTML" : {
          "file" : "lib/Text/WordDiff/HTML.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Text::WordDiff::HTMLTwoLines" : {
          "file" : "lib/Text/WordDiff/HTMLTwoLines.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/theory/test-xpath/issues/"
+         "web" : "https://github.com/ThePerlShop/text-worddiff/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Text-WordDiff/",
+      "homepage" : "https://metacpan.org/release/Text-WordDiff",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/theory/test-xpath/tree/"
+         "url" : "https://github.com/ThePerlShop/text-worddiff"
       }
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

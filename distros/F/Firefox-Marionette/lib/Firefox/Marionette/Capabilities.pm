@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -101,7 +101,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.57
+Version 0.58
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,7 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * proxy - describes the L<proxy|Firefox::Marionette::Proxy> setup for the upcoming browser session.
 
-=item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certian session operations.
+=item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certain session operations.
 
 =item * moz_webdriver_click - a boolean value to indicate which kind of interactability checks to run when performing a L<click|Firefox::Marionette#click> or L<sending keys|Firefox::Marionette#type> to an elements. For Firefoxen prior to version 58.0 some legacy code as imported from an older version of FirefoxDriver was in use.
 

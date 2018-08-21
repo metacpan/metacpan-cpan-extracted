@@ -1,8 +1,11 @@
 Revision history for Perl extension Text::FIGlet and "working demos" in bin/
 (figlet.pl, minifig.pl, charmap.pl, showfigfonts.pl)
 
+2.19.4  Sun Aug 19 13h EST 2018
+	- Fix tests due to perl 5.28's bad breaking of ~~ scalarification
+
 2.19.3	Fri Apr 19 23h EST 2013
-	- Change $VERSION to avoif MakeMaker mis-handling of v-strings.
+	- Change $VERSION to avoid MakeMaker mis-handling of v-strings.
 	- Skip Test 4 (POD) if no Test::More
 	- Fix Unicode (tests) and remove "deprecated" encoding pragma,
 	  simplifying Font.pm

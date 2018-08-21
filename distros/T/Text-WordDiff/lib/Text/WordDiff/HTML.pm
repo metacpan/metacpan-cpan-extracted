@@ -4,7 +4,7 @@ use strict;
 use HTML::Entities qw(encode_entities);
 use vars qw($VERSION @ISA);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 @ISA = qw(Text::WordDiff::Base);
 
 sub file_header {
@@ -149,6 +149,8 @@ other than all uppercase.
 =end comment
 
 David Wheeler <david@kineticode.com>
+
+Currently maintained by the developers of The Perl Shop <tps@cpan.org>.
 
 =head1 Copyright and License
 

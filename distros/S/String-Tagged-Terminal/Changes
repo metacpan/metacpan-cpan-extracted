@@ -1,5 +1,10 @@
 Revision history for String-Tagged-Terminal
 
+0.03    2018-08-17 12:22:57
+        [CHANGES]
+         * Added ->print_to_terminal and ->say_to_terminal methods
+         * Support the NO_COLOR environment variable (http://no-color.org)
+
 0.02    2017-10-03 15:53:04
         [BUGFIXES]
          * Declare dependency on Convert::Color::XTerm (RT123182)

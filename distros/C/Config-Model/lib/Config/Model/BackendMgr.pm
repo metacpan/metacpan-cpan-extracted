@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.125';
+$Config::Model::BackendMgr::VERSION = '2.126';
 use Mouse;
 use strict;
 use warnings;
@@ -114,11 +114,6 @@ sub get_cfg_file_path {
         $logger->trace("$args{backend} override target file is $override ($mode mode)");
         return ( 1, $override );
     }
-
-    Config::Model::Exception::Model->throw(
-        error  => "backend error: empty 'config_dir' parameter (and no config_file override)",
-        object => $self->node
-    ) unless defined $args{config_dir} or defined $self->config_dir;
 
     my ( $dir_ok, $dir ) = $self->get_cfg_dir_path(%args);
 
@@ -232,7 +227,7 @@ sub read_config_data {
         $self->try_read_backend( $rw_config, $root_dir, $config_file_override, $check, $backend );
 
     Config::Model::Exception::ConfigFile::Missing->throw (
-        file   => $file,
+        file   => $file || "<unknown>",
         object => $self->node,
     ) unless $res or $auto_create_override or $auto_create;
 
@@ -420,7 +415,7 @@ sub auto_write_init {
         else {
             $res = eval { $backend_obj->$f( %backend_args ); };
             my $error = $@;
-            $logger->warn( "write backend $backend $backend_class" . '::' . "$f failed: $error" )
+            $logger->error( "write backend $backend $backend_class" . '::' . "$f failed: $error" )
                 if $error;
             $self->close_file_to_write( $error, $file_path, $rw_config->{file_mode} );
 
@@ -440,6 +435,8 @@ sub auto_write_init {
 
 sub auto_delete {
     my ($self, $file_path, $args) = @_;
+
+    return unless $file_path;
 
     my $perl_data;
     $perl_data = $self->node->dump_as_data( full_dump => $args->{full_dump} // 0)
@@ -501,7 +498,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.125';
+$Config::Model::DeprecatedHandle::VERSION = '2.126';
 our $AUTOLOAD;
 
 sub new {
@@ -544,7 +541,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.125
+version 2.126
 
 =head1 SYNOPSIS
 

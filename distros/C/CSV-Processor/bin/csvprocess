@@ -1,0 +1,106 @@
+#!/perl
+
+#ABSTRACT: command line utility that insert new columns in csv files
+
+package csvprocess;
+$csvprocess::VERSION = '1.01';
+
+
+use strict;
+use warnings;
+use CSV::Processor;
+use Regexp::Common;
+use Getopt::Long qw(:config auto_help);
+use feature 'say';
+use Carp;
+use Pod::Usage;
+
+$SIG{__DIE__} = sub {
+    Carp::longmess( $_[0] );
+};
+
+my %opts;
+GetOptions(
+    "f|file=s"      => \$opts{file},
+    "i|in=s"        => \$opts{in_column},
+    "o|out=s"       => \$opts{out_column},
+    "p|processor=s" => \$opts{processor},
+    "v|verbose"     => \$opts{verbose}
+) or die("Error in command line arguments\n");
+
+say "Verbose mode enabled" if $opts{verbose};
+
+pod2usage() if !defined $opts{file};
+
+if ( !defined $opts{in_column} ) {
+    $opts{in_column} = 6;    # by default ygeo set url in column with index 6
+}
+
+if ( $opts{in_column} =~ /$RE{num}{int}/ && !$opts{out_column} ) {
+    $opts{out_column} = $opts{in_column} + 1;
+}
+
+say "Reading data from column "
+  . $opts{in_column}
+  . ", writing data to column "
+  . $opts{out_column}
+  if $opts{verbose};
+
+my $method = $opts{processor};
+say "Processor: CSV::Process::" . $method if $opts{verbose};
+
+my $bot = CSV::Processor->new( file => $opts{file}, verbose => $opts{verbose} );
+$bot->$method( $opts{in_column}, $opts{out_column} );
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csvprocess - command line utility that insert new columns in csv files
+
+=head1 VERSION
+
+version 1.01
+
+=head1 SYNOPSIS
+
+    csvprocess -f <file_name> -p <method> -i <in_column_name_or_index> -o <out_column_name_or_index> -v
+    
+    csvprocess -f test.csv -p add_email -i 0
+    csvprocess -f test.csv -p add_email -i 0 -o 5 -v
+    csvprocess -f test.csv -p add_email -i EMAIL -v
+
+Column numbering starts from 1, inserted column will have <out_column_name_or_index>
+
+If no third parameter (<out_column_name_or_index>) provided data will be written next column
+
+All available options:
+
+    -f | --file         name of input file
+    -p | --processor    name of method of L<CSV::Processor>
+    -i | --in           number or name of column, data from which will be considered as source
+    -o | --out          number or name of column, where result will be stored
+    -v | --verbose      verbose mode
+
+=head1 DESCRIPTION
+
+Set of useful utilities that works with html and urls
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

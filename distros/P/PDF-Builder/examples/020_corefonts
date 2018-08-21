@@ -101,7 +101,7 @@ my @ecs = qw{
 # just Latin-1 for now...
 @ecs = qw{ latin1 };
 
-my ($x, $y, $pdf, $fn, $ec, $f1, $yp);
+my ($y, $pdf, $f1);
 
 # override default list with command line entries
 if (scalar @ARGV) {
@@ -109,9 +109,9 @@ if (scalar @ARGV) {
 }
 
 # loop through list of font names
-foreach $fn (@fns) {
+foreach my $fn (@fns) {
     # at least one page for each encoding 
-    foreach $ec (@ecs) {
+    foreach my $ec (@ecs) {
         $pdf = PDF::Builder->new(-compress => $compress);
         $f1 = $pdf->corefont('Helvetica');  # for various labels
 
@@ -145,10 +145,10 @@ foreach $fn (@fns) {
 
 	    # draw grid of characters and information
 	    # yp character row value (0..F T to B)
-            foreach $yp (0..15) {
+            foreach my $yp (0..15) {
 		$y = 15 - $yp;  # y vertical (row) position T to B
                 print STDERR ".";
-                foreach $x (0..15) {  # x horizontal (column) position L to R
+                foreach my $x (0..15) {  # x horizontal (column) position L to R
                     $txt->translate($gLLx+($sx*$x),$gLLy+($sy*$y));
 		    my $ci = $yp*16 + $x;  # 0..255 value
 		    my $c  = chr($ci);

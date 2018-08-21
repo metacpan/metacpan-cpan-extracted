@@ -1,0 +1,20 @@
+## name double
+## failures 0
+## cut
+
+use Data::Dumper;
+print 42;
+
+## name quadruple
+## failures 1
+## cut
+
+use Data::::Dumper;
+print 42;
+
+## name sextuble
+## failures 1
+## cut
+
+use Data::::::Dumper;
+print 42;

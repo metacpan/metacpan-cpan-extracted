@@ -17,8 +17,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '2.031'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -29,7 +29,8 @@ use PDF::Builder::Basic::PDF::Name;
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Dict - PDF Dictionaries and Streams. Inherits from L<PDF::Objind>
+PDF::Builder::Basic::PDF::Dict - PDF Dictionaries and Streams. Inherits from 
+L<PDF::Builder::Basic::PDF::Objind>
 
 =head1 INSTANCE VARIABLES
 
@@ -104,6 +105,7 @@ sub filter {
         @filters = map { ref($_)? $_: PDF::Builder::Basic::PDF::Name->new($_) } @filters;
         $self->{'Filter'} = PDF::Builder::Basic::PDF::Array->new(@filters);
     # }
+    return $self->{'Filter'};
 }
 
 # Undocumented alias, which may be removed in a future release
@@ -226,6 +228,7 @@ sub outobjdeep {
 
         $fh->print("\nendstream"); # next is endobj which has the final cr
     }
+    return;
 }
 
 =head2 $d->read_stream($force_memory)

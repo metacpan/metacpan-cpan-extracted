@@ -3,7 +3,7 @@ use Moo;
 use Sub::Quote;
 
 # ABSTRACT: Measure event timings and send them to StatsD
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Time::HiRes qw(gettimeofday tv_interval);
@@ -18,7 +18,7 @@ has '_pending' => (
   default => quote_sub q{1},
 );
 
-has ['metric', 'start', '_file', '_line', 'warning_callback'] => (
+has ['metric', 'start', '_file', '_line', 'warning_callback', 'sample_rate'] => (
   is => 'rw',
 );
 
@@ -80,7 +80,7 @@ Net::Statsd::Client::Timer - Measure event timings and send them to StatsD
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 

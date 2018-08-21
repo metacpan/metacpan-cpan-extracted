@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(parse_text to_editor_args);
@@ -22,11 +22,11 @@ sub parse_text {
     my $orig;
 
     my $line_number = _maybe_extract_line_number( \$text );
+    my $sub_name    = _maybe_extract_subroutine_name( \$text );
 
     # Is this is an actual file.
     $file_name = $text if -e path($text);
 
-    my $sub_name       = _maybe_extract_subroutine_name( \$text );
     my $is_module_name = is_module_name($text);
 
     if ( !$file_name && $is_module_name ) {
@@ -94,13 +94,13 @@ sub _maybe_extract_line_number {
 
     # git-grep (don't match on ::)
     # lib/Open/This.pm:17
-    if ( $$text =~ s{(\w):(\d*)\b}{$1} ) {
+    if ( $$text =~ s{(\w):(\d+)\b}{$1} ) {
         return $2;
     }
 
     # git-grep contextual match
     # lib/Open/This.pm-17-
-    if ( $$text =~ s{(\w)-(\d*)-}{$1} ) {
+    if ( $$text =~ s{(\w)-(\d+)\-{0,1}}{$1} ) {
         return $2;
     }
     return undef;
@@ -147,7 +147,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head1 DESCRIPTION
 

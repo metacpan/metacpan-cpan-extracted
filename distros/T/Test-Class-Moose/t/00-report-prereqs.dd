@@ -69,7 +69,7 @@ do { my $x = {
                                       'Test::Most' => '0',
                                       'Try::Tiny' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'perl' => '5.010000',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

@@ -3,67 +3,68 @@ abstract: 'RapidApp-powered blog'
 author:
   - 'Henry Van Styn <vanstyn@cpan.org>'
 build_requires:
-  Test::More: '0'
+  Test::More: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0.06'
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Rapi-Blog
 requires:
-  Catalyst::Controller: '0'
-  Catalyst::Model::DBIC::Schema: '0'
-  Catalyst::Plugin::RapidApp::RapidDbic::TableBase: '0'
-  DBIx::Class::Core: '0'
-  DBIx::Class::Helpers: '2.033003'
-  DBIx::Class::ResultSet: '0'
-  DBIx::Class::Schema: '0'
-  DBIx::Class::Schema::Diff: '1.05'
-  Date::Parse: '0'
-  DateTime: '0'
-  Exporter: '0'
-  File::ShareDir: '0'
-  FindBin: '0'
-  HTML::Strip: '2.10'
-  Module::Locate: '0'
-  Module::Runtime: '0'
-  Moo: '0'
-  Moose: '0'
-  MooseX::MarkAsMethods: '0'
-  MooseX::NonMoose: '0'
-  POSIX: '0'
-  Path::Class: '0'
-  Plack::App::File: '0'
-  Plack::Builder: '0'
-  Plack::Middleware::ConditionalGET: '0'
-  Pod::Find: '0'
-  Pod::Usage: '0'
-  RapidApp: '1.3004'
-  RapidApp::Builder: '0'
-  RapidApp::Module::DbicPropPage: '0'
-  RapidApp::Module::DbicRowDV: '0'
-  RapidApp::Template::AccessStore: '0'
-  RapidApp::Util: '0'
-  RapidApp::Util::Role::ModelDBIC: '0'
-  Scalar::Util: '0'
-  String::Random: '0'
-  Term::ReadLine: '0'
-  Types::Standard: '0'
-  URI::Escape: '0'
-  YAML::XS: '0.65'
-  namespace::autoclean: '0'
-  parent: '0'
-  strict: '0'
-  utf8: '0'
-  vars: '0'
-  warnings: '0'
+  Catalyst::Controller: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Plugin::RapidApp::RapidDbic::TableBase: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Helpers: 2.033003
+  DBIx::Class::ResultSet: 0
+  DBIx::Class::Schema: 0
+  DBIx::Class::Schema::Diff: 1.05
+  Date::Parse: 0
+  DateTime: 0
+  Exporter: 0
+  File::ShareDir: 0
+  FindBin: 0
+  HTML::Strip: 2.10
+  Module::Locate: 0
+  Module::Runtime: 0
+  Moo: 0
+  Moose: 0
+  MooseX::MarkAsMethods: 0
+  MooseX::NonMoose: 0
+  POSIX: 0
+  Path::Class: 0
+  Plack::App::File: 0
+  Plack::Builder: 0
+  Plack::Middleware::ConditionalGET: 0
+  Pod::Find: 0
+  Pod::Usage: 0
+  RapidApp: 1.3101
+  RapidApp::Builder: 0
+  RapidApp::Module::DbicPropPage: 0
+  RapidApp::Module::DbicRowDV: 0
+  RapidApp::Module::Tree: 0
+  RapidApp::Template::AccessStore: 0
+  RapidApp::Util: 0
+  RapidApp::Util::Role::ModelDBIC: 0
+  Scalar::Util: 0
+  String::Random: 0
+  Term::ReadLine: 0
+  Types::Standard: 0
+  URI::Escape: 0
+  YAML::XS: 0.65
+  namespace::autoclean: 0
+  parent: 0
+  strict: 0
+  utf8: 0
+  vars: 0
+  warnings: 0
 resources:
   IRC: irc://irc.perl.org/#rapidapp
   bugtracker: https://github.com/vanstyn/Rapi-Blog/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/Rapi-Blog.git
-version: '1.0101'
+version: 1.0200

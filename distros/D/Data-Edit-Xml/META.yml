@@ -15,11 +15,11 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '20180812'
+    version: '20180817'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20180805'
+  Data::Table::Text: '20180817'
   Storable: '0'
   Test2::API: '0'
   Test::More: '0'
@@ -27,5 +27,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180812'
+version: '20180817'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

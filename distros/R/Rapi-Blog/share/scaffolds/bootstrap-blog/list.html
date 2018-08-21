@@ -40,6 +40,9 @@
     [% END %]
     [% IF p.tag %]Tagged "[% p.tag %]" [% END %]
     [% IF p.category %]In "[% p.category %]" [% END %]
+    [% IF p.section_id %]Section: "[% resolve_section_id(p.section_id) %]" 
+      [% ELSIF p.under_section_id %]Under Section: "[% resolve_section_id(p.under_section_id) %]" 
+      [% END %]
   </h3>
   
   [% IF result.params.username %]

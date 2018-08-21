@@ -16,9 +16,9 @@ my $build = Module::Build->new(
     },
     meta_merge => {
         resources => {
-            homepage   => 'http://search.cpan.org/dist/Text-Diff-HTML/',
-            bugtracker => 'http://github.com/theory/text-diff-html/issues/',
-            repository => 'http://github.com/theory/text-diff-html/',
+            homepage   => 'https://metacpan.org/release/Text-Diff-HTML',
+            bugtracker => 'http://github.com/ThePerlShop/text-diff-html/issues/',
+            repository => 'http://github.com/ThePerlShop/text-diff-html/',
         }
     },
 );

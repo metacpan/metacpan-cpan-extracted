@@ -50,7 +50,7 @@ like $@ , qr{ junk \s 'Foobar' \s after \s XML \s element}x, 'detect junk after 
 
 SKIP: {
     skip 'need File::Basename for resolveing filename', 1
-        if ( ! eval "require File::Basename");
+        if ( ! eval { require File::Basename } );
     my $dir = File::Basename::dirname( __FILE__ );
     $parser = XML::Parser::Lite->new();
     open my $fh, '<', "$dir/adam.xml";

@@ -12,8 +12,8 @@ plan tests => 25;
 ok( is_bool(true),  'true is_bool()' );
 ok( is_bool(false), 'false is_bool()' );
 
-is( ref true,  Types::Bool::BOOL_CORE, 'ref true' );
-is( ref false, Types::Bool::BOOL_CORE, 'ref false' );
+is( ref true,  Types::Bool::BOOL_PACKAGE, 'ref true' );
+is( ref false, Types::Bool::BOOL_PACKAGE, 'ref false' );
 
 ok( !is_bool(undef), 'undef not is_bool()' );
 ok( !is_bool(''),    '"" not is_bool()' );

@@ -1,4 +1,4 @@
-Text/WordDiff version 0.08
+Text/WordDiff version 0.09
 ==========================
 
 This library's module, Text::WordDiff, is a variation on the lovely
@@ -34,7 +34,7 @@ Text::WordDiff requires the following modules:
 * Term::ANSIColor '0',
 * HTML::Entities '0',
 
-Copyright and Licence
+Copyright and License
 ---------------------
 
 Copyright (c) 2005-2011 David E. Wheeler. Some Rights Reserved.

@@ -1,7 +1,8 @@
-use Test::More tests => 4;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 4;
 
 use PDF::Builder::Basic::PDF::Filter::ASCII85Decode;
 
@@ -28,3 +29,5 @@ is($in,
 is($filter->outfilt($in, 1),
    $out,
    q{ASCII85Decode test string is encoded correctly (multiple of four bytes)});
+
+1;

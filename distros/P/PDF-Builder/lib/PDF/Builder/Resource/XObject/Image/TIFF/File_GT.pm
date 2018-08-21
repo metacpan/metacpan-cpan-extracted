@@ -3,15 +3,15 @@ package PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use IO::File;
 use Graphics::TIFF ':all';  # already confirmed to be installed
 
 =head1 NAME
 
-PDF::Builder::Resource::XObject::Image::TIFF::File - support routines for TIFF image library (Graphics::TIFF enabled)
+PDF::Builder::Resource::XObject::Image::TIFF::File_GT - support routines for TIFF image library (Graphics::TIFF enabled)
 
 =cut
 

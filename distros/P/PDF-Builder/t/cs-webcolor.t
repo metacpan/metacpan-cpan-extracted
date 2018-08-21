@@ -1,7 +1,8 @@
-use Test::More tests => 2;
-
+#!/usr/bin/perl
 use warnings;
 use strict;
+
+use Test::More tests => 2;
 
 use PDF::Builder;
 
@@ -22,3 +23,5 @@ like($string, qr{obj \[ /Indexed /DeviceRGB 255},
 
 like($string, qr{CS 3 SC 72 144 m 288 144 l S},
      q{Indexed color is used for horizontal line});
+
+1;

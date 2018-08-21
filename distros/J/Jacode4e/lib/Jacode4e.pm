@@ -5,7 +5,7 @@ package Jacode4e;
 #
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
-$VERSION = '2.13.6.6';
+$VERSION = '2.13.6.7';
 $VERSION = $VERSION;
 
 use strict;
@@ -86,14 +86,17 @@ Jacode4e - jacode.pl-like program for enterprise
     %option
       The options you can specify are as follows:
  
-      key mnemonic     value means
+      key mnemonic      value means
       -----------------------------------------------------------------------
-      INPUT_LAYOUT     input record layout by 'S' and 'D' sequence
-                       'S' means one char as SBCS, 'D' means one char as DBCS
-      OUTPUT_SHIFTING  true means use output shift code, false means not use
-                       default is false
-      SPACE            output space code in DBCS/MBCS
-      GETA             output geta code in DBCS/MBCS
+      INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
+                        'S' means one char as SBCS, 'D' means one char as DBCS
+      OUTPUT_SHIFTING   true means use output shift code, false means not use
+                        default is false
+      SPACE             output space code in DBCS/MBCS
+      GETA              output geta code in DBCS/MBCS
+      OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
+                        { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
+                        (CAUTION! override also SPACE option)
       -----------------------------------------------------------------------
 
 =head1 SAMPLE
@@ -101,14 +104,15 @@ Jacode4e - jacode.pl-like program for enterprise
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.6');
+  Jacode4e::VERSION('2.13.6.7');
   while (<>) {
       $return =
       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {
-          'INPUT_LAYOUT'    => 'SSSDDDSSDDSDSD',
-          'OUTPUT_SHIFTING' => 0,
-          'SPACE'           => "\x81\xA2",
-          'GETA'            => "\x81\xA1",
+          'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
+          'OUTPUT_SHIFTING'  => 0,
+          'SPACE'            => "\x81\xA2",
+          'GETA'             => "\x81\xA1",
+          'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
       });
       print $_;
   }

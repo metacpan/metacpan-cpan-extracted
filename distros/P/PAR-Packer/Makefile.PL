@@ -96,7 +96,8 @@ WriteMakefile1(
           url  => 'git://github.com/rschupp/PAR-Packer.git',
           web  => 'https://github.com/rschupp/PAR-Packer',
         },
-        MailingList => 'par@perl.org',
+        MailingList => 'mailto:par@perl.org',
+        bugtracker => { web => 'https://rt.cpan.org/Dist/Display.html?Queue=PAR-Packer' },
       },
       no_index => {
         directory => [ 'contrib' ],
@@ -104,8 +105,18 @@ WriteMakefile1(
     },
 );
 
-# parallel make: install modules into blib *before* recursing into "myldr"
-sub MY::postamble { return "subdirs :: pm_to_blib\n" }
+# inhibit parallel make as modules must be installed into blib *before*
+# recursing into myldr (i.e. target pm_to_blib must have finished
+# before subdirs is started)
+sub MY::postamble 
+{ 
+    return <<'...'
+# GNU make and others
+.NOTPARALLEL:
+# dmake
+.SEQUENTIAL:
+...
+}
 
 sub WriteMakefile1 {  #Compatibility code for old versions of EU::MM. Written by Alexandr Ciornii, version 2. Added by eumm-upgrade.
     my %params=@_;

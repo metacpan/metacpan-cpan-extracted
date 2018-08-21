@@ -2,7 +2,7 @@ package App::tt;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 1;
 
@@ -14,7 +14,7 @@ App::tt - Time tracking application
 
 =head1 VERSION
 
-0.05
+0.07
 
 =head1 DESCRIPTION
 
@@ -33,8 +33,8 @@ optional arguments.
   $ tt help <action>
   $ tt <action> -h
 
-Available actions: L</analyze>, L</edit>, L</log>, L</register>, L</start>,
-L</status> (default) and L</stop>.
+Available actions: L</edit>, L</log>, L</register>, L</start>, L</status>
+(default) and L</stop>.
 
 Basic usage;
 
@@ -57,27 +57,21 @@ Each action can tak C<-h> for more details. Example:
 
   $ tt start -h
 
-=head2 analyze
-
-This action can analyze all the git repos in a directory and print what time
-you started/stopped working on a set of repos grouped per day. The output
-is suitable for "tt register".
-
-  $ cd ..                  # one step up from the current git-project
-  $ tt analyze             # default is last month
-  $ tt analyze "last week" # analyze git reflog from last week
-  $ tt analyze 2015-07-01  # analyze git reflog since a given date
-
 =head2 edit
 
-This command can be used to rewrite all the log entries. See source
-code before running this action. (Internals might change)
+This command can be used to rewrite one all all the log entries.
+
+  # Edit the last entry with your favorite $EDITOR
+  $ tt edit
+
+  # Edit a given file with your favorite $EDITOR
+  $ tt edit ~/.TimeTracker/2017/12/20171220-092000_rg.trc
+
+  # Rewrite all the log entries with a perl script
+  # See source code before running this action. (Internals might change)
+  $ cat rewrite.pl | tt edit
 
 DISCLAIMER! Backup your files before running this action!
-
-  $ cat rewrite.pl | tt edit
-  # verify output, and then run:
-  $ cat rewrite.pl | tt edit --no-dry-run
 
 =head2 log
 

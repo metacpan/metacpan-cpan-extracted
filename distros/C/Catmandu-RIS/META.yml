@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,22 +16,25 @@ meta-spec:
 name: Catmandu-RIS
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Catmandu: '0'
   Catmandu::Importer::CSV: '0'
-  Encode: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-RIS/issues
   homepage: https://github.com/LibreCat/Catmandu-RIS
   repository: https://github.com/LibreCat/Catmandu-RIS.git
-version: '0.10'
+version: '0.11'
 x_contributors:
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
-  - 'vpeil <vitali.peil@uni-bielefeld.de>'
+  - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 0

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Resource::CIDFont::TrueType::FontFile;
@@ -121,7 +121,7 @@ sub subsetByCId {
 
     return if $self->iscff();
     my $g = shift;
-    $self->fontfile()->subsetByCId($g);
+    return $self->fontfile()->subsetByCId($g);
 }
 
 sub subvec {
@@ -129,7 +129,7 @@ sub subvec {
 
     return 1 if $self->iscff();
     my $g = shift;
-    $self->fontfile()->subvec($g);
+    return $self->fontfile()->subvec($g);
 }
 
 sub glyphNum {
@@ -173,7 +173,7 @@ sub outobjdeep {
         #}
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
 }
 
 =back

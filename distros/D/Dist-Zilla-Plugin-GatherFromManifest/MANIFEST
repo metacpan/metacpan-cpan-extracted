@@ -8,4 +8,3 @@ README
 dist.ini
 t/00-use.t
 t/author-critic.t
-t/author-pod-syntax.t

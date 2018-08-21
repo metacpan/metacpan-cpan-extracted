@@ -23,7 +23,7 @@ $name
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Multiline signatures get converted for anonymous subs";
-sub  { my ($name,$value)=@_;
+sub  { my ($name,$value)=@_;();
 
 
 
@@ -43,7 +43,7 @@ sub foo
 SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "Multiline signatures get converted for named subroutines";
-sub foo { my ($name,$value)=@_;
+sub foo { my ($name,$value)=@_;();
 
 
 
@@ -135,7 +135,7 @@ Filter::signatures::transform_arguments();
     s/$extractor/${$components[unpack('N',$1)]}/g;
 
 is $_, <<'RESULT', "Multiline signatures with comments get converted";
-sub foo { my ($name,$value)=@_;
+sub foo { my ($name,$value)=@_;();
 
 
 

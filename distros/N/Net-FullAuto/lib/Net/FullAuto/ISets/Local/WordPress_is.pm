@@ -1077,10 +1077,10 @@ END
 $do=1;
 if ($do==1) {
 
-resolver_timeout 5s;
-resolver 127.0.0.1 [::1]:5353;
-add_header Strict-Transport-Security "max-age=63072000; includeSubDomains;" always;
-add_header X-Frame-Options https://video.get-wisdom.com;
+#resolver_timeout 5s;
+#resolver 127.0.0.1 [::1]:5353;
+#add_header Strict-Transport-Security "max-age=63072000; includeSubDomains;" always;
+#add_header X-Frame-Options https://video.get-wisdom.com;
 
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/^ssl_certificate_key/assl_dhparam /etc/letsencrypt".

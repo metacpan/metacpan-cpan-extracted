@@ -10,6 +10,7 @@ README
 README.md
 TAGS
 at/chrome.test
+at/edge.test
 at/firefox.test
 at/legacy.test
 at/other.html
@@ -18,6 +19,7 @@ at/sanity-edge.test
 at/sanity-ie.test
 at/sanity-safari.test
 at/sanity.test
+at/test-firefox.test
 at/test.html
 cpanfile
 dist.ini
@@ -28,6 +30,7 @@ lib/Selenium/CanStartBinary.pm
 lib/Selenium/CanStartBinary/FindBinary.pm
 lib/Selenium/CanStartBinary/ProbePort.pm
 lib/Selenium/Chrome.pm
+lib/Selenium/Edge.pm
 lib/Selenium/Firefox.pm
 lib/Selenium/Firefox/Binary.pm
 lib/Selenium/Firefox/Profile.pm
@@ -53,6 +56,7 @@ lib/Selenium/Remote/WDKeys.pm
 lib/Selenium/Remote/WebElement.pm
 lib/Selenium/Waiter.pm
 lib/Test/Selenium/Chrome.pm
+lib/Test/Selenium/Edge.pm
 lib/Test/Selenium/Firefox.pm
 lib/Test/Selenium/InternetExplorer.pm
 lib/Test/Selenium/PhantomJS.pm

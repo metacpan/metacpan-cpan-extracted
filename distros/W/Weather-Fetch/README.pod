@@ -1,0 +1,53 @@
+=head1 NAME
+
+Weather::Fetch - a module that fetches the weather
+
+=head1 DESCRIPTION
+
+This is a module that can be used to make a weather app.
+see EXAMPLE below or F<script/weather.pl> for example
+
+=head1 EXAMPLE
+
+use Weather::Fetch;
+
+#Get the information you need from https://www.accuweather.com
+#
+#For example we will use Chicago
+#
+#https://www.accuweather.com/en/us/chicago-il/60608/weather-forecast/348308
+#
+#This is the URL after we find our City/Town, so lets take the info we need
+#
+#code = 60608
+#Language = en
+#country = us
+#city = chicago
+
+my $w = new Weather::Fetch("F", "60608", "EN", "US", "chicago");
+my $xml = $w->getXml;
+
+sub get_weather {
+	my ($type) = @_;
+	my $temp = $w->getWeather($xml, $type);
+	return $temp;
+}
+
+my $con = get_weather("condition");
+my $temp = get_weather("temp");
+
+print $con . " " . $temp . "\n";
+
+exit 0;
+
+=head1 AUTHOR
+
+Brad Heffernan
+
+=head1 LICENSE
+
+FreeBSD
+
+
+=cut
+

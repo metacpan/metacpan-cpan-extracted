@@ -5,9 +5,10 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.009'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.010'; # VERSION
+my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
+use Carp;
 use Encode qw(:all);
 use Font::TTF::Font;
 use POSIX qw(ceil floor);
@@ -28,7 +29,7 @@ sub _look_for_cmap {
 
     $fname =~ s/[^a-z0-9]+//gi;
     return ({%{$cmap->{$fname}}}) if defined $cmap->{$fname};
-    eval "require 'PDF/Builde/Resource/CIDFont/CMap/$fname.cmap'";
+    eval "require 'PDF/Builde/Resource/CIDFont/CMap/$fname.cmap'"; ## no critic
     unless ($@) {
         return {%{$cmap->{$fname}}};
     } else {
@@ -212,7 +213,7 @@ sub read_kern_table {
     my $fh = $font->{' INFILE'};
     my $data = undef;
 
-    return undef unless $font->{'kern'};
+    return (undef) unless $font->{'kern'};  # need () so critic happy
 
     my $buf = undef;
 
@@ -313,7 +314,7 @@ sub new {
 
     my $data = {};
 
-    die "cannot find font '$file' ..." unless -f $file;
+    confess "cannot find font '$file'" unless -f $file;
     my $font = Font::TTF::Font->open($file);
     $data->{'obj'} = $font;
 
@@ -513,8 +514,9 @@ sub subsetByCId {
     return if $self->iscff();
     if (defined $self->font()->{'loca'}->read()->{'glyphs'}->[$g]) {
         $self->font()->{'loca'}->read()->{'glyphs'}->[$g]->read();
-        map { vec($self->data()->{'subvec'}, $_, 1) = 1; } $self->font()->{'loca'}->{'glyphs'}->[$g]->get_refs();
+        return map { vec($self->data()->{'subvec'}, $_, 1) = 1; } $self->font()->{'loca'}->{'glyphs'}->[$g]->get_refs();
     }
+    return;
 }
 
 sub subvec {
@@ -557,7 +559,7 @@ sub outobjdeep {
 	}
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
 }
 
 1;

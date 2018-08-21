@@ -8,8 +8,6 @@ use parent 'Linux::Perl::eventfd';
 use constant {
     NR_eventfd  => 284,
     NR_eventfd2 => 290,
-
-    flag_SEMAPHORE => 1,
 };
 
 1;
