@@ -1,0 +1,5 @@
+0.24.0 2018-24-08
+  - initial version
+
+0.24.1 2018-27-08
+  - reference to the DBD::SQLite documentation instead of keeping a copy of it

@@ -56,7 +56,7 @@ package DDC::Any;
 ##--------------------------------------------------------------
 ## $bool = PACKAGE->have_xs()
 ##  + attempts to load DDC::XS, and returns true if it is available in a suitable version
-our $MIN_XS_VERSION = 0.15;
+our $MIN_XS_VERSION = 0.21;
 sub have_xs {
   shift if (UNIVERSAL::isa($_[0],__PACKAGE__));
   eval "use DDC::XS;" if (!$INC{'DDC/XS.pm'});
@@ -195,7 +195,8 @@ DDC::Any - abstract wrapper for DDC::XS or DDC::PP
 
  ##=====================================================================
  ## Package Variables
- my $which = $DDC::Any::WHICH;	##-- either 'DDC::XS' or 'DDC::PP'
+ my $which = $DDC::Any::WHICH;	        ##-- either 'DDC::XS' or 'DDC::PP'
+ my $xsver = $DDC::Any::MIN_XS_VERSION; ##-- currently v0.21
 
  ##=====================================================================
  ## Usage
@@ -243,7 +244,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016, Bryan Jurish.  All rights reserved.
+Copyright (c) 2016-2018, Bryan Jurish.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

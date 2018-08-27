@@ -1,0 +1,17 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+lib/Net/Doveadm.pm
+lib/Net/Doveadm/X.pm
+lib/Net/Doveadm/X/Authn.pm
+lib/Net/Doveadm/X/Base.pm
+lib/Net/Doveadm/X/Generic.pm
+lib/Net/Doveadm/X/Response.pm
+t/basic.t
+t/basic_authn.t
+t/basic_blocking.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

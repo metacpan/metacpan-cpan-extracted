@@ -9,10 +9,10 @@ use base 'Exporter';
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(deep_stringify);
 
-use Data::Structure::Util qw(get_refs unbless);
-use Scalar::Util          qw(blessed);
+use Data::Structure::Util qw(unbless);
+use Ref::Util             qw(is_blessed_ref);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -65,33 +65,39 @@ If this parameter is passed, Stringify::Deep will unbless and stringify objects 
 
 sub deep_stringify {
     my $struct  = shift;
+    return unless defined $struct;
+
     my $params  = shift || {};
     my $reftype = ref $struct || '';
+
+    if ($reftype eq 'HASH') {
+        for my $key (keys %$struct) {
+            $struct->{$key} = deep_stringify($struct->{$key}, $params);
+        }
+        return $struct;
+    }
 
     if ($reftype eq 'ARRAY') {
         for my $i (0..scalar(@$struct) - 1) {
             $struct->[$i] = deep_stringify($struct->[$i], $params);
         }
-    } elsif ($reftype eq 'HASH') {
-        for my $key (keys %$struct) {
-            $struct->{$key} = deep_stringify($struct->{$key}, $params);
-        }
-    } else {
-        if (blessed $struct) {
-            my $overloaded = overload::Method( $struct, q{""} );
-            if (!$overloaded and $params->{leave_unoverloaded_objects_intact}) {
-                unbless $struct;
-                $reftype = ref $struct || '';
-            }
-        }
+        return $struct;
+    }
 
-        if ($reftype !~ /^(ARRAY|HASH)$/) {
-            $struct = "$struct"
-                if defined $struct;
+    if (
+        $reftype &&
+        $params->{leave_unoverloaded_objects_intact} &&
+        is_blessed_ref($struct) &&
+        ! overload::Method($struct, q{""})
+    ) {
+        unbless $struct;
+        $reftype = ref $struct || '';
+        if ($reftype =~ /^(ARRAY|HASH)$/) {
+            return $struct;
         }
     }
 
-    return $struct;
+    return "$struct";
 }
 
 =head1 DEPENDENCIES
@@ -102,13 +108,16 @@ Data::Structure::Util, Scalar::Util
 
 Michael Aquilina <aquilina@cpan.org>
 
+Thanks to LARRYL (Larry Leszczynski) for his patch contributing performance improvements.
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 Michael Aquilina.
+Copyright (C) 2012-2018 Michael Aquilina.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
 
 1;
+
 

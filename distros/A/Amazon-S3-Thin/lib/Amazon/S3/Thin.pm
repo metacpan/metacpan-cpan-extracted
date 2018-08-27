@@ -9,7 +9,7 @@ use Encode;
 use Amazon::S3::Thin::Resource;
 use Amazon::S3::Thin::Credentials;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $MAIN_HOST = 's3.amazonaws.com';
@@ -218,6 +218,8 @@ sub _build_xml_for_delete {
 
     return $content;
 }
+
+# Operations on Buckets
 
 sub put_bucket {
     my ($self, $bucket, $headers) = @_;
@@ -443,13 +445,39 @@ compatible with L<LWP::UserAgent> (i.e. providing the same interface).
 
 Debug option.
 
-=head1 METHODS
+=head1 Operations on Buckets
+
+=head2 put_bucket( $bucket [, $headers])
+
+B<Arguments>:
+
+=over 2
+
+=item 1. bucket - a string with the bucket
+
+=item 2. headers (B<optional>) - hashref with extra headr information
+
+=back
+
+=head2 delete_bucket( $bucket [, $headers])
+
+B<Arguments>:
+
+=over 3
+
+=item 1. bucket - a string with the bucket
+
+=item 2. headers (B<optional>) - hashref with extra headr information
+
+=back
+
+
+=head1 Operations on Objects
 
 =head2 get_object( $bucket, $key [, $headers] )
 
 B<Arguments>:
 
-a list of the following items, in order:
 
 =over 3
 
@@ -508,7 +536,6 @@ L<< Amazon's documentation for COPY|http://docs.aws.amazon.com/AmazonS3/latest/A
 
 B<Arguments>:
 
-a list of the following items, in order:
 
 =over 4
 

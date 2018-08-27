@@ -1,4 +1,4 @@
-package t::lib::NoGood;
+package NoGood;
 use Test::Routine;
 
 test "this will be duplicated" => sub { die 'Unimplemented' };

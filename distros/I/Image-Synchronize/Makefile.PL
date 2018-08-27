@@ -15,6 +15,9 @@ WriteMakefile(
                           'XML::Twig' => 0,
                           'YAML::Any' => 0,
                          },
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+    },
     ABSTRACT_FROM     => 'lib/Image/Synchronize.pm', # retrieve abstract from module
     AUTHOR            => 'Louis Strous <LS@quae.nl>',
     LICENSE           => 'perl',

@@ -40,3 +40,6 @@ Revision history for Assert-Conditional
 0.008    Tue May 22 11:51:37 CDT 2018
          Rewrite hash_unlocked missing till 5.16 as !hash_locked
          Add omitted etc/generate-exporter-pod to MANIFEST
+
+0.009    Tue Aug 21 06:29:56 MDT 2018
+         Delay slow calls to uca_sort till you really need them, credit Larry Leszczynski

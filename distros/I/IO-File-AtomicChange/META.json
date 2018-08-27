@@ -64,7 +64,7 @@
    "provides" : {
       "IO::File::AtomicChange" : {
          "file" : "lib/IO/File/AtomicChange.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/hirose31/IO-File-AtomicChange"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "HIROSE Masaaki <hirose31@gmail.com>",
       "Shoichi Kaji <skaji@outlook.com>"

@@ -7,6 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Module::Build: '0.28'
+  Path::Tiny: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.28'
@@ -20,7 +21,7 @@ name: Parallel-ForkManager-Segmented
 provides:
   Parallel::ForkManager::Segmented:
     file: lib/Parallel/ForkManager/Segmented.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   List::MoreUtils: '0'
   Parallel::ForkManager: '0'
@@ -31,7 +32,7 @@ resources:
   bugtracker: https://github.com/shlomif/parallel-forkmanager-segmented/issues
   homepage: http://metacpan.org/release/Parallel-ForkManager-Segmented
   repository: https://github.com/shlomif/perl-Parallel-ForkManager-Segmented.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.028000'

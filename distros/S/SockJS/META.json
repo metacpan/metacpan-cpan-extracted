@@ -1,10 +1,10 @@
 {
-   "abstract" : "SockJS perl implementation",
+   "abstract" : "SockJS Perl implementation",
    "author" : [
-      "Viacheslav Tykhanovskyi <vti@cpan.org>"
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "artistic_2"
    ],
@@ -16,40 +16,115 @@
    "no_index" : {
       "directory" : [
          "t",
+         "xt",
          "inc",
-         "t"
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {}
-      },
       "configure" : {
-         "requires" : {}
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
       },
       "runtime" : {
          "requires" : {
             "AnyEvent" : "0",
-            "Carp" : "0",
-            "Digest::MD5" : "0",
+            "IO::String" : "0",
             "JSON" : "0",
             "Plack" : "0",
-            "Protocol::WebSocket" : "0.10",
-            "Scalar::Util" : "0",
-            "Test::Class" : "0",
-            "Test::More" : "0",
-            "perl" : "5.008007"
+            "Protocol::WebSocket" : "0",
+            "Test::Fatal" : "0",
+            "Test::MonkeyMock" : "0",
+            "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "SockJS" : {
+         "file" : "lib/SockJS.pm",
+         "version" : "0.06"
+      },
+      "SockJS::Connection" : {
+         "file" : "lib/SockJS/Connection.pm"
+      },
+      "SockJS::Exception" : {
+         "file" : "lib/SockJS/Exception.pm"
+      },
+      "SockJS::Middleware::Cache" : {
+         "file" : "lib/SockJS/Middleware/Cache.pm"
+      },
+      "SockJS::Middleware::Cors" : {
+         "file" : "lib/SockJS/Middleware/Cors.pm"
+      },
+      "SockJS::Middleware::Http10" : {
+         "file" : "lib/SockJS/Middleware/Http10.pm"
+      },
+      "SockJS::Middleware::JSessionID" : {
+         "file" : "lib/SockJS/Middleware/JSessionID.pm"
+      },
+      "SockJS::Session" : {
+         "file" : "lib/SockJS/Session.pm"
+      },
+      "SockJS::Transport" : {
+         "file" : "lib/SockJS/Transport.pm"
+      },
+      "SockJS::Transport::Base" : {
+         "file" : "lib/SockJS/Transport/Base.pm"
+      },
+      "SockJS::Transport::EventSource" : {
+         "file" : "lib/SockJS/Transport/EventSource.pm"
+      },
+      "SockJS::Transport::HtmlFile" : {
+         "file" : "lib/SockJS/Transport/HtmlFile.pm"
+      },
+      "SockJS::Transport::JSONPPolling" : {
+         "file" : "lib/SockJS/Transport/JSONPPolling.pm"
+      },
+      "SockJS::Transport::JSONPSend" : {
+         "file" : "lib/SockJS/Transport/JSONPSend.pm"
+      },
+      "SockJS::Transport::WebSocket" : {
+         "file" : "lib/SockJS/Transport/WebSocket.pm"
+      },
+      "SockJS::Transport::XHRPolling" : {
+         "file" : "lib/SockJS/Transport/XHRPolling.pm"
+      },
+      "SockJS::Transport::XHRSend" : {
+         "file" : "lib/SockJS/Transport/XHRSend.pm"
+      },
+      "SockJS::Transport::XHRStreaming" : {
+         "file" : "lib/SockJS/Transport/XHRStreaming.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "web" : "https://github.com/vti/sockjs-perl/issues"
+      },
+      "homepage" : "https://github.com/vti/sockjs-perl",
       "repository" : {
-         "url" : "http://github.com/vti/sockjs-perl"
+         "url" : "git://github.com/vti/sockjs-perl.git",
+         "web" : "https://github.com/vti/sockjs-perl"
       }
    },
-   "version" : "0.01"
+   "version" : "0.06",
+   "x_contributors" : [
+      "BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>",
+      "vti <viacheslav.t@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

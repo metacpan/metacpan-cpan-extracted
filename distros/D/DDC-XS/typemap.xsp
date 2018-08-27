@@ -105,4 +105,5 @@
 %typemap{vector_CQCountKeyExprPtr};
 %typemap{CQFilterList};
 %typemap{CQSubcorpusList};
+%typemap{CQCommentList};
 %typemap{ddcObjectList};

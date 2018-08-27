@@ -15,6 +15,7 @@ use File::Temp;
 use Test::Deep;
 use Test::More;
 use Test::SharedFork;
+use Test::FailWarnings -allow_deps => 1;
 
 use Linux::Perl::getdents;
 

@@ -1,0 +1,28 @@
+---
+abstract: "SLOYD's default Pod::Weaver configuration"
+author:
+  - 'Stephan Loyd <sloyd@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-PluginBundle-SLOYD
+provides:
+  Pod::Weaver::PluginBundle::SLOYD:
+    file: lib/Pod/Weaver/PluginBundle/SLOYD.pm
+    version: '0.0001'
+requires:
+  Pod::Weaver::Config::Assembler: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/stphnlyd/perl5-Pod-Weaver-PluginBundle-SLOYD.git
+version: '0.0001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

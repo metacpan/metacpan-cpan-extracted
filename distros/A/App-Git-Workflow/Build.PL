@@ -11,6 +11,7 @@ my $builder = Module::Build->new(
     requires          => {
         'perl'            => '5.008',
         'autodie'         => 0,
+        'CHI::Memoize'    => 0,
         'Error'           => 0,
         'File::chdir'     => 0,
         'Git'             => 0,

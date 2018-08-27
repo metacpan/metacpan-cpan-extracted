@@ -130,6 +130,59 @@ subtest 'since' => sub {
             or diag explain [ $rs->all ];
 };
 
+subtest 'perl_maturity' => sub {
+    my $perl_devel = $schema->resultset( 'PerlVersion' )->create({ version => '5.25.0' });
+    my $perl_patch = $schema->resultset( 'PerlVersion' )->create({ version => '5.24.0 patch 123' });
+    my $perl_stable = $schema->resultset( 'PerlVersion' )->create({ version => '5.22.2' });
+
+    my $devel_stat = $schema->resultset( 'Stats' )->create({
+        'dist' => 'Sorauta-SVN-AutoCommit',
+        'fulldate' => '201705071643',
+        'guid' => '00000000-3343-11e7-b830-917e22bfee97',
+        'id' => 2,
+        'osname' => 'linux',
+        'osvers' => '4.8.0-2-amd64',
+        'perl' => '5.25.0',
+        'platform' => 'x86_64-linux',
+        'postdate' => 201705,
+        'state' => 'pass',
+        'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
+        'type' => 2,
+        'uploadid' => 169497,
+        'version' => '0.02',
+    });
+
+    my $patch_stat = $schema->resultset( 'Stats' )->create({
+        'dist' => 'Sorauta-SVN-AutoCommit',
+        'fulldate' => '201705071643',
+        'guid' => '11111111-3343-11e7-b830-917e22bfee97',
+        'id' => 3,
+        'osname' => 'linux',
+        'osvers' => '4.8.0-2-amd64',
+        'perl' => '5.24.0 patch 123',
+        'platform' => 'x86_64-linux',
+        'postdate' => 201705,
+        'state' => 'pass',
+        'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
+        'type' => 2,
+        'uploadid' => 169497,
+        'version' => '0.02',
+    });
+
+    my $dev_rs = $schema->resultset( 'Stats' )->perl_maturity( 'dev' );
+    my @dev_rows = $dev_rs->all;
+    is scalar @dev_rows, 2, '2 tests reported for a devel perl';
+    is_deeply [ sort map { $_->guid } @dev_rows ],
+        [ '00000000-3343-11e7-b830-917e22bfee97', '11111111-3343-11e7-b830-917e22bfee97' ],
+        'correct guids for devel perl';
+
+    my $stable_rs = $schema->resultset( 'Stats' )->perl_maturity( 'stable' );
+    my @stable_rows = $stable_rs->all;
+    is scalar @stable_rows, 1, '1 test reported for a stable perl';
+    is $stable_rows[0]->guid, 'd0ab4d36-3343-11e7-b830-917e22bfee97',
+        'correct guid for stable perl';
+};
+
 done_testing;
 
 

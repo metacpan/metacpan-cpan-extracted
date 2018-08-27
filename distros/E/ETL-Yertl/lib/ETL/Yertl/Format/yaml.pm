@@ -1,174 +1,63 @@
 package ETL::Yertl::Format::yaml;
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 # ABSTRACT: YAML read/write support for Yertl
+
+#pod =head1 SYNOPSIS
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<ETL::Yertl::FormatStream>
+#pod
+#pod =cut
 
 use ETL::Yertl;
 use base 'ETL::Yertl::Format';
-use Module::Runtime qw( use_module );
-use ETL::Yertl::Util qw( pairs );
 
-#pod =attr format_module
-#pod
-#pod The module being used for this format. Possible modules, in order of importance:
-#pod
-#pod =over 4
-#pod
-#pod =item L<YAML::XS> (any version)
-#pod
-#pod =item L<YAML::Syck> (any version)
-#pod
-#pod =item L<YAML> (any version)
-#pod
-#pod =item L<YAML::Tiny> (any version)
-#pod
-#pod =back
-#pod
-#pod =cut
+sub new {
+    my ( $class, @args ) = @_;
+    my $self = $class->SUPER::new( @args );
+    no strict 'refs';
+    $self->{_load} = \&{ $self->{formatter_class} . '::Load' };
+    $self->{_dump} = \&{ $self->{formatter_class} . '::Dump' };
+    return $self;
+}
 
-# Pairs of module => supported version
-our @FORMAT_MODULES = (
-    'YAML::XS' => 0,
-    'YAML::Syck' => 0,
-    #'YAML' => 0, # Disabled: YAML::Old changes have broke something here...
-    'YAML::Tiny' => 0,
-);
+sub _formatter_classes {
+    return (
+        [ 'YAML::XS' => 0 ],
+        [ 'YAML::Syck' => 0 ],
+        # [ 'YAML' => 0 ], # Disabled: YAML::Old changes have broke something here...
+        [ 'YAML::Tiny' => 0 ],
+    );
+}
 
-sub format_module {
-    my ( $self ) = @_;
-    return $self->{_format_module} if $self->{_format_module};
-    for my $format_module ( pairs @FORMAT_MODULES ) {
-        eval {
-            # Prototypes on use_module() make @$format_module not work correctly
-            use_module( $format_module->[0], $format_module->[1] );
-        };
-        if ( !$@ ) {
-            return $self->{_format_module} = $format_module->[0];
+sub read_buffer {
+    my ( $self, $buffref, $eof ) = @_;
+    my @docs;
+    $self->{_doc_buf} ||= '';
+    while ( $$buffref =~ s/^(.*\n)// ) {
+        my $line = $1;
+        if ( $line =~ /^---/ && $self->{_doc_buf} ) {
+            #; say STDERR "## Got document\n$self->{_doc_buf}";
+            push @docs, $self->{_load}->( $self->{_doc_buf} );
+            $self->{_doc_buf} = '';
+        }
+        else {
+            $self->{_doc_buf} .= $line;
         }
     }
-    die "Could not load a formatter for YAML. Please install one of the following modules:\n"
-        . join( "",
-            map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
-            pairs @FORMAT_MODULES
-        )
-        . "\n";
+    if ( $eof && $self->{_doc_buf} ) {
+        #; say STDERR "## Got document\n$self->{_doc_buf}";
+        push @docs, $self->{_load}->( $self->{_doc_buf} );
+    }
+    return @docs;
 }
 
-
-# Hash of MODULE => formatter sub
-my %FORMAT_SUB = (
-
-    'YAML::XS' => {
-        decode => sub {
-            my ( $self, $msg ) = @_;
-            return YAML::XS::Load( $msg );
-        },
-
-        write => sub {
-            my $self = shift;
-            return YAML::XS::Dump( @_ );
-        },
-
-        read => sub {
-            my $self = shift;
-            my $yaml = do { local $/; readline $self->{input} };
-            return $yaml ? YAML::XS::Load( $yaml ) : ();
-        },
-
-    },
-
-    'YAML::Syck' => {
-        decode => sub {
-            my ( $self, $msg ) = @_;
-            return YAML::Syck::Load( $msg );
-        },
-
-        write => sub {
-            my $self = shift;
-            return YAML::Syck::Dump( @_ );
-        },
-
-        read => sub {
-            my $self = shift;
-            my $yaml = do { local $/; readline $self->{input} };
-            return $yaml ? YAML::Syck::Load( $yaml ) : ();
-        },
-
-    },
-
-    'YAML' => {
-        decode => sub {
-            my ( $self, $msg ) = @_;
-            return YAML::Load( $msg );
-        },
-
-        write => sub {
-            my $self = shift;
-            return YAML::Dump( @_ );
-        },
-
-        read => sub {
-            my $self = shift;
-            my $yaml = do { local $/; readline $self->{input} };
-            return $yaml ? YAML::Load( $yaml ) : ();
-        },
-
-    },
-
-    'YAML::Tiny' => {
-        decode => sub {
-            my ( $self, $msg ) = @_;
-            return YAML::Tiny::Load( $msg );
-        },
-
-        write => sub {
-            my $self = shift;
-            return YAML::Tiny::Dump( @_ );
-        },
-
-        read => sub {
-            my $self = shift;
-            my $yaml = do { local $/; readline $self->{input} };
-            return $yaml ? YAML::Tiny::Load( $yaml ) : ();
-        },
-
-    },
-
-);
-
-#pod =method write( DOCUMENTS )
-#pod
-#pod Convert the given C<DOCUMENTS> to YAML. Returns a YAML string.
-#pod
-#pod =cut
-
-sub write {
-    my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{write}->( $self, @_ );
-}
-
-#pod =method read()
-#pod
-#pod Read a YAML string from L<input> and return all the documents.
-#pod
-#pod =cut
-
-sub read {
-    my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{read}->( $self );
-}
-
-#pod =method decode
-#pod
-#pod     my $msg = $yaml->decode( $bytes );
-#pod
-#pod Decode the given bytes into a single data structure. C<$bytes> must be
-#pod a single YAML document.
-#pod
-#pod =cut
-
-sub decode {
-    my ( $self, $msg ) = @_;
-    return $FORMAT_SUB{ $self->format_module }{decode}->( $self, $msg );
+sub format {
+    my ( $self, $doc ) = @_;
+    return $self->{_dump}->( $doc );
 }
 
 1;
@@ -183,42 +72,15 @@ ETL::Yertl::Format::yaml - YAML read/write support for Yertl
 
 =head1 VERSION
 
-version 0.037
+version 0.039
 
-=head1 ATTRIBUTES
+=head1 SYNOPSIS
 
-=head2 format_module
+=head1 DESCRIPTION
 
-The module being used for this format. Possible modules, in order of importance:
+=head1 SEE ALSO
 
-=over 4
-
-=item L<YAML::XS> (any version)
-
-=item L<YAML::Syck> (any version)
-
-=item L<YAML> (any version)
-
-=item L<YAML::Tiny> (any version)
-
-=back
-
-=head1 METHODS
-
-=head2 write( DOCUMENTS )
-
-Convert the given C<DOCUMENTS> to YAML. Returns a YAML string.
-
-=head2 read()
-
-Read a YAML string from L<input> and return all the documents.
-
-=head2 decode
-
-    my $msg = $yaml->decode( $bytes );
-
-Decode the given bytes into a single data structure. C<$bytes> must be
-a single YAML document.
+L<ETL::Yertl::FormatStream>
 
 =head1 AUTHOR
 

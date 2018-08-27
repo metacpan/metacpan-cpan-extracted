@@ -19,8 +19,8 @@ to instantiate it directly .. which isn’t very useful per se.
 
 =head1 DESCRIPTION
 
-This is the extension to use with the experimental ACME TLS ALPN
-challenge, described at
+This is the X.509 extension to use when creating validation certificates
+for use with the experimental ACME TLS ALPN challenge, described at
 L<https://datatracker.ietf.org/doc/draft-ietf-acme-tls-alpn/>.
 
 =cut
@@ -33,9 +33,8 @@ use constant {
     # id-pkix = 1.3.6.1.5.5.7
     # id-pe = id-pkix 1
     # id-pe-acmeIdentifier = id-pe 31
-    # id-pe-acmeIdentifier-v1 = id-pe-acmeIdentifier 1
     #
-    OID => '1.3.6.1.5.5.7.1.30.1',
+    OID => '1.3.6.1.5.5.7.1.31',
 
     CRITICAL => 1,
 

@@ -1,0 +1,96 @@
+NAME
+    App::ISBNUtils - Command-line utilities related to ISBN
+
+VERSION
+    This document describes version 0.002 of App::ISBNUtils (from Perl
+    distribution App-ISBNUtils), released on 2018-08-23.
+
+DESCRIPTION
+    This distribution contains the following command-line utilities related
+    to ISBN:
+
+    *   format-isbn10
+
+    *   format-isbn13
+
+FUNCTIONS
+  format_isbn10
+    Usage:
+
+     format_isbn10(%args) -> [status, msg, result, meta]
+
+    Format ISBN 10, print error if number is invalid.
+
+    You can feed an ISBN 13 and it will be converted to ISBN 10 (as long as
+    the ISBN 13 prefix is 978-).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   isbn10* => *isbn10*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  format_isbn13
+    Usage:
+
+     format_isbn13(%args) -> [status, msg, result, meta]
+
+    Format ISBN 13, print error if number is invalid.
+
+    You can feed an ISBN 10 and it will be converted to ISBN 13.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   isbn13* => *isbn13*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ISBNUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ISBNUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ISBNUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    isbn from App::isbn
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

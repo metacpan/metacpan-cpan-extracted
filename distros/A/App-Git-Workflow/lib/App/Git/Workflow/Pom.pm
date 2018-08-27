@@ -16,7 +16,7 @@ use App::Git::Workflow::Repository qw//;
 use App::Git::Workflow;
 use base qw/App::Git::Workflow/;
 
-our $VERSION = 1.0.8;
+our $VERSION = 1.0.9;
 
 sub new {
     my $class = shift;
@@ -62,7 +62,7 @@ sub get_pom_versions {
             # skip branches marked as OLD
             next BRANCH if !$run && $saved->{old};
 
-            my $current = $self->commit_details($branch);
+            my $current = eval { $self->commit_details($branch) } or next;
 
             # Skip any branches that are over $MAX_AGE old
             if ( $current->{time} < time - $max_age ) {
@@ -79,13 +79,15 @@ sub get_pom_versions {
                 next BRANCH;
             }
 
-            my $xml = $self->git->show("$branch:$pom");
+            my $xml = eval { $self->git->show("$branch:$pom"); };
+
+            next if !$xml;
             chomp $xml;
             next if !$xml;
 
             $branch =~ s{^origin/}{}xms;
 
-            my $numerical = my $version = eval { $self->pom_version($xml) };
+            my $numerical = my $version = eval { $self->pom_version($xml, $pom) };
 
             # make sure we get a valid version
             if ( $@ || !defined $numerical ) {
@@ -114,7 +116,13 @@ sub get_pom_versions {
 }
 
 sub pom_version {
-    my ($self, $xml) = @_;
+    my ($self, $xml, $pom) = @_;
+
+    if ( $pom && $pom =~ /[.]json$/ ) {
+        require JSON;
+        my $json = JSON::decode_json($xml);
+        return $json->{version};
+    }
 
     my $doc = XML::Tiny::parsefile( $xml !~ /\n/ && -f $xml ? $xml : '_TINY_XML_STRING_' . $xml);
 
@@ -151,7 +159,7 @@ App::Git::Workflow::Pom - Tools for maven POM files with git
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Pom version 1.0.8
+This documentation refers to App::Git::Workflow::Pom version 1.0.9
 
 =head1 SYNOPSIS
 

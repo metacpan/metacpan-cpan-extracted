@@ -38,7 +38,7 @@ perldoc command.
 LICENSE AND COPYRIGHT
 ---------------------
 
-Copyright (C) 2014-2017 Jeremy Volkening <jdv@base2bio.com>
+Copyright (C) 2014-2018 Jeremy Volkening <jdv@base2bio.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free

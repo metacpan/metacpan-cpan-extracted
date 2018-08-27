@@ -1,23 +1,25 @@
 package Git::CPAN::Patch::Command::FormatPatch;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Format patches using C<cpan/master> as the origin reference
-$Git::CPAN::Patch::Command::FormatPatch::VERSION = '2.3.2';
-use 5.10.0;
+$Git::CPAN::Patch::Command::FormatPatch::VERSION = '2.3.4';
+use 5.20.0;
 
 use strict;
 use warnings;
 
-use Method::Signatures::Simple;
 
 use MooseX::App::Command;
 
 with 'Git::CPAN::Patch::Role::Git';
 with 'Git::CPAN::Patch::Role::Patch';
 
+use experimental qw/
+    signatures
+    postderef
+/;
 
-method run {
-    $self->format_patch;
-}
+
+sub run ($self) { $self->format_patch }
 
 __PACKAGE__->meta->make_immutable;
 
@@ -35,7 +37,7 @@ Git::CPAN::Patch::Command::FormatPatch - Format patches using C<cpan/master> as 
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 SYNOPSIS
 
@@ -63,7 +65,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

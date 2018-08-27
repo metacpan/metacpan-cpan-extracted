@@ -1,0 +1,7 @@
+#! /bin/sh
+
+rm -f "/home/dimitar/Google Drive/dev/perl-misc/ddmitov/DBD-SQLeet.zip"
+cd ..
+zip "/home/dimitar/Google Drive/dev/perl-misc/ddmitov/DBD-SQLeet.zip" -r DBD-SQLeet
+cd "/home/dimitar/Google Drive"
+grive

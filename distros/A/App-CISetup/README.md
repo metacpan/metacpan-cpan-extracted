@@ -4,7 +4,7 @@ App::CISetup - Command line tools to generate and update Travis and AppVeyor con
 
 # VERSION
 
-version 0.13
+version 0.14
 
 # DESCRIPTION
 
@@ -28,7 +28,7 @@ Zak B. Elep <zakame@zakame.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MaxMind, Inc.
+This software is Copyright (c) 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

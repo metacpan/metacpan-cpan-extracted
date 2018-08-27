@@ -26,7 +26,7 @@ where the only valid option at the moment is
 
 EOD
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 my $rdln = Term::ReadLine->new ('Solve Sudoku and other set-allocation puzzles');
 my $OUT = $rdln->OUT || \*STDOUT;

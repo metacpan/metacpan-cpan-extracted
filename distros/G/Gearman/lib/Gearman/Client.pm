@@ -1,6 +1,6 @@
 package Gearman::Client;
 use version ();
-$Gearman::Client::VERSION = version->declare("2.004.014");
+$Gearman::Client::VERSION = version->declare("2.004.015");
 
 use strict;
 use warnings;
@@ -87,6 +87,22 @@ Calls L<Gearman::Objects> to set I<job_servers>
 prefix
 
 Calls I<prefix> (see L<Gearman::Objects>) to set the prefix / namespace.
+
+=item
+
+command_timeout
+
+Maximum time a gearman command should take to get a result (not a job timeout)
+
+default: 30 seconds
+
+=item
+
+backoff_max
+
+Max number of failed connection attempts before an job server will be temporary disabled
+
+default: 90
 
 =back
 

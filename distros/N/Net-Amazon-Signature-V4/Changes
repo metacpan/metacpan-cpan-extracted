@@ -1,4 +1,8 @@
 Revision history for Net-Amazon-Signature-v4
+0.19	2018-08-24
+		- Fix error in signature if a URI path component is 0 (GH#4)
+		- Fix canonical path encoding for use in Elasticsearch service (GH#6)
+
 0.18	2017-11-21
 		- Performance optimizations to request canonicalization
 

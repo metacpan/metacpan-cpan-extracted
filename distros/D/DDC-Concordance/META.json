@@ -33,7 +33,7 @@
       "runtime" : {
          "recommends" : {
             "Alien::DDC::Concordance" : "0.002",
-            "DDC::XS" : "0.14"
+            "DDC::XS" : "0.21"
          },
          "requires" : {
             "IO::Socket::INET" : "0",
@@ -54,6 +54,6 @@
          "web" : "https://sourceforge.net/p/ddc-concordance/code/HEAD/tree/ddc-perl/"
       }
    },
-   "version" : "0.41",
+   "version" : "0.42",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

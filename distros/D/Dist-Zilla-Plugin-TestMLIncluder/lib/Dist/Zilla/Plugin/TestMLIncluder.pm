@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::TestMLIncluder;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -76,17 +76,40 @@ sub munge_file {
     $content .= <<'...';
 
 use Config;
-open IN, '<', 'inc/bin/testml-cpan' or die;
+use File::Find;
+
+my $file = 'inc/bin/testml-cpan';
+open IN, '<', $file or die "Can't open '$file' for input";
 my @bin = <IN>;
 close IN;
 
 shift @bin;
 unshift @bin, "#!$Config{perlpath}\n";
-open OUT, '>', 'inc/bin/testml-cpan' or die;
+open OUT, '>', $file or die "Can't open '$file' for output";
 print OUT @bin;
 close OUT;
 
 chmod 0755, 'inc/bin/testml-cpan';
+
+if ($^O eq 'MSWin32') {
+  my $file = 'inc/bin/testml-cpan.cmd';
+  open OUT, '>', $file or die "Can't open '$file' for output";
+  print OUT 'if exist %~dpn0 perl %0 %*', "\r\n";
+  close OUT;
+
+  find sub {
+    return unless -f && /\.t$/;
+    my $file = $_;
+    open IN, '<', $file or die "Can't open '$file' for input";
+    return unless <IN> =~ /testml-cpan/;
+    my $text = do {local $/; <IN>};
+    close IN;
+    open OUT, '>', $file or die "Can't open '$file' for output";
+    print OUT '#!inc\\bin\\testml-cpan', "\r\n";
+    print OUT $text;
+    close OUT;
+  }, 't';
+}
 ...
     $file->content($content);
   }

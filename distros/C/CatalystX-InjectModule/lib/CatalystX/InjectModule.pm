@@ -1,7 +1,7 @@
 use utf8;
 
 package CatalystX::InjectModule;
-$CatalystX::InjectModule::VERSION = '0.13';
+$CatalystX::InjectModule::VERSION = '0.14';
 use Moose::Role;
 use namespace::autoclean;
 use CatalystX::InjectModule::MI;
@@ -69,7 +69,7 @@ CatalystX::InjectModule - injects modules containing components, plugins, config
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 This module is at EXPERIMENTAL stage, so use with caution.
 

@@ -1,13 +1,12 @@
 package Git::CPAN::Patch::Command::Import;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Import a module into a git repository
-$Git::CPAN::Patch::Command::Import::VERSION = '2.3.2';
-use 5.10.0;
+$Git::CPAN::Patch::Command::Import::VERSION = '2.3.4';
+use 5.20.0;
 
 use strict;
 use warnings;
 use File::Temp qw/ tempdir /;
-use Method::Signatures::Simple;
 use Git::Repository;
 use Git::CPAN::Patch::Import;
 use File::chdir;
@@ -31,7 +30,7 @@ has tmpdir => (
   }
 );
 
-use experimental qw(smartmatch);
+use experimental qw(smartmatch signatures);
 
 our $PERL_GIT_URL = 'git://perl5.git.perl.org/perl.git';
 
@@ -86,7 +85,7 @@ option author_email => (
     documentation => "explicitly set the author's email",
 );
 
-method get_releases_from_url($url) {
+sub get_releases_from_url($self,$url) {
     require LWP::Simple;
 
     ( my $name = $url ) =~ s#^.*/##;
@@ -103,11 +102,11 @@ method get_releases_from_url($url) {
     );
 }
 
-method get_releases_from_local_file($path) {
+sub get_releases_from_local_file($self,$path) {
     return Git::CPAN::Patch::Release->new( metacpan => $self->metacpan, tarball => $path );
 }
 
-method clone_git_repo($release,$url) {
+sub clone_git_repo($self,$release,$url) {
     $self->git_run( 'remote', 'add', 'cpan', $url );
     {
         # git will output the tags on STDERR
@@ -127,7 +126,7 @@ sub looks_like_git {
     return $repo->{url} =~ /github\.com|\.git$/;
 }
 
-method get_releases_from_cpan($dist_or_module) {
+sub get_releases_from_cpan($self,$dist_or_module) {
 
     # is it a module belonging to a distribution?
     my $dist = eval{ $self->metacpan->module($dist_or_module)->data->{distribution}
@@ -176,7 +175,7 @@ method get_releases_from_cpan($dist_or_module) {
     return sort { $a->date cmp $b->date } @releases;
 }
 
-method releases_to_import {
+sub releases_to_import ($self) {
     given ( $self->thing_to_import ) {
         when ( qr/^(?:https?|file|ftp)::/ ) {
             return $self->get_releases_from_url( $_ );
@@ -190,7 +189,7 @@ method releases_to_import {
     }
 }
 
-method import_release($release) {
+sub import_release($self,$release) {
     my $import_version = $release->dist_version;
 
     if ( $self->check and $self->last_imported_version ) {
@@ -264,7 +263,7 @@ END
     $self->git_run( config => 'cpan.module-name', $release->dist_name );
 }
 
-method run {
+sub run ($self) {
     my @releases = $self->releases_to_import;
 
     for my $r ( @releases ) {
@@ -291,7 +290,7 @@ Git::CPAN::Patch::Command::Import - Import a module into a git repository
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 SYNOPSIS
 
@@ -375,7 +374,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

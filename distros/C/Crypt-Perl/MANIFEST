@@ -1,6 +1,7 @@
 .gitignore
 .travis.yml
 Changes
+LICENSE
 MANIFEST
 Makefile.PL
 README.pod

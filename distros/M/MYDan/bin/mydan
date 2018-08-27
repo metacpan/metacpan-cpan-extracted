@@ -48,6 +48,7 @@ my @cmd =
     [ 'diagnosis', "系统诊断.\n", 'dan/diagnosis/bin/diagnosis' ],
     [ 'tcpserver', "脚本提供tcp服务.\n", 'dan/tools/tcpserver' ],
     [ 'deploy', "本地发布切连接小工具.\n", 'dan/tools/deploy' ],
+    [ 'secure', "私密文件管理小工具.\n", 'dan/tools/secure', 'box/tools/secure' ],
 
     [ 'diskSpaceControl', "控制磁盘使用空间在某个百分比.\n", 'dan/tools/diskSpaceControl', 'box/tools/diskSpaceControl' ],
 

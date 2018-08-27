@@ -1,25 +1,31 @@
 Revision history for Perl module Symbol::Get
 
-0.01 Mon 19 Dec 2016
-    - original version; created by ExtUtils::ModuleMaker 0.55
+0.10 Fri 24 Aug 2018
+    - Fix LICENSE file (again)
 
-0.02 Tue 20 Dec 2016
-    - Add get_names(), and failure tests
+0.09 Fri 24 Aug 2018
+    - Fix LICENSE file.
 
-0.03 Wed 21 Dec 2016
-    - Teach get() how to handle constants
-
-0.04 Thu 22 Dec 2016
-    - Teach get() how to handle list constants
-
-0.05 Fri 23 Dec 2016
-    - Accommodate pre-5.20 Perl versions’ storage of list constants
-
-0.06 Wed 08 Feb 2017
-    - Add copy_constant() for more reliable access to constants.
+0.08 Thu 21 Sep 2017
+    - Fix SYNOPSIS to show correct usage.
 
 0.07 Thu 09 Feb 2017
     - Disown get() for constants. It’s just not reliable.
 
-0.08 Thu 21 Sep 2017
-    - Fix SYNOPSIS to show correct usage.
+0.06 Wed 08 Feb 2017
+    - Add copy_constant() for more reliable access to constants.
+
+0.05 Fri 23 Dec 2016
+    - Accommodate pre-5.20 Perl versions’ storage of list constants
+
+0.04 Thu 22 Dec 2016
+    - Teach get() how to handle list constants
+
+0.03 Wed 21 Dec 2016
+    - Teach get() how to handle constants
+
+0.02 Tue 20 Dec 2016
+    - Add get_names(), and failure tests
+
+0.01 Mon 19 Dec 2016
+    - original version; created by ExtUtils::ModuleMaker 0.55

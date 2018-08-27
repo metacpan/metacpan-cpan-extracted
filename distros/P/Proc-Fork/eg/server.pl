@@ -13,10 +13,10 @@ my $server = IO::Socket::INET->new(
 
 my $client;
 while ($client = $server->accept) {
-    run_fork { child {
-        # Service the socket
-        sleep(10);
-        print $client "Ooga! ", time % 1000, "\n";
-        exit; # child exits. Parent loops to accept another connection.
-    } }
+	run_fork { child {
+		# Service the socket
+		sleep(10);
+		print $client "Ooga! ", time % 1000, "\n";
+		exit; # child exits. Parent loops to accept another connection.
+	} }
 }

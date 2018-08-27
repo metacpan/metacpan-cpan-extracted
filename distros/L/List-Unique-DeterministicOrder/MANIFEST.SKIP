@@ -1,0 +1,14 @@
+.git
+
+blib
+
+.bak
+
+.old
+
+MYMETA
+
+^Makefile$
+
+appveyor\.yml
+\.travis\.yml

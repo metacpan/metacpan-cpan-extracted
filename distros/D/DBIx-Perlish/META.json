@@ -1,0 +1,56 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Dmitry Karasik <dmitry@karasik.eu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Perlish",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "t"
+      ],
+      "file" : [
+         "Makefile.PL"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "Devel::Caller" : "0",
+            "Keyword::Pluggable" : "1.01",
+            "Pod::Markdown" : "3.1",
+            "perl" : "5.014001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/dk/DBIx-Perlish"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -4,7 +4,7 @@
       "-2017  Florian Pritz <bluewind@xinu.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "gpl_3"
    ],
@@ -69,6 +69,7 @@
       },
       "test" : {
          "requires" : {
+            "Log::Any::Adapter::TAP" : "0",
             "Software::License::GPL_3" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
@@ -82,7 +83,7 @@
    "provides" : {
       "App::BorgRestore" : {
          "file" : "lib/App/BorgRestore.pm",
-         "version" : "v3.0.0"
+         "version" : "v3.1.0"
       },
       "App::BorgRestore::Borg" : {
          "file" : "lib/App/BorgRestore/Borg.pm"
@@ -108,6 +109,7 @@
          "web" : "https://github.com/Bluewind/App-BorgRestore"
       }
    },
-   "version" : "3.0.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "3.1.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 0
 }

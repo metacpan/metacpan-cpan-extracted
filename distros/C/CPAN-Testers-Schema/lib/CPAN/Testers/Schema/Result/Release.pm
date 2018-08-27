@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Release;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Collected test report stats about a single CPAN release
 
 #pod =head1 SYNOPSIS
@@ -221,7 +221,7 @@ CPAN::Testers::Schema::Result::Release - Collected test report stats about a sin
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -325,19 +325,9 @@ release was last updated.
 
 L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

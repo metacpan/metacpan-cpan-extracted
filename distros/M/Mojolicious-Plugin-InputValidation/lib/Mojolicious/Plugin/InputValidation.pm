@@ -1,5 +1,5 @@
 package IV_ANY;
-sub new { bless {@_}, shift }
+sub new { my $class = shift; bless {@_}, $class }
 sub optional { shift->{optional} }
 sub nillable { shift->{nillable} }
 sub error { my $self = shift; $self->{error} = shift if @_; $self->{error} }
@@ -20,7 +20,7 @@ sub accepts {
 
 package IV_WORD;
 use base 'IV_ANY';
-sub new { bless {@_}, shift }
+sub new { my $class = shift; bless {@_}, $class }
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
@@ -32,7 +32,7 @@ sub accepts {
 
 package IV_FLOAT;
 use base 'IV_ANY';
-sub new { bless {@_}, shift }
+sub new { my $class = shift; bless {@_}, $class }
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
@@ -44,7 +44,7 @@ sub accepts {
 
 package IV_INT;
 use base 'IV_ANY';
-sub new { bless {@_}, shift }
+sub new { my $class = shift; bless {@_}, $class }
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
@@ -169,7 +169,7 @@ sub accepts {
         return 0;
     }
 
-    for my $key (@want_keys) {
+    for my $key (grep { $have_keys{$_} } @want_keys) {
         my $err = Mojolicious::Plugin::InputValidation::_validate_structure($value->{$key}, $self->{pattern}{$key}, "$path/$key");
 
         if ($err) {
@@ -183,7 +183,7 @@ sub accepts {
 
 package IV_DATETIME;
 use base 'IV_ANY';
-sub new { bless {@_}, shift }
+sub new { my $class = shift; bless {@_}, $class }
 sub pattern {
     my $self         = shift;
     $self->{pattern} = shift if @_;
@@ -202,7 +202,7 @@ package Mojolicious::Plugin::InputValidation;
 use Mojo::Base 'Mojolicious::Plugin';
 no strict 'subs';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Mojo::Util 'monkey_patch';
 

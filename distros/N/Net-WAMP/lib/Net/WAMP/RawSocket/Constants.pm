@@ -12,6 +12,8 @@ use constant {
         undef,
         'json',
         'msgpack',
+        'cbor',
+        #'ubjson',
     ],
 
     HANDSHAKE_ERR_1 => 'serializer unsupported',

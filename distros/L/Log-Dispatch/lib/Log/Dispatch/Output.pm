@@ -3,13 +3,13 @@ package Log::Dispatch::Output;
 use strict;
 use warnings;
 
-our $VERSION = '2.67';
+our $VERSION = '2.68';
 
 use Carp ();
 use Try::Tiny;
 use Log::Dispatch;
 use Log::Dispatch::Types;
-use Log::Dispatch::Vars qw( %LevelNamesToNumbers @OrderedLevels );
+use Log::Dispatch::Vars qw( @OrderedLevels );
 use Params::ValidationCompiler qw( validation_for );
 
 use base qw( Log::Dispatch::Base );
@@ -39,7 +39,8 @@ sub new {
         my $self = shift;
         my %p    = $validator->(@_);
 
-        return unless $self->_should_log( $p{level} );
+        my $level_num = $self->_level_as_number( $p{level} );
+        return unless $self->_should_log($level_num);
 
         local $! = undef;
         $p{message} = $self->_apply_callbacks(%p)
@@ -47,6 +48,22 @@ sub new {
 
         $self->log_message(%p);
     }
+
+    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    sub _log_with_num {
+        my $self      = shift;
+        my $level_num = shift;
+        my %p         = @_;
+
+        return unless $self->_should_log($level_num);
+
+        local $! = undef;
+        $p{message} = $self->_apply_callbacks(%p)
+            if $self->{callbacks};
+
+        $self->log_message(%p);
+    }
+    ## use critic
 }
 
 {
@@ -81,8 +98,7 @@ sub new {
         my $self = shift;
         my %p    = $validator->(@_);
 
-        $self->{level_names}   = \@OrderedLevels;
-        $self->{level_numbers} = \%LevelNamesToNumbers;
+        $self->{level_names} = \@OrderedLevels;
 
         $self->{name} = $p{name} || $self->_unique_name();
 
@@ -129,28 +145,11 @@ sub accepted_levels {
 }
 
 sub _should_log {
-    my $self = shift;
+    my $self      = shift;
+    my $level_num = shift;
 
-    my $msg_level = $self->_level_as_number(shift);
-    return (   ( $msg_level >= $self->{min_level} )
-            && ( $msg_level <= $self->{max_level} ) );
-}
-
-sub _level_as_number {
-    my $self  = shift;
-    my $level = shift;
-
-    unless ( defined $level ) {
-        Carp::croak 'undefined value provided for log level';
-    }
-
-    unless ( Log::Dispatch->level_is_valid($level) ) {
-        Carp::croak "$level is not a valid Log::Dispatch log level";
-    }
-
-    return $level if $level =~ /\A[0-7]+\z/;
-
-    return $self->{level_numbers}{$level};
+    return (   ( $level_num >= $self->{min_level} )
+            && ( $level_num <= $self->{max_level} ) );
 }
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
@@ -204,7 +203,7 @@ Log::Dispatch::Output - Base class for all Log::Dispatch::* objects
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -336,7 +335,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

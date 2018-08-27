@@ -1,5 +1,13 @@
 Revision history for Perl extension Web::Query
 
+0.39 2018-08-21
+  [ BUG FIXES ]
+    - localize $@ in destructor to prevent clobbering. (GH#51, Maurice
+      Aubrey)
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 81 insertions(+), 4 deletions(-)
+
 0.38 2016-07-03
   [ BUG FIXES ]
     - HTML::Selector::XPath 0.19 has a bug regarding '//b' expressions.

@@ -5,7 +5,7 @@ use warnings;
 
 use Call::Context ();
 
-our $VERSION = 0.08;
+our $VERSION = '0.10';
 
 =encoding utf-8
 

@@ -4,13 +4,18 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.625';
+our $VERSION = '1.627';
 
+
+use Encode qw( decode );
+
+use Encode::Locale qw();
 use Win32::Console qw( STD_INPUT_HANDLE ENABLE_MOUSE_INPUT ENABLE_PROCESSED_INPUT STD_OUTPUT_HANDLE
                        RIGHT_ALT_PRESSED LEFT_ALT_PRESSED RIGHT_CTRL_PRESSED LEFT_CTRL_PRESSED SHIFT_PRESSED
                        FOREGROUND_INTENSITY BACKGROUND_INTENSITY );
 
-use Term::Choose::Constants qw( :win32 );
+use Win32::Console::PatchForRT33513 qw();
+use Term::Choose::Constants         qw( :win32 );
 
 
 sub SHIFTED_MASK () {
@@ -20,7 +25,6 @@ sub SHIFTED_MASK () {
     | LEFT_CTRL_PRESSED
     | SHIFT_PRESSED
 }
-
 
 
 sub new {
@@ -41,7 +45,7 @@ sub __get_key_OS {
                 return CONTROL_SPACE;
             }
             else {
-                return $char;
+                return ord decode( 'console_in', chr( $char & 0xff ) );
             }
         }
         else{
@@ -93,38 +97,43 @@ sub __get_key_OS {
 
 
 sub __set_mode {
-    my ( $self, $mouse, $hide_cursor ) = @_;
+    my ( $self, $config ) = @_;
     $self->{input} = Win32::Console->new( STD_INPUT_HANDLE );
     $self->{old_in_mode} = $self->{input}->Mode();
-    $self->{input}->Mode( !ENABLE_PROCESSED_INPUT )                    if ! $mouse;
-    $self->{input}->Mode( !ENABLE_PROCESSED_INPUT|ENABLE_MOUSE_INPUT ) if   $mouse;
+    if ( $config->{mouse} ) {
+        $self->{input}->Mode( !ENABLE_PROCESSED_INPUT|ENABLE_MOUSE_INPUT );
+    }
+    else {
+        $self->{input}->Mode( !ENABLE_PROCESSED_INPUT );
+    }
     $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
-    $self->{def_attr} = $self->{output}->Attr();
-    $self->{fg_color} = $self->{def_attr} & 0x7;
-    $self->{bg_color} = $self->{def_attr} & 0x70;
-    $self->{inverse}  = ( $self->{bg_color} >> 4 ) | ( $self->{fg_color} << 4 );
-    $self->{output}->Cursor( -1, -1, -1, 0 ) if $hide_cursor;
-    return $mouse;
+    $self->{curr_attr} = $self->{output}->Attr();
+    $self->{fg_color}  = $self->{curr_attr} & 0x7;
+    $self->{bg_color}  = $self->{curr_attr} & 0x70;
+    $self->{fill_attr} = $self->{bg_color} | $self->{bg_color};
+    $self->{inverse}   = ( $self->{bg_color} >> 4 ) | ( $self->{fg_color} << 4 );
+    if ( $self->{hide_cursor} = $config->{hide_cursor} ) {
+        $self->__hide_cursor();
+    }
+    return $config->{mouse};
 }
 
 
 sub __reset_mode {
-    my ( $self, $mouse, $hide_cursor ) = @_;  # no use for $mouse on win32
+    my ( $self ) = @_;
     if ( defined $self->{input} ) {
         if ( defined $self->{old_in_mode} ) {
             $self->{input}->Mode( $self->{old_in_mode} );
             delete $self->{old_in_mode};
         }
         $self->{input}->Flush;
-        # workaround Bug #33513:
-        delete $self->{input}{handle};
-        #
     }
     if ( defined $self->{output} ) {
         $self->__reset;
-        $self->{output}->Cursor( -1, -1, -1, 1 ) if $hide_cursor;
         #$self->{output}->Free();
-        delete $self->{output}{handle}; # ?
+    }
+    if ( delete $self->{hide_cursor} ) {
+        $self->__show_cursor();
     }
 }
 
@@ -148,26 +157,63 @@ sub __set_cursor_position {
 }
 
 
-sub __clear_screen {
+sub __hide_cursor {
     my ( $self ) = @_;
-    $self->{output}->Cls( $self->{def_attr} );
+    if ( ! exists $self->{output}{handle} || ! defined $self->{output}{handle} ) {
+        $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
+    }
+    $self->{output}->Cursor( -1, -1, -1, 0 );
 }
 
 
-sub __clear_to_end_of_screen {
+sub __show_cursor {
+    my ( $self ) = @_;
+    if ( ! exists $self->{output}{handle} || ! defined $self->{output}{handle} ) {
+        $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
+    }
+    $self->{output}->Cursor( -1, -1, -1, 1 );
+}
+
+
+sub __clear_screen {
+    my ( $self ) = @_;
+    if ( ! exists $self->{output}{handle} || ! defined $self->{output}{handle} ) {
+        $self->{output} = Win32::Console->new( STD_OUTPUT_HANDLE );
+    }
+    if ( ! defined $self->{curr_attr} ) {
+        $self->{curr_attr} = $self->{output}->Attr();
+    }
+    $self->{output}->Cls( $self->{curr_attr} );
+}
+
+
+sub __clear_lines_to_end_of_screen {
     my ( $self ) = @_;
     my ( $width, $height ) = $self->{output}->Size();
     $self->__get_cursor_position();
+    $self->__set_cursor_position( 0, $self->{abs_cursor_y}  );
     $self->{output}->FillAttr(
-            $self->{bg_color} | $self->{bg_color},
+            $self->{fill_attr},
             $width * $height,
-            $self->{abs_cursor_x}, $self->{abs_cursor_y} );
+            0, $self->{abs_cursor_y} );
+}
+
+
+sub __clear_line {
+    my ( $self ) = @_;
+    my ( $width, $height ) = $self->{output}->Size(); #
+    $self->__get_cursor_position();
+    $self->__set_cursor_position( 0, $self->{abs_cursor_y} );
+    $self->{output}->FillAttr(
+            $self->{fill_attr},
+            $width,
+            0, $self->{abs_cursor_y} );
 }
 
 
 sub __bold_underline {
     my ( $self ) = @_;
-    $self->{output}->Attr( $self->{def_attr} | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY  );
+    $self->{output}->Attr( $self->{curr_attr} | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY  );
 }
 
 
@@ -179,26 +225,34 @@ sub __reverse {
 
 sub __reset {
     my ( $self ) = @_;
-    $self->{output}->Attr( $self->{def_attr} );
+    $self->{output}->Attr( $self->{curr_attr} );
 }
 
 
 sub __up {
-    #my ( $self, $rows_up ) = @_;
-    my ( $col, $row ) = $_[0]->__get_cursor_position;
-    $_[0]->__set_cursor_position( $col, $row - $_[1] );
+    my ( $self, $rows_up ) = @_;
+    $self->__get_cursor_position;
+    $self->__set_cursor_position( $self->{abs_cursor_x}, $self->{abs_cursor_y} - $rows_up );
 }
 
+
+sub __down {
+    my ( $self, $rows_down ) = @_;
+    $self->__get_cursor_position;
+    $self->__set_cursor_position( $self->{abs_cursor_x}, $self->{abs_cursor_y} + $rows_down );
+}
+
+
 sub __left {
-    #my ( $self, $cols_left ) = @_;
-    my ( $col, $row ) = $_[0]->__get_cursor_position;
-    $_[0]->__set_cursor_position( $col - $_[1], $row );
+    my ( $self, $cols_left ) = @_;
+    $self->__get_cursor_position;
+    $self->__set_cursor_position( $self->{abs_cursor_x} - $cols_left, $self->{abs_cursor_y} );
 }
 
 sub __right {
-    #my ( $self, $cols_right ) = @_;
-    my ( $col, $row ) = $_[0]->__get_cursor_position;
-    $_[0]->__set_cursor_position( $col + $_[1], $row );
+    my ( $self, $cols_right ) = @_;
+    $self->__get_cursor_position;
+    $self->__set_cursor_position( $self->{abs_cursor_x} + $cols_right, $self->{abs_cursor_y} );
 }
 
 

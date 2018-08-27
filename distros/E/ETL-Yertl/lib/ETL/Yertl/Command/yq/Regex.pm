@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yq::Regex;
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 # ABSTRACT: A regex-based parser for programs
 
 use ETL::Yertl;
@@ -349,7 +349,7 @@ ETL::Yertl::Command::yq::Regex - A regex-based parser for programs
 
 =head1 VERSION
 
-version 0.037
+version 0.039
 
 =head1 AUTHOR
 

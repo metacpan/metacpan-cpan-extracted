@@ -173,10 +173,9 @@ generates a topology that looks like this
 
 Originally there was a third argument giving the total size of the
 puzzle. Beginning with version 0.005_01 this was deprecated, since it
-appeared to me to be redundant. As of version 0.018_01
-specification of this will result in a warning. As of the first release
-after September 15 2018, all uses of this argument will result in a
-warning, and six month after that it will become fatal.
+appeared to me to be redundant. As of version [% next_version %],
+all uses of this argument will result in a warning. Six months after
+that it will become fatal.
 
 Setting this attribute modifies the following "real" attributes:
 
@@ -578,7 +577,7 @@ use warnings;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 our @EXPORT_OK = qw{
     SUDOKU_SUCCESS
     SUDOKU_NO_SOLUTION
@@ -2255,7 +2254,7 @@ eod
     my %deprecate = (
 	brick_third_argument	=> {
 	    message	=> 'Specifying 3 values for set( brick => ... ) is deprecated',
-	    level	=> 1,
+	    level	=> 2,
 	},
     );
 

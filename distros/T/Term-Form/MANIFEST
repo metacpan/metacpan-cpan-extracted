@@ -1,7 +1,5 @@
 Changes
 lib/Term/Form.pm
-lib/Term/Form/Linux.pm
-lib/Term/Form/Win32.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

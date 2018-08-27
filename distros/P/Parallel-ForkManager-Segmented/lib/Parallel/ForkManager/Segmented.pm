@@ -1,5 +1,5 @@
 package Parallel::ForkManager::Segmented;
-$Parallel::ForkManager::Segmented::VERSION = '0.0.1';
+$Parallel::ForkManager::Segmented::VERSION = '0.0.2';
 use strict;
 use warnings;
 use 5.014;
@@ -34,6 +34,13 @@ sub run
     my $cb         = $args->{process_item};
     my $nproc      = $args->{nproc};
     my $batch_size = $args->{batch_size};
+
+    # Return prematurely on empty input to avoid calling $ch with undef()
+    # at least once.
+    if ( not @$items )
+    {
+        return;
+    }
 
     my $pm;
 
@@ -79,11 +86,12 @@ __END__
 
 =head1 NAME
 
-Parallel::ForkManager::Segmented - use Parallel::ForkManager on batches / segments of items.
+Parallel::ForkManager::Segmented - use Parallel::ForkManager on batches /
+segments of items.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -104,7 +112,9 @@ version 0.0.1
     my $PWD       = Cwd::getcwd();
     my @WML_FLAGS = (
         qq%
-    --passoption=2,-X3074 --passoption=2,-I../lib/ --passoption=3,-I../lib/ --passoption=3,-w -I../lib/ $ENV{LATEMP_WML_FLAGS} -p1-3,5,7 -DROOT~. -DLATEMP_THEME=sf.org1 -I $HOME/apps/wml
+    --passoption=2,-X3074 --passoption=2,-I../lib/ --passoption=3,-I../lib/
+    --passoption=3,-w -I../lib/ $ENV{LATEMP_WML_FLAGS} -p1-3,5,7 -DROOT~.
+    -DLATEMP_THEME=sf.org1 -I $HOME/apps/wml
     % =~ /(\S+)/g
     );
 
@@ -136,7 +146,11 @@ version 0.0.1
         my $src      = "$lfn.wml";
         if ( $UNCOND or is_newer( $src, $abs_dest ) )
         {
-            push @queue, [ [ $abs_dest, "-DLATEMP_FILENAME=$lfn", $src, ], $dest ];
+            push @queue,
+            [
+                [ $abs_dest, "-DLATEMP_FILENAME=$lfn", $src, ],
+                $dest,
+            ];
         }
     }
     my $to_proc = [ map $_->[1], @queue ];
@@ -162,7 +176,7 @@ version 0.0.1
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 METHODS
 

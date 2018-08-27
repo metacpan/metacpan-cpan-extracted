@@ -1,7 +1,9 @@
 Revision history for DBIx-Perlish
+1.01 27 Aug 2017
+       Migrate to Keyword::Pluggable so db_ functions are macros 
 
-0.64 Wed Feb 11 13:02:55 CET 2015
-       Optimize multi-inserts a bit (use prepare/execute where feasible)
+1.00 30 Apr 2018
+       Break compatibility with 5.8-5.13 to work on perls above 5.20
 
 0.63 Wed Oct 15 15:30:09 CEST 2014
        From szabgab: add GitHub link to META files and thus to MetaCPAN.org

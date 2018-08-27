@@ -1,3 +1,6 @@
+0.29 Fri Aug 24 19:16:42 PDT 2018
+ - Fixes for TestML on windows
+
 0.28 Sat Jul 28 15:24:54 PDT 2018
  - Switch to new TestML for tests
 

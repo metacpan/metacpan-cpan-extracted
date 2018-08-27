@@ -498,7 +498,7 @@ our $configure_aws1=sub {
 
    1. Sign in to the AWS Management Console and open the IAM console at:
 
-      https://console.aws.amazon.com/iam/#users
+      https://console.aws.amazon.com/iam/home#/users/admin?section=security_credentials
 
    2. Click the blue checkbox of the name of the user you want to create
       an access key for:

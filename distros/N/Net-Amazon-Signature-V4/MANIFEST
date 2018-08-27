@@ -107,6 +107,11 @@ t/aws4_testsuite/get-vanilla.creq
 t/aws4_testsuite/get-vanilla.req
 t/aws4_testsuite/get-vanilla.sreq
 t/aws4_testsuite/get-vanilla.sts
+t/aws4_testsuite/get-zero.authz
+t/aws4_testsuite/get-zero.creq
+t/aws4_testsuite/get-zero.req
+t/aws4_testsuite/get-zero.sreq
+t/aws4_testsuite/get-zero.sts
 t/aws4_testsuite/post-header-key-case.authz
 t/aws4_testsuite/post-header-key-case.creq
 t/aws4_testsuite/post-header-key-case.req

@@ -5,7 +5,7 @@ use Time::HiRes qw/sleep/;
 
 {
     package Jopa;
-    use parent qw/Class::Accessor::Inherited::XS/;
+    use parent qw/Class::Accessor::Inherited::XS::Compat/;
 }
 
 Jopa->mk_inherited_accessors('foo');

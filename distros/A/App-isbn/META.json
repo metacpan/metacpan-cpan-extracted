@@ -34,11 +34,13 @@
       "runtime" : {
          "requires" : {
             "App::lcpan::Call" : "0.11",
+            "Data::Sah::Coerce::perl::str::str_to_isbn" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Log::ger" : "0.023",
             "PERLANCAR::Module::List" : "0",
             "Perinci::CmdLine::Any" : "0",
+            "Sah::Schema::isbn" : "0",
             "WWW::Scraper::ISBN" : "0",
             "WWW::Scraper::ISBN::AmazonDE_Driver" : "0",
             "WWW::Scraper::ISBN::Blackwell_Driver" : "0",
@@ -69,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-isbn"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

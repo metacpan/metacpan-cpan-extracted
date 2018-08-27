@@ -1,5 +1,7 @@
 # -*- Mode: CPerl -*-
 use Test::More tests=>18;
+
+#use lib qw(../blib/lib ../blib/arch);
 use DDC::XS;
 
 ##-- 1..3: sample, sort

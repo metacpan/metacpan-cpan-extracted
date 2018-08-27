@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -42,7 +42,7 @@ __PACKAGE__->upgrade_directory( dist_dir( 'CPAN-Testers-Schema' ) );
 
 #pod =method connect_from_config
 #pod
-#pod     my $schema = CPAN::Testers::Schema->connect_from_config;
+#pod     my $schema = CPAN::Testers::Schema->connect_from_config( %extra_conf );
 #pod
 #pod Connect to the MySQL database using a local MySQL configuration file
 #pod in C<$HOME/.cpanstats.cnf>. This configuration file should look like:
@@ -55,10 +55,14 @@ __PACKAGE__->upgrade_directory( dist_dir( 'CPAN-Testers-Schema' ) );
 #pod
 #pod See L<DBD::mysql/mysql_read_default_file>.
 #pod
+#pod C<%extra_conf> will be added to the L<DBIx::Class::Schema/connect>
+#pod method in the C<%dbi_attributes> hashref (see
+#pod L<DBIx::Class::Storage::DBI/connect_info>).
+#pod
 #pod =cut
 
 # Convenience connect method
-sub connect_from_config ( $class ) {
+sub connect_from_config ( $class, %config ) {
     my $schema = $class->connect(
         "DBI:mysql:mysql_read_default_file=$ENV{HOME}/.cpanstats.cnf;".
         "mysql_read_default_group=application;mysql_enable_utf8=1",
@@ -70,6 +74,7 @@ sub connect_from_config ( $class ) {
             mysql_enable_utf8 => 1,
             quote_char => '`',
             name_sep   => '.',
+            %config,
         },
     );
     return $schema;
@@ -104,7 +109,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -132,7 +137,7 @@ processing, data APIs, and the frontend web application.
 
 =head2 connect_from_config
 
-    my $schema = CPAN::Testers::Schema->connect_from_config;
+    my $schema = CPAN::Testers::Schema->connect_from_config( %extra_conf );
 
 Connect to the MySQL database using a local MySQL configuration file
 in C<$HOME/.cpanstats.cnf>. This configuration file should look like:
@@ -145,6 +150,10 @@ in C<$HOME/.cpanstats.cnf>. This configuration file should look like:
 
 See L<DBD::mysql/mysql_read_default_file>.
 
+C<%extra_conf> will be added to the L<DBIx::Class::Schema/connect>
+method in the C<%dbi_attributes> hashref (see
+L<DBIx::Class::Storage::DBI/connect_info>).
+
 =head2 ordered_schema_versions
 
 Get the available schema versions by reading the files in the share
@@ -155,23 +164,13 @@ L<cpantesters-schema> script.
 
 L<CPAN::Testers::Schema::Result::Stats>, L<DBIx::Class>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
 
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
-
 =head1 CONTRIBUTORS
 
-=for stopwords Breno G. de Oliveira Joel Berger Mohammad S Anwar Nick Tonkin
+=for stopwords Breno G. de Oliveira Joel Berger Mohammad S Anwar Nick Tonkin Paul Cochrane
 
 =over 4
 
@@ -190,6 +189,10 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 =item *
 
 Nick Tonkin <1nickt@users.noreply.github.com>
+
+=item *
+
+Paul Cochrane <paul@liekut.de>
 
 =back
 

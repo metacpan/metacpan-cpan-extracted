@@ -1,0 +1,14 @@
+Changes
+lib/Keyword/Pluggable.pm
+Makefile.PL
+MANIFEST
+Pluggable.xs
+t/00-load.t
+t/basic.t
+t/global.t
+t/package.t
+t/eval.t
+t/lineno.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

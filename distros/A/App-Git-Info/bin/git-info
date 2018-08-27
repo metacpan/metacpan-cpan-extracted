@@ -1,9 +1,13 @@
 #!/usr/bin/env perl
 
+# ABSTRACT: Displays a summary of information about the git repository.
+
 use strict;
 use warnings;
 
 use App::Git::Info;
+
+run();
 
 # PODNAME: git-info
 
@@ -15,13 +19,19 @@ __END__
 
 =head1 NAME
 
-git-info
+git-info - Displays a summary of information about the git repository.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
+
+=head1 NAME
+
+=head1 VERSION
+
+version 0.2.0
 
     shlomif@telaviv1:~/conf/trunk$ git info info
     ⇒ On branch master
@@ -30,14 +40,6 @@ version 0.0.2
     origin  git@github.com:shlomif/shlomif-computer-settings.git (fetch)
     origin  git@github.com:shlomif/shlomif-computer-settings.git (push)
     shlomif@telaviv1:~/conf/trunk$
-
-=head1 NAME
-
-git-info - displays a summary of information about the git repository.
-
-=head1 VERSION
-
-version 0.0.2
 
 =head1 TIP
 

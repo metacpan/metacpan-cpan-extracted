@@ -36,7 +36,7 @@
             "GraphViz2" : "2.34",
             "Graphics::ColorNames" : "2.11",
             "MIME::Base64" : "3.14",
-            "Map::Tube" : "3.54",
+            "Map::Tube" : "3.55",
             "Map::Tube::Exception" : "3.17",
             "Moo::Role" : "2.000000",
             "namespace::autoclean" : "0.28",
@@ -47,11 +47,11 @@
    "provides" : {
       "Map::Tube::Plugin::Graph" : {
          "file" : "lib/Map/Tube/Plugin/Graph.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Map::Tube::Plugin::Graph::Utils" : {
          "file" : "lib/Map/Tube/Plugin/Graph/Utils.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Plugin-Graph"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

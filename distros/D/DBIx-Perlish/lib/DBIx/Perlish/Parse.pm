@@ -1,5 +1,5 @@
 package DBIx::Perlish::Parse;
-use 5.008;
+use 5.014;
 use warnings;
 use strict;
 
@@ -8,6 +8,7 @@ our $_cover;
 
 use B;
 use Carp;
+use Devel::Caller qw(caller_cv);
 
 sub bailout
 {
@@ -54,6 +55,8 @@ gen_is("padop");
 gen_is("svop");
 gen_is("unop");
 gen_is("pmop");
+gen_is("methop");
+gen_is("unop_aux");
 
 sub is_const
 {
@@ -125,7 +128,7 @@ sub want_const
 sub want_variable_method
 {
 	my ($S, $op) = @_;
-	return unless is_unop($op, "method");
+	return unless is_unop($op, "method") || is_methop($op, "method");
 	$op = $op->first;
 	return unless is_null($op->sibling);
 	my ($name, $ok) = get_value($S, $op, soft => 1);
@@ -136,12 +139,16 @@ sub want_variable_method
 sub want_method
 {
 	my ($S, $op) = @_;
-	unless (is_svop($op, "method_named")) {
+	my $sv;
+	if ( is_methop($op, "method_named")) {
+		$sv = $op->meth_sv;
+	} elsif ( is_svop($op, "method_named")) {
+		$sv = $op->sv;
+	} else {
 		my $r = want_variable_method($S, $op);
 		bailout $S, "method call syntax expected" unless $r;
 		return $r;
 	}
-	my $sv = $op->sv;
 	if (!$$sv) {
 		$sv = $S->{padlist}->[1]->ARRAYelt($op->targ);
 	}
@@ -170,6 +177,7 @@ sub padname
 	my $padname = $S->{padlist}->[0]->ARRAYelt($op->targ);
 	if ($padname && !$padname->isa("B::SPECIAL")) {
 		return if $p{no_fakes} && $padname->FLAGS & B::SVf_FAKE;
+		return unless defined $padname->PVX;
 		return "my " . $padname->PVX;
 	} else {
 		return "my #" . $op->targ;
@@ -184,7 +192,7 @@ sub get_padlist_scalar_by_name
 	for (my $k = 0; $k < @n; $k++) {
 		next if $n[$k]->isa("B::SPECIAL");
 		next if $n[$k]->isa("B::NULL");
-		if ($n[$k]->PVX eq $n) {
+		if (($n[$k]->PVX // '') eq $n) {
 			my $v = $padlist->[1]->ARRAYelt($k);
 			if (!$v->isa("B::SPECIAL")) {
 				return $v;
@@ -217,6 +225,172 @@ sub get_padlist_scalar
 	$v = $v->object_2svref;
 	return $v if $ref_only;
 	return $$v;
+}
+
+sub bailout_multiref_vivify($)
+{
+	my $S = shift;
+	bailout $S, 
+		"accessing fields syntax is not supported anymore; for tables use methods instead, ".
+		"for arrayrefs and hashrefs don't leave them unassigned"
+}
+
+sub aux_init_padsv
+{
+	my ( $S ) = @_;
+
+ 	my $inner = $S->{curr_cv}->PADLIST;
+	return {
+		S                   => $S,
+		inner               => $inner,
+		orig_pads           => [ $inner->ARRAY ]->[1],
+		names               => [ $inner->NAMES->ARRAY ],
+		outer_padlist       => undef,
+		outer_padlist_array => undef,
+		padlist             => [],
+	};
+}
+
+sub aux_get_padsv
+{
+	my ( $store, $index ) = @_;
+
+	unless ( defined $store->{padlist}->[$index] ) {
+		my $padname = $store->{names}->[$index];
+		if ( $padname->FLAGS & B::SVf_FAKE && $store->{inner}->outid > 1) {
+			unless ($store->{outer_padlist}) {
+				$store->{outer_padlist} = $store->{S}->{padlists}->{$store->{inner}->outid};
+				unless ($store->{outer_padlist}) {
+					# hacky hacky - look up the caller stack to get their padlists, maybe?
+					my $id = 0;
+					while ( 1 ) {
+						my $sub  = caller_cv($id++) or last;
+						my $padlist = B::svref_2object($sub)->PADLIST;
+						$store->{S}->{padlists}->{$padlist->id} //= [$padlist->ARRAY];
+						next unless $padlist->id == $store->{inner}->outid;
+						$store->{outer_padlist} = $store->{S}->{padlists}->{$store->{inner}->outid};
+						last;
+					}
+				}
+				bailout $store->{S}, "cannot refer to an outer padlist ".$store->{inner}->outid
+					unless $store->{outer_padlist};
+				$store->{outer_padlist_array} = [$store->{outer_padlist}->[1]->ARRAY];
+			}
+			$store->{padlist}->[$index] = $store->{outer_padlist_array}->[ $padname->PARENT_PAD_INDEX ];
+		} else {
+			$store->{padlist}->[$index] = $store->{orig_pads}->ARRAYelt($index);
+		}
+	}
+
+	return $store->{padlist}->[$index];
+}
+
+sub parse_multideref
+{
+	my ( $S, $aux ) = @_;
+ 	my @items = $aux->aux_list($S->{curr_cv});
+	my @ret;
+
+	my $AUX = aux_init_padsv($S);
+
+ 	ITEMS: while ( @items ) {
+ 		my $actions = shift @items;
+
+		my $ref;
+		my $sv = shift(@items) or bailout $S, "unexpected empty multideref";
+
+		while ( my $ptr = shift @items ) {
+ 			my $access  = $actions & B::MDEREF_ACTION_MASK();
+			unless ($ref) {
+ 				if (
+ 					$access == B::MDEREF_HV_padhv_helem() ||
+ 					$access == B::MDEREF_AV_padav_aelem() ||
+ 					$access == B::MDEREF_HV_padsv_vivify_rv2hv_helem() ||
+ 					$access == B::MDEREF_AV_padsv_vivify_rv2av_aelem()
+ 				) {
+ 					$ref  = aux_get_padsv($AUX, $sv)->object_2svref;
+					bailout_multiref_vivify $S
+						if !$ref || ((ref($ref) eq 'SCALAR') && !$$ref);
+				} elsif (
+                		        $access == B::MDEREF_HV_pop_rv2hv_helem() ||
+                		        $access == B::MDEREF_HV_vivify_rv2hv_helem() ||
+					$access == B::MDEREF_HV_gvhv_helem()
+				) {
+					bailout_multiref_vivify $S unless ref($sv);
+					$ref = $sv->HV->object_2svref;
+				} elsif (
+                		        $access == B::MDEREF_AV_pop_rv2av_aelem() ||
+                		        $access == B::MDEREF_AV_vivify_rv2av_aelem() ||
+					$access == B::MDEREF_AV_gvav_aelem()
+				) {
+					bailout_multiref_vivify $S unless ref($sv);
+					$ref = $sv->AV->object_2svref;
+				} else {
+					bailout $S, "don't quite know what to do with multideref access=$access";
+ 				}
+			}
+ 
+			my $key;
+			my $index = $actions & B::MDEREF_INDEX_MASK();
+
+			if ( $index != B::MDEREF_INDEX_none() ) {
+				if ( $index == B::MDEREF_INDEX_const() ) {
+					$key = ${$ptr->object_2svref};
+				} elsif ( $index == B::MDEREF_INDEX_padsv() ) {
+ 					$key  = aux_get_padsv($AUX, $ptr)->object_2svref;
+				} elsif ( $index == B::MDEREF_INDEX_gvsv() ) {
+					$key = ${$ptr->object_2svref};
+				}
+ 				$ref = $$ref if ref($ref) =~ /REF|SCALAR/;
+ 				$ref = (
+ 					$access == B::MDEREF_HV_padhv_helem() ||
+ 					$access == B::MDEREF_HV_padsv_vivify_rv2hv_helem() ||
+                		        $access == B::MDEREF_HV_pop_rv2hv_helem() ||
+                		        $access == B::MDEREF_HV_vivify_rv2hv_helem() ||
+					$access == B::MDEREF_HV_gvhv_helem()
+				) ? $ref->{$key} : $ref->[$key];
+
+				if (!$ref && (
+					$access == B::MDEREF_AV_gvsv_vivify_rv2av_aelem () ||
+					$access == B::MDEREF_AV_padsv_vivify_rv2av_aelem() ||
+					$access == B::MDEREF_AV_vivify_rv2av_aelem      () ||
+					$access == B::MDEREF_HV_gvsv_vivify_rv2hv_helem () ||
+					$access == B::MDEREF_HV_padsv_vivify_rv2hv_helem() ||
+					$access == B::MDEREF_HV_vivify_rv2hv_helem      ()
+				)) {
+					push @ret, undef;
+					last ITEMS;
+				}
+			}
+			if ($index == B::MDEREF_INDEX_none() || $index & B::MDEREF_FLAG_last()) {
+				push @ret, $ref;
+				last;
+			}
+			$actions >>= B::MDEREF_SHIFT();
+ 		}
+
+		push @ret, $ref unless @ret;
+	}
+
+	bailout $S, "cannot infer single multideref value" unless 1 == @ret;
+
+	return $ret[0];
+}
+
+sub get_concat_value
+{
+	my ( $S, @args) = @_;
+	my $val = '';
+	for my $op ( @args ) {
+		my ($rv, $ok);
+		if ( $rv = is_const($S, $op)) {
+		} else {
+			($rv, $ok) = get_value($S, $op, soft => 1, eval => 1);
+			bailout $S, "cannot parse expression (near $val)" unless $ok;
+		}
+		$val .= $rv;
+	}
+	return $val;
 }
 
 sub get_value
@@ -259,7 +433,17 @@ sub get_value
 	} elsif (is_unop($op, "null") && (is_svop($op->first, "gvsv") || is_padop($op->first, "gvsv"))) {
 		my $gv = get_gv($S, $op->first, bailout => 1);
 		$val = ${$gv->SV->object_2svref};
+	} elsif (is_unop($op, "null") && is_unop_aux($op->first, "multideref")) {
+		$val = parse_multideref($S, $op->first);
+	} elsif ( $p{eval} && is_binop($op, "concat")) {
+		my @args = ($op->first);
+		push @args, $args[-1]->sibling while !is_null($args[-1]) && !is_null($args[-1]->sibling);
+		$val = get_concat_value($S, @args);
+	} elsif ( $p{eval} && is_unop_aux($op, "multiconcat")) {
+		my @terms = parse_multiconcat($S, $op, eval => 1) or goto BAILOUT;
+		$val = join('', map { $_->{str} } @terms);
 	} else {
+	BAILOUT:
 		return () if $p{soft};
 		bailout $S, "cannot parse \"", $op->name, "\" op as a value or value reference";
 	}
@@ -290,6 +474,8 @@ sub find_aliased_tab
 {
 	my ($S, $op) = @_;
 	my $var = padname($S, $op);
+	return "" unless defined $var;
+
 	my $ss = $S;
 	while ($ss) {
 		my $tab;
@@ -381,7 +567,7 @@ sub new_var
 
 sub try_parse_attr_assignment
 {
-	my ($S, $op, $realname) = @_;
+	my ($S, $op, $realname, %opt) = @_;
 	return unless is_unop($op, "entersub");
 	$op = want_unop($S, $op);
 	return unless is_pushmark_or_padrange($op);
@@ -402,7 +588,7 @@ sub try_parse_attr_assignment
 	my @attr = grep { length($_) } split /(?:[\(\)])/, $attr;
 	return unless @attr;
 	$op = $op->sibling;
-	return unless is_svop($op, "method_named");
+	return unless is_methop($op, "method_named") || is_svop($op, "method_named");
 	return unless want_method($S, $op, "import");
 	if ($realname) {
 		if (lc $attr[0] eq "table") {
@@ -415,7 +601,7 @@ sub try_parse_attr_assignment
 	}
 	$attr = join ".", @attr;
 	new_var($S, $varn, $attr);
-	return $attr;
+	return $varn;
 }
 
 sub parse_list
@@ -513,6 +699,7 @@ sub parse_term
 {
 	my ($S, $op, %p) = @_;
 
+	my $placeholder;
 	local $S->{in_term} = 1;
 	if (is_unop($op, "entersub")) {
 		my $funcall = try_funcall($S, $op);
@@ -557,12 +744,9 @@ sub parse_term
 		return wantarray ?
 			("$term is not null", "$term is null") :
 			"$term is not null";
-	} elsif (my ($val, $ok) = get_value($S, $op, soft => 1)) {
-		if (defined $val) {
-			return placeholder_value($S, $val);
-		} else {
-			return "null";
-		}
+	} elsif (($placeholder) = get_value($S, $op, soft => 1)) {
+		return 'null' unless defined $placeholder;
+		goto PLACEHOLDER;
 	} elsif (is_unop($op, "backtick")) {
 		my $fop = $op->first;
 		$fop = $fop->sibling while is_op($fop, "null");
@@ -592,7 +776,8 @@ sub parse_term
 			# This will probably be represented by a string,
 			# we'll let DBI to handle the quoting of a bound
 			# value.
-			return placeholder_value($S, $const);
+			$placeholder = $const;
+			goto PLACEHOLDER;
 		}
 	} elsif (is_pvop($op, "next")) {
 		my $seq = $op->pv;
@@ -608,9 +793,28 @@ sub parse_term
 		}
 	} elsif (is_pmop($op, "match")) {
 		return parse_regex($S, $op, 0);
+	} elsif (is_unop_aux($op, "multideref")) {
+		$placeholder = parse_multideref($S, $op);
+		goto PLACEHOLDER;
+	} elsif (is_unop_aux($op, "multiconcat")) {
+		my ($c, $v) = try_special_concat($S, $op);
+		if ($c) {
+			push @{$S->{values}}, @$v;
+			return "($c)";
+		}
+		bailout $S, "unsupported multiconcat";
 	} else {
+	BAILOUT:
 		bailout $S, "cannot reconstruct term from operation \"",
 				$op->name, '"';
+	}
+
+	PLACEHOLDER:
+	if ( $p{inline_placeholder}) {
+		bailout $S, "cannot inline undefined value" unless defined $placeholder;
+		return $placeholder;
+	} else {
+		return placeholder_value($S, $placeholder);
 	}
 }
 
@@ -630,6 +834,19 @@ sub parse_simple_term
 	if (my ($const,$sv) = is_const($S, $op)) {
 		return $const;
 	} elsif (my ($val, $ok) = get_value($S, $op, soft => 1)) {
+		return $val;
+	} else {
+		bailout $S, "cannot reconstruct simple term from operation \"",
+				$op->name, '"';
+	}
+}
+
+sub parse_simple_eval
+{
+	my ($S, $op) = @_;
+	if (my ($const,$sv) = is_const($S, $op)) {
+		return $const;
+	} elsif (my ($val, $ok) = get_value($S, $op, eval => 1)) {
 		return $val;
 	} else {
 		bailout $S, "cannot reconstruct simple term from operation \"",
@@ -677,19 +894,40 @@ sub try_get_dbfetch
 	return if is_null($dbfetch);
 	return unless is_null($dbfetch->sibling);
 
-	return unless is_unop($rg, "refgen");
+	return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
 	$rg = $rg->first if is_unop($rg->first, "null");
-	return unless is_pushmark_or_padrange($rg->first);
-	my $codeop = $rg->first->sibling;
+	my $codeop = $rg->first;
+	$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
 	return unless is_svop($codeop, "anoncode");
 
 	$dbfetch = $dbfetch->first if is_unop($dbfetch->first, "null");
 	$dbfetch = $dbfetch->first;
 	my $gv = get_gv($S, $dbfetch);
 	return unless $gv;
-	return unless $gv->NAME =~ /^(db_fetch|db_select)$/;
+	return unless $gv->NAME eq 'subselect';
 
 	return $codeop;
+}
+
+sub try_parse_funcall
+{
+	my ($S, $sub, %opt) = @_;
+	$opt{select} //= 1;
+	my $fn;
+	my $sql = try_funcall($S, $sub, only_normal_funcs => 1, func_name_return => \$fn);
+	return unless $sql;
+	if (($S->{gen_args}->{flavor}||"") eq "oracle") {
+		my $cast;
+		if ($cast = $S->{gen_args}{quirks}{oracle_table_func_cast}{$fn}) {
+			$sql = "cast($sql as $cast)";
+		}
+		$sql = "table($sql)";
+		$sql = "select * from $sql" if $opt{select};
+	} elsif ($opt{select})  {
+		# XXX we know this works in postgres, what about the rest?
+		$sql = "select $sql";
+	}
+	return $sql;
 }
 
 sub try_parse_subselect
@@ -702,14 +940,12 @@ sub try_parse_subselect
 
 	if (is_op($sub, "padav")) {
 		my $ary = get_padlist_scalar($S, $sub->targ, "ref only");
-		#my $ary = $S->{padlist}->[1]->ARRAYelt($sub->targ)->object_2svref;
-		bailout $S, "empty array in not valid in \"<-\"" unless @$ary;
+		return '1=0' unless $ary && @$ary;
 		$sql = join ",", ("?") x @$ary;
 		@vals = @$ary;
 	} elsif (is_unop($sub, "rv2av") && is_op($sub->first, "padsv")) {
 		my $ary = get_padlist_scalar($S, $sub->first->targ, "ref only");
-		#my $ary = $S->{padlist}->[1]->ARRAYelt($sub->first->targ)->object_2svref;
-		bailout $S, "empty array in not valid in \"<-\"" unless @$$ary;
+		return '1=0' unless $ary && $$ary && @$$ary;
 		$sql = join ",", ("?") x @$$ary;
 		@vals = @$$ary;
 	} elsif (is_listop($sub, "anonlist") or
@@ -743,20 +979,9 @@ sub try_parse_subselect
 		if ($codeop) {
 			$sql = handle_subselect($S, $codeop);
 		} else {
-			my $fn;
-			$sql = try_funcall($S, $sub, only_normal_funcs => 1, func_name_return => \$fn);
-			return unless $sql;
-			if (($S->{gen_args}->{flavor}||"") eq "oracle") {
-				my $cast;
-				if ($cast = $S->{gen_args}{quirks}{oracle_table_func_cast}{$fn}) {
-					$sql = "cast($sql as $cast)";
-				}
-				$sql = "select * from table($sql)";
-			} else {
-				# XXX we know this works in postgres, what about the rest?
-				$sql = "select $sql";
-			}
+			$sql = try_parse_funcall($S, $sub);
 		}
+		bailout $S, "unsupported syntax in subselect" unless $sql;
 	}
 
 	my $left = parse_term($S, $sop->first, not_after => 1);
@@ -782,9 +1007,9 @@ sub handle_subselect
 		$gen_args{prefix} = $S->{subselect};
 	}
 	$S->{subselect}++;
-	my ($sql, $vals, $nret) = DBIx::Perlish::gen_sql($subref, "select",
+	my ($sql, $vals, $nret, %flags) = DBIx::Perlish::gen_sql($subref, "select",
 		%gen_args);
-	if ($nret != 1 && !$p{returns_dont_care}) {
+	if ($nret != 1 && !$p{returns_dont_care} && !$flags{returns_dont_care}) {
 		bailout $S, "subselect query sub must return exactly one value\n";
 	}
 
@@ -795,7 +1020,6 @@ sub handle_subselect
 sub parse_assign
 {
 	my ($S, $op) = @_;
-
 	if (is_listop($op->last, "list") &&
 		is_pushmark_or_padrange($op->last->first) &&
 		is_unop($op->last->first->sibling, "entersub"))
@@ -814,6 +1038,18 @@ sub parse_assign
 			my $tab = try_parse_attr_assignment($S,
 				$op->last->first->sibling, "($sql)");
 			return if $tab;
+		} elsif ( 
+			is_unop( $op->first, "entersub") 
+			&& ( my $sql = try_parse_funcall($S, $op->first, select => 0))
+		) {
+			# my $p : table = function(1,2,3);
+			my $tab = try_parse_attr_assignment($S,
+				$op->last->first->sibling, $sql);
+			if ( $tab ) {
+				my $alias = $S->{var_alias}->{$tab};
+				$S->{returns_dont_care}->{$alias} = 1;
+				return;
+			}
 		}
 	}
 	bailout $S, "assignments are not understood in $S->{operation}'s query sub"
@@ -841,7 +1077,8 @@ sub parse_simple_assign
 sub callarg
 {
 	my ($S, $op) = @_;
-	$op = $op->first if is_unop($op, "null");
+	$op = $op->first   if is_unop($op, "null");
+	$op = $op->sibling if !is_null($op) && is_op($op, "null");
 	return () if is_pushmark_or_padrange($op);
 	return $op;
 }
@@ -869,10 +1106,10 @@ sub try_funcall
 			return if $p{only_normal_funcs};
 			return unless @args == 1 || @args == 2;
 			my $rg = $args[0];
-			return unless is_unop($rg, "refgen");
+			return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
 			$rg = $rg->first if is_unop($rg->first, "null");
-			return unless is_pushmark_or_padrange($rg->first);
-			my $codeop = $rg->first->sibling;
+			my $codeop = $rg->first;
+			$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
 			return unless is_svop($codeop, "anoncode");
 			return unless $S->{operation} eq "select";
 			my $cv = $codeop->sv;
@@ -886,7 +1123,8 @@ sub try_funcall
 				%gen_args);
 			# XXX maybe check for nret validity
 			push @{$S->{additions}}, {
-				type => $func,
+				type => ((($S->{gen_args}->{flavor}||"") eq "oracle" && $func eq 'except') ? 
+					'minus' : $func),
 				sql  => $sql,
 				vals => $vals,
 			};
@@ -901,14 +1139,14 @@ sub try_funcall
 		if ($p{union_or_friends}) {
 			bailout $S, "missing semicolon after $p{union_or_friends} sub";
 		}
-		if ($func =~ /^(db_fetch|db_select)$/) {
+		if ($func eq 'subselect') {
 			return if $p{only_normal_funcs};
 			return unless @args == 1;
 			my $rg = $args[0];
-			return unless is_unop($rg, "refgen");
+			return unless is_unop($rg, "refgen") || is_unop($rg, "srefgen");
 			$rg = $rg->first if is_unop($rg->first, "null");
-			return unless is_pushmark_or_padrange($rg->first);
-			my $codeop = $rg->first->sibling;
+			my $codeop = $rg->first;
+			$codeop = $codeop->sibling if is_pushmark_or_padrange($codeop);
 			return unless is_svop($codeop, "anoncode");
 			my $sql = handle_subselect($S, $codeop, returns_dont_care => 1);
 			return "exists ($sql)";
@@ -917,7 +1155,7 @@ sub try_funcall
 			return unless @args == 1;
 			# XXX understand more complex expressions here
 			my $sql;
-			return unless $sql = is_const($S, $args[0]);
+			return unless $sql = parse_simple_eval($S, $args[0]);
 			return $sql;
 		}
 		if ($S->{parsing_return} && $S->{aggregates}{lc $func}) {
@@ -1039,6 +1277,7 @@ my %binop2_map = (
 	multiply => "*",
 	divide   => "/",
 	concat   => "||",
+	multiconcat   => "||",
 	pow      => "^",
 );
 
@@ -1069,7 +1308,15 @@ sub parse_expr
 				if $S->{in_term};
 			my $saved_values = $S->{values};
 			$S->{values} = [];
-			my $set = parse_term($S, $op->last);
+			my $set;
+			if ( is_unop_aux($op, 'multiconcat')) {
+				my $v;
+				($set, $v) = try_special_concat($S, $op, multiconcat => { skip_first => 1 });
+				bailout $S, "unsupported multiconcat" unless $set;
+				push @{$S->{values}}, @$v;
+			} else {
+				$set = parse_term($S, $op->last);
+			}
 			push @{$S->{set_values}}, @{$S->{values}};
 			$S->{values} = $saved_values;
 			if ($op->name eq "pow") {
@@ -1085,7 +1332,7 @@ sub parse_expr
 			return ();
 		}
 	}
-	if (is_binop($op, "concat")) {
+	if (is_binop($op, "concat") || is_unop_aux($op, "multiconcat")) {
 		my ($c, $v) = try_special_concat($S, $op);
 		if ($c) {
 			push @{$S->{values}}, @$v;
@@ -1129,16 +1376,45 @@ sub parse_expr
 	}
 }
 
+sub parse_multiconcat
+{
+	my ( $S, $aux, %opt) = @_;
+	my @concats;
+
+	my @args = ($aux->first);
+	push @args, $args[-1]->sibling while !is_null($args[-1]) && !is_null($args[-1]->sibling);
+	shift @args while @args && is_op($args[0], 'null');
+	shift @args if $opt{skip_first};
+
+	my ($nargs, $pv, @lengths) = $aux->aux_list($S->{curr_cv});
+	while ( defined (my $l = shift @lengths )) {
+		if ( $l >= 0 ) {
+			my $str = substr( $pv, 0, $l, '');
+			push @concats, { str => $str };
+		} 
+		my $op = shift(@args) or last;
+		if ( $opt{eval}) {
+			my ($rv, $ok) = get_value($S, $op, soft => 1, eval => 1);
+			bailout $S, "cannot parse expression (near $pv)" unless $ok;
+			push @concats, { str => $rv };
+		} else {
+			push @concats, { op => $op };
+		}
+	}
+
+	return @concats;
+}
+
 sub try_special_concat
 {
-	my ($S, $op, $no_processing) = @_;
+	my ($S, $op, %opt) = @_;
 	my @terms;
 	my $str;
 	if (is_binop($op, "concat")) {
-		my @t = try_special_concat($S, $op->first, "don't process");
+		my @t = try_special_concat($S, $op->first, terms_only => 1);
 		return () unless @t;
 		push @terms, @t;
-		@t = try_special_concat($S, $op->last, "don't process");
+		@t = try_special_concat($S, $op->last, terms_only => 1);
 		return () unless @t;
 		push @terms, @t;
 	} elsif (($str = is_const($S, $op))) {
@@ -1146,7 +1422,7 @@ sub try_special_concat
 	} elsif (is_unop($op, "null")) {
 		$op = $op->first;
 		while (!is_null($op)) {
-			my @t = try_special_concat($S, $op, "don't process");
+			my @t = try_special_concat($S, $op, terms_only => 1);
 			return () unless @t;
 			push @terms, @t;
 			$op = $op->sibling;
@@ -1171,10 +1447,24 @@ sub try_special_concat
 		my $tab = find_aliased_tab($S, $op);
 		return () unless $tab;
 		push @terms, {tab => $tab};
+	} elsif (is_unop_aux($op, "multiconcat")) {
+		my @subterms = parse_multiconcat($S, $op, %{ $opt{multiconcat} // {}});
+		return () unless @subterms;
+		for my $st (@subterms) {
+			if ( defined $st->{str} ) {
+				push @terms, $st;
+			} else {
+				my @t = try_special_concat($S, $st->{op}, terms_only => 1);
+				return () unless @t;
+				push @terms, @t;
+			}
+		}
+	} elsif (is_unop_aux($op, "multideref")) {
+		push @terms, { str => parse_multideref($S, $op ) };
 	} else {
 		return ();
 	}
-	return @terms if $no_processing;
+	return @terms if $opt{terms_only};
 	$str = "";
 	my @sql;
 	my @v;
@@ -1295,9 +1585,9 @@ sub parse_regex
 	my $can_like = $like =~ /^\^?[-!%\s\w]*\$?$/; # like that begins with non-% can use indexes
 	
 	if ( $flavor eq 'mysql') {
-	
 		# mysql LIKE is case-insensitive
 		goto LIKE if not $case and $can_like;
+		$like =~ s/'/''/g;
 
 		return 
 			"$lhs ".
@@ -1312,6 +1602,7 @@ sub parse_regex
 			$what = 'ilike' if $case;
 			goto LIKE;
 		} 
+		$like =~ s/'/''/g;
 		return 
 			"$lhs ".
 			( $neg ? '!' : '') . 
@@ -1350,6 +1641,7 @@ sub parse_regex
 		# return "$lhs $what ?";
 		return ($neg ? "not " : "") . "$what(?, $lhs)";
 	} else {
+		$like =~ s/'/''/g;
 		# XXX is SQL-standard LIKE case-sensitive or not?
 		if ($case) {
 			$lhs = "lower($lhs)";
@@ -1400,7 +1692,7 @@ sub parse_join
 	# allow 2-arg syntax for cross joins:
 	#    join $a * $b
 	# and 3-arg syntax for all other joins:
-	#    join $a * $b => db_fetch { ... }
+	#    join $a * $b => subselect { ... }
 	bailout $S, "not a valid join() syntax"
 		unless 2 <= @op and 3 >= @op and
 			is_pushmark_or_padrange($op[0]) and 
@@ -1433,15 +1725,15 @@ sub parse_join
 	# table names
 	my @tab;
 	$tab[0] = find_aliased_tab($S, $op[1]-> first) or 
-		bailout $S, "first argument join() is not a table";
+		bailout $S, "first argument of join() is not a table";
 	$tab[1] = find_aliased_tab($S, $op[1]-> last) or 
-		bailout $S, "second argument join() is not a table";
+		bailout $S, "second argument of join() is not a table";
 	
-	# db_fetch
+	# subselect
 	my ( $condition, $codeop);
 	if ( $op[2]) {
 		$codeop = try_get_dbfetch( $S, $op[2]);
-		bailout $S, "third argument to join is not a db_fetch expression"
+		bailout $S, "third argument to join is not a subselect expression"
 			unless $codeop;
 
 		my $cv = $codeop->sv;
@@ -1459,7 +1751,7 @@ sub parse_join
 		$S2-> {alias} = $S-> {alias};
 		parse_sub($S2, $subref);
 		bailout $S, 
-			"join() db_fetch expression cannot contain anything ".
+			"join() subselect expression cannot contain anything ".
 			"but conditional expressions on already declared tables"
 				if scalar( grep { @{ $S2-> {$_} } } qw(
 					group_by order_by autogroup_by ret_values joins
@@ -1467,7 +1759,7 @@ sub parse_join
 
 		unless ( @{ $S2->{where}||[] }) {
 			bailout $S, 
-				"join() db_fetch expression must contain ".
+				"join() subselect expression must contain ".
 				"at least one conditional expression"
 					unless $jointype eq 'inner';
 			$jointype = 'cross';
@@ -1585,6 +1877,12 @@ sub parse_orderby_label
 	my @op;
 	if (is_listop($op, "list") || is_listop($op, "sort")) {
 		@op = get_all_children($op);
+	} elsif ( is_unop($op, "null")) {
+		$op = $op->first;
+		while ( $op && !is_null($op)) {
+			push @op, $op;
+			$op = $op->sibling;
+		}
 	} else {
 		push @op, $op;
 	}
@@ -1593,7 +1891,7 @@ sub parse_orderby_label
 		next if is_pushmark_or_padrange($op);
 		# XXX next if is_op($op, "null");
 		my $term;
-		$term = parse_term($S, $op)
+		$term = parse_term($S, $op, inline_placeholder => 1)
 			unless $term = is_const($S, $op);
 		if ($term =~ /^asc/i) {
 			next;  # skip "ascending"
@@ -1735,6 +2033,8 @@ sub parse_op
 {
 	my ($S, $op) = @_;
 
+	return if $S->{seen}->{$$op}++;
+
 	if ($S->{skipnext}) {
 		delete $S->{skipnext};
 		return;
@@ -1782,6 +2082,7 @@ sub parse_op
 		# skip
 	} elsif (is_op($op, "null")) {
 		# skip
+		parse_op($S, $op->sibling);
 	} elsif (is_cop($op, "nextstate")) {
 		$S->{file} = $op->file;
 		$S->{line} = $op->line;
@@ -1812,6 +2113,8 @@ sub parse_op
 		push @{$S->{sets}}, parse_selfmod($S, $op->first, "- 1");
 	} elsif (is_listop($op, "exec")) {
 		$S->{seen_exec}++;
+	} elsif (is_unop_aux($op, "multiconcat")) {
+		where_or_having($S, parse_expr($S, $op));
 	} else {
 		bailout $S, "don't quite know what to do with op \"" . $op->name . "\"";
 	}
@@ -1831,6 +2134,8 @@ sub parse_sub
 	}
 	my $root = B::svref_2object($sub);
 	$S->{padlist} = [$root->PADLIST->ARRAY];
+	$S->{curr_cv} = $root;
+	$S->{padlists}->{ $root->PADLIST->id } = $S->{padlist} if $root->PADLIST->can('id');
 	$root = $root->ROOT;
 	parse_op($S, $root);
 }
@@ -1858,6 +2163,8 @@ sub init
 		aggregates  => { avg => 1, count => 1, max => 1, min => 1, sum => 1 },
 		autogroup_by     => [],
 		autogroup_fields => {},
+		seen        => {},
+		padlists    => $args{prev_S} ? $args{prev_S}->{padlists} : {},
 	};
 	$S->{alias} = $args{prefix} ? "$args{prefix}_t01" : "t01";
 	$S;

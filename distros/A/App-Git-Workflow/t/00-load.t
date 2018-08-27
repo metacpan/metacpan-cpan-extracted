@@ -8,6 +8,7 @@ use File::Spec;
 
 use_ok('App::Git::Workflow');
 use_ok('App::Git::Workflow::Command');
+use_ok('App::Git::Workflow::Command::Amend');
 use_ok('App::Git::Workflow::Command::BranchAge');
 use_ok('App::Git::Workflow::Command::BranchClean');
 use_ok('App::Git::Workflow::Command::Branches');

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 use MCE::Shared::Base ();
 use base 'MCE::Shared::Base::Common';
@@ -1115,7 +1115,7 @@ MCE::Shared::Minidb - A pure-Perl in-memory data store
 
 =head1 VERSION
 
-This document describes MCE::Shared::Minidb version 1.838
+This document describes MCE::Shared::Minidb version 1.839
 
 =head1 DESCRIPTION
 
@@ -1518,7 +1518,7 @@ the key does not exists in the first level hash (H)oH.
 Returns keys stored in the first level hash (H)oH when no arguments are given.
 Otherwise, returns the given fields in the hash stored at key. Fields that do
 not exist will have the C<undef> value. In scalar context, returns the size of
-the object, either the hash store at key or the first level hash.
+the object, either the hash stored at key or the first level hash.
 
  @keys   = $db->hkeys;
  @fields = $db->hkeys( "some_key" );
@@ -1562,7 +1562,7 @@ either the given key or given field does not exists.
 Returns key-value pairs stored in the first level hash (H)oH when no arguments
 are given. Otherwise, returns field-value pairs for the given fields in the hash
 stored at key. Fields that do not exist will have the C<undef> value. In scalar
-context, returns the size of the object, either the hash store at key or the
+context, returns the size of the object, either the hash stored at key or the
 first level hash.
 
  @pairs = $db->hpairs;                 # ( key => href, ... )
@@ -1648,7 +1648,7 @@ to sort from large to small, specify the C<DESC> modifier.
 Returns values stored in the first level hash (H)oH when no arguments are given.
 Otherwise, returns values for the given fields in the hash stored at key. Fields
 that do not exist will have the C<undef> value. In scalar context, returns the
-size of the object, either the hash store at key or the first level hash.
+size of the object, either the hash stored at key or the first level hash.
 
  @hrefs = $db->hvals;
  @vals  = $db->hvals( "some_key" );
@@ -1821,7 +1821,7 @@ the key does not exists in the first level hash (H)oA.
 Returns keys stored in the first level hash (H)oA when no arguments are given.
 Otherwise, returns the given indices in the list stored at key. Indices that do
 not exist will have the C<undef> value. In scalar context, returns the size of
-the object, either the list store at key or the first level hash.
+the object, either the list stored at key or the first level hash.
 
  @keys    = $db->lkeys;
  @indices = $db->lkeys( "some_key" );
@@ -1865,8 +1865,8 @@ if either the given key or given index does not exists.
 Returns key-value pairs stored in the first level hash (H)oA when no arguments
 are given. Otherwise, returns index-value pairs for the given indices in the
 list stored at key. Indices that do not exist will have the C<undef> value.
-In scalar context, returns the size of the object, either the list store at key
-or the first level hash.
+In scalar context, returns the size of the object, either the list stored
+at key or the first level hash.
 
  @pairs = $db->lpairs;                 # ( key => aref, ... )
  @pairs = $db->lpairs( "some_key" );   # ( index => value, ... )
@@ -1996,11 +1996,11 @@ The behavior is similar to the Perl C<splice> function.
 
 =item lvals ( key, [ index [, index, ... ] ] )
 
-Returns values stored in the first level hash (H)oA when no arguments are given.
-Otherwise, returns values for the given indices in the list stored at key.
-Indices that do not exist will have the C<undef> value. In scalar context,
-returns the size of the object, either the list store at key or the first level
-hash.
+Returns values stored in the first level hash (H)oA when no arguments are
+given. Otherwise, returns values for the given indices in the list stored
+at key. Indices that do not exist will have the C<undef> value. In scalar
+context, returns the size of the object, either the list stored at key or
+the first level hash.
 
  @arefs = $db->lvals;
  @vals  = $db->lvals( "some_key" );

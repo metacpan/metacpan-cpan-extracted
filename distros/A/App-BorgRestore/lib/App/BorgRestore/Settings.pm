@@ -75,9 +75,9 @@ If you create a backup of /home/user only, you will need to use the following:
 
 Default: 102400
 
-The size of the in-memory cache of sqlite in kibibytes. This should be large
-enough to fit the database so that adding new backup data does not need to use
-the disk too much.
+The size of the in-memory cache of sqlite in kibibytes. Increasing this may
+reduce disk IO and improve performance on certain systems when updating the
+cache.
 
 =back
 
@@ -105,16 +105,21 @@ See LICENSE for the full license text.
 =cut
 
 our $borg_repo = "backup:borg-".hostname;
-our $cache_path_base = sprintf("%s/borg-restore.pl", $ENV{XDG_CACHE_HOME} // $ENV{HOME}."/.cache");
+our $cache_path_base;
 our @backup_prefixes = (
 	{regex => "^/", replacement => ""},
 );
 our $sqlite_cache_size = 102400;
+my @configfiles;
 
-my @configfiles = (
-	sprintf("%s/borg-restore.cfg", $ENV{XDG_CONFIG_HOME} // $ENV{HOME}."/.config"),
-	"/etc/borg-restore.cfg",
-);
+if (defined $ENV{XDG_CONFIG_HOME} or defined $ENV{HOME}) {
+	push @configfiles, sprintf("%s/borg-restore.cfg", $ENV{XDG_CONFIG_HOME} // $ENV{HOME}."/.config");
+}
+push @configfiles, "/etc/borg-restore.cfg";
+
+if (defined $ENV{XDG_CACHE_HOME} or defined $ENV{HOME}) {
+	$cache_path_base = sprintf("%s/borg-restore.pl", $ENV{XDG_CACHE_HOME} // $ENV{HOME} ."/.cache");
+}
 
 for my $configfile (@configfiles) {
 	$configfile = App::BorgRestore::Helper::untaint($configfile, qr/.*/);
@@ -126,6 +131,13 @@ for my $configfile (@configfiles) {
 		}
 	}
 }
+
+if (not defined $cache_path_base) {
+	die "Error: \$cache_path_base is not defined. This is most likely because the\n"
+	."environment variables \$HOME and \$XDG_CACHE_HOME are not set. Consider setting\n"
+	."the path in the config file or ensure that the variables are set.";
+}
+
 $cache_path_base = App::BorgRestore::Helper::untaint($cache_path_base, qr/.*/);
 
 sub get_cache_base_dir_path {

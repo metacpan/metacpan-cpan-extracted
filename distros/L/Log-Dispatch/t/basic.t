@@ -16,7 +16,7 @@ my %tests;
 
 BEGIN {
     local $@ = undef;
-    foreach (qw( MailSend MIMELite MailSendmail MailSender )) {
+    for (qw( MailSend MIMELite MailSendmail MailSender )) {
         ## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
         eval "use Log::Dispatch::Email::$_";
         $tests{$_} = !$@;
@@ -555,7 +555,7 @@ subtest(
         @levels{qw( warn err crit emerg )}
             = (qw( warning error critical emergency ));
 
-        foreach my $allowed_level (
+        for my $allowed_level (
             qw( debug info notice warning error critical alert emergency )) {
             my $dispatch = Log::Dispatch->new;
 
@@ -569,10 +569,10 @@ subtest(
                 )
             );
 
-            foreach my $test_level (
+            for my $test_level (
                 qw( debug info notice warn warning err
                 error crit critical alert emerg emergency )
-                ) {
+            ) {
                 $string = q{};
                 $dispatch->$test_level( $test_level, 'test' );
 
@@ -630,14 +630,14 @@ subtest(
 subtest(
     'Log::Dispatch->level_is_valid method',
     sub {
-        foreach my $l (
+        for my $l (
             qw( debug info notice warning err error
             crit critical alert emerg emergency )
-            ) {
+        ) {
             ok( Log::Dispatch->level_is_valid($l), "$l is valid level" );
         }
 
-        foreach my $l (qw( debu inf foo bar )) {
+        for my $l (qw( debu inf foo bar )) {
             ok( !Log::Dispatch->level_is_valid($l), "$l is not valid level" );
         }
 

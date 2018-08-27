@@ -1,13 +1,14 @@
 package Module::Version;
-
+our $AUTHORITY = 'cpan:XSAWYERX';
+# ABSTRACT: Get module versions
+$Module::Version::VERSION = '0.13';
 use strict;
 use warnings;
+use parent 'Exporter';
 
-use base 'Exporter';
-use Carp;
+use Carp qw< croak >;
 use ExtUtils::MakeMaker;
 
-our $VERSION   = '0.12';
 our @EXPORT_OK = 'get_version';
 
 sub get_version {
@@ -16,12 +17,16 @@ sub get_version {
 
     $file || return;
 
-    return MM->parse_version($file)
+    return MM->parse_version($file);
 }
 
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -29,7 +34,7 @@ Module::Version - Get module versions
 
 =head1 VERSION
 
-Version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -79,10 +84,6 @@ Accepts a module name and fetches the version of the module.
 
 If the module doesn't exist, returns undef.
 
-=head1 AUTHOR
-
-Sawyer X, C<< <xsawyerx at cpan.org> >>
-
 =head1 BUGS
 
 Please report bugs and other issues on the bugtracker:
@@ -94,13 +95,15 @@ L<http://github.com/xsawyerx/module-version/issues>
 This module sports 100% test coverage, but in case you have more issues, please
 see I<BUGS> above.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2010 Sawyer X.
+Sawyer X
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=head1 COPYRIGHT AND LICENSE
 
-See http://dev.perl.org/licenses/ for more information.
+This software is copyright (c) 2010-2018 by Sawyer X.
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

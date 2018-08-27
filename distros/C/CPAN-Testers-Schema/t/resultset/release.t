@@ -271,6 +271,12 @@ subtest 'by_dist' => sub {
             or diag explain [ $rs->all ];
     };
 
+    subtest 'version' => sub {
+        my $rs = $schema->resultset( 'Release' )->by_dist( 'My-Dist', '1.001' );
+        $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+        is_deeply [ $rs->all ], [ $data{Release}->@[0] ], 'get 1.001 of My-Dist'
+            or diag explain [ $rs->all ];
+    };
 };
 
 subtest 'by_author' => sub {

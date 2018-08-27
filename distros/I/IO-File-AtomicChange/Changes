@@ -1,5 +1,9 @@
 Revision history for IO::File::AtomicChange
 
+0.08      2018-08-22 04:14:30+00:00 UTC
+    [INSTALLATION]
+        - Add path of dist dir to @INC
+
 0.07      2018-08-16 05:12:05+00:00 UTC
     [BUG FIXES]
         - Require IO >= 1.39 to prevent failure of IO::Handle::sync for O_RDONLY file handle

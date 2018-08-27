@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001068';
+our $VERSION = '0.001069';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -640,6 +640,11 @@ sub options {
             section => 'Harness Options',
             usage   => ['-P Module', '--preload Module'],
             summary => ['Preload a module before running tests', 'this option may be given multiple times'],
+            action => sub {
+                my $self = shift;
+                my ($settings, $field, $arg, $opt) = @_;
+                push @{$settings->{preload}}, $arg;
+            },
         },
 
         {
@@ -653,8 +658,7 @@ sub options {
             action => sub {
                 my $self = shift;
                 my ($settings, $field, $arg, $opt) = @_;
-                return unless $settings->{preload};
-                @{$settings->{preload}} = ();
+                delete $settings->{preload};
             },
         },
 

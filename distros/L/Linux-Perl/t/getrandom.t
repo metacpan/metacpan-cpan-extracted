@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Test::More;
-use Test::FailWarnings;
+use Test::FailWarnings -allow_deps => 1;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";

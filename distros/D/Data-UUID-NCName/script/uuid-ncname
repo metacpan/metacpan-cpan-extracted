@@ -6,7 +6,7 @@ uuid-ncname - Command-line converter for UUIDs <-> NCNames
 
 =head1 SYNOPSIS
 
-    uuid-ncname [-r|-n|-i FILE ...]  [uuid-or-ncname, ...]
+    uuid-ncname [-r|-n|-v VERSION|-i FILE ...] [uuid-or-ncname, ...]
 
     uuid-ncname < file
 
@@ -21,8 +21,8 @@ input is piped in, generate a single new NCName, based on a V4 UUID.
 
 =item -r --reverse
 
-Convert input I<from> UUID-NCName identifiers, I<back> into an ordinary
-UUID.
+Explicitly convert input I<from> UUID-NCName identifiers, I<back> into
+an ordinary UUID. (Default is to detect the form of the input.)
 
 =item -n --nocase --nc --32
 
@@ -32,6 +32,20 @@ Generate Base32 UUID-NCNames, rather than Base64.
 
 Take input from the specified file. Can be passed in several times.
 
+=item -v --version 0|1
+
+Specify identifier version. See L<Data::UUID::NCName> for details.
+Defaults to 1.
+
+=item --noalign
+
+Do not align the last few bits to the Base(32, 64) encoding symbols.
+You probably don't want this unless you need to handle mangled input.
+
+=item -h --help
+
+Print this message.
+
 =back
 
 =cut
@@ -40,10 +54,11 @@ use strict;
 use warnings FATAL => 'all';
 
 use Data::UUID::NCName ();
-use UUID::Tiny         ();
 use Getopt::Long       ();
-use Pod::Usage         ();
+#use Pod::Usage         ();
 use Carp               ();
+
+our $VERSION = '0.05';
 
 Getopt::Long::Configure(qw(bundling no_ignore_case));
 
@@ -54,7 +69,9 @@ my $B32  = qr/^\s*([A-Pa-p][2-7A-Za-z]{25})\s*$/;
 my $ALL  = qr/$UUID|$B64|$B32/;
 
 my %p = (
-    input => [],
+    input   => [],
+    version => 1,
+    noalign => 0,
 );
 
 Getopt::Long::GetOptions(
@@ -62,10 +79,15 @@ Getopt::Long::GetOptions(
     'r|reverse'      => \$p{reverse},
     'n|nocase|nc|32' => \$p{nc},
     'u|urn'          => \$p{urn},
+    'v|version=i'    => \$p{version},
+    'noalign'        => \$p{noalign},
     'h|help'         => \$p{help},
 );
 
-exit Pod::Usage::pod2usage(0) if $p{help};
+if ($p{help}) {
+    require Pod::Usage;
+    exit Pod::Usage::pod2usage(0);
+}
 
 my @input;
 
@@ -102,22 +124,30 @@ elsif (@ARGV) {
 #     }
 # }
 else {
+    require UUID::Tiny;
     push @input, lc UUID::Tiny::create_uuid_as_string(&UUID::Tiny::UUID_V4);
 }
+
+my %param = (
+    radix   => $p{nc} ? 32 : 64,
+    version => int !!$p{version},
+    align   => !$p{noalign},
+);
 
 for my $in (@input) {
 
     if (my ($x) = ($in =~ $UUID)) {
         print $p{reverse} ? "$x\n" :
-            Data::UUID::NCName::to_ncname($x, $p{nc} ? 32 : 64) . "\n";
+            Data::UUID::NCName::to_ncname($x, %param) . "\n";
     }
     elsif (($x) = ($in =~ $B64)) {
-        $x = Data::UUID::NCName::from_ncname($x);
+        $x = Data::UUID::NCName::from_ncname($x, %param);
         print $p{nc} && !$p{reverse} ?
-            Data::UUID::NCName::to_ncname($x, 32) . "\n" : "$x\n";
+            Data::UUID::NCName::to_ncname($x, %param) . "\n" : "$x\n";
     }
     elsif (($x) = ($in =~ $B32)) {
-        $x = Data::UUID::NCName::from_ncname($x);
-        print $p{reverse} ? "$x\n" : Data::UUID::NCName::to_ncname($x) . "\n";
+        $x = Data::UUID::NCName::from_ncname($x, %param);
+        print $p{reverse} ? "$x\n" :
+            Data::UUID::NCName::to_ncname($x, %param) . "\n";
     }
 }

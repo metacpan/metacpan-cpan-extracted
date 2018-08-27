@@ -1,13 +1,16 @@
 package ETL::Yertl::Command::ygrok;
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 # ABSTRACT: Parse lines of text into documents
 
 use ETL::Yertl;
-use ETL::Yertl::Util qw( load_module );
+use ETL::Yertl::Util qw( load_module docs_from_string );
 use Getopt::Long qw( GetOptionsFromArray );
 use Regexp::Common;
 use File::HomeDir;
 use Hash::Merge::Simple qw( merge );
+use IO::Async::Loop;
+use ETL::Yertl::Format;
+use ETL::Yertl::FormatStream;
 
 our %PATTERNS = (
     WORD => '\b\w+\b',
@@ -158,14 +161,14 @@ sub main {
                     say $pattern;
                 }
                 else {
-                    my $out_fmt = load_module( format => 'default' )->new;
-                    say $out_fmt->write( $pattern );
+                    my $out_fmt = ETL::Yertl::Format->get_default;
+                    say $out_fmt->format( $pattern );
                 }
             }
             else {
                 # Show all patterns we know about
-                my $out_fmt = load_module( format => 'default' )->new;
-                say $out_fmt->write( $patterns );
+                my $out_fmt = ETL::Yertl::Format->get_default;
+                say $out_fmt->format( $patterns );
             }
         }
 
@@ -181,30 +184,49 @@ sub main {
         $re = qr{^$re$};
     }
 
-    my $out_formatter = load_module( format => 'default' )->new;
+    my $loop = IO::Async::Loop->new;
+
+    my $out = ETL::Yertl::FormatStream->new_for_stdout(
+        autoflush => 1,
+    );
+    $loop->add( $out );
+
     push @files, "-" unless @files;
     for my $file ( @files ) {
 
         # We're doing a similar behavior to <>, but manually for easier testing.
-        my $fh;
+        my %args = (
+            on_read => sub {
+                my ( $self, $buffref, $eof ) = @_;
+                while ( $$buffref =~ s/^(.*)\n// ) {
+                    my $line = $1;
+                    if ( $line =~ $re ) {
+                        my $doc = { %+ };
+                        $out->write( $doc );
+                    }
+                }
+                return 0;
+            },
+            on_read_eof => sub { $loop->stop },
+        );
+        my $in;
         if ( $file eq '-' ) {
-            # Use the existing STDIN so tests can fake it
-            $fh = \*STDIN;
+            $in = IO::Async::Stream->new_for_stdin( %args );
         }
         else {
-            unless ( open $fh, '<', $file ) {
+            open my $fh, '<', $file or do {
                 warn "Could not open file '$file' for reading: $!\n";
                 next;
-            }
+            };
+            $in = IO::Async::Stream->new(
+                read_handle => $fh,
+                %args,
+            );
         }
-
-        while ( my $line = <$fh> ) {
-            #; say STDERR "$line =~ $re";
-            if ( $line =~ $re ) {
-                print $out_formatter->write( { %+ } );
-            }
-        }
+        $loop->add( $in );
+        $loop->run;
     }
+
 }
 
 sub _all_patterns {
@@ -254,8 +276,7 @@ sub config {
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ygrok.yml' );
     my $config = {};
     if ( $conf_file->exists ) {
-        my $yaml = load_module( format => 'yaml' )->new( input => $conf_file->openr );
-        ( $config ) = $yaml->read;
+        ( $config ) = docs_from_string( yaml => $conf_file->slurp );
     }
     return $config;
 }
@@ -276,7 +297,7 @@ sub config_pattern {
         }
         $pattern_category->{ $parts[-1] } = $pattern;
         my $yaml = load_module( format => 'yaml' )->new;
-        $conf_file->spew( $yaml->write( $all_config ) );
+        $conf_file->spew( $yaml->format( $all_config ) );
         return;
     }
     return $pattern_category->{ $parts[-1] } || '';
@@ -294,7 +315,7 @@ ETL::Yertl::Command::ygrok - Parse lines of text into documents
 
 =head1 VERSION
 
-version 0.037
+version 0.039
 
 =head1 AUTHOR
 

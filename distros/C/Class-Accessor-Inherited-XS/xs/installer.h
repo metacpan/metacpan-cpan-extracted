@@ -42,25 +42,27 @@ CAIXS_install_cv(pTHX_ SV* full_name) {
     return cv;
 }
 
-template <AccessorType type> static
-shared_keys*
-CAIXS_install_accessor(pTHX_ SV* full_name, AccessorOpts opts) {
-    CV* cv;
+template <AccessorType type, AccessorOpts opts>
+struct CImpl {
+static shared_keys* CAIXS_install_accessor(pTHX_ AccessorOpts val, SV* full_name) {
+    if (type != InheritedCb && (opts & PushName)) goto next;
+    if (type == InheritedCb && (opts & IsReadonly)) goto next;
+    if (type == Constructor) goto next;
 
-    if ((opts & (IsReadonly | IsWeak)) == (IsReadonly | IsWeak)) {
-        cv = CAIXS_install_cv<type, (AccessorOpts)(IsReadonly | IsWeak)>(aTHX_ full_name);
-
-    } else if (opts & IsReadonly) {
-        cv = CAIXS_install_cv<type, IsReadonly>(aTHX_ full_name);
-
-    } else if (opts & IsWeak) {
-        cv = CAIXS_install_cv<type, IsWeak>(aTHX_ full_name);
-
-    } else {
-        cv = CAIXS_install_cv<type, None>(aTHX_ full_name);
+    if ((val & opts) == opts) {
+        CV* cv = CAIXS_install_cv<type, opts>(aTHX_ full_name);
+        return CAIXS_payload_init<type>(aTHX_ cv);
     }
 
+next:
+    return CImpl<type, (AccessorOpts)(opts-1)>::CAIXS_install_accessor(aTHX_ val, full_name);
+}};
+
+template <AccessorType type>
+struct CImpl<type, (AccessorOpts)0> {
+static shared_keys* CAIXS_install_accessor(pTHX_ int val, SV* full_name) {
+    CV* cv = CAIXS_install_cv<type, None>(aTHX_ full_name);
     return CAIXS_payload_init<type>(aTHX_ cv);
-}
+}};
 
 #endif /* __INHERITED_XS_INSTALLER_H_ */

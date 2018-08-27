@@ -123,6 +123,7 @@ dan/tools/range
 dan/tools/rcall
 dan/tools/release
 dan/tools/rsync
+dan/tools/secure
 dan/tools/shell
 dan/tools/supervisor
 dan/tools/sync
@@ -287,6 +288,7 @@ lib/MYDan/Util/Proxy.pm
 lib/MYDan/Util/ReservedSpace/File.pm
 lib/MYDan/Util/Say.pm
 lib/MYDan/Util/Screen.pm
+lib/MYDan/Util/Secure.pm
 lib/MYDan/Util/SQLiteDB.pm
 lib/MYDan/Util/Sudo.pm
 lib/MYDan/Util/Supervisor.pm

@@ -1,3 +1,6 @@
+0.15 Fri Aug 24 18:55:20 PDT 2018
+ - Fix the new TestML for MSWin32
+
 0.14 Sat Jul 28 15:45:46 PDT 2018
  - Support the new TestML!
 

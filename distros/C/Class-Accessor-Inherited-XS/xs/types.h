@@ -28,13 +28,19 @@ enum AccessorType {
     LazyClass,
 };
 
+/* bitset in disguise */
 enum AccessorOpts {
     None       = 0,
     IsReadonly = 1,
     IsWeak     = 2,
+    PushName   = 4,
 };
 
+/* 2 * last_element - 1 for template instantiation */
+#define AccessorOptsBF ((AccessorOpts)7)
+
 /*
+    - last indicies, so add '1' to obtain elements count
     - must have a value for each AccessorType element
     - '-2' will croak in av_extend() and is used as a guard
 */

@@ -8,7 +8,7 @@ use PPIx::Utils::Classification ':all';
 use PPIx::Utils::Language ':all';
 use PPIx::Utils::Traversal ':all';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @EXPORT_OK = (
     @PPIx::Utils::Classification::EXPORT_OK,

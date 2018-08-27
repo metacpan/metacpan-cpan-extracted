@@ -1,12 +1,15 @@
 # -*- mode: cperl -*-
 use strict;
 use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/..";
+
 use t::Utils;
 
 use Test::More;
 plan tests => 2;
 
-use FindBin;
 use IO::File::AtomicChange;
 
 my $basedir     = $FindBin::Bin; # t/

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Resource::UrlProvider;
-$Footprintless::Resource::UrlProvider::VERSION = '1.28';
+$Footprintless::Resource::UrlProvider::VERSION = '1.29';
 # ABSTRACT: A resource provider for resources retrieved by URL
 # PODNAME: Footprintless::Resource::UrlProvider
 
@@ -80,7 +80,7 @@ Footprintless::Resource::UrlProvider - A resource provider for resources retriev
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 CONSTRUCTORS
 

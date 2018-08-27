@@ -1,7 +1,7 @@
 package Web::Query::LibXML;
 our $AUTHORITY = 'cpan:TOKUHIROM';
 # ABSTRACT: fast, drop-in replacement for Web::Query
-$Web::Query::LibXML::VERSION = '0.38';
+$Web::Query::LibXML::VERSION = '0.39';
 
 use 5.008005;
 use strict;
@@ -68,7 +68,7 @@ Web::Query::LibXML - fast, drop-in replacement for Web::Query
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 

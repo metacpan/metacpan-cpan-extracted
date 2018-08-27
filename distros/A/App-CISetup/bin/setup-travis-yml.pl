@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use App::CISetup::Travis::ConfigUpdater;
 
@@ -25,7 +25,7 @@ setup-travis-yml.pl - Tool for managing .travis.yml files
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -253,7 +253,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MaxMind, Inc.
+This software is Copyright (c) 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

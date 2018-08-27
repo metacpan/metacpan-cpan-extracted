@@ -8,7 +8,7 @@ package Log::Dispatch::Email::MailSender;
 use strict;
 use warnings;
 
-our $VERSION = '2.67';
+our $VERSION = '2.68';
 
 use Log::Dispatch::Types;
 use Mail::Sender ();
@@ -70,7 +70,7 @@ sub send_email {
         if eval {
         my $sender = Mail::Sender->new(
             {
-                from => $self->{from} || 'LogDispatch@foo.bar',
+                from         => $self->{from} || 'LogDispatch@foo.bar',
                 fake_from    => $self->{fake_from},
                 replyto      => $self->{replyto},
                 to           => ( join ',', @{ $self->{to} } ),
@@ -114,7 +114,7 @@ Log::Dispatch::Email::MailSender - Subclass of Log::Dispatch::Email that uses th
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -202,7 +202,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

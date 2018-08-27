@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.42 Fri, 24 Aug 2018 11:15:38 +0200 moocow
+	+ added DDC:PP support for ddc v2.1.16 (~DDC::XS v0.21) lexer-comments "#[...]", "#:...\n" and parsed comments #CMT '...'
+
 v0.41 Fri, 09 Mar 2018 09:48:31 +0100 moocow
 	+ DDC::Client::Distributed is now just a dummy wrapper for DDC::Client
 	+ added support for ddc-v2.1.9 navigation hints in run_query, get_first_hits

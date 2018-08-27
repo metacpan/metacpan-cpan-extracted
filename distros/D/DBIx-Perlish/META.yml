@@ -1,20 +1,33 @@
 ---
-name: DBIx-Perlish
-version: 0.64
+abstract: unknown
 author:
-  - 'Anton Berezin <tobez@tobez.org>'
-abstract: a perlish interface to SQL databases
+  - 'Dmitry Karasik <dmitry@karasik.eu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: bsd
-requires:
-  Test::More: 0
-  version: 0
-provides:
-  DBIx::Perlish:
-    file: lib/DBIx/Perlish.pm
-    version: 0.64
-  DBIx::Perlish::Parse:
-    file: lib/DBIx/Perlish/Parse.pm
-generated_by: hand
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Perlish
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - t
+  file:
+    - Makefile.PL
+requires:
+  DBI: '0'
+  Devel::Caller: '0'
+  Keyword::Pluggable: '1.01'
+  Pod::Markdown: '3.1'
+  perl: '5.014001'
+resources:
+  repository: http://github.com/dk/DBIx-Perlish
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

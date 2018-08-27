@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Test::Routine::Manual::Demo;
 # ABSTRACT: a walkthrough, in code, of Test::Routine
-$Test::Routine::Manual::Demo::VERSION = '0.025';
+$Test::Routine::Manual::Demo::VERSION = '0.027';
 #pod =head1 The Demo
 #pod
 #pod =head2 t/demo/01-demo.t
@@ -378,7 +378,7 @@ $Test::Routine::Manual::Demo::VERSION = '0.025';
 #pod   
 #pod     has id => (
 #pod       is      => 'ro',
-#pod       default => sub { 
+#pod       default => sub {
 #pod         my ($self) = @_;
 #pod         return Scalar::Util::refaddr($self);
 #pod       },
@@ -447,7 +447,7 @@ Test::Routine::Manual::Demo - a walkthrough, in code, of Test::Routine
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 The Demo
 
@@ -820,7 +820,7 @@ version 0.025
   
     has id => (
       is      => 'ro',
-      default => sub { 
+      default => sub {
         my ($self) = @_;
         return Scalar::Util::refaddr($self);
       },

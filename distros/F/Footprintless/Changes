@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless
 
+1.29 2018-08-22
+
+    - fixed tests so they dont fail due to invalid env vars
+
 1.28 2018-03-16
 
     - added fail fast to _download

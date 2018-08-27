@@ -86,3 +86,5 @@ Revision history for Perl extension B::Keywords.
     There's still a chance for perl6 compat
 1.18 Mon Jan 29 18:09:23 CET 2018 rurban
   - Oops, forgot break
+1.19 Thu Aug 23 11:16:09 CEST 2018
+  - our was added with 5.005_61

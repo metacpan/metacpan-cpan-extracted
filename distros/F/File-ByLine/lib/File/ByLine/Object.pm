@@ -6,7 +6,7 @@
 #
 
 package File::ByLine::Object;
-$File::ByLine::Object::VERSION = '1.181990';
+$File::ByLine::Object::VERSION = '1.182370';
 use v5.10;
 
 # ABSTRACT: Internal object used by File::ByLine
@@ -785,7 +785,7 @@ File::ByLine::Object - Internal object used by File::ByLine
 
 =head1 VERSION
 
-version 1.181990
+version 1.182370
 
 =head1 SEE File::ByLine
 

@@ -4,6 +4,7 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+README
 cpanfile
 ex/simple/example.pl
 ex/simple/templates/mytalk.html.ep
@@ -75,6 +76,7 @@ share/public/revealjs/plugin/math/math.js
 share/public/revealjs/plugin/multiplex/client.js
 share/public/revealjs/plugin/multiplex/index.js
 share/public/revealjs/plugin/multiplex/master.js
+share/public/revealjs/plugin/multiplex/package.json
 share/public/revealjs/plugin/notes-server/client.js
 share/public/revealjs/plugin/notes-server/index.js
 share/public/revealjs/plugin/notes-server/notes.html

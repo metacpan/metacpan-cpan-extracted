@@ -18,7 +18,7 @@ WWW::Mechanize::Chrome::Node - represent a Chrome HTML node in Perl
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 MEMBERS
 
@@ -27,7 +27,7 @@ our $VERSION = '0.18';
 The attributes this node has
 
 =cut
-    
+
 has 'attributes' => (
     is => 'lazy',
     default => sub { {} },
@@ -111,7 +111,7 @@ has 'mech' => (
 
 sub _fetchNodeId($self) {
     $self->driver->send_message('DOM.requestNode', objectId => $self->objectId)->then(sub($d) {
-        Future->done( $d->{nodeId} );
+        Future->done( 0+$d->{nodeId} );
     });
 }
 
@@ -123,7 +123,7 @@ sub _nodeId($self) {
         $nid = $self->_fetchNodeId();
         $self->_generation( $generation );
     } else {
-        $nid = Future->done( $nid );
+        $nid = Future->done( 0+$nid );
     }
     $nid;
 }
@@ -192,6 +192,9 @@ sub get_attribute( $self, $attribute ) {
 Sets or creates an attribute of a node. To remove an attribute,
 pass in the attribute value as C<undef>.
 
+Note that this invalidates the C<nodeId> of every node so you may or may not
+need to refetch all other nodes or receive stale values.
+
 =cut
 
 sub set_attribute_future( $self, $attribute, $value ) {
@@ -199,13 +202,24 @@ sub set_attribute_future( $self, $attribute, $value ) {
     weaken $s;
     my $r;
     if( defined $value ) {
-        $r = $self->driver->send_message(
-            'DOM.setAttributeValue',
-            name => $attribute,
-            value => $value )
+        $r = $self->_nodeId()
+           ->then(sub( $nodeId ) {
+            $self->driver->send_message(
+                'DOM.setAttributeValue',
+                name => $attribute,
+                value => $value,
+                nodeId => 0+$nodeId
+            )
+        })
+
     } else {
-        $r = $self->driver->send_message('DOM.removeAttribute',
-            name => $attribute )
+        $r = $self->_nodeId()
+           ->then(sub( $nodeId ) {
+            $self->driver->send_message('DOM.removeAttribute',
+                name => $attribute,
+                nodeId => 0+$nodeId
+            )
+        })
     }
     return $r
 }

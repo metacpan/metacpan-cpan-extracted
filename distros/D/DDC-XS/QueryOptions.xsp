@@ -24,6 +24,7 @@
   	void setFilters(CQFilterList val) %code %{ ddcxs_obj_setvec(CQFilterList, m_QFilters, val); %};
 
 	%name{Subcorpora} CQSubcorpusList m_Subcorpora %get %set;
+	%name{Comments}  CQCommentList m_Comments %get %set;
   public:
 	%name{new} CQueryOptions();
 	%name{swap} void swap(CQueryOptions& x);

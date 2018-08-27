@@ -3,7 +3,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "3.0.0";
+our $VERSION = "3.1.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
@@ -448,7 +448,7 @@ method _handle_removed_archives($borg_archives) {
 
 	if (@$remove_archives) {
 		for my $archive (@$remove_archives) {
-			$log->debugf("Removing archive %s", $archive);
+			$log->infof("Removing archive %s", $archive);
 			$self->{db}->begin_work;
 			$self->{db}->remove_archive($archive);
 			$self->{db}->commit;
@@ -469,7 +469,7 @@ method _handle_added_archives($borg_archives) {
 		my $start = Time::HiRes::gettimeofday();
 		my $lookuptable = [{}, 0];
 
-		$log->debugf("Adding archive %s", $archive);
+		$log->infof("Adding archive %s", $archive);
 
 		$self->{borg}->list_archive($archive, sub {
 			my $line = shift;

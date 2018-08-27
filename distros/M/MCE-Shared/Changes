@@ -1,6 +1,19 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.839 Sat Aug 25 13:00:00 EST 2018
+
+  * Seeds the Math::Random::MT::Auto generator automatically when present
+    in MCE::Hobo, similarly to Math::Random and Math::Prime::Util, to avoid
+    child processes sharing the same seed value as the parent and each other.
+    The new seed is computed using the current seed.
+
+  * Updated MCE::Shared::Cache to support optional argument "expires_in" for
+    set and sugar methods.
+
+  * Updated MCE::Shared documentation.
+  * Bumped MCE dependency to 1.837.
+
 1.838 Mon Jun 25 22:00:00 EST 2018
 
   * Fixed exporting deeply-shared regressions.

@@ -2,7 +2,7 @@ Changes
 lib/Mojolicious/Plugin/InputValidation.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/01-input-validation.t
 t/02-mojo-lite.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

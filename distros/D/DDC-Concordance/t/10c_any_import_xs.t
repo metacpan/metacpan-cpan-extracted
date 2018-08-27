@@ -5,7 +5,7 @@ use DDC::Any qw(:none);
 no warnings 'once';
 
 if (!DDC::Any->have_xs()) {
-  plan skip_all => 'DDC::XS '.($DDC::XS::VERSION ? "v$DDC::XS::VERSION is too old" : 'not available');
+  plan skip_all => 'DDC::XS '.($DDC::XS::VERSION ? "v$DDC::XS::VERSION is too old (we need at least v$DDC::Any::MIN_XS_VERSION)" : 'not available');
 } else {
   plan tests => 8;
 }

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Tunnel;
-$Footprintless::Tunnel::VERSION = '1.28';
+$Footprintless::Tunnel::VERSION = '1.29';
 # ABSTRACT: Provides tunneling over ssh
 # PODNAME: Footprintless::Tunnel
 
@@ -190,7 +190,7 @@ Footprintless::Tunnel - Provides tunneling over ssh
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 

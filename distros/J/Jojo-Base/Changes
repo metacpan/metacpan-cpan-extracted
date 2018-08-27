@@ -1,7 +1,12 @@
 
 Release history for Jojo-Base
 
-0.6.0     2017-11-11 10:45:46-08:00 America/Los_Angeles
+0.7.0     2018-08-21 12:34:02-07:00 America/Los_Angeles
+
+    - Use public Jojo::Role->make_role() method
+    - Require Jojo::Role 0.5.0+
+
+v0.6     2017-11-11 10:45:46-08:00 America/Los_Angeles
 
     - Require Mojolicious 7.43+
 

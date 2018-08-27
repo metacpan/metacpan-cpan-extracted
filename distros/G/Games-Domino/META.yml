@@ -20,16 +20,16 @@ no_index:
 provides:
   Games::Domino:
     file: lib/Games/Domino.pm
-    version: '0.30'
+    version: '0.31'
   Games::Domino::Params:
     file: lib/Games/Domino/Params.pm
-    version: '0.30'
+    version: '0.31'
   Games::Domino::Player:
     file: lib/Games/Domino/Player.pm
-    version: '0.30'
+    version: '0.31'
   Games::Domino::Tile:
     file: lib/Games/Domino/Tile.pm
-    version: '0.30'
+    version: '0.31'
 requires:
   Attribute::Memoize: '1.01'
   List::Util: '1.19'
@@ -39,10 +39,10 @@ requires:
   Term::ReadKey: '2.33'
   Term::Screen::Lite: '0.03'
   Type::Tiny: '1.000005'
-  namespace::clean: '0.24'
+  namespace::autoclean: '0.28'
   overload: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Games-Domino.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

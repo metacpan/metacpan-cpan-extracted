@@ -3,7 +3,7 @@ package Crypt::RSA::Parse;
 use strict;
 use warnings;
 
-our $VERSION = 0.043;
+our $VERSION = 0.044;
 
 =pod
 
@@ -47,6 +47,11 @@ Crypt::RSA::Parse - Parse RSA keys
 
         Crypt::RSA::Parse::...
     }
+
+=head1 DEPRECATION NOTICE
+
+B<IMPORTANT:> This distribution is no longer maintained. See its successor,
+L<Crypt::Perl>, for a much more comprehensive toolkit.
 
 =head1 DESCRIPTION
 

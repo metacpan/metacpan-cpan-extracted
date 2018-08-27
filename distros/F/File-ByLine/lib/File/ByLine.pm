@@ -6,7 +6,7 @@
 #
 
 package File::ByLine;
-$File::ByLine::VERSION = '1.181990';
+$File::ByLine::VERSION = '1.182370';
 use v5.10;
 
 # ABSTRACT: Line-by-line file access loops
@@ -32,11 +32,11 @@ our @ISA = qw(Exporter);
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT =
-  qw(dolines forlines greplines maplines parallel_dolines parallel_forlines parallel_greplines parallel_maplines readlines);
+  qw(dolines forlines greplines maplines parallel_dolines parallel_forlines parallel_greplines parallel_maplines readlines writefile appendfile);
 ## use critic
 
 our @EXPORT_OK =
-  qw(dolines forlines greplines maplines parallel_dolines parallel_forlines parallel_greplines parallel_maplines readlines);
+  qw(dolines forlines greplines maplines parallel_dolines parallel_forlines parallel_greplines parallel_maplines readlines writefile appendfile);
 
 
 sub dolines (&$) {
@@ -137,6 +137,40 @@ sub readlines ($) {
     return $OBJ->lines($file);
 }
 
+
+sub writefile ($@) {
+    my ( $file, @lines ) = @_;
+    if ( !defined($file) ) { die("Must define the filename"); }
+
+    # Last line should have it's newline removed, if applicable
+    if (@lines) { $lines[-1] =~ s/\n$//s; }
+
+    open my $fh, '>', $file;
+    foreach my $line (@lines) {
+        say $fh $line;
+    }
+    close $fh;
+
+    return;
+}
+
+
+sub appendfile ($@) {
+    my ( $file, @lines ) = @_;
+    if ( !defined($file) ) { die("Must define the filename"); }
+
+    # Last line should have it's newline removed, if applicable
+    if (@lines) { $lines[-1] =~ s/\n$//s; }
+
+    open my $fh, '>>', $file;
+    foreach my $line (@lines) {
+        say $fh $line;
+    }
+    close $fh;
+
+    return;
+}
+
 #
 # Object Oriented Interface
 #
@@ -162,7 +196,7 @@ File::ByLine - Line-by-line file access loops
 
 =head1 VERSION
 
-version 1.181990
+version 1.182370
 
 =head1 SYNOPSIS
 
@@ -194,6 +228,11 @@ version 1.181990
   # Read an entire file, split into lines
   my (@result) = readlines "file.txt";
 
+  # Write out a file
+  writefile "file.txt", @lines;  # Since version 2.182360
+
+  # Append to a file
+  appendfile "file.txt", @lines; # Since version 2.182362
 
   #
   # Object Oriented Interface (More Powerful!)
@@ -234,7 +273,7 @@ version 1.181990
   my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
 
   # Read an entire file, split into lines
-  my (@result) = readlines "file.txt";
+  my (@result) = $byline->lines("file.txt");
 
   # Alternative way of specifying filenames
   my $byline = File::ByLine->new();
@@ -298,7 +337,7 @@ not orthogonal with the C<maplines()>/C<greplines()> routines.
 
 Requires L<Parallel::WorkUnit> to be installed.
 
-Three parameters are requied: a codref, a filename, and number of simultanious
+Three parameters are required: a codref, a filename, and number of simultanious
 child threads to use.
 
 Instead of a single filename, an arrayref can be passed in, in which case the
@@ -334,7 +373,7 @@ from C<parallel_forlines()>.
 
 Requires L<Parallel::WorkUnit> to be installed.
 
-Three parameters are requied: a filename, a codref, and number of simultanious
+Three parameters are required: a filename, a codref, and number of simultanious
 child threads to use.
 
 Instead of a single filename, an arrayref can be passed in, in which case the
@@ -384,7 +423,7 @@ This function returns the lines for which the coderef evaluates as true.
 
   my (@result) = parallel_greplines { m/foo/ } "file.txt", 10;
 
-Three parameters are requied: a coderef, filename, and number of simultanious
+Three parameters are required: a coderef, filename, and number of simultanious
 child threads to use.
 
 Instead of a single filename, an arrayref can be passed in, in which case the
@@ -445,7 +484,7 @@ This function returns the lines for which the coderef evaluates as true.
 
   my (@result) = parallel_maplines { lc($_) } "file.txt", 10;
 
-Three parameters are requied: a coderef, filename, and number of simultanious
+Three parameters are required: a coderef, filename, and number of simultanious
 child threads to use.
 
 Instead of a single filename, an arrayref can be passed in, in which case the
@@ -479,6 +518,53 @@ Otherwise, this function is identical to C<maplines()>.
 
 This function simply returns an array of lines (without newlines) read from
 a file.
+
+=head2 writefile
+
+  writefile "file.txt", @lines;
+
+This was added in version 2.181850.
+
+This function creates a file (overwriting existing files) and writes each
+line to the file.  Each line (array element) is terminated with a newline,
+except the last line IF the last line ends in a newline itself.
+
+I.E. the following will write a file with three lines, each terminated by
+a newline:
+
+  writefile "file.txt", "a", "b", "c";
+
+So will this:
+
+  writefile "file.txt", "a\nb", "c\n";
+
+There is no object-oriented equivilent to this function.
+
+This does not return any value.
+
+=head2 appendfile
+
+  appendfile "file.txt", @lines;
+
+This was added in version 2.181862.
+
+This function creates or appends to a file (appending on existing files) and
+writes each line to the end of the file.  Each line (array element) is
+terminated with a newline, except the last line IF the last line ends in a
+newline itself.
+
+I.E. the following will append to a file with three lines, each terminated by
+a newline:
+
+  appendfile "file.txt", "a", "b", "c";
+
+So will this:
+
+  appendfile "file.txt", "a\nb", "c\n";
+
+There is no object-oriented equivilent to this function.
+
+This does not return any value.
 
 =head1 OBJECT ORIENTED INTERFACE
 
@@ -714,9 +800,10 @@ someone appreciates your work!
 I don't seek any money for this - I do this work because I enjoy it.  That
 said, should you want to show appreciation financially, few things would make
 me smile more than knowing that you sent a donation to the Gender Identity
-Center of Colorado (See L<http://giccolorado.org/>).  This organization
-understands TIMTOWTDI in life and, in line with that understanding, provides
-life-saving support to the transgender community.
+Center of Colorado (See L<http://giccolorado.org/> and donation page
+at L<https://tinyurl.com/giccodonation>).  This organization understands
+TIMTOWTDI in life and, in line with that understanding, provides life-saving
+support to the transgender community.
 
 =head1 AUTHOR
 

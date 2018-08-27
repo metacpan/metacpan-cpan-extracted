@@ -1,4 +1,9 @@
-Revision history for Module-Version
+0.13      2018-08-26 23:55:36+03:00 Asia/Jerusalem
+
+        * Fix a test failure when Test::More's VERSION ends with unnecessary
+          zeros. Thanks, Andreas J. König.
+        * Cleanups.
+        * Dzilify.
 
 0.12    29.06.10
         * Missed another one :(

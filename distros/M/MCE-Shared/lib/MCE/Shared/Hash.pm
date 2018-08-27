@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -64,7 +64,7 @@ sub _find {
    my $params = ref($_[0]) eq 'HASH' ? shift : {};
    my $query  = shift;
 
-   MCE::Shared::Base::_find_hash( $self, $params, $query, $self );
+   MCE::Shared::Base::_find_hash( $self, $params, $query );
 }
 
 # clone ( key [, key, ... ] )
@@ -312,7 +312,7 @@ MCE::Shared::Hash - Hash helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Hash version 1.838
+This document describes MCE::Shared::Hash version 1.839
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,8 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Proc::Fork;
-$Proc::Fork::VERSION = '0.804';
-# ABSTRACT: simple, intuitive interface to the fork() system call
+
+our $VERSION = '0.806';
 
 use Exporter::Tidy (
 	default => [ ':all' ],
@@ -66,10 +64,6 @@ __END__
 
 Proc::Fork - simple, intuitive interface to the fork() system call
 
-=head1 VERSION
-
-version 0.804
-
 =head1 SYNOPSIS
 
  use Proc::Fork;
@@ -113,6 +107,8 @@ All four clauses need not be specified. If the retry clause is omitted, only one
 If the code in any of the clauses does not die or exit, it will continue execution after the fork block.
 
 =head1 INTERFACE
+
+All of the following functions are exported by default:
 
 =head2 run_fork
 
@@ -235,7 +231,7 @@ If an C<error> clause is not used, errors will raise an exception using C<die>.
 
  # Other daemon initialization activities.
  $SIG{INT} = $SIG{TERM} = $SIG{HUP} = $SIG{PIPE} = \&some_signal_handler;
- POSIX::setsid() or die "Cannot start a new session: $!\n";
+ POSIX::setsid() == -1 and die "Cannot start a new session: $!\n";
  close $_ for *STDIN, *STDOUT, *STDERR;
 
  # rest of daemon program follows
@@ -265,30 +261,6 @@ If an C<error> clause is not used, errors will raise an exception using C<die>.
      } }
  }
 
-=head1 EXPORTS
-
-This package exports the following symbols by default.
-
-=over 4
-
-=item * C<run_fork>
-
-=item * C<child>
-
-=item * C<parent>
-
-=item * C<retry>
-
-=item * C<error>
-
-=back
-
-=head1 BUGS AND LIMITATIONS
-
-None currently known, for what that's worth.
-
-Please report bugs or feature requests to L<http://github.com/ap/Proc-Fork/issues>.
-
 =head1 AUTHOR
 
 Aristotle Pagaltzis <pagaltzis@gmx.de>
@@ -299,7 +271,7 @@ Documentation by Eric J. Roode.
 
 This documentation is copyright (c) 2002 by Eric J. Roode.
 
-This software is copyright (c) 2013 by Aristotle Pagaltzis.
+This software is copyright (c) 2018 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

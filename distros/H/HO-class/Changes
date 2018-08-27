@@ -1,5 +1,13 @@
 Revision history for HO-class
 
+0.076 - 2018-08-24
+* fix bug in lvalue acessors, currently for lvalue accessors the correct
+  index is only available during runtime
+
+0.075 - 2018-08-24
+* change alias implementation, the former one breaks with inheritence
+* added BUGS section in pod
+
 0.074 - 2018-08-17
 * let accessors use the index defined by new constructor
 

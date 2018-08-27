@@ -1,0 +1,34 @@
+---
+abstract: 'Dovecot’s administrative interface protocol'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IO::Framed: '0.12'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Doveadm
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MIME::Base64: '0'
+  X::Tiny: '0'
+resources:
+  repository: git://github.com/FGasper/p5-Net-Doveadm.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,17 @@
 Revision history for Perl extension Term::Size.
 
+0.209 2018-08-21  Term-Size
+
+    - Tweak documentation
+    - Promote to a stable release
+
+0.208 2018-08-20  Term-Size ( TRIAL VERSION )
+
+    - use PerlIO instead of FILE* RT#38594
+    - On error, Term::Size functions now return undef
+      in scalar context, or an empty list on list context
+      RT#76292
+
 0.207 2008-08-16  Term-Size
         - the original code for retrieving terminal size
           via XS ioctl is back -- and this dist

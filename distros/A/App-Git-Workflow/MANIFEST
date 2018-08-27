@@ -1,3 +1,4 @@
+bin/git-amend
 bin/git-branch-age
 bin/git-branch-clean
 bin/git-branch-grep
@@ -21,6 +22,7 @@ hooks/commit-msg
 install.pl
 lib/App/Git/Workflow.pm
 lib/App/Git/Workflow/Command.pm
+lib/App/Git/Workflow/Command/Amend.pm
 lib/App/Git/Workflow/Command/BranchAge.pm
 lib/App/Git/Workflow/Command/BranchClean.pm
 lib/App/Git/Workflow/Command/Branches.pm
@@ -47,6 +49,7 @@ META.yml
 README.pod
 t/00-load.t
 t/boilerplate.t
+t/cmd-amend.t
 t/cmd-branch-clean.t
 t/cmd-branch-grep.t
 t/cmd-branches.t

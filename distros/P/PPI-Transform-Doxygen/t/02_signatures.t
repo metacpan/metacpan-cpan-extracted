@@ -47,6 +47,18 @@ isnt($content{private}, undef, 'private section');
 my %test = (
     public => [
         {
+            head => '** @fn void method1()',
+            text => 'Undocumented Function',
+        },
+        {
+            head => '** @fn void method2()',
+            text => 'Undocumented Function',
+        },
+        {
+            head => '** @fn $self method3(scalar self, scalar bla3)',
+            text => 'around method3',
+        },
+        {
             head => '** @fn void attr1()',
             text => 'Undocumented Function',
         },
@@ -77,10 +89,12 @@ my %test = (
         {
             head => '** @fn static $self new(scalar class, hash args)',
             text => 'static new',
+            wipe => 1,
         },
         {
             head => '** @fn static $ok test1(scalar first, scalar second, array rest)',
             text => 'static test1',
+            wipe => 1,
             default => [
                 q(Default value for $second is 'default'.),
             ],
@@ -88,6 +102,7 @@ my %test = (
         {
             head => '** @fn $self test2(scalar self, scalar first, scalar second, hash args)',
             text => 'method test2',
+            wipe => 1,
             default => [
                 q(Default value for $first is 'default'.),
                 q(Default value for $second is [].),
@@ -96,6 +111,7 @@ my %test = (
         {
             head => '** @fn $self test3(scalar self, scalar xxx)',
             text => 'method test3 head2',
+            wipe => 0,
         },
     ],
     private => [
@@ -103,6 +119,7 @@ my %test = (
 );
 
 for my $type ( qw(public private) ) {
+    #warn $content{$type};
     for my $test ( @{ $test{$type} } ) {
         my $head = quotemeta($test->{head});
         (my $inner) = $content{$type} =~ m!/$head(.+?)\*/!s;
@@ -110,6 +127,10 @@ for my $type ( qw(public private) ) {
         my $text = quotemeta($test->{text});
         like($inner, qr!<p>$text</p>!s, $test->{text} . ' description');
         my $def = $test->{default} // [];
+        unlike($inner, qr/\r?\n=for/, $test->{text} . ' wiped =for')
+            if $test->{wipe};
+        like($inner, qr/\r?\n=for/, $test->{text} . ' not wiped =for')
+            if defined $test->{wipe} && !$test->{wipe};
         for my $d ( @$def ) {
             my $dtxt = quotemeta($d);
             like($inner, qr!<p>$dtxt</p>!s, 'default description');

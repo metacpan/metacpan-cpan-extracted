@@ -1,5 +1,30 @@
 Changelog for CPAN-Testers-Schema
 
+0.023     2018-08-23 20:32:28-05:00 America/Chicago
+
+    [Added]
+
+    - Added a `version` argument to release resultsets to filter
+      per-release summary data by dist _and_version.
+    - Added classes for the Perl version metadata tables. These classes
+      allow access to the `perl_version` table which stores metadata
+      about known Perl 5 releases.
+    - Added method to search for test summary rows by the Perl maturity
+
+    [Fixed]
+
+    - Fixed "patch" Perls to be considered "development" Perls. This is
+      how the existing site and backend treats them, even though the two
+      flags are different. "Patch" Perls are changed from the official
+      P5P releases, and should therefore be treated differently.
+    - Fixed Travis config to use MySQL 5.7. This MySQL version is
+      required for the tests to run. Thanks @paultcochrane [Github #21]
+    - Fixed "created" date in test reports being set to impossible
+      values. We were allowing this to come from reporters, but we want
+      this to be the time that we got the report. Later, if we want, we
+      can add another field for when the reporter claims to have created
+      the report. [Github #19]
+
 0.022     2018-04-19 14:26:24+02:00 Europe/Oslo
 
     [Added]

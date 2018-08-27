@@ -2,12 +2,12 @@
 use warnings;
 use strict;
 use Test::More tests => 9;
-use DBIx::Perlish qw/:all/;
+use DBIx::Perlish qw/:all/, dbh => 'undef';
 use t::test_utils;
 
 test_select_sql {
 	my $a : tab1;
-	my $b : table = db_fetch {
+	my $b : table = subselect {
 		my $c : tab2;
 	};
 } "stupid inline view",
@@ -16,7 +16,7 @@ test_select_sql {
 
 test_select_sql {
 	my $a : tab1;
-	my $b : table = db_fetch {
+	my $b : table = subselect {
 		my $c : tab2;
 		my $d : tab3;
 
@@ -31,7 +31,7 @@ test_select_sql {
 
 test_select_sql {
 	my $t : dba_tab_columns;
-	my $x : table = db_fetch {
+	my $x : table = subselect {
 		my $u : user_cons_columns;
 		my $c : user_cons_columns;
 		my $uc : user_constraints;
@@ -44,7 +44,7 @@ test_select_sql {
 			   ctn => $c->table_name, ccn => $c->column_name;
 	};
 
-	join $t < $x => db_fetch {
+	join $t < $x => subselect {
 		$x->ctn == $t->table_name;
 		$x->ccn == $t->column_name;
 	};

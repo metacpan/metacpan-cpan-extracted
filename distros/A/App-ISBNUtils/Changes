@@ -1,0 +1,9 @@
+0.002   2018-08-23 (PERLANCAR)
+
+	- format-isbn10: Mention that one can convert from ISBN 13 (using
+	  coerce rule str_to_isbn10 0.002+).
+
+
+0.001   2018-08-23 (PERLANCAR)
+
+        - First release.

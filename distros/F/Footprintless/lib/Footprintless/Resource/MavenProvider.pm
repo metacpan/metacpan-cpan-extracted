@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Resource::MavenProvider;
-$Footprintless::Resource::MavenProvider::VERSION = '1.28';
+$Footprintless::Resource::MavenProvider::VERSION = '1.29';
 # ABSTRACT: A resource provider for resources retrieved by maven coordinate
 # PODNAME: Footprintless::Resource::MavenProvider
 
@@ -60,7 +60,7 @@ Footprintless::Resource::MavenProvider - A resource provider for resources retri
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 METHODS
 

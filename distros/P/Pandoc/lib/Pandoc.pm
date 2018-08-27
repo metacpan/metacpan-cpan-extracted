@@ -1,7 +1,6 @@
 package Pandoc;
-use strict;
+use 5.014;
 use warnings;
-use 5.010;
 
 use utf8;
 
@@ -11,7 +10,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.8.6';
+our $VERSION = '0.8.8';
 
 use Pandoc::Version;
 use Pandoc::Error;

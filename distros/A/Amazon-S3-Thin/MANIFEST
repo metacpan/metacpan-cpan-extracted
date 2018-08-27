@@ -19,6 +19,7 @@ t/01_new.t
 t/02_signer_v2.t
 t/02_signer_v4.t
 t/03_request.t
+t/04_request_v2.t
 t/90_functional.t
 t/91_functional.t
 META.yml

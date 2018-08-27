@@ -1,0 +1,12 @@
+Changes
+lib/Algorithm/Heapify/XS.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/max_heap.t
+t/min_heap.t
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

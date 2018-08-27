@@ -1,7 +1,7 @@
 package App::isbn;
 
-our $DATE = '2018-08-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-23'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -51,7 +51,7 @@ _
             },
         },
         isbn => {
-            schema => 'str*',
+            schema => 'isbn*',
             pos => 0,
         },
         drivers => {
@@ -91,7 +91,7 @@ sub isbn {
         require WWW::Scraper::ISBN;
 
         my $isbn = $args{isbn} or return [400, "Please specify ISBN"];
-        $isbn =~ s/[^0-9Xx]//g;
+        # $isbn =~ s/[^0-9Xx]//g; # already by schema
         my $drivers = $args{drivers} // _installed_drivers();
         my $res = [200, "OK", {}];
         for my $driver (@$drivers) {
@@ -103,7 +103,7 @@ sub isbn {
                 my $book = $rec->book;
                 for my $k (keys %$book) {
                     next if $k =~ /^(html)$/;
-                    $res->[2]{"${driver}_$k"} = "$book->{$k}";
+                    $res->[2]{"${driver}_$k"} = "" . ($book->{$k} // '');
                 }
             } else {
                 log_info "Couldn't find ISBN %s using driver %s", $isbn, $driver;
@@ -130,7 +130,7 @@ App::isbn - Query book information by ISBN
 
 =head1 VERSION
 
-This document describes version 0.001 of App::isbn (from Perl distribution App-isbn), released on 2018-08-02.
+This document describes version 0.002 of App::isbn (from Perl distribution App-isbn), released on 2018-08-23.
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ and requires L<App::lcpan> and an up-to-date local mini-CPAN.
 
 =item * B<drivers> => I<array[str]>
 
-=item * B<isbn> => I<str>
+=item * B<isbn> => I<isbn>
 
 =back
 

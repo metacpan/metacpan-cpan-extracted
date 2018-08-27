@@ -2,3 +2,12 @@ Revision history for FTN-Outbound-BSO
 
 20160516  2016-05-16 14:12:53-04:00 America/New_York
     Initial version.
+
+20180823  2018-08-23 00:22:55-07:00 America/Los_Angeles
+    Some Kwalitee Issues fixes
+    Use explicit variable in 'for' loop (weird case on Linux)
+    Followed standard update fts-5005.002 -> fts-5005.003
+    Code refactoring
+    Documentation changes
+    Tests refactoring
+    More tests

@@ -8,7 +8,9 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Parallel/ForkManager/Segmented.pm',
-    't/00-compile.t'
+    't/00-compile.t',
+    't/avoid-callback-on-empty-input.t',
+    't/system-test-1.t'
 );
 
 notabs_ok($_) foreach @files;

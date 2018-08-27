@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan;
+use MYDan::Util::Secure;
+use MYDan::Util::OptConf;
+
+=head1 SYNOPSIS
+
+ $0 --pull
+ $0 --add /path/file1
+ $0 --del /path/file1
+ $0 --show
+ $0 --push
+   
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( pull add=s del=s show push ) )->dump();
+
+$option->assert() unless grep{ $o{$_} }qw( pull push show add del );
+
+my $secure = MYDan::Util::Secure->new( path => $MYDan::PATH );
+
+map{ $secure->$_() if $o{$_} }qw( pull push show );
+map{ $secure->$_( $o{$_} ) if $o{$_} }qw( add del );

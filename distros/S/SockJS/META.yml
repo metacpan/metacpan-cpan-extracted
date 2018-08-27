@@ -1,33 +1,80 @@
 ---
-abstract: 'SockJS perl implementation'
+abstract: 'SockJS Perl implementation'
 author:
-  - 'Viacheslav Tykhanovskyi <vti@cpan.org>'
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
 build_requires: {}
-configure_requires: {}
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SockJS
 no_index:
   directory:
     - t
+    - xt
     - inc
-    - t
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SockJS:
+    file: lib/SockJS.pm
+    version: '0.06'
+  SockJS::Connection:
+    file: lib/SockJS/Connection.pm
+  SockJS::Exception:
+    file: lib/SockJS/Exception.pm
+  SockJS::Middleware::Cache:
+    file: lib/SockJS/Middleware/Cache.pm
+  SockJS::Middleware::Cors:
+    file: lib/SockJS/Middleware/Cors.pm
+  SockJS::Middleware::Http10:
+    file: lib/SockJS/Middleware/Http10.pm
+  SockJS::Middleware::JSessionID:
+    file: lib/SockJS/Middleware/JSessionID.pm
+  SockJS::Session:
+    file: lib/SockJS/Session.pm
+  SockJS::Transport:
+    file: lib/SockJS/Transport.pm
+  SockJS::Transport::Base:
+    file: lib/SockJS/Transport/Base.pm
+  SockJS::Transport::EventSource:
+    file: lib/SockJS/Transport/EventSource.pm
+  SockJS::Transport::HtmlFile:
+    file: lib/SockJS/Transport/HtmlFile.pm
+  SockJS::Transport::JSONPPolling:
+    file: lib/SockJS/Transport/JSONPPolling.pm
+  SockJS::Transport::JSONPSend:
+    file: lib/SockJS/Transport/JSONPSend.pm
+  SockJS::Transport::WebSocket:
+    file: lib/SockJS/Transport/WebSocket.pm
+  SockJS::Transport::XHRPolling:
+    file: lib/SockJS/Transport/XHRPolling.pm
+  SockJS::Transport::XHRSend:
+    file: lib/SockJS/Transport/XHRSend.pm
+  SockJS::Transport::XHRStreaming:
+    file: lib/SockJS/Transport/XHRStreaming.pm
 requires:
-  AnyEvent: 0
-  Carp: 0
-  Digest::MD5: 0
-  JSON: 0
-  Plack: 0
-  Protocol::WebSocket: 0.10
-  Scalar::Util: 0
-  Test::Class: 0
-  Test::More: 0
-  perl: 5.008007
+  AnyEvent: '0'
+  IO::String: '0'
+  JSON: '0'
+  Plack: '0'
+  Protocol::WebSocket: '0'
+  Test::Fatal: '0'
+  Test::MonkeyMock: '0'
+  Test::More: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/vti/sockjs-perl
-version: 0.01
+  bugtracker: https://github.com/vti/sockjs-perl/issues
+  homepage: https://github.com/vti/sockjs-perl
+  repository: git://github.com/vti/sockjs-perl.git
+version: '0.06'
+x_contributors:
+  - 'BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>'
+  - 'vti <viacheslav.t@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

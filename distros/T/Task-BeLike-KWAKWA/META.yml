@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/kwakwaversal/task-belike-kwakwa/issues
   homepage: https://github.com/kwakwaversal/task-belike-kwakwa
   repository: https://github.com/kwakwaversal/task-belike-kwakwa.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Paul Williams <kwakwaversal@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

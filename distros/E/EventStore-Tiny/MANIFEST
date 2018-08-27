@@ -1,7 +1,5 @@
 .travis.yml
 Changes
-EventStore-Tiny-0.41/META.json
-EventStore-Tiny-0.41/META.yml
 lib/EventStore/Tiny.pm
 lib/EventStore/Tiny/DataEvent.pm
 lib/EventStore/Tiny/Event.pm
@@ -22,6 +20,7 @@ t/1_unit/snapshot.t
 t/2_integration/api.t
 t/2_integration/caching.t
 t/2_integration/logging.t
+t/2_integration/slack.t
 t/2_integration/storage.t
 t/9_demo/lib/Tamagotchi.pm
 t/9_demo/tamagotchi.t

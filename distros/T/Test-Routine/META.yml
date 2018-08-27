@@ -10,10 +10,11 @@ build_requires:
   Test::Fatal: '0'
   Test::Moose: '0'
   Test::More: '0.96'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,10 +46,10 @@ resources:
   bugtracker: https://github.com/rjbs/Test-Routine/issues
   homepage: https://github.com/rjbs/Test-Routine
   repository: https://github.com/rjbs/Test-Routine.git
-version: '0.025'
+version: '0.027'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026001'
   plugins:
     -
       class: inc::BuildDemo
@@ -68,7 +69,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Filter/Git::GatherDir'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Filter/CheckPrereqsIndexed'
@@ -89,7 +90,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Filter/RJBS-Outdated'
-      version: '0.052'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -101,58 +102,58 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Filter/CPAN-Outdated'
-      version: '0.052'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/@Filter/PruneCruft'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/@Filter/ManifestSkip'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/@Filter/MetaYAML'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/@Filter/License'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/@Filter/Readme'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/@Filter/ExecDir'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/@Filter/ShareDir'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/@Filter/Manifest'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/@Filter/TestRelease'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/@Filter/ConfirmRelease'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/@Filter/UploadToCPAN'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@Filter/MakeMaker'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -161,38 +162,38 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.18.0
           repo_root: .
       name: '@Filter/Git::NextVersion'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Filter/NextRelease'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Filter/Test::ChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Filter/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -200,7 +201,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@Filter/TestMoreWithSubtests'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -288,11 +289,11 @@ x_Dist_Zilla:
               name: '@RJBS/List'
               version: '4.015'
       name: '@Filter/PodWeaver'
-      version: '4.008'
+      version: '4.009'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Filter/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -305,10 +306,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.18.0
           repo_root: .
       name: '@Filter/@Git/Check'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -322,12 +323,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Filter/@Git/Commit'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -335,16 +336,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.025'
+          tag: '0.027'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Filter/@Git/Tag'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -354,25 +355,25 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.18.0
           repo_root: .
       name: '@Filter/@Git/Push'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.12.2
+          git_version: 2.18.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Filter/Git::Contributors'
-      version: '0.029'
+      version: '0.034'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -380,60 +381,61 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: PruneFiles
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.009'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.009'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.009'
+    version: '6.012'
 x_contributors:
   - 'Alex White <VVu@geekfarm.org>'
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'gregor herrmann <gregoa@debian.org>'
   - 'Jesse Luehrs <doy@tozt.net>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

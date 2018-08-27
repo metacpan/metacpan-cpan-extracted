@@ -18,7 +18,7 @@ provides:
     version: '0.001001'
   Babble:
     file: lib/Babble.pm
-    version: '0.090006'
+    version: '0.090007'
   Babble::Filter:
     file: lib/Babble/Filter.pm
   Babble::Grammar:
@@ -51,5 +51,5 @@ requires:
   Mu: '0'
   PPR: '0.000021'
   strictures: '2'
-version: '0.090006'
+version: '0.090007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -16,11 +16,11 @@ Net::Amazon::Signature::V4 - Implements the Amazon Web Services signature versio
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 
 =head1 SYNOPSIS
@@ -179,11 +179,11 @@ sub _simplify_uri {
 	my @parts = split /\//, $orig_uri;
 	my @simple_parts = ();
 	for my $part ( @parts ) {
-		if ( ! $part || $part eq '.' ) {
+		if ( $part eq '' || $part eq '.' ) {
 		} elsif ( $part eq '..' ) {
 			pop @simple_parts;
 		} else {
-			push @simple_parts, $part;
+			push @simple_parts, uri_escape($part);
 		}
 	}
 	my $simple_uri = '/' . join '/', @simple_parts;

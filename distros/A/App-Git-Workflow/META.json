@@ -34,6 +34,7 @@
             "Term::Spinner" : "0"
          },
          "requires" : {
+            "CHI::Memoize" : "0",
             "Error" : "0",
             "File::chdir" : "0",
             "Git" : "0",
@@ -49,11 +50,15 @@
    "provides" : {
       "App::Git::Workflow" : {
          "file" : "lib/App/Git/Workflow.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command" : {
          "file" : "lib/App/Git/Workflow/Command.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
+      },
+      "App::Git::Workflow::Command::Amend" : {
+         "file" : "lib/App/Git/Workflow/Command/Amend.pm",
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::BranchAge" : {
          "file" : "lib/App/Git/Workflow/Command/BranchAge.pm",
@@ -61,75 +66,75 @@
       },
       "App::Git::Workflow::Command::BranchClean" : {
          "file" : "lib/App/Git/Workflow/Command/BranchClean.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::BranchGrep" : {
          "file" : "lib/App/Git/Workflow/Command/BranchGrep.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Branches" : {
          "file" : "lib/App/Git/Workflow/Command/Branches.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Committers" : {
          "file" : "lib/App/Git/Workflow/Command/Committers.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Cows" : {
          "file" : "lib/App/Git/Workflow/Command/Cows.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Feature" : {
          "file" : "lib/App/Git/Workflow/Command/Feature.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Files" : {
          "file" : "lib/App/Git/Workflow/Command/Files.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Jira" : {
          "file" : "lib/App/Git/Workflow/Command/Jira.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Pom" : {
          "file" : "lib/App/Git/Workflow/Command/Pom.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Recent" : {
          "file" : "lib/App/Git/Workflow/Command/Recent.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Search" : {
          "file" : "lib/App/Git/Workflow/Command/Search.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::TagGrep" : {
          "file" : "lib/App/Git/Workflow/Command/TagGrep.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::UpToDate" : {
          "file" : "lib/App/Git/Workflow/Command/UpToDate.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Command::Watch" : {
          "file" : "lib/App/Git/Workflow/Command/Watch.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Pom" : {
          "file" : "lib/App/Git/Workflow/Pom.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "App::Git::Workflow::Repository" : {
          "file" : "lib/App/Git/Workflow/Repository.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "Mock::App::Git::Workflow::Repository" : {
          "file" : "lib/Mock/App/Git/Workflow/Repository.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "Test::Git::Workflow::Command" : {
          "file" : "lib/Test/Git/Workflow/Command.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       }
    },
    "release_status" : "stable",
@@ -144,6 +149,6 @@
          "url" : "git://github.com/ivanwills/git-workflow-tools.git"
       }
    },
-   "version" : "v1.0.8",
+   "version" : "v1.0.9",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+# ABSTRACT: Program for querying Perl module versions
+# PODNAME: mversion
 
 use strict;
 use warnings;
@@ -13,9 +15,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-mversion - Program to get module versions
+mversion - Program for querying Perl module versions
+
+=head1 VERSION
+
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -99,13 +107,15 @@ L<Module::Version>
 
 Github page at L<http://github.com/xsawyerx/module-version>.
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2010 Sawyer X.
+Sawyer X
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=head1 COPYRIGHT AND LICENSE
 
-See http://dev.perl.org/licenses/ for more information.
+This software is copyright (c) 2010-2018 by Sawyer X.
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

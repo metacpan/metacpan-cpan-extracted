@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.33  2018-08-24T15:20:00+00:00
+      - Upgraded dependency on Map::Tube v3.55.
+
 0.32  2018-08-01T10:40:00+00:00
       - Added ability to set the map background color optionally.
       - Upgraded dependency on Map::Tube v3.54.

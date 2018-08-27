@@ -1,0 +1,14 @@
+Source: libdzt-perl
+Section: perl
+Priority: optional
+Maintainer: Name Lastname <lastname@example.com>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.4
+Homepage: http://q-bit.ru
+
+Package: libdzt-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Test package
+ Test package for DZT

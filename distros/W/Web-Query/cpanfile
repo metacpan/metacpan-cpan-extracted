@@ -34,7 +34,6 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Test::More" => "0.96";
-  requires "Test::PAUSE::Permissions" => "0";
   requires "Test::Vars" => "0";
   requires "utf8" => "0";
 };

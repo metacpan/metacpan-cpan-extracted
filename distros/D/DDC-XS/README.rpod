@@ -15,7 +15,7 @@ DDC::XS - Query parsing and manipulation for DDC concordance seach engine
 You must have compiled and installed a current version of the DDC search engine sources e.g. from
 L<http://sourceforge.net/projects/ddc-concordance/files/ddc-concordance/>
 
-Tested version(s) v2.1.5.
+Tested version(s) v2.1.15.
 
 =item ExtUtils::XSpp
 

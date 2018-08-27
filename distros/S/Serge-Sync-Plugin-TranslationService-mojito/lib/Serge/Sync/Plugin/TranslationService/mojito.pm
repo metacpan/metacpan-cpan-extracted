@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros culture_from_lang locale_from_lang);
 use version;
 
-our $VERSION = qv('0.901.2');
+our $VERSION = qv('0.902.0');
 
 sub name {
     return 'Mojito translation server (http://www.mojito.global/) synchronization plugin';
@@ -33,9 +33,7 @@ sub init {
         file_type              => 'STRING',
         status_equal_target    => 'STRING',
         status_pull            => 'STRING',
-        destination_locales    => 'ARRAY',
-        # JAVA_HOME environment variable
-        java_home              => 'STRING',
+        destination_locales    => 'ARRAY'
     });
 }
 
@@ -68,10 +66,6 @@ sub validate_data {
 
     die "'localized_files_path' not defined" unless defined $self->{data}->{localized_files_path};
     die "'localized_files_path', which is set to '$self->{data}->{localized_files_path}', does not point to a valid directory.\n" unless -d $self->{data}->{localized_files_path};
-
-    if (defined $self->{data}->{java_home}) {
-        die "'java_home', which is set to '$self->{data}->{java_home}', does not point to a valid dir.\n" unless -d $self->{data}->{java_home};
-    }
 
     $self->{data}->{import_translations} = 1 unless defined $self->{data}->{import_translations};
     $self->{data}->{source_language} = 'en' unless defined $self->{data}->{source_language};
@@ -110,10 +104,6 @@ sub run_mojito_cli {
 
     $command = 'mojito '.$command;
     print "Running '$command'...\n";
-
-    if (defined $self->{data}->{java_home}) {
-        $ENV{'JAVA_HOME'} = $self->{data}->{java_home};
-    }
 
     return $self->run_cmd($command, $capture);
 }

@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::ReleaseStat;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: A single test report reduced to a simple pass/fail
 
 #pod =head1 SYNOPSIS
@@ -207,7 +207,7 @@ CPAN::Testers::Schema::Result::ReleaseStat - A single test report reduced to a s
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -301,19 +301,9 @@ L<CPAN::Testers::Schema::Result::Upload>.
 
 L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

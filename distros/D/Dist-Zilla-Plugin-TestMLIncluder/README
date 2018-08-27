@@ -5,7 +5,7 @@ NAME
 VERSION
 
     This document describes Dist::Zilla::Plugin::TestMLIncluder version
-    0.14.
+    0.15.
 
 SYNOPSIS
 

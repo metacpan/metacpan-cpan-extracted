@@ -5,4 +5,13 @@ use Test::More;
 
 use Test::Prereq;
 
-prereq_ok( undef, [ qw( constant Encode Encode::Locale Term::ReadKey Win32::Console Data_Test_Arguments Data_Test_Readline ) ] );
+prereq_ok( undef, [ qw(
+        Term::Choose::Constants
+        Term::Choose::LineFold
+        Term::Choose::Linux
+        Term::Choose::Win32
+
+        Data_Test_Arguments
+        Data_Test_Readline
+    )
+] );

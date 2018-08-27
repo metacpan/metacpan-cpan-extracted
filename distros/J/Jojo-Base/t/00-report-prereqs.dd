@@ -11,13 +11,14 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Jojo::Role' => 'v0.2.0'
+                                        'Jojo::Role' => 'v0.5.0'
                                       },
                       'requires' => {
                                       'Mojo::Base' => '0',

@@ -97,6 +97,6 @@ for (qw/a b/) {
     is(Jopa->$_, shift @res);
 }
 
-is(Class::Accessor::Inherited::XS::_unstolen_count, Class::Accessor::Inherited::XS::OPTIMIZED_OPMETHOD ? 5 : 6);
+is(Class::Accessor::Inherited::XS::Debug::unstolen_count(), Class::Accessor::Inherited::XS::OPTIMIZED_OPMETHOD ? 5 : 6);
 
 done_testing;

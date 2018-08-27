@@ -3,7 +3,7 @@ NAME
     signature version 4, AWS4-HMAC-SHA256
 
 VERSION
-    Version 0.18
+    Version 0.19
 
 SYNOPSIS
     This module signs an HTTP::Request to Amazon Web Services by appending

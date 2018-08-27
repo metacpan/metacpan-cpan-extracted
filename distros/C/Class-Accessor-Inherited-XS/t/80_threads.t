@@ -9,7 +9,7 @@ use Test::More HAS_THREADS ? ('no_plan') : (skip_all => 'for threaded perls only
 
 {
     package Jopa;
-    use parent qw/Class::Accessor::Inherited::XS/;
+    use parent qw/Class::Accessor::Inherited::XS::Compat/;
 }
 
 my @threads;

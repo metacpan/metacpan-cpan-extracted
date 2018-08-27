@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::CommandOptionsFactory;
-$Footprintless::CommandOptionsFactory::VERSION = '1.28';
+$Footprintless::CommandOptionsFactory::VERSION = '1.29';
 # ABSTRACT: A factory for creating command options
 # PODNAME: Footprintless::CommandOptionsFactory
 
@@ -53,7 +53,7 @@ Footprintless::CommandOptionsFactory - A factory for creating command options
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 DESCRIPTION
 

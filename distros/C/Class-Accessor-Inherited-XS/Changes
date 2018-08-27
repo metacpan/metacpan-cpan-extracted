@@ -1,5 +1,11 @@
 Revision history for Class::Accessor::Inherited::XS.
 
+0.35 Sun Aug 26 00:45:39 MSK 2018
+    - added c++ backend for weak accessors
+    - added c++ backend for named inherited accessors
+    - rewrite accessor generation to recursive templates
+    - better CAIXS interface
+
 0.34 Sun Aug 13 23:55:53 MSK 2017
     - add missing file to MANIFEST
 

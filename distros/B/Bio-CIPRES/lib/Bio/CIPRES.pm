@@ -15,7 +15,7 @@ use XML::LibXML;
 use Bio::CIPRES::Job;
 use Bio::CIPRES::Error;
 
-our $VERSION = '0.003003';
+our $VERSION = '0.003004';
 our $SERVER  = 'cipresrest.sdsc.edu';
 our $API     = 'cipresrest/v1';
 our $DOMAIN  = 'Cipres Authentication';
@@ -424,7 +424,7 @@ Jeremy Volkening <jdv@base2bio.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016 Jeremy Volkening
+Copyright 2016-2018 Jeremy Volkening
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

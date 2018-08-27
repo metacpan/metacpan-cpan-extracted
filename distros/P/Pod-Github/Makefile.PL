@@ -25,7 +25,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp' => '0',
         'Encode' => '0',
-        'File::Slurp' => '0',
+        'Path::Tiny' => '0',
         'Getopt::Long' => '0',
         'parent' => '0',
         'Pod::Markdown' => '3.005',

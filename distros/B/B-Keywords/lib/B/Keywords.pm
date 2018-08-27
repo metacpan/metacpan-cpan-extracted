@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.18';
+$VERSION = '1.19';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -131,7 +131,7 @@ use vars '@Functions';
     BEGIN
     DESTROY
     END ),
-    # STOP was between 5.5.64 - v5.6.0
+    # STOP was between 5.5.64 - 5.6.0
   ($] >= 5.005064 && $] < 5.006
     ? qw(STOP) : qw(CHECK)),
     # INIT was called RESTART before 5.004_50
@@ -264,8 +264,10 @@ use vars '@Functions';
     oct
     open
     opendir
-    ord
+    ord ),
+  ($] >= 5.005061 ? qw(
     our
+  ) : ()), qw(
     pack
     pipe
     pop

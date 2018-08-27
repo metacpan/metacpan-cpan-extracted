@@ -1,5 +1,27 @@
 Revision history for git-workflow-tools
 
+1.0.9   2018-08-26
+        Updating for release of version 1.0.9
+        Added perl 5.8 (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Fixed warning (Ivan Wills)
+        Got package.json parsing working (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Making pom also work with package.json as well as pom.xml files (Ivan Wills)
+        Added the ability to ignore file paths (Ivan Wills)
+        Making amend test work for now (Ivan Wills)
+        Fixed test to work with memoization (Ivan Wills)
+        Moved memoize earlier to help prevent re-memoization (Ivan Wills)
+        Added chomping the git dir (Ivan Wills)
+        Added extracting the keys to make chi happy (Ivan Wills)
+        Adding the original list of git commands (Ivan Wills)
+        Adding Chi::Memoize to dependencies (Ivan Wills)
+        Trying to memoize commit_detials to make running recent faster (Ivan Wills)
+        Starting writing the new git-amend command (Ivan Wills)
+        Removing hard coded file groups and fixed autocomplete to work the way the helper works (Ivan Wills)
+        Added TODO for new command (Ivan Wills)
+
 1.0.8   2018-07-29
         Updating for release of version 1.0.8
         Added documentation for ignore function (Ivan Wills)

@@ -34,3 +34,23 @@ count(x) #by[$w=1+1]	count(x) #by[$w =1 +1]
 count(x) #by[$w=1-1]	count(x) #by[$w =1 -1]
 count(x) #by[$w+1]	count(x) #by[$w +1]
 count(x) #by[$w-1]	count(x) #by[$w -1]
+
+#-- lexer block-comments
+ #[comment] foo && bar=2	foo && bar=2
+ foo #[comment] && bar=2	foo && bar=2
+ foo && #[comment] bar=2	foo && bar=2
+ foo && bar #[comment]=2	foo && bar=2
+ foo && bar=2 #[comment]	foo && bar=2
+
+#-- lexer line-comments
+foo #:comment	foo
+foo #:comment bar	foo
+foo #:comment\nbar	foo bar
+#:comment\nfoo	foo
+
+#-- parsed comments
+ foo #cmt bar	foo #cmt 'bar'
+ foo #cmt[bar]	foo #cmt 'bar'
+##NO #cmt bar foo	foo #cmt 'bar'
+ count(x) #cmt bar #by[y]	count(x) #by[y] #cmt 'bar'
+ count(x #cmt bar) #by[y]	count(x) #by[y] #cmt 'bar'

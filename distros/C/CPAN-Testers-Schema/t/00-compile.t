@@ -6,18 +6,20 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CPAN/Testers/Schema.pm',
     'CPAN/Testers/Schema/Base.pm',
     'CPAN/Testers/Schema/Result/LatestIndex.pm',
     'CPAN/Testers/Schema/Result/MetabaseUser.pm',
+    'CPAN/Testers/Schema/Result/PerlVersion.pm',
     'CPAN/Testers/Schema/Result/Release.pm',
     'CPAN/Testers/Schema/Result/ReleaseStat.pm',
     'CPAN/Testers/Schema/Result/Stats.pm',
     'CPAN/Testers/Schema/Result/TestReport.pm',
     'CPAN/Testers/Schema/Result/Upload.pm',
+    'CPAN/Testers/Schema/ResultSet/PerlVersion.pm',
     'CPAN/Testers/Schema/ResultSet/Release.pm',
     'CPAN/Testers/Schema/ResultSet/Stats.pm',
     'CPAN/Testers/Schema/ResultSet/TestReport.pm',

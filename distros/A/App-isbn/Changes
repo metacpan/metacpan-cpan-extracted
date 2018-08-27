@@ -1,3 +1,10 @@
+0.002   2018-08-23 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+	- Use isbn schema.
+
+
 0.001   2018-08-02 (PERLANCAR)
 
         - First release.

@@ -11,6 +11,7 @@ use LP_EnsureArch;
 LP_EnsureArch::ensure_support('uname');
 
 use Test::More;
+use Test::FailWarnings -allow_deps => 1;
 use Test::SharedFork;
 
 use Linux::Perl::uname;

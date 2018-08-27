@@ -1,5 +1,5 @@
 {
-   "abstract" : "displays a summary of information about the git repository.",
+   "abstract" : "Displays a summary of information about the git repository.",
    "author" : [
       "Shlomi Fish <shlomif@cpan.org>"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "App::Git::Info" : {
          "file" : "lib/App/Git/Info.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/shlomif/perl-App-Git-Info"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"

@@ -76,7 +76,8 @@ CQFHasFieldSet*	O_DDCXS_OBJECT
 ##-- object types: QueryOptions.xsp
 CQueryOptions*	O_DDCXS_OBJECT
 CQSubcorpusList	T_ddcxs
-
+CQCommentList	T_ddcxs
+    
 ##-- object types: TODO
 #TxChain	T_
 

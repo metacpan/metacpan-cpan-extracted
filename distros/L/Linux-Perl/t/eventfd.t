@@ -15,7 +15,7 @@ use Fcntl;
 use IO::File;
 
 use Test::More;
-use Test::FailWarnings;
+use Test::FailWarnings -allow_deps => 1;
 use Test::SharedFork;
 
 use Linux::Perl::eventfd;

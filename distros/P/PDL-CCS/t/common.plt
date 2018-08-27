@@ -2,6 +2,7 @@
 # File: t/common.plt
 # Description: re-usable test subs; requires Test::More
 BEGIN { $| = 1; }
+use strict;
 
 # isok($label,@_) -- prints helpful label
 sub isok {
@@ -74,7 +75,7 @@ sub pdlstr {
 }
 sub labstr {
   my ($label,$ok,$got,$want) = @_;
-  $label .= "\n  :     got=".pdlstr($got)."\n  :  wanted=".pdlstr($wanted) if (!$ok);
+  $label .= "\n  :     got=".pdlstr($got)."\n  :  wanted=".pdlstr($want) if (!$ok);
   return $label;
 }
 

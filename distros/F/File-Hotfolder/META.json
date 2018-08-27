@@ -4,13 +4,13 @@
       "Jakob Voß"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Hotfolder",
    "no_index" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.8",
+            "Dist::Milla" : "v1.0.15",
             "Test::Pod" : "1.41"
          }
       },
@@ -42,6 +42,11 @@
          },
          "suggests" : {
             "AnyEvent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0"
          }
       }
    },
@@ -57,8 +62,9 @@
          "web" : "https://github.com/nichtich/File-Hotfolder"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_contributors" : [
+      "Filip Andres <filip.andres@booking.com>",
       "Jakob Voss <voss@gbv.de>"
    ]
 }

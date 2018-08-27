@@ -17,7 +17,7 @@ use Data::Compare; # Exports Compare()
 $Storable::Deparse  = 1;
 $Storable::Eval     = 1;
 
-our $VERSION = '0.43';
+our $VERSION = '0.51';
 
 use Class::Tiny {
     registry        => sub {{}},
@@ -25,6 +25,7 @@ use Class::Tiny {
                              logger => shift->logger)},
     init_data       => sub {{}},
     logger          => sub {EventStore::Tiny::Logger->log_cb},
+    slack           => 0, # Default: strict mode
     cache_distance  => 0, # Default: store snapshot each time. no caching: undef
 }, '_cached_snapshot';
 
@@ -94,12 +95,14 @@ sub snapshot {
 
         # Nothing? Great!
         return EventStore::Tiny::Snapshot->new(
-            state       => clone($self->_cached_snapshot->state),
             timestamp   => $self->_cached_snapshot->timestamp,
+            state       => $self->slack ?
+                $self->_cached_snapshot->state
+                : clone($self->_cached_snapshot->state),
         ) if $es->size == 0;
 
         # Still something? Start here
-        $state = clone $cached_sn->state;
+        $state = $self->slack ? $cached_sn->state : clone $cached_sn->state;
     }
 
     # Calculate snapshot
@@ -244,6 +247,10 @@ Standard constructor. Understands all attributes as arguments. For most use case
 
 A hashref representing the initial state. B<Default: C<{}>>
 
+=item slack
+
+See L</SLACK MODE> below. B<Default: 0>
+
 =item cache_distance
 
 The number of events after a new snapshot is cached for accellerated access. 0 means the cache is updated after each event. undef means the system does not use any caching. B<Default: 0>
@@ -318,6 +325,10 @@ Returns the internal L<EventStore::Tiny::EventStream> object that stores all con
     my $state = $store->init_state;
 
 Returns a cloned copy of the ininitial state all events are applied on, which was defined by L</init_data> as a hashref.
+
+=head2 SLACK MODE
+
+By default, L<EventStore::Tiny> is in strict mode. That means, that all L</snapshot> data is cloned to prevent the internal state from illegal modification. However, if you B<really know what you're doing>, you can activate L</slack> mode to get references to the internal (cached) state. This improves performance a lot, but has also the downside that it can break your data consistence. You really have to make sure, that you modify your data with events only!
 
 =head2 OTHER
 

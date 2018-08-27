@@ -1,30 +1,35 @@
 ---
 abstract: 'Get module versions'
 author:
-  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Sawyer X'
 build_requires:
-  Test::More: 0
+  ExtUtils::MakeMaker: '6.56'
+  File::Spec: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Module-Version
 provides:
   Module::Version:
     file: lib/Module/Version.pm
-    version: 0.12
+    version: '0.13'
   Module::Version::App:
     file: lib/Module/Version/App.pm
-    version: 0.05
+    version: '0.13'
 requires:
-  Carp: 0
-  Exporter: 0
-  ExtUtils::MakeMaker: 6.56
-  Getopt::Long: 0
-  autodie: 0
+  Carp: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '6.56'
+  Getopt::Long: '0'
+  parent: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.12
+  repository: git://github.com/xsawyerx/module-version.git
+version: '0.13'
+x_authority: cpan:XSAWYERX
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::TestReport;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Raw reports as JSON documents
 
 #pod =head1 SYNOPSIS
@@ -45,6 +45,9 @@ primary_column 'id', {
 #pod
 #pod The ISO8601 date/time of when the report was inserted into the database.
 #pod Will default to the current time.
+#pod
+#pod The JSON report also contains a C<created> field. This is the date/time
+#pod that the report was created on the reporter's machine.
 #pod
 #pod =cut
 
@@ -98,12 +101,16 @@ __PACKAGE__->inflate_column( report => {
 #pod This is overridden to provide sane defaults for the C<id> and C<created>
 #pod fields.
 #pod
+#pod B<NOTE:> You should not supply a C<created> unless you are creating
+#pod reports in the past. Reports created in the past will be hidden from
+#pod many feeds, and may cause failures to not be reported to authors.
+#pod
 #pod =cut
 
 sub new( $class, $attrs ) {
     $attrs->{report}{id} = $attrs->{id} ||= Data::UUID->new->create_str;
     $attrs->{created} ||= DateTime->now( time_zone => 'UTC' );
-    $attrs->{report}{created} = $attrs->{created}->datetime . 'Z';
+    $attrs->{report}{created} ||= $attrs->{created}->datetime . 'Z';
     return $class->next::method( $attrs );
 };
 
@@ -134,7 +141,7 @@ CPAN::Testers::Schema::Result::TestReport - Raw reports as JSON documents
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -160,6 +167,9 @@ The UUID of this report stored in standard hex string representation.
 The ISO8601 date/time of when the report was inserted into the database.
 Will default to the current time.
 
+The JSON report also contains a C<created> field. This is the date/time
+that the report was created on the reporter's machine.
+
 =head2 report
 
 The full JSON report.
@@ -181,6 +191,10 @@ object and should not be called directly.
 This is overridden to provide sane defaults for the C<id> and C<created>
 fields.
 
+B<NOTE:> You should not supply a C<created> unless you are creating
+reports in the past. Reports created in the past will be hidden from
+many feeds, and may cause failures to not be reported to authors.
+
 =head2 upload
 
     my $upload = $row->upload;
@@ -192,19 +206,9 @@ the distribution tested by this test report.
 
 L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

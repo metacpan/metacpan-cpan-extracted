@@ -12,6 +12,7 @@ Makefile.PL
 README.pod
 TODO
 dist.ini
+examples/using-oo-interface.pl
 lib/File/ByLine.pm
 lib/File/ByLine/Object.pm
 t/00-load.t
@@ -21,6 +22,8 @@ t/01-Basic.t
 t/02-Parallel.t
 t/03-construction.t
 t/04-attributes.t
+t/05-write-file.t
+t/06-append-file.t
 t/20-github-0005.t
 t/author-critic.t
 t/author-eol.t

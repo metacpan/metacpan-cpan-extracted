@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Action;
-$Footprintless::App::Action::VERSION = '1.28';
+$Footprintless::App::Action::VERSION = '1.29';
 # ABSTRACT: A base class for actions
 # PODNAME: Footprintless::App::Action
 
@@ -86,7 +86,7 @@ Footprintless::App::Action - A base class for actions
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 FUNCTIONS
 

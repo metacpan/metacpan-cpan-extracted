@@ -9,7 +9,13 @@ use Footprintless::ExtendedTestFactory;
 use File::Basename;
 use File::Spec;
 
-BEGIN { use_ok('Footprintless') }
+BEGIN {
+    # Clear out the env vars to prevent failures due to automatic configuration
+    # with invalid env vars (ex: FPL_CONFIG_PROPS=:/foo/bar)
+    $ENV{FPL_CONFIG_DIRS}  = "";
+    $ENV{FPL_CONFIG_PROPS} = "";
+    use_ok('Footprintless');
+}
 
 eval {
     require Getopt::Long;

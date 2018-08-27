@@ -51,7 +51,7 @@ use Test::More;
 
   has id => (
     is      => 'ro',
-    default => sub { 
+    default => sub {
       my ($self) = @_;
       return Scalar::Util::refaddr($self);
     },

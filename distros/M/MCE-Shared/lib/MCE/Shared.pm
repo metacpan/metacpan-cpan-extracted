@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -127,9 +127,10 @@ sub share {
 ##
 ###############################################################################
 
+our $AUTOLOAD; # MCE::Shared::<method_name>
+
 sub AUTOLOAD {
-   # $AUTOLOAD = MCE::Shared::<method_name>
-   my $_fcn = substr($MCE::Shared::AUTOLOAD, 13);
+   my $_fcn = $AUTOLOAD;  substr($_fcn, 0, rindex($_fcn,':') + 1, '');
 
    shift if ( defined $_[0] && $_[0] eq 'MCE::Shared' );
 
@@ -141,9 +142,10 @@ sub AUTOLOAD {
       _use( 'MCE::Shared::'.ucfirst($_fcn) );
       my $_params = ref $_[0] eq 'HASH' ? shift : {};
 
-      my $_item = ( $_fcn eq 'array' )
-         ? &share($_params, MCE::Shared::Array->new())
-         : &share($_params, MCE::Shared::Hash->new());
+      $_params->{module} = ( $_fcn eq 'array' )
+         ? 'MCE::Shared::Array' : 'MCE::Shared::Hash';
+
+      my $_item = &share($_params);  delete $_params->{module};
 
       if ( scalar @_ ) {
          $_params->{_DEEPLY_} = 1;
@@ -182,15 +184,15 @@ sub AUTOLOAD {
    }
 
    # cache, condvar, minidb, ordhash, queue, scalar, sequence, et cetera
-   $_fcn = 'sequence' if $_fcn eq 'num_sequence';
-
+   $_fcn = 'sequence'  if $_fcn eq 'num_sequence';
    my $_pkg = ucfirst( lc $_fcn ); local $@;
 
    if ( $INC{"MCE/Shared/$_pkg.pm"} || eval "use MCE::Shared::$_pkg (); 1" ) {
       $_pkg = "MCE::Shared::$_pkg";
 
-      return &share({}, $_pkg->new(_shared => 1, @_)) if $_fcn eq 'cache';
-      return &share({}, $_pkg->new(@_));
+      return &share({}, $_pkg->new(@_)) if ( $_fcn =~ /^(?:condvar|queue)$/ );
+
+      return &share({ module => $_pkg }, @_);
    }
 
    _croak("Can't locate object method \"$_fcn\" via package \"MCE::Shared\"");
@@ -430,7 +432,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.838
+This document describes MCE::Shared version 1.839
 
 =head1 SYNOPSIS
 
@@ -564,9 +566,10 @@ isn't used for anything else.
  my $q1 = MCE::Shared->queue();
  my $q2 = MCE::Shared->queue( await => 1 );
 
-For platforms where L<IO::FDPass> isn't possible, construct C<condvar> and
-C<queue> before other classes. The manager process is delayed until sharing
-other classes or started explicitly.
+For platforms where L<IO::FDPass> isn't possible (e.g. Cygwin), construct
+C<condvar> and C<queue> before other classes. The shared-manager process
+will be delayed until sharing other classes (e.g. Array, Hash) or starting
+explicitly.
 
  use MCE::Shared;
 
@@ -579,7 +582,8 @@ other classes or started explicitly.
 
  my $ha = MCE::Shared->hash();  # started implicitly
 
-Note: MCE starts the shared-manager if not yet started. Ditto for MCE::Hobo.
+Note that MCE starts the shared-manager, prior to spawning workers, if not
+yet started. Ditto for MCE::Hobo.
 
 Regarding mce_open, C<IO::FDPass> is needed for constructing a shared-handle
 from a non-shared handle not yet available inside the shared-manager process.
@@ -629,47 +633,40 @@ Install 1.1 or later to rid of limitations described above.
 
 Below, synopsis for sharing classes included with MCE::Shared.
 
- # short form
-
  use MCE::Shared;
+
+ # short form
 
  $ar = MCE::Shared->array( @list );
  $ca = MCE::Shared->cache( max_keys => 500, max_age => 60 );
  $cv = MCE::Shared->condvar( 0 );
  $fh = MCE::Shared->handle( ">>", \*STDOUT ); # see mce_open below
  $ha = MCE::Shared->hash( @pairs );
- $oh = MCE::Shared->ordhash( @pairs );
  $db = MCE::Shared->minidb();
+ $oh = MCE::Shared->ordhash( @pairs );
  $qu = MCE::Shared->queue( await => 1, fast => 0 );
  $va = MCE::Shared->scalar( $value );
  $se = MCE::Shared->sequence( $begin, $end, $step, $fmt );
 
  mce_open my $fh, ">>", \*STDOUT or die "open error: $!";
 
- # long form, must include class module
+ # long form
 
- use MCE::Shared::Array;
- use MCE::Shared::Cache;
- use MCE::Shared::Hash;
- use MCE::Shared::Minidb;
- use MCE::Shared::Ordhash;
- use MCE::Shared::Queue;
- use MCE::Shared::Scalar;
-
- $ar = MCE::Shared->share( MCE::Shared::Array->new( ... ) );
- $ca = MCE::Shared->share( MCE::Shared::Cache->new( ... ) );
- $ha = MCE::Shared->share( MCE::Shared::Hash->new( ... ) );
- $db = MCE::Shared->share( MCE::Shared::Minidb->new( ... ) );
- $oh = MCE::Shared->share( MCE::Shared::Ordhash->new( ... ) );
- $qu = MCE::Shared->share( MCE::Shared::Queue->new( ... ) );
- $va = MCE::Shared->share( MCE::Shared::Scalar->new( ... ) );
+ $ar = MCE::Shared->share( { module => 'MCE::Shared::Array'    }, ... );
+ $ca = MCE::Shared->share( { module => 'MCE::Shared::Cache'    }, ... );
+ $cv = MCE::Shared->share( { module => 'MCE::Shared::Condvar'  }, ... );
+ $fh = MCE::Shared->share( { module => 'MCE::Shared::Handle'   }, ... );
+ $ha = MCE::Shared->share( { module => 'MCE::Shared::Hash'     }, ... );
+ $db = MCE::Shared->share( { module => 'MCE::Shared::Minidb'   }, ... );
+ $oh = MCE::Shared->share( { module => 'MCE::Shared::Ordhash'  }, ... );
+ $qu = MCE::Shared->share( { module => 'MCE::Shared::Queue'    }, ... );
+ $va = MCE::Shared->share( { module => 'MCE::Shared::Scalar'   }, ... );
+ $se = MCE::Shared->share( { module => 'MCE::Shared::Sequence' }, ... );
 
 The restriction for sharing classes not included with MCE::Shared
 is that the object must not have file-handles nor code-blocks.
 
- use Hash::Ordered;
-
- $oh = MCE::Shared->share( Hash::Ordered->new( ... ) );
+ $oh = MCE::Shared->share( { module => 'Hash::Ordered' }, ... );
 
 =over 3
 
@@ -686,27 +683,31 @@ a message and stop if open fails.
 
 See L<MCE::Shared::Handle> for chunk IO demonstrations.
 
- # non-shared or local construction for use by a single process
- # shorter, mce_open is an alias for MCE::Shared::Handle::open
+ {
+   use MCE::Shared::Handle;
 
- use MCE::Shared::Handle;
+   # "non-shared" or "local construction" for use by a single process
+   MCE::Shared::Handle->open( my $fh, "<", "file.log" ) or die "$!";
+   MCE::Shared::Handle::open  my $fh, "<", "file.log"   or die "$!";
 
- MCE::Shared::Handle->open( my $fh, "<", "file.log" ) or die "$!";
- MCE::Shared::Handle::open  my $fh, "<", "file.log"   or die "$!";
+   # mce_open is an alias for MCE::Shared::Handle::open
+   mce_open my $fh, "<", "file.log" or die "$!";
+ }
 
- mce_open my $fh, "<", "file.log" or die "$!";
+ {
+   use MCE::Shared;
 
- # construction for sharing with other threads and processes
- # shorter, mce_open is an alias for MCE::Shared::open
+   # construction for "sharing" with other threads and processes
+   MCE::Shared->open( my $fh, "<", "file.log" ) or die "$!";
+   MCE::Shared::open  my $fh, "<", "file.log"   or die "$!";
 
- use MCE::Shared;
-
- MCE::Shared->open( my $fh, "<", "file.log" ) or die "$!";
- MCE::Shared::open  my $fh, "<", "file.log"   or die "$!";
-
- mce_open my $fh, "<", "file.log" or die "$!";
+   # mce_open is an alias for MCE::Shared::open
+   mce_open my $fh, "<", "file.log" or die "$!";
+ }
 
 Simple examples to open a file for reading:
+
+ use MCE::Shared;
 
  # mce_open is exported by MCE::Shared or MCE::Shared::Handle.
  # It creates a shared file handle with MCE::Shared present
@@ -737,6 +738,8 @@ necessary in order to retrieve the data from the shared-manager process.
 
 The C<export> method is described later under the Common API section.
 
+ use MCE::Shared;
+
  sub _dump {
     require Data::Dumper unless $INC{'Data/Dumper.pm'};
     no warnings 'once';
@@ -753,8 +756,6 @@ The C<export> method is described later under the Common API section.
        : print Data::Dumper::Dumper( $_[0] ) . "\n";
  }
 
- use MCE::Shared;
-
  tie my %abc, 'MCE::Shared';
 
  my @parents = qw( a b c );
@@ -767,6 +768,8 @@ The C<export> method is described later under the Common API section.
  }
 
  _dump( tied( %abc ) );
+
+ __END__
 
  # Output
 
@@ -795,6 +798,7 @@ Dereferencing provides hash-like behavior for C<hash> and C<ordhash>.
 Array-like behavior is allowed for C<array>, not shown below.
 
  use MCE::Shared;
+ use Data::Dumper;
 
  my $abc = MCE::Shared->hash;
 
@@ -807,12 +811,11 @@ Array-like behavior is allowed for C<array>, not shown below.
     }
  }
 
- _dump( $abc );
+ print Dumper( $abc->export({ unbless => 1 }) ), "\n";
 
 Each level in a deeply structure requires a separate trip to the shared-manager
 process. The included C<MCE::Shared::Minidb> module provides optimized methods
-for working with hash of hashes C<HoH> and/or hash of arrays C<HoA>. As such,
-do the following when performance is desired.
+for working with hash of hashes C<HoH> and hash of arrays C<HoA>.
 
  use MCE::Shared;
 
@@ -823,7 +826,7 @@ do the following when performance is desired.
 
  for my $parent ( @parents ) {
     for my $child ( @children ) {
-       $abc->hset( $parent, $child, 1 );
+       $abc->hset($parent, $child, 1);
     }
  }
 
@@ -839,9 +842,9 @@ For further reading, see L<MCE::Shared::Minidb>.
 
 This class method transfers the blessed-object to the shared-manager
 process and returns a C<MCE::Shared::Object> containing the C<SHARED_ID>.
-Starting with the 1.827 release, the module option sends parameters to the
-shared-manager, where the object is then constructed. This is useful for
-classes involving XS code or a file handle.
+Starting with the 1.827 release, the "module" option sends parameters to
+the shared-manager, where the object is then constructed. This is useful
+for classes involving XS code or a file handle.
 
  use MCE::Shared;
 
@@ -876,20 +879,14 @@ classes involving XS code or a file handle.
  }
 
  {
-   use MCE::Shared::Ordhash;
-
-   my $oh1 = MCE::Shared->share( MCE::Shared::Ordhash->new() );
-   my $oh2 = MCE::Shared->share({ module => 'MCE::Shared::Ordhash' });
-   my $oh3 = MCE::Shared->ordhash();  # same thing
+   my $oh1 = MCE::Shared->share({ module => 'MCE::Shared::Ordhash' });
+   my $oh2 = MCE::Shared->ordhash();  # same thing
 
    $oh1->assign( @pairs );
    $oh2->assign( @pairs );
-   $oh3->assign( @pairs );
  }
 
  {
-   use Hash::Ordered;
-
    my ($ho_shared, $ho_nonshared);
 
    $ho_shared = MCE::Shared->share({ module => 'Hash::Ordered' });
@@ -904,24 +901,17 @@ hash, or scalar object.
 
  use MCE::Shared;
 
- use MCE::Shared::Array;    # Loading helper classes isn't necessary
- use MCE::Shared::Hash;     # when using the shorter form or via the
- use MCE::Shared::Scalar;   # module option.
+ my $a1 = MCE::Shared->share( { module => 'MCE::Shared::Array' }, @list );
+ my $a2 = MCE::Shared->share( [ @list ] );
+ my $a3 = MCE::Shared->array( @list );
 
- my $a1 = MCE::Shared->share( MCE::Shared::Array->new( @list ) );
- my $a2 = MCE::Shared->share({ module => 'MCE::Shared::Array' }, @list );
- my $a3 = MCE::Shared->share( [ @list ] );  # sugar syntax
- my $a4 = MCE::Shared->array( @list );
+ my $h1 = MCE::Shared->share( { module => 'MCE::Shared::Hash' }, @pairs );
+ my $h2 = MCE::Shared->share( { @pairs } );
+ my $h3 = MCE::Shared->hash( @pairs );
 
- my $h1 = MCE::Shared->share( MCE::Shared::Hash->new( @pairs ) );
- my $h2 = MCE::Shared->share({ module => 'MCE::Shared::Hash' }, @pairs );
- my $h3 = MCE::Shared->share( { @pairs } ); # sugar syntax
- my $h4 = MCE::Shared->hash( @pairs );
-
- my $s1 = MCE::Shared->share( MCE::Shared::Scalar->new( 20 ) );
- my $s2 = MCE::Shared->share({ module => 'MCE::Shared::Scalar' }, 20 );
- my $s3 = MCE::Shared->share( \do{ my $o = 20 } );
- my $s4 = MCE::Shared->scalar( 20 );
+ my $s1 = MCE::Shared->share( { module => 'MCE::Shared::Scalar' }, 20 );
+ my $s2 = MCE::Shared->share( \do{ my $o = 20 } );
+ my $s3 = MCE::Shared->scalar( 20 );
 
 When the C<module> option is given, one may optionally specify the constructor
 function via the C<new> option. This is necessary for the CDB_File module,
@@ -1327,14 +1317,11 @@ L<https://github.com/marioroy/mce-cookbook>
 
 Returns the real C<blessed> name, provided by the shared-manager process.
 
- use Scalar::Util qw(blessed);
  use MCE::Shared;
+ use Scalar::Util qw(blessed);
 
- use MCE::Shared::Ordhash;
- use Hash::Ordered;
-
- my $oh1 = MCE::Shared->share( MCE::Shared::Ordhash->new() );
- my $oh2 = MCE::Shared->share( Hash::Ordered->new() );
+ my $oh1 = MCE::Shared->share({ module => 'MCE::Shared::Ordhash' });
+ my $oh2 = MCE::Shared->share({ module => 'Hash::Ordered'        });
 
  print blessed($oh1), "\n";    # MCE::Shared::Object
  print blessed($oh2), "\n";    # MCE::Shared::Object
@@ -1417,7 +1404,7 @@ scalar respectively.
     print Data::Dumper::Dumper($_[0]) . "\n";
  }
 
- my $oh1 = MCE::Shared->share( MCE::Shared::Ordhash->new() );
+ my $oh1 = MCE::Shared->share({ module => 'MCE::Shared::Ordhash' });
  my $oh2 = MCE::Shared->ordhash();  # same thing
 
  _dump($oh1);
@@ -1427,21 +1414,25 @@ scalar respectively.
     # bless( [ 2, 'MCE::Shared::Ordhash' ], 'MCE::Shared::Object' )
 
  _dump( $oh1->export );  # dumps object structure and content
- _dump( $oh2->export );
+ _dump( $oh2->export );  # ditto
 
 C<export> can optionally take a list of indices/keys for what to export.
 This applies to shared array, hash, and ordhash.
 
  use MCE::Shared;
 
- my $h1 = MCE::Shared->hash(           # shared hash
+ # shared hash
+ my $h1 = MCE::Shared->hash(
     qw/ I Heard The Bluebirds Sing by Marty Robbins /
       # k v     k   v         k    v  k     v
  );
 
- my $h2 = $h1->export( qw/ I The / );  # non-shared hash
+ # non-shared hash
+ my $h2 = $h1->export( qw/ I The / );
 
  _dump($h2);
+
+ __END__
 
  # Output
 
@@ -1451,13 +1442,16 @@ This applies to shared array, hash, and ordhash.
  }, 'MCE::Shared::Hash' );
 
 Specifying the unbless option exports a non-blessed data structure instead.
-Unbless applies to shared MCE::Shared::{ Array, Hash, and Scalar } objects.
+The unbless option applies to shared MCE::Shared::{ Array, Hash, and Scalar }
+objects.
 
  my $h2 = $h1->export( { unbless => 1 }, qw/ I The / );
  my $h3 = $h1->export( { unbless => 1 } );
 
  _dump($h2);
  _dump($h3);
+
+ __END__
 
  # Output
 
@@ -1477,9 +1471,8 @@ Unbless applies to shared MCE::Shared::{ Array, Hash, and Scalar } objects.
 
 The C<next> method provides parallel iteration between workers for shared
 C<array>, C<hash>, C<ordhash>, and C<sequence>. In list context, returns the
-next key-value pair. This applies to C<array>, C<hash>, and C<ordhash>.
-In scalar context, returns the next item. The C<undef> value is returned
-after iteration has completed.
+next key-value pair or beg-end pair for sequence. In scalar context, returns
+the next item. The C<undef> value is returned after the iteration has completed.
 
 Internally, the list of keys to return is set when the closure is constructed.
 Later keys added to the shared array or hash are not included. Subsequently,
@@ -1490,42 +1483,59 @@ The following example iterates through a shared array in parallel.
  use MCE::Hobo;
  use MCE::Shared;
 
- my $ob = MCE::Shared->array( 'a' .. 'j' );
+ my $ar = MCE::Shared->array( 'a' .. 'j' );
 
  sub demo1 {
-    my ( $id ) = @_;
-    while ( my ( $index, $value ) = $ob->next ) {
-       print "$id: [ $index ] $value\n";
+    my ( $wid ) = @_;
+    while ( my ( $index, $value ) = $ar->next ) {
+       print "$wid: [ $index ] $value\n";
        sleep 1;
     }
  }
 
  sub demo2 {
-    my ( $id ) = @_;
-    while ( defined ( my $value = $ob->next ) ) {
-       print "$id: $value\n";
+    my ( $wid ) = @_;
+    while ( defined ( my $value = $ar->next ) ) {
+       print "$wid: $value\n";
        sleep 1;
     }
  }
 
+ $ar->rewind();
+
+ MCE::Hobo->new( \&demo1, $_ ) for 1 .. 3;
+ MCE::Hobo->waitall(), print "\n";
+
+ $ar->rewind();
+
  MCE::Hobo->new( \&demo2, $_ ) for 1 .. 3;
+ MCE::Hobo->waitall(), print "\n";
 
- # ... do other work ...
-
- MCE::Hobo->waitall();
+ __END__
 
  # Output
+
+ 1: [ 0 ] a
+ 2: [ 1 ] b
+ 3: [ 2 ] c
+ 1: [ 3 ] d
+ 2: [ 5 ] f
+ 3: [ 4 ] e
+ 2: [ 8 ] i
+ 3: [ 6 ] g
+ 1: [ 7 ] h
+ 2: [ 9 ] j
 
  1: a
  2: b
  3: c
- 2: f
+ 2: e
+ 3: f
  1: d
- 3: e
- 2: g
- 3: i
- 1: h
- 2: j
+ 3: g
+ 1: i
+ 2: h
+ 1: j
 
 The form is similar for C<sequence>. For large sequences, the C<bounds_only>
 option is recommended. Also, specify C<chunk_size> accordingly. This reduces
@@ -1543,6 +1553,9 @@ the amount of traffic to and from the shared-manager process.
 
  sub compute_pi {
     my ( $wid ) = @_;
+
+    # Optionally, also receive the chunk_id value
+    # while ( my ( $beg, $end, $chunk_id ) = $seq->next ) { ... }
 
     while ( my ( $beg, $end ) = $seq->next ) {
        my ( $_pi, $t ) = ( 0.0 );
@@ -1564,6 +1577,8 @@ the amount of traffic to and from the shared-manager process.
 
  printf "pi = %0.13f\n", $pi->get / $N;
 
+ __END__
+
  # Output
 
  3.1415926535898
@@ -1573,6 +1588,8 @@ the amount of traffic to and from the shared-manager process.
 =item rewind ( key, [, key, ... ] )
 
 =item rewind ( "query string" )
+
+=item rewind ( )
 
 Rewinds the parallel iterator for L<MCE::Shared::Array>, L<MCE::Shared::Hash>,
 or L<MCE::Shared::Ordhash> when no arguments are given. Otherwise, resets the
@@ -1609,9 +1626,12 @@ the shared module.
 
 =item rewind ( begin, end [, step, format ] )
 
+=item rewind ( )
+
 Rewinds the parallel iterator for L<MCE::Shared::Sequence> when no arguments
 are given. Otherwise, resets the iterator with given criteria.
 
+ # sequence
  $seq->rewind;
 
  $seq->rewind( { chunk_size => 10, bounds_only => 1 }, 1, 100 );
@@ -1639,8 +1659,8 @@ an alias to C<STORE>.
  my $h2 = MCE::Shared->hash();
 
  # auto-shares deeply
- $h1->store( 'key', [ 0, 2, 5, { 'foo' => 'bar' } ] );
- $h2->{key}[3]{foo} = 'baz';   # via auto-vivification
+ $h1->store('key', [ 0, 2, 5, { 'foo' => 'bar' } ]);
+ $h2->{key}[3]{foo} = 'baz';    # via auto-vivification
 
  my $v1 = $h1->get('key')->get(3)->get('foo');  # bar
  my $v2 = $h2->get('key')->get(3)->get('foo');  # baz
@@ -1654,17 +1674,19 @@ an alias to C<STORE>.
 
 =item init
 
-This method is called automatically by each MCE or Hobo worker immediately
-after being spawned. The effect is extra parallelism during inter-process
-communication. The optional ID (an integer) is modded internally in a
-round-robin fashion.
+This method is called by each MCE and Hobo worker automatically after spawning.
+The effect is extra parallelism and decreased latency during inter-process
+communication to the shared-manager process. The optional ID (an integer) is
+modded internally in a round-robin fashion.
 
  MCE::Shared->init();
  MCE::Shared->init( ID );
 
 =item start
 
-Starts the shared-manager process. This is done automatically.
+Starts the shared-manager process. This is done automatically unless Perl
+lacks L<IO::FDPass>, needed to share C<condvar> or C<queue> while the
+shared-manager is running.
 
  MCE::Shared->start();
 
@@ -1693,7 +1715,7 @@ Application-level advisory locking is possible with L<MCE::Mutex>.
     for ( 1 .. 1000 ) {
        $mutex->lock;
 
-       # The next statement involves 2 IPC ops ( get and set ).
+       # Incrementing involves 2 IPC ops ( FETCH and STORE ).
        # Thus, locking is required.
        $cntr++;
 
@@ -1706,8 +1728,8 @@ Application-level advisory locking is possible with L<MCE::Mutex>.
 
  print $cntr, "\n"; # 8000
 
-However, locking is not necessary when using the OO interface. This is possible
-as MCE::Shared is implemented using a single-point of entry for commands sent
+Typically, locking is not necessary using the OO interface. The reason is that
+MCE::Shared is implemented using a single-point of entry for commands sent
 to the shared-manager process. Furthermore, the shared classes include sugar
 methods for combining set and get in a single operation.
 

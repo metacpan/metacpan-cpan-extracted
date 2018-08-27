@@ -19,7 +19,7 @@ no_index:
     - inc
 recommends:
   Alien::DDC::Concordance: '0.002'
-  DDC::XS: '0.14'
+  DDC::XS: '0.21'
 requires:
   IO::Socket::INET: '0'
   JSON: '0'
@@ -30,5 +30,5 @@ requires:
   perl: '5.01'
 resources:
   repository: svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

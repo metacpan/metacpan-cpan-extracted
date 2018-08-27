@@ -57,6 +57,7 @@ sub test_ufunc {
   $decoded_rc   .= $missing_val;
   $decoded_rc->indexND($which_rc) .= $nzvals_rc;
 
+  #$decoded_rc = undef if ("${pdl_ufunc_name}:missing=$missing_val:vals" eq 'borover:missing=BAD:vals'); ##-- DEBUG
   #isok("${pdl_ufunc_name}:missing=$missing_val:type", $nzvals_rc->type, $dense_rc->type);
   pdlok("${pdl_ufunc_name}:missing=$missing_val:vals", $decoded_rc, $dense_rc);
 }

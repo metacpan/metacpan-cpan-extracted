@@ -3,7 +3,8 @@ use 5;
 use ExtUtils::MakeMaker;
 
 my $EUMM_VERSION = eval $ExtUtils::MakeMaker::VERSION;
-my $is_win32 = ($^O =~ /MSWin/i);
+
+die q{OS unsupported\n} if $^O =~ /MSWin/i;
 
 WriteMakefile(
 	'NAME'          => 'Term::Size',
@@ -18,11 +19,4 @@ WriteMakefile(
 	        LICENSE => 'perl', # needs EEUU > 6.30_01
         ) : ()),
 
-) unless $is_win32;
-
-ExtUtils::MakeMaker::WriteEmptyMakefile(
-	'NAME'          => 'Term::Size',
-	'VERSION_FROM'  => 'Size.pm',
-) if $is_win32;
-
-
+);

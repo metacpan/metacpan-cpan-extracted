@@ -16,11 +16,25 @@
     after call_sv().
 */
 
+#define PUSH_PAYLOAD_KEY \
+    if (opts & PushName) {                      \
+    /* METHOD_NAMED path won't give us a free SP slot */ \
+    EXTEND(SP, items + 1);                      \
+    *(SP += items + 1) = payload->hash_key;     \
+    PUTBACK;                                    \
+    /*
+        re-enable when messing with stack for tests
+        assert(PL_curstackinfo->si_stack_hwm >= PL_stack_sp - PL_stack_base);
+    */ \
+    }
+
+
 #define CALL_READ_CB(result)                        \
     if (type == InheritedCb && payload->read_cb) {  \
         ENTER;                                      \
         PUSHMARK(SP);                               \
         *(SP+1) = result;                           \
+        PUSH_PAYLOAD_KEY; \
         call_sv(payload->read_cb, G_SCALAR);        \
         LEAVE;                                      \
     } else {                                        \
@@ -31,6 +45,7 @@
     if (type == InheritedCb && payload->write_cb) { \
         ENTER;                                      \
         PUSHMARK(SP);                               \
+    if (1) { PUSH_PAYLOAD_KEY; }                    \
         call_sv(payload->write_cb, G_SCALAR);       \
         SPAGAIN;                                    \
         LEAVE;                                      \

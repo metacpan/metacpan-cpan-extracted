@@ -44,7 +44,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.57'; # our $VERSION = '';
+$VERSION = '0.59'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.'; 
 
 #########################################################################################
@@ -244,7 +244,7 @@ sub sim    # This function launch the simulations in ESP-r
             #{
             #  if ( $countblock == 0 )
             #  {
-                open( SIMLIST, ">>$simlist") or die( "$!" );
+                open( SIMLIST, ">$simlist") or die( "$!" );
             #  }
             #  else 
             #  {
@@ -257,11 +257,11 @@ sub sim    # This function launch the simulations in ESP-r
             {
               if ( $countblock == 0 )
               {
-                open( SIMBLOCK, ">>$simblock"); # or die;
+                open( SIMBLOCK, ">$simblock"); # or die;
               }
               else 
               {
-                open( SIMBLOCK, ">>$simblock"); # or die;
+                open( SIMBLOCK, ">$simblock"); # or die;
               }
             }
             
@@ -462,11 +462,11 @@ $printthis
               {
                 if ( $countblock == 0 )
                 {
-                  open( SIMBLOCK, ">>$simblock"); # or die;
+                  open( SIMBLOCK, ">$simblock"); # or die;
                 }
                 else 
                 {
-                  open( SIMBLOCK, ">>$simblock"); # or die;
+                  open( SIMBLOCK, ">$simblock"); # or die;
                 }
               }
               
@@ -474,11 +474,11 @@ $printthis
               {
                 if ( $countblock == 0 )
                 {
-                  open( RETBLOCK, ">>$retblock"); # or die;
+                  open( RETBLOCK, ">$retblock"); # or die;
                 }
                 else 
                 {
-                  open( RETBLOCK, ">>$retblock"); # or die;
+                  open( RETBLOCK, ">$retblock"); # or die;
                 }
               }
             }
@@ -576,31 +576,31 @@ $printthis
     if ( $dowhat{newretrieve} eq "y" )
     {
       #say $tee "INSIM1: countinstance: $countinstance";
-      my @result = Sim::OPT::Report::newretrieve( 
+      my @resultretrieve = Sim::OPT::Report::newretrieve( 
       { 
         instances => \@instances, countcase => $countcase, countblock => $countblock, 
         dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer, countinstance => $countinstance,
         simcases => \@simcases, simstruct => \@simstruct, resfile => $resfile,
       } );
-      $dirfiles{retcases} = $result[0]; 
-      $dirfiles{retstruct} = $result[1];
-      $dirfiles{notecases} = $result[2];
+      $dirfiles{retcases} = $resultretrieve[0]; 
+      $dirfiles{retstruct} = $resultretrieve[1];
+      $dirfiles{notecases} = $resultretrieve[2];
     }
 
     if ( $dowhat{newreport} eq "y" )
     { 
       #say $tee "INSIM2: countinstance: $countinstance";
-      my @result = Sim::OPT::Report::newreport( 
+      my @resultreport = Sim::OPT::Report::newreport( 
       { 
         instances => \@instances, countcase => $countcase, countblock => $countblock, 
         dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer, countinstance => $countinstance, 
         resfile => $resfile, simcases => \@simcases, simstruct => \@simstruct, resfile => $resfile,
       } );
-      $dirfiles{repcases} = $result[0];
-      $dirfiles{repstruct} = $result[1];
-      $dirfiles{mergestruct} = $result[2];
-      $dirfiles{mergecases} = $result[3];
-      $dirfiles{repfilebackup} = $result[4];
+      $dirfiles{repcases} = $resultreport[0];
+      $dirfiles{repstruct} = $resultreport[1];
+      $dirfiles{mergestruct} = $resultreport[2];
+      $dirfiles{mergecases} = $resultreport[3];
+      $dirfiles{repfilebackup} = $resultreport[4];
     }
     
 

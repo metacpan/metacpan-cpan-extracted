@@ -39,5 +39,5 @@ requires:
   Term::ANSIColor: '4.05'
   YAML: '1.15'
   namespace::autoclean: '0.28'
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'YAML::Tiny version 1.70'

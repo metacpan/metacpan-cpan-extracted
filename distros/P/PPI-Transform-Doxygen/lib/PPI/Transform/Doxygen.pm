@@ -138,7 +138,9 @@ In that case there is no redundant information you'll have to synchronize on
 each change.
 In that case the first parameter behind the B<=for> has to be C<method>,
 C<function> or C<class_method>. The second parameter specifies the return
-value.
+value. Both parameters must be present because the =for tag requires them.
+There are no defaults.
+
 A conflicting B<=head2> declaration for the same subroutine will take
 precedence.
 
@@ -181,7 +183,7 @@ use Pod::POM::View::Text;
 use PPI::Transform::Doxygen::POD;
 use Params::Util qw{_INSTANCE};
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 my %vtype = qw(% hash @ array $ scalar & func * glob);
 
@@ -342,6 +344,15 @@ sub _get_used_modules {
 }
 
 
+my %modifier = (
+    has    => '<b>Accessor Method</b>',
+    before => '<b>Method Modifier: <i>before</i></b>',
+    after  => '<b>Method Modifier: <i>after</i></b>',
+    around => '<b>Method Modifier: <i>around</i></b>',
+    fresh  => '<b>Method Modifier: <i>fresh</i></b>',
+);
+
+
 sub _parse_packages_subs {
     my($self, $doc) = @_;
 
@@ -361,9 +372,10 @@ sub _parse_packages_subs {
     my $stmt_nodes = $doc->find('PPI::Statement') || [];
     for my $stmt_node ( @$stmt_nodes ) {
 
-        my $pkg  = '!main';
+        my $pkg = '!main';
+        my $mod = $stmt_node->child(0);
         next unless $stmt_node->class() eq 'PPI::Statement::Sub'
-            or $stmt_node->child(0) eq 'has';
+            or $modifier{$mod};
 
         my $node = $stmt_node;
         while ($node) {
@@ -395,8 +407,10 @@ sub _parse_packages_subs {
                      ? $stmt_node->name
                      : $stmt_node->child(2)->content;
 
+        # split has sub_name => [qw(one two three)]
         for my $sn ( grep { /\w/ && $_ ne 'qw' } split(/\W+/, $sub_name) ) {
-            $pkg_subs{$pkg}{subs}{ $sn } = $stmt_node;
+            $pkg_subs{$pkg}{subs}{$sn}  = $stmt_node;
+            $pkg_subs{$pkg}{mtype}{$sn} = $modifier{$mod} if $modifier{$mod};
         }
     }
 
@@ -408,6 +422,7 @@ sub _out_process_subs {
     my($class, $pkg_subs, $sub_info) = @_;
 
     my $sub_nodes = $pkg_subs->{$class}{subs};
+    my $mod_types = $pkg_subs->{$class}{mtype};
 
     my $out = '';
 
@@ -438,6 +453,7 @@ sub _out_process_subs {
             $fstr .= ')';
 
             $out .= "/** \@fn $fstr\n";
+            $out .= "$mod_types->{$sname}\n" if $mod_types->{$sname};
             $out .= $si->{text} . "\n";
             $out .= _out_html_code( $sname, $sub_nodes->{$sname} );
             $out .= "*/\n";
@@ -521,32 +537,16 @@ sub _parse_pod {
 
 sub _filter_head2 {
     my($pom, $sub_ref) = @_;
-
-    my $nodes = $pom->content();
-    my $method_for = 0;
-    for my $sn ( @$nodes ) {
-        $sn = '' if $method_for;
-        next unless $sn and $sn->type() =~ /^(?:head[1-4]|begin|item|over|pod|for)$/;
+    for my $sn ( @{ $pom->content() } ) {
         if ( $sn->type() eq 'head2' and $sn->title() =~ /[\w:]+\s*\(.*\)/ ) {
             my $sinfo = _sub_extract( $sn->title() );
-            if ($sinfo) {
-                $sinfo->{text} = PPI::Transform::Doxygen::POD->print($sn->content());
+            if ( $sinfo ) {
+                $sinfo->{text} = PPI::Transform::Doxygen::POD->print($sn) // '';
                 $sub_ref->{$sinfo->{name}} = $sinfo;
                 $sn = '';
             }
-        } elsif ( $sn->type() eq 'for' ) {
-            if (
-                $sn->type eq 'for'
-                and
-                $sn->format =~ /^(?:function|method|class_method)$/
-            ) {
-                $sn = '';
-                $method_for = 1;
-            }
-
-        } else {
-            _filter_head2($sn);
         }
+        _filter_head2($sn, $sub_ref) if $sn;
     }
 }
 
@@ -584,6 +584,7 @@ sub _sub_extract {
         name   => $name,
         static => $static,
         class  => $class,
+        text   => '',
     };
 }
 
@@ -669,11 +670,12 @@ sub _out_html_code {
 sub _sub_info_from_node {
     my($sname, $class, $node) = @_;
 
-    return undef unless $node->class eq 'PPI::Statement::Sub';
+    return undef unless $node->class eq 'PPI::Statement::Sub'
+        or ($node->children > 6 and $node->child(6)->content eq 'sub');
 
     my $parser = Pod::POM->new();
     my %si;
-    my $txt = my $def = '';
+    my $txt = my $def = my $fmt = '';
     my @params;
     my($rv, $static);
     my $type = $sname =~ /^_/ ? 'private' : 'public';
@@ -684,7 +686,8 @@ sub _sub_info_from_node {
         my $pom = $parser->parse_text($quoted);
         next unless my $for = $pom->for->[0];
         $rv     = $for->text;
-        $static = $for->format eq 'function' || $for->format eq 'class_method';
+        $fmt    = $for->format;
+        $static = $fmt eq 'function' || $fmt eq 'class_method';
         $txt .= PPI::Transform::Doxygen::POD->print($pom);
     }
     my $proto = $node->find('PPI::Token::Prototype') || [];
@@ -696,12 +699,6 @@ sub _sub_info_from_node {
             $def .= "<p>Default value for $attr is $default.</p>\n";
         }
         @params = _add_type(\@params);
-    }
-    my @word_tok = $node->find('PPI::Token::Word');
-    my $last;
-    while ( my $tok = pop @word_tok ) {
-        $last = "$tok";
-        next unless $tok eq 'return';
     }
 
     return undef unless $txt;
@@ -716,6 +713,7 @@ sub _sub_info_from_node {
         static => $static,
         class  => $class,
         text   => $txt,
+        regex  => qr/\r?\n=for\s+$fmt\s+\Q$rv\E.+?\r?\n=cut\n\n?/s,
     }
 }
 
@@ -723,14 +721,12 @@ sub _sub_info_from_node {
 sub _integrate_sub_info {
     my($pkg_subs, $sub_info) = @_;
 
-    my %si_by_name = map { $_ => $sub_info->{$_} } keys %$sub_info;
-
     my %look;
     for my $class ( keys %$pkg_subs ) {
         for my $subname ( keys %{ $pkg_subs->{$class}{subs} } ) {
-            if ( $si_by_name{$subname} ) {
+            if ( $sub_info->{$subname} ) {
                 # pod info exists
-                $si_by_name{$subname}{class} = $class;
+                $sub_info->{$subname}{class} = $class;
                 $look{$subname} = 1;
                 next;
             };
@@ -739,8 +735,11 @@ sub _integrate_sub_info {
                 $class,
                 $pkg_subs->{$class}{subs}{$subname},
             );
-            $sub_info->{$subname} = $si if $si;
-            $look{$subname} = 1;
+            if ( $si ) {
+                $sub_info->{$subname} = $si;
+                $pkg_subs->{$class}{subs}{$subname} =~ s/$si->{regex}//;
+                $look{$subname} = 1;
+            }
         }
     }
 
@@ -766,7 +765,7 @@ L<https://github.com/tomk3003/ppi-transform-doxygen>
 
 =head1 COPYRIGHT
 
-Copyright 2016 Thomas Kratz.
+Copyright 2016-2018 Thomas Kratz.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

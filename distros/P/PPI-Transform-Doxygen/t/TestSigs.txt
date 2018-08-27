@@ -1,5 +1,5 @@
 package My::TestSigs;
-use Mojo::Base -base, -signatures;
+use Mojo::Base -role, -signatures;
 
 =head1 NAME
 
@@ -16,6 +16,25 @@ has attr2 => sub { 'blabla' };
 
 has ['attr3', 'attr4'];
 has [qw(attr5 attr6 attr7)];
+
+after method1 => sub ($self, $bla1) {};
+
+before method2 => sub ($self, $bla2) {};
+
+around method3 => sub ($self, $bla3) {
+=for method $self
+
+around method3
+
+=cut
+
+return;
+};
+
+sub fresh {};
+
+fresh method4 => sub ($self, $bla4) {};
+
 
 sub test1 ($first, $second = 'default', @rest) {
 =for function $ok

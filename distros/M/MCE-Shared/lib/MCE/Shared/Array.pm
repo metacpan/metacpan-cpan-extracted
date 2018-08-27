@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -290,31 +290,25 @@ sub sort {
 
    if ( defined wantarray ) {
       if ( $alpha ) { ( $desc )
-       ? CORE::sort { $b cmp $a } @{ $self }
-       : CORE::sort { $a cmp $b } @{ $self };
+         ? CORE::sort { $b cmp $a } @{ $self }
+         : CORE::sort { $a cmp $b } @{ $self };
       }
       else { ( $desc )
-       ? CORE::sort { $b <=> $a } @{ $self }
-       : CORE::sort { $a <=> $b } @{ $self };
+         ? CORE::sort { $b <=> $a } @{ $self }
+         : CORE::sort { $a <=> $b } @{ $self };
       }
    }
 
    # Sort values in-place otherwise, in void context.
 
    elsif ( $alpha ) { ( $desc )
-    ? $self->_reorder( CORE::sort { $b cmp $a } @{ $self } )
-    : $self->_reorder( CORE::sort { $a cmp $b } @{ $self } );
+      ? do { @{ $self } = CORE::sort { $b cmp $a } @{ $self } }
+      : do { @{ $self } = CORE::sort { $a cmp $b } @{ $self } };
    }
    else { ( $desc )
-    ? $self->_reorder( CORE::sort { $b <=> $a } @{ $self } )
-    : $self->_reorder( CORE::sort { $a <=> $b } @{ $self } );
+      ? do { @{ $self } = CORE::sort { $b <=> $a } @{ $self } }
+      : do { @{ $self } = CORE::sort { $a <=> $b } @{ $self } };
    }
-}
-
-sub _reorder {
-   my $self = shift; @{ $self } = @_; 
-
-   return;
 }
 
 ###############################################################################
@@ -396,7 +390,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.838
+This document describes MCE::Shared::Array version 1.839
 
 =head1 DESCRIPTION
 

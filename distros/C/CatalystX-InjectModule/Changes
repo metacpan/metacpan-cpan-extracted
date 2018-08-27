@@ -1,5 +1,8 @@
 Revision history for CatalystX-InjectModule
 
+0.14 2018-08-21
+     - build local config file (myapp_local.yml)
+
 0.13 2018-07-09
      - use Catalyst config (and local config) before modules config
      

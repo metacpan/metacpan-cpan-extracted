@@ -13,6 +13,7 @@ my @files = (
     't/01-basic.t',
     't/02-test.t',
     't/03-dump_config.t',
+    't/04-mvp-args.t',
     't/lib/RunTests.pm',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',

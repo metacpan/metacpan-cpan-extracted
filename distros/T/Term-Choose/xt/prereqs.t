@@ -4,4 +4,13 @@ use strict;
 
 use Test::More;
 use Test::Prereq;
-prereq_ok( undef, [ qw( Term::ReadKey Win32::Console Data_Test_Arguments Data_Test_Choose ) ] );
+prereq_ok( undef, [
+    qw(     Term::ReadKey
+            Encode
+            Encode::Locale
+            Win32::Console
+            Win32::Console::PatchForRT33513
+
+            Data_Test_Arguments Data_Test_Choose
+    )
+] );

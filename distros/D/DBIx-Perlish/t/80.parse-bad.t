@@ -98,11 +98,11 @@ test_bad_delete {
 
 test_bad_select {
 	my $t : t1;
-	$t->id  <-  db_fetch { my $tt : t2 };
+	$t->id  <-  subselect { my $tt : t2 };
 } "subselect returns too much 1", qr/subselect query sub must return exactly one value/;
 test_bad_select {
 	my $t : t1;
-	$t->id  <-  db_fetch {
+	$t->id  <-  subselect {
 		my $t2 : t2; my $t3 : t3;
 		$t2->id == $t3->id;
 		return $t2;
@@ -119,32 +119,38 @@ test_bad_select {
 	last unless 3..($testmy * $testour);
 } "bad simple term 3", qr/cannot reconstruct simple term from operation/;
 
-test_bad_select { join 1,2,3,4; } "bad join 1", qr/not a valid join/;
-test_bad_select { join 1,2; } "bad join 2", qr/not a valid join/;
-test_bad_select { join 1,2,3; } "bad join 3", qr/not a valid join/;
+if ( DBIx::Perlish->optree_version == 1 ) {
+	test_bad_select { join 1,2; } "bad join 1", qr/not a valid join/;
+	test_bad_select { join 1,2,3; } "bad join 2", qr/not a valid join/;
+	test_bad_select { join 1,2,3,4; } "bad join 3", qr/not a valid join/;
+} else {
+	test_bad_select { join $1,2,3; } "bad join 1", qr/not a valid join/;
+	test_bad_select { join $1,2,3,4; } "bad join 2", qr/not a valid join/;
+	test_bad_select { join $1,$2,$3,4,5; } "bad join 3", qr/not a valid join/;
+}
 test_bad_select { join $testmy - 2; } "bad join 4", qr/not a valid join.*x is expected/;
 test_bad_select { join $testmy - 2, 1; } "bad join 5", qr/not a valid join.*> is expected/;
 test_bad_select { join $testmy + 2, 1; } "bad join 6", qr/not a valid join/;
-test_bad_select { join 2 * $testmy; } "bad join 7", qr/first argument join/;
-test_bad_select { my $t : tab; join $t * 2; } "bad join 8", qr/second argument join/;
-test_bad_select { my $t1 : t1; my $t2 : t2; join $t1 * $t2, xx(); } "bad join 9", qr/not a db_fetch/;
+test_bad_select { join 2 * $testmy; } "bad join 7", qr/first argument of join/;
+test_bad_select { my $t : tab; join $t * 2; } "bad join 8", qr/second argument of join/;
+test_bad_select { my $t1 : t1; my $t2 : t2; join $t1 * $t2, xx(); } "bad join 9", qr/not a subselect/;
 test_bad_select { my $t1 : t1; my $t2 : t2;
-	join $t1 * $t2 => db_fetch { my $t3 : t3 }
+	join $t1 * $t2 => subselect { my $t3 : t3 }
 } "bad join 10", qr/anything but conditional/;
 test_bad_select { my $t1 : t1; my $t2 : t2;
-	join $t1 * $t2 => db_fetch { return $t1->x }
+	join $t1 * $t2 => subselect { return $t1->x }
 } "bad join 11", qr/anything but conditional/;
 test_bad_select { my $t1 : t1; my $t2 : t2;
-	join $t1 * $t2 => db_fetch { group_by: $t1->name }
+	join $t1 * $t2 => subselect { group_by: $t1->name }
 } "bad join 12", qr/anything but conditional/;
 test_bad_select { my $t1 : t1; my $t2 : t2;
-	join $t1 * $t2 => db_fetch { order: $t1->name }
+	join $t1 * $t2 => subselect { order: $t1->name }
 } "bad join 13", qr/anything but conditional/;
 test_bad_select { my $t1 : t1; my $t2 : t2;
-	join $t1 + $t2 => db_fetch { }
+	join $t1 + $t2 => subselect { }
 } "bad join 14", qr/at least one conditional/;
 test_bad_select { my $t1 : t1; my $t2 : t2;
-	join $t1 * $t2 <= db_fetch {}, 42;
+	join $t1 * $t2 <= subselect {}, 42;
 } "bad join 15", qr/not a valid join/;
 
 test_bad_select { tbl->id++; } "selfmod in select 1", qr/self-modifications are not understood/;
@@ -154,7 +160,7 @@ test_bad_update { tbl->id++ - 5 } "bad selfmod 1", qr/cannot reconstruct term/;
 test_bad_update { 4 + (tbl->id += 4) } "bad selfmod 2", qr/self-modifications inside an expression is illegal/;
 
 test_bad_select {
-	{ return t1->name } union { return t2->name } db_fetch { return t3->name }
+	{ return t1->name } union { return t2->name } subselect { return t3->name }
 } "multi-union gone bad", qr/missing semicolon after union/;
 
 test_bad_select {

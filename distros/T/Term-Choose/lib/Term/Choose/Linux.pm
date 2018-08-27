@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.625';
+our $VERSION = '1.627';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -173,30 +173,28 @@ sub __mouse_event_to_button {
 
 
 sub __set_mode {
-    my ( $self, $mouse, $hide_cursor ) = @_;
-    if ( $mouse ) {
-        if ( $mouse == 3 ) {
+    my ( $self, $config ) = @_;
+    if ( $self->{mouse} = $config->{mouse} ) {
+        if ( $self->{mouse} == 3 ) {
             my $return = binmode STDIN, ':utf8';
             if ( $return ) {
                 print SET_ANY_EVENT_MOUSE_1003;
                 print SET_EXT_MODE_MOUSE_1005;
             }
             else {
-                $mouse = 0;
-                warn "binmode STDIN, :utf8: $!\n";
-                warn "mouse-mode disabled\n";
+                $self->{mouse} = 0;
+                warn "binmode STDIN, :utf8: $!\nmouse-mode disabled\n";
             }
         }
-        elsif ( $mouse == 4 ) {
+        elsif ( $self->{mouse} == 4 ) {
             my $return = binmode STDIN, ':raw';
             if ( $return ) {
                 print SET_ANY_EVENT_MOUSE_1003;
                 print SET_SGR_EXT_MODE_MOUSE_1006;
             }
             else {
-                $mouse = 0;
-                warn "binmode STDIN, :raw: $!\n";
-                warn "mouse-mode disabled\n";
+                $self->{mouse} = 0;
+                warn "binmode STDIN, :raw: $!\nmouse-mode disabled\n";
             }
         }
         else {
@@ -205,32 +203,48 @@ sub __set_mode {
                 print SET_ANY_EVENT_MOUSE_1003;
             }
             else {
-                $mouse = 0;
-                warn "binmode STDIN, :raw: $!\n";
-                warn "mouse-mode disabled\n";
+                $self->{mouse} = 0;
+                warn "binmode STDIN, :raw: $!\nmouse-mode disabled\n";
             }
         }
     }
+    my $mode_stty;
+    if ( ! $config->{mode} ) {
+        die "No mode!";
+    }
+    elsif ( $config->{mode} eq 'ultra-raw' ) {
+        $mode_stty = 'raw';
+    }
+    elsif ( $config->{mode} eq 'cbreak' ) {
+        $mode_stty = 'cbreak';
+    }
+    else {
+        die "Invalid mode!";
+    }
     if ( $Term_ReadKey ) {
-        Term::ReadKey::ReadMode( 'ultra-raw' );
+        Term::ReadKey::ReadMode( $config->{mode} );
     }
     else {
         $Stty = `stty --save`;
         chomp $Stty;
-        system( "stty -echo raw" ) == 0 or die $?;
+        system( "stty -echo $mode_stty" ) == 0 or die $?;
     }
-    print HIDE_CURSOR if $hide_cursor;
-    return $mouse;
+    if ( $self->{hide_cursor} = $config->{hide_cursor} ) {
+        $self->__hide_cursor;
+    }
+    return $self->{mouse};
 };
 
 
 sub __reset_mode {
-    my ( $self, $mouse, $hide_cursor ) = @_;
-    print SHOW_CURSOR if $hide_cursor;
-    if ( $mouse ) {
+    my ( $self ) = @_;
+    if ( delete $self->{hide_cursor} ) {
+        $self->__show_cursor();
+    }
+    if ( delete $self->{mouse} ) {
         binmode STDIN, ':encoding(UTF-8)' or warn "binmode STDIN, :encoding(UTF-8): $!\n";
-        print UNSET_EXT_MODE_MOUSE_1005     if $mouse == 3;
-        print UNSET_SGR_EXT_MODE_MOUSE_1006 if $mouse == 4;
+        print UNSET_EXT_MODE_MOUSE_1005     if $self->{mouse} == 3;
+        print UNSET_SGR_EXT_MODE_MOUSE_1006 if $self->{mouse} == 4;
         print UNSET_ANY_EVENT_MOUSE_1003;
     }
     $self->__reset();
@@ -273,15 +287,33 @@ sub __get_cursor_position {
 }
 
 
+sub __hide_cursor {
+    #my ( $self ) = @_;
+    print HIDE_CURSOR;
+}
+
+
+sub __show_cursor {
+    #my ( $self ) = @_;
+    print SHOW_CURSOR;
+}
+
+
 sub __clear_screen {
     #my ( $self ) = @_;
     print CLEAR_SCREEN;
 }
 
 
-sub __clear_to_end_of_screen {
+sub __clear_lines_to_end_of_screen {
     #my ( $self ) = @_;
-    print CLEAR_TO_END_OF_SCREEN;
+    print "\r", CLEAR_TO_END_OF_SCREEN;
+}
+
+
+sub __clear_line {
+    #my ( $self ) = @_;
+    print "\r", CLEAR_TO_END_OF_LINE;
 }
 
 
@@ -303,9 +335,17 @@ sub __reset {
 }
 
 
+# up, down, left, right: $_[1] has to be 1 or greater
+
 sub __up {
     #my ( $self ) = @_;
     print "\e[${_[1]}A";
+}
+
+
+sub __down  {
+    #my ( $self ) = @_;
+    print "\e[${_[1]}B";
 }
 
 

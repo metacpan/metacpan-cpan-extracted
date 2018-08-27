@@ -39,6 +39,28 @@ subtest parallel_dolines_inline_bad_option => sub {
     ok( $e, "Got exception - bad header option contents" );
 };
 
+subtest parallel_bad_proc => sub {
+    my $e = dies {
+        parallel_dolines { return; } "t/data/3lines.txt", undef;
+    };
+    ok( $e, "Got exception - parallel_dolines undefined process count" );
+
+    $e = dies {
+        parallel_forlines "t/data/3lines.txt", undef, sub { return; };
+    };
+    ok( $e, "Got exception - parallel_forlines undefined process count" );
+
+    $e = dies {
+        parallel_greplines { 1 } "t/data/3lines.txt", undef;
+    };
+    ok( $e, "Got exception - parallel_greplines undefined process count" );
+
+    $e = dies {
+        parallel_maplines { 1 } "t/data/3lines.txt", undef;
+    };
+    ok( $e, "Got exception - parallel_maplines undefined process count" );
+};
+
 subtest parallel_dolines => sub {
     my ( $fh1, $fn1 ) = tempfile();
     my ( $fh2, $fn2 ) = tempfile();

@@ -1,9 +1,8 @@
 package File::Hotfolder;
-use strict;
 use warnings;
 use v5.10;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Carp;
 use File::Find;
@@ -52,6 +51,7 @@ sub new {
                       or croak "Unable to create new inotify object: $!"),
         callback   => ($args{callback} || sub { 1 }),
         delete     => !!$args{delete},
+        fork       => !!$args{fork},
         print      => 0+($args{print} || 0),
         filter     => _build_filter($args{filter},
                                     sub { $_[0] !~ qr{^(.*/)?\.[^/]*$} }),
@@ -59,9 +59,10 @@ sub new {
         scan       => $args{scan},
         catch      => _build_catch($args{catch}),
         logger     => _build_logger($args{logger}),
+        event_mask => ($args{event_mask} || ( IN_CLOSE_WRITE | IN_MOVED_TO )),
     }, $class;
 
-    $self->watch_recursive( $path );
+    $self->watch_recursive( $path, 1 );
 
     $self;
 }
@@ -80,14 +81,14 @@ sub _build_filter {
 }
 
 sub watch_recursive {
-    my ($self, $path) = @_;
+    my ($self, $path, $is_root) = @_;
 
     my $args = {
         no_chdir => 1, 
         wanted => sub {
             if (-d $_) {
                 $self->_watch_directory($_);
-            } elsif( $self->{scan} ) {
+            } elsif( !$is_root || $self->{scan} ) {
                 # TODO: check if not open or modified (lsof or fuser)
                 $self->_callback($_);
             }
@@ -127,7 +128,7 @@ sub _watch_directory {
                     $self->log( UNWATCH_DIR, $path );
                     $e->w->cancel;
                 }
-            } elsif ( $e->IN_CLOSE_WRITE || $e->IN_MOVED_TO ) {
+            } elsif ( $e->mask & $self->{event_mask} ) {
                 $self->_callback($path);
             }
 
@@ -143,6 +144,9 @@ sub _callback {
     if ($self->{filter} && !$self->{filter}->($path)) {
         return;
     }
+
+    my $fork = $self->{fork} ? fork : undef;
+    return if $fork; # parent
 
     $self->log( FOUND_FILE, $path );
     
@@ -164,6 +168,8 @@ sub _callback {
     } else {
         $self->log( KEEP_FILE, $path );
     }
+
+    exit if (defined $fork and !$fork); # child
 }
 
 sub loop {
@@ -189,8 +195,8 @@ our %LOGS = (
     FOUND_FILE  , "found %s",
     KEEP_FILE   , "keep %s",
     DELETE_FILE , "delete %s",
-    CATCH_ERROR , "error %s: %s",
-    WATCH_ERROR , "failed %s: %s",
+    CATCH_ERROR , "error %s",
+    WATCH_ERROR , "failed %s",
 );
 
 sub _build_logger {
@@ -223,7 +229,7 @@ sub log {
         $self->{logger}->( 
             event   => $event,
             path    => $path,
-            message => sprintf($LOGS{$event}, $path, $event),
+            message => sprintf($LOGS{$event}, $path),
         );
     }
 }
@@ -256,6 +262,7 @@ File::Hotfolder - recursive watch directory for new or modified files
             my $path = shift;
             ...
         },
+        fork     => 0,                  # fork callback
         delete   => 1,                  # delete each file if callback returns true
         filter   => qr/\.json$/,        # only watch selected files
         print    => WATCH_DIR           # show which directories are watched
@@ -263,7 +270,8 @@ File::Hotfolder - recursive watch directory for new or modified files
         catch    => sub {               # catch callback errors
             my ($path, $error) = @_;
             ...
-        }
+        },
+        event_mask => IN_CLOSE          # filter event only to those of interest
     )->loop;
 
     # function interface
@@ -279,6 +287,10 @@ File::Hotfolder - recursive watch directory for new or modified files
         print   => DELETE_FILE | KEEP_FILE
     );
     
+    # wait for events with AnyEvent
+    File::HotFolder->new( ... )->anyevent;
+    AnyEvent->condvar->recv;
+
 =head1 DESCRIPTION
 
 This module uses L<Linux::Inotify2> to recursively watch a directory for new or
@@ -310,6 +322,14 @@ Delete the modified file if a callback returned a true value (disabled by
 default). A C<DELETE_FILE> will be logged after deletion or a C<KEEP_FILE>
 event otherwise.
 
+=item event_mask
+
+React only to those event satisfying the mask. Can be any mask built of the
+following Linux::Inotify2 event flags: C<IN_CREATE>, C<IN_CLOSE_WRITE>,
+C<IN_MOVE>, C<IN_DELETE>, C<IN_DELETE_SELF>, C<IN_MOVE_SELF>.
+
+Defaults to C<IN_CLOSE_WRITE> | C<IN_MOVED_TO>.
+
 =item fullname
 
 Return absolute path names. By default pathes are relative to the base
@@ -326,14 +346,20 @@ C<0> to disable.
 Filter directory names with regular expression before watching. Set to ignore
 hidden directories (starting with a dot) by default. Use C<0> to disable.
 
+=item fork
+
+Execute callback in a child process by forking if possible.  Logging also takes
+place in the child process.
+
 =item print
 
-Which events to log. Unless parameter C<logger> is specified, events are
-printed to STDOUT or STDERR. Possible event types are exported as constants
-C<WATCH_DIR>, C<UNWATCH_DIR>, C<FOUND_FILE>, C<DELETE_FILE>, C<KEEP_FILE>,
-C<CATCH_ERROR>, and C<WATCH_ERROR>. The constant C<HOTFOLDER_ERROR> combines
-C<CATCH_ERROR> and C<WATCH_ERROR> and the constant C<HOTFOLDER_ALL> combines
-all event types.
+Log events to STDOUT and STDERR unless an explicit C<logger> is specified.
+
+This parameter expects a value with event types.  Possible event types are
+exported as constants C<WATCH_DIR>, C<UNWATCH_DIR>, C<FOUND_FILE>,
+C<DELETE_FILE>, C<KEEP_FILE>, C<CATCH_ERROR>, and C<WATCH_ERROR>. The constant
+C<HOTFOLDER_ERROR> combines C<CATCH_ERROR> and C<WATCH_ERROR> and the constant
+C<HOTFOLDER_ALL> combines all event types.
 
 =item logger
 
@@ -384,9 +410,17 @@ L<Filesys::Notify::KQueue>...), so this method may return C<undef>.
 
 =head1 SEE ALSO
 
+=over
+
+=item
+
 L<File::ChangeNotify>, L<Filesys::Notify::Simple>
 
+=item
+
 L<AnyEvent>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

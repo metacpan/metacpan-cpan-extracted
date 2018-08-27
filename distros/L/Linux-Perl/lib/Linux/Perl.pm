@@ -37,6 +37,12 @@ Each family of system calls lives in its own namespace under C<Linux::Perl>:
 
 =item * L<Linux::Perl::getdents>
 
+=item * L<Linux::Perl::getrandom>
+
+=item * L<Linux::Perl::timerfd>
+
+=item * L<Linux::Perl::epoll>
+
 =back
 
 The distribution contains a number of other modules, none of which is
@@ -78,7 +84,7 @@ use warnings;
 
 use Linux::Perl::X ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.11';
 
 sub call {
     local $!;

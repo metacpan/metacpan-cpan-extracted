@@ -3,11 +3,16 @@
 use strict;
 use warnings;
 use Test::More;
+use Path::Tiny;
 use App::Git::Workflow::Command::Recent;
 use lib 't/lib';
 use Test::Git::Workflow::Command;
 
 our $name = 'test';
+
+my $git_dir = "t/data/git-recent/";
+path($git_dir)->remove_tree if -d $git_dir;
+system "tree -a $git_dir";
 
 run();
 done_testing();
@@ -17,10 +22,11 @@ sub run {
         {
             ARGV => [],
             mock => [
+                { 'rev-parse' => "$git_dir\n" },
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '1000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}1000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -38,9 +44,9 @@ OUT
             ARGV => [qw/--out text/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '2000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}2000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -58,9 +64,9 @@ OUT
             ARGV => [qw/--out json/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '3000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}3000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -81,9 +87,9 @@ OUT
             ARGV => [qw/--out perl/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '4000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}4000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -103,9 +109,9 @@ OUT
             ARGV => [qw/--out unknown/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '5000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}5000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -119,9 +125,9 @@ OUT
             ARGV => [qw/--out json --since 2014-11-10/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '6000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}6000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -145,9 +151,9 @@ OUT
             ARGV => [qw/--out json --month/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '7000000000000000000000000000000000000000',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}7000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
             ],
             STD => {
@@ -171,10 +177,10 @@ OUT
             ARGV => [qw/--out json --week/],
             mock => [
                 { 'rev-list' =>  [
-                    '0000000000000000000000000000000000000000',
+                    '8000000000000000000000000000000000000000',
                     '1111111111111111111111111111111111111111',
                 ]},
-                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
+                { log    => "1414997088\x{1}8000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
                 { log    => "1414997088\x{1}1111111111111111111111111111111111111111\x{1}Test Other\x{1}test.other\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
@@ -200,6 +206,6 @@ OUT
 
     for my $data (@data) {
         command_ok('App::Git::Workflow::Command::Recent', $data)
-            or return;
+            or last;
     }
 }

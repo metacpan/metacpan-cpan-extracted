@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -124,7 +124,7 @@ my $_tid = $_has_threads ? threads->tid() : 0;
 my $_oid = "$$.$_tid";
 
 sub _croak {
-   Carp::carp($_[0]); MCE::Signal::stop_and_exit('__DIE__');
+   Carp::carp($_[0]); MCE::Signal::stop_and_exit('INT');
 }
 sub CLONE {
    $_tid = threads->tid() if $_has_threads;
@@ -333,10 +333,6 @@ sub _share {
          $self->[2] = 1, last if $_class->isa($_module);
       }
       $_export_nul{ $_class } = undef if $self->[2];
-   }
-
-   if ( my $_code = $_obj{ $_id }->can('_shared_init') ) {
-      $_code->($_obj{ $_id });
    }
 
    return $self;
@@ -552,6 +548,7 @@ sub _loop {
             CORE::die(@_);
          }
       }
+
       $SIG{INT} = $SIG{__DIE__} = $SIG{__WARN__} = sub { };
       print {*STDERR} defined $_[0] ? $_[0] : '';
       CORE::kill('INT', $_is_MSWin32 ? -$$ : -getpgrp);
@@ -564,7 +561,7 @@ sub _loop {
       no warnings 'redefine'; local $@; eval '*Prima::cleanup = sub {}';
    }
 
-   my ($_id, $_fcn, $_wa, $_len, $_le2, $_le3, $_func, $_var);
+   my ($_id, $_fcn, $_wa, $_len, $_le2, $_func, $_var);
    my ($_client_id, $_done) = (0, 0);
 
    my $_channels   = $_SVR->{_dat_r_sock};
@@ -637,51 +634,47 @@ sub _loop {
    };
 
    my $_iter = sub {
-      if ( !exists $_itr{ $_id } ) {
+      unless ( exists $_itr{ $_id } ) {
 
          my $pkg = $_all{ $_id };
          my $flg = ($pkg->can('NEXTKEY') || $pkg->can('keys')) ? 1 : 0;
-         my $get = ($pkg->can('FETCH')) ? 'FETCH' : ($pkg->can('get')) ? 'get' : '';
+         my $get = $pkg->can('FETCH') ? 'FETCH' : $pkg->can('get') ? 'get' : '';
 
-         # MCE::Shared::{ Array, Hash, Ordhash }, Hash::Ordered, or similar.
-         if ( ($flg || $pkg->can('FETCHSIZE')) && $get ) {
-            $get = 'peek' if $pkg->isa('MCE::Shared::Cache');
-
-            my @_keys;
-            if ( !exists $_itr{ "$_id:args" } ) {
-               @_keys = $pkg->can('keys')
-                  ? $_obj{ $_id }->keys()
-                  : $_obj_keys->( $_obj{ $_id } );
-            }
-            else {
-               my $_args = $_itr{ "$_id:args" };
-               if ( @{ $_args } == 1 &&
-                    $_args->[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
-
-                  @_keys = $_obj{ $_id }->keys($_args->[0])
-                     if $pkg->isa('MCE::Shared::Base::Common');
-               }
-               else {
-                  $_obj{ $_id }->_prune_head()
-                     if $pkg->isa('MCE::Shared::Cache');
-
-                  @_keys = @{ $_args };
-               }
-            }
-
-            $_itr{ $_id } = sub {
-               my $_key = shift @_keys;
-               print({$_DAU_R_SOCK} '-1'.$LF), return if !defined($_key);
-               my $_buf = $_freeze->([ $_key, $_obj{ $_id }->$get($_key) ]);
-               print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
-            };
-         }
-
-         # Not supported
-         else {
+         unless ( ($flg || $pkg->can('FETCHSIZE')) && $get ) {
             print {$_DAU_R_SOCK} '-1'.$LF;
             return;
          }
+
+         # MCE::Shared::{ Array, Cache, Hash, Ordhash }, Hash::Ordered,
+         # or similar module.
+
+         $get = 'peek' if $pkg->isa('MCE::Shared::Cache');
+
+         if ( !exists $_itr{ "$_id:args" } ) {
+            @{ $_itr{ "$_id:args" } } = $pkg->can('keys')
+               ? $_obj{ $_id }->keys()
+               : $_obj_keys->( $_obj{ $_id } );
+         }
+         else {
+            my $_args = $_itr{ "$_id:args" };
+            if ( @{ $_args } == 1 &&
+                 $_args->[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
+
+               @{ $_args } = $_obj{ $_id }->keys($_args->[0])
+                  if $pkg->isa('MCE::Shared::Base::Common');
+            }
+            else {
+               $_obj{ $_id }->_prune_head()
+                  if $pkg->isa('MCE::Shared::Cache');
+            }
+         }
+
+         $_itr{ $_id } = sub {
+            my $_key = shift @{ $_itr{ "$_id:args" } };
+            print({$_DAU_R_SOCK} '-1'.$LF), return if !defined($_key);
+            my $_buf = $_freeze->([ $_key, $_obj{ $_id }->$get($_key) ]);
+            print {$_DAU_R_SOCK} length($_buf).$LF, $_buf;
+         };
       }
 
       $_itr{ $_id }->();
@@ -969,8 +962,8 @@ sub _loop {
             $_code->($_var, @{ $_thaw->($_buf) });
          }
          else {
-            my @_args = @{ $_thaw->($_buf) };
             weaken( delete $_itr{ $_id } ) if ( exists $_itr{ $_id } );
+            my @_args = @{ $_thaw->($_buf) };
             if ( @_args ) {
                $_itr{ "$_id:args" } = \@_args;
             } else {
@@ -1534,15 +1527,14 @@ sub _size {
 ##
 ###############################################################################
 
-our $AUTOLOAD;
+our $AUTOLOAD; # MCE::Shared::Object::<method_name>
 
 sub AUTOLOAD {
-   # $AUTOLOAD = MCE::Shared::Object::<method_name>
-   my $_fcn = substr($AUTOLOAD, 21);
+   my $_fcn = $AUTOLOAD;  substr($_fcn, 0, rindex($_fcn,':') + 1, '');
 
    # save this method for future calls
    no strict 'refs';
-   *$AUTOLOAD = sub { _auto($_fcn, @_) };
+   *{ $AUTOLOAD } = sub { _auto($_fcn, @_) };
 
    goto &{ $AUTOLOAD };
 }
@@ -1666,9 +1658,9 @@ sub export {
    $_item;
 }
 
-# iterator ( index, [, index, ... ] )
-# iterator ( key, [, key, ... ] )
-# iterator ( "query string" )
+# iterator ( index [, index, ... ] )  # Array
+# iterator ( key [, key, ... ] )      # Cache, Hash, Ordhash
+# iterator ( "query string" )         # Cache, Hash, Ordhash, Array
 # iterator ( )
 
 sub iterator {
@@ -1676,40 +1668,39 @@ sub iterator {
 
    my $pkg = $self->blessed();
    my $flg = ($pkg->can('NEXTKEY') || $pkg->can('keys')) ? 1 : 0;
-   my $get = ($pkg->can('FETCH')) ? 'FETCH' : ($pkg->can('get')) ? 'get' : '';
+   my $get = $pkg->can('FETCH') ? 'FETCH' : $pkg->can('get') ? 'get' : '';
 
-   # MCE::Shared::{ Array, Hash, Ordhash }, Hash::Ordered, or similar.
-   if ( ($flg || $pkg->can('FETCHSIZE')) && $get ) {
-      $get = 'peek' if $pkg->isa('MCE::Shared::Cache');
-
-      if ( ! @keys ) {
-         @keys = $self->keys;
-      }
-      elsif ( @keys == 1 && $keys[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
-         return sub { } unless $pkg->isa('MCE::Shared::Base::Common');
-         @keys = $self->keys($keys[0]);
-      }
-      elsif ( $pkg->isa('MCE::Shared::Cache') ) {
-         $self->_prune_head();
-      }
-
-      return sub {
-         return unless @keys;
-         my $key = shift @keys;
-         return ( $key => $self->$get($key) );
-      };
-   }
-
-   # Not supported
-   else {
+   unless ( ($flg || $pkg->can('FETCHSIZE')) && $get ) {
       return sub { };
    }
+
+   # MCE::Shared::{ Array, Cache, Hash, Ordhash }, Hash::Ordered,
+   # or similar module.
+
+   $get = 'peek' if $pkg->isa('MCE::Shared::Cache');
+
+   if ( ! @keys ) {
+      @keys = $self->keys;
+   }
+   elsif ( @keys == 1 && $keys[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
+      return sub { } unless $pkg->isa('MCE::Shared::Base::Common');
+      @keys = $self->keys($keys[0]);
+   }
+   elsif ( $pkg->isa('MCE::Shared::Cache') ) {
+      $self->_prune_head();
+   }
+
+   return sub {
+      return unless @keys;
+      my $key = shift @keys;
+      return ( $key => $self->$get($key) );
+   };
 }
 
-# rewind ( begin, end, [ step, format ] )  # Sequence
 # rewind ( index [, index, ... ] )         # Array
-# rewind ( key [, key, ... ] )             # Hash, Ordhash
-# rewind ( "query string" )                # Array, Hash, Ordhash
+# rewind ( key [, key, ... ] )             # Cache, Hash, Ordhash
+# rewind ( "query string" )                # Cache, Hash, Ordhash, Array
+# rewind ( begin, end [, step, format ] )  # Sequence
 # rewind ( )
 
 sub rewind {
@@ -1841,7 +1832,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.838
+This document describes MCE::Shared::Server version 1.839
 
 =head1 DESCRIPTION
 

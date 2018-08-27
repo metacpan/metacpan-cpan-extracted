@@ -188,7 +188,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
          "file" : "lib/Dist/Zilla/Plugin/MakeMaker/Fallback.pm",
-         "version" : "0.028"
+         "version" : "0.029"
       }
    },
    "release_status" : "stable",
@@ -206,10 +206,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.028",
+   "version" : "0.029",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.029001"
+         "version" : "5.029002"
       },
       "plugins" : [
          {
@@ -794,7 +794,7 @@
                }
             },
             "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.028"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
@@ -926,7 +926,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20180720"
+                  "Module::CoreList" : "5.20180820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1143,7 +1143,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.028",
+                  "tag" : "v0.029",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1402,8 +1402,8 @@
       }
    },
    "x_authority" : "cpan:ETHER",
-   "x_generated_by_perl" : "v5.29.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_generated_by_perl" : "v5.29.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0
 }

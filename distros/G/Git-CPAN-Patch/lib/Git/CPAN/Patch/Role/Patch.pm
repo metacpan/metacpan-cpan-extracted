@@ -1,14 +1,17 @@
 package Git::CPAN::Patch::Role::Patch;
 our $AUTHORITY = 'cpan:YANICK';
-$Git::CPAN::Patch::Role::Patch::VERSION = '2.3.2';
+$Git::CPAN::Patch::Role::Patch::VERSION = '2.3.4';
 use 5.10.0;
 
 use strict;
 use warnings;
 
-use Method::Signatures::Simple;
-
 use Moose::Role;
+
+use experimental qw/
+    signatures
+    postderef
+/;
 
 requires 'git_run';
 
@@ -16,7 +19,7 @@ has patches => (
     is => 'rw',
     traits => [ 'Array' ],
     isa => 'ArrayRef',
-    default => method { [
+    default => sub ($self) { [
         $self->git_run( 'format-patch', 'cpan/master' )
     ] },
     handles => {
@@ -26,7 +29,7 @@ has patches => (
     },
 );
 
-method format_patch {
+sub format_patch ($self) {
     say for $self->all_patches;
 }
 
@@ -34,7 +37,7 @@ has module_name => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
-    default => method {
+    default => sub ($self) {
 
         if (my $module = $self->git->run('config', 'cpan.module-name')) {
             return $module
@@ -53,7 +56,7 @@ has module_name => (
     },
 );
 
-method send_emails(@patches) {
+sub send_emails($self,@patches) {
     my $to = 'bug-' . $self->module_name . '@rt.cpan.org';
 
     system 'git', "send-email", '--no-chain-reply-to', "--to", $to, @patches;
@@ -73,7 +76,7 @@ Git::CPAN::Patch::Role::Patch
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 AUTHOR
 
@@ -81,7 +84,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,11 @@
+package FTN::Outbound::BSO;
+$FTN::Outbound::BSO::VERSION = '20180823';
+
 use strict;
 use warnings;
 use utf8;
 
-package FTN::Outbound::BSO;
-$FTN::Outbound::BSO::VERSION = '20160516';
-# fts-5005.002  BinkleyTerm Style Outbound
+# fts-5005.003  BinkleyTerm Style Outbound
 # except s/Continuous/Crash/g
 
 use Log::Log4perl ();
@@ -16,7 +17,7 @@ use Fcntl ();
 use FTN::Addr ();
 use FTN::Outbound::Reference_file ();
 
-my %flavour_extension = ( immediate =>  [ qw/ iut ilo / ], # Xut (netmail) Xlo (reference file) by fts-5005.002
+my %flavour_extension = ( immediate =>  [ qw/ iut ilo / ], # Xut (netmail) Xlo (reference file) by fts-5005.003
                           # continuous => [ qw/ c c / ], # except this one
                           crash =>      [ qw/ cut clo / ],
                           direct =>     [ qw/ dut dlo / ],
@@ -26,7 +27,7 @@ my %flavour_extension = ( immediate =>  [ qw/ iut ilo / ], # Xut (netmail) Xlo (
 # Reference files consist of a number of lines (terminated by 0x0a or 0x0d,0x0a) each consisting of the name of the file to transfer to the remote system.
 
 # file_type => extension.  both keys and values should be unique in their sets
-# content notes are from fts-5005.002
+# content notes are from fts-5005.003
 my %control_file_extension = ( file_request => 'req', # file requests
                                # The format of request files is documented in FTS-0006.
                                busy => 'bsy', # busy control file.
@@ -35,19 +36,28 @@ my %control_file_extension = ( file_request => 'req', # file requests
                                # may contain one line of PID information (less than 70 characters).
                                hold => 'hld', # hold control file
                                # must contain a one line string with the expiration of the hold period expressed in UNIX-time.
-                               # the second line of an hld file may contain one line of PID information. (Less than 70 characters)
                                try => 'try', # try control file
-                               # A try file must contain one line string with a diagnostic message.  It is for information purposes only.
-                               # the second line of a try file may contain one line of PID information. ( < 70 characters)
+                               # A try file (if implemented by a mailer) must contain the following:
+
+                               # NOK - Number of good connects, expressed as a 16-bit, big-endian integer.
+                               # NBAD - Number of bad connects, expressed as a 16-bit, big-endian integer.
+                               # CLength - Length of comment in bytes, expressed as an 8-bit unsigned integer.
+                               # Comment - CLength bytes, detailing the results of the most recent connection attempt.
+
+                               # On completion of a successful session, NOK is incremented and NBAD is reset to zero.
+                               # On completion of a failed session, NBAD is incremented.
+                               # IF NBAD reaches the mailer's configured limit for failed sessions,
+                               # the node is marked undialable, NOK and NBAD are reset to zero,
+                               # and a hld control file is created in accordance with section 5.3.
                              );
 
 =head1 NAME
 
-FTN::Outbound::BSO - Object-oriented module for working with BinkleyTerm Style Outbound.
+FTN::Outbound::BSO - working with BinkleyTerm Style Outbound.
 
 =head1 VERSION
 
-version 20160516
+version 20180823
 
 =head1 SYNOPSIS
 
@@ -57,14 +67,15 @@ version 20160516
 
   Log::Log4perl -> easy_init( $Log::Log4perl::INFO );
 
-  my $bso = FTN::Outbound::BSO -> new( outbound_root => '/var/lib/ftn/outbound',
-                                       domain => 'fidonet',
-                                       zone => 2,
-                                       domain_abbrev => { fidonet => '_out',
-                                                          homenet => 'leftnet',
-                                                        },
-                                       maximum_session_time => 3600, # one hour
-                                     ) or die 'cannot create bso object';
+  my $bso = FTN::Outbound::BSO
+    -> new( outbound_root => '/var/lib/ftn/outbound',
+            domain => 'fidonet',
+            zone => 2,
+            domain_abbrev => { fidonet => '_out',
+                               homenet => 'leftnet',
+                             },
+            maximum_session_time => 3600, # one hour
+          ) or die 'cannot create bso object';
 
   my $addr = FTN::Addr -> new( '2:451/30' );
 
@@ -91,7 +102,7 @@ version 20160516
 
 =head1 DESCRIPTION
 
-FTN::Outbound::BSO module is for working with BinkleyTerm Style Outbound in FTN following specifications from fts-5005.002 document.  Figuring out correct file to process might be a tricky process: different casing, few our main domains, other differences.  This module helps with this task.
+FTN::Outbound::BSO module is for working with BinkleyTerm Style Outbound in FTN following specifications from fts-5005.003 document.  Figuring out correct file to process might be a tricky process: different casing, few our main domains, other differences.  This module helps with this task.
 
 =head1 OBJECT CREATION
 
@@ -99,7 +110,7 @@ FTN::Outbound::BSO module is for working with BinkleyTerm Style Outbound in FTN 
 
 Expects parameters as hash:
 
-  outbound_root - directory path as a character string where whole outbound is located.  Mandatory parameter.  This directory should exist.
+  outbound_root - directory path as a character string where the whole outbound is located.  Mandatory parameter.  This directory should exist.
 
 By standard constructor needs our domain and zone.  They can be provided as:
 
@@ -362,7 +373,7 @@ sub scan {
     next                        # looking only for directories
       unless -d $dir_name_fs;
 
-    # our_domain_dir, our_domain_dir.9999, other_domain.9999
+    # our_domain_dir, our_domain_dir.7fff, other_domain.1999
     next
       unless $dz_out =~ /^($domain_abbr_re)(?:\.([1-7]?[0-9a-f]{3}))?$/i
       && ( $1 eq $self -> {domain_abbrev}{ $self -> {domain} }
@@ -392,17 +403,17 @@ sub scan {
                             $!,
                           );
 
-    while ( readdir $dz_dh ) {
-      $_ = Encode::decode( locale_fs => $_ );
+    while ( my $dir_entry = readdir $dz_dh ) {
+      $dir_entry = Encode::decode( locale_fs => $dir_entry );
 
       next
-        unless m/^([0-9a-f]{4})([0-9a-f]{4})\.(.+)$/i;
+        unless $dir_entry =~ m/^([0-9a-f]{4})([0-9a-f]{4})\.(.+)$/i;
 
       my ( $net, $node ) = map hex, $1, $2;
       my $ext = $3;
 
       my $full_name = File::Spec -> catfile( $dir_name,
-                                             $_,
+                                             $dir_entry,
                                            );
 
       my $full_name_fs = Encode::encode( locale_fs => $full_name );
@@ -418,7 +429,7 @@ sub scan {
                           $full_name,
                         );
 
-        $result{ $domain }{ $zone }{ $dz_out }{ $net }{ $node }{points_dir}{ $_ } = $full_name; # might be different hex casing for net/node or extension
+        $result{ $domain }{ $zone }{ $dz_out }{ $net }{ $node }{points_dir}{ $dir_entry } = $full_name; # might be different hex casing for net/node or extension
 
         opendir my $p_dh, $full_name_fs
           or $logger -> logdie( sprintf 'cannot opendir %s: %s',
@@ -538,15 +549,15 @@ sub is_busy {
 
   exists $self -> {scanned}{ $addr -> domain }
     && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }
-    && grep exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }
-    && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }
-    && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }
-    && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }{busy},
-    keys %{ $self -> {scanned}{ $addr -> domain }{ $addr -> zone } };
+    && grep { exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }
+              && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }
+              && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }
+              && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }{busy}
+            } keys %{ $self -> {scanned}{ $addr -> domain }{ $addr -> zone } };
 }
 
-sub _select_domain_zone_dir { # best one.  for updating.  for checking need a list (another method or direct access to the structure)
-                              # and make it if it doesn't exist or isn't good enough (e.g. our_domain_abbr.our_zone)
+sub _select_domain_zone_dir { # best one.  for updating.  for checking needs a list (another method or direct access to the structure)
+                              # and makes one if it doesn't exist or isn't good enough (e.g. our_domain_abbr.our_zone)
   my $logger = Log::Log4perl -> get_logger( __PACKAGE__ );
 
   ref( my $self = shift ) or $logger -> logcroak( "I'm only an object method!" );
@@ -576,14 +587,16 @@ sub _select_domain_zone_dir { # best one.  for updating.  for checking need a li
             keys %{ $self -> {scanned}{ $domain }{ $zone } }
           )
      ) {
-    my @list = sort { length $a <=> length $b }
+    my @list = sort { length $a <=> length $b
+                        || $b cmp $a # we prefer lower case
+                      }
       keys %{ $self -> {scanned}{ $domain }{ $zone } };
 
     my ( $t ) = grep $_ eq $best_match, @list; # might be exact case
 
     $best_match = defined $t ?
       $t
-      : $list[ 0 ]; # if didn't find the best match, use very first existing
+      : $list[ 0 ]; # if didn't find the best match, use the very first existing one
   } else {          # need to create
     my $dir_full_name = File::Spec -> catdir( $self -> {outbound_root},
                                               $best_match,
@@ -604,7 +617,6 @@ sub _select_domain_zone_dir { # best one.  for updating.  for checking need a li
     $self -> {scanned}{ $domain }{ $zone }{ $best_match }{dir} = $dir_full_name;
   }
 
-  # $self -> {scanned}{ $domain }{ $zone }{ $best_match }{dir};
   $best_match;
 }
 
@@ -631,12 +643,13 @@ sub _select_points_dir { # select best existing.  or make it.  for updating
                             $node,
                           );
 
-  # what if other_domain_abbr.zone (perfect one) doesn't have required points dir
-  # but other_domain_abbr.zOnE has?
-  my @dz_out_with_existing_points_dir = grep exists $self -> {scanned}{ $domain }{ $zone }{ $_ }{ $net }
+  # what if domain_abbr.zone (perfect one) doesn't have required points dir
+  # but domain_abbr.zOnE has?
+  my @dz_out_with_existing_points_dir = sort { $b cmp $a } # we prefer lower case of domain[.zone] dir
+    grep length $_ == length $dz_out # to filter out our_domain.our_zone versions
+    && exists $self -> {scanned}{ $domain }{ $zone }{ $_ }{ $net }
     && exists $self -> {scanned}{ $domain }{ $zone }{ $_ }{ $net }{ $node }
     && exists $self -> {scanned}{ $domain }{ $zone }{ $_ }{ $net }{ $node }{points_dir},
-    grep length $_ == length $dz_out, # to filter out our_domain.our_zone versions
     keys %{ $self -> {scanned}{ $domain }{ $zone } };
 
   if ( @dz_out_with_existing_points_dir ) { # ok, there is at least one with points dir.  how do we select best of them?
@@ -647,11 +660,13 @@ sub _select_points_dir { # select best existing.  or make it.  for updating
       my ( $t ) = grep exists $self -> {scanned}{ $domain }{ $zone }{ $_ }{ $net }{ $node }{points_dir}{ $points_dir },
         @dz_out_with_existing_points_dir;
 
-      $dz_out = defined $t ? $t : $dz_out_with_existing_points_dir[ 0 ]; # if no best in either place, just use very first one
+      $dz_out = defined $t ? $t : $dz_out_with_existing_points_dir[ 0 ]; # if no best in either place, just use the very first one
     }
 
-    # now we've got best outbound.  let's find best points dir.  or just very first
-    $points_dir = ( keys %{ $self -> {scanned}{ $domain }{ $zone }{ $dz_out }{ $net }{ $node }{points_dir} } )[ 0 ]
+    # now we've got best outbound.  let's find best points dir.  or just the very first
+    $points_dir = ( sort { $b cmp $a } # we prefer lower case of points dir
+                    keys %{ $self -> {scanned}{ $domain }{ $zone }{ $dz_out }{ $net }{ $node }{points_dir} }
+                  )[ 0 ]
       unless exists $self -> {scanned}{ $domain }{ $zone }{ $dz_out }{ $net }{ $node }{points_dir}{ $points_dir };
 
   } else { # doesn't exist.  we need to create it using best domain_abbr[.zone] dir
@@ -713,11 +728,11 @@ sub busy_protected_sub { # address, sub_ref( self ).  (order busy, execute sub, 
 
   # check that it's not already busy
   while ( $self -> is_busy( $addr ) ) {
-    sleep( 4 );                 # blocking...
+    sleep( 4 );                 # waiting...
     $self -> scan;
   }
 
-  # here there are no busy flag for passed address.  make it in best dir then
+  # here there is no busy flag for passed address.  make it in the best dir then
   my $busy_name;
 
   if ( $addr -> point ) {       # possible dir creation
@@ -791,9 +806,9 @@ sub busy_protected_sub { # address, sub_ref( self ).  (order busy, execute sub, 
 
 Expects arguments:
 
-  address going to be dealt with as a FTN::Addr object
+  address is going to be dealt with as a FTN::Addr object
 
-  file type as one of netmail, reference_file, file_request, busy, call, hold, try.
+  file type is one of netmail, reference_file, file_request, busy, call, hold, try.
 
   If file type is netmail or reference_file, then next parameter should be its flavour: immediate, crash, direct, normal, hold.
 
@@ -801,14 +816,14 @@ Expects arguments:
 
 Does not deal with busy flag implicitly.  Recommended usage is in the function passed to busy_protected_sub.
 
-Returns full name of the file to process (might not exists though).
+Returns full name of the file to process (might not exists yet though).
 
 =cut
 
 sub addr_file_to_change { # addr, type ( netmail, file_reference, .. ), [flavour], [ sub_ref( filename ) ].
   # figures required filetype name (new or existing) and calls subref with that name.
   # does not deal with busy implicitly
-  # returns full name of changed file (might not exist though)
+  # returns full name of the file to be changed/created
   my $logger = Log::Log4perl -> get_logger( __PACKAGE__ );
 
   ref( my $self = shift ) or $logger -> logcroak( "I'm only an object method!" );
@@ -822,15 +837,15 @@ sub addr_file_to_change { # addr, type ( netmail, file_reference, .. ), [flavour
   $logger -> logdie( 'no type passed' )
     unless @_;
 
+  my $type = shift;
+
   $logger -> logdie( sprintf 'incorrect type: %s',
-                     defined $_[ 0 ] ? $_[ 0 ] : 'undef',
+                     defined $type ? $type : 'undef',
                    )
-    unless defined $_[ 0 ]
-    && grep $_[ 0 ] eq $_,
+    unless defined $type
+    && grep $type eq $_,
     @flavoured,
     keys %control_file_extension;
-
-  my $type = shift;
 
   my $filename = $addr -> point ?
     sprintf( '%08x.', $addr -> point )
@@ -878,14 +893,14 @@ sub addr_file_to_change { # addr, type ( netmail, file_reference, .. ), [flavour
   # check any outdir except our_domain.our_zone for already existing file
   my $dz_out = $self -> _select_domain_zone_dir( $addr -> domain, $addr -> zone );
 
-  my @dz_out_with_existing_file = grep exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }
+  my @dz_out_with_existing_file = grep length $_ == length $dz_out # to filter out our_domain.our_zone versions
+    && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }
     && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }
     && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }
     && exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }{ $type }
     && ( ! $flavoured
          || exists $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }{ $type }{ $flavour }
        ),
-         grep length $_ == length $dz_out, # to filter out our_domain.our_zone versions
          keys %{ $self -> {scanned}{ $addr -> domain }{ $addr -> zone } };
 
   my $full_filename;
@@ -894,7 +909,7 @@ sub addr_file_to_change { # addr, type ( netmail, file_reference, .. ), [flavour
     unless ( grep $dz_out eq $_,
              @dz_out_with_existing_file
            ) { # best domain.zone does not have existing file.  let's select best of the worst
-      # first try to find one with best formatted file
+      # first try to find one with the best formatted file
       my ( $t ) = grep {
         my $r = $self -> {scanned}{ $addr -> domain }{ $addr -> zone }{ $_ }{ $addr -> net }{ $addr -> node }{ $addr -> point }{ $type };
 

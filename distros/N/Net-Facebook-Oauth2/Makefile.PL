@@ -5,11 +5,12 @@ WriteMakefile(
     NAME              => 'Net::Facebook::Oauth2',
     VERSION_FROM      => 'lib/Net/Facebook/Oauth2.pm', # finds $VERSION
     PREREQ_PM         => {
-        'LWP::UserAgent' => 0,
-        'URI'            => 0,
-        'Carp'           => 0,
-        'URI::Escape'    => 0,
-        'JSON::MaybeXS'  => 0,
+        'LWP::UserAgent'       => 0,
+        'LWP::Protocol::https' => 0,
+        'URI'                  => 0,
+        'Carp'                 => 0,
+        'URI::Escape'          => 0,
+        'JSON::MaybeXS'        => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'       => 0.88,

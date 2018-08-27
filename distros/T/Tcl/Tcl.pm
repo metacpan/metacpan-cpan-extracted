@@ -1,6 +1,6 @@
 package Tcl;
 
-$Tcl::VERSION = '1.25';
+$Tcl::VERSION = '1.27';
 
 =head1 NAME
 
@@ -428,23 +428,25 @@ a refcount was kept at the PVCV that prevented it from getting garbage collected
 but that SV itself got "lost" and could never be garbage collected,
 thereby also keeping anything in that codes PAD.
 
-To assist in tracking chages to the internal table and the commands table 3 trace variables were added,
-set them to non-blank or non-zero to add the tracking output to SYSOUT
+To assist in tracking chages to the internal table and the commands table 3 trace subs were added,
+set them to non-blank or non-zero to add the tracking output to SYSOUT, like this in your code:
+
+    sub Tcl::TRACE_SHOWCODE(){1}
 
 =over
 
-=item $Tcl::TRACE_SHOWCODE
+=item Tcl::TRACE_SHOWCODE
 
 Display all generated Tcl code by call().
 Be aware: Tkx::MainLoop runs by issuing a lot of "winfo exists ." calls, a LOT.
 But this is a nice way to tell what your programs are doing to Tcl.
 
 
-=item $Tcl::TRACE_CREATECOMMAND
+=item Tcl::TRACE_CREATECOMMAND
 
 Display Tcl subroutine creation by call/create_tcl_sub
 
-=item $Tcl::TRACE_DELETECOMMAND
+=item Tcl::TRACE_DELETECOMMAND
 
 Display Tcl subroutine deletion by cleanup/delete_ref/_code_dispose
 
@@ -535,20 +537,13 @@ to use these libraries in a link stage.
 
 use strict;
 
-our $TRACE_SHOWCODE;       # display generated code in call();
-our $TRACE_CREATECOMMAND;  # display sub creates;
-our $TRACE_DELETECOMMAND;  # display sub deletes;
+sub TRACE_SHOWCODE(){0}      # display generated code in call();
+sub TRACE_CREATECOMMAND(){0} # display sub creates;
+sub TRACE_DELETECOMMAND(){0} # display sub deletes;
 
-$TRACE_SHOWCODE      = 0 unless defined $TRACE_SHOWCODE;
-$TRACE_DELETECOMMAND = 0 unless defined $TRACE_DELETECOMMAND;
-$TRACE_CREATECOMMAND = 0 unless defined $TRACE_CREATECOMMAND;
-
-our $SAVEALLCODES;         # simulate the v1.05 way of saving only last call
-    $SAVEALLCODES  = 1 unless defined $SAVEALLCODES;
-
-our $SAVENOCODE ;          # simulate the v1.05 way of leaving any existing
+sub SAVEALLCODES () {1}    # simulate the v1.05 way of saving only last call
+sub SAVENOCODE() {1}       # simulate the v1.05 way of leaving any existing
                            #  $anon_refs{$descrname} alone if new line has no coderefs
-    $SAVENOCODE    = 1 unless defined $SAVENOCODE;
 
 our $DL_PATH;
 unless (defined $DL_PATH) {
@@ -595,8 +590,10 @@ sub new {
     return $int;
 }
 
+my $pid = $$; # see rt ticket 77522
 END {
-    Tcl::_Finalize();
+    Tcl::_Finalize()
+        if $$ == $pid;
 }
 
 # %anon_refs keeps track of anonymous subroutines and scalar/array/hash
@@ -648,7 +645,7 @@ sub call {
     my @codes;
 
     my $lastcodes = $anon_refs{$descrname}; # could be an array, want to hold all for now so they can be reused
-    unless  ($SAVENOCODE) {
+    unless  (SAVENOCODE()) {
       unless  ($#args == 1 and $args[0] eq 'set') {
           # this was to clean up things like
           # Tkx::fileevent($remote, writable  => sub {...});
@@ -749,7 +746,7 @@ sub call {
 
     $lastcodes = []; # now let any from last use be destroyed
 
-    showcode(\@args) if ($TRACE_SHOWCODE);
+    showcode(\@args) if TRACE_SHOWCODE();
 
     if ($#codes>-1 and $args[0] eq 'after') {
 #	AFTERS can clog up the tables real quick, so plan to delete them via Tcl::Code::DESTROY
@@ -775,7 +772,7 @@ sub call {
 	    for my $code (@codes) { $code->[3]=$newname;                    } # save under new name
 	    # this should trigger DESTROY unless a newer after or something else still holds a $tclname in the list
 	    $interp->invoke('after',$delay, "perl::Eval {Tcl::_code_dispose('$newname')}");
-	    showcode(      ['after',$delay, "perl::Eval {Tcl::_code_dispose('$newname')}"]   ) if ($TRACE_SHOWCODE); ;
+	    showcode(      ['after',$delay, "perl::Eval {Tcl::_code_dispose('$newname')}"]   ) if TRACE_SHOWCODE();
 	    return $id;
         }   # delay
 	# if we're here - user does something wrong, but there is nothing we worry about
@@ -786,7 +783,7 @@ sub call {
     # incase there are lines that have more than one  like ===== fileevent readable=>$sub1 writable=>$sub2
     # although that isnt legal, but this is                ===== if 1 $sub1 $sub2
     #  the downside is that add/delete processing goes on for $sub1 every call if we only keep the last
-    if ($SAVEALLCODES) {
+    if (SAVEALLCODES()) {
         if (scalar(@codes)>1) {  # no reason to save an array of just 1
             delete $anon_refs{$descrname};
             $anon_refs{$descrname}=\@codes;
@@ -829,7 +826,6 @@ sub call {
 }
 
 sub showcode{
-  return unless ($TRACE_SHOWCODE);
   print 'TCL::TRACE_SHOWCODE:'.join(' ',@{$_[0]})."\n";
 }
 
@@ -864,7 +860,7 @@ sub create_tcl_sub {
                                     ],'Tcl::Cmdbase');
       $interp->CreateCommand($tclname, $sub, undef, undef, 1);
 
-      print "TCL::TRACE_CREATECOMMAND: $interp -> $descrname ( $tclname => $sub ,undef,udef,1 )\n" if ($TRACE_CREATECOMMAND);
+      print "TCL::TRACE_CREATECOMMAND: $interp -> $descrname ( $tclname => $sub ,undef,udef,1 )\n" if TRACE_CREATECOMMAND();
       delete $anon_refs{$descrname};
     }
     my @newtcl=@{$anon_refs{$tclname}[0]};
@@ -1010,7 +1006,7 @@ sub DESTROY {
     return unless ($tclname);
     if (defined $interp) {
       $interp->DeleteCommand($tclname);
-      print "TCL::TRACE_DELETECOMMAND: $interp -> ( $tclname )\n" if ($Tcl::TRACE_DELETECOMMAND);
+      print "TCL::TRACE_DELETECOMMAND: $interp -> ( $tclname )\n" if TRACE_DELETECOMMAND();
     }
 }
 

@@ -1,10 +1,10 @@
 ##-*- Mode: CPerl -*-
 
-## File: DDC::::yylexer.pm
+## File: DDC::::yyqlexer.pm
 ## Author: Bryan Jurish <moocow@cpan.org>
 ## Description:
 ##  + lexer for ddc queries (formerly DDC::Query::yylexer)
-##  + last updated for ddc v2.1.1
+##  + last updated for ddc v2.1.15
 ##======================================================================
 
 package DDC::PP::yyqlexer;
@@ -51,6 +51,9 @@ BEGIN {
   $DEF{regex_text}     = "(?:(?:\\\\.)|[^\\\\/])*";
   $DEF{regex_modifier} = '[dgimsx]';
 
+  ##-- comments
+  $DEF{comment_text}   = "(?:\\\\.|[^\\]])*";
+
   ##-- compile patterns
   foreach (keys %DEF) {
     #print STDERR __PACKAGE__, ": compiling regex macro: $_ ~ /$DEF{$_}/\n";
@@ -69,6 +72,7 @@ BEGIN {
 ##    bufp => $pos,     ##-- current pos() in source buffer
 ##    buf  => $buf,     ##-- local buffer (for filehandle input)
 ##    state => $q,      ##-- symbolic state name (default: 'INITIAL')
+##    stack => \@stack, ##-- state stack
 ##
 ##    ##-- utf-8 or byte mode?
 ##    utf8 => $bool,    ##-- whether to use utf8 or byte-mode (default: true (non-compatible but handy))
@@ -88,6 +92,7 @@ sub new {
 		   buf  =>undef,
 		   utf8 =>1,
 		   state => 'INITIAL',
+		   stack => [],
 
 		   yytext=>undef,
 		   yytype=>undef,
@@ -107,6 +112,7 @@ sub clear {
   my $lex = shift;
   delete @$lex{qw(src fh bufr bufp buf yytext yytype yylineno)};
   $lex->{state} = 'INITIAL';
+  @{$lex->{stack}} = qw();
   return $lex;
 }
 BEGIN { *reset = *close = \&clear; }
@@ -262,6 +268,19 @@ sub yywhere {
 	 );
 }
 
+## $q = $lex->yypushq($new_state)
+sub yypushq {
+  my ($lex,$qnew) = @_;
+  push(@{$lex->{stack}},$lex->{state});
+  return $lex->{state} = $qnew;
+}
+
+## $q = $lex->yypopq()
+sub yypopq {
+  my $lex = shift;
+  return $lex->{state} = pop(@{$lex->{stack}}) || 'INITIAL';
+}
+
 ##======================================================================
 ## Runtime lexer routines
 
@@ -289,6 +308,10 @@ sub yylex {
 	##-- end-of-file (should be first pattern)
 	if    ($$bufr =~ m/\G\z/)	{ $type = '__EOF__'; }
 
+	##-- comments
+	elsif ($$bufr =~ m/\G\#:[^\n]*/sp)	{ $type='__SKIP__'; }
+	elsif ($$bufr =~ m/\G\#\[/p)		{ $type='__SKIP__'; $lex->yypushq('Q_COMMENT'); }
+
 	##-- operators
 	elsif ($$bufr =~ m/\G\&\&/p)	{ $type = 'OP_BOOL_AND'; }
 	elsif ($$bufr =~ m/\G\|\|/p)	{ $type = 'OP_BOOL_OR'; }
@@ -305,7 +328,8 @@ sub yylex {
 	elsif ($$bufr =~ m/\Gdate/pi) { $type = 'KW_DATE'; $lex->{state}='Q_DATE' }
 
 	##-- query operators
-	elsif ($$bufr =~ m/\G\#(?:(?:co?n?te?xt?|n))/pi)			{ $type = 'CNTXT'; }
+	elsif ($$bufr =~ m/\G\#(?:comment|cmt)/pi)			{ $type = 'KW_COMMENT'; }
+	elsif ($$bufr =~ m/\G\#(?:(?:co?n?te?xt?|n))/pi)		{ $type = 'CNTXT'; }
 	elsif ($$bufr =~ m/\G\#(?:with)?in/pi)				{ $type = 'WITHIN'; }
 	elsif ($$bufr =~ m/\G\#(?:sep(?:arate)?|nojoin)(?:_hits)?/pi)	{ $type = 'SEPARATE_HITS'; }
 	elsif ($$bufr =~ m/\G\#(?:nosep(?:arate)?|join)(?:_hits)?/pi)	{ $type = 'NOSEPARATE_HITS'; }
@@ -407,6 +431,14 @@ sub yylex {
 	elsif ($$bufr =~ m/\G./p)	{ $type = '__ERROR__'; }
 
 	$match = ${^MATCH} if (!defined($match));
+      }
+      ##------------------------
+      elsif ($lex->{state} eq 'Q_COMMENT') {
+	if    ($$bufr =~ m/\G\]/p)		    { $type='__SKIP__'; $lex->yypopq(); }
+	elsif ($$bufr =~ m/\G$DEF{comment_text}/sp) { $type='__SKIP__';  }
+	else                                        { $type='__ERROR__'; }
+
+	$match = ${^MATCH};
       }
       ##------------------------
       elsif ($lex->{state} eq 'Q_DATE') {
@@ -525,7 +557,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2017 by Bryan Jurish
+Copyright (C) 2011-2018 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

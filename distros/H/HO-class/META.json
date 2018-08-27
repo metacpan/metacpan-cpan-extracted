@@ -1,7 +1,7 @@
 {
    "abstract" : "class builder for hierarchical objects",
    "author" : [
-      "Sebastian Knapp <rock@ccls-online.de>"
+      "Sebastian Knapp <sknpp@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
@@ -42,6 +42,6 @@
          "url" : "git://github.com/giftnuss/p5-ho-class.git"
       }
    },
-   "version" : "0.074",
+   "version" : "0.076",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

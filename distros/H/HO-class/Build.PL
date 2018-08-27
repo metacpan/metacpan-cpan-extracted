@@ -5,15 +5,15 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'HO::class',
     license             => 'perl',
-    dist_author         => 'Sebastian Knapp <rock@ccls-online.de>',
-    dist_version        => '0.074',
+    dist_author         => 'Sebastian Knapp <sknpp@cpan.org>',
+    dist_version        => '0.076',
     requires => {
         'perl' => '5.6.0',
         'Class::ISA' => '0.20',
         'Package::Subroutine' => 'v0.22'
     },
-    configure_requires => { 
-        'Module::Build' => 0.42 
+    configure_requires => {
+        'Module::Build' => 0.42
     },
     build_requires => {
         'Test::More' => 0,

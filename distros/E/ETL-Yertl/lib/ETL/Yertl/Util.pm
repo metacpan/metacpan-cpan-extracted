@@ -1,5 +1,5 @@
 package ETL::Yertl::Util;
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 # ABSTRACT: Utility functions for Yertl modules
 
 #pod =head1 SYNOPSIS
@@ -15,8 +15,23 @@ use Exporter qw( import );
 use Module::Runtime qw( use_module compose_module_name );
 
 our @EXPORT_OK = qw(
-    load_module pairs pairkeys firstidx
+    load_module firstidx
+    docs_from_string
 );
+
+sub docs_from_string {
+    my ( $format, $string );
+    if ( @_ > 1 ) {
+        $format = ETL::Yertl::Format->get( $_[0] );
+        $string = $_[1];
+    }
+    else {
+        $format = ETL::Yertl::Format->get_default;
+        $string = $_[0];
+    }
+    my @docs = $format->read_buffer( \$string, 1 );
+    return @docs;
+}
 
 #pod =sub load_module
 #pod
@@ -54,37 +69,6 @@ sub load_module {
     return $class;
 }
 
-#pod =sub pairs
-#pod
-#pod     my @pairs = pairs @array;
-#pod
-#pod Return an array of arrayrefs of pairs from the given even-sized array.
-#pod
-#pod =cut
-
-# This duplicates List::Util pair, but this is not included in Perl 5.10
-sub pairs(@) {
-    my ( @array ) = @_;
-    my @pairs;
-    while ( @array ) {
-        push @pairs, [ shift( @array ), shift( @array ) ];
-    }
-    return @pairs;
-}
-
-#pod =sub pairkeys
-#pod
-#pod     my @keys = pairkeys @array;
-#pod
-#pod Return the first item of every pair of items in an even-sized array.
-#pod
-#pod =cut
-
-# This duplicates List::Util pairkeys, but this is not included in Perl 5.10
-sub pairkeys(@) {
-    return map $_[$_], grep { $_ % 2 == 0 } 0..$#_;
-}
-
 #pod =sub firstidx
 #pod
 #pod     my $i = firstidx { ... } @array;
@@ -116,7 +100,7 @@ ETL::Yertl::Util - Utility functions for Yertl modules
 
 =head1 VERSION
 
-version 0.037
+version 0.039
 
 =head1 SYNOPSIS
 
@@ -135,18 +119,6 @@ module is not found or the module cannot be loaded.
 
 This function should be used to load modules that the user requests. The error
 messages are suitable for user consumption.
-
-=head2 pairs
-
-    my @pairs = pairs @array;
-
-Return an array of arrayrefs of pairs from the given even-sized array.
-
-=head2 pairkeys
-
-    my @keys = pairkeys @array;
-
-Return the first item of every pair of items in an even-sized array.
 
 =head2 firstidx
 

@@ -1,26 +1,14 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.028000;
 use ExtUtils::MakeMaker;
-
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
 WriteMakefile(
-    NAME             => 'voiceIt::voiceIt2',
-    AUTHOR           => q{Hassan Ismaeel <hassan@voiceit.io>},
-    VERSION_FROM     => 'lib/voiceIt/voiceIt2.pm',
-    ABSTRACT_FROM    => 'lib/voiceIt/voiceIt2.pm',
-    LICENSE          => 'artistic_2',
-    PL_FILES         => {},
-    MIN_PERL_VERSION => '5.006',
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
-    },
-    BUILD_REQUIRES => {
-        'Test::More' => '0',
-    },
-    PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
-    },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'voiceIt-voiceIt2-*' },
+    NAME              => 'voiceIt::voiceIt2',
+    VERSION_FROM      => 'lib/voiceIt/voiceIt2.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    ABSTRACT_FROM     => 'lib/voiceIt/voiceIt2.pm', # retrieve abstract from module
+    AUTHOR            => 'Andrew Lee <andrew@local>',
+    #LICENSE           => 'perl',
+    #Value must be from legacy list of licenses here
+    #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
 );

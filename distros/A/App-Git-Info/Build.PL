@@ -13,12 +13,12 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "displays a summary of information about the git repository.",
+  "dist_abstract" => "Displays a summary of information about the git repository.",
   "dist_author" => [
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Git-Info",
-  "dist_version" => "0.0.2",
+  "dist_version" => "0.2.0",
   "license" => "mit",
   "module_name" => "App::Git::Info",
   "recursive_test_files" => 1,

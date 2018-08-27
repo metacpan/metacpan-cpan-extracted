@@ -1,6 +1,6 @@
 package App::ccdiff;
 
-our $VERSION = "0.21";
+our $VERSION = "0.24";
 
 use strict;
 use warnings
@@ -9,9 +9,11 @@ use warnings
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
-ccdiff - Colored character diff
+ccdiff - Colored Character diff
 
 =head1 SYNOPSIS
 
@@ -66,10 +68,10 @@ The default is to use traditional diff:
 a unified diff (-u1) would be
 
  5,5c5,5
-   Tue Sep  6 05:43:59 2005,B.O.Q.S.,,1125978239,1943341
- - Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
- + Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
-   Mon Feb 23 10:37:02 2004,R.X.K.S.,van,1077529022,1654127
+  Tue Sep  6 05:43:59 2005,B.O.Q.S.,,1125978239,1943341
+ -Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+ +Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+  Mon Feb 23 10:37:02 2004,R.X.K.S.,van,1077529022,1654127
 
 =item --verbose[=1] -v[1]
 
@@ -83,17 +85,70 @@ C<--verbose> accepts an optional verbosity-level. On level 2 and up, all
 horizontal changes get left-and-right markers inserted to enable seeing the
 location of the ZERO WIDTH or invisible characters.
 
+An example of this:
+
+With -Uu0v0:
+
+ 1,1c1,1
+ - A  BCDE Fg
+ + A BcdE​Fg
+
+With -Uu0v1:
+
+ 1,1c1,1
+ - A  BCDE Fg
+ - -- verbose : SPACE, LATIN CAPITAL LETTER C, LATIN CAPITAL LETTER D, SPACE
+ + A BcdE​Fg
+ + -- verbose : LATIN SMALL LETTER C, LATIN SMALL LETTER D, ZERO WIDTH SPACE
+
+With -Uu0v2:
+
+ 1,1c1,1
+ - A ↱ ↰B↱CD↰E↱ ↰Fg
+ - -- verbose : SPACE, LATIN CAPITAL LETTER C, LATIN CAPITAL LETTER D, SPACE
+ + A B↱cd↰E↱​↰Fg
+ + -- verbose : LATIN SMALL LETTER C, LATIN SMALL LETTER D, ZERO WIDTH SPACE
+
+With -Uu0v2 --ascii:
+
+ 1,1c1,1
+ - A > <B>CD<E> <Fg
+ - -- verbose : SPACE, LATIN CAPITAL LETTER C, LATIN CAPITAL LETTER D, SPACE
+ + A B>cd<E>​<Fg
+ + -- verbose : LATIN SMALL LETTER C, LATIN SMALL LETTER D, ZERO WIDTH SPACE
+
+the word "verbose" and the character markers will be displayed using the
+C<verbose> color.
+
 =item --markers -m
 
 Use markers under each changed character in change-chunks.
 
 C<--markers> is especially useful if the terminal does not support colors, or
-if you want to copy/paste the output to (ASCII) mail. See also C<--ascii>
+if you want to copy/paste the output to (ASCII) mail. See also C<--ascii>. The
+markers will have the same color as added or deleted text.
+
+This will look like (with unified diff):
+
+ 5,5c5,5
+ -Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+ -               ▼       ▼
+ +Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+ +               ▲       ▲
 
 =item --ascii -a
 
 Use (colored) ASCII indicators instead of Unicode. The default indicators are
-Unicode characters that stand out better.
+Unicode characters that stand out better. The markers will have the same color
+as added or deleted text.
+
+For the vertical markers (C<-m>) that would look like:
+
+ 5,5c5,5
+ -Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+ -               ^       ^
+ +Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+ +               ^       ^
 
 For the positional indicators, I did consider using U+034e (COMBINING UPWARDS
 ARROW BELOW), but as most terminals are probably unable to show it due to line
@@ -131,33 +186,56 @@ Define the background color for changed text.
 
 Prefix position indicators with an index.
 
+ [001] 5,5c5,5
+ -Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+ +Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+
 If a positive number is passed (C<--index=4> or C<-I 4>), display just the
-chunk with that index. This is useful in combination with C<--verbose>.
+chunk with that index, using the C<verbose> color:
+
+This is useful in combination with C<--verbose>.
+
+=item --threshold=2 -t 2
+
+Defines the number of lines a change block may differ before the fall-back of
+horizontal diff to vertical diff.
+
+If a chunk describes a change, and the number of lines in the original block
+has less or more lines than the new block and that difference exceeds this
+threshold, C<ccdiff> will fall-back to vertical diff.
+
+=item --heuristics=n -h n
+
+Defines the percentage of character-changes a change block may differ before
+the fall-back of horizontal diff to vertical diff.
+
+This percentage is calculated as C<(characters removed + characters added) /
+(2 * characters unchanged))>. 
 
 =item --ignore-case -i
 
 Ignore case on comparison.
 
-=item --ignore-all-space -w 
+=item --ignore-all-space -w
 
 Ignore all white-space changes. This will set all options C<-b>, C<-Z>, C<-E>,
 and C<-B>.
 
-=item --ignore-trailing-space -Z 
+=item --ignore-trailing-space -Z
 
 Ignore changes in trailing white-space (TAB's and spaces).
 
-=item --ignore-ws|ignore-space-change -b 
+=item --ignore-ws|ignore-space-change -b
 
 Ignore changes in horizontal white-space (TAB's and spaces). This does not
 include white-space changes that splits non-white-space or removes white-space
 between two non-white-space elements.
 
-=item --ignore-tab-expansion -E 
+=item --ignore-tab-expansion -E
 
 NYI
 
-=item --ignore-blank-lines -B 
+=item --ignore-blank-lines -B
 
 B<Just Partly Implemented> (WIP)
 
@@ -195,7 +273,7 @@ Between parens is the corresponding command-line option.
 
  markers : false
 
-defines if markers should be used under changed characters. The default is to
+Defines if markers should be used under changed characters. The default is to
 use colors only. The C<-m> command line option will toggle the option when set
 from a configuration file.
 
@@ -203,14 +281,14 @@ from a configuration file.
 
  ascii   : false
 
-defines to use ASCII markers instead of Unicode markers. The default is to use
+Defines to use ASCII markers instead of Unicode markers. The default is to use
 Unicode markers.
 
 =item reverse (-r)
 
  reverse : false
 
-defines if changes are displayed as foreground-color over background-color
+Defines if changes are displayed as foreground-color over background-color
 or background-color over foreground-color. The default is C<false>, so it will
 color the changes with the appropriate color (C<new> or C<old>) over the
 default background color.
@@ -219,9 +297,11 @@ default background color.
 
  new     : green
 
-defines the color to be used for added text. The default is C<green>.
+Defines the color to be used for added text. The default is C<green>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning. This option can include C<bold> either as prefix or
 as suffix.
 
@@ -236,9 +316,11 @@ This option may also be specified as
 
  old     : red
 
-defines the color to be used for delete text. The default is C<red>.
+Defines the color to be used for delete text. The default is C<red>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning. This option can include C<bold> either as prefix or
 as suffix.
 
@@ -253,10 +335,12 @@ This option may also be specified as
 
  bg      : white
 
-defines the color to be used as background for changed text. The default is
+Defines the color to be used as background for changed text. The default is
 C<white>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning. The C<bold> attribute is not allowed.
 
 This option may also be specified as
@@ -275,10 +359,12 @@ This option may also be specified as
 
  verbose : cyan
 
-defines the color to be used as color for the verbose tag. The default is
+Defines the color to be used as color for the verbose tag. The default is
 C<cyan>. This color will only be used under C<--verbose>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning.
 
 This option may also be specified as
@@ -292,7 +378,7 @@ This option may also be specified as
 
  utf8    : yes
 
-defines whether all I/O is to be interpreted as UTF-8. The default is C<no>.
+Defines whether all I/O is to be interpreted as UTF-8. The default is C<no>.
 
 This option may also be specified as
 
@@ -304,7 +390,7 @@ This option may also be specified as
 
  index   : no
 
-defines if the position indication for a change chunk is prefixed with an
+Defines if the position indication for a change chunk is prefixed with an
 index number. The default is C<no>. The index is 1-based.
 
 Without this option, the position indication would be like
@@ -322,7 +408,65 @@ with this option, it would be
 When this option contains a positive integer, C<ccdiff> will only show diff
 the diff chunk with that index.
 
+=item emacs
+
+ emacs   : no
+
+If this option is yes/true, calling C<ccdiff> with just one single argument,
+and that argument being an existing file, the arguments will act as
+
+ $ ccdiff file~ file
+
+if file~ exists.
+
+=item threshold (-t)
+
+ threshold : 2
+
+Defines the number of lines a change block may differ before the fall-back of
+horizontal diff to vertical diff.
+
+=item heuristics (-h)
+
+ heuristics : 40
+
+Defines the percentage of character-changes a change block may differ before
+the fall-back of horizontal diff to vertical diff. The default is undefined,
+meaning no fallback based on heuristics.
+
 =back
+
+=head1 Git integration
+
+You can use ccdiff to show diffs in git. It may work like this:
+
+ $ git config --global diff.tool ccdiff
+ $ git config --global difftool.prompt false
+ $ git config --global difftool.ccdiff.cmd 'ccdiff --utf-8 -u -r $LOCAL $REMOTE'
+ $ git difftool SHA~..SHA
+ $ cat >~/bin/git-ccdiff <<EOF
+ #!/bin/sh
+
+ commit=$1
+ shift
+ if [ "$commit" = "" ]; then
+     git difftool
+ else
+     git difftool $commit~1..$commit
+     fi
+ EOF
+ $ chmod 755 ~/bin/git-ccdiff
+ $ git ccdiff SHA
+
+From then on you can do
+
+ $ git ccdiff
+ $ git ccdiff 5c5a39f2
+
+=head1 CAVEATS
+
+Due to the implementation, where both sides of the comparison are completely
+kept in memory, this tool might not be able to deal with (very) large datasets.
 
 =head1 SEE ALSO
 

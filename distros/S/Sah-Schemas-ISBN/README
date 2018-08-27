@@ -1,0 +1,70 @@
+NAME
+    Sah::Schemas::ISBN - Various Sah schemas related to ISBN (International
+    Standard Book Number)
+
+VERSION
+    This document describes version 0.003 of Sah::Schemas::ISBN (from Perl
+    distribution Sah-Schemas-ISBN), released on 2018-08-23.
+
+SAH SCHEMAS
+    *   isbn
+
+        ISBN 10 or ISBN 13 number.
+
+        Nondigits [^0-9Xx] will be removed during coercion.
+
+        Checksum digit must be valid.
+
+    *   isbn10
+
+        ISBN 10 number.
+
+        Nondigits [^0-9Xx] will be removed during coercion.
+
+        "x" will be converted to uppercase.
+
+        Checksum digit must be valid.
+
+    *   isbn13
+
+        ISBN 13 number.
+
+        Nondigits [^0-9] will be removed during coercion.
+
+        Checksum digit must be valid.
+
+        Basically EAN-13, except with additional coercion rule to coerce it
+        from ISBN 10.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-ISBN>.
+
+SOURCE
+    Source repository is at
+    <https://github.com///u1@198.58.100.202:/home/u1/repos/perl-Sah-Schemas-
+    ISBN>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-ISBN>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah - specification
+
+    Data::Sah
+
+    <https://en.wikipedia.org/wiki/International_Standard_Book_Number>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

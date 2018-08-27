@@ -1,7 +1,7 @@
 package Web::Query;
 our $AUTHORITY = 'cpan:TOKUHIROM';
 # ABSTRACT: Yet another scraping library like jQuery
-$Web::Query::VERSION = '0.38';
+$Web::Query::VERSION = '0.39';
 use strict;
 use warnings;
 use 5.008001;
@@ -707,6 +707,7 @@ sub DESTROY {
     return unless $_[0]->{need_delete};
 
     # avoid memory leaks
+    local $@;
     eval { $_->delete } for @{$_[0]->{trees}};
 }
 
@@ -724,7 +725,7 @@ Web::Query - Yet another scraping library like jQuery
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 

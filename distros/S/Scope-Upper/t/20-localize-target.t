@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 70 + 4;
+use Test::More tests => 70 + 2 * 5 + 4;
 
 use Scope::Upper qw<localize UP HERE>;
 
@@ -331,6 +331,42 @@ sub X::foo { 'X::foo' }
   is(Y->foo, 'Y::foo', 'localize "Y::foo", sub { "Y::foo" } => UP [ok]');
  }
  is(Y->foo, 'X::foo', 'localize "Y::foo", sub { "Y::foo" } => UP [end]');
+}
+
+# Import
+
+sub is_imported {
+ my ($pkg, $sig, $val) = @_;
+ my $exp  = $sig eq '$' ? \$val : $val;
+ my $var  = 'daffodil'; # don't use 'x' or eval will capture $main::x
+ my $spec = $sig . $pkg . '::' . $var;
+ localize $spec, $val => HERE;
+ {
+  my $desc = "localize imported ${sig}${var} to $val";
+  my $got  = eval "package $pkg; \\${sig}${var}";
+  if ($@) {
+   fail "$desc test did not compile: $@";
+  } else {
+   is_deeply $got, $exp, $desc;
+  }
+ }
+ {
+  my $desc = "localize defined ${sig}${var} to $val";
+  my $got  = eval "\\${sig}${pkg}::${var}";
+  if ($@) {
+   fail "$desc test did not compile: $@";
+  } else {
+   is_deeply $got, $exp, $desc;
+  }
+ }
+}
+
+{
+ is_imported 'Scope::Upper::Test::Mock10', '$', 0;
+ is_imported 'Scope::Upper::Test::Mock11', '$', \1;
+ is_imported 'Scope::Upper::Test::Mock12', '@', [ 2, 3 ];
+ is_imported 'Scope::Upper::Test::Mock13', '%', { a => 4 };
+ is_imported 'Scope::Upper::Test::Mock14', '&', sub { 5 };
 }
 
 # Invalid

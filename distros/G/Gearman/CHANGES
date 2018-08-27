@@ -1,3 +1,9 @@
+2.004.015 2018-08-24 16:41:00 Europe/Berlin
+    add documentation of client's undocumented options
+    - https://github.com/p-alik/perl-Gearman/issues/40
+    add example explains usage of work sub's callbacks.
+    - https://github.com/p-alik/perl-Gearman/issues/41
+
 2.004.014 2018-03-13 19:28:00 Europe/Berlin
     - prevent recursion warnings
       https://github.com/p-alik/perl-Gearman/issues/38

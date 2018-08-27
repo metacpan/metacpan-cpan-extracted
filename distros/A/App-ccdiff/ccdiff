@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 
-use 5.12.1;
+use 5.14.0;
 use warnings;
 
-our $VERSION = "0.21 - 20180818";
+our $VERSION = "0.24 - 20180826";
 our $CMD     = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -24,6 +24,8 @@ sub usage {
     say "   -B    --ignore-blank-lines    Ignore changes where lines are all blank";
     say "   -i    --ignore-case           Ignore case changes";
     say "  Other options:";
+    say "   -t n  --threshold=2  Horizontal line diff threshold";
+    say "   -h n  --heuristics=n Horizontal char diff threshold";
     say "   -m    --markers      Use markers to indicate change positions";
     say "   -a    --ascii        Use ASCII instead of Unicode indicators";
     say "         --list-colors  List available colors and exit";
@@ -35,26 +37,44 @@ sub usage {
     exit $err;
     } # usage
 
-my %rc = read_rc ();
+$ENV{CCDIFF_OPTIONS} and unshift @ARGV, split m/\s+/ => $ENV{CCDIFF_OPTIONS};
+my %rc = (
+    ascii	=> 0,
+    bg		=> "white",
+    emacs	=> 0,
+    heuristics	=> 0,
+    index	=> 0,
+    markers	=> 0,
+    new		=> "green",
+    old		=> "red",
+    reverse	=> 0,
+    threshold	=> 2,
+    utf8	=> 0,
+    verbose	=> "cyan",
+    );
+read_rc ();
 
 use charnames ();
 use Algorithm::Diff;
 use Term::ANSIColor qw(:constants color);
 use Getopt::Long qw(:config bundling);
-my $opt_a = $rc{ascii}   // 0;
-my $opt_r = $rc{reverse} // 0;
-my $opt_m = $rc{markers} // 0;
+my $opt_a = $rc{ascii};
+my $opt_r = $rc{reverse};
+my $opt_m = $rc{markers};
 GetOptions (
     "help|?"		=> sub { usage (0); },
     "V|version"		=> sub { say "$CMD [$VERSION]"; exit 0; },
       "man"		=> sub { exec "pod2man $0 | nroff -man"; },
       "info"		=> sub { exec "pod2text $0"; },
 
-    "U|utf-8!"		=> \(my $opt_U = $rc{utf8} // 0),
+    "U|utf-8!"		=> \(my $opt_U = $rc{utf8}),
 
 #   "c|context:3"	=> \ my $opt_c,	# implement context-diff?
     "u|unified:3"	=> \ my $opt_u,
-    "I|idx|index:-1"	=> \(my $opt_I = $rc{index} // 0),
+    "I|idx|index:-1"	=> \(my $opt_I = $rc{index}),
+    "t|threshold=i"	=> \(my $opt_t = $rc{threshold}),
+    "h|heuristics=i"	=> \(my $opt_h = $rc{heuristics}),
+      "emacs!"		=> \(my $emacs = $rc{emacs}),
 
     "a|ascii"		=> sub { $opt_a ^= 1 },
     "m|markers"		=> sub { $opt_m ^= 1 },
@@ -68,14 +88,15 @@ GetOptions (
     "B|ignore-blank-lines!"		=> \ my $opt_B, # NYI
 
     "p|pink!"		=> \ my $opt_p,
-      "old=s"		=> \(my $old_color = $rc{old} // "red"  ),
-      "new=s"		=> \(my $new_color = $rc{new} // "green"),
-      "bg=s"		=> \(my $rev_color = $rc{bg}  // "white"),
+      "old=s"		=> \(my $old_color = $rc{old}),
+      "new=s"		=> \(my $new_color = $rc{new}),
+      "bg=s"		=> \(my $rev_color = $rc{bg}),
       "list-colors!"	=> \ my $list_colors,
 
     "v|verbose:1"	=> \(my $opt_v = 0),
     ) or usage (1);
-$opt_w and $opt_b = $opt_Z = $opt_E = $opt_B = 1;
+$opt_w      and $opt_b = $opt_Z = $opt_E = $opt_B = 1;
+$opt_h >= 1 and $opt_h /= 100;
 
 # Color initialization
 $opt_p and $old_color = "magenta";
@@ -85,35 +106,50 @@ for ($old_color, $new_color, $rev_color) {
     }
 my %clr = map { $_ => color (s{^(.*)[ _]bold$}{bold $1}ir =~
                              s{^bold[ _]}{bold }ir) }
-	  map { $_, "on_$_", "bold $_" }
+	  map {( $_, "on_$_", "bold $_" )}
     qw( red green blue black white cyan magenta yellow );
+$clr{$_} //= color ($_) for tac_colors ();
+$clr{none} = $clr{on_none} = "";
+for ([ \$old_color, $rc{old} ], [ \$new_color, $rc{new} ], [ \$rev_color, $rc{bg} ]) {
+    my ($c, $def) = @$_;
+    $$c && exists $clr{$$c} and next;
+    warn "color ", $$c // "(undefined)", " is unknown, using $def instead\n";
+    $$c = $def;
+    }
 my $clr_red = $clr{$old_color};
 my $clr_grn = $clr{$new_color};
 my $clr_rev = $clr{$rev_color};
-my $clr_dbg = $clr{$rc{verbose} || "cyan"};
+my $clr_dbg = $clr{$rc{verbose}};
 my $reset   = RESET;
 if ($list_colors) {
-    say $clr{$_}, $_, $reset for keys %clr;
+    my @clr = map { sprintf "%s%-18s%s", $clr{$_}, $_, $reset } sort keys %clr;
+    while (@clr) {
+	say join "  " => map { $_ // "" } splice @clr, 0, 4;
+	}
     exit;
     }
 
-my $clr_old = $opt_r ? $clr_rev . $clr{"on_$old_color" =~ s/bold //ir}
-                     : $clr_red . $clr{"on_$rev_color" =~ s/bold //ir};
-my $clr_new = $opt_r ? $clr_rev . $clr{"on_$new_color" =~ s/bold //ir}
-                     : $clr_grn . $clr{"on_$rev_color" =~ s/bold //ir};
+my $bg_old = $clr{$rc{bg_old} || ($opt_r ? "on_$old_color" =~ s/bold //ir :
+					   "on_$rev_color" =~ s/bold //ir)};
+my $bg_new = $clr{$rc{bg_new} || ($opt_r ? "on_$new_color" =~ s/bold //ir :
+					   "on_$rev_color" =~ s/bold //ir)};
+my $clr_old = $opt_r ? $clr_rev . $bg_old : $clr_red . $bg_old;
+my $clr_new = $opt_r ? $clr_rev . $bg_new : $clr_grn . $bg_new;
 # Indicators
 my $chr_old = $clr_old . ($opt_a ? "^" : "\x{25bc}") . $reset;
 my $chr_new = $clr_new . ($opt_a ? "^" : "\x{25b2}") . $reset;
 my $chr_cml = $clr_dbg . ($opt_a ? ">" : "\x{21b1}") . $reset;
 my $chr_cmr = $clr_dbg . ($opt_a ? "<" : "\x{21b0}") . $reset;
 my $chr_eql = " ";
-my $chr_lft = defined $opt_u ? "-" : "<";
-my $chr_rgt = defined $opt_u ? "+" : ">";
+my $chr_lft = $clr_old . (defined $opt_u ? "-" : "< ") . $reset;
+my $chr_rgt = $clr_new . (defined $opt_u ? "+" : "> ") . $reset;
+my $chr_ctx =             defined $opt_u ? " " : "  ";
 
 binmode STDOUT, ":encoding(utf-8)";
 
 my $f1 = shift or usage (1);
-my $f2 = shift // "-";
+my $f2 = $ARGV[0] // "-";
+$emacs and @ARGV == 0 && -f $f1 && -f "$f1~" and ($f1, $f2) = ("$f1~", $f1);
 
 $f1 eq "-" && $f2 eq "-" and usage (1);
 
@@ -158,15 +194,17 @@ while ($diff->Next) {
     if ($diff->Same) {
 	if (defined $opt_u) {
 	    @s = $diff->Items (1);
-	    $N > 1 and print "  $_" for grep { defined } @s[0..($opt_u - 1)];
+	    $N > 1 and print "$chr_ctx$_" for grep { defined } @s[0..($opt_u - 1)];
 	    unshift @s, undef while @s < $opt_u;
 	    }
 	next;
 	}
     my $sep = "";
-    my @d = map {[ $diff->Items ($_) ]} 1, 2;
+    my @d  = map {[ $diff->Items ($_) ]} 1, 2;
+    my @do = @{$d[0]};
+    my @dn = @{$d[1]};
 
-    if ($opt_B and "@{$d[0]}" !~ m/\S/ && "@{$d[1]}" !~ m/\S/) {
+    if ($opt_B and "@do" !~ m/\S/ && "@dn" !~ m/\S/) {
 	# Modify @s for -u?
 	next;
 	}
@@ -176,62 +214,84 @@ while ($diff->Next) {
 	printf "%s[%03d]%s ", ${clr_dbg}, $idx, $reset;
 	}
 
-    if (!@{$d[1]}) {
+    if (!@dn) {
 	printf "%d,%dd%d\n", $diff->Get (qw( Min1 Max1 Max2 ));
-	$_ = $clr_old . (s/$/$reset/r) for @{$d[0]}
+	$_ = $clr_old . (s/$/$reset/r) for @do;
 	}
-    elsif (!@{$d[0]}) {
+    elsif (!@do) {
 	printf "%da%d,%d\n", $diff->Get (qw( Max1 Min2 Max2 ));
-	$_ = $clr_new . (s/$/$reset/r) for @{$d[1]}
+	$_ = $clr_new . (s/$/$reset/r) for @dn;
 	}
     else {
 	$sep = "---\n" unless defined $opt_u;
 	printf "%d,%dc%d,%d\n", $diff->Get (qw( Min1 Max1 Min2 Max2 ));
-	@d = subdiff (@d);
+	if ($opt_t > 0 and abs (@do - @dn) > $opt_t) {
+	    $_ = $clr_old . (s/$/$reset/r) for @do;
+	    $_ = $clr_new . (s/$/$reset/r) for @dn;
+	    }
+	else {
+	    my @D = subdiff (@d, my $heu = {});
+	    if ($opt_h and $heu->{pct} > $opt_h) {
+		$_ = $clr_old . (s/$/$reset/r) for @do;
+		$_ = $clr_new . (s/$/$reset/r) for @dn;
+		}
+	    else {
+		@do = @{$D[0]};
+		@dn = @{$D[1]};
+		}
+	    }
 	}
     if ($opt_u and @s) {
-	print "  $_" for grep { defined } map { $s[$#s - $opt_u + $_] } 1..$opt_u;
+	print "$chr_ctx$_" for grep { defined } map { $s[$#s - $opt_u + $_] } 1..$opt_u;
 	}
-    print "$chr_lft $_" for @{$d[0]};
+    print "$chr_lft$_" for @do;
     print $sep;
-    print "$chr_rgt $_" for @{$d[1]};
+    print "$chr_rgt$_" for @dn;
     }
 
 sub subdiff {
-    my $d = Algorithm::Diff->new (map { [ map { split m// } @$_ ] } @_);
+    my ($old, $new, $heu) = @_;
+    my $d = Algorithm::Diff->new (map { [ map { split m// } @$_ ] } $old, $new);
     my ($d1, $d2, $x1, $x2, @h1, @h2) = ("", "", "", "");
     my ($cml, $cmr) = $opt_v < 2 ? ("", "") : ($chr_cml, $chr_cmr);
     my ($cmd, $cma) = ($chr_old, $chr_new);
+    @{$heu}{qw( old new same )} = (1, 1, 1); # prevent div/0
     while ($d->Next) {
-	my @c = map {[ $d->Items ($_) ]} 1, 2;
+	my @c  = map {[ $d->Items ($_) ]} 1, 2;
+	my @co = @{$c[0]};
+	my @cn = @{$c[1]};
 	if ($d->Same) {
-	    $d1 .= $_ for @{$c[0]};
-	    $d2 .= $_ for @{$c[1]};
-	    $x1 .= $_ for map { s/\S/$chr_eql/gr } @{$c[0]};
-	    $x2 .= $_ for map { s/\S/$chr_eql/gr } @{$c[0]};
+	    $d1 .= $_ for @co;
+	    $d2 .= $_ for @cn;
+	    $x1 .= $_ for map { s/\S/$chr_eql/gr } @co;
+	    $x2 .= $_ for map { s/\S/$chr_eql/gr } @co;
+	    $heu->{same} += scalar @co;
 	    next;
 	    }
-	if (@{$c[0]}) {
+	if (@co) {
 	    $d1 .= $cml.$clr_old;
-	    $d1 .= $_ for @{$c[0]};
+	    $d1 .= s/\n/$reset\n$clr_old/gr for @co;
 	    $d1 .= $reset.$cmr;
-	    $x1 .= $_ for map { s/[^\t\r\n]/$cmd/gr } @{$c[0]};
-	    $opt_v and push @h1, map { $opt_U ? charnames::viacode (ord) : unpack "H*"; } @{$c[0]};
+	    $x1 .= $_ for map { s/[^\t\r\n]/$cmd/gr } @co;
+	    $opt_v and push @h1, map { $opt_U ? charnames::viacode (ord) : unpack "H*"; } @co;
+	    $heu->{old} += scalar @co;
 	    }
-	if (@{$c[1]}) {
+	if (@cn) {
 	    $d2 .= $cml.$clr_new;
-	    $d2 .= $_ for @{$c[1]};
+	    $d2 .= s/\n/$reset\n$clr_new/gr for @cn;
 	    $d2 .= $reset.$cmr;
-	    $x2 .= $_ for map { s/[^\t\r\n]/$cma/gr } @{$c[1]};
-	    $opt_v and push @h2, map { $opt_U ? charnames::viacode (ord) : unpack "H*"; } @{$c[1]};
+	    $x2 .= $_ for map { s/[^\t\r\n]/$cma/gr } @cn;
+	    $opt_v and push @h2, map { $opt_U ? charnames::viacode (ord) : unpack "H*"; } @cn;
+	    $heu->{new} += scalar @cn;
 	    }
 	}
-    my @d = map { [ split m/(?<=\n)/ => $_ ] } $d1, $d2;
+    $heu->{pct} = ($heu->{old} + $heu->{new}) / (2 * $heu->{same});
+    my @d = map { [ split m/(?<=\n)/ ] } $d1, $d2;
     if ($opt_m) {
 	$opt_v > 1 and s/(\S+)/ $1 /g for $x1, $x2;
-	my @x = map { /\S/ ? [ split m/(?<=\n)/ => $_ ] : [] } $x1, $x2;
+	my @x = map { /\S/ ? [ split m/(?<=\n)/ ] : [] } $x1, $x2;
 	foreach my $n (0, 1) {
-	    @{$x[$n]} and $d[$n] = [ map { $d[$n][$_], $x[$n][$_] // "" } 0 .. (scalar @{$d[$n]} - 1) ];
+	    @{$x[$n]} and $d[$n] = [ map {( $d[$n][$_], $x[$n][$_] // "" )} 0 .. (scalar @{$d[$n]} - 1) ];
 	    }
 	}
     if ($opt_v) {
@@ -242,7 +302,6 @@ sub subdiff {
     } # subdiff
 
 sub read_rc {
-    my %rc;
     foreach my $rcf (
 	    "$ENV{HOME}/ccdiff.rc",
 	    "$ENV{HOME}/.ccdiffrc",
@@ -262,14 +321,52 @@ sub read_rc {
 		=~ s{^(?:yes|true)$}{-1}ir; # -1 is still true
 	    }
 	}
-    %rc;
     } # read_rc
+
+# Return the known colors from Term::ANSIColor
+# Stolen striaght from the pm
+sub tac_colors {
+    my %c256;
+    foreach my $r (0 .. 5) {
+        foreach my $g (0 .. 5) {
+            $c256{lc $_}++ for map {("RGB$r$g$_", "ON_RGB$r$g$_")} 0 .. 5;
+	    }
+	}
+    $c256{lc $_}++ for
+      # Basic colors
+      qw(
+	CLEAR           RESET             BOLD            DARK
+	FAINT           ITALIC            UNDERLINE       UNDERSCORE
+	BLINK           REVERSE           CONCEALED
+
+	BLACK           RED               GREEN           YELLOW
+	BLUE            MAGENTA           CYAN            WHITE
+	ON_BLACK        ON_RED            ON_GREEN        ON_YELLOW
+	ON_BLUE         ON_MAGENTA        ON_CYAN         ON_WHITE
+
+	BRIGHT_BLACK    BRIGHT_RED        BRIGHT_GREEN    BRIGHT_YELLOW
+	BRIGHT_BLUE     BRIGHT_MAGENTA    BRIGHT_CYAN     BRIGHT_WHITE
+	ON_BRIGHT_BLACK ON_BRIGHT_RED     ON_BRIGHT_GREEN ON_BRIGHT_YELLOW
+	ON_BRIGHT_BLUE  ON_BRIGHT_MAGENTA ON_BRIGHT_CYAN  ON_BRIGHT_WHITE
+	),
+      # 256 colors
+      (map { ("ANSI$_", "ON_ANSI$_") } 0 .. 255),
+      (map { ("GREY$_", "ON_GREY$_") } 0 .. 23);
+
+    my $ACV = $Term::ANSIColor::VERSION;
+    $ACV < 3.02 and delete @c256{grep m/italic/   => keys %c256};
+    $ACV < 4.00 and delete @c256{grep m/rgb|grey/ => keys %c256};
+    $ACV < 4.06 and delete @c256{grep m/ansi/     => keys %c256};
+    sort keys %c256;
+    } # tac_colors
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
-ccdiff - Colored character diff
+ccdiff - Colored Character diff
 
 =head1 SYNOPSIS
 
@@ -324,10 +421,10 @@ The default is to use traditional diff:
 a unified diff (-u1) would be
 
  5,5c5,5
-   Tue Sep  6 05:43:59 2005,B.O.Q.S.,,1125978239,1943341
- - Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
- + Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
-   Mon Feb 23 10:37:02 2004,R.X.K.S.,van,1077529022,1654127
+  Tue Sep  6 05:43:59 2005,B.O.Q.S.,,1125978239,1943341
+ -Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+ +Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+  Mon Feb 23 10:37:02 2004,R.X.K.S.,van,1077529022,1654127
 
 =item --verbose[=1] -v[1]
 
@@ -341,17 +438,70 @@ C<--verbose> accepts an optional verbosity-level. On level 2 and up, all
 horizontal changes get left-and-right markers inserted to enable seeing the
 location of the ZERO WIDTH or invisible characters.
 
+An example of this:
+
+With -Uu0v0:
+
+ 1,1c1,1
+ - A  BCDE Fg
+ + A BcdE​Fg
+
+With -Uu0v1:
+
+ 1,1c1,1
+ - A  BCDE Fg
+ - -- verbose : SPACE, LATIN CAPITAL LETTER C, LATIN CAPITAL LETTER D, SPACE
+ + A BcdE​Fg
+ + -- verbose : LATIN SMALL LETTER C, LATIN SMALL LETTER D, ZERO WIDTH SPACE
+
+With -Uu0v2:
+
+ 1,1c1,1
+ - A ↱ ↰B↱CD↰E↱ ↰Fg
+ - -- verbose : SPACE, LATIN CAPITAL LETTER C, LATIN CAPITAL LETTER D, SPACE
+ + A B↱cd↰E↱​↰Fg
+ + -- verbose : LATIN SMALL LETTER C, LATIN SMALL LETTER D, ZERO WIDTH SPACE
+
+With -Uu0v2 --ascii:
+
+ 1,1c1,1
+ - A > <B>CD<E> <Fg
+ - -- verbose : SPACE, LATIN CAPITAL LETTER C, LATIN CAPITAL LETTER D, SPACE
+ + A B>cd<E>​<Fg
+ + -- verbose : LATIN SMALL LETTER C, LATIN SMALL LETTER D, ZERO WIDTH SPACE
+
+the word "verbose" and the character markers will be displayed using the
+C<verbose> color.
+
 =item --markers -m
 
 Use markers under each changed character in change-chunks.
 
 C<--markers> is especially useful if the terminal does not support colors, or
-if you want to copy/paste the output to (ASCII) mail. See also C<--ascii>
+if you want to copy/paste the output to (ASCII) mail. See also C<--ascii>. The
+markers will have the same color as added or deleted text.
+
+This will look like (with unified diff):
+
+ 5,5c5,5
+ -Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+ -               ▼       ▼
+ +Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+ +               ▲       ▲
 
 =item --ascii -a
 
 Use (colored) ASCII indicators instead of Unicode. The default indicators are
-Unicode characters that stand out better.
+Unicode characters that stand out better. The markers will have the same color
+as added or deleted text.
+
+For the vertical markers (C<-m>) that would look like:
+
+ 5,5c5,5
+ -Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+ -               ^       ^
+ +Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+ +               ^       ^
 
 For the positional indicators, I did consider using U+034e (COMBINING UPWARDS
 ARROW BELOW), but as most terminals are probably unable to show it due to line
@@ -389,33 +539,56 @@ Define the background color for changed text.
 
 Prefix position indicators with an index.
 
+ [001] 5,5c5,5
+ -Sat Dec 18 07:08:33 1998,I.O.D.U.,,756194433,1442539
+ +Sat Dec 18 07:00:33 1993,I.O.D.U.,,756194433,1442539
+
 If a positive number is passed (C<--index=4> or C<-I 4>), display just the
-chunk with that index. This is useful in combination with C<--verbose>.
+chunk with that index, using the C<verbose> color:
+
+This is useful in combination with C<--verbose>.
+
+=item --threshold=2 -t 2
+
+Defines the number of lines a change block may differ before the fall-back of
+horizontal diff to vertical diff.
+
+If a chunk describes a change, and the number of lines in the original block
+has less or more lines than the new block and that difference exceeds this
+threshold, C<ccdiff> will fall-back to vertical diff.
+
+=item --heuristics=n -h n
+
+Defines the percentage of character-changes a change block may differ before
+the fall-back of horizontal diff to vertical diff.
+
+This percentage is calculated as C<(characters removed + characters added) /
+(2 * characters unchanged))>. 
 
 =item --ignore-case -i
 
 Ignore case on comparison.
 
-=item --ignore-all-space -w 
+=item --ignore-all-space -w
 
 Ignore all white-space changes. This will set all options C<-b>, C<-Z>, C<-E>,
 and C<-B>.
 
-=item --ignore-trailing-space -Z 
+=item --ignore-trailing-space -Z
 
 Ignore changes in trailing white-space (TAB's and spaces).
 
-=item --ignore-ws|ignore-space-change -b 
+=item --ignore-ws|ignore-space-change -b
 
 Ignore changes in horizontal white-space (TAB's and spaces). This does not
 include white-space changes that splits non-white-space or removes white-space
 between two non-white-space elements.
 
-=item --ignore-tab-expansion -E 
+=item --ignore-tab-expansion -E
 
 NYI
 
-=item --ignore-blank-lines -B 
+=item --ignore-blank-lines -B
 
 B<Just Partly Implemented> (WIP)
 
@@ -453,7 +626,7 @@ Between parens is the corresponding command-line option.
 
  markers : false
 
-defines if markers should be used under changed characters. The default is to
+Defines if markers should be used under changed characters. The default is to
 use colors only. The C<-m> command line option will toggle the option when set
 from a configuration file.
 
@@ -461,14 +634,14 @@ from a configuration file.
 
  ascii   : false
 
-defines to use ASCII markers instead of Unicode markers. The default is to use
+Defines to use ASCII markers instead of Unicode markers. The default is to use
 Unicode markers.
 
 =item reverse (-r)
 
  reverse : false
 
-defines if changes are displayed as foreground-color over background-color
+Defines if changes are displayed as foreground-color over background-color
 or background-color over foreground-color. The default is C<false>, so it will
 color the changes with the appropriate color (C<new> or C<old>) over the
 default background color.
@@ -477,9 +650,11 @@ default background color.
 
  new     : green
 
-defines the color to be used for added text. The default is C<green>.
+Defines the color to be used for added text. The default is C<green>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning. This option can include C<bold> either as prefix or
 as suffix.
 
@@ -494,9 +669,11 @@ This option may also be specified as
 
  old     : red
 
-defines the color to be used for delete text. The default is C<red>.
+Defines the color to be used for delete text. The default is C<red>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning. This option can include C<bold> either as prefix or
 as suffix.
 
@@ -511,10 +688,12 @@ This option may also be specified as
 
  bg      : white
 
-defines the color to be used as background for changed text. The default is
+Defines the color to be used as background for changed text. The default is
 C<white>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning. The C<bold> attribute is not allowed.
 
 This option may also be specified as
@@ -533,10 +712,12 @@ This option may also be specified as
 
  verbose : cyan
 
-defines the color to be used as color for the verbose tag. The default is
+Defines the color to be used as color for the verbose tag. The default is
 C<cyan>. This color will only be used under C<--verbose>.
 
-any color accepted by L<Term::ANSIColor> is allowed. Any other color will
+The color C<none> is also accepted and disables this color.
+
+Any color accepted by L<Term::ANSIColor> is allowed. Any other color will
 result in a warning.
 
 This option may also be specified as
@@ -550,7 +731,7 @@ This option may also be specified as
 
  utf8    : yes
 
-defines whether all I/O is to be interpreted as UTF-8. The default is C<no>.
+Defines whether all I/O is to be interpreted as UTF-8. The default is C<no>.
 
 This option may also be specified as
 
@@ -562,7 +743,7 @@ This option may also be specified as
 
  index   : no
 
-defines if the position indication for a change chunk is prefixed with an
+Defines if the position indication for a change chunk is prefixed with an
 index number. The default is C<no>. The index is 1-based.
 
 Without this option, the position indication would be like
@@ -580,7 +761,65 @@ with this option, it would be
 When this option contains a positive integer, C<ccdiff> will only show diff
 the diff chunk with that index.
 
+=item emacs
+
+ emacs   : no
+
+If this option is yes/true, calling C<ccdiff> with just one single argument,
+and that argument being an existing file, the arguments will act as
+
+ $ ccdiff file~ file
+
+if file~ exists.
+
+=item threshold (-t)
+
+ threshold : 2
+
+Defines the number of lines a change block may differ before the fall-back of
+horizontal diff to vertical diff.
+
+=item heuristics (-h)
+
+ heuristics : 40
+
+Defines the percentage of character-changes a change block may differ before
+the fall-back of horizontal diff to vertical diff. The default is undefined,
+meaning no fallback based on heuristics.
+
 =back
+
+=head1 Git integration
+
+You can use ccdiff to show diffs in git. It may work like this:
+
+ $ git config --global diff.tool ccdiff
+ $ git config --global difftool.prompt false
+ $ git config --global difftool.ccdiff.cmd 'ccdiff --utf-8 -u -r $LOCAL $REMOTE'
+ $ git difftool SHA~..SHA
+ $ cat >~/bin/git-ccdiff <<EOF
+ #!/bin/sh
+
+ commit=$1
+ shift
+ if [ "$commit" = "" ]; then
+     git difftool
+ else
+     git difftool $commit~1..$commit
+     fi
+ EOF
+ $ chmod 755 ~/bin/git-ccdiff
+ $ git ccdiff SHA
+
+From then on you can do
+
+ $ git ccdiff
+ $ git ccdiff 5c5a39f2
+
+=head1 CAVEATS
+
+Due to the implementation, where both sides of the comparison are completely
+kept in memory, this tool might not be able to deal with (very) large datasets.
 
 =head1 SEE ALSO
 

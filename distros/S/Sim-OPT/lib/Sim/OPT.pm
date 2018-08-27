@@ -63,10 +63,10 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns %vals 
 @sweeps @mediumiters @varinumbers @caseseed @chanceseed @chancedata $dimchance $tee @pars_tocheck retrieve
 report newretrieve newreport
-$target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
+$target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios @totalcases
 );
 
-$VERSION = '0.73.61';
+$VERSION = '0.75.7';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -441,16 +441,16 @@ sub calcmediumiters
 	return ( @mediumiters );
 }
 	
-sub getitersnum
-{ # IT GETS THE NUMBER OF ITERATION. UNUSED. CUT
-	my $countcase = shift;
-	my $varinumber = shift;
-	my @varinumbers = @_;
-	my $itersnum = $varinumbers[$countcase]{$varinumber};
-	
-	return $itersnum;
-	# IT HAS TO BE CALLED WITH getitersnum($countcase, $varinumber, @varinumbers);
-}
+#sub getitersnum
+#{ # IT GETS THE NUMBER OF ITERATION. UNUSED. CUT
+#	my $countcase = shift;
+#	my $varinumber = shift;
+#	my @varinumbers = @_;
+#	my $itersnum = $varinumbers[$countcase]{$varinumber};
+#	
+#	return $itersnum;
+#	# IT HAS TO BE CALLED WITH getitersnum($countcase, $varinumber, @varinumbers);
+#}
 
 sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 {
@@ -1031,18 +1031,12 @@ sub exe
 	my %dirfiles = %{ $d{ dirfiles } };
 	my %datastruc = %{ $d{datastruc} };
 	my @rescontainer = @{ $d{rescontainer} };
+
+        my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
+        my $precomputed = $dowhat{precomputed}; #NEW
+        my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
 	
 	say $tee "#Executing new searches for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-	
-	if ( $dowhat{newreport} eq "y" )
-	{
-		$dowhat{report} = "n";
-	}
-
-	if ( $dowhat{newretrieve} eq "y" )
-	{
-		$dowhat{retrieve} = "n";
-	}
 	
 	if ( $dowhat{morph} eq "y" ) 
 	{ 
@@ -1057,66 +1051,36 @@ sub exe
 		$dirfiles{morphstruct} = $result[1];
 	}
 
-	if ( ( $dowhat{simulate} eq "y" ) or ( ( $dowhat{newreport} eq "y" ) and ( $dowhat{newretrieve} eq "y" ) ) )
+	if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
 	{ 
-		if ( ( $dowhat{newreport} eq "y" ) and ( $dowhat{newretrieve} eq "y" ) )
-		{
-			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			my @result = Sim::OPT::Sim::sim( 
-			{ 
-				instances => \@instances, countcase => $countcase, countblock => $countblock, 
-				dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainers
-			} );
-			$dirfiles{simcases} = $result[0]; 
-			$dirfiles{simstruct} = $result[1]; 
-			$dirfiles{retcases} = $result[2]; 
-			$dirfiles{retstruct} = $result[3];
-			$dirfiles{notecases} = $result[4];
-			$dirfiles{repcases} = $result[5];
-			$dirfiles{repstruct} = $result[6];
-			$dirfiles{mergestruct} = $result[7];
-			$dirfiles{mergecases} = $result[8];
-			$dirfiles{repfilebackup} = $result[9];
-		}
-		else
-		{
+		
+		say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+		my @result = Sim::OPT::Sim::sim( 
+		{ 
+			instances => \@instances, countcase => $countcase, countblock => $countblock, 
+			dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainers
+		} );
+		$dirfiles{simcases} = $result[0]; 
+		$dirfiles{simstruct} = $result[1]; 
+		$dirfiles{retcases} = $result[2]; 
+		$dirfiles{retstruct} = $result[3];
+		$dirfiles{notecases} = $result[4];
+		$dirfiles{repcases} = $result[5];
+		$dirfiles{repstruct} = $result[6];
+		$dirfiles{mergestruct} = $result[7];
+		$dirfiles{mergecases} = $result[8];
+		$dirfiles{repfilebackup} = $result[9];		
+	}
+        elsif ( $dowhat{simulate} eq "y" )
+	{
 			say $tee "#Calling simulations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			my @result = Sim::OPT::Sim::sim( 
-			{ 
-				instances => \@instances, countcase => $countcase, countblock => $countblock, 
-				dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainers
-			} );
-			$dirfiles{simcases} = $result[0]; 
-			$dirfiles{simstruct} = $result[1]; 
-		}
-	}
-
-	if ( $dowhat{retrieve} eq "y" )
-	{ 
-		say $tee "#Calling retrieval of results for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-		my @result = Sim::OPT::Report::retrieve( 
+		my @result = Sim::OPT::Sim::sim( 
 		{ 
 			instances => \@instances, countcase => $countcase, countblock => $countblock, 
-			dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer,
+			dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainers
 		} );
-		$dirfiles{retcases} = $result[0]; 
-		$dirfiles{retstruct} = $result[1];
-		$dirfiles{notecases} = $result[2];
-	}
-
-	if ( $dowhat{report} eq "y" )
-	{ 
-		say $tee "#Calling reporting of results for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-		my @result = Sim::OPT::Report::report( 
-		{ 
-			instances => \@instances, countcase => $countcase, countblock => $countblock, 
-			dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer,
-		} );
-		$dirfiles{repcases} = $result[0];
-		$dirfiles{repstruct} = $result[1];
-		$dirfiles{mergestruct} = $result[2];
-		$dirfiles{mergecases} = $result[3];
-		$dirfiles{repfilebackup} = $result[4];
+		$dirfiles{simcases} = $result[0]; 
+		$dirfiles{simstruct} = $result[1]; 
 	}
 
 	if ( $dowhat{descend} eq "y" )
@@ -1216,6 +1180,7 @@ sub opt
 	#eval `cat $configfile`; # The file where the program data are
 
 	require $configfile;
+
 	#if ( not ( $outfile ) ) { $outfile = "$mypath/$file-$fileconfig-feedback.txt"; } 
 	if ( not ( $tofile ) ) { 
 		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
@@ -1234,6 +1199,81 @@ sub opt
 #	if ($chancefile) { eval `cat $chancefile` or die( "$!" ); }
 
 	print "\nNow in Sim::OPT. \n";
+
+        if ( $dowhat{randomsweeps} eq "yes" ) #IT SHUFFLES  @sweeps UNDER REQUEST SETTING.
+        {
+          my @newsweeps;
+          foreach my $arrayref ( @sweeps )
+          {
+              my @newarr;
+              my @array = @{ $arrayref };
+              @array = shuffle( @array );
+              foreach my $arefref ( @array )
+              {
+                my @arrayy = @{ $arefref };
+                @arrayy = shuffle( @arrayy );
+                push ( @newarr, [ @arrayy ] );
+              }
+              push ( @newsweeps, [ @newarr ] );
+            }
+            @sweeps = @newsweeps;
+            print "NEW SWEEPS: " . dump( @sweeps ) . "\n";
+        }
+         
+        my $i = 0;
+        my @newarr;
+        if ( $dowhat{randomdirs} eq "yes" )  
+        { #IT SHUFFLES  $dowhat{direction} UNDER APPROPRIATE SETTINGS.
+          foreach my $directionref ( @{ $dowhat{direction} } )
+          {
+            my @varinumber = %{ $varinumbers[i] };
+            my $numvarinumber = ( scalar( @varinumber ) / 2 ) ;
+            my @directions;
+            my $x = 0;
+            foreach ( @{ $directionref } )
+            {  
+              while ( $x < $numvarinumber )
+              {
+                my @bag = ( ">", "<", "=" );
+                @bag = shuffle( @bag );
+                push ( @directions, $bag[0] );
+                $x++;
+              }
+            }
+            push ( @newarr, [ @directions ] );
+            $i++;
+          }
+          $dowhat{direction} = [ @newarr ];
+          say "NEW RANDOMIZED DIRECTIONS: " . dump( $dowhat{direction} );
+        }
+
+        #my $i = 0;
+        #my @newarr;
+        ##IT SHUFFLES  $dowhat{direction} UNDER APPROPRIATE SETTINGS.
+        #  foreach my $directionref ( @{ $dowhat{direction} } )
+        #  {
+        #    my @varinumber = %{ $varinumbers[i] };
+        #    my $numvarinumber = ( scalar( @varinumber ) / 2 ) ;
+        #    
+        #    my @directions;
+        #    foreach $dirref ( @{ $directionref } )
+        #    {  
+        #       if ( scalar( @{ $dirref } ) == 0 )
+        #       {
+        #         push ( @{ $dirref } , ">" );
+        #       }
+        #       while ( scalar( @{ $dirref } ) < $numvarinumber )
+        #       {
+        #         push ( @directions, $dirref->[0] );
+        #       }
+        #    }
+        #    push ( @newarr, [ @directions ] );
+        #    $i++;
+        #  }
+        #  $dowhat{direction} = [ @newarr ];
+        #  say "NEW FILLED DIRECTIONS: " . dump( $dowhat{direction} );
+        #}
+
 		
 	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
 #	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
@@ -1275,7 +1315,7 @@ sub opt
 	
 	if ( ( $target eq "takechance" ) and (@chancedata) and ( $dimchance ) ) 
 	{
-		my @obt = Sim::OPT::Takechance::takechance( \@caseseed, \@chanceseed, \@chancedata, $dimchance ); say $tee "PASSED: \@sweeps: " . dump(@sweeps);
+		my @obt = Sim::OPT::Takechance::takechance( \@caseseed, \@chanceseed, \@chancedata, $dimchance );              #say $tee "PASSED: \@sweeps: " . dump(@sweeps);
 		@sweeps_ = @{ $obt[0] };
 		@caseseed_ = @{ $obt[1] };
 		@chanceseed_ = @{ $obt[2] };
@@ -1367,6 +1407,8 @@ The number of iterations to be taken into account for each parameter for each ca
 
 The instance number that has to considered the basic one, corresponding to the root case, is specified by the variable "@miditers". "@miditers" for the last example may be for instance set to ( { 1 => 2, 2 => 2, 3 => 2, 4 => 2, 5 => 2, 6 => 2 } ).
 
+OPT can work on a given set of pre-simulated results without launching new simulations, and it can randomize the sequence of the parameter search and the initialization level of the parameters (see the included examples).
+
 By default the behaviour of the program is sequential. To make it parallel locally, subspaces may be named, so as to work as collector cells. A name named "name" must be written ">name" and placed at the end of the block from which it is receiving the value produced by the block. Clearly, one named block (cell) can receive inputs by more than one block. The name named "name" should instead be written "name>" and placed at the beginning of the block in the case that it brings into it the values it contains.
 
 An example: 
@@ -1402,7 +1444,7 @@ The program works under Linux.
 
 =head1 SEE ALSO
 
-Annotated examples ("esp.pl" for ESP-r, "ep.pl" for EnergyPlus - the two perform the same morphing operations on models describing the same building -, and "des.pl" about block search) can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. For more information, reference to the source code should be made.
+Annotated examples ("esp.pl" for ESP-r, "ep.pl" for EnergyPlus - the two perform the same morphing operations on models describing the same building -, "des.pl" about block search, and "f.pl" about a search in a pre-simulated dataset) can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. For more information, reference to the source code should be made.
 
 =head1 AUTHOR
 

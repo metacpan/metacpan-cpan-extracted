@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Mixins;
-$Footprintless::Mixins::VERSION = '1.28';
+$Footprintless::Mixins::VERSION = '1.29';
 # ABSTRACT: A utility package for mixins for standard object
 # PODNAME: Footprintless::Mixins
 
@@ -232,7 +232,7 @@ Footprintless::Mixins - A utility package for mixins for standard object
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 DESCRIPTION
 

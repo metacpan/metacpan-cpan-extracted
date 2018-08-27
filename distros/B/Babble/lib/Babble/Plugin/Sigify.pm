@@ -9,7 +9,7 @@ sub transform_to_plain {
     my ($m) = @_;
     my $body = $m->submatches->{body}->text;
     $body =~ s/^\s+//;
-    if ($body =~ s/^{\s*my\s*(\([^\)]+\))\s*=\s*\@_\s*;/{/sm) {
+    if ($body =~ s/^\{\s*my\s*(\([^\)]+\))\s*=\s*\@_\s*;/{/sm) {
       my $sig = $1;
       $body =~ s/^{\n\n/{\n/;
       $m->submatches->{body}->replace_text($sig.' '.$body);

@@ -88,6 +88,13 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Stefan Hornburg</foaf:name>
+      <foaf:nick>Racke</foaf:nick>
+      <foaf:mbox rdf:resource="mailto:racke@linuxia.de" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>temp0</foaf:name>
       <foaf:mbox rdf:resource="mailto:temp@temp.com" />
     </foaf:Person>
@@ -391,6 +398,18 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.3.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-01-12</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.3.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-12-22</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.3.3</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-21</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

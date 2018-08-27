@@ -25,7 +25,7 @@ no_index:
 provides:
   IO::File::AtomicChange:
     file: lib/IO/File/AtomicChange.pm
-    version: 0.07
+    version: 0.08
 requires:
   File::Copy: 0
   File::Temp: 0
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/hirose31/IO-File-AtomicChange/issues
   homepage: https://github.com/hirose31/IO-File-AtomicChange
   repository: https://github.com/hirose31/IO-File-AtomicChange.git
-version: 0.07
+version: 0.08
 x_contributors:
   - 'HIROSE Masaaki <hirose31@gmail.com>'
   - 'Shoichi Kaji <skaji@outlook.com>'

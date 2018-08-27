@@ -1,25 +1,31 @@
 Revision history for Perl module Crypt::Format
 
-0.01 Fri Jan  8 17:20:51 2016
-    - original version; created by ExtUtils::ModuleMaker 0.55
+0.09 Fri Aug 24 2018
+    - LICENSE update
 
-0.02 Fri Jan  8 18:00:00 2016
-    - Added der2pem()
+0.08 Fri Aug 24 2018
+    - LICENSE update
 
-0.03 Fri Jan  8 18:15:00 2016
-    - Fix some distribution issues
-
-0.04 Fri Jan  8 20:15:00 2016
-    - Documentation, and more distribution issues
-
-0.05 Thu Jan 14 13:00:00 2016
-    - Add normalize_pem()
-
-0.051 Thu Jan 14 13:35:00 2016
-    - Add normalize_pem() to SYNOPSIS
+0.07 Thu Feb  2 2017
+    - Fix POD encoding (thanks, CARNIL!), add repo to POD.
 
 0.06 Sat Jan 16 23:00:00 2016
     - Allow customizable Base64 module
 
-0.07 Thu Feb  2 2017
-    - Fix POD encoding (thanks, CARNIL!), add repo to POD.
+0.051 Thu Jan 14 13:35:00 2016
+    - Add normalize_pem() to SYNOPSIS
+
+0.05 Thu Jan 14 13:00:00 2016
+    - Add normalize_pem()
+
+0.04 Fri Jan  8 20:15:00 2016
+    - Documentation, and more distribution issues
+
+0.03 Fri Jan  8 18:15:00 2016
+    - Fix some distribution issues
+
+0.02 Fri Jan  8 18:00:00 2016
+    - Added der2pem()
+
+0.01 Fri Jan  8 17:20:51 2016
+    - original version; created by ExtUtils::ModuleMaker 0.55

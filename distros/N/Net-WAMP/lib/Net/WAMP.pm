@@ -1,6 +1,6 @@
 package Net::WAMP;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =encoding utf-8
 

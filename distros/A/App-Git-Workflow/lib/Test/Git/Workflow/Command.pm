@@ -16,7 +16,7 @@ use Capture::Tiny qw/capture/;
 use App::Git::Workflow;
 use Mock::App::Git::Workflow::Repository;
 
-our $VERSION     = 1.0.8;
+our $VERSION     = 1.0.9;
 our @EXPORT      = qw/command_ok/;
 our @EXPORT_OK   = qw/command_ok/;
 our %EXPORT_TAGS = ();
@@ -104,7 +104,7 @@ sub command_ok ($$) {  ## no critic
         is_deeply \%{"${module}::option"}, $data->{option}, 'Options set correctly'
             or diag explain \%{"${module}::option"}, $data->{option};
         ok !@{ $git->{data} }, "All data setup is used"
-            or diag explain $git->{data};
+            or diag explain $git->{data}, [ map {keys %$_} @{ $data->{mock} } ];
     };
 }
 
@@ -118,7 +118,7 @@ Test::Git::Workflow::Command - Test Git::Workflow::Command::* files
 
 =head1 VERSION
 
-This documentation refers to Test::Git::Workflow::Command version 1.0.8
+This documentation refers to Test::Git::Workflow::Command version 1.0.9
 
 =head1 SYNOPSIS
 

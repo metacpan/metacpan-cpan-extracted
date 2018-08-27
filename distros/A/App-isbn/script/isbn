@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-08-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-23'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ isbn - Query book information by ISBN
 
 =head1 VERSION
 
-This document describes version 0.001 of isbn (from Perl distribution App-isbn), released on 2018-08-02.
+This document describes version 0.002 of isbn (from Perl distribution App-isbn), released on 2018-08-23.
 
 =head1 SYNOPSIS
 
@@ -86,15 +86,15 @@ See C<--driver>.
 
 =item B<--isbn>=I<s>
 
-=item B<-l>
-
-Shortcut for --action installed_drivers.
-
-See C<--action>.
-
 =item B<-L>
 
 Shortcut for --action available_drivers.
+
+See C<--action>.
+
+=item B<-l>
+
+Shortcut for --action installed_drivers.
 
 See C<--action>.
 

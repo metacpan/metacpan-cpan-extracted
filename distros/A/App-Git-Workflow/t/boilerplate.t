@@ -58,6 +58,7 @@ subtest 'Changes' => sub {
     );
 };
 
+module_boilerplate_ok('bin/git-amend');
 module_boilerplate_ok('bin/git-branch-age');
 module_boilerplate_ok('bin/git-branch-clean');
 module_boilerplate_ok('bin/git-branches');
@@ -76,6 +77,7 @@ module_boilerplate_ok('bin/git-search');
 module_boilerplate_ok('bin/git-watch');
 module_boilerplate_ok('lib/App/Git/Workflow.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command.pm');
+module_boilerplate_ok('lib/App/Git/Workflow/Command/Amend.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/BranchAge.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/BranchClean.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/Branches.pm');

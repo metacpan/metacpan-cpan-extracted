@@ -838,7 +838,7 @@ them, they will still raise an exception on error.
 Set by default under C<ASSERT_CONDITIONAL=carp>.
 
 Assertions are always imported but they do not raise an exception if they fail;
-instead they old carp at you.  This is true even if you manage to call an assertion
+instead they all carp at you.  This is true even if you manage to call an assertion
 you haven't imported.
 
 =back

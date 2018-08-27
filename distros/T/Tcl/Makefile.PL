@@ -1,4 +1,3 @@
-#!perl -w
 # before running this script make sure you have 'tclsh' in your path, 
 # and this 'tcl' distribution is required one.
 
@@ -111,11 +110,10 @@ if (defined($libpath) && defined($incpath)) {
     # When user has its own tclConfig.sh with --tclconfig=..., then we
     # overwrite values in %tclcfg
 
-    $?=0;
-    open(my $fh, "$tclsh tclcfg.tcl |") or _die "error starting $tclsh: $!";
-    _die "error starting $tclsh: \$?=$?; \$!=$!\n" if $?!=0;
-    my $tclcfg = join '', <$fh>;
+    my $tclcfg = `$tclsh tclcfg.tcl`;
+    _die "error starting $tclsh: \$?=$?; \$!=$!\n" if $tclcfg eq ''; # can't check $?, BUG 133463
     print $tclcfg;
+
     my %tclcfg = $tclcfg =~ /^([^=]+)=(.*?)$/gm;
 
     $defs .= " -DTCLSH_PATH=\\\"".([$tclcfg{tclsh}=~/^(.*)\//]->[0])."\\\""; #haack
@@ -230,8 +228,13 @@ my $mm = WriteMakefile(
     MIN_PERL_VERSION => '5.006',
     ABSTRACT_FROM => 'Tcl.pm',
     META_MERGE => {
+        "meta-spec" => { version => 2 },
         resources => {
-            repository => 'http://github.com/gisle/tcl.pm',
+            repository => {
+                type => 'git',
+                web => 'https://github.com/gisle/tcl.pm',
+                url => 'https://github.com/gisle/tcl.pm.git',
+            },
             MailingList => 'mailto:tcltk@perl.org',
         }
     },

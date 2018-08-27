@@ -1,0 +1,88 @@
+{
+   "abstract" : "optional type restrictions for Moo attributes",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Moo",
+      "types"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooX-Should",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::StrictMode" : "0",
+            "Moo" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "Module::Metadata" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::Should" : {
+         "file" : "lib/MooX/Should.pm",
+         "version" : "v0.1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/MooX-Should/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/MooX-Should.git",
+         "web" : "https://github.com/robrwo/MooX-Should"
+      }
+   },
+   "version" : "v0.1.2",
+   "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

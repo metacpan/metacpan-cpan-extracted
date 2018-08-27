@@ -6,7 +6,7 @@
 
 package Assert::Conditional;
 
-our $VERSION = 0.008;
+our $VERSION = 0.009;
 
 use v5.12;
 use utf8;
@@ -1162,11 +1162,11 @@ sub assert_min_keys( \[%$] @ )
     _promote_to_hashref($hashref);
     @keylist                            || botch "no min keys given";
 
-    my @missing = uca_sort grep { !exists $hashref->{$_} } @keylist;
+    my @missing = grep { !exists $hashref->{$_} } @keylist;
     return unless @missing;
 
     my $message = "key" . (@missing > 1 && "s") . " "
-                . quotify_and(@missing)
+                . quotify_and(uca_sort @missing)
                 . " missing from hash";
 
     botch $message;
@@ -1179,15 +1179,14 @@ sub assert_max_keys( \[%$] @ )
     _promote_to_hashref($hashref);
     my %allowed = map { $_ => 1 } @keylist;
     my @forbidden;
-    for my $key (uca_sort keys %$hashref) {
+    for my $key (keys %$hashref) {
         delete $allowed{$key} || push @forbidden, $key;
     }
     return unless @forbidden;
 
-    my $message = !@forbidden ? "" :
-        "key" . (@forbidden > 1 && "s") . " "
-              . quotify_and(@forbidden)
-              . " forbidden in hash";
+    my $message = "key" . (@forbidden > 1 && "s") . " "
+                        . quotify_and(uca_sort @forbidden)
+                        . " forbidden in hash";
 
     botch $message;
 }
@@ -1206,22 +1205,22 @@ sub assert_minmax_keys( \[%$] \[@$] \[@$] )
     my %required = map { $_ => 1 } @$minkeys;
     my %allowed  = map { $_ => 1 } @$maxkeys;
 
-    for my $key (uca_sort keys %$hashref) {
+    for my $key (keys %$hashref) {
         delete $required{$key};
         delete $allowed{$key} || push @forbidden, $key;
     }
-    my @missing = uca_sort keys %required;
+    my @missing = keys %required;
 
     return unless @missing || @forbidden;
 
     my $missing_msg = !@missing ? "" :
         "key" . (@missing > 1 && "s") . " "
-              . quotify_and(@missing)
+              . quotify_and(uca_sort @missing)
               . " missing from hash";
 
     my $forbidden_msg = !@forbidden ? "" :
         "key" . (@forbidden > 1 && "s") . " "
-              . quotify_and(@forbidden)
+              . quotify_and(uca_sort @forbidden)
               . " forbidden in hash";
 
     my $message = commify_and grep { length } $missing_msg, $forbidden_msg;
@@ -1502,12 +1501,12 @@ sub assert_can($@)
     my($invocant, @methods) = @_;
     @methods                            || botch "need one or more methods to check against";
     my $type = _get_invocant_type $invocant;
-    my @cant = grep { !$invocant->can($_) } uca_sort @methods;
+    my @cant = grep { !$invocant->can($_) } @methods;
     return unless @cant;
 
     my $message = "cannot invoke method"
                 . (@cant > 1 && "s") . " "
-                . quotify_or(@cant)
+                . quotify_or(uca_sort @cant)
                 . " on $type $invocant";
 
     botch $message;
@@ -1520,12 +1519,12 @@ sub assert_cant($@)
     my($invocant, @methods) = @_;
     @methods                            || botch "need one or more methods to check against";
     my $type = _get_invocant_type $invocant;
-    my @can = grep { $invocant->can($_) } uca_sort @methods;
+    my @can = grep { $invocant->can($_) } @methods;
     return unless @can;
 
     my $message = "should not be able to invoke method"
                 . (@can > 1 && "s") . " "
-                . quotify_or(@can)
+                . quotify_or(uca_sort @can)
                 . " on $type $invocant";
 
     botch $message;
@@ -1569,8 +1568,8 @@ sub assert_isa($@)
     my($subclass, @superclasses) = @_;
     @superclasses                       || botch "needs one or more superclasses to check against";
     my $type = _get_invocant_type $subclass;
-    my @ainta = grep { !$subclass->isa($_) } uca_sort @superclasses;
-    !@ainta || botch "your $subclass $type should be a subclass of " . commify_and @ainta;
+    my @ainta = grep { !$subclass->isa($_) } @superclasses;
+    !@ainta || botch "your $subclass $type should be a subclass of " . commify_and(uca_sort @ainta);
 }
 
 sub assert_ainta($@)
@@ -1581,8 +1580,8 @@ sub assert_ainta($@)
     my($subclass, @superclasses) = @_;
     @superclasses                       || botch "needs one or more superclasses to check against";
     my $type = _get_invocant_type $subclass;
-    my @isa = grep { $subclass->isa($_) } uca_sort @superclasses;
-    !@isa || botch "your $subclass $type should not be a subclass of " . commify_or @isa
+    my @isa = grep { $subclass->isa($_) } @superclasses;
+    !@isa || botch "your $subclass $type should not be a subclass of " . commify_or(uca_sort @isa);
 }
 
 sub assert_object_isa($@)
@@ -1624,10 +1623,10 @@ sub assert_does($@)
     my($invocant, @roles) = @_;
     @roles                              || botch "needs one or more roles to check against";
     my $type = _get_invocant_type $invocant;
-    my @doesnt = grep { !$invocant->DOES($_) } uca_sort @roles;
+    my @doesnt = grep { !$invocant->DOES($_) } @roles;
     !@doesnt || botch "your $type $invocant does not have role"
                     .  (@doesnt > 1 && "s") . " "
-                    .  commify_or(@doesnt);
+                    .  commify_or(uca_sort @doesnt);
 }
 
 sub assert_doesnt($@)
@@ -1637,10 +1636,10 @@ sub assert_doesnt($@)
     my($invocant, @roles) = @_;
     @roles                              || botch "needs one or more roles to check against";
     my $type = _get_invocant_type $invocant;
-    my @does = grep { $invocant->DOES($_) } uca_sort @roles;
+    my @does = grep { $invocant->DOES($_) } @roles;
     !@does || botch "your $type $invocant does not have role"
                     .  (@does > 1 && "s") . " "
-                    .  commify_or(@does);
+                    .  commify_or(uca_sort @does);
 }
 
 sub assert_object_overloads($@)
@@ -2111,7 +2110,7 @@ them, they will still raise an exception on error. This is the default.
 =item carp
 
 Assertions are always imported but they do not raise an exception if they
-fail; instead they old carp at you.  This is true even if you somehow
+fail; instead they all carp at you.  This is true even if you somehow
 manage to call an assertion you haven't imported.
 
 Note that if combined, you can get both effects:
@@ -2569,6 +2568,8 @@ L</assert_nfkc>, L</assert_nfkd>, and L</assert_nonastral>.
 
 =head2 Assertions about Calling Context
 
+These assertions inspect their immediate caller’s C<wantarray>.
+
 =over
 
 =item assert_list_context()
@@ -2577,7 +2578,7 @@ Current function was called in list context.
 
 =item assert_nonlist_context()
 
-Current function was not called in list context.
+Current function was I<not> called in list context.
 
 =item assert_scalar_context()
 
@@ -2589,33 +2590,40 @@ Current function was called in void context.
 
 =item assert_nonvoid_context()
 
-Current function was not called in void context.
+Current function was I<not> called in void context.
 
 =back
 
 =head2 Assertions about Scalars
 
+These assertions don't pay any special attention to objects, so the normal
+effects of evaluating an object where a regular scalar is expected apply.
+
 =over
 
 =item assert_true(I<EXPR>)
 
-Scalar expression I<EXPR> is true according to Perl's sense of Boolean
-logic, the sort of thing you would put in an C<if>) condition to have its
-block run.
+The scalar expression I<EXPR> is true according to Perl's sense of Boolean
+logic, the sort of thing you would put in an C<if (...)> condition to have
+its block run.
 
-Consider using L</assert_happy_code> instead for more descriptive error
-messages because that assertion will show the literal expression that was
-expected to be true but which unexpectedly evaluated to false.
+If this assertion fails, it will not report the original expression.  You
+should therefore strongly consider using L</assert_happy_code> instead for
+more descriptive error messages because L</assert_happy_code> will show the
+literal expression that was expected to be true but which unexpectedly
+evaluated to false.
 
 =item assert_false(I<EXPR>)
 
-Scalar expression I<EXPR> is true according to Perl's sense of Boolean
+The scalar expression I<EXPR> is true according to Perl's sense of Boolean
 logic, the sort of thing you would put in an C<unless>) condition to have
 its block run.
 
-Consider using L</assert_unhappy_code> instead for more descriptive error
-messages because that assertion will show the literal expression that was
-expected to be false but which unexpectedly evaluated to true.
+If this assertion fails, it will not report the original expression.  You
+should therefore strongly consider using L</assert_unhappy_code> instead
+for more descriptive error messages, because  L</assert_unhappy_code> will
+display the literal expression that was expected to be false but which
+unexpectedly evaluated to true.
 
 False values in Perl are the undefined value, both kinds of empty string
 (C<q()> and C<!1>), the string of length one whose only character is an
@@ -2626,9 +2634,9 @@ returned by the C<ioctl>, C<fcntl>, and C<syscall> system calls.
 
 =item assert_defined(I<EXPR>)
 
-The scalar I<EXPR> argument is defined.  Consider using
-one of either L</assert_defined_variable> or
-L</assert_defined_value> to better document your intention.
+The scalar I<EXPR> argument is defined.  Consider using one of either
+L</assert_defined_variable> or L</assert_defined_value> to better
+document your intention.
 
 =item assert_undefined(I<EXPR>)
 
@@ -2636,133 +2644,152 @@ The scalar I<EXPR> argument is not defined.
 
 =item assert_defined_variable(I<SCALAR>)
 
-The scalar I<variable> argument I<SCALAR> is defined.  This is safer to
+The scalar B<variable> argument I<SCALAR> is defined.  This is safer to
 call than L</assert_defined_value> because it requires an actual scalar
 variable with a leading dollar sign, so generates a compiler error if you
 try to pass it other sigils.
 
-=item assert_defined_value(I<VALUE>)
+=item assert_defined_value(I<EXPR>)
 
-The scalar I<VALUE> is defined.
+The scalar I<EXPR> is defined.
 
 =item assert_is(I<THIS>, I<THAT>)
 
-The two defined non-ref arguments test true for string equality, codepoint
-by codepoint, with the built-in C<eq> operator.  Stringification overloads
-are therefore honored, but this test is not otherwise in any fashion
-recursive or object-aware.
+The two defined non-ref arguments test true for "string equality", codepoint
+by codepoint, using the built-in C<eq> operator.  
 
-See also L</assert_eq> to compare normalized Unicode strings and
-L</assert_eq_letters> to compare only their letters and disregard the rest.
+When called on objects with operator overloads, their C<eq> overload or if
+necessary their stringification overloads will thereofre be honored but
+this test is not otherwise in any fashion recursive or object-aware.
+
+This is not the same as equivalent Unicode strings. For that, use
+L</assert_eq> to compare normalized Unicode strings, and use
+L</assert_eq_letters> to compare only their letters but disregard the rest.
 
 =item assert_isnt(I<THIS>, I<THAT>)
 
 The two defined non-ref arguments test false for string equality with the
-C<ne> operator.  Stringification overloads are therefore honored, but this
+C<ne> operator.  The expected overloads are therefore honored, but this
 test is not otherwise in any fashion recursive or object-aware.
 
 =back
 
 =head2 Assertions about Numbers
 
-=over
+Most of the assertions in this section treat their arguments as numbers.
+When called on objects with operator overloads, their evaluation will
+therefore trigger a C<0+> nummification overload in preference to a C<"">
+stringification overload if the former exists. Otherwise normal fallback
+rules apply as documented in the L<overload> pragma.
 
-=item assert_numeric(I<ARG>)
+=over 
 
-Non-ref argument looks like a number suitable for implicit conversion.
+=item assert_numeric(I<EXPR>)
 
-=item assert_nonnumeric(I<ARG>)
+The defined non-ref argument looks like a number suitable for implicit
+conversion according to the builtin L<Scalar::Util/looks_like_number>
+predicate.
 
-Non-ref argument doesn't look like a number suitable for implicit conversion.
+=item assert_nonnumeric(I<EXPR>)
 
-=item assert_positive(I<ARG>)
+The defined non-ref argument does I<not> look like a number suitable for
+implicit conversion, again per L<Scalar::Util/looks_like_number>.
 
-Non-ref argument is numerically greater than zero.
+=item assert_positive(I<EXPR>)
 
-=item assert_nonpositive(I<ARG>)
+The defined non-ref argument is numerically greater than zero.
 
-Non-ref argument is numerically less than or equal to zero.
+=item assert_nonpositive(I<EXPR>)
 
-=item assert_negative(I<ARG>)
+The defined non-ref argument is numerically less than or equal to zero.
 
-Non-ref argument is numerically less than zero.
+=item assert_negative(I<EXPR>)
 
-=item assert_nonnegative(I<ARG>)
+The defined non-ref argument is numerically less than zero.
 
-Non-ref argument is numerically greater than or equal to numeric zero.
+=item assert_nonnegative(I<EXPR>)
 
-=item assert_zero(I<ARG>)
+The defined non-ref argument is numerically greater than or equal to
+numeric zero.
 
-Non-ref argument is numerically equal to numeric zero.
+=item assert_zero(I<EXPR>)
 
-=item assert_nonzero(I<ARG>)
+The defined non-ref argument is numerically equal to numeric zero.
 
-Non-ref argument is not numerically equal to numeric zero.
+=item assert_nonzero(I<EXPR>)
 
-=item assert_integer(I<ARG>)
+The defined non-ref argument is not numerically equal to numeric zero.
 
-Non-ref numeric argument has no fractional part.
+=item assert_integer(I<EXPR>)
 
-=item assert_fractional(I<ARG>)
+The defined non-ref numeric argument has no fractional part.
 
-Non-ref numeric argument has a fractional part.
+=item assert_fractional(I<EXPR>)
 
-=item assert_signed_number(I<ARG>)
+The defined non-ref numeric argument has a fractional part.
 
-Non-ref numeric argument has a leading sign, ASCII C<-> or C<+>.
-A Unicode C<MINUS SIGN> does not currently count because Perl
-will not respect it for implicit string-to-number conversions.
+=item assert_signed_number(I<EXPR>)
 
-=item assert_natural_number(I<N>)
+The defined non-ref numeric argument has a leading sign, ASCII C<-> or
+C<+>.  A Unicode C<MINUS SIGN> does not currently count because Perl will
+not respect it for implicit string-to-number conversions.
+
+=item assert_natural_number(I<EXPR>)
 
 One of the counting numbers: 1, 2, 3, . . .
 
-=item assert_whole_number(I<ARG>)
+=item assert_whole_number(I<EXPR>)
 
 A natural number or zero.
 
-=item assert_positive_integer(I<ARG>)
+=item assert_positive_integer(I<EXPR>)
 
 An integer greater than zero.
 
-=item assert_nonpositive_integer(I<ARG>)
+=item assert_nonpositive_integer(I<EXPR>)
 
 An integer not greater than zero.
 
-=item assert_negative_integer(I<ARG>)
+=item assert_negative_integer(I<EXPR>)
 
 An integer less than zero.
 
-=item assert_nonnegative_integer(I<ARG>)
+=item assert_nonnegative_integer(I<EXPR>)
 
 An integer that's zero or below.
 
-=item assert_hex_number(I<ARG>)
+=item assert_hex_number(I<EXPR>)
 
-Beyond an optional leading C<0x>, argument contains only ASCII hex digits,
-making it suitable for feeding to the C<hex> function.
+Beyond an optional leading C<0x>, the argument contains only ASCII hex
+digits, making it suitable for feeding to the C<hex> function.
 
-=item assert_box_number(I<ARG>)
+=item assert_box_number(I<EXPR>)
 
-A string suitable for feeding to Perl's C<oct> function, so a non-negative
-integer with an optional leading C<0b> for binary, C<0o> or C<0 >for octal,
-or C<0x> for hex.
+The argument treated as a I<string> is suitable for feeding to Perl's
+C<oct> function, so a non-negative integer with an optional leading C<0b>
+for binary, C<0o> or C<0> for octal, or C<0x> for hex.
 
-Mnemonic: I<box> numbers are B<b>inary, B<o>ctal, or he<b> numbers.
+Mnemonic: "I<box> numbers" are B<b>inary, B<o>ctal, or heB<x> numbers.
 
-=item assert_even_number(I<N>)
+=item assert_even_number(I<EXPR>)
 
-An integer that is an even multiple of two.
+The defined non-ref integer expression must be an even multiple of two.
 
-=item assert_odd_number(I<N>)
+=item assert_odd_number(I<EXPR>)
 
-An integer that is not an even multiple of two.
+The defined non-ref integer expression must I<not> be an even multiple of two.
 
 =item assert_in_numeric_range(I<NUMBER>, I<LOW>, I<HIGH>)
 
-A number that falls between the numeric range specified in the next two
-arguments; that is, it must be at least as great as the low end of the
-range but no higher than the high end of the range.
+The scalar I<NUMBER> argument falls between the numeric range specified in
+the next two scalar arguments; that is, it must be at least as great as the
+I<LOW> end of the range but no higher than the I<HIGH> end of the range.
+
+It's like writing either of these:
+
+    assert_happy_code { $number >= $low && $number <= $high };
+
+    assert_true($number >= $low && $number <= $high);
 
 =back
 
@@ -2770,55 +2797,55 @@ range but no higher than the high end of the range.
 
 =over
 
-=item assert_empty(I<ARG>)
+=item assert_empty(I<EXPR>)
 
-Defined non-ref argument is of zero length.
+The defined non-ref argument is of zero length.
 
-=item assert_nonempty(I<ARG>)
+=item assert_nonempty(I<EXPR>)
 
-Defined non-ref argument is not of zero length.
+The defined non-ref argument is not of zero length.
 
-=item assert_blank(I<ARG>)
+=item assert_blank(I<EXPR>)
 
-Defined non-ref argument has at most only whitespace
+The defined non-ref argument has at most only whitespace
 characters in it.   It may be length zero.
 
-=item assert_nonblank(I<ARG>)
+=item assert_nonblank(I<EXPR>)
 
-Defined non-ref argument has at least one non-whitespace
+The defined non-ref argument has at least one non-whitespace
 character in it.
 
-=item assert_single_line(I<ARG>)
+=item assert_single_line(I<EXPR>)
+
+The defined non-empty string argument has at most one optional linebreak grapheme
+(C<\R>, so a CRLF or vertical whitespace line newline, carriage return, and
+form feed) at the very end.  It is disqualified if it has a linebreak
+anywhere shy of the end, or more than one of them at the end.
+
+=item assert_multi_line(I<EXPR>)
 
 Non-empty string argument has at most one optional linebreak grapheme
 (C<\R>, so a CRLF or vertical whitespace line newline, carriage return, and
 form feed) at the very end.  It is disqualified if it has a linebreak
 anywhere shy of the end, or more than one of them at the end.
 
-=item assert_multi_line(I<ARG>)
-
-Non-empty string argument has at most one optional linebreak grapheme
-(C<\R>, so a CRLF or vertical whitespace line newline, carriage return, and
-form feed) at the very end.  It is disqualified if it has a linebreak
-anywhere shy of the end, or more than one of them at the end.
-
-=item assert_single_paragraph(I<ARG>)
+=item assert_single_paragraph(I<EXPR>)
 
 Non-empty string argument has at any number of linebreak graphemes
 at the very end only.  It is disqualified if it has linebreaks
 anywhere shy of the end, but does not care how many are there.
 
-=item assert_bytes(I<ARG>)
+=item assert_bytes(I<EXPR>)
 
 Argument contains only code points between 0x00 and 0xFF.
 Such data is suitable for writing out as binary bytes.
 
-=item assert_nonbytes(I<ARG>)
+=item assert_nonbytes(I<EXPR>)
 
 Argument contains code points greater than 0xFF.
 Such data must first be encoded when written.
 
-=item assert_wide_characters(I<ARG>)
+=item assert_wide_characters(I<EXPR>)
 
 The same thing as saying that it contains non-bytes.
 
@@ -2828,69 +2855,70 @@ The same thing as saying that it contains non-bytes.
 
 =over
 
-=item assert_nonascii(I<ARG>)
+=item assert_nonascii(I<EXPR>)
 
 Argument contains at least one code point larger that 127.
 
-=item assert_ascii(I<ARG>)
+=item assert_ascii(I<EXPR>)
 
 Argument contains only code points less than 128.
 
-=item assert_alphabetic(I<ARG>)
+=item assert_alphabetic(I<EXPR>)
 
 Argument contains only alphabetic code points,
 but not necessarily ASCII ones.
 
-=item assert_nonalphabetic(I<ARG>)
+=item assert_nonalphabetic(I<EXPR>)
 
 Argument contains only non-alphabetic code points,
 but not necessarily ASCII ones.
 
-=item assert_alnum(I<ARG>)
+=item assert_alnum(I<EXPR>)
 
 Argument contains only alphabetic or numeric code points,
 but not necessarily ASCII ones.
 
-=item assert_digits(I<ARG>)
+=item assert_digits(I<EXPR>)
 
 Argument contains only ASCII digits.
 
-=item assert_uppercased(I<ARG>)
+=item assert_uppercased(I<EXPR>)
 
 Argument will not change if uppercased.
 
-=item assert_lowercased(I<ARG>)
+=item assert_lowercased(I<EXPR>)
 
 Argument will not change if lowercased.
 
-=item assert_unicode_ident(I<ARG>)
+=item assert_unicode_ident(I<EXPR>)
 
 Argument is a legal Unicode identifier, so one beginning with an (X)ID Start
 code point and having any number of (X)ID Continue code points following.
 Note that Perl identifiers are somewhat different from this.
 
-=item assert_simple_perl_ident(I<ARG>)
+=item assert_simple_perl_ident(I<EXPR>)
 
 Like a Unicode identifier but which may also start
 with connector punctuation like underscores.  No package
 separators are allowed, however.  Sigils do not count.
 
 Also, special variables like C<$.> or C<${^PREMATCH}>
-will not work either, since C<.> and C<{> and C<^> are
-all behind the pale.
+will not work either, since passing this function
+strings like C<.> and C<{> and C<^> are
+all beyond the pale.
 
-=item assert_full_perl_ident(I<ARG>)
+=item assert_full_perl_ident(I<EXPR>)
 
 Like a simple Perl identifier but which also
 allows for optional package separators,
 either C<::> or C<'>.
 
-=item assert_qualified_ident(I<ARG>)
+=item assert_qualified_ident(I<EXPR>)
 
 Like a full Perl identifier but with
 mandatory package separators, either C<::> or C<'>.
 
-=item assert_ascii_ident(I<ARG>)
+=item assert_ascii_ident(I<EXPR>)
 
 What most people think of as an identifier,
 one with only ASCII letter, digits, and underscores,
@@ -2898,17 +2926,19 @@ and which cannot begin with a digit.
 
 =item assert_regex(I<ARG>)
 
-The argument is a compile Regexp object.
+The argument must be a compile Regexp object.
 
-=item assert_like(I<STRING>, I<PATTERN>)
-
-The string, which must be a defined non-reference,
-matches the pattern, which must be a compiled Regexp object.
-
-=item assert_unlike(I<STRING>, I<PATTERN>)
+=item assert_like(I<STRING>, I<REGEX>)
 
 The string, which must be a defined non-reference,
-cannot match the pattern, which must be a compiled Regexp object.
+matches the pattern, which must be a compiled Regexp object
+produces by the C<qr> operator.
+
+=item assert_unlike(I<STRING>, I<REGEX>)
+
+The string, which must be a defined non-reference,
+cannot match the pattern, which must be a compiled Regexp object
+produces by the C<qr> operator.
 
 =back
 
@@ -2918,17 +2948,17 @@ cannot match the pattern, which must be a compiled Regexp object.
 
 =item assert_latin1(I<ARG>)
 
-Argument contains only code points
+The argument contains only code points
 from U+0000 through U+00FF.
 
 =item assert_latinish(I<ARG>)
 
-Argument contains only characters from the
+The argument contains only characters from the
 Latin, Common, or Inherited scripts.
 
 =item assert_astral(I<ARG>)
 
-Argument contains at least one code point larger
+The argument contains at least one code point larger
 than U+FFFF, so those above Plane 0.
 
 =item assert_nonastral(I<ARG>)
@@ -2938,30 +2968,32 @@ from U+0000 through U+FFFF.
 
 =item assert_bmp(I<ARG>)
 
-Argument contains only code points in the
+An alias for L</assert_nonastral>.
+
+The argument contains only code points in the
 Basic Multilingual Plain; that is, in Plane 0.
 
 =item assert_nfc(I<ARG>)
 
 The argument is in Unicode Normalization Form C,
-formed by canonical decomposition followed by
+formed by canonical I<B<de>composition> followed by
 canonical composition.
 
 =item assert_nfkc(I<ARG>)
 
 The argument is in Unicode Normalization Form KC,
-formed by compatible decomposition followed by
+formed by compatible I<B<de>composition> followed by
 compatible composition.
 
 =item assert_nfd(I<ARG>)
 
 The argument is in Unicode Normalization Form D,
-formed by canonical decomposition.
+formed by canonical I<B<de>composition>.
 
 =item assert_nfkd(I<ARG>)
 
 The argument is in Unicode Normalization Form KD,
-formed by compatible decomposition.
+formed by compatible I<B<de>composition>.
 
 =item assert_eq(I<THIS>, I<THAT>)
 
@@ -2969,14 +3001,15 @@ The two strings have the same NFC forms using the C<eq>
 operator.  This means that default ignorable code points
 will throw of the equality check.
 
-This is not the same as L</assert_is>.
+This is not the same as L</assert_is>.  You may well
+want the next assertion instead.
 
 =item assert_eq_letters(I<THIS>, I<THAT>)
 
 The two strings test equal when considered only at the primary strength
-(letters only) using the Unicode Collation Algorithm.  That means that
-case, non-letters, and combining marks are ignored, as are other default
-ignorable code points.
+(letters only) using the Unicode Collation Algorithm.  That means that case
+(whether upper-, lower-, or titecase), non-letters, and combining marks are
+ignored, as are other default ignorable code points.
 
 =back
 
@@ -2994,7 +3027,8 @@ The first argument must not occur in the list following it.
 
 =item assert_list_nonempty(I<LIST>)
 
-The list must not have zero elements.
+The list must have at least one element, although that
+element does not have to nonblank or even defined.
 
 =back
 
@@ -3004,33 +3038,33 @@ The list must not have zero elements.
 
 =item assert_array_nonempty( I<ARRAY> )
 
-The array must not have zero elements.
+The array must at least one element.
 
 =item assert_arrayref_nonempty( I<ARRAYREF> )
 
 The array reference must refer to an existing array with
-more than zero elements.
+at least one element.
 
-=item assert_array_length( I<ARRAY>, [ I<LENGTH> ])
+=item assert_array_length(I<ARRAY>, [ I<LENGTH> ])
 
 The array must have the number of elements specified
 in the optional second argument.  If the second
 argument is omitted, any non-zero length will do.
 
-=item assert_array_length_min( I<ARRAY>, I<MIN_ELEMENTS> )
+=item assert_array_length_min(I<ARRAY>, I<MIN_ELEMENTS>)
 
 The array must have at least as many elements as specified
-in the  second argument.
+by the number in the second argument.
 
-=item assert_array_length_max( I<ARRAY>, I<MAX_ELEMENTS> )
+=item assert_array_length_max(I<ARRAY>, I<MAX_ELEMENTS>)
 
-The array must have no more elements than specified
+The array must have no more elements than the number specified
 in the second argument.
 
 =item assert_array_length_minmax(I<ARRAY>, I<MIN_ELEMENTS>, I<MAX_ELEMENTS>)
 
-The array must have at least as many elements as
-the second element, but no more than the third.
+The array must have at least as many elements as the number given in the
+second element, but no more than the one in the third.
 
 =back
 
@@ -3042,43 +3076,50 @@ those out from visibility.
 
 =over
 
-=item assert_argc(;$)
+=item assert_argc()
 
-The function must have been passed the number of arguments specified
-in the optional assert argument.  If the assert
-argument is omitted, any non-zero number of arguments will do.
+=item assert_argc(I<COUNT>)
+
+=for comment
+This is a workaround to create a "blank" line so that the code sample is distinct.
+
+Z<>
+
+    assert_argc(3);  # must be exactly 3 args
+    assert_argc( );  # must be at least 1 arg
+
+The function must have been passed the number of arguments specified in the
+optional I<COUNT> argument.  When called without a I<COUNT> argument, any
+non-zero number of arguments will do.
 
 Does not work under L<Test::Exception>.
 
-=item assert_argc_min(I<ARG>)
+=item assert_argc_min(I<COUNT>)
 
-The function must have been passed at least as many arguments as specified
-in the assert argument.
+The function must have been passed at I<least> as many arguments as
+specified in the I<COUNT> argument.
 
 Does not work under L<Test::Exception>.
 
-=item assert_argc_max(I<ARG>)
+=item assert_argc_max(I<COUNT>)
 
-The function must have been passed no more arguments than specified
-in the assert argument.
+The function must have been passed at I<most> as arguments as specified in
+the I<COUNT> argument.
+
+Does not work under L<Test::Exception>.
 
 Does not work under L<Test::Exception>.
 
 =item assert_argc_minmax(I<MIN>, I<MAX>)
 
 The function must have been passed at least as many arguments as
-specified by the first assert element, but no more than the second.
+specified by the I<MIN>, but no more than specified in the I<MAX>.
 
 Does not work under L<Test::Exception>.
 
 =back
 
 =head2 Assertions about Hashes
-
-The thing to remember with these is that "required" keys really means I<at
-B<least> these keys>, while "allowed" keys really means I<at B<most> these
-keys>. If you need those to be the same set, then just use L</assert_keys>
-directly.
 
 =over
 
@@ -3102,8 +3143,8 @@ Z<>
 
 The I<HASH> must have all keys in the non-empty I<KEY_LIST> but no others.
 
-This is especially useful when you've got hash that you're treating as a
-"fixed record" data-type, as thought it were a C C<struct>: all fields are
+This is especially useful when you've got a hash that you're treating as a
+"fixed record" data-type, as though it were a C C<struct>: all fields are
 guaranteed to be present and nothing else.
 
 This assertion also accepts a I<HASHREF> argument instead, but it still
@@ -3262,6 +3303,11 @@ L</assert_max_keys>, and L</assert_minmax_keys> over the assertions in this
 section, since those have better names and aren't so finicky about their
 first argument. The following assertions are retained for backwards
 compatibility, but internally they all turn into one of those four.
+
+The thing to remember with these is that "required" keys really means I<at
+B<least> these keys>, while "allowed" keys really means I<at B<most> these
+keys>. If you need those to be the same set, then just use L</assert_keys>
+directly.
 
 =over
 
@@ -4091,7 +4137,7 @@ them, they will still raise an exception on error.
 =item ASSERT_CONDITIONAL=carp
 
 Assertions are always imported but they do not raise an exception if they fail;
-instead they old carp at you.  This is true even if you manage to call an assertion
+instead they all carp at you.  This is true even if you manage to call an assertion
 you haven't imported.
 
 =back

@@ -1,6 +1,6 @@
 package DBIx::Perlish;
 
-use 5.008;
+use 5.014;
 use warnings;
 use strict;
 use Carp;
@@ -8,26 +8,28 @@ use Carp;
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS $SQL @BIND_VALUES);
 require Exporter;
 use base 'Exporter';
+use Keyword::Pluggable;
 
-$VERSION = '0.64';
-@EXPORT = qw(db_fetch db_select db_update db_delete db_insert sql);
-@EXPORT_OK = qw(union intersect except);
+$VERSION = '1.01';
+@EXPORT = qw(sql);
+@EXPORT_OK = qw(union intersect except subselect);
 %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use DBIx::Perlish::Parse;
 
-sub db_fetch  (&) { DBIx::Perlish->fetch ($_[0]) }
-sub db_select (&) { DBIx::Perlish->fetch ($_[0]) }
-sub db_update (&) { DBIx::Perlish->update($_[0]) }
-sub db_delete (&) { DBIx::Perlish->delete($_[0]) }
-sub db_insert { DBIx::Perlish->insert(@_) }
-
 sub union (&;$) {}
 sub intersect (&;$) {}
 sub except (&;$) {}
+sub subselect (&) {}
 
 my $default_object;
 my $non_object_quirks = {};
+
+sub optree_version
+{
+	return 1 if $^V lt 5.22.0;
+	return 2;
+}
 
 sub import
 {
@@ -39,13 +41,13 @@ sub import
 		pop @EXPORT_OK;
 		%EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 	}
-	if (@_ == 5) {
-		my %p = @_[1..4];
-		if ($p{prefix} && $p{prefix} =~ /^[a-zA-Z_]\w*$/ &&
-			$p{dbh} && ref $p{dbh} && (ref $p{dbh} eq "SCALAR" || ref $p{dbh} eq "REF"))
-		{
+	my @shift;
+	@shift = (shift()) if @_ % 2;
+	my %p = @_;
+	if ($p{prefix} && $p{prefix} =~ /^[a-zA-Z_]\w*$/) {
+		no strict 'refs';
+		if ( $p{dbh} && ref $p{dbh} && (ref $p{dbh} eq "SCALAR" || ref $p{dbh} eq "REF")) {
 			my $dbhref = $p{dbh};
-			no strict 'refs';
 			*{$pkg."::$p{prefix}_fetch"} =
 			*{$pkg."::$p{prefix}_select"} =
 				sub (&) { my $o = DBIx::Perlish->new(dbh => $$dbhref); $o->fetch(@_) };
@@ -58,53 +60,41 @@ sub import
 			return;
 		}
 	}
-	DBIx::Perlish->export_to_level(1, @_);
+
+	my $prefix = delete($p{prefix}) // 'db';
+	my $dbh    = delete($p{dbh}) // '$dbh';
+	my $iprefix = '__' . $dbh . '_execute_perlish';
+	$iprefix =~ s/\W//g;
+
+	Keyword::Pluggable::define
+		keyword    => $prefix . '_' . $$_[0], 
+		code       => $iprefix . $$_[1],
+		expression => 1,
+		package    => $pkg
+	for
+		[fetch  => " $dbh, q(fetch),  sub "],
+		[select => " $dbh, q(fetch),  sub "],
+		[update => " $dbh, q(update), sub "],
+		[delete => " $dbh, q(delete), sub "],
+		[insert => "_insert $dbh, "],
+	;
+
+	{
+		no strict 'refs';
+		*{$pkg."::${iprefix}"} = sub ($$&) { 
+			my ( $dbh, $method, $sub ) = @_;
+			my $o = DBIx::Perlish->new(dbh => $dbh); 
+			$o->$method($sub);
+		};
+		*{$pkg."::${iprefix}_insert"} = sub { 
+			my $o = DBIx::Perlish->new(dbh => shift);
+			$o->insert(@_)
+		};
+	}
+	DBIx::Perlish->export_to_level(1, @shift, %p);
 }
 
-sub get_dbh
-{
-	my ($lvl) = @_;
-	my $dbh;
-	if ($default_object) {
-		$dbh = $default_object->{dbh};
-	}
-	eval { require PadWalker; };
-	unless ($@) {
-		unless ($dbh) {
-			my $vars = PadWalker::peek_my($lvl);
-			$dbh = ${$vars->{'$dbh'}} if $vars->{'$dbh'};
-		}
-		unless ($dbh) {
-			my $vars = PadWalker::peek_our($lvl);
-			$dbh = ${$vars->{'$dbh'}} if $vars->{'$dbh'};
-		}
-		unless ($dbh) {
-			my ($pkg) = caller($lvl-1);
-			no strict 'refs';
-			$dbh = ${"${pkg}::dbh"};
-		}
-	}
-	die "Database handle not set.  Maybe you forgot to call DBIx::Perlish::init()?\n" unless $dbh;
-	unless (UNIVERSAL::isa($dbh, "DBI::db")) { # XXX maybe relax for other things?
-		die "Invalid database handle found.\n";
-	}
-	$dbh;
-}
-
-sub init
-{
-	my %p;
-	if (@_ == 1) {
-		$p{dbh} = $_[0];
-	} else {
-		%p = @_;
-	}
-	die "The \"dbh\" parameter is required\n" unless $p{dbh};
-	unless (UNIVERSAL::isa($p{dbh}, "DBI::db")) { # XXX maybe relax for other things?
-		die "Invalid database handle supplied in the \"dbh\" parameter.\n";
-	}
-	$default_object = DBIx::Perlish->new(dbh => $p{dbh});
-}
+sub init { warn "DBIx::Perlish::init is deprecated" }
 
 sub new
 {
@@ -151,13 +141,12 @@ sub _get_flavor
 	return lc $dbh->{Driver}{Name};
 }
 
-sub fetch
+sub gen_sql_select
 {
 	my ($moi, $sub) = @_;
 	my $me = ref $moi ? $moi : {};
 
-	my $nret;
-	my $dbh = $me->{dbh} || get_dbh(3);
+	my $dbh = $me->{dbh};
 	my @kf;
 	my $flavor = _get_flavor($dbh);
 	my $kf_convert = sub { return $_[0] };
@@ -168,15 +157,39 @@ sub fetch
 			$kf_convert = sub { return lc $_[0] };
 		}
 	}
-	($me->{sql}, $me->{bind_values}, $nret) = gen_sql($sub, "select", 
+	my ($sql, $bind_values, $nret, %flags) = gen_sql($sub, "select", 
 		flavor     => $flavor,
 		dbh        => $dbh,
 		quirks     => $me->{quirks} || $non_object_quirks,
 		key_fields => \@kf,
 		kf_convert => $kf_convert,
 	);
+	$flags{key_fields} = \@kf if @kf;
+	return $sql, $bind_values, $nret, %flags;
+}
+
+sub query
+{
+	my ($moi, $sub) = @_;
+	my $me = ref $moi ? $moi : {};
+	my ( $sql ) = $moi->gen_sql_select($sub);
+	return $sql;
+}
+
+sub fetch
+{
+	my ($moi, $sub) = @_;
+	my $me = ref $moi ? $moi : {};
+
+	my $nret;
+	my $dbh = $me->{dbh};
+	my %flags;
+
+	($me->{sql}, $me->{bind_values}, $nret, %flags) = $me->gen_sql_select($sub);
 	$SQL = $me->{sql}; @BIND_VALUES = @{$me->{bind_values}};
-	if (@kf) {
+
+	if ($flags{key_fields}) {
+		my @kf = @{ $flags{key_fields} // [] };
 		my $kf = @kf == 1 ? $kf[0] : [@kf];
 		my $r = $dbh->selectall_hashref($me->{sql}, $kf, {}, @{$me->{bind_values}}) || {};
 		my $postprocess;
@@ -225,7 +238,7 @@ sub update
 	my ($moi, $sub) = @_;
 	my $me = ref $moi ? $moi : {};
 
-	my $dbh = $me->{dbh} || get_dbh(3);
+	my $dbh = $me->{dbh};
 	($me->{sql}, $me->{bind_values}) = gen_sql($sub, "update",
 		flavor => _get_flavor($dbh),
 		dbh    => $dbh,
@@ -240,7 +253,7 @@ sub delete
 	my ($moi, $sub) = @_;
 	my $me = ref $moi ? $moi : {};
 
-	my $dbh = $me->{dbh} || get_dbh(3);
+	my $dbh = $me->{dbh};
 	($me->{sql}, $me->{bind_values}) = gen_sql($sub, "delete",
 		flavor => _get_flavor($dbh),
 		dbh    => $dbh,
@@ -255,7 +268,7 @@ sub insert
 	my ($moi, $table, @rows) = @_;
 	my $me = ref $moi ? $moi : {};
 
-	my $dbh = $me->{dbh} || get_dbh(3);
+	my $dbh = $me->{dbh};
 	my %sth;
 	for my $row (@rows) {
 		my @keys = sort keys %$row;
@@ -308,6 +321,7 @@ sub gen_sql
 	my $nret = 9999;
 	my $no_aliases;
 	my $dangerous;
+	my %flags;
 	if ($operation eq "select") {
 		my $nkf = 0;
 		if ($S->{key_fields}) {
@@ -322,6 +336,11 @@ sub gen_sql
 			for my $ret (@{$S->{returns}}) {
 				$nret = 9999 if $ret =~ /\*/;
 			}
+			$flags{returns_dont_care} = 1 if
+				1 == @{$S->{returns}} && 
+				$S->{returns}->[0] =~ /^(.*)\.\*/ &&
+				$S->{returns_dont_care}->{$1}
+			;
 		} else {
 			$sql .= "*";
 		}
@@ -431,7 +450,7 @@ sub gen_sql
 	}
 	$sql =~ s/\s+$//;
 
-	return ($sql, $v, $nret);
+	return ($sql, $v, $nret, %flags);
 }
 
 
@@ -444,7 +463,7 @@ DBIx::Perlish - a perlish interface to SQL databases
 
 =head1 VERSION
 
-This document describes DBIx::Perlish version 0.64
+This document describes DBIx::Perlish version 1.00
 
 
 =head1 SYNOPSIS
@@ -453,7 +472,6 @@ This document describes DBIx::Perlish version 0.64
     use DBIx::Perlish;
 
     my $dbh = DBI->connect(...);
-    DBIx::Perlish::init($dbh);
 
     # selects:
     my @rows = db_fetch {
@@ -465,7 +483,7 @@ This document describes DBIx::Perlish version 0.64
     # sub-queries:
     my @rows = db_fetch {
         my $x : users;
-        $x->id <- db_fetch {
+        $x->id <- subselect {
             my $t2 : table1;
             $t2->col == 2 || $t2->col == 3;
             return $t2->user_id;
@@ -576,68 +594,6 @@ of the "SQL sprinkling" style of database interaction.
 It is also fully compatible with the "clean and tidy" method.
 
 =head2 Procedural interface
-
-=head3 init()
-
-The C<init()> sub initializes procedural interface
-to the module.
-
-It accepts named parameters.
-One parameter, C<dbh>, is required and must be a valid DBI database handler.
-
-All other parameters are silently ignored.
-
-Alternatively, C<init()> can be called with a single
-positional parameter, in which case it is assumed to
-be the DBI database handler.
-
-If the supplied database handler is not valid, an
-exception is thrown.
-
-This procedure does not return anything meaningful.
-
-Examples:
-
-    my $dbh = DBH->connect(...);
-    DBIx::Perlish::init(dbh => $dbh);
-
-    my $dbh = DBH->connect(...);
-    DBIx::Perlish::init($dbh);
-
-=head3 Special treatment of the C<$dbh> variable
-
-If the user did not
-call C<init()> before issuing any of the C<db_fetch {}>,
-C<db_update {}>, C<db_delete {}> or C<db_insert {}>, those
-functions look for one special case before bailing out.
-
-Namely, they try to locate a variable C<my $dbh>, C<our $dbh>,
-or caller's package global C<$dbh>,
-in that order, in the scope in which they are used.  If such
-variable is found, and if it contains a valid C<DBI> database
-handler, they will use it for performing the actual query.
-This allows one to write something like that, and expect the
-module to do the right thing:
-
-    my $dbh = DBI->connect(...);
-    my @r = db_fetch { users->name !~ /\@/ };
-
-Initially, the author did not recommend relying on this feature in the
-production code on a theory that it is `magical' and makes assumptions
-about names used outside of the module itself.
-The author recommended to always use the C<init()> subroutine.
-
-However, the experience of using the C<DBIx::Perlish> module
-in production environment
-has shown that the assumption about the name of the database handle
-is true in almost all cases
-in practice
-(but see L</Working with multiple database handles> below),
-and that the magical nature of the feature does not hinder,
-indeed helps writing code in a style that is easy to maintain.
-In fact, there is often B<less> of an action-at-a-distance effect when
-relying on the implicit C<$dbh> instead of using the C<init()> sub.
-
 
 =head3 db_fetch {}
 
@@ -878,7 +834,7 @@ Examples:
     # delete with a subquery
     db_delete {
         my $u : users;
-        $u->name <- db_fetch {
+        $u->name <- subselect {
             visitors->origin eq "Uranus";
             return visitors->name;
         }
@@ -926,6 +882,10 @@ the function might throw any of the exceptions thrown by DBI.
 
 The C<db_insert {}> function is exported by default.
 
+=head3 subselect()
+
+This call, formerly known as as internal form of C<db_fetch>, 
+is basically an SQL SELECT statement. See L</Subqueries>.
 
 =head3 union()
 
@@ -1094,12 +1054,12 @@ several different ways:
 =back
 
 Last, but not least, a combination of verbatim "table" attribute
-with a nested L</db_fetch {}> can be used to implement I<inline views>:
+with a nested L</subselect {}> can be used to implement I<inline views>:
 
-    my $var : table = db_fetch { ... };
+    my $var : table = subselect { ... };
 
 In this case a B<select> statement corresponding to
-the nested L</db_fetch {}> will represent the table.
+the nested L</subselect {}> will represent the table.
 Please note that not all database drivers support
 this, although at present the C<DBIx::Perlish> module
 does not care and will generate SQL which will subsequently
@@ -1448,11 +1408,11 @@ For details about the sorting criteria see the documentation
 for C<ORDER BY> clause in your SQL dialect reference manual.
 Before a sorting expression in a list one may specify one of the
 string constants "asc", "ascending", "desc", "descending" to
-alter the sorting order, for example:
+alter the sorting order, or even generic direction and column, for example:
 
     db_fetch {
         my $t : tbl;
-        order_by: asc => $t->name, desc => $t->age;
+        order_by: asc => $t->name, desc => $t->age, $direction, $column;
     };
 
 Specifying label C<group:>, C<groupby:>, or C<group_by:>,
@@ -1553,7 +1513,7 @@ construct, for example:
 
     db_delete {
         my $t : table1;
-        db_fetch {
+        subselect {
             $t->id == table2->table1_id;
         };
     };
@@ -1567,7 +1527,7 @@ the right:
 
     db_delete {
         my $t : table1;
-        $t->id  <-  db_fetch {
+        $t->id  <-  subselect {
             return table2->table1_id;
         };
     };
@@ -1586,6 +1546,19 @@ the table function:
         tbl->id  <-  tablefunc($id);
     };
 
+Where result of a subquery comes from a function, the following syntax can be
+also used:
+    
+    db_fetch {
+        my $t : table = tablefunc($id);
+	return $t;
+    };
+
+This allows for SQL syntax like
+
+   SELECT t.* FROM tablefunc(?) t, other_table
+
+where joins of subselects are not enough.
 
 =head3 Joins
 
@@ -1594,8 +1567,8 @@ specify a join condition. The join syntax is one of (the last two are
 equivalent):
 
     join $t1 BINARY_OP $t2;
-    join $t1 BINARY_OP $t2 => db_fetch { CONDITION };
-    join $t1 BINARY_OP $t2 <= db_fetch { CONDITION };
+    join $t1 BINARY_OP $t2 => subselect { CONDITION };
+    join $t1 BINARY_OP $t2 <= subselect { CONDITION };
 
 where CONDITION is an arbitrary expression using fields from C<$t1> and C<$t2>
 , and BINARY_OP is one of C<*>,C<+>,C<x>,C<&>,C<|>,C<< < >>,C<< > >> operators,
@@ -1606,7 +1579,7 @@ which correspond to the following standard join types:
 =item Inner join
 
 This corresponds to either of C<*>, C<&>, and C<x> operators.
-The C<db_fetch {}> condition for inner join may be omitted,
+The C<subselect {}> condition for inner join may be omitted,
 in which case it degenerates into a I<cross join>.
 
 =item Full outer join
@@ -1630,7 +1603,7 @@ Example:
 
     my $x : x;
     my $y : y;
-    join $y * $x => db_fetch { $y-> id == $x-> id };
+    join $y * $x => subselect { $y-> id == $x-> id };
 
 =head2 Object-oriented interface
 
@@ -1667,9 +1640,6 @@ An object-oriented version of L</db_delete {}>.
 
 An object-oriented version of L</db_insert()>.
 
-=head3 sql()
-
-Takes no parameters.
 Returns the SQL string, most recently generated by database
 queries performed by the object.
 Returns undef if there were no queries made thus far.
@@ -1679,11 +1649,16 @@ Example:
     $db->query(sub { $u : users });
     print $db->sql, "\n";
 
-The C<sql()> sub can also be called in a procedural fashion,
-in which case it serves the purpose of injecting
-verbatim pieces of SQL into query subs
-(see L</Query filter statements>) or into the values
-to be inserted via L</db_insert()>.
+=head3 query($sub)
+
+Returns converts C<$sub> into SQL text.
+Useful for debugging and passing down prepared queries
+
+=head3 sql()
+
+Serves the purpose of injecting verbatim pieces of SQL into query subs (see
+L</Query filter statements>) or into the values to be inserted via
+L</db_insert()>.
 
 The C<sql()> function is exported by default.
 
@@ -1703,6 +1678,11 @@ Example:
 
 An object-oriented version of L</quirk()>.
 
+=head3 optree_version
+
+Returns 1 if perl version is prior 5.22, where there are no optimizations on the optree.
+Returns 2 otherwise, when perl introduced changes to optree, that caused certain uncompatibilities.
+See more in C<BACKWARD COMPATIBILITY>
 
 =head2 Working with multiple database handles
 
@@ -1720,17 +1700,6 @@ to L</new()>.
 
 The obvious disadvantage is that one has to explicitly use "sub"
 when specifying a query sub, so the syntax is unwieldy.
-
-=item Switching handles with L</init()>
-
-This will work, but it will add quite a bit of clutter to the
-code, especially if queries to multiple databases are intermixed
-with each other.
-
-=item Switching handles via manipulation of the C<$dbh> variable
-
-This has the same disadvantage as the previous method.  Besides,
-it looks like vodoo.
 
 =item Using special import syntax
 
@@ -1860,20 +1829,17 @@ Currently, only statement and sub execution data are faked.
 
 =head1 DEPENDENCIES
 
-The C<DBIx::Perlish> module needs at least perl 5.8.2, quite possibly
-a somewhat higher version.  I have only tested it with
-5.8.4, 5.8.8, 5.8.9, and 5.10.0, while
-the CPAN testers, http://www.cpantesters.org/distro/D/DBIx-Perlish.html ,
-provided much better coverage.
+The C<DBIx::Perlish> module needs at least perl 5.14.
 
 This module requires C<DBI> to do anything useful.
 
 In order to support the special handling of the C<$dbh> variable,
-C<PadWalker> needs to be installed.
+C<Keyword::Pluggable> needs to be installed. C<Devel::Caller> is 
+needed for some magic, and C<Pod::Markdown> is a developer dependency
+for auto-generating README.md.
 
 Other modules used used by C<DBIx::Perlish> are included
 into the standard Perl distribution.
-
 
 =head1 INCOMPATIBILITIES
 
@@ -1899,6 +1865,14 @@ class.
 Mason is to blame for this, since it disregards
 warnings' handlers installed by other modules.
 
+=head1 BACKWARD COMPATIBILITY
+
+Perl 5.22 introduced certain changes to the way optree is constructed.
+Some of these cannot be adequately treated, because whole constructs might be
+simply optimized away before even they hit the parser (example: C<join(1,2)> gets translated into constant C<2>).
+
+Known cases are not documented so far, but look in the tests for I<optree_version> invocations
+to see where these are found.
 
 =head1 BUGS AND LIMITATIONS
 

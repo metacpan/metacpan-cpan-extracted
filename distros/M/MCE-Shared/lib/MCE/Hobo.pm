@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -29,8 +29,6 @@ use overload (
    q(!=)    => sub { !equal(@_) },
    fallback => 1
 );
-
-no overloading;
 
 sub import {
    no strict 'refs'; no warnings 'redefine';
@@ -214,7 +212,8 @@ sub create {
    # Sets the seed of the base generator uniquely between workers.
    # The new seed is computed using the current seed and ID value.
    # One may set the seed at the application level for predictable
-   # results. Ditto for Math::Prime::Util and Math::Random.
+   # results. Ditto for Math::Prime::Util, Math::Random, and
+   # Math::Random::MT::Auto.
 
    srand( abs($_DATA->{"$pkg:seed"} - ($id * 100000)) % 2147483560 );
 
@@ -233,6 +232,15 @@ sub create {
       Math::Random::random_set_seed($new_seed, $new_seed);
    }
 
+   if ( $INC{'Math/Random/MT/Auto.pm'} ) {
+      my $cur_seed = Math::Random::MT::Auto::get_seed()->[0];
+      my $new_seed = ($cur_seed < 1073741781)
+         ? $cur_seed + ((abs($id) * 10000) % 1073741780)
+         : $cur_seed - ((abs($id) * 10000) % 1073741780);
+
+      Math::Random::MT::Auto::set_seed($new_seed);
+   }
+
    _dispatch($mngd, $func, \@args);
 }
 
@@ -243,6 +251,7 @@ sub create {
 ###############################################################################
 
 sub equal {
+   no overloading;
    return 0 unless ( ref $_[0] && ref $_[1] );
    $_[0]->{WRK_ID} == $_[1]->{WRK_ID} ? 1 : 0;
 }
@@ -805,7 +814,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.838
+This document describes MCE::Hobo version 1.839
 
 =head1 SYNOPSIS
 

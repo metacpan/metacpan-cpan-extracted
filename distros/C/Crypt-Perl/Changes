@@ -1,5 +1,13 @@
 Revision history for Perl module Crypt::Perl
 
+0.29 Fri Aug 24 2018
+- Fix LICENSE file
+
+0.28 Fri Aug 24 2018
+- Make acmeValidation_01.pm use the updated OID from TLS-ALPN draft 05.
+- Tighten PK.pm’s JWK parsing logic for Ed25519.
+- add LICENSE file
+
 0.27 Sat Jul 28 2018
 - Teach PKCS10.pm how to create CSRs with Ed25519.
 - Lazy-load Digest::SHA in X509v3.pm and PKCS10.pm since it’s no longer

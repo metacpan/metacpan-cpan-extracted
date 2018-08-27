@@ -1,6 +1,6 @@
 package CAIXS;
-use parent 'Class::Accessor::Inherited::XS';
-BEGIN {our $VERSION = $Class::Accessor::Inherited::XS::VERSION}
+use Class::Accessor::Inherited::XS;
+BEGIN { *CAIXS:: = *Class::Accessor::Inherited::XS:: }
 1;
 __END__
 

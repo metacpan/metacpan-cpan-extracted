@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Stats;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: The basic statistics information extracted from test reports
 
 #pod =head1 SYNOPSIS
@@ -271,6 +271,16 @@ column 'uploadid', {
 
 belongs_to upload => 'CPAN::Testers::Schema::Result::Upload' => 'uploadid';
 
+#pod =method perl_version
+#pod
+#pod Get the related metadata about the Perl version this report is for. See
+#pod L<CPAN::Testers::Schema::Result::PerlVersion>.
+#pod
+#pod =cut
+
+might_have perl_version => 'CPAN::Testers::Schema::Result::PerlVersion' =>
+    { 'foreign.version' => 'self.perl' };
+
 1;
 
 __END__
@@ -283,7 +293,7 @@ CPAN::Testers::Schema::Result::Stats - The basic statistics information extracte
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -429,23 +439,18 @@ L<CPAN::Testers::Schema::Result::Uploads>).
 
 Get the related row in the `uploads` table. See L<CPAN::Testers::Schema::Result::Upload>.
 
+=head2 perl_version
+
+Get the related metadata about the Perl version this report is for. See
+L<CPAN::Testers::Schema::Result::PerlVersion>.
+
 =head1 SEE ALSO
 
 L<DBIx::Class::Row>, L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

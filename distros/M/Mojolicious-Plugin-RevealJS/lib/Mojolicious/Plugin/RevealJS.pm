@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use 5.12.0;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
 
 use Mojo::Home;
@@ -30,8 +30,16 @@ sub register {
     transition => 'slide', #none/fade/slide/convex/concave/zoom
   });
 
-  $app->helper('include_code' => \&_include_code);
   $app->helper('revealjs.export' => \&_export);
+
+  $app->helper(include_code => \&_include_code);
+  $app->helper(section => sub { shift->tag(section => @_) });
+  $app->helper(markdown_section => sub {
+    my ($c, @args) = @_;
+    return $c->tag(section => data => { markdown => undef } => sub {
+      return $c->tag(script => (type => 'text/template') => @args);
+    });
+  });
 }
 
 sub _include_code {
@@ -54,8 +62,13 @@ sub _include_code {
     <pre><code class="<%= $lang %>" data-trim>
       <%= $text =%>
     </code></pre>
-    <p style="float: right; text-color: white; font-size: small;"><%= $file %></p>
+    % if (defined $file) {
+    <p class="filename" style="float: right; text-color: white; font-size: small;"><%= $file %></p>
+    % }
   INCLUDE
+
+  $filename = undef if exists $opts{include_filename} && !$opts{include_filename};
+
   my $html = $c->render_to_string(
     inline => $template,
     'revealjs.private.text' => $file,
@@ -118,7 +131,7 @@ It provides a layout (C<revealjs>) which contains the boilerplate and loads the 
 It also provides a few simple helpers.
 Future versions of the plugin will allow setting of configuration like themes.
 
-The bundled version of Reveal.js is currently 3.5.0.
+The bundled version of Reveal.js is currently 3.7.0.
 
 Note that this module is in an alpha form!
 The author makes no compatibilty promises.
@@ -278,6 +291,10 @@ sets the language for the highlighting, defaults to the value of C<< stash('lang
 
 limits the section to a given section name
 
+=item include_filename
+
+if true (default) include the filename when the code is included
+
 =back
 
 NOTE: This feature is experimental!
@@ -290,11 +307,30 @@ Then in the file
 
   Excluded content
 
-  # reveal being part1
+  # reveal begin part1
   Included content
   # reveal end part1
 
   Excluded content
+
+=head2 section
+
+  %= section begin
+  ...
+  % end
+
+A shortcut for creating a section tag.
+
+  %# longer form
+  %= tag section => ...
+
+=head2 markdown_section
+
+  %= markdown_section begin
+  ...
+  % end
+
+Build a section tag and script/template tag to properly use the built-in markdown handling within this slide.
 
 =head2 revealjs->export
 

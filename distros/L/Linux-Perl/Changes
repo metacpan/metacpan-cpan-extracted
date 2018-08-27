@@ -1,5 +1,18 @@
 Revision history for Perl module Linux::Perl
 
+0.11 Mon Aug 27 2018
+- Fix eventfd/i386.pm.
+
+0.10 Fri Aug 24 2018
+- fix LICENSE file (again)
+
+0.09 Fri Aug 24 2018
+- Attempt i686 compatibility.
+- fix LICENSE file
+
+0.08 Sun Aug 19 2018
+- Add epoll and timerfd
+
 0.07 Sat Aug 18 2018
 - Fix MANIFEST
 

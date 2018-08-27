@@ -3,7 +3,7 @@ package Task::BeLike::KWAKWA;
 use strict;
 use 5.008_005;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # ABSTRACT: Be more like KWAKWA - use the modules he likes!
 
@@ -42,6 +42,36 @@ Task::BeLike::KWAKWA - Be more like KWAKWA!
 =head3 L<DateTime::Format::ISO8601>
 
     my $dt = DateTime::Format::ISO8601->parse_datetime('2018-01-01T00:00:00Z');
+
+=head2 Debugging
+
+=head3 L<Reply>
+
+Install L<Term::ReadLine::Gnu>. You'll likely need C<libreadline-dev> or
+C<readline-devel> to have actual readline support.
+
+	# ~/.replyrc
+    script_line1 = use strict
+	script_line2 = use warnings
+	script_line3 = use 5.024000
+
+	[Interrupt]
+	[FancyPrompt]
+	[DataDumper]
+	[Colors]
+	[ReadLine]
+	[Hints]
+	[Packages]
+	[LexicalPersistence]
+	[ResultCache]
+	[Autocomplete::Packages]
+	[Autocomplete::Lexicals]
+	[Autocomplete::Functions]
+	[Autocomplete::Globals]
+	[Autocomplete::Methods]
+	[Autocomplete::Commands]
+
+=head3 L<Pry>
 
 =head2 Filesystem
 

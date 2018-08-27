@@ -2,7 +2,7 @@ use Test::More tests => 2;
 use strict;
 use warnings;
 use Pod::Github;
-use File::Slurp qw(read_file);
+use Path::Tiny;
 use FindBin qw($Bin);
 
 my %default_args = (
@@ -22,7 +22,7 @@ sub test {
 
     $args = { %default_args,  %$args };
 
-    my $expected = read_file("$Bin/../t/fixtures/$outfile");
+    my $expected = path("$Bin/../t/fixtures/$outfile")->slurp_utf8;
 
     my $obj = Pod::Github->new(%$args);
     $obj->output_string(\my $actual);

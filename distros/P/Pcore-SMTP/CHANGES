@@ -1,3 +1,6 @@
+v0.6.2 2018-08-24T17:59:28Z
+ - Pcore::Handle readline -> read_line
+
 v0.6.1 2018-08-10T02:28:12Z
  - Pcore::AE::Handle removed
 

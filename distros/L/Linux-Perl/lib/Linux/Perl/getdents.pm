@@ -27,6 +27,8 @@ information without making additional system calls.
 use strict;
 use warnings;
 
+use parent qw( Linux::Perl::Base::BitsTest );
+
 use Linux::Perl;
 use Linux::Perl::Endian;
 use Linux::Perl::EasyPack;
@@ -46,8 +48,8 @@ use constant {
 my ($lde64_keys, $lde64_pack, $lde64_start_size);
 BEGIN {
     ($lde64_keys, $lde64_pack) = Linux::Perl::EasyPack::split_pack_list(
-        ino => 'Q', #ino64_t
-        off => 'Q', #off64_t
+        ino => __PACKAGE__->_PACK_u64(), #ino64_t
+        off => __PACKAGE__->_PACK_u64(), #off64_t
         reclen => 'S!',
         type => 'C',
         #name => 'a*',

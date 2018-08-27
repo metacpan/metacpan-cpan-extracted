@@ -1,3 +1,7 @@
+0.021		2018-08-24	T. R. Wyant
+    Further deprecate third 'set brick' argument. It now warns on every
+    use.
+
 0.020		2018-05-28	T. R. Wyant
     Remove references to search.cpan.org. Sigh.
 

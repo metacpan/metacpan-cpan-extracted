@@ -40,14 +40,14 @@ X<Lets Encrypt> X<Let's Encrypt> X<letsencrypt>
     {
         my $terms_url = $acme->get_terms_of_service();
 
-        $acme->create_new_account(
+        $acme->create_account(
             termsOfServiceAgreed => 1,
         );
     }
 
     #Save $acme->key_id() somewhere so you can use it again.
 
-    my $order = $acme->create_new_order(
+    my $order = $acme->create_order(
         identifiers => [
             { type => 'dns', value => '*.example.com' },
         ],
@@ -140,10 +140,13 @@ use Net::ACME2::HTTP;
 use Net::ACME2::Order;
 use Net::ACME2::Authorization;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use constant {
     _JWK_THUMBPRINT_DIGEST => 'sha256',
+
+    _HTTP_OK => 200,
+    _HTTP_CREATED => 201,
 };
 
 # accessed from test
@@ -206,7 +209,7 @@ sub new {
 =head2 $id = I<OBJ>->key_id()
 
 Returns the object’s cached key ID, either as given at instantiation
-or as fetched in C<create_new_account()>.
+or as fetched in C<create_account()>.
 
 =cut
 
@@ -245,18 +248,20 @@ sub get_terms_of_service {
     return $url;
 }
 
-=head2 $created_yn = I<OBJ>->create_new_account( %OPTS )
+=head2 $created_yn = I<OBJ>->create_account( %OPTS )
 
-Creates a new account using the ACME2 object’s key and the passed
+Creates an account using the ACME2 object’s key and the passed
 %OPTS, which are as described in the ACME2 spec (cf. C<newAccount>).
 Boolean values may be given as simple Perl booleans.
 
 Returns 1 if the account is newly created
 or 0 if the account already existed.
 
+NB: C<create_new_account()> is an alias for this method.
+
 =cut
 
-sub create_new_account {
+sub create_account {
     my ($self, %opts) = @_;
 
     for my $name (newAccount_booleans()) {
@@ -273,9 +278,9 @@ sub create_new_account {
 
     $self->{'_ua'}->set_key_id( $self->{'_key_id'} );
 
-    return 0 if $resp->status() == 200;
+    return 0 if $resp->status() == _HTTP_OK;
 
-    $resp->die_because_unexpected() if $resp->status() != 201;
+    $resp->die_because_unexpected() if $resp->status() != _HTTP_CREATED;
 
     my $struct = $resp->content_struct();
 
@@ -302,22 +307,24 @@ sub create_new_account {
 #    return $set;
 #}
 
-=head2 $order = I<OBJ>->create_new_order( %OPTS )
+=head2 $order = I<OBJ>->create_order( %OPTS )
 
 Returns a L<Net::ACME2::Order> object. %OPTS is as described in the
 ACME spec (cf. C<newOrder>). Boolean values may be given as simple
 Perl booleans.
 
+NB: C<create_new_order()> is an alias for this method.
+
 =cut
 
-sub create_new_order {
+sub create_order {
     my ($self, %opts) = @_;
 
     $self->_require_key_id(\%opts);
 
     my $resp = $self->_post( 'newOrder', \%opts );
 
-    $resp->die_because_unexpected() if $resp->status() != 201;
+    $resp->die_because_unexpected() if $resp->status() != _HTTP_CREATED;
 
     return Net::ACME2::Order->new(
         id => $resp->header('location'),
@@ -346,7 +353,7 @@ sub get_authorization {
 }
 
 #Server may not support! (Pebble doesn’t, and LE won’t?)
-#sub create_new_authorization {
+#sub create_authorization {
 #    my ($self, $type, $value) = @_;
 #
 #    my %opts = (
@@ -504,7 +511,7 @@ sub _require_key_id {
     my ($self, $opts_hr) = @_;
 
     $opts_hr->{'_key_id'} = $self->{'_key_id'} or do {
-        _die_generic('No key ID has been set. Either pass “key_id” to new(), or create_new_account().');
+        _die_generic('No key ID has been set. Either pass “key_id” to new(), or create_account().');
     };
 
     return
@@ -569,6 +576,10 @@ sub _post_url {
 sub _die_generic {
     die Net::ACME2::X->create('Generic', @_);
 }
+
+#legacy aliases
+*create_new_account = \*create_account;
+*create_new_order = \*create_order;
 
 1;
 

@@ -55,6 +55,6 @@
          "web" : "https://github.com/FGasper/p5-Crypt-RSA-Parse"
       }
    },
-   "version" : 0.043,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.044,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

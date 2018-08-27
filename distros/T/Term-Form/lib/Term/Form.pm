@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.500';
+our $VERSION = '0.501';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -13,16 +13,16 @@ use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
 use Term::Choose::Constants qw( :form );
 
 
-my $Plugin_Package;
+my $Plugin;
 
 BEGIN {
     if ( $^O eq 'MSWin32' ) {
-        require Term::Form::Win32;
-        $Plugin_Package = 'Term::Form::Win32';
+        require Term::Choose::Win32;
+        $Plugin = 'Term::Choose::Win32';
     }
     else {
-        require Term::Form::Linux;
-        $Plugin_Package = 'Term::Form::Linux';
+        require Term::Choose::Linux;
+        $Plugin = 'Term::Choose::Linux';
     }
 }
 
@@ -43,7 +43,7 @@ sub new {
         name => $name,
     }, $class;
     $self->__set_defaults();
-    $self->{pg} = $Plugin_Package->new();
+    $self->{pg} = $Plugin->new();
     return $self;
 }
 
@@ -56,14 +56,14 @@ sub DESTROY {
 
 sub __init_term {
     my ( $self, $hide_cursor ) = @_;
-    $self->{pg}->__set_mode( $hide_cursor );
+    $self->{pg}->__set_mode( { mode => 'cbreak', hide_cursor => $hide_cursor } );
 }
 
 
 sub __reset_term {
     my ( $self, $hide_cursor ) = @_;
     if ( defined $self->{pg} ) {
-        $self->{pg}->__reset_mode( $hide_cursor );
+        $self->{pg}->__reset_mode();
     }
     for my $key ( keys %$self ) {
         next if $key eq 'pg' || $key eq 'name';
@@ -189,7 +189,7 @@ sub readline {
             $self->{pg}->__up( $self->{i}{pre_text_row_count} );
             $self->{pg}->__clear_lines_to_end_of_screen();
             $self->__pre_text_row_count();
-            print "\r", $self->{i}{pre_text}, "\n";
+            print $self->{i}{pre_text}, "\n";
         }
         $m->{avail_w} = $self->{i}{avail_w}; # reset to default
         $self->__print_readline( $opt, $list, $m );
@@ -199,8 +199,7 @@ sub readline {
             carp "EOT: $!";
             return;
         }
-        #$m->{th} = $self->{i}{th};         # threshold number of chars
-        $self->__calculate_threshold( $m ); # threshold print width
+        $self->__calculate_threshold( $m );
         if    ( $key == NEXT_get_key ) { next }
         elsif ( $key == KEY_TAB      ) { next }
         elsif ( $key == CONTROL_U                       ) { $self->__ctrl_u( $m ) }
@@ -270,11 +269,6 @@ sub __left {
     my ( $self, $m ) = @_;
     if ( $m->{pos} ) {
         $m->{pos}--;
-        ## threshold number of chars:
-        #if( $m->{p_pos} == $m->{th} && $m->{diff} ) {
-        #    _unshift_element( $m, $m->{pos} - $m->{p_pos} );
-
-        # threshold print width:
         # '<=' and not '==' because th_l could change and fall behind p_pos
         if( $m->{p_pos} <= $m->{th_l} && $m->{diff} ) {
              while ($m->{p_pos} <= $m->{th_l}) {
@@ -296,13 +290,6 @@ sub __right {
     my ( $self, $m ) = @_;
     if ( $m->{pos} < $#{$m->{str}} ) {
         $m->{pos}++;
-        ## threshold number of chars:
-        #if(    $m->{p_pos} == $#{$m->{p_str}} - $m->{th}
-        #    && $#{$m->{p_str}} + $m->{diff} != $#{$m->{str}}
-        #) {
-        #    _push_element( $m );
-
-        # threshold print width:
         # '>=' and not '==' because th_r could change and fall in front of p_pos
         if(    $m->{p_pos} >= $#{$m->{p_str}} - $m->{th_r}
             && $#{$m->{p_str}} + $m->{diff} != $#{$m->{str}}
@@ -328,11 +315,6 @@ sub __bspace {
     my ( $self, $m ) = @_;
     if ( $m->{pos} ) {
         $m->{pos}--;
-        ## threshold number of chars:
-        #if( $m->{p_pos} == $m->{th} && $m->{diff} ) {
-        #    _unshift_element( $m, $m->{pos} - $m->{p_pos} );
-
-        # threshold print width:
         # '<=' and not '==' because th_l could change and fall behind p_pos
         if ( $m->{p_pos} <= $m->{th_l} && $m->{diff} ) {
             while ($m->{p_pos} <= $m->{th_l}) {
@@ -529,7 +511,7 @@ sub __print_readline {
     my $key = $self->__padded_or_trimed_key( $list, $self->{i}{curr_row} );
     $self->{pg}->__clear_line();
     if ( $opt->{mark_curr} ) {
-        $self->{pg}->__mark_current();
+        $self->{pg}->__bold_underline();
         print "\r", $key;
         $self->{pg}->__reset();
     }
@@ -922,7 +904,8 @@ sub fill_form {
                 }
                 else {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
-                    $self->{pg}->__down( $self->{i}{end_row} - $self->{i}{curr_row} );
+                    my $rows = $self->{i}{end_row} - $self->{i}{curr_row};
+                    $self->{pg}->__down( $rows );
                     $self->{i}{curr_row} = $self->{i}{end_row};
                     $m = $self->__string_and_pos( $list );
                 }
@@ -1055,7 +1038,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.500
+Version 0.501
 
 =cut
 

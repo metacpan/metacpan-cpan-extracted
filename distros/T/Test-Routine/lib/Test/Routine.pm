@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Test::Routine;
 # ABSTRACT: composable units of assertion
-$Test::Routine::VERSION = '0.025';
+$Test::Routine::VERSION = '0.027';
 #pod =head1 SYNOPSIS
 #pod
 #pod   # mytest.t
@@ -218,7 +218,7 @@ use Test::Routine::Common;
 use Test::Routine::Test;
 
 Moose::Exporter->setup_import_methods(
-  with_caller => [ qw(test) ],
+  as_is       => [ qw(test) ],
   also        => 'Moose::Role',
 );
 
@@ -234,7 +234,7 @@ sub init_meta {
 
 my $i = 0;
 sub test {
-  my $caller = shift;
+  my $caller = caller();
   my $name   = shift;
   my ($arg, $body);
 
@@ -261,13 +261,18 @@ sub test {
   my $class = Moose::Meta::Class->initialize($caller);
 
   my %origin;
-  @origin{qw(file line nth)} = ((caller(1))[1,2], $i++);
+  @origin{qw(file line nth)} = ((caller(0))[1,2], $i++);
 
   my $method;
   if (blessed($body) && $body->isa('Class::MOP::Method')) {
     my $method_metaclass = Moose::Util::with_traits(
-      blessed($body), 'Test::Routine::Test::Role'
+      blessed($body),
+      'Test::Routine::Test::Role',
+      ($caller->can('test_routine_test_traits')
+        ? $caller->test_routine_test_traits
+        : ()),
     );
+
     $method = $method_metaclass->meta->rebless_instance(
       $body,
       %$arg,
@@ -275,9 +280,20 @@ sub test {
       package_name => $caller,
       _origin      => \%origin,
     );
-  }
-  else {
-    $method = Test::Routine::Test->wrap(
+  } else {
+    my $test_class = 'Test::Routine::Test';
+
+    if ($caller->can('test_routine_test_traits')) {
+      my @traits = $caller->test_routine_test_traits;
+
+      $test_class = Moose::Meta::Class->create_anon_class(
+        superclasses => [ $test_class ],
+        cache        => 1,
+        roles        => \@traits,
+      )->name;
+    }
+
+    $method = $test_class->wrap(
       %$arg,
       name => $name,
       body => $body,
@@ -312,7 +328,7 @@ Test::Routine - composable units of assertion
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 SYNOPSIS
 

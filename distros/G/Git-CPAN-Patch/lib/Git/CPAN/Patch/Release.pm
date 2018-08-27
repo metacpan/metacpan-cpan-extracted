@@ -1,9 +1,8 @@
 package Git::CPAN::Patch::Release;
 our $AUTHORITY = 'cpan:YANICK';
-$Git::CPAN::Patch::Release::VERSION = '2.3.2';
+$Git::CPAN::Patch::Release::VERSION = '2.3.4';
 use strict;
 use warnings;
-use Method::Signatures::Simple;
 use File::chdir;
 use Archive::Any;
 use Path::Tiny;
@@ -11,6 +10,11 @@ use File::Temp qw/ tempdir tempfile /;
 use version;
 
 use Moose;
+
+use experimental qw/
+    signatures
+    postderef
+/;
 
 has tmpdir => (
   is => 'ro',
@@ -135,7 +139,7 @@ has tarball => (
 has extracted_dir => (
     is => 'ro',
     lazy => 1,
-    default => method {
+    default => sub($self) {
 
         my $archive = Archive::Any->new( $self->tarball );
         my $tmpdir = $self->tmpdir;
@@ -155,7 +159,7 @@ has cpan_parse => (
     is => 'ro',
     predicate => 'has_cpan_parse',
     lazy => 1,
-    default => method {
+    default => sub($self) {
         require CPAN::ParseDistribution;
         CPAN::ParseDistribution->new( $self->tarball );
     },
@@ -174,7 +178,7 @@ has meta_info => (
     is => 'ro',
     lazy => 1,
     predicate => 'has_meta_info',
-    default => method {
+    default => sub($self) {
         require MetaCPAN::Client;
 
         if( my $release = $self->metacpan->release({ all =>
@@ -203,7 +207,7 @@ has meta_info => (
 has dist_version => (
     is => 'ro',
     lazy => 1,
-    default => method {
+    default => sub($self) {
             $self->has_meta_info
                 ? $self->meta_info->{version}
                 : $self->cpan_parse->distversion
@@ -213,7 +217,7 @@ has dist_version => (
 has dist_name => (
     is => 'ro',
     lazy => 1,
-    default => method {
+    default => sub($self) {
         $self->has_meta_info
             ? $self->meta_info->{distribution} || $self->meta_info->{name}
             : $self->cpan_parse->dist
@@ -235,7 +239,7 @@ Git::CPAN::Patch::Release
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 AUTHOR
 
@@ -243,7 +247,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

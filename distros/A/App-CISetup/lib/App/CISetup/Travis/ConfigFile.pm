@@ -5,13 +5,13 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
 use File::Which qw( which );
 use IPC::Run3 qw( run3 );
-use List::AllUtils qw( first_index uniq );
+use List::AllUtils qw( first first_index uniq );
 use Path::Iterator::Rule;
 use Try::Tiny;
 use YAML qw( Dump );
@@ -146,6 +146,22 @@ sub _fixup_helpers_usage {
     return;
 }
 
+my @Perls = qw(
+    blead
+    dev
+    5.28
+    5.26
+    5.24
+    5.22
+    5.20
+    5.18
+    5.16
+    5.14
+    5.12
+    5.10
+    5.8
+);
+
 # XXX - if a build is intentionally excluding Perls besides 5.8 this will add
 # those Perls back. Not sure how best to deal with this. We want to test on
 # all Perls for most modules, and any manually generated file might forget to
@@ -154,21 +170,7 @@ sub _rewrite_perl_block {
     my $self   = shift;
     my $travis = shift;
 
-    my @perls = qw(
-        blead
-        dev
-        5.26
-        5.24
-        5.22
-        5.20
-        5.18
-        5.16
-        5.14
-        5.12
-        5.10
-        5.8
-    );
-
+    my @perls = @Perls;
     for my $perl (qw( 5.8 5.10 5.12 )) {
         pop @perls
             unless grep {/\Q$perl/} @{ $travis->{perl} };
@@ -196,12 +198,13 @@ sub _update_perl_matrix {
     push @bleads, 'blead-thr'
         if grep { $_ eq 'blead-thr' } @{ $travis->{perl} };
 
+    my $latest = first {/^5/} @Perls;
     my @include = @{ $travis->{matrix}{include} // [] };
     push @include, {
-        perl => '5.26',
+        perl => $latest,
         env  => 'COVERAGE=1',
         }
-        unless grep { $_->{perl} eq '5.26' && $_->{env} eq 'COVERAGE=1' }
+        unless grep { $_->{perl} eq $latest && $_->{env} eq 'COVERAGE=1' }
         @include;
 
     my @allow_failures = @{ $travis->{matrix}{allow_failures} // [] };
@@ -327,6 +330,7 @@ sub _run3 {
 
 my @BlocksOrder = qw(
     sudo
+    dist
     addons
     language
     compiler

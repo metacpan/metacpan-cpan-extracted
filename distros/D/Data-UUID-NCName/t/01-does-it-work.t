@@ -7,59 +7,57 @@ use Test::More;
 our @UUIDS;
 
 BEGIN {
-    my $obj;
-    my $gen = sub {};
-    eval { require OSSP::uuid };
-    if ($@) {
-        local $@;
-        eval { require Data::UUID };
-        if ($@) {
-            my $x = `uuidgen`;
-            if ($? == 0) {
-                $gen = sub { chomp(my $x = `uuidgen`) };
-            }
-            else {
-                plan skip_all => 'Require something that generates UUIDs';
-                exit;
-            }
-        }
-        else {
-            $obj = Data::UUID->new;
-            $gen = sub { lc $obj->create_str };
-        }
-    }
-    else {
-        $obj = OSSP::uuid->new;
-        $gen = sub { $obj->make('v4'); $obj->export('str') };
-    }
+    require UUID::Tiny;
 
     for my $i (1..100) {
-        push @UUIDS, $gen->();
+        push @UUIDS, lc UUID::Tiny::create_uuid_as_string(&UUID::Tiny::UUID_V4);
     }
 }
 
-plan tests => 4 * @UUIDS + 6;
+plan tests => 8 * @UUIDS + 7;
 
 use_ok('Data::UUID::NCName', ':all');
 
 # EXPECTED OUTPUTS
 
-my $z64 = to_ncname_64('00000000-0000-0000-0000-000000000000');
-my $z32 = to_ncname_32('00000000-0000-0000-0000-000000000000');
+my $z = '00000000-0000-0000-0000-000000000000';
+
+my $z64 = to_ncname_64($z, version => 0);
+my $z32 = to_ncname_32($z, version => 0);
 
 is($z64, 'AAAAAAAAAAAAAAAAAAAAAA',     'Null64 UUID OK');
 is($z32, 'Aaaaaaaaaaaaaaaaaaaaaaaaaa', 'Null32 UUID OK');
 
-my $f64 = to_ncname_64('ffffffff-ffff-ffff-ffff-ffffffffffff');
-my $f32 = to_ncname_32('ffffffff-ffff-ffff-ffff-ffffffffffff');
+my $f = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+
+my $f64 = to_ncname_64($f, version => 0);
+my $f32 = to_ncname_32($f, version => 0);
 
 #diag('E' . MIME::Base64::encode_base64url(pack 'C*', (255) x 15, 15 << 2));
 
 is($f64, 'P____________________P',     'FF64 UUID OK');
 is($f32, 'P777777777777777777777777p', 'FF32 UUID OK');
 
-my $f064 = to_ncname_64('ffffffff-ffff-4fff-ffff-fffffffffff0');
-my $z064 = to_ncname_64('00000000-0000-4000-0000-00000000000f');
+my $f0 = 'ffffffff-ffff-4fff-ffff-fffffffffff0';
+# my $z0 = '00000000-0000-4000-0000-00000000000f';
+# my $x0 = 'ffffffff-ffff-4fff-0fff-ffffffffffff';
+# my $y0 = '00000000-0000-4000-f000-000000000000';
+
+my $f064   = to_ncname_64($f0, version => 0);
+# my $z064   = to_ncname_64($z0, version => 0);
+# my $f064v1 = to_ncname_64($f0, version => 1);
+# my $z064v1 = to_ncname_64($z0, version => 1);
+# my $y064v1 = to_ncname_64($y0, version => 1);
+# my $x064v1 = to_ncname_64($x0, version => 1);
+
+# diag($f064);
+# diag($f064v1);
+
+# diag($z064);
+# diag($z064v1);
+
+# diag($x064v1);
+# diag($y064v1);
 
 #my $lint = substr
 #    MIME::Base64::encode_base64url(pack 'C*', (0) x 15, 0xf << 2), 0, 21;
@@ -80,6 +78,11 @@ is($f064, 'E____________________A', 'F064 ends with A');
 #diag($f064);
 #diag($z064);
 
+my $rando = 'bd6fbdd8-ca6a-43d4-8360-5d7cb1aee563';
+my $v1n = to_ncname($rando, radix => 64, version => 1);
+my $v1u = from_ncname($v1n, version => 1);
+is($v1u, $rando, 'identifier version 1 matches');
+
 # FUZZ TESTING
 
 for my $uu (@UUIDS) {
@@ -90,21 +93,24 @@ for my $uu (@UUIDS) {
 sub mooltipass {
     my $uuid = shift;
 
-    my $ncn64 = Data::UUID::NCName::to_ncname($uuid);
-    my $ncn32 = Data::UUID::NCName::to_ncname($uuid, 32);
+    for my $v (0, 1) {
+        my %p = (version => $v);
 
-    #diag($ncn64);
-    is(length $ncn64, 22, "Base64 NCName is 22 characters long");
+        my $ncn64 = Data::UUID::NCName::to_ncname($uuid, %p);
+        my $ncn32 = Data::UUID::NCName::to_ncname($uuid, 32, %p);
 
-    my $uu64 = Data::UUID::NCName::from_ncname_64($ncn64);
-    is($uu64, $uuid, 'Base64 content matches original UUID');
+        #diag($ncn64);
+        is(length $ncn64, 22, "Base64 NCName is 22 characters long");
 
-    #diag($ncn32);
-    is(length $ncn32, 26, "Base32 NCName is 26 characters long");
+        my $uu64 = Data::UUID::NCName::from_ncname_64($ncn64, %p);
+        is($uu64, $uuid, 'Base64 content matches original UUID');
 
-    my $uu32 = Data::UUID::NCName::from_ncname_32($ncn32);
-    is($uu32, $uuid, 'Base32 content matches original UUID');
+        #diag($ncn32);
+        is(length $ncn32, 26, "Base32 NCName is 26 characters long");
 
+        my $uu32 = Data::UUID::NCName::from_ncname_32($ncn32, %p);
+        is($uu32, $uuid, 'Base32 content matches original UUID');
+    }
 }
 
 #diag(to_ncname('00000000-0000-4000-0000-00000000000f'));

@@ -9,6 +9,11 @@ borg-restore.pl \[options\] &lt;path>
     Options:
      --help, -h                 short help message
      --debug                    show debug messages
+     --quiet                    show only warnings and errors
+     --detail                   Output additional detail for some operations
+                                (currently only --list)
+     --json                     Output JSON instead of human readable text
+                                (currently only --list)
      --update-cache, -u         update cache files
      --list [pattern]           List paths contained in the backups, optionally
                                 matching an SQLite LIKE pattern
@@ -63,6 +68,20 @@ It can be used to build your own restoration script.
 
     Enable debug messages.
 
+- **--quiet**
+
+    Reduce output by showing only show warnings and above (errors).
+
+- **--detail**
+
+    Output additional detail information with some operations. Refer to the
+    specific options for more information. Currently only works with **--list**
+
+- **--json**
+
+    Output JSON instead of human readable text with some operations. Refer to the
+    specific options for more information. Currently only works with **--list**
+
 - **--update-cache**, **-u**
 
     Update the lookup database. You should run this after creating or removing a backup.
@@ -72,6 +91,12 @@ It can be used to build your own restoration script.
     List paths contained in the backups, optionally matching an SQLite LIKE
     pattern. If no % occurs in the pattern, the patterns is automatically wrapped
     between two % so it may match anywhere in the path.
+
+    If **--detail** is used, also outputs which archives contain a version of the
+    file. If the same version is part of multiple archives, only one archive is
+    shown.
+
+    If **--json** is used, the output is JSON. Can also be combined with **--detail**.
 
 - **--destination=**_path_, **-d **_path_
 

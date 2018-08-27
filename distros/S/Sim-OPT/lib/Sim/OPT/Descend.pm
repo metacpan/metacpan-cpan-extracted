@@ -37,7 +37,7 @@ no warnings;
 
 our @EXPORT = qw( descend ); # our @EXPORT = qw( );
 
-$VERSION = '0.58.00'; # our $VERSION = '';
+$VERSION = '0.59.00'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -77,8 +77,6 @@ sub descend
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   say $tee "\n#Now in Sim::OPT::Descend.\n";
   
-  
-  %dowhat = %main::dowhat;
 
   %simtitles = %main::simtitles; 
   %retrievedata = %main::retrievedata;
@@ -98,6 +96,11 @@ sub descend
   @maketabledata = @main::maketabledata;
   @filter_columns = @main::filter_columns;
   %vals = %main::vals;
+
+  %dowhat = %main::dowhat;
+  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
+  my $precomputed = $dowhat{precomputed}; #NEW
+  my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
   
   my @simcases = @{ $dirfiles{simcases} }; 
   my @simstruct = @{ $dirfiles{simstruct} }; 
@@ -125,7 +128,7 @@ sub descend
   
   my $skipfile = $vals{skipfile}; 
   my $skipsim = $vals{skipsim}; 
-  my $skipreport = $vals{skipreport}; 
+  my $skipreport = $vals{skipreport};
     
   #my $getpars = shift;
   #eval( $getpars );
@@ -134,12 +137,20 @@ sub descend
 
   #my $getpars = shift;
   #eval( $getpars );
-  my $repfile = $repstruct[$countcase][$countblock][0]; say $tee "OBTAINED \$repfile : " . dump( $repfile );
-  if ( not ( defined( $repfile ) ) )
+  
+  my $repfile;
+  if ( $precomputed eq "" )#NEW
   {
-    $repfile = $dirfiles{repfilebackup}; 
+    $repfile = $repstruct[$countcase][$countblock][0]; say $tee "OBTAINED \$repfile : " . dump( $repfile );
+    if ( undef($repfile))
+    {
+      $repfile = "$mypath/$file-report-$countcase-$countblock.txt";
+    }
   }
-  say $tee "OBTAINED BACKUP \$repfile : " . dump( $repfile );
+  else
+  {
+    $repfile = "$mypath/$file-report-$countcase-$countblock.txt";
+  }
   
   my $instance = $instances[0]; # THIS WOULD HAVE TO BE A LOOP HERE TO MIX ALL THE MERGECASES!!! ### ZZZ
   
@@ -187,7 +198,7 @@ sub descend
 
   my $cleanmixed = "$repfile-clean.csv"; 
   my $throwclean = $cleanmixed; $throwclean =~ s/\.csv//;
-  my $selectmixed = "$throwclean-select.csv"; 
+  my $selectmixed = "$throwclean-select.csv";
   
   sub cleanselect
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
@@ -220,7 +231,7 @@ sub descend
     {
       if ( ( $line ne "" ) and ( $line ne " " ) and ( $line ne "\n" ) )
       {
-        my @elts = split(/\s+|,/, $line); ### DDD
+        my @elts = split(/\s+|,/, $line); 
         $elts[0] =~ /^(.*)_-(.*)/;
         my $touse = $1; 
         $touse =~ s/$mypath\///;
@@ -257,10 +268,13 @@ sub descend
     }
     close SELECTEDMIXED;
   }
-
-    if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
+  
+  if ( $precomputed eq "" )
   {
-    cleanselect( $repfile, $cleanmixed, $selectmixed );
+    if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
+    {
+      cleanselect( $repfile, $cleanmixed, $selectmixed );
+    }
   }
   
   
@@ -396,11 +410,14 @@ sub descend
     close WEIGHT;
     
   }
-  if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
-  {
-    weight( $selectmixed, $weight ); #
-  }
   
+  if ( $precomputed eq "" )
+  {
+    if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
+    {
+      weight( $selectmixed, $weight ); #
+    }
+  }
   
   my $weighttwo = "$throw-weighttwo.csv"; # THIS WILL HOST PARTIALLY SCALED VALUES, MADE POSITIVE AND WITH A CELING OF 1
   sub weighttwo
@@ -454,15 +471,23 @@ sub descend
       $counterline++;
     }
   }
-  if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
-  {
-    weighttwo( $weight, $weighttwo );
-  }
     
+  if ( $precomputed eq "" )
+  {
+    if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
+    {
+      weighttwo( $weight, $weighttwo );
+    }
+  }
   
+  if ( not ( $precomputed eq "") ) #NEW. TAKE CARE
+  { 
+    #`cp -f $repfile $weighttwo`;
+    $weighttwo = $repfile;###############
+  }
   
   my $sortmixed = "$repfile-sortmixed.csv"; 
-  #if ($repfile) { $sortmixed = "$repfile-sortmixed.csv"; } else { die( "$!" ); } # globsAL!
+  #if ($repfile) { $sortmixed = "$repfile-sortmixed.csv"; } else { die( "$!" ); } # global!
   sub sortmixed
   {
     my ( $weighttwo, $sortmixed ) = @_;
@@ -497,6 +522,7 @@ sub descend
       {
         push( @rescontainer, $line );
       }
+      push ( @totalcases, $line );
     }
     
     #if ($numberelts > 0) { print SORTMIXED_ `sort -t, -k$numberelts -n $weighttwo`; } 
@@ -515,7 +541,7 @@ sub descend
     
     close SORTMIXED_;
   }
-  sortmixed( $weighttwo, $sortmixed );
+   sortmixed( $weighttwo, $sortmixed );
   
   ##########################################################
   
@@ -525,15 +551,25 @@ sub descend
     my ( $sortmixed, $uplift_ref ) = @_;
     my @uplift = @$uplift_ref;
     #my $pass_signal = ""; # IF VOID, GAUSS SEIDEL METHOD. IF 0, JACOBI METHOD. ...
-    
-    
-    
-    
+
     open( SORTMIXED_, $sortmixed ) or die( "$!" );
     my @lines = <SORTMIXED_>;
     close SORTMIXED_;
+    my $winnerentry;
     
-    my $winnerentry = $lines[0]; #ay TOFILE "dump( IN SUB TAKEOPTIMA\$winnerentry): " . dump($winnerentry);
+    if ( $direction eq ">" )#NEW. TAKE CARE
+    {
+      $winnerentry = $lines[0]; #say TOFILE "dump( IN SUB TAKEOPTIMA\$winnerentry): " . dump($winnerentry);
+    }
+    elsif ( $direction eq "<" )
+    {
+      $winnerentry = $lines[-1];
+    }
+    elsif ( $direction eq "=" )
+    {
+      my $half = ( int( scalar( @lines) / 2)  );
+      $winnerentry = $lines[$half];
+    }
     chomp $winnerentry;
     
     my @winnerelms = split(/\s+|,/, $winnerentry);
@@ -682,7 +718,10 @@ sub descend
       say $tee "#Optimal option for case  $countcaseplus: $newtarget";
       #my $instnum = Sim::OPT::countarray( @{ $morphstruct[$countcase] } );
       
-      my $netinstnum = scalar( @morphcases );
+      #my $netinstnum = scalar( @morphcases );
+      @totalcases = uniq( @totalcases );
+      my $netinstnum = scalar( @totalcases );
+
       say $tee "#Net number of instances: $netinstnum." ;
       open( RESPONSE , ">$mypath/response.txt" );
       say RESPONSE "#Optimal option for case  $countcaseplus: $newtarget";

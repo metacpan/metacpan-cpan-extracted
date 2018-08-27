@@ -1,0 +1,98 @@
+NAME
+
+    WebService::Mocean - Perl library for integration with MoceanSMS
+    gateway, https://moceanapi.com.
+
+SYNOPSIS
+
+      use WebService::Mocean;
+      my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
+
+DESCRIPTION
+
+    WebService::Mocean is Perl library for integration with MoceanSMS
+    gateway, https://moceanapi.com.
+
+DEVELOPMENT
+
+    Source repo at https://github.com/kianmeng/webservice-mocean.
+
+ Docker
+
+    If you have Docker installed, you can build your Docker container for
+    this project.
+
+        $ docker build -t webservice-mocean .
+        $ docker run -it -v $(pwd):/root webservice-restcountries bash
+        # cpanm --installdeps --notest .
+
+ Milla
+
+    Setting up the required packages.
+
+        $ milla authordeps --missing | cpanm
+        $ milla listdeps --missing | cpanm
+
+    Check you code coverage.
+
+        $ milla cover
+
+    Several ways to run the test.
+
+        $ milla test
+        $ milla test --author --release
+        $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla test
+        $ AUTHOR_TESTING=1 RELEASE_TESTING=1 milla run prove t/01_instantiation.t
+        $ LOGGING=1 milla run prove t/t/02_request.t
+
+    Release the module.
+
+        $ milla build
+        $ milla release
+
+METHODS
+
+ new($api_key, $api_secret, [%$args])
+
+    Construct a new WebService::Mocean instance. The api_key and api_secret
+    is compulsory fields. Optionally takes additional hash or hash
+    reference.
+
+        # Instantiate the class.
+        my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
+    
+        # Alternative way.
+        my $mocean_api = WebService::Mocean->new({api_key => 'foo', api_secret => 'bar'});
+
+  api_url
+
+    The URL of the API resource.
+
+        # Instantiate the class by setting the URL of the API endpoints.
+        my $mocean_api = WebService::Mocean->new({api_url => 'http://example.com/api/'});
+    
+        # Alternative way.
+        my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
+        $mocean_api->api_url('http://example.com/api/');
+
+ send_mt_sms($to, $from, $text)
+
+    Send Mobile Terminated (MT) message, which means the message is sent
+    from mobile SMS provider and terminated at the to the mobile phone.
+
+        # Send sample SMS.
+        my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
+        $mocean_api->send_mt_sms('0123456789', 'ACME Ltd.', 'Hello');
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Kian Meng, Ang.
+
+    This is free software, licensed under:
+
+        The Artistic License 2.0 (GPL Compatible)
+
+AUTHOR
+
+    Kian Meng, Ang <kianmeng@users.noreply.github.com>
+

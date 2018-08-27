@@ -1,0 +1,69 @@
+use alienfile;
+use File::Glob qw( bsd_glob );
+
+configure {
+  requires 'FFI::CheckLib';
+};
+
+probe sub {
+  my($build) = @_;
+
+  my @system = FFI::CheckLib::find_lib(lib => [qw(newrelic-collector-client newrelic-common newrelic-transaction)]);
+  if(@system)
+  {
+    $build->runtime_prop->{my_lib} = \@system;
+    $build->runtime_prop->{version} = 'unknown';
+    return 'system';
+  }
+
+  @system = bsd_glob('/opt/newrelic/lib/libnewrelic*.so');
+  if(@system)
+  {
+    $build->runtime_prop->{my_lib} = \@system;
+    $build->runtime_prop->{version} = 'unknown';
+    return 'system';
+  }
+
+  'share';
+};
+
+share {
+  my $version = '0.16.2.0-beta';
+  my $sha256 = 'b50aa8abefb83dfd115fbf0dff4d9686b9db27ae3e923e053f301995e091f2f7';
+  plugin Download => (
+    url => "http://download.newrelic.com/agent_sdk/nr_agent_sdk-v$version.x86_64.tar.gz",
+  );
+  plugin Extract => 'tar.gz';
+
+  requires 'Crypt::Digest::SHA256';
+  before extract => sub {
+    my($build) = @_;
+    my $digest = Crypt::Digest::SHA256::sha256_file_hex(
+      $build->install_prop->{download},
+    );
+    if($digest ne $sha256)
+    {
+      log "bad SHA256 digest for @{[ $build->install_prop->{download} ]}";
+      log "expected: $sha256";
+      log "got:      $digest";
+      die "bad digest";
+    }
+  };
+
+  build [
+    # since this only works on 64bit linux
+    # don't really have to worry about
+    # portability so we can use all the unixisms
+    # we want!
+    'mkdir -p %{.install.prefix}/include',
+    'mkdir -p %{.install.prefix}/lib',
+    'cp -a include/* %{.install.prefix}/include',
+    'cp -a lib/* %{.install.prefix}/lib',
+  ];
+
+  gather sub {
+    my($build) = @_;
+    $build->runtime_prop->{version} = $version;
+  };
+}
+

@@ -1,10 +1,84 @@
 ==================================================
-Changes from 2017-01-24 00:00:00 +0000 to present.
+Changes from 2017-08-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.027 at 2018-01-24 21:03:02 +0000
+version 0.029 at 2018-08-25 21:38:51 +0000
 ------------------------------------------
+
+  Change: 425a5b229d30ba31d9bc344a8f26edab3fcfe088
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-08-26 00:34:01 +0000
+
+    fix version 
+
+  Change: e367ea527ae1012d46b668d2f598c39b56186c97
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-08-26 00:22:03 +0000
+
+    Merge pull request #32 from Madskill/fix_dist_ini
+
+    fix dist.ini and docs 
+
+  Change: c611c855e7a7b65cdfbcf5d3e314ec130b595e6b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-08-26 00:08:33 +0000
+
+    fix dist.ini and docs 
+
+------------------------------------------
+version 0.028 at 2018-08-25 20:24:47 +0000
+------------------------------------------
+
+  Change: 07020c8fe69ceef1225b3f54053d74fc98279164
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-08-25 23:24:47 +0000
+
+    Merge pull request #31 from
+    Madskill/create_table_definition_in_real_time
+
+    Create table definition in real time 
+
+  Change: 3ccadc3f9a3d9e0be08d782964424cfe96d237dc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-08-25 23:21:49 +0000
+
+    removed unused code 
+
+  Change: fdaedd5fe6f4314d0472562032af40d672417c88
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-08-25 23:17:55 +0000
+
+    added test and fix meta 
+
+  Change: 172c9d897dd262e608f473694ea9c163b87cf3ae
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-08-25 15:38:59 +0000
+
+    create table definition in real time 
+
+  Change: 929ffaee5dafb88e98938cf9769e0ccac43fc64e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-08-20 00:58:21 +0000
+
+    Merge remote-tracking branch 'upstream/master' into
+    create_table_definition_in_real_time 
+
+  Change: c2668f1bf49dfd5825afb35bd563774e84dc3132
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-08-20 00:58:11 +0000
+
+    fix pod 
+
+------------------------------------------
+version 0.027 at 2018-01-24 21:03:25 +0000
+------------------------------------------
+
+  Change: bcddf30c2c1c526666688179af366531fd3d8e06
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-01-25 00:03:25 +0000
+
+    Version 0.027 
 
   Change: ddf5a8694e1e49f93b3551324c24ef67b07754b5
   Author: Igor <igor-sverdlov@mail.ru>
@@ -310,5 +384,5 @@ version 0.017 at 2017-08-27 08:06:31 +0000
     fix query and added methods: set_dbh, dbh 
 
 =================================================
-Plus 16 releases after 2017-01-24 00:00:00 +0000.
+Plus 16 releases after 2017-08-25 00:00:00 +0000.
 =================================================

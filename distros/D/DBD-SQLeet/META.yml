@@ -1,0 +1,39 @@
+---
+abstract: 'SQLite3 DBI Driver with optional encryption'
+author:
+  - 'Matt Sergeant <matt@sergeant.org>'
+  - 'Francis J. Lacoste <flacoste@logreport.org>'
+  - 'Wolfgang Sourdeau <wolfgang@logreport.org>'
+  - 'Adam Kennedy <adamk@cpan.org>'
+  - 'Max Maischein <corion@cpan.org>'
+  - 'Laurent Dami <dami@cpan.org>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Dimitar D. Mitov <ddmitov@yahoo.com>'
+build_requires:
+  File::Spec: '0.82'
+  Test::More: '0.42'
+configure_requires:
+  DBI: '1.57'
+  ExtUtils::MakeMaker: '6.48'
+  File::Spec: '0.82'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-SQLeet
+no_index:
+  directory:
+    - t
+    - inc
+    - util
+requires:
+  DBI: '1.57'
+  Scalar::Util: '0'
+  Tie::Hash: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ddmitov/DBD-SQLeet
+version: '1.58'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

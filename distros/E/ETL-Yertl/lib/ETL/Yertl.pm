@@ -1,5 +1,5 @@
 package ETL::Yertl;
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 # ABSTRACT: ETL with a Shell
 
 use strict;
@@ -20,6 +20,7 @@ our %IMPORT_BUNDLES = (
         boolean => [':all'],
         'Path::Tiny' => [qw( path cwd tempfile tempdir )],
         'Dir::Self' => [qw( __DIR__ )],
+        'ETL::Yertl::Util' => [qw( docs_from_string )],
     ],
 );
 
@@ -41,7 +42,7 @@ ETL::Yertl - ETL with a Shell
 
 =head1 VERSION
 
-version 0.037
+version 0.039
 
 =head1 SYNOPSIS
 

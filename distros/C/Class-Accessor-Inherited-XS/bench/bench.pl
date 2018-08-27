@@ -53,7 +53,7 @@ cmpthese(
 
 BEGIN {
     package AAA;
-    use base qw/Class::Accessor::Inherited::XS/;
+    use base qw/Class::Accessor::Inherited::XS::Compat/;
     use strict;
 
     sub new { return bless {}, shift }

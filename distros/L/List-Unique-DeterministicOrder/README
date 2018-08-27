@@ -1,0 +1,6 @@
+List-Unique-DeterministicOrder
+
+This module provides a structure to store a set
+of keys, without duplicates, and be able to access
+them by either key name or index.
+

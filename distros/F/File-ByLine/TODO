@@ -8,7 +8,6 @@ Todo Items:
   * Documentation on parallel_ that these methods do a SEEK_EOF, so you
     shouldn't use them on things like terminal input.  There's a little
     note already, but it's not particularly clear.
-  * A write routine wouldn't be a bad thing.
   * A more detailed CONTRIBUTING file
   * Ability to lock the file before read (particularly for use with the
     header option)
@@ -23,4 +22,5 @@ Todo Items:
   * Method in map/dofile/grep that says "Don't process any more lines of
     this file" and "don't process any more lines of any file"
   * Grep that returns name of file rather than line that matched
+  * Provide an append_file command
 

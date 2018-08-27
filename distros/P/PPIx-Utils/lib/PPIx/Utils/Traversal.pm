@@ -13,7 +13,7 @@ use PPIx::Utils::_Common qw(
     is_ppi_simple_statement
 );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @EXPORT_OK = qw(
     first_arg parse_arg_list split_nodes_on_comma
@@ -192,6 +192,11 @@ sub _get_constant_names_from_constant_pragma {
 
     my $follower = $arguments[0];
     return() if not defined $follower;
+
+    if ($follower->isa('PPI::Token::Operator') && $follower->content eq '+') {
+        $follower = $arguments[1];
+        return() if not defined $follower;
+    }
 
     # We test for a 'PPI::Structure::Block' in the following because some
     # versions of PPI parse the last element of 'use constant { ONE => 1, TWO

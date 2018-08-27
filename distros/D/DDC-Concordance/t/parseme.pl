@@ -2,6 +2,14 @@
 use Test::More;
 use strict;
 
+sub unescape_qstr {
+  my $qstr = shift;
+  $qstr =~ s{\\n}{\n}g;
+  $qstr =~ s{\\t}{\t}g;
+  $qstr =~ s{^\\#}{#}g;
+  return $qstr;
+}
+
 ## \@qdata = load_qdata($filename)
 sub load_qdata {
   my $file = shift;
@@ -10,9 +18,9 @@ sub load_qdata {
   my @qdata = qw();
   while (defined($_=<$fh>)) {
     chomp;
-    next if (/^\s*$/ || /^\s*\#/);
+    next if (/^\s*$/ || /^\#/);
     my ($q1,$q2,$cmt) = split(/\t/,$_,3);
-    push(@qdata,[$q1,$q2,$cmt]);
+    push(@qdata,[unescape_qstr($q1),unescape_qstr($q2),$cmt]);
   }
   close($fh);
   return \@qdata;

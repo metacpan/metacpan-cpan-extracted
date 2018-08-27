@@ -1,3 +1,10 @@
+0.002   2018-08-22 (PERLANCAR)
+
+	- [doc] Add example and mention App::WHOGrowthReferenceUtils.
+
+	- Accept 'weight' and 'height' to calculate percentiles.
+
+
 0.001   2018-08-21 (PERLANCAR)
 
         - First early release.

@@ -1,0 +1,10 @@
+GET
+/0/foo
+
+date:Mon, 09 Sep 2011 23:36:00 GMT
+host:host.foo.com
+x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+x-amz-date:20110909T233600Z
+
+date;host;x-amz-content-sha256;x-amz-date
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

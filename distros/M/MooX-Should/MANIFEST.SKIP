@@ -1,0 +1,22 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+MooX-Should-.*\.tar\.gz
+MooX-Should-v\d+\.\d+\.\d+/
+
+^MYMETA\.*
+
+# Travis-CI
+
+\.travis\.yml
+
+# Distzilla etc
+
+\.build/

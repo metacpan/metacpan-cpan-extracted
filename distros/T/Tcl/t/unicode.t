@@ -1,5 +1,3 @@
-#!perl -w
-
 # Test the transfer of null and various unicode data through assorted APIs.
 # The \x{2030} is the permille sign.
 #

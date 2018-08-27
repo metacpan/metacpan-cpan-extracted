@@ -11,3 +11,10 @@ print 42;
 
 use Data::Dumper qw<Dumper>;
 print 42;
+
+## name Getopt::Long config
+## failures 0
+## cut
+
+use Getopt::Long qw(:config bundling);
+print 42;

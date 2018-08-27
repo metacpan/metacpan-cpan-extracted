@@ -44,5 +44,5 @@ requires:
   perl: '5.008000'
 resources:
   repository: https://github.com/FGasper/p5-Crypt-Perl.git
-version: '0.27'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

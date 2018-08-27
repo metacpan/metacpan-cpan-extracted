@@ -13,13 +13,15 @@ use Pod::Usage ();
 use List::MoreUtils qw/uniq/;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
+use CHI::Memoize qw(:all);
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.8;
+our $VERSION  = 1.0.9;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
+our $memoized = 0;
 
 sub run {
     my $self = shift;
@@ -32,6 +34,7 @@ sub run {
         'day|d',
         'depth|D=i',
         'files|f',
+        'ignore_files|ignore-files=s@',
         'ignore_user|ignore-users=s@',
         'ignore_branch|ignore-branches=s@',
         'month|m',
@@ -43,6 +46,19 @@ sub run {
         'users|u',
         'week|w',
     );
+
+    if (!$memoized) {
+        my $git_dir = $workflow->git->rev_parse("--show-toplevel");
+        chomp $git_dir;
+        $git_dir =~ s{[/\\]$}{};
+        memoize('App::Git::Workflow::commit_details',
+            driver     => 'File',
+            root_dir   => "$git_dir/.git/gw-commit-detials",
+            expires_in => '1w',
+            key        => sub { shift @_; @_ },
+        );
+        $memoized = 1;
+    }
 
     # get a list of recent commits
     my @commits = $self->recent_commits(\%option);
@@ -81,6 +97,7 @@ sub run {
         %changed = %branches;
     }
     else {
+        my %files;
         for my $file (keys %changed) {
             delete $changed{$file}{files};
         }
@@ -208,6 +225,14 @@ sub changed_from_shas {
 sub ignore {
     my ($self, $commit) = @_;
 
+    if ($option{ignore_files}) {
+        for my $ignore (@{ $option{ignore_files} }) {
+            for my $file (keys %{ $commit->{files} }) {
+                return 1 if $file =~ /$ignore/;
+            }
+        }
+    }
+
     if ($option{ignore_user}
         && grep {$commit->{user} =~ /$_/} @{ $option{ignore_user} } ) {
         return 1;
@@ -231,7 +256,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.8
+This documentation refers to git-recent version 1.0.9
 
 =head1 SYNOPSIS
 

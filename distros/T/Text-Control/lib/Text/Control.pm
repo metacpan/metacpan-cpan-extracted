@@ -3,7 +3,7 @@ package Text::Control;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 
 my $CTRL_PATTERN = '[\x00-\x19\x7f-\xff]';
 

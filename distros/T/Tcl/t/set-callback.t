@@ -1,4 +1,3 @@
-#!perl -w
 use Tcl;
 use strict;
 use warnings;

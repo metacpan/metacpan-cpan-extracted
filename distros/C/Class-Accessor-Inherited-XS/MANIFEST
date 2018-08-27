@@ -38,6 +38,7 @@ t/41_register_type.t
 t/42_partial.t
 t/43_fail_preserve.t
 t/44_register_types.t
+t/45_register_type_info.t
 t/70_opcode_entersub.t
 t/71_opcode_method_named.t
 t/72_opcode_method.t

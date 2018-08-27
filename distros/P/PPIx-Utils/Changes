@@ -1,2 +1,5 @@
+0.002     2018-08-23 13:32:07 EDT
+  - Add tests and support a special case in get_constant_name_elements_from_declaring_statement (#1)
+
 0.001     2017-06-04 04:13:19 EDT
   - First release

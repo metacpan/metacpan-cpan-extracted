@@ -34,5 +34,5 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/FGasper/p5-Net-WAMP.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

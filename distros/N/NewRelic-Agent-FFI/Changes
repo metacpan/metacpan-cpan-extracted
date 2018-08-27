@@ -1,0 +1,8 @@
+Revision history for NewRelic-Agent-FFI
+
+0.02      2018-08-23 11:40:34 -0400
+  - Added tests and fixed a number of bugs that they uncovered
+  - Documentation coverage for all methods.
+
+0.01      2018-08-22 05:28:51 -0400
+  - initial version

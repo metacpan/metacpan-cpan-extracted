@@ -1,124 +1,82 @@
 package ETL::Yertl::Format::csv;
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 # ABSTRACT: CSV read/write support for Yertl
+
+#pod =head1 SYNOPSIS
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<ETL::Yertl::FormatStream>
+#pod
+#pod =cut
 
 use ETL::Yertl;
 use base 'ETL::Yertl::Format';
-use Module::Runtime qw( use_module );
-use ETL::Yertl::Util qw( pairs );
 
 sub new {
-    my ( $class, %args ) = @_;
-    $args{delimiter} ||= ',';
-    return $class->SUPER::new( %args );
+    my ( $class, %opt ) = @_;
+    $opt{delimiter} ||= ',';
+    return $class->SUPER::new( %opt );
 }
 
-#pod =attr format_module
-#pod
-#pod The module being used for this format. Possible modules, in order of importance:
-#pod
-#pod =over 4
-#pod
-#pod =item L<Text::CSV_XS> (any version)
-#pod
-#pod =item L<Text::CSV> (any version)
-#pod
-#pod =back
-#pod
-#pod =cut
+sub _formatter_classes {
+    return (
+        [ 'Text::CSV_XS' => 0 ],
+        [ 'Text::CSV' => 0 ],
+    );
+}
 
-# Pairs of module => supported version
-our @FORMAT_MODULES = (
-    'Text::CSV_XS' => 0,
-    'Text::CSV' => 0,
-);
-
-sub format_module {
+sub _formatter {
     my ( $self ) = @_;
-    return $self->{_format_module} if $self->{_format_module};
-    for my $format_module ( pairs @FORMAT_MODULES ) {
-        eval {
-            # Prototypes on use_module() make @$format_module not work correctly
-            use_module( $format_module->[0], $format_module->[1] );
-        };
-        if ( !$@ ) {
-            return $format_module->[0];
+    return $self->{formatter_class}->new( { sep_char => $self->{delimiter} } );
+}
+
+sub read_buffer {
+    my ( $self, $buffref, $eof ) = @_;
+    my $csv = $self->_formatter;
+    my $names = $self->{_field_names} ||= [];
+    my @docs;
+    while ( $$buffref =~ s/^(.*\n)// ) {
+        my $line = $1;
+        if ( !@$names ) {
+            $csv->parse( $line );
+            @$names = $csv->fields;
+            next;
         }
+
+        my $status = $csv->parse( $line );
+        my @fields = $csv->fields;
+        my $doc = {
+            map {; $names->[ $_ ] => $fields[ $_ ] }
+            0..$#fields
+        };
+        push @docs, $doc;
     }
-    die "Could not load a formatter for CSV. Please install one of the following modules:\n"
-        . join( "",
-            map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
-            pairs @FORMAT_MODULES
-        )
-        . "\n";
+    return @docs;
 }
 
-sub _field_names {
-    my ( $self, $new_names ) = @_;
-    if ( $new_names ) {
-        $self->{_field_names} = $new_names;
+sub format {
+    my ( $self, $doc ) = @_;
+    my $csv = $self->_formatter;
+
+    my $names = $self->{_field_names} ||= [];
+    if ( !@$names ) {
+        @$names = sort keys %$doc;
     }
-    return $self->{_field_names} || [];
-}
 
-sub _csv {
-    my ( $self ) = @_;
-    return $self->{_csv} ||= $self->format_module->new({
-        binary => 1, eol => $\,
-        sep_char => $self->{delimiter},
-    });
-}
-
-#pod =method write( DOCUMENTS )
-#pod
-#pod Convert the given C<DOCUMENTS> to CSV. Returns a CSV string.
-#pod
-#pod =cut
-
-sub write {
-    my ( $self, @docs ) = @_;
-    my $csv = $self->_csv;
     my $str = '';
-    my @names = @{ $self->_field_names };
-
-    if ( !@names ) {
-        @names = sort keys %{ $docs[0] };
-        $csv->combine( @names );
+    if ( !$self->{_wrote_header} ) {
+        $csv->combine( @$names );
         $str .= $csv->string . $/;
-        $self->_field_names( \@names );
+        $self->{_wrote_header} = 1;
     }
 
-    for my $doc ( @docs ) {
-        $csv->combine( map { $doc->{ $_ } } @names );
-        $str .= $csv->string . $/;
-    }
+    $csv->combine( map { $doc->{ $_ } } @$names );
+    $str .= $csv->string . $/;
 
     return $str;
-}
-
-#pod =method read()
-#pod
-#pod Read a CSV string from L<input> and return all the documents.
-#pod
-#pod =cut
-
-sub read {
-    my ( $self ) = @_;
-    my $fh = $self->{input} || die "No input filehandle";
-    my $csv = $self->_csv;
-    my @names = @{ $self->_field_names };
-
-    if ( !@names ) {
-        @names = @{ $csv->getline( $fh ) };
-        $self->_field_names( \@names );
-    }
-
-    my @docs;
-    while ( my $row = $csv->getline( $fh ) ) {
-        push @docs, { map {; $names[ $_ ] => $row->[ $_ ] } 0..$#{ $row } };
-    }
-
-    return @docs;
 }
 
 1;
@@ -133,31 +91,15 @@ ETL::Yertl::Format::csv - CSV read/write support for Yertl
 
 =head1 VERSION
 
-version 0.037
+version 0.039
 
-=head1 ATTRIBUTES
+=head1 SYNOPSIS
 
-=head2 format_module
+=head1 DESCRIPTION
 
-The module being used for this format. Possible modules, in order of importance:
+=head1 SEE ALSO
 
-=over 4
-
-=item L<Text::CSV_XS> (any version)
-
-=item L<Text::CSV> (any version)
-
-=back
-
-=head1 METHODS
-
-=head2 write( DOCUMENTS )
-
-Convert the given C<DOCUMENTS> to CSV. Returns a CSV string.
-
-=head2 read()
-
-Read a CSV string from L<input> and return all the documents.
+L<ETL::Yertl::FormatStream>
 
 =head1 AUTHOR
 

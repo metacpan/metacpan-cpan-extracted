@@ -1,10 +1,10 @@
 {
-   "abstract" : "a simple Perl wrapper around Facebook OAuth v2.0 protocol",
+   "abstract" : "a simple Perl wrapper around Facebook OAuth 2.0 protocol",
    "author" : [
       "Mahmoud A. Mehyar <mamod.mehyar@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -41,6 +41,7 @@
          "requires" : {
             "Carp" : "0",
             "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -59,5 +60,5 @@
          "url" : "https://github.com/mamod/Net-Facebook-Oauth2"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11"
 }

@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use Encode;
-use File::Slurp qw(read_file);
+use Path::Tiny;
 use parent 'Pod::Markdown';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $DATA_KEY = '_Pod_Github_';
 
@@ -49,7 +49,7 @@ sub _include_markdown {
     my $conf = $self->{$DATA_KEY};
 
     my $content = $conf->{$name}           ? $conf->{$name}
-                : $conf->{$name . '-file'} ? scalar read_file($conf->{$name . '-file'})
+                : $conf->{$name . '-file'} ? path($conf->{$name . '-file'})->slurp_utf8
                                            : undef
                                            ;
 

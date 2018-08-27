@@ -1,7 +1,7 @@
 This archive contains the distribution App-Git-Info,
-version 0.0.2:
+version 0.2.0:
 
-  displays a summary of information about the git repository.
+  Displays a summary of information about the git repository.
 
 This software is Copyright (c) 2018 by Shlomi Fish.
 

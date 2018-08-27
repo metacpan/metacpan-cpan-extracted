@@ -1,5 +1,5 @@
 
-use Test::More tests => 17;
+use Test::More tests => 21;
 
 # this script is for testing Term::Size default behavior
 
@@ -35,6 +35,19 @@ for (@handles) {
 
   }
 
+}
+
+{
+    pipe my $rd, my $wr;
+    my @chars = chars $rd;
+    ok(!@chars, 'chars return () on error (list context)');
+    my $chars = chars $rd;
+    is($chars, undef, 'chars return undef on error (scalar context)');
+
+    my @pixels = pixels $rd;
+    ok(!@pixels, 'pixels return () on error (list context)');
+    my $pixels = pixels $rd;
+    is($pixels, undef, 'pixels return undef on error (scalar context)');
 }
 
 if (-t STDIN) {

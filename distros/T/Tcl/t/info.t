@@ -1,9 +1,7 @@
-#!perl -w
-
 use strict;
 use Test qw(plan ok);
 
-plan tests => 6;
+plan tests => 6, todo=>[2];
 
 use Tcl;
 use File::Spec::Functions;
@@ -23,6 +21,7 @@ if ($^O eq 'cygwin') {
     chomp($cpath);
     ok($cpath, canonpath($^X));
 } else {
+    # see ticket 25822
     ok(canonpath($tcl->Eval("info nameofexecutable")), canonpath($^X));
 }
 ok($tcl->Eval("info exists tcl_platform"), 1);

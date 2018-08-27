@@ -234,6 +234,7 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
     }
 
 #ifdef __APPLE__
+#ifdef SEE_TICKET_125664 /*sorry, no replacement for deprecated function */
     if (!handle) {
       OSErr oserr;
       FSRef ref;
@@ -261,6 +262,7 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
 	}
       }
     }
+#endif
 #endif
 
     if (!handle) {

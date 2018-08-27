@@ -1,6 +1,6 @@
 package Test::Routine::Runner;
 # ABSTRACT: tools for running Test::Routine tests
-$Test::Routine::Runner::VERSION = '0.025';
+$Test::Routine::Runner::VERSION = '0.027';
 use Moose;
 
 #pod =head1 OVERVIEW
@@ -95,8 +95,15 @@ sub run {
   } @tests;
 
   Test2::API::run_subtest($self->description, sub {
-    for my $test (@ordered_tests) {
-      $test_instance->run_test( $test );
+    TEST: for my $test (@ordered_tests) {
+      my $ctx = Test2::API::context;
+      if (my $reason = $test->skip_reason($test_instance)) {
+        $ctx->skip($test->name, $reason);
+      } else {
+        $test_instance->run_test( $test );
+      }
+
+      $ctx->release;
     }
   });
 }
@@ -115,7 +122,7 @@ Test::Routine::Runner - tools for running Test::Routine tests
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 OVERVIEW
 

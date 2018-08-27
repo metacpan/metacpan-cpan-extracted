@@ -4,15 +4,15 @@ lib/Bio/CIPRES.pm
 lib/Bio/CIPRES/Error.pm
 lib/Bio/CIPRES/Job.pm
 lib/Bio/CIPRES/Output.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
 README.md
 t/00-load.t
-t/boilerplate.t
-t/cipres.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
+t/01-manifest.t
+t/02-boilerplate.t
+t/03-pod.t
+t/04-pod-coverage.t
+t/90-cipres.t
 t/test_data/cipres.conf
-META.yml
-META.json
-LICENSE

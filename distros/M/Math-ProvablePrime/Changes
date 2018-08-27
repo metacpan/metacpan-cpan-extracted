@@ -1,13 +1,25 @@
 Revision history for Perl module Math::ProvablePrime
 
-0.01 Sat Dec 10 2016
-    - original release
+0.045
+    - Fix LICENSE file.
 
-0.02 Wed Dec 14 2016
-    - fix to Miller/Rabin test logic (“//=” in Perl vs. Python)
-    - fix a function name typo (I guess it was never called?)
-    - minor optimizations
-    - remove Test::Deep as a requirement from test (it was unused)
+0.044
+    - A few BigInt optimizations … for what it’s worth!
+    - Add LICENSE file.
+
+0.043 Tue Jan 03 2017
+    - Fix Makefile.PL to include Bytes::Random::Secure::Tiny dependency
+
+0.042 Tue Dec 27 2016
+    - Add planned deprecation notice
+    - Several small optimizations (thanks to Dana Jacobsen)
+    - Remove ptab iteration for >31 bits
+
+0.041 Fri Dec 16 2016
+    - Add minimum version for Math::BigInt
+
+0.04 Thu Dec 15 2016
+    - fix another missing test dependency (Test::Class)
 
 0.03 Thu Dec 15 2016
     - fix scope typo in Miller/Rabin check
@@ -15,16 +27,11 @@ Revision history for Perl module Math::ProvablePrime
     - test random integer generation
     - remove “leftover” Bytes::Random::Secure::Tiny dependency
 
-0.04 Thu Dec 15 2016
-    - fix another missing test dependency (Test::Class)
+0.02 Wed Dec 14 2016
+    - fix to Miller/Rabin test logic (“//=” in Perl vs. Python)
+    - fix a function name typo (I guess it was never called?)
+    - minor optimizations
+    - remove Test::Deep as a requirement from test (it was unused)
 
-0.041 Fri Dec 16 2016
-    - Add minimum version for Math::BigInt
-
-0.042 Tue Dec 27 2016
-    - Add planned deprecation notice
-    - Several small optimizations (thanks to Dana Jacobsen)
-    - Remove ptab iteration for >31 bits
-
-0.043 Tue Jan 03 2017
-    - Fix Makefile.PL to include Bytes::Random::Secure::Tiny dependency
+0.01 Sat Dec 10 2016
+    - original release

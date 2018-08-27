@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::LatestIndex;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: A cache of the latest version of a dist by author
 
 #pod =head1 SYNOPSIS
@@ -142,7 +142,7 @@ CPAN::Testers::Schema::Result::LatestIndex - A cache of the latest version of a 
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -220,19 +220,9 @@ L<CPAN::Testers::Schema::Result::Upload>.
 L<DBIx::Class::Row>, L<CPAN::Testers::Schema>,
 L<CPAN::Testers::Schema::Result::Upload>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

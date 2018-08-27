@@ -1,3 +1,7 @@
+0.05
+        - ProhibitUnusedImport: ignore Getopt::Long for it has special argument spec.
+        - ProhibitUnusedConstant: avoid a case of false positive.
+
 0.04
         - ProhibitUnusedImport: ignore all pragmas.
         - add: ProhibitExcessiveColons

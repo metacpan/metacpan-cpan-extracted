@@ -5,7 +5,7 @@
       "Sergey Aleynikov <randir@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -54,5 +54,5 @@
          "url" : "https://github.com/vovkasm/Class-Accessor-Inherited-XS"
       }
    },
-   "version" : "0.34"
+   "version" : "0.35"
 }

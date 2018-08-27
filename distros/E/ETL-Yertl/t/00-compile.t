@@ -2,28 +2,26 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ETL/Yertl.pm',
     'ETL/Yertl/Adapter/graphite.pm',
     'ETL/Yertl/Adapter/influxdb.pm',
-    'ETL/Yertl/Command/yfrom.pm',
     'ETL/Yertl/Command/ygrok.pm',
     'ETL/Yertl/Command/yq.pm',
     'ETL/Yertl/Command/yq/Regex.pm',
     'ETL/Yertl/Command/ysql.pm',
-    'ETL/Yertl/Command/yto.pm',
     'ETL/Yertl/Command/yts.pm',
     'ETL/Yertl/Format.pm',
     'ETL/Yertl/Format/csv.pm',
-    'ETL/Yertl/Format/default.pm',
     'ETL/Yertl/Format/json.pm',
     'ETL/Yertl/Format/yaml.pm',
+    'ETL/Yertl/FormatStream.pm',
     'ETL/Yertl/Util.pm'
 );
 
@@ -65,7 +63,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -82,6 +80,9 @@ foreach my $file (@scripts)
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
     @switches = (@switches, split(' ', $1)) if $1;
 
+    close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
+        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
+
     my $stderr = IO::Handle->new;
 
     diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
@@ -95,7 +96,7 @@ foreach my $file (@scripts)
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

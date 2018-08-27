@@ -1,5 +1,10 @@
 # Change file for File::Hotfolder
 
+0.06  2018-08-26 21:08:22 CEST
+    - support forking (issue #6)
+    - bugfix for new directory race
+    - added event_mask param
+
 0.04  2015-03-26 11:53:22 CET
     - improved filter and new option: filter_dir (issue #7)
     - extended logging

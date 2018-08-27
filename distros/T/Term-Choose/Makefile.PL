@@ -8,7 +8,10 @@ my %prereqs_os_specific;
 
 if ( $^O eq 'MSWin32' ) {
     %prereqs_os_specific = (
-        'Win32::Console' => 0,
+        'Encode'                          => 0,
+        'Encode::Locale'                  => 0,
+        'Win32::Console'                  => 0,
+        'Win32::Console::PatchForRT33513' => 0,
     );
 }
 

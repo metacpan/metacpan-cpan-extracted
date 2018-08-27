@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::deployment::deploy;
-$Footprintless::App::Command::deployment::deploy::VERSION = '1.28';
+$Footprintless::App::Command::deployment::deploy::VERSION = '1.29';
 # ABSTRACT: deploys all files managed by the deployment
 # PODNAME: Footprintless::App::Command::deployment::deploy
 
@@ -54,7 +54,7 @@ Footprintless::App::Command::deployment::deploy - deploys all files managed by t
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 AUTHOR
 

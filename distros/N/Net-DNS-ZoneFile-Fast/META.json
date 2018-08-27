@@ -31,22 +31,10 @@
          }
       },
       "runtime" : {
-         "requires" : {
-            "IO::File" : "0",
-            "MIME::Base64" : "0",
-            "Net::DNS" : "0.65",
-            "Net::DNS::SEC" : "0.15"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "svn",
-         "url" : "https://dnssec-tools.org/svn/dnssec-tools/",
-         "web" : "https://dnssec-tools.org/svn/dnssec-tools/"
-      }
-   },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

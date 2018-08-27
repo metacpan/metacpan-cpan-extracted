@@ -1,5 +1,17 @@
 Revision history for App-Git-Info
 
+0.2.0       2018-08-22
+    - Put the actual processing in a main::run() sub.
+        - In part to silence the tests.
+        - Breaking change.
+
+0.0.3       2018-08-21
+    - Fix the abstract in the POD
+        - https://github.com/shlomif/perl-App-Git-Info/pull/1
+        - Thanks to MANWAR
+    - Fix a trailing double newline at the output of "git info info"
+        - Resulted in an empty line.
+
 0.0.2       2018-08-21
     - Fix "git info info"
         - App::Rad does not seem too suitable for writing modulinos

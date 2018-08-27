@@ -1,0 +1,77 @@
+=pod
+
+=head1 NAME
+
+File::Generator
+
+=head1 SYNOPSIS
+
+A module for exporting test files
+
+  use strict;
+  use warnings;
+  use File::Generator
+  
+  my $generator = File::Generator->new();
+  my $fastqFile = $generator->generate("fastq");
+  my $fastqFile2= $generator->generate("fastq");
+  my $largeFastq= $generator->generate("fastq",{maxbytes=>10000});
+
+=head1 DESCRIPTION
+
+Generate random test files.
+
+=pod
+
+=head1 METHODS
+
+=over
+
+=item File::Generator->new(\%options)
+
+Create a new instance of the file generator with the following options
+
+  Applicable arguments:
+  Argument     Default    Description
+  tempdir                 A temporary directory. If not supplied,
+                          one will be created for you in $TMPDIR
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $generator->generate($fileType,\%options)
+
+Generate a type of file
+
+  Arguments: $fileType (string) - a type of file to generate
+                Available types: "fastq", "fasta"
+             %options
+               maxbytes - up to how many bytes of the output
+                          you want to make. 
+
+  Returns:   Path to a file (string)
+
+=back
+
+
+=cut
+
+=head1 COPYRIGHT AND LICENSE
+
+MIT license.  Go nuts.
+
+=head1 AUTHOR
+
+Author: Lee Katz <lkatz@cdc.gov>
+
+For additional help, go to https://github.com/lskatz/File--Generator
+
+
+=cut
+

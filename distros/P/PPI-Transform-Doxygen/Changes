@@ -1,3 +1,7 @@
+0.33 2018-08-24
+  - C<> formatting will be converted to inline monospaced text instead of blocks
+  - added support for Class::Method::Modifier (before, after, around, fresh)
+
 0.32 2018-05-22
   - remove debugging code
 

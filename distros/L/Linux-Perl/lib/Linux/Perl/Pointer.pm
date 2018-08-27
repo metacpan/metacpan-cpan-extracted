@@ -1,5 +1,8 @@
 package Linux::Perl::Pointer;
 
+use strict;
+use warnings;
+
 use constant UNPACK_TMPL => (4 == length pack 'P') ? 'L' : 'Q';
 
 sub get_address {

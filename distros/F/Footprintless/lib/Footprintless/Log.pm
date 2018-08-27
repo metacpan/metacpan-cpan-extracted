@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Log;
-$Footprintless::Log::VERSION = '1.28';
+$Footprintless::Log::VERSION = '1.29';
 # ABSTRACT: A log manager
 # PODNAME: Footprintless::Log
 
@@ -208,7 +208,7 @@ Footprintless::Log - A log manager
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000011';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(parse_text to_editor_args);
@@ -42,10 +42,11 @@ sub parse_text {
         }
     }
 
-    if ( $file_name && $sub_name && $^O ne 'MSWin32' ) {
-        my $grep = `grep -n "sub $sub_name" $file_name`;
-        my @results = split m{:}, $grep;
-        $line_number = shift @results;
+    if ( !$line_number ) {
+        $line_number = _maybe_extract_line_number_via_sub_name(
+            $file_name,
+            $sub_name
+        );
     }
 
     return $file_name
@@ -115,6 +116,21 @@ sub _maybe_extract_subroutine_name {
     return undef;
 }
 
+sub _maybe_extract_line_number_via_sub_name {
+    my $file_name = shift;
+    my $sub_name  = shift;
+
+    if ( $file_name && $sub_name && open( my $fh, '<', $file_name ) ) {
+        my $line_number = 1;
+        while ( my $line = <$fh> ) {
+            if ( $line =~ m{sub $sub_name\b} ) {
+                return $line_number;
+            }
+            ++$line_number;
+        }
+    }
+}
+
 sub _maybe_find_local_file {
     my $text          = shift;
     my $possible_name = module_notional_filename($text);
@@ -147,7 +163,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000009
+version 0.000011
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,11 @@
 Revision history for Perl module Mojolicious::Plugin::RevealJS
 
+0.13 2018-08-27
+  - Add include_filename directive to include_code
+  - Add section helper
+  - Add markdown_section helper
+  - Bump bundled reveal.js to 3.7.0
+
 0.12 2017-06-17
   - Bump bundled reveal.js to 3.5.0
   - Add a configurable base tag

@@ -10,7 +10,7 @@ plan skip_all => "DBD::SQLite cannot be loaded" if $@;
 eval "use PadWalker;";
 plan skip_all => "PadWalker cannot be loaded" if $@;
 
-plan tests => 99;
+plan tests => 104;
 
 my $dbh = DBI->connect("dbi:SQLite:");
 ok($dbh, "db connection");
@@ -22,9 +22,9 @@ my $o = DBIx::Perlish->new(dbh => $dbh);
 ok((db_insert 'names', { id => 1, name => "hello" }), "insert one");
 ok((db_insert 'names', { id => 33, name => "smth/xx" }), "insert one more");
 ok($o->insert('names', { id => 3, name => "ehlo" }), "obj: insert one");
-is(scalar db_fetch { my $t : names; $t->id == 1; return $t->name; }, "hello", "fetch inserted");
-is(scalar db_fetch { my $t : names; $t->name =~ /^h/; return $t->name; }, "hello", "fetch anchored regex");
-is(scalar db_fetch { my $t : names; $t->name =~ /\//; return $t->name; }, "smth/xx", "fetch regex with /");
+is(scalar (db_fetch { my $t : names; $t->id == 1; return $t->name; }), "hello", "fetch inserted");
+is(scalar (db_fetch { my $t : names; $t->name =~ /^h/; return $t->name; }), "hello", "fetch anchored regex");
+is(scalar (db_fetch { my $t : names; $t->name =~ /\//; return $t->name; }), "smth/xx", "fetch regex with /");
 ok((db_delete { names->id == 33 }), "delete one now");
 
 my $h = db_fetch { my $t : names; $t->id == 1; return -k $t->id, $t; };
@@ -117,19 +117,26 @@ is($o->sql, "select * from names t01", "obj: sql()");
 is(scalar $o->bind_values, 0, "obj: bind_values()");
 
 is(scalar $o->fetch(sub { my $t : names; $t->id == 1; return $t->name; }), "hello", "obj: fetch inserted");
-is(scalar db_fetch { my $t : names; $t->id == 2; return $t->name; }, undef, "fetch non-existent");
+is(scalar (db_fetch { my $t : names; $t->id == 2; return $t->name; }), undef, "fetch non-existent");
 ok((db_update { names->name = "aha"; exec }), "update all");
 ok($o->update(sub { names->name = "behe"; exec }), "obj: update all");
 @n = $o->bind_values;
 is(scalar(@n), 1, "obj: update all bind_values count");
 is($n[0], "behe", "obj: update all bind_values value");
-is(scalar db_fetch { my $t : names; $t->id == 1; return $t->name; }, "behe", "fetch updated");
-is(scalar db_select { my $t : names; $t->id == 1; return $t->name; }, "behe", "select updated");
+is(scalar (db_fetch { my $t : names; $t->id == 1; return $t->name; }), "behe", "fetch updated");
+is(scalar (db_select { my $t : names; $t->id == 1; return $t->name; }), "behe", "select updated");
 ok((db_delete { names->id == 3 }), "delete one");
 ok($o->delete(sub { names->id == 1 }), "obj: delete one");
-is(scalar db_fetch { my $t : names; $t->id == 1; return $t->name; }, undef, "fetch deleted");
+is(scalar (db_fetch { my $t : names; $t->id == 1; return $t->name; }), undef, "fetch deleted");
 
 ok((db_insert 'names', { id => sql 5, name => "five" }), "insert with verbatim");
+
+@n = ();
+$r = [];
+is( scalar (db_fetch { my $t : names; $t->id < -@n }), undef, "empty in 1");
+is( scalar (db_fetch { my $t : names; $t->id < -@$r }), undef, "empty in 2");
+is( scalar (db_fetch { my $union:table = subselect { my $t : names; $t->id < -@n } }), undef, "empty in 3");
+is( scalar (db_fetch { my $union:table = subselect { my $t : names; $t->id < -@$r } }), undef, "empty in 4");
 
 # just to bump up coverage - those red things annoy me
 union     {}; pass("coverage: union");
@@ -139,12 +146,14 @@ sql "haha"  ; pass("coverage: sql");
 
 ok((db_insert 'names', { id => 700, name => "bebe" },
                        { id => 701, name => sql("'wxyz'") },
-                       { id => 702, name => "meme" },
+                       { id => 702, name => "me'me" },
 ), "insert three");
-is(scalar db_fetch { my $t : names; $t->id == 700; return $t->name; }, "bebe", "fetch multi-inserted 700");
-is(scalar db_fetch { my $t : names; $t->id == 701; return $t->name; }, "wxyz", "fetch multi-inserted 701");
-is(scalar db_fetch { my $t : names; $t->id == 702; return $t->name; }, "meme", "fetch multi-inserted 702");
+is(scalar (db_fetch { my $t : names; $t->id == 700; return $t->name; }), "bebe", "fetch multi-inserted 700");
+is(scalar (db_fetch { my $t : names; $t->id == 701; return $t->name; }), "wxyz", "fetch multi-inserted 701");
+is(scalar (db_fetch { my $t : names; $t->id == 702; return $t->name; }), "me'me", "fetch multi-inserted 702");
 
 
-DBIx::Perlish::init($dbh);
-is(scalar db_fetch { my $t : names; $t->id == 1; return $t->name; }, undef, "one more fetch deleted");
+is(scalar (db_fetch { my $t : names; $t->id == 1; return $t->name; }), undef, "one more fetch deleted");
+
+my $q = "'";
+is( scalar (db_fetch { my $t : names; $t->name =~ $q; return $t->name }), "me'me", "fetch with quote");

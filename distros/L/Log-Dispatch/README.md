@@ -4,7 +4,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 # VERSION
 
-version 2.67
+version 2.68
 
 # SYNOPSIS
 
@@ -150,15 +150,14 @@ You can also pass a subroutine reference, just like passing one to the
 Has the same behavior as calling `log()` but calls
 `_die_with_message()` at the end.
 
-## $dispatch->log\_and\_croak( level => $, message => $ or \\& )
-
-This method adjusts the `$Carp::CarpLevel` scalar so that the croak
-comes from the context in which it is called.
-
 You can throw exception objects by subclassing this method.
 
 If the `carp_level` parameter is present its value will be added to
 the current value of `$Carp::CarpLevel`.
+
+## $dispatch->log\_and\_croak( level => $, message => $ or \\& )
+
+A synonym for `$dispatch-`log\_and\_die()>.
 
 ## $dispatch->log\_to( name => $, level => $, message => $ )
 
@@ -403,6 +402,7 @@ Dave Rolsky <autarch@urth.org>
 - Doug Bell <doug@preaction.me>
 - Graham Ollis <plicease@cpan.org>
 - Gregory Oschwald <goschwald@maxmind.com>
+- hartzell <hartzell@alerce.com>
 - Johann Rolschewski <jorol@cpan.org>
 - Jonathan Swartz <swartz@pobox.com>
 - Karen Etheridge <ether@cpan.org>
@@ -415,13 +415,14 @@ Dave Rolsky <autarch@urth.org>
 - Rohan Carly <se456@rohan.id.au>
 - Ross Attrill <ross.attrill@gmail.com>
 - Salvador Fandiño <sfandino@yahoo.com>
+- Sergey Leschenko <sergle.ua@gmail.com>
 - Slaven Rezic <srezic@cpan.org>
 - Steve Bertrand <steveb@cpan.org>
 - Whitney Jackson <whitney.jackson@baml.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000413';
+our $VERSION='1.0000415';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -568,8 +568,10 @@ $SIG{ INT } = sub{ eval { require Term::ReadKey };
 $SIG{__DIE__} = sub{ eval { require Term::ReadKey };
                    unless ($@) { Term::ReadKey::ReadMode(0) };
                    print "\n";
-                   print $tee "FATAL ERROR!: $_[0]\n" if $tee;
-                   print "FATAL ERROR!: $_[0]\n";
+                   print $tee "FATAL ERROR!: $_[0]\n" if $tee
+                     && $_[0]!~/close_everything/;
+                   print "FATAL ERROR!: $_[0]\n"
+                     && $_[0]!~/close_everything/;
                    $tee->close() if $tee;
                    $log->close() if $log;
                    <STDIN> if exists $ENV{PAR_TEMP};
@@ -4342,8 +4344,8 @@ if ($get_BerkeleyDB) {
                require CPAN;
                CPAN::Shell->force('install',$p);
             };
-            eval "use $p;1" ||
-               fa_die("$@ *** Please manually install $p from cpan.org first...\n")
+            #eval "use $p;1" ||
+            #   fa_die("$@ *** Please manually install $p from cpan.org first...\n");
          }
       }
    }
@@ -4351,6 +4353,8 @@ if ($get_BerkeleyDB) {
 
 chdir $cwd;
 
+my $x=1;
+if ($x==0) {
 my $B_flag=1;
 while (1) {
    eval {
@@ -4403,6 +4407,7 @@ END
    }
    last
 }
+}
 
 sub download_berkeleydb {
 
@@ -4443,7 +4448,6 @@ sub download_berkeleydb {
          my $file=$2;
          my $file=substr($file,(index $file,'/')+1,-7);
          my $ver=$file;
-         $ver=~s/_.*$//;
          $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
          my $timeout=120;my $a='';my $w="      ";
          my $pre="/usr/local/BerkeleyDB.$ver";
@@ -4798,8 +4802,7 @@ END
             $filename=~s/........NC.tar$//;
             `mv -f $filename.NC $filename.NC_$uniq`;
          }
-         my $ver=$file;
-         $ver=~s/_.*$//;
+         my $ver=$filename;
          $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
          my $timeout=120;my $a='';my $w="      ";
          my $pre="/usr/local/BerkeleyDB.$ver";

@@ -43,7 +43,7 @@
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.01",
-            "Test::NoWarnings" : "0.01"
+            "Test::NoWarnings" : "0"
          }
       }
    },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/FGasper/p5-Math-ProvablePrime"
       }
    },
-   "version" : 0.043,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.045,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,7 @@
 package Image::Synchronize;
 
+# TODO: Prevent Thumbs.db files from being attempted to write to
+
 =head1 NAME
 
 Image::Synchronize - a module for synchronizing filesystem
@@ -77,7 +79,7 @@ use YAML::Any qw(
   LoadFile
 );
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 my $CASE_TOLERANT;
 
@@ -264,6 +266,11 @@ sub add_maybe {
   return ();
 }
 
+#  $corrected_time = apply_camera_offset($time, $offset);
+#
+# Applies camera offset C<$offset> (in seconds) to a clones of
+# C<$time>, which must be a Synchronize::Timestamp.  Returns the
+# clone.
 sub apply_camera_offset {
   my ( $t, $offset ) = @_;
   $t = $t->clone;
@@ -327,6 +334,11 @@ sub camera_id {
   return $id;
 }
 
+#   $camera_id = $ims->camera_id_from_fallback($fallback_camera_id);
+#
+# Returns the regular camera ID of a camera that has a fallback camera
+# ID equal to C<$fallback_camera_id>, or C<undef> if there is no such
+# camera.
 sub camera_id_from_fallback {
   my ( $self, $fallback_camera_id ) = @_;
   my $r = $self->{fallback_to_camera_id}->{$fallback_camera_id};
@@ -334,6 +346,8 @@ sub camera_id_from_fallback {
     my @candidates =
       sort { ( $r->{$b} <=> $r->{$a} ) or ( $a cmp $b ) } keys %{$r};
     return $candidates[0];
+  } else {
+    return;
   }
 }
 
@@ -346,7 +360,7 @@ sub camera_id_from_fallback {
 # isn't set, and otherwise uses that file name in the directory
 # defined by the C<HOME> environment variable.
 sub camera_offsets_path {
-  my ( $self, $write ) = @_;
+  my ( $self ) = @_;
   my $path = $self->option('offsetspath');
   if ( not $path ) {
     $path = '.imsync-cameraoffsets.yaml';
@@ -419,13 +433,16 @@ sub common_prefix_path {
   return common_prefix( '/', @_ );
 }
 
+# This is a callback function
 sub convert_to_xmp {
   my ( $tag, $in, $out ) = @_;
   $out->{ 'XMP:' . $tag } = $in;
 }
 
-# deduce the camera timezone offset from the $camera_time and the
-# $target_time.  The $target_time must be an absolute time (with
+#  $offset = deduce_camera_offset($camera_time, $target_time);
+#
+# deduce the camera timezone offset from the C<$camera_time> and the
+# C<$target_time>.  The $target_time must be an absolute time (with
 # timezone offset).
 sub deduce_camera_offset {
   my ( $camera_time, $target_time ) = @_;
@@ -1164,6 +1181,8 @@ sub display_offset {
   return $result;
 }
 
+#  $regex = end_glob_to_regex($pattern);
+#
 # return a regular expression corresponding to glob C<$pattern>.
 sub end_glob_to_regex {
   my ($pattern) = @_;
@@ -1175,7 +1194,7 @@ sub end_glob_to_regex {
   return qr/${case}${pattern}$/;
 }
 
-#  $success = ensure_backup($file);
+#  $success = $ims->ensure_backup($file);
 #
 # Ensures that there is a backup of the $file.  The name of the backup
 # is equal to $file with '_original' appended.  If such a file does
@@ -1208,6 +1227,9 @@ sub ensure_backup {
   }
 }
 
+#  $ims->export_camera_offsets;
+#
+# Export the camera offsets.  Returns C<$ims>.
 sub export_camera_offsets {
   my ($self) = @_;
   my $path   = $self->camera_offsets_path(1);
@@ -1217,6 +1239,9 @@ sub export_camera_offsets {
   $self;
 }
 
+#  $ims->exportgpx($exportfile);
+#
+# Exports the positions to GPX file C<$exportfile>.  Returns C<$ims>.
 sub exportgpx {
   my ( $self, $exportfile ) = @_;
 
@@ -1313,6 +1338,22 @@ sub exportgpx {
 sub fallback_camera_id {
   my ( $path, $info ) = @_;
   return '?' . basename_pattern($path);
+}
+
+#   @targets = $ims->find_info_targets($t);
+#
+# Returns the files that match C<$t>, which must be a
+# Synchronize::Timestamp or a Synchronize::Timerange.
+sub find_info_targets {
+  my ( $self, $t ) = @_;
+  my @targets;
+  foreach my $file ( keys %{ $self->{original_info} } ) {
+    my $create_date = $self->{original_info}->{$file}->get('CreateDate');
+    next unless defined $create_date;
+    push @targets, $file
+      if $t->contains_local($create_date);
+  }
+  return @targets;
 }
 
 #  $r = geo_distance([$latitude1, $longitude1, $altitude1],

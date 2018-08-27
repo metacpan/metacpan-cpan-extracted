@@ -1,5 +1,5 @@
 package Exception::DB::NoFieldsAvailable;
-$Exception::DB::NoFieldsAvailable::VERSION = '0.027';
+$Exception::DB::NoFieldsAvailable::VERSION = '0.029';
 use base qw(Exception::DB);
 
 =head1 Name
@@ -13,7 +13,7 @@ Base class for DB queries.
 =cut
 
 package QBit::Application::Model::DB::Query;
-$QBit::Application::Model::DB::Query::VERSION = '0.027';
+$QBit::Application::Model::DB::Query::VERSION = '0.029';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);

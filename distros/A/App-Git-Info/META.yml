@@ -1,5 +1,5 @@
 ---
-abstract: 'displays a summary of information about the git repository.'
+abstract: 'Displays a summary of information about the git repository.'
 author:
   - 'Shlomi Fish <shlomif@cpan.org>'
 build_requires:
@@ -20,7 +20,7 @@ name: App-Git-Info
 provides:
   App::Git::Info:
     file: lib/App/Git/Info.pm
-    version: v0.0.2
+    version: v0.2.0
 requires:
   App::Rad: '0'
   perl: '5.016'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-git-info/issues
   homepage: http://metacpan.org/release/App-Git-Info
   repository: https://github.com/shlomif/perl-App-Git-Info.git
-version: 0.0.2
+version: 0.2.0
 x_Dist_Zilla:
   perl:
     version: '5.028000'

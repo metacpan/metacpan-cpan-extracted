@@ -1,13 +1,14 @@
   package HO::accessor
 # ++++++++++++++++++++
 ; use strict; use warnings;
-our $VERSION='0.051';
+our $VERSION='0.052';
 
 ; use Class::ISA
 ; require Carp
 
 ; my %classes
 ; my %accessors
+; my %methods
 
 ; our %type = ('@'=>sub () {[]}, '%'=>sub () {{}}, '$'=>sub () {undef})
 
@@ -163,7 +164,7 @@ our $VERSION='0.051';
     }
 
 ; sub import
-    { my ($package,$ac,$init,$new) = @_
+    { my ($package,$ac,$methods,$init,$new) = @_
     ; $ac   ||= []
 
     ; my $caller = $HO::accessor::class || CORE::caller
@@ -218,6 +219,9 @@ our $VERSION='0.051';
       ; foreach my $acc (@class_accessors)
           { *{"${caller}::${acc}"}=$accessors{$caller}{$acc}
           }
+
+      ; my %class_methods = @$methods
+      ; $methods{$caller} = \%class_methods
       }
 
     # setup init method
@@ -243,6 +247,11 @@ our $VERSION='0.051';
 ; sub _value_of
     { my ($class,$accessorname) = @_
     ; return $accessors{$class}{$accessorname}->()
+    }
+
+; sub _methods_code
+    { my ($class,$methodname) = @_
+    ; return $methods{$class}{$methodname}
     }
 
 ; 1

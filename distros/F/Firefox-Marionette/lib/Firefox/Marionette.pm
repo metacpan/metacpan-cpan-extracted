@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -239,6 +239,33 @@ sub new {
         Firefox::Marionette::Exception->throw(
 'Failed to correctly determine the Firefox process id through the initial connection capabilities'
         );
+    }
+    if (   ( defined $parameters{implicit} )
+        || ( defined $parameters{page_load} )
+        || ( defined $parameters{script} ) )
+    {
+        my $page_load =
+          defined $parameters{page_load}
+          ? $parameters{page_load}
+          : _DEFAULT_PAGE_LOAD_TIMEOUT();
+        my $script =
+          defined $parameters{script}
+          ? $parameters{script}
+          : _DEFAULT_SCRIPT_TIMEOUT();
+        my $implicit =
+          defined $parameters{implicit}
+          ? $parameters{implicit}
+          : _DEFAULT_IMPLICIT_TIMEOUT();
+        $self->timeouts(
+            Firefox::Marionette::Timeouts->new(
+                page_load => $page_load,
+                script    => $script,
+                implicit  => $implicit,
+            )
+        );
+    }
+    elsif ( $parameters{timeouts} ) {
+        $self->timeouts( $parameters{timeouts} );
     }
     return $self;
 }
@@ -3103,7 +3130,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.58
+Version 0.59
 
 =head1 SYNOPSIS
 
@@ -3152,13 +3179,21 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * visible - should firefox be visible on the desktop.  This defaults to "0".
 
+=item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
+
+=item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeout#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * script - a shortcut to allow directly providing the L<script|Firefox::Marionette::Timeout#script> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
 =back
 
 This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>.  In a non MacOS/Win32/Cygwin environment, if necessary (no DISPLAY variable can be found and visible has been set to true) and possible (Xvfb can be executed successfully), this method will also automatically start an L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.
  
 =head2 go
 
-Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods
+Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods
 
 =head2 uri
 
@@ -3563,11 +3598,11 @@ returns the active element of the current browsing context's document element, i
 
 =head2 back
 
-causes the browser to traverse one step backward in the joint history of the current browsing context.  The browser will wait for the one step backward to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+causes the browser to traverse one step backward in the joint history of the current browsing context.  The browser will wait for the one step backward to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 forward
 
-causes the browser to traverse one step forward in the joint history of the current browsing context. The browser will wait for the one step forward to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+causes the browser to traverse one step forward in the joint history of the current browsing context. The browser will wait for the one step forward to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 active_frame
 
@@ -3611,7 +3646,7 @@ maximises the firefox window. This method returns L<itself|Firefox::Marionette> 
 
 =head2 refresh
 
-refreshes the current page.  The browser will wait for the page to completely refresh or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+refreshes the current page.  The browser will wait for the page to completely refresh or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 alert_text
 
@@ -3681,7 +3716,7 @@ accepts a L<element|Firefox::Marionette::Element> as the first parameter and cle
 
 =head2 click
 
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
 
 =head2 timeouts
 
@@ -3954,6 +3989,26 @@ Please report any bugs or feature requests to
 C<bug-firefox-marionette@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
+=head1 SEE ALSO
+
+=over
+
+=item *
+L<MozRepl|MozRepl>
+
+=item *
+L<Selenium::Firefox|Selenium::Firefox>
+
+=item *
+L<Firefox::Application|Firefox::Application>
+
+=item *
+L<Mozilla::Mechanize|Mozilla::Mechanize>
+
+=item *
+L<Gtk2::MozEmbed|Gtk2::MozEmbed>
+
+=back
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
   package HO::class
 # *****************
 ; use strict; use warnings;
-  our $VERSION='0.074';
+  our $VERSION='0.076';
 # ********************
 
 ; require HO::accessor
@@ -83,7 +83,7 @@
                             })->()
     }
     ; { local $HO::accessor::class = $class
-      ; import HO::accessor:: (\@acc,$makeinit,$makeconstr)
+      ; import HO::accessor:: (\@acc,\@methods,$makeinit,$makeconstr)
       }
 
     ; { no strict 'refs'
@@ -112,10 +112,10 @@
       ; while(@lvalue)
           { my $name = shift(@lvalue)
           ; my $acc = "_$name"
-          ; my $idx = HO::accessor::_value_of($class, $acc)
+          # lvalue methods are inherited not copied, so they needs to have dynamic index
           ; *{join('::',$class,$name)} = sub : lvalue
                { my $self = shift();
-               ; $self->[$idx]
+               ; $self->[$self->$acc]
                }
           }
       ; while(my ($name,$subdata) = splice(@r_,0,2))
@@ -123,9 +123,8 @@
           ; *{join('::',$class,$name)} = $coderef->($name,$class)
           }
       ; while(my ($new,$subname) = splice(@alias,0,2))
-          { my $idx = HO::accessor::_value_of($class,"_$subname")
-          ; *{join('::',$class,$new)} = \&{join('::',$class,$subname)}
-          ; *{join('::',$class,"_$new")} = \&{join('::',$class,"_$subname")}
+          { my $code = HO::accessor::_methods_code($class, $subname)
+          ; *{join('::',$class,$new)} = $code
           }
       }
     }
@@ -155,7 +154,8 @@ HO::class - class builder for hierarchical objects
       _method => huh => sub { print 'go' },
       _rw     => bla => '%',
       _ro     => foo => '$',
-      alias   => foobar => 'foo';
+      _ro     => bar => sub { 'dub' },
+      alias   => go => 'huh';
 
     sub init {
        my ($self,@args) = @_;
@@ -195,6 +195,11 @@ The accessor is for read access only.
 
 =item C<_index>
 
+=item C<alias>
+
+Currently alias only works for methods and only when the code is given
+during class definition.
+
 =back
 
 The second field is name of the part from class
@@ -216,6 +221,10 @@ defined in L<HO::accessor> class in the global C<%type> hash.
 =item $ - means a scalar and defaults to undef
 
 =back
+
+If the third argument is a subref then the return value of this subref
+is used as a default value for the attribute. To determine the the type,
+this code will be called once during construction.
 
 =head2 Building a class at runtime
 
@@ -263,6 +272,11 @@ existence of a colon in the name is checked.
 
 Development started because there was no class builder for array based
 objects with all the features I needed.
+
+=head1 BUGS
+
+Yes, there are bugs in this software. Probably it is only good for
+experiments and not for serious code.
 
 =head1 ACKNOWLEDGEMENT
 

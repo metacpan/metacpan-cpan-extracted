@@ -21,14 +21,14 @@ cpanm QBit::Application::Model::DB
 
 =item *
 
-apt-get install libqbit-application-model-db-perl (http://perlhub.ru/)
+cpanm https://github.com/QBitFramework/QBit-Application-Model-DB.git
 
 =back
 
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.027';
+$QBit::Application::Model::DB::VERSION = '0.029';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -143,8 +143,8 @@ sub meta {
 
     throw gettext("First argument must be package name, QBit::Application::Model::DB descendant")
       if !$package
-          || ref($package)
-          || !$package->isa('QBit::Application::Model::DB');
+      || ref($package)
+      || !$package->isa('QBit::Application::Model::DB');
 
     my $pkg_stash = package_stash(ref($package) || $package);
     $pkg_stash->{'__META__'} = \%meta;
@@ -210,49 +210,120 @@ sub init {
     unless (package_stash(ref($self))->{'__METHODS_CREATED__'}) {
         my $meta = $self->get_all_meta();
 
-        my %tables;
-        foreach my $table_name (keys(%{$meta->{'tables'} || {}})) {
-            my %table = %{$meta->{'tables'}{$table_name}};
-
-            $table{'class'} = $self->_get_table_class(type => $table{'type'});
-            $table{'fields'}       = [$table{'class'}->default_fields(%table),       @{$table{'fields'}       || []}];
-            $table{'indexes'}      = [$table{'class'}->default_indexes(%table),      @{$table{'indexes'}      || []}];
-            $table{'foreign_keys'} = [$table{'class'}->default_foreign_keys(%table), @{$table{'foreign_keys'} || []}];
-            $table{'primary_key'}  = $table{'class'}->default_primary_key(%table)
-              unless exists($table{'primary_key'});
-
-            $tables{$table_name} = \%table;
-        }
-
-        $self->{'__TABLE_TREE_LEVEL__'}{$_} = $self->_table_tree_level(\%tables, $_, 0) foreach keys(%tables);
-        $self->{'__TABLES__'} = {};
-
-        my $class = ref($self);
-
-        foreach my $table_name ($self->_sorted_tables(keys(%tables))) {
-            throw gettext('Cannot create table object, "%s" is reserved', $table_name)
-              if $self->can($table_name);
-            {
-                no strict 'refs';
-                *{$class . '::' . $table_name} = sub {
-                    my ($self) = @_;
-
-                    $self->{'__TABLES__'}{$table_name} = $tables{$table_name}->{'class'}->new(
-                        %{$tables{$table_name}},
-                        name => $table_name,
-                        db   => $self,
-                    ) unless exists($self->{'__TABLES__'}{$table_name});
-
-                    return $self->{'__TABLES__'}{$table_name};
-                };
-            };
-            $self->$table_name if $self->get_option('preload_accessors');
-        }
+        $self->make_tables($meta->{'tables'} // {});
 
         package_stash(ref($self))->{'__METHODS_CREATED__'} = TRUE;
     }
 
     $self->{'__SAVEPOINTS__'} = 0;
+}
+
+=head2 make_tables
+
+It create "accessors" for accessing tables.
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<$tables> - reference of a hash (required).
+
+  {
+      table_name => <string (table name also)>,
+      table_name => <object (QBit::Application::Model::DB::Table)>,
+      table_name => <hash (definition of a table)>,
+  }
+
+=back
+
+B<Example:>
+
+  $app->db->make_tables({clients => 'users'});
+  # or
+  $app->db->make_tables({clients => $app->db->users});
+  # or
+  $app->db->make_tables({
+      clients => {
+         fields       => ...,
+         primary_key  => ...,
+         indexes      => ...,
+         foreign_keys => ...,
+         collate      => ...,
+         engine       => ...,
+      }
+  });
+
+  # after
+  $app->db->clients->create();
+  $app->db->clients->add_multi(...);
+  $app->db->drop();
+
+=cut
+
+sub make_tables {
+    my ($self, $tables_meta) = @_;
+
+    my $class     = ref($self);
+    my $pkg_stash = package_stash($class);
+
+    my ($meta, %tables);
+    foreach my $table_name (keys(%$tables_meta)) {
+        my $table_meta = $tables_meta->{$table_name};
+
+        my %table = ();
+        if (ref($table_meta) eq 'HASH') {
+            %table = %$table_meta;
+        } else {
+            my $table_name_template = blessed($table_meta) ? $table_meta->name : $table_meta;
+
+            $meta //= $self->get_all_meta();
+
+            %table = %{$meta->{'tables'}{$table_name_template}};
+        }
+
+        if ($pkg_stash->{'__METHODS_CREATED__'}) {
+            $pkg_stash->{'__META__'}{'tables'}{$table_name} = {%table};
+        }
+
+        $table{'class'} = $self->_get_table_class(type => $table{'type'});
+        $table{'fields'}       = [$table{'class'}->default_fields(%table),       @{$table{'fields'}       || []}];
+        $table{'indexes'}      = [$table{'class'}->default_indexes(%table),      @{$table{'indexes'}      || []}];
+        $table{'foreign_keys'} = [$table{'class'}->default_foreign_keys(%table), @{$table{'foreign_keys'} || []}];
+        $table{'primary_key'}  = $table{'class'}->default_primary_key(%table)
+          unless exists($table{'primary_key'});
+
+        $tables{$table_name} = \%table;
+    }
+
+    $self->{'__TABLE_TREE_LEVEL__'}{$_} = $self->_table_tree_level(\%tables, $_, 0) foreach keys(%tables);
+    $self->{'__TABLES__'} //= {};
+
+    my $preload_accessors = $self->app->get_option('preload_accessors');
+
+    foreach my $table_name ($self->_sorted_tables(keys(%tables))) {
+        throw gettext('Cannot create table object, "%s" is reserved', $table_name)
+          if $self->can($table_name);
+        {
+            no strict 'refs';
+
+            *{$class . '::' . $table_name} = sub {
+                $_[0]->{'__TABLES__'}{$table_name} //= do {
+                    throw gettext('No package for table "%s"', $table_name)
+                      unless defined($tables{$table_name}->{'class'});
+
+                    $tables{$table_name}->{'class'}->new(
+                        %{$tables{$table_name}},
+                        name => $table_name,
+                        db   => $_[0],
+                    );
+                };
+            };
+        };
+
+        $self->$table_name if $preload_accessors;
+    }
 }
 
 =head2 set_dbh
@@ -558,9 +629,7 @@ sub create_sql {
 
     $self->_connect();
 
-    my $SQL = '';
-
-    $SQL .= join("\n\n", map {$self->$_->create_sql()} $self->_get_list_tables(@tables));
+    my $SQL = join("\n\n", map {$self->$_->create_sql()} $self->_get_list_tables(@tables));
 
     return "$SQL\n";
 }
@@ -591,7 +660,7 @@ sub init_db {
     $self->_do($self->$_->create_sql()) foreach $self->_get_list_tables(@tables);
 }
 
-=head2 finish
+=head2 post_run
 
 B<No arguments.>
 
@@ -599,11 +668,11 @@ Check that transaction closed
 
 B<Example:>
 
-  $app->db->finish();
+  $app->db->post_run();
 
 =cut
 
-sub finish {
+sub post_run {
     my ($self) = @_;
 
     if ($self->{'__SAVEPOINTS__'}) {
@@ -716,8 +785,13 @@ sub _table_tree_level {
     return $self->{'__TABLE_TREE_LEVEL__'}{$table_name} + $level
       if exists($self->{'__TABLE_TREE_LEVEL__'}{$table_name});
 
-    my @foreign_tables =
-      ((map {$_->[1]} @{$tables->{$table_name}{'foreign_keys'}}), @{$tables->{$table_name}{'inherits'} || []});
+    my @foreign_tables = ();
+    if (exists($tables->{$table_name})) {
+        @foreign_tables =
+          ((map {$_->[1]} @{$tables->{$table_name}{'foreign_keys'}}), @{$tables->{$table_name}{'inherits'} || []});
+    } else {
+        @foreign_tables = ((map {$_->[1]} @{$self->$table_name->foreign_keys()}), @{$self->$table_name->inherits()});
+    }
 
     return @foreign_tables
       ? array_max(map {$self->_table_tree_level($tables, $_, $level + 1)} @foreign_tables)

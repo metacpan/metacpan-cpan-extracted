@@ -1,5 +1,8 @@
 Revision history for UUID-NCName
 
+0.05    Sun 26 Aug 2018 19:46:55 PDT
+        Data format overhaul; see docs.
+
 0.04    Wed Apr  8 17:21:46 PDT 2015
         Added uuid-ncname script.
 

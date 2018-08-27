@@ -1,6 +1,6 @@
 package Git::CPAN::Patch::Import;
 our $AUTHORITY = 'cpan:YANICK';
-$Git::CPAN::Patch::Import::VERSION = '2.3.2';
+$Git::CPAN::Patch::Import::VERSION = '2.3.4';
 use 5.10.0;
 
 use strict;
@@ -536,7 +536,7 @@ Git::CPAN::Patch::Import
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 DESCRIPTION
 
@@ -553,7 +553,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

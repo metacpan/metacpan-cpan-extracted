@@ -1,4 +1,25 @@
+1.182370  2018-08-25 07:30:40-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * Released as non-trial release
+ * From 1.182362 Added an append routine (appendfile())
+
+1.182362  2018-08-24 16:55:58-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * Added an append routine (appendfile())
+
+1.182361  2018-08-24 05:47:25-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * Released as non-trial release
+ * From 1.182360 Added an examples directory
+ * From 1.182360 Added a write routine (writefile())
+
+1.182360  2018-08-23 22:31:08-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * Added an examples directory
+ * Added a write routine (writefile())
+
 1.181990  2018-07-17 21:42:27-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
  * From 1.181981 Don't fail tests (04-attributes.t) when Parallel::WorkUnit not
                  installed
  * From 1.181980 Add skip_unreadable attribute, to skip over unreadable
@@ -13,6 +34,7 @@
                  header_handler
 
 1.181981  2018-07-16 21:34:26-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
  * TRIAL/DEV RELEASE ONLY
  * Don't fail tests (04-attributes.t) when Parallel::WorkUnit not
    installed
@@ -84,7 +106,7 @@
 1.001 - May 28, 2018  ### Released as development trial version only. ###
  Joelle Maslak <jmaslak@antelope.net>
  * Add parallelized grep/map and forlines routines
-Mohammad S Anwar (manwar)
+ Mohammad S Anwar (manwar)
  * Code cleanups
 
 1.000 - May 28, 2018

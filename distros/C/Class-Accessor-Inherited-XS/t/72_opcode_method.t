@@ -53,6 +53,6 @@ for (qw/a a a/) {
     is($o->$_(7), 7);
 }
 
-is(Class::Accessor::Inherited::XS::_unstolen_count, Class::Accessor::Inherited::XS::OPTIMIZED_OPMETHOD ? 7 : 3);
+is(Class::Accessor::Inherited::XS::Debug::unstolen_count(), Class::Accessor::Inherited::XS::OPTIMIZED_OPMETHOD ? 7 : 3);
 
 done_testing;

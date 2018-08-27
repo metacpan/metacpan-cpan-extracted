@@ -1,15 +1,20 @@
-0.52 2015.04.16
-    The type of the Time::NVtime pointer is NV ()() not double ()(), as can be seen from looking at the Time::HiRes source.
-      On Linux x86_64 on a uselongdouble build when you replace the Time::NVtime entry with a
-      double (*)() pointer calls to that function end up leaving an entry on the FPU stack,
-      eventually causing the failure seen at https://rt.perl.org/Ticket/Display.html?id=123879
-      This minimal commit fixes that issue and allows DBIX::Class::TimeStamp to pass its tests.
-      (Tony Cook)
+Revision history for Time::Warp
 
+0.53  2018.08.22
+      - New maintainer (MANWAR)
+      - Updated GitHub repo details.
+      - Tidied up Changes.
 
-0.51 2014.10.17
-    New maintainer (SZABGAB)
-    Use Test::More instead of Test
-    Include META.yml RT #77752
-    POD encoding is now utf8 RT #93259
+0.52  2015.04.16
+      - The type of the Time::NVtime pointer is NV ()() not double ()(), as can be seen from looking at the Time::HiRes source.
+        On Linux x86_64 on a uselongdouble build when you replace the Time::NVtime entry with a
+        double (*)() pointer calls to that function end up leaving an entry on the FPU stack,
+        eventually causing the failure seen at https://rt.perl.org/Ticket/Display.html?id=123879
+        This minimal commit fixes that issue and allows DBIX::Class::TimeStamp to pass its tests.
+        (Tony Cook)
 
+0.51  2014.10.17
+      - New maintainer (SZABGAB)
+      - Use Test::More instead of Test
+      - Include META.yml RT #77752
+      - POD encoding is now utf8 RT #93259

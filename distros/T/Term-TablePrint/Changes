@@ -1,10 +1,16 @@
 Revision history for Term::TablePrint
 
 
+0.076   2018-08-21
+        - Use 'hide_cursor', 'show_cursor' and 'clear_screen' from "Term::Choose".
+        - "Term::Choose": minimum version "1.626".
+
+0.075_01   2018-08-18
+        - Developer release.
+
 0.075   2018-08-14
         - Don't hide the cursor if OS is Win32.
         - "Term::Choose": minimum version "1.624".
-
 
 0.074   2018-08-14
         - Use OS specific clear_screen and hide_cursor.

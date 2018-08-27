@@ -7,3 +7,4 @@
 * branch-recreate - recreate a branch by cherry-picking without some commits (is this possible generically?)
     (git show --pretty=%P may help for merge commits)
 * branch-grep and tag-grep should support GREP_COLOR (or some other config) to colour results
+* New command git-amend to help amend more than one level of history

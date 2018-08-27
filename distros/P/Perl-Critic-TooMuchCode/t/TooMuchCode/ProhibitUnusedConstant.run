@@ -12,3 +12,33 @@ say 42;
 use constant QUESTION => 42;
 use constant ANSWER => 42;
 say 42;
+
+
+## name constant in constant
+## failures 0
+## cut
+
+use constant A => 42;
+use constant B => A + 42;
+say B;
+
+## name constant in HashRef with a preceeding plus sign.
+## TODO requires fixes in PPIx::Utils
+## failures 2
+## cut
+
+use constant +{
+    FOO => 1,
+    BAR => 2,
+};
+say 42;
+
+## name constant in HashRef
+## failures 2
+## cut
+
+use constant {
+    FOO => 1,
+    BAR => 2,
+};
+say 42;

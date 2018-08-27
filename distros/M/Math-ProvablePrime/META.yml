@@ -9,7 +9,7 @@ build_requires:
   Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0.01'
-  Test::NoWarnings: '0.01'
+  Test::NoWarnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -28,5 +28,5 @@ requires:
   Math::BigInt: '1.999806'
 resources:
   repository: https://github.com/FGasper/p5-Math-ProvablePrime.git
-version: 0.043
+version: 0.045
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

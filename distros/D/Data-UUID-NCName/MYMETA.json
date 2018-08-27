@@ -1,10 +1,10 @@
 {
    "abstract" : "Make valid NCName tokens which are also UUIDs.",
    "author" : [
-      "Dorian Taylor, C<< <dorian at cpan.org> >>, Dorian Taylor <dorian@cpan.org>"
+      "Dorian Taylor <dorian@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "apache_2_0"
    ],
@@ -15,14 +15,13 @@
    "name" : "Data-UUID-NCName",
    "no_index" : {
       "directory" : [
-         "t",
-         "inc"
+         "inc",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Data::UUID" : "0",
             "ExtUtils::MakeMaker" : "6.59",
             "Test::More" : "0"
          }
@@ -34,13 +33,23 @@
       },
       "runtime" : {
          "requires" : {
-            "MIME::Base32" : "0",
-            "MIME::Base64" : "0",
-            "UUID::Tiny" : "0",
-            "perl" : "5.008"
+            "MIME::Base32" : "1.303",
+            "MIME::Base64" : "3.15",
+            "Type::Tiny" : "1.002002",
+            "UUID::Tiny" : "1.04",
+            "perl" : "5.012"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "resources" : {
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/doriantaylor/p5-data-uuid-ncname"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

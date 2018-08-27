@@ -1,5 +1,13 @@
 Revision history for Perl module Net::ACME2
 
+0.23 24 Aug 2018
+- Fix LICENSE file (again)
+
+0.22 24 Aug 2018
+- Rename create_new_account() and create_new_order() to create_account()
+  and create_order(). (“Create new” is redundant.)
+- Fix LICENSE file.
+
 0.21 25 Jul 2018
 - Make LetsEncrypt.pm default to the production server.
 - Make LetsEncrypt.pm accept an “environment” to simplify testing.

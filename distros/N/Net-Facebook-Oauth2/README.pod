@@ -1,6 +1,6 @@
 =head1 NAME
 
-Net::Facebook::Oauth2 - a simple Perl wrapper around Facebook OAuth v2.0 protocol
+Net::Facebook::Oauth2 - a simple Perl wrapper around Facebook OAuth 2.0 protocol
 
 =for html
 <a href="https://travis-ci.org/mamod/Net-Facebook-Oauth2"><img src="https://travis-ci.org/mamod/Net-Facebook-Oauth2.svg?branch=master"></a>
@@ -19,14 +19,15 @@ Somewhere in your application's login process:
 
     # get the authorization URL for your application
     my $url = $fb->get_authorization_url(
-        scope   => [ 'public_profile', 'email', 'user_posts', 'manage_pages' ],
+        scope   => [ 'name', 'email', 'profile_picture' ],
         display => 'page'
     );
 
 Now redirect the user to this C<$url>.
 
 Once the user authorizes your application, Facebook will send him/her back
-to your application, on the C<callback> link provided above.
+to your application, on the C<callback> link provided above. PLEASE NOTE
+THAT YOU MUST PRE-AUTHORIZE YOUR CALLBACK URI ON FACEBOOK'S APP DASHBOARD.
 
 Inside that callback route, use the verifier code parameter that Facebook
 sends to get the access token:
@@ -35,10 +36,29 @@ sends to get the access token:
     # provides (e.g. $c->req->param('code'), $cgi->param('code'), etc)
     my $code = param('code');
 
-    my $access_token = $fb->get_access_token(code => $code);
+    use Try::Tiny;  # or eval {}, or whatever
+
+    my ($unique_id, $access_token);
+    try {
+        $access_token = $fb->get_access_token(code => $code); # <-- could die!
+
+        # Facebook tokens last ~2h, but you may upgrade them to ~60d if you want:
+        $access_token = $fb->get_long_lived_token( access_token => $access_token );
+
+        my $access_data = $fb->debug_token( input => $access_token );
+        if ($access_data && $access_data->{is_valid}) {
+            $unique_id = $access_data->{user_id};
+            # you could also check here for what scopes were granted to you
+            # by inspecting $access_data->{scopes}->@*
+        }
+    } catch {
+        # handle errors here!
+    };
 
 If you got so far, your user is logged! Save this access token in your
-database or session.
+database or session. As shown in the example above, Facebook also provides
+a unique I<user_id> for this token so you can associate it with a particular
+user of your app.
 
 Later on you can use it to communicate with Facebook on behalf of this user:
 
@@ -47,7 +67,7 @@ Later on you can use it to communicate with Facebook on behalf of this user:
     );
 
     my $info = $fb->get(
-        'https://graph.facebook.com/v2.8/me'   # Facebook API URL
+        'https://graph.facebook.com/v3.1/me'   # Facebook API URL
     );
 
     print $info->as_json;
@@ -92,7 +112,7 @@ Big Thanks To
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 by Mahmoud A. Mehyar
+Copyright (C) 2012-2018 by Mahmoud A. Mehyar
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

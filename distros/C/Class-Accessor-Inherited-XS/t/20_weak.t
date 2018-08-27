@@ -2,10 +2,12 @@ use strict;
 use Test::More;
 
 use parent 'Class::Accessor::Inherited::XS::Compat';
-__PACKAGE__->mk_object_accessors(['foo', 'foo', 2]);
-__PACKAGE__->mk_class_accessors(['bar', undef, 0, 0, 1]);
-__PACKAGE__->mk_class_accessors(['baz', sub {{}}, 0, 0, 1]);
-__PACKAGE__->mk_inherited_accessors(['foobar', 'foobar', 2]);
+use Class::Accessor::Inherited::XS::Constants;
+
+__PACKAGE__->mk_object_accessors(['foo', 'foo', IsWeak]);
+__PACKAGE__->mk_class_accessors(['bar', undef, 0, IsWeak]);
+__PACKAGE__->mk_class_accessors(['baz', sub {{}}, 0, IsWeak]);
+__PACKAGE__->mk_inherited_accessors(['foobar', 'foobar', IsWeak]);
 
 sub exception (&) {
     $@ = undef;

@@ -4,8 +4,10 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
+use lib 't/lib';
+
 {
-  my $err = exception { require t::lib::NoGood };
+  my $err = exception { require NoGood };
   like(
     $err,
     qr/with the same name/,
@@ -14,7 +16,7 @@ use Test::Fatal;
 }
 
 {
-  my $err = exception { require t::lib::NoGood2 };
+  my $err = exception { require NoGood2 };
   like(
     $err,
     qr/there's already a subroutine named/,

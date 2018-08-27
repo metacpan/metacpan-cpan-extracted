@@ -26,7 +26,7 @@ $test->each_match_of('SubroutineDeclaration' => sub {
   my ($match) = @_;
   my $text = $match->text;
   my ($name) = $text =~ /\Asub (\w+)/;
-  $text =~ s/{/{ # define $name/;
+  $text =~ s/\{/{ # define $name/;
   $match->replace_text($text);
 });
 

@@ -20,6 +20,20 @@
 #######################################################################
 
 
+2018-08-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000415 released
+
+        * Updated Makefile.PL.
+
+
+2018-08-24  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000414 released
+
+        * Updated Instruction Set ClipBucket_is.pm.
+
+
 2018-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000413 released

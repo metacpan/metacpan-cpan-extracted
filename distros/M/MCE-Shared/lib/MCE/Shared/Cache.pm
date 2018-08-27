@@ -16,12 +16,12 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-use Scalar::Util qw( dualvar );
+use Scalar::Util qw( dualvar looks_like_number );
 use Time::HiRes qw( time );
 
 use MCE::Shared::Base ();
@@ -54,8 +54,6 @@ use overload (
    fallback => 1
 );
 
-no overloading;
-
 ###############################################################################
 ## ----------------------------------------------------------------------------
 ## TIEHASH, STORE, FETCH, DELETE, FIRSTKEY, NEXTKEY, EXISTS, CLEAR, SCALAR
@@ -72,41 +70,44 @@ sub TIEHASH {
 
    if ( !defined $opts ) {
       $opts = {};
-      for my $cnt ( 1 .. 3 ) {
-         if ( @_ && $_[0] =~ /^(max_keys|max_age|_shared)$/ ) {
+      for my $cnt ( 1 .. 2 ) {
+         if ( @_ && $_[0] =~ /^(max_keys|max_age)$/ ) {
             $opts->{ $1 } = $_[1];
             splice @_, 0, 2;
          }
       }
    }
 
-   my $size = MCE::Shared::Cache::_size( $opts->{'max_keys'} // undef );
-   my $expi = MCE::Shared::Cache::_secs( $opts->{'max_age' } // undef );
    my ( $begi, $gcnt ) = ( 0, 0 );
+   my $expi = MCE::Shared::Cache::_secs( $opts->{'max_age' } // undef );
+   my $size = MCE::Shared::Cache::_size( $opts->{'max_keys'} // undef );
 
    my $obj = bless [ {}, [], {}, \$begi, \$gcnt, \$expi, \$size ], $class;
 
-   # The shared-server preallocates the two hashes automatically, where the
-   # data resides, when constructed with MCE::Shared->cache( ... ).
-
-   $obj->_prealloc() unless $opts->{_shared};
    $obj->mset(@_) if @_;
-
    $obj;
 }
 
-# STORE ( key, value )
+# STORE ( key, value [, expires_in ] )
 
 sub STORE {
    my ( $data, $keys, $indx, $begi, $gcnt, $expi, $size ) = @{ $_[0] };
+   my $exptime = ( @_ == 4 ) ? $_[3] : ${ $expi };
+
+   if ( !defined $exptime ) {
+      $exptime = -1;
+   } elsif ( !looks_like_number $exptime ) {
+      $exptime = MCE::Shared::Cache::_secs( $exptime );
+   }
 
    # update existing key
    if ( defined ( my $off = $indx->{ $_[1] } ) ) {
       $off -= ${ $begi };
 
       # update expiration
-      $keys->[ $off ] = dualvar( time + ${ $expi }, $_[1] )
-         if ( defined ${ $expi } );
+      $keys->[ $off ] = ( $exptime >= 0 )
+         ? dualvar( time + $exptime, $_[1] )
+         : dualvar( -1, $_[1] );
 
       # promote key if not last, inlined for performance
       if ( ! $off ) {
@@ -116,17 +117,17 @@ sub STORE {
          $indx->{ $_[1] } = ++${ $begi } + @{ $keys } - 1;
 
          MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
-            if ( ${ $gcnt } && !defined $keys->[0] );
+            if ( ${ $gcnt } && !defined $keys->[ 0 ] );
 
          # safety to not overrun
-         $_[0]->purge() if ( ${ $begi } > 2.147e9 );
+         $_[0]->purge if ( ${ $begi } > 1e9 );
       }
       elsif ( $off != @{ $keys } - 1 ) {
          push @{ $keys }, delete $keys->[ $off ];
          $indx->{ $_[1] } = ${ $begi } + @{ $keys } - 1;
 
-         # GC keys if gcnt:size ratio is greater than 2:3
-         $_[0]->purge() if ( ++${ $gcnt } > @{ $keys } * 0.667 );
+         # GC keys if the gcnt:size ratio is greater than 2:3
+         $_[0]->purge if ( ++${ $gcnt } > @{ $keys } * 0.667 );
       }
 
       return $data->{ $_[1] } = $_[2];
@@ -136,9 +137,9 @@ sub STORE {
    $data->{ $_[1] } = $_[2];
    $indx->{ $_[1] } = ${ $begi } + @{ $keys };
 
-   push @{ $keys }, defined ${ $expi }
-      ? dualvar( time + ${ $expi }, $_[1] )
-      : "$_[1]";
+   push @{ $keys }, ( $exptime >= 0 )
+      ? dualvar( time + $exptime, $_[1] )
+      : dualvar( -1, $_[1] );
 
    # evict the least used key, inlined for performance
    if ( defined ${ $size } && @{ $keys } - ${ $gcnt } > ${ $size } ) {
@@ -146,10 +147,10 @@ sub STORE {
       ${ $begi }++; delete $data->{ $key }; delete $indx->{ $key };
 
       MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
-         if ( ${ $gcnt } && !defined $keys->[0] );
+         if ( ${ $gcnt } && !defined $keys->[ 0 ] );
 
       # safety to not overrun
-      $_[0]->purge() if ( ${ $begi } > 2.147e9 );
+      $_[0]->purge if ( ${ $begi } > 1e9 );
    }
 
    $_[2];
@@ -163,13 +164,13 @@ sub FETCH {
    return undef if !defined ( my $off = $_[0]->[_INDX]{ $_[1] } );
 
    # cache hit
-   my ( $data, $keys, $indx, $begi, $gcnt, $expi ) = @{ $_[0] };
+   my ( $data, $keys, $indx, $begi, $gcnt ) = @{ $_[0] };
 
    $off -= ${ $begi };
 
    # key expired
    $_[0]->del( $_[1] ), return undef if (
-      defined ${ $expi } && $keys->[ $off ] < time
+      $keys->[ $off ] >= 0 && $keys->[ $off ] < time
    );
 
    # promote key if not upper half, inlined for performance
@@ -180,17 +181,17 @@ sub FETCH {
       $indx->{ $_[1] } = ++${ $begi } + @{ $keys } - 1;
 
       MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
-         if ( ${ $gcnt } && !defined $keys->[0] );
+         if ( ${ $gcnt } && !defined $keys->[ 0 ] );
 
       # safety to not overrun
-      $_[0]->purge() if ( ${ $begi } > 2.147e9 );
+      $_[0]->purge if ( ${ $begi } > 1e9 );
    }
-   elsif ( $off - ${ $gcnt } < ((@{ $keys } - ${ $gcnt }) >> 1) ) {
+   elsif ( $off - ${ $gcnt } < ( ( @{ $keys } - ${ $gcnt } ) >> 1 ) ) {
       push @{ $keys }, delete $keys->[ $off ];
       $indx->{ $_[1] } = ${ $begi } + @{ $keys } - 1;
 
-      # GC keys if gcnt:size ratio is greater than 2:3
-      $_[0]->purge() if ( ++${ $gcnt } > @{ $keys } * 0.667 );
+      # GC keys if the gcnt:size ratio is greater than 2:3
+      $_[0]->purge if ( ++${ $gcnt } > @{ $keys } * 0.667 );
    }
 
    $data->{ $_[1] };
@@ -209,7 +210,7 @@ sub DELETE {
    if ( ! $off ) {
       ${ $begi }++; shift @{ $keys };
 
-      if ( ${ $gcnt } && !defined $keys->[0] ) {
+      if ( ${ $gcnt } && !defined $keys->[ 0 ] ) {
          MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt );
       } elsif ( ! @{ $keys } ) {
          ${ $begi } = 0;
@@ -222,7 +223,7 @@ sub DELETE {
    elsif ( $off == @{ $keys } - 1 ) {
       pop @{ $keys };
 
-      if ( ${ $gcnt } && !defined $keys->[-1] ) {
+      if ( ${ $gcnt } && !defined $keys->[ -1 ] ) {
          MCE::Shared::Cache::_gckeys_tail( $keys, $gcnt );
       } elsif ( ! @{ $keys } ) {
          ${ $begi } = 0;
@@ -234,8 +235,8 @@ sub DELETE {
    # must be a key somewhere in-between
    $keys->[ $off ] = undef;   # tombstone
 
-   # GC keys if gcnt:size ratio is greater than 2:3
-   $_[0]->purge() if ( ++${ $gcnt } > @{ $keys } * 0.667 );
+   # GC keys if the gcnt:size ratio is greater than 2:3
+   $_[0]->purge if ( ++${ $gcnt } > @{ $keys } * 0.667 );
 
    delete $data->{ $_[1] };
 }
@@ -261,9 +262,11 @@ sub EXISTS {
    my ( $self, $key ) = @_;
    return '' if !defined ( my $off = $self->[_INDX]{ $key } );
 
+   $off -= ${ $self->[_BEGI] };
+
    $self->del( $key ), return '' if (
-      defined ${ $self->[_EXPI] } &&
-      $self->[_KEYS][ $off -= ${ $self->[_BEGI] } ] < time
+      $self->[_KEYS][ $off ] >= 0 &&
+      $self->[_KEYS][ $off ] < time
    );
 
    1;
@@ -285,7 +288,7 @@ sub CLEAR {
 # SCALAR ( )
 
 sub SCALAR {
-   $_[0]->_prune_head() if defined ${ $_[0]->[_EXPI] };
+   $_[0]->_prune_head;
 
    scalar keys %{ $_[0]->[_DATA] };
 }
@@ -302,12 +305,10 @@ sub STORABLE_freeze {
    my ( $self, $cloning ) = @_;
    return if $cloning;
 
-   my @TIME;
+   my @TIME; $self->purge;
 
-   if ( defined ${ $self->[_EXPI] } ) {
-      for my $key ( @{ $self->[_KEYS] } ) {
-         push @TIME, defined $key ? 0 + $key : $key;
-      }
+   for my $key ( @{ $self->[_KEYS] } ) {
+      push @TIME, 0 + $key;
    }
 
    return '', [ @{ $self }, \@TIME ];
@@ -320,13 +321,11 @@ sub STORABLE_thaw {
    my $TIME = pop @{ $ret };
    @{ $self } = @{ $ret };
 
-   if ( defined ${ $self->[_EXPI] } ) {
-      my ( $i, $keys ) = ( 0, $self->[_KEYS] );
+   my ( $i, $keys ) = ( 0, $self->[_KEYS] );
 
-      for my $time ( @{ $TIME } ) {
-         $keys->[$i] = dualvar( $time, $keys->[$i] ) if defined ( $time );
-         $i++;
-      }
+   for my $time ( @{ $TIME } ) {
+      $keys->[ $i ] = dualvar( $time, $keys->[ $i ] );
+      $i++;
    }
 
    return;
@@ -336,12 +335,10 @@ sub STORABLE_thaw {
 
 sub FREEZE {
    my ( $self ) = @_;
-   my @TIME;
+   my @TIME; $self->purge;
 
-   if ( defined ${ $self->[_EXPI] } ) {
-      for my $key ( @{ $self->[_KEYS] } ) {
-         push @TIME, defined $key ? 0 + $key : $key;
-      }
+   for my $key ( @{ $self->[_KEYS] } ) {
+      push @TIME, 0 + $key;
    }
 
    return [ @{ $self }, \@TIME ];
@@ -350,17 +347,15 @@ sub FREEZE {
 sub THAW {
    my ( $class, $serializer, $data ) = @_;
    my $TIME = pop @{ $data };
-   my $self = $class->new();
+   my $self = $class->new;
 
    @{ $self } = @{ $data };
 
-   if ( defined ${ $self->[_EXPI] } ) {
-      my ( $i, $keys ) = ( 0, $self->[_KEYS] );
+   my ( $i, $keys ) = ( 0, $self->[_KEYS] );
 
-      for my $time ( @{ $TIME } ) {
-         $keys->[$i] = dualvar( $time, $keys->[$i] ) if defined ( $time );
-         $i++;
-      }
+   for my $time ( @{ $TIME } ) {
+      $keys->[ $i ] = dualvar( $time, $keys->[ $i ] );
+      $i++;
    }
 
    return $self;
@@ -368,15 +363,9 @@ sub THAW {
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## _gckeys_head, _gckeys_tail, _inskey, _prealloc, _prune_head, _secs, _size
+## _gckeys_head, _gckeys_tail, _inskey, _prune_head, _secs, _size
 ##
 ###############################################################################
-
-# Called by MCE::Shared::Server::_share
-
-sub _shared_init {
-   $_[0]->_prealloc();
-}
 
 # GC start of list
 
@@ -384,7 +373,7 @@ sub _gckeys_head {
    my ( $keys, $begi, $gcnt ) = @_;
    my $i = 1;
 
-   $i++ until ( defined $keys->[$i] );
+   $i++ until ( defined $keys->[ $i ] );
    ${ $begi } += $i, ${ $gcnt } -= $i;
    splice @{ $keys }, 0, $i;
 
@@ -397,7 +386,7 @@ sub _gckeys_tail {
    my ( $keys, $gcnt ) = @_;
    my $i = $#{ $keys } - 1;
 
-   $i-- until ( defined $keys->[$i] );
+   $i-- until ( defined $keys->[ $i ] );
    ${ $gcnt } -= $#{ $keys } - $i;
    splice @{ $keys }, $i + 1;
 
@@ -408,6 +397,13 @@ sub _gckeys_tail {
 
 sub _inskey {
    my ( $data, $keys, $indx, $begi, $gcnt, $expi, $size ) = @{ $_[0] };
+   my $exptime = ( @_ == 3 ) ? $_[2] : ${ $expi };
+
+   if ( !defined $exptime ) {
+      $exptime = -1;
+   } elsif ( !looks_like_number $exptime ) {
+      $exptime = MCE::Shared::Cache::_secs( $exptime );
+   }
 
    # update existing key
    if ( defined ( my $off = $indx->{ $_[1] } ) ) {
@@ -415,11 +411,12 @@ sub _inskey {
 
       # unset value if expired
       $data->{ $_[1] } = undef
-         if ( defined ${ $expi } && $keys->[ $off ] < time );
+         if ( $keys->[ $off ] >= 0 && $keys->[ $off ] < time );
 
       # update expiration
-      $keys->[ $off ] = dualvar( time + ${ $expi }, $_[1] )
-         if ( defined ${ $expi } );
+      $keys->[ $off ] = ( $exptime >= 0 )
+         ? dualvar( time + $exptime, $_[1] )
+         : dualvar( -1, $_[1] );
 
       # promote key if not last, inlined for performance
       if ( ! $off ) {
@@ -429,17 +426,17 @@ sub _inskey {
          $indx->{ $_[1] } = ++${ $begi } + @{ $keys } - 1;
 
          MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
-            if ( ${ $gcnt } && !defined $keys->[0] );
+            if ( ${ $gcnt } && !defined $keys->[ 0 ] );
 
          # safety to not overrun
-         $_[0]->purge() if ( ${ $begi } > 2.147e9 );
+         $_[0]->purge if ( ${ $begi } > 1e9 );
       }
       elsif ( $off != @{ $keys } - 1 ) {
          push @{ $keys }, delete $keys->[ $off ];
          $indx->{ $_[1] } = ${ $begi } + @{ $keys } - 1;
 
-         # GC keys if gcnt:size ratio is greater than 2:3
-         $_[0]->purge() if ( ++${ $gcnt } > @{ $keys } * 0.667 );
+         # GC keys if the gcnt:size ratio is greater than 2:3
+         $_[0]->purge if ( ++${ $gcnt } > @{ $keys } * 0.667 );
       }
 
       return;
@@ -448,9 +445,9 @@ sub _inskey {
    # insert key
    $indx->{ $_[1] } = ${ $begi } + @{ $keys };
 
-   push @{ $keys }, defined ${ $expi }
-      ? dualvar( time + ${ $expi }, $_[1] )
-      : "$_[1]";
+   push @{ $keys }, ( $exptime >= 0 )
+      ? dualvar( time + $exptime, $_[1] )
+      : dualvar( -1, $_[1] );
 
    # evict the least used key, inlined for performance
    if ( defined ${ $size } && @{ $keys } - ${ $gcnt } > ${ $size } ) {
@@ -458,23 +455,11 @@ sub _inskey {
       ${ $begi }++; delete $data->{ $key }; delete $indx->{ $key };
 
       MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
-         if ( ${ $gcnt } && !defined $keys->[0] );
+         if ( ${ $gcnt } && !defined $keys->[ 0 ] );
 
       # safety to not overrun
-      $_[0]->purge() if ( ${ $begi } > 2.147e9 );
+      $_[0]->purge if ( ${ $begi } > 1e9 );
    }
-
-   return;
-}
-
-# preallocate two hashes internally
-
-sub _prealloc {
-   my ( $self ) = @_;
-   my $size = ${ $self->[_SIZE] } // 500;
-
-   keys %{ $self->[_DATA] } = $size + 1;
-   keys %{ $self->[_INDX] } = $size + 1;
 
    return;
 }
@@ -482,17 +467,16 @@ sub _prealloc {
 # prune start of list
 
 sub _prune_head {
-   return unless defined ${ $_[0]->[_EXPI] };
-
    my ( $data, $keys, $indx, $begi, $gcnt ) = @{ $_[0] };
    my ( $i, $time ) = ( 0, time );
 
    for my $k ( @{ $keys } ) {
       $i++, ${ $gcnt }--, next unless ( defined $k );
-      last if ( $keys->[$i] > $time );
+      last if ( $keys->[ $i ] < 0 || $keys->[ $i ] > $time );
 
       delete $data->{ $k };
       delete $indx->{ $k };
+
       $i++;
    }
 
@@ -503,43 +487,44 @@ sub _prune_head {
 
 # compute seconds
 
-sub _secs {
-   my ( $secs ) = @_;
-
+{
    # seconds, minutes, hours, days, weeks
    my %secs = ( '' => 1, s => 1, m => 60, h => 3600, d => 86400, w => 604800 );
 
-   $secs = undef if ( defined $secs && $secs eq 'never' );
+   sub _secs {
+      my ( $secs ) = @_;
 
-   if ( defined $secs ) {
-      $secs = 0 if ( $secs eq 'now' );
-      $secs = 0.0001 if ( $secs ne '0' && $secs < 0.0001 );
-      $secs = $1 * $secs{ lc($2) } if $secs =~ /^(\d*\.?\d*)\s*([smhdw]?)/i;
+      return undef if ( !defined $secs || $secs eq 'never' );
+      return 0 if ( !$secs || $secs eq 'now' );
+      return 0.0001 if ( $secs < 0.0001 );
+
+      $secs = $1 * $secs{ lc($2) }
+         if ( $secs =~ /^(\d*\.?\d*)\s*([smhdw]?)/i );
+
+      $secs;
    }
-
-   $secs;
 }
 
 # compute size
 
-sub _size {
-   my ( $size ) = @_;
+{
+   # kibiBytes (KiB), mebiBytes (MiB)
+   my %size = ( '' => 1, k => 1024, m => 1048576 );
 
    # Digital Information Sizes Calculator
    # http://dr-lex.be/info-stuff/bytecalc.html
 
-   # kibiBytes (KiB), mebiBytes (MiB)
-   my %size = ( '' => 1, k => 1024, m => 1048576 );
+   sub _size {
+      my ( $size ) = @_;
 
-   $size = undef if ( defined $size && $size eq 'unlimited' );
+      return undef if ( !defined $size || $size eq 'unlimited' );
+      return 0 if ( !$size || $size < 0 );
 
-   if ( defined $size ) {
-      $size = 0 if $size < 0;
-      $size = $1 * $size{ lc($2) } if $size =~ /^(\d*\.?\d*)\s*([km]?)/i;
+      $size = $1 * $size{ lc($2) }
+         if ( $size =~ /^(\d*\.?\d*)\s*([km]?)/i );
+
       $size = int( $size + 0.5 );
    }
-
-   $size;
 }
 
 ###############################################################################
@@ -574,8 +559,8 @@ sub iterator {
    elsif ( @keys == 1 && $keys[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       @keys = $self->keys($keys[0]);
    }
-   elsif ( defined ${ $self->[_EXPI] } ) {
-      $self->_prune_head();
+   else {
+      $self->_prune_head;
    }
 
    return sub {
@@ -591,8 +576,7 @@ sub iterator {
 
 sub keys {
    my $self = shift;
-
-   $self->_prune_head() if defined ${ $self->[_EXPI] };
+   $self->_prune_head;
 
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( { getkeys => 1 }, @_ );
@@ -614,16 +598,9 @@ sub keys {
 sub _keys {
    my $self = shift;
 
-   if ( ${ $self->[_EXPI] } ) {
-      map { ''. $_ } ${ $self->[_GCNT] }
-         ? grep defined($_), reverse @{ $self->[_KEYS] }
-         : reverse @{ $self->[_KEYS] };
-   }
-   else {
-      ${ $self->[_GCNT] }
-         ? grep defined($_), reverse @{ $self->[_KEYS] }
-         : reverse @{ $self->[_KEYS] };
-   }
+   map { ''. $_ } ${ $self->[_GCNT] }
+      ? grep defined($_), reverse @{ $self->[_KEYS] }
+      : reverse @{ $self->[_KEYS] };
 }
 
 # pairs ( key [, key, ... ] )
@@ -632,8 +609,7 @@ sub _keys {
 
 sub pairs {
    my $self = shift;
-
-   $self->_prune_head() if defined ${ $self->[_EXPI] };
+   $self->_prune_head;
 
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( @_ );
@@ -656,8 +632,7 @@ sub pairs {
 
 sub values {
    my $self = shift;
-
-   $self->_prune_head() if defined ${ $self->[_EXPI] };
+   $self->_prune_head;
 
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( { getvals => 1 }, @_ );
@@ -689,30 +664,13 @@ sub assign {
 
 sub max_age {
    my ( $self, $secs ) = @_;
-   my $keys = $self->[_KEYS];
    my $expi = $self->[_EXPI];
 
-   $secs = MCE::Shared::Cache::_secs( $secs );
-
-   if ( defined $secs ) {
-      $self->purge();
-      if ( defined ${ $expi } ) {
-         my $off    = $secs - ${ $expi };
-         @{ $keys } = map { dualvar( $_ + $off, $_.'' ) } @{ $keys };
-         ${ $expi } = $secs, $self->_prune_head();
-      }
-      else {
-         my $time   = time;
-         @{ $keys } = map { dualvar( $time + $secs, $_ ) } @{ $keys };
-         ${ $expi } = $secs, $self->_prune_head();
-      }
+   if ( @_ == 2 && defined $secs ) {
+      ${ $expi } = MCE::Shared::Cache::_secs( $secs );
    }
    elsif ( @_ == 2 ) {
-      $self->purge();
-      if ( defined ${ $expi } ) {
-         @{ $keys } = map { $_.'' } @{ $keys };
-         ${ $expi } = undef;
-      }
+      ${ $expi } = undef;
    }
 
    if ( defined wantarray ) {
@@ -725,10 +683,11 @@ sub max_age {
 sub max_keys {
    my ( $self, $size ) = @_;
 
-   $size = MCE::Shared::Cache::_size( $size );
+   if ( @_ == 2 && defined $size ) {
+      $size = MCE::Shared::Cache::_size( $size );
+      $self->purge;
 
-   if ( defined $size ) {
-      my ( $data, $keys, $indx, $begi, $gcnt ) = @{ $self };
+      my ( $data, $keys, $indx, $begi ) = @{ $self };
       my $count = CORE::keys( %{ $data } ) - $size;
 
       # evict the least used keys
@@ -736,11 +695,8 @@ sub max_keys {
          my $key = shift @{ $keys };
          ${ $begi }++; delete $data->{ $key }; delete $indx->{ $key };
 
-         MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
-            if ( ${ $gcnt } && !defined $keys->[0] );
-
          # safety to not overrun
-         $self->purge() if ( ${ $begi } > 2.147e9 );
+         $self->purge if ( ${ $begi } > 1e9 );
       }
 
       ${ $self->[_SIZE] } = $size;
@@ -809,26 +765,19 @@ sub peek {
 # purge ( )
 
 sub purge {
-   my ( $data, $keys, $indx, $begi, $gcnt, $expi ) = @{ $_[0] };
-   my $i; $i = ${ $begi } = ${ $gcnt } = 0;
+   my ( $data, $keys, $indx, $begi, $gcnt ) = @{ $_[0] };
+   my $i;  $i = ${ $begi } = ${ $gcnt } = 0;
 
    # purge in-place for minimum memory consumption
 
-   if ( defined ${ $expi } ) {
-      my $time = time;
-      for my $k ( @{ $keys } ) {
-         if ( defined $k && $k < $time ) {
-            delete $data->{ $k };
-            delete $indx->{ $k };
-            next;
-         }
-         $keys->[ $i ] = $k, $indx->{ $k } = $i++ if ( defined $k );
-      }
-   }
-   else {
-      for my $k ( @{ $keys } ) {
-         $keys->[ $i ] = $k, $indx->{ $k } = $i++ if ( defined $k );
-      }
+   my $time = time;
+
+   for my $k ( @{ $keys } ) {
+      delete($data->{ $k }), delete($indx->{ $k }), next
+         if ( defined $k && $k >= 0 && $k < $time );
+
+      $keys->[ $i ] = $k, $indx->{ $k } = $i++
+         if ( defined $k );
    }
 
    splice @{ $keys }, $i;
@@ -842,59 +791,59 @@ sub purge {
 ##
 ###############################################################################
 
-# append ( key, string )
+# append ( key, string [, expires_in ] )
 
 sub append {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[3] ? $_[3] : () );
    length( $_[0]->[_DATA]{ $_[1] } .= $_[2] // '' );
 }
 
-# decr ( key )
+# decr ( key [, expires_in ] )
 
 sub decr {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[2] ? $_[2] : () );
    --$_[0]->[_DATA]{ $_[1] };
 }
 
-# decrby ( key, number )
+# decrby ( key, number [, expires_in ] )
 
 sub decrby {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[3] ? $_[3] : () );
    $_[0]->[_DATA]{ $_[1] } -= $_[2] || 0;
 }
 
-# incr ( key )
+# incr ( key [, expires_in ] )
 
 sub incr {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[2] ? $_[2] : () );
    ++$_[0]->[_DATA]{ $_[1] };
 }
 
-# incrby ( key, number )
+# incrby ( key, number [, expires_in ] )
 
 sub incrby {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[3] ? $_[3] : () );
    $_[0]->[_DATA]{ $_[1] } += $_[2] || 0;
 }
 
-# getdecr ( key )
+# getdecr ( key [, expires_in ] )
 
 sub getdecr {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[2] ? $_[2] : () );
    $_[0]->[_DATA]{ $_[1] }-- // 0;
 }
 
-# getincr ( key )
+# getincr ( key [, expires_in ] )
 
 sub getincr {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[2] ? $_[2] : () );
    $_[0]->[_DATA]{ $_[1] }++ // 0;
 }
 
-# getset ( key, value )
+# getset ( key, value [, expires_in ] )
 
 sub getset {
-   $_[0]->_inskey( $_[1] );
+   $_[0]->_inskey( $_[1], defined $_[3] ? $_[3] : () );
 
    my $old = $_[0]->[_DATA]{ $_[1] };
    $_[0]->[_DATA]{ $_[1] } = $_[2];
@@ -906,7 +855,7 @@ sub getset {
 # len ( )
 
 sub len {
-   $_[0]->_prune_head() if defined ${ $_[0]->[_EXPI] };
+   $_[0]->_prune_head;
 
    ( defined $_[1] )
       ? length $_[0]->get( $_[1] )
@@ -923,6 +872,7 @@ sub len {
    *{ __PACKAGE__.'::exists' } = \&EXISTS;
    *{ __PACKAGE__.'::clear'  } = \&CLEAR;
    *{ __PACKAGE__.'::del'    } = \&delete;
+   *{ __PACKAGE__.'::remove' } = \&delete;
    *{ __PACKAGE__.'::merge'  } = \&mset;
    *{ __PACKAGE__.'::vals'   } = \&values;
 }
@@ -950,7 +900,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.838
+This document describes MCE::Shared::Cache version 1.839
 
 =head1 DESCRIPTION
 
@@ -991,8 +941,8 @@ fetches only.
  $ca = MCE::Shared::Cache->new( max_age  => "12 hours" );
  $ca = MCE::Shared::Cache->new( max_age  => "0.5 days" );
  $ca = MCE::Shared::Cache->new( max_age  => "1 week" );
- $ca = MCE::Shared::Cache->new( max_age  => "never" ); # or undef
- $ca = MCE::Shared::Cache->new( max_age  => "now" );   # or 0
+ $ca = MCE::Shared::Cache->new( max_age  => undef );   # no expiration
+ $ca = MCE::Shared::Cache->new( max_age  => 0 );       # now
 
  # construction for sharing with other threads and processes
 
@@ -1015,8 +965,8 @@ fetches only.
  $ca = MCE::Shared->cache( max_age  => "12 hours" );
  $ca = MCE::Shared->cache( max_age  => "0.5 days" );
  $ca = MCE::Shared->cache( max_age  => "1 week" );
- $ca = MCE::Shared->cache( max_age  => "never" ); # or undef
- $ca = MCE::Shared->cache( max_age  => "now" );   # or 0
+ $ca = MCE::Shared->cache( max_age  => undef );   # no expiration
+ $ca = MCE::Shared->cache( max_age  => 0 );       # now
 
  # hash-like dereferencing
 
@@ -1203,8 +1153,8 @@ Constructs a new object.
  $ca = MCE::Shared::Cache->new( max_age  => "12 hours" );
  $ca = MCE::Shared::Cache->new( max_age  => "0.5 days" );
  $ca = MCE::Shared::Cache->new( max_age  => "1 week" );
- $ca = MCE::Shared::Cache->new( max_age  => "never" ); # or undef
- $ca = MCE::Shared::Cache->new( max_age  => "now" );   # or 0
+ $ca = MCE::Shared::Cache->new( max_age  => undef );   # no expiration
+ $ca = MCE::Shared::Cache->new( max_age  => 0 );       # now
 
  $ca->assign( @pairs );
 
@@ -1227,8 +1177,8 @@ Constructs a new object.
  $ca = MCE::Shared->cache( max_age  => "12 hours" );
  $ca = MCE::Shared->cache( max_age  => "0.5 days" );
  $ca = MCE::Shared->cache( max_age  => "1 week" );
- $ca = MCE::Shared->cache( max_age  => "never" ); # or undef
- $ca = MCE::Shared->cache( max_age  => "now" );   # or 0
+ $ca = MCE::Shared->cache( max_age  => undef );   # no expiration
+ $ca = MCE::Shared->cache( max_age  => 0 );       # now
 
  $ca->assign( @pairs );
 
@@ -1370,8 +1320,7 @@ Reorder: Yes, only when key is given
 =item max_age ( [ secs ] )
 
 Returns the maximum age set on the cache or "never" if not defined internally.
-When seconds is given, it adjusts any keys by subtracting or adding the time
-difference accordingly.
+It sets the default expiry time when seconds is given.
 
  $age = $ca->max_age;
 
@@ -1381,8 +1330,8 @@ difference accordingly.
  $ca->max_age( "12 hours" );
  $ca->max_age( "0.5 days" );
  $ca->max_age( "1 week" );
- $ca->max_age( "never" );   # or undef
- $ca->max_age( "now" );     # or 0
+ $ca->max_age( undef );     # no expiration
+ $ca->max_age( 0 );         # now
 
 =item max_keys ( [ size ] )
 
@@ -1390,10 +1339,9 @@ Returns the size limit set on the cache or "unlimited" if not defined
 internally. When size is given, it adjusts the cache accordingly to the
 new size by pruning the head of the list if necessary.
 
- $size = $ca->max_size;
+ $size = $ca->max_keys;
 
- $ca->max_keys( "unlimited" );
- $ca->max_keys( undef );    # ditto
+ $ca->max_keys( undef );    # unlimited
  $ca->max_keys( "4 KiB" );  # 4*1024
  $ca->max_keys( "1 MiB" );  # 1*1024*1024
  $ca->max_keys( 500 );
@@ -1520,18 +1468,32 @@ Reorder: Very likely, see API on given command
 
 =item purge ( )
 
-A utility method for purging any *tombstones* in the keys array. It also
-resets a couple counters internally. Expired items are also purged when
-max_age is defined.
+Remove all tombstones and expired data from the cache.
 
  $ca->purge;
 
-=item set ( key, value )
+=item remove
+
+C<remove> is an alias for C<delete>.
+
+=item set ( key, value [, expires_in ] )
 
 Sets the value of the given cache key and returns its new value.
+Optionally in v1.839 and later releases, give the number of seconds
+before the key is expired.
 
  $val = $ca->set( "key", "value" );
  $val = $ca->{ "key" } = "value";
+
+ $val = $ca->set( "key", "value", 3600  );  # or "60 minutes"
+ $val = $ca->set( "key", "value", undef );  # or "never"
+ $val = $ca->set( "key", "value", 0     );  # or "now"
+
+ $val = $ca->set( "key", "value", "2 seconds" );  # or "2s"
+ $val = $ca->set( "key", "value", "2 minutes" );  # or "2m"
+ $val = $ca->set( "key", "value", "2 hours"   );  # or "2h"
+ $val = $ca->set( "key", "value", "2 days"    );  # or "2d"
+ $val = $ca->set( "key", "value", "2 weeks"   );  # or "2w"
 
 Reorder: Yes
 
@@ -1580,9 +1542,12 @@ reduction in inter-process communication.
 The API resembles a subset of the Redis primitives
 L<http://redis.io/commands#strings> with key representing the cache key.
 
+Optionally in v1.839 and later releases, give the number of seconds
+before the key is expired, similarly to C<set>.
+
 =over 3
 
-=item append ( key, string )
+=item append ( key, string [, expires_in ] )
 
 Appends a value to a key and returns its new length.
 
@@ -1590,7 +1555,7 @@ Appends a value to a key and returns its new length.
 
 Reorder: Yes
 
-=item decr ( key )
+=item decr ( key [, expires_in ] )
 
 Decrements the value of a key by one and returns its new value.
 
@@ -1598,7 +1563,7 @@ Decrements the value of a key by one and returns its new value.
 
 Reorder: Yes
 
-=item decrby ( key, number )
+=item decrby ( key, number [, expires_in ] )
 
 Decrements the value of a key by the given number and returns its new value.
 
@@ -1606,7 +1571,7 @@ Decrements the value of a key by the given number and returns its new value.
 
 Reorder: Yes
 
-=item getdecr ( key )
+=item getdecr ( key [, expires_in ] )
 
 Decrements the value of a key by one and returns its old value.
 
@@ -1614,7 +1579,7 @@ Decrements the value of a key by one and returns its old value.
 
 Reorder: Yes
 
-=item getincr ( key )
+=item getincr ( key [, expires_in ] )
 
 Increments the value of a key by one and returns its old value.
 
@@ -1622,7 +1587,7 @@ Increments the value of a key by one and returns its old value.
 
 Reorder: Yes
 
-=item getset ( key, value )
+=item getset ( key, value [, expires_in ] )
 
 Sets the value of a key and returns its old value.
 
@@ -1630,7 +1595,7 @@ Sets the value of a key and returns its old value.
 
 Reorder: Yes
 
-=item incr ( key )
+=item incr ( key [, expires_in ] )
 
 Increments the value of a key by one and returns its new value.
 
@@ -1638,7 +1603,7 @@ Increments the value of a key by one and returns its new value.
 
 Reorder: Yes
 
-=item incrby ( key, number )
+=item incrby ( key, number [, expires_in ] )
 
 Increments the value of a key by the given number and returns its new value.
 
@@ -1660,33 +1625,25 @@ construction for running on a single core.
 Otherwise, the following is a parallel version for a L<benchmark script|https://blog.celogeek.com/201401/426/perl-benchmark-cache-with-expires-and-max-size> found on the web. The serial version was created by Celogeek for benchmarking various caching modules.
 
 The MCE C<progress> option makes it possible to track progress while running
-among many workers. Being a parallel script means that it involves IPC to and
-from the shared-manager process, where the data resides. In regards to IPC,
-fetches may take longer on Linux versus running on Darwin or FreeBSD.
+parallel. This script involves IPC to and from the shared-manager process,
+where the data resides. In regards to IPC, fetches may take longer on Linux
+versus Darwin or FreeBSD.
 
  #!/usr/bin/perl
 
  use strict;
  use warnings;
- use feature 'say', 'state';
+ use feature qw( say );
 
- use Digest::MD5 qw/md5_base64/;
- use Time::HiRes qw/time/;
- use Proc::ProcessTable;
-
- use MCE 1.814;   # requires 1.814 minimally
+ use Digest::MD5 qw( md5_base64 );
+ use Time::HiRes qw( time );
+ use MCE 1.814;
  use MCE::Shared;
-
- sub get_current_process_memory {
-     state $pt = Proc::ProcessTable->new;
-     my %info = map { $_->pid => $_ } @{$pt->table};
-     return $info{$$}->rss;
- }
 
  $| = 1; srand(0);
 
  # construct shared variables
- # MCE::Shared handles serialization automatically, when needed
+ # serialization is handled automatically
 
  my $c     = MCE::Shared->cache( max_keys => 500_000 );
  my $found = MCE::Shared->scalar( 0 );
@@ -1711,11 +1668,10 @@ fetches may take longer on Linux versus running on Darwin or FreeBSD.
  )->spawn();
 
  say "Mapping";
- my @todo = map { md5_base64($_) } (1..600_000);
- say "Starting";
+ my @todo = map { md5_base64($_) } ( 1 .. 600_000 );
 
- my $mem = get_current_process_memory();
- my ($read, $write);
+ say "Starting";
+ my ( $read, $write );
 
  {
      my $s = time;
@@ -1742,7 +1698,6 @@ fetches may take longer on Linux versus running on Darwin or FreeBSD.
 
  say "Read : ", sprintf("%0.3f", scalar(@todo) / $read);
  say "Found: ", $found->get();
- say "Mem  : ", get_current_process_memory() - $mem;
 
 The C<progress> option is further described on Metacpan. Several examples
 are provided, accommodating all input data-types in MCE.

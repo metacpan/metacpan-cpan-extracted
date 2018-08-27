@@ -1,5 +1,13 @@
 Revision history for Perl module Net::Facebook::Oauth2.
 
+0.11
+    - update to Graph API v3.1
+    - allow custom API version setting (GH#15)
+    - new method debug_token() to fetch access token metadata from Facebook
+    - new method get_long_lived_token() to upgrade access tokens
+    - add missing dep
+    - documentation updates
+
 0.10  2016 2016-10-14
 	- Update to Graph API v2.8
 	- add missing deps

@@ -70,4415 +70,4461 @@ sub new {
 [
 	{#State 0
 		ACTIONS => {
-			"!" => 63,
-			"^" => 65,
-			'COUNT' => 66,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"\"" => 48,
-			"{" => 47,
-			'NEAR' => 54,
-			'PREFIX' => 55,
-			"[" => 70,
-			'KEYS' => 8,
-			"<" => 52,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			"*" => 17,
-			'AT_LBRACE' => 71,
-			"(" => 35,
-			'STAR_LBRACE' => 36
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"!" => 18,
+			"(" => 56,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'PREFIX' => 33,
+			'REGEX' => 14,
+			"[" => 13,
+			"\"" => 30,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			"{" => 24,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			'COUNT' => 61,
+			"*" => 44,
+			"\$" => 23,
+			"\@" => 45,
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'DOLLAR_DOT' => 20
 		},
 		GOTOS => {
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_anchor' => 40,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_lemma' => 42,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_prefix' => 50,
-			'qwk_indextuple' => 9,
-			'qc_tokens' => 51,
-			'qc_matchid' => 14,
-			's_word' => 11,
-			'query' => 10,
-			'query_conditions' => 13,
-			'qw_withor' => 12,
-			'qw_infix' => 53,
-			'qc_concat' => 15,
-			'qc_basic' => 18,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qw_any' => 20,
-			'count_query' => 59,
-			's_prefix' => 56,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			'qw_regex' => 60,
-			'index' => 24,
-			'q_clause' => 25,
-			'qc_phrase' => 27,
-			'qc_boolean' => 64,
-			'regex' => 28,
-			's_suffix' => 67,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
+			'count_query' => 55,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 50,
+			'qc_concat' => 49,
+			'query_conditions' => 48,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qc_near' => 43,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'q_clause' => 38,
+			'qc_basic' => 72,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
 			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 33,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72
+			'query' => 34,
+			's_word' => 35,
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'qc_boolean' => 26,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qc_matchid' => 19
 		}
 	},
 	{#State 1
-		DEFAULT => -259
-	},
-	{#State 2
 		ACTIONS => {
-			'REGOPT' => 73
+			'INTEGER' => 42,
+			'DATE' => 69,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -269
-	},
-	{#State 3
-		DEFAULT => -266
-	},
-	{#State 4
-		DEFAULT => -146
-	},
-	{#State 5
-		DEFAULT => -152
-	},
-	{#State 6
-		DEFAULT => -179
-	},
-	{#State 7
-		DEFAULT => -149
-	},
-	{#State 8
-		ACTIONS => {
-			"(" => 74
+		GOTOS => {
+			'symbol' => 73,
+			's_chunk' => 74
 		}
 	},
-	{#State 9
+	{#State 2
+		DEFAULT => -144
+	},
+	{#State 3
+		DEFAULT => -159
+	},
+	{#State 4
+		DEFAULT => -253
+	},
+	{#State 5
+		DEFAULT => -183
+	},
+	{#State 6
+		DEFAULT => -156
+	},
+	{#State 7
 		ACTIONS => {
 			"=" => 75
 		}
 	},
+	{#State 8
+		DEFAULT => -147
+	},
+	{#State 9
+		DEFAULT => -150
+	},
 	{#State 10
-		ACTIONS => {
-			'' => 76
-		}
+		DEFAULT => -148
 	},
 	{#State 11
-		DEFAULT => -221,
-		GOTOS => {
-			'l_txchain' => 77
-		}
+		DEFAULT => -263
 	},
 	{#State 12
-		DEFAULT => -157
+		DEFAULT => -267
 	},
 	{#State 13
-		DEFAULT => -1
-	},
-	{#State 14
-		DEFAULT => -116
-	},
-	{#State 15
-		ACTIONS => {
-			'KEYS' => 8,
-			"*" => 17,
-			'INTEGER' => 21,
-			'SUFFIX' => 3,
-			'REGEX' => 2,
-			'SYMBOL' => 1,
-			'STAR_LBRACE' => 36,
-			"(" => 78,
-			"\@" => 37,
-			"\$" => 26,
-			'INFIX' => 23,
-			'INDEX' => 29,
-			"<" => 52,
-			'PREFIX' => 55,
-			'NEAR' => 54,
-			'NEG_REGEX' => 61,
-			'DATE' => 57,
-			"%" => 58,
-			'COLON_LBRACE' => 38,
-			"{" => 47,
-			"\"" => 48,
-			'DOLLAR_DOT' => 49,
-			"[" => 70,
-			'AT_LBRACE' => 71,
-			"^" => 65
-		},
-		DEFAULT => -115,
+		DEFAULT => -215,
 		GOTOS => {
-			's_prefix' => 56,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60,
-			'qc_basic' => 79,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qw_any' => 20,
-			'qw_infix' => 53,
-			'qwk_indextuple' => 9,
-			'qc_tokens' => 51,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qw_prefix' => 50,
-			'symbol' => 44,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'qw_thesaurus' => 7,
-			'qw_anchor' => 40,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 33,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_phrase' => 27,
-			'index' => 24
+			'l_morph' => 76
 		}
 	},
+	{#State 14
+		ACTIONS => {
+			'REGOPT' => 77
+		},
+		DEFAULT => -273
+	},
+	{#State 15
+		DEFAULT => -149
+	},
 	{#State 16
-		DEFAULT => -155
+		DEFAULT => -146
 	},
 	{#State 17
-		DEFAULT => -169
+		DEFAULT => -160
 	},
 	{#State 18
 		ACTIONS => {
-			"*" => 17,
-			'INTEGER' => 21,
-			'KEYS' => 8,
-			'SUFFIX' => 3,
-			'REGEX' => 2,
-			'SYMBOL' => 1,
-			'STAR_LBRACE' => 36,
-			"(" => 78,
-			"\@" => 37,
-			'INDEX' => 29,
-			"\$" => 26,
-			'INFIX' => 23,
-			'NEG_REGEX' => 61,
-			'DATE' => 57,
-			"%" => 58,
-			"<" => 52,
-			'NEAR' => 54,
-			'PREFIX' => 55,
-			"{" => 47,
-			"\"" => 48,
-			'DOLLAR_DOT' => 49,
-			'COLON_LBRACE' => 38,
-			'AT_LBRACE' => 71,
-			"[" => 70,
-			"^" => 65
+			"\"" => 30,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			"!" => 18,
+			"(" => 56,
+			'PREFIX' => 33,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			"[" => 13,
+			'REGEX' => 14,
+			'NEAR' => 60,
+			'INFIX' => 59,
+			'INTEGER' => 42,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'DOLLAR_DOT' => 20,
+			"{" => 24,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"*" => 44,
+			"\$" => 23,
+			"\@" => 45
 		},
-		DEFAULT => -113,
 		GOTOS => {
-			'qc_word' => 33,
-			'qw_morph' => 31,
+			'qc_boolean' => 26,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qc_matchid' => 19,
+			'qc_basic' => 72,
+			'q_clause' => 78,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_word' => 35,
 			'qw_listfile' => 32,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qc_phrase' => 27,
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qw_infix' => 53,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qc_tokens' => 51,
-			'qwk_indextuple' => 9,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qc_basic' => 80,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44
+			'qw_exact' => 68,
+			'qc_phrase' => 67,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qc_near' => 43,
+			'qw_any' => 2,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 50,
+			'qc_concat' => 49
 		}
 	},
 	{#State 19
-		ACTIONS => {
-			"=" => 82
-		},
-		DEFAULT => -127,
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 81
-		}
+		DEFAULT => -120
 	},
 	{#State 20
-		DEFAULT => -140
+		ACTIONS => {
+			'SYMBOL' => 11,
+			"=" => 80,
+			'INTEGER' => 42,
+			'DATE' => 69
+		},
+		GOTOS => {
+			'symbol' => 79
+		}
 	},
 	{#State 21
-		DEFAULT => -260
+		DEFAULT => -153
 	},
 	{#State 22
-		DEFAULT => -137
+		ACTIONS => {
+			'WITH' => 83,
+			'WITHOUT' => 81,
+			"=" => 86,
+			'WITHOR' => 85
+		},
+		DEFAULT => -136,
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 82
+		}
 	},
 	{#State 23
-		DEFAULT => -267
+		ACTIONS => {
+			"(" => 87
+		},
+		DEFAULT => -249
 	},
 	{#State 24
-		DEFAULT => -246
+		DEFAULT => -212,
+		GOTOS => {
+			'l_set' => 88
+		}
 	},
 	{#State 25
 		ACTIONS => {
-			"=" => 82,
-			'OP_BOOL_AND' => 86,
-			'OP_BOOL_OR' => 84
-		},
-		DEFAULT => -29,
-		GOTOS => {
-			'matchid' => 87,
-			'q_filters' => 85,
-			'matchid_eq' => 83
+			"=" => 89
 		}
 	},
 	{#State 26
-		ACTIONS => {
-			"(" => 88
-		},
-		DEFAULT => -245
+		DEFAULT => -118
 	},
 	{#State 27
-		DEFAULT => -133
+		DEFAULT => -145
 	},
 	{#State 28
-		DEFAULT => -165
+		DEFAULT => -181
 	},
 	{#State 29
-		DEFAULT => -263
-	},
-	{#State 30
-		DEFAULT => -156
-	},
-	{#State 31
-		DEFAULT => -150
-	},
-	{#State 32
-		DEFAULT => -154
-	},
-	{#State 33
-		ACTIONS => {
-			'WITHOR' => 89,
-			"=" => 82,
-			'WITHOUT' => 92,
-			'WITH' => 91
-		},
-		DEFAULT => -132,
+		DEFAULT => -212,
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
+			'l_set' => 90
 		}
 	},
-	{#State 34
-		DEFAULT => -141
-	},
-	{#State 35
+	{#State 30
 		ACTIONS => {
-			'STAR_LBRACE' => 36,
-			'AT_LBRACE' => 71,
-			"(" => 35,
-			"*" => 17,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'KEYS' => 8,
-			"<" => 52,
-			"[" => 70,
-			'PREFIX' => 55,
-			'NEAR' => 54,
-			"{" => 47,
-			"\"" => 48,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			"^" => 65,
-			"!" => 63
+			'DOLLAR_DOT' => 20,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"{" => 24,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'REGEX' => 14,
+			"[" => 13,
+			'PREFIX' => 33,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			"(" => 91,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71
 		},
 		GOTOS => {
-			'q_clause' => 95,
-			'index' => 24,
-			'qc_boolean' => 99,
-			'qc_phrase' => 94,
-			'regex' => 28,
-			's_suffix' => 67,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'qc_word' => 93,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
 			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_anchor' => 40,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_prefix' => 50,
-			'qc_matchid' => 98,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qwk_indextuple' => 9,
-			'qc_tokens' => 51,
-			'qc_concat' => 97,
-			'qw_infix' => 53,
-			'qw_any' => 20,
-			'qc_basic' => 18,
-			'qw_with' => 16,
-			'qc_near' => 96,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60,
-			's_prefix' => 56
+			's_word' => 35,
+			'qc_word' => 92,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'regex' => 52,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'qw_prefix_set' => 9,
+			'l_phrase' => 93,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5
+		}
+	},
+	{#State 31
+		DEFAULT => -270
+	},
+	{#State 32
+		DEFAULT => -158
+	},
+	{#State 33
+		DEFAULT => -269
+	},
+	{#State 34
+		ACTIONS => {
+			'' => 94
+		}
+	},
+	{#State 35
+		DEFAULT => -225,
+		GOTOS => {
+			'l_txchain' => 95
 		}
 	},
 	{#State 36
-		DEFAULT => -208,
-		GOTOS => {
-			'l_set' => 100
-		}
+		DEFAULT => -171
 	},
 	{#State 37
-		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
-		},
+		DEFAULT => -212,
 		GOTOS => {
-			's_word' => 101,
-			'symbol' => 44
+			'l_set' => 96
 		}
 	},
 	{#State 38
 		ACTIONS => {
-			'INTEGER' => 21,
-			'DATE' => 57,
-			'SYMBOL' => 1
+			'OP_BOOL_AND' => 97,
+			"=" => 86,
+			'OP_BOOL_OR' => 98
 		},
+		DEFAULT => -30,
 		GOTOS => {
-			's_semclass' => 103,
-			'symbol' => 102
+			'matchid_eq' => 84,
+			'q_filters' => 99,
+			'matchid' => 100
 		}
 	},
 	{#State 39
 		ACTIONS => {
-			"=" => 104
-		}
+			'REGOPT' => 101
+		},
+		DEFAULT => -275
 	},
 	{#State 40
-		DEFAULT => -153
+		DEFAULT => -143
 	},
 	{#State 41
-		DEFAULT => -138
+		DEFAULT => -157
 	},
 	{#State 42
-		DEFAULT => -151
+		DEFAULT => -264
 	},
 	{#State 43
-		DEFAULT => -142
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -131,
+		GOTOS => {
+			'matchid' => 102,
+			'matchid_eq' => 84
+		}
 	},
 	{#State 44
-		DEFAULT => -249
+		DEFAULT => -173
 	},
 	{#State 45
-		DEFAULT => -159
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'INTEGER' => 42,
+			'DATE' => 69
+		},
+		GOTOS => {
+			'symbol' => 4,
+			's_word' => 103
+		}
 	},
 	{#State 46
-		DEFAULT => -148
+		DEFAULT => -151
 	},
 	{#State 47
-		DEFAULT => -208,
+		ACTIONS => {
+			'INTEGER' => 42,
+			'DATE' => 69,
+			'SYMBOL' => 11
+		},
 		GOTOS => {
-			'l_set' => 105
+			's_semclass' => 104,
+			'symbol' => 105
 		}
 	},
 	{#State 48
-		ACTIONS => {
-			'REGEX' => 2,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'SUFFIX' => 3,
-			"^" => 65,
-			"{" => 47,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			'KEYS' => 8,
-			"<" => 52,
-			'PREFIX' => 55,
-			"[" => 70,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			'AT_LBRACE' => 71,
-			"(" => 107,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			"\@" => 37,
-			'NEG_REGEX' => 61
-		},
-		GOTOS => {
-			'qw_lemma' => 42,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_infix' => 53,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qwk_indextuple' => 9,
-			'qw_regex' => 60,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'l_phrase' => 108,
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_word' => 106,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34
-		}
+		DEFAULT => -1
 	},
 	{#State 49
 		ACTIONS => {
-			"=" => 109,
-			'SYMBOL' => 1,
-			'INTEGER' => 21,
-			'DATE' => 57
+			"<" => 65,
+			'NEAR' => 60,
+			'INFIX' => 59,
+			'KEYS' => 71,
+			'DATE' => 69,
+			"\@" => 45,
+			"*" => 44,
+			'COLON_LBRACE' => 47,
+			'NEG_REGEX' => 39,
+			'INTEGER' => 42,
+			"(" => 106,
+			"%" => 51,
+			"\$" => 23,
+			"{" => 24,
+			'DOLLAR_DOT' => 20,
+			'PREFIX' => 33,
+			'AT_LBRACE' => 37,
+			'STAR_LBRACE' => 29,
+			'SUFFIX' => 31,
+			"\"" => 30,
+			"^" => 1,
+			"[" => 13,
+			'REGEX' => 14,
+			'SYMBOL' => 11,
+			'INDEX' => 12
 		},
+		DEFAULT => -119,
 		GOTOS => {
-			'symbol' => 110
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			'qc_basic' => 107,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 22,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'qc_tokens' => 50,
+			'qw_prefix_set' => 9,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_any' => 2,
+			'qc_near' => 43,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8
 		}
 	},
 	{#State 50
-		DEFAULT => -145
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -130,
+		GOTOS => {
+			'matchid' => 108,
+			'matchid_eq' => 84
+		}
 	},
 	{#State 51
 		ACTIONS => {
-			"=" => 82
+			'DATE' => 69,
+			'INTEGER' => 42,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -126,
 		GOTOS => {
-			'matchid' => 111,
-			'matchid_eq' => 83
+			's_lemma' => 110,
+			'symbol' => 109
 		}
 	},
 	{#State 52
-		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
-		},
-		GOTOS => {
-			'symbol' => 112,
-			's_filename' => 113
-		}
+		DEFAULT => -169
 	},
 	{#State 53
-		DEFAULT => -143
+		DEFAULT => -154
 	},
 	{#State 54
-		ACTIONS => {
-			"(" => 114
-		}
+		DEFAULT => -152
 	},
 	{#State 55
-		DEFAULT => -265
-	},
-	{#State 56
-		DEFAULT => -175
-	},
-	{#State 57
-		DEFAULT => -261
-	},
-	{#State 58
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'INTEGER' => 21,
-			'DATE' => 57
-		},
-		GOTOS => {
-			'symbol' => 116,
-			's_lemma' => 115
-		}
-	},
-	{#State 59
 		DEFAULT => -2
 	},
+	{#State 56
+		ACTIONS => {
+			"\"" => 30,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"!" => 18,
+			"(" => 56,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			"[" => 13,
+			'REGEX' => 14,
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			"{" => 24,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"*" => 44,
+			"\@" => 45,
+			"\$" => 23
+		},
+		GOTOS => {
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qc_concat' => 117,
+			'qc_tokens' => 50,
+			'qw_prefix_set' => 9,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qc_near' => 116,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'qc_basic' => 72,
+			'q_clause' => 114,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68,
+			'qc_phrase' => 115,
+			'qw_withor' => 62,
+			'qw_lemma' => 64,
+			'index' => 63,
+			'qw_set_infl' => 27,
+			'qc_boolean' => 113,
+			's_index' => 25,
+			'qc_matchid' => 112,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 111
+		}
+	},
+	{#State 57
+		DEFAULT => -141
+	},
+	{#State 58
+		DEFAULT => -179
+	},
+	{#State 59
+		DEFAULT => -271
+	},
 	{#State 60
-		DEFAULT => -139
+		ACTIONS => {
+			"(" => 118
+		}
 	},
 	{#State 61
 		ACTIONS => {
-			'REGOPT' => 117
-		},
-		DEFAULT => -271
-	},
-	{#State 62
-		DEFAULT => -158
-	},
-	{#State 63
-		ACTIONS => {
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			"(" => 35,
-			'AT_LBRACE' => 71,
-			'STAR_LBRACE' => 36,
-			"*" => 17,
-			"[" => 70,
-			'NEAR' => 54,
-			'PREFIX' => 55,
-			'KEYS' => 8,
-			"<" => 52,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"\"" => 48,
-			"{" => 47,
-			"^" => 65,
-			"!" => 63,
-			'SUFFIX' => 3,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2
-		},
-		GOTOS => {
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_phrase' => 27,
-			'qc_boolean' => 64,
-			'index' => 24,
-			'q_clause' => 118,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qc_word' => 33,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_anchor' => 40,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_set_exact' => 43,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			's_prefix' => 56,
-			'qw_regex' => 60,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qc_basic' => 18,
-			'qw_any' => 20,
-			'qw_infix' => 53,
-			'qc_concat' => 15,
-			'qc_tokens' => 51,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qc_matchid' => 14
+			"(" => 119
 		}
 	},
+	{#State 62
+		DEFAULT => -161
+	},
+	{#State 63
+		DEFAULT => -250
+	},
 	{#State 64
-		DEFAULT => -114
+		DEFAULT => -155
 	},
 	{#State 65
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21
+			'SYMBOL' => 11,
+			'INTEGER' => 42,
+			'DATE' => 69
 		},
 		GOTOS => {
-			'symbol' => 120,
-			's_chunk' => 119
+			's_filename' => 120,
+			'symbol' => 121
 		}
 	},
 	{#State 66
-		ACTIONS => {
-			"(" => 121
-		}
+		DEFAULT => -162
 	},
 	{#State 67
-		DEFAULT => -177
+		DEFAULT => -137
 	},
 	{#State 68
-		DEFAULT => -167
+		DEFAULT => -142
 	},
 	{#State 69
-		DEFAULT => -147
+		DEFAULT => -265
 	},
 	{#State 70
-		DEFAULT => -211,
-		GOTOS => {
-			'l_morph' => 122
-		}
+		DEFAULT => -163
 	},
 	{#State 71
-		DEFAULT => -208,
-		GOTOS => {
-			'l_set' => 123
+		ACTIONS => {
+			"(" => 122
 		}
 	},
 	{#State 72
-		DEFAULT => -144
+		ACTIONS => {
+			'DOLLAR_DOT' => 20,
+			"{" => 24,
+			"\$" => 23,
+			'SUFFIX' => 31,
+			"\"" => 30,
+			'STAR_LBRACE' => 29,
+			'AT_LBRACE' => 37,
+			'PREFIX' => 33,
+			"^" => 1,
+			'REGEX' => 14,
+			"[" => 13,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'INFIX' => 59,
+			'NEAR' => 60,
+			"<" => 65,
+			'DATE' => 69,
+			'KEYS' => 71,
+			'INTEGER' => 42,
+			'NEG_REGEX' => 39,
+			'COLON_LBRACE' => 47,
+			"\@" => 45,
+			"*" => 44,
+			"%" => 51,
+			"(" => 106
+		},
+		DEFAULT => -117,
+		GOTOS => {
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 50,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qc_near' => 43,
+			'qw_any' => 2,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_exact' => 68,
+			'qc_phrase' => 67,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qc_basic' => 123,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_lemma' => 64,
+			'index' => 63,
+			'qw_withor' => 62
+		}
 	},
 	{#State 73
-		DEFAULT => -270
+		DEFAULT => -256
 	},
 	{#State 74
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			"!" => 63,
-			"^" => 65,
-			'COUNT' => 66,
-			"\"" => 48,
-			"{" => 47,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"<" => 52,
-			'KEYS' => 8,
-			'NEAR' => 54,
-			'PREFIX' => 55,
-			"[" => 70,
-			"*" => 17,
-			'AT_LBRACE' => 71,
-			"(" => 35,
-			'STAR_LBRACE' => 36,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			'NEG_REGEX' => 61,
-			"\@" => 37
-		},
-		GOTOS => {
-			'qwk_indextuple' => 9,
-			'qc_tokens' => 51,
-			'qc_matchid' => 14,
-			'query_conditions' => 124,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qc_concat' => 15,
-			'qw_infix' => 53,
-			'qc_basic' => 18,
-			'qc_near' => 19,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			'count_query' => 126,
-			's_prefix' => 56,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_anchor' => 40,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_suffix_set' => 46,
-			'qw_thesaurus' => 7,
-			'qw_prefix' => 50,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 33,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'index' => 24,
-			'q_clause' => 25,
-			'qc_phrase' => 27,
-			'qwk_countsrc' => 125,
-			'qc_boolean' => 64,
-			'regex' => 28,
-			's_suffix' => 67
-		}
+		DEFAULT => -197
 	},
 	{#State 75
 		ACTIONS => {
-			'KEYS' => 127
+			'KEYS' => 124
 		}
 	},
 	{#State 76
-		DEFAULT => 0
+		ACTIONS => {
+			'SYMBOL' => 11,
+			"," => 128,
+			";" => 125,
+			'INTEGER' => 42,
+			"]" => 129,
+			'DATE' => 69
+		},
+		GOTOS => {
+			'symbol' => 126,
+			's_morphitem' => 127
+		}
 	},
 	{#State 77
-		ACTIONS => {
-			'EXPANDER' => 129
-		},
-		DEFAULT => -161,
-		GOTOS => {
-			's_expander' => 128
-		}
+		DEFAULT => -274
 	},
 	{#State 78
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			"^" => 65,
-			"\"" => 48,
-			"{" => 47,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			'KEYS' => 8,
-			"<" => 52,
-			'PREFIX' => 55,
-			'NEAR' => 54,
-			"[" => 70,
-			"*" => 17,
-			'AT_LBRACE' => 71,
-			"(" => 78,
-			'STAR_LBRACE' => 36,
-			'INTEGER' => 21,
-			"%" => 58,
-			'DATE' => 57,
-			'NEG_REGEX' => 61,
-			"\@" => 37
+			"=" => 86
 		},
+		DEFAULT => -125,
 		GOTOS => {
-			'qc_phrase' => 130,
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qc_word' => 131,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_infix' => 53,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			's_prefix' => 56,
-			'qw_regex' => 60,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qc_near' => 132,
-			'qw_with' => 16,
-			'qw_any' => 20
+			'matchid_eq' => 84,
+			'matchid' => 100
 		}
 	},
 	{#State 79
-		DEFAULT => -124
+		ACTIONS => {
+			"=" => 130
+		}
 	},
 	{#State 80
-		DEFAULT => -123
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 131
+		}
 	},
 	{#State 81
-		DEFAULT => -130
+		ACTIONS => {
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"(" => 91,
+			'PREFIX' => 33,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			"[" => 13,
+			'REGEX' => 14,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			"{" => 24,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"*" => 44,
+			"\$" => 23,
+			"\@" => 45,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'DOLLAR_DOT' => 20
+		},
+		GOTOS => {
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 133,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'qw_exact' => 68,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_any' => 2,
+			'qw_with' => 3,
+			'symbol' => 4,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_prefix_set' => 9,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_without' => 17,
+			'qw_bareword' => 57
+		}
 	},
 	{#State 82
-		DEFAULT => -280
+		DEFAULT => -211
 	},
 	{#State 83
 		ACTIONS => {
-			'INTEGER' => 133
+			"\$" => 23,
+			"\@" => 45,
+			"*" => 44,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"{" => 24,
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'REGEX' => 14,
+			"[" => 13,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			"(" => 91,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'SUFFIX' => 31,
+			'DATE' => 69
 		},
 		GOTOS => {
-			'int_str' => 135,
-			'integer' => 134
+			'qw_withor' => 62,
+			'qw_lemma' => 64,
+			'index' => 63,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 134,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_prefix_set' => 9,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'regex' => 52
 		}
 	},
 	{#State 84
 		ACTIONS => {
-			'KEYS' => 8,
-			"<" => 52,
-			"[" => 70,
-			'PREFIX' => 55,
-			'NEAR' => 54,
-			'STAR_LBRACE' => 36,
-			"(" => 35,
-			'AT_LBRACE' => 71,
-			"*" => 17,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			"^" => 65,
-			"!" => 63,
-			"{" => 47,
-			"\"" => 48,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49
+			'INTEGER' => 132
 		},
 		GOTOS => {
-			'qw_infix' => 53,
-			'qc_concat' => 15,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qc_matchid' => 14,
-			'qc_tokens' => 51,
-			'qwk_indextuple' => 9,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qc_basic' => 18,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_set_exact' => 43,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'qc_word' => 33,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qc_boolean' => 64,
-			'qc_phrase' => 27,
-			'q_clause' => 136,
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28
+			'int_str' => 135,
+			'integer' => 136
 		}
 	},
 	{#State 85
 		ACTIONS => {
-			'FILENAMES_ONLY' => 138,
-			'DEBUG_RANK' => 157,
-			'LESS_BY_RIGHT' => 156,
-			'GREATER_BY_DATE' => 159,
-			'LESS_BY_SIZE' => 160,
-			'NOSEPARATE_HITS' => 161,
-			'GREATER_BY_MIDDLE' => 145,
-			'GREATER_BY_SIZE' => 158,
-			'RANDOM' => 139,
-			'LESS_BY' => 140,
-			'WITHIN' => 141,
-			'IS_DATE' => 142,
-			'LESS_BY_RANK' => 143,
-			'CNTXT' => 146,
-			"!" => 168,
-			'GREATER_BY' => 169,
-			'LESS_BY_LEFT' => 147,
-			'GREATER_BY_LEFT' => 163,
-			'IS_SIZE' => 164,
-			'LESS_BY_DATE' => 165,
-			'HAS_FIELD' => 166,
-			":" => 150,
-			'GREATER_BY_RIGHT' => 152,
-			'SEPARATE_HITS' => 153,
-			'GREATER_BY_RANK' => 155,
-			'LESS_BY_MIDDLE' => 171
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'DOLLAR_DOT' => 20,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"{" => 24,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			"(" => 91,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			'REGEX' => 14,
+			"[" => 13,
+			'PREFIX' => 33,
+			'INDEX' => 12,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -28,
 		GOTOS => {
-			'q_flag' => 167,
-			'qf_bibl_sort' => 151,
-			'qf_has_field' => 148,
-			'qf_random_sort' => 162,
-			'qf_date_sort' => 170,
-			'qf_size_sort' => 154,
-			'qf_rank_sort' => 144,
-			'qf_context_sort' => 137,
-			'q_filter' => 149
+			'qc_word' => 137,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'qw_prefix_set' => 9,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54
 		}
 	},
 	{#State 86
-		ACTIONS => {
-			"\"" => 48,
-			"{" => 47,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'REGEX' => 2,
-			"^" => 65,
-			"!" => 63,
-			'AT_LBRACE' => 71,
-			"(" => 35,
-			'STAR_LBRACE' => 36,
-			"*" => 17,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			'KEYS' => 8,
-			"<" => 52,
-			"[" => 70,
-			'PREFIX' => 55,
-			'NEAR' => 54
-		},
-		GOTOS => {
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qc_concat' => 15,
-			'qw_infix' => 53,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qc_matchid' => 14,
-			'qc_tokens' => 51,
-			'qwk_indextuple' => 9,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'qc_basic' => 18,
-			'qc_near' => 19,
-			'qc_boolean' => 64,
-			'qc_phrase' => 27,
-			'q_clause' => 172,
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_word' => 33,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34
-		}
+		DEFAULT => -284
 	},
 	{#State 87
-		DEFAULT => -117
+		ACTIONS => {
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"\$" => 142,
+			'INDEX' => 12,
+			'SYMBOL' => 11
+		},
+		DEFAULT => -230,
+		GOTOS => {
+			'l_indextuple' => 138,
+			's_indextuple_item' => 139,
+			'symbol' => 140,
+			's_index' => 141,
+			'index' => 63
+		}
 	},
 	{#State 88
 		ACTIONS => {
-			'SYMBOL' => 1,
-			"\$" => 173,
-			'INTEGER' => 21,
-			'INDEX' => 29,
-			'DATE' => 57
+			'INTEGER' => 42,
+			'RBRACE_STAR' => 143,
+			'DATE' => 69,
+			'SYMBOL' => 11,
+			"," => 145,
+			"}" => 146
 		},
-		DEFAULT => -226,
 		GOTOS => {
-			's_index' => 175,
-			'symbol' => 174,
-			'l_indextuple' => 176,
-			'index' => 24,
-			's_indextuple_item' => 177
+			'symbol' => 4,
+			's_word' => 144
 		}
 	},
 	{#State 89
 		ACTIONS => {
-			"[" => 70,
-			'PREFIX' => 55,
-			'KEYS' => 8,
-			"<" => 52,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'STAR_LBRACE' => 36,
-			'AT_LBRACE' => 71,
-			"(" => 107,
-			"*" => 17,
-			"^" => 65,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"{" => 47
+			"%" => 150,
+			'STAR_LBRACE' => 153,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'REGEX' => 14,
+			"[" => 160,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			":" => 159,
+			'AT_LBRACE' => 155,
+			'NEG_REGEX' => 39,
+			"^" => 161,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"\@" => 151,
+			"*" => 152,
+			"<" => 148,
+			"{" => 158
 		},
 		GOTOS => {
-			'qw_with' => 16,
-			'qw_any' => 20,
-			's_prefix' => 56,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qw_infix' => 53,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_prefix' => 50,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_anchor' => 40,
-			'qw_exact' => 41,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qc_word' => 178,
-			'regex' => 28,
-			's_suffix' => 67,
-			'index' => 24
+			'symbol' => 4,
+			'regex' => 149,
+			's_prefix' => 147,
+			'neg_regex' => 156,
+			's_suffix' => 154,
+			's_word' => 157,
+			's_infix' => 162
 		}
 	},
 	{#State 90
-		DEFAULT => -207
+		ACTIONS => {
+			"}" => 163,
+			"," => 145,
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'RBRACE_STAR' => 164,
+			'INTEGER' => 42
+		},
+		GOTOS => {
+			's_word' => 144,
+			'symbol' => 4
+		}
 	},
 	{#State 91
 		ACTIONS => {
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'REGEX' => 2,
-			"^" => 65,
-			"{" => 47,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"<" => 52,
-			'KEYS' => 8,
-			"[" => 70,
-			'PREFIX' => 55,
-			"(" => 107,
-			'AT_LBRACE' => 71,
-			'STAR_LBRACE' => 36,
-			"*" => 17,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			'INTEGER' => 21,
-			"%" => 58,
-			'DATE' => 57
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"[" => 13,
+			'REGEX' => 14,
+			'PREFIX' => 33,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			"(" => 91,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71
 		},
 		GOTOS => {
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_set_exact' => 43,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_anchor' => 40,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_prefix' => 50,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qwk_indextuple' => 9,
-			'qw_infix' => 53,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56,
-			'index' => 24,
-			'regex' => 28,
-			's_suffix' => 67,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qc_word' => 179,
-			'qw_morph' => 31,
+			'qc_word' => 165,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'qw_exact' => 68,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_word' => 35,
 			'qw_listfile' => 32,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_any' => 2,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'regex' => 52,
+			'qw_prefix_set' => 9,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54
 		}
 	},
 	{#State 92
 		ACTIONS => {
-			'DATE' => 57,
-			"%" => 58,
-			'INTEGER' => 21,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			"(" => 107,
-			'AT_LBRACE' => 71,
-			'PREFIX' => 55,
-			"[" => 70,
-			"<" => 52,
-			'KEYS' => 8,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"{" => 47,
-			"^" => 65,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3
+			'WITHOUT' => 81,
+			'WITH' => 83,
+			"=" => 86,
+			'WITHOR' => 85
 		},
+		DEFAULT => -219,
 		GOTOS => {
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_word' => 180,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_anchor' => 40,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_prefix' => 50,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_infix' => 53,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qwk_indextuple' => 9,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qw_with' => 16
+			'matchid' => 82,
+			'matchid_eq' => 84
 		}
 	},
 	{#State 93
 		ACTIONS => {
-			'WITHOUT' => 92,
-			'WITH' => 91,
-			'WITHOR' => 89,
-			")" => 181,
-			"=" => 82
+			'INFIX' => 59,
+			'INTEGER' => 42,
+			"#" => 170,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			"{" => 24,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"*" => 44,
+			"\@" => 45,
+			"\$" => 23,
+			"\"" => 167,
+			'HASH_EQUAL' => 169,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'STAR_LBRACE' => 29,
+			'HASH_LESS' => 171,
+			"%" => 51,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			'HASH_GREATER' => 166,
+			"(" => 91,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			"[" => 13,
+			'REGEX' => 14
 		},
-		DEFAULT => -132,
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 168,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_prefix_set' => 9,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3
 		}
 	},
 	{#State 94
-		ACTIONS => {
-			")" => 182
-		},
-		DEFAULT => -133
+		DEFAULT => 0
 	},
 	{#State 95
 		ACTIONS => {
-			'OP_BOOL_AND' => 86,
-			'OP_BOOL_OR' => 84,
-			"=" => 82
+			'EXPANDER' => 173
 		},
+		DEFAULT => -165,
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 87
+			's_expander' => 172
 		}
 	},
 	{#State 96
 		ACTIONS => {
-			")" => 183,
-			"=" => 82
+			'SYMBOL' => 11,
+			"," => 145,
+			"}" => 174,
+			'INTEGER' => 42,
+			'DATE' => 69
 		},
-		DEFAULT => -127,
 		GOTOS => {
-			'matchid' => 81,
-			'matchid_eq' => 83
+			's_word' => 144,
+			'symbol' => 4
 		}
 	},
 	{#State 97
 		ACTIONS => {
-			'REGEX' => 2,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'SUFFIX' => 3,
-			"^" => 65,
-			"\"" => 48,
-			"{" => 47,
-			")" => 184,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"<" => 52,
-			'KEYS' => 8,
-			'NEAR' => 54,
-			'PREFIX' => 55,
-			"[" => 70,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			"(" => 78,
-			'AT_LBRACE' => 71,
-			'DATE' => 57,
-			"%" => 58,
-			'INTEGER' => 21,
-			"\@" => 37,
-			'NEG_REGEX' => 61
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"\"" => 30,
+			'REGEX' => 14,
+			"[" => 13,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			"(" => 56,
+			"!" => 18,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37
 		},
-		DEFAULT => -115,
 		GOTOS => {
-			'index' => 24,
-			'qc_phrase' => 27,
-			'regex' => 28,
-			's_suffix' => 67,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_morph' => 31,
+			'qc_concat' => 49,
+			'qc_tokens' => 50,
+			'qw_prefix_set' => 9,
+			'regex' => 52,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_any' => 2,
+			'qc_near' => 43,
+			'qw_with' => 3,
+			'symbol' => 4,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
 			'qw_listfile' => 32,
-			'qc_word' => 33,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_prefix' => 50,
-			'qc_tokens' => 51,
-			'qwk_indextuple' => 9,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qw_infix' => 53,
-			'qc_basic' => 79,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qw_any' => 20,
-			's_prefix' => 56,
-			'qw_regex' => 60,
-			'qw_keys' => 62,
-			'qw_bareword' => 22
+			's_word' => 35,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'q_clause' => 175,
+			'qc_basic' => 72,
+			'qc_matchid' => 19,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 22,
+			'qw_withor' => 62,
+			'qw_lemma' => 64,
+			'index' => 63,
+			's_index' => 25,
+			'qc_boolean' => 26,
+			'qw_set_infl' => 27
 		}
 	},
 	{#State 98
 		ACTIONS => {
-			")" => 185
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"{" => 24,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			"\"" => 30,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			"!" => 18,
+			"(" => 56,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"[" => 13,
+			'REGEX' => 14,
+			'PREFIX' => 33,
+			'INDEX' => 12,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -116
+		GOTOS => {
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qc_near' => 43,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_prefix_set' => 9,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'qc_concat' => 49,
+			'qc_tokens' => 50,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_set_infl' => 27,
+			'qc_boolean' => 26,
+			's_index' => 25,
+			'qw_withor' => 62,
+			's_prefix' => 58,
+			'qc_word' => 22,
+			'qc_matchid' => 19,
+			'qw_thesaurus' => 21,
+			'qc_basic' => 72,
+			'q_clause' => 176,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68,
+			'qc_phrase' => 67
+		}
 	},
 	{#State 99
 		ACTIONS => {
-			")" => 186
+			'LESS_BY_DATE' => 199,
+			":" => 198,
+			'LESS_BY_LEFT' => 178,
+			"!" => 200,
+			'GREATER_BY_LEFT' => 179,
+			'GREATER_BY_DATE' => 202,
+			'GREATER_BY_RANK' => 180,
+			'LESS_BY_MIDDLE' => 203,
+			'LESS_BY_SIZE' => 204,
+			'GREATER_BY_MIDDLE' => 181,
+			'WITHIN' => 183,
+			'CNTXT' => 182,
+			'GREATER_BY' => 205,
+			'IS_DATE' => 184,
+			'LESS_BY' => 206,
+			'GREATER_BY_RIGHT' => 207,
+			'KW_COMMENT' => 210,
+			'HAS_FIELD' => 185,
+			'RANDOM' => 211,
+			'LESS_BY_RANK' => 186,
+			'GREATER_BY_SIZE' => 188,
+			'NOSEPARATE_HITS' => 191,
+			'IS_SIZE' => 192,
+			'FILENAMES_ONLY' => 212,
+			'SEPARATE_HITS' => 195,
+			'LESS_BY_RIGHT' => 213,
+			'DEBUG_RANK' => 197
 		},
-		DEFAULT => -114
+		DEFAULT => -29,
+		GOTOS => {
+			'q_flag' => 177,
+			'qf_has_field' => 193,
+			'q_filter' => 201,
+			'qf_bibl_sort' => 209,
+			'qf_random_sort' => 194,
+			'qf_context_sort' => 196,
+			'q_comment' => 208,
+			'qf_rank_sort' => 187,
+			'qf_size_sort' => 190,
+			'qf_date_sort' => 189
+		}
 	},
 	{#State 100
-		ACTIONS => {
-			"," => 189,
-			'SYMBOL' => 1,
-			'RBRACE_STAR' => 190,
-			"}" => 188,
-			'INTEGER' => 21,
-			'DATE' => 57
-		},
-		GOTOS => {
-			'symbol' => 44,
-			's_word' => 187
-		}
+		DEFAULT => -121
 	},
 	{#State 101
-		DEFAULT => -163
+		DEFAULT => -276
 	},
 	{#State 102
-		DEFAULT => -250
+		DEFAULT => -134
 	},
 	{#State 103
-		ACTIONS => {
-			"}" => 191
-		}
+		DEFAULT => -167
 	},
 	{#State 104
 		ACTIONS => {
-			"{" => 199,
-			"^" => 203,
-			'SUFFIX' => 3,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'REGEX' => 2,
-			"\@" => 197,
-			'NEG_REGEX' => 61,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 202,
-			'AT_LBRACE' => 207,
-			'STAR_LBRACE' => 198,
-			"*" => 194,
-			"[" => 205,
-			'PREFIX' => 55,
-			":" => 196,
-			"<" => 200
-		},
-		GOTOS => {
-			's_suffix' => 204,
-			's_prefix' => 201,
-			's_infix' => 192,
-			's_word' => 193,
-			'neg_regex' => 206,
-			'regex' => 195,
-			'symbol' => 44
+			"}" => 214
 		}
 	},
 	{#State 105
-		ACTIONS => {
-			"}" => 209,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			'SYMBOL' => 1,
-			"," => 189,
-			'RBRACE_STAR' => 208
-		},
-		GOTOS => {
-			'symbol' => 44,
-			's_word' => 187
-		}
+		DEFAULT => -254
 	},
 	{#State 106
 		ACTIONS => {
-			'WITHOUT' => 92,
-			'WITHOR' => 89,
-			'WITH' => 91,
-			"=" => 82
+			'INTEGER' => 42,
+			'NEAR' => 60,
+			'INFIX' => 59,
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			"{" => 24,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"\"" => 30,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			"(" => 106,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			'REGEX' => 14,
+			"[" => 13,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33
 		},
-		DEFAULT => -215,
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_prefix_set' => 9,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_any' => 2,
+			'qc_near' => 216,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'qc_phrase' => 215,
+			'qw_exact' => 68,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 165
 		}
 	},
 	{#State 107
-		ACTIONS => {
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'STAR_LBRACE' => 36,
-			"(" => 107,
-			'AT_LBRACE' => 71,
-			"*" => 17,
-			"[" => 70,
-			'PREFIX' => 55,
-			'KEYS' => 8,
-			"<" => 52,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"{" => 47,
-			"^" => 65,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1
-		},
-		GOTOS => {
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_word' => 131,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_set_exact' => 43,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_infix' => 53,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qwk_indextuple' => 9,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qw_with' => 16
-		}
+		DEFAULT => -128
 	},
 	{#State 108
-		ACTIONS => {
-			'HASH_LESS' => 211,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			"#" => 210,
-			"(" => 107,
-			'AT_LBRACE' => 71,
-			'PREFIX' => 55,
-			'HASH_GREATER' => 215,
-			"[" => 70,
-			'KEYS' => 8,
-			"<" => 52,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"\"" => 212,
-			"{" => 47,
-			"^" => 65,
-			'HASH_EQUAL' => 213,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'SUFFIX' => 3
-		},
-		GOTOS => {
-			'index' => 24,
-			'regex' => 28,
-			's_suffix' => 67,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qc_word' => 214,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_anchor' => 40,
-			'qw_thesaurus' => 7,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_prefix' => 50,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qwk_indextuple' => 9,
-			'qw_infix' => 53,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56
-		}
+		DEFAULT => -138
 	},
 	{#State 109
-		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'int_str' => 216
-		}
+		DEFAULT => -255
 	},
 	{#State 110
-		ACTIONS => {
-			"=" => 217
-		}
+		DEFAULT => -195
 	},
 	{#State 111
-		DEFAULT => -134
+		ACTIONS => {
+			"=" => 86,
+			'WITH' => 83,
+			")" => 217,
+			'WITHOR' => 85,
+			'WITHOUT' => 81
+		},
+		DEFAULT => -136,
+		GOTOS => {
+			'matchid' => 82,
+			'matchid_eq' => 84
+		}
 	},
 	{#State 112
-		DEFAULT => -253
+		ACTIONS => {
+			")" => 218
+		},
+		DEFAULT => -120
 	},
 	{#State 113
-		DEFAULT => -197
+		ACTIONS => {
+			")" => 219
+		},
+		DEFAULT => -118
 	},
 	{#State 114
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			"^" => 65,
-			"\"" => 48,
-			"{" => 47,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"<" => 52,
-			'KEYS' => 8,
-			'PREFIX' => 55,
-			"[" => 70,
-			"*" => 17,
-			'AT_LBRACE' => 71,
-			"(" => 218,
-			'STAR_LBRACE' => 36,
-			'INTEGER' => 21,
-			"%" => 58,
-			'DATE' => 57,
-			'NEG_REGEX' => 61,
-			"\@" => 37
+			"=" => 86,
+			'OP_BOOL_AND' => 97,
+			'OP_BOOL_OR' => 98
 		},
 		GOTOS => {
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_phrase' => 27,
-			'index' => 24,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qc_word' => 33,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			's_prefix' => 56,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'qw_infix' => 53,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qc_tokens' => 219,
-			'qwk_indextuple' => 9
+			'matchid' => 100,
+			'matchid_eq' => 84
 		}
 	},
 	{#State 115
-		DEFAULT => -191
+		ACTIONS => {
+			")" => 220
+		},
+		DEFAULT => -137
 	},
 	{#State 116
-		DEFAULT => -251
+		ACTIONS => {
+			")" => 221,
+			"=" => 86
+		},
+		DEFAULT => -131,
+		GOTOS => {
+			'matchid' => 102,
+			'matchid_eq' => 84
+		}
 	},
 	{#State 117
-		DEFAULT => -272
+		ACTIONS => {
+			"{" => 24,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			")" => 222,
+			"*" => 44,
+			"\@" => 45,
+			"\$" => 23,
+			'INFIX' => 59,
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"(" => 106,
+			'PREFIX' => 33,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'REGEX' => 14,
+			"[" => 13,
+			"\"" => 30,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51
+		},
+		DEFAULT => -119,
+		GOTOS => {
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'qc_basic' => 107,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
+			'qw_withor' => 62,
+			'qw_lemma' => 64,
+			'index' => 63,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 22,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qc_tokens' => 50,
+			'qw_prefix_set' => 9,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_any' => 2,
+			'qc_near' => 43,
+			'qw_with' => 3,
+			'symbol' => 4
+		}
 	},
 	{#State 118
 		ACTIONS => {
-			"=" => 82
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			"{" => 24,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"*" => 44,
+			"\$" => 23,
+			"\@" => 45,
+			"\"" => 30,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			"(" => 223,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'PREFIX' => 33,
+			"[" => 13,
+			'REGEX' => 14
 		},
-		DEFAULT => -121,
 		GOTOS => {
-			'matchid' => 87,
-			'matchid_eq' => 83
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qw_exact' => 68,
+			'qc_phrase' => 67,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_any' => 2,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 224
 		}
 	},
 	{#State 119
-		DEFAULT => -193
-	},
-	{#State 120
-		DEFAULT => -252
-	},
-	{#State 121
 		ACTIONS => {
-			"{" => 47,
-			"\"" => 48,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			"!" => 63,
-			"^" => 65,
-			"*" => 17,
-			'AT_LBRACE' => 71,
-			"(" => 35,
-			'STAR_LBRACE' => 36,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			'KEYS' => 8,
-			"<" => 52,
-			'NEAR' => 54,
-			'PREFIX' => 55,
-			"[" => 70
+			"{" => 24,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"*" => 44,
+			"\@" => 45,
+			"\$" => 23,
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"!" => 18,
+			"(" => 56,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			"[" => 13,
+			'REGEX' => 14,
+			"\"" => 30,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'STAR_LBRACE' => 29,
+			"%" => 51
 		},
 		GOTOS => {
-			'qwk_indextuple' => 9,
-			'qc_tokens' => 51,
-			'qc_matchid' => 14,
-			's_word' => 11,
-			'query_conditions' => 220,
-			'qw_withor' => 12,
-			'qc_concat' => 15,
-			'qw_infix' => 53,
-			'qc_basic' => 18,
-			'qw_with' => 16,
-			'qc_near' => 19,
-			'qw_any' => 20,
-			's_prefix' => 56,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			'qw_regex' => 60,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_anchor' => 40,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_prefix' => 50,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			'neg_regex' => 68,
+			'qw_lemma' => 64,
+			'index' => 63,
+			'qc_boolean' => 26,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_withor' => 62,
+			's_prefix' => 58,
+			'qc_word' => 22,
+			'qc_matchid' => 19,
+			'qw_thesaurus' => 21,
+			'qc_basic' => 72,
+			'q_clause' => 38,
+			's_word' => 35,
 			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 33,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'index' => 24,
-			'q_clause' => 25,
-			'qc_phrase' => 27,
-			'qc_boolean' => 64,
-			'regex' => 28,
-			's_suffix' => 67
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68,
+			'qc_phrase' => 67,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_suffix' => 46,
+			'qc_near' => 43,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_prefix_set' => 9,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'query_conditions' => 225,
+			'qc_concat' => 49,
+			'qc_tokens' => 50
 		}
+	},
+	{#State 120
+		DEFAULT => -201
+	},
+	{#State 121
+		DEFAULT => -257
 	},
 	{#State 122
 		ACTIONS => {
-			"]" => 221,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			";" => 225,
-			"," => 222,
-			'SYMBOL' => 1
+			"(" => 56,
+			"!" => 18,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"[" => 13,
+			'REGEX' => 14,
+			'PREFIX' => 33,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			"\"" => 30,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24,
+			"\@" => 45,
+			"\$" => 23,
+			'COUNT' => 61,
+			"*" => 44,
+			'INFIX' => 59,
+			'NEAR' => 60,
+			'INTEGER' => 42,
+			'DOLLAR_DOT' => 20,
+			'NEG_REGEX' => 39,
+			"^" => 1
 		},
 		GOTOS => {
-			'symbol' => 223,
-			's_morphitem' => 224
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qc_near' => 43,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'regex' => 52,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 50,
+			'query_conditions' => 228,
+			'qc_concat' => 49,
+			'qw_without' => 17,
+			'count_query' => 227,
+			'qw_bareword' => 57,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qc_matchid' => 19,
+			's_index' => 25,
+			'qc_boolean' => 26,
+			'qw_set_infl' => 27,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'qwk_countsrc' => 226,
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'q_clause' => 38,
+			'qc_basic' => 72,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			'qw_listfile' => 32,
+			's_word' => 35
 		}
 	},
 	{#State 123
-		ACTIONS => {
-			'INTEGER' => 21,
-			"}" => 226,
-			'DATE' => 57,
-			"," => 189,
-			'SYMBOL' => 1
-		},
-		GOTOS => {
-			'symbol' => 44,
-			's_word' => 187
-		}
+		DEFAULT => -127
 	},
 	{#State 124
-		DEFAULT => -4,
-		GOTOS => {
-			'count_filters' => 227
-		}
-	},
-	{#State 125
-		ACTIONS => {
-			")" => 228
-		}
-	},
-	{#State 126
-		DEFAULT => -205
-	},
-	{#State 127
 		ACTIONS => {
 			"(" => 229
 		}
 	},
+	{#State 125
+		DEFAULT => -218
+	},
+	{#State 126
+		DEFAULT => -258
+	},
+	{#State 127
+		DEFAULT => -216
+	},
 	{#State 128
-		DEFAULT => -222
+		DEFAULT => -217
 	},
 	{#State 129
-		DEFAULT => -268
+		DEFAULT => -193
 	},
 	{#State 130
 		ACTIONS => {
-			")" => 182
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 230
 		}
 	},
 	{#State 131
-		ACTIONS => {
-			'WITHOUT' => 92,
-			"=" => 82,
-			'WITHOR' => 89,
-			")" => 181,
-			'WITH' => 91
-		},
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
-		}
+		DEFAULT => -199
 	},
 	{#State 132
-		ACTIONS => {
-			")" => 183,
-			"=" => 82
-		},
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 81
-		}
-	},
-	{#State 133
-		DEFAULT => -275
-	},
-	{#State 134
 		DEFAULT => -279
 	},
+	{#State 133
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -204,
+		GOTOS => {
+			'matchid' => 82,
+			'matchid_eq' => 84
+		}
+	},
+	{#State 134
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -203,
+		GOTOS => {
+			'matchid' => 82,
+			'matchid_eq' => 84
+		}
+	},
 	{#State 135
-		DEFAULT => -276
+		DEFAULT => -280
 	},
 	{#State 136
-		ACTIONS => {
-			"=" => 82
-		},
-		DEFAULT => -120,
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 87
-		}
+		DEFAULT => -283
 	},
 	{#State 137
-		DEFAULT => -47
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -205,
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 82
+		}
 	},
 	{#State 138
-		DEFAULT => -38
+		ACTIONS => {
+			"," => 231,
+			")" => 232
+		}
 	},
 	{#State 139
-		ACTIONS => {
-			"[" => 230
-		},
-		DEFAULT => -74
+		DEFAULT => -231
 	},
 	{#State 140
-		ACTIONS => {
-			"[" => 231
-		}
+		DEFAULT => -252
 	},
 	{#State 141
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'KW_FILENAME' => 233
-		},
-		GOTOS => {
-			'symbol' => 232,
-			's_breakname' => 234
-		}
+		DEFAULT => -251
 	},
 	{#State 142
-		ACTIONS => {
-			"[" => 235
-		}
+		DEFAULT => -249
 	},
 	{#State 143
-		DEFAULT => -61
+		DEFAULT => -187
 	},
 	{#State 144
-		DEFAULT => -46
+		DEFAULT => -213
 	},
 	{#State 145
-		ACTIONS => {
-			"[" => 236
-		},
-		DEFAULT => -102,
-		GOTOS => {
-			'qfb_ctxsort' => 237
-		}
+		DEFAULT => -214
 	},
 	{#State 146
-		ACTIONS => {
-			'INTEGER' => 133,
-			"[" => 238
-		},
+		DEFAULT => -225,
 		GOTOS => {
-			'integer' => 239,
-			'int_str' => 135
+			'l_txchain' => 233
 		}
 	},
 	{#State 147
-		ACTIONS => {
-			"[" => 236
-		},
-		DEFAULT => -102,
-		GOTOS => {
-			'qfb_ctxsort' => 240
-		}
+		DEFAULT => -180
 	},
 	{#State 148
-		DEFAULT => -45
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
+		},
+		GOTOS => {
+			'symbol' => 121,
+			's_filename' => 234
+		}
 	},
 	{#State 149
-		DEFAULT => -31
+		DEFAULT => -170
 	},
 	{#State 150
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21
+			'INTEGER' => 42,
+			'DATE' => 69,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -42,
 		GOTOS => {
-			'symbol' => 242,
-			's_subcorpus' => 243,
-			'qf_subcorpora' => 241
+			'symbol' => 109,
+			's_lemma' => 235
 		}
 	},
 	{#State 151
-		DEFAULT => -50
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
+		},
+		GOTOS => {
+			'symbol' => 4,
+			's_word' => 236
+		}
 	},
 	{#State 152
-		ACTIONS => {
-			"[" => 236
-		},
-		DEFAULT => -102,
-		GOTOS => {
-			'qfb_ctxsort' => 244
-		}
+		DEFAULT => -174
 	},
 	{#State 153
-		DEFAULT => -36
-	},
-	{#State 154
-		DEFAULT => -48
-	},
-	{#State 155
-		DEFAULT => -60
-	},
-	{#State 156
-		ACTIONS => {
-			"[" => 236
-		},
-		DEFAULT => -102,
+		DEFAULT => -212,
 		GOTOS => {
-			'qfb_ctxsort' => 245
+			'l_set' => 237
 		}
 	},
+	{#State 154
+		DEFAULT => -182
+	},
+	{#State 155
+		DEFAULT => -212,
+		GOTOS => {
+			'l_set' => 238
+		}
+	},
+	{#State 156
+		DEFAULT => -172
+	},
 	{#State 157
-		DEFAULT => -40
+		DEFAULT => -225,
+		GOTOS => {
+			'l_txchain' => 239
+		}
 	},
 	{#State 158
-		ACTIONS => {
-			"[" => 246
-		},
-		DEFAULT => -81,
+		DEFAULT => -212,
 		GOTOS => {
-			'qfb_int' => 247
+			'l_set' => 240
 		}
 	},
 	{#State 159
 		ACTIONS => {
-			"[" => 249
-		},
-		DEFAULT => -88,
-		GOTOS => {
-			'qfb_date' => 248
+			"{" => 241
 		}
 	},
 	{#State 160
-		ACTIONS => {
-			"[" => 246
-		},
-		DEFAULT => -81,
+		DEFAULT => -215,
 		GOTOS => {
-			'qfb_int' => 250
+			'l_morph' => 242
 		}
 	},
 	{#State 161
-		DEFAULT => -37
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'INTEGER' => 42,
+			'DATE' => 69
+		},
+		GOTOS => {
+			's_chunk' => 243,
+			'symbol' => 73
+		}
 	},
 	{#State 162
-		DEFAULT => -51
+		DEFAULT => -184
 	},
 	{#State 163
-		ACTIONS => {
-			"[" => 236
-		},
-		DEFAULT => -102,
-		GOTOS => {
-			'qfb_ctxsort' => 251
-		}
+		DEFAULT => -189
 	},
 	{#State 164
-		ACTIONS => {
-			"[" => 252
-		}
+		DEFAULT => -185
 	},
 	{#State 165
 		ACTIONS => {
-			"[" => 249
+			"=" => 86,
+			")" => 217,
+			'WITHOUT' => 81,
+			'WITH' => 83,
+			'WITHOR' => 85
 		},
-		DEFAULT => -88,
 		GOTOS => {
-			'qfb_date' => 253
+			'matchid_eq' => 84,
+			'matchid' => 82
 		}
 	},
 	{#State 166
 		ACTIONS => {
-			"[" => 254
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 135,
+			'integer' => 244
 		}
 	},
 	{#State 167
-		DEFAULT => -30
+		DEFAULT => -139
 	},
 	{#State 168
 		ACTIONS => {
-			'HAS_FIELD' => 166,
-			'DEBUG_RANK' => 255,
-			"!" => 256,
-			'FILENAMES_ONLY' => 257
+			'WITHOR' => 85,
+			"=" => 86,
+			'WITH' => 83,
+			'WITHOUT' => 81
 		},
+		DEFAULT => -220,
 		GOTOS => {
-			'qf_has_field' => 258
+			'matchid' => 82,
+			'matchid_eq' => 84
 		}
 	},
 	{#State 169
 		ACTIONS => {
-			"[" => 259
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 135,
+			'integer' => 245
 		}
 	},
 	{#State 170
-		DEFAULT => -49
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 135,
+			'integer' => 246
+		}
 	},
 	{#State 171
 		ACTIONS => {
-			"[" => 236
+			'INTEGER' => 132
 		},
-		DEFAULT => -102,
 		GOTOS => {
-			'qfb_ctxsort' => 260
+			'integer' => 247,
+			'int_str' => 135
 		}
 	},
 	{#State 172
-		ACTIONS => {
-			"=" => 82
-		},
-		DEFAULT => -119,
-		GOTOS => {
-			'matchid' => 87,
-			'matchid_eq' => 83
-		}
+		DEFAULT => -226
 	},
 	{#State 173
-		DEFAULT => -245
+		DEFAULT => -272
 	},
 	{#State 174
-		DEFAULT => -248
+		DEFAULT => -175
 	},
 	{#State 175
-		DEFAULT => -247
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -123,
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 100
+		}
 	},
 	{#State 176
 		ACTIONS => {
-			")" => 262,
-			"," => 261
+			"=" => 86
+		},
+		DEFAULT => -124,
+		GOTOS => {
+			'matchid' => 100,
+			'matchid_eq' => 84
 		}
 	},
 	{#State 177
-		DEFAULT => -227
+		DEFAULT => -32
 	},
 	{#State 178
 		ACTIONS => {
-			"=" => 82
+			"[" => 248
 		},
-		DEFAULT => -201,
+		DEFAULT => -106,
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
+			'qfb_ctxsort' => 249
 		}
 	},
 	{#State 179
 		ACTIONS => {
-			"=" => 82
+			"[" => 248
 		},
-		DEFAULT => -199,
+		DEFAULT => -106,
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
+			'qfb_ctxsort' => 250
 		}
 	},
 	{#State 180
-		ACTIONS => {
-			"=" => 82
-		},
-		DEFAULT => -200,
-		GOTOS => {
-			'matchid' => 90,
-			'matchid_eq' => 83
-		}
+		DEFAULT => -64
 	},
 	{#State 181
-		DEFAULT => -160
+		ACTIONS => {
+			"[" => 248
+		},
+		DEFAULT => -106,
+		GOTOS => {
+			'qfb_ctxsort' => 251
+		}
 	},
 	{#State 182
-		DEFAULT => -136
-	},
-	{#State 183
-		DEFAULT => -131
-	},
-	{#State 184
-		DEFAULT => -125
-	},
-	{#State 185
-		DEFAULT => -118
-	},
-	{#State 186
-		DEFAULT => -122
-	},
-	{#State 187
-		DEFAULT => -209
-	},
-	{#State 188
-		DEFAULT => -185
-	},
-	{#State 189
-		DEFAULT => -210
-	},
-	{#State 190
-		DEFAULT => -181
-	},
-	{#State 191
-		DEFAULT => -187
-	},
-	{#State 192
-		DEFAULT => -180
-	},
-	{#State 193
-		DEFAULT => -221,
-		GOTOS => {
-			'l_txchain' => 263
-		}
-	},
-	{#State 194
-		DEFAULT => -170
-	},
-	{#State 195
-		DEFAULT => -166
-	},
-	{#State 196
 		ACTIONS => {
-			"{" => 264
-		}
-	},
-	{#State 197
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21
+			"[" => 253,
+			'INTEGER' => 132
 		},
 		GOTOS => {
-			's_word' => 265,
-			'symbol' => 44
+			'int_str' => 135,
+			'integer' => 252
 		}
 	},
-	{#State 198
-		DEFAULT => -208,
+	{#State 183
+		ACTIONS => {
+			'INTEGER' => 42,
+			'DATE' => 69,
+			'SYMBOL' => 11,
+			'KW_FILENAME' => 255
+		},
 		GOTOS => {
-			'l_set' => 266
+			's_breakname' => 256,
+			'symbol' => 254
+		}
+	},
+	{#State 184
+		ACTIONS => {
+			"[" => 257
+		}
+	},
+	{#State 185
+		ACTIONS => {
+			"[" => 258
+		}
+	},
+	{#State 186
+		DEFAULT => -65
+	},
+	{#State 187
+		DEFAULT => -50
+	},
+	{#State 188
+		ACTIONS => {
+			"[" => 260
+		},
+		DEFAULT => -85,
+		GOTOS => {
+			'qfb_int' => 259
+		}
+	},
+	{#State 189
+		DEFAULT => -53
+	},
+	{#State 190
+		DEFAULT => -52
+	},
+	{#State 191
+		DEFAULT => -41
+	},
+	{#State 192
+		ACTIONS => {
+			"[" => 261
+		}
+	},
+	{#State 193
+		DEFAULT => -49
+	},
+	{#State 194
+		DEFAULT => -55
+	},
+	{#State 195
+		DEFAULT => -40
+	},
+	{#State 196
+		DEFAULT => -51
+	},
+	{#State 197
+		DEFAULT => -44
+	},
+	{#State 198
+		ACTIONS => {
+			'DATE' => 69,
+			'SYMBOL' => 11,
+			'INTEGER' => 42
+		},
+		DEFAULT => -46,
+		GOTOS => {
+			's_subcorpus' => 263,
+			'qf_subcorpora' => 264,
+			'symbol' => 262
 		}
 	},
 	{#State 199
-		DEFAULT => -208,
+		ACTIONS => {
+			"[" => 265
+		},
+		DEFAULT => -92,
 		GOTOS => {
-			'l_set' => 267
+			'qfb_date' => 266
 		}
 	},
 	{#State 200
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21
+			'HAS_FIELD' => 185,
+			'DEBUG_RANK' => 267,
+			"!" => 270,
+			'FILENAMES_ONLY' => 269
 		},
 		GOTOS => {
-			'symbol' => 112,
-			's_filename' => 268
+			'qf_has_field' => 268
 		}
 	},
 	{#State 201
-		DEFAULT => -176
+		DEFAULT => -33
 	},
 	{#State 202
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21
+			"[" => 265
 		},
+		DEFAULT => -92,
 		GOTOS => {
-			'symbol' => 116,
-			's_lemma' => 269
+			'qfb_date' => 271
 		}
 	},
 	{#State 203
 		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
+			"[" => 248
 		},
+		DEFAULT => -106,
 		GOTOS => {
-			'symbol' => 120,
-			's_chunk' => 270
+			'qfb_ctxsort' => 272
 		}
 	},
 	{#State 204
-		DEFAULT => -178
+		ACTIONS => {
+			"[" => 260
+		},
+		DEFAULT => -85,
+		GOTOS => {
+			'qfb_int' => 273
+		}
 	},
 	{#State 205
-		DEFAULT => -211,
-		GOTOS => {
-			'l_morph' => 271
+		ACTIONS => {
+			"[" => 274
 		}
 	},
 	{#State 206
-		DEFAULT => -168
+		ACTIONS => {
+			"[" => 275
+		}
 	},
 	{#State 207
-		DEFAULT => -208,
+		ACTIONS => {
+			"[" => 248
+		},
+		DEFAULT => -106,
 		GOTOS => {
-			'l_set' => 272
+			'qfb_ctxsort' => 276
 		}
 	},
 	{#State 208
-		DEFAULT => -183
+		DEFAULT => -31
 	},
 	{#State 209
-		DEFAULT => -221,
-		GOTOS => {
-			'l_txchain' => 273
-		}
+		DEFAULT => -54
 	},
 	{#State 210
 		ACTIONS => {
-			'INTEGER' => 133
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"[" => 278,
+			'SYMBOL' => 11
 		},
 		GOTOS => {
-			'integer' => 274,
-			'int_str' => 135
+			'symbol' => 277
 		}
 	},
 	{#State 211
 		ACTIONS => {
-			'INTEGER' => 133
+			"[" => 279
 		},
-		GOTOS => {
-			'integer' => 275,
-			'int_str' => 135
-		}
+		DEFAULT => -78
 	},
 	{#State 212
-		DEFAULT => -135
+		DEFAULT => -42
 	},
 	{#State 213
 		ACTIONS => {
-			'INTEGER' => 133
+			"[" => 248
 		},
+		DEFAULT => -106,
 		GOTOS => {
-			'int_str' => 135,
-			'integer' => 276
+			'qfb_ctxsort' => 280
 		}
 	},
 	{#State 214
-		ACTIONS => {
-			"=" => 82,
-			'WITHOUT' => 92,
-			'WITHOR' => 89,
-			'WITH' => 91
-		},
-		DEFAULT => -216,
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
-		}
+		DEFAULT => -191
 	},
 	{#State 215
 		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'integer' => 277,
-			'int_str' => 135
+			")" => 220
 		}
 	},
 	{#State 216
-		DEFAULT => -195
+		ACTIONS => {
+			")" => 221,
+			"=" => 86
+		},
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 102
+		}
 	},
 	{#State 217
-		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'int_str' => 278
-		}
+		DEFAULT => -164
 	},
 	{#State 218
-		ACTIONS => {
-			'REGEX' => 2,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3,
-			"^" => 65,
-			"{" => 47,
-			"\"" => 48,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"<" => 52,
-			'KEYS' => 8,
-			'PREFIX' => 55,
-			"[" => 70,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			'AT_LBRACE' => 71,
-			"(" => 218,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'NEG_REGEX' => 61,
-			"\@" => 37
-		},
-		GOTOS => {
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 131,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_phrase' => 130,
-			'index' => 24,
-			's_prefix' => 56,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			'qw_regex' => 60,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			'qw_infix' => 53,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qw_prefix' => 50,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_anchor' => 40,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5
-		}
+		DEFAULT => -122
 	},
 	{#State 219
-		ACTIONS => {
-			"=" => 82,
-			"," => 279
-		},
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 111
-		}
+		DEFAULT => -126
 	},
 	{#State 220
-		DEFAULT => -4,
-		GOTOS => {
-			'count_filters' => 280
-		}
+		DEFAULT => -140
 	},
 	{#State 221
-		DEFAULT => -189
+		DEFAULT => -135
 	},
 	{#State 222
-		DEFAULT => -213
+		DEFAULT => -129
 	},
 	{#State 223
-		DEFAULT => -254
-	},
-	{#State 224
-		DEFAULT => -212
-	},
-	{#State 225
-		DEFAULT => -214
-	},
-	{#State 226
-		DEFAULT => -171
-	},
-	{#State 227
 		ACTIONS => {
-			'CLIMIT' => 290,
-			'BY' => 282,
-			'GREATER_BY_COUNT' => 284,
-			'SAMPLE' => 287,
-			'GREATER_BY_KEY' => 285,
-			'LESS_BY_KEY' => 288,
-			'LESS_BY_COUNT' => 291
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'DOLLAR_DOT' => 20,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"\"" => 30,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			"(" => 223,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"[" => 13,
+			'REGEX' => 14,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'PREFIX' => 33
 		},
-		DEFAULT => -206,
 		GOTOS => {
-			'count_sample' => 283,
-			'count_limit' => 289,
-			'count_sort' => 286,
-			'count_by' => 292,
-			'count_filter' => 293,
-			'count_sort_op' => 281
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 165,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68,
+			'qc_phrase' => 215,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_prefix_set' => 9,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'regex' => 52,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17
 		}
 	},
+	{#State 224
+		ACTIONS => {
+			"," => 281,
+			"=" => 86
+		},
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 108
+		}
+	},
+	{#State 225
+		DEFAULT => -4,
+		GOTOS => {
+			'count_filters' => 282
+		}
+	},
+	{#State 226
+		ACTIONS => {
+			")" => 283
+		}
+	},
+	{#State 227
+		DEFAULT => -209
+	},
 	{#State 228
-		DEFAULT => -202
+		DEFAULT => -4,
+		GOTOS => {
+			'count_filters' => 284
+		}
 	},
 	{#State 229
 		ACTIONS => {
-			"!" => 63,
-			"^" => 65,
-			'COUNT' => 66,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"\"" => 48,
-			"{" => 47,
-			'PREFIX' => 55,
-			'NEAR' => 54,
-			"[" => 70,
-			"<" => 52,
-			'KEYS' => 8,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			"*" => 17,
-			'AT_LBRACE' => 71,
-			"(" => 35,
-			'STAR_LBRACE' => 36
+			"\"" => 30,
+			'DATE' => 69,
+			'SUFFIX' => 31,
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			"(" => 56,
+			"!" => 18,
+			'PREFIX' => 33,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'REGEX' => 14,
+			"[" => 13,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'NEAR' => 60,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'DOLLAR_DOT' => 20,
+			"{" => 24,
+			"<" => 65,
+			'COLON_LBRACE' => 47,
+			'COUNT' => 61,
+			"*" => 44,
+			"\$" => 23,
+			"\@" => 45
 		},
 		GOTOS => {
-			'index' => 24,
-			'q_clause' => 25,
-			'qc_phrase' => 27,
-			'qc_boolean' => 64,
-			'qwk_countsrc' => 294,
-			'regex' => 28,
-			's_suffix' => 67,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_morph' => 31,
+			'q_clause' => 38,
+			'qc_basic' => 72,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
 			'qw_listfile' => 32,
-			'qc_word' => 33,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_thesaurus' => 7,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'qw_prefix' => 50,
-			'qc_tokens' => 51,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'query_conditions' => 124,
-			'qc_matchid' => 14,
-			'qw_infix' => 53,
-			'qc_concat' => 15,
-			'qc_near' => 19,
-			'qc_basic' => 18,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			's_prefix' => 56,
-			'count_query' => 126,
-			'qw_regex' => 60,
-			'qw_bareword' => 22,
-			'qw_keys' => 62
+			's_word' => 35,
+			'qwk_countsrc' => 285,
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			's_index' => 25,
+			'qc_boolean' => 26,
+			'qw_set_infl' => 27,
+			'qw_lemma' => 64,
+			'index' => 63,
+			'qw_withor' => 62,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			'qc_matchid' => 19,
+			'count_query' => 227,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'regex' => 52,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 50,
+			'qc_concat' => 49,
+			'query_conditions' => 228,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qc_near' => 43,
+			'qw_anchor' => 41,
+			'qw_regex' => 40
 		}
 	},
 	{#State 230
-		ACTIONS => {
-			"]" => 296,
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'int_str' => 295
-		}
+		DEFAULT => -200
 	},
 	{#State 231
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'KW_DATE' => 297,
-			'INTEGER' => 21,
-			'DATE' => 57
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"\$" => 142,
+			'SYMBOL' => 11,
+			'INDEX' => 12
 		},
 		GOTOS => {
-			's_biblname' => 298,
-			'symbol' => 299
+			'index' => 63,
+			'symbol' => 140,
+			's_indextuple_item' => 286,
+			's_index' => 141
 		}
 	},
 	{#State 232
-		DEFAULT => -257
+		DEFAULT => -208
 	},
 	{#State 233
-		DEFAULT => -258
+		ACTIONS => {
+			'EXPANDER' => 173
+		},
+		DEFAULT => -177,
+		GOTOS => {
+			's_expander' => 172
+		}
 	},
 	{#State 234
-		DEFAULT => -35
+		DEFAULT => -202
 	},
 	{#State 235
-		ACTIONS => {
-			'INTEGER' => 301,
-			'DATE' => 302
-		},
-		GOTOS => {
-			'date' => 300
-		}
+		DEFAULT => -196
 	},
 	{#State 236
-		ACTIONS => {
-			"=" => 82,
-			'SYMBOL' => 307
-		},
-		DEFAULT => -107,
-		GOTOS => {
-			'sym_str' => 306,
-			'qfbc_matchref' => 304,
-			'matchid_eq' => 83,
-			'qfb_ctxkey' => 303,
-			'matchid' => 305
-		}
+		DEFAULT => -168
 	},
 	{#State 237
-		DEFAULT => -67
+		ACTIONS => {
+			'SYMBOL' => 11,
+			"," => 145,
+			"}" => 288,
+			'INTEGER' => 42,
+			'RBRACE_STAR' => 287,
+			'DATE' => 69
+		},
+		GOTOS => {
+			's_word' => 144,
+			'symbol' => 4
+		}
 	},
 	{#State 238
 		ACTIONS => {
-			'INTEGER' => 133
+			'SYMBOL' => 11,
+			"," => 145,
+			"}" => 289,
+			'INTEGER' => 42,
+			'DATE' => 69
 		},
 		GOTOS => {
-			'int_str' => 135,
-			'integer' => 308
+			's_word' => 144,
+			'symbol' => 4
 		}
 	},
 	{#State 239
-		DEFAULT => -33
+		ACTIONS => {
+			'EXPANDER' => 173
+		},
+		DEFAULT => -166,
+		GOTOS => {
+			's_expander' => 172
+		}
 	},
 	{#State 240
-		DEFAULT => -62
+		ACTIONS => {
+			'DATE' => 69,
+			'INTEGER' => 42,
+			'RBRACE_STAR' => 290,
+			"," => 145,
+			"}" => 291,
+			'SYMBOL' => 11
+		},
+		GOTOS => {
+			'symbol' => 4,
+			's_word' => 144
+		}
 	},
 	{#State 241
 		ACTIONS => {
-			"," => 309
+			'DATE' => 69,
+			'INTEGER' => 42,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -32
+		GOTOS => {
+			'symbol' => 105,
+			's_semclass' => 292
+		}
 	},
 	{#State 242
-		DEFAULT => -255
+		ACTIONS => {
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"]" => 293,
+			"," => 128,
+			";" => 125,
+			'SYMBOL' => 11
+		},
+		GOTOS => {
+			'symbol' => 126,
+			's_morphitem' => 127
+		}
 	},
 	{#State 243
-		DEFAULT => -43
+		DEFAULT => -198
 	},
 	{#State 244
-		DEFAULT => -65
+		ACTIONS => {
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"[" => 13,
+			'REGEX' => 14,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'PREFIX' => 33,
+			"(" => 91,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'INFIX' => 59,
+			'INTEGER' => 42,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24
+		},
+		GOTOS => {
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_prefix_set' => 9,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'regex' => 52,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 294,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'neg_regex' => 36,
+			'qw_matchid' => 70,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68
+		}
 	},
 	{#State 245
-		DEFAULT => -64
+		ACTIONS => {
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			'REGEX' => 14,
+			"[" => 13,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"(" => 91,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			'INFIX' => 59,
+			'INTEGER' => 42,
+			"*" => 44,
+			"\@" => 45,
+			"\$" => 23,
+			"{" => 24,
+			"<" => 65,
+			'COLON_LBRACE' => 47
+		},
+		GOTOS => {
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_suffix' => 46,
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			'qw_regex' => 40,
+			'qw_anchor' => 41,
+			'qw_any' => 2,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_set_exact' => 16,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_prefix_set' => 9,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'qw_withor' => 62,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_thesaurus' => 21,
+			's_prefix' => 58,
+			'qc_word' => 295,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_exact' => 68
+		}
 	},
 	{#State 246
 		ACTIONS => {
-			"," => 311,
-			'INTEGER' => 133,
-			"]" => 310
+			"(" => 91,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			"[" => 13,
+			'REGEX' => 14,
+			'PREFIX' => 33,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24,
+			"\@" => 45,
+			"\$" => 23,
+			"*" => 44,
+			'INFIX' => 59,
+			'INTEGER' => 42,
+			'DOLLAR_DOT' => 20,
+			"^" => 1,
+			'NEG_REGEX' => 39
+		},
+		GOTOS => {
+			'qw_exact' => 68,
+			's_suffix' => 28,
+			'qw_keys' => 66,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			's_word' => 35,
+			'qw_listfile' => 32,
+			'qw_thesaurus' => 21,
+			'qc_word' => 296,
+			's_prefix' => 58,
+			'qw_withor' => 62,
+			'qw_set_infl' => 27,
+			's_index' => 25,
+			'qw_lemma' => 64,
+			'index' => 63,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'regex' => 52,
+			'qw_prefix_set' => 9,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qw_bareword' => 57,
+			'qw_without' => 17,
+			'qw_set_exact' => 16,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'symbol' => 4,
+			'qw_with' => 3,
+			'qw_any' => 2,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7
+		}
+	},
+	{#State 247
+		ACTIONS => {
+			'STAR_LBRACE' => 29,
+			"%" => 51,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'SYMBOL' => 11,
+			'INDEX' => 12,
+			'PREFIX' => 33,
+			'REGEX' => 14,
+			"[" => 13,
+			'KEYS' => 71,
+			'AT_LBRACE' => 37,
+			"(" => 91,
+			"^" => 1,
+			'NEG_REGEX' => 39,
+			'DOLLAR_DOT' => 20,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			"*" => 44,
+			"\$" => 23,
+			"\@" => 45,
+			"{" => 24,
+			'COLON_LBRACE' => 47,
+			"<" => 65
+		},
+		GOTOS => {
+			'qw_suffix' => 46,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_set_exact' => 16,
+			'regex' => 52,
+			'qw_morph' => 53,
+			'qw_infix_set' => 10,
+			'qw_prefix_set' => 9,
+			'qw_withor' => 62,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_thesaurus' => 21,
+			'qc_word' => 297,
+			's_prefix' => 58,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28
+		}
+	},
+	{#State 248
+		ACTIONS => {
+			'SYMBOL' => 298,
+			"=" => 86
+		},
+		DEFAULT => -111,
+		GOTOS => {
+			'qfbc_matchref' => 300,
+			'matchid_eq' => 84,
+			'sym_str' => 302,
+			'qfb_ctxkey' => 301,
+			'matchid' => 299
+		}
+	},
+	{#State 249
+		DEFAULT => -66
+	},
+	{#State 250
+		DEFAULT => -67
+	},
+	{#State 251
+		DEFAULT => -71
+	},
+	{#State 252
+		DEFAULT => -37
+	},
+	{#State 253
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 135,
+			'integer' => 303
+		}
+	},
+	{#State 254
+		DEFAULT => -261
+	},
+	{#State 255
+		DEFAULT => -262
+	},
+	{#State 256
+		DEFAULT => -39
+	},
+	{#State 257
+		ACTIONS => {
+			'INTEGER' => 304,
+			'DATE' => 305
+		},
+		GOTOS => {
+			'date' => 306
+		}
+	},
+	{#State 258
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'INTEGER' => 42,
+			'DATE' => 69
+		},
+		GOTOS => {
+			'symbol' => 307,
+			's_biblname' => 308
+		}
+	},
+	{#State 259
+		DEFAULT => -73
+	},
+	{#State 260
+		ACTIONS => {
+			"," => 310,
+			'INTEGER' => 132,
+			"]" => 309
+		},
+		GOTOS => {
+			'int_str' => 311
+		}
+	},
+	{#State 261
+		ACTIONS => {
+			'INTEGER' => 132
 		},
 		GOTOS => {
 			'int_str' => 312
 		}
 	},
-	{#State 247
-		DEFAULT => -69
+	{#State 262
+		DEFAULT => -259
 	},
-	{#State 248
-		DEFAULT => -72
+	{#State 263
+		DEFAULT => -47
 	},
-	{#State 249
+	{#State 264
+		ACTIONS => {
+			"," => 313
+		},
+		DEFAULT => -36
+	},
+	{#State 265
 		ACTIONS => {
 			"," => 314,
-			'INTEGER' => 301,
-			'DATE' => 302,
-			"]" => 313
+			"]" => 316,
+			'INTEGER' => 304,
+			'DATE' => 305
 		},
 		GOTOS => {
 			'date' => 315
 		}
 	},
-	{#State 250
-		DEFAULT => -68
-	},
-	{#State 251
-		DEFAULT => -63
-	},
-	{#State 252
-		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'int_str' => 316
-		}
-	},
-	{#State 253
-		DEFAULT => -71
-	},
-	{#State 254
-		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
-		},
-		GOTOS => {
-			's_biblname' => 317,
-			'symbol' => 299
-		}
-	},
-	{#State 255
-		DEFAULT => -41
-	},
-	{#State 256
-		ACTIONS => {
-			'HAS_FIELD' => 166,
-			"!" => 256
-		},
-		GOTOS => {
-			'qf_has_field' => 258
-		}
-	},
-	{#State 257
-		DEFAULT => -39
-	},
-	{#State 258
-		DEFAULT => -59
-	},
-	{#State 259
-		ACTIONS => {
-			'INTEGER' => 21,
-			'DATE' => 57,
-			'SYMBOL' => 1,
-			'KW_DATE' => 318
-		},
-		GOTOS => {
-			's_biblname' => 319,
-			'symbol' => 299
-		}
-	},
-	{#State 260
-		DEFAULT => -66
-	},
-	{#State 261
-		ACTIONS => {
-			'SYMBOL' => 1,
-			"\$" => 173,
-			'INDEX' => 29,
-			'DATE' => 57,
-			'INTEGER' => 21
-		},
-		GOTOS => {
-			's_index' => 175,
-			's_indextuple_item' => 320,
-			'symbol' => 174,
-			'index' => 24
-		}
-	},
-	{#State 262
-		DEFAULT => -204
-	},
-	{#State 263
-		ACTIONS => {
-			'EXPANDER' => 129
-		},
-		DEFAULT => -162,
-		GOTOS => {
-			's_expander' => 128
-		}
-	},
-	{#State 264
-		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
-		},
-		GOTOS => {
-			's_semclass' => 321,
-			'symbol' => 102
-		}
-	},
-	{#State 265
-		DEFAULT => -164
-	},
 	{#State 266
-		ACTIONS => {
-			'RBRACE_STAR' => 323,
-			"," => 189,
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			"}" => 322
-		},
-		GOTOS => {
-			's_word' => 187,
-			'symbol' => 44
-		}
+		DEFAULT => -75
 	},
 	{#State 267
-		ACTIONS => {
-			'INTEGER' => 21,
-			"}" => 324,
-			'DATE' => 57,
-			"," => 189,
-			'SYMBOL' => 1,
-			'RBRACE_STAR' => 325
-		},
-		GOTOS => {
-			's_word' => 187,
-			'symbol' => 44
-		}
+		DEFAULT => -45
 	},
 	{#State 268
-		DEFAULT => -198
+		DEFAULT => -63
 	},
 	{#State 269
-		DEFAULT => -192
+		DEFAULT => -43
 	},
 	{#State 270
-		DEFAULT => -194
+		ACTIONS => {
+			'HAS_FIELD' => 185,
+			"!" => 270
+		},
+		GOTOS => {
+			'qf_has_field' => 268
+		}
 	},
 	{#State 271
-		ACTIONS => {
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"]" => 326,
-			"," => 222,
-			'SYMBOL' => 1,
-			";" => 225
-		},
-		GOTOS => {
-			'symbol' => 223,
-			's_morphitem' => 224
-		}
+		DEFAULT => -76
 	},
 	{#State 272
-		ACTIONS => {
-			'INTEGER' => 21,
-			"}" => 327,
-			'DATE' => 57,
-			'SYMBOL' => 1,
-			"," => 189
-		},
-		GOTOS => {
-			'symbol' => 44,
-			's_word' => 187
-		}
+		DEFAULT => -70
 	},
 	{#State 273
-		ACTIONS => {
-			'EXPANDER' => 129
-		},
-		DEFAULT => -173,
-		GOTOS => {
-			's_expander' => 128
-		}
+		DEFAULT => -72
 	},
 	{#State 274
 		ACTIONS => {
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"{" => 47,
-			"^" => 65,
-			'SUFFIX' => 3,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			'INTEGER' => 21,
-			"%" => 58,
-			'DATE' => 57,
-			"(" => 107,
-			'AT_LBRACE' => 71,
-			'STAR_LBRACE' => 36,
-			"*" => 17,
-			"[" => 70,
-			'PREFIX' => 55,
-			'KEYS' => 8,
-			"<" => 52
+			'KW_DATE' => 317,
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
 		},
 		GOTOS => {
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qwk_indextuple' => 9,
-			'qw_infix' => 53,
-			'qw_any' => 20,
-			'qw_with' => 16,
-			'qw_bareword' => 22,
-			'qw_keys' => 62,
-			'qw_regex' => 60,
-			's_prefix' => 56,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_lemma' => 42,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_anchor' => 40,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_prefix' => 50,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qc_word' => 328,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'index' => 24,
-			'regex' => 28,
-			's_suffix' => 67
+			'symbol' => 307,
+			's_biblname' => 318
 		}
 	},
 	{#State 275
 		ACTIONS => {
-			"{" => 47,
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'SUFFIX' => 3,
-			"^" => 65,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			'AT_LBRACE' => 71,
-			"(" => 107,
-			'DATE' => 57,
-			"%" => 58,
-			'INTEGER' => 21,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			'KEYS' => 8,
-			"<" => 52,
-			'PREFIX' => 55,
-			"[" => 70
+			'KW_DATE' => 320,
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
 		},
 		GOTOS => {
-			's_prefix' => 56,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			'qw_infix' => 53,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			'qw_prefix' => 50,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'symbol' => 44,
-			'qw_thesaurus' => 7,
-			'qw_anchor' => 40,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 329,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			's_suffix' => 67,
-			'regex' => 28,
-			'index' => 24
+			's_biblname' => 319,
+			'symbol' => 307
 		}
 	},
 	{#State 276
-		ACTIONS => {
-			'INDEX' => 29,
-			'DOLLAR_DOT' => 49,
-			"{" => 47,
-			"^" => 65,
-			'REGEX' => 2,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'COLON_LBRACE' => 38,
-			"\$" => 26,
-			'SUFFIX' => 3,
-			"%" => 58,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			"*" => 17,
-			'STAR_LBRACE' => 36,
-			'AT_LBRACE' => 71,
-			"(" => 107,
-			'PREFIX' => 55,
-			"[" => 70,
-			'KEYS' => 8,
-			"<" => 52
-		},
-		GOTOS => {
-			'index' => 24,
-			'regex' => 28,
-			's_suffix' => 67,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_suffix' => 69,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 330,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_prefix_set' => 4,
-			'qw_chunk' => 5,
-			'qw_anchor' => 40,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_set_exact' => 43,
-			'qw_exact' => 41,
-			'qw_lemma' => 42,
-			'symbol' => 44,
-			'qw_suffix_set' => 46,
-			'qw_matchid' => 45,
-			'qw_thesaurus' => 7,
-			'qw_prefix' => 50,
-			'qwk_indextuple' => 9,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qw_infix' => 53,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			's_prefix' => 56,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60
-		}
+		DEFAULT => -69
 	},
 	{#State 277
-		ACTIONS => {
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"{" => 47,
-			"^" => 65,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'INFIX' => 23,
-			'SYMBOL' => 1,
-			'REGEX' => 2,
-			'NEG_REGEX' => 61,
-			"\@" => 37,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"%" => 58,
-			'AT_LBRACE' => 71,
-			"(" => 107,
-			'STAR_LBRACE' => 36,
-			"*" => 17,
-			"[" => 70,
-			'PREFIX' => 55,
-			'KEYS' => 8,
-			"<" => 52
-		},
-		GOTOS => {
-			'index' => 24,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qc_word' => 331,
-			'qw_without' => 30,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			's_index' => 39,
-			's_infix' => 6,
-			'qw_anchor' => 40,
-			'qw_exact' => 41,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_prefix' => 50,
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_infix' => 53,
-			'qwk_indextuple' => 9,
-			's_word' => 11,
-			'qw_withor' => 12,
-			's_prefix' => 56,
-			'qw_regex' => 60,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_with' => 16,
-			'qw_any' => 20
-		}
+		DEFAULT => -34
 	},
 	{#State 278
-		DEFAULT => -196
+		ACTIONS => {
+			'INTEGER' => 42,
+			'DATE' => 69,
+			'SYMBOL' => 11
+		},
+		GOTOS => {
+			'symbol' => 321
+		}
 	},
 	{#State 279
 		ACTIONS => {
-			"{" => 47,
-			"\"" => 48,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			"^" => 65,
-			'AT_LBRACE' => 71,
-			"(" => 218,
-			'STAR_LBRACE' => 36,
-			"*" => 17,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			'INTEGER' => 21,
-			"%" => 58,
-			'DATE' => 57,
-			'KEYS' => 8,
-			"<" => 52,
-			"[" => 70,
-			'PREFIX' => 55
+			'INTEGER' => 132,
+			"]" => 322
 		},
 		GOTOS => {
-			'qw_thesaurus' => 7,
-			'qw_suffix_set' => 46,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_prefix' => 50,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			's_infix' => 6,
-			's_index' => 39,
-			'qw_anchor' => 40,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_exact' => 41,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			's_prefix' => 56,
-			'qw_regex' => 60,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qc_tokens' => 332,
-			'qwk_indextuple' => 9,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qw_infix' => 53,
-			'regex' => 28,
-			's_suffix' => 67,
-			'index' => 24,
-			'qc_phrase' => 27,
-			'qw_set_infl' => 34,
-			'qw_infix_set' => 72,
-			'qw_suffix' => 69,
-			'neg_regex' => 68,
-			'qw_without' => 30,
-			'qw_morph' => 31,
-			'qw_listfile' => 32,
-			'qc_word' => 33
+			'int_str' => 323
 		}
 	},
 	{#State 280
-		ACTIONS => {
-			'CLIMIT' => 290,
-			'BY' => 282,
-			'GREATER_BY_COUNT' => 284,
-			'SAMPLE' => 287,
-			")" => 333,
-			'GREATER_BY_KEY' => 285,
-			'LESS_BY_KEY' => 288,
-			'LESS_BY_COUNT' => 291
-		},
-		GOTOS => {
-			'count_sample' => 283,
-			'count_limit' => 289,
-			'count_sort' => 286,
-			'count_sort_op' => 281,
-			'count_filter' => 293,
-			'count_by' => 292
-		}
+		DEFAULT => -68
 	},
 	{#State 281
 		ACTIONS => {
-			"[" => 335
+			'INFIX' => 59,
+			'INTEGER' => 42,
+			'DOLLAR_DOT' => 20,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"{" => 24,
+			"\$" => 23,
+			"\@" => 45,
+			"*" => 44,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			"\"" => 30,
+			"%" => 51,
+			'STAR_LBRACE' => 29,
+			"(" => 223,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			'REGEX' => 14,
+			"[" => 13,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			'PREFIX' => 33
 		},
-		DEFAULT => -21,
 		GOTOS => {
-			'count_sort_minmax' => 334
+			'qwk_indextuple' => 7,
+			'qw_infix' => 8,
+			's_infix' => 5,
+			'qw_chunk' => 6,
+			'qw_suffix' => 46,
+			'qw_any' => 2,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_set_exact' => 16,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'qw_suffix_set' => 54,
+			'qw_prefix' => 15,
+			'qw_prefix_set' => 9,
+			'regex' => 52,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'qc_tokens' => 324,
+			'qw_lemma' => 64,
+			'index' => 63,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'qw_withor' => 62,
+			's_prefix' => 58,
+			'qc_word' => 22,
+			'qw_thesaurus' => 21,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'qc_phrase' => 67,
+			'qw_exact' => 68
 		}
 	},
 	{#State 282
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'KW_DATE' => 337,
-			"\$" => 173,
-			'INDEX' => 29,
-			'KW_FILENAME' => 343,
-			'KW_FILEID' => 345,
-			"[" => 346,
-			"*" => 336,
-			"(" => 338,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			"\@" => 341
+			'KW_COMMENT' => 210,
+			")" => 333,
+			'LESS_BY_COUNT' => 326,
+			'LESS_BY_KEY' => 325,
+			'CLIMIT' => 329,
+			'SAMPLE' => 334,
+			'BY' => 338,
+			'GREATER_BY_KEY' => 332,
+			'GREATER_BY_COUNT' => 337
 		},
-		DEFAULT => -223,
 		GOTOS => {
-			'index' => 24,
-			'symbol' => 299,
-			's_biblname' => 339,
-			'l_countkeys' => 340,
-			's_index' => 344,
-			'count_key' => 342
+			'count_sample' => 336,
+			'count_limit' => 330,
+			'q_comment' => 335,
+			'count_sort_op' => 339,
+			'count_sort' => 328,
+			'count_filter' => 331,
+			'count_by' => 327
 		}
 	},
 	{#State 283
-		DEFAULT => -7
+		DEFAULT => -206
 	},
 	{#State 284
-		DEFAULT => -20
+		ACTIONS => {
+			'CLIMIT' => 329,
+			'GREATER_BY_KEY' => 332,
+			'GREATER_BY_COUNT' => 337,
+			'SAMPLE' => 334,
+			'BY' => 338,
+			'KW_COMMENT' => 210,
+			'LESS_BY_COUNT' => 326,
+			'LESS_BY_KEY' => 325
+		},
+		DEFAULT => -210,
+		GOTOS => {
+			'count_sort_op' => 339,
+			'count_by' => 327,
+			'count_filter' => 331,
+			'count_sort' => 328,
+			'count_limit' => 330,
+			'count_sample' => 336,
+			'q_comment' => 335
+		}
 	},
 	{#State 285
-		DEFAULT => -18
+		ACTIONS => {
+			")" => 340
+		}
 	},
 	{#State 286
-		DEFAULT => -9
+		DEFAULT => -232
 	},
 	{#State 287
-		ACTIONS => {
-			'INTEGER' => 133,
-			"[" => 347
-		},
-		GOTOS => {
-			'integer' => 348,
-			'int_str' => 135
-		}
+		DEFAULT => -186
 	},
 	{#State 288
-		DEFAULT => -17
+		DEFAULT => -190
 	},
 	{#State 289
-		DEFAULT => -8
+		DEFAULT => -176
 	},
 	{#State 290
-		ACTIONS => {
-			"[" => 350,
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'integer' => 349,
-			'int_str' => 135
-		}
+		DEFAULT => -188
 	},
 	{#State 291
-		DEFAULT => -19
+		DEFAULT => -225,
+		GOTOS => {
+			'l_txchain' => 341
+		}
 	},
 	{#State 292
-		DEFAULT => -6
+		ACTIONS => {
+			"}" => 342
+		}
 	},
 	{#State 293
-		DEFAULT => -5
+		DEFAULT => -194
 	},
 	{#State 294
 		ACTIONS => {
-			")" => 351
+			'WITHOR' => 85,
+			"=" => 86,
+			'WITH' => 83,
+			'WITHOUT' => 81
+		},
+		DEFAULT => -223,
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 82
 		}
 	},
 	{#State 295
 		ACTIONS => {
-			"]" => 352
+			'WITHOUT' => 81,
+			'WITHOR' => 85,
+			"=" => 86,
+			'WITH' => 83
+		},
+		DEFAULT => -224,
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 82
 		}
 	},
 	{#State 296
-		DEFAULT => -75
+		ACTIONS => {
+			'WITH' => 83,
+			"=" => 86,
+			'WITHOR' => 85,
+			'WITHOUT' => 81
+		},
+		DEFAULT => -221,
+		GOTOS => {
+			'matchid' => 82,
+			'matchid_eq' => 84
+		}
 	},
 	{#State 297
 		ACTIONS => {
-			"," => 354
+			'WITHOUT' => 81,
+			'WITHOR' => 85,
+			"=" => 86,
+			'WITH' => 83
 		},
-		DEFAULT => -94,
+		DEFAULT => -222,
 		GOTOS => {
-			'qfb_bibl_ne' => 353,
-			'qfb_bibl' => 355
+			'matchid_eq' => 84,
+			'matchid' => 82
 		}
 	},
 	{#State 298
-		ACTIONS => {
-			"," => 354
-		},
-		DEFAULT => -94,
-		GOTOS => {
-			'qfb_bibl_ne' => 353,
-			'qfb_bibl' => 356
-		}
+		DEFAULT => -268
 	},
 	{#State 299
-		DEFAULT => -256
+		DEFAULT => -112
 	},
 	{#State 300
 		ACTIONS => {
-			"]" => 357
+			'INTEGER' => 132,
+			"+" => 345,
+			"-" => 343
+		},
+		DEFAULT => -113,
+		GOTOS => {
+			'qfbc_offset' => 344,
+			'int_str' => 135,
+			'integer' => 346
 		}
 	},
 	{#State 301
-		DEFAULT => -278
+		ACTIONS => {
+			"]" => 349,
+			"," => 347
+		},
+		GOTOS => {
+			'qfb_bibl_ne' => 348
+		}
 	},
 	{#State 302
-		DEFAULT => -277
+		ACTIONS => {
+			"=" => 86
+		},
+		DEFAULT => -111,
+		GOTOS => {
+			'matchid' => 299,
+			'qfbc_matchref' => 350,
+			'matchid_eq' => 84
+		}
 	},
 	{#State 303
 		ACTIONS => {
-			"," => 354,
-			"]" => 359
-		},
-		GOTOS => {
-			'qfb_bibl_ne' => 358
+			"]" => 351
 		}
 	},
 	{#State 304
-		ACTIONS => {
-			"-" => 363,
-			'INTEGER' => 133,
-			"+" => 360
-		},
-		DEFAULT => -109,
-		GOTOS => {
-			'integer' => 362,
-			'qfbc_offset' => 361,
-			'int_str' => 135
-		}
+		DEFAULT => -282
 	},
 	{#State 305
-		DEFAULT => -108
+		DEFAULT => -281
 	},
 	{#State 306
 		ACTIONS => {
-			"=" => 82
-		},
-		DEFAULT => -107,
-		GOTOS => {
-			'matchid' => 305,
-			'qfbc_matchref' => 364,
-			'matchid_eq' => 83
+			"]" => 352
 		}
 	},
 	{#State 307
-		DEFAULT => -264
+		DEFAULT => -260
 	},
 	{#State 308
 		ACTIONS => {
-			"]" => 365
+			"," => 353
 		}
 	},
 	{#State 309
-		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
-		},
-		GOTOS => {
-			'symbol' => 242,
-			's_subcorpus' => 366
-		}
+		DEFAULT => -86
 	},
 	{#State 310
-		DEFAULT => -82
+		ACTIONS => {
+			"]" => 354,
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 355
+		}
 	},
 	{#State 311
 		ACTIONS => {
-			"]" => 368,
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'int_str' => 367
+			"," => 357,
+			"]" => 356
 		}
 	},
 	{#State 312
 		ACTIONS => {
-			"]" => 370,
-			"," => 369
+			"]" => 358
 		}
 	},
 	{#State 313
-		DEFAULT => -89
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
+		},
+		GOTOS => {
+			'symbol' => 262,
+			's_subcorpus' => 359
+		}
 	},
 	{#State 314
 		ACTIONS => {
-			'DATE' => 302,
-			'INTEGER' => 301
+			'DATE' => 305,
+			'INTEGER' => 304
 		},
 		GOTOS => {
-			'date' => 371
+			'date' => 360
 		}
 	},
 	{#State 315
 		ACTIONS => {
-			"," => 373,
-			"]" => 372
+			"," => 361,
+			"]" => 362
 		}
 	},
 	{#State 316
-		ACTIONS => {
-			"]" => 374
-		}
+		DEFAULT => -93
 	},
 	{#State 317
 		ACTIONS => {
-			"," => 375
+			"," => 347
+		},
+		DEFAULT => -98,
+		GOTOS => {
+			'qfb_bibl_ne' => 363,
+			'qfb_bibl' => 364
 		}
 	},
 	{#State 318
 		ACTIONS => {
-			"," => 354
+			"," => 347
 		},
-		DEFAULT => -94,
+		DEFAULT => -98,
 		GOTOS => {
-			'qfb_bibl_ne' => 353,
-			'qfb_bibl' => 376
+			'qfb_bibl' => 365,
+			'qfb_bibl_ne' => 363
 		}
 	},
 	{#State 319
 		ACTIONS => {
-			"," => 354
+			"," => 347
 		},
-		DEFAULT => -94,
+		DEFAULT => -98,
 		GOTOS => {
-			'qfb_bibl' => 377,
-			'qfb_bibl_ne' => 353
+			'qfb_bibl' => 366,
+			'qfb_bibl_ne' => 363
 		}
 	},
 	{#State 320
-		DEFAULT => -228
+		ACTIONS => {
+			"," => 347
+		},
+		DEFAULT => -98,
+		GOTOS => {
+			'qfb_bibl_ne' => 363,
+			'qfb_bibl' => 367
+		}
 	},
 	{#State 321
 		ACTIONS => {
-			"}" => 378
+			"]" => 368
 		}
 	},
 	{#State 322
-		DEFAULT => -186
+		DEFAULT => -79
 	},
 	{#State 323
-		DEFAULT => -182
+		ACTIONS => {
+			"]" => 369
+		}
 	},
 	{#State 324
-		DEFAULT => -221,
+		ACTIONS => {
+			"=" => 86,
+			"," => 370
+		},
 		GOTOS => {
-			'l_txchain' => 379
+			'matchid' => 108,
+			'matchid_eq' => 84
 		}
 	},
 	{#State 325
-		DEFAULT => -184
+		DEFAULT => -18
 	},
 	{#State 326
-		DEFAULT => -190
+		DEFAULT => -20
 	},
 	{#State 327
-		DEFAULT => -172
+		DEFAULT => -6
 	},
 	{#State 328
-		ACTIONS => {
-			'WITH' => 91,
-			'WITHOR' => 89,
-			'WITHOUT' => 92,
-			"=" => 82
-		},
-		DEFAULT => -217,
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
-		}
+		DEFAULT => -9
 	},
 	{#State 329
 		ACTIONS => {
-			"=" => 82,
-			'WITH' => 91,
-			'WITHOR' => 89,
-			'WITHOUT' => 92
+			"[" => 372,
+			'INTEGER' => 132
 		},
-		DEFAULT => -218,
 		GOTOS => {
-			'matchid' => 90,
-			'matchid_eq' => 83
+			'integer' => 371,
+			'int_str' => 135
 		}
 	},
 	{#State 330
-		ACTIONS => {
-			'WITHOR' => 89,
-			'WITH' => 91,
-			'WITHOUT' => 92,
-			"=" => 82
-		},
-		DEFAULT => -220,
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 90
-		}
+		DEFAULT => -8
 	},
 	{#State 331
-		ACTIONS => {
-			"=" => 82,
-			'WITHOUT' => 92,
-			'WITHOR' => 89,
-			'WITH' => 91
-		},
-		DEFAULT => -219,
-		GOTOS => {
-			'matchid' => 90,
-			'matchid_eq' => 83
-		}
+		DEFAULT => -5
 	},
 	{#State 332
-		ACTIONS => {
-			"," => 380,
-			"=" => 82
-		},
-		GOTOS => {
-			'matchid' => 111,
-			'matchid_eq' => 83
-		}
+		DEFAULT => -19
 	},
 	{#State 333
 		DEFAULT => -4,
 		GOTOS => {
-			'count_filters' => 381
+			'count_filters' => 373
 		}
 	},
 	{#State 334
-		DEFAULT => -16
-	},
-	{#State 335
 		ACTIONS => {
-			"," => 383,
-			'SYMBOL' => 1,
-			"]" => 382,
-			'DATE' => 57,
-			'INTEGER' => 21
+			'INTEGER' => 132,
+			"[" => 374
 		},
 		GOTOS => {
-			'symbol' => 384
+			'integer' => 375,
+			'int_str' => 135
 		}
 	},
+	{#State 335
+		DEFAULT => -10
+	},
 	{#State 336
-		DEFAULT => -229
+		DEFAULT => -7
 	},
 	{#State 337
-		ACTIONS => {
-			"/" => 385
-		},
-		DEFAULT => -233
+		DEFAULT => -21
 	},
 	{#State 338
 		ACTIONS => {
-			'KW_FILEID' => 345,
-			"\$" => 173,
-			'KW_DATE' => 337,
-			'SYMBOL' => 1,
-			"\@" => 341,
-			'KW_FILENAME' => 343,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			'INDEX' => 29,
-			"(" => 338,
-			"*" => 336
+			'INTEGER' => 42,
+			"*" => 378,
+			"\@" => 379,
+			"\$" => 142,
+			'KW_FILENAME' => 383,
+			'KW_FILEID' => 384,
+			'DATE' => 69,
+			'KW_DATE' => 377,
+			"(" => 380,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			"[" => 386
 		},
+		DEFAULT => -227,
 		GOTOS => {
-			's_biblname' => 339,
-			'symbol' => 299,
-			'index' => 24,
-			'count_key' => 386,
-			's_index' => 344
+			'count_key' => 382,
+			'l_countkeys' => 376,
+			'index' => 63,
+			's_index' => 381,
+			's_biblname' => 385,
+			'symbol' => 307
 		}
 	},
 	{#State 339
-		DEFAULT => -235
+		ACTIONS => {
+			"[" => 388
+		},
+		DEFAULT => -22,
+		GOTOS => {
+			'count_sort_minmax' => 387
+		}
 	},
 	{#State 340
-		ACTIONS => {
-			"," => 387
-		},
-		DEFAULT => -10
+		DEFAULT => -207
 	},
 	{#State 341
 		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21
+			'EXPANDER' => 173
 		},
+		DEFAULT => -178,
 		GOTOS => {
-			'symbol' => 388
+			's_expander' => 172
 		}
 	},
 	{#State 342
-		ACTIONS => {
-			"~" => 389
-		},
-		DEFAULT => -224
+		DEFAULT => -192
 	},
 	{#State 343
-		DEFAULT => -232
-	},
-	{#State 344
 		ACTIONS => {
-			"=" => 82
-		},
-		DEFAULT => -239,
-		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 391,
-			'ck_matchid' => 390
-		}
-	},
-	{#State 345
-		DEFAULT => -231
-	},
-	{#State 346
-		ACTIONS => {
-			'KW_FILEID' => 345,
-			'KW_DATE' => 337,
-			"\$" => 173,
-			'SYMBOL' => 1,
-			"\@" => 341,
-			'KW_FILENAME' => 343,
-			'INTEGER' => 21,
-			'INDEX' => 29,
-			'DATE' => 57,
-			"(" => 338,
-			"*" => 336
-		},
-		DEFAULT => -223,
-		GOTOS => {
-			'count_key' => 342,
-			's_index' => 344,
-			'l_countkeys' => 392,
-			's_biblname' => 339,
-			'symbol' => 299,
-			'index' => 24
-		}
-	},
-	{#State 347
-		ACTIONS => {
-			'INTEGER' => 133
+			'INTEGER' => 132
 		},
 		GOTOS => {
-			'integer' => 393,
+			'integer' => 389,
 			'int_str' => 135
 		}
 	},
-	{#State 348
-		DEFAULT => -12
+	{#State 344
+		DEFAULT => -110
 	},
-	{#State 349
-		DEFAULT => -14
-	},
-	{#State 350
+	{#State 345
 		ACTIONS => {
-			'INTEGER' => 133
+			'INTEGER' => 132
 		},
 		GOTOS => {
 			'int_str' => 135,
-			'integer' => 394
+			'integer' => 390
+		}
+	},
+	{#State 346
+		DEFAULT => -114
+	},
+	{#State 347
+		ACTIONS => {
+			"," => 391,
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
+		},
+		DEFAULT => -100,
+		GOTOS => {
+			'symbol' => 392
+		}
+	},
+	{#State 348
+		ACTIONS => {
+			"]" => 393
+		}
+	},
+	{#State 349
+		DEFAULT => -107
+	},
+	{#State 350
+		ACTIONS => {
+			'INTEGER' => 132,
+			"+" => 345,
+			"-" => 343
+		},
+		DEFAULT => -113,
+		GOTOS => {
+			'integer' => 346,
+			'int_str' => 135,
+			'qfbc_offset' => 394
 		}
 	},
 	{#State 351
-		DEFAULT => -203
+		DEFAULT => -38
 	},
 	{#State 352
-		DEFAULT => -76
+		DEFAULT => -77
 	},
 	{#State 353
-		DEFAULT => -95
+		ACTIONS => {
+			"{" => 397,
+			'SYMBOL' => 11,
+			'PREFIX' => 33,
+			'REGEX' => 14,
+			'INTEGER' => 42,
+			'INFIX' => 59,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'NEG_REGEX' => 39
+		},
+		GOTOS => {
+			's_suffix' => 396,
+			's_infix' => 398,
+			'neg_regex' => 395,
+			's_prefix' => 400,
+			'symbol' => 399,
+			'regex' => 401
+		}
 	},
 	{#State 354
-		ACTIONS => {
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"," => 395,
-			'SYMBOL' => 1
-		},
-		DEFAULT => -96,
-		GOTOS => {
-			'symbol' => 396
-		}
+		DEFAULT => -87
 	},
 	{#State 355
 		ACTIONS => {
-			"]" => 397
+			"]" => 402
 		}
 	},
 	{#State 356
-		ACTIONS => {
-			"]" => 398
-		}
+		DEFAULT => -88
 	},
 	{#State 357
-		DEFAULT => -73
-	},
-	{#State 358
 		ACTIONS => {
-			"]" => 399
+			"]" => 404,
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 403
 		}
 	},
+	{#State 358
+		DEFAULT => -74
+	},
 	{#State 359
-		DEFAULT => -103
+		DEFAULT => -48
 	},
 	{#State 360
 		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'integer' => 400,
-			'int_str' => 135
+			"]" => 405
 		}
 	},
 	{#State 361
-		DEFAULT => -106
-	},
-	{#State 362
-		DEFAULT => -110
-	},
-	{#State 363
 		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'integer' => 401,
-			'int_str' => 135
-		}
-	},
-	{#State 364
-		ACTIONS => {
-			'INTEGER' => 133,
-			"-" => 363,
-			"+" => 360
-		},
-		DEFAULT => -109,
-		GOTOS => {
-			'integer' => 362,
-			'qfbc_offset' => 402,
-			'int_str' => 135
-		}
-	},
-	{#State 365
-		DEFAULT => -34
-	},
-	{#State 366
-		DEFAULT => -44
-	},
-	{#State 367
-		ACTIONS => {
-			"]" => 403
-		}
-	},
-	{#State 368
-		DEFAULT => -83
-	},
-	{#State 369
-		ACTIONS => {
-			'INTEGER' => 133,
-			"]" => 405
-		},
-		GOTOS => {
-			'int_str' => 404
-		}
-	},
-	{#State 370
-		DEFAULT => -84
-	},
-	{#State 371
-		ACTIONS => {
-			"]" => 406
-		}
-	},
-	{#State 372
-		DEFAULT => -90
-	},
-	{#State 373
-		ACTIONS => {
-			'INTEGER' => 301,
-			'DATE' => 302,
-			"]" => 408
+			"]" => 406,
+			'INTEGER' => 304,
+			'DATE' => 305
 		},
 		GOTOS => {
 			'date' => 407
 		}
 	},
-	{#State 374
-		DEFAULT => -70
+	{#State 362
+		DEFAULT => -94
 	},
-	{#State 375
+	{#State 363
+		DEFAULT => -99
+	},
+	{#State 364
 		ACTIONS => {
-			"{" => 412,
-			'NEG_REGEX' => 61,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			'SUFFIX' => 3,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'PREFIX' => 55
+			"]" => 408
+		}
+	},
+	{#State 365
+		ACTIONS => {
+			"]" => 409
+		}
+	},
+	{#State 366
+		ACTIONS => {
+			"]" => 410
+		}
+	},
+	{#State 367
+		ACTIONS => {
+			"]" => 411
+		}
+	},
+	{#State 368
+		DEFAULT => -35
+	},
+	{#State 369
+		DEFAULT => -80
+	},
+	{#State 370
+		ACTIONS => {
+			"{" => 24,
+			'COLON_LBRACE' => 47,
+			"<" => 65,
+			"*" => 44,
+			"\@" => 45,
+			"\$" => 23,
+			'INFIX' => 59,
+			'INTEGER' => 413,
+			'NEG_REGEX' => 39,
+			"^" => 1,
+			'DOLLAR_DOT' => 20,
+			'AT_LBRACE' => 37,
+			'KEYS' => 71,
+			"(" => 223,
+			'PREFIX' => 33,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			"[" => 13,
+			'REGEX' => 14,
+			"\"" => 30,
+			'SUFFIX' => 31,
+			'DATE' => 69,
+			'STAR_LBRACE' => 29,
+			"%" => 51
 		},
 		GOTOS => {
-			's_infix' => 409,
-			's_prefix' => 413,
-			's_suffix' => 414,
-			'regex' => 410,
-			'symbol' => 411,
-			'neg_regex' => 415
+			'qc_phrase' => 67,
+			'qw_exact' => 68,
+			'qw_keys' => 66,
+			's_suffix' => 28,
+			'integer' => 412,
+			'qw_matchid' => 70,
+			'neg_regex' => 36,
+			'qw_listfile' => 32,
+			's_word' => 35,
+			'qc_word' => 22,
+			's_prefix' => 58,
+			'qw_thesaurus' => 21,
+			's_index' => 25,
+			'qw_set_infl' => 27,
+			'index' => 63,
+			'qw_lemma' => 64,
+			'qw_withor' => 62,
+			'regex' => 52,
+			'qw_infix_set' => 10,
+			'qw_morph' => 53,
+			'qw_prefix_set' => 9,
+			'qc_tokens' => 414,
+			'qw_without' => 17,
+			'qw_bareword' => 57,
+			'int_str' => 135,
+			'qw_set_exact' => 16,
+			'qw_prefix' => 15,
+			'qw_suffix_set' => 54,
+			'qw_with' => 3,
+			'symbol' => 4,
+			'qw_any' => 2,
+			'qw_anchor' => 41,
+			'qw_regex' => 40,
+			'qw_infix' => 8,
+			'qwk_indextuple' => 7,
+			'qw_suffix' => 46,
+			'qw_chunk' => 6,
+			's_infix' => 5
 		}
+	},
+	{#State 371
+		DEFAULT => -15
+	},
+	{#State 372
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'integer' => 415,
+			'int_str' => 135
+		}
+	},
+	{#State 373
+		ACTIONS => {
+			'KW_COMMENT' => 210,
+			'LESS_BY_COUNT' => 326,
+			'LESS_BY_KEY' => 325,
+			'CLIMIT' => 329,
+			'BY' => 338,
+			'SAMPLE' => 334,
+			'GREATER_BY_KEY' => 332,
+			'GREATER_BY_COUNT' => 337
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'q_comment' => 335,
+			'count_sample' => 336,
+			'count_limit' => 330,
+			'count_filter' => 331,
+			'count_sort' => 328,
+			'count_by' => 327,
+			'count_sort_op' => 339
+		}
+	},
+	{#State 374
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 135,
+			'integer' => 416
+		}
+	},
+	{#State 375
+		DEFAULT => -13
 	},
 	{#State 376
 		ACTIONS => {
-			"]" => 416
-		}
+			"," => 417
+		},
+		DEFAULT => -11
 	},
 	{#State 377
 		ACTIONS => {
-			"]" => 417
-		}
+			"/" => 418
+		},
+		DEFAULT => -237
 	},
 	{#State 378
-		DEFAULT => -188
+		DEFAULT => -233
 	},
 	{#State 379
 		ACTIONS => {
-			'EXPANDER' => 129
+			'DATE' => 69,
+			'INTEGER' => 42,
+			'SYMBOL' => 11
 		},
-		DEFAULT => -174,
 		GOTOS => {
-			's_expander' => 128
+			'symbol' => 419
 		}
 	},
 	{#State 380
 		ACTIONS => {
-			'PREFIX' => 55,
-			"[" => 70,
-			"<" => 52,
-			'KEYS' => 8,
-			'INTEGER' => 420,
-			"%" => 58,
-			'DATE' => 57,
-			"\@" => 37,
-			'NEG_REGEX' => 61,
-			"*" => 17,
-			"(" => 218,
-			'AT_LBRACE' => 71,
-			'STAR_LBRACE' => 36,
-			"^" => 65,
-			'SYMBOL' => 1,
-			'INFIX' => 23,
-			'REGEX' => 2,
-			'SUFFIX' => 3,
-			"\$" => 26,
-			'COLON_LBRACE' => 38,
-			'DOLLAR_DOT' => 49,
-			'INDEX' => 29,
-			"\"" => 48,
-			"{" => 47
+			"(" => 380,
+			'SYMBOL' => 11,
+			"*" => 378,
+			'INDEX' => 12,
+			"\@" => 379,
+			"\$" => 142,
+			'KW_FILENAME' => 383,
+			'INTEGER' => 42,
+			'KW_FILEID' => 384,
+			'DATE' => 69,
+			'KW_DATE' => 377
 		},
 		GOTOS => {
-			's_prefix' => 56,
-			'qw_keys' => 62,
-			'qw_bareword' => 22,
-			'qw_regex' => 60,
-			'qw_with' => 16,
-			'qw_any' => 20,
-			'qw_infix' => 53,
-			'qwk_indextuple' => 9,
-			'qc_tokens' => 418,
-			'qw_withor' => 12,
-			's_word' => 11,
-			'qw_prefix' => 50,
-			'symbol' => 44,
-			'qw_matchid' => 45,
-			'qw_suffix_set' => 46,
-			'qw_thesaurus' => 7,
-			'qw_anchor' => 40,
-			's_index' => 39,
-			's_infix' => 6,
-			'int_str' => 135,
-			'qw_exact' => 41,
-			'qw_set_exact' => 43,
-			'qw_lemma' => 42,
-			'qw_chunk' => 5,
-			'qw_prefix_set' => 4,
-			'qw_infix_set' => 72,
-			'qw_set_infl' => 34,
-			'qw_listfile' => 32,
-			'qw_morph' => 31,
-			'qc_word' => 33,
-			'neg_regex' => 68,
-			'qw_suffix' => 69,
-			'qw_without' => 30,
-			's_suffix' => 67,
-			'regex' => 28,
-			'qc_phrase' => 27,
-			'integer' => 419,
-			'index' => 24
+			's_index' => 381,
+			's_biblname' => 385,
+			'symbol' => 307,
+			'index' => 63,
+			'count_key' => 420
 		}
 	},
 	{#State 381
 		ACTIONS => {
-			'CLIMIT' => 290,
-			'SAMPLE' => 287,
-			'BY' => 282,
-			'GREATER_BY_COUNT' => 284,
-			'LESS_BY_KEY' => 288,
-			'GREATER_BY_KEY' => 285,
-			'LESS_BY_COUNT' => 291
+			"=" => 86
 		},
-		DEFAULT => -3,
+		DEFAULT => -243,
 		GOTOS => {
-			'count_sort' => 286,
-			'count_limit' => 289,
-			'count_sample' => 283,
-			'count_by' => 292,
-			'count_filter' => 293,
-			'count_sort_op' => 281
+			'matchid_eq' => 84,
+			'matchid' => 422,
+			'ck_matchid' => 421
 		}
 	},
 	{#State 382
-		DEFAULT => -22
+		ACTIONS => {
+			"~" => 423
+		},
+		DEFAULT => -228
 	},
 	{#State 383
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'DATE' => 57,
-			'INTEGER' => 21,
-			"]" => 422
-		},
-		GOTOS => {
-			'symbol' => 421
-		}
+		DEFAULT => -236
 	},
 	{#State 384
-		ACTIONS => {
-			"," => 423,
-			"]" => 424
-		}
+		DEFAULT => -235
 	},
 	{#State 385
-		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'int_str' => 135,
-			'integer' => 425
-		}
+		DEFAULT => -239
 	},
 	{#State 386
 		ACTIONS => {
-			")" => 426,
-			"~" => 389
+			'DATE' => 69,
+			'KW_FILEID' => 384,
+			'INTEGER' => 42,
+			'KW_DATE' => 377,
+			"(" => 380,
+			'KW_FILENAME' => 383,
+			"\@" => 379,
+			"\$" => 142,
+			'INDEX' => 12,
+			"*" => 378,
+			'SYMBOL' => 11
+		},
+		DEFAULT => -227,
+		GOTOS => {
+			'count_key' => 382,
+			's_index' => 381,
+			's_biblname' => 385,
+			'symbol' => 307,
+			'l_countkeys' => 424,
+			'index' => 63
 		}
 	},
 	{#State 387
-		ACTIONS => {
-			"*" => 336,
-			"(" => 338,
-			'INTEGER' => 21,
-			'INDEX' => 29,
-			'DATE' => 57,
-			"\@" => 341,
-			'KW_FILENAME' => 343,
-			'SYMBOL' => 1,
-			'KW_FILEID' => 345,
-			"\$" => 173,
-			'KW_DATE' => 337
-		},
-		GOTOS => {
-			'index' => 24,
-			'symbol' => 299,
-			's_biblname' => 339,
-			's_index' => 344,
-			'count_key' => 427
-		}
+		DEFAULT => -17
 	},
 	{#State 388
-		DEFAULT => -230
+		ACTIONS => {
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"]" => 425,
+			"," => 427,
+			'SYMBOL' => 11
+		},
+		GOTOS => {
+			'symbol' => 426
+		}
 	},
 	{#State 389
-		ACTIONS => {
-			'REGEX_SEARCH' => 429
-		},
-		GOTOS => {
-			'replace_regex' => 428
-		}
+		DEFAULT => -116
 	},
 	{#State 390
-		ACTIONS => {
-			"-" => 430,
-			"+" => 432,
-			'INTEGER' => 133
-		},
-		DEFAULT => -241,
-		GOTOS => {
-			'int_str' => 135,
-			'integer' => 433,
-			'ck_offset' => 431
-		}
+		DEFAULT => -115
 	},
 	{#State 391
-		DEFAULT => -240
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			'INTEGER' => 42
+		},
+		DEFAULT => -101,
+		GOTOS => {
+			'symbol' => 428
+		}
 	},
 	{#State 392
 		ACTIONS => {
-			"]" => 434,
-			"," => 387
-		}
+			"," => 429
+		},
+		DEFAULT => -102
 	},
 	{#State 393
-		ACTIONS => {
-			"]" => 435
-		}
+		DEFAULT => -108
 	},
 	{#State 394
-		ACTIONS => {
-			"]" => 436
-		}
+		DEFAULT => -109
 	},
 	{#State 395
 		ACTIONS => {
-			'DATE' => 57,
-			'INTEGER' => 21,
-			'SYMBOL' => 1
-		},
-		DEFAULT => -97,
-		GOTOS => {
-			'symbol' => 437
+			"]" => 430
 		}
 	},
 	{#State 396
 		ACTIONS => {
-			"," => 438
-		},
-		DEFAULT => -98
-	},
-	{#State 397
-		DEFAULT => -77
-	},
-	{#State 398
-		DEFAULT => -79
-	},
-	{#State 399
-		DEFAULT => -104
-	},
-	{#State 400
-		DEFAULT => -111
-	},
-	{#State 401
-		DEFAULT => -112
-	},
-	{#State 402
-		DEFAULT => -105
-	},
-	{#State 403
-		DEFAULT => -87
-	},
-	{#State 404
-		ACTIONS => {
-			"]" => 439
+			"]" => 431
 		}
 	},
+	{#State 397
+		DEFAULT => -212,
+		GOTOS => {
+			'l_set' => 432
+		}
+	},
+	{#State 398
+		ACTIONS => {
+			"]" => 433
+		}
+	},
+	{#State 399
+		ACTIONS => {
+			"]" => 434
+		}
+	},
+	{#State 400
+		ACTIONS => {
+			"]" => 435
+		}
+	},
+	{#State 401
+		ACTIONS => {
+			"]" => 436
+		}
+	},
+	{#State 402
+		DEFAULT => -91
+	},
+	{#State 403
+		ACTIONS => {
+			"]" => 437
+		}
+	},
+	{#State 404
+		DEFAULT => -89
+	},
 	{#State 405
-		DEFAULT => -85
+		DEFAULT => -97
 	},
 	{#State 406
-		DEFAULT => -93
+		DEFAULT => -95
 	},
 	{#State 407
 		ACTIONS => {
-			"]" => 440
+			"]" => 438
 		}
 	},
 	{#State 408
-		DEFAULT => -91
+		DEFAULT => -82
 	},
 	{#State 409
-		ACTIONS => {
-			"]" => 441
-		}
+		DEFAULT => -84
 	},
 	{#State 410
-		ACTIONS => {
-			"]" => 442
-		}
+		DEFAULT => -83
 	},
 	{#State 411
-		ACTIONS => {
-			"]" => 443
-		}
+		DEFAULT => -81
 	},
 	{#State 412
-		DEFAULT => -208,
-		GOTOS => {
-			'l_set' => 444
+		ACTIONS => {
+			")" => 439
 		}
 	},
 	{#State 413
 		ACTIONS => {
-			"]" => 445
-		}
+			")" => -279
+		},
+		DEFAULT => -264
 	},
 	{#State 414
 		ACTIONS => {
-			"]" => 446
+			"=" => 86,
+			"," => 440
+		},
+		GOTOS => {
+			'matchid_eq' => 84,
+			'matchid' => 108
 		}
 	},
 	{#State 415
 		ACTIONS => {
-			"]" => 447
+			"]" => 441
 		}
 	},
 	{#State 416
-		DEFAULT => -78
+		ACTIONS => {
+			"]" => 442
+		}
 	},
 	{#State 417
-		DEFAULT => -80
+		ACTIONS => {
+			"(" => 380,
+			'INDEX' => 12,
+			'SYMBOL' => 11,
+			"*" => 378,
+			"\$" => 142,
+			"\@" => 379,
+			'KW_FILENAME' => 383,
+			'INTEGER' => 42,
+			'KW_FILEID' => 384,
+			'DATE' => 69,
+			'KW_DATE' => 377
+		},
+		GOTOS => {
+			'index' => 63,
+			's_biblname' => 385,
+			'symbol' => 307,
+			's_index' => 381,
+			'count_key' => 443
+		}
 	},
 	{#State 418
 		ACTIONS => {
-			"," => 448,
-			"=" => 82
+			'INTEGER' => 132
 		},
 		GOTOS => {
-			'matchid_eq' => 83,
-			'matchid' => 111
-		}
-	},
-	{#State 419
-		ACTIONS => {
-			")" => 449
-		}
-	},
-	{#State 420
-		ACTIONS => {
-			")" => -275
-		},
-		DEFAULT => -260
-	},
-	{#State 421
-		ACTIONS => {
-			"]" => 450
-		}
-	},
-	{#State 422
-		DEFAULT => -23
-	},
-	{#State 423
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'INTEGER' => 21,
-			'DATE' => 57,
-			"]" => 451
-		},
-		GOTOS => {
-			'symbol' => 452
-		}
-	},
-	{#State 424
-		DEFAULT => -24
-	},
-	{#State 425
-		DEFAULT => -234
-	},
-	{#State 426
-		DEFAULT => -238
-	},
-	{#State 427
-		ACTIONS => {
-			"~" => 389
-		},
-		DEFAULT => -225
-	},
-	{#State 428
-		DEFAULT => -237
-	},
-	{#State 429
-		ACTIONS => {
-			'REGEX_REPLACE' => 453
-		}
-	},
-	{#State 430
-		ACTIONS => {
-			'INTEGER' => 133
-		},
-		GOTOS => {
-			'integer' => 454,
+			'integer' => 444,
 			'int_str' => 135
 		}
 	},
+	{#State 419
+		DEFAULT => -234
+	},
+	{#State 420
+		ACTIONS => {
+			")" => 445,
+			"~" => 423
+		}
+	},
+	{#State 421
+		ACTIONS => {
+			"+" => 447,
+			"-" => 448,
+			'INTEGER' => 132
+		},
+		DEFAULT => -245,
+		GOTOS => {
+			'int_str' => 135,
+			'ck_offset' => 446,
+			'integer' => 449
+		}
+	},
+	{#State 422
+		DEFAULT => -244
+	},
+	{#State 423
+		ACTIONS => {
+			'REGEX_SEARCH' => 451
+		},
+		GOTOS => {
+			'replace_regex' => 450
+		}
+	},
+	{#State 424
+		ACTIONS => {
+			"," => 417,
+			"]" => 452
+		}
+	},
+	{#State 425
+		DEFAULT => -23
+	},
+	{#State 426
+		ACTIONS => {
+			"," => 454,
+			"]" => 453
+		}
+	},
+	{#State 427
+		ACTIONS => {
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"]" => 456,
+			'SYMBOL' => 11
+		},
+		GOTOS => {
+			'symbol' => 455
+		}
+	},
+	{#State 428
+		DEFAULT => -104
+	},
+	{#State 429
+		ACTIONS => {
+			'DATE' => 69,
+			'INTEGER' => 42,
+			'SYMBOL' => 11
+		},
+		DEFAULT => -103,
+		GOTOS => {
+			'symbol' => 457
+		}
+	},
+	{#State 430
+		DEFAULT => -58
+	},
 	{#State 431
-		DEFAULT => -236
+		DEFAULT => -60
 	},
 	{#State 432
 		ACTIONS => {
-			'INTEGER' => 133
+			'DATE' => 69,
+			'INTEGER' => 42,
+			"}" => 458,
+			"," => 145,
+			'SYMBOL' => 11
 		},
 		GOTOS => {
-			'int_str' => 135,
-			'integer' => 455
+			'symbol' => 4,
+			's_word' => 144
 		}
 	},
 	{#State 433
-		DEFAULT => -242
+		DEFAULT => -61
 	},
 	{#State 434
-		DEFAULT => -11
-	},
-	{#State 435
-		DEFAULT => -13
-	},
-	{#State 436
-		DEFAULT => -15
-	},
-	{#State 437
-		DEFAULT => -100
-	},
-	{#State 438
-		ACTIONS => {
-			'SYMBOL' => 1,
-			'INTEGER' => 21,
-			'DATE' => 57
-		},
-		DEFAULT => -99,
-		GOTOS => {
-			'symbol' => 456
-		}
-	},
-	{#State 439
-		DEFAULT => -86
-	},
-	{#State 440
-		DEFAULT => -92
-	},
-	{#State 441
-		DEFAULT => -57
-	},
-	{#State 442
-		DEFAULT => -53
-	},
-	{#State 443
-		DEFAULT => -52
-	},
-	{#State 444
-		ACTIONS => {
-			'INTEGER' => 21,
-			"}" => 457,
-			'DATE' => 57,
-			'SYMBOL' => 1,
-			"," => 189
-		},
-		GOTOS => {
-			's_word' => 187,
-			'symbol' => 44
-		}
-	},
-	{#State 445
-		DEFAULT => -55
-	},
-	{#State 446
 		DEFAULT => -56
 	},
-	{#State 447
-		DEFAULT => -54
+	{#State 435
+		DEFAULT => -59
 	},
-	{#State 448
+	{#State 436
+		DEFAULT => -57
+	},
+	{#State 437
+		DEFAULT => -90
+	},
+	{#State 438
+		DEFAULT => -96
+	},
+	{#State 439
+		DEFAULT => -132
+	},
+	{#State 440
 		ACTIONS => {
-			'INTEGER' => 133
+			'INTEGER' => 132
 		},
 		GOTOS => {
 			'int_str' => 135,
-			'integer' => 458
+			'integer' => 459
+		}
+	},
+	{#State 441
+		DEFAULT => -16
+	},
+	{#State 442
+		DEFAULT => -14
+	},
+	{#State 443
+		ACTIONS => {
+			"~" => 423
+		},
+		DEFAULT => -229
+	},
+	{#State 444
+		DEFAULT => -238
+	},
+	{#State 445
+		DEFAULT => -242
+	},
+	{#State 446
+		DEFAULT => -240
+	},
+	{#State 447
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'integer' => 460,
+			'int_str' => 135
+		}
+	},
+	{#State 448
+		ACTIONS => {
+			'INTEGER' => 132
+		},
+		GOTOS => {
+			'int_str' => 135,
+			'integer' => 461
 		}
 	},
 	{#State 449
-		DEFAULT => -128
+		DEFAULT => -246
 	},
 	{#State 450
-		DEFAULT => -26
+		DEFAULT => -241
 	},
 	{#State 451
-		DEFAULT => -25
+		ACTIONS => {
+			'REGEX_REPLACE' => 462
+		}
 	},
 	{#State 452
-		ACTIONS => {
-			"]" => 459
-		}
+		DEFAULT => -12
 	},
 	{#State 453
-		ACTIONS => {
-			'REGOPT' => 460
-		},
-		DEFAULT => -273
+		DEFAULT => -25
 	},
 	{#State 454
-		DEFAULT => -244
+		ACTIONS => {
+			'SYMBOL' => 11,
+			'DATE' => 69,
+			"]" => 464,
+			'INTEGER' => 42
+		},
+		GOTOS => {
+			'symbol' => 463
+		}
 	},
 	{#State 455
-		DEFAULT => -243
+		ACTIONS => {
+			"]" => 465
+		}
 	},
 	{#State 456
-		DEFAULT => -101
+		DEFAULT => -24
 	},
 	{#State 457
-		ACTIONS => {
-			"]" => 461
-		}
+		DEFAULT => -105
 	},
 	{#State 458
 		ACTIONS => {
-			")" => 462
+			"]" => 466
 		}
 	},
 	{#State 459
-		DEFAULT => -27
+		ACTIONS => {
+			")" => 467
+		}
 	},
 	{#State 460
-		DEFAULT => -274
+		DEFAULT => -247
 	},
 	{#State 461
-		DEFAULT => -58
+		DEFAULT => -248
 	},
 	{#State 462
-		DEFAULT => -129
+		ACTIONS => {
+			'REGOPT' => 468
+		},
+		DEFAULT => -277
+	},
+	{#State 463
+		ACTIONS => {
+			"]" => 469
+		}
+	},
+	{#State 464
+		DEFAULT => -26
+	},
+	{#State 465
+		DEFAULT => -27
+	},
+	{#State 466
+		DEFAULT => -62
+	},
+	{#State 467
+		DEFAULT => -133
+	},
+	{#State 468
+		DEFAULT => -278
+	},
+	{#State 469
+		DEFAULT => -28
 	}
 ],
                                   yyrules  =>
@@ -4541,85 +4587,85 @@ sub
 { $_[1] }
 	],
 	[#Rule 10
-		 'count_by', 2,
+		 'count_filter', 1,
 sub
-#line 132 "lib/DDC/PP/yyqparser.yp"
-{ {Keys=>$_[2]} }
+#line 129 "lib/DDC/PP/yyqparser.yp"
+{ {}    }
 	],
 	[#Rule 11
-		 'count_by', 4,
+		 'count_by', 2,
 sub
 #line 133 "lib/DDC/PP/yyqparser.yp"
-{ {Keys=>$_[3]} }
+{ {Keys=>$_[2]} }
 	],
 	[#Rule 12
-		 'count_sample', 2,
+		 'count_by', 4,
 sub
-#line 137 "lib/DDC/PP/yyqparser.yp"
-{ {Sample=>$_[2]} }
+#line 134 "lib/DDC/PP/yyqparser.yp"
+{ {Keys=>$_[3]} }
 	],
 	[#Rule 13
-		 'count_sample', 4,
+		 'count_sample', 2,
 sub
 #line 138 "lib/DDC/PP/yyqparser.yp"
-{ {Sample=>$_[3]} }
+{ {Sample=>$_[2]} }
 	],
 	[#Rule 14
-		 'count_limit', 2,
+		 'count_sample', 4,
 sub
-#line 143 "lib/DDC/PP/yyqparser.yp"
-{ {Limit=>$_[2]} }
+#line 139 "lib/DDC/PP/yyqparser.yp"
+{ {Sample=>$_[3]} }
 	],
 	[#Rule 15
-		 'count_limit', 4,
+		 'count_limit', 2,
 sub
 #line 144 "lib/DDC/PP/yyqparser.yp"
-{ {Limit=>$_[3]} }
+{ {Limit=>$_[2]} }
 	],
 	[#Rule 16
-		 'count_sort', 2,
+		 'count_limit', 4,
 sub
-#line 148 "lib/DDC/PP/yyqparser.yp"
-{ $_[2]->{Sort}=$_[1]; $_[2] }
+#line 145 "lib/DDC/PP/yyqparser.yp"
+{ {Limit=>$_[3]} }
 	],
 	[#Rule 17
-		 'count_sort_op', 1,
+		 'count_sort', 2,
 sub
-#line 152 "lib/DDC/PP/yyqparser.yp"
-{ DDC::PP::LessByCountKey }
+#line 149 "lib/DDC/PP/yyqparser.yp"
+{ $_[2]->{Sort}=$_[1]; $_[2] }
 	],
 	[#Rule 18
 		 'count_sort_op', 1,
 sub
 #line 153 "lib/DDC/PP/yyqparser.yp"
-{ DDC::PP::GreaterByCountKey }
+{ DDC::PP::LessByCountKey }
 	],
 	[#Rule 19
 		 'count_sort_op', 1,
 sub
 #line 154 "lib/DDC/PP/yyqparser.yp"
-{ DDC::PP::LessByCountValue }
+{ DDC::PP::GreaterByCountKey }
 	],
 	[#Rule 20
 		 'count_sort_op', 1,
 sub
 #line 155 "lib/DDC/PP/yyqparser.yp"
-{ DDC::PP::GreaterByCountValue }
+{ DDC::PP::LessByCountValue }
 	],
 	[#Rule 21
-		 'count_sort_minmax', 0,
+		 'count_sort_op', 1,
 sub
-#line 159 "lib/DDC/PP/yyqparser.yp"
-{ {} }
+#line 156 "lib/DDC/PP/yyqparser.yp"
+{ DDC::PP::GreaterByCountValue }
 	],
 	[#Rule 22
-		 'count_sort_minmax', 2,
+		 'count_sort_minmax', 0,
 sub
 #line 160 "lib/DDC/PP/yyqparser.yp"
 { {} }
 	],
 	[#Rule 23
-		 'count_sort_minmax', 3,
+		 'count_sort_minmax', 2,
 sub
 #line 161 "lib/DDC/PP/yyqparser.yp"
 { {} }
@@ -4628,10 +4674,10 @@ sub
 		 'count_sort_minmax', 3,
 sub
 #line 162 "lib/DDC/PP/yyqparser.yp"
-{ {Lo=>$_[2]} }
+{ {} }
 	],
 	[#Rule 25
-		 'count_sort_minmax', 4,
+		 'count_sort_minmax', 3,
 sub
 #line 163 "lib/DDC/PP/yyqparser.yp"
 { {Lo=>$_[2]} }
@@ -4640,28 +4686,28 @@ sub
 		 'count_sort_minmax', 4,
 sub
 #line 164 "lib/DDC/PP/yyqparser.yp"
-{ {Hi=>$_[3]} }
+{ {Lo=>$_[2]} }
 	],
 	[#Rule 27
-		 'count_sort_minmax', 5,
+		 'count_sort_minmax', 4,
 sub
 #line 165 "lib/DDC/PP/yyqparser.yp"
-{ {Lo=>$_[2],Hi=>$_[4]} }
+{ {Hi=>$_[3]} }
 	],
 	[#Rule 28
-		 'query_conditions', 2,
+		 'count_sort_minmax', 5,
 sub
-#line 172 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 166 "lib/DDC/PP/yyqparser.yp"
+{ {Lo=>$_[2],Hi=>$_[4]} }
 	],
 	[#Rule 29
-		 'q_filters', 0,
+		 'query_conditions', 2,
 sub
-#line 178 "lib/DDC/PP/yyqparser.yp"
-{ undef }
+#line 173 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 30
-		 'q_filters', 2,
+		 'q_filters', 0,
 sub
 #line 179 "lib/DDC/PP/yyqparser.yp"
 { undef }
@@ -4673,1497 +4719,1521 @@ sub
 { undef }
 	],
 	[#Rule 32
-		 'q_flag', 2,
+		 'q_filters', 2,
 sub
-#line 184 "lib/DDC/PP/yyqparser.yp"
+#line 181 "lib/DDC/PP/yyqparser.yp"
 { undef }
 	],
 	[#Rule 33
-		 'q_flag', 2,
+		 'q_filters', 2,
 sub
-#line 185 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{ContextSentencesCount} = $_[2]; undef }
+#line 182 "lib/DDC/PP/yyqparser.yp"
+{ undef }
 	],
 	[#Rule 34
-		 'q_flag', 4,
+		 'q_comment', 2,
 sub
 #line 186 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{ContextSentencesCount} = $_[3]; undef }
+{ push(@{$_[0]->qopts->{Comments}}, $_[2]); undef }
 	],
 	[#Rule 35
-		 'q_flag', 2,
+		 'q_comment', 4,
 sub
 #line 187 "lib/DDC/PP/yyqparser.yp"
-{ push(@{$_[0]->qopts->{Within}}, $_[2]); undef }
+{ push(@{$_[0]->qopts->{Comments}}, $_[3]); undef }
 	],
 	[#Rule 36
-		 'q_flag', 1,
+		 'q_flag', 2,
 sub
-#line 188 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{SeparateHits} = 1; undef }
+#line 191 "lib/DDC/PP/yyqparser.yp"
+{ undef }
 	],
 	[#Rule 37
-		 'q_flag', 1,
+		 'q_flag', 2,
 sub
-#line 189 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{SeparateHits} = 0; undef }
+#line 192 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{ContextSentencesCount} = $_[2]; undef }
 	],
 	[#Rule 38
-		 'q_flag', 1,
+		 'q_flag', 4,
 sub
-#line 190 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{EnableBibliography} = 0; undef }
+#line 193 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{ContextSentencesCount} = $_[3]; undef }
 	],
 	[#Rule 39
 		 'q_flag', 2,
 sub
-#line 191 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{EnableBibliography} = 1; undef }
+#line 194 "lib/DDC/PP/yyqparser.yp"
+{ push(@{$_[0]->qopts->{Within}}, $_[2]); undef }
 	],
 	[#Rule 40
 		 'q_flag', 1,
 sub
-#line 192 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{DebugRank} = 1; undef }
+#line 195 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{SeparateHits} = 1; undef }
 	],
 	[#Rule 41
-		 'q_flag', 2,
+		 'q_flag', 1,
 sub
-#line 193 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->qopts->{DebugRank} = 0; undef }
+#line 196 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{SeparateHits} = 0; undef }
 	],
 	[#Rule 42
-		 'qf_subcorpora', 0,
+		 'q_flag', 1,
 sub
-#line 198 "lib/DDC/PP/yyqparser.yp"
-{ undef }
+#line 197 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{EnableBibliography} = 0; undef }
 	],
 	[#Rule 43
-		 'qf_subcorpora', 1,
+		 'q_flag', 2,
 sub
-#line 199 "lib/DDC/PP/yyqparser.yp"
-{ push(@{$_[0]->qopts->{Subcorpora}}, $_[1]); undef }
+#line 198 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{EnableBibliography} = 1; undef }
 	],
 	[#Rule 44
-		 'qf_subcorpora', 3,
+		 'q_flag', 1,
 sub
-#line 200 "lib/DDC/PP/yyqparser.yp"
-{ push(@{$_[0]->qopts->{Subcorpora}}, $_[3]); undef }
+#line 199 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{DebugRank} = 1; undef }
 	],
 	[#Rule 45
-		 'q_filter', 1,
+		 'q_flag', 2,
 sub
-#line 204 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]; }
+#line 200 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->qopts->{DebugRank} = 0; undef }
 	],
 	[#Rule 46
-		 'q_filter', 1,
+		 'qf_subcorpora', 0,
 sub
 #line 205 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]; }
+{ undef }
 	],
 	[#Rule 47
-		 'q_filter', 1,
+		 'qf_subcorpora', 1,
 sub
 #line 206 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]; }
+{ push(@{$_[0]->qopts->{Subcorpora}}, $_[1]); undef }
 	],
 	[#Rule 48
-		 'q_filter', 1,
+		 'qf_subcorpora', 3,
 sub
 #line 207 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]; }
+{ push(@{$_[0]->qopts->{Subcorpora}}, $_[3]); undef }
 	],
 	[#Rule 49
 		 'q_filter', 1,
 sub
-#line 208 "lib/DDC/PP/yyqparser.yp"
+#line 211 "lib/DDC/PP/yyqparser.yp"
 { $_[1]; }
 	],
 	[#Rule 50
 		 'q_filter', 1,
 sub
-#line 209 "lib/DDC/PP/yyqparser.yp"
+#line 212 "lib/DDC/PP/yyqparser.yp"
 { $_[1]; }
 	],
 	[#Rule 51
 		 'q_filter', 1,
 sub
-#line 210 "lib/DDC/PP/yyqparser.yp"
+#line 213 "lib/DDC/PP/yyqparser.yp"
 { $_[1]; }
 	],
 	[#Rule 52
-		 'qf_has_field', 6,
+		 'q_filter', 1,
 sub
 #line 214 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFHasFieldValue', $_[3], $_[5]) }
+{ $_[1]; }
 	],
 	[#Rule 53
-		 'qf_has_field', 6,
+		 'q_filter', 1,
 sub
 #line 215 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFHasFieldRegex', $_[3], $_[5]) }
+{ $_[1]; }
 	],
 	[#Rule 54
-		 'qf_has_field', 6,
+		 'q_filter', 1,
 sub
 #line 216 "lib/DDC/PP/yyqparser.yp"
-{ (my $f=$_[0]->newf('CQFHasFieldRegex', $_[3], $_[5]))->Negate(); $f }
+{ $_[1]; }
 	],
 	[#Rule 55
-		 'qf_has_field', 6,
+		 'q_filter', 1,
 sub
 #line 217 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFHasFieldPrefix', $_[3],$_[5]) }
+{ $_[1]; }
 	],
 	[#Rule 56
 		 'qf_has_field', 6,
 sub
-#line 218 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFHasFieldSuffix', $_[3],$_[5]) }
+#line 221 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFHasFieldValue', $_[3], $_[5]) }
 	],
 	[#Rule 57
 		 'qf_has_field', 6,
 sub
-#line 219 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFHasFieldInfix', $_[3],$_[5]) }
+#line 222 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFHasFieldRegex', $_[3], $_[5]) }
 	],
 	[#Rule 58
-		 'qf_has_field', 8,
+		 'qf_has_field', 6,
 sub
-#line 220 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFHasFieldSet', $_[3], $_[6]) }
+#line 223 "lib/DDC/PP/yyqparser.yp"
+{ (my $f=$_[0]->newf('CQFHasFieldRegex', $_[3], $_[5]))->Negate(); $f }
 	],
 	[#Rule 59
-		 'qf_has_field', 2,
+		 'qf_has_field', 6,
 sub
-#line 221 "lib/DDC/PP/yyqparser.yp"
-{ $_[2]->Negate; $_[2] }
+#line 224 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFHasFieldPrefix', $_[3],$_[5]) }
 	],
 	[#Rule 60
-		 'qf_rank_sort', 1,
+		 'qf_has_field', 6,
 sub
 #line 225 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFRankSort', DDC::PP::GreaterByRank) }
+{ $_[0]->newf('CQFHasFieldSuffix', $_[3],$_[5]) }
 	],
 	[#Rule 61
-		 'qf_rank_sort', 1,
+		 'qf_has_field', 6,
 sub
 #line 226 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFRankSort', DDC::PP::LessByRank) }
+{ $_[0]->newf('CQFHasFieldInfix', $_[3],$_[5]) }
 	],
 	[#Rule 62
-		 'qf_context_sort', 2,
+		 'qf_has_field', 8,
 sub
-#line 230 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newCFilter(DDC::PP::LessByLeftContext,      -1, $_[2]) }
+#line 227 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFHasFieldSet', $_[3], $_[6]) }
 	],
 	[#Rule 63
-		 'qf_context_sort', 2,
+		 'qf_has_field', 2,
 sub
-#line 231 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newCFilter(DDC::PP::GreaterByLeftContext,   -1, $_[2]) }
+#line 228 "lib/DDC/PP/yyqparser.yp"
+{ $_[2]->Negate; $_[2] }
 	],
 	[#Rule 64
-		 'qf_context_sort', 2,
+		 'qf_rank_sort', 1,
 sub
 #line 232 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newCFilter(DDC::PP::LessByRightContext,      1, $_[2]) }
+{ $_[0]->newf('CQFRankSort', DDC::PP::GreaterByRank) }
 	],
 	[#Rule 65
-		 'qf_context_sort', 2,
+		 'qf_rank_sort', 1,
 sub
 #line 233 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newCFilter(DDC::PP::GreaterByRightContext,   1, $_[2]) }
+{ $_[0]->newf('CQFRankSort', DDC::PP::LessByRank) }
 	],
 	[#Rule 66
 		 'qf_context_sort', 2,
 sub
-#line 234 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newCFilter(DDC::PP::LessByMiddleContext,     0, $_[2]) }
+#line 237 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newCFilter(DDC::PP::LessByLeftContext,      -1, $_[2]) }
 	],
 	[#Rule 67
 		 'qf_context_sort', 2,
 sub
-#line 235 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newCFilter(DDC::PP::GreaterByMiddleContext,  0, $_[2]) }
+#line 238 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newCFilter(DDC::PP::GreaterByLeftContext,   -1, $_[2]) }
 	],
 	[#Rule 68
-		 'qf_size_sort', 2,
+		 'qf_context_sort', 2,
 sub
 #line 239 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFSizeSort', DDC::PP::LessBySize,    @{$_[2]}) }
+{ $_[0]->newCFilter(DDC::PP::LessByRightContext,      1, $_[2]) }
 	],
 	[#Rule 69
-		 'qf_size_sort', 2,
+		 'qf_context_sort', 2,
 sub
 #line 240 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFSizeSort', DDC::PP::GreaterBySize, @{$_[2]}) }
+{ $_[0]->newCFilter(DDC::PP::GreaterByRightContext,   1, $_[2]) }
 	],
 	[#Rule 70
-		 'qf_size_sort', 4,
+		 'qf_context_sort', 2,
 sub
 #line 241 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFSizeSort', DDC::PP::LessBySize,    $_[3],$_[3]) }
+{ $_[0]->newCFilter(DDC::PP::LessByMiddleContext,     0, $_[2]) }
 	],
 	[#Rule 71
-		 'qf_date_sort', 2,
+		 'qf_context_sort', 2,
 sub
-#line 245 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    @{$_[2]}) }
+#line 242 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newCFilter(DDC::PP::GreaterByMiddleContext,  0, $_[2]) }
 	],
 	[#Rule 72
-		 'qf_date_sort', 2,
+		 'qf_size_sort', 2,
 sub
 #line 246 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFDateSort', DDC::PP::GreaterByDate, @{$_[2]}) }
+{ $_[0]->newf('CQFSizeSort', DDC::PP::LessBySize,    @{$_[2]}) }
 	],
 	[#Rule 73
-		 'qf_date_sort', 4,
+		 'qf_size_sort', 2,
 sub
 #line 247 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    $_[3],$_[3]) }
+{ $_[0]->newf('CQFSizeSort', DDC::PP::GreaterBySize, @{$_[2]}) }
 	],
 	[#Rule 74
-		 'qf_random_sort', 1,
+		 'qf_size_sort', 4,
 sub
-#line 251 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFRandomSort') }
+#line 248 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFSizeSort', DDC::PP::LessBySize,    $_[3],$_[3]) }
 	],
 	[#Rule 75
-		 'qf_random_sort', 3,
+		 'qf_date_sort', 2,
 sub
 #line 252 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFRandomSort') }
+{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    @{$_[2]}) }
 	],
 	[#Rule 76
-		 'qf_random_sort', 4,
+		 'qf_date_sort', 2,
 sub
 #line 253 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFRandomSort',$_[3]) }
+{ $_[0]->newf('CQFDateSort', DDC::PP::GreaterByDate, @{$_[2]}) }
 	],
 	[#Rule 77
-		 'qf_bibl_sort', 5,
+		 'qf_date_sort', 4,
 sub
-#line 257 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    @{$_[4]}) }
+#line 254 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    $_[3],$_[3]) }
 	],
 	[#Rule 78
-		 'qf_bibl_sort', 5,
+		 'qf_random_sort', 1,
 sub
 #line 258 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFDateSort', DDC::PP::GreaterByDate, @{$_[4]}) }
+{ $_[0]->newf('CQFRandomSort') }
 	],
 	[#Rule 79
-		 'qf_bibl_sort', 5,
+		 'qf_random_sort', 3,
 sub
 #line 259 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
+{ $_[0]->newf('CQFRandomSort') }
 	],
 	[#Rule 80
-		 'qf_bibl_sort', 5,
+		 'qf_random_sort', 4,
 sub
 #line 260 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
+{ $_[0]->newf('CQFRandomSort',$_[3]) }
 	],
 	[#Rule 81
-		 'qfb_int', 0,
+		 'qf_bibl_sort', 5,
 sub
-#line 268 "lib/DDC/PP/yyqparser.yp"
-{ [] }
+#line 264 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    @{$_[4]}) }
 	],
 	[#Rule 82
-		 'qfb_int', 2,
+		 'qf_bibl_sort', 5,
 sub
-#line 269 "lib/DDC/PP/yyqparser.yp"
-{ [] }
+#line 265 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFDateSort', DDC::PP::GreaterByDate, @{$_[4]}) }
 	],
 	[#Rule 83
-		 'qfb_int', 3,
+		 'qf_bibl_sort', 5,
 sub
-#line 270 "lib/DDC/PP/yyqparser.yp"
-{ [] }
+#line 266 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
 	],
 	[#Rule 84
-		 'qfb_int', 3,
+		 'qf_bibl_sort', 5,
 sub
-#line 271 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2]] }
+#line 267 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
 	],
 	[#Rule 85
-		 'qfb_int', 4,
+		 'qfb_int', 0,
 sub
-#line 272 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2]] }
+#line 275 "lib/DDC/PP/yyqparser.yp"
+{ [] }
 	],
 	[#Rule 86
-		 'qfb_int', 5,
+		 'qfb_int', 2,
 sub
-#line 273 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2],$_[4]] }
+#line 276 "lib/DDC/PP/yyqparser.yp"
+{ [] }
 	],
 	[#Rule 87
-		 'qfb_int', 4,
+		 'qfb_int', 3,
 sub
-#line 274 "lib/DDC/PP/yyqparser.yp"
-{ [undef,$_[3]] }
+#line 277 "lib/DDC/PP/yyqparser.yp"
+{ [] }
 	],
 	[#Rule 88
-		 'qfb_date', 0,
+		 'qfb_int', 3,
 sub
-#line 279 "lib/DDC/PP/yyqparser.yp"
-{ [] }
+#line 278 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2]] }
 	],
 	[#Rule 89
-		 'qfb_date', 2,
+		 'qfb_int', 4,
 sub
-#line 280 "lib/DDC/PP/yyqparser.yp"
-{ [] }
+#line 279 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2]] }
 	],
 	[#Rule 90
-		 'qfb_date', 3,
+		 'qfb_int', 5,
 sub
-#line 281 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2]] }
-	],
-	[#Rule 91
-		 'qfb_date', 4,
-sub
-#line 282 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2]] }
-	],
-	[#Rule 92
-		 'qfb_date', 5,
-sub
-#line 283 "lib/DDC/PP/yyqparser.yp"
+#line 280 "lib/DDC/PP/yyqparser.yp"
 { [$_[2],$_[4]] }
 	],
-	[#Rule 93
-		 'qfb_date', 4,
+	[#Rule 91
+		 'qfb_int', 4,
 sub
-#line 284 "lib/DDC/PP/yyqparser.yp"
+#line 281 "lib/DDC/PP/yyqparser.yp"
 { [undef,$_[3]] }
 	],
-	[#Rule 94
-		 'qfb_bibl', 0,
+	[#Rule 92
+		 'qfb_date', 0,
 sub
-#line 289 "lib/DDC/PP/yyqparser.yp"
+#line 286 "lib/DDC/PP/yyqparser.yp"
 { [] }
 	],
-	[#Rule 95
-		 'qfb_bibl', 1,
+	[#Rule 93
+		 'qfb_date', 2,
 sub
-#line 290 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 287 "lib/DDC/PP/yyqparser.yp"
+{ [] }
+	],
+	[#Rule 94
+		 'qfb_date', 3,
+sub
+#line 288 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2]] }
+	],
+	[#Rule 95
+		 'qfb_date', 4,
+sub
+#line 289 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2]] }
 	],
 	[#Rule 96
-		 'qfb_bibl_ne', 1,
+		 'qfb_date', 5,
+sub
+#line 290 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2],$_[4]] }
+	],
+	[#Rule 97
+		 'qfb_date', 4,
+sub
+#line 291 "lib/DDC/PP/yyqparser.yp"
+{ [undef,$_[3]] }
+	],
+	[#Rule 98
+		 'qfb_bibl', 0,
 sub
 #line 296 "lib/DDC/PP/yyqparser.yp"
 { [] }
 	],
-	[#Rule 97
-		 'qfb_bibl_ne', 2,
+	[#Rule 99
+		 'qfb_bibl', 1,
 sub
 #line 297 "lib/DDC/PP/yyqparser.yp"
-{ [] }
-	],
-	[#Rule 98
-		 'qfb_bibl_ne', 2,
-sub
-#line 298 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2]] }
-	],
-	[#Rule 99
-		 'qfb_bibl_ne', 3,
-sub
-#line 299 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2]] }
+{ $_[1] }
 	],
 	[#Rule 100
-		 'qfb_bibl_ne', 3,
+		 'qfb_bibl_ne', 1,
 sub
-#line 300 "lib/DDC/PP/yyqparser.yp"
-{ [undef,$_[3]] }
-	],
-	[#Rule 101
-		 'qfb_bibl_ne', 4,
-sub
-#line 301 "lib/DDC/PP/yyqparser.yp"
-{ [$_[2],$_[4]] }
-	],
-	[#Rule 102
-		 'qfb_ctxsort', 0,
-sub
-#line 306 "lib/DDC/PP/yyqparser.yp"
+#line 303 "lib/DDC/PP/yyqparser.yp"
 { [] }
 	],
-	[#Rule 103
-		 'qfb_ctxsort', 3,
+	[#Rule 101
+		 'qfb_bibl_ne', 2,
 sub
-#line 307 "lib/DDC/PP/yyqparser.yp"
-{ $_[2] }
+#line 304 "lib/DDC/PP/yyqparser.yp"
+{ [] }
+	],
+	[#Rule 102
+		 'qfb_bibl_ne', 2,
+sub
+#line 305 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2]] }
+	],
+	[#Rule 103
+		 'qfb_bibl_ne', 3,
+sub
+#line 306 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2]] }
 	],
 	[#Rule 104
-		 'qfb_ctxsort', 4,
+		 'qfb_bibl_ne', 3,
 sub
-#line 308 "lib/DDC/PP/yyqparser.yp"
-{ [@{$_[2]}, @{$_[3]}] }
+#line 307 "lib/DDC/PP/yyqparser.yp"
+{ [undef,$_[3]] }
 	],
 	[#Rule 105
-		 'qfb_ctxkey', 3,
+		 'qfb_bibl_ne', 4,
 sub
-#line 313 "lib/DDC/PP/yyqparser.yp"
-{ [$_[1],$_[2],$_[3]] }
+#line 308 "lib/DDC/PP/yyqparser.yp"
+{ [$_[2],$_[4]] }
 	],
 	[#Rule 106
-		 'qfb_ctxkey', 2,
+		 'qfb_ctxsort', 0,
 sub
-#line 314 "lib/DDC/PP/yyqparser.yp"
-{ [undef,$_[1],$_[2]] }
+#line 313 "lib/DDC/PP/yyqparser.yp"
+{ [] }
 	],
 	[#Rule 107
-		 'qfbc_matchref', 0,
+		 'qfb_ctxsort', 3,
 sub
-#line 319 "lib/DDC/PP/yyqparser.yp"
-{ 0 }
-	],
-	[#Rule 108
-		 'qfbc_matchref', 1,
-sub
-#line 320 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 109
-		 'qfbc_offset', 0,
-sub
-#line 325 "lib/DDC/PP/yyqparser.yp"
-{  undef }
-	],
-	[#Rule 110
-		 'qfbc_offset', 1,
-sub
-#line 326 "lib/DDC/PP/yyqparser.yp"
-{  $_[1] }
-	],
-	[#Rule 111
-		 'qfbc_offset', 2,
-sub
-#line 327 "lib/DDC/PP/yyqparser.yp"
-{  $_[2] }
-	],
-	[#Rule 112
-		 'qfbc_offset', 2,
-sub
-#line 328 "lib/DDC/PP/yyqparser.yp"
-{ -$_[2] }
-	],
-	[#Rule 113
-		 'q_clause', 1,
-sub
-#line 336 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 114
-		 'q_clause', 1,
-sub
-#line 337 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 115
-		 'q_clause', 1,
-sub
-#line 338 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 116
-		 'q_clause', 1,
-sub
-#line 339 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 117
-		 'qc_matchid', 2,
-sub
-#line 343 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->SetMatchId($_[2]); $_[1] }
-	],
-	[#Rule 118
-		 'qc_matchid', 3,
-sub
-#line 344 "lib/DDC/PP/yyqparser.yp"
+#line 314 "lib/DDC/PP/yyqparser.yp"
 { $_[2] }
 	],
-	[#Rule 119
-		 'qc_boolean', 3,
+	[#Rule 108
+		 'qfb_ctxsort', 4,
 sub
-#line 351 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQAnd', $_[1],$_[3]) }
+#line 315 "lib/DDC/PP/yyqparser.yp"
+{ [@{$_[2]}, @{$_[3]}] }
+	],
+	[#Rule 109
+		 'qfb_ctxkey', 3,
+sub
+#line 320 "lib/DDC/PP/yyqparser.yp"
+{ [$_[1],$_[2],$_[3]] }
+	],
+	[#Rule 110
+		 'qfb_ctxkey', 2,
+sub
+#line 321 "lib/DDC/PP/yyqparser.yp"
+{ [undef,$_[1],$_[2]] }
+	],
+	[#Rule 111
+		 'qfbc_matchref', 0,
+sub
+#line 326 "lib/DDC/PP/yyqparser.yp"
+{ 0 }
+	],
+	[#Rule 112
+		 'qfbc_matchref', 1,
+sub
+#line 327 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 113
+		 'qfbc_offset', 0,
+sub
+#line 332 "lib/DDC/PP/yyqparser.yp"
+{  undef }
+	],
+	[#Rule 114
+		 'qfbc_offset', 1,
+sub
+#line 333 "lib/DDC/PP/yyqparser.yp"
+{  $_[1] }
+	],
+	[#Rule 115
+		 'qfbc_offset', 2,
+sub
+#line 334 "lib/DDC/PP/yyqparser.yp"
+{  $_[2] }
+	],
+	[#Rule 116
+		 'qfbc_offset', 2,
+sub
+#line 335 "lib/DDC/PP/yyqparser.yp"
+{ -$_[2] }
+	],
+	[#Rule 117
+		 'q_clause', 1,
+sub
+#line 343 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 118
+		 'q_clause', 1,
+sub
+#line 344 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 119
+		 'q_clause', 1,
+sub
+#line 345 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 120
-		 'qc_boolean', 3,
+		 'q_clause', 1,
 sub
-#line 352 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQOr', $_[1],$_[3]) }
+#line 346 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 121
-		 'qc_boolean', 2,
+		 'qc_matchid', 2,
 sub
-#line 353 "lib/DDC/PP/yyqparser.yp"
-{ $_[2]->Negate; $_[2] }
+#line 350 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->SetMatchId($_[2]); $_[1] }
 	],
 	[#Rule 122
-		 'qc_boolean', 3,
+		 'qc_matchid', 3,
 sub
-#line 354 "lib/DDC/PP/yyqparser.yp"
+#line 351 "lib/DDC/PP/yyqparser.yp"
 { $_[2] }
 	],
 	[#Rule 123
-		 'qc_concat', 2,
+		 'qc_boolean', 3,
 sub
-#line 360 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQAndImplicit', $_[1],$_[2]) }
+#line 358 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQAnd', $_[1],$_[3]) }
 	],
 	[#Rule 124
-		 'qc_concat', 2,
+		 'qc_boolean', 3,
 sub
-#line 361 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQAndImplicit', $_[1],$_[2]) }
+#line 359 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQOr', $_[1],$_[3]) }
 	],
 	[#Rule 125
-		 'qc_concat', 3,
+		 'qc_boolean', 2,
 sub
-#line 362 "lib/DDC/PP/yyqparser.yp"
-{ $_[2] }
+#line 360 "lib/DDC/PP/yyqparser.yp"
+{ $_[2]->Negate; $_[2] }
 	],
 	[#Rule 126
-		 'qc_basic', 1,
+		 'qc_boolean', 3,
 sub
-#line 370 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 127
-		 'qc_basic', 1,
-sub
-#line 371 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 128
-		 'qc_near', 8,
-sub
-#line 375 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQNear', $_[7],$_[3],$_[5]) }
-	],
-	[#Rule 129
-		 'qc_near', 10,
-sub
-#line 376 "lib/DDC/PP/yyqparser.yp"
-{  $_[0]->newq('CQNear', $_[9],$_[3],$_[5],$_[7]) }
-	],
-	[#Rule 130
-		 'qc_near', 2,
-sub
-#line 377 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->SetMatchId($_[2]); $_[1] }
-	],
-	[#Rule 131
-		 'qc_near', 3,
-sub
-#line 378 "lib/DDC/PP/yyqparser.yp"
+#line 361 "lib/DDC/PP/yyqparser.yp"
 { $_[2] }
 	],
-	[#Rule 132
-		 'qc_tokens', 1,
+	[#Rule 127
+		 'qc_concat', 2,
 sub
-#line 386 "lib/DDC/PP/yyqparser.yp"
+#line 367 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQAndImplicit', $_[1],$_[2]) }
+	],
+	[#Rule 128
+		 'qc_concat', 2,
+sub
+#line 368 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQAndImplicit', $_[1],$_[2]) }
+	],
+	[#Rule 129
+		 'qc_concat', 3,
+sub
+#line 369 "lib/DDC/PP/yyqparser.yp"
+{ $_[2] }
+	],
+	[#Rule 130
+		 'qc_basic', 1,
+sub
+#line 377 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
+	],
+	[#Rule 131
+		 'qc_basic', 1,
+sub
+#line 378 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 132
+		 'qc_near', 8,
+sub
+#line 382 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQNear', $_[7],$_[3],$_[5]) }
 	],
 	[#Rule 133
-		 'qc_tokens', 1,
+		 'qc_near', 10,
 sub
-#line 387 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 383 "lib/DDC/PP/yyqparser.yp"
+{  $_[0]->newq('CQNear', $_[9],$_[3],$_[5],$_[7]) }
 	],
 	[#Rule 134
-		 'qc_tokens', 2,
+		 'qc_near', 2,
 sub
-#line 388 "lib/DDC/PP/yyqparser.yp"
+#line 384 "lib/DDC/PP/yyqparser.yp"
 { $_[1]->SetMatchId($_[2]); $_[1] }
 	],
 	[#Rule 135
-		 'qc_phrase', 3,
+		 'qc_near', 3,
 sub
-#line 392 "lib/DDC/PP/yyqparser.yp"
+#line 385 "lib/DDC/PP/yyqparser.yp"
 { $_[2] }
 	],
 	[#Rule 136
-		 'qc_phrase', 3,
+		 'qc_tokens', 1,
 sub
 #line 393 "lib/DDC/PP/yyqparser.yp"
-{ $_[2] }
+{ $_[1] }
 	],
 	[#Rule 137
-		 'qc_word', 1,
+		 'qc_tokens', 1,
 sub
-#line 401 "lib/DDC/PP/yyqparser.yp"
+#line 394 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
 	[#Rule 138
-		 'qc_word', 1,
+		 'qc_tokens', 2,
 sub
-#line 402 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 395 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->SetMatchId($_[2]); $_[1] }
 	],
 	[#Rule 139
-		 'qc_word', 1,
+		 'qc_phrase', 3,
 sub
-#line 403 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 399 "lib/DDC/PP/yyqparser.yp"
+{ $_[2] }
 	],
 	[#Rule 140
-		 'qc_word', 1,
+		 'qc_phrase', 3,
 sub
-#line 404 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 400 "lib/DDC/PP/yyqparser.yp"
+{ $_[2] }
 	],
 	[#Rule 141
-		 'qc_word', 1,
-sub
-#line 405 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 142
-		 'qc_word', 1,
-sub
-#line 406 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 143
-		 'qc_word', 1,
-sub
-#line 407 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 144
 		 'qc_word', 1,
 sub
 #line 408 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 145
+	[#Rule 142
 		 'qc_word', 1,
 sub
 #line 409 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 146
+	[#Rule 143
 		 'qc_word', 1,
 sub
 #line 410 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 147
+	[#Rule 144
 		 'qc_word', 1,
 sub
 #line 411 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 148
+	[#Rule 145
 		 'qc_word', 1,
 sub
 #line 412 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 149
+	[#Rule 146
 		 'qc_word', 1,
 sub
 #line 413 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 150
+	[#Rule 147
 		 'qc_word', 1,
 sub
 #line 414 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 151
+	[#Rule 148
 		 'qc_word', 1,
 sub
 #line 415 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 152
+	[#Rule 149
 		 'qc_word', 1,
 sub
 #line 416 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 153
+	[#Rule 150
 		 'qc_word', 1,
 sub
 #line 417 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 154
+	[#Rule 151
 		 'qc_word', 1,
 sub
 #line 418 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 155
+	[#Rule 152
 		 'qc_word', 1,
 sub
 #line 419 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 156
+	[#Rule 153
 		 'qc_word', 1,
 sub
 #line 420 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 157
+	[#Rule 154
 		 'qc_word', 1,
 sub
 #line 421 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 158
+	[#Rule 155
 		 'qc_word', 1,
 sub
 #line 422 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 159
+	[#Rule 156
 		 'qc_word', 1,
 sub
 #line 423 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 160
-		 'qc_word', 3,
+	[#Rule 157
+		 'qc_word', 1,
 sub
 #line 424 "lib/DDC/PP/yyqparser.yp"
-{ $_[2] }
-	],
-	[#Rule 161
-		 'qw_bareword', 2,
-sub
-#line 428 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokInfl', "", $_[1], $_[2]) }
-	],
-	[#Rule 162
-		 'qw_bareword', 4,
-sub
-#line 429 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokInfl', $_[1], $_[3], $_[4]) }
-	],
-	[#Rule 163
-		 'qw_exact', 2,
-sub
-#line 433 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokExact', "", $_[2]) }
-	],
-	[#Rule 164
-		 'qw_exact', 4,
-sub
-#line 434 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokExact', $_[1], $_[4]) }
-	],
-	[#Rule 165
-		 'qw_regex', 1,
-sub
-#line 438 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokRegex', "",   $_[1]) }
-	],
-	[#Rule 166
-		 'qw_regex', 3,
-sub
-#line 439 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokRegex', $_[1],$_[3]) }
-	],
-	[#Rule 167
-		 'qw_regex', 1,
-sub
-#line 440 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokRegex', "",    $_[1], 1) }
-	],
-	[#Rule 168
-		 'qw_regex', 3,
-sub
-#line 441 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokRegex', $_[1], $_[3], 1) }
-	],
-	[#Rule 169
-		 'qw_any', 1,
-sub
-#line 445 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokAny') }
-	],
-	[#Rule 170
-		 'qw_any', 3,
-sub
-#line 446 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokAny',$_[1]) }
-	],
-	[#Rule 171
-		 'qw_set_exact', 3,
-sub
-#line 450 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSet', "",    undef, $_[2]) }
-	],
-	[#Rule 172
-		 'qw_set_exact', 5,
-sub
-#line 451 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSet', $_[1], undef, $_[2]) }
-	],
-	[#Rule 173
-		 'qw_set_infl', 4,
-sub
-#line 455 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSetInfl', "",    $_[2], $_[4]) }
-	],
-	[#Rule 174
-		 'qw_set_infl', 6,
-sub
-#line 456 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSetInfl', $_[1], $_[4], $_[6]) }
-	],
-	[#Rule 175
-		 'qw_prefix', 1,
-sub
-#line 460 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokPrefix', "",    $_[1]) }
-	],
-	[#Rule 176
-		 'qw_prefix', 3,
-sub
-#line 461 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokPrefix', $_[1], $_[3]) }
-	],
-	[#Rule 177
-		 'qw_suffix', 1,
-sub
-#line 465 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSuffix', "",    $_[1]) }
-	],
-	[#Rule 178
-		 'qw_suffix', 3,
-sub
-#line 466 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSuffix', $_[1], $_[3]) }
-	],
-	[#Rule 179
-		 'qw_infix', 1,
-sub
-#line 470 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokInfix', "",    $_[1]) }
-	],
-	[#Rule 180
-		 'qw_infix', 3,
-sub
-#line 471 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokInfix', $_[1], $_[3]) }
-	],
-	[#Rule 181
-		 'qw_infix_set', 3,
-sub
-#line 475 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokInfixSet', "", $_[2]) }
-	],
-	[#Rule 182
-		 'qw_infix_set', 5,
-sub
-#line 476 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokInfixSet', $_[1], $_[4]) }
-	],
-	[#Rule 183
-		 'qw_prefix_set', 3,
-sub
-#line 480 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokPrefixSet',"", $_[2]) }
-	],
-	[#Rule 184
-		 'qw_prefix_set', 5,
-sub
-#line 481 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokPrefixSet',$_[1], $_[4]) }
-	],
-	[#Rule 185
-		 'qw_suffix_set', 3,
-sub
-#line 485 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSuffixSet',"", $_[2]) }
-	],
-	[#Rule 186
-		 'qw_suffix_set', 5,
-sub
-#line 486 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokSuffixSet',$_[1], $_[4]) }
-	],
-	[#Rule 187
-		 'qw_thesaurus', 3,
-sub
-#line 490 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokThes', "Thes",$_[2]) }
-	],
-	[#Rule 188
-		 'qw_thesaurus', 6,
-sub
-#line 491 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokThes', $_[1], $_[5]) }
-	],
-	[#Rule 189
-		 'qw_morph', 3,
-sub
-#line 495 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokMorph', "MorphPattern", $_[2]) }
-	],
-	[#Rule 190
-		 'qw_morph', 5,
-sub
-#line 496 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokMorph', $_[1], $_[4]) }
-	],
-	[#Rule 191
-		 'qw_lemma', 2,
-sub
-#line 500 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokLemma', "Lemma", $_[2]) }
-	],
-	[#Rule 192
-		 'qw_lemma', 4,
-sub
-#line 501 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokLemma', $_[1], $_[4]) }
-	],
-	[#Rule 193
-		 'qw_chunk', 2,
-sub
-#line 505 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokChunk', "", $_[2]) }
-	],
-	[#Rule 194
-		 'qw_chunk', 4,
-sub
-#line 506 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokChunk', $_[1], $_[4]) }
-	],
-	[#Rule 195
-		 'qw_anchor', 3,
-sub
-#line 510 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokAnchor', "",    $_[3]) }
-	],
-	[#Rule 196
-		 'qw_anchor', 4,
-sub
-#line 511 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokAnchor', $_[2], $_[4]) }
-	],
-	[#Rule 197
-		 'qw_listfile', 2,
-sub
-#line 515 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokFile', "",    $_[2]) }
-	],
-	[#Rule 198
-		 'qw_listfile', 4,
-sub
-#line 516 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQTokFile', $_[1], $_[4]) }
-	],
-	[#Rule 199
-		 'qw_with', 3,
-sub
-#line 520 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQWith', $_[1],$_[3]) }
-	],
-	[#Rule 200
-		 'qw_without', 3,
-sub
-#line 524 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQWithout', $_[1],$_[3]) }
-	],
-	[#Rule 201
-		 'qw_withor', 3,
-sub
-#line 528 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQWithor', $_[1],$_[3]) }
-	],
-	[#Rule 202
-		 'qw_keys', 4,
-sub
-#line 532 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newKeysQuery($_[3][0], $_[3][1]); }
-	],
-	[#Rule 203
-		 'qw_keys', 6,
-sub
-#line 533 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newKeysQuery($_[5][0], $_[5][1], $_[1]); }
-	],
-	[#Rule 204
-		 'qwk_indextuple', 4,
-sub
-#line 537 "lib/DDC/PP/yyqparser.yp"
-{ $_[3] }
-	],
-	[#Rule 205
-		 'qwk_countsrc', 1,
-sub
-#line 542 "lib/DDC/PP/yyqparser.yp"
-{ [$_[1], {}] }
-	],
-	[#Rule 206
-		 'qwk_countsrc', 2,
-sub
-#line 543 "lib/DDC/PP/yyqparser.yp"
-{ [$_[0]->newCountQuery($_[1], $_[2]), $_[2]] }
-	],
-	[#Rule 207
-		 'qw_matchid', 2,
-sub
-#line 547 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->SetMatchId($_[2]); $_[1] }
-	],
-	[#Rule 208
-		 'l_set', 0,
-sub
-#line 555 "lib/DDC/PP/yyqparser.yp"
-{ [] }
-	],
-	[#Rule 209
-		 'l_set', 2,
-sub
-#line 556 "lib/DDC/PP/yyqparser.yp"
-{ push(@{$_[1]}, $_[2]); $_[1] }
-	],
-	[#Rule 210
-		 'l_set', 2,
-sub
-#line 557 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
+	[#Rule 158
+		 'qc_word', 1,
+sub
+#line 425 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 159
+		 'qc_word', 1,
+sub
+#line 426 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 160
+		 'qc_word', 1,
+sub
+#line 427 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 161
+		 'qc_word', 1,
+sub
+#line 428 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 162
+		 'qc_word', 1,
+sub
+#line 429 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 163
+		 'qc_word', 1,
+sub
+#line 430 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 164
+		 'qc_word', 3,
+sub
+#line 431 "lib/DDC/PP/yyqparser.yp"
+{ $_[2] }
+	],
+	[#Rule 165
+		 'qw_bareword', 2,
+sub
+#line 435 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokInfl', "", $_[1], $_[2]) }
+	],
+	[#Rule 166
+		 'qw_bareword', 4,
+sub
+#line 436 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokInfl', $_[1], $_[3], $_[4]) }
+	],
+	[#Rule 167
+		 'qw_exact', 2,
+sub
+#line 440 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokExact', "", $_[2]) }
+	],
+	[#Rule 168
+		 'qw_exact', 4,
+sub
+#line 441 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokExact', $_[1], $_[4]) }
+	],
+	[#Rule 169
+		 'qw_regex', 1,
+sub
+#line 445 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokRegex', "",   $_[1]) }
+	],
+	[#Rule 170
+		 'qw_regex', 3,
+sub
+#line 446 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokRegex', $_[1],$_[3]) }
+	],
+	[#Rule 171
+		 'qw_regex', 1,
+sub
+#line 447 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokRegex', "",    $_[1], 1) }
+	],
+	[#Rule 172
+		 'qw_regex', 3,
+sub
+#line 448 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokRegex', $_[1], $_[3], 1) }
+	],
+	[#Rule 173
+		 'qw_any', 1,
+sub
+#line 452 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokAny') }
+	],
+	[#Rule 174
+		 'qw_any', 3,
+sub
+#line 453 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokAny',$_[1]) }
+	],
+	[#Rule 175
+		 'qw_set_exact', 3,
+sub
+#line 457 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSet', "",    undef, $_[2]) }
+	],
+	[#Rule 176
+		 'qw_set_exact', 5,
+sub
+#line 458 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSet', $_[1], undef, $_[2]) }
+	],
+	[#Rule 177
+		 'qw_set_infl', 4,
+sub
+#line 462 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSetInfl', "",    $_[2], $_[4]) }
+	],
+	[#Rule 178
+		 'qw_set_infl', 6,
+sub
+#line 463 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSetInfl', $_[1], $_[4], $_[6]) }
+	],
+	[#Rule 179
+		 'qw_prefix', 1,
+sub
+#line 467 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokPrefix', "",    $_[1]) }
+	],
+	[#Rule 180
+		 'qw_prefix', 3,
+sub
+#line 468 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokPrefix', $_[1], $_[3]) }
+	],
+	[#Rule 181
+		 'qw_suffix', 1,
+sub
+#line 472 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSuffix', "",    $_[1]) }
+	],
+	[#Rule 182
+		 'qw_suffix', 3,
+sub
+#line 473 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSuffix', $_[1], $_[3]) }
+	],
+	[#Rule 183
+		 'qw_infix', 1,
+sub
+#line 477 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokInfix', "",    $_[1]) }
+	],
+	[#Rule 184
+		 'qw_infix', 3,
+sub
+#line 478 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokInfix', $_[1], $_[3]) }
+	],
+	[#Rule 185
+		 'qw_infix_set', 3,
+sub
+#line 482 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokInfixSet', "", $_[2]) }
+	],
+	[#Rule 186
+		 'qw_infix_set', 5,
+sub
+#line 483 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokInfixSet', $_[1], $_[4]) }
+	],
+	[#Rule 187
+		 'qw_prefix_set', 3,
+sub
+#line 487 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokPrefixSet',"", $_[2]) }
+	],
+	[#Rule 188
+		 'qw_prefix_set', 5,
+sub
+#line 488 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokPrefixSet',$_[1], $_[4]) }
+	],
+	[#Rule 189
+		 'qw_suffix_set', 3,
+sub
+#line 492 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSuffixSet',"", $_[2]) }
+	],
+	[#Rule 190
+		 'qw_suffix_set', 5,
+sub
+#line 493 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokSuffixSet',$_[1], $_[4]) }
+	],
+	[#Rule 191
+		 'qw_thesaurus', 3,
+sub
+#line 497 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokThes', "Thes",$_[2]) }
+	],
+	[#Rule 192
+		 'qw_thesaurus', 6,
+sub
+#line 498 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokThes', $_[1], $_[5]) }
+	],
+	[#Rule 193
+		 'qw_morph', 3,
+sub
+#line 502 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokMorph', "MorphPattern", $_[2]) }
+	],
+	[#Rule 194
+		 'qw_morph', 5,
+sub
+#line 503 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokMorph', $_[1], $_[4]) }
+	],
+	[#Rule 195
+		 'qw_lemma', 2,
+sub
+#line 507 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokLemma', "Lemma", $_[2]) }
+	],
+	[#Rule 196
+		 'qw_lemma', 4,
+sub
+#line 508 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokLemma', $_[1], $_[4]) }
+	],
+	[#Rule 197
+		 'qw_chunk', 2,
+sub
+#line 512 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokChunk', "", $_[2]) }
+	],
+	[#Rule 198
+		 'qw_chunk', 4,
+sub
+#line 513 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokChunk', $_[1], $_[4]) }
+	],
+	[#Rule 199
+		 'qw_anchor', 3,
+sub
+#line 517 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokAnchor', "",    $_[3]) }
+	],
+	[#Rule 200
+		 'qw_anchor', 4,
+sub
+#line 518 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokAnchor', $_[2], $_[4]) }
+	],
+	[#Rule 201
+		 'qw_listfile', 2,
+sub
+#line 522 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokFile', "",    $_[2]) }
+	],
+	[#Rule 202
+		 'qw_listfile', 4,
+sub
+#line 523 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQTokFile', $_[1], $_[4]) }
+	],
+	[#Rule 203
+		 'qw_with', 3,
+sub
+#line 527 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQWith', $_[1],$_[3]) }
+	],
+	[#Rule 204
+		 'qw_without', 3,
+sub
+#line 531 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQWithout', $_[1],$_[3]) }
+	],
+	[#Rule 205
+		 'qw_withor', 3,
+sub
+#line 535 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQWithor', $_[1],$_[3]) }
+	],
+	[#Rule 206
+		 'qw_keys', 4,
+sub
+#line 539 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newKeysQuery($_[3][0], $_[3][1]); }
+	],
+	[#Rule 207
+		 'qw_keys', 6,
+sub
+#line 540 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newKeysQuery($_[5][0], $_[5][1], $_[1]); }
+	],
+	[#Rule 208
+		 'qwk_indextuple', 4,
+sub
+#line 544 "lib/DDC/PP/yyqparser.yp"
+{ $_[3] }
+	],
+	[#Rule 209
+		 'qwk_countsrc', 1,
+sub
+#line 549 "lib/DDC/PP/yyqparser.yp"
+{ [$_[1], {}] }
+	],
+	[#Rule 210
+		 'qwk_countsrc', 2,
+sub
+#line 550 "lib/DDC/PP/yyqparser.yp"
+{ [$_[0]->newCountQuery($_[1], $_[2]), $_[2]] }
+	],
 	[#Rule 211
-		 'l_morph', 0,
+		 'qw_matchid', 2,
+sub
+#line 554 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->SetMatchId($_[2]); $_[1] }
+	],
+	[#Rule 212
+		 'l_set', 0,
 sub
 #line 562 "lib/DDC/PP/yyqparser.yp"
 { [] }
 	],
-	[#Rule 212
-		 'l_morph', 2,
+	[#Rule 213
+		 'l_set', 2,
 sub
 #line 563 "lib/DDC/PP/yyqparser.yp"
 { push(@{$_[1]}, $_[2]); $_[1] }
 	],
-	[#Rule 213
-		 'l_morph', 2,
+	[#Rule 214
+		 'l_set', 2,
 sub
 #line 564 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 214
-		 'l_morph', 2,
-sub
-#line 565 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
 	[#Rule 215
-		 'l_phrase', 1,
+		 'l_morph', 0,
 sub
 #line 569 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQSeq', [$_[1]]) }
-	],
-	[#Rule 216
-		 'l_phrase', 2,
-sub
-#line 570 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->Append($_[2]); $_[1] }
-	],
-	[#Rule 217
-		 'l_phrase', 4,
-sub
-#line 571 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->Append($_[4], $_[3]); $_[1] }
-	],
-	[#Rule 218
-		 'l_phrase', 4,
-sub
-#line 572 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->Append($_[4], $_[3], '<'); $_[1] }
-	],
-	[#Rule 219
-		 'l_phrase', 4,
-sub
-#line 573 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->Append($_[4], $_[3], '>'); $_[1] }
-	],
-	[#Rule 220
-		 'l_phrase', 4,
-sub
-#line 574 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->Append($_[4], $_[3], '='); $_[1] }
-	],
-	[#Rule 221
-		 'l_txchain', 0,
-sub
-#line 578 "lib/DDC/PP/yyqparser.yp"
-{ []; }
-	],
-	[#Rule 222
-		 'l_txchain', 2,
-sub
-#line 579 "lib/DDC/PP/yyqparser.yp"
-{ push(@{$_[1]}, $_[2]); $_[1] }
-	],
-	[#Rule 223
-		 'l_countkeys', 0,
-sub
-#line 584 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprList') }
-	],
-	[#Rule 224
-		 'l_countkeys', 1,
-sub
-#line 585 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprList', Exprs=>[$_[1]]) }
-	],
-	[#Rule 225
-		 'l_countkeys', 3,
-sub
-#line 586 "lib/DDC/PP/yyqparser.yp"
-{ $_[1]->PushKey($_[3]); $_[1] }
-	],
-	[#Rule 226
-		 'l_indextuple', 0,
-sub
-#line 590 "lib/DDC/PP/yyqparser.yp"
 { [] }
 	],
+	[#Rule 216
+		 'l_morph', 2,
+sub
+#line 570 "lib/DDC/PP/yyqparser.yp"
+{ push(@{$_[1]}, $_[2]); $_[1] }
+	],
+	[#Rule 217
+		 'l_morph', 2,
+sub
+#line 571 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 218
+		 'l_morph', 2,
+sub
+#line 572 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 219
+		 'l_phrase', 1,
+sub
+#line 576 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQSeq', [$_[1]]) }
+	],
+	[#Rule 220
+		 'l_phrase', 2,
+sub
+#line 577 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->Append($_[2]); $_[1] }
+	],
+	[#Rule 221
+		 'l_phrase', 4,
+sub
+#line 578 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->Append($_[4], $_[3]); $_[1] }
+	],
+	[#Rule 222
+		 'l_phrase', 4,
+sub
+#line 579 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->Append($_[4], $_[3], '<'); $_[1] }
+	],
+	[#Rule 223
+		 'l_phrase', 4,
+sub
+#line 580 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->Append($_[4], $_[3], '>'); $_[1] }
+	],
+	[#Rule 224
+		 'l_phrase', 4,
+sub
+#line 581 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->Append($_[4], $_[3], '='); $_[1] }
+	],
+	[#Rule 225
+		 'l_txchain', 0,
+sub
+#line 585 "lib/DDC/PP/yyqparser.yp"
+{ []; }
+	],
+	[#Rule 226
+		 'l_txchain', 2,
+sub
+#line 586 "lib/DDC/PP/yyqparser.yp"
+{ push(@{$_[1]}, $_[2]); $_[1] }
+	],
 	[#Rule 227
-		 'l_indextuple', 1,
+		 'l_countkeys', 0,
 sub
 #line 591 "lib/DDC/PP/yyqparser.yp"
-{ [$_[1]] }
+{ $_[0]->newq('CQCountKeyExprList') }
 	],
 	[#Rule 228
-		 'l_indextuple', 3,
+		 'l_countkeys', 1,
 sub
 #line 592 "lib/DDC/PP/yyqparser.yp"
-{ push(@{$_[1]},$_[3]); $_[1] }
+{ $_[0]->newq('CQCountKeyExprList', Exprs=>[$_[1]]) }
 	],
 	[#Rule 229
-		 'count_key', 1,
+		 'l_countkeys', 3,
 sub
-#line 599 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprConstant', "*") }
+#line 593 "lib/DDC/PP/yyqparser.yp"
+{ $_[1]->PushKey($_[3]); $_[1] }
 	],
 	[#Rule 230
-		 'count_key', 2,
+		 'l_indextuple', 0,
 sub
-#line 600 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprConstant', $_[2]) }
+#line 597 "lib/DDC/PP/yyqparser.yp"
+{ [] }
 	],
 	[#Rule 231
-		 'count_key', 1,
+		 'l_indextuple', 1,
 sub
-#line 601 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprFileId', $_[1]) }
+#line 598 "lib/DDC/PP/yyqparser.yp"
+{ [$_[1]] }
 	],
 	[#Rule 232
-		 'count_key', 1,
+		 'l_indextuple', 3,
 sub
-#line 602 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprFileName', $_[1]) }
+#line 599 "lib/DDC/PP/yyqparser.yp"
+{ push(@{$_[1]},$_[3]); $_[1] }
 	],
 	[#Rule 233
 		 'count_key', 1,
 sub
-#line 603 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprDate', $_[1]) }
+#line 606 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprConstant', "*") }
 	],
 	[#Rule 234
-		 'count_key', 3,
+		 'count_key', 2,
 sub
-#line 604 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprDateSlice', $_[1],$_[3]) }
+#line 607 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprConstant', $_[2]) }
 	],
 	[#Rule 235
 		 'count_key', 1,
 sub
-#line 605 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprBibl', $_[1]) }
+#line 608 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprFileId', $_[1]) }
 	],
 	[#Rule 236
-		 'count_key', 3,
+		 'count_key', 1,
 sub
-#line 606 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprToken', $_[1],$_[2],$_[3]) }
+#line 609 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprFileName', $_[1]) }
 	],
 	[#Rule 237
-		 'count_key', 3,
+		 'count_key', 1,
 sub
-#line 607 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newq('CQCountKeyExprRegex', $_[1],@{$_[3]}) }
+#line 610 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprDate', $_[1]) }
 	],
 	[#Rule 238
 		 'count_key', 3,
 sub
-#line 608 "lib/DDC/PP/yyqparser.yp"
-{ $_[2]; }
+#line 611 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprDateSlice', $_[1],$_[3]) }
 	],
 	[#Rule 239
-		 'ck_matchid', 0,
+		 'count_key', 1,
 sub
 #line 612 "lib/DDC/PP/yyqparser.yp"
-{     0 }
+{ $_[0]->newq('CQCountKeyExprBibl', $_[1]) }
 	],
 	[#Rule 240
-		 'ck_matchid', 1,
+		 'count_key', 3,
 sub
 #line 613 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+{ $_[0]->newq('CQCountKeyExprToken', $_[1],$_[2],$_[3]) }
 	],
 	[#Rule 241
-		 'ck_offset', 0,
+		 'count_key', 3,
 sub
-#line 617 "lib/DDC/PP/yyqparser.yp"
-{      0 }
+#line 614 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newq('CQCountKeyExprRegex', $_[1],@{$_[3]}) }
 	],
 	[#Rule 242
-		 'ck_offset', 1,
+		 'count_key', 3,
 sub
-#line 618 "lib/DDC/PP/yyqparser.yp"
-{  $_[1] }
+#line 615 "lib/DDC/PP/yyqparser.yp"
+{ $_[2]; }
 	],
 	[#Rule 243
-		 'ck_offset', 2,
+		 'ck_matchid', 0,
 sub
 #line 619 "lib/DDC/PP/yyqparser.yp"
-{  $_[2] }
+{     0 }
 	],
 	[#Rule 244
-		 'ck_offset', 2,
+		 'ck_matchid', 1,
 sub
 #line 620 "lib/DDC/PP/yyqparser.yp"
-{ -$_[2] }
+{ $_[1] }
 	],
 	[#Rule 245
-		 's_index', 1,
+		 'ck_offset', 0,
 sub
-#line 628 "lib/DDC/PP/yyqparser.yp"
-{ '' }
+#line 624 "lib/DDC/PP/yyqparser.yp"
+{      0 }
 	],
 	[#Rule 246
-		 's_index', 1,
+		 'ck_offset', 1,
 sub
-#line 629 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 625 "lib/DDC/PP/yyqparser.yp"
+{  $_[1] }
 	],
 	[#Rule 247
-		 's_indextuple_item', 1,
+		 'ck_offset', 2,
 sub
-#line 633 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 626 "lib/DDC/PP/yyqparser.yp"
+{  $_[2] }
 	],
 	[#Rule 248
-		 's_indextuple_item', 1,
+		 'ck_offset', 2,
 sub
-#line 634 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 627 "lib/DDC/PP/yyqparser.yp"
+{ -$_[2] }
 	],
 	[#Rule 249
-		 's_word', 1,
+		 's_index', 1,
 sub
-#line 637 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 635 "lib/DDC/PP/yyqparser.yp"
+{ '' }
 	],
 	[#Rule 250
-		 's_semclass', 1,
+		 's_index', 1,
 sub
-#line 638 "lib/DDC/PP/yyqparser.yp"
+#line 636 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
 	[#Rule 251
-		 's_lemma', 1,
-sub
-#line 639 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 252
-		 's_chunk', 1,
+		 's_indextuple_item', 1,
 sub
 #line 640 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 253
-		 's_filename', 1,
+	[#Rule 252
+		 's_indextuple_item', 1,
 sub
 #line 641 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 254
-		 's_morphitem', 1,
-sub
-#line 642 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 255
-		 's_subcorpus', 1,
-sub
-#line 643 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
-	],
-	[#Rule 256
-		 's_biblname', 1,
+	[#Rule 253
+		 's_word', 1,
 sub
 #line 644 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 257
-		 's_breakname', 1,
+	[#Rule 254
+		 's_semclass', 1,
+sub
+#line 645 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 255
+		 's_lemma', 1,
 sub
 #line 646 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
-	[#Rule 258
-		 's_breakname', 1,
+	[#Rule 256
+		 's_chunk', 1,
 sub
 #line 647 "lib/DDC/PP/yyqparser.yp"
-{ "file" }
+{ $_[1] }
+	],
+	[#Rule 257
+		 's_filename', 1,
+sub
+#line 648 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 258
+		 's_morphitem', 1,
+sub
+#line 649 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 259
-		 'symbol', 1,
+		 's_subcorpus', 1,
 sub
-#line 655 "lib/DDC/PP/yyqparser.yp"
-{ unescape($_[1]) }
+#line 650 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 260
-		 'symbol', 1,
+		 's_biblname', 1,
 sub
-#line 656 "lib/DDC/PP/yyqparser.yp"
+#line 651 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
 	[#Rule 261
-		 'symbol', 1,
+		 's_breakname', 1,
 sub
-#line 657 "lib/DDC/PP/yyqparser.yp"
+#line 653 "lib/DDC/PP/yyqparser.yp"
 { $_[1] }
 	],
 	[#Rule 262
-		 'index', 1,
+		 's_breakname', 1,
 sub
-#line 661 "lib/DDC/PP/yyqparser.yp"
-{ '' }
+#line 654 "lib/DDC/PP/yyqparser.yp"
+{ "file" }
 	],
 	[#Rule 263
-		 'index', 1,
+		 'symbol', 1,
 sub
 #line 662 "lib/DDC/PP/yyqparser.yp"
 { unescape($_[1]) }
 	],
 	[#Rule 264
-		 'sym_str', 1,
+		 'symbol', 1,
 sub
-#line 665 "lib/DDC/PP/yyqparser.yp"
-{ unescape($_[1]) }
+#line 663 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 265
-		 's_prefix', 1,
+		 'symbol', 1,
 sub
-#line 667 "lib/DDC/PP/yyqparser.yp"
-{ unescape($_[1]) }
+#line 664 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 266
-		 's_suffix', 1,
+		 'index', 1,
 sub
 #line 668 "lib/DDC/PP/yyqparser.yp"
-{ unescape($_[1]) }
+{ '' }
 	],
 	[#Rule 267
-		 's_infix', 1,
+		 'index', 1,
 sub
 #line 669 "lib/DDC/PP/yyqparser.yp"
 { unescape($_[1]) }
 	],
 	[#Rule 268
-		 's_expander', 1,
+		 'sym_str', 1,
 sub
-#line 671 "lib/DDC/PP/yyqparser.yp"
+#line 672 "lib/DDC/PP/yyqparser.yp"
 { unescape($_[1]) }
 	],
 	[#Rule 269
-		 'regex', 1,
+		 's_prefix', 1,
 sub
 #line 674 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newre($_[1]) }
+{ unescape($_[1]) }
 	],
 	[#Rule 270
-		 'regex', 2,
+		 's_suffix', 1,
 sub
 #line 675 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newre($_[1],$_[2]) }
+{ unescape($_[1]) }
 	],
 	[#Rule 271
-		 'neg_regex', 1,
+		 's_infix', 1,
 sub
-#line 679 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newre($_[1]) }
+#line 676 "lib/DDC/PP/yyqparser.yp"
+{ unescape($_[1]) }
 	],
 	[#Rule 272
-		 'neg_regex', 2,
+		 's_expander', 1,
 sub
-#line 680 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->newre($_[1],$_[2]) }
+#line 678 "lib/DDC/PP/yyqparser.yp"
+{ unescape($_[1]) }
 	],
 	[#Rule 273
-		 'replace_regex', 2,
+		 'regex', 1,
 sub
-#line 684 "lib/DDC/PP/yyqparser.yp"
-{ [$_[1],$_[2],''] }
+#line 681 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newre($_[1]) }
 	],
 	[#Rule 274
-		 'replace_regex', 3,
+		 'regex', 2,
 sub
-#line 685 "lib/DDC/PP/yyqparser.yp"
-{ [$_[1],$_[2],$_[3]] }
+#line 682 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newre($_[1],$_[2]) }
 	],
 	[#Rule 275
-		 'int_str', 1,
+		 'neg_regex', 1,
 sub
-#line 688 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 686 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newre($_[1]) }
 	],
 	[#Rule 276
-		 'integer', 1,
+		 'neg_regex', 2,
 sub
-#line 690 "lib/DDC/PP/yyqparser.yp"
-{ no warnings 'numeric'; ($_[1]+0) }
+#line 687 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->newre($_[1],$_[2]) }
 	],
 	[#Rule 277
-		 'date', 1,
+		 'replace_regex', 2,
 sub
-#line 693 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 691 "lib/DDC/PP/yyqparser.yp"
+{ [$_[1],$_[2],''] }
 	],
 	[#Rule 278
-		 'date', 1,
+		 'replace_regex', 3,
 sub
-#line 694 "lib/DDC/PP/yyqparser.yp"
-{ $_[1] }
+#line 692 "lib/DDC/PP/yyqparser.yp"
+{ [$_[1],$_[2],$_[3]] }
 	],
 	[#Rule 279
-		 'matchid', 2,
+		 'int_str', 1,
 sub
-#line 697 "lib/DDC/PP/yyqparser.yp"
-{ $_[0]->yybegin('INITIAL'); $_[2] }
+#line 695 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
 	],
 	[#Rule 280
+		 'integer', 1,
+sub
+#line 697 "lib/DDC/PP/yyqparser.yp"
+{ no warnings 'numeric'; ($_[1]+0) }
+	],
+	[#Rule 281
+		 'date', 1,
+sub
+#line 700 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 282
+		 'date', 1,
+sub
+#line 701 "lib/DDC/PP/yyqparser.yp"
+{ $_[1] }
+	],
+	[#Rule 283
+		 'matchid', 2,
+sub
+#line 704 "lib/DDC/PP/yyqparser.yp"
+{ $_[0]->yybegin('INITIAL'); $_[2] }
+	],
+	[#Rule 284
 		 'matchid_eq', 1,
 sub
-#line 699 "lib/DDC/PP/yyqparser.yp"
+#line 706 "lib/DDC/PP/yyqparser.yp"
 { $_[0]->yybegin('Q_MATCHID'); $_[1] }
 	]
 ],
@@ -6171,7 +6241,7 @@ sub
     bless($self,$class);
 }
 
-#line 701 "lib/DDC/PP/yyqparser.yp"
+#line 708 "lib/DDC/PP/yyqparser.yp"
 
 ##############################################################
 # Footer Section
@@ -6197,7 +6267,7 @@ sub newf {
 ## $cf = $yyqparser->newCFilter($filterSortType, $defaultOffset, \@args)
 sub newCFilter {
   my ($qp,$type,$off,$args) = @_;
-  print STDERR "newCFilter: ", Data::Dumper->Dump([@_[1..$#_]]), "\n";
+  #print STDERR "newCFilter: ", Data::Dumper->Dump([@_[1..$#_]]), "\n"; ##-- DEBUG
   $args->[2] = $off if (!defined($args->[2]));
   return $qp->newf('CQFContextSort', $type, @$args);
 }

@@ -1,12 +1,12 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Release;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Query the per-release summary testers data
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     my $rs = $schema->resultset( 'Release' );
-#pod     $rs->by_dist( 'My-Dist' );
+#pod     $rs->by_dist( 'My-Dist', '0.001' );
 #pod     $rs->by_author( 'PREACTION' );
 #pod     $rs->since( '2016-01-01T00:00:00' );
 #pod     $rs->maturity( 'stable' );
@@ -28,14 +28,19 @@ use CPAN::Testers::Schema::Base 'ResultSet';
 #pod =method by_dist
 #pod
 #pod     $rs = $rs->by_dist( 'My-Dist' );
+#pod     $rs = $rs->by_dist( 'My-Dist', '0.001' );
 #pod
-#pod Add a dist constraint to the query, replacing any previous dist
-#pod constraints.
+#pod Add a dist constraint to the query (with optional version), replacing
+#pod any previous dist constraints.
 #pod
 #pod =cut
 
-sub by_dist( $self, $dist ) {
-    return $self->search( { 'me.dist' => $dist } );
+sub by_dist( $self, $dist, $version = undef ) {
+    my %search = ( 'me.dist' => $dist );
+    if ( $version ) {
+        $search{ 'me.version' } = $version;
+    }
+    return $self->search( \%search );
 }
 
 #pod =method by_author
@@ -93,12 +98,12 @@ CPAN::Testers::Schema::ResultSet::Release - Query the per-release summary tester
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
     my $rs = $schema->resultset( 'Release' );
-    $rs->by_dist( 'My-Dist' );
+    $rs->by_dist( 'My-Dist', '0.001' );
     $rs->by_author( 'PREACTION' );
     $rs->since( '2016-01-01T00:00:00' );
     $rs->maturity( 'stable' );
@@ -114,9 +119,10 @@ version of a distribution has.
 =head2 by_dist
 
     $rs = $rs->by_dist( 'My-Dist' );
+    $rs = $rs->by_dist( 'My-Dist', '0.001' );
 
-Add a dist constraint to the query, replacing any previous dist
-constraints.
+Add a dist constraint to the query (with optional version), replacing
+any previous dist constraints.
 
 =head2 by_author
 
@@ -143,19 +149,9 @@ Restrict results to only those dists that are stable. Also supported:
 
 L<DBIx::Class::ResultSet>, L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

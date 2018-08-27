@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.6.1;
+package Pcore::SMTP v0.6.2;
 
 use Pcore -dist, -const, -class, -res;
 use Pcore::Handle qw[:TLS_CTX];
@@ -136,7 +136,7 @@ sub _read_response ( $self, $h ) {
     my $data = [];
 
     while () {
-        my $line = $h->readline($CRLF);
+        my $line = $h->read_line($CRLF);
 
         return res [ $h->{status}, $h->{reason} ] if !$line;
 

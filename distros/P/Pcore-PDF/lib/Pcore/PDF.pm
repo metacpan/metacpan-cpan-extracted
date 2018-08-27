@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.3;
+package Pcore::PDF v0.5.4;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -195,7 +195,7 @@ sub _run_thread ($self) {
 }
 
 sub _get_proc ($self) {
-    my $proc = P->sys->run_proc1( [ $self->{bin}, '--control' ], stdin => 1, stdout => 1, stderr => 1 );
+    my $proc = P->sys->run_proc( [ $self->{bin}, '--control' ], stdin => 1, stdout => 1, stderr => 1 );
 
     undef $proc->{child_stdout};
     undef $proc->{child_stderr};

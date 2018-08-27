@@ -1,3 +1,7 @@
+v1.23.10 Fri, 24 Aug 2018 10:14:40 +0200 moocow
+	+ fixed typo in failed test label-reporting labstr() in t/common.plt, added 'use strict'
+	+ may help to diagnose RT bug #126294 (CCS/Ufunc/t/01_ufunc.t test 'borover:missing=BAD' fails on armv6l-linux ~ rpi)
+
 v1.23.9 Fri, 22 Jun 2018 13:55:35 +0200 moocow
 	+ ufunc.pd: avoid "|=" and "&=" operators (attmpet to get build working on ARM64, reported by L. Baillet)
 	  - see http://www.cpantesters.org/cpan/report/eaad8962-7102-11e8-905e-5ddc267117a8

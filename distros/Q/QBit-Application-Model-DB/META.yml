@@ -3,27 +3,27 @@ abstract: 'Base class for working with databases'
 author:
   - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
 build_requires:
-  DBD::Mock: 0
-  QBit::Application: 0
-  Test::Differences: 0
-  Test::More: 0
-  lib::abs: 0
+  DBD::Mock: '0'
+  QBit::Application: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  lib::abs: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: QBit-Application-Model-DB
 requires:
-  DBI: 0
-  Exception: 0
-  QBit::Application::Model: 0
-  QBit::Class: 0
-  Sys::Hostname: 0
-  base: 0
-  qbit: 0
-  strict: 0
-version: 0.027
+  DBI: '0'
+  Exception: '0'
+  QBit::Application::Model: '0'
+  QBit::Class: '0'
+  Sys::Hostname: '0'
+  base: '0'
+  qbit: '0'
+  strict: '0'
+version: '0.029'

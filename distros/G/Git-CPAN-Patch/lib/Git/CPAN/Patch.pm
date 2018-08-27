@@ -1,7 +1,7 @@
 package Git::CPAN::Patch;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Patch CPAN modules using Git
-$Git::CPAN::Patch::VERSION = '2.3.2';
+$Git::CPAN::Patch::VERSION = '2.3.4';
 use 5.10.1;
 
 use strict;
@@ -11,10 +11,14 @@ use MooseX::App 1.21;
 use MooseX::SemiAffordanceAccessor;
 
 use MetaCPAN::API;
-use Method::Signatures::Simple 1.07;
 
 app_base 'git-cpan';
 app_namespace 'Git::CPAN::Patch::Command';
+
+use experimental qw/
+    signatures
+    postderef
+/;
 
 app_command_name {
     join '-', map { lc } $_[0] =~ /([A-Z]+[a-z]+)/g;
@@ -59,11 +63,11 @@ has repo => (
     lazy_build => 1,
 );
 
-method _build_repo {
+sub _build_repo ($self){
     Git::Repository->new( );
 }
 
-method _build_distribution_name {
+sub _build_distribution_name ($self){
     my $target = $self->target;
 
     $target =~ s/-/::/g;
@@ -73,7 +77,7 @@ method _build_distribution_name {
     return  $mcpan->module( $target )->{distribution};
 }
 
-method _build_distribution_meta {
+sub _build_distribution_meta ($self) {
     my $mcpan = MetaCPAN::API->new;
 
     $mcpan->release( distribution => $self->distribution_name );
@@ -93,7 +97,7 @@ Git::CPAN::Patch - Patch CPAN modules using Git
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 SYNOPSIS
 
@@ -110,7 +114,7 @@ version 2.3.2
     ... hack lib/Foo/Bar.pm ...
 
     % git commit -am "blah"
-    % git-cpan sendpatch 
+    % git-cpan send-patch
 
     # update the module
     # this automatically rebases the current branch
@@ -190,7 +194,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

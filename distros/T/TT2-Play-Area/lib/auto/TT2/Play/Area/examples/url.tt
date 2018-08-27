@@ -1,11 +1,13 @@
+Here's a typical example using using uri encoding.  It's normally used
+with the tail end of the url where parameters go.
+
 <a href="[% link | html %]?value=[% value | uri %]">
 
-Note that uri encoding only escapes double quotes, not single, so you
+See how the uri encoding only escapes double quotes, not single, so you
 need to have your attributes encoded in double quotes.
 
-Also note that encoding a whole link is generally the wrong thing to do.
-
-Otherwise the structural characters that make up a url (/?&#) will end encoded
+Encoding a whole link is generally the wrong thing to do.  Otherwise the
+structural characters that make up a url (/?&#) will end encoded
 making the link useless.
 
 [% SET full_link = link _ '?value=' _ value %]
@@ -19,3 +21,9 @@ that is useful is on page urls.
 
 <a href="[% url(page = 1) %]">Page 1</a>
 <a href="[% url(page = 2) %]">Page 2</a>
+
+See https://metacpan.org/pod/Template::Plugin::URL for more details.
+Note that one of the oddities of it is that it automatically encodes
+& for the parameter separator on the assumption that it will be used
+within html out of the box.  This can be problematic, but can be turned
+off.

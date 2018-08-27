@@ -26,25 +26,25 @@ Linux::Perl::eventfd
 This is an interface to the C<eventfd>/C<eventfd2> system call.
 (C<eventfd2> is only called if the given parameters require it.)
 
+This class inherits from L<Linux::Perl::Base::TimerEventFD>.
+
 =cut
 
 use strict;
 use warnings;
 
+use parent 'Linux::Perl::Base::TimerEventFD';
+
 use Module::Load;
 
 use Linux::Perl;
-use Linux::Perl::Constants;
-use Linux::Perl::Constants::Fcntl;
+
 use Linux::Perl::Endian;
+use Linux::Perl::ParseFlags;
 
 use constant {
-    flag_SEMAPHORE => 1,
-    PERL_CAN_64BIT => !!do { local $@; eval { pack 'Q', 1 } },
+    _flag_SEMAPHORE => 1,
 };
-
-*flag_CLOEXEC = *Linux::Perl::Constants::Fcntl::flag_CLOEXEC;
-*flag_NONBLOCK = *Linux::Perl::Constants::Fcntl::flag_NONBLOCK;
 
 =head1 METHODS
 
@@ -91,37 +91,21 @@ sub new {
 
     my $is_cloexec;
 
-    my $flags = 0;
-    if ( $opts{'flags'} ) {
-        for my $fl ( @{ $opts{'flags'} } ) {
-            my $val_cr = $arch_module->can("flag_$fl") or do {
-                die "unknown flag: “$fl”";
-            };
-            $flags |= $val_cr->();
-
-            $is_cloexec = 1 if $fl eq 'CLOEXEC';
-        }
-    }
+    my $flags = Linux::Perl::ParseFlags::parse($arch_module, $opts{'flags'});
 
     my $call = 'NR_' . ($flags ? 'eventfd2' : 'eventfd');
 
     my $fd = Linux::Perl::call( 0 + $arch_module->$call(), $initval, $flags || () );
 
     #Force CLOEXEC if the flag was given.
-    local $^F = 0 if $is_cloexec;
+    local $^F = 0 if $flags & $arch_module->_flag_CLOEXEC();
 
     open my $fh, '+<&=' . $fd;
 
     return bless [$fh], $arch_module;
 }
 
-=head2 I<OBJ>->fileno()
-
-Returns the file descriptor number.
-
-=cut
-
-sub fileno { fileno $_[0][0] }
+#----------------------------------------------------------------------
 
 =head2 $val = I<OBJ>->read()
 
@@ -130,39 +114,20 @@ on error.
 
 =cut
 
-my ($big, $low);
+*read = __PACKAGE__->can('_read');
 
-sub read {
-    return undef if !sysread $_[0][0], my $buf, 8;
-
-    if (PERL_CAN_64BIT) {
-        ($big, $low) = (0, unpack('Q', $buf));
-    }
-    else {
-        if (Linux::Perl::Endian::SYSTEM_IS_BIG_ENDIAN) {
-            ($big, $low) = unpack 'NN', $buf;
-        }
-        else {
-            ($low, $big) = unpack 'VV', $buf;
-        }
-
-        #TODO: Need to test what happens on a 32-bit Perl.
-        die "No 64-bit support! (high=$big, low=$low)" if $big;
-    }
-
-    return $low;
-}
+#----------------------------------------------------------------------
 
 =head2 I<OBJ>->add( NUMBER )
 
-Adds NUMBER to the counter.
+Adds NUMBER to the counter. Returns undef and sets C<$!> on failure.
 
 =cut
 
 my $packed;
 
 sub add {
-    if (PERL_CAN_64BIT) {
+    if ($_[0]->_PERL_CAN_64BIT()) {
         $packed = pack 'Q', $_[1];
     }
     elsif (Linux::Perl::Endian::SYSTEM_IS_BIG_ENDIAN) {

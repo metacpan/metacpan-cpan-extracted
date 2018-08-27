@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.59  Thu Aug 23 06:48:00 2018
+       Provided direct shortcuts to timeout parameters for the new method.
+
 0.58  Sat Aug 18 14:56:00 2018
        Fixed timeouts parameters for new.  Thanks to Alexander Welsch for the bug report.
 

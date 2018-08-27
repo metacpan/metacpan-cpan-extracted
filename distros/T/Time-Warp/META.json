@@ -4,7 +4,7 @@
       "Joshua Nathaniel Pritikin <jpritikin@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -39,14 +39,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/szabgab/Time-Warp"
+         "web" : "http://github.com/manwar/Time-Warp"
       },
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/szabgab/Time-Warp.git",
-         "web" : "http://github.com/szabgab/Time-Warp",
+         "url" : "http://github.com/manwar/Time-Warp.git",
+         "web" : "http://github.com/manwar/Time-Warp",
          "x_license" : "http://dev.perl.org/licenses/"
       }
    },
-   "version" : "0.52"
+   "version" : "0.53",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

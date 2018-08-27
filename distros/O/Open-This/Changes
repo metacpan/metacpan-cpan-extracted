@@ -1,5 +1,11 @@
 Revision history for Open-This
 
+0.000011  2018-08-23 11:59:02Z
+    - Fix some tests under Windows
+
+0.000010  2018-08-22 13:43:42Z
+    - Don't rely on a working grep binary
+
 0.000009  2018-08-20 19:33:14Z
     - Parse path/to/file::sub_name()
 

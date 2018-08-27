@@ -10,7 +10,7 @@ REQUIREMENTS
         <http://sourceforge.net/projects/ddc-concordance/files/ddc-concordan
         ce/>
 
-        Tested version(s) v2.1.5.
+        Tested version(s) v2.1.15.
 
     ExtUtils::XSpp
         For compiling C++ wrapper classes. Tested version v0.18.

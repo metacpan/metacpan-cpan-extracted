@@ -1,6 +1,7 @@
 # -*- Mode: CPerl -*-
 use Test::More tests=>9;
 
+#use lib qw(../blib/lib ../blib/arch);
 use DDC::XS;
 
 ##-- 1: constructor

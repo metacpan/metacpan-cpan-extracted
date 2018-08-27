@@ -808,25 +808,31 @@ typedef struct {
 
 static I32 su_ud_localize_init(pTHX_ su_ud_localize *ud, SV *sv, SV *val, SV *elem) {
 #define su_ud_localize_init(UD, S, V, E) su_ud_localize_init(aTHX_ (UD), (S), (V), (E))
- UV deref = 0;
- svtype t = SVt_NULL;
- I32 size;
+ int take_ref = 0;
+ svtype     t = SVt_NULL;
+ I32     size;
 
  SvREFCNT_inc_simple_void(sv);
 
  if (SvTYPE(sv) >= SVt_PVGV) {
+  if (SvFAKE(sv)) {
+   sv_force_normal(sv);
+   goto string_spec;
+  }
+
   if (!val || !SvROK(val)) { /* local *x; or local *x = $val; */
    t = SVt_PVGV;
   } else {                   /* local *x = \$val; */
    t = SvTYPE(SvRV(val));
-   deref = 1;
   }
  } else if (SvROK(sv)) {
   croak("Invalid %s reference as the localization target",
                  sv_reftype(SvRV(sv), 0));
  } else {
   STRLEN len, l;
-  const char *p = SvPV_const(sv, len), *s;
+  const char *p, *s;
+string_spec:
+  p = SvPV_const(sv, len);
   for (s = p, l = len; l > 0 && isSPACE(*s); ++s, --l) { }
   if (!l) {
    l = len;
@@ -842,14 +848,17 @@ static I32 su_ud_localize_init(pTHX_ su_ud_localize *ud, SV *sv, SV *val, SV *el
   if (t != SVt_NULL) {
    ++s;
    --l;
+   if (t == SVt_PV)
+    take_ref = 1;
   } else if (val) { /* t == SVt_NULL, type can't be inferred from the sigil */
    if (SvROK(val) && !sv_isobject(val)) {
     t = SvTYPE(SvRV(val));
-    deref = 1;
    } else {
     t = SvTYPE(val);
+    take_ref = 1;
    }
   }
+
   SvREFCNT_dec(sv);
   sv = newSVpvn(s, l);
  }
@@ -858,31 +867,31 @@ static I32 su_ud_localize_init(pTHX_ su_ud_localize *ud, SV *sv, SV *val, SV *el
   case SVt_PVAV:
    size  = elem ? SU_SAVE_AELEM_OR_ADELETE_SIZE
                 : SU_SAVE_ARY_SIZE;
-   deref = 0;
    break;
   case SVt_PVHV:
    size  = elem ? SU_SAVE_HELEM_OR_HDELETE_SIZE
                 : SU_SAVE_HASH_SIZE;
-   deref = 0;
    break;
   case SVt_PVGV:
    size  = SU_SAVE_GP_SIZE;
-   deref = 0;
    break;
   case SVt_PVCV:
    size  = SU_SAVE_GVCV_SIZE;
-   deref = 0;
    break;
   default:
    size = SU_SAVE_SCALAR_SIZE;
    break;
  }
- /* When deref is set, val isn't NULL */
 
  SU_UD_PRIVATE(ud) = t;
 
  ud->sv   = sv;
- ud->val  = val ? newSVsv(deref ? SvRV(val) : val) : NULL;
+ if (val) {
+  val     = newSVsv(val);
+  ud->val = take_ref ? newRV_noinc(val) : val;
+ } else {
+  ud->val = NULL;
+ }
  ud->elem = SvREFCNT_inc(elem);
 
  return size;
@@ -957,7 +966,7 @@ static void su_localize(pTHX_ void *ud_) {
    su_save_gvcv(gv);
    break;
   default:
-   gv = (GV *) save_scalar(gv);
+   save_scalar(gv);
    break;
  }
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.625';
+our $VERSION = '1.627';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -30,6 +30,7 @@ BEGIN {
 
 
 sub new {
+    # 'choose' as function uses its own implicit new
     my $class = shift;
     my ( $opt ) = @_;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
@@ -158,20 +159,20 @@ sub __validate_and_add_options {
 
 sub __init_term {
     my ( $self ) = @_;
-    $self->{mouse} = $self->{plugin}->__set_mode( $self->{mouse}, $self->{hide_cursor} );
+    my $config = { mode => 'ultra-raw', mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} };
+    $self->{mouse} = $self->{plugin}->__set_mode( $config );
 }
 
 
 sub __reset_term {
     my ( $self, $from_choose ) = @_;
     if ( $from_choose ) {
-        print CR;
         my $up = $self->{i_row} + $self->{nr_prompt_lines};
         $self->{plugin}->__up( $up ) if $up;
-        $self->{plugin}->__clear_to_end_of_screen();
+        $self->{plugin}->__clear_lines_to_end_of_screen();
     }
     if ( defined $self->{plugin} ) {
-        $self->{plugin}->__reset_mode( $self->{mouse}, $self->{hide_cursor} );
+        $self->{plugin}->__reset_mode();
     }
     if ( exists $self->{backup_opt} ) {
         my $backup_opt = $self->{backup_opt};
@@ -200,11 +201,10 @@ sub __get_key {
 
 sub choose {      #hae
     if ( ref $_[0] ne 'Term::Choose' ) {
-        #return Term::Choose->new()->__choose( @_ );
         return __choose( bless( { plugin => $Plugin->new() }, 'Term::Choose' ), @_ );
     }
     my $self = shift;
-    return $self->__choose( @_ ); # 1 backup_self
+    return $self->__choose( @_ );
 }
 
 sub __choose {
@@ -257,10 +257,9 @@ sub __choose {
             if ( $self->{wantarray} && @{$self->{marked}} ) {
                 $self->{mark} = $self->__marked_rc2idx();
             }
-            print CR;
             my $up = $self->{i_row} + $self->{nr_prompt_lines};
             $self->{plugin}->__up( $up ) if $up;
-            $self->{plugin}->__clear_to_end_of_screen();
+            $self->{plugin}->__clear_lines_to_end_of_screen();
             $self->__write_first_screen();
             next GET_KEY;
         }
@@ -731,12 +730,12 @@ sub __write_first_screen {
         $self->__prepare_page_number();
     }
     $self->{avail_height_idx} = $self->{avail_height} - 1;
-    $self->{p_begin}    = 0;
-    $self->{p_end}      = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
-    $self->{i_row}      = 0;
-    $self->{i_col}      = 0;
-    $self->{pos}        = [ 0, 0 ];
-    $self->{marked}     = [];
+    $self->{p_begin} = 0;
+    $self->{p_end}   = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
+    $self->{i_row}   = 0;
+    $self->{i_col}   = 0;
+    $self->{pos}     = [ 0, 0 ];
+    $self->{marked}  = [];
     if ( $self->{wantarray} && defined $self->{mark} ) {
         $self->__marked_idx2rc( $self->{mark}, 1 );
     }
@@ -903,7 +902,7 @@ sub __goto {
 sub __prepare_page_number {
     my ( $self ) = @_;
     #my $total_pp = 0;
-    if ( $#{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) {
+    if ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) {
         my $total_pp = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
         my $total_pp_w = length $total_pp;
         $self->{footer_fmt} = '--- Page %0' . $total_pp_w . 'd/' . $total_pp . ' ---';
@@ -926,7 +925,7 @@ sub __prepare_page_number {
 sub __wr_screen {
     my ( $self ) = @_;
     $self->__goto( 0, 0 );
-    $self->{plugin}->__clear_to_end_of_screen();
+    $self->{plugin}->__clear_lines_to_end_of_screen();
     if ( $self->{pp_row} ) {
         $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{p_begin} / $self->{avail_height} ) + 1;
@@ -1099,7 +1098,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.625
+Version 1.627
 
 =cut
 

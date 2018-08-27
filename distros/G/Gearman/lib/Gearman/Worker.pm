@@ -1,6 +1,6 @@
 package Gearman::Worker;
 use version;
-$Gearman::Worker::VERSION = version->declare("2.004.014");
+$Gearman::Worker::VERSION = version->declare("2.004.015");
 
 use strict;
 use warnings;
@@ -28,14 +28,29 @@ Gearman::Worker - Worker for gearman distributed job system
       }
     );
 
-    $worker->register_function($funcname => $subref);
+    $worker->register_function($funcname => sub {
+        ...
+      }
+    );
 
     $worker->work(
+      on_start => sub {
+        my ($jobhandle) = @_;
+        ...
+      },
+      on_complete => sub {
+        my ($jobhandle, $result) = @_;
+        ...
+      },
+      on_fail => sub {
+        my ($jobhandle, $err) = @_;
+        ..
+      },
       stop_if => sub {
         my ($is_idle, $last_job_time) = @_;
         # stop idle worker
         return $is_idle;
-      }
+      },
     );
 
 
@@ -112,8 +127,8 @@ I<sum> job.
 
 =head1 NOTE
 
-If you intend using UTF-8 data with SSL based connection,
-beware there is no UTF-8 support in underlying L<Net::SSLeay>.
+If you intend to send or receive UTF-8 data over SSL connections,
+beware that there is no UTF-8 support in the underlying L<Net::SSLeay>.
 L<perlunicode/"Forcing-Unicode-in-Perl-(Or-Unforcing-Unicode-in-Perl)"> describes proper workarounds.
 
 =head1 METHODS
@@ -177,9 +192,9 @@ sub new {
 
 =head2 reset_abilities
 
-tell all the jobservers that this worker can't do anything
+This tells all the job servers that this worker can no longer do any tasks.
 
-B<return> true if C<reset_abilityes> request successfully transmitted to C<job_servers>
+B<return> true if C<reset_abilities> request successfully transmitted to C<job_servers>
 
 =cut
 
@@ -195,8 +210,9 @@ sub reset_abilities {
 
 =head2 work(%opts)
 
-Endless loop takes a job and wait for the next one.
+This endlessly loops. It takes an applicable job, if available, does the job, and then waits for the next one.
 You can pass "stop_if", "on_start", "on_complete" and "on_fail" callbacks in I<%opts>.
+See L</SYNOPSIS>
 
 =cut
 

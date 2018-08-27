@@ -39,10 +39,12 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/gisle/tcl.pm"
+         "type" : "git",
+         "url" : "https://github.com/gisle/tcl.pm.git",
+         "web" : "https://github.com/gisle/tcl.pm"
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.25",
+   "version" : "1.27",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,6 +6,7 @@ use DirHandle();
 use File::HomeDir();
 use File::Spec();
 use File::Temp();
+use Cwd();
 
 if (exists $ENV{COUNT}) {
 	$0 = "Test run number $ENV{COUNT}";
@@ -22,6 +23,12 @@ while(my $entry = $handle->read()) {
 	$ENV{FIREFOX_BINARY} = File::Spec->catfile($path, $entry, 'firefox');
 	if (-e $ENV{FIREFOX_BINARY}) {
 		system { 'make' } 'make', 'test' and die "Failed to 'cover' for $ENV{FIREFOX_BINARY}";
+		my $bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . '" HARNESS_PERL_SWITCHES="' . $ENV{HARNESS_PERL_SWITCHES} . '" make test';
+		warn "Remote Execution of '$bash_command'";
+		system { 'ssh' } 'ssh', 'localhost', $bash_command and die "Failed to remote cover for $ENV{FIREFOX_BINARY}"; 
+		$bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_VISIBLE=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . '" HARNESS_PERL_SWITCHES="' . $ENV{HARNESS_PERL_SWITCHES} . '" make test';
+		warn "Remote Execution of '$bash_command'";
+		system { 'ssh' } 'ssh', 'localhost', $bash_command and die "Failed to remote cover for $ENV{FIREFOX_BINARY}"; 
 	}
 }
 system { 'cover' } 'cover' and die "Failed to 'cover' for $ENV{FIREFOX_BINARY}";

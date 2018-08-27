@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::deployment::clean;
-$Footprintless::App::Command::deployment::clean::VERSION = '1.28';
+$Footprintless::App::Command::deployment::clean::VERSION = '1.29';
 # ABSTRACT: removes all files managed by the deployment
 # PODNAME: Footprintless::App::Command::deployment::clean
 
@@ -46,7 +46,7 @@ Footprintless::App::Command::deployment::clean - removes all files managed by th
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 AUTHOR
 

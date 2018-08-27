@@ -13,7 +13,7 @@ use PPIx::Utils::_Common qw(
     is_ppi_simple_statement
 );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @EXPORT_OK = qw(
     is_assignment_operator

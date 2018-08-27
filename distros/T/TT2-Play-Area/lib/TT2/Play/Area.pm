@@ -11,18 +11,31 @@ use Path::Tiny;
 use Template;
 use Template::Alloy;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my $example_dir = path( module_dir('TT2::Play::Area') )->child('examples');
 
 set appname => 'TT2::Play::Area';
 set charset => 'UTF-8';
-set engines => { template => { AUTO_FILTER => 'html' } };
-set layout  => 'main';
+set engines => {
+    template => {
+        Alloy => {
+            ABSOLUTE      => 1,
+            AUTO_FILTER   => 'html',
+            RELATIVE      => 1,
+            NO_INCLUDES   => 1,
+            INCLUDE_PATHS => [
+                path( module_dir('TT2::Play::Area') )->child('views')
+                  ->stringify
+            ],
+        }
+    }
+};
+set layout => 'main';
 set public_dir =>
   path( module_dir('TT2::Play::Area') )->child('public')->stringify;
 set template => 'alloy';
-set views => path( module_dir('TT2::Play::Area') )->child('views')->stringify;
+set views    => '';
 
 my %engines = (
     tt2        => 'TT2',
@@ -161,7 +174,7 @@ TT2::Play::Area - Simple site to allow playing with TT2 syntax and built in plug
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension App-BorgRestore
 
+3.1.0 2018-08-25T09:46:27Z
+	- Add --json option
+	- Add --detail option
+	- Log cache update status message per archive to INFO
+	- Add --quiet option
+	- Remove sqlite cache size warning
+
 3.0.0 2018-03-23T14:57:52Z
 	- No longer automatically enable --adhoc when cache is empty
 

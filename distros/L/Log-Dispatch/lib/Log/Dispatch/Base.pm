@@ -2,9 +2,40 @@ package Log::Dispatch::Base;
 
 use strict;
 use warnings;
+
+use Carp ();
+use Log::Dispatch::Vars
+    qw( %CanonicalLevelNames %LevelNamesToNumbers @OrderedLevels );
 use Scalar::Util qw( refaddr );
 
-our $VERSION = '2.67';
+our $VERSION = '2.68';
+
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _level_as_number {
+    my $self  = shift;
+    my $level = shift;
+
+    my $level_name = $self->level_is_valid($level);
+    return unless $level_name;
+
+    return $LevelNamesToNumbers{$level_name};
+}
+## use critic
+
+sub level_is_valid {
+    shift;
+    my $level = shift;
+
+    if ( !defined $level ) {
+        Carp::croak('Logging level was not provided');
+    }
+
+    if ( $level =~ /\A[0-9]+\z/ && $level <= $#OrderedLevels ) {
+        return $OrderedLevels[$level];
+    }
+
+    return $CanonicalLevelNames{$level};
+}
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _apply_callbacks {
@@ -12,7 +43,7 @@ sub _apply_callbacks {
     my %p    = @_;
 
     my $msg = delete $p{message};
-    foreach my $cb ( @{ $self->{callbacks} } ) {
+    for my $cb ( @{ $self->{callbacks} } ) {
         $msg = $cb->( message => $msg, %p );
     }
 
@@ -62,7 +93,7 @@ Log::Dispatch::Base - Code shared by dispatch and output objects.
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -77,9 +108,7 @@ version 2.67
 Unless you are me, you probably don't need to know what this class
 does.
 
-=for Pod::Coverage add_callback
-
-=for Pod::Coverage remove_callback
+=for Pod::Coverage .*
 
 =head1 SUPPORT
 
@@ -97,7 +126,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

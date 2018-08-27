@@ -7,7 +7,7 @@ run_fork { parent { exit } };
 
 # Other daemon initialization activities.
 $SIG{INT} = $SIG{TERM} = $SIG{HUP} = $SIG{PIPE} = \&some_signal_handler;
-POSIX::setsid() or die "Cannot start a new session: $!\n";
+POSIX::setsid() == -1 and die "Cannot start a new session: $!\n";
 close $_ for *STDIN, *STDOUT, *STDERR;
 
 # rest of daemon program follows

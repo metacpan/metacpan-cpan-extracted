@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,6 @@
       "develop" : {
          "requires" : {
             "Test::More" : "0.96",
-            "Test::PAUSE::Permissions" : "0",
             "Test::Vars" : "0",
             "utf8" : "0"
          }
@@ -64,11 +63,11 @@
    "provides" : {
       "Web::Query" : {
          "file" : "lib/Web/Query.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       },
       "Web::Query::LibXML" : {
          "file" : "lib/Web/Query/LibXML.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       }
    },
    "release_status" : "stable",
@@ -83,18 +82,23 @@
          "web" : "https://github.com/tokuhirom/Web-Query"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_authority" : "cpan:TOKUHIROM",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
       "Carlos Fernando Avila Gratz <cafe01@gmail.com>",
       "DQNEO <dqneoo@gmail.com>",
       "Hiroki Honda <cside.story@gmail.com>",
       "Kang-min Liu <gugod@gugod.org>",
+      "Maurice Aubrey <maurice.aubrey@gmail.com>",
       "moznion <moznion@gmail.com>",
       "Oleg <verdrehung@gmail.com>",
       "Tokuhiro Matsuno <tokuhirom+cpan@gmail.com>",
       "xaicron <xaicron@gmail.com>",
       "Yanick Champoux <yanick@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

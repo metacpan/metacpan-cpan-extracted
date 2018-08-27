@@ -1,6 +1,7 @@
 use 5.008001;
 use strict;
 use warnings;
+use utf8;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefile_args = (
@@ -36,6 +37,8 @@ my %WriteMakefile_args = (
         x_contributors => [
             'Arthur Axel fREW Schmidt <frioux@gmail.com>',
             'Dan Book <dbook@cpan.org>',
+            'Javier Arturo Rodriguez <javier@rodriguez.org.mx>',
+            'José Borges Ferreira <jose.ferreira@anubisnetworks.com>',
             'Karen Etheridge <ether@cpan.org>',
             'Steven Hartland <steven.hartland@multiplay.co.uk>',
         ],

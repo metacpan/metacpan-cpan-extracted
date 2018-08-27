@@ -3,7 +3,7 @@ package Firefox::Marionette::Timeouts;
 use strict;
 use warnings;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -35,7 +35,7 @@ Firefox::Marionette::Timeouts - Represents the timeouts for page loading, search
 
 =head1 VERSION
 
-Version 0.58
+Version 0.59
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * page_load - the timeout used for L<go|Firefox::Marionette#go>, L<back|Firefox::Marionette#back>, L<forward|Firefox::Marionette#forward>, L<refresh|Firefox::Marionette#refresh> and L<click|Firefox::Marionette#click> methods in milliseconds
 
-=item * scripts - the timeout used for L<script|Firefox::Marionette#script> and L<async_script|Firefox::Marionette#async_script> methods in milliseconds
+=item * script - the timeout used for L<script|Firefox::Marionette#script> and L<async_script|Firefox::Marionette#async_script> methods in milliseconds
 
 =item * implicit - the timeout used for L<find|Firefox::Marionette#find> and L<list|Firefox::Marionette#list> methods in milliseconds
 
@@ -72,7 +72,7 @@ This method returns a new L<timeout|Firefox::Marionette::Timeout> object.
 
 returns the the timeout used for L<go|Firefox::Marionette#go>, L<back|Firefox::Marionette#back>, L<forward|Firefox::Marionette#forward>, L<refresh|Firefox::Marionette#refresh> and L<click|Firefox::Marionette#click> methods in milliseconds.
 
-=head2 scripts
+=head2 script
 
 returns the the timeout used for L<script|Firefox::Marionette#script> and L<async_script|Firefox::Marionette#async_script> methods in milliseconds.
 

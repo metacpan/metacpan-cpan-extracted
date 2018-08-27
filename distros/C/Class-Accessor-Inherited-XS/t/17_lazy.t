@@ -49,6 +49,6 @@ is($$ref, 98);
 $$ref = 17;
 is(__PACKAGE__->moo, 17);
 
-is(Class::Accessor::Inherited::XS::_unstolen_count, 0);
+is(Class::Accessor::Inherited::XS::Debug::unstolen_count(), 0);
 
 done_testing;

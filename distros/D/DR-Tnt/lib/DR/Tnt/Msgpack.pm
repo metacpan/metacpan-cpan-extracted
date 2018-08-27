@@ -267,18 +267,32 @@ sub msgunpack_safely_utf8($) {
 
 sub looks_like_number($) {
     my ($v) = @_;
-    return 0 unless Scalar::Util::looks_like_number($v);
-
-
+    
     state $MAX_INT = unpack('J', pack('j', -1));
 
-    return 0 if $v == 'Infinity';
-    return 0 if $v == '-Infinity';
+    for ($v) {
+        return 0 unless defined $_;
 
-    if ($v == int $v) {
-        return 0 unless $v <= $MAX_INT;
+        return 0 unless Scalar::Util::looks_like_number($_);
+        # phones
+        return 0 if /\s/;
+        return 0 if /^\s*\+\s*/;
+        
+
+        return 0 if $_ == 'Infinity';
+        return 0 if $_ == '-Infinity';
+
+        if ($_ == int $_) {
+            return 0 unless $_ <= $MAX_INT;
+        }
+        
+        unless ($v eq (0 + $v)) {
+            return 1 if /-?(?:\d+\.\d*|\.\d+)$/;
+            return 0 unless /^-?(\d+(?:\.\d*)?|\.\d+)e-?\d+$/;
+        }
+
+        return 1;
     }
-    return 1;
 }
 
 sub msgpack($);

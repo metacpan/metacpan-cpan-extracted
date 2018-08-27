@@ -1,17 +1,21 @@
 package Term::Size;
 
 use strict;
-use Carp;
 use vars qw(@EXPORT_OK @ISA $VERSION);
 
-use AutoLoader ();
 use DynaLoader ();
 use Exporter ();
 
 @ISA = qw(Exporter DynaLoader);
 @EXPORT_OK = qw(chars pixels);
 
-$VERSION = '0.207';
+$VERSION = '0.209';
+
+bootstrap Term::Size $VERSION;
+
+1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -26,22 +30,7 @@ Term::Size - Retrieve terminal size (Unix version)
 
 =head1 DESCRIPTION
 
-  THIS IS AN UNOFFICIAL PATCH AGAINST Term-Size 0.2 DISTRIBUTION 
-  FOUND ON CPAN (http://search.cpan.org/~timpx/Term-Size-0.2/).
-  IT IS UNOFFICIAL IN THE SENSE THAT THE AUTHOR Tim Goodwin 
-  HASN'T APPROVED IT (YET, I HOPE). BECAUSE OF THIS, THIS 
-  DISTRIBUTION IS NOT INDEXED AND AVAILABLE VIA cpan OR cpanp 
-  SHELLS UNLESS YOU EXPLICITLY SAY 
-  "install FERREIRA/Term-Size-0.203.tar.gz". 
-  
-  THIS IS UNDELICATE? I THINK IT IS IN A CERTAIN SENSE. BUT IT 
-  IS A WAY TO UNFREEZE THE CURRENT DISTRIBUTION STATUS. IF TIM 
-  DISAPPROVES, I WILL REMOVE THIS DISTRIBUTION RIGHT AWAY. 
-  IF HE APPROVES, I WILL REMOVE THIS DISTRIBUTION RIGHT AWAY 
-  AND WORK OUT (AFTER BEEN GIVEN MAINTAINERSHIP STATUS) 
-  A DISTRIBUTION WITHOUT THIS NOTE AND WHICH INDEXES CORRECTLY.
-
-B<Term::Size> is a Perl module which provides a straightforward way to
+L<Term::Size> is a Perl module which provides a straightforward way to
 retrieve the terminal size.
 
 Both functions take an optional filehandle argument, which defaults to
@@ -57,7 +46,7 @@ list, that is, the terminal width.
 
 The functions may be imported.
 
-If you need to pass a filehandle to either of the C<Term::Size>
+If you need to pass a filehandle to either of the L<Term::Size>
 functions, beware that the C<*STDOUT{IO}> syntax is only supported in
 Perl 5.004 and later.  If you have an earlier version of Perl, or are
 interested in backwards compatibility, use C<*STDOUT> instead.
@@ -88,27 +77,31 @@ interested in backwards compatibility, use C<*STDOUT> instead.
 
 =head1 RETURN VALUES
 
-Both functions return C<undef> if there is an error.
+If there is an error, both functions return C<undef>
+in scalar context, or an empty list in list context.
 
 If the terminal size information is not available, the functions
 will normally return C<(0, 0)>, but this depends on your system.  On
 character only terminals, C<pixels> will normally return C<(0, 0)>.
 
-=head1 BUGS
+=head1 CAVEATS
 
-It only works on Unix systems.
+L<Term::Size> only works on Unix systems, as it relies on the
+C<ioctl> function to retrieve the terminal size. If you need
+terminal size in Windows, see L<Term::Size::Win32>.
+
+Before version 0.208, C<chars> and C<pixels> used to return false on error.
+
+=head1 SEE ALSO
+
+L<Term::Size::Any>, L<Term::Size::Perl>, L<Term::Size::ReadKey>, L<Term::Size::Win32>.
 
 =head1 AUTHOR
 
 Tim Goodwin, <tim@uunet.pipex.com>, 1997-04-23.
 
-Candidate for maintainership:
+=head1 MANTAINER
+
 Adriano Ferreira, <ferreira@cpan.org>, 2006-05-19.
 
 =cut
-
-bootstrap Term::Size $VERSION;
-
-1;
-
-__END__

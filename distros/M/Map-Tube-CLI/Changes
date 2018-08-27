@@ -1,5 +1,8 @@
 Revision history for Map::Tube::CLI
 
+0.55  Wed Aug 23 18:10:00 2018
+      - Upgraded dependency on Map::Tube v3.55.
+
 0.54  Sat Aug 04 23:20:00 2018
       - Updated pod w.r.t the new command line option --bgcolor.
 

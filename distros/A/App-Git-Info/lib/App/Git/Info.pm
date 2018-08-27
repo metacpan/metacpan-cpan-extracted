@@ -1,21 +1,29 @@
 package App::Git::Info;
-$App::Git::Info::VERSION = '0.0.2';
+$App::Git::Info::VERSION = '0.2.0';
+# ABSTRACT: Displays a summary of information about the git repository.
+
 use strict;
 use warnings;
 use 5.016;
 
 package main;
-$main::VERSION = '0.0.2';
+$main::VERSION = '0.2.0';
 use App::Rad;
 
-App::Rad->run;
+sub run
+{
+    return App::Rad->run;
+}
 
 sub info
 {
-    return (  `git status` =~ s#\A(On branch \S+).*#⇒ $1#mrs . "\n"
+    my $ret =
+        (     `git status` =~ s#\A(On branch \S+).*#⇒ $1#mrs . "\n"
             . `git status -s`
             . "⇒ Remotes:\n"
             . `git remote -v` );
+    chomp $ret;
+    return $ret;
 }
 
 1;
@@ -28,13 +36,19 @@ __END__
 
 =head1 NAME
 
-App::Git::Info
+App::Git::Info - Displays a summary of information about the git repository.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
+
+=head1 NAME
+
+=head1 VERSION
+
+version 0.2.0
 
     shlomif@telaviv1:~/conf/trunk$ git info info
     ⇒ On branch master
@@ -43,14 +57,6 @@ version 0.0.2
     origin  git@github.com:shlomif/shlomif-computer-settings.git (fetch)
     origin  git@github.com:shlomif/shlomif-computer-settings.git (push)
     shlomif@telaviv1:~/conf/trunk$
-
-=head1 NAME
-
-git-info - displays a summary of information about the git repository.
-
-=head1 VERSION
-
-version 0.0.2
 
 =head1 METHODS
 

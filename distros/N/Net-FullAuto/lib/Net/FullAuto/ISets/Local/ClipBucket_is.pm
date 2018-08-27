@@ -82,6 +82,7 @@ my $configure_clipbucket=sub {
    my $local=$localhost;
    my $handle=$local;
    my ($stdout,$stderr)=('','');
+   my $c='';
    ($stdout,$stderr)=$handle->cmd("rm -rvf /var/cache/yum",'__display__');
    ($stdout,$stderr)=$handle->cmd("sudo yum -y update",'__display__');
    ($stdout,$stderr)=$handle->cmd("sudo yum clean all",'__display__');
@@ -144,6 +145,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
+my $b==0;
+if ($b==1) {
    if (-1==index `php -v`,'PHP') {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://github.com/php/php-src.git','__display__');
@@ -712,19 +715,28 @@ END
 #      '__display__');
 #   ($stdout,$stderr)=$handle->cmd(
 #      "sudo yum -y install MariaDB-server MariaDB-client",'__display__');
+}
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp mariadb',,'__display__');
    ($stdout,$stderr)=$handle->cwd('mariadb');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://github.com/MariaDB/server.git','__display__');
+   ($stdout,$stderr)=$handle->cwd('server');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git checkout 10.3','__display__');
+   ($stdout,$stderr)=$handle->cwd('..');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'yum-builddep mariadb-server','__display__');
+      'yum-builddep -y mariadb-server','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'cmake -DRPM=centos7 server/','__display__');
+      '/bin/cmake -DRPM=centos7 server/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
+      'make install',600,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'groupadd mysql');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'useradd -r -g mysql mysql');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/bin/mysql_install_db --user=mysql','__display__');
 print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
    ($stdout,$stderr)=$handle->cmd("uname -a");
    if ($stdout=~/Ubuntu/i) {
@@ -903,7 +915,7 @@ END
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
    # http://www.linuxveda.com/2015/06/05/gnu-social-vs-twitter/
-   my $nginx='nginx-1.10.0';
+   my $nginx='nginx-1.14.0'; # updated from 1.10.0
    $nginx='nginx-1.9.13' if $^O eq 'cygwin';
    ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
       "http://nginx.org/download/$nginx.tar.gz",'__display__');

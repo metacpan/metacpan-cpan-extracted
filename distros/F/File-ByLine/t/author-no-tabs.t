@@ -24,6 +24,8 @@ my @files = (
     't/02-Parallel.t',
     't/03-construction.t',
     't/04-attributes.t',
+    't/05-write-file.t',
+    't/06-append-file.t',
     't/20-github-0005.t',
     't/author-critic.t',
     't/author-eol.t',

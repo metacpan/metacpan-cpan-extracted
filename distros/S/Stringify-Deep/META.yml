@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Stringify-Deep
-version:            0.02
+version:            0.03
 abstract:           Stringifies elements in data structures for easy serialization
 author:
     - Michael Aquilina <aquilina@cpan.org>

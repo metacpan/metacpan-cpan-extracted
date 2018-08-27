@@ -1,5 +1,12 @@
 Changes for TT2-Play-Area
 
+0.002     2018-08-26 17:17:10+01:00 Europe/London
+
+  - Hopefully improved clarity of the text in some of the examples.
+  - Upgrade docker image to perl 5.28
+  - Added test that runs in a browser.
+  - Fix config for local development.
+
 0.001     2018-08-16 14:33:30+01:00 Europe/London
 
   - Initial Version

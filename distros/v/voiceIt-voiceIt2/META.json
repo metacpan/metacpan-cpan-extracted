@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Perl extension for blah blah blah",
    "author" : [
-      "Hassan Ismaeel <hassan@voiceit.io>"
+      "Andrew Lee <andrew@local>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -31,12 +31,10 @@
          }
       },
       "runtime" : {
-         "requires" : {
-            "perl" : "5.006"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "0",
+   "version" : "0.01",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

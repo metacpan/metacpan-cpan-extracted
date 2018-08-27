@@ -1,0 +1,13 @@
+Revision history for Perl extension Algorithm::Heapify::XS.
+
+
+0.03  Mon Aug 27 2018
+        - Fixups for threaded builds.
+
+0.02  Sun Aug 26 2018
+        - Doc fixes
+
+0.01  Sun Aug 26 2018
+	- original version; created by h2xs 1.23 with options
+		-A -n Algorithm::Heapify::XS
+

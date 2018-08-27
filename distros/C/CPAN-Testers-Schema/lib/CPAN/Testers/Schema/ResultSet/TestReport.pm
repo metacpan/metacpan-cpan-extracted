@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::TestReport;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -128,7 +128,7 @@ CPAN::Testers::Schema::ResultSet::TestReport - Query the raw test reports
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -165,19 +165,9 @@ APIs.
 L<CPAN::Testers::Schema::Result::TestReport>, L<DBIx::Class::ResultSet>,
 L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

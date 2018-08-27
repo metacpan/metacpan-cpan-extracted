@@ -1,8 +1,26 @@
 Revision history for Term::Choose
 
 
+1.627   2018-08-21
+    - Code refactoring.
+
+1.626   2018-08-21
+    - Bugfix in 'prepare_page_number'.
+    - Modified "Term::Choose::Linux" and "Term::Choose::Win32" so that "Term::Form" can use them.
+    - Added methods 'hide_cursor', 'show_cursor' and 'clear_screen'; used in "Term::TablePrint".
+    - If OS is MSWin32, use "Win32::Console::PatchForRT33513".
+
+1.625_03   2018-08-18
+        - Developer release
+
+1.625_02   2018-08-18
+        - Developer release
+
+1.625_01   2018-08-16
+        - Developer release - MSWin32
+
 1.625   2018-08-15
-        - Fixed syntax error in "Term::Choose::Win23".
+        - Fixed syntax error in "Term::Choose::Win32".
 
 1.624   2018-08-14
         - Undo "1.623".

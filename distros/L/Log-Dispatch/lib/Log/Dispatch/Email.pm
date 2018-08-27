@@ -3,7 +3,7 @@ package Log::Dispatch::Email;
 use strict;
 use warnings;
 
-our $VERSION = '2.67';
+our $VERSION = '2.68';
 
 use Devel::GlobalDestruction qw( in_global_destruction );
 use Log::Dispatch::Types;
@@ -95,6 +95,8 @@ sub DESTROY {
             = "Log messages for the $name output (a $class object) remain unsent but the program is terminating.\n";
         $message .= "The messages are:\n";
         $message .= "  $_\n" for @{ $self->{buffer} };
+
+        warn $message;
     }
     else {
         $self->flush();
@@ -117,7 +119,7 @@ Log::Dispatch::Email - Base class for objects that send log messages via email
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -208,7 +210,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Test::Routine::Compositor;
 # ABSTRACT: the tool for turning test routines into runnable classes
-$Test::Routine::Compositor::VERSION = '0.025';
+$Test::Routine::Compositor::VERSION = '0.027';
 use Carp qw(confess);
 use Class::Load;
 use Moose::Meta::Class;
@@ -84,7 +84,7 @@ Test::Routine::Compositor - the tool for turning test routines into runnable cla
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 AUTHOR
 

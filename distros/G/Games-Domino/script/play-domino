@@ -4,7 +4,7 @@ package App::Games::Domino;
 
 use Games::Domino;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 use MooX::Options;
 
 option 'verbose' => (is => 'ro', order => 1, default => sub { 0 }, doc => 'Play the game in verbose mode.');

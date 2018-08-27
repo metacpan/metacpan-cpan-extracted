@@ -1,23 +1,27 @@
 package Git::CPAN::Patch::Command::Sources;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: lists sources for the module
-$Git::CPAN::Patch::Command::Sources::VERSION = '2.3.2';
+$Git::CPAN::Patch::Command::Sources::VERSION = '2.3.4';
 use 5.10.0;
 
 use strict;
 use warnings;
-use Method::Signatures::Simple;
 use List::Pairwise qw/ mapp /;
 
 use MooseX::App::Command;
 
 with 'Git::CPAN::Patch::Role::Git';
 
+use experimental qw/
+    signatures
+    postderef
+/;
+
 option repository => (
     is      => 'rw',
     isa     => 'Bool',
     default => 1,
-    trigger => method {
+    trigger => sub ($self) {
         return unless $self->repository;
         $self->set_cpan(0);
         $self->set_backpan(0);
@@ -29,7 +33,7 @@ option cpan => (
     is      => 'rw',
     isa     => 'Bool',
     default => 1,
-    trigger => method {
+    trigger => sub ($self) {
         return unless $self->cpan;
         $self->set_repository(0);
         $self->set_backpan(0);
@@ -41,7 +45,7 @@ option backpan => (
     is      => 'rw',
     isa     => 'Bool',
     default => 0,
-    trigger => method {
+    trigger => sub ($self) {
         return unless $self->backpan;
         $self->set_repository(0);
         $self->set_cpan(0);
@@ -57,7 +61,7 @@ parameter thingy => (
 has release_meta => (
     is => 'ro',
     lazy => 1,
-    default => method {
+    default => sub ($self) {
         require MetaCPAN::API;
         my $mcpan = MetaCPAN::API->new;
 
@@ -80,7 +84,7 @@ has backpan_index => (
     },
 );
 
-method run {
+sub run ($self) {
     if ( $self->repository and $self->release_meta->{resources}{repository} ) {
         say "vcs:";
         mapp { say "  $a: $b" } %{ $self->release_meta->{resources}{repository} };
@@ -119,7 +123,7 @@ Git::CPAN::Patch::Command::Sources - lists sources for the module
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 SYNOPSIS
 
@@ -131,7 +135,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

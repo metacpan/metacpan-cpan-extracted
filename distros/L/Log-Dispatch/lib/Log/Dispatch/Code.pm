@@ -3,7 +3,7 @@ package Log::Dispatch::Code;
 use strict;
 use warnings;
 
-our $VERSION = '2.67';
+our $VERSION = '2.68';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -53,7 +53,7 @@ Log::Dispatch::Code - Object for logging to a subroutine reference
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

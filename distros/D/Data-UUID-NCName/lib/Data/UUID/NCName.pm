@@ -1,14 +1,52 @@
 package Data::UUID::NCName;
 
-use 5.008;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
+use feature 'state';
+use base 'Exporter::Tiny';
+use overload;
 
 use MIME::Base32 ();
 use MIME::Base64 ();
-use Carp ();
+use Carp         ();
 
-use base qw(Exporter);
+use Type::Params qw(compile multisig);
+use Types::Standard qw(slurpy Maybe Any Item Str Int Dict Object Optional);
+use Type::Library -base, -declare => qw(Stringable AnyUUID Format Radix Ver);
+use Type::Utils -all;
+
+sub _to_string {
+    my $x = shift;
+    overload::Method($x, '""') || $x->can('to_string') || $x->can('as_string');
+}
+
+declare Stringable, as Object, where \&_to_string;
+
+declare AnyUUID, as Str|Stringable, where {
+    use bytes;
+    my $x = ref $_ ? _to_string($_)->($_) : $_;
+
+    return 1 if length $x == 16;
+
+    if (my ($hex) = ($x =~ /^\s*(?i:urn:uuid:)?([0-9A-Fa-f-]{32,})\s*$/sm)) {
+        $hex =~ s/-//g;
+        return 1 if length $hex == 32;
+    }
+
+    if (my ($b64) = ($x =~ m!^\s*([0-9A-Za-z+/_-]=*)\s*$!sm)) {
+        $b64 =~ tr!-_!+/!;
+        return 1 if 16 == length(MIME::Base64::decode($b64));
+    }
+
+    return;
+};
+
+enum Format, [qw(str hex b64 bin)];
+enum Radix,  [32, 64];
+enum Ver,    [0, 1]; # there may be more versions later on
+
+=encoding utf8
 
 =head1 NAME
 
@@ -16,25 +54,26 @@ Data::UUID::NCName - Make valid NCName tokens which are also UUIDs
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
     use Data::UUID::NCName qw(:all);
 
     my $uuid  = '1ff916f3-6ed7-443a-bef5-f4c85f18cd10';
-    my $ncn   = to_ncname($uuid);
-    my $ncn32 = to_ncname($uuid, 32);
+    my $ncn   = to_ncname($uuid, version => 1);
+    my $ncn32 = to_ncname($uuid, version => 1, radix => 32);
 
-    # $ncn is now "EH_kW827XQ6vvX0yF8YzRA".
-    # $ncn32 is "Ed74rn43o25b2x327jsc7ddgra" and case-insensitive.
+    # $ncn is now "EH_kW827XQ6719MhfGM0QL".
+    # $ncn32 is "Ed74rn43o25b255puzbprrtiql" and case-insensitive.
 
     # from Test::More, this will output 'ok':
-    is(from_ncname($ncn), $uuid, 'Decoding result matches original');
+    is(from_ncname($ncn, version => 1),
+        $uuid, 'Decoding result matches original');
 
 =head1 DESCRIPTION
 
@@ -43,6 +82,66 @@ of the L<UUID|http://tools.ietf.org/html/rfc4122> which conforms to
 the constraints of various other identifiers such as NCName, and create an
 L<isomorphic|http://en.wikipedia.org/wiki/Isomorphism> mapping between
 them.
+
+=head1 FORMAT DEPRECATION NOTICE
+
+After careful consideration, I have decided to change the UUID-NCName
+format in a minor yet incompatible way. In particular, I have moved
+the quartet containing the
+L<C<variant>|https://tools.ietf.org/html/rfc4122#section-4.1.1> to the
+very end of the identifier, whereas it previously was mixed into the
+middle somewhere.
+
+This can be considered an application of L<Postel's
+Law|https://en.wikipedia.org/wiki/Postel%27s_law>, based on the
+assumption that these identifiers will be generated through other
+methods, and potentially naïvely. Like the C<version> field, the
+C<variant> field has a limited acceptable range of values. If, for
+example, one were to attempt to generate a conforming identifier by
+simply generating a random Base32 or Base64 string, it will be
+difficult to ensure that the C<variant> field will indeed conform when
+the identifier is converted to a standard UUID. By moving the
+C<variant> field out to the end of the identifier, everything between
+the C<version> and C<variant> bookends can be generated randomly
+without any further consideration, like so:
+
+    our @B64_ALPHA = ('A'..'Z', 'a'..'z', 0..9, qw(- _));
+
+    sub make_cheapo_b64_uuid_ncname () {
+        my @vals = map { int rand 64 } (1..20); # generate content
+        push @vals, 8 + int rand 4;             # last digit is special
+        'E' . join '', map { $B64_ALPHA[$_] } @vals; # 'E' for UUID V4
+    }
+
+    # voilà:
+    my $cheap = make_cheapo_b64_uuid_ncname;
+    # EPrakcT1o2arqWSOuIMGSK or something
+
+    # as expected, we can decode it (version 1, naturally)
+    my $uu = Data::UUID::NCName::from_ncname($cheap, version => 1);
+    # 3eb6a471-3d68-4d9a-aaea-5923ae20c192 - UUID is valid
+
+Furthermore, since the default behaviour is to align the bits of the
+last byte to the size of the encoding symbol, and since the C<variant>
+bits are masked, a compliant RFC4122 UUID will I<always> end with
+C<I>, C<J>, C<K>, or C<L>, in I<both> Base32 (case-insensitive) and
+Base64 variants.
+
+Since I have already released this module prior to this format change,
+I have added a C<version> parameter to both L</to_ncname> and
+L</from_ncname>. The version currently defaults to C<0>, the old one,
+but will issue a warning if not explicitly set. Later I will change
+the default to C<1>, while keeping the warning, then later still,
+finally remove the warning with C<1> as the default. This should
+ensure that any code written during the transition produces the
+correct results.
+
+=over 4
+
+Unless you have to support identifiers generated from version 0.04 or
+older, B<you should be running these functions with C<version =E<gt> 1>>.
+
+=back
 
 =head1 RATIONALE & METHOD
 
@@ -222,7 +321,8 @@ my $UUF = sprintf('%s-%s-%s-%s-%s', '%02x' x 4, ('%02x' x 2) x 3, '%02x' x 6);
 my %ENCODE = (
     32 => sub {
         my @in = unpack 'C*', shift;
-        $in[-1] >>= 1;
+        my $align = shift;
+        $in[-1] >>= 1 if $align;
         my $out = MIME::Base32::encode_rfc3548(pack 'C*', @in);
 
         # we want lower case because IT IS RUDE TO SHOUT
@@ -230,8 +330,9 @@ my %ENCODE = (
     },
     64 => sub {
         my @in = unpack 'C*', shift;
-        #warn $in[-1] >> 2;
-        $in[-1] >>= 2;
+        my $align = shift;
+        $in[-1] >>= 2 if $align;
+
         my $out = MIME::Base64::encode(pack 'C*', @in);
         # note that the rfc4648 sequence ends in +/ or -_
         $out =~ tr!+/!-_!;
@@ -242,17 +343,18 @@ my %ENCODE = (
 
 my %DECODE = (
     32 => sub {
-        my $in = shift;
+        my ($in, $align) = @_;
+
         $in = uc substr($in, 0, 25) . '0';
 
         my @out = unpack 'C*', MIME::Base32::decode_rfc3548($in);
-        $out[-1] <<= 1;
+        $out[-1] <<= 1 if $align;
 
         pack 'C*', @out;
     },
     64 => sub {
-        my $in = shift;
-        #warn $in;
+        my ($in, $align) = @_;
+
         $in = substr($in, 0, 21) . 'A==';
         # note that the rfc4648 sequence ends in +/ or -_
         $in =~ tr!-_!+/!;
@@ -261,43 +363,88 @@ my %DECODE = (
 
         my @out = unpack 'C*', MIME::Base64::decode($in);
 
-        $out[-1] <<= 2;
+        $out[-1] <<= 2 if $align;
 
         pack 'C*', @out;
     },
 );
 
-sub _bin_uuid_to_pair {
-    my $data = shift;
-    my @list = unpack 'N4', $data;
+my @TRANSFORM = (
+    # old version, prior to format change
+    [
+        # _bin_uuid_to_pair
+        sub {
+            my $data = shift;
+            my @list = unpack 'N4', $data;
 
-    my $ver = ($list[1] & 0x0000f000) >> 12;
-    $list[1] = ($list[1] & 0xffff0000) |
-        (($list[1] & 0x00000fff) << 4) | ($list[2] >> 28);
-    $list[2] = ($list[2] & 0x0fffffff) << 4 | ($list[3] >> 28);
-    $list[3] <<= 4;
+            my $ver = ($list[1] & 0x0000f000) >> 12;
+            $list[1] = ($list[1] & 0xffff0000) |
+                (($list[1] & 0x00000fff) << 4) | ($list[2] >> 28);
+            $list[2] = ($list[2] & 0x0fffffff) << 4 | ($list[3] >> 28);
+            $list[3] <<= 4;
 
-    return $ver, pack 'N4', @list;
-}
+            return $ver, pack 'N4', @list;
+        },
+        # _pair_to_bin_uuid
+        sub {
+            my ($ver, $data) = @_;
 
-sub _pair_to_bin_uuid {
-    my ($ver, $data) = @_;
+            $ver &= 0xf;
 
-    $ver &= 0xf;
+            my @list = unpack 'N4', $data;
 
-    my @list = unpack 'N4', $data;
+            $list[3] >>= 4;
+            $list[3] |= (($list[2] & 0xf) << 28);
+            $list[2] >>= 4;
+            $list[2] |= (($list[1] & 0xf) << 28);
+            $list[1] = ($list[1] & 0xffff0000) | ($ver << 12) |
+                (($list[1] >> 4) & 0xfff);
 
-    $list[3] >>= 4;
-    $list[3] |= (($list[2] & 0xf) << 28);
-    $list[2] >>= 4;
-    $list[2] |= (($list[1] & 0xf) << 28);
-    $list[1] =
-        ($list[1] & 0xffff0000) | ($ver << 12) | (($list[1] >> 4) & 0xfff);
+            #warn unpack 'H*', pack 'N4', @list;
 
-    #warn unpack 'H*', pack 'N4', @list;
+            pack 'N4', @list;
+        },
+    ],
+    # new version
+    [
+        # _bin_uuid_to_pair
+        sub {
+            my $data = shift;
+            my @list = unpack 'N4', $data;
 
-    pack 'N4', @list;
-}
+            my $ver = ($list[1] & 0x0000f000) >> 12;
+            my $var = ($list[2] & 0xf0000000) >> 24;
+            $list[1] = ($list[1] & 0xffff0000) |
+                (($list[1] & 0x00000fff) << 4) |
+                (($list[2] & 0x0fffffff) >> 24);
+            $list[2] = ($list[2] & 0x00ffffff) << 8 | ($list[3] >> 24);
+            $list[3] = ($list[3] << 8) | $var;
+
+            return $ver, pack 'N4', @list;
+        },
+        # _pair_to_bin_uuid
+        sub {
+            my ($ver, $data) = @_;
+
+            $ver &= 0xf;
+
+            my @list = unpack 'N4', $data;
+
+            my $var = ($list[3] & 0xf0) << 24;
+
+            $list[3] >>= 8;
+            $list[3] |= (($list[2] & 0xff) << 24);
+            $list[2] >>= 8;
+            $list[2] |= (($list[1] & 0xf) << 24) | $var;
+            $list[1] = ($list[1] & 0xffff0000) | ($ver << 12) |
+                (($list[1] >> 4) & 0xfff);
+
+            #warn unpack 'H*', pack 'N4', @list;
+
+            pack 'N4', @list;
+        },
+    ],
+);
 
 sub _encode_version {
     my $ver = $_[0] & 15;
@@ -316,7 +463,7 @@ sub _decode_version {
 
 =head1 SUBROUTINES
 
-=head2 to_ncname $UUID [, $RADIX ]
+=head2 to_ncname $UUID [, $RADIX ] [, %PARAMS ]
 
 Turn C<$UUID> into an NCName. The UUID can be in the canonical
 (hyphenated) hexadecimal form, non-hyphenated hexadecimal, Base64
@@ -325,18 +472,63 @@ NCName equivalent to the UUID, in either Base32 or Base64 (url), given
 a specified C<$RADIX> of 32 or 64. If the radix is omitted, Base64
 is assumed.
 
+The following keyword parameters are also accepted, and override the
+positional parameters where applicable:
+
+=over 4
+
+=item radix 32|64
+
+Either 32 or 64 to explicitly specify Base32 or Base64 output.
+Defaults to 64.
+
+=item version 0|1
+
+Version 0 will generate the original version of NCName identifiers,
+prior to the changes noted above. Version 1 is the new version, which
+is I<not> backwards-compatible. The default, for a transitional
+period, is to generate version 0, but complain about it. Set the
+version explicitly (to 1, or to 0 if you need backwards compatibility)
+to eliminate the warning messages.
+
+=item align $FALSY|$TRUTHY
+
+Align the last 4 bits to the Base32/Base64 symbol size. You almost
+certainly want this, so the default is I<true>.
+
+=back
+
 =cut
 
 sub to_ncname {
-    my ($uuid, $radix) = @_;
+    state $dict = slurpy Dict[
+        radix   => Optional[Radix],
+        version => Optional[Ver],
+        align   => Optional[Item],
+        slurpy Any];
+    state $check = multisig(
+        [AnyUUID, Optional[Radix], $dict],
+        [AnyUUID, $dict]);
 
-    if ($radix) {
-        Carp::croak("Radix must be either 32 or 64, not $radix")
-              unless $radix == 32 || $radix == 64;
+    my ($uuid, $radix, $p) = $check->(@_);
+
+    # optional radix moved to named parameter
+    if (ref $radix) {
+        $p = $radix;
+        undef $radix;
     }
-    else {
-        $radix = 64;
+
+    $radix //= $p->{radix} || 64;
+    $p->{align} = !!($p->{align} // 1);
+
+    unless (defined $p->{version}) {
+        Carp::carp('Set an explicit `version` to eliminate this warning.' .
+                       ' See Data::UUID::NCName docs.');
+        $p->{version} = 0;
     }
+
+    # type checking has ensured this is Stringable so get the string
+    $uuid = _to_string($uuid)->($uuid) if ref $uuid;
 
     # get the uuid into a binary string
     my $bin;
@@ -349,7 +541,8 @@ sub to_ncname {
         $uuid =~ s/\s+//g;
 
         # handle hexadecimal
-        if ($uuid =~ /^[0-9A-Fa-f-]{32,}$/) {
+        if ($uuid =~ /^(?i:urn:uuid:)?[0-9A-Fa-f-]{32,}$/) {
+            $uuid =~ s/^urn:uuid://i;
             $uuid =~ s/-//g;
             #warn $uuid;
             $bin = pack 'H*', $uuid;
@@ -365,16 +558,14 @@ sub to_ncname {
         }
     }
 
-
     # extract the version
-    my ($version, $content) = _bin_uuid_to_pair($bin);
-    #warn $version;
+    my ($version, $content) = $TRANSFORM[$p->{version}][0]->($bin);
 
     # wah-lah.
-    _encode_version($version) . $ENCODE{$radix}->($content);
+    _encode_version($version) . $ENCODE{$radix}->($content, $p->{align});
 }
 
-=head2 from_ncname $NCNAME [, $FORMAT, $RADIX ]
+=head2 from_ncname $NCNAME [, $FORMAT [, $RADIX] ] [, %PARAMS ]
 
 Turn an appropriate C<$NCNAME> back into a UUID, where I<appropriate>,
 unless overridden by C<$RADIX>, is defined beginning with one initial
@@ -416,6 +607,29 @@ A binary string.
 
 =back
 
+This function also takes the new keyword-style parameters:
+
+=over 4
+
+=item format
+
+As above.
+
+=item radix
+
+As above.
+
+=item version
+
+Sets the identifier version. Defaults to version 0 with a warning. See
+the note about setting an explicit C<version> parameter in L</to_ncname>.
+
+=item align
+
+Assume the last few bits are aligned to the symbol, as in L</to_ncname>.
+
+=back
+
 =cut
 
 my %FORMAT = (
@@ -436,19 +650,51 @@ my %FORMAT = (
 );
 
 sub from_ncname {
-    my ($ncname, $format, $radix) = @_;
+    state $dict = slurpy Dict[
+        format  => Optional[Format],
+        radix   => Optional[Radix],
+        version => Optional[Ver],
+        align   => Optional[Item],
+        slurpy Any];
+    state $check = multisig(
+        [Str, $dict],
+        [Str, Maybe[Format], Optional[Radix], $dict],
+        [Str, Maybe[Format], $dict],
+    );
 
-    # handle formatter
-    $format ||= 'str';
-    Carp::croak("Invalid format $format") unless $FORMAT{$format};
+    my ($ncname, $format, $radix, $p) = $check->(@_);
+
+    # handle vagaries of legacy positional parameters
+    if (ref $format) {
+        $p = $format;
+        undef $format;
+    }
+    elsif (ref $radix) {
+        $p = $radix;
+        undef $radix;
+    }
+
+    # unconditional override by key-value radix and format parameters
+    $radix = $p->{radix} if defined $p->{radix};
+
     # reuse this variable because it doesn't get used for anything else
-    $format = $FORMAT{$format};
+    $format = $FORMAT{$p->{format} || $format || 'str'};
+
+    # coerce align parameter to boolish
+    $p->{align} = !!($p->{align} // 1);
+
+    # enforce explicit presence of version
+    unless (defined $p->{version}) {
+        Carp::carp('Set an explicit `version` to eliminate this warning.' .
+                       ' See Data::UUID::NCName docs.');
+        $p->{version} = 0;
+    }
 
     # obviously this must be defined
     return unless defined $ncname;
 
     # no whitespace
-    $ncname =~ s/^\s*(.*?)\s*$/$1/;
+    $ncname =~ s/^\s*(.*?)\s*$/$1/sm;
 
     # note that the rfc4648 sequence ends in +/ or -_
     my ($version, $content) = ($ncname =~ /^([A-Za-z])([0-9A-Za-z_-]{21,})$/)
@@ -482,54 +728,54 @@ sub from_ncname {
     # get this stuff back to canonical form
     $version = _decode_version($version);
     # warn $version;
-    $content = $DECODE{$radix}->($content);
+    $content = $DECODE{$radix}->($content, $p->{align});
     # warn  unpack 'H*', $content;
 
     # reassemble the pair
-    my $bin = _pair_to_bin_uuid($version, $content);
+    my $bin = $TRANSFORM[$p->{version}][1]->($version, $content);
 
     # *now* format.
     $format->($bin);
 }
 
-=head2 to_ncname_64 $UUID
+=head2 to_ncname_64 $UUID [, %PARAMS ]
 
 Shorthand for Base64 NCNames.
 
 =cut
 
 sub to_ncname_64 {
-    to_ncname(shift, 64);
+    to_ncname(@_, radix => 64);
 }
 
-=head2 from_ncname_64 $NCNAME [, $FORMAT ]
+=head2 from_ncname_64 $NCNAME [, $FORMAT | %PARAMS ]
 
 Ditto.
 
 =cut
 
 sub from_ncname_64 {
-    from_ncname(shift, shift, 64);
+    from_ncname(@_, radix => 64);
 }
 
-=head2 to_ncname_32 $UUID
+=head2 to_ncname_32 $UUID [, %PARAMS ]
 
 Shorthand for Base32 NCNames.
 
 =cut
 
 sub to_ncname_32 {
-    to_ncname(shift, 32);
+    to_ncname(shift, 32, @_);
 }
 
-=head2 from_ncname_32 $NCNAME [, $FORMAT ]
+=head2 from_ncname_32 $NCNAME [, $FORMAT | %PARAMS ]
 
 Ditto.
 
 =cut
 
 sub from_ncname_32 {
-    from_ncname(shift, shift, 32);
+    from_ncname(@_, radix => 32);
 }
 
 =head1 AUTHOR
@@ -538,25 +784,18 @@ Dorian Taylor, C<< <dorian at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-data-uuid-ncname
-at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-UUID-NCName>.  I
-will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Data::UUID::NCName
-
-You can also look for information at:
+Please report bugs/issues/etc L<in
+GitHub|https://github.com/doriantaylor/p5-data-uuid-ncname/issues>.
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * MetaCPAN
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-UUID-NCName>
+L<https://metacpan.org/release/Data-UUID-NCName>
+
+=item * GitHub repository (bugs also go here)
+
+L<https://github.com/doriantaylor/p5-data-uuid-ncname>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -566,54 +805,71 @@ L<http://annocpan.org/dist/Data-UUID-NCName>
 
 L<http://cpanratings.perl.org/d/Data-UUID-NCName>
 
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Data-UUID-NCName/>
-
 =back
 
 =head1 SEE ALSO
 
 =over 4
 
-=item L<Data::UUID>
+=item
 
-=item L<OSSP::uuid>
+L<UUID::Tiny>
 
-=item L<RFC 4122|http://tools.ietf.org/html/rfc4122>
+=item
 
-=item L<RFC 4648|http://tools.ietf.org/html/rfc4648>
+L<Data::UUID>
 
-=item L<Namespaces in XML|http://www.w3.org/TR/xml-names/#NT-NCName>
+=item
+
+L<OSSP::uuid>
+
+=item
+
+L<RFC 4122|http://tools.ietf.org/html/rfc4122>
+
+=item
+
+L<RFC 4648|http://tools.ietf.org/html/rfc4648>
+
+=item
+
+L<Namespaces in XML|http://www.w3.org/TR/xml-names/#NT-NCName>
 (NCName)
 
-=item L<W3C XML Schema Definition Language (XSD) 1.1 Part 2:
+=item
+
+L<W3C XML Schema Definition Language (XSD) 1.1 Part 2:
 Datatypes|http://www.w3.org/TR/xmlschema11-2/#ID> (ID)
 
-=item L<RDF/XML Syntax Specification
+=item
+
+L<RDF/XML Syntax Specification
 (Revised)|http://www.w3.org/TR/rdf-syntax-grammar/#rdf-id>
 
-=item L<Turtle|http://www.w3.org/TR/turtle/#BNodes>
+=item
+
+L<Turtle|http://www.w3.org/TR/turtle/#BNodes>
 
 =back
 
 This module lives under the C<Data::> namespace for the purpose of
-namespace hygiene. It I<does not> depend on L<Data::UUID> or any
-other UUID modules.
+namespace hygiene. The main module I<does not> depend on
+L<Data::UUID>, howevever the script L<uuid-ncname> I<does> depend on
+L<UUID::Tiny> to generate UUIDs.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Dorian Taylor.
+Copyright 2012-2018 Dorian Taylor.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
-may not use this file except in compliance with the License.  You may
+may not use this file except in compliance with the License. You may
 obtain a copy of the License at
 L<http://www.apache.org/licenses/LICENSE-2.0> .
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-implied.  See the License for the specific language governing
+implied. See the License for the specific language governing
 permissions and limitations under the License.
 
 =cut

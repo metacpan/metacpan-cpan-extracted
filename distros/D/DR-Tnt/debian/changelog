@@ -1,3 +1,15 @@
+libdr-tnt-perl (0.24-1) nowtaxi; urgency=medium
+
+  * Float poinst detect properly.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 22 Aug 2018 12:30:09 +0300
+
+libdr-tnt-perl (0.23-1) nowtaxi; urgency=medium
+
+  * Detect Num/phone/float more properly.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 21 Aug 2018 10:53:01 +0300
+
 libdr-tnt-perl (0.22-1) nowtaxi; urgency=medium
 
   * Test instance wait for 5 seconds (if docker hangs, some tests can fail).

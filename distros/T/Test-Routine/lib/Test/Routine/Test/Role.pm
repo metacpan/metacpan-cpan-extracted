@@ -1,6 +1,6 @@
 package Test::Routine::Test::Role;
 # ABSTRACT: role providing test attributes
-$Test::Routine::Test::Role::VERSION = '0.025';
+$Test::Routine::Test::Role::VERSION = '0.027';
 use Moose::Role;
 
 has description => (
@@ -15,6 +15,8 @@ has _origin => (
   isa => 'HashRef',
   required => 1,
 );
+
+sub skip_reason { return }
 
 no Moose::Role;
 
@@ -32,7 +34,7 @@ Test::Routine::Test::Role - role providing test attributes
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 AUTHOR
 

@@ -59,7 +59,7 @@ use Math::BigInt try => 'GMP,Pari,FastCalc';
 
 use Math::ProvablePrime::Rand ();
 
-our $VERSION = 0.043;
+our $VERSION = 0.045;
 
 my (@ptab, $MI);
 
@@ -612,7 +612,10 @@ sub _ceil_sqrt_bigint {
     return $bigint->copy()->bsqrt()->bneg()->btdiv(1)->bneg();
 }
 
-my ($_MBI_1, $_MBI_2, $_MBI_3);
+my ($_MBI_1, $_MBI_2, $_MBI_3, $_MBI_200);
+END {
+    undef $_MBI_1, $_MBI_2, $_MBI_3, $_MBI_200;
+}
 
 my $_MBI_PRIMES_3_THROUGH_103;
 
@@ -686,8 +689,14 @@ sub find {
     # A different c value may be desirable for use in different computing
     # environments.
 
+    $_MBI_1 ||= _mbi(1);
+    $_MBI_2 ||= _mbi(2);
+    $_MBI_3 ||= _mbi(3);
+    $_MBI_200 ||= _mbi(200);
+
     #division, rounded-up
-    my $bb = _mbi($ki)->bpow(2)->bneg()->btdiv(200)->bneg();
+    my $bb = _mbi($ki);
+    $bb->bmul($bb)->bneg()->btdiv($_MBI_200)->bneg();
 
     my $r;
     if ( $ki > (2 * $MI) ) {
@@ -703,11 +712,7 @@ sub find {
 
     my $q = find( 1 + int( $r * $ki ) );
 
-    $_MBI_1 ||= _mbi(1);
-    $_MBI_2 ||= _mbi(2);
-    $_MBI_3 ||= _mbi(3);
-
-    my $ib = $_MBI_1->copy()->blsft($ki - 1)->bdiv( (ref $q) ? $q->copy()->badd($q) : ($q + $q));
+    my $ib = $_MBI_1->copy()->blsft($ki - 1)->bdiv($q)->bdiv($_MBI_2);
 
     my $n;
     my $success = 0;

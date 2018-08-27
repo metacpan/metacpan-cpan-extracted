@@ -1,13 +1,22 @@
---- #YAML:1.0
-name:                Term-Size
-version:             0.207
-abstract:            Retrieve terminal size (Unix version)
-license:             perl
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    Test::More:                    0
+---
+abstract: 'Retrieve terminal size (Unix version)'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Size
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+version: '0.209'

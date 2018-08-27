@@ -4,17 +4,6 @@ use strict;
 use ExtUtils::MakeMaker;
 
 
-my %prereqs_os_specific;
-my %test_prereqs_os_specific;
-if ( $^O eq 'MSWin32' ) {
-    %prereqs_os_specific = (
-        'constant'       => 0,
-        'Encode'         => 0,
-        'Encode::Locale' => 0,
-        'Win32::Console' => 0,
-    );
-}
-
 WriteMakefile(
     PL_FILES         => {},
     MIN_PERL_VERSION => '5.008003',
@@ -47,12 +36,7 @@ WriteMakefile(
         'Carp'                    => 0,
         'Exporter'                => 0,
         'List::Util'              => '1.33',
-        'Term::Choose'            => '1.607',
-        'Term::Choose::LineFold'  => '1.607',
-        'Term::Choose::Linux'     => '1.607',
-        'Term::Choose::Win32'     => '1.607',
-        'Term::Choose::Constants' => '1.607',
-        %prereqs_os_specific,
+        'Term::Choose'            => '1.626',
     },
     dist  => {
         COMPRESS => 'gzip',

@@ -6,7 +6,7 @@ use strict;
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.62';
+    $VERSION = '1.63';
     @ISA     = qw( Archive::Zip );
 
     if ($^O eq 'MSWin32') {
@@ -34,6 +34,10 @@ use constant DEFAULT_DIRECTORY_PERMISSIONS => 040755;
 use constant DEFAULT_FILE_PERMISSIONS      => 0100666;
 use constant DIRECTORY_ATTRIB              => 040000;
 use constant FILE_ATTRIB                   => 0100000;
+use constant OS_SUPPORTS_SYMLINK           => do {
+  local $@;
+  !!eval { symlink("",""); 1 };
+};
 
 # Returns self if successful, else undef
 # Assumes that fh is positioned at beginning of central directory file header.
@@ -650,7 +654,7 @@ sub _dosToUnixTime {
 
 # Note, this is not exactly UTC 1980, it's 1980 + 12 hours and 1
 # minute so that nothing timezoney can muck us up.
-my $safe_epoch = 31.626060;
+my $safe_epoch = 31.636060;
 
 # convert a unix time to DOS date/time
 # NOT AN OBJECT METHOD!
@@ -1090,7 +1094,7 @@ sub _writeData {
 
 # If symbolic link, just create one if the operating system is Linux, Unix, BSD or VMS
 # TODO: Add checks for other operating systems
-    if ($self->{'isSymbolicLink'} == 1 && $^O eq 'linux') {
+    if ($self->{'isSymbolicLink'} == 1 && OS_SUPPORTS_SYMLINK) {
         my $chunkSize = $Archive::Zip::ChunkSize;
         my ($outRef, $status) = $self->readChunk($chunkSize);
         symlink $$outRef, $self->{'newName'};

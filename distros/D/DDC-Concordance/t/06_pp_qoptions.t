@@ -1,5 +1,5 @@
 # -*- Mode: CPerl -*-
-use Test::More tests=>11;
+use Test::More tests=>17;
 use DDC::PP;
 
 ##-- 1..2: parse
@@ -23,6 +23,15 @@ like($filters->[1]->toString, qr/^\#(?:ASC|LESS)(?:_BY)?_DATE$/i, "qopts:filters
 ##-- 11: corpora
 my $corpora = $qo->getSubcorpora;
 is(join(' ',@{$corpora||[]}), 'c1 c2', "qopts:corpora");
+
+##-- 12..17: comments
+ok(($q = DDC::PP->parse(qq{foo #[ block comment ] && bar #sep #cmt 'parsed comment'})), "qopts:cmts:parse");
+ok(($qo=$q->getOptions), "qopts:cmts:options");
+
+like($q->toString,  qr/foo && bar/, 'qopts:comments:scanner');
+ok($qo->getSeparateHits, 'qopts:cmts:flag');
+ok(($cmts=$qo->getComments) && @{$cmts//[]}==1, 'qopts:cmts:parsed');
+is($cmts->[0], "parsed comment", 'qopts:cmts:parsed:content');
 
 print "\n";
 

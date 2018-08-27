@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric );
 
 package MCE::Shared::Base;
 
-our $VERSION = '1.838';
+our $VERSION = '1.839';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -22,15 +22,15 @@ use Scalar::Util qw( looks_like_number );
 use bytes;
 
 ##
-#  Several methods in MCE::Shared::{ Array, Cache, Hash, Minidb, Ordhash } take
-#  a query string for an argument. The format of the string is described below.
-#  The _compile function is where the query string is evaluated and expanded
-#  into Perl code.
+#  Several methods in MCE::Shared::{ Array, Cache, Hash, Minidb, and Ordhash }
+#  take a query string for an argument. The format of the string is described
+#  below. The _compile function is where the query string is evaluated and
+#  expanded into Perl code.
 # 
-#  In the context of sharing, the query mechanism is beneficial for the shared-
-#  manager process. The shared-manager performs the query where the data resides
-#  versus sending data in whole to the client process for traversing. Only the
-#  data found is sent.
+#  In the context of sharing, the query mechanism is beneficial for the
+#  shared-manager process. The shared-manager runs the query where the data
+#  resides versus sending data in whole to the client process for traversing.
+#  Only the data found is sent back.
 # 
 #  o Basic demonstration
 # 
@@ -142,7 +142,8 @@ sub _find_array {
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## Find items in HASH. Called by MCE::Shared::{ Cache, Hash, Minidb, Ordhash }.
+## Find items in HASH.
+## Called by MCE::Shared::{ Cache, Hash, Minidb, Ordhash }.
 ##
 ###############################################################################
 
@@ -193,17 +194,29 @@ sub _find_hash {
 
    # wants keys
    if ( $params->{'getkeys'} ) {
-      eval qq{ map { ($q) ? (\$_) : () } \$obj->keys };
+      eval qq{
+         map { ($q) ? (\$_) : () }
+            ( \$obj ? \$obj->keys : CORE::keys \%{\$data} )
+      };
    }
    # wants values
    elsif ( $params->{'getvals'} ) {
       $grepvals
-         ? eval qq{ grep { ($q) } \$obj->vals }
-         : eval qq{  map { ($q) ? (\$data->{\$_}) : () } \$obj->keys };
+         ? eval qq{
+              grep { ($q) }
+                 ( \$obj ? \$obj->vals : CORE::values \%{\$data} )
+           }
+         : eval qq{
+              map { ($q) ? (\$data->{\$_}) : () }
+                 ( \$obj ? \$obj->keys : CORE::keys \%{\$data} )
+           };
    }
    # wants pairs
    else {
-      eval qq{ map { ($q) ? (\$_ => \$data->{\$_}) : () } \$obj->keys };
+      eval qq{
+         map { ($q) ? (\$_ => \$data->{\$_}) : () }
+            ( \$obj ? \$obj->keys : CORE::keys \%{\$data} )
+      };
    }
 }
 
@@ -295,7 +308,7 @@ MCE::Shared::Base - Base package for helper classes
 
 =head1 VERSION
 
-This document describes MCE::Shared::Base version 1.838
+This document describes MCE::Shared::Base version 1.839
 
 =head1 DESCRIPTION
 

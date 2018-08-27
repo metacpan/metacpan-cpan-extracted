@@ -2,8 +2,8 @@ NAME
     App::isbn - Query book information by ISBN
 
 VERSION
-    This document describes version 0.001 of App::isbn (from Perl
-    distribution App-isbn), released on 2018-08-02.
+    This document describes version 0.002 of App::isbn (from Perl
+    distribution App-isbn), released on 2018-08-23.
 
 SYNOPSIS
     See isbn script.
@@ -35,7 +35,7 @@ FUNCTIONS
 
     *   drivers => *array[str]*
 
-    *   isbn => *str*
+    *   isbn => *isbn*
 
     Returns an enveloped result (an array).
 

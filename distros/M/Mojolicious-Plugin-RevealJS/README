@@ -1,0 +1,216 @@
+NAME
+
+    Mojolicious::Plugin::RevealJS - Mojolicious Ã¢ÂÂ¤Ã¯Â¸Â Reveal.js
+
+SYNOPSIS
+
+      use Mojolicious::Lite;
+    
+      plugin 'RevealJS';
+    
+      any '/' => { template => 'mytalk', layout => 'revealjs' };
+    
+      app->start;
+
+DESCRIPTION
+
+    Mojolicious::Plugin::RevealJS is yet another attempt at making
+    presentations with Mojolicious. While the author's previous attempts
+    have tried do too much, this one simply makes it easier to use
+    Reveal.js <http://lab.hakim.se/reveal-js>. It provides a layout
+    (revealjs) which contains the boilerplate and loads the bundled
+    libraries. It also provides a few simple helpers. Future versions of
+    the plugin will allow setting of configuration like themes.
+
+    The bundled version of Reveal.js is currently 3.7.0.
+
+    Note that this module is in an alpha form! The author makes no
+    compatibilty promises.
+
+LAYOUTS
+
+      # controller
+      $c->layout('revealjs'); # or
+      $c->stash(layout => 'revealjs');
+    
+      # or template
+      % layout 'revealjs';
+
+ revealjs
+
+    This layout is essentially the standard template distributed as part of
+    the Reveal.js tarball. It is modified for use in a Mojolicious
+    template.
+
+  stash paramters
+
+    It accepts the stash parameters:
+
+      * author - sets the metadata value
+
+      * description - sets the metadata value
+
+      * init - Reveal.js initialization options, a hashref for JSON
+      conversion documented below
+
+      * theme - a string representing a theme css to be included. If the
+      string ends in .css it is included literally, otherwise it is assumed
+      to be the name of a bundled Reveal.js theme. Bundled themes are:
+      black, white, league, beige, sky, night, serif, simple, solarized.
+      Defaults to black. See more on the "Reveal.js page"
+      <https://github.com/hakimel/reveal.js#theming>.
+
+      * title - sets the window title, not used on the title slide
+
+      * base - sets the <base> tag for the document. Useful for hosting
+      static pages at a location other than /. Defaults to /, if explicitly
+      set to undef the tag is not included.
+
+  initialization parameters
+
+    As mentioned above, the stash key init is a hashref that is merge into
+    a set of defaults and used to initialize Reveal.js. Some RevealJS
+    initialization options, specifically those that have a default are:
+
+      * center - enable slide centering (boolean, true by default)
+
+      * controls - enable controls (boolean, true by default)
+
+      * history - enable history (boolean, true by default)
+
+      * progress - enable progress indicator (boolean, true by default)
+
+      * transition - set the slide transition type (one of: none, fade,
+      slide, convex, concave, zoom; default: slide)
+
+    These defaults are set in the default stash value for revealjs.init. So
+    they can be modified globally modifying that value (probably during
+    setup).
+
+      $app->defaults->{'revealjs.init'}{transition} = 'none';
+
+    Note that booleans are references to scalar values, true == \1, false
+    == \0. See more availalbe options on the "Reveal.js page"
+    <https://github.com/hakimel/reveal.js#configuration>.
+
+  additional templates
+
+    In order to further customize the template the following unimplemented
+    templates are included into the layout
+
+      * revealjs_head.html.ep - included at the end of the <head> tag.
+
+      * revealjs_preinit.js.ep - included just before initializing
+      Reveal.js. Especially useful to modify the javascript variable init.
+
+      * revealjs_body.html.ep - included at the end of the <body> tag.
+
+HELPERS
+
+ include_code
+
+      %= include_code 'path/to/file.pl'
+
+    This helper does several things:
+
+      * localizes trailing arguments into the stash
+
+      * slurps a file containing code
+
+      * http escapes the content
+
+      * applies some simple formatting
+
+      * displays the relative path to the location of the file (for the
+      benefit of repo cloners)
+
+    The helper takes a file name and additional key-value pairs. The
+    following keys and their value are removed from the pairs, the
+    remaining are localized into the stash:
+
+    language
+
+      sets the language for the highlighting, defaults to the value of
+      stash('language') // 'perl'
+
+    section
+
+      limits the section to a given section name
+
+    include_filename
+
+      if true (default) include the filename when the code is included
+
+    NOTE: This feature is experimental!
+
+    The section is definite by a line comment of the form # or // or -- or
+    <!-- followed by reveal begin $name and ended with comment mark
+    followed by reveal end $name.
+
+      %= include_code 'path/to/file', section => 'part1'
+
+    Then in the file
+
+      Excluded content
+    
+      # reveal begin part1
+      Included content
+      # reveal end part1
+    
+      Excluded content
+
+ section
+
+      %= section begin
+      ...
+      % end
+
+    A shortcut for creating a section tag.
+
+      %# longer form
+      %= tag section => ...
+
+ markdown_section
+
+      %= markdown_section begin
+      ...
+      % end
+
+    Build a section tag and script/template tag to properly use the
+    built-in markdown handling within this slide.
+
+ revealjs->export
+
+      $ ./myapp.pl eval 'app->revealjs->export("/" => "path/", \%options)'
+
+    Exports the rendered page and all of the files in the static
+    directories to the designated path. This is very crude, but effective
+    for usual cases.
+
+    Allowed options are:
+
+    base
+
+      Override the base tag by removing the original and inserting a new
+      one just inside the <head> tag with the given value as the href
+      target. This feature is cludgy (as is this whole helper), consider it
+      experimental, its behavior may change.
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Mojolicious-Plugin-RevealJS
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2015 by Joel Berger
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Reveal.js (bundled) is Copyright (C) 2015 Hakim El Hattab,
+    http://hakim.se and released under the MIT license.
+

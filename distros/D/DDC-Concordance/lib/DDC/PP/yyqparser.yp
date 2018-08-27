@@ -6,7 +6,7 @@
 ##    Author: Bryan Jurish <moocow@cpan.org>
 ##
 ## Description: Yapp parser specification for DDC queries
-##  + last updated for ddc v2.1.5
+##  + last updated for ddc v2.1.15
 ##
 ################################################################
 
@@ -125,7 +125,8 @@ count_filter:
 		count_by 			{ $_[1] }
 	|	count_sample			{ $_[1] }
 	|	count_limit			{ $_[1] }
-	|	count_sort			{ $_[1] }
+  	|	count_sort			{ $_[1] }
+	|	q_comment			{ {}    }
 	;
 
 count_by:
@@ -176,8 +177,14 @@ query_conditions:
 ## q_filters (qf*): Filters and Global Query Flags
 q_filters:
 						{ undef }
+	|	q_filters q_comment		{ undef }
 	|	q_filters q_flag		{ undef }
 	|	q_filters q_filter		{ undef }
+	;
+
+q_comment:
+		KW_COMMENT symbol		{ push(@{$_[0]->qopts->{Comments}}, $_[2]); undef }
+  	|	KW_COMMENT '[' symbol ']'	{ push(@{$_[0]->qopts->{Comments}}, $_[3]); undef }
 	;
 
 q_flag:
@@ -723,7 +730,7 @@ sub newf {
 ## $cf = $yyqparser->newCFilter($filterSortType, $defaultOffset, \@args)
 sub newCFilter {
   my ($qp,$type,$off,$args) = @_;
-  print STDERR "newCFilter: ", Data::Dumper->Dump([@_[1..$#_]]), "\n";
+  #print STDERR "newCFilter: ", Data::Dumper->Dump([@_[1..$#_]]), "\n"; ##-- DEBUG
   $args->[2] = $off if (!defined($args->[2]));
   return $qp->newf('CQFContextSort', $type, @$args);
 }

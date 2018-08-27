@@ -30,6 +30,9 @@ console.log([% malicious.json %]);
 </script>
 
 <p>
+Within the context of HTML a browser will interpret a &lt;/script&gt;,
+even within a string as an end of a script block.
+
 A simple way to prevent &lt;/script&gt; tags from breaking the flow of the
 json is to replace the &lt; with an escaped version of the character.  That
 preserves the string in javascript, while preventing the browser from

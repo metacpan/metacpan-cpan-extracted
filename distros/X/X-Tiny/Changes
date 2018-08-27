@@ -1,5 +1,11 @@
 Revision history for Perl module X::Tiny
 
+0.15 Fri Aug 24 2018
+- Fix LICENSE file (again).
+
+0.14 Fri Aug 24 2018
+- Fix LICENSE file.
+
 0.13 Fri Jan 18 2018
 - Fix copyright notice and spelling (no production changes)
 

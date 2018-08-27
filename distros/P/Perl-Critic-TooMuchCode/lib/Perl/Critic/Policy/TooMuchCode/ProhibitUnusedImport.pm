@@ -12,6 +12,9 @@ sub applies_to           { return 'PPI::Document' }
 
 #---------------------------------------------------------------------------
 
+# special modules, where the args of import do not mean the symbols to be imported.
+my %is_special = map { $_ => 1 } qw(Getopt::Long MooseX::Foreign MouseX::Foreign);
+
 sub violates {
     my ( $self, $elem, $doc ) = @_;
     my @violations = $self->gather_violations_generic($elem, $doc);
@@ -29,7 +32,7 @@ sub gather_violations_generic {
         my $expr_qw = $st->find( sub { $_[1]->isa('PPI::Token::QuoteLike::Words'); }) or next;
 
         my $included_module = $st->schild(1);
-        next if $included_module =~ /\A[a-z:]*\z/;
+        next if $included_module =~ /\A[a-z:]*\z/ || $is_special{$included_module};
 
         if (@$expr_qw == 1) {
             my $expr = $expr_qw->[0];

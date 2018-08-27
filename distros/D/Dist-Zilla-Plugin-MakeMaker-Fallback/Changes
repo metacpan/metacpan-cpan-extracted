@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.029     2018-08-25 05:43:12Z
+          - fix handling of options defined in [MakeMaker::Awesome]
+
 0.028     2018-08-16 03:15:58Z
           - add new skip_release_testing configuration option, for the rare
             distribution where running 'make test' alongside './Build test'

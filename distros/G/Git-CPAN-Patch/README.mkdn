@@ -4,7 +4,7 @@ Git::CPAN::Patch - Patch CPAN modules using Git
 
 # VERSION
 
-version 2.3.2
+version 2.3.4
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ version 2.3.2
 ... hack lib/Foo/Bar.pm ...
 
 % git commit -am "blah"
-% git-cpan sendpatch 
+% git-cpan send-patch
 
 # update the module
 # this automatically rebases the current branch
@@ -99,7 +99,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

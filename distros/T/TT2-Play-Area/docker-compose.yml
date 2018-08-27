@@ -1,0 +1,14 @@
+version: '2'
+services:
+    geckodriver:
+        image: quay.io/cvlibrary/geckodriver
+        logging:
+            driver: none
+    test:
+        build: .
+        environment:
+            SITE_URL: http://test:5000/
+            WEBDRIVER_HOST: geckodriver
+            WEBDRIVER_PORT: 4444
+        volumes:
+            - .:/opt/play-area

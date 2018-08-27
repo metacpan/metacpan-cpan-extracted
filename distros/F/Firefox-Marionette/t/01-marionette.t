@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 341;
+use Test::More tests => 347;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -49,26 +49,29 @@ sub start_firefox {
 		}
 		if ((defined $parameters{capabilities}) && ($parameters{capabilities}->moz_headless())) {
 			my $old = $parameters{capabilities};
-			my $new = { moz_headless => 0 };
+			my %new = ( moz_headless => 0 );
 			if (defined $old->proxy()) {
-				$new->{proxy} = $old->proxy();
+				$new{proxy} = $old->proxy();
 			}
 			if (defined $old->moz_use_non_spec_compliant_pointer_origin()) {
-				$new->{moz_use_non_spec_compliant_pointer_origin} = $old->moz_use_non_spec_compliant_pointer_origin();
+				$new{moz_use_non_spec_compliant_pointer_origin} = $old->moz_use_non_spec_compliant_pointer_origin();
 			}
 			if (defined $old->accept_insecure_certs()) {
-				$new->{accept_insecure_certs} = $old->accept_insecure_certs();
+				$new{accept_insecure_certs} = $old->accept_insecure_certs();
 			}
 			if (defined $old->page_load_strategy()) {
-				$new->{page_load_strategy} = $old->page_load_strategy();
+				$new{page_load_strategy} = $old->page_load_strategy();
 			}
 			if (defined $old->moz_webdriver_click()) {
-				$new->{moz_webdriver_click} = $old->moz_webdriver_click();
+				$new{moz_webdriver_click} = $old->moz_webdriver_click();
 			}
 			if (defined $old->moz_accessibility_checks()) {
-				$new->{moz_accessibility_checks} = $old->moz_accessibility_checks();
+				$new{moz_accessibility_checks} = $old->moz_accessibility_checks();
 			}
-			$parameters{capabilities} = Firefox::Marionette::Capabilities->new($new);
+			if (defined $old->timeouts()) {
+				$new{timeouts} = $old->timeouts();
+			}
+			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
 		}
 		diag("Overriding firefox visibility");
 	}
@@ -409,7 +412,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 23);
+		skip($skip_message, 22);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	ok($firefox->sleep_time_in_ms() == 5, "\$firefox->sleep_time_in_ms() is 5 milliseconds");
@@ -533,34 +536,36 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('https://proxy.example.org')), moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, debug => 1, page_load => 65432, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('https://proxy.example.org')), moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 5);
+		skip($skip_message, 6);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok($capabilities->proxy()->type() eq 'pac', "\$capabilities->proxy()->type() is 'pac'");
 	ok($capabilities->proxy()->pac()->host() eq 'proxy.example.org', "\$capabilities->proxy()->pac()->host() is 'proxy.example.org'");
+        ok($capabilities->timeouts()->page_load() == 65432, "\$firefox->capabilities()->timeouts()->page_load() correctly reflects the page_load shortcut timeout");
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 0, profile => $profile);
+	($skip_message, $firefox) = start_firefox(0, debug => 0, script => 5432, profile => $profile);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 240);
+		skip($skip_message, 241);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
 	ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
 	ok($firefox->window_handle() =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $firefox->window_handle());
 	ok($firefox->chrome_window_handle() =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $firefox->chrome_window_handle());
+        ok($firefox->capabilities()->timeouts()->script() == 5432, "\$firefox->capabilities()->timeouts()->script() correctly reflects the scripts shortcut timeout:" . $firefox->capabilities()->timeouts()->script());
 	ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
 	ok(scalar $firefox->chrome_window_handles() == 1, "There is one window/tab open at the moment");
 	ok(scalar $firefox->window_handles() == 1, "There is one actual window open at the moment");
@@ -1127,31 +1132,35 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, visible => 0);
+	($skip_message, $firefox) = start_firefox(0, visible => 0, implicit => 987654);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 4);
+		skip($skip_message, 5);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with visible set to 0");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok($capabilities->moz_headless() || $ENV{FIREFOX_VISIBLE} || 0, "\$capabilities->moz_headless() is set to " . ($ENV{FIREFOX_VISIBLE} ? 'false' : 'true'));
+        ok($capabilities->timeouts()->implicit() == 987654, "\$firefox->capabilities()->timeouts()->implicit() correctly reflects the implicit shortcut timeout");
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0));
+	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 9);
+		skip($skip_message, 12);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to different values");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+        ok($capabilities->timeouts()->page_load() == 78_901, "\$firefox->capabilities()->timeouts()->page_load() correctly reflects the timeouts shortcut timeout");
+        ok($capabilities->timeouts()->script() == 76_543, "\$firefox->capabilities()->timeouts()->script() correctly reflects the timeouts shortcut timeout");
+        ok($capabilities->timeouts()->implicit() == 34_567, "\$firefox->capabilities()->timeouts()->implicit() correctly reflects the timeouts shortcut timeout");
 	SKIP: {
 		if (!grep /^page_load_strategy$/, $capabilities->enumerate()) {
 			diag("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version());

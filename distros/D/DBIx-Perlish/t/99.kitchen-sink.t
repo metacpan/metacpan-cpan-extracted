@@ -1,7 +1,7 @@
 use warnings;
 use strict;
-use Test::More tests => 439;
 use DBIx::Perlish qw/:all/;
+use Test::More;
 use t::test_utils;
 
 # lone [boolean] tests
@@ -121,12 +121,12 @@ test_select_sql {
 
 # subselects
 test_select_sql {
-	tbl->id  <-  db_fetch { return t2->some_id };
+	tbl->id  <-  subselect { return t2->some_id };
 } "simple IN subselect",
 "select * from tbl t01 where t01.id in (select s01_t01.some_id from t2 s01_t01)",
 [];
 test_select_sql {
-	!tbl->id  <-  db_fetch { return t2->some_id };
+	!tbl->id  <-  subselect { return t2->some_id };
 } "simple NOT IN subselect",
 "select * from tbl t01 where t01.id not in (select s01_t01.some_id from t2 s01_t01)",
 [];
@@ -143,6 +143,12 @@ test_select_sql {
 } "Ora: tablefunc NOT IN subselect",
 "select * from tbl t01 where t01.id not in (select * from table(tablefunc(?)))",
 [42];
+test_select_sql {
+	my $p : table = tablefunc($someid);
+	return $p;
+} "ora: tableop",
+"select t01.* from table(tablefunc(?)) t01",
+[42];
 $main::flavor = "pg";
 test_select_sql {
 	tbl->id  <- tablefunc($someid);
@@ -154,17 +160,23 @@ test_select_sql {
 } "Pg: tablefunc NOT IN subselect",
 "select * from tbl t01 where t01.id not in (select tablefunc(?))",
 [42];
+test_select_sql {
+	my $p : table = tablefunc($someid);
+	return $p;
+} "Pg: tableop",
+"select t01.* from tablefunc(?) t01",
+[42];
 $main::flavor = "";
 
 test_select_sql {
 	my $t : tbl;
-	db_fetch { $t->id == t2->some_id };
+	subselect { $t->id == t2->some_id };
 } "simple EXISTS subselect",
 "select * from tbl t01 where exists (select * from t2 s01_t01 where t01.id = s01_t01.some_id)",
 [];
 test_select_sql {
 	my $t : tbl;
-	!db_fetch { $t->id == t2->some_id };
+	!subselect { $t->id == t2->some_id };
 } "simple NOT EXISTS subselect",
 "select * from tbl t01 where not exists (select * from t2 s01_t01 where t01.id = s01_t01.some_id)",
 [];
@@ -249,6 +261,24 @@ test_select_sql {
 	order_by: descending => $t->name;
 } "simple order by, descending",
 "select * from tbl t01 order by t01.name desc",
+[];
+
+# order by desc
+my $order_by = 'desc';
+my $order_col = 'name';
+test_select_sql {
+	my $t : tbl;
+	order_by: $order_by, $t->name;
+	return $t;
+} "inline order by, custom order",
+"select t01.* from tbl t01 order by t01.name desc",
+[];
+
+test_select_sql {
+	my $t : tbl;
+	order_by: $order_by, $order_col;
+} "inline order by, both custom",
+"select * from tbl t01 order by name desc",
 [];
 
 # order by several
@@ -495,9 +525,10 @@ test_select_sql {
 [];
 
 my $limit = undef;
+my $days = 86;
 test_select_sql {
 	my $e : event_log;
-	$e->time < sql("localtimestamp - interval '86 days'");
+	$e->time < sql("localtimestamp - interval '$days days'");
 	return $e->id, $e->circuit_number, time => sql("date_trunc('second', time)"), $e->type;
 	if ($limit) {
 		last unless 0..$limit;
@@ -505,6 +536,7 @@ test_select_sql {
 } "conditional real-if with limit, false",
 "select t01.id, t01.circuit_number, date_trunc('second', time) as time, t01.type from event_log t01 where t01.time < localtimestamp - interval '86 days'",
 [];
+
 $limit = 5;
 test_select_sql {
 	my $e : event_log;
@@ -657,12 +689,19 @@ test_select_sql {
 "select (? || t01.firstname || ? || t01.lastname || ?) from tab t01",
 ["foo-", " ", "-moo"];
 
-test_select_sql {
-	my $t : tab;
-	return "abc$t->{name}xyz";
-} "concat, interp, hash syntax",
-"select (? || t01.name || ?) from tab t01",
-["abc", "xyz"];
+if ( DBIx::Perlish->optree_version == 1 ) {
+	test_select_sql {
+	       my $t : tab;
+	       return "abc$t->{name}xyz";
+	} "concat, interp, hash syntax",
+	"select (? || t01.name || ?) from tab t01",
+	["abc", "xyz"];
+} else {
+	test_bad_select {
+		my $t : tab;
+		return "abc$t->{name}xyz";
+	} "concat, interp, hash syntax", qr/not supported anymore/;
+}
 
 # mysql string concatentation really is different
 $main::flavor = "mysql";
@@ -700,12 +739,20 @@ test_select_sql {
 "select (concat(?, t01.firstname, ?, t01.lastname, ?)) from tab t01",
 ["foo-", " ", "-moo"];
 
-test_select_sql {
-	my $t : tab;
-	return "abc$t->{name}xyz";
-} "mysql: concat, interp, hash syntax",
-"select (concat(?, t01.name, ?)) from tab t01",
-["abc", "xyz"];
+if ( DBIx::Perlish->optree_version == 1 ) {
+	test_select_sql {
+	       my $t : tab;
+	       return "abc$t->{name}xyz";
+	} "mysql: concat, interp, hash syntax",
+	"select (concat(?, t01.name, ?)) from tab t01",
+	["abc", "xyz"];
+} else {
+	test_bad_select {
+		my $t : tab;
+		return "abc$t->{name}xyz";
+	} "mysql: concat, interp, hash syntax", qr/not supported anymore/;
+}
+
 $main::flavor = "";
 
 # defined
@@ -1023,14 +1070,10 @@ use vars '@ISA';
 package main;
 
 my $bad_dbh = bless {}, 'something';
-eval { DBIx::Perlish::init($bad_dbh) };
-like($@||"", qr/Invalid database handle supplied/, "init with bad dbh");
 eval { DBIx::Perlish->new(dbh => $bad_dbh) };
 like($@||"", qr/Invalid database handle supplied/, "new with bad dbh");
 
 my $good_dbh = bless {}, 'good_dbh';
-eval { DBIx::Perlish::init($good_dbh) };
-is($@||"", "", "init with inherited dbh");
 eval { DBIx::Perlish->new(dbh => $good_dbh) };
 is($@||"", "", "new with inherited dbh");
 
@@ -1181,21 +1224,45 @@ test_select_sql {
 # regression, $not_a_hash->{blah}, $not_a_hash->{blah}{bluh}
 my $not_a_hash = undef;
 my %not_a_hash;
-test_select_sql {
-	return $not_a_hash->{blah};
-} "not a hash 1",
-"select null",
-[];
-test_select_sql {
-	return $not_a_hash->{blah}{bluh};
-} "not a hash 2",
-"select null",
-[];
-test_select_sql {
-	return $not_a_hash{blah}{bluh};
-} "not a hash 3",
-"select null",
-[];
+if ( DBIx::Perlish->optree_version == 1 ) {
+	test_select_sql {
+		return $not_a_hash->{blah};
+	} "not a hash 1",
+	"select null",
+	[];
+	
+	test_select_sql {
+		return $not_a_hash->{blah}{bluh};
+	} "not a hash 2",
+	"select null",
+	[];
+	test_select_sql {
+		return $not_a_hash{blah}{bluh};
+	} "not a hash 3",
+	"select null",
+	[];
+} else {
+	test_bad_select {
+		return $not_a_hash->{blah};
+	} "undefined hashref", qr/not supported/;
+	test_bad_select {
+		return $not_a_hash->{blah}{bluh};
+	} "undefined hashref 2", qr/not supported/;
+	test_bad_select {
+		return $not_a_hash{blah}{bluh};
+	} "undefined hashref 3", qr/not supported/;
+}
+
+# nonlocal padlists
+sub foo
+{
+	my $me = shift;
+	test_select_sql {
+		my $t : table = $me->{table};
+		!$t->id == 5;
+	} "nonlocal padlist", "select * from tbl t01 where not t01.id = 5", [];
+}
+foo({ table => 'tbl' });
 
 # having
 test_select_sql {
@@ -1205,3 +1272,5 @@ test_select_sql {
 } "simple having",
 "select t01.city from weather t01 group by t01.city having max(t01.temp_lo) < 40",
 [];
+
+done_testing;

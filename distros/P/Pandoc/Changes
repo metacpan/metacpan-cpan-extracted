@@ -1,5 +1,11 @@
 Revision history for Pandoc Perl module
 
+0.8.8  2018-08-24 10:42:00 CEST
+    - Update dependencies, require Perl 5.14
+ 
+0.8.7  2018-08-22 09:46:00 CEST
+    - Optionally authentificate GitHub API request with token
+
 0.8.6  2018-07-04 09:39:52 CEST
     - Change license to EUPL 1.2
 

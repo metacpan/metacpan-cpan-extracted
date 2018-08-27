@@ -21,8 +21,11 @@ like exception {Jopa::foo()}, qr/Usage:/;
 like exception {Jopa::new()}, qr/Usage:/;
 like exception {Jopa::fuz()}, qr/Usage:/;
 
-my $arrobj = bless [], 'Jopa';
-like exception {$arrobj->foo}, qr/hash-based/;
+my $foometh = Jopa->can('foo');
+
+like exception {$foometh->(bless [], 'Jopa')}, qr/hash-based/;
+like exception {$foometh->([])}, qr/hash-based/;
+like exception {$foometh->({})}, qr/glob to package/;
 
 my $scalarobj = bless \(my $z), 'Jopa';
 like exception {$scalarobj->foo}, qr/hash-based/;

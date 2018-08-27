@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::service;
-$Footprintless::App::Command::service::VERSION = '1.28';
+$Footprintless::App::Command::service::VERSION = '1.29';
 use Footprintless::App -command;
 use Footprintless::Util qw(exit_due_to);
 use Log::Any;
@@ -73,7 +73,7 @@ Footprintless::App::Command::service - Performs an action on one or more service
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 

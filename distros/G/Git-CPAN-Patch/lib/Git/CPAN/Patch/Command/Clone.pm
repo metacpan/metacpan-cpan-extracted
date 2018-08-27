@@ -1,18 +1,19 @@
 package Git::CPAN::Patch::Command::Clone;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Clone a CPAN module's history into a new git repository
-$Git::CPAN::Patch::Command::Clone::VERSION = '2.3.2';
-use 5.10.0;
+$Git::CPAN::Patch::Command::Clone::VERSION = '2.3.4';
+use 5.20.0;
 
 use strict;
 use warnings;
 
 use autodie;
 use Path::Class;
-use Method::Signatures::Simple;
 
 use MooseX::App::Command;
 extends 'Git::CPAN::Patch::Command::Import';
+
+use experimental 'signatures';
 
 parameter target => (
     is       => 'rw',
@@ -27,7 +28,7 @@ has _seen_imports => (
 );
 
 
-before [ qw/import_release clone_git_repo /] => method($release) {
+before [ qw/import_release clone_git_repo /] => sub($self,$release,@) {
     return if $self->_seen_imports;
     $self->_set_seen_imports(1);
 
@@ -40,7 +41,7 @@ before [ qw/import_release clone_git_repo /] => method($release) {
     $self->set_root($target);
 };
 
-after [ qw/ clone_git_repo import_release /] => method {
+after [ qw/ clone_git_repo import_release /] => sub($self,@) {
     $self->git_run( 'reset', '--hard', $self->last_commit );
 };
 
@@ -60,7 +61,7 @@ Git::CPAN::Patch::Command::Clone - Clone a CPAN module's history into a new git 
 
 =head1 VERSION
 
-version 2.3.2
+version 2.3.4
 
 =head1 SYNOPSIS
 
@@ -101,7 +102,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

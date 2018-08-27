@@ -1,0 +1,34 @@
+Source: libdist-zilla-pluginbundle-qbit-perl
+Section: perl
+Priority: optional
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8),
+ libfile-pushd-perl,
+ libgit-wrapper-perl,
+ libdist-zilla-perl,
+ libdist-zilla-plugin-git-perl,
+ libdist-zilla-plugin-changelogfromgit-perl,
+ libdist-zilla-plugin-changelogfromgit-debian-sequential-perl,
+ libdist-zilla-plugin-copymeta-perl,
+ libdist-zilla-plugin-perlhubupload-perl,
+ libnamespace-autoclean-perl,
+ libmoose-perl
+Build-Depends-Indep: perl
+Standards-Version: 3.9.4
+Homepage: http://search.cpan.org/dist/Dist-Zilla-PluginBundle-QBit/
+
+Package: libdist-zilla-pluginbundle-qbit-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libgit-wrapper-perl,
+ libdist-zilla-perl,
+ libdist-zilla-plugin-git-perl,
+ libdist-zilla-plugin-changelogfromgit-perl,
+ libdist-zilla-plugin-changelogfromgit-debian-sequential-perl,
+ libdist-zilla-plugin-copymeta-perl,
+ libdist-zilla-plugin-perlhubupload-perl,
+ libnamespace-autoclean-perl,
+ libmoose-perl
+Description: Dist::Zilla bundle for build and release QBit Framework packages
+ It does not generate debian/* files, you must create them by yourself in
+ advance.

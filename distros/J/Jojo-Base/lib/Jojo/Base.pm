@@ -1,6 +1,6 @@
 
 package Jojo::Base;
-$Jojo::Base::VERSION = '0.6.0';
+$Jojo::Base::VERSION = '0.7.0';
 # ABSTRACT: Mojo::Base + lexical "has"
 use 5.018;
 use strict;
@@ -19,7 +19,7 @@ use Mojo::Util ();
 use Sub::Inject 0.2.0 ();
 
 use constant ROLES =>
-  !!(eval { require Jojo::Role; Jojo::Role->VERSION('0.4.0'); 1 });
+  !!(eval { require Jojo::Role; Jojo::Role->VERSION('0.5.0'); 1 });
 
 use constant SIGNATURES => ($] >= 5.020);
 
@@ -40,8 +40,8 @@ sub import {
 
   # Role
   elsif ($flag eq '-role') {
-    Carp::croak 'Jojo::Role 0.4.0+ is required for roles' unless ROLES;
-    Jojo::Role->_become_role($caller);
+    Carp::croak 'Jojo::Role 0.5.0+ is required for roles' unless ROLES;
+    Jojo::Role->make_role($caller);
   }
 
   # Module
@@ -76,7 +76,7 @@ sub import {
 sub role_provider {'Jojo::Role'}
 
 sub with_roles {
-  Carp::croak 'Jojo::Role 0.4.0+ is required for roles' unless ROLES;
+  Carp::croak 'Jojo::Role 0.5.0+ is required for roles' unless ROLES;
   my ($self, @roles) = @_;
 
   return Jojo::Role->create_class_with_roles($self, @roles)
@@ -94,7 +94,7 @@ BEGIN {
       return sub { Mojo::Base::attr($target, @_) }
     },
     with => sub {    # dummy
-      return sub { Carp::croak 'Jojo::Role 0.4.0+ is required for roles' }
+      return sub { Carp::croak 'Jojo::Role 0.5.0+ is required for roles' }
     },
   );
 
@@ -156,7 +156,7 @@ sub _generate_subs {
 #pod   use Jojo::Base -role;
 #pod
 #pod All four forms save a lot of typing. Note that role support depends on
-#pod L<Jojo::Role> (0.4.0+).
+#pod L<Jojo::Role> (0.5.0+).
 #pod
 #pod   # use Jojo::Base -strict;
 #pod   use strict;
@@ -262,7 +262,7 @@ sub _generate_subs {
 #pod Composes the current package with one or more L<Jojo::Role> roles.
 #pod For roles following the naming scheme C<MyClass::Role::RoleName> you
 #pod can use the shorthand C<+RoleName>. Note that role support depends on
-#pod L<Jojo::Role> (0.4.0+).
+#pod L<Jojo::Role> (0.5.0+).
 #pod
 #pod It works with L<Jojo::Role> or L<Role::Tiny> roles.
 #pod
@@ -281,7 +281,7 @@ sub _generate_subs {
 #pod returns the new class, or if called on an object reblesses the object into the
 #pod new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
 #pod can use the shorthand C<+RoleName>. Note that role support depends on
-#pod L<Jojo::Role> (0.4.0+).
+#pod L<Jojo::Role> (0.5.0+).
 #pod
 #pod   # Create a new class with the role "SubClass::Role::Foo" and instantiate it
 #pod   my $new_class = SubClass->with_roles('+Foo');
@@ -329,7 +329,7 @@ Jojo::Base - Mojo::Base + lexical "has"
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 
@@ -372,7 +372,7 @@ to be effortless and powerful.
   use Jojo::Base -role;
 
 All four forms save a lot of typing. Note that role support depends on
-L<Jojo::Role> (0.4.0+).
+L<Jojo::Role> (0.5.0+).
 
   # use Jojo::Base -strict;
   use strict;
@@ -478,7 +478,7 @@ Create attributes for hash-based objects, just like the L<Mojo::Base/"attr"> met
 Composes the current package with one or more L<Jojo::Role> roles.
 For roles following the naming scheme C<MyClass::Role::RoleName> you
 can use the shorthand C<+RoleName>. Note that role support depends on
-L<Jojo::Role> (0.4.0+).
+L<Jojo::Role> (0.5.0+).
 
 It works with L<Jojo::Role> or L<Role::Tiny> roles.
 
@@ -497,7 +497,7 @@ Create a new class with one or more roles. If called on a class
 returns the new class, or if called on an object reblesses the object into the
 new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
 can use the shorthand C<+RoleName>. Note that role support depends on
-L<Jojo::Role> (0.4.0+).
+L<Jojo::Role> (0.5.0+).
 
   # Create a new class with the role "SubClass::Role::Foo" and instantiate it
   my $new_class = SubClass->with_roles('+Foo');

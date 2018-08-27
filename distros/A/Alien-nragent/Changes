@@ -1,0 +1,7 @@
+Revision history for Alien-nragent
+
+0.02      2018-08-23 11:39:47 -0400
+  - Refuse to install on platforms other than x86_64-linux
+
+0.01      2018-08-22 05:28:02 -0400
+  - initial version

@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Upload;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Query the CPAN uploads data
 
 #pod =head1 SYNOPSIS
@@ -79,7 +79,7 @@ CPAN::Testers::Schema::ResultSet::Upload - Query the CPAN uploads data
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -123,19 +123,9 @@ ISO8601 date.
 L<CPAN::Testers::Schema::Result::Upload>, L<DBIx::Class::ResultSet>,
 L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

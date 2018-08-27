@@ -1,5 +1,35 @@
 Changelog for ETL-Yertl
 
+0.039     2018-08-22 13:09:41-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed output from commands not having all the documents. We now
+      autoflush the output filehandles, which is a bit slower but more
+      stable.
+
+    - Fixed trying to load partial YAML documents. Our detection of when
+      we got a complete document into the buffer was wrong. Now we loop
+      over the lines individually to look for the document marker
+      (`---`) and only consider the end of the buffer when we've reached
+      the end of the file.
+
+    - Fixed ysql trying to read the config in the default format. The
+      default format can be changed by setting the `YERTL_FORMAT`
+      environment variable, but the config is always in YAML.
+
+    - Removed last references to ETL::Yertl::Format::default. We are now
+      using ETL::Yertl::Format->get_default, which is less magical.
+
+0.038     2018-08-22 00:11:50-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed many Yertl commands running out of memory when parsing
+      large-ish files.
+    - Fixed long delay before producing documents when reading large
+      files.
+
 0.037     2017-10-27 17:27:41-05:00 America/Chicago
 
     [Fixed]

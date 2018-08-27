@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Stats;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -21,6 +21,7 @@ our $VERSION = '0.022';
 
 use CPAN::Testers::Schema::Base 'ResultSet';
 use Log::Any '$LOG';
+use Carp ();
 
 #pod =method since
 #pod
@@ -34,6 +35,31 @@ sub since( $self, $date ) {
     my $fulldate = $date =~ s/[-:T]//gr;
     $fulldate = substr $fulldate, 0, 12; # 12 digits makes YYYYMMDDHHNN
     return $self->search( { fulldate => { '>=', $fulldate } } );
+}
+
+#pod =method perl_maturity
+#pod
+#pod     $rs = $rs->perl_maturity( 'stable' ) # or 'dev'
+#pod
+#pod Restrict the resultset to reports submitted for either C<stable> or
+#pod C<dev> Perl versions.
+#pod
+#pod =cut
+
+sub perl_maturity( $self, $maturity ) {
+    my $devel = $maturity eq 'stable' ? 0 : $maturity eq 'dev' ? 1
+        : Carp::croak "Unknown maturity: $maturity; Must be one of: 'stable', 'dev'";
+    if ( !$devel ) {
+        # Patch versions are not stable either
+        return $self->search(
+            { 'perl_version.devel' => 0, 'perl_version.patch' => 0 },
+            { join => 'perl_version' },
+        );
+    }
+    return $self->search(
+        { -or => { 'perl_version.devel' => 1, 'perl_version.patch' => 1 } },
+        { join => 'perl_version' },
+    );
 }
 
 #pod =method insert_test_report
@@ -110,7 +136,7 @@ CPAN::Testers::Schema::ResultSet::Stats - Query the raw test reports
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -128,6 +154,13 @@ This object helps to insert and query the legacy test reports (cpanstats).
     my $rs = $rs->since( $iso_dt );
 
 Restrict the resultset to reports submitted since the given date/time (in ISO8601 format).
+
+=head2 perl_maturity
+
+    $rs = $rs->perl_maturity( 'stable' ) # or 'dev'
+
+Restrict the resultset to reports submitted for either C<stable> or
+C<dev> Perl versions.
 
 =head2 insert_test_report
 
@@ -147,19 +180,9 @@ information.
 L<CPAN::Testers::Schema::Result::Stats>, L<DBIx::Class::ResultSet>,
 L<CPAN::Testers::Schema>
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Oriol Soriano <oriolsoriano@gmail.com>
-
-=item *
-
-Doug Bell <preaction@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

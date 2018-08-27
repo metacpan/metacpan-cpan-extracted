@@ -16,14 +16,14 @@ use strict;
 our @ISA = qw(DDC::PP::Object);
 
 __PACKAGE__->defprop($_)
-  foreach (qw(ContextSentencesCount EnableBibliography DebugRank SeparateHits Filters Subcorpora)); #Within
+  foreach (qw(ContextSentencesCount EnableBibliography DebugRank SeparateHits Filters Subcorpora Comments)); #Within
 sub getWithin { return $_[0]{Within}; }
 sub setWithin { return $_[0]{Within} = UNIVERSAL::isa($_[1],'ARRAY') ? $_[1] : [$_[1]]; }
 __PACKAGE__->defalias('ContextCount'=>'ContextSentencesCount',0,1);
 
 sub new {
   my ($that,%opts) = @_;
-  return $that->SUPER::new(EnableBibliography=>1,Filters=>[],Subcorpora=>[],Within=>[],%opts);
+  return $that->SUPER::new(EnableBibliography=>1,Filters=>[],Subcorpora=>[],Within=>[],Comments=>[],%opts);
 }
 
 sub swap {
@@ -35,7 +35,7 @@ sub swap {
 }
 
 sub Clear {
-  @{$_[0]{Filters}} = @{$_[0]{Subcorpora}} = qw();
+  @{$_[0]{Filters}} = @{$_[0]{Subcorpora}} = @{$_[0]{Comments}} = qw();
 }
 
 __PACKAGE__->nomethod('CanFilterByFile');
@@ -52,6 +52,7 @@ sub toString {
 	  .(!$qo->{EnableBibliography} ? " #FILENAMES" : '')
 	  .($qo->{DebugRank} ? " #DEBUG_RANK" : '')
 	  .join('', map { " ".$_->toString } @{$qo->{Filters}||[]})
+	  .join('', map {" #CMT ".$qo->sqString($_)} @{$qo->{Comments}||[]})
 	  .($qo->{Subcorpora} && @{$qo->{Subcorpora}} ? (" :".join(',', map {$qo->sqString($_)} @{$qo->{Subcorpora}})) : '')
 	 );
 }
@@ -71,6 +72,7 @@ sub jsonData {
 	  ($qo->{DebugRank} ? (DebugRank=>$qo->{DebugRank}) : qw()),
 	  (Filters=>[map {($_->toHash(json=>1))} @{$qo->{Filters}||[]}]),
 	  ($qo->{Subcorpora} && @{$qo->{Subcorpora}} ? (Subcorpora=>$qo->{Subcorpora}) : qw()),
+	  ($qo->{Comments} && @{$qo->{Comments}} ? (Comments=>$qo->{Comments}) : qw()),
 	 );
 }
 
@@ -106,7 +108,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Bryan Jurish
+Copyright (C) 2016-2018 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

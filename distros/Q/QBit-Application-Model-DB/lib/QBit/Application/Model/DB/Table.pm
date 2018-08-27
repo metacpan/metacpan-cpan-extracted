@@ -10,7 +10,7 @@ Base class for DB tables.
 =cut
 
 package QBit::Application::Model::DB::Table;
-$QBit::Application::Model::DB::Table::VERSION = '0.027';
+$QBit::Application::Model::DB::Table::VERSION = '0.029';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -422,6 +422,32 @@ sub truncate {
     $self->db->_do('TRUNCATE TABLE ' . $self->quote_identifier($self->name));
 }
 
+=head2 create
+
+Create table in DB.
+
+B<Arguments:>
+
+=over
+
+=item *
+
+B<%opts> - options with keys, same as for method create_sql
+
+=back
+
+B<Example:>
+
+  $app->db->users->create();
+
+=cut
+
+sub create {
+    my ($self, %opts) = @_;
+
+    $self->db->_do($self->create_sql(%opts));
+}
+
 =head2 drop
 
 B<Arguments:>
@@ -437,8 +463,6 @@ B<%opts> - options with keys
 =item *
 
 B<if_exists> - added 'IF EXISTS'
-
-=item *
 
 =back
 
@@ -456,6 +480,47 @@ sub drop {
     my ($self, %opts) = @_;
 
     $self->db->_do('DROP TABLE ' . ($opts{'if_exists'} ? 'IF EXISTS ' : '') . $self->quote_identifier($self->name));
+}
+
+=head2 swap
+
+B<Arguments:>
+
+=over
+
+=item *
+
+B<$name_or_table> - table name or object
+
+=back
+
+B<Example:>
+
+  $app->db->users->swap('clients');
+
+  # RENAME TABLE `users` TO `users_<pid>_<time>`, `clients` TO `users`, `users_<pid>_<time>` TO `clients`;
+
+  $app->db->users->swap($app->db->clients); # same
+
+=cut
+
+sub swap {
+    my ($self, $name_or_table) = @_;
+
+    my $table_name_to_swap = blessed($name_or_table)
+      && $name_or_table->isa('QBit::Application::Model::DB::Table') ? $name_or_table->name : $name_or_table;
+
+    my $tmp_table_name = sprintf('%s_%d_%d', $self->name, $$, time);
+
+    $self->db->_do('RENAME TABLE '
+          . $self->quote_identifier($self->name) . ' TO '
+          . $self->quote_identifier($tmp_table_name)
+          . ",\n    "
+          . $self->quote_identifier($table_name_to_swap) . ' TO '
+          . $self->quote_identifier($self->name)
+          . ",\n    "
+          . $self->quote_identifier($tmp_table_name) . ' TO '
+          . $self->quote_identifier($table_name_to_swap));
 }
 
 =head2 default_fields

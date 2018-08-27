@@ -2,27 +2,102 @@ NAME
     B::Keywords - Lists of reserved barewords and symbol names
 
 SYNOPSIS
-      use B::Keywords;
-      print join "\n", @B::Keywords::Symbols,
-                       @B::Keywords::Barewords;
+      use B::Keywords qw( @Symbols @Barewords );
+      print join "\n", @Symbols,
+                       @Barewords;
 
 DESCRIPTION
-    B::Keywords supplies seven arrays of keywords: @Scalars, @Arrays,
-    @Hashes, @Filehandles, @Symbols, @Functions and @Barewords. The @Symbols
-    array includes the contents of each of @Scalars, @Arrays, @Hashes and
-    @Filehandles. Similarly, @Barewords adds a few non-function keywords
-    (like __DATA__, NULL) to the @Functions array.
+    "B::Keywords" supplies several arrays of exportable keywords: @Scalars,
+    @Arrays, @Hashes, @Filehandles, @Symbols, @Functions, @Barewords,
+    @TieIOMethods, @UNIVERSALMethods and @ExporterSymbols.
+
+    The @Symbols array includes the contents of each of @Scalars, @Arrays,
+    @Hashes, @Functions and @Filehandles.
+
+    Similarly, @Barewords adds a few non-function keywords and operators to
+    the @Functions array.
 
     All additions and modifications are welcome.
 
-SEE ALSO
-    keywords.pl from the perl source, perlvar, perlfunc, perldelta.
+    The perl parser uses a static list of keywords from regen/keywords.pl
+    which constitutes the strict list of keywords @Functions and @Barewords,
+    though some @Functions are not functions in the strict sense. Several
+    library functions use more special symbols, handles and methods.
 
-AUTHOR
-    Joshua ben Jore <jjore@cpan.org>
+DATA
+    @Scalars
+    @Arrays
+    @Hashes
+    @Filehandles
+    @Functions
+        The above are lists of variables, special file handles, and built in
+        functions.
+
+    @Symbols
+        This is just the combination of all of the above: variables, file
+        handles, and functions.
+
+    @Barewords
+        This is a list of other special keywords in perl including operators
+        and all the control structures.
+
+    @TieIOMethods
+        Those are special tie or PerlIO methods called by the perl core,
+        namely for tieing or PerlIO::via (or both of those) or threads.
+
+    @UNIVERSALMethods
+        Methods defined by the core package UNIVERSAL.
+
+    @ExporterSymbols
+        Variables or functions used by Exporter (some internal), which is
+        almost as good as being keywords, for you mustn't use them for any
+        other purpose in any package that isa Exporter, which is quite
+        common.
+
+EXPORT
+    Anything can be exported if you desire. Use the :all tag to get
+    everything.
+
+SEE ALSO
+    regen/keywords.pl from the perl source, perlvar, perlfunc, perldelta.
+
+BUGS
+    Please report any bugs or feature requests to "bug-B-Keywords at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=B-Keywords>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc B::Keywords
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=B-Keywords>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/B-Keywords>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/B-Keywords>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/B-Keywords>
+
+ACKNOWLEDGEMENTS
+    Michael G Schwern, Reini Urban, Florian Ragwitz and Zsbán Ambrus for
+    patches and releases.
 
 COPYRIGHT AND LICENSE
-    Copyright 2007, Joshua ben Jore. All rights reserved.
+    Copyright 2009 Joshua ben Jore, All rights reserved. Copyright 2013,
+    2015, 2017, 2018 Reini Urban, All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either:
@@ -31,4 +106,13 @@ COPYRIGHT AND LICENSE
     Foundation; version 2, or
 
     b) the "Artistic License" which comes with Perl.
+
+SOURCE AVAILABILITY
+    This source is in Github: <git://github.com/rurban/b-keywords.git>
+
+AUTHOR
+    Joshua ben Jore <jjore@cpan.org>
+
+MAINTAINER
+    Reini Urban <rurban@cpan.org>
 

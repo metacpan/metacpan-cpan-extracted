@@ -1,5 +1,3 @@
-#!perl -w
-
 use strict;
 use Test qw(plan ok);
 
