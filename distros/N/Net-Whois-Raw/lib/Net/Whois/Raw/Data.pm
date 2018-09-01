@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99016';
+$Net::Whois::Raw::Data::VERSION = '2.99018';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -404,6 +404,7 @@ our %servers = qw(
     KIM             whois.afilias.net
     LGBT            whois.afilias.net
     LOTTO           whois.afilias.net
+    LLC             whois.afilias.net
     ORGANIC         whois.afilias.net
     PET             whois.afilias.net
     PINK            whois.afilias.net
@@ -420,6 +421,9 @@ our %servers = qw(
     ARMY            whois.nic.army
     ATTORNEY        whois.nic.attorney
     AUCTION         whois.nic.auction
+    BABY            whois.nic.baby
+    BOSTON          whois.nic.boston
+    BUZZ            whois.nic.buzz
     CONSULTING      whois.nic.consulting
     DANCE           whois.nic.dance
     DEGREE          whois.nic.degree
@@ -427,9 +431,12 @@ our %servers = qw(
     DENTIST         whois.nic.dentist
     ENGINEER        whois.nic.engineer
     FORSALE         whois.nic.forsale
+    FUN             whois.nic.fun
     FUTBOL          whois.nic.futbol
     GIVES           whois.nic.gives
     HAUS            whois.nic.haus
+    HEALTH          whois.nic.health
+    HOSPITAL        whois.nic.hospital
     IMMOBILIEN      whois.nic.immobilien
     KAUFEN          whois.nic.kaufen
     LAWYER          whois.nic.lawyer
@@ -437,15 +444,21 @@ our %servers = qw(
     MODA            whois.nic.moda
     MORTGAGE        whois.nic.mortgage
     NAVY            whois.nic.navy
+    NAGOYA          whois.nic.nagoya
     NINJA           whois.nic.ninja
+    NYC             whois.nic.nyc
     PUB             whois.nic.pub
+    QPON            whois.nic.qpon
     REHAB           whois.nic.rehab
     REPUBLICAN      whois.nic.republican
     REVIEWS         whois.nic.reviews
     ROCKS           whois.nic.rocks
     SOCIAL          whois.nic.social
     SOFTWARE        whois.nic.software
+    STREAM          whois.nic.stream
+    TOKYO           whois.nic.tokyo
     VET             whois.nic.vet
+    YOKOHAMA        whois.nic.yokohama
 
     BAND            whois.rightside.co
     FAMILY          whois.rightside.co
@@ -796,6 +809,7 @@ our %servers = qw(
     ORG.UK      whois.nic.uk
     PLC.UK      whois.nic.uk
 
+    AFRICA      africa-whois.registry.net.za
     CAPETOWN    capetown-whois.registry.net.za
     CO.ZA       whois.registry.net.za
     DURBAN      durban-whois.registry.net.za
@@ -886,6 +900,8 @@ our %servers = qw(
     ORG.NS      whois.pir.org
     BIZ.NS      whois.biz
     NAME.NS     whois.nic.name
+    COM.TR      whois.nic.tr
+    COM.HN      whois.nic.hn
     VIP         whois.nic.vip
     PROMO       whois.nic.promo
 
@@ -2022,8 +2038,9 @@ our %notfound = (
     'whois.arin.net'        => '^No match found',
     'whois.ripe.net'        => 'No entries found',
 
-    'whois.ripn.net'        => 'No entries found',
-    'whois.registry.ripn.net' => 'No entries found',
+    'whois.ripn.net'          => '(?:No entries found|The queried object does not exist)',
+    'whois.registry.ripn.net' => '(?:No entries found|The queried object does not exist)',
+    'whois.nic.net.ru'      => 'No entries found for the selected source',
     'whois.nic.ru'          => 'No entries found',
     'whois.nnov.ru'         => 'No entries found',
     'whois.int.ru'          => 'No entries found',
@@ -2059,12 +2076,12 @@ our %notfound = (
     'jobswhois.verisign-grs.com' => '^No match for',
     'tvwhois.verisign-grs.com'   => '^No match for',
     'whois.registrypro.pro'      => '^NOT FOUND',
-    'whois.worldsite.ws'         => 'No match for',
-    'whois.nic.travel'           => 'No Domain exists',
+    'whois.worldsite.ws'         => 'The queried object does not exist: ',
+    'whois.nic.travel'           => '^No Data Found',
     'whois.donuts.co'            => 'Domain not found',
     'whois.nic.menu'             => 'No Data Found',
     'whois.uniregistry.net'      => 'object does not exist',
-    'whois.nic.uno'              => 'Not found:',
+    'whois.nic.uno'              => '^No Data Found',
     'whois.nic.berlin'           => '^The queried object does not exis',
     'whois.nic.kiwi'             => 'Status\: Not Registered',
     'whois.nic.build'            => 'No Data Found',
@@ -2082,15 +2099,15 @@ our %notfound = (
     'whois.amnic.net'         => 'No match',
     'whois.aunic.net'         => 'No Data Found',
     'whois.dns.be'            => 'Status:\s+AVAILABLE',
-    'whois.register.bg'       => '^Domain name \S+ does not exist',
+    'whois.register.bg'       => '(?:^Domain name \S+ does not exist|registration status\: available)',
     'whois.registro.br'       => 'No match for',
     'whois.registry.hm'       => 'Domain not found',
     'whois.nic.ht'            => 'No Object Found',
     'whois.cira.ca'           => '^Domain status\:\s+available',
-    'whois.nic.cd'            => 'Domain Not Found',
+    'whois.nic.cd'            => 'Domain Status: No Object Found',
     'whois.nic.ch'            => '^We do not have an entry in our database matching your',
     'whois.nic.ci'            => 'No Object Found',
-    'whois.nic.cl'            => '\: no existe',
+    'whois.nic.cl'            => '\: no entries found',
     'whois.nic.cx'            => 'No Object Found',
     'whois.nic.cz'            => 'no entries found',
     'whois.denic.de'          => 'Status\: free',
@@ -2175,7 +2192,7 @@ our %notfound = (
     'whois.nic.wf'            => 'No entries found',
     'whois.nic.yt'            => 'No entries found',
     'whois.nic.pw'            => 'DOMAIN NOT FOUND',
-    'whois.nic.vip'           => 'The queried object does not exist: This object could not be found',
+    'whois.nic.vip'           => 'This domain name has not been registered\.',
 
     'whois.nsiregistry.net'     => 'No match for',
 
@@ -2192,7 +2209,7 @@ our %notfound = (
     'whois2.afilias-grs.net'    => '^NOT FOUND',
     'whois.aitdomains.com'      => '^No match for',
     'whois.alldomains.com'      => '^No match for',
-    'whois.centralnic.com'      => 'DOMAIN NOT FOUND',
+    'whois.centralnic.com'      => '(?:DOMAIN NOT FOUND|Status:\s+free)',
     'whois.communigal.net'      => '^NOT FOUND',
     'whois.desertdevil.com'     => 'No match for domain',
     'whois.directi.com'         => 'No Match for',
@@ -2251,6 +2268,7 @@ our %notfound = (
     'net-whois.registry.net.za'   => '^Available',
     'org-whois.registry.net.za'   => '^Available',
     'www-whois.registry.net.za'   => '^Available',
+    'web-whois.registry.net.za'   => '^Available',
 
     'whois.i-dns.net'                      => '^NOMATCH',
     'whois.dns.hr'                         => 'No entries found',
@@ -2259,7 +2277,7 @@ our %notfound = (
     'whois.nic.priv.at'                    => 'No entries found for the selected source',
     'whois.nic.ac'                         => 'NOT FOUND',
     'whois.audns.net.au'                   => '^No Data Found',
-    'whois.nic.best'                       => '^No Data Found',
+    'whois.nic.best'                       => 'The queried object does not exist: DOMAIN NOT FOUND',
     'whois.nic.bj'                         => 'No Object Found',
     'whois.nic.broker'                     => 'No match for',
     'whois.nic.career'                     => 'No match for',
@@ -2270,7 +2288,7 @@ our %notfound = (
     'whois.nic.film'                       => 'No Data Found',
     'whois.nic.forex'                      => 'No match for',
     'whois.nic.men'                        => 'No Data Found',
-    'whois.nic.ooo'                        => 'No match for',
+    'whois.nic.ooo'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
     'whois.nic.priv.at'                    => 'No entries found for the selected source',
     'whois.nic.pro'                        => 'NOT FOUND',
     'whois.nic.so'                         => 'Not found',
@@ -2351,6 +2369,7 @@ our %notfound = (
     'whois.nic.canon'                      => 'The queried object does not exist: DOMAIN NOT FOUND',
     'durban-whois.registry.net.za'         => 'Available',
     'joburg-whois.registry.net.za'         => 'Available',
+    'africa-whois.registry.net.za'         => 'Available',
     'kero.yachay.pe'                       => 'Domain Status: No Object Found',
     'whois-corsica.nic.fr'                 => 'The queried object does not exist: Domain name',
     'whois-fe.movistar.tango.knipp.de'     => 'The queried object does not exist: no matching objects found',
@@ -2370,7 +2389,7 @@ our %notfound = (
     'whois-total.nic.fr'                   => 'The queried object does not exist: Domain name',
     'whois.agitsys.net'                    => 'Domain Status: No Object Found',
     'whois.ati.tn'                         => 'NO OBJECT FOUND!',
-    'whois.co.ug'                          => 'No entries found for the selected source',
+    'whois.co.ug'                          => '^No entries found',
     'whois.dominio.gq'                     => 'Invalid query or domain name not known in Dominio GQ Domain Registry',
     'whois.dot.cf'                         => 'Invalid query or domain name not known in Dot CF Domain Registry',
     'whois.dot.ml'                         => 'Invalid query or domain name not known in Point ML Domain Registry',
@@ -2402,7 +2421,7 @@ our %notfound = (
     'whois.nic.comsec'                     => 'No match for "',
     'whois.nic.cooking'                    => 'This domain name has not been registered\.',
     'whois.nic.cookingchannel'             => 'No match for "',
-    'whois.nic.country',                   => 'object does not exist',
+    'whois.nic.country',                   => 'Domain \S+ is available for registration',
     'whois.nic.cr'                         => 'no entries found',
     'whois.nic.cricket'                    => '^No Data Found',
     'whois.nic.csc'                        => 'No match for "',
@@ -2429,12 +2448,12 @@ our %notfound = (
     'whois.nic.firmdale'                   => 'Domain Not Found',
     'whois.nic.fishing'                    => 'This domain name has not been registered\.',
     'whois.nic.foodnetwork'                => 'No match for "',
-    'whois.nic.frl'                        => 'Status: AVAILABLE \(No match for domain "',
+    'whois.nic.frl'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
     'whois.nic.frontdoor'                  => 'No match for "',
     'whois.nic.fujixerox'                  => 'No match for "',
     'whois.nic.gallo'                      => 'No match for "',
     'whois.nic.gdn'                        => 'Domain Not Found',
-    'whois.nic.gent'                       => 'Status: AVAILABLE \(No match for domain "',
+    'whois.nic.gent'                       => 'The queried object does not exist: DOMAIN NOT FOUND',
     'whois.nic.genting'                    => 'No match for "',
     'whois.nic.george'                     => 'No match for "',
     'whois.nic.ggee'                       => 'The queried object does not exist: DOMAIN NOT FOUND',
@@ -2453,10 +2472,52 @@ our %notfound = (
     'whois.nic.hyundai'                    => 'The queried object does not exist: DOMAIN NOT FOUND',
     'whois.nic.ibm'                        => 'No Data Found',
     'whois.nic.ice'                        => 'No match for "',
-    'whois.nic.icu'                        => 'No Data Found',
+    'whois.nic.icu'                        => '(?:^registration status\: invalid|The queried object does not exist: DOMAIN NOT FOUND)',
     'whois.nic.ifm'                        => 'The queried object does not exist: no matching objects found',
     'whois.nic.insurance'                  => 'No match for "',
-    'whois.nic.irish'                      =>  '^Domain not found',
+    'whois.nic.irish'                      => '^Domain not found',
+    'whois.nic.airforce'                   => '^Domain not found',
+    'whois.nic.market'                     => '^Domain not found',
+    'whois.nic.forsale'                    => '^Domain not found',
+    'whois.nic.degree'                     => '^Domain not found',
+    'whois.nic.gives'                      => '^Domain not found',
+    'whois.nic.rehab'                      => '^Domain not found',
+    'whois.nic.dentist'                    => '^Domain not found',
+    'whois.nic.software'                   => '^Domain not found',
+    'whois.nic.auction'                    => '^Domain not found',
+    'whois.nic.engineer'                   => '^Domain not found',
+    'whois.nic.vet'                        => '^Domain not found',
+    'whois.nic.attorney'                   => '^Domain not found',
+    'whois.nic.lawyer'                     => '^Domain not found',
+    'whois.nic.haus'                       => '^Domain not found',
+    'whois.nic.rocks'                      => '^Domain not found',
+    'whois.nic.consulting'                 => '^Domain not found',
+    'whois.nic.kaufen'                     => '^Domain not found',
+    'whois.nic.actor'                      => '^Domain not found',
+    'whois.nic.moda'                       => '^Domain not found',
+    'whois.nic.pub'                        => '^Domain not found',
+    'whois.nic.social'                     => '^Domain not found',
+    'whois.nic.futbol'                     => '^Domain not found',
+    'whois.nic.reviews'                    => '^Domain not found',
+    'whois.nic.ninja'                      => '^Domain not found',
+    'whois.nic.immobilien'                 => '^Domain not found',
+    'whois.nic.democrat'                   => '^Domain not found',
+    'whois.nic.dance'                      => '^Domain not found',
+    'whois.nic.hospital'                   => '^Domain not found',
+    'whois.nic.buzz'                       => '^No Data Found',
+    'whois.nic.nyc'                        => '^No Data Found',
+    'whois.nic.qpon'                       => '^No Data Found',
+    'whois.nic.stream'                     => '^No Data Found',
+    'whois.nic.baby'                       => '^No Data Found',
+    'whois.nic.health'                     => '^No Data Found',
+    'whois.nic.tokyo'                      => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.nagoya'                     => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.yokohama'                   => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.fun'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.boston'                     => 'This domain name has not been registered\.',
+    'whois.nic.tr'                         => 'No match found for',
+    'whois.nic.wien'                       => '^Available',
+    'whois.nic.hn'                         => 'Domain Status: No Object Found',
     'whois.nic.iselect'                    => 'No Data Found',
     'whois.nic.jaguar'                     => 'No match for "',
     'whois.nic.java'                       => 'No match for "',
@@ -4280,7 +4341,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99016
+version 2.99018
 
 =head1 AUTHOR
 

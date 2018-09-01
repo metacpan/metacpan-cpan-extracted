@@ -16,14 +16,15 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES   => {
-        'Test::More' => 0,
+        'Test::More'      => 0,
+        'Test::Exception' => 0.43,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Text-MostFreqKDistance-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Text::MostFreqKDistance' => { file => 'lib/Text/MostFreqKDistance.pm', version => '0.08' },
+            'Text::MostFreqKDistance' => { file => 'lib/Text/MostFreqKDistance.pm', version => '0.09' },
         },
         resources => {
             repository => {

@@ -34,7 +34,7 @@ $| = 1;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(close_fh);
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 our $NO_README = 0;
 
 our (%FILENO, %SIG_OLD, $IPC_COUNT, $IPC_DIR_DEDICATED,
@@ -1343,7 +1343,7 @@ sub _END_background_cleanup1 {
     # rename process, if supported by the OS, to note that we are cleaning up
     # not everyone will like this "feature"
     local $0 = "Forks::Super:cleanup:$0";
-    sleep 3;
+    CORE::sleep 3;
 
     # removing all the files we created during IPC
     # doesn't always go smoothly. We'll give a
@@ -1383,7 +1383,7 @@ sub _END_background_cleanup2 {
     my $z = rmdir($_IPC_DIR) || 0;
     if (!$z) {
 	unlink glob("$_IPC_DIR/*");
-	sleep 5;
+	CORE::sleep 5;
 	$z = rmdir($_IPC_DIR) || 0;
     }
 
@@ -1394,7 +1394,7 @@ sub _END_background_cleanup2 {
 	# Observed these files on Linux running from NSF mounted filesystem
 	# .nfsXXX files are usually temporary (~30s) but hard to kill
 	for my $i (1..10) {
-	    sleep 5;
+	    CORE::sleep 5;
 	    last unless glob("$_IPC_DIR/.nfs*");
 	}
 	$z = rmdir($_IPC_DIR) || 0;
@@ -1434,11 +1434,11 @@ sub END_cleanup {
     my $zz = rmdir($_IPC_DIR) || 0;
     return if $zz;
 
-    sleep 2;
+    CORE::sleep 2;
     exit 0 if CORE::fork();
 
     # long sleep here for maximum portability.
-    sleep 10;
+    CORE::sleep 10;
     _END_background_cleanup2();
     return;
 }
@@ -1472,7 +1472,7 @@ sub END_cleanup_MSWin32 {
 	    }
 	}
     } continue {
-	sleep 1;
+	CORE::sleep 1;
 	@G = grep { -e $_ } keys %IPC_FILES;
     }
 
@@ -3399,7 +3399,7 @@ Forks::Super::Job::Ipc - interprocess communication routines for Forks::Super
 
 =head1 VERSION
 
-0.94
+0.95
 
 =head1 DESCRIPTION
 

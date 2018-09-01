@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,32 +22,32 @@ no_index:
 provides:
   Math::Prime::Util:
     file: lib/Math/Prime/Util.pm
-    version: '0.70'
+    version: '0.71'
   Math::Prime::Util::ChaCha:
     file: lib/Math/Prime/Util/ChaCha.pm
-    version: '0.70'
+    version: '0.71'
   Math::Prime::Util::Entropy:
     file: lib/Math/Prime/Util/Entropy.pm
-    version: '0.70'
+    version: '0.71'
   Math::Prime::Util::MemFree:
     file: lib/Math/Prime/Util/MemFree.pm
-    version: '0.70'
+    version: '0.71'
   Math::Prime::Util::PP:
     file: lib/Math/Prime/Util/PP.pm
-    version: '0.70'
+    version: '0.71'
   Math::Prime::Util::PrimeArray:
     file: lib/Math/Prime/Util/PrimeArray.pm
-    version: '0.70'
+    version: '0.71'
   Math::Prime::Util::PrimeIterator:
     file: lib/Math/Prime/Util/PrimeIterator.pm
-    version: '0.70'
+    version: '0.71'
   ntheory:
     file: lib/ntheory.pm
-    version: '0.70'
+    version: '0.71'
 recommends:
   Digest::SHA: '5.87'
   Math::BigInt::GMP: '0'
-  Math::Prime::Util::GMP: '0.5'
+  Math::Prime::Util::GMP: '0.51'
 requires:
   Carp: '0'
   Config: '0'
@@ -64,5 +64,5 @@ resources:
   homepage: https://github.com/danaj/Math-Prime-Util
   license: http://dev.perl.org/licenses/
   repository: https://github.com/danaj/Math-Prime-Util
-version: '0.70'
+version: '0.71'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

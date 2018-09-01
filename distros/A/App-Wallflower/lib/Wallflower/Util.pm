@@ -1,5 +1,5 @@
 package Wallflower::Util;
-$Wallflower::Util::VERSION = '1.009';
+$Wallflower::Util::VERSION = '1.011';
 use strict;
 use warnings;
 
@@ -24,7 +24,8 @@ sub links_from {
     my $le = $linkextor{ HTTP::Headers->new( @{ $response->[1] } )
             ->content_type };
     return if !$le;
-    return $le->( $response->[2], $url );
+    return grep !$_->scheme || $_->scheme =~ /^http/,
+      $le->( $response->[2], $url );
 }
 
 # HTML
@@ -70,7 +71,7 @@ Wallflower::Util - Utility functions for Wallflower
 
 =head1 VERSION
 
-version 1.009
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -95,7 +96,8 @@ produced by L<Wallflower>'s C<get()> method.
 
     my @links = links_from( $response, $url );
 
-Returns all links found in the response body, depending on its content type.
+Returns all local, HTTP and HTTPS links found in the response body,
+depending on its content type.
 
 C<$response> is the array reference returned by L<Wallflower>'s C<get()>
 method. C<$url> is the base URL for resolving relative links, i.e. the

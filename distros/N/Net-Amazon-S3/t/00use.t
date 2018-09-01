@@ -1,12 +1,16 @@
 #!perl
-use warnings;
+
 use strict;
 
-use lib 'lib';
+use Test::More;
+use Test::Warnings;
+use Test::LoadAllModules;
 
-use Test::More tests => 4;
+plan tests => 1+1;
 
-use_ok( 'Net::Amazon::S3' );
-use_ok( 'Net::Amazon::S3::Client' );
-use_ok( 'Net::Amazon::S3::Client::Bucket' );
-use_ok( 'Net::Amazon::S3::Client::Object' );
+subtest 'use_ok' => sub {
+    all_uses_ok(
+        search_path => 'Net::Amazon::S3',
+        except => [qw/ /],
+    )
+};

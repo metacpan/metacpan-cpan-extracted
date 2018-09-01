@@ -4,6 +4,54 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// spvm_portable.h
+struct SPVM_portable;
+typedef struct SPVM_portable SPVM_PORTABLE;
+
+// spvm_runtime_info_case_info.h
+struct SPVM_runtime_info_case_info;
+typedef struct SPVM_runtime_info_case_info SPVM_RUNTIME_INFO_CASE_INFO;
+
+// spvm_runtime_info_switch_info.h
+struct SPVM_runtime_info_switch_info;
+typedef struct SPVM_runtime_info_switch_info SPVM_RUNTIME_INFO_SWITCH_INFO;
+
+// spvm_runtime_info_constant.h
+struct SPVM_runtime_info_constant;
+typedef struct SPVM_runtime_info_constant SPVM_RUNTIME_INFO_CONSTANT;
+
+// spvm_runtime_info_type.h
+struct SPVM_runtime_info_type;
+typedef struct SPVM_runtime_info_type SPVM_RUNTIME_INFO_TYPE;
+
+// spvm_runtime_builder.h
+struct SPVM_runtime_builder;
+typedef struct SPVM_runtime_builder SPVM_RUNTIME_BUILDER;
+
+// spvm_runtime_my.h
+struct SPVM_runtime_my;
+typedef struct SPVM_runtime_my SPVM_RUNTIME_MY;
+
+// spvm_runtime_package.h
+struct SPVM_runtime_package;
+typedef struct SPVM_runtime_package SPVM_RUNTIME_PACKAGE;
+
+// spvm_runtime_sub.h
+struct SPVM_runtime_sub;
+typedef struct SPVM_runtime_sub SPVM_RUNTIME_SUB;
+
+// spvm_runtime_package_var.h
+struct SPVM_runtime_package_var;
+typedef struct SPVM_runtime_package_var SPVM_RUNTIME_PACKAGE_VAR;
+
+// spvm_runtime_field.h
+struct SPVM_runtime_field;
+typedef struct SPVM_runtime_field SPVM_RUNTIME_FIELD;
+
+// spvm_runtime_basic_type.h
+struct SPVM_runtime_basic_type;
+typedef struct SPVM_runtime_basic_type SPVM_RUNTIME_BASIC_TYPE;
+
 // spvm_array_field_access.h
 struct SPVM_array_field_access;
 typedef struct SPVM_array_field_access SPVM_ARRAY_FIELD_ACCESS;

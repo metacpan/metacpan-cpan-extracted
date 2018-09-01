@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 {
     # Includes RT-Send-To in the list of headers used to grab
@@ -60,8 +60,11 @@ my $orig_note = RT::Ticket->can('_RecordNote');
 
     # lazily initialize the MIMEObj if needed; copied from original method
     unless ( $args{'MIMEObj'} ) {
+        my $data = ref $args{'Content'}? $args{'Content'} : [ $args{'Content'} ];
         $args{'MIMEObj'} = MIME::Entity->build(
-            Data => ( ref $args{'Content'}? $args{'Content'}: [ $args{'Content'} ] )
+            Type    => "text/plain",
+            Charset => "UTF-8",
+            Data    => [ map {Encode::encode("UTF-8", $_)} @{$data} ],
         );
     }
 

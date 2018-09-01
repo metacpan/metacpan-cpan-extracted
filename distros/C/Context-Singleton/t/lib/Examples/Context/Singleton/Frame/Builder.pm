@@ -102,8 +102,8 @@ example expect_build => as {
 
         object => $params{object} // shared->object,
         with_deduced => $params{with_deduced},
-        (expect => $params{expect}) x not exists $params{throws},
-        (throws => $params{throws}) x exists $params{throws},
+        (expect => $params{expect}) x!  exists $params{throws},
+        (throws => $params{throws}) x!! exists $params{throws},
     );
 };
 

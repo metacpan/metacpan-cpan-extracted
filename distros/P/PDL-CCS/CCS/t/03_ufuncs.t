@@ -58,9 +58,23 @@ sub test_ufunc {
     $ccs_mask->indexND( scalar($ccs_rc->whichND) ) .= 1;
     $dense_rc->where( $ccs_mask->not ) .= $ccs_rc->missing;
   }
+  my $label = "${ufunc_name}:missing=$missing_val";
 
-  skipok("${ufunc_name}:missing=$missing_val:type", ($HAVE_PDL_2_014 ? 0 : "PDL >= v2.014 only"), $ccs_rc->type, $dense_rc->type);
-  pdlok("${ufunc_name}:missing=$missing_val:vals", $ccs_rc->decode, $dense_rc);
+  ##-- check output type
+ SKIP: {
+    skip("${label}:type - only for PDL >= v2.014",1) if (!$HAVE_PDL_2_014);
+    isok("${label}:type", $ccs_rc->type, $dense_rc->type);
+  }
+
+  ##-- check output values
+ SKIP: {
+    ##-- RT bug #126294 (ses also analogous tests in CCS/Ufunc/t/01_ufunc.t)
+    skip("RT #126294 - PDL::borover() appears to be broken", 1)
+      if ($label eq 'borover:missing=BAD' && pdl([10,0,-2])->setvaltobad(0)->borover->sclr != -2);
+
+    pdlok("${label}:vals", $ccs_rc->decode, $dense_rc);
+  }
+
 }
 
 

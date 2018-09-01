@@ -16,7 +16,7 @@ BEGIN {
     *{ 'Acme::IRSRegexp' . "::" } = \*{ __PACKAGE__ . "::" };
 }
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub TIEHANDLE {
     my ($pkg, @opts) = @_;
@@ -430,7 +430,7 @@ Acme::InputRecordSeparatorIsRegexp - awk doesn't have to be better at something.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -456,7 +456,7 @@ Version 0.04
 =head1 DESCRIPTION
 
 In the section about the L<"input record separator"|perlvar/"$/">,
-C<perlvar> famously notes
+C<perlvar> famously quips
 
 =over 4
 
@@ -488,7 +488,7 @@ builtin C<readline> function and operator, include the record
 separator at the end of the line, so the lines returned may end
 in C<\r\n>, C<\r>, or C<\n>.
 
-Other use cases are files that contain multiple types of records
+Another use case is files that contain multiple types of records
 where a different sequence of characters is used to denote the
 end of different types of records.
 
@@ -640,17 +640,6 @@ C<Acme::InputRecordSeparatorIsRegexp>, allowing you to write
     use Acme::InputRecordSeparatorIsRegexp;
     tie *$fh, 'Acme::IRSRegexp', 
 
-=head1 LIMITATIONS
-
-=over 4
-
-=item not suitable for streamed input handles, where it is not
-practical for this module to read ahead on the input stream
-
-=item readline is slooooow on Perl v5.8 or earlier
-
-=back
-
 =head1 AUTHOR
 
 Marty O'Brien, C<< <mob at cpan.org> >>
@@ -666,7 +655,10 @@ already been tied to this package.
 
 Calling L<< C<chomp>|"chomp"/perlfunc >> on a return value from this
 package will operate with C<$/>, B<not> with the regular expression
-associated with the tied file handle.
+associated with the tied file handle. Use the construction
+C<< tied(*$fh)->chomp(...) >> to perform the chomp operation on
+a filehandle that has customized its input record separator with
+this package.
 
 Please report any bugs or feature requests to 
 C<bug-tie-handle-regexpirs at rt.cpan.org>, or through

@@ -3,9 +3,10 @@ package Test::NoWarnings;
 use 5.006;
 use strict;
 use warnings;
-use Carp                      ();
-use Exporter                  ();
-use Test::Builder             ();
+
+use Carp ();
+use Exporter ();
+use Test::Builder ();
 use Test::NoWarnings::Warning ();
 
 use vars qw( $VERSION @EXPORT_OK @ISA $do_end_test );
@@ -20,8 +21,8 @@ BEGIN {
   $do_end_test = 0;
 }
 
-my $TEST     = Test::Builder->new;
-my $PID      = $$;
+my $TEST = Test::Builder->new;
+my $PID = $$;
 my @WARNINGS = ();
 
 $SIG{__WARN__} = make_catcher(\@WARNINGS);
@@ -41,7 +42,7 @@ END {
 sub make_warning {
   local $SIG{__WARN__};
 
-  my $msg     = shift;
+  my $msg = shift;
   my $warning = Test::NoWarnings::Warning->new;
 
   $warning->setMessage($msg);

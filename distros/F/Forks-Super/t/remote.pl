@@ -15,11 +15,13 @@ use warnings;
 
 use Forks::Super::SysInfo;
 
-Forks::Super::POSTFORK_CHILD {
-    # RT#117025 for Test::SSH workaround. Otherwise, the server
-    # closes at the end of each child process.
-    *Test::SSH::Backend::OpenSSH::_run_dir = sub { };
-};
+if ($INC{"Test/SSH.pm"}) {
+    Forks::Super::POSTFORK_CHILD {
+        # RT#117025 for Test::SSH workaround. Otherwise, the server
+        # closes at the end of each child process.
+        *Test::SSH::Backend::OpenSSH::_run_dir = sub { };
+    };
+}
 
 if ($ENV{CRIPPLE_TEST_SSH}) {
     $Forks::Super::Config::CONFIG{"Test::SSH"} = 0;

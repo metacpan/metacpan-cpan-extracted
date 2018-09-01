@@ -8,7 +8,7 @@
       "Max Maischein <corion@cpan.org>",
       "Laurent Dami <dami@cpan.org>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",
-      "Dimitar D. Mitov <ddmitov@yahoo.com>"
+      "Dimitar D. Mitov <ddmitov@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/ddmitov/DBD-SQLeet"
       }
    },
-   "version" : "1.58",
+   "version" : "0.24.3",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

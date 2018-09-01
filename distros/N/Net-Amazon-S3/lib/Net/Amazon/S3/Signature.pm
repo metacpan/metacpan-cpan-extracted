@@ -1,9 +1,9 @@
-
+#ABSTRACT: S3 Signature implementation base class
 use strict;
 use warnings;
 
 package Net::Amazon::S3::Signature;
-$Net::Amazon::S3::Signature::VERSION = '0.84';
+$Net::Amazon::S3::Signature::VERSION = '0.85';
 use Moose;
 
 has http_request => (
@@ -33,15 +33,15 @@ __END__
 
 =head1 NAME
 
-Net::Amazon::S3::Signature
+Net::Amazon::S3::Signature - S3 Signature implementation base class
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 NAME
 
-Net::Amazon::S3::Signature - S3 Signature implementation base class
+Net::Amazon::S3::Signature
 
 =head1 METHODS
 

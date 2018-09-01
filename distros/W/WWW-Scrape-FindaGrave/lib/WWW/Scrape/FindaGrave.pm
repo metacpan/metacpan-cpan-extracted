@@ -2,10 +2,18 @@ package WWW::Scrape::FindaGrave;
 
 use warnings;
 use strict;
-use WWW::Mechanize::GZip;
 use LWP::UserAgent;
 use HTML::SimpleLinkExtor;
 use LWP::Protocol::https;
+use Carp;
+
+# TODO: new interface
+#
+# Request:
+# https://www.findagrave.com/memorial/search?firstname=Edmund&middlename=Frank&lastname=Horne&birthyear=&birthyearfilter=&deathyear=&deathyearfilter=&location=&locationId=&memorialid=&datefilter=&orderby=
+#
+# Results
+# <a class="memorial-item" href="/memorial/92467529/edmund-frank-horne" id="sr-92467529" data-scroll-offset="1">
 
 =head1 NAME
 
@@ -13,11 +21,11 @@ WWW::Scrape::FindaGrave - Scrape the Find a Grave website
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -49,8 +57,9 @@ It takes two mandatory arguments firstname and lastname.
 
 Also one of either date_of_birth and date_of_death must be given
 
-There are three optional arguments: middlename, ua and mech.  Mech is a pointer
-to an object such as L<WWW::Mechanize>.  If not given it will be created.
+There are three optional arguments: middlename, ua and host.
+
+host is the domain of the site to search, the default is www.findagrave.com.
 
 ua is a pointer to an object that understands get and env_proxy messages, such
 as L<LWP::UserAgent::Throttled>.
@@ -62,95 +71,92 @@ sub new {
 
 	return unless(defined($class));
 
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args;
+	if(ref($_[0]) eq 'HASH') {
+		%args = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak("Usage: __PACKAGE__->new(%args)");
+	} elsif(@_ % 2 == 0) {
+		%args = @_;
+	}
+
 
 	die "First name is not optional" unless($args{'firstname'});
 	die "Last name is not optional" unless($args{'lastname'});
 	die "You must give one of the date of birth or death"
 		unless($args{'date_of_death'} || $args{'date_of_birth'});
 
+	my $ua = delete $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	$ua->env_proxy(1);
+
+	# if(!defined($param{'host'})) {
+		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
+	# }
+
 	my $rc = {
-		mech => $args{'mech'} || WWW::Mechanize::GZip->new(noproxy => 0),
+		ua => $ua,
 		date_of_birth => $args{'date_of_birth'},
 		date_of_death => $args{'date_of_death'},
 		country => $args{'country'},
 		firstname => $args{'firstname'},
 		middlename => $args{'middlename'},
 		lastname => $args{'lastname'},
+		matches => 0,
+		index => 0,
 	};
-	$rc->{'host'} = $args{'host'} || 'old.findagrave.com';
+	$rc->{'host'} = $args{'host'} || 'www.findagrave.com';
 
-	my $page = 'https://' . $rc->{'host'} . '/cgi-bin/fg.cgi';
-	my $resp = $rc->{'mech'}->get($page);
-	unless($resp->is_success()) {
-		die $resp->status_line;
+	my %query_parameters;
+	if($args{'firstname'}) {
+		$query_parameters{'firstname'} = $args{'firstname'};
 	}
-
-	my %fields = (
-		GSfn => $rc->{'firstname'},
-		GSln => $rc->{'lastname'},
-		GSiman => 0,
-		GSpartial => 0,
-	);
-
-	if($rc->{date_of_death}) {
-		$fields{GSdy} = $rc->{date_of_death};
-		$fields{GSdyrel} = 'in';
-	} elsif($rc->{'date_of_birth'}) {
-		$fields{GSby} = $rc->{date_of_birth};
-		$fields{GSbyrel} = 'in';
+	if($args{'middlename'}) {
+		$query_parameters{'middlename'} = $args{'middlename'};
 	}
-
-	if($rc->{'middlename'}) {
-		$fields{GSmn} = $rc->{'middlename'};
+	if($args{'lastname'}) {
+		$query_parameters{'lastname'} = $args{'lastname'};
 	}
-
-	# Don't enable this.  If we know the date of birth but findagrave
-	# doesn't, findagrave will miss the match. Of course, the downside
-	# of not doing this is that you will get false positives.  It's really
-	# a problem with findagrave.
-	# if($date_of_birth) {
-		# $fields{GSby} = $date_of_birth;
-		# $fields{GSbyrel} = 'in';
-	# }
-
-	if($rc->{'country'}) {
-		if($rc->{'country'} eq 'United States') {
-			$fields{GScntry} = 'The United States';
+	if($args{'date_of_birth'}) {
+		$query_parameters{'birthyear'} = $args{'date_of_birth'};
+	}
+	if($args{'date_of_death'}) {
+		$query_parameters{'deathyear'} = $args{'date_of_death'};
+	}
+	if($args{'country'}) {
+		if($args{'country'} eq 'United States') {
+			$query_parameters{'location'} = 'United States of America';
+			$query_parameters{'locationId'} = 'country_4';
+		} elsif($args{'country'} eq 'England') {
+			$query_parameters{'location'} = 'England';
+			$query_parameters{'locationId'} = 'country_5';
 		} else {
-			$fields{GScntry} = $rc->{'country'};
+			$query_parameters{'location'} = $args{'country'};
 		}
 	}
+	my $uri = URI->new("https://$rc->{host}/memorial/search");
+	$uri->query_form(%query_parameters);
+	my $url = $uri->as_string();
 
-	$resp = $rc->{'mech'}->submit_form(
-		form_number => 1,
-		fields => \%fields,
-	);
-	unless($resp->is_success) {
-		die $resp->status_line;
+	my $resp = $ua->get($url);
+
+	if($resp->is_error()) {
+		Carp::carp("API returned error: on $url ", $resp->status_line());
+		return { };
 	}
-	if($resp->content =~ /Sorry, there are no records in the Find A Grave database matching your query\./) {
-		$rc->{'matches'} = 0;
-		return bless $rc, $class;
+
+	unless($resp->is_success()) {
+		die $resp->status_line();
 	}
-	if($resp->content =~ /<B>(\d+)<\/B>\s+total matches/mi) {
+
+	$rc->{'resp'} = $resp;
+	if($resp->content() =~ /\s(\d+)\smatching record found for/mi) {
 		$rc->{'matches'} = $1;
 		return bless $rc, $class if($rc->{'matches'} == 0);
+		$rc->{'page'} = 1;
+		$rc->{'query_parameters'} = \%query_parameters;
+	} else {
+		$rc->{'matches'} = 0;
 	}
-
-	# Shows 40 per page
-	$rc->{'base'} = $resp->base();
-	$rc->{'ua'} = $args{'ua'} || LWP::UserAgent->new(
-			keep_alive => 1,
-			agent => __PACKAGE__,
-			from => 'foo@example.com',
-			timeout => 10,
-		);
-
-	$rc->{'ua'}->env_proxy(1);
-	$rc->{'index'} = 0;
-	$rc->{'resp'} = $resp;
-
 	return bless $rc, $class;
 }
 
@@ -164,7 +170,7 @@ sub get_next_entry
 {
 	my $self = shift;
 
-	return if(!defined($self->{'matches'} == 0));
+	return if(!defined($self->{'matches'}));
 	return if($self->{'matches'} == 0);
 
 	my $rc = pop @{$self->{'results'}};
@@ -174,31 +180,19 @@ sub get_next_entry
 
 	my $firstname = $self->{'firstname'};
 	my $lastname = $self->{'lastname'};
-	my $date_of_death = $self->{'date_of_death'};
-	my $date_of_birth = $self->{'date_of_birth'};
+	# my $date_of_death = $self->{'date_of_death'};	# FIXME: check results against this
+	# my $date_of_birth = $self->{'date_of_birth'};	# FIXME: check results against this
 
 	my $base = $self->{'resp'}->base();
 	my $e = HTML::SimpleLinkExtor->new($base);
-	$e->remove_tags('img', 'script');
-	$e->parse($self->{'resp'}->content);
 
-	foreach my $link ($e->links) {
+	$e->remove_tags('img', 'script');
+	$e->parse($self->{'resp'}->content());	# FIXME: having to parse every time
+
+	foreach my $link ($e->links()) {
 		my $match = 0;
-		my $host = $self->{'host'};
-		if($date_of_death) {
-			if($link =~ /\Q$host\E\/cgi-bin\/fg.cgi\?.*&GSln=\Q$lastname\E.*&GSfn=\Q$firstname\E.*&GSdy=\Q$date_of_death\E.*&GRid=\d+/i) {
-				$match = 1;
-			}
-		} elsif(defined($date_of_birth)) {
-			if($link =~ /\Q$host\E\/cgi-bin\/fg.cgi\?.*&GSln=\Q$lastname\E.*&GSfn=\Q$firstname\E.*&GSby=\Q$date_of_birth\E.*&GRid=\d+/i) {
-				$match = 1;
-			}
-		}
-		if($match && $self->{'country'}) {
-			my $country = $self->{'country'};
-			if($self->{'resp'}->content !~ /\Q$country\E/i) {
-				$match = 0;
-			}
+		if($link =~ /\/memorial\/\d+\/\Q$firstname\E.+\Q$lastname\E/i) {
+			$match = 1;
 		}
 		if($match) {
 			push @{$self->{'results'}}, $link;
@@ -206,8 +200,24 @@ sub get_next_entry
 	}
 	$self->{'index'}++;
 	if($self->{'index'} <= $self->{'matches'}) {
-		my $index = $self->{'index'};
-		$self->{'resp'} = $self->{'ua'}->get("$base&sr=$index");
+		$self->{'page'}++;
+		$self->{'query_parameters'}->{'page'} = $self->{'page'};
+
+		my $uri = URI->new("https://$self->{host}/memorial/search");
+		$uri->query_form(%{$self->{'query_parameters'}});
+		my $url = $uri->as_string();
+
+		my $resp = $self->{'ua'}->get($url);
+		$self->{'resp'} = $resp;
+
+		if($resp->is_error()) {
+			Carp::carp("API returned error: on $url ", $resp->status_line());
+			return { };
+		}
+
+		unless($resp->is_success()) {
+			die $resp->status_line();
+		}
 	}
 
 	return pop @{$self->{'results'}};
@@ -227,15 +237,14 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-L<https://github.com/nigelhorne/gedgrave>
-L<https://old.findagrave.com>
+L<https://github.com/nigelhorne/gedcom>
+L<https://www.findagrave.com>
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc WWW::Scrape::FindaGrave
-
 
 You can also look for information at:
 
@@ -255,16 +264,15 @@ L<http://cpanratings.perl.org/d/WWW-Scrape-FindaGrave>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/WWW-Scrape-FindaGrave/>
+L<https://metacpan.org/release/WWW-Scrape-FindaGrave>
 
 =back
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Nigel Horne.
+Copyright 2016-2018 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

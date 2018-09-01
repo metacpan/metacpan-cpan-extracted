@@ -7,7 +7,7 @@ use File::Spec;
 use File::Basename ();
 
 # ABSTRACT: A prove plugin that works with File::ShareDir::Dist
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub load
@@ -34,7 +34,7 @@ App::Prove::Plugin::ShareDirDist - A prove plugin that works with File::ShareDir
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ Yanick Champoux (yanick)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017,2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

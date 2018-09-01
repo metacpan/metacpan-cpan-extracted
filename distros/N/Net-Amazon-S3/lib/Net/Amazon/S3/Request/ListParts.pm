@@ -1,34 +1,24 @@
 package Net::Amazon::S3::Request::ListParts;
-$Net::Amazon::S3::Request::ListParts::VERSION = '0.84';
+$Net::Amazon::S3::Request::ListParts::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
 # ABSTRACT: List the parts in a multipart upload.
 
-with 'Net::Amazon::S3::Role::Bucket';
+with 'Net::Amazon::S3::Request::Role::Query::Param::Upload_id';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::GET';
 
-has 'key'               => ( is => 'ro', isa => 'Str',             required => 1 );
-has 'upload_id'         => ( is => 'ro', isa => 'Str',             required => 1 );
-has 'acl_short'         => ( is => 'ro', isa => 'Maybe[AclShort]', required => 0 );
 has 'headers' =>
     ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
 
 __PACKAGE__->meta->make_immutable;
 
-sub http_request {
-    my $self    = shift;
-    my $headers = $self->headers;
+sub _request_headers {
+    my ($self) = @_;
 
-    if ( $self->acl_short ) {
-        $headers->{'x-amz-acl'} = $self->acl_short;
-    }
-
-    return $self->_build_http_request(
-        method  => 'GET',
-        path    => $self->_uri( $self->key ).'?uploadId='.$self->upload_id,
-        headers => $self->headers,
-    );
+    return %{ $self->headers };
 }
 
 1;
@@ -45,7 +35,7 @@ Net::Amazon::S3::Request::ListParts - List the parts in a multipart upload.
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 AUTHOR
 

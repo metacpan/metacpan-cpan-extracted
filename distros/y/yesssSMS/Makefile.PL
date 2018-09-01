@@ -5,8 +5,12 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'yesssSMS',
     VERSION_FROM      => 'lib/yesssSMS.pm', # finds $VERSION
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+    	'HTML::Parser' => '3.71',
+	'LWP::UserAgent' => '6.08',
+	'HTTP::Cookies' => '6.01',
+    }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/yesssSMS.pm', # retrieve abstract from module
-       AUTHOR         => 'Armin Fuerst <armin@>') : ()),
+       AUTHOR         => 'Armin Fuerst <armin@fuerst.priv.at>') : ()),
 );

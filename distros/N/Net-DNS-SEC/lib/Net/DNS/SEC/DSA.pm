@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1677 2018-05-22 11:59:10Z willem $
+# $Id: DSA.pm 1701 2018-07-28 07:36:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1701 $)[1];
 
 
 =head1 NAME
@@ -45,6 +45,11 @@ use strict;
 use integer;
 use warnings;
 use MIME::Base64;
+
+use constant DSA_OK => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA');
+
+BEGIN { die unless DSA_OK }					# not needed on voyage
+
 
 my %parameters = (
 	3 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],

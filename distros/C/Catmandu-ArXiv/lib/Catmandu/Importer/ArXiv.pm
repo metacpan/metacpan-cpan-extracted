@@ -1,25 +1,25 @@
 package Catmandu::Importer::ArXiv;
 
-our $VERSION = '0.200';
+our $VERSION = '0.211';
 
 use Catmandu::Sane;
 use Catmandu::Importer::XML;
 use Catmandu::Fix::Condition::is_valid_orcid as => 'is_valid_orcid';
 use Moo;
 use Furl;
+use URI;
 
 with 'Catmandu::Importer';
 
 # INFO:
-# http://arxiv.org/help/api/index/
+# https://arxiv.org/help/api/index/
 
-use constant BASE_URL => 'http://export.arxiv.org/api/query?';
-
-has base => ( is => 'ro', default => sub { return BASE_URL; } );
+has base_api => ( is => 'ro', default => sub { return "https://export.arxiv.org/api/query"; } );
+has base_frontend => (is => 'ro', default => sub { return "https://arxiv.org"; } );
 has query => ( is => 'ro' );
 has id    => ( is => 'ro' ); # can be a comma seperated list
-has start => ( is => 'ro' );
-has limit => ( is => 'ro' );
+has start => ( is => 'ro', default => sub { return 0; } );
+has limit => ( is => 'ro' , default => sub { return 20; });
 
 sub BUILD {
     my $self = shift;
@@ -45,14 +45,19 @@ sub _call {
 
     my $url;
     if ($self->query && is_valid_orcid({orcid => $self->query}, 'orcid')) {
-        $url = "https://arxiv.org/a/" . $self->query . ".atom2";
+        my $u1 = URI->new($self->base_frontend);
+        $u1->path("a/" . $self->query . ".atom2");
+        $url =  $u1->as_string;
     }
     else {
-        $url = $self->base;
-        $url .= 'search_query=' . $self->query if $self->query;
-        $url .= '&id_list=' . $self->id        if $self->id;
-        $url .= '&start=' . $self->start       if $self->start;
-        $url .= '&max_results=' . $self->limit if $self->limit;
+        my $u2 = URI->new($self->base_api);
+        $u2->query_form(
+            search_query => $self->query // '',
+            id_list => $self->id // '',
+            start => $self->start,
+            max_results => $self->limit,
+        );
+        $url = $u2->as_string;
     }
 
     my $res = $self->_request($url);
@@ -89,7 +94,7 @@ sub generator {
 
 =head1 NAME
 
-  Catmandu::Importer::ArXiv - Package that imports data from http://arxiv.org/.
+  Catmandu::Importer::ArXiv - Package that imports data from https://arxiv.org/.
 
 =head1 SYNOPSIS
 
@@ -110,13 +115,22 @@ sub generator {
 
 =over
 
+=item base_api
+
+The API endpoint. Default is https://export.arxiv.org/api/query
+
+=item base_frontend
+
+The arXiv base url. Default is https://arxiv.org
+
 =item query
 
 Search by query.
 
 =item id
 
-Search by one or many arXiv ids. This parameter accepts a comma-separated list of ids. This parameter accepts also an ORCID ID.
+Search by one or many arXiv ids. This parameter accepts a comma-separated list of ids.
+This parameter accepts also an ORCID iD.
 
 =item start
 

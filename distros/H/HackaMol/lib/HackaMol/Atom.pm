@@ -1,5 +1,5 @@
 package HackaMol::Atom;
-$HackaMol::Atom::VERSION = '0.047';
+$HackaMol::Atom::VERSION = '0.048';
 #ABSTRACT: HackaMol Atom Class
 use 5.008;
 use Moose;
@@ -190,7 +190,7 @@ HackaMol::Atom - HackaMol Atom Class
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 

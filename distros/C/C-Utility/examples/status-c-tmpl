@@ -1,0 +1,10 @@
+#linein
+/* My great file. */
+typedef enum {
+#lineout
+[%- FOR status IN statuses %]
+[% status %],
+[%- END %]
+#linein
+}
+status_t;

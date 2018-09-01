@@ -24,10 +24,11 @@ no_index:
     - t
     - inc
 requires:
+  JSON::PP: '0'
   Text::Trim: '0'
   XSLoader: '0'
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/JavaScript-Duktape-XS
-version: '0.000070'
+version: '0.000071'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

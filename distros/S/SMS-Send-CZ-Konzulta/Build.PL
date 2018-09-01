@@ -14,12 +14,12 @@ my %module_build_args = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "SMS::Send driver for Konzulta - Czech Republic ",
+  "dist_abstract" => "SMS::Send driver for Konzulta - Czech Republic",
   "dist_author" => [
     "Radek \x{160}iman <rbit\@rbit.cz>"
   ],
   "dist_name" => "SMS-Send-CZ-Konzulta",
-  "dist_version" => "1.000",
+  "dist_version" => "1.001",
   "license" => "perl",
   "module_name" => "SMS::Send::CZ::Konzulta",
   "recursive_test_files" => 1,
@@ -29,6 +29,7 @@ my %module_build_args = (
     "LWP::UserAgent" => 0,
     "Log::LogLite" => 0,
     "SMS::Send::Driver" => 0,
+    "Text::Unidecode" => 0,
     "XML::Simple" => 0,
     "base" => 0,
     "strict" => 0,

@@ -324,7 +324,7 @@ examples illustrate these type of frequencies:
   1:0*12:2:0:0:0       the 12th Tuesday of each year
 
 NOTE: The day of week refers to the numeric value of each day as
-specified by ISO 8601. In other words, day 1 is ALWAY Monday, day 7 is
+specified by ISO 8601. In other words, day 1 is ALWAYS Monday, day 7 is
 ALWAYS Sunday, etc., regardless of what day of the week the week is
 defined to begin on (using the FirstDay config variable). So when the
 day field refers to the day of week, it's value (or values if a range

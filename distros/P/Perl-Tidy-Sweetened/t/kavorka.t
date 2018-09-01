@@ -170,4 +170,10 @@ sub name2 : Attrib(Arg) {      # comment
 }
 TIDIED
 
+run_test( <<'RAW', <<'TIDIED', 'but begin', '',  );
+method foo () but begin { 'bar' }
+RAW
+method foo () but begin { 'bar' }
+TIDIED
+
 done_testing;

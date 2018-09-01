@@ -1007,20 +1007,10 @@ int is_semiprime(UV n) {
   }
   /* 9.8% of random inputs left */
   if (is_def_prime(n)) return 0;
-  if (p > n3) return 1;
+  if (p > n3) return 1; /* past this, n is a composite and larger than p^3 */
   /* 4-8% of random inputs left */
-  /* n is a composite and larger than p^3 */
-  if (   pbrent_factor(n, factors, 90000, 1) == 2
-         /* The only things we normally see by now are 16+ digit semiprimes */
-      || pminus1_factor(n, factors, 4000, 4000) == 2
-         /* 0.09% of random 64-bit inputs left */
-      || pbrent_factor(n, factors, 180000, 7) == 2 )
-    return (is_def_prime(factors[0]) && is_def_prime(factors[1]));
-  /* 0.002% of random 64-bit inputs left */
-  {
-    UV facs[MPU_MAX_FACTORS+1];
-    return (factor(n,facs) == 2);
-  }
+  if (factor_one(n, factors, 0, 0) != 2) return 0;
+  return (is_def_prime(factors[0]) && is_def_prime(factors[1]));
 }
 
 int is_fundamental(UV n, int neg) {
@@ -1085,10 +1075,14 @@ UV pillai_v(UV n) {
 
 int moebius(UV n) {
   UV factors[MPU_MAX_FACTORS+1];
-  UV i, nfactors;
+  int i, nfactors;
 
-  if (n <= 1) return (int)n;
-  if ( n >= 49 && (!(n% 4) || !(n% 9) || !(n%25) || !(n%49)) )
+  if (n <= 5) return (n == 1) ? 1 : (n % 4) ? -1 : 0;
+  if (n >=  49 && (!(n %   4) || !(n %   9) || !(n %  25) || !(n %  49)))
+    return 0;
+  if (n >= 361 && (!(n % 121) || !(n % 169) || !(n % 289) || !(n % 361)))
+    return 0;
+  if (n >= 961 && (!(n % 529) || !(n % 841) || !(n % 961)))
     return 0;
 
   nfactors = factor(n, factors);
@@ -1119,6 +1113,21 @@ UV znorder(UV a, UV n) {
   phi = carmichael_lambda(n);
   nfactors = factor_exp(phi, fac, exp);
   k = phi;
+#if USE_MONTMATH
+  if (n & 1) {
+    const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
+    UV ma = mont_geta(a, n);
+    for (i = 0; i < nfactors; i++) {
+      UV b, a1, ek, pi = fac[i], ei = exp[i];
+      b = ipow(pi,ei);
+      k /= b;
+      a1 = mont_powmod(ma, k, n);
+      for (ek = 0; a1 != mont1 && ek++ <= ei; a1 = mont_powmod(a1, pi, n))
+        k *= pi;
+      if (ek > ei) return 0;
+    }
+  } else
+#endif
   for (i = 0; i < nfactors; i++) {
     UV b, a1, ek, pi = fac[i], ei = exp[i];
     b = ipow(pi,ei);
@@ -1133,7 +1142,7 @@ UV znorder(UV a, UV n) {
 
 UV znprimroot(UV n) {
   UV fac[MPU_MAX_FACTORS+1];
-  UV exp[MPU_MAX_FACTORS+1];
+  UV phi_div_fac[MPU_MAX_FACTORS+1];
   UV a, phi, on, r;
   int i, nfactors;
 
@@ -1146,20 +1155,33 @@ UV znprimroot(UV n) {
   if (!is_prob_prime(r)) return 0;        /* c^a or 2c^a */
   phi = (r-1) * (on/r);                   /* p^a or 2p^a */
 
-  nfactors = factor_exp(phi, fac, exp);
+  nfactors = factor_exp(phi, fac, 0);
   for (i = 0; i < nfactors; i++)
-    exp[i] = phi / fac[i];  /* exp[i] = phi(n) / i-th-factor-of-phi(n) */
-  for (a = 2; a < n; a++) {
-    /* Skip first few perfect powers */
-    if (a == 4 || a == 8 || a == 9) continue;
-    /* Skip values we know can't be right: (a|n) = 0 (or 1 for odd primes) */
-    if (phi == n-1) {
-      if (kronecker_uu(a, n) != -1)  continue;
-    } else {
-      if (kronecker_uu(a, n) == 0)  continue;
+    phi_div_fac[i] = phi / fac[i];
+
+#if USE_MONTMATH
+  if (n & 1) {
+    const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
+    for (a = 2; a < n; a++) {
+      if (a == 4 || a == 8 || a == 9) continue;  /* Skip some perfect powers */
+      /* Skip values we know can't be right: (a|n) = 0 (or 1 for odd primes) */
+      if (phi == n-1) { if (kronecker_uu(a, n) != -1) continue; }
+      else            { if (gcd_ui(a,n) != 1) continue; }
+      r = mont_geta(a, n);
+      for (i = 0; i < nfactors; i++)
+        if (mont_powmod(r, phi_div_fac[i], n) == mont1)
+          break;
+      if (i == nfactors) return a;
     }
+  } else
+#endif
+  for (a = 2; a < n; a++) {
+    if (a == 4 || a == 8 || a == 9) continue;  /* Skip some perfect powers */
+    /* Skip values we know can't be right: (a|n) = 0 (or 1 for odd primes) */
+    if (phi == n-1) { if (kronecker_uu(a, n) != -1) continue; }
+    else            { if (gcd_ui(a,n) != 1) continue; }
     for (i = 0; i < nfactors; i++)
-      if (powmod(a, exp[i], n) == 1)
+      if (powmod(a, phi_div_fac[i], n) == 1)
         break;
     if (i == nfactors) return a;
   }
@@ -1169,38 +1191,57 @@ UV znprimroot(UV n) {
 int is_primitive_root(UV a, UV n, int nprime) {
   UV s, fac[MPU_MAX_FACTORS+1];
   int i, nfacs;
+
   if (n <= 1) return n;
   if (a >= n) a %= n;
+  if (n <= 4) return a == n-1;
+  if (n % 4 == 0)  return 0;
+
+  /* Very simple, but not fast:
+   *     s = nprime ? n-1 : totient(n);
+   *     return s == znorder(a, n);
+   */
+
   if (gcd_ui(a,n) != 1) return 0;
-  s = nprime ? n-1 : totient(n);
+  if (nprime) {
+    s = n-1;
+  } else {
+    UV on = (n&1) ? n : (n>>1);
+    UV k = powerof(on);
+    UV r = rootof(on, k);
+    if (!is_prob_prime(r)) return 0;        /* c^a or 2c^a */
+    s = (r-1) * (on/r);                     /* p^a or 2p^a */
+  }
+  if (s == n-1 && kronecker_uu(a,n) != -1) return 0;
 
   /* a^x can be a primitive root only if gcd(x,s) = 1 */
   i = is_power(a,0);
   if (i > 1 && gcd_ui(i, s) != 1) return 0;
 
-  /* Quick check for small factors before full factor */
-  if ((s % 2) == 0 && powmod(a, s/2, n) == 1) return 0;
-
 #if USE_MONTMATH
   if (n & 1) {
     const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
     a = mont_geta(a, n);
+    /* Quick check for small factors before full factor */
+    if ((s % 2) == 0 && mont_powmod(a, s/2, n) == mont1) return 0;
     if ((s % 3) == 0 && mont_powmod(a, s/3, n) == mont1) return 0;
     if ((s % 5) == 0 && mont_powmod(a, s/5, n) == mont1) return 0;
     nfacs = factor_exp(s, fac, 0);
-    for (i = 0; i < nfacs; i++) {
-      if (fac[i] > 5 && mont_powmod(a, s/fac[i], n) == mont1) return 0;
-    }
+    for (i = 0; i < nfacs; i++)
+      if (fac[i] > 5 && mont_powmod(a, s/fac[i], n) == mont1)
+        return 0;
   } else
 #endif
   {
+    /* Quick check for small factors before full factor */
+    if ((s % 2) == 0 && powmod(a, s/2, n) == 1) return 0;
     if ((s % 3) == 0 && powmod(a, s/3, n) == 1) return 0;
     if ((s % 5) == 0 && powmod(a, s/5, n) == 1) return 0;
     /* Complete factor and check each one not found above. */
     nfacs = factor_exp(s, fac, 0);
-    for (i = 0; i < nfacs; i++) {
-      if (fac[i] > 5 && powmod(a, s/fac[i], n) == 1) return 0;
-    }
+    for (i = 0; i < nfacs; i++)
+      if (fac[i] > 5 && powmod(a, s/fac[i], n) == 1)
+        return 0;
   }
   return 1;
 }
@@ -1850,21 +1891,27 @@ long double Li(long double x) {
   return Ei(logl(x));
 }
 
-UV inverse_li(UV x) {
-  UV r;
+static long double ld_inverse_li(long double lx) {
   int i;
-  long double t, lx = (long double)x, term, old_term = 0;
-  if (x <= 2) return x + (x > 0);
+  long double t, term, old_term = 0;
   /* Iterate Halley's method until error grows. */
-  for (i = 0, t = lx*logl(x); i < 4; i++) {
+  t = (lx <= 2)  ?  2  :  lx * logl(lx);
+  for (i = 0; i < 4; i++) {
     long double dn = Li(t) - lx;
     term = dn*logl(t) / (1.0L + dn/(2*t));
     if (i > 0 && fabsl(term) >= fabsl(old_term)) { t -= term/4; break; }
     old_term = term;
     t -= term;
   }
-  r = (UV)ceill(t);
+  return t;
+}
 
+UV inverse_li(UV x) {
+  UV r, i;
+  long double lx = (long double) x;
+
+  if (x <= 2) return x + (x > 0);
+  r = (UV) ceill( ld_inverse_li(lx) );
   /* Meet our more stringent goal of an exact answer. */
   i = (x > 4e16) ? 2048 : 128;
   if (Li(r-1) >= lx) {
@@ -1879,25 +1926,47 @@ UV inverse_li(UV x) {
   return r;
 }
 
-UV inverse_R(UV x) {
+static long double ld_inverse_R(long double lx) {
   int i;
-  long double t, dn, lx = (long double) x, term, old_term = 0;
-  if (x <= 2) return x + (x > 0);
+  long double t, dn, term, old_term = 0;
 
   /* Rough estimate */
-  t = lx * logl(x);
-  /* Improve: approx inverse li with one round of Halley */
-  dn = Li(t) - lx;
-  t = t - dn * logl(t) / (1.0L + dn/(2*t));
-  /* Iterate 1-4 rounds of Halley */
-  for (i = 0; i < 4; i++) {
+  if (lx <= 3.5) {
+    t = lx + 2.24*(lx-1)/2;
+  } else {
+    t = lx * logl(lx);
+    if      (lx <   50) { t *= 1.2; }
+    else if (lx < 1000) { t *= 1.15; }
+    else {   /* use inverse Li (one iteration) for first inverse R approx */
+      dn = Li(t) - lx;
+      term = dn * logl(t) / (1.0L + dn/(2*t));
+      t -= term;
+    }
+  }
+  /* Iterate 1-n rounds of Halley, usually only 3 needed. */
+  for (i = 0; i < 100; i++) {
     dn = RiemannR(t) - lx;
+#if 1  /* Use f(t) = li(t) for derivatives */
     term = dn * logl(t) / (1.0L + dn/(2*t));
+#else  /* Use f(t) = li(t) - li(sqrt(t))/2 for derivatives */
+    long double logt = logl(t);
+    long double sqrtt = sqrtl(t);
+    long double FA = 2 * sqrtt * logt;
+    long double FB = 2 * sqrtt - 1;
+    long double ifz = FA / FB;
+    long double iffz = (logt - 2*FB) / (2 * sqrtt * FA * FA * FA * FA);
+    term = dn * ifz * (1.0L - dn * iffz);
+#endif
     if (i > 0 && fabsl(term) >= fabsl(old_term)) { t -= term/4; break; }
     old_term = term;
     t -= term;
   }
-  return (UV)ceill(t);
+  return t;
+}
+
+UV inverse_R(UV x) {
+  if (x < 2) return x + (x > 0);
+  return (UV) ceill( ld_inverse_R( (long double) x) );
 }
 
 
@@ -2495,16 +2564,26 @@ int is_catalan_pseudoprime(UV n) {
 
   m = 1;
   a = n >> 1;
+  /*
+   * Ideally we could use some of the requirements for a mod 4/8/64 here:
+   * http://www.combinatorics.net/conf/Z60/sp/sp/Shu-Chung%20Liu.pdf
+   * But, how do we make +/-2 = X mod n into a solution for x = X mod 8?
+   *
+   * We could also exploit the exhaustive testing that shows there only
+   * exist three below 1e10:  5907, 1194649, and 12327121.
+   */
   {
     UV factors[MPU_MAX_FACTORS+1];
     int nfactors = factor_exp(n, factors, 0);
-    /* Aebi and Cairns 2008, page 9 */
 #if BITS_PER_WORD == 32
-    if (nfactors == 2)
+    if (nfactors == 2) return 0;  /* Page 9, all 32-bit semiprimes */
 #else
-    if (nfactors == 2 && (n < UVCONST(10000000000)))
+    if (nfactors == 2) {   /* Conditions from Aebi and Cairns (2008) */
+      if (n < UVCONST(10000000000)) return 0;     /* Page 9 */
+      if (2*factors[0]+1 >= factors[1]) return 0; /* Corollary 2 and 3 */
+    }
 #endif
-      return 0;
+    /* Test every factor */
     for (i = 0; i < nfactors; i++) {
       if (_catalan_vtest(a << 1, factors[i]))
         return 0;
@@ -2777,4 +2856,31 @@ void randperm(void* ctx, UV n, UV k, UV *S) {
       { UV t = S[i]; S[i] = S[i+j]; S[i+j] = t; }
     }
   }
+}
+
+UV random_factored_integer(void* ctx, UV n, int *nf, UV *factors) {
+  UV r, s, nfac;
+  if (n < 1)
+    return 0;
+#if BITS_PER_WORD == 64 && (USE_MONTMATH || MULMODS_ARE_FAST)
+  if (1)   /* Our factoring is very fast, just use it */
+#elif BITS_PER_WORD == 64
+  if (n < UVCONST(1000000000000))
+#endif
+  {
+    r = 1 + urandomm64(ctx, n);
+    *nf = factor(r, factors);
+    return r;
+  }
+  do {  /* Kalai's algorithm */
+    for (s = n, r = 1, nfac = 0;  s > 1;  ) {
+      s = 1 + urandomm64(ctx, s);
+      if (!is_prime(s)) continue;
+      if (s > n / r) { r = 0; break; } /* overflow */
+      r *= s;
+      factors[nfac++] = s;
+    }
+  } while (r == 0 || r > n || (1 + urandomm64(ctx,n)) > r);
+  *nf = nfac;
+  return r;
 }

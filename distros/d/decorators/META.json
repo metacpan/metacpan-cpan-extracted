@@ -1,0 +1,53 @@
+{
+   "abstract" : "Apply decorators to your methods",
+   "author" : [
+      "Stevan Little <stevan@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "decorators",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
+            "MOP" : "0.14",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "UNIVERSAL::Object" : "0.14",
+            "perl" : "v5.14.4"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevan/p5-decorators/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/p5-decorators.git",
+         "web" : "https://github.com/stevan/p5-decorators"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.59';
+our $VERSION = '0.64';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -2702,10 +2702,38 @@ sub loaded {
     );
 }
 
-sub script {
-    my ( $self, $script, %parameters ) = @_;
+sub _script_parameters {
+    my ( $self, %parameters ) = @_;
     delete $parameters{script};
     $parameters{args} ||= [];
+    my %mapping = (
+        timeout => 'scriptTimeout',
+        new     => 'newSandbox',
+    );
+    foreach my $from ( sort { $a cmp $b } keys %mapping ) {
+        my $to = $mapping{$from};
+        if ( defined $parameters{$to} ) {
+            Carp::carp(
+"**** DEPRECATED PARAMETER - using $to as a parameter for the script(...) method HAS BEEN REPLACED BY the $from parameter ****"
+            );
+        }
+        elsif ( defined $parameters{$from} ) {
+            $parameters{$to} = $parameters{$from};
+            delete $parameters{$from};
+        }
+    }
+    foreach my $key (qw(newSandbox)) {
+        if ( defined $parameters{$key} ) {
+            $parameters{$key} =
+              $parameters{$key} ? JSON::true() : JSON::false();
+        }
+    }
+    return %parameters;
+}
+
+sub script {
+    my ( $self, $script, %parameters ) = @_;
+    %parameters = $self->_script_parameters(%parameters);
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -2717,6 +2745,31 @@ sub script {
     );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
+}
+
+sub json {
+    my ($self) = @_;
+    my $content = $self->strip();
+    return JSON::decode_json($content);
+}
+
+sub strip {
+    my ($self)  = @_;
+    my $content = $self->html();
+    my $header  = quotemeta
+'<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="alternate stylesheet" type="text/css" href="resource://gre-resources/plaintext.css" title="Wrap Long Lines" /></head><body><pre>';
+    my $footer = quotemeta '</pre></body></html>';
+    $content =~ s/^$header(.*)$footer$/$1/smx;
+    $header = quotemeta
+'<html><head><link rel="alternate stylesheet" type="text/css" href="resource://content-accessible/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
+    $content =~ s/^$header(.*)$footer$/$1/smx;
+    $header = quotemeta
+'<html><head><link rel="alternate stylesheet" type="text/css" href="resource://gre-resources/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
+    $content =~ s/^$header(.*)$footer$/$1/smx;
+    $header = quotemeta
+'<html><head><link rel="alternate stylesheet" type="text/css" href="resource://content-accessible/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
+    $content =~ s/^$header(.*)$footer$/$1/smx;
+    return $content;
 }
 
 sub html {
@@ -3130,7 +3183,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.59
+Version 0.64
 
 =head1 SYNOPSIS
 
@@ -3469,25 +3522,21 @@ returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C
 
 =head2 script 
 
-accepts a scalar containing a javascript function that is executed in the browser, and an optional hash as a second parameter.  Allowed keys are below;
+accepts a scalar containing a javascript function body that is executed in the browser, and an optional hash as a second parameter.  Allowed keys are below;
 
 =over 4
 
-=item * args - The reference to a list is the arguments passed to the script.
+=item * args - The reference to a list is the arguments passed to the function body.
 
-=item * scriptTime - A timeout to override the default L<scripts|Firefox::Marionette::Timeouts#scripts> timeout.
+=item * timeout - A timeout to override the default L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
 
-=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window>object if C<newSandbox> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluted in a sandbox with elevated system privileges, equivalent to chrome space.
+=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window>object if C<new> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluted in a sandbox with elevated system privileges, equivalent to chrome space.
 
-=item * newSandbox - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluted in a fresh sandbox.
+=item * new - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluted in a fresh sandbox.
 
 =item * filename - Filename of the client's program where this script is evaluated.
 
 =item * line - Line in the client's program where this script is evaluated.
-
-=item * debug_script - Attach an L<onerror|https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror> event handler on the L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window> object.  It does not differentiate content errors from chrome errors.
-
-=item * directInject - Evaluate the script without wrapping it in a function.
 
 =back
 
@@ -3501,22 +3550,41 @@ Returns the result of the javascript function.
         # luckily!
     }
 
-The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout, which, by default is 30 seconds.
+The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
 
 =head2 async_script 
 
 accepts a scalar containing a javascript function that is executed in the browser.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout, which, by default is 30 seconds.
+The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
 
 =head2 html
 
-returns the page source of the content document.
+returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<strip|Firefox::Marionette#strip> for an alterative when dealing with other non-html content types such as text/plain.
 
     use Firefox::Marionette();
     use v5.10;
 
     say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
+
+=head2 strip
+
+returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<html|Firefox::Marionette#html> for an alterative when dealing with html content types.  This is a convenience method that wraps the L<html|Firefox::Marionette#html> method.
+
+    use Firefox::Marionette();
+    use JSON();
+    use v5.10;
+
+    say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+
+=head2 json
+
+returns a L<JSON|JSON> object that has been parsed from the page source of the content document.  This is a convenience method that wraps the L<strip|Firefox::Marionette#strip> method.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
 =head2 context
 
@@ -3744,7 +3812,7 @@ returns a list of top-level browsing contexts. On desktop this typically corresp
 
 =head2 accept_connections
 
-Enables or disables accepting new socket connections.  By calling this method with `false` the server will not accept any further connections, but existing connections will not be forcible closed. Use `true` to re-enable accepting connections.
+Enables or disables accepting new socket connections.  By calling this method with false the server will not accept any further connections, but existing connections will not be forcible closed. Use true to re-enable accepting connections.
 
 Please note that when closing the connection via the client you can end-up in a non-recoverable state if it hasn't been enabled before.
 

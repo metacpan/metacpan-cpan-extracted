@@ -1,0 +1,162 @@
+# PODNAME:Net::Amazon::S3::Features
+# ABSTRACT: Features available in Net::Amazon::S3
+
+__CUT__
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Net::Amazon::S3::Features - Features available in Net::Amazon::S3
+
+=head1 VERSION
+
+version 0.85
+
+=head1 API COMPARISON
+
+Net::Amazon::S3 supports two APIs with different feature support.
+
+This document describes current behaviour.
+
+=head2 Error reporting
+
+How API signals operation error
+
+=over
+
+=item set S3 err
+
+Operation returns expression evaluated as false
+and C<< err >> with C<< errstr >> are populated from response content
+
+=item set network error
+
+Populates S3 err with C<< network_error >> constant and S3 errstr
+with http status line (eg: C<< 404 Not Found >>) and throws.
+
+=item confess
+
+Operation throws using C<< confess >>
+
+=back
+
+=head2 Feature support
+
+For details see corresponding C<< api-operation >> / C<< client-operation >> test file
+
+ |-----------------------+----------------------------+--------------------------|
+ | operation             | Net::Amazon::S3 (API)      | Net::Amazon::S3::Client  |
+ |-----------------------+----------------------------+--------------------------|
+ | service-buckets-list  |                            |                          |
+ | - returns             | Bucket instances in struct | Bucket instances (list)  |
+ | - errors              | set S3 err                 | confess                  |
+ |-----------------------+----------------------------+--------------------------|
+ | bucket-acl-get        |                            |                          |
+ | - returns             | response body (XML)        | response body (XML)      |
+ |                       | (undef on Not Found)       |                          |
+ | - errors              | set network error          | confess                  |
+ |                       | (none on Not Found)        |                          |
+ |-----------------------+----------------------------+--------------------------|
+ | bucket-acl-set        |                            |                          |
+ | - with canned acl     | yes, as acl_short          | N/A                      |
+ | - with xml acl        | yes, as acl_xml            | N/A                      |
+ | - returns             | boolean                    | N/A                      |
+ | - errors              | set S3 err                 | N/A                      |
+ |-----------------------+----------------------------+--------------------------|
+ | bucket-create         |                            |                          |
+ | - with region         | yes                        | yes                      |
+ | - returns             | Bucket instance            | Bucket instance          |
+ | - errors              | set S3 err                 | confess                  |
+ |-----------------------+----------------------------+--------------------------|
+ | bucket-delete         |                            |                          |
+ | - returns             | boolean                    | true                     |
+ | - errors              | set S3 err                 | confess                  |
+ |-----------------------+----------------------------+--------------------------|
+ | bucket-objects-list   |                            |                          |
+ | - list version 1      | yes                        | yes                      |
+ | - list version 2      | no                         | no                       |
+ | - common prefixes     | supported                  | not supported            |
+ | - list all            | list all method            | yes                      |
+ | - returns             | struct with list           | iterator (Object list)   |
+ | - errors              | set S3 err                 | confess during iteration |
+ |-----------------------+----------------------------+--------------------------|
+ | bucket-objects-delete |                            |                          |
+ | - returns             | boolean                    | HTTP::Response object    |
+ | - errors              | set S3 err                 | confess                  |
+ |-----------------------+----------------------------+--------------------------|
+ | object-acl-get        |                            |                          |
+ | - returns             | response body (XML)        | N/A                      |
+ |                       | (undef on Not Found)       | N/A                      |
+ | - errors              | set network error          | N/A                      |
+ |                       | (none on Not Found)        | N/A                      |
+ |-----------------------+----------------------------+--------------------------|
+ | object-acl-set        |                            |                          |
+ | - with canned acl     | yes, as acl_short          | N/A                      |
+ | - with xml acl        | yes, as acl_xml            | N/A                      |
+ | - returns             | boolean                    | N/A                      |
+ | - errors              | set S3 err                 | N/A                      |
+ |-----------------------+----------------------------+--------------------------|
+ | object-copy           |                            |                          |
+ | - returns             | boolean                    | N/A                      |
+ | - errors              | set S3 err                 | N/A                      |
+ |-----------------------+----------------------------+--------------------------|
+ | object-create         |                            |                          |
+ | - returns             | boolean                    | empty string             |
+ | - errors              | set S3 err                 | confess                  |
+ |-----------------------+----------------------------+--------------------------|
+ | object-delete         |                            |                          |
+ | - returns             | boolean                    | true                     |
+ | - errors              | set S3 err                 | confess                  |
+ |-----------------------+----------------------------+--------------------------|
+ | object-fetch          |                            |                          |
+ | - returns             | struct with value          | value                    |
+ |                       | (undef on Not Found)       |                          |
+ | - errors              | set network error          | confess                  |
+ |                       | (none on Not Found)        |                          |
+ |-----------------------+----------------------------+--------------------------|
+ | object-head           |                            |                          |
+ | - returns             | boolean                    | N/A                      |
+ | - errors              | set S3 err                 | N/A                      |
+ |-----------------------+----------------------------+--------------------------|
+
+=head2 TODO plan (asorted, not promised)
+
+=over
+
+=item normalize error reporting
+
+Make every operation to behave similar (especially C<< Net::Amazon::S3 >>
+
+=item make error reporting pluggable
+
+With possibility to inject user's own reporting
+
+=item unify features
+
+Both APIs should support same set of operations
+
+=item support all AWS S3 operations and x-amz-* headers
+
+https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html
+
+=item add async API (AnyEvent / IO::Async)
+
+=back
+
+=head1 AUTHOR
+
+Leo Lapworth <llap@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

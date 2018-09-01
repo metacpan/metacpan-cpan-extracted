@@ -71,7 +71,7 @@
    "provides" : {
       "OpenOffice::OODoc::InsertDocument" : {
          "file" : "lib/OpenOffice/OODoc/InsertDocument.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://gitlab.com/mintlab/perl-openoffice-oodoc-insertdocument"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Wesley Schwengle <gitlab@opperschaap.net>",
       "Wesley Schwengle <wesley@schwengle.net>"

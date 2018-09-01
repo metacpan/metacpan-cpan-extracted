@@ -4,7 +4,7 @@
       "Jeremy Volkening <jdv@base2bio.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "gpl_3"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Bio::CIPRES" : {
          "file" : "lib/Bio/CIPRES.pm",
-         "version" : "0.003004"
+         "version" : "0.004001"
       },
       "Bio::CIPRES::Error" : {
          "file" : "lib/Bio/CIPRES/Error.pm",
@@ -50,6 +50,10 @@
       },
       "Bio::CIPRES::Job" : {
          "file" : "lib/Bio/CIPRES/Job.pm",
+         "version" : "0.001"
+      },
+      "Bio::CIPRES::Message" : {
+         "file" : "lib/Bio/CIPRES/Message.pm",
          "version" : "0.001"
       },
       "Bio::CIPRES::Output" : {
@@ -65,5 +69,6 @@
          "url" : "https://github.com/jvolkening/p5-Bio-CIPRES"
       }
    },
-   "version" : "0.003004"
+   "version" : "0.004001",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

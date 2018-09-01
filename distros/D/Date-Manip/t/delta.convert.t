@@ -148,7 +148,7 @@ $tests="
 
 '0:0:0:0:0:0:8452755 business'  approx  => 0 0 52 0 7 59 15 1
 
-'0:0:0:0:0:0:8452755 business'  estimated  => 1 0 0 0 0 0 3 1
+'0:0:0:0:0:0:8452755 business'  estimated  => 1 0 0 0 0 0 0 1
 
 #
 
@@ -174,7 +174,7 @@ $tests="
 
 '0:0:53:0:0:0:0 business'       approx  => 0 0 53 0 0 0 0 1
 
-'0:0:53:0:0:0:0 business'       estimated  => 1 0 0 4 1 0 48 1
+'0:0:53:0:0:0:0 business'       estimated  => 1 0 0 4 1 0 45 1
 
 #
 

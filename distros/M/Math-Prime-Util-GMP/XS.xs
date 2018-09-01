@@ -141,11 +141,15 @@ is_pseudoprime(IN char* strn, ...)
         default:  break; /* let 9 fall through */
       }
     }
-    mpz_init_set_str(n, strn, 10);
     for (i = 1; i < items; i++) {
       const char* strbase = SvPV_nolen(ST(i));
       validate_string_number(cv, "base", strbase);
-      mpz_init_set_str(a, strbase, 10);
+      if (strbase[1] == '\0' && (strbase[0] == '0' || strbase[0] == '1'))
+        croak("Base %s is invalid", strbase);
+    }
+    mpz_init_set_str(n, strn, 10);
+    for (i = 1; i < items; i++) {
+      mpz_init_set_str(a, SvPV_nolen(ST(i)), 10);
       switch (ix) {
         case 0:  RETVAL = is_pseudoprime(n, a); break;
         case 1:  RETVAL = is_euler_pseudoprime(n, a); break;
@@ -413,8 +417,12 @@ prime_count(IN char* strlo, IN char* strhi = 0)
       mpz_init_set_ui(lo, 0);
       VALIDATE_AND_SET(hi, strlo);
     } else {
-      VALIDATE_AND_SET(lo, strlo);
-      VALIDATE_AND_SET(hi, strhi);
+      if (*strlo == '+')  strlo++;
+      if (*strhi == '+')  strhi++;
+      validate_string_number(cv, "lo", strlo);
+      validate_string_number(cv, "hi", strhi);
+      mpz_init_set_str(lo, strlo, 10);
+      mpz_init_set_str(hi, strhi, 10);
     }
     if (ix == 2 && mpz_sizeinbase(hi,2) <= 32) {
       uint32_t ulo = mpz_get_ui(lo),  uhi = mpz_get_ui(hi);
@@ -479,7 +487,12 @@ totient(IN char* strn)
       case 4:  harmfrac(n, res, n);
                XPUSH_MPZ(n);
                break;
-      case 5:  znprimroot(res, n);  break;
+      case 5:  znprimroot(res, n);
+               if (!mpz_sgn(res) && mpz_cmp_ui(n,1) != 0) {
+                 mpz_clear(n);  mpz_clear(res);
+                 XSRETURN_UNDEF;
+               }
+               break;
       case 6:  ramanujan_tau(res, n);  break;
       case 7:  mpz_sqrt(res, n);  break;
       case 8:  mpz_set_ui(res, prime_power(res, n)); break;
@@ -488,8 +501,6 @@ totient(IN char* strn)
       case 11:
       default: mpz_isaac_urandomm(res, n); break;
     }
-    if (ix == 5 && !mpz_sgn(res) && mpz_cmp_ui(n,1) != 0)
-      {  mpz_clear(n);  mpz_clear(res);  XSRETURN_UNDEF;  }
     XPUSH_MPZ(res);
     mpz_clear(n);
     mpz_clear(res);
@@ -555,7 +566,12 @@ void harmreal(IN char* strn, IN UV prec = 40)
 
 void powreal(IN char* strn, IN char* strx, IN UV prec = 40)
   ALIAS:
-    agmreal = 1
+    rootreal = 1
+    agmreal = 2
+    addreal = 3
+    subreal = 4
+    mulreal = 5
+    divreal = 6
   PREINIT:
     mpf_t n, x;
     char* res;
@@ -571,7 +587,16 @@ void powreal(IN char* strn, IN char* strx, IN UV prec = 40)
     mpf_init2(x, bits);
     if (mpf_set_str(x, strx, 10) != 0)
       croak("Not valid base-10 floating point input: %s", strx);
-    res = (ix == 0) ? powreal(n, x, prec) : agmreal(n, x, prec);
+    switch (ix) {
+      case 0:  res = powreal(n, x, prec);  break;
+      case 1:  res = rootreal(n, x, prec); break;
+      case 2:  res = agmreal(n, x, prec); break;
+      case 3:  res = addreal(n, x, prec); break;
+      case 4:  res = subreal(n, x, prec); break;
+      case 5:  res = mulreal(n, x, prec); break;
+      case 6:
+      default: res = divreal(n, x, prec);  break;
+    }
     mpf_clear(n);
     mpf_clear(x);
     if (res == 0)
@@ -604,7 +629,6 @@ gcd(...)
       Safefree(list);
       XSRETURN(1);
     }
-    mpz_init(n);
     mpz_init_set_ui(ret, (ix == 1 || ix == 3) ? 1 : 0);
     for (i = 0; i < items; i++) {
       char* strn = SvPV_nolen(ST(i));
@@ -616,9 +640,9 @@ gcd(...)
         case 3:
         default: mpz_mul(ret, ret, n); break;
       }
+      mpz_clear(n);
     }
     XPUSH_MPZ(ret);
-    mpz_clear(n);
     mpz_clear(ret);
 
 int
@@ -734,6 +758,7 @@ invmod(IN char* stra, IN char* strb)
     rootint = 9
     logint = 10
     factorialmod = 11
+    multifactorial = 12
   PREINIT:
     mpz_t a, b, t;
     int retundef;
@@ -798,9 +823,12 @@ invmod(IN char* stra, IN char* strb)
       if (mpz_cmp_ui(b,2) < 0) croak("rootint: base must be > 1");
       if (mpz_sgn(a) <=  0) croak("rootint: n must be > 0");
       mpz_set_ui(a, logint(a, mpz_get_ui(b)));
-    } else {
+    } else if (ix == 11) {
       if (mpz_sgn(b) < 0) retundef = 1;
       else                factorialmod(a, mpz_get_ui(a), b);
+    } else {
+      if (mpz_sgn(a) < 0 || mpz_sgn(b) < 0) retundef = 1;
+      else                multifactorial(a, mpz_get_ui(a), mpz_get_ui(b));
     }
     if (!retundef) XPUSH_MPZ(a);
     mpz_clear(b); mpz_clear(a);
@@ -896,10 +924,12 @@ void random_nbit_prime(IN UV n)
     random_ndigit_prime = 6
     urandomb = 7
     factorial = 8
-    partitions = 9
-    primorial = 10
-    pn_primorial = 11
-    consecutive_integer_lcm = 12
+    factorial_sum = 9
+    subfactorial = 10
+    partitions = 11
+    primorial = 12
+    pn_primorial = 13
+    consecutive_integer_lcm = 14
   PREINIT:
     mpz_t p;
     char* proof;
@@ -925,10 +955,12 @@ void random_nbit_prime(IN UV n)
       case 6:  mpz_random_ndigit_prime(p, n); break;
       case 7:  mpz_isaac_urandomb(p, n); break;
       case 8:  mpz_fac_ui(p, n); break;   /* swing impl in 5.1+, so fast */
-      case 9:  partitions(p, n); break;
-      case 10: _GMP_primorial(p, n);  break;
-      case 11: _GMP_pn_primorial(p, n);  break;
-      case 12:
+      case 9:  factorial_sum(p, n); break;
+      case 10: subfactorial(p, n); break;
+      case 11: partitions(p, n); break;
+      case 12: _GMP_primorial(p, n);  break;
+      case 13: _GMP_pn_primorial(p, n);  break;
+      case 14:
       default: consecutive_integer_lcm(p, n);  break;
     }
     XPUSH_MPZ(p);

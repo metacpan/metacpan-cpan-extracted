@@ -311,7 +311,7 @@ s3cl - Command line for Amazon s3 cloud storage
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 
@@ -343,7 +343,7 @@ This program gives a command line interface to Amazons s3 storage
 service. It does not limit the number of requests (which may cost
 you more money than if you did it a different way!) and each
 request costs Money (although some costs from EC2 may be $0.0,
-check latest from Amazon costs page) - we take NO reponsibility
+check latest from Amazon costs page) - we take NO responsibility
 for your bill.
 
 =head1 AUTHOR

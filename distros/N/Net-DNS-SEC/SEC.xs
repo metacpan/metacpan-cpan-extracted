@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1683 2018-06-04 09:02:09Z willem $"
+#define XS_Id "$Id: SEC.xs 1705 2018-08-23 10:24:02Z willem $"
 
 
 =head1 NAME
@@ -34,10 +34,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
-
-=head1 SEE ALSO
-
-L<OpenSSL|http://www.openssl.org/docs>
 
 =cut
 
@@ -133,43 +129,19 @@ int EVP_DigestVerify(EVP_MD_CTX *ctx,
 #ifndef NO_DSA
 int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
 {
-	/* If the fields p, q and g in d are NULL, the corresponding input
-	* parameters MUST be non-NULL.
-	*/
-	if ((d->p == NULL && p == NULL)
-		|| (d->q == NULL && q == NULL)
-		|| (d->g == NULL && g == NULL))
-		return 0;
-
-	if (p != NULL) {
-		BN_free(d->p);
-		d->p = p;
-	}
-	if (q != NULL) {
-		BN_free(d->q);
-		d->q = q;
-	}
-	if (g != NULL) {
-		BN_free(d->g);
-		d->g = g;
-	}
+	BN_free(d->p);
+	d->p = p;
+	BN_free(d->q);
+	d->q = q;
+	BN_free(d->g);
+	d->g = g;
 	return 1;
 }
 
 int DSA_set0_key(DSA *d, BIGNUM *pub_key, BIGNUM *priv_key)
 {
-	/* If the field pub_key in d is NULL, the corresponding input
-	* parameters MUST be non-NULL.  The priv_key field may
-	* be left NULL.
-	*/
-	if (d->pub_key == NULL && pub_key == NULL) return 0;
-
-	if (pub_key != NULL) {
-		d->pub_key = pub_key;
-	}
-	if (priv_key != NULL) {
-		d->priv_key = priv_key;
-	}
+	d->priv_key = priv_key;
+	d->pub_key = pub_key;
 	return 1;
 }
 #endif
@@ -197,10 +169,23 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10001000L)
+#ifndef NO_ECCGOST
 #define NO_ECCGOST
+#endif
 #define NO_ECDSA
 #endif
 
+
+#ifndef NO_ECCGOST
+
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+int ECDSA_SIG_set0(ECDSA_SIG *ecsig, BIGNUM *r, BIGNUM *s)
+{
+	ecsig->r = r;
+	ecsig->s = s;
+	return 1;
+}
+#endif
 
 BIGNUM *bn_new_hex(const char *hex)
 {
@@ -221,12 +206,21 @@ void bn_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
 	}
 	return;
 }
+#endif
+
+
+#ifndef croak_memory_wrap
+void croak_memory_wrap(void)
+{
+	return;
+}
+#endif
 
 
 int checkret(const int ret, int line)
 {
-	if ( ret != 1 ) croak("libcrypto error at %s line %d", __FILE__, line);
-	return ret;
+	if ( ret == 1 ) return ret;
+	croak("libcrypto error (%s line %d)", __FILE__, line);
 }
 
 #define checkerr(arg)	checkret( (arg), __LINE__ )
@@ -236,11 +230,13 @@ MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
 
 PROTOTYPES: DISABLE
 
+void croak_memory_wrap()
+
 SV*
 VERSION(void)
     PREINIT:
-	SV *v_SV = newSVpv( XS_Id, 16 );
-	char *v;
+	char *v = XS_Id;;
+	SV *v_SV = newSVpv( v, 16 );
     CODE:
 	v = (char*) SvEND(v_SV);
 	v = v - 4;
@@ -274,15 +270,15 @@ EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
     PREINIT:
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
 	unsigned char *m;
-	STRLEN mlen;
 	unsigned char sigbuf[512];		/* RFC3110(2) */
-	STRLEN slen = sizeof(sigbuf);
+	STRLEN slen;
 	int r;
     CODE:
-	m = (unsigned char*) SvPV( message, mlen );
+	m = (unsigned char*) SvPVX(message);
 	EVP_MD_CTX_reset(ctx);
 	checkerr( EVP_DigestSignInit( ctx, NULL, md, NULL, pkey ) );
-	r = EVP_DigestSign( ctx, sigbuf, &slen, m, mlen );
+	slen = sizeof(sigbuf);
+	r = EVP_DigestSign( ctx, sigbuf, &slen, m, SvCUR(message) );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
 	checkerr(r);
@@ -295,15 +291,13 @@ EVP_verify(SV *message, SV *signature, EVP_PKEY *pkey, const EVP_MD *md=NULL)
     PREINIT:
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
 	unsigned char *m;
-	STRLEN mlen;
 	unsigned char *s;
-	STRLEN slen;
     CODE:
-	m = (unsigned char*) SvPV( message, mlen );
-	s = (unsigned char*) SvPV( signature, slen );
+	m = (unsigned char*) SvPVX(message);
+	s = (unsigned char*) SvPVX(signature);
 	EVP_MD_CTX_reset(ctx);
 	checkerr( EVP_DigestVerifyInit( ctx, NULL, md, NULL, pkey ) );
-	RETVAL = EVP_DigestVerify( ctx, s, slen, m, mlen );
+	RETVAL = EVP_DigestVerify( ctx, s, SvCUR(signature), m, SvCUR(message) );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
     OUTPUT:
@@ -330,15 +324,10 @@ DSA_set0_pqg(DSA *d, SV *p_SV, SV *q_SV, SV *g_SV)
 	BIGNUM *p;
 	BIGNUM *q;
 	BIGNUM *g;
-	unsigned char *bin;
-	STRLEN len;
     CODE:
-	bin = (unsigned char*) SvPV( p_SV, len );
-	p = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( q_SV, len );
-	q = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( g_SV, len );
-	g = BN_bin2bn( bin, len, NULL );
+	p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
+	q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
+	g = BN_bin2bn( (unsigned char*) SvPVX(g_SV), SvCUR(g_SV), NULL );
 	RETVAL = checkerr( DSA_set0_pqg( d, p, q, g ) );
     OUTPUT:
 	RETVAL
@@ -346,15 +335,11 @@ DSA_set0_pqg(DSA *d, SV *p_SV, SV *q_SV, SV *g_SV)
 int
 DSA_set0_key(DSA *dsa, SV *y_SV, SV *x_SV)
     PREINIT:
-	BIGNUM *x = NULL;
-	BIGNUM *y = NULL;
-	unsigned char *bin;
-	STRLEN len;
+	BIGNUM *x;
+	BIGNUM *y;
     CODE:
-	bin = (unsigned char*) SvPV( x_SV, len );
-	x = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( y_SV, len );
-	y = BN_bin2bn( bin, len, NULL );
+	x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
+	y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
 	RETVAL = checkerr( DSA_set0_key( dsa, y, x ) );
     OUTPUT:
 	RETVAL
@@ -379,13 +364,9 @@ RSA_set0_factors(RSA *r, SV *p_SV, SV *q_SV)
     PREINIT:
 	BIGNUM *p;
 	BIGNUM *q;
-	unsigned char *bin;
-	STRLEN len;
     CODE:
-	bin = (unsigned char*) SvPV( p_SV, len );
-	p = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( q_SV, len );
-	q = BN_bin2bn( bin, len, NULL );
+	p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
+	q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
 	RETVAL = checkerr( RSA_set0_factors( r, p, q ) );
     OUTPUT:
 	RETVAL
@@ -396,15 +377,10 @@ RSA_set0_key(RSA *r, SV *n_SV, SV *e_SV, SV *d_SV)
 	BIGNUM *d;
 	BIGNUM *e;
 	BIGNUM *n;
-	unsigned char *bin;
-	STRLEN len;
     CODE:
-	bin = (unsigned char*) SvPV( d_SV, len );
-	d = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( e_SV, len );
-	e = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( n_SV, len );
-	n = BN_bin2bn( bin, len, NULL );
+	d = BN_bin2bn( (unsigned char*) SvPVX(d_SV), SvCUR(d_SV), NULL );
+	e = BN_bin2bn( (unsigned char*) SvPVX(e_SV), SvCUR(e_SV), NULL );
+	n = BN_bin2bn( (unsigned char*) SvPVX(n_SV), SvCUR(n_SV), NULL );
 	RETVAL = checkerr( RSA_set0_key( r, n, e, d ) );
     OUTPUT:
 	RETVAL
@@ -429,11 +405,8 @@ int
 EC_KEY_set_private_key(EC_KEY *key, SV *prv_SV)
     PREINIT:
 	BIGNUM *prv;
-	unsigned char *bin;
-	STRLEN len;
     CODE:
-	bin = (unsigned char*) SvPV( prv_SV, len );
-	prv = BN_bin2bn( bin, len, NULL );
+	prv = BN_bin2bn( (unsigned char*) SvPVX(prv_SV), SvCUR(prv_SV), NULL );
 	RETVAL = EC_KEY_set_private_key( key, prv );
 	BN_clear_free(prv);
 	checkerr(RETVAL);
@@ -445,13 +418,9 @@ EC_KEY_set_public_key_affine_coordinates(EC_KEY *key, SV *x_SV, SV *y_SV)
     PREINIT:
 	BIGNUM *x;
 	BIGNUM *y;
-	unsigned char *bin;
-	STRLEN len;
     CODE:
-	bin = (unsigned char*) SvPV( x_SV, len );
-	x = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( y_SV, len );
-	y = BN_bin2bn( bin, len, NULL );
+	x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
+	y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
 	RETVAL = EC_KEY_set_public_key_affine_coordinates( key, x, y );
 	BN_free(x);
 	BN_free(y);
@@ -467,24 +436,16 @@ EC_KEY_set_public_key_affine_coordinates(EC_KEY *key, SV *x_SV, SV *y_SV)
 #ifndef NO_EdDSA
 
 EVP_PKEY*
-EVP_PKEY_new_raw_private_key(int nid, SV *private_key)
-    PREINIT:
-	const unsigned char *k;
-	STRLEN  klen;
+EVP_PKEY_new_raw_private_key(int nid, SV *key)
     CODE:
-	k = (unsigned char*) SvPV( private_key, klen );
-	RETVAL = EVP_PKEY_new_raw_private_key( nid, NULL, k, klen );
+	RETVAL = EVP_PKEY_new_raw_private_key( nid, NULL, (unsigned char*) SvPVX(key) , SvCUR(key) );
     OUTPUT:
 	RETVAL
 
 EVP_PKEY*
-EVP_PKEY_new_raw_public_key(int nid, SV *public_key)
-    PREINIT:
-	const unsigned char *k;
-	STRLEN  klen;
+EVP_PKEY_new_raw_public_key(int nid, SV *key)
     CODE:
-	k = (unsigned char*) SvPV( public_key, klen );
-	RETVAL = EVP_PKEY_new_raw_public_key( nid, NULL, k, klen );
+	RETVAL = EVP_PKEY_new_raw_public_key( nid, NULL, (unsigned char*) SvPVX(key) , SvCUR(key) );
     OUTPUT:
 	RETVAL
 
@@ -499,8 +460,7 @@ EVP_PKEY_new_raw_public_key(int nid, SV *public_key)
 
 EC_KEY*
 EC_KEY_new_ECCGOST()
-    PREINIT:
-	# GOST_R_34_10_2001_CryptoPro_A
+    PREINIT:					# GOST_R_34_10_2001_CryptoPro_A
 	BIGNUM *a = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94");
 	BIGNUM *b = bn_new_hex("00A6");
 	BIGNUM *p = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97");
@@ -545,20 +505,19 @@ ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
 	unsigned char *bin;
 	STRLEN len;
     CODE:
-	bin = (unsigned char*) SvPV( r_SV, len );
-	r = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( s_SV, len );
-	s = BN_bin2bn( bin, len, NULL );
-	bin = (unsigned char*) SvPV( H, len );
+	r = BN_bin2bn( (unsigned char*) SvPVX(r_SV), SvCUR(r_SV), NULL );
+	s = BN_bin2bn( (unsigned char*) SvPVX(s_SV), SvCUR(s_SV), NULL );
+	bin = (unsigned char*) SvPVX(H);
+	len = SvCUR(H);
 	alpha = BN_bin2bn( bin, len, NULL );
 
 	group = EC_KEY_get0_group(eckey);
 	checkerr( EC_GROUP_get_order(group, q, ctx) );
 	checkerr( BN_mod(e, alpha, q, ctx) );
-	if ( BN_is_zero(e) ) checkerr( BN_one(e) );
 	BN_free(alpha);
 
-	# algebraic transformation of ECC-GOST into equivalent ECDSA problem
+	/* algebraic transformation of ECC-GOST into equivalent ECDSA problem */
+	if ( BN_is_zero(e) ) BN_one(e);
 	checkerr( BN_mod_sub(m, q, s, q, ctx) );
 	checkerr( BN_mod_sub(s, q, e, q, ctx) );
 	BN_CTX_free(ctx);
@@ -566,12 +525,7 @@ ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
 	BN_free(q);
 
 	ecsig = ECDSA_SIG_new();
-#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
-	ecsig->r = r;
-	ecsig->s = s;
-#else
 	checkerr( ECDSA_SIG_set0(ecsig, r, s) );
-#endif
 
 	bn_bn2binpad(m, bin, len);
 	BN_free(m);

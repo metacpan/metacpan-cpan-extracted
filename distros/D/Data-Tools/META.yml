@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,5 +19,5 @@ no_index:
     - inc
 resources:
   repository: https://github.com/cade-vs/perl-data-tools.git
-version: '1.18'
+version: '1.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Mojolicious;
 use Mojolicious::Types;
 
 # Basic functionality
@@ -78,5 +79,26 @@ is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1'),
   ['xml', 'txt', 'xml'], 'right formats';
 is_deeply $t->detect('application/json, text/javascript, */*; q=0.01'),
   ['json'], 'right formats';
+
+# File types
+is $t->file_type('foo/bar.png'), 'image/png',              'right type';
+is $t->file_type('foo/bar.js'),  'application/javascript', 'right type';
+is $t->file_type('foo/bar'),     undef,                    'no type';
+
+# Content types
+my $c = Mojolicious->new->build_controller;
+$t->content_type($c, {ext => 'json'});
+is $c->res->headers->content_type, 'application/json', 'right type';
+$t->content_type($c, {ext => 'txt'});
+is $c->res->headers->content_type, 'application/json', 'type not changed';
+$c->res->headers->remove('Content-Type');
+$t->content_type($c, {ext => 'html'});
+is $c->res->headers->content_type, 'text/html;charset=UTF-8', 'right type';
+$c->res->headers->remove('Content-Type');
+$t->content_type($c, {ext => 'unknown'});
+is $c->res->headers->content_type, 'text/plain;charset=UTF-8', 'right type';
+$c->res->headers->remove('Content-Type');
+$t->content_type($c, {file => 'foo/bar.png'});
+is $c->res->headers->content_type, 'image/png', 'right type';
 
 done_testing();

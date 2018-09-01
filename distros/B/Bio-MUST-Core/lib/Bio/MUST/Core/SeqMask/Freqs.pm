@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Freqs;
 # ABSTRACT: Arbitrary frequencies for sequence sites
-$Bio::MUST::Core::SeqMask::Freqs::VERSION = '0.181310';
+$Bio::MUST::Core::SeqMask::Freqs::VERSION = '0.182420';
 use Moose;
 use namespace::autoclean;
 
@@ -149,7 +149,7 @@ Bio::MUST::Core::SeqMask::Freqs - Arbitrary frequencies for sequence sites
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 SYNOPSIS
 

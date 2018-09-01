@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Axmud (visually-impaired users)
-Version=1.1.050
+Version=1.1.138
 Exec=baxmud.pl
 Icon=axmud
 Type=Application

@@ -3,6 +3,7 @@ Changes
 lib/Bio/CIPRES.pm
 lib/Bio/CIPRES/Error.pm
 lib/Bio/CIPRES/Job.pm
+lib/Bio/CIPRES/Message.pm
 lib/Bio/CIPRES/Output.pm
 LICENSE
 MANIFEST			This list of files

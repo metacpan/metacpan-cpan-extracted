@@ -5,7 +5,9 @@ Devel::Cover::Report::Codecov - Backend for Codecov reporting of coverage statis
 
 # SYNOPSIS
 
-    $ cover -report codecov
+```
+$ cover -report codecov
+```
 
 # DESCRIPTION
 
@@ -18,12 +20,13 @@ You must set CODECOV\_TOKEN environment variables if you don't use Travis CI, Ci
 
 - [Travis CI](https://travis-ci.org/)
 - [Circle CI](https://circleci.com/)
-- [AppVeyor](http://www.appveyor.com/)
 - [Codeship](https://codeship.com/)
-- [Drone.io](https://drone.io/)
 - [Semaphore](https://semaphoreci.com/)
-- [Wercker](http://wercker.com/)
-- [GitLab](https://about.gitlab.com/gitlab-ci/)
+- [drone.io](https://drone.io/)
+- [AppVeyor](https://www.appveyor.com/)
+- [Wercker](https://wercker.com/)
+- [Shippable](https://www.shippable.com/)
+- [GitLab CI](https://about.gitlab.com/gitlab-ci/)
 
 There are example Codecov CI settings in [example-perl](https://github.com/codecov/example-perl).
 

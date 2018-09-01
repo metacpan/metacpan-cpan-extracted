@@ -13,7 +13,6 @@ lib/Devel/Cover/Report/Codecov/Service/Codeship.pm
 lib/Devel/Cover/Report/Codecov/Service/Drone.pm
 lib/Devel/Cover/Report/Codecov/Service/Git.pm
 lib/Devel/Cover/Report/Codecov/Service/GitLab.pm
-lib/Devel/Cover/Report/Codecov/Service/Magnum.pm
 lib/Devel/Cover/Report/Codecov/Service/Mercurial.pm
 lib/Devel/Cover/Report/Codecov/Service/Semaphore.pm
 lib/Devel/Cover/Report/Codecov/Service/Shippable.pm
@@ -45,7 +44,6 @@ t/codecov/service/git/detect.t
 t/codecov/service/git/fallback.t
 t/codecov/service/gitlab/configuration.t
 t/codecov/service/gitlab/detect.t
-t/codecov/service/magnum/detect.t
 t/codecov/service/mercurial/configuration.t
 t/codecov/service/mercurial/detect.t
 t/codecov/service/mercurial/fallback.t

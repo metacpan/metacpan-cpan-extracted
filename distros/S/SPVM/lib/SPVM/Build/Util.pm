@@ -6,11 +6,40 @@ use Carp 'croak';
 use Config;
 use File::Basename 'dirname', 'basename';
 use File::Path 'mkpath';
+use Pod::Usage 'pod2usage';
+use Getopt::Long 'GetOptionsFromArray';
+use List::Util 'min';
 
 use SPVM::Build::Config;
 
 # SPVM::Build::tUtil is used from Makefile.PL
 # so this module must be wrote as pure per script, not contain XS and don't use any other SPVM modules except for SPVM::Build::Config.
+
+sub unindent {
+  my $str = shift;
+  my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
+  $str =~ s/^[ \t]{0,$min}//gm if $min;
+  return $str;
+}
+
+sub extract_usage {
+  my $file = @_ ? "$_[0]" : (caller)[1];
+
+  open my $handle, '>', \my $output;
+  pod2usage -exitval => 'noexit', -input => $file, -output => $handle;
+  $output =~ s/^.*\n|\n$//;
+  $output =~ s/\n$//;
+
+  return SPVM::Build::Util::unindent($output);
+}
+
+sub getopt {
+  my ($array, $opts) = map { ref $_[0] eq 'ARRAY' ? shift : $_ } \@ARGV, [];
+  my $save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case),
+    @$opts);
+  GetOptionsFromArray $array, @_;
+  Getopt::Long::Configure($save);
+}
 
 sub get_shared_lib_func_address {
   my ($shared_lib_file, $shared_lib_func_name) = @_;
@@ -122,7 +151,7 @@ sub create_package_make_rule {
   $make_rule
     .= "$shared_lib_file :: @deps\n\n";
   $make_rule
-    .= "\t$^X -Mblib -MSPVM::Build -e \"SPVM::Build->new(build_dir => 'spvm_build')->create_shared_lib_${category}_dist('$package_name')\"\n\n";
+    .= "\t$^X -Mblib -MSPVM::Build -e \"SPVM::Build->new(build_dir => 'spvm_build')->build_shared_lib_${category}_dist('$package_name')\"\n\n";
   
   return $make_rule;
 }
@@ -171,11 +200,16 @@ sub new_default_build_config {
   my $default_config = {%Config};
   $build_config->replace_all_config($default_config);
   
-  # Default include path
-  my $env_header_include_dir = $INC{"SPVM/Build/Util.pm"};
-  $env_header_include_dir =~ s/\/Util\.pm$//;
-  $env_header_include_dir .= '/include';
-  $build_config->add_ccflags("-I$env_header_include_dir");
+  # Include directory
+  my $include_dir = $INC{"SPVM/Build/Util.pm"};
+  $include_dir =~ s/\/Util\.pm$//;
+  $include_dir .= '/include';
+  $build_config->add_ccflags("-I$include_dir");
+
+  # lib directory
+  my $lib_dir = $INC{"SPVM/Build/Util.pm"};
+  $lib_dir =~ s/\/SPVM\/Build\/Util.pm$//;
+  $build_config->add_ccflags("-I$lib_dir");
   
   # C99
   $build_config->set_std('c99');

@@ -1,0 +1,27 @@
+
+Promise (value) states
+
+- unknown
+- transient
+- permanent
+
+try_deduce
+
+_deduce_promise (Frame)
+
+my $context = frame
+my $retval;
+
+for each candidate
+  $context = context->new_context
+  next unless $retval = $context->_deduce_promise
+  $context->commit;
+  last;
+}
+
+return $retval;
+
+_deduce_promise (Context)
+
+for each candidate
+  - 

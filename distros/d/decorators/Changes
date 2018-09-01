@@ -1,0 +1,5 @@
+Revision history for Perl extension decorators
+
+0.01 29 August 2018
+    - Initial release of code based on the Method::Traits
+      module, but now refactored to be a MOP pragma

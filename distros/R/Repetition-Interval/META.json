@@ -1,0 +1,53 @@
+{
+   "abstract" : "A library to calculate intervals for spaced repetition memorization",
+   "author" : [
+      "Mark Allen <mallen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Repetition-Interval",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "POSIX" : "0",
+            "Types::Standard" : "0",
+            "namespace::clean" : "0",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Repetition-Interval@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Repetition-Interval"
+      },
+      "homepage" : "https://metacpan.org/dist/repetition-interval",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/repetition-interval.git",
+         "web" : "https://github.com/mrallen1/repetition-interval"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

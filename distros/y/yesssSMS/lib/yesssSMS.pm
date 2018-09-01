@@ -29,12 +29,13 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '2.00';
+our $VERSION = '2.11';
 
 sub new
 {
 	my $self = {};
 	$self->{LOGINSTATE} = 0;
+	$self->{URL}="https://www.yesss.at/kontomanager.at/";
 
 	bless ($self);
 	return $self;
@@ -43,6 +44,8 @@ sub new
 sub login
 {
 	my $self = shift;
+	my $phoneParser;
+
 	($self->{TELNR},
 		$self->{PASS})=@_;
 
@@ -59,8 +62,7 @@ sub login
 	$self->{UA}->cookie_jar(HTTP::Cookies->new);
 
 	# go to start page
-	#$self->{CONTENT}=$self->{UA}->get("https://www.yesss.at/");
-	$self->{CONTENT}=$self->{UA}->get("https://www.yesss.at/kontomanager.at/");
+	$self->{CONTENT}=$self->{UA}->get($self->{URL});
 
 	# if there was an error on the start page, stop
 	if (!($self->{CONTENT}->is_success))
@@ -71,11 +73,7 @@ sub login
 	}
 
 	# do the login post
-	#$self->{CONTENT}=$self->{UA}->post("https://www.yesss.at/kontomanager.php",{'login_rufnummer' => $self->{TELNR},'login_passwort' => $self->{PASS}});
-	$self->{CONTENT}=$self->{UA}->post("https://www.yesss.at/kontomanager.at/index.php",{'login_rufnummer' => $self->{TELNR},'login_passwort' => $self->{PASS}});
-
-	#print "Returncode during login: ".$self->{CONTENT}->code."\n";
-	#print "Content during login: ".$self->{CONTENT}->decoded_content."\n";
+	$self->{CONTENT}=$self->{UA}->post($self->{URL}."index.php",{'login_rufnummer' => $self->{TELNR},'login_passwort' => $self->{PASS}});
 
 	# successful login results in redirect
 	if (!($self->{CONTENT}->is_redirect))
@@ -100,10 +98,87 @@ sub login
 			return 4;
 		}
 	}
+
+	# parse interesting values
+	$phoneParser=HTML::Parser->new(api_version=>3,
+		start_h => [\&loginStartTagParse, "self,tagname,attr"],
+		text_h => [\&loginTextParse, "self, text"],
+		end_h => [\&loginEndTagParse, "self, tagname"]
+	);
+	# bring my "self" into the handlers without global vars
+	# delete possible existing subscriptions
+	# initialize some variables needed for the parser
+	undef($self->{SUBSCRIPTIONS});
+	$phoneParser->{'yesssSMSself'}=$self;
+	$phoneParser->{'inSubscriber'}=0;
+	$phoneParser->{'inProgresslist'}=0;
+	$phoneParser->{'inProgressheading'}=0;
+	$phoneParser->{'amountSubscriptions'}=0;
+	$phoneParser->{'amountItems'}=0;
+	$phoneParser->parse($self->{CONTENT}->decoded_content);
+
+	# print found phone numbers and their values
+
 	$self->{LOGINSTATE}=1;
 	$self->{LASTERROR}='Login successful';
 	$self->{RETURNCODE}=0;
 	return 0;
+}
+
+sub selectPhonenumber
+{
+	my $self = shift;
+	my ($telnr)=@_;
+	my $phoneParser;
+
+	# switching is only possible after login
+	if ($self->{LOGINSTATE} == 0)
+	{
+		$self->{LASTERROR}='Not logged in while trying to select phonenumber';
+		$self->{RETURNCODE}=1;
+		return 1;
+	}
+
+	# check, if the requested phonenumber is valid
+	if (! defined($self->{SUBSCRIBERS}->{$telnr}))
+	{
+		$self->{LASTERROR}='Requested phonenumber not available in account';
+		$self->{RETURNCODE}=6;
+		return 6;
+	}
+
+	$self->{CONTENT}=$self->{UA}->post($self->{URL}."kundendaten.php",
+		{
+			'subscriber' => $self->{SUBSCRIBERS}->{$telnr},
+			'groupaction' => 'change_subscriber'
+		}
+		);
+
+	# stop on error
+	if (!($self->{CONTENT}->is_success))
+	{
+		$self->{LASTERROR}='Error while selecting phonenumber';
+		$self->{RETURNCODE}=7;
+		return 7;
+	}
+
+	# parse interesting values
+	$phoneParser=HTML::Parser->new(api_version=>3,
+		start_h => [\&loginStartTagParse, "self,tagname,attr"],
+		text_h => [\&loginTextParse, "self, text"],
+		end_h => [\&loginEndTagParse, "self, tagname"]
+	);
+	# bring my "self" into the handlers without global vars
+	undef($self->{SUBSCRIPTIONS});
+	$phoneParser->{'yesssSMSself'}=$self;
+	$phoneParser->{'inSubscriber'}=0;
+	$phoneParser->{'inProgresslist'}=0;
+	$phoneParser->{'inProgressheading'}=0;
+	$phoneParser->{'amountSubscriptions'}=0;
+	$phoneParser->{'amountItems'}=0;
+	$phoneParser->parse($self->{CONTENT}->decoded_content);
+
+	
 }
 
 sub sendmessage
@@ -133,7 +208,7 @@ sub sendmessage
 	}
 
 	# go to correct menu item
-	$self->{CONTENT}=$self->{UA}->post("https://www.yesss.at/kontomanager.at/websms.php");
+	$self->{CONTENT}=$self->{UA}->post($self->{URL}."websms.php");
 
 	# stop on error
 	if (!($self->{CONTENT}->is_success))
@@ -144,7 +219,7 @@ sub sendmessage
 	}
 
 	# try to send message
-	$self->{CONTENT}=$self->{UA}->post("https://www.yesss.at/kontomanager.at/websms_send.php",{'to_netz' => 'a','to_nummer' => $telnr,'nachricht' => $message});
+	$self->{CONTENT}=$self->{UA}->post($self->{URL}."websms_send.php",{'to_netz' => 'a','to_nummer' => $telnr,'nachricht' => $message});
 
 	# stop on error
 	if (!($self->{CONTENT}->is_success))
@@ -179,7 +254,7 @@ sub logout
 	}
 
 	# post the logout url
-	$self->{CONTENT}=$self->{UA}->post("https://www.yesss.at/kontomanager.at/index.php?dologout=1");
+	$self->{CONTENT}=$self->{UA}->post($self->{URL}."index.php?dologout=1");
 
 	# if there was an error during logout, stop
 	if (!($self->{CONTENT}->is_success))
@@ -217,6 +292,13 @@ sub getContent
 	return $self->{CONTENT};
 }
 
+sub getSubscriptions
+{
+	my $self = shift;
+
+	return $self->{SUBSCRIPTIONS};
+}
+
 sub DESTROY
 {
 	my $self = shift;
@@ -224,6 +306,161 @@ sub DESTROY
 	{
 		$self->logout();
 	}
+}
+
+
+####### methods for parser
+# login/switch phone number
+sub loginStartTagParse
+{
+	my ($self, $tagname, $attr) = @_;
+
+	if (($self->{'inSubscriber'} != 1) &&
+		($self->{'inProgresslist'} < 1))
+	{
+		if (($tagname eq 'select') &&
+			($attr->{'id'} eq 'subscriber'))
+		{
+			$self->{'inSubscriber'}=1;
+		}
+		elsif (($tagname eq 'div') && 
+			(defined ($attr->{'class'})) &&
+			($attr->{'class'} eq 'progress-list'))
+		{
+			$self->{'inProgresslist'}++;
+		}
+	}
+	elsif ($self->{'inSubscriber'} == 1)
+	{
+		if ($tagname eq 'option')
+		{
+			$self->{'lastValue'}=$attr->{'value'};
+		}
+	}
+	elsif ($self->{'inProgresslist'} >= 1)
+	{
+		if ($tagname eq 'div')
+		{
+			if ($attr->{'class'} eq 'info-list-item')
+			{
+				$self->{'inProgresslist'}=0;
+				$self->{'amountItems'}=0;
+			}
+			elsif ($attr->{'class'} eq 'progress-item')
+			{
+				$self->{'amountItems'}++;
+				$self->{'inProgresslist'}++;
+			}
+			else
+			{
+				$self->{'inProgresslist'}++;
+			}
+		}
+		if ($tagname eq 'h3')
+		{
+			if ((defined($attr->{'id'})) &&
+				($attr->{'id'} eq 'kostenkontrolle'))
+			{
+				# we ignore 'Kostenkontrolle'
+				$self->{'inProgresslist'}=0;
+				$self->{'amountItems'}=0;
+			}
+			else
+			{
+				$self->{'inProgressheading'}=1;
+			}
+		}
+	}
+}
+
+sub loginTextParse
+{
+	my ($self, $text) = @_;
+	my $phonenumber;
+	my $progressname;
+	my $progresstype;
+	my $value;
+
+	&trim(\$text);
+	if (($self->{'inSubscriber'} == 1) &&
+		(length($text)>1))
+	{
+		($phonenumber)=$text=~/^([0-9]+)[^0-9]/;
+		$self->{'yesssSMSself'}->{SUBSCRIBERS}->{$phonenumber}=$self->{'lastValue'};
+	}
+	elsif (($self->{'inProgressheading'} == 1) &&
+		(length($text)>1))
+	{
+		($progressname,$progresstype)=$text=~/Ihr (.*) ([^\s]*):$/;
+		$self->{'amountSubscriptions'}++;
+		$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->[$self->{'amountSubscriptions'}-1]->{'name'}=$progressname;
+		if ($progresstype eq 'Guthaben')
+		{
+			$progresstype='Paket';
+		}
+		$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->[$self->{'amountSubscriptions'}-1]->{'type'}=$progresstype;
+	}
+	elsif (($self->{'inProgresslist'} >= 1) &&
+		(length($text)>1))
+	{
+		if ($text=~/^[0-9]+\s/)
+		{
+			($value)=$text=~/^[0-9]+\s(.+)$/;
+			$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->
+				[$self->{'amountSubscriptions'}-1]->{'items'}->[$self->{'amountItems'}-1]->{'unit'}=$value;
+		}
+		elsif ($text=~/^Verbraucht/)
+		{
+			($value)=$text=~/^Verbraucht: ([0-9]+)$/;
+			$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->
+				[$self->{'amountSubscriptions'}-1]->{'items'}->[$self->{'amountItems'}-1]->{'used'}=$value;
+		}
+		elsif ($text=~/^Verbleibend/)
+		{
+			($value)=$text=~/^Verbleibend: ([0-9]+)$/;
+			$self->{'yesssSMSself'}->{SUBSCRIPTIONS}->
+				[$self->{'amountSubscriptions'}-1]->{'items'}->[$self->{'amountItems'}-1]->{'remaining'}=$value;
+		}
+	}
+}
+
+sub loginEndTagParse
+{
+	my ($self, $tagname) = @_;
+
+	if ($self->{'inSubscriber'} == 1)
+	{
+		if ($tagname eq 'select')
+		{
+			$self->{'inSubscriber'}=0;
+		}
+	}
+	elsif ($self->{'inProgresslist'} >= 1)
+	{
+		if ($tagname eq 'div')
+		{
+			$self->{'inProgresslist'}--;
+			if ($self->{'inProgresslist'} == 0)
+			{
+				$self->{'amountItems'}=0;
+			}
+		}
+		if ($self->{'inProgressheading'} == 1)
+		{
+			if ($tagname eq 'h3')
+			{
+				$self->{'inProgressheading'}=0;
+			}
+		}
+	}
+}
+
+sub trim
+{
+	my $string=$_[0];
+
+	$$string =~ s/^\s+//;
+	$$string =~ s/\s+$//;
 }
 
 1;
@@ -250,7 +487,22 @@ yesssSMS - Send text messages to mobile phones through the website of yesss!
  {
  	print STDERR "Error during login: ".$sms->getLastError()."\n";
  }
+
+ # if multiple phonenumbers are available, switch if needed
+ $sms->selectPhonenumber('4368187654321');
+
+ # check whether the switch was successfull
+ if ($sms->getLastResult!=0)
+ {
+ 	print STDERR "Error during selectPhonenumber: ".
+		$sms->getLastError()."\n";
+ }
  
+ # print remaining units of the main subscription
+ print "Remaining: ";
+ print $sms->{SUBSCRIPTIONS}->[0]->{'items'}->[0]->{'remaining'}." ";
+ print $sms->{SUBSCRIPTIONS}->[0]->{'items'}->[0]->{'unit'}."\n";
+
  # send a text message
  $sms->sendmessage('00436817654321','Just testing...');
  
@@ -307,6 +559,16 @@ The following method logs into the website with your phone number and the passwo
 
 =back
 
+
+The following method selects the sending phonenumer (for accounts with multiple phones):
+
+=over
+
+=item $sms->selectPhonenumer(MyAlternatePhonenumer)
+
+=back
+
+
 The following method sends a text message if a login was successful before:
 
 =over
@@ -322,6 +584,18 @@ The following method logs out of the website of yesss!
 =over
 
 =item $sms->logout()
+
+=back
+
+The following method returns the hash to all subscription details:
+
+=over
+
+=item $sms->getSubscriptions()
+
+0 means: not logged in
+
+1 means: logged in
 
 =back
 
@@ -378,6 +652,12 @@ Original version
 =item 2.00
 
 Adopted for the new website being online since August 1st, 2014
+
+=item 2.10
+
+Added the possibility to change the sending phonenumber
+Login and selecting phonenumber reads details about tarifs and packages
+Details about tarif and packages are available through getSubscriptions
 
 =back
 

@@ -1,17 +1,18 @@
 requires "Class::Load" => "0";
 requires "Exception::Class" => "0";
+requires "Exporter::Tiny" => "0";
 requires "List::MoreUtils" => "0";
 requires "List::Util" => "0";
 requires "Module::Pluggable::Object" => "0";
 requires "Ref::Util" => "0";
 requires "Scalar::Util" => "0";
 requires "Sub::Install" => "0";
-requires "Sub::Name" => "0";
 requires "Variable::Magic" => "0";
 requires "feature" => "0";
 requires "namespace::clean" => "0";
 requires "overload" => "0";
 requires "parent" => "0";
+requires "perl" => "v5.12.0";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -21,12 +22,18 @@ on 'build' => sub {
 
 on 'test' => sub {
   requires "Exporter" => "0";
+  requires "FindBin" => "0";
   requires "Hash::Util" => "0";
+  requires "Sub::Name" => "0";
   requires "Sub::Override" => "0";
   requires "Sub::Uplevel" => "0";
+  requires "Syntax::Construct" => "0";
   requires "Test::Deep" => "0";
+  requires "Test::Deep::Cmp" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0.94";
+  requires "Test::Warnings" => "0";
+  requires "lib" => "0";
 };
 
 on 'configure' => sub {

@@ -1,5 +1,5 @@
 ---
-abstract: 'SMS::Send driver for Konzulta - Czech Republic '
+abstract: 'SMS::Send driver for Konzulta - Czech Republic'
 author:
   - 'Radek Šiman <rbit@rbit.cz>'
 build_requires:
@@ -22,9 +22,10 @@ requires:
   LWP::UserAgent: '0'
   Log::LogLite: '0'
   SMS::Send::Driver: '0'
+  Text::Unidecode: '0'
   XML::Simple: '0'
   base: '0'
   strict: '0'
   warnings: '0'
-version: '1.000'
+version: '1.001'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -466,4 +466,29 @@ my @exp_nomiss_lens = (56, 54, 48, 54, 44, 50, 48, 50, 52, 34);
         'got expected seq len stats';
 }
 
+{
+    my $chunk = 200;
+
+    my $split = sub {
+        my $seq = shift;
+        my $base_id = ( split /\s+/xms, $seq->full_id )[0];
+        my $max_pos = $seq->seq_len - $chunk;
+        my $n = 0;
+        my $out_str;
+        for (my $pos = 0; $pos <= $max_pos; $pos += $chunk, $n++) {
+            $out_str .= ">$base_id.$n\n" . $seq->edit_seq($pos,
+                $pos + $chunk <= $max_pos ? $chunk : 2 * $chunk
+            ) . "\n";
+        }
+        return $out_str;
+    };
+
+    cmp_store(
+        obj  => $class, method => 'instant_store',
+        file => 'outsplit.fasta',
+        test => 'got expected instantly transformed FASTA file',
+        args => { infile => file('test', 'insplit.fasta'), coderef => $split },
+    );
+}
+
 done_testing;

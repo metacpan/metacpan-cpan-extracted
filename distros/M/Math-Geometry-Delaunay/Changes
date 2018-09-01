@@ -1,5 +1,18 @@
 Revision history for Perl extension Math::Geometry::Delaunay.
 
+0.21 Friday August 31 16:51:00 2018
+
+  - remove duplicate typedef preventing compile with some gccs
+
+0.20 Thursday August 30 19:14:00 2018
+
+  - use fenv.h (C++11) for floating point control on linux,
+    if it's avaliable, instead of older glibc fpu_control.h
+
+  - fix to_svg() to accept topology hash blessed as "mgd_topo"
+
+  - minor adjustments to avoid compiler warnings
+
 0.19 Sunday November 30 21:00:00 2014
 
   - Fix build for ARM-linux, e.g. Raspberry Pi

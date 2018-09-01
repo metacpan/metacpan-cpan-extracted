@@ -1,5 +1,5 @@
 package HackaMol;
-$HackaMol::VERSION = '0.047';
+$HackaMol::VERSION = '0.048';
 #ABSTRACT: HackaMol: Object-Oriented Library for Molecular Hacking
 use 5.008;
 use Moose;
@@ -666,7 +666,7 @@ HackaMol - HackaMol: Object-Oriented Library for Molecular Hacking
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 DESCRIPTION
 

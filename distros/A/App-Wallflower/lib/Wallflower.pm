@@ -1,10 +1,10 @@
 package Wallflower;
-$Wallflower::VERSION = '1.009';
+$Wallflower::VERSION = '1.011';
 use strict;
 use warnings;
 
 use Plack::Util ();
-use Path::Class;
+use Path::Tiny ();
 use URI;
 use HTTP::Date qw( time2str str2time);
 use HTTP::Headers::Fast;    # same as Plack::Response
@@ -20,7 +20,7 @@ for my $attr (qw( application destination env index url )) {
 sub new {
     my ( $class, %args ) = @_;
     my $self = bless {
-        destination => Path::Class::Dir->new(),    # File::Spec->curdir
+        destination => Path::Tiny->new('.'),
         env         => {},
         index       => 'index.html',
         url         => 'http://localhost/',
@@ -59,7 +59,7 @@ sub target {
     $segments[-1] = $self->index if $segments[-1] eq '';
 
     # generate target file name
-    return Path::Class::File->new( $self->destination, @segments );
+    return Path::Tiny->new( $self->destination, grep length, @segments );
 }
 
 # save the URL to a file
@@ -124,7 +124,7 @@ sub get {
     if ( $status eq '200' ) {
 
         # get a file to save the content in
-        my $dir = ( $file = $target )->dir;
+        my $dir = ( $file = $target )->parent;
         if ( !-e $dir ) {
             eval { $dir->mkpath } or do {
                 warn "$@\n" if $@;
@@ -183,7 +183,7 @@ Wallflower - Stick Plack applications to the wallpaper
 
 =head1 VERSION
 
-version 1.009
+version 1.011
 
 =head1 SYNOPSIS
 

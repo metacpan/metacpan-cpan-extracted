@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99016';
+$Net::Whois::Raw::VERSION = '2.99018';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -479,7 +479,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99016
+version 2.99018
 
 =head1 SYNOPSIS
 

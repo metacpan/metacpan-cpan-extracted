@@ -4,7 +4,7 @@ MANIFEST			This list of files
 README
 SEC.xs
 typemap
-demo/getkeyset.pl
+demo/getkeyset
 demo/key2ds
 demo/make-signed-keyset
 lib/Net/DNS/SEC.pm

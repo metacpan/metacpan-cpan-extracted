@@ -1,9 +1,10 @@
 package Dist::Zilla::Plugin::TestMLIncluder;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::FileMunger';
+with 'Dist::Zilla::Role::PrereqSource';
 
 use Dist::Zilla::File::InMemory;
 use IO::All;
@@ -123,6 +124,17 @@ sub add {
       name => $name,
       content => $content,
     )
+  );
+}
+
+sub register_prereqs {
+  my $self = shift;
+  $self->zilla->register_prereqs(
+    {
+      type  => 'requires',
+      phase => 'test',
+    },
+    'JSON::PP' => 0,
   );
 }
 

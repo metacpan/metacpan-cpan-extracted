@@ -1,5 +1,16 @@
 Revision history for App-Wallflower
 
+1.011 2018-09-01 BOOK
+    - improve the inter-process communication algorithm when running
+      in parallel mode
+    - Wallflower::Util links_from() now only returns relevant links
+
+1.010 2018-08-31 BOOK
+    - add a --parallel option to wallflower, to fetch files in parallel
+    - add a --version option to wallflower
+    - minor documentation improvements
+    - switch to Path::Tiny for handling paths
+
 1.009 2018-07-06 BOOK
     - fixed a bug with the --filter option, which made it visit only
       the first link in the input

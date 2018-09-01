@@ -8,8 +8,11 @@ BEGIN {
 	if(-e 't/online.enabled') {
 		use_ok('WWW::Scrape::FindaGrave') || print 'Bail out!';
 	} else {
-		diag 'You must be on-line to test WWW::Scrape::FindaGrave';
-		print 'Bail out!';
+		SKIP: {
+			diag 'You must be on-line to test WWW::Scrape::FindaGrave';
+			skip 'You must be on-line to test WWW::Scrape::FindaGrave', 1;
+			print 'Bail out!';
+		}
 	}
 }
 

@@ -22,7 +22,8 @@ DESCRIPTION
     libraries. It also provides a few simple helpers. Future versions of
     the plugin will allow setting of configuration like themes.
 
-    The bundled version of Reveal.js is currently 3.7.0.
+    The bundled version of Reveal.js is currently 3.7.0. The bundled
+    version of reveal-sampler is currently b04a34e.
 
     Note that this module is in an alpha form! The author makes no
     compatibilty promises.
@@ -111,6 +112,11 @@ HELPERS
 
       %= include_code 'path/to/file.pl'
 
+    NOTE this helper is mildly-deprecated in favor of the reveal-sampler
+    plugin and "include_sample". It isn't going away yet, but if things
+    work out with that functionality this method may eventually be
+    implemented via it or removed entirely.
+
     This helper does several things:
 
       * localizes trailing arguments into the stash
@@ -158,6 +164,52 @@ HELPERS
       # reveal end part1
     
       Excluded content
+
+ include_sample
+
+      %= include_sample 'path/to/file.pl'
+
+    The spiritual successor (and possbily actually the sucessor) to
+    "include_code". The heavy lifting is done in the client via the
+    reveal-sampler plugin which is bundled. It is much simpler than
+    "include_code".
+
+    It takes the url of the file to render, which must be in a publicly
+    available via static render. This file path may also contain a url
+    fragment designating the section or line numbers to display. Read more
+    at https://github.com/ldionne/reveal-sampler.
+
+    After the file url, the following trailing key-value pair options are
+    available.
+
+    language
+
+      Sets the language for the highlighting. Note that the alias lang is
+      also allowed and defaults to the value of the language stash value.
+      If this is not set, the client-side code will also attempt to set it
+      based on the file extension.
+
+    mark
+
+      Sets lines to be marked by the client. This follows the documentation
+      at https://github.com/ldionne/reveal-sampler.
+
+    trim
+
+      Sets the data-trim attribute for revealjs.
+
+    noescape
+
+      Sets the data-noescape attribute for revealjs. Note that if the
+      "mark" option is used, the front-end will automatically apply this
+      attribute.
+
+    annotation
+
+      A text line to be rendered below the code section. This is normally
+      used to display the file name/path. If not explicitly given it will
+      default to the url of the file (without any fragment). If explicitly
+      undefined, the annotation will not be rendered.
 
  section
 
@@ -212,5 +264,7 @@ COPYRIGHT AND LICENSE
     under the same terms as Perl itself.
 
     Reveal.js (bundled) is Copyright (C) 2015 Hakim El Hattab,
-    http://hakim.se and released under the MIT license.
+    http://hakim.se and released under the MIT license. reveal-sampler
+    (bundled) is Copyright (C) 2017 Louis Dionne and released under the MIT
+    license.
 

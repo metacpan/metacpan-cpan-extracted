@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1705 2018-08-23 10:24:02Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -38,6 +38,10 @@ my %prerequisite = (
 my %optional;
 
 
+my @debris = qw(*.gcov *.gcda *.gcno);
+
+
+my $def = eval 'require Digest::GOST' ? '' : '-DNO_ECCGOST';
 my $inc = '';
 my $lib = '-lcrypto';
 my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
@@ -62,9 +66,11 @@ $lib = $ENV{OPENSSL_LIB}     if $ENV{OPENSSL_LIB};
 WriteMakefile(
 	%metadata,
 	PREREQ_PM  => {%prerequisite},
-	INC	   => "$inc",
+	DEFINE	   => $def,
+	INC	   => $inc,
 	LIBS	   => [$lib],
 	META_MERGE => {recommends => {%optional}},
+	clean	   => {FILES => "@debris"},
 	);
 
 
@@ -73,6 +79,7 @@ package MY;				## customise generated Makefile
 sub special_targets {
 	return join "\n\n", '.NOTPARALLEL:', shift->SUPER::special_targets();
 }
+
 
 sub install {
 	my $self = shift;
@@ -105,10 +112,11 @@ sub install {
 
 	return $self->SUPER::install(@_) unless $hidden{$install_site};
 
-	warn <<"AMEN";
+	my $message;
+	warn $message = <<"AMEN";
 ##
 ##	The install location for this version of Net::DNS::SEC differs
-##	from the existing @version in your perl library.
+##	from the existing @version in your perl library at
 ##	@installed
 ##
 ##	The installation will be rendered ineffective because the
@@ -118,30 +126,39 @@ sub install {
 ##	Makefile has been generated to support build and test only.
 ##
 AMEN
+	my $echo = '	$(NOECHO) $(ECHO) "##"';
+	$message =~ s/##/$echo/eg;
 
-	return <<'END';
+	return join '', <<'END', $message;
 install :
-	$(NOECHO) $(ECHO) "##	Makefile supports test build only"
+	$(NOECHO) $(ECHO) "##	Makefile supports build and test only"
 	$(NOECHO) $(ECHO) "##	(see message from Makefile.PL)"
 	$(NOECHO) $(FALSE)
+
+test :: $(TEST_TYPE)
 END
-}
-
-
-sub libscan {
-	my $path = $_[1];
-	return '' if $path =~ /\B\.svn\b/;
-	return $path;
 }
 
 
 sub postamble {
-	return <<'END';
-test_cover : pure_all
+	my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+	return <<"PlanB" unless `gcov -v 2>$nul`;
+test_cover :
 	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
+	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test
 	cover -summary
-END
+PlanB
+	my $ccflags = join ' ', qw(-O0 -fprofile-arcs -ftest-coverage);
+	my $ldflags = join ' ', qw(-fprofile-arcs -ftest-coverage);
+	return <<"PlanA";
+test_cover :
+	cover -delete
+	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W SEC.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
+	gcov SEC.xs
+	gcov2perl SEC.xs.gcov
+	cover -summary
+	\$(NOECHO) touch SEC.c		# force partial rebuild before install
+PlanA
 }
 
 

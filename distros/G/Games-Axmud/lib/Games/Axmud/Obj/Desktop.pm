@@ -99,7 +99,7 @@
             # Zones can specify that only certain window types can be placed in them, or can specify
             #   that all window types may be placed in them.
             # Hash in the form
-            #   $gridHash{number} = blessed_reference_to_workspace_grid_object
+            #   $gridHash{unique_number} = blessed_reference_to_workspace_grid_object
             gridHash                    => {},
             # Number of workspace grid objects ever created for this workspace (used to give every
             #   workspace grid object a unique number)

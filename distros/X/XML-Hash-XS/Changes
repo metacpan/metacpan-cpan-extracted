@@ -1,5 +1,9 @@
 Revision history for perl module XML::Hash::XS
 
+0.53    2018-08-31
+    - Don't trim spaces on text node when "trim" option is off
+        - Thanks to Tudor Marghidanu for report
+
 0.52    2018-03-25
     - Implement searilization of objects with overloaded stringification
         - Thanks to Slobodan Mišković for advice

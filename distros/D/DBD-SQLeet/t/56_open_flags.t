@@ -12,7 +12,6 @@ use SQLeetTest;
 use Test::More;
 
 my $tests = 7;
-$tests += 1 if has_sqleet_sqlite('3.7.7');
 plan tests => $tests;
 
 use DBI;
@@ -54,19 +53,6 @@ unlink $dbfile if -f $dbfile;
     });
   };
   ok !$@ && $dbh && -f $dbfile, "created a dbfile for readwrite";
-  $dbh->disconnect;
-  unlink $dbfile if -f $dbfile;
-}
-
-if (has_sqleet_sqlite('3.7.7')) {
-  my $dbh = eval {
-    DBI->connect("dbi:SQLeet:$dbfile", undef, undef, {
-      PrintError => 0,
-      RaiseError => 1,
-      sqlite_open_flags => DBD::SQLeet::OPEN_URI,
-    });
-  };
-  ok !$@ && $dbh && -f $dbfile, "readwrite/create flags are turned on if no readonly/readwrite/create flags are set";
   $dbh->disconnect;
   unlink $dbfile if -f $dbfile;
 }

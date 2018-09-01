@@ -1,0 +1,15 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+lib/lib/archive.pm
+t/01_basic.t
+t/02_file.t
+t/03_url.t
+t/arclib/VMod.tgz
+t/arclib/VMod2.tgz
+t/arclib/VMod3.tgz
+t/arclib/VMod4-7.0.tar.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

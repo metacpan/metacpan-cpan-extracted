@@ -1,5 +1,20 @@
 Revision history for Firefox-Marionette
 
+0.64  Fri Aug 31 20:12:00 2018
+       Removed unnecessary debug statements from the script method
+
+0.63  Fri Aug 31 06:51:00 2018
+       Fixed Win32 tests.  Updated script parameters to match current firefox script parameters.
+
+0.62  Thu Aug 30 06:35:00 2018
+       Corrected documentation
+
+0.61  Wed Aug 29 06:50:00 2018
+       Forcing HTTP::Daemon to use LocalAddr of 'localhost' to stop CPAN Tester errors
+
+0.60  Tue Aug 28 21:10:00 2018
+       Adding json and strip methods
+
 0.59  Thu Aug 23 06:48:00 2018
        Provided direct shortcuts to timeout parameters for the new method.
 

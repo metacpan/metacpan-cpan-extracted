@@ -75,7 +75,8 @@
         { src: 'revealjs/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
         { src: 'revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
         { src: 'revealjs/plugin/zoom-js/zoom.js', async: true },
-        { src: 'revealjs/plugin/notes/notes.js', async: true }
+        { src: 'revealjs/plugin/notes/notes.js', async: true },
+        { src: 'reveal-sampler/sampler.js' }
       ];
 
       %= include 'revealjs_preinit', format => 'js'

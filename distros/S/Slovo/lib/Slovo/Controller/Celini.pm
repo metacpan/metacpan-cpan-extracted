@@ -60,7 +60,9 @@ sub store($c) {
 
   # 1. Validate input
   my $v = $c->_validation;
-  return $c->render(action => 'create', celini => {}) if $v->has_error;
+  return $c->render(action => 'create', celini => {},
+                    in => {%{$v->output}, %$in})
+    if $v->has_error;
 
   # 2. Insert it into the database
   $in = {%{$v->output}, %$in};
@@ -156,6 +158,7 @@ sub remove($c) {
 
 
 # Validation for actions that store or update
+# Validation rules for the record to be stored in the database
 sub _validation($c) {
   $c->req->param(alias => $c->param('title')) unless $c->param('alias');
   for (qw(featured accepted bad deleted)) {
@@ -163,29 +166,34 @@ sub _validation($c) {
   }
   my $v = $c->validation;
 
-  # Add validation rules for the record to be stored in the database
-  $v->optional('data_type', 'trim')->size(0, 32)->in(
-                                                     'въпросъ', 'ѿговоръ',
-                                                     'писанѥ',  'белѣжка',
-                                                     'книга',   'глава',
-                                                     'заглавѥ', 'цѣлина'
-                                                    );
-  my $alias   = 'optional';
-  my $title   = $alias;
-  my $page_id = $alias;
-  my $types   = 'книга|въпросъ|писанѥ|белѣжка';
-  if ($v->param('data_type') =~ /^($types)$/x) {
-    $page_id = $title = $alias = 'required';
+  state $types = $c->openapi_spec('/parameters/data_type/enum');
+  $v->required('data_type', 'trim')->in(@$types);
+  my $alias = 'optional';
+  my $title = $alias;
+  my $pid   = $alias;
+
+  # For all but the last two types the following properties are required
+  my $types_rx = join '|', @$types[0 .. @$types - 2];
+  my $dt = $v->param('data_type') // '';
+  if ($dt =~ /^($types_rx)$/x) {
+    $title = $alias = 'required';
+  }
+
+  # for ѿговоръ pid is required
+  elsif ($dt =~ /^($types->[-2])$/x) {
+    $pid = 'required';
   }
   $v->$alias('alias', 'slugify')->size(0, 255);
   $v->$title('title', 'xml_escape', 'trim')->size(0, 255);
-  $v->optional('pid',     'trim')->like(qr/^\d+$/);
+  $v->$pid('pid', 'trim')->like(qr/^\d+$/);
   $v->optional('from_id', 'trim')->like(qr/^\d+$/);
-  $v->$page_id('page_id', 'trim')->like(qr/^\d+$/);
-  $v->optional('user_id',     'trim')->like(qr/^\d+$/);
-  $v->optional('group_id',    'trim')->like(qr/^\d+$/);
-  $v->optional('sorting',     'trim')->like(qr/^\d{1,3}$/);
-  $v->optional('data_format', 'trim')->size(0, 32);
+  $v->required('page_id', 'trim')->like(qr/^\d+$/);
+  $v->optional('user_id',  'trim')->like(qr/^\d+$/);
+  $v->optional('group_id', 'trim')->like(qr/^\d+$/);
+  $v->optional('sorting',  'trim')->like(qr/^\d{1,3}$/);
+
+  state $formats = $c->openapi_spec('/parameters/data_format/enum');
+  $v->required('data_format', 'trim')->in(@$formats);
   $v->optional('description', 'trim')->size(0, 255);
   $v->optional('keywords',    'trim')->size(0, 255);
   $v->optional('tags',        'trim')->size(0, 100);
@@ -201,6 +209,7 @@ sub _validation($c) {
   $v->optional('start',       'trim')->like(qr/^\d{1,10}$/);
   $v->optional('stop',        'trim')->like(qr/^\d{1,10}$/);
   $v->optional('published',   'trim')->in(2, 1, 0);
+  $c->b64_images_to_files('body');
   return $v;
 }
 

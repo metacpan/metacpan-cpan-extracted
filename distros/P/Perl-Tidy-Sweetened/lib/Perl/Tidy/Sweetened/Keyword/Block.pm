@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 $|++;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 # Regex to match balanced params. Reproduced from Regexp::Common to avoid
 # adding a non-core dependency.
@@ -159,7 +159,7 @@ Perl::Tidy::Sweetened::Keyword::Block - Perl::Tidy::Sweetened filter plugin to d
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -231,32 +231,6 @@ is significant.
 =head1 AUTHOR
 
 Mark Grimes E<lt>mgrimes@cpan.orgE<gt>
-
-=head1 CONTRIBUTORS
-
-=over 4
-
-=item *
-
-Kent Fredric (@kentnl)
-
-=item *
-
-Gregoy Oschwald (@oschwal)
-
-=item *
-
-Curtis Brandt (@aggrolite)
-
-=item *
-
-@pblaberge
-
-=item *
-
-Peter Roberts (@pwr22)
-
-=back
 
 =head1 SOURCE
 

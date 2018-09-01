@@ -1,4 +1,3 @@
-
 #define PERL_NO_GET_CONTEXT 1 /* Define at top for more efficiency. */
 
 #include "EXTERN.h"
@@ -421,6 +420,7 @@ PREINIT:
   dMY_CXT;
   int i;
 PPCODE:
+  _prime_memfreeall();
   MY_CXT.MPUroot = NULL;
   MY_CXT.MPUGMP = NULL;
   MY_CXT.MPUPP = NULL;
@@ -430,7 +430,6 @@ PPCODE:
     SvREFCNT_dec_NN(sv);
   } /* stashes are owned by stash tree, no refcount on them in MY_CXT */
   Safefree(MY_CXT.randcxt); MY_CXT.randcxt = 0;
-  _prime_memfreeall();
   return; /* skip implicit PUTBACK, returning @_ to caller, more efficient*/
 
 
@@ -546,10 +545,12 @@ UV _is_csprng_well_seeded()
     RETVAL
 
 void prime_memfree()
+  PREINIT:
+    dMY_CXT;
   PPCODE:
     prime_memfree();
     /* (void) _vcallgmpsubn(aTHX_ G_VOID|G_DISCARD, "_GMP_memfree", 0, 49); */
-    _vcallsub_with_pp("prime_memfree");
+    if (MY_CXT.MPUPP != NULL) _vcallsub_with_pp("prime_memfree");
     return;
 
 void
@@ -573,11 +574,12 @@ prime_precalc(IN UV n)
 void
 prime_count(IN SV* svlo, ...)
   ALIAS:
-    twin_prime_count = 1
-    ramanujan_prime_count = 2
-    ramanujan_prime_count_approx = 3
-    sum_primes = 4
-    print_primes = 5
+    semiprime_count = 1
+    twin_prime_count = 2
+    ramanujan_prime_count = 3
+    ramanujan_prime_count_approx = 4
+    sum_primes = 5
+    print_primes = 6
   PREINIT:
     int lostatus, histatus;
     UV lo, hi;
@@ -595,12 +597,13 @@ prime_count(IN SV* svlo, ...)
       }
       if (lo <= hi) {
         if      (ix == 0) { count = prime_count(lo, hi); }
-        else if (ix == 1) { count = twin_prime_count(lo, hi); }
-        else if (ix == 2) { count = ramanujan_prime_count(lo, hi); }
-        else if (ix == 3) { count = ramanujan_prime_count_approx(hi);
+        else if (ix == 1) { count = semiprime_count(lo, hi); }
+        else if (ix == 2) { count = twin_prime_count(lo, hi); }
+        else if (ix == 3) { count = ramanujan_prime_count(lo, hi); }
+        else if (ix == 4) { count = ramanujan_prime_count_approx(hi);
                             if (lo > 2)
                               count -= ramanujan_prime_count_approx(lo-1); }
-        else if (ix == 4) {
+        else if (ix == 5) {
 #if BITS_PER_WORD == 64 && HAVE_UINT128
           if (hi >= 29505444491UL && hi-lo > hi/50) {
             UV hicount, lo_hic, lo_loc;
@@ -616,7 +619,7 @@ prime_count(IN SV* svlo, ...)
           }
 #endif
           lostatus = sum_primes(lo, hi, &count);
-        } else if (ix == 5) {
+        } else if (ix == 6) {
           int fd = (items < 3) ? fileno(stdout) : my_sviv(ST(2));
           print_primes(lo, hi, fd);
           XSRETURN_EMPTY;
@@ -626,11 +629,12 @@ prime_count(IN SV* svlo, ...)
     }
     switch (ix) {
       case 0: _vcallsubn(aTHX_ GIMME_V, VCALL_ROOT, "_generic_prime_count", items, 0); break;
-      case 1: _vcallsub_with_pp("twin_prime_count");  break;
-      case 2: _vcallsub_with_pp("ramanujan_prime_count");  break;
-      case 3: _vcallsub_with_pp("ramanujan_prime_count_approx");  break;
-      case 4: _vcallsub_with_pp("sum_primes");  break;
-      case 5:
+      case 1: _vcallsub_with_pp("semiprime_count");  break;
+      case 2: _vcallsub_with_pp("twin_prime_count");  break;
+      case 3: _vcallsub_with_pp("ramanujan_prime_count");  break;
+      case 4: _vcallsub_with_pp("ramanujan_prime_count_approx");  break;
+      case 5: _vcallsub_with_pp("sum_primes");  break;
+      case 6:
       default:_vcallsub_with_pp("print_primes");  break;
     }
     return; /* skip implicit PUTBACK */
@@ -771,9 +775,8 @@ sieve_range(IN SV* svn, IN UV width, IN UV depth)
             XPUSHs(sv_2mortal(newSVuv( i )));
       } else {                   /* small trial + factor for each value */
         for (i = (n<2)?2-n:0; i < width; i++)
-          if (trial_factor(n+i, factors, 2, 100) < 2)
-            if (factor(n+i,factors) < 2 || factors[0] > depth)
-              XPUSHs(sv_2mortal(newSVuv( i )));
+          if (factor_one(n+i, factors, 1, 1) < 2 || factors[0] > depth)
+            XPUSHs(sv_2mortal(newSVuv( i )));
       }
     }
     if (status != 1) {
@@ -1572,6 +1575,24 @@ void urandomb(IN UV bits)
     }
     OBJECTIFY_RESULT(ST(0), ST(0));
     XSRETURN(1);
+
+void random_factored_integer(IN SV* svn)
+  PPCODE:
+    if (_validate_int(aTHX_ svn, 0)) {
+      dMY_CXT;
+      int nf;
+      UV r, F[MPU_MAX_FACTORS+1], n = my_svuv(svn);
+      AV* av = newAV();
+      if (n < 1) croak("random_factored_integer: n must be >= 1");
+      r = random_factored_integer(MY_CXT.randcxt, n, &nf, F);
+      while (nf > 0)
+        av_push(av, newSVuv(F[--nf]));
+      XPUSHs(sv_2mortal(newSVuv( r )));
+      XPUSHs(sv_2mortal(newRV_noinc( (SV*) av )));
+    } else {
+      (void)_vcallsubn(aTHX_ G_ARRAY, VCALL_PP, "random_factored_integer",items,0);
+      return;
+    }
 
 void Pi(IN UV digits = 0)
   PREINIT:
@@ -2460,10 +2481,14 @@ forprimes (SV* block, IN SV* svbeg, IN SV* svend = 0)
     SvREFCNT_dec(svarg);
     END_FORCOUNT;
 
+#define FORCOMPTEST(ix,n) \
+  ( (ix==1) || (ix==0 && n&1) || (ix==2 && is_semiprime(n)) )
+
 void
-forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
+foroddcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
   ALIAS:
-    foroddcomposites = 1
+    forcomposites = 1
+    forsemiprimes = 2
   PROTOTYPE: &$;$
   PREINIT:
     UV beg, end;
@@ -2481,12 +2506,15 @@ forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
       croak("Not a subroutine reference");
 
     if (!_validate_int(aTHX_ svbeg, 0) || (items >= 3 && !_validate_int(aTHX_ svend,0))) {
-      _vcallsubn(aTHX_ G_VOID|G_DISCARD, VCALL_ROOT, (ix == 0) ? "_generic_forcomposites" : "_generic_foroddcomposites", items, 0);
+      _vcallsubn(aTHX_ G_VOID|G_DISCARD, VCALL_ROOT,
+         (ix == 0) ? "_generic_foroddcomposites"
+       : (ix == 1) ? "_generic_forcomposites"
+       :             "_generic_forsemiprimes", items, 0);
       return;
     }
 
     if (items < 3) {
-      beg = ix ? 8 : 4;
+      beg = ix ? 4 : 8;
       end = my_svuv(svbeg);
     } else {
       beg = my_svuv(svbeg);
@@ -2500,7 +2528,7 @@ forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
 #if USE_MULTICALL
     if (!CvISXSUB(cv) && end >= beg) {
       unsigned char* segment;
-      UV seg_base, seg_low, seg_high, c, cbeg, cend, prevprime, nextprime;
+      UV seg_base, seg_low, seg_high, c, cbeg, cend, cinc, prevprime, nextprime;
       void* ctx;
       dMULTICALL;
       I32 gimme = G_VOID;
@@ -2515,12 +2543,12 @@ forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
         beg = (beg <= 4) ? 3 : beg-1;
         nextprime = next_prime(beg);
         while (beg++ < end) {
-          if (beg == nextprime)     nextprime = next_prime(beg);
-          else if (!ix || beg & 1)  { sv_setuv(svarg, beg); MULTICALL; }
+          if      (beg == nextprime)    nextprime = next_prime(beg);
+          else if (FORCOMPTEST(ix,beg)) { sv_setuv(svarg, beg); MULTICALL; }
           CHECK_FORCOUNT;
         }
       } else {
-        if (ix) {
+        if (!ix) {
           if (beg < 8)  beg = 8;
         } else if (beg <= 4) { /* sieve starts at 7, so handle this here */
           sv_setuv(svarg, 4);  MULTICALL;
@@ -2537,11 +2565,14 @@ forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
             CHECK_FORCOUNT;
             cbeg = prevprime+1;
             if (cbeg < beg)
-              cbeg = beg - (ix == 1 && (beg % 2));
+              cbeg = beg - (ix == 0 && (beg % 2));
             prevprime = p;
             cend = prevprime-1;  if (cend > end) cend = end;
-            /* If ix=1, skip evens by starting 1 farther and skipping by 2 */
-            for (c = cbeg + ix; c <= cend; c=c+1+ix) {
+            /* If ix=0, skip evens by starting 1 farther and skipping by 2 */
+            /* For ix==2 we could be clever and skip past %4 and %9 */
+            cinc = 1 + (ix==0);
+            for (c = cbeg + (ix==0); c <= cend; c += cinc) {
+              if (ix == 2 && !is_semiprime(c))  continue;
               if      (SvTYPE(svarg) != SVt_IV) { sv_setuv(svarg,c); }
               else if (crossuv && c > IV_MAX)   { sv_setuv(svarg,c); crossuv=0;}
               else                              { SvUV_set(svarg,c); }
@@ -2552,7 +2583,7 @@ forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
         end_segment_primes(ctx);
         if (end > nextprime)   /* Complete the case where end > max_prime */
           while (nextprime++ < end)
-            if (!ix || nextprime & 1) {
+            if (FORCOMPTEST(ix,nextprime)) {
               CHECK_FORCOUNT;
               sv_setuv(svarg, nextprime);
               MULTICALL;
@@ -2566,7 +2597,7 @@ forcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
     if (beg <= end) {
       beg = (beg <= 4) ? 3 : beg-1;
       while (beg++ < end) {
-        if ((!ix || beg&1) && !is_prob_prime(beg)) {
+        if (FORCOMPTEST(ix,beg) && !is_prob_prime(beg)) {
           sv_setuv(svarg, beg);
           PUSHMARK(SP);
           call_sv((SV*)cv, G_VOID|G_DISCARD);
@@ -2874,6 +2905,85 @@ forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
     END_FORCOUNT;
 
 void
+forfactored (SV* block, IN SV* svbeg, IN SV* svend = 0)
+  ALIAS:
+    forsquarefree = 1
+  PROTOTYPE: &$;$
+  PREINIT:
+    UV beg, end, n, *factors;
+    int i, nfactors, maxfactors;
+    factor_range_context_t fctx;
+    GV *gv;
+    HV *stash;
+    SV* svarg;  /* We use svarg to prevent clobbering $_ outside the block */
+    CV *cv;
+    SV* svals[64];
+    uint16_t oldforloop;
+    char     oldforexit;
+    char    *forexit;
+    dMY_CXT;
+  PPCODE:
+    cv = sv_2cv(block, &stash, &gv, 0);
+    if (cv == Nullcv)
+      croak("Not a subroutine reference");
+
+    if (!_validate_int(aTHX_ svbeg, 0) || (items >= 3 && !_validate_int(aTHX_ svend,0))) {
+      _vcallsubn(aTHX_ G_VOID|G_DISCARD, VCALL_ROOT, (ix == 0) ? "_generic_forfactored" : "_generic_forsquarefree", items, 0);
+      return;
+    }
+
+    if (items < 3) {
+      beg = 1;
+      end = my_svuv(svbeg);
+    } else {
+      beg = my_svuv(svbeg);
+      end = my_svuv(svend);
+    }
+    if (beg > end) return;
+
+    for (maxfactors = 0, n = end >> 1;  n;  n >>= 1)
+      maxfactors++;
+    for (i = 0; i < maxfactors; i++) {
+      svals[i] = newSVuv(UV_MAX);
+      SvREADONLY_on(svals[i]);
+    }
+
+    SAVESPTR(GvSV(PL_defgv));
+    svarg = newSVuv(0);
+    GvSV(PL_defgv) = svarg;
+    START_FORCOUNT;
+    if (beg <= 1) {
+      dSP; ENTER; PUSHMARK(SP);
+      sv_setuv(svarg, 1);
+      PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+      beg = 2;
+    }
+    fctx = factor_range_init(beg, end, ix);
+    for (n = 0; n < end-beg+1; n++) {
+      CHECK_FORCOUNT;
+      nfactors = factor_range_next(&fctx);
+      if (nfactors > 0) {
+        /* TODO: Figure out how to use multicall for this. */
+        dSP; ENTER; PUSHMARK(SP);
+        sv_setuv(svarg, fctx.n);
+        factors = fctx.factors;
+        EXTEND(SP, nfactors);
+        for (i = 0; i < nfactors; i++) {
+          SV* sv = svals[i];
+          SvREADONLY_off(sv);
+          sv_setuv(sv, factors[i]);
+          SvREADONLY_on(sv);
+          PUSHs(sv);
+        }
+        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+      }
+    }
+    SvREFCNT_dec(svarg);
+    for (i = 0; i < maxfactors; i++)
+      SvREFCNT_dec(svals[i]);
+    END_FORCOUNT;
+
+void
 vecreduce(SV* block, ...)
 PROTOTYPE: &@
 CODE:
@@ -2998,7 +3108,7 @@ factor_test_harness1(...)
   PPCODE:
     /* Pass in a big array of numbers, we factor them in a timed loop */
     {
-      UV res, factors[MPU_MAX_FACTORS+1], exponents[MPU_MAX_FACTORS+1], *comp;
+      UV res, factors[MPU_MAX_FACTORS+1], *comp;
       struct timeval gstart, gstop;
       double t_time;
       int i, j, k, correct, nf, num = items;
@@ -3040,8 +3150,6 @@ factor_test_harness1(...)
 
 void
 factor_test_harness2(IN int count, IN int bits = 63)
-  PREINIT:
-    dMY_CXT;
   PPCODE:
     /* We'll factor <count> <bits>-bit numbers */
     {

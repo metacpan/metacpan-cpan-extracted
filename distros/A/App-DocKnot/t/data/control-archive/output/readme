@@ -42,12 +42,13 @@ DESCRIPTION
   control message archive [2] hosted on ftp.isc.org, and the source of the
   control.ctl file provided with INN.
 
+  [1] ftp://ftp.isc.org/pub/usenet/CONFIG/
+  [2] ftp://ftp.isc.org/pub/usenet/control/
+
   For a web presentation of the information recorded here, as well as
   other useful information about Usenet hierarchies, please see the list
   of Usenet managed hierarchies [3].
 
-  [1] ftp://ftp.isc.org/pub/usenet/CONFIG/
-  [2] ftp://ftp.isc.org/pub/usenet/control/
   [3] http://usenet.trigofacile.com/hierarchies/
 
 REQUIREMENTS
@@ -63,14 +64,15 @@ REQUIREMENTS
   gzip [1] and bzip2 [2] are required.  Both are generally available with
   current operating systems, possibly as supplemental packages.
 
+  [1] https://www.gnu.org/software/gzip/
+  [2] http://www.bzip.org/
+
   process-control expects to be fed file names and message IDs of control
   messages on standard input and therefore needs to be run from a news
   server or some other source of control messages.  A minimalist news
   server like tinyleaf is suitable for this (I wrote tinyleaf, available
   as part of INN [3], for this purpose).
 
-  [1] https://www.gnu.org/software/gzip/
-  [2] http://www.bzip.org/
   [3] https://www.eyrie.org/~eagle/software/inn/
 
 VERSIONING

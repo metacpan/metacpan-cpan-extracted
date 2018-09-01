@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Paragraph;
 # ABSTRACT: a group of sentences in a JMAP response
-$JMAP::Tester::Response::Paragraph::VERSION = '0.020';
+$JMAP::Tester::Response::Paragraph::VERSION = '0.021';
 use Moo;
 
 use JMAP::Tester::Abort 'abort';
@@ -188,7 +188,7 @@ JMAP::Tester::Response::Paragraph - a group of sentences in a JMAP response
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 OVERVIEW
 

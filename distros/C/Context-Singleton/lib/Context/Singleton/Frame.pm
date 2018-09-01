@@ -5,7 +5,7 @@ use warnings;
 
 package Context::Singleton::Frame;
 
-our $VERSION = v1.0.1;
+our $VERSION = v1.0.2;
 
 use List::Util;
 use Scalar::Util;

@@ -1,8 +1,15 @@
+#include "duk_console.h"
+#include "c_eventloop.h"
 #include "pl_stats.h"
 #include "pl_util.h"
 #include "pl_duk.h"
 
 #define PL_GC_RUNS 2
+
+#define PL_JSON_CLASS                         "JSON::PP"
+#define PL_JSON_BOOLEAN_CLASS  PL_JSON_CLASS  "::" "Boolean"
+#define PL_JSON_BOOLEAN_TRUE   PL_JSON_CLASS  "::" "true"
+#define PL_JSON_BOOLEAN_FALSE  PL_JSON_CLASS  "::" "false"
 
 static duk_ret_t perl_caller(duk_context* ctx);
 
@@ -17,7 +24,8 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
         }
         case DUK_TYPE_BOOLEAN: {
             duk_bool_t val = duk_get_boolean(ctx, pos);
-            ret = newSViv(val);
+            ret = get_sv(val ? PL_JSON_BOOLEAN_TRUE : PL_JSON_BOOLEAN_FALSE, 0);
+            SvREFCNT_inc(ret);
             break;
         }
         case DUK_TYPE_NUMBER: {
@@ -132,6 +140,9 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
     int ret = 1;
     if (!SvOK(value)) {
         duk_push_null(ctx);
+    } else if (sv_isa(value, PL_JSON_BOOLEAN_CLASS)) {
+        int val = SvTRUE(value);
+        duk_push_boolean(ctx, val);
     } else if (SvIOK(value)) {
         int val = SvIV(value);
         duk_push_int(ctx, val);
@@ -144,7 +155,8 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
         duk_push_lstring(ctx, vstr, vlen);
     } else if (SvROK(value)) {
         SV* ref = SvRV(value);
-        if (SvTYPE(ref) == SVt_PVAV) {
+        int type = SvTYPE(ref);
+        if (type == SVt_PVAV) {
             AV* values = (AV*) ref;
             char kstr[100];
             int klen = sprintf(kstr, "%p", values);
@@ -178,7 +190,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                     ++count;
                 }
             }
-        } else if (SvTYPE(ref) == SVt_PVHV) {
+        } else if (type == SVt_PVHV) {
             HV* values = (HV*) ref;
             char kstr[100];
             int klen = sprintf(kstr, "%p", values);
@@ -228,7 +240,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                     }
                 }
             }
-        } else if (SvTYPE(ref) == SVt_PVCV) {
+        } else if (type == SVt_PVCV) {
             /* use perl_caller as generic handler, but store the real callback */
             /* in a slot, from where we can later retrieve it */
             SV* func = newSVsv(value);
@@ -496,33 +508,49 @@ SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file)
 {
     SV* ret = &PL_sv_undef; /* return undef by default */
     duk_context* ctx = duk->ctx;
-    Stats stats;
-    duk_uint_t flags = 0;
     duk_int_t rc = 0;
 
-    /* flags |= DUK_COMPILE_STRICT; */
+    do {
+        Stats stats;
+        duk_uint_t flags = 0;
 
-    pl_stats_start(aTHX_ duk, &stats);
-    if (!file) {
-        rc = duk_pcompile_string(ctx, flags, js);
-    }
-    else {
-        duk_push_string(ctx, file);
-        rc = duk_pcompile_string_filename(ctx, flags, js);
-    }
-    pl_stats_stop(aTHX_ duk, &stats, "compile");
+        /* flags |= DUK_COMPILE_STRICT; */
 
-    if (rc != DUK_EXEC_SUCCESS) {
-        croak("JS could not compile code: %s\n", duk_safe_to_string(ctx, -1));
-    }
+        pl_stats_start(aTHX_ duk, &stats);
+        if (!file) {
+            /* Compile the requested code without a reference to the file where it lives */
+            rc = duk_pcompile_string(ctx, flags, js);
+        }
+        else {
+            /* Compile the requested code referencing the file where it lives */
+            duk_push_string(ctx, file);
+            rc = duk_pcompile_string_filename(ctx, flags, js);
+        }
+        pl_stats_stop(aTHX_ duk, &stats, "compile");
+        if (rc != DUK_EXEC_SUCCESS) {
+            /* Only for an error this early we print something out and bail out */
+            duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
+                            "JS could not compile code: %s\n",
+                            duk_safe_to_string(ctx, -1));
+            break;
+        }
 
-    pl_stats_start(aTHX_ duk, &stats);
-    rc = duk_pcall(ctx, 0);
-    pl_stats_stop(aTHX_ duk, &stats, "run");
-    check_duktape_call_for_errors(rc, ctx);
+        /* Run the requested code and check for possible errors*/
+        pl_stats_start(aTHX_ duk, &stats);
+        rc = duk_pcall(ctx, 0);
+        pl_stats_stop(aTHX_ duk, &stats, "run");
+        check_duktape_call_for_errors(rc, ctx);
 
-    ret = pl_duk_to_perl(aTHX_ ctx, -1);
-    duk_pop(ctx);
+        /* Convert returned value to Perl and pop it off the stack */
+        ret = pl_duk_to_perl(aTHX_ ctx, -1);
+        duk_pop(ctx);
+
+        /* Launch eventloop and check for errors again. */
+        /* This call only returns after the eventloop terminates. */
+        rc = duk_safe_call(ctx, eventloop_run, duk, 0 /*nargs*/, 1 /*nrets*/);
+        check_duktape_call_for_errors(rc, ctx);
+    } while (0);
+
     return ret;
 }
 

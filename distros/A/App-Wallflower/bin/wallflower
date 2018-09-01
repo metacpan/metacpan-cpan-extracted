@@ -13,7 +13,7 @@ wallflower - Sorry I can't dance, I'm hanging on to my friend's purse
 
 =head1 VERSION
 
-version 1.009
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,8 @@ as long as the shorter version is unambiguous.
                             usually development, deployment, or test
                             (default: deployment)
 
+ --parallel    <count>      Number of processes to run in parallel
+
  --index       <filename>   Name of index file for URLs ending in /
                             (default: index.html)
 
@@ -44,7 +46,7 @@ as long as the shorter version is unambiguous.
  --no-follow                (default = follow)
 
  --filter                   Arguments are files containing lists of URLs
- --files
+ --files                    (if no file is given, read from standard input)
  -F
 
  --url         <url>        URL of the production site. If the URL has
@@ -69,6 +71,7 @@ as long as the shorter version is unambiguous.
  --help                     Print a short help summary and exit
  --manual                   Print the full manual page and exit
  --tutorial                 Print the tutorial and exit
+ --version                  Print wallflower version information and exit
 
 Options marked with * can be repeated as necessary.
 

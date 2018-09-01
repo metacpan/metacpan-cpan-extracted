@@ -2,7 +2,7 @@ package Catmandu::Store::File::BagIt::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.211';
+our $VERSION = '0.231';
 
 use Moo;
 use Carp;
@@ -80,7 +80,7 @@ sub get {
     return {
         _id          => $id,
         size         => $size,
-        md5          => $bagit->get_checksum($id) // undef,
+        md5          => $bagit->get_checksum($packed_key) // undef,
         content_type => $content_type,
         created      => $created,
         modified     => $modified,
@@ -95,7 +95,15 @@ sub get {
             while (!$data->eof) {
                 my $buffer;
                 $data->read($buffer, 1024);
-                $bytes += $out->write($buffer);
+
+                my $n = $out->syswrite($buffer);
+
+                unless (defined($n)) {
+                    $self->log->error("syswrite on io failed : disk full or not available?");
+                    return $bytes;
+                }
+                
+                $bytes += $n;
             }
 
             $out->close();
@@ -129,11 +137,11 @@ sub add {
 
     unless ($update) {
         $bagit->remove_info('Bagging-Date');
-        $bagit->add_info('Bagging-Date', strftime("%Y-%M-%D %H:%M:%S", localtime(time)));
+        $bagit->add_info('Bagging-Date', strftime("%Y-%M-%D", gmtime));
     }
 
     $bagit->remove_info('Bagging-Update');
-    $bagit->add_info('Bagging-Update', strftime("%Y-%m-%d %H:%M:%S", localtime(time)));
+    $bagit->add_info('Bagging-Update', strftime("%Y-%m-%d", gmtime));
 
     $bagit->write($path, overwrite => 1);
 

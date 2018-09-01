@@ -1,5 +1,12 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99018  Aug 29 2018 Eugeny Subachev
+    - - Fixed/added 'not found' patterns of hn com.hn cd TLDs.
+
+2.99017  Aug 28 2018 Eugeny Subachev
+    - Added whois servers of some TLDs.
+    - Fixed/added 'not found' patterns of many whois servers.  
+
 2.99016  Jul 18 2018 Alexander Nalobin
     - fixed recursion to referal whois servers in QRY_FIRST mode
 

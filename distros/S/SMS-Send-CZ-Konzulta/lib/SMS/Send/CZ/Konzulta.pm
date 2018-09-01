@@ -2,20 +2,21 @@
 
 package SMS::Send::CZ::Konzulta;
 
-# ABSTRACT: SMS::Send driver for Konzulta - Czech Republic 
+# ABSTRACT: SMS::Send driver for Konzulta - Czech Republic
 
 use warnings;
 use strict;
 use Carp;
 
-our $VERSION = "1.000";
+our $VERSION = "1.001";
 $VERSION = eval $VERSION;
 
 use base 'SMS::Send::Driver';
 use Log::LogLite;
 use XML::Simple;
 use LWP::UserAgent;
-use DateTime qw();
+use DateTime qw( );
+use Text::Unidecode;
 
 sub new {
     my $class  = shift;
@@ -36,7 +37,7 @@ sub new {
     }, $class;
 
     $self->log("Driver Konzulta created", 4);
-    
+
     $self;
 }
 
@@ -51,9 +52,10 @@ sub log {
 sub send_sms {
     my ($self, %args) = @_;
     my $url = 'https://www.sms-operator.cz/webservices/webservice.aspx';
-    
+
+    $args{'text'} = unidecode($args{'text'});
     $self->log("TEXT: " . $args{'text'} . ", TO: " . $args{'to'}, 4);
-    
+
     my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });
     my $message = "<SmsServices>
 		  <DataHeader>
@@ -72,7 +74,7 @@ sub send_sms {
 		  </DataArray>
 		</SmsServices>
     ";
-    
+
     my $res = $ua->post($url, Content_Type => 'text/xml', Content => $message);
 
     if( $res->is_success ) {
@@ -82,7 +84,7 @@ sub send_sms {
 	        my $data = $parser->XMLin($res->decoded_content);
 	        if ($data->{'DataArray'}->{'DataItem'}->{'Status'} == 0) {
 	            $self->log("SMS #" . $data->{'DataArray'}->{'DataItem'}->{'SmsId'} . " sent", 4);
-	
+
 	            return 1;
 	        }
 	        else {
@@ -109,11 +111,11 @@ __END__
 
 =head1 NAME
 
-SMS::Send::CZ::Konzulta - SMS::Send driver for Konzulta - Czech Republic 
+SMS::Send::CZ::Konzulta - SMS::Send driver for Konzulta - Czech Republic
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -123,12 +125,12 @@ use SMS::Send;
     _login    => 'who',
     _password => 'secret',
     );
-  
+
   my $sent = $sender->send_sms(
     text => 'Test SMS',
     to   => '604111111',
     );
-  
+
   # Did it send?
   if ( $sent ) {
     print "Sent test message\n";
@@ -147,13 +149,11 @@ Logs message to /var/log/konzulta.log if this file is accessible and writable
 Sends the message using provider's API at https://www.sms-operator.cz/webservices/webservice.aspx and takes additional arguments:
 'text' containgin the message itself and 'to' with recipient's number.
 
-Processing information is automatically logged to /var/log/konzulta.log to allow tracking of possible problems.   
+Processing information is automatically logged to /var/log/konzulta.log to allow tracking of possible problems.
 
 Returns true if the msssage was successfully sent
 
 Returns false if an error occured
-
-=cut
 
 =head1 AUTHOR
 

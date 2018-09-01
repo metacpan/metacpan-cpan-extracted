@@ -3,7 +3,7 @@ NAME
     sugar
 
 VERSION
-    version 1.14
+    version 1.15
 
 STATUS
 DESCRIPTION
@@ -48,17 +48,6 @@ SEE ALSO
 
 AUTHOR
     Mark Grimes <mgrimes@cpan.org>
-
-CONTRIBUTORS
-    *   Kent Fredric (@kentnl)
-
-    *   Gregoy Oschwald (@oschwal)
-
-    *   Curtis Brandt (@aggrolite)
-
-    *   @pblaberge
-
-    *   Peter Roberts (@pwr22)
 
 SOURCE
     Source repository is at

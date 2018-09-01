@@ -105,6 +105,7 @@ sub entropy_bytes {
 *inverse_li = \&Math::Prime::Util::PP::inverse_li;
 *sieve_prime_cluster = \&Math::Prime::Util::PP::sieve_prime_cluster;
 *twin_prime_count = \&Math::Prime::Util::PP::twin_prime_count;
+*semiprime_count = \&Math::Prime::Util::PP::semiprime_count;
 *ramanujan_prime_count = \&Math::Prime::Util::PP::ramanujan_prime_count;
 *sum_primes = \&Math::Prime::Util::PP::sum_primes;
 *print_primes = \&Math::Prime::Util::PP::print_primes;
@@ -115,6 +116,7 @@ sub entropy_bytes {
 *is_fundamental = \&Math::Prime::Util::PP::is_fundamental;
 *is_semiprime = \&Math::Prime::Util::PP::is_semiprime;
 *is_totient = \&Math::Prime::Util::PP::is_totient;
+*is_square = \&Math::Prime::Util::PP::is_square;
 
 *random_prime = \&Math::Prime::Util::PP::random_prime;
 *random_ndigit_prime = \&Math::Prime::Util::PP::random_ndigit_prime;
@@ -126,6 +128,7 @@ sub entropy_bytes {
 *miller_rabin_random = \&Math::Prime::Util::PP::miller_rabin_random;
 *random_semiprime = \&Math::Prime::Util::PP::random_semiprime;
 *random_unrestricted_semiprime = \&Math::Prime::Util::PP::random_unrestricted_semiprime;
+*random_factored_integer = \&Math::Prime::Util::PP::random_factored_integer;
 
 *numtoperm = \&Math::Prime::Util::PP::numtoperm;
 *permtonum = \&Math::Prime::Util::PP::permtonum;
@@ -693,11 +696,6 @@ sub is_power {
   $vn = '-'.$vn if $n < 0;
   return Math::Prime::Util::PP::is_power($vn, $a, $refp);
 }
-sub is_square {
-  my($n) = @_;
-  return 0 if defined $n && int($n) < 0;
-  return Math::Prime::Util::PP::is_power($n,2);
-}
 sub is_prime_power {
   my($n, $refp) = @_;
   my $vn = "$n";  $vn =~ s/^-//;
@@ -762,48 +760,20 @@ sub forprimes (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
 }
 
 sub forcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  my($sub, $beg, $end) = @_;
-  if (!defined $end) { $end = $beg; $beg = 4; }
-  _validate_num($beg) || _validate_positive_integer($beg);
-  _validate_num($end) || _validate_positive_integer($end);
-  $beg = 4 if $beg < 4;
-  $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
-  my $oldforexit = _start_for_loop();
-  {
-    my $pp;
-    local *_ = \$pp;
-    for ( ; $beg <= $end ; $beg++ ) {
-      if (!is_prime($beg)) {
-        $pp = $beg;
-        $sub->();
-      last if $_exitloop;
-      }
-    }
-  }
-  _end_for_loop($oldforexit);
+  Math::Prime::Util::_generic_forcomp_sub('composites', @_);
+}
+sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  Math::Prime::Util::_generic_forcomp_sub('oddcomposites', @_);
+}
+sub forsemiprimes(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  Math::Prime::Util::_generic_forcomp_sub('semiprimes', @_);
 }
 
-sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
-  my($sub, $beg, $end) = @_;
-  if (!defined $end) { $end = $beg; $beg = 9; }
-  _validate_num($beg) || _validate_positive_integer($beg);
-  _validate_num($end) || _validate_positive_integer($end);
-  $beg = 9 if $beg < 9;
-  $beg++ unless $beg & 1;
-  $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
-  my $oldforexit = _start_for_loop();
-  {
-    my $pp;
-    local *_ = \$pp;
-    for ( ; $beg <= $end ; $beg += 2 ) {
-      if (!is_prime($beg)) {
-        $pp = $beg;
-        $sub->();
-        last if $_exitloop;
-      }
-    }
-  }
-  _end_for_loop($oldforexit);
+sub forfactored(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  Math::Prime::Util::_generic_forfac(0, @_);
+}
+sub forsquarefree(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
+  Math::Prime::Util::_generic_forfac(1, @_);
 }
 
 sub fordivisors (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)

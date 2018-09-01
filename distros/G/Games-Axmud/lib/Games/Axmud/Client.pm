@@ -723,6 +723,7 @@
                     'CommandBuffer', 'SetCommandBuffer', 'EditCommandBuffer', 'DumpCommandBuffer',
                     'SaveBuffer', 'LoadBuffer', 'ReplayBuffer', 'HaltReplay', 'SetAutoComplete',
                         'ToggleWindowKey', 'ToggleMainWindow', 'ToggleLabel', 'ToggleIrreversible',
+                        'TogglePopup',
                     'ShowFile', 'DisableSaveLoad', 'DisableSaveWorld', 'Save', 'Load',
                         'AutoSave', 'EmergencySave',
                     'ExportFiles', 'ImportFiles', 'ExportData', 'ImportData',
@@ -867,6 +868,9 @@
                 '@Attack task',
                     'Kill', 'KKill', 'KillAll', 'KillMall', 'Interact', 'IInteract', 'InteractAll',
                         'InteractMall',
+                '@Channels and Divert tasks',
+                    'AddChannelPattern', 'DeleteChannelPattern', 'ListChannelPattern',
+                        'EmptyChannelsWindow', 'EmptyDivertWindow',
                 '@Chat task',
                     'ChatListen', 'ChatIgnore', 'AddContact', 'EditContact', 'DeleteContact',
                         'ListContact',
@@ -881,9 +885,6 @@
                     'Compass', 'PermCompass', 'WorldCompass',
                 '@Debugger task',
                     'SetDebuggerMode',
-                '@Divert task',
-                    'AddDivertPattern', 'DeleteDivertPattern', 'ListDivertPattern',
-                        'EmptyDivertWindow',
                 '@Inventory / Condition tasks',
                     'ActivateInventory', 'DisactivateInventory',
                     'ProtectObject', 'UnprotectObject', 'ListProtectObject',
@@ -891,7 +892,7 @@
                     'SellAll', 'DropAll', 'UseAll',
                 '@Locator task',
                     'MoveDirection', 'RelayDirection', 'Teleport', 'AddTeleport', 'DeleteTeleport',
-                        'InsertLook', 'ListTeleport', 'ResetLocatorTask',
+                        'ListTeleport', 'InsertLook', 'InsertFailedExit', 'ResetLocatorTask',
                     'AddExitPattern', 'DeleteExitPattern', 'ListExitPattern',
                     'CollectUnknownWords', 'EmptyUnknownWords', 'ListUnknownWords',
                     'CollectContentsLines', 'EmptyContentsLines', 'ListContentsLines',
@@ -906,6 +907,8 @@
                         'EditRegionmap', 'EmptyRegion', 'DeleteRegion', 'DeleteTemporaryRegion',
                         'DeleteRoom', 'DeleteModelObject', 'ListModel', 'ListOrphan', 'DumpModel',
                         'EditModel', 'UpdateModel', 'ModelReport', 'ListSourceCode',
+                    'AddLabelStyle', 'EditLabelStyle', 'RenameLabelStyle', 'DeleteLabelStyle',
+                        'ListLabelStyle',
                     'AddPlayerCharacter', 'DeletePlayerCharacter', 'ListPlayerCharacter',
                     'AddMinionString', 'DeleteMinionString', 'ListMinionString',
                     'SetLightList', 'ResetLightList', 'SetLightStatus',
@@ -916,6 +919,7 @@
                     'RoomCommand', 'IgnoreRoomCommand', 'NoticeRoomCommand', 'ListRoomCommand',
                 '@Exit model commands',
                     'AddExit', 'EditExit', 'DeleteExit', 'ListExitModel', 'DumpExitModel',
+                    'AllocateExit',
             ],
             # An ordered list of commands, initially set to $self->constClientCmdPrettyList, and
             #   modified when plugins are loaded, enabled or disabled in order to show (or remove)
@@ -1143,8 +1147,11 @@
             #   active 'internal' window's command entry box; set to FALSE otherwise
             # (NB GA::Client->autoCompleteMode must also be set to 'auto')
             useCompleteKeysFlag         => TRUE,            # [config]
-            # Flag set to TRUE if the CTRL+TAB key combination should switch between tabs in a pane
-            #   object (GA::Table::Pane) in the active 'internal' window; set to FALSE otherwise
+            # Flag set to TRUE if the TAB key should switch between tabs in a pane object
+            #   (GA::Table::Pane) in the active 'internal' window; set to FALSE otherwise
+            # If the window contains an entry strip object (GA::Strip::Entry), the TAB key is used
+            #   in auto-completion, so CTRL+TAB is required to switch tabs. If there's no entry
+            #   strip object, TAB will do the job
             useSwitchKeysFlag           => TRUE,            # [config]
 
             # The instruction buffer for the client. Every instruction processed by any session is
@@ -1279,6 +1286,7 @@
             constWorldHash              => {
                 'aardwolf'          => '1.0.140', # Aardwolf MUD / aardmud.org 40000
                 'achaea'            => '1.0.050', # Achaea / achaea.com 23
+                'advun'             => '1.1.138', # Adventures Unlimited / tharel.net 5005
                 'aetolia'           => '1.0.376', # Aetolia / aetolia.com 23
                 'alteraeon'         => '1.0.140', # Alter Aeon / alteraeon.com 3000
                 'anguish'           => '1.0.050', # Ancient Anguish / ancient.anguish.org 2222
@@ -1292,7 +1300,9 @@
                 'batmud'            => '1.0.140', # BatMUD / batmud.bat.org 23
                 'bedlam'            => '1.0.140', # Bedlam / mud.playbedlam.com 9000
                 'burningmud'        => '1.1.0',   # Burning MUD / burningmud.com 4000
+                'bylins'            => '1.1.138', # Bylins MUD / bylins.su 4000
                 'carrion'           => '1.1.050', # Carrion Fields / carrionfields.net 4449
+                'clessidra'         => '1.1.138', # Clessidra MUD / mud.clessidra.it 4000
                 'clok'              => '1.0.275', # CLOK / clok.contrarium.net 4000
                 'coffeemud'         => '1.1.0',   # CoffeeMud / coffeemud.net 23
                 'cryosphere'        => '1.0.376', # Cryosphere / cryosphere.org 6666
@@ -1301,6 +1311,7 @@
                 'dartmud'           => '1.1.0',   # DartMUD / dartmud.com 2525
                 'dawn'              => '1.1.0',   # Dawn / 23.241.198.57 3000
                 'discworld'         => '1.0.140', # Discworld MUD / discworld.starturtle.net 23
+                'dragonstone'       => '1.1.138', # DragonStone / dragonstone.mudmagic.com 2345
                 'dsdev'             => '1.0.0',   # Dead Souls development mud / dead-souls.net 8000
                 'dslands'           => '1.0.0',   # Dark and Shattered Lands / dsl-mud.org 4000
                 'dslocal'           => '1.0.0',   # Local installation of Dead Souls mudlib
@@ -1308,6 +1319,7 @@
                 'dsprime'           => '1.0.0',   # Dead Souls game mud / dead-souls.net 6666
                 'dunemud'           => '1.1.0',   # DuneMUD / dune.servint.com 6789
                 'duris'             => '1.0.0',   # Duris: Land of BloodLust / mud.durismud.com 7777
+                'edmud'             => '1.1.138', # Eternal Darkness / edmud.net 9700
                 'elephantmud'       => '1.1.0',   # Elephant MUD / elephant.org 23
                 'elysium'           => '1.1.050', # Elysium RPG / elysium-rpg.com 7777
                 'empire'            => '1.1.0',   # EmpireMUD 2.0 / empiremud.net 4000
@@ -1315,6 +1327,7 @@
                 'fourdims'          => '1.0.050', # 4Dimensions / 4dimensions.org 6000
                 'genesis'           => '1.0.0',   # Genesis / mud.genesismud.org 3011
                 'hellmoo'           => '1.1.050', # HellMOO / hellmoo.org 7777
+                'hexonyx'           => '1.1.138', # HexOnyx / mud.hexonyx.com 7777
                 'holyquest'         => '1.1.0',   # HolyQuest / holyquest.org 8080
                 'iberia'            => '1.0.0',   # Iberia MUD / iberiamud.com 5900
                 'icesus'            => '1.1.0',   # Icesus / icesus.org 23
@@ -1343,6 +1356,8 @@
                 'penultimate'       => '1.1.0',   # Penultimate Destination
                                                   #     / penultimatemush.com 9500
                 'pict'              => '1.0.140', # Pict MUD / pict.genesismuds.com 4200
+                'ravenmud'          => '1.1.138', # RavenMUD / ravenmud.com 6060
+                'realmsmud'         => '1.1.138', # RealmsMUD / realmsmud.org 1501
                 'reinos'            => '1.1.0',   # Reinos de Leyenda / rlmud.org 5001
                 'retromud'          => '1.1.0',   # RetroMUD / retromud.org 3000
                 'rodespair'         => '1.1.0',   # Realms of Despair / realmsofdespair.com 23
@@ -1356,8 +1371,10 @@
                 'threescapes'       => '1.1.0',   # 3Scapes / 3scapes.org 3200
                 'torilmud'          => '1.1.0',   # TorilMUD / torilmud.org 9999
                 'tsunami'           => '1.1.050', # Tsunami / tsunami.thebigwave.net 23
+                'twotowers'         => '1.1.138', # Two Towers / t2tmud.org 9999
                 'valhalla'          => '1.0.0',   # Valhalla MUD / valhalla.com 4242
                 'vikingmud'         => '1.0.050', # Viking MUD / connect.vikingmud.org 2001
+                'waterdeep'         => '1.1.138', # Waterdeep / waterdeep.org 4200
                 'wotmud'            => '1.1.0',   # The Wheel of Time MUD / game.wotmud.org 2224
                 'zombiemud'         => '1.1.0',   # ZombieMUD / zombiemud.org 23
                 # Pre-configured worlds from earlier releases => '1.1.0', now defunct
@@ -1396,379 +1413,541 @@
             # World models
             # ------------
 
-            # Constant registry list of values used to initialise room filters in world models
-            #   (GA::Obj::WorldModel)
+            # Constant registry list of room filters in a standard order
             constRoomFilterList         => [
-                'markers', 0,
-                'navigation', 0,
-                'commercial', 0,
-                'buildings', 0,
-                'structures', 0,
-                'terrain', 0,
-                'objects', 0,
-                'light', 0,
-                'guilds', 0,
-                'quests', 0,
-                'attacks', 0,
+                'markers',
+                'custom',
+                'navigation',
+                'commercial',
+                'buildings',
+                'structures',
+                'terrain',
+                'objects',
+                'light',
+                'guilds',
+                'quests',
+                'attacks',
             ],
             # Constant registry list of values used to initialise room flags in world models
             constRoomFlagList           => [
                 # Markers
+                # -------
+                # blocked_room - Set if this room shouldn't be available to pathfinding functions
+                #   (or similar code)
                 'blocked_room' , 'Bl', 'markers',
                     '#A6483C',  # Dark red
-                    'Room blocked',
+                    'Room is blocked',
+                # interesting - Set if this room is marked as interesting
                 'interesting', 'In', 'markers',
                     '#EC7171',  # Pink
                     'Room is interesting',
+                # investigate - Set if this room is marked as worth coming back later to investigate
                 'investigate', 'Iv', 'markers',
                     '#F37E1B',  # Orange
                     'Room worth investigating',
+                # unexplored - Set if this room hasn't been visited yet
                 'unexplored', 'Ux', 'markers',
                     '#AE5463',  # Dull dark red
                     'Room not visited yet',
+                #   unspecified - Set if this room has an 'unspecified' room statement
                 'unspecified', 'Un', 'markers',
                     '#84885C',  # Very pale green
                     'Unspecified room statement',
+                # avoid_room - Set if this room is marked as worth avoiding
                 'avoid_room' , 'Av', 'markers',
                     '#E15835',  # Orange-red
                     'Room worth avoiding',
+                # mortal_danger - Set if entering this room will probably get the character killed
                 'mortal_danger', 'Md', 'markers',
                     '#FF0000',  # Default red
                     'Room is extremely dangerous',
+                # danger - Set if entering this room is dangerous
                 'danger', 'Dg', 'markers',
                     '#A12C1C',  # Dark red
                     'Room is dangerous',
+                # dummy_room - Set if this room is not actually accessible
                 'dummy_room', 'Dr', 'markers',
                     '#A4A4A4',  # Grey
                     'Inaccessible (dummy) room',
+                # rent_room - Set if this room is where the character can rent (store stuff)
                 'rent_room', 'Rt', 'markers',
                     '#CACA84',  # Pale brown/yellow
                     'Room for renting',
+                # camp_room - Set if this room is where the character can camp
                 'camp_room', 'Cm', 'markers',
                     '#909044',  # Darker brown/yellow
                     'Room for camping',
+                # stash_room - Set if this room is where you like to leave things temporarily
                 'stash_room', 'St', 'markers',
                     '#C1722B',  # Dirty orange
                     'Room for stashing things',
+                # hide_room - Set if this room is where you like to hide
                 'hide_room', 'Hd', 'markers',
                     '#AE8B6A',  # Grey-brown
                     'Room for hiding',
+                # random_room - Set if this room was randomly generated (by the world)
                 'random_room', 'Rn', 'markers',
                     '#A7B455',  # Yellow-green
                     'Randomly-generated room',
+                # immortal_room - Set if this room is only accessible to admin users
                 'immortal_room', 'Im', 'markers',
                     '#FF2161',  # Red-purple
                     'Room not accessible to mortals',
+
+                # Custom
+                # ------
+                # (all room flags added by the user are in this filter)
+
                 # Navigation
+                # ----------
+                # world_centre - Set if this room has been designated the centre of the world
                 'world_centre', 'Mc', 'navigation',
                     '#FB922C',  # Orange
                      'Room is centre of world',
+                # world_start - Set if this room is the room where new players start
                 'world_start', 'Ms', 'navigation',
                     '#57FF6A',  # Lilac green
                      'Start room for new players',
+                # meet_point - Set if this room has been designated as a meeting point (usually a
+                #   room in the world at the centre of a town, near shops)
                 'meet_point', 'Mp', 'navigation',
                     '#D77EC7',  # Light purple
                     'Room is a meetpoint',
+                # main_route - Set if this is a main route
                 'main_route', 'Mr', 'navigation',
                     '#A0959F',  # Dark grey
                     'Room is on a main route',
+                # minor_route - Set if this is a minor route
                 'minor_route', 'mr', 'navigation',
                     '#CDC4CD',  # Light grey
                     'Room is on a minor route',
+                # cross_route - Set if this is where two or more routes meet
                 'cross_route', 'Cr', 'navigation',
                     '#F0B68F',  # Light orange
                     'Room is at an intersection',
+                # arrow_route - Set if this room leads in the right direction
                 'arrow_route', 'Aw', 'navigation',
                     '#ECD24E',  # Gold
                     'Room leads in right direction',
+                # wrong_route - Set if this room leads in the wrong direction
                 'wrong_route', 'Br', 'navigation',
                     '#A55B2A',  # Brown
                     'Room leads in wrong direction',
+                # portal - Set if this room contains some kind of portal
                 'portal', 'Pl', 'navigation',
                     '#88FFE7',  # Bright cyan
                     'Room contains some kind of portal',
+                # sign_post - Set if this room contains a signpost
                 'sign_post', 'Sp', 'navigation',
                     '#B58870',  # Pale brown
                     'Room contains a signpost',
+                # bus_stop - Set if this room is a stop along a moving vehicle's route
+                'bus_stop', 'Bs', 'navigation',
+                    '#6F6F6F',  # Darker grey
+                    'Room has a bus stop',
+                # moving_boat - Set if this room is on a (moving) boat
                 'moving_boat', 'Bt', 'navigation',
                     '#3CD1C8',  # Cyan
                     'Room is a (moving) boat',
+                # vehicle - Set if this room is on a (moving) vehicle
                 'vehicle', 'Vh', 'navigation',
                     '#869D9B',  # Grey-cyan
                     'Room is a (moving) vehicle',
+                # fixed_boat - Set if this room is on a (stationary) boat
                 'fixed_boat', 'Fb', 'navigation',
                     '#237974',  # Darkish blue
                     'Room is on a (stationary) boat',
+                # swim_room - Set if this room is in water, so the character needs to swim
                 'swim_room', 'Sw', 'navigation',
                     '#2656C6',  # Blue
                     'Character needs to swim here',
+                # fly_room - Set if this room is in the air, so the character needs to fly
                 'fly_room', 'Fl', 'navigation',
                     '3A79F7',   # Sky blue
                     'Character needs to fly here',
+
                 # Commercial
+                # ----------
+                # shop_general - Set if this room is a general store
                 'shop_general', 'Sh', 'commercial',
                     '#F7FF65',  # Light yellow
                     'Room is a general store',
+                # shop_weapon - Set if this room is a weapon shop
                 'shop_weapon', 'Ws', 'commercial',
                     '#F97F20',  # Orange
                     'Room is a weapon shop',
+                # shop_armour - Set if this room is an armour shop
                 'shop_armour', 'Wa', 'commercial',
                     '#DA440C',  # Slightly darker orange
                     'Room is an armour shop',
+                # shop_clothes - Set if this room is a clothes shop
                 'shop_clothes', 'Wc', 'commercial',
                     '#DAA10C',  # Yellow-gold
                     'Room is a clothes shop',
+                # shop_player - Set if this room is a player-controlled shop
+                'shop_player', 'Sy', 'commercial',
+                    '#FFA966',   # Light orange
+                    'Room is a player-controlled shop',
+                # shop_special - Set if this room is some other kind of shop
                 'shop_special', 'Ss', 'commercial',
                     '#3AFF34',  # Green
                     'Room is another kind of shop',
+                # shop_empty - Set if this room is an empty shop
                 'shop_empty', 'Se', 'commercial',
                     '#8DFF89',  # Pale greeen
                     'Room is an empty shop',
+                # smithy - Set if this room is a smithy
                 'smithy', 'Sm', 'commercial',
                     '#D58111',  # Light brown
                     'Room is a smithy',
+                # bank - Set if this room is a bank
                 'bank', 'Bn', 'commercial',
                     '#8E0E3F',  # Purple
                     'Room is a bank',
+                # pub - Set if this room is some kind of pub
                 'pub', 'Pb', 'commercial',
                     '#1730F5',  # Blue
                     'Room is a pub',
+                # cafe - Set if this room is some kind of cafeteria (like a pub, but with non-
+                #   alcoholic drinks)
+                'cafe', 'Cf', 'commercial',
+                    '#3196CA',  # Dark cyan
+                    'Room is a cafeteria',
+                # restaurant - Set if this room is some kind of restaurant (where the character can
+                #   eat)
                 'restaurant', 'Re', 'commercial',
                     '#487F9B',  # Murky blue
                     'Room is a restaurant',
+                # takeaway - Set if this room is some kind of takeaway (where the character can
+                #   buy food to carry)
                 'takeaway', 'Ta', 'commercial',
                     '#A9C1F4',  # Very light blue
                     'Room is a takeaway',
+                # auction - Set if this room is an auction house
                 'auction', 'Au', 'commercial',
                     '#CA1E4D',  # Red
                     'Room is an auction house',
+                # post_office - Set if this room is a post office
                 'post_office', 'Po', 'commercial',
                     '#8CB583',  # Dull green
                     'Room is a post office',
+
                 # Buildings
+                # ---------
+                # library - Set if this room is where books, parchments, signs, notice boards and so
+                #   on are available
                 'library', 'Lb', 'buildings',
                     '#DEF3CC',  # Very pale green
                     'Room is a library',
+                # theatre - Set if this room is a theatre or performance venue
                 'theatre', 'Th', 'buildings',
                     '#2DD06C',  # Turquoise
                     'Room is a theatre',
+                # temple - Set if this room is some kind of temple or shrine
                 'temple', 'Te', 'buildings',
                     '#7C6365',  # Very dull red
                     'Room is a temple',
+                # church - Set if this room is a church or cathedral
                 'church', 'Ch', 'buildings',
                     '#C17D80',  # Pale red
                     'Room is a church/cathedral',
+                # hotel - Set if this room is a hotel
                 'hotel', 'Hl', 'buildings',
                     '#B0B167',  # Dull yellow
                     'Room is a hotel',
+                # storage - Set if this room is somewhere you can store things
                 'storage', 'St', 'buildings',
                     '#996712',  # Green-brown
                     'Room is a storage facility',
+                # office - Set if this room is an office
                 'office', 'Of', 'buildings',
                     '#A36C6C',  # Dull red
                     'Room is an office',
+                # jail - Set if this room is a jail or dungeon
                 'jail', 'Jl', 'buildings',
                     '#C46F47',  # Pale brown
                     'Room is a jail or dungeon',
+                # hospital - Set if this room is some kind of hospital
                 'hospital', 'Ho', 'buildings',
                     '#ED0C60',  # Red-purple
                     'Room is a hospital',
+                # stable - Set if this room is a room where animals are stored
                 'stable', 'St', 'buildings',
                     '#DF9F4B',  # Straw orange
                     'Room is a stable for animals',
+                # tent - Set if this room is inside a tent
                 'tent', 'Tt', 'buildings',
                     '#D2B380',  # Canvas
                     'Room is a tent',
+                # house - Set if this room is an ordinary house or home
                 'house', 'Hs', 'buildings',
                     '#3B7E55',  # Dark green
                     'Room is a house or home',
+                # ord_building - Set if this room is an ordinary building
                 'ord_building', 'Ob', 'buildings',
                     '#82E1CA',  # Light cyan
                     'Room is an ordinary building',
+                # bulletin_board - Set if this room contains some kind of bulletin board
                 'bulletin_board', 'Bb', 'buildings',
                     '#A47AB8',  # Light purple
                     'Room contains a bulletin board',
+
                 # Structures
+                # ----------
+                # building - Set if this is any kind of building
                 'building', 'Bu', 'structures',
                     '#B7764F',  # Pale brown
                     'Room is any kind of building',
+                # gate - Set if this is at (or outside) a city gate
                 'gate', 'Ga', 'structures',
                     '#87BDC6',  # Pale blue
                     'Room is at a city gate',
+                # wall - Set if this is on (or alongside) a city wall
                 'wall', 'Wl', 'structures',
                     '#C9D3D5',  # Blue-grey
                     'Room is on/outside a city wall',
+                # tower - Set if this is on (or inside) a tower
                 'tower', 'Tw', 'structures',
                     '#B1A27F',  # Dull yellow
                     'Room is on/inside a tower',
+                # staircase - Set if this is on a staircase
                 'staircase', 'Sc', 'structures',
                     '#FFB47C',  # Sandy yellow
                     'Room is on a staircase',
+                # tunnel - Set if this is in a tunnel
                 'tunnel', 'Tu', 'structures',
                     '#C4897D',  # Dull pink
                     'Room is in a tunnel',
+                # bridge - Set if this is a on a bridge
                 'bridge', 'Br', 'structures',
                     '#A9631F',  # Brown
                     'Room is on a bridge',
+                # fountain - Set if this room has a fountain
                 'fountain', 'Fn', 'structures',
                     '#35BDD8',  # Bright blue
                     'Room contains a fountain',
+                # well - Set if this is a well or water source
                 'well', 'We', 'structures',
                     '#76A1D3',  # Light blue
                     'Room is a well',
+                # farm - Set if this is a farm
                 'farm', 'Fa', 'structures',
                     '#A84100',  # Brown
                     'Room is on a farm',
+                # field - Set if this is a field
                 'field', 'Fi', 'structures',
                     '#75B256',  # Paler green
                     'Room is in a field',
+                # park - Set if this is a park/garden
                 'park', 'Pa', 'structures',
                     '#00FF00',  # (Pure) green
                     'Room is in a garden/park',
+                # graveyard - Set if this is a graveyard
                 'graveyard', 'Gy', 'structures',
                     '#CBA5AE',  # Dull pink
                     'Room is in a graveyard',
+                # port - Set if this is a port/harbour/jetty
                 'port', 'Pt', 'structures',
                     '#117311',  # Bottle green
                     'Room is in a port/harbour/jetty',
+                # maze - Set if this is a maze
                 'maze', 'Mz', 'structures',
                     '#D30027',  # Headache red
                     'Room is in a maze',
+
                 # Terrain
+                # -------
+                # forest - Set if this is a forest/wood
                 'forest', 'Fo', 'terrain',
                     '#227122',  # Dark green
                      'Room is in a forest/wood',
+                # clearing - Set if this is a clearing
                 'clearing', 'Cl', 'terrain',
                     '#68E568',  # Pale green
                      'Room is a clearing',
+                # grassland - Set if this is a grassland/plain
                 'grassland', 'Gl', 'terrain',
                     '#BFED57',  # Yellow-green
                     'Room is in a grassland/plain',
+                # swamp - Set if this is a swamp/marsh
                 'swamp', 'Sw', 'terrain',
                     '#6F9956',  # Dirty green
                     'Room is in a swamp/marsh',
+                # desert - Set if this is a desert
                 'desert', 'De', 'terrain',
                     '#F5F72B',  # Yellow
                     'Room is in a desert',
+                # beach - Set if this is a beach/coast
                 'beach', 'Be', 'terrain',
                     '#F7922B',  # Red-orange
                     'Room is on a beach/coastline',
+                # river - Set if this is a river/stream
                 'river', 'Rv', 'terrain',
                     '#61C3EB',  # Light blue
                     'Room is in a river/stream',
+                # lake - Set if this is a lake
                 'lake', 'Lk', 'terrain',
                     '#A9E6FF',  # Very light blue
                     'Room is in a lake',
+                # sea - Set if this is a sea/ocean
                 'sea', 'Se', 'terrain',
                     '#216D8C',  # Darker blue
                     'Room is in a sea/ocean',
+                # cave - Set if this is a cave
                 'cave', 'Cv', 'terrain',
                     '#849DAD',  # Grey-blue
                      'Room is in a cave',
+                # mountain - Set if this is a mountainous area
                 'mountain', 'Mn', 'terrain',
                     '#CDDDE7',  # Blue-white
                     'Room is in a mountainous area',
+                # rocky - Set if this is rocky landscape
                 'rocky', 'Rc', 'terrain',
                     '#C5AC95',  # Brown-grey
                     'Room is in a rocky landscape',
+                # icy - Set if this is icy landscape
                 'icy', 'Ic', 'terrain',
                     '#96BFC3',  # Very pale blue
                     'Room is in an icy landscape',
+                # hill - Set if this is a hill
                 'hill', 'Hi', 'terrain',
                     '#7ADA97',  # Light green
                     'Room is on a hill',
+                # pit - Set if this is next to (or inside) a pit or hole
                 'pit', 'Pi', 'terrain',
                     '#A7B179',  # Dull yellow-green
-                    'Room is in a pit',
+                    'Room is in a pit or contains one',
+
                 # Objects
+                # -------
+                # weapon - Set if the room contains a weapon
                 'weapon', 'Wp', 'objects',
                     '#A87389',  # Pale purple
                     'Room contains a weapon',
+                # armour - Set if the room contains an armour
                 'armour', 'Ar', 'objects',
                     '#82405C',  # Dark pale purple
                     'Room contains an armour',
+                # garment - Set if the room contains a garment
                 'garment', 'Gr', 'objects',
                     '#FF74AE',  # Purple-pink
                     'Room contains a garment',
+                # major_npc - Set if the room contains an important NPC
                 'major_npc', 'Np', 'objects',
                     '#3BCC2F',  # Green
                     'Room contains an important NPC',
+                # talk_npc - Set if the room contains a talking NPC
                 'talk_npc', 'Tn', 'objects',
                     '#086800',  # Dark green
                     'Room contains a talking NPC',
+                # npc - Set if the room contains any NPC
                 'npc', 'Np', 'objects',
                     '#7FEE75',  # Light green
                     'Room contains an NPC',
+                # portable - Set if the room contains a portable object
                 'portable', 'Pr', 'objects',
                     '#262FD8',  # Dark blue
                     'Room contains a portable object',
+                # decoration - Set if the room contains a decoration object
                 'decoration', 'Dc', 'objects',
                     '#10EBA1',  # Light cyan
                     'Room contains a decoration object',
+                # money - Set if the room contains money
                 'money', 'My', 'objects',
                     '#FFE63B',  # Gold
                     'Room contains money',
+                # treasure - Set if the room contains a valuable object
                 'treasure', 'Tr', 'objects',
                     '#FF673B',  # Red-orange
                     'Room treasure or valuable objects',
+                # collectable - Set if the room contains a collectable object
                 'collectable', 'Cl', 'objects',
                     '#FF9900',  # Orange
                     'Room contains collectable objects',
+
                 # Light
+                # -----
+                # outside - Set if this room is outside
                 'outside', 'Ou', 'light',
                     '#77C4E4',  # Sky blue
                     'Room is outside',
+                # inside - Set if this room is inside
                 'inside', 'In', 'light',
                     '#D38D36',  # Light brown
                     'Room is inside',
+                # overground - Set if this room is above ground
                 'overground', 'Ov', 'light',
                     '#36D355',  # Green
                     'Room is above ground',
+                # underground - Set if this room is underground
                 'underground', 'Un', 'light',
                     '#CDCDCD',  # Grey
                     'Room is underground',
+                # torch - Set if average player needs a torch in this room
                 'torch', 'To', 'light',
                     '#E1D139',  # Yellow
                     'Room usually needs a torch',
+                # always_dark - Set if this room is always dark
                 'always_dark', 'Ad', 'light',
                     '#977E6A',  # Pale brown
                     'Room is always dark',
+
                 # Guilds
+                # ------
+                # guild_entrance - Set if this room is an entrance to a guild (possibly guarded)
                 'guild_entrance', 'Ge', 'guilds',
                     '#8F2AF9',  # Purple-blue
                     'Entrance to a guild',
+                # guild_main - Set if this is a room inside the guild where a character can advance
+                #   skills and/or join the guild
                 'guild_main', 'Gm', 'guilds',
                     '#DAA0FB',  # Light purple
                     'Guild room for advancing skills',
+                # guild_practice - Set if this room is where a character can practice guild skills
                 'guild_practice', 'Gp', 'guilds',
                     '#DB0C89',  # Red-purple
                     'Guild room for practicing skills',
+                # guild_shop - Set if this is a room inside the guild where a character can buy
+                #   guild-specific items
                 'guild_shop', 'Gs', 'guilds',
                     '#CE4DF7',  # Purple
                     'Guild room for shopping',
+                # guild_other - Set if this is a room inside the guild where a character can't
+                #   advance skills or buy guild-specific items
                 'guild_other', 'Go', 'guilds',
                     '#89679C',  # Grey-purple
                     'Other kind of guild room',
+
                 # Quests
+                # ------
+                # quest_room - Set if this room is important in a quest
                 'quest_room' , 'Qr', 'quests',
                     '#F4E637',  # Yellow
                     'Room used in quest',
+                # quest_begin - Set if this room is the start of a quest
                 'quest_begin', 'Qb', 'quests',
                     '#58FF57',  # Green
                     'Quest begins in room',
+                # quest_end - Set if this room is the end of a quest
                 'quest_end', 'Qe', 'quests',
                     '#FF6957',  # Red
                     'Quest ends in room',
+
                 # Attacks
+                # -------
+                # peaceful - Set if the world doesn't allow fights in this room
                 'peaceful', 'Pf', 'attacks',
                     '#9CE3DD',  # Light cyan
                     'World forbids attacks in room',
+                # recovery - Set if this room lets the character recover from fights more quickly
                 'recovery', 'Ry', 'attacks',
                     '#E9DC3D',  # Yellow
                     'Character recovers quickly in room',
+                # char_dead - Set if any character has ever died in this room
                 'char_dead', 'Cd', 'attacks',
                     '#FF361E',  # Red
                     'Any character has died in room',
+                # char_pass_out - Set if any character has ever been knocked out in this room
                 'char_pass_out', 'Cp', 'attacks',
                     '#ED22BE',  # Purple
                     'Any character has passed out in room',
@@ -2056,6 +2235,7 @@
             constTaskPackageHash        => {
                 'advance_task'          => 'Games::Axmud::Task::Advance',
                 'attack_task'           => 'Games::Axmud::Task::Attack',
+                'channels_task'         => 'Games::Axmud::Task::Channels',
                 'chat_task'             => 'Games::Axmud::Task::Chat',
                 'compass_task'          => 'Games::Axmud::Task::Compass',
                 'condition_task'        => 'Games::Axmud::Task::Condition',
@@ -2090,6 +2270,9 @@
                 'advance'               => 'advance_task',
                 'att'                   => 'attack_task',
                 'attack'                => 'attack_task',
+                'chan'                  => 'channels_task',
+                'channel'               => 'channels_task',
+                'channels'              => 'channels_task',
                 'chat'                  => 'chat_task',
                 'comp'                  => 'compass_task',
                 'compass'               => 'compass_task',
@@ -2350,12 +2533,13 @@
             #   GA::Obj::Component->type)
             constComponentTypeList      => [
                 'anchor',
-                'ignore_line',
                 'verb_title', 'verb_descrip', 'verb_exit', 'verb_content', 'verb_special',
                 'brief_title', 'brief_exit', 'brief_title_exit', 'brief_exit_title',
                 'brief_content',
                 'room_cmd',
                 'mudlib_path',
+                'weather',
+                'ignore_line',
                 'custom',
             ],
             # Object parsing sanity check (in case someone creates a room containing a billion
@@ -2432,8 +2616,9 @@
                 'descrips'              => TRUE,
                 'contents'              => TRUE,
                 'attack'                => FALSE,
-                'divert'                => TRUE,
+                'channels'              => TRUE,
                 'chat'                  => TRUE,
+                'divert'                => TRUE,
                 'sleep'                 => TRUE,
                 'passout'               => TRUE,
                 'dead'                  => TRUE,
@@ -2441,8 +2626,8 @@
             # A list of GA::Session logfiles in a standard order, for use in the world profile's
             #   'edit' window
             constSessionLogOrderList    => [
-                'receive', 'display', 'rooms', 'descrips','contents', 'attack', 'divert', 'chat',
-                'sleep', 'passout', 'dead',
+                'receive', 'display', 'rooms', 'descrips','contents', 'attack', 'channels', 'chat',
+                'divert', 'sleep', 'passout', 'dead',
             ],
 
             # Parallel hash of short descriptions for each type of logfile, for use in the
@@ -2477,10 +2662,12 @@
                     => 'Logs all room contents strings processed by the Locator task',
                 'attack'
                     => 'Logs all attacks processed by the Attack task',
-                'divert'
-                    => 'Logs all text processed by the Divert task',
+                'channels'
+                    => 'Logs all text processed by the Channels task',
                 'chat'
                     => 'Logs all conversations with chat contacts',
+                'divert'
+                    => 'Logs all text processed by the Divert task',
                 'sleep'
                     => 'Logs lines leading up to the character falling asleep',
                 'passout'
@@ -4410,7 +4597,8 @@
             #
             # Constant default colour scheme for the pane objects (GA::Table::Pane), each of which
             #   displays a Gtk2::TextView in an 'internal' windows
-            # (These values never changes; each value is a standard colour tag)
+            # (These values never change; each value MUST be a standard colour tag, not an Xterm or
+            #   RGB colour tag)
             constTextColour             => 'white',
             constUnderlayColour         => 'ul_black',
             constBackgroundColour       => 'black',
@@ -4943,6 +5131,7 @@
                 # Default TTS settings for various built-in tasks
                 'attack'                => 'espeak',
                 'chat'                  => 'espeak',
+                'channels'              => 'espeak',
                 'divert'                => 'espeak',
                 'locator'               => 'espeak',
                 'status'                => 'espeak',
@@ -5037,6 +5226,8 @@
                 'fight'                 => 'attack_task',       # Turn on/off automatic kill reading
                 'interact'              => 'attack_task',       # ...interaction reading
                 'interaction'           => 'attack_task',       # ...interaction reading
+                # Channels task
+                'channels'              => 'channels_task',     # Turn on/off reading diverted msgs
                 # Chat task
                 'chat'                  => 'chat_task',         # Turns on/off reading all messages
                 'chatout'               => 'chat_task',         # ...only sent messages
@@ -5216,6 +5407,9 @@
             #   visible. Flag set to TRUE if an icon should be drawn, FALSE if an asterisk should be
             #   drawn instead
             irreversibleIconFlag        => FALSE,       # [config]
+            # Flag set to TRUE if the popup window created by GA::Generic::Win->showBusyWin should
+            #   not be shown at all; FALSE if it can be shown (when required)
+            allowBusyWinFlag            => TRUE,        # [config]
             # Flag set to TRUE if a session's 'main' window urgency hint should be set, when text
             #   is received from the world
             mainWinUrgencyFlag          => FALSE,       # [config]
@@ -6232,12 +6426,14 @@
                 $taskObj = $self->addGlobalInitTask('divert_task');
                 if ($taskObj) {
 
+                    $taskObj->set_requireWinFlag(FALSE);
                     $taskObj->set_startWithWinFlag(FALSE);
                     # Turn off sound effects, since TTS is used instead
                     $taskObj->ivUndef('tellAlertSound');
                     $taskObj->ivUndef('socialAlertSound');
                     $taskObj->ivUndef('customAlertSound');
                     $taskObj->ivUndef('warningAlertSound');
+                    $taskObj->ivUndef('otherAlertSound');
                 }
 
                 # Don't show the setup window twice
@@ -6376,7 +6572,10 @@
 
         # Because of a Gtk issue, using 'exit' will cause a segfault. However, in certain (rare)
         #   situations, we do actually need to use 'exit' or we'll get a Gtk2-CRITICAL error
-        if (! $self->forceExitFlag) {
+        if (
+            ! $self->forceExitFlag
+            || (! $axmud::BLIND_MODE_FLAG && ! $self->sessionCount)
+        ) {
             Gtk2->main_quit();
         } else {
             exit;
@@ -6594,11 +6793,15 @@
 
                 my $line = <$fileHandle>;
 
+                # Without this line, the Russian phrasebook is gibberish
+                $line = Encode::decode('utf8', $line);
+
                 if (! defined $line) {
 
                     $exitFlag = TRUE;
 
-                } elsif ($line =~ m/^\w/) {
+#                } elsif ($line =~ m/^\w/) {
+                } elsif ($line =~ m/^\s*[[:alnum:]]/) {
 
                     # Ignore empty lines and lines starting with a #
                     chomp $line;
@@ -6684,7 +6887,7 @@
             # There shouldn't be anything left
             if (@lineList) {
 
-                return undef;
+               return undef;
             }
 
             # Store the data in a phrasebook object
@@ -8770,6 +8973,8 @@
 
         # Set the standard IV (normally done by GA::Generic::Task->setParentFileObj)
         $taskObj->{_parentFile} = 'tasks';
+        # Set the task type (normally done in the call to $taskObj->new)
+        $taskObj->{taskType} = 'initial';
 
         # Update the global initial tasklist (normally done by GA::Generic::Task->updateTaskLists)
         # Give task a unique name within the global initial tasklist
@@ -9105,7 +9310,7 @@
         $self->writeText(
             'Because of the Perl error, ' . $axmud::SCRIPT . ' internal processes have been'
             . ' suspended across all sessions. (This will prevent you from seeing the same'
-            . ' error message again and again, and potentially protect your stored data'
+            . ' error message again and again, and will perhaps protect your stored data'
             . ' from getting corrupted.)',
         );
         $self->writeText(' ');
@@ -9122,10 +9327,16 @@
             . ' itself should be reported to the authors.',
         );
         $self->writeText(' ');
-            $self->writeText(
-                'When you are ready, you can use the \';restart\' command to return '
-                . $axmud::SCRIPT . ' to a more-or-less functional state.',
-            );
+        $self->writeText(
+            'When you are ready, you can use the \';restart\' command to return '
+            . $axmud::SCRIPT . ' to a more-or-less functional state.',
+        );
+        $self->writeText(' ');
+        $self->writeText('---');
+        $self->writeText(' ');
+        $self->writeText(
+            'Too long, didn\'t read? Just type:   ;restart',
+        );
         $self->writeText(' ');
 
         return 1;
@@ -10578,7 +10789,8 @@
             # Private plugins begin with an alpha-numeric character and end .pm; all other .pm files
             #   in the directory must begin with an underline character
             # Remove all non-plugin files from the list
-            if ($path =~ m/private[\\\/][A-Za-z0-9][A-Za-z0-9\_\ ]*\.pm$/) {
+#            if ($path =~ m/private[\\\/][A-Za-z0-9][A-Za-z0-9\_\ ]*\.pm$/) {
+            if ($path =~ m/private[\\\/][[:alnum:]][[:word:]\s]*\.pm$/) {
 
                 push (@modList, $path);
             }
@@ -12367,8 +12579,9 @@
         # Can be called by anything
         # Translate one of the standard colour tags used by Axmud (e.g. 'white') or an xterm colour
         #   tag (e.g. 'x255') into an RGB colour tag (e.g. '#FFFFFF')
-        # If an RGB colour tag is supplied, returns it unmodified. If the standard/xterm colour tag
-        #   isn't recognised, returns a default colour
+        # If an RGB colour tag is supplied, returns it unmodified
+        # If the standard/xterm colour tag isn't recognised, returns a failsafe RGB tag based on
+        #   either $self->constTextColour or $self->constBackgroundColour
         #
         # Expected arguments
         #   $tag    - the Axmud colour tag to translate
@@ -12379,14 +12592,21 @@
 
         my ($self, $tag, $check) = @_;
 
+        # Local variables
+        my ($defaultText, $defaultBackground);
+
         # Check for improper arguments
         if (! defined $tag || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->returnRGBColour', @_);
         }
 
+        # Get some failsafe RGB tags to use in case $tag isn't recognised
+        $defaultText = $self->ivShow('colourTagHash', $self->constTextColour);
+        $defaultBackground = $self->ivShow('colourTagHash', $self->constBackgroundColour);
+
         # If we have been supplied with an RGB colour tag, we must return it unmodified
-        if ($tag =~ m/^\#[A-Fa-f0-9]{6}$/) {
+        if ($tag =~ m/^[Uu]?\#[A-Fa-f0-9]{6}$/) {
 
             return $tag;
 
@@ -12403,7 +12623,7 @@
             } else {
 
                 # Invalid (normal) underlay colour tag. Use the default background colour instead
-                return $self->constBackgroundColour;
+                return $defaultBackground;
             }
 
         } elsif (substr($tag, 0, 3) eq 'UL_') {
@@ -12417,7 +12637,7 @@
             } else {
 
                 # Invalid (bold) underlay colour tag. Use the default background colour instead
-                return $self->constBackgroundColour;
+                return $defaultBackground;
             }
 
         } elsif ($self->ivExists('colourTagHash', $tag)) {
@@ -12445,7 +12665,7 @@
         } else {
 
             # Invalid colour tag. Use the (global) default text colour instead
-            return $self->constTextColour;
+            return $defaultText;
         }
     }
 
@@ -14130,7 +14350,8 @@
 
         # Checks whether a name for a Perl object matches Axmud's naming rules (namely, must be
         #   between 1 to $maxLength characters, containing letters, numbers and underlines -
-        #   first character can't be a number)
+        #   first character can't be a number. International characters, e.g. those in Cyrillic,
+        #   are accepted)
         # Also checks that the name doesn't clash with one of Axmud's reserved words
         #
         # Expected arguments
@@ -14159,7 +14380,8 @@
         # Perform the check
         $maxLength--;
 
-        if (! ($name =~  m/^[A-Za-z_]{1}[A-Za-z0-9_]{0,$maxLength}$/)) {
+#        if (! ($name =~  m/^[A-Za-z_]{1}[A-Za-z0-9_]{0,$maxLength}$/)) {
+        if (! ($name =~  m/^[[:alpha:]\_]{1}[[:word:]]{0,$maxLength}$/)) {
             return undef;
         } else {
             return 1;
@@ -15124,6 +15346,31 @@
 
         # The data stored in this IV is saved in the 'config' file
         $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_allowAsciiBellFlag');
+
+        return 1;
+    }
+
+    sub set_allowBusyWinFlag {
+
+        my ($self, $flag, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $flag || defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->set_allowBusyWinFlag',
+                @_,
+            );
+        }
+
+        if ($flag) {
+            $self->ivPoke('allowBusyWinFlag', TRUE);
+        } else {
+            $self->ivPoke('allowBusyWinFlag', FALSE);
+        }
+
+        # The data stored in this IV is saved in the 'config' file
+        $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_allowBusyWinFlag');
 
         return 1;
     }
@@ -20059,6 +20306,8 @@
         { $_[0]->{toolbarLabelFlag} }
     sub irreversibleIconFlag
         { $_[0]->{irreversibleIconFlag} }
+    sub allowBusyWinFlag
+        { $_[0]->{allowBusyWinFlag} }
     sub mainWinUrgencyFlag
         { $_[0]->{mainWinUrgencyFlag} }
     sub mainWinTooltipFlag

@@ -1,5 +1,9 @@
 Revision history for WWW::Scape::FindaGrave
 
+0.06	Tue Aug 28 10:16:33 EDT 2018
+	Fix undefined variable usage
+	Started work on new website
+
 0.05	Tue Nov  7 15:00:00 EST 2017
 	Use the legacy website, the new one doesn't scrape well and doesn't have RESTful
 

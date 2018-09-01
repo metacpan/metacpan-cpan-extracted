@@ -11,7 +11,7 @@ my $tri = Math::Geometry::Delaunay->new();
 # Run this script directly to see it.
 # Something like:
 # perl -Iblib/arch  -Iblib/lib -T t/03-delaunays_pslg.t
-$tri->quiet(0); 
+$tri->quiet(1); 
 
 # run the various packaged delaunay triangulations on a list of points
 

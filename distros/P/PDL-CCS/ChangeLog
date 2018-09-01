@@ -1,9 +1,19 @@
+v1.23.12 Tue, 28 Aug 2018 09:20:08 +0200 moocow
+	+ RT bug #126924, part III
+	  - added exception to CCS::Nd::borover() test in CCS/t/03_ufuncs.t
+	  - analogous to v1.23.11 fix for CCS/Ufunc/t/01_ufunc.t
+
+v1.23.11 Mon, 27 Aug 2018 14:35:47 +0200 moocow
+	+ workaround for RT bug #126294, reported by G. Herrmann
+	  - skip ufunc "borover:missing=BAD" test in CCS/Ufunc/t/01_ufunc.t if PDL::borover() is broken
+	  - upstream patch submitted to PDL maintainers as https://sourceforge.net/p/pdl/bugs/446/
+
 v1.23.10 Fri, 24 Aug 2018 10:14:40 +0200 moocow
 	+ fixed typo in failed test label-reporting labstr() in t/common.plt, added 'use strict'
 	+ may help to diagnose RT bug #126294 (CCS/Ufunc/t/01_ufunc.t test 'borover:missing=BAD' fails on armv6l-linux ~ rpi)
 
 v1.23.9 Fri, 22 Jun 2018 13:55:35 +0200 moocow
-	+ ufunc.pd: avoid "|=" and "&=" operators (attmpet to get build working on ARM64, reported by L. Baillet)
+	+ ufunc.pd: avoid "|=" and "&=" operators (attempt to get build working on ARM64, reported by L. Baillet)
 	  - see http://www.cpantesters.org/cpan/report/eaad8962-7102-11e8-905e-5ddc267117a8
 	  - see https://buildd.debian.org/status/package.php?p=libpdl-ccs-perl
 	+ more verbose diagnostics for failed pdlok() tests in t/common.plt

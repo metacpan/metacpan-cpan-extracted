@@ -1,4 +1,4 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Comment: This file documents the copyright statements and licenses for
  every file in this package in a machine-readable format.  For a less
  detailed, higher-level overview, see README.
@@ -9,7 +9,7 @@ Copyright: 2013-2018 Russ Allbery <rra@cpan.org>
 License: Expat
 
 Files: *
-Copyright: 1993-1994, 1996-1998, 2000, 2003-2014
+Copyright: 1993-1994, 1996-1998, 2000, 2002-2014
     The Board of Trustees of the Leland Stanford Junior University
   2000-2004, 2006-2018 Russ Allbery <rra@cpan.org>
 License: Expat

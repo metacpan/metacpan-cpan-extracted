@@ -45,7 +45,7 @@ function b()
     c();
 }
 
-function a() {
+function main() {
     b();
     return "ok";
 }
@@ -65,56 +65,40 @@ EOS
         ok(1, "loaded file '$js_file'");
     }
 
-    my $call = 'a';
-    my %types = (
-        normal     => {
-            method => 'eval',
-            args   => [ "$call()" ],
-        },
-        event_loop => {
-            method => 'dispatch_function_in_event_loop',
-            args   => [ $call ],
-        },
-    );
-    foreach my $type (sort keys %types) {
-        my $code = $types{$type};
-        my $method = $code->{method};
-        next unless $method;
+    my $call = 'main';
+    $vm->reset_msgs();
+    $vm->eval("$call()");
+    my $msgs = $vm->get_msgs();
+    # print STDERR Dumper($msgs);
 
-        $vm->reset_msgs();
-        $vm->$method(@{ $code->{args} });
-        my $msgs = $vm->get_msgs();
-        # print STDERR Dumper($msgs);
+    ok($msgs, "got messages from JS");
+    next unless $msgs;
 
-        ok($msgs, "got messages from JS for $type execution");
-        next unless $msgs;
+    ok($msgs->{stderr}, "got error messages from JS");
+    next unless $msgs->{stderr};
 
-        ok($msgs->{stderr}, "got error messages from JS");
-        next unless $msgs->{stderr};
+    my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2);
+    ok($contexts, "got parsed stacktrace");
+    next unless $contexts;
 
-        my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2);
-        ok($contexts, "got parsed stacktrace");
-        next unless $contexts;
-
-        my $context_no = 0;
-        foreach my $context (@$contexts) {
-            ++$context_no;
-            like($context->{message}, qr/:.*(not |un)defined/,
-                 "context $context_no contains error message");
-            is(scalar @{ $context->{frames} }, 2,
-               "context $context_no contains correct number of frames");
-            my $frame_no = 0;
-            foreach my $frame (@{ $context->{frames} }) {
-                ++$frame_no;
-                ok(exists $frame->{file}, "frame $context_no.$frame_no has member file");
-                ok(exists $frame->{line}, "frame $context_no.$frame_no has member line");
-                ok(exists $frame->{line_offset}, "frame $context_no.$frame_no has member line_offset");
-                ok(ref( $frame->{lines} ) eq 'ARRAY', "frame $context_no.$frame_no has member lines as arrayref");
-            }
+    my $context_no = 0;
+    foreach my $context (@$contexts) {
+        ++$context_no;
+        like($context->{message}, qr/:.*(not |un)defined/,
+             "context $context_no contains error message");
+        is(scalar @{ $context->{frames} }, 2,
+           "context $context_no contains correct number of frames");
+        my $frame_no = 0;
+        foreach my $frame (@{ $context->{frames} }) {
+            ++$frame_no;
+            ok(exists $frame->{file}, "frame $context_no.$frame_no has member file");
+            ok(exists $frame->{line}, "frame $context_no.$frame_no has member line");
+            ok(exists $frame->{line_offset}, "frame $context_no.$frame_no has member line_offset");
+            ok(ref( $frame->{lines} ) eq 'ARRAY', "frame $context_no.$frame_no has member lines as arrayref");
         }
-
-        # print STDERR Dumper($contexts);
     }
+
+    # print STDERR Dumper($contexts);
 }
 
 sub test_multiple_errors {
@@ -157,20 +141,20 @@ EOS
 
     $vm->reset_msgs();
     foreach my $seq (1..$top) {
-        my $js_func = sprintf("f_%d", $seq);
-        $vm->dispatch_function_in_event_loop($js_func);
+        my $js_func = sprintf("f_%d()", $seq);
+        $vm->eval($js_func);
     }
     my $msgs = $vm->get_msgs();
     # print STDERR Dumper($msgs);
     ok($msgs, "got messages from JS");
-    next unless $msgs;
+    return unless $msgs;
 
     ok($msgs->{stderr}, "got error messages from JS");
-    next unless $msgs->{stderr};
+    return unless $msgs->{stderr};
 
     my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2, \@interesting_files);
     ok($contexts, "got parsed stacktrace");
-    next unless $contexts;
+    return unless $contexts;
     # print STDERR Dumper($contexts);
 }
 

@@ -376,17 +376,3 @@ int pl_register_eventloop_functions(V8Context* ctx)
     }
     return n;
 }
-
-SV* pl_run_function_in_event_loop(pTHX_ V8Context* ctx, const char* func)
-{
-    /* Start a zero timer which will call our function from the event loop. */
-    // TODO: stop using a fixed size buffer
-    char js[1024];
-    sprintf(js, "setTimeout(function() { %s(); }, 0);", func);
-    pl_eval(aTHX_ ctx, js);
-
-    /* Launch eventloop; this call only returns after the eventloop terminates. */
-    eventloop_run(ctx);
-
-    return &PL_sv_yes;
-}

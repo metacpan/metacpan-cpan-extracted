@@ -9,7 +9,7 @@ Scrape the Find a Grave website
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -41,8 +41,9 @@ It takes two mandatory arguments firstname and lastname.
 
 Also one of either date\_of\_birth and date\_of\_death must be given
 
-There are three optional arguments: middlename, ua and mech.  Mech is a pointer
-to an object such as [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize).  If not given it will be created.
+There are three optional arguments: middlename, ua and host.
+
+host is the domain of the site to search, the default is www.findagrave.com.
 
 ua is a pointer to an object that understands get and env\_proxy messages, such
 as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP::UserAgent::Throttled).
@@ -65,8 +66,8 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-[https://github.com/nigelhorne/gedgrave](https://github.com/nigelhorne/gedgrave)
-[https://old.findagrave.com](https://old.findagrave.com)
+[https://github.com/nigelhorne/gedcom](https://github.com/nigelhorne/gedcom)
+[https://www.findagrave.com](https://www.findagrave.com)
 
 # SUPPORT
 
@@ -90,10 +91,10 @@ You can also look for information at:
 
 - Search CPAN
 
-    [http://search.cpan.org/dist/WWW-Scrape-FindaGrave/](http://search.cpan.org/dist/WWW-Scrape-FindaGrave/)
+    [https://metacpan.org/release/WWW-Scrape-FindaGrave](https://metacpan.org/release/WWW-Scrape-FindaGrave)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Nigel Horne.
+Copyright 2016-2018 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

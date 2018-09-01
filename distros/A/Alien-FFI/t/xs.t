@@ -38,7 +38,7 @@ test2(unsigned char input_value)
   if(ffi_prep_cif(&ffi_cif, FFI_DEFAULT_ABI, 1, &ffi_type_uint8, args) == FFI_OK)
   {
     values[0] = &input_value;
-    ffi_call(&ffi_cif, (void*) doublechaar, &return_value, values);
+    ffi_call(&ffi_cif, FFI_FN(doublechaar), &return_value, values);
     return return_value;
   }
   return -1;

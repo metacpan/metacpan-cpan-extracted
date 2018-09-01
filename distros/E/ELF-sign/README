@@ -1,0 +1,142 @@
+NAME
+    ELF::sign - X509 signing of elf execuables
+
+VERSION
+    Version 0.07
+
+DESCRIPTION
+    This module allows one to sign a elf file - or any other file type -
+    based on a PKCS#7 via a X509-Certifcate and its private key, and include
+    the signature in the file.
+
+    It uses SHA512 Hashing via PKCS#7 to ensure the correctness.
+
+SYNOPSIS
+    You can mix inmemory and file based commands.
+
+  Signing
+       use ELF::sign;
+       my $sign = ELF::sign->new();
+       $sign->crtFile("test.crt");
+       $sign->keyFile("test.key");
+       $sign->dataFile($filename);
+       my $error = $sign->sign() ||
+                   $sign->save($outfile);
+       die $error
+         if $error;
+
+  Verifying
+       use ELF::sign;
+       my $verify = ELF::sign->new();
+       $verify->crtFile("test.crt");
+       $verify->dataFile($filename);
+       my $error = $verify->verify() ||
+                   $verify->save($outfile, 1);
+       die $error
+         if $error;
+
+FUNCTIONS
+    new
+      Returns a new *ELF::sign* object. It ignores any options.
+
+    data{File}($data{/$filename})
+      Assignes data (as a file with suffix *File*) on which signing or
+      verifying operations can be applied.
+
+      Detects automatically if there is already a signature on the file or
+      on the data, and parses it in this case. Verifying via *verify()* is
+      possible if there is one or if *sign()* has been successfully called.
+      Signing via *sign()* is always possible, and overwrites a maybe
+      exsting signing - but just inmemory. To update to a file you have to
+      use *save()*.
+
+      If the *File* suffix is used, you specify a file. If this file cannot
+      be read, then *dataFile* returns undef.
+
+      In any other case, also on *data()*, it returns the attached signing
+      (PKCS#7) or the scalar defined value 0 if there is none but the file
+      was able to be read.
+
+    crt{File}($data{/$filename})
+      Assignes a X509-certificate to be used for verifing or signing. To
+      sign you also need to set the corresponding *key{File}()*.
+
+    key{File}($data{/$filename})
+      Assignes a key to be used for signing via *sign()*. To sign you also
+      need to set the corresponding *crt{File}()*.
+
+    verify()
+      Verifies that a attached or via *sign()* created signature matches the
+      data passed via *data{File}()* and the public key of *crt{File}()*.
+
+      Returns undef on success, or on any error the cause as scalar(string).
+
+      WARNING: ELF::sign currently does not verify the validity of the
+      certificate, it only uses the public key in the certificate specified
+      by *crt{File}()* and does do not any further certificate, ca
+      processing or checks. This will get fixed in one of the next releases.
+
+    sign()
+      Creates inmemory a PKCS#7 signature via *crt{File}()* and
+      *key{File}()* on the data that has been passed via *data{File}()*.
+      Returns undef on success, or on any error the cause as scalar(string).
+
+      To store and attach this signature you have to use *get()* or
+      *save()*. The signature alone, the PKCS#7, can be fetched via
+      *pkcs7()*.
+
+    get({1})
+      Returns the passed data passed via *data{File}()* as scalar(string),
+      and the attached signature, if available. If the optional parameter is
+      true, it omits the signature.
+
+    save($filename{,1})
+      Saves the passed data passed via *data{File}()* to a file, including
+      the attached signature if available. If the optional parameter is
+      true, it omits the signature.
+
+    pkcs7({$data})
+      Returns the currently active PKCS#7 signature, if available, or undef.
+      Via the optional data the pkcs7 can be manually overwritten.
+
+    hexdump($string)
+      Returns string data in hex format.
+
+      Example:
+
+        perl -e 'use ELF::sign; print ELF::sign::hexdump("test")."\n";'
+        74:65:73:74
+
+  Internal functions
+    crt()
+    crtFile()
+    key()
+    keyFile()
+    data()
+    dataFile()
+    datasign()
+    dataverify()
+    load()
+    loadFile()
+    dataToBio()
+    PEMdataToPKCS7()
+    PEMdataToX509()
+    PEMdataToEVP_PKEY()
+    getDigest()
+    doFile()
+    getFromData()
+    getFromFile()
+    PEM_read_bio_PKCS7()
+
+Commercial support
+    Commercial support can be gained at <elfsignsupport at cryptomagic.eu>.
+
+    Used in our products, you can find on <https://www.cryptomagic.eu/>
+
+COPYRIGHT & LICENSE
+    Copyright 2010-2018 Markus Schraeder, CryptoMagic GmbH, all rights
+    reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

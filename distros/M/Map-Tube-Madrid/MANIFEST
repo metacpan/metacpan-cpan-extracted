@@ -3,11 +3,13 @@ lib/Map/Tube/Madrid.pm
 lib/Map/Tube/Madrid/Line/L1.pm
 lib/Map/Tube/Madrid/Line/L3.pm
 lib/Map/Tube/Madrid/Line/L5.pm
+lib/Map/Tube/Madrid/Line/L11.pm
 share/madrid-map.json
 maps/Madrid-Metro.png
 maps/L1.png
 maps/L3.png
 maps/L5.png
+maps/L11.png
 Makefile.PL
 LICENSE
 MANIFEST

@@ -18,6 +18,7 @@ WriteMakefile (
 	'File::Spec' => 0,
 	'File::Slurper' => '0.012',
 	'C::Tokenize' => '0.18',
+	'Text::LineNumber' => '0.02',
     },
     META_MERGE => {
         resources => {

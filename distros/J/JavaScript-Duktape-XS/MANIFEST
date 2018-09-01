@@ -56,6 +56,7 @@ t/14_cyclic.t
 t/15_sandbox.t
 t/16_const.t
 t/17_remove.t
+t/18_boolean.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

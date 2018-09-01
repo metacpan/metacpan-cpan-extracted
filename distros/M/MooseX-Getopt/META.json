@@ -205,47 +205,47 @@
    "provides" : {
       "MooseX::Getopt" : {
          "file" : "lib/MooseX/Getopt.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Basic" : {
          "file" : "lib/MooseX/Getopt/Basic.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Dashes" : {
          "file" : "lib/MooseX/Getopt/Dashes.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::GLD" : {
          "file" : "lib/MooseX/Getopt/GLD.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Meta::Attribute" : {
          "file" : "lib/MooseX/Getopt/Meta/Attribute.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Meta::Attribute::NoGetopt" : {
          "file" : "lib/MooseX/Getopt/Meta/Attribute/NoGetopt.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Meta::Attribute::Trait" : {
          "file" : "lib/MooseX/Getopt/Meta/Attribute/Trait.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Meta::Attribute::Trait::NoGetopt" : {
          "file" : "lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::OptionTypeMap" : {
          "file" : "lib/MooseX/Getopt/OptionTypeMap.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::ProcessedArgv" : {
          "file" : "lib/MooseX/Getopt/ProcessedArgv.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "MooseX::Getopt::Strict" : {
          "file" : "lib/MooseX/Getopt/Strict.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       }
    },
    "release_status" : "stable",
@@ -263,10 +263,10 @@
       "x_IRC" : "irc://irc.perl.org/#moose",
       "x_MailingList" : "http://lists.perl.org/list/moose.html"
    },
-   "version" : "0.72",
+   "version" : "0.73",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.029001"
+         "version" : "5.029002"
       },
       "plugins" : [
          {
@@ -817,13 +817,16 @@
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.47"
                },
+               "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
+                  "skip_release_testing" : 0
+               },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 9,
                   "version" : "6.012"
                }
             },
             "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.027"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
@@ -955,7 +958,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20180720"
+                  "Module::CoreList" : "5.20180820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1172,7 +1175,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.72",
+                  "tag" : "v0.73",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1273,7 +1276,7 @@
                }
             },
             "name" : "@Author::ETHER/GitHub::Update",
-            "version" : "0.45"
+            "version" : "0.46"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
@@ -1467,31 +1470,33 @@
       "Olaf Alders <olaf@wundersolutions.com>",
       "Hans Dieter Pearcey <hdp@weftsoar.net>",
       "Ryan D Johnson <ryan@innerfence.com>",
-      "Dave Rolsky <autarch@urth.org>",
       "Nelo Onyiah <nelo.onyiah@gmail.com>",
+      "Dave Rolsky <autarch@urth.org>",
       "Ricardo SIGNES <rjbs@cpan.org>",
       "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avarab@gmail.com>",
-      "Damien Krotkine <dkrotkine@weborama.com>",
       "Hinrik \u00d6rn Sigur\u00f0sson <hinrik.sig@gmail.com>",
+      "Damien Krotkine <dkrotkine@weborama.com>",
       "Jose Luis Martinez <jlmartinez@capside.com>",
-      "Gregory Oschwald <goschwald@maxmind.com>",
-      "Devin Austin <dhoss@cpan.org>",
-      "Todd Hepler <thepler@employees.org>",
       "Chris Prather <chris@prather.org>",
-      "Jesse Luehrs <doy@tozt.net>",
-      "Gordon Irving <goraxe@goraxe.me.uk>",
-      "Drew Taylor <drew@drewtaylor.com>",
-      "Shlomi Fish <shlomif@shlomifish.org>",
-      "Stevan Little <stevan.little@gmail.com>",
-      "Damyan Ivanov <dmn@debian.org>",
-      "Stuart A Johnston <saj_git@thecommune.net>",
-      "Justin Hunter <justin.d.hunter@gmail.com>",
+      "Devin Austin <dhoss@cpan.org>",
+      "Gregory Oschwald <goschwald@maxmind.com>",
+      "Todd Hepler <thepler@employees.org>",
+      "Michael Schout <mschout@gkg.net>",
+      "Andreas Koenig <andk@cpan.org>",
       "Jonathan Swartz <swartz@pobox.com>",
       "John Goulah <jgoulah@cpan.org>",
-      "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>"
+      "Jesse Luehrs <doy@tozt.net>",
+      "Shlomi Fish <shlomif@shlomifish.org>",
+      "Stevan Little <stevan.little@gmail.com>",
+      "Gordon Irving <goraxe@goraxe.me.uk>",
+      "Stuart A Johnston <saj_git@thecommune.net>",
+      "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
+      "Drew Taylor <drew@drewtaylor.com>",
+      "Damyan Ivanov <dmn@debian.org>",
+      "Justin Hunter <justin.d.hunter@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.29.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_generated_by_perl" : "v5.29.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0
 }

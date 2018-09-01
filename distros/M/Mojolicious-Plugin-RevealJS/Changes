@@ -1,5 +1,19 @@
 Revision history for Perl module Mojolicious::Plugin::RevealJS
 
+0.17 2018-08-31
+  - Fix bug with mark in reveal-sampler
+
+0.16 2018-08-31
+  - Fix some broken pod, manwar++
+
+0.15 2018-08-31
+  - Fix a bug with specifying language in reveal-sampler
+
+0.14 2018-08-31
+  - Bundle reveal-sampler
+  - Add include_sample helper
+  - Soft-deprecate include_code
+
 0.13 2018-08-27
   - Add include_filename directive to include_code
   - Add section helper

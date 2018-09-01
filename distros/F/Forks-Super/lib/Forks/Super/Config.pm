@@ -19,7 +19,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(CONFIG CONFIG_module);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 our (%CONFIG, $IS_TEST, $IS_TEST_CONFIG, %SIGNO, $CONFIG_FILE);
 
@@ -91,9 +91,6 @@ sub deconfig {
 #
 # try to import some modules, with the expectation that the module
 # might not be available.
-#
-# Hmmmm. We often run this subroutine from the children, which could mean
-# we have to run it for every child.
 #
 sub CONFIG {
     my ($module, $warn, @settings) = @_;

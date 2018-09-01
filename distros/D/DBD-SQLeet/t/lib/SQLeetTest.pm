@@ -7,8 +7,8 @@ use Exporter   ();
 use File::Spec ();
 use Test::More ();
 
-our @ISA     = 'Exporter';
-our @EXPORT  = qw/connect_ok dies dbfile @CALL_FUNCS $sqleet_sqlite_call has_sqleet_sqlite requires_sqleet_sqlite/;
+our @ISA = 'Exporter';
+our @EXPORT = qw/connect_ok dies dbfile @CALL_FUNCS $sqleet_sqlite_call has_sqleet_sqlite requires_sqleet_sqlite/;
 our @CALL_FUNCS;
 our $sqleet_sqlite_call;
 
@@ -68,13 +68,11 @@ expected error message.
 
 sub dies {
   my ($coderef, $regex, $msg) = @_;
-        eval {$coderef->()};
-        my $exception = $@;
+    eval {$coderef->()};
+    my $exception = $@;
   Test::More::ok($exception =~ $regex,
-                       $msg || "dies with exception: $exception");
+                  $msg || "dies with exception: $exception");
 }
-
-
 
 =head2 @CALL_FUNCS
 
@@ -111,7 +109,6 @@ a final test in an END block outside of the loop.
 
 =cut
 
-
 # old_style way ("func")
 push @CALL_FUNCS, sub {
   my $dbh = shift;
@@ -125,7 +122,6 @@ $DBI::VERSION >= 1.608 and push @CALL_FUNCS, sub {
   my $method    = "sqlite_" . $func_name;
   return $dbh->$method(@_);
 };
-
 
 =head2 $sqleet_sqlite_call
 
@@ -148,7 +144,7 @@ $sqleet_sqlite_call = sub {
 
 =head2 has_sqleet_sqlite
 
-  has_sqleet_sqlite('3.6.11');
+  has_sqleet_sqlite('3.24.0');
 
 returns true if DBD::SQLeet is built with a version of SQLite equal to or higher than the specified version.
 

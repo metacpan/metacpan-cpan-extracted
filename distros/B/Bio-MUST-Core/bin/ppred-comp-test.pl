@@ -53,7 +53,7 @@ ppred-comp-test.pl - Compute compositional test based on ppred data
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 SYNOPSIS
 

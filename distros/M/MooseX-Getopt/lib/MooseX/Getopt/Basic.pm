@@ -1,7 +1,7 @@
 package MooseX::Getopt::Basic;
 # ABSTRACT: MooseX::Getopt::Basic - role to implement the Getopt::Long functionality
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 use Moose::Role;
 
@@ -85,6 +85,7 @@ sub process_argv {
     # did the user request usage information?
     if ( $processed{usage} and $params->{help_flag} ) {
         $class->print_usage_text($processed{usage});
+        exit 0;
     }
 
     return MooseX::Getopt::ProcessedArgv->new(
@@ -175,7 +176,6 @@ sub _getopt_full_usage
 {
     my ($self, $usage) = @_;
     print $usage->text;
-    exit 0;
 }
 #(this is already documented in MooseX::Getopt. But FIXME later, via RT#82195)
 #pod =for Pod::Coverage
@@ -254,7 +254,7 @@ sub _attrs_to_options {
             }
         }
 
-        push @options, {
+        my $push = {
             name       => $flag,
             init_arg   => $attr->init_arg,
             opt_string => $opt_string,
@@ -268,8 +268,13 @@ sub _attrs_to_options {
             # See 100_gld_default_bug.t for an example
             # - SL
             #( ( $attr->has_default && ( $attr->is_default_a_coderef xor $attr->is_lazy ) ) ? ( default => $attr->default({}) ) : () ),
-            ( $attr->has_documentation ? ( doc => $attr->documentation ) : () ),
+        };
+        if ($attr->has_documentation) {
+            my $doc = $attr->documentation;
+            $doc =~ s/[\r\n]+/ /g;
+            $push->{doc} = $doc;
         }
+        push @options, $push;
     }
 
     return @options;
@@ -289,7 +294,7 @@ MooseX::Getopt::Basic - MooseX::Getopt::Basic - role to implement the Getopt::Lo
 
 =head1 VERSION
 
-version 0.72
+version 0.73
 
 =head1 SYNOPSIS
 

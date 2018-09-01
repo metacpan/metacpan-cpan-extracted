@@ -8,5 +8,6 @@
 ^Build$
 ^Build.bat$
 ^pod2htm
+.swp$
 ^_build/
 ^.git/

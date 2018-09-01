@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client;
-$Net::Amazon::S3::Client::VERSION = '0.84';
+$Net::Amazon::S3::Client::VERSION = '0.85';
 use Moose 0.85;
 use HTTP::Status qw(is_error status_message);
 use MooseX::StrictConstructor 0.16;
@@ -88,10 +88,7 @@ sub _send_request {
 
     if ( is_error($code) ) {
         if ( $content_type eq 'application/xml' ) {
-            my $doc = $self->s3->libxml->parse_string($content);
-            my $xpc = XML::LibXML::XPathContext->new($doc);
-            $xpc->registerNs( 's3',
-                'http://s3.amazonaws.com/doc/2006-03-01/' );
+            my $xpc = $self->s3->_xpc_of_content ($content);
 
             if ( $xpc->findnodes('/Error') ) {
                 my $code    = $xpc->findvalue('/Error/Code');
@@ -117,11 +114,7 @@ sub _send_request_xpc {
     my ( $self, $http_request, $filename ) = @_;
     my $http_response = $self->_send_request( $http_request, $filename );
 
-    my $doc = $self->s3->libxml->parse_string( $http_response->content );
-    my $xpc = XML::LibXML::XPathContext->new($doc);
-    $xpc->registerNs( 's3', 'http://s3.amazonaws.com/doc/2006-03-01/' );
-
-    return $xpc;
+    return $self->s3->_xpc_of_content( $http_response->content );
 }
 
 1;
@@ -138,7 +131,7 @@ Net::Amazon::S3::Client - An easy-to-use Amazon S3 client
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

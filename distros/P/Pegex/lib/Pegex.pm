@@ -1,10 +1,10 @@
 use strict; use warnings;
 package Pegex;
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 use Pegex::Parser;
 
-use Exporter 'import';
+use base 'Exporter';
 our @EXPORT = 'pegex';
 
 sub pegex {

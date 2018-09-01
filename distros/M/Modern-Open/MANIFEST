@@ -1,11 +1,10 @@
 Modern/Open.pm
 Changes
 Makefile.PL
-pMakefile.PL
+pmake.bat
 MANIFEST
 README
 META.yml
-Test/Simply.pm
 t/001_open.t
 t/002_open.t
 t/003_open.t

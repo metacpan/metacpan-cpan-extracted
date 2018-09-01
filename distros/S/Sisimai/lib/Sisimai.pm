@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v4.22.7');
+our $VERSION = version->declare('v4.23.0');
 our $PATCHLV = 0;
 sub version { return $VERSION.($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub sysname { 'bouncehammer' }
@@ -26,9 +26,6 @@ sub make {
     my $argv0 = shift // return undef;
     die ' ***error: wrong number of arguments' if scalar @_ % 2;
 
-    require Sisimai::Data;
-    require Sisimai::Message;
-
     my $argv1 = { @_ };
     my $input = $argv1->{'input'} || undef;
     my $field = $argv1->{'field'} || [];
@@ -37,8 +34,9 @@ sub make {
     unless( $input ) {
         # "input" did not specified, try to detect automatically.
         my $rtype = ref $argv0;
-        if( length $rtype == 0 ) {
-            # The argument may be a path to email
+        if( ! $rtype || $rtype eq 'SCALAR' ) {
+            # The argument may be a path to email OR a scalar reference to an
+            # email text
             $input = 'email';
 
         } elsif( $rtype eq 'ARRAY' || $rtype eq 'HASH' ) {
@@ -51,6 +49,9 @@ sub make {
     my $delivered1 = { 'delivered' => $argv1->{'delivered'} // 0 };
     my $hookmethod = $argv1->{'hook'} || undef;
     my $bouncedata = [];
+
+    require Sisimai::Data;
+    require Sisimai::Message;
 
     if( $input eq 'email' ) {
         # Path to mailbox or Maildir/, or STDIN: 'input' => 'email'
@@ -224,6 +225,7 @@ messages like following.
 
     use Sisimai;
     my $v = Sisimai->make('/path/to/mbox'); # or Path to Maildir/
+    #  $v = Sisimai->make(\'From Mailer-Daemon ...'); 
 
     if( defined $v ) {
         for my $e ( @$v ) {

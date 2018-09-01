@@ -1,5 +1,8 @@
 Revision history for Perl extension App-RemoteCommand
 
+0.982  2018-09-01 18:36:29 JST
+  - Add -F (ssh configfile) option
+
 0.981  2018-03-24 23:22:35 JST
   - When canceling, send signal to process group of master connection
 

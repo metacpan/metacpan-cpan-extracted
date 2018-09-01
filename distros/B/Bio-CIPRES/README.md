@@ -4,6 +4,8 @@ Bio::CIPRES
 [![Build Status](https://travis-ci.org/jvolkening/p5-Bio-CIPRES.svg?branch=master)](https://travis-ci.org/jvolkening/p5-Bio-CIPRES)
 [![Coverage Status](https://coveralls.io/repos/github/jvolkening/p5-Bio-CIPRES/badge.svg?branch=master)](https://coveralls.io/github/jvolkening/p5-Bio-CIPRES?branch=master)
 [![CPAN version](https://badge.fury.io/pl/Bio-CIPRES.svg)](https://badge.fury.io/pl/Bio-CIPRES)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/Bio-CIPRES.png)](http://cpants.cpanauthors.org/dist/Bio-CIPRES)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 `Bio::CIPRES` is an interface to the CIPRES REST API for running phylogenetic
 analyses via the CIPRES service. Currently it provides general classes and

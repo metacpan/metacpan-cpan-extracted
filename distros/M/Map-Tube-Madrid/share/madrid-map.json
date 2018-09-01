@@ -4,9 +4,11 @@
     {
         "line":
         [
-            { "id": "L1", "name": "L1", "color": "cyan"  },
-            { "id": "L3", "name": "L3", "color": "red"   },
-            { "id": "L5", "name": "L5", "color": "green" }
+            { "id": "L1",  "name": "L1",  "color": "cyan"    },
+            { "id": "L3",  "name": "L3",  "color": "red"     },
+            { "id": "L5",  "name": "L5",  "color": "#78B778" },
+            { "id": "L6",  "name": "L6",  "color": "#787878" },
+            { "id": "L11", "name": "L11", "color": "#304930" }
         ]
     },
     "stations":
@@ -15,13 +17,15 @@
         [
             { "id": "CALLAO",            "name": "Callao",    "line": "L3:14,L5:17", "link": "L5-16,L5-18,L3-13,L3-15" },
             { "id": "CHAMARTIN",         "name": "Chamartin", "line": "L1:3",        "link": "L1-02,PLAZA-DE-CASTILLA" },
-            { "id": "PLAZA-DE-CASTILLA", "name": "Plaza de Castilla", "line": "L1:4",  "link": "CHAMARTIN,L1-05" },
-            { "id": "CUATRO-CAMINOS",    "name": "Cuatro Caminos",    "line": "L1:9",  "link": "L1-08,L1-10"     },
-            { "id": "BILBAO",            "name": "Bilbao",            "line": "L1:12", "link": "L1-11,TRIBUNAL"  },
-            { "id": "TRIBUNAL",          "name": "Tribunal",          "line": "L1:13", "link": "BILBAO,GRAN-VIA" },
-            { "id": "GRAN-VIA",          "name": "Gran Vía",          "line": "L1:14", "link": "TRIBUNAL,SOL"    },
-            { "id": "SOL",               "name": "Sol",               "line": "L1:15", "link": "GRAN-VIA,L1-16"  },
-            { "id": "PACIFICO",          "name": "Pacífico",          "line": "L1:21", "link": "L1-20,L1-22"     },
+            { "id": "PLAZA-DE-CASTILLA", "name": "Plaza de Castilla", "line": "L1:4",   "link": "CHAMARTIN,L1-05" },
+            { "id": "CUATRO-CAMINOS",    "name": "Cuatro Caminos",    "line": "L1:9",   "link": "L1-08,L1-10"     },
+            { "id": "BILBAO",            "name": "Bilbao",            "line": "L1:12",  "link": "L1-11,TRIBUNAL"  },
+            { "id": "TRIBUNAL",          "name": "Tribunal",          "line": "L1:13",  "link": "BILBAO,GRAN-VIA" },
+            { "id": "GRAN-VIA",          "name": "Gran Vía",          "line": "L1:14",  "link": "TRIBUNAL,SOL"    },
+            { "id": "SOL",               "name": "Sol",               "line": "L1:15",  "link": "GRAN-VIA,L1-16"  },
+            { "id": "PACIFICO",          "name": "Pacífico",          "line": "L1:21",  "link": "L1-20,L1-22"     },
+            { "id": "PLAZA-ELIPTICA",    "name": "Plaza Eliptica",    "line": "L11:7,L6:1", "link": "L11-06,L6-02" },
+            { "id": "OPORTO",            "name": "Oporto",            "line": "L5:25,L6:3", "link": "L5-24,L5-26,L6-02,L6-04" },
 
             { "id": "L1-01", "name": "Pinar de",            "line": "L1:1",   "link": "L1-02"                   },
             { "id": "L1-02", "name": "Bambú",               "line": "L1:2",   "link": "L1-01,CHAMARTIN"         },
@@ -89,15 +93,24 @@
             { "id": "L5-21", "name": "Acacias",                "line": "L5:21", "link": "L5-20,L5-22"  },
             { "id": "L5-22", "name": "Pirámides",              "line": "L5:22", "link": "L5-21,L5-23"  },
             { "id": "L5-23", "name": "Marqués de Vadillo",     "line": "L5:23", "link": "L5-22,L5-24"  },
-            { "id": "L5-24", "name": "Urgel",                  "line": "L5:24", "link": "L5-23,L5-25"  },
-            { "id": "L5-25", "name": "Oporto",                 "line": "L5:25", "link": "L5-24,L5-26"  },
-            { "id": "L5-26", "name": "Vista Alegre",           "line": "L5:26", "link": "L5-25,L5-27"  },
+            { "id": "L5-24", "name": "Urgel",                  "line": "L5:24", "link": "L5-23,OPORTO" },
+            { "id": "L5-26", "name": "Vista Alegre",           "line": "L5:26", "link": "OPORTO,L5-27" },
             { "id": "L5-27", "name": "Carabanchel",            "line": "L5:27", "link": "L5-26,L5-28"  },
             { "id": "L5-28", "name": "Eugenia de Montijo",     "line": "L5:28", "link": "L5-27,L5-29"  },
             { "id": "L5-29", "name": "Aluche",                 "line": "L5:29", "link": "L5-28,L5-30"  },
             { "id": "L5-30", "name": "Empalme",                "line": "L5:30", "link": "L5-29,L5-31"  },
             { "id": "L5-31", "name": "Campamento",             "line": "L5:31", "link": "L5-30,L5-32"  },
-            { "id": "L5-32", "name": "Casa de Campo",          "line": "L5:32", "link": "L5-31"        }
+            { "id": "L5-32", "name": "Casa de Campo",          "line": "L5:32", "link": "L5-31"        },
+
+            { "id": "L6-02", "name": "Opañel",     "line": "L6:2",  "link": "PLAZA-ELIPTICA,OPORTO" },
+            { "id": "L6-04", "name": "Carpentana", "line": "L6:4",  "link": "OPORTO" },
+
+            { "id": "L11-01", "name": "La Fortuna",       "line": "L11:01", "link": "L11-02" },
+            { "id": "L11-02", "name": "La Peseta",        "line": "L11:02", "link": "L11-01,L11-03" },
+            { "id": "L11-03", "name": "Carabanchel Alto", "line": "L11:03", "link": "L11-02,L11-04" },
+            { "id": "L11-04", "name": "San Francisco",    "line": "L11:04", "link": "L11-03,L11-05" },
+            { "id": "L11-05", "name": "Pan Bendito",      "line": "L11:05", "link": "L11-04,L11-06" },
+            { "id": "L11-06", "name": "Abrantes",         "line": "L11:06", "link": "L11-05,PLAZA-ELIPTICA" }
         ]
     }
 }

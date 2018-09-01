@@ -1,0 +1,736 @@
+NAME
+    AnyEvent::WebDriver - control browsers using the W3C WebDriver protocol
+
+SYNOPSIS
+       # start geckodriver or any other w3c-compatible webdriver via the shell
+       $ geckdriver -b myfirefox/firefox --log trace --port 4444
+
+       # then use it
+       use AnyEvent::WebDriver;
+
+       # create a new webdriver object
+       my $wd = new AnyEvent::WebDriver;
+
+       # create a new session with default capabilities.
+       $wd->new_session ({});
+
+       $wd->navigate_to ("https://duckduckgo.com/html");
+       my $searchbox = $wd->find_element ("css selector" => 'input[type="text"]');
+
+       $wd->element_send_keys ($searchbox => "free software");
+       $wd->element_click ($wd->find_element ("css selector" => 'input[type="submit"]'));
+
+       sleep 10;
+
+DESCRIPTION
+    WARNING: THE API IS NOT GUARANTEED TO BE STABLE UNTIL VERSION 1.0.
+
+    This module aims to implement the W3C WebDriver specification which is
+    the standardised equivalent to the Selenium WebDriver API., which in
+    turn aims at remotely controlling web browsers such as Firefox or
+    Chromium.
+
+    At the time of this writing, it was so brand new that I could only get
+    "geckodriver" (For Firefox) to work, but that is expected to be fixed
+    very soon indeed.
+
+    To make most of this module, or, in fact, to make any reasonable use of
+    this module, you would need to refer to the W3C WebDriver
+    recommendation, which can be found here
+    <https://www.w3.org/TR/webdriver1/>:
+
+       https://www.w3.org/TR/webdriver1/
+
+  CONVENTIONS
+    Unless otherwise stated, all delays and time differences in this module
+    are represented as an integer number of milliseconds.
+
+  WEBDRIVER OBJECTS
+    new AnyEvent::WebDriver key => value...
+        Create a new WebDriver object. Example for a remote WebDriver
+        connection (the only type supported at the moment):
+
+           my $wd = new AnyEvent::WebDriver host => "localhost", port => 4444;
+
+        Supported keys are:
+
+        endpoint => $string
+            For remote connections, the endpoint to connect to (defaults to
+            "http://localhost:4444").
+
+        proxy => $proxyspec
+            The proxy to use (same as the "proxy" argument used by
+            AnyEvent::HTTP). The default is "undef", which disables proxies.
+            To use the system-provided proxy (e.g. "http_proxy" environment
+            variable), specify a value of "default".
+
+        autodelete => $boolean
+            If true (the default), then automatically execute
+            "delete_session" when the WebDriver object is destroyed with an
+            active session. IF set to a false value, then the session will
+            continue to exist.
+
+        timeout => $seconds
+            The HTTP timeout, in (fractional) seconds (default: 300, but
+            this will likely drastically reduce). This timeout is reset on
+            any activity, so it is not an overall request timeout. Also,
+            individual requests might extend this timeout if they are known
+            to take longer.
+
+        persistent => 1 | "undef"
+            If true (the default) then persistent connections will be used
+            for all requests, which assumes you have a reasonably stable
+            connection (such as to "localhost" :) and that the WebDriver has
+            a persistent timeout much higher than what AnyEvent::HTTP uses.
+
+            You can force connections to be closed for non-idempotent
+            requests by setting this to "undef".
+
+    $al = $wd->actions
+        Creates an action list associated with this WebDriver. See ACTION
+        LISTS, below, for full details.
+
+    $sessionstring = $wd->save_session
+        Save the current session in a string so it can be restored load with
+        "load_session". Note that only the session data itself is stored
+        (currently the session id and capabilities), not the endpoint
+        information itself.
+
+        The main use of this function is in conjunction with disabled
+        "autodelete", to save a session to e.g., and restore it later. It
+        could presumably used for other applications, such as using the same
+        session from multiple processes and so on.
+
+    $wd->load_session ($sessionstring)
+    $wd->set_session ($sessionid, $capabilities)
+        Starts using the given session, as identified by $sessionid.
+        $capabilities should be the original session capabilities, although
+        the current version of this module does not make any use of it.
+
+        The $sessionid is stored in "$wd->{sid}" (and could be fetched form
+        there for later use), while the capabilities are stored in
+        "$wd->{capabilities}".
+
+  SIMPLIFIED API
+    This section documents the simplified API, which is really just a very
+    thin wrapper around the WebDriver protocol commands. They all block
+    (using AnyEvent condvars) the caller until the result is available, so
+    must not be called from an event loop callback - see "EVENT BASED API"
+    for an alternative.
+
+    The method names are pretty much taken directly from the W3C WebDriver
+    specification, e.g. the request documented in the "Get All Cookies"
+    section is implemented via the "get_all_cookies" method.
+
+    The order is the same as in the WebDriver draft at the time of this
+    writing, and only minimal massaging is done to request parameters and
+    results.
+
+   SESSIONS
+    $wd->new_session ({ key => value... })
+        Try to connect to the WebDriver and initialize a new session with a
+        "new session" command, passing the given key-value pairs as value
+        (e.g. "capabilities").
+
+        No session-dependent methods must be called before this function
+        returns successfully, and only one session can be created per
+        WebDriver object.
+
+        On success, "$wd->{sid}" is set to the session ID, and
+        "$wd->{capabilities}" is set to the returned capabilities.
+
+        Simple example of creating a WebDriver object and a new session:
+
+           my $wd = new AnyEvent::Selenium endpoint => "http://localhost:4545";
+           $wd->new_session ({});
+
+        Real-world example with capability negotiation:
+
+           $wd->new_session ({
+              capabilities => {
+                 alwaysMatch => {
+                    pageLoadStrategy        => "eager",
+                    unhandledPromptBehavior => "dismiss",
+                    # proxy => { proxyType => "manual", httpProxy => "1.2.3.4:56", sslProxy => "1.2.3.4:56" },
+                 },
+                 firstMatch => [
+                    {
+                       browserName => "firefox",
+                       "moz:firefoxOptions" => {
+                          binary => "firefox/firefox",
+                          args => ["-devtools"],
+                          prefs => {
+                             "dom.webnotifications.enabled" => \0,
+                             "dom.push.enabled" => \0,
+                             "dom.disable_beforeunload" => \1,
+                             "browser.link.open_newwindow" => 3,
+                             "browser.link.open_newwindow.restrictions" => 0,
+                             "dom.popup_allowed_events" => "",
+                             "dom.disable_open_during_load" => \1,
+                          },
+                       },
+                    },
+                    {
+                       # generic fallback
+                    },
+                 ],
+
+              },
+           });
+
+        Firefox-specific capability documentation can be found on MDN
+        <https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities
+        >, Chrome-specific capability documentation might be found here
+        <http://chromedriver.chromium.org/capabilities>, but the latest
+        release at the time of this writing has effectively no WebDriver
+        support at all, and canary releases are not freely downloadable.
+
+        If you have URLs for Safari/IE/Edge etc. capabilities, feel free to
+        tell me about them.
+
+    $wd->delete_session
+        Deletes the session - the WebDriver object must not be used after
+        this call.
+
+    $timeouts = $wd->get_timeouts
+        Get the current timeouts, e.g.:
+
+           my $timeouts = $wd->get_timeouts;
+           => { implicit => 0, pageLoad => 300000, script => 30000 }
+
+    $wd->set_timeouts ($timeouts)
+        Sets one or more timeouts, e.g.:
+
+           $wd->set_timeouts ({ script => 60000 });
+
+   NAVIGATION
+    $wd->navigate_to ($url)
+        Navigates to the specified URL.
+
+    $url = $wd->get_current_url
+        Queries the current page URL as set by "navigate_to".
+
+    $wd->back
+        The equivalent of pressing "back" in the browser.
+
+    $wd->forward
+        The equivalent of pressing "forward" in the browser.
+
+    $wd->refresh
+        The equivalent of pressing "refresh" in the browser.
+
+    $title = $wd->get_title
+        Returns the current document title.
+
+   COMMAND CONTEXTS
+    $handle = $wd->get_window_handle
+        Returns the current window handle.
+
+    $wd->close_window
+        Closes the current browsing context.
+
+    $wd->switch_to_window ($handle)
+        Changes the current browsing context to the given window.
+
+    $handles = $wd->get_window_handles
+        Return the current window handles as an array-ref of handle IDs.
+
+    $handles = $wd->switch_to_frame ($frame)
+        Switch to the given frame identified by $frame, which must be either
+        "undef" to go back to the top-level browsing context, an integer to
+        select the nth subframe, or an element object.
+
+    $handles = $wd->switch_to_parent_frame
+        Switch to the parent frame.
+
+    $rect = $wd->get_window_rect
+        Return the current window rect(angle), e.g.:
+
+           $rect = $wd->get_window_rect
+           => { height => 1040, width => 540, x => 0, y => 0 }
+
+    $wd->set_window_rect ($rect)
+        Sets the window rect(angle).
+
+    $wd->maximize_window
+    $wd->minimize_window
+    $wd->fullscreen_window
+        Changes the window size by either maximising, minimising or making
+        it fullscreen. In my experience, this will timeout if no window
+        manager is running.
+
+   ELEMENT RETRIEVAL
+    To reduce typing and memory strain, the element finding functions accept
+    some shorter and hopefully easier to remember aliases for the standard
+    locator strategy values, as follows:
+
+       Alias   Locator Strategy
+       css     css selector
+       link    link text
+       substr  partial link text
+       tag     tag name
+
+    $element = $wd->find_element ($locator_strategy, $selector)
+        Finds the first element specified by the given selector and returns
+        its element object. Raises an error when no element was found.
+
+        Examples showing all standard locator strategies:
+
+           $element = $wd->find_element ("css selector" => "body a");
+           $element = $wd->find_element ("link text" => "Click Here For Porn");
+           $element = $wd->find_element ("partial link text" => "orn");
+           $element = $wd->find_element ("tag name" => "input");
+           $element = $wd->find_element ("xpath" => '//input[@type="text"]');
+           => e.g. { "element-6066-11e4-a52e-4f735466cecf" => "decddca8-5986-4e1d-8c93-efe952505a5f" }
+
+        Same examples using aliases provided by this module:
+
+           $element = $wd->find_element (css => "body a");
+           $element = $wd->find_element (link => "Click Here For Porn");
+           $element = $wd->find_element (substr => "orn");
+           $element = $wd->find_element (tag => "input");
+
+    $elements = $wd->find_elements ($locator_strategy, $selector)
+        As above, but returns an arrayref of all found element objects.
+
+    $element = $wd->find_element_from_element ($element, $locator_strategy,
+    $selector)
+        Like "find_element", but looks only inside the specified $element.
+
+    $elements = $wd->find_elements_from_element ($element,
+    $locator_strategy, $selector)
+        Like "find_elements", but looks only inside the specified $element.
+
+           my $head = $wd->find_element ("tag name" => "head");
+           my $links = $wd->find_elements_from_element ($head, "tag name", "link");
+
+    $element = $wd->get_active_element
+        Returns the active element.
+
+   ELEMENT STATE
+    $bool = $wd->is_element_selected
+        Returns whether the given input or option element is selected or
+        not.
+
+    $string = $wd->get_element_attribute ($element, $name)
+        Returns the value of the given attribute.
+
+    $string = $wd->get_element_property ($element, $name)
+        Returns the value of the given property.
+
+    $string = $wd->get_element_css_value ($element, $name)
+        Returns the value of the given CSS value.
+
+    $string = $wd->get_element_text ($element)
+        Returns the (rendered) text content of the given element.
+
+    $string = $wd->get_element_tag_name ($element)
+        Returns the tag of the given element.
+
+    $rect = $wd->get_element_rect ($element)
+        Returns the element rect(angle) of the given element.
+
+    $bool = $wd->is_element_enabled
+        Returns whether the element is enabled or not.
+
+   ELEMENT INTERACTION
+    $wd->element_click ($element)
+        Clicks the given element.
+
+    $wd->element_clear ($element)
+        Clear the contents of the given element.
+
+    $wd->element_send_keys ($element, $text)
+        Sends the given text as key events to the given element.
+
+   DOCUMENT HANDLING
+    $source = $wd->get_page_source
+        Returns the (HTML/XML) page source of the current document.
+
+    $results = $wd->execute_script ($javascript, $args)
+        Synchronously execute the given script with given arguments and
+        return its results ($args can be "undef" if no arguments are
+        wanted/needed).
+
+           $ten = $wd->execute_script ("return arguments[0]+arguments[1]", [3, 7]);
+
+    $results = $wd->execute_async_script ($javascript, $args)
+        Similar to "execute_script", but doesn't wait for script to return,
+        but instead waits for the script to call its last argument, which is
+        added to $args automatically.
+
+          $twenty = $wd->execute_async_script ("arguments[0](20)", undef);
+
+   COOKIES
+    $cookies = $wd->get_all_cookies
+        Returns all cookies, as an arrayref of hashrefs.
+
+           # google surely sets a lot of cookies without my consent
+           $wd->navigate_to ("http://google.com");
+           use Data::Dump;
+           ddx $wd->get_all_cookies;
+
+    $cookie = $wd->get_named_cookie ($name)
+        Returns a single cookie as a hashref.
+
+    $wd->add_cookie ($cookie)
+        Adds the given cookie hashref.
+
+    $wd->delete_cookie ($name)
+        Delete the named cookie.
+
+    $wd->delete_all_cookies
+        Delete all cookies.
+
+   ACTIONS
+    $wd->perform_actions ($actions)
+        Perform the given actions (an arrayref of action specifications
+        simulating user activity, or an "AnyEvent::WebDriver::Actions"
+        object). For further details, read the spec or the section "ACTION
+        LISTS", below.
+
+        An example to get you started (see the next example for a mostly
+        equivalent example using the "AnyEvent::WebDriver::Actions" helper
+        API):
+
+           $wd->navigate_to ("https://duckduckgo.com/html");
+           my $input = $wd->find_element ("css selector", 'input[type="text"]');
+           $wd->perform_actions ([
+              {
+                 id => "myfatfinger",
+                 type => "pointer",
+                 pointerType => "touch",
+                 actions => [
+                    { type => "pointerMove", duration => 100, origin => $input, x => 40, y => 5 },
+                    { type => "pointerDown", button => 1 },
+                    { type => "pause", duration => 40 },
+                    { type => "pointerUp", button => 1 },
+                 ],
+              },
+              {
+                 id => "mykeyboard",
+                 type => "key",
+                 actions => [
+                    { type => "pause" },
+                    { type => "pause" },
+                    { type => "pause" },
+                    { type => "pause" },
+                    { type => "keyDown", value => "a" },
+                    { type => "pause", duration => 100 },
+                    { type => "keyUp", value => "a" },
+                    { type => "pause", duration => 100 },
+                    { type => "keyDown", value => "b" },
+                    { type => "pause", duration => 100 },
+                    { type => "keyUp", value => "b" },
+                    { type => "pause", duration => 2000 },
+                    { type => "keyDown", value => "\x{E007}" }, # enter
+                    { type => "pause", duration => 100 },
+                    { type => "keyUp", value => "\x{E007}" }, # enter
+                    { type => "pause", duration => 5000 },
+                 ],
+              },
+           ]);
+
+        And here is essentially the same (except for fewer pauses) example
+        as above, using the much simpler "AnyEvent::WebDriver::Actions" API.
+        Note that the pointer up and key down event happen concurrently in
+        this example:
+
+           $wd->navigate_to ("https://duckduckgo.com/html");
+           my $input = $wd->find_element ("css selector", 'input[type="text"]');
+           $wd->actions
+              ->move ($input, 40, 5, "touch1")
+              ->click
+              ->key ("a")
+              ->key ("b")
+              ->pause (2000)
+              ->key ("\x{E007}")
+              ->pause (5000)
+              ->perform;
+
+    $wd->release_actions
+        Release all keys and pointer buttons currently depressed.
+
+   USER PROMPTS
+    $wd->dismiss_alert
+        Dismiss a simple dialog, if present.
+
+    $wd->accept_alert
+        Accept a simple dialog, if present.
+
+    $text = $wd->get_alert_text
+        Returns the text of any simple dialog.
+
+    $text = $wd->send_alert_text
+        Fills in the user prompt with the given text.
+
+   SCREEN CAPTURE
+    $wd->take_screenshot
+        Create a screenshot, returning it as a PNG image in a "data:" URL.
+
+    $wd->take_element_screenshot ($element)
+        Accept a simple dialog, if present.
+
+  ACTION LISTS
+    Action lists can be quite complicated. Or at least it took a while for
+    me to twist my head around them. Basically, an action list consists of a
+    number of sources representing devices (such as a finger, a mouse, a pen
+    or a keyboard) and a list of actions for each source.
+
+    An action can be a key press, a pointer move or a pause (time delay).
+    Actions from different sources can happen "at the same time", while
+    actions from a single source are executed in order.
+
+    While you can provide an action list manually, it is (hopefully) less
+    cumbersome to use the API described in this section to create them.
+
+    The basic process of creating and performing actions is to create a new
+    action list, adding action sources, followed by adding actions. Finally
+    you would "perform" those actions on the WebDriver.
+
+    Virtual time progresses as long as you add actions to the same event
+    source. Adding events to different sources are considered to happen
+    concurrently. If you want to force time to progress, you can do this
+    using a call to "->pause (0)".
+
+    Most methods here are designed to chain, i.e. they return the web
+    actions object, to simplify multiple calls.
+
+    For example, to simulate a mouse click to an input element, followed by
+    entering some text and pressing enter, you can use this:
+
+       $wd->actions
+          ->click (1, 100)
+          ->type ("some text")
+          ->key ("{Enter}")
+          ->perform;
+
+    By default, keyboard and mouse input sources are provided. You can
+    create your own sources and use them when adding events. The above
+    example could be more verbosely written like this:
+
+       $wd->actions
+          ->source ("mouse", "pointer", pointerType => "mouse")
+          ->source ("kbd", "key")
+          ->click (1, 100, "mouse")
+          ->type ("some text", "kbd")
+          ->key ("{Enter}", "kbd")
+          ->perform;
+
+    When you specify the event source explicitly it will switch the current
+    "focus" for this class of device (all keyboards are in one class, all
+    pointer-like devices such as mice/fingers/pens are in one class), so you
+    don't have to specify the source for subsequent actions.
+
+    When you use the sources "keyboard", "mouse", "touch1".."touch3", "pen"
+    without defining them, then a suitable default source will be created
+    for them.
+
+    $al = new AnyEvent::WebDriver::Actions
+        Create a new empty action list object. More often you would use the
+        "$wd->action_list" method to create one that is already associated
+        with a given web driver.
+
+    $al = $al->source ($id, $type, key => value...)
+        The first time you call this with a given ID, this defines the event
+        source using the extra parameters. Subsequent calls merely switch
+        the current source for its event class.
+
+        It's not an error to define built-in sources (such as "keyboard" or
+        "touch1") differently then the defaults.
+
+        Example: define a new touch device called "fatfinger".
+
+           $al->source (fatfinger => "pointer", pointerType => "touch");
+
+        Example: define a new touch device called "fatfinger".
+
+           $al->source (fatfinger => "pointer", pointerType => "touch");
+
+        Example: switch default keyboard source to "kbd1", assuming it is of
+        "key" class.
+
+           $al->source ("kbd1");
+
+    $al = $al->pause ($duration)
+        Creates a pause with the given duration. Makes sure that time
+        progresses in any case, even when $duration is 0.
+
+    $al = $al->pointer_down ($button, $source)
+    $al = $al->pointer_up ($button, $source)
+        Press or release the given button. $button defaults to 1.
+
+    $al = $al->click ($button, $source)
+        Convenience function that creates a button press and release action
+        without any delay between them. $button defaults to 1.
+
+    $al = $al->doubleclick ($button, $source)
+        Convenience function that creates two button press and release
+        action pairs in a row, with no unnecessary delay between them.
+        $button defaults to 1.
+
+    $al = $al->move ($button, $origin, $x, $y, $duration, $source)
+        Moves a pointer to the given position, relative to origin (either
+        "viewport", "pointer" or an element object.
+
+    $al = $al->keyDown ($key, $source)
+    $al = $al->keyUp ($key, $source)
+        Press or release the given key.
+
+    $al = $al->key ($key, $source)
+        Peess and release the given key, without unnecessary delay.
+
+        A special syntax, "{keyname}" can be used for special keys - all the
+        special key names from section 17.4.2
+        <https://www.w3.org/TR/webdriver1/#keyboard-actions> of the
+        WebDriver recommendation can be used.
+
+        Example: press and release "a".
+
+           $al->key ("a");
+
+        Example: press and release the "Enter" key:
+
+           $al->key ("\x{e007}");
+
+        Example: press and release the "enter" key using the special key
+        name syntax:
+
+           $al->key ("{Enter}");
+
+    $al = $al->type ($string, $source)
+        Convenience method to simulate a series of key press and release
+        events for the keys in $string. There is no syntax for special keys,
+        everything will be typed "as-is" if possible.
+
+    $al->perform ($wd)
+        Finalises and compiles the list, if not done yet, and calls
+        "$wd->perform" with it.
+
+        If $wd is undef, and the action list was created using the
+        "$wd->actions" method, then perform it against that WebDriver
+        object.
+
+        There is no underscore variant - call the "perform_actions_" method
+        with the action object instead.
+
+    $al->perform_release ($wd)
+        Exactly like "perform", but additionally call "release_actions"
+        afterwards.
+
+    ($actions, $duration) = $al->compile
+        Finalises and compiles the list, if not done yet, and returns an
+        actions object suitable for calls to "$wd->perform_actions". When
+        called in list context, additionally returns the total duration of
+        the action list.
+
+        Since building large action lists can take nontrivial amounts of
+        time, it can make sense to build an action list only once and then
+        perform it multiple times.
+
+        Actions must not be added after compiling a list.
+
+  EVENT BASED API
+    This module wouldn't be a good AnyEvent citizen if it didn't have a true
+    event-based API.
+
+    In fact, the simplified API, as documented above, is emulated via the
+    event-based API and an "AUTOLOAD" function that automatically provides
+    blocking wrappers around the callback-based API.
+
+    Every method documented in the "SIMPLIFIED API" section has an
+    equivalent event-based method that is formed by appending a underscore
+    ("_") to the method name, and appending a callback to the argument list
+    (mnemonic: the underscore indicates the "the action is not yet finished"
+    after the call returns).
+
+    For example, instead of a blocking calls to "new_session", "navigate_to"
+    and "back", you can make a callback-based ones:
+
+       my $cv = AE::cv;
+
+       $wd->new_session ({}, sub {
+          my ($status, $value) = @_,
+
+          die "error $value->{error}" if $status ne "200";
+
+          $wd->navigate_to_ ("http://www.nethype.de", sub {
+
+             $wd->back_ (sub {
+                print "all done\n";
+                $cv->send;
+             });
+
+          });
+       });
+
+       $cv->recv;
+
+    While the blocking methods "croak" on errors, the callback-based ones
+    all pass two values to the callback, $status and $res, where $status is
+    the HTTP status code (200 for successful requests, typically 4xx or 5xx
+    for errors), and $res is the value of the "value" key in the JSON
+    response object.
+
+    Other than that, the underscore variants and the blocking variants are
+    identical.
+
+  LOW LEVEL API
+    All the simplified API methods are very thin wrappers around WebDriver
+    commands of the same name. They are all implemented in terms of the
+    low-level methods ("req", "get", "post" and "delete"), which exists in
+    blocking and callback-based variants ("req_", "get_", "post_" and
+    "delete_").
+
+    Examples are after the function descriptions.
+
+    $wd->req_ ($method, $uri, $body, $cb->($status, $value))
+    $value = $wd->req ($method, $uri, $body)
+        Appends the $uri to the "endpoint/session/{sessionid}/" URL and
+        makes a HTTP $method request ("GET", "POST" etc.). "POST" requests
+        can provide a UTF-8-encoded JSON text as HTTP request body, or the
+        empty string to indicate no body is used.
+
+        For the callback version, the callback gets passed the HTTP status
+        code (200 for every successful request), and the value of the
+        "value" key in the JSON response object as second argument.
+
+    $wd->get_ ($uri, $cb->($status, $value))
+    $value = $wd->get ($uri)
+        Simply a call to "req_" with $method set to "GET" and an empty body.
+
+    $wd->post_ ($uri, $data, $cb->($status, $value))
+    $value = $wd->post ($uri, $data)
+        Simply a call to "req_" with $method set to "POST" - if $body is
+        "undef", then an empty object is send, otherwise, $data must be a
+        valid request object, which gets encoded into JSON for you.
+
+    $wd->delete_ ($uri, $cb->($status, $value))
+    $value = $wd->delete ($uri)
+        Simply a call to "req_" with $method set to "DELETE" and an empty
+        body.
+
+    Example: implement "get_all_cookies", which is a simple "GET" request
+    without any parameters:
+
+       $cookies = $wd->get ("cookie");
+
+    Example: implement "execute_script", which needs some parameters:
+
+       $results = $wd->post ("execute/sync" => { script => "$javascript", args => [] });
+
+    Example: call "find_elements" to find all "IMG" elements:
+
+       $elems = $wd->post (elements => { using => "css selector", value => "img" });
+
+HISTORY
+    This module was unintentionally created (it started inside some quickly
+    hacked-together script) simply because I couldn't get the existing
+    "Selenium::Remote::Driver" module to work, ever, despite multiple
+    attempts over the years and trying to report multiple bugs, which have
+    been completely ignored. It's also not event-based, so, yeah...
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://anyevent.schmorp.de
+

@@ -500,7 +500,7 @@ in a day of week and possibly a time:
 
 If $curr = 0, this means to look for the previous occurrence of the day
 of week, and set the time to the value passed in (or current time if
-no time was passed in). The day is ALWAY less than the current day. If
+no time was passed in). The day is ALWAYS less than the current day. If
 the current day is the same day of week as $dow, then the date
 returned will be one week earlier.
 

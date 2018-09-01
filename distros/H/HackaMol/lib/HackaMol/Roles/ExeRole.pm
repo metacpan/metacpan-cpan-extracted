@@ -1,5 +1,5 @@
 package HackaMol::Roles::ExeRole;
-$HackaMol::Roles::ExeRole::VERSION = '0.047';
+$HackaMol::Roles::ExeRole::VERSION = '0.048';
 #ABSTRACT:  
 use 5.008;
 use Moose::Role;
@@ -56,7 +56,7 @@ HackaMol::Roles::ExeRole -
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 DESCRIPTION
 

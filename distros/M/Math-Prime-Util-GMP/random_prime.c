@@ -114,6 +114,7 @@ static int _random_prime_trivial(mpz_t p, mpz_t lo_in, mpz_t hi_in)
       mpz_set(p,lo);
       res = 1;
     }
+    mpz_clear(hi); mpz_clear(lo);
     return res;
   }
   /* lo and hi are now odd and at least one odd between them */
@@ -137,10 +138,7 @@ static int _random_prime_trivial(mpz_t p, mpz_t lo_in, mpz_t hi_in)
     /* We couldn't find anything.  Perhaps no primes in range. */
     res = _random_prime_primeinc(p, lo, hi);
   }
-  mpz_clear(r);
-  mpz_clear(t);
-  mpz_clear(lo);
-  mpz_clear(hi);
+  mpz_clear(r); mpz_clear(t); mpz_clear(hi); mpz_clear(lo);
   return res;
 }
 
@@ -165,7 +163,7 @@ void mpz_random_ndigit_prime(mpz_t p, UV n)
   mpz_mul_ui(hi, lo, 10);
 
   if (!mpz_random_prime(p, lo, hi))
-    croak("Failed to find %lu digit prime\n", n);
+    croak("Failed to find %"UVuf" digit prime\n", n);
 
   mpz_clear(lo);
   mpz_clear(hi);
@@ -351,7 +349,7 @@ void mpz_random_maurer_prime(mpz_t n, UV k, char** proofptr)
         mpz_powm(a, a, q, n);
         mpz_add_ui(t,a,1);
         if (mpz_cmp(t, n) != 0) continue;
-        if (verbose > 2) { printf("(%lu)",k); fflush(stdout); }
+        if (verbose > 2) { printf("(%"UVuf")",k); fflush(stdout); }
         /* Ensure all results passed BPSW.  ~20% speed penalty. */
         if (!_GMP_is_lucas_pseudoprime(n,2)) croak("Maurer internal failure");
         MAKE_PROOF_START(proofptr, n, 3)

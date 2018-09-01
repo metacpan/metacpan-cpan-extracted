@@ -2,7 +2,7 @@ package Catmandu::Store::File::Multi::Index;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Moo;
 use namespace::clean;

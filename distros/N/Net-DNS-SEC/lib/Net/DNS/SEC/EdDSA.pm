@@ -1,9 +1,9 @@
 package Net::DNS::SEC::EdDSA;
 
 #
-# $Id: EdDSA.pm 1677 2018-05-22 11:59:10Z willem $
+# $Id: EdDSA.pm 1701 2018-07-28 07:36:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1701 $)[1];
 
 
 =head1 NAME
@@ -45,6 +45,11 @@ use strict;
 use integer;
 use warnings;
 use MIME::Base64;
+
+use constant EdDSA_OK => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_public_key');
+
+BEGIN { die unless EdDSA_OK }					# not needed on voyage
+
 
 my %parameters = (
 	15 => [1087, 32, 64],

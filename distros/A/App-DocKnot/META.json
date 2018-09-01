@@ -38,7 +38,7 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

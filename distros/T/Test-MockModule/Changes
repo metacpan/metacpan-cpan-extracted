@@ -1,5 +1,18 @@
 Revision history for Test::MockModule
 
+v0.170.0
+- 182d066 Fix versioning for semver conversion + PAUSE - Geoff Franks
+- 4afeedf release v0.17.0 - CI Bot
+- 9df8ac4 Add CI pipeline for releasing to cpan - Geoff Franks
+- 577350e Pod - provide a code snippet for original usage - Nicolas R
+- 3e4ec72 Add missing pod entries - Geoff Franks
+
+v0.16
+    - Fixes an issue where warnings were thrown for mismatched prototypes,
+      when mocking a prototyped function.
+
+      Thanks @toddr for the fix!
+
 v0.15
     - Fixes a minor bug in the release tarball
 

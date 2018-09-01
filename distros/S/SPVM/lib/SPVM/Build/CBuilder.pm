@@ -34,29 +34,54 @@ sub category {
 }
 
 sub build {
-  my $self = shift;
+  my ($self, $opt) = @_;
+  
+  my $build_all_sub = $opt->{all_sub};
   
   my $package_names = $self->info->get_package_names;
   for my $package_name (@$package_names) {
     
-    my $sub_names = $self->get_sub_names($package_name);
+    my $category = $self->{category};
+    my $sub_names;
+    if ($build_all_sub) {
+      if ($category eq 'precompile') {
+        $sub_names = $self->info->get_sub_names($package_name);
+      }
+      else {
+        croak "Can't specify all_subs option in $category";
+      }
+    }
+    elsif ($category eq 'native') {
+      $sub_names = $self->info->get_native_sub_names($package_name)
+    }
+    elsif ($category eq 'precompile') {
+      $sub_names = $self->info->get_precompile_sub_names($package_name)
+    }
+    
     if (@$sub_names) {
       # Shared library is already installed in distribution directory
-      my $shared_lib_path = $self->get_installed_shared_lib_path($package_name);
+      my $shared_lib_path = $self->get_shared_lib_path_dist($package_name);
 
       # Try runtime compile if shared library is not found
       unless (-f $shared_lib_path) {
-        $self->create_shared_lib_runtime($package_name);
+        $self->build_shared_lib_runtime($package_name, $sub_names);
 
-        # Build directory
-        my $shared_lib_rel_file = SPVM::Build::Util::convert_package_name_to_shared_lib_rel_file($package_name, $self->category);
-        my $build_dir = $self->{build_dir};
-        my $output_dir = "$build_dir/lib";
-        $shared_lib_path = "$output_dir/$shared_lib_rel_file";
+        $shared_lib_path = $self->get_shared_lib_path_runtime($package_name);
       }
       $self->bind_subs($shared_lib_path, $package_name, $sub_names);
     }
   }
+}
+
+sub get_shared_lib_path_runtime {
+  my ($self, $package_name) = @_;
+  
+  my $shared_lib_rel_file = SPVM::Build::Util::convert_package_name_to_shared_lib_rel_file($package_name, $self->category);
+  my $build_dir = $self->{build_dir};
+  my $output_dir = "$build_dir/lib";
+  my $shared_lib_path = "$output_dir/$shared_lib_rel_file";
+  
+  return $shared_lib_path;
 }
 
 sub create_cfunc_name {
@@ -91,20 +116,32 @@ sub bind_subs {
   }
 }
 
-sub create_shared_lib {
-  my ($self, %opt) = @_;
+sub build_shared_lib {
+  my ($self, $package_name, $sub_names, $opt) = @_;
   
-  # Package name
-  my $package_name = $opt{package_name};
+  # Compile source file and create object files
+  my $object_files = $self->compile_objects($package_name, $sub_names, $opt);
+  
+  # Link object files and create shared library
+  $self->link_shared_lib(
+    $package_name,
+    $sub_names,
+    $object_files,
+    $opt
+  );
+}
+
+sub compile_objects {
+  my ($self, $package_name, $sub_names, $opt) = @_;
 
   # Build directory
-  my $work_dir = $opt{work_dir};
+  my $work_dir = $opt->{work_dir};
   unless (defined $work_dir && -d $work_dir) {
     confess "Work directory must be specified for " . $self->category . " build";
   }
   
   # Output directory
-  my $output_dir = $opt{output_dir};
+  my $output_dir = $opt->{output_dir};
   unless (defined $output_dir && -d $output_dir) {
     confess "Output directory must be specified for " . $self->category . " build";
   }
@@ -114,16 +151,14 @@ sub create_shared_lib {
   my $shared_lib_file = "$output_dir/$shared_lib_rel_file";
 
   # Return if source code is chaced and exists shared lib file
-  if ($opt{is_cached} && -f $shared_lib_file) {
+  if ($opt->{is_cached} && -f $shared_lib_file) {
     return;
   }
   
-  my $sub_names = $opt{sub_names};
-  
   # Quiet output
-  my $quiet = defined $opt{quiet} ? $opt{quiet} : 0;
+  my $quiet = defined $opt->{quiet} ? $opt->{quiet} : 0;
  
-  my $input_dir = $opt{input_dir};
+  my $input_dir = $opt->{input_dir};
   my $package_path = SPVM::Build::Util::convert_package_name_to_path($package_name, $self->category);
   my $input_src_dir = "$input_dir/$package_path";
   
@@ -157,7 +192,6 @@ sub create_shared_lib {
   
   # CBuilder configs
   my $ccflags = $build_config->get_ccflags;
-  my $ldflags = $build_config->get_ldflags;
   
   # Default include path
   $build_config->add_ccflags("-I$input_src_dir");
@@ -189,6 +223,66 @@ sub create_shared_lib {
     push @$object_files, $object_file;
   }
   
+  return $object_files;
+}
+
+sub link_shared_lib {
+  my ($self, $package_name, $sub_names, $object_files, $opt) = @_;
+
+  # Build directory
+  my $work_dir = $opt->{work_dir};
+  unless (defined $work_dir && -d $work_dir) {
+    confess "Work directory must be specified for " . $self->category . " build";
+  }
+  
+  # Output directory
+  my $output_dir = $opt->{output_dir};
+  unless (defined $output_dir && -d $output_dir) {
+    confess "Output directory must be specified for " . $self->category . " build";
+  }
+
+  # shared lib file
+  my $shared_lib_rel_file = SPVM::Build::Util::convert_package_name_to_shared_lib_rel_file($package_name, $self->category);
+  my $shared_lib_file = "$output_dir/$shared_lib_rel_file";
+
+  # Return if source code is chaced and exists shared lib file
+  if ($opt->{is_cached} && -f $shared_lib_file) {
+    return;
+  }
+  
+  # Quiet output
+  my $quiet = defined $opt->{quiet} ? $opt->{quiet} : 0;
+ 
+  my $input_dir = $opt->{input_dir};
+  my $package_path = SPVM::Build::Util::convert_package_name_to_path($package_name, $self->category);
+  my $input_src_dir = "$input_dir/$package_path";
+  
+  my $work_object_dir = "$work_dir/$package_path";
+  mkpath $work_object_dir;
+  
+  # Config file
+  my $package_base_name = $package_name;
+  $package_base_name =~ s/^.+:://;
+  my $input_config_dir = $input_src_dir;
+  my $config_file = "$input_config_dir/$package_base_name.config";
+  
+  # Config
+  my $build_config;
+  if (-f $config_file) {
+    $build_config = do $config_file
+      or confess "Can't parser $config_file: $!$@";
+  }
+  else {
+    $build_config = SPVM::Build::Util::new_default_build_config;
+  }
+  
+  # CBuilder configs
+  my $ldflags = $build_config->get_ldflags;
+
+  # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
+  # and overwrite user configs
+  my $config = $build_config->to_hash;
+  
   my $cfunc_names = [];
   for my $sub_name (@$sub_names) {
     my $category = $self->category;
@@ -204,6 +298,7 @@ sub create_shared_lib {
     push @$cfunc_names, '';
   }
   
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
   my $tmp_shared_lib_file = $cbuilder->link(
     objects => $object_files,
     package_name => $package_name,
@@ -222,7 +317,7 @@ sub create_shared_lib {
   return $shared_lib_file;
 }
 
-sub get_installed_shared_lib_path {
+sub get_shared_lib_path_dist {
   my ($self, $package_name) = @_;
   
   my @package_name_parts = split(/::/, $package_name);

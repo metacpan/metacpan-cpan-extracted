@@ -3,7 +3,17 @@
 use 5.006;
 use strict; use warnings;
 use Text::MostFreqKDistance;
-use Test::More tests => 12;
+use Test::More tests => 16;
+use Test::Exception;
+
+throws_ok { MostFreqKHashing() }
+    qr/Missing source string/, 'Caught missing source string';
+throws_ok { MostFreqKHashing('x') }
+    qr/Missing frequency value/, 'Caught missing frequency value';
+throws_ok { MostFreqKHashing('x','y') }
+    qr/Invalid frequency value/, 'Caught invalid frequency value';
+throws_ok { MostFreqKHashing('x',-1) }
+    qr/Invalid frequency value/, 'Caught invalid frequency value';
 
 while (<DATA>) {
     chomp;

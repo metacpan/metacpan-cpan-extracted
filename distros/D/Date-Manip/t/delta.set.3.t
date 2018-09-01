@@ -184,7 +184,7 @@ $tests="
 
 { delta [ 0 14 2 4 10 20 30 ] mode business  type approx }     => 1 2 3 0 1 20 30
 
-{ delta [ 0 14 2 4 10 20 30 ] mode business  type estimated }  => 1 2 3 0 1 20 33
+{ delta [ 0 14 2 4 10 20 30 ] mode business  type estimated }  => 1 2 3 0 1 20 30
 
 { delta [ 0 14 2 4 10 20 30 ] mode standard  type exact }
    =>

@@ -26,6 +26,10 @@ install:
 - git clone --depth=1
   git://github.com/ingydotnet/test-base-pm ../test-base-pm
 [% END -%]
+[% IF include_testml -%]
+- git clone --depth=1
+  git://github.com/testml-lang/testml ../testml
+[% END -%]
 [% IF testml1 -%]
 - git clone --depth=1
   git://github.com/ingydotnet/testml1-pm ../testml1-pm
@@ -47,7 +51,11 @@ install:
 [% END -%]
 
 script:
-- true && [ ! -e test/ ] ||
+- true &&
+[% IF include_testml -%]
+  source ../testml/.rc &&
+[% END -%]
+  [ ! -e test/ ] ||
   PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine
 [% IF testbase -%]
   PERL5LIB=../test-base-pm/lib

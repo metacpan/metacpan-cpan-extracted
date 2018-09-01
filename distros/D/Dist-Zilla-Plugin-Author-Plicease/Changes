@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.28      2018-08-30 14:49:58 -0400
+  - inc/mymm-test.pl runs just before test if present.
+
+2.27      2018-08-30 10:00:16 -0400
+  - inc/mymm-build.pl runs at build time if present.
+
 2.26      2018-05-22 13:22:22 -0400
   - Dist::Zilla::Plugin::Author::Plicease::DevShare is deprecated and should not be used for new code
   - rm test dependency on Path::Class

@@ -1,22 +1,13 @@
 package Net::Amazon::S3::Request::DeleteBucket;
-$Net::Amazon::S3::Request::DeleteBucket::VERSION = '0.84';
+$Net::Amazon::S3::Request::DeleteBucket::VERSION = '0.85';
 use Moose 0.85;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Bucket';
 
 # ABSTRACT: An internal class to delete a bucket
 
-with 'Net::Amazon::S3::Role::Bucket';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::DELETE';
 
 __PACKAGE__->meta->make_immutable;
-
-sub http_request {
-    my $self = shift;
-
-    return $self->_build_http_request(
-        method => 'DELETE',
-        path   => $self->_uri,
-    );
-}
 
 1;
 
@@ -32,7 +23,7 @@ Net::Amazon::S3::Request::DeleteBucket - An internal class to delete a bucket
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

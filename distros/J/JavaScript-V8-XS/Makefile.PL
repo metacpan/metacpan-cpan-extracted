@@ -29,9 +29,10 @@ WriteMakefile(
     LICENSE        => 'mit',
     MIN_PERL_VERSION => 5.018000,
     PREREQ_PM      => {
-        'ExtUtils::XSpp' => '0.11',
-        'XSLoader'       => 0,
+        'JSON::PP'       => 0,
         'Text::Trim'     => 0,
+        'XSLoader'       => 0,
+        'ExtUtils::XSpp' => '0.11',
     },
     TEST_REQUIRES  => {
         'Data::Dumper'   => 0,

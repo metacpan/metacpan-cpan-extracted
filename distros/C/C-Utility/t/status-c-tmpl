@@ -1,0 +1,8 @@
+#linein
+/* My great file. */
+typedef enum {
+#lineout
+STATUSES
+#linein
+}
+status_t;

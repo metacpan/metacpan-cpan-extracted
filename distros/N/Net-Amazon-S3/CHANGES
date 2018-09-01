@@ -1,5 +1,11 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.85 Tue 28 Aug 2018 20:14:38 BST
+     - Support standard_ia and onezone_ia storage classes (thanks Michele Beltrame)
+     - run 'use_ok' on all modules (thanks Yanick Champoux)
+     - spellings (thanks Gregor Herrmann)
+     - LOTS of cleanup and refactoring (thanks Branislav Zahradník)
+
 0.84 Mon 16 Jul 2018 17:49:10 BST
      - Put back credential cache code lost in Signature 4 patch (Branislav Zahradník)
 

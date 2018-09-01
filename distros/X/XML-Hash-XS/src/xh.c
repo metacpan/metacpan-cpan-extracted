@@ -259,11 +259,13 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
                     opts->merge_text = xh_param_assign_bool(v);
                     break;
                 }
+                goto error;
             case 11:
                 if (xh_str_equal11(p, 'f', 'o', 'r', 'c', 'e', '_', 'a', 'r', 'r', 'a', 'y')) {
                     xh_param_assign_pattern(&opts->force_array, v);
                     break;
                 }
+                goto error;
             case 13:
                 if (xh_str_equal13(p, 'f', 'o', 'r', 'c', 'e', '_', 'c', 'o', 'n', 't', 'e', 'n', 't')) {
                     opts->force_content = xh_param_assign_bool(v);

@@ -172,7 +172,7 @@ sub extra_config {
 
     # CCFLAGS
     $summary_config{CCFLAGS}  = ( $Config{ccflags} || '' ) . ' -o $@';
-    $summary_config{CCFLAGS} .= ' -g -Wall -Werror -Wextra -pedantic -std=c99 -DPERL_GCC_PEDANTIC -DWITH_DEBUG -O0'
+    $summary_config{CCFLAGS} .= ' -g -Wall -Werror -Wextra -pedantic -Wno-clobbered -std=c99 -DPERL_GCC_PEDANTIC -DWITH_DEBUG -O0'
         if $PARAMS{DEBUG};
     $summary_config{CCFLAGS} .= ' -DWITH_TRACE'
         if $PARAMS{DEBUG} && $PARAMS{TRACE};

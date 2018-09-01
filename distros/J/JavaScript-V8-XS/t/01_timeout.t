@@ -37,7 +37,7 @@ function main() {
 }
 JS
     my $got_eval = $vm->eval($js);
-    my $got_run = $vm->dispatch_function_in_event_loop('main');
+    my $got_run = $vm->eval('main()');
     my $perl_ret = $vm->get('perl_ret');
     is($perl_ret, 'EMPTY1234567', "timeouts dispatched correctly");
 }
@@ -54,7 +54,7 @@ function main() {
 }
 JS
     my $got_eval = $vm->eval($js);
-    stderr_like sub { $vm->dispatch_function_in_event_loop('main'); },
+    stderr_like sub { $vm->eval('main()'); },
                 qr/Error:/,
                 "got correct error from setTimeout";
 }

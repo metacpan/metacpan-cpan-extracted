@@ -18,7 +18,6 @@ my @tests = (
             [ 'Content-Type' => 'text/html' ],
             File::Spec->catfile( t => 'file-01.html' )
         ],
-        'mailto:author@example.com',
         '/style.css',
         '/#content',
         '/',
@@ -26,6 +25,7 @@ my @tests = (
         '/news.html',
         '/credits.html',
         '/contact.html',
+        'http://www.cpan.org/',
         '/img/lorem.png',
     ],
     [   '/foo/bar.css',

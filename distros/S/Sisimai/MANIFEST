@@ -81,6 +81,7 @@ lib/Sisimai/MIME.pm
 lib/Sisimai/Mail.pm
 lib/Sisimai/Mail/Maildir.pm
 lib/Sisimai/Mail/Mbox.pm
+lib/Sisimai/Mail/Memory.pm
 lib/Sisimai/Mail/STDIN.pm
 lib/Sisimai/Message.pm
 lib/Sisimai/Message/Email.pm
@@ -366,6 +367,8 @@ set-of-emails/maildir/bsd/email-office365-05.eml
 set-of-emails/maildir/bsd/email-office365-06.eml
 set-of-emails/maildir/bsd/email-office365-07.eml
 set-of-emails/maildir/bsd/email-office365-08.eml
+set-of-emails/maildir/bsd/email-office365-09.eml
+set-of-emails/maildir/bsd/email-office365-10.eml
 set-of-emails/maildir/bsd/email-opensmtpd-01.eml
 set-of-emails/maildir/bsd/email-opensmtpd-02.eml
 set-of-emails/maildir/bsd/email-opensmtpd-03.eml
@@ -413,6 +416,7 @@ set-of-emails/maildir/bsd/email-postfix-41.eml
 set-of-emails/maildir/bsd/email-postfix-42.eml
 set-of-emails/maildir/bsd/email-postfix-43.eml
 set-of-emails/maildir/bsd/email-postfix-44.eml
+set-of-emails/maildir/bsd/email-postfix-45.eml
 set-of-emails/maildir/bsd/email-qmail-01.eml
 set-of-emails/maildir/bsd/email-qmail-02.eml
 set-of-emails/maildir/bsd/email-qmail-03.eml
@@ -724,6 +728,7 @@ t/020-mail.t
 t/021-mail-mbox.t
 t/022-mail-maildir.t
 t/023-mail-stdin.t
+t/024-mail-memory.t
 t/025-smtp.t
 t/026-smtp-status.t
 t/027-smtp-reply.t

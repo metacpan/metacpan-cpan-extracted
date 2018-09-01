@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request;
-$Net::Amazon::S3::Request::VERSION = '0.84';
+$Net::Amazon::S3::Request::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -85,25 +85,70 @@ subtype 'BucketName' => as 'BucketName3' => where {
 
 has 's3' => ( is => 'ro', isa => 'Net::Amazon::S3', required => 1 );
 
+has '_http_request_content' => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Maybe[Str]',
+    lazy => 1,
+    builder => '_request_content',
+);
+
 __PACKAGE__->meta->make_immutable;
 
-sub _uri {
-    my ( $self, $key ) = @_;
-    my $bucket = $self->bucket->bucket;
+sub _request_content {
+    '';
+}
 
-    my $uri = (defined($key))
-        ? $bucket . "/" . (join '/', map {$self->s3->_urlencode($_)} split /\//, $key)
-        : $bucket . "/";
+sub _request_path {
+    '';
+}
 
-    # Although Amazon's Signature 4 test suite explicitely handles // it appears
-    # it's inconsistent with their implementation so removing it here
-    $uri =~ s{//+}{/}g;
+sub _request_headers {
+}
 
-    return $uri;
+sub _request_query_action {
+}
+
+sub _request_query_params {
+}
+
+sub _request_query_string {
+    my ($self) = @_;
+
+    my %query_params = $self->_request_query_params;
+
+    my @parts = (
+        ($self->_request_query_action) x!! $self->_request_query_action,
+        map "$_=${\ $self->s3->_urlencode( $query_params{$_} ) }", sort keys %query_params,
+    );
+
+    return '' unless @parts;
+    return '?' . join '&', @parts;
+}
+
+sub _http_request_path {
+    my ($self) = @_;
+
+    return $self->_request_path . $self->_request_query_string;
+}
+
+sub _http_request_headers {
+    my ($self) = @_;
+
+    return +{ $self->_request_headers };
 }
 
 sub _build_signed_request {
     my ($self, %params) = @_;
+
+    $params{path}       = $self->_http_request_path     unless exists $params{path};
+    $params{method}     = $self->_http_request_method   unless exists $params{method};
+    $params{headers}    = $self->_http_request_headers  unless exists $params{headers};
+    $params{content}    = $self->_http_request_content  unless exists $params{content} or ! defined $self->_http_request_content;
+
+    # Although Amazon's Signature 4 test suite explicitely handles // it appears
+    # it's inconsistent with their implementation so removing it here
+    $params{path} =~ s{//+}{/}g;
 
     return Net::Amazon::S3::HTTPRequest->new(
         %params,
@@ -116,6 +161,12 @@ sub _build_http_request {
     my ($self, %params) = @_;
 
     return $self->_build_signed_request( %params )->http_request;
+}
+
+sub http_request {
+    my $self = shift;
+
+    return $self->_build_http_request;
 }
 
 1;
@@ -132,7 +183,7 @@ Net::Amazon::S3::Request - Base class for request objects
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

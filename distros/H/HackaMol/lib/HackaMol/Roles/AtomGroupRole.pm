@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.047';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.048';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -7,6 +7,7 @@ use Math::Trig;
 use Math::Vector::Real;
 use FileHandle;
 use Scalar::Util 'reftype';
+use List::Util qw(sum);
 
 #use MooseX::Storage;
 #with Storage( 'format' => 'JSON', 'io' => 'File', traits => ['OnlyWhenBuilt'] );
@@ -57,6 +58,32 @@ has 'info' => (
 	lazy => 1,
     default   => "",
 );
+
+sub calc_bfps {
+    # this should be rerun for each selection
+    #10.1016/j.jmb.2015.09.024
+    my $self = shift;
+    unless ($self->count_atoms > 1){
+      warn "calc_bfps> group not large enough\n";
+      return;
+    }
+    my @atoms = $self->all_atoms;
+    my @bfacts = map {$_->bfact} @atoms;
+    my $bfact_mean = sum(@bfacts)/@bfacts;
+    my $sd = 0;
+    $sd += ($_ - $bfact_mean)**2 foreach @bfacts;
+    unless ($sd > 0){
+      warn "calc_bfps> no variance in the group bfactors\n";
+      return;
+    }
+    my $bfact_std = sqrt($sd / (@bfacts - 1));
+    foreach my $atom (@atoms){
+        my $bfp = ($atom->bfact - $bfact_mean)/$bfact_std;
+        $atom->bfp( $bfp );
+    }
+    return map{$_->bfp} @atoms;
+}
+
 
 sub dipole {
     my $self = shift;
@@ -339,38 +366,61 @@ sub what_time {
     return $ts[0];
 }
 
-sub print_xyz {
-    my $self = shift;
-    my $fh   = _open_file_unless_fh(shift);
+sub string_xyz {
+	my $self              = shift;
+	my $add_info_to_blank = shift;
 
-    my @atoms = $self->all_atoms;
-    print $fh $self->count_atoms . "\n\n" unless $self->qcat_print;
-    foreach my $at (@atoms) {
-        printf $fh (
+	my $string;
+    $string .= $self->count_atoms . "\n" unless $self->qcat_print;
+    $string .= $add_info_to_blank if (defined($add_info_to_blank)); 
+    $string .= "\n";
+
+    foreach my $at ($self->all_atoms) {
+        $string .= sprintf (
             "%3s %10.6f %10.6f %10.6f\n",
             $at->symbol, @{ $at->get_coords( $at->t ) }
         );
     }
+    return $string;
+}
+
+sub print_xyz {
+    my $self = shift;
+    my $fh   = _open_file_unless_fh(shift);
+
+    print $fh $self->string_xyz;
+
+    # my @atoms = $self->all_atoms;
+    #print $fh $self->count_atoms . "\n\n" unless $self->qcat_print;
+    #foreach my $at (@atoms) {
+    #    printf $fh (
+    #        "%3s %10.6f %10.6f %10.6f\n",
+    #        $at->symbol, @{ $at->get_coords( $at->t ) }
+    #    );
+    #}
 
     return ($fh);           # returns filehandle for future writing
 
 }
 
-sub print_pdb {
+sub string_pdb  {
     my $self = shift;
-    my $fh   = _open_file_unless_fh(shift);
 
-    my @atoms = $self->all_atoms;
-    printf $fh ( "MODEL       %2i\n", $atoms[0]->t + 1 ) unless $self->qcat_print;
-    my $atform = "%-6s%5i  %-3s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";        
+	my $t = $self->what_time;
+	my @atoms = $self->all_atoms;
+    
+	my $string;
+	$string .= sprintf( "MODEL       %2i\n", $t + 1 ) unless $self->qcat_print;
+
+    my $atform = "%-6s%5i  %-3s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
 
     foreach my $at (@atoms) {
         # front pad one space if name length is < 4
-        my $form = $atform; 
+        my $form = $atform;
         if (length $at->name > 3){
-          $form = "%-6s%5i %4s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n" 
+          $form = "%-6s%5i %4s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n"
         }
-        printf $fh (
+        $string .= sprintf (
             $form,
             (
                 map { $at->$_ }
@@ -391,9 +441,51 @@ sub print_pdb {
             $at->segid,
             $at->symbol,    # $at->charge
         );
-
     }
-    print $fh "ENDMDL\n" unless $self->qcat_print;
+    $string .= "ENDMDL\n" unless $self->qcat_print;
+	return $string;
+}
+
+sub print_pdb {
+    my $self = shift;
+    my $fh   = _open_file_unless_fh(shift);
+
+    print $fh $self->string_pdb;
+
+#   my @atoms = $self->all_atoms;
+#   printf $fh ( "MODEL       %2i\n", $atoms[0]->t + 1 ) unless $self->qcat_print;
+#   my $atform = "%-6s%5i  %-3s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";        
+
+#   foreach my $at (@atoms) {
+#       # front pad one space if name length is < 4
+#       my $form = $atform; 
+#       if (length $at->name > 3){
+#         $form = "%-6s%5i %4s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n" 
+#       }
+#       printf $fh (
+#           $form,
+#           (
+#               map { $at->$_ }
+#                 qw (
+#                 record_name
+#                 serial
+#                 name
+#                 altloc
+#                 resname
+#                 chain
+#                 resid
+#                 icode
+#                 )
+#           ),
+#           @{ $at->get_coords( $at->t ) },
+#           $at->occ,
+#           $at->bfact,
+#           $at->segid,
+#           $at->symbol,    # $at->charge
+#       );
+
+#   }
+#   print $fh "ENDMDL\n" unless $self->qcat_print;
 
     return ($fh);           # returns filehandle for future writing
 }
@@ -436,7 +528,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 

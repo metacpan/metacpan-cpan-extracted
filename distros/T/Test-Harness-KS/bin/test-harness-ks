@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+# Copyright 2018 National Library of Finland
+# Copyright 2017 KohaSuomi
+
+
+use Modern::Perl;
+use Carp;
+use autodie;
+$Carp::Verbose = 'true'; #die with stack trace
+use English; #Use verbose alternatives for perl's strange $0 and $\ etc.
+use Getopt::Long qw(:config no_ignore_case);
+use Try::Tiny;
+use Scalar::Util qw(blessed);
+
+use Log::Log4perl qw(get_logger);
+use Log::Log4perl::Level;
+
+use Test::Harness::KS;
+
+my ($help, $dryRun);
+my ($verbose) = ('WARN');
+my ($cover, $junit, $tar, $resultsDir);
+my ($testAll, $testUnit, $testXt);
+my @otherTestFiles;
+my @includes;
+
+
+GetOptions(
+    'h|help'                      => \$help,
+    'v|verbose:s'                 => \$verbose,
+    'dry-run'                     => \$dryRun,
+    'results-dir=s'               => \$resultsDir,
+    'cover'                       => \$cover,
+    'junit'                       => \$junit,
+    'tar'                         => \$tar,
+    'l|lib:s'                     => \@includes,
+    'a|all'                       => \$testAll,
+    'u|unit'                      => \$testUnit,
+    'x|xt'                        => \$testXt,
+    'f|files:s'                   => \@otherTestFiles,
+);
+
+my $usage = <<USAGE;
+
+Runs a ton of tests with other metrics if needed
+
+  -h --help       This friendly help!
+
+  -v --verbose    String, one of the Log::Log4perl log levels:
+                  OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL
+
+  --tar           Create a testResults.tar.gz from all tests and deliverables
+
+  --dry-run       Don't run tests or other metrics. Simply show what would
+                  happen.
+
+  --results-dir   Where to gather test deliverables and archive.
+                  Defaults to the current dir
+
+  --cover         Run Devel::Cover and output Clover- and HTML-reports
+
+  --junit         Run test using TAP::Harness::Junit instead of TAP::Harness
+                  and output junit xml-files under --results-dir
+
+  -l --lib        Extra include directories to pass to the test harness.
+                  Same as perl -Ilib
+                  Can be repeated.
+
+  -a --all        Test all .t-files withing subdirectories under directory ./t/
+                  Use with --unit to include test files in ./t/*.t as well.
+
+  -u --unit       Unit tests in ./t/*.t
+
+  -x --xt         XT tests in ./xt/*.t
+
+  -f --files      Path, list of test files to test. Used to add files that
+                  don't belong to the preset test groups.
+                  Repeatable.
+
+EXAMPLE
+
+    ## First run unit test suite and archive the test deliverables
+    test-harness-ks --unit --tar
+
+    ## Then run a big test suite, with code coverage metrics
+    test-harness-ks --all --tar --cover
+
+    ## If you are interested in unit tests and xt tests only...
+    test-harness-ks --unit --xt -v ERROR -l lib -l t/lib
+
+    ## Run other test files alltogether, use a subshell to include more tests
+    test-harness-ks -f some/other/dir/00-load.t -f '`ls some/other/dir/t/*.t`'
+
+USAGE
+
+if ($help) {
+    print $usage;
+    exit 0;
+}
+
+Log::Log4perl->easy_init( Log::Log4perl::Level::to_priority( $verbose ) );
+
+run();
+sub run {
+    my (@tests, $tests);
+    push(@tests, @{_getAllTests()})  if $testAll;
+    push(@tests, @{_getUnitTests()}) if $testUnit;
+    push(@tests, @{_getXTTests()})   if $testXt;
+    push(@tests, @{Test::Harness::KS::parseOtherTests(\@otherTestFiles)}) if @otherTestFiles;
+
+    get_logger->info("Selected the following test files:\n".join("\n",@tests)) if $verbose;
+
+    my $ksTestHarness = Test::Harness::KS->new(
+        resultsDir => $resultsDir,
+        tar        => $tar,
+        cover      => $cover,
+        junit      => $junit,
+        testFiles  => \@tests,
+        dryRun     => $dryRun,
+    );
+    $ksTestHarness->run();
+}
+
+sub _getAllTests {
+    return Test::Harness::KS::findFiles('t/*/', '*.t');
+}
+sub _getUnitTests {
+    return Test::Harness::KS::findFiles('t/', '*.t', 1);
+}
+sub _getXTTests {
+    return Test::Harness::KS::findFiles('xt/', '*.t');
+}
+

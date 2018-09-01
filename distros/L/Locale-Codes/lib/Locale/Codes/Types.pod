@@ -177,7 +177,7 @@ CPAN/modules/by-module/Locale/
 The World Factbook maintained by the CIA is a potential source of
 the data.  Unfortunately, it adds/preserves non-standard codes, so it is
 not used as a source of data.
-L<https://www.cia.gov/library/publications/the-world-factbook/appendix/print_appendix-d.html>
+L<https://www.cia.gov/library/publications/the-world-factbook/appendix/appendix-d.html>
 
 Another unofficial source of data is the Statoids web site:
 L<http://www.statoids.com/wab.html> . Currently, it is not used to get

@@ -13,6 +13,7 @@ extern void const_euler(mpf_t gamma, unsigned long prec);
 extern void const_pi(mpf_t pi, unsigned long prec);
 extern void const_log2(mpf_t logn, unsigned long prec);
 extern void free_float_constants(void);
+extern void free_borwein_zeta(void);
 
 extern char* bernreal(mpz_t zn, unsigned long prec);
 extern char* harmreal(mpz_t zn, unsigned long prec);
@@ -21,9 +22,16 @@ extern char* eireal(mpf_t r, unsigned long prec);
 extern char* lireal(mpf_t r, unsigned long prec);
 extern char* riemannrreal(mpf_t r, unsigned long prec);
 extern char* lambertwreal(mpf_t r, unsigned long prec);
+
 extern char* logreal(mpf_t r, unsigned long prec);
 extern char* expreal(mpf_t r, unsigned long prec);
 extern char* powreal(mpf_t r, mpf_t x, unsigned long prec);
+extern char* rootreal(mpf_t r, mpf_t x, unsigned long prec);
+extern char* addreal(mpf_t r, mpf_t x, unsigned long prec);
+extern char* subreal(mpf_t r, mpf_t x, unsigned long prec);
+extern char* mulreal(mpf_t r, mpf_t x, unsigned long prec);
+extern char* divreal(mpf_t r, mpf_t x, unsigned long prec);
+
 extern char* agmreal(mpf_t a, mpf_t b, unsigned long prec);
 extern char* eulerconst(unsigned long n);
 extern char* piconst(unsigned long n);

@@ -12,12 +12,14 @@ use Moose::Util 'find_meta';
 
     with 'MooseX::Getopt';
 
-    has foo => ( isa => 'Int', is => 'ro', documentation => 'A foo' );
+    has foo => ( isa => 'Int', is => 'ro', documentation => 'A foo
+with newline and some 123456789 123456789 123456789 characters' );
 }
 
 my $usage = qr/^\Qusage: 104_override_usage.t [-?h] [long options...]\E
 \t-h -\? --usage --help\s+Prints this usage information\.
-\t--foo (INT)?\s+A foo$/m;
+\t--foo (INT)?\s+A foo .+
+\t\s+.+characters/m;
 
 {
     local @ARGV = ('--foo', '1');
@@ -55,11 +57,28 @@ my $usage = qr/^\Qusage: 104_override_usage.t [-?h] [long options...]\E
 }
 
 {
+    find_meta('MyScript')->add_after_method_modifier(
+        print_usage_text => sub {
+            print "--- DOCUMENTATION ---\n";
+        },
+    );
+
+    local @ARGV = ('--help');
+    trap { MyScript->new_with_options };
+    like(
+        $trap->stdout,
+        qr/$usage\n--- DOCUMENTATION ---\n/,
+        'additional text included before normal usage string',
+    );
+}
+
+{
     package MyScript2;
     use Moose;
 
     with 'MooseX::Getopt';
-    has foo => ( isa => 'Int', is => 'ro', documentation => 'A foo' );
+    has foo => ( isa => 'Int', is => 'ro', documentation => 'A foo
+with newline and some 123456789 123456789 123456789 characters' );
 }
 
 {

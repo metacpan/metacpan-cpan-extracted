@@ -28,7 +28,7 @@ $Data::Dumper::Indent = 0;
 $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 
-no strict; 
+no strict;
 no warnings;
 
 @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
@@ -37,48 +37,50 @@ no warnings;
 
 our @EXPORT = qw( descend ); # our @EXPORT = qw( );
 
-$VERSION = '0.59.00'; # our $VERSION = '';
+$VERSION = '0.59.9'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
 # HERE FOLLOWS THE CONTENT OF "Descend.pm" - Sim::OPT::Descend
 ##############################################################################
 
-sub descend 
+sub descend
 {
-  my $swap = shift; 
+  my $swap = shift;
   my %dat = %$swap;
-  my @instances = @{ $dat{instances} }; 
-  my $countcase = $dat{countcase}; 
-  my $countblock = $dat{countblock}; 
-  my %dirfiles = %{ $dat{dirfiles} }; 
+  my @instances = @{ $dat{instances} };
+  my $countcase = $dat{countcase};
+  my $countblock = $dat{countblock};
+  my %dirfiles = %{ $dat{dirfiles} };
   my %datastruc = %{ $dat{datastruc} }; ######
   my @rescontainer = @{ $dat{rescontainer} }; ######
-    
-  $configfile = $main::configfile; 
-  @varinumbers = @main::varinumbers; 
+
+  $configfile = $main::configfile;
+  @varinumbers = @main::varinumbers;
   @mediumiters = @main::mediumiters;
-  @rootnames = @main::rootnames; 
-  %vals = %main::vals; 
-  
-  $mypath = $main::mypath;  
-  $exeonfiles = $main::exeonfiles; 
-  $generatechance = $main::generatechance; 
+  @rootnames = @main::rootnames;
+  %vals = %main::vals;
+
+  #@pinmediumiters = @main::pinmediumiters;
+
+  $mypath = $main::mypath;
+  $exeonfiles = $main::exeonfiles;
+  $generatechance = $main::generatechance;
   $file = $main::file;
   $preventsim = $main::preventsim;
-  $fileconfig = $main::fileconfig; 
+  $fileconfig = $main::fileconfig;
   $outfile = $main::outfile;
   $tofile = $main::tofile;
   $report = $main::report;
   $simnetwork = $main::simnetwork;
-  
-  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
+
+  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   say $tee "\n#Now in Sim::OPT::Descend.\n";
-  
 
-  %simtitles = %main::simtitles; 
+
+  %simtitles = %main::simtitles;
   %retrievedata = %main::retrievedata;
   @keepcolumns = @main::keepcolumns;
   @weights = @main::weights;
@@ -101,43 +103,43 @@ sub descend
   my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
   my $precomputed = $dowhat{precomputed}; #NEW
   my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
-  
-  my @simcases = @{ $dirfiles{simcases} }; 
-  my @simstruct = @{ $dirfiles{simstruct} }; 
+
+  my @simcases = @{ $dirfiles{simcases} };
+  my @simstruct = @{ $dirfiles{simstruct} };
   my @morphcases = @{ $dirfiles{morphcases} };
   my @morphstruct = @{ $dirfiles{morphstruct} };
-  my @retcases = @{ $dirfiles{retcases} }; 
-  my @retstruct = @{ $dirfiles{retstruct} }; 
-  my @repcases = @{ $dirfiles{repcases} };  
+  my @retcases = @{ $dirfiles{retcases} };
+  my @retstruct = @{ $dirfiles{retstruct} };
+  my @repcases = @{ $dirfiles{repcases} };
   my @repstruct = @{ $dirfiles{repstruct} }; say $tee "dumpINDESCEND(\@repstruct): " . dump(@repstruct);
-  my @mergecases = @{ $dirfiles{mergecases} }; 
-  my @mergestruct = @{ $dirfiles{mergestruct} }; 
-  my @descendcases = @{ $dirfiles{descendcases} }; 
-  my @descendstruct = @{ $dirfiles{descendstruct} }; 
-  
-  my $morphlist = $dirfiles{morphlist}; 
+  my @mergecases = @{ $dirfiles{mergecases} };
+  my @mergestruct = @{ $dirfiles{mergestruct} };
+  my @descendcases = @{ $dirfiles{descendcases} };
+  my @descendstruct = @{ $dirfiles{descendstruct} };
+
+  my $morphlist = $dirfiles{morphlist};
   my $morphblock = $dirfiles{morphblock};
-  my $simlist = $dirfiles{simlist}; 
+  my $simlist = $dirfiles{simlist};
   my $simblock = $dirfiles{simblock};
   my $retlist = $dirfiles{retlist};
   my $retblock = $dirfiles{retblock};
-  my $replist = $dirfiles{replist}; 
-  my $repblock = $dirfiles{repblock}; 
-  my $descendlist = $dirfiles{descendlist}; 
-  my $descendblock = $dirfiles{descendblock}; 
-  
-  my $skipfile = $vals{skipfile}; 
-  my $skipsim = $vals{skipsim}; 
+  my $replist = $dirfiles{replist};
+  my $repblock = $dirfiles{repblock};
+  my $descendlist = $dirfiles{descendlist};
+  my $descendblock = $dirfiles{descendblock};
+
+  my $skipfile = $vals{skipfile};
+  my $skipsim = $vals{skipsim};
   my $skipreport = $vals{skipreport};
-    
-  #my $getpars = shift;
-  #eval( $getpars );
-
-  #if ( fileno (MORPHLIST)            
 
   #my $getpars = shift;
   #eval( $getpars );
-  
+
+  #if ( fileno (MORPHLIST)
+
+  #my $getpars = shift;
+  #eval( $getpars );
+
   my $repfile;
   if ( $precomputed eq "" )#NEW
   {
@@ -151,64 +153,69 @@ sub descend
   {
     $repfile = "$mypath/$file-report-$countcase-$countblock.txt";
   }
-  
+
+  my $totalres = "$mypath/$file-totalres-$countcase.txt";
+
   my $instance = $instances[0]; # THIS WOULD HAVE TO BE A LOOP HERE TO MIX ALL THE MERGECASES!!! ### ZZZ
-  
+
   my %d = %{$instance};
-  my $countcase = $d{countcase}; 
-  my $countblock = $d{countblock}; 
+  my $countcase = $d{countcase};
+  my $countblock = $d{countblock};
   my %datastruc = %{ $d{datastruc} }; ######
   my @rescontainer = @{ $d{rescontainer} }; ######
   my @miditers = @{ $d{miditers} }; say $tee "BEGIN DESCENT \@miditers : " . dump(@miditers);
   my @winneritems = @{ $d{winneritems} }; say $tee " \@winneritems " . dump(@winneritems);
-  my $countvar = $d{countvar}; 
-  my $countstep = $d{countstep}; 
-  my $to = $d{to}; 
-  my $origin = $d{origin}; 
-  my @uplift = @{ $d{uplift} }; 
+  my $countvar = $d{countvar};
+  my $countstep = $d{countstep};
+  my $to = $d{to};
+  my $origin = $d{origin};
+  my @uplift = @{ $d{uplift} };
   my @backvalues = @{ $d{backvalues} }; say $tee "IN DESCENT \@backvalues " . dump(@backvalues);
   my @sweeps = @{ $d{sweeps} }; say $tee "dump(\@sweeps): " . dump(@sweeps);
   my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
-  
+
   my $counthold = 0;
-  
-  my $skip = $vals{$countvar}{skip}; 
-  
-  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase); 
-  my @blockelts = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock); 
-  my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);  
-  my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock); 
-  my $from = Sim::OPT::getline($toitem); 
-  my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
-  my %mids = Sim::OPT::getcase(\@miditers, $countcase); 
+
+  my $skip = $vals{$countvar}{skip};
+
+  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
+  my @blockelts = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock);
+  my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);
+  my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock);
+  my $from = Sim::OPT::getline($toitem);
+  my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase);
+  my %mids = Sim::OPT::getcase(\@miditers, $countcase);
 
   my $word = join( ", ", @blockelts ); ###NEW
-  
-  my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers); 
-  my $varnumber = $countvar; 
+
+  my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers);
+  my $varnumber = $countvar;
   my $contblocksplus = ($countblock + 1);
   my $countcaseplus = ($countcase + 1);
-  
+
   say $tee "Descending into case $countcaseplus, block $contblocksplus.";
 
-  my @columns_to_report = @{ $reporttempsdata[1] };  
-  my $number_of_columns_to_report = scalar(@columns_to_report); 
-  my $number_of_dates_to_mix = scalar(@simtitles); 
-  my @dates                    = @simtitles; 
+  my @columns_to_report = @{ $reporttempsdata[1] };
+  my $number_of_columns_to_report = scalar(@columns_to_report);
+  my $number_of_dates_to_mix = scalar(@simtitles);
+  my @dates                    = @simtitles;
 
-  my $cleanmixed = "$repfile-clean.csv"; 
+  my $cleanmixed = "$repfile-clean.csv";
   my $throwclean = $cleanmixed; $throwclean =~ s/\.csv//;
   my $selectmixed = "$throwclean-select.csv";
-  
+
+  my $remember;
+  #if ( $direction eq "star" ) { $remember = $winneritems[$countcase][0]; }
+
   sub cleanselect
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
     my ( $repfile, $cleanmixed, $selectmixed ) = @_;
     say $tee "Cleaning results for case $countcaseplus, block $contblocksplus.";
-    open( MIXFILE, $repfile ) or die( "$!" ); say $tee "dump(\$repfile IN SUB cleanselect): " . dump($repfile); 
-    my @lines = <MIXFILE>; 
+    open( MIXFILE, $repfile ) or die( "$!" ); say $tee "dump(\$repfile IN SUB cleanselect): " . dump($repfile);
+    my @lines = <MIXFILE>;
     close MIXFILE;
     open( CLEANMIXED, ">$cleanmixed" ) or die( "$!" );
-    
+
     foreach my $line ( @lines )
     {
       $line =~ s/\n/°/g;
@@ -220,20 +227,20 @@ sub descend
       }
     }
     close CLEANMIXED;
-  
+
     # IT SELECTS SOME COLUMNS AND COPIES THEM IN ANOTHER FILE
     open( CLEANMIXED, $cleanmixed ) or die( "$!" );
-    my @lines = <CLEANMIXED>; 
+    my @lines = <CLEANMIXED>;
     close CLEANMIXED;
-    
+
     open( SELECTEDMIXED, ">$selectmixed" ) or die( "$!" );
     foreach my $line (@lines)
     {
       if ( ( $line ne "" ) and ( $line ne " " ) and ( $line ne "\n" ) )
       {
-        my @elts = split(/\s+|,/, $line); 
+        my @elts = split(/\s+|,/, $line);
         $elts[0] =~ /^(.*)_-(.*)/;
-        my $touse = $1; 
+        my $touse = $1;
         $touse =~ s/$mypath\///;
         print SELECTEDMIXED "$touse,";
         my $countout = 0;
@@ -251,12 +258,12 @@ sub descend
             {
               print SELECTEDMIXED "$elm";
             }
-              
+
             if ( ( $countout < $#keepcolumns  ) or ( $countin < $#cols) )
             {
               print  SELECTEDMIXED ",";
             }
-            else 
+            else
             {
               print  SELECTEDMIXED "\n";
             }
@@ -268,7 +275,7 @@ sub descend
     }
     close SELECTEDMIXED;
   }
-  
+
   if ( $precomputed eq "" )
   {
     if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
@@ -276,20 +283,20 @@ sub descend
       cleanselect( $repfile, $cleanmixed, $selectmixed );
     }
   }
-  
-  
+
+
   my $throw = $selectmixed; $throw =~ s/\.csv//;
-  my $weight = "$throw-weight.csv"; 
+  my $weight = "$throw-weight.csv";
   sub weight
-  {  
+  {
     my ( $selectmixed, $weight ) = @_;
     say $tee "Scaling results for case $countcaseplus, block $contblocksplus.";
-    open( SELECTEDMIXED, $selectmixed ) or die( "$!" ); 
-    my @lines = <SELECTEDMIXED>; 
+    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );
+    my @lines = <SELECTEDMIXED>;
     close SELECTEDMIXED;
     my $counterline = 0;
     open( WEIGHT, ">$weight" ) or die( "$!" );
-    
+
     my @containerone;
     my @containernames;
     foreach my $line (@lines)
@@ -303,15 +310,15 @@ sub descend
       {
         if ( Sim::OPT::odd($countel) )
         {
-          push ( @{$containerone[$countcol]}, $elt); 
+          push ( @{$containerone[$countcol]}, $elt);
           $countcol++;
         }
         push (@containernames, $touse);
         $countel++;
       }
-    } 
-    
-      
+    }
+
+
     my @containertwo;
     my @containerthree;
     $countcolm = 0;
@@ -319,7 +326,7 @@ sub descend
     foreach my $colref ( @containerone )
     {
       my @column = @{ $colref }; # DEREFERENCE
-      
+
       if ( $weights[$countcolm] < 0 ) # TURNS EVERYTHING POSITIVE
       {
         foreach my $el (@column)
@@ -327,7 +334,7 @@ sub descend
           $el = ($el * -1);
         }
       }
-      
+
       if ( max(@column) != 0) # FILLS THE UNTRACTABLE VALUES
       {
         push (@maxes, max(@column));
@@ -336,10 +343,10 @@ sub descend
       {
         push (@maxes, "NOTHING1");
       }
-          
+
       print TOFILE "MAXES: " . Dumper(@maxes) . "\n";
       print TOFILE "DUMPCOLUMN: " . Dumper(@column) . "\n";
-      
+
       foreach my $el (@column)
       {
         my $eltrans;
@@ -355,14 +362,14 @@ sub descend
         push ( @{$containertwo[$countcolm]}, $eltrans) ; print TOFILE "ELTRANS: $eltrans\n";
       }
       $countcolm++;
-    } 
+    }
     print TOFILE "CONTAINERTWO " . Dumper(@containertwo) . "\n";
-        
+
     my $countline = 0;
     foreach my $line (@lines)
     {
       $line =~ s/^[\n]//;
-      my @elts = split(/\s+|,/, $line);    
+      my @elts = split(/\s+|,/, $line);
       my $countcolm = 0;
       foreach $eltref (@containertwo)
       {
@@ -387,15 +394,15 @@ sub descend
         push (@elts, $rescaledel);
         $countcolm++;
       }
-      
+
       $countline++;
-      
+
       my $counter = 0;
       foreach my $el (@elts)
-      {    
+      {
         print WEIGHT "$el";
         if ($counter < $#elts)
-        { 
+        {
           print WEIGHT ",";
         }
         else
@@ -408,9 +415,9 @@ sub descend
       $counterline++;
     }
     close WEIGHT;
-    
+
   }
-  
+
   if ( $precomputed eq "" )
   {
     if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
@@ -418,16 +425,16 @@ sub descend
       weight( $selectmixed, $weight ); #
     }
   }
-  
+
   my $weighttwo = "$throw-weighttwo.csv"; # THIS WILL HOST PARTIALLY SCALED VALUES, MADE POSITIVE AND WITH A CELING OF 1
   sub weighttwo
   {
     my ( $weight, $weighttwo ) = @_;
     say $tee "Weighting results for case $countcaseplus, block $contblocksplus.";
-    open( WEIGHT, $weight ); 
+    open( WEIGHT, $weight );
     my @lines = <WEIGHT>;
     close WEIGHT;
-    open( WEIGHTTWO, ">$weighttwo" ); 
+    open( WEIGHTTWO, ">$weighttwo" );
     my $counterline;
     foreach my $line (@lines)
     {
@@ -444,22 +451,22 @@ sub descend
         if ($counterelt > ( $#elts - $numberels ))
         {
           print TOFILE "ELT: $elt\n";
-          $newelt = ( $elt * abs($weights[$counterin]) ); 
+          $newelt = ( $elt * abs($weights[$counterin]) );
           print TOFILE "ABS " . abs($weights[$counterin]) . "\n";
-          $sum = ( $sum + $newelt ) ; 
+          $sum = ( $sum + $newelt ) ;
           $counterin++;
         }
         $counterelt++;
       }
       $avg = ($sum / scalar(@keepcolumns) );
       push ( @elts, $avg);
-      
+
       my $counter = 0;
       foreach my $elt (@elts)
-      {    
+      {
         print WEIGHTTWO "$elt";
         if ($counter < $#elts)
-        { 
+        {
           print WEIGHTTWO ",";
         }
         else
@@ -471,7 +478,7 @@ sub descend
       $counterline++;
     }
   }
-    
+
   if ( $precomputed eq "" )
   {
     if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
@@ -479,44 +486,51 @@ sub descend
       weighttwo( $weight, $weighttwo );
     }
   }
-  
+
   if ( not ( $precomputed eq "") ) #NEW. TAKE CARE
-  { 
-    #`cp -f $repfile $weighttwo`;
+  {
     $weighttwo = $repfile;###############
   }
-  
-  my $sortmixed = "$repfile-sortmixed.csv"; 
-  #if ($repfile) { $sortmixed = "$repfile-sortmixed.csv"; } else { die( "$!" ); } # global!
+
+  my $sortmixed;
+  if ($repfile) { $sortmixed = "$repfile-sortmixed.csv"; } else { die( "$!" ); }
+
   sub sortmixed
   {
     my ( $weighttwo, $sortmixed ) = @_;
     say $tee "Processing results for case $countcaseplus, block $contblocksplus.";
-    open( WEIGHTTWO, $weighttwo ) or die( "$!" ); 
-    open( SORTMIXED_, ">$sortmixed" ) or die( "$!" ); 
+    open( WEIGHTTWO, $weighttwo ) or die( "$!" );
+    open( SORTMIXED_, ">$sortmixed" ) or die( "$!" );
     my @lines = <WEIGHTTWO>;
     close WEIGHTTWO;
-    
-    my $count = 0;
-    foreach ( @lines )
+
+    foreach my $line ( @lines )
     {
-      $_ = "$containernames[$count]," . "$_";
-      $count++;
+      $line =~ s/^\,+//g;
+      $line =~ s/^\s+//g;
+      $line =~ s/\,+$//g;
+      $line =~ s/\s+$//g;
+      $line =~ s/"//g;
     }
+
     say TOFILE "TAKEOPTIMA--dump(\@lines): " . dump(@lines);
-    
-    my $line = $lines[0];
-    my @eltstemp = split( /,/, $line );
-    my $numberelts = scalar( @eltstemp );
-    
-    #my @sorted = sort { (split(/,/, $b))[$#eltstemp] <=> (split(/,/, $a))[$#eltstemp] } @lines;
-    my @sorted = sort { ( split( /,/, $a ) )[ $#eltstemp ] <=> (split( /,/, $b ) )[ $#eltstemp ] } @lines;
-    
-    foreach my $line ( @sorted ) 
+
+    my @sorted;
+    unless ( $direction eq "star" )
     {
-      $line =~ s/^,//;
-      $line =~ s/^\s+//;
+      @sorted = sort { (split( ',', $a))[ -1 ] <=> ( split( ',', $b))[ -1 ] } @lines;
+    }
+    else
+    {
+      @sorted = sort { (split( ',', $a))[ 0 ] <=> ( split( ',', $b))[ 0 ] } @lines;
+    }
+
+    open( TOTALRES, ">>$totalres" ) or die;
+
+    foreach my $line ( @sorted )
+    {
       print SORTMIXED_ $line;
+      print TOTALRES $line;
 
       if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
       {
@@ -524,12 +538,13 @@ sub descend
       }
       push ( @totalcases, $line );
     }
-    
-    #if ($numberelts > 0) { print SORTMIXED_ `sort -t, -k$numberelts -n $weighttwo`; } 
-    
+    close TOTALRES;
+
+    #if ($numberelts > 0) { print SORTMIXED_ `sort -t, -k$numberelts -n $weighttwo`; }
+
     #my @sorted = sort { $b->[1] <=> $a->[1] } @lines;
-    
-    
+
+
     #sort { $a->[$#eltstemp] <=> $b->[$#eltstemp] }
     #map { [ [ @lines ] , /,/ ] }
     #foreach my $elt (@sorted)
@@ -538,14 +553,14 @@ sub descend
     #}
 
     #if ($numberelts > 0) { print SORTMIXED_ `sort -n -k$numberelts,$numberelts -t , $weighttwo`; } ### ZZZ
-    
+
     close SORTMIXED_;
   }
    sortmixed( $weighttwo, $sortmixed );
-  
+
   ##########################################################
-  
-  
+
+
   sub takeoptima
   {
     my ( $sortmixed, $uplift_ref ) = @_;
@@ -556,7 +571,7 @@ sub descend
     my @lines = <SORTMIXED_>;
     close SORTMIXED_;
     my $winnerentry;
-    
+
     if ( $direction eq ">" )#NEW. TAKE CARE
     {
       $winnerentry = $lines[0]; #say TOFILE "dump( IN SUB TAKEOPTIMA\$winnerentry): " . dump($winnerentry);
@@ -565,20 +580,21 @@ sub descend
     {
       $winnerentry = $lines[-1];
     }
-    elsif ( $direction eq "=" )
+    elsif ( ( $direction eq "=" ) or ( $direction eq "star" ) )
     {
-      my $half = ( int( scalar( @lines) / 2)  );
-      $winnerentry = $lines[$half];
+      my $half = ( int( scalar( @lines ) / 2 )  );
+      #$winnerentry = $lines[ $half ];
+      $winnerentry = $lines[ 1 ];
     }
     chomp $winnerentry;
-    
+
     my @winnerelms = split(/\s+|,/, $winnerentry);
-    my $winnerline = $winnerelms[0]; 
+    my $winnerline = $winnerelms[0];
     my $winnerval = $winnerelms[-1];
-    push ( @{ $uplift[$countcase][$countblock] }, $winnerval); 
-    
+    push ( @{ $uplift[$countcase][$countblock] }, $winnerval);
+
     my $message;
-    unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+    unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
     {
       $message = "$mypath/attention.txt";
     }
@@ -586,7 +602,7 @@ sub descend
     {
       $message = "$mypath\\attention.txt";
     }
-    
+
     open( MESSAGE, ">>$message");
     my $countelm = 0;
     foreach my $elm (@lines)
@@ -609,28 +625,28 @@ sub descend
   say $tee "BEFORE PUSHING --->\@backvalues " . dump( @backvalues );
     my ( $copy, $newtarget );
     my ( @taken );
-    my ( %newcarrier );  
-    
+    my ( %newcarrier );
+
     #my $openingelt = if ($sourcesweeps[ $countcase ][ $countblock ][0] =~ /\>/) { $sourcesweeps[ $countcase ][ $countblock ][0] =~ s/>//; };
     my $closingelt;
-    if ( $sourcesweeps[ $countcase ][ $countblock ][-1] =~ /\>/ ) 
-    { 
-      $sourcesweeps[ $countcase ][ $countblock ][-1] =~ s/>//; 
+    if ( $sourcesweeps[ $countcase ][ $countblock ][-1] =~ /\>/ )
+    {
+      $sourcesweeps[ $countcase ][ $countblock ][-1] =~ s/>//;
       $closingelt = $sourcesweeps[ $countcase ][ $countblock ][-1];
     };
-    
+
     #if ( defined( $openingelt ) )
-    #{  
+    #{
     #  my @contained = @{ $datastruc{$openingelt} };
     #  my @sorted = sort { ( split( /,/, $a ) )[ $#contained ] <=> (split( /,/, $b ) )[ $#contained ] } @contained ;
     #}
-    
+
     push( @backvalues, [ $winnerline, $winnerval ] );  say $tee "OBTAINED--->\@backvalues " . dump( @backvalues );
     push( @{ $datastruc{$word} }, $winnerentry );  say $tee "OBTAINED--->\@{ \$datastruc{\$word} } " . dump( @{ $datastruc{$word} } );
     say $tee "\$sourcesweeps[ \$countcase ][ \$countblock ][0] " . dump( $sourcesweeps[ $countcase ][ $countblock ][0] );
-    
+
     if ( ( not ( defined( $openingelt ) ) ) and ( not ( defined( $closingelt ) ) ) )
-    {  
+    {
       my ( @values, @keys );
       foreach my $values_ref ( @backvalues )
       {
@@ -640,8 +656,8 @@ sub descend
         push( @values, $value );
       }
       my $optimal = min( @values );
-      
-      
+
+
       my $count = 0;
       my ( $truewinnerline );
       foreach my $value ( @values )
@@ -652,16 +668,16 @@ sub descend
           $count++;
         }
       }
-      
-      
+
+
       $copy = $truewinnerline;
       $copy =~ s/$mypath\/$file//;
-      @taken = Sim::OPT::extractcase( "$copy", \%mids ); 
-      $newtarget = $taken[0]; 
+      @taken = Sim::OPT::extractcase( "$copy", \%mids );
+      $newtarget = $taken[0];
       $newtarget =~ s/$mypath\///;
-      %newcarrier = %{ $taken[1] }; 
-      
-      %{ $miditers[$countcase] } = %newcarrier; 
+      %newcarrier = %{ $taken[1] };
+
+      %{ $miditers[$countcase] } = %newcarrier;
       @backvalues = ( ); #EMPTY THE CONTAINER
     }
     elsif ( defined( $closingelt ) )
@@ -674,8 +690,8 @@ sub descend
         push( @values, $value );
       }
       my $optimal = min( @values );
-      
-      
+
+
       my $count = 0;
       my ( $truewinnerline );
       foreach my $value ( @values )
@@ -686,67 +702,84 @@ sub descend
           $count++;
         }
       }
-      
-      
+
       $copy = $truewinnerline;
       $copy =~ s/$mypath\/$file//;
-      @taken = Sim::OPT::extractcase( "$copy", \%mids ); 
-      $newselected = $taken[0]; 
+      @taken = Sim::OPT::extractcase( "$copy", \%mids );
+      $newselected = $taken[0];
       $newselected =~ s/$mypath\///;
-      push ( @{ $datastruc{$closingelt} }, $newselected ); 
-    
+      push ( @{ $datastruc{$closingelt} }, $newselected );
+
       $copy_old = $winnerline;
       $copy_old =~ s/$mypath\/$file//;
-      @taken_old = Sim::OPT::extractcase( "$copy_old", \%mids ); 
-      $newtarget = $taken_old[0]; 
+      @taken_old = Sim::OPT::extractcase( "$copy_old", \%mids );
+      $newtarget = $taken_old[0];
       $newtarget =~ s/$mypath\///;
       @backvalues = ( ); #EMPTY THE CONTAINER
     }
-    
-    
+
     say $tee "TAKEOPTIMA AFTER->\@miditers: " . dump(@miditers);
-    
-    
+
     $countblock++; ### !!!
-    
-        
+
     # STOP CONDITION
     if ( $countblock == scalar( @blocks ) ) # NUMBER OF BLOCK OF THE CURRENT CASE
-    { 
+    {
       say $tee "TAKEOPTIMA FINAL ->\$countblock " . dump($countblock);
       my @morphcases = grep -d, <$mypath/$file_*>;
       say $tee "#Optimal option for case  $countcaseplus: $newtarget";
       #my $instnum = Sim::OPT::countarray( @{ $morphstruct[$countcase] } );
-      
+
       #my $netinstnum = scalar( @morphcases );
       @totalcases = uniq( @totalcases );
       my $netinstnum = scalar( @totalcases );
 
       say $tee "#Net number of instances: $netinstnum." ;
       open( RESPONSE , ">$mypath/response.txt" );
-      say RESPONSE "#Optimal option for case  $countcaseplus: $newtarget";
-      
-      say RESPONSE "#Net number of instances: $netinstnum." ;
-        
+      unless ( $direction eq "star" )
+      {
+        say RESPONSE "#Optimal option for case  $countcaseplus: $newtarget";
+      }
+
+      say RESPONSE "#Net number of instances: $netinstnum.\n" ;
+      say RESPONSE "Order of the parameters: " . dump( @sweeps );
+      say RESPONSE "Number of parameter levels: " . dump( @varinumbers );
+      say RESPONSE "Last initialization levels: " . dump( @mediumiters );
+      say RESPONSE "Descent directions: " . dump( $dowhat{direction} );
+
       $countblock = 0;
       $countcase = $countcase++;
       if ( $countcase == scalar( @sweeps ) )# NUMBER OF CASES OF THE CURRENT PROBLEM
       {
-        exit (say $tee "#END RUN.");          
+        exit (say $tee "#END RUN.");
       }
     }
     else
     {
+      #if ( $direction eq "stars" ) { $newtarget = $remember; }
       push ( @{ $winneritems[$countcase][$countblock] }, $newtarget ); say $tee "TAKEOPTIMA->\@winneritems " . dump(@winneritems);
       say $tee "#Leaving case " . ($countcase + 1) . ", block " . ($countblock + 1) . " and descending!\ ";
-      Sim::OPT::callcase( { countcase => $countcase, countblock => $countblock, 
-      miditers => \@miditers,  winneritems => \@winneritems, 
+      Sim::OPT::callcase( { countcase => $countcase, countblock => $countblock,
+      miditers => \@miditers,  winneritems => \@winneritems,
       dirfiles => \%dirfiles, uplift => \@uplift,
       backvalues => \@backvalues,
       sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, datastruc => \%datastruc } );
     }
   }
   takeoptima( $sortmixed, \@uplift );
+
+  open( TOTALRES, "$totalres" ) or die;
+  my @lines = <TOTALRES>;
+  close TOTALRES;
+
+  @lines = uniq( sort( @lines ) );
+  open( TOTALRES, ">$totalres" ) or die;
+  foreach my $line ( @lines )
+  {
+    print TOTALRES $line;
+  }
+  close TOTALRES;
+
   close OUTFILE;
   close TOFILE;
 }    # END SUB descend

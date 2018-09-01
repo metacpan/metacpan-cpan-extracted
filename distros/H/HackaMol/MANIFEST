@@ -12,6 +12,7 @@ TODO.md
 dist.ini
 examples/Analysis/BackBone_Dihedrals.pl
 examples/Analysis/mol_maxdist.pl
+examples/BFP/2cba.pl
 examples/Benchmarks/Atom-MVR-timer.pl
 examples/Benchmarks/MVR.pl
 examples/Benchmarks/Mem.pl
@@ -49,7 +50,8 @@ examples/Wonkish/lazy_attr.pl
 examples/Wonkish/refaddr_mvr.pl
 examples/Wonkish/waterdat.pl
 examples/Zmatrix/H14C6O4N2.zmat
-examples/Zmatrix/quick.zmat
+examples/Zmatrix/ethane_ss.pl
+examples/Zmatrix/propane_ss.pl
 examples/Zmatrix/valine.zmat
 examples/Zmatrix/zmat.pl
 examples/group_rot.pl
@@ -57,6 +59,8 @@ examples/hackamol_synopsis.pl
 examples/store.pl
 examples/store_mol.pl
 examples/superpose/superpose_nmr.pl
+examples/xtal/xtal.pl
+examples/xtal/xtal_kmeans.pl
 lib/HackaMol.pm
 lib/HackaMol/Angle.pm
 lib/HackaMol/Atom.pm

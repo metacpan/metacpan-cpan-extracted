@@ -108,7 +108,9 @@ is( $hack->name, "hackitup", "HackaMol name attr" );
     $fh->close;
 
     my $mol2 = $hack->read_file_mol("t/lib/1L2Y.xyz");
-    is( $mol2->count_atoms, 304, "read atoms in from xyz" );
+
+    is ($mol1->string_xyz(''), $mol2->string_xyz,'xyzs are same after reading');
+    #is( $mol2->count_atoms, 304, "read atoms in from xyz" );
 
     my @Z1 = map { $_->Z } $mol1->all_atoms;
     my @Z2 = map { $_->Z } $mol2->all_atoms;

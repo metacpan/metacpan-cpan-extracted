@@ -35,9 +35,9 @@
         #
         # Expected arguments
         #   $name       - World's short name, matching GA::Profile::World->name (max 16 chars,
-        #                   containing A-Za-z0-9_ - 1st char can't be number. Must not exist as a
-        #                   key in the global hash of reserved names,
-        #                   $axmud::CLIENT->constReservedHash)
+        #                   containing A-Za-z0-9_ - 1st char can't be number, non-Latin alphabets
+        #                   acceptable. Must not exist as a key in the global hash of reserved
+        #                   names, $axmud::CLIENT->constReservedHash)
         #   $longName   - World's long name, matching GA::Profile::World->longName (suggested max
         #                   length of 32 chars)
         #   $host       - DNS or IP address
@@ -89,8 +89,9 @@
             # ---
 
             # World's short name, matching GA::Profile::World->name (max 16 chars, containing
-            #   A-Za-z0-9_ - 1st char can't be number. Must not exist as a key in the global hash of
-            #   reserved names, $axmud::CLIENT->constReservedHash)
+            #   A-Za-z0-9_ - 1st char can't be number, non-Latin alphabets acceptable. Must not
+            #   exist as a key in the global hash of reserved names,
+            #   $axmud::CLIENT->constReservedHash)
             name                        => $name,
             # World's long name, matching GA::Profile::World->longName (suggested max length of 32
             #   chars)

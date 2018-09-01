@@ -101,6 +101,16 @@ static void _bern_real_zeta(mpf_t bn, mpz_t zn, unsigned long prec);
 static unsigned long zeta_n = 0;
 static mpz_t* zeta_d = 0;
 
+void free_borwein_zeta(void) {
+  unsigned long i;
+  if (zeta_n > 0) {
+    for (i = 0; i <= zeta_n; i++)
+      mpz_clear(zeta_d[i]);
+    Safefree(zeta_d);
+    zeta_n = 0;
+  }
+}
+
 static void _borwein_d(unsigned long D) {
   mpz_t t1, t2, t3, sum;
   unsigned long i, n = 3 + (1.31 * D);
@@ -108,11 +118,7 @@ static void _borwein_d(unsigned long D) {
   if (zeta_n >= n)
     return;
 
-  if (zeta_n > 0) {
-    for (i = 0; i <= zeta_n; i++)
-      mpz_clear(zeta_d[i]);
-    Safefree(zeta_d);
-  }
+  free_borwein_zeta();
 
   n += 10;   /* Add some in case we want a few more digits later */
   zeta_n = n;
@@ -370,10 +376,10 @@ static void _riemann_r(mpf_t r, mpf_t n, unsigned long prec)
  */
 static void _const_euler(mpf_t gamma, unsigned long prec)
 {
-  const double log2 = 0.693147180559945309417232121458176568L;
+  const double log10 = 2.3025850929940456840179914546843642076L;
   const unsigned long maxsqr = (1UL << (4*sizeof(unsigned long))) - 1;
   unsigned long bits = 40 + DIGS2BITS(prec);
-  unsigned long x = ceil((2 + bits) * log2/4);
+  unsigned long x = floor(2 + prec * log10/4);
   unsigned long N = ceil(1 + 3.591121477*x - 0.195547*log(x));
   unsigned long xx = x*x;
   unsigned long k;
@@ -389,6 +395,10 @@ static void _const_euler(mpf_t gamma, unsigned long prec)
   mpf_init2(a,    bits);
   mpf_init2(b,    bits);
 
+  /*
+   * Brent and McMillan (1980) algorithm B1.
+   * http://www.ams.org/journals/mcom/1980-34-149/S0025-5718-1980-0551307-4/
+   */
   mpf_set_ui(u, x);
   mpf_log(u, u);
   mpf_neg(u, u);
@@ -396,19 +406,14 @@ static void _const_euler(mpf_t gamma, unsigned long prec)
   mpf_set_ui(b, 1);
   mpf_set_ui(v, 1);
 
-  /* Let v(x) = sum_n[      x^n / n!^2]
-   *     u(x) = sum_n[H_n * x^n / n!^2]    (H_n = 1 + 1/2 + 1/3 + ... + 1/n)
-   * Then C = u(x)/v(x) - log(x)/2
-   */
   if (x <= maxsqr && N <= maxsqr) {
-    /*  v_k *= x^2 / k^2  |  u_k *= x^2 / k + v_k) / k  */
     for (k = 1; k <= N; k++) {
       mpf_mul_ui(b, b, xx);
-      mpf_div_ui(b, b, k*k);
+      mpf_div_ui(b, b, k*k);   /* B_k = B_{k-1} * x^2 / k^2 */
       mpf_mul_ui(a, a, xx);
       mpf_div_ui(a, a, k);
       mpf_add(a, a, b);
-      mpf_div_ui(a, a, k);
+      mpf_div_ui(a, a, k);     /* A_k = (A_{k-1} * x^2 / k + B_k) / k */
       mpf_add(u, u, a);
       mpf_add(v, v, b);
     }
@@ -441,10 +446,11 @@ static void _const_euler(mpf_t gamma, unsigned long prec)
  *   See http://www.jjj.de/arctan/arctanpage.html for best arctan series.
  *
  * - AGM.  Quite good, and this seems to be best for relatively small sizes.
+ *   See: https://arxiv.org/abs/1802.07558
  *
  * - Ramanujan / Chudnovsky with binary splitting.
  *   About 2-4x faster than AGM for large enough sizes.  This version is based
- *   on Alexander Yee's example.  I have tested with a port of Pari/GP's abpq_sum
+ *   on Alexander Yee's example.  I have tested vs a port of Pari/GP's abpq_sum
  *   and it came out about the same speed but uses a lot more memory.
  *   There are many more optimizations that can be done for this.  Xue's code
  *   on the GMP page uses quite a bit of code to do running reduction of P,Q
@@ -554,7 +560,7 @@ static void _agm_pi(mpf_t pi, unsigned long prec)
   for (k = 0; (prec >> (k+1)) > 0; k++) {
     mpf_set(prev_an, an);           /* Y <- A */
     mpf_add(t, an, bn);
-    mpf_div_ui(an, t, 2);           /* A <- (A+B)/2 */
+    mpf_div_2exp(an, t, 1);         /* A <- (A+B)/2 */
     mpf_mul(t, bn, prev_an);
     mpf_sqrt(bn, t);                /* B <- (BY)^(1/2) */
     mpf_sub(prev_an, prev_an, an);
@@ -608,7 +614,7 @@ static void _const_log2(mpf_t logn, unsigned long prec)
   mpf_div(logn, logn, t);
   /* logn = .69313147... */
   mpf_clear(t);
-  mpz_clear(t1); mpz_clear(t2); mpz_clear(term2); mpz_clear(pows);
+  mpz_clear(t1); mpz_clear(t2); mpz_clear(term1); mpz_clear(term2); mpz_clear(pows);
 }
 
 /* Cache constants.  We should thread lock these. */
@@ -704,10 +710,59 @@ void li(mpf_t r, mpf_t n, unsigned long prec)
   mpf_clear(logn);
 }
 
-void ei(mpf_t r, mpf_t n, unsigned long prec)
+void ei(mpf_t r, mpf_t x, unsigned long prec)
 {
-  mpf_exp(r, n);
-  li(r, r, prec+3);
+#if 0
+  #include <mpfr.h>
+  mpfr_t C, Cin;
+  mpfr_init2(C,    10+DIGS2BITS(prec));
+  mpfr_init2(Cin,  mpf_get_prec(x));
+  mpfr_set_f(Cin, x, MPFR_RNDN);
+  mpfr_eint(C, Cin, MPFR_RNDN);
+  mpfr_get_f(r, C, MPFR_RNDN);
+  mpfr_clear(Cin);
+  mpfr_clear(C);
+  return;
+#endif
+  if (mpf_sgn(x) > 0 && mpf_cmp_ui(x, 100) < 0) {
+    /* x > 0 only */
+    mpf_t factn, invn, term, sum, t, tol;
+    unsigned long n, bits = precbits(r, prec, 14);
+
+    mpf_init2(factn, bits);
+    mpf_init2(invn,  bits);
+    mpf_init2(term,  bits);
+    mpf_init2(sum,   bits);
+    mpf_init2(t,     bits);
+    mpf_init2(tol,   bits);
+
+    mpf_set_ui(tol, 10);  mpf_pow_ui(tol, tol, prec+4);  mpf_ui_div(tol,1,tol);
+    mpf_set(factn, x);
+
+    for (n = 2; n <= 1000000; n++) {
+      mpf_set_ui(t, n);
+      mpf_ui_div(invn, 1, t);
+      mpf_mul(t, x, invn);
+      mpf_mul(factn, factn, t);
+      mpf_mul(term, factn, invn);
+      mpf_add(sum, sum, term);
+
+      mpf_abs(term, term);
+      mpf_mul(t, sum, tol);
+      mpf_abs(t, t);
+      if (mpf_cmp(term, t) <= 0) break;
+    }
+    const_euler(t, prec+4);  mpf_add(sum, sum, t);
+    mpf_log(t, x);           mpf_add(sum, sum, t);
+    mpf_add(sum, sum, x);
+    mpf_set(r, sum);
+
+    mpf_clear(tol); mpf_clear(t); mpf_clear(sum);
+    mpf_clear(term); mpf_clear(invn); mpf_clear(factn);
+  } else {
+    mpf_exp(r, x);
+    li(r, r, prec+3);
+  }
 }
 
 
@@ -905,24 +960,25 @@ void bernfrac(mpz_t num, mpz_t den, mpz_t zn)
 
 /***************************       Lambert W       ***************************/
 
-static void _lambertw(mpf_t w, mpf_t x, unsigned long prec)
+static void _lambertw(mpf_t r, mpf_t x, unsigned long prec)
 {
   int i;
-  unsigned long bits = 96+mpf_get_prec(x);  /* More bits for intermediate */
-  mpf_t t, w1, zn, qn, en, tol;
+  unsigned long bits = 96+mpf_get_prec(r);  /* More bits for intermediate */
+  mpf_t w, t, tol, w1, zn, qn, en;
 
   if (mpf_cmp_d(x, -0.36787944117145) < 0)
     croak("Invalid input to LambertW:  x must be >= -1/e");
   if (mpf_sgn(x) == 0)
-    { mpf_set(w, x); return; }
+    { mpf_set(r, x); return; }
 
   /* Use Fritsch rather than Halley. */
+  mpf_init2(w,   bits);
   mpf_init2(t,   bits);
+  mpf_init2(tol, bits);
   mpf_init2(w1,  bits);
   mpf_init2(zn,  bits);
   mpf_init2(qn,  bits);
   mpf_init2(en,  bits);
-  mpf_init2(tol, bits);
 
   /* Initial estimate */
   if (mpf_cmp_d(x, -0.06) < 0) {  /* Pade(3,2) */
@@ -1038,11 +1094,14 @@ static void _lambertw(mpf_t w, mpf_t x, unsigned long prec)
     if (mpf_cmp_d(w,-1) <= 0) break;
   }
 
-  if (mpf_cmp_d(w, -1) <= 0)
-    mpf_set_si(w, -1);
-
   mpf_clear(en); mpf_clear(qn); mpf_clear(zn);
-  mpf_clear(w1); mpf_clear(t); mpf_clear(tol);
+  mpf_clear(w1); mpf_clear(tol); mpf_clear(t);
+
+  if (mpf_cmp_d(w, -1) <= 0)
+    mpf_set_si(r, -1);
+  else
+    mpf_set(r, w);
+  mpf_clear(w);
 }
 
 /*****************************************************************************/
@@ -1060,12 +1119,15 @@ char* zetareal(mpf_t z, unsigned long prec)
   gmp_sprintf(out, "%.*Ff", (int)(prec), z);
   return out;
 }
-
 char* riemannrreal(mpf_t r, unsigned long prec)
 {
   if (mpf_cmp_ui(r,0) <= 0) return 0;
   _riemann_r(r, r, prec);
   return _str_real(r, prec);
+}
+char* lambertwreal(mpf_t x, unsigned long prec) {
+  _lambertw(x, x, prec);
+  return _str_real(x, prec);
 }
 char* lireal(mpf_t r, unsigned long prec)
 {
@@ -1080,21 +1142,25 @@ char* eireal(mpf_t r, unsigned long prec)
   ei(r, r, prec);
   return _str_real(r, prec);
 }
-char* logreal(mpf_t r, unsigned long prec)
-{
-  mpf_log(r, r);
-  return _str_real(r, prec);
-}
-char* expreal(mpf_t r, unsigned long prec)
-{
-  mpf_exp(r, r);
-  return _str_real(r, prec);
-}
-char* powreal(mpf_t r, mpf_t x, unsigned long prec)
-{
-  mpf_pow(r, r, x);
-  return _str_real(r, prec);
-}
+#define DEFINE_REAL_1ARG(func, mfunc) \
+  char* func(mpf_t r, unsigned long prec) { \
+    mfunc(r, r); \
+    return _str_real(r, prec); \
+  }
+#define DEFINE_REAL_2ARG(func, mfunc) \
+  char* func(mpf_t r, mpf_t x, unsigned long prec) { \
+    mfunc(r, r, x); \
+    return _str_real(r, prec); \
+  }
+DEFINE_REAL_1ARG(logreal, mpf_log)
+DEFINE_REAL_1ARG(expreal, mpf_exp)
+DEFINE_REAL_2ARG(powreal, mpf_pow)
+DEFINE_REAL_2ARG(rootreal, mpf_root)
+DEFINE_REAL_2ARG(addreal, mpf_add)
+DEFINE_REAL_2ARG(subreal, mpf_sub)
+DEFINE_REAL_2ARG(mulreal, mpf_mul)
+DEFINE_REAL_2ARG(divreal, mpf_div)
+
 char* agmreal(mpf_t a, mpf_t b, unsigned long prec)
 {
   if (mpz_sgn(a) == 0 || mpz_sgn(b) == 0) {
@@ -1160,17 +1226,5 @@ char* bernreal(mpz_t zn, unsigned long prec) {
     out = _str_real(z, prec);
     mpf_clear(z);
   }
-  return out;
-}
-
-char* lambertwreal(mpf_t x, unsigned long prec) {
-  char* out;
-  mpf_t w;
-  unsigned long bits = 64 + DIGS2BITS(prec);
-
-  mpf_init2(w, bits);
-  _lambertw(w, x, 10+prec);
-  out = _str_real(w, prec);
-  mpf_clear(w);
   return out;
 }

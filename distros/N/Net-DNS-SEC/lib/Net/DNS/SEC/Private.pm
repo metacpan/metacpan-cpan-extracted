@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Private;
 
 #
-# $Id: Private.pm 1677 2018-05-22 11:59:10Z willem $
+# $Id: Private.pm 1705 2018-08-23 10:24:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1705 $)[1];
 
 
 =head1 NAME
@@ -200,8 +200,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl>, L<Net::DNS>, L<Net::DNS::SEC>,
-L<Net::DNS::RR::DNSKEY>, L<Net::DNS::RR::KEY>,
-L<Net::DNS::RR::RRSIG>, L<Net::DNS::RR::SIG>
+L<Net::DNS::RR::DNSKEY>, L<Net::DNS::RR::RRSIG>
 
 =cut
 

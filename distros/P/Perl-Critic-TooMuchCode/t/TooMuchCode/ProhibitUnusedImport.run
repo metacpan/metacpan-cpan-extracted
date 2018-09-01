@@ -18,3 +18,17 @@ print 42;
 
 use Getopt::Long qw(:config bundling);
 print 42;
+
+## name Read
+## failures 0
+## cut
+
+use Encode       qw( decode );
+my $val = decode ("utf-16be", $val);
+
+## name Bin
+## failures 0
+## cut
+
+use FindBin qw( $RealBin );
+my $prog = $RealBin . "/../foo.pl";

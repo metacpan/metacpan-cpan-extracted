@@ -1,25 +1,15 @@
 package Net::Amazon::S3::Request::GetObjectAccessControl;
-$Net::Amazon::S3::Request::GetObjectAccessControl::VERSION = '0.84';
+$Net::Amazon::S3::Request::GetObjectAccessControl::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
 # ABSTRACT: An internal class to get an object's access control
 
-with 'Net::Amazon::S3::Role::Bucket';
-
-has 'key'    => ( is => 'ro', isa => 'Str',         required => 1 );
+with 'Net::Amazon::S3::Request::Role::Query::Action::Acl';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::GET';
 
 __PACKAGE__->meta->make_immutable;
-
-sub http_request {
-    my $self = shift;
-
-    return $self->_build_http_request(
-        method => 'GET',
-        path   => $self->_uri($self->key) . '?acl',
-    );
-}
 
 1;
 
@@ -35,7 +25,7 @@ Net::Amazon::S3::Request::GetObjectAccessControl - An internal class to get an o
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

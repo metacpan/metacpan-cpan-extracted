@@ -3,6 +3,7 @@
 # Test that our declared minimum Perl version matches our syntax
 
 use strict;
+
 BEGIN {
   $|  = 1;
   $^W = 1;

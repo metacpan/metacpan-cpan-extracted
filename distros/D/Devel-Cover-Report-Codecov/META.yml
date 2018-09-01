@@ -22,7 +22,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,7 +41,7 @@ no_index:
 provides:
   Devel::Cover::Report::Codecov:
     file: lib/Devel/Cover/Report/Codecov.pm
-    version: '0.22'
+    version: '0.24'
   Devel::Cover::Report::Codecov::Service::AppVeyor:
     file: lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm
   Devel::Cover::Report::Codecov::Service::Bitrise:
@@ -56,8 +56,6 @@ provides:
     file: lib/Devel/Cover/Report/Codecov/Service/Git.pm
   Devel::Cover::Report::Codecov::Service::GitLab:
     file: lib/Devel/Cover/Report/Codecov/Service/GitLab.pm
-  Devel::Cover::Report::Codecov::Service::Magnum:
-    file: lib/Devel/Cover/Report/Codecov/Service/Magnum.pm
   Devel::Cover::Report::Codecov::Service::Mercurial:
     file: lib/Devel/Cover/Report/Codecov/Service/Mercurial.pm
   Devel::Cover::Report::Codecov::Service::Semaphore:
@@ -82,7 +80,7 @@ resources:
   bugtracker: https://github.com/codecov/codecov-perl/issues
   homepage: https://github.com/codecov/codecov-perl
   repository: git://github.com/codecov/codecov-perl.git
-version: '0.22'
+version: '0.24'
 x_authority: cpan:PINE
 x_contributors:
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
@@ -90,4 +88,6 @@ x_contributors:
   - 'Pedro Melo <melo@simplicidade.org>'
   - 'Pine Mizune <pinemz@gmail.com>'
   - 'stevepeak <steve@stevepeak.net>'
+  - 'Álvaro Castellano Vela <alvaro.castellano.vela@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

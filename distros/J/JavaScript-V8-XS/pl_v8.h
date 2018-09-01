@@ -24,11 +24,11 @@ class V8Context;
  * Because data in Perl and JS can be nested (array of hashes of arrays of...),
  * the functions are recursive.
  *
- * pl_duk_to_perl: takes a JS value from a given position in the duktape stack,
+ * pl_v8_to_perl: takes a JS value from a given position in the V8 stack,
  * and creates the equivalent Perl value.
  *
- * pl_perl_to_duk: takes a Perl value and leaves the equivalent JS value at the
- * top of the duktape stack.
+ * pl_perl_to_v8: takes a Perl value and leaves the equivalent JS value at the
+ * top of the V8 stack.
  */
 SV* pl_v8_to_perl(pTHX_ V8Context* ctx, const Local<Object>& object);
 const Local<Object> pl_perl_to_v8(pTHX_ SV* value, V8Context* ctx);
@@ -69,16 +69,6 @@ int pl_del_global_or_property(pTHX_ V8Context* ctx, const char* name);
 int pl_run_gc(V8Context* ctx);
 
 SV* pl_global_objects(pTHX_ V8Context* ctx);
-
-#if 0
-/*
- * This is a generic dispatcher that allows calling any Perl function from JS.
- */
-int pl_call_perl_sv(duk_context* ctx, SV* func);
-
-/* Get / set the value for a global object or a slot in an object */
-SV* pl_instanceof_global_or_property(pTHX_ duk_context* ctx, const char* object, const char* class);
-#endif
 
 bool find_parent(V8Context* ctx, const char* name, Local<Context>& context, Local<Object>& object, Local<Value>& slot, int create = 0);
 bool find_object(V8Context* ctx, const char* name, Local<Context>& context, Local<Object>& object);

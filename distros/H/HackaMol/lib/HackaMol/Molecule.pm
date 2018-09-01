@@ -1,5 +1,5 @@
 package HackaMol::Molecule;
-$HackaMol::Molecule::VERSION = '0.047';
+$HackaMol::Molecule::VERSION = '0.048';
 #ABSTRACT: Molecule class for HackaMol
 use 5.008;
 use Moose;
@@ -275,7 +275,7 @@ HackaMol::Molecule - Molecule class for HackaMol
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 

@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -595,8 +595,7 @@ sub launch {
 	}
 	_postlaunch_child($job);
 	return 0;
-
-    }  
+    }
 
     Carp::confess 'Forks::Super::launch(): ',
 	"Somehow we got invalid pid=$pid from fork call.";
@@ -1193,6 +1192,7 @@ sub _postlaunch_child_to_remote_cmd {
         deinit_child();
         exit $? >> 8;
     } else {
+        # TODO: support other remote access commands like 'rsh'
         croak "Forks::Super: Only 'ssh' protocol supported for remote";
     }
 }
@@ -2642,7 +2642,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.94
+0.95
 
 =head1 SYNOPSIS
 

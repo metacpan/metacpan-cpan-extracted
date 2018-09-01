@@ -34,32 +34,6 @@ L<Perl::Tidy>
 
 Mark Grimes E<lt>mgrimes@cpan.orgE<gt>
 
-=head1 CONTRIBUTORS
-
-=over 4
-
-=item *
-
-Kent Fredric (@kentnl)
-
-=item *
-
-Gregoy Oschwald (@oschwal)
-
-=item *
-
-Curtis Brandt (@aggrolite)
-
-=item *
-
-@pblaberge
-
-=item *
-
-Peter Roberts (@pwr22)
-
-=back
-
 =head1 SOURCE
 
 Source repository is at L<https://github.com/mvgrimes/Perl-Tidy-Sweetened>.

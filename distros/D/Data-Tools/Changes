@@ -1,5 +1,13 @@
 Revision history for Perl extension Data::Tools
 
+1.19 2018-08-31
+
+    - changed escaping style of hash2str() and str2hash()
+    - old style, url-escaping are renamed as hash2str_url() and str2hash_url()
+    - added hash2str_keys() to allow to specify certain keys order, check docs
+    - added hash_save_url() and hash_load_url()
+    - added hash_save_keys() to use hash2str_keys(), check docs
+
 1.18 2018-08-10
 
     - added data_tools_set_file_io_encoding()

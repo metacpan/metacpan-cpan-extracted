@@ -36,7 +36,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.78";
+our $VERSION = "0.79";
 sub  Version { $VERSION }
 
 use Carp;
@@ -64,35 +64,41 @@ my @parsers = (
     [ ios  => "IO::Scalar",				""		],
     [ dmp  => "Data::Peek",				""		],
     );
-my %can = map {
-    my $p = $_;
-    my $preset = $ENV{"SPREADSHEET_READ_\U$p->[0]"};
-    if ($preset and $preset =~ m/^[\w:]+$/) {
-	if (eval "require $preset" and not $@) {
-	    # forcing a parser should still check the version
-	    for (grep { $p->[1] eq $preset and $p->[2] } @parsers) {
-		my $ok;
-		my $has = $preset->VERSION;
-		$has =~ s/_[0-9]+$//;			# Remove beta-part
-		if ($p->[2] =~ m/^v([0-9.]+)/) {	# clumsy versions
-		    my @min = split m/\./ => $1;
-		    $has =~ s/^v//;
-		    my @has = split m/\./ => $has;
-		    $ok = (($has[0] * 1000 + $has[1]) * 1000 + $has[2]) >=
-			  (($min[0] * 1000 + $min[1]) * 1000 + $min[2]);
-		    }
-		else {	# normal versions
-		    $ok = $has >= $p->[2];
-		    }
-		$ok or $preset = "!$preset";
-		}
-	    }
-	else {
-	    $preset = "!$preset";
-	    }
+my %can = ( supports => { map { $_->[1] => $_->[2] } @parsers });
+foreach my $p (@parsers) {
+    my $format = $p->[0];
+    $can{$format} and next;
+    $can{$format} = "";
+    my $preset = $ENV{"SPREADSHEET_READ_\U$format"} or next;
+    my $min_version = $can{supports}{$preset};
+    unless ($min_version) {
+	# Catch weirdness like $SPREADSHEET_READ_XLSX = "DBD::Oracle"
+	$can{$format} = "!$preset is not supported for the $format format";
+	next;
 	}
-    $p->[0] => $preset || "";
-    } @parsers;
+    if (eval "local \$_; require $preset" and not $@) {
+	# forcing a parser should still check the version
+	my $ok;
+	my $has = $preset->VERSION;
+	$has =~ s/_[0-9]+$//;			# Remove beta-part
+	if ($min_version =~ m/^v([0-9.]+)/) {	# clumsy versions
+	    my @min = split m/\./ => $1;
+	    $has =~ s/^v//;
+	    my @has = split m/\./ => $has;
+	    $ok = (($has[0] * 1000 + $has[1]) * 1000 + $has[2]) >=
+		  (($min[0] * 1000 + $min[1]) * 1000 + $min[2]);
+	    }
+	else {	# normal versions
+	    $ok = $has >= $min_version;
+	    }
+	$ok or $preset = "!$preset";
+	}
+    else {
+	$preset = "!$preset";
+	}
+    $can{$format} = $preset;
+    }
+delete $can{supports};
 for (@parsers) {
     my ($flag, $mod, $vsn) = @$_;
     $can{$flag} and next;
@@ -182,7 +188,10 @@ sub new {
 sub parses {
     ref $_[0] eq __PACKAGE__ and shift;
     my $type = _parser (shift)	or  return 0;
-    $can{$type} =~ m/^!/ and return 0;
+    if ($can{$type} =~ m/^!\s*(.*)/) {
+	$@ = $1;
+	return 0;
+	}
     return $can{$type};
     } # parses
 
@@ -526,32 +535,56 @@ sub ReadData {
 	return _clipsheets \%opt, [ @data ];
 	}
 
-    # From /etc/magic: Microsoft Office Document
-    if ($io_txt && $_parser !~ m/^xlsx?$/ &&
-		    $txt =~ m{^(\376\067\0\043
-			       |\320\317\021\340\241\261\032\341
-			       |\333\245-\0\0\0)}x) {
-	$can{xls} or croak "Spreadsheet::ParseExcel not installed";
-	my $tmpfile;
-	if ($can{ios}) { # Do not use a temp file if IO::Scalar is available
-	    $tmpfile = \$txt;
+    if ($io_txt) { # && $_parser !~ m/^xlsx?$/) {
+	if (    # /etc/magic: Microsoft Office Document
+		$txt =~ m{\A(\376\067\0\043
+			    |\320\317\021\340\241\261\032\341
+			    |\333\245-\0\0\0)}x
+		# /usr/share/misc/magic
+	     || $txt =~ m{\A.{2080}Microsoft Excel 5.0 Worksheet}
+	     || $txt =~ m{\A\x09\x04\x06\x00\x00\x00\x10\x00}
+		) {
+	    $can{xls} or croak "Spreadsheet::ParseExcel not installed";
+	    my $tmpfile;
+	    if ($can{ios}) { # Do not use a temp file if IO::Scalar is available
+		$tmpfile = \$txt;
+		}
+	    else {
+		$tmpfile = File::Temp->new (SUFFIX => ".xls", UNLINK => 1);
+		binmode $tmpfile;
+		print   $tmpfile $txt;
+		close   $tmpfile;
+		}
+	    open $io_ref, "<", $tmpfile or return;
+	    $io_txt = 0;
+	    $_parser = _parser ($opt{parser} = "xls");
 	    }
-	else {
-	    $tmpfile = File::Temp->new (SUFFIX => ".xls", UNLINK => 1);
-	    binmode $tmpfile;
-	    print   $tmpfile $txt;
-	    close   $tmpfile;
+	elsif ( # /usr/share/misc/magic
+		$txt =~ m{\APK\003\004.{4,30}(?:\[Content_Types\]\.xml|_rels/\.rels)}
+		) {
+	    $can{xlsx} or croak "XLSX parser not installed";
+	    my $tmpfile;
+	    if ($can{ios}) { # Do not use a temp file if IO::Scalar is available
+		$tmpfile = \$txt;
+		}
+	    else {
+		$tmpfile = File::Temp->new (SUFFIX => ".xlsx", UNLINK => 1);
+		binmode $tmpfile;
+		print   $tmpfile $txt;
+		close   $tmpfile;
+		}
+	    open $io_ref, "<", $tmpfile or return;
+	    $io_txt = 0;
+	    $_parser = _parser ($opt{parser} = "xlsx");
 	    }
-	open $io_ref, "<", $tmpfile or return;
-	$io_txt = 0;
-	$_parser = _parser ($opt{parser} = "xls");
 	}
     if ($opt{parser} ? $_parser =~ m/^xlsx?$/
 		     : ($io_fil && $txt =~ m/\.(xlsx?)$/i && ($_parser = $1))) {
 	my $parse_type = $_parser =~ m/x$/i ? "XLSX" : "XLS";
 	my $parser = $can{lc $parse_type} or
 	    croak "Parser for $parse_type is not installed";
-	$debug and print STDERR "Opening $parse_type $txt using $parser-", $can{lc $parse_type}->VERSION, "\n";
+	$debug and print STDERR "Opening $parse_type ", $io_ref ? "<REF>" : $txt,
+	    " using $parser-", $can{lc $parse_type}->VERSION, "\n";
 	$opt{passwd} and $parser_opts{Password} = $opt{passwd};
 	my $oBook = eval {
 	    $io_ref
@@ -1083,15 +1116,16 @@ return its content in a universal manner independent of the parsing
 module that does the actual spreadsheet scanning.
 
 For OpenOffice and/or LibreOffice this module uses
-L<Spreadsheet::ReadSXC|http://metacpan.org/release/Spreadsheet-ReadSXC>
+L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>
 
 For Microsoft Excel this module uses
-L<Spreadsheet::ParseExcel|http://metacpan.org/release/Spreadsheet-ParseExcel>,
-L<Spreadsheet::ParseXLSX|http://metacpan.org/release/Spreadsheet-ParseXLSX>, or
-L<Spreadsheet::XLSX|http://metacpan.org/release/Spreadsheet-XLSX> (discouraged).
+L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel>,
+L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>, or
+L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX> (stronly
+discouraged).
 
-For CSV this module uses L<Text::CSV_XS|http://metacpan.org/release/Text-CSV_XS>
-or L<Text::CSV_PP|http://metacpan.org/release/Text-CSV_PP>.
+For CSV this module uses L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS>
+or L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP>.
 
 For SquirrelCalc there is a very simplistic built-in parser
 
@@ -1173,17 +1207,26 @@ All options accepted by ReadData are accepted by new.
 
  my $book = ReadData ($content);
 
- my $book = ReadData ($fh, parser => "xls");
+ my $book = ReadData ($content,  parser => "xlsx");
 
-Tries to convert the given file, string, or stream to the data
-structure described above.
+ my $book = ReadData ($fh,       parser => "xlsx");
 
-Processing Excel data from a stream or content is supported through
-a L<File::Temp|https://metacpan.org/release/File-Temp> temporary file or
+ my $book = ReadData (\$content, parser => "xlsx");
+
+Tries to convert the given file, string, or stream to the data structure
+described above.
+
+Processing Excel data from a stream or content is supported through a
+L<File::Temp|https://metacpan.org/release/File-Temp> temporary file or
 L<IO::Scalar|https://metacpan.org/release/IO-Scalar> when available.
 
 L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>
 does preserve sheet order as of version 0.20.
+
+Choosing between C<$content> and C<\\$content> (with or without passing
+the desired C<parser> option) may be depending on trial and terror.
+C<ReadData> does try to determine parser type on content if needed, but
+not all combinations are checked, and not all signatures are builtin.
 
 Currently supported options are:
 
@@ -1655,7 +1698,7 @@ The entries C<maxrow> and C<maxcol> are 1-based.
 =head3 Merged cells
 
 Note that only
-L<Spreadsheet::ReadSXC|http://metacpan.org/release/Spreadsheet-ReadSXC>
+L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>
 documents the use of merged cells, and not in a way useful for the spreadsheet
 consumer.
 
@@ -1663,15 +1706,15 @@ CSV does not support merged cells (though future implementations of CSV
 for the web might).
 
 The documentation of merged areas in
-L<Spreadsheet::ParseExcel|http://metacpan.org/release/Spreadsheet-ParseExcel> and
-L<Spreadsheet::ParseXLSX|http://metacpan.org/release/Spreadsheet-ParseXLSX> can
+L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel> and
+L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX> can
 be found in
-L<Spreadsheet::ParseExcel::Worksheet|http://metacpan.org/release/Spreadsheet-ParseExcel-Worksheet>
-and L<Spreadsheet::ParseExcel::Cell|http://metacpan.org/release/Spreadsheet-ParseExcel-Cell>.
+L<Spreadsheet::ParseExcel::Worksheet|https://metacpan.org/release/Spreadsheet-ParseExcel-Worksheet>
+and L<Spreadsheet::ParseExcel::Cell|https://metacpan.org/release/Spreadsheet-ParseExcel-Cell>.
 
-None of basic L<Spreadsheet::XLSX|http://metacpan.org/release/Spreadsheet-XLSX>,
-L<Spreadsheet::ParseExcel|http://metacpan.org/release/Spreadsheet-ParseExcel>, and
-L<Spreadsheet::ParseXLSX|http://metacpan.org/release/Spreadsheet-ParseXLSX> manual
+None of basic L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX>,
+L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel>, and
+L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX> manual
 pages mention merged cells at all.
 
 This module just tries to return the information in a generic way.
@@ -1873,6 +1916,23 @@ names C<meta>, or just be new values in the C<attr> hashes.
 
 =back
 
+=item Other parsers
+
+Add support for new(er) parsers for already supported formats, like
+
+=over 2
+
+=item Data::XLSX::Parser
+
+Data::XLSX::Parser provides faster way to parse Microsoft Excel's .xlsx
+files. The implementation of this module is highly inspired from Python's
+FastXLSX library.
+
+This is SAX based parser, so you can parse very large XLSX file with
+lower memory usage.
+
+=back
+
 =item Other spreadsheet formats
 
 I consider adding any spreadsheet interface that offers a usable API.
@@ -1912,68 +1972,68 @@ match what F<CONTRIBUTING.md> describes.
 
 =item Text::CSV_XS, Text::CSV_PP
 
-See L<Text::CSV_XS|http://metacpan.org/release/Text-CSV_XS> ,
-L<Text::CSV_PP|http://metacpan.org/release/Text-CSV_PP> , and
-L<Text::CSV|http://metacpan.org/release/Text-CSV> documentation.
+See L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS> ,
+L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP> , and
+L<Text::CSV|https://metacpan.org/release/Text-CSV> documentation.
 
-L<Text::CSV|http://metacpan.org/release/Text-CSV> is a wrapper over Text::CSV_XS (the fast XS version) and/or
-L<Text::CSV_PP|http://metacpan.org/release/Text-CSV_PP> (the pure perl version).
+L<Text::CSV|https://metacpan.org/release/Text-CSV> is a wrapper over Text::CSV_XS (the fast XS version) and/or
+L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP> (the pure perl version).
 
 =item Spreadsheet::ParseExcel
 
-L<Spreadsheet::ParseExcel|http://metacpan.org/release/Spreadsheet-ParseExcel> is
+L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel> is
 the best parser for old-style Microsoft Excel (.xls) files.
 
 =item Spreadsheet::ParseXLSX
 
-L<Spreadsheet::ParseXLSX|http://metacpan.org/release/Spreadsheet-ParseXLSX> is
-like L<Spreadsheet::ParseExcel|http://metacpan.org/release/Spreadsheet-ParseExcel>,
+L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX> is
+like L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel>,
 but for new Microsoft Excel 2007+ files (.xlsx). They have the same API.
 
-This module uses L<XML::Twig|http://metacpan.org/release/XML-Twig> to parse the
+This module uses L<XML::Twig|https://metacpan.org/release/XML-Twig> to parse the
 internal XML.
 
 =item Spreadsheet::XLSX
 
-See L<Spreadsheet::XLSX|http://metacpan.org/release/Spreadsheet-XLSX>
+See L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX>
 documentation.
 
 This module is dead and deprecated. It is B<buggy and unmaintained>.  I<Please>
-use L<Spreadsheet::ParseXLSX|http://metacpan.org/release/Spreadsheet-ParseXLSX>
+use L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>
 instead.
 
 =item Spreadsheet::ReadSXC
 
-L<Spreadsheet::ReadSXC|http://metacpan.org/release/Spreadsheet-ReadSXC> is a
+L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC> is a
 parser for OpenOffice/LibreOffice (.sxc and .ods) spreadsheet files.
 
 =item Spreadsheet::BasicRead
 
-See L<Spreadsheet::BasicRead|http://metacpan.org/release/Spreadsheet-BasicRead>
+See L<Spreadsheet::BasicRead|https://metacpan.org/release/Spreadsheet-BasicRead>
 for xlscat-like functionality (Excel only)
 
 =item Spreadsheet::ConvertAA
 
-See L<Spreadsheet::ConvertAA|http://metacpan.org/release/Spreadsheet-ConvertAA>
+See L<Spreadsheet::ConvertAA|https://metacpan.org/release/Spreadsheet-ConvertAA>
 for an alternative set of L</cell2cr>/L</cr2cell> pair.
 
 =item Spreadsheet::Perl
 
-L<Spreadsheet::Perl|http://metacpan.org/release/Spreadsheet-Perl> offers a Pure
+L<Spreadsheet::Perl|https://metacpan.org/release/Spreadsheet-Perl> offers a Pure
 Perl implementation of a spreadsheet engine.  Users that want this format to be
 supported in Spreadsheet::Read are hereby motivated to offer patches. It is
 not high on my TODO-list.
 
 =item Spreadsheet::CSV
 
-L<Spreadsheet::CSV|http://metacpan.org/release/Spreadsheet-CSV> offers the
+L<Spreadsheet::CSV|https://metacpan.org/release/Spreadsheet-CSV> offers the
 interesting approach of seeing all supported spreadsheet formats as if it were
-CSV, mimicking the L<Text::CSV_XS|http://metacpan.org/release/Text-CSV_XS>
+CSV, mimicking the L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS>
 interface.
 
 =item xls2csv
 
-L<xls2csv|http://metacpan.org/release/xls2csv> offers an alternative for my
+L<xls2csv|https://metacpan.org/release/xls2csv> offers an alternative for my
 C<xlscat -c>, in the xls2csv tool, but this tool focuses on character encoding
 transparency, and requires some other modules.
 

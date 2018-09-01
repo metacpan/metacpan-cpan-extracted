@@ -62,7 +62,7 @@ sub read {
 
         while( my $r = <$filehandle> ) {
             # Read the UNIX mbox file from 'From ' to the next 'From '
-            last if( length $readbuffer && substr($r, 0, 5) eq 'From ' );
+            last if( $readbuffer && substr($r, 0, 5) eq 'From ' );
             $readbuffer .= $r;
         }
         $seekoffset += length $readbuffer;
@@ -102,7 +102,7 @@ C<new()> is a constructor of Sisimai::Mail::Mbox
 
 =head1 INSTANCE METHODS
 
-=head2 C<B<base()>>
+=head2 C<B<dir()>>
 
 C<dir()> returns the directory name of mbox
 

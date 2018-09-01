@@ -13,8 +13,9 @@ use XML::LibXML;
 use Scalar::Util qw/blessed weaken/;
 use List::Util qw/first/;
 
-use Bio::CIPRES::Output;
 use Bio::CIPRES::Error;
+use Bio::CIPRES::Message;
+use Bio::CIPRES::Output;
 
 
 sub new {
@@ -54,6 +55,7 @@ sub is_finished   { return $_[0]->{is_finished} }
 sub is_failed     { return $_[0]->{is_failed}   }
 sub poll_interval { return $_[0]->{poll_secs}   }
 sub submit_time   { return $_[0]->{submit_time} }
+sub messages      { return $_[0]->{messages}    }
 
 sub stage {
 
@@ -71,15 +73,10 @@ sub stage {
     # progress of a job."
     #
     # so we follow their advice.
+    #
+    # Here, we just return the stage text of the last message received
 
-    map {$_->{timestamp} =~ s/(\d\d)\:(\d\d)$/$1$2/}
-        @{ $self->{messages} };
-
-    my @sorted = sort {
-        $a->{timestamp} <=> $b->{timestamp}
-    } @{ $self->{messages} };
-
-    return $sorted[-1]->{stage};
+    return $self->{messages}->[-1]->stage;
 
 }
 
@@ -88,6 +85,9 @@ sub refresh {
     my ($self) = @_;
 
     my $xml = $self->_get( $self->{url_status} );
+    say "\n", '=' . 80, "\n";
+    say $xml;
+    say "\n", '=' . 80, "\n";
     my $dom = XML::LibXML->load_xml( string => $xml );
     $self->_parse_status($dom);
 
@@ -214,21 +214,12 @@ sub _parse_status {
     $s->{submit_time} = $submit_time;
 
     # parse messages
-    for my $msg ($dom->findnodes('messages/message')) {
-        my $t = $msg->findvalue('timestamp');
-        $t =~ s/(\d\d):(\d\d)$/$1$2/;
-        my $ref = {
-            timestamp => Time::Piece->strptime($t, "%Y-%m-%dT%H:%M:%S%z"),
-            stage     => $msg->findvalue('stage'),
-            text      => $msg->findvalue('text'),
-        };
-
-        # check for missing values
-        map {length $ref->{$_} || croak "Missing value for $_\n"} keys %$ref;
-
-        push @{ $s->{messages} }, $ref;
-
+    my @messages;
+    for my $msg_node ($dom->findnodes('messages/message')) {
+        push @messages,
+            Bio::CIPRES::Message->new($msg_node);
     }
+    $s->{messages} = [sort {$a <=> $b} @messages];
 
     # parse metadata
     for my $meta ($dom->findnodes('metadata/entry')) {
@@ -382,6 +373,10 @@ Returns the STDERR from the job as a string.
 
 Returns the original submission date/time as a Time::Piece object
 
+=item B<messages>
+
+Returns a reference to an array of C<Bio::CIPRES::Message> objects associated
+with the job
 
 =item B<delete>
 

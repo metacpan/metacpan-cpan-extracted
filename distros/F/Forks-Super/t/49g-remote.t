@@ -62,7 +62,7 @@ SKIP: {
     my $pid = fork {
         cmd => [ $^X, $xcmd, "-e=Hello", "-w=World", "-x=4" ],
         remote => $full_remote,
-        child_fh => "out,err",
+        child_fh => "in,out,err",
     };
     ok($pid, "fork with rhost $pid->{remote}{host}");
     ok($pid == waitpid($pid,0), 'waitpid on remote cmd');
@@ -142,16 +142,22 @@ SKIP: {
     ok($pid->is_active, "remote cmd is active after 8s")
         or diag "state is ",$pid->{state};
     Forks::Super::kill('INT', $pid);
-    ok($pid == waitpid($pid,0,5), "remote cmd reaped");
-    ok(!$pid->is_active, "remote cmd terminated (state $pid->{state})");
-    @out = $pid->read_stdout;
-    diag "Output is @out";
-
-    # if you get intermediate output, @out should contain "One"
-    # and "Two" but not "Three". If you don't get intermediate output,
-    # then you don't get any output.
-    ok(@out==0 || ("@out" =~ /One/ && "@out" =~ /Two/),
-       'correct intermediate output received from remote cmd');
+  SKIP: {
+      if ($^O eq 'cygwin') {
+          skip "intermediate output not available on cygwin", 3;
+      }
+      ok($pid == waitpid($pid,0,5), "remote cmd reaped");
+      ok(!$pid->is_active, 
+         "remote cmd terminated (state $pid->{state})");
+      @out = $pid->read_stdout;
+      diag "Output is @out";
+      
+      # if you get intermediate output, @out should contain "One"
+      # and "Two" but not "Three". If you don't get intermediate output,
+      # then you don't get any output.
+      ok(@out==0 || ("@out" =~ /One/ && "@out" =~ /Two/),
+         'correct intermediate output received from remote cmd');
+    }
     ok("@out" !~ /Three/, 'incomplete output recevied from remote cmd');
     @err = $pid->read_stderr;
     diag "Error is @err";

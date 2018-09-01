@@ -17,8 +17,11 @@ t/cv.t
 t/dist.t
 t/gv.t
 t/kwalitee.t
+t/link.t
 t/manifest.t
 t/metrics.t
+t/no404.t
+t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t

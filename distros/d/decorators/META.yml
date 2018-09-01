@@ -1,0 +1,28 @@
+---
+abstract: 'Apply decorators to your methods'
+author:
+  - 'Stevan Little <stevan@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: decorators
+requires:
+  Carp: '0'
+  List::Util: '0'
+  MOP: '0.14'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  UNIVERSAL::Object: '0.14'
+  perl: v5.14.4
+resources:
+  bugtracker: https://github.com/stevan/p5-decorators/issues
+  repository: https://github.com/stevan/p5-decorators.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

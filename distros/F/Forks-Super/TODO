@@ -128,11 +128,11 @@ Possible TODOs:
         (__config_fh_child_stdin_file, $job->{fh_config}{f_in},
 	sub/natural-style)
 
-    ___ use shared memory between processes, where supported
-        ___ synchronization based on shared memory
+    _x_ use shared memory between processes, where supported
+        _x_ synchronization based on shared memory
 	___ process pools based on shared memory
-        ___ IPC by shared memory
-        ___ job queue on shared memory
+        _X_ IPC by shared memory
+        _o_ job queue on shared memory [see Forks::Queue]
 
     ___ encryption and other layers on IO channels
 
@@ -182,8 +182,16 @@ Possible TODOs:
 
     ___ pmap or pgrep with chunking, more like mce_grep
 
-    ___ is "share" the right framework to return data from a background job?
+    _X_ is "share" the right framework to return data from a background job?
+        Yeah, it's pretty good.
 
-    ___ job groups, where we can call wait or kill all of the jobs
+    _o_ job groups, where we can call wait or kill all of the jobs
         in the group.
+        Can use {name} for this, right?
 
+    ___ install Forks::Super::pause as CORE::GLOBAL::sleep on Windows?
+
+    ___ a user SIGCHLD handler could run after the Forks::Super handler
+        and use overridden wait, waitpid calls, right?
+
+    ___ Test <$pid> in list context, $] >= 5.018

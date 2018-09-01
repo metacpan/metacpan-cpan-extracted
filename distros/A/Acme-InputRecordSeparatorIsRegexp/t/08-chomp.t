@@ -17,13 +17,13 @@ for (1..20) {
 	$yy .= "\r\n";
     }
 }
-open my $xx, '>', 't/test08.txt';
+open my $xx, '>:raw', 't/test08.txt';
 print $xx $yy;
 close $xx;
 
 my $fh;
 ok(!defined($fh), "\$fh undefined before open call");
-my $z = open($fh, "<:irs(\r\n|\r|\n)", "t/test08.txt");
+my $z = open($fh, '<:raw:irs(\r\n|\r|\n)', "t/test08.txt");
 ok(defined($fh), "\$fh updated in open call");
 ok($z, 'Acme::InputRecordSeparatorIsRegexp::open ok');
 ok(tied(*$fh), 'return tied handle');

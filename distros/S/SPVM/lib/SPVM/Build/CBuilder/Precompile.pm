@@ -25,27 +25,17 @@ sub new {
   return $self;
 }
 
-sub get_sub_names {
-  my ($self, $package_name) = @_;
-  
-  my $sub_names = $self->info->get_precompile_sub_names($package_name);
-  
-  return $sub_names;
-}
-
 sub create_csource {
-  my ($self, %opt) = @_;
+  my ($self, $package_name, $sub_names, $opt) = @_;
   
-  my $package_name = $opt{package_name};
-  
-  my $input_dir = $opt{input_dir};
+  my $input_dir = $opt->{input_dir};
 
-  my $work_dir = $opt{work_dir};
+  my $work_dir = $opt->{work_dir};
   mkpath $work_dir;
   
-  my $output_dir = $opt{output_dir};
+  my $output_dir = $opt->{output_dir};
   
-  my $is_cached_ref = $opt{is_cached};
+  my $is_cached_ref = $opt->{is_cached};
   
   my $package_path = SPVM::Build::Util::convert_package_name_to_path($package_name, $self->category);
   my $work_src_dir = "$work_dir/$package_path";
@@ -68,7 +58,7 @@ sub create_csource {
   }
   
   # Create c source file
-  my $package_csource = $self->build_package_csource($package_name);
+  my $package_csource = $self->build_package_csource($package_name, $sub_names);
   open my $fh, '>', $source_file
     or die "Can't create $source_file";
   print $fh $package_csource;
@@ -82,8 +72,8 @@ sub create_csource {
   }
 }
 
-sub create_shared_lib_dist {
-  my ($self, $package_name) = @_;
+sub build_shared_lib_dist {
+  my ($self, $package_name, $sub_names) = @_;
   
   my $input_dir = 'lib';
 
@@ -93,7 +83,6 @@ sub create_shared_lib_dist {
   my $output_dir = 'blib/lib';
   
   my $category = $self->category;
-  my $sub_names = $self->get_sub_names($package_name);
   
   my $module_base_name = $package_name;
   $module_base_name =~ s/^.+:://;
@@ -101,25 +90,30 @@ sub create_shared_lib_dist {
 
   my $is_cached;
   $self->create_csource(
-    package_name => $package_name,
-    input_dir => $input_dir,
-    work_dir => $work_dir,
-    output_dir => $work_dir,
-    is_cached => \$is_cached,
+    $package_name,
+    $sub_names,
+    {
+      input_dir => $input_dir,
+      work_dir => $work_dir,
+      output_dir => $work_dir,
+      is_cached => \$is_cached,
+    }
   );
   
-  $self->create_shared_lib(
-    package_name => $package_name,
-    input_dir => $work_dir,
-    work_dir => $work_dir,
-    output_dir => $output_dir,
-    sub_names => $sub_names,
-    is_cached => $is_cached,
+  $self->build_shared_lib(
+    $package_name,
+    $sub_names,
+    {
+      input_dir => $work_dir,
+      work_dir => $work_dir,
+      output_dir => $output_dir,
+      is_cached => $is_cached,
+    }
   );
 }
 
-sub create_shared_lib_runtime {
-  my ($self, $package_name) = @_;
+sub build_shared_lib_runtime {
+  my ($self, $package_name, $sub_names) = @_;
 
   # Output directory
   my $build_dir = $self->{build_dir};
@@ -134,25 +128,28 @@ sub create_shared_lib_runtime {
   my $output_dir = "$build_dir/lib";
   mkpath $output_dir;
   
-  my $sub_names = $self->get_sub_names($package_name);
-  
   my $is_cached;
   $self->create_csource(
-    package_name => $package_name,
-    input_dir => $input_dir,
-    work_dir => $work_dir,
-    output_dir => $work_dir,
-    is_cached => \$is_cached,
+    $package_name,
+    $sub_names,
+    {
+      input_dir => $input_dir,
+      work_dir => $work_dir,
+      output_dir => $work_dir,
+      is_cached => \$is_cached,
+    }
   );
   
-  $self->create_shared_lib(
-    package_name => $package_name,
-    input_dir => $work_dir,
-    work_dir => $work_dir,
-    output_dir => $output_dir,
-    quiet => 1,
-    sub_names => $sub_names,
-    is_cached => $is_cached,
+  $self->build_shared_lib(
+    $package_name,
+    $sub_names,
+    {
+      input_dir => $work_dir,
+      work_dir => $work_dir,
+      output_dir => $output_dir,
+      quiet => 1,
+      is_cached => $is_cached,
+    }
   );
 }
 

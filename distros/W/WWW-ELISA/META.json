@@ -1,0 +1,71 @@
+{
+   "abstract" : "a module for working the the REST API ELi:SA (https://elisa.hbz-nrw.de/)",
+   "author" : [
+      "Vitali Peil <vitali.peil@uni-bielefeld.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-ELISA",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "HTTP::Request" : "0",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vpeil/perl-www-elisa/issues"
+      },
+      "homepage" : "https://github.com/vpeil/perl-www-elisa",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vpeil/perl-www-elisa.git",
+         "web" : "https://github.com/vpeil/perl-www-elisa"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_static_install" : 1
+}
+

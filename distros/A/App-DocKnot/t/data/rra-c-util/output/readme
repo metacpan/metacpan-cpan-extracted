@@ -37,6 +37,8 @@ DESCRIPTION
   other packages.  You can think of it as my version of Gnulib [1], with
   everything released under a permissive license (no GPL).
 
+  [1] https://www.gnu.org/software/gnulib/
+
   As well as C portability frameworks, Autoconf macros, and a general C
   utility library, this package has also accumulated a considerable
   collection of standard tests (for C and Perl packages) and a large
@@ -49,7 +51,6 @@ DESCRIPTION
   tests/tap/macros.h, or tests/tap/libtap.sh.  Those files should be
   pulled from C TAP Harness [2] instead.
 
-  [1] https://www.gnu.org/software/gnulib/
   [2] https://www.eyrie.org/~eagle/software/c-tap-harness/
 
 REQUIREMENTS

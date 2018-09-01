@@ -14,7 +14,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -718,6 +718,13 @@ return type.  As of this writing only native types and strings are
 supported as closure argument types and only native types are supported 
 as closure return types.  Here is an example, with C code:
 
+[ version 0.54 ]
+
+EXPERIMENTAL: As of version 0.54, the record type (see L<FFI::Platypus::Record>)
+is also experimentally supported as a closure argument type.  One
+caveat is that  the record member type string_rw is NOT supported
+and probably never will be.
+
  /*
   * closure.c - on Linux compile with: gcc closure.c -shared -o closure.so -fPIC
   */
@@ -1020,7 +1027,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

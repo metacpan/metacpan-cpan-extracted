@@ -1,0 +1,23 @@
+#!/bin/bash
+
+header() {
+	echo
+	echo "###############################################"
+	echo
+	echo $*
+	echo
+}
+
+#!/bin/bash
+
+set -e
+
+pushd ${REPO_ROOT}
+perl Build.PL
+
+header "Running tests..."
+./Build test
+header "Testing POD coverage..."
+./Build testpodcoverage
+header "Examining test coverage..."
+./Build testcover

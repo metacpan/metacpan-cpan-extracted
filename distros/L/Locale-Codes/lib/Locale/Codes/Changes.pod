@@ -24,7 +24,19 @@ codes, I will add them to the module and release a new version.
 
 =head1 VERSION 3.59  (planned 2018-12-01  sbeck)
 
-=head1 VERSION 3.58  (planned 2018-09-01  sbeck)
+=head1 VERSION 3.58  (2018-09-01  sbeck)
+
+=over 4
+
+=item B<(*) Locale-Codes removed from core>
+
+Locale-Codes will no longer be distributed in new versions of perl.
+
+=item Documentation fix
+
+Fixed an incorrect link reported by Mohammad S Anwar on GitHub (#9)
+
+=back
 
 =head1 VERSION 3.57  (2018-06-01  sbeck)
 

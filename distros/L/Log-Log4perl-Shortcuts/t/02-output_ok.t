@@ -2,7 +2,6 @@
 use Test::More;
 use Test::Warn;
 use Test::Output;
-use Test::NoWarnings;
 use Test::Exception;
 use File::HomeDir;
 diag( "Running my tests" );
@@ -14,7 +13,8 @@ diag( "Running my tests" );
 
 
 
-my $tests = 9; # keep on line 17 for ,i (increment and ,d (decrement)
+
+my $tests = 8; # keep on line 17 for ,i (increment and ,d (decrement)
 plan tests => $tests;
 
 
@@ -27,43 +27,35 @@ combined_like (\&error, qr/\[ERROR] I am an error message./s, 'Prints error mess
 combined_like (\&stack, qr/\[TRACE].*Logger/s, 'Prints stack trace message');
 
 sub trace {
-  my $obj = Logger->new( );
-  $obj->trace;
+  &Logger::trace;
 }
 
 sub stack {
-  my $obj = Logger->new( );
-  $obj->stack;
+  &Logger::stack;
 }
 
 sub info {
-  my $obj = Logger->new( );
-  $obj->info;
+  &Logger::info;
 }
 
 sub warn {
-  my $obj = Logger->new( );
-  $obj->warn;
+  &Logger::warn;
 }
 
 sub debug {
-  my $obj = Logger->new( );
-  $obj->debug;
+  &Logger::debug;
 }
 
 sub fatal {
-  my $obj = Logger->new( );
-  dies_ok { $obj->fatal } 'fatal kills ok';
+  dies_ok { &Logger::fatal } 'fatal kills ok';
 }
 
 sub error {
-  my $obj = Logger->new( );
-  $obj->error;
+  &Logger::error;
 }
 
 package Logger;
 use Log::Log4perl::Shortcuts qw(:all);
-use Moose;
 
 sub trace {
   logt('I am a trace message.');
@@ -92,4 +84,3 @@ sub fatal {
 sub error {
   loge('I am an error message.');
 }
-

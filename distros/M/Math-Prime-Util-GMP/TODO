@@ -78,7 +78,7 @@
   Using sieve_range doesn't help, as the issue is the massive return array.
 
 - More efficient version of ramanujan_tau?  MPU has an hclassno implementation
-  now.
+  now.  FLINT does an interesting method as well.
 
 - Consider ranged ramanujan_tau.  See:
   https://cs.uwaterloo.ca/journals/JIS/VOL13/Lygeros/lygeros5.pdf
@@ -135,8 +135,19 @@
 
 - lambertw should use increasing precision.
 
-- prime_count_lower, prime_count_upper
+- Euler using:
+   = binary splitting
+   = B3 from Brent/McMillan (1980)
+   = FLINT's B3 (b6ebd880cea55e6e6cf99d6c454607a5872b2c96)
 
-- Euler using binary splitting.
+- Functions used in MPU that were MPFR.
+    = (++) Pi is about 2x faster than MPFR
+    = (--) li(10^17) is 2x slower than MPFR
+    = (--) ei(0.5) is much slower than MPFR (20x and worse exponent)
+    = (--) Euler is much slower than MPFR (10x and worse exponent)
+    = (--) zeta is much slower than MPFR (10x and worse exponent)
+    =      harmreal, riemannr, prime_count_lower, prime_count_upper
 
-- Euler with 5.2.1 from http://www.mpfr.org/algorithms.pdf.
+- tinyqs needs a destroy to clear all the init vars
+
+- maybe export rising_factorial and falling_factorial.

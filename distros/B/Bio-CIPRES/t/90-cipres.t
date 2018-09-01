@@ -58,12 +58,26 @@ SKIP: {
 SKIP: {
 
     # Skip the rest if no user credentials found
-    skip "No valid credentials available", 21 if (! -r "$ENV{HOME}/.cipres");
+    skip "No valid credentials available", 21
+        if ( ! -r "$ENV{HOME}/.cipres"
+        && (! defined $ENV{CIPRES_USER} || ! defined $ENV{CIPRES_PASS}) );
+
+    # additional tests for Bio::CIPRES::Error
+    eval { Bio::CIPRES::Error->new() };
+    ok($@ =~ /Undefined XML string in constructor/, "new Error missing XML" );
+    eval { Bio::CIPRES::Error->new('foo') };
+    ok($@ =~ /Start tag expected/, "new Error invalid XML" );
 
     # Good (testing) credentials
-    my $ua = Bio::CIPRES->new(
-        conf => "$ENV{HOME}/.cipres",
-    );
+    my $ua = -r "$ENV{HOME}/.cipres"
+      ? Bio::CIPRES->new(
+            conf => "$ENV{HOME}/.cipres",
+        )
+      : Bio::CIPRES->new(
+            user => $ENV{CIPRES_USER},
+            pass => $ENV{CIPRES_PASS},
+        );
+    isa_ok( $ua, 'Bio::CIPRES' );
 
     # try to fetch non-existant job
     eval { $ua->get_job('foobar') };
@@ -84,6 +98,7 @@ SKIP: {
     ok( $@, "submit_job() threw expected exception" );
     isa_ok( $@, 'Bio::CIPRES::Error' );
     cmp_ok( $@,  '==', ERR_FORM_VALIDATION, "exception == ERR_FORM_VALIDATION");
+    ok( "$@" =~ /Error in param/, "exception stringification worked");
 
     # submit good job
     my $job = $ua->submit_job(
@@ -111,15 +126,30 @@ SKIP: {
 
     ok(! $job->is_failed, "job not failed" );
 
+    # test Bio::CIPRES::Message
+    my $msg = $job->messages()->[-1];
+    is( $msg->stage, 'COMPLETED' , "message returned expected state" );
+    ok( length $msg->text, "message returned a text summary" );
+    isa_ok( $msg->timestamp, 'Time::Piece' );
+    ok( "$msg" =~ /^Output/, "message stringification works" );
+
     my ($result) = $job->outputs(name => 'infile.aln', group => 'aligfile');
     isa_ok( $result, 'Bio::CIPRES::Output' );
     cmp_ok( $result->size, '==', 114, "output correct size" );
+    ok( $result->url =~ /^http/, "output has download URL" );
 
+    # test output download to scalar
     my $contents = $result->download;
-    open my $foo, '>', 'foobarbaz';
-    print {$foo} $contents;
-    close $foo;
     like( $contents, qr/^test_seq_2\s+AAAT/mi, "returned expected job output" );
+
+    # test handling of output paths
+    eval {my $res = $result->download(out => '/this/path/should/not/exist') };
+    ok( $@ =~ /^Unspecified error/, "Error on non-writable path" );
+    open my $touch, '>', 'foo';
+    eval {$result->download(out => 'foo') };
+    ok( $@ =~ /^Output file exists/, "Error on existing file" );
+    ok( $result->download(out => 'foo', overwrite => 1), "Overwrite");
+    unlink 'foo';
 
     my $stdout = $job->stdout;
     my $stderr = $job->stderr;

@@ -4,8 +4,9 @@ use strict;
 use File::Spec;
 use Carp;
 use File::Versions 'make_backup';
-use File::Slurper 'read_text';
-use C::Tokenize '$comment_re';
+use File::Slurper qw/read_text write_text/;
+use C::Tokenize qw/$comment_re $include $reserved_re/;
+use Text::LineNumber;
 
 require Exporter;
 
@@ -36,7 +37,7 @@ our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK,
 );
 
-our $VERSION = '0.009';
+our $VERSION = '0.012';
 
 sub convert_to_c_string
 {
@@ -110,23 +111,11 @@ sub c_to_h_name
     return $h_file_name;
 }
 
-# This list of reserved words in C is from
-# http://crasseux.com/books/ctutorial/Reserved-words-in-C.html
-
-my @reserved_words = sort {length $b <=> length $a} qw/auto if break
-int case long char register continue return default short do sizeof
-double static else struct entry switch extern typedef float union for
-unsigned goto while enum void const signed volatile/;
-
-# A regular expression to match reserved words in C.
-
-my $reserved_words_re = join '|', @reserved_words;
-
 sub valid_c_variable
 {
     my ($variable_name) = @_;
     if ($variable_name !~ /^[A-Za-z_][A-Za-z_0-9]+$/ ||
-	$variable_name =~ /^(?:$reserved_words_re)$/) {
+	$variable_name =~ /^(?:$reserved_re)$/) {
 	return;
     }
     return 1;
@@ -263,20 +252,52 @@ sub remove_quotes
     $string =~ s/^"|"$|"\s*"//g;
     return $string;
 }
+#use Data::Dumper;
+sub linedirective
+{
+    my ($intext, $file, $directive) = @_;
+    die unless $intext && $file && $directive;
+    my %renumbered;
+    # Uniquifier for the lines.
+    my $count = 0;
+    # This is unlikely to occur.
+    my $tag = 'ABRACADABRA';
+    # Watch for blue-moon occurences
+    die if $intext =~ /$tag\d+/;
+    while ($intext =~ s/^\Q$directive/$tag$count$tag/sm) {
+	$count++;
+    }
+    # Make the line numbering only after the above substitution, or we
+    # get problems due to changed offsets after the substitution
+    # above.
+    my $tln = Text::LineNumber->new ($intext);
+    # "pos" doesn't work well with s///g, so now we need to match the tags
+    # one by one.
+    while ($intext =~ /($tag\d+$tag)/g) {
+	my $key = $1;
+	my $pos = pos ($intext);
+	my $line = $tln->off2lnr ($pos);
+#	print "Position $pos in $file = line $line.\n";
+
+	# The actual line the line directive sends us to is one after
+	# the value the line contains, e.g. on the first line we
+	# should have "#line 2", so we need to add one to the value.
+
+	$renumbered{$key} = $line + 1;
+    }
+#    print Dumper (\%renumbered);
+    $intext =~ s/($tag\d+$tag)/#line $renumbered{$1} "$file"/g;
+    # Check for failures. We already checked this doesn't occur
+    # naturally in the file above.
+    die if $intext =~ /$tag\d+$tag/;
+    return $intext;
+}
 
 sub linein
 {
     my ($infile) = @_;
-    my $intext = '';
-    open my $in, "<:encoding(utf8)", $infile or die "Can't open $infile: $!";
-    while (<$in>) {
-	if (/#linein/) {
-	    my $line = $. + 1;
-	    s/#linein/#line $line "$infile"/;
-	}
-	$intext .= $_;
-    }
-    close $in or die $!;
+    my $intext = read_text ($infile);
+    $intext = linedirective ($intext, $infile, '#linein');
     return $intext;
 }
 
@@ -284,18 +305,8 @@ sub lineout
 {
     my ($outtext, $outfile) = @_;
 
-    my @outlines = split /\n/, $outtext;
-    open my $out, ">:encoding(utf8)", $outfile or die $!;
-    for (my $i = 0; $i <= $#outlines; $i++) {
-	if ($outlines[$i] =~ /#lineout/) {
-	    my $line = $i + 1;
-	    print $out "#line $line \"$outfile\"\n";
-	}
-	else {
-	    print $out $outlines[$i], "\n";
-	}
-    }
-    close $out or die $!;
+    $outtext = linedirective ($outtext, $outfile, "#lineout");
+    write_text ($outfile, $outtext);
 }
 
 sub stamp_file
@@ -317,9 +328,11 @@ sub read_includes
 {
     my ($file) = @_;
     my $text = read_text ($file);
+    # Remove all the comments from the file so that things like
+    # /*#include "something.h"*/ don't create false positives.
     $text =~ s/$comment_re//g;
     my @hfiles;
-    while ($text =~ /#include\s*"(.*?)"/g) {
+    while ($text =~ /$include/g) {
 	push @hfiles, $1;
     }
     return \@hfiles;

@@ -5,7 +5,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.15';
+$VERSION = '0.170.0';
 
 my %mocked;
 sub new {
@@ -157,8 +157,10 @@ sub _valid_subname {
 
 sub _replace_sub {
 	my ($sub_name, $coderef) = @_;
-	# from Test::MockObject
-	local $SIG{__WARN__} = sub { warn $_[0] unless $_[0] =~ /redefined/ };
+
+    no warnings 'redefine';
+    no warnings 'prototype';
+
 	if (defined $coderef) {
 		*{$sub_name} = $coderef;
 	} else {
@@ -300,7 +302,7 @@ instance).
 B<MOCKING + EXPORT>
 
 If you are trying to mock a subroutine exported from another module, this may
-not behave as you initialy would expect, since Test::MockModule is only mocking
+not behave as you initially would expect, since Test::MockModule is only mocking
 at the target module, not anything importing that module. If you mock the local
 package, or use a fully qualified function name, you will get the behavior you
 desire:
@@ -338,11 +340,11 @@ you can instead mock it in the module you are testing:
 	my $posix = Test::MockModule->new("POSIX");
 	$posix->mock("strftime", "Yesterday");
 
-	is MyModule::minus_twentyfour(), "Yesterday", "`minus-tewntyfour` got mocked"; # fails
+	is MyModule::minus_twentyfour(), "Yesterday", "`minus-twentyfour` got mocked"; # fails
 
 	my $mymodule = Test::MockModule->new("MyModule", no_auto => 1);
 	$mymodule->mock("strftime", "Yesterday");
-	is MyModule::minus_twentyfour(), "Yesterday", "`minus-tewntyfour` got mocked"; # succeeds
+	is MyModule::minus_twentyfour(), "Yesterday", "`minus-twentyfour` got mocked"; # succeeds
 
 =item redefine($subroutine)
 
@@ -357,6 +359,42 @@ and will not die if it's available in the chain.
 =item original($subroutine)
 
 Returns the original (unmocked) subroutine
+
+Here is a sample how to wrap a function with custom arguments using the original subroutine.
+This is useful when you cannot (do not) want to alter the original code to abstract
+one hardcoded argument pass to a function.
+
+	package MyModule;
+
+	sub sample {
+		return get_path_for("/a/b/c/d");
+	}
+
+	sub get_path_for {
+		... # anything goes there...
+	}
+
+	package main;
+	use Test::MockModule;
+
+	my $mock = Test::MockModule->new("MyModule");
+	# replace all calls to get_path_for using a different argument
+	$mock->redefine("get_path_for", sub {
+		return $mock->original("get_path_for")->("/my/custom/path");
+	});
+
+	# or
+
+	$mock->redefine("get_path_for", sub {
+		my $path = shift;
+		if ( $path && $path eq "/a/b/c/d" ) {
+			# only alter calls with path set to "/a/b/c/d"
+			return $mock->original("get_path_for")->("/my/custom/path");
+		} else { # preserve the original arguments
+			return $mock->original("get_path_for")->(@_);
+		}
+	});
+
 
 =item unmock($subroutine [, ...])
 
@@ -376,6 +414,19 @@ for mocking methods you want to ignore!
 
     # Neuter a list of methods in one go
     $module->noop('purge', 'updated');
+
+
+=back
+
+=over 4
+
+=item TRACE
+
+A stub for Log::Trace
+
+=item DUMP
+
+A stub for Log::Trace
 
 =back
 

@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild::Repository::HTTP;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Carp;
 
@@ -161,7 +161,12 @@ sub check_http_response {
   }
   else {
     if ( !$res->{success} ) {
-      return ( 1, $res->{reason}, $res->{headers}, $res->{url} );
+      my $reason = $res->{status} == 599 ? $res->{content} : "@{[ $res->{status} ]} @{[ $res->{reason} ]}";
+      if($res->{status} == 599 && $reason =~ /https support/)
+      {
+        $reason .= "See https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues/6#issuecomment-417097485";
+      }
+      return ( 1, $reason, $res->{headers}, $res->{url} );
     }
     return ( 0, $res->{content}, $res->{headers}, $res->{url} );
   }

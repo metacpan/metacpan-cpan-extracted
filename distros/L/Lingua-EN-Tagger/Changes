@@ -1,5 +1,8 @@
 Revision history for Perl extension Lingua::EN::Tagger
 
+0.30            Aaron Coburn            8/27/18
+        Re-release without PaxHeader garbage in tar distribution.
+
 0.29            Aaron Coburn            5/18/18
         Add an add_tags_incrementally method for a more
         stream-based parsing mechanism. Updated email address.

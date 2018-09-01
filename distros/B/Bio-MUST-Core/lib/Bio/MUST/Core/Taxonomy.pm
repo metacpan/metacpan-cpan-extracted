@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.181310';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.182420';
 use Moose;
 use namespace::autoclean;
 
@@ -748,7 +748,7 @@ sub _common_taxonomy {                      ## no critic (RequireArgUnpacking)
         my $taxon_n = $count_for{$taxon};
         last TAXON if $taxon_n / $n < $threshold;
         push @common_lineage, $taxon;
-        @lineages = grep { $_->[$i] eq $taxon } @lineages;
+        @lineages = grep { ( $_->[$i] // q{} ) eq $taxon } @lineages;
     }
 
     # examine context for returning plain array or ArrayRef
@@ -1639,7 +1639,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 SYNOPSIS
 

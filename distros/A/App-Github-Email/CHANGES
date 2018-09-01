@@ -1,10 +1,58 @@
 ==================================================
-Changes from 2017-01-20 00:00:00 +0000 to present.
+Changes from 2017-08-31 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.2.1 at 2018-01-20 12:55:09 +0000
+version 0.3.3 at 2018-08-31 03:48:25 +0000
 ------------------------------------------
+
+  Change: eb22ab0c065b0bf1f426c9ae7edd0c61f0f40658
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 11:47:42 +0000
+
+    change to v0.3.3 
+
+  Change: 69eec28e13ca6a18ef0ef6cb3659940c70396633
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 11:46:31 +0000
+
+    replaced say with print 
+
+  Change: dd18621ef8c15c47fc0031adc2cf4fcf6854a7c1
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 00:12:20 +0000
+
+    fixed missing binary program bug 
+
+  Change: 89954c04037243a8048103394690c1dd67af5c8f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 00:07:52 +0000
+
+    emphasize bin/ for exes 
+
+  Change: ace882d064984edc7f6e6f8cccb7b52ffa9b1b70
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 00:05:30 +0000
+
+    organize tests and use only MakeMaker plugin 
+
+  Change: 8c26c307a883adb4f985fa7be30db2d0a0225dc9
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-23 22:38:11 +0000
+
+    Add test to use existing user. 
+
+  Change: 2c8b66bbde3091fd1c51bf2f82554155665d3e5a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-23 22:37:43 +0000
+
+    Use confess(Carp) instead of plain die. 
+
+  Change: b0c30976d6ae42d0a20096026a2b255c86ba1b2a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-20 22:24:51 +0000
+
+    Add pragma guard. 
 
   Change: f68972d8a3e42affb33f8d1cf45f3ceb8f5c3e11
   Author: faraco <skelic3@gmail.com>

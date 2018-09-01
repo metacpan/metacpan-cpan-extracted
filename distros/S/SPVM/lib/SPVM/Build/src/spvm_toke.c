@@ -22,6 +22,7 @@
 #include "spvm_type.h"
 #include "spvm_use.h"
 #include "spvm_basic_type.h"
+#include "spvm_my.h"
 
 SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -69,9 +70,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             
             assert(package_name);
             
-            SPVM_OP* found_op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));
+            SPVM_PACKAGE* found_package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
             
-            if (found_op_package) {
+            if (found_package) {
               continue;
             }
             else {
@@ -883,23 +884,28 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           SPVM_TYPE* constant_type;
           
           if (*compiler->bufptr == 'L')  {
-            constant_type = SPVM_TYPE_create_long_type(compiler);
+            SPVM_OP* op_constant_type = SPVM_OP_new_op_long_type(compiler, compiler->cur_file, compiler->cur_line);
+            constant_type = op_constant_type->uv.type;
             compiler->bufptr++;
           }
           else if (*compiler->bufptr == 'f')  {
-            constant_type = SPVM_TYPE_create_float_type(compiler);
+            SPVM_OP* op_constant_type = SPVM_OP_new_op_float_type(compiler, compiler->cur_file, compiler->cur_line);
+            constant_type = op_constant_type->uv.type;
             compiler->bufptr++;
           }
           else if (*compiler->bufptr == 'd')  {
-            constant_type = SPVM_TYPE_create_double_type(compiler);
+            SPVM_OP* op_constant_type = SPVM_OP_new_op_double_type(compiler, compiler->cur_file, compiler->cur_line);
+            constant_type = op_constant_type->uv.type;
             compiler->bufptr++;
           }
           else {
             if (is_floating_number) {
-              constant_type = SPVM_TYPE_create_double_type(compiler);
+              SPVM_OP* op_constant_type = SPVM_OP_new_op_double_type(compiler, compiler->cur_file, compiler->cur_line);
+              constant_type = op_constant_type->uv.type;
             }
             else {
-              constant_type = SPVM_TYPE_create_int_type(compiler);
+              SPVM_OP* op_constant_type = SPVM_OP_new_op_int_type(compiler, compiler->cur_file, compiler->cur_line);
+              constant_type = op_constant_type->uv.type;
             }
           }
           
@@ -1168,7 +1174,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               case 'm' :
                 if (strcmp(keyword, "my") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_MY);
+                  SPVM_MY* my = SPVM_MY_new(compiler);
+                  yylvalp->opval = SPVM_OP_new_op_my(compiler, my, compiler->cur_file, compiler->cur_line);
                   return MY;
                 }
                 break;

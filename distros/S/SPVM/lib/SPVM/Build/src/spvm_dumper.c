@@ -82,8 +82,8 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     else if (id == SPVM_OP_C_ID_VAR) {
       SPVM_VAR* var = op_cur->uv.var;
       printf(" \"%s\"", var->op_name->uv.name);
-      if (var->op_my) {
-        printf(" (my->var_id:%d) declaration : %d", var->op_my->uv.my->var_id, op_cur->uv.var->is_declaration);
+      if (var->my) {
+        printf(" (my->var_id:%d) declaration : %d", var->my->var_id, op_cur->uv.var->is_declaration);
       }
       else {
         printf(" (my->var_id:not yet resolved)");
@@ -92,7 +92,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     else if (id == SPVM_OP_C_ID_PACKAGE_VAR_ACCESS) {
       SPVM_PACKAGE_VAR_ACCESS* package_var_access = op_cur->uv.package_var_access;
       printf(" \"%s\"", package_var_access->op_name->uv.name);
-      printf(" (id :%d)", package_var_access->op_package_var->uv.package_var->id);
+      printf(" (id :%d)", package_var_access->package_var->id);
     }
     else if (id == SPVM_OP_C_ID_NAME) {
       printf(" \"%s\"", op_cur->uv.name);
@@ -178,14 +178,12 @@ void SPVM_DUMPER_dump_constants(SPVM_COMPILER* compiler, SPVM_LIST* op_constants
   }
 }
 
-void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_LIST* op_packages) {
+void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_LIST* packages) {
   {
     int32_t i;
-    for (i = 0; i < op_packages->length; i++) {
+    for (i = 0; i < packages->length; i++) {
       printf("package[%" PRId32 "]\n", i);
-      SPVM_OP* op_package = SPVM_LIST_fetch(op_packages, i);
-      SPVM_PACKAGE* package = op_package->uv.package;
-      
+      SPVM_PACKAGE* package = SPVM_LIST_fetch(packages, i);
       
       if (package->op_name) {
         printf("  name => \"%s\"\n", package->op_name->uv.name);
@@ -201,21 +199,19 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_LIST* op_packages) 
       
       // Field information
       printf("  fields\n");
-      SPVM_LIST* op_fields = package->op_fields;
+      SPVM_LIST* fields = package->fields;
       {
         int32_t j;
-        for (j = 0; j < op_fields->length; j++) {
-          SPVM_OP* op_field = SPVM_LIST_fetch(op_fields, j);
-          SPVM_FIELD* field = op_field->uv.field;
+        for (j = 0; j < fields->length; j++) {
+          SPVM_FIELD* field = SPVM_LIST_fetch(fields, j);
           printf("    field%" PRId32 "\n", j);
           SPVM_DUMPER_dump_field(compiler, field);
         }
       }
       {
         int32_t j;
-        for (j = 0; j < package->op_subs->length; j++) {
-          SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, j);
-          SPVM_SUB* sub = op_sub->uv.sub;
+        for (j = 0; j < package->subs->length; j++) {
+          SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, j);
           printf("  sub[%" PRId32 "]\n", j);
           SPVM_DUMPER_dump_sub(compiler, sub);
         }
@@ -224,13 +220,12 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_LIST* op_packages) 
   }
 }
 
-void SPVM_DUMPER_dump_packages_opcode_array(SPVM_COMPILER* compiler, SPVM_LIST* op_packages) {
+void SPVM_DUMPER_dump_packages_opcode_array(SPVM_COMPILER* compiler, SPVM_LIST* packages) {
   {
     int32_t i;
-    for (i = 0; i < op_packages->length; i++) {
+    for (i = 0; i < packages->length; i++) {
       printf("package[%" PRId32 "]\n", i);
-      SPVM_OP* op_package = SPVM_LIST_fetch(op_packages, i);
-      SPVM_PACKAGE* package = op_package->uv.package;
+      SPVM_PACKAGE* package = SPVM_LIST_fetch(packages, i);
       
       if (package->op_name) {
         printf("  name => \"%s\"\n", package->op_name->uv.name);
@@ -245,9 +240,8 @@ void SPVM_DUMPER_dump_packages_opcode_array(SPVM_COMPILER* compiler, SPVM_LIST* 
       
       {
         int32_t j;
-        for (j = 0; j < package->op_subs->length; j++) {
-          SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, j);
-          SPVM_SUB* sub = op_sub->uv.sub;
+        for (j = 0; j < package->subs->length; j++) {
+          SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, j);
           printf("  sub[%" PRId32 "]\n", j);
           SPVM_DUMPER_dump_sub_opcode_array(compiler, sub);
         }
@@ -335,33 +329,31 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
     printf("      abs_name => \"%s\"\n", sub->abs_name);
     printf("      name => \"%s\"\n", sub->op_name->uv.name);
     printf("      return_type => ");
-    SPVM_TYPE_fprint_type_name(compiler, stdout, sub->op_return_type->uv.type->basic_type->id, sub->op_return_type->uv.type->dimension, sub->op_return_type->uv.type->flag);
+    SPVM_TYPE_fprint_type_name(compiler, stdout, sub->return_type->basic_type->id, sub->return_type->dimension, sub->return_type->flag);
     printf("\n");
-    printf("      is_enum => %d\n", sub->is_enum);
-    printf("      have_native_desc => %d\n", sub->have_native_desc);
+    printf("      is_enum => %d\n", (sub->flag & SPVM_SUB_C_FLAG_IS_ENUM) ? 1 : 0);
+    printf("      have_native_desc => %d\n", (sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC) ? 1 : 0);
     printf("      var_alloc_length => %d\n", SPVM_SUB_get_var_alloc_length(compiler, sub));
     printf("      arg_alloc_length => %d\n", SPVM_SUB_get_var_alloc_length(compiler, sub));
     
     printf("      args\n");
-    SPVM_LIST* op_args = sub->op_args;
+    SPVM_LIST* args = sub->args;
     {
       int32_t i;
-      for (i = 0; i < op_args->length; i++) {
-        SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, i);
-        SPVM_MY* my = op_arg->uv.my;
+      for (i = 0; i < args->length; i++) {
+        SPVM_MY* my = SPVM_LIST_fetch(sub->args, i);
         printf("        [%" PRId32 "] ", i);
         SPVM_DUMPER_dump_my(compiler, my);
       }
     }
     
-    if (!sub->have_native_desc) {
+    if (!(sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC)) {
       printf("      mys\n");
-      SPVM_LIST* op_mys = sub->op_mys;
+      SPVM_LIST* mys = sub->mys;
       {
         int32_t i;
-        for (i = 0; i < op_mys->length; i++) {
-          SPVM_OP* op_my = SPVM_LIST_fetch(sub->op_mys, i);
-          SPVM_MY* my = op_my->uv.my;
+        for (i = 0; i < mys->length; i++) {
+          SPVM_MY* my = SPVM_LIST_fetch(sub->mys, i);
           printf("        mys[%" PRId32 "] ", i);
           SPVM_DUMPER_dump_my(compiler, my);
         }
@@ -389,21 +381,20 @@ void SPVM_DUMPER_dump_sub_opcode_array(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
     printf("      var_alloc_length => %d\n", SPVM_SUB_get_var_alloc_length(compiler, sub));
     printf("      arg_alloc_length => %d\n", SPVM_SUB_get_var_alloc_length(compiler, sub));
     
-    if (!sub->have_native_desc) {
+    if (!(sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC)) {
       printf("      mys\n");
-      SPVM_LIST* op_mys = sub->op_mys;
+      SPVM_LIST* mys = sub->mys;
       {
         int32_t i;
-        for (i = 0; i < op_mys->length; i++) {
-          SPVM_OP* op_my = SPVM_LIST_fetch(sub->op_mys, i);
-          SPVM_MY* my = op_my->uv.my;
+        for (i = 0; i < mys->length; i++) {
+          SPVM_MY* my = SPVM_LIST_fetch(sub->mys, i);
           printf("        mys[%" PRId32 "] ", i);
           SPVM_DUMPER_dump_my(compiler, my);
         }
       }
       
       printf("      opcode_array\n");
-      SPVM_DUMPER_dump_opcode_array(compiler, compiler->opcode_array, sub->opcode_base, sub->opcode_length);
+      SPVM_DUMPER_dump_opcode_array(compiler, compiler->opcode_array, sub->opcodes_base, sub->opcodes_length);
     }
   }
   else {
@@ -419,7 +410,7 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
     
     printf("      index => \"%" PRId32 "\"\n", field->index);
     
-    SPVM_TYPE* type = field->op_type->uv.type;
+    SPVM_TYPE* type = field->type;
     printf("      type => ");
     SPVM_TYPE_fprint_type_name(compiler, stdout, type->basic_type->id, type->dimension, type->flag);
     printf("\n");
@@ -451,7 +442,7 @@ void SPVM_DUMPER_dump_my(SPVM_COMPILER* compiler, SPVM_MY* my) {
     printf("\n");
     printf("          name => %s\n", my->op_name->uv.name);
     printf("          type => ");
-    SPVM_TYPE* type = my->op_type->uv.type;
+    SPVM_TYPE* type = my->type;
     SPVM_TYPE_fprint_type_name(compiler, stdout, type->basic_type->id, type->dimension, type->flag);
     printf("\n");
     printf("          var_id => %d\n", my->var_id);

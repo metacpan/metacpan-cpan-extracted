@@ -347,7 +347,11 @@ arg
 invocant
   : var ':' SELF
     {
-      $$ = SPVM_OP_build_arg(compiler, $1, $3);
+      SPVM_TYPE* type = SPVM_TYPE_new(compiler);
+      type->is_self = 1;
+      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, $3->file, $3->line);
+      
+      $$ = SPVM_OP_build_arg(compiler, $1, op_type);
     }
 
 opt_descriptors
@@ -955,57 +959,49 @@ basic_type
     }
   | BYTE
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_byte_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_byte_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | SHORT
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_short_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_short_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | INT
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_int_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | LONG
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_long_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_long_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | FLOAT
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_float_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_float_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | DOUBLE
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_double_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_double_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | OBJECT
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_object_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_any_object_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
   | STRING
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_string_type(compiler);
+      SPVM_OP* op_type = SPVM_OP_new_op_string_type(compiler, $1->file, $1->line);
       
       $$ = op_type;
     }
@@ -1046,7 +1042,7 @@ type_or_void
   : type
   | VOID
     {
-      $$ = SPVM_OP_new_op_void(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
     }
 
 field_name : NAME

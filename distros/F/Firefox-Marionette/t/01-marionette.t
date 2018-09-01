@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 347;
+use Test::More tests => 351;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -404,7 +404,7 @@ SKIP: {
 }
 
 SKIP: {
-	my $daemon = HTTP::Daemon->new() || die "Failed to create HTTP::Daemon";
+	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
 	my $proxy = Firefox::Marionette::Proxy->new( http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', ftp => 'ftp.example.org:2121', none => [ 'local.example.org' ], socks => 'socks.example.org:1081' );
 	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1, timeouts => Firefox::Marionette::Timeouts->new(page_load => 54_321, script => 4567, implicit => 6543)));
@@ -496,6 +496,7 @@ SKIP: {
 				}
 			} elsif (defined $pid) {
 				eval {
+					local $SIG{ALRM} = sub { die "alarm during proxy server\n" };
 					alarm 5;
 					$0 = "[Test HTTP Proxy for " . getppid . "]";
 					while (my $connection = $daemon->accept()) {
@@ -503,6 +504,7 @@ SKIP: {
 						if (my $child = fork) {
 						} elsif (defined $child) {
 							eval {
+								local $SIG{ALRM} = sub { die "alarm during proxy server accept\n" };
 								alarm 5;
 								while (my $request = $connection->get_request()) {
 									diag("Got request for " . $request->uri());
@@ -511,8 +513,12 @@ SKIP: {
 								}
 								$connection->close;
 								$connection = undef;
+								exit 0;
+							} or do {
+								chomp $@;
+								diag("Caught exception in proxy server accept:$@");
 							};
-							exit 0;
+							exit 1;
 						} else {
 							diag("Failed to fork connection:$!");
 							die "Failed to fork:$!";
@@ -520,7 +526,7 @@ SKIP: {
 					}
 				} or do {
 					chomp $@;
-					warn "$@\n";
+					diag("Caught exception in proxy server:$@");
 				};
 				exit 1;
 			} else {
@@ -558,7 +564,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 241);
+		skip($skip_message, 242);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -1005,6 +1011,7 @@ SKIP: {
 	}
 	ok($firefox->uri()->host() eq 'metacpan.org', "\$firefox->uri()->host() is equal to metacpan.org:" . $firefox->uri());
 	ok($firefox->script('return window.find("lucky");'), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
+	ok($firefox->script('return window.find("lucky");', timeout => 10_000, new => 1), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command (using timeout and new (true) as parameters)");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
@@ -1132,18 +1139,97 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, visible => 0, implicit => 987654);
+	($skip_message, $firefox) = start_firefox(0, visible => 0, debug => 1, implicit => 987654);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 5);
+		skip($skip_message, 8);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with visible set to 0");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok($capabilities->moz_headless() || $ENV{FIREFOX_VISIBLE} || 0, "\$capabilities->moz_headless() is set to " . ($ENV{FIREFOX_VISIBLE} ? 'false' : 'true'));
         ok($capabilities->timeouts()->implicit() == 987654, "\$firefox->capabilities()->timeouts()->implicit() correctly reflects the implicit shortcut timeout");
+	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
+	SKIP: {
+		if ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
+			my @sig_nums  = split q[ ], $Config{sig_num};
+			my @sig_names = split q[ ], $Config{sig_name};
+			my %signals_by_name;
+			my $idx = 0;
+			foreach my $sig_name (@sig_names) {
+				$signals_by_name{$sig_name} = $sig_nums[$idx];
+				$idx += 1;
+			}
+			my $json_document = '{ "id": "5", "value": "something"}';
+			my $txt_document = 'This is ordinary text';
+			if (my $pid = fork) {
+				$firefox->go($daemon->url() . '?format=JSON');
+				ok($firefox->strip() eq $json_document, "Correctly retrieved JSON document");
+				diag($firefox->strip());
+				ok($firefox->json()->{id} == 5, "Correctly parsed JSON document");
+				$firefox->go($daemon->url() . '?format=txt');
+				ok($firefox->strip() eq $txt_document, "Correctly retrieved TXT document");
+				diag($firefox->strip());
+				while(kill 0, $pid) {
+					kill $signals_by_name{TERM}, $pid;
+					sleep 1;
+					waitpid $pid, POSIX::WNOHANG();
+				}
+			} elsif (defined $pid) {
+				eval {
+					local $SIG{ALRM} = sub { die "alarm during content server\n" };
+					alarm 40;
+					$0 = "[Test HTTP Content Server for " . getppid . "]";
+					while (my $connection = $daemon->accept()) {
+						diag("Accepted connection");
+						if (my $child = fork) {
+						} elsif (defined $child) {
+							eval {
+								local $SIG{ALRM} = sub { die "alarm during content server accept\n" };
+								alarm 40;
+								while (my $request = $connection->get_request()) {
+									diag("Got request for " . $request->uri());
+									my ($headers, $response);
+									if ($request->uri() =~ /format=JSON/) {
+										$headers = HTTP::Headers->new('Content-Type', 'application/json; charset=utf-8');
+										$response = HTTP::Response->new(200, "OK", $headers, $json_document);
+									} elsif ($request->uri() =~ /format=txt/) {
+										$headers = HTTP::Headers->new('Content-Type', 'text/plain');
+										$response = HTTP::Response->new(200, "OK", $headers, $txt_document);
+									} else {
+										$response = HTTP::Response->new(200, "OK", undef, 'hello world');
+									}
+									$connection->send_response($response);
+								}
+								$connection->close;
+								$connection = undef;
+								exit 0;
+							} or do {
+								chomp $@;
+								diag("Caught exception in content server accept:$@");
+							};
+							exit 1;
+						} else {
+							diag("Failed to fork connection:$!");
+							die "Failed to fork:$!";
+						}
+					}
+				} or do {
+					chomp $@;
+					diag("Caught exception in content server:$@");
+				};
+				exit 1;
+			} else {
+				diag("Failed to fork http proxy:$!");
+				die "Failed to fork:$!";
+			}
+		} else {
+			skip("No forking available for $^O", 3);
+			diag("No forking available for $^O");
+		}
+	}
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
 }
 

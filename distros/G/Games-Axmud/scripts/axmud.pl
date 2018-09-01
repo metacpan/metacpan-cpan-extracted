@@ -41,8 +41,8 @@ use vars qw(
 );
 
 $SCRIPT = 'Axmud';              # Name used in system messages
-$VERSION = '1.1.050';           # Version number for this client
-$DATE = '31 Jul 2018';
+$VERSION = '1.1.138';           # Version number for this client
+$DATE = '31 Aug 2018';
 $NAME_SHORT = 'axmud';          # Lower-case version of $SCRIPT; same as the package name above
 $NAME_ARTICLE = 'an Axmud';     # Name with an article
 $BASIC_NAME = 'Axbasic';        # Name of Axmud's built-in scripting library

@@ -1,5 +1,8 @@
 Revision history for Games::Cards::Pair
 
+0.19  Fri Aug 31 17:05:00 2018
+      - Replaced "namespace::clean" with "namespace::autoclean".
+
 0.18  Thu Jul 05 08:00:00 2018
       - Used InstanceOf instead Object as type.
 

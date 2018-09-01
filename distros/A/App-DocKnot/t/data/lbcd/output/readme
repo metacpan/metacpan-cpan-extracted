@@ -27,6 +27,8 @@ DESCRIPTION
   the returned weights based on whether those services are reachable, or
   to return a static weight for round-robin load balancing.
 
+  [1] https://www.stanford.edu/~riepel/lbnamed/
+
   The information provided isn't particularly sophisticated, and a good
   hardware load balancer will be able to consider such things as
   connection latency and responsiveness to make better decisions.
@@ -43,8 +45,6 @@ DESCRIPTION
   it to add protocol version 3 with some additional features and service
   probing, and then I rewrote it again to update the coding style and use
   my standard portability layer.
-
-  [1] https://www.stanford.edu/~riepel/lbnamed/
 
 REQUIREMENTS
 
@@ -90,7 +90,8 @@ BUILDING AND INSTALLATION
 
   Pass --enable-silent-rules to configure for a quieter build (similar to
   the Linux kernel).  Use make warnings instead of make to build with full
-  GCC compiler warnings (requires a relatively current version of GCC).
+  compiler warnings (requires either GCC or Clang and may require a
+  relatively current version of the compiler).
 
   You will generally want to start lbcd at system boot.  All that is
   needed is a simple init script to start lbcd with the appropriate

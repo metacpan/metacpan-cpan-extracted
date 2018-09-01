@@ -1,5 +1,8 @@
 Revision history for Alien-FFI
 
+0.22      2018-08-28 10:37:44 -0400
+  - Additional failure diagnostics
+
 0.21      2018-06-01 07:48:31 -0400
   - Production release identical to 0.20_05
 

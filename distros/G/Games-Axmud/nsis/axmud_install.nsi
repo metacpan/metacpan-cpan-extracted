@@ -1,4 +1,4 @@
-# Axmud v1.1.050 installer script for MS Windows
+# Axmud v1.1.138 installer script for MS Windows
 #
 # Copyright (C) 2011-2018 A S Lewis
 #
@@ -82,7 +82,7 @@
 #   - The Axmud folder contains an /nsis folder, which contains this file
 #   - In this file, opeupdate the version number just below, e.g.
 #
-#       OutFile "install-axmud-1.1.050.exe"
+#       OutFile "install-axmud-1.1.138.exe"
 #
 #   - Compile the installer (e.g. by right-clicking this file and selecting
 #       'Compile NSIS script file')
@@ -98,7 +98,7 @@
 
     ;Name and file
     Name "Axmud"
-    OutFile "install-axmud-1.1.050.exe"
+    OutFile "install-axmud-1.1.138.exe"
 
     ;Default installation folder
     InstallDir "$LOCALAPPDATA\Axmud"
@@ -136,6 +136,8 @@
     !insertmacro MUI_PAGE_LICENSE "license.txt"
 
     !insertmacro MUI_PAGE_COMPONENTS
+
+    !insertmacro MUI_PAGE_DIRECTORY
 
     !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX"
     !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Axmud"

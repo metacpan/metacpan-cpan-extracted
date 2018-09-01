@@ -16,7 +16,9 @@ extern void mpz_isaac_urandomm(mpz_t rop, mpz_t n);
 extern UV irand64(int nbits);
 extern NV drand64(void);
 
-int is_primitive_root(mpz_t a, mpz_t b, int nprime);
+extern UV   is_power(mpz_t n, UV a);
+extern UV   prime_power(mpz_t prime, mpz_t n);
+extern int  is_primitive_root(mpz_t a, mpz_t b, int nprime);
 
 /* tdiv_r is faster, but we'd need to guarantee the input is positive */
 #define mpz_mulmod(r, a, b, n, t)  \
@@ -79,6 +81,8 @@ extern int modified_cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p);
 /* return a class poly (Hilbert [type 1] or Weber [type 2]) */
 extern UV poly_class_poly(IV D, mpz_t**T, int* type);
 
+extern const char* poly_class_type_name(int type);
+
 /* return a 0 terminated list of all D's sorted by degree */
 extern IV* poly_class_degrees(int insert_1s);
 
@@ -97,6 +101,7 @@ extern UV poly_class_poly_num(int i, int *D, mpz_t**T, int* type);
 extern void mpf_log(mpf_t logx, mpf_t x);
 extern void mpf_exp(mpf_t expx, mpf_t x);
 extern void mpf_pow(mpf_t powx, mpf_t b, mpf_t x);
+extern void mpf_root(mpf_t rootx, mpf_t x, mpf_t n);
 extern void mpf_agm(mpf_t r, mpf_t a, mpf_t b);
 
 extern UV logint(mpz_t n, UV base);

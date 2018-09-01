@@ -13,6 +13,16 @@
 #include "spvm_limit.h"
 #include "spvm_basic_type.h"
 
+SPVM_TYPE* SPVM_TYPE_clone_type(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
+  SPVM_TYPE* new_type = SPVM_TYPE_new(compiler);
+  new_type->basic_type = type->basic_type;
+  new_type->dimension = type->dimension;
+  new_type->flag = type->flag;
+  new_type->is_self = type->is_self;
+  
+  return new_type;
+}
+
 int32_t SPVM_TYPE_get_type_name_length(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
   assert(basic_type);
@@ -309,6 +319,18 @@ SPVM_TYPE* SPVM_TYPE_create_double_ref_type(SPVM_COMPILER* compiler) {
   return type;
 }
 
+SPVM_TYPE* SPVM_TYPE_create_any_object_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_TYPE_new(compiler);
+  type->basic_type = SPVM_LIST_fetch(compiler->basic_types, SPVM_BASIC_TYPE_C_ID_ANY_OBJECT);
+  type->dimension = 0;
+  
+  assert(type);
+  
+  return type;
+}
+
 _Bool SPVM_TYPE_is_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   (void)compiler;
   
@@ -410,10 +432,9 @@ _Bool SPVM_TYPE_is_value_type(SPVM_COMPILER* compiler, int32_t basic_type_id, in
   int32_t is_value_t;
   if (dimension == 0 && !(flag & SPVM_TYPE_C_FLAG_REF)) {
     const char* basic_type_name = basic_type->name;
-    SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type_name, strlen(basic_type_name));
+    SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
     // Package
-    if (op_package) {
-      SPVM_PACKAGE* package = op_package->uv.package;
+    if (package) {
       if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
         is_value_t = 1;
       }
@@ -439,31 +460,30 @@ _Bool SPVM_TYPE_is_value_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
   
-  int32_t is_value_t;
+  int32_t is_value_ref_type;
   if (dimension == 0 && (flag & SPVM_TYPE_C_FLAG_REF)) {
     const char* basic_type_name = basic_type->name;
-    SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type_name, strlen(basic_type_name));
+    SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
     // Package
-    if (op_package) {
-      SPVM_PACKAGE* package = op_package->uv.package;
+    if (package) {
       if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
-        is_value_t = 1;
+        is_value_ref_type = 1;
       }
       else {
-        is_value_t = 0;
+        is_value_ref_type = 0;
       }
     }
     // Numeric type
     else {
-      is_value_t = 0;
+      is_value_ref_type = 0;
     }
   }
   // Array
   else {
-    is_value_t = 0;
+    is_value_ref_type = 0;
   }
   
-  return is_value_t;
+  return is_value_ref_type;
 }
 
 _Bool SPVM_TYPE_is_value_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
@@ -474,10 +494,9 @@ _Bool SPVM_TYPE_is_value_array_type(SPVM_COMPILER* compiler, int32_t basic_type_
   int32_t is_value_array_type;
   if (dimension == 1 && !(flag & SPVM_TYPE_C_FLAG_REF)) {
     const char* basic_type_name = basic_type->name;
-    SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type_name, strlen(basic_type_name));
+    SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
     // Package
-    if (op_package) {
-      SPVM_PACKAGE* package = op_package->uv.package;
+    if (package) {
       if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
         is_value_array_type = 1;
       }
@@ -505,11 +524,10 @@ _Bool SPVM_TYPE_basic_type_is_value_type(SPVM_COMPILER* compiler, int32_t basic_
   
   int32_t is_basic_type_value_t;
   const char* basic_type_name = basic_type->name;
-  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type_name, strlen(basic_type_name));
+  SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
   
   // Package
-  if (op_package) {
-    SPVM_PACKAGE* package = op_package->uv.package;
+  if (package) {
     if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
       is_basic_type_value_t = 1;
     }
@@ -536,13 +554,11 @@ int32_t SPVM_TYPE_get_width(SPVM_COMPILER* compiler, int32_t basic_type_id, int3
     assert(basic_type);
     
     const char* basic_type_name = basic_type->name;
-    SPVM_OP* op_package = basic_type->op_package;
+    SPVM_PACKAGE* package = basic_type->package;
     
-    assert(op_package);
+    assert(package);
     
-    // Package
-    SPVM_PACKAGE* package = op_package->uv.package;
-    width = package->op_fields->length;
+    width = package->fields->length;
   }
   else {
     width = 1;

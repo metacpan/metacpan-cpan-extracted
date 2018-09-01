@@ -1,3 +1,17 @@
+## name complex case 1
+## failures 1
+## cut
+
+use constant { PI => 4 * CORE::atan2(1, 1), ANS => 42 };
+say PI;
+
+## name complex case 2
+## failures 2
+## cut
+
+use constant { PI => 4 * CORE::atan2(1, 1), ANS => 42 };
+say 42;
+
 ## name Basic
 ## failures 1
 ## cut

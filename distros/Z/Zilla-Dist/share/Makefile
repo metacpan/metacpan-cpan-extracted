@@ -27,7 +27,7 @@ NAMEPATH := $(shell $(ZILD) meta name)
 endif
 NAME := $(shell $(ZILD) meta name)
 VERSION := $(shell $(ZILD) meta version)
-RELEASE_BRANCH := $(shell $(ZILD) meta branch)
+RELEASE_BRANCH ?= $(shell $(ZILD) meta branch)
 
 DISTDIR := $(NAME)-$(VERSION)
 DIST := $(DISTDIR).tar.gz
@@ -205,6 +205,7 @@ uninstall: distdir
 
 clean:
 	rm -fr blib cpan .build .inline $(DIST) $(DISTDIR)
+	find . -type d | grep '\.testml' | xargs rm -fr
 
 distclean purge: clean
 

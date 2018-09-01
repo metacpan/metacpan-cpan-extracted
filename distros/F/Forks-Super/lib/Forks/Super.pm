@@ -39,7 +39,7 @@ our %EXPORT_TAGS =
       'filehandles'  => [ @export_ok_vars, @EXPORT ],
       'vars'         => [ @export_ok_vars, @EXPORT ],
       'all'          => [ @EXPORT_OK, @EXPORT ] );
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 our $SOCKET_READ_TIMEOUT = 0.05;  # seconds
 our $MAIN_PID;
@@ -565,7 +565,7 @@ sub Forks::Super::Impl::_kill {
 		push @signalled, $pid;
 		push @terminated, $pid if $is_kill;
 	    }
-	    if ($!) {
+	    if ($! && !$!{ESRCH}) {
 		carp "Forks::Super::kill: $! $pid";
 	    }
 	}
@@ -654,7 +654,8 @@ sub _unreap {
     my (@pids) = @_;
     my $old_status = $?;
     foreach my $pid (@pids) {
-	if ($pid == Forks::Super::Wait::waitpid $pid, 0, 1.0) {
+        my $waitpid = Forks::Super::Wait::waitpid($pid, 0, 1.0);
+	if ($pid == $waitpid) {
 	    my $j = Forks::Super::Job::get($pid);
 	    $j->{state} = 'COMPLETE';
 	    if (delete $j->{reaped}) {
@@ -807,7 +808,7 @@ Forks::Super - extensions and convenience methods to manage background processes
 
 =head1 VERSION
 
-Version 0.94
+Version 0.95
 
 =head1 SYNOPSIS
 
@@ -824,11 +825,12 @@ Version 0.94
     }
 
     # --- wait for a child process to finish
-    $w = wait;                    # blocking wait on any child, child exit status in $?
-    $w = waitpid $pid,0;          # blocking wait on specific child
-    $w = waitpid $pid,WNOHANG;    # non-blocking, use with POSIX ':sys_wait_h'
-    $w = waitpid 0,$flag;         # wait on any process in current process group
-    waitall;                      # block until all children are finished
+    $w = wait;                  # blocking wait on any child,
+                                # child exit status in $?
+    $w = waitpid $pid,0;        # blocking wait on specific child
+    $w = waitpid $pid,WNOHANG;  # non-blocking, use with POSIX ':sys_wait_h'
+    $w = waitpid 0,$flag;       # wait on any process in current process group
+    waitall;                    # block until all children are finished
 
     # -------------- helpful extensions ---------------------
     # fork directly to a shell command. Child doesn't return.
@@ -2313,12 +2315,15 @@ Not all options to C<fork> are compatible with emulation mode.
 #       exit from child sub not allowed (will exit from parent)
 #       die from child can write $job->{error} in parent
 #   share \@, \%
-#       "child" overwrites parent values, not adds to parent values
+#       "child" overwrites parent values, does not add to parent values
+#       if you use `share` with an `on_finish` callback to handle
+#       the shared value (see `pmap`,`pgrep` source), then you should
+#       be all right
 #   timeout, expiration
 #       can only use alarm, not the poor man's alarm or
 #       other techniques, so may be less effective
 #   depends_start
-#       may behave differently than expected when dependcy is emulated
+#       may behave differently than expected when dependency is emulated
 #   child_fh
 #       interactive sessions are not supported
 #       child_fh => 'in' is not useful as parent will not run at the same
@@ -2326,7 +2331,7 @@ Not all options to C<fork> are compatible with emulation mode.
 #   read_stdout, read_stderr
 #       as "child" is complete, all output is ready immediately
 #       block => 1  argument is useless
-#   kill (function), suspend (function)
+#   kill, suspend functions
 #       less useful since can't be called from parent once "child" has started
 #-------------------------------------------------------------
 
@@ -2388,40 +2393,6 @@ enough basis. The user may invoke the
     Forks::Super::Deferred:check_queue()
 
 method at any time to force the queue to be examined.
-
-=head2 Special tips for Windows systems
-
-On POSIX systems (including Cygwin), programs using the
-C<Forks::Super> module are interrupted when a child process
-completes. A callback function performs some housekeeping
-and may perform other duties like trying to dispatch
-things from the list of deferred jobs.
-
-Windows systems do not have the signal handling capabilities
-of other systems, and so other things equal, a script
-running on Windows will not perform the housekeeping
-tasks as frequently as a script on other systems.
-
-The method C<Forks::Super::pause> can be used as a drop in
-replacement for the Perl C<sleep> call. In a C<pause>
-function call, the program will check on active
-child processes, reap the ones that have completed, and
-attempt to dispatch jobs on the queue.
-
-Calling C<pause> with an argument of 0 is also a valid
-way of invoking the child handler function on Windows.
-When used this way, C<pause> returns immediately after
-running the child handler.
-
-Child processes are implemented differently in Windows
-than in POSIX systems. The C<CORE::fork> and C<Forks::Super::fork>
-calls will usually return a B<pseudo-process ID> to the
-parent process, and this will be a B<negative value>.
-The Unix idiom of testing whether a C<fork> call returns
-a positive number needs to be modified on Windows systems
-by testing whether  C<Forks::Super::isValidPid($pid)> returns
-true, where C<$pid> is the return value from a C<Forks::Super::fork>
-call.
 
 =head1 Alternate fork syntax
 
@@ -2622,183 +2593,7 @@ XXX Undocumented second argument to override DWIM behavior
 
 =back
 
-=head2 PREFORK, POSTFORK
-
-=head3 PREFORK { ... };
-
-=head3 POSTFORK { ... };
-
-=head3 POSTFORK_PARENT { ... };
-
-=head3 POSTFORK_CHILD { ... };
-
-Sets up one or more code blocks that are run before and after system
-call to C<fork>. Use cases for these functions include setting up
-I/O handles, database connections, or any other resource that doesn't
-play nicely across a C<fork>.
-
-C<POSTFORK> blocks are executed by both parent and child processes
-immediately after the C<fork>. C<POSTFORK_PARENT> blocks are only
-executed in the parent and C<POSTFORK_CHILD> blocks are only executed
-in the child process.
-
-C<PREFORK> blocks are executed first-in, first-out.
-
-C<POSTFORK>, C<POSTFORK_PARENT>, and C<POSTFORK_CHILD> blocks are
-executed last-in, first-out.
-
-=head2 Interprocess communication functions
-
-=head3 read_stdout
-
-=head3 read_stderr
-
-=over 4
-
-=item C<$line = Forks::Super::read_stdout($pid [,%options] )>
-
-=item C<@lines = Forks::Super::read_stdout($pid [,%options] )>
-
-=item C<$line = Forks::Super::read_stderr($pid [, %options])>
-
-=item C<@lines = Forks::Super::read_stderr($pid [, %options] )>
-
-=item C<< $line = $job->read_stdout( [%options] ) >>
-
-=item C<< @lines = $job->read_stdout( [%options] ) >>
-
-=item C<< $line = $job->read_stderr( [%options]) >>
-
-=item C<< @lines = $job->read_stderr( [%options] ) >>
-
-For jobs that were started with the C<< child_fh => "out" >>
-and C<< child_fh => "err" >> options enabled, read data from
-the STDOUT and STDERR file handles of child processes.
-
-Aside from the more readable syntax, these functions may be preferable to
-some alternate ways of reading from an interprocess I/O handle
-
-    $line = < {$Forks::Super::CHILD_STDOUT{$pid}} >;
-    @lines = < {$job->{child_stdout}} >;
-    @lines = < {$Forks::Super::CHILD_STDERR{$pid}} >;
-    $line = < {$job->{child_stderr}} >;
-
-because the C<read_stdout> and C<read_stderr> functions will
-
-=over 4
-
-=item * clear the EOF condition when the parent is reading from
-the handle faster than the child is writing to it
-
-=item * not block.
-
-=back
-
-Functions work in both scalar and list context. If there is no data to
-read on the file handle, but the child process is still active and could
-put more data on the file handle, these functions return  C<""> (empty
-string) in scalar context and C<()> (empty list) in list context.
-If there is no more data on the file handle and the
-child process is finished, the return values of the functions
-will be C<undef>.
-
-These methods all take any number of arbitrary key-value
-pairs as additional arguments. There are currently three
-recognized options to these methods:
-
-=over 4
-
-=item * C<< block => 0 | 1 >>
-
-Determines whether blocking I/O is used on the file, socket,
-or pipe handle. If enabled, the
-L<read_stdXXX|Forks::Super::Job/"read_stdout"> function will
-hang until input is available or until the module can determine
-that the process creating input for that handle has completed.
-Blocking I/O can lead to deadlocks unless you are careful about
-managing the process creating input for the handle. The default
-mode is non-blocking.
-
-=item * C<< warn => 0 | 1 >>
-
-If warnings on the L<read_stdXXX|Forks::Super::Job/"read_stdout"> function
-are disabled, then some warning messages (reading from a closed
-handle, reading from a non-existent/unconfigured handle) will
-be suppressed. Enabled by default.
-
-Note that the output of the child process may be buffered, and
-data on the channel that C<read_stdout> and C<read_stderr> read
-from may not be available until the child process has produced
-a lot of output, or until the child process has finished.
-C<Forks::Super> will make an effort to autoflush the file handles
-that write from one process and are read in another process,
-but assuring that arbitrary external commands will flush
-their output regularly is beyond the scope of this module.
-
-=item * C<< timeout => $num_seconds >>
-
-On an otherwise non-blocking file handle, waits up to the
-specified number of seconds for input to become available.
-
-=back
-
-=back
-
-=head3 getc_stdout
-
-=head3 getc_stderr
-
-=over 4
-
-=item C<< $char = $job->getc_stdout( [%options] ) >>
-
-=item C<< $char = $job->getc_stderr( [%options] ) >>
-
-Retrieves a single character from a child process output stream,
-if available. Supports the same C<block>, C<timeout>, and
-C<warn> options as the L<"read_stdout"> and L<"read_stderr"> functions.
-
-=back
-
-=head3 C<< <$job> >>
-
-=over 4
-
-The C<< <> >> operator has been overloaded for the
-L<Forks::Super::Job|Forks::Super::Job> package such that
-calling
-
-    <$job>
-
-is equivalent to calling
-
-    scalar $job->read_stdout()
-
-(Due to a limitation of overloading in Perl, this construction
-cannot be used in list context.)
-
-=back
-
-=head3 close_fh
-
-=over 4
-
-=item C<Forks::Super::close_fh($pid)>
-
-=item C<Forks::Super::close_fh($pid, 'stdin', 'stdout', 'stderr')>
-
-Closes the specified open file handles and socket handles for
-interprocess communication with the specified child process. With
-no additional arguments, closes all open handles for the process.
-
-Most operating systems impose a hard limit on the number of
-file handles that can be opened in a process simultaneously,
-so you should use this function when you are finished communicating with
-a child process so that you don't run into that limit.
-
-See also L<Forks::Super::Job/"close_fh">.
-
-=back
+=head2 Lazy background evaluation
 
 =head3 bg_eval
 
@@ -2997,6 +2792,160 @@ expressions as
 
 =back
 
+=head2 Interprocess communication functions
+
+=head3 read_stdout
+
+=head3 read_stderr
+
+=over 4
+
+=item C<$line = Forks::Super::read_stdout($pid [,%options] )>
+
+=item C<@lines = Forks::Super::read_stdout($pid [,%options] )>
+
+=item C<$line = Forks::Super::read_stderr($pid [, %options])>
+
+=item C<@lines = Forks::Super::read_stderr($pid [, %options] )>
+
+=item C<< $line = $job->read_stdout( [%options] ) >>
+
+=item C<< @lines = $job->read_stdout( [%options] ) >>
+
+=item C<< $line = $job->read_stderr( [%options]) >>
+
+=item C<< @lines = $job->read_stderr( [%options] ) >>
+
+For jobs that were started with the C<< child_fh => "out" >>
+and C<< child_fh => "err" >> options enabled, read data from
+the STDOUT and STDERR file handles of child processes.
+
+Aside from the more readable syntax, these functions may be preferable to
+some alternate ways of reading from an interprocess I/O handle
+
+    $line = < {$Forks::Super::CHILD_STDOUT{$pid}} >;
+    @lines = < {$job->{child_stdout}} >;
+    @lines = < {$Forks::Super::CHILD_STDERR{$pid}} >;
+    $line = < {$job->{child_stderr}} >;
+
+because the C<read_stdout> and C<read_stderr> functions will
+
+=over 4
+
+=item * clear the EOF condition when the parent is reading from
+the handle faster than the child is writing to it
+
+=item * not block.
+
+=back
+
+Functions work in both scalar and list context. If there is no data to
+read on the file handle, but the child process is still active and could
+put more data on the file handle, these functions return  C<""> (empty
+string) in scalar context and C<()> (empty list) in list context.
+If there is no more data on the file handle and the
+child process is finished, the return values of the functions
+will be C<undef>.
+
+These methods all take any number of arbitrary key-value
+pairs as additional arguments. There are currently three
+recognized options to these methods:
+
+=over 4
+
+=item * C<< block => 0 | 1 >>
+
+Determines whether blocking I/O is used on the file, socket,
+or pipe handle. If enabled, the
+L<read_stdXXX|Forks::Super::Job/"read_stdout"> function will
+hang until input is available or until the module can determine
+that the process creating input for that handle has completed.
+Blocking I/O can lead to deadlocks unless you are careful about
+managing the process creating input for the handle. The default
+mode is non-blocking.
+
+=item * C<< warn => 0 | 1 >>
+
+If warnings on the L<read_stdXXX|Forks::Super::Job/"read_stdout"> function
+are disabled, then some warning messages (reading from a closed
+handle, reading from a non-existent/unconfigured handle) will
+be suppressed. Enabled by default.
+
+Note that the output of the child process may be buffered, and
+data on the channel that C<read_stdout> and C<read_stderr> read
+from may not be available until the child process has produced
+a lot of output, or until the child process has finished.
+C<Forks::Super> will make an effort to autoflush the file handles
+that write from one process and are read in another process,
+but assuring that arbitrary external commands will flush
+their output regularly is beyond the scope of this module.
+
+=item * C<< timeout => $num_seconds >>
+
+On an otherwise non-blocking file handle, waits up to the
+specified number of seconds for input to become available.
+
+=back
+
+=back
+
+=head3 getc_stdout
+
+=head3 getc_stderr
+
+=over 4
+
+=item C<< $char = $job->getc_stdout( [%options] ) >>
+
+=item C<< $char = $job->getc_stderr( [%options] ) >>
+
+Retrieves a single character from a child process output stream,
+if available. Supports the same C<block>, C<timeout>, and
+C<warn> options as the L<"read_stdout"> and L<"read_stderr"> functions.
+
+=back
+
+=head3 C<< <$job> >>
+
+=over 4
+
+For perl v5.8.8 or better,
+the C<< <> >> operator has been overloaded for the
+L<Forks::Super::Job|Forks::Super::Job> package such that
+calling
+
+    <$job>
+
+is equivalent to calling
+
+    $job->read_stdout()
+
+Note that prior to perl v5.18.0, due to a limitation on overloading,
+this construction is always interpreted in scalar context.
+
+=back
+
+=head3 close_fh
+
+=over 4
+
+=item C<Forks::Super::close_fh($pid)>
+
+=item C<Forks::Super::close_fh($pid, 'stdin', 'stdout', 'stderr')>
+
+Closes the specified open file handles and socket handles for
+interprocess communication with the specified child process. With
+no additional arguments, closes all open handles for the process.
+
+Most operating systems impose a hard limit on the number of
+file handles that can be opened in a process simultaneously,
+so you should use this function when you are finished communicating with
+a child process so that you don't run into that limit.
+
+See also L<Forks::Super::Job/"close_fh">.
+
+=back
+
 =head3 open2
 
 =head3 open3
@@ -3035,83 +2984,6 @@ be passed to C<Forks::Super::open2> and C<Forks::Super::open3>:
 
 =cut
 
-# the inspiration for  pmap  is R's  mclapply  function.
-
-=head3 pmap
-
-=over4
-
-=item C<< @result = pmap BLOCK LIST >>
-
-=item C<< @result = pmap BLOCK \%opts, LIST >>
-
-Like the C<map BLOCK LIST> syntax for 
-the builtin L<map|perlfunc/"map"> function, 
-evaluates C<BLOCK> in list context for each element of C<LIST> 
-and returns the list value composed of the results
-of each evaluation. Each evaluation is performed in a background
-process, so the evaluations may be done in parallel.
-
-Each element if the list is aliased to C<$_> prior to evaluation of
-the C<BLOCK>, just like C<map>.
-
-    @result = Forks::Super::pmap { evaluate_element($_) } @elements;
-
-If the first element after C<BLOCK> or C<EXPR> is an unblessed
-hash reference, it will be treated as a set of options to be passed
-to the underlying L<"fork"> call.
-
-    use Forks::Super 'pmap';
-    # process a set of URLs, but skip any URLs that take more than 10s
-    @result = pmap {; {url=>$_,result=>process_url($_)} } {timeout => 10}, @urls;
-
-In the edge case that your C<LIST> might contains hash references but you 
-don't want the first one to be interpreted as a set of options to C<fork>,
-you can always safely pass a reference to an empty hash
-
-    # always safe to do this
-    @result = pmap { CODE } {}, @list;
-
-=back
-
-=head3 pgrep
-
-=over4
-
-=item C<< @match = pgrep BLOCK LIST >>
-
-=item C<< @match = pgrep BLOCK \%opts, LIST >>
-
-=item C<< $count = pgrep BLOCK LIST >>
-
-=item C<< $count = pgrep BLOCK \%opts, LIST >>
-
-Like the C<grep BLOCK LIST> syntax for the 
-builtin L<grep|perlfunc/"grep"> function, 
-evaluates C<BLOCK> in list context for each element of C<LIST> 
-and returns the subset of list elements for which the expression
-evaluated to true. Each evaluation is performed in a background
-process, so the evaluations may be done in parallel.
-
-Each element if the list is aliased to C<$_> prior to evaluation of
-the C<BLOCK>, just like C<grep>.
-
-    @success = Forks::Super::pgrep { evaluate($_) =~ /OK/ } @elements;
-
-If the first element after C<BLOCK> or C<EXPR> is an unblessed
-hash reference, it will be treated as a set of options to be passed
-to the underlying L<"fork"> call. 
-In the edge case that your C<LIST> might contains hash references but you 
-don't want the first one to be interpreted as a set of options to C<fork>,
-you can always safely pass a reference to an empty hash
-
-    # always safe to do this
-    @match = pgrep { CODE } {}, @list;
-
-In scalar context, returns the number of elements
-in the list for which the evaluation is true, like C<grep>.
-
-=back
 
 =head2 Obtaining job information
 
@@ -3124,6 +2996,8 @@ in the list for which the evaluation is true, like C<grep>.
 Returns a C<Forks::Super::Job> object associated with process ID
 or job ID C<$pid>. See L<Forks::Super::Job|Forks::Super::Job> for
 information about the methods and attributes of these objects.
+
+Returns C<undef> if C<$pid> is not a valid job ID.
 
 I<This subroutine is mainly redundant since v0.41, where the
 default return value of> C<fork> I<is an overloaded>
@@ -3172,7 +3046,110 @@ for deceased processes.
 
 =back
 
+=head2 PREFORK, POSTFORK
+
+=head3 PREFORK { ... };
+
+=head3 POSTFORK { ... };
+
+=head3 POSTFORK_PARENT { ... };
+
+=head3 POSTFORK_CHILD { ... };
+
+Sets up one or more code blocks that are run before and after system
+call to C<fork>. Use cases for these functions include setting up
+I/O handles, database connections, or any other resource that doesn't
+play nicely across a C<fork>.
+
+C<POSTFORK> blocks are executed by both parent and child processes
+immediately after the C<fork>. C<POSTFORK_PARENT> blocks are only
+executed in the parent and C<POSTFORK_CHILD> blocks are only executed
+in the child process.
+
+C<PREFORK> blocks are executed first-in, first-out.
+
+C<POSTFORK>, C<POSTFORK_PARENT>, and C<POSTFORK_CHILD> blocks are
+executed last-in, first-out.
+
 =head2 Miscellaneous functions
+
+# the inspiration for  pmap  is R's  mclapply  function.
+
+=head3 pmap
+
+=over 4
+
+=item C<< @result = pmap BLOCK LIST >>
+
+=item C<< @result = pmap BLOCK \%opts, LIST >>
+
+Like the C<map BLOCK LIST> syntax for 
+the builtin L<map|perlfunc/"map"> function, 
+evaluates C<BLOCK> in list context for each element of C<LIST> 
+and returns the list value composed of the results
+of each evaluation. Each evaluation is performed in a background
+process, so the evaluations may be done in parallel.
+
+Each element if the list is aliased to C<$_> prior to evaluation of
+the C<BLOCK>, just like C<map>.
+
+    @result = Forks::Super::pmap { evaluate_element($_) } @elements;
+
+If the first element after C<BLOCK> or C<EXPR> is an unblessed
+hash reference, it will be treated as a set of options to be passed
+to the underlying L<"fork"> call.
+
+    use Forks::Super 'pmap';
+    # process a set of URLs, but skip any URLs that take more than 10s
+    @result = pmap {; {url=>$_,result=>process_url($_)} } {timeout => 10}, @urls;
+
+In the edge case that your C<LIST> might contains hash references but you 
+don't want the first one to be interpreted as a set of options to C<fork>,
+you can always safely pass a reference to an empty hash
+
+    # always safe to do this
+    @result = pmap { CODE } {}, @list;
+
+=back
+
+=head3 pgrep
+
+=over 4
+
+=item C<< @match = pgrep BLOCK LIST >>
+
+=item C<< @match = pgrep BLOCK \%opts, LIST >>
+
+=item C<< $count = pgrep BLOCK LIST >>
+
+=item C<< $count = pgrep BLOCK \%opts, LIST >>
+
+Like the C<grep BLOCK LIST> syntax for the 
+builtin L<grep|perlfunc/"grep"> function, 
+evaluates C<BLOCK> in list context for each element of C<LIST> 
+and returns the subset of list elements for which the expression
+evaluated to true. Each evaluation is performed in a background
+process, so the evaluations may be done in parallel.
+
+Each element if the list is aliased to C<$_> prior to evaluation of
+the C<BLOCK>, just like C<grep>.
+
+    @success = Forks::Super::pgrep { evaluate($_) =~ /OK/ } @elements;
+
+If the first element after C<BLOCK> or C<EXPR> is an unblessed
+hash reference, it will be treated as a set of options to be passed
+to the underlying L<"fork"> call. 
+In the edge case that your C<LIST> might contain hash references but you 
+don't want the first one to be interpreted as a set of options to C<fork>,
+you can always safely pass a reference to an empty hash
+
+    # always safe to do this
+    @match = pgrep { CODE } {}, @list;
+
+In scalar context, returns the number of elements
+in the list for which the evaluation is true, like C<grep>.
+
+=back
 
 =head3 pause
 
@@ -3212,7 +3189,7 @@ C<close> call in code like
     ...
     close $fh or die "...";
 
-will fail because C<Forks::Super>'s C<SIGCHLD> handler reaps the
+could fail because C<Forks::Super>'s C<SIGCHLD> handler might reap the
 process before the implicit C<waitpid> call in the C<close> function
 gets to it.
 
@@ -3247,13 +3224,14 @@ Module variables may be initialized on the C<use Forks::Super> line
     # set max simultaneous procs to 5, allow children to call CORE::fork()
     use Forks::Super MAX_PROC => 5, CHILD_FORK_OK => -1;
 
-or they may be set explicitly in the code:
+or they may be set explicitly:
 
     $Forks::Super::ON_BUSY = 'queue';
     $Forks::Super::IPC_DIR = "/home/joe/temp-ipc-files";
 
-Some module variables govern global settings that affect most C<fork> calls,
-but can be overridden by a parameter setting in any specific C<fork> call.
+Many module variables govern global settings that affect all C<fork> calls.
+But many can be overridden by a parameter setting in any 
+specific C<fork> call.
 
     $Forks::Super::ON_BUSY = 'queue';
     $j1 = fork { sub => ... };                     # put on queue if busy
@@ -3272,8 +3250,7 @@ be spawned by C<Forks::Super>. If a C<fork> call is attempted while
 there are already at least this many active background processes,
 the behavior of the C<fork> call will be determined by the
 value in L<$Forks::Super::ON_BUSY|/"ON_BUSY"> or by the
-L<"on_busy"> option passed
-to the C<fork> call.
+L<"on_busy"> option passed to the C<fork> call.
 
 This value will be ignored during a C<fork> call if the L<"force">
 option is passed to C<fork> with a non-zero value. The value might also
@@ -3340,8 +3317,8 @@ L<"max_load"> parameter to C<fork> for details.
 Determines behavior of a C<fork> call when the system is too
 busy to create another background process.
 
-If this value is set
-to C<block>, then C<fork> will wait until the system is no
+If this value is set to C<block>,
+then C<fork> will wait until the system is no
 longer too busy and then launch the background process.
 The return value will be a normal process ID value (assuming
 there was no system error in creating a new process).
@@ -3433,9 +3410,9 @@ module in a daemon process:
 
 To see the internal workings of the C<Forks::Super> module, set
 C<$Forks::Super::DEBUG> to a non-zero value. Information messages
-will be written to the C<Forks::Super::Debug::DEBUG_FH> file handle. By default
-C<Forks::Super::Debug::DEBUG_FH> is aliased to C<STDERR>, but it may be reset
-by the module user at any time.
+will be written to the C<Forks::Super::Debug::DEBUG_FH> file handle.
+By default C<Forks::Super::Debug::DEBUG_FH> is aliased to C<STDERR>, 
+but it may be reset by the module user at any time.
 
 Debugging behavior may be overridden for specific jobs
 if the L<"debug"> or L<"undebug"> option is provided to C<fork>.
@@ -4008,13 +3985,51 @@ without the necessary modules will be silently ignored.
 
 =head1 BUGS AND LIMITATIONS
 
+=head2 Special tips for Windows systems
+
+On POSIX systems (including Cygwin), programs using the
+C<Forks::Super> module are interrupted when a child process
+completes. A callback function performs some housekeeping
+and may perform other duties like trying to dispatch
+items from the list of deferred jobs.
+
+=head3 C<Forks::Super::pause> vs. C<sleep>
+
+Windows systems do not have the signal handling capabilities
+of other systems, and so other things equal, a script
+running on Windows will not perform the housekeeping
+tasks as frequently as a script on other systems.
+
+The method C<Forks::Super::pause> can be used as a drop in
+replacement for the Perl C<sleep> call. In a C<pause>
+function call, the program will check on active
+child processes, reap the ones that have completed, and
+attempt to dispatch jobs on the queue.
+
+Calling C<pause> with an argument of 0 is also a valid
+way of invoking the child handler function on Windows.
+When used this way, C<pause> returns immediately after
+running the child handler.
+
+=head3 C<Forks::Super::isValidPid($pid)> vs. C<< if ($pid > 0) >>
+
+Child processes are implemented differently in Windows
+than in POSIX systems. The C<CORE::fork> and C<Forks::Super::fork>
+calls from Windows will usually return a B<pseudo-process ID> 
+to the parent process, and this will be a B<negative number>.
+The Unix idiom of testing whether a C<fork> call returns
+a positive number needs to be modified on Windows systems
+by testing whether  C<Forks::Super::isValidPid($pid)> returns
+true, where C<$pid> is the return value from a C<Forks::Super::fork>
+call.
+
 =head2 Interference with piped C<open>
 
 As documented in
 L<RT#124316|https://rt.cpan.org/Public/Bug/Display.html?id=124316>,
 C<Forks::Super> sets a relatively heavy C<SIGCHLD> handler, which
-can apparently cause a race condition when you call C<close> on a
-piped filehandle
+can cause a race condition when you call C<close> on a piped
+filehandle
 
     open my $fh, '|-', "command you expect to work ...";
     ...
@@ -4108,6 +4123,12 @@ Also L<Win32::Job|Win32::Job>.
 
 Inspiration for L<"bg_eval"> function from
 L<Acme::Fork::Lazy|Acme::Fork::Lazy>.
+
+L<Forks::Queue|Forks::Queue> provides a mechanism to manipulate
+a queue object from different processes simultaneously, and can
+be helpful to implement a dynamic queue for a supervisor-worker
+model with processes, not unlike L<Threads::Queue|Threads::Queue>
+can do for threads.
 
 =head1 AUTHOR
 

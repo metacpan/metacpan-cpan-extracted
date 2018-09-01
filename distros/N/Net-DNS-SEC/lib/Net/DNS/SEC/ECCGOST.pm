@@ -1,10 +1,9 @@
 package Net::DNS::SEC::ECCGOST;
 
 #
-# $Id: ECCGOST.pm 1677 2018-05-22 11:59:10Z willem $
+# $Id: ECCGOST.pm 1701 2018-07-28 07:36:34Z willem $
 #
-use vars qw($VERSION);
-$VERSION = (qw$LastChangedRevision: 1677 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1701 $)[1];
 
 
 =head1 NAME
@@ -41,17 +40,19 @@ public key resource record.
 use strict;
 use integer;
 use warnings;
-use Carp;
 
-use Digest::GOST 0.06;
-use Digest::GOST::CryptoPro;
+use constant ECCGOST_OK => Net::DNS::SEC::libcrypto->can('ECCGOST_verify');
+
+BEGIN { die unless ECCGOST_OK }					# not needed on voyage
+
+BEGIN { require Digest::GOST::CryptoPro }
 
 
 my %parameters = ( 12 => [840, 'Digest::GOST::CryptoPro'] );
 
 
 sub sign {
-	croak 'Russian Federation standard GOST R 34.10-2001 now obsolete';
+	die 'Russian Federation standard GOST R 34.10-2001 is obsolete';
 }
 
 
@@ -60,7 +61,7 @@ sub verify {
 
 	my $algorithm = $keyrr->algorithm;
 	my ( $nid, $object ) = @{$parameters{$algorithm} || []};
-	croak 'public key not ECC-GOST' unless $nid;
+	die 'public key not ECC-GOST' unless $nid;
 	my $hash = $object->new();
 	$hash->add($sigdata);
 	my $H = reverse $hash->digest;

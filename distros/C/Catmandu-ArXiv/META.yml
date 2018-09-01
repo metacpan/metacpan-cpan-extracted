@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,8 @@ requires:
   Catmandu::Identifier: '0.06'
   Catmandu::XML: '0.16'
   Furl: '3.07'
+  IO::Socket::SSL: '2.059'
+  URI: '0'
   XML::LibXML: '0'
   XML::LibXSLT: '0'
   perl: v5.10.1
@@ -35,9 +37,11 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-ArXiv/issues
   homepage: https://github.com/LibreCat/Catmandu-ArXiv
   repository: https://github.com/LibreCat/Catmandu-ArXiv.git
-version: '0.200'
+version: '0.211'
 x_contributors:
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
   - 'wouterw <wouter.willaert@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 0

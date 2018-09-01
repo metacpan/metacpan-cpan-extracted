@@ -1,5 +1,9 @@
 Revision history for perl module Text::Caml
 
+0.17 2018-08-31T20:17:00Z
+
+ - Non-escape mode (Igor Lobanov)
+
 0.16 2017-05-03T10:42:27Z
 
  - Escape "{" and "}" (Shoichi Kaji)

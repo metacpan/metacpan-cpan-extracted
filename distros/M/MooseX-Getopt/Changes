@@ -1,5 +1,11 @@
 Revision history for MooseX-Getopt
 
+0.73      2018-09-01 05:43:55Z
+ - properly wrap usage text that contains newlines (Andreas Koenig, github
+   #10)
+ - move the exit() to a higher scope, to allow for 'after' method modifiers on
+   'print_usage_text' (Michael Schout, github #9)
+
 0.72      2018-08-04 04:45:57Z
  - fix tests that broke with Getopt::Long::Descriptive 0.103 (RT#125992,
    Damyan Ivanov, debian-perl group)

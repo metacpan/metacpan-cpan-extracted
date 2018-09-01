@@ -22,3 +22,20 @@ WriteMakefile(
     AUTHOR            => 'Louis Strous <LS@quae.nl>',
     LICENSE           => 'perl',
 );
+
+sub MY::postamble {
+  return <<'EOD';
+# for MS Windows
+imsync.exe: $(TO_INST_PM) $(EXE_FILES)
+	pp -o imsync.exe -B -c bin/imsync
+
+# for the imsync.quae.nl website
+html: html/en/imsync.html html/nl/imsync.html
+
+html/en/imsync.html: bin/imsync
+	pod2cpanhtml $< > $@
+
+html/nl/imsync.html: bin/imsync-nl.pod
+	pod2cpanhtml $< > $@
+EOD
+}

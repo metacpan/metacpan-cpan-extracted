@@ -69,7 +69,9 @@ sub cmp_dims {
 
 sub pdlstr {
   my $a = shift;
-  my $str = defined($a) ? "$a" : '(undef)';
+  return '(undef)' if (!defined($a));
+  my $typ = UNIVERSAL::can($a,'type') ? $a->type : 'NOTYPE';
+  my $str = "($typ) $a";
   #$str =~ s/\n/ /g;
   return $str;
 }

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.181310';
+$Bio::MUST::Core::Ali::VERSION = '0.182420';
 use Moose;
 use namespace::autoclean;
 
@@ -726,6 +726,62 @@ sub load_stockholm {
     return $ali;
 }
 
+
+sub instant_store {
+    my $class   = shift;
+	my $outfile = shift;
+    my $args    = shift // {};          # HashRef (should not be empty...)
+
+    my $infile  = $args->{infile};
+    croak 'Error: no infile specified for instant_store; aborting!'
+        unless $infile;
+
+    my $coderef = $args->{coderef};
+    croak 'Error: no coderef specified for instant_store; aborting!'
+        unless $coderef;
+
+    open my $in,  '<', $infile;
+    open my $out, '>', $outfile;
+
+    my $seq_id;
+    my $seq;
+
+    LINE:
+    while (my $line = <$in>) {
+        chomp $line;
+
+        # skip empty lines and process comments
+        next LINE if $line =~ $EMPTY_LINE
+                  || $line =~ $COMMENT_LINE;
+
+        # at each '>' char...
+        my ($defline) = $line =~ $DEF_LINE;
+        if ($defline) {
+
+            # process current seq (if any)
+            if ($seq) {
+                my $new_seq = Seq->new( seq_id => $seq_id, seq => $seq );
+                print {$out} $coderef->($new_seq);
+                $seq = q{};
+            }
+
+            $seq_id = $defline;
+            next LINE;
+        }
+
+        # elongate current seq (seqs can be broken on several lines)
+        $seq .= $line;
+    }
+
+    # process last seq (if any)
+    if ($seq) {
+        my $new_seq = Seq->new( seq_id => $seq_id, seq => $seq );
+        print {$out} $coderef->($new_seq);
+    }
+
+    return;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -739,7 +795,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 SYNOPSIS
 
@@ -1441,6 +1497,39 @@ comment classes (=GS, =GR and =GC).
     # RL    J Virol 1997;71:5990-5996.
 
 This method requires one argument.
+
+=head2 instant_store
+
+Class method intended to transform a large sequence file read from disk
+without loading it in memory. This method will transparently process plain
+FASTA files in addition to the MUST pseudo-FASTA format (ALI files).
+
+    my $chunk = 200;
+
+    my $split = sub {
+        my $seq = shift;
+        my $base_id = ( split /\s+/xms, $seq->full_id )[0];
+        my $max_pos = $seq->seq_len - $chunk;
+        my $n = 0;
+        my $out_str;
+        for (my $pos = 0; $pos <= $max_pos; $pos += $chunk, $n++) {
+            $out_str .= ">$base_id.$n\n" . $seq->edit_seq($pos,
+                $pos + $chunk <= $max_pos ? $chunk : 2 * $chunk
+            ) . "\n";
+        }
+        return $out_str;
+    };
+
+    use aliased 'Bio::MUST::Core::Ali';
+
+    Ali->instant_store(
+        'outfile.fasta', { infile => 'infile.fasta', coderef => $split }
+    );
+
+This method requires two arguments. The sercond is a hash reference that must
+contain the following keys:
+    - infile:  input sequence file
+    - coderef: subroutine implementing the transforming logic
 
 =head1 ALIASES
 

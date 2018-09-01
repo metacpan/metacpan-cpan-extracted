@@ -3,7 +3,7 @@ use strict;
 
 package JMAP::Tester::Result::Auth;
 # ABSTRACT: what you get when you authenticate
-$JMAP::Tester::Result::Auth::VERSION = '0.020';
+$JMAP::Tester::Result::Auth::VERSION = '0.021';
 use Moo;
 with 'JMAP::Tester::Role::Result';
 
@@ -36,7 +36,7 @@ JMAP::Tester::Result::Auth - what you get when you authenticate
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 OVERVIEW
 

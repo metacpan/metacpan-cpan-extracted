@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # test $Forks::Super::Config::CONFIG{'filehandles'} = 0 --
-# force Forks::Super to use sockets/pipes exclusively
+# forces Forks::Super to use sockets/pipes exclusively
 
 sub _read_socket {
     my $handle = shift;

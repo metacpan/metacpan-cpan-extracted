@@ -50,7 +50,7 @@ or (manually):
 
 #### COPYRIGHT AND LICENSE ####
 
-Copyright (C) 2008-2015 Breno G. de Oliveira
+Copyright (C) 2008-2018 Breno G. de Oliveira
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

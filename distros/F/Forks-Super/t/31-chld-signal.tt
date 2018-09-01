@@ -144,7 +144,7 @@ __END__
 
 What is the status of this test?
 
-passes all tests on Linux, v5.8.8, v5.12.2, v5.16.3
+passes all tests on Linux, v5.8.8, v5.12.2, v5.16.3, v5.24.0, v5.26.1
 ok on MSWin32 5.16.3
 ok on solaris v5.16.3, v5.12.2, v5.10.1
 ok on aix v5.16.3, v5.12.2, v5.10.1

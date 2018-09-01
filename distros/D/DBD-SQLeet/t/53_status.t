@@ -8,13 +8,11 @@ BEGIN {
 }
 
 use lib "t/lib";
-use SQLeetTest qw/connect_ok @CALL_FUNCS has_sqleet_sqlite/;
+use SQLeetTest qw/connect_ok @CALL_FUNCS/;
 use Test::More;
 use Test::NoWarnings;
 
 my $tests = 3;
-$tests += 2 if has_sqleet_sqlite('3.6.4');
-$tests += 1 if has_sqleet_sqlite('3.7.0');
 
 plan tests => 4 + $tests * @CALL_FUNCS + 1;
 
@@ -40,10 +38,6 @@ for my $func (@CALL_FUNCS) {
     ok $db_status && ref $db_status eq ref {}, "db status is a hashref";
     my $num_of_keys = scalar keys %$db_status;
     ok $num_of_keys, "db status: $num_of_keys indicators";
-    if (has_sqleet_sqlite('3.7.0')) {
-      my $used_cache = $db_status->{cache_used}{current};
-      ok defined $used_cache && $used_cache, "current used cache: $used_cache";
-    }
   }
 
   {
@@ -51,11 +45,5 @@ for my $func (@CALL_FUNCS) {
     $sth->execute("text1");
     my $st_status = $sth->$func('st_status');
     ok $st_status && ref $st_status eq ref {}, "st status is a hashref";
-    if (has_sqleet_sqlite('3.6.4')) {
-      my $num_of_keys = scalar keys %$st_status;
-      ok $num_of_keys, "st status: $num_of_keys indicators";
-      my $sort = $st_status->{sort};
-      ok defined $sort, "num of sort: $sort";
-    }
   }
 }

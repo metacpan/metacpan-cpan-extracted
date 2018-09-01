@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Function/Return.pm
+lib/Function/Return/Info.pm
+minil.toml
+t/00_compile.t
+t/01_wrap_sub.t
+t/02_return_attribute.t
+t/03_return_info.t
+t/04_import_option_name.t
+t/05_import_option_no_check.t
+META.yml
+MANIFEST

@@ -1,11 +1,11 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1684 2018-06-04 09:03:04Z willem $
+# $Id: SEC.pm 1708 2018-08-31 12:22:27Z willem $
 #
 our $VERSION;
-$VERSION = '1.09';
-our $SVNVERSION = (qw$LastChangedRevision: 1684 $)[1];
+$VERSION = '1.10';
+our $SVNVERSION = (qw$LastChangedRevision: 1708 $)[1];
 our $XS_VERSION = $VERSION;
 $VERSION = eval($VERSION);
 
@@ -20,17 +20,14 @@ Net::DNS::SEC - DNSSEC extensions to Net::DNS
 
 =head1 DESCRIPTION
 
-The Net::DNS::SEC suite provides additional packages required to support
-DNSSEC as described in RFC4033, RFC4034, RFC4035 and subsequent related
-documents.
-
-It also provides support for SIG0 which is useful for dynamic updates
-using key-pairs.
-
-RSA, DSA and elliptic curve crypto algorithms are supported.
-
 Net::DNS::SEC is installed as an extension to an existing Net::DNS
-installation.
+installation providing packages to support DNSSEC as specified in
+RFC4033, RFC4034, RFC4035 and related documents.
+
+It also provides support for SIG0 which is useful for dynamic updates.
+
+Implements cryptographic signature generation and verification functions
+using RSA, DSA, ECDSA, and Edwards curve algorithms.
 
 The extended features are made available by replacing Net::DNS by
 Net::DNS::SEC in the use declaration.
@@ -117,7 +114,7 @@ sub key_difference {
 eval { Net::DNS::SEC->bootstrap($XS_VERSION) } || warn;
 
 
-foreach (qw(CDS DS DLV RRSIG SIG)) {
+foreach (qw(DS CDS DLV RRSIG)) {
 	new Net::DNS::RR( type => $_ );				# pre-load to access class methods
 }
 

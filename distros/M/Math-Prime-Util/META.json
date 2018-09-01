@@ -4,7 +4,7 @@
       "Dana A Jacobsen <dana@acm.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
          "recommends" : {
             "Digest::SHA" : "5.87",
             "Math::BigInt::GMP" : "0",
-            "Math::Prime::Util::GMP" : "0.5"
+            "Math::Prime::Util::GMP" : "0.51"
          },
          "requires" : {
             "Carp" : "0",
@@ -63,35 +63,35 @@
    "provides" : {
       "Math::Prime::Util" : {
          "file" : "lib/Math/Prime/Util.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "Math::Prime::Util::ChaCha" : {
          "file" : "lib/Math/Prime/Util/ChaCha.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "Math::Prime::Util::Entropy" : {
          "file" : "lib/Math/Prime/Util/Entropy.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "Math::Prime::Util::MemFree" : {
          "file" : "lib/Math/Prime/Util/MemFree.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "Math::Prime::Util::PP" : {
          "file" : "lib/Math/Prime/Util/PP.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "Math::Prime::Util::PrimeArray" : {
          "file" : "lib/Math/Prime/Util/PrimeArray.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "Math::Prime::Util::PrimeIterator" : {
          "file" : "lib/Math/Prime/Util/PrimeIterator.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       },
       "ntheory" : {
          "file" : "lib/ntheory.pm",
-         "version" : "0.70"
+         "version" : "0.71"
       }
    },
    "release_status" : "stable",
@@ -104,6 +104,6 @@
          "url" : "https://github.com/danaj/Math-Prime-Util"
       }
    },
-   "version" : "0.70",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.71",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

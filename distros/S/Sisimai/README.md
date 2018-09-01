@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.26-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.22.7-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.23.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README-JA(日本語)**](README-JA.md)
 - [What is Sisimai](#what-is-sisimai)
@@ -112,13 +112,21 @@ Usage
 
 Basic usage
 -------------------------------------------------------------------------------
-`Sisimai->make()` method provides feature for getting parsed data as Perl Hash reference
-from bounced email messages like following.
+`Sisimai->make()` method provides feature for getting parsed data as Perl Hash
+reference from bounced email messages like following.
 
 ```perl
 #! /usr/bin/env perl
 use Sisimai;
 my $v = Sisimai->make('/path/to/mbox'); # or path to Maildir/
+
+# Beginning with v4.23.0, both make() and dump() method of Sisimai class can
+# read bounce messages from variable instead of a path to mailbox
+use IO::File;
+my $r = '';
+my $f = IO::File->new('/path/to/mbox'); # or path to Maildir/
+{ local $/ = undef; $r = <$f>; $f->close }
+my $v = Sisimai->make(\$r);
 
 # If you want to get bounce records which reason is "delivered", set "delivered"
 # option to make() method like the following:
@@ -228,7 +236,7 @@ Output example
 ![](https://libsisimai.org/static/images/demo/sisimai-dump-02.gif)
 
 ```json
-[{"rhost": "mx.example.co.jp","recipient": "filtered@example.co.jp","token": "01b88ad40b2f7089a6b1986ade14d323aaad9da2","deliverystatus": "5.2.1","smtpcommand": "RCPT","alias": "filtered@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Email::Postfix","messageid": "","diagnosticcode": "550 5.2.1 <filtered@example.co.jp>... User Unknown","lhost": "smtp.example.com","replycode": "550","reason": "userunknown","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp"},{"lhost": "smtp.example.com","reason": "userunknown","replycode": "550","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp","rhost": "mx.example.co.jp","recipient": "userunknown@example.co.jp","deliverystatus": "5.1.1","token": "948ed89b794207632dbab0ce3b72175553d9de83","smtpcommand": "RCPT","alias": "userunknown@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Email::Postfix","messageid": "","diagnosticcode": "550 5.1.1 <userunknown@example.co.jp>... User Unknown"}]
+[{"action": "failed", "subject": "Nyaan", "catch": null, "token": "08acf78323edc7923a783c04749dd547ab45c433", "alias": "", "messageid": "201806090556.w595u8GZ093276@neko.example.jp", "listid": "", "smtpcommand": "MAIL", "smtpagent": "Email::Sendmail", "lhost": "localhost", "timezoneoffset": "+0900", "feedbacktype": "", "senderdomain": "neko.example.jp", "diagnostictype": "SMTP", "softbounce": 1, "deliverystatus": "5.0.0", "addresser": "kijitora@neko.example.jp", "diagnosticcode": "550 Unauthenticated senders not allowed", "timestamp": 1528523769, "destination": "example.com", "recipient": "sironeko@example.com", "reason": "securityerror", "replycode": "550", "rhost": "neko.example.jp"}]
 ```
 
 Sisimai Specification
@@ -257,8 +265,8 @@ and Sisimai. More information about differences are available at
 | Easy to install                                | No            | Yes         |
 | Install using cpan, cpanm, or cpm command      | N/A           | OK          |
 | Dependencies (Except core modules of Perl)     | 24 modules    | 2 modules   |
-| LOC:Source lines of code                       | 18200 lines   | 8600 lines  |
-| The number of tests in t/, xt/ directory       | 27365 tests   | 235000 tests|
+| LOC:Source lines of code                       | 18200 lines   | 8500 lines  |
+| The number of tests in t/, xt/ directory       | 27365 tests   | 236000 tests|
 | License                                        | GPLv2 or Perl | 2 clause BSD|
 | Support Contract provided by Developer         | End Of Sales  | Available   |
 

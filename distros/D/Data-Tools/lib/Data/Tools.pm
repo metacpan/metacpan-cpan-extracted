@@ -3,7 +3,7 @@
 #  Data::Tools perl module
 #  2013-2018 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
-#  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
+#  <cade@bis.bg> <cade@cpan.org> <shabanski@gmail.com> 
 #
 #  GPL
 #
@@ -19,12 +19,14 @@ use Digest::SHA1;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
 
               data_tools_set_file_io_encoding
+              data_tools_set_file_io_utf8
+              data_tools_set_file_io_bin
 
               file_save
               file_load
@@ -45,7 +47,10 @@ our @EXPORT = qw(
               
               str2hash 
               hash2str
+              hash2str_keys
 
+              str2hash_url
+              hash2str_url
               url2hash
               
               hash_uc
@@ -55,6 +60,9 @@ our @EXPORT = qw(
               
               hash_save
               hash_load
+              hash_save_keys
+              hash_save_url
+              hash_load_url
               
               hash_validate
               
@@ -108,6 +116,18 @@ sub data_tools_set_file_io_encoding
 {
   $FILE_IO_ENCODING = shift;
   $FILE_IO_BINMODE  = uc $FILE_IO_ENCODING eq ':RAW' ? 1 : 0;
+}
+
+sub data_tools_set_file_io_utf8
+{
+  $FILE_IO_ENCODING = 'UTF-8';
+  $FILE_IO_BINMODE  = 0;
+}
+
+sub data_tools_set_file_io_bin
+{
+  $FILE_IO_ENCODING = ':RAW';
+  $FILE_IO_BINMODE  = 1;
 }
 
 ##############################################################################
@@ -422,7 +442,58 @@ sub str_countable
 
 ##############################################################################
 
+sub hash2str
+{
+   my $hr = shift;
+
+   my $str;
+   while( my ( $k, $v ) = each %$hr )
+    {
+    $k =~ s/=/\\=/g;
+    $v =~ s/\\/\\\\/g;
+    $v =~ s/\n/\\n/g;
+    $str .= "$k=$v\n";
+    }
+
+  return $str;
+}
+
 sub str2hash
+{
+  my $str = shift;
+  my %hr;
+
+  for( split /\n/, $str )
+    {
+    my ( $k, $v ) = split /(?<!\\)=/, $_, 2;
+    $k =~ s/\\=/=/g;
+    $v =~ s/\\\\/\\/g;
+    $v =~ s/\\n/\n/g;
+    $hr{ $k } = $v;
+    }
+
+return \%hr;
+}
+
+sub hash2str_keys
+{
+  my $hr = shift;
+
+  my $str;
+  for my $k ( @_ )
+    {
+    my $v = $hr->{ $k };
+    $k =~ s/=/\\=/g;
+    $v =~ s/\\/\\\\/g;
+    $v =~ s/\n/\\n/g;
+    $str .= "$k=$v\n";
+    }
+
+  return $str;
+}
+
+
+sub str2hash_url
 {
   my $str = shift;
   
@@ -434,7 +505,7 @@ sub str2hash
   return \%h;
 }
 
-sub hash2str
+sub hash2str_url
 {
   my $hr = shift; # hash reference
 
@@ -515,6 +586,32 @@ sub hash_load
   my $fn = shift;
   
   return str2hash( file_load( $fn ) );
+}
+
+sub hash_save_keys
+{
+  my $fn = shift;
+  my $hr = shift;
+
+  my $data;
+  $data .= hash2str_keys( $hr, @_ );
+  return file_save( $fn, $data );
+}
+
+sub hash_save_url
+{
+  my $fn = shift;
+  # @_ array of hash references
+  my $data;
+  $data .= hash2str_url( $_ ) for @_;
+  return file_save( $fn, $data );
+}
+
+sub hash_load_url
+{
+  my $fn = shift;
+  
+  return str2hash_url( file_load( $fn ) );
 }
 
 ##############################################################################
@@ -790,8 +887,17 @@ INIT  { __url_escapes_init(); }
 
   # --------------------------------------------------------------------------
   
-  my $hash_str = hash2str( $hash_ref ); # convert hash to string "key=value\n"
+  # uses simple backslash escaping of \n, = and \ itself
+  my $data_str = hash2str( $hash_ref ); # convert hash to string "key=value\n"
   my $hash_ref = str2hash( $hash_str ); # convert str "key-value\n" to hash
+
+  # same as hash2str() but uses keys in certain order
+  my $data_str = hash2str_keys( \%hash, sort keys %hash );
+  my $data_str = hash2str_keys( \%hash, sort { $a <=> $b } keys %hash );
+
+  # same as hash2str() and str2hash() but uses URL-style escaping
+  my $data_str = hash2str_url( $hash_ref ); # convert hash to string "key=value\n"
+  my $hash_ref = str2hash_url( $hash_str ); # convert str "key-value\n" to hash
   
   my $hash_ref = url2hash( 'key1=val1&key2=val2&testing=tralala);
   # $hash_ref will be { key1 => 'val1', key2 => 'val2', testing => 'tralala' }
@@ -805,6 +911,13 @@ INIT  { __url_escapes_init(); }
   # save/load hash in str_url_escaped form to/from a file
   my $res      = hash_save( $file_name, $hash_ref );
   my $hash_ref = hash_load( $file_name );
+
+  # save hash with certain keys order, uses hash2str_keys()
+  my $res      = hash_save( $file_name, \%hash, sort keys %hash );
+  
+  # same as hash_save() and hash_load() but uses hash2str_url() and str2hash_url()
+  my $res      = hash_save_url( $file_name, $hash_ref );
+  my $hash_ref = hash_load_url( $file_name );
 
   # validate (nested) hash by example
   

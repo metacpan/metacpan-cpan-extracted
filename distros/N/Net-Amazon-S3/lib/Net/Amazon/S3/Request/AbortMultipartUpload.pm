@@ -1,29 +1,17 @@
 package Net::Amazon::S3::Request::AbortMultipartUpload;
-$Net::Amazon::S3::Request::AbortMultipartUpload::VERSION = '0.84';
+$Net::Amazon::S3::Request::AbortMultipartUpload::VERSION = '0.85';
 use Moose 0.85;
 use Digest::MD5 qw/md5 md5_hex/;
 use MIME::Base64;
 use Carp qw/croak/;
 use XML::LibXML;
 
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
-with 'Net::Amazon::S3::Role::Bucket';
-
-has 'key'       => ( is => 'ro', isa => 'Str',        required => 1 );
-has 'upload_id' => ( is => 'ro', isa => 'Str',        required => 1 );
+with 'Net::Amazon::S3::Request::Role::Query::Param::Upload_id';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::DELETE';
 
 __PACKAGE__->meta->make_immutable;
-
-sub http_request {
-  my $self = shift;
-
-  #build signed request
-  return $self->_build_http_request(
-    method  => 'DELETE',
-    path    => $self->_uri( $self->key ) . '?uploadId=' . $self->upload_id,
-  );
-}
 
 1;
 
@@ -37,7 +25,7 @@ Net::Amazon::S3::Request::AbortMultipartUpload - An internal class to complete a
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

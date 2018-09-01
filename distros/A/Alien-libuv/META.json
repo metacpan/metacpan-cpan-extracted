@@ -86,7 +86,7 @@
    "provides" : {
       "Alien::libuv" : {
          "file" : "lib/Alien/libuv.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/genio/Alien-libuv"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -438,7 +438,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.005",
+                  "tag" : "v1.006",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

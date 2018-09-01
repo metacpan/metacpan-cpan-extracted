@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-FileStore/issues
   homepage: https://github.com/LibreCat/Catmandu-FileStore
   repository: https://github.com/LibreCat/Catmandu-FileStore.git
-version: '1.11'
+version: '1.12'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

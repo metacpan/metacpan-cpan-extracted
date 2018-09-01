@@ -3,15 +3,32 @@ Revision history for AnyEvent::HTTP
 TODO: provide lwp_request function that takes an lwp http requets and returns a http response.
 TODO: set_proxy hook
 TODO: use proxy hook
-TODO: maybe read big chunks in smaller portions for chunked-encoding + on_body.
 TODO: on_upgrade, for 101 responses?
 TODO: document session vs. sessionid correctly.
 TODO: support proxy username:password in both proxy switch and set_proxy string (dzagashev@gmail.com)
 TODO: remove "unexpectedly got a destructed handle"
 
+TODO: maybe read big chunks in smaller portions for chunked-encoding + on_body.
 TODO: callback as body (Kostirya)
 TODO: infinite recursion(?) (Kostirya)
 TODO: default rbuf_max value maybe? how about reading large chunks in small parts?
+TODO: servers send empty reason, which then gets mangled with linear whitespace CRLF - maybe workaround?
+
+TODO: look into http 0.9 support (Kostirya <kostirya@gmail.com>)
+TODO: http://appft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&%23038;d=PG01&%23038;p=1&%23038;u=/netahtml/PTO/srchnum.html&%23038;r=1&%23038;f=G&%23038;l=50&%23038;s1="20110298798".PGNR.&%23038;OS=DN/20110298798&%23038;RS=DN/20110298798
+
+2.24 Thu Aug 30 03:23:03 CEST 2018
+	- bring cookie management more in line with RFC 6265; implement idn
+          matching for cookie domains.
+        - update cookie_jar version to 2, invalidate existing cookie jars.
+        - preserve original cookie domain attribute.
+        - also expire old cookie jars in cookie parser, just in case.
+	- further improve relative redirection code.
+        - comment out code that tried to detect possible bugs with persistent
+          connection caching, but since it never triggered, it's probably
+          working fine :)
+	- do not call on_body callback on a response that AE::HTTP will recurse
+          on internally (reported by Антон Онуфриев and Ruslan Zakirov).
 
 2.23 Sun Aug 28 11:30:33 CEST 2016
 	- relative redirects used the proxy schema instead of the request

@@ -48,7 +48,7 @@ This module requires these other modules and libraries:
 
   IO::Interactive
 
-  Image::ExifTool> version 10.14 or up
+  Image::ExifTool version 10.14 or up
 
   Path::Class
 

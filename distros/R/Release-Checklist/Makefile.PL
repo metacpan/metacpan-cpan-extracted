@@ -5,7 +5,7 @@
 require 5.006;
 use strict;
 
-our $VERSION = "0.08";
+our $VERSION = "0.10";
 
 use ExtUtils::MakeMaker;
 
@@ -46,7 +46,6 @@ Checklist.pm:	doc
 	perl pod2pm.pl
 
 test::		doc
-	perl test-doc.pl
 	perl scripts/pod-spell-check --aspell --ispell
 
 tgzdist:

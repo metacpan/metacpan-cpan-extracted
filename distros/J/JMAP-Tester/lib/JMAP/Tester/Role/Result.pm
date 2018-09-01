@@ -2,7 +2,7 @@ use v5.10.0;
 use warnings;
 package JMAP::Tester::Role::Result;
 # ABSTRACT: the kind of thing that you get back for a request
-$JMAP::Tester::Role::Result::VERSION = '0.020';
+$JMAP::Tester::Role::Result::VERSION = '0.021';
 use Moo::Role;
 
 use JMAP::Tester::Abort ();
@@ -89,7 +89,7 @@ JMAP::Tester::Role::Result - the kind of thing that you get back for a request
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 OVERVIEW
 

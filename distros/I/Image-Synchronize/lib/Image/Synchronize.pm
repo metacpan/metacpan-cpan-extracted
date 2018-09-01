@@ -1,7 +1,5 @@
 package Image::Synchronize;
 
-# TODO: Prevent Thumbs.db files from being attempted to write to
-
 =head1 NAME
 
 Image::Synchronize - a module for synchronizing filesystem
@@ -79,7 +77,7 @@ use YAML::Any qw(
   LoadFile
 );
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 my $CASE_TOLERANT;
 
@@ -486,6 +484,20 @@ sub delete_backups {
   $self;
 }
 
+#  @best_scorers = best_scorers(sub { ... }, @targets)
+#
+# Return the best-scoring items.  The code reference, when called for
+# a target, should return a numerical score.  The highest score among
+# the @targets is determined, and all elements of @targets that have
+# that highest score are returned.
+sub best_scorers {
+  my ($code, @targets) = @_;
+  my %score = map { $code->($_) } @targets;
+  my @order = sort { $score{$b} <=> $score{$a} } @targets;
+  my $bestscore = $score{ $order[0] };
+  return grep { $score{$_} == $bestscore } keys %score;
+}
+
 #    $ims->determine_new_values_for_all_files;
 #
 # Determines the proposed final values (target timestamp, location, and
@@ -558,12 +570,8 @@ EOD
         # prefer targets of which the beginning of the path looks
         # most like that of the current file
 
-        my %score =
-          map { $_ => length_of_common_prefix( $file, $_ ) } @targets;
-        my @order = sort { $score{$b} <=> $score{$a} } @targets;
-        my $bestscore = $score{ $order[0] };
-
-        @targets = grep { $score{$_} == $bestscore } keys %score;
+        @targets = best_scorers
+          ( sub { $_ => length_of_common_prefix( $file, $_ ) }, @targets);
       }
       if ( @targets > 1 ) {
 
@@ -582,6 +590,19 @@ EOD
         if (@matches) {
           @targets = @matches;
         }
+      }
+      if (@targets > 1) {
+        # prefer the one(s) with the beginning of the file name is
+        # most like that of the current file
+        my $b = file($file)->basename;
+        @targets = best_scorers
+          ( sub {
+              $_ => length_of_common_prefix( $b, file($_)->basename ) },
+            @targets);
+      }
+      if (@targets > 1) {
+        # apply lexicographic sort, so the results are predictable.
+        @targets = sort @targets;
       }
       $count_modified +=
         $self->determine_new_values_for_file( $file, $targets[0] );
@@ -1102,6 +1123,19 @@ sub determine_new_values_for_file {
 
   push @messages, $new_info->stringify(' ');
 
+  if (scalar(keys %changes) == 1
+      and exists $changes{ImsyncVersion}
+      and defined $info->get('ImsyncVersion')) {
+    # The only thing that changed is the ImsyncVersion value: the file
+    # already has that tag but the current version of imsync is newer
+    # than the one that modified the file last.  This is not a good
+    # reason to change the file, so we suppress that change.
+    %changes = ();
+    $min_force_for_change = 99;
+    $new_info->set('ImsyncVersion', $info->get('ImsyncVersion'));
+    push @messages, ' Only ImsyncVersion has changed -- suppressing.';
+  }
+
   my $result = 0;
   if ( $min_force_for_change < 99 ) {    # some changes
     if ( ( $extra_info->get('explicit_change') // 0 ) > 0
@@ -1526,21 +1560,26 @@ sub get_image_info {
     foreach my $tag ( sort keys %{$image_info} ) {
       my $group    = $self->backend->GetGroup($tag);
       my $bare_tag = $tag =~ s/ \(\d+\)$//r;          # omit index number if any
+
+      # For GPS tags we reject those in the EXIF group because they
+      # lack the N/S or E/W or +/- "sign".  The corresponding tags in
+      # the Composite or XMP groups are complete and are acceptable.
+      next
+        if exists $gps_location_tags{$bare_tag}
+        and $group eq 'EXIF';
+
       my $value    = $image_info->{$tag};
+
       if ( exists $time_tags{$bare_tag}
         or exists $time_tags{"$group:$bare_tag"} )
       {                                               # it expresses a time
         $value = Image::Synchronize::Timestamp->new($value);
       }
 
-      # for GPS tags we only accept those in the Composite group,
-      # because the ones in the EXIF group lack the N/S or E/W or +/-
-      # "sign".
-      next
-        if exists $gps_location_tags{$bare_tag}
-        and $group ne 'Composite';
-
-      $info->set( $group, $bare_tag, $value );
+      if (defined $value) {
+        $info->set( $group, $bare_tag, $value );
+      } # otherwise $value was undefined, for example because a
+        # timestamp tag's value wasn't valid.
     }
   }
 
@@ -2877,6 +2916,7 @@ EOD
 
   my $min_offset;
   my $max_offset;
+  my $count_nonzero_offset = 0;
   foreach my $file (
     sort {
       timestamp_for_sorting( $self->{original_info}->{$a},
@@ -2968,6 +3008,7 @@ EOD
       );
     }
     if ($time_change) {
+      ++$count_nonzero_offset;
       $min_offset = $time_change
         if not( defined $min_offset )
         or $time_change < $min_offset;
@@ -2981,7 +3022,7 @@ EOD
   $max_offset //= 0;
   if ( $min_offset == $max_offset ) {
     if ($min_offset) {    # not equal to zero
-      log_message( "All non-zero offsets are equal to ",
+      log_message( "All $count_nonzero_offset non-zero offsets are equal to ",
         display_offset($min_offset), ".\n\n" );
     }
     else {
@@ -2990,7 +3031,7 @@ EOD
   }
   else {
     log_message(
-      "Non-zero offsets are between ",
+      "$count_nonzero_offset non-zero offsets are between ",
       display_offset($min_offset),
       " and ", display_offset($max_offset), ".\n"
     );
@@ -3155,7 +3196,9 @@ sub resolve_files {
   return () unless @items;
   $options //= {};
   if ( not( $options->{recurse} ) ) {
-    $rule = $rule->clone->max_depth(1);    # no recursion
+    $rule = Path::Iterator::Rule->new
+      ->max_depth(1)            # no recursion
+      ->and($rule);
   }
   my @files;
   foreach my $item (@items) {
@@ -3173,12 +3216,20 @@ sub resolve_files {
 
       # seek directories matching the pattern
       my @subdirs =
-        Path::Iterator::Rule->new->directory->name( $f->basename )
-        ->all( $f->parent );
+        Path::Iterator::Rule->new
+          ->max_depth(1)
+          ->name( $f->basename )
+          ->directory
+          ->all( $f->parent );
       push @files, $rule->all(@subdirs) if @subdirs;
 
       # seek files matching the pattern
-      push @files, $rule->clone->name( $f->basename )->all( $f->parent );
+      push @files,
+        Path::Iterator::Rule->new
+          ->max_depth(1)
+          ->name( $f->basename )
+          ->and( $rule )
+          ->all( $f->parent );
     }
   }
 

@@ -21,7 +21,7 @@
 
 \h1[[% name %]]
 [% IF quote %]
-\quote[% IF quote.text.length < 80 %](short)[% END %][
+\quote[% IF quote.text.length < 80 %](short)[% ELSIF quote.broken %](broken)[% END %][
 
 [% indent(quote.text, 4) %]
 
@@ -51,7 +51,8 @@
 [% END %][% END %]
     \h2[Development]
 
-    \link[todo.html][To-do list][% IF vcs.github %] \break
+    \link[todo.html][To-do list][% FOREACH doc IN docs.developer %] \break
+    \link[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %] \break
     \link[https://github.com/[% vcs.github %]]
          [GitHub][% END %][% IF support.github %] \break
     \link[https://github.com/[% support.github %]/issues]
@@ -147,11 +148,12 @@ also \link[[% vcs.browse %]][browse the current development source].
     Security advisories:
 [% FOREACH advisory IN advisories %]
     \doc[security/[% advisory.date %].html]
-        [[% advisory.date %]: [% advisory.versions %]]
-[% END %][% END %]
+        [[% advisory.date %]: [% advisory.versions %]][% END %]
+[% END %]
     Developer documentation:
 
-    \doc[todo.html][To-do list][% IF vcs.github %]
+    \doc[todo.html][To-do list][% FOREACH doc IN docs.developer %]
+    \doc[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %]
     \doc[https://github.com/[% vcs.github %]]
         [GitHub][% END %][% IF support.github %]
     \doc[https://github.com/[% support.github %]/issues]
@@ -160,6 +162,11 @@ also \link[[% vcs.browse %]][browse the current development source].
         [Travis-CI][% END %][% IF vcs.openhub %]
     \doc[[% vcs.openhub %]]
         [Open HUB code analysis][% END %]
+    [% IF docs.contrib %]
+    Contributed programs:
+    [% FOREACH doc IN docs.contrib %]
+    \doc[[% doc.name %].html][[% doc.title %]][% END %]
+[% END %]
 ]
 
 \div(right)[
@@ -188,7 +195,8 @@ Security advisories:
 [% END %][% END %]
 Developer documentation:
 
-\doc[todo.html][To-do list][% IF vcs.github %]
+\doc[todo.html][To-do list][% FOREACH doc IN docs.developer %]
+    \doc[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %]
 \doc[https://github.com/[% vcs.github %]]
     [GitHub][% END %][% IF support.github %]
 \doc[https://github.com/[% support.github %]/issues]
@@ -197,7 +205,11 @@ Developer documentation:
     [Travis-CI][% END %][% IF vcs.openhub %]
 \doc[[% vcs.openhub %]]
     [Open HUB code analysis][% END %]
-
+[% IF docs.contrib %]
+Contributed programs:
+[% FOREACH doc IN docs.contrib %]
+\doc[[% doc.name %].html][[% doc.title %]]
+[% END %][% END %]
 \h2[License]
 [% END %]
 The [% name %] package as a whole is covered by the following copyright

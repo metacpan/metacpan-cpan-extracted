@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Perl::Tidy qw();
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Perl::Tidy::Sweetened::Pluggable;
 use Perl::Tidy::Sweetened::Keyword::Block;
@@ -44,7 +44,7 @@ $plugins->add_filter(
         keyword     => 'fun',
         marker      => 'FUN',
         replacement => 'sub',
-        clauses     => [ 'PAREN?' ],
+        clauses     => ['PAREN?'],
     ) );
 
 # Create a subroutine filter for:
@@ -55,7 +55,8 @@ $plugins->add_filter(
         keyword     => 'method',
         marker      => 'METHOD',
         replacement => 'sub',
-        clauses     => [ 'PAREN?', '(returns \s* PAREN)?' ],
+        clauses =>
+          [ 'PAREN?', '(returns \s* PAREN)?', '(\b(?:is|but|does) \s+ \w+)?' ],
     ) );
 
 # Create a subroutine filter for:
@@ -66,7 +67,7 @@ $plugins->add_filter(
         keyword     => 'classmethod',
         marker      => 'CLASSMETHOD',
         replacement => 'sub',
-        clauses     => [ 'PAREN?' ],
+        clauses     => ['PAREN?'],
     ) );
 
 # Create a subroutine filter for:
@@ -77,7 +78,7 @@ $plugins->add_filter(
         keyword     => 'objectmethod',
         marker      => 'OBJECTMETHOD',
         replacement => 'sub',
-        clauses     => [ 'PAREN?' ],
+        clauses     => ['PAREN?'],
     ) );
 
 # Create a subroutine filter for:
@@ -121,7 +122,7 @@ Perl::Tidy::Sweetened - Tweaks to Perl::Tidy to support some syntactic sugar
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 STATUS
 
@@ -177,32 +178,6 @@ L<Perl::Tidy>
 =head1 AUTHOR
 
 Mark Grimes E<lt>mgrimes@cpan.orgE<gt>
-
-=head1 CONTRIBUTORS
-
-=over 4
-
-=item *
-
-Kent Fredric (@kentnl)
-
-=item *
-
-Gregoy Oschwald (@oschwal)
-
-=item *
-
-Curtis Brandt (@aggrolite)
-
-=item *
-
-@pblaberge
-
-=item *
-
-Peter Roberts (@pwr22)
-
-=back
 
 =head1 SOURCE
 

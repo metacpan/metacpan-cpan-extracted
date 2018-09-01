@@ -6,7 +6,7 @@ use Config;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build and make available libffi
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 
@@ -25,7 +25,7 @@ Alien::FFI - Build and make available libffi
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

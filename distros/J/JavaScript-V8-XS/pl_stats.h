@@ -8,7 +8,7 @@ struct Perf {
     double m0, m1;
 };
 
-void pl_stats_start(pTHX_ V8Context* duk, Perf* perf);
-void pl_stats_stop(pTHX_ V8Context* duk, Perf* perf, const char* name);
+void pl_stats_start(pTHX_ V8Context* ctx, Perf* perf);
+void pl_stats_stop(pTHX_ V8Context* ctx, Perf* perf, const char* name);
 
 #endif

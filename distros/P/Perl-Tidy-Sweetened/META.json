@@ -4,7 +4,7 @@
       "Mark Grimes E<lt>mgrimes@cpan.orgE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.022"
+            "App::ModuleBuildTiny" : "0.023"
          }
       },
       "runtime" : {
@@ -42,23 +42,23 @@
    "provides" : {
       "Perl::Tidy::Sweet" : {
          "file" : "lib/Perl/Tidy/Sweet.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Perl::Tidy::Sweetened" : {
          "file" : "lib/Perl/Tidy/Sweetened.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Perl::Tidy::Sweetened::Keyword::Block" : {
          "file" : "lib/Perl/Tidy/Sweetened/Keyword/Block.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Perl::Tidy::Sweetened::Pluggable" : {
          "file" : "lib/Perl/Tidy/Sweetened/Pluggable.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Perl::Tidy::Sweetened::Variable::Twigils" : {
          "file" : "lib/Perl/Tidy/Sweetened/Variable/Twigils.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "http://github.com/mvgrimes/Perl-Tidy-Sweetened"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_contributors" : [
       "Kent Fredric (@kentnl)",
       "Gregoy Oschwald (@oschwal)",

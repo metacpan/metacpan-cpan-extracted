@@ -27,7 +27,7 @@ ok(Forks::Super::Util::isValidPid("5000"), 'isValidPid #1');
 ok(!Forks::Super::Util::isValidPid("-1"), 'isValidPid #2');
 ok(!Forks::Super::Util::isValidPid("0"), 'isValidPid #3');
 ok(!Forks::Super::Util::isValidPid("word"), 'isValidPid #4');
-ok(!Forks::Super::Util::isValidPid("-999999"), 'isValidPid #5');
+ok(!Forks::Super::Util::isValidPid("-5_555_555"), 'isValidPid #5');
 ok(Forks::Super::Util::isValidPid("-404") ^ ($^O ne 'MSWin32'), 
    'isValidPid #6');
 

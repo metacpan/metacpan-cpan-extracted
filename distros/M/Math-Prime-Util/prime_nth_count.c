@@ -273,6 +273,7 @@ UV segment_prime_count(UV low, UV high)
 
   if (low > high)  return count;
 
+#if !defined(BENCH_SEGCOUNT)
   if (low == 7 && high <= 30*NPRIME_SIEVE30) {
     count += count_segment_ranged(prime_sieve30, NPRIME_SIEVE30, low, high);
     return count;
@@ -285,6 +286,7 @@ UV segment_prime_count(UV low, UV high)
    * to sieve all the rest.  We should be using LMO or Lehmer much earlier. */
 #ifdef APPLY_TABLES
   APPLY_TABLES
+#endif
 #endif
 
   low_d = low/30;
@@ -333,6 +335,10 @@ UV prime_count(UV lo, UV hi)
 
   if (lo > hi || hi < 2)
     return 0;
+
+#if defined(BENCH_SEGCOUNT)
+  return segment_prime_count(lo, hi);
+#endif
 
   /* We use table acceleration so this is preferable for small inputs */
   if (hi < 66000000)  return segment_prime_count(lo, hi);
@@ -396,6 +402,9 @@ UV prime_count_lower(UV n)
   fn  = (long double) n;
   fl1 = logl(n);
   fl2 = fl1 * fl1;
+
+  /* Axler 2014: https://arxiv.org/abs/1409.1780  (v7 2016), Cor 3.6
+   * show variations of this. */
 
   if (n <= 300000) { /* Quite accurate and avoids calling Li for speed. */
     a = (n < 70200) ? 947 : (n < 176000) ? 904 : 829;
@@ -461,6 +470,12 @@ UV prime_count_upper(UV n)
   fl1 = logl(n);
   fl2 = fl1 * fl1;
 
+  /* Axler 2014: https://arxiv.org/abs/1409.1780  (v7 2016), Cor 3.5
+   *
+   * upper = fn/(fl1-1.0L-1.0L/fl1-3.35L/fl2-12.65L/(fl2*fl1)-89.6L/(fl2*fl2));
+   * return (UV) floorl(upper);
+   */
+
   if (BITS_PER_WORD == 32 || fn <= 821800000.0) {  /* Dusart 2010, page 2 */
     for (i = 0; i < (int)NUPPER_THRESH; i++)
       if (n < _upper_thresh[i].thresh)
@@ -512,7 +527,7 @@ UV nth_prime_upper(UV n)
   /* Dusart 2010 page 2 */
   upper = fn * (flogn + flog2n - 1.0 + ((flog2n-2.00)/flogn));
   if        (n >= 46254381) {
-     /* Axler 2017 http//arxiv.org/pdf/1706.03651.pdf Corollary 1.2 */
+     /* Axler 2017 http://arxiv.org/pdf/1706.03651.pdf Corollary 1.2 */
     upper -= fn * ((flog2n*flog2n-6*flog2n+10.667)/(2*flogn*flogn));
   } else if (n >=  8009824) {
     /* Axler 2013 page viii Korollar G */
@@ -823,6 +838,38 @@ UV nth_twin_prime_approx(UV n)
     else                                   hi = mid;
   }
   return lo;
+}
+
+/******************************************************************************/
+/*                                SEMI PRIMES                                 */
+/******************************************************************************/
+
+static UV _semiprime_count(UV n)
+{
+  UV pc = 0, sum = 0;
+  START_DO_FOR_EACH_PRIME(2, isqrt(n)) {
+    sum += LMO_prime_count(n/p) - pc++;
+  } END_DO_FOR_EACH_PRIME;
+  return sum;
+}
+static UV _range_semiprime_count(UV lo, UV hi)
+{
+  UV sum = 0;
+  for (; lo < hi; lo++)     /* TODO: We should walk composites */
+    if (is_semiprime(lo))
+      sum++;
+  if (is_semiprime(hi))
+    sum++;
+  return sum;
+}
+
+UV semiprime_count(UV lo, UV hi)
+{
+  if (lo > hi || hi < 4)
+    return 0;
+  return   (hi >= 1000 && (hi-lo+1) < hi / (isqrt(hi)/12))
+         ? _range_semiprime_count(lo, hi)
+         : _semiprime_count(hi) - ((lo < 4) ? 0 : _semiprime_count(lo-1));
 }
 
 /******************************************************************************/

@@ -1,0 +1,7 @@
+Revision history for WWW::Scape::BillionGraves
+
+0.02	Thu Aug 30 21:33:27 EDT 2018
+	Use the API search directly rather than a Firefox engine
+
+0.01	Wed Aug 29 16:17:01 EDT 2018
+        First release

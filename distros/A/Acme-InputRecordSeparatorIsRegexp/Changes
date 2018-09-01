@@ -1,7 +1,7 @@
 Revision history for Acme-InputRecordSeparatorIsRegexp
 
-0.01    2013-10-05
-        First version, released on an unsuspecting world.
+0.01	2013-10-05
+	First version, released on an unsuspecting world.
 
 0.02	2013-10-07
 	Allow a qr// expression to be used to specify the record separator.
@@ -16,3 +16,9 @@ Revision history for Acme-InputRecordSeparatorIsRegexp
 	record separator. Previous functionality of  open  function is retired.
 	Support  autochomp  and  input_record_separator  functions on arbitrary
 	filehandles, possibly tie-ing them to this package as a side-effect.
+
+0.05	2018-08-28
+	Test fixes for MSWin32
+
+0.06	2018-08-30
+	Test fixes for MSWin32 and this time I mean it.

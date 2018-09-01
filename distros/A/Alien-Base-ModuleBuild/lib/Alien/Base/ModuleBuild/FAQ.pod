@@ -1,3 +1,7 @@
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Alien::Base::ModuleBuild::FAQ - Frequently Asked Questions about Alien::Base::ModuleBuild
@@ -456,8 +460,6 @@ update the C<PATH> as necessary:
  unshift @PATH, Alien::MyTool->bin_dir;
  system 'mytool';
 
-=back
- 
 =head2 How do I use C<Alien::Base> from C<Dist::Zilla>
 
 For creating L<Alien::Base> based dists from L<Dist::Zilla> you can use the plugin 

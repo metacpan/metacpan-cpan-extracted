@@ -1,5 +1,9 @@
 Revision history for Log-Log4perl-Shortcuts
 
+0.009     2018-08-30 21:07:18-04:00 America/New_York
+
+0.008     2018-08-30 20:45:28-04:00 America/New_York
+
 0.007     2018-05-30 00:17:32-04:00 America/New_York
 - Fixed config file test so it works on other systems
 

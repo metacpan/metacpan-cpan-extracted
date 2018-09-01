@@ -27,6 +27,7 @@ rcommand - simple remote command launcher
       --append-hostname     append hostname to each output line, default on
       --append-time         append time to each output line, default off
       --sudo=USER           execute COMMAND or SCRIPT with sudo -u USER
+  -F                        ssh configfile
   -q, --quiet               do not show SUCCESS/FAIL results
   -h, --help                show this help
   -v, --version             show version

@@ -12,7 +12,10 @@ Mail::SPF::Iterator - iterative SPF lookup
 	$mailfrom, # from MAIL FROM:
 	$helo,     # from HELO|EHLO
 	$myname,   # optional: my hostname
-	{ default_spf => 'mx/24 ?all' }
+	{
+	    default_spf => 'mx/24 ?all',
+	    # rfc4408 => 1, # for compatibility only
+	}
     );
 
     # could be other resolvers too
@@ -58,18 +61,14 @@ Mail::SPF, which does blocking DNS lookups, this module just returns the DNS
 queries and later expects the responses.
 
 Lookup of the DNS records will be done outside of the module and can be done
-in a event driven way.
+in a event driven way. It is also possible to do many parallel SPF checks
+in parallel without needing multiple threads or processes.
 
 This module can also make use of SenderID records for checking the C<mfrom>
-part, but only if it finds an SenderID record first (e.g. if the SPF reply
-contains only SenderID and the the TXT SenderID and SPF and it gets the SPF
-reply first it will use SenderID, if it gets TXT first it will use SPF).
+part, but it will prefer SPF. It will only use DNS TXT records for looking up
+SPF policies unless compatibility with RFC 4408 is explicitly enabled.
 
-This behavior is not compatible with RFC4406 where SenderID records take
-preference, but compatible with RFC4408 in that it uses SPF records and
-provides a way to use SenderID if no SPF records are given.
-
-See RFC4408 for SPF and RFC4406 for SenderID.
+See RFC 7208 (old RFC 4408) for SPF and RFC 4406 for SenderID.
 
 =head1 METHODS
 
@@ -93,9 +92,12 @@ according to the RFC but often is not.
 MYNAME is the name of the local host. It's only used if required by macros
 inside the SPF record.
 
-OPT is used for additional arguments. Currently only B<default_spf> is expected
-which is used to set a default SPF record in case no SPF/TXT records are
+OPT is used for additional arguments. Currently B<default_spf> can be used
+to set a default SPF record in case no SPF/TXT records are
 returned from DNS (useful values are for example 'mx ?all' or 'mx/24 ?all').
+B<rfc4408> can be set to true in case stricter compatibility is needed with RFC
+4408 instead of RFC 7208, i.e. lookup of DNS SPF records, no limit on void DNS
+lookups etc.
 
 Returns the new object.
 
@@ -114,7 +116,7 @@ C<< ( RESULT, COMMENT, HASH, EXPLAIN ) >>. RESULT is the result, e.g. "Fail",
 information about problem, mechanism for the Received-SPF header.
 EXPLAIN will be set to the explain string if RESULT is Fail.
 
-If no final result was achieved yet it will either return 
+If no final result was achieved yet it will either return
 C<< (undef,@QUERIES) >> with a list of new queries to continue, C<< ('') >>
 in case the ANSWER produced an error but got ignored, because there are
 other queries open, or C<< () >> in case the ANSWER was ignored because it
@@ -206,7 +208,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.114';
+our $VERSION = '1.115';
 
 use fields (
     # values given in or derived from params to new()
@@ -227,6 +229,7 @@ use fields (
     'cbq',             # list of queries from last mech incl state
     'validated',       # cache used in validation of hostnames for ptr and %{p}
     'limit_dns_mech',  # countdown for number of mechanism using DNS queries
+    'limit_dns_void',  # countdown for number of void DNS queries
     'explain_default', # default explanation of object specific
     'result',          # contains final result
     'tmpresult',       # contains the best result we have so far
@@ -240,16 +243,17 @@ use Data::Dumper;
 use base 'Exporter';
 
 
-### Socket6 is not yet perl core, so check, if we can use it. Otherwise we
-### hopefully don't get any IP6 data, so no need to use it.
+### check if IPv6 support is in Socket, otherwise try Socket6
 my $can_ip6;
 BEGIN {
-
-    $can_ip6 = 0;
     $can_ip6 = eval {
+	require Socket;
+	Socket->import(qw(inet_pton inet_ntop));
+	Socket->import('AF_INET6') if ! defined &AF_INET6;
+	1;
+    } || eval {
 	require Socket6;
 	Socket6->import(qw( inet_pton inet_ntop));
-	# newer Socket versions already export AF_INET6
 	Socket6->import('AF_INET6') if ! defined &AF_INET6;
 	1;
     };
@@ -387,6 +391,7 @@ sub new {
 	cbq => [],             # the DNS queries for cb
 	validated => {},       # validated IP/domain names for PTR and %{p}
 	limit_dns_mech => 10,  # Limit on Number of DNS mechanism
+	limit_dns_void => 2,   # Limit on Number of void DNS answers
 	mech => undef,         # list of spf mechanism
 	redirect => undef,     # redirect from SPF record
 	explain => undef,      # explain from SPF record
@@ -494,7 +499,7 @@ sub mailheader {
     my ($result,$info,$hash) = @{ $self->{result} || return };
     $result .= " (using default SPF of \"$self->{used_default_spf}\")"
 	if $self->{used_default_spf};
-    return $result ." ". join( "; ", map { 
+    return $result ." ". join( "; ", map {
 	# Quote: this is not exactly rfc2822 but should be enough
 	my $v = $hash->{$_};
 	$v =~ s{([\"\\])}{\\$1}g;
@@ -502,7 +507,7 @@ sub mailheader {
 	$v =~ s{^\s+}{};
 	$v =~ s{\s+$}{};
 	$v = qq("$v") if $v =~ m{[\s;()]} or $v eq '';
-	"$_=$v" 
+	"$_=$v"
     } sort keys %$hash );
 }
 
@@ -629,8 +634,18 @@ sub next {
 
     # call callback with no records on error
     my $rcode = $dnsresp->header->rcode;
-    if ( $rcode ne 'NOERROR' ) {
+    my @answer = $dnsresp->answer;
+    if (!@answer or  $rcode ne 'NOERROR') {
 	my ($sub,@arg) = @$callback;
+	if ($sub != \&_got_TXT_exp
+	    and ! $self->{opt}{rfc4408}
+	    and --$self->{limit_dns_void} < 0) {
+	    $self->{result} = [ SPF_PermError, "",
+		{ problem => "Number of void DNS queries exceeded" }];
+	    _update_result_info($self);
+	    return @{$self->{result}};
+	}
+
 	return $self->_next_process_cbrv(
 	    $sub->($self,$qtype,$rcode,[],[],@arg));
     }
@@ -641,7 +656,7 @@ sub next {
     my $qname = $question->qname;
     $qname =~s{\\(?:(\d\d\d)|(.))}{ $2 || chr($1) }esg; # presentation -> raw
     my (%cname,%ans);
-    for my $rr ($dnsresp->answer) {
+    for my $rr (@answer) {
 	my $rtype = $rr->type;
 	# changed between Net::DNS 0.63 and 0.64
 	# it reports now the presentation name instead of the raw name
@@ -708,10 +723,10 @@ sub next {
 # Args: ($self)
 # Returns: @dnsq
 ############################################################################
-sub todo { 
-    return 
-	map { $_->{pkt} ? ($_->{pkt}):() } 
-	@{ shift->{cbq} } 
+sub todo {
+    return
+	map { $_->{pkt} ? ($_->{pkt}):() }
+	@{ shift->{cbq} }
 }
 
 ############################################################################
@@ -807,7 +822,7 @@ sub _next_process_cbrv {
     # -> @rv is the probably the final result, but check if we had a better
     # one already
     my $final;
-    if ($self->{tmpresult} and 
+    if ($self->{tmpresult} and
 	$ResultQ{ $self->{tmpresult}[0] } > $ResultQ{ $rv[0] }) {
 	$final = $self->{result} = $self->{tmpresult};
     } else {
@@ -873,7 +888,7 @@ sub _next_mech {
 
 	# if we have more mechanisms in the current SPF record take next
 	if ( my $next = shift @{$self->{mech}} ) {
-	    my ($sub,@arg) = @$next;
+	    my ($sub,$id,@arg) = @$next;
 	    my @rv = $sub->($self,@arg);
 	    redo if ! @rv; # still no match and no queries
 	    return @rv;
@@ -942,7 +957,7 @@ sub _next_rv_dnsq {
     my @dnsq = @_;
     # track queries for later verification
     $self->{cbq} = [ map {
-	{ q => ($_->question)[0], id => $_->header->id, pkt => $_ } 
+	{ q => ($_->question)[0], id => $_->header->id, pkt => $_ }
     } @dnsq ];
     $DEBUG && DEBUG( "need to lookup ".join( " | ",
 	map { "'".$_->{id}.'/'.$_->{q}->string."'" } @{$self->{cbq}}));
@@ -1028,7 +1043,9 @@ sub _query_txt_spf {
 
     $self->{cb} = [ \&_got_txt_spf ];
     return (
-	scalar(Net::DNS::Packet->new( $self->{domain}, 'SPF','IN' )),
+	# use SPF DNS record only if rfc4408 compatibility is required
+	$self->{opt}{rfc4408}
+	    ? (scalar(Net::DNS::Packet->new( $self->{domain}, 'SPF','IN' ))):(),
 	scalar(Net::DNS::Packet->new( $self->{domain}, 'TXT','IN' )),
     );
 }
@@ -1154,7 +1171,7 @@ sub _parse_spf {
 	    if ( $mech eq 'all' ) {
 		die "no arguments allowed with mechanism 'all': '$_'\n"
 		    if $arg ne '';
-		push @mech, [ \&_mech_all, $qual ]
+		push @mech, [ \&_mech_all, $_, $qual ]
 
 	    } elsif ( $mech eq 'ip4' ) {
 		my ($ip,$plen) =
@@ -1165,7 +1182,7 @@ sub _parse_spf {
 		eval { $ip = inet_aton( $ip ) }
 		    or die "bad ip '$ip' in '$_'\n";
 		next if ! $self->{clientip4}; # don't use for IP6
-		push @mech, [ \&_mech_ip4, $qual, $ip,$plen ];
+		push @mech, [ \&_mech_ip4, $_, $qual, $ip,$plen ];
 
 	    } elsif ( $mech eq 'ip6' ) {
 		my ($ip,$plen) =
@@ -1177,27 +1194,21 @@ sub _parse_spf {
 		    or die "bad ip '$ip' in '$_'\n"
 		    if $can_ip6;
 		next if ! $self->{clientip6}; # don't use for IP4
-		push @mech, [ \&_mech_ip6, $qual, $ip,$plen ];
+		push @mech, [ \&_mech_ip6, $_, $qual, $ip,$plen ];
 
 	    } elsif ( $mech eq 'a' or $mech eq 'mx' ) {
 		$arg ||= '';
 		my ($domain,$plen4,$plen6) =
-		    $arg =~m{^(?::(.+?))?(?:/(?:([1-9]\d*|0)|/([1-9]\d*|0)))?$}
-		    or die "bad argument for mechanism '$mech' in '$_'\n";
-		if ( defined $plen4 ) {
-		    $plen4>32 and die "invalid prefix len >32 in '$_'\n";
-		} elsif ( defined $plen6 ) {
-		    $plen6>128 and die "invalid prefix len >128 in '$_'\n";
-		}
-		if ( $self->{clientip4} ) {
-		    # ignore IP6 checks when we are using IP4
-		    next if defined $plen6;
-		    $plen4 = 32 if ! defined $plen4;
-		} else {
-		    # ignore IP4 checks when we are using IP6
-		    next if defined $plen4;
-		    $plen6 = 128 if ! defined $plen6;
-		}
+		    $arg =~m{^
+			(?: : (.+?))?                # [ ":" domain-spec ]
+			(?: /  (?: ([1-9]\d*|0) ))?  # [ ip4-cidr-length ]
+			(?: // (?: ([1-9]\d*|0) ))?  # [ "/" ip6-cidr-length ]
+		    $}x or die "bad argument for mechanism '$mech' in '$_'\n";
+
+		$plen4 = 32 if ! defined $plen4;
+		$plen6 = 128 if ! defined $plen6;
+		die "invalid prefix len >32 in '$_'\n" if $plen4>32;
+		die "invalid prefix len >128 in '$_'\n" if $plen6>128;
 		if ( ! $domain ) {
 		    $domain = $self->{domain};
 		} else {
@@ -1208,7 +1219,7 @@ sub _parse_spf {
 		}
 		my $sub = $mech eq 'a' ? \&_mech_a : \&_mech_mx;
 		push @mech, [ \&_resolve_macro_p, $domain ] if ref($domain);
-		push @mech, [ $sub, $qual, $domain,
+		push @mech, [ $sub, $_, $qual, $domain,
 		    $self->{clientip4} ? $plen4:$plen6 ];
 
 	    } elsif ( $mech eq 'ptr' ) {
@@ -1217,22 +1228,22 @@ sub _parse_spf {
 		$domain = $domain
 		    ? $self->_macro_expand($domain)
 		    : $self->{domain};
-		push @mech, [ \&_resolve_macro_p, $domain ] if ref($domain);
-		push @mech, [ \&_mech_ptr, $qual, $domain ];
+		push @mech, [ \&_resolve_macro_p, $_, $domain ] if ref($domain);
+		push @mech, [ \&_mech_ptr, $_, $qual, $domain ];
 
 	    } elsif ( $mech eq 'exists' ) {
 		my ($domain) = ( $arg || '' )=~m{^:([^/]+)$}
 		    or die "bad argument for mechanism '$mech' in '$_'\n";
 		$domain = $self->_macro_expand($domain);
-		push @mech, [ \&_resolve_macro_p, $domain ] if ref($domain);
-		push @mech, [ \&_mech_exists, $qual, $domain ];
+		push @mech, [ \&_resolve_macro_p, $_, $domain ] if ref($domain);
+		push @mech, [ \&_mech_exists, $_, $qual, $domain ];
 
 	    } elsif ( $mech eq 'include' ) {
 		my ($domain) = ( $arg || '' )=~m{^:([^/]+)$}
 		    or die "bad argument for mechanism '$mech' in '$_'\n";
 		$domain = $self->_macro_expand($domain);
-		push @mech, [ \&_resolve_macro_p, $domain ] if ref($domain);
-		push @mech, [ \&_mech_include, $qual, $domain ];
+		push @mech, [ \&_resolve_macro_p, $_, $domain ] if ref($domain);
+		push @mech, [ \&_mech_include, $_, $qual, $domain ];
 
 	    } else {
 		die "unhandled mechanism '$mech'\n"
@@ -1480,6 +1491,16 @@ sub _got_MX {
 	map { [ $_->exchange, $_->preference ] }
 	@$ans;
     my %mx = map { $_ => [] } @mx;
+
+    if (!$self->{opt}{rfc4408}) {
+	# RFC 4408 limited the number of MX to query to 10
+	# RFC 7208 instead said that ALL returned MX should count
+	# against the limit and the test suite suggest that this limit
+	# should be enforced before even asking the MX
+	return ( SPF_PermError, "",
+	    { problem => "Number of DNS mechanism exceeded" })
+	    if $self->{limit_dns_mech}-@mx < 0;
+    }
 
     # try to find A|AAAA records in additional data
     my $atyp = $self->{clientip4} ? 'A':'AAAA';

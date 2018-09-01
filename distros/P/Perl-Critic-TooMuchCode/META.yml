@@ -29,19 +29,18 @@ provides:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedConstant.pm
   Perl::Critic::Policy::TooMuchCode::ProhibitUnusedImport:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm
-    version: '0.01'
   Perl::Critic::Policy::TooMuchCode::ProhibitUnusedInclude:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
   Perl::Critic::TooMuchCode:
     file: lib/Perl/Critic/TooMuchCode.pm
-    version: '0.05'
+    version: '0.07'
 requires:
   List::Util: '1.50'
-  PPIx::Utils: '0'
+  PPIx::Utils: '0.002'
   Perl::Critic: '0'
   Scalar::Util: '1.50'
 resources:
   repository: https://github.com/gugod/Perl-Critic-TooMuchCode.git
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: '1'

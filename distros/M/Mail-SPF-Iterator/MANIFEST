@@ -1,17 +1,24 @@
-README
 Changes
 COPYRIGHT
 lib/Mail/SPF/Iterator.pm
 Makefile.PL
 MANIFEST			This list of files
+README
 samples/spflookup.pl
 t/01_load.t
+t/02_spf-test-suite-rfc4408.t
 t/02_spf-test-suite.t
+t/03_spf-test-suite-rfc7208.t
+t/04_misc.t
 t/make-testpl.pl
 t/misc.pl
 t/misc.yml
+t/rfc4408-tests.LICENSE
 t/rfc4408-tests.pl
 t/rfc4408-tests.yml
-t/rfc4408-tests.LICENSE
+t/rfc7208-tests-2014.05.pl
+t/rfc7208-tests-2014.05.yml
+t/rfc7208-tests.LICENSE
+t/spf-test-suite.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,13 @@
+0.000006    2018-08-28
+            * Convert JS booleans into JSON::PP::Boolean objects.
+              This allows us to roundtrip, especially for cases such as
+              reading a JSON file in JS (which will likely use booleans)
+              and passing that to / from Perl.
+            * Get rid of dispatch_function_in_event_loop().  It is
+              actually better that calling eval() always tries to
+              dispatch any pending timers after running the requested code.
+            * Fixed wrong references to Duktape.
+
 0.000005    2018-07-27
             * Add support for removing objects / slots.
 

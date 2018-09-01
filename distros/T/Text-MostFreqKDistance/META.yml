@@ -3,6 +3,7 @@ abstract: 'Estimate strings similarity.'
 author:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 build_requires:
+  Test::Exception: '0.43'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -20,10 +21,10 @@ no_index:
 provides:
   Text::MostFreqKDistance:
     file: lib/Text/MostFreqKDistance.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Text-MostFreqKDistance.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

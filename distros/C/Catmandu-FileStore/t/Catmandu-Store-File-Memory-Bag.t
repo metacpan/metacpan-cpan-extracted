@@ -78,8 +78,12 @@ note("get");
     my $str;
     my $io = IO::String->new($str);
 
-    ok $bag->stream($io, $file), 'can stream the data';
+    my $bytes = $bag->stream($io, $file);
 
+    ok $bytes, 'can stream the data';
+
+    is $bytes , 16 , 'got 16 bytes data';
+    
     is $str , "钱唐湖春行\n", 'got the correct data';
 }
 

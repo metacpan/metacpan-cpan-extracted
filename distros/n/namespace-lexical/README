@@ -1,0 +1,69 @@
+NAME
+    namespace::lexical - like namespace::clean but instead of deleting subs,
+    makes them lexical
+
+SYNOPSIS
+      package My::Class;
+      use Scalar::Util 'blessed';
+      use namespace::lexical;
+  
+      # blessed() is available here but there
+      # is no My::Class->blessed() method.
+  
+      package My::Other::Class;
+  
+      # blessed() is still available here!!!
+
+DESCRIPTION
+    namespace::lexical works a lot like namespace::clean but rather than
+    removing functions from your namespace, it converts them into lexical subs
+    (like `my sub foo { ... }` on Perl 5.18 and above).
+
+    namespace::lexical requires Perl 5.12 or above.
+
+  API
+    `import`
+        The standard way to use this module is:
+
+          use namespace::lexical;
+
+        This will loop through all functions defined so far in the caller
+        package and lexicalize them.
+
+    `lexicalize($stash, $subname, $coderef)`
+        This method should be passed a Package::Stash object, a sub name, and
+        an optional coderef. It will remove the sub by name from the provided
+        stash, and install the coderef into the caller lexical scope using the
+        given name.
+
+        If no coderef is given, it will grab the existing coderef from the
+        stash.
+
+        If the stash is undef, it will skip removing the sub from the stash
+        and only install the lexical version.
+
+        The coderef and stash cannot both be undef.
+
+        Most end users will have no reason to call this method directly.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=namespace-lexical>.
+
+SEE ALSO
+    Lexical::Sub, namespace::clean.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2018 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

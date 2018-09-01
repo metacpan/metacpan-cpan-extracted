@@ -8,7 +8,7 @@ use warnings;
 # LICENSE: This file is covered by the EUPL license, please see the
 # LICENSE file in this repository for more information
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use OpenOffice::OODoc;
 
@@ -77,6 +77,12 @@ sub insertDocument {
             'text:(p|h|list)'
         );
     foreach my $oodoc_from_text_element (@oodoc_from_text_elements) {
+        # apply the destination style name if this element has none
+        my $oodoc_from_text_style_name =
+            $oodoc_from_document->textStyle($oodoc_from_text_element);
+        $oodoc_from_document->textStyle($oodoc_from_text_element, $oodoc_dest_text_style_name)
+            unless $oodoc_from_text_style_name;
+
         $oodoc_dest_document->insertElement( $oodoc_path,
             $oodoc_from_text_element, position => $position, );
     }
@@ -238,7 +244,7 @@ OpenOffice::OODoc::InsertDocument - Insert, merge or append OpenOffice::OODoc ob
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

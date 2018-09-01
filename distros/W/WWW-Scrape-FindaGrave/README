@@ -1,4 +1,4 @@
-WWW-Scrape-FindaGrave 0.05
+WWW-Scrape-FindaGrave 0.06
 
 INSTALLATION
 
@@ -30,9 +30,10 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/WWW-Scrape-FindaGrave/
 
+When filing a bug, please include a patch or pull request.
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016-2017 Nigel Horne
+Copyright (C) 2016-2018 Nigel Horne
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

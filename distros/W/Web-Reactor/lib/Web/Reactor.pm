@@ -12,14 +12,16 @@ use strict;
 use Storable qw( dclone freeze thaw ); # FIXME: move to Data::Tools (data_freeze/data_thaw)
 use CGI 4.08;
 use CGI::Cookie;
+use MIME::Base64;
 use Data::Tools;
 use Exception::Sink;
 use Data::Dumper;
+use Encode;
 
 use Web::Reactor::Utils;
 use Web::Reactor::HTML::Form;
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 ##############################################################################
 
@@ -56,6 +58,8 @@ sub new
   my %env = @_;
 
   # FIXME: verify %env content! Data::Validate::Struct
+  boom "request scheme [HTTP] does not match cookies security policy! either enable HTTPS scheme or set DISABLE_SECURE_COOKIES=1"
+      if uc $ENV{ 'REQUEST_SCHEME' } eq 'HTTP' and ! $env{ 'DISABLE_SECURE_COOKIES' };
 
   $class = ref( $class ) || $class;
   my $self = {
@@ -263,15 +267,41 @@ sub main_process
     }
 
   # import plain parameters from GET/POST request
-  for my $n ( CGI::param() )
+  for my $n ( CGI::url_param(), CGI::param() )
     {
     if( $n !~ /^[A-Za-z0-9\-\_\.\:]+$/o )
       {
       $self->log( "error: invalid CGI/input parameter name: [$n]" );
       next;
       }
-    my $v = CGI::param( $n );
-    my @v = CGI::multi_param( $n );
+    my @u = CGI::upload( $n );
+    my $u = CGI::upload( $n );
+    my $v = CGI::url_param( $n );
+       $v = CGI::param( $n ) if $v eq '';
+    my @v = CGI::multi_param( $n ); # TODO: handling of multi-values
+    
+    $n = uc $n;
+
+    if( @u > 0 )
+      {
+      my $uc = 0;
+      for my $uh ( @u )
+        {
+        $input_user_hr->{ "$n:FN:$uc" } = "$uh"; # file name
+        $input_user_hr->{ "$n:FH:$uc" } = $uh;   # file handle
+        $input_user_hr->{ "$n:FI:$uc" } = CGI::uploadInfo( $uh ); # file info
+        $uc++;
+        }
+      $input_user_hr->{ "$n:FC" } = @u; # file count
+      }
+    
+    if( ref( $u ) )
+      {
+      $input_user_hr->{ "$n:FH" } = $u;
+      # this is file upload, get more info
+      $input_user_hr->{ "$n:UPLOAD_INFO" } = CGI::uploadInfo( $u );
+      $v = "$v";
+      }
 
     if( $iconv )
       {
@@ -279,7 +309,8 @@ sub main_process
       $_ = $iconv->convert( $_ ) for @v;
       }
 
-    $n = uc $n;
+    $v = decode( $app_charset, $v );
+    $_ = decode( $app_charset, $_ ) for @v;
 
     $self->log_debug( "debug: CGI input param [$n] value [$v] [@v]" );
 
@@ -306,11 +337,6 @@ sub main_process
       {
       $n = uc $n;
       $input_user_hr->{ $n } = $v;
-      if( ref( $v ) eq 'Fh' )
-        {
-        # this is file upload, get more info
-        $input_user_hr->{ "$n:UPLOAD_INFO" } = CGI::uploadInfo( $v );
-        }
       }
     }
 
@@ -898,6 +924,36 @@ sub crypto_thaw_hex
   return thaw( $self->decrypt_hex( $data ) );
 }
 
+sub encrypt_base64u
+{
+  my $self = shift;
+
+  return MIME::Base64::encode_base64url( $self->encrypt( @_ ) );
+}
+
+sub decrypt_base64u
+{
+  my $self = shift;
+
+  return $self->decrypt( MIME::Base64::decode_base64url( @_ ) );
+}
+
+sub crypto_freeze_base64u
+{
+  my $self = shift;
+  my $data = shift; # reference to any data/scalar/hash/array
+
+  return $self->encrypt_base64u( freeze( $data ) );
+}
+
+sub crypto_thaw_base64u
+{
+  my $self = shift;
+  my $data = shift; # base64u encoded data
+
+  return thaw( $self->decrypt_base64u( $data ) );
+}
+
 ##############################################################################
 
 sub set_debug
@@ -1124,8 +1180,10 @@ sub render
 #print STDERR Dumper( 'PORTRAY --- ' x 11, $page, $portray_data );
 
   my $page_data = $portray_data->{ 'DATA'      };
+  my $page_fh   = $portray_data->{ 'FH'        }; # filehandle has priority
   my $page_type = $portray_data->{ 'TYPE'      };
   my $file_name = $portray_data->{ 'FILE_NAME' };
+  my $disp_type = $portray_data->{ 'DISPOSITION_TYPE' } || 'inline'; # default, rest must be handled as 'attachment', ref: rfc6266#section-4.2
 
   if( lc $page_type =~ /^text\/html/ )
     {
@@ -1148,7 +1206,7 @@ sub render
 
   # FIXME: charset
   $self->set_headers( 'content-type'        => $page_type );
-  $self->set_headers( 'content-disposition' => "attachment; filename=$file_name" ) if $file_name;
+  $self->set_headers( 'content-disposition' => "$disp_type; filename=$file_name" ) if $file_name;
 
   my $http_csp = $self->{ 'ENV' }{ 'HTTP_CSP' }; # || " default-src 'self' ";
   $self->set_headers( 'Content-Security-Policy' => $http_csp );
@@ -1159,7 +1217,22 @@ sub render
   my $page_headers = $self->__make_headers();
 
   print $page_headers;
-  print $page_data;
+  if( $page_fh )
+    {
+    my $buf_size = 1024*1024;
+    my $print_data;
+    while(4)
+      {
+      my $read_size = read( $page_fh, $print_data, $buf_size );
+      print $print_data;
+      last if $read_size < $buf_size;
+      }
+    }
+  else
+    {  
+    # TODO: FIXME: check app-charset and convert only if needed
+    print encode( $app_charset, $page_data );
+    }
 
   $self->log_debug( "debug: page response content: page, action, type, headers, data: " . Dumper( $page, $action, $page_type, $page_headers, $page_type =~ /^text\// ? $page_data : '*binary*' ) ) if $self->is_debug() > 2;
 
@@ -1313,6 +1386,7 @@ sub forward_new_action
 sub __param
 {
   my $self = shift;
+  my $peek = shift; # 1 not save, 0 save in cache
   my $safe = shift; # 1 safe_input, 0 user_input
 
   my $input_hr;
@@ -1330,17 +1404,24 @@ sub __param
 
   my $ps = $self->get_page_session();
 
-  $ps->{ $save_key } ||= {};
+  $ps->{ $save_key } ||= {} unless $peek;
 
   my @res;
   while( @_ )
     {
     my $p = uc shift;
-    if( exists $input_hr->{ $p } )
+    if( $peek )
       {
-      $ps->{ $save_key }{ $p } = $input_hr->{ $p };
+      push @res, $input_hr->{ $p };
       }
-    push @res, $ps->{ $save_key }{ $p };
+    else
+      {  
+      if( exists $input_hr->{ $p } )
+        {
+        $ps->{ $save_key }{ $p } = $input_hr->{ $p };
+        }
+      push @res, $ps->{ $save_key }{ $p };
+      }
     }
 
   return wantarray ? @res : shift( @res );
@@ -1349,19 +1430,37 @@ sub __param
 sub param_unsafe
 {
   my $self = shift;
-  return $self->__param( 0, @_ );
+  return $self->__param( 0, 0, @_ );
 }
 
 sub param
 {
   my $self = shift;
-  return $self->__param( 1, @_ );
+  return $self->__param( 0, 1, @_ );
 }
 
 sub param_safe
 {
   my $self = shift;
   return $self->param( @_ );
+}
+
+sub param_peek_unsafe
+{
+  my $self = shift;
+  return $self->__param( 1, 0, @_ );
+}
+
+sub param_peek
+{
+  my $self = shift;
+  return $self->__param( 1, 1, @_ );
+}
+
+sub param_peek_safe
+{
+  my $self = shift;
+  return $self->param_peek( @_ );
 }
 
 sub param_clear_cache
@@ -1520,7 +1619,7 @@ sub load_trans
 
   for my $tf ( @tf )
     {
-    my $hr = hash_load( $tf );
+    my $hr = $self->load_trans_file( $tf );
     # trim whitespace
     my @temp = %$hr;
     for( @temp )
@@ -1534,6 +1633,13 @@ sub load_trans
     }
 
   return 1;
+}
+
+sub load_trans_file
+{
+  my $self = shift;
+
+  return hash_load( shift );
 }
 
 ##############################################################################

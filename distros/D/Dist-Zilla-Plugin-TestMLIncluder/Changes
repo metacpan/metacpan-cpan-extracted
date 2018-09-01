@@ -1,3 +1,6 @@
+0.16 Mon Aug 27 08:27:44 PDT 2018
+ - Make sure JSON::PP is on user system
+
 0.15 Fri Aug 24 18:55:20 PDT 2018
  - Fix the new TestML for MSWin32
 

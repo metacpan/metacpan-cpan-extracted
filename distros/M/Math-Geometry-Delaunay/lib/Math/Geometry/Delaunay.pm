@@ -11,7 +11,7 @@ our $VERSION;
 
 BEGIN {
     use XSLoader;
-    $VERSION = '0.19';
+    $VERSION = '0.21';
     XSLoader::load('Math::Geometry::Delaunay');
     exactinit();
     }
@@ -1308,15 +1308,15 @@ sub to_svg {
     foreach my $key ( keys %spec ) { if (ref($spec{$key}) !~ /ARRAY/) { carp("style config for '$key' should be a reference to an array"); return; } } 
 
     # make copies of points, because we'll be moving and scaling them
-    
-    if (ref($triio) =~ /HASH/ && defined $triio->{nodes}) {
+
+    if (ref($triio) =~ /HASH|mgd_topo/ && defined $triio->{nodes}) {
         push @pts, map [$_,defined $spec{nodes}  ? @{$spec{nodes}} : undef], map [@{$_->{point}}], @{$triio->{nodes}};
         }
     else {
         push @pts, map [[@{$_}],defined $spec{nodes}  ? @{$spec{nodes}} : undef], ltolol(2,$triio->pointlist);
         }
     if ($vorio) {
-        if (ref($vorio) =~ /HASH/ && defined $vorio->{nodes}) {
+        if (ref($vorio) =~ /HASH|mgd_topo/ && defined $vorio->{nodes}) {
             push @vpts, map [$_,defined $spec{vnodes} ?  @{$spec{vnodes}} : undef], map [@{$_->{point}}], @{$vorio->{nodes}};
             }
         else {
@@ -1361,7 +1361,7 @@ sub to_svg {
     my $scaled_minx = 0;
     my $scaled_miny = 0;
 
-    if (ref($triio) =~ /HASH/ && defined $triio->{nodes}) {
+    if (ref($triio) =~ /HASH|mgd_topo/ && defined $triio->{nodes}) {
         if ($spec{edges})    {push @edges, map {[$_,@{$spec{edges}}]}    map [$pts[$_->{nodes}->[0]->{index}]->[0],$pts[$_->{nodes}->[1]->{index}]->[0]], @{$triio->{edges}};}
         if ($spec{segments}) {push @segs,  map {[$_,@{$spec{segments}}]} map [$pts[$_->{nodes}->[0]->{index}]->[0],$pts[$_->{nodes}->[1]->{index}]->[0]], @{$triio->{segments}};}
         #ignoring any subparametric points for elements
@@ -1388,7 +1388,7 @@ sub to_svg {
         }
 
     if ($vorio) {
-        if (ref($vorio) =~ /HASH/ && defined $vorio->{nodes}) {
+        if (ref($vorio) =~ /HASH|mgd_topo/ && defined $vorio->{nodes}) {
             # circles only available in this case
             if (defined $spec{circles}) {
                 push @circles, map {
@@ -1548,7 +1548,7 @@ Math::Geometry::Delaunay - Quality Mesh Generator and Delaunay Triangulator
 
 =head1 VERSION
 
-Version 0.19
+Version 0.21
 
 =cut
 

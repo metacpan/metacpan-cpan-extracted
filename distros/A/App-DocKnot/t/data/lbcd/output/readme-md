@@ -89,7 +89,8 @@ not use any sophisticated Perl features or add-on modules.
 
 Pass `--enable-silent-rules` to configure for a quieter build (similar to
 the Linux kernel).  Use `make warnings` instead of `make` to build with
-full GCC compiler warnings (requires a relatively current version of GCC).
+full GCC compiler warnings (requires either GCC or Clang and may require a
+relatively current version of the compiler).
 
 You will generally want to start lbcd at system boot.  All that is needed
 is a simple init script to start lbcd with the appropriate options or kill
@@ -132,7 +133,8 @@ always have the current version of this package, the current
 documentation, and pointers to any additional resources.
 
 New lbcd releases are announced on the lbnamed-users mailing list.  To
-subscribe or see the list archives, go to the [lbnamed-users management
+subscribe or see the list archives, go to the [lbnamed-users list
+information
 page](https://mailman.stanford.edu/mailman/listinfo/lbnamed-users).
 
 I welcome bug reports and patches for this package at eagle@eyrie.org.

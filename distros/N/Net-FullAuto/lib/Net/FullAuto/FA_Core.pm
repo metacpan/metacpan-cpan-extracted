@@ -436,6 +436,7 @@ BEGIN {
       my $object=($handle)?$handle:$Net::FullAuto::FA_Core::cmdinfo;
       unless (exists $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}) {
          my $stdout='';my $stderr='';
+         $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}='';
          if (exists $Net::FullAuto::FA_Core::Hosts{"__Master_${$}__"}{$cmd}) {
             my $cmdpath=
                   $Net::FullAuto::FA_Core::Hosts{"__Master_${$}__"}{$cmd};
@@ -477,6 +478,7 @@ BEGIN {
                }
             } else {
                unless (exists $handle->{_shell}) {
+                  bless($handle);
                   ($stdout,$stderr)=$handle->cmd('env');
                   if ($stdout=~/^SHELL=(.*)$/m) {
                      my $shell=$1;chomp $shell;
@@ -30216,7 +30218,9 @@ print "GETTING THIS=${c}out${pid_ts}.txt\n";
                }
             } else {
                $live_command=
-                  ' ('.$command.';echo $?)'." | sed -e 's/^/stdout: /' 2>&1";
+                  ' ('.$command.';echo $?) | '.
+                  $Net::FullAuto::FA_Core::gbp->('sed',$self).
+                  "sed -e 's/^/stdout: /' 2>&1";
             }
             $live_command.=' &' if $bckgrd;
             print $Net::FullAuto::FA_Core::LOG

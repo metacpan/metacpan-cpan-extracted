@@ -58,13 +58,14 @@ sub mpu_public_regex {
       miller_rabin_random
       lucas_sequence lucasu lucasv
       primes twin_primes ramanujan_primes sieve_prime_cluster sieve_range
-      forprimes forcomposites foroddcomposites fordivisors
+      forprimes forcomposites foroddcomposites forsemiprimes fordivisors
       forpart forcomp forcomb forperm forderange formultiperm
+      forfactored forsquarefree
       lastfor
       numtoperm permtonum randperm shuffle
       prime_iterator prime_iterator_object
       next_prime  prev_prime
-      prime_count
+      prime_count semiprime_count
       prime_count_lower prime_count_upper prime_count_approx
       nth_prime nth_prime_lower nth_prime_upper nth_prime_approx inverse_li
       twin_prime_count twin_prime_count_approx
@@ -79,6 +80,7 @@ sub mpu_public_regex {
       random_maurer_prime random_maurer_prime_with_cert
       random_shawe_taylor_prime random_shawe_taylor_prime_with_cert
       random_semiprime random_unrestricted_semiprime
+      random_factored_integer
       primorial pn_primorial consecutive_integer_lcm gcdext chinese
       gcd lcm factor factor_exp divisors valuation hammingweight
       todigits fromdigits todigitstring sumdigits

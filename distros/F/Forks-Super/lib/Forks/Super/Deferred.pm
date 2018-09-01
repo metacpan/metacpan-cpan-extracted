@@ -17,10 +17,10 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(queue_job);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 # must sync FIRST_DEFERRED_ID with Win32 code in Forks::Super::Util::isValidPid
-use constant FIRST_DEFERRED_ID => -1_100_000;
+use constant FIRST_DEFERRED_ID => -2_100_000;
 use constant QUEUE_PRIORITY_INCREMENT => 1.0E-6;
 use constant DEFAULT_QUEUE_MONITOR_FREQ => 30;
 
@@ -139,7 +139,8 @@ sub _launch_queue_monitor_fork {
     }
 
     $OLD_QINTERRUPT_SIG = $SIG{$Forks::Super::QUEUE_INTERRUPT};
-    $SIG{$Forks::Super::QUEUE_INTERRUPT} = \&Forks::Super::Deferred::check_queue;
+#   $SIG{$Forks::Super::QUEUE_INTERRUPT} = \&Forks::Super::Deferred::check_queue;
+    $SIG{$Forks::Super::QUEUE_INTERRUPT} = \&check_queue;
     $QUEUE_MONITOR_PPID = $$;
     $QUEUE_MONITOR_PID = CORE::fork();
     if (not defined $QUEUE_MONITOR_PID) {
@@ -194,7 +195,7 @@ sub _launch_queue_monitor_fork_child {
     my $expire = time + $QUEUE_MONITOR_LIFESPAN;
     my $consecutive_failures = 0;
     while (time < $expire && $consecutive_failures < 10) {
-	sleep $QUEUE_MONITOR_FREQ;
+	CORE::sleep $QUEUE_MONITOR_FREQ;
 
 	if ($DEBUG || $QUEUE_DEBUG) {
 	    debug("queue monitor $$ passing signal to $QUEUE_MONITOR_PPID");
@@ -544,7 +545,7 @@ Forks::Super::Deferred - manage queue of background tasks to perform
 
 =head1 VERSION
 
-0.94
+0.95
 
 =head1 DESCRIPTION
 

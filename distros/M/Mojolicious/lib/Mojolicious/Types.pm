@@ -32,6 +32,16 @@ has mapping => sub {
   };
 };
 
+sub content_type {
+  my ($self, $c, $o) = (shift, shift, shift // {});
+
+  my $headers = $c->res->headers;
+  return undef if $headers->content_type;
+
+  my $type = $o->{file} ? $self->file_type($o->{file}) : $self->type($o->{ext});
+  $headers->content_type($type // $self->type('txt'));
+}
+
 sub detect {
   my ($self, $accept) = @_;
 
@@ -52,6 +62,8 @@ sub detect {
 
   return [map { @{$reverse{$_} // []} } @detected];
 }
+
+sub file_type { $_[1] =~ /\.(\w+)$/ ? $_[0]->type($1) : undef }
 
 sub type {
   my ($self, $ext, $type) = @_;
@@ -125,6 +137,33 @@ MIME type mapping.
 L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
+=head2 content_type
+
+  $types->content_type(Mojolicious::Controller->new, {ext => 'json'});
+
+Detect MIME type for L<Mojolicious::Controller> object unless a C<Content-Type>
+response header has already been set, defaults to using the MIME type for the
+C<txt> extension if no better alternative could be found. Note that this method
+is EXPERIMENTAL and might change without warning!
+
+These options are currently available:
+
+=over 2
+
+=item ext
+
+  ext => 'json'
+
+File extension to get MIME type for.
+
+=item file
+
+  file => 'foo/bar.png'
+
+File path to get MIME type for.
+
+=back
+
 =head2 detect
 
   my $exts = $types->detect('text/html, application/json;q=9');
@@ -133,6 +172,13 @@ Detect file extensions from C<Accept> header value.
 
   # List detected extensions prioritized
   say for @{$types->detect('application/json, text/xml;q=0.1', 1)};
+
+=head2 file_type
+
+  my $type = $types->file_type('foo/bar.png');
+
+Get MIME type for file path. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 type
 

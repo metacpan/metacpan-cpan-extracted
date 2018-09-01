@@ -117,17 +117,9 @@ t/ffi/uint32.c
 t/ffi/uint64.c
 t/ffi/uint8.c
 t/ffi_platypus.t
-t/ffi_platypus__attach.t
-t/ffi_platypus__attach_void.t
-t/ffi_platypus__cast.t
-t/ffi_platypus__ignore_not_found.t
 t/ffi_platypus_api.t
 t/ffi_platypus_buffer.t
 t/ffi_platypus_closure.t
-t/ffi_platypus_closure__die.t
-t/ffi_platypus_closure__private.t
-t/ffi_platypus_closure__reuse.t
-t/ffi_platypus_closure__space.t
 t/ffi_platypus_declare.t
 t/ffi_platypus_dl.t
 t/ffi_platypus_function.t
@@ -162,6 +154,7 @@ t/type_uint8.t
 typemap
 xs/ABI.xs
 xs/API.xs
+xs/Closure.xs
 xs/ClosureData.xs
 xs/Declare.xs
 xs/Function.xs

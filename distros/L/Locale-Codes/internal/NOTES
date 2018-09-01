@@ -47,7 +47,7 @@ Update the copyright
 Before every release, spellcheck the documents:
 
    for i in `find lib -type f -name \*.pod` ;do
-      pod2text $i > $i.txt
+      pod2text --width=100 $i > $i.txt
       ispell -p internal/ispell.isp $i.txt
       rm -f $i.txt $i.txt.bak
    done

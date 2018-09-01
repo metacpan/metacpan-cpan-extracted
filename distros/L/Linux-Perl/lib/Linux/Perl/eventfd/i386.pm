@@ -1,4 +1,4 @@
-package Linux::Perl::eventfd::x86_64;
+package Linux::Perl::eventfd::i386;
 
 use strict;
 use warnings;

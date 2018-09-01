@@ -8,6 +8,7 @@ WriteMakefile(
     LICENSE        => 'mit',
     MIN_PERL_VERSION => 5.018000,
     PREREQ_PM      => {
+        'JSON::PP'     => 0,
         'Text::Trim'   => 0,
         'XSLoader'     => 0,
     },

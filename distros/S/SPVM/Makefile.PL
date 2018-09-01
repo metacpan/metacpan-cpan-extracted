@@ -67,6 +67,7 @@ WriteMakefile(
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
     clean => {FILES => "spvm_build/src spvm_build/work spvm_build/lib t/spvm_build/src t/spvm_build/work t/spvm_build/lib @object_files"},
     DEFINE => "@defines -o \$@",
+    EXE_FILES => ['script/spvmcc'],
 );
 
 # Create precompile test
@@ -80,11 +81,11 @@ sub MY::postamble {
   my $make_rule = '';
   
   # Native compile make rule
-  $make_rule .= SPVM::Build::Util::create_make_rule_native('SPVM::CORE');
-  $make_rule .= SPVM::Build::Util::create_make_rule_native('SPVM::Example');
+  #$make_rule .= SPVM::Build::Util::create_make_rule_native('SPVM::CORE');
+  #$make_rule .= SPVM::Build::Util::create_make_rule_native('SPVM::Example');
   
   # Precompile make rule
-  $make_rule .= SPVM::Build::Util::create_make_rule_precompile('SPVM::Example');
+  #$make_rule .= SPVM::Build::Util::create_make_rule_precompile('SPVM::Example');
   
   return $make_rule;
 }

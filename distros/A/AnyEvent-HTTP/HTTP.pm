@@ -48,7 +48,7 @@ use AnyEvent::Handle ();
 
 use base Exporter::;
 
-our $VERSION = 2.23;
+our $VERSION = 2.24;
 
 our @EXPORT = qw(http_get http_post http_head http_request);
 
@@ -456,7 +456,7 @@ sub _get_slot($$) {
 sub cookie_jar_expire($;$) {
    my ($jar, $session_end) = @_;
 
-   %$jar = () if $jar->{version} != 1;
+   %$jar = () if $jar->{version} != 2;
 
    my $anow = AE::now;
 
@@ -486,20 +486,19 @@ sub cookie_jar_expire($;$) {
 sub cookie_jar_extract($$$$) {
    my ($jar, $scheme, $host, $path) = @_;
 
-   %$jar = () if $jar->{version} != 1;
+   %$jar = () if $jar->{version} != 2;
+
+   $host = AnyEvent::Util::idn_to_ascii $host
+      if $host =~ /[^\x00-\x7f]/;
 
    my @cookies;
 
    while (my ($chost, $paths) = each %$jar) {
       next unless ref $paths;
 
-      if ($chost =~ /^\./) {
-         next unless $chost eq substr $host, -length $chost;
-      } elsif ($chost =~ /\./) {
-         next unless $chost eq $host;
-      } else {
-         next;
-      }
+      # exact match or suffix including . match
+      $chost eq $host or ".$chost" eq substr $host, -1 - length $chost
+         or next;
 
       while (my ($cpath, $cookies) = each %$paths) {
          next unless $cpath eq substr $path, 0, length $cpath;
@@ -530,6 +529,8 @@ sub cookie_jar_extract($$$$) {
 # parse set_cookie header into jar
 sub cookie_jar_set_cookie($$$$) {
    my ($jar, $set_cookie, $host, $date) = @_;
+
+   %$jar = () if $jar->{version} != 2;
 
    my $anow = int AE::now;
    my $snow; # server-now
@@ -585,7 +586,7 @@ sub cookie_jar_set_cookie($$$$) {
       my $cpath = (delete $kv{path}) || "/";
 
       if (exists $kv{domain}) {
-         $cdom = delete $kv{domain};
+         $cdom = $kv{domain};
 
          $cdom =~ s/^\.?/./; # make sure it starts with a "."
 
@@ -594,12 +595,14 @@ sub cookie_jar_set_cookie($$$$) {
          # this is not rfc-like and not netscape-like. go figure.
          my $ndots = $cdom =~ y/.//;
          next if $ndots < ($cdom =~ /\.[^.][^.]\.[^.][^.]$/ ? 3 : 2);
+
+         $cdom = substr $cdom, 1; # remove initial .
       } else {
          $cdom = $host;
       }
 
       # store it
-      $jar->{version} = 1;
+      $jar->{version} = 2;
       $jar->{lc $cdom}{$cpath}{$name} = \%kv;
 
       redo if /\G\s*,/gc;
@@ -906,7 +909,7 @@ sub http_request($$@) {
                $loc =~ s/^\.\/+//;
 
                if ($loc !~ m%^[.?#]%) {
-                  my $prefix = "$uscheme://$uhost:$uport";
+                  my $prefix = "$uscheme://$uauthority";
 
                   unless ($loc =~ s/^\///) {
                      $prefix .= $upath;
@@ -1033,7 +1036,7 @@ sub http_request($$@) {
          } elsif ($chunked) {
             my $cl = 0;
             my $body = "";
-            my $on_body = $arg{on_body} || sub { $body .= shift; 1 };
+            my $on_body = (!$redirect && $arg{on_body}) || sub { $body .= shift; 1 };
 
             $state{read_chunk} = sub {
                $_[1] =~ /^([0-9a-fA-F]+)/
@@ -1076,7 +1079,7 @@ sub http_request($$@) {
 
             $_[0]->push_read (line => $state{read_chunk});
 
-         } elsif ($arg{on_body}) {
+         } elsif (!$redirect && $arg{on_body}) {
             if (defined $len) {
                $_[0]->on_read (sub {
                   $len -= length $_[0]{rbuf};
@@ -1219,11 +1222,11 @@ sub http_request($$@) {
          $was_persistent = 1;
 
          $state{handle} = ka_fetch $ka_key;
-         $state{handle}->destroyed
-            and die "AnyEvent::HTTP: unexpectedly got a destructed handle (1), please report.";#d#
+#         $state{handle}->destroyed
+#            and die "AnyEvent::HTTP: unexpectedly got a destructed handle (1), please report.";#d#
          $prepare_handle->();
-         $state{handle}->destroyed
-            and die "AnyEvent::HTTP: unexpectedly got a destructed handle (2), please report.";#d#
+#         $state{handle}->destroyed
+#            and die "AnyEvent::HTTP: unexpectedly got a destructed handle (2), please report.";#d#
          $handle_actual_request->();
 
       } else {

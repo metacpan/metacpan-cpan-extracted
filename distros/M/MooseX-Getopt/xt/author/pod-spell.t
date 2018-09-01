@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
 Alders
+Andreas
 Arnfjörð
 Attribute
 Austin
@@ -54,6 +55,7 @@ Jonathan
 Jose
 Justin
 Karen
+Koenig
 Kogman
 Krotkine
 Little
@@ -62,6 +64,7 @@ Luis
 Mannsåker
 Martinez
 Meta
+Michael
 MooseX
 Nelo
 NoGetopt
@@ -77,6 +80,7 @@ Ricardo
 Rolsky
 Ryan
 SIGNES
+Schout
 Shlomi
 Sigurðsson
 Stevan
@@ -88,6 +92,7 @@ Todd
 Tomas
 Trait
 Yuval
+andk
 autarch
 avarab
 blblack
@@ -109,6 +114,7 @@ jgoulah
 jlmartinez
 justin
 lib
+mschout
 nelo
 nothingmuch
 olaf

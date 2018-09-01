@@ -1,6 +1,7 @@
 #include <map>
 #include "pl_stats.h"
 #include "pl_console.h"
+#include "pl_eventloop.h"
 #include "pl_v8.h"
 
 #define PL_GC_RUNS 2
@@ -121,6 +122,9 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
         // Convert the result into Perl data
         Local<Object> object = Local<Object>::Cast(result);
         ret = pl_v8_to_perl(aTHX_ ctx, object);
+
+        // Launch eventloop; this call only returns after the eventloop terminates.
+        eventloop_run(ctx);
     } while (0);
     if (!ok) {
         if (try_catch.HasCaught()) {

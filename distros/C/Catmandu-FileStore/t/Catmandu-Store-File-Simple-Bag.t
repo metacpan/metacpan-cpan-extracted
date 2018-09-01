@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use IO::String;
+use IO::File;
 use Catmandu::Store::File::Simple;
 use Path::Tiny;
 use utf8;
@@ -96,13 +97,37 @@ note("get");
         ok $bag->get("test" . $_ . ".txt"), "get(test" . $_ . ".txt)";
     }
 
-    my $file = $bag->get("test1.txt");
+    {
+        my $file = $bag->get("test1.txt");
 
-    my $str = $bag->as_string_utf8($file);
+        my $str = $bag->as_string_utf8($file);
 
-    ok $str , 'can stream the data';
+        ok $str , 'can stream the data';
 
-    is $str , "钱唐湖春行\n", 'got the correct data';
+        is $str , "钱唐湖春行\n", 'got the correct data';
+    }
+
+    {
+        my $file = $bag->get("test1.txt");
+
+        my $tempfile = Path::Tiny->tempfile;
+
+        my $io    = IO::File->new("> $tempfile");
+
+        $io->binmode(":raw");
+
+        my $bytes = $bag->stream($io, $file);
+
+        $io->close();
+
+        ok $bytes , 'can stream the data';
+
+        is $bytes , 16 , 'got correct byte count';
+
+        my $str = path($tempfile)->slurp_utf8;
+
+        is $str , "钱唐湖春行\n", 'got the correct data';
+    }
 }
 
 note("delete");

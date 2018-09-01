@@ -1,25 +1,20 @@
 package Net::Amazon::S3::Request::CreateBucket;
-$Net::Amazon::S3::Request::CreateBucket::VERSION = '0.84';
+$Net::Amazon::S3::Request::CreateBucket::VERSION = '0.85';
 use Moose 0.85;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Bucket';
 
 # ABSTRACT: An internal class to create a bucket
 
-with 'Net::Amazon::S3::Role::Bucket';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
 
-has 'acl_short' => ( is => 'ro', isa => 'Maybe[AclShort]', required => 0 );
 has 'location_constraint' =>
     ( is => 'ro', isa => 'MaybeLocationConstraint', coerce => 1, required => 0 );
 
 __PACKAGE__->meta->make_immutable;
 
-sub http_request {
-    my $self = shift;
-
-    my $headers
-        = ( $self->acl_short )
-        ? { 'x-amz-acl' => $self->acl_short }
-        : {};
+sub _request_content {
+    my ($self) = @_;
 
     my $content = '';
     if ( defined $self->location_constraint &&
@@ -29,12 +24,12 @@ sub http_request {
             . $self->location_constraint
             . "</LocationConstraint></CreateBucketConfiguration>";
     }
+}
+
+sub http_request {
+    my $self = shift;
 
     return $self->_build_http_request(
-        method  => 'PUT',
-        path    => $self->_uri,
-        headers => $headers,
-        content => $content,
         region  => 'us-east-1',
     );
 }
@@ -53,7 +48,7 @@ Net::Amazon::S3::Request::CreateBucket - An internal class to create a bucket
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

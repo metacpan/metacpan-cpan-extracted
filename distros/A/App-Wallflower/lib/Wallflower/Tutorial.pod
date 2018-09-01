@@ -6,7 +6,7 @@ Wallflower::Tutorial - Turn your Plack app into a static site
 
 =head1 VERSION
 
-version 1.009
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -116,10 +116,20 @@ all reachable URLs have been processed.
 The simplest way to generate the full static site is to make
 sure that all URLs can be reached by repeatedly following links from the root.
 
-When using the C<--url> option to "mount" your application under some path,
+When using the B<--url> option to "mount" your application under some path,
 don't forget to call L<wallflower> with that path as the root:
 
     wallflower --application myapp.psgi --url http://localhost/myapp /myapp/
+
+In case all of the application URL are not reachable from the root, it
+is possible to pass L<wallflower> a list of starting points (one per line),
+using the B<--filter> option:
+
+    wallflower --application myapp.psgi --filter urls.txt
+
+Note that the B<--filter> option turns L<wallflower> into a "filter" command:
+it takes a list of files as argument, and if no file is given, it reads the
+list of URL from the command-line.
 
 =head1 URL SEMANTICS COMPARED TO DIRECTORY SEMANTICS
 

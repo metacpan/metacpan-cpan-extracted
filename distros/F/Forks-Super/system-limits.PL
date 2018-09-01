@@ -17,7 +17,7 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
@@ -44,7 +44,7 @@ if ($^O eq 'MSWin32') {
     if ("@ARGV" !~ / --bg /) {
         $pid = system 1, "$^X $0 @ARGV --bg";
     }
-} elsif ($INC{'perl5db.pl'}) {
+} elsif ($INC{'perl5db.pl'} || $ENV{SYS_LIMITS_FG}) {
     $pid = 0;
 } else {
     $pid = fork;
@@ -122,10 +122,10 @@ our $DARWIN = $^O eq 'darwin' || $^O eq 'MacOS';
 &find_socket_capacity;
 &find_pipe_capacity;            # on some systems:  512 * ulimit -p
 &wait_waitpid_results;
-&explore_sync_options;
 &explore_alternate_alarm;
 &check_proc_process_table;
 &probe_ssh_test_env;
+&explore_sync_options;
 
 
 # gnukfreebsd/midnightbsd can see "Maximal count of pending signals 
@@ -377,6 +377,7 @@ sub wait_waitpid_results {
 
 #
 # what options are available to this system for interprocess synchronization?
+# This sub also can terminate the
 #
 sub explore_sync_options {
     $DARWIN && print STDERR "  in explore_sync_options\n";
@@ -434,6 +435,7 @@ sub explore_sync_options {
     sleep 2;
     open my $fh, '>>', $file;
     my $t = time;
+    $SIG{ALRM} = sub { die "explore_sync_options ",__LINE__ };
     eval { eval { alarm 30 }; flock $fh, 2; alarm 0; };
     $t = time - $t;
     close $fh;
@@ -625,6 +627,8 @@ sub probe_ssh_test_env {
                 print STDERR "Suitable ssh test configuration: $cmdtmp\n";
                 write_limits('test_ssh_target', $cmdtmp);
                 return;
+            } else {
+                print STDERR "ssh test configuration failed for cmd: $cmd\n";
             }
         }
     }

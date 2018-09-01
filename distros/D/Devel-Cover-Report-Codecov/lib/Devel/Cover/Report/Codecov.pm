@@ -2,7 +2,7 @@ package Devel::Cover::Report::Codecov;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 use URI;
 use Furl;
@@ -13,7 +13,7 @@ use Module::Find;
 useall 'Devel::Cover::Report::Codecov::Service';
 
 
-our $API_ENDPOINT = 'http://codecov.io/upload/v2';
+our $API_ENDPOINT = 'https://codecov.io/upload/v2';
 our $RETRY_TIMES  = 5;
 our $RETRY_DELAY  = 1; # sec
 
@@ -212,17 +212,19 @@ You must set CODECOV_TOKEN environment variables if you don't use Travis CI, Cir
 
 =item * L<Circle CI|https://circleci.com/>
 
-=item * L<AppVeyor|http://www.appveyor.com/>
-
 =item * L<Codeship|https://codeship.com/>
-
-=item * L<Drone.io|https://drone.io/>
 
 =item * L<Semaphore|https://semaphoreci.com/>
 
-=item * L<Wercker|http://wercker.com/>
+=item * L<drone.io|https://drone.io/>
 
-=item * L<GitLab|https://about.gitlab.com/gitlab-ci/>
+=item * L<AppVeyor|https://www.appveyor.com/>
+
+=item * L<Wercker|https://wercker.com/>
+
+=item * L<Shippable|https://www.shippable.com/>
+
+=item * L<GitLab CI|https://about.gitlab.com/gitlab-ci/>
 
 =back
 

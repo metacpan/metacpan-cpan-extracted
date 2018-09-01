@@ -26,7 +26,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.72';
+$VERSION='6.73';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -370,7 +370,7 @@ sub _init_language {
 ###############################################################################
 
 # Use an algorithm from Calendar FAQ (except that I subtract 305 to get
-# Jan 1, 0001 = day #1.
+# Jan 1, 0001 = day #1).
 #
 sub days_since_1BC {
    my($self,$arg) = @_;
@@ -382,7 +382,9 @@ sub days_since_1BC {
       return 365*$y + $y/4 - $y/100 + $y/400 + ($m*306 + 5)/10 + ($d - 1) - 305;
    } else {
       my $g   = $arg + 305;
-      my $y   = (10000*$g + 14780)/3652425;
+      no integer;
+      my $y   = int((10000*$g + 14780)/3652425);
+      use integer;
       my $ddd = $g - (365*$y + $y/4 - $y/100 + $y/400);
       if ($ddd < 0) {
          $y   = $y - 1;
@@ -2358,10 +2360,11 @@ sub _delta_convert {
 
 sub __normalize_ym {
    my($y,$m,$s,$mon) = @_;
+   no integer;
 
    if (defined($s)) {
       $m      = int($s/$mon);
-      $s     -= $m*$mon;
+      $s     -= int(sprintf('%f',$m*$mon));
       $y      = int($m/12);
       $m     -= $y*12;
 
@@ -2376,9 +2379,10 @@ sub __normalize_ym {
 }
 sub __normalize_wd {
    my($w,$d,$s,$wk,$day) = @_;
+   no integer;
 
    $d      = int($s/$day);
-   $s     -= $d*$day;
+   $s     -= int($d*$day);
    $w      = int($d/$wk);
    $d     -= $w*$wk;
 
@@ -2386,6 +2390,7 @@ sub __normalize_wd {
 }
 sub __normalize_hms {
    my($h,$mn,$s) = @_;
+   no integer;
 
    $h      = int($s/3600);
    $s     -= $h*3600;

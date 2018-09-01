@@ -122,7 +122,6 @@ t/docs/pod-spelling.t
 t/docs/pod.t
 t/docs/spdx-license.t
 t/docs/synopsis.t
-t/docs/urls.t
 t/lib/Test/RRA.pm
 t/lib/Test/RRA/Config.pm
 t/lib/Test/RRA/ModuleVersion.pm
@@ -131,6 +130,7 @@ t/style/coverage.t
 t/style/critic.t
 t/style/minimum-version.t
 t/style/module-version.t
+t/style/obsolete-strings.t
 t/style/strict.t
 TODO
 META.yml

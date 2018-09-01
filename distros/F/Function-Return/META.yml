@@ -1,0 +1,50 @@
+---
+abstract: 'add return type for a function'
+author:
+  - 'Kenta, Kobayashi <kentafly88@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  Types::Standard: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Function-Return
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Function::Return:
+    file: lib/Function/Return.pm
+    version: '0.02'
+  Function::Return::Info:
+    file: lib/Function/Return/Info.pm
+requires:
+  Function::Parameters: '0'
+  Scalar::Util: '0'
+  Scope::Upper: '0'
+  Sub::Info: '0'
+  Sub::Util: '0'
+  attributes: '0'
+  perl: '5.014004'
+resources:
+  bugtracker: https://github.com/kfly8/p5-Function-Return/issues
+  homepage: https://github.com/kfly8/p5-Function-Return
+  repository: git://github.com/kfly8/p5-Function-Return.git
+version: '0.02'
+x_authority: cpan:KFLY
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

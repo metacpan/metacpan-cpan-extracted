@@ -1,5 +1,10 @@
 Revision history for Perl extension File::Path.
 
+2.16 2018-08-31
+    - Correct inadequate method of generating names for dummy users
+      and groups during testing (RTC 121967).  No change in
+      functionality from 2.15.
+
 2.15 2017-07-29
     - Correct documentation error re possible arguments for rmtree().
 
@@ -31,7 +36,7 @@ Revision history for Perl extension File::Path.
 2.12_004 2017-04-18
     - Certain functions used in tests are not available on Windows;
       skip them.
-    - Move certain functions used in testing to t/FilePathTest.pm. 
+    - Move certain functions used in testing to t/FilePathTest.pm.
 
 2.12_003 2017-04-07
     - Add tests to improve coverage ratios as measured by Devel::Cover

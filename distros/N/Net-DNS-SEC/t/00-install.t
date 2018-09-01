@@ -1,63 +1,10 @@
-# $Id: 00-install.t 1658 2018-03-29 15:07:50Z willem $ -*-perl-*-
+# $Id: 00-install.t 1701 2018-07-28 07:36:34Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
 use File::Spec;
 use File::Find;
 use ExtUtils::MakeMaker;
-
-
-eval {
-	my %macro;						# extract Makefile macros
-	open MAKEFILE, 'Makefile' or die $!;
-	while (<MAKEFILE>) {
-		$macro{$1} = $2 if /^([A-Z_]+)\s+=\s+(.*)$/;
-	}
-	close MAKEFILE;
-
-	my %install_type = qw(perl INSTALLARCHLIB site INSTALLSITEARCH vendor INSTALLVENDORARCH);
-	my $install_site = join '', '$(DESTDIR)$(', $install_type{$macro{INSTALLDIRS}}, ')';
-	for ($install_site) {
-		s/\$\(([A-Z_]+)\)/$macro{$1}/eg while /\$\(/;	# expand Makefile macros
-		s|([/])[/]+|$1|g;				# remove gratuitous //s
-	}
-
-	local @INC = grep !m/\bblib\W(arch|lib)$/i, @INC;
-	eval 'require Net::DNS::SEC';
-	my @version = grep $_, ( 'version', $Net::DNS::SEC::VERSION );
-
-	my $nameregex = '\W+Net\WDNS\WSEC.pm$';
-	my @installed = grep $_ && m/$nameregex/io, values %INC;
-	my %noinstall;
-
-	foreach (@installed) {
-		my $path = $1 if m/^(.+)$nameregex/i;
-		my %seen;
-		foreach (@INC) {
-			$seen{$_}++;				# find $path in @INC
-			last if $_ eq $path;
-		}
-		foreach ( grep !$seen{$_}, @INC ) {
-			$noinstall{$_}++;			# mark hidden libraries
-		}
-	}
-
-	warn <<"AMEN" if $noinstall{$install_site};
-
-##
-##	The install location for this version of Net::DNS::SEC differs
-##	from the existing @version in your perl library.
-##	@installed
-##
-##	The installation will be rendered ineffective because the
-##	library search finds the existing version before reaching
-##	$install_site
-##
-##	Makefile has been generated to support build and test only.
-##
-AMEN
-
-};
 
 
 my @files;

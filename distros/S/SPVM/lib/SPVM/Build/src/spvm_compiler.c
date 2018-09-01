@@ -19,6 +19,7 @@
 #include "spvm_runtime_api.h"
 #include "spvm_sub.h"
 #include "spvm_field.h"
+#include "spvm_package_var.h"
 #include "spvm_native.h"
 #include "spvm_opcode.h"
 #include "spvm_basic_type.h"
@@ -26,6 +27,7 @@
 #include "spvm_op_checker.h"
 #include "spvm_opcode_builder.h"
 #include "spvm_object.h"
+#include "spvm_my.h"
 
 SPVM_COMPILER* SPVM_COMPILER_new() {
   SPVM_COMPILER* compiler = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_COMPILER));
@@ -42,14 +44,14 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->op_types = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->basic_types = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->basic_type_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->op_subs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->op_sub_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->op_fields = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->op_field_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->op_packages = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->op_package_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->op_package_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->op_package_var_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->subs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  compiler->sub_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->fields = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  compiler->field_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->packages = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  compiler->package_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->package_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  compiler->package_var_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->module_include_pathes = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
@@ -65,29 +67,6 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   SPVM_LIST_push(compiler->op_use_stack, op_use_core);
 
   return compiler;
-}
-
-SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
-  
-  SPVM_RUNTIME* runtime = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_RUNTIME));
-  
-  SPVM_ENV* env = (SPVM_ENV*)SPVM_RUNTIME_API_get_env_runtime();
-  
-  runtime->env = env;
-
-  runtime->compiler = compiler;
-  
-  // Set global runtime
-  SPVM_RUNTIME_API_set_runtime(env, runtime);
-  
-  // Initialize Package Variables
-  runtime->package_vars = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_VALUE) * (compiler->op_package_vars->length + 1));
-
-  runtime->mortal_stack_capacity = 1;
-
-  runtime->mortal_stack = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_OBJECT*) * runtime->mortal_stack_capacity);
-  
-  return runtime;
 }
 
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler) {

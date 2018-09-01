@@ -1,0 +1,30 @@
+---
+meta:
+  name:    perl5-test-mockmodule
+  target:  ci.spruce.cf
+  url:     https://ci.spruce.cf
+
+  image:
+    name: gfranks/cpan-uploader
+
+  aws:
+    access_key: (( vault "secret/aws/cfcommunity:access" ))
+    secret_key: (( vault "secret/aws/cfcommunity:secret" ))
+
+  cpan:
+    user: (( vault "secret/pipelines/test-mockmodule/cpan:user" ))
+    password: (( vault "secret/pipelines/test-mockmodule/cpan:password" ))
+
+  github:
+    owner:  geofffranks
+    repo:   test-mockmodule
+    branch: master
+    private_key:  (( vault "secret/pipelines/test-mockmodule/github:private" ))
+    access_token: (( vault "secret/pipelines/test-mockmodule/github:token" ))
+
+  slack:
+    webhook: (( vault "secret/pipelines/test-mockmodule/slack:webhook" ))
+    channel: '@gfranks'
+    username:      ci-bot
+    blob_success:  '(( concat "$BUILD_PIPELINE_NAME: New version of $BUILD_JOB_NAME was detected, and updated in master. <" meta.url "/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME| Cut a new release?>" ))'
+    blob_failure:  '(( concat "$BUILD_PIPELINE_NAME: :airplane_arriving: <" meta.url "/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME| Failed to update the blob for $BUILD_JOB_NAME>" ))'

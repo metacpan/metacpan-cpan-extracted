@@ -23,5 +23,4 @@ If a world profile already exists, you can specify its name instead
 
     axmud.pl cryosphere
 
-Note that certain features have not been implemented on MS Windows yet (namely
-window tiling, multiple desktop support and text-to-speech)
+Note that certain features have not been implemented on MS Windows yet (namely window tiling and multiple desktop support)

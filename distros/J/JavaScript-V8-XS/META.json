@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "ExtUtils::XSpp" : "0.11",
+            "JSON::PP" : "0",
             "Text::Trim" : "0",
             "XSLoader" : "0",
             "perl" : "5.018"
@@ -56,6 +57,6 @@
          "web" : "https://github.com/gonzus/JavaScript-V8-XS"
       }
    },
-   "version" : "0.000005",
+   "version" : "0.000006",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

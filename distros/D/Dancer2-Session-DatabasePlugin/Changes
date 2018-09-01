@@ -18,3 +18,6 @@
   -- added unit tests to validate selective db cache clean up
 1.0007
   -- Reduced min version over Carp to 1.38
+1.008
+  -- added support for manual bind operations. IE Oracle doesn't handle dynamic bind type correctly and needs to.
+  -- pod examples to support this.

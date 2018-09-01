@@ -42,6 +42,6 @@
          "web" : "https://bitbucket.org/softvisio/common-header/overview"
       }
    },
-   "version" : "v0.1.6",
+   "version" : "v0.2.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,3 +1,6 @@
+0.30 Wed Aug 29 21:19:34 PDT 2018
+ - Support Perl 5.8.9
+
 0.29 Fri Aug 24 19:16:42 PDT 2018
  - Fixes for TestML on windows
 

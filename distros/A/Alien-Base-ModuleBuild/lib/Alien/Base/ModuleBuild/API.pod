@@ -1,3 +1,7 @@
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
  
 Alien::Base::ModuleBuild::API - API Reference for Alien:: Authors
@@ -244,7 +248,9 @@ A hashref or arrayref of hashrefs defining the repositories used to find and fet
 
 =item protocol
 
-One of C<ftp> or C<http> or C<local>. The first two are obvious, C<local> allows packaging a tarball with the Alien:: module.
+One of C<ftp>, C<http> C<https> or C<local>. The first three are obvious, C<local> allows packaging a tarball with the Alien:: module.
+
+If your repository is going to need C<https>, make sure that you specify that, because it will inform L<Alien::Base::ModuleBuild> that you will need the prereqs for SSL (namely L<Net::SSLeay> and L<IO::Socket::SSL>).
 
 =item protocol_class
 

@@ -10,7 +10,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.53'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 sub record_layout
@@ -81,6 +81,7 @@ sub record_layout
   no strict 'refs';
   constant->import("${caller}::_ffi_record_size", $size);
   constant->import("${caller}::_ffi_record_align", $record_align);
+  *{join '::', $caller, '_ffi_record_ro'} = \&_ffi_record_ro;
   *{join '::', $caller, 'new'} = sub {
     my $class = shift;
     my $args = ref($_[0]) ? [%{$_[0]}] : \@_;
@@ -104,6 +105,7 @@ sub record_layout
   if(@destroy)
   {
     $destroy_sub = sub {
+      return if _ffi_record_ro($_[0]);
       $_->($_[0]) for @destroy;
     };
   }
@@ -128,7 +130,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -380,7 +382,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

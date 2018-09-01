@@ -1,3 +1,7 @@
+0.65 Wed Aug 29 09:53:13 PDT 2018
+ - Use new TestML for tests
+ - Support back to perl5.8.3
+
 0.64 Sun Sep 17 19:26:03 PDT 2017
  - Applied 3 small PRs from @mohawk2++ (60,61,62)
 

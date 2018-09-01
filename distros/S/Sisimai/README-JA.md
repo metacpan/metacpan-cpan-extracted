@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.26-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.22.7-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.23.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README(English)**](README.md)
 - [シシマイ? | What is Sisimai](#what-is-sisimai)
@@ -117,6 +117,14 @@ Basic usage
 #! /usr/bin/env perl
 use Sisimai;
 my $v = Sisimai->make('/path/to/mbox'); # or path to Maildir/
+
+# Beginning with v4.23.0, both make() and dump() method of Sisimai class can
+# read bounce messages from variable instead of a path to mailbox
+use IO::File;
+my $r = '';
+my $f = IO::File->new('/path/to/mbox'); # or path to Maildir/
+{ local $/ = undef; $r = <$f>; $f->close }
+my $v = Sisimai->make(\$r);
 
 # If you want to get bounce records which reason is "delivered", set "delivered"
 # option to make() method like the following:
@@ -253,8 +261,8 @@ bounceHammer 2.7.13p3とSisimai(シシマイ)は下記のような違いがあ�
 | インストール作業が簡単かどうか                 | やや面倒      | 簡単で楽    |
 | cpan, cpanm, cpmコマンドでのインストール       | 非対応        | 対応済      |
 | 依存モジュール数(Perlのコアモジュールを除く)   | 24モジュール  | 2モジュール |
-| LOC:ソースコードの行数                         | 18200行       | 8600行      |
-| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 235000件    |
+| LOC:ソースコードの行数                         | 18200行       | 8500行      |
+| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 236000件    |
 | ライセンス                                     | GPLv2かPerl   | 二条項BSD   |
 | 開発会社によるサポート契約                     | 終売(EOS)     | 提供中      |
 

@@ -1,3 +1,11 @@
+1.115 2018-08-31
+- Update module to support current RFC 7208 instead of the older RFC 4408. This
+  means especially that DNS SPF records will be no longer used (only TXT).
+  Compatibilty with RFC 4408 can be enabled.
+- fix handling of ipv6 in mechanism 'a' and 'mx'. It now understands 
+  a/24 (as before), a/24//64 and a//64 - the last two were wrongly considered 
+  invalid before.
+
 1.114 2018-03-09
 - optionally have default SPF record which gets used for sites which don't
   specify their own. Since this affects often smaller sites something like

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.181310';
+$Bio::MUST::Core::Types::VERSION = '0.182420';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -104,7 +104,14 @@ subtype 'Bio::MUST::Core::Types::Seq'
 
 coerce 'Bio::MUST::Core::Types::Seq'
     => from 'Str'
-    => via { ( my $seq = tr{-\n}{*}dr ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq }
+    => via { ( my $seq = $_ ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq =~ tr{-\n}{*}dr }
+#     => via {
+#             my $seq =  tr{\n}{}dr;                  # concat all lines into one
+#                $seq =~ s{\A ([^*]+) \* \z}{$1}xms;  # remove single trailing '*'
+#                $seq =~ tr{-}{*};                    # use '*' instead of '-'
+#                $seq;
+#        }
+#   => via { ( my $seq = tr{-\n}{*}dr ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq }
 ;   # Note: s/// only modifies plain seqs ending in '*'
 
 # subtype for a stringified NCBI Taxonomy lineage
@@ -228,7 +235,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 SYNOPSIS
 

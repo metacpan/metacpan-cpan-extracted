@@ -17,11 +17,11 @@ for (1..20) {
 	$yy .= "\r\n";
     }
 }
-open my $xx, '>', 't/test04.txt';
+open my $xx, '>:raw', 't/test04.txt';
 print $xx $yy;
 close $xx;
 
-my $z = open(my $fh, "<:irs(\r\n|\r|\n)", "t/test04.txt");
+my $z = open(my $fh, '<:raw:irs(\r\n|\r|\n)', "t/test04.txt");
 (tied *$fh)->{maxrecsize} = 100;
 ok($z, 'Acme::InputRecordSeparatorIsRegexp::open ok');
 ok(tied(*$fh), 'return tied handle');

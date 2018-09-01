@@ -17,6 +17,19 @@ can_ok $row, qw/ is_good is_bad is_ugly good_bar coyote
    baz_est_bien baz_est_mal /;
 
 ok $row->$_, $_ for (qw/ is_good coyote baz_est_mal /);
-ok !$row->$_, $_ for (qw/ is_bad is_ugly good_bar baz_est_bien /);
+ok !$row->$_, $_ for (qw/ is_bad is_ugly good_bar baz_est_bien is_success is_fail /);
+
+{
+    local $@;
+    eval slurp($INC{'Test/Schema/Result/A.pm'});
+    is(my $exn = $@, '', 'reload a result class');
+}
+
+sub slurp {
+    my ($file) = @_;
+    open my $fh, '<', $file or die "Can't open $file for reading: $!\n";
+    local $/;
+    return <$fh>;
+}
 
 done_testing;

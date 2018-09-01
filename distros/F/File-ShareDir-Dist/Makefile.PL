@@ -24,19 +24,23 @@ my %WriteMakefileArgs = (
   "PM"               => {
     "lib/App/Prove/Plugin/ShareDirDist.pm" => "\$(INST_LIB)/App/Prove/Plugin/ShareDirDist.pm",
     "lib/App/Yath/Plugin/ShareDirDist.pm"  => "\$(INST_LIB)/App/Yath/Plugin/ShareDirDist.pm",
-    "lib/File/ShareDir/Dist.pm"            => "\$(INST_LIB)/File/ShareDir/Dist.pm"
+    "lib/File/ShareDir/Dist.pm"            => "\$(INST_LIB)/File/ShareDir/Dist.pm",
+    "lib/File/ShareDir/Dist/Install.pm"    => "\$(INST_LIB)/File/ShareDir/Dist/Install.pm"
   },
-  "PREREQ_PM"     => {},
+  "PREREQ_PM" => {
+    "File::Copy" => 0
+  },
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test"    => {
     "TESTS" => "t/*.t"
     }
 );
 
 my %FallbackPrereqs = (
+  "File::Copy" => 0,
   "Test::More" => "0.88"
 );
 

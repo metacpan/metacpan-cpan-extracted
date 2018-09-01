@@ -166,6 +166,7 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
 
 #define OPEN_TAG(s, l)                                                  \
     xh_log_trace2("new tag: [%.*s]", l, s);                             \
+    flags |= XH_X2H_TEXT_NODE;                                          \
     if (real_depth == 0) {                                              \
         if (flags & XH_X2H_ROOT_FOUND) goto INVALID_XML;                \
         flags |= XH_X2H_ROOT_FOUND;                                     \
@@ -205,6 +206,7 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
 
 #define CLOSE_TAG                                                       \
     xh_log_trace0("close tag");                                         \
+    flags &= ~XH_X2H_TEXT_NODE;                                         \
     if (real_depth == 0) goto INVALID_XML;                              \
     if (!XH_X2H_FILTER_SEARCH(flags)) {                                 \
         _CLOSE_TAG                                                      \
@@ -859,6 +861,20 @@ PPCAT(loop, _NORMALIZE_LINE_FEED_END):                                  \
         enc = s;                                                        \
     }
 
+#define END_OF_TEXT(loop, s, l)                                         \
+    if (s != NULL) {                                                    \
+        if (flags & (XH_X2H_IS_NOT_BLANK | XH_X2H_TEXT_NODE)) {         \
+            if (flags & XH_X2H_NEED_NORMALIZE) {                        \
+                NORMALIZE_TEXT(loop, s, (l))                            \
+                NEW_TEXT(enc, enc_len)                                  \
+            }                                                           \
+            else {                                                      \
+                NEW_TEXT(s, (l))                                        \
+            }                                                           \
+        }                                                               \
+        s = NULL;                                                       \
+    }
+
 static void
 xh_x2h_parse_chunk(xh_x2h_ctx_t *ctx, xh_char_t **buf, size_t *bytesleft, xh_bool_t terminate)
 {
@@ -908,21 +924,10 @@ PARSE_CONTENT:
     flags &= ~(XH_X2H_NEED_NORMALIZE | XH_X2H_IS_NOT_BLANK);
     DO(CONTENT)
         EXPECT_CHAR("new element", '<')
-            if (content != NULL) {
-                if (flags & XH_X2H_IS_NOT_BLANK) {
-                    if (flags & XH_X2H_NEED_NORMALIZE) {
-                        NORMALIZE_TEXT(TEXT1, content, end - content)
-                        NEW_TEXT(enc, enc_len)
-                    }
-                    else {
-                        NEW_TEXT(content, end - content)
-                    }
-                }
-                content = NULL;
-            }
             DO(PARSE_ELEMENT)
                 EXPECT_CHAR("xml declaration", '?')
                     if (real_depth != 0) goto INVALID_XML;
+                    END_OF_TEXT(TEXT_BEFORE_XML_DECL, content, end - content)
 #undef  NEW_ATTRIBUTE
 #define NEW_ATTRIBUTE(k, kl, v, vl) NEW_XML_DECL_ATTRIBUTE(k, kl, v, vl)
 #undef  SEARCH_ATTRIBUTE_VALUE
@@ -933,6 +938,8 @@ PARSE_CONTENT:
 #undef  SEARCH_ATTRIBUTE_VALUE
 #define SEARCH_ATTRIBUTE_VALUE(loop, top_loop, quot) SEARCH_NODE_ATTRIBUTE_VALUE(loop, top_loop, quot)
                 EXPECT_CHAR("comment or cdata or doctype", '!')
+                    flags &= ~XH_X2H_TEXT_NODE;
+                    END_OF_TEXT(TEXT_BEFORE_COMMENT, content, end - content)
                     DO(XML_COMMENT_NODE_OR_CDATA)
                         EXPECT_CHAR("comment", '-')
                             PARSE_COMMENT
@@ -952,6 +959,7 @@ PARSE_CONTENT:
                     END(XML_COMMENT_NODE_OR_CDATA)
                     goto INVALID_XML;
                 EXPECT_CHAR("closing tag", '/')
+                    END_OF_TEXT(TEXT_BEFORE_CLOSING_TAG, content, end - content)
                     //node = cur;
                     DO(PARSE_CLOSING_TAG)
                         EXPECT_CHAR("end tag name", '>')
@@ -970,6 +978,8 @@ PARSE_CONTENT:
                     END(PARSE_CLOSING_TAG)
                     goto INVALID_XML;
                 EXPECT_ANY("opening tag")
+                    flags &= ~XH_X2H_TEXT_NODE;
+                    END_OF_TEXT(TEXT_BEFORE_OPENING_TAG, content, end - content)
                     node = cur - 1;
                     DO(PARSE_OPENING_TAG)
                         EXPECT_CHAR("end tag", '>')
@@ -1010,7 +1020,8 @@ PARSE_CONTENT:
                 goto START_CONTENT;
             break;
         EXPECT_CHAR("reference", '&')
-            flags |= XH_X2H_NORMALIZE_REF;
+            flags |= (XH_X2H_NORMALIZE_REF | XH_X2H_IS_NOT_BLANK);
+            goto START_CONTENT;
         EXPECT_ANY("any char")
             flags |= XH_X2H_IS_NOT_BLANK;
             START_CONTENT:
@@ -1018,20 +1029,11 @@ PARSE_CONTENT:
             end = cur;
     END(CONTENT)
 
-    if (content != NULL) {
-        if (flags & XH_X2H_IS_NOT_BLANK) {
-            if (flags & XH_X2H_NEED_NORMALIZE) {
-                NORMALIZE_TEXT(TEXT2, content, end - content)
-                NEW_TEXT(enc, enc_len)
-            }
-            else {
-                NEW_TEXT(content, end - content)
-            }
-        }
-        content = NULL;
-    }
-
-    if (real_depth != 0 || !(flags & XH_X2H_ROOT_FOUND)) goto INVALID_XML;
+    if (
+        ((content != NULL) && (flags & XH_X2H_IS_NOT_BLANK)) ||
+        (real_depth != 0) ||
+        !(flags & XH_X2H_ROOT_FOUND)
+    ) goto INVALID_XML;
 
     ctx->state          = PARSER_ST_DONE;
     *bytesleft          = eof - cur;

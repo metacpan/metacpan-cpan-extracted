@@ -44,4 +44,6 @@ on 'develop' => sub {
     requires 'Test::PAUSE::Permissions', '0.05';
     requires 'Test::Spellunker', '0.4.0';
     requires 'Version::Next', '1.000';
+    requires 'Pod::Markdown::Github', '0.02';
+
 };

@@ -1,4 +1,4 @@
-use Forks::Super ':test';
+use Forks::Super ':test_CA';
 use Test::More;
 use strict;
 use warnings;
@@ -133,12 +133,17 @@ SKIP: {
     ok($pid->is_active, "remote cmd is active after 20s")
         or diag "state is ",$pid->{state};
     Forks::Super::kill('INT', $pid);
-    ok($pid == waitpid($pid,0,5), "remote cmd reaped");
-    ok(!$pid->is_active, "remote cmd terminated");
-    @out = $pid->read_stdout;
-    diag "Output is @out";
-    ok("@out" =~ /One/ && "@out" =~ /Two/,
-       'intermediate output received from remote cmd');
+  SKIP: {
+      if ($^O eq 'cygwin') {
+          skip "intermediate output not available on cygwin", 3;
+      }
+      ok($pid == waitpid($pid,0,5), "remote cmd reaped");
+      ok(!$pid->is_active, "remote cmd terminated");
+      @out = $pid->read_stdout;
+      diag "Output is @out";
+      ok("@out" =~ /One/ && "@out" =~ /Two/,
+         'intermediate output received from remote cmd');
+    }
     ok("@out" !~ /Three/, 'incomplete output recevied from remote cmd');
     @err = $pid->read_stderr;
     diag "Error is @err";

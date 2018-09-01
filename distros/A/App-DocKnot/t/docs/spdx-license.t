@@ -68,7 +68,7 @@ my @IGNORE_PATHS = (
 
 # Only run this test during automated testing, since failure doesn't indicate
 # any user-noticable flaw in the package itself.
-skip_unless_automated('SPDX license identifier tests');
+skip_unless_automated('SPDX identifier tests');
 
 # Check a single file for an occurrence of the string.
 #

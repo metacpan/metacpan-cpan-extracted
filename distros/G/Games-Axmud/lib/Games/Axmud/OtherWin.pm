@@ -247,10 +247,14 @@
                 $self->notebook->set_current_page(2);
             } elsif ($firstTab eq 'peek') {
                 $self->notebook->set_current_page(3);
-            } elsif ($firstTab eq 'license') {
+            } elsif ($firstTab eq 'changes') {
                 $self->notebook->set_current_page(4);
-            } elsif ($firstTab eq 'license_2') {
+            } elsif ($firstTab eq 'install') {
                 $self->notebook->set_current_page(5);
+            } elsif ($firstTab eq 'license') {
+                $self->notebook->set_current_page(6);
+            } elsif ($firstTab eq 'license_2') {
+                $self->notebook->set_current_page(7);
             }
         }
 
@@ -338,7 +342,8 @@
         # Local variables
         my (
             $file, $fileHandle,
-            @aboutList, @helpList, @peekList, @licenseList, @license2List,
+            @aboutList, @helpList, @peekList, @changesList, @installList, @licenseList,
+            @license2List,
         );
 
         # Check for improper arguments
@@ -443,6 +448,56 @@
 
         # Add the 'peek/poke' tab to the notebook
         $self->addTab($notebook, '_Peek/Poke', FALSE, @peekList);
+
+        # Load the CHANGES file
+        $file = $axmud::SHARE_DIR . '/../CHANGES';
+        if (! (-e $file)) {
+
+            push (@peekList, 'Changes file missing');
+
+        } else {
+
+            if (! open($fileHandle, $file)) {
+
+                push (
+                    @changesList,
+                    'Unable to read changes file',
+                );
+
+            } else {
+
+                @changesList = <$fileHandle>;
+                close($fileHandle);
+            }
+        }
+
+        # Add the 'changes' tab to the notebook
+        $self->addTab($notebook, 'Cha_nges', FALSE, @changesList);
+
+        # Load the INSTALL file
+        $file = $axmud::SHARE_DIR . '/../INSTALL';
+        if (! (-e $file)) {
+
+            push (@peekList, 'Install file missing');
+
+        } else {
+
+            if (! open($fileHandle, $file)) {
+
+                push (
+                    @installList,
+                    'Unable to read install file',
+                );
+
+            } else {
+
+                @installList = <$fileHandle>;
+                close($fileHandle);
+            }
+        }
+
+        # Add the 'install' tab to the notebook
+        $self->addTab($notebook, '_Installation', FALSE, @installList);
 
         # Load the GPL license file
         $file = $axmud::SHARE_DIR . '/../COPYING';
@@ -747,8 +802,9 @@
             sortAzButton                => undef,       # Gtk2::RadioToolButton
             sortZaButton                => undef,       # Gtk2::RadioToolButton
             sortRandButton              => undef,       # Gtk2::RadioToolButton
+            searchButton                => undef,       # Gtk2::Button
+            cancelSearchButton          => undef,       # Gtk2::Button
             consoleButton               => undef,       # Gtk2::Button
-            label                       => undef,       # Gtk2::Label
             # Table widgets
             entry                       => undef,       # Gtk2::Entry
             entry2                      => undef,       # Gtk2::Entry
@@ -819,7 +875,12 @@
             # First line displayed in 'information' section
             noWebsiteString             => 'Websites: (no websites)',
             # Second line
-            noConnectString             => 'Connections: 0, previous: (never connected)',
+            noConnectString             => 'Connections: 0',
+
+            # Current search terms. If 'undef', all worlds are listed; otherwise, only those worlds
+            #   matching one or both search terms are listed
+            searchRegex                 => undef,
+            searchLanguage              => undef,
         };
 
         # Bless the object into existence
@@ -1073,12 +1134,36 @@
 
         my ($self, $check) = @_;
 
+        # Local variables
+        my (
+            $allString,
+            @comboList,
+            %hash,
+        );
+
         # Check for improper arguments
         if (defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->createStripButtons', @_);
         }
 
+        # Compile a list of languages used by all basic world objects. Put 'English' at the top
+        #   because most basic worlds use it
+        foreach my $basicObj ($axmud::CLIENT->ivValues('constBasicWorldHash')) {
+
+            if ($basicObj->language && $basicObj->language ne 'English') {
+
+                $hash{$basicObj->language} = undef;
+            }
+        }
+
+        @comboList = sort {lc($a) cmp lc($b)} (keys %hash);
+        unshift (@comboList, 'English');
+
+        $allString = '<all languages>';
+        unshift (@comboList, $allString);
+
+        # Add widgets
         my $button = Gtk2::RadioToolButton->new(undef);
         $self->hBox->pack_start($button, FALSE, FALSE, 0);
         $button->set_active(TRUE);
@@ -1111,7 +1196,7 @@
         });
 
         my $separator = Gtk2::SeparatorToolItem->new();
-        $self->hBox->pack_start($separator, FALSE, FALSE, 0);
+        $self->hBox->pack_start($separator, TRUE, TRUE, 0);
 
         my $button3 = Gtk2::RadioToolButton->new(undef);
         $self->hBox->pack_start($button3, FALSE, FALSE, 0);
@@ -1168,28 +1253,108 @@
         });
 
         my $separator2 = Gtk2::SeparatorToolItem->new();
-        $self->hBox->pack_start($separator2, FALSE, FALSE, 0);
+        $self->hBox->pack_start($separator2, TRUE, TRUE, 0);
 
         my $button6 = Gtk2::Button->new();
         $self->hBox->pack_start($button6, FALSE, FALSE, 0);
+        $button6->set_image(
+            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/connect/icon_search.png')
+        );
+        $button6->set_tooltip_text('Search worlds');
+        $button6->signal_connect('clicked' => sub {
+
+            # Open a dialogue window
+            my ($regex, $language) = $self->showDoubleComboDialogue(
+                'Search worlds',
+                'Enter a search pattern:',
+                '(And/or) search by language:',
+                \@comboList,
+            );
+
+            if (! defined $regex) {
+
+                # Cancel search terms
+                $self->ivUndef('searchRegex');
+                $self->ivUndef('searchLanguage');
+
+            } else {
+
+                # Apply search terms
+                if ($regex eq '') {
+                    $self->ivUndef('searchRegex');
+                } else {
+                    $self->ivPoke('searchRegex', $regex);
+                }
+
+                if ($language eq $allString) {
+                    $self->ivUndef('searchLanguage');
+                } else {
+                    $self->ivPoke('searchLanguage', $language);
+                }
+            }
+
+            # Update the treeview
+            $self->resetTreeView();
+
+            # Update the button icon
+            if (! defined $self->searchRegex && ! defined $self->searchLanguage) {
+
+                $button6->set_image(
+                    Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/connect/icon_search.png')
+                );
+
+            } else {
+
+                $button6->set_image(
+                    Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/connect/icon_apply.png')
+                );
+            }
+        });
+
+        my $button7 = Gtk2::Button->new();
+        $self->hBox->pack_start($button7, FALSE, FALSE, 0);
+        $button7->set_image(
+            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/connect/icon_clear.png')
+        );
+        $button7->set_tooltip_text('Cancel search');
+        $button7->signal_connect('clicked' => sub {
+
+            # Cancel search terms
+            $self->ivUndef('searchRegex');
+            $self->ivUndef('searchLanguage');
+
+            # Update the treeview
+            $self->resetTreeView();
+
+            # Update the button icon
+            $button6->set_image(
+                Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/connect/icon_search.png')
+            );
+        });
+
+        my $separator3 = Gtk2::SeparatorToolItem->new();
+        $self->hBox->pack_start($separator3, TRUE, TRUE, 0);
+
+        my $button8 = Gtk2::Button->new();
+        $self->hBox->pack_start($button8, FALSE, FALSE, 0);
 
         if (! $axmud::CLIENT->systemMsgList) {
 
-            $button6->set_image(
+            $button8->set_image(
                 Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/connect/icon_console.png')
             );
 
         } else {
 
-            $button6->set_image(
+            $button8->set_image(
                 Gtk2::Image->new_from_file(
                     $axmud::SHARE_DIR . '/icons/connect/icon_console_alert.png',
                 )
             );
         }
 
-        $button6->set_tooltip_text('Show error console');
-        $button6->signal_connect('clicked' => sub {
+        $button8->set_tooltip_text('Show error console');
+        $button8->signal_connect('clicked' => sub {
 
             # Open an Error Console window
             $self->createFreeWin(
@@ -1200,22 +1365,15 @@
             );
         });
 
-        my $separator3 = Gtk2::SeparatorToolItem->new();
-        $self->hBox->pack_start($separator3, FALSE, FALSE, 0);
-
-        my $label = Gtk2::Label->new();
-        $self->hBox->pack_start($label, TRUE, TRUE, 0);
-        $label->set_markup($axmud::SCRIPT . ' v' . $axmud::VERSION);
-        $label->set_alignment(0.5, 0.5);
-
         # Store the widgets as IVs
         $self->ivPoke('preConfigButton', $button);
         $self->ivPoke('otherWorldButton', $button2);
         $self->ivPoke('sortAzButton', $button3);
         $self->ivPoke('sortZaButton', $button4);
         $self->ivPoke('sortRandButton', $button5);
-        $self->ivPoke('consoleButton', $button6);
-        $self->ivPoke('label', $label);
+        $self->ivPoke('searchButton', $button6);
+        $self->ivPoke('cancelSearchButton', $button7);
+        $self->ivPoke('consoleButton', $button8);
 
         return 1;
     }
@@ -1506,7 +1664,7 @@
 
         # Local variables
         my (
-            $displayFlag, $sortMode, $model, $matchPointer, $treeSelection,
+            $displayFlag, $sortMode, $regex, $model, $matchPointer, $treeSelection,
             @faveList, @otherList, @objList, @initList, @displayList,
             %worldHash, %nameHash, %checkHash, %displayHash, %miniWorldHash,
         );
@@ -1550,8 +1708,36 @@
 
             # Display list of world profiles
 
-            # Import the hash of world profiles
-            %worldHash = $axmud::CLIENT->worldProfHash;
+            # Import the hash of world profiles. If search terms have been applied, remove any
+            #   worlds that don't match
+            $regex = $self->searchRegex;
+            foreach my $worldObj ($axmud::CLIENT->ivValues('worldProfHash')) {
+
+                my ($dictObj, $language);
+
+                if ($worldObj->dict) {
+
+                    $dictObj = $axmud::CLIENT->ivShow('dictHash', $worldObj->dict);
+                    if ($dictObj) {
+
+                        $language = $dictObj->language;
+                    }
+                }
+
+                if (
+                    (
+                        ! defined $regex
+                        || $worldObj->name =~ m/$regex/i
+                        || $worldObj->longName =~ m/$regex/i
+                    ) && (
+                        ! defined $self->searchLanguage
+                        || ($language && (lc($language) eq lc($self->searchLanguage)))
+                    )
+                ) {
+                    $worldHash{$worldObj->name} = $worldObj;
+                }
+            }
+
             # For each world, decide which name to use. Create a hash in the form
             #   $nameHash{profile_name} = displayed_name
             #   (where 'displayed_name' is the long name, if available, or the profile name, if not)
@@ -1619,14 +1805,23 @@
             #   or randomly, depending on which radio buttons are active)
             @otherList = sort {
 
+                my $aName = lc($nameHash{$a->name});
+                my $bName = lc($nameHash{$b->name});
+
+                # Sort, ignoring initial articles. Don't bother ignoring articles in languages other
+                #   than English, because the basic mudlist contains only a couple of items that
+                #   would be affected
+                $aName =~ s/^(the|a)\s//;
+                $bName =~ s/^(the|a)\s//;
+
                 if ($a->numberConnects > $b->numberConnects) {
                     -1;
                 } elsif ($b->numberConnects > $a->numberConnects) {
                     1;
                 } elsif ($sortMode eq 'az') {
-                    lc($nameHash{$a->name}) cmp lc($nameHash{$b->name});
+                    $aName cmp $bName;
                 } elsif ($sortMode eq 'za') {
-                    lc($nameHash{$b->name}) cmp lc($nameHash{$a->name});
+                    $bName cmp $aName;
                 } elsif (int(rand(2))) {
                     -1;
                 } else {
@@ -1660,10 +1855,19 @@
             #   buttons are active)
             @initList = sort {
 
+                my $aName = lc($a->longName);
+                my $bName = lc($b->longName);
+
+                # Sort, ignoring initial articles. Don't bother ignoring articles in languages other
+                #   than English, because the basic mudlist contains only a couple of items that
+                #   would be affected
+                $aName =~ s/^(the|a)\s//;
+                $bName =~ s/^(the|a)\s//;
+
                 if ($sortMode eq 'az') {
-                    lc($a->longName) cmp lc($b->longName);
+                    $aName cmp $bName;
                 } elsif ($sortMode eq 'za') {
-                    lc($b->longName) cmp lc($a->longName);
+                    $bName cmp $aName;
                 } elsif (int(rand(2))) {
                     -1;
                 } else {
@@ -1674,10 +1878,22 @@
 
             # Remove any worlds for which a world profile actually exists (the same world shouldn't
             #   appear in both lists)
+            # If any search terms have been applied, remove any worlds that don't match
+            $regex = $self->searchRegex;
             foreach my $obj (@initList) {
 
-                if (! $axmud::CLIENT->ivExists('worldProfHash', $obj->name)) {
-
+                if (
+                    (
+                        ! $axmud::CLIENT->ivExists('worldProfHash', $obj->name)
+                    ) && (
+                        ! defined $regex
+                        || $obj->name =~ m/$regex/i
+                        || $obj->longName =~ m/$regex/i
+                    ) && (
+                        ! defined $self->searchLanguage
+                        || lc($obj->language) eq lc($self->searchLanguage)
+                    )
+                ) {
                     push (@objList, $obj);
                 }
             }
@@ -2036,12 +2252,19 @@
         # 'Connections'
         if (! $displayFlag) {
 
-            $connections = 'Connections: ' . $worldObj->numberConnects . ', previous: ';
+            $connections = 'Connections: ' . $worldObj->numberConnects;
             if ($worldObj->lastConnectDate && $worldObj->lastConnectTime) {
-                $connections .= $worldObj->lastConnectDate . ' at ' . $worldObj->lastConnectTime;
-            } else {
-                $connections .= '(never connected)';
+
+                $connections .= ', most recent: ' . $worldObj->lastConnectDate . ' at '
+                                    . $worldObj->lastConnectTime;
             }
+
+#            $connections = 'Connections: ' . $worldObj->numberConnects . ', previous: ';
+#            if ($worldObj->lastConnectDate && $worldObj->lastConnectTime) {
+#                $connections .= $worldObj->lastConnectDate . ' at ' . $worldObj->lastConnectTime;
+#            } else {
+#                $connections .= '(never connected)';
+#            }
 
         } else {
 
@@ -2254,20 +2477,20 @@
 
         # Called by $self->applyChangesCallback and ->connectWorldCallback
         # Copies changes to values, stored in the specified mini-world object, to the corresponding
-        #   world profile
+        #   world profile (if it exists)
         #
         # Expected arguments
         #   $miniWorldObj   - A GA::Obj::MiniWorld
         #
         # Return values
-        #   'undef' on improper arguments
+        #   'undef' on improper arguments or if there is no world profile to update
         #   1 otherwise
 
         my ($self, $miniWorldObj, $check) = @_;
 
         # Local variables
         my (
-            $worldObj, $host, $port, $descrip,
+            $worldObj, $profFlag, $host, $port, $descrip,
             %newHash,
         );
 
@@ -2279,6 +2502,13 @@
 
         # Import the equivalent world profile object, for convenience
         $worldObj = $miniWorldObj->worldObj;
+        # Is it actually a world profile, or is it a basic world object (GA::Obj::BasicWorld), which
+        #   has different IVs?
+        if (! $worldObj->isa('Games::Axmud::Profile::World')) {
+
+            # It's a basic world object; nothing for this function to do
+            return undef;
+        }
 
         # (We can't change the profile's ->name)
 
@@ -2287,12 +2517,20 @@
         if ($host && $host =~ m/\w/) {
 
             $host = $axmud::CLIENT->trimWhitespace($host);
-            if ($axmud::CLIENT->ipv6Check($host)) {
-                $worldObj->ivPoke('ipv6', $host);
-            } elsif ($axmud::CLIENT->ipv4Check($host)) {
-                $worldObj->ivPoke('ipv4', $host);
+
+            if ($profFlag) {
+
+                if ($axmud::CLIENT->ipv6Check($host)) {
+                    $worldObj->ivPoke('ipv6', $host);
+                } elsif ($axmud::CLIENT->ipv4Check($host)) {
+                    $worldObj->ivPoke('ipv4', $host);
+                } else {
+                    $worldObj->ivPoke('dns', $host);
+                }
+
             } else {
-                $worldObj->ivPoke('dns', $host);
+
+                $worldObj->ivPoke('host', $host);
             }
         }
 
@@ -2603,13 +2841,13 @@
         $currentAccount = $self->miniWorldObj->ivShow('accountHash', $char);
 
         # Prompt the user to enter a new password
-        $string = "Enter the new account name associated with the \'" . $char . "\' character\n";
+        $string = "Enter the new account name associated with the\n\'" . $char . "\' character";
         if ($self->miniWorldObj->loginAccountMode eq 'not_required') {
-            $string .= '(not required for this world)';
+            $string .= ' (not required for this world)';
         } elsif ($self->miniWorldObj->loginAccountMode eq 'required') {
-            $string .= '(recommended for this world)';
+            $string .= ' (recommended for this world)';
         } else {
-            $string .= '(if required for this world)';
+            $string .= ' (if required for this world)';
         }
 
         $newAccount = $self->showEntryDialogue(
@@ -3333,10 +3571,12 @@
         { $_[0]->{sortZaButton} }
     sub sortRandButton
         { $_[0]->{sortRandButton} }
+    sub searchButton
+        { $_[0]->{searchButton} }
+    sub cancelSearchButton
+        { $_[0]->{cancelSearchButton} }
     sub consoleButton
         { $_[0]->{consoleButton} }
-    sub label
-        { $_[0]->{label} }
     sub entry
         { $_[0]->{entry} }
     sub entry2
@@ -3411,6 +3651,11 @@
         { $_[0]->{noWebsiteString} }
     sub noConnectString
         { $_[0]->{noConnectString} }
+
+    sub searchRegex
+        { $_[0]->{searchRegex} }
+    sub searchLanguage
+        { $_[0]->{searchLanguage} }
 }
 
 { package Games::Axmud::OtherWin::Console;

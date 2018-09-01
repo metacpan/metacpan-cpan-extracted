@@ -234,11 +234,14 @@
         #   merging embedded hashes but replacing embedded scalars and lists
         #
         # Expected arguments
+        #   (none besides $self)
+        #
+        # Optional arguments
         #   $newScalar  - A scalar (might be a list/hash reference, might be embedded within other
         #                   list/hash references) from the recently-received ATCP/GMCP package's
-        #                   data
+        #                   data. If 'undef', the scalar was (probably) a JSON null value
         #   $oldScalar  - The corresponding scalar in the previously-received ATCP/GMCP package's
-        #                   data
+        #                   data. If 'undef', the scalar was (probably) a JSON null value
         #
         # Return values
         #   'undef' on improper arguments
@@ -247,13 +250,17 @@
         my ($self, $newScalar, $oldScalar, $check) = @_;
 
         # Check for improper arguments
-        if (! defined $newScalar || ! defined $oldScalar || defined $check) {
+        if (defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->update_scalar', @_);
         }
 
-        if (ref $newScalar eq 'HASH' && ref $oldScalar eq 'HASH') {
-
+        if (
+            defined $newScalar
+            && ref $newScalar eq 'HASH'
+            && defined $oldScalar
+            && ref $oldScalar eq 'HASH'
+        ) {
             # (Merge the hashes, and return the combined hash
             foreach my $key (keys %$newScalar) {
 
@@ -7726,6 +7733,87 @@
         return $label;
     }
 
+    sub addLabelFrame {
+
+        # Adds a Gtk2::Label within a Gtk2::Frame (giving the appearance of text in a box) at the
+        #   specified position in the tab's Gtk2::Table
+        #
+        # Example calls:
+        #   my $label = $self->addLabel($table, 'Some plain text',
+        #       0, 6, 0, 1);
+        #   my $label = $self->addLabel($table, '<b>Some pango markup text</b>',
+        #       0, 6, 0, 1,
+        #       0, 0.5);
+        #
+        # Expected arguments
+        #   $table      - The tab's Gtk2::Table object
+        #   $text       - The text to display (plain text or pango markup text)
+        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
+        #               - The position of the label in the table
+        #
+        # Optional arguments
+        #   $alignLeft, $alignRight
+        #               - Used in the call to ->set_alignment; two values in the range 0-1
+        #               - If not specified, $alignLeft is set to 0, $alignRight to 0.5
+        #
+        # Return values
+        #   An empty list of improper arguments or if the widget's position in the Gtk2::Table is
+        #       invalid
+        #   Otherwise, a list in the form
+        #       (gtk_frame, gtk_label)
+
+        my (
+            $self, $table, $text, $leftAttach, $rightAttach, $topAttach, $bottomAttach, $alignLeft,
+            $alignRight, $check
+        ) = @_;
+
+        # Local variables
+        my @emptyList;
+
+        # Check for improper arguments
+        if (
+            ! defined $table || ! defined $text || ! defined $leftAttach || ! defined $rightAttach
+            || ! defined $topAttach || ! defined $bottomAttach || defined $check
+        ) {
+            $axmud::CLIENT->writeImproper($self->_objClass . '->addLabel', @_);
+            return @emptyList;
+        }
+
+        # Check that the position in the table makes sense
+        if (! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)) {
+
+            return @emptyList;
+        }
+
+        # Set default alignment, if none specified
+        if (! defined $alignLeft) {
+
+            $alignLeft = 0;
+        }
+
+        if (! defined $alignRight) {
+
+            $alignRight = 0.5;
+        }
+
+        # Create the frame
+        my $frame = Gtk2::Frame->new(undef);
+        $frame->set_border_width($self->borderPixels);
+
+        # Create the label
+        my $label = Gtk2::Label->new();
+        $frame->add($label);
+        $label->set_markup($text);
+
+        # Set its alignment
+        $label->set_alignment($alignLeft, $alignRight);
+
+        # Add the frame to the table
+        $table->attach_defaults($frame, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
+
+        return ($frame, $label);
+    }
+
     sub addButton {
 
         # Adds a Gtk2::Button at the specified position in the tab's Gtk2::Table
@@ -7998,8 +8086,11 @@
 
             # If $value is the one currently stored in $self->editObj, mark this radio button
             #   as active
-            if (defined $value && $value eq $self->editObj->$iv) {
-
+            if (
+                defined $value
+                && defined $self->editObj->$iv
+                && $value eq $self->editObj->$iv
+            ) {
                 $radioButton->set_active(TRUE);
             }
 
@@ -8388,8 +8479,10 @@
 
             } else {
 
-                # Box is empty, so any $self->checkEntry test will fail (for $mode
-                #   set to a function reference, we'll have to assume that)
+                # Box is empty, so any $self->checkEntry test will fail
+                # When $mode is set to a function reference, we'll have to assume that an empty
+                #   entry box is not an acceptable value. If it is acceptable, you can call
+                #   $self->setEntryIcon immediately after calling this function
                 $entry->set_icon_from_stock('secondary', 'gtk-no');
             }
         }
@@ -9042,682 +9135,6 @@
         return $slWidget;
     }
 
-    sub addDrawingArea {
-
-        # Creates a GA::Obj::DrawingArea to handle a Gtk2::DrawingArea of a specified size for
-        #   drawing
-        #
-        # Example calls:
-        #   $self->addDrawingArea($table, '',
-        #       undef, undef, undef,
-        #       FALSE, FALSE,,
-        #       0, 12, 1, 12);
-        #   $self->addDrawingArea($table, 'black_gc',
-        #       'configureFunc', 'motionFunc', 'clickFunc',
-        #       TRUE, TRUE,
-        #       0, 12, 1, 12,
-        #       300, 200);
-        #
-        # Expected arguments
-        #   $table          - The tab's Gtk2::Table object
-        #   $colour         - Background colour - 'white_gc', 'black_gc', etc (if an empty string,
-        #                       'white_gc' is used)
-        #   $initialFunc    - A function to call during setup, in order to do any initial drawing.
-        #                       If 'undef', no function is called
-        #   $clickFunc      - A function to call whenever the user clicks on the drawing area (which
-        #                       emits the 'button-press-event' signal). If 'undef', the signal is
-        #                       ignored
-        #   $motionFunc     - A function to call whenever mouse motion over the drawing area is
-        #                       detected (due to the motion-notify-event signal). If 'undef', the
-        #                       signal is ignored
-        #   $scrollHorizFlag, $scrollVertFlag
-        #                   - Flags set to TRUE if the scolled window, in which the drawing area
-        #                       appears, scrolls; set to FALSE otherwise
-        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
-        #                   - The position of the entry in the table
-        #
-        # Optional arguments
-        #   $width, $height - The width and height of the pixmap, in pixels. If not specified, a
-        #                       default size of 300x200 is used
-        #
-        # Return values
-        #   'undef' on improper arguments, or if a GA::Obj::DrawingArea can't be created
-        #   Otherwise returns the GA::Obj::DrawingArea created
-
-        my (
-            $self, $table, $colour, $initialFunc, $clickFunc, $motionFunc, $scrollHorizFlag,
-            $scrollVertFlag, $leftAttach, $rightAttach, $topAttach, $bottomAttach, $width, $height,
-            $check
-        ) = @_;
-
-        # Local variables
-        my $drawingAreaObj;
-
-        # Check for improper arguments
-        if (
-            ! defined $table || ! defined $colour || ! defined $scrollHorizFlag
-            || ! defined $scrollVertFlag || ! defined $leftAttach || ! defined $rightAttach
-            || ! defined $topAttach || ! defined $bottomAttach || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->addDrawingArea', @_);
-        }
-
-        # Check that the position in the table makes sense
-        if (! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)) {
-
-            return undef;
-        }
-
-        # Create a GA::Obj::DrawingArea to store all the values needed by the various drawing
-        #   functions supplied by GA::Generic::EditWin
-        $drawingAreaObj = Games::Axmud::Obj::DrawingArea->new();
-        if (! $drawingAreaObj) {
-
-            return undef;
-        }
-
-        # Set default width/height, if necessary
-        if (! defined $width) {
-
-            $width = 300;
-        }
-
-        if (! defined $height) {
-
-            $height = 200;
-        }
-
-        # Set the default background colour, if not specified
-        if (! $colour) {
-
-            $colour = 'white_gc';
-        }
-
-        # Create a scrolled window
-        my $scrolledWin = Gtk2::ScrolledWindow->new();
-        $scrolledWin->set_size_request($width, $height);
-        my $hAdjustment = $scrolledWin->get_hadjustment();
-        $scrolledWin->set_border_width(3);
-
-        # Set the scrolling policy
-        if ($scrollHorizFlag && $scrollVertFlag) {
-            $scrolledWin->set_policy('always','always');
-        } elsif ($scrollHorizFlag) {
-            $scrolledWin->set_policy('always', 'never');
-        } elsif ($scrollVertFlag) {
-            $scrolledWin->set_policy('never', 'always');
-        } else {
-            $scrolledWin->set_policy('never', 'never');
-        }
-
-        # Create a viewport
-        my $viewPort = Gtk2::Viewport->new(undef,undef);
-        # Add the viewport to the scrolled window
-        $scrolledWin->add($viewPort);
-        # Add the scrolled window to the table
-        $table->attach_defaults($scrolledWin, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
-
-        # Create the drawing area
-        my $drawingArea = Gtk2::DrawingArea->new();
-
-        # Add an event box for detecting the user's mouse
-        my $eventBox = Gtk2::EventBox->new();
-        $eventBox->add($drawingArea);
-        $eventBox->add_events(['pointer-motion-mask', 'pointer-motion-hint-mask']);
-
-        # Detect mouse clicks over the drawing area
-        $eventBox->signal_connect ('button-press-event' => sub {
-
-            my ($widget, $event) = @_;
-
-            if (! $clickFunc) {
-
-                return undef;
-
-            } else {
-
-                # Inform the specified function of the co-ords of the mouse above the drawing area
-                return $self->$clickFunc($drawingAreaObj, $event->x, $event->y);
-            }
-        });
-
-        # Detect mouse motion over the drawing area
-        $eventBox->signal_connect ('motion-notify-event' => sub {
-
-            my ($widget, $event) = @_;
-
-            if (! $motionFunc) {
-
-                return undef;
-
-            } else {
-
-                # Inform the specified function of the co-ords of the mouse above the drawing area
-                return $self->$motionFunc($drawingAreaObj, $event->x, $event->y);
-            }
-        });
-
-        # Add the event box, containing the drawing area, to the viewport
-        $viewPort->add($eventBox);
-
-        # Set IVs in the Games::Axmud::Obj::DrawingArea
-        $drawingAreaObj->ivPoke('width', $width);
-        $drawingAreaObj->ivPoke('height', $height);
-        $drawingAreaObj->ivPoke('scrolledWin', $scrolledWin);
-        $drawingAreaObj->ivPoke('hAdjustment', $hAdjustment);
-        $drawingAreaObj->ivPoke('viewPort', $viewPort);
-        $drawingAreaObj->ivPoke('drawingArea', $drawingArea);
-        $drawingAreaObj->ivPoke('eventBox', $eventBox);
-
-        # Set events for the drawing area
-        $drawingArea->set_events ([
-            'exposure-mask',
-            'leave-notify-mask',
-            'button-press-mask',
-            'pointer-motion-mask',
-            'pointer-motion-hint-mask',
-        ]);
-
-        # Two signals used to handle the backing pixmap
-        $drawingArea->signal_connect('expose_event' => sub {
-
-            # Redraw the screen from the backing pixmap
-            my $widget = shift;    # GtkWidget      *widget
-            my $event  = shift;    # GdkEventExpose *event
-
-            $widget->window->draw_drawable(
-                $widget->style->fg_gc($widget->state),
-                $drawingAreaObj->pixmap,
-                $event->area->x,
-                    $event->area->y,
-                $event->area->x,
-                    $event->area->y,
-                $event->area->width,
-                    $event->area->height
-            );
-
-            return FALSE;
-        });
-
-        $drawingArea->signal_connect('configure_event' => sub {
-
-            # Create a new backing pixmap of the appropriate size
-
-            my $widget = shift;    # GtkWidget         *widget
-            my $event  = shift;    # GdkEventConfigure *event
-
-            # Local variables
-            my ($pixmap, $graphicsContext, $colourMap);
-
-            # Create a pixmap
-            $pixmap = Gtk2::Gdk::Pixmap->new(
-                $widget->window,
-                $widget->allocation->width,
-                $widget->allocation->height,
-                -1,
-            );
-
-            $pixmap->draw_rectangle(
-                $widget->style->$colour,
-                TRUE,
-                0, 0,
-                $widget->allocation->width,
-                $widget->allocation->height,
-            );
-
-            # Create a GDK graphics context
-            $graphicsContext = Gtk2::Gdk::GC->new($pixmap);
-
-            # Create a colour map
-            $colourMap = $pixmap->get_colormap;
-
-            # Store these objects
-            $drawingAreaObj->ivPoke('pixmap', $pixmap);
-            $drawingAreaObj->ivPoke('graphicsContext', $graphicsContext);
-            $drawingAreaObj->ivPoke('colourMap', $colourMap);
-
-            # Set a default foreground colour
-            $graphicsContext->set_foreground($drawingAreaObj->getColour('black'));
-
-            # Now draw something!
-            if ($initialFunc) {
-
-                $self->$initialFunc($drawingAreaObj);
-            }
-
-            return TRUE;
-        });
-
-        return $drawingAreaObj;
-    }
-
-    sub addImage {
-
-        # Adds a Gtk2::Image from a specified file, inside a frame (optionally using scrollbars)
-        #
-        # Example calls:
-        #   my ($image, $frame, $viewPort) = $self->addImage($table, $filePath, $pixBuffer, TRUE,
-        #       128, 128,
-        #       0, 12, 1, 12);
-        #   my ($image, $frame) = $self->addImage($table, undef, undef, FALSE,
-        #       128, 128,
-        #       0, 12, 1, 12);
-        #
-        # Expected arguments
-        #   $table          - The tab's Gtk2::Table object
-        #   $filePath       - Full path to the file containing the image to be displayed (or 'undef'
-        #                       if not using a file)
-        #   $pixBuffer      - A Gtk2::Gdk::Pixbuf containing the image to be displayed (or 'undef'
-        #                       if not using a pixbuf)
-        #   $scrollFlag     - Flag set to TRUE if the image's viewport should use scrollbars,
-        #                       FALSE if not
-        #   $width, $height - The size of the frame in which the image is shown (in pixels)
-        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
-        #                   - The position of the frame in the table
-        #
-        # Return values
-        #   An empty list on improper arguments or if a $filePath is specified which doesn't exist
-        #   Otherwise returns a list in the form
-        #       (gtk2_image, gtk2_frame, gtk2_viewport)
-        #   NB If neither $filePath nor $pixBuffer are specified, or if the Gtk2::Image can't be
-        #       created, the 'gtk2_image' return value will be set to 'undef'
-        #   NB If $scrollFlag is FALSE, the 'gtk2_viewport' return value will be set to 'undef'
-
-        my (
-            $self, $table, $filePath, $pixBuffer, $scrollFlag, $width, $height, $leftAttach,
-            $rightAttach, $topAttach, $bottomAttach, $check
-        ) = @_;
-
-        # Local variables
-        my @emptyList;
-
-        # Check for improper arguments
-        if (
-            ! defined $table || ! defined $scrollFlag || ! defined $width || ! defined $height
-            || ! defined $leftAttach || ! defined $rightAttach || ! defined $topAttach
-            || ! defined $bottomAttach || defined $check
-        ) {
-            $axmud::CLIENT->writeImproper($self->_objClass . '->addImage', @_);
-            return @emptyList;
-        }
-
-        # Check that the position in the table makes sense, and that filename (if specified) exists
-        if (
-            ! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)
-            || (defined $filePath && ! -e $filePath)
-        ) {
-            return @emptyList;
-        }
-
-        # Create a frame
-        my $frame = Gtk2::Frame->new(undef);
-        $frame->set_border_width(3);
-        $frame->set_size_request($width, $height);
-
-        # Create the Gtk2::Image
-        my $image;
-        if ($filePath) {
-            $image = Gtk2::Image->new_from_file($filePath);
-        } elsif ($pixBuffer) {
-            $image = Gtk2::Image->new_from_pixbuf($pixBuffer);
-        }
-
-        my $viewPort;
-        if ($scrollFlag) {
-
-            # Create a scrolled window
-            my $scrolledWin = Gtk2::ScrolledWindow->new();
-            $scrolledWin->set_border_width(3);
-
-            # Create a viewport
-            $viewPort = Gtk2::Viewport->new(undef, undef);
-
-            # If a Gtk2::Image was created, add it to the viewport
-            if ($image) {
-
-                $viewPort->add($image);
-            }
-
-            # Add the viewport to the scrolled window
-            $scrolledWin->add($viewPort);
-            # Add the scrolled window to the frame
-            $frame->add($scrolledWin);
-
-        } else {
-
-            # If a Gtk2::Image was created, add it to the frame
-            if ($image) {
-
-                $frame->add($image);
-            }
-        }
-
-        # Add the frame to the table
-        $table->attach_defaults($frame, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
-
-        return ($image, $frame, $viewPort);
-    }
-
-    sub changeImage {
-
-        # Changes the image shown as the result of a call to $self->addImage
-        #
-        # Expected arguments
-        #   (none besides $self)
-        #
-        # Optional arguments
-        #   $viewPort   - The Gtk2::Viewport which contains the image ('undef' if no scrolling
-        #                   viewport was used)
-        #   $frame      - The Gtk2::Frame which contains the image ('undef' if a scrolling
-        #                   viewport was used; ignored if $viewPort is defined)
-        #   $oldImage   - The Gtk2::Image it currently contains. If it contains no image, set to
-        #                   'undef'
-        #   $filePath   - Full path to the file containing the image to be displayed (or 'undef' if
-        #                   not using a file)
-        #   $pixBuffer  - A Gtk2::Gdk::Pixbuf  containing the image to be displayed (or 'undef'
-        #                   if not using a pixbuf)
-        #
-        # Return values
-        #   'undef' on improper arguments, if the specified file doesn't exist or if a Gtk2::Image
-        #       can't be created
-        #   Otherwise returns the Gtk2::Image created, or 'undef' if none is created
-
-        my ($self, $viewPort, $frame, $oldImage, $filePath, $pixBuffer, $check) = @_;
-
-        # Check for improper arguments
-        if ((! defined $viewPort && ! defined $frame) || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->changeImage', @_);
-        }
-
-        # Create a new Gtk2::Image
-        my $newImage;
-        if ($filePath) {
-            $newImage = Gtk2::Image->new_from_file($filePath);
-        } elsif ($pixBuffer) {
-            $newImage = Gtk2::Image->new_from_pixbuf($pixBuffer);
-        }
-
-        if ($viewPort) {
-
-            # Remove the old image from its viewport, if an old image was specified
-            if ($oldImage) {
-
-                $axmud::CLIENT->desktopObj->removeWidget($viewPort, $oldImage);
-            }
-
-            # Add the new image to the viewport, if a new image was created
-            if ($newImage) {
-
-                $viewPort->add($newImage);
-            }
-
-        } else {
-
-            # Remove the old image from its frame, if an old image was specified
-            if ($oldImage) {
-
-                $axmud::CLIENT->desktopObj->removeWidget($frame, $oldImage);
-            }
-
-            # Add the new image to the frame, if a new image was created
-            if ($newImage) {
-
-                $frame->add($newImage);
-            }
-        }
-
-        # Update the window to show the changes
-        $self->winShowAll($self->_objClass . '->changeImage');
-
-        return $newImage;       # May be undef
-    }
-
-    sub addSimpleImage {
-
-        # Adds a Gtk2::Image from a specified file, not inside a frame
-        #
-        # Example calls:
-        #   my $image = $self->addImage($table, $filePath, $pixBuffer,
-        #       0, 12, 1, 12);
-        #   my $image  = $self->addImage($table, undef, undef,
-        #       0, 12, 1, 12);
-        #
-        # Expected arguments
-        #   $table          - The tab's Gtk2::Table object
-        #   $filePath       - Full path to the file containing the image to be displayed (or 'undef'
-        #                       if not using a file)
-        #   $pixBuffer      - A Gtk2::Gdk::Pixbuf containing the image to be displayed (or 'undef'
-        #                       if not using a pixbuf)
-        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
-        #                   - The position of the frame in the table
-        #
-        # Return values
-        #   'undef' on improper arguments or if a $filePath is specified which doesn't exist
-        #   Otherwise the Gtk2::Image created
-
-        my (
-            $self, $table, $filePath, $pixBuffer, $leftAttach, $rightAttach, $topAttach,
-            $bottomAttach, $check,
-        ) = @_;
-
-        # Check for improper arguments
-        if (
-            ! defined $table || ! defined $leftAttach || ! defined $rightAttach
-            || ! defined $topAttach || ! defined $bottomAttach || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->addSimpleImage', @_);
-        }
-
-        # Check that the position in the table makes sense, and that filename (if specified) exists
-        if (
-            ! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)
-            || (defined $filePath && ! -e $filePath)
-        ) {
-            return undef;
-        }
-
-        # Create the Gtk2::Image
-        my $image;
-        if ($filePath) {
-            $image = Gtk2::Image->new_from_file($filePath);
-        } elsif ($pixBuffer) {
-            $image = Gtk2::Image->new_from_pixbuf($pixBuffer);
-        }
-
-        if ($image) {
-
-            # Add the image to the table
-            $table->attach_defaults($image, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
-        }
-
-        return $image;
-    }
-
-    sub addSimpleCanvas {
-
-        # Adds a Gnome2::Canvas to the table which is coloured in, using a single colour
-        # (Call $self->fillSimpleCanvas to change the colour)
-        #
-        # Example calls:
-        #   my ($image, $frame, $viewPort) = $self->addSimpleCanvas($table, '#FF0000',
-        #       6, 7, 6, 7,
-        #       50, 50);
-        #   my ($image, $frame, $viewPort) = $self->addSimpleCanvas($table, 'red',
-        #       6, 7, 6, 7);
-        #
-        # Expected arguments
-        #   $table          - The Gtk2::Table displayed in the current tab
-        #
-        #   $colour         - The initial colour of the canvas. Can be any valid Axmud colour tag
-        #                       (e.g. 'red', 'x255', '#FF0000'). If not specified or if the colour
-        #                       is invalid, the canvas is initially drawn white
-        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
-        #                   - The position of the canvas in the table
-        #
-        # Optional arguments
-        #   $width, $height - The size, in pixels, of the canvas. If not specified, a default size
-        #                       of 30x30 is used
-        #
-        # Return values
-        #   An empty list on improper arguments or if the table coordinates don't make sense
-        #   Otherwise, a list containing the Gnome2::Canvas created and the
-        #       Gnome2::Canvas::Rect drawn as the background
-
-        my (
-            $self, $table, $colour, $leftAttach, $rightAttach, $topAttach, $bottomAttach, $width,
-            $height, $check
-        ) = @_;
-
-        # Local variables
-        my (
-            $mode, $newObj,
-            @emptyList,
-        );
-
-        # Check for improper arguments
-        if (
-            ! defined $table || ! defined $leftAttach || ! defined $rightAttach
-            || ! defined $topAttach || ! defined $bottomAttach || defined $check
-        ) {
-            $axmud::CLIENT->writeImproper($self->_objClass . '->addSimpleCanvas', @_);
-            return @emptyList;
-        }
-
-        # Check that the position in table makes sense
-        if (! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)) {
-
-            return @emptyList;
-        }
-
-        # Use default $colour/width/height, if not specified
-        ($mode) = $axmud::CLIENT->checkColourTags($colour);
-        if (! $colour || ! $mode ) {
-
-            $colour = '#FFFFFF';
-
-        } else {
-
-            # Make sure we have an RGB colour
-            $colour = $axmud::CLIENT->returnRGBColour($colour);
-        }
-
-        if (! $width) {
-
-            $width = 30;
-        }
-
-        if (! $height) {
-
-            $height = 30;
-        }
-
-        # Create a frame
-        my $frame = Gtk2::Frame->new(undef);
-        $frame->set_border_width(0);
-        $frame->set_size_request($width, $height);
-
-        # Create the canvas
-        my $canvas = Gnome2::Canvas->new();
-        # Set the canvas size
-        $canvas->set_scroll_region(0, 0, $width, $height);
-        # Add the canvas to the frame
-        $frame->add($canvas);
-
-        # Add the frame to the table
-        $table->attach_defaults($frame, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
-
-        # Fill the canvas with colour
-        $newObj = $self->fillSimpleCanvas($canvas, undef, $colour, $width, $height);
-
-        return ($canvas, $newObj);
-    }
-
-    sub fillSimpleCanvas {
-
-        # Sets the background colour of the canvas drawn in the earlier call to
-        #   $self->addSimpleCanvas
-        #
-        # Expected arguments
-        #   $canvas         - The Gnome2::Canvas
-        #
-        # Optional arguments
-        #   $oldObj         - The existing Gnome2::Canvas::Rect, if there is one. Set to 'undef' if
-        #                       this function is being called by $self->addSimpleCanvas
-        #   $colour         - The colour to use. Can be any valid Axmud colour tag (e.g. 'red',
-        #                       'x255', '#FF0000'). If not specified or if the colour  is invalid,
-        #                       the canvas is drawn white
-        #   $width, $height - The size, in pixels, of the canvas. If not specified, a default size
-        #                       of 30x30 is used
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvas, $oldObj, $colour, $width, $height, $check) = @_;
-
-        # Local variables
-        my ($mode, $partX, $partY, $newObj);
-
-        # Check for improper arguments
-        if (! defined $canvas || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->fillSimpleCanvas', @_);
-        }
-
-        # Use default $colour/width/height, if not specified
-        ($mode) = $axmud::CLIENT->checkColourTags($colour);
-        if (! $colour || ! $mode) {
-
-            $colour = '#FFFFFF';
-
-        } else {
-
-            # Make sure we have an RGB colour
-            $colour = $axmud::CLIENT->returnRGBColour($colour);
-        }
-
-        if (! $width) {
-
-            $width = 30;
-        }
-
-        if (! $height) {
-
-            $height = 30;
-        }
-
-        # Destroy the old background rectangle, if there is one
-        if ($oldObj) {
-
-            $oldObj->destroy();
-        }
-
-        # Draw the canvas object. The actual size and position is a little smaller, so that the
-        #   whole of the canvas is visible, without the frame getting in the way
-        # v1.0.694 - not possible to use the same trick as we used with 'main' window gauges, to get
-        #   the canvas object lined up perfectly in the middle. These x/y coordinates produce
-        #   something reasonable close
-        $partX = int($width / 10);
-        $partY = int($height / 10);
-
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvas->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => $partX,
-            y1 => $partY,
-            x2 => ($width - $partX),
-            y2 => ($height - ($partY * 2)),
-            fill_color => $colour,
-            outline_color => '#000000',     # Black
-        );
-
-        $newObj->lower_to_bottom();
-
-        # Drawing complete
-        return $newObj;
-    }
-
     # Add widgets - special functions for GA::EditWin::Generic::Interface and
     #   GA::EditWin::Interface::Active
 
@@ -10318,7 +9735,6 @@
                 || ! ($value =~ /^[+-]?\d+\.?\d*$/)
                 || (defined $min && $value < $min)
                 || (defined $max && $value > $max)
-                || ($value % 2)     # Number is odd
             ) {
                 # Invalid value
                 return undef;
@@ -10397,6 +9813,41 @@
         }
 
         # All values acceptable for this IV
+        return 1;
+    }
+
+    sub setEntryIcon {
+
+        # Called by the same function that called $self->addEntryWithIcon
+        # If we need to manually change the entry's icon for some reason, this function can be
+        #   called
+        # For example, if ->addEntryWithIcon is called with a function reference which sets the icon
+        #   every time the entry's text is changed, no IV is specified but we want an empty entry
+        #   box to be an acceptable value, this function can take care of it
+        #
+        # Expected arguments
+        #   $entry      - The Gtk2::Entry whose icon should be modified
+        #   $flag       - TRUE to use 'gtk-yes' (representing an acceptable value), FALSE to use
+        #                   'gtk-no' (representing an unacceptable value)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $entry, $flag, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $entry || ! defined $flag || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setEntryIcon', @_);
+        }
+
+        if (! $flag) {
+            $entry->set_icon_from_stock('secondary', 'gtk-no');
+        } else {
+            $entry->set_icon_from_stock('secondary', 'gtk-yes');
+        }
+
         return 1;
     }
 
@@ -18603,7 +18054,8 @@
             #   no 'task parameters' (IVs which are unique to each kind of task)
 
             # What type of task this is, e.g. 'locator_task', 'attack_bot_task' etc (max 16
-            #   characters, A-Z, a-z, underline, numbers (not on first char)
+            #   characters, A-Z, a-z, underline, numbers (not on first char), non-Latin alphabets
+            #   acceptable)
             name                        => 'generic_task',
 
             # Capitalised form of $self->name, used for (e.g.) task window titles (max 32 chars)
@@ -18821,6 +18273,15 @@
             # Set automatically if the winmap specified by $self->winmap contains a pane object; can
             #   be set manually otherwise
             defaultTabObj               => undef,
+            # For any task window using a pane object, which kind of tab to add to the pane when the
+            #   task window opens - 'simple' to create a simple tab (one with no label), 'multi' to
+            #   create a tab with a label, and 'empty' to create no tabs at first, leaving an empty
+            #   an empty pane
+            # For task windows that don't use a pane object, this IV is ignored, so the value should
+            #   remain set to 'undef'
+            # If set to 'multi' or 'empty', simple tabs are never added; the first tab is always a
+            #   normal tab
+            tabMode                     => undef,
             # For any task window using a pane object, flag set to TRUE if that pane object uses a
             #   monochrome colour scheme (a specified background colour with a suitable text
             #   colour), which is set by the task itself (for example, the Status task changes
@@ -18828,6 +18289,14 @@
             # Flag set to FALSE if the default colour scheme for 'custom' windows should apply (or
             #   if there is no pane object at all)
             monochromeFlag              => FALSE,
+            # For any task using a pane object, the colour scheme applied is specified thus:
+            #   1. If the following IV is set, that colour scheme is applied
+            #   2. Otherwise, if a colour scheme exists with the same name as the task (matching
+            #       $self->name, e.g. 'locator_task', or that name with the '_task' removed, e.g.
+            #       'locator'), then that colour scheme is applied
+            #   3. Otherwise, the colour scheme applied is the same as the window's ->winType (for
+            #       all task windows, 'custom')
+            colourScheme                => undef,
             # For any task window using a pane object, flag set to TRUE if that pane objecct's
             #   vertical scroll bar, if any, should remain at the top, leaving the first lines in
             #   view; set FALSE if it should scroll to the bottom (as normal)
@@ -19007,6 +18476,8 @@
         # Same applies to the IV that sets whether a window is opened, when the task starts (for the
         #   benefit of tasks which can do either)
         $clone->{startWithWinFlag}      = $self->startWithWinFlag;
+        # Same applies to the preferred colour scheme
+        $clone->{colourScheme}          = $self->colourScheme;
 
         return 1;
     }
@@ -19158,8 +18629,8 @@
         #
         # Updates the current, global initial, custom or profile initial tasklists with the newly-
         #   created task, as appropriate. Also sets $self->uniqueName
-        # NB We use $self->{...} to set the value of IVs, rather thatn $self->ivPoke(...), to avoid
-        #   setting the ->modifyFlag IV of parent FileObj (stored in $self->_parentFile)
+        # NB We use $self->{...} to set the value of IVs, rather than $self->ivPoke(...), to avoid
+        #   setting the ->modifyFlag IV of parent GA::Obj::File (stored in $self->_parentFile)
         #
         # Expected arguments
         #   $session    - The calling function's GA::Session (set as an IV for current tasks only)
@@ -20084,8 +19555,10 @@
             }
         }
 
-        # Set a few IVs
-        $self->configureWin($winObj);
+        # Add a tab, if required. The TRUE argument indicates window setup
+        $self->addTab(undef, TRUE);
+        # Set up the entry box, if present
+        $self->setupEntry();
 
         return 1;
     }
@@ -20155,7 +19628,6 @@
             undef,          # No ->objName
             # ->initHash
             'frame_title'       => $self->prettyName,
-            'no_label_flag'     => TRUE,
             'entry_flag'        => $entryFlag,
             'func'              => $entryFunc,
             'id'                => $self->uniqueName,
@@ -20172,27 +19644,10 @@
         $self->ivPoke('taskWinFlag', TRUE);
         $self->ivPoke('taskWinEntryFlag', $entryFlag);
 
-        # Add a tab to the pane object
-        $tabObj = $tableObj->addSimpleTab($self->session);
-        $self->ivPoke('defaultTabObj', $tabObj);
+        # Add a tab, if required. The TRUE argument indicates window setup
+        $self->addTab(undef, TRUE);
 
-        # The default newline behaviour for task windows is to insert a newline character before
-        #   each string displayed, rather than inserting one afterwards (as usual)
-        $tabObj->textViewObj->set_newLineDefault('before');
-
-        # Mark the pane's textview object as monochrome, if required
-        if ($self->monochromeFlag) {
-
-            $tabObj->paneObj->applyMonochrome($tabObj);
-        }
-
-        # Prevent the pane's textview from scrolling downwards
-        if ($self->noScrollFlag) {
-
-            $tabObj->textViewObj->set_scrollLockType('top');
-            $tabObj->textViewObj->toggleScrollLock();
-        }
-
+        # Operatin complete
         return 1;
     }
 
@@ -20303,8 +19758,10 @@
         $self->ivPoke('taskWinFlag', TRUE);
         $self->ivPoke('taskWinEntryFlag', $entryFlag);
 
-        # Set a few IVs
-        $self->configureWin($tableObj->pseudoWinObj);
+        # Add a tab, if required. The TRUE argument indicates window setup
+        $self->addTab(undef, TRUE);
+        # Set up the entry box, if present
+        $self->setupEntry();
 
         return 1;
     }
@@ -20425,75 +19882,99 @@
         return 1;
     }
 
-    sub configureWin {
+    sub addTab {
 
-        # Called by the task's ->openGridWin and ->openPseudoWin functions
-        # After a window object is created (handling a 'grid' window or a pseudo-window), sets a few
-        #   IVs
+        # Can be called by any code. During window setup, called by $self->openGridWin,
+        #   ->openPaneWin and ->openPseudoWin
+        # Adds a tab to the task window's pane object, and updates IVs
         #
         # Expected arguments
-        #   $winObj     - The window object created
+        #   (none besides $self)
+        #
+        # Optional arguments
+        #   $labelText  - If defined, the tab label text to use. Ignored when a simple tab is
+        #                   created
+        #   $openFlag   - Set to TRUE when called during window setup, in which case a tab is not
+        #                   opened if $self->tabMode is 'empty'. Set to FALSE (or 'undef') when
+        #                   called by anything else, in which case this function treats values of
+        #                   $self->tabMode 'empty and 'multi' the same, in other words, for all
+        #                   defined values of $self->tabMode, we try to open a tab
         #
         # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
+        #   'undef' on improper arguments or if no tab is added to the pane object
+        #   Otherwise returns the tab object (GA::Obj::Tab) created
 
-        my ($self, $winObj, $check) = @_;
+        my ($self, $labelText, $openFlag, $check) = @_;
 
         # Local variables
-        my ($paneObj, $tabObj, $entryObj);
+        my ($paneObj, $tabObj);
 
         # Check for improper arguments
-        if (! defined $winObj || defined $check) {
+        if (defined $check) {
 
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->configureWin', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->addTab', @_);
+        }
+
+        # Check the window is actually open
+        if (! $self->winObj) {
+
+            return undef;
         }
 
         # Find the pane object (GA::Table::Pane), if one was created
-        $paneObj = $winObj->findTableObj('pane');
-        if ($paneObj) {
+        $paneObj = $self->winObj->findTableObj('pane');
 
-            if (! $paneObj->notebook) {
-                $tabObj = $paneObj->addSimpleTab($self->session);
-            } else {
-                $tabObj = $paneObj->addTab($self->session);
-            }
-
-            if ($tabObj) {
-
-                # The first tab added is the default one
-                $self->ivPoke('defaultTabObj', $tabObj);
-
-                # The default newline behaviour for task windows is to insert a newline character
-                #   before each string displayed, rather than inserting one afterwards (as usual)
-                $tabObj->textViewObj->set_newLineDefault('before');
-
-                # Mark the pane's textview object as monochrome, if required
-                if ($self->monochromeFlag) {
-
-                    $tabObj->paneObj->applyMonochrome($tabObj);
-                }
-            }
+        # The type of tab created depends on the value of $self->tabMode
+        if (
+            # No pane object exists
+            ! $paneObj
+            # Can't create tabs at all, if ->tabMode not set
+            || ! defined $self->tabMode
+            # Can't create a simple tab, if one already exists
+            || ($self->tabMode eq 'simple' && $self->defaultTabObj)
+        ) {
+            return undef;
         }
 
-        # Find the entry for this window, if one was created, and set its callback function. The
-        #   entry box may have been created by a strip object (GA::Strip::Entry) or a table object
-        #   (GA::Table::Entry)
-        $entryObj = $winObj->ivShow('firstStripHash', 'Games::Axmud::Strip::Entry');
-        if (! $entryObj) {
+        if ($self->tabMode eq 'simple') {
 
-            $entryObj = $winObj->findTableObj('entry');
+            $tabObj = $paneObj->addSimpleTab(
+                $self->session,
+                $self->getColourScheme(),
+            );
+
+        } elsif (
+            ($openFlag && $self->tabMode eq 'multi')
+            || ! $openFlag
+        ) {
+            $tabObj = $paneObj->addTab(
+                $self->session,
+                $self->getColourScheme(),
+                undef,
+                undef,
+                $labelText,
+            );
         }
 
-        if (! $entryObj) {
+        if (! $tabObj) {
 
-            $self->ivPoke('taskWinEntryFlag', FALSE);
+            return undef;
+        }
 
-        } else {
+        if (! $self->defaultTabObj) {
 
-            $self->ivPoke('taskWinEntryFlag', TRUE);
-            $entryObj->set_func($self->getMethodRef('entryCallback'));
-            $entryObj->set_id($self->uniqueName);
+            # The first tab added is the default one
+            $self->ivPoke('defaultTabObj', $tabObj);
+        }
+
+        # The default newline behaviour for task windows is to insert a newline character before
+        #   each string displayed, rather than inserting one afterwards (as usual)
+        $tabObj->textViewObj->set_newLineDefault('before');
+
+        # Mark the pane's textview object as monochrome, if required
+        if ($self->monochromeFlag) {
+
+            $tabObj->paneObj->applyMonochrome($tabObj);
         }
 
         # Prevent the pane's textview from scrolling downwards
@@ -20503,7 +19984,132 @@
             $tabObj->textViewObj->toggleScrollLock();
         }
 
-        return 1;
+        # Call a task function when the visible tab changes
+        $paneObj->set_switchFunc($self->getMethodRef('switchTabCallback'));
+        $paneObj->set_switchID($self->name);
+
+        # Operation complete
+        return $tabObj;
+    }
+
+    sub removeTab {
+
+        # Can be called by any code
+        # The task window's set up functions add a first tab (or not) to the window, and then other
+        #   parts of the task code are free to call $self->addTab to add more tabs, in which case
+        #   this function can be called to remove them again
+        # When the task window closes, it's not necessary to call this function at all
+        #
+        # Expected arguments
+        #   $arg    - So that tasks have flexibility over the way they store the tabs they create,
+        #               $arg can be the tab object (GA::Obj::Tab) or the tab object's ->number
+        #
+        # Return values
+        #   'undef' on improper arguments, if the specified tab no longer exists in the task
+        #       window's pane object (GA::Table::Pane) or if the close operation fails
+        #   1 if the close operation succeeds
+
+        my ($self, $arg, $check) = @_;
+
+        # Local variables
+        my ($paneObj, $result);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setupEntry', @_);
+        }
+
+        # Check the task window is actually open
+        if (! $self->winObj) {
+
+            return undef;
+        }
+
+        # Find the pane object (GA::Table::Pane)
+        $paneObj = $self->winObj->findTableObj('pane');
+
+        if ($axmud::CLIENT->intCheck($arg, 0)) {
+
+            $arg = $paneObj->ivShow('tabObjHash', $arg);
+            if (! defined $arg) {
+
+                # Tab has already been removed
+                return undef;
+            }
+
+        } elsif (
+            ! $paneObj->ivExists('tabObjHash', $arg->number)
+            || $paneObj->ivShow('tabObjHash', $arg->number) ne $arg
+        ) {
+            # Tab has already been removed
+            return undef;
+        }
+
+        # Remove the tab
+        $result = $paneObj->removeTab($arg);
+
+        # Update standard IVs
+        if ($self->defaultTabObj && $self->defaultTabObj eq $arg) {
+
+            $self->ivUndef('defaultTabObj');
+        }
+
+        # Operation complete
+        return $result;
+    }
+
+    sub setupEntry {
+
+        # Called by $self->openGridWin, ->openPaneWin and ->openPseudoWin (only)
+        # Sets up the task window's entry box, if it exists
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if no entry box exists
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $entryObj;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setupEntry', @_);
+        }
+
+        if (! $self->winObj) {
+
+            return undef;
+        }
+
+        # Find the entry for this window, if one was created, and set its callback function. The
+        #   entry box may have been created by a strip object (GA::Strip::Entry) or a table object
+        #   (GA::Table::Entry)
+        $entryObj = $self->winObj->ivShow('firstStripHash', 'Games::Axmud::Strip::Entry');
+        if (! $entryObj) {
+
+            $entryObj = $self->winObj->findTableObj('entry');
+        }
+
+        if (! $entryObj) {
+
+            $self->ivPoke('taskWinEntryFlag', FALSE);
+
+            return undef;
+
+        } else {
+
+            $self->ivPoke('taskWinEntryFlag', TRUE);
+            $entryObj->set_func($self->getMethodRef('entryCallback'));
+            $entryObj->set_id($self->uniqueName);
+
+            return 1;
+        }
     }
 
     sub setTaskWinTitle {
@@ -20568,45 +20174,6 @@
         }
     }
 
-    sub entryCallback {
-
-        # Usually called by ->signal_connect in GA::Strip::Entry->setEntrySignals or in
-        #   GA::Table::Entry->setActivateEvent, when the user types something in the strip/table
-        #   object's Gtk2::Entry and presses RETURN
-        # This generic function just displays the typed text in the task window's default tab;
-        #   other tasks can write their own ->entryCallback as required
-        #
-        # Expected arguments
-        #   $obj        - The strip or table object whose Gtk2::Entry was used
-        #   $entry      - The Gtk2::Entry itself
-        #
-        # Optional arguments
-        #   $id         - A value passed to the table object that identifies the particular
-        #                   Gtk2::Entry used (in case the table object uses multiple entries). By
-        #                   default, $self->openWin sets $id to the same as $self->uniqueName;
-        #                   could be an 'undef' value otherwise
-        #   $text       - The text typed in the entry by the user (should not be 'undef')
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $obj, $entry, $id, $text, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $obj || ! defined $entry || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->entryCallback', @_);
-        }
-
-        if ($self->taskWinFlag && $self->defaultTabObj && $self->defaultTabObj->textViewObj) {
-
-            $self->defaultTabObj->textViewObj->insertText($text, 'after');
-        }
-
-        return 1;
-    }
-
     # Shortcuts to GA::Obj::TextView for the task's default tab
 
     sub clearBuffer {
@@ -20662,6 +20229,114 @@
         } else {
             return undef;
         }
+    }
+
+    # Callbacks
+
+    sub entryCallback {
+
+        # Usually called by a ->signal_connect in GA::Strip::Entry->setEntrySignals or in
+        #   GA::Table::Entry->setActivateEvent, when the user types something in the strip/table
+        #   object's Gtk2::Entry and presses RETURN
+        # This generic function just displays the typed text in the task window's default tab;
+        #   other tasks can write their own ->entryCallback as required
+        #
+        # Expected arguments
+        #   $obj        - The strip or table object whose Gtk2::Entry was used
+        #   $entry      - The Gtk2::Entry itself
+        #
+        # Optional arguments
+        #   $id         - A value passed to the table object that identifies the particular
+        #                   Gtk2::Entry used (in case the table object uses multiple entries). By
+        #                   default, $self->openWin sets $id to the same as $self->uniqueName;
+        #                   could be an 'undef' value otherwise
+        #   $text       - The text typed in the entry by the user (should not be 'undef')
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $obj, $entry, $id, $text, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $obj || ! defined $entry || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->entryCallback', @_);
+        }
+
+        if ($self->taskWinFlag && $self->defaultTabObj && $self->defaultTabObj->textViewObj) {
+
+            $self->defaultTabObj->textViewObj->insertText($text, 'after');
+        }
+
+        return 1;
+    }
+
+    sub switchTabCallback {
+
+        # Usually called GA::Table::Pane->respondVisibleTab whenever the visible tab in the task
+        #   window changes
+        # This generic function does nothing; other tasks can write their own ->switchTabCallback
+        #   as required
+        #
+        # Expected arguments
+        #   $paneObj    - The GA::Table::Pane object for the task window
+        #   $tabObj     - The GA::Obj::Tab for the newly-visible tab
+        #
+        # Optional arguments
+        #   $id         - A value passed by the pane object; for tasks, set to this task's ->name
+        #                   (in general, might be 'undef')
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $paneObj, $tabObj, $id, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $paneObj || ! defined $tabObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->switchTabCallback', @_);
+        }
+
+        # (This generic function does nothing)
+
+        return 1;
+    }
+
+    sub closeTabCallback {
+
+        # Usually called GA::Table::Pane->removeTab whenever a tab in the task window is manually
+        #   closed by the user
+        # This generic function simpy checks that the closed tab isn't the same one stored in
+        #   $self->defaultTabObj, and resets that IV, if so
+        #
+        # Expected arguments
+        #   $paneObj    - The GA::Table::Pane object for the task window
+        #   $tabObj     - The GA::Obj::Tab for the closed tab
+        #
+        # Optional arguments
+        #   $id         - A value passed by the pane object; for tasks, set to this task's ->name
+        #                   (in general, might be 'undef')
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $paneObj, $tabObj, $id, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $paneObj || ! defined $tabObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->closeTabCallback', @_);
+        }
+
+        if ($self->defaultTabObj && $self->defaultTabObj eq $tabObj) {
+
+            $self->ivUndef('defaultTabObj');
+        }
+
+        return 1;
     }
 
     # Text-to-speech functions
@@ -20925,6 +20600,60 @@
 
     # Misc functions
 
+    sub getColourScheme {
+
+        # Called by $self->openPaneWin and ->configureWin
+        # Returns the name of the colour scheme that should be used in a tab in the task window
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the default colour scheme for task windows
+        #       ('custom') should be used
+        #   Otherwise, returns the name of the colour scheme to use
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my ($colourScheme, $name);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->getColourScheme', @_);
+        }
+
+        if (
+            $self->colourScheme
+            && $axmud::CLIENT->ivExists('colourSchemeHash', $self->colourScheme)
+        ) {
+            return $self->colourScheme;
+
+        } else {
+
+            # If a colour scheme exists with the same name as this task, use it; otherwise use the
+            #   default colour scheme for 'custom' windows (by leaving $colourScheme as 'undef')
+            # For the convenience of the user, check for both 'locator_task' and 'locator'
+            $name = $self->name;
+            if ($axmud::CLIENT->ivExists('colourSchemeHash', $name)) {
+
+                return $name;
+
+            } else {
+
+                $name =~ s/_task//;
+                if ($axmud::CLIENT->ivExists('colourSchemeHash', $name)) {
+
+                    return $name;
+                }
+            }
+        }
+
+        # Use the default colour scheme
+        return undef;
+    }
+
     sub returnParameterHash {
 
         # Can be called by anything
@@ -20981,6 +20710,29 @@
 
     ##################
     # Accessors - set
+
+    sub set_colourScheme {
+
+        my ($self, $colourScheme, $check) = @_;
+
+        # Local variables
+        my $paneObj;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_colourScheme', @_);
+        }
+
+        $self->ivPoke('colourScheme', $colourScheme);       # Can be 'undef'
+
+        if ($self->defaultTabObj && $self->defaultTabObj->paneObj) {
+
+            $self->defaultTabObj->paneObj->applyColourScheme(undef, $self->colourScheme);
+        }
+
+        return 1;
+    }
 
     sub set_defaultTabObj {
 
@@ -21071,6 +20823,25 @@
         } else {
 
             $self->ivUndef('resumeStatus');
+        }
+
+        return 1;
+    }
+
+    sub set_requireWinFlag {
+
+        my ($self, $flag, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $flag || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_requireWinFlag', @_);
+        }
+
+        if ($flag) {
+            $self->ivPoke('requireWinFlag', TRUE);
+        } else {
+            $self->ivPoke('requireWinFlag', FALSE);
         }
 
         return 1;
@@ -21422,8 +21193,12 @@
         { $_[0]->{winUpdateFunc} }
     sub defaultTabObj
         { $_[0]->{defaultTabObj} }
+    sub tabMode
+        { $_[0]->{tabMode} }
     sub monochromeFlag
         { $_[0]->{monochromeFlag} }
+    sub colourScheme
+        { $_[0]->{colourScheme} }
     sub noScrollFlag
         { $_[0]->{noScrollFlag} }
 
@@ -23978,6 +23753,154 @@
         return $newFont;
     }
 
+    sub promptRoomFlag {
+
+        # Called by GA::EditWin::WorldModel->roomFlags1Tab
+        # Prompts the user for the attributes of a new custom room flag
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   An empty list on improper arguments or if the user closes the window without clicking
+        #       the 'OK' button
+        #   Otherwise returns a list in the form
+        #       (name, short_name, descrip, colour)
+        #   ...roughly corresponding to IVs in the new GA::Obj::RoomFlag object
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my (
+            $colour, $response,
+            @emptyList, @returnList,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            $axmud::CLIENT->writeImproper($self->_objClass . '->promptRoomFlag', @_);
+            return @emptyList;
+        }
+
+        # Show the 'dialogue' window
+        my $dialogueWin = Gtk2::Dialog->new(
+            'Add custom room flag',
+            $self->winWidget,
+            [qw/modal destroy-with-parent/],
+            'gtk-cancel' => 'reject',
+            'gtk-ok'     => 'accept',
+        );
+
+        $dialogueWin->set_position('center-always');
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+
+        $dialogueWin->signal_connect('delete-event' => sub {
+
+            $dialogueWin->destroy();
+            $self->restoreFocus();
+
+            return @emptyList;
+        });
+
+        # Add widgets to the 'dialogue' window
+        my $vBox = $dialogueWin->vbox;
+        # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
+        #   Gtk2::VBox on the right, into which we put everything
+        my $vBox2 = $self->addDialogueIcon($vBox);
+
+        # Need a table as it's the quicket way to draw the room flag colour
+        my $table = Gtk2::Table->new(3, 7, FALSE);
+        $vBox2->pack_start($table, TRUE, TRUE, $axmud::CLIENT->constFreeSpacingPixels);
+        $table->set_row_spacings($axmud::CLIENT->constFreeSpacingPixels);
+        $table->set_col_spacings($axmud::CLIENT->constFreeSpacingPixels);
+
+        # Name
+        my $label = Gtk2::Label->new();
+        $table->attach_defaults($label, 0, 3, 0, 1);
+        $label->set_alignment(0, 0);
+        $label->set_markup('Room flag name (max 16 chars)');
+
+        my $entry = Gtk2::Entry->new();
+        $table->attach_defaults($entry, 0, 3, 1, 2);
+        $entry->set_width_chars(16);
+        $entry->set_max_length(16);
+
+        # Short name
+        my $label2 = Gtk2::Label->new();
+        $table->attach_defaults($label2, 0, 3, 2, 3);
+        $label2->set_alignment(0, 0);
+        $label2->set_markup('Short name (max 2 chars)');
+
+        my $entry2 = Gtk2::Entry->new();
+        $table->attach_defaults($entry2, 0, 3, 3, 4);
+        $entry2->set_width_chars(2);
+        $entry2->set_max_length(2);
+
+        # Description
+        my $label3 = Gtk2::Label->new();
+        $table->attach_defaults($label3, 0, 3, 4, 5);
+        $label3->set_alignment(0, 0);
+        $label3->set_markup('Description');
+
+        my $entry3 = Gtk2::Entry->new();
+        $table->attach_defaults($entry3, 0, 3, 5, 6);
+
+        # Colour
+        $colour = '#FFFFFF';            # Default new colour is white
+
+        my $label4 = Gtk2::Label->new();
+        $table->attach_defaults($label4, 0, 1, 6, 7);
+        $label4->set_markup('Use colour');
+        $label4->set_alignment(0, 0.5);
+
+        my ($frame, $canvas, $canvasObj) = $self->addSimpleCanvas($table,
+            $colour,
+            undef,                  # No neutral colour
+            1, 2, 6, 7,
+        );
+
+        my $button = Gtk2::Button->new('Set');
+        $table->attach_defaults($button, 2, 3, 6, 7);
+        $button->signal_connect('clicked' => sub {
+
+            my $choice = $self->showColourSelectionDialogue(
+                'Colour',
+                $colour,
+            );
+
+            if ($choice) {
+
+                $colour = $choice;
+                $canvasObj = $self->fillSimpleCanvas($canvas, $canvasObj, $colour);
+            }
+        });
+
+        # Display the dialogue window
+        $vBox->show_all();
+
+        # If the user clicked 'cancel', $response will be 'reject'
+        $response = $dialogueWin->run();
+
+        if ($response ne 'accept') {
+
+            $dialogueWin->destroy();
+            $self->restoreFocus();
+
+            return @emptyList;
+
+        # Otherwise, user clicked 'ok'
+        } else {
+
+            @returnList = ($entry->get_text(), $entry2->get_text(), $entry3->get_text(), $colour);
+
+            $dialogueWin->destroy();
+            $self->restoreFocus();
+
+            return @returnList;
+        }
+    }
+
     sub showIrreversibleTest {
 
         # Called by GA::Cmd::ToggleIrreversible->do
@@ -24089,7 +24012,7 @@
         #                   caption 'Loading...' is used
         #
         # Return values
-        #   'undef' on improper arguments
+        #   'undef' on improper arguments or if the window is not opened
         #   1 otherwise
 
         my ($self, $path, $caption, $check) = @_;
@@ -24098,6 +24021,12 @@
         if (defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showBusyWin', @_);
+        }
+
+        # Don't show the popup window at all, if not allowed
+        if (! $axmud::CLIENT->allowBusyWinFlag) {
+
+            return undef;
         }
 
         # Only one of these temporary popup windows can exist at a time. If one already exists,
@@ -25088,7 +25017,7 @@
         #       0, 12, 1, 12);
         #
         # Expected arguments
-        #   $table      - The Gtk2::Table itself
+        #   $table          - The Gtk2::Table itself
         #   $filePath       - Full path to the file containing the image to be displayed (or 'undef'
         #                       if not using a file)
         #   $pixBuffer      - A Gtk2::Gdk::Pixbuf  containing the image to be displayed (or 'undef'
@@ -25144,6 +25073,496 @@
         return $image;
     }
 
+    sub addDrawingArea {
+
+        # Creates a GA::Obj::DrawingArea to handle a Gtk2::DrawingArea of a specified size for
+        #   drawing
+        #
+        # Example calls:
+        #   $self->addDrawingArea($table, '',
+        #       undef, undef, undef,
+        #       FALSE, FALSE,,
+        #       0, 12, 1, 12);
+        #   $self->addDrawingArea($table, 'black_gc',
+        #       'configureFunc', 'motionFunc', 'clickFunc',
+        #       TRUE, TRUE,
+        #       0, 12, 1, 12,
+        #       300, 200);
+        #
+        # Expected arguments
+        #   $table          - The tab's Gtk2::Table object
+        #   $colour         - Background colour - 'white_gc', 'black_gc', etc (if an empty string,
+        #                       'white_gc' is used)
+        #   $initialFunc    - A function to call during setup, in order to do any initial drawing.
+        #                       If 'undef', no function is called
+        #   $clickFunc      - A function to call whenever the user clicks on the drawing area (which
+        #                       emits the 'button-press-event' signal). If 'undef', the signal is
+        #                       ignored
+        #   $motionFunc     - A function to call whenever mouse motion over the drawing area is
+        #                       detected (due to the motion-notify-event signal). If 'undef', the
+        #                       signal is ignored
+        #   $scrollHorizFlag, $scrollVertFlag
+        #                   - Flags set to TRUE if the scolled window, in which the drawing area
+        #                       appears, scrolls; set to FALSE otherwise
+        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
+        #                   - The position of the entry in the table
+        #
+        # Optional arguments
+        #   $width, $height - The width and height of the pixmap, in pixels. If not specified, a
+        #                       default size of 300x200 is used
+        #
+        # Return values
+        #   'undef' on improper arguments, or if a GA::Obj::DrawingArea can't be created
+        #   Otherwise returns the GA::Obj::DrawingArea created
+
+        my (
+            $self, $table, $colour, $initialFunc, $clickFunc, $motionFunc, $scrollHorizFlag,
+            $scrollVertFlag, $leftAttach, $rightAttach, $topAttach, $bottomAttach, $width, $height,
+            $check
+        ) = @_;
+
+        # Local variables
+        my $drawingAreaObj;
+
+        # Check for improper arguments
+        if (
+            ! defined $table || ! defined $colour || ! defined $scrollHorizFlag
+            || ! defined $scrollVertFlag || ! defined $leftAttach || ! defined $rightAttach
+            || ! defined $topAttach || ! defined $bottomAttach || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->addDrawingArea', @_);
+        }
+
+        # Check that the position in the table makes sense
+        if (! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)) {
+
+            return undef;
+        }
+
+        # Create a GA::Obj::DrawingArea to store all the values needed by the various drawing
+        #   functions supplied by GA::Generic::EditWin
+        $drawingAreaObj = Games::Axmud::Obj::DrawingArea->new();
+        if (! $drawingAreaObj) {
+
+            return undef;
+        }
+
+        # Set default width/height, if necessary
+        if (! defined $width) {
+
+            $width = 300;
+        }
+
+        if (! defined $height) {
+
+            $height = 200;
+        }
+
+        # Set the default background colour, if not specified
+        if (! $colour) {
+
+            $colour = 'white_gc';
+        }
+
+        # Create a scrolled window
+        my $scrolledWin = Gtk2::ScrolledWindow->new();
+        $scrolledWin->set_size_request($width, $height);
+        my $hAdjustment = $scrolledWin->get_hadjustment();
+        $scrolledWin->set_border_width(3);
+
+        # Set the scrolling policy
+        if ($scrollHorizFlag && $scrollVertFlag) {
+            $scrolledWin->set_policy('always','always');
+        } elsif ($scrollHorizFlag) {
+            $scrolledWin->set_policy('always', 'never');
+        } elsif ($scrollVertFlag) {
+            $scrolledWin->set_policy('never', 'always');
+        } else {
+            $scrolledWin->set_policy('never', 'never');
+        }
+
+        # Create a viewport
+        my $viewPort = Gtk2::Viewport->new(undef,undef);
+        # Add the viewport to the scrolled window
+        $scrolledWin->add($viewPort);
+        # Add the scrolled window to the table
+        $table->attach_defaults($scrolledWin, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
+
+        # Create the drawing area
+        my $drawingArea = Gtk2::DrawingArea->new();
+
+        # Add an event box for detecting the user's mouse
+        my $eventBox = Gtk2::EventBox->new();
+        $eventBox->add($drawingArea);
+        $eventBox->add_events(['pointer-motion-mask', 'pointer-motion-hint-mask']);
+
+        # Detect mouse clicks over the drawing area
+        $eventBox->signal_connect ('button-press-event' => sub {
+
+            my ($widget, $event) = @_;
+
+            if (! $clickFunc) {
+
+                return undef;
+
+            } else {
+
+                # Inform the specified function of the co-ords of the mouse above the drawing area
+                return $self->$clickFunc($drawingAreaObj, $event->x, $event->y);
+            }
+        });
+
+        # Detect mouse motion over the drawing area
+        $eventBox->signal_connect ('motion-notify-event' => sub {
+
+            my ($widget, $event) = @_;
+
+            if (! $motionFunc) {
+
+                return undef;
+
+            } else {
+
+                # Inform the specified function of the co-ords of the mouse above the drawing area
+                return $self->$motionFunc($drawingAreaObj, $event->x, $event->y);
+            }
+        });
+
+        # Add the event box, containing the drawing area, to the viewport
+        $viewPort->add($eventBox);
+
+        # Set IVs in the Games::Axmud::Obj::DrawingArea
+        $drawingAreaObj->ivPoke('width', $width);
+        $drawingAreaObj->ivPoke('height', $height);
+        $drawingAreaObj->ivPoke('scrolledWin', $scrolledWin);
+        $drawingAreaObj->ivPoke('hAdjustment', $hAdjustment);
+        $drawingAreaObj->ivPoke('viewPort', $viewPort);
+        $drawingAreaObj->ivPoke('drawingArea', $drawingArea);
+        $drawingAreaObj->ivPoke('eventBox', $eventBox);
+
+        # Set events for the drawing area
+        $drawingArea->set_events ([
+            'exposure-mask',
+            'leave-notify-mask',
+            'button-press-mask',
+            'pointer-motion-mask',
+            'pointer-motion-hint-mask',
+        ]);
+
+        # Two signals used to handle the backing pixmap
+        $drawingArea->signal_connect('expose_event' => sub {
+
+            # Redraw the screen from the backing pixmap
+
+            my $widget = shift;    # GtkWidget      *widget
+            my $event  = shift;    # GdkEventExpose *event
+
+            $widget->window->draw_drawable(
+                $widget->style->fg_gc($widget->state),
+                $drawingAreaObj->pixmap,
+                $event->area->x,
+                    $event->area->y,
+                $event->area->x,
+                    $event->area->y,
+                $event->area->width,
+                    $event->area->height,
+            );
+
+            return FALSE;
+        });
+
+        $drawingArea->signal_connect('configure_event' => sub {
+
+            # Create a new backing pixmap of the appropriate size
+
+            my $widget = shift;    # GtkWidget         *widget
+            my $event  = shift;    # GdkEventConfigure *event
+
+            # Local variables
+            my ($pixmap, $graphicsContext, $colourMap);
+
+            # Create a pixmap
+            $pixmap = Gtk2::Gdk::Pixmap->new(
+                $widget->window,
+                $widget->allocation->width,
+                $widget->allocation->height,
+                -1,
+            );
+
+            $pixmap->draw_rectangle(
+                $widget->style->$colour,
+                TRUE,
+                0, 0,
+                $widget->allocation->width,
+                $widget->allocation->height,
+            );
+
+            # Create a GDK graphics context
+            $graphicsContext = Gtk2::Gdk::GC->new($pixmap);
+
+            # Create a colour map
+            $colourMap = $pixmap->get_colormap();
+
+            # Store these objects
+            $drawingAreaObj->ivPoke('pixmap', $pixmap);
+            $drawingAreaObj->ivPoke('graphicsContext', $graphicsContext);
+            $drawingAreaObj->ivPoke('colourMap', $colourMap);
+
+            # Set a default foreground colour
+            $graphicsContext->set_foreground($drawingAreaObj->getColour('black'));
+
+            # Now draw something!
+            if ($initialFunc) {
+
+                $self->$initialFunc($drawingAreaObj);
+            }
+
+            return TRUE;
+        });
+
+        return $drawingAreaObj;
+    }
+
+    sub addSimpleCanvas {
+
+        # Adds a Gnome2::Canvas to the table which is coloured in, using a single colour
+        # (Call $self->fillSimpleCanvas to change the colour)
+        #
+        # Example calls:
+        #   my ($frame, $canvas, $canvasObj) = $self->addSimpleCanvas($table, '#FF0000', '#FFFFFF',
+        #       6, 7, 6, 7,
+        #       50, 50);
+        #   my ($frame, $canvas, $canvasObj) = $self->addSimpleCanvas($table, 'red', undef,
+        #       6, 7, 6, 7);
+        #
+        # Expected arguments
+        #   $table          - The Gtk2::Table displayed in the current tab
+        #   $colour         - The initial colour of the canvas. Can be any valid Axmud colour tag
+        #                       (e.g. 'red', 'x255', '#FF0000')
+        #   $noColour       - If $colour is not specified or if it is invalid, this colour is used.
+        #                       If $noColour is also not specified or invalid, then no colour is
+        #                       drawn (no canvas object is drawn on the canvas)
+        #   $leftAttach, $rightAttach, $topAttach, $bottomAttach
+        #                   - The position of the canvas in the table
+        #
+        # Optional arguments
+        #   $width, $height - The size, in pixels, of the canvas. If not specified, a default size
+        #                       of 30x30 is used
+        #
+        # Return values
+        #   An empty list on improper arguments or if the table coordinates don't make sense
+        #   Otherwise, a list in the form
+        #       (Gtk2::Frame, Gnome2::Canvas, Gnome2::Canvas::Rect)
+        #   ...where the last value will be 'undef' if no colour was drawn
+
+        my (
+            $self, $table, $colour, $noColour, $leftAttach, $rightAttach, $topAttach, $bottomAttach,
+            $width, $height, $check
+        ) = @_;
+
+        # Local variables
+        my (
+            $type, $canvasObj,
+            @emptyList,
+        );
+
+        # Check for improper arguments
+        if (
+            ! defined $table || ! defined $leftAttach || ! defined $rightAttach
+            || ! defined $topAttach || ! defined $bottomAttach || defined $check
+        ) {
+            $axmud::CLIENT->writeImproper($self->_objClass . '->addSimpleCanvas', @_);
+            return @emptyList;
+        }
+
+        # Check that the position in table makes sense
+        if (! $self->checkPosn($leftAttach, $rightAttach, $topAttach, $bottomAttach)) {
+
+            return @emptyList;
+        }
+
+        # Use default $colour/width/height, if not specified
+        if ($colour) {
+
+            ($type) = $axmud::CLIENT->checkColourTags($colour);
+        }
+
+        if (! $colour || ! $type ) {
+
+            # Check the neutral colour
+            if ($noColour) {
+
+                ($type) = $axmud::CLIENT->checkColourTags($noColour);
+            }
+
+            if (! $type) {
+
+                # No colour is drawn
+                $colour = undef;
+
+            } else {
+
+                # Use the neutral colour
+                $colour = $noColour;
+            }
+        }
+
+        # Make sure we have an RGB tag, not a different kind of colour tag
+        if ($colour) {
+
+            $colour = $axmud::CLIENT->returnRGBColour($colour);
+        }
+
+        # Use default width/height, if values not specified
+        if (! $width) {
+
+            $width = 30;
+        }
+
+        if (! $height) {
+
+            $height = 30;
+        }
+
+        # Create a frame
+        my $frame = Gtk2::Frame->new(undef);
+        $frame->set_border_width(0);
+        $frame->set_size_request($width, $height);
+
+        # Create the canvas
+        my $canvas = Gnome2::Canvas->new();
+        # Set the canvas size
+        $canvas->set_scroll_region(0, 0, $width, $height);
+        # Add the canvas to the frame
+        $frame->add($canvas);
+
+        # Add the frame to the table
+        $table->attach_defaults($frame, $leftAttach, $rightAttach, $topAttach, $bottomAttach);
+
+        # Fill the canvas with colour (if a colour was specified)
+        if ($colour) {
+
+            $canvasObj = $self->fillSimpleCanvas($canvas, undef, $colour, $width, $height);
+        }
+
+        return ($frame, $canvas, $canvasObj);
+    }
+
+    sub fillSimpleCanvas {
+
+        # Sets the background colour of the canvas drawn in the earlier call to
+        #   $self->addSimpleCanvas
+        #
+        # Expected arguments
+        #   $canvas         - The existing Gnome2::Canvas
+        #
+        # Optional arguments
+        #   $oldObj         - The existing Gnome2::Canvas::Rect, if there is one. Set to 'undef' if
+        #                       this function is being called by $self->addSimpleCanvas, or if no
+        #                       colour was drawn on the earlier call to ->addSimpleCanvas
+        #   $colour         - The colour to draw on the canvas. Can be any valid Axmud colour tag
+        #                       (e.g. 'red', 'x255', '#FF0000')
+        #   $noColour       - If $colour is not specified or if it is invalid, this colour is used.
+        #                       If $noColour is also not specified or invalid, then no colour is
+        #                       drawn (no canvas object is drawn on the canvas)
+        #
+        # Optional arguments
+        #   $width, $height - The size, in pixels, of the canvas. If not specified, a default size
+        #                       of 30x30 is used
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   The replacement Gnome2::Canvas::Rect otherwise
+
+        my ($self, $canvas, $oldObj, $colour, $noColour, $width, $height, $check) = @_;
+
+        # Local variables
+        my ($type, $partX, $partY, $canvasObj);
+
+        # Check for improper arguments
+        if (! defined $canvas || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->fillSimpleCanvas', @_);
+        }
+
+        # Use default $colour/width/height, if not specified
+        if ($colour) {
+
+            ($type) = $axmud::CLIENT->checkColourTags($colour);
+        }
+
+        if (! $colour || ! $type ) {
+
+            # Check the neutral colour
+            if ($noColour) {
+
+                ($type) = $axmud::CLIENT->checkColourTags($noColour);
+            }
+
+            if (! $type) {
+
+                # No colour is drawn
+                $colour = undef;
+
+            } else {
+
+                # Use the neutral colour
+                $colour = $noColour;
+            }
+        }
+
+        # Make sure we have an RGB tag, not a different kind of colour tag
+        if ($colour) {
+
+            $colour = $axmud::CLIENT->returnRGBColour($colour);
+        }
+
+        # Use default width/height, if values not specified
+        if (! $width) {
+
+            $width = 30;
+        }
+
+        if (! $height) {
+
+            $height = 30;
+        }
+
+        # Destroy the old background rectangle, if there is one
+        if ($oldObj) {
+
+            $oldObj->destroy();
+        }
+
+        # Draw the canvas object (if a colour was specified)
+        if ($colour) {
+
+            # The actual size and position is a little smaller, so that the whole of the canvas is
+            #   visible, without the frame getting in the way
+            # v1.0.694 - not possible to use the same trick as we used with 'main' window gauges, to
+            #   get the canvas object lined up perfectly in the middle. These x/y coordinates
+            #   produce something reasonable close
+            $partX = int($width / 10);
+            $partY = int($height / 10);
+
+            $canvasObj = Gnome2::Canvas::Item->new(
+                $canvas->root(),
+                'Gnome2::Canvas::Rect',
+                x1 => $partX,
+                y1 => $partY,
+                x2 => ($width - $partX),
+                y2 => ($height - ($partY * 2)),
+                fill_color => $colour,
+                outline_color => '#000000',     # Black
+            );
+
+            $canvasObj->lower_to_bottom();
+        }
+
+        # Drawing complete
+        return $canvasObj;
+    }
+
     # Support functions for adding widgets
 
     sub checkPosn {
@@ -25162,6 +25581,9 @@
 
         my ($self, $leftAttach, $rightAttach, $topAttach, $bottomAttach, $check) = @_;
 
+        # Local variables
+        my ($tableWidth, $tableHeight);
+
         # Check for improper arguments
         if (
             ! defined $leftAttach || ! defined $rightAttach || ! defined $topAttach
@@ -25170,11 +25592,25 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->checkPosn', @_);
         }
 
+        # In case this window doesn't have ->tableWidth and ->tableHeight IVs (I'm looking at you,
+        #   GA::Win::Map!), use some failsafe values
+        if (! exists $self->{tableWidth}) {
+
+            # A 12x13 table, with a spare cell around every border)
+            $tableWidth = 13;
+            $tableHeight = 14;
+
+        } else {
+
+            $tableWidth = $self->{tableWidth};
+            $tableHeight = $self->{tableHeight};
+        }
+
         # Check coordinates
         if (
             $leftAttach < 0 || $topAttach < 0
-            || $rightAttach > $self->tableWidth
-            || $bottomAttach > $self->tableHeight
+            || $rightAttach > $tableWidth
+            || $bottomAttach > $tableHeight
             || $rightAttach < $leftAttach || $bottomAttach < $topAttach
         ) {
             return $self->writeWarning(

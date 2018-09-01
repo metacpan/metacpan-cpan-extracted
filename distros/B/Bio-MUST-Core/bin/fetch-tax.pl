@@ -47,7 +47,7 @@ if ($ARGV_legacy_nom) {
     @ARGV_levels = ( $ARGV_legacy_nom );
 
     # build classifier for legacy NOM file if legacy_nom is a readable FRA file
-    $classifier = $tax->classifier_from_systematic_frame($ARGV_legacy_nom)
+    $classifier = $tax->tax_labeler_from_systematic_frame($ARGV_legacy_nom)
         if $ARGV_legacy_nom =~ m/.fra$/xmgi && -e $ARGV_legacy_nom;
 }
 
@@ -161,7 +161,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 USAGE
 

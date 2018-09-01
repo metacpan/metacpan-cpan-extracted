@@ -25,7 +25,7 @@ use Date::Manip::Base;
 use Data::Dumper;
 
 our $VERSION;
-$VERSION='6.72';
+$VERSION='6.73';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.

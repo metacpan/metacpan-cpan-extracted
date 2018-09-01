@@ -1,9 +1,11 @@
-name = "Devel-Cover-Report-Codecov"
-badges = ["travis"]
-module_maker = "ModuleBuildTiny"
-license = "mit"
 authority = "cpan:PINE"
 authors = ["Pine Mizune"]
+badges = ["travis"]
+license = "mit"
+markdown_maker = "Pod::Markdown::Github"
+module_maker = "ModuleBuildTiny"
+name = "Devel-Cover-Report-Codecov"
+
 
 [ReleaseTest]
 MinimumVersion = false

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -32,10 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "HTML::SimpleLinkExtor" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
-            "WWW::Mechanize::GZip" : "0",
             "perl" : "5.006002"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/nigelhorne/WWW-Scrape-FindaGrave"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

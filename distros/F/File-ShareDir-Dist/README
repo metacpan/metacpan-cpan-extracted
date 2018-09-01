@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
@@ -122,6 +122,15 @@ FUNCTIONS
 
     Returns nothing if no share directory could be found.
 
+ dist_config
+
+    [version 0.07]
+
+     my $config = dist_config $dist_name;
+
+    Returns the config at runtime as created by
+    File::ShareDir::Dist::Install and install time.
+
 ENVIRONMENT
 
     PERL_FILE_SHAREDIR_DIST
@@ -136,7 +145,11 @@ CAVEATS
 
 SEE ALSO
 
-    File::ShareDir
+    File::ShareDir::Dist::Install
+
+    App::Prove::Plugin::ShareDirDist
+
+    App::Yath::Plugin::ShareDirDist
 
 AUTHOR
 
@@ -148,7 +161,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017,2018 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

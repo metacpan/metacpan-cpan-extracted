@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.84';
+$Net::Amazon::S3::Client::Object::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -17,7 +17,7 @@ enum 'AclShort' =>
     [ qw(private public-read public-read-write authenticated-read) ];
 
 enum 'StorageClass' =>
-    [ qw(standard reduced_redundancy) ];
+    [ qw(standard reduced_redundancy standard_ia onezone_ia) ];
 
 has 'client' =>
     ( is => 'ro', isa => 'Net::Amazon::S3::Client', required => 1 );
@@ -416,7 +416,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 
@@ -565,7 +565,8 @@ You may also set Content-Encoding using C<content_encoding>, and
 Content-Disposition using C<content_disposition>.
 
 You may specify the S3 storage class by setting C<storage_class> to either
-C<standard> or C<reduced_redundancy>; the default is C<standard>.
+C<standard>, C<reduced_redundancy>, C<standard_ia>, or C<onezone_ia>;
+the default is C<standard>.
 
 =head2 put_filename
 
@@ -589,7 +590,8 @@ You may also set Content-Encoding using C<content_encoding>, and
 Content-Disposition using C<content_disposition>.
 
 You may specify the S3 storage class by setting C<storage_class> to either
-C<standard> or C<reduced_redundancy>; the default is C<standard>.
+C<standard>, C<reduced_redundancy>, C<standard_ia>, or C<onezone_ia>;
+the default is C<standard>.
 
 User metadata may be set by providing a non-empty hashref as
 C<user_metadata>.

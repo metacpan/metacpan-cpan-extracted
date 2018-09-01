@@ -1,5 +1,8 @@
 Revision history for Alien-libuv
 
+1.006     2018-08-28
+  - Update to the libuv v1.23.0 release
+
 1.005     2018-08-09
   - Don't even try to build on anything below Win7; It's broken.
 

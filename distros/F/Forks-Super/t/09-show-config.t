@@ -32,44 +32,31 @@ foreach my $key (sort keys %Forks::Super::SysInfo::CONFIG) {
 }
 print STDERR "\n";
 
-my $ps = $ENV{PERL_SIGNALS} || "";
-print STDERR "\$ENV{PERL_SIGNALS} = $ps\n";
-
 my $locale = $ENV{LOCALE} || "";
-print STDERR "\$ENV{LOCALE} = $locale\n";
-
 my $lang = $ENV{LANG} || "";
-print STDERR "\$ENV{LANG} = $lang\n";
-
 my $lc_all = $ENV{LC_ALL} || "";
-print STDERR "\$ENV{LC_ALL} = $lc_all\n";
+diag "\$ENV{LANG} = $lang, \$ENV{LOCALE} = $locale, \$ENV{LC_ALL} = $lc_all";
 
-print STDERR "Forks::Super::Job is overloaded: ",
-	$Forks::Super::Job::OVERLOAD_ENABLED, "\n";
-print STDERR "Using tied IPC filehandles: ",
-	" $Forks::Super::Job::Ipc::USE_TIE_FH",
-	" $Forks::Super::Job::Ipc::USE_TIE_SH",
-	" $Forks::Super::Job::Ipc::USE_TIE_PH\n";
+diag "Max open fh: $Forks::Super::SysInfo::MAX_OPEN_FH";
 
-print STDERR "Max open fh: $Forks::Super::SysInfo::MAX_OPEN_FH\n";
+diag "Max fork: $Forks::Super::SysInfo::MAX_FORK";
 
-print STDERR "Max fork: $Forks::Super::SysInfo::MAX_FORK\n";
-
-print STDERR "Time_HiRes_TOL: $Forks::Super::SysInfo::TIME_HIRES_TOL\n";
+diag "Time_HiRes_TOL: $Forks::Super::SysInfo::TIME_HIRES_TOL";
 if ($Forks::Super::SysInfo::TIME_HIRES_TOL >= 0.5) {
     print STDERR "     are you serious?\n";
 }
-print STDERR "Number of cpus: $Forks::Super::SysInfo::NUM_PROCESSORS\n";
-print STDERR "\$ENV{TEST_LENIENT} = ",($ENV{TEST_LENIENT}||"undef"),"\n";
+diag "Number of cpus: $Forks::Super::SysInfo::NUM_PROCESSORS";
+diag "\$ENV{TEST_LENIENT} = ",($ENV{TEST_LENIENT}||"undef");
+
+diag "remote command: $Forks::Super::SysInfo::TEST_SSH_TEMPLATE";
 
 local $! = $Forks::Super::SysInfo::FILE_NOT_FOUND_ERRNO || 2;
-print STDERR "FNF Error message: $!\n";
+diag "FNF Error message: $!";
 
 print STDERR "\n";
 
 if ($^O =~ /bsd/i) {
-    print STDERR "Alt alarm on BSD: ",
-        $Forks::Super::SysInfo::PREFER_ALTERNATE_ALARM, "\n";
+    diag "Alt alarm on BSD: ", $Forks::Super::SysInfo::PREFER_ALTERNATE_ALARM;
 }
 
 if (grep /provided by ActiveState/, qx($^X -v)) {

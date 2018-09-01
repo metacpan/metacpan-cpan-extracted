@@ -1,6 +1,7 @@
 use 5.00503;
 use strict;
-use Test::Simply tests => 9;
+BEGIN { $|=1; print "1..9\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }}
+
 use Modern::Open;
 
 my $rc = 0;

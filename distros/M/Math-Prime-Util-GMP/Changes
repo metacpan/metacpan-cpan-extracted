@@ -1,5 +1,37 @@
 Revision history for Perl module Math::Prime::Util::GMP
 
+0.51 2018-02-27
+
+    [ADDED]
+
+    - rootreal(x,n[,digits])  nth root of x:  x^(1/n)
+    - addreal(x,y[,digits])   x+y
+    - subreal(x,y[,digits])   x-y
+    - mulreal(x,y[,digits])   x*y
+    - divreal(x,y[,digits])   x/y
+    - subfactorial(n)         !n (derangements)
+    - factorial_sum(n)        !n (sum of factorials)
+    - multifactorial(x,n)     x!, x!!, x!!!, etc.
+
+    [FIXES]
+
+    - Some memory leaks squashed.
+
+    - Trizen reported a factor bug.  Fixed with patch to tinyqs.c init code.
+
+    [OTHER]
+
+    - Work around a bug in NetBSD.
+
+    - Standalone ecpp creation fixed.
+
+    - Allow Ramanujan polynomials (D = 11 mod 24) for ECPP, reducing sizes.
+
+    - Some new code for ei().
+
+    - is_primitive_root quite a bit faster.
+
+
 0.50 2017-11-28
 
     [FIXES]
@@ -16,7 +48,7 @@ Revision history for Perl module Math::Prime::Util::GMP
     - ei(x[,digits])         Exponential Integral of x (x floating point)
     - logreal(x[,digits])    Natural logarithm of x
     - expreal(x[,digits])    e^x
-    - powreal(n,x[,digits])  n^x
+    - powreal(x,n[,digits])  x^n
     - agmreal(a,b[,digits])  AGM(a,b) - arithmetic-geometric mean
     - prime_count_lower(n)   lower bounds for prime count
     - prime_count_upper(n)   upper bounds for prime count

@@ -5,7 +5,9 @@ author:
 build_requires:
   Alien::Build: '0.73'
   Alien::Build::MM: '0.73'
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
+  IPC::Cmd: '0'
   Test2::V0: '0.000060'
   Test::Alien: '0'
   perl: '5.006'
@@ -15,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +31,7 @@ resources:
   bugtracker: https://github.com/Perl5-FFI/Alien-FFI/issues
   homepage: https://metacpan.org/pod/Alien::FFI
   repository: git://github.com/Perl5-FFI/Alien-FFI.git
-version: '0.21'
+version: '0.22'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
   requires:
@@ -45,5 +47,6 @@ x_alienfile:
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.29.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

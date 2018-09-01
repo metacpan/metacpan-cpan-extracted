@@ -4,7 +4,7 @@
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,11 @@
          "requires" : {
             "perl" : "v5.8.1"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,7 +55,8 @@
          "web" : "https://github.com/ingydotnet/yaml-libyaml-pm"
       }
    },
-   "version" : "0.72",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "0.74",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

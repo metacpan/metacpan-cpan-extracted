@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.59
+    Version 0.64
 
 SYNOPSIS
 
@@ -72,6 +72,23 @@ SUBROUTINES/METHODS
       * visible - should firefox be visible on the desktop. This defaults
       to "0".
 
+      * timeouts - a shortcut to allow directly providing a timeout object,
+      instead of needing to use timeouts from the capabilities parameter.
+      Overrides the timeouts provided (if any) in the capabilities
+      parameter.
+
+      * page_load - a shortcut to allow directly providing the page_load
+      timeout, instead of needing to use timeouts from the capabilities
+      parameter. Overrides all longer ways.
+
+      * script - a shortcut to allow directly providing the script timeout,
+      instead of needing to use timeouts from the capabilities parameter.
+      Overrides all longer ways.
+
+      * implicit - a shortcut to allow directly providing the implicit
+      timeout, instead of needing to use timeouts from the capabilities
+      parameter. Overrides all longer ways.
+
     This method returns a new Firefox::Marionette object, connected to an
     instance of firefox <https://firefox.com>. In a non MacOS/Win32/Cygwin
     environment, if necessary (no DISPLAY variable can be found and visible
@@ -82,7 +99,7 @@ SUBROUTINES/METHODS
  go
 
     Navigates the current browsing context to the given URI and waits for
-    the document to load or the session's page timeout duration to elapse
+    the document to load or the session's page_load duration to elapse
     before returning, which, by default is 5 minutes. This method returns
     itself to aid in chaining methods
 
@@ -453,12 +470,42 @@ SUBROUTINES/METHODS
 
  html
 
-    returns the page source of the content document.
+    returns the page source of the content document. This page source can
+    be wrapped in html that firefox provides. See the json method for an
+    alternative when dealing with response content types such as
+    application/json and strip for an alterative when dealing with other
+    non-html content types such as text/plain.
 
         use Firefox::Marionette();
         use v5.10;
     
         say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
+
+ strip
+
+    returns the page source of the content document after an attempt has
+    been made to remove typical firefox html wrappers of non html content
+    types such as text/plain and application/json. See the json method for
+    an alternative when dealing with response content types such as
+    application/json and html for an alterative when dealing with html
+    content types. This is a convenience method that wraps the html method.
+
+        use Firefox::Marionette();
+        use JSON();
+        use v5.10;
+    
+        say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+
+ json
+
+    returns a JSON object that has been parsed from the page source of the
+    content document. This is a convenience method that wraps the strip
+    method.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
  context
 
@@ -564,7 +611,7 @@ SUBROUTINES/METHODS
 
     causes the browser to traverse one step backward in the joint history
     of the current browsing context. The browser will wait for the one step
-    backward to complete or the session's page timeout duration to elapse
+    backward to complete or the session's page_load duration to elapse
     before returning, which, by default is 5 minutes. This method returns
     itself to aid in chaining methods.
 
@@ -572,7 +619,7 @@ SUBROUTINES/METHODS
 
     causes the browser to traverse one step forward in the joint history of
     the current browsing context. The browser will wait for the one step
-    forward to complete or the session's page timeout duration to elapse
+    forward to complete or the session's page_load duration to elapse
     before returning, which, by default is 5 minutes. This method returns
     itself to aid in chaining methods.
 
@@ -630,9 +677,9 @@ SUBROUTINES/METHODS
  refresh
 
     refreshes the current page. The browser will wait for the page to
-    completely refresh or the session's page timeout duration to elapse
-    before returning, which, by default is 5 minutes. This method returns
-    itself to aid in chaining methods.
+    completely refresh or the session's page_load duration to elapse before
+    returning, which, by default is 5 minutes. This method returns itself
+    to aid in chaining methods.
 
  alert_text
 
@@ -720,8 +767,8 @@ SUBROUTINES/METHODS
  click
 
     accepts a element as the first parameter and sends a 'click' to it. The
-    browser will wait for any page load to complete or the session's page
-    timeout duration to elapse before returning, which, by default is 5
+    browser will wait for any page load to complete or the session's
+    page_load duration to elapse before returning, which, by default is 5
     minutes.
 
  timeouts
@@ -1056,6 +1103,18 @@ BUGS AND LIMITATIONS
     Please report any bugs or feature requests to
     bug-firefox-marionette@rt.cpan.org, or through the web interface at
     http://rt.cpan.org.
+
+SEE ALSO
+
+      * MozRepl
+
+      * Selenium::Firefox
+
+      * Firefox::Application
+
+      * Mozilla::Mechanize
+
+      * Gtk2::MozEmbed
 
 AUTHOR
 

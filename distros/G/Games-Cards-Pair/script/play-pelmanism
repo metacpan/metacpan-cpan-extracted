@@ -5,7 +5,7 @@ package App::Games::Cards::Pair;
 use Games::Cards::Pair;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 use Types::Standard -all;
 use MooX::Options;
 

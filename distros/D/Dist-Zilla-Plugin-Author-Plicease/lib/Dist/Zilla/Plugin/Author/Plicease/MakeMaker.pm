@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.26 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.28 {
 
   use 5.014;
   use Moose;
@@ -31,10 +31,11 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.26 {
     
     $self->$orig(@args);
     
-    my $file = first { $_->name eq 'Makefile.PL' } @{ $self->zilla->files };
-    my $mod  = first { $_->name eq 'inc/mymm.pl' } @{ $self->zilla->files };
+    my $file  = first { $_->name eq 'Makefile.PL' }       @{ $self->zilla->files };
+    my $mod   = first { $_->name eq 'inc/mymm.pl' }       @{ $self->zilla->files };
+    my $build = first { $_->name eq 'inc/mymm-build.pl' } @{ $self->zilla->files };
+    my $test  = first { $_->name eq 'inc/mymm-test.pl' }  @{ $self->zilla->files };
 
-    $DB::single = 1;
     my @content = do {
       my $in  = $file->content;
       my $out = '';
@@ -104,7 +105,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.26 {
       @content = @new;
     }
 
-    if($mod)
+    if($mod || $test)
     {
       my $last = pop @content;
       if($last =~ /^WriteMakefile\(/)
@@ -113,8 +114,17 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.26 {
         while(defined $content[0] && $content[0] !~ /\%FallbackPrereqs/)
         {
           my $line = shift @content;
-        
-          $line =~ s/use ExtUtils::MakeMaker;/use ExtUtils::MakeMaker 6.64;/;
+
+          if($test)
+          {
+            # TODO: not exactly sure when the test order was fixed in EUMM.
+            #       research and correct.
+            $line =~ s/use ExtUtils::MakeMaker;/use ExtUtils::MakeMaker 7.1001;/;
+          }
+          else
+          {
+            $line =~ s/use ExtUtils::MakeMaker;/use ExtUtils::MakeMaker 6.64;/;
+          }
         
           push @new, $line;
         }
@@ -132,6 +142,32 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.26 {
       }
     }
 
+
+    if($build || $test)
+    {
+      push @content, "sub MY::postamble {";
+      push @content, "  my \$postamble = '';";
+      push @content, '';
+      if($build)
+      {
+        push @content, "  \$postamble .=";
+        push @content, "    \"pure_all :: mymm_build\\n\" .";
+        push @content, "    \"mymm_build :\\n\" .";
+        push @content, "    \"\\t\\\$(FULLPERL) inc/mymm-build.pl\\n\\n\";";
+        push @content, '';
+      }
+      if($test)
+      {
+        push @content, "  \$postamble .=";
+        push @content, "    \"subdirs-test_dynamic subdirs-test_static subdirs-test :: mymm_test\\n\" .";
+        push @content, "    \"mymm_test :\\n\" .";
+        push @content, "    \"\\t\\\$(FULLPERL) inc/mymm-test.pl\\n\\n\";";
+        push @content, '';
+      }
+      push @content, "  \$postamble;";
+      push @content, "}";
+    }
+
     $file->content(join "\n", @content);
 
     return;
@@ -147,6 +183,15 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.26 {
       $self->zilla->register_prereqs(
         { phase => 'configure' },
         'ExtUtils::MakeMaker' => '6.64'
+      );
+    }
+
+    my $test = first { $_->name eq 'inc/mymm-test.pl' } @{ $self->zilla->files };
+    if($test)
+    {
+      $self->zilla->register_prereqs(
+        { phase => 'configure' },
+        'ExtUtils::MakeMaker' => '7.1001'
       );
     }
     
@@ -183,7 +228,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use 5.12.0;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 $VERSION = eval $VERSION;
 
 use Mojo::Home;
@@ -33,6 +33,7 @@ sub register {
   $app->helper('revealjs.export' => \&_export);
 
   $app->helper(include_code => \&_include_code);
+  $app->helper(include_sample => \&_include_sample);
   $app->helper(section => sub { shift->tag(section => @_) });
   $app->helper(markdown_section => sub {
     my ($c, @args) = @_;
@@ -77,6 +78,39 @@ sub _include_code {
     %opts
   );
   return b $html;
+}
+
+sub _include_sample {
+  my ($c, $sample, %opts) = @_;
+  my $template = <<'  INCLUDE';
+    <pre><%= t code => @$code %></pre>
+    % if (defined $annotation) {
+    <p class="sample-annotation" style="float: right; text-color: white; font-size: small;"><%= $annotation %></p>
+    % }
+  INCLUDE
+
+  my (@code, %data);
+  my $lang = $opts{language} // $opts{lang} // $c->stash('language');
+  if (defined $lang) {
+    $lang = "lang-$lang" unless $lang =~ /^lang-/;
+    push @code, class => $lang;
+  }
+
+  $data{sample}        = $sample;
+  $data{trim}          = $opts{trim}     if exists $opts{trim};
+  $data{noescape}      = $opts{noescape} if exists $opts{noescape};
+  $data{'sample-mark'} = $opts{mark}     if exists $opts{mark};
+  push @code, data => \%data;
+
+  my $anno_default = $sample;
+  $anno_default =~ s/\#.*$//;
+
+  my $html = $c->render_to_string(
+    inline   => $template,
+    code     => \@code,
+    annotation => exists $opts{annotation} ? $opts{annotation} : $anno_default,
+  );
+  return $html;
 }
 
 sub _export {
@@ -132,6 +166,7 @@ It also provides a few simple helpers.
 Future versions of the plugin will allow setting of configuration like themes.
 
 The bundled version of Reveal.js is currently 3.7.0.
+The bundled version of reveal-sampler is currently b04a34e.
 
 Note that this module is in an alpha form!
 The author makes no compatibilty promises.
@@ -252,6 +287,9 @@ C<revealjs_body.html.ep> - included at the end of the C<< <body> >> tag.
 
   %= include_code 'path/to/file.pl'
 
+NOTE this helper is mildly-deprecated in favor of the reveal-sampler plugin and L</include_sample>.
+It isn't going away yet, but if things work out with that functionality this method may eventually be implemented via it or removed entirely.
+
 This helper does several things:
 
 =over
@@ -313,6 +351,51 @@ Then in the file
 
   Excluded content
 
+=head2 include_sample
+
+  %= include_sample 'path/to/file.pl'
+
+The spiritual successor (and possbily actually the sucessor) to L</include_code>.
+The heavy lifting is done in the client via the reveal-sampler plugin which is bundled.
+It is much simpler than L</include_code>.
+
+It takes the url of the file to render, which must be in a publicly available via static render.
+This file path may also contain a url fragment designating the section or line numbers to display.
+Read more at L<https://github.com/ldionne/reveal-sampler>.
+
+After the file url, the following trailing key-value pair options are available.
+
+=over
+
+=item language
+
+Sets the language for the highlighting.
+Note that the alias C<lang> is also allowed and defaults to the value of the C<language> stash value.
+If this is not set, the client-side code will also attempt to set it based on the file extension.
+
+=item mark
+
+Sets lines to be marked by the client.
+This follows the documentation at L<https://github.com/ldionne/reveal-sampler>.
+
+=item trim
+
+Sets the C<data-trim> attribute for revealjs.
+
+=item noescape
+
+Sets the C<data-noescape> attribute for revealjs.
+Note that if the L</mark> option is used, the front-end will automatically apply this attribute.
+
+=item annotation
+
+A text line to be rendered below the code section.
+This is normally used to display the file name/path.
+If not explicitly given it will default to the url of the file (without any fragment).
+If explicitly undefined, the annotation will not be rendered.
+
+=back
+
 =head2 section
 
   %= section begin
@@ -366,3 +449,4 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 Reveal.js (bundled) is Copyright (C) 2015 Hakim El Hattab, http://hakim.se and released under the MIT license.
+reveal-sampler (bundled) is Copyright (C) 2017 Louis Dionne and released under the MIT license.

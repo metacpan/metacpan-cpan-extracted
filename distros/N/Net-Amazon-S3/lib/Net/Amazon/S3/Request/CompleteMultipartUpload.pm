@@ -1,27 +1,26 @@
 package Net::Amazon::S3::Request::CompleteMultipartUpload;
-$Net::Amazon::S3::Request::CompleteMultipartUpload::VERSION = '0.84';
+$Net::Amazon::S3::Request::CompleteMultipartUpload::VERSION = '0.85';
 use Moose 0.85;
 use Digest::MD5 qw/md5 md5_hex/;
 use MIME::Base64;
 use Carp qw/croak/;
 use XML::LibXML;
 
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
-with 'Net::Amazon::S3::Role::Bucket';
+with 'Net::Amazon::S3::Request::Role::Query::Param::Upload_id';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_length';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_type' => { content_type => 'application/xml' };
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::POST';
 
 has 'etags'         => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
-has 'key'           => ( is => 'ro', isa => 'Str',        required => 1 );
 has 'part_numbers'  => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
-has 'upload_id'     => ( is => 'ro', isa => 'Str',    required => 1 );
 
 __PACKAGE__->meta->make_immutable;
 
-sub http_request {
-    my $self = shift;
-
-    croak "must have an equally sized list of etags and part numbers"
-        unless scalar(@{$self->part_numbers}) == scalar(@{$self->etags});
+sub _request_content {
+    my ($self) = @_;
 
     #build XML doc
     my $xml_doc = XML::LibXML::Document->new('1.0','UTF-8');
@@ -36,26 +35,14 @@ sub http_request {
         $root_element->addChild($part);
     }
 
-    my $content = $xml_doc->toString;
+    return $xml_doc->toString;
+}
 
-    my $md5        = md5($content);
+sub BUILD {
+    my ($self) = @_;
 
-    my $md5_base64 = encode_base64($md5);
-    chomp $md5_base64;
-
-    my $header_spec = {
-        'Content-MD5'    => $md5_base64,
-        'Content-Length' => length $content,
-        'Content-Type'   => 'application/xml'
-    };
-
-    #build signed request
-    return $self->_build_http_request(
-        method  => 'POST',
-        path    => $self->_uri( $self->key ). '?uploadId='.$self->upload_id,
-        content => $content,
-        headers => $header_spec,
-    );
+    croak "must have an equally sized list of etags and part numbers"
+        unless scalar(@{$self->part_numbers}) == scalar(@{$self->etags});
 }
 
 1;
@@ -70,7 +57,7 @@ Net::Amazon::S3::Request::CompleteMultipartUpload - An internal class to complet
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

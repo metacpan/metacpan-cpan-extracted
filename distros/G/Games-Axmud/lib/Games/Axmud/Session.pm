@@ -517,6 +517,7 @@
             #   isn't running)
             advanceTask                 => undef,
             attackTask                  => undef,
+            channelsTask                => undef,
             chatTask                    => undef,   # Only stored the 'lead' Chat task
             compassTask                 => undef,
             conditionTask               => undef,
@@ -1044,8 +1045,8 @@
             # When there are no file objects in $self->sessionFileObjHash whose ->modifyFlag is set
             #   to TRUE (meaning that none of them need to be saved), this flag is set to FALSE
             # When the first file object has its ->modifyFlag set to TRUE, $self->setModifyFlag
-            #   calls GA::Table::Pane->setTabLabel for each session using the same world profile as
-            #   this one
+            #   calls GA::Table::Pane->setSessionTabLabel for each session using the same world
+            #   profile as this one
             # That function displays an asterisk in the label for the session's default tab. In
             #   addition, this flag gets set to TRUE
             # The flag is set back to FALSE by $self->checkTabLabels when all file objects are saved
@@ -1884,6 +1885,13 @@
             }
         }
 
+        # If using a charset other than the default one, display it now
+        if ($self->sessionCharSet ne $axmud::CLIENT->constCharSet) {
+
+            $self->writeText('Using charset \'' . $self->sessionCharSet . '\'');
+            $self->writeText(' ');
+        }
+
         # When connecting to a world, the 'Connecting...' message will appear on this line, instead
         if ($self->initOfflineFlag) {
 
@@ -2041,7 +2049,7 @@
         if (
             $axmud::CLIENT->shareMainWinFlag
             && $self->defaultTabObj
-            && ! $self->defaultTabObj->paneObj->removeTab($self)
+            && ! $self->defaultTabObj->paneObj->removeSessionTab($self)
         ) {
             return $self->writeError(
                 'Could not remove the tab for a session',
@@ -2283,10 +2291,25 @@
         }
 
         # Add a new tab (containing a textview object)
-        if (! $paneObj->notebook && ! $paneObj->tabObjHash) {
-            $tabObj = $paneObj->addSimpleTab($self, TRUE, TRUE, $tabLabelText);
+        if ($axmud::CLIENT->simpleTabFlag && ! $paneObj->tabObjHash) {
+
+            $tabObj = $paneObj->addSimpleTab(
+                $self,
+                undef,              # Use default colour scheme for 'main' windows
+                TRUE,               # Called by this function
+                TRUE,               # Is the session's default tab
+                $tabLabelText,
+            );
+
         } else {
-            $tabObj = $paneObj->addTab($self, TRUE, TRUE, $tabLabelText);
+
+            $tabObj = $paneObj->addTab(
+                $self,
+                undef,              # Use default colour scheme for 'main' windows
+                TRUE,               # Called by this function
+                TRUE,               # Is the session's default tab
+                $tabLabelText,
+            );
         }
 
         if (! $tabObj) {
@@ -3379,8 +3402,8 @@
         # Local variables
         my (
             $worldProfFileObj, $otherProfFileObj, $worldModelFileObj, $dictsFileObj, $result,
-            $saveMode, $worldObj, $dictName, $dictObj, $worldModelObj, $updateCageFlag,
-            $otherSession, $mapObj, $basicObj, $otherProfPath, $worldModelPath,
+            $saveMode, $worldObj, $basicObj, $dictName, $dictObj, $worldModelObj, $updateCageFlag,
+            $otherSession, $mapObj, $otherProfPath, $worldModelPath,
             %newHash,
         );
 
@@ -3594,10 +3617,26 @@
 
                     $worldObj->ivPoke('longName', $basicObj->longName);
                     $worldObj->ivPoke('adultFlag', $basicObj->adultFlag);
+
+                    # If the basic world object specifies a Russian-language world, automatically
+                    #   set the world profile's charset as KOI-8 (which seems to be more common
+                    #   that UTF-8)
+                    if (
+                        lc($basicObj->language) eq 'russian'
+                        || lc($basicObj->language) eq 'russkiy'
+                    ) {
+                        # Use 'koi8-r', if available, otherwise use 'utf8', if available
+                        if (defined $axmud::CLIENT->ivFind('charSetList', 'koi8-r')) {
+                            $worldObj->ivPoke('worldCharSet', 'koi8-r');
+                        } elsif (defined $axmud::CLIENT->ivFind('charSetList', 'utf8')) {
+                            $worldObj->ivPoke('worldCharSet', 'utf8');
+                        }
+                    }
                 }
             }
 
             # (The rest of this section is re-used in part 4; change this one, change that one)
+
             # Create the new world profile's associated cage
             if (! $self->createCages($worldObj, TRUE)) {
 
@@ -3641,6 +3680,23 @@
 
                     # Update IVs. Add the dictionary object to its registry
                     $axmud::CLIENT->add_dict($dictObj);
+                    # Set its language, if a corresponding basic world object exists
+                    if ($basicObj && $basicObj->language ne 'English') {
+
+                        $dictObj->ivPoke('language', $basicObj->language);
+
+                        # Upload the phrasebook to the dictionary, if a phrasebook exists for this
+                        #   language
+                        OUTER: foreach my $pbObj ($axmud::CLIENT->ivValues('constPhrasebookHash')) {
+
+                            if (lc($basicObj->language) eq lc($pbObj->targetName)) {
+
+                                $dictObj->uploadPhrasebook($pbObj);
+                                last OUTER;
+                            }
+                        }
+                    }
+
                     # Some files have to be saved shortly
                     $saveMode = 'save_dict';
                 }
@@ -3758,6 +3814,10 @@
 
                         # Update IVs. Add the dictionary object to its registry
                         $axmud::CLIENT->add_dict($dictObj);
+
+                        # (In this situation, don't set the language from the corresponding basic
+                        #   world object, and don't upload a phrasebook)
+
                         # Some files have to be saved shortly
                         $saveMode = 'save_dict';
                     }
@@ -8937,7 +8997,7 @@
         # Change the tab label, if we need to
         if ($changeTabFlag) {
 
-            $self->defaultTabObj->paneObj->setTabLabel(
+            $self->defaultTabObj->paneObj->setSessionTabLabel(
                 $self,
                 $self->getTabLabelText(),
                 $self->showModFlag,      # Show an asterisk, or not
@@ -8981,7 +9041,8 @@
             if ($self->currentChar) {
 
                 $charName = $self->currentChar->name;
-                if (! ($charName =~ m/[A-Z]/)) {
+#                if (! ($charName =~ m/[A-Z]/)) {
+                if (! ($charName =~ m/[[:upper:]]/)) {
 
                     $charName = ucfirst($charName);
                 }
@@ -9659,7 +9720,7 @@
 
                 if ($session->defaultTabObj) {
 
-                    $session->defaultTabObj->paneObj->setTabLabel(
+                    $session->defaultTabObj->paneObj->setSessionTabLabel(
                         $session,
                         $session->getTabLabelText(),
                         $session->showModFlag,              # Show an asterisk, or not
@@ -12707,7 +12768,8 @@
         #   starts an MXP entity
         # Attempts to extract a valid MXP entity in the form &keyword;
         # The entity keyword must start with a letter (A-Za-z) and then consist of letters, numbers
-        #   or underline characters. No other characters are permitted.
+        #   or underline characters. No other characters are permitted (including non-Latin
+        #   alphabets)
         # (This function also recognises entities in the form '&#nnn;' )
         # If a valid entity isn't found, the calling function displays the text 'as is'
         #
@@ -13942,9 +14004,11 @@
                     $bufferText =~ m/\n$/
                     # The most recent line contains alphanumeric characters but doesn't end with a
                     #   punctuation mark, and is optionally followed by one or more empty lines
-                    && ! ($bufferText =~ m/\w\s*[\.\,\:\;\!\?][\s*\n]+$/)
+#                    && ! ($bufferText =~ m/\w\s*[\.\,\:\;\!\?][\s*\n]+$/)
+                    && ! ($bufferText =~ m/[[:alnum:]]\s*[\.\,\:\;\!\?][\s*\n]+$/)
                     # The new line starts with a capital letter
-                    && $addText =~ m/^\s*[A-Z]/
+#                    && $addText =~ m/^\s*[A-Z]/
+                    && $addText =~ m/^\s*[[:upper:]]/
                 ) {
                     $bufferText =~ s/\n$/\.\n/;
                 }
@@ -16957,7 +17021,6 @@
                     'mxp_frame_' . $frameObj->name,
                     # Configuration hash
                     'frame_title'       => $ivHash{'name'},
-                    'no_label_flag'     => TRUE,
                 );
 
                 if (! $newPaneObj) {
@@ -17794,6 +17857,12 @@
                     if (((scalar @cmdList) + 1) == (scalar @optionList)) {
 
                         # The first item in @optionList is the hint; the rest are menu items
+                        $linkObj->ivPoke('hint', shift @optionList);
+
+                    } elsif ((scalar @cmdList) > 1 && (scalar @optionList) == 1) {
+
+                        # The only item in @optionList must be a hint, as there are more commands
+                        #   than hints
                         $linkObj->ivPoke('hint', shift @optionList);
 
                     } elsif ((scalar @cmdList) != (scalar @optionList)) {
@@ -22675,7 +22744,7 @@
 
         foreach my $tag (@tagList) {
 
-            my ($type, $underlayFlag);
+            my ($type, $underlayFlag, $boldishTag);
 
             # When called by $self->applyTriggerStyle, @tagList can contain bold text colour tags
             #   like 'BLUE'. When called by $self->processLineSegment, @tagList would instead
@@ -22921,10 +22990,24 @@
             } else {
 
                 ($type, $underlayFlag) = $axmud::CLIENT->checkColourTags($tag);
-                if ($type && ($type eq 'xterm' || $type eq 'rgb')) {
+                if ($type) {
 
-                    # xterm/RGB colour tags should be case insensitive
-                    $tag = lc($tag);
+                    if ($type eq 'standard') {
+
+                        # We're going to check $tag against the textview's object colour in a
+                        #   moment, which is stored as (for example) 'RED' if it's a bold colour. We
+                        #   need to compare it with 'RED', not 'red', if bold is on
+                        if ($hash{'bold'}) {
+                            $boldishTag = uc($tag);
+                        } else {
+                            $boldishTag = $tag;
+                        }
+
+                    } else {
+
+                        # xterm/RGB colour tags should be case insensitive
+                        $boldishTag = lc($tag);
+                    }
                 }
 
                 # PART 5a: Text colour tags
@@ -22936,7 +23019,7 @@
                     ) {
                         # (The re-occuring tag is ignored)
 
-                    } elsif ($attribsOffFlag && $tag eq $textViewObj->textColour) {
+                    } elsif ($attribsOffFlag && $boldishTag eq $textViewObj->textColour) {
 
                         # After an 'attribs off', if the tag matches the 'main' window's normal text
                         #   colour, let that be the text colour
@@ -23003,7 +23086,7 @@
                     ) {
                         # (The re-occuring tag is ignored)
 
-                    } elsif ($attribsOffFlag && $tag eq $textViewObj->underlayColour) {
+                    } elsif ($attribsOffFlag && $boldishTag eq $textViewObj->underlayColour) {
 
                         # After an 'attribs off', if the tag matches the 'main' window's normal
                         #   underlay colour, let that be the underlay colour
@@ -27237,7 +27320,8 @@
             # Server: IAC SB TELOPT_ATCP Package[.SubPackages][.Message] <data> IAC SE
 
             # Separate the package name and data components
-            if ($parameters =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+#            if ($parameters =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+            if ($parameters =~ m/^([[:alpha:]\_][[:word:]\-\.]*)\s(.*)/) {
 
                 $name = lc($1);
                 $data = $2;
@@ -27252,7 +27336,8 @@
             # Server: IAC SB TELOPT_GMCP Package[.SubPackages][.Message] <data> IAC SE
 
             # Separate the package name and data components
-            if ($parameters =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+#            if ($parameters =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+            if ($parameters =~ m/^([[:alpha:]\_][[:word:]\-\.]*)\s(.*)/) {
 
                 $name = lc($1);
                 $data = $2;
@@ -28344,7 +28429,8 @@
             );
 
         # Check that $name is in the correct format. If not, we don't send $data, if specified
-        } elsif (! ($name =~ m/^[A-Za-z_][A-Za-z0-9_\-\.]*$/)) {
+#        } elsif (! ($name =~ m/^[A-Za-z_][A-Za-z0-9_\-\.]*$/)) {
+        } elsif (! ($name =~ m/^[[:alpha:]\_][[:word:]\-\.]*$/)) {
 
             $data = undef;
         }
@@ -28442,7 +28528,8 @@
             );
 
         # Check that $name is in the correct format. If not, we don't send $data, if specified
-        } elsif (! ($name =~ m/^[A-Za-z_][A-Za-z0-9_\-\.]*$/)) {
+#        } elsif (! ($name =~ m/^[A-Za-z_][A-Za-z0-9_\-\.]*$/)) {
+        } elsif (! ($name =~ m/^[[:alpha:]\_][[:word:]\-\.]*$/)) {
 
             $data = undef;
         }
@@ -30900,6 +30987,7 @@
         # 'c' can be a single character in the range a-z, or a sequence of characters in the form
         #   (xxx) where 'xxx' is a movement command, or (xxx/yyy) where 'xxx' is a movement command
         #   and 'yyy' is the opposite movement command, or {zzz} where 'zzz' is any comment text
+        # (NB Characters from non-Latin alphabets are acceptable)
         #
         # If 'c' is a single character in the range a-z, this function consults the current
         #   dictionary's ->speedDirHash. If 'c' exists as a key in that hash, the corresponding
@@ -30915,6 +31003,8 @@
         #
         # 'm' can be a single character in the range A-Z, or a sequence of characters in the form
         #   [xxx] or [xxx/yyy]
+        # (NB Characters from non-Latin alphabets are acceptable)
+        #
         # If 'm' is a single character in the range A-Z, this function consults the current
         #   dictionary's ->speedModifierHash. If 'm' exists as a key in that hash, the corresponding
         #   value is handled as a standard command (matching a key GA::Cage::Cmd->cmdHash)
@@ -31058,20 +31148,23 @@
 
             # Extract the 'm' component, a single character in the range A-Z, or a sequence of
             #   characters in the form [xxx] or [xxx/yyy]
-            if ($inputString =~ m/^\[([A-Za-z0-9\_\/]+)\](.*)/) {
+#            if ($inputString =~ m/^\[([A-Za-z0-9\_\/]+)\](.*)/) {
+            if ($inputString =~ m/^\[([[:word:]\/]+)\](.*)/) {
 
                 $modifier = $1;
                 $inputString = $2;
 
                 # Split (xxx/yyy). If there is more than one '/' character, everything after the
                 #   first one is part of the reverse modifier
-                if ($modifier =~ m/^([A-Za-z0-9\_]+)\/([A-Za-z0-9\_]+)/) {
+#                if ($modifier =~ m/^([A-Za-z0-9\_]+)\/([A-Za-z0-9\_]+)/) {
+                if ($modifier =~ m/^([[:word:]]+)\/([[:word:]]+)/) {
 
                     $modifier = $1;
                     $revModifier = $2;
                 }
 
-            } elsif ($inputString =~ m/^([A-Z])(.*)/) {
+#            } elsif ($inputString =~ m/^([A-Z])(.*)/) {
+            } elsif ($inputString =~ m/^([[:upper:]])(.*)/) {
 
                 $modifier = $1;
                 $inputString = $2;
@@ -31091,20 +31184,23 @@
                 $dir = '';
                 $multiple = 0;
 
-            } elsif ($inputString =~ m/^\(([A-Za-z0-9\_\/]+)\)(.*)/) {
+#            } elsif ($inputString =~ m/^\(([A-Za-z0-9\_\/]+)\)(.*)/) {
+            } elsif ($inputString =~ m/^\(([[:word:]\/]+)\)(.*)/) {
 
                 $dir = $1;
                 $inputString = $2;
 
                 # Split (xxx/yyy). If there is more than one '/' character, everything after the
                 #   first one is part of the reverse modifier
-                if ($dir =~ m/^([A-Za-z0-9\_]+)\/([A-Za-z0-9\_]+)/) {
+#                if ($dir =~ m/^([A-Za-z0-9\_]+)\/([A-Za-z0-9\_]+)/) {
+                if ($dir =~ m/^([[:word:]]+)\/([[:word:]]+)/) {
 
                     $dir = $1;
                     $revDir = $2;
                 }
 
-            } elsif ($inputString =~ m/^([a-z])(.*)/) {
+#            } elsif ($inputString =~ m/^([a-z])(.*)/) {
+            } elsif ($inputString =~ m/^([[:lower:]])(.*)/) {
 
                 $dir = $1;
                 $inputString = $2;
@@ -31291,7 +31387,7 @@
 
         # Local variables
         my (
-            $standardCmd, $userCmd, $cmdObj,
+            $standardCmd, $userCmd, $worldCmd, $cmdObj, $result,
             @inputWord,
         );
 
@@ -31319,64 +31415,95 @@
         #   (built-in) client command
         if (! $axmud::CLIENT->ivExists('userCmdHash', $userCmd)) {
 
-            return $self->writeError(
-                'Unrecognised client command \'' . $userCmd . '\'',
-                $self->_objClass . '->clientCmd',
-            );
+            # Special exception - any primary direction (standard or custom, abbreviated or not)
+            #   is converted to ';allocateexit', for example ';north portal' is converted to
+            #   ';allocateexit north portal'
+            # In addition, a world command in that direction is executed (at the end of this
+            #   function)
+            if ($axmud::CLIENT->ivExists('constPrimaryDirList', $userCmd)) {
+
+                # Standard primary direction
+                $worldCmd = $self->currentDict->ivShow('primaryDirHash', $userCmd);
+                unshift (@inputWord, $userCmd);
+                $userCmd = $standardCmd = 'allocateexit';
+
+            } elsif (defined $self->currentDict->checkPrimaryDir($userCmd)) {
+
+                # Custom primary direction
+                $worldCmd = $userCmd;
+                unshift (@inputWord, $userCmd);
+                $userCmd = $standardCmd = 'allocateexit';
+
+            } else {
+
+                return $self->writeError(
+                    'Unrecognised client command \'' . $userCmd . '\'',
+                    $self->_objClass . '->clientCmd',
+                );
+            }
 
         } else {
 
             # Get the corresponding standard (built-in) command
             $standardCmd = $axmud::CLIENT->ivShow('userCmdHash', $userCmd);
+        }
 
-            # Check that a Perl object for this command actually exists (no reason why it shouldn't,
-            #   but we'll check anyway)
-            if (! $axmud::CLIENT->ivExists('clientCmdHash', $standardCmd)) {
+        # Check that a Perl object for this command actually exists (no reason why it shouldn't,
+        #   but we'll check anyway)
+        if (! $axmud::CLIENT->ivExists('clientCmdHash', $standardCmd)) {
 
-                return $self->writeError(
-                    'Missing client command \'' . $userCmd . '\' in registry',
-                    $self->_objClass . '->clientCmd',
-                );
+            return $self->writeError(
+                'Missing client command \'' . $userCmd . '\' in registry',
+                $self->_objClass . '->clientCmd',
+            );
 
-            } else {
+        } else {
 
-                $cmdObj = $axmud::CLIENT->ivShow('clientCmdHash', $standardCmd);
+            $cmdObj = $axmud::CLIENT->ivShow('clientCmdHash', $standardCmd);
+        }
+
+        # Many commands are not available after a disconnection (however, all commands are available
+        #   in 'connect offline' mode)
+        if ($self->status eq 'disconnected' && ! $cmdObj->disconnectFlag) {
+
+            return $self->writeError(
+                '\'' . $standardCmd . '\' command unavailable while disconnected from the'
+                . ' world',
+                $self->_objClass . '->clientCmd',
+            );
+        }
+
+        # For commands whose ->noBracketFlag is TRUE, we have to re-parse $inputString, this time
+        #   ignoring brackets (...) and diamond brackets <...>
+        if ($cmdObj->noBracketFlag) {
+
+            @inputWord = split(m/\s+/, $inputString);
+        }
+
+        # Replace the first word in @inputWord so that it's the standard (built-in) command, not the
+        #   user command actually typed by the user
+        $inputWord[0] = $standardCmd;
+
+        # Call the corresponding command object's ->do function to execute the command
+        $result = $cmdObj->do($self, $inputString, $userCmd, @inputWord);
+        if (! $result) {
+
+            return undef;
+
+        } else {
+
+            # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+            $axmud::CLIENT->desktopObj->restrictWidgets();
+
+            # If the user typed a command like ';north portal' which was translated into
+            #   ';allocateexit north portal', execute the corresponding world command
+            if ($worldCmd) {
+
+                $self->worldCmd($worldCmd);
             }
 
-            # Many commands are not available after a disconnection (however, all commands are
-            #   available in 'connect offline' mode)
-            if ($self->status eq 'disconnected' && ! $cmdObj->disconnectFlag) {
+            return 1;
 
-                return $self->writeError(
-                    '\'' . $standardCmd . '\' command unavailable while disconnected from the'
-                    . ' world',
-                    $self->_objClass . '->clientCmd',
-                );
-            }
-
-            # For commands whose ->noBracketFlag is TRUE, we have to re-parse $inputString, this
-            #   time ignoring brackets (...) and diamond brackets <...>
-            if ($cmdObj->noBracketFlag) {
-
-                @inputWord = split(m/\s+/, $inputString);
-            }
-
-            # Replace the first word in @inputWord so that it's the standard (built-in) command,
-            #   not the user command actually typed by the user
-            $inputWord[0] = $standardCmd;
-
-            # Call the corresponding command object's ->do function to execute the command
-            if (! $cmdObj->do($self, $inputString, $userCmd, @inputWord)) {
-
-                return undef;
-
-            } else {
-
-                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                $axmud::CLIENT->desktopObj->restrictWidgets();
-
-                return 1;
-            }
         }
     }
 
@@ -31740,7 +31867,8 @@
             #   most world that recognise 'north' won't recognise 'NORTH')
             # Doesn't apply to forced world comments (starting with the sigil ,,), and passwords
             #   have already been processed by this function (hopefully)
-            if (! $forcedFlag && $axmud::CLIENT->convertWorldCmdFlag && $cmd =~ m/^[A-Z]*$/) {
+#            if (! $forcedFlag && $axmud::CLIENT->convertWorldCmdFlag && $cmd =~ m/^[A-Z]*$/) {
+            if (! $forcedFlag && $axmud::CLIENT->convertWorldCmdFlag && $cmd =~ m/^[[:upper:]]*$/) {
 
                 $cmd = lc($cmd);
             }
@@ -32826,7 +32954,7 @@
         if ($exitObj) {
 
             # If protected moves are turned on, don't allow a move through an impassable exit
-            if ($self->worldModelObj->protectedMovesFlag && $exitObj->impassFlag) {
+            if ($self->worldModelObj->protectedMovesFlag && $exitObj->exitOrnament eq 'impass') {
 
                 $self->writeText(
                     'PROTECTED MOVES: \'' . $cmd . '\' uses an impassable exit, so it has been'
@@ -32895,8 +33023,12 @@
             # This command was processed as an assisted move
             return 1;
 
-        } elsif ($standard && $self->worldModelObj->protectedMovesFlag) {
-
+        } elsif (
+            $standard
+            && $self->worldModelObj->protectedMovesFlag
+            # Protected moves mode is not required for rooms in wilderness mode
+            && $roomObj->wildMode eq 'normal'
+        ) {
             $self->writeText(
                 'PROTECTED MOVES: \'' . $cmd . '\' does not correspond to a world model exit, so it'
                 . ' has been blocked (use \';setprotectedmoves off\' to stop these messages)',
@@ -37174,6 +37306,7 @@
 
             # O task.current.advance
             # O task.current.attack
+            # O task.current.channels
             # O task.current.chat
             # O task.current.compass
             # O task.current.condition
@@ -37199,12 +37332,12 @@
                 } else {
 
                     if (
-                        $third eq 'advance' || $third eq 'attack' || $third eq 'chat'
-                        || $third eq 'compass' || $third eq 'condition' || $third eq 'debugger'
-                        || $third eq 'divert' || $third eq 'inventory' || $third eq 'launch'
-                        || $third eq 'locator' || $third eq 'notepad' || $third eq 'rawtext'
-                        || $third eq 'rawtoken' || $third eq 'status' || $third eq 'tasklist'
-                        || $third eq 'watch'
+                        $third eq 'advance' || $third eq 'attack' || $third eq 'channels'
+                        || $third eq 'chat' || $third eq 'compass' || $third eq 'condition'
+                        || $third eq 'debugger' || $third eq 'divert' || $third eq 'inventory'
+                        || $third eq 'launch' || $third eq 'locator' || $third eq 'notepad'
+                        || $third eq 'rawtext' || $third eq 'rawtoken' || $third eq 'status'
+                        || $third eq 'tasklist' || $third eq 'watch'
                     ) {
                         if ($third eq 'rawtext') {
                             $taskIV = 'rawText';
@@ -39603,6 +39736,8 @@
         { $_[0]->{advanceTask} }
     sub attackTask
         { $_[0]->{attackTask} }
+    sub channelsTask
+        { $_[0]->{channelsTask} }
     sub chatTask
         { $_[0]->{chatTask} }
     sub compassTask

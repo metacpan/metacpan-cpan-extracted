@@ -6,9 +6,9 @@ use Net::OpenSSH;
 use IO::Pty;
 
 sub _ssh {
-    my ($self, $host) = @_;
+    my ($self, %args) = @_;
     my $loglevel = DEBUG ? "error" : "quiet";
-    Net::OpenSSH->new($host,
+    Net::OpenSSH->new($args{host},
         async => 1,
         strict_mode => 0,
         timeout => 6,
@@ -19,6 +19,7 @@ sub _ssh {
             -o => "StrictHostKeyChecking=no",
             -o => "UserKnownHostsFile=/dev/null",
             -o => "LogLevel=$loglevel",
+            ($args{configfile} ? (-F => $args{configfile}) : ()),
         ],
     );
 }
@@ -30,9 +31,9 @@ use constant STATE_DISCONNECTING => 4;
 use constant STATE_DONE          => 5;
 
 sub new {
-    my ($class, $host) = @_;
+    my ($class, %args) = @_;
     bless {
-        host => $host,
+        %args,
         ssh => undef,
         cmd => [],
         at_exit => undef,
@@ -112,7 +113,7 @@ sub one_tick {
     if ($ssh and $exit_pid and $ssh->get_master_pid and $exit_pid == $ssh->get_master_pid) {
         DEBUG and logger " FAIL %s, master process exited unexpectedly", $self->host;
         $ssh->master_exited;
-        $self->{exit} = $exit_code;
+        $self->{exit} = $exit_code || -1;
         $self->{_error} = $self->{ssh}->error || "master process exited unexpectedly";
         $self->{state} = STATE_DONE;
         undef $self->{ssh};
@@ -120,7 +121,7 @@ sub one_tick {
 
     if ($self->{state} == STATE_TODO) {
         DEBUG and logger " CONNECT %s", $self->host;
-        $ssh = $self->{ssh} = $self->_ssh($self->{host});
+        $ssh = $self->{ssh} = $self->_ssh(host => $self->{host}, configfile => $self->{configfile});
         $self->{state} = STATE_CONNECTING;
     }
 

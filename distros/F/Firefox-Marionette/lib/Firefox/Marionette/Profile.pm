@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.59';
+our $VERSION = '0.64';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -141,6 +141,7 @@ sub new {
     $profile->set_value( 'dom.disable_open_click_delay',          0,       0 );
     $profile->set_value( 'app.update.auto',                       'false', 0 );
     $profile->set_value( 'app.update.enabled',                    'false', 0 );
+    $profile->set_value( 'devtools.jsonview.enabled',             'false', 0 );
     $profile->set_value( 'network.http. request.max-start-delay', '0',     0 );
     $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
     $profile->set_value( 'browser.startup.homepage_override.mstone',
@@ -271,7 +272,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.59
+Version 0.64
 
 =head1 SYNOPSIS
 

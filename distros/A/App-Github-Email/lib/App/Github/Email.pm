@@ -1,11 +1,11 @@
 package App::Github::Email;
-$App::Github::Email::VERSION = '0.2.1';
+$App::Github::Email::VERSION = '0.3.3';
 # ABSTRACT: Search and print particular Github user emails.
 
 use strict;
 use warnings;
-use v5.10;
 
+use Carp qw(confess); 
 use JSON;
 use LWP::UserAgent;
 use List::MoreUtils qw(uniq);
@@ -37,7 +37,7 @@ sub get_user {
     }
 
     else {
-        die "User is not exist\n";
+        confess("User is not exist.");
     }
 }
 
@@ -55,7 +55,7 @@ App::Github::Email - Search and print particular Github user emails.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.3.3
 
 =head1 SYNOPSIS
 

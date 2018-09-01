@@ -9,7 +9,16 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION=1.0007;
+our $VERSION=1.0008;
+
+our $HANDLE_SQL_STRING=\&stub_function;
+our $HANDLE_EXECUTE=\&handle_execute;
+sub stub_function { }
+
+sub handle_execute {
+  my ($name,$sth,@args)=@_;
+  $sth->execute(@args);
+}
 
 our $CACHE={};
 
@@ -237,16 +246,16 @@ sub get_sth($) {
   return $self->sth_cache->{$method} if exists $self->sth_cache->{$method};
 
   my $query=$self->$method;
-  my $sth=$self->dbh->prepare($query);
+  my $sth;
+  $HANDLE_SQL_STRING->($method,$query,$self->dbh,$sth);
+  $sth=$self->dbh->prepare($query) unless defined($sth);
   return $self->sth_cache->{$method}=$sth;
 }
 
 sub _sessions {
   my ($self) = @_;
   my $data=[];
-  my $sth=$self->get_sth('create_sessions_query');
-
-  $sth->execute();
+  my $sth=$self->get_sth('create_sessions_query');$HANDLE_EXECUTE->('create_sessions_query',$sth,);
 
   while(my $row=$sth->fetchtow_arrayref) {
     push @{$data},@{$row};
@@ -258,8 +267,7 @@ sub _sessions {
 sub find_session {
   my ( $self, $id ) = @_;
 
-  my $sth=$self->get_sth('create_retrieve_query');
-  $sth->execute($id);
+  my $sth=$self->get_sth('create_retrieve_query');$HANDLE_EXECUTE->('create_retrieve_query',$sth,$id);
   my ($s)=$sth->fetchrow_array;
   $sth->finish;
   return $s;
@@ -277,14 +285,13 @@ sub _retrieve {
 
 sub _change_id {
   my ( $self, $old_id, $new_id ) = @_;
-  my $sth=$self->get_sth('create_change_query');
-  $sth->execute($new_id,$old_id);
+  my $sth=$self->get_sth('create_change_query');$HANDLE_EXECUTE->('create_change_query',$sth,$new_id,$old_id);
 }
 
 sub _destroy {
   my ( $self, $id ) = @_;
-  my $sth=$self->get_sth('create_destroy_query');
-  $sth->execute($id);
+
+  my $sth=$self->get_sth('create_destroy_query');$HANDLE_EXECUTE->('create_destroy_query',$sth,$id);
 }
 
 sub _flush {
@@ -296,11 +303,9 @@ sub _flush {
   my $string=nfreeze($data);
     
   if(defined($s)) {
-    my $sth=$self->get_sth('create_update_query');
-    $sth->execute($string,$id);;
+    my $sth=$self->get_sth('create_update_query');$HANDLE_EXECUTE->('create_update_query',$sth,$string,$id);
   } else {
-    my $sth=$self->get_sth('create_flush_query');
-    $sth->execute($id,$string);
+    my $sth=$self->get_sth('create_flush_query');$HANDLE_EXECUTE->('create_flush_query',$sth,$id,$string);
   }
 }
 
@@ -330,6 +335,65 @@ If you access sessions preforking, you will need to reset the statement handle s
 Example:
 
   %{$Dancer2::Session::DatabasePlugin::CACHE}=();
+
+=head1 Specal Examples
+
+=head2 Oracle in general
+
+Oracle has some odd quirks, here is an example configuration that may help solve more than a few problems.
+
+  Database:
+    connections:
+      myoracledb:
+        driver: "Oracle:(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = my.oracle.server.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME=ORACLE.SERVICE.COM)))"
+        username: OracleUser
+        password: 'xxxxxxx'
+        dbi_params:
+           RaiseError: 1
+           AutoCommit: 1
+           FetchHashKeyName: 'NAME_uc'
+           LongReadLen: 1000000
+
+=head2 The manual bind example ( Oracle and the like )
+
+Some databases require manual binds for blob.  Here is an example of how to do this for Oracle.
+
+  use DBD::Oracle qw(:ora_types);
+  use Dancer2;
+  use Dancer2::Plugin::Database;
+  use Dancer2::Plugin::SessionDatabase;
+
+  $Dancer2::Session::DatabasePlugin::HANDLE_EXECUTE=sub {
+    my ($name,$sth,@bind)=@_;
+    if($name eq 'create_update_query') {
+      my ($string,$id)=@bind;
+      $sth->bind_param(1,$string,{ora_type => ORA_BLOB });
+      $sth->bind_param(2,$id,{ora_type => ORA_VARCHAR2});
+      $sth->execute();
+    } elsif($name eq 'create_flush_query') {
+      my ($id,$string)=@bind;
+      $sth->bind_param(1,$id,{ora_type => ORA_VARCHAR2});
+      $sth->bind_param(2,$string,{ora_type => ORA_BLOB });
+      $sth->execute();
+    } else {
+      $sth->execute(@bind);
+    }
+  };
+
+=head2 Completly Changing an SQL statement
+
+Sometimes you may want to replace the query created with something entierly new.  To do this you will need to set $HANDLE_SQL_STRING function refrerence.
+
+  use Dancer2;
+  use Dancer2::Plugin::Database;
+  use Dancer2::Plugin::SessionDatabase;
+
+  $Dancer2::Session::DatabasePlugin::HANDLE_SQL_STRING=sub {
+    my ($name)=@_;
+    if($name eq 'query_to_alter') {
+      $_[1]='some new sql statement';
+    }
+  };
 
 =head1 See Also
 

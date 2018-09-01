@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.22.7"
+         "version" : "v4.23.0"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -263,6 +263,9 @@
       "Sisimai::Mail::Mbox" : {
          "file" : "lib/Sisimai/Mail/Mbox.pm"
       },
+      "Sisimai::Mail::Memory" : {
+         "file" : "lib/Sisimai/Mail/Memory.pm"
+      },
       "Sisimai::Mail::STDIN" : {
          "file" : "lib/Sisimai/Mail/STDIN.pm"
       },
@@ -434,7 +437,7 @@
          "web" : "https://github.com/sisimai/p5-Sisimai"
       }
    },
-   "version" : "v4.22.7",
+   "version" : "v4.23.0",
    "x_contributors" : [
       "jcbf <underspell@gmail.com>",
       "Jonathan Leroy <jonathan@inikup.com>",
@@ -446,6 +449,8 @@
       "Adrian Yee <adrian@gt.net>",
       "root <root@bwt-1.squaremx.com>",
       "batarian71 <36008612+batarian71@users.noreply.github.com>",
+      "Xavier Guimard <x.guimard@free.fr>",
+      "Stefan Hornburg (Racke) <racke@linuxia.de>",
       "azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>",
       "azumakuniyuki <azumakuniyuki@gmail.com>"
    ]

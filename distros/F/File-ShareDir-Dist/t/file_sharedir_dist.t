@@ -3,7 +3,7 @@ use warnings;
 use overload ();
 use Test::More;
 use File::Spec;
-use File::ShareDir::Dist qw( dist_share );
+use File::ShareDir::Dist qw( dist_share dist_config );
 
 sub slurp
 {
@@ -197,6 +197,54 @@ subtest 'override' => sub {
 
     is slurp($file), "s1\n", 'file content matches';
     
+  };
+
+};
+
+subtest 'dist_config' => sub {
+
+  subtest 'non-dist' => sub {
+
+    local @INC = (File::Spec->rel2abs(File::Spec->catdir(qw( corpus lib1 ))));
+    
+    is_deeply(
+      dist_config('Foo-Bar-Baz'),
+      {},
+    );
+  
+  };
+
+  subtest 'dist, but missing share dir' => sub {
+
+    local @INC = (File::Spec->rel2abs(File::Spec->catdir(qw( corpus lib2 ))));
+    
+    is_deeply(
+      dist_config('Foo-Bar-Baz'),
+      {},
+    );
+  
+  };
+
+  subtest 'dist, but missing config.pl' => sub {
+
+    local @INC = (File::Spec->rel2abs(File::Spec->catdir(qw( corpus lib3 ))));
+    
+    is_deeply(
+      dist_config('Foo-Bar-Baz'),
+      {},
+    );
+  
+  };
+
+  subtest 'dist, with config.pl' => sub {
+
+    local @INC = (File::Spec->rel2abs(File::Spec->catdir(qw( corpus withconfig ))));
+    
+    is_deeply(
+      dist_config('Foo-Bar-Baz'),
+      { key1 => 'val1' },
+    );
+  
   };
 
 };

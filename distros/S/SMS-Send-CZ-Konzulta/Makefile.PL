@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "SMS::Send driver for Konzulta - Czech Republic ",
+  "ABSTRACT" => "SMS::Send driver for Konzulta - Czech Republic",
   "AUTHOR" => "Radek \x{160}iman <rbit\@rbit.cz>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"
@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "Log::LogLite" => 0,
     "SMS::Send::Driver" => 0,
+    "Text::Unidecode" => 0,
     "XML::Simple" => 0,
     "base" => 0,
     "strict" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "SMS::Send" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.000",
+  "VERSION" => "1.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "SMS::Send" => 0,
   "SMS::Send::Driver" => 0,
   "Test::More" => 0,
+  "Text::Unidecode" => 0,
   "XML::Simple" => 0,
   "base" => 0,
   "strict" => 0,

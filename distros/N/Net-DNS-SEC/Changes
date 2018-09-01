@@ -1,6 +1,12 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.10 Aug 31, 2018
+
+	make test_cover
+	now collects SEC.xs test coverage metrics using gcc and gcov.
+
+
 **** 1.09 Jun 4, 2018
 
 	Avoid use of EC_GROUP_new, EC_GROUP_set_curve_GFp, and
@@ -591,4 +597,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1684 2018-06-04 09:03:04Z willem $
+$Id: Changes 1708 2018-08-31 12:22:27Z willem $

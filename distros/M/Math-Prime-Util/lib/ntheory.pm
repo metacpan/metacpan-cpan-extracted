@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $ntheory::AUTHORITY = 'cpan:DANAJ';
-  $ntheory::VERSION = '0.70';
+  $ntheory::VERSION = '0.71';
 }
 
 BEGIN {
@@ -92,6 +92,8 @@ Tags:
   twin_prime_count_approx(n)          fast approx count of twin primes
   nth_twin_prime(n)                   the nth twin prime (n=1 returns 3)
   nth_twin_prime_approx(n)            fast approximate nth twin prime
+  semiprime_count(n)                  count of semiprimes <= n
+  semiprime_count(start, end)         count of semiprimes in range
   ramanujan_prime_count(n)            count of Ramanujan primes <= n
   ramanujan_prime_count(start, end)   count of Ramanujan primes in range
   ramanujan_prime_count_lower(n)      fast lower bound for Ramanujan count
@@ -122,6 +124,9 @@ Tags:
   forprimes { ... } [start,] end      loop over primes in range
   forcomposites { ... } [start,] end  loop over composites in range
   foroddcomposites {...} [start,] end loop over odd composites in range
+  forsemiprimes {...} [start,] end    loop over semiprimes in range
+  forfactored {...} [start,] end      loop with factors
+  forsquarefree {...} [start,] end    loop with factors of square-free n
   fordivisors { ... } n               loop over the divisors of n
   forpart { ... } n [,{...}]          loop over integer partitions
   forcomp { ... } n [,{...}]          loop over integer compositions
@@ -145,6 +150,7 @@ Tags:
   csrand(data)                        seed the CSPRNG with binary data
   srand([seed])                       simple seed (exported with :rand)
   rand([limit])                       alias for drand (exported with :rand)
+  random_factored_integer(n)          random [1..n] and array ref of factors
 
 =head2 RANDOM PRIMES
 
@@ -271,7 +277,7 @@ Tags:
 
 =head1 COPYRIGHT
 
-Copyright 2011-2017 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
+Copyright 2011-2018 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

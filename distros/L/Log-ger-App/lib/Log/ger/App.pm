@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2018-08-07'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-08-30'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -134,7 +134,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,7 @@ If you also do logging in your script:
 This module basically loads L<Log::ger::Output::Composite> with some sensible
 defaults and allows customizing some aspects via environment variable.
 
-B<Outputs:>
+=head2 Default outputs
 
  Code                            Screen  File                   Syslog
  ------------------------------  ------  ----                   ------
@@ -164,20 +164,57 @@ B<Outputs:>
  Script running as root          y       /var/log/PROGNAME.log  -
  Daemon                          -       /var/log/PROGNAME.log  y
 
-B<General log level:> the default is C<warn> (like L<Log::ger>'s default). You
-can set it from environment using L<LOG_LEVEL> (e.g. C<LOG_LEVEL=trace> to set
-level to trace or L<LOG_LEVEL=0> to turn off logging). Alternatively, you can
-set to C<trace> using C<TRACE=1>, or C<debug> with C<DEBUG=1>, C<info> with
-C<VERBOSE=1>, C<error> with C<QUIET=1>.
+=head2 Determining if script is a daemon
 
-B<Per-output level:> the default is to use general level, but you can set a
-different level using I<OUTPUT_NAME>_{C<LOG_LEVEL|TRACE|DEBUG|VERBOSE|QUIET>}
+Log::ger::App assumes your script is a daemon if some daemon-related modules are
+loaded, e.g. L<App::Daemon>, L<HTTP::Daemon>, L<Net::Daemon>, etc (see the
+source code for the complete list). Alternatively, you can also set
+C<$main::IS_DAEMON> to 1 (0) to specifically state that your script is (not) a
+daemon. Or, you can set it via import argument (see L</"import">).
+
+=head2 Setting general log level
+
+The default is C<warn> (like L<Log::ger>'s default).
+
+B<Via import argument.> You can set general log level via import argument (see
+L</"import">) but users of your script will not be able to customize it.
+
+B<Via environment variables.> You can also set general log level from
+environment using C<LOG_LEVEL> (e.g. C<LOG_LEVEL=trace> to set level to trace or
+C<LOG_LEVEL=0> to turn off logging). Alternatively, you can set to C<trace>
+using C<TRACE=1>, or C<debug> with C<DEBUG=1>, C<info> with C<VERBOSE=1>,
+C<error> with C<QUIET=1>.
+
+=head2 Setting per-output log level
+
+The default is to use general level, but you can set a different level for each
+output using I<OUTPUT_NAME>_{C<LOG_LEVEL|TRACE|DEBUG|VERBOSE|QUIET>} environment
 variables. For example, C<SCREEN_DEBUG=1> to set screen level to C<debug> or
 C<FILE_LOG_LEVEL=off> to turn off file logging.
 
+=head2 Showing timestamp
+
+Timestamps are shown in log files. On the screen, timestamps are not shown by
+default. To show timestamps on the screen, set C<LOG_ADD_TIMESTAMP> to true. For
+example, when timestamps are not shown:
+
+ myprog: First log message
+ myprog: Doing task 1 ...
+ myprog: Doing task 2 ...
+
+When timestamps are shown:
+
+ myprog: [2018-08-30T15:14:50] First log message
+ myprog: [2018-08-30T15:14:50] Doing task 1 ...
+ myprog: [2018-08-30T15:15:01] Doing task 2 ...
+
 =head1 FUNCTIONS
 
-=head2 $pkg->import(%args)
+=head2 import
+
+Usage:
+
+ $pkg->import(%args)
 
 Arguments:
 
@@ -192,6 +229,13 @@ variable like described previously in L</"DESCRIPTION">.
 
 Explicitly set program name. Otherwise, default will be taken from C<$0> (after
 path and '.pl' suffix is removed) or set to C<prog>.
+
+Program name will be shown on the screen, e.g.:
+
+ myprog: First log message
+ myprog: Doing task 1 ...
+ myprog: Doing task 2 ...
+ myprog: Exiting ...
 
 =item * daemon => bool
 
@@ -214,17 +258,25 @@ configuration.
 Boolean. Default to false. If set to true, will add timestamps to the screen
 log. Normally, timestamps will only be added to the file log.
 
-=head2 LOG_LEVEL => str
+=head2 LOG_LEVEL
 
-Can be set to C<off> or numeric/string log level.
+String. Can be set to C<off> or numeric/string log level.
 
-=head2 TRACE => bool
+=head2 TRACE
 
-=head2 DEBUG => bool
+Bool.
 
-=head2 VERBOSE => bool
+=head2 DEBUG
 
-=head2 QUIET => bool
+Bool.
+
+=head2 VERBOSE
+
+Bool.
+
+=head2 QUIET
+
+Bool.
 
 =head2 SCREEN_LOG_LEVEL
 

@@ -105,12 +105,21 @@
 - divsum and divsummult as block functions.
   The latter does sum = vecprod(1 + f(p_i) + f(p_i^2) + ... f(p_i^e) for all p.
 
+- Consider Lim-Lee random prime generation, optionally with proof.
+  https://pdfs.semanticscholar.org/fd1d/864a95d7231eaf133b00a1757ee5d0bf0e07.pdf
+  libgcrypt/cipher/primegen.c
+
+- More formal random prime generation for pedantic FIPS etc. users, with
+  guarantee of specific algorithm.
+
 - surround_primes
 
 - More Montgomery: znlog, catalan
 
 - polymul, polyadd, polydiv, polyneg, polyeval, polyorder, polygcd, polylcm, polyroots, ...
   A lot of our ops do these mod n, we could make ..mod versions of each.
+
+- poly_is_reducible
 
 - use word-based for-sieve for non-segment.
 
@@ -121,13 +130,24 @@
 - compare wheel_t with primes separated and possibly cached.
 
 - urandomm with bigints could be faster.
-   8.2s  my $f=factorial(144); urandomm($f) for 1..5e5;
+   7.7s  my $f=factorial(144); urandomm($f) for 1..5e5;
+   6.2s  my $f=factorial(144); urandomm("$f") for 1..5e5;
+   4.8s  my $f="".factorial(144); urandomm($f) for 1..5e5;
    5.3s  use Math::GMP qw/:constant/; my $f=factorial(144); urandomm($f) for 1..5e5;
-   1.8s  my $f=Math::Prime::Util::GMP::factorial(144); Math::Prime::Util::GMP::urandomm($f) for 1..5e5;
+   1.7s  my $f=Math::Prime::Util::GMP::factorial(144); Math::Prime::Util::GMP::urandomm($f) for 1..5e5;
+  In the first case, we're calling ""->bstr->_str once for validation in MPU
+  and and once for use in MPU::GMP.
+  The last case is all strings with no read/write bigint objects anywhere.
 
 - Destroy csprng context on thread destruction.
 
 - submit bug report for Perl error in 30b8ab3
+
+- localized a/b in vecreduce, see:
+  https://metacpan.org/diff/file?target=REHSACK/List-MoreUtils-XS-0.428/&source=HERMES%2FList-MoreUtils-XS-0.427_001#XS.xs
+  perl #92264 (sort in 5.27.7)
+
+- consider #define PERL_REENTRANT
 
 - add back formultiperm optimization if we can get around lastfor issue.
 
@@ -144,4 +164,23 @@
 
 - update prime count lower/upper from https://arxiv.org/pdf/1703.08032.pdf
 
-- Consider Lim-Lee random prime generation, optionally with proof.
+- urandomr
+
+- circular primes ... just use repdigits after 1M?  https://oeis.org/A068652
+
+- Figure out how to use multicall for forfactored and forsquarefree.
+
+- perhaps square-free flag for factor for early stop.  Use in moebius etc.
+
+- make a NVCONST, define log, sqrt, etc. for quadmath vs. long double
+
+- move most of our long double routines to NVCONST (see above).
+
+- Change from Kalai to Bach's algorithm for random factored integers
+  https://maths-people.anu.edu.au/~brent/pd/multiplication-HK.pdf
+
+- Adjust crossover in random_factored_integer PP code for Kalai vs. naive
+
+- Pari/GP 2.12 beta has rewritten (much faster) Bernoulli.  Check it out.
+
+- semiprime_count PP just walk if small range.

@@ -1,4 +1,4 @@
-# $Id: 10-keyset.t 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
+# $Id: 10-keyset.t 1705 2018-08-23 10:24:02Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -338,16 +338,16 @@ $rr = Net::DNS::RR->new(
 push( @sigrr, $rr );
 
 
-my $ks = Net::DNS::SEC::Keyset->new( \@keyrr, \@sigrr );
+my $ks = Net::DNS::SEC::Keyset->new( [@keyrr], [@sigrr] );
 
 ok( $ks, "Keyset created from two arrays." );
 
 
 my @ks_sigs = $ks->sigs;
-ok( eq_array( \@ks_sigs, \@sigrr ), "Sigs out equal to sigs in" );
+ok( eq_array( [@ks_sigs], [@sigrr] ), "Sigs out equal to sigs in" );
 
 my @ks_keys = $ks->keys;
-my @keydiff = key_difference( \@keyrr, \@ks_keys );
+my @keydiff = key_difference( [@keyrr], [@ks_keys] );
 
 is( scalar(@keydiff), 0, "Keys out equal to keys in" );
 
@@ -401,8 +401,8 @@ ok( $exception ||= '', "unwritable file\t[$exception]" );
 
 
 # 0.17 backward compatibility (exercise code for test coverage only)
-eval { my $scalar = key_difference( \@keyrr, \@ks_sigs, [] ); };
-eval { my @array = key_difference( \@keyrr, \@ks_sigs ); };
+eval { my $scalar = key_difference( [@keyrr], [@ks_sigs], [] ); };
+eval { my @array = key_difference( [@keyrr], [@ks_sigs] ); };
 
 
 exit;

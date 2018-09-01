@@ -4,6 +4,7 @@
 #include <math.h>
 
 #define FUNC_isqrt  1
+#define FUNC_icbrt  1
 #define FUNC_gcd_ui 1
 #define FUNC_is_perfect_square 1
 #define FUNC_clz 1
@@ -50,12 +51,9 @@ static const unsigned short primes_small[] =
    1949,1951,1973,1979,1987,1993,1997,1999,2003,2011};
 #define NPRIMES_SMALL (sizeof(primes_small)/sizeof(primes_small[0]))
 
-
-/* The main factoring loop */
-/* Puts factors in factors[] and returns the number found. */
-int factor(UV n, UV *factors)
+static int _small_trial_factor(UV n, UV *factors, UV *newn, uint32_t *lastf)
 {
-  int nsmallfactors, nfactors = 0;   /* Number of factored in factors result */
+  int nfactors = 0;
   uint32_t f = 7;
 
   if (n > 1) {
@@ -65,11 +63,11 @@ int factor(UV n, UV *factors)
   }
 
   if (f*f <= n) {
-    UV const lastsp = 83;
-    UV sp = 4;
+    uint32_t const lastsp = 83;
+    uint32_t sp = 4;
     /* Trial division from 7 to 421.  Use 32-bit if possible. */
     if (n <= 4294967295U) {
-      unsigned int un = n;
+      uint32_t un = n;
       while (sp < lastsp) {
         while ( (un%f) == 0 ) {
           factors[nfactors++] = f;
@@ -91,7 +89,7 @@ int factor(UV n, UV *factors)
     }
     /* If n is small and still composite, finish it here */
     if (n < 2011*2011 && f*f <= n) {  /* Trial division from 431 to 2003 */
-      unsigned int un = n;
+      uint32_t un = n;
       while (sp < NPRIMES_SMALL) {
         while ( (un%f) == 0 ) {
           factors[nfactors++] = f;
@@ -103,10 +101,131 @@ int factor(UV n, UV *factors)
       n = un;
     }
   }
-  if (f*f > n) {
-    if (n != 1) factors[nfactors++] = n;
-    return nfactors;
+  if (f*f > n && n != 1) {
+    factors[nfactors++] = n;
+    n = 1;
   }
+  if (newn) *newn = n;
+  if (lastf) *lastf = f;
+  return nfactors;
+}
+
+static int _power_factor(UV n, UV *factors)
+{
+  int nfactors, i, j, k = powerof(n);
+  if (k > 1) {
+    UV p = rootof(n, k);
+    nfactors = factor(p, factors);
+    for (i = nfactors; i >= 0; i--)
+      for (j = 0; j < k; j++)
+        factors[k*i+j] = factors[i];
+    return k*nfactors;
+  }
+  factors[0] = n;
+  return 1;
+}
+
+/* Find one factor of an input n. */
+int factor_one(UV n, UV *factors, int primality, int trial)
+{
+  int nfactors;
+  if (n < 4) {
+    factors[0] = n;
+    return (n == 1) ? 0 : 1;
+  }
+  /* TODO: deal with small n */
+  if (trial) {
+    uint32_t sp, f;
+    if (!(n&1)) { factors[0] = 2; factors[1] = n >> 1; return 2; }
+    if (!(n%3)) { factors[0] = 3; factors[1] = n / 3; return 2; }
+    if (!(n%5)) { factors[0] = 5; factors[1] = n / 5; return 2; }
+    for (sp = 4; (f = primes_small[sp]) < 2011; sp++) {
+      if ( (n % f) == 0 )
+        { factors[0] = f; factors[1] = n/f; return 2; }
+    }
+    if (n < f*f) { factors[0] = n; return 1; }
+  }
+  if (primality && is_prime(n)) {
+    factors[0] = n;
+    return 1;
+  }
+#if 0  /* Simple solution, just fine on x86_64 */
+  nfactors = (n < 1073741824UL) ? holf32(n, factors, 1000000)
+                                : pbrent_factor(n, factors, 500000, 1);
+  if (nfactors < 2) croak("factor_one failed on %lu\n", n);
+#endif
+  {
+    /* Adjust the number of rounds based on the number size and speed */
+    UV const nbits = BITS_PER_WORD - clz(n);
+#if USE_MONTMATH
+    UV const br_rounds = 8000 + (9000 * ((nbits <= 45) ? 0 : (nbits-45)));
+    UV const sq_rounds = 200000;
+#elif MULMODS_ARE_FAST
+    UV const br_rounds =  500 + ( 200 * ((nbits <= 45) ? 0 : (nbits-45)));
+    UV const sq_rounds = 100000;
+#else
+    UV const br_rounds = (nbits >= 63) ? 120000 : (nbits >= 58) ? 500 : 0;
+    UV const sq_rounds = 200000;
+#endif
+
+#if BITS_PER_WORD == 64
+    /* For small semiprimes the fastest solution is HOLF under 32, then
+     * Lehman (no trial) under 38.  However on random inputs, HOLF is
+     * best only under 28-30 bits, and adding Lehman is always slower. */
+    if (nbits <= 30) { /* This should always succeed */
+      nfactors = holf32(n, factors, 1000000);
+      if (nfactors > 1) return nfactors;
+    }
+#endif
+    /* Almost all inputs are factored here */
+    if (br_rounds > 0) {
+      nfactors = pbrent_factor(n, factors, br_rounds, 1);
+      if (nfactors > 1) return nfactors;
+    }
+#if USE_MONTMATH
+    nfactors = pbrent_factor(n, factors, 2*br_rounds, 3);
+    if (nfactors > 1) return nfactors;
+#endif
+    /* Random 64-bit inputs at this point:
+     *   About 3.1% are small enough that we did with HOLF.
+     *   montmath:  96.89% pbrent,  0.01% pbrent2
+     *   fast:      73.43% pbrent, 21.97% squfof, 1.09% p-1, 0.49% prho, long
+     *   slow:      75.34% squfof, 19.47% pbrent, 0.20% p-1, 0.06% prho
+     */
+    /* SQUFOF with these parameters gets 99.9% of everything left */
+    if (nbits <= 62) {
+      nfactors = squfof_factor(n, factors, sq_rounds);
+      if (nfactors > 1) return nfactors;
+    }
+    /* At this point we should only have 16+ digit semiprimes. */
+    nfactors = pminus1_factor(n, factors, 8000, 120000);
+    if (nfactors > 1) return nfactors;
+    /* Get the stragglers */
+    nfactors = prho_factor(n, factors, 120000);
+    if (nfactors > 1) return nfactors;
+    nfactors = pbrent_factor(n, factors, 500000, 5);
+    if (nfactors > 1) return nfactors;
+    nfactors = prho_factor(n, factors, 120000);
+    if (nfactors > 1) return nfactors;
+    croak("factor_one failed on %lu\n", n);
+  }
+  return nfactors;
+}
+
+/******************************************************************************/
+/*                              Main factor loop                              */
+/*                                                                            */
+/* Puts factors in factors[] and returns the number found.                    */
+/******************************************************************************/
+int factor(UV n, UV *factors)
+{
+  UV tofac_stack[MPU_MAX_FACTORS+1];
+  int nsmallfactors, npowerfactors, nfactors, i, j, ntofac = 0;
+  uint32_t f;
+
+  nfactors = _small_trial_factor(n, factors, &n, &f);
+  if (n == 1) return nfactors;
+
 #if BITS_PER_WORD == 64
   /* For small values less than f^3, use simple factor to split semiprime */
   if (n < 100000000 && n < f*f*f) {
@@ -119,110 +238,17 @@ int factor(UV n, UV *factors)
   nsmallfactors = nfactors;
 
   /* Perfect powers.  Factor root only once. */
-  {
-    int i, j, k = powerof(n);
-    if (k > 1) {
-      UV p = rootof(n, k);
-      nfactors = factor(p, factors+nsmallfactors);
-      for (i = nfactors; i >= 0; i--)
-        for (j = 0; j < k; j++)
-          factors[nsmallfactors+k*i+j] = factors[nsmallfactors+i];
-      return nsmallfactors + k*nfactors;
-    }
-  }
-
-  {
-  UV tofac_stack[MPU_MAX_FACTORS+1];
-  int i, j, ntofac = 0;
-  int const verbose = _XS_get_verbose();
+  npowerfactors = _power_factor(n, factors+nsmallfactors);
+  if (npowerfactors > 1) return nsmallfactors + npowerfactors;
 
   /* loop over each remaining factor, until ntofac == 0 */
   do {
     while ( (n >= f*f) && (!is_def_prime(n)) ) {
-      int split_success = 0;
-      /* Adjust the number of rounds based on the number size and speed */
-      UV const nbits = BITS_PER_WORD - clz(n);
-#if USE_MONTMATH
-      UV const br_rounds = 8000 + (9000 * ((nbits <= 45) ? 0 : (nbits-45)));
-      UV const sq_rounds = 200000;
-#elif MULMODS_ARE_FAST
-      UV const br_rounds =  500 + ( 200 * ((nbits <= 45) ? 0 : (nbits-45)));
-      UV const sq_rounds = 100000;
-#else
-      UV const br_rounds = (nbits >= 63) ? 120000 : (nbits >= 58) ? 500 : 0;
-      UV const sq_rounds = 200000;
-#endif
-
-#if BITS_PER_WORD == 64
-      /* For small semiprimes the fastest solution is HOLF under 32, then
-       * Lehman (no trial) under 38.  However on random inputs, HOLF is
-       * best only under 28-30 bits, and adding Lehman is always slower. */
-      if (!split_success && nbits <= 30) { /* This should always succeed */
-        split_success = holf32(n, tofac_stack+ntofac, 1000000)-1;
-        if (verbose) printf("holf %d\n", split_success);
-      }
-#endif
-      /* Almost all inputs are factored here */
-      if (!split_success && br_rounds > 0) {
-        split_success = pbrent_factor(n, tofac_stack+ntofac, br_rounds, 1)-1;
-        if (verbose) printf("pbrent %d\n", split_success);
-      }
-#if USE_MONTMATH
-      if (!split_success) {
-        split_success = pbrent_factor(n, tofac_stack+ntofac, 2*br_rounds, 3)-1;
-        if (verbose) printf("second pbrent %d\n", split_success);
-      }
-#endif
-      /* Random 64-bit inputs at this point:
-       *   About 3.1% are small enough that we did with HOLF.
-       *   montmath:  96.89% pbrent,  0.01% pbrent2
-       *   fast:      73.43% pbrent, 21.97% squfof, 1.09% p-1, 0.49% prho, long
-       *   slow:      75.34% squfof, 19.47% pbrent, 0.20% p-1, 0.06% prho
-       */
-      /* SQUFOF with these parameters gets 99.9% of everything left */
-      if (!split_success && nbits <= 62) {
-        split_success = squfof_factor(n,tofac_stack+ntofac, sq_rounds)-1;
-        if (verbose) printf("squfof %d\n", split_success);
-      }
-      /* At this point we should only have 16+ digit semiprimes. */
-      if (!split_success) {
-        split_success = pminus1_factor(n, tofac_stack+ntofac, 8000, 120000)-1;
-        if (verbose) printf("pminus1 %d\n", split_success);
-        /* Get the stragglers */
-        if (!split_success) {
-          split_success = prho_factor(n, tofac_stack+ntofac, 120000)-1;
-          if (verbose) printf("long prho %d\n", split_success);
-          if (!split_success) {
-            split_success = pbrent_factor(n, tofac_stack+ntofac, 500000, 5)-1;
-            if (verbose) printf("long pbrent %d\n", split_success);
-          }
-        }
-      }
-
-      if (split_success) {
-        MPUassert( split_success == 1, "split factor returned more than 2 factors");
-        ntofac++; /* Leave one on the to-be-factored stack */
-        if ((tofac_stack[ntofac] == n) || (tofac_stack[ntofac] == 1))
-          croak("bad factor\n");
-        n = tofac_stack[ntofac];  /* Set n to the other one */
-      } else {
-        /* Nothing should ever get here, but we're paranoid. */
-        UV m = f % 30;
-        UV limit = isqrt(n);
-        if (verbose) printf("doing trial on %"UVuf"\n", n);
-        while (f <= limit) {
-          if ( (n%f) == 0 ) {
-            do {
-              n /= f;
-              factors[nfactors++] = f;
-            } while ( (n%f) == 0 );
-            limit = isqrt(n);
-          }
-          f += wheeladvance30[m];
-          m =  nextwheel30[m];
-        }
-        break;  /* We just factored n via trial division.  Exit loop. */
-      }
+      int split_success = factor_one(n, tofac_stack+ntofac, 0, 0) - 1;
+      if (split_success != 1 || tofac_stack[ntofac] == 1 || tofac_stack[ntofac] == n)
+        croak("internal: factor_one failed to factor %"UVuf"\n", n);
+      ntofac++; /* Leave one on the to-be-factored stack */
+      n = tofac_stack[ntofac];  /* Set n to the other one */
     }
     /* n is now prime (or 1), so add to already-factored stack */
     if (n != 1)  factors[nfactors++] = n;
@@ -236,7 +262,6 @@ int factor(UV n, UV *factors)
     for (j = i; j > 0 && factors[j-1] > fi; j--)
       factors[j] = factors[j-1];
     factors[j] = fi;
-  }
   }
   return nfactors;
 }
@@ -266,7 +291,6 @@ int factor_exp(UV n, UV *factors, UV* exponents)
   }
   return j;
 }
-
 
 int trial_factor(UV n, UV *factors, UV f, UV last)
 {
@@ -1220,6 +1244,145 @@ int lehman_factor(UV n, UV *factors, int do_trial) {
   factors[0] = n;
   return 1;
 }
+
+static const uint32_t _fr_chunk = 8192;
+static const uint32_t _fr_sieve_crossover = 10000000;  /* About 10^14 */
+
+static void _vec_factor(UV lo, UV hi, UV *nfactors, UV *farray, UV noffset, int square_free)
+{
+  UV *N, j, n, sqrthi, sievelim;
+  sqrthi = isqrt(hi);
+  n = hi-lo+1;
+  New(0, N, hi-lo+1, UV);
+  for (j = 0; j < n; j++) {
+    N[j] = 1;
+    nfactors[j] = 0;
+  }
+  sievelim = (sqrthi < _fr_sieve_crossover) ? sqrthi : icbrt(hi);
+  START_DO_FOR_EACH_PRIME(2, sievelim) {
+    UV q, t, A;
+    if (square_free == 0) {
+      UV kmin = hi / p;
+      for (q = p; q <= kmin; q *= p) {
+        t = lo / q, A = t * q;
+        if (A < lo) A += q;
+        for (j = A-lo; j < n; j += q) {
+          farray[ j*noffset + nfactors[j]++ ] = p;
+          N[j] *= p;
+        }
+      }
+    } else {
+      q = p*p, t = lo / q, A = t * q;
+      if (A < lo) A += q;
+      for (j = A-lo; j < n; j += q) {
+        N[j] = 0;
+        nfactors[j] = 0;
+      }
+      q = p, t = lo / q, A = t * q;
+      if (A < lo) A += q;
+      for (j = A-lo; j < n; j += q) {
+        if (N[j] > 0) {
+          farray[ j*noffset + nfactors[j]++ ] = p;
+          N[j] *= p;
+        }
+      }
+    }
+  } END_DO_FOR_EACH_PRIME
+
+  if (sievelim == sqrthi) {
+    /* Handle the unsieved results, which are prime */
+    for (j = 0; j < n; j++) {
+      if (N[j] == 1)
+        farray[ j*noffset + nfactors[j]++ ] = j+lo;
+      else if (N[j] > 0 && N[j] != j+lo)
+        farray[ j*noffset + nfactors[j]++ ] = (j+lo) / N[j];
+    }
+  } else {
+    /* Handle the unsieved results, which are prime or semi-prime */
+    for (j = 0; j < n; j++) {
+      UV rem = j+lo;
+      if (N[j] > 0 && N[j] != rem) {
+        if (N[j] != 1)
+          rem /= N[j];
+        if (square_free && is_perfect_square(rem)) {
+          nfactors[j] = 0;
+        } else {
+          UV* f = farray + j*noffset + nfactors[j];
+          nfactors[j] += factor_one(rem, f, 1, 0);
+        }
+      }
+    }
+  }
+  Safefree(N);
+}
+
+factor_range_context_t factor_range_init(UV lo, UV hi, int square_free) {
+  factor_range_context_t ctx;
+  ctx.lo = lo;
+  ctx.hi = hi;
+  ctx.n = lo-1;
+  ctx.is_square_free = square_free ? 1 : 0;
+  if (hi-lo+1 > 100) {        /* Sieve in chunks */
+    if (square_free) ctx._noffset = (hi <= 42949672965UL) ? 10 : 15;
+    else             ctx._noffset = BITS_PER_WORD - clz(hi);
+    ctx._coffset = _fr_chunk;
+    New(0, ctx._nfactors, _fr_chunk, UV);
+    New(0, ctx._farray, _fr_chunk * ctx._noffset, UV);
+    { /* Prealloc all the sieving primes now. */
+      UV t = isqrt(hi);
+      if (t >= _fr_sieve_crossover) t = icbrt(hi);
+      get_prime_cache(t, 0);
+    }
+  } else {                    /* factor each number */
+    New(0, ctx.factors, square_free ? 15 : 63, UV);
+    ctx._nfactors = 0;
+    ctx._farray = ctx.factors;
+    ctx._noffset = 0;
+  }
+  return ctx;
+}
+
+int factor_range_next(factor_range_context_t *ctx) {
+  int j, nfactors;
+  UV n;
+  if (ctx->n >= ctx->hi)
+    return -1;
+  n = ++(ctx->n);
+  if (ctx->_nfactors) {
+    if (ctx->_coffset >= _fr_chunk) {
+      UV clo = n;
+      UV chi = n + _fr_chunk - 1;
+      if (chi > ctx->hi) chi = ctx->hi;
+      _vec_factor(clo, chi, ctx->_nfactors, ctx->_farray, ctx->_noffset, ctx->is_square_free);
+      ctx->_coffset = 0;
+    }
+    nfactors = ctx->_nfactors[ctx->_coffset];
+    ctx->factors = ctx->_farray + ctx->_coffset * ctx->_noffset;
+    ctx->_coffset++;
+  } else {
+    if (ctx->is_square_free && n >= 49 && (!(n% 4) || !(n% 9) || !(n%25) || !(n%49)))
+      return 0;
+    nfactors = factor(n, ctx->factors);
+    if (ctx->is_square_free) {
+      for (j = 1; j < nfactors; j++)
+        if (ctx->factors[j] == ctx->factors[j-1])
+          break;
+      if (j < nfactors) return 0;
+    }
+  }
+  return nfactors;
+}
+
+void factor_range_destroy(factor_range_context_t *ctx) {
+  if (ctx->_farray != 0) Safefree(ctx->_farray);
+  if (ctx->_nfactors != 0) Safefree(ctx->_nfactors);
+  ctx->_farray = ctx->_nfactors = ctx->factors = 0;
+}
+
+
+/******************************************************************************/
+/* DLP */
+/******************************************************************************/
 
 static UV dlp_trial(UV a, UV g, UV p, UV maxrounds) {
   UV k, t;

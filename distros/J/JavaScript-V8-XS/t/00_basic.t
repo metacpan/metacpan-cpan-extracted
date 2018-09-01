@@ -65,7 +65,6 @@ sub test_eval {
     my @commands = (
         [ "'gonzo'" => 'gonzo' ],
         [ "3+4*5"   => 23 ],
-        [ "true"    => 1 ],
         [ "null"    => undef ],
         [ "print('Hello world from Javascript!');" => undef, 'Hello world from Javascript!' ],
         [ "print(2+3*4)" => undef, '14' ],

@@ -1,87 +1,79 @@
 {
-   "abstract" : "Meta-Wrapper for reading spreadsheet data",
-   "name" : "Spreadsheet-Read",
+   "resources" : {
+      "repository" : {
+         "web" : "https://github.com/Tux/Spreadsheet-Read",
+         "url" : "https://github.com/Tux/Spreadsheet-Read",
+         "type" : "git"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "dynamic_config" : 1,
+   "license" : [
+      "perl_5"
+   ],
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ],
    "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "IO::Scalar" : "0",
+            "File::Temp" : "0.2308",
+            "Data::Peek" : "0.48"
+         },
+         "requires" : {
+            "perl" : "5.008001",
+            "Encode" : "0",
+            "Data::Peek" : "0",
+            "Exporter" : "0",
+            "Data::Dumper" : "0",
+            "File::Temp" : "0.22",
+            "Carp" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "Test::More" : "1.302140"
+         },
          "requires" : {
-            "Test::Harness" : "0",
+            "Test::More" : "0.88",
             "Test::NoWarnings" : "0",
-            "Test::More" : "0.88"
-         },
-         "recommends" : {
-            "Test::More" : "1.302120"
+            "Test::Harness" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {
-            "Data::Dumper" : "0",
-            "Data::Peek" : "0",
-            "Exporter" : "0",
-            "Carp" : "0",
-            "perl" : "5.008001",
-            "Encode" : "0",
-            "File::Temp" : "0.22"
-         },
-         "recommends" : {
-            "IO::Scalar" : "0",
-            "File::Temp" : "0.2304",
-            "Data::Peek" : "0.47"
-         }
-      }
-   },
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "type" : "git",
-         "web" : "https://github.com/Tux/Spreadsheet-Read",
-         "url" : "https://github.com/Tux/Spreadsheet-Read"
       }
    },
    "provides" : {
       "Spreadsheet::Read" : {
-         "file" : "Read.pm",
-         "version" : "0.78"
+         "version" : "0.79",
+         "file" : "Read.pm"
       }
    },
-   "license" : [
-      "perl_5"
-   ],
-   "dynamic_config" : 1,
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-   ],
+   "abstract" : "Meta-Wrapper for reading spreadsheet data",
+   "generated_by" : "Author",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "version" : "0.79",
    "release_status" : "stable",
    "optional_features" : {
-      "opt_tools" : {
-         "description" : "Spreadsheet tools",
+      "opt_excelx" : {
+         "description" : "Provides parsing of Microsoft Excel 2007 files",
          "prereqs" : {
             "runtime" : {
-               "recommends" : {
-                  "Tk::NoteBook" : "0",
-                  "Tk" : "804.034",
-                  "Tk::TableMatrix::Spreadsheet" : "0"
-               }
-            }
-         }
-      },
-      "opt_csv" : {
-         "description" : "Provides parsing of CSV streams",
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "Text::CSV_XS" : "1.34",
-                  "Text::CSV_PP" : "1.95",
-                  "Text::CSV" : "1.95"
-               },
                "requires" : {
-                  "Text::CSV_XS" : "0.71"
+                  "Spreadsheet::ParseXLSX" : "0.13",
+                  "Spreadsheet::ParseExcel::FmtDefault" : "0"
+               },
+               "recommends" : {
+                  "Spreadsheet::ParseXLSX" : "0.27"
                }
             }
          }
@@ -96,39 +88,47 @@
             }
          }
       },
-      "opt_excelx" : {
+      "opt_csv" : {
          "prereqs" : {
             "runtime" : {
                "recommends" : {
-                  "Spreadsheet::ParseXLSX" : "0.27"
+                  "Text::CSV" : "1.97",
+                  "Text::CSV_PP" : "1.97",
+                  "Text::CSV_XS" : "1.36"
                },
                "requires" : {
-                  "Spreadsheet::ParseExcel::FmtDefault" : "0",
-                  "Spreadsheet::ParseXLSX" : "0.13"
+                  "Text::CSV_XS" : "0.71"
                }
             }
          },
-         "description" : "Provides parsing of Microsoft Excel 2007 files"
+         "description" : "Provides parsing of CSV streams"
       },
       "opt_excel" : {
-         "description" : "Provides parsing of Microsoft Excel files",
          "prereqs" : {
             "runtime" : {
+               "recommends" : {
+                  "Spreadsheet::ParseExcel" : "0.65"
+               },
                "requires" : {
                   "Spreadsheet::ParseExcel" : "0.34",
                   "Spreadsheet::ParseExcel::FmtDefault" : "0"
-               },
-               "recommends" : {
-                  "Spreadsheet::ParseExcel" : "0.65"
                }
             }
-         }
+         },
+         "description" : "Provides parsing of Microsoft Excel files"
+      },
+      "opt_tools" : {
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Tk::TableMatrix::Spreadsheet" : "0",
+                  "Tk" : "804.034",
+                  "Tk::NoteBook" : "0"
+               }
+            }
+         },
+         "description" : "Spreadsheet tools"
       }
    },
-   "generated_by" : "Author",
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-   },
-   "version" : "0.78"
+   "name" : "Spreadsheet-Read"
 }

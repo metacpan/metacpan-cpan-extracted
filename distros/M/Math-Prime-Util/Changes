@@ -1,5 +1,42 @@
 Revision history for Perl module Math::Prime::Util
 
+0.71 2018-08-28
+
+    [ADDED]
+
+    - forfactored { ... } a,b         loop n=a..b setting $_=n, @_=factor(n)
+    - forsquarefree { ... } a,b       as forfactored, but only square-free n
+    - forsemiprimes { ... } a,b       as forcomposites, but only semiprimes
+    - random_factored_integer(n)      random [1..n] w/ array ref of factors
+    - semiprime_count([lo],hi)        counts semiprimes in range
+
+    [FIXES]
+
+    - Monolithic sieves beyond 30*2^32 (~ 1.2 * 10^11) overflowed.
+
+    - is_semiprime was wrong for five small values since 0.69.  Fixed.
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - is_primitive_root much faster (doesn't need to calulate totient,
+      and faster rejection when n has no primitive root).
+
+    - znprimroot and znorder use Montgomery, 1.2x to 2x faster.
+
+    - slightly faster sieve_range for native size inputs (use factor_one).
+
+    - bin/primes.pl faster for palindromic primes and works for 10^17
+
+    [OTHER]
+
+    - Added ability to use -DBENCH_SEG for benchmarking sieves using
+      prime_count and ntheory::_segment_pi without table optimizations.
+
+    - Reorg of main factor loop.  Should be identical from external view.
+
+    - Internal change to is_semiprime and is_catalan_pseudoprime.
+
+
 0.70 2017-12-02
 
     [FIXES]

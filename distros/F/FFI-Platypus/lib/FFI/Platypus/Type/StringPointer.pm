@@ -7,7 +7,7 @@ use Scalar::Util qw( readonly );
 use Config ();
 
 # ABSTRACT: Convert a pointer to a string and back
-our $VERSION = '0.53'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 use constant _incantation =>
@@ -76,7 +76,7 @@ FFI::Platypus::Type::StringPointer - Convert a pointer to a string and back
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

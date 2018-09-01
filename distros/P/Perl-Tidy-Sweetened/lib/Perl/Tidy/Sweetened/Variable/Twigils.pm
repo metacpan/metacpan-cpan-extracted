@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 $|++;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -96,7 +96,7 @@ Perl::Tidy::Sweetened::Variable::Twigils - Perl::Tidy::Sweetened filter plugin t
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -142,32 +142,6 @@ Then back into the original twigiled variable in the C<postfilter>.
 =head1 AUTHOR
 
 Mark Grimes E<lt>mgrimes@cpan.orgE<gt>
-
-=head1 CONTRIBUTORS
-
-=over 4
-
-=item *
-
-Kent Fredric (@kentnl)
-
-=item *
-
-Gregoy Oschwald (@oschwal)
-
-=item *
-
-Curtis Brandt (@aggrolite)
-
-=item *
-
-@pblaberge
-
-=item *
-
-Peter Roberts (@pwr22)
-
-=back
 
 =head1 SOURCE
 

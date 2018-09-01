@@ -9,6 +9,7 @@ pod_spelling_system:
     - Champoux
     - Yanick
     - yanick
+    - EUMM
 
 pod_coverage:
   skip: 0

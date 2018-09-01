@@ -1,7 +1,10 @@
 Revision history for Catmandu-FileStore
 
+1.12  2018-08-29 14:22:03 CEST
+    - Replacing writes with syswrites and better checks on number of bytes written
+
 1.11  2018-06-28 11:30:58 CEST
     - Fixing Windows tests
-    
+
 1.10  2018-06-25 13:37:20 CEST
     - initial version

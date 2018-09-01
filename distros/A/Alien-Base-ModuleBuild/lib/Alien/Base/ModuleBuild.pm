@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use parent 'Module::Build';
 
@@ -1266,6 +1266,10 @@ sub _catdir {
 
 __END__
 __POD__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 

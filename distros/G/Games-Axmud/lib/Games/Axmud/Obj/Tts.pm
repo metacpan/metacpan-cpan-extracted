@@ -34,8 +34,8 @@
         #
         # Expected arguments
         #   $name       - A unique string name for this TTS object (max 16 chars, containing
-        #                   A-Za-z0-9_ - 1st char can't be number. Reserved names in
-        #                   $axmud::CLIENT->constReservedHash allowed)
+        #                   A-Za-z0-9_ - 1st char can't be number, non-Latin alphabets acceptable.
+        #                   Reserved names in $axmud::CLIENT->constReservedHash allowed)
         #   $engine     - TTS engine to use (must be one of the values in
         #                   GA::CLIENT->constTTSList)
         #
@@ -76,7 +76,8 @@
         }
 
         # Check that $name is valid and not already in use by another TTS object
-        if (! ($name =~ m/^[A-Za-z_]{1}[A-Za-z0-9_]{0,15}$/)) {
+#        if (! ($name =~ m/^[A-Za-z_]{1}[A-Za-z0-9_]{0,15}$/)) {
+        if (! ($name =~ m/^[[:alpha:]\_]{1}[[:word:]]{0,15}$/)) {
 
             return $axmud::CLIENT->writeError(
                 'Registry naming error: invalid name \'' . $name . '\'',
@@ -199,8 +200,9 @@
         #
         # Expected arguments
         #   $name       - A unique string name for this TTS object (max 16 chars, containing
-        #                   A-Za-z0-9_ - 1st char can't be number. Must not exist as a key in the
-        #                   global hash of reserved names, $axmud::CLIENT->constReservedHash)
+        #                   A-Za-z0-9_ - 1st char can't be number, non-Latin alphabets acceptable.
+        #                   Must not exist as a key in the global hash of reserved names,
+        #                   $axmud::CLIENT->constReservedHash)
         #
         # Return values
         #   'undef' on improper arguments or if $name is invalid

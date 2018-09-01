@@ -32,7 +32,7 @@ subtest 'if service found' => sub {
 
             get_request_url => sub {
                 my ($url, $query) = @_;
-                is $url, 'http://codecov.io/upload/v2';
+                is $url, 'https://codecov.io/upload/v2';
                 cmp_deeply $query, { key => 'value' };
                 return 'http://www.example.com';
             },

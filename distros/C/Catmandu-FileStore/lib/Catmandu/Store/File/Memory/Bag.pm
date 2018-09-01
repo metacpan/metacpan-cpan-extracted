@@ -1,6 +1,6 @@
 package Catmandu::Store::File::Memory::Bag;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Catmandu::Sane;
 use Moo;
@@ -73,6 +73,8 @@ sub add {
             unless defined($io);
 
         $io->write($str);
+
+        bytes::length($str);
     };
 
     $self->store->_files->{$name}->{$id} = clone($data);

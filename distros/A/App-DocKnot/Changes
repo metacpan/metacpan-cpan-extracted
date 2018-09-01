@@ -1,12 +1,36 @@
                        User-Visible DocKnot Changes
 
+DocKnot 1.06 (2018-08-31)
+
+    When generating text output, put the footnotes containing URLs for
+    links immediately following the containing paragraph rather than the
+    end of the text block.  This is both more readable and avoids odd
+    placement of the footnotes when a template adds further paragraphs to
+    the end of a text block containing footnotes.
+
+    Do not wrap paragraphs in output that seem to be a bunch of short
+    lines, and add support for broken quotes (multiple short lines, such
+    as poetry) in quotes in the thread template.
+
+    Adjust the README and README.md template to say that make warnings
+    requires either GCC or Clang, instead of only mentioning GCC.
+
+    Adjust the README.md wording for the list information URL when package
+    releases are announced on a mailing list.
+
+    Add support for additional developer documentation links in the thread
+    output template.
+
+    Add support for contributed program documentation links in the thread
+    output template.
+
 DocKnot 1.05 (2018-05-05)
 
     Add the Travis-CI badge to README.md and a link to Travis-CI to the
     thread development links if the vcs.travis key is set in
     metadata.json.
 
-    Add a Status.io badge for the CPAN version to README.md and a link to
+    Add a Shields.io badge for the CPAN version to README.md and a link to
     metacpan.org in the thread output if the distribution.cpan key is set
     in metadata.json.
 

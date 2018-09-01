@@ -177,6 +177,7 @@
     use Games::Axmud::Obj::Gauge;
     use Games::Axmud::Obj::GaugeLevel;
     use Games::Axmud::Obj::Gmcp;
+    use Games::Axmud::Obj::GridColour;
     use Games::Axmud::Obj::Keycode;
     use Games::Axmud::Obj::Link;
     use Games::Axmud::Obj::Loop;
@@ -192,6 +193,7 @@
     use Games::Axmud::Obj::Regionmap;
     use Games::Axmud::Obj::RegionPath;
     use Games::Axmud::Obj::Repeat;
+    use Games::Axmud::Obj::RoomFlag;
     use Games::Axmud::Obj::Route;
     use Games::Axmud::Obj::SkillHistory;
     use Games::Axmud::Obj::Sound;
@@ -3551,9 +3553,9 @@
         foreach my $key (keys %hash) {
 
             if (defined $hash{$key}) {
-                $self->writeDebug('  key ' . $key . ' value ' . $hash{$key});
+                $self->writeDebug('  key: ' . $key . ' value: ' . $hash{$key});
             } else {
-                $self->writeDebug('  key ' . $key . ' value <<UNDEF>>');
+                $self->writeDebug('  key: ' . $key . ' value: <<UNDEF>>');
             }
         }
 

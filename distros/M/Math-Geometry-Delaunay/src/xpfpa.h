@@ -157,7 +157,63 @@
                 return _xpfpa_result; \
             }
 
-#elif defined(HAVE__FPU_SETCW) // glibc systems
+
+#elif defined(HAVE__FESETENV) // C++11 fenv.h available
+
+// fenv.h defines functions fegetenv and fesetenv and type fenv_t
+# include <fenv.h>
+
+#define _FPU_EXTENDED 0x300
+#define _FPU_DOUBLE   0x200
+#define _FPU_SINGLE   0x0
+
+# define XPFPA_DECLARE() \
+            fenv_t _xpfpa_fpu;
+            unsigned short int _xpfpa_fpu_oldcw;
+
+# define XPFPA_SWITCH_DOUBLE() \
+            fegetenv(&_xpfpa_fpu); \
+            _xpfpa_fpu_oldcw = _xpfpa_fpu.__control_word; \
+            _xpfpa_fpu.__control_word = (_xpfpa_fpu_oldcw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE; \
+            fesetenv(&_xpfpa_fpu);
+# define XPFPA_SWITCH_SINGLE() \
+            fegetenv(&_xpfpa_fpu); \
+            _xpfpa_fpu_oldcw = _xpfpa_fpu.__control_word; \
+            _xpfpa_fpu.__control_word = (_xpfpa_fpu_oldcw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE; \
+            fesetenv(&_xpfpa_fpu);
+# define XPFPA_SWITCH_DOUBLE_EXTENDED() \
+            fegetenv(&_xpfpa_fpu); \
+            _xpfpa_fpu_oldcw = _xpfpa_fpu.__control_word; \
+            _xpfpa_fpu.__control_word = (_xpfpa_fpu_oldcw & ~_FPU_SINGLE & ~_FPU_DOUBLE) | _FPU_EXTENDED; \
+            fesetenv(&_xpfpa_fpu);
+# define XPFPA_RESTORE() \
+            fegetenv(&_xpfpa_fpu); \
+            _xpfpa_fpu.__control_word = _xpfpa_fpu_oldcw; \
+            fesetenv(&_xpfpa_fpu);
+// We use a temporary volatile variable (in a new block) in order to ensure
+// that the optimizer does not mis-optimize the instructions. Also, a volatile
+// variable ensures truncation to correct precision.
+# define XPFPA_RETURN_DOUBLE(val) \
+            { \
+                volatile double _xpfpa_result = (val); \
+                XPFPA_RESTORE() \
+                return _xpfpa_result; \
+            }
+# define XPFPA_RETURN_SINGLE(val) \
+            { \
+                volatile float _xpfpa_result = (val); \
+                XPFPA_RESTORE() \
+                return _xpfpa_result; \
+            }
+# define XPFPA_RETURN_DOUBLE_EXTENDED(val) \
+            { \
+                volatile long double _xpfpa_result = (val); \
+                XPFPA_RESTORE() \
+                return _xpfpa_result; \
+            }
+
+
+#elif defined(HAVE__FPU_SETCW) // older glibc fpu_control.h
 
 // fpu_control.h defines _FPU_[GS]ETCW
 # include <fpu_control.h>
@@ -200,6 +256,7 @@
                 XPFPA_RESTORE() \
                 return _xpfpa_result; \
             }
+
 
 #elif defined(HAVE_FPSETPREC) // FreeBSD
 

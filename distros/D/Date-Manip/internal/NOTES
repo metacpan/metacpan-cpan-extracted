@@ -162,7 +162,7 @@ Update the copyright
      sed -e "s,\(Copyright (c) ....\)\-.... \(Sullivan Beck\),\1-$y \2," $i > z
      mv z $i
    done
-   chmod +x internal/tzdata internal/gen_dm5abbrevs examples/dm_*
+   chmod +x internal/tzdata internal/gen_dm5abbrevs examples/dm_* internal/langpod
 
 #########################################################################
 Switch the system timezone to America/Central and run the tests.

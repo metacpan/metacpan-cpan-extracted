@@ -5,9 +5,14 @@ project.  Listed here are only the things left to be done.
 
 Metadata required for README files:
 
-* Hacking requirements
+* Contributor information (step-by-step guide, checklists)
 * Generate a separate install file for Debian packaging
 * Pointers to long licenses
+* Where releases are announced
+* Quick-start guide
+* Jargon
+* Release schedule
+* Contributor SLA
 
 Metadata required for web pages:
 

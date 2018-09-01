@@ -1,5 +1,5 @@
 package JMAP::Tester::Logger;
-$JMAP::Tester::Logger::VERSION = '0.020';
+$JMAP::Tester::Logger::VERSION = '0.021';
 use Moo::Role;
 
 use JMAP::Tester::LogWriter;
@@ -28,6 +28,7 @@ has writer => (
       if ($value =~ /\A-([1-9][0-9]*)\z/) {
         open my $handle, '>&', "$1"
           or die "can't dup fd $1 for logger output: $!";
+        $handle->autoflush(1);
         return JMAP::Tester::LogWriter::Handle->new({ handle => $handle });
       }
 
@@ -69,7 +70,7 @@ JMAP::Tester::Logger
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

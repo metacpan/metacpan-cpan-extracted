@@ -1,0 +1,8 @@
+Revision history for namespace-local
+
+0.02    Tue Aug 28 2018
+        CPAN release
+
+0.01    Sun Aug 26 2018
+        first version, resets symbol table on use line & on scope exit
+

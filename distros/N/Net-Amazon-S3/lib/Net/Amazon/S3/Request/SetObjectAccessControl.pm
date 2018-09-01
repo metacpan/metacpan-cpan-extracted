@@ -1,21 +1,27 @@
 package Net::Amazon::S3::Request::SetObjectAccessControl;
-$Net::Amazon::S3::Request::SetObjectAccessControl::VERSION = '0.84';
+$Net::Amazon::S3::Request::SetObjectAccessControl::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
 # ABSTRACT: An internal class to set an object's access control
 
-with 'Net::Amazon::S3::Role::Bucket';
-
-has 'key'       => ( is => 'ro', isa => 'Str',             required => 1 );
-has 'acl_short' => ( is => 'ro', isa => 'Maybe[AclShort]', required => 0 );
 has 'acl_xml'   => ( is => 'ro', isa => 'Maybe[Str]',      required => 0 );
+
+with 'Net::Amazon::S3::Request::Role::Query::Action::Acl';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
 
 __PACKAGE__->meta->make_immutable;
 
-sub http_request {
-    my $self = shift;
+sub _request_content {
+    my ($self) = @_;
+
+    return $self->acl_xml || '';
+}
+
+sub BUILD {
+    my ($self) = @_;
 
     unless ( $self->acl_xml || $self->acl_short ) {
         confess "need either acl_xml or acl_short";
@@ -24,19 +30,6 @@ sub http_request {
     if ( $self->acl_xml && $self->acl_short ) {
         confess "can not provide both acl_xml and acl_short";
     }
-
-    my $headers
-        = ( $self->acl_short )
-        ? { 'x-amz-acl' => $self->acl_short }
-        : {};
-    my $xml = $self->acl_xml || '';
-
-    return $self->_build_http_request(
-        method  => 'PUT',
-        path    => $self->_uri( $self->key ) . '?acl',
-        headers => $headers,
-        content => $xml,
-    );
 }
 
 1;
@@ -53,7 +46,7 @@ Net::Amazon::S3::Request::SetObjectAccessControl - An internal class to set an o
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::GMP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::GMP::VERSION = '0.50';
+  $Math::Prime::Util::GMP::VERSION = '0.51';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -65,11 +65,13 @@ our @EXPORT_OK = qw(
                      prime_count prime_count_lower prime_count_upper
                      primorial
                      pn_primorial
-                     factorial factorialmod
+                     factorial subfactorial multifactorial factorial_sum
+                     factorialmod
                      consecutive_integer_lcm
                      partitions bernfrac bernreal harmfrac harmreal stirling
                      zeta li ei riemannr lambertw
-                     logreal expreal powreal agmreal
+                     addreal subreal mulreal divreal
+                     logreal expreal powreal rootreal agmreal
                      gcd lcm kronecker valuation binomial gcdext hammingweight
                      invmod sqrtmod addmod mulmod divmod powmod
                      vecsum vecprod
@@ -190,7 +192,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal logreal expreal powreal agmreal stirling zeta li ei riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint todigits urandomb urandomr
+=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal addreal subreal mulreal divreal logreal expreal powreal rootreal agmreal stirling zeta li ei riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint todigits urandomb urandomr
 
 =head1 NAME
 
@@ -199,7 +201,7 @@ Math::Prime::Util::GMP - Utilities related to prime numbers and factoring, using
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 
 =head1 SYNOPSIS
@@ -1090,11 +1092,49 @@ defined as the product of the integers 1 to C<n> with the special case
 of C<factorial(0) = 1>.  This corresponds to Pari's C<factorial(n)>
 and Mathematica's C<Factorial[n]> functions.
 
+=head2 multifactorial
+
+Given two positive integer arguments C<n> and C<m>, returns C<n!^(m)>,
+the multifactorial.  C<m=1> is the standard L</factorial> while C<m=2>
+is the double factorial.  While the factorial is the product of all
+integers C<n> and below, the multifactorial skips those without the
+same parity as C<n mod m>.  Hence
+
+  multifactorial(n,2) = n * (n-2) * (n-4) * ...
+
+The multifactorials are the OEIS series
+(m=1) L<OEIS series A000142|http://oeis.org/A000142>,
+(m=2) L<OEIS series A006882|http://oeis.org/A006882>,
+(m=3) L<OEIS series A007661|http://oeis.org/A007661>,
+(m=4) L<OEIS series A007662|http://oeis.org/A007662>, ...
+
+Also see L<Peter Luschny's excellent writeup|http://oeis.org/wiki/User:Peter_Luschny/Multifactorials>.
+
 =head2 factorialmod
 
 Given two positive integer arguments C<n> and C<m>, returns C<n! mod m>.
 This is much faster than computing the large C<factorial(n)> followed
 by a mod operation.
+
+=head2 factorial_sum
+
+Given positive integer argument C<n>, returns the factorial sum of C<n>.
+This is defined as the sum of C<factorial(k)> for C<0 .. n-1>.  These
+are equivalent, though this function is faster:
+
+  factorial_sum($n) == vecsum(map{ factorial($_) } 0..$n-1)
+
+This is sometimes called the left factorial, confusingly also used for
+L</subfactorial>.  This is L<OEIS series A003422|http://oeis.org/A003422>.
+
+=head2 subfactorial
+
+Given positive integer argument C<n>, returns the subfactorial of C<n>.
+This is also called the derangement number, and occasionally the left
+factorial.
+
+This is L<OEIS series A000166|http://oeis.org/A000166>.
+This corresponds to Mathematica's C<Subfactorial[n]> function.
 
 =head2 gcd
 
@@ -1165,6 +1205,15 @@ case.  GMP's API does not allow negative C<k> but otherwise matches.
 L<Math::BigInt> does not implement any extensions and the results for
 C<n E<lt> 0, k E<gt> 0> are undefined.
 
+=head2 addreal
+=head2 subreal
+=head2 mulreal
+=head2 divreal
+
+Returns the corresponding basic math operation applied to the two inputs.
+An optional third argument indicates the number of significant digits
+(default 40) with the result rounded.
+
 =head2 logreal
 
 Returns the natural logarithm of the input C<n>.
@@ -1196,6 +1245,15 @@ An optional third argument indicates the number of significant digits
 Like L<logreal> and L<expreal>, this is a basic math function that is
 not available from the GMP library but implemented in MPFR.  Since the
 latter is not always available, this can be useful to have.
+
+=head2 rootreal
+
+Returns the C<n>-th root of C<x> for the inputs C<n> and C<x>.
+An optional third argument indicates the number of significant digits
+(default 40) with the result rounded.
+
+This is just C<powreal(x^(1/n)>, but allows C<n> to be easily specified
+in full precision.
 
 =head2 agmreal
 

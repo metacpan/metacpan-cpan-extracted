@@ -21,11 +21,11 @@ while (length($xx) < 4) {
 	$yy .= "\r\n";
     }
 }
-open my $f0, '>', 't/test10.txt';
+open my $f0, '>:raw', 't/test10.txt';
 print $f0 $yy;
 close $f0;
 
-my $z = open my $fh, '<:irs(\r\n|\r|\n)', "t/test10.txt";
+my $z = open my $fh, '<:raw:irs(\r\n|\r|\n)', "t/test10.txt";
 ok($z && $fh, 'Acme::InputRecordSeparatorIsRegexp::open ok');
 ok(tied(*$fh), 'return tied handle');
 
@@ -102,7 +102,7 @@ ok($rs eq "op|qr|s", "IO::Handle::input_record_separator monkey patched");
 ok(tied *$f3, 'set input_record_separator ties file handle');
 close $f3;
 
-open my $f4, "<", "t/test10.txt";
+open my $f4, "<:raw", "t/test10.txt";
 ok(!tied *$f4, "regular file handle not tied");
 $f4->input_record_separator( qr/\r\n|\r|\n/ );
 $rs = $f4->input_record_separator;

@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.70';
+  $Math::Prime::Util::PP::VERSION = '0.71';
 }
 
 BEGIN {
@@ -146,6 +146,7 @@ sub _validate_positive_integer {
     $_[0] = _bigint_to_int($_[0]) if $n <= INTMAX;
   } else {
     my $strn = "$n";
+    if ($strn eq '-0') { $_[0] = 0; $strn = '0'; }
     croak "Parameter '$strn' must be a positive integer"
       if $strn eq '' || ($strn =~ tr/0123456789//c && $strn !~ /^\+?\d+$/);
     if ($n <= INTMAX) {
@@ -174,6 +175,7 @@ sub _validate_integer {
     $_[0] = _bigint_to_int($_[0]) if $n <= $poscmp && $n >= $negcmp;
   } else {
     my $strn = "$n";
+    if ($strn eq '-0') { $_[0] = 0; $strn = '0'; }
     croak "Parameter '$strn' must be an integer"
       if $strn eq '' || ($strn =~ tr/-0123456789//c && $strn !~ /^[-+]?\d+$/);
     if ($n <= $poscmp && $n >= $negcmp) {
@@ -891,7 +893,10 @@ sub euler_phi {
 
   my @pe = Math::Prime::Util::factor_exp($n);
 
-  if (ref($n) ne 'Math::BigInt') {
+  if ($#pe == 0 && $pe[0]->[1] == 1) {
+    if (ref($n) ne 'Math::BigInt') { $totient *= $n-1; }
+    else                           { $totient->bmul($n->bdec()); }
+  } elsif (ref($n) ne 'Math::BigInt') {
     foreach my $f (@pe) {
       my ($p, $e) = @$f;
       $totient *= $p - 1;
@@ -986,12 +991,13 @@ sub is_semiprime {
 
 sub _totpred {
   my($n, $maxd) = @_;
-  return 0 if (ref($n) ? $n->is_odd() : ($n & 1));
+  return 0 if $maxd <= 1 || (ref($n) ? $n->is_odd() : ($n & 1));
+  $n = Math::BigInt->new("$n") unless ref($n) || $n < INTMAX;
   $n >>= 1;
   return 1 if $n == 1 || ($n < $maxd && Math::Prime::Util::is_prime(2*$n+1));
   for my $d (Math::Prime::Util::divisors($n)) {
     last if $d >= $maxd;
-    my $p = ($d < (~0 >> 1))  ?  ($d<<1)+1  :  Math::Prime::Util::vecprod(2,$d)+1;
+    my $p = ($d < (INTMAX >> 1))  ?  ($d<<1)+1  :  Math::Prime::Util::vecprod(2,$d)+1;
     next unless Math::Prime::Util::is_prime($p);
     my $r = int($n / $d);
     while (1) {
@@ -1113,19 +1119,26 @@ sub exp_mangoldt {
 
 sub carmichael_lambda {
   my($n) = @_;
-  return euler_phi($n) if $n < 8;                # = phi(n) for n < 8
-  return euler_phi($n)/2 if ($n & ($n-1)) == 0;  # = phi(n)/2 for 2^k, k>2
+  return euler_phi($n) if $n < 8;          # = phi(n) for n < 8
+  return $n >> 2 if ($n & ($n-1)) == 0;    # = phi(n)/2 = n/4 for 2^k, k>2
 
   my @pe = Math::Prime::Util::factor_exp($n);
   $pe[0]->[1]-- if $pe[0]->[0] == 2 && $pe[0]->[1] > 2;
 
-  my $lcm = Math::BigInt::blcm(
-    map { $_->[0]->copy->bpow($_->[1]->copy->bdec)->bmul($_->[0]->copy->bdec) }
-    map { [ map { Math::BigInt->new("$_") } @$_ ] }
-    @pe
-  );
-  $lcm = _bigint_to_int($lcm) if $lcm->bacmp(BMAX) <= 0;
-  return $lcm;
+  my $lcm;
+  if (!ref($n)) {
+    $lcm = Math::Prime::Util::lcm(
+      map { ($_->[0] ** ($_->[1]-1)) * ($_->[0]-1) } @pe
+    );
+  } else {
+    $lcm = Math::BigInt::blcm(
+      map { $_->[0]->copy->bpow($_->[1]->copy->bdec)->bmul($_->[0]->copy->bdec) }
+      map { [ map { Math::BigInt->new("$_") } @$_ ] }
+      @pe
+    );
+    $lcm = _bigint_to_int($lcm) if $lcm->bacmp(BMAX) <= 0;
+  }
+  $lcm;
 }
 
 sub is_carmichael {
@@ -1298,11 +1311,10 @@ sub divisor_sum {
   # Also separate BigInt and do fiddly bits for better performance.
 
   my @factors = Math::Prime::Util::factor_exp($n);
-  my $product = (!$will_overflow) ? 1 : BONE->copy;
+  my $product = 1;
+  my @fm;
   if ($k == 0) {
-    foreach my $f (@factors) {
-      $product *= ($f->[1] + 1);
-    }
+    $product = Math::Prime::Util::vecprod(map { $_->[1]+1 } @factors);
   } elsif (!$will_overflow) {
     foreach my $f (@factors) {
       my ($p, $e) = @$f;
@@ -1324,23 +1336,35 @@ sub divisor_sum {
       }
       $product *= $fmult;
     }
+  } elsif ($k == 1) {
+    foreach my $f (@factors) {
+      my ($p, $e) = @$f;
+      my $pk = Math::BigInt->new("$p");
+      if ($e == 1) { push @fm, $pk->binc; next; }
+      my $fmult = $pk->copy->binc;
+      my $pke = $pk->copy;
+      for my $E (2 .. $e) {
+        $pke->bmul($pk);
+        $fmult->badd($pke);
+      }
+      push @fm, $fmult;
+    }
+    $product = Math::Prime::Util::vecprod(@fm);
   } else {
     my $bik = Math::BigInt->new("$k");
     foreach my $f (@factors) {
       my ($p, $e) = @$f;
       my $pk = Math::BigInt->new("$p")->bpow($bik);
-      if    ($e == 1) { $pk->binc(); $product->bmul($pk); }
-      elsif ($e == 2) { $pk->badd($pk*$pk)->binc(); $product->bmul($pk); }
-      else {
-        my $fmult = $pk->copy->binc;
-        my $pke = $pk->copy;
-        for my $E (2 .. $e) {
-          $pke->bmul($pk);
-          $fmult->badd($pke);
-        }
-        $product->bmul($fmult);
+      if ($e == 1) { push @fm, $pk->binc; next; }
+      my $fmult = $pk->copy->binc;
+      my $pke = $pk->copy;
+      for my $E (2 .. $e) {
+        $pke->bmul($pk);
+        $fmult->badd($pke);
       }
+      push @fm, $fmult;
     }
+    $product = Math::Prime::Util::vecprod(@fm);
   }
   $product;
 }
@@ -1963,6 +1987,23 @@ sub twin_prime_count {
     $sum += scalar(@{Math::Prime::Util::twin_primes($low,$seghigh)});
     $low = $seghigh + 1;
   }
+  $sum;
+}
+sub _semiprime_count {
+  my $n = shift;
+  my($sum,$pc) = (0,0);
+  Math::Prime::Util::forprimes( sub {
+    $sum += Math::Prime::Util::prime_count(int($n/$_))-$pc++;
+  }, sqrtint($n));
+  $sum;
+}
+sub semiprime_count {
+  my($low,$high) = @_;
+  if (defined $high) { _validate_positive_integer($low); }
+  else               { ($low,$high) = (2, $low);         }
+  _validate_positive_integer($high);
+  # todo: threshold of fast count vs. walk
+  my $sum = _semiprime_count($high) - (($low < 4) ? 0 : semiprime_count($low-1));
   $sum;
 }
 sub ramanujan_prime_count {
@@ -3438,6 +3479,7 @@ sub factorialmod {
 
 sub _is_perfect_square {
   my($n) = @_;
+  return (1,1,0,0,1)[$n] if $n <= 4;
 
   if (ref($n) eq 'Math::BigInt') {
     my $mc = _bigint_to_int($n & 31);
@@ -3997,8 +4039,8 @@ sub is_extra_strong_lucas_pseudoprime {
 
   my($U, $V, $Qk) = lucas_sequence($n, $P, $Q, $k);
 
-  return 1 if $U == 0 && ($V == BTWO || $V == ($n - BTWO));
   $V = Math::BigInt->new("$V") unless ref($V) eq 'Math::BigInt';
+  return 1 if $U == 0 && ($V == BTWO || $V == ($n - BTWO));
   foreach my $r (0 .. $s-2) {
     return 1 if $V->is_zero;
     $V->bmul($V)->bsub(BTWO)->bmod($n);
@@ -4244,7 +4286,7 @@ sub is_mersenne_prime {
   return 0 if $p > 3 && $p % 4 == 3 && $p < ((~0)>>1) && is_prob_prime($p*2+1);
   my $mp = BONE->copy->blsft($p)->bdec;
 
-  # Definitely faster than using Math::BigInt
+  # Definitely faster than using Math::BigInt that doesn't have GMP.
   return (0 == (Math::Prime::Util::GMP::lucas_sequence($mp, 4, 1, $mp+1))[0])
     if $Math::Prime::Util::_GMPfunc{"lucas_sequence"};
 
@@ -5405,30 +5447,6 @@ sub ramanujan_tau {
     }
   }
 
-  if (0) {
-    my $n2 = Math::Prime::Util::vecprod($n,$n);
-    my $n5 = Math::Prime::Util::vecprod($n2,$n2,$n);
-    my $lim = 2*Math::Prime::Util::sqrtint($n);
-    my $sum = Math::Prime::Util::vecsum(
-                map { Math::Prime::Util::vecprod(
-                        int(Math::Prime::Util::GMP::powreal($_,10)),
-                        Math::Prime::Util::hclassno( ($n << 2) - $_*$_ )
-                      )
-                } 1 .. $lim
-              );
-    my $tau = Math::Prime::Util::vecsum(
-                 Math::Prime::Util::vecprod(42,$n5),
-                 Math::Prime::Util::vecprod(-42,$n2,$n2),
-                 Math::Prime::Util::vecprod(-48,$n2,$n),
-                 Math::Prime::Util::vecprod(-27,$n2),
-                 Math::Prime::Util::vecprod(-8,$n),
-                 -1
-              );
-    $tau = vecprod($tau, $n+1);
-    $tau -= $sum;
-    return $tau;
-  }
-
   # _taup is faster for small numbers, but gets very slow.  It's not a huge
   # deal, and the GMP code will probably get run for small inputs anyway.
   vecprod(map { _taupower($_->[0],$_->[1]) } Math::Prime::Util::factor_exp($n));
@@ -5925,7 +5943,7 @@ sub LambertW {
   $w;
 }
 
-my $_Pi = "3.14159265358979323846264338328";
+my $_Pi = "3.141592653589793238462643383279503";
 sub Pi {
   my $digits = shift;
   return 0.0+$_Pi unless $digits;
@@ -6555,6 +6573,24 @@ sub random_unrestricted_semiprime {
   $n;
 }
 
+sub random_factored_integer {
+  my($n) = @_;
+  return (0,[]) if defined $n && int($n) < 0;
+  _validate_positive_integer($n,1);
+
+  while (1) {
+    my @S = ($n);
+    # make s_i chain
+    push @S, 1 + Math::Prime::Util::urandomm($S[-1])  while $S[-1] > 1;
+    # first is n, last is 1
+    @S = grep { is_prime($_) } @S[1 .. $#S-1];
+    my $r = Math::Prime::Util::vecprod(@S);
+    return ($r, [@S]) if $r <= $n && (1+urandomm($n)) <= $r;
+  }
+}
+
+
+
 1;
 
 __END__
@@ -6574,7 +6610,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.70
+Version 0.71
 
 
 =head1 SYNOPSIS

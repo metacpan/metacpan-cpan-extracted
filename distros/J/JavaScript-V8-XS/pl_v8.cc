@@ -5,6 +5,11 @@
 
 #define PL_GC_RUNS 2
 
+#define PL_JSON_CLASS                         "JSON::PP"
+#define PL_JSON_BOOLEAN_CLASS  PL_JSON_CLASS  "::" "Boolean"
+#define PL_JSON_BOOLEAN_TRUE   PL_JSON_CLASS  "::" "true"
+#define PL_JSON_BOOLEAN_FALSE  PL_JSON_CLASS  "::" "false"
+
 using namespace v8;
 
 // A way to compare Local<Object> instances via operator<, which is what a
@@ -100,7 +105,8 @@ static SV* pl_v8_to_perl_impl(pTHX_ V8Context* ctx, const Local<Object>& object,
     }
     else if (object->IsBoolean()) {
         bool val = object->BooleanValue();
-        ret = newSViv(val);
+        ret = get_sv(val ? PL_JSON_BOOLEAN_TRUE : PL_JSON_BOOLEAN_FALSE, 0);
+        SvREFCNT_inc(ret);
     }
     else if (object->IsNumber()) {
         double val = object->NumberValue();
@@ -116,14 +122,6 @@ static SV* pl_v8_to_perl_impl(pTHX_ V8Context* ctx, const Local<Object>& object,
         Local<External> v8_val = Local<External>::Cast(object->Get(v8_key));
         FuncData* data = (FuncData*) v8_val->Value();
         ret = data->func;
-#if 0
-        /* if the JS function has a slot with the Perl callback, */
-        /* then we know we created it, so we return that */
-        if (duk_get_prop_lstring(ctx, pos, PL_SLOT_GENERIC_CALLBACK, sizeof(PL_SLOT_GENERIC_CALLBACK) - 1)) {
-            ret = (SV*) duk_get_pointer(ctx, pos);
-        }
-        duk_pop(ctx); /* pop function / null pointer */
-#endif
     }
     else if (object->IsArray()) {
         MapJ2P::iterator k = seen.find(object);
@@ -204,6 +202,9 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
 {
     Local<Object> ret = Local<Object>::Cast(Null(ctx->isolate));
     if (!SvOK(value)) {
+    } else if (sv_isa(value, PL_JSON_BOOLEAN_CLASS)) {
+        int val = SvTRUE(value);
+        ret = Local<Object>::Cast(Boolean::New(ctx->isolate, val));
     } else if (SvIOK(value)) {
         int val = SvIV(value);
         ret = Local<Object>::Cast(Number::New(ctx->isolate, val));

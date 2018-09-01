@@ -1,5 +1,19 @@
+0.10	30 Aug 2018 - H.Merijn Brand
+    * Skip t/00-md.t in non-devel environments with a message
+    * Mention dead code
+
+0.09	28 Aug 2018 - H.Merijn Brand
+    * MD -> POD fixes/workarounds
+    * More proza
+    * Mention Travis CI
+    * More README
+    * Mention prereqs in META
+    * Reference to perlmodstyle
+    * Add a tickets section
+
 0.08	03 Apr 2018 - H.Merijn Brand
     * Add Travis CI
+    * Some md > POD formatting fixes
 
 0.07	31 Mar 2018 - H.Merijn Brand
     * Add META.resources

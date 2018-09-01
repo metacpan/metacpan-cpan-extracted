@@ -1,5 +1,29 @@
 Revision history for FFI-Platypus
 
+0.55      2018-08-29 10:37:36 -0400
+  - Production release identical to 0.54_03
+
+0.54_03   2018-08-28 10:46:04 -0400
+  - Additional test diagnostics.
+
+0.54_02   2018-08-28 05:30:04 -0400
+  - record as closure argument is now read-only.  This makes
+    sense since such records are actually copies.  For when
+    you need a non-copy use an opaque type instead.  This allows
+    records with rw strings (although they will be ro in the
+    closure).
+
+0.54_01   2018-08-16 03:27:31 -0400
+  - Experimental: allow record as closure argument
+    Records with string_rw are not supported, and
+    will likely crash your script if you try to use
+    them.  Support for such records is probably not in
+    the cards, but a future version may disallow them
+    to avoid crashes.
+  - Closure objects now have a sticky method, similar to what
+    is already available in the discouraged FFI::Platypus::Declare
+    interface
+
 0.53      2018-08-15 20:38:29 -0400
   - Production release identical to 0.52_04
 

@@ -27,10 +27,22 @@
 
 #define REAL double
 #define TRIVOID void
+typedef REAL *vertex;
 
 #include "triangle.h"
 
-/* these let us refer to the struct in triangle.h    */
+/* declare a couple functions in triangle.c not exposed by triangle.h */
+/* mainly to supress compiler warnings */
+
+#ifdef ANSI_DECLARATORS
+REAL counterclockwiseadapt(vertex pa, vertex pb, vertex pc, REAL detsum);
+void exactinit();
+#else /* not ANSI_DECLARATORS */
+void counterclockwiseadapt();
+void exactinit();
+#endif /* not ANSI_DECLARATORS */
+
+/* these let us refer to the struct in triangle.h */
 
 typedef struct triangulateio * Math__Geometry__Delaunay__TriangulateioPtr;
 typedef struct triangulateio   Math__Geometry__Delaunay__Triangulateio;
@@ -62,8 +74,6 @@ intArray * intArrayPtr( int nelem ) {
 /* Triangle's version (removed mesh and behavior params)      */
 /* "The result is also a rough approximation of twice the     */
 /*  signed area of the triangle defined by the three points." */
-
-typedef double * vertex;
 
 /* A global defined in triangle.c */
 extern REAL ccwerrboundA;
@@ -234,7 +244,7 @@ numberof(SV * THIS, int newval = 0)
         STRLEN len;
     CODE:
         if (!sv_derived_from(THIS, "Math::Geometry::Delaunay::Triangulateio")) {croak("Wrong type to numberof()");} 
-        if (SvCUR(SvRV(THIS)) != sizeof(*p)) { croak("Size %d of packed data != expected %d", SvCUR(SvRV(THIS)), sizeof(*p)); }
+        if (SvCUR(SvRV(THIS)) != sizeof(*p)) { croak("Size %lu of packed data != expected %lu", SvCUR(SvRV(THIS)), sizeof(*p)); }
         p = (struct triangulateio *) SvPV((SV*)SvRV(THIS), len);
         
         switch (ix) {
@@ -289,7 +299,7 @@ doubleList(doubleArray * array, ... )
         int orig_items_cnt = (int) items;
     CODE:
         if (!sv_derived_from(ST(0), "Math::Geometry::Delaunay::Triangulateio")) {croak("Wrong type to numberof()");} 
-        if (SvCUR(SvRV(ST(0))) != sizeof(*p)) { croak("Size %d of packed data != expected %d", SvCUR(SvRV(ST(0))), sizeof(*p)); }
+        if (SvCUR(SvRV(ST(0))) != sizeof(*p)) { croak("Size %lu of packed data != expected %lu", SvCUR(SvRV(ST(0))), sizeof(*p)); }
         p = (struct triangulateio *) SvPV((SV*)SvRV(ST(0)), len);
 
         /* setter */
@@ -345,7 +355,7 @@ intList( intArray * array, ... )
         int orig_items_cnt = (int) items;
     CODE:
         if (!sv_derived_from(ST(0), "Math::Geometry::Delaunay::Triangulateio")) {croak("Wrong type to numberof()");} 
-        if (SvCUR(SvRV(ST(0))) != sizeof(*p)) { croak("Size %d of packed data != expected %d", SvCUR(SvRV(ST(0))), sizeof(*p)); }
+        if (SvCUR(SvRV(ST(0))) != sizeof(*p)) { croak("Size %lu of packed data != expected %lu", SvCUR(SvRV(ST(0))), sizeof(*p)); }
         p = (struct triangulateio *) SvPV((SV*)SvRV(ST(0)), len);
         /* setter */
         if (orig_items_cnt > 1) {
@@ -397,7 +407,7 @@ triio_DESTROY(SV * THIS)
         struct triangulateio * p;
     CODE:
         if (!sv_derived_from(ST(0), "Math::Geometry::Delaunay::Triangulateio")) {croak("Wrong type to numberof()");} 
-        if (SvCUR(SvRV(ST(0))) != sizeof(*p)) { croak("Size %d of packed data != expected %d", SvCUR(SvRV(ST(0))), sizeof(*p)); }
+        if (SvCUR(SvRV(ST(0))) != sizeof(*p)) { croak("Size %lu of packed data != expected %lu", SvCUR(SvRV(ST(0))), sizeof(*p)); }
         p = (struct triangulateio *) SvPV((SV*)SvRV(ST(0)), len);
 
         if (p->pointlist)             {trifree(p->pointlist);}

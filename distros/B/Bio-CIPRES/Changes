@@ -1,8 +1,18 @@
 Revision history for Bio-CIPRES
 
+0.004001 2018-09-01
+         Improved checks and safeguards on file downloads
+         Expanded test coverage
+
+0.004    2018-08-31
+         Added Bio::CIPRES::Message class for better message handling
+         Check downloads against advertised size
+         Updated deployment process
+
 0.003004 2018-08-24
          Fixed test to account for small change in output format
          Renamed tests to adjust order
+
 0.003003 2017-04-24
          Fixed bug returning incorrect value for Bio::CIPRES::Job::is_failed()
          Fixed return type of Bio::CIPRES::Job::submit_time()

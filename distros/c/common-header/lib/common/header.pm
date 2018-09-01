@@ -1,12 +1,13 @@
-package common::header v0.1.6;
+package common::header v0.2.1;
 
 # NOTE !!!WARNING!!! don't use indirect with strawberry perl
 # https://rt.cpan.org/Public/Bug/Display.html?id=102321
 
 use utf8;
-use strict qw[refs subs vars];
+use strict qw[subs vars];
+no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
 
-no warnings;    ## no critic qw[TestingAndDebugging::ProhibitNoWarnings]
+no warnings;           ## no critic qw[TestingAndDebugging::ProhibitNoWarnings]
 use warnings (
     'all',
     FATAL => qw[

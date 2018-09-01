@@ -4,7 +4,7 @@
       "Pine Mizune"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "mit"
    ],
@@ -37,6 +37,7 @@
             "Data::Dumper" : "2.154",
             "Data::Section::Simple" : "0.07",
             "Minilla" : "v3.0.1",
+            "Pod::Markdown::Github" : "0.02",
             "Software::License::MIT" : "0.103011",
             "Test::CPAN::Meta" : "0.25",
             "Test::MinimumVersion::Fast" : "0.04",
@@ -84,7 +85,7 @@
    "provides" : {
       "Devel::Cover::Report::Codecov" : {
          "file" : "lib/Devel/Cover/Report/Codecov.pm",
-         "version" : "0.22"
+         "version" : "0.24"
       },
       "Devel::Cover::Report::Codecov::Service::AppVeyor" : {
          "file" : "lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm"
@@ -106,9 +107,6 @@
       },
       "Devel::Cover::Report::Codecov::Service::GitLab" : {
          "file" : "lib/Devel/Cover/Report/Codecov/Service/GitLab.pm"
-      },
-      "Devel::Cover::Report::Codecov::Service::Magnum" : {
-         "file" : "lib/Devel/Cover/Report/Codecov/Service/Magnum.pm"
       },
       "Devel::Cover::Report::Codecov::Service::Mercurial" : {
          "file" : "lib/Devel/Cover/Report/Codecov/Service/Mercurial.pm"
@@ -137,14 +135,16 @@
          "web" : "https://github.com/codecov/codecov-perl"
       }
    },
-   "version" : "0.22",
+   "version" : "0.24",
    "x_authority" : "cpan:PINE",
    "x_contributors" : [
       "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
       "M Somerville <dracos@users.noreply.github.com>",
       "Pedro Melo <melo@simplicidade.org>",
       "Pine Mizune <pinemz@gmail.com>",
-      "stevepeak <steve@stevepeak.net>"
+      "stevepeak <steve@stevepeak.net>",
+      "Álvaro Castellano Vela <alvaro.castellano.vela@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

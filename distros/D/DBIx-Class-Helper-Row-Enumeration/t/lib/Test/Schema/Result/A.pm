@@ -47,6 +47,18 @@ __PACKAGE__->add_columns(
 
 );
 
+__PACKAGE__->add_column(
+
+    bop => {
+        data_type => 'enum',
+        is_nullable => 1,
+        extra     => {
+            list   => [qw/ success fail /],
+        },
+    },
+
+);
+
 __PACKAGE__->set_primary_key('id');
 
 1;

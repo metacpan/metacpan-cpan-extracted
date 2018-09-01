@@ -1,0 +1,88 @@
+{
+   "abstract" : "add return type for a function",
+   "author" : [
+      "Kenta, Kobayashi <kentafly88@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Function-Return",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Function::Parameters" : "0",
+            "Scalar::Util" : "0",
+            "Scope::Upper" : "0",
+            "Sub::Info" : "0",
+            "Sub::Util" : "0",
+            "attributes" : "0",
+            "perl" : "5.014004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98",
+            "Types::Standard" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Function::Return" : {
+         "file" : "lib/Function/Return.pm",
+         "version" : "0.02"
+      },
+      "Function::Return::Info" : {
+         "file" : "lib/Function/Return/Info.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-Function-Return/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-Function-Return",
+      "repository" : {
+         "url" : "git://github.com/kfly8/p5-Function-Return.git",
+         "web" : "https://github.com/kfly8/p5-Function-Return"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:KFLY",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

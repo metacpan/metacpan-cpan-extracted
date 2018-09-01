@@ -1,37 +1,31 @@
 package Net::Amazon::S3::Request::PutObject;
-$Net::Amazon::S3::Request::PutObject::VERSION = '0.84';
+$Net::Amazon::S3::Request::PutObject::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
 # ABSTRACT: An internal class to put an object
 
-with 'Net::Amazon::S3::Role::Bucket';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short';
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Encryption';
+with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
 
-has 'key'       => ( is => 'ro', isa => 'Str',             required => 1 );
 has 'value'     => ( is => 'ro', isa => 'Str|CodeRef|ScalarRef',     required => 1 );
-has 'acl_short' => ( is => 'ro', isa => 'Maybe[AclShort]', required => 0 );
 has 'headers' =>
     ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
-has 'encryption' => ( is => 'ro', isa => 'Maybe[Str]',      required => 0 );
 
 __PACKAGE__->meta->make_immutable;
 
+sub _request_headers {
+    my ($self) = @_;
+
+    return %{ $self->headers };
+}
+
 sub http_request {
     my $self    = shift;
-    my $headers = $self->headers;
-
-    if ( $self->acl_short ) {
-        $headers->{'x-amz-acl'} = $self->acl_short;
-    }
-    if ( defined $self->encryption ) {
-        $headers->{'x-amz-server-side-encryption'} = $self->encryption;
-    }
 
     return $self->_build_http_request(
-        method  => 'PUT',
-        path    => $self->_uri( $self->key ),
-        headers => $self->headers,
         content => $self->value,
     );
 }
@@ -50,7 +44,7 @@ Net::Amazon::S3::Request::PutObject - An internal class to put an object
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

@@ -57,9 +57,19 @@ sub test_ufunc {
   $decoded_rc   .= $missing_val;
   $decoded_rc->indexND($which_rc) .= $nzvals_rc;
 
-  #$decoded_rc = undef if ("${pdl_ufunc_name}:missing=$missing_val:vals" eq 'borover:missing=BAD:vals'); ##-- DEBUG
-  #isok("${pdl_ufunc_name}:missing=$missing_val:type", $nzvals_rc->type, $dense_rc->type);
-  pdlok("${pdl_ufunc_name}:missing=$missing_val:vals", $decoded_rc, $dense_rc);
+  my $label = "${pdl_ufunc_name}:missing=$missing_val";
+
+  ##-- exceptions
+ SKIP: {
+    ##-- RT bug #126294 (see also analogous tests in CCS/t/03_ufuncs.t)
+    ## - maybe test ($Config{stdchar}=~/unsigned/) or ($Config{stdchar} eq 'unsigned char') instead
+    skip("RT #126294 - PDL::borover() appears to be broken", 1)
+      if ($label eq 'borover:missing=BAD' && pdl([10,0,-2])->setvaltobad(0)->borover->sclr != -2);
+
+    ##-- actual test
+    #isok("${label}:type", $nzvals_rc->type, $dense_rc->type);
+    pdlok("${label}:vals", $decoded_rc, $dense_rc);
+  }
 }
 
 my $BAD = pdl(0)->setvaltobad(0);

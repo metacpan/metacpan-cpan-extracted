@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use Time::HiRes;
 use Forks::Super::Util;
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 our @ISA = qw(Forks::Super::Sync);
 
 my $ipc_seq = 0;
@@ -153,7 +153,7 @@ sub _get_filename {
                  'E:/Windows/Temp', 'E:/Winnt/Temp', $ENV{TEMP}, '.');
     } else {
 	my ($cwd) = Forks::Super::Util::abs_path('.');
-        @dirs = ('/tmp', '/var/tmp', '/usr/tmp', $cwd);
+        @dirs = ('/dev/shm', '/tmp', '/var/tmp', '/usr/tmp', $cwd);
     }
     foreach my $dir (@dirs, $Forks::Super::IPC_DIR) {
         if ($dir =~ /\S/ && -d $dir && -r $dir && -w $dir && -x $dir) {

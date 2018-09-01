@@ -8,7 +8,7 @@ author:
   - 'Max Maischein <corion@cpan.org>'
   - 'Laurent Dami <dami@cpan.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
-  - 'Dimitar D. Mitov <ddmitov@yahoo.com>'
+  - 'Dimitar D. Mitov <ddmitov@cpan.org>'
 build_requires:
   File::Spec: '0.82'
   Test::More: '0.42'
@@ -35,5 +35,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ddmitov/DBD-SQLeet
-version: '1.58'
+version: '0.24.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

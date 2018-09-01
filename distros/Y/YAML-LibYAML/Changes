@@ -1,3 +1,7 @@
+0.74 Fri Aug 31 18:06:17 PDT 2018
+ - Fix tests on older perls
+ - Support back to perl.5.8.1
+
 0.72 Sun Jul  8 17:03:08 CEST 2018
  - Update to libyaml 0.2.1 (tinita) It's forbidden now to escape single
    quotes inside double quotes

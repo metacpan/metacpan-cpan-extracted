@@ -822,10 +822,10 @@
         my $entry2 = $self->addEntryWithIcon($table, undef, 'string', 1, undef,
             3, 12, 4, 5);
         if (defined $axmud::CLIENT->autoBackupDir) {
-            
+
             $entry2->set_text($axmud::CLIENT->autoBackupDir);
         }
-        
+
         my $button3 = $self->addButton($table,
             'Choose directory', 'Select a directory where backup files are created', undef,
             6, 9, 5, 6);
@@ -3247,7 +3247,9 @@
                 $self->session->pseudoCmd('togglewindowkey -c',  $self->pseudoCmdMode);
             }
         });
-        $self->addLabel($table, 'Use CTRL+TAB keys to switch between tabs in a window pane',
+        $self->addLabel($table,
+            'Use CTRL+TAB keys to switch between tabs in a window pane (or just TAB if there is'
+            . ' no command entry box)',
             2, 12, 5, 6);
 
         my $checkButton6 = $self->addCheckButton($table, undef, TRUE,
@@ -3328,12 +3330,30 @@
 
         my $checkButton10 = $self->addCheckButton($table, undef, TRUE,
             1, 2, 10, 11);
-        $checkButton10->set_active($axmud::CLIENT->connectHistoryFlag);
+        $checkButton10->set_active($axmud::CLIENT->allowBusyWinFlag);
         $checkButton10->signal_connect('toggled' => sub {
 
             if (
-                ($checkButton10->get_active && ! $axmud::CLIENT->connectHistoryFlag)
-                || (! $checkButton10->get_active && $axmud::CLIENT->connectHistoryFlag)
+                ($checkButton10->get_active && ! $axmud::CLIENT->allowBusyWinFlag)
+                || (! $checkButton10->get_active && $axmud::CLIENT->allowBusyWinFlag)
+            ) {
+                $self->session->pseudoCmd('togglepopup',  $self->pseudoCmdMode);
+            }
+        });
+        $self->addLabel(
+            $table,
+            'Show popup windows during long operations (loading large files, drawing large maps'
+            . ' etc)',
+            2, 12, 10, 11);
+
+        my $checkButton11 = $self->addCheckButton($table, undef, TRUE,
+            1, 2, 11, 12);
+        $checkButton11->set_active($axmud::CLIENT->connectHistoryFlag);
+        $checkButton11->signal_connect('toggled' => sub {
+
+            if (
+                ($checkButton11->get_active && ! $axmud::CLIENT->connectHistoryFlag)
+                || (! $checkButton11->get_active && $axmud::CLIENT->connectHistoryFlag)
             ) {
                 $self->session->pseudoCmd('togglehistory',  $self->pseudoCmdMode);
             }
@@ -3341,7 +3361,7 @@
         $self->addLabel(
             $table,
             'Collect connection histories for each world',
-            2, 12, 10, 11);
+            2, 12, 11, 12);
 
         # Tab complete
         $vBox->pack_start($table, 0, 0, 0);
@@ -6428,7 +6448,7 @@
         $self->addLabel($table, $tag,
             1, 3, $row, ($row + 1));
 
-        my ($canvas, $canvasObj) = $self->addSimpleCanvas($table, $rgbColour,
+        my ($frame, $canvas, $canvasObj) = $self->addSimpleCanvas($table, $rgbColour, undef,
             3, 4, $row, ($row + 1));
 
         my $entry = $self->addEntry($table, undef, FALSE,
@@ -6474,7 +6494,7 @@
             );
         });
 
-        $self->addSimpleCanvas($table, $rgbDefault,
+        $self->addSimpleCanvas($table, $rgbDefault, undef,
             9, 10, $row, ($row + 1));
 
         my $entry2 = $self->addEntry($table, undef, FALSE,
@@ -6512,12 +6532,12 @@
         foreach my $obj (
             sort {lc($a->name) cmp lc($b->name)} ($axmud::CLIENT->ivValues('colourSchemeHash'))
         ) {
-            my ($mode, $textFlag, $underlayFlag, $backgroundFlag);
+            my ($type, $textFlag, $underlayFlag, $backgroundFlag);
 
             # (The flags are set to TRUE if the argument is an underlay tag, FALSE if not)
-            ($mode, $textFlag) = $axmud::CLIENT->checkColourTags($obj->textColour);
-            ($mode, $underlayFlag) = $axmud::CLIENT->checkColourTags($obj->textColour);
-            ($mode, $backgroundFlag) = $axmud::CLIENT->checkColourTags($obj->textColour);
+            ($type, $textFlag) = $axmud::CLIENT->checkColourTags($obj->textColour);
+            ($type, $underlayFlag) = $axmud::CLIENT->checkColourTags($obj->textColour);
+            ($type, $backgroundFlag) = $axmud::CLIENT->checkColourTags($obj->textColour);
 
             if (! $textFlag || $underlayFlag || ! $backgroundFlag) {
 
@@ -6850,7 +6870,7 @@
         $self->addLabel($table, $descrip,
             1, 3, $row, ($row + 1));
 
-        my ($canvas, $canvasObj) = $self->addSimpleCanvas($table, $colour,
+        my ($frame, $canvas, $canvasObj) = $self->addSimpleCanvas($table, $colour, undef,
             3, 4, $row, ($row + 1));
 
         my $entry = $self->addEntry($table, undef, FALSE,
@@ -6896,7 +6916,7 @@
             );
         });
 
-        $self->addSimpleCanvas($table, $default,
+        $self->addSimpleCanvas($table, $default, undef,
             10, 11, $row, ($row + 1));
 
         my $entry2 = $self->addEntry($table, undef, FALSE,
@@ -6938,7 +6958,23 @@
         $self->addLabel($table, '<b>Colour schemes</b>',
             0, 12, 0, 1);
         $self->addLabel($table, '<i>List of colour schemes used by various windows</i>',
-            1, 12, 1, 2);
+            1, 6, 1, 2);
+
+        my $checkButton = $self->addCheckButton($table, undef, TRUE,
+            6, 12, 1, 2);
+        $checkButton->set_active($axmud::CLIENT->convertInvisibleFlag);
+        $checkButton->set_label('Convert invisible text received from the world');
+        $checkButton->signal_connect('toggled' => sub {
+
+            my $flag = $checkButton->get_active();
+
+            if (
+                (! $flag && ! $axmud::CLIENT->convertInvisibleFlag)
+                || ($flag && $axmud::CLIENT->convertInvisibleFlag)
+            ) {
+                $self->session->pseudoCmd('convertText');
+            }
+        });
 
         # Add a simple list
         @columnList = (
@@ -15407,8 +15443,8 @@
 
         $self->autoSaveTab();
         $self->charSetTab();
+        $self->coloursFontsTab();
         $self->commandsTab();
-        $self->fontsTab();
         $self->logsTab();
         $self->soundTab();
         $self->speechTab();
@@ -15754,6 +15790,84 @@
         return 1;
     }
 
+    sub coloursFontsTab {
+
+        # ColoursFonts tab
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my ($mainObj, $customObj);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->coloursFontsTab', @_);
+        }
+
+        # Tab setup
+        my ($vBox, $table) = $self->addTab('_Colours/Fonts', $self->notebook);
+
+        # Import colour schemes
+        $mainObj = $axmud::CLIENT->ivShow('colourSchemeHash', 'main');
+        $customObj = $axmud::CLIENT->ivShow('colourSchemeHash', 'custom');
+
+        # Colours/fonts
+        $self->addLabel($table, '<b>Colour/font settings</b>',
+            0, 12, 0, 1);
+
+        my $button = $self->addButton($table,
+            'Set the colours/fonts used in \'main\' windows',
+            'Edit the colour scheme \'main\'',
+            undef,
+            1, 12, 1, 2);
+        $button->signal_connect('clicked' => sub {
+
+            $self->session->pseudoCmd('editcolourscheme main');
+        });
+
+        my $button2 = $self->addButton($table,
+            'Set the colours/fonts used in (most) task windows',
+            'Edit the colour scheme \'custom\'',
+            undef,
+            1, 12, 2, 3);
+        $button2->signal_connect('clicked' => sub {
+
+            $self->session->pseudoCmd('editcolourscheme custom');
+        });
+
+        my $checkButton = $self->addCheckButton($table, undef, TRUE,
+            1, 2, 3, 4);
+        $checkButton->set_active($axmud::CLIENT->convertInvisibleFlag);
+        $checkButton->set_label(
+            'Convert inivisble text (i.e. text that\'s the same colour as the background)',
+        );
+
+        $checkButton->signal_connect('toggled' => sub {
+
+            my $flag = $checkButton->get_active();
+
+            if (
+                (! $flag && ! $axmud::CLIENT->convertInvisibleFlag)
+                || ($flag && $axmud::CLIENT->convertInvisibleFlag)
+            ) {
+                $self->session->pseudoCmd('convertText');
+            }
+        });
+
+        # Tab complete
+        $vBox->pack_start($table, 0, 0, 0);
+
+        return 1;
+    }
+
     sub commandsTab {
 
         # Commands tab
@@ -15774,7 +15888,7 @@
         }
 
         # Tab setup
-        my ($vBox, $table) = $self->addTab('_Commands', $self->notebook);
+        my ($vBox, $table) = $self->addTab('C_ommands', $self->notebook);
 
         # Command sigils
         $self->addLabel($table, '<b>Command sigils</b>',
@@ -15976,145 +16090,6 @@
                 $self->session->pseudoCmd('togglesigil -b', $self->pseudoCmdMode);
                 $checkButton8->set_active($axmud::CLIENT->speedSigilFlag);
             }
-        });
-
-        # Tab complete
-        $vBox->pack_start($table, 0, 0, 0);
-
-        return 1;
-    }
-
-    sub fontsTab {
-
-        # Fonts tab
-        #
-        # Expected arguments
-        #   (none besides $self)
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $check) = @_;
-
-        # Local variables
-        my ($mainObj, $customObj);
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->fontsTab', @_);
-        }
-
-        # Tab setup
-        my ($vBox, $table) = $self->addTab('_Fonts', $self->notebook);
-
-        # Import colour schemes
-        $mainObj = $axmud::CLIENT->ivShow('colourSchemeHash', 'main');
-        $customObj = $axmud::CLIENT->ivShow('colourSchemeHash', 'custom');
-
-        # Font settings
-        $self->addLabel($table, '<b>Font settings</b>',
-            0, 12, 0, 1);
-
-        $self->addLabel($table, 'Main window font',
-            1, 3, 1, 2);
-        my $entry = $self->addEntry($table, undef, FALSE,
-            3, 6, 1, 2);
-        $entry->set_text($mainObj->font . ' ' . $mainObj->fontSize);
-
-        my $button = $self->addButton($table, 'Change font', 'Change this font', undef,
-            6, 9, 1, 2);
-        $button->signal_connect('clicked' => sub {
-
-            my $font = $self->showFontSelectionDialogue(
-                'Colour scheme \'' . $mainObj->name . '\' font',
-            );
-
-            if (defined $font) {
-
-                # $font is a string in the form 'Monospace 10'. Separate the font name from the
-                #   size
-                if ($font =~ m/(.*)\s(.\d)$/) {
-
-                    $mainObj->ivPoke('font', $1);
-                    $mainObj->ivPoke('fontSize', $2);
-
-                    $entry->set_text($font);
-
-                    # Update 'internal' windows
-                    $self->session->pseudoCmd(
-                        'updatecolourscheme ' . $mainObj->name,
-                        $self->pseudoCmdMode,
-                    );
-                }
-            }
-        });
-
-        my $button2 = $self->addButton($table, 'Reset font', 'Use the default font', undef,
-            9, 12, 1, 2);
-        $button2->signal_connect('clicked' => sub {
-
-            $mainObj->ivPoke('font', $axmud::CLIENT->constFont);
-            $mainObj->ivPoke('fontSize', $axmud::CLIENT->constFontSize);
-
-            $entry->set_text($axmud::CLIENT->constFont . ' ' . $axmud::CLIENT->constFontSize);
-
-            # Update 'internal' windows
-            $self->session->pseudoCmd(
-                'updatecolourscheme ' . $mainObj->name,
-                $self->pseudoCmdMode,
-            );
-        });
-
-        $self->addLabel($table, 'Font used in (most) task windows',
-            1, 3, 2, 3);
-        my $entry2 = $self->addEntry($table, undef, FALSE,
-            3, 6, 2, 3);
-        $entry2->set_text($customObj->font . ' ' . $customObj->fontSize);
-
-        my $button3 = $self->addButton($table, 'Change font', 'Change this font', undef,
-            6, 9, 2, 3);
-        $button3->signal_connect('clicked' => sub {
-
-            my $font = $self->showFontSelectionDialogue(
-                'Colour scheme \'' . $customObj->name . '\' font',
-            );
-
-            if (defined $font) {
-
-                # $font is a string in the form 'Monospace 10'. Separate the font name from the
-                #   size
-                if ($font =~ m/(.*)\s(.\d)$/) {
-
-                    $customObj->ivPoke('font', $1);
-                    $customObj->ivPoke('fontSize', $2);
-
-                    $entry2->set_text($font);
-
-                    # Update 'internal' windows
-                    $self->session->pseudoCmd(
-                        'updatecolourscheme ' . $customObj->name,
-                        $self->pseudoCmdMode,
-                    );
-                }
-            }
-        });
-
-        my $button4 = $self->addButton($table, 'Reset font', 'Use the default font', undef,
-            9, 12, 2, 3);
-        $button4->signal_connect('clicked' => sub {
-
-            $customObj->ivPoke('font', $axmud::CLIENT->constFont);
-            $customObj->ivPoke('fontSize', $axmud::CLIENT->constFontSize);
-
-            $entry2->set_text($axmud::CLIENT->constFont . ' ' . $axmud::CLIENT->constFontSize);
-
-            # Update 'internal' windows
-            $self->session->pseudoCmd(
-                'updatecolourscheme ' . $customObj->name,
-                $self->pseudoCmdMode,
-            );
         });
 
         # Tab complete

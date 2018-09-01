@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.50",
-            "PPIx::Utils" : "0",
+            "PPIx::Utils" : "0.002",
             "Perl::Critic" : "0",
             "Scalar::Util" : "1.50"
          }
@@ -59,15 +59,14 @@
          "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedConstant.pm"
       },
       "Perl::Critic::Policy::TooMuchCode::ProhibitUnusedImport" : {
-         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm",
-         "version" : "0.01"
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm"
       },
       "Perl::Critic::Policy::TooMuchCode::ProhibitUnusedInclude" : {
          "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm"
       },
       "Perl::Critic::TooMuchCode" : {
          "file" : "lib/Perl/Critic/TooMuchCode.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -78,7 +77,7 @@
          "web" : "https://github.com/gugod/Perl-Critic-TooMuchCode"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : "1"
 }

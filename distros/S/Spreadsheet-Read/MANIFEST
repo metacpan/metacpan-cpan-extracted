@@ -107,5 +107,6 @@ t/623_misc.t
 t/624_dates.t
 t/625_perc.t
 t/627_merged.t
+t/999_fail.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

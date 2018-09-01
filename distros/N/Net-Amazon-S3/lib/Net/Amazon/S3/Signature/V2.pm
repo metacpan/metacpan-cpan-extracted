@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Net::Amazon::S3::Signature::V2;
-$Net::Amazon::S3::Signature::V2::VERSION = '0.84';
+$Net::Amazon::S3::Signature::V2::VERSION = '0.85';
 use Moose;
 use URI::Escape qw( uri_escape_utf8 );
 use HTTP::Date qw[ time2str ];
@@ -164,7 +164,7 @@ Net::Amazon::S3::Signature::V2
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 AUTHOR
 

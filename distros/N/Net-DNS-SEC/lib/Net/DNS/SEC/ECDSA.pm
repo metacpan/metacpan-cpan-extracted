@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
 #
-# $Id: ECDSA.pm 1677 2018-05-22 11:59:10Z willem $
+# $Id: ECDSA.pm 1701 2018-07-28 07:36:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1701 $)[1];
 
 
 =head1 NAME
@@ -45,6 +45,10 @@ use strict;
 use integer;
 use warnings;
 use MIME::Base64;
+
+use constant ECDSA_OK => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_EC_KEY');
+
+BEGIN { die unless ECDSA_OK }					# not needed on voyage
 
 
 my %parameters = (

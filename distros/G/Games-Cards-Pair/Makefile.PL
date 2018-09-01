@@ -18,22 +18,22 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Attribute::Memoize' => 1.01,
-        'List::Util'         => 1.19,
-        'List::MoreUtils'    => 0.33,
-        'Term::Screen::Lite' => 0,
-        'Moo'                => '2.000000',
-        'namespace::clean'   => '0.24',
-        'Type::Tiny'         => '1.000005',
+        'Attribute::Memoize'   => 1.01,
+        'List::Util'           => 1.19,
+        'List::MoreUtils'      => 0.33,
+        'Term::Screen::Lite'   => 0,
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
+        'Type::Tiny'           => '1.000005',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Games-Cards-Pair-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Games::Cards::Pair'         => { file => 'lib/Games/Cards/Pair.pm'       , version => '0.18' },
-            'Games::Cards::Pair::Card'   => { file => 'lib/Games/Cards/Pair/Card.pm'  , version => '0.18' },
-            'Games::Cards::Pair::Params' => { file => 'lib/Games/Cards/Pair/Params.pm', version => '0.18' },
+            'Games::Cards::Pair'         => { file => 'lib/Games/Cards/Pair.pm'       , version => '0.19' },
+            'Games::Cards::Pair::Card'   => { file => 'lib/Games/Cards/Pair/Card.pm'  , version => '0.19' },
+            'Games::Cards::Pair::Params' => { file => 'lib/Games/Cards/Pair/Params.pm', version => '0.19' },
         },
         resources => {
             repository => {

@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.28      2018-08-30 14:51:50 -0400
+  - Require plicease plugins 2.28
+
+2.27      2018-08-30 10:02:01 -0400
+  - Require plicease plugins 2.27
+
 2.26      2018-05-22 13:24:18 -0400
   - Require plicease plugins 2.26
   - Allow override of underscore_eval_version on OurPkgVersion

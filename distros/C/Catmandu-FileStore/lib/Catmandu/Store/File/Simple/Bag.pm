@@ -2,7 +2,7 @@ package Catmandu::Store::File::Simple::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Moo;
 use Carp;
@@ -94,7 +94,15 @@ sub get {
             while (!$data->eof) {
                 my $buffer;
                 $data->read($buffer, 1024);
-                $bytes += $out->write($buffer);
+
+                my $n = $out->syswrite($buffer);
+
+                unless (defined($n)) {
+                    $self->log->error("syswrite on io failed : disk full or not available?");
+                    return $bytes;
+                }
+
+                $bytes += $n;
             }
 
             $out->close();

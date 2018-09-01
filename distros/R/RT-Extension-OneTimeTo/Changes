@@ -1,3 +1,6 @@
+1.04 2018-08-29
+ - Fix a double-encoding issue in RT::Ticket::_RecordNote
+
 1.03 2018-01-03
  - Fix tests to be author tests, and work without RT in @INC
 

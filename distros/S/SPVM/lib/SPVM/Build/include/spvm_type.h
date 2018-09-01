@@ -11,10 +11,12 @@ enum {
 };
 
 struct SPVM_type {
+  SPVM_OP* op_type;
   SPVM_BASIC_TYPE* basic_type;
   int32_t dimension;
   int32_t flag;
   int32_t sub_rel_id;
+  _Bool is_self;
 };
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler);
@@ -37,6 +39,7 @@ SPVM_TYPE* SPVM_TYPE_create_int_ref_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_create_long_ref_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_create_float_ref_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_create_double_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_create_any_object_type(SPVM_COMPILER* compiler);
 
 _Bool SPVM_TYPE_is_integral_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 _Bool SPVM_TYPE_is_numeric_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -60,5 +63,7 @@ void SPVM_TYPE_fprint_type_name(SPVM_COMPILER* compiler, FILE* fh, int32_t basic
 void SPVM_TYPE_sprint_type_name(SPVM_COMPILER* compiler, char* buffer, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 int32_t SPVM_TYPE_get_width(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+SPVM_TYPE* SPVM_TYPE_clone_type(SPVM_COMPILER* compiler, SPVM_TYPE* type);
 
 #endif

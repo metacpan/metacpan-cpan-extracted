@@ -1,0 +1,84 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["=","Plan",23],
+    ["%<>",["*grammar"],
+      ["==",
+        [".",
+          ["*","grammar"],
+          ["compile"],
+          ["yaml"]],
+        [".",
+          ["*","grammar"],
+          ["bootstrap-compile"],
+          ["yaml"]],
+        "$BlockLabel - Compiler output matches bootstrap?"]]],
+  "data": [
+    { "label": "Single Regex",
+      "point": {
+        "grammar": "a: /x/\n"}},
+    { "label": "Single Reference",
+      "point": {
+        "grammar": "a: <b>\n"}},
+    { "label": "Single Error",
+      "point": {
+        "grammar": "a: `b`\n"}},
+    { "label": "Simple All Group",
+      "point": {
+        "grammar": "a: /b/ <c>\n"}},
+    { "label": "Simple Any Group",
+      "point": {
+        "grammar": "a: <b> | <c>\n"}},
+    { "label": "Bracketed All Group",
+      "point": {
+        "grammar": "a: ( <b> /c/ )\n"}},
+    { "label": "Bracketed Any Group",
+      "point": {
+        "grammar": "a: ( <b> | /c/ | `d` )\n"}},
+    { "label": "Bracketed Group in Unbracketed Group",
+      "point": {
+        "grammar": "a: <b> ( <c> | <d> )\n"}},
+    { "label": "Multiple Rules",
+      "point": {
+        "grammar": "a: <b>\nb: <c>\n"}},
+    { "label": "Simple Grammar",
+      "point": {
+        "grammar": "a: ( <b> <c>* )\nb: /x/\nc: /y+/\n"}},
+    { "label": "Semicolons OK",
+      "point": {
+        "grammar": "a: <b>;\nb: <c>\nc: /d/;\n"}},
+    { "label": "Unbracketed",
+      "point": {
+        "grammar": "a: <b> <c> <d>\nb: <c> | <d>\n"}},
+    { "label": "Not Rule",
+      "point": {
+        "grammar": "a: !<b> <c>\n"}},
+    { "label": "Multiline",
+      "point": {
+        "grammar": "a: <b>\n   <c>\nb:\n    /c/ <d>\n    <e>;\nc:\n    <d> |\n    ( /e/ <f> )\n    | `g`\n"}},
+    { "label": "Various Groups",
+      "point": {
+        "grammar": "a: <b> ( <c> | <d> )\nb: ( <c> | <d> ) <e>\nc: <d> | ( <e> <f>) | <g>\nd: <e> | (<f> <g>) | <h> | ( `i` )\ne: ( <f> )\n"}},
+    { "label": "Modifiers",
+      "point": {
+        "grammar": "a: !<a> =<b>\nb: ( /c/ <d> )+\nc: ( /c/ <d> )+\n"}},
+    { "label": "Any Group Plus Rule",
+      "point": {
+        "grammar": "a: /w/ ( <x>+ | <y>* ) <z>?\n"}},
+    { "label": "Equivalent",
+      "point": {
+        "grammar": "a: <b>\nc: !<d>\n"}},
+    { "label": "Regex and Rule",
+      "point": {
+        "grammar": "a_b: /c/ <d>\n"}},
+    { "label": "Quantified group",
+      "point": {
+        "grammar": "a: <b> ( <c>* | <d>+ )+\ne: ( <f> !<g> )?\n"}},
+    { "label": "Multiple Regex",
+      "point": {
+        "grammar": "b: ( /x/ )+\n"}},
+    { "label": "Comments",
+      "point": {
+        "grammar": "# line comment\n\na: b    # end of line comment\n\nb: /\n\n    foo  # regex comment\n\n    # regex line comment\n\n    bar\n\n    # regex line comment\n/\n\n"}},
+    { "label": "Comment between rules",
+      "point": {
+        "grammar": "a: b\n# comment\nb: c\n"}}]}

@@ -29,7 +29,24 @@ incompatible. These are marked with an exclamation mark (!).
 
 =head1 VERSION 6.74 (planned 2018-12-01)
 
-=head1 VERSION 6.73 (planned 2018-09-01)
+=head1 VERSION 6.73 (2018-09-01)
+
+=over 4
+
+=item Fixed math on non-64-bit architectures
+
+Much of the math in Date::Manip::Base is in a 'use integer' section.  This math
+can overflow in some cases in non-64-bit architectures.  Fixed the cases where
+this would reasonably occur.  Reported by Daniel Albers (GitHub #22).  Also
+reported and tested in RT 126052.
+
+=item Bug in normalizing estimated business deltas
+
+While working on the non-64-bit issue, it uncovered a bug where normalizing
+estimated business deltas was wrong.  It had never been reported, and it was
+only off by a couple seconds in some rare situations.
+
+=back
 
 =head1 VERSION 6.72 (2018-06-06)
 

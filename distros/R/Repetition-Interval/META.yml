@@ -1,0 +1,27 @@
+---
+abstract: 'A library to calculate intervals for spaced repetition memorization'
+author:
+  - 'Mark Allen <mallen@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Repetition-Interval
+requires:
+  Moo: '0'
+  POSIX: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  strictures: '2'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Repetition-Interval
+  homepage: https://metacpan.org/dist/repetition-interval
+  repository: git://github.com/mrallen1/repetition-interval.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,6 +1,6 @@
 package Text::MostFreqKDistance;
 
-$Text::MostFreqKDistance::VERSION   = '0.08';
+$Text::MostFreqKDistance::VERSION   = '0.09';
 $Text::MostFreqKDistance::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Text::MostFreqKDistance - Estimate strings similarity.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -98,6 +98,10 @@ frequencies of two characters are equal.
 
 sub MostFreqKHashing {
     my ($string, $k) = @_;
+
+    die "ERROR: Missing source string.\n"        unless defined $string;
+    die "ERROR: Missing frequency value.\n"      unless defined $k;
+    die "ERROR: Invalid frequency value [$k].\n" unless ($k =~ /^[0-9]+$/);
 
     my $MostFreqKHashing = '';
     foreach (@{_MostFreqKHashing($string, $k)}) {

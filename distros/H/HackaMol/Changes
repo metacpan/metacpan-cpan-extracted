@@ -1,5 +1,12 @@
 Revision history for HackaMol
 
+0.048     2018-08-27 20:22:45-06:00 America/Denver
+  
+  * remove uc( chain ) issue #50
+  * add string_pdb method e.g. print $mol->string_pdb
+  * add string_xyz method e.g. print $mol->string_xyz
+  * add calc_bfps to group and bfp to atom normalized bfactors
+
 0.047     2017-12-28 19:50:18-07:00 America/Denver
   * added mol_disulfide_bonds($mol,$fudge) to HackaMol.pm
   * added read_pdbfile_mol to HackaMol.pm for reading pdb header and model ids

@@ -22,9 +22,10 @@ requires:
   File::Slurper: '0.012'
   File::Spec: '0'
   File::Versions: '0'
+  Text::LineNumber: '0.02'
   perl: '5.006001'
 resources:
   bugtracker: https://github.com/benkasminbullock/C-Utility/issues
   repository: https://github.com/benkasminbullock/C-Utility
-version: '0.009'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.84';
+$Net::Amazon::S3::Bucket::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -20,27 +20,6 @@ __PACKAGE__->meta->make_immutable;
 
 # ABSTRACT: convenience object for working with Amazon S3 buckets
 
-
-sub _uri {
-    my ( $self, $key ) = @_;
-    return ($key)
-        ? $self->bucket . "/" . $self->account->_urlencode($key)
-        : $self->bucket . "/";
-}
-
-sub _conf_to_headers {
-    my ( $self, $conf ) = @_;
-    $conf = {} unless defined $conf;
-    $conf = {%$conf};    # clone it so as not to clobber the caller's copy
-
-    if ( $conf->{acl_short} ) {
-        $self->account->_validate_acl_short( $conf->{acl_short} );
-        $conf->{'x-amz-acl'} = $conf->{acl_short};
-        delete $conf->{acl_short};
-    }
-
-    return $conf;
-}
 
 
 # returns bool
@@ -435,7 +414,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

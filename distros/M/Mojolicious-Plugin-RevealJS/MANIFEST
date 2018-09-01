@@ -11,6 +11,9 @@ ex/simple/templates/mytalk.html.ep
 ex/takahashi/example.pl
 ex/takahashi/templates/mytalk.html.ep
 lib/Mojolicious/Plugin/RevealJS.pm
+share/public/reveal-sampler/LICENSE.md
+share/public/reveal-sampler/README.md
+share/public/reveal-sampler/sampler.js
 share/public/revealjs/LICENSE
 share/public/revealjs/README.md
 share/public/revealjs/css/print/paper.css

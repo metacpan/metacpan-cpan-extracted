@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.84
+version 0.85
 
 # SYNOPSIS
 
@@ -164,7 +164,7 @@ Create a new S3 client object. Takes some arguments:
 - use\_virtual\_host
 
     Use the virtual host method ('bucketname.s3.amazonaws.com') instead of specifying the
-    bucket at the first part of the path. This is particularily useful if you want to access
+    bucket at the first part of the path. This is particularly useful if you want to access
     buckets not located in the US-Standard region (such as EU, Asia Pacific or South America).
     See [http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html) for the pros and cons.
 
@@ -200,7 +200,7 @@ Takes a hashref:
 
 - acl\_short (optional)
 
-    See the set\_acl subroutine for documenation on the acl\_short options
+    See the set\_acl subroutine for documentation on the acl\_short options
 
 - location\_constraint (option)
 

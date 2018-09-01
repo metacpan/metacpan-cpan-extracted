@@ -19,7 +19,7 @@ use String::Glob::Permute 'string_glob_permute';
 
 use constant TICK_SECOND => 0.1;
 
-our $VERSION = '0.981';
+our $VERSION = '0.982';
 
 my $SCRIPT = File::Basename::basename($0);
 my $SUDO_PROMPT = sprintf "sudo password (asking with %s): ", $SCRIPT;
@@ -80,6 +80,7 @@ sub parse_options {
         "append-time!"        => \(my $append_time),
         "sudo=s"              => \($self->{sudo_user}),
         "q|quiet"             => \($self->{quiet}),
+        "F=s"                 => \($self->{configfile}),
     or exit(2);
 
     my $host_arg = $host_file ? undef : shift @ARGV;
@@ -263,7 +264,7 @@ sub register {
     };
 
     for my $host (@{$self->{host}}) {
-        my $ssh = App::RemoteCommand::SSH->new($host);
+        my $ssh = App::RemoteCommand::SSH->new(host => $host, configfile => $self->{configfile});
         $ssh->add($_) for @ssh_cmd;
         $ssh->at_exit($ssh_at_exit) if $ssh_at_exit;
         push @{$self->{pending}}, $ssh;

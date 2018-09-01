@@ -1,0 +1,8 @@
+TYPEMAP
+MELF *     T_PTR
+X509 *     T_PTR
+EVP_PKEY * T_PTR
+PKCS7 *    T_PTR
+BIO *      T_PTR
+PKCS7 **   T_PTR
+pem_password_cb * T_PTR

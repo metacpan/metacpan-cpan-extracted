@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -eu
+
+header() {
+	echo
+	echo "###############################################"
+	echo
+	echo $*
+	echo
+}
+
+: ${REPO_ROOT:?required}
+: ${RELEASE_ROOT:?required}
+: ${REPO_OUT:?required}
+: ${BRANCH:?required}
+: ${GITHUB_OWNER:?required}
+: ${VERSION_FROM:?required}
+
+if [[ ! -f ${VERSION_FROM} ]]; then
+  echo >&2 "Version file (${VERSION_FROM}) not found.  Did you misconfigure Concourse?"
+  exit 2
+fi
+VERSION=$(cat ${VERSION_FROM})
+if [[ -z ${VERSION} ]]; then
+  echo >&2 "Version file (${VERSION_FROM}) was empty.  Did you misconfigure Concourse?"
+  exit 2
+fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+###############################################################
+
+header "Generating release notes..."
+pushd ${REPO_ROOT}
+changes=$(git log --pretty="- %h %s - %an" $(git describe --tags | cut -d - -f1)..HEAD)
+old_changes=$(tail -n +3 Changes)
+cat <<EOF > Changes
+Revision history for Test::MockModule
+
+v${VERSION}
+$changes
+
+$old_changes
+EOF
+popd
+
+header "Updating module version..."
+pushd ${REPO_ROOT}
+sed -i "s/\$VERSION = '.*';/\$VERSION = '$VERSION';/" lib/Test/MockModule.pm
+
+header "Creating distribution tarball..."
+perl Build.PL
+./Build manifest
+./Build dist
+
+header "Uploading distribution to cpan..."
+cat <<EOF > ~/.pause
+user ${CPAN_USER}
+password ${CPAN_PASSWORD}
+EOF
+
+cpan-upload *.tar.gz
+popd
+
+mkdir -p ${RELEASE_ROOT}/artifacts
+
+echo "${VERSION}"                          > ${RELEASE_ROOT}/tag
+echo "v${VERSION}"                         > ${RELEASE_ROOT}/name
+mv ${REPO_ROOT}/*-v${VERSION}.tar.gz          ${RELEASE_ROOT}/artifacts
+[ -f ${REPO_ROOT}/ci/release_notes.md ] && mv ${REPO_ROOT}/ci/release_notes.md ${RELEASE_ROOT}/notes.md
+cat <<EOF >>${RELEASE_ROOT}/notes.md
+
+# Changes
+
+$changes
+EOF
+
+header "Updating git repo with release..."
+if [[ -z $(git config --global user.email) ]]; then
+  git config --global user.email "ci@starkandwayne.com"
+fi
+if [[ -z $(git config --global user.name) ]]; then
+  git config --global user.name "CI Bot"
+fi
+
+(cd ${REPO_ROOT}
+ git merge --no-edit ${BRANCH}
+ git add -A
+ git status
+ git commit -m "release v${VERSION}")
+
+# so that future steps in the pipeline can push our changes
+cp -a ${REPO_ROOT} ${REPO_OUT}

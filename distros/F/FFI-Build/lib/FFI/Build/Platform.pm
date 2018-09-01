@@ -11,7 +11,7 @@ use File::Temp ();
 use Capture::Tiny ();
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub new
@@ -168,7 +168,10 @@ sub for
 
 sub ld
 {
-  shift->{config}->{ld};
+  my $ld = shift->{config}->{ld};
+  $ld =~ s/^\s+//;
+  $ld =~ s/\s+$//;
+  $ld;
 }
 
 sub _uniq
@@ -379,7 +382,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

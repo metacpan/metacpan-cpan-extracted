@@ -22,10 +22,12 @@ if ($optimize) {
   $optimize = "$optimize";
 }
 
-my $build_config = SPVM::Build::Util::default_build_config;
+my $build_config = SPVM::Build::Util::new_default_build_config;
 $optimize ||= $build_config->get_config('optimize');
 
-my $ccflags = "$Config{ccflags} " . join(' ', @{$build_config->get_extra_compiler_flags});
+my $ccflags = $build_config->get_ccflags;
+
+my $ldflags = $build_config->get_ldflags;
 
 my $src_dir = "lib/SPVM/Build/src";
 my @csource_files = glob "$src_dir/*.c";
@@ -33,12 +35,14 @@ my @object_files = map { my $object_file = $_; $object_file =~ s/\.c$/.o/; $obje
 
 my $object_dir = 'solo';
 
-my $cccmd = "cc @defines -I. -Ilib/SPVM/Build/include $ccflags -lm  $optimize";
+my $cccmd = "cc -c @defines $ccflags $optimize";
+my $ldcmd = "cc $ldflags";
 
 my $makefile = <<"EOS";
 
 all:
-	$cccmd -o solo/spvm_main solo/spvm_main.c @object_files
+	$cccmd -o solo/main.o solo/main.c
+	$ldcmd -o solo/main -lm -o solo/main solo/main.o @object_files
 
 test:
 	$cccmd -o solo/t/spvm_t_list solo/t/spvm_t_list.c spvm_list.o spvm_util_allocator.o
@@ -47,7 +51,7 @@ test:
 	solo/t/spvm_t_hash
 
 clean:
-	rm -rf solo/spvm_main
+	rm -rf solo/main
 EOS
 
 my $makefile_file = 'solo/Makefile';

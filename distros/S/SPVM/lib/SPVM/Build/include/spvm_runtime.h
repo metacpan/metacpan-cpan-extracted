@@ -42,21 +42,61 @@ struct SPVM_runtime {
   // API
   SPVM_ENV* env;
   
-  // Compiler
-  SPVM_COMPILER* compiler;
+  char** symbols;
   
+  SPVM_OPCODE* opcodes;
+  
+  SPVM_RUNTIME_MY* args;
+  SPVM_RUNTIME_MY* mys;
+  
+  SPVM_RUNTIME_BASIC_TYPE* basic_types;
+  int32_t basic_types_length;
+
+  SPVM_RUNTIME_FIELD* fields;
+  int32_t fields_length;
+
+  SPVM_RUNTIME_PACKAGE_VAR* package_vars;
+  int32_t package_vars_length;
+
+  SPVM_RUNTIME_SUB* subs;
+  int32_t subs_length;
+
+  SPVM_RUNTIME_PACKAGE* packages;
+  int32_t packages_length;
+  
+  int64_t* info_long_values;
+  double* info_double_values;
+  char** info_string_values;
+  int32_t* info_string_lengths;
+  int32_t* info_sub_ids;
+  int32_t* info_package_var_ids;
+  int32_t* info_field_ids;
+  SPVM_RUNTIME_INFO_TYPE* info_types;
+  
+  void** sub_native_addresses;
+  void** sub_precompile_addresses;
+
+  SPVM_LIST* info_switch_infos;
+  
+  // Symbol table
+  SPVM_HASH* basic_type_symtable;
+  SPVM_HASH* package_symtable;
+  SPVM_HASH* field_symtable;
+  SPVM_HASH* package_var_symtable;
+  SPVM_HASH* sub_symtable;
+
   // Exception
   SPVM_OBJECT* exception;
   
   // Package variables
-  SPVM_VALUE* package_vars;
+  SPVM_VALUE* package_vars_heap;
   
+  // Mortal stack
   SPVM_OBJECT** mortal_stack;
-  
   int32_t mortal_stack_top;
-  
   int32_t mortal_stack_capacity;
-
+  
+  // Memory blocks count
   int32_t memory_blocks_count;
 };
 

@@ -13,7 +13,9 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MM
+  Capture::Tiny
   ExtUtils::MakeMaker
+  IPC::Cmd
   Test2::V0
   Test::Alien
 );
@@ -26,6 +28,15 @@ $post_diag = sub {
   diag "libs           = ", Alien::FFI->libs;
   diag "libs_static    = ", Alien::FFI->libs_static;
   diag "my_configure   = ", Alien::FFI->runtime_prop->{my_configure} if defined Alien::FFI->runtime_prop->{my_configure};
+  require IPC::Cmd;
+  if(IPC::Cmd::can_run('lsb_release'))
+  {
+    spacer();
+    diag Capture::Tiny::capture_merged(sub {
+      system 'lsb_release', '-a';
+      ();
+    });
+  }
 };
 
 my @modules = sort keys %modules;

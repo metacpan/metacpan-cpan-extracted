@@ -944,7 +944,7 @@
         $textViewObj = $session->defaultTabObj->textViewObj;
 
         # Display colours
-        $self->writeText($axmud::SCRIPT . ' standard colour tag test');
+        $session->writeText($axmud::SCRIPT . ' standard colour tag test');
 
         foreach my $text (@textColourList) {
 
@@ -959,7 +959,7 @@
         $textViewObj->insertText('', 'after');
 
         # Display colours with italics
-        $self->writeText($axmud::SCRIPT . ' standard colour tags with italics');
+        $session->writeText($axmud::SCRIPT . ' standard colour tags with italics');
 
         foreach my $text (@textColourList) {
 
@@ -974,7 +974,7 @@
         $textViewObj->insertText('', 'after');
 
         # Display colours with strike-through and underline
-        $self->writeText(
+        $session->writeText(
             $axmud::SCRIPT . ' standard colour tags with strike-through / underline',
         );
 
@@ -998,7 +998,7 @@
         $textViewObj->insertText('', 'after');
 
         # Display a small selection of RGB colour tags
-        $self->writeText(
+        $session->writeText(
             $axmud::SCRIPT . ' RGB colour tags (small selection of 16.7 million possible colours)',
         );
 
@@ -1116,7 +1116,7 @@
         }
 
         # Display header
-        $self->writeText(
+        $session->writeText(
             $axmud::SCRIPT . ' xterm colour tag test (colour cube: ' . $colourCube . ')',
         );
 
@@ -5268,15 +5268,25 @@
                 $name = 'peek';
                 $page = 3;
 
+            } elsif ($switch eq '-n') {
+
+                $name = 'changes';
+                $page = 4;
+
+            } elsif ($switch eq '-i') {
+
+                $name = 'install';
+                $page = 5;
+
             } elsif ($switch eq '-g') {
 
                 $name = 'license';
-                $page = 4;
+                $page = 6;
 
             } elsif ($switch eq '-l') {
 
                 $name = 'license_2';
-                $page = 5;
+                $page = 7;
 
             } else {
 
@@ -6036,7 +6046,7 @@
                 $char = '<none>';
             }
 
-            $self->writeText(
+            $session->writeText(
                 $string . sprintf(
                     '%-4.4s %-13.13s %-16.16s %-16.16s',
                     $thisSession->number,
@@ -8829,7 +8839,8 @@
                     return $self->error(
                         $session, $inputString,
                         'Invalid month string \'' . $month . '\' (use A-Z, a-z, 0-9 or underlines;'
-                        . ' first character must be a letter, max 16 characters)',
+                        . ' first character must be a letter, non-Latin alphabets acceptable, max'
+                        . ' 16 characters)',
                     );
 
                 } elsif (exists $checkHash{$month}) {
@@ -8964,7 +8975,8 @@
                     return $self->error(
                         $session, $inputString,
                         'Invalid day string \'' . $day . '\' (use A-Z, a-z, 0-9 or underlines;'
-                        . ' first character must be a letter, max 16 characters)',
+                        . ' first character must be a letter, non-Latin alphabets acceptable, max'
+                        . ' 16 characters)',
                     );
 
                 } elsif (exists $checkHash{$day}) {
@@ -14674,6 +14686,82 @@
     }
 }
 
+{ package Games::Axmud::Cmd::TogglePopup;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('togglepopup', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['tpp', 'togglepop', 'togglepopup'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Toggles popup windows';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $string;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        if (! $axmud::CLIENT->allowBusyWinFlag) {
+
+            $axmud::CLIENT->set_allowBusyWinFlag(TRUE);
+            $string = 'ON';
+
+        } else {
+
+            $axmud::CLIENT->set_allowBusyWinFlag(FALSE);
+            $string = 'OFF';
+        }
+
+        return $self->complete(
+            $session, $standardCmd,
+            'Popup windows turned ' . $string,
+        );
+    }
+}
+
 { package Games::Axmud::Cmd::ShowFile;
 
     use strict;
@@ -14799,20 +14887,20 @@
             # Display header
             if ($fileObj->modifyFlag) {
 
-                $self->writeText(
+                $session->writeText(
                     'Metadata for the ' . $string . ' file \'' . $arg . '\' (data modified and not'
                     . ' saved)',
                 );
 
             } else {
 
-                $self->writeText(
+                $session->writeText(
                     'Metadata for the ' . $string . ' file \'' . $arg . '\' (data not modified)',
                 );
             }
 
             # Display list
-            $self->writeText('   File type     : ' . $fileObj->fileType);
+            $session->writeText('   File type     : ' . $fileObj->fileType);
             if (defined $fileObj->scriptName) {
 
                 $session->writeText(
@@ -17128,8 +17216,9 @@
             $newDir = $axmud::DATA_DIR . '/data/worlds/' . $headerHash{'assoc_world_prof'};
             $newFile = $newDir . '/' . $headerHash{'file_type'} . '.axm';
 
-            # Check that the directory exists, and that a 'worldprof' file exists in it
-            if (! (-d $newDir) || ! (-e $newFile)) {
+            # Check that the directory exists, and that the corresponding 'worldprof' file already
+            #   exists in it
+            if (! (-d $newDir) || ! (-e $newDir . '/worldprof.axm')) {
 
                 push (@failList, $headerHash{'file'});
 
@@ -21892,7 +21981,8 @@
         # Split @args into a name and data component, if possible; otherwise submit the whole
         #   argument list as a single string
         $string = join(' ', @args);
-        if ($string =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+#        if ($string =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+        if ($string =~ m/^([[:alpha:]\_][[:word:]\-\.]*)\s(.*)/) {
 
             $name = lc($1);
             $data = $2;
@@ -21991,7 +22081,8 @@
         # Split @args into a name and data component, if possible; otherwise submit the whole
         #   argument list as a single string
         $string = join(' ', @args);
-        if ($string =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+#        if ($string =~ m/^([A-Za-z_][A-Za-z0-9_\-\.]*)\s(.*)/) {
+        if ($string =~ m/^([[:alpha:]\_][[:word:]\-\.]*)\s(.*)/) {
 
             $name = lc($1);
             $data = $2;
@@ -25140,7 +25231,8 @@
 
         # Again for visually-impaired user benefit, check the name is valid (reserved names are
         #   allowed) before creating the new configuration object
-        } elsif (! ($configuration =~ m/^[A-Za-z_]{1}[A-Za-z0-9_]{0,15}$/)) {
+#        } elsif (! ($configuration =~ m/^[A-Za-z_]{1}[A-Za-z0-9_]{0,15}$/)) {
+        } elsif (! ($configuration =~ m/^[[:alpha:]\_]{1}[[:word:]]{0,15}$/)) {
 
             return $self->error(
                 $session, $inputString,
@@ -27398,7 +27490,7 @@
                 $string = '   ';
             }
 
-            $self->writeText($string . sprintf('%-16.16s', $name) . ' ' . $dictObj->language);
+            $session->writeText($string . sprintf('%-16.16s', $name) . ' ' . $dictObj->language);
         }
 
         # Display footer
@@ -27610,7 +27702,9 @@
             # Display list
             foreach my $pbObj (@list) {
 
-                $self->writeText(sprintf('   %-16.16s %-16.16s', $pbObj->name, $pbObj->targetName)),
+                $session->writeText(
+                    sprintf('   %-16.16s %-16.16s', $pbObj->name, $pbObj->targetName),
+                ),
             }
 
             # Display footer
@@ -30980,11 +31074,13 @@
 
         # Check $char is valid (converting to lower case, if need be)
         $char = lc($char);
-        if (! $char =~ m/^[a-z]$/) {
+#        if (! $char =~ m/^[a-z]$/) {
+        if (! $char =~ m/^[[:lower:]]$/) {
 
             return $self->error(
                 $session, $inputString,
-                'The speedwalk character must be a letter in the range a-z',
+                'The speedwalk character must be a letter in the range a-z (non-Latin alphabets'
+                . ' acceptable)',
             );
         }
 
@@ -31267,11 +31363,13 @@
 
         # Check $char is valid (converting to upper case, if need be)
         $char = uc($char);
-        if (! $char =~ m/^[A-Z]$/) {
+#        if (! $char =~ m/^[A-Z]$/) {
+        if (! $char =~ m/^[[:upper:]]$/) {
 
             return $self->error(
                 $session, $inputString,
-                'The speedwalk character must be a letter in the range A-Z',
+                'The speedwalk character must be a letter in the range A-Z (non-Latin alphabets'
+                . ' acceptable)',
             );
         }
 
@@ -32466,7 +32564,7 @@
         }
 
         # Display header
-        $self->writeText('List of profile templates (* = variables fixed)');
+        $session->writeText('List of profile templates (* = variables fixed)');
 
         # Display list
         foreach my $obj (@list) {
@@ -32479,7 +32577,7 @@
                 $string = '   ';
             }
 
-            $self->writeText($string . $obj->category);
+            $session->writeText($string . $obj->category);
         }
 
         # Display footer
@@ -33349,7 +33447,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('addworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['aw', 'addworld'];
+        $self->{defaultUserCmdList} = ['awo', 'addworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Adds a world profile';
 
@@ -33472,7 +33570,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('setworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['sw', 'setworld'];
+        $self->{defaultUserCmdList} = ['swo', 'setworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Sets the current world profile';
 
@@ -33589,7 +33687,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('cloneworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['cw', 'copyworld', 'cloneworld'];
+        $self->{defaultUserCmdList} = ['cwo', 'copyworld', 'cloneworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Clones a world profile';
 
@@ -33663,7 +33761,7 @@
         $originalName = shift @args;
         $copyName = shift @args;
 
-        # ;cw <copy>
+        # ;cwo <copy>
         if (! defined $copyName) {
 
             # Use the current world as the original
@@ -34022,7 +34120,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('editworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['ew', 'editworld'];
+        $self->{defaultUserCmdList} = ['ewo', 'editworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Opens an \'edit\' window for a world profile';
 
@@ -34130,7 +34228,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('deleteworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['dw', 'delworld', 'deleteworld'];
+        $self->{defaultUserCmdList} = ['dwo', 'delworld', 'deleteworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Deletes a world profile';
 
@@ -34294,7 +34392,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('listworld', TRUE, TRUE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['lw', 'listworld'];
+        $self->{defaultUserCmdList} = ['lwo', 'listworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Lists all world profiles';
 
@@ -34332,8 +34430,8 @@
         }
 
         # Display header
-        $self->writeText('List of world profiles (* = current world, T - temporary)');
-        $self->writeText('    Profile name     World long name                  IP/DNS & Port');
+        $session->writeText('List of world profiles (* = current world, T - temporary)');
+        $session->writeText('    Profile name     World long name                  IP/DNS & Port');
 
         # Display list
         foreach my $obj (@profList) {
@@ -34675,7 +34773,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('restoreworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['rw', 'restoreworld'];
+        $self->{defaultUserCmdList} = ['rwo', 'restoreworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Restores pre-configured worlds';
 
@@ -35348,7 +35446,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('updateworld', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['uw', 'updateworld'];
+        $self->{defaultUserCmdList} = ['uwo', 'updateworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Updates the current world profile';
 
@@ -39028,13 +39126,13 @@
         }
 
         # Display header
-        $self->writeText(
+        $session->writeText(
             'List of ' . $type . ' cages (inferiors listed first) (* = current, x = unattached)',
         );
 
         if (! $longFlag) {
 
-            $self->writeText('   Cage name                        Inferior cage');
+            $session->writeText('   Cage name                        Inferior cage');
         }
 
         # Display list
@@ -39082,9 +39180,9 @@
                 $level = 0;
 
                 if ($longFlag) {
-                    $self->writeText($gap . sprintf('%-42.42s', $cage));
+                    $session->writeText($gap . sprintf('%-42.42s', $cage));
                 } else {
-                    $self->writeText($gap . sprintf('%-32.32s (No inferior cage)', $cage));
+                    $session->writeText($gap . sprintf('%-32.32s (No inferior cage)', $cage));
                 }
             }
         }
@@ -60772,8 +60870,8 @@
         # Local variables
         my (
             $switch, $text, $textFlag, $flagCount, $underlay, $underlayFlag, $background,
-            $backgroundFlag, $font, $fontFlag, $fontSize, $fontSizeFlag, $schemeObj, $type,
-            $tagUnderlayFlag,
+            $backgroundFlag, $font, $fontFlag, $fontSize, $fontSizeFlag, $monoFlag, $oldTag,
+            $newTag, $addFlag, $deleteFlag, $schemeObj, $type, $tagUnderlayFlag, $msg,
         );
 
         # Extract switches
@@ -60814,6 +60912,27 @@
             $flagCount++;
         }
 
+        ($switch, @args) = $self->extract('-m', 0, @args);
+        if ($switch) {
+
+            $monoFlag = TRUE;
+            $flagCount++;
+        }
+
+        ($switch, $oldTag, $newTag, @args) = $self->extract('-a', 2, @args);
+        if ($switch) {
+
+            $addFlag = TRUE;
+            $flagCount++;
+        }
+
+        ($switch, $oldTag, @args) = $self->extract('-d', 1, @args);
+        if ($switch) {
+
+            $deleteFlag = TRUE;
+            $flagCount++;
+        }
+
         # @args should now be empty
         if (! defined $name || ! $flagCount || @args) {
 
@@ -60830,33 +60949,111 @@
             );
         }
 
+        # Check the validity of any colour tags and font sizes specified, before making any changes
+        if ($textFlag && defined $text) {
+
+            ($type, $tagUnderlayFlag) = $axmud::CLIENT->checkColourTags($text);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid colour tag \'' . $text . '\'',
+                );
+
+            } elsif ($tagUnderlayFlag) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Underlay tags like \'' . $text . '\' can\'t be used as the text colour',
+                );
+            }
+        }
+
+        if ($underlayFlag && defined $underlay) {
+
+            ($type, $tagUnderlayFlag) = $axmud::CLIENT->checkColourTags($underlay);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid colour tag \'' . $underlay . '\'',
+                );
+
+            } elsif (! $tagUnderlayFlag) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Colour tag \'' . $underlay . '\' is not an underlay colour',
+                );
+            }
+        }
+
+        if ($backgroundFlag && defined $background) {
+
+            ($type, $tagUnderlayFlag) = $axmud::CLIENT->checkColourTags($background);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid colour tag \'' . $background . '\'',
+                );
+
+            } elsif ($tagUnderlayFlag) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Underlay tags like \'' . $background . '\' can\'t be used as the'
+                    . ' background colour',
+                );
+            }
+        }
+
+        if ($fontSizeFlag && defined $fontSize && ! $axmud::CLIENT->intCheck($fontSize, 0)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Invalid font size \'' . $fontSize . '\'',
+            );
+        }
+
+        if (($addFlag || $deleteFlag) && defined $oldTag) {
+
+            ($type) = $axmud::CLIENT->checkColourTags($oldTag);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid colour tag \'' . $oldTag . '\'',
+                );
+
+            } elsif ($deleteFlag && ! $schemeObj->ivExists('overrideHash', $oldTag)) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'The colour tag \'' . $oldTag . '\' isnt\'t one of those specified as an'
+                    . ' override in the colour scheme',
+                );
+            }
+        }
+
+        if ($addFlag && defined $newTag) {
+
+            ($type) = $axmud::CLIENT->checkColourTags($newTag);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid colour tag \'' . $newTag . '\'',
+                );
+            }
+        }
+
         # Apply switches
         if ($textFlag) {
 
             if (defined $text) {
-
-                ($type, $tagUnderlayFlag) = $axmud::CLIENT->checkColourTags($text);
-                if (! $type) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'Invalid colour tag \'' . $text . '\'',
-                    );
-
-                } elsif ($tagUnderlayFlag) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'Underlay tags like \'' . $text . '\' can\'t be used as the text colour',
-                    );
-
-                } else {
-
-                    $schemeObj->ivPoke('textColour', $text);
-                }
-
+                $schemeObj->ivPoke('textColour', $text);
             } else {
-
                 $schemeObj->ivPoke('textColour', $axmud::CLIENT->constTextColour);
             }
         }
@@ -60864,29 +61061,8 @@
         if ($underlayFlag) {
 
             if (defined $underlay) {
-
-                ($type, $tagUnderlayFlag) = $axmud::CLIENT->checkColourTags($underlay);
-                if (! $type) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'Invalid colour tag \'' . $underlay . '\'',
-                    );
-
-                } elsif (! $tagUnderlayFlag) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'Colour tag \'' . $underlay . '\' is not an underlay colour',
-                    );
-
-                } else {
-
-                    $schemeObj->ivPoke('underlayColour', $underlay);
-                }
-
+                $schemeObj->ivPoke('underlayColour', $underlay);
             } else {
-
                 $schemeObj->ivPoke('underlayColour', $axmud::CLIENT->constUnderlayColour);
             }
         }
@@ -60894,30 +61070,8 @@
         if ($backgroundFlag) {
 
             if (defined $background) {
-
-                ($type, $tagUnderlayFlag) = $axmud::CLIENT->checkColourTags($background);
-                if (! $type) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'Invalid colour tag \'' . $background . '\'',
-                    );
-
-                } elsif ($tagUnderlayFlag) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'Underlay tags like \'' . $background . '\' can\'t be used as the'
-                        . ' background colour',
-                    );
-
-                } else {
-
-                    $schemeObj->ivPoke('backgroundColour', $background);
-                }
-
+                $schemeObj->ivPoke('backgroundColour', $background);
             } else {
-
                 $schemeObj->ivPoke('backgroundColour', $axmud::CLIENT->constBackgroundColour);
             }
         }
@@ -60934,30 +61088,48 @@
         if ($fontSizeFlag) {
 
             if (defined $fontSize) {
+                $schemeObj->ivPoke('fontSize', $fontSize);
+            } else {
+                $schemeObj->ivPoke('fontSize', $axmud::CLIENT->constFontSize);
+            }
+        }
 
-                if (! $axmud::CLIENT->intCheck($fontSize, 0)) {
+        if ($monoFlag) {
 
-                    return $self->error(
-                        $session, $inputString,
-                        'Invalid font size \'' . $fontSize . '\'',
-                    );
+            if (! $schemeObj->overrideAllFlag) {
 
-                } else {
-
-                    $schemeObj->ivPoke('fontSize', $fontSize);
-                }
+                $schemeObj->ivPoke('overrideAllFlag', TRUE);
+                $msg = ', setting \'ignore all colour tags\' mode ON';
 
             } else {
 
-                $schemeObj->ivPoke('fontSize', $axmud::CLIENT->constFontSize);
+                $schemeObj->ivPoke('overrideAllFlag', FALSE);
+                $msg = ', setting \'ignore all colour tags\' mode OFF';
             }
+
+        } else {
+
+            $msg = '';
+        }
+
+        if ($addFlag) {
+
+            $schemeObj->ivAdd('overrideHash', $oldTag, $newTag);
+        }
+
+        if ($deleteFlag) {
+
+            $schemeObj->ivDelete('overrideHash', $oldTag);
         }
 
         # Resolve any problems now, before they have a chance to create a Perl error
         $schemeObj->repair();
 
         # Operation complete
-        return $self->complete($session, $standardCmd, 'Modified colour scheme \'' . $name . '\'');
+        return $self->complete(
+            $session, $standardCmd,
+            'Modified colour scheme \'' . $name . '\'' . $msg,
+        );
     }
 
     ##################
@@ -61390,7 +61562,9 @@
         }
 
         # Display header
-        $session->writeText('List of colour schemes (* - standard)');
+        $session->writeText(
+            'List of colour schemes (* - standard, # - ignores all other colour tags)',
+        );
 
         # Display list
         if (defined $name) {
@@ -61411,9 +61585,15 @@
                 $axmud::CLIENT->ivExists('constGridWinTypeHash', $schemeObj->name)
                 || $axmud::CLIENT->ivExists('constFreeWinTypeHash', $schemeObj->name)
             ) {
-                $column = ' * ';
+                $column = ' *';
             } else {
-                $column = '   ';
+                $column = '  ';
+            }
+
+            if ($schemeObj->overrideAllFlag) {
+                $column .= '# ';
+            } else {
+                $column .= '  ';
             }
 
             $session->writeText($column . $schemeObj->name);
@@ -61424,6 +61604,17 @@
             $session->writeText(
                 '      Font: ' . $schemeObj->font . ' ' . $schemeObj->fontSize,
             );
+
+            foreach my $key (sort {lc($a) cmp lc($b)} ($schemeObj->ivKeys('overrideHash'))) {
+
+                my $value = $schemeObj->ivShow('overrideHash', $key);
+                if (! defined $value) {
+
+                    $value = '(use normal colour)';
+                }
+
+                $session->writeText('      Override: ' . $key . ' > ' . $value);
+            }
         }
 
         # Display footer
@@ -69079,6 +69270,680 @@
     }
 }
 
+# Channels and Divert tasks
+
+{ package Games::Axmud::Cmd::AddChannelPattern;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('addchannelpattern', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['achp', 'addchan', 'addchannel', 'addchannelpattern'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Adds a Channels/Divert task pattern';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            @args,
+        ) = @_;
+
+        # Local variables
+        my (
+            $flagCount, $switch, $gagFlag, $noGagFlag, $exceptFlag, $channel, $pattern, $worldObj,
+            $msg,
+        );
+
+        # Extract switches
+        $flagCount = 0;
+
+        ($switch, @args) = $self->extract('-g', 0, @args);
+        if (defined $switch) {
+
+            $gagFlag = TRUE;
+            $flagCount++;
+        }
+
+        ($switch, @args) = $self->extract('-m', 0, @args);
+        if (defined $switch) {
+
+            $noGagFlag = TRUE;
+            $flagCount++;
+        }
+
+        ($switch, @args) = $self->extract('-e', 0, @args);
+        if (defined $switch) {
+
+            $exceptFlag = TRUE;
+            $flagCount++;
+        }
+
+        # There should be 1 or 2 arguments left
+        $channel = shift @args;
+        $pattern = shift @args;
+
+        if (@args || ($exceptFlag && defined $pattern)) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check validity of switches
+        if ($flagCount > 1) {
+
+            return $self->error(
+                $session, $inputString,
+                'The switches -g, -m an -e can\'t be combined',
+            );
+        }
+
+        # Import the current world profile
+        $worldObj = $session->currentWorld;
+
+        # Add the pattern to the profile
+        if (! $flagCount || $gagFlag) {
+
+            $worldObj->ivPush('channelList', $pattern, $channel, TRUE);
+            $msg = 'Added pattern \'' . $pattern . '\' to channel \'' . $channel
+                        . '\' (gagged in the \'main\' window)',
+
+        } elsif ($noGagFlag) {
+
+            $worldObj->ivPush('channelList', $pattern, $channel, FALSE);
+            $msg =  'Added pattern \'' . $pattern . '\' to channel \'' . $channel
+                        . '\' (not gagged in the \'main\' window)',
+
+        } else {
+
+            # In this case, $channel is actually the pattern
+            $worldObj->ivPush('noChannelList', $channel);
+
+            $msg = 'Added channel exception pattern \'' . $channel . '\'';
+        }
+
+        # If the Channels or Divert tasks are currently running, tell them to reset their triggers
+        if ($session->channelsTask) {
+
+            if (! $session->channelsTask->resetTriggers()) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                   'General error resetting the current Channels task\'s triggers. ' . $msg,
+                );
+            }
+
+        } elsif ($session->divertTask) {
+
+            if (! $session->divertTask->resetTriggers()) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'General error resetting the current Divert task\'s triggers. ' . $msg,
+                );
+            }
+        }
+
+        return $self->complete($session, $standardCmd, $msg);
+    }
+}
+
+{ package Games::Axmud::Cmd::DeleteChannelPattern;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('deletechannelpattern', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['dchp', 'delchan', 'delchannel', 'deletechannelpattern'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Deletes Channels/Divert task patterns';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $switch, $number,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my ($worldObj, $total, $index, $pattern, $msg);
+
+        # Check for improper arguments
+        if (! defined $switch || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Import the current world profile
+        $worldObj = $session->currentWorld;
+
+        # ;dchp <number>
+        if (! defined $number) {
+
+            $number = $switch;
+
+            # GA::Profile::World->channelList is in groups of 3, in the form
+            #   (pattern, channel, flag)
+            $total = int(scalar ($worldObj->channelList) / 3);
+
+            if (! $axmud::CLIENT->intCheck($number, 1, $total)) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid position \'' . $number . '\' (you must specify the pattern\'s'
+                    . ' position, the number in the list generated by \';listchannelpattern\')',
+                );
+
+            } else {
+
+                # Remove the group
+                $index = ($number - 1) * 3;
+                $pattern = $worldObj->ivIndex('channelList', $index);
+                $worldObj->ivSplice('channelList', $index, 3);
+
+                $msg = 'Removed channel pattern #' . $number . ' \'' . $pattern . '\'';
+            }
+
+        # ;dhcp -e <number>
+        } else {
+
+            if ($switch ne '-e') {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Unrecognised switch \'' . $switch . '\'',
+                );
+            }
+
+            # GA::Profile::World->noChannelList is in groups of 1
+            $total = scalar ($worldObj->noChannelList);
+
+            if (! $axmud::CLIENT->intCheck($number, 1, $total)) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid position \'' . $number . '\' (you must specify the pattern\'s'
+                    . ' position the number in the list generated by \';listchannelpattern -e\')',
+                );
+
+            } else {
+
+                # Remove the pattern
+                $index = $number - 1;
+                $pattern = $worldObj->ivIndex('noChannelList', $index);
+                $worldObj->ivSplice('noChannelList', $index, 1);
+
+                $msg = 'Removed channel pattern exception #' . $number . ' \'' . $pattern . '\'';
+            }
+        }
+
+        # If the Channels or Divert tasks are currently running, tell them to reset their triggers
+        if ($session->channelsTask) {
+
+            if (! $session->channelsTask->resetTriggers()) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                   'General error resetting the current Channels task\'s triggers. ' . $msg,
+                );
+            }
+
+        } elsif ($session->divertTask) {
+
+            if (! $session->divertTask->resetTriggers()) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'General error resetting the current Divert task\'s triggers. ' . $msg,
+                );
+            }
+        }
+
+        return $self->complete($session, $standardCmd, $msg);
+    }
+}
+
+{ package Games::Axmud::Cmd::ListChannelPattern;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('listchannelpattern', TRUE, TRUE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['lchp', 'listchan', 'listchannel', 'listchannelpattern'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Lists Channels/Divert task patterns';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $arg,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $worldObj, $count,
+            @list, @modList,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Import the current world profile
+        $worldObj = $session->currentWorld;
+
+        # ;achp -e
+        if (defined $arg && $arg eq '-e') {
+
+            @list = $worldObj->noChannelList;
+            if (! @list) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'The list of channel exception patterns is empty',
+                );
+            }
+
+            # Display header
+            $session->writeText('List of channel exception patterns');
+            $session->writeText('   #    Pattern');
+
+            # Display list
+            $count = 0;
+            foreach my $pattern (@list) {
+
+                $count++;
+                $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
+            }
+
+            # Display footer
+            if (@list == 1) {
+                $session->writeText('End of list (1 pattern found)');
+            } else {
+                $session->writeText('End of list (' . scalar @list . ' patterns found)');
+            }
+
+        # ;achp <channel>
+        } elsif (defined $arg) {
+
+            @list = $worldObj->channelList;
+
+            # @list is in groups of 3, in the form (pattern, channel, flag)
+            # Filter out any groups whose channel isn't $channel
+            $count = 0;
+            do {
+
+                my ($pattern, $channel, $flag);
+
+                $count++;
+
+                $pattern = shift @list;
+                $channel = shift @list;
+                $flag = shift @list;
+
+                if (defined $channel && $channel eq $arg) {
+
+                    push (@modList, $count, $pattern, $channel, $flag);
+                }
+
+            } until (! @list);
+
+            if (! @modList) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'There are no patterns assigned to the channel \'' . $arg . '\'',
+                );
+            }
+
+            # Display header
+            $session->writeText('List of channel patterns (* - gagged in \'main\' window)');
+            $session->writeText('   #    Channel          Pattern');
+
+            # Display list
+            do {
+
+                my ($num, $pattern, $channel, $flag, $column);
+
+                $num = shift @modList;
+                $pattern = shift @modList;
+                $channel = shift @modList;
+                $flag = shift @modList;
+
+                if ($flag) {
+                    $column = ' * ';
+                } else {
+                    $column = '   ';
+                }
+
+                $session->writeText(
+                    $column . sprintf('%-4.4s %-16.16s', $num, $channel) . ' ' . $pattern,
+                );
+
+            } until (! @modList);
+
+            # Display footer
+            if (@list == 1) {
+                $session->writeText('End of list (1 pattern found)');
+            } else {
+                $session->writeText('End of list (' . scalar @list . ' patterns found)');
+            }
+
+        # ;achp
+        } else {
+
+            @list = $worldObj->channelList;
+            if (! @list) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'The current world profile contains no channel patterns',
+                );
+            }
+
+            # Display header
+            $session->writeText('List of channel patterns (* - gagged in \'main\' window)');
+            $session->writeText('   #    Channel          Pattern');
+
+            # Display list
+            $count = 0;
+            do {
+
+                my ($pattern, $channel, $flag, $column);
+
+                $count++;
+
+                $pattern = shift @list;
+                $channel = shift @list;
+                $flag = shift @list;
+
+                if ($flag) {
+                    $column = ' * ';
+                } else {
+                    $column = '   ';
+                }
+
+                $session->writeText(
+                    $column . sprintf('%-4.4s %-16.16s', $count, $channel) . ' ' . $pattern,
+                );
+
+            } until (! @list);
+
+            # Display footer
+            if (@list == 1) {
+                $session->writeText('End of list (1 pattern found)');
+            } else {
+                $session->writeText('End of list (' . scalar @list . ' patterns found)');
+            }
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::EmptyChannelsWindow;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('emptychannelswindow', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = [
+            'ecw',
+            'emptychan',
+            'emptychannelwindow',
+            'emptychannelswindow',
+        ];
+
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Empties the Channels task window';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the Channels task is running and has a window open
+        if (! $session->channelsTask || ! $session->channelsTask->taskWinFlag) {
+
+            return $self->error(
+                $session, $inputString,
+                'The Channels task is not currently running',
+            );
+
+        } else {
+
+            # Reset the task's window
+            $session->channelsTask->resetWin();
+
+            return $self->complete(
+                $session, $standardCmd,
+                'The Channels task window has been reset',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::EmptyDivertWindow;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('emptydivertwindow', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['edw', 'emptydivert', 'emptydivertwindow'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Empties the Divert task window';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the Divert task is running and has a window open
+        if (! $session->divertTask) {
+
+            return $self->error(
+                $session, $inputString,
+                'The Divert task is not currently running',
+            );
+
+        } elsif (! $session->divertTask->taskWinFlag) {
+
+            return $self->error(
+                $session, $inputString,
+                'The Divert task is running without a task window',
+            );
+
+        } else {
+
+            # Reset the task's window
+            $session->divertTask->resetWin();
+
+            return $self->complete(
+                $session, $standardCmd,
+                'The Divert task window has been reset',
+            );
+        }
+    }
+}
+
 # Chat task
 
 { package Games::Axmud::Cmd::ChatListen;
@@ -75055,656 +75920,6 @@
     }
 }
 
-# Divert task
-
-{ package Games::Axmud::Cmd::AddDivertPattern;
-
-    use strict;
-    use warnings;
-    use diagnostics;
-
-    use Glib qw(TRUE FALSE);
-
-    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
-
-    ##################
-    # Constructors
-
-    sub new {
-
-        # Create a new instance of this command object (there should only be one)
-        #
-        # Expected arguments
-        #   (none besides $class)
-        #
-        # Return values
-        #   'undef' if GA::Generic::Cmd->new reports an error
-        #   Blessed reference to the new object on success
-
-        my ($class, $check) = @_;
-
-        # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('adddivertpattern', TRUE, FALSE);
-        if (! $self) {return undef}
-
-        $self->{defaultUserCmdList} = ['adp', 'adddivert', 'adddivertpattern'];
-        $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Adds a pattern for Divert tasks';
-
-        # Bless the object into existence
-        bless $self, $class;
-        return $self;
-    }
-
-    ##################
-    # Methods
-
-    sub do {
-
-        my (
-            $self, $session, $inputString, $userCmd, $standardCmd,
-            $switch, $pattern,
-            $check,
-        ) = @_;
-
-        # Local variables
-        my ($worldObj, $confirm);
-
-        # Check for improper arguments
-        if (! defined $switch || ! defined $pattern || defined $check) {
-
-            return $self->improper($session, $inputString);
-        }
-
-        # Import the current world profile
-        $worldObj = $session->currentWorld;
-
-        # Add the pattern to the profile
-        if ($switch eq '-t') {
-
-            $worldObj->ivPush('tellPatternList', $pattern);
-            $confirm = 'Tell pattern \'';
-
-        } elsif ($switch eq '-e') {
-
-            $worldObj->ivPush('noTellPatternList', $pattern);
-            $confirm = 'Tell exception pattern \'';
-
-        } elsif ($switch eq '-s') {
-
-            $worldObj->ivPush('socialPatternList', $pattern);
-            $confirm = 'Social pattern \'';
-
-        } elsif ($switch eq '-o') {
-
-            $worldObj->ivPush('noSocialPatternList', $pattern);
-            $confirm = 'Social exception pattern \'';
-
-        } elsif ($switch eq '-c') {
-
-            # Uses a gagged trigger
-            $worldObj->ivPush('customDivertPatternList', $pattern, 1);
-            $confirm = 'Gagged custom pattern \'';
-
-        } elsif ($switch eq '-u') {
-
-            # Uses an ungagged trigger
-            $worldObj->ivPush('customDivertPatternList', $pattern, 0);
-            $confirm = 'Ungagged custom pattern \'';
-
-        } elsif ($switch eq '-x') {
-
-            $worldObj->ivPush('noCustomDivertPatternList', $pattern);
-            $confirm = 'Custom exception pattern \'';
-
-        } else {
-
-            return $self->error($session, $inputString, 'Unrecognised switch \'' . $switch . '\'');
-        }
-
-        # If the Divert task is currently running, tell it to reset its triggers
-        if ($session->divertTask) {
-
-            if (! $session->divertTask->resetTriggers()) {
-
-                return $self->error(
-                    $session, $inputString,
-                    'General error resetting the current Divert task\'s triggers (but the new'
-                    . ' pattern has been added to the current world profile)',
-                );
-            }
-        }
-
-        return $self->complete(
-            $session, $standardCmd,
-            $confirm . $pattern . '\' added to the list of patterns for Divert tasks',
-        );
-    }
-}
-
-{ package Games::Axmud::Cmd::DeleteDivertPattern;
-
-    use strict;
-    use warnings;
-    use diagnostics;
-
-    use Glib qw(TRUE FALSE);
-
-    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
-
-    ##################
-    # Constructors
-
-    sub new {
-
-        # Create a new instance of this command object (there should only be one)
-        #
-        # Expected arguments
-        #   (none besides $class)
-        #
-        # Return values
-        #   'undef' if GA::Generic::Cmd->new reports an error
-        #   Blessed reference to the new object on success
-
-        my ($class, $check) = @_;
-
-        # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('deletedivertpattern', TRUE, FALSE);
-        if (! $self) {return undef}
-
-        $self->{defaultUserCmdList} = ['ddp', 'deldivert', 'deletedivertpattern'];
-        $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Deletes a pattern for Divert tasks';
-
-        # Bless the object into existence
-        bless $self, $class;
-        return $self;
-    }
-
-    ##################
-    # Methods
-
-    sub do {
-
-        my (
-            $self, $session, $inputString, $userCmd, $standardCmd,
-            $switch, $number,
-            $check,
-        ) = @_;
-
-        # Local variables
-        my ($worldObj, $confirm, $error);
-
-        # Check for improper arguments
-        if (! defined $switch || ! defined $number || defined $check) {
-
-            return $self->improper($session, $inputString);
-        }
-
-        # Import the current world profile
-        $worldObj = $session->currentWorld;
-
-        # Check that $number is valid
-        if (! $axmud::CLIENT->intCheck($number, 1)) {
-
-            return $self->error($session, $inputString, 'Invalid number \'' . $number . '\'');
-        }
-
-        # Delete the pattern from the profile
-        if ($switch eq '-t') {
-
-            if (! $worldObj->tellPatternList) {
-
-                $error = 'The list of tell patterns for Divert tasks is empty';
-
-            } elsif ($worldObj->ivNumber('tellPatternList') < $number) {
-
-                $error = 'The list of tell patterns for Divert tasks doesn\'t contain a message #'
-                            . $number;
-
-            } else {
-
-                $worldObj->ivSplice('tellPatternList', ($number - 1), 1);
-                $confirm = 'Tell pattern #' . $number . ' deleted added to the list of patterns for'
-                            . ' Divert tasks';
-            }
-
-        } elsif ($switch eq '-e') {
-
-            if (! $worldObj->noTellPatternList) {
-
-                $error = 'The list of tell patterns for Divert tasks is empty';
-
-            } elsif ($worldObj->ivNumber('noTellPatternList') < $number) {
-
-                $error = 'The list of tell exception patterns for Divert tasks doesn\'t contain a'
-                            . ' message #' . $number;
-
-            } else {
-
-                $worldObj->ivSplice('noTellPatternList', ($number - 1), 1);
-                $confirm = 'Tell exception pattern #' . $number . ' deleted added to the list of'
-                            . ' patterns for Divert tasks';
-            }
-
-        } elsif ($switch eq '-s') {
-
-            if (! $worldObj->socialPatternList) {
-
-                $error = 'The list of social patterns for Divert tasks is empty';
-
-            } elsif ($worldObj->ivNumber('socialPatternList') < $number) {
-
-                $error = 'The list of social patterns for Divert tasks doesn\'t contain a message #'
-                            . $number;
-
-            } else {
-
-                $worldObj->ivSplice('socialPatternList', ($number - 1), 1);
-                $confirm = 'Social pattern #' . $number . ' deleted added to the list of patterns'
-                            . ' for Divert tasks';
-            }
-
-        } elsif ($switch eq '-o') {
-
-            if (! $worldObj->noSocialPatternList) {
-
-                $error = 'The list of social patterns for Divert tasks is empty';
-
-            } elsif ($worldObj->ivNumber('noSocialPatternList') < $number) {
-
-                $error = 'The list of social exception patterns for Divert tasks doesn\'t contain a'
-                            . ' message #' . $number;
-
-            } else {
-
-                $worldObj->ivSplice('noSocialPatternList', ($number - 1), 1);
-                $confirm = 'Social exception pattern #' . $number . ' deleted added to the list of'
-                            . ' patterns for Divert tasks';
-            }
-
-        } elsif ($switch eq '-c' || $switch eq '-u') {
-
-            if (! $worldObj->customDivertPatternList) {
-
-                $error = 'The list of custom patterns for Divert tasks is empty';
-
-            } elsif ($worldObj->ivNumber('customDivertPatternList') < $number) {
-
-                $error = 'The list of custom patterns for Divert tasks doesn\'t contain a message #'
-                            . $number;
-
-            } else {
-
-                $worldObj->ivSplice('customDivertPatternList', ($number - 1), 1);
-                $confirm = 'Custom pattern #' . $number . ' deleted added to the list of patterns'
-                            . ' for Divert tasks';
-            }
-
-        } elsif ($switch eq '-x') {
-
-            if (! $worldObj->noCustomDivertPatternList) {
-
-                $error = 'The list of custom patterns for Divert tasks is empty';
-
-            } elsif ($worldObj->ivNumber('noCustomDivertPatternList') < $number) {
-
-                $error = 'The list of custom exception patterns for Divert tasks doesn\'t contain a'
-                            . ' message #' . $number;
-
-            } else {
-
-                $worldObj->ivSplice('noCustomDivertPatternList', ($number - 1), 1);
-                $confirm = 'Custom exception pattern #' . $number . ' deleted added to the list of'
-                            . ' patterns for Divert tasks';
-            }
-
-        } else {
-
-            return $self->error($session, $inputString, 'Unrecognised switch \'' . $switch . '\'');
-        }
-
-        if ($error) {
-
-            return $self->error($session, $inputString, $error);
-
-        } else {
-
-            # If the Divert task is currently running, tell it to reset its triggers
-            if ($session->divertTask) {
-
-                if (! $session->divertTask->resetTriggers()) {
-
-                    return $self->error(
-                        $session, $inputString,
-                        'General error resetting the current Divert task\'s triggers (but the'
-                        . ' existing pattern has been removed from the current world profile)',
-                    );
-                }
-            }
-
-            return $self->complete($session, $standardCmd, $confirm);
-        }
-    }
-}
-
-{ package Games::Axmud::Cmd::ListDivertPattern;
-
-    use strict;
-    use warnings;
-    use diagnostics;
-
-    use Glib qw(TRUE FALSE);
-
-    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
-
-    ##################
-    # Constructors
-
-    sub new {
-
-        # Create a new instance of this command object (there should only be one)
-        #
-        # Expected arguments
-        #   (none besides $class)
-        #
-        # Return values
-        #   'undef' if GA::Generic::Cmd->new reports an error
-        #   Blessed reference to the new object on success
-
-        my ($class, $check) = @_;
-
-        # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('listdivertpattern', TRUE, TRUE);
-        if (! $self) {return undef}
-
-        $self->{defaultUserCmdList} = ['ldp', 'listdivert', 'listdivertpattern'];
-        $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Lists patterns for Divert tasks';
-
-        # Bless the object into existence
-        bless $self, $class;
-        return $self;
-    }
-
-    ##################
-    # Methods
-
-    sub do {
-
-        my (
-            $self, $session, $inputString, $userCmd, $standardCmd,
-            $switch,
-            $check,
-        ) = @_;
-
-        # Local variables
-        my (
-            $worldObj, $count,
-            @list,
-        );
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $self->improper($session, $inputString);
-        }
-
-        # Import the current world profile
-        $worldObj = $session->currentWorld;
-
-       if (! $switch || $switch eq '-t' || $switch eq '-e') {
-
-            @list = $worldObj->tellPatternList;
-            if (@list) {
-
-                # Display header
-                $session->writeText('List of tell patterns for Divert tasks');
-
-                # Display list
-                $count = 0;
-                foreach my $pattern (@list) {
-
-                    $count++;
-                    $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
-                }
-
-                # Display footer
-                if (@list == 1) {
-                    $session->writeText('End of list (1 pattern found)');
-                } else {
-                    $session->writeText('End of list (' . scalar @list . ' patterns found)');
-                }
-
-            } else {
-
-                $session->writeText('List of tell patterns for Divert tasks is empty');
-            }
-
-            @list = $worldObj->noTellPatternList;
-            if (@list) {
-
-                # Display header
-                $session->writeText('List of tell exception patterns for Divert tasks');
-
-                # Display list
-                $count = 0;
-                foreach my $pattern (@list) {
-
-                    $count++;
-                    $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
-                }
-
-                # Display footer
-                if ($count == 1) {
-                    $session->writeText('End of list (1 pattern found)');
-                } else {
-                    $session->writeText('End of list (' . scalar @list . ' patterns found)');
-                }
-
-            } else {
-
-                $session->writeText('List of tell exception patterns for Divert tasks is empty');
-            }
-        }
-
-        if (! $switch || $switch eq '-s' || $switch eq '-o') {
-
-            @list = $worldObj->socialPatternList;
-            if (@list) {
-
-                # Display header
-                $session->writeText('List of social patterns for Divert tasks');
-
-                # Display list
-                $count = 0;
-                foreach my $pattern (@list) {
-
-                    $count++;
-                    $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
-                }
-
-                # Display footer
-                if (@list == 1) {
-                    $session->writeText('End of list (1 pattern found)');
-                } else {
-                    $session->writeText('End of list (' . scalar @list . ' patterns found)');
-                }
-
-            } else {
-
-                $session->writeText('List of social patterns for Divert tasks is empty');
-            }
-
-            @list = $worldObj->noSocialPatternList;
-            if (@list) {
-
-                # Display header
-                $session->writeText('List of social exception patterns for Divert tasks');
-
-                # Display list
-                $count = 0;
-                foreach my $pattern (@list) {
-
-                    $count++;
-                    $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
-                }
-
-                # Display footer
-                if ($count == 1) {
-                    $session->writeText('End of list (1 pattern found)');
-                } else {
-                    $session->writeText('End of list (' . scalar @list . ' patterns found)');
-                }
-
-            } else {
-
-                $session->writeText('List of social exception patterns for Divert tasks is empty');
-            }
-        }
-
-        if (! $switch || $switch eq '-c' || $switch eq '-u' || $switch eq '-x') {
-
-            @list = $worldObj->customDivertPatternList;
-            if (@list) {
-
-                # Display header
-                $session->writeText('List of custom patterns for Divert tasks');
-
-                # Display list
-                $count = 0;
-                foreach my $pattern (@list) {
-
-                    $count++;
-                    $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
-                }
-
-                # Display footer
-                if (@list == 1) {
-                    $session->writeText('End of list (1 pattern found)');
-                } else {
-                    $session->writeText('End of list (' . scalar @list . ' patterns found)');
-                }
-
-            } else {
-
-                $session->writeText('List of custom patterns for Divert tasks is empty');
-            }
-
-            @list = $worldObj->noCustomDivertPatternList;
-            if (@list) {
-
-                # Display header
-                $session->writeText('List of custom exception patterns for Divert tasks');
-
-                # Display list
-                $count = 0;
-                foreach my $pattern (@list) {
-
-                    $count++;
-                    $session->writeText(sprintf('   %-4.4s', $count) . ' ' . $pattern);
-                }
-
-                # Display footer
-                if ($count == 1) {
-                    $session->writeText('End of list (1 pattern found)');
-                } else {
-                    $session->writeText('End of list (' . scalar @list . ' patterns found)');
-                }
-
-            } else {
-
-                $session->writeText('List of custom exception patterns for Divert tasks is empty');
-            }
-        }
-
-        return $self->complete($session, $standardCmd, 'Lists displayed');
-    }
-}
-
-{ package Games::Axmud::Cmd::EmptyDivertWindow;
-
-    use strict;
-    use warnings;
-    use diagnostics;
-
-    use Glib qw(TRUE FALSE);
-
-    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
-
-    ##################
-    # Constructors
-
-    sub new {
-
-        # Create a new instance of this command object (there should only be one)
-        #
-        # Expected arguments
-        #   (none besides $class)
-        #
-        # Return values
-        #   'undef' if GA::Generic::Cmd->new reports an error
-        #   Blessed reference to the new object on success
-
-        my ($class, $check) = @_;
-
-        # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('emptydivertwindow', TRUE, FALSE);
-        if (! $self) {return undef}
-
-        $self->{defaultUserCmdList} = ['edw', 'emptydivert', 'emptydivertwindow'];
-        $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Empties the Divert task window';
-
-        # Bless the object into existence
-        bless $self, $class;
-        return $self;
-    }
-
-    ##################
-    # Methods
-
-    sub do {
-
-        my (
-            $self, $session, $inputString, $userCmd, $standardCmd,
-            $check,
-        ) = @_;
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $self->improper($session, $inputString);
-        }
-
-        # Check the Divert task is running and has a window open
-        if (! $session->divertTask) {
-
-            return $self->error(
-                $session, $inputString,
-                'The Divert task is not currently running',
-            );
-
-        } elsif (! $session->divertTask->taskWinFlag) {
-
-            return $self->error(
-                $session, $inputString,
-                'The Divert task is running without a task window',
-            );
-
-        } else {
-
-            # Reset the task's window
-            $session->divertTask->resetWin();
-
-            return $self->complete(
-                $session, $standardCmd,
-                'The Divert task\'s window has been reset',
-            );
-        }
-    }
-}
-
 # Inventory / Condition tasks
 
 { package Games::Axmud::Cmd::ActivateInventory;
@@ -76452,7 +76667,7 @@
         }
 
         # Display header
-        $self->writeText('Protected object list for \'' . $session->currentChar->name . '\'');
+        $session->writeText('Protected object list for \'' . $session->currentChar->name . '\'');
 
         # Display list
         @list = $session->currentChar->protectObjList;
@@ -76463,34 +76678,34 @@
             $count++;
 
             if ($obj->noun) {
-                $self->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: ' . $obj->noun);
+                $session->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: ' . $obj->noun);
             } else {
-                $self->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: <unnamed>');
+                $session->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: <unnamed>');
             }
 
             if ($obj->categoryList) {
 
-                $self->writeText('        Categories  : ' . join(' / ', $obj->categoryList));
+                $session->writeText('        Categories  : ' . join(' / ', $obj->categoryList));
             }
 
             if ($obj->otherNounList) {
 
-                $self->writeText('        Other nouns : ' . join(' / ', $obj->otherNounList));
+                $session->writeText('        Other nouns : ' . join(' / ', $obj->otherNounList));
             }
 
             if ($obj->adjList) {
 
-                $self->writeText('        Adjectives  : ' . join(' / ', $obj->adjList));
+                $session->writeText('        Adjectives  : ' . join(' / ', $obj->adjList));
             }
 
             if ($obj->pseudoAdjList) {
 
-                $self->writeText('        Pseudo-adjs : ' . join(' / ', $obj->pseudoAdjList));
+                $session->writeText('        Pseudo-adjs : ' . join(' / ', $obj->pseudoAdjList));
             }
 
             if ($obj->unknownWordList) {
 
-                $self->writeText('        Unknowns    : ' . join(' / ', $obj->unknownWordList));
+                $session->writeText('        Unknowns    : ' . join(' / ', $obj->unknownWordList));
             }
         }
 
@@ -77060,7 +77275,7 @@
         }
 
         # Display header
-        $self->writeText('Monitored object list for \'' . $session->currentChar->name . '\'');
+        $session->writeText('Monitored object list for \'' . $session->currentChar->name . '\'');
 
         # Display list
         @list = $session->currentChar->monitorObjList;
@@ -77071,34 +77286,34 @@
             $count++;
 
             if ($obj->noun) {
-                $self->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: ' . $obj->noun);
+                $session->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: ' . $obj->noun);
             } else {
-                $self->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: <unnamed>');
+                $session->writeText(' ' . sprintf('%-3.3s', $count) . ' Object: <unnamed>');
             }
 
             if ($obj->categoryList) {
 
-                $self->writeText('        Categories  : ' . join(' / ', $obj->categoryList));
+                $session->writeText('        Categories  : ' . join(' / ', $obj->categoryList));
             }
 
             if ($obj->otherNounList) {
 
-                $self->writeText('        Other nouns : ' . join(' / ', $obj->otherNounList));
+                $session->writeText('        Other nouns : ' . join(' / ', $obj->otherNounList));
             }
 
             if ($obj->adjList) {
 
-                $self->writeText('        Adjectives  : ' . join(' / ', $obj->adjList));
+                $session->writeText('        Adjectives  : ' . join(' / ', $obj->adjList));
             }
 
             if ($obj->pseudoAdjList) {
 
-                $self->writeText('        Pseudo-adjs : ' . join(' / ', $obj->pseudoAdjList));
+                $session->writeText('        Pseudo-adjs : ' . join(' / ', $obj->pseudoAdjList));
             }
 
             if ($obj->unknownWordList) {
 
-                $self->writeText('        Unknowns    : ' . join(' / ', $obj->unknownWordList));
+                $session->writeText('        Unknowns    : ' . join(' / ', $obj->unknownWordList));
             }
         }
 
@@ -78197,6 +78412,147 @@
             return $self->complete(
                 $session, $standardCmd,
                 'Inserted a \'look\' command into the Locator task\'s movement list',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::InsertFailedExit;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('insertfailedexit', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = [
+            'ife', 'ifail', 'insertfail', 'insertfailexit', 'insertfailedexit',
+        ];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Automatically adds a failed exit message';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $switch,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $mode;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Prepare arguments for the call to the Locator task
+        if (! $switch || $switch eq '-r') {
+            $mode = 'room';
+        } elsif ($switch eq '-w') {
+            $mode = 'world';
+        } elsif ($switch eq '-u') {
+            $mode = 'update';
+        } else {
+
+            return $self->error(
+                $session, $inputString,
+                'Unrecognised switch \'' . $switch . '\'',
+            );
+        }
+
+        # Do same basic checks
+        if (! $session->locatorTask) {
+
+            return $self->error($session, $inputString, 'The Locator task is not running');
+
+        } elsif (! $session->locatorTask->roomObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'The Locator task doesn\'t know your character\'s location',
+            );
+
+        } elsif ($mode eq 'room' && ! $session->mapObj->currentRoom) {
+
+            return $self->error(
+                $session, $inputString,
+                'The automapper\'s current room is not set',
+            );
+
+        } elsif (! defined $session->locatorTask->prevCmdBufferNum) {
+
+            return $self->error(
+                $session, $inputString,
+                'This command can only be used when the Locator task is expecting one room'
+                . ' statement in response to a movement or a look/glance command',
+            );
+        }
+
+        # Insert the failed exit message
+        if (! $session->locatorTask->insertFailedExit($mode)) {
+
+            if ($mode eq 'room') {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Could not insert a failed exit message into the current room\'s list of such'
+                    . ' messages',
+                );
+
+            } elsif ($mode eq 'world') {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Could not insert a failed exit message into the world profile\'s list of such'
+                    . ' messages',
+                );
+
+            } else {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Could not update the Locator task after a failed exit message',
+                );
+            }
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Inserted a failed exit message into the current room\'s list of such messages',
             );
         }
     }
@@ -80328,7 +80684,7 @@
         my $self = Games::Axmud::Generic::Cmd->new('setstatusevent', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['sse', 'setevent', 'setstatusevent'];
+        $self->{defaultUserCmdList} = ['sev', 'setevent', 'setstatusevent'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
         $self->{descrip} = 'Handles settings for Status task events';
 
@@ -83115,7 +83471,7 @@
        # Local variables
         my (
             $mainCount, $suppCount, $matchFlag, $visitsFlag, $guildsFlag, $roomFlagsFlag,
-            $roomsFlag, $exitsFlag, $quickFlag,
+            $roomsFlag, $exitsFlag, $checkedFlag, $quickFlag,
             @charList, @regionList, @guildNameList, @roomFlagList, @regionObjList,
         );
 
@@ -83131,7 +83487,7 @@
                 $matchFlag = FALSE;
 
                 # Extract the main switches: -v (visits), -g (guilds), -f (room flags),
-                #   -m (room titles/descrips), -x (exits), -q (quick)
+                #   -m (room titles/descrips), -x (exits), -h (checked directions), -q (quick)
                 ($switch, @args) = $self->extract('-v', 0, @args);
                 if (defined $switch) {
 
@@ -83169,6 +83525,14 @@
 
                     $matchFlag = TRUE;
                     $exitsFlag = TRUE;
+                    $mainCount++;
+                }
+
+                ($switch, @args) = $self->extract('-h', 0, @args);
+                if (defined $switch) {
+
+                    $matchFlag = TRUE;
+                    $checkedFlag = TRUE;
                     $mainCount++;
                 }
 
@@ -83272,7 +83636,7 @@
 
             return $self->error(
                 $session, $inputString,
-                'Only one switch from the group -v, -g, -f, -m, -x, -q allowed',
+                'Only one switch from the group -v, -g, -f, -m, -x, -h, -q allowed',
             );
         }
 
@@ -83905,12 +84269,12 @@
                 }
             }
 
-            if (! @roomFlagList) {
-
-                $session->writeText(' ');
-            }
-
             if (%combinedHash) {
+
+                if (! @roomFlagList) {
+
+                    $session->writeText(' ');
+                }
 
                 # Get a sorted list of all room flags found
                 @sortedRoomFlagList = sort {lc($a) cmp lc($b)} (keys %combinedHash);
@@ -84083,8 +84447,62 @@
                 . ', incomplete/impassable: ' . $incompleteImpassTotal . ')',
             );
 
+        # ;mrp -h
+        # ;mrp -h -r <region>
+        } elsif ($checkedFlag) {
+
+            my (
+                $exitTotal, $checkedTotal, $checkableTotal,
+                %dirHash,
+            );
+
+            # The number of checkable directions depends on GA::Obj::WorldModel->checkableDirMode,
+            #   and specifies directions ranging from NSEW to all primary directions
+            # Compile a hash of checkable directions, in the form
+            #   %hash{custom_primary_direction} = undef
+            %dirHash = $session->worldModelObj->getCheckableDirs($session);
+
+            # Display header
+            $session->writeText('World model checked direction report');
+            $session->writeText(' ');
+
+            # Initialise counts
+            $exitTotal = 0;
+            $checkedTotal = 0;
+            $checkableTotal = 0;
+
+            # Display list
+            foreach my $regionObj (@regionObjList) {
+
+                my ($exitCount, $checkedCount, $checkableCount)
+                    = $regionObj->countCheckedDirs($session, %dirHash);
+
+                $exitTotal += $exitCount;
+                $checkedTotal += $checkedCount;
+                $checkableTotal += $checkableCount;
+
+                $session->writeText('   Region \'' . $regionObj->name . '\'');
+
+                $session->writeText('      World model exits       : ' . $exitCount);
+                $session->writeText('      Checked directions      : ' . $checkedCount);
+                $session->writeText('      Checkable directions    : ' . $checkableCount);
+            }
+
+            # Display footer
+            return $self->complete(
+                $session, $standardCmd,
+                'End of checked direction report (total world model exits: ' . $exitTotal
+                . ', checked directions: ' . $checkedTotal . ', checkable directions: '
+                . $checkableTotal . ')',
+            );
+
         # ;mrp -q
         } elsif ($quickFlag) {
+
+            # Display header
+            $session->writeText('World model exit report');
+            $session->writeText(' ');
+
 
             my (
                 $regionmap, $visitCount, $titleCount, $verbCount,
@@ -84166,7 +84584,7 @@
             return $self->complete(
                 $session, $standardCmd,
                 'End of quick report (unvisited rooms: ' . $visitCount . ', rooms without titles: '
-                . $titleCount . ', rooms without verbose descrips: ' . $verbCount . ')',
+                . $titleCount . ', rooms without verbose descriptions: ' . $verbCount . ')',
             );
         }
     }
@@ -84404,6 +84822,573 @@
             return $self->complete(
                 $session, $standardCmd,
                 'End of list (' . scalar @sortedList . ' child objects found)',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::AddLabelStyle;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('addlabelstyle', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['als', 'addstyle', 'addlabelstyle'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Adds a map label style';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $name, $text, $underlay,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my ($type, $underlayFlag, $obj);
+
+        # Check for improper arguments
+        if (! defined $name || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check $name is not too long
+        if (length $name > 16) {
+
+            return $self->error(
+                $session, $inputString,
+                'Invalid label style name (can contain any characters, but maximum length is 16)',
+            );
+
+        # Check a style with that name doesn't already exist
+        } elsif ($session->worldModelObj->ivExists('mapLabelStyleHash', $name)) {
+
+            return $self->error(
+                $session, $inputString,
+                'There is already a label style called \'' . $name . '\' in the world model',
+            );
+        }
+
+        # If $text and $underlay are specified, check they're valid, and convert to am RGB colour
+        #   tag
+        if (defined $text) {
+
+            ($type, $underlayFlag) = $axmud::CLIENT->checkColourTags($text);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid ' . $axmud::SCRIPT . ' colour tag \'' . $text . '\'',
+                );
+
+            } else {
+
+                if ($underlayFlag) {
+
+                    # Convert an underlay tag to a text tag (the Gnome2::Canvas doesn't care about
+                    #   the difference between Axmud text/underlay colour tags)
+                    $text = $axmud::CLIENT->swapColours($text);
+                }
+
+                # Convert to an RGB colour tag
+                $text = $axmud::CLIENT->returnRGBColour($text);
+            }
+        }
+
+        if (defined $underlay) {
+
+            ($type) = $axmud::CLIENT->checkColourTags($underlay);
+            if (! $type) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Invalid ' . $axmud::SCRIPT . ' colour tag \'' . $underlay . '\'',
+                );
+
+            } else {
+
+                if ($underlayFlag) {
+
+                    $underlay = $axmud::CLIENT->swapColours($underlay);
+                }
+
+                $underlay = $axmud::CLIENT->returnRGBColour($underlay);
+            }
+        }
+
+        # Create the map label style object
+        $obj = $session->worldModelObj->addLabelStyle($session, $name, $text, $underlay);
+
+        # Operation complete
+        if (! $obj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Could not add label style \'' . $name . '\'',
+            );
+
+        } else {
+
+            return $self->complete($session, $standardCmd, 'Added label style \'' . $name . '\'');
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::EditLabelStyle;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('editlabelstyle', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['els', 'editstyle', 'editlabelstyle'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Opens an \'edit\' window for a map label style';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $name,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $obj;
+
+        # Check for improper arguments
+        if (! defined $name || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the map label style exists
+        $obj = $session->worldModelObj->ivShow('mapLabelStyleHash', $name);
+        if (! $obj) {
+
+            return $self->error(
+                $session, $inputString,
+                'The world model doesn\'t contain a map label style called \'' . $name . '\'',
+            );
+        }
+
+        # Open an \'edit\' window for the style object
+        if (
+            ! $session->mainWin->createFreeWin(
+                'Games::Axmud::EditWin::MapLabelStyle',
+                $session->mainWin,
+                $session,
+                'Edit label style \'' . $name . '\'',
+                $obj,
+                FALSE,                  # Not temporary
+            )
+        ) {
+            return $self->error(
+                $session, $inputString,
+                'Could not edit the map label style \'' . $name . '\'',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Opened \'edit\' window for the map label style \'' . $name . '\'',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::RenameLabelStyle;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('renamelabelstyle', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['rls', 'renamestyle', 'renamelabelstyle'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Renames a map label style';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $oldName, $newName,
+            $check,
+        ) = @_;
+
+        # Check for improper arguments
+        if (! defined $oldName || ! defined $newName || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check that the old name exists (no reason why it shouldn't, but we'll check anyway)
+        if (! $session->worldModelObj->ivExists('mapLabelStyleHash', $oldName)) {
+
+            return $self->error(
+                $session, $inputString,
+                'A map label style called \'' . $oldName . '\' doesn\'t exist',
+            );
+
+        # ...and that the new name doesn't already exist
+        } elsif ($session->worldModelObj->ivExists('mapLabelStyleHash', $newName)) {
+
+            return $self->error(
+                $session, $inputString,
+                'A map label style called \'' . $newName . '\' already exists',
+            );
+
+        } elsif (! $session->worldModelObj->renameLabelStyle($session, $oldName, $newName)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Failed to rename the map label style \'' . $oldName . '\'',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Map label style \'' . $oldName . '\' renamed as \'' . $newName . '\'',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::DeleteLabelStyle;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('deletelabelstyle', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['dls', 'delstyle', 'deletestyle', 'deletelabelstyle'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Deletes a map label style';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $name,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $obj;
+
+        # Check for improper arguments
+        if (! defined $name || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the map label style exists
+        $obj = $session->worldModelObj->ivShow('mapLabelStyleHash', $name);
+        if (! $obj) {
+
+            return $self->error(
+                $session, $inputString,
+                'The world model doesn\'t contain a map label style called \'' . $name . '\'',
+            );
+
+        } else {
+
+            # Delete the style
+            $session->worldModelObj->deleteLabelStyle(
+                TRUE,           # Update automapper windows now
+                $name,
+            );
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Map label style \'' . $name . '\' deleted',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::ListLabelStyle;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('listlabelstyle', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['lls', 'liststyle', 'listlabelstyles'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Lists map label styles';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my @list;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        if (! $session->worldModelObj->mapLabelStyleHash) {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'The world model contains no map label styles',
+            );
+        }
+
+        # Display header
+        $session->writeText(
+            'List of map label styles (* - current style for new labels)',
+        );
+        $session->writeText(
+            '   Name             Text     Underlay Size     Ital Bold Undl Strk Box  Orientation',
+        );
+
+        # Display list
+        @list = sort {lc($a->name) cmp lc($b->name)}
+                    ($session->worldModelObj->ivValues('mapLabelStyleHash'));
+
+        foreach my $obj (@list) {
+
+            my ($column, $text, $underlay, $italics, $bold, $under, $strike, $box);
+
+            if (
+                defined $session->worldModelObj->mapLabelStyle
+                && $session->worldModelObj->mapLabelStyle eq $obj->name
+            ) {
+                $column = ' * ';
+            } else {
+                $column = '   ';
+            }
+
+            if (defined $obj->textColour) {
+                $text = $obj->textColour;
+            } else {
+                $text = 'not set';
+            }
+
+            if (defined $obj->underlayColour) {
+                $underlay = $obj->underlayColour;
+            } else {
+                $underlay = 'not set';
+            }
+
+            if (! $obj->italicsFlag) {
+                $italics = 'NO   ';
+            } else {
+                $italics = 'YES  ';
+            }
+
+            if (! $obj->boldFlag) {
+                $bold = 'NO   ';
+            } else {
+                $bold = 'YES  ';
+            }
+
+            if (! $obj->underlineFlag) {
+                $under = 'NO   ';
+            } else {
+                $under = 'YES  ';
+            }
+
+            if (! $obj->strikeFlag) {
+                $strike = 'NO   ';
+            } else {
+                $strike = 'YES  ';
+            }
+
+            if (! $obj->boxFlag) {
+                $box = 'NO   ';
+            } else {
+                $box = 'YES  ';
+            }
+
+
+            $session->writeText(
+                $column
+                .  sprintf(
+                    '%-16.16s %-8.8s %-8.8s %-8.8s ', $obj->name, $text, $underlay, $obj->relSize,
+                )
+                . $italics . $bold . $under . $strike . $box . $obj->gravity,
+            );
+        }
+
+        # Display footer
+        if (@list == 1) {
+
+            return $self->complete($session, $standardCmd, 'End of list (1 map label style found)');
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'End of list (' . @list . ' map label styles found)',
             );
         }
     }
@@ -85690,11 +86675,22 @@
             if ($session->mapWin) {
 
                 if ($waitFlag) {
+
                     $result = $session->mapWin->setMode('wait');
-                } elsif ($followFlag) {
-                    $result = $session->mapWin->setMode('follow');
-                } elsif ($updateFlag) {
-                    $result = $session->mapWin->setMode('update');
+
+                } else {
+
+                    if ($followFlag) {
+                        $result = $session->mapWin->setMode('follow');
+                    } elsif ($updateFlag) {
+                        $result = $session->mapWin->setMode('update');
+                    }
+
+                    # The call to ->setMode fails if no regionmap is visible, and when 'follow' mode
+                    #   is on, the previous call to ->setCurrentRoom didn't set the automapper's
+                    #   ghost room
+                    # Solution to both problems is to set the current room a second time
+                    $session->mapObj->setCurrentRoom($roomObj);
                 }
 
                 if (! $result) {
@@ -86023,7 +87019,7 @@
         # Local variables
         my (
             $waitFlag, $followFlag, $updateFlag, $taskObj, $newRoomObj, $result,
-            @roomList,
+            @roomList, @selectList,
         );
 
         # Check for improper arguments
@@ -86094,7 +87090,8 @@
         # Compare the Locator task's current room with every room in the model
         foreach my $roomObj ($session->worldModelObj->ivValues('roomModelHash')) {
 
-            if ($session->worldModelObj->locateRoom($session, $roomObj)) {
+            my ($result) = $session->worldModelObj->compareRooms($session, $roomObj);
+            if ($result) {
 
                 push (@roomList, $roomObj);
             }
@@ -86163,6 +87160,22 @@
                     }
                 }
             }
+
+        # If more than one match was found and the automapper window is open, select the matching
+        #   rooms
+        } elsif (@roomList && $session->mapWin) {
+
+            foreach my $roomObj (@roomList) {
+
+                push (@selectList, $roomObj, 'room');
+            }
+
+            $session->mapWin->setSelectedObj();
+            $session->mapWin->setSelectedObj(\@selectList, TRUE);
+        }
+
+        # Display footer
+        if (@roomList == 1) {
 
             # Display footer
             return $self->complete(
@@ -88234,6 +89247,189 @@
                 'End of exit model list (' . $count  . ' objects found)',
             );
         }
+    }
+}
+
+{ package Games::Axmud::Cmd::AllocateExit;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('allocateexit', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['alx', 'allocexit', 'allocateexit'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Allocates an unallocated exit';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            @args,
+        ) = @_;
+
+        # Local variables
+        my ($roomObj, $dir, $standardDir, $customDir, $string);
+
+        # Check for improper arguments
+        if ((scalar @args) < 2) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Import the automapper's current room (for convenience)
+        $roomObj = $session->mapObj->currentRoom;
+
+        # Check that allocating an exit is feasible
+        if (! $roomObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t allocate a primary direction to an exit until a current room is set',
+            );
+        }
+
+        # The first argument is a primary direction (standard or custom, abbreviated or not)
+        $dir = shift @args;
+        # Translate it into a standard primary direction
+        $standardDir = $session->currentDict->checkStandardDir($dir);
+        if (! defined $standardDir) {
+
+            return $self->error(
+                $session, $inputString,
+                '\'' . $dir . '\' is not a recognised primary direction',
+            );
+
+        } else {
+
+            # Get the unabbreviated form
+            $customDir = $session->currentDict->ivShow('primaryDirHash', $standardDir);
+        }
+
+        # The remaining arguments (once joined together in a simple string, eliminating multiple
+        #   whitespace characters) should match an unallocated exit in the automapper's current room
+        # Find the matching unallocated exit
+        $string = join(' ', @args);
+        OUTER: foreach my $dir ($roomObj->ivKeys('exitNumHash')) {
+
+            my ($exitObj, $matchExitObj, $result);
+
+            if (index($dir, $string) != -1) {
+
+                # Check it's an unallocated exit
+                $exitObj = $session->worldModelObj->ivShow(
+                    'exitModelHash',
+                    $roomObj->ivShow('exitNumHash', $dir),
+                );
+
+                # If the exit object doesn't exist (for some reason), then obviously we can't
+                #   allocate a direction to it (the error message at the end of this function is
+                #   seen instead)
+                if ($exitObj) {
+
+                    if (
+                        $exitObj->drawMode ne 'temp_alloc'
+                        && $exitObj->drawMode ne 'temp_unalloc'
+                    ) {
+                        return $self->error(
+                            $session, $inputString,
+                            'The exit \'' . $dir . '\' is not an unallocated exit',
+                        );
+                    }
+
+                    # If any exits already use the same map direction, then it's an 'allocate
+                    #   shadow' operation
+                    INNER: foreach my $exitNum ($roomObj->ivValues('exitNumHash')) {
+
+                        my $otherExitObj = $session->worldModelObj->ivShow(
+                            'exitModelHash',
+                            $roomObj->ivShow('exitNumHash', $dir),
+                        );
+
+                        if ($otherExitObj ne $exitObj && $otherExitObj->mapDir eq $standardDir) {
+
+                            $matchExitObj = $otherExitObj;
+                            last INNER;
+                        }
+                    }
+
+                    if ($matchExitObj) {
+
+                        $result = $session->worldModelObj->setExitShadow(
+                            TRUE,                   # Update Automapper windows now
+                            $roomObj,
+                            $matchExitObj,
+                            $exitObj,
+                        );
+
+                    } else {
+
+                        $result = $session->worldModelObj->setExitMapDir(
+                            $session,
+                            TRUE,                   # Update Automapper windows now
+                            $roomObj,
+                            $exitObj,
+                            $standardDir,
+                        );
+                    }
+
+                    if (! $result) {
+
+                        return $self->error(
+                            $session, $inputString,
+                            'Failed to allocate the \'' . $dir . '\' exit in the direction \''
+                            . $customDir . '\'',
+                        );
+
+                    } else {
+
+                        return $self->complete(
+                            $session, $standardCmd,
+                            'Allocated the \'' . $dir . '\' exit to the direction \''
+                            . $customDir . '\'',
+                        );
+                    }
+                }
+            }
+        }
+
+        # No matching exit found
+        return $self->error(
+            $session, $inputString,
+            'Couldn\'t find an unallocated exit matching \'' . $string . '\' in the automapper\'s'
+            . ' current room',
+        );
     }
 }
 

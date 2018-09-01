@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.70';
+  $Math::Prime::Util::VERSION = '0.71';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -33,13 +33,14 @@ our @EXPORT_OK =
       miller_rabin_random
       lucas_sequence lucasu lucasv
       primes twin_primes ramanujan_primes sieve_prime_cluster sieve_range
-      forprimes forcomposites foroddcomposites fordivisors
+      forprimes forcomposites foroddcomposites forsemiprimes fordivisors
       forpart forcomp forcomb forperm forderange formultiperm
+      forfactored forsquarefree
       lastfor
       numtoperm permtonum randperm shuffle
       prime_iterator prime_iterator_object
       next_prime  prev_prime
-      prime_count
+      prime_count semiprime_count
       prime_count_lower prime_count_upper prime_count_approx
       nth_prime nth_prime_lower nth_prime_upper nth_prime_approx inverse_li
       twin_prime_count twin_prime_count_approx
@@ -54,6 +55,7 @@ our @EXPORT_OK =
       random_maurer_prime random_maurer_prime_with_cert
       random_shawe_taylor_prime random_shawe_taylor_prime_with_cert
       random_semiprime random_unrestricted_semiprime
+      random_factored_integer
       primorial pn_primorial consecutive_integer_lcm gcdext chinese
       gcd lcm factor factor_exp divisors valuation hammingweight
       todigits fromdigits todigitstring sumdigits
@@ -562,53 +564,81 @@ sub _generic_forprimes {
   Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
-sub _generic_forcomposites {
-  my($sub, $beg, $end) = @_;
-  if (!defined $end) { $end = $beg; $beg = 4; }
+sub _generic_forcomp_sub {
+  my($what, $sub, $beg, $end) = @_;
+  if (!defined $end) { $end = $beg; $beg = 0; }
   _validate_positive_integer($beg);
   _validate_positive_integer($end);
-  $beg = 4 if $beg < 4;
+  my $cinc = 1;
+  my $semiprimes = ($what eq 'semiprimes');
+  if ($what eq 'oddcomposites') {
+    $beg = 9 if $beg < 9;
+    $beg++ unless $beg & 1;
+    $cinc = 2;
+  } else {
+    $beg = 4 if $beg < 4;
+  }
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
   my $oldforexit = Math::Prime::Util::_start_for_loop();
   {
     my $pp;
     local *_ = \$pp;
     for (my $p = next_prime($beg-1);  $beg <= $end;  $p = next_prime($p)) {
-      for ( ; $beg < $p && $beg <= $end ; $beg++ ) {
+      for ( ; $beg < $p && $beg <= $end ; $beg += $cinc ) {
+        next if $semiprimes && !is_semiprime($beg);
         $pp = $beg;
         $sub->();
         last if Math::Prime::Util::_get_forexit();
       }
-      $beg++;
+      $beg += $cinc;
       last if Math::Prime::Util::_get_forexit();
     }
   }
   Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
+sub _generic_forcomposites {
+  _generic_forcomp_sub('composites', @_);
+}
+
 sub _generic_foroddcomposites {
-  my($sub, $beg, $end) = @_;
-  if (!defined $end) { $end = $beg; $beg = 9; }
+  _generic_forcomp_sub('oddcomposites', @_);
+}
+
+sub _generic_forsemiprimes {
+  _generic_forcomp_sub('semiprimes', @_);
+}
+
+sub _generic_forfac {
+  my($sf, $sub, $beg, $end) = @_;
   _validate_positive_integer($beg);
-  _validate_positive_integer($end);
-  $beg = 9 if $beg < 9;
-  $beg++ unless $beg & 1;
-  $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
+  if (defined $end) {
+    _validate_positive_integer($end);
+    $beg = 1 if $beg < 1;
+  } else {
+    ($beg,$end) = (1,$beg);
+  }
   my $oldforexit = Math::Prime::Util::_start_for_loop();
   {
     my $pp;
     local *_ = \$pp;
-    for (my $p = next_prime($beg-1);  $beg <= $end;  $p = next_prime($p)) {
-      for ( ; $beg < $p && $beg <= $end ; $beg += 2 ) {
+    while ($beg <= $end) {
+      if (!$sf || is_square_free($beg)) {
         $pp = $beg;
-        $sub->();
+        my @f = factor($beg);
+        $sub->(@f);
         last if Math::Prime::Util::_get_forexit();
       }
-      $beg += 2;
-      last if Math::Prime::Util::_get_forexit();
+      $beg++;
     }
   }
   Math::Prime::Util::_end_for_loop($oldforexit);
+}
+sub _generic_forfactored {
+  _generic_forfac(0, @_);
+}
+sub _generic_forsquarefree {
+  _generic_forfac(1, @_);
 }
 
 sub _generic_fordivisors {
@@ -983,7 +1013,7 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.70
+Version 0.71
 
 
 =head1 SYNOPSIS
@@ -1381,6 +1411,44 @@ numbers greater than 1 which are not prime and not divisible by two:
 C<9, 15, 21, 25, 27, 33, 35, ...>.
 
 
+=head2 forsemiprimes
+
+Similar to L</forcomposites>, but only giving composites with exactly
+two factors.
+The semiprimes, L<OEIS A001358|http://oeis.org/A001358>, are the
+products of two primes:
+C<4, 6, 9, 10, 14, 15, 21, 22, 25, ...>.
+
+This is essentially equivalent to:
+
+  forcomposites { if (is_semiprime($_)) { ... } }
+
+
+=head2 forfactored
+
+  forfactored { say "$_: @_"; } 100;
+
+Given a block and either an end number or start/end pair, calls the block for
+each number in the inclusive range.  C<$_> is set to the number while C<@_>
+holds the factors.  Especially for small inputs or large ranges, This can be
+faster than calling L</factor> on each sequential value.
+
+Similar to the arrays returned by similar functions such as L</forpart>,
+the values in C<@_> are read-only.
+Any attempt to modify them will result in undefined behavior.
+
+This corresponds to the Pari/GP 2.10 C<forfactored> function.
+
+
+=head2 forsquarefree
+
+Similar to L</forfactored>, but skipping numbers in the range that have a
+repeated factor.  Inside the block, the moebius function can be cheaply
+computed as C<((scalar(@_) & 1) ? -1 : 1)> or similar.
+
+This corresponds to the Pari/GP 2.10 C<forsquarefree> function.
+
+
 =head2 fordivisors
 
   fordivisors { $prod *= $_ } $n;
@@ -1656,6 +1724,17 @@ conjecture B of Hardy and Littlewood 1922, as stated in
 Sebah and Gourdon 2002.  For inputs under 10M, a correction factor is
 additionally applied to reduce the mean squared error.
 
+
+=head2 semiprime_count
+
+Similar to prime count, but returns the count of semiprimes (composites with
+exactly two factors).  Takes either a single number indicating a count
+from 2 to the argument, or two numbers indicating a range.
+
+A fast method that requires computation only to the square root of the
+range end is used, unless the range is so small that walking it is faster.
+
+
 =head2 ramanujan_primes
 
 Returns the Ramanujan primes R_n between the upper and lower limits
@@ -1749,7 +1828,8 @@ a Legendre sum method for larger values.
 
 While this is fairly efficient, the state of the art is Kim Walisch's
 L<primesum|https://github.com/kimwalisch/primesum>.
-It is recommended for very large values.
+It is recommended for very large values, as it can be hundreds of times
+faster.
 
 =head2 print_primes
 
@@ -3690,6 +3770,19 @@ Manual seeding using C<srand> is not compatible with cryptographic security.
 
 An alias for L</drand>, not exported unless the ":rand" tag is used.
 
+=head2 random_factored_integer
+
+  my($n, $factors) = random_factored_integer(1000000);
+
+Given a positive non-zero input C<n>, returns a uniform random integer
+in the range C<1> to C<n>, along with an array reference containing
+the factors.
+
+This uses Kalai's algorithm for generating random integers along with
+their factorization, and is much faster than the naive method of
+generating random integers followed by a factorization.
+A later implementation may use Bach's more efficient algorithm.
+
 
 =head1 RANDOM PRIMES
 
@@ -5328,7 +5421,7 @@ Douglas A. Stoll and Patrick Demichel , "The impact of ζ(s) complex zeros on π
 
 =head1 COPYRIGHT
 
-Copyright 2011-2017 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
+Copyright 2011-2018 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

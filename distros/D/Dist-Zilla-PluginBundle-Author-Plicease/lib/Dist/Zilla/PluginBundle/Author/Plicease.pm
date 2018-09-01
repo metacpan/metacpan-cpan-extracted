@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.26 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.28 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.26 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.26
+    Author::Plicease.*   2.28
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -363,7 +363,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -603,7 +603,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package HackaMol::PeriodicTable;
-$HackaMol::PeriodicTable::VERSION = '0.047';
+$HackaMol::PeriodicTable::VERSION = '0.048';
 #ABSTRACT: package for period table data... needs to change
 use 5.008;
 require Exporter;
@@ -581,7 +581,7 @@ HackaMol::PeriodicTable - package for period table data... needs to change
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 EXTENDS
 

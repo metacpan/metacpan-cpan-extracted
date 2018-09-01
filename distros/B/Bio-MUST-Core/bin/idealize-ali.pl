@@ -32,7 +32,7 @@ idealize-ali.pl - Discard (nearly) gap-only sites from ALI files
 
 =head1 VERSION
 
-version 0.181310
+version 0.182420
 
 =head1 USAGE
 

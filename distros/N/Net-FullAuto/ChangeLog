@@ -20,6 +20,14 @@
 #######################################################################
 
 
+2018-08-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000416 released
+
+        * Fixed recursive lookup of path info in
+	  FA_Core.pm.
+
+
 2018-08-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000415 released

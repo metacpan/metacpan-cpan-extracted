@@ -75,7 +75,7 @@
    "provides" : {
       "DBIx::Class::Helper::Row::Enumeration" : {
          "file" : "lib/DBIx/Class/Helper/Row/Enumeration.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.1.4"
       }
    },
    "release_status" : "stable",
@@ -89,8 +89,11 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-Row-Enumeration"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.4",
    "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Aaron Crane <arc@cpan.org>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

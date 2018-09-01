@@ -5,3 +5,25 @@ Revision history for Perl extension Image::Synchronize.
 
 1.1  2018-08-24
      FIX: --time with a timestamp or timerange for target was broken.
+
+1.2  2018-04-25
+
+     - FIX: Reject only GPS tags from the EXIF group (because they are
+       incomplete), instead of accepting only GPS tags from the
+       Composite group.  Now GPS tags from the XMP group are accepted.
+
+     - If the only thing that would be changed in a file is the imsync
+       version number, then suppress that change.
+
+     - Report the number of non-zero modification time offset changes.
+
+     - Restrict search to depth 1 when looking for subdirectories.
+
+     - FIX: Invalid embedded timestamps weren't rejected in the proper
+       way, leading to Perl warnings about undefined variable.  Now
+       invalid embedded timestamps are rejected in the correct way.
+
+     - FIX: When assigning a timestamp via the file number, the
+       outcome could vary from one run to the next if there were
+       multiple source files with the same file number as the target.
+       Now the outcome is fully deterministic.

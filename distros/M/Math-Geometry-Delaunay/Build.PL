@@ -88,7 +88,12 @@ else {
         }
     elsif ($^O =~ /linux/i) {
         if ($builder->config('archname') !~ /^arm/i) { # xpfpa macros not suited to ARM, but doubles on ARM should be fine
-            push @{$builder->extra_compiler_flags()}, "-DHAVE__FPU_SETCW";
+            if ($builder->config('i_fenv')) { # C++11 fenv.h available
+                push @{$builder->extra_compiler_flags()}, "-DHAVE__FESETENV";
+                }
+            else { # expecting older glibc fpu_control.h to be available
+                push @{$builder->extra_compiler_flags()}, "-DHAVE__FPU_SETCW";
+                }
             }
         }
 

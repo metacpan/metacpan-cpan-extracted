@@ -73,7 +73,8 @@ SKIP: {
     my $t3 = Time::HiRes::time() - $t;
     okl($p == -1 && $t3 <= 1.5,
         "waitpid doesn't catch bg_qx job, fast fail ${t3}s expect <=1s");
-    ok($x eq "$z \n", "scalar bg_qx $x");
+    ok($x eq "$z \n", "scalar bg_qx $x")
+        or diag("was $x; expected $z \\n");
     my $h = Time::HiRes::time();
     ($t,$t2) = ($h-$t,$h-$t2);
     my $y = $x;

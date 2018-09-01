@@ -37,8 +37,9 @@
         # Expected arguments
         #   $session    - The GA::Session which called this function (not stored as an IV)
         #   $name       - A unique string name for this dictionary (max 16 chars, containing
-        #                   A-Za-z0-9_ - 1st char can't be number. Must not exist as a key in the
-        #                   global hash of reserved names, $axmud::CLIENT->constReservedHash)
+        #                   A-Za-z0-9_ - 1st char can't be number, non-Latin alphabets acceptable.
+        #                   Must not exist as a key in the global hash of reserved names,
+        #                   $axmud::CLIENT->constReservedHash)
         #
         # Optional arguments
         #   $language   - Which language the dictionary will use. If specified, can be any string
@@ -1234,10 +1235,10 @@
             # Speedwalk directions
             # --------------------
 
-            # Hash of speedwalking characters (lower-case letters in range a-z) and their
-            #   corresponding movement commands, which can be standard primary directions (one of
-            #   the items in GA::Client->constPrimaryDirList) or any other type of movement
-            #   command
+            # Hash of speedwalking characters (lower-case letters in range a-z, non-Latin alphabets
+            #   acceptable) and their corresponding movement commands, which can be standard primary
+            #   directions (one of the items in GA::Client->constPrimaryDirList) or any other type
+            #   of movement command
             # When interpreting speedwalk commands, GA::Session refers to this hash. If the key's
             #   corresponding value is a standard primary direction, this dictionary is consulted to
             #   provide the corresponding custom primary direction. Otherwise, GA::Session assumes
@@ -1256,9 +1257,9 @@
                 'g'                     => 'southwest',
                 'h'                     => 'southeast',
             },
-            # Hash of speedwalking modifier characters (upper-case letters in range A-Z) and their
-            #   corresponding standard commands (keys in GA::Cage::Cmd->cmdHash, e.g. 'go', 'fly',
-            #   'sail', 'open_dir', 'unlock_dir' etc)
+            # Hash of speedwalking modifier characters (upper-case letters in range A-Z, non-Latin
+            #   alphabets acceptable) and their corresponding standard commands (keys in
+            #   GA::Cage::Cmd->cmdHash, e.g. 'go', 'fly', 'sail', 'open_dir', 'unlock_dir' etc)
             # The cage specifies a replacement command for each standard command (the replacement
             #   command can be modified by the user). The replacement is usually in the form
             #   'go direction', 'fly direction', 'sail direction'. There are also non-movement
@@ -1343,8 +1344,9 @@
         # Expected arguments
         #   $session    - The GA::Session which called this function (not stored as an IV)
         #   $name       - A unique string name for this dictionary (max 16 chars, containing
-        #                   A-Za-z0-9_ - 1st char can't be number. Must not exist as a key in the
-        #                   global hash of reserved names, $axmud::CLIENT->constReservedHash)
+        #                   A-Za-z0-9_ - 1st char can't be number, non-Latin alphabets acceptable.
+        #                   Must not exist as a key in the global hash of reserved names,
+        #                   $axmud::CLIENT->constReservedHash)
         #
         # Return values
         #   'undef' on improper arguments or if $name is invalid
@@ -2574,6 +2576,8 @@
         $self->ivPush('secondaryDirList', $customDir);
         $self->ivAdd('secondaryDirHash', $customDir, $customDir);
         $self->ivAdd('secondaryAbbrevHash', $customDir, $customAbbrev);
+        $self->ivAdd('secondaryOppHash', $customDir, '');
+        $self->ivAdd('secondaryOppAbbrevHash', $customDir, '');
         $self->ivAdd('secondaryAutoHash', $customDir, undef);
 
         if (! $noUpdateFlag) {

@@ -5,80 +5,72 @@ use feature 'state';
 
 package Context::Singleton;
 
-our $VERSION = v1.0.1;
+our $VERSION = v1.0.2;
+
+use parent 'Exporter::Tiny';
 
 use Sub::Install qw();
-use Sub::Name qw();
 use Variable::Magic qw();
 
 use Context::Singleton::Frame;
 
-sub _install_and_rename {
-    my (%params) = @_;
+our @EXPORT = keys %{ _by_frame_class_accessors () };
 
-    Sub::Install::install_sub (\%params);
-    Sub::Name::subname "$params{into}::$params{as}" => $params{code};
+sub _by_frame_class_accessors {
+	my ($frame_class) = @_;
+	$frame_class //= 'Context::Singleton::Frame';
+
+	state %cache;
+
+	return $cache{$frame_class} //= do {
+		my $current_frame = $frame_class->new;
+
+		my $restore_context_wizard = Variable::Magic::wizard
+			free => sub { $current_frame = $current_frame->parent; 1 },
+		;
+
+		my $frame = sub (&) {
+			Variable::Magic::cast my $guard => $restore_context_wizard;
+			$current_frame = $current_frame->new;
+
+			$_[0]->();
+		};
+
+		+{
+			contrive      => sub { $current_frame->db->contrive (@_) },
+			current_frame => sub { $current_frame },
+			deduce        => sub { $current_frame->deduce (@_) },
+			frame         => $frame,
+			is_deduced    => sub { $current_frame->is_deduced (@_) },
+			load_rules    => sub { $current_frame->db->load_rules (@_) },
+			proclaim      => sub { $current_frame->proclaim (@_) },
+			trigger       => sub { $current_frame->db->trigger (@_) },
+			try_deduce    => sub { $current_frame->try_deduce (@_) },
+		};
+	};
 }
 
-use namespace::clean;
+sub _exporter_expand_sub {
+    my ($class, $name, $args, $globals) = @_;
+
+	return $name => _by_frame_class_accessors ($globals->{frame_class})->{$name};
+}
 
 sub import {
-    my (undef, %params) = @_;
+	my ($class, @params) = @_;
 
-    warnings->import;
-    strict->import;
+	my $globals = Ref::Util::is_hashref ($params[0])
+		? shift @params
+		: {}
+		;
 
-    my ($stack, $package) = (0);
+	$globals->{into} //= scalar caller;
 
-    while (my ($caller, undef, undef, $sub) = caller ($stack++)) {
-        last unless $sub =~ m/::import$/;
-        $package = $caller;
-    }
+	$class->SUPER::import ($globals, @params);
 
-    $params{resolver_class} //= 'Context::Singleton::Frame';
-    $params{load_path} //= [ ];
-    $params{with_import} //= 0;
+	_by_frame_class_accessors ($globals->{frame_class})->{load_rules}->(@{ $globals->{load_path} })
+		if $globals->{load_path};
 
-    state $current_context = $params{resolver_class}->new;
-
-    # localize lexical variable
-    my $restore_context_wizard = Variable::Magic::wizard (
-        free => sub { $current_context = $current_context->parent; 1 },
-    );
-
-    my $frame = sub (&) {
-        Variable::Magic::cast my $guard => $restore_context_wizard;
-        $current_context = $current_context->new;
-
-        $_[0]->();
-    };
-
-    my $load_rules  = sub { $current_context->db->load_rules (@_) };
-    my $trigger     = sub { $current_context->db->trigger (@_) };
-    my $proclaim    = sub { $current_context->proclaim (@_) };
-    my $try_deduce  = sub { $current_context->try_deduce (@_) };
-    my $deduce      = sub { $current_context->deduce (@_) };
-    my $is_deduced  = sub { $current_context->is_deduced (@_) };
-    my $contrive    = sub { $current_context->db->contrive (@_) };
-
-    my $prefix = '';
-    $prefix = $params{prefix} . '_' if $params{prefix};
-
-    _install_and_rename (into => $package, as => "${prefix}load_rules",  code => $load_rules);
-    _install_and_rename (into => $package, as => "${prefix}trigger",     code => $trigger);
-    _install_and_rename (into => $package, as => "${prefix}frame",       code => $frame);
-    _install_and_rename (into => $package, as => "${prefix}proclaim",    code => $proclaim);
-    _install_and_rename (into => $package, as => "${prefix}deduce",      code => $deduce);
-    _install_and_rename (into => $package, as => "${prefix}try_deduce",  code => $try_deduce);
-    _install_and_rename (into => $package, as => "${prefix}is_deduced",  code => $is_deduced);
-    _install_and_rename (into => $package, as => "${prefix}contrive",    code => $contrive);
-
-    if ($params{with_import}) {
-        my $import = sub { Context::Singleton->import };
-        _install_and_rename (into => $package, as => 'import', code => $import);
-    }
-
-    $load_rules->(@{ $params{load_path} });
 }
 
 1;

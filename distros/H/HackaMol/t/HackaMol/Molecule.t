@@ -413,5 +413,32 @@ is($newmol->count_atoms, $mol->count_atoms, 'pushing a group of atoms already wi
 
 }
 
+# test bfp
+{
+    
+my $pdb =
+'MODEL        1
+HETATM    1  O   UNK     1       2.053   0.020  -0.077  1.00 20.00           O
+HETATM    2  H   UNK     1       1.084   0.022  -0.123  1.00 20.00           H
+HETATM    3  H   UNK     1       2.331   0.061  -1.003  1.00 10.00           H
+HETATM    4  O   UNK     2       4.053   0.020  -0.077  1.00 10.00           O
+HETATM    5  H   UNK     2       3.084   0.022  -0.123  1.00 20.00           H
+HETATM    6  H   UNK     2       4.331   0.061  -1.003  1.00 20.00           H
+ENDMDL
+';
+
+my $mol = $hack->read_string_mol($pdb,'pdb');
+my $grp1 = $mol->select_group('resid 1');
+my $grp2 = $mol->select_group('resid 2');
+
+my @bfps1 = $grp1->calc_bfps;
+my @bfps2 = $grp2->calc_bfps;
+
+is_deeply(\@bfps1, [reverse @bfps2], 'BFPs check');
+is_deeply(\@bfps1, [map{$_->bfp} $grp1->all_atoms], 'BFPs stored');
+
+}
+
+
 done_testing();
 

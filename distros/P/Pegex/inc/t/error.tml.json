@@ -1,0 +1,93 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*grammar","*input","*error"],
+      ["~~",
+        [".",
+          ["parse-input",
+            ["*","grammar"],
+            ["*","input"]],
+          ["Catch"],
+          ["Msg"]],
+        ["*","error"]]]],
+  "data": [
+    { "label": "Error fails at furthest match",
+      "point": {
+        "grammar": "a: b+ c\nb: /b/\nc: /c/\n",
+        "input": "bbbbddddd\n",
+        "error": "ddddd\\n"},
+      "user": "# XXX This one not testing much.\n"},
+    { "label": "Pegex: Rule header syntax error",
+      "point": {
+        "grammar": "a|: /a+/\n",
+        "input": "aaa\n",
+        "error": "Rule header syntax error"}},
+    { "label": "Pegex: Rule ending syntax error",
+      "point": {
+        "grammar": "a: /a+/ |\n",
+        "input": "aaa\n",
+        "error": "Rule ending syntax error"}},
+    { "label": "Pegex: Illegal rule modifier",
+      "point": {
+        "grammar": "a: /a+/\nb: ^<a>1-2\n",
+        "input": "aaa\n",
+        "error": "Illegal rule modifier"}},
+    { "label": "Pegex: Missing > in rule reference",
+      "point": {
+        "grammar": "a: /a+/\nb: !<a1-2\n",
+        "input": "aaa\n",
+        "error": "Missing > in rule reference"}},
+    { "label": "Pegex: Missing < in rule reference",
+      "point": {
+        "grammar": "a: /a+/\nb: !a>1-2\n",
+        "input": "aaa\n",
+        "error": "Rule ending syntax error"}},
+    { "label": "Pegex: Illegal character in rule quantifier",
+      "point": {
+        "grammar": "a: /a+/\nb: !a^1-2\n",
+        "input": "aaa\n",
+        "error": "Rule ending syntax error"}},
+    { "label": "Pegex: Unprotected rule name with numeric quantifier",
+      "point": {
+        "grammar": "a: /a+/\nb: !a1-2\n",
+        "input": "aaa\n",
+        "error": "Parse document failed for some reason"}},
+    { "label": "Pegex: Runaway regular expression",
+      "point": {
+        "grammar": "a: /a+\n",
+        "input": "aaa\n",
+        "error": "Runaway regular expression"}},
+    { "label": "Pegex: Illegal group rule modifier",
+      "point": {
+        "grammar": "a: /a+/\nb: !(a =<a>)1-2\n",
+        "input": "aaa\n",
+        "error": "Illegal group rule modifier"}},
+    { "label": "Pegex: Runaway rule group",
+      "point": {
+        "grammar": "a: /a+/\nb: .(a =<a>1-2\n",
+        "input": "aaa\n",
+        "error": "Runaway rule group"}},
+    { "label": "Pegex: Illegal character in group rule quantifier",
+      "point": {
+        "grammar": "a: /a+/\nb: .(a =<a>)^2\n",
+        "input": "aaa\n",
+        "error": "Rule ending syntax error"}},
+    { "label": "Pegex: Multi-line error messages not allowed",
+      "point": {
+        "grammar": "a: /a+/\nb: `This is legal`\nc: `This is\n \nillegal`\n",
+        "input": "aaa\n",
+        "error": "Multi-line error messages not allowed"}},
+    { "label": "Pegex: Runaway error message",
+      "point": {
+        "grammar": "a: /a+/\nb: `This is legal`\nc: `This is\n\nillegal\n",
+        "input": "aaa\n",
+        "error": "Runaway error message"}},
+    { "label": "Pegex: Leading separator form (BOK) no longer supported",
+      "point": {
+        "grammar": "a: /a+/ %%% ~\n",
+        "input": "aaa\n",
+        "error": "Rule ending syntax error"}},
+    { "label": "Pegex: Illegal characters in separator indicator",
+      "point": {
+        "grammar": "a: /a+/ %%~%%^%% ~\n",
+        "input": "aaa\n",
+        "error": "Rule ending syntax error"}}]}

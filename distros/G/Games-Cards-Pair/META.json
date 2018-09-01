@@ -38,7 +38,7 @@
             "Moo" : "2.000000",
             "Term::Screen::Lite" : "0",
             "Type::Tiny" : "1.000005",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -46,15 +46,15 @@
    "provides" : {
       "Games::Cards::Pair" : {
          "file" : "lib/Games/Cards/Pair.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "Games::Cards::Pair::Card" : {
          "file" : "lib/Games/Cards/Pair/Card.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "Games::Cards::Pair::Params" : {
          "file" : "lib/Games/Cards/Pair/Params.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/manwar/Games-Cards-Pair"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

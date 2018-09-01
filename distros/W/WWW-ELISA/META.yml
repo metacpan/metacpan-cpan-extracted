@@ -1,0 +1,38 @@
+---
+abstract: 'a module for working the the REST API ELi:SA (https://elisa.hbz-nrw.de/)'
+author:
+  - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-ELISA
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Digest::MD5: '0'
+  HTTP::Request: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/vpeil/perl-www-elisa/issues
+  homepage: https://github.com/vpeil/perl-www-elisa
+  repository: https://github.com/vpeil/perl-www-elisa.git
+version: '0.02'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

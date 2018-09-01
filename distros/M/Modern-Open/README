@@ -1,6 +1,6 @@
 NAME
 
-  Modern::Open - Three-argument open and Autovivification support
+  Modern::Open - Autovivification, Autodie, and 3-args open support
 
 SYNOPSIS
 
@@ -8,10 +8,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-  Modern::Open provides three-argument open and autovivification support of
-  open, opendir, sysopen, pipe, socket, and accept, on perl 5.00503.
-  This is a module to help writing portable programs and modules across
-  recent and old versions of Perl.
+  Modern::Open provides autovivification and autodie support of open(),
+  opendir(), sysopen(), pipe(), socket(), and accept() on perl 5.00503
+  or later. And supports three-argument open(), too.
 
 INSTALLATION
 

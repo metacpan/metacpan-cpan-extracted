@@ -1,3 +1,5 @@
+.circleci/config.yml
+.perlcriticrc
 .travis.yml
 Build.PL
 Changes

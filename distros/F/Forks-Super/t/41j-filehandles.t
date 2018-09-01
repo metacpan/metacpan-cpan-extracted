@@ -30,6 +30,7 @@ ok($z eq '', "\$obj->read_stdout() empty while waiting")
 okl($t <= 1, "fast return [2] ${t}s expected <= 1s");
 
 $t = Time::HiRes::time();
+# TODO with $] >= 5.018:  test <$pid> in list context.
 $z = $] >= 5.008008 ? <$pid> : $pid->read_stdout();
 $t = Time::HiRes::time() - $t;
 ok($z eq '', "<\$obj> empty while waiting");

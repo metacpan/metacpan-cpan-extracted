@@ -87,6 +87,10 @@ sub begin
   $self->{ 'FORM_ID'   } = $form_id = $form_id || $self->html_new_id();
   $self->{ 'RADIO'     } = {};
   $self->{ 'RET_MAP'   } = {}; # return data mapping (combo, checkbox, etc.)
+  
+  my $options;
+  
+  $options .= " autocomplete='off'" if $opt{ 'NO_AUTOCOMPLETE' };
 
   my $text;
 
@@ -98,7 +102,7 @@ sub begin
   $page_session->{ ':FORM_DEF' }{ $form_name } = {};
 
   $state_keeper ||= $reo->args_here( FORM_NAME => $form_name ); # keep state and more args
-  $text .= "<form name='$form_name' id='$form_id' action='$action' method='$method' enctype='multipart/form-data'>";
+  $text .= "<form name='$form_name' id='$form_id' action='$action' method='$method' enctype='multipart/form-data' $options>";
   $text .= "</form>";
   $text .= "<input type=hidden name='_' value='$state_keeper' form='$form_id'>";
   $text .= "<input style='display: none;' name='__avoidiebug__' form='$form_id'>"; # stupid IE bugs
@@ -192,7 +196,7 @@ sub checkbox_multi
 
   my $name   = uc $opt{ 'NAME'   };
   my $class  =    $opt{ 'CLASS'  } || $self->{ 'CLASS_MAP' }{ 'CHECKBOX' } || 'checkbox';
-  my $value  =    $opt{ 'VALUE'  } ? 1 : 0;
+  my $value  =    $opt{ 'VALUE'  };
   my $args   =    $opt{ 'ARGS'   };
   my $stages =    $opt{ 'STAGES' } || 2;
   my $labels =    $opt{ 'LABELS' } || [ 'x', '&radic;' ];
@@ -214,22 +218,20 @@ sub checkbox_multi
     $current_class = $c if $s == 0;
     $current_class = $c if $s == $value;
     }
-
   my $label = $labels->[ $value ];
 
   my $text;
 
-  my $ch_id = $self->html_new_id(); # checkbox data holder
+  my $cb_id = $self->html_new_id(); # checkbox id
+  my $el_id = $self->html_new_id(); # checkbox label element id
 
   my $form_id = $self->{ 'FORM_ID' };
   #print STDERR "ccccccccccccccccccccc CHECKBOX [$name] [$value]\n";
   #$text .= "<input type='checkbox' name='$name' value='1' $options>";
   $text .= "\n";
-  $text .= "<input type='hidden' name='$name' id='$ch_id' value='$value' form='$form_id' $args>";
-####  $text .= qq[ <input type='checkbox' $options checkbox_data_input_id="$ch_id" onclick='document.getElementById( "$ch_id" ).value = this.checked ? 1 : 0'> ];
-#  $text .= qq[ <input type='checkbox' $options data-checkbox-input-id="$ch_id" form='$form_id' onclick='reactor_form_checkbox_toggle(this)' class='$class'> ];
-#  $text .= qq[ <input type='checkbox' $options data-checkbox-input-id="$ch_id" form='$form_id' onclick='reactor_form_checkbox_toggle(this)' class='$class'> ];
-  $text .= qq[ <div class='$current_class' data-stages='$stages' data-checkbox-input-id="$ch_id" form='$form_id' onclick='reactor_form_checkbox_toggle_multi(this)' $options>$label</div> ];
+  $text .= "<input type='hidden' name='$name' id='$cb_id' value='$value' form='$form_id' $args>";
+  $text .= qq[ <span class='$current_class' id='$el_id' data-stages='$stages' data-checkbox-input-id="$cb_id" onclick='reactor_form_multi_checkbox_toggle(this)' $options>$label</span> ];
+  $text .= "<script>reactor_form_multi_checkbox_setup_id( '$el_id' )</script>";
   $text .= "\n";
 
   return $text;
@@ -426,6 +428,7 @@ sub textarea
   my $data  =    $opt{ 'VALUE' };
   my $rows  =    $opt{ 'ROWS'  } || 10;
   my $cols  =    $opt{ 'COLS'  } ||  5;
+  my $maxl  =    $opt{ 'MAXLEN'  } || $opt{ 'MAX' };
   my $geo   =    $opt{ 'GEOMETRY' }  || $opt{ 'GEO' };
   my $args  =    $opt{ 'ARGS'    };
 
@@ -433,24 +436,25 @@ sub textarea
 
   ( $cols, $rows ) = ( $1, $2 ) if $geo =~ /(\d+)[\*\/\\](\d+)/i;
 
+
   my $options;
 
-#  $options .= "SIZE='$size' "      if $size > 0;
-#  $options .= "MAXLENGTH='$maxl' " if $maxl > 0;
-  $options .= $opt{ 'DISABLED' } ? 'disabled ' : '';
+  $options .= "disabled='disabled'"  if $opt{ 'DISABLED' };
+  $options .= "maxlength='$maxl' "   if $maxl > 0;
+  $options .= "id='$id' "            if $id ne '';
+  $options .= "readonly='readonly' " if $opt{ 'READONLY' } || $opt{ 'RO' };
+  $options .= "required='required' " if $opt{ 'REQUIRED' } || $opt{ 'REQ' };
   $options .= "onFocus=\"this.value=''\" " if $opt{ 'FOCUS_AUTO_CLEAR' };
-#  $options .= "ID='$id' "   if $id ne '';
-#  $options .= "ID='$name' " if $opt{ 'NAME_ID' };
 
-#  my $extra = $opt{ 'EXTRA' };
-#  $options .= " $extra ";
+  my $extra = $opt{ 'EXTRA' };
+  $options .= " $extra ";
 
   $data = str_html_escape( $data );
 
   my $text;
   my $form_id = $self->{ 'FORM_ID' };
 
-  $text .= "<textarea class='$class' id='$id' name='$name' rows='$rows' cols='$cols' $options form='$form_id' $args>$data</textarea>";
+  $text .= "<textarea class='$class' name='$name' rows='$rows' cols='$cols' $options form='$form_id' $args>$data</textarea>";
 
   $text .= "\n";
   return $text;
@@ -474,7 +478,6 @@ sub input
 
   my $len   =    $opt{ 'LEN'     };
   my $args  =    $opt{ 'ARGS'    };
-
   my $hid   =    $opt{ 'HIDDEN'  };
   my $ret   =    $opt{ 'RET'     } || $opt{ 'RETURN'  }; # if return value should be mapped, works only with HIDDEN
 
@@ -484,14 +487,16 @@ sub input
 
   my $options;
 
-  $options .= $opt{ 'DISABLED' } ? 'disabled ' : '';
-  $options .= "size='$size' "                if $size > 0;
-  $options .= "maxlength='$maxl' "           if $maxl > 0;
-  # $options .= "onFocus=\"this.value=''\" "   if $opt{ 'FOCUS_AUTO_CLEAR' };
-  $options .= "ID='$id' "                    if $id ne '';
-  # $options .= "ID='$name' "                  if $opt{ 'NAME_ID' } or $id eq '';
-  $options .= "type='password' "             if $opt{ 'PASS' } || $opt{ 'PASSWORD' };
-  $options .= "type='hidden' " if $hid; # FIXME: handle TYPE better
+  $options .= "disabled='disabled'"  if $opt{ 'DISABLED' };
+  $options .= "size='$size' "        if $size > 0;
+  $options .= "maxlength='$maxl' "   if $maxl > 0;
+  $options .= "id='$id' "            if $id ne '';
+  $options .= "type='password' "     if $opt{ 'PASS' } || $opt{ 'PASSWORD' };
+  $options .= "type='hidden' "       if $hid; # FIXME: handle TYPE better
+  $options .= "readonly='readonly' " if $opt{ 'READONLY' } || $opt{ 'RO' };
+  $options .= "required='required' " if $opt{ 'REQUIRED' } || $opt{ 'REQ' };
+  $options .= "onFocus=\"this.value=''\" " if $opt{ 'FOCUS_AUTO_CLEAR' };
+  $options .= "autocomplete='off' "  if $opt{ 'NO_AUTOCOMPLETE' };
 
 
   my $extra = $opt{ 'EXTRA' };

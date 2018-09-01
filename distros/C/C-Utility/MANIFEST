@@ -5,6 +5,9 @@ examples/line-directive.pl
 examples/lineout.pl
 examples/michael-caine.pl
 examples/stamp-file.pl
+examples/status-c-tmpl
+examples/status.c
+examples/statuses.pl
 lib/C/Utility.pm
 lib/C/Utility.pod
 Makefile.PL
@@ -13,6 +16,9 @@ MANIFEST.SKIP
 README
 script/make-c-text
 t/C-Utility.t
+t/lineinout.t
 t/remove-quotes.t
+t/status-c-tmpl
+t/statuses.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

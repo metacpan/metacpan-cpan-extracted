@@ -53,7 +53,11 @@ SPVM::Test - SPVM test module
   sub FLOAT_PRECICE : float () { return 32767f; }
   sub DOUBLE_PRECICE : double () { return 2147483647.0; }
 
-  sub main : int ($mvar : int) {
+  sub main : int ($args : string[]) {
+    print($args->[0] . "\n");
+    print($args->[1] . "\n");
+    print($args->[2] . "\n");
+    
     {
       my $point1 : TestCase::Point_d3;
       
@@ -1359,7 +1363,7 @@ SPVM::Test - SPVM test module
     # my $error : String = "Error";
     # croak $error;
     
-    return $mvar + 3;
+    return 0;
   }
 
   # Call void function

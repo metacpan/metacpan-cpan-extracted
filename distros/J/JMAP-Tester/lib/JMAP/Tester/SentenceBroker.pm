@@ -1,6 +1,6 @@
 use v5.10.0;
 package JMAP::Tester::SentenceBroker;
-$JMAP::Tester::SentenceBroker::VERSION = '0.020';
+$JMAP::Tester::SentenceBroker::VERSION = '0.021';
 use Moo;
 with 'JMAP::Tester::Role::SentenceBroker';
 
@@ -54,7 +54,7 @@ JMAP::Tester::SentenceBroker
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

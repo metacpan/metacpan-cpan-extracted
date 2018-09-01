@@ -1,15 +1,22 @@
 Build.PL
 Changes
+ci/Dockerfile
+ci/pipeline.yml
+ci/repipe
+ci/scripts/shipit
+ci/scripts/testflight
+ci/settings.yml
 lib/Test/MockModule.pm
 LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 README.md
 t/inheritance.t
 t/lib/ExampleModule.pm
 t/mockmodule.t
 t/pod.t
 t/pod_coverage.t
+t/prototype.t
 t/redefine.t
+META.yml
+META.json

@@ -1,33 +1,31 @@
 --- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Modern-Open
-abstract: Three-argument open and Autovivification support
-version: 0.07
+version: 0.08
+abstract: Autovivification, Autodie, and 3-args open support
 author:
   - INABA Hitoshi <ina@cpan.org>
 license: perl
+generated_by: pmake.bat
 requires:
-  ExtUtils::MakeMaker: 5.4302
   Archive::Tar: 0.072
   Compress::Zlib: 1.03
   Config: 0
+  ExtUtils::MakeMaker: 5.4302
   Fcntl: 1.03
   File::Basename: 2.6
   File::Copy: 2.02
   File::Path: 1.0401
   FindBin: 1.42
   Getopt::Std: 1.01
+  Symbol: 1.02
   Test: 1.122
   Test::Harness: 1.1602
   perl: 5.005_03
   strict: 1.01
-  Symbol: 1.02
-  FileHandle: 2.00
-  DirHandle: 0
 build_requires:
   Test: 1.122
-urls:
+resources:
   license: http://dev.perl.org/licenses/
-meta-spec:
-  version: 1.3
-  url: http://module-build.sourceforge.net/META-spec-v1.3.html
-generated_by: INABA Hitoshi <ina@cpan.org>

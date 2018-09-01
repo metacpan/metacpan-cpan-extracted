@@ -1,5 +1,5 @@
 package HackaMol::Roles::PdbRole;
-$HackaMol::Roles::PdbRole::VERSION = '0.047';
+$HackaMol::Roles::PdbRole::VERSION = '0.048';
 #ABSTRACT: PdbRole of lazy attributes for HackaMol atoms
 use Moose::Role;
 use Carp;
@@ -30,6 +30,8 @@ sub aa321 {
 has 'record_name', is => 'rw', isa => 'Str', lazy => 1, default => 'HETATM';
 has 'occ',         is => 'rw', isa => 'Num', lazy => 1, default => 1.0;
 has 'bfact',       is => 'rw', isa => 'Num', lazy => 1, default => 20.0;
+has 'bfp',         is => 'rw', isa => 'Num'  ; # bfactor profile 
+                                                         # (10.1016/j.jmb.2015.09.024)
 has 'resname',     is => 'rw', isa => 'Str', lazy => 1, default => 'UNK';
 has 'chain',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
 has 'altloc',      is => 'rw', isa => 'Str', lazy => 1, default => ' ';
@@ -245,7 +247,7 @@ HackaMol::Roles::PdbRole - PdbRole of lazy attributes for HackaMol atoms
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 

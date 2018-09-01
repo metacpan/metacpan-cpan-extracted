@@ -1,0 +1,36 @@
+Revision history for AnyEvent::WebDriver
+
+0.9 Fri Aug 31 04:44:10 CEST 2018
+	- enable persistent connections for non-idempotent requests by default.
+        - make "verboser" action example actually more verbose.
+	- doc fixes.
+
+0.5 Wed Aug 29 07:54:58 CEST 2018
+	- add api stability warning to docs.
+	- document ->key method for action lists.
+        - implement special key names for ->key method in action lists.
+        - implement the ->type convenience function mentioned in the docs.
+        - implement some (hopefully) useful locator strategy aliases.
+        - implement ->set_sessionm ->save_session, ->load_session method.
+	- make JSON::XS optional and require JSON::PP as fallback.
+        - fix ->switch_to_window method.
+        - fix AUTOLOAD to report the actual method name in case an unknown
+          method was called.
+        - doc fixes.
+
+0.2 Wed Aug 29 04:17:20 CEST 2018
+	- implement a helper API to make it easier to build action lists.
+        - drop the concept of element IDs and use the element object everywhere.
+	- minor fixes.
+	- the webdriver rec has actually been published by now.
+
+0.1 Wed Aug 29 01:31:22 CEST 2018
+	- implement request timeout, document future plans
+          for timeouts.
+        - documentation fixes.
+        - JSON::XS wasn't marked as dependency.
+        - only call boolean_values if JSON::XS actually supports it.
+        - fix some "$wdf"'s that have snaked in.
+
+0    Wed Aug 29 00:55:44 CEST 2018
+	- original version, mostly from scratch.

@@ -1079,6 +1079,8 @@ Peek / Poke list
         Current Advance task (GA::Session->advanceTask)
    O task.current.attack
         Current Attack task (GA::Session->attackTask)
+   O task.current.channels
+        Current Channels task (GA::Session->channelsTask)
    O task.current.chat
         Lead Chat task (GA::Session->chatTask)
    O task.current.compass

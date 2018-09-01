@@ -1,35 +1,22 @@
 package Net::Amazon::S3::Request::GetObject;
-$Net::Amazon::S3::Request::GetObject::VERSION = '0.84';
+$Net::Amazon::S3::Request::GetObject::VERSION = '0.85';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
-extends 'Net::Amazon::S3::Request';
+extends 'Net::Amazon::S3::Request::Object';
 
-with 'Net::Amazon::S3::Role::Bucket';
-
-has 'key'    => ( is => 'ro', isa => 'Str',        required => 1 );
-has 'method' => ( is => 'ro', isa => 'HTTPMethod', required => 1 );
+with 'Net::Amazon::S3::Request::Role::HTTP::Method';
 
 # ABSTRACT: An internal class to get an object
 
 __PACKAGE__->meta->make_immutable;
 
-sub http_request {
-    my $self = shift;
-
-    return $self->_build_http_request(
-        method => $self->method,
-        path   => $self->_uri( $self->key ),
-    );
-}
-
 sub query_string_authentication_uri {
     my ( $self, $expires, $query_form ) = @_;
 
-    my $uri = URI->new( $self->_uri( $self->key ) );
+    my $uri = URI->new( $self->_request_path );
     $uri->query_form( %$query_form ) if $query_form;
 
     return $self->_build_signed_request(
-        method => $self->method,
         path   => $uri->as_string,
     )->query_string_authentication_uri($expires);
 }
@@ -48,7 +35,7 @@ Net::Amazon::S3::Request::GetObject - An internal class to get an object
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

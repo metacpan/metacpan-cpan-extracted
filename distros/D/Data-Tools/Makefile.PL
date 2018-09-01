@@ -4,6 +4,7 @@ WriteMakefile(
 
   NAME            => 'Data::Tools',
   VERSION_FROM    => 'lib/Data/Tools.pm',
+  LICENSE         => 'gpl_2',
   META_MERGE      => {
     'meta-spec' => { version => 2 },
     resources => {

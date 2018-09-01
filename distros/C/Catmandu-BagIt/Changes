@@ -1,8 +1,18 @@
 Revision history for Catmandu-BagIt
 
+0.231  2018-08-29 14:23:44 CEST
+    - Adding better checks on syswrites and counting of bytes
+
+0.23  2018-04-04 09:41:00 CEST
+    - Fixing Bagging-Date and Bagging-Update syntax
+    - Deleting unused skip-manifest option
+
+0.22  2018-02-26 15:34:23 CET
+    - Fixing checksums for URI encoded files
+
 0.211  2018-02-09 17:25:37 CET
     - Making IO::Pipe tests optional to support multiple platforms
-    
+
 0.21  2018-02-07 09:44:56 CET
     - Maintenance release: fixing parallel executed tests
 

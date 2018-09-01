@@ -33,24 +33,48 @@ sub new {
 sub size  { return $_[0]->{length}       };
 sub name  { return $_[0]->{filename}     };
 sub group { return $_[0]->{group}        };
+sub url   { return $_[0]->{url_download} };
 
 sub download {
 
     my ($self, %args) = @_;
 
+    # don't overwrite existing files unless told to
+    if (
+        defined $args{out}
+        && ! $args{overwrite}
+        && -e $args{out}
+    ) {
+        die "Output file exists and 'overwrite' not given";
+    };
+        
     my @a = $self->{url_download};
     push @a, ':content_file', $args{out}
         if (defined $args{out});
 
     my $res = $self->{agent}->get(@a)
         or croak "LWP internal error: $@";
-    croak "Error saving file to disk"
-        if (defined $args{out} && ! -e $args{out});
 
     die Bio::CIPRES::Error->new( $res->content )
         if (! $res->is_success);
+    die "Unspecified error on download"
+        if ($res->header('X-Died')
+        || $res->header('Client-Aborted'));
 
-    return $res->decoded_content;
+    if (defined $args{out}) {
+        croak "Error saving file to disk: missing output"
+            if (! -e $args{out});
+        croak "Downloaded file wrong size"
+            if (-s $args{out} != $self->size);
+    }
+    else {
+        croak "Downloaded content wrong size"
+            if (length($res->content) != $self->size);
+    }
+
+    return defined $args{out}
+        ? 1
+        : $res->content;
 
 }
 
@@ -130,16 +154,26 @@ Returns the size of the output file in bytes.
 
 Returns the output group that the file is a member of.
 
+=item B<url>
+
+    my $url = $output->url;
+
+Returns the download URL for the output file
+
 =item B<download>
 
     my $content = $output->download;
-    my $res = $output->download( 'out' => $filename );
+    my $res = $output->download(
+        'out' => $filename,
+        'overwrite' => 1,
+    );
 
 Attempts to download the output file, and either returns the contents (if no
 arguments are given) or saves them to disk (if the 'out' argument is provided
-with a valid output filename). Throws an exception on any error - this will be
-an object of type L<Bio::CIPRES::Error> if the error occurs on the server
-end.
+with a valid output filename). Throws an exception if the output file exists
+unless the C<overwrite> option is given. Throws an exception on any error -
+this will be an object of type L<Bio::CIPRES::Error> if the error occurs on
+the server end.
 
 =back
 

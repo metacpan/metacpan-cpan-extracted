@@ -11,6 +11,7 @@ use SPVM::Build::CBuilder::Precompile;
 use SPVM::Build::Util;
 use SPVM::Build::Config;
 use SPVM::Build::Info;
+use Scalar::Util 'weaken';
 
 use File::Path 'rmtree';
 use File::Spec;
@@ -28,25 +29,47 @@ sub new {
   
   bless $self, $class;
   
-  $self->{compiler} ||= $self->create_compiler;
-  
-  $self->{info} ||= SPVM::Build::Info->new(compiler => $self->{compiler});
+  $self->{info} ||= SPVM::Build::Info->new;
+  $self->{info}{build} = $self;
+  weaken($self->{info}{build});
   
   $self->{cbuilder_native} ||= SPVM::Build::CBuilder::Native->new(
     build_dir => $build_dir,
-    compiler => $self->{compiler},
     info => $self->{info},
   );
+  $self->{cbuilder_native}{build} = $self;
+  weaken $self->{cbuilder_native}{build};
   
   $self->{cbuilder_precompile} ||= SPVM::Build::CBuilder::Precompile->new(
     build_dir => $build_dir,
-    compiler => $self->{compiler},
     info => $self->{info},
   );
+  $self->{cbuilder_precompile}{build} = $self;
+  weaken $self->{cbuilder_precompile}{build};
   
   $self->{config} ||= SPVM::Build::Util::new_default_build_config;
   
   return $self;
+}
+
+sub build_spvm {
+  my $self = shift;
+  
+  # Compile SPVM source code and create runtime env
+  my $compile_success = $self->compile_spvm();
+  
+  if ($compile_success) {
+    # Build Precompile packages - Compile C source codes and link them to SPVM precompile subroutine
+    $self->build_precompile;
+    
+    # Build native packages - Compile C source codes and link them to SPVM native subroutine
+    $self->build_native;
+    
+    # Bind SPVM to Perl
+    $self->bind_to_perl;
+  }
+  
+  return $compile_success;
 }
 
 sub use {
@@ -81,40 +104,19 @@ sub cbuilder_precompile {
   return $self->{cbuilder_precompile};
 }
 
-sub build_spvm {
-  my $self = shift;
-  
-  # Compile SPVM source code
-  my $compile_success = $self->compile_spvm();
-  
-  if ($compile_success) {
-    # Build run-time
-    $self->build_runtime;
-    
-    # Build Precompile packages - Compile C source codes and link them to SPVM precompile subroutine
-    $self->build_precompile;
-    
-    # Build native packages - Compile C source codes and link them to SPVM native subroutine
-    $self->build_native;
-    
-    # Bind SPVM to Perl
-    $self->bind_to_perl;
-  }
-  
-  return $compile_success;
-}
-
-sub create_shared_lib_native_dist {
+sub build_shared_lib_native_dist {
   my ($self, $package_name) = @_;
   
   $self->use($package_name);
   
   $self->compile_spvm;
+
+  my $sub_names = $self->info->get_native_sub_names($package_name);
   
-  $self->cbuilder_native->create_shared_lib_dist($package_name);
+  $self->cbuilder_native->build_shared_lib_dist($package_name, $sub_names);
 }
 
-sub create_shared_lib_precompile_dist {
+sub build_shared_lib_precompile_dist {
   my ($self, $package_name) = @_;
   
   $self->use($package_name);
@@ -124,7 +126,9 @@ sub create_shared_lib_precompile_dist {
     die "Compile error";
   }
   
-  $self->cbuilder_precompile->create_shared_lib_dist($package_name);
+  my $sub_names = $self->info->get_precompile_sub_names($package_name);
+  
+  $self->cbuilder_precompile->build_shared_lib_dist($package_name, $sub_names);
 }
 
 sub build_precompile {

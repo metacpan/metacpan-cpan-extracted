@@ -184,18 +184,6 @@ SV* V8Context::eval(const char* code, const char* file)
     return pl_eval(aTHX_ this, code, file);
 }
 
-SV* V8Context::dispatch_function_in_event_loop(const char* func)
-{
-    ENTER_SCOPE;
-    set_up();
-
-    Perf perf;
-    pl_stats_start(aTHX_ this, &perf);
-    SV* ret = pl_run_function_in_event_loop(aTHX_ this, func);
-    pl_stats_stop(aTHX_ this, &perf, "dispatch");
-    return ret;
-}
-
 SV* V8Context::global_objects()
 {
     ENTER_SCOPE;

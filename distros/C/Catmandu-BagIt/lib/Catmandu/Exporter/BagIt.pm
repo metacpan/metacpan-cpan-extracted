@@ -1,6 +1,6 @@
 package Catmandu::Exporter::BagIt;
 
-our $VERSION = '0.211';
+our $VERSION = '0.231';
 
 =head1 NAME
 
@@ -12,7 +12,6 @@ Catmandu::Exporter::BagIt - Package that exports data as BagIts
 
    my $exporter = Catmandu::Exporter::BagIt->new(
                             overwrite     => 0 ,
-                            skip_manifest => 0,
                   );
 
    $exporter->add($bagit_record);
@@ -72,11 +71,6 @@ Optional. Skip an item when the BagIt for it already exists.
 
 Optional. Throws an Catmandu::Error when the exporter tries to overwrite an existing directory.
 
-=item skip_manifest
-
-Optional. Skips the re-calculation of MD5 manifest checksums in case BagIt directories get overwritten. Use this
-option for instance when overwriting only the tags of a bag.
-
 =back
 
 =head1 SEE ALSO
@@ -112,7 +106,6 @@ with 'Catmandu::Exporter';
 has user_agent      => (is => 'ro');
 has ignore_existing => (is => 'ro' , default => sub { 0 });
 has overwrite       => (is => 'ro' , default => sub { 0 });
-has skip_manifest   => (is => 'ro' , default => sub { 0 });
 
 sub _mtime {
     my $file = $_[0];

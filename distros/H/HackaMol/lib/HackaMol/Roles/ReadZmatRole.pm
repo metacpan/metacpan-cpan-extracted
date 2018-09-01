@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadZmatRole;
-$HackaMol::Roles::ReadZmatRole::VERSION = '0.047';
+$HackaMol::Roles::ReadZmatRole::VERSION = '0.048';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(%KNOWN_NAMES _trim);
@@ -171,7 +171,7 @@ HackaMol::Roles::ReadZmatRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,19 @@
+Game::DijkstraMap - a numeric grid of weights plus some related functions
+
+to install this module, use CPAN, for example:
+
+  cpan Game::DijkstraMap
+
+run perldoc(1) on Game::DijkstraMap for additional documentation
+
+
+for the source code, see
+
+https://github.com/thrig/Game-DijkstraMap
+
+this can be built and installed by running
+
+  perl Makefile.PL
+  make
+  make test
+  make install
