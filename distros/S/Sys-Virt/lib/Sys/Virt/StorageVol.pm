@@ -245,7 +245,7 @@ Do a plain delete without any attempt to scrub data.
 
 =item Sys::Virt::StorageVol::DELETE_ZEROED
 
-Zero out current allocated blocks when deleteing the volume
+Zero out current allocated blocks when deleting the volume
 
 =item Sys::Virt::StorageVol::DELETE_WITH_SNAPSHOTS
 

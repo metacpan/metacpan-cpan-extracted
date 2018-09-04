@@ -2,7 +2,7 @@ package Catmandu::Cmd::breaker;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use parent 'Catmandu::Cmd';
 use Catmandu;
@@ -12,17 +12,21 @@ use Path::Tiny;
 use namespace::clean;
 
 sub command_opt_spec {
-    (
-        ["verbose|v","verbose output"],
-        ["maxscan=i","maximum number of lines to scan for uniq fields (default -1 = unlimited)"],
-        ["fields=s","a file or comma delimited string of unique fields to use"],
+    (   [ "verbose|v", "verbose output" ],
+        [ "maxscan=i",
+          "maximum number of lines to scan for uniq fields (default -1 = unlimited)"
+        ],
+        [ "fields=s",
+          "a file or comma delimited string of unique fields to use"
+        ],
+        [ "as=s", "set ouput format (default Table)" ],
     );
 }
 
 sub command {
-    my ($self, $opts, $args) = @_;
+    my ( $self, $opts, $args ) = @_;
 
-    unless (@$args == 1) {
+    unless ( @$args == 1 ) {
         say STDERR "usage: $0 breaker file\n";
         exit 1;
     }
@@ -30,24 +34,26 @@ sub command {
     my $file = $args->[0];
 
     my $maxscan = $opts->maxscan // -1;
+    my $as      = $opts->as      // 'Table';
 
     my $tags;
 
-    if ($opts->fields) {
-        if (-r $opts->fields) {
-            $tags = join "," , path($opts->fields)->lines_utf8({chomp =>1});
+    if ( $opts->fields ) {
+        if ( -r $opts->fields ) {
+            $tags = join ",",
+                path( $opts->fields )->lines_utf8( { chomp => 1 } );
         }
         else {
             $tags = $opts->fields;
         }
     }
     my $breaker = Catmandu::Breaker->new(
-                    verbose => $opts->verbose,
-                    maxscan => $maxscan,
-                    tags    => $tags
-                    );
+        verbose => $opts->verbose,
+        maxscan => $maxscan,
+        tags    => $tags,
+    );
 
-    $breaker->parse($file);
+    $breaker->parse($file, $as);
 }
 
 1;
@@ -81,5 +87,8 @@ Catmandu::Cmd::breaker - Parse Catmandu::Breaker exports
 
   $ cat data.breaker | cut -f 2 | sort -u > fields.txt
   $ catmandu breaker -v --fields fields.txt data.breaker
+
+  # Export statistics as CSV. See L<Catmandu::Exporter::Stat> for supported formats.
+  $ catmandu breaker --as CSV data.breaker
 
 =cut

@@ -1,17 +1,18 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::CheckListEditor;
-$Config::Model::Tk::CheckListEditor::VERSION = '1.366';
+$Config::Model::Tk::CheckListEditor::VERSION = '1.367';
 use strict;
 use warnings;
 use Carp;
+use 5.10.1;
 
 use base qw/ Tk::Frame Config::Model::Tk::CheckListViewer/;
 use vars qw/$icon_path/;
@@ -79,12 +80,16 @@ sub Populate {
     )->pack(@fbe1);
     $lb->insert( 'end', @choice );
 
-    # mastering perl/Tk page 160
+    # setup item help change when mouse hovers listbox items
     my $b_sub = sub {
-        my @selected = map { $choice[$_] } $lb->curselection;
-        $cw->set_value_help(@selected);
+        my $index = $lb->nearest($lb->pointery - $lb->rooty);
+        state $selected //= '';
+        if ($selected ne $choice[$index]) {
+            $selected = $choice[$index];
+            $cw->set_value_help($selected);
+        }
     };
-    $lb->bind( '<<ListboxSelect>>', $b_sub );
+    $lb->bind( '<Motion>', $b_sub );
 
     my $bframe = $ed_frame->Frame->pack;
     $bframe->Button(
@@ -111,7 +116,6 @@ sub Populate {
     $help_frame->pack(@fx);
     $cw->{value_help_widget} = $help_widget;
     $cw->add_info_button()->pack(@fxe1);
-    $b_sub->();
 
     # Add a second page to edit the list order for ordered check list
     if ( $leaf->ordered ) {

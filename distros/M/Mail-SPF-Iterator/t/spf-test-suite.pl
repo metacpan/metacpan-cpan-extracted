@@ -11,29 +11,36 @@ use Mail::SPF::Iterator;
 use Net::DNS;
 use Data::Dumper;
 
+my $testcount = 0;
+END { print "1..$testcount\n" }
+
 sub run {
     my ($tfile,%testopt) = @_;
     my $tests;
-    for ( $tfile,"t/$tfile" ) {
-	-f or next;
-	$tests = do $_;
-	die $@ if $@;
-	last;
-    }
-    if ( ! $tests or !@$tests ) {
-	print "1..1\nok # skip Perl file for test suite not found\n";
-	exit;
+    if (ref $tfile) {
+	$tests = $tfile
+    } else {
+	for ( $tfile,"t/$tfile" ) {
+	    -f or next;
+	    $tests = do $_;
+	    die $@ if $@;
+	    last;
+	}
     }
 
-    my @Tests = @$tests;
-    my $sum = 0;
-    $sum += 2*keys(%{ $_->{tests} }) for (@Tests);
-    print "1..$sum\n";
+    if (my $skip = delete $testopt{skip}) {
+	for my $test (@$tests) {
+	    delete $test->{tests}{$_} for @$skip;
+	}
+    }
+
+    return if ! @$tests;
+    $testcount += 2*keys(%{ $_->{tests} }) for @$tests;
 
     Mail::SPF::Iterator->import( Debug => $DEBUG );
 
     for my $use_additionals ('with additionals','') {
-	for my $test ( @Tests ) {
+	for my $test (@$tests) {
 	    my $desc= $test->{description};
 	    my $dns_setup = $test->{zonedata};
 	    my $subtests = $test->{tests};
@@ -315,3 +322,5 @@ sub send {
     $packet->header->rcode('NXDOMAIN');
     return $packet;
 }
+
+1;

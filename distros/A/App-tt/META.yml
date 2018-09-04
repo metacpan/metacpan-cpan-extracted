@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/app-tt/issues
   homepage: https://github.com/jhthorsen/app-tt
   repository: https://github.com/jhthorsen/app-tt.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -13,8 +13,9 @@ Mail::SPF::Iterator - iterative SPF lookup
 	$helo,     # from HELO|EHLO
 	$myname,   # optional: my hostname
 	{
-	    default_spf => 'mx/24 ?all',
-	    # rfc4408 => 1, # for compatibility only
+	    default_spf => 'mx/24 ?all', # in case no record was found in DNS
+	    pass_all => SPF_SoftFail,    # treat records like '+all' as error
+	    # rfc4408 => 1,              # for compatibility only
 	}
     );
 
@@ -98,6 +99,9 @@ returned from DNS (useful values are for example 'mx ?all' or 'mx/24 ?all').
 B<rfc4408> can be set to true in case stricter compatibility is needed with RFC
 4408 instead of RFC 7208, i.e. lookup of DNS SPF records, no limit on void DNS
 lookups etc.
+B<pass_all> can be set to the expected outcome in case a SPF policy gets found,
+which would pass everything. Such policies are common used domains used by
+spammers.
 
 Returns the new object.
 
@@ -208,7 +212,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.115';
+our $VERSION = '1.116';
 
 use fields (
     # values given in or derived from params to new()
@@ -1276,6 +1280,24 @@ sub _parse_spf {
 	    # unknown modifier - check if arg is valid macro-string
 	    # (will die() on error) but ignore modifier
 	    $self->_macro_expand($arg || '');
+	}
+    }
+
+    if ($self->{opt}{pass_all}) {
+	my $r = 0;
+	for (@mech) {
+	    my $qual = $_->[2];
+	    last if $_->[0] == \&_mech_include;
+	    $r=-1,last if $qual eq SPF_Fail;
+	    $r=+1,last if $qual eq SPF_Pass and $_->[0] == \&_mech_all;
+	}
+	if ($r == 1) {
+	    # looks like a pass all rule
+	    $self->{result} = [
+		$self->{opt}{pass_all},
+		{ problem => "record designed to allow every sender" }
+	    ];
+	    _update_result_info($self);
 	}
     }
     $self->{mech} = \@mech;

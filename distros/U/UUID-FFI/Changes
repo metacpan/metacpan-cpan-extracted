@@ -1,5 +1,8 @@
 Revision history for UUID-FFI
 
+0.07      2018-09-03 09:38:14 -0400
+  - Fallback on Alien::libuuid, if there is not libuuid already installed
+
 0.06      2017-08-28 15:58:41 -0400
   - Migrate to EUMM
 

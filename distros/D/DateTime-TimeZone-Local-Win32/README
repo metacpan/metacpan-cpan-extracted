@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.01
+    version 2.02
 
 SYNOPSIS
 
@@ -50,8 +50,8 @@ HOW THE TIME ZONE IS DETERMINED
 
 	For each sub key, we compare the value of the key with "/Std"
 	appended to the end to the value of
-	"SYSTEM/CurrentControlSet/Control/TimeZoneInformation/StandardName"
-	. This gives us the English name of the Windows time zone, which we
+	"SYSTEM/CurrentControlSet/Control/TimeZoneInformation/StandardName".
+	This gives us the English name of the Windows time zone, which we
 	use to look up the IANA time zone name.
 
 	* Windows 95, Windows 98, Windows Millenium Edition

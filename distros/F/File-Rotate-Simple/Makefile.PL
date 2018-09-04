@@ -2,37 +2,38 @@
 use strict;
 use warnings;
 
-use 5.008008;
+
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "no-frills file rotation",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
-  "CONFIGURE_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0
+  },
   "DISTNAME" => "File-Rotate-Simple",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008008",
   "NAME" => "File::Rotate::Simple",
   "PREREQ_PM" => {
     "Graph" => 0,
-    "List::Util" => "1.35",
-    "Module::Runtime" => "0.011",
-    "Moo" => 0,
+    "Module::Runtime" => 0,
+    "Moo" => "1.001000",
     "Path::Tiny" => "0.018",
     "Ref::Util" => 0,
-    "Time::Piece" => 0,
     "Time::Seconds" => 0,
     "Types::Standard" => 0,
-    "namespace::autoclean" => "0.16",
-    "version" => 0
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::Exception" => 0,
-    "Test::More" => "1.302015",
-    "Test::Most" => 0
+    "File::Spec" => 0,
+    "Module::Metadata" => 0,
+    "Path::Tiny" => "0.018",
+    "Test::More" => "0.99",
+    "Test::Most" => 0,
+    "Time::Piece" => 0
   },
-  "VERSION" => "v0.2.2",
+  "VERSION" => "v0.2.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,20 +41,19 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Spec" => 0,
   "Graph" => 0,
-  "List::Util" => "1.35",
-  "Module::Runtime" => "0.011",
-  "Moo" => 0,
+  "Module::Metadata" => 0,
+  "Module::Runtime" => 0,
+  "Moo" => "1.001000",
   "Path::Tiny" => "0.018",
   "Ref::Util" => 0,
-  "Test::Exception" => 0,
-  "Test::More" => "1.302015",
+  "Test::More" => "0.99",
   "Test::Most" => 0,
   "Time::Piece" => 0,
   "Time::Seconds" => 0,
   "Types::Standard" => 0,
-  "namespace::autoclean" => "0.16",
-  "version" => 0
+  "namespace::autoclean" => 0
 );
 
 

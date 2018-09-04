@@ -1,5 +1,5 @@
 package Starch::Factory;
-$Starch::Factory::VERSION = '0.07';
+$Starch::Factory::VERSION = '0.09';
 =head1 NAME
 
 Starch::Factory - Role applicator and class creator.

@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Starch::Util qw(
     load_prefixed_module
@@ -13,7 +12,7 @@ subtest load_prefixed_module => sub{
     my $suffix = '::Test::LoadPrefixedModule';
     my $package = $prefix . $suffix;
     like(
-        exception { load_prefixed_module( $prefix, $package ) },
+        dies { load_prefixed_module( $prefix, $package ) },
         qr{Can't locate},
         'load_prefixed_module failed on non-existing module',
     );

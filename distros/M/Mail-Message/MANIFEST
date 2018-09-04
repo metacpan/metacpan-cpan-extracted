@@ -177,5 +177,6 @@ t/423msgconv-emabs.t
 t/500parser-field.t
 t/501parser-readmp.t
 t/502parser-nested.t
+xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

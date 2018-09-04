@@ -1,42 +1,56 @@
-Finance/Bank/Postbank_de version 0.20
-==================================
+Finance::Bank::Postbank_de - Check your Postbank.de bank account from Perl
 
-This is a module faciliating access to the german
-Postbank online banking website at https://banking.postbank.de.
-It has been renamed from Finance::Bank::Postbank, as there
-also is a netherlands Postbank at http://www.postbank.nl,
-which is not related.
+DESCRIPTION
+
+This module provides a rudimentary interface to the Postbank online banking system at
+https://meine.postbank.de/.
+
+The interface was cooked up by me without taking a look at the other Finance::Bank
+modules. If you have any proposals for a change, they are welcome !
+
 
 INSTALLATION
 
-To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-This module requires these other modules and libraries:
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-  WWW::Mechanize
 
-  an SSL module for LWP
+REPOSITORY
 
-I tried hard to avoid the dependencies on Test::Inline, and I use
-some cheap modified pod2test script to enable prerequisite checking
-for my synopsis code - so if you rebuild the Test::Inline examples,
-these tests might fail because of prerequisites not met.
+The public repository of this module is
+L<https://github.com/Corion/Finance-Bank-Postbank_de>.
 
-The synopsis uses the following additional modules :
+SUPPORT
 
-  Tie::File
+The public support forum of this module is
+L<https://perlmonks.org/>.
 
-  List::Sliding::Changes
+BUG TRACKER
 
-COPYRIGHT AND LICENCE
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Bank-Postbank_de>
+or via mail to L<finance-bank-postbank_de-Bugs@rt.cpan.org>.
 
-This module may be used under the same terms as Perl itself.
+AUTHOR
 
-Copyright (C) 2003-2005 Max Maischein <corion@cpan.org>
+Max Maischein, E<lt>corion@cpan.orgE<gt>
+
+LICENSE
+
+This module is released under the same terms as Perl itself.
+
+COPYRIGHT (c)
+
+Copyright 2003-2018 by Max Maischein C<corion@cpan.org>.

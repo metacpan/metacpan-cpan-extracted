@@ -1,0 +1,73 @@
+{
+   "abstract" : "convert OpenAPI schema to SQL::Translator schema",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SQL-Translator-Parser-OpenAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.10"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::Validator" : "2.01",
+            "Lingua::EN::Inflect::Number" : "0",
+            "SQL::Translator" : "0.11024",
+            "SQL::Translator::Schema::Constants" : "0",
+            "String::CamelCase" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Snapshot" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/SQL-Translator-Parser-OpenAPI/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mohawk2/SQL-Translator-Parser-OpenAPI"
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
+}

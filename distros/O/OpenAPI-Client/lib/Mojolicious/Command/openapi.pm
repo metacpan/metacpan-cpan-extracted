@@ -36,10 +36,10 @@ sub run {
   getopt \@args,
     'i|inactivity-timeout=i' => sub { $ua{inactivity_timeout} = $_[1] },
     'I|information=s'        => \$info_about,
-    'o|connect-timeout=i'    => sub { $ua{connect_timeout}    = $_[1] },
+    'o|connect-timeout=i'    => sub { $ua{connect_timeout} = $_[1] },
     'p|parameter=s'          => \my %parameters,
     'c|content=s'            => \my $content,
-    'S|response-size=i'      => sub { $ua{max_response_size}  = $_[1] },
+    'S|response-size=i'      => sub { $ua{max_response_size} = $_[1] },
     'v|verbose'              => \my $verbose;
 
   # Read body from STDIN
@@ -68,7 +68,7 @@ sub run {
     }
   );
 
-  my $tx = $self->_client->call($op => \%parameters, $content ? (body => decode_json $content) : ());
+  my $tx = $self->_client->call($op => \%parameters, $content ? (json => decode_json $content) : ());
   if ($tx->error and $tx->error->{message} eq 'Invalid input') {
     _warn _header($tx->req), _header($tx->res) if $verbose;
   }

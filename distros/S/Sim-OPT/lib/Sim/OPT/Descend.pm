@@ -22,7 +22,8 @@ use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Takechance;
-use Sim::OPT::Modish;
+use Sim::OPT::Interlinear;
+
 
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Useqq  = 1;
@@ -205,7 +206,6 @@ sub descend
   my $selectmixed = "$throwclean-select.csv";
 
   my $remember;
-  #if ( $direction eq "star" ) { $remember = $winneritems[$countcase][0]; }
 
   sub cleanselect
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
@@ -506,10 +506,7 @@ sub descend
 
     foreach my $line ( @lines )
     {
-      $line =~ s/^\,+//g;
-      $line =~ s/^\s+//g;
-      $line =~ s/\,+$//g;
-      $line =~ s/\s+$//g;
+      $line =~ s/\,+$//;
       $line =~ s/"//g;
     }
 
@@ -584,7 +581,7 @@ sub descend
     {
       my $half = ( int( scalar( @lines ) / 2 )  );
       #$winnerentry = $lines[ $half ];
-      $winnerentry = $lines[ 1 ];
+      $winnerentry = $lines[ 1 ]; ############## IMPROVE THIS!
     }
     chomp $winnerentry;
 
@@ -716,6 +713,7 @@ sub descend
       $newtarget = $taken_old[0];
       $newtarget =~ s/$mypath\///;
       @backvalues = ( ); #EMPTY THE CONTAINER
+      if ( $direction eq "star" ) { $newtarget = ${ $direction{pinwinneritems} }[$countcase]; }
     }
 
     say $tee "TAKEOPTIMA AFTER->\@miditers: " . dump(@miditers);
@@ -727,7 +725,10 @@ sub descend
     {
       say $tee "TAKEOPTIMA FINAL ->\$countblock " . dump($countblock);
       my @morphcases = grep -d, <$mypath/$file_*>;
-      say $tee "#Optimal option for case  $countcaseplus: $newtarget";
+      unless ( $direction eq "star" )
+      {
+        say $tee "#Optimal option for case  $countcaseplus: $newtarget";
+      }
       #my $instnum = Sim::OPT::countarray( @{ $morphstruct[$countcase] } );
 
       #my $netinstnum = scalar( @morphcases );
@@ -756,7 +757,6 @@ sub descend
     }
     else
     {
-      #if ( $direction eq "stars" ) { $newtarget = $remember; }
       push ( @{ $winneritems[$countcase][$countblock] }, $newtarget ); say $tee "TAKEOPTIMA->\@winneritems " . dump(@winneritems);
       say $tee "#Leaving case " . ($countcase + 1) . ", block " . ($countblock + 1) . " and descending!\ ";
       Sim::OPT::callcase( { countcase => $countcase, countblock => $countblock,

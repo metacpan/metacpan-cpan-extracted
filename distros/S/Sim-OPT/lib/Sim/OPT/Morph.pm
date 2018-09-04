@@ -24,7 +24,6 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
-use Sim::OPT::Modish;
 use Devel::Trace;
 Devel::Trace::trace('on');  # Enable
 #use Parallel::ForkManager;

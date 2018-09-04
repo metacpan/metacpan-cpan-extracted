@@ -22,6 +22,9 @@ my ($base, $m) = RT::Extension::Memo::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
 $mjs->get($m->rt_base_url . '?user=user;pass=password');
 
+# Unset Richtext preference
+$user->SetPreferences($RT::System, {'MemoRichText' => 0});
+
 # Edit plaintext memo
 $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
 my $action_button = $mjs->selector('#ActionMemo', single => 1);

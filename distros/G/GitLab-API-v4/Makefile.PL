@@ -46,10 +46,11 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Log::Any::Adapter::TAP" => "0.003003",
+    "MIME::Base64" => "3.15",
     "Test2::V0" => "0.000094",
     "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,6 +72,7 @@ my %FallbackPrereqs = (
   "Log::Any::Adapter" => "1.703",
   "Log::Any::Adapter::Screen" => "0.13",
   "Log::Any::Adapter::TAP" => "0.003003",
+  "MIME::Base64" => "3.15",
   "Moo" => "2.003000",
   "Path::Tiny" => "0.079",
   "Pod::Usage" => 0,

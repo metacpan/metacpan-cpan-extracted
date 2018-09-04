@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 1.21
+Version 1.22
 
 =cut
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 
 =head1 SYNOPSIS
@@ -667,6 +667,19 @@ Emphasis and strong can also be written with tags, like <em>emphasis</em>,
 <strong>strong</strong> and <code>code</code>.
 
 Added tag <sup> and <sub> for superscript and subscript.
+
+=head4 Inline logic
+
+Asterisk and equal symbols (*, **, *** =) are interpreted as markup
+elements if they are paired (an opening one and a closing one).
+
+The opening one must be preceded by something which is not an
+alphanumerical character (or at the beginning of the line) and
+followed by something which is not a space.
+
+The closing one must be preceded by something which is not a space,
+and followed by something which is not an alphanumerical character (or
+at the end of the line).
 
 =head3 Block markup
 

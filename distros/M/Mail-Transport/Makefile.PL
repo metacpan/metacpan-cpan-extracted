@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.002';
+my $VERSION = '3.003';
 
 my %prereq =
  ( Carp           => 0
@@ -51,7 +51,7 @@ WriteMakefile
  , AUTHOR     => 'Mark Overmeer'
  , ABSTRACT   => 'Email message exchange'
  , PREREQ_PM  => \%prereq
- , LICENSE    => 'perl'
+ , LICENSE    => 'perl_5'
 
  , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -61,9 +61,9 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-Mail-Transport.git'
               , web  => 'https://github.com/markov2/perl5-Mail-Transport'
               }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
           }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
  );
 
@@ -75,7 +75,7 @@ RAWDIR          = ../public_html/mail-transport/raw
 DISTDIR         = ../public_html/mail-transport/source
 
 LICENSE         = perl
-EXTENDS			= ../../perl/MailMessage:../../perl/MailPOP:../../perl/MailIMAP
+EXTENDS			= ../Mail-Message:../Mail-Box-POP3:../Mail-Box-IMAP4
 
 # for POD
 FIRST_YEAR      = 2001

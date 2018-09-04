@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.366';
+$Config::Model::TkUI::VERSION = '1.367';
 use 5.10.1;
 use strict;
 use warnings;
@@ -30,6 +30,7 @@ use Pod::POM::View::Text;
 
 use Tk::DoubleClick;
 
+use Tk::Balloon;
 use Tk::Photo;
 use Tk::PNG;    # required for Tk::Photo to be able to load pngs
 use Tk::DialogBox;
@@ -133,8 +134,11 @@ sub Populate {
 
         # snatched from openclipart-png
         $tool_img            = $cw->Photo( -file => $icon_path . 'tools_nicu_buculei_01.png' );
-        $gnome_img{next}     = $cw->Photo( -file => $icon_path . 'gnome-next.png' );
-        $gnome_img{previous} = $cw->Photo( -file => $icon_path . 'gnome-previous.png' );
+
+
+        # snatched from gnome gnome-icon-theme package
+        map {$gnome_img{$_}     = $cw->Photo( -file => $icon_path . "gnome-$_.png"); }
+         qw/next previous window-close gtk-execute/;
     }
 
     foreach my $parm (qw/-root/) {
@@ -239,20 +243,52 @@ sub Populate {
 
     # add bottom frame
     my $bottom_frame = $cw->Frame->pack(qw/-pady 0 -fill both -expand 1/);
+    my $tree_frame = $bottom_frame->Frame->pack(qw/-fill both -expand 1 -side left/);
 
     # create the widget for tree navigation
     require Tk::Tree;
-    my $tree = $bottom_frame->Scrolled(
+    my $tree = $tree_frame->Scrolled(
         qw/Tree/,
         -columns   => 4,
         -header    => 1,
         -opencmd   => sub { $cw->open_item(@_); },
         -closecmd  => sub { $cw->close_item(@_); },
-    )->pack(qw/-fill both -expand 1 -side left/);
+    )->pack(qw/-fill both -expand 1 -side bottom/);
+
     $cw->{tktree} = $tree;
 
+    my $sub_filter = sub {
+        $cw->reload;
+    };
+    my $clear_filter = sub {
+        $cw->{elt_filter_value} = '';
+        $cw->reload;
+    };
+    my $reload_on_key = sub {
+        $cw->reload;
+    };
+
+    my $filter_clear = $tree_frame->Button (
+        -image => $gnome_img{'window-close'},
+        -command => $clear_filter
+    );
+    $cw->Balloon(-state => 'balloon')->attach($filter_clear, -msg => 'clear filter');
+    $filter_clear->pack(-side => 'right');
+    $tree_frame->Label(-text => 'filter elements',)->pack(-side => 'left');
+
+    $cw->{elt_filter_value} = '';
+    my $element_filter_w = $tree_frame->Entry(
+        -textvariable => \$cw->{elt_filter_value},
+    );
+    $cw->Balloon(-state => 'balloon')->attach(
+        $element_filter_w,
+        -msg => 'define a filter applied to element name. At least 3 character long.'
+            .' Can be a Perl regexp. Click on gear button to apply');
+    $element_filter_w->pack(qw/-side right -fill x -expand 1/);
+    $element_filter_w->bind('<KeyRelease>', $reload_on_key);
+
     # add adjuster
-    $bottom_frame->Adjuster()->packAfter( $tree, -side => 'left' );
+    $bottom_frame->Adjuster()->packAfter( $tree_frame, -side => 'left' );
 
     # add headers
     $tree->headerCreate( 0, -text => "element" );
@@ -593,13 +629,130 @@ sub show_changes {
     )->pack;
 }
 
+
+# scan a tree and return a hash where each found path is the key and the
+# value is either hide, show or an empty string.
+sub apply_filter {
+    my ($cw, $fd_path) = @_;
+
+    # fd_path: force display path. The show action must be set in the
+    # call back so that the 'show' action can be propagated from the
+    # shown leaf up to the root of the tree.
+
+    my $elt_filter = $cw->{elt_filter_value} ;
+
+    # 'show' trumps 'hide' which trumps ''
+    my %combine_hash = (
+        show => { show => 'show', hide => 'show', '' => 'show'},
+        hide => { show => 'show', hide => 'hide', '' => 'hide'},
+        ''   => { show => 'show', hide => 'hide', '' => ''    },
+    );
+
+    my $leaf_cb = sub {
+        my ($scanner, $data_ref, $node,$element_name,$index, $leaf_object) = @_ ;
+        my $loc = $leaf_object->location;
+        my $action = '';
+        if ( $cw->{show_only_custom} ) {
+             $action = 'show' if $leaf_object->has_data ;
+        }
+        elsif ( $cw->{hide_empty_values} ) {
+            my $v = $leaf_object->fetch(qw/mode user check no/);
+            $action = 'hide' unless (defined $v and length($v));
+        }
+        $action = 'show' if $loc eq $fd_path;
+        $data_ref->{return} = $data_ref->{actions}{$loc} = $action ;
+    };
+
+    my $check_list_cb = sub {
+        my ($scanner, $data_ref,$node,$element_name,undef, $obj) = @_;
+        my $loc = $obj->location;
+        my $action = '';
+        if ( $cw->{hide_empty_values} ) {
+             $action = 'hide' unless $obj->fetch(mode => 'user');
+        }
+        $action = 'show' if $loc eq $fd_path;
+        $data_ref->{return} = $data_ref->{actions}{$loc} = $action ;
+    };
+
+    my $hash_cb = sub {
+        my ($scanner, $data_ref,$node,$element_name,@keys) = @_ ;
+        my $obj = $node->fetch_element($element_name);
+        my $loc = $obj->location;
+
+        # custom code using $data_ref
+        if ($cw->{hide_empty_values}) {
+            $data_ref->{actions}{$loc} //= 'hide' unless $obj->has_data;
+        }
+
+        # resume exploration
+        my $hash_action = '';
+        map {
+            my $inner_ref = { actions => $data_ref->{actions} };
+            $scanner->scan_hash($inner_ref, $node, $element_name, $_);
+            $hash_action = $combine_hash{$hash_action}{$inner_ref->{return}};
+        } @keys ;
+        $hash_action = 'show' if $loc eq $fd_path;
+        $data_ref->{return} = $data_ref->{actions}{$loc} = $hash_action;
+    };
+
+    my $node_cb = sub {
+        my ($scanner, $data_ref,$node, @element_list) = @_ ;
+        my $node_loc = $node->location;
+
+        my $node_action = '';
+        foreach my $elt ( @element_list ) {
+            my $filter_action = '';
+            if (length($elt_filter) > 2) {
+                if ($elt =~ /$elt_filter/) {
+                    $filter_action = 'show' ;
+                }
+                else {
+                    $filter_action = 'hide';
+                }
+            }
+            my $obj = $node->fetch_element($elt);
+            my $loc = $obj->location;
+            my $inner_ref = { actions => $data_ref->{actions} };
+            $scanner->scan_element($inner_ref, $node,$elt);
+            my $action = $combine_hash{$filter_action}{$inner_ref->{return}};
+            $data_ref->{actions}{$loc} = $action;
+            $node_action = $combine_hash{$node_action}{$action};
+        }
+
+        $node_action = 'show' if $node_loc eq $fd_path;
+
+        $data_ref->{return} = $data_ref->{actions}{$node_loc} = $node_action;
+    };
+
+    my $scan = Config::Model::ObjTreeScanner-> new (
+        leaf_cb => $leaf_cb,
+        hash_element_cb => $hash_cb,
+        list_element_cb => $hash_cb,
+        node_content_cb => $node_cb,
+    ) ;
+
+    my %force_display_path = ();
+    $scan->scan_node(\%force_display_path, $cw->{root}) ;
+
+    return $force_display_path{actions};
+}
+
 sub reload {
     my $cw = shift;
     carp "reload: too many parameters" if @_ > 1;
-    my $force_display_path = shift;    # force open editor on this path
+    my $force_display_path = shift // '';    # force open editor on this path
 
     $logger->trace( "reloading tk tree"
             . ( defined $force_display_path ? " (force display $force_display_path)" : '' ) );
+
+    my $actions = {};
+    # eval is required to trap bad regexp entered in filter widget
+    $actions = eval { $cw->apply_filter($force_display_path); };
+    if ($@) {
+        my $msg = $@;
+        $msg =~ s/at lib.*//s; # remove file from error message
+        $cw->show_message("filter error: $msg");
+    }
 
     my $tree = $cw->{tktree};
 
@@ -607,18 +760,22 @@ sub reload {
 
     my $new_drawing = not $tree->infoExists($instance_name);
 
-    my $sub =
-        sub { $cw->{scanner}->scan_node( [ $instance_name, $cw, @_ ], $cw->{root} ); };
+    my $sub = sub {
+        my $opening = shift ;
+        $tree->itemConfigure($instance_name, 2, -text => $cw->{root}->fetch_gist);
+        $cw->{scanner}->scan_node( [ $instance_name, $cw, $opening, $actions ], $cw->{root} );
+    };
 
     if ($new_drawing) {
         $tree->add( $instance_name, -data => [ $sub, $cw->{root} ] );
         $tree->itemCreate( $instance_name, 0, -text => $instance_name, );
+        $tree->itemCreate( $instance_name, 2, -text => '' );
         $tree->setmode( $instance_name, 'close' );
         $tree->open($instance_name);
     }
 
     # the first parameter indicates that we are opening the root
-    $sub->( 1, $force_display_path );
+    $sub->( 1 );
     $tree->see($force_display_path)
         if ( $force_display_path and $tree->info( exists => $force_display_path ) );
     $cw->{editor}->reload if defined $cw->{editor};
@@ -684,6 +841,7 @@ sub on_cut_buffer_dump {
     $cw->reload;
     $cw->create_element_widget($cw->{current_mode}, $tree_path);
     $cw->open_item($tree_path);
+    $cw->{tktree}->setmode( $tree_path => 'close' );
 }
 
 # replace dot in str by _|_
@@ -727,31 +885,22 @@ my %elt_mode = (
 );
 
 sub disp_obj_elt {
-    my ( $scanner, $data_ref, $node,    @element_list ) = @_;
-    my ( $path,    $cw,       $opening, $fd_path )      = @$data_ref;
+    my ( $scanner, $data_ref, $node,    @orig_element_list ) = @_;
+    my ( $path,    $cw,       $opening, $actions )      = @$data_ref;
     my $tkt  = $cw->{tktree};
     my $mode = $tkt->getmode($path);
+    my $elt_filter = $cw->{elt_filter_value} ;
 
-    if ($cw->{show_only_custom} or $cw->{hide_empty_values}) {
-        my @new_element_list;
-        foreach my $elt ( @element_list ) {
-            my $obj = $node->fetch_element($elt);
-            if ($cw->{show_only_custom}) {
-                push @new_element_list, $elt if $node->fetch_element($elt)->has_data;
-            }
-            elsif ($cw->{hide_empty_values}) {
-                my $elt_type = $obj->get_type;
-                my $show
-                    = $elt_type eq 'hash'       ? $obj->has_data
-                    : $elt_type eq 'list'       ? $obj->has_data
-                    : $elt_type eq 'leaf'       ? length($obj->fetch(qw/mode user check no/) // '')
-                    : $elt_type eq 'check_list' ? $obj->fetch(mode => 'user')
-                    :                             1 ;
-                push @new_element_list, $elt if $show;
-            }
+    my @element_list;
+    foreach my $elt (@orig_element_list) {
+        my $obj = $node->fetch_element($elt);
+        my $loc = $obj->location;
+        my $action = $actions->{$loc} // '';
+        if ($action ne 'hide') {
+            push @element_list, $elt;
         }
-        @element_list = @new_element_list;
     }
+
     $logger->trace( "disp_obj_elt path $path mode $mode opening $opening " . "(@element_list)" );
 
     $cw->prune( $path, @element_list );
@@ -762,7 +911,7 @@ sub disp_obj_elt {
     foreach my $elt (@element_list) {
         my $newpath  = "$path." . to_path($elt);
         my $scan_sub = sub {
-            $scanner->scan_element( [ $newpath, $cw, @_ ], $node, $elt );
+            $scanner->scan_element( [ $newpath, $cw,  $opening, $actions ], $node, $elt );
         };
         my @data = ( $scan_sub, $node->fetch_element($elt) );
 
@@ -787,9 +936,14 @@ sub disp_obj_elt {
 
         my $elt_loc = $node_loc ? $node_loc . ' ' . $elt : $elt;
 
-        $cw->setmode( 'node', $newpath, $eltmode, $elt_loc, $fd_path, $opening, $scan_sub );
+        $cw->setmode( 'node', $newpath, $eltmode, $elt_loc, $opening, $actions, $scan_sub );
 
         my $obj = $node->fetch_element($elt);
+
+        if ($elt_type =~ 'node') {
+            $tkt->itemCreate( $newpath, 2, -text => $obj->fetch_gist );
+        }
+
         if ( $elt_type eq 'hash' ) {
             $cw->update_hash_image( $obj, $newpath );
         }
@@ -812,9 +966,10 @@ sub show_single_list_value {
 
     # leave alone element that is not a list of leaf
     return unless $elt_type eq 'list' and $obj->get_cargo_type eq 'leaf';
+    my $size = $obj->fetch_size;
 
-    $logger->trace("show_single_list_value called on ", $obj->location);
-    if ($obj->fetch_size == 1 and $show) {
+    $logger->trace("show_single_list_value called on ", $obj->location, " show is $show, size is $size" );
+    if ($size == 1 and $show) {
         disp_leaf(undef,[ $path, $cw ], $obj->parent, $obj->element_name, 0, $obj->fetch_with_id(0));
     }
     else {
@@ -824,7 +979,7 @@ sub show_single_list_value {
 
 sub disp_hash {
     my ( $scanner, $data_ref, $node, $element_name, @idx ) = @_;
-    my ( $path, $cw, $opening, $fd_path ) = @$data_ref;
+    my ( $path, $cw, $opening, $actions ) = @$data_ref;
     my $tkt  = $cw->{tktree};
     my $mode = $tkt->getmode($path);
     $logger->trace("disp_hash    path is $path  mode $mode (@idx)");
@@ -851,7 +1006,7 @@ sub disp_hash {
     foreach my $idx (@idx) {
         my $newpath  = $path . '.' . to_path($idx);
         my $scan_sub = sub {
-            $scanner->scan_hash( [ $newpath, $cw, @_ ], $node, $element_name, $idx );
+            $scanner->scan_hash( [ $newpath, $cw,  $opening, $actions ], $node, $element_name, $idx );
         };
 
         my $eltmode = $elt_mode{$elt_type};
@@ -906,11 +1061,11 @@ sub disp_hash {
         $elt_loc .= ' ' if $elt_loc;
 
         # need to keep regexp identical to the one from C::M::Anything:composite_name
-        # so that force_display_path (aka fd_path may work)
+        # so that force_display_path (aka force_display_path may work)
         $elt_loc .= $element_name . ':' . ( $idx =~ /\W/ ? '"' . $idx . '"' : $idx );
 
         # hide new entry if hash is not yet opened
-        $cw->setmode( 'hash', $newpath, $eltmode, $elt_loc, $fd_path, $opening, $scan_sub );
+        $cw->setmode( 'hash', $newpath, $eltmode, $elt_loc, $opening, $actions, $scan_sub );
 
         $prevpath = $newpath;
     }
@@ -936,18 +1091,17 @@ sub update_hash_image {
 }
 
 sub setmode {
-    my ( $cw, $type, $newpath, $eltmode, $elt_loc, $fd_path, $opening, $scan_sub ) = @_;
+    my ( $cw, $type, $newpath, $eltmode, $elt_loc, $opening, $actions, $scan_sub ) = @_;
     my $tkt = $cw->{tktree};
 
-    my $force_open = ( $fd_path and index( $fd_path, $elt_loc ) == 0 ) ? 1 : 0;
-    my $force_match = ( $fd_path and $fd_path eq $elt_loc ) ? 1 : 0;
+    $actions->{$elt_loc} //= '';
+    my $force_open = $actions->{$elt_loc} eq 'show' ? 1 : 0;
+    my $force_close = $actions->{$elt_loc} eq 'hide' ? 1 : 0;
 
     $logger->trace( "$type: elt_loc '$elt_loc', opening $opening "
-            . "eltmode $eltmode force_open $force_open "
-            . ( $fd_path ? "on '$fd_path' " : '' )
-            . "force_match $force_match" );
+                        . "eltmode $eltmode force_open $force_open");
 
-    if ( $eltmode ne 'open' or $force_open or $opening ) {
+    if ( not $force_close and ($eltmode ne 'open' or $force_open or $opening )) {
         $tkt->show( -entry => $newpath );
 
         # counter-intuitive: want to display [-] if force opening and not leaf item
@@ -959,14 +1113,7 @@ sub setmode {
 
     # counterintuitive but right: scan will be done when the entry
     # is opened. mode can be open, close, none
-    $scan_sub->( $force_open, $fd_path ) if ( ( $eltmode ne 'open' ) or $force_open );
-
-    if ($force_match) {
-        $tkt->see($newpath);
-        $tkt->selectionSet($newpath);
-        $cw->update_loc_bar($newpath);
-        $cw->create_element_widget( 'edit', $newpath );
-    }
+    $scan_sub->( $force_open ) if ( ( $eltmode ne 'open' ) or $force_open );
 }
 
 sub trim_value {
@@ -982,7 +1129,7 @@ sub trim_value {
 
 sub disp_check_list {
     my ( $scanner, $data_ref, $node, $element_name, $index, $leaf_object ) = @_;
-    my ( $path, $cw, $opening, $fd_path ) = @$data_ref;
+    my ( $path, $cw, $opening, $actions ) = @$data_ref;
     $logger->trace("disp_check_list    path is $path");
 
     my $value = $leaf_object->fetch;
@@ -1004,7 +1151,7 @@ sub disp_check_list {
 
 sub disp_leaf {
     my ( $scanner, $data_ref, $node, $element_name, $index, $leaf_object ) = @_;
-    my ( $path, $cw, $opening, $fd_path ) = @$data_ref;
+    my ( $path, $cw, $opening, $actions ) = @$data_ref;
     $logger->trace("disp_leaf    path is $path");
 
     my $std_v = $leaf_object->fetch(qw/mode standard check no silent 1/);
@@ -1041,7 +1188,7 @@ sub disp_leaf {
 
 sub disp_node {
     my ( $scanner, $data_ref, $node, $element_name, $key, $contained_node ) = @_;
-    my ( $path, $cw, $opening, $fd_path ) = @$data_ref;
+    my ( $path, $cw, $opening, $actions ) = @$data_ref;
     $logger->trace("disp_node    path is $path");
     my $curmode = $cw->{tktree}->getmode($path);
     $cw->{tktree}->setmode( $path, 'open' ) if $curmode eq 'none';

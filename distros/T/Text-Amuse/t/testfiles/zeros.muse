@@ -13,7 +13,7 @@
 
 **** 0
 
-Hello [1] There is a title, an author, a date, a source, two footnoes. All filled with
+Hello [1] There is a title, an author, a date, a source, two footnotes. All filled with
 0
 and
 0

@@ -2,7 +2,7 @@ package Datahub::Factory::Fixer::Condition;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 use Datahub::Factory;
 use Moo;
@@ -62,7 +62,7 @@ sub fix_module {
     $condition_r //= 'Undefined condition';
 
     if ($condition_r eq 'Undefined condition') {
-        Catmandu::BadVal->throw(
+        Datahub::Factory::InvalidCondition->throw(
             'message' => sprintf('Condition path "%s" did not yield a value from item.', $condition_path)
         );
     }
@@ -76,7 +76,7 @@ sub fix_module {
         }
     }
 
-    Catmandu::BadVal->throw(
+    Datahub::Factory::InvalidCondition->throw(
         'message' => sprintf('Fixer condition "%s" did not yield a defined fixer', $condition_r)
     );
 }

@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/openapi-client/issues
   homepage: https://github.com/jhthorsen/openapi-client
   repository: https://github.com/jhthorsen/openapi-client.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

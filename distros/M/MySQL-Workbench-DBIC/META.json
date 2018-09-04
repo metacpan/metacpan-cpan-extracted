@@ -34,7 +34,7 @@
             "JSON" : "0",
             "List::Util" : "0",
             "Moo" : "1.003001",
-            "MySQL::Workbench::Parser" : "1.00",
+            "MySQL::Workbench::Parser" : "1.01",
             "perl" : "5.010001"
          }
       },
@@ -43,6 +43,7 @@
             "File::Copy" : "0",
             "File::Path" : "0",
             "FindBin" : "0",
+            "Pod::Coverage::TrustPod" : "0",
             "Test::LongString" : "0.16"
          }
       }
@@ -50,11 +51,11 @@
    "provides" : {
       "MySQL::Workbench::DBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "MySQL::Workbench::DBIC::FakeDBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC/FakeDBIC.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"

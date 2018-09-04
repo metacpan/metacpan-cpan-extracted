@@ -2,12 +2,17 @@
 #PODNAME: anki_import
 use strict;
 use warnings;
-use Data::Dumper qw(Dumper);
+use Cwd;
 use Anki::Import;
 
-eval {
-  anki_import(@ARGV);
+eval { anki_import(@ARGV) };
+
+# allow command output
+if ($@ =~ /^usage: anki_import/) {
+  print STDERR $@;
 }
+
+#ABSTRACT: command line command for the Anki::Import module
 
 __END__
 
@@ -15,11 +20,11 @@ __END__
 
 =head1 NAME
 
-anki_import
+anki_import - command line command for the Anki::Import module
 
 =head1 VERSION
 
-version 0.011
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -33,8 +38,6 @@ web interface at L<https://github.com/sdondley/Anki-Import/issues>.
 =head1 SEE ALSO
 
 L<Anki::Import>
-
-#ABSTRCT: command line command for the Anki::Import module
 
 =head1 AUTHOR
 

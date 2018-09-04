@@ -6,6 +6,7 @@ gen_multi_tests.pl
 ignore.txt
 lib/PkgConfig.pm
 LICENSE
+maint/releaseprep
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

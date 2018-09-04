@@ -45,7 +45,10 @@ use Linux::Perl;
 use Linux::Perl::EasyPack;
 use Linux::Perl::TimeSpec;
 
-use parent qw( Linux::Perl::Base::BitsTest );
+use parent qw(
+    Linux::Perl::Base
+    Linux::Perl::Base::BitsTest
+);
 
 my ($io_event_keys_ar, $io_event_pack, $io_event_size);
 
@@ -75,10 +78,7 @@ sub new {
 
     die "Need number of events!" if !$nr_events;
 
-    if (!$class->can('NR_io_setup')) {
-        require Linux::Perl::ArchLoader;
-        $class = Linux::Perl::ArchLoader::get_arch_module($class);
-    }
+    $class = $class->_get_arch_module();
 
     my $context = "\0" x 8;
 

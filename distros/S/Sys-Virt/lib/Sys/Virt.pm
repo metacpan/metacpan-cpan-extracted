@@ -79,7 +79,7 @@ use Sys::Virt::NWFilterBinding;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '4.6.0';
+our $VERSION = '4.7.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -1473,7 +1473,7 @@ can be extracted using the C<unpack> method as follows:
 
 Returns a hash reference providing information about the host
 CPU statistics. If <$cpuNum> is omitted, it defaults to C<Sys::Virt::NODE_CPU_STATS_ALL_CPUS>
-which causes it to return cummulative information for all
+which causes it to return cumulative information for all
 CPUs in the host. If C<$cpuNum> is zero or larger, it returns
 information just for the specified number. The C<$flags>
 parameter is currently unused and defaults to zero. The
@@ -1507,7 +1507,7 @@ The overall percentage utilization.
 
 Returns a hash reference providing information about the host
 memory statistics. If <$cellNum> is omitted, it defaults to C<Sys::Virt::NODE_MEMORY_STATS_ALL_CELLS>
-which causes it to return cummulative information for all
+which causes it to return cumulative information for all
 NUMA cells in the host. If C<$cellNum> is zero or larger, it
 returns information just for the specified number. The C<$flags>
 parameter is currently unused and defaults to zero. The

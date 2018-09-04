@@ -1,7 +1,7 @@
 package App::ListNewCPANDists;
 
-our $DATE = '2018-03-12'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-09-02'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +25,7 @@ our $db_schema_spec = {
     ],
 };
 
-my %args_common = (
+our %args_common = (
     cpan => {
         summary => 'Location of your local CPAN mirror, e.g. /path/to/cpan',
         schema => 'dirname*',
@@ -43,6 +43,29 @@ _
         summary => 'Filename of database',
         schema =>'filename*',
         default => 'index-lncd.db',
+    },
+);
+
+our %args_filter = (
+    exclude_dists => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_dist',
+        schema => ['array*', of=>'perl::distname*'],
+        tags => ['category:filtering'],
+    },
+    exclude_dist_re => {
+        schema => 're*',
+        tags => ['category:filtering'],
+    },
+    exclude_authors => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_author',
+        schema => ['array*', of=>'cpan::pause_id*'],
+        tags => ['category:filtering'],
+    },
+    exclude_author_re => {
+        schema => 're*',
+        tags => ['category:filtering'],
     },
 );
 
@@ -183,6 +206,7 @@ can customize the location of the generated SQLite database using the `cpan` and
 _
     args => {
         %args_common,
+        %args_filter,
         from_time => {
             schema => $sch_date,
             req => 1,
@@ -240,6 +264,7 @@ sub list_new_cpan_dists {
     my @res;
     my $num_hits = @{ $api_res->{hits}{hits} };
     my $i = 0;
+  HIT:
     for my $hit (@{ $api_res->{hits}{hits} }) {
         $i++;
         my $dist = $hit->{fields}{distribution};
@@ -252,7 +277,7 @@ sub list_new_cpan_dists {
             log_trace("First release of distribution %s is not in this time period, skipped", $dist);
             next;
         }
-        push @res, {
+        my $row = {
             dist => $dist,
             release => $hit->{fields}{name},
             author => $hit->{fields}{author},
@@ -260,6 +285,30 @@ sub list_new_cpan_dists {
             abstract => $hit->{fields}{abstract},
             date => $hit->{fields}{date},
         };
+        log_trace "row=%s", $row;
+
+      FILTER: {
+            if ($args{exclude_dists} && @{ $args{exclude_dists} } &&
+                    (grep {$dist eq $_} @{ $args{exclude_dists} })) {
+                log_info "Distribution %s is in exclude_dists, skipped", $dist;
+                next HIT;
+            }
+            if ($args{exclude_dist_re} && $dist =~ /$args{exclude_dist_re}/) {
+                log_info "Distribution %s matches exclude_dist_re, skipped", $dist;
+                next HIT;
+            }
+            if ($args{exclude_authors} && @{ $args{exclude_authors} } &&
+                    (grep {$row->{author} eq $_} @{ $args{exclude_authors} })) {
+                log_info "Author %s is in exclude_authors, skipped", $row->{author};
+                next HIT;
+            }
+            if ($args{exclude_author_re} && $hit->{fields}{author} =~ /$args{exclude_author_re}/) {
+                log_info "Author %s matches exclude_dist_re, skipped", $row->{author};
+                next HIT;
+            }
+        }
+
+        push @res, $row;
     }
 
     my %resmeta = (
@@ -279,6 +328,7 @@ of starting and ending time period.
 
 _
     args => {
+        %args_filter,
         month => {
             schema => ['int*', min=>1, max=>12],
             req => 1,
@@ -306,6 +356,10 @@ sub list_monthly_new_cpan_dists {
         %args,
         from_time => DateTime->from_epoch(epoch => $from_time),
         to_time   => DateTime->from_epoch(epoch => $to_time),
+        (exclude_dists      => $args{exclude_dists}     ) x !!defined($args{exclude_dists}),
+        (exclude_dists_re   => $args{exclude_dists_re}  ) x !!defined($args{exclude_dists_re}),
+        (exclude_authors    => $args{exclude_authors}   ) x !!defined($args{exclude_authors}),
+        (exclude_authors_re => $args{exclude_authors_re}) x !!defined($args{exclude_authors_re}),
     );
 }
 
@@ -319,6 +373,7 @@ structure.
 
 _
     args => {
+        %args_filter,
         month => {
             schema => ['int*', min=>1, max=>12],
             req => 1,
@@ -388,7 +443,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2018-03-12.
+This document describes version 0.008 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2018-09-02.
 
 =head1 FUNCTIONS
 
@@ -409,6 +464,14 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<exclude_author_re> => I<re>
+
+=item * B<exclude_authors> => I<array[cpan::pause_id]>
+
+=item * B<exclude_dist_re> => I<re>
+
+=item * B<exclude_dists> => I<array[perl::distname]>
 
 =item * B<month>* => I<int>
 
@@ -444,6 +507,14 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<exclude_author_re> => I<re>
+
+=item * B<exclude_authors> => I<array[cpan::pause_id]>
+
+=item * B<exclude_dist_re> => I<re>
+
+=item * B<exclude_dists> => I<array[perl::distname]>
 
 =item * B<month>* => I<int>
 
@@ -496,6 +567,14 @@ L<App::lcpan>, you can use the local CPAN mirror generated by L<lcpan>
 =item * B<db_name> => I<filename> (default: "index-lncd.db")
 
 Filename of database.
+
+=item * B<exclude_author_re> => I<re>
+
+=item * B<exclude_authors> => I<array[cpan::pause_id]>
+
+=item * B<exclude_dist_re> => I<re>
+
+=item * B<exclude_dists> => I<array[perl::distname]>
 
 =item * B<from_time>* => I<date>
 

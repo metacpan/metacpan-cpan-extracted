@@ -1,5 +1,5 @@
 package Starch::Plugin::RenewExpiration::State;
-$Starch::Plugin::RenewExpiration::State::VERSION = '0.07';
+$Starch::Plugin::RenewExpiration::State::VERSION = '0.09';
 use Moo::Role;
 use strictures 2;
 use namespace::clean;

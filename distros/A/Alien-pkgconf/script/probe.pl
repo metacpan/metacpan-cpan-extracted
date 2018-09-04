@@ -273,6 +273,7 @@ elsif($^O eq 'darwin')
 {
   $status{pkg_config_dir} = [qw(
     /usr/lib/pkgconfig
+    /usr/local/lib/pkgconfig
   )];
 }
 

@@ -1,6 +1,6 @@
 package WWW::Google::PageSpeedOnline::Stats;
 
-$WWW::Google::PageSpeedOnline::Stats::VERSION   = '0.25';
+$WWW::Google::PageSpeedOnline::Stats::VERSION   = '0.26';
 $WWW::Google::PageSpeedOnline::Stats::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,13 @@ WWW::Google::PageSpeedOnline::Stats - Placeholder for the stat of L<WWW::Google:
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has [ qw(totalRequestBytes htmlResponseBytes cssResponseBytes imageResponseBytes
          javascriptResponseBytes otherResponseBytes numberStaticResources

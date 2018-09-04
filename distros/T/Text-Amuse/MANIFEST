@@ -36,6 +36,7 @@ t/headers.t
 t/hyphenation.t
 t/images.t
 t/inline-elements.t
+t/inline-markup.t
 t/internal-linking.t
 t/languages.t
 t/list-continuations.t

@@ -3,7 +3,7 @@ package Datahub::Factory::Arthub;
 use Datahub::Factory::Sane;
 use namespace::clean;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 1;
 __END__

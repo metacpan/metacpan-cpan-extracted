@@ -1,5 +1,8 @@
 Revision history for WWW::Google::PageSpeedOnline
 
+0.26  Sun Sep 02 06:55:00 2018
+      - Used "namespace::autoclean" instead of "namespace::clean".
+
 0.25  Tue Mar 13 18:05:00 2018
       - Improved method exporting.
 

@@ -255,7 +255,7 @@ package Perlito5::AST::Apply;
         },
         '__SUB__' => sub {
             my ($self, $level, $wantarray) = @_;
-            'this.getCurrentSub()'
+            'this.currentSub'
         },
         'wantarray' => sub {
             my ($self, $level, $wantarray) = @_;
@@ -1051,10 +1051,14 @@ package Perlito5::AST::Apply;
                 $wantarray = 'return';
             }
 
+            my $method  = $wantarray eq 'void' || $wantarray eq 'statement'
+                ? 'throw new PlReturnException'
+                : 'PerlOp.ret';
+
             if ( ! @{ $self->{arguments} } ) {
-                return 'PerlOp.ret(PerlOp.context(' . Perlito5::Java::to_context($wantarray) . '))';
+                return $method . '(PerlOp.context(' . Perlito5::Java::to_context($wantarray) . '))';
             }
-            return 'PerlOp.ret(' . Perlito5::Java::to_runtime_context( $self->{arguments}, $level+1, $wantarray ) . ')';
+            return $method . '(' . Perlito5::Java::to_runtime_context( $self->{arguments}, $level+1, $wantarray ) . ')';
         },
         'goto' => sub {
             my ($self, $level, $wantarray) = @_;
@@ -1401,7 +1405,7 @@ package Perlito5::AST::Apply;
                 $fun = Perlito5::Java::to_filehandle($self->{special_arg}, $level+1);
             }
             else {
-                $fun  = 'PlV.STDOUT';
+                $fun  = 'PlV.selectedFileHandle';
             }
             return 'PlCORE.print('
                 . join( ', ',
@@ -1419,7 +1423,7 @@ package Perlito5::AST::Apply;
                 $fun = Perlito5::Java::to_filehandle($self->{special_arg}, $level+1);
             }
             else {
-                $fun  = 'PlV.STDOUT';
+                $fun  = 'PlV.selectedFileHandle';
             }
             return 'PlCORE.say('
                 . join( ', ',
@@ -1437,7 +1441,7 @@ package Perlito5::AST::Apply;
                 $fun = Perlito5::Java::to_filehandle($self->{special_arg}, $level+1);
             }
             else {
-                $fun  = 'PlV.STDOUT';
+                $fun  = 'PlV.selectedFileHandle';
             }
             my $list = 'PlCORE.sprintf(' . Perlito5::Java::to_context($wantarray) . ', ' . Perlito5::Java::to_list(\@in, $level) . ').toString()';
             'PlCORE.print(' . Perlito5::Java::to_context($wantarray) . ', ' . $fun . ', ' . $list . ')';
@@ -1522,6 +1526,15 @@ package Perlito5::AST::Apply;
              .      Perlito5::Java::to_filehandle($fun, $level+1) . ', '
              .      $list
              . ')';
+        },
+        'formline' => sub {
+            my ($self, $level, $wantarray) = @_;
+            # create a PlStringConstant
+            my $code = Perlito5::AST::Buf->new( buf => 'Perlito5::Runtime::Formline::formline' )->emit_java($level, 'scalar');
+            return $code . '.apply('
+                    . Perlito5::Java::to_context($wantarray) . ', '
+                    . Perlito5::Java::to_param_list($self->{arguments}, $level+1)
+                  . ')';
         },
         'map' => sub {
             my ($self, $level, $wantarray) = @_;
@@ -1785,9 +1798,7 @@ package Perlito5::AST::Apply;
         },
     );
 
-    for my $op (qw/ binmode close closedir opendir readdir seek seekdir read sysread
-        write syswrite /
-    ) {
+    for my $op (qw/ binmode closedir opendir readdir seek seekdir read sysread syswrite / ) {
         $emit_js{$op} = sub {
             my ($self, $level, $wantarray) = @_;
             my @in  = @{$self->{arguments}};
@@ -1795,6 +1806,18 @@ package Perlito5::AST::Apply;
             'PlCORE.' . $op . '('
              .      Perlito5::Java::to_context($wantarray) . ', '
              .      Perlito5::Java::to_filehandle($fun, $level+1) . ', '
+             .      Perlito5::Java::to_param_list(\@in, $level+1)  
+             . ')';
+        };
+    }
+    for my $op (qw/ close write/ ) {
+        $emit_js{$op} = sub {
+            my ($self, $level, $wantarray) = @_;
+            my @in  = @{$self->{arguments}};
+            my $fun = shift(@in);
+            'PlCORE.' . $op . '('
+             .      Perlito5::Java::to_context($wantarray) . ', '
+             .      ( $fun ? Perlito5::Java::to_filehandle($fun, $level+1) . ', ' : '' )
              .      Perlito5::Java::to_param_list(\@in, $level+1)  
              . ')';
         };

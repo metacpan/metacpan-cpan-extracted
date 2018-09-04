@@ -33,6 +33,8 @@ C<man 7 epoll> and the various system calls’ pages) for full details.
 
 =cut
 
+use parent 'Linux::Perl::Base';
+
 use Linux::Perl;
 use Linux::Perl::Constants::Fcntl;
 use Linux::Perl::EasyPack;
@@ -63,11 +65,7 @@ sub new {
 
     local ($!, $^E);
 
-    my $arch_module = $class->can('NR_epoll_create') && $class;
-    $arch_module ||= do {
-        require Linux::Perl::ArchLoader;
-        Linux::Perl::ArchLoader::get_arch_module($class);
-    };
+    my $arch_module = $class->_get_arch_module();
 
     my $flags = Linux::Perl::ParseFlags::parse( $class, $opts{'flags'} );
 
@@ -282,28 +280,28 @@ Waits for one or more events on the epoll. %OPTS are:
 
 =item * C<timeout> - in seconds
 
-=item * C<sigmask> - Optional, an array of signals to block. The signals
-can be specified either as names (e.g., C<INT>) or as numbers.
-See C<man 2 epoll_pwait> for why you might want to do this. (Note that Perl
-doesn’t really expect you to block signals directly, so this may screw
-things up for you in weird ways. If in doubt, avoid this option.)
+=item * C<sigmask> - Optional, an array of signals to block as part of
+this function call. Give signals either as names (e.g., C<INT>) or as numbers.  See C<man 2 epoll_pwait> for why you might want to do this.  Also see
+L<Linux::Perl::sigprocmask> for an easy, light way to block signals.
 
 =back
 
-The return is a list of hash references, one for each received event.
-Each hash reference is:
+The return is a list of key-value pairs. Each pair is:
 
 =over
 
-=item * C<data> - The same number given in C<add()>—or, if you didn’t
+=item * The C<data> number given in C<add()>—or, if you didn’t
 set a custom C<data> value, the file descriptor associated with the event.
 
-=item * C<events> - Corresponds to the same-named array given in C<add()>,
+=item * A number that corresponds to the C<events> array given in C<add()>,
 but to optimize performance this is returned as a single number. Check
 for specific events by iterating through the C<EVENT_NUMBER()> hash
 reference.
 
 =back
+
+You can generally assign this list into a hash for easy parsing, as long
+as you do not specify non-unique custom C<data> values.
 
 =cut
 
@@ -338,17 +336,14 @@ sub wait {
         ),
     );
 
-    my @events;
+    my @events_kv;
     for (1 .. $count) {
         my ($events_num, $data) = unpack( $epoll_event_pack, substr( $buf, 0, length($blank_event), q<> ) );
 
-        push @events, {
-            events => $events_num,
-            data => $data,
-        };
+        push @events_kv, $data => $events_num;
     }
 
-    return @events;
+    return @events_kv;
 }
 
 1;

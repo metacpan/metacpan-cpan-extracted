@@ -4,13 +4,13 @@
       "Ludovico Stevens <lstevens@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Control-CLI-Extreme",
    "prereqs" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Control::CLI::Extreme" : {
          "file" : "lib/Control/CLI/Extreme.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -44,5 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.00"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

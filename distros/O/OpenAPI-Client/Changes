@@ -1,5 +1,9 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.18 2018-09-02T14:13:51+0200
+ - Add "after_build_tx" event
+ - Add "opeartionId_p" methods for promise based API
+
 0.17 2018-08-02T16:00:20+0800
  - Fix duplicate keys in test #13
 

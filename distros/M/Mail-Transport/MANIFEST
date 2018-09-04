@@ -20,5 +20,6 @@ lib/Mail/Transport/Send.pod
 lib/Mail/Transport/Sendmail.pm
 lib/Mail/Transport/Sendmail.pod
 t/001use.t
+xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+Revision history for Bit::Twiddling
+
+0.08    2018-09-02
+        - require MakeMaker version 6.48
+        - add META_MERGE to Makefile.PL
+
+0.07    2018-09-02
+        - remove C<use 5.022> from 2 test files
+
+0.06    2018-09-02
+        - add a link to HitHub issues for bug reporting
+
+0.05    2018-09-02
+        - Fix broken tests on Windows
+        - add TODO
+
+0.04    2018-08-31
+        - fix a test t/nearest_higher_power_of_2.t
+
+0.03    2018-08-31
+        - remove C<use Data::Dump> from tests
+
+0.02    2018-08-31
+        - remove C<use autodie> from tests
+
+0.01    2018-08-31
+        - First release

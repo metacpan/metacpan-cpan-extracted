@@ -5,7 +5,7 @@ use strictures 2;
 # due to a change in how the various starch objects are created which
 # could be a breakage or cause for fixing this test.
 
-use Test::More;
+use Test2::V0;
 use Log::Any::Test;
 use Log::Any qw($log);
 

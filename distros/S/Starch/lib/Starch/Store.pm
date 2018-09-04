@@ -1,5 +1,5 @@
 package Starch::Store;
-$Starch::Store::VERSION = '0.07';
+$Starch::Store::VERSION = '0.09';
 =head1 NAME
 
 Starch::Store - Base role for Starch stores.
@@ -10,13 +10,13 @@ This role defines an interfaces for Starch store classes.  Starch store
 classes are meant to be thin wrappers around the store implementations
 (such as DBI, CHI, etc).
 
-See L<Starch::Manual/STORES> for instructions on using stores and a list of
+See L<Starch/STORES> for instructions on using stores and a list of
 available Starch stores.
 
 See L<Starch::Extending/STORES> for instructions on writing your own stores.
 
 This role adds support for method proxies to consuming classes as
-described in L<Starch::Manual/METHOD PROXIES>.
+described in L<Starch/METHOD PROXIES>.
 
 =cut
 

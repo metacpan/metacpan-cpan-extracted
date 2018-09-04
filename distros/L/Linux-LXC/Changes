@@ -1,5 +1,9 @@
 Changes file for Linux::LXC
 
+1.0003    2018-09-03 07:36:43+02:00 Europe/Paris
+	* PLL-1: manage get_config() call without parameter.
+	* PLL-4: add a paragraph in the POD file about the bug-tracker.
+
 1.0002    2017-04-02 11:30:20+02:00 Europe/Paris
 
 	* Fix ownership of folder created with the "put" subroutine.

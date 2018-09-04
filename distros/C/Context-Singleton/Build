@@ -1,4 +1,4 @@
-#! /home/brano/.cache/perlbrew/perls/gdc-el7/bin/perl
+#! /home/brano/.cache/perlbrew/perls/perl-5.16.3-threads/bin/perl
 
 use strict;
 use Cwd;
@@ -7,11 +7,11 @@ use File::Spec;
 
 sub magic_number_matches {
   return 0 unless -e '_build/magicnum';
-  my $FH;
-  open $FH, '<','_build/magicnum' or return 0;
-  my $filenum = <$FH>;
-  close $FH;
-  return $filenum == 674591;
+  local *FH;
+  open FH, '_build/magicnum' or return 0;
+  my $filenum = <FH>;
+  close FH;
+  return $filenum == 929557;
 }
 
 my $progname;
@@ -33,10 +33,6 @@ BEGIN {
     (
      '/home/brano/lib/perl5'
     );
-    if ($INC[-1] ne '.') {
-        push @INC, '.';
-    }
-
 }
 
 close(*DATA) unless eof(*DATA); # ensure no open handles to this script

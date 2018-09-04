@@ -10,7 +10,7 @@ HTML::GoogleMaps::V3 - a simple wrapper around the Google Maps API
 
 # VERSION
 
-0.10
+0.12
 
 # SYNOPSIS
 
@@ -124,8 +124,8 @@ features, bug fixes, or anything else then please raise an issue / pull request:
 
 # AUTHORS
 
-Nate Mueller &lt;nate@cs.wisc.edu> - Original Author
+Nate Mueller <nate@cs.wisc.edu> - Original Author
 
-Lee Johnson &lt;leejo@cpan.org> - Maintainer of this fork
+Lee Johnson <leejo@cpan.org> - Maintainer of this fork
 
 Nigel Horne - Contributor of several patches

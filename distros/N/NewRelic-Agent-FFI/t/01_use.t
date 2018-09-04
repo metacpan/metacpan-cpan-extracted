@@ -2,7 +2,7 @@ use Test2::V0 -no_srand => 1;
 sub require_ok ($);
 
 require_ok 'NewRelic::Agent::FFI';
-require_ok 'NewRelic::Agent::SDK' if -f 'lib/NewRelic/Agent/SDK.pm';
+require_ok 'NewRelic::Agent::FFI::Procedural';
 
 done_testing;
 

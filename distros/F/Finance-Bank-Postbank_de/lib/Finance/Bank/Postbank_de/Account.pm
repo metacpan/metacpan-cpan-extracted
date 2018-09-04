@@ -4,51 +4,56 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use POSIX qw(strftime);
-use base 'Class::Accessor';
+use Moo 2;
 
-use vars qw[ $VERSION %tags %totals %columns %safety_check ];
+our $VERSION = '0.54';
 
-$VERSION = '0.51';
+has [
+    'number',
+    'balance',
+    'balance_unavailable',
+    'balance_prev',
+    'transactions_future',
+    'iban',
+    'blz',
+    'account_type',
+    'name',
+    ] => ( is => 'rw' );
 
-BEGIN {
-  Finance::Bank::Postbank_de::Account->mk_accessors(qw( number balance balance_unavailable balance_prev transactions_future iban blz account_type name));
-};
+around BUILDARGS => sub {
+  my ($orig, $class,%args) = @_;
 
-sub new {
-  my $self = $_[0]->SUPER::new();
-  my ($class,%args) = @_;
-
+  if( exists $args{ number } and exists $args{ kontonummer }
+      and $args{ number } ne $args{ kontonummer } ) {
+      croak "'kontonummer' is '$args{kontonummer}' and 'number' is '$args{ number }'";
+  };
   my $num = delete $args{number} || delete $args{kontonummer};
-  croak "'kontonummer' is '$args{kontonummer}' and 'number' is '$num'"
-    if $args{kontonummer} and $args{kontonummer} ne $num;
+  $args{ number } = $num
+      if defined $num;
 
-  $self->number($num) if (defined $num);
-
-  $self->name($args{name})
-    if (exists $args{name});
-
-  $self;
+  $orig->( $class, %args );
 };
 
 { no warnings 'once';
 *kontonummer = *number;
 }
 
-%safety_check = (
+our %safety_check = (
   name		=> 1,
   kontonummer	=> 1,
 );
 
-%tags = (
+our %tags = (
   #Girokonto => [qw(Name BLZ Kontonummer IBAN)],
   "gebuchte Ums\x{00E4}tze" => [qw(Name BLZ Kontonummer IBAN)],
   Tagesgeldkonto => [qw(Name BLZ Kontonummer IBAN)],
   Sparcard => [qw(Name BLZ Kontonummer  IBAN)],
   Sparkonto => [qw(Name BLZ Kontonummer  IBAN)],
   Kreditkarte => [qw(Name BLZ Kontonummer IBAN)],
+  '' => [qw(Name BLZ Kontonummer IBAN)],
 );
 
-%totals = (
+our %totals = (
   "gebuchte Ums\x{00E4}tze" => [
       [qr'^Aktueller Kontostand' => 'balance'],
       [qr'^Summe vorgemerkter Ums.tze' => 'transactions_future'],
@@ -57,10 +62,15 @@ sub new {
   Sparcard => [[qr'Aktueller Kontostand' => 'balance'],],
   Sparkonto => [[qr'Aktueller Kontostand' => 'balance'],],
   Tagesgeldkonto => [[qr'Aktueller Kontostand' => 'balance'],],
+  "" => [
+      [qr'^Aktueller Kontostand' => 'balance'],
+      [qr'^Summe der Ums.tze in den n.chsten 14 Tagen' => 'transactions_future'],
+      [qr'^Davon noch nicht verf.gbar' => 'balance_unavailable'],
+  ],
 );
 
-%columns = (
-  qr'Buchungstag'			=> 'tradedate',
+our %columns = (
+  qr'Buchungsdatum'			=> 'tradedate',
   qr'Wertstellung'		=> 'valuedate',
   qr'Umsatzart'			=> 'type',
   qr'Buchungsdetails'		=> 'comment',
@@ -93,7 +103,7 @@ sub slurp_file {
   local $/ = undef;
   open my $fh, "< $filename"
     or croak "Couldn't read from file '$filename' : $!";
-  binmode $fh, ':encoding(CP-1252)';
+  binmode $fh, ':encoding(UTF-8)';
   <$fh>;
 };
 
@@ -123,20 +133,26 @@ sub parse_statement {
 
   my @lines = split /\r?\n/, $raw_statement;
   croak "No valid account statement: '$lines[0]'"
-    unless $lines[0] =~ /^Umsatzauskunft - (.*)$/;
+    unless $lines[0] =~ /^Umsatzauskunft;$/;
   shift @lines;
 
-  my $account_type = $1;
-  if( ! exists $tags{ $account_type }) {
-    $account_type =~ s!([^\x00-\x7f])!sprintf '%08x', ord($1)!ge;
-    croak "Unknown account type '$account_type' (" . (join ",",keys %tags) . ")"
-      unless exists $tags{$account_type};
-  };
-  $self->account_type($account_type);
+  my $account_type = '';
+  #my $account_type = $1;
+  #if( ! exists $tags{ $account_type }) {
+  #  $account_type =~ s!([^\x00-\x7f])!sprintf '%08x', ord($1)!ge;
+  #  croak "Unknown account type '$account_type' (" . (join ",",keys %tags) . ")"
+  #    unless exists $tags{$account_type};
+  #};
+  #$self->account_type($account_type);
 
   # Name: PETRA PFIFFIG
-  for my $tag (@{ $tags{ $self->account_type }||[] }) {
-    $lines[0] =~ /^\Q$tag\E;(.*)$/
+  #for my $tag (@{ $tags{ $self->account_type }||[] }) {
+  my $sep = ";";
+  if( $lines[0] =~ /([\t;])/) {
+    $sep = $1;
+  };
+  for my $tag (@{ $tags{ $account_type }||[] }) {
+    $lines[0] =~ /^\Q$tag\E$sep(.*?)$sep?$/
       or croak "Field '$tag' not found in account statement ($lines[0])";
     my $method = lc($tag);
     my $value = $1;
@@ -149,17 +165,13 @@ sub parse_statement {
     shift @lines;
   };
 
-  my $sep = ";";
-  if( $lines[0] =~ /([\t])/) {
-    $sep = $1;
-  };
 
   while ($lines[0] !~ /^\s*$/) {
     my $line = shift @lines;
     my ($method,$balance);
-    for my $total (@{ $totals{ $self->account_type }||[] }) {
+    for my $total (@{ $totals{ $account_type }||[] }) {
       my ($re,$possible_method) = @$total;
-      if ($line =~ /$re;\s*(?:(?:(\S+)\s*(?:\x{20AC}|\x{80}))|(null))$/) {
+      if ($line =~ /$re$sep\s*(?:(?:(\S+)\s*(?:\x{20AC}|\x{80}))|(null))$sep$/) {
         $method = $possible_method;
         $balance = $1 || $2;
         if ($balance =~ /^(-?[0-9.,]+)\s*$/) {
@@ -182,8 +194,14 @@ sub parse_statement {
     or croak "Expected an empty line after the account balances, got '$lines[0]'";
   shift @lines;
 
+  # Now skip over the transactions in the future
+  while( $lines[0] !~ /^gebuchte Ums.tze/ ) {
+    shift @lines;
+  };
+  shift @lines;
+
   # Now parse the lines for each cashflow :
-  $lines[0] =~ /^"Buchungstag"${sep}"Wertstellung"${sep}"Umsatzart"/
+  $lines[0] =~ /^Buchungsdatum${sep}Wertstellung${sep}Umsatzart/
     or croak "Couldn't find start of transactions ($lines[0])";
 
   my (@fields);

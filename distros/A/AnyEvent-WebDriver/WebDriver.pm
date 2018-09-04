@@ -17,28 +17,39 @@ AnyEvent::WebDriver - control browsers using the W3C WebDriver protocol
    $wd->new_session ({});
 
    $wd->navigate_to ("https://duckduckgo.com/html");
-   my $searchbox = $wd->find_element ("css selector" => 'input[type="text"]');
+   my $searchbox = $wd->find_element (css => 'input[type="text"]');
 
    $wd->element_send_keys ($searchbox => "free software");
-   $wd->element_click ($wd->find_element ("css selector" => 'input[type="submit"]'));
+   $wd->element_click ($wd->find_element (css => 'input[type="submit"]'));
 
+   # session gets autodeleted by default, so wait a bit
    sleep 10;
+
+   # this is an example of an action sequence
+   $wd->actions
+      ->move ($wd->find_element (...), 40, 5)
+      ->click
+      ->type ("some text")
+      ->key ("{Enter}")
+      ->perform;
 
 =head1 DESCRIPTION
 
-WARNING: THE API IS NOT GUARANTEED TO BE STABLE UNTIL VERSION 1.0.
+WARNING: BEFORE VERSION 1.0, API CHANGES ARE LIKELY.
 
 This module aims to implement the W3C WebDriver specification which is the
 standardised equivalent to the Selenium WebDriver API., which in turn aims
 at remotely controlling web browsers such as Firefox or Chromium.
 
 At the time of this writing, it was so brand new that I could only get
-C<geckodriver> (For Firefox) to work, but that is expected to be fixed
+C<geckodriver> (for Firefox) to work, but that is expected to be fixed
 very soon indeed.
 
-To make most of this module, or, in fact, to make any reasonable use of
-this module, you would need to refer to the W3C WebDriver recommendation,
-which can be found L<here|https://www.w3.org/TR/webdriver1/>:
+One of the design goals of this module was to stay very close to the
+language and words used in the WebDriver specification itself, so to make
+most of this module, or, in fact, to make any reasonable use of this
+module, you would need to refer to the W3C WebDriver recommendation, which
+can be found L<here|https://www.w3.org/TR/webdriver1/>:
 
    https://www.w3.org/TR/webdriver1/
 
@@ -57,7 +68,7 @@ use Carp ();
 use AnyEvent ();
 use AnyEvent::HTTP ();
 
-our $VERSION = 0.9;
+our $VERSION = 0.91;
 
 our $WEB_ELEMENT_IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 our $WEB_WINDOW_IDENTIFIER  =  "window-fcc6-11e5-b4f8-330a88ab9d7f";
@@ -560,7 +571,10 @@ Return the current window rect(angle), e.g.:
 
 =item $wd->set_window_rect ($rect)
 
-Sets the window rect(angle).
+Sets the window rect(angle), e.g.:
+
+   $wd->set_window_rect ({ width => 780, height => 560 });
+   $wd->set_window_rect ({ x => 0, y => 0, width => 780, height => 560 });
 
 =cut
 
@@ -779,7 +793,10 @@ Clear the contents of the given element.
 
 =item $wd->element_send_keys ($element, $text)
 
-Sends the given text as key events to the given element.
+Sends the given text as key events to the given element. Key input state
+can be cleared by embedding C<\x{e000}> in C<$text>. Presumably, you can
+embed modifiers using their unicode codepoints, but the specification is
+less than clear to mein this area.
 
 =cut
 
@@ -917,9 +934,9 @@ equivalent example using the C<AnyEvent::WebDriver::Actions> helper API):
          pointerType => "touch",
          actions => [
             { type => "pointerMove", duration => 100, origin => $input, x => 40, y => 5 },
-            { type => "pointerDown", button => 1 },
+            { type => "pointerDown", button => 0 },
             { type => "pause", duration => 40 },
-            { type => "pointerUp", button => 1 },
+            { type => "pointerUp", button => 0 },
          ],
       },
       {
@@ -947,9 +964,7 @@ equivalent example using the C<AnyEvent::WebDriver::Actions> helper API):
    ]);
 
 And here is essentially the same (except for fewer pauses) example as
-above, using the much simpler C<AnyEvent::WebDriver::Actions> API. Note
-that the pointer up and key down event happen concurrently in this
-example:
+above, using the much simpler C<AnyEvent::WebDriver::Actions> API:
 
    $wd->navigate_to ("https://duckduckgo.com/html");
    my $input = $wd->find_element ("css selector", 'input[type="text"]');
@@ -958,9 +973,9 @@ example:
       ->click
       ->key ("a")
       ->key ("b")
-      ->pause (2000)
-      ->key ("\x{E007}")
-      ->pause (5000)
+      ->pause (2000) # so you can watch leisurely
+      ->key ("{Enter}")
+      ->pause (5000) # so you can see the result
       ->perform;
 
 =item $wd->release_actions
@@ -1061,30 +1076,27 @@ me to twist my head around them. Basically, an action list consists of a
 number of sources representing devices (such as a finger, a mouse, a pen
 or a keyboard) and a list of actions for each source.
 
-An action can be a key press, a pointer move or a pause (time
-delay). Actions from different sources can happen "at the same time",
-while actions from a single source are executed in order.
+An action can be a key press, a pointer move or a pause (time delay).
 
-While you can provide an action list manually, it is (hopefully) less
+While you can provide these action lists manually, it is (hopefully) less
 cumbersome to use the API described in this section to create them.
 
 The basic process of creating and performing actions is to create a new
 action list, adding action sources, followed by adding actions. Finally
 you would C<perform> those actions on the WebDriver.
 
-Virtual time progresses as long as you add actions to the same event
-source. Adding events to different sources are considered to happen
-concurrently. If you want to force time to progress, you can do this using
-a call to C<< ->pause (0) >>.
-
 Most methods here are designed to chain, i.e. they return the web actions
 object, to simplify multiple calls.
+
+Also, while actions from different sources can happen "at the same time"
+in the WebDriver protocol, this class ensures that actions will execute in
+the order specified.
 
 For example, to simulate a mouse click to an input element, followed by
 entering some text and pressing enter, you can use this:
 
    $wd->actions
-      ->click (1, 100)
+      ->click (0, 100)
       ->type ("some text")
       ->key ("{Enter}")
       ->perform;
@@ -1096,7 +1108,7 @@ be more verbosely written like this:
    $wd->actions
       ->source ("mouse", "pointer", pointerType => "mouse")
       ->source ("kbd", "key")
-      ->click (1, 100, "mouse")
+      ->click (0, 100, "mouse")
       ->type ("some text", "kbd")
       ->key ("{Enter}", "kbd")
       ->perform;
@@ -1208,7 +1220,7 @@ sub _add {
    my $al = $source->{actions};
 
    push @$al, { type => "pause" }
-      while @$al < $self->{tick} - 1;
+      while @$al < $self->{tick}; # -1 == allow concurrent actions
 
    $kv{type} = $type;
 
@@ -1270,31 +1282,31 @@ sub pause {
 
 =item $al = $al->pointer_up ($button, $source)
 
-Press or release the given button. C<$button> defaults to C<1>.
+Press or release the given button. C<$button> defaults to C<0>.
 
 =item $al = $al->click ($button, $source)
 
 Convenience function that creates a button press and release action
-without any delay between them. C<$button> defaults to C<1>.
+without any delay between them. C<$button> defaults to C<0>.
 
 =item $al = $al->doubleclick ($button, $source)
 
 Convenience function that creates two button press and release action
 pairs in a row, with no unnecessary delay between them. C<$button>
-defaults to C<1>.
+defaults to C<0>.
 
 =cut
 
 sub pointer_down {
    my ($self, $button, $source) = @_;
 
-   $self->_add ($source, ptr => pointerDown => button => ($button // 1)*1)
+   $self->_add ($source, ptr => pointerDown => button => ($button // 0)*1)
 }
 
 sub pointer_up {
    my ($self, $button, $source) = @_;
 
-   $self->_add ($source, ptr => pointerUp => button => ($button // 1)*1)
+   $self->_add ($source, ptr => pointerUp => button => ($button // 0)*1)
 }
 
 sub click {
@@ -1327,6 +1339,18 @@ sub move {
                 origin => $origin, x => $x*1, y => $y*1, duration => $duration*1)
 }
 
+=item $al = $al->cancel ($source)
+
+Executes a pointer cancel action.
+
+=cut
+
+sub cancel {
+   my ($self, $source) = @_;
+
+   $self->_add ($source, ptr => "pointerCancel")
+}
+
 =item $al = $al->keyDown ($key, $source)
 
 =item $al = $al->keyUp ($key, $source)
@@ -1356,12 +1380,14 @@ Example: press and release the "enter" key using the special key name syntax:
 =item $al = $al->type ($string, $source)
 
 Convenience method to simulate a series of key press and release events
-for the keys in C<$string>. There is no syntax for special keys,
-everything will be typed "as-is" if possible.
+for the keys in C<$string>, one pair per extended unicode grapheme
+cluster. There is no syntax for special keys, everything will be typed
+"as-is" if possible.
 
 =cut
 
 our %SPECIAL_KEY = (
+#   "NULL"           => \xE000,
    "Unidentified"   => 0xE000,
    "Cancel"         => 0xE001,
    "Help"           => 0xE002,
@@ -1584,7 +1610,7 @@ identical.
 
 All the simplified API methods are very thin wrappers around WebDriver
 commands of the same name. They are all implemented in terms of the
-low-level methods (C<req>, C<get>, C<post> and C<delete>), which exists
+low-level methods (C<req>, C<get>, C<post> and C<delete>), which exist
 in blocking and callback-based variants (C<req_>, C<get_>, C<post_> and
 C<delete_>).
 

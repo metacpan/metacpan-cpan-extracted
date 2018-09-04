@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::CollectiveAccess;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 use Moo;
 use Catmandu;
@@ -13,36 +13,7 @@ with 'Datahub::Factory::Importer';
 has endpoint   => (is => 'ro', required => 1);
 has username   => (is => 'ro', required => 1);
 has password   => (is => 'ro', required => 1);
-has field_list => (is => 'ro', default => sub {
-    return [
-        'ca_objects.object_id',
-        'ca_objects.preferred_labels',
-        'ca_objects.description',
-        'ca_objects.subtitle',
-        'ca_objects.geonames',
-        'ca_objects.lcsh_terms',
-        'ca_objects.colour',
-        'ca_objects.contentActivity',
-        'ca_objects.contentConcept',
-        'ca_objects.contentDescription',
-        'ca_objects.dimensions.dimensions_width',
-        'ca_objects.dimensions.dimensions_height',
-        'ca_objects.dimensions.dimensions_depth',
-        'ca_objects.dimensions.circumference',
-        'ca_objects.dimensions.dimensions_type',
-        'ca_objects.materialInfo.materialInfostyle',
-        'ca_objects.objectProductionDate',
-        'ca_objects.techniqueInfo.techniqueInfodatePeriod',
-        'ca_objects.dateText',
-        'ca_objects.objectName.objectObjectName',
-        'ca_objects.objectWorkPid.objectWorkPidDomain',
-        'ca_objects.objectWorkPid.objectWorkPidID',
-        'ca_objects.objectRecordPid.objectRecordPidDomain',
-        'ca_objects.objectRecordPid.objectRecordPidID',
-        'ca_entities.entity_id',
-        'ca_entities.relationship_type_code'
-    ];
-});
+has display    => (is => 'ro', default => 'teaser');
 
 sub _build_importer {
     my $self = shift;
@@ -50,7 +21,7 @@ sub _build_importer {
         username   => $self->username,
         password   => $self->password,
         url        => $self->endpoint,
-        field_list => $self->field_list
+        display    => $self->display
     );
     return $ca->bag;
 }

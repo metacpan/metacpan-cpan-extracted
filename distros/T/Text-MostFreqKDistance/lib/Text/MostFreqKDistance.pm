@@ -1,6 +1,6 @@
 package Text::MostFreqKDistance;
 
-$Text::MostFreqKDistance::VERSION   = '0.09';
+$Text::MostFreqKDistance::VERSION   = '0.10';
 $Text::MostFreqKDistance::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Text::MostFreqKDistance - Estimate strings similarity.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -59,6 +59,13 @@ FASTA format.
 
 sub MostFreqKSDF {
     my ($a, $b, $k, $d) = @_;
+
+    die "ERROR: Missing source string (first).\n"   unless defined $a;
+    die "ERROR: Missing source string (second).\n"  unless defined $b;
+    die "ERROR: Missing frequency value.\n"         unless defined $k;
+    die "ERROR: Invalid frequency value [$k].\n"    unless ($k =~ /^[0-9]+$/);
+    die "ERROR: Missing max distance value.\n"      unless defined $d;
+    die "ERROR: Invalid max distance value [$d].\n" unless ($d =~ /^[0-9]+$/);
 
     my $MostFreqKHashing_a = _MostFreqKHashing($a, $k);
     my $MostFreqKHashing_b = _MostFreqKHashing($b, $k);

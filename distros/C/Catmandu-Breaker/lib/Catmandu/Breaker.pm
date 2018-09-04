@@ -1,6 +1,6 @@
 package Catmandu::Breaker;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Moo;
 use Carp;
@@ -9,118 +9,116 @@ use Catmandu::Util;
 use Catmandu;
 use Data::Dumper;
 
-has verbose  => (is => 'ro', default => sub { 0  });
-has maxscan  => (is => 'ro', default => sub { -1 });
-has tags     => (is => 'ro');
-has _counter => (is => 'ro', default => sub { 0  });
+has verbose  => ( is => 'ro', default => sub {0} );
+has maxscan  => ( is => 'ro', default => sub {-1} );
+has tags     => ( is => 'ro' );
+has _counter => ( is => 'ro', default => sub {0} );
 
 sub counter {
-	my ($self) = @_;
-	$self->{_counter} = $self->{_counter} + 1;
-	$self->{_counter};
+    my ($self) = @_;
+    $self->{_counter} = $self->{_counter} + 1;
+    $self->{_counter};
 }
 
 sub to_breaker {
-	my ($self,$identifier,$tag,$value) = @_;
+    my ( $self, $identifier, $tag, $value ) = @_;
 
-	croak "usage: to_breaker(idenifier,tag,value)"
-			unless defined($identifier)
-					&& defined($tag) && defined($value);
+    croak "usage: to_breaker(idenifier,tag,value)"
+        unless defined($identifier) && defined($tag) && defined($value);
 
-	$value =~ s{\n}{\\n}mg;
+    $value =~ s{\n}{\\n}mg;
 
-	sprintf "%s\t%s\t%s\n"
-    					, $identifier
-    					, $tag
-    					, $value;
+    sprintf "%s\t%s\t%s\n", $identifier, $tag, $value;
 }
 
 sub from_breaker {
-    my ($self,$line) = @_;
+    my ( $self, $line ) = @_;
 
-    my ($id,$tag,$value) = split(/\s+/,$line,3);
+    my ( $id, $tag, $value ) = split( /\s+/, $line, 3 );
 
     croak "error line not in breaker format : $line"
-    		unless defined($id) && defined($tag) && defined($value);
+        unless defined($id) && defined($tag) && defined($value);
 
-    return +{
-    	identifier => $id ,
-    	tag        => $tag ,
-    	value      => $value
-    };
+    return +{ identifier => $id, tag => $tag, value => $value };
 }
 
 sub parse {
-    my ($self,$file) = @_;
+    my ( $self, $file, $format ) = @_;
 
-    my $tags     = $self->tags // $self->scan_tags($file);
+    my $tags = $self->tags // $self->scan_tags($file);
+    $format = $format // 'Table';
 
-    my $importer = Catmandu->importer('Text', file => $file);
-    my $exporter = Catmandu->exporter('Stat', fields => $tags);
+    my $importer = Catmandu->importer( 'Text', file => $file );
+    my $exporter = Catmandu->exporter( 'Stat', fields => $tags, as => $format );
 
     my $rec     = {};
     my $prev_id = undef;
 
     my $it = $importer;
 
-    if ($self->verbose) {
+    if ( $self->verbose ) {
         $it = $importer->benchmark();
     }
 
-    $it->each(sub {
-      my $line  = $_[0]->{text};
+    $it->each(
+        sub {
+            my $line = $_[0]->{text};
 
-      my $brk   = $self->from_breaker($line);
-      my $id    = $brk->{identifier};
-      my $tag   = $brk->{tag};
-      my $value = $brk->{value};
+            my $brk   = $self->from_breaker($line);
+            my $id    = $brk->{identifier};
+            my $tag   = $brk->{tag};
+            my $value = $brk->{value};
 
-      if (defined($prev_id) && $prev_id ne $id) {
-         $exporter->add($rec);
-         $rec = {};
-      }
+            if ( defined($prev_id) && $prev_id ne $id ) {
+                $exporter->add($rec);
+                $rec = {};
+            }
 
-      $rec->{_id} = $id;
+            $rec->{_id} = $id;
 
-      if (exists $rec->{$tag}) {
-          my $prev = ref($rec->{$tag}) eq 'ARRAY' ? $rec->{$tag} : [$rec->{$tag}];
-          $rec->{$tag} = [ @$prev , $value ];
-      }
-      else {
-          $rec->{$tag} = $value;
-      }
+            if ( exists $rec->{$tag} ) {
+                my $prev
+                    = ref( $rec->{$tag} ) eq 'ARRAY'
+                    ? $rec->{$tag}
+                    : [ $rec->{$tag} ];
+                $rec->{$tag} = [ @$prev, $value ];
+            }
+            else {
+                $rec->{$tag} = $value;
+            }
 
-      $prev_id = $id;
-    });
+            $prev_id = $id;
+        }
+    );
     $exporter->add($rec);
 
     $exporter->commit;
 }
 
-sub scan_tags  {
-    my ($self,$file) = @_;
+sub scan_tags {
+    my ( $self, $file ) = @_;
 
     my $tags = {};
-    my $io = Catmandu::Util::io($file);
+    my $io   = Catmandu::Util::io($file);
 
     print STDERR "Scanning:\n" if $self->verbose;
     my $n = 0;
-    while (my $line = $io->getline) {
-      $n++;
-      chop($line);
+    while ( my $line = $io->getline ) {
+        $n++;
+        chop($line);
 
-      print STDERR "..$n\n" if ($self->verbose && $n % 1000 == 0);
+        print STDERR "..$n\n" if ( $self->verbose && $n % 1000 == 0 );
 
-      my $brk   = $self->from_breaker($line);
-      my $tag   = $brk->{tag};
-      $tags->{$tag} = 1 ;
+        my $brk = $self->from_breaker($line);
+        my $tag = $brk->{tag};
+        $tags->{$tag} = 1;
 
-      last if ($self->maxscan > 0 && $n > $self->maxscan);
+        last if ( $self->maxscan > 0 && $n > $self->maxscan );
     }
 
     $io->close;
 
-    return join(",",sort keys %$tags);
+    return join( ",", sort keys %$tags );
 }
 
 1;
@@ -169,6 +167,10 @@ Catmandu::Breaker - Package that exports data in a Breaker format
 
   $ cat data.breaker | cut -f 2 | sort -u > data.fields
   $ catmandu breaker -v --fields data.fields data.breaker
+
+  # Export statistics as CSV. See L<Catmandu::Exporter::Stat> for supported formats.
+  $ catmandu breaker --as CSV data.breaker
+
 
 =head1 DESCRIPTION
 
@@ -257,6 +259,8 @@ With the special L<marc handler|Catmandu::Exporter::Breaker::Parser::marc>:
 
 For the L<Catmandu::PICA> tools a L<pica handler|Catmandu::Exporter::Breaker::Parser::pica> is available.
 
+For the L<Catmandu::MAB2> tools a L<mab handler|Catmandu::Exporter::Breaker::Parser::mab> is available.
+
 For the L<Catmandu::XML> tools an L<xml handler|Catmandu::Exporter::Breaker::Parser::xml> is available:
 
     $ catmandu convert XML --path book to Breaker --handler xml < t/book.xml
@@ -287,7 +291,8 @@ but the C<040d> value is only present 5 times. The C<020a> is empty in 10% (zero
 of the records. The C<001> has very unique values (entropy is maximum), but all C<040c>
 fields contain the same information (entropy is minimum).
 
-See L<Catmandu::Exporter::Stat> for more information about the statistical fields.
+See L<Catmandu::Exporter::Stat> for more information about the statistical fields
+and supported output formats.
 
 =head1 MODULES
 
@@ -310,5 +315,7 @@ Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>
 =head1 CONTRIBUTORS
 
 Jakob Voss, C<< nichtich at cpan.org >>
+
+Johann Rolschewski, C<< jorol at cpan.org >>
 
 =cut

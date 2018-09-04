@@ -1,5 +1,5 @@
 package Starch::Plugin::Trace;
-$Starch::Plugin::Trace::VERSION = '0.07';
+$Starch::Plugin::Trace::VERSION = '0.09';
 use Moo;
 use strictures 2;
 use namespace::clean;

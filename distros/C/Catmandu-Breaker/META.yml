@@ -32,8 +32,9 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Breaker/issues
   homepage: https://github.com/LibreCat/Catmandu-Breaker
   repository: https://github.com/LibreCat/Catmandu-Breaker.git
-version: '0.12'
+version: '0.14'
 x_contributors:
   - 'Jakob Voss <voss@gbv.de>'
+  - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

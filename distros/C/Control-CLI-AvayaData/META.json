@@ -4,13 +4,13 @@
       "Ludovico Stevens <lstevens@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Control-CLI-AvayaData",
    "prereqs" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Control::CLI::AvayaData" : {
          "file" : "lib/Control/CLI/AvayaData.pm",
-         "version" : "2.04"
+         "version" : "2.05"
       }
    },
    "release_status" : "stable",
@@ -44,5 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.04"
+   "version" : "2.05",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

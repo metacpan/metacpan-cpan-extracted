@@ -22,7 +22,7 @@ sub test_all {
 
 my ($model, $trace, $args) = init_test('show');
 
-note("You can play with the widget if you run the test with 's' argument");
+note("You can play with the widget if you run this test with '--show' option");
 
 my $wr_root = setup_test_dir;
 my $cmu ;
@@ -112,7 +112,7 @@ SKIP: {
      sub { $inst->show_message("Hello World")},
 	 sub { $cmu->force_element_display($root->grab('std_id:dd DX')) ; ok(1,"test ".$idx++)},
 	 sub { $cmu->edit_copy('test1.std_id'); ok(1,"test ".$idx++)},
-	 sub { $cmu->force_element_display($root->grab('hash_a:titi')) ; ok(1,"test ".$idx++)},
+	 sub { $cmu->force_element_display($root->grab('hash_a:titi')) ; ok(1,"test grab 'hash_a:titi' ".$idx++)},
 	 sub { $cmu->edit_copy('test1.hash_a.titi'); ok(1,"test ".$idx++)},
 	 sub { $cmu->create_element_widget('view','test1'); ok(1,"test ".$idx++)},
 	 sub { $tktree->open('test1.lista') ; ok(1,"test ".$idx++)},

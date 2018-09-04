@@ -25,5 +25,5 @@ requires:
   AnyEvent::HTTP: '2.22'
   JSON::PP: '2.273'
   common::sense: '3.74'
-version: 0.9
+version: 0.91
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

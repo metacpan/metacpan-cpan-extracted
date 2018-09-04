@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -187,6 +187,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|Invalid password. Authentication failed'			# username teamnoc level ro // invalid-old-pwd // ...
 					. '|Passwords do not match. Password change aborted'		# username teamnoc level ro // valid-old-pwd // newpwd // diffpwd
 					. '|Error: Prefix List ".+?" not found'				# no ip prefix-list "<non-existent>"
+					. '|Invalid ipv4 address\.'					# filter acl ace action 11 6 permit redirect-next-hop 2000:100::201 (on a non-ipv6 acl)
 				. ')',
 	$Prm{xlr}		=>	'^('
 					. '.+? not found'
@@ -1307,7 +1308,60 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			$self->{POLL}{local_buffer} = $self->{POLL}{read_buffer} =~ /\n/ ? '' : stripLastLine(\$self->{POLL}{local_buffer}); # Flush or keep lastline
 			$self->{POLL}{local_buffer} .= $self->{POLL}{read_buffer};  # If read was single line, this buffer appends it to lastline from previous read
 
-			# Pattern matching; try and detect patterns, and record their depth in the input stream
+			# Try and match CLI prompts; this is the only exit point of the loop
+			if ($login->{family_type}) { # A family type was already detected from banner
+				if ($login->{family_type} eq $Prm{pers}) {
+					foreach my $type ('cli', 'nncli') {
+						$promptType = "$login->{family_type}_$type";
+						if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$promptType})/) {
+							($capturedPrompt, $switchName, $login->{cpu_slot}, $configContext) = ($1, $2, $3, $4);
+							$cliType = $type;
+							last;
+						}
+					}
+				}
+				else {
+					if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$login->{family_type}})/) {
+						($capturedPrompt, $switchName, $configContext) = ($1, $2, $4);
+						$promptType = $login->{family_type};
+					}
+				}
+			}
+			else { # A family type has not been detected yet; try and detect from received prompt
+				foreach my $key (@InitPromptOrder) {
+					if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$key})/) {
+						($capturedPrompt, $switchName, $login->{cpu_slot}, $configContext) = ($1, $2, $3, $4);
+						$promptType = $key;
+						($login->{family_type} = $key) =~ s/_(\w+)$//;
+						$cliType = $1;
+						$login->{detectionFromPrompt} = 1;
+						last;
+					}
+				}
+			}
+			if ($capturedPrompt) { # We have a prompt, we can exit loop
+				$self->debugMsg(8,"\nlogin() Got CLI prompt for family type $login->{family_type} !\n");
+				$self->_setDevicePrompts($promptType, $switchName);
+				$capturedPrompt =~ s/^\x0d//; # Remove initial carriage return if there
+				$capturedPrompt =~ s/\x0d$//; # Remove trailing carriage return if there (possible if we match on not the last prompt, as we do /m matching above
+				($self->{LASTPROMPT} = $capturedPrompt) =~ s/$LastPromptClense//o;
+				$self->{$Package}{CONFIGCONTEXT} = $configContext;
+				$self->{$Package}{PROMPTTYPE} = $promptType;
+				$self->debugMsg(4,"login() Prompt type = $self->{$Package}{PROMPTTYPE}\n");
+
+				$self->_setAttrib('cpu_slot', $login->{cpu_slot}) if $login->{family_type} eq $Prm{pers};
+				if ($login->{detectionFromPrompt}) {
+					if ($login->{family_type} eq $Prm{bstk} || (defined $cliType && $cliType eq 'nncli')) {
+						$self->_setAttrib('is_nncli', 1);
+					}
+					else {
+						$self->_setAttrib('is_nncli', 0);
+					}
+				}
+				last LOGINLOOP;
+			}
+
+			# If no prompt yet; pattern matching; try and detect patterns, and record their depth in the input stream
 			$pattern = '';
 			$deepest = -1;
 			foreach my $key (keys %LoginPatterns) {
@@ -1476,59 +1530,6 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			elsif ($pattern =~ /^radiustimeout\d$/) { # Radius timeout
 				$login->{login_error} = "Switch got no response from RADIUS servers\n";
 				next; # In this case don't error, as radius falback might still get us in
-			}
-
-			# Then try and match CLI prompts; this is the only exit point of the loop
-			if ($login->{family_type}) { # A family type was already detected from banner
-				if ($login->{family_type} eq $Prm{pers}) {
-					foreach my $type ('cli', 'nncli') {
-						$promptType = "$login->{family_type}_$type";
-						if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$promptType})/) {
-							($capturedPrompt, $switchName, $login->{cpu_slot}, $configContext) = ($1, $2, $3, $4);
-							$cliType = $type;
-							last;
-						}
-					}
-				}
-				else {
-					if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$login->{family_type}})/) {
-						($capturedPrompt, $switchName, $configContext) = ($1, $2, $4);
-						$promptType = $login->{family_type};
-					}
-				}
-			}
-			else { # A family type has not been detected yet; try and detect from received prompt
-				foreach my $key (@InitPromptOrder) {
-					if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$key})/) {
-						($capturedPrompt, $switchName, $login->{cpu_slot}, $configContext) = ($1, $2, $3, $4);
-						$promptType = $key;
-						($login->{family_type} = $key) =~ s/_(\w+)$//;
-						$cliType = $1;
-						$login->{detectionFromPrompt} = 1;
-						last;
-					}
-				}
-			}
-			if ($capturedPrompt) { # We have a prompt, we can exit loop
-				$self->debugMsg(8,"\nlogin() Got CLI prompt for family type $login->{family_type} !\n");
-				$self->_setDevicePrompts($promptType, $switchName);
-				$capturedPrompt =~ s/^\x0d//; # Remove initial carriage return if there
-				$capturedPrompt =~ s/\x0d$//; # Remove trailing carriage return if there (possible if we match on not the last prompt, as we do /m matching above
-				($self->{LASTPROMPT} = $capturedPrompt) =~ s/$LastPromptClense//o;
-				$self->{$Package}{CONFIGCONTEXT} = $configContext;
-				$self->{$Package}{PROMPTTYPE} = $promptType;
-				$self->debugMsg(4,"login() Prompt type = $self->{$Package}{PROMPTTYPE}\n");
-
-				$self->_setAttrib('cpu_slot', $login->{cpu_slot}) if $login->{family_type} eq $Prm{pers};
-				if ($login->{detectionFromPrompt}) {
-					if ($login->{family_type} eq $Prm{bstk} || (defined $cliType && $cliType eq 'nncli')) {
-						$self->_setAttrib('is_nncli', 1);
-					}
-					else {
-						$self->_setAttrib('is_nncli', 0);
-					}
-				}
-				last LOGINLOOP;
 			}
 		}
 		if ($login->{family_type} eq $Prm{generic} || ($login->{detectionFromPrompt} && $self->{LASTPROMPT} !~ /^@/) ) { # Can't tell, need extended discovery
@@ -1989,7 +1990,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 					$self->debugMsg(4,"Seeking attribute $attrib->{attribute} value by issuing command: config bootconfig sio console baud ? / boot config sio console baud ?\n");
 					$attrib->{debugMsg} = 1;
 				}
-				my ($ok, $outref) = $self->cmdConfig($pkgsub, 'config bootconfig sio console baud ?', "boot config sio console baud ?$CTRL_C", 1);
+				my ($ok, $outref) = $self->cmdConfig($pkgsub, 'config bootconfig sio console baud ?', "boot config sio console baud ?$CTRL_C");
 				return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 				# VSP9k		:   <9600 - 115200>  Baud rate {9600 | 19200 | 38400 | 57600 | 115200}
 				# 8600acli	:   <1200-115200>  Rate
@@ -2008,7 +2009,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				$self->debugMsg(4,"Seeking attribute $attrib->{attribute} value by issuing command: config bootconfig sio baud ? / boot config sio baud ?\n");
 				$attrib->{debugMsg} = 1;
 			}
-			my ($ok, $outref) = $self->cmdConfig($pkgsub, 'config bootconfig sio baud ?', "boot config sio baud ?$CTRL_C", 1);
+			my ($ok, $outref) = $self->cmdConfig($pkgsub, 'config bootconfig sio baud ?', "boot config sio baud ?$CTRL_C");
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			# 8300nncli	:   <1200-115200>  rate
 			# 8300ppcli	:<rate>           = what rate {2400|4800|9600|19200|38400|57600|115200} IN {1200..115200}
@@ -2044,6 +2045,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				if ($self->{$Package}{ATTRIB}{'is_voss'}) {
 					if ($$outref =~ /BrandName:?\s+: (.+)/gc) { # On VOSS VSPs we read it
 						(my $brandname = $1) =~ s/, Inc\.$//; # Remove 'Inc.'
+						$brandname =~ s/\.$//; # Remove trailing full stop
 						$self->_setAttrib('brand_name', $brandname);
 					}
 					else { # VSP9000 case, it is_voss, but reports no BrandName, so we set it..
@@ -2096,6 +2098,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				if ($self->{$Package}{ATTRIB}{'is_voss'}) {
 					if ($$outref =~ /BrandName:?\s+: (.+)/gc) { # On VOSS VSPs we read it
 						(my $brandname = $1) =~ s/, Inc\.$//; # Remove 'Inc.'
+						$brandname =~ s/\.$//; # Remove trailing full stop
 						$self->_setAttrib('brand_name', $brandname);
 					}
 					else { # VSP9000 case, it is_voss, but reports no BrandName, so we set it..
@@ -3269,7 +3272,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		# Output from commands below is prone to false triggers on the generic prompt;
 		#  so we lock it down to the minimum length required
 		$self->last_prompt =~ /(.*)([\?\$%#>]\s?)$/;
-		$self->prompt(join('', ".{", length($1), ",}$2\$"));
+		$self->prompt(join('', ".{", length($1), ",}\\$2\$"));
 	}
 
 	# Prefer commands unique to platform, and with small output (not more paged)
@@ -5842,7 +5845,7 @@ L<http://search.cpan.org/dist/Control-CLI-AvayaData/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Ludovico Stevens.
+Copyright 2018 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

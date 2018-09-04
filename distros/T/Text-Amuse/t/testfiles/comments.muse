@@ -64,7 +64,7 @@ Nested
 <verbatim>;</verbatim> Not a comment because of <verbatim><verbatim></verbatim>
 
 <comment>
-Here the comment will stop. This is a kind of implementation artefact.
+Here the comment will stop. This is a kind of implementation artifact.
 
 <example>
 verbatim

@@ -823,6 +823,13 @@ sub to_native_int {
             {
                 return to_native_int( $cond->{arguments}[0], $level, $java_type ) . " + " . to_native_int( $cond->{arguments}[1], $level, $java_type );
             }
+            if (  $cond->{code} eq 'infix:<->'
+               && (   $cond->{arguments}[0]->isa( 'Perlito5::AST::Int' )
+                  ||  $cond->{arguments}[1]->isa( 'Perlito5::AST::Int' ) )
+               )
+            {
+                return to_native_int( $cond->{arguments}[0], $level, $java_type ) . " - " . to_native_int( $cond->{arguments}[1], $level, $java_type );
+            }
 
         }
 
@@ -988,13 +995,13 @@ sub to_native_bool {
                 }
                 return '!' . $arg->emit_java($level, 'scalar') . '.is_undef()';
             }
-            # if (  $cond->{code} eq 'prefix:<@>'
-            #    )
-            # {
-            #     if (@{$cond->{arguments}} == 1) {
-            #         return $cond->{arguments}->[0]->emit_java($level, $wantarray) . '.length_of_array_boolean()';
-            #     }
-            # }
+            if (  $cond->{code} eq 'prefix:<@>'
+               )
+            {
+                if (@{$cond->{arguments}} == 1) {
+                    return $cond->emit_java($level, 'list') . '.length_of_array_boolean()';
+                }
+            }
         }
 
         if (  $class eq 'Perlito5::AST::Var' && $cond->{sigil} eq '@' ) {

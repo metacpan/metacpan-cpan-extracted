@@ -1,5 +1,5 @@
 package Test::Starch;
-$Test::Starch::VERSION = '0.07';
+$Test::Starch::VERSION = '0.09';
 =head1 NAME
 
 Test::Starch - Test core features of starch.
@@ -44,8 +44,7 @@ use Types::Common::String -types;
 
 use Starch;
 use Starch::Manager;
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Moo;
 use strictures 2;
@@ -134,7 +133,7 @@ sub test_manager {
             my $old_data = { foo=>32, bar=>[1,2,3] };
             my $new_data = $starch->clone_data( $old_data );
 
-            is_deeply( $new_data, $old_data, 'cloned data matches source data' );
+            is( $new_data, $old_data, 'cloned data matches source data' );
 
             isnt( "$old_data->{bar}", "$new_data->{bar}", 'clone data structure has different reference' );
         };
@@ -287,7 +286,7 @@ sub test_state {
 
         subtest reload => sub{
             my $state = $starch->state();
-            is( exception { $state->reload() }, undef, 'reloading a non-dirty state did not fail' );
+            is( dies { $state->reload() }, undef, 'reloading a non-dirty state did not fail' );
 
             my $state1 = $starch->state();
             $state1->data->{foo} = 91;
@@ -442,7 +441,7 @@ sub test_store {
         subtest new_sub_store => sub{
             my $sub_store1 = $store->new_sub_store( class=>'::Memory', max_expires=>12 );
             isa_ok( $sub_store1, 'Starch::Store::Memory' );
-            is( $sub_store1->manager(), $store->manager(), 'sub store has same manager as parent store' );
+            is( ''.$sub_store1->manager(), ''.$store->manager(), 'sub store has same manager as parent store' );
             my $sub_store2 = $sub_store1->new_sub_store( class=>'::Memory' );
             is( $sub_store2->max_expires(), 12, 'sub store has max_expires from parent store' );
         };
@@ -466,7 +465,7 @@ sub test_store {
             my $store = $store->new_sub_store( class=>'::Memory' );
             ok( (!$store->can_reap_expired()), 'expiration reaping is disabled' );
             like(
-                exception { $store->reap_expired() },
+                dies { $store->reap_expired() },
                 qr{does not support expired state reaping},
                 'reap_expired failed',
             );

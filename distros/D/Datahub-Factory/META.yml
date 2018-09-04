@@ -69,7 +69,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Datahub-Factory/issues
   homepage: https://github.com/thedatahub/Datahub-Factory
   repository: https://github.com/thedatahub/Datahub-Factory.git
-version: '1.73'
+version: '1.74'
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

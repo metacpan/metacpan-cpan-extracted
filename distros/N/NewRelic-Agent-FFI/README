@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.05
 
 SYNOPSIS
 
@@ -28,9 +28,11 @@ DESCRIPTION
     Agent SDK.
 
     It is a drop in replacement for NewRelic::Agent that is implemented
-    using FFI::Platypus instead of XS and C++.
+    using FFI::Platypus instead of XS and C++. If you are writing new code,
+    then I highly recommend the procedural interface instead:
+    NewRelic::Agent::FFI::Procedural.
 
-    Why use this module instead of the other one?
+    Why use NewRelic::Agent::FFI module instead of NewRelic::Agent?
 
     Powerful Alien technology
 
@@ -164,11 +166,17 @@ METHODS
 
  set_transaction_category
 
+     my $status = $agent->set_transaction_category($tx, $category);
+
+    Sets the transaction category.
+
+ set_transaction_type_web
+
      my $status = $agent->set_transaction_type_web($tx);
 
     Sets the transaction type to 'web'
 
- set_transaction_type_web
+ set_transaction_type_other
 
      my $status = $agent->set_transaction_type_other($tx);
 
@@ -182,7 +190,7 @@ METHODS
 
  notice_transaction_error
 
-     my $status = notice_transaction_error($tx, $exception_type, $error_message, $stack_trace, $stack_frame_delimiter);
+     my $status = $agent->notice_transaction_error($tx, $exception_type, $error_message, $stack_trace, $stack_frame_delimiter);
 
     Identify an error that occurred during the transaction. The first
     identified error is sent with each transaction.
@@ -258,15 +266,15 @@ METHODS
 
  get_app_language_version
 
+     my $version = $agent->get_app_language_version;
+
     Get the language version.
 
- CAVEATS
+SEE ALSO
 
-    This module attempts to replicate the same interface as
-    NewRelic::Agent, and this module includes a superset of the same tests.
-    Unfortunately, the existing test suite for NewRelic::Agent is
-    completely insufficient to have a high degree of confidence that either
-    module works.
+    NewRelic::Agent::FFI::Procedural
+
+      Procedural interface, recommended over this one.
 
 AUTHOR
 

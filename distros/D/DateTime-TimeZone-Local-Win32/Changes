@@ -1,3 +1,9 @@
+2.02    2018-09-03
+
+    - Correct time zone for America/Port-au-Prince to use hyphens. Patch by Jonathan Luckey. RT #127017.
+	
+	- No longer treat any time zone as a known bad time zone as all tests now pass.
+
 2.01    2018-04-09
 
     - Add new time zone for Sao Tome Standard Time.

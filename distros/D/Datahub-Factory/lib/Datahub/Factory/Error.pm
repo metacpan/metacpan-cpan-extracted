@@ -2,7 +2,7 @@ package Datahub::Factory::Error;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 use Moo;
 use namespace::clean;
@@ -27,7 +27,23 @@ sub log_message {
     $self->message;
 }
 
+package Datahub::Factory::InvalidCondition;
+
+use Moo;
+use namespace::clean;
+
+extends 'Datahub::Factory::Error';
+
 package Datahub::Factory::InvalidPipeline;
+
+use Datahub::Factory::Sane;
+
+use Moo;
+use namespace::clean;
+
+extends 'Datahub::Factory::Error';
+
+package Datahub::Factory::FixFileNotFound;
 
 use Datahub::Factory::Sane;
 

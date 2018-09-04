@@ -1,5 +1,8 @@
 Revision history for Alien-nragent
 
+0.04      2018-09-04 08:46:09 -0400
+  - Simplify detection logic
+
 0.03      2018-08-28 05:57:45 -0400
   - Extra diagnostics
 

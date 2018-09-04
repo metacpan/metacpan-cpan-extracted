@@ -1,6 +1,12 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.01 2018-09-02 08:23:00
+
+  [IMPROVEMENTS]
+  * when a column comment is json, it is handled as extra info. That way, devs can define
+    additional components to load and extra column info (e.g. passphrase handling)
+
 1.00 2018-05-15 18:34:00
 
   [IMPROVEMENTS]

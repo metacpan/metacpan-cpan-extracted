@@ -38,6 +38,9 @@ SYNOPSIS
     
       $ cat data.breaker | cut -f 2 | sort -u > data.fields
       $ catmandu breaker -v --fields data.fields data.breaker
+    
+      # Export statistics as CSV. See L<Catmandu::Exporter::Stat> for supported formats.
+      $ catmandu breaker --as CSV data.breaker
 
 DESCRIPTION
 
@@ -129,6 +132,8 @@ BREAKER FORMAT
 
     For the Catmandu::PICA tools a pica handler is available.
 
+    For the Catmandu::MAB2 tools a mab handler is available.
+
     For the Catmandu::XML tools an xml handler is available:
 
         $ catmandu convert XML --path book to Breaker --handler xml < t/book.xml
@@ -161,7 +166,7 @@ BREAKER STATISTICS
     information (entropy is minimum).
 
     See Catmandu::Exporter::Stat for more information about the statistical
-    fields.
+    fields and supported output formats.
 
 MODULES
 
@@ -180,4 +185,6 @@ AUTHOR
 CONTRIBUTORS
 
     Jakob Voss, nichtich at cpan.org
+
+    Johann Rolschewski, jorol at cpan.org
 

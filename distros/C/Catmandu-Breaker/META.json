@@ -63,9 +63,10 @@
          "web" : "https://github.com/LibreCat/Catmandu-Breaker"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_contributors" : [
       "Jakob Voss <voss@gbv.de>",
+      "Johann Rolschewski <jorol@cpan.org>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"

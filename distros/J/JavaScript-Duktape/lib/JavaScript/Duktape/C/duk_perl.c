@@ -622,6 +622,12 @@ duk_bool_t aperl_duk_del_prop_index(duk_context *ctx, duk_idx_t obj_idx, duk_uar
     return ret;
 }
 
+//duk_bool_t duk_del_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal);
+duk_bool_t aperl_duk_del_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal) {
+    duk_bool_t ret = duk_del_prop_literal(ctx, obj_idx, key_literal);
+    return ret;
+}
+
 //duk_bool_t duk_del_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const char *key, duk_size_t key_len);
 duk_bool_t aperl_duk_del_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const char *key, duk_size_t key_len) {
     duk_bool_t ret = duk_del_prop_lstring(ctx, obj_idx, key, key_len);
@@ -824,6 +830,18 @@ void aperl_duk_get_finalizer(duk_context *ctx, duk_idx_t idx) {
     duk_get_finalizer(ctx, idx);
 }
 
+//duk_bool_t duk_get_global_heapptr(duk_context *ctx, void *ptr);
+duk_bool_t aperl_duk_get_global_heapptr(duk_context *ctx, void *ptr) {
+    duk_bool_t ret = duk_get_global_heapptr(ctx, ptr);
+    return ret;
+}
+
+//duk_bool_t duk_get_global_literal(duk_context *ctx, const char *key_literal);
+duk_bool_t aperl_duk_get_global_literal(duk_context *ctx, const char *key_literal) {
+    duk_bool_t ret = duk_get_global_literal(ctx, key_literal);
+    return ret;
+}
+
 //duk_bool_t duk_get_global_lstring(duk_context *ctx, const char *key, duk_size_t key_len);
 duk_bool_t aperl_duk_get_global_lstring(duk_context *ctx, const char *key, duk_size_t key_len) {
     duk_bool_t ret = duk_get_global_lstring(ctx, key, key_len);
@@ -946,6 +964,12 @@ duk_bool_t aperl_duk_get_prop_index(duk_context *ctx, duk_idx_t obj_idx, duk_uar
     return ret;
 }
 
+//duk_bool_t duk_get_prop_literal(duk_context *ctx, const char *key_literal);
+duk_bool_t aperl_duk_get_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal) {
+    duk_bool_t ret = duk_get_prop_literal(ctx, obj_idx, key_literal);
+    return ret;
+}
+
 //duk_bool_t duk_get_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const char *key, duk_size_t key_len);
 duk_bool_t aperl_duk_get_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const char *key, duk_size_t key_len) {
     duk_bool_t ret = duk_get_prop_lstring(ctx, obj_idx, key, key_len);
@@ -1026,6 +1050,12 @@ duk_bool_t aperl_duk_has_prop_heapptr(duk_context *ctx, duk_idx_t obj_idx, void 
 //duk_bool_t duk_has_prop_index(duk_context *ctx, duk_idx_t obj_idx, duk_uarridx_t arr_idx);
 duk_bool_t aperl_duk_has_prop_index(duk_context *ctx, duk_idx_t obj_idx, duk_uarridx_t arr_idx) {
     duk_bool_t ret = duk_has_prop_index(ctx, obj_idx, arr_idx);
+    return ret;
+}
+
+//duk_bool_t duk_has_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal);
+duk_bool_t aperl_duk_has_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal) {
+    duk_bool_t ret = duk_has_prop_literal(ctx, obj_idx, key_literal);
     return ret;
 }
 
@@ -1623,6 +1653,12 @@ void aperl_duk_push_int(duk_context *ctx, duk_int_t val) {
     duk_push_int(ctx, val);
 }
 
+//const char *duk_push_literal(duk_context *ctx, const char *str_literal);
+const char *aperl_duk_push_literal(duk_context *ctx, const char *str_literal) {
+    const char *ret = duk_push_literal(ctx, str_literal);
+    return ret;
+}
+
 //const char *duk_push_lstring(duk_context *ctx, const char *str, duk_size_t len);
 const char *aperl_duk_push_lstring(duk_context *ctx, const char *str, duk_size_t len) {
     const char *ret = duk_push_lstring(ctx, str, len);
@@ -1632,6 +1668,11 @@ const char *aperl_duk_push_lstring(duk_context *ctx, const char *str, duk_size_t
 //void duk_push_nan(duk_context *ctx);
 void aperl_duk_push_nan(duk_context *ctx) {
     duk_push_nan(ctx);
+}
+
+//void duk_push_new_target(duk_context *ctx);
+void aperl_duk_push_new_target(duk_context *ctx) {
+    duk_push_new_target(ctx);
 }
 
 //void duk_push_null(duk_context *ctx);
@@ -1715,6 +1756,18 @@ void aperl_duk_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_
     duk_put_function_list(ctx, obj_idx, funcs);
 }
 
+//duk_bool_t duk_put_global_heapptr(duk_context *ctx, void *ptr);
+duk_bool_t aperl_duk_put_global_heapptr(duk_context *ctx, void *ptr) {
+    duk_bool_t ret = duk_put_global_heapptr(ctx, ptr);
+    return ret;
+}
+
+//duk_bool_t duk_put_global_literal(duk_context *ctx, const char *key_literal);
+duk_bool_t aperl_duk_put_global_literal(duk_context *ctx, const char *key_literal) {
+    duk_bool_t ret = duk_put_global_literal(ctx, key_literal);
+    return ret;
+}
+
 //duk_bool_t duk_put_global_lstring(duk_context *ctx, const char *key, duk_size_t key_len);
 duk_bool_t aperl_duk_put_global_lstring(duk_context *ctx, const char *key, duk_size_t key_len) {
     duk_bool_t ret = duk_put_global_lstring(ctx, key, key_len);
@@ -1750,6 +1803,12 @@ duk_bool_t aperl_duk_put_prop_index(duk_context *ctx, duk_idx_t obj_idx, duk_uar
     return ret;
 }
 
+//duk_bool_t duk_put_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal);
+duk_bool_t aperl_duk_put_prop_literal(duk_context *ctx, duk_idx_t obj_idx, const char *key_literal) {
+    duk_bool_t ret = duk_put_prop_literal(ctx, obj_idx, key_literal);
+    return ret;
+}
+
 //duk_bool_t duk_put_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const char *key, duk_size_t key_len);
 duk_bool_t aperl_duk_put_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const char *key, duk_size_t key_len) {
     duk_bool_t ret = duk_put_prop_lstring(ctx, obj_idx, key, key_len);
@@ -1759,6 +1818,12 @@ duk_bool_t aperl_duk_put_prop_lstring(duk_context *ctx, duk_idx_t obj_idx, const
 //duk_bool_t duk_put_prop_string(duk_context *ctx, duk_idx_t obj_idx, const char *key);
 duk_bool_t aperl_duk_put_prop_string(duk_context *ctx, duk_idx_t obj_idx, const char *key) {
     duk_bool_t ret = duk_put_prop_string(ctx, obj_idx, key);
+    return ret;
+}
+
+//duk_double_t duk_random(duk_context *ctx);
+duk_double_t aperl_duk_random(duk_context *ctx) {
+    duk_double_t ret = duk_random(ctx);
     return ret;
 }
 

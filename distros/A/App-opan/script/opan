@@ -4,18 +4,17 @@ package App::opan;
 
 use strictures 2;
 
-our $VERSION = '0.002002';
+our $VERSION = '0.003000';
 
 use Dist::Metadata;
 use File::Open qw(fopen);
 use List::UtilsBy qw(sort_by);
-use File::Path qw(mkpath);
 use IPC::System::Simple qw(capture);
 use Mojo::Util qw(monkey_patch);
 use Mojo::File qw(path);
-use File::Spec;
-use File::Copy qw(copy);
 use Import::Into;
+
+our %TOKENS = map { $_=>1 } split/:/, $ENV{OPAN_AUTH_TOKENS} || '';
 
 sub packages_header {
   my ($count) = @_;
@@ -130,8 +129,7 @@ my @pan_names = qw(upstream custom pinset combined nopin);
 
 sub do_init {
   my ($app) = @_;
-  mkpath('pans');
-  mkpath("pans/$_/dists") for @pan_names;
+  path("pans/$_/dists")->make_path for @pan_names;
   write_packages_file("pans/$_/index", []) for qw(custom pinset);
   do_pull($app);
 }
@@ -143,7 +141,7 @@ sub do_fetch {
         ->res->body
   );
   path('pans/upstream/index')->spurt(
-    scalar capture zcat => 'pans/upstream/index.gz'
+    scalar capture qw(gzip -dc), 'pans/upstream/index.gz'
   );
 }
 
@@ -169,10 +167,10 @@ sub do_pull {
 }
 
 sub do_add {
-  my ($app, $path) = @_;
-  my (undef, $dir, $file) = File::Spec->splitpath($path);
-  mkpath(my $pan_dir = 'pans/custom/dists/M/MY/MY');
-  copy($path, my $pan_path = File::Spec->catdir($pan_dir, $file))
+  my ($app, $path_arg) = @_;
+  my $path = path($path_arg);
+  my $pan_dir = path('pans/custom/dists/M/MY/MY')->make_path;
+  $path->copy_to(my $pan_path = $pan_dir->child($path->basename))
     or die "Failed to copy ${path} into custom pan: $!";
   add_dist_to_index('pans/custom/index', $pan_path);
 }
@@ -183,11 +181,11 @@ sub do_unadd {
 }
 
 sub do_pin {
-  my ($app, $path) = @_;
-  $path =~ /^(([A-Z])[A-Z])[A-Z]/ and $path = join('/', $2, $1, $path);
-  my (undef, $dir, $file) = File::Spec->splitpath($path);
-  mkpath("pans/pinset/dists/${dir}");
-  path(my $pan_path = "pans/pinset/dists/${path}")->spurt(
+  my ($app, $path_arg) = @_;
+  $path_arg =~ /^(([A-Z])[A-Z])[A-Z]/ and $path_arg = join('/', $2, $1, $path_arg);
+  my $path = path($path_arg);
+  path("pans/pinset/dists/")->child($path->dirname)->make_path;
+  my $pan_path = path("pans/pinset/dists/${path}")->spurt(
     $app->ua->get($app->cpan_url.'authors/id/'.$path)->res->body
   );
   add_dist_to_index('pans/pinset/index', $pan_path);
@@ -271,6 +269,27 @@ foreach my $cmd (
 }
 
 use Mojolicious::Lite;
+
+Mojo::IOLoop->recurring(600 => sub { do_pull(app); }) if $ENV{OPAN_RECURRING_PULL};
+
+post "/upload" => sub {
+  my $c = shift;
+  unless ($TOKENS{$c->req->url->to_abs->password || ""}) {
+    $c->res->headers->www_authenticate("Basic realm=opan");
+    return $c->render(status => 401, text => "Token missing or not found\n");
+  }
+  my $upload = $c->req->upload('dist') || $c->req->upload('pause99_add_uri_httpupload')
+    or return $c->render(status => 400, text => "dist file missing\n");
+  my $pan_dir = path('pans/custom/dists/M/MY/MY')->make_path;
+  $upload->move_to(my $pan_path = $pan_dir->child($upload->filename))
+    or $c->render(
+    status => 500,
+    text   => "Failed to move ${upload} into custom pan: $!\n"
+    );
+  add_dist_to_index('pans/custom/index', $pan_path);
+  do_merge(app);
+  $c->render(text => "$pan_path Added to opan\n");
+};
 
 push(@{app->commands->namespaces}, 'App::opan::Command');
 
@@ -606,17 +625,31 @@ variable C<OPAN_AUTOPIN> is set to a true value (calling the L</cpanm> or
 L</carton> commands with C<--autopin> sets this for you, because you already
 specified you wanted that).
 
+=head2 uploads
+
+To enable the /upload endpoint, set the ENV var OPAN_AUTH_TOKENS to a colon
+separated list of accepted tokens for uploads. This will allow a post with a
+'file' upload argument, checking http basic auth password against the provided
+auth tokens.
+
+=head2 recurring pull
+
+Set ENV OPAN_RECURRING_PULL to a true value to make opan automatically pull
+from upstream every 600 seconds
+
 =head1 AUTHOR
 
 Matt S. Trout (mst) <mst@shadowcat.co.uk>
 
 =head1 CONTRIBUTORS
 
-None yet, but I'm sure there'll be enough bugs for that to change shortly.
+Aaron Crane (arc) <arc@cpan.org>
+
+Marcus Ramburg (marcus) <marcus.ramberg@gmail.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016 the L<App::opan> L</AUTHOR> and L</CONTRIBUTORS>
+Copyright (c) 2016-2018 the L<App::opan> L</AUTHOR> and L</CONTRIBUTORS>
 as listed above.
 
 =head1 LICENSE

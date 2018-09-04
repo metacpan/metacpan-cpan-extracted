@@ -3,35 +3,49 @@ abstract: 'no-frills file rotation'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
-  Test::Exception: '0'
-  Test::More: '1.302015'
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Path::Tiny: '0.018'
+  Test::More: '0.99'
   Test::Most: '0'
+  Time::Piece: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - devops
+  - file
+  - logrotate
+  - logs
+  - ops
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: File-Rotate-Simple
+provides:
+  File::Rotate::Simple:
+    file: lib/File/Rotate/Simple.pm
+    version: v0.2.3
 recommends:
   Class::Load::XS: '0'
   Ref::Util::XS: '0'
   Type::Tiny::XS: '0'
 requires:
   Graph: '0'
-  List::Util: '1.35'
-  Module::Runtime: '0.011'
-  Moo: '0'
+  Module::Runtime: '0'
+  Moo: '1.001000'
   Path::Tiny: '0.018'
   Ref::Util: '0'
-  Time::Piece: '0'
   Time::Seconds: '0'
   Types::Standard: '0'
-  namespace::autoclean: '0.16'
-  perl: v5.8.8
-  version: '0'
+  namespace::autoclean: '0'
 resources:
   bugtracker: https://github.com/robrwo/File-Rotate-Simple/issues
   repository: git://github.com/robrwo/File-Rotate-Simple.git
-version: v0.2.2
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: v0.2.3
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

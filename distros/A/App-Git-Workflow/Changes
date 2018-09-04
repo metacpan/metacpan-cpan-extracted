@@ -1,5 +1,13 @@
 Revision history for git-workflow-tools
 
+1.1.0   2018-09-02
+        Updating for release of version 1.1.0
+        Updated arguments (and documentation) to match new default operation (Ivan Wills)
+        Made --all not be the default mode and adding filtering out branches not in the specified mode (Ivan Wills)
+        Updating the documentation (Ivan Wills)
+        Added ability to truncate based on specific paths rather than --depths all paths (Ivan Wills)
+        Added YAML fiels to be supported by git-pom (Ivan Wills)
+
 1.0.9   2018-08-26
         Updating for release of version 1.0.9
         Added perl 5.8 (Ivan Wills)

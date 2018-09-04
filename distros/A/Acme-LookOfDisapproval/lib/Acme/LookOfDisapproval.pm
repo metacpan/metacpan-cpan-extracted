@@ -1,16 +1,12 @@
 use strict;
 use warnings;
 use utf8;
-package Acme::LookOfDisapproval;
-{
-  $Acme::LookOfDisapproval::VERSION = '0.006';
-}
-# git description: v0.005-6-g478008e
+package Acme::LookOfDisapproval; # git description: v0.006-39-g517ae12
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# ABSTRACT: Send warnings with ಠ_ಠ
+# KEYWORDS: unicode canary warning utf8 symbol
 
-BEGIN {
-  $Acme::LookOfDisapproval::AUTHORITY = 'cpan:ETHER';
-}
-# ABSTRACT: send warnings with ಠ_ಠ
+our $VERSION = '0.007';
 
 use Exporter;
 our @EXPORT = ('ಠ_ಠ');
@@ -31,15 +27,13 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Karen Etheridge unicode dzil utf8 irc
-
 =head1 NAME
 
-Acme::LookOfDisapproval - send warnings with ಠ_ಠ
+Acme::LookOfDisapproval - Send warnings with ಠ_ಠ
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -58,6 +52,8 @@ disapproval.
 Behaves identically to L<perlfunc/warn>.
 
 =head1 BACKGROUND
+
+=for stopwords unicode
 
 I wrote this as an exercise in using unicode in code, not just in a string.
 Then, it became an interesting learning experience in how to cleanly map to a
@@ -85,6 +81,8 @@ call C<import> directly on L<utf8> (it's a pragma, so the caller doesn't
 matter -- only when it is called: during the caller's compilation cycle),
 and then we can export our symbol by using L<goto> to jump to L<Exporter>.
 
+=for stopwords dzil utf8
+
 I also discovered while writing this distribution that L<Dist::Zilla> is not
 able to munge files with utf8 characters, therefore I had to switch to packaging
 this distribution with vanilla L<ExtUtils::MakeMaker>; also, a number of the
@@ -92,12 +90,6 @@ author and release tests that would have been added by dzil automatically
 didn't work either (for example, see C<t/00-compile.t> -- C<< qx(^$X "require $_") >>
 both needs the C<:binmode> or C<:encoding(UTF-8)> layer applied to C<STDOUT>, and
 requires the L<utf8> pragma applied in the sub-perl (leading to more patches).
-
-=head1 SUPPORT
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-LookOfDisapproval>
-(or L<bug-Acme-LookOfDisapproval@rt.cpan.org|mailto:bug-Acme-LookOfDisapproval@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 SEE ALSO
 
@@ -113,11 +105,18 @@ L<lambda> - another example of unicode sub names
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-LookOfDisapproval>
+(or L<bug-Acme-LookOfDisapproval@rt.cpan.org|mailto:bug-Acme-LookOfDisapproval@rt.cpan.org>).
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Karen Etheridge.
 

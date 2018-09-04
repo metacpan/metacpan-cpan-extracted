@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008003;
+use 5.008001;
 
 use ExtUtils::MakeMaker;
 
@@ -21,15 +21,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Pegex",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008003",
+  "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Pegex",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Scalar::Util" => 0
+  },
   "TEST_REQUIRES" => {
     "JSON::PP" => 0,
-    "Test::Simple" => "0.88",
-    "YAML::XS" => 0
+    "YAML::XS" => "0.74"
   },
-  "VERSION" => "0.65",
+  "VERSION" => "0.67",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +39,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "JSON::PP" => 0,
-  "Test::Simple" => "0.88",
-  "YAML::XS" => 0
+  "Scalar::Util" => 0,
+  "YAML::XS" => "0.74"
 );
 
 

@@ -5,7 +5,7 @@ use feature 'state';
 
 package Context::Singleton;
 
-our $VERSION = v1.0.2;
+our $VERSION = v1.0.4;
 
 use parent 'Exporter::Tiny';
 
@@ -37,21 +37,21 @@ sub _by_frame_class_accessors {
 		};
 
 		+{
-			contrive      => sub { $current_frame->db->contrive (@_) },
+			contrive      => sub { $current_frame->contrive (@_) },
 			current_frame => sub { $current_frame },
 			deduce        => sub { $current_frame->deduce (@_) },
 			frame         => $frame,
 			is_deduced    => sub { $current_frame->is_deduced (@_) },
-			load_rules    => sub { $current_frame->db->load_rules (@_) },
+			load_rules    => sub { $current_frame->load_rules (@_) },
 			proclaim      => sub { $current_frame->proclaim (@_) },
-			trigger       => sub { $current_frame->db->trigger (@_) },
+			trigger       => sub { $current_frame->trigger (@_) },
 			try_deduce    => sub { $current_frame->try_deduce (@_) },
 		};
 	};
 }
 
 sub _exporter_expand_sub {
-    my ($class, $name, $args, $globals) = @_;
+	my ($class, $name, $args, $globals) = @_;
 
 	return $name => _by_frame_class_accessors ($globals->{frame_class})->{$name};
 }
@@ -117,7 +117,7 @@ Singleton idenfication, string, global.
 
 Rule specifies how to build value
 
-  contrive 'resource' => ( ... );
+	contrive 'resource' => ( ... );
 
 There can be multiple recipes for building a C<singleton value>.
 The one with most relevant dependencies (those proclaimed in the deepest frame)
@@ -141,17 +141,17 @@ Context singleton exports the following functions by default.
 
 =head2 frame CODE
 
-   frame {
-      ...;
-   }
+	frame {
+		...;
+	}
 
 Creates a new frame. Its argument behaves like a function and it returns its
 return value. It preserves list/scalar context when calling CODE.
 
 =head2 proclaim resource => value, ...;
 
-   proclaim resource => value;
-   proclaim resource => value, resource2 => value2;
+	proclaim resource => value;
+	proclaim resource => value, resource2 => value2;
 
 Define the value of a resource in the current context.
 
@@ -161,7 +161,7 @@ Returns the value of the last resource in the argument list.
 
 =head2 deduce
 
-   my $var = deduce 'resource';
+	my $var = deduce 'resource';
 
 Makes and returns a resource value available in current frame.
 
@@ -170,7 +170,7 @@ or looks into parent frames (using deepest = best).
 
 =head2 load_path
 
-  load_path 'prefix-1', ...;
+	load_path 'prefix-1', ...;
 
 Evaluate all modules within given module prefix(es).
 Every prefix is evaluated only once.
@@ -179,16 +179,16 @@ Every prefix is evaluated only once.
 
 Defines new receipt how to build resource value
 
-  contrive 'name' => (
-     class => 'Foo::Bar',
-     deduce => 'rule_object',
-     builder => 'new',
-     default => { rule_1 => 'v1', ... },
-     dep => [ 'rule_2', ... ],
-     dep => { param_a => 'rule_1', ... },
-     as => sub { ... },
-     value => 10,
-  );
+	contrive 'name' => (
+		class => 'Foo::Bar',
+		deduce => 'rule_object',
+		builder => 'new',
+		default => { rule_1 => 'v1', ... },
+		dep => [ 'rule_2', ... ],
+		dep => { param_a => 'rule_1', ... },
+		as => sub { ... },
+		value => 10,
+	);
 
 =over
 
@@ -213,8 +213,8 @@ a default builder providing dynamic load.
 
 Behaves essentially like
 
-   eval "use Class::Name";
-   Class::Name->$builder (@deps);
+	eval "use Class::Name";
+	Class::Name->$builder (@deps);
 
 =item deduce => rule_name
 
@@ -223,8 +223,8 @@ as a value of the given rule.
 
 Behaves essentially like
 
-   my $object = deduce ('rule_name');
-   $object->$builder (@deps);
+	my $object = deduce ('rule_name');
+	$object->$builder (@deps);
 
 =item default
 

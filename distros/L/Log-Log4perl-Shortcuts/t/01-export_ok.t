@@ -1,9 +1,9 @@
 #/usr/bin/env perl
 use Test::More;
 use Test::NoWarnings;
+use Test::File::ShareDir::Dist { 'Log-Log4perl-Shortcuts' => 'config/' };
+use Test::File::ShareDir::Module { 'Log::Log4perl::Shortcuts' => 'config/' };
 diag( "Running export tests" );
-
-
 
 
 
@@ -21,8 +21,8 @@ subtest 'exports subs ok' => \&exports;
 subtest 'exports all ok' => \&exports_all;
 
 sub exports {
-  use Log::Log4perl::Shortcuts qw(change_config_file);
-  ok ( defined &Log::Log4perl::Shortcuts::change_config_file, 'exports "change_config_file" sub' );
+  use Log::Log4perl::Shortcuts qw(set_log_config);
+  ok ( defined &Log::Log4perl::Shortcuts::set_log_config, 'exports "set_log_config" sub' );
 
   use Log::Log4perl::Shortcuts qw(logw);
   ok ( defined &Log::Log4perl::Shortcuts::logw, 'exports "logw" sub' );
@@ -48,7 +48,7 @@ sub exports {
 
 sub exports_all {
   use Log::Log4perl::Shortcuts qw(:all);
-  ok ( defined &Log::Log4perl::Shortcuts::change_config_file, 'exports "change_config_file" sub' );
+  ok ( defined &Log::Log4perl::Shortcuts::set_log_config, 'exports "set_log_config" sub' );
   ok ( defined &Log::Log4perl::Shortcuts::logw, 'exports "logw" sub' );
   ok ( defined &Log::Log4perl::Shortcuts::logf, 'exports "logf" sub' );
   ok ( defined &Log::Log4perl::Shortcuts::loge, 'exports "loge" sub' );

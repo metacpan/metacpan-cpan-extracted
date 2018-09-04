@@ -5,7 +5,7 @@ use feature 'state';
 
 package Context::Singleton::Frame::DB;
 
-our $VERSION = v1.0.2;
+our $VERSION = v1.0.4;
 
 use Class::Load;
 use Module::Pluggable::Object;
@@ -16,101 +16,107 @@ use Context::Singleton::Frame::Builder::Hash;
 use Context::Singleton::Frame::Builder::Array;
 
 sub new {
-    my ($class) = @_;
+	my ($class) = @_;
 
-    my $self = bless {
-        cache => {},
-        plugin => {},
-    }, $class;
+	my $self = bless {
+		cache => {},
+		plugin => {},
+	}, $class;
 
-    $self->contrive ('Class::Load', (
-        value => 'Class::Load',
-    ));
+	$self->contrive ('Class::Load', (
+		value => 'Class::Load',
+	));
 
-    $self->contrive ('class_loader', (
-        dep => [ 'Class::Load' ],
-        as  => sub { $_[0]->can ('load_class') },
-    ));
+	$self->contrive ('class_loader', (
+		dep => [ 'Class::Load' ],
+		as  => sub { $_[0]->can ('load_class') },
+	));
 
-    return $self;
+	return $self;
 }
 
 sub instance {
-    state $instance = __PACKAGE__->new;
-    return $instance;
+	state $instance = __PACKAGE__->new;
+	return $instance;
 }
 
 sub _contrive_class_loader {
-    my ($self, $name) = @_;
+	my ($self, $name) = @_;
 
-    return if exists $self->{cache}{$name};
+	return if exists $self->{cache}{$name};
 
-    $self->contrive ($name, (
-        dep => [ 'class_loader' ],
-        as => eval "sub { \$_[0]->(q[$name]) && q[$name] }",
-    ));
+	$self->contrive ($name, (
+		dep => [ 'class_loader' ],
+		as => eval "sub { \$_[0]->(q[$name]) && q[$name] }",
+	));
 
-    return;
+	return;
 }
 
 sub _guess_builder_class {
-    my ($self, $def) = @_;
+	my ($self, $def) = @_;
 
-    return 'Context::Singleton::Frame::Builder::Value' if exists $def->{value};
-    return 'Context::Singleton::Frame::Builder::Hash'  if Ref::Util::is_hashref ($def->{dep});
-    return 'Context::Singleton::Frame::Builder::Array'
+	return 'Context::Singleton::Frame::Builder::Value' if exists $def->{value};
+	return 'Context::Singleton::Frame::Builder::Hash'  if Ref::Util::is_hashref ($def->{dep});
+	return 'Context::Singleton::Frame::Builder::Array'
 }
 
 sub contrive {
-    my ($self, $name, %def) = @_;
+	my ($self, $name, %def) = @_;
 
-    if ($def{class}) {
-        $self->_contrive_class_loader ($def{class});
-        $def{builder} //= 'new';
-    }
+	if ($def{class}) {
+		$self->_contrive_class_loader ($def{class});
+		$def{builder} //= 'new';
+	}
 
-    my $builder_class = $self->_guess_builder_class (\%def);
-    my $builder = $builder_class->new (%def);
+	if ($def{class} // $def{deduce}) {
+		$def{this} = $def{class} // $def{deduce};
+		delete $def{class};
+		delete $def{deduce};
+	}
 
-    push @{ $self->{cache}{ $name } }, $builder;
+	my $builder_class = $self->_guess_builder_class (\%def);
+	my $builder = $builder_class->new (%def);
 
-    return;
+	push @{ $self->{cache}{ $name } }, $builder;
+
+	return;
 }
 
 sub trigger {
-    my ($self, $name, $code) = @_;
+	my ($self, $name, $code) = @_;
 
-    push @{ $self->{trigger}{ $name } }, $code;
+	push @{ $self->{trigger}{ $name } }, $code;
 
-    return;
+	return;
 }
 
 sub find_builder_for {
-    my ($self, $name) = @_;
+	my ($self, $name) = @_;
 
-    return @{ $self->{cache}{ $name } // [] };
+	return @{ $self->{cache}{ $name } // [] };
 }
 
 sub find_trigger_for {
-    my ($self, $name) = @_;
+	my ($self, $name) = @_;
 
-    return @{ $self->{trigger}{ $name } // [] };
+	return @{ $self->{trigger}{ $name } // [] };
 }
 
 sub load_rules {
-    my ($self, @packages) = @_;
+	my ($self, @packages) = @_;
 
-    for my $package (@packages) {
-        $self->{plugins}{ $package } //= do {
-            Module::Pluggable::Object->new (
-                require => 1,
-                search_path => [ $package ],
-            )->plugins;
-            1;
-        };
-    }
+	for my $package (@packages) {
+		$self->{plugins}{ $package } //= do {
+			Module::Pluggable::Object->new (
+				require => 1,
+				search_path => [ $package ],
+			)->plugins;
+			1;
+		};
+	}
 
-    return;
+	return;
 }
 
 1;

@@ -2,17 +2,18 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-# example contributed by 
-# (c) 2009 Alexander Becker <asb_ehb at yahoo.de> 
-# Adapted to Unix and streamlined by
+# (c) 2009 Alexander Becker <asb_ehb at yahoo.de>
 # (c) 2009 Dominique Dumont <ddumont at cpan.org>
+
+# example contributed by Alexander Becker
+# Adapted to Unix and streamlined by Dominique Dumont
 
 # See https://rt.cpan.org/Ticket/Display.html?id=49999
 

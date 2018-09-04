@@ -8,15 +8,18 @@ configure {
 probe sub {
   my($build) = @_;
 
-  my @system = FFI::CheckLib::find_lib(lib => [qw(newrelic-collector-client newrelic-common newrelic-transaction)]);
-  if(@system)
+  my @find_lib_args = (
+    lib => [ qw(newrelic-collector-client newrelic-common newrelic-transaction) ],
+  );
+
+  # some common places someone might install newrelic libs
+  my @try = grep { -d $_ } qw( /opt/newrelic/lib );
+  if(@try)
   {
-    $build->runtime_prop->{my_lib} = \@system;
-    $build->runtime_prop->{version} = 'unknown';
-    return 'system';
+    push @find_lib_args, libpath => \@try;
   }
 
-  @system = bsd_glob('/opt/newrelic/lib/libnewrelic*.so');
+  my @system = FFI::CheckLib::find_lib(@find_lib_args);
   if(@system)
   {
     $build->runtime_prop->{my_lib} = \@system;

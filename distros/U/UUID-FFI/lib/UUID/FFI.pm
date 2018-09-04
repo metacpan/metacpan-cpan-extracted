@@ -2,7 +2,7 @@ package UUID::FFI;
 
 use strict;
 use warnings;
-use FFI::Platypus;
+use FFI::Platypus 0.56;
 use FFI::Platypus::Memory ();
 use FFI::CheckLib ();
 use Carp qw( croak );
@@ -13,34 +13,36 @@ use overload '<=>' => sub { $_[0]->compare($_[1]) },
 # TODO: as_bin or similar
 
 # ABSTRACT: Universally Unique Identifiers FFI style
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
-
-*_malloc = \&FFI::Platypus::Memory::malloc;
-*_free   = \&FFI::Platypus::Memory::free;
 
 my $ffi = FFI::Platypus->new;
 
-$ffi->lib(FFI::CheckLib::find_lib_or_die(lib => 'uuid'));
+$ffi->lib(sub {
+  my $lib = FFI::CheckLib::find_lib(lib => 'uuid');
+  return $lib if $lib;
+  require Alien::libuuid;
+  Alien::libuuid->dynamic_libs;
+});
 
-$ffi->attach( [uuid_generate_random => '_generate_random'] => ['pointer']            => 'void'   => '$');
-$ffi->attach( [uuid_generate_time   => '_generate_time']   => ['pointer']            => 'void'   => '$');
-$ffi->attach( [uuid_unparse         => '_unparse']         => ['pointer', 'pointer'] => 'void'   => '$$');
-$ffi->attach( [uuid_parse           => '_parse']           => ['string', 'pointer']  => 'int'    => '$$');
-$ffi->attach( [uuid_copy            => '_copy']            => ['pointer', 'pointer'] => 'void'   => '$$');
-$ffi->attach( [uuid_clear           => '_clear']           => ['pointer']            => 'void'   => '$');
-$ffi->attach( [uuid_type            => '_type']            => ['pointer']            => 'int'    => '$');
-$ffi->attach( [uuid_variant         => '_variant']         => ['pointer']            => 'int'    => '$');
-$ffi->attach( [uuid_time            => '_time']            => ['pointer','pointer']  => 'time_t' => '$$');
-$ffi->attach( [uuid_is_null         => '_is_null']         => ['pointer']            => 'int'    => '$');
-$ffi->attach( [uuid_compare         => '_compare']         => ['pointer', 'pointer'] => 'int'    => '$$');
+$ffi->attach( [uuid_generate_random => '_generate_random'] => ['pointer']            => 'void'   => '$'  );
+$ffi->attach( [uuid_generate_time   => '_generate_time']   => ['pointer']            => 'void'   => '$'  );
+$ffi->attach( [uuid_unparse         => '_unparse']         => ['pointer', 'pointer'] => 'void'   => '$$' );
+$ffi->attach( [uuid_parse           => '_parse']           => ['string',  'pointer'] => 'int'    => '$$' );
+$ffi->attach( [uuid_copy            => '_copy']            => ['pointer', 'pointer'] => 'void'   => '$$' );
+$ffi->attach( [uuid_clear           => '_clear']           => ['pointer']            => 'void'   => '$'  );
+$ffi->attach( [uuid_type            => '_type']            => ['pointer']            => 'int'    => '$'  );
+$ffi->attach( [uuid_variant         => '_variant']         => ['pointer']            => 'int'    => '$'  );
+$ffi->attach( [uuid_time            => '_time']            => ['pointer', 'pointer'] => 'time_t' => '$$' );
+$ffi->attach( [uuid_is_null         => '_is_null']         => ['pointer']            => 'int'    => '$'  );
+$ffi->attach( [uuid_compare         => '_compare']         => ['pointer', 'pointer'] => 'int'    => '$$' );
 
 
 sub new
 {
   my($class, $hex) = @_;
   croak "usage: UUID::FFI->new($hex)" unless $hex;
-  my $self = bless \_malloc(16), $class;
+  my $self = bless \FFI::Platypus::Memory::malloc(16), $class;
   my $r = _parse($hex, $$self);
   croak "$hex is not a valid hex UUID" if $r != 0; 
   $self;
@@ -50,7 +52,7 @@ sub new
 sub new_random
 {
   my($class) = @_;
-  my $self = bless \_malloc(16), $class;
+  my $self = bless \FFI::Platypus::Memory::malloc(16), $class;
   _generate_random->($$self);
   $self;
 }
@@ -59,7 +61,7 @@ sub new_random
 sub new_time
 {
   my($class) = @_;
-  my $self = bless \_malloc(16), $class;
+  my $self = bless \FFI::Platypus::Memory::malloc(16), $class;
   _generate_time($$self);
   $self;
 }
@@ -68,7 +70,7 @@ sub new_time
 sub new_null
 {
   my($class) = @_;
-  my $self = bless \_malloc(16), $class;
+  my $self = bless \FFI::Platypus::Memory::malloc(16), $class;
   _clear($$self);
   $self;
 }
@@ -80,7 +82,7 @@ sub is_null { _is_null(${$_[0]}) }
 sub clone
 {
   my($self) = @_;
-  my $other = bless \_malloc(16), ref $self;
+  my $other = bless \FFI::Platypus::Memory::malloc(16), ref $self;
   _copy($$other, $$self);
   $other;
 }
@@ -131,7 +133,7 @@ sub time
 sub DESTROY
 {
   my($self) = @_;
-  _free($$self);
+  FFI::Platypus::Memory::free($$self);
 }
 
 1;
@@ -148,7 +150,7 @@ UUID::FFI - Universally Unique Identifiers FFI style
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

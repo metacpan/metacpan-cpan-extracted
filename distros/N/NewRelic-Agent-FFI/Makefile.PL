@@ -9,47 +9,36 @@ BEGIN {
 use strict;
 use warnings;
 use 5.008001;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
+require "./inc/mymm.pl";
 
 my %WriteMakefileArgs = (
   "ABSTRACT"           => "Perl Agent for NewRelic APM",
   "AUTHOR"             => "Graham Ollis <plicease\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => "6.64",
+    "FFI::CheckLib"       => 0
   },
   "DISTNAME"         => "NewRelic-Agent-FFI",
   "LICENSE"          => "perl",
   "MIN_PERL_VERSION" => "5.008001",
   "NAME"             => "NewRelic::Agent::FFI",
   "PM"               => {
-    "lib/NewRelic/Agent/FFI.pm" => "\$(INST_LIB)/NewRelic/Agent/FFI.pm"
+    "lib/NewRelic/Agent/FFI.pm"            => "\$(INST_LIB)/NewRelic/Agent/FFI.pm",
+    "lib/NewRelic/Agent/FFI/Procedural.pm" => "\$(INST_LIB)/NewRelic/Agent/FFI/Procedural.pm"
   },
   "PREREQ_PM" => {
-    "Alien::nragent" => 0,
-    "FFI::Platypus"  => 0
+    "FFI::CheckLib"     => 0,
+    "FFI::Platypus"     => "0.56",
+    "FFI::Platypus::DL" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.05",
   "test"    => {
     "TESTS" => "t/*.t"
     }
 );
 
-my %FallbackPrereqs = (
-  "Alien::nragent" => 0,
-  "FFI::Platypus"  => 0,
-  "Test2::V0"      => "0.000060"
-);
-
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
-  delete $WriteMakefileArgs{TEST_REQUIRES};
-  delete $WriteMakefileArgs{BUILD_REQUIRES};
-  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
-}
-
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-WriteMakefile(%WriteMakefileArgs);
+mymm::myWriteMakefile(%WriteMakefileArgs);

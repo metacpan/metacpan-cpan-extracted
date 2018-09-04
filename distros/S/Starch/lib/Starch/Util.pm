@@ -1,5 +1,5 @@
 package Starch::Util;
-$Starch::Util::VERSION = '0.07';
+$Starch::Util::VERSION = '0.09';
 =head1 NAME
 
 Starch::Util - Utility functions used internally by Starch.

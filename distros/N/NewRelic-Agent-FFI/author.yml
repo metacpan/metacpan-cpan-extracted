@@ -11,6 +11,7 @@ pod_spelling_system:
     - SDK
     - superset
     - datastore
+    - obfuscator
 
 pod_coverage:
   skip: 0

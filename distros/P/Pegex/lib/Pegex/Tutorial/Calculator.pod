@@ -32,9 +32,9 @@ calculator programs:
 
 =over
 
-=item * L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/calculator1.pl>
+=item * L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/calculator/calculator1.pl>
 
-=item * L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/calculator2.pl>
+=item * L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/calculator/calculator2.pl>
 
 =back
 
@@ -230,7 +230,7 @@ class called L<example/lib/Precedence.pm>.
 This is an implementation of Edsger Dijkstra's famous Shunting-yard Algorithm
 from 1961! It's only 20 lines of Perl. I won't include it inline here, but
 have a look at it for yourself.
-L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/lib/Precedence.pm>
+L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/calculator/lib/Precedence.pm>
 
 The Shunting-yard algorithm simply takes a list of expression tokens and
 transforms them into an RPN stack. It uses information from a
@@ -250,11 +250,6 @@ changed the runner code to look like this:
         my $result = RPN::evaluate($rpn);
         print $@ || "$expr = $result\n";
     }
-
-As you can see I also moved the evaluator code into a separate/reusable
-module: L<example/lib/RPN.pm>. This is another 30 lines of Perl. Please take a
-look at it.
-L<https://github.com/ingydotnet/pegex-pm/blob/master/eg/lib/RPN.pm>
 
 So overall, this second solution was a bit more code, but also feels more
 solid on several levels.

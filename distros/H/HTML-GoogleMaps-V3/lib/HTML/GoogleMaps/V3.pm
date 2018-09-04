@@ -10,7 +10,7 @@ HTML::GoogleMaps::V3 - a simple wrapper around the Google Maps API
 
 =head1 VERSION
 
-0.10
+0.12
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ use warnings;
 
 use Template;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 sub new {
     my ( $class,%opts ) = @_;
@@ -104,6 +104,12 @@ sub _text_to_point {
 
     if ( my @loc = $self->{geocoder}->geocode( location => $point_text ) ) {
         if ( my $location = $loc[0] ) {
+
+            if ( ref( $location ) ne 'HASH' ) {
+                warn "$point_text didn't return a HASH ref as first element from ->geocode";
+                return 0;
+            }
+
             return [
                 $location->{geometry}{location}{lat},
                 $location->{geometry}{location}{lng},

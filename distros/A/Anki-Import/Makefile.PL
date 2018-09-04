@@ -6,11 +6,18 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Anki note generation made easy.",
   "AUTHOR" => "Steve Dondley <s\@dondley.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Anki-Import",
   "EXE_FILES" => [
@@ -20,23 +27,22 @@ my %WriteMakefileArgs = (
   "NAME" => "Anki::Import",
   "PREREQ_PM" => {
     "Cwd" => 0,
-    "Data::Dumper" => 0,
     "Exporter" => 0,
     "Getopt::Args" => 0,
-    "Log::Log4perl::Shortcuts" => 0,
+    "Log::Log4perl::Shortcuts" => "0.011",
     "Path::Tiny" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Carp" => 0,
-    "Modern::Perl" => 0,
+    "Data::Dumper" => 0,
+    "File::Path" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "Test::Warnings" => 0,
-    "vars" => 0
+    "Test::Output" => 0,
+    "Test::Warnings" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,19 +50,18 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
   "Exporter" => 0,
+  "File::Path" => 0,
   "Getopt::Args" => 0,
-  "Log::Log4perl::Shortcuts" => 0,
-  "Modern::Perl" => 0,
+  "Log::Log4perl::Shortcuts" => "0.011",
   "Path::Tiny" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::Output" => 0,
   "Test::Warnings" => 0,
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 
@@ -71,3 +76,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

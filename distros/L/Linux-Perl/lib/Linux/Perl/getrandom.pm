@@ -33,6 +33,8 @@ to be present in some earlier kernel versions.
 use Linux::Perl;
 use Linux::Perl::Pointer;
 
+use parent 'Linux::Perl::Base';
+
 my %FLAG_VALUE = (
     NONBLOCK => 1,
     RANDOM => 2,
@@ -41,10 +43,7 @@ my %FLAG_VALUE = (
 sub getrandom {
     my ($class, %opts) = @_;
 
-    if (!$class->can('NR_getrandom')) {
-        require Linux::Perl::ArchLoader;
-        $class = Linux::Perl::ArchLoader::get_arch_module($class);
-    }
+    $class = $class->_get_arch_module();
 
     my $flags = 0;
     if ($opts{'flags'}) {

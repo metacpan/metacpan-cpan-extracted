@@ -5,7 +5,9 @@ use warnings;
 
 my $sig_num_hr;
 
-use constant _SIG_MAX => 63;
+use constant {
+    _SIG_MAX => 63,
+};
 
 sub from_list {
     my (@list) = @_;
@@ -33,6 +35,20 @@ sub from_list {
     vec( $vec, _SIG_MAX(), 1 ) = 0;
 
     return $vec;
+}
+
+sub to_list {
+    my ($mask) = @_;
+
+    my @nums;
+
+    for my $n ( 0 .. _SIG_MAX() ) {
+        if ( vec($mask, $n, 1) ) {
+            push @nums, 1 + $n;
+        }
+    }
+
+    return @nums;
 }
 
 1;

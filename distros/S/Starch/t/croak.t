@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Starch;
 use Starch::Store::Memory;
@@ -20,8 +19,8 @@ my $state = $starch->state();
 $state->mark_dirty();
 
 like(
-    exception { $state->save() },
-    qr{^foo at t/croak\.t line \d+},
+    dies { $state->save() },
+    qr{^foo at \S*croak\.t line \d+},
     'croak reported proper caller',
 );
 

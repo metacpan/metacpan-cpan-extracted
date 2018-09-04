@@ -26,10 +26,6 @@ my $Username		;# = 'rwa';
 my $Password		;# = 'rwa';
 my $PublicKeyPath	;# = 'C:\Users\<user>\.ssh\id_dsa.pub';	# '/export/home/<user>/.ssh/id_dsa.pub'
 my $PrivateKeyPath	;# = 'C:\Users\<user>\.ssh\id_dsa';	# '/export/home/<user>/.ssh/id_dsa'
-#my $PublicKeyPath	 = 'C:\Users\ludovicostev\.ssh\id_dsa.pub';	# '/export/home/<user>/.ssh/id_dsa.pub'
-#my $PrivateKeyPath	 = 'C:\Users\ludovicostev\.ssh\id_dsa';		# '/export/home/<user>/.ssh/id_dsa'
-#my $PublicKeyPath	 = 'C:\Users\ludovicostev\.ssh\id_rsa.pub';	# '/export/home/<user>/.ssh/id_dsa.pub'
-#my $PrivateKeyPath	 = 'C:\Users\ludovicostev\.ssh\id_rsa';		# '/export/home/<user>/.ssh/id_dsa'
 my $Passphrase		;
 my $Baudrate		;# = 9600;	# Baudrate to use for initial connection
 my $UseBaudrate		;# = 'max';	# Baudrate to switch to during tests

@@ -11,7 +11,7 @@ use Mail::Message::Body::Lines;
 use Mail::Message::Body::Multipart;
 use Mail::Message::Head::Complete;
 
-use Test::More tests => 33;
+use Test::More tests => 34;
 use IO::Scalar;
 
 my $body = Mail::Message::Body::Multipart->new
@@ -205,9 +205,10 @@ EXPECTED
 ### since 2.106: check partnumbers
 my $pn = $message->partNumber;
 defined $pn or $pn = 'undef';
-cmp_ok($pn, 'eq', 'undef', 'partnr of top is undef');
-cmp_ok($message->body->part(0)->partNumber, 'eq', '1', 'partNumber 1');
-cmp_ok($message->body->part(1)->partNumber, 'eq', '2', 'partNumber 2');
+is($pn, 'undef', 'partnr of top is undef');
+is($message->body->part(0)->partNumber, '1', 'partNumber 1');
+is($message->body->part(1)->partNumber, '2', 'partNumber 2');
+is($message->body->part(0)->body->dispositionFilename('non-existent'), 'non-existent/part.html');
 
 my $m1 = Mail::Message->buildFromBody($body, From => 'me', To => 'you',
    Date => 'now', 'Message-Id' => '<simple>');

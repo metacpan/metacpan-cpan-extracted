@@ -8,7 +8,7 @@ use List::Util qw( first );
 use base qw( Alien::Base );
 
 # ABSTRACT: Download and install the NewRelic agent
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 {
@@ -45,7 +45,7 @@ Alien::nragent - Download and install the NewRelic agent
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

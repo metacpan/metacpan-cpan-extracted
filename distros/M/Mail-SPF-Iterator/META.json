@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -43,5 +43,5 @@
          "url" : "https://github.com/noxxi/p5-mail-spf-iterator"
       }
    },
-   "version" : "1.115"
+   "version" : "1.116"
 }

@@ -1,6 +1,13 @@
 Revision history for Email::Sender::Transport::Redirect
 
-0.005  Thu May 26 09:26:44 2016 CEST
+0.006 Sun Sep  2 16:22:37 2018 CEST
+
+    [DOCUMENTATION]
+
+    * Fix missing indention for code in POD of Recipients module
+      (Stefan Hornburg / Racke).
+
+0.005 Thu May 26 09:26:44 2016 CEST
 
     [ENHANCEMENTS]
 

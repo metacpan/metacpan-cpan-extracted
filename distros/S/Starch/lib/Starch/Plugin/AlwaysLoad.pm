@@ -1,5 +1,5 @@
 package Starch::Plugin::AlwaysLoad;
-$Starch::Plugin::AlwaysLoad::VERSION = '0.07';
+$Starch::Plugin::AlwaysLoad::VERSION = '0.09';
 =head1 NAME
 
 Starch::Plugin::AlwaysLoad - Always retrieve state data.

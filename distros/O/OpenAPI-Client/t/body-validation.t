@@ -17,9 +17,12 @@ post '/user/login' => sub {
 plugin OpenAPI => {url => 'data://main/test.json'};
 
 my $client = OpenAPI::Client->new('data://main/test.json', app => app);
-my $tx;
+my ($tx, $req);
+
+$client->once(after_build_tx => sub { $req = pop->req });
 
 $tx = $client->loginUser;
+is $tx->req, $req, 'after_build_tx emitted tx';
 is $tx->res->code, 400, 'invalid loginUser';
 is $tx->error->{message}, 'Invalid input', 'invalid message';
 
@@ -30,6 +33,11 @@ is $tx->res->json->{email}, 'superman@example.com', 'valid return';
 $tx = $client->loginUser({body => {password => 's3cret'}});
 is $tx->res->code, 400, 'missing email';
 is $tx->error->{message}, 'Invalid input', 'invalid message';
+
+$client->once(after_build_tx => sub { pop->req->headers->header('X-Secret' => 'supersecret') });
+$tx = $client->loginUser;
+is $tx->req->env->{operationId}, 'loginUser', 'got operationId in env';
+is $tx->req->headers->header('X-Secret'), 'supersecret', 'modified request';
 
 is $i, 1, 'only sent data to server once';
 

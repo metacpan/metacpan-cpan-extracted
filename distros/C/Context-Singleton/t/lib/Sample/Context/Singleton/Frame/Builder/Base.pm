@@ -10,26 +10,26 @@ package Sample::Context::Singleton::Frame::Builder::Base::__::Builtin::Deps;
 use parent 'Context::Singleton::Frame::Builder::Base';
 
 sub _build_required {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    $self->SUPER::_build_required, 'foo', 'bar';
+	$self->SUPER::_build_required, 'foo', 'bar';
 }
 
 sub build_callback_args {
-    my ($self, $resolved) = @_;
+	my ($self, $resolved) = @_;
 
-    $self->SUPER::build_callback_args ($resolved), $resolved->{foo}, $resolved->{bar};
+	$self->SUPER::build_callback_args ($resolved), $resolved->{foo}, $resolved->{bar};
 }
 
 package Sample::Context::Singleton::Frame::Builder::Base::__::Builder;
 
 sub new {
-    my ($class, $value) = @_;
-    bless [ @_ ], $class;
+	my ($class, $value) = @_;
+	bless [ @_ ], $class;
 }
 
 sub method {
-    [ @_ ];
+	[ @_ ];
 }
 
 1;

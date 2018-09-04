@@ -1,7 +1,7 @@
 package CommonLinesMap;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has json => (is => 'ro', default => sub { File::Spec->catfile('t', 'common-lines-map.json') });
 with 'Map::Tube';

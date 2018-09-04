@@ -29,7 +29,21 @@ Each family of system calls lives in its own namespace under C<Linux::Perl>:
 
 =over
 
+=item * L<Linux::Perl::epoll>
+
+=item * L<Linux::Perl::inotify>
+
 =item * L<Linux::Perl::eventfd>
+
+=item * L<Linux::Perl::getrandom>
+
+=item * L<Linux::Perl::timerfd>
+
+=item * L<Linux::Perl::memfd>
+
+=item * L<Linux::Perl::signalfd>
+
+=item * L<Linux::Perl::sigprocmask>
 
 =item * L<Linux::Perl::aio>
 
@@ -37,21 +51,18 @@ Each family of system calls lives in its own namespace under C<Linux::Perl>:
 
 =item * L<Linux::Perl::getdents>
 
-=item * L<Linux::Perl::getrandom>
-
-=item * L<Linux::Perl::timerfd>
-
-=item * L<Linux::Perl::epoll>
+=item * L<Linux::Perl::mq>
 
 =back
 
 The distribution contains a number of other modules, none of which is
-intended for outside use.
+currently intended for outside use.
 
 =head1 PLATFORM-SPECIFIC INVOCATION
 
 Each Linux::Perl system call implementation can be called with a
-platform-neutral syntax as well as with a platform-specific one:
+platform-neutral syntax as well as with a platform-specific one;
+for example:
 
     my $efd = Linux::Perl::eventfd->new();
 
@@ -62,20 +73,13 @@ L<Config> to determine the current platform.
 
 =head1 PLATFORM SUPPORT
 
-The following platforms are supported:
-
-=over
-
-=item * x86_64 (i.e., 64-bit Intel/AMD)
-
-=item * arm (e.g., Raspberry Pi)
-
-=back
-
-Note that a 64-bit Perl is assumed/required.
+C<x86_64> and C<arm> are the best-supported platforms. C<i686> and C<i386>
+also have some support.
 
 Support for adding new platforms just involves adding new modules with the
 necessary constants to the distribution.
+
+Note also that a 64-bit Perl is generally assumed.
 
 =cut
 
@@ -84,12 +88,14 @@ use warnings;
 
 use Linux::Perl::X ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
+
+our @_TOLERATE_ERRNO;
 
 sub call {
     local $!;
     my $ok = syscall(0 + $_[0], @_[1 .. $#_]);
-    if ($ok == -1) {
+    if ($ok == -1 && !grep { $_ == $! } @_TOLERATE_ERRNO) {
         die Linux::Perl::X->create('Call', $_[0], $!);
     }
 

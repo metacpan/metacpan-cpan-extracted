@@ -1,5 +1,5 @@
 package Starch::State;
-$Starch::State::VERSION = '0.07';
+$Starch::State::VERSION = '0.09';
 =head1 NAME
 
 Starch::State - The Starch state object.

@@ -15,7 +15,6 @@ build_requires:
   Test::Deep::Cmp: '0'
   Test::Exception: '0'
   Test::More: '0.94'
-  Test::Warnings: '0'
   lib: '0'
 configure_requires:
   Module::Build: '0.28'
@@ -29,55 +28,46 @@ name: Context-Singleton
 provides:
   Context::Singleton:
     file: lib/Context/Singleton.pm
-    version: v1.0.3
-  Context::Singleton::Context:
-    file: lib/Context/Singleton/Context.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Exception::Deduced:
     file: lib/Context/Singleton/Exception/Deduced.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Exception::Invalid:
     file: lib/Context/Singleton/Exception/Invalid.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Exception::Nondeducible:
     file: lib/Context/Singleton/Exception/Nondeducible.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame:
     file: lib/Context/Singleton/Frame.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Builder::Array:
     file: lib/Context/Singleton/Frame/Builder/Array.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Builder::Base:
     file: lib/Context/Singleton/Frame/Builder/Base.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Builder::Hash:
     file: lib/Context/Singleton/Frame/Builder/Hash.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Builder::Value:
     file: lib/Context/Singleton/Frame/Builder/Value.pm
-    version: v1.0.3
-  Context::Singleton::Frame::Content:
-    file: lib/Context/Singleton/Frame/Content.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::DB:
     file: lib/Context/Singleton/Frame/DB.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Promise:
     file: lib/Context/Singleton/Frame/Promise.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Promise::Builder:
     file: lib/Context/Singleton/Frame/Promise/Builder.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Promise::Rule:
     file: lib/Context/Singleton/Frame/Promise/Rule.pm
-    version: v1.0.3
+    version: v1.0.4
   Context::Singleton::Frame::Result:
     file: lib/Context/Singleton/Frame/Result.pm
-    version: v1.0.3
-  Context::Singleton::Singleton:
-    file: lib/Context/Singleton/Singleton.pm
-    version: v1.0.3
+    version: v1.0.4
 requires:
   Class::Load: '0'
   Exception::Class: '0'
@@ -93,12 +83,11 @@ requires:
   namespace::clean: '0'
   overload: '0'
   parent: '0'
-  perl: v5.12.0
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/happy-barney/perl-Context-Singleton
   repository: https://github.com/happy-barney/perl-Context-Singleton.git
-version: 1.0.3
+version: 1.0.4
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

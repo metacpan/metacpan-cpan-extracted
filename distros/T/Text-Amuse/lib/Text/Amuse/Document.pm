@@ -1113,7 +1113,7 @@ sub _list_element_is_a_progression {
     # not defined, not needed.
     my $last = $self->_list_pile_last_element->start_list_index;
     my $current = $el->start_list_index;
-    # no index from one or another, we cant compare
+    # no index from one or another, we can't compare
     if (!$last or !$current) {
         return 1;
     }

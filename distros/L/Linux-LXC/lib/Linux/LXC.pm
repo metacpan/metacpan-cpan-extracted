@@ -1,5 +1,5 @@
 # Linux::LXC - Manage LXC containers.
-# Copyright (C) 2017 Spydemon <jsaipakoimetr@spyzone.fr>
+# Copyright (C) 2018 Spydemon <jsaipakoimetr@spyzone.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Linux::LXC;
-$Linux::LXC::VERSION = '1.0002';
+$Linux::LXC::VERSION = '1.0003';
 
 use v5.0;
 
@@ -96,6 +96,9 @@ sub get_lxc_path {
 
 sub get_config {
 	my ($this, $attr, $filter, $flags) = @_;
+	unless ($attr) {
+		croak 'Parameter to get is missing';
+	}
 	if (defined $filter and ref($filter) ne 'Regexp') {
 		croak '$filter should be a regular expresion';
 	}

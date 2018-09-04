@@ -133,3 +133,9 @@ Revision history for Control-CLI-AvayaData
 	  VSP-8284-XSQ
 	* Updated to support new Control::CLI's 'atomic_connect' argument in connect()
 	* Update to error message patterns
+
+2.05	2018-09-02
+	* Method login() was failing with SSH publickey authentication on ERS on TCP port other than 22
+	* Internal method discoverDevice(), used by login(), was failing to set the default prompt on "Generic"
+	  non-Avaya device types which used either '$' or '?' as last character on their prompts
+	* Update to error patterns

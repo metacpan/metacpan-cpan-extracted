@@ -4,7 +4,7 @@ Linux::LXC - Manage your LXC containers.
 
 =head1 VERSION
 
-1.0002
+1.0003
 
 =head1 SYNOPSYS
 
@@ -249,9 +249,15 @@ Stop the container.
 
 Spydemon <jsaipakoimetr@spyzone.fr>
 
+=head1 BUGS AND INFO
+
+A bug tracker is available for this module at the address: https://dev.spyzone.fr/Perl/Linux-LXC but inscriptions are
+closed because of spamming issue.
+If you want an account for contributing, report any enhancement suggestion or bug report, please send me an email.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Spydemon.
+This software is copyright (c) 2018 by Spydemon.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

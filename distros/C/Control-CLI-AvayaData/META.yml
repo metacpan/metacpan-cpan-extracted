@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +18,10 @@ name: Control-CLI-AvayaData
 provides:
   Control::CLI::AvayaData:
     file: lib/Control/CLI/AvayaData.pm
-    version: '2.04'
+    version: '2.05'
 requires:
   Control::CLI: '2.02'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.04'
+version: '2.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@ package InvalidMap;
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 with 'Map::Tube';
 

@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.6.0
+Version 1.6.1
 
 =cut
 
-our $VERSION = 'v1.6.0';
+our $VERSION = 'v1.6.1';
 
 =head1 SYNOPSIS
 
@@ -2129,6 +2129,30 @@ sub calculate_helm_chart_index {
     my ( $self, %args ) = @_;
     my $repository = $args{repository} || $self->repository();
     return $self->_handle_repository_reindex("/helm/$repository/reindex");
+}
+
+=head2 calculate_cran_repository_metadata
+
+Calculates/recalculates the Packages and Release metadata for this repository, based on the CRAN packages in it.
+
+=cut
+
+sub calculate_cran_repository_metadata {
+    my ( $self, %args ) = @_;
+    my $repository = $args{repository} || $self->repository();
+    return $self->_handle_repository_reindex("/cran/reindex/$repository", %args);
+}
+
+=head2 calculate_conda_repository_metadata
+
+Calculates/recalculates the Conda packages and release metadata for this repository.
+
+=cut
+
+sub calculate_conda_repository_metadata {
+    my ( $self, %args ) = @_;
+    my $repository = $args{repository} || $self->repository();
+    return $self->_handle_repository_reindex("/conda/reindex/$repository", %args);
 }
 
 =head1 SYSTEM & CONFIGURATION

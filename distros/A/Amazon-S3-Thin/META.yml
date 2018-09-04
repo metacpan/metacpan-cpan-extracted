@@ -26,7 +26,7 @@ no_index:
 provides:
   Amazon::S3::Thin:
     file: lib/Amazon/S3/Thin.pm
-    version: '0.22'
+    version: '0.23'
   Amazon::S3::Thin::Credentials:
     file: lib/Amazon/S3/Thin/Credentials.pm
   Amazon::S3::Thin::Resource:
@@ -37,6 +37,7 @@ provides:
     file: lib/Amazon/S3/Thin/Signer/V4.pm
 requires:
   AWS::Signature4: '0'
+  Config::Tiny: '0'
   Digest::HMAC_SHA1: '0'
   Digest::MD5: '0'
   Encode: '0'
@@ -49,7 +50,7 @@ resources:
   bugtracker: https://github.com/DQNEO/Amazon-S3-Thin/issues
   homepage: https://github.com/DQNEO/Amazon-S3-Thin
   repository: git://github.com/DQNEO/Amazon-S3-Thin.git
-version: '0.22'
+version: '0.23'
 x_contributors:
   - 'Bob Showalter <showaltb@gmail.com>'
   - 'Bob Stockdale <bstockdale@zappos.com>'

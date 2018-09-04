@@ -2,6 +2,8 @@ use v5;
 
 package Perlito5::JavaScript2::Runtime;
 
+use Perlito5::Runtime::Sprintf;
+
 sub perl5_to_js {
     my ($source, $namespace, $want, $scalar_hints, $hash_hints, $scope_js) = @_;
 
@@ -1169,52 +1171,86 @@ var p5negative = function(o) {
     return -o;
 };
 
-function p5regex_s_modifier (s) {
-    var cc = s.split(/(\\.)|/);
-    var out = [];
-    var is_char_class = false;
-    for(var i = 0; i < cc.length; i++) {
-        var c = cc[i];
-        if (typeof c != "undefined") {
-            if (c == "[")                    { is_char_class = true }
-            if (c == "]" && is_char_class )  { is_char_class = false }
-            if (c == "." && !is_char_class ) { c = "[\\S\\s]" }
-            out.push(c);
-        }
+function p5regex_compile (s, flags) {
+    var flag_x = false;
+    var flag_xx = false;
+    var flag_s = false;
+    var flag_i = false;
+    if (flags.indexOf("s") != -1) {
+        flags = flags.replace("s", "");
+        flag_s = true;
     }
-    return out.join("");
-}
-
-function p5regex_x_modifier (s) {
-    var cc = s.split(/(\\.)|/);
+    if (flags.indexOf("xx") != -1) {
+        flags = flags.replace("xx", "");
+        flag_x = true;
+        flag_xx = true;
+    }
+    if (flags.indexOf("x") != -1) {
+        flags = flags.replace("x", "");
+        flag_x = true;
+    }
+    var cc = s.split("");
     var out = [];
     var is_char_class = false;
     var is_comment = false;
     for(var i = 0; i < cc.length; i++) {
         var c = cc[i];
-        if (typeof c != "undefined") {
-            if (c == "[")                    { is_char_class = true }
-            if (c == "]" && is_char_class )  { is_char_class = false }
-            if (c == " " && !is_char_class ) { c = "" }
-            if (c == "#" && !is_char_class ) { c = ""; is_comment = true }
-            if (c == "\n" && is_comment )    { c = ""; is_comment = false }
-            if (is_comment)                  { c = "" }
+        if (flag_x) {
+            if (c == " " && flag_xx )        { continue }
+            if (c == " " && !is_char_class ) { continue }
+            if (c == "#" && !is_char_class ) { is_comment = true;  continue }
+            if (c == "\n" && is_comment )    { is_comment = false; continue }
+            if (is_comment)                  { continue }
+        } 
+        if (c == "\\") {
             out.push(c);
+            i++;
+            if (i < cc.length) {
+                out.push(cc[i]);
+            }
+            continue;
         }
+        if (flag_s) {
+            if (c == "." && !is_char_class ) { out.push("[\\S\\s]"); continue }
+        }
+        if (flag_i && c.toUpperCase() != c.toLowerCase()) {
+            if (is_char_class) {
+                out.push(c.toUpperCase() + c.toLowerCase()); continue;
+            }
+            out.push("[" + c.toUpperCase() + c.toLowerCase() + "]"); continue;
+        }
+        if (c == "(" && !is_char_class ) {
+            if (i+1 < cc.length && cc[i+1] == "?") {
+                var flag = true;
+                while (i+2 < cc.length && (cc[i+2] == "-" || cc[i+2] == "x" || cc[i+2] == "i" || cc[i+2] == "s") ) {
+                    // TODO - restore flags at end of pattern group
+                    if (cc[i+2] == "-") { flag   = false }    // (?-x) (?-x:
+                    if (cc[i+2] == "x") { flag_x = flag  }    // (?x) (?x:
+                    if (cc[i+2] == "i") { flag_i = flag  }    // (?i) (?i:
+                    if (cc[i+2] == "s") { flag_s = flag  }    // (?s) (?s:
+                    if (cc[i+2] == "x" && i+3 < cc.length && cc[i+3] == "x") { flag_xx = flag  }  // (?xx) (?xx:
+                    i++;
+                }
+                if (i+2 < cc.length && cc[i+2] == ")") {
+                    i = i + 2;
+                    continue;
+                }
+                if (i+2 < cc.length && cc[i+2] == ":") {
+                    i = i + 2;
+                    out.push("(?:");
+                    continue;
+                }
+            }
+        }
+        if (c == ")" && !is_char_class ) {
+            // TODO - restore flags at end of pattern group
+        }
+        if (c == "[")                    { is_char_class = true }
+        if (c == "]" && is_char_class )  { is_char_class = false }
+        out.push(c);
     }
-    return out.join("");
-}
-
-function p5regex_compile (s, flags) {
-    if (flags.indexOf("s") != -1) {
-        flags = flags.replace("s", "");
-        s = p5regex_s_modifier(s);
-    }
-    if (flags.indexOf("x") != -1) {
-        flags = flags.replace("x", "");
-        s = p5regex_x_modifier(s);
-    }
-    return new RegExp(s, flags);
+    var sout = out.join("");
+    return new RegExp(sout, flags);
 }
 
 var p5qr = function(search, modifier) {
@@ -1361,6 +1397,84 @@ var p5chomp = function(s) {
         return [0, s]
     }
 };
+
+var p5vec_set = function(sb, offset, bits, value) {
+    if (offset < 0) {
+        return CORE.die(["Negative offset to vec in lvalue context: " + offset]);
+    }
+    sb = p5str(sb);
+    if (bits == 1) {
+        var byteOfs = Math.floor(offset / 8);
+        var bitOfs  = offset - 8 * byteOfs;
+        var mask = 1;
+        value = (value & mask) << bitOfs;
+        mask = mask << bitOfs;
+        if (byteOfs < sb.length) {
+            value = (sb.charCodeAt(byteOfs) & ~mask) | value;
+        }
+        offset = byteOfs;
+        bits = 8;
+    }
+    if (bits == 2) {
+        var byteOfs = Math.floor(offset / 4);
+        var bitOfs  = 2 * (offset - 4 * byteOfs);
+        var mask = 3;
+        value = (value & mask) << bitOfs;
+        mask = mask << bitOfs;
+        if (byteOfs < sb.length) {
+            value = (sb.charCodeAt(byteOfs) & ~mask) | value;
+        }
+        offset = byteOfs;
+        bits = 8;
+    }
+    if (bits == 4) {
+        var byteOfs = Math.floor(offset / 2);
+        var bitOfs  = 4 * (offset - 2 * byteOfs);
+        var mask = 15;
+        value = (value & mask) << bitOfs;
+        mask = mask << bitOfs;
+        if (byteOfs < sb.length) {
+            value = (sb.charCodeAt(byteOfs) & ~mask) | value;
+        }
+        offset = byteOfs;
+        bits = 8;
+    }
+    if (bits == 8) {
+        if (offset == 0) {
+            if (sb.length < 2) {
+                sb = String.fromCharCode(value);
+            }
+            else {
+                sb = String.fromCharCode(value) + sb.substr(1);
+            }
+        }
+        else {
+            while (offset >= sb.length) {
+                sb = sb + String.fromCharCode(0);
+            }
+            if (sb.length <= offset) {
+                sb = sb.substr(0, offset) + String.fromCharCode(value);
+            }
+            else {
+                sb = sb.substr(0, offset) + String.fromCharCode(value) + sb.substr(offset + 1);
+            }
+        }
+        return sb;
+    }
+    if (bits == 16) {
+        sb = p5vec_set(sb, offset,     8, (value >> 8) & 256);
+        sb = p5vec_set(sb, offset + 1, 8, value & 256);
+        return sb;
+    }
+    if (bits == 32) {
+        sb = p5vec_set(sb, offset,     8, (value >> 24) & 256);
+        sb = p5vec_set(sb, offset + 1, 8, (value >> 16) & 256);
+        sb = p5vec_set(sb, offset + 2, 8, (value >> 8)  & 256);
+        sb = p5vec_set(sb, offset + 3, 8, value & 256);
+        return sb;
+    }
+    return CORE.die(["Illegal number of bits in vec: " + bits]);
+}
 
 var p5for = function(namespace, var_name, func, args, cont, label) {
     var local_idx = p5LOCAL.length;
@@ -1589,6 +1703,31 @@ var p5sort = function(namespace, func, args) {
     namespace["v_b"] = b_old;
     return out;
 };
+
+function p5hash_delete(v,k) {
+    var res = v[k];
+    delete (v[k]);
+    return res;
+}
+function p5hash_delete_list(v,k) {
+    var res = [];
+    for (var i = 0; i < k.length; i++) {
+        res.push(v[k[i]]);
+        delete (v[k[i]]);
+    }
+    return res;
+}
+function p5deleteSymbolTable(v,k) {
+    if (!k instanceof Array) {
+        k = [k];
+    }
+    for (var i = 0; i < k.length; i++) {
+        delete (p5pkg[v][k[i]]);
+        delete (p5pkg[v]["v_" + k[i]]);
+        delete (p5pkg[v]["List_" + k[i]]);
+        delete (p5pkg[v]["Hash_" + k[i]]);
+    }
+}
 
 EOT
 

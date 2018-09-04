@@ -33,14 +33,17 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Text::MostFreqKDistance" : {
          "file" : "lib/Text/MostFreqKDistance.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -51,6 +54,6 @@
          "web" : "https://github.com/manwar/Text-MostFreqKDistance"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

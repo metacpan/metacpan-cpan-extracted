@@ -25,19 +25,18 @@ use warnings;
 use Call::Context;
 use Linux::Perl;
 
-use constant BUFFER_SIZE => 257 * 6;
+use parent 'Linux::Perl::Base';
+
+use constant _BUFFER_SIZE => 257 * 6;
 
 sub uname {
     my ($class) = @_;
 
     Call::Context::must_be_list();
 
-    if (!$class->can('NR_uname')) {
-        require Linux::Perl::ArchLoader;
-        $class = Linux::Perl::ArchLoader::get_arch_module($class);
-    }
+    $class = $class->_get_arch_module();
 
-    my $buf = ("\0" x BUFFER_SIZE);
+    my $buf = ("\0" x _BUFFER_SIZE);
     Linux::Perl::call( $class->NR_uname(), $buf );
 
     return split m<\0+>, $buf;

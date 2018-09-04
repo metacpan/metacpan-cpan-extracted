@@ -1,6 +1,6 @@
 package WWW::ELISA;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -93,11 +93,11 @@ __END__
 
 =head1 NAME
 
-WWWW::ELISA - a module for working the the REST API ELi:SA (https://elisa.hbz-nrw.de/)
+WWW::ELISA - a module for working the the REST API ELi:SA (https://elisa.hbz-nrw.de/)
 
 =head1 SYNOPSIS
 
-    use WWWW::Elisa;
+    use WWW::Elisa;
 
     my $api = WWW::ELISA->new(callerID => "user1", secret => "s3cret");
 
@@ -105,10 +105,10 @@ WWWW::ELISA - a module for working the the REST API ELi:SA (https://elisa.hbz-nr
         userID      => 'me@example.com',
         notepadName => "Wishlist_1",
         titleList => [
-            {title => {isbn => "9780822363804", notiz => "WWW::ELISA Test",}},
-            {title => {isbn => "9788793379312", notiz => "WWW::ELISA Test2",}}
+            {title => {isbn => "9780822363804", notiz => "WWW::ELISA Test"}},
+            {title => {isbn => "9788793379312", notiz => "WWW::ELISA Test2"}},
         ];
-    }
+    };
 
     $api->push($data);
 

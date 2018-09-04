@@ -1,28 +1,42 @@
 package Anki::Import ;
-$Anki::Import::VERSION = '0.011';
+$Anki::Import::VERSION = '0.021';
 use strict;
 use warnings;
 use Cwd;
 use Path::Tiny;
 use Getopt::Args;
-use Log::Log4perl::Shortcuts qw(:all);
+use Log::Log4perl::Shortcuts 0.011 qw(:all);
 use Exporter qw(import);
-use Data::Dumper qw(Dumper);
 our @EXPORT = qw(anki_import);
 
 # set up variables
-my @lines;
+my @lines;                # lines from source file
+my $line_count = 0;       # count processed lines to give more helpful error msg
+my $cline      = '';      # current line getting processed
+my $lline      = '';      # last (previous) line processed
 my $ntype      = 'Basic'; # default note type
-my $line_count = 0;       # count lines to give more helpful error msg
-my $cline      = '';      # current line
-my $lline;                # last (previous) line
-my %notes      = ();      # data structure for storing notes
+my @notes      = ();      # array for storing notes
+my @autotags   = ();      # for storing automated tags
 
-# process arguments
+set_log_config('anki-import.cfg', __PACKAGE__);
+#set_log_config('test.cfg', __PACKAGE__);
+
+# argument processing
+arg file => (
+  isa => 'Str',
+  required => 1,
+  comment => 'the name of the source file'
+);
 arg parent_dir => (
   isa => 'Str',
   default => cwd,
-  comment => 'optional directory to save output files, default to current directory',
+  comment => 'optional directory to save output files, defaults to current directory',
+);
+opt quiet  => (
+  isa => 'Bool',
+  alias => 'q',
+  default => 1,
+  comment => 'suppress success msg'
 );
 opt verbose => (
   isa => 'Bool',
@@ -31,16 +45,18 @@ opt verbose => (
 );
 opt vverbose => (
   isa => 'Bool',
-  alias => 'vv',
+  alias => 'V',
   comment => 'verbose information plus debug info'
 );
 
 # start here
 sub anki_import {
-  my $file = shift;
-  logf('No file passed to Anki::Import. Aborting.') if !$file;
-
   my $args = optargs( @_ );
+
+  my $file = $args->{file};
+  if (!$file) {
+    logf('Aborting: No file passed to Anki::Import.');
+  }
 
   # set log level as appropriate
   if ($args->{verbose}) {
@@ -52,12 +68,12 @@ sub anki_import {
   }
   logi('Log level set');
 
-
   # get and load the source file
   logi('Loading file');
   my $path  = path($file);
+  logd($path);
   if (!path($file)->exists) {
-    logf("Source file named '$file' does not exist.");
+    logf("Aborting: Source file named '$file' does not exist.");
   };
   @lines = $path->lines_utf8;
 
@@ -66,8 +82,16 @@ sub anki_import {
 
   # do the stuff we came here for
   validate_src_file();
-  logd(\%notes);
-  generate_importable_files($args->{parent_dir});
+  logd(\@notes);
+
+  my $pd = $args->{parent_dir};
+  generate_importable_files($pd);
+
+  unless ($args->{'quiet'}) {
+    set_log_level('info');
+    logi("Success! Your import files are in the $pd"
+      . '/anki_import_files directory') unless $args->{quiet};
+  }
   # fin
 }
 
@@ -117,7 +141,7 @@ sub validate_src_file {
     }
 
     logi('Storing note');
-    store_note($note);
+    push @notes, {ntype => $ntype, note => $note};
   }
 
 }
@@ -143,17 +167,6 @@ sub slurp_note {
   return \@note;
 }
 
-sub store_note {
-  my $note = shift;
-  logd($note);
-
-  if ($notes{$ntype}) {
-    push @{$notes{$ntype}}, $note;
-  } else {
-    $notes{$ntype} = [$note];
-  }
-}
-
 sub next_line {
   return 0 if !@lines; # last line in file is always blank
   $lline = $cline;
@@ -168,55 +181,73 @@ sub next_line {
 sub generate_importable_files {
   my $pd = shift;
   logi('Generating files for import');
+  my %filenames;
 
-  # loop over note types
-  foreach my $ntype (keys %notes) {
-    logi('Looping over note type');
-    my $file = '';
+  # loop over notes
+  foreach my $note (@notes) {
+    logi('Looping over notes');
 
-    # loop over notes
-    logi('Formatting notes for output');
-    foreach my $note (@{$notes{$ntype}}) {
-      $file .= process_note($note);
-    }
-    chomp $file;
-    logd($file);
+    my $line = process_note($note->{note});
 
-    # write our file out
-    logi('Writing notes out to file');
-    my $out_path = path($pd, "anki_import_files/${ntype}_notes_import.txt")->touchpath;
-    $out_path->spew([$file]);
+    # write to our file out
+    my $filename = $note->{ntype} . '_notes_import.txt';
+    $filenames{$filename}{content} .= $line;
+  }
+
+  logi('Writing notes out to file');
+  foreach my $file ( keys %filenames ) {
+    my $out_path = path($pd, "anki_import_files/$file")->touchpath;
+    chomp $filenames{$file}{content};
+    $out_path->spew($filenames{$file}{content});
   }
 }
 
-# process individual notes
 sub process_note {
   my $note = shift;
+  logd($note, 'note_2b_processed');
 
-  my $out = '';
+  my $new_autotags = 0;
+  my @fields = ();
   # loop over fields
   foreach my $field (@$note) {
     my $in_code = 0;   # tracks if we are preserving whitespace
     my $field_out = '';
 
     # loop over lines in field
+    my @lines = ('');
     foreach my $line (@$field) {
+      my $last_line = \$lines[-1];
+
+      # detect automated tags
       logd($line);
+      if ($line =~ /^\+\s*$/ && !$in_code) {
+        push @autotags, split (/\s+/, $$last_line);
+        $new_autotags = 1;
+      }
+      if ($line =~ /^\^\s*$/ && !$in_code) {
+        @autotags = split (/\s+/, $$last_line);
+        $new_autotags = 1;
+        next;
+      }
+
       if ($line =~ /^`\s*$/ && !$in_code) {
+        if ($$last_line && $$last_line !~ /^<br>+$/) {
+          $$last_line .= '<br>';
+        }
         next;
       }
       if ($line =~ /^`{3,3}$/ && !$in_code) {
         $in_code = 1;
-        if ($field_out) {
-          $field_out .= '<br><br>';
+        if ($$last_line) {
+          $$last_line .= '<br><br>';
         }
-        $field_out .= '<div style="text-align: left; font-family: courier; white-space: pre;">';
+        $$last_line .= '<div style="text-align: left; font-family: courier; white-space: pre;">';
         next;
       }
 
       # exit whitespace preservation mode
       if ($line =~ /^`{3,3}$/ && $in_code) {
-        $field_out .= "</div><br><br>";
+        $$last_line .= "</div><br><br>";
         $in_code = 0;
         next;
       }
@@ -225,34 +256,69 @@ sub process_note {
         $line =~ s/(?<!\\)`/\\`/g;
         $line =~ s/(?<!\\)\*/\\*/g;
         $line =~ s/(?<!\\)%/\\%/g;
-        $field_out .= $line . "<br>";
+        $$last_line .= $line . "<br>";
       } else {
-        $field_out .= "$line ";
+        push @lines, $line;
       }
     }
-
     # handle formatting codes in text, preserve escaped characters
+    logd($field_out, 'field_out');
+    my $field = join ' ', @lines;
 
     # backticked characters
-    $field_out =~ s/(?<!\\)`(.*?)`/<span style="font-family: courier; weight: bold;">$1<\/span>/gm;
-    $field_out =~ s/\\`/`/g;
+    $field =~ s/(?<!\\)`(.*?)`/<span style="font-family: courier; weight: bold;">$1<\/span>/gm;
+    $field =~ s/\\`/`/g;
 
     # bold
-    $field_out =~ s/(?<!\\)\*(.*?)\*/<span style="weight: bold;">$1<\/span>/gm;
-    $field_out =~ s/\\\*/*/g;
+    $field =~ s/(?<!\\)\*(.*?)\*/<span style="weight: bold;">$1<\/span>/gm;
+    $field =~ s/\\\*/*/g;
 
     # unordered lists
-    $field_out =~ s'(?<!\\)%(.*?)%'"<ul><li>" . join ("</li><li>", (split (/,\s*/, $1))) . "</li><\/ul>"'gme;
-    $field_out =~ s/\\%/%/g;
+    $field =~ s'(?<!\\)%(.*?)%'"<ul><li>" . join ("</li><li>", (split (/,\s*/, $1))) . "</li><\/ul>"'gme;
+    $field =~ s/\\%/%/g;
 
-    $field_out .= "\t";
-    $out .= $field_out;
+    $field =~ s/(<br>)+$//;
+    push @fields, $field;
+
   }
 
   # clean up extraneous characters at the end of the line
-  $out =~ s/ *\t$|\t$|(<br>)+\t$//;
+
+  # handle autotagging TODO: Ugly, needs cleanup
+  if (@autotags && !$new_autotags) {
+    logd($note->[-1][0], 'lnote_elem');
+    my @note_tags = split (/\s+/, $fields[-1]);
+    logd(\@note_tags, 'raw_note_tags');
+    my @new_tags = ();
+    foreach my $note_tag (@note_tags) {
+      my $in_autotags = grep { $_ eq $note_tag } @autotags;
+      push @new_tags, $note_tag unless $in_autotags;
+    }
+    foreach my $autotag (@autotags) {
+      my $discard_autotag = grep { $_ eq $autotag } @note_tags;
+      push @new_tags, $autotag if !$discard_autotag;
+    }
+    logd(\@new_tags, 'new_tags');
+    my $new_tags = join (' ', @new_tags);
+    #$new_tags =~ s/^\s+//;
+    $fields[-1] = $new_tags;
+  }
+  $new_autotags = 0;
+
+  my $out = join ("\t", @fields);
+
+  # create cloze fields
+  my $cloze_count = 1;
+  # TODO: should probably handle escaped braces just in case
+  while ($out =~ /\{\{\{(.*?)}}}/) {
+    $out =~ s/\{\{\{(.*?)}}}/{{c${cloze_count}::$1}}/s;
+    $cloze_count++;
+  }
+  logd($out, 'out');
+
   $out .= "\n";
 }
+
 
 1; # Magic true value
 # ABSTRACT: Anki note generation made easy.
@@ -267,7 +333,7 @@ Anki::Import - Anki note generation made easy.
 
 =head1 VERSION
 
-version 0.011
+version 0.021
 
 =head1 OVERVIEW
 
@@ -298,6 +364,9 @@ Inputting notes into Anki can be a tedious chore. C<Anki::Import> lets you
 you generate Anki notes with your favorite text editor (e.g. vim, BBEdit, Atom,
 etc.) so you can enter formatted notes into Anki's database more efficiently.
 
+At a minimum, you should have basic familiarity with using your computer's
+command line terminal to make use of this program.
+
 =head2 Steps for creating, processing and imorting new notes
 
 =head3 Step 1: Generate the notes with your text editor
@@ -313,7 +382,7 @@ See the L</General description of the source file> section for details.
 Once the source file is created and saved, run the
 C<anki_import> command from the command line or from a script to generate the
 import files. This will create a new directory called "anki_import_files"
-which contains one file for each of the note types generated by C<Anki::Import>
+containing one text file for each of the note types generated by C<Anki::Import>
 and which you will import in the next step. By default, the directory is
 created in the current directory.
 
@@ -366,10 +435,11 @@ C<#note_type> comment at the beginning of a line. You can choose any note type
 name you wish but it is recommended that you use note type names similar to
 those that exist in your Anki database to make importing the notes easier.
 
-Any notes appearing after a note type comment will be assigned to that note
-type until a new note type comment is encountered (see the example in the next
-section). If no note types are indicated in your source file, the "Basic"
-note type is used.
+Note type comments not only assign a note type to the next note, but any
+notes therafter until a new note type comment is encountered (see the example
+in the next section). So note type comments actually delineate a note type
+section. If no note types are indicated in your source file, the
+"Basic" note type is used.
 
 Note types are used to help C<Anki::Import> ensure other notes of the same type
 have the same number of fields. If the notes assigned to a particular note type
@@ -379,6 +449,32 @@ note has the correct number of fields.
 Note: note type sections can be split across the file (i.e. you do not have to
 group the notes of a particular note type together).
 
+=head3 Tagging notes
+
+Place your space seprated lit of tags in the last field. As long as there is
+one more field in the source files that fields in the note you are importing
+to, Anki will generate tags from the last field.
+
+You can automate tag generation by placing a single '^' (caret) character
+on a line by itself immediately after your list of tags. These tags will now
+be used for all later notes in the file until they are overridden by a new list
+of automated tags. Also any new tags you place at the end of a note will be
+added to the list of tags that are automatically generated.
+
+To reset the automated list of tags, place a single '^' (caret) character
+in place of the field where your tags will go.
+
+To suppress the application of an automated tag from the list of automated tags
+for a particular note, include that tag in the tag field and it will not be
+tagged with that term for that one note.
+
+To add a new tag to the already existing set of tags, enter the tags on
+a line followed by a new line with a single '+' sign on it by itself.
+
+Note: If you use tags on any of your notes in a parcitular note type, you must
+use tags on all of your notes or indicate that the tag field should be left
+blank with a '`' (backtick) character on a line by itself.
+
 =head3 Applying text formatting to your notes
 
 Learning how to format the source file is key to getting Anki to import your
@@ -386,8 +482,8 @@ notes properly and getting the most out of C<Anki::Import>.
 
 Following a few simple rules, you can assign notes to a note type, preserve
 whitespace in fields, create bold text, create blank lines in your fields,
-indicate which fields are blank and generate simple lists. Study the
-example below for details.
+add tags, create cloze deletions, indicate which fields are blank and
+generate simple lists. Study the example below for details.
 
 Note: Lines containing only whitespace characters are treated as blank lines.
 
@@ -397,7 +493,8 @@ Below is an example of how to format a source data file. Note that the column on
 the right containing comments for this example are not permitted in an actual
 source data file.
 
-    # Basic                              # Any notes below here to the next
+    # Basic                              # We start a note section here. Any
+                                         # notes below here to the next
                                          # note type comment are assigned to
                                          # the 'Basic' note type
 
@@ -424,7 +521,6 @@ source data file.
 
 
 
-
     # less_basic                         # New note type called "less_basic"
                                          # with 3 fields
     What is the third day of week?       # Question 3, Field 1
@@ -433,13 +529,25 @@ source data file.
 
     Wed.                                 # Question 3, Field 3
 
+    your_tags go_here                    # We set up automated tags on this note
+    ^                                    # with the '^' symbol on a line by itself
+                                         # immediately after out tag list.
+                                         # These tags will be applied to this and
+                                         # all future notes unless overridden.
 
-    Put another question here.
 
-    Here is an answer that has
+    Put {{{another question}}} here.     # Surround text with 3 braces for a cloze
+
+    Here is an field that has
     `                                    # Insert a blank line into a field
     a blank line in it.                  # with a single backtick character
-                                         # surround by lines with text
+                                         # surrounded by lines with text.
+    go_here                              # We set autotags in the last note and
+                                         # they will carry forward to this note
+                                         # except for the exclusions we place
+                                         # here. This note will *not* be tagged
+                                         # with 'go_here' but it will still be
+                                         # tagged under 'your_tags'.
 
 
 
@@ -453,20 +561,31 @@ source data file.
     }
     ```                                  # end whitespace preservation
 
-    Answer goes here.
+    This is %comma,delimted,text%        # Bullet lists with %item1,item2,item3%
+
+    '                                    # The tags field is left blank. But all
+                                         # the auto tags will still be applied.
 
 
+    Another question                     # Field 1
 
-    Final question                       # Field 1
+    `                                    # Field 2 is blank.
 
-    `                                    # Field 2 is blank. Use single backtick
-                                         # on a line surrouned by blank lines.
-    This is *in bold*                    # Field 3 has bold words
-    `                                    # and a blank line
-    This is %an,unordered,list%          # and uses percent sign with comma
-                                         # delimited text to generate an
-                                         # unordered HTML list, with one item for
-                                         # each term separated with commas
+    This is *in bold*                    # Field 3 has bold words, followed by a
+    `                                    # blank line, followed by
+    %an,unordered,list%                  # an ordered list.
+
+    new_tags more_new_tags               # This and future notes will use these
+    ^                                    # newer automated tags.
+
+
+    #basic                               # switch back to a 'basic' note type
+    Last question
+
+    Last anser
+
+    new_tag                              # We add a new_tag to our autotag list
+    +                                    # with the '+' sign.
 
 =head1 USAGE
 
@@ -475,23 +594,33 @@ script. It behaves the same way in both environments.
 
 =head2 Command line usage
 
-C<Anki::Import> provides a command for generating import files:
+The C<Anki::Import> module installs the C<anki_import> command line command
+for generating import files which is used as follow:
 
-    anki_import source_file [parent_dir] [verbosity_level]
+    anki_import source_file [parent_dir] [--verbosity_level]
 
-The command processes the source file and generates files to be imported into
+    B<Example:> anki_import pop_quiz.txt /home/me --verbose
+
+C<anki_import> processes the C<source_file> and generates files to be imported into
 Anki, one file for each note type. These files are placed in a directory called
 C<anki_import_files>. This directory is placed in the current working directory
 by default.
 
-Note: All previously generated files of a particular note type will be
-overwritten by this command without warning.
+Note that previously generated files already located in the C<anki_import_files>
+directory the command is outputting to will will be overwritten without warning.
+Add a unique (C<parent_dir> path to help prevent this.
 
 B<C<parent_dir>> is an optional argument containing the path you want C<Anki::Import>
-to save the files for output.
+to save the files for output. You may use a C<~> (tilde) to represent the home
+directory for the current user.
 
-B<C<$verbosity>> can be set to either C<--verbose> (C<-v>) or C<--vverbose> (C<-vv>)
-for verbosity and maximum verbosity, respectively.
+B<C<$verbosity>> options can be set to C<--verbose> or C<--vverbose>
+(very verbose) or C<--quiet>. The verbosity options have aliases for your
+typing convenience: C<-v>, C<-V> and C<-q>, respectively.
+
+Use the C<--verbose> or C<--vverbose> option to help troubleshoot source file
+processing issues. The (C<--quiet>) option suppresses the success
+message printed upon successful processing of the source file.
 
 =head2 From a script
 
@@ -500,15 +629,68 @@ command line:
 
 =head2 anki_import($source_file, [$parent_dir], [$verbosity]);
 
-See the L</Command line usage> for more details on the optional arguments.
+Usage in a script is the same as for the command line except that the arguments
+must be enclosed in quotes.
+
+    Example:
+
+    anki_import('script_file.txt', '/home/me', '--verbose');
+
+See the L</Command line usage> for more details on the optional arguments. By
+default, the verbosity output from the function call is (C<--quiet>. If you
+want the function call to output a success message, use (C<--no-quiet>);
+
+=head1 INSTALLATION
+
+C<Anki::Import> is written in the Perl programming langauge. Therefore, you must
+have the Perl installed on your system. MacOS and *nix machines will have
+Perl already installed but the Windows operating system does not
+come pre-installed with Perl and so you may have to install it first before you
+can use C<Anki::Import>.
+
+If you are unsure if you have Perl installed, open a command prompt and type in:
+
+    perl -v
+
+If Perl is installed, it will report the version of Perl on your machine and
+other information. If Perl is not installed, you will get a "not recognized"
+error on Windows.
+
+=head2 Installing Strawberry Perl on Windows
+
+If you are on Windows and you do not have Perl installed, you can download a
+version of Perl called "Strawberry Perl" from the
+L<Strawberry Perl website|http://strawberryperl.com/>. Be sure to install the
+proper version (64 or 32 bit).
+
+Once installed successfully, see the next section for downloading and installing
+C<Anki::Import>.
+
+=head2 Installing Anki::Import with C<cpanm>
+
+C<Anki::Import> is easy to install if you have a Perl module called
+L<App::cpanimus> installed. This module provides a command, C<cpanm>, to easily
+downloading and installing modules from the Perl module repository called
+B<CPAN>. Simply run this command from the command line to install
+C<Anki::Import>:
+
+    cpanm Anki::Import
+
+Strawberry Perl for Windows has the C<cpanm> already installed.
+
+=head2 Installing Anki::Import without C<cpanm>
+
+If you do not have the C<cpan> command on your computer, you will need to use
+either the older CPAN shell method of installation or, as a last resort, perform
+manual installation. Refer to the
+C<Anki::Import> L<INSTALL file|https://metacpan.org/source/STEVIED/Anki-Import-0.012/INSTALL>
+for further details on these installation methods.
 
 =head1 REQUIRES
 
 =over 4
 
 =item * L<Cwd|Cwd>
-
-=item * L<Data::Dumper|Data::Dumper>
 
 =item * L<Exporter|Exporter>
 
@@ -567,6 +749,13 @@ You can make new bug reports, and view existing ones, through the
 web interface at L<https://github.com/sdondley/Anki-Import/issues>.
 
 =head1 SEE ALSO
+
+=head2 Development status
+
+This module is currently in the beta stages and is actively supported and
+maintained. Suggestions for improvement are welcome. There are likely bugs
+with the text formatting in certain edge cases but it should work well for
+normal, intended use.
 
 L<Anki documentation|https://apps.ankiweb.net/docs/manual.html>
 

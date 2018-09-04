@@ -1,5 +1,11 @@
 Revision history for WWW-ELISA
 
+0.04  2018-09-03 10:22:28 CEST
+    - pod
+
+0.03  2018-09-03 08:49:26 CEST
+    - modify synopsis
+
 0.02  2018-08-31 09:08:20 CEST
     - modify test file
 

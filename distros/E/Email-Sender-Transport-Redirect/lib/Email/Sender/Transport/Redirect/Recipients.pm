@@ -17,9 +17,9 @@ L<Email::Sender::Transport::Redirect> and shouldn't be used directly.
 
   my $rec = Email::Sender::Transport::Redirect::Recipients->new($string_or_hashref);
 
-print $rec->to;
-print Dumper($rec->exclude);
-print $rec->replace('myemail@example');
+  print $rec->to;
+  print Dumper($rec->exclude);
+  print $rec->replace('myemail@example');
 
 =head1 CONSTRUCTOR
 

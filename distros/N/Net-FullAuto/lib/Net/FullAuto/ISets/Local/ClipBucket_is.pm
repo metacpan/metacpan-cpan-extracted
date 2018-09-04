@@ -61,8 +61,6 @@ my $configure_clipbucket=sub {
    my $site_profile=$_[8]||'';
    my $site_build=$_[9]||'';
    $service_and_cert_password=$_[10]||'';
-   my $twitter_api_key=$_[11]||'';
-   my $twitter_api_sec=$_[12]||'';
    my $sudo='sudo ';
    if ($site_profile=~/Commmunity/) {
       $site_profile='community';
@@ -914,7 +912,6 @@ END
    # https://wiki.loadaverage.org/clipbucket/installation_guides/install_like_loadaverage
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
-   # http://www.linuxveda.com/2015/06/05/gnu-social-vs-twitter/
    my $nginx='nginx-1.14.0'; # updated from 1.10.0
    $nginx='nginx-1.9.13' if $^O eq 'cygwin';
    ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
@@ -1867,8 +1864,6 @@ my $standup_clipbucket=sub {
    my $site_profile="]T[{choose_site_profile}";
    my $site_build="]T[{choose_build}";
    my $strong_password="]I[{'clipbucket_enter_password',1}";
-   my $twitter_api_key="]I[{'clipbucket_twitter_api',1}";
-   my $twitter_api_sec="]I[{'clipbucket_twitter_api',2}";
    #if (-1<index $site_name, ']T[') {
    #   $site_name="]I[{'clipbucket_enter_domain_name',1}"; 
    #}
@@ -1930,21 +1925,21 @@ my $standup_clipbucket=sub {
          launch_server('CLIPBUCKET.com',$cnt,$clipbucket,'',$c,
          $configure_clipbucket,'',$region,$verified_email,
          $permanent_ip,$site_name,$site_profile,$site_build,
-         $strong_password,$twitter_api_key,$twitter_api_sec);
+         $strong_password);
       } else {
          my $num=$#{$main::aws->{'CLIPBUCKET.com'}}-1;
          foreach my $num (0..$num) {
             launch_server('CLIPBUCKET.com',$cnt++,$clipbucket,'',$c,
             $configure_clipbucket,'',$region,$verified_email,
             $permanent_ip,$site_name,$site_profile,$site_build,
-            $strong_password,$twitter_api_key,$twitter_api_sec);
+            $strong_password);
          }
       }
    } else {
       $configure_clipbucket->('CLIPBUCKET.com',$cnt++,$clipbucket,
             $region,$verified_email,
             $permanent_ip,$site_name,$site_profile,$site_build,
-            $strong_password,$twitter_api_key,$twitter_api_sec);
+            $strong_password);
    }
 
    return '{choose_is_setup}<';

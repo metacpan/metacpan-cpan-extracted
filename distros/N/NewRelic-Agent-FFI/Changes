@@ -1,5 +1,21 @@
 Revision history for NewRelic-Agent-FFI
 
+0.05      2018-09-04 06:15:29 -0400
+  - Fix configure prereqs
+  - Documentation fixes
+
+0.04      2018-09-03 23:09:37 -0400
+  - Added these functions to the procedural interface:
+    newrelic_register_message_handler
+    newrelic_message_handler to 
+    newrelic_basic_literal_replacement_obfuscator
+    newrelic_request_shutdown
+  - Added status constants to procedural interface
+
+0.03      2018-09-03 16:38:54 -0400
+  - Only use Alien::nragent as fallback if the libs aren't already installed
+  - Added NewRelic::Agent::FFI::Procedural
+
 0.02      2018-08-23 11:40:34 -0400
   - Added tests and fixed a number of bugs that they uncovered
   - Documentation coverage for all methods.

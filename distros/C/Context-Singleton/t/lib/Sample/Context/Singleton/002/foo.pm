@@ -9,7 +9,7 @@ our $VERSION = v1.0.0;
 use Sample::Context::Singleton;
 
 contrive '002-foo' => (
-    value => '002-foo',
+	value => '002-foo',
 );
 
 1;

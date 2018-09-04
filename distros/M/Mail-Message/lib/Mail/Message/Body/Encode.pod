@@ -134,15 +134,16 @@ Examples:
 
 =item $obj-E<gt>B<dispositionFilename>( [$directory] )
 
-Returns the name which can be used as filename to store the information
-in the indicated $directory. To get a filename, various fields are searched
-for C<filename> and C<name> attributes.  Without $directory, the name found
-will be returned.
+Various fields are searched for C<filename> and C<name> attributes.  Without
+$directory, the name found will be returned unmodified.
 
-Only the basename of the found name will be used, for security reasons:
-otherwise, it may be possible to access other directories than the
-one indicated.  If no name was found, or the name is already in use,
-then an unique name is generated.
+When a $directory is given, a filename is composed.  For security reasons,
+only the basename of the found name gets used and many potentially
+dangerous characters removed.  If no name was found, or when the found
+name is already in use, then an unique name is generated.
+
+Don't forget to read RFC6266 section 4.3 for the security aspects in your
+email application.
 
 =item $obj-E<gt>B<isBinary>()
 
@@ -203,12 +204,12 @@ unknown.  The decoded data is returned.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.006,
-built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.007,
+built on September 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

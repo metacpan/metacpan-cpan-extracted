@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.56'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -112,7 +112,7 @@ sub lib
 
   if(@new)
   {
-    push @{ $self->{lib} }, @new;
+    push @{ $self->{lib} }, map { ref $_ eq 'CODE' ? $_->() : $_ } @new;
     delete $self->{mangler};
   }
   
@@ -550,7 +550,7 @@ sub _have_pm
 
 package FFI::Platypus::Function;
 
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.56'; # VERSION
 
 use overload '&{}' => sub {
   my $ffi = shift;
@@ -571,7 +571,7 @@ use overload '&{}' => sub {
   sub { $self->{code}->(@_) };
 };
 
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.56'; # VERSION
 
 sub new
 {
@@ -600,13 +600,13 @@ sub get_data
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.56'; # VERSION
 
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.56'; # VERSION
 
 sub new
 {
@@ -700,7 +700,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 SYNOPSIS
 

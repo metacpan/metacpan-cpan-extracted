@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
+# Copyrights 2001-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Reporter';
 
@@ -139,8 +139,9 @@ sub body()
     my $body = $self->unfoldedBody;
     return $body unless $self->isStructured;
 
-    $body =~ s/\s*\;.*//s;
-    $body;
+    my ($first) = $body =~ m/^((?:"[^"]*"|'[^']*'|[^;])*)/;
+	$first =~ s/\s+$//;
+	$first;
 }
 
 

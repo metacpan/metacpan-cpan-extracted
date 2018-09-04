@@ -13,7 +13,6 @@ lib/Perlito5/CompileTime/Dumper.pm
 lib/Perlito5/Dumper.pm
 lib/Perlito5/DumpToAST.pm
 lib/Perlito5/Emitter/Token.pm
-lib/Perlito5/Eval.pm
 lib/Perlito5/FoldConstant.pm
 lib/Perlito5/Grammar.pm
 lib/Perlito5/Grammar/Attribute.pm
@@ -69,11 +68,12 @@ lib/Perlito5/Perl6/Runtime.pm
 lib/Perlito5/Perl6/TreeGrammar.pm
 lib/Perlito5/Regex.pm
 lib/Perlito5/Runtime.pm
+lib/Perlito5/Runtime/Formline.pm
+lib/Perlito5/Runtime/Sprintf.pm
 lib/Perlito5/Test.pm
 lib/Perlito5/TreeGrammar.pm
 lib/Perlito5/X64/Assembler.pm
 lib/Perlito5/XS/Emitter.pm
-lib/Perlito5X/.DS_Store
 lib/Perlito5X/attributes.pm
 lib/Perlito5X/B.pm
 lib/Perlito5X/base.pm
@@ -148,9 +148,7 @@ lib/Perlito5X/Sub/Name.pm
 lib/Perlito5X/Sub/Util.pm
 lib/Perlito5X/Symbol.pm
 lib/Perlito5X/Term/ANSIColor.pm
-lib/Perlito5X/Test/.DS_Store
 lib/Perlito5X/Test/Builder.pm
-lib/Perlito5X/Test/Builder/.DS_Store
 lib/Perlito5X/Test/Builder/Formatter.pm
 lib/Perlito5X/Test/Builder/IO/Scalar.pm
 lib/Perlito5X/Test/Builder/Module.pm
@@ -303,6 +301,7 @@ t/comma_return_array.t
 t/comma_scalar.t
 t/comment.t
 t/data.t
+t/decl.t
 t/deref_arrow.t
 t/deref_defined_or.t
 t/deref_dollar.t

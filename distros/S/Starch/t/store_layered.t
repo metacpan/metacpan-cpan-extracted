@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
+use Test2::V0;
 use Test::Starch;
 
 use Starch;
@@ -28,20 +28,20 @@ subtest basics => sub{
     my $inner = $layered->inner();
 
     $layered->set( 'foo', [], {bar=>32}, 10 );
-    is_deeply( $layered->get('foo', []), {bar=>32}, 'layered get' );
-    is_deeply( $outer->get('foo', []), {bar=>32}, 'outer get' );
-    is_deeply( $inner->get('foo', []), {bar=>32}, 'inner get' );
+    is( $layered->get('foo', []), {bar=>32}, 'layered get' );
+    is( $outer->get('foo', []), {bar=>32}, 'outer get' );
+    is( $inner->get('foo', []), {bar=>32}, 'inner get' );
 
     $layered->set( 'foo', [], {bar=>59}, 10 );
     $outer->remove('foo', []);
     is( $outer->get('foo', []), undef, 'outer get (no outer)' );
-    is_deeply( $layered->get('foo', []), {bar=>59}, 'layered get (no outer)' );
-    is_deeply( $inner->get('foo', []), {bar=>59}, 'inner get (no outer)' );
+    is( $layered->get('foo', []), {bar=>59}, 'layered get (no outer)' );
+    is( $inner->get('foo', []), {bar=>59}, 'inner get (no outer)' );
 
     $layered->set( 'foo', [], {bar=>16}, 10 );
     $inner->remove('foo', []);
-    is_deeply( $layered->get('foo', []), {bar=>16}, 'layered get (no inner)' );
-    is_deeply( $outer->get('foo', []), {bar=>16}, 'outer get (no inner)' );
+    is( $layered->get('foo', []), {bar=>16}, 'layered get (no inner)' );
+    is( $outer->get('foo', []), {bar=>16}, 'outer get (no inner)' );
     is( $inner->get('foo', []), undef, 'inner get (no inner)' );
 
     ok( (!$layered->can_reap_expired()), 'cannot reap expired' );

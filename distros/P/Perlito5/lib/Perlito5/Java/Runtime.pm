@@ -6,6 +6,8 @@ use strict;
 use Perlito5::Java::CORE;
 use Perlito5::Java::Crypt;
 use Perlito5::Java::JavaCompiler;
+use Perlito5::Runtime::Formline;
+use Perlito5::Runtime::Sprintf;
 
 sub perl5_to_java {
     my ($source, $namespace, $want, $scope_java) = @_;
@@ -1919,10 +1921,11 @@ EOT
             return value;
         }
         PlLvalue var = (PlLvalue)vv;
+        var.addMagic();
 
         if (value.is_undef()) {
-            var.pos = null;
-            var.regex_zero_length_flag = false;
+            var.magic.pos = null;
+            var.magic.regex_zero_length_flag = false;
             return value;
         }
 
@@ -1933,7 +1936,7 @@ EOT
 
         if (old_pos == pos) {
             // PlCORE.say("zero length match");
-            if (var.regex_zero_length_flag) {
+            if (var.magic.regex_zero_length_flag) {
                 if (matcher.matcher.find()) {
                     matcher.regex_string = str;
                     pos = matcher.matcher.end();
@@ -1943,22 +1946,22 @@ EOT
                     // String cap = str.substring(matcher.start(), matcher.end());
                     // PlCORE.say("zero length match [true]: [" + cap + "] ["+ cap1+"] pos=" + pos + " start="+matcher.start() + " end="+matcher.end());
 
-                    var.regex_zero_length_flag = false;
+                    var.magic.regex_zero_length_flag = false;
                 }
                 else {
                     reset_match();
-                    var.pos = null;
+                    var.magic.pos = null;
                     return PlCx.UNDEF;
                 }
             }
             else {
-                var.regex_zero_length_flag = true;
+                var.magic.regex_zero_length_flag = true;
             }
         }
 
         // TODO - test that pos < string length
         value = new PlInt(pos);
-        var.pos = pos;
+        var.magic.pos = pos;
         return value;
     }
 
@@ -2573,6 +2576,8 @@ class PlV {
     public static PlFileHandle STDIN  = (PlFileHandle)PlStringConstant.getConstant("main::STDIN").fileRef.o;
     public static PlFileHandle STDOUT = (PlFileHandle)PlStringConstant.getConstant("main::STDOUT").fileRef.o;
     public static PlFileHandle STDERR = (PlFileHandle)PlStringConstant.getConstant("main::STDERR").fileRef.o;
+    public static PlFileHandle selectedFileHandle = STDOUT;
+    public static final PlStringConstant sub_sprintf_vd = PlStringConstant.getConstant("Perlito5::Runtime::Sprintf::sprintf_vd");
 
     // initialize special variables like $_ $\
 EOT
@@ -2625,6 +2630,8 @@ EOT
         PlV.STDERR.typeglob_name = "main::STDERR";
         PlV.STDERR.charset       = "UTF-8";
         PlFileHandle.allOpenFiles.add(PlV.STDERR);
+
+        PlCORE.select(PlV.STDOUT);
 
         try {
             PlV.path = Paths.get(".").toRealPath();
@@ -3222,21 +3229,17 @@ EOT
         return (PlArray)this;
     }
     public PlArray array_deref(String namespace) {
-        PlCORE.die("Not an ARRAY reference");
-        return (PlArray)this;
+        return (PlArray)PlCORE.die("Not an ARRAY reference");
     }
     public PlArray array_deref_strict() {
-        PlCORE.die("Not an ARRAY reference");
-        return (PlArray)this;
+        return (PlArray)PlCORE.die("Not an ARRAY reference");
     }
     public PlObject array_deref_set(PlObject i) {
-        PlCORE.die("Not an ARRAY reference");
-        return this;
+        return PlCORE.die("Not an ARRAY reference");
     }
 
     public PlObject hget_arrayref(String i) {
-        PlCORE.die("Not a HASH reference");
-        return this;
+        return PlCORE.die("Not a HASH reference");
     }
     public PlObject hget_hashref(String i) {
         PlCORE.die("Not a HASH reference");
@@ -3244,38 +3247,30 @@ EOT
     }
 
     public PlObject aget_arrayref(int i) {
-        PlCORE.die("Not an ARRAY reference");
-        return this;
+        return PlCORE.die("Not an ARRAY reference");
     }
     public PlObject aget_hashref(int i) {
-        PlCORE.die("Not an ARRAY reference");
-        return this;
+        return PlCORE.die("Not an ARRAY reference");
     }
 
     public PlObject hash_deref(String namespace) {
-        PlCORE.die("Not a HASH reference");
-        return this;
+        return PlCORE.die("Not a HASH reference");
     }
     public PlHash hash_deref_strict() {
-        PlCORE.die("Not a HASH reference");
-        return (PlHash)this;
+        return (PlHash)PlCORE.die("Not a HASH reference");
     }
     public PlObject hash_deref_set(PlObject i) {
-        PlCORE.die("Not a HASH reference");
-        return this;
+        return PlCORE.die("Not a HASH reference");
     }
 
     public PlObject hget(String i) {
-        PlCORE.die("Not a HASH reference");
-        return this;
+        return PlCORE.die("Not a HASH reference");
     }
     public PlObject hget_lvalue(String i) {
-        PlCORE.die("Not a HASH reference");
-        return this;
+        return PlCORE.die("Not a HASH reference");
     }
     public PlObject hget_lvalue_local(String i) {
-        PlCORE.die("Not a HASH reference");
-        return this;
+        return PlCORE.die("Not a HASH reference");
     }
 
     public PlObject hset(String s, PlObject v) {
@@ -4145,6 +4140,15 @@ class PlFileHandle extends PlScalarImmutable {
     public boolean output_autoflush;
     public PlObject tied;
 
+    // "format" variables
+    public PlLvalue format_formfeed;                // $^L
+    public PlLvalue format_page_number;             // $%
+    public PlLvalue format_lines_left;              // $-
+    public PlLvalue format_line_break_characters;   // $:
+    public PlLvalue format_lines_per_page;          // $=
+    public PlLvalue format_top_name;                // $^
+    public PlLvalue format_name;                    // $~
+
     public static final int BUFFER_SIZE = 4096;
     public static final int BUFFER_THRESHOLD = BUFFER_SIZE - 256;
     public static HashSet<PlFileHandle> allOpenFiles = new HashSet<PlFileHandle>();
@@ -4156,6 +4160,15 @@ class PlFileHandle extends PlScalarImmutable {
         this.is_argv = false;
         this.binmode = false;
         this.output_autoflush = false;
+
+        // "format" variables
+        this.format_formfeed = new PlLvalue( new PlString("" + (char)12) );              // $^L
+        this.format_page_number = new PlLvalue( new PlInt(0) );                          // $%
+        this.format_lines_left = new PlLvalue( new PlInt(0) );                           // $-
+        this.format_line_break_characters = new PlLvalue( new PlString(" " + (char)10 + "-") );  // $:
+        this.format_lines_per_page = new PlLvalue( new PlInt(60) );                      // $=
+        this.format_top_name = new PlLvalue();                                           // $^
+        this.format_name = new PlLvalue();                                               // $~
     }
 
     public PlFileHandle(String name) {
@@ -4164,6 +4177,8 @@ class PlFileHandle extends PlScalarImmutable {
             this.is_argv = true;
         }
         this.typeglob_name = name;
+        this.format_top_name.set(this.typeglob_name + "_TOP");
+        this.format_name.set(this.typeglob_name);
     }
 
     public void dupFileHandle(PlFileHandle o) {
@@ -4183,6 +4198,15 @@ class PlFileHandle extends PlScalarImmutable {
         this.binmode =           o.binmode;
         this.output_autoflush =  o.output_autoflush;
         this.tied =              o.tied;
+
+        // "format" variables
+        this.format_formfeed.set(o.format_formfeed);
+        this.format_page_number.set(o.format_page_number);
+        this.format_lines_left.set(o.format_lines_left);
+        this.format_line_break_characters.set(o.format_line_break_characters);
+        this.format_lines_per_page.set(o.format_lines_per_page);
+        this.format_top_name.set(o.format_top_name);
+        this.format_name.set(o.format_name);
     }
 
     public boolean is_filehandle() {
@@ -4379,7 +4403,7 @@ class PlLvalueSpecialVarAutoflush extends PlLvalue {
     // the $| variable
     public PlObject set(PlObject o) {
         // System.out.println("Set autoflush " + (o.to_boolean() ? "1" : "0"));
-        PlV.STDOUT.set_autoflush(o);
+        PlV.selectedFileHandle.set_autoflush(o);
         return super.set(o);
     }
     public PlObject set(PlScalarImmutable o) {
@@ -4555,10 +4579,6 @@ class PlClosure extends PlReference implements Runnable {
         return _lastLineNumber;
     }
 
-    public PlClosure getCurrentSub() {
-        return this.currentSub;
-    }
-
     // subclasses override perlFileName() and perlLineNumber()
     public String perlFileName() {
         return null;
@@ -4597,7 +4617,7 @@ class PlClosure extends PlReference implements Runnable {
             }
         }
         // try other things
-        return this.get().castToClass(params, pos);
+        return super.castToClass(params, pos);
     }
 
     public PlString ref() {
@@ -5757,11 +5777,17 @@ EOT
     , <<'EOT'
 
 }
-class PlLvalue extends PlScalarObject {
-    public PlScalarImmutable o;
+class PlLvalueMagic {
+    public PlLvalueMagic() {
+    }
+
     public Integer pos;
     public boolean regex_zero_length_flag;
     public PlObject tied;
+}
+class PlLvalue extends PlScalarObject {
+    public PlScalarImmutable o;
+    public PlLvalueMagic magic;
 
     // Note: several versions of PlLvalue()
     public PlLvalue() {
@@ -5788,6 +5814,12 @@ class PlLvalue extends PlScalarObject {
         this.o = o.scalar();
     }
 
+    public void addMagic() {
+        if (this.magic == null) {
+            this.magic = new PlLvalueMagic();
+        }
+    }
+
     public PerlArgumentLookupResult castToClass(ArrayList<Class[]> params, int pos) {
         // want PlLvalue
         for (Class[] cl : params) {
@@ -5808,12 +5840,12 @@ class PlLvalue extends PlScalarObject {
         if (this.o.is_filehandle()) {
             return this.o.tie(args);
         }
-
-        if (this.tied != null) {
+        this.addMagic();
+        if (this.magic.tied != null) {
             this.untie();
         }
         PlObject self = PerlOp.call("TIESCALAR", args, PlCx.VOID);
-        this.tied = self;
+        this.magic.tied = self;
         return self;
     }
 
@@ -5822,13 +5854,13 @@ class PlLvalue extends PlScalarObject {
             return ((PlFileHandle)this.o).untie();
         }
 
-        if (this.tied != null) {
-            PlObject tied = this.tied;
+        if (this.magic != null && this.magic.tied != null) {
+            PlObject tied = this.magic.tied;
             PlObject untie = PerlOp.call("can", new PlArray(tied, new PlString("UNTIE")), PlCx.SCALAR);
             if (untie.to_boolean()) {
                 untie.apply(PlCx.VOID, new PlArray(tied));
             };
-            this.tied = null;
+            this.magic.tied = null;
             return tied;
         }
         return this;
@@ -5838,8 +5870,8 @@ class PlLvalue extends PlScalarObject {
             return this.o.tied();
         }
 
-        if (this.tied != null) {
-            return this.tied;
+        if (this.magic != null && this.magic.tied != null) {
+            return this.magic.tied;
         }
         return PlCx.UNDEF;
     }
@@ -5858,26 +5890,26 @@ class PlLvalue extends PlScalarObject {
     }
 
     public PlObject pos() {
-        // TODO - optimize: we are adding "pos" (Integer) to all PlLvalue objects
-        if (this.pos == null) {
-            return PlCx.UNDEF;
+        if (this.magic != null && this.magic.pos != null) {
+            return new PlInt(this.magic.pos);
         }
-        return new PlInt(this.pos);
+        return PlCx.UNDEF;
     }
     public PlObject set_pos(PlObject value) {
-        this.regex_zero_length_flag = false;
+        addMagic();
+        this.magic.regex_zero_length_flag = false;
         if (value.is_undef()) {
-            this.pos = null;
+            this.magic.pos = null;
         }
         else {
-            this.pos = value.to_int();
+            this.magic.pos = value.to_int();
         }
         return value;
     }
 
     public PlScalarImmutable get() {
-        if (this.tied != null) {
-            PlScalarImmutable v = PerlOp.call("FETCH", new PlArray(tied), PlCx.VOID).scalar();
+        if (this.magic != null && this.magic.tied != null) {
+            PlScalarImmutable v = PerlOp.call("FETCH", new PlArray(this.magic.tied), PlCx.VOID).scalar();
             this.o = v;
             return v;
         }
@@ -6072,7 +6104,7 @@ class PlLvalue extends PlScalarObject {
     public PlArray array_deref_strict() {
         // @$x doesn't autovivify
         PlScalarImmutable o = this.get();
-        return (PlArray)(o.array_deref_strict());
+        return o.array_deref_strict();
     }
     public PlArray array_deref_lvalue() {
         PlScalarImmutable o = this.get();
@@ -6132,30 +6164,27 @@ class PlLvalue extends PlScalarObject {
 
     // Note: several versions of set()
     public PlObject set(PlObject o) {
-        if (o == null) {
-            o = PlCx.UNDEF;
-        }
         if (o.is_lvalue()) {
             o = o.get();
         }
-        if (this.tied != null) {
-            PerlOp.call("STORE", new PlArray(tied, o), PlCx.VOID);
+        if (this.magic != null && this.magic.tied != null) {
+            PerlOp.call("STORE", new PlArray(this.magic.tied, o), PlCx.VOID);
             return this;
         }
         this.o = (PlScalarImmutable)o;
         return this;
     }
     public PlObject set(PlScalarImmutable o) {
-        if (this.tied != null) {
-            PerlOp.call("STORE", new PlArray(tied, o), PlCx.VOID);
+        if (this.magic != null && this.magic.tied != null) {
+            PerlOp.call("STORE", new PlArray(this.magic.tied, o), PlCx.VOID);
             return this;
         }
         this.o = o;
         return this;
     }
     public PlObject set(PlLvalue o) {
-        if (this.tied != null) {
-            PerlOp.call("STORE", new PlArray(tied, o), PlCx.VOID);
+        if (this.magic != null && this.magic.tied != null) {
+            PerlOp.call("STORE", new PlArray(this.magic.tied, o), PlCx.VOID);
             return this;
         }
         this.o = o.get();
@@ -6171,27 +6200,23 @@ class PlLvalue extends PlScalarObject {
     }
     public PlObject set(Object o) {
         // $a = new Object()
+        // $a = null
+        if (o == null) {
+            return this.set(PlCx.UNDEF);
+        }
         return this.set(PlJavaObject.fromObject(o));
     }
     public PlObject set(String s) {
-        if (s == null) {
-            this.set(PlCx.UNDEF);
-            return this;
-        }
-        this.set(new PlString(s));
-        return this;
+        return this.set(new PlString(s));
     }
     public PlObject set(boolean s) {
-        this.set(new PlBool(s));
-        return this;
+        return this.set(new PlBool(s));
     }
     public PlObject set(double s) {
-        this.set(new PlDouble(s));
-        return this;
+        return this.set(new PlDouble(s));
     }
     public PlObject set(long s) {
-        this.set(new PlInt(s));
-        return this;
+        return this.set(new PlInt(s));
     }
 
     public PlScalarImmutable length() {
@@ -6356,15 +6381,15 @@ EOT
     , ((map {
             my $perl = $_;
 "    public PlObject ${perl}(PlObject s) {
-        if (this.tied != null) {
-            PlScalarImmutable v = PerlOp.call(\"FETCH\", new PlArray(tied), PlCx.VOID).scalar();
+        if (this.magic != null && this.magic.tied != null) {
+            PlScalarImmutable v = PerlOp.call(\"FETCH\", new PlArray(this.magic.tied), PlCx.VOID).scalar();
             this.o = v;
         }
         return this.o.${perl}(s);
     }
     public PlObject ${perl}2(PlObject s) {
-        if (this.tied != null) {
-            PlScalarImmutable v = PerlOp.call(\"FETCH\", new PlArray(tied), PlCx.VOID).scalar();
+        if (this.magic != null && this.magic.tied != null) {
+            PlScalarImmutable v = PerlOp.call(\"FETCH\", new PlArray(this.magic.tied), PlCx.VOID).scalar();
             this.o = v;
         }
         return s.${perl}(this.o);
@@ -6408,8 +6433,8 @@ EOT
     , ((map {
             my ($op, $type) = @$_;
 "    public $type $op() {
-        if (this.tied != null) {
-            PlScalarImmutable v = PerlOp.call(\"FETCH\", new PlArray(tied), PlCx.VOID).scalar();
+        if (this.magic != null && this.magic.tied != null) {
+            PlScalarImmutable v = PerlOp.call(\"FETCH\", new PlArray(this.magic.tied), PlCx.VOID).scalar();
             this.o = v;
         }
         return this.o.$op();
@@ -6690,8 +6715,7 @@ class PlArrayList extends ArrayList<PlObject> implements Iterable<PlObject> {
         }
         return v;
     }
-    public PlObject aget(int i) {
-        int pos  = i;
+    public PlObject aget(int pos) {
         if (pos < 0) {
             pos = this.size() + pos;
         }
@@ -7223,22 +7247,6 @@ EOT
         return result.pop();
     }
 
-    public PlObject get_scalar(PlObject s) {
-        // $$x
-        int i = s.to_int();
-        PlObject o = this.a.aget(i);
-        if (o.is_undef()) {
-            PlLvalue a = new PlLvalue();
-            this.a.aset(i, new PlLvalueRef(a));
-            return a;
-        }
-        else if (o.is_scalarref()) {
-            return o.get();
-        }
-        // Modification of a read-only value attempted
-        // return PlCORE.die("Not an SCALAR reference");
-        return o;
-    }
     public PlObject aget_scalarref(int i) {
         PlObject o = this.a.aget(i);
         if (o.is_undef()) {
@@ -7604,15 +7612,6 @@ class PlTieHashMap extends PlHashMap {
 
 } // PlTieHashMap
 
-class PlHashIterator {
-    public Iterator<Map.Entry<String, PlObject>> iterator;
-
-    public PlHashIterator() {
-    }
-    public void reset() {
-        iterator = null;
-    }
-}
 class PlHashMap extends HashMap<String, PlObject> implements Iterable<Map.Entry<String, PlObject>> {
     public PlHashMap() {
     }
@@ -7678,19 +7677,16 @@ class PlHashLvalueIterator implements Iterator<PlObject> {
 }
 class PlHash extends PlObject implements Iterable<PlObject> {
     public PlHashMap h;
-    public PlHashIterator each_iterator;
+    public Iterator<Map.Entry<String, PlObject>> each_iterator;
 
     public Iterator<PlObject> iterator() {
         return new PlHashLvalueIterator(this); 
     }
 
     public PlHash() {
-        this.each_iterator = new PlHashIterator();
         this.h = new PlHashMap();
-        this.each_iterator.reset();
     }
     public PlHash(PlObject... args) {
-        this.each_iterator = new PlHashIterator();
         this.h = new PlHashMap();
         int args_size = args.length;
         for (int i = 0; i < args_size; i++) {
@@ -7729,7 +7725,6 @@ class PlHash extends PlObject implements Iterable<PlObject> {
                 this.hset(s.toString(), value);
             }
         }
-        this.each_iterator.reset();
     }
 
 
@@ -7816,7 +7811,7 @@ class PlHash extends PlObject implements Iterable<PlObject> {
             PlCORE.warn(PlCx.VOID, new PlArray(new PlString("Odd number of elements in hash assignment")));
             this.hset(s.toString(), PlCx.UNDEF);
         }
-        this.each_iterator.reset();
+        this.each_iterator = null;
         if (want == PlCx.LIST) {
             return this.to_list_of_aliases();
         }
@@ -7912,23 +7907,6 @@ class PlHash extends PlObject implements Iterable<PlObject> {
         }
 
         return PerlOp.push_local(this, i);
-    }
-
-    public PlObject get_scalar(PlObject arg) {
-        // $$x
-        String s = arg.toString();
-        PlObject o = this.h.get(s);
-        if (o == null || o.is_undef()) {
-            PlLvalue a = new PlLvalue();
-            this.hset(s, new PlLvalueRef(a));
-            return a;
-        }
-        else if (o.is_scalarref()) {
-            return o.get();
-        }
-        // Modification of a read-only value attempted
-        // return PlCORE.die("Not an SCALAR reference");
-        return o;
     }
 
     public PlObject hget_scalarref(String i) {
@@ -8059,11 +8037,11 @@ class PlHash extends PlObject implements Iterable<PlObject> {
     }
     public PlObject each() {
         PlArray aa = new PlArray();
-        if (this.each_iterator.iterator == null) {
-            this.each_iterator.iterator = this.h.iterator();
+        if (this.each_iterator == null) {
+            this.each_iterator = this.h.iterator();
         }
-        if (this.each_iterator.iterator.hasNext()) {
-            Map.Entry<String, PlObject> entry = this.each_iterator.iterator.next();
+        if (this.each_iterator.hasNext()) {
+            Map.Entry<String, PlObject> entry = this.each_iterator.next();
             String key = entry.getKey();
             aa.push_void(new PlString(key));
             PlObject value = entry.getValue();
@@ -8071,7 +8049,7 @@ class PlHash extends PlObject implements Iterable<PlObject> {
         }
         else {
             // return empty list
-            this.each_iterator.reset();
+            this.each_iterator = null;
         }
         return aa;
     }
@@ -8765,8 +8743,7 @@ EOT
         return PlV.array_get(s);
     }
     public PlArray array_deref_strict() {
-        PlCORE.die("Can't use string (\"" + this.s + "\") as an ARRAY ref while \"strict refs\" in use");
-        return PlV.array_get(s);
+        return (PlArray)PlCORE.die("Can't use string (\"" + this.s + "\") as an ARRAY ref while \"strict refs\" in use");
     }
     public PlArray array_deref(String namespace) {
         if (s.indexOf("::") == -1) {
@@ -8793,8 +8770,7 @@ EOT
         return PlV.hash_get(s);
     }
     public PlHash hash_deref_strict() {
-        PlCORE.die("Can't use string (\"" + this.s + "\") as a HASH ref while \"strict refs\" in use");
-        return PlV.hash_get(s);
+        return (PlHash)PlCORE.die("Can't use string (\"" + this.s + "\") as a HASH ref while \"strict refs\" in use");
     }
     public PlObject hash_deref_set(PlObject v) {
         // TODO - concatenate current namespace if needed

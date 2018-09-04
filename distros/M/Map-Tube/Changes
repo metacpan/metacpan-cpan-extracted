@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.56  2018-09-04T09:15:00+00:00
+      - Tidied up test scripts to use "namespace::autoclean".
+
 3.55  2018-08-09T18:00:00+00:00
       - Documented the newly added attribute "bgcolor".
 

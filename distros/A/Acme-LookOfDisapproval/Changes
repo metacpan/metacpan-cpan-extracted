@@ -1,10 +1,15 @@
 Revision history for Acme-LookOfDisapproval
 
+0.007     2018-09-02 21:00:36Z
+          - switch from JSON to JSON::PP
+          - many fixes to build infrastructure to keep pace with changes to
+            the tooling ecosystem
+
 0.006     2013-11-29 18:22:26Z
           - Acme::ಠ_ಠ is back, with a lot of convoluted hoop-jumping to bypass
             various broken bits of the toolchain (see git commit for details)
 
-0.005     2013-10-26 05:02:09Z (Karen Etheridge)
+0.005     2013-10-26 05:02:09Z
           - now packaging with Dist::Zilla 5.0
             - required removing Acme::ಠ_ಠ, pending resolution of issues in
               PPI, Module::Runtime and Params::Util

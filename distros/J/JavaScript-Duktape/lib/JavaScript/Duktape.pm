@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 use Scalar::Util qw( weaken );
-our $VERSION = '2.4.2';
+our $VERSION = '2.5.0';
 
 my $GlobalRef = {};
 

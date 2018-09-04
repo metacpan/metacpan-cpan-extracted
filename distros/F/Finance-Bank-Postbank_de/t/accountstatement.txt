@@ -1,20 +1,29 @@
-Umsatzauskunft - gebuchte Ums�tze
-Name;Petra Pfiffig
-BLZ;20010020
-Kontonummer;9999999999
-IBAN;DE31200100209999999999
-Aktueller Kontostand;5.314,05 �
-Summe vorgemerkter Ums�tze;-11,33 �
+Umsatzauskunft;
+Name;Petra Pfiffig;
+BLZ;10010010;
+Kontonummer;0565623128;
+IBAN;DE40100100100565623128;
+Aktueller Kontostand;451,99 €;
+Summe der Umsätze in den nächsten 14 Tagen;-3.110,99 €;
 
-"Buchungstag";"Wertstellung";"Umsatzart";"Buchungsdetails";"Auftraggeber";"Empf�nger";"Betrag (�)";"Saldo (�)"
-"11.03.2012";"11.03.2012";"�berweisung";"111111/DE05370501981000000000 Finanzkasse 3991234 Steuernummer 00703434 ";"Petra Pfiffig";"Finanzkasse K�ln-S�d";"-328,75";"5.314,05"
-"11.03.2012";"11.03.2012";"�berweisung";"111111/DE90200100203299999999 �bertrag auf SparCard �berschuss was ich diesmal gespart hab ";"Petra Pfiffig";"Petra Pfiffig";"-228,61";"5.642,80"
-"11.03.2012";"11.03.2012";"Gutschrift";"Bez�ge Pers.Nr. 70600170/01 Arbeitgeber u. Co ";"Petra Pfiffig";"Petra Pfiffig";"2.780,70";"5.871,41"
-"11.03.2012";"11.03.2012";"�berweisung";"DA 1000001 ";"Petra Pfiffig";"Verlagshaus Scribere GmbH";"-31,50";"3.090,71"
-"11.03.2012";"11.03.2012";"Scheckeinreichung";"Eingang vorbehalten Gutbuchung 12345 ";"Ein Fremder";"Petra Pfiffig";"1.830,00";"3.122,21"
-"10.03.2012";"10.03.2012";"Lastschrift";"Miete 600+250 EUR Obj22/328 Schulstr.7, 12345 Meinheim ";"Petra Pfiffig";"Eigenheim KG";"-850,00";"1.292,21"
-"10.03.2012";"10.03.2012";"Inh. Scheck";"";"Petra Pfiffig";"2000123456789";"-75,00";"2.142,21"
-"08.03.2012";"08.03.2012";"Lastschrift";"Teilnehmernr 1234567 Rundfunk 0103-1203 ";"Petra Pfiffig";"GEZ";"-84,75";"2.217,21"
-"06.03.2012";"06.03.2012";"Lastschrift";"Rechnung 03121999 ";"Petra Pfiffig";"Telefon AG K�ln";"-125,80";"2.301,96"
-"04.03.2012";"04.03.2012";"Lastschrift";"Stromkosten Kd.Nr.1462347 Jahresabrechnung ";"Petra Pfiffig";"Stadtwerke Musterstadt";"-580,06";"2.427,76"
-"04.03.2012";"04.03.2012";"Gutschrift";"Kindergeld Kindergeld-Nr. 1462347 ";"Arbeitsamt Bonn";"Petra Pfiffig";"154,00";"3.007,82"
+Umsätze in den nächsten 14 Tagen;
+Buchungsdatum;Umsatzart;Buchungsdetails;Auftraggeber;Empfänger;Betrag (€);
+26.01.2018;Dauerauftrag;;Petra Pfiffig;CCF KINDERHILFSWERK;-25,00 €;
+31.01.2018;Überweisung;;Petra Pfiffig;Petra und Peter Pfiffig;-2.500,00 €;
+31.01.2018;Komfortsparen;;Petra Pfiffig;PETRA PFIFFIG;-10,00 €;
+16.01.2018;Lastbuchung;;Petra Pfiffig;;-575,99 €;
+
+gebuchte Umsätze;
+Buchungsdatum;Wertstellung;Umsatzart;Buchungsdetails;Auftraggeber;Empfänger;Betrag (€);Saldo (€);
+22.01.2018;22.01.2018;Dauerauftrag;;Petra Pfiffig;CCF KINDERHILFSWERK;-25,00 €;451,99 €;
+19.01.2018;19.01.2018;Dauerauftrag;VERMÖGENSAUFBAU;Petra Pfiffig;PETRA PFIFFIG;-100,00 €;476,99 €;
+18.01.2018;18.01.2018;Gutschrift;Referenz ZV0205004716790200000002;PETRA PFIFFIG;Petra Pfiffig;2,00 €;576,99 €;
+18.01.2018;18.01.2018;Überweisung;;Petra Pfiffig;Petra Pfiffig;-1,00 €;574,99 €;
+17.01.2018;17.01.2018;Lastbuchung Komfort-Sparen;;Petra Pfiffig;PETRA PFIFFIG;-12.524,01 €;575,99 €;
+17.01.2018;17.01.2018;Lastbuchung Komfort-Sparen;;Petra Pfiffig;PETRA PFIFFIG;-50,00 €;13.100,00 €;
+16.01.2018;16.01.2018;Überweisung;;Petra Pfiffig;unicef Schweiz;-200,00 €;13.150,00 €;
+16.01.2018;16.01.2018;Spende;Petra Pfiffig;Petra Pfiffig;CCF Kinderhilfswerk;-50,00 €;13.350,00 €;
+16.01.2018;16.01.2018;Überweisung;Spareinlage;Petra Pfiffig;Petra Pfiffig;-2.500,00 €;13.400,00 €;
+16.01.2018;16.01.2018;Überweisung;;Petra Pfiffig;Petra Pfiffig;-100,00 €;15.900,00 €;
+10.01.2018;10.01.2018;Gutschrift;Guthaben für Debitkarte;Michael Mustermann;Petra Pfiffig;1.000,00 €;16.000,00 €;
+09.01.2018;09.01.2018;Gutschrift;Buchung -  (Haben Giro) Überweisungsgutschrift;Michael Mustermann;Petra Pfiffig;15.000,00 €;15.000,00 €;

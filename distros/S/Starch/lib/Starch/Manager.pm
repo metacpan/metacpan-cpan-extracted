@@ -1,5 +1,5 @@
 package Starch::Manager;
-$Starch::Manager::VERSION = '0.07';
+$Starch::Manager::VERSION = '0.09';
 =head1 NAME
 
 Starch::Manager - Entry point for accessing Starch state objects.
@@ -17,7 +17,7 @@ Typically you will be using the L<Starch> module to create this
 object.
 
 This class supports method proxies as described in
-L<Starch::Manual/METHOD PROXIES>.
+L<Starch/METHOD PROXIES>.
 
 =cut
 
@@ -61,7 +61,7 @@ C<class> key and will be converted into a store object automatically.
 The C<class> can be fully qualified, or relative to the C<Starch::Store>
 namespace.  A leading C<::> signifies that the store's package name is relative.
 
-More information about stores can be found at L<Starch::Manual/STORES>.
+More information about stores can be found at L<Starch/STORES>.
 
 =cut
 
@@ -88,21 +88,6 @@ sub _build_store {
     );
 }
 
-=head2 factory
-
-The underlying L<Starch::Factory> object which manages all the plugins
-and state/store object construction.
-
-This argument is automatically set when calling C<new> on L<Starch>.
-
-=cut
-
-has factory => (
-    is       => 'ro',
-    isa      => InstanceOf[ 'Starch::Factory' ],
-    required => 1,
-);
-
 =head1 OPTIONAL ARGUMENTS
 
 =head2 expires
@@ -110,7 +95,7 @@ has factory => (
 How long, in seconds, a state should live after the last time it was
 modified.  Defaults to C<60 * 60 * 2> (2 hours).
 
-See L<Starch::Manual/EXPIRATION> for more information.
+See L<Starch/EXPIRATION> for more information.
 
 =cut
 
@@ -129,7 +114,7 @@ that the plugin's package name is relative.
 
 Plugins can modify nearly any functionality in Starch.  More information
 about plugins, as well as which plugins are available, can be found at
-L<Starch::Manual/PLUGINS>.
+L<Starch/PLUGINS>.
 
 =cut
 
@@ -224,6 +209,21 @@ has dirty_state_key => (
 );
 
 =head1 ATTRIBUTES
+
+=head2 factory
+
+The L<Starch::Factory> object which applies plugins and handles the
+construction of the manager, state, and store objects.
+
+=cut
+
+# This argument is always set by Starch->new().  So, to the end-user,
+# this is an attribute not a required argument.
+has factory => (
+    is       => 'ro',
+    isa      => InstanceOf[ 'Starch::Factory' ],
+    required => 1,
+);
 
 =head2 state_id_type
 

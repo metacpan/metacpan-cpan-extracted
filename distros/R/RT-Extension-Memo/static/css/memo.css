@@ -5,6 +5,7 @@
 
 .memo-content {
     min-height: 10em;
+    max-height: 28em;
     background-color: #eee;
     padding: 10px 20px;
     border: 2px solid #aaa;

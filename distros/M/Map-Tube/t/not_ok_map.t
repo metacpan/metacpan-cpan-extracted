@@ -2,7 +2,7 @@ package GoodMap;
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'good-map.xml') });
 with 'Map::Tube';
@@ -11,7 +11,7 @@ package BadMap;
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has json => (is => 'ro', default => sub { File::Spec->catfile('t', 'bad-map.json') });
 with 'Map::Tube';

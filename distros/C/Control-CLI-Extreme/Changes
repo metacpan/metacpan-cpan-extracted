@@ -17,3 +17,17 @@ Revision history for Control-CLI-Extreme
 
 1.00	2018-02-18
 	* First version posted on CPAN
+
+1.01	2018-09-02
+	* Internal method discoverDevice(), used by login(), was failing to set the default prompt on "Generic"
+	  non-Extreme device types which used either '$' or '?' as last character on their prompts
+	* Added support for ISW (Extreme Networks industrial switch range)
+	* Added non_recognized_login argument flag to both connect() and login() methods, which controls whether the
+	  login() method should immediately return when an initial login output sequence is not recognized or whether
+	  the method should keep trying to read login output until either a recognized login prompt is detected or
+	  expiry of the timeout
+	* Updates to error patterns
+	* Added generic_login argument flag to both connect() and login() methods, which disables extended discovery
+	  if it is desired to connect to non Extreme devices using this class
+	* Was failing to properly read attribute 'max_baud' on PassportERS family type
+	* Attribute switch_mode was getting incorrectly set to 'Stack' on standalone ExtremeXOS x440 & x670

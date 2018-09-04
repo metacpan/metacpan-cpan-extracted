@@ -40,7 +40,10 @@ This class inherits from L<Linux::Perl::Base::TimerEventFD>.
 use strict;
 use warnings;
 
-use parent 'Linux::Perl::Base::TimerEventFD';
+use parent (
+    'Linux::Perl::Base',
+    'Linux::Perl::Base::TimerEventFD',
+);
 
 use Call::Context;
 
@@ -96,11 +99,7 @@ sub new {
 
     my $flags = Linux::Perl::ParseFlags::parse( $class, $opts{'flags'} );
 
-    my $arch_module = $class->can('NR_timerfd_create') && $class;
-    $arch_module ||= do {
-        require Linux::Perl::ArchLoader;
-        Linux::Perl::ArchLoader::get_arch_module($class);
-    };
+    my $arch_module = $class->_get_arch_module();
 
     my $fd = Linux::Perl::call( $arch_module->NR_timerfd_create(), 0 + $clockid, $flags );
 

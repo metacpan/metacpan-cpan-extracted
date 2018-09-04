@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.006';
+my $VERSION = '3.007';
 
 my @optional =
 ( 
@@ -148,10 +148,10 @@ foreach my $optional (sort {$a->[0] cmp $b->[0]} @optional)
 WriteMakefile
  ( NAME       => 'Mail::Message'
  , VERSION    => $VERSION
- , AUTHOR     => 'Mark Overmeer'
+ , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
  , ABSTRACT   => 'Processing MIME messages'
  , PREREQ_PM  => \%prereq
- , LICENSE    => 'perl'
+ , LICENSE    => 'perl_5'
 
  , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -161,9 +161,9 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-Mail-Message.git'
               , web  => 'https://github.com/markov2/perl5-Mail-Message'
               }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
           }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
  );
 
@@ -175,7 +175,7 @@ RAWDIR          = ../public_html/mail-message/raw
 DISTDIR         = ../public_html/mail-message/source
 
 LICENSE         = perl
-EXTENDS			= ../User-Identity:../MIME-Types:../Object-Realize-Later:../MailTools:../../perl/MailBoxC:../../perl/MailBox4:../Mail-Transport
+EXTENDS			= ../User-Identity:../MIME-Types:../Object-Realize-Later:../MailTools:../Mail-Box-Parser-C:../Mail-Box:../Mail-Transport
 
 # for POD
 FIRST_YEAR      = 2001

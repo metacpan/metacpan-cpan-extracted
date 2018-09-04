@@ -3,7 +3,21 @@
 use 5.006;
 use strict; use warnings;
 use Text::MostFreqKDistance;
-use Test::More tests => 6;
+use Test::More tests => 12;
+use Test::Exception;
+
+throws_ok { MostFreqKSDF() }
+    qr/Missing source string/, 'Caught missing source string';
+throws_ok { MostFreqKSDF('my') }
+    qr/Missing source string/, 'Caught missing source string';
+throws_ok { MostFreqKSDF('my','a') }
+    qr/Missing frequency/, 'Caught missing frequency';
+throws_ok { MostFreqKSDF('my','a',2) }
+    qr/Missing max distance/, 'Caught missing max distance';
+throws_ok { MostFreqKSDF('my','a',-1) }
+    qr/Invalid frequency/, 'Caught invalid frequency';
+throws_ok { MostFreqKSDF('my','a',2,-1) }
+    qr/Invalid max distance/, 'Caught invalid max distance';
 
 while (<DATA>) {
     chomp;

@@ -2,12 +2,25 @@
 Changes
 lib/Finance/Bank/Postbank_de.pm
 lib/Finance/Bank/Postbank_de/Account.pm
+lib/Finance/Bank/Postbank_de/APIv1.pm
+lib/Finance/Bank/Postbank_de/APIv1/Account.pm
+lib/Finance/Bank/Postbank_de/APIv1/BusinessPartner.pm
+lib/Finance/Bank/Postbank_de/APIv1/Depot.pm
+lib/Finance/Bank/Postbank_de/APIv1/Finanzstatus.pm
+lib/Finance/Bank/Postbank_de/APIv1/Message.pm
+lib/Finance/Bank/Postbank_de/APIv1/Position.pm
+lib/Finance/Bank/Postbank_de/APIv1/Transaction.pm
+lib/HAL/Resource.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
 README
+scripts/dump-brokerage-account.pl
+scripts/serve-brokerage-account.pl
+scripts/test-hal.pl
 t/01-api-account.t
 t/01-api-postbank.t
 t/02-form-login.t

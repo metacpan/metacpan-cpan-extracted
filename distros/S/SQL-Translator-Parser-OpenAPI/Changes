@@ -1,0 +1,8 @@
+Revision history for Perl extension SQL-Translator-Parser-OpenAPI
+
+0.02	Tue  4 Sep 17:51:10 BST 2018
+ - update metadata for kwalitee (thanks @manwar!)
+ - update metadata to dodge slight data-structure diffs
+
+0.01	Mon  3 Sep 11:51:55 BST 2018
+ - first version

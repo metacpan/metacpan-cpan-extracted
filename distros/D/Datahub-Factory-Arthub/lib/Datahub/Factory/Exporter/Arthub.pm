@@ -2,12 +2,13 @@ package Datahub::Factory::Exporter::Arthub;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 use Lido::XML;
 use Moo;
 use Catmandu;
 use namespace::clean;
+use Catmandu::BadVal;
 
 with 'Datahub::Factory::Exporter';
 
@@ -40,6 +41,10 @@ sub add {
     #  - If no preferred id's are defined, use the first one we'll encounter.
     #  - If there's only one LidoRecID, use that one regardless of it's type.
     my $id;
+    if (!exists($item->{'lidoRecID'})) {
+        Catmandu::BadVal->throw('No LidoRecID element found in document.');
+    }
+
     if (scalar($item->{'lidoRecID'}) > 1) {
         my @matches = grep { 'preferred' eq $_->{pref} } @{ $item->{'lidoRecID'} };
         if (@matches) {

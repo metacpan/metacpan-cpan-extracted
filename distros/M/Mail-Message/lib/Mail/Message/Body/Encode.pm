@@ -1,4 +1,4 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
+# Copyrights 2001-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Body;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Reporter';
 
@@ -250,23 +250,24 @@ sub dispositionFilename(;$)
 
     my $dir      = shift;
     my $filename = '';
-    if(defined $base)
+    if(defined $base)   # RFC6266 section 4.3, very safe
     {   $filename = basename $base;
-        $filename =~ s/[^\w.-]//;
-    }
-
-    unless(length $filename)
-    {   my $ext    = ($self->mimeType->extensions)[0] || 'raw';
-        my $unique;
-        for($unique = 'part-0'; 1; $unique++)
-        {   my $out = File::Spec->catfile($dir, "$unique.$ext");
-            open IN, '<', $out or last;  # does not exist: can use it
-            close IN;
+        for($filename)
+        {   s/\s+/ /g;  s/ $//; s/^ //;
+            s/[^\w .-]//g;
         }
-        $filename = "$unique.$ext";
     }
 
-    File::Spec->catfile($dir, $filename);
+	my ($filebase, $ext) = length $filename && $filename =~ m/(.*)\.([^.]+)/
+      ? ($1, $2) : (part => ($self->mimeType->extensions)[0] || 'raw');
+
+    my $fn = File::Spec->catfile($dir, "$filebase.$ext");
+
+    for(my $unique = 1; -e $fn; $unique++)
+    {   $fn = File::Spec->catfile($dir, "$filebase-$unique.$ext");
+    }
+
+	$fn;
 }
 
 #------------------------------------------

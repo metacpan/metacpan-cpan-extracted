@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #

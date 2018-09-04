@@ -43,6 +43,7 @@ use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Modish;
+use Sim::OPT::Interlinear;
 
 our @ISA = qw( Exporter ); # our @adamkISA = qw(Exporter);
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
@@ -63,10 +64,10 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns %vals
 @sweeps @mediumiters @varinumbers @caseseed @chanceseed @chancedata $dimchance $tee @pars_tocheck retrieve
 report newretrieve newreport
-$target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios @totalcases @pinmediumiters
+$target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios @totalcases @pinwinneritems
 );
 
-$VERSION = '0.75.37';
+$VERSION = '0.75.41';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -1247,28 +1248,28 @@ sub opt
     say "NEW RANDOMIZED DIRECTIONS: " . dump( $dowhat{direction} );
   }
 
-	{ #IT FILLS THE MISSING $dowhat{direction} UNDER APPROPRIATE SETTINGS.
-	my $i = 0;
-	my @newarr;
-	foreach my $dirref ( @{ $dowhat{direction} } )
-	{
-	  my @varinumber = %{ $varinumbers[i] };
-	  my $numcases = ( scalar( @varinumber ) / 2 ) ;
+  { #IT FILLS THE MISSING $dowhat{direction} UNDER APPROPRIATE SETTINGS.
+    my $i = 0;
+    my @newarr;
+    foreach my $dirref ( @{ $dowhat{direction} } )
+    {
+      my @varinumber = %{ $varinumbers[i] };
+      my $numcases = ( scalar( @varinumber ) / 2 ) ;
 
-		  my @directions;
-			my $itemsnum = scalar( @{ $dirref } );
-			my $c = 0;
-		  while ( ( $itemsnum + $c ) <= $numcases )
-		  {
-	     push ( @directions, ${ $dirref }[0] );
-				$c++;
-		  }
-		  push ( @newarr, [ @directions ] );
-			$i++;
-		}
-		$dowhat{direction} = [ @newarr ];
-		say "NEW FILLED DIRECTIONS: " . dump( $dowhat{direction} );
-	}
+      my @directions;
+      my $itemsnum = scalar( @{ $dirref } );
+      my $c = 0;
+      while ( ( $itemsnum + $c ) <= $numcases )
+      {
+        push ( @directions, ${ $dirref }[0] );
+        $c++;
+      }
+      push ( @newarr, [ @directions ] );
+      $i++;
+    }
+    $dowhat{direction} = [ @newarr ];
+    say "NEW FILLED DIRECTIONS: " . dump( $dowhat{direction} );
+  }
 
   if ( $dowhat{randominit} eq "yes" )
   {
@@ -1358,10 +1359,11 @@ sub opt
 		calcoverlaps( @sweeps ); # PRODUCES @calcoverlaps WHICH IS global. ZZZ
 
                 #@mediumiters = @pinmediumiters; say $tee "###############MEDIUMITERS: " . dump ( @mediumiters );
-		@mediumiters = calcmediumiters( @varinumbers );
+		
+                if ( scalar( @mediumiters ) == 0 ) { calcmediumiters( @varinumbers ); }
 		#$itersnum = getitersnum($countcase, $varinumber, @varinumbers);
 
-		@rootnames = definerootcases(\@sweeps, \@mediumiters);
+		@rootnames = definerootcases( \@sweeps, \@mediumiters );
 
 		my $countcase = 0;
 		my $countblock = 0;
@@ -1369,6 +1371,17 @@ sub opt
 		my @rescontainer;
 
 		my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
+                
+                my $count = 0;
+                my @arr;
+                foreach ( @varinumbers )
+                {
+                  my $elt = getitem(\@winneritems, $count, 0); 
+                  push ( @arr, $elt );
+                  $count++;
+                }
+                $datastruc{pinwinneritem} = [ @arr ];
+                
 
 		callcase( { countcase => $countcase, rootnames => \@rootnames, countblock => $countblock,
 		miditers => \@mediumiters, winneritems => \@winneritems, sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, datastruc => \%datastruc, rescontainer => \@rescontainer } ); #EVERYTHING HAS TO BEGIN IN SOME WAY

@@ -9,7 +9,7 @@ our $VERSION = v1.0.0;
 use Sample::Context::Singleton qw[ contrive ];
 
 contrive 'constant' => (
-    value => '42',
+	value => '42',
 );
 
 1;

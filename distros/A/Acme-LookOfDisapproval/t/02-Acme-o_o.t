@@ -1,15 +1,15 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Test::More;
-use Test::Warnings 0.005 ':all';
+use Test::More 0.88;
+use Test::Warnings 0.009 ':no_end_test', ':all';
 use utf8;
 use Acme::ಠ_ಠ;
-use JSON 2;
+use JSON::PP;
 
-binmode $_, ':utf8' foreach map { Test::Builder->new->$_ } qw(output failure_output todo_output);
-binmode STDOUT, ':utf8';
-binmode STDERR, ':utf8';
+binmode Test::More->builder->$_, ':encoding(UTF-8)' foreach qw(output failure_output todo_output);
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
 
 my $line; my $file = __FILE__;
 is(
@@ -18,6 +18,7 @@ is(
     'warning appears, and with the right file and line',
 );
 
-diag '%INC is: ' . JSON->new->ascii(1)->canonical(1)->pretty->encode(\%INC);
+diag '%INC is: ' . JSON::PP->new->ascii->canonical->pretty->encode(\%INC);
 
+had_no_warnings if $ENV{AUTHOR_TESTING};
 done_testing;

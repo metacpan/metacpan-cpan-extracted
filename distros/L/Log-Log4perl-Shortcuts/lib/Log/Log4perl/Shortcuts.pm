@@ -1,42 +1,54 @@
 package Log::Log4perl::Shortcuts ;
-$Log::Log4perl::Shortcuts::VERSION = '0.009';
+$Log::Log4perl::Shortcuts::VERSION = '0.011';
 use 5.10.0;
 use Carp;
 use Log::Log4perl;
 use Log::Log4perl::Level;
-use File::HomeDir;
+use Path::Tiny;
+use Module::Data;
+use File::UserConfig;
 use Data::Dumper qw(Dumper);
 
 require Exporter;
 @ISA = Exporter;
-@EXPORT_OK = qw(logc logt logd logi logw loge logf change_config_file set_log_level);
-%EXPORT_TAGS = ( all => [qw(logc logt logd logi logw loge logf change_config_file set_log_level)] );
+@EXPORT_OK = qw(logc logt logd logi logw loge logf set_log_config set_log_level);
+%EXPORT_TAGS = ( all => [qw(logc logt logd logi logw loge logf set_log_config set_log_level)] );
 Exporter::export_ok_tags('all');
 
-BEGIN {
-  our $config_dir = '/perl/log_config/';
-  our $current_config = 'default2.cfg';
-  our $home_dir = File::HomeDir->my_home;
-  my $file = $home_dir . $config_dir . $current_config;
-  if (!-f $file) {
-    Log::Log4perl->init_once('config/default.cfg');
-  } else {
-    Log::Log4perl->init_once($file);
-  }
-};
+my $package = __PACKAGE__;
+$package =~ s/::/-/g;
+my $config_dir = path(File::UserConfig->new(dist => $package)->configdir, 'log_config');
+
+my $default_config_file = path($config_dir, 'default.cfg');
+
+if (!$default_config_file->exists) {
+  carp ("Unable to load default Log::Log4perl::Shortcuts configuration file. Aborting");
+} else {
+  Log::Log4perl->init_once($default_config_file->canonpath);
+}
 
 my $log_level = $TRACE;
 
-
 ### Public methods ###
 
-sub change_config_file {
-  $current_config = shift;
-  my $file = $home_dir . $config_dir . $current_config;
-  if (!-f $file) {
-    carp ("Configuration file $file does not exist. Configuration file unchanged.");
+sub set_log_config {
+  my $new_config = shift;
+  my $module = shift;
+
+  my $temp_config_dir;
+  if ($module) {
+    $module =~ s/::/-/g;
+    $temp_config_dir = path(File::UserConfig->new(dist => $module)->configdir, 'log_config');
   } else {
-    Log::Log4perl->init($file);
+    $temp_config_dir = $config_dir;
+  }
+
+  my $path = path($temp_config_dir, $new_config);
+
+  if (!$path->is_file) {
+    carp ("Configuration file $path->canonpath does not exist. Configuration file unchanged.");
+  } else {
+    Log::Log4perl->init($path->canonpath);
     return 'success';
   }
 }
@@ -96,27 +108,46 @@ sub logw {
 sub loge {
   my $msg = shift;
 
-  my $log = _get_logger(shift);;
+  my $log = '';
+  my $options = {};
+  my $next_arg = shift;
+  if (ref $next_arg) {
+    my $options = shift;
+  } else {
+    $log = _get_logger($next_arg);;
+  }
+
   return unless $log->is_error;
 
-  $msg = sprintf("%-80s %s\n", $msg, [caller(0)]->[0] . ": " . [caller(0)]->[2]);
-  $msg .= '        ' . _get_callers();
-  chomp $msg;
-  chomp $msg;
-
+  $msg = sprintf("%-80s %s\n", $msg, [caller(0)]->[0] . ": line " . [caller(0)]->[2]);
+  if ($options->{show_callers}) {
+    $msg .= '        ' . _get_callers();
+    chomp $msg;
+    chomp $msg;
+  }
   $log->error_warn($msg);
 }
 
 sub logf {
   my $msg = shift;
 
-  my $log = _get_logger(shift);;
+  my $log = '';
+  my $options = {};
+  my $next_arg = shift;
+  if (ref $next_arg) {
+    my $options = shift;
+  } else {
+    $log = _get_logger($next_arg);;
+  }
+
   return unless $log->is_fatal;
 
-  $msg = sprintf("%-80s %s\n", $msg, [caller(0)]->[0] . ": " . [caller(0)]->[2]);
-  $msg .= '        ' . _get_callers();
-  chomp $msg;
-  chomp $msg;
+  $msg = sprintf("%-80s %s\n", $msg, [caller(0)]->[0] . ": line " . [caller(0)]->[2]);
+  if ($options->{show_callers}) {
+    $msg .= '        ' . _get_callers();
+    chomp $msg;
+    chomp $msg;
+  }
 
   $log->logdie($msg);
 }
@@ -157,7 +188,7 @@ Log::Log4perl::Shortcuts - shortcut functions to make log4perl even easier
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 OVERVIEW
 
@@ -198,6 +229,10 @@ The B<$category> arguments, if supplied, are appended to the name of the calling
 package where the log command was invoked. For example, if C<logi('Info log entry', 'my_category')>
 is called from package C<Foo::Bar>, the log entry will be made with the category:
 
+The B<$options> arguments, if avaiable, supply addition options to the C<loge>
+and C<logf> functions. If C< { show_callers =E<gt> 1 } > is supplied, a stack trace
+will be printed out below the error or fatal message.
+
   Foo::Bar.my_category
 
 =head1 Functions
@@ -222,11 +257,11 @@ Prints a message to the I<info> logger when the log level is set to B<INFO> or a
 
 Prints a message to the I<warn> logger when the log level is set to B<WARN> or above.
 
-=head2 loge ($msg, [$category])
+=head2 loge ($msg, [$category], [{ $options => value, ... }])
 
 Prints a message to the I<error> logger when the log level is set to B<ERROR> or above.
 
-=head2 logf ($msg, [$category])
+=head2 logf ($msg, [$category], [{ $options => value, ... }])
 
 Prints a message to the I<fatal> logger when the log level is set to B<FATAL> or above.
 
@@ -237,7 +272,7 @@ Prints a message to the I<fatal> logger when the log level is set to B<FATAL> or
 Prints call stack when log level is set to B<TRACE> or above. Note that no
 message argument is used by this function.
 
-=head2 change_config_file ($filename)
+=head2 set_log_config ($filename)
 
 Changes the log configuration file which must be placed in the C<~/perl/log_config> directory.
 
@@ -248,7 +283,7 @@ Change the log level. Should be one of 'trace', 'debug', 'info', 'warn', 'error'
 =head1 CONFIGURATION AND ENVIRONMENT
 
 Place any custom log configuration files you'd like to use in C<~/perl/log_config> and use the
-C<change_config_file> function to switch to it.
+C<set_log_config> function to switch to it.
 
 =head1 REQUIRES
 
@@ -260,11 +295,15 @@ C<change_config_file> function to switch to it.
 
 =item * L<Exporter|Exporter>
 
-=item * L<File::HomeDir|File::HomeDir>
+=item * L<File::UserConfig|File::UserConfig>
 
 =item * L<Log::Log4perl|Log::Log4perl>
 
 =item * L<Log::Log4perl::Level|Log::Log4perl::Level>
+
+=item * L<Module::Data|Module::Data>
+
+=item * L<Path::Tiny|Path::Tiny>
 
 =back
 
@@ -308,7 +347,7 @@ L<https://github.com/sdondley/Log-Log4perl-Shortcuts>
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
-web interface at L<http://github.com/sdondley/Log-Log4perl-Shortcuts/issues>.
+web interface at L<https://github.com/sdondley/Log-Log4perl-Shortcuts/issues>.
 
 =head1 INSTALLATION
 

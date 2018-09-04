@@ -1,0 +1,1720 @@
+'---
+schema:
+  procedures: {}
+  tables:
+    accepted_reports:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        id:
+          data_type: varchar
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 1
+          size:
+            - 0
+        status:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: status
+          order: 2
+          size:
+            - 0
+      indices: []
+      name: accepted_reports
+      options: []
+      order: 1
+    distributions:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - name
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - version
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 2
+          size:
+            - 0
+        version:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: version
+          order: 3
+          size:
+            - 0
+      indices: []
+      name: distributions
+      options: []
+      order: 2
+    environments:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - language_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: languages
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - language_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - system_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: systems
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - system_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 1
+          size:
+            - 0
+        language_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: language_id
+          order: 2
+          size:
+            - 0
+        system_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: system_id
+          order: 3
+          size:
+            - 0
+        toolchain:
+          data_type: \'\'
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: toolchain
+          order: 4
+          size:
+            - 0
+        user_agent:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: user_agent
+          order: 5
+          size:
+            - 0
+      indices: []
+      name: environments
+      options: []
+      order: 3
+    languages:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - archname
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - name
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - version
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        archname:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: archname
+          order: 1
+          size:
+            - 0
+        build:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: build
+          order: 2
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 3
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 4
+          size:
+            - 0
+        variables:
+          data_type: \'\'
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: variables
+          order: 5
+          size:
+            - 0
+        version:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: version
+          order: 6
+          size:
+            - 0
+      indices: []
+      name: languages
+      options: []
+      order: 4
+    new_reports:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - distribution_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: distributions
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - distribution_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - environment_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: environments
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - environment_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - reporter_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: reporters
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - reporter_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - result_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: results
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - result_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        comments:
+          data_type: \'\'
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: comments
+          order: 1
+          size:
+            - 0
+        distribution_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: distribution_id
+          order: 2
+          size:
+            - 0
+        environment_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: environment_id
+          order: 3
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 4
+          size:
+            - 0
+        reporter_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: reporter_id
+          order: 5
+          size:
+            - 0
+        result_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: result_id
+          order: 6
+          size:
+            - 0
+      indices: []
+      name: new_reports
+      options: []
+      order: 5
+    prerequisites:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - name
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - need
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - phase
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        have:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: have
+          order: 1
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 2
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 3
+          size:
+            - 0
+        need:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: need
+          order: 4
+          size:
+            - 0
+        phase:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: phase
+          order: 5
+          size:
+            - 0
+      indices: []
+      name: prerequisites
+      options: []
+      order: 6
+    releases:
+      comments:
+        - A summary of test reports for a single CPAN release
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        author:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: author
+          order: 1
+          size:
+            - 0
+        dist:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: dist
+          order: 2
+          size:
+            - 0
+        fail:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: fail
+          order: 3
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 4
+          size:
+            - 0
+        na:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: na
+          order: 5
+          size:
+            - 0
+        pass:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: pass
+          order: 6
+          size:
+            - 0
+        unknown:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: unknown
+          order: 7
+          size:
+            - 0
+        version:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: version
+          order: 8
+          size:
+            - 0
+      indices: []
+      name: releases
+      options: []
+      order: 7
+    report_summaries:
+      comments:
+        - Flattened summary data from the test report data structure
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - grade_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: grades
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        date:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: date
+          order: 1
+          size:
+            - 0
+        dist:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: dist
+          order: 2
+          size:
+            - 0
+        grade_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: grade_id
+          order: 3
+          size:
+            - 0
+        guid:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: guid
+          order: 4
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 5
+          size:
+            - 0
+        osname:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: osname
+          order: 6
+          size:
+            - 0
+        osvers:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: osvers
+          order: 7
+          size:
+            - 0
+        perl:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: perl
+          order: 8
+          size:
+            - 0
+        platform:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: platform
+          order: 9
+          size:
+            - 0
+        reporter:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: reporter
+          order: 10
+          size:
+            - 0
+        version:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: version
+          order: 11
+          size:
+            - 0
+      indices: []
+      name: report_summaries
+      options: []
+      order: 8
+    reporters:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - email
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        email:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: email
+          order: 1
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 2
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 3
+          size:
+            - 0
+      indices: []
+      name: reporters
+      options: []
+      order: 9
+    results:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - grade_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: grades
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - grade_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - output_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields:
+            - id
+          reference_table: test_outputs
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - output_id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        duration:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: duration
+          order: 1
+          size:
+            - 0
+        failures:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: failures
+          order: 2
+          size:
+            - 0
+        grade_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: grade_id
+          order: 3
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 4
+          size:
+            - 0
+        output_id:
+          data_type: int
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: output_id
+          order: 5
+          size:
+            - 0
+        skipped:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: skipped
+          order: 6
+          size:
+            - 0
+        tests:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: tests
+          order: 7
+          size:
+            - 0
+        todo:
+          data_type: \'\'
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: todo
+          order: 8
+          size:
+            - 0
+        warnings:
+          data_type: int
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: warnings
+          order: 9
+          size:
+            - 0
+      indices: []
+      name: results
+      options: []
+      order: 10
+    systems:
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - osname
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        cpu_count:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: cpu_count
+          order: 1
+          size:
+            - 0
+        cpu_description:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: cpu_description
+          order: 2
+          size:
+            - 0
+        cpu_type:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: cpu_type
+          order: 3
+          size:
+            - 0
+        filesystem:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: filesystem
+          order: 4
+          size:
+            - 0
+        hostname:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: hostname
+          order: 5
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 6
+          size:
+            - 0
+        osname:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: osname
+          order: 7
+          size:
+            - 0
+        osversion:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: osversion
+          order: 8
+          size:
+            - 0
+        variables:
+          data_type: \'\'
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: variables
+          order: 9
+          size:
+            - 0
+      indices: []
+      name: systems
+      options: []
+      order: 11
+    test_outputs:
+      comments:
+        - At least one of the properties must be set
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        build:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: build
+          order: 1
+          size:
+            - 0
+        configure:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: configure
+          order: 2
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 3
+          size:
+            - 0
+        install:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: install
+          order: 4
+          size:
+            - 0
+        test:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: test
+          order: 5
+          size:
+            - 0
+        uncategorized:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: uncategorized
+          order: 6
+          size:
+            - 0
+      indices: []
+      name: test_outputs
+      options: []
+      order: 12
+    uploads:
+      comments:
+        - A release to CPAN
+      constraints:
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: UNIQUE
+        - deferrable: 1
+          expression: \'\'
+          fields:
+            - id
+          match_type: \'\'
+          name: \'\'
+          on_delete: \'\'
+          on_update: \'\'
+          options: []
+          reference_fields: []
+          reference_table: \'\'
+          type: NOT NULL
+      fields:
+        author:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: author
+          order: 1
+          size:
+            - 0
+        dist:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: dist
+          order: 2
+          size:
+            - 0
+        filename:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: filename
+          order: 3
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 1
+          name: id
+          order: 4
+          size:
+            - 0
+        released:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: released
+          order: 5
+          size:
+            - 0
+        version:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: version
+          order: 6
+          size:
+            - 0
+      indices: []
+      name: uploads
+      options: []
+      order: 13
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: t/01-corpus.json
+  no_comments: 0
+  parser_args: {}
+  parser_type: SQL::Translator::Parser::OpenAPI
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+'

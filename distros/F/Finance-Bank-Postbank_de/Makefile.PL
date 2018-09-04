@@ -46,18 +46,28 @@ my %module = (
     'PREREQ_PM'    => {
         'WWW::Mechanize'         => 1.52,
         'LWP::Protocol::https'   => 0,
+        'HTTP::CookieJar::LWP'   => 0,
         'IO::Socket::SSL'        => 0, # For some constants as to what we want to verify
         'Mozilla::CA'            => 0,
-        'Class::Accessor'        => 0,
+        'Moo'                    => 2,
         'List::Sliding::Changes' => 0.02,
         'Encode'                 => 0, # for decoding the content and dealing with umlauts
+        'Filter::signatures'     => 0.15,
+        'JSON'                   => 0,
+        'Future'                 => 0,
     }, # e.g., Module::Name => 1.1
     MIN_PERL_VERSION => '5.008', # 5.8 for Encode, 5.6 for the syntax
     TEST_REQUIRES => {
-        'Test::More'       => 0,
-        'Text::Balanced'   => 0,
-        'Test::MockObject' => 0,
-        'MIME::Lite'       => 3.00,
+        'Test::More'          => 0,
+        'Text::Balanced'      => 0,
+        'Test::MockObject'    => 0,
+        'MIME::Lite'          => 3.00,
+        'File::Temp'          => 0,
+        'Text::Table'         => 0, # well, author tests, but ...
+        'Text::CSV_XS'        => 0,
+        'Excel::Writer::XLSX' => 0,
+        'Mojolicious::Lite'   => 0,
+        'POSIX'               => 0, # just to be complete
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -76,7 +86,7 @@ sub get_module_info { %module }
 
 if( ! caller ) {
     # I should maybe use something like Shipwright...
-    #regen_README($main_file);
+    regen_README($main_file);
     #regen_EXAMPLES();
     WriteMakefile1(get_module_info);
 
@@ -183,7 +193,7 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://github.com/Corion/Filter-signatures)
+[![Build Status](https://travis-ci.org/Corion/$distbase.svg?branch=master)](https://travis-ci.org/Corion/$distbase)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );

@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -46,17 +46,20 @@ my %LoginPatterns = ( # Patterns to check for during device login (Telnet/Serial
 	more2		=>	'--More--',
 	wlan9100banner	=>	'Avaya Wi-Fi Access Point',
 	xos		=>	'ExtremeXOS',
+	isw		=>	'Product: ISW',
 );
 my %Prm = ( # Hash containing list of named parameters returned by attributes
-	xos	=>	'ExtremeXOS',
 	bstk	=>	'BaystackERS',
 	pers	=>	'PassportERS',
 	xlr	=>	'Accelar',
 	sr	=>	'SecureRouter',
 	trpz	=>	'WLAN2300',
 	xirrus	=>	'WLAN9100',
+	xos	=>	'ExtremeXOS',
+	isw	=>	'ISW',
 	generic	=>	'generic',
 );
+
 my %Attribute = (
 	Global		=> [
 			'family_type',
@@ -112,6 +115,10 @@ my %Attribute = (
 			'is_oob_connected',
 			],
 
+	$Prm{isw}	=> [
+			'is_isw',
+			],
+
 	$Prm{xlr}	=> [
 			'is_master_cpu',
 			'is_dual_cpu',
@@ -128,6 +135,7 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{trpz}		=>	'([^\n\x0d\x0a]+)[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?([^\n\x0d\x0a]+?)()(?:\((.+?)\))?# $',
 	$Prm{xos}		=>	'(?:\* )?([^\n\x0d\x0a]+)\.\d+ [>#] $',
+	$Prm{isw}		=>	'([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?[>#] $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
 );
 
@@ -140,6 +148,7 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{trpz}		=>	'SWITCHNAME[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?SWITCHNAME(?:\((.+?)\))?# $',
 	$Prm{xos}		=>	'(?:\* )?SWITCHNAME\.\d+ [>#] $',
+	$Prm{isw}		=>	'SWITCHNAME(?:\((.+?)\))?[>#] $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
 );
 my $LastPromptClense = '^(?:\x0d? *\x0d|\x10\x00)'; # When capturing lastprompt, SecureRouter and Xirrus sometimes precede the prompt with these characters
@@ -153,7 +162,14 @@ my %MorePrompt = ( # Regular expression character like ()[]. need to be backslas
 	$Prm{trpz}		=>	'press any key to continue, q to quit\.',
 	$Prm{xirrus}		=>	'--MORE--\x10?',
 	$Prm{xos}		=>	'\e\[7mPress <SPACE> to continue or <Q> to quit:(?:\e\[m)?',
-	$Prm{generic}		=>	'----More \(q=Quit, space/return=Continue\)----|--More-- \(q = quit\) |Press any key to continue \(q : quit\) :\x00|press any key to continue, q to quit\.|--MORE--|\e\[7mPress <SPACE> to continue or <Q> to quit:(?:\e\[m)?',
+	$Prm{isw}		=>	'-- more --, next page: Space, continue: g, quit: \^C',
+	$Prm{generic}		=>	'----More \(q=Quit, space/return=Continue\)----'
+					. '|--More-- \(q = quit\) '
+					. '|Press any key to continue \(q : quit\) :\x00'
+					. '|press any key to continue, q to quit\.'
+					. '|--MORE--'
+					. '|\e\[7mPress <SPACE> to continue or <Q> to quit:(?:\e\[m)?'
+					. '|-- more --, next page: Space, continue: g, quit: \^C'
 );
 my %MorePromptDelay = ( # Only when a possible more prompt can be matched as subset of other more prompt patterns; for these an extra silent read is required
 	$Prm{bstk}		=>	undef,
@@ -164,7 +180,12 @@ my %MorePromptDelay = ( # Only when a possible more prompt can be matched as sub
 	$Prm{trpz}		=>	undef,
 	$Prm{xirrus}		=>	undef,
 	$Prm{xos}		=>	undef,
+	$Prm{isw}		=>	undef,
 	$Prm{generic}		=>	'--More--',
+);
+
+our %MoreSkipWithin = ( # Only on family type switches were possible, set to the character used to skip subsequent more prompts
+	$Prm{isw}		=>	'g',
 );
 
 my %RefreshCommands = ( # Some commands on some devices endlessly refresh the output requested; not desireable when scripting CLI; these paterns determine how to exit such commands
@@ -222,6 +243,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|Invalid password. Authentication failed'			# username teamnoc level ro // invalid-old-pwd // ...
 					. '|Passwords do not match. Password change aborted'		# username teamnoc level ro // valid-old-pwd // newpwd // diffpwd
 					. '|Error: Prefix List ".+?" not found'				# no ip prefix-list "<non-existent>"
+					. '|Invalid ipv4 address\.'					# filter acl ace action 11 6 permit redirect-next-hop 2000:100::201 (on a non-ipv6 acl)
 				. ')',
 	$Prm{xlr}		=>	'^('
 					. '.+? not found'
@@ -243,6 +265,11 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 	$Prm{xos}		=>	'^('
 					. '\x07?\s+\^\n.+'
 				. ')',
+	$Prm{isw}		=>	'^('
+					. '\s+\^\n.+'
+					. '|% Incomplete command.'
+					. '|% Invalid '							# ISW3(config)#% interface vlan 101; ISW3(config-if-vlan)#% ip igmp snooping : % Invalid IGMP VLAN 101!
+				. ')',
 );
 our $CmdConfirmPrompt = '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - yes, n - no, <cr> - cancel) *[\)\]](?: *[?:] *| )$'; # Y/N prompt
 our $CmdInitiatedPrompt = '[?:=](?:[ \t]*|\(.+?\) )$'; # Prompt for additional user info
@@ -251,7 +278,9 @@ our $WakeConsole = "\n"; # Sequence to send when connecting to console to wake d
 my $LoginReadAttempts = 10;		# Number of read attempts for readwait() method used in login()
 my $CmdPromptReadAttempts = 8;		# Number of read attempts for readwait() method used in poll_cmd()
 my $ReadwaitTimer = 100;		# Timer to use when calling readwait()
-my $CmdTimeoutRatio = 0.1;		# In cmd() if read times out, a 2nd read is attempted with timeout * this ratio 
+my $CmdTimeoutRatio = 0.1;		# In cmd() if read times out, a 2nd read is attempted with timeout * this ratio
+my $NonRecognizedLogin = 0;		# In login() determines whether a non-recognized login output sequence makes method return using error mode action
+my $GenericLogin = 0;			# In login(), if set, disables extended discovery
 
 my $Space = " ";
 my $CTRL_C = "\cC";
@@ -366,7 +395,7 @@ sub connect { # All the steps necessary to connect to a CLI session on an Extrem
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
 				 'errmode', 'connection_timeout', 'timeout', 'read_attempts', 'wake_console',
 				 'return_reference', 'blocking', 'data_with_error', 'terminal_type', 'window_size',
-				 'callback', 'forcebaud', 'atomic_connect');
+				 'callback', 'forcebaud', 'atomic_connect', 'non_recognized_login', 'generic_login');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 
@@ -406,6 +435,8 @@ sub connect { # All the steps necessary to connect to a CLI session on an Extrem
 		read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 		data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
 		wake_console		=>	defined $args{wake_console} ? $args{wake_console} : $self->{$Package}{wake_console},
+		non_recognized_login	=>	defined $args{non_recognized_login} ? $args{non_recognized_login} : $NonRecognizedLogin,
+		generic_login		=>	defined $args{generic_login} ? $args{generic_login} : $GenericLogin,
 		# Declare method storage keys which will be used
 		stage			=>	$self->{LOGINSTAGE} ? 1 : 0,
 	};
@@ -449,7 +480,7 @@ sub login { # Handles steps necessary to get to CLI session, including menu, ban
 	my $pkgsub = "${Package}::login";
 	my $self =shift;
 	my @validArgs = ('username', 'password', 'prompt_credentials', 'timeout', 'errmode', 'return_reference',
-			 'read_attempts', 'wake_console', 'blocking', 'data_with_error');
+			 'read_attempts', 'wake_console', 'blocking', 'data_with_error', 'non_recognized_login', 'generic_login');
 	my %args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 
 	# Initialize the base POLL structure
@@ -472,6 +503,8 @@ sub login { # Handles steps necessary to get to CLI session, including menu, ban
 		read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 		data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
 		wake_console		=>	defined $args{wake_console} ? $args{wake_console} : $self->{$Package}{wake_console},
+		non_recognized_login	=>	defined $args{non_recognized_login} ? $args{non_recognized_login} : $NonRecognizedLogin,
+		generic_login		=>	defined $args{generic_login} ? $args{generic_login} : $GenericLogin,
 		# Declare method storage keys which will be used
 		stage			=>	0,
 		login_attempted		=>	undef,
@@ -1183,7 +1216,7 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
 				 'errmode', 'connection_timeout', 'login_timeout', 'read_attempts', 'wake_console',
 				 'data_with_error', 'terminal_type', 'window_size', 'callback', 'forcebaud',
-				 'atomic_connect');
+				 'atomic_connect', 'non_recognized_login', 'generic_login');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{host}, $args{port}, $args{username}, $args{password}, $args{publickey}, $args{privatekey},
@@ -1216,6 +1249,8 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 			read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 			data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
 			wake_console		=>	defined $args{wake_console} ? $args{wake_console} : $self->{$Package}{wake_console},
+			non_recognized_login	=>	defined $args{non_recognized_login} ? $args{non_recognized_login} : $NonRecognizedLogin,
+			generic_login		=>	defined $args{generic_login} ? $args{generic_login} : $GenericLogin,
 			# Declare method storage keys which will be used
 			stage			=>	$self->{LOGINSTAGE} ? 1 : 0,
 			# Declare keys to be set if method called from another polled method
@@ -1262,8 +1297,10 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 			Password		=> $connect->{password},
 			Read_attempts		=> $connect->{read_attempts},
 			Wake_console		=> $connect->{wake_console},
-			Prompt_credentials	=> $connect->{prompt_credentials},
 			Data_with_error		=> $connect->{data_with_error},
+			Non_recognized_login	=> $connect->{non_recognized_login},
+			Generic_login		=> $connect->{generic_login},
+			Prompt_credentials	=> $connect->{prompt_credentials},
 			Timeout			=> $connect->{login_timeout},
 	);
 	$self->{POLL}{output_buffer} = $$outRef if $ok;
@@ -1282,7 +1319,8 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 	}
 
 	unless (defined $self->{POLL}{$pollsub}) { # Only applicable if called from another method already in polling mode
-		my @validArgs = ('username', 'password', 'prompt_credentials', 'timeout', 'errmode', 'read_attempts', 'wake_console', 'data_with_error');
+		my @validArgs = ('username', 'password', 'prompt_credentials', 'timeout', 'errmode', 'read_attempts', 'wake_console',
+				 'data_with_error', 'non_recognized_login', 'generic_login');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{username}, $args{password}, $args{read_attempts}, $args{wake_console},
@@ -1293,10 +1331,12 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			# Set method argument keys
 			username		=>	defined $args{username} ? $args{username} : $self->{USERNAME},
 			password		=>	defined $args{password} ? $args{password} : $self->{PASSWORD},
+			prompt_credentials	=>	defined $args{prompt_credentials} ? $args{prompt_credentials} : $self->{prompt_credentials},
 			read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 			data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
 			wake_console		=>	defined $args{wake_console} ? $args{wake_console} : $self->{$Package}{wake_console},
-			prompt_credentials	=>	defined $args{prompt_credentials} ? $args{prompt_credentials} : $self->{prompt_credentials},
+			non_recognized_login	=>	defined $args{non_recognized_login} ? $args{non_recognized_login} : $NonRecognizedLogin,
+			generic_login		=>	defined $args{generic_login} ? $args{generic_login} : $GenericLogin,
 			# Declare method storage keys which will be used
 			stage			=>	0,
 			login_attempted		=>	undef,
@@ -1423,8 +1463,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 						if ($key eq 'banner' || $key eq 'menu' || $key eq 'submenu') {
 							$login->{family_type} = $Prm{bstk};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 1);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1);
 							if ($key eq 'banner') {
 								$self->{POLL}{read_buffer} =~ /\*\*\* ((?:[^\*\n]+?) (?:Switch|Controller|Platform) (?:WC)?\d+.*?)\s+/ &&
 									$self->_setModelAttrib($1);
@@ -1437,45 +1476,43 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 						elsif ($key eq 'srbanner') {
 							$login->{family_type} = $Prm{sr};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 1);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1);
 							$self->{POLL}{read_buffer} =~ /\((Secure Router \d+)\)/ && $self->_setModelAttrib($1);
 							$self->{POLL}{read_buffer} =~ /Version: (.+)/ && $self->_setAttrib('sw_version', $1);
 						}
 						elsif ($key eq 'xlrbanner') {
 							$login->{family_type} = $Prm{xlr};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 0);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0);
 							$self->{POLL}{read_buffer} =~ /\* Software Release (?i:v|REL)?(.+?) / && $self->_setAttrib('sw_version', $1);
 						}
 						elsif ($key eq 'ersbanner' || $key eq 'passportbanner' || $key eq 'pp1600banner') {
 							$login->{family_type} = $Prm{pers};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 0);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0);
 							$self->{POLL}{read_buffer} =~ /\* Software Release (?i:v|REL)?(.+?) / && $self->_setAttrib('sw_version', $1);
 						}
 						elsif ($key eq 'vspbanner') {
 							$login->{family_type} = $Prm{pers};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 1);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1);
 							$self->{POLL}{read_buffer} =~ /Software Release Build (.+?) / && $self->_setAttrib('sw_version', $1);
 						}
 						elsif ($key eq 'wlan9100banner') {
 							$login->{family_type} = $Prm{xirrus};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 1);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1);
 							$self->{POLL}{read_buffer} =~ /AvayaOS Version (.+?) / && $self->_setAttrib('sw_version', $1);
 						}
 						elsif ($key eq 'xos') {
 							$login->{family_type} = $Prm{xos};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setAttrib('family_type', $login->{family_type});
-							$self->_setAttrib('is_nncli', 0);
-							$self->_setAttrib('is_xos', 1);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_xos => 1);
+						}
+						elsif ($key eq 'isw') {
+							$login->{family_type} = $Prm{isw};
+							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1, is_isw => 1, baudrate => 115200);
 						}
 					}
 					if ($patdepth > $deepest) { # We have a deeper match, we keep it
@@ -1589,8 +1626,11 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 				$login->{login_error} = "Switch got no response from RADIUS servers\n";
 				next; # In this case don't error, as radius falback might still get us in
 			}
+			if (!$login->{family_type} && $login->{non_recognized_login}) { # If we have some complete output, which does not match any of the above, we can come out if we asked to
+				return $self->poll_return($self->error("$pkgsub: Non recognized login output"));
+			}
 		}
-		if ($login->{family_type} eq $Prm{generic} || ($login->{detectionFromPrompt} && $self->{LASTPROMPT} !~ /^@/) ) { # Can't tell, need extended discovery
+		if (!$login->{generic_login} && ($login->{family_type} eq $Prm{generic} || ($login->{detectionFromPrompt} && $self->{LASTPROMPT} !~ /^@/)) ) { # Can't tell, need extended discovery
 			$login->{stage}++; # Move to next section in non-blocking mode
 		}
 		else {
@@ -1607,12 +1647,12 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 		}
 		$login->{stage} += 2; # Move to final section
 	}
-	if ($login->{stage} < 4) { # Family type was detected, not just from the prompt (though we do rely on prompt alone for Standby CPUs on PassportERS)
+	if ($login->{stage} < 4) { # Generic_login OR family type was detected, not just from the prompt (though we do rely on prompt alone for Standby CPUs on PassportERS)
 		if ($login->{family_type} eq $Prm{pers} || $login->{family_type} eq $Prm{xlr}) {
 			$self->_setAttrib('is_master_cpu', $self->{LASTPROMPT} =~ /^@/ ? 0 : 1);
 			$self->_setAttrib('is_dual_cpu', 1) if $self->{LASTPROMPT} =~ /^@/;
 		}
-		$self->_setAttrib('family_type', $login->{family_type}) if $login->{detectionFromPrompt};
+		$self->_setFamilyTypeAttrib($login->{family_type}) if $login->{detectionFromPrompt};
 	}
 
 	# Store credentials if these were used
@@ -1776,7 +1816,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 
 		my $output = $cmd->{lastLine}.$self->{POLL}{read_buffer};	# New output appended to previous lastLine
 		$self->{POLL}{output_buffer} .= $cmd->{outputNewline};		# Re-add newLine if had been withheld
-		#$self->debugMsg(8,"\ncmd() Output for new cycle:\n>", \$output, "<\n") if length $output;
+		$self->debugMsg(8,"\ncmd() Output for new cycle:\n>", \$output, "<\n") if length $output;
 
 		# We check for refresh patterns here, as the patterns may not be in the lastline
 		if ($self->{$Package}{noRefreshCmdPattern} && !$cmd->{noRefreshCmdDone} && $output =~ /$self->{$Package}{noRefreshCmdPattern}/m) { # We have a refreshed command
@@ -1787,11 +1827,13 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 		}
 
 		if (length $output) { # Clean up patterns
-			$output =~ s/^(?:\x08 \x08)*//;					# Remove backspace chars following a more prompt, if any
+			$output =~ s/^(?:\x08 \x08)+//;					# Remove backspace chars following a more prompt, if any
 			$output =~ s/^\x0d *\x00\x0d//	if $familyType eq $Prm{sr};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
+			$output =~ s/^(?:\e\[D \e\[D)+// if $familyType eq $Prm{isw};	# Remove ISW escape sequences following more prompt
 			$output =~ s/^(?:\e\[60;D|(?:\e\[m)?\x0d)\e\[K// if $familyType eq $Prm{xos};	# Remove ExtremeXOS escape sequence following more prompt
 			$output =~ s/\e\[2J\e\[H//       if $cmd->{noRefreshCmdDone} && $familyType eq $Prm{pers}; # Recover from ExtremeXOS refreshed command
 			$output =~ s/\x0d\e\[23A\e\[J/\n/ if $cmd->{noRefreshCmdDone} && $familyType eq $Prm{xos}; # Recover from ExtremeXOS refreshed command
+			$output =~ s/$cmd->{more_prompt}(?:\e\[D \e\[D)+//g if $familyType eq $Prm{isw} && $cmd->{more_prompt};	# Remove double --more-- prompt which is not used
 			if ($familyType eq $Prm{xirrus}) {
 				$output =~ s/\x10?\x00//g; 				# Remove weird chars that WLAN9100 peppers output with, with telnet only, 
 											# ...in some case even not at beginning of line..
@@ -1853,16 +1895,21 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 				$self->{POLL}{output_buffer} .= $cmd->{outputNewline} if $newLineLastLine;
 			}
 			$cmd->{outputNewline} = '' if $newLineLastLine; # Either way (\n gobbled or not) we clear it
-			if ($cmd->{more_pages} == 0 || $cmd->{more_pages}-- > 1) { # We get the next page
+			my $char;
+			if (defined $MoreSkipWithin{$familyType} && $cmd->{more_pages} == 0) { # On ISW we have an option to skip more paging
+				$char = $MoreSkipWithin{$familyType};
+				$self->debugMsg(8,"\ncmd() More prompt detected; skipping subsequent by feeding '$char'\n");
+			}
+			elsif ($cmd->{more_pages} == 0 || $cmd->{more_pages}-- > 1) { # We get the next page
+				$char = $Space;
 				$self->debugMsg(8,"\ncmd() More prompt detected; feeding 'SPACE'\n");
-				$self->put(string => $Space, errmode => 'return')
-					or return $self->poll_return($self->error("$pkgsub: Unable to page at more prompt // ".$self->errmsg));
 			}
 			else { # We quit here
+				$char = 'q';
 				$self->debugMsg(8,"\ncmd() More prompt detected; feeding 'Q'\n");
-				$self->put(string => 'q', errmode => 'return')
-					or return $self->poll_return($self->error("$pkgsub: Unable to quit more prompt // ".$self->errmsg));
 			}
+			$self->put(string => $char, errmode => 'return')
+				or return $self->poll_return($self->error("$pkgsub: Unable to page at more prompt // ".$self->errmsg));
 			return $self->poll_return(0) unless $self->{POLL}{blocking};
 			next CMDLOOP;
 		}
@@ -2033,7 +2080,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		};
 		$attrib->{attribute} eq 'max_baud' && do {
 			if ($attrib->{stage} < 4) { # 4th stage
-				my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['config bootconfig sio console baud ?', "boot config sio console baud ?$CTRL_C"], 1);
+				my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['config bootconfig sio console baud ?', "boot config sio console baud ?$CTRL_C"], undef, 1);
 				return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 				# VSP9k		:   <9600 - 115200>  Baud rate {9600 | 19200 | 38400 | 57600 | 115200}
 				# 8600acli	:   <1200-115200>  Rate
@@ -2048,7 +2095,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 					$attrib->{debugMsg} = 0;
 				}
 			}
-			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['config bootconfig sio baud ?', "boot config sio baud ?$CTRL_C"], 1);
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['config bootconfig sio baud ?', "boot config sio baud ?$CTRL_C"], undef, 1);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			# 8300nncli	:   <1200-115200>  rate
 			# 8300ppcli	:<rate>           = what rate {2400|4800|9600|19200|38400|57600|115200} IN {1200..115200}
@@ -2080,6 +2127,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				if ($self->{$Package}{ATTRIB}{'is_voss'}) {
 					if ($$outref =~ /BrandName:?\s+: (.+)/gc) { # On VOSS VSPs we read it
 						(my $brandname = $1) =~ s/, Inc\.$//; # Remove 'Inc.'
+						$brandname =~ s/\.$//; # Remove trailing full stop
 						$self->_setAttrib('brand_name', $brandname);
 					}
 					else { # VSP9000 case, it is_voss, but reports no BrandName, so we set it..
@@ -2128,6 +2176,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				if ($self->{$Package}{ATTRIB}{'is_voss'}) {
 					if ($$outref =~ /BrandName:?\s+: (.+)/gc) { # On VOSS VSPs we read it
 						(my $brandname = $1) =~ s/, Inc\.$//; # Remove 'Inc.'
+						$brandname =~ s/\.$//; # Remove trailing full stop
 						$self->_setAttrib('brand_name', $brandname);
 					}
 					else { # VSP9000 case, it is_voss, but reports no BrandName, so we set it..
@@ -2539,7 +2588,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		 $attrib->{attribute} eq 'unit_number' || $attrib->{attribute} eq 'master_unit') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show stacking']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			if ($$outref =~ /This node is not in an Active Topology/g) {
+			if ($$outref =~ /(?:This node is not in an Active Topology|stacking-support:\s+\w+\s+Disabled)/) {
 				$self->_setAttrib('switch_mode', 'Switch');
 				$self->_setAttrib('unit_number', undef);
 				$self->_setAttrib('stack_size', undef);
@@ -2584,6 +2633,25 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$self->_setAttrib('is_oob_connected', defined $self->socket &&
 				(defined $self->{$Package}{ATTRIB}{'oob_ip'} && $self->socket->peerhost eq $self->{$Package}{ATTRIB}{'oob_ip'}) ?
 				1 : 0 );
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+	}
+	elsif ($familyType eq $Prm{isw}) {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'sw_version')&& do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /MAC Address      : (.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /System Name      : (.+)/g && $self->_setAttrib('sysname', $1);
+			$$outref =~ /Product          : (.+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Software Version : V(.+)/g && $self->_setAttrib('sw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show interface * veriphy']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$self->_setSlotPortHashAttrib($outref);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -2978,6 +3046,7 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	return $self->poll_return($self->error("$pkgsub: No connection established")) unless $familyType;
+	return $self->poll_return(1) if $familyType eq $Prm{isw};
 	if ($familyType eq $Prm{bstk}) {
 		$devMorePage->{cmdString} = $devMorePage->{enable} ? 23 : 0 unless defined $devMorePage->{cmdString};
 		my ($ok, undef, $resref) = $self->poll_cmd($pkgsub, "terminal length $devMorePage->{cmdString}");
@@ -3279,7 +3348,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		# Output from commands below is prone to false triggers on the generic prompt;
 		#  so we lock it down to the minimum length required
 		$self->last_prompt =~ /(.*)([\?\$%#>]\s?)$/;
-		$self->prompt(join('', ".{", length($1), ",}$2\$"));
+		$self->prompt(join('', ".{", length($1), ",}\\$2\$"));
 	}
 
 	# Prefer commands unique to platform, and with small output (not more paged)
@@ -3290,8 +3359,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /\s+Configured\s+In Use\s+Last BootP/) {
-			$self->_setAttrib('family_type', $Prm{bstk});
-			$self->_setAttrib('is_nncli', 1);
+			$self->_setFamilyTypeAttrib($Prm{bstk}, is_nncli => 1);
 			$self->{$Package}{PROMPTTYPE} = $Prm{bstk};
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{bstk}}/;
@@ -3305,9 +3373,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^\s+auto-recover-delay :/m) {
-			$self->_setAttrib('family_type', $Prm{pers});
-			$self->_setAttrib('is_nncli', 1);
-			$self->_setAttrib('is_master_cpu', 1);
+			$self->_setFamilyTypeAttrib($Prm{pers}, is_nncli => 1, is_master_cpu => 1);
 			$self->{$Package}{PROMPTTYPE} ="$Prm{pers}_nncli";
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
 			$self->{LASTPROMPT} =~ /$InitPrompt{"$Prm{pers}_nncli"}/;
@@ -3317,15 +3383,14 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 	}
 	if ($discDevice->{stage} < 4) { # Next stage
 		# ExtremeXOS detection command
-		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version');
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include XOS');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^Image   : ExtremeXOS version (.+) by /m) {
-			$self->_setAttrib('sw_version', $1);
+			my $version = $1;
+			$self->_setFamilyTypeAttrib($Prm{xos}, is_nncli => 0, is_xos => 1);
+			$self->_setAttrib('sw_version', $version);
 			$self->_setAttrib('fw_version', $1) if $$outref =~ /^BootROM :(.+)$/m;
-			$self->_setAttrib('family_type', $Prm{xos});
-			$self->_setAttrib('is_nncli', 0);
-			$self->_setAttrib('is_xos', 1);
 			$self->{$Package}{PROMPTTYPE} = $Prm{xos};
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{xos}}/;
@@ -3334,15 +3399,30 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		}
 	}
 	if ($discDevice->{stage} < 5) { # Next stage
+		# ISW detection command
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'do show version | include ISW'); # Must add do, as we may be in config mode
+		return $ok unless $ok;
+		$discDevice->{stage}++; # Move to next stage on next cycle
+		if ($$outref =~ /^Product          : (.+)(?:, PoE Switch)?/m) {
+			my $model = $1;
+			$self->_setFamilyTypeAttrib($Prm{isw}, is_nncli => 1, is_isw => 1, baudrate => 115200);
+			$self->_setModelAttrib($model);
+			$self->{$Package}{PROMPTTYPE} = $Prm{isw};
+			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{isw}}/;
+			$self->_setDevicePrompts($Prm{isw}, $1);
+			return (1, $Prm{isw});
+		}
+	}
+	if ($discDevice->{stage} < 6) { # Next stage
 		# PassportERS-cli detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show bootconfig info');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^Version:\s+(?i:v|REL)?(.+)/m) {
-			$self->_setAttrib('fw_version', $1);
-			$self->_setAttrib('family_type', $Prm{pers});
-			$self->_setAttrib('is_nncli', 0);
-			$self->_setAttrib('is_master_cpu', 1);
+			my $version = $1;
+			$self->_setFamilyTypeAttrib($Prm{pers}, is_nncli => 0, is_master_cpu => 1);
+			$self->_setAttrib('fw_version', $version);
 			$self->{$Package}{PROMPTTYPE} = "$Prm{pers}_cli";
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
 			$self->{LASTPROMPT} =~ /$InitPrompt{"$Prm{pers}_cli"}/;
@@ -3350,15 +3430,14 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{pers});
 		}
 	}
-	if ($discDevice->{stage} < 6) { # Next stage
+	if ($discDevice->{stage} < 7) { # Next stage
 		# WLAN 9100 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show contact-info');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^Access Point Hostname\s*(.+)$/m) {
 			my $sysname = $1;
-			$self->_setAttrib('family_type', $Prm{xirrus});
-			$self->_setAttrib('is_nncli', 1);
+			$self->_setFamilyTypeAttrib($Prm{xirrus}, is_nncli => 1);
 			$self->_setAttrib('sysname', $sysname);
 			$self->{$Package}{PROMPTTYPE} = $Prm{xirrus};
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
@@ -3367,15 +3446,14 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{xirrus});
 		}
 	}
-	if ($discDevice->{stage} < 7) { # Next stage
+	if ($discDevice->{stage} < 8) { # Next stage
 		# Secure Router detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show chassis');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^Chassis Model: (.+)$/m) {
 			my $model = $1;
-			$self->_setAttrib('family_type', $Prm{sr});
-			$self->_setAttrib('is_nncli', 1);
+			$self->_setFamilyTypeAttrib($Prm{sr}, is_nncli => 1);
 			$self->_setModelAttrib($model);
 			$self->{$Package}{PROMPTTYPE} = $Prm{sr};
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
@@ -3384,15 +3462,14 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{sr});
 		}
 	}
-	if ($discDevice->{stage} < 8) { # Next stage
+	if ($discDevice->{stage} < 9) { # Next stage
 		# WLAN 2300 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show system');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /Product Name:\s+(.+)/g) {
 			my $model = $1;
-			$self->_setAttrib('family_type', $Prm{trpz});
-			$self->_setAttrib('is_nncli', 1);
+			$self->_setFamilyTypeAttrib($Prm{trpz}, is_nncli => 1);
 			$self->_setModelAttrib($model);
 			$$outref =~ /System Name:\s+(.+)/g && $self->_setAttrib('sysname', $1);
 			$$outref =~ /System MAC:\s+(.+)/g && $self->_setBaseMacAttrib($1);
@@ -3403,15 +3480,13 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{trpz});
 		}
 	}
-	if ($discDevice->{stage} < 9) { # Next stage
+	if ($discDevice->{stage} < 10) { # Next stage
 		# Accelar detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show sys perf');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^\s+NVRamSize:/m) {
-			$self->_setAttrib('family_type', $Prm{xlr});
-			$self->_setAttrib('is_nncli', 0);
-			$self->_setAttrib('is_master_cpu', 1);
+			$self->_setFamilyTypeAttrib($Prm{xlr}, is_nncli => 0, is_master_cpu => 1);
 			$self->{$Package}{PROMPTTYPE} = $Prm{xlr};
 			$self->debugMsg(4,"Prompt type = $self->{$Package}{PROMPTTYPE}\n\n");
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{xlr}}/;
@@ -3421,8 +3496,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 	}
 
 	# We give up; set as generic device
-	$self->_setAttrib('family_type', $Prm{generic});
-	$self->_setAttrib('is_nncli', 0);
+	$self->_setFamilyTypeAttrib($Prm{generic}, is_nncli => 0);
 	$self->_setDevicePrompts($Prm{generic});
 	return (1, $Prm{generic});
 }
@@ -3448,7 +3522,7 @@ sub debugMsg { # Print a debug message
 ########################################## Internal Private Methods ##########################################
 
 sub _attribExecuteCmd { # Executes commands for attribute retrieval
-	my ($self, $pkgsub, $attrib, $cmd, $pages) = @_;
+	my ($self, $pkgsub, $attrib, $cmd, $pages, $cmdConfig) = @_;
 
 	unless ($attrib->{debugMsg}) {
 		my $cmdInfo = $#$cmd ? $cmd->[$self->{$Package}{ATTRIB}{'is_nncli'}] : $cmd->[0];
@@ -3456,6 +3530,7 @@ sub _attribExecuteCmd { # Executes commands for attribute retrieval
 		$self->debugMsg(4,"Seeking attribute $attrib->{attribute} value by issuing command: ", \$cmdInfo, " $pageInfo\n");
 		$attrib->{debugMsg} = 1;
 	}
+	return $self->cmdConfig($pkgsub, $cmd->[0], $cmd->[1]) if $#$cmd && $cmdConfig;
 	return $self->cmdPrivExec($pkgsub, $cmd->[0], $cmd->[1], $pages) if $#$cmd;
 	return $self->poll_cmd($pkgsub, $cmd->[0], $pages);
 }
@@ -3474,6 +3549,26 @@ sub _setDevicePrompts { # Steps to set the actual device prompt & more prompt
 	$self->prompt($setPrompt);
 	$self->more_prompt($MorePrompt{$keyType}, $MorePromptDelay{$keyType});
 	$self->no_refresh_cmd($RefreshCommands{$keyType}{pattern}, $RefreshCommands{$keyType}{send}) if defined $RefreshCommands{$keyType};
+	return;
+}
+
+
+sub _setFamilyTypeAttrib { # Set family_type attribute and other related settings
+	my ($self, $family, %attribList) = @_;
+	$self->_setAttrib('family_type', $family);
+	if (defined $Attribute{$family}) {
+		$self->_setAttrib('all', [@{$Attribute{Global}}, @{$Attribute{$family}}]);
+		$self->debugMsg(4,"Attribute - all = Global + $family attributes\n");
+	}
+	else {
+		$self->_setAttrib('all', $Attribute{Global});
+		$self->debugMsg(4,"Attribute - all = Global only\n");
+	}
+	if (%attribList) { # Set other fixed value attributes
+		foreach my $attrib (keys %attribList) {
+			$self->_setAttrib($attrib, $attribList{$attrib});
+		}
+	}
 	return;
 }
 
@@ -3499,6 +3594,26 @@ sub _setSlotPortAttrib { # Set the Slot & Port attributes
 	@slots = sort {$a <=> $b} @slots; # Slots might need re-arranging on older swithes with fastEther & gigEther ports 
 	$self->_setAttrib('slots', \@slots);
 	$self->_setAttrib('ports', \@ports);
+	return;
+}
+
+
+sub _setSlotPortHashAttrib { # Set the Slot & Port attributes where the port attribute is a hash (not an array)
+	my ($self, $outref) = @_;
+	my (@slots, %ports, $currentHash);
+	# Get current attribute if partly stored
+	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
+	%ports = %{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
+	while ($$outref =~ /^(FastEthernet|GigabitEthernet) (\d\/\d{1,2})/mg) {
+		if (!defined $currentHash || $1 ne $currentHash) { # New hash
+			$currentHash = $1;
+			push(@slots, $currentHash) unless grep {$_ eq $currentHash} @slots;
+		}
+		push(@{$ports{$currentHash}}, $2) unless grep {$_ eq $2} @{$ports{$currentHash}};
+	}
+	@slots = sort {$a cmp $b} @slots; # Slots might need re-arranging on older swithes with fastEther & gigEther ports 
+	$self->_setAttrib('slots', \@slots);
+	$self->_setAttrib('ports', \%ports);
 	return;
 }
 
@@ -3533,6 +3648,12 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{xirrus}) {
 		# Try and reformat the model number into something like WAP-9132
 		$model =~ s/(\D+)(\d+)/$1-$2/;		# From show chassis
+	}
+	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{isw}) {
+		# Try and reformat the model number into something like ISW_8-10/100P_4-SFP
+		$model =~ s/, (?:PoE )?Switch$//;
+		$model =~ s/ /_/g;		# From: ISW 8-10/100P, 4-SFP
+		$model =~ s/,//g;		# From: ISW_8-10/100P_4-SFP
 	}
 	elsif ($self->{$Package}{ATTRIB}{'is_apls'}) {
 		# Try and reformat from DSG6248CFP to DSG-6248-CFP
@@ -3601,17 +3722,6 @@ sub _setAttrib { # Set attribute
 	}
 	else {
 		$self->debugMsg(4,"Attribute - $attrib => undef\n");
-	}
-	if ($attrib eq 'family_type') {
-		if (defined $Attribute{$value}) {
-			$self->{$Package}{ATTRIB}{'all'} = [@{$Attribute{Global}}, @{$Attribute{$value}}];
-			$self->debugMsg(4,"Attribute - all = Global + $value attributes\n");
-		}
-		else {
-			$self->{$Package}{ATTRIB}{'all'} = $Attribute{Global};
-			$self->debugMsg(4,"Attribute - all = Global only\n");
-		}
-		$self->{$Package}{ATTRIBFLAG}{'all'} = 1;
 	}
 	return;
 }
@@ -3842,6 +3952,10 @@ ERS models 2500, 3x00, 4x00, 5x00
 
 =item *
 
+ISW industrial switches
+
+=item *
+
 SR models 2330, 4134
 
 =item *
@@ -4013,6 +4127,8 @@ Methods which can be run on a previously created Control::CLI::Extreme instance
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
   	[Atomic_connect		=> $flag,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
   ($ok, $output || $outputRef) = $obj->connect(
@@ -4042,6 +4158,8 @@ Methods which can be run on a previously created Control::CLI::Extreme instance
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
   	[Atomic_connect		=> $flag,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 Polling method (only applicable in non-blocking mode):
@@ -4090,6 +4208,8 @@ For Telnet, these arguments are used:
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
   	[Atomic_connect		=> $flag,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 If not specified, the default port number for Telnet is 23. The wake_console argument is only relevant when connecting to a Telnet port other than 23 (i.e. to a Terminal Server device) or if console() has been manually set; see console(). In which case, the login() method, which is called by connect(), will automatically send the wake_console string sequence to the attached device to alert it of the connection. The default sequence will work across all Extreme Networking products but can be overridden by using the wake_console argument. See wake_console().
@@ -4121,6 +4241,8 @@ For SSH, these arguments are used:
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
   	[Atomic_connect		=> $flag,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 If not specified, the default port number for SSH is 22. The wake_console argument is only relevant when connecting to a SSH port other than 22 (i.e. to a Terminal Server device) or if console() has been manually set; see console(). In which case, the login() method, which is called by connect(), will automatically send the wake_console string sequence to the attached device to alert it of the connection. The default sequence will work across all Extreme Networking products but can be overridden by using the wake_console argument. See wake_console().
@@ -4161,6 +4283,8 @@ For Serial port, these arguments are used:
   	[Wake_console		=> $string,]
   	[Blocking		=> $flag,]
   	[Errmode		=> $errmode,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 If arguments "baudrate", "parity", "databits", "stopbits" and "handshake" are not specified, the defaults are: Baud Rate = 9600, Data Bits = 8, Parity = none, Stop Bits = 1, Handshake = none. These default values will work on all Extreme Networking products with default settings.
@@ -4207,6 +4331,8 @@ Or, if you have set an error mode action of 'return':
   	[Wake_console		=> $string,]
   	[Blocking		=> $flag,]
   	[Errmode		=> $errmode,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
   ($ok, $output || $outputRef) = $obj->login(
@@ -4220,6 +4346,8 @@ Or, if you have set an error mode action of 'return':
   	[Wake_console		=> $string,]
   	[Blocking		=> $flag,]
   	[Errmode		=> $errmode,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 Polling method (only applicable in non-blocking mode):
@@ -4233,7 +4361,7 @@ This method handles login authentication for Telnet and Serial port access (also
 On success the method returns a true (1) value. On failure the error mode action is performed. See errmode().
 In non-blocking mode (blocking disabled) the login() method will most likely immediately return with a false, but defined, value of 0. You will then need to call the login_poll() method at regular intervals until it returns a true (1) value indicating that the login is complete.
 In the first form only a success/failure value is returned in scalar context, while in the second form, in list context, both the success/failure value is returned as well as any output received from the host device during the login sequence; the latter is either the output itself or a reference to that output, depending on the object setting of return_reference or the argument override provided in this method.
-This method internally uses the readwait() method and by default sets the read_attemps for it to 10 (which is a safe value to ensure proper connection to any Extreme Networking device); the read_attempts argument provided by login() can be used to override that value.
+This method internally uses the readwait() method and by default sets the read_attemps for it to 10 (which is a safe value to ensure proper connection to any Extreme Networking device); the read_attempts argument provided by login() can be used to override that value. The non_recognized_login argument flag controls whether the method should immediately return when an initial login output sequence is not recognized or whether the method should keep trying to read login output until either a recognized login prompt is detected or expiry of the timeout. The generic_login argument flag disables extended discovery if it is desired to connect to non Extreme devices using this class.
 
 Once a valid Extreme Networking CLI prompt is detected (using pre-configured pattern match strings), this method records the actual CLI prompt of the host device for the remainder of the session by automatically invoking the prompt() method with a new pattern match string based on the actual device CLI prompt. This ensures a more robust behaviour where the chances of triggering on a fake prompt embedded in the device output data is greatly reduced.
 At the same time this method will also set the --more-- prompt used by the device when paging output as well as a number of attributes depending on what family_type was detected for the host device. See attribute().
@@ -4659,6 +4787,10 @@ B<PassportERS> : Any of Passport/ERS-1600, Passport/ERS-8x00, VOSS VSPs (VSP-900
 
 =item *
 
+B<ISW> : ISW industrial switches
+
+=item *
+
 B<WLAN9100> : WLAN 91xx Access Points
 
 =item *
@@ -4682,7 +4814,7 @@ B<generic> : Not an Extreme Networking product; equivalent functionality to Cont
 
 =item *
 
-I<model>: Device model e.g. X460G2-24t-10G4, VSP-8284-XSQ, ERS-4526-GTX-PWR; The model naming will usually be in the format <VSP|ERS|ES|WC>-<number>-<type>-<subtype>. This attribute will remain undefined if connected to the Standby CPU of a PassportERS device.
+I<model>: Device model e.g. X460G2-24t-10G4, VSP-8284-XSQ, ERS-4526-GTX-PWR; The model naming will usually be in the format <VSP|ERS|ES|WC>-<number>-<type>-<subtype>. This attribute will remain undefined if connected to the Standby CPU of a PassportERS device. Typical ISW formatting is ISW_8-10/100P_4-SFP or ISW_4GbP_2GbT_2-SFP.
 
 =item *
 
@@ -4695,7 +4827,7 @@ I<base_mac>: Base MAC address of the device in string format xx-xx-xx-xx-xx-xx. 
 =item *
 
 I<is_acli>: Flag; true(1) for Cisco like acli mode which has PrivExec & Config modes; false(0) otherwise.
-So for family types B<BaystackERS>, B<SecureRouter>, B<WLAN2300>, B<WLAN9100> and B<PassportERS> (the latter in acli mode) this flag is true.
+So for family types B<BaystackERS>, B<SecureRouter>, B<WLAN2300>, B<WLAN9100> B<ISW> and B<PassportERS> (the latter in acli mode) this flag is true.
 Whereas for family types B<ExtremeXOS>, B<Accelar>, B<generic> and B<PassportERS> (the latter in cli mode) this flag is false.
 
 =item *
@@ -4712,12 +4844,12 @@ I<fw_version>: BootROM / Boot Monitor / Firmware verson, if applicable, undef ot
 
 =item *
 
-I<slots>: Returns a list (array reference) of all valid slot numbers (or unit numbers in a stack); returns an empty list if the device ports have no slot number associated (e.g. a BaystackERS or ExtremeXOS switch in non-stacking/standalone mode) and undefined if no slot/port information could be retrieved from the device, e.g. if connected to the Standby CPU of a PassportERS device
+I<slots>: Returns a list (array reference) of all valid slot numbers (or unit numbers in a stack) or interface types (in the case of ISW there are FastEthernet & GigabitEtherne interfaces); returns an empty list if the device ports have no slot number associated (e.g. a BaystackERS or ExtremeXOS switch in non-stacking/standalone mode) and undefined if no slot/port information could be retrieved from the device, e.g. if connected to the Standby CPU of a PassportERS device
 
 =item *
 
-I<ports>: If the I<slots> attribute is defined, this attribute returns an array reference where the index is the slot number (valid slot numbers are provided by the I<slots> attribute) and the array elements are a list (array references again) of valid ports for that particular slot. Note that for 40GbE/100GbE channelized ports the 10GbE/25GbE sub interfaces will be listed in port/subport fashion in this list; e.g. channelized ports 1/2/1-1/2/4 will be seen as ports 2/1,2/2,2/3,2/4 on the port list for slot 1.
-If the I<slots> attribute is defined but empty (i.e. there is no slot number associated to available ports - e.g. a BaystackERS switch in standalone mode), this attribute returns a list (array reference) of valid port numbers for the device.
+I<ports>: If the I<slots> attribute is defined, this attribute returns an array (slots are numbers) or hash (slots are names; in the case of ISW, names 'FastEthernet' and 'GigabitEthernet') reference where the index/key is the slot number (valid slot/key numbers are provided by the I<slots> attribute) and the array/hash elements are a list (array references) of valid ports for that particular slot. Note that for 40GbE/100GbE channelized ports the 10GbE/25GbE sub interfaces will be listed in port/subport fashion in this list; e.g. channelized ports 1/2/1-1/2/4 will be seen as ports 2/1,2/2,2/3,2/4 on the port list for slot 1.
+If the I<slots> attribute is defined but empty (i.e. there is no slot number associated to available ports - e.g. a BaystackERS switch in standalone mode), this attribute returns a list (array reference) of valid port numbers for the device. (The test script for this class - extreme.cli.t - has an attribute method that shows how to decode the slot & port attributes).
 
 =item *
 
@@ -4886,6 +5018,18 @@ I<oob_ip>: Out-of-band IP address (only defined on devices which have an OOB por
 =item *
 
 I<is_oob_connected>: Flag; true(1) if the connection to the device is to the oob_ip IP address; false(0) otherwise
+
+=back
+
+
+
+Attributes which only apply to B<ISW> family type:
+
+=over 4
+
+=item *
+
+I<is_isw>: Flag; true(1) if the device is an ISW industrial switch; false(0) otherwise.
 
 =back
 
@@ -5614,6 +5758,8 @@ Of the supported family types only the WLAN2300 requires a password to access pr
   	[Errmode                => $errmode,]
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
   ($ok, $outputref) = $obj->poll_connect($pkgsub,
@@ -5638,6 +5784,8 @@ Of the supported family types only the WLAN2300 requires a password to access pr
   	[Errmode                => $errmode,]
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 Normally this is the internal method used by connect() and connect_poll() methods.
@@ -5655,6 +5803,8 @@ Arguments after $ok will only be defined if $ok is true(1).
   	[Data_with_error        => $flag,]
   	[Wake_console           => $string,]
   	[Errmode                => $errmode,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
   ($ok, $outputref) = $obj->poll_login($pkgsub,
@@ -5666,6 +5816,8 @@ Arguments after $ok will only be defined if $ok is true(1).
   	[Data_with_error        => $flag,]
   	[Wake_console           => $string,]
   	[Errmode                => $errmode,]
+  	[Non_recognized_login	=> $flag,]
+  	[Generic_login		=> $flag,]
   );
 
 Normally this is the internal method used by login() and login_poll() methods.

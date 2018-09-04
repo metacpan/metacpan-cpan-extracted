@@ -21,6 +21,7 @@ t/actions.mwb
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/comment.mwb
+t/comment.mwb.bak
 t/date.mwb
 t/index.mwb
 t/test.mwb

@@ -129,7 +129,45 @@ EOT
         return new PlInt(count);
 EOT
     write => <<'EOT',
-        return PlCORE.die("write() not implemented");
+
+        // The current format name is stored in the variable $~ ($FORMAT_NAME), and
+        // the current top of form format name is in $^ ($FORMAT_TOP_NAME). The
+        // current output page number is stored in $% ($FORMAT_PAGE_NUMBER), and the
+        // number of lines on the page is in $= ($FORMAT_LINES_PER_PAGE). Whether to
+        // autoflush output on this handle is stored in $| ($OUTPUT_AUTOFLUSH). The
+        // string output before each top of page (except the first) is stored in $^L
+        // ($FORMAT_FORMFEED).
+
+        PlHash formats = PlStringConstant.getConstant("Perlito5::FORMAT").hashRef.o.hash_deref_strict();
+        PlLvalue accumulator = PlStringConstant.getConstant("main::" + (char)1).scalarRef;    // $^A
+
+        String name = PlStringConstant.getConstant("main::~").scalarRef.toString();
+        if (name.equals("")) {
+            name = fh.typeglob_name;
+        }
+        if (name.length() > 6 && name.startsWith("main::")) {
+            name = name.substring(6);
+        }
+
+        String top_name = PlStringConstant.getConstant("main::^").scalarRef.toString();
+        if (top_name.equals("")) {
+            top_name = name + "_TOP";
+        }
+        if (top_name.length() > 6 && top_name.startsWith("main::")) {
+            top_name = top_name.substring(6);
+        }
+
+        if (!formats.hget(name).to_boolean()) {
+            PlCORE.die(PlCx.VOID, new PlArray(new PlString("Undefined format \"" + name + "\"")));
+        }
+
+        if (formats.hget(top_name).to_boolean()) {
+            formats.hget(top_name).apply(PlCx.VOID, new PlArray());
+        }
+        formats.hget(name).apply(PlCx.VOID, new PlArray());
+        PlCORE.print(want, fh, accumulator.toString());
+        accumulator.set(PlCx.EMPTY);
+        return new PlInt(1);
 EOT
     readline => <<'EOT',
         if (want == PlCx.LIST) {
@@ -340,6 +378,12 @@ EOT
         } sort keys %FileFunc
     ), 
     <<'EOT',
+    public static final PlObject write(int want, PlArray List__) {
+        return PlCORE.write(PlCx.VOID, PlV.selectedFileHandle, List__);
+    }
+    public static final PlObject close(int want, PlArray List__) {
+        return PlCORE.close(PlCx.VOID, PlV.selectedFileHandle, List__);
+    }
     public static final PlObject open(int want, PlFileHandle fh, PlArray List__, String namespace) {
         // open FILEHANDLE,EXPR
         // open FILEHANDLE,MODE,EXPR
@@ -598,7 +642,7 @@ EOT
 
     // shortcut functions for internal use: say, warn, die
     public static final PlObject say(String s) {
-        return PlCORE.say(PlCx.VOID, PlV.STDOUT, s);
+        return PlCORE.say(PlCx.VOID, PlV.selectedFileHandle, s);
     }
     public static final PlObject warn(String s) {
         return PlCORE.warn(PlCx.VOID, new PlArray(new PlString(s)));
@@ -743,15 +787,25 @@ EOT
     }
     public static final PlObject select(PlFileHandle fh) {
         // select FILEHANDLE
-        PlFileHandle fOld = PlV.STDOUT;
-        PlV.STDOUT = fh;
+        PlFileHandle fOld = PlV.selectedFileHandle;
+        PlV.selectedFileHandle = fh;
+
+        // point the "format" variables to the selected filehandle
+        PlV.sset_alias("main::" + (char)12, fh.format_formfeed);      // $^L
+        PlV.sset_alias("main::%", fh.format_page_number);             // $%
+        PlV.sset_alias("main::-", fh.format_lines_left);              // $-
+        PlV.sset_alias("main:::", fh.format_line_break_characters);   // $:
+        PlV.sset_alias("main::=", fh.format_lines_per_page);          // $=
+        PlV.sset_alias("main::^", fh.format_top_name);                // $^
+        PlV.sset_alias("main::~", fh.format_name);                    // $~
+
         return fOld;
     }
     public static final PlObject select(int want, PlArray List__) {
         int arg_count = List__.length_of_array_int();
         if (arg_count == 0) {
             // Returns the currently selected filehandle
-            return PlV.STDOUT;
+            return PlV.selectedFileHandle;
         }
         if (arg_count == 4) {
             if (List__.aget(0).is_undef() && List__.aget(1).is_undef() && List__.aget(2).is_undef()) {
@@ -1200,16 +1254,25 @@ EOT
                                 break;
                             case 'v':
                                 // TODO - format value like "v1.v2.v3"
-                                // replace "%v" with "%s"
+                                // replace "%vd" with "%s"
+                                scanning = false;
                                 StringBuilder sbv = new StringBuilder();
                                 if (offset > 0) {
                                     sbv.append(format.substring(0, offset));
                                 }
-                                sbv.append("s");
-                                if (offset + 1 < format.length()) {
-                                    sbv.append(format.substring(offset + 1));
+                                sbv.append("s");    // replace "vd" with "s"
+                                if (offset + 2 < format.length()) {
+                                    sbv.append(format.substring(offset + 2));   // skip "v" and "d"
                                 }
                                 format = sbv.toString();
+                                length = format.length();
+                                args[args_index] = PlV.sub_sprintf_vd.apply(PlCx.SCALAR, PlArray.construct_list_of_aliases(List__.aget(args_index+1))).toString();
+                                args_index++;
+                                if (args_index > args_max) {
+                                    // panic
+                                    offset = length;
+                                }
+                                offset++;   // skip "v"
                                 break;
                             case 'c': case 's': case 'd': case 'u': case 'o':
                             case 'x': case 'e': case 'f': case 'g':
@@ -1239,6 +1302,7 @@ EOT
                                                 sb.append(format.substring(offset + 1));
                                             }
                                             format = sb.toString();
+                                            length = format.length();
                                             //PlCORE.say("format [" + format + "]");
                                         }
 
@@ -1252,6 +1316,7 @@ EOT
                                             sb.append("0");
                                             sb.append(format.substring(offset));
                                             format = sb.toString();
+                                            length = format.length();
                                         }
                                         args[args_index] = List__.aget(args_index+1).to_double();
                                         break;
@@ -2118,7 +2183,13 @@ EOT
         return new PlInt( (long)Math.floor(System.currentTimeMillis() * 0.001 + 0.5));
     }
     public static final PlDouble sleep(int want, PlArray List__) {
-        long s = ((Double)(List__.shift().to_double() * 1000)).longValue();
+        long s;
+        if (List__.to_int() == 0) {
+            s = Long.MAX_VALUE;
+        }
+        else {
+            s = ((Double)(List__.shift().to_double() * 1000)).longValue();
+        }
         try {
             TimeUnit.MILLISECONDS.sleep(s);
         } catch (InterruptedException e) {

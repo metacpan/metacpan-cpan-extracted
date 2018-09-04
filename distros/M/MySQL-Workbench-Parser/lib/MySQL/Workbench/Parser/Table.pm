@@ -239,7 +239,7 @@ MySQL::Workbench::Parser::Table - A table of the ER model
 
 =head1 VERSION
 
-version 1
+version 1.01
 
 =for Pod::Coverage BUILD
 

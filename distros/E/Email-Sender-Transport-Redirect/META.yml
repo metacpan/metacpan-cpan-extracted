@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,5 +27,5 @@ resources:
   IRC: irc://irc.freenode.net/#interchange
   bugtracker: https://github.com/racke/Email-Sender-Transport-Redirect/issues
   repository: https://github.com/racke/Email-Sender-Transport-Redirect.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

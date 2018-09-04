@@ -1,0 +1,37 @@
+2018-09-04   Armin Fuerst <armin@fuerst.priv.at>
+
+   Release 2.13
+   Improved documentation for getSubscriptions().
+
+
+2018-09-04   Armin Fuerst <armin@fuerst.priv.at>
+
+   Release 2.12
+   Corrected typo in description
+
+
+2018-08-31   Armin Fuerst <armin@fuerst.priv.at>
+
+   Release 2.11
+   Added Changelog
+
+
+2018-08-31   Armin Fuerst <armin@fuerst.priv.at>
+
+   Release 2.10
+   Added the possibility to change the sending phonenumber
+   Login and selecting phonenumber reads details about tarifs and packages
+   Details about tarif and packages are available through getSubscriptions
+
+
+2014-08-01   Armin Fuerst <armin@fuerst.priv.at>
+
+   Release 2.00
+   Adopted for the new webinterface
+
+
+2014-03-14   Armin Fuerst <armin@fuerst.priv.at>
+
+   Release 1.00
+   Initial release - allows to send short messages through
+   the webinterface of yesss!

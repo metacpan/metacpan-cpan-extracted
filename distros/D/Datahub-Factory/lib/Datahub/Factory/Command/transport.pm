@@ -2,7 +2,7 @@ package Datahub::Factory::Command::transport;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 use parent 'Datahub::Factory::Cmd';
 
@@ -32,6 +32,7 @@ sub opt_spec {
         [ "importer|i=s", "Location of the importer configuration file"],
         [ "fixer|f=s", "Location of the fixer configuration file"],
         [ "exporter|e=s", "Location of the exporter configuration file"],
+        [ "number|n=i", "Number of records to process before breaking"],
         [ "verbose|v", "Verbose output"]
     );
 }
@@ -132,7 +133,13 @@ sub execute {
             # Determine if we should skip, or halt the processing entirely.
             # Depends on the type of Exception which bubbles up.
             if (is_instance $_, 'Catmandu::BadVal') {
-                $msg = sprintf('Item %d (counted): could not execute fix: %s', $counter, $error);
+                $msg = sprintf('Item #%d (counted): could not execute fix: %s', $counter, $error);
+                $self->error($msg);
+                $logger->error($msg);
+                return 1;
+            }
+            elsif (is_instance $_, 'Datahub::Factory::InvalidCondition') {
+                $msg = sprintf('Item #%d (counted): %s', $counter, $error);
                 $self->error($msg);
                 $logger->error($msg);
                 return 1;
@@ -143,10 +150,26 @@ sub execute {
                 $logger->fatal($error);
                 exit 1;
             }
+            elsif (is_instance $_, 'Datahub::Factory::FixFileNotFound') {
+                # Throw a fatal error if the pipeline configuration was invalid
+                $self->error($msg);
+                $logger->fatal($error);
+                exit 1;
+            }
             elsif (is_instance $_, 'Datahub::Factory::ModuleNotFound') {
                 # Throw a fatal error if we couldn't load a fix module
                 $logger->fatal($error);
                 exit 1;
+            }
+            elsif (is_instance $_, 'Catmandu::HTTPError') {
+                # Need to move this to proper Exception handling.
+                if (!defined($error)) {
+                    $error = $_->response_body;
+                }
+                $msg = sprintf('Item %d (counted): %s', $counter, $error);
+                $self->error($msg);
+                $logger->fatal($error);
+                return 1;
             }
             else {
                 # Catmandu modules produce a wide variety of exceptions. This
@@ -154,6 +177,14 @@ sub execute {
                 $logger->error($error);
                 $self->error($error);
                 return 1;
+            }
+        } finally {
+            # Break when we hit the pre-defined number of records to process
+            # if this option was set.
+            if ($opt->{number}) {
+                if ($counter == $opt->{number}) {
+                    exit 1;
+                }
             }
         }) {
             # skip to the next record if an error was raised.

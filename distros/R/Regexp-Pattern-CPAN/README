@@ -1,4 +1,49 @@
-SEE ALSO
+NAME
+    Regexp::Pattern::CPAN - Regexp patterns related to CPAN
 
+VERSION
+    This document describes version 0.002 of Regexp::Pattern::CPAN (from
+    Perl distribution Regexp-Pattern-CPAN), released on 2018-09-02.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("CPAN::pause_id");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   pause_id
+
+        PAUSE author ID, or PAUSE ID for short.
+
+        I'm not sure whether PAUSE allows digit for the first letter. For
+        safety I'm assuming no.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-CPAN>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-CPAN>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-CPAN>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Regexp::Pattern::Perl
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

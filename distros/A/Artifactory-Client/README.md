@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.6.0
+Version 1.6.1
 
 # SYNOPSIS
 
@@ -686,6 +686,14 @@ Recalculates the index for a Bower repository.
 ## calculate\_helm\_chart\_index
 
 Calculates Helm chart index on the specified path (local repositories only).
+
+## calculate\_cran\_repository\_metadata
+
+Calculates/recalculates the Packages and Release metadata for this repository, based on the CRAN packages in it.
+
+## calculate\_conda\_repository\_metadata
+
+Calculates/recalculates the Conda packages and release metadata for this repository.
 
 # SYSTEM & CONFIGURATION
 

@@ -12,7 +12,6 @@ lib/Starch/Cookbook.pod
 lib/Starch/Extending.pod
 lib/Starch/Factory.pm
 lib/Starch/Manager.pm
-lib/Starch/Manual.pod
 lib/Starch/Plugin/AlwaysLoad.pm
 lib/Starch/Plugin/Bundle.pm
 lib/Starch/Plugin/CookieArgs.pm

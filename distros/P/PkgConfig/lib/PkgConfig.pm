@@ -20,7 +20,7 @@ package
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.21026';
+our $VERSION = '0.22026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -356,6 +356,15 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
             "-I$path/lib/pkgconfig/../../include",
         );
     }
+} elsif($^O eq 'darwin') {
+
+    if(-x '/usr/local/Homebrew/bin/brew') {
+        # Mac OS X with homebrew installed
+        push @DEFAULT_SEARCH_PATH,
+            bsd_glob '/usr/local/opt/*/lib/pkgconfig'
+        ;
+    }
+
 }
 
 my @ENV_SEARCH_PATH = split($Config{path_sep}, $ENV{PKG_CONFIG_PATH} || "");

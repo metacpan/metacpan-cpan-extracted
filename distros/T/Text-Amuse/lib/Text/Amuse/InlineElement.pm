@@ -96,7 +96,10 @@ sub append {
 }
 
 sub tag {
-    shift->{tag};
+    if (@_ > 1) {
+        $_[0]{tag} = $_[1];
+    }
+    $_[0]{tag};
 }
 
 sub fmt {

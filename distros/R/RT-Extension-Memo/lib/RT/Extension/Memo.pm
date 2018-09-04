@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::Memo;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =encoding utf8
 
@@ -137,6 +137,36 @@ $RT::Config::META{MemoRichTextHeight} = {
     WidgetArguments => {
         Description => 'Memo height (in number of pixel) for rich text editing',
     },
+};
+
+# Copy memo when merging ticket
+my $old_MergeInto = RT::Ticket->can("_MergeInto");
+*RT::Ticket::_MergeInto = sub {
+    my $self = shift;
+    my $MergeInto = shift;
+
+    my $attr = $self->FirstAttribute('Memo');
+    my ($ok, $msg) = $old_MergeInto->($self, $MergeInto);
+
+    if ($attr && $attr->Content && $attr->Content !~ /^\s*$/) {
+        my $merged_memo = '';
+        my $merged_attr = $MergeInto->FirstAttribute('Memo');
+        if ($merged_attr && $merged_attr->Content && $merged_attr->Content !~ /^\s*$/) {
+            if (RT->Config->Get('MemoRichText', $self->CurrentUser)) {
+                $merged_memo = $merged_attr->Content . "<br />";
+            } else {
+                $merged_memo = $merged_attr->Content . "\n";
+            }
+        }
+        $merged_memo .= $attr->Content;
+        my ($memo_ok, $memo_msg) = $MergeInto->SetAttribute(Name => 'Memo', Content => $merged_memo);
+        unless ($memo_ok) {
+            $RT::Handle->Rollback();
+            return (0, $self->loc("Merge failed. Couldn't merge Memo"));
+        }
+    }
+
+    return ($ok, $msg);
 };
 
 =head1 AUTHOR

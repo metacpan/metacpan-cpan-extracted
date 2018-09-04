@@ -64,6 +64,7 @@ BuildRequires:  perl(XML::XPath::XMLParser)
 BuildRequires:  perl(Test::CPAN::Changes)
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+BuildRequires:  git
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 
 %description
@@ -72,7 +73,7 @@ machine management APIs. This allows machines running within arbitrary
 virtualization containers to be managed with a consistent API.
 
 %prep
-%setup -q -n Sys-Virt-v%{version}
+%autosetup -S git -n Sys-Virt-v%{version}
 
 
 %build

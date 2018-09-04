@@ -16,7 +16,7 @@ use constant IS_WINDOWS           => is_os_type('Windows');
 use constant READ                 => 0;
 use constant WRITE                => 1;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 our %ORIGINAL_ENV = %ENV;
 
 has env => sub { +{%ORIGINAL_ENV} };
@@ -155,16 +155,12 @@ sub _run {
     Mojo::IOLoop->stream($p->[READ]);
   }
 
-  $c->delay(
-    sub {
-      my ($delay) = @_;
-      $c->stash('cgi.pid' => $pid, 'cgi.stdin' => $stdin);
-      $stderr[READ]->on(read => _stderr_cb($c, $log_key)) if $stderr[READ];
-      $stdout[READ]->on(read => _stdout_cb($c, $log_key));
-      $stdout[READ]->on(close => $delay->begin);
-    },
-    sub {
-      my ($delay) = @_;
+  $c->stash('cgi.pid' => $pid, 'cgi.stdin' => $stdin);
+  $c->render_later;
+
+  $stderr[READ]->on(read => _stderr_cb($c, $log_key)) if $stderr[READ];
+  $stdout[READ]->on(read => _stdout_cb($c, $log_key));
+  $stdout[READ]->on(close => sub {
       my $GUARD = 50;
       warn "[CGI:$args->{name}:$pid] Child closed STDOUT\n" if DEBUG;
       unlink $stdin->path or die "Could not remove STDIN @{[$stdin->path]}" if -e $stdin->path;
@@ -176,7 +172,7 @@ sub _run {
       $defaults->{pids}{$pid} = $args->{pids}{$pid} if kill 0, $pid;
       return $c->finish if $c->res->code;
       return $c->render(text => "Could not run CGI script ($?, $!).\n", status => 500);
-    },
+    }
   );
 }
 
@@ -264,11 +260,11 @@ Mojolicious::Plugin::CGI - Run CGI script from Mojolicious
 
 =head1 VERSION
 
-0.38
+0.39
 
 =head1 DESCRIPTION
 
-This plugin enable L<Mojolicious> to run Perl CGI scripts. It does so by forking
+This plugin enables L<Mojolicious> to run Perl CGI scripts. It does so by forking
 a new process with a modified environment and reads the STDOUT in a non-blocking
 manner.
 
@@ -316,11 +312,11 @@ The above contains all the options you can pass on to the plugin.
     $c->cgi->run(script => File::Spec->rel2abs("/path/to/cgi/$name"));
   };
 
-The helper can take most the arguments that L</register> takes, with the
+The helper can take most of the arguments that L</register> takes, with the
 exception of C<support_semicolon_in_query_string>.
 
 It is critical that "script_name" and "path_info" is present in
-L<stash|Mojolicious::Controller/stash>. If the values are extracted directly
+L<stash|Mojolicious::Controller/stash>. Whether the values are extracted directly
 from the path or set manually does not matter.
 
 Note that the helper is registered in all of the examples.
@@ -346,7 +342,7 @@ since it runs in a separate fork/process.
     ...
   };
 
-The code above need to be added before other plugins or handler which use
+The code above needs to be added before other plugins or handlers which use
 L<Mojo::Message::Request/url>. It will inject a C<before_dispatch>
 hook which saves the original QUERY_STRING, before it is split on
 "&" in L<Mojo::Parameters>.

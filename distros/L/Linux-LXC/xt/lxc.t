@@ -29,6 +29,8 @@ my @containerConfig = $container->get_config('lxc.utsname');
 is $containerConfig[0], 'lxc-test', 'Can fetch a configuration value.';
 is_deeply {$container->get_config('lxc.arch', qr/x(\d+)_(\d+)/)},
 	{'86', '64'}, 'Check multi select configuration value.';
+throws_ok {$container->get_config()}
+	qr/Parameter to get is missing/, 'Check get_config without parameter.';
 
 $container->set_config('lxc.aa_allow_incomplete', 1);
 $container->start;

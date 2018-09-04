@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "1.001014"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,22 +36,25 @@
             "Template" : "2",
             "perl" : "5.005"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001014"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Humanstate/html-googlemaps-v3/issues"
-      },
       "homepage" : "https://metacpan.org/module/HTML/GoogleMaps/V3",
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Humanstate/html-googlemaps-v3.git",
+         "web" : "https://github.com/Humanstate/html-googlemaps-v3"
+      }
    },
-   "version" : "0.10",
-   "x_repository" : {
-      "type" : "git",
-      "url" : "https://github.com/Humanstate/html-googlemaps-v3.git",
-      "web" : "https://github.com/Humanstate/html-googlemaps-v3"
-   }
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

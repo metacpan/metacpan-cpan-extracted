@@ -12,7 +12,6 @@ $three->{a} = 4;
 is($one->{a}, 2);
 is($two->{a}, 3);
 is($three->{a}, 4);
-
 my ($one, $two, $three) = x(3, $obj);
 is($one->{a}, 1);
 is($two->{a}, 1);

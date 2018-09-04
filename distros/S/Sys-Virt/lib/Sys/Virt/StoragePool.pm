@@ -436,7 +436,7 @@ Include disk storage pools
 
 =item Sys::Virt::StoragePool::LIST_FS
 
-Include filesytem storage pools
+Include filesystem storage pools
 
 =item Sys::Virt::StoragePool::LIST_ISCSI
 

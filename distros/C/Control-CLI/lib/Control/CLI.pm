@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -63,7 +63,7 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 	poll_obj_error		=> 'ignore',		# Default error mode for poll() method
 	report_query_status	=> 0,			# Default setting of report_query_status for class object
 	prompt		=> '.*[\?\$%#>]\s?$',		# Default prompt used in login() and cmd() methods
-	username_prompt	=> '(?i:username|login)[: ]+$',	# Default username prompt used in login() method
+	username_prompt	=> '(?i:user ?name|login)[: ]+$',	# Default username prompt used in login() method
 	password_prompt	=> '(?i)password[: ]+$',	# Default password prompt used in login() method
 	terminal_type	=> 'vt100',			# Default terminal type (for SSH)
 	window_size	=> [],				# Default terminal window size [width, height]
@@ -1753,16 +1753,16 @@ sub poll_return { # Method to return from poll methods
 		}
 	}
 	if ($self->{POLL}{output_type} & 2) { # Provide Output_result
-		if (!ref $self->{POLL}{output_result}) { # If a scalar
-			push(@output_list, $self->{POLL}{output_result});
-		}
-		elsif (ref $self->{POLL}{output_result} eq 'ARRAY') { # If an array
+		if (ref $self->{POLL}{output_result} eq 'ARRAY') { # If an array
 			if ($self->{POLL}{return_list}) {
 				push(@output_list, @{$self->{POLL}{output_result}});
 			}
 			else {
 				push(@output_list, $self->{POLL}{output_result});
 			}
+		}
+		else { # Anything else (scalar or hash ref)
+			push(@output_list, $self->{POLL}{output_result});
 		}
 	}
 	return ($ok, @output_list);
@@ -2402,7 +2402,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 		}
 		if ($self->{POLL}{local_buffer} =~ /$login->{password_prompt}/) { # Handle password prompt
 			unless ($login->{password}) {
-				unless ($login->{prompt_credentials}) {
+				unless (defined $login->{prompt_credentials}) {
 					$self->{LOGINSTAGE} = 'password';
 					return $self->poll_return($self->error("$pkgsub: Password required"));
 				}
@@ -3704,7 +3704,7 @@ This method is usually not required for SSH, where authentication is part of the
 In the first form only a success/failure value is returned in scalar context, while in the second form, in list context, both the success/failure value is returned as well as any output received from the host device during the login sequence; the latter is either the output itself or a reference to that output, depending on the object setting of return_reference or the argument override provided in this method.
 For this method to succeed the username & password prompts from the remote host must match the default prompts defined for the object or the overrides specified via the optional "username_prompt" & "password_prompt" arguments. By default these regular expressions are set to:
 
-	'(?i:username|login)[: ]+$'
+	'(?i:user ?name|login)[: ]+$'
 	'(?i)password[: ]+$'
 
 Following a successful authentication, if a valid CLI prompt is received, the method will return a true (1) value. The expected CLI prompt is either the globally set prompt - see prompt() - or the local override specified with the optional "prompt" argument. By default, the following prompt is expected:
@@ -4347,7 +4347,7 @@ The object CLI prompt match pattern is only used by the login() and cmd() method
 This method sets the login() username prompt match pattern for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned.
 The default prompt match pattern used is:
 
-	'(?i:username|login)[: ]*$'
+	'(?i:user ?name|login)[: ]*$'
 
 
 =item B<password_prompt()> - set the login() password prompt match pattern for this object
@@ -4674,7 +4674,7 @@ Once a polling capable method is called, in non-blocking mode, a polling structu
 
   ($ok, $output1 [, $output2]) = $obj->poll_return($ok);
 
-Takes the desired exit status, $ok (which could be set to 1, 0 or undef), updates the poll structure "complete" key with it and returns the same value. If the poll structure "output_requested" key is true then the exit status is returned in list context together with any available output. The poll structure "output_type" key bits 0 and 1 determine what type of output is returned in the list; if bit 0 is set, the contents of poll structure "output_buffer" key are returned (either as direct output or as a reference, depending on whether key "return_reference" is set or not) and at the same time the contents of the "output_buffer" key are deleted to ensure that the same output is not returned again at the next non-blocking call; if bit 1 is set, the contents of poll structure "output_result" key is returned added to the list (the "output_result" key can hold either a scalar value or an array; both cases are handled); if both bit 0 and bit 1 are set then both output types are added to the returned list.
+Takes the desired exit status, $ok (which could be set to 1, 0 or undef), updates the poll structure "complete" key with it and returns the same value. If the poll structure "output_requested" key is true then the exit status is returned in list context together with any available output. The poll structure "output_type" key bits 0 and 1 determine what type of output is returned in the list; if bit 0 is set, the contents of poll structure "output_buffer" key are returned (either as direct output or as a reference, depending on whether key "return_reference" is set or not) and at the same time the contents of the "output_buffer" key are deleted to ensure that the same output is not returned again at the next non-blocking call; if bit 1 is set, the contents of poll structure "output_result" key is returned added to the list (the "output_result" key can hold either a scalar value or an array reference or a hash reference; in the case of an array reference either the array reference or the actual array list can be returned depnding on whether the poll structure "return_list" key is set or not); if both bit 0 and bit 1 are set then both output types are added to the returned list.
 Note, a polled method should ALWAYS use this poll_return method to come out; whether it has completed successfully, non-blocking not ready, or encountered an error. Otherwise the calling method's <method>_poll() will not be able to behave correctly.
 
 In the case of an internally called poll method, poll_struct_restore() is automatically invoked and output1 & $output2 are only returned on success ($ok true), as references respectively to output_buffer and output_result poll structure keys; on failure ($ok undef) or not ready ($ok == 0) then output1 & $output2 remain undefined.
@@ -5125,7 +5125,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Ludovico Stevens.
+Copyright 2018 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

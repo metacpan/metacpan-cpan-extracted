@@ -7,7 +7,7 @@ app->log->level('error') unless $ENV{HARNESS_IS_VERBOSE};
 
 post '/user' => sub {
   my $c = shift->openapi->valid_input or return;
-  $c->render(openapi => {});
+  $c->render(openapi => $c->validation->output);
   },
   'addUser';
 
@@ -15,7 +15,13 @@ plugin OpenAPI => {url => 'data://main/test.json'};
 
 my $client = OpenAPI::Client->new('data://main/test.json', app => app);
 my $tx = $client->addUser({user => {username => 'superwoman'}});
+is $tx->res->json->{user}{username}, 'superwoman', 'echo back username (b)';
 like $tx->req->headers->header('Content-Type'), qr{application/json}, 'application/json';
+
+undef $tx;
+my $p = $client->addUser_p({user => {username => 'supergirl'}})->then(sub { $tx = shift });
+$p->wait;
+is $tx->res->json->{user}{username}, 'supergirl', 'echo back username (p)';
 
 done_testing;
 

@@ -1,5 +1,5 @@
 package overload::x;
-use 5.006; use strict; use warnings; our $VERSION = '0.102';
+use 5.006; use strict; use warnings; our $VERSION = '1.0';
 use base 'Import::Export';
 use Clone qw(clone);
 
@@ -12,15 +12,15 @@ use overload
 	'x' => \&x;
 
 sub n {
-	my $n = shift; # \shift is really broken AND has varying behaviour depending on which OS you're using apparently
-	return bless \$n, __PACKAGE__;
+	my $n = shift;
+	bless \$n, __PACKAGE__;
 }
 
 sub x {
 	my ($times, $obj) = @_;
 	my @times = map {
 		ref $obj ? clone($obj) : $obj
-	} 1 .. (ref $times ? $$times : $times); # IN list context this counts which suckkks...
+	} 1 .. (ref $times ? $$times : $times);
 	wantarray ? @times : \@times;
 }
 
@@ -39,7 +39,7 @@ overload::x - x on refs
 
 =head1 VERSION
 
-Version 0.102
+Version 1.0
 
 =cut
 

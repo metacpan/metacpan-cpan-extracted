@@ -4,16 +4,46 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "devops",
+      "file",
+      "logrotate",
+      "logs",
+      "ops"
+   ],
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Rotate-Simple",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "Class::Load::XS" : "0",
@@ -22,28 +52,33 @@
          },
          "requires" : {
             "Graph" : "0",
-            "List::Util" : "1.35",
-            "Module::Runtime" : "0.011",
-            "Moo" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "1.001000",
             "Path::Tiny" : "0.018",
             "Ref::Util" : "0",
-            "Time::Piece" : "0",
             "Time::Seconds" : "0",
             "Types::Standard" : "0",
-            "namespace::autoclean" : "0.16",
-            "perl" : "v5.8.8",
-            "version" : "0"
+            "namespace::autoclean" : "0"
          }
       },
       "test" : {
          "recommends" : {
-            "Test::Warnings" : "0"
+            "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Test::Exception" : "0",
-            "Test::More" : "1.302015",
-            "Test::Most" : "0"
+            "File::Spec" : "0",
+            "Module::Metadata" : "0",
+            "Path::Tiny" : "0.018",
+            "Test::More" : "0.99",
+            "Test::Most" : "0",
+            "Time::Piece" : "0"
          }
+      }
+   },
+   "provides" : {
+      "File::Rotate::Simple" : {
+         "file" : "lib/File/Rotate/Simple.pm",
+         "version" : "v0.2.3"
       }
    },
    "release_status" : "stable",
@@ -57,7 +92,11 @@
          "web" : "https://github.com/robrwo/File-Rotate-Simple"
       }
    },
-   "version" : "v0.2.2",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "v0.2.3",
+   "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

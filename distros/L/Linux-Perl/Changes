@@ -1,5 +1,13 @@
 Revision history for Perl module Linux::Perl
 
+0.14 Tue Sep 4 2018
+- BREAKING CHANGE: epoll wait() now returns a list of key/value pairs
+  rather than a list of hashes. (The new format is lighter in tight loops.)
+
+0.13 Thu Aug 30 2018
+- Add memfd, mq (POSIX message queueing), signalfd, sigprocmask, & inotify.
+- Add i686 for aio and getdents.
+
 0.12 Mon Aug 27 2018
 - Fix eventfd/i386.pm (again?), and add i686 aio (untested!).
 

@@ -1,5 +1,13 @@
 Revision history for RT-Extension-Memo
 
+0.05 2018-09-03
+ - Merge memo in merged ticket
+ - Setup a max-height
+ - Modify tests for Richtext as default
+ - Setup Richtext as default
+0.04 2017-11-30
+ - Replace \n by <br /> *only* when MemoRichText config parameter is false
+ - Add MemoRichTextHeight parameter
 0.03 2017-10-20
  - Do not replace \n by <br />
  - Remove MemoWidth option to allow styling directly in CSS

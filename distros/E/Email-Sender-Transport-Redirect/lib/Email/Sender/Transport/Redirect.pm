@@ -1,6 +1,6 @@
 package Email::Sender::Transport::Redirect;
 {
-    $Email::Sender::Transport::Redirect::VERSION = '0.005';
+    $Email::Sender::Transport::Redirect::VERSION = '0.006';
 }
 
 =head1 NAME
@@ -9,7 +9,7 @@ Email::Sender::Transport::Redirect - Intercept all emails and redirect them to a
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =head1 SYNOPSIS
 

@@ -25,45 +25,220 @@ token stmt_yadayada {
     }
 };
 
-token stmt_format {
-    'format' <.Perlito5::Grammar::Space::ws> 
-    [ <Perlito5::Grammar::full_ident>
-    | { $MATCH->{'Perlito5::Grammar::full_ident'} = 'STDOUT' }
-    ]
-    {
-        # inject a here-doc request - see Perlito5::Grammar::String
-        my $placeholder = Perlito5::AST::Apply->new(
-            code      => 'list:<.>',
-            namespace => '',
+#
+# format =          # comment
+# format NAME =     # comment
+#
+#   # comment
+#
+#   . OPTIONAL-SPACE  [ \n | EOF ]
+#
+#   ONE-LINE_OF-TEXT
+#   . OPTIONAL-SPACE  [ \n | EOF ]
+#
+#   ONE-LINE_OF-TEXT
+#   { LIST,
+#   LIST   }   # comment
+#
+#   ONE-LINE_OF-TEXT
+#   ONE-LINE-LIST   # comment
+#
+#
+# format BLOCK =
+# @<<< @<<<
+# {foo=>"bar"} # this is a block, not a hash!
+# .
+#
+#
+# $ perl -e ' $v = "abc"; $c = "ert"; $a = "yuu"; format=  # comment 
+# xyz @<<< @<<<
+# { $c; $v; }, $a
+# .
+# write; '
+# xyz abc  yuu
+#
+#
+# Errors: "Format not terminated"
+#
+#
+sub stmt_format {
+    my $m = _stmt_format(@_);
+    return if !$m;
+    my $self = Perlito5::Match::flat($m);
+
+    # warn "p5:format:", Perlito5::Dumper::Dumper($self);
+
+    my @arguments = @{$self->{arguments}};
+    my $format_name = shift @arguments;     # "Buf", maybe empty string
+
+    # $Perlito5::FORMAT{"name"} = sub { ... }
+    my @stmts = ();
+    while (@arguments) {
+        # add formline() calls
+        my $picture = shift @arguments;         # "Buf"
+        my $args    = shift @arguments;         # "Apply->{'code' => "list:<,>"}
+        push @stmts, Perlito5::AST::Apply->new(
+            code => 'formline',
             arguments => [
-                # XXX - this comment was originally on Perlito5::Grammar::String
-                # XXX - test 12 t/base/lex.t fails if we don't use this "double-pointer"   '
-                Perlito5::AST::Apply->new(
-                    code      => 'list:<.>',
-                    namespace => '',
-                    arguments => []
-                  )
-            ]
+                $picture,
+                ( $args ? $args : () ),
+            ],
         );
-        push @Perlito5::Grammar::String::Here_doc, [
-            'single_quote',
-            $placeholder->{arguments}[0]{arguments},
-            '.',  # delimiter
+    }
+
+    my $ast = Perlito5::AST::Apply->new(
+        code => "infix:<=>",
+        arguments => [
+            Perlito5::AST::Lookup->new(
+                obj => Perlito5::AST::Var->new(
+                    '_real_sigil' => "%",
+                    '_decl' => "our",
+                    'name' => "FORMAT",
+                    'namespace' => "Perlito5",
+                    'sigil' => "\$",
+                ),
+                index_exp => $format_name,
+            ),
+            Perlito5::AST::Sub->new(
+                block => Perlito5::AST::Block->new(
+                    stmts => \@stmts,
+                ),
+            ),
+        ],
+    );
+
+    # warn "p5:format: out - ", Perlito5::Dumper::Dumper($ast);
+
+    # evaluate the sub definition in a BEGIN block
+    $block = Perlito5::AST::Block->new( stmts => [$ast] );
+    Perlito5::Grammar::Block::eval_begin_block($block, 'BEGIN');  
+    # runtime effect of subroutine declaration is "undef"
+    $m->{capture} = Perlito5::Grammar::Block::ast_nop();
+    return $m;
+}
+token _stmt_format {
+    'format'
+    [ <.Perlito5::Grammar::Space::ws> <Perlito5::Grammar::full_ident>
+    | { $MATCH->{'Perlito5::Grammar::full_ident'} = { capture => 'STDOUT' } }
+    ]
+    <.Perlito5::Grammar::Space::opt_ws>
+    '=' 
+    [ ' ' | \t ]*
+    [ '#' <.Perlito5::Grammar::Space::to_eol> ]?
+    [ \c10 \c13? | \c13 \c10? ]
+
+    # { print STDERR "'format' parsing\n"; }
+    {
+        # print STDERR "ident: ", Perlito5::Dumper::Dumper( $MATCH );
+        $MATCH->{fmt} = [
+            Perlito5::AST::Buf->new(
+                buf => Perlito5::Match::flat($MATCH->{'Perlito5::Grammar::full_ident'}),
+            ),
         ];
         $MATCH->{capture} =
             Perlito5::AST::Apply->new(
                 code      => 'p5:format',
                 namespace => '',
-                arguments => [
-                    Perlito5::Match::flat($MATCH->{'Perlito5::Grammar::full_ident'}),
-                    $placeholder,
-                ]
+                arguments => $MATCH->{fmt},
             );
     }
-    <.Perlito5::Grammar::Space::opt_ws>
-    '=' 
-    # TODO - make sure there are only spaces or comments until the end of the line
-    <.Perlito5::Grammar::Space::ws>  # this will read the 'here-doc' we are expecting
+
+    [
+        '.' [ ' ' | \t ]*   # TODO - test for EOF
+        # { print STDERR "end of format\n"; }
+        { return $MATCH }
+    |
+        '#' <Perlito5::Grammar::Space::to_eol> [ \c10 \c13? | \c13 \c10? ]
+        # { print STDERR "comment\n"; }
+    |
+        <Perlito5::Grammar::Space::to_eol> [ \c10 \c13? | \c13 \c10? ]
+        # { print STDERR "one line of text\n"; }
+        {
+            # print STDERR "match picture: ", Perlito5::Dumper::Dumper( $MATCH );
+            my $picture = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Space::to_eol"}->[-1]);
+            # print STDERR "picture: ", Perlito5::Dumper::Dumper( $picture );
+            push @{ $MATCH->{fmt} }, Perlito5::AST::Buf->new( buf => $picture . "\n" );
+        }
+        [
+            '.' [ ' ' | \t ]*   # TODO - test for EOF
+            # { print STDERR "end of format\n"; }
+            { return $MATCH }
+        |
+            [ ' ' | \t ]*
+            [   <before '{'>
+                <Perlito5::Grammar::Block::closure_block>
+                {
+                    my $op = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Block::closure_block"}->[-1]);
+                    # print STDERR "got block\n"; 
+                    # print STDERR "block ", Perlito5::Dumper::Dumper( $op );
+                    if ( ref($op) eq "Perlito5::AST::Block" ) {
+                        $MATCH->{_ops} = [ $op->{stmts}[-1] ];
+                    }
+                    else {
+                        Perlito5::Compiler::error "Syntax error";
+                    }
+                }
+                [
+                    ',' <Perlito5::Grammar::Space::to_eol>
+                    {
+                        my $stmt = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Space::to_eol"}->[-1]);
+                        # print STDERR "stmt: ", Perlito5::Dumper::Dumper( $stmt );
+
+                        Perlito5::Grammar::Scope::check_variable_declarations();
+                        Perlito5::Grammar::Scope::create_new_compile_time_scope();
+                        my $exp = Perlito5::Grammar::Expression::exp_parse( [ split("", $stmt) ], 0 );
+                        Perlito5::Grammar::Scope::end_compile_time_scope();
+                        Perlito5::Grammar::Scope::check_variable_declarations();
+
+                        my $exp2;
+                        if ($exp) {
+                            # print STDERR "stmt exp: ", Perlito5::Dumper::Dumper( $exp );
+                            $exp2 = Perlito5::Match::flat($exp);
+                            # print STDERR "op2: ", Perlito5::Dumper::Dumper( $exp2 );
+                        }
+                        # $MATCH->{capture} = $op1;
+                        if ($exp2) {
+                            push @{ $MATCH->{_ops} }, $exp2;
+                        }
+                    }
+                ]?
+                {
+                    # print STDERR "ops: ", Perlito5::Dumper::Dumper( $MATCH->{_ops} );
+                    push @{ $MATCH->{fmt} }, Perlito5::AST::Apply->new(
+                        arguments => $MATCH->{_ops},
+                        code => 'list:<,>',
+                    );
+                }
+            |
+                <Perlito5::Grammar::Space::to_eol>
+                {
+                    my $stmt = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Space::to_eol"}->[-1]);
+                    # print STDERR "stmt 2: ", Perlito5::Dumper::Dumper( $stmt );
+
+                    Perlito5::Grammar::Scope::check_variable_declarations();
+                    Perlito5::Grammar::Scope::create_new_compile_time_scope();
+                    my $exp = Perlito5::Grammar::Expression::exp_parse( [ split("", $stmt) ], 0 );
+                    Perlito5::Grammar::Scope::end_compile_time_scope();
+                    Perlito5::Grammar::Scope::check_variable_declarations();
+
+                    my $exp2;
+                    if ($exp) {
+                        # print STDERR "stmt 2 exp: ", Perlito5::Dumper::Dumper( $exp );
+                        $exp2 = Perlito5::Match::flat($exp);
+                    }
+                    if (!$exp2) {
+                        $exp2 = Perlito5::AST::Apply->new(
+                            arguments => [],
+                            code => 'list:<,>',
+                        );
+                    }
+                    # print STDERR "op2: ", Perlito5::Dumper::Dumper( $exp2 );
+                    push @{ $MATCH->{fmt} }, $exp2;
+                }
+            ]
+            [ \c10 \c13? | \c13 \c10? ]
+        ]
+    ]*
 };
 
 token stmt_package {

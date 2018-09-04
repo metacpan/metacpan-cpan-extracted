@@ -1,3 +1,8 @@
+0.008   2018-09-02 (PERLANCAR)
+
+	- Add filter arguments: exclude_{dists,dist_re,authors,author_re}.
+
+
 0.007   2018-03-12 (PERLANCAR)
 
 	- Turn off read_config & read_env for the CLIs.

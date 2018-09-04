@@ -1,5 +1,17 @@
 Revision history for AnyEvent::WebDriver
 
+TODO: investigate modifer key usage/special key usage in send_element_keys
+TODO: firefox profiles
+TODO: capabilities object?
+
+0.91 Tue Sep  4 03:20:56 CEST 2018
+	- actions created via Actions objects no longer queue actions
+          to execute concurrently.
+        - default mouse button to 0 instead of 0.
+	- implement ->cancel action (pointerCancel).
+	- add pauses between events in examples.
+        - doc fixes.
+
 0.9 Fri Aug 31 04:44:10 CEST 2018
 	- enable persistent connections for non-idempotent requests by default.
         - make "verboser" action example actually more verbose.

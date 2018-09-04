@@ -27,7 +27,10 @@ information without making additional system calls.
 use strict;
 use warnings;
 
-use parent qw( Linux::Perl::Base::BitsTest );
+use parent qw(
+    Linux::Perl::Base
+    Linux::Perl::Base::BitsTest
+);
 
 use Linux::Perl;
 use Linux::Perl::Endian;
@@ -89,10 +92,7 @@ for an implementation of this.)
 sub getdents {
     my ($class, $fh_or_fileno, $bufsize) = @_;
 
-    if (!$class->can('NR_getdents64')) {
-        require Linux::Perl::ArchLoader;
-        $class = Linux::Perl::ArchLoader::get_arch_module($class);
-    }
+    $class = $class->_get_arch_module();
 
     my $buf = "\0" x $bufsize;
 

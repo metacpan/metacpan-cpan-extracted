@@ -20,6 +20,9 @@ ok(RT::Test->set_rights({Principal => $user, Right => [qw(ShowTicket)]}), 'Set S
 my ($base, $m) = RT::Extension::Memo::Test->started_ok;
 ok($m->login('user', 'password'), 'Logged in agent');
 
+# Unset Richtext preference
+$user->SetPreferences($RT::System, {'MemoRichText' => 0});
+
 # Display ticket with ShowTicket rights granted to user
 $m->get_ok($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id, 'Ticket display page with ShowTicket right');
 $m->content_lacks('<div class="memo-content" id="MemoContent" data-objectclass="RT::Ticket" data-objectid="1">This is a memo</div>', 'Hide memo with ShowTicket right');

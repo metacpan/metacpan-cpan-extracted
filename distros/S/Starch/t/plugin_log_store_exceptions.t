@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strictures 2;
 
-use Test::More;
+use Test2::V0;
 use Test::Fatal;
 use Test::Starch;
 use Log::Any::Test;
@@ -46,7 +46,7 @@ foreach my $method (qw( set get remove )) {
     log_empty_ok();
 
     like(
-        exception { $die_store->$method( 1234, [] ) },
+        dies { $die_store->$method( 1234, [] ) },
         qr{$uc_method FAIL},
         "$method exception thrown",
     );

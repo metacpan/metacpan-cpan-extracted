@@ -42,6 +42,7 @@
          },
          "requires" : {
             "Catmandu" : "1.07",
+            "Catmandu::FileStore" : "1.12",
             "File::Copy" : "0",
             "IO" : "0",
             "LWP::Simple" : "6.00",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.231",
+   "version" : "0.232",
    "x_contributors" : [
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"

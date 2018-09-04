@@ -1,5 +1,25 @@
 Revision history for Perl extension Finance::Bank::Postbank_de.
 
+0.54 2018-09-02
+  + Add missing prerequisite for JSON, Future
+    This addresses RT #127022 , reported by Slaven Rezic
+
+0.53 2018-09-02
+  + Add missing prerequisite for Filter::signatures
+    This addresses RT #127022 , reported by Slaven Rezic
+
+0.52 2018-09-02
+  [Distribution]
+  + This is most likely a breaking change. I've tried to keep the old interface
+    alive and so far, the test suite passes with what I think are mostly
+    data changes and removal of old tests that reached too deep.
+  + Merge the API branch, as the old website got switched off.
+  + There is no compatibility shim yet to restore the functionality of the old
+    module. The tests will currently fail, sorry.
+  + All files are now stored and read as UTF-8 indiscriminately.
+  + Use the new API, which could be less fragile than the scraping approach
+    used before.
+
 0.51 2018-07-17
   [Distribution]
   + Fix prerequisites

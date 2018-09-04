@@ -64,6 +64,14 @@ is $tx->res->code, 400, 'invalid listPets';
 is $tx->error->{message}, 'Invalid input', 'sync invalid message';
 is $i, 0, 'invalid on client side';
 
+note 'Promise testing';
+my $p = $client->listPets_p->then(sub { $tx = shift });
+$tx = undef;
+$p->wait;
+is $tx->res->code, 400, 'invalid listPets';
+is $tx->error->{message}, 'Invalid input', 'sync invalid message';
+is $i, 0, 'invalid on client side';
+
 note 'call()';
 $tx = $client->call('list pets', {page => 2});
 is_deeply $tx->res->json, [{page => 2}], 'call(list pets)';

@@ -22,7 +22,6 @@ use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
-use Sim::OPT::Modish;
 #use Parallel::ForkManager;
 use Data::Dumper;
 #$Data::Dumper::Indent = 0;

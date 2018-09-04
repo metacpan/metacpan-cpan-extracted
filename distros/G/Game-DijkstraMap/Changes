@@ -1,4 +1,13 @@
 See also the git repository.
 
+0.04    domingo,  2 de septiembre de 2018
+        New methods for path finding: next, next_best, next_sq,
+        path_best. Documentation on diagonals.
+
+0.02    2018-09-01
+        Add recalc() method (update() now makes no such effort as it
+        cannot) and related commentary about these methods in the
+        perldocs. Also new str2map() utility method.
+
 0.01    August 31 2018
         First version, released on an unsuspecting world.

@@ -6,11 +6,18 @@ use 5.010000;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "config";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "shortcut functions to make log4perl even easier",
   "AUTHOR" => "Steve Dondley <s\@dondley.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Log-Log4perl-Shortcuts",
   "LICENSE" => "perl",
@@ -20,15 +27,20 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Data::Dumper" => 0,
     "Exporter" => 0,
-    "File::HomeDir" => 0,
+    "File::UserConfig" => 0,
     "Log::Log4perl" => 0,
-    "Log::Log4perl::Level" => 0
+    "Log::Log4perl::Level" => 0,
+    "Module::Data" => 0,
+    "Path::Tiny" => 0
   },
   "TEST_REQUIRES" => {
     "File::Copy" => 0,
+    "File::HomeDir" => 0,
     "File::Temp" => 0,
     "Test::Exception" => 0,
     "Test::Fatal" => 0,
+    "Test::File::ShareDir::Dist" => 0,
+    "Test::File::ShareDir::Module" => 0,
     "Test::More" => 0,
     "Test::NoWarnings" => 0,
     "Test::Output" => 0,
@@ -37,7 +49,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,10 +63,15 @@ my %FallbackPrereqs = (
   "File::Copy" => 0,
   "File::HomeDir" => 0,
   "File::Temp" => 0,
+  "File::UserConfig" => 0,
   "Log::Log4perl" => 0,
   "Log::Log4perl::Level" => 0,
+  "Module::Data" => 0,
+  "Path::Tiny" => 0,
   "Test::Exception" => 0,
   "Test::Fatal" => 0,
+  "Test::File::ShareDir::Dist" => 0,
+  "Test::File::ShareDir::Module" => 0,
   "Test::More" => 0,
   "Test::NoWarnings" => 0,
   "Test::Output" => 0,
@@ -75,3 +92,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

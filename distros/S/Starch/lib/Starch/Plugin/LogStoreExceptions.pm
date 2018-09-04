@@ -1,5 +1,5 @@
 package Starch::Plugin::LogStoreExceptions;
-$Starch::Plugin::LogStoreExceptions::VERSION = '0.07';
+$Starch::Plugin::LogStoreExceptions::VERSION = '0.09';
 =head1 NAME
 
 Starch::Plugin::LogStoreExceptions - Turn Starch store exceptions into log messages.

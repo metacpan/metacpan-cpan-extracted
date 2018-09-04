@@ -73,24 +73,19 @@ sub _do_tests {
     my $epl = $class->new();
     $epl->add( $r, events => ['IN'] );
 
-    my @events = $epl->wait( maxevents => 1, timeout => 0.1 );
+    my %events = $epl->wait( maxevents => 1, timeout => 0.1 );
 
-    cmp_deeply( \@events, [], 'no read events' ) or diag explain \@events;
+    cmp_deeply( \%events, {}, 'no read events' ) or diag explain \%events;
 
     syswrite( $w, 'x' );
 
-    @events = $epl->wait( maxevents => 1, timeout => 0.1 );
+    %events = $epl->wait( maxevents => 1, timeout => 0.1 );
 
     cmp_deeply(
-        \@events,
-        [
-            {
-                events => $epl->EVENT_NUMBER()->{'IN'},
-                data => fileno($r),
-            },
-        ],
+        \%events,
+        { fileno($r) => $epl->EVENT_NUMBER()->{'IN'} },
         'received an event',
-    ) or diag explain \@events;
+    ) or diag explain \%events;
 
     {
         sysread( $r, my $buf, 1 );  #flush buffer
@@ -108,8 +103,8 @@ sub _do_tests {
 
     $epl->delete( $r );
 
-    @events = $epl->wait( maxevents => 1, timeout => 0.1 );
-    is_deeply( \@events, [], 'delete() removes an event' );
+    %events = $epl->wait( maxevents => 1, timeout => 0.1 );
+    is_deeply( \%events, {}, 'delete() removes an event' );
 
     #----------------------------------------------------------------------
 
@@ -118,33 +113,23 @@ sub _do_tests {
     $epl->add( $yin, events => ['IN'] );
     $epl->modify( $yin, events => ['OUT'] );
 
-    @events = $epl->wait( maxevents => 1, timeout => 0.1 );
+    %events = $epl->wait( maxevents => 1, timeout => 0.1 );
 
     cmp_deeply(
-        \@events,
-        [
-            {
-                events => $epl->EVENT_NUMBER()->{'OUT'},
-                data => fileno($yin),
-            },
-        ],
+        \%events,
+        { fileno($yin) => $epl->EVENT_NUMBER()->{'OUT'} },
         'received expected event after modify()',
-    ) or diag explain @events;
+    ) or diag explain %events;
 
     close $yang;
 
-    @events = $epl->wait( maxevents => 1, timeout => 0.1 );
+    %events = $epl->wait( maxevents => 1, timeout => 0.1 );
 
     cmp_deeply(
-        \@events,
-        [
-            {
-                events => $epl->EVENT_NUMBER()->{'OUT'} | $epl->EVENT_NUMBER()->{'HUP'},
-                data => fileno($yin),
-            },
-        ],
+        \%events,
+        { fileno($yin) => $epl->EVENT_NUMBER()->{'OUT'} | $epl->EVENT_NUMBER()->{'HUP'} },
         'received expected event(s) after closing one end of a socketpair',
-    ) or diag explain @events;
+    ) or diag explain \%events;
 
     #----------------------------------------------------------------------
 
@@ -162,8 +147,8 @@ sub _do_tests {
         sysread $r, my $buf, 1;
     }
 
-    @events = $epl->wait( maxevents => 1, timeout => 0.1 );
-    is_deeply( \@events, [], 'edge-triggered flag works' ) or diag explain \@events;
+    %events = $epl->wait( maxevents => 1, timeout => 0.1 );
+    is_deeply( \%events, {}, 'edge-triggered flag works' ) or diag explain \%events;
 
     #----------------------------------------------------------------------
 

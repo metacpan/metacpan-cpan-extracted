@@ -22,6 +22,7 @@ tables:
     columns:
       -
         autoincrement: '0'
+        comment: ''
         datatype: INT
         default_value: ''
         length: '-1'
@@ -42,6 +43,7 @@ tables:
     columns:
       -
         autoincrement: '0'
+        comment: "\t"
         datatype: INT
         default_value: ''
         length: '-1'
@@ -50,6 +52,7 @@ tables:
         precision: '-1'
       -
         autoincrement: '0'
+        comment: ''
         datatype: VARCHAR
         default_value: ''
         length: '45'
@@ -58,6 +61,7 @@ tables:
         precision: '-1'
       -
         autoincrement: '0'
+        comment: ''
         datatype: DECIMAL
         default_value: ''
         length: '-1'
@@ -66,6 +70,7 @@ tables:
         precision: 10,0
       -
         autoincrement: '0'
+        comment: ''
         datatype: VARCHAR
         default_value: ''
         length: '45'
@@ -74,6 +79,7 @@ tables:
         precision: '-1'
       -
         autoincrement: '0'
+        comment: ''
         datatype: INT
         default_value: ''
         length: '-1'
@@ -82,6 +88,7 @@ tables:
         precision: '-1'
       -
         autoincrement: '0'
+        comment: ''
         datatype: INT
         default_value: ''
         length: '-1'
@@ -125,6 +132,7 @@ tables:
     columns:
       -
         autoincrement: '0'
+        comment: ''
         datatype: INT
         default_value: ''
         length: '-1'

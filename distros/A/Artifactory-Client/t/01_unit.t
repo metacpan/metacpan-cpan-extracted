@@ -2543,6 +2543,24 @@ subtest 'calculate_helm_chart_index', sub {
     is( $resp->code, 200, 'request succeeded' );
 };
 
+subtest 'calculate_cran_repository_metadata', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->calculate_cran_repository_metadata();
+    is( $resp->code, 200, 'request succeeded' );
+};
+
+subtest 'calculate_conda_repository_metadata', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->calculate_conda_repository_metadata();
+    is( $resp->code, 200, 'request succeeded' );
+};
+
 subtest 'system_info', sub {
     my $client = setup();
     local *{'LWP::UserAgent::get'} = sub {

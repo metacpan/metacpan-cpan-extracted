@@ -1,12 +1,12 @@
 package Regexp::Pattern::CPAN;
 
-our $DATE = '2017-01-05'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our %RE = (
     pause_id => {
         summary => 'PAUSE author ID, or PAUSE ID for short',
-        pat => qr/[a-z][a-z0-9]{1,8}/,
+        pat => qr/[A-Z][A-Z0-9]{1,8}/,
         description => <<'_',
 
 I'm not sure whether PAUSE allows digit for the first letter. For safety I'm
@@ -31,7 +31,7 @@ Regexp::Pattern::CPAN - Regexp patterns related to CPAN
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::CPAN (from Perl distribution Regexp-Pattern-CPAN), released on 2017-01-05.
+This document describes version 0.002 of Regexp::Pattern::CPAN (from Perl distribution Regexp-Pattern-CPAN), released on 2018-09-02.
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

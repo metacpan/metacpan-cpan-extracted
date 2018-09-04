@@ -1,5 +1,8 @@
 Revision history for Perl extension Amazon-S3-Thin
 
+0.23 2018-09-03T15:30:25Z
+   - Add Config::Tiny in PREREQ_PM of Makefile.PL to pass test
+
 0.22 2018-08-22T14:34:37Z
    - Add more test and docs
 

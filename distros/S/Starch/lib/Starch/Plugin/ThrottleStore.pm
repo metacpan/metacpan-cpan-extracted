@@ -1,5 +1,5 @@
 package Starch::Plugin::ThrottleStore;
-$Starch::Plugin::ThrottleStore::VERSION = '0.07';
+$Starch::Plugin::ThrottleStore::VERSION = '0.09';
 =head1 NAME
 
 Starch::Plugin::ThrottleStore - Throttle misbehaving Starch stores.

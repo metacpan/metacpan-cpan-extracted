@@ -34,6 +34,7 @@ static/css/memo.css
 static/js/memo.js
 xt/00-load.t
 xt/memo.t
+xt/merge.t
 xt/richtext.t
 xt/rights.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

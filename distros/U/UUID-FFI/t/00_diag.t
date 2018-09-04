@@ -10,6 +10,7 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Alien::libuuid
   ExtUtils::MakeMaker
   FFI::CheckLib
   FFI::Platypus

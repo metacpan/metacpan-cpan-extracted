@@ -1,4 +1,7 @@
 Revision history for Net-Zendesk
 
+0.02 2018-09-03
+    - ensure request parameters are JSON encoded.
+
 0.01 2017-03-12
     - First version, released on an unsuspecting world.

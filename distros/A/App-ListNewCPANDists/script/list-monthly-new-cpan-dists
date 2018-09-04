@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListNewCPANDists/list_monthly_new_cpan_dists
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2018-03-12'; # DATE
+our $DATE = '2018-09-02'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-monthly-new-cpan-dists - List new CPAN distributions in a given month
 
 =head1 VERSION
 
-This document describes version 0.007 of list-monthly-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2018-03-12.
+This document describes version 0.008 of list-monthly-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2018-09-02.
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,32 @@ C<*> marks required options.
 =item B<--month>=I<s>*
 
 =item B<--year>=I<s>*
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--exclude-author-re>=I<s>
+
+=item B<--exclude-author>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--exclude-authors-json>=I<s>
+
+See C<--exclude-author>.
+
+=item B<--exclude-dist-re>=I<s>
+
+=item B<--exclude-dist>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--exclude-dists-json>=I<s>
+
+See C<--exclude-dist>.
 
 =back
 

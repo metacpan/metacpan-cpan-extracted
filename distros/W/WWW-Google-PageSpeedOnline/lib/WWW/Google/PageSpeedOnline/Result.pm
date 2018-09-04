@@ -1,6 +1,6 @@
 package WWW::Google::PageSpeedOnline::Result;
 
-$WWW::Google::PageSpeedOnline::Result::VERSION   = '0.25';
+$WWW::Google::PageSpeedOnline::Result::VERSION   = '0.26';
 $WWW::Google::PageSpeedOnline::Result::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,13 @@ WWW::Google::PageSpeedOnline::Result - Placeholder for the result of L<WWW::Goog
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has [ qw(id title score rules) ] => (is => 'ro');
 

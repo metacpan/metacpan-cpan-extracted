@@ -15,14 +15,16 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Sah-Schemas-CPAN",
   "LICENSE" => "perl",
   "NAME" => "Sah::Schemas::CPAN",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::str::str_toupper" => "0.002"
+  },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,6 +32,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::str::str_toupper" => "0.002",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

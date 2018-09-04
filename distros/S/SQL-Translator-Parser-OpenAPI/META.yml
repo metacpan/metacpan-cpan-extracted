@@ -1,0 +1,35 @@
+---
+abstract: 'convert OpenAPI schema to SQL::Translator schema'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+  Test::Snapshot: '0.02'
+configure_requires:
+  ExtUtils::MakeMaker: '7.10'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Translator-Parser-OpenAPI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::Validator: '2.01'
+  Lingua::EN::Inflect::Number: '0'
+  SQL::Translator: '0.11024'
+  SQL::Translator::Schema::Constants: '0'
+  String::CamelCase: '0'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/mohawk2/SQL-Translator-Parser-OpenAPI/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/SQL-Translator-Parser-OpenAPI
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,11 @@
 Revision history for App-opan
 
+0.003000 - 2018-09-02
+  - Use gzip instead of zcat because Mac OS X's zcat is bizarre
+  - Refactor to use more Mojo::File
+  - Added token protected upload endpoint with CPAN::Uploader compat
+  - Added periodic updater.
+
 0.002002 - 2017-05-22
   - port the tests to new Mojo::File API as well so it still installs
 

@@ -13,6 +13,10 @@ my ($base, $m) = RT::Extension::Memo::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
+# Unset Richtext preference
+my $user = RT::Test->load_or_create_user(Name => 'root', Password => 'password');
+$user->SetPreferences($RT::System, {'MemoRichText' => 0});
+
 # Display ticket
 $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
 
@@ -64,6 +68,7 @@ $mjs->click($action_button);
 $mjs->field($textarea, 'This is a memo');
 $mjs->click($action_button);
 
+sleep 1; # wait for DB to sync
 $ticket->ClearAttributes;
 $attr = $ticket->FirstAttribute('Memo');
 is($attr->Content, 'This is a memo', 'Attribute set on saved memo');
@@ -126,6 +131,7 @@ $mjs->click($action_button);
 $mjs->field($textarea, '');
 $mjs->click($action_button);
 
+sleep 1; # wait for DB to sync
 $ticket->ClearAttributes;
 $attr = $ticket->FirstAttribute('Memo');
 is($attr->Content, '', 'Attribute empty on empty attribute');

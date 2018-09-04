@@ -1,3 +1,9 @@
+1.116 2018-09-01
+- New option 'pass_all'. This can be used to override the 'pass' outcome
+  in case a policy was detected which is designed to pass everything (very crude
+  checks so far). Such policies are setup by spammers for their domains so that
+  they get SPF pass even when sending from botnets.
+
 1.115 2018-08-31
 - Update module to support current RFC 7208 instead of the older RFC 4408. This
   means especially that DNS SPF records will be no longer used (only TXT).

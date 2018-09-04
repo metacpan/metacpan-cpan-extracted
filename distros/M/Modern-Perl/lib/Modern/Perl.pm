@@ -1,6 +1,6 @@
 package Modern::Perl;
 # ABSTRACT: enable all of the features of Modern Perl with one import
-$Modern::Perl::VERSION = '1.20180701';
+$Modern::Perl::VERSION = '1.20180901';
 use 5.010_000;
 
 use strict;
@@ -93,7 +93,7 @@ Modern::Perl - enable all of the features of Modern Perl with one import
 
 =head1 VERSION
 
-version 1.20180701
+version 1.20180901
 
 =head1 SYNOPSIS
 

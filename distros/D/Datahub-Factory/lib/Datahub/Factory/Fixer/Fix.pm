@@ -2,16 +2,23 @@ package Datahub::Factory::Fixer::Fix;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 use Moo;
 use Catmandu;
+use Datahub::Factory;
 use namespace::clean;
 
 has file_name     => (is => 'ro', required => 1, isa => sub {
     if (!defined($_[0])) {
         Catmandu::BadArg->throw(
             message => 'Required argument "file_name" undefined'
+        );
+    }
+
+    if (! -e $_[0]) {
+        Datahub::Factory::FixFileNotFound->throw(
+            message => sprintf('Fix file %s could not be found on the filesystem.', $_[0])
         );
     }
  });

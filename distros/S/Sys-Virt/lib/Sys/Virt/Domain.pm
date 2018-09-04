@@ -1078,7 +1078,7 @@ default. At the moment this is only supported by the QEMU driver.
 =item C<Sys::Virt::Domain::MIGRATE_PARAM_MIGRATE_DISKS>
 
 The list of disks to migrate when doing block storage migration.
-In constrast to other parameters whose values are plain strings,
+In contrast to other parameters whose values are plain strings,
 the parameter value should be an array reference, whose elements
 are in turn strings representing the disk target names.
 
@@ -1360,7 +1360,7 @@ Obtain information about the state of all virtual CPUs in a running
 guest domain. The returned list will have one element for each vCPU,
 where each elements contains a hash reference. The keys in the hash
 are, C<number> the vCPU number, C<cpu> the physical CPU on which the
-vCPU is currently scheduled, C<cpuTime> the cummulative execution
+vCPU is currently scheduled, C<cpuTime> the cumulative execution
 time of the vCPU, C<state> the running state and C<affinity> giving
 the allowed shedular placement. The value for C<affinity> is a
 string representing a bitmask against physical CPUs, 8 cpus per
@@ -1422,7 +1422,7 @@ documented later, and defaults to 0 if omitted.
 =item my @stats = $dom->get_cpu_stats($startCpu, $numCpus, $flags=0)
 
 Requests the guests host physical CPU usage statistics, starting
-from host CPU <$startCpu> counting upto C<$numCpus>. If C<$startCpu>
+from host CPU <$startCpu> counting up to C<$numCpus>. If C<$startCpu>
 is -1 and C<$numCpus> is 1, then the utilization across all CPUs
 is returned. Returns an array of hash references, each element
 containing stats for one CPU.
@@ -1518,7 +1518,7 @@ The elapsed time in milliseconds
 
 =item Sys::Virt::Domain::JOB_TIME_ELAPSED_NET
 
-Time in miliseconds since the beginning of the migration job NOT
+Time in milliseconds since the beginning of the migration job NOT
 including the time required to transfer control flow from the
 source host to the destination host.
 
@@ -3515,7 +3515,7 @@ The disk media was cleared, as its source was missing when attempting to start t
 
 =item Sys::Virt::Domain::EVENT_DISK_DROP_MISSING_ON_START
 
-The disk device was dropped, as its source was missing whe  attempting to start the guest
+The disk device was dropped, as its source was missing when  attempting to start the guest
 
 =back
 

@@ -21,7 +21,7 @@ setup is a plugin bundle which adds arguments to the manager object and then add
 to the state objects which acts upon the arguments.
 
 See L<Starch::Plugin::CookieArgs> for a basic example plugin.  See
-L<Starch::Manual/PLUGINS> for more existing plugins.
+L<Starch/PLUGINS> for more existing plugins.
 
 See the SYNOPSIS in L<Starch::Plugin::Bundle>, L<Starch::Plugin::ForManager>,
 L<Starch::Plugin::ForState>, and L<Starch::Plugin::ForStore> documentation
@@ -42,11 +42,11 @@ the store class does nothing more than glue those three methods with some underl
 implementation such as L<DBI> or L<CHI>.
 
 The L<Starch::Store::CHI> store is a good example store to use for
-building new store classes.  See L<Starch::Manual/STORES> for more existing stores.
+building new store classes.  See L<Starch/STORES> for more existing stores.
 
 Stores should be written so that the underlying driver object (the C<$dbh>
 for a DBI store, for example) can be passed as an argument.   This allows
-the user to utilize L<Starch::Manual/METHOD PROXIES> to build their own driver objects.
+the user to utilize L<Starch/METHOD PROXIES> to build their own driver objects.
 
 A state's expires duration is stored in the state data under the
 L<Starch::Manager/expires_state_key>.  This should B<not> be considered
@@ -163,8 +163,8 @@ via an C<after> method modifier as in:
                 |    +---------------------------+
                 |                                V
     +------------------------+       +------------------------+
-    |      4. session        |       |      2. factory        |
-    |   (Starch::Session)    |       |   (Starch::Factory)    |
+    |      4. state          |       |      2. factory        |
+    |   (Starch::State)      |       |   (Starch::Factory)    |
     +------------------------+       +------------------------+
 
 This diagram shows which objects hold references to other objects.  Solid
@@ -194,7 +194,7 @@ references to other stores.
 
 =item 4.
 
-B<session> - The session provides the runtime public interface to the store
+B<state> - The state provides the runtime public interface to the store
 and other parts of starch.  It holds a strong reference to the manager.
 
 =back

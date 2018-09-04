@@ -1,5 +1,12 @@
 Revision history for HTML::GoogleMaps::V3
 
+0.12 2018-09-04
+        - add missing meta spec to dist (GH #19)
+        - thanks to Mohammad S Anwar for the above patch
+
+0.11 2018-09-03
+        - check location is a HASH ref before using (GH #17)
+
 0.10 2017-01-01
         - fix various typos in the module (GH #12)
         - allow dependency injection of the GeoCoder module (GH #14)

@@ -67,7 +67,7 @@ yard algorithm, to handle precedence.
 
 =item * L<The TestML Perl Module|https://github.com/ingydotnet/testml-pm>
 
-=item * L<A JSON Decoder Perl Module|https://github.com/ingydotnet/pegex-json-pgx>
+=item * L<Pegex JSON Parser for Perl|https://github.com/ingydotnet/pegex-json-pm>
 
 =item * L<A JSONY Decoder Perl Module|https://github.com/ingydotnet/json-pgx>
 

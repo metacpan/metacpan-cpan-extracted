@@ -1,6 +1,6 @@
 package Acme::ICan::tSpell;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moo;
 use MooX::LazierAttributes qw/rw lzy/;
@@ -27,7 +27,7 @@ validate_subs (
 sub get {
     my $response = $_[0]->tiny->get($_[1]);
     $response->{success} and return $response;
-    croak sprintf "something went terribly wrong status - %s - reason - %s", 
+    croak sprintf "something went terribly wrong: status - %s - reason - %s", 
         $response->{status}, $response->{reason};
 }
 
@@ -54,7 +54,7 @@ Acme::ICan::tSpell - What do you do..
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

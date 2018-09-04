@@ -17,7 +17,7 @@ use CHI::Memoize qw(:all);
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.9;
+our $VERSION  = 1.1.0;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -30,9 +30,9 @@ sub run {
         \%option,
         'all|a',
         'branch|b',
-        'branches|B',
         'day|d',
         'depth|D=i',
+        'path_depth|path-depth|p=i%',
         'files|f',
         'ignore_files|ignore-files=s@',
         'ignore_user|ignore-users=s@',
@@ -178,9 +178,9 @@ sub recent_commits {
     }
 
     unshift @args, $option->{tag} ? '--tags'
-        : $option->{branch}       ? '--branches'
+        : $option->{all}          ? '--all'
         : $option->{remote}       ? '--remotes'
-        :                           '--all';
+        :                           '--branches';
 
     return $workflow->git->rev_list(@args);
 }
@@ -199,6 +199,25 @@ sub changed_from_shas {
             if ( defined $option{depth} ) {
                 $type = join '/', grep {defined $_} (split m{/}, $type)[0 .. $option{depth} - 1];
             }
+            if ( defined $option{path_depth} ) {
+                for my $path (keys %{ $option{path_depth} }) {
+                    if ( $type =~ /^$path/ ) {
+                        $type = join '/', grep {defined $_} (split m{/}, $type)[0 .. $option{path_depth}{$path} - 1];
+                    }
+                }
+            }
+            my %branches;
+            if ( $option{remote} ) {
+                %branches = map { $_ => 1 } grep {/^origin/} keys %{ $changed->{branches} };
+            }
+            elsif ( $option{all} ) {
+                %branches = %{ $changed->{branches} };
+            }
+            else {
+                %branches = map { $_ => 1 } grep {!/^origin/} keys %{ $changed->{branches} };
+            }
+            next if !%branches;
+
             $changed{$type}{users}{$changed->{user}}++;
             $changed{$type}{files} = {
                 %{ $changed{$type}{files} || {} },
@@ -206,7 +225,7 @@ sub changed_from_shas {
             };
             $changed{$type}{branches} = {
                 %{ $changed{$type}{branches} || {} },
-                %{ $changed->{branches} },
+                %branches,
             };
         }
 
@@ -256,7 +275,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.9
+This documentation refers to git-recent version 1.1.0
 
 =head1 SYNOPSIS
 
@@ -271,13 +290,12 @@ This documentation refers to git-recent version 1.0.9
   -d --day      Show changed files from the last day (Default action)
   -w --week     Show changed files from the last week
   -m --month    Show changed files from the last month
-  -a --all      Show recent based on everything
-  -b --branch   Show recent based on branches only
+  -a --all      Show recent based on local and remote branches
   -r --remote   Show recent based on remotes only
   -t --tag      Show recent based on tags only
 
  OUTPUT:
-  -B --branches Show the output by what's changed in each branch
+  -b --branch   Show the output by what's changed in each branch
   -D --depth[=]int
                 Truncate files to this number of directories (allows showing
                 areas that have changed)

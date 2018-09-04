@@ -11,6 +11,7 @@ use File::Find;
 use File::HomeDir;
 use File::Path 'make_path';
 use File::Spec;
+use IO::Handle;
 use JSON::XS;
 use Time::Piece;
 use constant DEBUG => $ENV{APP_TT_DEBUG} || 0;
@@ -193,12 +194,12 @@ sub cmd_register {
   }
 
   %event = (
-    __CLASS__ => 'App::TimeTracker::Data::Task',
-    project   => $project,
-    start     => $start,
-    stop      => $stop,
-    user      => scalar(getpwuid $<),
-    tags      => [split /,/, $tags || ''],
+    __CLASS__   => 'App::TimeTracker::Data::Task',
+    project     => $project,
+    start       => $start,
+    stop        => $stop,
+    user        => scalar(getpwuid $<),
+    tags        => [split /,/, $tags || ''],
     description => $description || $self->description,
   );
 

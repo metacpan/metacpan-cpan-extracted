@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Implementation independent persistent statefulness.",
+  "ABSTRACT" => "A framework independent HTTP session library.",
   "AUTHOR" => "Aran Deltac <bluefeet\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -32,11 +32,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::Fatal" => 0,
-    "Test::More" => 0,
-    "Test::Simple" => "0.96"
+    "Test2::V0" => "0.000094",
+    "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,9 +53,8 @@ my %FallbackPrereqs = (
   "MooX::BuildArgs" => "0.02",
   "Scalar::Util" => 0,
   "Storable" => 0,
-  "Test::Fatal" => 0,
+  "Test2::V0" => "0.000094",
   "Test::More" => 0,
-  "Test::Simple" => "0.96",
   "Try::Tiny" => "0.18",
   "Type::Tiny" => "1.000005",
   "namespace::clean" => "0.24",

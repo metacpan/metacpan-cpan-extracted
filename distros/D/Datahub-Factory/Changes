@@ -1,5 +1,15 @@
 Revision history for Datahub-Factory
 
+1.74  2018-09-03 14:11:03 CEST
+
+    - Added: Datahub::Factory::FixFileNotFound error.
+    - Added: Datahub::Factory::InvalidCondition error.
+    - Fixed: fixes #62 fixer Fix throws an error file_name is undefined
+    - Added: fixes #61 break after finite number of records in transport.
+    - Fixed: issue #60 concatenation error when a HTTP error is thrown.
+    - Fixed: issue #59 Error when adding only one fixer when Fix plugin is used.
+    - Added: support display parameter for Catmandu::CA.
+
 1.73  2017-11-30 12:03:28 CET
 
     - Changed: added a General block to the configuration.

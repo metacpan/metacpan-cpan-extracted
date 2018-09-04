@@ -22,8 +22,8 @@ It covers almost all of the L<Pegex::Syntax> as well.
 
 =item L<Pegex::Tutorial::Calculator>
 
-Pegex comes with an C<examples/> directory. One example is
-L<Pegex/examples/calculator.pl>. It's a simple precedence parser (and
+Pegex comes with an C<eg/> directory. One example is
+L<Pegex/eg/calculator/calculator1.pl>. It's a simple precedence parser (and
 evaluator) for arithmetic expressions like this one:
 
     1 * (2 + 3) / (4 ^ 5 ^ 6 - -7)

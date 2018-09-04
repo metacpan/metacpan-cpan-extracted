@@ -26,12 +26,13 @@ t/14_indexes.t
 t/15_no_indexes.t
 t/17_custom_code.t
 t/18_table_comments.t
+t/19_more_comments.t
 t/Role.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
-t/boilerplate.t
 t/comment.mwb
 t/comment.mwb.bak
 t/m_to_n.mwb
+t/more_comments.mwb
 t/test.mwb
 t/uppercase.mwb

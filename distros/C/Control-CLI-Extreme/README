@@ -10,6 +10,7 @@ Control::CLI::Extreme currently supports:
       DSG models 6248, 7648, 7480, 8032, 9032
       ERS/Passport models 1600, 8300, 8600, 8800
       ERS models 2500, 3x00, 4x00, 5x00
+      ISW industrial switches
       SR models 2330, 4134
       WLAN 91xx
       WLAN(WC) 81x0

@@ -15,15 +15,24 @@ SYNOPSIS
        $wd->new_session ({});
 
        $wd->navigate_to ("https://duckduckgo.com/html");
-       my $searchbox = $wd->find_element ("css selector" => 'input[type="text"]');
+       my $searchbox = $wd->find_element (css => 'input[type="text"]');
 
        $wd->element_send_keys ($searchbox => "free software");
-       $wd->element_click ($wd->find_element ("css selector" => 'input[type="submit"]'));
+       $wd->element_click ($wd->find_element (css => 'input[type="submit"]'));
 
+       # session gets autodeleted by default, so wait a bit
        sleep 10;
 
+       # this is an example of an action sequence
+       $wd->actions
+          ->move ($wd->find_element (...), 40, 5)
+          ->click
+          ->type ("some text")
+          ->key ("{Enter}")
+          ->perform;
+
 DESCRIPTION
-    WARNING: THE API IS NOT GUARANTEED TO BE STABLE UNTIL VERSION 1.0.
+    WARNING: BEFORE VERSION 1.0, API CHANGES ARE LIKELY.
 
     This module aims to implement the W3C WebDriver specification which is
     the standardised equivalent to the Selenium WebDriver API., which in
@@ -31,10 +40,12 @@ DESCRIPTION
     Chromium.
 
     At the time of this writing, it was so brand new that I could only get
-    "geckodriver" (For Firefox) to work, but that is expected to be fixed
+    "geckodriver" (for Firefox) to work, but that is expected to be fixed
     very soon indeed.
 
-    To make most of this module, or, in fact, to make any reasonable use of
+    One of the design goals of this module was to stay very close to the
+    language and words used in the WebDriver specification itself, so to
+    make most of this module, or, in fact, to make any reasonable use of
     this module, you would need to refer to the W3C WebDriver
     recommendation, which can be found here
     <https://www.w3.org/TR/webdriver1/>:
@@ -250,7 +261,10 @@ DESCRIPTION
            => { height => 1040, width => 540, x => 0, y => 0 }
 
     $wd->set_window_rect ($rect)
-        Sets the window rect(angle).
+        Sets the window rect(angle), e.g.:
+
+           $wd->set_window_rect ({ width => 780, height => 560 });
+           $wd->set_window_rect ({ x => 0, y => 0, width => 780, height => 560 });
 
     $wd->maximize_window
     $wd->minimize_window
@@ -341,7 +355,10 @@ DESCRIPTION
         Clear the contents of the given element.
 
     $wd->element_send_keys ($element, $text)
-        Sends the given text as key events to the given element.
+        Sends the given text as key events to the given element. Key input
+        state can be cleared by embedding "\x{e000}" in $text. Presumably,
+        you can embed modifiers using their unicode codepoints, but the
+        specification is less than clear to mein this area.
 
    DOCUMENT HANDLING
     $source = $wd->get_page_source
@@ -402,9 +419,9 @@ DESCRIPTION
                  pointerType => "touch",
                  actions => [
                     { type => "pointerMove", duration => 100, origin => $input, x => 40, y => 5 },
-                    { type => "pointerDown", button => 1 },
+                    { type => "pointerDown", button => 0 },
                     { type => "pause", duration => 40 },
-                    { type => "pointerUp", button => 1 },
+                    { type => "pointerUp", button => 0 },
                  ],
               },
               {
@@ -432,9 +449,7 @@ DESCRIPTION
            ]);
 
         And here is essentially the same (except for fewer pauses) example
-        as above, using the much simpler "AnyEvent::WebDriver::Actions" API.
-        Note that the pointer up and key down event happen concurrently in
-        this example:
+        as above, using the much simpler "AnyEvent::WebDriver::Actions" API:
 
            $wd->navigate_to ("https://duckduckgo.com/html");
            my $input = $wd->find_element ("css selector", 'input[type="text"]');
@@ -443,9 +458,9 @@ DESCRIPTION
               ->click
               ->key ("a")
               ->key ("b")
-              ->pause (2000)
-              ->key ("\x{E007}")
-              ->pause (5000)
+              ->pause (2000) # so you can watch leisurely
+              ->key ("{Enter}")
+              ->pause (5000) # so you can see the result
               ->perform;
 
     $wd->release_actions
@@ -478,29 +493,26 @@ DESCRIPTION
     or a keyboard) and a list of actions for each source.
 
     An action can be a key press, a pointer move or a pause (time delay).
-    Actions from different sources can happen "at the same time", while
-    actions from a single source are executed in order.
 
-    While you can provide an action list manually, it is (hopefully) less
-    cumbersome to use the API described in this section to create them.
+    While you can provide these action lists manually, it is (hopefully)
+    less cumbersome to use the API described in this section to create them.
 
     The basic process of creating and performing actions is to create a new
     action list, adding action sources, followed by adding actions. Finally
     you would "perform" those actions on the WebDriver.
 
-    Virtual time progresses as long as you add actions to the same event
-    source. Adding events to different sources are considered to happen
-    concurrently. If you want to force time to progress, you can do this
-    using a call to "->pause (0)".
-
     Most methods here are designed to chain, i.e. they return the web
     actions object, to simplify multiple calls.
+
+    Also, while actions from different sources can happen "at the same time"
+    in the WebDriver protocol, this class ensures that actions will execute
+    in the order specified.
 
     For example, to simulate a mouse click to an input element, followed by
     entering some text and pressing enter, you can use this:
 
        $wd->actions
-          ->click (1, 100)
+          ->click (0, 100)
           ->type ("some text")
           ->key ("{Enter}")
           ->perform;
@@ -512,7 +524,7 @@ DESCRIPTION
        $wd->actions
           ->source ("mouse", "pointer", pointerType => "mouse")
           ->source ("kbd", "key")
-          ->click (1, 100, "mouse")
+          ->click (0, 100, "mouse")
           ->type ("some text", "kbd")
           ->key ("{Enter}", "kbd")
           ->perform;
@@ -558,20 +570,23 @@ DESCRIPTION
 
     $al = $al->pointer_down ($button, $source)
     $al = $al->pointer_up ($button, $source)
-        Press or release the given button. $button defaults to 1.
+        Press or release the given button. $button defaults to 0.
 
     $al = $al->click ($button, $source)
         Convenience function that creates a button press and release action
-        without any delay between them. $button defaults to 1.
+        without any delay between them. $button defaults to 0.
 
     $al = $al->doubleclick ($button, $source)
         Convenience function that creates two button press and release
         action pairs in a row, with no unnecessary delay between them.
-        $button defaults to 1.
+        $button defaults to 0.
 
     $al = $al->move ($button, $origin, $x, $y, $duration, $source)
         Moves a pointer to the given position, relative to origin (either
         "viewport", "pointer" or an element object.
+
+    $al = $al->cancel ($source)
+        Executes a pointer cancel action.
 
     $al = $al->keyDown ($key, $source)
     $al = $al->keyUp ($key, $source)
@@ -600,8 +615,9 @@ DESCRIPTION
 
     $al = $al->type ($string, $source)
         Convenience method to simulate a series of key press and release
-        events for the keys in $string. There is no syntax for special keys,
-        everything will be typed "as-is" if possible.
+        events for the keys in $string, one pair per extended unicode
+        grapheme cluster. There is no syntax for special keys, everything
+        will be typed "as-is" if possible.
 
     $al->perform ($wd)
         Finalises and compiles the list, if not done yet, and calls
@@ -678,7 +694,7 @@ DESCRIPTION
   LOW LEVEL API
     All the simplified API methods are very thin wrappers around WebDriver
     commands of the same name. They are all implemented in terms of the
-    low-level methods ("req", "get", "post" and "delete"), which exists in
+    low-level methods ("req", "get", "post" and "delete"), which exist in
     blocking and callback-based variants ("req_", "get_", "post_" and
     "delete_").
 

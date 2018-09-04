@@ -439,7 +439,7 @@ sub inline_elements {
 
                             (?<verbatim>      \<verbatim\> .*? \<\/verbatim\>      ) |
                             (?<verbatim_code> \<code\>     .*? \<\/code\>          ) |
-                            (?<verbatim_code> (?<!\w)\=(?=\S)  .+? (?<=\S)\=(?!\w) ) |
+                            (?<verbatim_code> (?<![[:alnum:]])\=(?=\S)  .+? (?<=\S)\=(?![[:alnum:]]) ) |
                             (?<bidimarker>   (?:\<\<\<|\>\>\>) ) |
                             (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
@@ -581,6 +581,29 @@ sub manage_regular {
     # them into open/close tag via unroll, or turn them into regular
     # text
 
+    # given the way we parsed the string, we have to do another round
+    # to check if the open/close are legit. This would have been
+    # probably done better with regexp, but we're down this road now
+    # and no turning back.
+
+  CHECK_LEGIT:
+    {
+        for (my $i = 0; $i <= $#processed; $i++) {
+
+            my $el = $processed[$i];
+            if ($el->type eq 'inline') {
+                if ($i > 0 and $i < $#processed) {
+                    if ($processed[$i - 1]->string =~ m/[[:alnum:]]\z/ and
+                        $processed[$i + 1]->string =~ m/\A[[:alnum:]]/) {
+                        $el->type('text');
+                        $el->tag('');
+                    }
+                }
+            }
+        }
+    }
+
+
     # print Dumper(\@processed);
     my @tracking;
   MARKUP:
@@ -593,6 +616,7 @@ sub manage_regular {
             # first element can only open if there is a next one.
             if (!$previous) {
                 if ($next and
+                    scalar(grep { $_->tag eq $piece->tag } @processed) and
                     $next->string =~ m/\A\S/) {
                     print "Opening initial " . $piece->string . "\n" if DEBUG;
                     $piece->type('open_inline');
@@ -630,7 +654,7 @@ sub manage_regular {
                     }
                 }
                 elsif ($next->string =~ m/\A\S/ and
-                    $previous->string =~ m/\W\z/ and
+                    $previous->string =~ m/[[:^alnum:]]\z/ and
                     scalar(grep { $_->tag eq $piece->tag } @processed)) {
                     print "Opening " . $piece->string . "\n" if DEBUG;
                     $piece->type('open_inline');

@@ -70,6 +70,8 @@ my $check = q~__PACKAGE__->add_columns(
 my $content = do{ local (@ARGV, $/) = $role_class; <> };
 like( $content, qr/\Q$check\E/ );
 
+like $content, qr/__PACKAGE__->load_components\([^\)]+PassphraseColumn/;
+
 eval{
 #    rmtree( $output_path );
     $output_path = _untaint_path( $output_path );

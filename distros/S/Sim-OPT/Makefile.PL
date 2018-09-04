@@ -23,7 +23,7 @@ WriteMakefile(
 			'Vector::Object3D::Polygon' => '0',
 			'Math::Polygon::Tree' => '0',
 			'Devel::REPL' => '0',
-			'Parallel::ForkManager' => '0',
+			#'Parallel::ForkManager' => '0',
 			#'Scalar::Util' => '0',
 			}, # e.g., Module::Name => 1.1
     ($] >= 5.014 ?     ## Add these new keywords supported since 5.005

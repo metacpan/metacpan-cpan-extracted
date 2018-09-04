@@ -7,9 +7,9 @@ README
 samples/spflookup.pl
 t/01_load.t
 t/02_spf-test-suite-rfc4408.t
-t/02_spf-test-suite.t
 t/03_spf-test-suite-rfc7208.t
 t/04_misc.t
+t/05_pass_all.t
 t/make-testpl.pl
 t/misc.pl
 t/misc.yml

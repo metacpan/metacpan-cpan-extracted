@@ -8,7 +8,7 @@
 
 package Mail::Transport::SMTP;
 use vars '$VERSION';
-$VERSION = '3.002';
+$VERSION = '3.003';
 
 use base 'Mail::Transport::Send';
 
@@ -35,7 +35,7 @@ sub init($)
     $self->SUPER::init($args) or return;
 
     my $helo = $args->{helo}
-      || eval { require Net::Config; $Net::Config::inet_domain }
+      || eval { require Net::Config; $Net::Config::NetConfig{inet_domain} }
       || eval { require Net::Domain; Net::Domain::hostfqdn() };
 
     $self->{MTS_net_smtp_opts} =
@@ -60,13 +60,12 @@ sub trySend($@)
     my $from = $args{from} || $self->{MTS_from} || $message->sender || '<>';
     $from = $from->address if ref $from && $from->isa('Mail::Address');
 
-    # Who are the destinations.
-    if(defined $args{To})
-    {   $self->log(WARNING =>
-   "Use option `to' to overrule the destination: `To' would refer to a field");
-    }
+    # Which are the destinations.
+    ! defined $args{To}
+        or $self->log(WARNING =>
+   "Use option `to' to overrule the destination: `To' refers to a field");
 
-    my @to = map {$_->address} $self->destinations($message, $args{to});
+    my @to = map $_->address, $self->destinations($message, $args{to});
 
     unless(@to)
     {   $self->log(NOTICE =>
@@ -75,9 +74,9 @@ sub trySend($@)
     }
 
     # Prepare the header
-    my @header;
+    my @headers;
     require IO::Lines;
-    my $lines = IO::Lines->new(\@header);
+    my $lines = IO::Lines->new(\@headers);
     $message->head->printUndisclosed($lines);
 
     #
@@ -101,17 +100,24 @@ sub trySend($@)
         }
 
         $server->data;
-        $server->datasend($_) foreach @header;
+        $server->datasend($_) for @headers;
         my $bodydata = $message->body->file;
 
-        if(ref $bodydata eq 'GLOB') { $server->datasend($_) while <$bodydata> }
-        else    { while(my $l = $bodydata->getline) { $server->datasend($l) } }
+        if(ref $bodydata eq 'GLOB') {
+            $server->datasend($_) while <$bodydata>;
+        }
+        else {
+            while(my $l = $bodydata->getline) { $server->datasend($l) }
+        }
 
-        return (0, $server->code, $server->message, 'DATA', $server->quit)
-            unless $server->dataend;
+        $server->dataend
+            or return (0, $server->code, $server->message,'DATA',$server->quit);
 
-        return ($server->quit, $server->code, $server->message, 'QUIT',
-                $server->code);
+        my $accept = ($server->message)[-1];
+        chomp $accept;
+
+		my $rc     = $server->quit;
+        return ($rc, $server->code, $server->message, 'QUIT', $rc, $accept);
     }
 
     # in SCALAR context
@@ -131,7 +137,7 @@ sub trySend($@)
     }
 
     $server->data;
-    $server->datasend($_) foreach @header;
+    $server->datasend($_) for @headers;
     my $bodydata = $message->body->file;
 
     if(ref $bodydata eq 'GLOB') { $server->datasend($_) while <$bodydata> }

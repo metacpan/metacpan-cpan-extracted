@@ -15,7 +15,7 @@ use Git;
 use File::Spec;
 use base qw/Exporter/;
 
-our $VERSION     = 1.0.9;
+our $VERSION     = 1.1.0;
 our @EXPORT      = qw/git/;
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
@@ -90,7 +90,7 @@ App::Git::Workflow::Repository - A basic wrapper around GIT
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Repository version 1.0.9
+This documentation refers to App::Git::Workflow::Repository version 1.1.0
 
 =head1 SYNOPSIS
 

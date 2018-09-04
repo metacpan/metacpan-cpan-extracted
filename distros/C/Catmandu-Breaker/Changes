@@ -1,5 +1,11 @@
 Revision history for Catmandu-Breaker
 
+0.14  2018-09-03 13:42:04 CEST
+  - Adding support for --as FORMAT output formats (jorol)
+
+0.13  2018-09-03 11:31:40 CEST
+  - Adding MAB2 support (jorol)
+
 0.12  2018-04-03 09:23:48 CEST
   - Fixing bug in --fields option
 

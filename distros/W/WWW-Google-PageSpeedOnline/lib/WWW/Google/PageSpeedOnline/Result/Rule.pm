@@ -1,6 +1,6 @@
 package WWW::Google::PageSpeedOnline::Result::Rule;
 
-$WWW::Google::PageSpeedOnline::Result::Rule::VERSION   = '0.25';
+$WWW::Google::PageSpeedOnline::Result::Rule::VERSION   = '0.26';
 $WWW::Google::PageSpeedOnline::Result::Rule::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,13 @@ WWW::Google::PageSpeedOnline::Result::Rule - Placeholder for the result rule of 
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has [ qw(localizedRuleName ruleImpact ruleScore) ] => (is => 'ro');
 

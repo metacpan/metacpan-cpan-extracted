@@ -2,7 +2,7 @@ package GoodMap;
 
 use 5.006;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'good-map.xml') });
 with 'Map::Tube';

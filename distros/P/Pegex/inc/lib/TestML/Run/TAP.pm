@@ -186,12 +186,12 @@ sub show_error {
   if (not ref $got) {
     $got = "'$got'"
   }
-  $self->diag("$got_prefix $got");
+  $self->tap_diag("$got_prefix $got");
 
   if (not ref $want) {
     $want = "'{$want}'"
   }
-  $self->diag("$want_prefix $want");
+  $self->tap_diag("$want_prefix $want");
 }
 
 sub out {

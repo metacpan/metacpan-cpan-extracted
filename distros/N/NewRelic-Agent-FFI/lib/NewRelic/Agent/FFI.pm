@@ -3,17 +3,18 @@ package NewRelic::Agent::FFI;
 use strict;
 use warnings;
 use 5.008001;
-use FFI::Platypus;
-use Alien::nragent;
+use FFI::Platypus 0.56;
+use FFI::CheckLib ();
+use NewRelic::Agent::FFI::Procedural ();
 
 # ABSTRACT: Perl Agent for NewRelic APM
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub new
 {
   my($class, %args) = @_;
-  
+
   my $license_key          = delete $args{license_key}
                           || $ENV{NEWRELIC_LICENSE_KEY}
                           || '';
@@ -30,8 +31,8 @@ sub new
   if (%args) {
     require Carp;
     Carp::croak("Invalid arguments: @{[ keys %args ]}");
-  }  
-  
+  }
+
   bless {
     license_key          => $license_key,
     app_name             => $app_name,
@@ -40,105 +41,141 @@ sub new
   }, $class;
 }
 
-my $ffi = FFI::Platypus->new;
-$ffi->lib(Alien::nragent->dynamic_libs);
-my $newrelic_basic_literal_replacement_obfuscator = $ffi->find_symbol('newrelic_basic_literal_replacement_obfuscator');
-
 
 sub embed_collector
 {
-  my($self) = @_;
-  my $newrelic_message_handler = $ffi->find_symbol('newrelic_message_handler');
-  if($newrelic_message_handler)
-  {
-    $ffi->function('newrelic_register_message_handler' => ['opaque'] => 'void')->call($newrelic_message_handler);
-  }
-  else
-  {
-    Carp::croak("unable to find newrelic_message_handler");
-  }
+  NewRelic::Agent::FFI::Procedural::newrelic_register_message_handler(
+    NewRelic::Agent::FFI::Procedural::newrelic_message_handler
+  );
 }
 
 
-$ffi->attach( [ newrelic_init => 'init' ] => [ 'string', 'string', 'string', 'string' ] => 'int' => sub {
-  my($xsub, $self) = @_;
-  $xsub->(
+sub init
+{
+  my($self) = @_;
+  NewRelic::Agent::FFI::Procedural::newrelic_init(
     $self->get_license_key,
     $self->get_app_name,
     $self->get_app_language,
     $self->get_app_language_version,
   );
-});
-
-
-$ffi->attach( [ newrelic_transaction_begin => 'begin_transaction' ] => [] => 'long' => sub {
-  shift->();
-});
-
-sub _set1
-{
-  $_[0]->($_[2]);
-}
-
-sub _set2
-{
-  $_[0]->(@_[2,3]);
-}
-
-sub _set3
-{
-  $_[0]->(@_[2,3,4]);
 }
 
 
-$ffi->attach( [ newrelic_transaction_set_name               => 'set_transaction_name'               ] => [ 'long', 'string' ] => 'int' => \&_set2 );
-$ffi->attach( [ newrelic_transaction_set_request_url        => 'set_transaction_request_url'        ] => [ 'long', 'string' ] => 'int' => \&_set2 );
-$ffi->attach( [ newrelic_transaction_set_max_trace_segments => 'set_transaction_max_trace_segments' ] => [ 'long', 'int'    ] => 'int' => \&_set2 );
-$ffi->attach( [ newrelic_transaction_set_category           => 'set_transaction_category'           ] => [ 'long', 'string' ] => 'int' => \&_set2 );
-$ffi->attach( [ newrelic_transaction_set_type_web   => 'set_transaction_type_web'   ] => [ 'long' ] => 'int' => \&_set1 );
-$ffi->attach( [ newrelic_transaction_set_type_other => 'set_transaction_type_other' ] => [ 'long' ] => 'int' => \&_set1 );
-$ffi->attach( [ newrelic_transaction_add_attribute => 'add_transaction_attribute' ] => [ 'long', 'string', 'string' ] => 'int' => \&_set3);
+sub begin_transaction
+{
+  NewRelic::Agent::FFI::Procedural::newrelic_transaction_begin();
+}
 
 
-$ffi->attach( [ newrelic_transaction_notice_error => 'notice_transaction_error' ] => [ 'long', 'string', 'string', 'string', 'string' ] => 'int' => sub {
-  my $xsub = shift;
-  my $self = shift;
-  $xsub->(@_);
-});
+sub set_transaction_name
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_set_name;
+}
+
+sub set_transaction_request_url
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_set_request_url;
+}
+
+sub set_transaction_max_trace_segments
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_set_max_trace_segments;
+}
+
+sub set_transaction_category
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_set_category;
+}
+
+sub set_transaction_type_web
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_set_type_web;
+}
+
+sub set_transaction_type_other
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_set_type_other;
+}
+
+sub add_transaction_attribute
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_add_attribute;
+}
+
+sub notice_transaction_error
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_notice_error;
+}
 
 
-$ffi->attach( [ newrelic_transaction_end => 'end_transaction' ] => [ 'long' ] => 'int' => \&_set1 );
-$ffi->attach( [ newrelic_record_metric => 'record_metric' ] => [ 'string', 'double'] => 'int' => \&_set2 );
-$ffi->attach( [ newrelic_record_cpu_usage => 'record_cpu_usage' ] => [ 'double', 'double' ] => 'int' => \&_set2);
-$ffi->attach( [ newrelic_record_memory_usage => 'record_memory_usage' ] => [ 'double' ] => 'int' => \&_set1);
+sub end_transaction
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_transaction_end;
+}
+
+sub record_metric
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_record_metric;
+}
+
+sub record_cpu_usage
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_record_cpu_usage;
+}
+
+sub record_memory_usage
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_record_memory_usage;
+}
 
 
-$ffi->attach( [ newrelic_segment_generic_begin => 'begin_generic_segment' ] => [ 'long', 'long', 'string' ] => 'long' => sub {
-  my $xsub = shift;
-  my $self = shift;
-  $xsub->(@_);
-});
+sub begin_generic_segment
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_segment_generic_begin;
+}
 
 
-$ffi->attach( [ newrelic_segment_datastore_begin => 'begin_datastore_segment' ] => [ 'long', 'long', 'string', 'string', 'string', 'string', 'opaque' ] => 'long' => sub {
-  $_[0]->(@_[2,3,4,5,6,7], $newrelic_basic_literal_replacement_obfuscator);
-});
+sub begin_datastore_segment
+{
+  NewRelic::Agent::FFI::Procedural::newrelic_segment_datastore_begin(
+    @_[1,2,3,4,5,6], NewRelic::Agent::FFI::Procedural::newrelic_basic_literal_replacement_obfuscator(),
+  )
+}
 
 
-$ffi->attach( [ newrelic_segment_external_begin => 'begin_external_segment' ] => [ 'long', 'long', 'string', 'string' ] => 'long' => sub {
-  my $xsub = shift;
-  my $self = shift;
-  $xsub->(@_);
-});
+sub begin_external_segment
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_segment_external_begin;
+}
 
 
-$ffi->attach( [ newrelic_segment_end => 'end_segment' ] => [ 'long', 'long' ] => 'int' => \&_set2);
+sub end_segment
+{
+  shift @_;
+  goto &NewRelic::Agent::FFI::Procedural::newrelic_segment_end;
+}
 
 
 sub get_license_key { shift->{license_key} }
 sub get_app_name { shift->{app_name} }
 sub get_app_language { shift->{app_language} }
 sub get_app_language_version { shift->{app_language_version} }
+
 
 1;
 
@@ -154,7 +191,7 @@ NewRelic::Agent::FFI - Perl Agent for NewRelic APM
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -175,9 +212,10 @@ version 0.02
 
 This module provides bindings for the L<NewRelic|https://docs.newrelic.com/docs/agents/agent-sdk/getting-started/new-relic-agent-sdk> Agent SDK.
 
-It is a drop in replacement for L<NewRelic::Agent> that is implemented using L<FFI::Platypus> instead of XS and C++.
+It is a drop in replacement for L<NewRelic::Agent> that is implemented using L<FFI::Platypus> instead of XS and C++.  If you are writing
+new code, then I highly recommend the procedural interface instead: L<NewRelic::Agent::FFI::Procedural>.
 
-Why use this module instead of the other one?
+Why use L<NewRelic::Agent::FFI> module instead of L<NewRelic::Agent>?
 
 =over 4
 
@@ -301,11 +339,17 @@ Sets the maximum trace section for the transaction.
 
 =head2 set_transaction_category
 
+ my $status = $agent->set_transaction_category($tx, $category);
+
+Sets the transaction category.
+
+=head2 set_transaction_type_web
+
  my $status = $agent->set_transaction_type_web($tx);
 
 Sets the transaction type to 'web'
 
-=head2 set_transaction_type_web
+=head2 set_transaction_type_other
 
  my $status = $agent->set_transaction_type_other($tx);
 
@@ -319,7 +363,7 @@ Adds the given attribute (key/value pair) for the transaction.
 
 =head2 notice_transaction_error
 
- my $status = notice_transaction_error($tx, $exception_type, $error_message, $stack_trace, $stack_frame_delimiter);
+ my $status = $agent->notice_transaction_error($tx, $exception_type, $error_message, $stack_trace, $stack_frame_delimiter);
 
 Identify an error that occurred during the transaction. The first identified
 error is sent with each transaction.
@@ -390,13 +434,19 @@ Get the language name (usually C<perl>).
 
 =head2 get_app_language_version
 
+ my $version = $agent->get_app_language_version;
+
 Get the language version.
 
-=head2 CAVEATS
+=head1 SEE ALSO
 
-This module attempts to replicate the same interface as L<NewRelic::Agent>, and this module includes a superset of the same tests.  
-Unfortunately, the existing test suite for L<NewRelic::Agent> is completely insufficient to have a high degree of confidence that
-either module works.
+=over 4
+
+=item L<NewRelic::Agent::FFI::Procedural>
+
+Procedural interface, recommended over this one.
+
+=back
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@ use Carp;
 use Path::Tiny;
 use namespace::clean;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 with 'Catmandu::Exporter';
 

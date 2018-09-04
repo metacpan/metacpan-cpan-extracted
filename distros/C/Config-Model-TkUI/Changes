@@ -1,3 +1,21 @@
+1.367 2018-09-01
+
+  Improvement:
+    * add a widget to filter element in tree. The filtering is based on element names.
+      All items matching a filter value are shown in the tree widget (gh #13)
+    * show node gist (i.e. information about node content) in tree widget
+      (provided the gist is not empty) (gh #14)
+
+  Bug fixes:
+    * Fix 'show only custom values' and 'hide empty values' filters to work
+      recursively.
+    * fix wizard to stop on items that have a warning
+    * Checklist viewer and editor: fix display of value help
+    * TkUI: fix open/close when pasting from cut buffer (gh #15)
+
+  Other
+    * Convert README file to README.md
+
 1.366 2018-05-07
 
     * dist.ini: update © year

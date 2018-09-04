@@ -1,0 +1,8 @@
+# -*- org -*-
+
+* TODO
+*** Investigate Perl::Version's Makefile.PL
+    https://metacpan.org/source/BDFOY/Perl-Version-1.013/Makefile.PL
+*** Investigate MY::postamble() in some Dist::Zilla Makefile.PL
+*** Investigate PREREQ_PM vs all the things in ExtUtils::MakeMaker
+* DONE

@@ -32,7 +32,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
             "Scalar::Util" : "0",
+            "namespace::clean" : "0",
             "perl" : "5.010000",
             "strict" : "0"
          }
@@ -45,7 +48,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.04",
    "x_homepageresources" : {
       "repository" : {
          "type" : "git",

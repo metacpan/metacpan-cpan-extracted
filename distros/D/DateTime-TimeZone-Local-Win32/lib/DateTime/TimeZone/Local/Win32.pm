@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.01';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.02';
 use 5.006;
 
 use strict;
@@ -105,7 +105,7 @@ sub EnvVars { return 'TZ' }
         'Greenwich Standard Time'         => 'GMT',
         'GTB'                             => 'Europe/Athens',
         'GTB Standard Time'               => 'Europe/Athens',
-        'Haiti Standard Time'             => 'America/Port_au_Prince',
+        'Haiti Standard Time'             => 'America/Port-au-Prince',
         'Hawaiian'                        => 'Pacific/Honolulu',
         'Hawaiian Standard Time'          => 'Pacific/Honolulu',
         'India'                           => 'Asia/Calcutta',
@@ -319,7 +319,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 

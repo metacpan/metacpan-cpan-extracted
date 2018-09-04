@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '2.11';
+our $VERSION = '2.13';
 
 sub new
 {
@@ -593,9 +593,15 @@ The following method returns the hash to all subscription details:
 
 =item $sms->getSubscriptions()
 
-0 means: not logged in
-
-1 means: logged in
+Returns an array with the subscription details:
+* each array contains a hash with "type", "name" and "items".
+* "type" is either "Tarif" or "Paket"
+* "name" is the name of the subscription
+* "items" contains an array with all items contained in the subscription.
+* each item-array contains a hash with "unit", "used" and "remaining"
+* "used" is the amount of already used units during the current accounting period
+* "remaining" is the amount of already remaining units during the current accounting period
+* "unit" contains the unit of "used" and "remaining"
 
 =back
 
@@ -658,6 +664,18 @@ Adopted for the new website being online since August 1st, 2014
 Added the possibility to change the sending phonenumber
 Login and selecting phonenumber reads details about tarifs and packages
 Details about tarif and packages are available through getSubscriptions
+
+=item 2.11
+
+Added "Changes"
+
+=item 2.12
+
+Corrected typo in description
+
+=item 2.13
+
+Improved documentation for getSubscriptions().
 
 =back
 

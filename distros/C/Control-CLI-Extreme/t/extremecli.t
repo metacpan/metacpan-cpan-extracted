@@ -16,10 +16,10 @@ my $Timeout		= 30;		# seconds
 my $ConnectionTimeout	= 15;		# seconds
 my $ErrorMode		= 'return';	# always return, so we check outcome in this test script
 my $ErrMsgFormat	= 'verbose';
-my $InputLog		= 'extremecli.t.in';
-my $OutputLog		= 'extremecli.t.out';
-my $DumpLog		= 'extremecli.t.dump';
-my $DebugLog		= 'extremecli.t.dbg';
+my $InputLog		;# = 'extremecli.t.in';
+my $OutputLog		;# = 'extremecli.t.out';
+my $DumpLog		;# = 'extremecli.t.dump';
+my $DebugLog		;# = 'extremecli.t.dbg';
 my $Host		;
 my $TcpPort		;
 my $Username		;# = 'rwa';
@@ -42,6 +42,7 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			Accelar			=> 'show sys info',
 			WLAN9100		=> 'show running-config',
 			ExtremeXOS		=> 'show system | exclude UpTime', # Suppress uptime line as seconds count risks modifying the output length between compares
+			ISW			=> 'show version',
 );
 my %CmdRefreshed = (	# CLI commands whose output is refreshed; to test that we can exit the refresh
 			PassportERS_cli		=> 'monitor ports stats interface utilization',
@@ -145,6 +146,13 @@ sub attribute { # Read, test, print and return a attribute
 			else { # Regular list
 				$displayValue = '(list:' . join(',', @$attribValue) . ')';
 			}
+		}
+		elsif (ref $attribValue eq 'HASH') { # Port Hash (ISW)
+			$displayValue = '';
+			foreach my $slot (keys %$attribValue) {
+				$displayValue .= "\nslot $slot: " . join(',', @{$attribValue->{$slot}}) if defined $attribValue->{$slot};
+			}
+			$displayValue = "( hash ):" . $displayValue;
 		}
 	}
 	if ($optional) {
@@ -292,7 +300,6 @@ do {{ # Test loop, we keep testing until user satisfied
 		if ($host =~ s/^(.+)@//) {
 			($username, $password) = split(':', $1);
 			undef $username unless length $username;
-			undef $password unless length $password;
 			print "Username = ", $username, "\n" if defined $username;
 			print "Password = ", $password, "\n" if defined $password;
 			$complexInput = 1;
@@ -426,7 +433,8 @@ do {{ # Test loop, we keep testing until user satisfied
 	attribute($cli, 'base_mac',1); # might be undefined (if executed on a Standby CPU or some products)
 	attribute($cli, 'is_apls',1); # will be undefined on non-PassportERS products
 	attribute($cli, 'is_voss',1); # will be undefined on non-PassportERS products
-	attribute($cli, 'is_xos',1); # will be undefined on non-PassportERS products
+	attribute($cli, 'is_xos',1); # will be undefined on non-ExtremeXOS products
+	attribute($cli, 'is_isw',1); # will be undefined on non-ISW products
 	attribute($cli, 'apls_box_type',1); # might be undefined if is_apls is false
 	attribute($cli, 'brand_name',1); # might be undefined if is_voss is false
 	$acli = attribute($cli, 'is_acli');
@@ -523,7 +531,7 @@ do {{ # Test loop, we keep testing until user satisfied
 					Return_result		=>	1,
 				);
 		}
-		elsif ($familyType eq 'SecureRouter') {
+		elsif ($familyType eq 'SecureRouter' || $familyType eq 'ISW') {
 			($ok, $result) = $cli->cmd(
 					Command			=>	'config term',
 					Return_result		=>	1,

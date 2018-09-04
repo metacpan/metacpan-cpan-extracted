@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Tk::Wizard;
-$Config::Model::Tk::Wizard::VERSION = '1.366';
+$Config::Model::Tk::Wizard::VERSION = '1.367';
 use strict;
 use warnings;
 use Carp;
@@ -178,7 +178,7 @@ sub prepare_wizard {
     $edf->Button(
         -text    => 'OK',
         -font => $cw->{font},
-        -command => sub { $cw->start_wizard($stop_on_warn) }
+        -command => sub { $cw->start_wizard(stop_on_warning => $stop_on_warn) }
     )->pack(qw/-side right -anchor e/);
 
     $edf->Button(

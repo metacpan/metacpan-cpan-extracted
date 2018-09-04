@@ -1,0 +1,49 @@
+---
+abstract: 'handles context specific singletons'
+author:
+  - 'Branislav Zahradník <barney@cpan.org>'
+build_requires:
+  Exporter: '0'
+  FindBin: '0'
+  Hash::Util: '0'
+  Module::Build: '0.28'
+  Sub::Name: '0'
+  Sub::Override: '0'
+  Sub::Uplevel: '0'
+  Syntax::Construct: '0'
+  Test::Deep: '0'
+  Test::Deep::Cmp: '0'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::Warnings: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Context-Singleton
+requires:
+  Class::Load: '0'
+  Exception::Class: '0'
+  Exporter::Tiny: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Module::Pluggable::Object: '0'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  Sub::Install: '0'
+  Variable::Magic: '0'
+  feature: '0'
+  namespace::clean: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.2018'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: v1.0.3

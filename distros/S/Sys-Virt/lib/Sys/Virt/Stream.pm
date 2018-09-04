@@ -89,7 +89,7 @@ C<recv_hole> should be called to get the hole size.
 
 =item $rv = $st->send($data, $nbytes)
 
-Send upto C<$nbytes> worth of data, copying from C<$data>.
+Send up to C<$nbytes> worth of data, copying from C<$data>.
 Returns the number of bytes sent, or -2 if I/O would block,
 or -1 on error.
 

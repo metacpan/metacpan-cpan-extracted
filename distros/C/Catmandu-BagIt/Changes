@@ -1,5 +1,8 @@
 Revision history for Catmandu-BagIt
 
+0.232  2018-09-03 11:27:36 CEST
+    - Adding missin dependency
+    
 0.231  2018-08-29 14:23:44 CEST
     - Adding better checks on syswrites and counting of bytes
 

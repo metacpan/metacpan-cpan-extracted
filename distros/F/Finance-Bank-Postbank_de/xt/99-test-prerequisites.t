@@ -35,7 +35,12 @@ BEGIN {
     };
 };
 
-my @tests = glob 't/*.t';
+my @tests;
+if( @ARGV ) {
+    @tests = @ARGV;
+} else {
+    @tests = grep { -f $_ } map { glob $_ } 't/*.t', 'scripts/*'
+}
 plan tests => 0+@tests;
 
 my $meta = Parse::CPAN::Meta->load_file('META.json');

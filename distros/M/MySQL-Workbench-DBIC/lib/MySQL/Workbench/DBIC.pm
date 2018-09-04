@@ -13,7 +13,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 has output_path    => ( is => 'ro', required => 1, default => sub { '.' } );
 has file           => ( is => 'ro', required => 1 );
@@ -92,11 +92,11 @@ sub _custom_code {
     my $content = do { local (@ARGV, $/) = $path; <> };
 
     my ($code) = $content =~ m{
-^[#] \s+ --- \s*
-^[#] \s+ Put \s+ your \s+ own \s+ code \s+ below \s+ this \s+ comment \s*
-^[#] \s+ --- \s*
-(.*?)
-^[#] \s+ --- \s*
+        ^[#] \s+ --- \s*
+        ^[#] \s+ Put \s+ your \s+ own \s+ code \s+ below \s+ this \s+ comment \s*
+        ^[#] \s+ --- \s*
+        (.*?)
+        ^[#] \s+ --- \s*
     }xms;
 
     $code //= '';
@@ -285,7 +285,8 @@ sub _class_template{
 
             my @options;
 
-            my $name = $column->name;
+            my $name        = $column->name;
+            my $col_comment = $column->comment;
 
             push @options, "data_type          => '" . $column->datatype . "',";
             push @options, "is_auto_increment  => 1,"                            if $column->autoincrement;
@@ -300,12 +301,21 @@ sub _class_template{
             push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
             push @options, "is_foreign_key     => 1," if $foreign_keys{$name};
 
-            if ( $data && $data->{column_info}->{$name} ) {
+            if ( ( $data && $data->{column_info}->{$name} ) || $col_comment ) {
                 local $Data::Dumper::Sortkeys = 1;
                 local $Data::Dumper::Indent   = 1;
                 local $Data::Dumper::Pad      = '      ';
 
-                my $dump = Dumper( $data->{column_info}->{$name} );
+                my $comment_data = eval {
+                    JSON->new->utf8(1)->decode( $col_comment );
+                };
+
+                my %hash = (
+                    %{ $data->{column_info}->{$name} || {} },
+                    %{ $comment_data || {} },
+                );
+
+                my $dump = Dumper( \%hash );
                 $dump    =~ s{\$VAR1 \s+ = \s* \{ \s*? $}{}xms;
                 $dump    =~ s{\A\s+\n\s{8}}{}xms;
                 $dump    =~ s{\n[ ]+\};\s*\z}{}xms;
@@ -469,7 +479,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

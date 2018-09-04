@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2018 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::CheckListViewer;
-$Config::Model::Tk::CheckListViewer::VERSION = '1.366';
+$Config::Model::Tk::CheckListViewer::VERSION = '1.367';
 use strict;
 use warnings;
 use Carp;
@@ -100,16 +100,9 @@ sub set_value_help {
     my $cw  = shift;
     my @set = @_;
 
-    my $w = $cw->{value_help_widget};
-    $w->delete( '0.0', 'end' );
+    my @help = grep {defined $_ } map { $cw->{leaf}->get_help($_) } @set ;
 
-    # in pod text, =encoding must be specified only once
-    $w->insert( 'end', "=encoding utf8\n\n");
-
-    foreach my $v (@set) {
-        my $value_help = $cw->{leaf}->get_help($v);
-        $w->insert( 'end', "$v: " . $value_help . "\n" ) if defined $value_help;
-    }
+    $cw->update_help($cw->{value_help_widget}, join("\n\n", @help));
 }
 
 sub get_info {

@@ -1,5 +1,14 @@
 Revision history for Datahub-Factory-VKC
 
+1.00  2018-09-03 14:18:59 CEST
+
+    - Stable release.
+
+0.100  2018-09-03 14:10:29 CEST
+
+    - Changed: Added missing indexes on the CITvgsrpObjTombstoneD_RO table.
+    - Changed: Skip record if no LidoRecID is available.
+
 0.99  2018-08-01 16:24:13 CEST
 
     - Changed: Yanked out SQL code and put in separate SQL file.

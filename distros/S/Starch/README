@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Starch,
-version 0.07:
+version 0.09:
 
-  Implementation independent persistent statefulness.
+  A framework independent HTTP session library.
 
 This software is copyright (c) 2018 by Aran Deltac.
 

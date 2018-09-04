@@ -33,9 +33,12 @@ my %params = (
         'lib'        => 0,
     },
     PREREQ_PM => {
-        'Carp'         => 0,
-        'Scalar::Util' => 0,
-        'strict'       => 0,
+        'Carp'             => 0,
+        'List::Util'       => 0,
+        'Moo'              => 0,
+        'namespace::clean' => 0,
+        'Scalar::Util'     => 0,
+        'strict'           => 0,
     },
 
     META_MERGE => {

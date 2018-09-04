@@ -1,0 +1,28 @@
+---
+abstract: 'Low-level bit-twiddling hacks'
+author:
+  - 'Brian Greenfield <briang@cpan.org>'
+build_requires:
+  Config: '0'
+  Test::More: '0.88'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bit-Twiddling
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/briang/p5-bit-twiddling/issues
+  homepage: https://github.com/briang/p5-bit-twiddling
+  repository: git://github.com/briang/p5-bit-twiddling.git
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

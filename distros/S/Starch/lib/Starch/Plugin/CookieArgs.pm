@@ -1,5 +1,5 @@
 package Starch::Plugin::CookieArgs;
-$Starch::Plugin::CookieArgs::VERSION = '0.07';
+$Starch::Plugin::CookieArgs::VERSION = '0.09';
 use Moo;
 use strictures 2;
 use namespace::clean;
@@ -85,9 +85,9 @@ These methods are added to the L<Starch::State> class.
 Returns L</cookie_delete_args> if the L<Starch::State/is_deleted>,
 otherwise returns L</cookie_set_args>.
 
-These args are meant to be compatible with L</CGI::Simple::Cookie>, minus
+These args are meant to be compatible with L<CGI::Simple::Cookie>, minus
 the C<-> in front of the argument names, which is the same format that
-Catalyst accepts for cookies.
+both Plack and Catalyst accept for cookies.
 
 =head2 cookie_set_args
 

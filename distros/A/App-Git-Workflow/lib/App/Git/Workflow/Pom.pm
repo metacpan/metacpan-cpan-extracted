@@ -16,7 +16,7 @@ use App::Git::Workflow::Repository qw//;
 use App::Git::Workflow;
 use base qw/App::Git::Workflow/;
 
-our $VERSION = 1.0.9;
+our $VERSION = 1.1.0;
 
 sub new {
     my $class = shift;
@@ -123,6 +123,11 @@ sub pom_version {
         my $json = JSON::decode_json($xml);
         return $json->{version};
     }
+    if ( $pom && $pom =~ /[.]ya?ml$/ ) {
+        require YAML;
+        my $json = YAML::Load($xml);
+        return $json->{version};
+    }
 
     my $doc = XML::Tiny::parsefile( $xml !~ /\n/ && -f $xml ? $xml : '_TINY_XML_STRING_' . $xml);
 
@@ -159,7 +164,7 @@ App::Git::Workflow::Pom - Tools for maven POM files with git
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Pom version 1.0.9
+This documentation refers to App::Git::Workflow::Pom version 1.1.0
 
 =head1 SYNOPSIS
 

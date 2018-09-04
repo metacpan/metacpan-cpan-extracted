@@ -1,13 +1,12 @@
 ---
-abstract: 'Implementation independent persistent statefulness.'
+abstract: 'A framework independent HTTP session library.'
 author:
   - 'Aran Deltac <bluefeet@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Test::Fatal: '0'
+  Test2::V0: '0.000094'
   Test::More: '0'
-  Test::Simple: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -34,5 +33,5 @@ resources:
   bugtracker: https://github.com/bluefeet/Starch/issues
   homepage: https://github.com/bluefeet/Starch
   repository: https://github.com/bluefeet/Starch.git
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'YAML::Tiny version 1.69'

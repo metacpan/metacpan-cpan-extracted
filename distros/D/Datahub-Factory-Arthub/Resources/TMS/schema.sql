@@ -12,6 +12,11 @@
 -- 
 -- INDEXES
 
+-- CITvgsrpObjTombstoneD_RO
+
+ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ObjectID` );
+ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ClassificationID` );
+
 -- Classifications
 
 ALTER TABLE `Classifications` CHANGE `ClassificationID` `ClassificationID` VARCHAR( 255 ) NULL DEFAULT NULL;

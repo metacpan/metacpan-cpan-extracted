@@ -10,6 +10,7 @@ t/fix/M-1.000001.tar.gz
 t/fix/M-1.tar.gz
 t/fix/upstream.fragment
 t/pan.t
+t/upload.t
 xt/ext.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

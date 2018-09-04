@@ -1,4 +1,7 @@
-Revision history for Regexp-Pattern-CPAN
+0.002   2018-09-02 (PERLANCAR)
+
+	- Require uppercase for PAUSE ID instead of lowercase.
+
 
 0.001   2017-01-05 (PERLANCAR)
 

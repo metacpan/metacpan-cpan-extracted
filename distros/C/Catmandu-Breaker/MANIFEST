@@ -12,12 +12,14 @@ lib/Catmandu/Breaker.pm
 lib/Catmandu/Cmd/breaker.pm
 lib/Catmandu/Exporter/Breaker.pm
 lib/Catmandu/Exporter/Breaker/Parser/json.pm
+lib/Catmandu/Exporter/Breaker/Parser/mab.pm
 lib/Catmandu/Exporter/Breaker/Parser/marc.pm
 lib/Catmandu/Exporter/Breaker/Parser/pica.pm
 lib/Catmandu/Exporter/Breaker/Parser/xml.pm
 t/Catmandu-Breaker.t
 t/Catmandu-Cmd-breaker.t
 t/Catmandu-Exporter-Breaker-Parser-json.t
+t/Catmandu-Exporter-Breaker-Parser-mab.t
 t/Catmandu-Exporter-Breaker-Parser-marc.t
 t/Catmandu-Exporter-Breaker-Parser-pica.t
 t/Catmandu-Exporter-Breaker-Parser-xml.t
@@ -28,6 +30,7 @@ t/camel.usmarc
 t/data.breaker
 t/data.fields
 t/data.tags
+t/mab.json
 t/marcxml.json
 t/oai_dc.json
 t/pica.json

@@ -13,41 +13,59 @@ BEGIN {
 require_ok 'Catmandu::Exporter::Breaker';
 
 {
-	my $file = "";
-	my $importer = Catmandu->importer('JSON',file => 't/oai_dc.json');
-	my $exporter = Catmandu::Exporter::Breaker->new(file => \$file);
+    my $file     = "";
+    my $importer = Catmandu->importer( 'JSON', file => 't/oai_dc.json' );
+    my $exporter = Catmandu::Exporter::Breaker->new( file => \$file );
 
-	$exporter->add_many($importer);
+    $exporter->add_many($importer);
 
-	$exporter->commit;
+    $exporter->commit;
 
-	is $exporter->count , 20 , 'Breaking OAI-DC ok';
+    is $exporter->count, 20, 'Breaking OAI-DC ok';
 }
 
 {
-	my $file = "";
-	my $importer = Catmandu->importer('JSON',file => 't/marcxml.json');
-	my $exporter = Catmandu::Exporter::Breaker->new(file => \$file, handler => 'marc');
+    my $file     = "";
+    my $importer = Catmandu->importer( 'JSON', file => 't/marcxml.json' );
+    my $exporter = Catmandu::Exporter::Breaker->new( file => \$file,
+        handler => 'marc' );
 
-	$exporter->add_many($importer);
+    $exporter->add_many($importer);
 
-	$exporter->commit;
+    $exporter->commit;
 
-	is $exporter->count , 20 , 'Breaking MARCXML ok';
+    is $exporter->count, 20, 'Breaking MARCXML ok';
 }
 
 {
-	my $file = "";
-	my $importer = Catmandu->importer('JSON',file => 't/pica.json');
-	my $exporter = Catmandu::Exporter::Breaker->new(file => \$file, handler => 'pica');
+    my $file     = "";
+    my $importer = Catmandu->importer( 'JSON', file => 't/pica.json' );
+    my $exporter = Catmandu::Exporter::Breaker->new( file => \$file,
+        handler => 'pica' );
 
-	$exporter->add_many($importer);
+    $exporter->add_many($importer);
 
-	$exporter->commit;
+    $exporter->commit;
 
-	is $exporter->count , 5 , 'Breaking PICA ok';
+    is $exporter->count, 5, 'Breaking PICA ok';
 
     like $file, qr/^658700774\t001\@0\t703/, 'PICA breaker format ok';
+}
+
+{
+    my $file     = "";
+    my $importer = Catmandu->importer( 'JSON', file => 't/mab.json' );
+    my $exporter = Catmandu::Exporter::Breaker->new( file => \$file,
+        handler => 'mab' );
+
+    $exporter->add_many($importer);
+
+    $exporter->commit;
+
+    is $exporter->count, 5, 'Breaking PICA ok';
+
+    like $file, qr/^5-x\tLDR\t00892nM2.01200024      h/,
+        'PICA breaker format ok';
 }
 
 done_testing;

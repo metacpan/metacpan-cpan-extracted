@@ -2,7 +2,7 @@ package Datahub::Factory::Flash;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 use Moo::Role;
 use MooX::Aliases;

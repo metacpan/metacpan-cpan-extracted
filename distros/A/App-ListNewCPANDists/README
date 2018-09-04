@@ -3,8 +3,8 @@ NAME
     period
 
 VERSION
-    This document describes version 0.007 of App::ListNewCPANDists (from
-    Perl distribution App-ListNewCPANDists), released on 2018-03-12.
+    This document describes version 0.008 of App::ListNewCPANDists (from
+    Perl distribution App-ListNewCPANDists), released on 2018-09-02.
 
 FUNCTIONS
   list_monthly_new_cpan_dists
@@ -20,6 +20,14 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   exclude_author_re => *re*
+
+    *   exclude_authors => *array[cpan::pause_id]*
+
+    *   exclude_dist_re => *re*
+
+    *   exclude_dists => *array[perl::distname]*
 
     *   month* => *int*
 
@@ -49,6 +57,14 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   exclude_author_re => *re*
+
+    *   exclude_authors => *array[cpan::pause_id]*
+
+    *   exclude_dist_re => *re*
+
+    *   exclude_dists => *array[perl::distname]*
 
     *   month* => *int*
 
@@ -96,6 +112,14 @@ FUNCTIONS
     *   db_name => *filename* (default: "index-lncd.db")
 
         Filename of database.
+
+    *   exclude_author_re => *re*
+
+    *   exclude_authors => *array[cpan::pause_id]*
+
+    *   exclude_dist_re => *re*
+
+    *   exclude_dists => *array[perl::distname]*
 
     *   from_time* => *date*
 

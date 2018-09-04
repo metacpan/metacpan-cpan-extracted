@@ -203,6 +203,13 @@ see L<http://duktape.org/api.html#duk_del_prop_index>
 =cut
 *del_prop_index = \&aperl_duk_del_prop_index;
 
+=item C<del_prop_literal>
+
+see L<http://duktape.org/api.html#duk_del_prop_literal>
+
+=cut
+*del_prop_literal = \&aperl_duk_del_prop_literal;
+
 =item C<del_prop_lstring>
 
 see L<http://duktape.org/api.html#duk_del_prop_lstring>
@@ -448,6 +455,20 @@ see L<http://duktape.org/api.html#duk_get_finalizer>
 =cut
 *get_finalizer = \&aperl_duk_get_finalizer;
 
+=item C<get_global_heapptr>
+
+see L<http://duktape.org/api.html#duk_get_global_heapptr>
+
+=cut
+*get_global_heapptr = \&aperl_duk_get_global_heapptr;
+
+=item C<get_global_literal>
+
+see L<http://duktape.org/api.html#duk_get_global_literal>
+
+=cut
+*get_global_literal = \&aperl_duk_get_global_literal;
+
 =item C<get_global_lstring>
 
 see L<http://duktape.org/api.html#duk_get_global_lstring>
@@ -588,6 +609,13 @@ see L<http://duktape.org/api.html#duk_get_prop_index>
 =cut
 *get_prop_index = \&aperl_duk_get_prop_index;
 
+=item C<get_prop_literal>
+
+see L<http://duktape.org/api.html#duk_get_prop_literal>
+
+=cut
+*get_prop_literal = \&aperl_duk_get_prop_literal;
+
 =item C<get_prop_lstring>
 
 see L<http://duktape.org/api.html#duk_get_prop_lstring>
@@ -685,6 +713,13 @@ see L<http://duktape.org/api.html#duk_has_prop_index>
 
 =cut
 *has_prop_index = \&aperl_duk_has_prop_index;
+
+=item C<has_prop_literal>
+
+see L<http://duktape.org/api.html#duk_has_prop_literal>
+
+=cut
+*has_prop_literal = \&aperl_duk_has_prop_literal;
 
 =item C<has_prop_lstring>
 
@@ -1400,6 +1435,13 @@ see L<http://duktape.org/api.html#duk_push_int>
 =cut
 *push_int = \&aperl_duk_push_int;
 
+=item C<push_literal>
+
+see L<http://duktape.org/api.html#duk_push_literal>
+
+=cut
+*push_literal = \&aperl_duk_push_literal;
+
 =item C<push_lstring>
 
 see L<http://duktape.org/api.html#duk_push_lstring>
@@ -1413,6 +1455,13 @@ see L<http://duktape.org/api.html#duk_push_nan>
 
 =cut
 *push_nan = \&aperl_duk_push_nan;
+
+=item C<push_new_target>
+
+see L<http://duktape.org/api.html#duk_push_new_target>
+
+=cut
+*push_new_target = \&aperl_duk_push_new_target;
 
 =item C<push_null>
 
@@ -1519,6 +1568,20 @@ see L<http://duktape.org/api.html#duk_put_function_list>
 =cut
 *put_function_list = \&aperl_duk_put_function_list;
 
+=item C<put_global_heapptr>
+
+see L<http://duktape.org/api.html#duk_put_global_heapptr>
+
+=cut
+*put_global_heapptr = \&aperl_duk_put_global_heapptr;
+
+=item C<put_global_literal>
+
+see L<http://duktape.org/api.html#duk_put_global_literal>
+
+=cut
+*put_global_literal = \&aperl_duk_put_global_literal;
+
 =item C<put_global_lstring>
 
 see L<http://duktape.org/api.html#duk_put_global_lstring>
@@ -1561,6 +1624,13 @@ see L<http://duktape.org/api.html#duk_put_prop_index>
 =cut
 *put_prop_index = \&aperl_duk_put_prop_index;
 
+=item C<put_prop_literal>
+
+see L<http://duktape.org/api.html#duk_put_prop_literal>
+
+=cut
+*put_prop_literal = \&aperl_duk_put_prop_literal;
+
 =item C<put_prop_lstring>
 
 see L<http://duktape.org/api.html#duk_put_prop_lstring>
@@ -1574,6 +1644,13 @@ see L<http://duktape.org/api.html#duk_put_prop_string>
 
 =cut
 *put_prop_string = \&aperl_duk_put_prop_string;
+
+=item C<random>
+
+see L<http://duktape.org/api.html#duk_random>
+
+=cut
+*random = \&aperl_duk_random;
 
 =item C<range_error_va>
 

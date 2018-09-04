@@ -15,6 +15,7 @@ my %options = (
         'Furl'            => 0,
         'IO::Socket::SSL' => 0,
         'Test::More'      => 0.88,
+        'JSON::MaybeXS'   => 0,
     },
     META_MERGE => {
         resources => {

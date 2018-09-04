@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +20,7 @@ no_index:
 requires:
   Furl: '0'
   IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
   MIME::Base64: '0'
   Test::More: '0.88'
   URI::Escape: '0'
@@ -27,5 +28,5 @@ resources:
   bugtracker: https://github.com/garu/Net-Zendesk/issues/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/garu/Net-Zendesk
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

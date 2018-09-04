@@ -21,7 +21,7 @@ Break
 List switching
 
  description list :: Definitino
- here the defintion continues
+ here the definition continues
  1. enum
  2. enum (2)
  a. alpha
@@ -34,7 +34,7 @@ List switching
 List switching
 
  description list :: Definitino
- here the defintion continues
+ here the definition continues
    1. enum
    2. enum (2)
       a. alpha

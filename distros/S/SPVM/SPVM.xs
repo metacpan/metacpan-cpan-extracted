@@ -94,7 +94,7 @@ SPVM_OBJECT* SPVM_XS_UTIL_get_object(SV* sv_data) {
 }
 
 SV* SPVM_XS_UTIL_create_sv_type_name(SPVM_ENV* env, int32_t basic_type_id, int32_t dimension) {
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
   const char* basic_type_name = runtime->symbols[basic_type->id];
@@ -160,7 +160,7 @@ get_subs(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   SV* sv_package_name = ST(1);
   const char* package_name = SvPV_nolen(sv_package_name);
@@ -235,7 +235,7 @@ get_sub_names(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   SV* sv_package_name = ST(1);
   const char* package_name = SvPV_nolen(sv_package_name);
@@ -280,7 +280,7 @@ get_package_names(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
   
   AV* av_package_names = (AV*)sv_2mortal((SV*)newAV());
   
@@ -321,7 +321,7 @@ get_package_load_path(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   SV* sv_package_name = ST(1);
   
@@ -418,11 +418,10 @@ compile_spvm(...)
     // Build portable info
     SPVM_PORTABLE* portable = SPVM_PORTABLE_build_portable(compiler);
     
-    // Create run-time
-    SPVM_RUNTIME* runtime = SPVM_RUNTIME_BUILDER_build_runtime(portable);
+    // Create run-time env
+    SPVM_ENV* env = SPVM_RUNTIME_BUILDER_build_runtime_env(portable);
     
     // Set ENV
-    SPVM_ENV* env = runtime->env;
     size_t iv_env = PTR2IV(env);
     SV* sviv_env = sv_2mortal(newSViv(iv_env));
     SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
@@ -459,7 +458,7 @@ bind_sub(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   // Native subroutine name
   const char* native_sub_name = SvPV_nolen(sv_native_sub_name);
@@ -494,7 +493,7 @@ build_package_csource(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
   
   SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, package_name, strlen(package_name));
   int32_t package_id = package->id;
@@ -503,7 +502,7 @@ build_package_csource(...)
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
   
   // Build package csource
-  SPVM_CSOURCE_BUILDER_build_package_csource(runtime, string_buffer, package_name);
+  SPVM_CSOURCE_BUILDER_build_package_csource(env, string_buffer, package_name);
   
   SV* sv_package_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   
@@ -536,7 +535,7 @@ bind_sub(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   SPVM_RUNTIME_SUB* runtime_sub = SPVM_HASH_fetch(runtime->sub_symtable, sub_abs_name, strlen(sub_abs_name));
   runtime_sub->flag |= SPVM_SUB_C_FLAG_IS_COMPILED;
@@ -723,7 +722,7 @@ new_object_array_len(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   int32_t length = (int32_t)SvIV(sv_length);
 
@@ -761,7 +760,7 @@ new_multi_array_len(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
   
   int32_t length = (int32_t)SvIV(sv_length);
 
@@ -800,7 +799,7 @@ new_value_t_array_len(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   int32_t length = (int32_t)SvIV(sv_length);
 
@@ -877,7 +876,7 @@ call_sub(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
   
   const char* package_name = SvPV_nolen(sv_package_name);
   const char* sub_name = SvPV_nolen(sv_sub_name);
@@ -1462,7 +1461,7 @@ set_array_elements(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   // Array must be SPVM::Data::Array object
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::Data::Array"))) {
@@ -1688,7 +1687,7 @@ set_array_elements_bin(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   // Array must be SPVM::Data::Array object
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::Data::Array"))) {
@@ -1880,7 +1879,7 @@ set_array_element(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
   
   // Index
   int32_t index = (int32_t)SvIV(sv_index);
@@ -2083,7 +2082,7 @@ get_array_element(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
   
   // Index
   int32_t index = (int32_t)SvIV(sv_index);
@@ -2267,7 +2266,7 @@ get_array_elements(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   // Array must be SPVM::Data::Array object
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::Data::Array"))) {
@@ -2471,7 +2470,7 @@ get_array_elements_bin(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   // Array must be SPVM::Data::Array object
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::Data::Array"))) {

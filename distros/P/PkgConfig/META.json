@@ -40,7 +40,7 @@
    "provides" : {
       "PkgConfig" : {
          "file" : "lib/PkgConfig.pm",
-         "version" : "0.21026"
+         "version" : "0.22026"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.21026",
+   "version" : "0.22026",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }
