@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =head1 NAME
 
@@ -245,7 +245,7 @@ sub connect : method {
     for (qw(host port)) {
         $uri->$_($self->$_) if defined $self->$_;
     }
-    my $auth = $self->auth;
+    my $auth = $self->{auth};
     $auth //= ($uri->userinfo =~ s{^[^:]*:}{}r) if defined $uri->userinfo;
     $self->{connection} //= $self->loop->connect(
         service => $uri->port // 6379,
@@ -435,7 +435,7 @@ sub execute_command {
         my $cmd = join ' ', @cmd;
         $log->tracef('Outgoing [%s]', $cmd);
         push @{$self->{pending}}, [ $cmd, $f ];
-        $log->infof("Pipeline depth now %d", 0 + @{$self->{pending}});
+        $log->tracef("Pipeline depth now %d", 0 + @{$self->{pending}});
         $self->stream->write(
             $self->protocol->encode_from_client(@cmd)
         )->then(sub {
@@ -481,7 +481,6 @@ sub protocol {
 
 sub host { shift->{host} }
 sub port { shift->{port} }
-sub auth { shift->{auth} }
 sub uri { shift->{uri} //= URI->new('redis://localhost') }
 
 sub configure {

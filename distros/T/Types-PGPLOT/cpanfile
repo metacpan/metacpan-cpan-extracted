@@ -4,6 +4,7 @@ requires "Type::Tiny" => "1.004";
 requires "Type::Utils" => "0";
 requires "Types::Common::Numeric" => "0";
 requires "Types::Standard" => "0";
+requires "perl" => "5.0100";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -12,12 +13,11 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
-  requires "List::Util" => "0";
+  requires "List::Util" => "1.29";
   requires "Test2::API" => "0";
   requires "Test2::V0" => "0";
   requires "Test::More" => "0";
   requires "Test::TypeTiny" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'test' => sub {
@@ -26,6 +26,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+  requires "Module::Build::Tiny" => "0.034";
 };
 
 on 'develop' => sub {
@@ -44,6 +45,7 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::MetaJSON" => "0";
   requires "Dist::Zilla::Plugin::MetaNoIndex" => "0";
   requires "Dist::Zilla::Plugin::MetaProvides::Package" => "0";
+  requires "Dist::Zilla::Plugin::ModuleBuildTiny" => "0";
   requires "Dist::Zilla::Plugin::NextRelease" => "0";
   requires "Dist::Zilla::Plugin::PodCoverageTests" => "0";
   requires "Dist::Zilla::Plugin::PodSyntaxTests" => "0";
@@ -57,8 +59,8 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::RunExtraTests" => "0";
   requires "Dist::Zilla::Plugin::Test::CPAN::Changes" => "0";
   requires "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" => "0";
-  requires "Dist::Zilla::Plugin::Test::CheckManifest" => "0";
   requires "Dist::Zilla::Plugin::Test::Compile" => "0";
+  requires "Dist::Zilla::Plugin::Test::DistManifest" => "0";
   requires "Dist::Zilla::Plugin::Test::Fixme" => "0";
   requires "Dist::Zilla::Plugin::Test::NoBreakpoints" => "0";
   requires "Dist::Zilla::Plugin::Test::NoTabs" => "0";
@@ -79,6 +81,7 @@ on 'develop' => sub {
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::CPAN::Meta::JSON" => "0.16";
   requires "Test::CleanNamespaces" => "0";
+  requires "Test::DistManifest" => "0";
   requires "Test::Fixme" => "0";
   requires "Test::More" => "0.96";
   requires "Test::NoBreakpoints" => "0.15";

@@ -9,19 +9,17 @@ Bit::Twiddling - Low-level bit-twiddling hacks
 
 =head1 VERSION
 
-Version 0.09 - 2018-08-31
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
     use Bit::Twiddling 'count_set_bits';
     my $number = 0b1111_0001;
     my $set_bits = count_set_bits($number); # 5
-    printf "There are %d ones in 0b%b\n", $set_bits, $number
-    #                         There are 5 ones in 0b11110001
 
     use Bit::Twiddling 'nearest_higher_power_of_2';
     print nearest_higher_power_of_2(   0); # 1
@@ -70,16 +68,15 @@ Bit::Twiddling ':all'>.
 
 =head1 FUNCTIONS
 
-The functions in this module all expect a single 64-bit integer
-argument, but will convert string to numeric if needed (and give an
-C<Argument "whatevs" isn't numeric in subroutine entry> warning). If
-the argument is C<undef>, it will also be treated as if it were zero
-and generate a C<Use of uninitialized value in subroutine entry>
-warning.
+The functions in this module expect a single integer argument, but
+will convert string to numeric if needed (and give an C<Argument "..."
+isn't numeric in subroutine entry> warning). If the argument is
+C<undef>, it will be treated as if it were zero and generate a C<Use
+of uninitialized value in subroutine entry> warning.
 
-This distribution is designed to work with 64-bit ints and has NOT
-BEEN TESTED WITH 32-BIT PERLS. I think it should be OK but I know one
-test in C<nearest.t> will definately fail.
+This distribution was designed to work with a perl compiled with
+C<use64bitint> and C<uselongdouble>. It should, however, be OK without
+these options.
 
 =head2 count_set_bits
 
@@ -114,14 +111,14 @@ implementations.
 
 Brian Greenfield <briang at cpan dot org>
 
-=head1 REPOSITORY
+=head1 REPORTING BUGS & OTHER WAYS TO CONTRIBUTE
 
-L<https://github.com/briang/p5-bit-twiddling>
+The code for this module is maintained on
+L<GitHub|https://github.com/briang/p5-bit-twiddling>.
 
-=head1 BUGS
-
-Please use report any bugs you find to L<GitHub
-issues|https://github.com/briang/p5-bit-twiddling/issues>.
+If you have a patch, feel free to fork the repository and submit a
+pull request. If you find a bug, please open an issue on the project
+at GitHub (L<https://github.com/briang/p5-bit-twiddling/issues>).
 
 =head1 ACKNOWLEDGEMENTS
 

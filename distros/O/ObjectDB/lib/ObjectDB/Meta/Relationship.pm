@@ -3,7 +3,7 @@ package ObjectDB::Meta::Relationship;
 use strict;
 use warnings;
 
-our $VERSION = '3.25';
+our $VERSION = '3.26';
 
 require Carp;
 use ObjectDB::Util qw(load_class);

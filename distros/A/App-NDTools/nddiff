@@ -67,11 +67,11 @@ Ignore substructure. May be used several times.
 
 =item B<--json>
 
-Use JSON as output diff format.
+Use JSON as output diff format. It's just a shortcut for C<--ofmt JSON>.
 
-=item B<--ofmt> E<lt>JSON|YAMLE<gt>
+=item B<--ofmt> E<lt>TERM|JSON|YAMLE<gt>
 
-Force specified output format usage. JSON is used by default; L<YAML::XS>
+Force specified output format usage. C<TERM> is used by default; L<YAML::XS>
 should be installed for YAML support, see L<App::NDTools/LIMITATIONS> for
 more info.
 
@@ -88,9 +88,9 @@ Don't show diff, only exit code shows exists diff or not.
 
 Dump diff as rules for L<ndproc>.
 
-=item B<--show>
+=item B<--show> E<lt>fileE<gt>
 
-Visualize diff (JSON/YAML formatted diff expected for argument).
+Visualize JSON/YAML formatted diff.
 
 =item B<--verbose|-v> [int]
 

@@ -4,6 +4,7 @@ Changes
 lib/HO/abstract.pm
 lib/HO/accessor.pm
 lib/HO/class.pm
+lib/HO/mixin.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -22,6 +23,7 @@ t/10_type.t
 t/11_runtime.t
 t/12_default.t
 t/13_noconstructor.t
+t/14_mixin.t
 xt/changes.t
 xt/critic.t
 xt/greaterversion.t

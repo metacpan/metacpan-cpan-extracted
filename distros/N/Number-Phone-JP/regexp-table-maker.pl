@@ -475,15 +475,15 @@ sub compress { # makes regexp more compressed
         my $len = length($1) / 2;
         sprintf("\\d{%d}", $len);
     }eg;
-    $regexp =~ s{((?:\\d)*)((?:\\d\{\d+\})+)((?:\\d(?!\{))*)}{
+    $regexp =~ s{((?:\\d)*)((?:\\d\{\d+\})+)((?:\\d(?!\{))*)}<
         my($prefix, $match_times, $postfix) = ($1, $2, $3);
         my $total = 0;
-        my @times = $match_times =~ m{\\d\{(\d+)\}}g;
+        my @times = $match_times =~ m|\\d\{(\d+)\}|g;
         $total += $_ for @times;
         $total += length($prefix)  / 2 if $prefix;
         $total += length($postfix) / 2 if $postfix;
         sprintf("\\d{%d}", $total);
-    }eg;
+    >eg;
     return $regexp;
 }
 

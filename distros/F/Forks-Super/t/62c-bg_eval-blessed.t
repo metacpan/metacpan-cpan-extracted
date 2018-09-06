@@ -28,8 +28,9 @@ my ($foo, $bar, $baz);
     my $untaint = ${^TAINT};
     my $t1 = time;
     my $ooo = bg_eval { slowly_return_object(10) } {untaint => $untaint};
-    my $t2 = time;
-    ok($t2-$t1 < 3, 'bg_eval returns quickly');
+    my $t2 = time - $t1;
+    ok($t2 < 3, 'bg_eval returns quickly')
+        or diag "Took ${t2}s, expected fast";
     ok(ref($ooo) eq 'Forks::Super::LazyEval::BackgroundScalar',
        'blessed bg_eval return val is BackgroundScalar');
     eval { $foo = $ooo->foo(0) };

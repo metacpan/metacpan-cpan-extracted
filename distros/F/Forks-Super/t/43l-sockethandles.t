@@ -40,7 +40,7 @@ if ($] < 5.008) {
     # read with :crlf layer doesn't work the same in 5.6
     $unicode_phrase =~ s/\n/\r\n/g;
 }
-s/\r/\\r/g,s/\n/\\n/g for $out,$unicode_phrase;
+s/\r\n/\n/g,s/\r/\\r/g,s/\n/\\n/g for $out,$unicode_phrase;
 ok($out eq $unicode_phrase, "read stdout")
     or diag("output was: $out\nexpected  : $unicode_phrase\n");
 

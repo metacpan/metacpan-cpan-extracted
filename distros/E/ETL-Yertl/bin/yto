@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package yto;
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 # ABSTRACT: Change YAML to another format (like JSON)
 
 use ETL::Yertl;
@@ -90,7 +90,7 @@ yto - Change YAML to another format (like JSON)
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

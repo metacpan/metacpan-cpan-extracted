@@ -1,5 +1,9 @@
 Revision history for HO-class
 
+0.077 - 2018-09-05
+* add our to %classes declaration in HO::accessor::import
+* start HO::mixin helper
+
 0.076 - 2018-08-24
 * fix bug in lvalue acessors, currently for lvalue accessors the correct
   index is only available during runtime

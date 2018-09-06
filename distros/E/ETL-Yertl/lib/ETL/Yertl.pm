@@ -1,10 +1,33 @@
 package ETL::Yertl;
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 # ABSTRACT: ETL with a Shell
 
 use strict;
 use warnings;
-use base 'Import::Base';
+use feature qw( :5.10 );
+use base 'Import::Base', 'Exporter';
+use Carp qw( croak );
+use Module::Runtime qw( use_module );
+use ETL::Yertl::FormatStream;
+use ETL::Yertl::Format;
+use IO::Async::Loop;
+
+our @EXPORT = qw( stdin stdout transform file );
+our @EXPORT_OK = qw( loop );
+
+sub loop;
+
+sub import {
+    $_[0]->export_to_level( 1, undef, @EXPORT );
+    for my $i ( 1..$#_ ) {
+        if ( grep { $_ eq $_[ $i ] } @EXPORT_OK ) {
+            $_[0]->export_to_level( 1, undef, $_[ $i ] );
+            splice @_, $i, 1;
+            redo;
+        }
+    }
+    goto &Import::Base::import;
+}
 
 our @IMPORT_MODULES = (
     strict => [],
@@ -30,6 +53,164 @@ sub yertl::diag {
     print STDERR "$text\n" if $ETL::Yertl::VERBOSE >= $level;
 }
 
+# format attribute takes simple string for named format object
+sub stream(%) {
+    my ( %args ) = @_;
+    if ( $args{format} && !ref $args{format} ) {
+        $args{format} = ETL::Yertl::Format->get( $args{format} );
+    }
+    my $stream = ETL::Yertl::FormatStream->new( %args );
+    loop->add( $stream );
+    return $stream;
+}
+
+#pod =sub stdin
+#pod
+#pod     my $stdin = stdin( %args );
+#pod
+#pod Get a L<ETL::Yertl::FormatStream> object for standard input. C<%args> is a list
+#pod of key/value pairs passed to L<ETL::Yertl::FormatStream/new>. Useful keys are:
+#pod
+#pod =over
+#pod
+#pod =item format
+#pod
+#pod Specify the format that standard input is. Defaults to C<yaml> or the value
+#pod of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+#pod
+#pod =back
+#pod
+#pod =cut
+
+sub stdin(;%) {
+    my ( %args ) = @_;
+    $args{read_handle} = \*STDIN;
+    return stream( %args );
+}
+
+#pod =sub stdout
+#pod
+#pod     my $stdout = stdout( %args );
+#pod
+#pod Get a L<ETL::Yertl::FormatStream> object for standard output. C<%args> is a list
+#pod of key/value pairs passed to L<ETL::Yertl::FormatStream/new>. Useful keys are:
+#pod
+#pod =over
+#pod
+#pod =item format
+#pod
+#pod Specify the format that standard input is. Defaults to C<yaml> or the value
+#pod of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+#pod
+#pod =item autoflush
+#pod
+#pod Immediately write documents to standard output to improve
+#pod responsiveness, instead of queuing them for later writes for efficiency.
+#pod This defaults to C<1> (on). Set it to C<0> to turn autoflush off.
+#pod
+#pod =back
+#pod
+#pod =cut
+
+sub stdout(;%) {
+    my ( %args ) = @_;
+    $args{write_handle} = \*STDOUT;
+    $args{autoflush} //= 1;
+    return stream( %args );
+}
+
+#pod =sub transform
+#pod
+#pod     my $xform = transform( sub { ... } );
+#pod     my $xform = transform( 'Local::Transform::Class' => @args );
+#pod
+#pod Create a new L<ETL::Yertl::Transform> object, passing in either a subref
+#pod to transform documents, or a class to instantiate and arguments to pass
+#pod to its constructor.
+#pod
+#pod The subref will receive two arguments: The L<ETL::Yertl::Transform>
+#pod object and the document to transform. C<$_> will also be set to the
+#pod document to transform.  The subref should return the transformed
+#pod document (either a new document, or the existing document after being
+#pod modified).
+#pod
+#pod If given a transform class, it should inherit from
+#pod L<ETL::Yertl::Transform>. The class will be loaded and an object
+#pod instantiated using the C<@args>.
+#pod
+#pod =cut
+
+sub transform($;%) {
+    my ( $xform, @args ) = @_;
+    my $obj;
+    if ( !ref $xform ) {
+        my $module = $xform;
+        $obj = use_module( $module )->new( @args );
+    }
+    elsif ( ref $xform eq 'CODE' ) {
+        $obj = ETL::Yertl::Transform->new(
+            @args,
+            transform_doc => $xform,
+        );
+    }
+    loop->add( $obj );
+    return $obj;
+}
+
+#pod =sub file
+#pod
+#pod     my $stream = file( $mode, $path, %args );
+#pod
+#pod Create a L<ETL::Yertl::FormatStream> object for the given C<$path>.
+#pod C<$mode> should be one of C<< < >> for reading or C<< > >> for writing.
+#pod C<%args> are additional arguments to pass to the
+#pod L<ETL::Yertl::FormatStream> constructor. Useful keys are:
+#pod
+#pod =over
+#pod
+#pod =item format
+#pod
+#pod Specify the format that standard input is. Defaults to C<yaml> or the value
+#pod of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+#pod
+#pod =back
+#pod
+#pod =cut
+
+sub file( $$;% ) {
+    my ( $mode, $name, %args ) = @_;
+    # Detect whether to read_handle/write_handle via '<', '>'
+    open my $fh, $mode, $name
+        or croak sprintf q{Can't open file "%s": %s}, $name, $!;
+    if ( $mode =~ /^</ ) {
+        $args{read_handle} = $fh;
+    }
+    elsif ( $mode =~ /^>/ ) {
+        $args{write_handle} = $fh;
+    }
+    else {
+        croak sprintf q{Can't determine if mode "%s" is read or write}, $mode;
+    }
+    return stream( %args );
+}
+
+#pod =sub loop
+#pod
+#pod     my $loop = loop();
+#pod
+#pod Get the L<IO::Async::Loop> singleton. Use this to add other L<IO::Async> objects
+#pod to a larger program. This is not needed for simple Yertl streams, and is mostly
+#pod used internally.
+#pod
+#pod This is not exported by default. You can import it using C<< use ETL::Yertl 'loop' >>.
+#pod
+#pod =cut
+
+sub loop() {
+    state $loop = IO::Async::Loop->new;
+    return $loop;
+}
+
 1;
 
 __END__
@@ -42,7 +223,7 @@ ETL::Yertl - ETL with a Shell
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -50,9 +231,6 @@ version 0.039
     # Convert file to Yertl's format
     $ yfrom csv file.csv >work.yml
     $ yfrom json file.json >work.yml
-
-    # Mask document
-    $ ymask 'field/inner' work.yml >masked.yml
 
     # Convert file to output format
     $ yto csv work.yml
@@ -70,7 +248,11 @@ version 0.039
     ### In Perl...
     use ETL::Yertl;
 
-    # XXX: To do: Perl API
+    # Give everyone a 5% raise
+    my $xform = file( '<', 'employees.yaml' )
+              | transform( sub { $_->{salary} *= 1.05 } )
+              >> stdout;
+    $xform->run;
 
 =head1 DESCRIPTION
 
@@ -94,6 +276,93 @@ Yertl will have tools for:
 =item Distributing data through messaging APIs (ZeroMQ)
 
 =back
+
+=head1 SUBROUTINES
+
+=head2 stdin
+
+    my $stdin = stdin( %args );
+
+Get a L<ETL::Yertl::FormatStream> object for standard input. C<%args> is a list
+of key/value pairs passed to L<ETL::Yertl::FormatStream/new>. Useful keys are:
+
+=over
+
+=item format
+
+Specify the format that standard input is. Defaults to C<yaml> or the value
+of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+
+=back
+
+=head2 stdout
+
+    my $stdout = stdout( %args );
+
+Get a L<ETL::Yertl::FormatStream> object for standard output. C<%args> is a list
+of key/value pairs passed to L<ETL::Yertl::FormatStream/new>. Useful keys are:
+
+=over
+
+=item format
+
+Specify the format that standard input is. Defaults to C<yaml> or the value
+of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+
+=item autoflush
+
+Immediately write documents to standard output to improve
+responsiveness, instead of queuing them for later writes for efficiency.
+This defaults to C<1> (on). Set it to C<0> to turn autoflush off.
+
+=back
+
+=head2 transform
+
+    my $xform = transform( sub { ... } );
+    my $xform = transform( 'Local::Transform::Class' => @args );
+
+Create a new L<ETL::Yertl::Transform> object, passing in either a subref
+to transform documents, or a class to instantiate and arguments to pass
+to its constructor.
+
+The subref will receive two arguments: The L<ETL::Yertl::Transform>
+object and the document to transform. C<$_> will also be set to the
+document to transform.  The subref should return the transformed
+document (either a new document, or the existing document after being
+modified).
+
+If given a transform class, it should inherit from
+L<ETL::Yertl::Transform>. The class will be loaded and an object
+instantiated using the C<@args>.
+
+=head2 file
+
+    my $stream = file( $mode, $path, %args );
+
+Create a L<ETL::Yertl::FormatStream> object for the given C<$path>.
+C<$mode> should be one of C<< < >> for reading or C<< > >> for writing.
+C<%args> are additional arguments to pass to the
+L<ETL::Yertl::FormatStream> constructor. Useful keys are:
+
+=over
+
+=item format
+
+Specify the format that standard input is. Defaults to C<yaml> or the value
+of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+
+=back
+
+=head2 loop
+
+    my $loop = loop();
+
+Get the L<IO::Async::Loop> singleton. Use this to add other L<IO::Async> objects
+to a larger program. This is not needed for simple Yertl streams, and is mostly
+used internally.
+
+This is not exported by default. You can import it using C<< use ETL::Yertl 'loop' >>.
 
 =head1 SEE ALSO
 
@@ -147,6 +416,14 @@ A set of tools for manipulating JSON (constrast with Yertl's YAML). For
 interoperability, set the C<YERTL_FORMAT> environment variable to
 C<"json">.
 
+=item L<Catmandu|http://librecat.org>
+
+A generic data processing toolkit. Convert data between multiple
+formats, import/export into multiple databases, and manipulate data with
+a mini-language.
+
+This project is very much like Yertl, and more mature besides.
+
 =item L<jq|http://stedolan.github.io/jq/>
 
 A filter for JSON documents. The inspiration for L<yq>. For
@@ -158,6 +435,40 @@ C<"json">.
 JSON Transformer. Allows multiple ways of manipulating JSON, including
 L<JSONPath|http://goessner.net/articles/JsonPath/>. For interoperability,
 set the C<YERTL_FORMAT> environment variable to C<"json">.
+
+=item L<pv (Pipe Viewer)|http://www.ivarch.com/programs/pv.shtml>
+
+This tool helps examine how fast data is flowing through a shell
+pipeline. If the size of the data is known, it can even provide
+a progress bar and an ETA.
+
+=item L<netcat (nc)|http://netcat.sourceforge.net>
+
+Netcat allows simple streaming over a network. Using Netcat you can
+start a Yertl pipeline on one machine and finish it on another machine.
+For example, you could generate metrics on each client machine, and then
+write them to a central machine to insert into a database on that
+machine.
+
+Netcat does not come with any security, so be careful (use firewalls).
+
+=item L<socat|http://www.dest-unreach.org/socat/doc/socat.html>
+
+Socat is a multi-purpose relay. It is similar to Netcat but with many
+more features such as SSL and client verification. Socat has security,
+so you can use this like Netcat in cases where you must accept data from
+the Internet.
+
+=item L<parallel (GNU Parallel)|https://www.gnu.org/software/parallel/>
+
+GNU Parallel is a shell tool for executing jobs in parallel on one or more
+computers. Parallel is very similar to C<xargs>, except it will execute
+the commands on other computers.
+
+=item L<distribution|https://github.com/wizzat/distribution>
+
+This tool creates charts. Pipe into it from C<yq> to create simple
+charts from your data.
 
 =back
 

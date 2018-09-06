@@ -97,7 +97,7 @@ sub accepts {
     }
 
     if ($self->{of}) {
-        for (my $i = 0; $i < $self->{max} // scalar $elems; $i++) {
+        for (my $i = 0; $i < ($self->{max} // $elems); $i++) {
             my $err = Mojolicious::Plugin::InputValidation::_validate_structure($value->[$i], $self->{of}, "$path/$i");
 
             if ($err) {
@@ -202,7 +202,7 @@ package Mojolicious::Plugin::InputValidation;
 use Mojo::Base 'Mojolicious::Plugin';
 no strict 'subs';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Mojo::Util 'monkey_patch';
 

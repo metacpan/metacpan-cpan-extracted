@@ -6,9 +6,9 @@ use parent 'App::NDTools::NDProc::Module';
 
 use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
-use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
+use Struct::Path::PerlStyle 0.80 qw(path2str);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub MODINFO { "Remove specified parts from structure" }
 
@@ -31,10 +31,7 @@ sub check_rule {
 }
 
 sub process_path {
-    my ($self, $data, $path, $opts) = @_;
-
-    my $spath = eval { str2path($path) };
-    die_fatal "Failed to parse path ($@)", 4 if ($@);
+    my ($self, $data, $path, $spath, $opts) = @_;
 
     return ${$data} = undef unless (@{$spath});
 

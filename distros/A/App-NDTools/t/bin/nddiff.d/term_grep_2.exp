@@ -1,6 +1,6 @@
   {fqdn}
--   alpha.example.org
-+   beta.example.org
+-   "alpha.example.org"
++   "beta.example.org"
   {mtime}
 -   1462431001
 +   1462431002

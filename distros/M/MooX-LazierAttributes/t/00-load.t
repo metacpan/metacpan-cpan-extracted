@@ -13,6 +13,7 @@ sub around { }
 sub after { }
 sub before { }
 
+
 BEGIN {
     use_ok( 'MooX::LazierAttributes' ) || print "Bail out!\n";
 }

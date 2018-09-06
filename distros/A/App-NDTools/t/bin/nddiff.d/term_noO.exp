@@ -1,9 +1,9 @@
   {files}
 +   {"/etc/cron.d/beta"}
-+     * * * * * root sleep 5
++     "* * * * * root sleep 5"
     {"/etc/hostname"}
-+     beta
++     "beta"
   {fqdn}
-+   beta.example.org
++   "beta.example.org"
   {mtime}
 +   1462431002

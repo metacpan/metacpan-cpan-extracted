@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ETL/Yertl.pm',
@@ -22,6 +22,7 @@ my @module_files = (
     'ETL/Yertl/Format/json.pm',
     'ETL/Yertl/Format/yaml.pm',
     'ETL/Yertl/FormatStream.pm',
+    'ETL/Yertl/Transform.pm',
     'ETL/Yertl/Util.pm'
 );
 

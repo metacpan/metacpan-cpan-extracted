@@ -1,5 +1,12 @@
 Revision history for App-Wallflower
 
+1.012 2018-09-05 BOOK
+    - refactor parallel processing to more evenly distribute the work
+      between children (the parent won't process any URL)
+    - add support for delayed and streaming responses
+      (thanks to Ferruccio Zamuner (FERZ))
+    - fix tests that were failing under Win32 (after the move to Path::Tiny)
+
 1.011 2018-09-01 BOOK
     - improve the inter-process communication algorithm when running
       in parallel mode

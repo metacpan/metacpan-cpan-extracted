@@ -1,0 +1,85 @@
+NAME
+
+    Mojolicious::Plugin::ForwardedFor - Retrieve the remote address from
+    X-Forwarded-For
+
+SYNOPSIS
+
+      use Mojolicious::Lite;
+      plugin ForwardedFor => {levels => 2}; # number of reverse proxies you control
+      any '/' => sub {
+        my $c = shift;
+        $c->render(json => {remote_addr => $c->forwarded_for});
+      };
+      app->start;
+
+DESCRIPTION
+
+    Mojolicious supports deployment via a reverse proxy setup by specifying
+    the proxy configuration option for Hypnotoad, or the MOJO_REVERSE_PROXY
+    environment variable. However, "remote_address" in Mojo::Transaction
+    will in this case only return the most recent address from the
+    X-Forwarded-For header, as it cannot automatically determine how many
+    remote addresses correspond to proxies.
+
+    Mojolicious::Plugin::ForwardedFor can be configured with the number of
+    reverse proxy "levels" that you control, and provides a "forwarded_for"
+    helper method that will return the remote address at that level. It is
+    important to set "levels" no higher than the number of proxies that
+    will have appended addresses to the X-Forwarded-For header, as the
+    original requests can pass anything as the initial value of the header,
+    and thus spoof additional proxy levels.
+
+HELPERS
+
+    Mojolicious::Plugin::ForwardedFor implements the following helpers.
+
+ forwarded_for
+
+      my $remote_addr = $c->forwarded_for;
+
+    Returns the least recently appended remote address from the
+    X-Forwarded-For header, while skipping no more than the configured
+    number of reverse proxy "levels". Returns the originating address of
+    the current request if configured for 0 reverse proxy levels, or if no
+    addresses have been appended to the header.
+
+METHODS
+
+    Mojolicious::Plugin::ForwardedFor inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+ register
+
+      $plugin->register(Mojolicious->new);
+      $plugin->register(Mojolicious->new, {levels => 1});
+
+    Register helper in Mojolicious application. Takes the following
+    options:
+
+    levels
+
+      Number of remote proxy levels to allow for when parsing
+      X-Forwarded-For. Defaults to the value of the MOJO_REVERSE_PROXY
+      environment variable, or 1.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::Transaction, Mojolicious::Guides::Cookbook
+

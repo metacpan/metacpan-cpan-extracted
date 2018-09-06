@@ -7,9 +7,10 @@ use parent 'App::NDTools::NDProc::Module';
 use Log::Log4Cli;
 use Scalar::Util qw(looks_like_number);
 use Struct::Path 0.80 qw(path);
-use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.15';
+use App::NDTools::Util qw(chomp_evaled_error);
+
+our $VERSION = '0.18';
 
 sub MODINFO { "Insert value into structure" }
 
@@ -19,9 +20,9 @@ sub arg_opts {
     return (
         $self->SUPER::arg_opts(),
         'boolean=s' => sub {
-            if ($_[1] eq '1' or $_[1] =~ /(T|t)rue/) {
+            if ($_[1] eq '1' or $_[1] =~ /^(T|t)rue$/) {
                 $self->{OPTS}->{value} = JSON::true;
-            } elsif ($_[1] eq '0' or $_[1] =~ /(F|f)alse/) {
+            } elsif ($_[1] eq '0' or $_[1] =~ /^(F|f)alse$/) {
                 $self->{OPTS}->{value} = JSON::false;
             } else {
                 $self->{ARG_ERROR} = "Unsuitable value for --boolean";
@@ -66,14 +67,12 @@ sub configure {
 }
 
 sub process_path {
-    my ($self, $data, $path, $opts) = @_;
-
-    my $spath = eval { str2path($path) };
-    die_fatal "Failed to parse path ($@)", 4 if ($@);
+    my ($self, $data, $path, $spath,  $opts) = @_;
 
     log_info { 'Updating path "' . $path . '"' };
     eval { path(${$data}, $spath, assign => $opts->{value}, expand => 1) };
-    die_fatal "Failed to lookup path '$path' ($@)", 4 if ($@);
+    die_fatal "Failed to lookup path '$path' (" .
+        chomp_evaled_error($@) . ")", 4 if ($@);
 }
 
 
@@ -101,7 +100,7 @@ Boolean value to insert.
 
 Load inserting value from file.
 
-=item B<--file-fmt> E<lt><RAW|JSON|YAML>E<gt>
+=item B<--file-fmt> E<lt>RAW|JSON|YAMLE<gt>
 
 Input file format.
 

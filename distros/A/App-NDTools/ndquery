@@ -76,7 +76,7 @@ On/Off pretty-print for JSON. Enabled by default.
 
 =item B<--raw-output>
 
-Dont't format result simple things (strings/numbers) - dump them as is.
+Dont't format result scalars (strings/numbers) - dump them as is.
 
 =item B<--replace>
 
@@ -88,7 +88,7 @@ Fail if unexisted path specified. Enabled by default.
 
 =item B<--values|--vals>
 
-Values will be printed if combined with C<--list> opt.
+Values will be printed when combined with C<--list> opt.
 
 =item B<--verbose|-v> [int]
 

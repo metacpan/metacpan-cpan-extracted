@@ -1,5 +1,5 @@
 package Bio::ToolBox::Data::file;
-our $VERSION = '1.61';
+our $VERSION = '1.62';
 
 =head1 NAME
 
@@ -90,26 +90,28 @@ sub taste_file {
 	$Taste->open_to_read_fh or return;
 	$Taste->parse_headers;
 	
+	# load first 10 data lines
+	$Taste->{data_table}->[0] = $Taste->{'column_names'}; # set table header names
+	for (my $i = 1; $i <= 10; $i++) {
+		my $line = $Taste->fh->getline or last;
+		next if $line !~ m/\w+/;
+		next if $line =~ /^#/;
+		$Taste->add_data_line($line);
+	}
+	$Taste->close_fh;
+	$Taste->verify(1); # silently check the integrity of the file
+	
 	# check existing metadata
 	if ($Taste->gff) {
 		return 'gff';
 	}
-	elsif ($Taste->bed == 12) {
+	elsif ($Taste->bed) {
 		return 'bed';
 	}
 	elsif ($Taste->ucsc) {
 		return 'ucsc';
 	}
 	
-	# load first 10 data lines
-	$Taste->{data_table}->[0] = $Taste->{'column_names'}; # set table header names
-	for (my $i = 1; $i <= 10; $i++) {
-		my $line = $Taste->fh->getline;
-		next if $line !~ m/\w+/;
-		next if $line =~ /^#/;
-		$Taste->add_data_line($line);
-	}
-	$Taste->close_fh;
 	
 	# check if the number of columns match a known format, then verify
 	my $number = $Taste->number_columns;
@@ -658,7 +660,7 @@ sub write_file {
 			# vcf requires bgzip
 			$args{'gz'} = 2;
 		}
-		if ($extension =~ m/\.gz$/i) {
+		elsif ($extension =~ m/\.gz$/i) {
 			$args{'gz'} = 1;
 		}
 		else {

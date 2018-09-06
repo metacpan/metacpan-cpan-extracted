@@ -1,5 +1,12 @@
 Revision history for Bit::Twiddling
 
+0.10    2018-09-05
+        - correct and improve POD (closes GitHub#2)
+        - change MIN_PERL_VERSION to 5.8
+        - requires Test::More 0.88 (for done_testing)
+
+0.09    UNRELEASED
+
 0.08    2018-09-02
         - require MakeMaker version 6.48
         - add META_MERGE to Makefile.PL

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw( tempdir );
+use Path::Tiny ();
 use URI;
 use Wallflower::Util qw( links_from );
 
@@ -10,13 +10,13 @@ my @tests = (
     [   '/',
         [   200,
             [ 'Content-Type' => 'text/plain' ],
-            File::Spec->catfile( t => 'file-01.html' )
+            Path::Tiny->new( t => 'file-01.html' )
         ],
     ],
     [   '/',
         [   200,
             [ 'Content-Type' => 'text/html' ],
-            File::Spec->catfile( t => 'file-01.html' )
+            Path::Tiny->new( t => 'file-01.html' )
         ],
         '/style.css',
         '/#content',
@@ -31,7 +31,7 @@ my @tests = (
     [   '/foo/bar.css',
         [   200,
             [ 'Content-Type' => 'text/css' ],
-            File::Spec->catfile( t => 'file-01.css' )
+            Path::Tiny->new( t => 'file-01.css' )
         ],
         '/foo/foo.css', '/foo/bar.css', '/img.png', '/foo/img_qq.png', '/img_q.png', 'http://example.com/ex.png',
     ],

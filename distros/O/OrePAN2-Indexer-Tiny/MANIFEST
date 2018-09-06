@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/OrePAN2/Indexer/Tiny.pm
+minil.toml
+script/orepan2-indexer-tiny
+t/00_compile.t
+META.yml
+MANIFEST

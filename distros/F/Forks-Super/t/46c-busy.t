@@ -34,7 +34,7 @@ my $t2 = Time::HiRes::time();
 my $pid4 = fork { sub => $sleepy };
 my $t3 = Time::HiRes::time();
 ($t2,$t1,$t0) = ($t3-$t2, $t3-$t1, $t3-$t0);
-okl($t2 >= 2 || ($t1 > 3.0),                                       ### 3 ###
+okl($t2 >= 1.66 || $t1 > 2.7,                                      ### 3 ###
     "blocked fork took ${t2}s ${t1}s ${t0}s expected >2s");
 ok(isValidPid($pid4), "blocking fork returns valid pid $pid4");    ### 4 ###
 waitall;

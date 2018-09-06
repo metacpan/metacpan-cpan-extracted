@@ -1,0 +1,29 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+
+use OrePAN2::Indexer::Tiny;
+
+my $directory = shift or die "Usage: $0 directory\n";
+
+my $orepan = OrePAN2::Indexer::Tiny->new(
+    directory => $directory,
+);
+$orepan->load_index();
+for my $archive_file ($orepan->list_archive_files()) {
+    $orepan->add_index( $archive_file );
+}
+$orepan->write_index();
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+orepan2-indexer-tiny - create 02packages.details.txt.gz
+
+=head1 SYNOPSIS
+
+    $ orepan2-indexer-tiny DIRECTORY

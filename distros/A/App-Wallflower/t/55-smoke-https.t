@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw( tempdir );
+use Path::Tiny ();
 use List::Util qw( sum );
 use Wallflower;
 
@@ -17,7 +17,7 @@ my @tests;
 
 push @tests, [
     'direct content',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir,
     sub {
         my $env = shift;
         require Plack::Request;

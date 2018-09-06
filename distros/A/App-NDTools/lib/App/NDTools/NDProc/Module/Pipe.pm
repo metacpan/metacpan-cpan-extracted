@@ -8,9 +8,8 @@ use IPC::Run3;
 use Log::Log4Cli;
 use App::NDTools::Slurp qw(s_decode s_encode);
 use Struct::Path 0.80 qw(path);
-use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub MODINFO { "Modify structure using external process" }
 
@@ -39,10 +38,7 @@ sub check_rule {
 }
 
 sub process_path {
-    my ($self, $data, $path, $opts) = @_;
-
-    my $spath = eval { str2path($path) };
-    die_fatal "Failed to parse path ($@)", 4 if ($@);
+    my ($self, $data, $path, $spath, $opts) = @_;
 
     my @refs = eval { path(${$data}, $spath, strict => $opts->{strict}) };
     die_fatal "Failed to lookup path '$path'", 4 if ($@);

@@ -1,7 +1,7 @@
   package HO::class
 # *****************
 ; use strict; use warnings;
-  our $VERSION='0.076';
+  our $VERSION='0.077';
 # ********************
 
 ; require HO::accessor

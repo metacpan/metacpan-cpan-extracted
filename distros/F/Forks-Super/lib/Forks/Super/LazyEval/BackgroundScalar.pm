@@ -56,7 +56,7 @@ use overload
 		         : atan2($_[0]->_fetch, $_[1]) }
 ;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 # "protocols" for serializing data and the methods used
 # to carry out the serialization
@@ -242,7 +242,7 @@ Forks::Super::LazyEval::BackgroundScalar
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 DESCRIPTION
 

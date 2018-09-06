@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -10,11 +10,12 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Type::Tiny compatible types for the PGPLOT library",
   "AUTHOR" => "Diab Jerius <djerius\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "Module::Build::Tiny" => "0.034"
   },
   "DISTNAME" => "Types-PGPLOT",
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Types::PGPLOT",
   "PREREQ_PM" => {
     "Readonly::Tiny" => 0,
@@ -31,13 +32,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.29",
     "Test2::API" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
     "Test::TypeTiny" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +50,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.29",
   "Readonly::Tiny" => 0,
   "Test2::API" => 0,
   "Test2::V0" => 0,

@@ -16,7 +16,7 @@ use Path::Tiny 'path';
 use Text::Diff ();
 use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 my $env;
 
@@ -257,7 +257,7 @@ sub status {
                 print 'diff - ', $this_path, "\n" unless ( $printed_path++ );
 
                 if ( not $b ) {
-                    print '  - ', substr( $a, 7 ), "\n";
+                    print '  - ', _rel2dir( substr( _rel2root($a), 6 ) ), "\n";
                 }
                 elsif ( not $a ) {
                     print "  + $b\n";
@@ -617,7 +617,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.18
+version 1.20
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)

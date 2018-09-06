@@ -195,3 +195,7 @@ Possible TODOs:
         and use overridden wait, waitpid calls, right?
 
     ___ Test <$pid> in list context, $] >= 5.018
+
+    ___ remote testing needs a lot of improvement. How can you check
+        for passwordless publickey authentication without ever needing
+        to read from tty?

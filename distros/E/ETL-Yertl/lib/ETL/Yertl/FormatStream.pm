@@ -1,5 +1,5 @@
 package ETL::Yertl::FormatStream;
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 # ABSTRACT: Read/write I/O stream with Yertl formatters
 
 #pod =head1 SYNOPSIS
@@ -45,7 +45,12 @@ use Carp qw( croak );
 sub configure {
     my ( $self, %args ) = @_;
 
-    $self->{format} = delete $args{format} || ETL::Yertl::Format->get_default;
+    if ( exists $args{format} ) {
+        $self->{format} = delete $args{format};
+    }
+    elsif ( !$self->{format} ) {
+        $self->{format} = ETL::Yertl::Format->get_default;
+    }
 
     for my $event ( qw( on_doc ) ) {
         $self->{ $event } = delete $args{ $event } if exists $args{ $event };
@@ -85,7 +90,7 @@ ETL::Yertl::FormatStream - Read/write I/O stream with Yertl formatters
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

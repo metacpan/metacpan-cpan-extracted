@@ -2,10 +2,12 @@ package Types::PGPLOT;
 
 # ABSTRACT: Type::Tiny compatible types for the PGPLOT library
 
+use 5.0100;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Type::Library
   -base,
@@ -420,7 +422,7 @@ Types::PGPLOT - Type::Tiny compatible types for the PGPLOT library
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

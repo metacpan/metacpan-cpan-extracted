@@ -1,5 +1,17 @@
 Revision history for Types-PGPLOT
 
+0.02      2018-09-05 11:38:58-04:00 America/New_York
+
+  [ BUILD FIXES ]
+
+    * specify minimum version of Perl to 5.10.0
+    * specify minimum version of List::Util to 1.29 to get pairs()
+
+  [ BUILD ]
+
+    * Add Build.PL
+
+
 0.01      2018-09-04 14:06:11-04:00 America/New_York
 
 * First release upon an unsuspecting world.

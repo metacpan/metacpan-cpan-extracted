@@ -1,5 +1,5 @@
 package ETL::Yertl::Format;
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 # ABSTRACT: Base class for input/output formats
 
 #pod =head1 SYNOPSIS
@@ -103,7 +103,7 @@ ETL::Yertl::Format - Base class for input/output formats
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

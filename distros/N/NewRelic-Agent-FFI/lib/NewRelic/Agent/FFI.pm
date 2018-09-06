@@ -2,13 +2,13 @@ package NewRelic::Agent::FFI;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.010;
 use FFI::Platypus 0.56;
 use FFI::CheckLib ();
 use NewRelic::Agent::FFI::Procedural ();
 
 # ABSTRACT: Perl Agent for NewRelic APM
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub new
@@ -191,7 +191,7 @@ NewRelic::Agent::FFI - Perl Agent for NewRelic APM
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -297,7 +297,7 @@ This value defaults to your perl version, and can also be automatically sourced 
 
 =head1 METHODS
 
-Methods noted below that return C<$status> return 0 for success or non-zero for failure.  See the NR SDK documentation for error codes.
+Methods noted below that return C<$rc> return 0 for success or non-zero for failure.  See the NR SDK documentation for error codes.
 
 =head2 embed_collector
 
@@ -307,7 +307,7 @@ Embeds the collector agent for harvesting NewRelic data. This should be called b
 
 =head2 init
 
- my $status = $agent->init;
+ my $rc = $agent->init;
 
 Initialize the connection to NewRelic.
 
@@ -321,72 +321,72 @@ Returns the transaction's ID on success, else negative warning code or error cod
 
 =head2 set_transaction_name
 
- my $status = $agent->set_transaction_name($tx, $name);
+ my $rc = $agent->set_transaction_name($tx, $name);
 
 Sets the transaction name.
 
 =head2 set_transaction_request_url
 
- my $status = $agent->set_transaction_request_url($tx, $url);
+ my $rc = $agent->set_transaction_request_url($tx, $url);
 
 Sets the transaction URL.
 
 =head2 set_transaction_max_trace_segments
 
- my $status = $agent->set_transaction_max_trace_segments($tx, $max);
+ my $rc = $agent->set_transaction_max_trace_segments($tx, $max);
 
 Sets the maximum trace section for the transaction.
 
 =head2 set_transaction_category
 
- my $status = $agent->set_transaction_category($tx, $category);
+ my $rc = $agent->set_transaction_category($tx, $category);
 
 Sets the transaction category.
 
 =head2 set_transaction_type_web
 
- my $status = $agent->set_transaction_type_web($tx);
+ my $rc = $agent->set_transaction_type_web($tx);
 
 Sets the transaction type to 'web'
 
 =head2 set_transaction_type_other
 
- my $status = $agent->set_transaction_type_other($tx);
+ my $rc = $agent->set_transaction_type_other($tx);
 
 Sets the transaction type to 'other'
 
 =head2 add_transaction_attribute
 
- my $status = $agent->add_transaction_attribute($tx, $key => $value);
+ my $rc = $agent->add_transaction_attribute($tx, $key => $value);
 
 Adds the given attribute (key/value pair) for the transaction.
 
 =head2 notice_transaction_error
 
- my $status = $agent->notice_transaction_error($tx, $exception_type, $error_message, $stack_trace, $stack_frame_delimiter);
+ my $rc = $agent->notice_transaction_error($tx, $exception_type, $error_message, $stack_trace, $stack_frame_delimiter);
 
 Identify an error that occurred during the transaction. The first identified
 error is sent with each transaction.
 
 =head2 end_transaction
 
- my $status = $agent->end_transaction($tx);
+ my $rc = $agent->end_transaction($tx);
 
 =head2 record_metric
 
- my $status = $agent->record_metric($key => $value);
+ my $rc = $agent->record_metric($key => $value);
 
 Records the given metric (key/value pair).  The C<$value> should be a floating point.
 
 =head2 record_cpu_usage
 
- my $status = $agent->record_cpu_usage($cpu_user_time_seconds, $cpu_usage_percent);
+ my $rc = $agent->record_cpu_usage($cpu_user_time_seconds, $cpu_usage_percent);
 
 Records the CPU usage. C<$cpu_user_time_seconds> and C<$cpu_usage_percent> are floating point values.
 
 =head2 record_memory_usage
 
- my $status = $agent->record_memory_usage($memory_megabytes);
+ my $rc = $agent->record_memory_usage($memory_megabytes);
 
 Records the memory usage. C<$memory_megabytes> is a floating point value.
 
@@ -410,7 +410,7 @@ Begins a new external segment.  C<$parent_seg> is a parent segment id (C<undef> 
 
 =head2 end_segment
 
- my $status = $agent->end_segment($tx, $seg);
+ my $rc = $agent->end_segment($tx, $seg);
 
 End the given segment.
 

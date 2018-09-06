@@ -1,3 +1,4 @@
+use 5.010;
 use Test2::V0 -no_srand => 1;
 use NewRelic::Agent::FFI;
 use Time::HiRes qw( sleep );
@@ -13,19 +14,23 @@ use Time::HiRes qw( sleep );
 
 my $license_key = $ENV{NEWRELIC_AGENT_FFI_TEST};
 my $nr;
+my $end_transaction_code = $license_key ? 0 : -65537;
 
 # TODO: test for set_transaction_category    ( newrelic_transaction_set_category )
 
 subtest 'setup' => sub {
 
   $nr = NewRelic::Agent::FFI->new(
-    license_key => $license_key || 'xxxx',
+    license_key => $license_key,
     app_name    => "NRAFFI (Test)",
   );
   isa_ok $nr, 'NewRelic::Agent::FFI';
 
-  $nr->embed_collector;
-  ok 1, 'embed_collector';
+  if($license_key)
+  {
+    $nr->embed_collector;
+    ok 1, 'embed_collector';
+  }
   
   is $nr->init, 0, 'init';
 };
@@ -86,7 +91,7 @@ subtest "transaction (web)" => sub {
 
   };
 
-  is $nr->end_transaction($tx), 0, 'end_transaction';
+  is $nr->end_transaction($tx), $end_transaction_code, 'end_transaction';
 };
 
 subtest 'transaction with error' => sub {
@@ -102,7 +107,7 @@ subtest 'transaction with error' => sub {
 
   is $nr->notice_transaction_error($tx, 'normal', 'ieeieieie something went wrong!', 'one:two:three', ':'), 0, 'notice_transaction_error';
   
-  is $nr->end_transaction($tx), 0, 'end_transaction';
+  is $nr->end_transaction($tx), $end_transaction_code, 'end_transaction';
 };
 
 subtest "transaction (other)" => sub {
@@ -117,7 +122,7 @@ subtest "transaction (other)" => sub {
 
   sleep rand 1;
 
-  is $nr->end_transaction($tx), 0, 'end_transaction';
+  is $nr->end_transaction($tx), $end_transaction_code, 'end_transaction';
 };
 
 done_testing;

@@ -1,0 +1,7 @@
+name = "OrePAN2-Indexer-Tiny"
+badges = ["travis"]
+authority="cpan:AKIYM"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

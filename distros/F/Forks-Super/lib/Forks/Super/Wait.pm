@@ -21,7 +21,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(waitall TIMEOUT WREAP_BG_OK);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 my ($productive_waitpid_code);
 my $respect_SIGCHLD_ignore = 1;
@@ -532,7 +532,7 @@ Forks::Super::Wait - manage background processes at the end of their life cycle
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 DESCRIPTION
 
@@ -549,7 +549,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017, Marty O'Brien.
+Copyright (c) 2009-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

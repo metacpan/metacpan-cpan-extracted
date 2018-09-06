@@ -3,9 +3,9 @@ package Number::Phone::JP::Table::Pager;
 use strict;
 use warnings;
 
-our $VERSION = '0.20180605';
+our $VERSION = '0.20180904';
 
-# Table last modified: 2018-06-05
+# Table last modified: 2018-09-04
 our %TEL_TABLE = (
     # Pref => q<Assoc-Pref-Regex>,
     20 => '(?:46\d{6})',

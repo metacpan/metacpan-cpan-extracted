@@ -20,17 +20,17 @@ no_index:
 provides:
   Crypt::Affine:
     file: lib/Crypt/Affine.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Affine::Params:
     file: lib/Crypt/Affine/Params.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Moo: '2.000000'
   Type::Tiny: '1.000005'
   autodie: '0'
-  namespace::clean: '0.24'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Crypt-Affine.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

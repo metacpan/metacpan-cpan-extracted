@@ -22,10 +22,9 @@ Process nested data structures according provided rules
 
 =over 4
 
-=item B<--builtin-format> <""|JSON>
+=item B<--builtin-format> <RAW|JSON|YAML>
 
-Format for builtin things (C<--builtin-rules>, C<--embed-rules>). Raw structure
-will be used if omitted or empty.
+Format for builtin rules and blames. Raw structure used by default.
 
 =item B<--builtin-rules> E<lt>pathE<gt>
 
@@ -89,13 +88,20 @@ Print version and exit.
 
 =back
 
+=head1 AVAILABLE MODULES
+
+ Insert     Insert value into structure
+ Merge      Merge structures according provided rules
+ Pipe       Modify structure using external process
+ Remove     Remove specified parts from structure
+
 =head1 EXAMPLES
 
-Simply merge three files using module 'Merge':
+Simply merge three files using module C<Merge>:
 
     ndproc --module Merge a.json --source b.json --source c.json
 
-Print usage for 'Merge' module:
+Print usage for C<Merge> module:
 
     ndproc --module Merge --help
 

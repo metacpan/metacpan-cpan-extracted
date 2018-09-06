@@ -1,13 +1,4 @@
 Changes
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Number/Phone/JP.pm
 lib/Number/Phone/JP/Table.pm
 lib/Number/Phone/JP/Table/Class1.pm
@@ -25,6 +16,7 @@ lib/Number/Phone/JP/Table/United.pm
 lib/Number/Phone/JP/Table/Upt.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README
 regexp-table-maker.pl

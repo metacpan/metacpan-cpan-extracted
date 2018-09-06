@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -673,7 +673,7 @@ sub _postlaunch_parent2 {
     my $job = shift;
     $job->_config_parent(2);
     $job->run_callback('start');
-    Forks::Super::handle_CHLD(-1);
+#   Forks::Super::handle_CHLD(-1);  # memory wrap panic in MSWin32?
     if ($$ != $Forks::Super::MAIN_PID) {
 	# Forks::Super::fork call from a child.
 	$XSIG{CHLD}[-1] ||= \&Forks::Super::handle_CHLD;
@@ -2642,7 +2642,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 SYNOPSIS
 
@@ -2661,7 +2661,9 @@ Forks::Super::Job - object representing a background task
 
 Calls to C<Forks::Super::fork()> that successfully spawn a child process or
 create a deferred job (see L<Forks::Super/"Deferred processes">) will cause 
-a C<Forks::Super::Job> instance to be created to track the job's state. 
+a C<Forks::Super::Job> instance to be created to track the job's state.
+In boolean, numeric, or string context, the Job object behaves like the
+process identifier of the child process.
 For many uses of C<fork()>, it will not be necessary to query the state of 
 a background job. But access to these objects is provided for users who 
 want to exercise even greater control over their use of background
@@ -2711,7 +2713,7 @@ L<getpgrp|perlfunc/"getpgrp">.
 
 =item created
 
-The time (since the epoch) at which the instance was created.
+The time (seconds since the epoch) at which the instance was created.
 
 =item start
 
@@ -2740,7 +2742,7 @@ Current allowable values are
 
 =item C<DEFERRED>
 
-For jobs that are on the job queue and have not started yet.
+For jobs that have been put on the job queue and have not started yet.
 
 =item C<ACTIVE>
 
@@ -3179,7 +3181,7 @@ exit status. See L</ATTRIBUTES>.
 
 =item C<< ($exit_code,$signal,$coredump) = $job->exit_status >>
 
-C<<exit_status>> is an alternative method to L<"status">
+C<exit_status> is an alternative method to L<"status">
 for retrieving the exit value of a background task
 that may be more intuitive.
 
@@ -3192,11 +3194,11 @@ exited on a signal and/or with a core dump, the result of this
 function is a negative number that indicates the signal that
 caused the background process failure.
 
-In list context, C<<exit_status>> returns a three element array
+In list context, C<exit_status> returns a three element array
 of the exit value, the signal number, and an indicator of
 whether the process dumped core.
 
-C<<exit_status>> returns nothing if called on a job that has
+C<exit_status> returns nothing if called on a job that has
 not completed.
 
 =back

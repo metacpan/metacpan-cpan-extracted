@@ -1,5 +1,5 @@
 package Wallflower;
-$Wallflower::VERSION = '1.011';
+$Wallflower::VERSION = '1.012';
 use strict;
 use warnings;
 
@@ -62,6 +62,25 @@ sub target {
     return Path::Tiny->new( $self->destination, grep length, @segments );
 }
 
+# Wallflower::NULL drops the streamed data
+for (qw( write close )) {
+    no strict 'refs';
+    *{"Wallflower::NULL::$_"} = sub { };
+}
+
+sub _build_handle {
+    my ($file) = @_;
+
+    # get a file to save the content in
+    my $dir = $file->parent;
+    eval { $dir->mkpath; 1; } or die "$@\n"
+      if !-e $dir;
+    open my $fh, '> :raw', $file    # no stinky crlf on Win32
+      or die "Can't open $file for writing: $!\n";
+
+    return $fh;
+}
+
 # save the URL to a file
 sub get {
     my ( $self, $uri ) = @_;
@@ -97,7 +116,7 @@ sub get {
         SERVER_PROTOCOL => "HTTP/1.0",
 
         # wallflower defaults
-        'psgi.streaming' => '',
+        'psgi.streaming' => 1,
     };
 
     # add If-Modified-Since headers if the target file exists
@@ -116,26 +135,31 @@ sub get {
         ( $status, $headers, $content ) = @$res;
     }
     elsif ( ref $res eq 'CODE' ) {
-        croak "Delayed response and streaming not supported yet";
+
+        # https://metacpan.org/pod/PSGI#Delayed-Response-and-Streaming-Body
+        $res->( sub {
+            my $response = shift;
+
+            # delayed response
+            ( $status, $headers, $content ) = @$response;
+
+            # streaming
+            if ( !defined $content ) {
+                return bless {}, 'Wallflower::NULL'
+                  if $status ne '200';    # we don't care about the body
+                return _build_handle( $file = $target );
+            }
+            return;
+        } );
     }
     else { croak "Unknown response from application: $res"; }
 
     # save the content to a file
     if ( $status eq '200' ) {
-
-        # get a file to save the content in
-        my $dir = ( $file = $target )->parent;
-        if ( !-e $dir ) {
-            eval { $dir->mkpath } or do {
-                warn "$@\n" if $@;
-                return [ 999, [], '' ];
-            };
-        }
-        open my $fh, '> :raw', $file    # no stinky crlf on Win32
-          or do {
-            warn "Can't open $file for writing: $!\n";
-            return [ 999, [], '' ];
-          };
+        my $fh = defined $content && do {
+            eval { _build_handle( $file = $target ) }
+              or do { warn $@; return [ 999, [], '' ]; };
+        };
 
         # copy content to the file
         if ( ref $content eq 'ARRAY' ) {
@@ -153,6 +177,7 @@ sub get {
             }
             $content->close;
         }
+        elsif ( !defined $content ) { }    # already streamed
         else {
             croak "Don't know how to handle body: $content";
         }
@@ -183,7 +208,7 @@ Wallflower - Stick Plack applications to the wallpaper
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

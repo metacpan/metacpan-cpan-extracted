@@ -29,7 +29,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.008"
+         }
       },
       "test" : {
          "requires" : {
@@ -51,6 +53,6 @@
          "web" : "https://github.com/briang/p5-bit-twiddling"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

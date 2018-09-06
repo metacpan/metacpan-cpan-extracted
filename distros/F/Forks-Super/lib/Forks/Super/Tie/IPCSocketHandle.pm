@@ -28,7 +28,7 @@ use IO::Socket;
 use IO::Handle;
 
 our @ISA = qw(IO::Socket IO::Handle);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 # XXX Windows hack. To get smoothly running sockets on Windows it
 #     seems we have to do a slight pause after each write op.
@@ -54,7 +54,8 @@ sub TIEHANDLE {
     # apply PerlIO layers to the socket here ...
     my $job = $$glob->{job} || Forks::Super::Job->this;
     if (defined($job) && $job->{debug}) {
-	Forks::Super::Debug::debug("io layers are @{$job->{fh_config}{layers}}");
+	Forks::Super::Debug::debug("io layers are " 
+				   . "@{$job->{fh_config}{layers} || []}");
     }
     if (defined($job) && $job->{fh_config}{layers}) {
 	my @io_layers = @{$job->{fh_config}{layers}};
@@ -151,6 +152,12 @@ sub READLINE {
     $self->{READLINE}++;
 
     my $glob = $self->{GLOB};
+
+    # rt#127016
+    if (Forks::Super::Util::IS_WIN32()) {
+	${$self->{SOCKET}}->{emulate_blocking} ||= $$glob->{emulate_blocking};
+    }
+    
     if ($$glob->{job} || ref($$glob->{job})) {
 	return Forks::Super::Job::Ipc::_read_socket(
 	    $self->{SOCKET}, $$glob->{job}, wantarray);

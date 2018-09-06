@@ -2,17 +2,17 @@ use strict;
 use warnings;
 use Test::More;
 
-use File::Spec;
+use Path::Tiny ();
 use URI;
 use Wallflower;
 
 my @tests = (
     [ '/'               => 'index.html' ],
-    [ '/kayo/'          => File::Spec->catfile(qw( kayo index.html )) ],
+    [ '/kayo/'          => Path::Tiny->new(qw( kayo index.html )) ],
     [ '/kayo'           => 'kayo' ],
-    [ '/awk/swoosh.css' => File::Spec->catfile(qw( awk swoosh.css )) ],
-    [ '/awk/clash'      => File::Spec->catfile(qw( awk clash )) ],
-    [ '/awk/clash/'     => File::Spec->catfile(qw( awk clash index.html )) ],
+    [ '/awk/swoosh.css' => Path::Tiny->new(qw( awk swoosh.css )) ],
+    [ '/awk/clash'      => Path::Tiny->new(qw( awk clash )) ],
+    [ '/awk/clash/'     => Path::Tiny->new(qw( awk clash index.html )) ],
     [ 'http://example.com/' => 'index.html' ],
 );
 
@@ -24,7 +24,7 @@ my @fails = (
 plan tests => @tests + 2 * @fails;
 
 # pick up a possible destination directory
-my $dir = File::Spec->tmpdir;
+my $dir = Path::Tiny->tempdir;
 
 my $wallflower = Wallflower->new(
     destination => $dir,
@@ -35,7 +35,7 @@ my $wallflower = Wallflower->new(
 for my $t (@tests) {
     my ( $uri, $file ) = @$t;
     $file = is( $wallflower->target( URI->new($uri) ),
-        File::Spec->catfile( $dir, $file ), $uri );
+        Path::Tiny->new( $dir, $file ), $uri );
 }
 
 # failure tests

@@ -29,14 +29,15 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Module::Metadata" : "0"
+            "Module::Metadata" : "1.000033"
          }
       },
       "runtime" : {
          "requires" : {
+            "Clone" : "0.39",
             "MooX::ReturnModifiers" : "0.03",
-            "Scalar::Util" : "0",
             "constant" : "0",
+            "namespace::clean" : "0.27",
             "perl" : "5.006"
          }
       }
@@ -44,7 +45,7 @@
    "provides" : {
       "MooX::LazierAttributes" : {
          "file" : "lib/MooX/LazierAttributes.pm",
-         "version" : "1.07"
+         "version" : "1.07008"
       }
    },
    "release_status" : "stable",
@@ -55,6 +56,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-LazierAttributes"
       }
    },
-   "version" : "1.07",
+   "version" : "1.07008",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

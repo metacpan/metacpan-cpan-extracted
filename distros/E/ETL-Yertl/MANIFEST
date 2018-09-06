@@ -14,6 +14,7 @@ bin/ysql
 bin/yto
 bin/yts
 cpanfile
+eg/transform.pl
 lib/ETL/Yertl.pm
 lib/ETL/Yertl/Adapter/graphite.pm
 lib/ETL/Yertl/Adapter/influxdb.pm
@@ -29,6 +30,7 @@ lib/ETL/Yertl/Format/yaml.pm
 lib/ETL/Yertl/FormatStream.pm
 lib/ETL/Yertl/Help/Cookbook.pod
 lib/ETL/Yertl/Help/ysql.pod
+lib/ETL/Yertl/Transform.pm
 lib/ETL/Yertl/Util.pm
 site.yml
 site/blog/2015/01/11/initial-release.markdown
@@ -99,11 +101,15 @@ t/command/yq/filter.t
 t/command/yq/functions.t
 t/command/yq/regression.t
 t/command/yq/values.t
+t/format.t
 t/format/csv.t
 t/format/json.t
 t/format/yaml.t
+t/format_stream.t
+t/helpers.t
 t/integration/parse_apache_log.t
 t/lib/ETL/Yertl/Adapter/test.pm
+t/lib/Local/AddHello.pm
 t/lib/LowVersion.pm
 t/share/command/ymask/in.yaml
 t/share/command/ysql/.yertl/ysql.yml
@@ -140,3 +146,4 @@ t/share/yaml/foo.yaml
 t/share/yaml/group_by.yaml
 t/share/yaml/noseperator.yaml
 t/share/yaml/test.yaml
+t/transform.t

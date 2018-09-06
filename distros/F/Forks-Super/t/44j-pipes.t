@@ -47,7 +47,8 @@ ok(!defined($c) || $c eq '', 'still nothing to read on stderr');
 ok($tt >= 1.0 && $tt <= 3.0, 'timeout on getc_stderr respected');
 my $cc = $pid->getc_stdout;
 ok($cc eq 'o', 'read another char from stdout') or diag("2nd char was '$cc'");
-ok($pid->read_stdout eq "o\n", 'read_stdout returns the rest of the line');
+$c = $pid->read_stdout;
+ok($c eq "o\n" || $c eq "o\r\n", 'read_stdout returns the rest of the line');
 $c = $pid->getc_stderr(block => 1);
 $t = Time::HiRes::time() - $t;
 
@@ -59,7 +60,8 @@ ok($t >= 3.5 && $t <= 6.8, 			     ### 12 ### was 6.5,obs 6.75
 $pid->wait;
 ok($pid->getc_stderr eq 'P',                         ### 13 ###
    'getc_stderr works after child expires');
-ok($pid->getc_stderr() . $pid->getc_stderr()
-   . ($pid->getc_stderr() || '') eq "Q\n",                   ### 14 ###
+$c = $pid->getc_stderr() . $pid->getc_stderr()
+    . ($pid->getc_stderr() || '');
+ok($c eq "Q\n" || $c eq "Q\r\n",                     ### 14 ###
    'got remaining chars from stderr');
 

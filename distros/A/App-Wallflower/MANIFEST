@@ -23,8 +23,10 @@ t/35-app.t
 t/40-mount.t
 t/50-smoke.t
 t/55-smoke-https.t
+t/60-parallel.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/file-01.css
 t/file-01.html
+t/rand.psgi
 t/release-distmeta.t

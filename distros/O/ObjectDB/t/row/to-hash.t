@@ -19,6 +19,39 @@ subtest 'to_hash' => sub {
     is_deeply($author->to_hash, { id => 1, name => 'vti' });
 };
 
+SKIP: {
+    skip 'JSON is required', 1 unless eval {require JSON; 1};
+
+    subtest 'to_hash with types' => sub {
+        _setup();
+
+        require AutoDiscovery;
+
+        my $auto = AutoDiscovery->new()->create;
+        $auto = $auto->load;
+
+        is(
+            JSON->new->canonical(1)->encode( $auto->to_hash ),
+            JSON->new->canonical(1)->encode(
+                {
+                    "bool_default_false"    => "0",
+                    "bool_default_true"     => "1",
+                    "bool_no_default"       => undef,
+                    "id"                    => 1,
+                    "int_default"           => 123,
+                    "int_default_empty"     => 0,
+                    "int_no_default"        => undef,
+                    "not_nullable"          => 1,
+                    "nullable"              => 1,
+                    "varchar_default"       => "hello",
+                    "varchar_default_empty" => "",
+                    "varchar_no_default"    => undef
+                }
+            )
+        );
+    };
+};
+
 subtest 'with_virtual_columns' => sub {
     _setup();
 
@@ -94,6 +127,7 @@ subtest 'with_related multi' => sub {
 done_testing;
 
 sub _setup {
+    TestEnv->prepare_table('auto');
     TestEnv->prepare_table('author');
     TestEnv->prepare_table('book');
 }

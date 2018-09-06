@@ -7,8 +7,6 @@ use Test::Fatal;
 use TestDBH;
 use TestEnv;
 
-use ObjectDB::Meta;
-
 eval { require DBIx::Inspector; 1 } or do {
     require Test::More;
     Test::More->import(skip_all => 'DBIx::Inspector required for this test');
@@ -17,16 +15,8 @@ eval { require DBIx::Inspector; 1 } or do {
 subtest 'discover schema' => sub {
     _setup();
 
-    {
-
-        package MyTable;
-        use base 'ObjectDB';
-        __PACKAGE__->meta(table => 'auto', discover_schema => 1);
-        sub init_db { TestDBH->dbh }
-    }
-
     is_deeply(
-        [ MyTable->meta->columns ],
+        [ AutoDiscovery->meta->columns ],
         [
             qw/
               id
@@ -44,26 +34,28 @@ subtest 'discover schema' => sub {
               /
         ]
     );
-    is_deeply([ MyTable->meta->primary_key ], ['id']);
+    is_deeply([ AutoDiscovery->meta->primary_key ], ['id']);
 
-    is(MyTable->new->get_column('varchar_no_default'),    undef);
-    is(MyTable->new->get_column('varchar_default_empty'), '');
-    is(MyTable->new->get_column('varchar_default'),       'hello');
+    is(AutoDiscovery->new->get_column('varchar_no_default'),    undef);
+    is(AutoDiscovery->new->get_column('varchar_default_empty'), '');
+    is(AutoDiscovery->new->get_column('varchar_default'),       'hello');
 
-    is(MyTable->new->get_column('int_no_default'),    undef);
-    is(MyTable->new->get_column('int_default_empty'), 0);
-    is(MyTable->new->get_column('int_default'),       123);
+    is(AutoDiscovery->new->get_column('int_no_default'),    undef);
+    is(AutoDiscovery->new->get_column('int_default_empty'), 0);
+    is(AutoDiscovery->new->get_column('int_default'),       123);
 
-    is(MyTable->new->get_column('bool_no_default'), undef);
-    ok(!MyTable->new->get_column('bool_default_false'));
-    ok(MyTable->new->get_column('bool_default_true'));
+    is(AutoDiscovery->new->get_column('bool_no_default'), undef);
+    ok(!AutoDiscovery->new->get_column('bool_default_false'));
+    ok(AutoDiscovery->new->get_column('bool_default_true'));
 
-    ok !( MyTable->meta->is_nullable('not_nullable') );
-    ok( MyTable->meta->is_nullable('nullable') );
+    ok !( AutoDiscovery->meta->is_nullable('not_nullable') );
+    ok( AutoDiscovery->meta->is_nullable('nullable') );
 };
 
 done_testing;
 
 sub _setup {
     TestEnv->prepare_table('auto');
+
+    require AutoDiscovery;
 }

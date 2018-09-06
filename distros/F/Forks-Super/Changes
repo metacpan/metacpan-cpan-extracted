@@ -1,5 +1,10 @@
 Revision history for Forks-Super
 
+0.96	2018-09-05
+        RT#127016 fix issue with blocking sockets/pipes on MSWin32
+        reduce memory wrap panic on MSWin32
+        Improved remote test procedure
+
 0.95    2018-08-30
         Improved diagnostics in remote tests, other test fixes.
         Accomodate higher thread IDs in MSWin32

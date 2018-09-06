@@ -15,7 +15,7 @@ use ObjectDB::Table;
 use ObjectDB::With;
 use ObjectDB::Util qw(execute filter_columns);
 
-our $VERSION = '3.25';
+our $VERSION = '3.26';
 
 $Carp::Internal{ (__PACKAGE__) }++;
 $Carp::Internal{"ObjectDB::$_"}++ for qw/
@@ -215,17 +215,30 @@ sub get_column {
     my ($name) = @_;
 
     if ($self->meta->is_column($name)) {
-        unless (exists $self->{columns}->{$name}) {
+        my $value;
+
+        if (exists $self->{columns}->{$name}) {
+            $value = $self->{columns}->{$name};
+        }
+        else {
             if (exists $self->meta->get_column($name)->{default}) {
                 my $default = $self->meta->get_column($name)->{default};
-                return ref $default eq 'CODE' ? $default->() : $default;
-            }
-            else {
-                return undef;
+                $value = ref $default eq 'CODE' ? $default->() : $default;
             }
         }
 
-        return $self->{columns}->{$name};
+        if (defined $value && $value ne '') {
+            if (my $type = $self->meta->get_column($name)->{type}) {
+                if ($type eq 'number') {
+                    $value += 0;
+                }
+                elsif ($type eq 'string') {
+                    $value .= '';
+                }
+            }
+        }
+
+        return $value;
     }
     elsif ($self->meta->is_relationship($name)) {
         return exists $self->{relationships}->{$name}

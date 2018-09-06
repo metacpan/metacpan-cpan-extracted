@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use Test::More;
 
 BEGIN {
@@ -10,12 +12,61 @@ BEGIN {
     };
 }
 
-use t::odea::BasicAttributes;
-use t::odea::ExtendsBasicAttributes;
+{
+	package BasicAttributes;
 
-use lib '.';
+	use Moo;
+	use MooX::LazierAttributes;
 
-my $basics = t::odea::BasicAttributes->new;
+	attributes (
+		one      => [ 10 ],    
+		two      => [ ro, [qw/one two three/] ],    
+		three    => [ 'ro', { one => 'two' } ],    
+		four     => [ 'ro', 'a default value' ],
+		five     => [ 'ro', bless {}, 'Thing' ],
+		six      => [ 'ro', 0 ],
+		seven    => [ 'ro', undef ],
+		eight    => [ 'rw' ],
+		nine     => [ ro, { broken => 'thing' }, { lzy } ],
+		ten      => [ 'rw', {}],
+		[qw/eleven twelve thirteen/] => [ro, 'test this'],
+		fourteen => [ rw, nan, { bld, clr, lzy } ],
+		fifthteen => [ sub { { correct => 'way' } } ],
+	);
+
+	sub _build_fourteen {
+		return 100;
+	}
+
+	1;
+}
+{
+	package ExtendsBasicAttributes;
+
+	use Moo;
+	use MooX::LazierAttributes;
+
+	extends 'BasicAttributes';
+
+	attributes (    
+		'+one'   => [ 20 ],
+		'+two'   => [ [qw/four five six/]],
+		'+three' => [ { three => 'four' }],
+		'+four'  => [ 'a different value'],
+		'+five'  => [ bless {}, 'Okays'],
+		six      => [ ro, 1 ],
+		'+seven' => [ nan, { lzy } ],
+		[qw/+eleven +twelve +thirteen/] => ['ahhhhhhhhhhhhh']
+	);
+
+	sub _build_fourteen {
+		return 40000;
+	}
+
+	1;
+}
+
+my $basics = BasicAttributes->new;
 
 is($basics->one, 10, 'okay we got 10');
 is_deeply($basics->two, [qw/one two three/], 'is deeply');
@@ -37,7 +88,7 @@ ok($basics->clear_fourteen, 'clear fourteen');
 is($basics->fourteen, 100, 'okay 100');
 is_deeply($basics->fifthteen, { correct => 'way' }, 'okay the correct way');
 
-my $extends = t::odea::ExtendsBasicAttributes->new;
+my $extends = ExtendsBasicAttributes->new;
 
 is($extends->one, 20, 'okay we got 20');
 is_deeply($extends->two, [qw/four five six/], 'is deeply');
@@ -52,4 +103,5 @@ is_deeply($extends->twelve, 'ahhhhhhhhhhhhh', 'arrayref of names - twelve');
 is_deeply($extends->thirteen, 'ahhhhhhhhhhhhh', 'arrayref of names - thirteen');
 is($extends->fourteen, 40000, 'okay 100');
 is_deeply($basics->fifthteen, { correct => 'way' }, 'okay the correct way');
+
 done_testing();

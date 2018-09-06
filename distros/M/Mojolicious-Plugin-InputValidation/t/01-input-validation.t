@@ -41,6 +41,27 @@ is err({ foo => ['2018-07-27T11:23:47Z'] }, { foo => [iv_datetime] }),
 is err({ foo => [1, 2, 3, 4, 'a'] }, { foo => iv_array(of => iv_int, max => 5) }),
     "Value 'a' is not an integer at path /foo/4", 'array with one wrong element';
 
+is err({ bar => 'flubber-worms47' }, { bar => iv_any(pattern => qr/flubber.*/) }),
+     '', 'hash with pattern (1)';
+
+is err({ bar => 'flubber-worms47' }, { bar => iv_any(pattern => qr/(flubberworms47|test|test2)/) }),
+     "Value 'flubber-worms47' does not match at path /bar",
+     'hash with pattern (2)';
+
+is err({ foo => { bar => 'flubber-worms47' } }, { foo => { bar => iv_any(pattern => qr/(flubber-worms47|test|test2)/) } }),
+    '', 'hash with hash with pattern (1)';
+
+is err({ foo => { bar => 'worms47' } }, { foo => { bar => iv_any(pattern => qr/(flubber-worms47|test|test2)/) } }),
+   "Value 'worms47' does not match at path /foo/bar",
+   'hash with hash with pattern (2)';
+
+is err({ foo => [{ bar => 'flubber-worms47' }] }, { foo => iv_array(of => { bar => iv_any(pattern => qr/(flubber-worms47|test|test2)/) }) }),
+    '', 'hash with array of hashes (1)';
+
+is err({ foo => [{ bar => 'worms47' }] }, { foo => iv_array(of => { bar => iv_any(pattern => qr/(flubber-worm47|test|test2)/) }) }),
+    "Value 'worms47' does not match at path /foo/0/bar",
+    'hash with array of hashes (2)';
+
 done_testing;
 
 sub err { Mojolicious::Plugin::InputValidation::_validate_structure(@_) }

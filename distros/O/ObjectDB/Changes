@@ -1,5 +1,9 @@
 Revision history for Perl extension ObjectDB
 
+3.26 2018-09-05T17:17:35Z
+
+    - type hints
+
 3.25 2017-12-26T21:41:56Z
 
     - remove custom exceptions

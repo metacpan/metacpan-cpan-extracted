@@ -45,7 +45,10 @@ okl($tt >= 1.0 && $tt <= 4.5,            ### 8 ###
 $c = $pid->getc_stdout;
 ok($c eq 'o', 'read another char from stdout')
     or diag("got '$c', expected 'o'");
-ok($pid->read_stdout eq "o\n", 'read_stdout returns the rest of the line');
+$c = $pid->read_stdout;
+ok($c eq "o\n" || $c eq "o\r\n",
+   'read_stdout returns the rest of the line')
+    or diag "rest of line is ",map{" ".ord}split//,$c;
 $c = $pid->getc_stderr(block => 1);
 $t = Time::HiRes::time() - $t;
 ok(defined($c) && $c eq 'O', 'got first char from stderr');
@@ -53,5 +56,8 @@ okl($t >= 3.5 && $t <= 7.65,                    ### 12 ### was 6.5, obs 7.62
     "took ${t}s, expected ~5s");
 $pid->wait;
 ok($pid->getc_stderr eq 'P', 'getc_stderr works after child expires');
-ok($pid->getc_stderr() . $pid->getc_stderr() . $pid->getc_stderr() eq "Q\n",
+$c = $pid->getc_stderr() . $pid->getc_stderr() . $pid->getc_stderr();
+ok($c eq "Q\n" || $c eq "Q\r\n",
    'got remaining chars from stderr');
+
+

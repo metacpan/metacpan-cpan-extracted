@@ -98,6 +98,9 @@ t/bin/nddiff.d/term_show_brief.json
 t/bin/nddiff.d/term_show_invalid.json
 t/bin/nddiff.d/term_show_text.exp
 t/bin/nddiff.d/term_show_text.json
+t/bin/nddiff.d/term_string_vs_number.a.json
+t/bin/nddiff.d/term_string_vs_number.b.json
+t/bin/nddiff.d/term_string_vs_number.exp
 t/bin/nddiff.d/term_subkey_AR.exp
 t/bin/nddiff.d/term_text.exp
 t/bin/nddiff.d/term_text_AR_0.exp
@@ -123,6 +126,9 @@ t/bin/nddiff.d/term_text_utf8.exp
 t/bin/nddiff.d/term_text_vs_empty_string.a.json
 t/bin/nddiff.d/term_text_vs_empty_string.b.json
 t/bin/nddiff.d/term_text_vs_empty_string.exp
+t/bin/nddiff.d/term_text_vs_number.a.json
+t/bin/nddiff.d/term_text_vs_number.b.json
+t/bin/nddiff.d/term_text_vs_number.exp
 t/bin/nddiff.d/term_text_vs_ref.a.json
 t/bin/nddiff.d/term_text_vs_ref.b.json
 t/bin/nddiff.d/term_text_vs_ref.exp
@@ -175,6 +181,7 @@ t/bin/ndproc-Merge.d/_cfg.gamma.json
 t/bin/ndproc-Merge.d/_empty_list.json
 t/bin/ndproc-Merge.d/_menu.a.json
 t/bin/ndproc-Merge.d/_menu.b.json
+t/bin/ndproc-Merge.d/arg_structure.exp
 t/bin/ndproc-Merge.d/dump_rules.exp
 t/bin/ndproc-Merge.d/ignore.exp
 t/bin/ndproc-Merge.d/implicit_array_item_0.exp
@@ -207,7 +214,6 @@ t/bin/ndproc-Remove.d/_deep-down-lorem.a.json
 t/bin/ndproc-Remove.d/_empty_hash.json
 t/bin/ndproc-Remove.d/_menu.a.json
 t/bin/ndproc-Remove.d/path.exp
-t/bin/ndproc-Remove.d/path_absent.exp
 t/bin/ndproc-Remove.d/path_empty.exp
 t/bin/ndproc-Remove.d/preserve.exp
 t/bin/ndproc-Remove.t

@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojo-UserAgent-Role-Queued
 
+1.10 2018-09-05T16:12:57Z
+    - change internals to use helper class object
+    - fixes problems with synopsis example reported by tyldis via irc
+
 1.01 2018-06-26T15:33:43Z
     - use non-leaking version of private callback method
     - restore typo fix in synopsis (Dan book)

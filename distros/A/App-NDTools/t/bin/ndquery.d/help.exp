@@ -46,8 +46,7 @@ Options:
         On/Off pretty-print for JSON. Enabled by default.
 
     --raw-output
-        Dont't format result simple things (strings/numbers) - dump them as
-        is.
+        Dont't format result scalars (strings/numbers) - dump them as is.
 
     --replace
         Replace original files by query result.
@@ -56,7 +55,7 @@ Options:
         Fail if unexisted path specified. Enabled by default.
 
     --values|--vals
-        Values will be printed if combined with "--list" opt.
+        Values will be printed when combined with "--list" opt.
 
     --verbose|-v [int]
         Increase verbosity, max level is 4.

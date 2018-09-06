@@ -6,7 +6,7 @@ use Carp;
 use Forks::Super::Debug ':all';
 use Forks::Super::Util ':all';
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 my $emulate_id = 0;
 
@@ -151,7 +151,7 @@ Forks::Super::Job::Emulate - support emulation mode for Job object
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 DESCRIPTION
 
@@ -169,7 +169,7 @@ call the methods of this package.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2016-2017, Marty O'Brien.
+Copyright (c) 2016-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or,

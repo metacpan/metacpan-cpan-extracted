@@ -2,10 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Output;
-use File::Temp qw( tempdir );
-use File::Spec;
+use Path::Tiny ();
 
-my $dir = tempdir( CLEANUP => 1 );
+my $dir = Path::Tiny->tempdir;
 
 # pod2usage calls exit
 BEGIN {
@@ -54,7 +53,7 @@ $awf->run;
 
 my $result = do {
     local $/;
-    my $file = File::Spec->catfile( $dir, 'index.html' );
+    my $file = Path::Tiny->new( $dir, 'index.html' );
     open my $fh, '< :raw', $file or die "Can't open $file: $!";
     <$fh>;
 };

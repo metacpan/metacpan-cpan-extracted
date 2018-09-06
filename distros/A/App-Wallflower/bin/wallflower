@@ -13,7 +13,7 @@ wallflower - Sorry I can't dance, I'm hanging on to my friend's purse
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 
@@ -38,6 +38,7 @@ as long as the shorter version is unambiguous.
                             (default: deployment)
 
  --parallel    <count>      Number of processes to run in parallel
+                            (recommended value: number of cores)
 
  --index       <filename>   Name of index file for URLs ending in /
                             (default: index.html)

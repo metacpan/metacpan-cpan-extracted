@@ -49,8 +49,10 @@ our $FILES_TO_CLEAN
 		   t/out/48b.* t/out/debug1-* t/poorsort.pl .fhfork*
 		   t/out/ipc* t/out/new-ipc* t/out/66* t/dir* t/out/24*
 		   t/out/daemon* lib/_Inline *.stackdump t/out/.sync*
-                   t/out/keys-*),
-            '"t/external[^-]command.pl"';
+                   t/out/keys-*);
+
+our $FILES_TO_REALCLEAN = "t/out/limits*";
+#    = join " ", $FILES_TO_CLEAN, "t/out/limits*";
 
 our %META_MERGE
     = (recommends => \%RECOMMENDED,
@@ -161,6 +163,7 @@ WriteMakefile(
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => $FILES_TO_CLEAN },
+    realclean           => { FILES => $FILES_TO_REALCLEAN },
 
 );
 

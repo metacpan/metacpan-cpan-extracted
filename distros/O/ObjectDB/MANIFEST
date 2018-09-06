@@ -36,6 +36,7 @@ t/columns.t
 t/connection.t
 t/inheritance.t
 t/lib/Author.pm
+t/lib/AutoDiscovery.pm
 t/lib/Book.pm
 t/lib/BookDescription.pm
 t/lib/BookTagMap.pm

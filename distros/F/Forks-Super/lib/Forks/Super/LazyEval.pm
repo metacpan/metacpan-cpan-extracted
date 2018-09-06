@@ -11,7 +11,7 @@ use warnings;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bg_eval bg_qx BG_EVAL BG_QX);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 use constant BG_EVAL => 'Forks::Super::bg_eval';
 use constant BG_QX   => 'Forks::Super::bg_qx';
@@ -337,7 +337,7 @@ Forks::Super::LazyEval - deferred processing of output from a background proc
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 DESCRIPTION
 
@@ -354,7 +354,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2017, Marty O'Brien.
+Copyright (c) 2010-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

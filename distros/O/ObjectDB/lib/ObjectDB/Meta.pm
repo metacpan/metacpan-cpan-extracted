@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use mro;
 
-our $VERSION = '3.25';
+our $VERSION = '3.26';
 
 require Storable;
 require Carp;
@@ -365,6 +365,7 @@ sub discover_schema {
     my $inspector = DBIx::Inspector->new(dbh => $dbh);
 
     my $table = $inspector->table($self->table);
+    Carp::croak('auto discovery failed') unless $table;
 
     $self->{columns} = [];
     foreach my $column ($table->columns) {
@@ -383,9 +384,17 @@ sub discover_schema {
             }
         }
 
+        my $type = 'string';
+        if ( $column->type_name =~ m/^bool/i ) {
+            $type = 'bool';
+        }
+        elsif ( $column->type_name =~ m/^(?:int|num|float|real|decimal)/i ) {
+            $type = 'number';
+        }
+
         my $is_null = $column->is_nullable eq 'YES' ? 1 : 0;
 
-        $self->add_column($column->name, { default => $default_value, is_null => $is_null });
+        $self->add_column($column->name, { default => $default_value, is_null => $is_null, type => $type });
     }
 
     $self->set_primary_key(map { $_->name } $table->primary_key);

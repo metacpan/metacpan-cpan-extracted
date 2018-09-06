@@ -7,7 +7,9 @@ cpanfile
 examples/example1.t
 examples/stress/sites_from_feeds.txt
 examples/stress/stress-the-internet.t
+examples/synopsis.pl
 lib/Mojo/UserAgent/Role/Queued.pm
+lib/Mojo/UserAgent/Role/Queued/Queue.pm
 minil.toml
 t/00_compile.t
 t/01-compose.t

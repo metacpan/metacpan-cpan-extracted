@@ -7,13 +7,14 @@ use parent 'App::NDTools::NDTool';
 use Algorithm::Diff qw(compact_diff);
 use JSON qw();
 use App::NDTools::Slurp qw(s_dump);
+use App::NDTools::Util qw(is_number);
 use Log::Log4Cli 0.18;
 use Struct::Diff 0.96 qw();
 use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(color);
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 my %COLOR;
@@ -169,6 +170,7 @@ sub diff_term {
         next unless (exists ${$dref}->{N});
         next unless (defined ${$dref}->{O} and defined ${$dref}->{N});
         next if (ref ${$dref}->{O} or ref ${$dref}->{N});
+        next if (is_number(${$dref}->{O}) or is_number(${$dref}->{N}));
 
         my @old = split($/, ${$dref}->{O}, -1);
         my @new = split($/, ${$dref}->{N}, -1);
@@ -450,7 +452,7 @@ sub term_value_diff_default {
     my @out;
 
     $value = $JSON->pretty($self->{OPTS}->{pretty})->encode($value)
-        if (ref $value or not defined $value);
+        unless (is_number($value));
 
     for my $line (split($/, $value)) {
         substr($line, 0, 0, $self->{OPTS}->{term}->{sign}->{$status} . $indent);

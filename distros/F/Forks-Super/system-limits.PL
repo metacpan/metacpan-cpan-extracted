@@ -17,7 +17,7 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
@@ -592,8 +592,8 @@ sub count_number_of_cpus {
 sub probe_ssh_test_env {
     $DARWIN && print STDERR "  in probe_ssh_test_env\n";
 
-    return if $LIMITS{'sys|test_ssh_target'};
-    write_limits( 'sys|test_ssh_target', '0');
+    return if $LIMITS{'test_ssh_target'};
+    write_limits( 'test_ssh_target', '0');
 
     my $ENV_USER = $ENV{USER} || 'xxxxx';
     my $ENV_HOST = $ENV{HOSTNAME} || 'xhxhxhxh';
@@ -605,7 +605,7 @@ sub probe_ssh_test_env {
     foreach my $host ('$ENV_HOST', '$ip', 'localhost', '$hostname') {
         foreach my $user ('$ENV_USER','') {
 
-            my $cmdtmp = "ssh ";
+            my $cmdtmp = "ssh -o BatchMode=yes";
             if ($user) {
                 $cmdtmp .= " -l $user";
             }

@@ -1,12 +1,12 @@
   {files}
 [1;32m+   {"/etc/cron.d/beta"}[0m
-[32m+     * * * * * root sleep 5[0m
+[32m+     "* * * * * root sleep 5"[0m
     {"/etc/hostname"}
-[31m-     alpha[0m
-[32m+     beta[0m
+[31m-     "alpha"[0m
+[32m+     "beta"[0m
   {fqdn}
-[31m-   alpha.example.org[0m
-[32m+   beta.example.org[0m
+[31m-   "alpha.example.org"[0m
+[32m+   "beta.example.org"[0m
   {mtime}
 [31m-   1462431001[0m
 [32m+   1462431002[0m

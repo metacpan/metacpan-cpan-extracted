@@ -19,10 +19,11 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/briang/p5-bit-twiddling/issues
   homepage: https://github.com/briang/p5-bit-twiddling
   repository: git://github.com/briang/p5-bit-twiddling.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

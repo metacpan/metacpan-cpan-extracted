@@ -14,7 +14,7 @@ WriteMakefile(
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
-        'Module::Metadata' => 0,
+        'Module::Metadata' => '1.000033',
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
@@ -22,7 +22,8 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'MooX::ReturnModifiers' => '0.03',
-        'Scalar::Util' => 0,
+        'namespace::clean' => '0.27',
+		'Clone' => '0.39',
         'constant' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

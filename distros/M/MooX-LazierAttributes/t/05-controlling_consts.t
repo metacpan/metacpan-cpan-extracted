@@ -15,7 +15,7 @@ BEGIN {
 
     package Test::Control;
     use Moo;
-    use MooX::LazierAttributes { limit => 10 }, qw/ro dstr dhash darray lzy_str/;
+    use MooX::LazierAttributes qw/ro dstr dhash darray lzy_str/;
     attributes( 
 		foo => [ ro, {} ], 
 		lzs => [ {lzy_str} ],
@@ -23,6 +23,7 @@ BEGIN {
 		dh => [ ro, {dhash} ],
 		da => [ ro, {darray} ]
 	);
+	1;
 }
 
 my $o1 = Test::Control->new( foo => { a => 'b' } );

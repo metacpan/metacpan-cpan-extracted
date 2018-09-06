@@ -7,14 +7,14 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  List::Util: '0'
+  List::Util: '1.29'
   Test2::API: '0'
   Test2::V0: '0'
   Test::More: '0'
   Test::TypeTiny: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
@@ -33,7 +33,7 @@ no_index:
 provides:
   Types::PGPLOT:
     file: lib/Types/PGPLOT.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Readonly::Tiny: '0'
   Type::Library: '0'
@@ -41,10 +41,11 @@ requires:
   Type::Utils: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '0'
+  perl: '5.0100'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Types-PGPLOT
   repository: git://github.com/djerius/types-pgplot.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

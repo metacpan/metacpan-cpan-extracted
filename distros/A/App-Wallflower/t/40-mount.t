@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw( tempdir );
 use List::Util qw( sum );
 use URI;
 use HTTP::Date qw( str2time );
+use Path::Tiny ();
 use Wallflower;
 
 # setup test data
@@ -19,7 +19,7 @@ my @tests;
 
 push @tests, [
     'direct content',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir,
     sub {
         my $env = shift;
         if ($env->{PATH_INFO} !~ m!^/?$!) {

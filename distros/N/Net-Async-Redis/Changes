@@ -1,5 +1,15 @@
 Revision history for Net-Async-Redis
 
+1.007     2018-09-05 10:11:44+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bug fixes:
+
+    - Support auth parameter, rather than insisting on auth information be passed as
+    part of the URI (thanks to Nael Alolwani for reporting)
+    - "Pipeline depth" notifications were logged at `info` level, these are an internal
+    diagnostic and not useful for application code, these are now `trace` level messages
+
 1.006     2018-07-12 22:39:10+08:00 Asia/Kuala_Lumpur
     No new features.
 

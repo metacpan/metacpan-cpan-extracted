@@ -32,11 +32,11 @@ $ua->get_p($search)->then(
         $ua->get_p($_)->then(\&get_reviews_and_favs)
           ->catch(sub { print "ERROR: ", @_, "\n" });
       }
-    )->each    # another each() to convert the collection to it's elements
+    )
   }
 )->then(
   sub {
-    Mojo::Promise->all(@_)->catch(sub { print "ERROR: ", @_, "\n" });
+    Mojo::Promise->all($_[0]->each)->catch(sub { print "ERROR: ", @_, "\n" });
   }
 )->catch(sub { print "ERROR: ", @_, "\n" })->wait();
 

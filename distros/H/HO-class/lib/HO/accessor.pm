@@ -1,7 +1,7 @@
   package HO::accessor
 # ++++++++++++++++++++
 ; use strict; use warnings;
-our $VERSION='0.052';
+our $VERSION='0.053';
 
 ; use Class::ISA
 ; require Carp
@@ -165,6 +165,7 @@ our $VERSION='0.052';
 
 ; sub import
     { my ($package,$ac,$methods,$init,$new) = @_
+    ; our %classes
     ; $ac   ||= []
 
     ; my $caller = $HO::accessor::class || CORE::caller

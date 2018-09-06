@@ -9,11 +9,14 @@ Makefile.PL
 README
 bin/anki_import
 lib/Anki/Import.pm
+out
 share/log_config/anki-import.cfg
 share/log_config/test.cfg
 t/00-use_ok.t
 t/01-class.t
 t/02-cli.t
+t/03-format_tests.t
+t/data/code_with_blank_lines.anki
 t/data/cs61.anki
 t/data/distzilla.anki
 t/data/perl_modules.anki

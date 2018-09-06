@@ -1,12 +1,10 @@
 Changes
-ignore.txt
 lib/MooX/LazierAttributes.pm
 Makefile.PL
 MANIFEST			This list of files
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
+META.json
+META.yml
 README
-README.md
 t/00-load.t
 t/01-basic_attributes.t
 t/02-the_haarg_test.t
@@ -14,19 +12,9 @@ t/03-has_attributes.t
 t/04-types.t
 t/05-controlling_consts.t
 t/06-moose.t
-t/09-_deep_clone.t
-t/10-_clone.t
 t/11-construct_attribute.t
 t/12-role_attributes.t
 t/manifest.t
-t/odea/BasicAttributes.pm
-t/odea/BasicTypes.pm
-t/odea/Calculator.pm
-t/odea/ExtendsBasicAttributes.pm
-t/odea/ExtendsHasAttributes.pm
-t/odea/HasAttributes.pm
-t/odea/RoleAttributes.pm
-t/odea/RoleHasAttributes.pm
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t

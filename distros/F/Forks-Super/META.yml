@@ -34,5 +34,5 @@ requires:
   Test::More: '0'
   Time::HiRes: '1.30'
   URI: '0'
-version: '0.95'
+version: '0.96'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

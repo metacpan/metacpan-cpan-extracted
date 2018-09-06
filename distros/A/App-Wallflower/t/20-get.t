@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw( tempdir );
+use Path::Tiny ();
 use List::Util qw( sum );
 use URI;
 use HTTP::Date qw( time2str );
@@ -38,7 +39,7 @@ push @tests, [
     ],
     [   '/klonk/' => 200,
         [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
-        File::Spec->catfile( 'klonk', 'index.html' ),
+        Path::Tiny->new( 'klonk', 'index.html' ),
         'Hello, World!'
     ],
     [   '/clunk' => 200,
@@ -54,7 +55,7 @@ push @tests, [
         [   200,
             [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
             do {
-                my $file = File::Spec->catfile( $tests[0][1], 'index.html' );
+                my $file = Path::Tiny->new( $tests[0][1], 'index.html' );
                 open my $fh, '<', $file or die "Can't open $file: $!";
                 $fh;
                 }
@@ -206,7 +207,7 @@ for my $t (@tests) {
         my $result = $wf->get($url);
         is_deeply(
             $result,
-            [   $status, $headers, $file && File::Spec->catfile( $dir, $file )
+            [   $status, $headers, $file && Path::Tiny->new( $dir, $file )
             ],
             "app ($desc) for $url"
         );

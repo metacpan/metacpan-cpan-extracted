@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Copy qw(copy);
 use Test::File::Contents;
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 use App::NDTools::Test;
 
@@ -14,6 +14,7 @@ my $mod = 'App::NDTools::NDProc';
 my @cmd = ($mod, '--module', 'Pipe');
 
 require_ok($mod) || BAIL_OUT("Failed to load $mod");
+
 
 $test = "cmd_absent";
 run_ok(
@@ -41,6 +42,16 @@ run_ok(
     stderr => qr/ FATAL] Failed to decode 'JSON'/,
     exit => 4,
 );
+
+$test = "path_parsing_failed";
+run_ok(
+    name => $test,
+    pre => sub { copy("_cfg.alpha.json", "$test.got") },
+    cmd => [ @cmd, '--cmd', 'foo', '--path', 'bar`', "$test.got" ],
+    stderr => qr/ FATAL] Failed to parse path Unsupported thing in the path, step #0: 'bar`'\. Exit 4/,
+    exit => 4
+);
+
 
 $test = "path";
 run_ok(

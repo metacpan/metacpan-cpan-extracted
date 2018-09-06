@@ -1,0 +1,42 @@
+---
+abstract: 'Minimal DarkPAN indexer'
+author:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OrePAN2-Indexer-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  OrePAN2::Indexer::Tiny:
+    file: lib/OrePAN2/Indexer/Tiny.pm
+    version: '0.02'
+requires:
+  Archive::Extract: '0'
+  CPAN::Meta: '0'
+  File::pushd: '0'
+  Parse::LocalDistribution: '0'
+resources:
+  bugtracker: https://github.com/akiym/OrePAN2-Indexer-Tiny/issues
+  homepage: https://github.com/akiym/OrePAN2-Indexer-Tiny
+  repository: git://github.com/akiym/OrePAN2-Indexer-Tiny.git
+version: '0.02'
+x_authority: cpan:AKIYM
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

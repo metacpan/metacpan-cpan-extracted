@@ -1,6 +1,5 @@
   {text}
--   some
--   text
+-   "some\ntext"
 +   [
 +      "ref"
 +   ]

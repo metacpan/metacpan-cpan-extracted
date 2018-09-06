@@ -194,7 +194,7 @@ t/forked_harness.pl
 t/remote.pl
 t/sleeper.pl
 t/spawner-and-counter.pl
-t/out/foo
+t/out/.exists
 bundle/conditionally-install-submodule.pl
 bundle/Sys-CpuAffinity/Build.PL
 bundle/Sys-CpuAffinity/Changes
@@ -206,14 +206,14 @@ bundle/Sys-CpuAffinity/contrib/contrib.doc
 bundle/Sys-CpuAffinity/contrib/cpusetGetCPUCount.xs
 bundle/Sys-CpuAffinity/contrib/cpuset_getaffinity.xs
 bundle/Sys-CpuAffinity/contrib/cpuset_setaffinity.xs
-bundle/Sys-CpuAffinity/contrib/fail/foo
+bundle/Sys-CpuAffinity/contrib/fail/.exists
 bundle/Sys-CpuAffinity/contrib/fortytwo.xs
 bundle/Sys-CpuAffinity/contrib/freebsd_cpuset.xs
 bundle/Sys-CpuAffinity/contrib/getaffinity_processor_bind.xs
 bundle/Sys-CpuAffinity/contrib/irix_sysmp.xs
 bundle/Sys-CpuAffinity/contrib/linux-sched_getaffinity.xs
 bundle/Sys-CpuAffinity/contrib/linux-sched_setaffinity.xs
-bundle/Sys-CpuAffinity/contrib/ok/foo
+bundle/Sys-CpuAffinity/contrib/ok/.exists
 bundle/Sys-CpuAffinity/contrib/processor_affinity.xs
 bundle/Sys-CpuAffinity/contrib/pthread_affinity_np.xs
 bundle/Sys-CpuAffinity/contrib/setaffinity_processor_bind.xs
@@ -224,7 +224,7 @@ bundle/Sys-CpuAffinity/contrib/win32_system_info.xs
 bundle/Sys-CpuAffinity/contrib/win32_system_info_alt.xs
 bundle/Sys-CpuAffinity/contrib/win32_threadaffinity.xs
 bundle/Sys-CpuAffinity/lib/Sys/CpuAffinity.pm
-bundle/Sys-CpuAffinity/lib/xs/foo
+bundle/Sys-CpuAffinity/lib/xs/.exists
 bundle/Sys-CpuAffinity/t/00-load.t
 bundle/Sys-CpuAffinity/t/02-available.t
 bundle/Sys-CpuAffinity/t/10-exercise.t

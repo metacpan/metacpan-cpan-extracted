@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 
 use Test::More;
 
-unless ( $ENV{RELEASE_TESTING} ) {
+unless ( $ENV{RELEASE_TESTING} or -d '.git' ) {
     plan( skip_all => "Author tests not required for installation" );
 }
 

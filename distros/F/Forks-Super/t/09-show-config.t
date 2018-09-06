@@ -37,6 +37,13 @@ my $lang = $ENV{LANG} || "";
 my $lc_all = $ENV{LC_ALL} || "";
 diag "\$ENV{LANG} = $lang, \$ENV{LOCALE} = $locale, \$ENV{LC_ALL} = $lc_all";
 
+print STDERR "Forks::Super::Job is overloaded: ",
+        $Forks::Super::Job::OVERLOAD_ENABLED, "\n";
+print STDERR "Using tied IPC filehandles: ",
+        " $Forks::Super::Job::Ipc::USE_TIE_FH",
+        " $Forks::Super::Job::Ipc::USE_TIE_SH",
+        " $Forks::Super::Job::Ipc::USE_TIE_PH\n";
+
 diag "Max open fh: $Forks::Super::SysInfo::MAX_OPEN_FH";
 
 diag "Max fork: $Forks::Super::SysInfo::MAX_FORK";

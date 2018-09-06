@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Copy qw(copy);
 use Test::File::Contents;
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 use App::NDTools::Test;
 
@@ -35,6 +35,14 @@ run_ok(
     name => $test,
     pre => sub { copy("_cfg.alpha.json", "$test.got") },
     cmd => [ @cmd, '--source', "_cfg.beta.json", '--ignore', "{files}{'/etc/hostname'}", "$test.got" ],
+    test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
+);
+
+$test = "arg_structure";
+run_ok(
+    name => $test,
+    pre => sub { copy("_cfg.alpha.json", "$test.got") },
+    cmd => [ @cmd, '--structure', '{"something": "new"}', "$test.got" ],
     test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
 );
 

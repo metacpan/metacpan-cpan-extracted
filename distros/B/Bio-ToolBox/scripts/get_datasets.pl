@@ -23,7 +23,7 @@ eval {
 	$parallel = 1;
 };
 
-my $VERSION = '1.61';
+my $VERSION = '1.62';
 
 
 print "\n A program to collect data for a list of features\n\n";
@@ -44,6 +44,7 @@ unless (@ARGV) {
 my (  
 	$infile,
 	$new,
+	$parse,
 	$outfile,
 	$main_database,
 	$data_database,
@@ -60,6 +61,7 @@ my (
 	$limit,
 	$position,
 	$fpkm_method,
+	$tpm,
 	$win,
 	$step,
 	$set_strand,
@@ -75,6 +77,7 @@ my @datasets; # an array of names of dataset values to be retrieved
 GetOptions( 
 	'i|in=s'           => \$infile, # load a pre-existing file
 	'new'              => \$new, # generate a new file
+	'parse!'           => \$parse, # parse input file
 	'o|out=s'          => \$outfile, # name of new output file 
 	'd|db=s'           => \$main_database, # main or annotation database name
 	'D|ddb=s'          => \$data_database, # data database
@@ -92,6 +95,7 @@ GetOptions(
 	'limit=i'          => \$limit, # size limit to fractionate a feature
 	'p|pos=s'          => \$position, # set the relative feature position
 	'fpkm|rpkm=s'      => \$fpkm_method, # set the fpkm method  
+	'tpm!'             => \$tpm, # calculate a tpm
 	'win=i'            => \$win, # indicate the size of genomic intervals
 	'step=i'           => \$step, # step size for genomic intervals
 	'force_strand|set_strand' => \$set_strand, # enforce a specific strand
@@ -140,7 +144,7 @@ my $Data;
 if ($infile) {
 	$Data = Bio::ToolBox::Data->new(
 		file       => $infile, 
-		parse      => 1,
+		parse      => $parse,
 		feature    => $feature,
 		subfeature => $subfeature,
 	) or die " unable to load input file '$infile'\n";
@@ -250,8 +254,8 @@ if ($datasets[0] eq 'none') {
 
 # check whether it is worth doing parallel execution
 if ($cpu > 1) {
-	while ($cpu > 1 and $Data->last_row / $cpu < 500) {
-		# We need at least 500 lines in each fork split to make 
+	while ($cpu > 1 and $Data->last_row / $cpu < 100) {
+		# We need at least 100 lines in each fork split to make 
 		# it worthwhile to do the split, otherwise, reduce the number of 
 		# splits to something more worthwhile
 		# dang it! it all depends on what we're collecting from
@@ -272,6 +276,11 @@ else {
 	# single threaded execution
 	single_execution();
 }
+
+
+# calculate normalized values
+calculate_fpkm_values() if ($fpkm_method or $tpm);
+
 
 
 ### Finished
@@ -307,9 +316,7 @@ sub set_defaults {
 	# command line
 	
 	# Check for required values
-	unless ($main_database) {
-		$feature ||= 'gene';
-	}
+	# we will let the parser set the feature value
 	unless ($infile) {
 		if (@ARGV and not $feature) {
 			# making an assumption that first unnamed variable is input file
@@ -321,6 +328,7 @@ sub set_defaults {
 			$new = 1;
 		}
 	}
+	$parse = 1 if ($infile and not defined $parse);
 	if ($new) {
 		unless ($outfile) {
 			die " You must define an output filename!";
@@ -380,7 +388,7 @@ sub set_defaults {
 		unless ($fpkm_method eq 'region' or $fpkm_method eq 'genome') {
 			die " fpkm option must be one of 'region' or 'genome'! see help\n";
 		}
-		unless ($method =~ /count/) {
+		unless ($method =~ /count|sum/) {
 			die " method must be a count if you use the fpkm option!\n";
 		}
 	}
@@ -522,8 +530,6 @@ sub parallel_execution {
 	}
 	my $count = $Data->reload_children(@files);
 	printf " reloaded %s features from children\n", format_with_commas($count);
-	
-	calculate_fpkm_values() if $fpkm_method;
 }
 
 
@@ -547,7 +553,6 @@ sub single_execution {
 		}
 		last if $dataset eq 'none';
 	}
-	calculate_fpkm_values() if $fpkm_method;
 }
 
 
@@ -573,7 +578,7 @@ sub collect_dataset {
 	}
 	elsif (defined $fstart and defined $fstop) {
 		# use a subfraction of the region
-		get_fractionated_genome_dataset($dataset, $index);
+		get_fractionated_dataset($dataset, $index);
 	}
 	else {
 		# everything else
@@ -794,7 +799,8 @@ sub add_new_dataset {
 
 
 sub calculate_fpkm_values {
-	print " Calculating FPKM values....\n";
+	print " Calculating FPKM values....\n" if $fpkm_method;
+	print " Calculating TPM values....\n" if $tpm;
 	
 	# calculate which indices;
 	my @indices = ($Data->number_columns - scalar @datasets) .. $Data->last_column;
@@ -828,7 +834,7 @@ sub calculate_fpkm_values {
 			# this was calculated earlier
 			$total = $dataset2sum{ $Data->metadata($index, 'dataset') };
 		}
-		else {
+		elsif ($fpkm_method eq 'region') {
 			# use the total from the counted regions or genes
 			$total = 0;
 			$Data->iterate( sub {
@@ -836,22 +842,51 @@ sub calculate_fpkm_values {
 				$total += $row->value($index);
 			} );
 		}
-		next unless $total;
+		
+		# add FPKM column
+		if ($fpkm_method) {
+			# add new column
+			my $fpkm_index = $Data->add_column($Data->name($index) . '_FPKM');
+			$Data->metadata($fpkm_index, 'dataset', $Data->metadata($index, 'dataset'));
+			$Data->metadata($fpkm_index, 'fpkm_method', $fpkm_method);
+			$Data->metadata($fpkm_index, 'total_count', $total); 
 	
-		# add new column
-		my $fpkm_index = $Data->add_column($Data->name($index) . '_FPKM');
-		$Data->metadata($fpkm_index, 'dataset', $Data->metadata($index, 'dataset'));
-		$Data->metadata($fpkm_index, 'fpkm_method', $fpkm_method);
-		$Data->metadata($fpkm_index, 'total_count', $total); 
+			# calculate and store the fpkms
+			$Data->iterate( sub {
+				my $row = shift;
+				my $length = defined $length_i ? $row->value($length_i) : $row->length;
+				$length ||= 1; # why would the length be zero?
+				my $fpkm = ($row->value($index) * 1_000_000_000) / ($length * $total);
+				# this is equivalent to traditional way: count / ( (total/1e6) * (length/1000) )
+				$row->value($fpkm_index, sprintf("%.3f", $fpkm));
+			} );
+		}
+		
+		# add TPM column
+		if ($tpm) {
+			# add new column
+			my $tpm_index = $Data->add_column($Data->name($index) . '_TPM');
+			$Data->metadata($tpm_index, 'dataset', $Data->metadata($index, 'dataset'));
 	
-		# calculate and store the fpkms
-		$Data->iterate( sub {
-			my $row = shift;
-			my $length = defined $length_i ? $row->value($length_i) : $row->length;
-			$length ||= 1; # why would the length be zero?
-			my $fpkm = ($row->value($index) * 1_000_000_000) / ($length * $total);
-			$row->value($fpkm_index, $fpkm);
-		} );
+			# first calculate the length normalized counts
+			my $tpm_total = 0;
+			$Data->iterate( sub {
+				my $row = shift;
+				my $length = defined $length_i ? $row->value($length_i) : $row->length;
+				$length ||= 1; # why would the length be zero?
+				my $tpm_value = $row->value($index) / ($length / 1000);
+				$row->value($tpm_index, $tpm_value);
+				$tpm_total += $tpm_value;
+			} );
+			
+			# then scale to million reads
+			my $scale = $tpm_total / 1000000;
+			$Data->iterate( sub {
+				my $row = shift;
+				my $tpm_value = $row->value($tpm_index) / $scale;
+				$row->value($tpm_index, sprintf("%.3f", $tpm_value));
+			} );
+		}
 	}
 }
 
@@ -892,7 +927,8 @@ get_datasets.pl [--options...] --in <filename> <data1> <data2...>
   -u --subfeature [exon|cds|          collect over gene subfeatures 
         5p_utr|3p_utr] 
   --force_strand                      use the specified strand in input file
-  --fpkm [region|genome]              convert count data to depth normalized
+  --fpkm [region|genome]              calculate FPKM using which total count
+  --tpm                               calculate TPM values
   
   Adjustments to features:
   -x --extend <integer>               extend the feature in both directions
@@ -906,6 +942,7 @@ get_datasets.pl [--options...] --in <filename> <data1> <data2...>
   General options:
   -z --gz                             compress output file
   -c --cpu <integer>                  number of threads, default 4
+  --noparse                           do not parse input file into SeqFeatures
   -v --version                        print version and exit
   -h --help                           show extended documentation
 
@@ -1098,20 +1135,28 @@ Two methods exist for normalizing:
 =item region 
 
 Uses the sum of counts over all input regions examined and ignores 
-non-counted reads
+non-counted reads. This is the traditional method of calculating FPKM 
+and should be used preferentially with genes.
 
 =item genome
 
 Uses the sum of all reads across the genome, regardless of whether 
-it was counted in an input region or not
+it was counted in an input region or not. This might be used when a 
+more global normalization is needed.
 
 =back
 
 The region method is best used with RNASeq data and a complete gene 
 annotation table. The genome method is best used with partial annotation 
 tables or other Seq types, such as ChIPSeq. This option can only be used 
-with one of the count methods (count, ncount, pcount). The FPKM values 
+with one of the count methods (count, ncount, pcount). A sum method may be 
+cautiously allowed if, for example, using bigWig point data. The FPKM values 
 are appended as additional columns in the output table.
+
+=item --tpm
+
+Calculate Transcripts Per Million, a normalization method analogous to FPKM 
+but less biased to sequencing depth. This uses explicitly 
 
 =back
 
@@ -1182,6 +1227,12 @@ file is opened, the compression status is preserved unless specified otherwise.
 Specify the number of CPU cores to execute in parallel. This requires 
 the installation of L<Parallel::ForkManager>. With support enabled, the 
 default is 4. Disable multi-threaded execution by setting to 1. 
+
+=item --noparse
+
+Prevent input annotation files from being automatically parsed into sequence 
+features. Coordinates will be used as is and new data columns will be appended 
+to the input file. 
 
 =item --version
 

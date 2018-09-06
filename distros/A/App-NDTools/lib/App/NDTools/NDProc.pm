@@ -13,7 +13,7 @@ use Struct::Diff 0.94 qw(diff split_diff);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 sub arg_opts {
     my $self = shift;
@@ -61,7 +61,7 @@ sub configure {
 sub defaults {
     return {
         'blame' => 1, # may be redefined per-rule
-        'builtin-format' => "", # raw
+        'builtin-format' => 'RAW',
         'modpath' => [ 'App::NDTools::NDProc::Module' ],
     };
 }
@@ -103,9 +103,9 @@ sub embed {
     my $ref = eval { (path($data, $spath, expand => 1))[0]};
     die_fatal "Unable to lookup '$path' ($@)", 4 if ($@);
 
-    ${$ref} = $self->{OPTS}->{'builtin-format'} ?
-        s_encode($thing, $self->{OPTS}->{'builtin-format'}) :
-        $thing;
+    ${$ref} = $self->{OPTS}->{'builtin-format'} eq 'RAW'
+        ? $thing
+        : s_encode($thing, $self->{OPTS}->{'builtin-format'});
 }
 
 sub exec {
@@ -218,9 +218,8 @@ sub load_builtin_rules {
     my $rules = eval { (path($data, $spath, deref => 1, strict => 1))[0] };
     die_fatal "Unable to lookup path ($@)", 4 if ($@);
 
-    return $self->{OPTS}->{'builtin-format'} ?
-        s_decode($rules, $self->{OPTS}->{'builtin-format'}) :
-        $rules;
+    return $rules if ($self->{OPTS}->{'builtin-format'} eq 'RAW');
+    return s_decode($rules, $self->{OPTS}->{'builtin-format'});
 }
 
 sub process_args {

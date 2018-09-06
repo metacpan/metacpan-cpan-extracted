@@ -1,5 +1,5 @@
 package App::Wallflower;
-$App::Wallflower::VERSION = '1.011';
+$App::Wallflower::VERSION = '1.012';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use Plack::Util ();
 use URI;
 use Wallflower;
 use Wallflower::Util qw( links_from );
-use List::Util qw( uniqstr );
+use List::Util qw( uniqstr max );
 use Path::Tiny;
 
 sub _default_options {
@@ -177,7 +177,10 @@ sub new {
         import Fcntl qw( :seek :flock );
         $self->{_parent_}  = $$;
         $self->{_forked_}  = 0;
-        $self->{_ipc_dir_} = Path::Tiny->tempdir( CLEANUP => 1, TEMPLATE => 'wallflower-XXXX' );
+        $self->{_ipc_dir_} = Path::Tiny->tempdir(
+            CLEANUP  => 1,
+            TEMPLATE => 'wallflower-XXXX'
+        );
     }
 
     return bless $self, $class;
@@ -190,14 +193,6 @@ sub run {
     $self->$method(@$args);
     if    ( $self->{option}{parallel} ) { $self->_wait_for_kids; }
     elsif ( $self->{option}{tap} )      { done_testing(); }
-}
-
-sub __open_fh {
-    my ($file) = @_;
-    open my $fh, -e $file ? '+<' : '+>', $file
-      or die "Can't open $file in read-write mode: $!";
-    $fh->autoflush(1);
-    $fh;
 }
 
 sub _push_todo {
@@ -217,39 +212,85 @@ sub _push_todo {
     push @$todo, @items;
 
     if ( $self->{option}{parallel} ) {
+        if   ( $self->{_parent_} == $$ ) { $self->_aggregate_todo(@items); }
+        else                             { $self->_save_todo; }
+    }
+}
 
-        # aggregate all child todo into ours and save it as __TODO__
-        if ( $self->{_parent_} == $$ ) {
-            my $fh = File::Temp->new(
-                TEMPLATE => "__TODO__-XXXX",
-                DIR      => $self->{_ipc_dir_},
-            );
-            local *ARGV;
-            if ( @ARGV = glob $self->{_ipc_dir_}->child('todo-*') ) {
-                no warnings 'inplace';   # the file may already be gone
-                print $fh @$todo = uniqstr grep !$seen->{$_},
-                  <>, map "$_\n", @$todo;
-                chomp @$todo;
-                close $fh;
-                my $TODO = $self->{_ipc_dir_}->child('__TODO__');
-                rename "$fh", $TODO
-                  or die "Can't rename $fh to $TODO: $!";
+sub _aggregate_todo {
+    my ( $self, @items ) = @_;
+    my $TODO   = $self->{_ipc_dir_}->child('__TODO__');
+    my $latest = ( stat $TODO )[9] || 0;
+
+    # aggregate all child todo into ours and save it as __TODO__
+    local *ARGV;
+    @ARGV = glob $self->{_ipc_dir_}->child('todo-*');
+    no warnings 'inplace';    # some files may already be gone
+    my $fh = File::Temp->new(
+        TEMPLATE => "__TODO__-XXXX",
+        DIR      => $self->{_ipc_dir_},
+    );
+    print $fh uniqstr @ARGV ? <> : (), map "$_\n", @items;
+    close $fh;
+    rename "$fh", $TODO
+      or die "Can't rename $fh to $TODO: $!";
+
+    # the parent to-do list is always empty
+    $self->{todo} = [];
+
+    # fork all kids
+    if ( !$self->{_forked_} ) {
+        for ( 1 .. $self->{option}{parallel} ) {
+            if ( not my $pid = fork ) {
+                $self->{_pidfile_} = Path::Tiny->tempfile(
+                    TEMPLATE => "pid-$$-XXXX",
+                    DIR      => $self->{_ipc_dir_},
+                );
+                delete $self->{_seen_fh_};    # will reopen
+                return;
+            }
+            elsif ( !defined $pid ) {
+                warn "Couldn't fork: $!";
+            }
+            else {
+                $self->{_forked_}++;
             }
         }
-
-        # save the child todo
-        else {
-            return if !@items; # no update
-
-            my $fh = File::Temp->new(
-                TEMPLATE => "todo-$$-XXXX",
-                DIR      => $self->{_ipc_dir_},
-            );
-            print $fh map "$_\n", @$todo;
-            close $fh;
-            $self->{_todo_fh_} = $fh;    # deletes previous one
-        }
+        sleep 1;    # give them time to settle
     }
+}
+
+sub _save_todo {
+    my ($self) = @_;
+
+    # save the child todo
+    my $fh = File::Temp->new(
+        TEMPLATE => "todo-$$-XXXX",
+        DIR      => $self->{_ipc_dir_},
+    );
+    print $fh map "$_\n", @{ $self->{todo} };
+    close $fh;
+    $self->{_todo_fh_} = $fh;    # deletes previous one
+}
+
+# returns a boolean indicating if the update can be trusted
+sub _update_todo {
+    my ($self) = @_;
+    my $todo   = $self->{todo};
+    my $TODO   = $self->{_ipc_dir_}->child('__TODO__');
+    my $SEEN   = $self->{_ipc_dir_}->child('__SEEN__');
+
+    return if !-e $TODO;
+    my $certainty =    # this update can be trusted if __TODO__ is the
+      ( stat $TODO )[9] > max( 0, map +(stat)[9] || 0,    # most recent
+        $SEEN, glob $self->{_ipc_dir_}->child('todo-*')); # file of all
+
+    # read from the shared todo
+    open my $fh, '<', $TODO or die "Can't open $TODO: $!";
+    @$todo = <$fh>;
+    chomp(@$todo);
+
+    return $certainty;
 }
 
 sub _next_todo {
@@ -260,11 +301,19 @@ sub _next_todo {
 
     if ( $self->{option}{parallel} ) {
 
+       # in parallel mode, the parent does not render anything
+       return if $self->{_parent_} == $$;
+
       TODO:
 
         # read from the shared seen file
         my $SEEN = $self->{_ipc_dir_}->child('__SEEN__');
-        my $seen_fh = $self->{_seen_fh_} ||= __open_fh($SEEN);
+        my $seen_fh = $self->{_seen_fh_} ||= do {
+            open my $fh, -e $SEEN ? '+<' : '+>', $SEEN
+              or die "Can't open $SEEN in read-write mode: $!";
+            $fh->autoflush(1);
+            $fh;
+        };
         flock( $seen_fh, LOCK_EX() ) or die "Cannot lock $SEEN: $!\n";
         seek( $seen_fh, 0, SEEK_CUR() );
         while (<$seen_fh>) { chomp; $seen->{$_}++; }
@@ -272,49 +321,25 @@ sub _next_todo {
         # find a todo item not seen
         ( $next, @$todo ) = uniqstr grep !$seen->{$_}, @$todo;
 
+        # or update todo and try again
         if ( !defined $next ) {
-
-            # read from the shared todo
-            my $TODO    = $self->{_ipc_dir_}->child('__TODO__');
-            my $todo_fh = __open_fh($TODO);
-            flock( $todo_fh, LOCK_EX() ) or die "Cannot lock $TODO: $!\n";
-            @$todo = <$todo_fh>;
-            flock( $todo_fh, LOCK_UN() ) or die "Cannot unlock $TODO: $!\n";
-            chomp(@$todo);
-
-            # try again
+            my $certain = $self->_update_todo;
             ( $next, @$todo ) = uniqstr grep !$seen->{$_}, @$todo;
 
+            # if we can't trust the update, try the entire thing again
+            if ( !defined $next && !$certain ) {
+                flock( $seen_fh, LOCK_UN() ) or die "Cannot unlock $SEEN: $!\n";
+                sleep 1;
+                goto TODO;
+            }
         }
-        else {
 
-            # write to the shared seen file
+        # write to the shared seen file
+        if ( defined $next ) {    # /!\ NOT ELSE /!\
             seek( $seen_fh, 0, SEEK_END() );
             print $seen_fh "$next\n";
         }
         flock( $seen_fh, LOCK_UN() ) or die "Cannot unlock $SEEN: $!\n";
-
-        # fork new kids if necessary
-        if (   @$todo
-            && $self->{_parent_} == $$
-            && $self->{_forked_} < $self->{option}{parallel} - 1 )
-        {
-            if ( not my $pid = fork ) {
-                $self->{_pidfile_} = Path::Tiny->tempfile(
-                    TEMPLATE => "pid-$$-XXXX",
-                    DIR      => $self->{_ipc_dir_},
-                );
-                delete $self->{_seen_fh_};    # will reopen
-            }
-            elsif ( !defined $pid ) {
-                warn "Couldn't fork: $!";
-            }
-            else {
-                $self->{_forked_}++;
-                $seen->{$next}++;             # the child will handle this one
-                goto TODO;                    # so pick another one
-            }
-        }
     }
     else {
         ( $next, @$todo ) = uniqstr grep !$seen->{$_}, @$todo;
@@ -330,10 +355,15 @@ sub _next_todo {
 sub _wait_for_kids {
     my ($self) = @_;
     return if $self->{_parent_} != $$;
-    sleep 1 while @{ [ glob( $self->{_ipc_dir_}->child('pid-*') ) ] };
-    if( $self->{option}{tap} ) {
-        seek my $fh = $self->{_seen_fh_}, 0, SEEK_SET();
+    while ( @{ [ glob( $self->{_ipc_dir_}->child('pid-*') ) ] } ) {
+        $self->_aggregate_todo;
+        sleep 1;
+    }
+    if ( $self->{option}{tap} ) {
         my $count;
+        my $SEEN = $self->{_ipc_dir_}->child( '__SEEN__' );
+        open my $fh, '<', $SEEN or die "Can't open $SEEN: $!";
+        seek $fh, 0, SEEK_SET();
         $count++ while <$fh>;
         my $tb = Test::Builder->new;
         $tb->no_ending(1);
@@ -352,6 +382,9 @@ sub _process_args {
         chomp;
 
         $self->_process_queue("$_");
+
+        # child processes should not process the filter input
+        last if $self->{option}{parallel} && $self->{_parent_} != $$;
     }
 }
 
@@ -408,7 +441,7 @@ App::Wallflower - Class performing the moves for the wallflower program
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

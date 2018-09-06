@@ -37,10 +37,11 @@ Options:
         Ignore substructure. May be used several times.
 
     --json
-        Use JSON as output diff format.
+        Use JSON as output diff format. It's just a shortcut for "--ofmt
+        JSON".
 
-    --ofmt <JSON|YAML>
-        Force specified output format usage. JSON is used by default;
+    --ofmt <TERM|JSON|YAML>
+        Force specified output format usage. "TERM" is used by default;
         YAML::XS should be installed for YAML support, see "LIMITATIONS" in
         App::NDTools for more info.
 
@@ -54,8 +55,8 @@ Options:
     --rules
         Dump diff as rules for ndproc.
 
-    --show
-        Visualize diff (JSON/YAML formatted diff expected for argument).
+    --show <file>
+        Visualize JSON/YAML formatted diff.
 
     --verbose|-v [int]
         Increase verbosity, max level is 4.

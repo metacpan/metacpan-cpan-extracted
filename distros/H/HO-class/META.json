@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HO-class",
    "prereqs" : {
@@ -34,6 +34,12 @@
          }
       }
    },
+   "provides" : {
+      "HO::mixin" : {
+         "file" : "lib/HO/mixin.pm",
+         "version" : "0.01"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://github.com/giftnuss/p5-ho-class/tree/master",
@@ -42,6 +48,6 @@
          "url" : "git://github.com/giftnuss/p5-ho-class.git"
       }
    },
-   "version" : "0.076",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.077",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

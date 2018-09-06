@@ -57,7 +57,10 @@
    "provides" : {
       "Mojo::UserAgent::Role::Queued" : {
          "file" : "lib/Mojo/UserAgent/Role/Queued.pm",
-         "version" : "1.01"
+         "version" : "1.10"
+      },
+      "Mojo::UserAgent::Role::Queued::Queue" : {
+         "file" : "lib/Mojo/UserAgent/Role/Queued/Queue.pm"
       }
    },
    "release_status" : "stable",
@@ -71,7 +74,7 @@
          "web" : "https://github.com/dotandimet/Mojo-UserAgent-Role-Queued"
       }
    },
-   "version" : "1.01",
+   "version" : "1.10",
    "x_contributors" : [
       "Dan Book <grinnz@gmail.com>"
    ],

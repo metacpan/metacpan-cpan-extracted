@@ -7,6 +7,7 @@ use warnings FATAL => 'all';
 
 use App::NDTools::INC;
 use App::NDTools::NDTool;
+use App::NDTools::Util qw(chomp_evaled_error);
 use Getopt::Long qw(GetOptionsFromArray :config bundling pass_through);
 use Log::Log4Cli;
 use Storable qw(dclone);
@@ -97,8 +98,17 @@ sub process {
         if ($opts->{preserve});
 
     for my $path (@{$opts->{path}}) {
-        log_debug { "Processing path '$path'" };
-        $self->process_path($data, $path, $opts, $source);
+        if (ref $path) {  # complex paths passed to mod as is
+            $self->process_path($data, $path, undef, $opts, $source);
+        } else {
+            log_debug { "Processing path '$path'" };
+
+            my $spath = eval { str2path($path) };
+            die_fatal 'Failed to parse path ' . chomp_evaled_error($@), 4
+                if ($@);
+
+            $self->process_path($data, $path, $spath, $opts, $source);
+        }
     }
 
     $self->restore_preserved($data)

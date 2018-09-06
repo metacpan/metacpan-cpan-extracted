@@ -26,7 +26,9 @@ no_index:
 provides:
   Mojo::UserAgent::Role::Queued:
     file: lib/Mojo/UserAgent/Role/Queued.pm
-    version: '1.01'
+    version: '1.10'
+  Mojo::UserAgent::Role::Queued::Queue:
+    file: lib/Mojo/UserAgent/Role/Queued/Queue.pm
 requires:
   Class::Method::Modifiers: '2.12'
   Mojolicious: '7.52'
@@ -36,7 +38,7 @@ resources:
   bugtracker: https://github.com/dotandimet/Mojo-UserAgent-Role-Queued/issues
   homepage: https://github.com/dotandimet/Mojo-UserAgent-Role-Queued
   repository: git://github.com/dotandimet/Mojo-UserAgent-Role-Queued.git
-version: '1.01'
+version: '1.10'
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

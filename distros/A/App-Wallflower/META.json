@@ -85,8 +85,9 @@
          "web" : "http://github.com/book/App-Wallflower"
       }
    },
-   "version" : "1.011",
+   "version" : "1.012",
    "x_contributors" : [
+      "Ferruccio Zamuner <ferz@cpan.org>",
       "Vincent Pit <vpit@cpan.org>",
       "Alexander Becker <asb@cpan.org>",
       "Pau Amma <pauamma@cpan.org>",

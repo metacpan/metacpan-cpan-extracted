@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'Alexander Schneider <alexander.schneider@minati.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-MIAB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.38'
+  JSON: '2.97001'
+  LWP::UserAgent: '6.31'
+  MIME::Base64: '3.13'
+  Moo: '2.2010'
+  WebService::Client: '0.0601'
+  perl: '5.006'
+  re: '0.34'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

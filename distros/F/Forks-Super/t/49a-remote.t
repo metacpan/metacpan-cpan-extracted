@@ -63,7 +63,11 @@ SKIP: {
     ok($pid, "fork with rhost $pid->{remote}{host}");
     ok($pid == waitpid($pid,0), 'waitpid on remote cmd');
     my @out = $pid->read_stdout;
-    ok(@out > 0, 'got remote output');
+    ok(@out > 0, 'got remote output') or do {
+	sleep 2;
+	@out = $pid->read_stdout;
+	diag "delayed remote output: @out";
+    };
     ok("@out" =~ /Hello/, 'got expected remote output');
     my @err = $pid->read_stderr;
     ok(@err > 0, 'got remote error stream');
@@ -81,7 +85,11 @@ SKIP: {
     my $w = wait;
     ok($pid == $w, 'wait on remote cmd ' . __LINE__) or diag($pid,$w);
     @out = $pid->read_stdout;
-    ok(@out > 0, 'got remote output');
+    ok(@out > 0, 'got remote output') or do {
+	sleep 2;
+	@out = $pid->read_stdout;
+	diag "delayed remote output: @out";
+    };
     ok("@out" =~ /Never/, 'got expected remote output')   or diag @out;
     @err = $pid->read_stderr;
     ok(@err > 0, 'got remote error stream');
@@ -97,7 +105,12 @@ SKIP: {
     ok($pid, "fork with array rhost $pid->{remote}{host}");
     ok($pid == wait, 'wait on remote cmd ' . __LINE__);
     @out = $pid->read_stdout;
-    ok(@out > 0, 'got remote output');
+    ok(@out > 0, 'got remote output')
+	or do {
+	    sleep 2;
+	    @out = $pid->read_stdout;
+	    diag "\@out: @out";
+    };
     ok("@out" =~ /squeamish/, 'got expected remote output')  or diag @out;
     @err = $pid->read_stderr;
     ok(@err > 0, 'got remote error stream')                  or diag @err;

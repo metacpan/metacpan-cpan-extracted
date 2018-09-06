@@ -17,11 +17,11 @@ App::NDTools - Command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.6.0
+Version 0.6.1
 
 =cut
 
-our $VERSION = "0.6.0";
+our $VERSION = "0.6.1";
 
 =head1 DESCRIPTION
 
@@ -42,6 +42,13 @@ Apply diff to the structure.
 =item B<L<ndproc>>
 
 Process structure using rules and modules.
+
+Available modules:
+
+    Insert     Insert value into structure
+    Merge      Merge structures according provided rules
+    Pipe       Modify structure using external process
+    Remove     Remove specified parts from structure
 
 =item B<L<ndquery>>
 

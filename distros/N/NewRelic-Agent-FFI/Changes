@@ -1,5 +1,13 @@
 Revision history for NewRelic-Agent-FFI
 
+0.07      2018-09-05 06:22:37 -0400
+  - Fixed bug in newrelic_init
+  - Dropped support for Perl 5.8.
+  - Example code for using your own SQL obfuscator
+
+0.06      2018-09-04 17:34:39 -0400
+  - Fix intermittent test fail
+
 0.05      2018-09-04 06:15:29 -0400
   - Fix configure prereqs
   - Documentation fixes

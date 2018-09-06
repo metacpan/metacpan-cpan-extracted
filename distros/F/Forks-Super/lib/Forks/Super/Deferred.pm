@@ -17,7 +17,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(queue_job);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 # must sync FIRST_DEFERRED_ID with Win32 code in Forks::Super::Util::isValidPid
 use constant FIRST_DEFERRED_ID => -2_100_000;
@@ -545,7 +545,7 @@ Forks::Super::Deferred - manage queue of background tasks to perform
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 DESCRIPTION
 
@@ -620,7 +620,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017, Marty O'Brien.
+Copyright (c) 2009-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

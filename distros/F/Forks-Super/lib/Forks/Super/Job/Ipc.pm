@@ -34,7 +34,7 @@ $| = 1;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(close_fh);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 our $NO_README = 0;
 
 our (%FILENO, %SIG_OLD, $IPC_COUNT, $IPC_DIR_DEDICATED,
@@ -3399,7 +3399,7 @@ Forks::Super::Job::Ipc - interprocess communication routines for Forks::Super
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 DESCRIPTION
 

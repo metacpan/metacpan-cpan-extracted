@@ -15,6 +15,7 @@ $modules{$_} = $_ for qw(
   FFI::CheckLib
   FFI::Platypus
   FFI::Platypus::DL
+  FFI::Platypus::Memory
   Test2::V0
 );
 

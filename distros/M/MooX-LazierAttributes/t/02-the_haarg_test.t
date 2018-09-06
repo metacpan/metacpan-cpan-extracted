@@ -17,6 +17,7 @@ BEGIN {
     use MooX::LazierAttributes;
     attributes( foo => [ 'ro', {} ], );
 }
+
 my $o1 = Foo->new;
 my $o2 = Foo->new;
 $o1->foo->{foo} = 219;
