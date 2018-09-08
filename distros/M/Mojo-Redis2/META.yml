@@ -1,5 +1,5 @@
 ---
-abstract: 'Pure-Perl non-blocking I/O Redis driver'
+abstract: '(DEPRECATED) Pure-Perl non-blocking I/O Redis driver'
 author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis2/issues
   homepage: https://github.com/jhthorsen/mojo-redis2
   repository: https://github.com/jhthorsen/mojo-redis2.git
-version: '0.34'
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

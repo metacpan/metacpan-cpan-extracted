@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::metacpan;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to MetaCPAN
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::metacpan - More lcpan subcommands related to MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::CmdBundle::metacpan (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-07-10.
+This document describes version 0.005 of App::lcpan::CmdBundle::metacpan (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2018-09-07.
 
 =head1 SYNOPSIS
 
@@ -28,11 +28,11 @@ This bundle provides the following lcpan subcommands:
 
 =over
 
+=item * L<lcpan metacpan-author|App::lcpan::Cmd::metacpan_author>
+
 =item * L<lcpan metacpan-mod|App::lcpan::Cmd::metacpan_mod>
 
 =item * L<lcpan metacpan-dist|App::lcpan::Cmd::metacpan_dist>
-
-=item * L<lcpan metacpan-author|App::lcpan::Cmd::metacpan_author>
 
 =back
 
@@ -64,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@ use warnings;
 use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";
@@ -120,9 +120,11 @@ sub run
 
       $opts{blessed} or next;
 
-      $c = $counts_per_package{ref $sv}{ $sv->blessed->stashname } //= Counts( ( 0 ) x 4 );
-      $c->blessed_svs++;
-      $c->blessed_bytes += $bytes;
+      if( $sv->blessed ) {
+         $c = $counts_per_package{ref $sv}{ $sv->blessed->stashname } //= Counts( ( 0 ) x 4 );
+         $c->blessed_svs++;
+         $c->blessed_bytes += $bytes;
+      }
    }
 
    my @table = (

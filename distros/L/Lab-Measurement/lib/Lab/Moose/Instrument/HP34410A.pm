@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34410A;
-$Lab::Moose::Instrument::HP34410A::VERSION = '3.660';
+$Lab::Moose::Instrument::HP34410A::VERSION = '3.661';
 #ABSTRACT: HP 34410A digital multimeter.
 
 use 5.010;
@@ -17,8 +17,11 @@ extends 'Lab::Moose::Instrument';
 with qw(
     Lab::Moose::Instrument::Common
     Lab::Moose::Instrument::SCPI::Sense::Function
-    Lab::Moose::Instrument::SCPI::Sense::Range
+    Lab::Moose::Instrument::SCPI::Sense::Impedance
     Lab::Moose::Instrument::SCPI::Sense::NPLC
+    Lab::Moose::Instrument::SCPI::Sense::Null
+    Lab::Moose::Instrument::SCPI::Sense::Range
+    Lab::Moose::Instrument::AdjustRange
 );
 
 sub BUILD {
@@ -47,6 +50,32 @@ sub get_value {
     return $self->query( command => ':read?', %args );
 }
 
+### Required methods of AdjustRange role
+
+sub allowed_ranges {
+    my $self     = shift;
+    my $function = $self->cached_sense_function();
+    if ( $function eq 'VOLT' ) {
+        return [ 0.1, 1, 10, 100, 1000 ];
+    }
+    elsif ( $function eq 'CURR' ) {
+        return [ 1e-4, 1e-3, 1e-2, 1e-1, 1, 3 ];
+    }
+    else {
+        croak "function $function not yet supported";
+    }
+}
+
+sub set_range {
+    my $self = shift;
+    return $self->sense_range(@_);
+}
+
+sub get_cached_range {
+    my $self = shift;
+    return $self->cached_sense_range(@_);
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -63,7 +92,7 @@ Lab::Moose::Instrument::HP34410A - HP 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 SYNOPSIS
 
@@ -86,9 +115,13 @@ Used roles:
 
 =item L<Lab::Moose::Instrument::SCPI::Sense::Function>
 
-=item L<Lab::Moose::Instrument::SCPI::Sense::Range>
+=item L<Lab::Moose::Instrument::SCPI::Sense::Impedance>
 
 =item L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
+
+=item L<Lab::Moose::Instrument::SCPI::Sense::Null>
+
+=item L<Lab::Moose::Instrument::SCPI::Sense::Range>
 
 =back
 

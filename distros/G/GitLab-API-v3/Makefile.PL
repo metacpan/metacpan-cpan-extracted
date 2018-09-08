@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A complete GitLab API v3 client. (deprecated)",
+  "ABSTRACT" => "A complete GitLab API v3 client. (DEPRECATED)",
   "AUTHOR" => "Aran Deltac <bluefeet\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Simple" => "0.94"
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

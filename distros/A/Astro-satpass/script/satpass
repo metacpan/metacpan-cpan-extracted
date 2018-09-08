@@ -9,10 +9,10 @@ use Astro::Coord::ECI;
 use Astro::Coord::ECI::Moon;
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Star;
-use Astro::Coord::ECI::TLE qw{:constants};
+use Astro::Coord::ECI::TLE qw{ :constants };
 use Astro::Coord::ECI::TLE::Iridium;
 use Astro::Coord::ECI::TLE::Set;
-use Astro::Coord::ECI::Utils qw{:all};
+use Astro::Coord::ECI::Utils qw{ :mainstream };
 
 use Carp qw{confess};
 use Config;
@@ -37,7 +37,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -134,7 +134,7 @@ my %mutator = (
     gmt => \&_set_unmodified,
     height => \&_set_unmodified,
     horizon => \&_set_angle,
-    illum	=> \&_set_eci_class,
+    illum	=> \&_set_illum_class,
     latitude => \&_set_angle,
     local_coord => \&_set_local_coord,
     location => \&_set_unmodified,
@@ -1960,22 +1960,36 @@ sub _set_angle_or_undef {
 }
 
 sub _set_eci_class {
-    my ( $name, $val ) = @_;
+    my ( $name, $val, $class ) = @_;
+    $class ||= 'Astro::Coord::ECI';
     ref $val and die "Error - $name must not be a reference\n";
     if ( defined $val ) {
 	_load_module( $val );
-	$val->isa( 'Astro::Coord::ECI' )
-	    or die "Error - $name must be an Astro::Coord::ECI::Sun\n";
+	$val->isa( $class )
+	    or die "Error - $name must be an $class\n";
     } else {
-	$val = 'Astro::Coord::ECI';
+	$val = $class;
     }
     $parm{$name} = $val;
+    $help_module{$name}
+	and $help_module{$name} = $val;
+    foreach my $body ( @bodies ) {
+	$body->set( $name => $val );
+    }
+    if ( defined( my $inx = _find_in_sky( $name ) ) ) {
+	splice @sky, $inx, $inx + 1, $val->new();
+    }
     return;
 }
 
 sub _set_ellipsoid {
 Astro::Coord::ECI->set (ellipsoid => $_[1]);
 $parm{$_[0]} = $_[1];
+}
+
+sub _set_illum_class {
+    $_[2] = 'Astro::Coord::ECI';
+    goto &_set_eci_class;
 }
 
 
@@ -2024,18 +2038,13 @@ eod
     }
 }
 
+
 sub _set_sun_class {
     my ( $name, $val ) = @_;
-    ref $val and die "Error - $name must not be a reference\n";
-    if ( defined $val ) {
-	_load_module( $val );
-	$val->isa( SUN_CLASS_DEFAULT )
-	    or die "Error - $name must be an Astro::Coord::ECI::Sun\n";
-    } else {
-	$val = SUN_CLASS_DEFAULT;
+    _set_eci_class( $name, $val, SUN_CLASS_DEFAULT );
+    foreach my $body ( @sky ) {
+	$body->set( sun => $val );
     }
-    $parm{$name} = $help_module{$name} = $val;
-    return;
 }
 
 sub _set_time {
@@ -2157,27 +2166,30 @@ if (!$verb) {
     @sky or print "The sky is empty.\n";
     }
 
-#	If the subcommand is 'add', add the given body. Stars are a
-#	special case, since we can have more than one, and we need to
-#	specify position. No matter what we're adding we check for
-#	duplicates first and silently no-op the request if one is
-#	found.
+    # If the subcommand is 'add', add the given body. Stars are a
+    # special case, since we can have more than one, and we need to
+    # specify position. No matter what we're adding we check for
+    # duplicates first and silently no-op the request if one is found.
+
 
   elsif ($verb eq 'add') {
     my $name = shift or die <<eod;
 Error - You did not specify what to add.
 eod
-    my $lcn = lc $name;
-    my $special = $lcn eq 'sun' || $lcn eq 'moon';
-    my $class = 'Astro::Coord::ECI::' .
-	($special ? ucfirst ($lcn) : 'Star');
-    foreach my $body (@sky) {
-	return if __instance($body, $class) &&
-		($special || $lcn eq lc $body->get ('name'));
-	}
+    return if defined _find_in_sky( $name );
+    my ( $class, $special );
+    if ( $name =~ m/ \A sun \z /smxi ) {
+	$class = $parm{sun};
+	$special = 1;
+    } elsif ( $name =~ m/ \A moon \z /smxi ) {
+	$class = 'Astro::Coord::ECI::Moon';
+	$special = 1;
+    } else {
+	$class = 'Astro::Coord::ECI::Star';
+    }
     my $body = $class->new (debug => $parm{debug});
-    unless ($special) {
-	$body->set (name => $name);
+    unless ( $special ) {
+	$body->set( name => $name );
 	@_ >= 2 or die <<eod;
 Error - You must specify a name, a right ascension (in either
         hours:minutes:seconds or degrees) and a declination
@@ -2200,27 +2212,27 @@ eod
     push @sky, $body;
     }
 
-#	If the subcommand is 'clear', we empty the background.
+    # If the subcommand is 'clear', we empty the background.
 
   elsif ($verb eq 'clear') {
     @sky = ();
     }
 
-#	If the subcommand is 'drop', we iterate over the background,
-#	dropping any bodies whose name matches any of the given
-#	names.
+    # If the subcommand is 'drop', we iterate over the background,
+    # dropping any bodies whose name matches any of the given names.
 
   elsif ($verb eq 'drop') {
     @_ or die <<eod;
 Error - You must specify at least one name to drop.
 eod
     my $match = qr{@{[join '|', map {quotemeta $_} @_]}}i;
-    @sky = grep {$_->get ('name') !~ m/$match/} @sky;
+    @sky = grep { $_->get( 'name' ) !~ $match } @sky;
     }
 
-#	If the subcommand is 'lookup', we take the next argument to
-#	be the name of the star to look up, and try to look it up
-#	on line. If we find it, we add it to the background.
+    # If the subcommand is 'lookup', we take the next argument to be the
+    # name of the star to look up, and try to look it up on line. If we
+    # find it, we add it to the background.
+    # Returns the looked-up body, or dies if it is a duplicate.
 
   elsif ($verb eq 'lookup') {
     my $name = $_[0];
@@ -2250,6 +2262,7 @@ eod
 Error - 'sky' subcommand '$verb' not known. See 'help'.
 eod
     }
+    return;
 }
 
 ########################################################################
@@ -2628,6 +2641,28 @@ sub _find_first_tag {
 	die "Error - Tag <$tag> not found.\n";
     }
     $tree;
+}
+
+# $inx = _find_in_sky( $name )
+# The return is the index of the named body in @sky, or undef if it is
+# not present. 'Sun' and 'Moon' are special cases; everything else is
+# presumed to be found by name.
+sub _find_in_sky {
+    my ( $name ) = @_;
+    my $check;
+    if ( $name =~ m/ \A sun \z /smxi ) {
+	$check = sub { __instance( $sky[$_[0]], 'Astro::Coord::ECI::Sun' ) };
+    } elsif ( $name =~ m/ \A moon \z /smxi ) {
+	$check = sub { __instance( $sky[$_[0]], 'Astro::Coord::ECI::Moon' ) };
+    } else {
+	my $re = qr/ \A \Q$name\E \z /smxi;
+	$check = sub { $sky[$_[0]]->get( 'name' ) =~ $re };
+    }
+    foreach my $inx ( 0 .. $#sky ) {
+	$check->( $inx )
+	    and return $inx;
+    }
+    return;
 }
 
 #	@suff = _find_suffixes ($prefix, $package)

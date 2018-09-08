@@ -25,7 +25,7 @@
     %= stylesheet $theme, id => 'theme'
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="revealjs/lib/css/zenburn.css">
+    <link rel="stylesheet" href="<%= stash('hljs_theme_url') // 'revealjs/lib/css/zenburn.css' %>">
 
 		<!-- Printing and PDF exports -->
 		<script>

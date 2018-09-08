@@ -1,0 +1,105 @@
+NAME
+    App::finquotehist - Fetch historical stock quotes
+
+VERSION
+    This document describes version 0.001 of App::finquotehist (from Perl
+    distribution App-finquotehist), released on 2018-09-07.
+
+SYNOPSIS
+    See finquotehist script.
+
+FUNCTIONS
+  finquotehist
+    Usage:
+
+     finquotehist(%args) -> [status, msg, result, meta]
+
+    Fetch historical stock quotes.
+
+    Examples:
+
+    *   List available engines (backends):
+
+         finquotehist( action => "list_engines");
+
+    *   Fetch historical quote (by default 1 year) for a few NASDAQ stocks:
+
+         finquotehist( symbols => ["AAPL", "AMZN", "MSFT"]);
+
+    *   Fetch quotes for a few Indonesian stocks, for a certain date range:
+
+         finquotehist(
+           symbols => ["BBCA.JK", "BBRI.JK", "TLKM.JK"],
+           from => "2018-01-01",
+           to => "2018-09-07"
+         );
+
+    *   Fetch quotes for a stock, from 3 years ago:
+
+         finquotehist( symbols => ["AAPL"], from => "3 years ago");
+
+    *   Fetch splits for a few Indonesian stocks:
+
+         finquotehist(
+           symbols => ["BBCA.JK", "BBRI.JK", "TLKM.JK"],
+           action  => "fetch_splits"
+         );
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "fetch_quotes")
+
+        Choose what action to perform. The default is 'fetch_quotes'. Other
+        actions include:
+
+        *   'fetch_splits' - Fetch splits.
+
+        *   'fetch_dividends' - Fetch dividends.
+
+        *   'list_engines' - List available engines (backends).
+
+    *   engines => *array[perl::modname]* (default: ["Yahoo","Google"])
+
+    *   from => *date*
+
+    *   symbols => *array[str]*
+
+    *   to => *date*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-finquotehist>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-finquotehist>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-finquotehist>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

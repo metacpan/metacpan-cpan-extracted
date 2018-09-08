@@ -9,6 +9,19 @@
 ##################################################################################
 
 ##################################################################################
+###                      02.09.18 Version 6.05                                 ###
+##################################################################################
+
+Die Versionsnummer ist jetzt 6.05, da Perl einige Zwischenversionen erforderte.
+
+   - einige Funktionen für das SCL-Verzeichnis wurden hinzugefügt (noch nicht 
+     dokumentiert, zunächst nur in C und PHP)
+   - die IBAN-Regel 48 entfällt ab September 2018
+   - Änderungen in der IBAN-Regel 56
+   - kleinere Korrekturen
+   - Testdateien für perl aktualisiert
+
+##################################################################################
 ###                      02.04.18 Version 6.04                                 ###
 ##################################################################################
 

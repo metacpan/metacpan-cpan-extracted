@@ -27,6 +27,7 @@ websocket '/socket' => sub {
     warn 'in message';
     push @messages, $_[2];
     $c->finish;
+    Mojo::IOLoop->stop if $connects > 2;
   });
 };
 
@@ -34,7 +35,7 @@ my $t = Test::Mojo->new;
 
 open_browser($t->ua->server->url->to_abs);
 #warn($t->ua->server->url->to_abs);
-Mojo::IOLoop->one_tick while $connects <= 2;
+Mojo::IOLoop->start;
 
 cmp_ok $connects, '>', 2, 'got multiple connects';
 is $messages[0], 'Connect: 1', 'correct first message';
@@ -51,15 +52,19 @@ __DATA__
 
 %= javascript '/websocket_multiplex.js'
 %= javascript begin
-  var url = '<%= url_for('socket')->to_abs %>' + '?original=1';
-  var ws = new WebSocket(url);
-  var multiplex = new WebSocketMultiplex(ws);
-  url += url + '&changed=1';
-  multiplex.url = url;
-  var channel = multiplex.channel('mytest');
-  var i = 1;
-  channel.onopen = function() {
-    console.log('channel opened');
-    channel.send('Connect: ' + i++);
-  }
+  (function(){
+    var url = '<%= url_for('socket')->to_abs %>' + '?original=1';
+    var ws = new WebSocket(url);
+    var multiplex = new WebSocketMultiplex(ws);
+    url += '&changed=1';
+    multiplex.url = url;
+    var channel = multiplex.channel('mytest');
+    var i = 1;
+    var connect = function() {
+      console.log('channel opened');
+      channel.send('Connect: ' + i++);
+    };
+    channel.onopen = connect;
+    channel.onreconnected = connect;
+  })();
 % end

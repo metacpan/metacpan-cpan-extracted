@@ -1,6 +1,6 @@
 package Lab::Bus::LinuxGPIB;
 #ABSTRACT: LinuxGPIB bus
-$Lab::Bus::LinuxGPIB::VERSION = '3.660';
+$Lab::Bus::LinuxGPIB::VERSION = '3.661';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -490,7 +490,7 @@ Lab::Bus::LinuxGPIB - LinuxGPIB bus
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 SYNOPSIS
 

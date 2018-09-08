@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Moo" : "2.000000",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -41,11 +41,11 @@
    "provides" : {
       "Crypt::Trifid" : {
          "file" : "lib/Crypt/Trifid.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Crypt::Trifid::Utils" : {
          "file" : "lib/Crypt/Trifid/Utils.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Crypt-Trifid"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

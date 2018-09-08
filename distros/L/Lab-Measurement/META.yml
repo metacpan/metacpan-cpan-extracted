@@ -99,5 +99,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/lab-measurement/issues
   homepage: https://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/lab-measurement.git
-version: '3.660'
+version: '3.661'
 x_serialization_backend: 'YAML::Tiny version 1.73'

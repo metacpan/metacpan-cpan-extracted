@@ -52,6 +52,7 @@ sub new {
 
   my %context = (
     requires => CPAN::Meta::Requirements->new,
+    noes => CPAN::Meta::Requirements->new,
     file => $args{file},
     stash => {},
   );
@@ -106,6 +107,7 @@ sub register_sub_parser {
 sub requires { shift->{requires} }
 sub recommends { shift->_optional('recommends') }
 sub suggests { shift->_optional('suggests') }
+sub noes { shift->{noes} }
 
 sub _optional {
   my ($self, $key) = @_;
@@ -141,6 +143,10 @@ sub add_conditional {
   shift->_add('conditional', @_);
 }
 
+sub add_no {
+  shift->_add('noes', @_);
+}
+
 sub _add {
   my ($self, $type, $module, $version) = @_;
   return unless is_module_name($module);
@@ -164,6 +170,10 @@ sub has_added_suggestion {
 
 sub has_added_conditional {
   shift->_has_added('conditional', @_);
+}
+
+sub has_added_no {
+  shift->_has_added('no', @_);
 }
 
 sub _has_added {

@@ -15,7 +15,7 @@ use IO::Uncompress::Gunzip ('$GunzipError');
 use IO::Zlib;
 use Parse::LocalDistribution;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub new {
     my ($class, %args) = @_;

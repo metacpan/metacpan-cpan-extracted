@@ -1,0 +1,81 @@
+#!perl
+# ABSTRACT: transforms JSON into tabular fields suitable for column
+# PODNAME: jcols
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use App::JsonLogUtils qw(lines json_cols);
+
+my $help = 0;
+my %param;
+
+GetOptions(
+  'help'   => \$help,
+  'sep=s'  => \$param{sep},
+  'cols=s' => \$param{cols},
+) or pod2usage(2);
+
+if ($help) {
+  pod2usage(1);
+  exit 0;
+}
+
+$| = 1;
+
+foreach (@ARGV ? @ARGV : (\*STDIN)) {
+  my $rows = json_cols $param{cols}, $param{sep}, lines $_;
+  while (my $row = <$rows>) {
+    print $row, "\n";
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+jcols - transforms JSON into tabular fields suitable for column
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  jcols --cols "field1 field2 field3 ..." [--sep "|"] [/path/to/file1 /path/to/file2 ...]
+
+=head1 DESCRIPTION
+
+Outputs JSON object fields in a format suitable for C<column>.
+
+=head1 OPTIONS
+
+=head2 --cols
+
+Space-separated list of fields to include in output. The first line of output will be the
+list of fields, separated by L</--sep>.
+
+=head2 --sep
+
+Optional separator string between columns. Defaults to a single tab.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

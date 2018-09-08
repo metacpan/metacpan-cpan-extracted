@@ -1,5 +1,8 @@
 Revision history for Perl module Mojolicious::Plugin::RevealJS
 
+0.18 2018-09-07
+  - Add hljs_theme_url stash value
+
 0.17 2018-08-31
   - Fix bug with mark in reveal-sampler
 

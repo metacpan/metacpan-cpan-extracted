@@ -45,14 +45,15 @@
  * # im Internet herunterladen.                                             #
  * ##########################################################################
  */
+#line 332 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.04 (final)"
+#define VERSION "6.05 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 04
+#define VERSION_MINOR 05
 #endif
-#define VERSION_DATE "2017-11-26"
+#define VERSION_DATE "2018-09-01"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -103,8 +104,8 @@ static lzo_align_t __LZO_MMODEL wrkmem[LZO1X_1_MEM_COMPRESS];
 #define KONTO_CHECK_VARS
 #include "konto_check.h"
 
-   /* Flag, um die Änderungen zum Dezember 2017 zu aktivieren */
-static int pz_aenderungen_aktivieren_2017_12;
+   /* Flag, um die Änderungen zum September 2018 zu aktivieren */
+static int pz_aenderungen_aktivieren_2018_09;
 
    /* falls die Variable verbose_debug gesetzt wird, werden bei einigen
     * Funktionen mittels perror() zusätzliche Debuginfos ausgegeben. Die
@@ -205,6 +206,13 @@ static int name_raw_len,name_kurz_raw_len,name_name_kurz_raw_len,ort_raw_len;
 static char **sortc_buf;
 static int *sorti_buf;
 
+   /* Variablen für das SCL-Verzeichnis */
+static char *scl_info_block,*scl_bic_block,*scl_name_block,*scl_flags_block,
+            **scl_bic_array,**scl_name_array,**scl_flags_array,
+            scl_gueltigkeit[16],scl_gueltigkeit_iso[16];
+static int scl_cnt;
+long scl_ts;
+
    /* Funktionspointer auf die aktuelle Kodierung */
 DLL_EXPORT const char *(*retval_enc)(int)=NULL;
 
@@ -241,6 +249,7 @@ static int convert_encoding(char **data,UINT4 *len);
 #define free(ptr) efree(ptr)
 #endif
 
+#line 777 "perl/Business-KontoCheck/konto_check.lxx"
 
    /* Testwert zur Markierung ungültiger Ziffern im BLZ-String (>8 Stellen) */
 #define BLZ_FEHLER 100000000
@@ -376,6 +385,7 @@ static int convert_encoding(char **data,UINT4 *len);
     */
 #define CHECK_RETVAL(fkt) do{if((retval=fkt)!=OK)goto fini;}while(0)     /* es muß noch aufgeräumt werden, daher goto */
 #define CHECK_RETURN(fkt) do{if((retval=fkt)!=OK)return retval;}while(0)
+#line 918 "perl/Business-KontoCheck/konto_check.lxx"
 
    /* einige Makros zur Umwandlung zwischen unsigned int und char */
 #define UCP  (unsigned char*)
@@ -432,24 +442,24 @@ DLL_EXPORT_V int
     lut_set_1[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_KURZ,0},
     lut_set_2[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_KURZ,LUT2_BIC,0},
     lut_set_3[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME,LUT2_PLZ,LUT2_ORT,0},
-    lut_set_4[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,0},
-    lut_set_5[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,0},
-    lut_set_6[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,0},
-    lut_set_7[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,0},
-    lut_set_8[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,0},
-    lut_set_9[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,LUT2_NR,0},
-    lut_set_iban[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_BLZ,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,0},  /* notwendige Felder für IBAN-Bestimmung */
+    lut_set_4[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,0},
+    lut_set_5[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,0},
+    lut_set_6[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,LUT2_NACHFOLGE_BLZ,0},
+    lut_set_7[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,0},
+    lut_set_8[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,0},
+    lut_set_9[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC, LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,LUT2_NR,0},
+    lut_set_iban[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_BLZ,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_IBAN_REGEL,0},  /* notwendige Felder für IBAN-Bestimmung */
 
     lut_set_o0[]={LUT2_BLZ,LUT2_PZ,0},
     lut_set_o1[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_KURZ,0},
     lut_set_o2[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_KURZ,LUT2_BIC,0},
     lut_set_o3[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME,LUT2_PLZ,LUT2_ORT,0},
-    lut_set_o4[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,0},
-    lut_set_o5[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,0},
-    lut_set_o6[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,0},
-    lut_set_o7[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,0},
-    lut_set_o8[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,0},
-    lut_set_o9[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_OWN_IBAN,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,LUT2_NR,0};
+    lut_set_o4[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,0},
+    lut_set_o5[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,0},
+    lut_set_o6[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,LUT2_NACHFOLGE_BLZ,0},
+    lut_set_o7[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,0},
+    lut_set_o8[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC,LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,0},
+    lut_set_o9[]={LUT2_BLZ,LUT2_PZ,LUT2_AENDERUNG,LUT2_NAME_NAME_KURZ,LUT2_PLZ,LUT2_ORT,LUT2_IBAN_REGEL,LUT2_BIC, LUT2_NACHFOLGE_BLZ,LUT2_LOESCHUNG,LUT2_PAN,LUT2_NR,0};
 
 #define COMPRESSION_DEFAULT COMPRESSION_ZLIB
 
@@ -495,6 +505,7 @@ int pz=-777;
 
 #define E_START(x)
 #define E_END(x)
+#line 1043 "perl/Business-KontoCheck/konto_check.lxx"
 
    /* Variable für die Methoden 27, 29 und 69 */
 static const int m10h_digits[4][10]={
@@ -575,7 +586,7 @@ static unsigned char ee[500],*eeh,*eep,eec[]={
    0xb3,0xa2,0xf4,0x0f,0x7e,0xb5,0x0a,0xdd,0x54,0xfb,0x74,0x56,0xf5,
    0x16,0x5a,0x53,0x14,0x3d,0xd8,0xbd,0x00,0x8b,0x59,0x95,0x67,0x00
 };
-#define EE 27
+#define EE 29
 
    /* Arrays für die Felder der LUT-Datei u.a. */
 static char *lut_prolog,*lut_sys_info,*lut_user_info;
@@ -943,6 +954,7 @@ static int create_lutfile_int(char *name, char *prolog, int slots,FILE **lut)
  * ###########################################################################
  */
 
+#line 1492 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int write_lut_block(char *lutname,UINT4 typ,UINT4 len,char *data)
 {
    char buffer[SLOT_BUFFER],*ptr;
@@ -980,6 +992,7 @@ DLL_EXPORT int write_lut_block(char *lutname,UINT4 typ,UINT4 len,char *data)
  * #############################################################################
  */
 
+#line 1530 "perl/Business-KontoCheck/konto_check.lxx"
 static int write_lut_block_int(FILE *lut,UINT4 typ,UINT4 len,char *data)
 {
    char buffer[SLOT_BUFFER],*ptr,*cptr;
@@ -1115,6 +1128,7 @@ static int write_lut_block_int(FILE *lut,UINT4 typ,UINT4 len,char *data)
  * ###########################################################################
  */
 
+#line 1666 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int read_lut_block(char *lutname, UINT4 typ,UINT4 *blocklen,char **data)
 {
    int retval;
@@ -1137,6 +1151,7 @@ DLL_EXPORT int read_lut_block(char *lutname, UINT4 typ,UINT4 *blocklen,char **da
  * ###########################################################################
  */
 
+#line 1690 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int read_lut_slot(char *lutname,int slot,UINT4 *blocklen,char **data)
 {
    int retval;
@@ -1158,6 +1173,7 @@ DLL_EXPORT int read_lut_slot(char *lutname,int slot,UINT4 *blocklen,char **data)
  * ###########################################################################
  */
 
+#line 1713 "perl/Business-KontoCheck/konto_check.lxx"
 static int read_lut_block_int(FILE *lut,int slot,int typ,UINT4 *blocklen,char **data)
 {
    char buffer[SLOT_BUFFER],*ptr,*sbuffer,*dbuffer;
@@ -1247,6 +1263,7 @@ static int read_lut_block_int(FILE *lut,int slot,int typ,UINT4 *blocklen,char **
             FREE(sbuffer);
             RETURN(ERROR_MALLOC);
          }
+#line 1818 "perl/Business-KontoCheck/konto_check.lxx"
 
          if(fread(sbuffer,1,compressed_len,lut)<compressed_len){
             FREE(sbuffer);
@@ -2839,6 +2856,7 @@ DLL_EXPORT int lut_info_id(char *lut_name,int *info1,int *info2,int *valid1,int 
  * ###########################################################################
  */
 
+#line 3411 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int *valid2)
 {
    char *ptr,*ptr1,buffer[128];
@@ -2926,6 +2944,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
 
       /* Infoblocks lesen: 1. Infoblock */
    if((ret=read_lut_block_int(in,0,LUT2_INFO,&cnt,&ptr))==OK){
+#line 3500 "perl/Business-KontoCheck/konto_check.lxx"
       *(ptr+cnt)=0;
       if(valid1){
          for(ptr1=ptr,v1=v2=0;*ptr1 && *ptr1!='\n' && !isdigit(*ptr1);ptr1++);
@@ -2973,6 +2992,7 @@ DLL_EXPORT int lut_info(char *lut_name,char **info1,char **info2,int *valid1,int
 
       /* Infoblocks lesen: 2. Infoblock */
    if((ret=read_lut_block_int(in,0,LUT2_2_INFO,&cnt,&ptr))==OK){
+#line 3549 "perl/Business-KontoCheck/konto_check.lxx"
       *(ptr+cnt)=0;
       if(valid2){
          for(ptr1=ptr,v1=v2=0;*ptr1 && *ptr1!='\n' && !isdigit(*ptr1);ptr1++);
@@ -3191,6 +3211,7 @@ DLL_EXPORT int copy_lutfile(char *old_name,char *new_name,int new_slots)
    qsort(slotdir,slot_cnt,sizeof(int),cmp_int);
    for(last_slot=-1,i=0;i<(int)slot_cnt;i++)if((typ=slotdir[i]) && typ!=(UINT4)last_slot){
       read_lut_block_int(lut1,0,typ,&len,&data);
+#line 3769 "perl/Business-KontoCheck/konto_check.lxx"
       write_lut_block_int(lut2,typ,len,data);
       FREE(data);
       last_slot=typ;
@@ -3420,6 +3441,7 @@ DLL_EXPORT int lut_init(char *lut_name,int required,int set)
  * # Copyright (C) 2008 Michael Plugge <m.plugge@hs-mannheim.de>             #
  * ###########################################################################
  */
+#line 3999 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,int incremental)
 {
    char *ptr,*dptr,*data,*eptr,*prolog,*info,*user_info,*hs=NULL,*info1,*info2,*ci=NULL,name_buffer[LUT_PATH_LEN];
@@ -3647,6 +3669,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
          typ1=typ;
       if(lut2_block_status[typ]==OK)continue;   /* jeden Block nur einmal einlesen */
       retval=read_lut_block_int(lut,0,typ,&len,&data);
+#line 4228 "perl/Business-KontoCheck/konto_check.lxx"
 
       switch(retval){
          case LUT_CRC_ERROR:
@@ -3734,6 +3757,7 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
             if(typ==LUT2_2_NAME || typ==LUT2_2_NAME_KURZ){
                FREE(data);
                i=read_lut_block_int(lut,0,LUT2_2_NAME_NAME_KURZ,&len,&data);
+#line 4320 "perl/Business-KontoCheck/konto_check.lxx"
                if(i==OK){  /* was gefunden; Typ ändern, dann weiter wie bei OK */
                   typ=LUT2_2_NAME_NAME_KURZ;
                   typ1=LUT2_NAME_NAME_KURZ;
@@ -3756,10 +3780,20 @@ DLL_EXPORT int kto_check_init(char *lut_name,int *required,int **status,int set,
                 * LUT2_OWN_IBAN nicht geladen werden konnte, wird der Block in
                 * der Funktion lut_blocks() als nicht geladen angegeben; bei
                 * lut_init() wird dagegen OK zurückgegeben.
+                *
+                * Die SCL-Blocks sind ebenfalls nicht immer in der LUT-Datei vorhanden.
+                * und sollen daher keine Warnung erzeugen.
                 */
-            if(typ!=LUT2_OWN_IBAN && typ!=LUT2_2_OWN_IBAN && typ!=LUT2_FILIALEN && typ!=LUT2_2_FILIALEN){
-               alles_ok=0;
-               lut_blocks_missing++;
+            switch(typ){
+               case LUT2_OWN_IBAN:
+               case LUT2_2_OWN_IBAN: 
+               case LUT2_FILIALEN:
+               case LUT2_2_FILIALEN:
+                  break;
+               default:
+                  alles_ok=0;
+                  lut_blocks_missing++;
+                  break;
             }
             lut2_block_len[typ]=lut2_block_len[typ1]=0;
             lut2_block_data[typ]=lut2_block_data[typ1]=NULL;
@@ -4329,6 +4363,7 @@ DLL_EXPORT int lut_blocks_id(int mode,int *lut_filename,int *lut_blocks_ok,int *
  * ###########################################################################
  */
 
+#line 4926 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT const char *current_lutfile_name(int *set,int *level,int *retval)
 {
    if(init_status<7 || !current_lutfile){
@@ -4736,6 +4771,7 @@ DLL_EXPORT const char *lut_bic(char *b,int zweigstelle,int *retval)
       if(retval)*retval=ret;
       return NULL;
    }
+   memcpy(kto2,"0000000000",10); /* für valgrind (kto2 ist nur ein Dummy) */
    bic=lut_bic_int(b,zweigstelle,retval); /* BIC aus der LUT-Datei holen */
    regel=lut_iban_regel(b,0,&ret);
    if(retval && ret==OK){  /* Test nur notwendig, falls retval nicht NULL */
@@ -4743,7 +4779,6 @@ DLL_EXPORT const char *lut_bic(char *b,int zweigstelle,int *retval)
          *retval=OK_HYPO_REQUIRES_KTO;  /* Sonderfall ehemalige Hypobank */
       else{
          strcpy(blz2,b);
-         strcpy(kto2,"13");   /* nur Dummy für Funktionsaufruf */
          iban_regel_cvt(blz2,kto2,&bic_neu,regel,NULL); /* Rückgabewert egal, nur bic_neu interessiert */
          if(bic && bic_neu && strcasecmp(bic,bic_neu))*retval=OK_INVALID_FOR_IBAN;  /* BIC wurde durch eine Regel geändert */
       }
@@ -5083,6 +5118,7 @@ static int iban_init(void)
  * ###########################################################################
  */
 
+#line 5681 "perl/Business-KontoCheck/konto_check.lxx"
 static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_version,RETVAL *retvals)
 {
    char tmp_buffer[16];
@@ -6148,6 +6184,10 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
          /* Iban-Regel 0030.00 +§§§3 */
          /* Pommersche Volksbank eG */
       case 30:
+
+
+            /* ab September 2018 entfällt die Regel 45, bleibt jedoch frei */
+         if(pz_aenderungen_aktivieren_2018_09)return OK;
 
             /* diese Bank hat gleich eine lange Reihe Konten, die trotz
              * fehlerhafter Prüfziffer umzuwandeln sind. Der Einfachheit halber
@@ -8390,135 +8430,109 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
          }
          RETURN_OK;
 
-         /* Iban-Regel 0056.00 +§§§3 */
-         /* Iban-Regel 0056.01 (ab September 2017) +§§§3 */
-         /* Iban-Regel 0056.01 (ab Dezember 2017) BLZ 51410111 ungültig +§§§3 */
-
-
+         /* Iban-Regel 0056.03 +§§§3 */
          /* SEB AG */
       case 56:
-         if(version<1){
-
-               /* Spendenkonten: nur mit festgelegten IBANs -> Konto und evl. BLZ/BIC anpassen */
-            if(k1==0)switch(k2){
-               case       36: strcpy(kto,"1010240003"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case       50: strcpy(kto,"1328506100"); if(b!=48010111){strcpy(blz,"48010111"); *bicp="ESSEDE5F480"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case       99: strcpy(kto,"1826063000"); if(b!=43010111){strcpy(blz,"43010111"); *bicp="ESSEDE5F430"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      110: strcpy(kto,"1015597802"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      240: strcpy(kto,"1010240000"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      333: strcpy(kto,"1011296100"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      555: strcpy(kto,"1600220800"); if(b!=10010111){strcpy(blz,"10010111"); *bicp="ESSEDE5F100"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      556: strcpy(kto,"1000556100"); if(b!=39010111){strcpy(blz,"39010111"); *bicp="ESSEDE5F390"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      606: strcpy(kto,"1967153801"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      700: strcpy(kto,"1070088000"); if(b!=26510111){strcpy(blz,"26510111"); *bicp="ESSEDE5F265"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      777: strcpy(kto,"1006015200"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case      999: strcpy(kto,"1010240001"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     1234: strcpy(kto,"1369152400"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     1313: strcpy(kto,"1017500000"); if(b!=57010111){strcpy(blz,"57010111"); *bicp="ESSEDE5F570"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     1888: strcpy(kto,"1241113000"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     1953: strcpy(kto,"1026500901"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     1998: strcpy(kto,"1547620500"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     2007: strcpy(kto,"1026500907"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     4004: strcpy(kto,"1635100100"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     4444: strcpy(kto,"1304610900"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     5000: strcpy(kto,"1395676000"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     5510: strcpy(kto,"1611754300"); if(b!=29010111){strcpy(blz,"29010111"); *bicp="ESSEDE5F290"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     6060: strcpy(kto,"1000400200"); if(b!=50010111){strcpy(blz,"50010111"); *bicp="ESSEDE5FXXX"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case     6800: strcpy(kto,"1296401301"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case    55555: strcpy(kto,"1027758200"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case    60000: strcpy(kto,"1005007001"); if(b!=50010111){strcpy(blz,"50010111"); *bicp="ESSEDE5FXXX"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case    66666: strcpy(kto,"1299807801"); if(b!=20010111){strcpy(blz,"20010111"); *bicp="ESSEDE5F200"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case   102030: strcpy(kto,"1837501600"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case   121212: strcpy(kto,"1249461502"); if(b!=70010111){strcpy(blz,"70010111"); *bicp="ESSEDE5F700"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case   130500: strcpy(kto,"1413482100"); if(b!=30010111){strcpy(blz,"30010111"); *bicp="ESSEDE5F300"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case   202020: strcpy(kto,"1213431002"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case   414141: strcpy(kto,"1010555101"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case   666666: strcpy(kto,"1798758900"); if(b!=20010111){strcpy(blz,"20010111"); *bicp="ESSEDE5F200"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-               case  5000000: strcpy(kto,"1403124100"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            }
-            else if(k1==5 && k2==500500){
-               strcpy(kto,"1045720000");
-               if(b!=60010111){
-                  strcpy(blz,"60010111");
-                  *bicp="ESSEDE5F600";
-                  return OK_BLZ_KTO_REPLACED;
-               }
-               else
-                  return OK_KTO_REPLACED;
-            }
-         }
 
             /* für die folgenden BLZs sind nur zehnstelllige Kontonummern erlaubt: */
-         if(pz_aenderungen_aktivieren_2017_12 && b==51410111)return INVALID_BLZ; /* die BLZ wird ab Dezember 2017 ungültig */
-         switch(b){
-            case 10010111:
-            case 13010111:
-            case 16010111:
-            case 20010111:
-            case 21010111:
-            case 21210111:
-            case 23010111:
-            case 25010111:
-            case 25410111:
-            case 25910111:
-            case 26010111:
-            case 26510111:
-            case 27010111:
-            case 28010111:
-            case 29010111:
-            case 29210111:
-            case 30010111:
-            case 31010111:
-            case 33010111:
-            case 35010111:
-            case 35211012:
-            case 36010111:
-            case 36210111:
-            case 37010111:
-            case 38010111:
-            case 39010111:
-            case 40010111:
-            case 41010111:
-            case 42010111:
-            case 42610112:
-            case 43010111:
-            case 44010111:
-            case 46010111:
-            case 48010111:
-            case 50010111:
-            case 50510111:
-            case 51010111:
-            case 51310111:
-            case 51410111:    /* wird ab Dezember 2017 ungültig */
-            case 52010111:
-            case 54210111:
-            case 55010111:
-            case 57010111:
-            case 58510111:
-            case 59010111:
-            case 60010111:
-            case 63010111:
-            case 65310111:
-            case 66010111:
-            case 66610111:
-            case 67010111:
-            case 67210111:
-            case 68010111:
-            case 68310111:
-            case 69010111:
-            case 70010111:
-            case 72010111:
-            case 75010111:
-            case 76010111:
-            case 79010111:
-            case 79510111:
-            case 81010111:
-            case 82010111:
-            case 86010111:
-               if(k1<10)return INVALID_KTO;
-            default:
-               break;
-         }
+         if(pz_aenderungen_aktivieren_2018_09)
+               /* die Liste wurde zum September 2018 kräftig gekürzt */
+            switch(b){
+               case 10010111:
+               case 13010111:
+               case 20010111:
+               case 21010111:
+               case 23010111:
+               case 25010111:
+               case 27010111:
+               case 30010111:
+               case 36010111:
+               case 37010111:
+               case 38010111:
+               case 39010111:
+               case 44010111:
+               case 50010111:
+               case 50510111:
+               case 51010111:
+               case 51310111:
+               case 55010111:
+               case 60010111:
+               case 70010111:
+               case 76010111:
+               case 86010111:
+                  if(k1<10)return INVALID_KTO;
+               default:
+                  break;
+            }
+         else 
+            switch(b){
+               case 10010111:
+               case 13010111:
+               case 16010111:
+               case 20010111:
+               case 21010111:
+               case 21210111:
+               case 23010111:
+               case 25010111:
+               case 25410111:
+               case 25910111:
+               case 26010111:
+               case 26510111:
+               case 27010111:
+               case 28010111:
+               case 29010111:
+               case 29210111:
+               case 30010111:
+               case 31010111:
+               case 33010111:
+               case 35010111:
+               case 35211012:
+               case 36010111:
+               case 36210111:
+               case 37010111:
+               case 38010111:
+               case 39010111:
+               case 40010111:
+               case 41010111:
+               case 42010111:
+               case 42610112:
+               case 43010111:
+               case 44010111:
+               case 46010111:
+               case 48010111:
+               case 50010111:
+               case 50510111:
+               case 51010111:
+               case 51310111:
+               case 52010111:
+               case 54210111:
+               case 55010111:
+               case 57010111:
+               case 58510111:
+               case 59010111:
+               case 60010111:
+               case 63010111:
+               case 65310111:
+               case 66010111:
+               case 66610111:
+               case 67010111:
+               case 67210111:
+               case 68010111:
+               case 68310111:
+               case 69010111:
+               case 70010111:
+               case 72010111:
+               case 75010111:
+               case 76010111:
+               case 79010111:
+               case 79510111:
+               case 81010111:
+               case 82010111:
+               case 86010111:
+                  if(k1<10)return INVALID_KTO;
+               default:
+                  break;
+            }
          RETURN_OK;
 
          /* Iban-Regel 0057.00 +§§§3 */
@@ -8538,6 +8552,7 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
    }
 }
 
+#line 9115 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_multiple() +§§§2 */
 /* ###########################################################################
  * # lut_multiple(): Universalfunktion, um zu einer gegebenen Bankleitzahl   #
@@ -8805,6 +8820,7 @@ DLL_EXPORT int lut_cleanup(void)
    FREE(sort_pz_f);
    FREE(sort_plz);
    FREE(sort_iban_regel);
+#line 9377 "perl/Business-KontoCheck/konto_check.lxx"
    if(name_raw && name_data!=name_raw)
       FREE(name_raw);
    else
@@ -8864,6 +8880,14 @@ DLL_EXPORT int lut_cleanup(void)
       free(handle_ptr);
    }
 
+   FREE(scl_info_block);
+   FREE(scl_bic_array);
+   FREE(scl_bic_block);
+   FREE(scl_name_array);
+   FREE(scl_name_block);
+   FREE(scl_flags_array);
+   FREE(scl_flags_block);
+
    if(init_status&8){
 
          /* bei init_status&8 ist wohl eine Initialisierung dazwischengekommen (sollte
@@ -8873,6 +8897,7 @@ DLL_EXPORT int lut_cleanup(void)
       lut_cleanup(); /* neuer Versuch, aufzuräumen */
       RETURN(INIT_FATAL_ERROR);
    }
+#line 9459 "perl/Business-KontoCheck/konto_check.lxx"
    init_status&=1;
    init_in_progress=0;
    return OK;
@@ -9045,8 +9070,8 @@ static void init_atoi_table(void)
    int i,ziffer;
    unsigned long l;
 
-      /* Änderungen zum 05.03.2018 aktivieren */
-   if(time(NULL)>1520204400 ||0)pz_aenderungen_aktivieren_2017_12=1;
+      /* Änderungen zum 02.09.2018 aktivieren */
+   if(time(NULL)>1535839200 ||0)pz_aenderungen_aktivieren_2018_09=1;
 
    /* ungültige Ziffern; Blanks und Tabs werden ebenfalls als ungültig
     * angesehen(!), da die Stellenzuordnung sonst nicht mehr stimmt. Ausnahme:
@@ -9172,6 +9197,14 @@ static void init_atoi_table(void)
    lut2_feld_namen[LUT2_2_IBAN_REGEL_SORT]="LUT2_2_IBAN_REGEL_SORT";
    lut2_feld_namen[LUT2_BIC_H_SORT]="LUT2_BIC_H_SORT";
    lut2_feld_namen[LUT2_2_BIC_H_SORT]="LUT2_2_BIC_H_SORT";
+   lut2_feld_namen[LUT2_SCL_INFO]="LUT2_SCL_INFO";
+   lut2_feld_namen[LUT2_2_SCL_INFO]="LUT2_2_SCL_INFO";
+   lut2_feld_namen[LUT2_SCL_BIC]="LUT2_SCL_BIC";
+   lut2_feld_namen[LUT2_2_SCL_BIC]="LUT2_2_SCL_BIC";
+   lut2_feld_namen[LUT2_SCL_NAME]="LUT2_SCL_NAME";
+   lut2_feld_namen[LUT2_2_SCL_NAME]="LUT2_2_SCL_NAME";
+   lut2_feld_namen[LUT2_SCL_FLAGS]="LUT2_SCL_FLAGS";
+   lut2_feld_namen[LUT2_2_SCL_FLAGS]="LUT2_2_SCL_FLAGS";
 
    lut_block_idx[1]=0;
    lut_block_idx[2]=0;
@@ -9200,6 +9233,10 @@ static void init_atoi_table(void)
    lut_block_idx[25]=0;
    lut_block_idx[26]=0;
    lut_block_idx[27]=0;
+   lut_block_idx[28]=-1;
+   lut_block_idx[29]=-1;
+   lut_block_idx[30]=-1;
+   lut_block_idx[31]=-1;
 
    lut_block_name1[1]="BLZ";
    lut_block_name1[2]="FILIALEN";
@@ -9228,6 +9265,10 @@ static void init_atoi_table(void)
    lut_block_name1[25]="IBAN_REGEL";
    lut_block_name1[26]="IBAN_REGEL_SORT";
    lut_block_name1[27]="BIC_H_SORT";
+   lut_block_name1[28]="SCL_INFO";
+   lut_block_name1[29]="SCL_BIC";
+   lut_block_name1[30]="SCL_NAME";
+   lut_block_name1[31]="SCL_FLAGS";
    lut_block_name1[101]="BLZ (2)";
    lut_block_name1[102]="FILIALEN (2)";
    lut_block_name1[103]="NAME (2)";
@@ -9255,6 +9296,10 @@ static void init_atoi_table(void)
    lut_block_name1[125]="IBAN_REGEL (2)";
    lut_block_name1[126]="IBAN_REGEL_SORT (2)";
    lut_block_name1[127]="BIC_H_SORT (2)";
+   lut_block_name1[128]="SCL_INFO (2)";
+   lut_block_name1[129]="SCL_BIC (2)";
+   lut_block_name1[130]="SCL_NAME (2)";
+   lut_block_name1[131]="SCL_FLAGS (2)";
 
    lut_block_name2[1]="1. BLZ";
    lut_block_name2[2]="1. Anzahl Fil.";
@@ -9283,6 +9328,10 @@ static void init_atoi_table(void)
    lut_block_name2[25]="1. IBAN Regel";
    lut_block_name2[26]="1. IBAN Regel idx";
    lut_block_name2[27]="1. BIC Hauptst.idx";
+   lut_block_name2[28]="1. SCL Infoblock";
+   lut_block_name2[29]="1. SCL BIC";
+   lut_block_name2[30]="1. SCL Banknamen";
+   lut_block_name2[31]="1. SCL Flags";
    lut_block_name2[101]="2. BLZ";
    lut_block_name2[102]="2. Anzahl Fil.";
    lut_block_name2[103]="2. Name";
@@ -9310,7 +9359,12 @@ static void init_atoi_table(void)
    lut_block_name2[125]="2. IBAN Regel";
    lut_block_name2[126]="2. IBAN Regel idx";
    lut_block_name2[127]="2. BIC Hauptst.idx";
-   lut_blocklen_max=453;
+   lut_block_name2[128]="2. SCL Infoblock";
+   lut_block_name2[129]="2. SCL BIC";
+   lut_block_name2[130]="2. SCL Banknamen";
+   lut_block_name2[131]="2. SCL Flags";
+   lut_blocklen_max=521;
+#line 9699 "perl/Business-KontoCheck/konto_check.lxx"
    init_status|=1;
 }
 
@@ -9370,6 +9424,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 
    switch(pz_methode){
 
+#line 9762 "perl/Business-KontoCheck/konto_check.lxx"
 /* Berechnungsmethoden 00 bis 09 +§§§3
    Berechnung nach der Methode 00 +§§§4 */
 /*
@@ -11704,6 +11759,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * ######################################################################
  */
 
+#line 11773 "perl/Business-KontoCheck/konto_check.lxx"
       case 51:
          if(*(kto+2)=='9'){   /* Ausnahme */
 
@@ -11965,6 +12021,8 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          else
             return FALSE;
 
+#line 11987 "perl/Business-KontoCheck/konto_check.lxx"
+#line 11989 "perl/Business-KontoCheck/konto_check.lxx"
 /*  Berechnung nach der Methode 53 +§§§4 */
 /*
  * ######################################################################
@@ -12263,6 +12321,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # bewerten.                                                          #
  * ######################################################################
  */
+#line 12258 "perl/Business-KontoCheck/konto_check.lxx"
       case 57:
 #if DEBUG>0
          if(retvals){
@@ -12908,6 +12967,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # Prüfzifferberechnung)                                              #
  * ######################################################################
  */
+#line 12838 "perl/Business-KontoCheck/konto_check.lxx"
       case 66:
 #if DEBUG>0
       case 2066:
@@ -20318,6 +20378,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          return NOT_IMPLEMENTED;
    }
 }
+#line 19052 "perl/Business-KontoCheck/konto_check.lxx"
 
 /*
  * ######################################################################
@@ -20415,6 +20476,7 @@ DLL_EXPORT int kto_check_blz(char *blz,char *kto)
 #if DEBUG>0    /* es werden einige Funktionen benutzt, die nur in der Debug-Variante enthalten sind */
 DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,const char **bic,int *regel,RETVAL *retvals)
 {
+#line 19150 "perl/Business-KontoCheck/konto_check.lxx"
    char *blz_o,buffer[32],kto_o[16],*blz_n,*kto_n,*ptr,*dptr;
    const char *bicp;
    int ret,ret_regel,r,i;
@@ -20463,6 +20525,7 @@ DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,con
    }
    else  /* BLZ und Kto gleich */
       return ret;
+#line 19199 "perl/Business-KontoCheck/konto_check.lxx"
 }
 
 #else   /* !DEBUG */
@@ -20613,6 +20676,7 @@ DLL_EXPORT int kto_check_blz_dbg(char *blz,char *kto,RETVAL *retvals)
  * # Copyright (C) 2007 Michael Plugge <m.plugge@hs-mannheim.de>             #
  * ###########################################################################
  */
+#line 19350 "perl/Business-KontoCheck/konto_check.lxx"
 DLL_EXPORT int kto_check_pz_dbg(char *pz,char *kto,char *blz,RETVAL *retvals)
 {
    int untermethode,pz_methode;
@@ -20848,6 +20912,7 @@ DLL_EXPORT int get_lut_info2_b(char *lutname,int *version,char **prolog_p,char *
    }
    else
       **user_info_p=0;
+#line 19571 "perl/Business-KontoCheck/konto_check.lxx"
    FREE(prolog);
    return OK;
 }
@@ -20982,20 +21047,20 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
       case 3:
          return __DATE__ ", " __TIME__;    /* Compilierdatum und -zeit */
       case 4:                              /* Datum der Prüfziffermethode */
-         if(pz_aenderungen_aktivieren_2017_12)
-            return "05.03.2018";
+         if(pz_aenderungen_aktivieren_2018_09)
+            return "02.09.2018";
          else
-            return "04.12.2017 (Aenderungen vom 05.03.2018 enthalten aber noch nicht aktiviert)";
+            return "04.06.2018 (Aenderungen vom 02.09.2018 enthalten aber noch nicht aktiviert)";
       case 5:
-        return "05.03.2018";
+        return "02.09.2018";
       case 6:
-        return "26. November 2017";            /* Klartext-Datum der Bibliotheksversion */
+        return "1. September 2018";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "04";             /* Unterversionszahl */
+        return "05";             /* Unterversionszahl */
    }
 }
 
@@ -21141,6 +21206,7 @@ DLL_EXPORT int dump_lutfile(char *outputname,UINT4 *required)
       default:
          break;
    }
+#line 19804 "perl/Business-KontoCheck/konto_check.lxx"
    fputc('\n',out);
    while(--i)fputc('=',out);
    fputc('\n',out);
@@ -21465,6 +21531,7 @@ DLL_EXPORT const char *iban2bic_id(char *iban,int *retval,int *blz,int *kto)
    return iban2bic(iban,retval,b,k);
 }
 
+#line 20129 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion iban_gen(), iban_bic_gen() und iban_bic_gen1 +§§§1 */
 /* ###########################################################################
  * # Die Funktion iban_gen generiert aus Bankleitzahl und Kontonummer eine   #
@@ -22297,6 +22364,7 @@ DLL_EXPORT int ipi_check(char *zweck)
  * # Copyright (C) 2009,2011 Michael Plugge <m.plugge@hs-mannheim.de>        #
  * ###########################################################################
  */
+#line 20962 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion volltext_zeichen() +§§§2 */
 /* Diese Funktion gibt für Zeichen die bei der Volltextsuche gültig sind
@@ -23143,6 +23211,7 @@ static int qcmp_bic_h(const void *ap,const void *bp)
       return a-b;
 }
 
+#line 21809 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion qcmp_bic() +§§§3 */
 static int qcmp_bic(const void *ap,const void *bp)
@@ -23247,6 +23316,7 @@ static int qcmp_iban_regel(const void *ap,const void *bp)
    else 
       return a-b;
 }
+#line 21824 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion init_blzf() +§§§2
  * Diese Funktion initialisiert das Array mit den Bankleitzahlen für alle
@@ -23314,6 +23384,7 @@ DLL_EXPORT int konto_check_idx2blz(int idx,int *zweigstelle,int *retval)
 }
 
 /* Funktion suche_int1() +§§§2 */
+#line 21892 "perl/Business-KontoCheck/konto_check.lxx"
 static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int cnt,int such_idx)
 {
@@ -23364,6 +23435,7 @@ static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstell
 }
 
 /* Funktion suche_int2() +§§§2 */
+#line 21943 "perl/Business-KontoCheck/konto_check.lxx"
 static int suche_int2(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int such_idx,int pz_suche)
 {
@@ -23978,6 +24050,7 @@ static int cmp_suche_sort(const void *ap,const void *bp)
 DLL_EXPORT int lut_suche_sort1(int anzahl,int *blz_base,int *zweigstellen_base,int *idx,int *anzahl_o,int **idx_op,int **cnt_op,int uniq)
 {
    int i,j,last_idx,*idx_a,*cnt_o;
+#line 22559 "perl/Business-KontoCheck/konto_check.lxx"
 
    if(idx_op)*idx_op=NULL;
    if(cnt_op)*cnt_op=NULL;
@@ -24059,6 +24132,7 @@ DLL_EXPORT int lut_suche_sort2(int anzahl,int *blz,int *zweigstellen,int *anzahl
    return OK;
 }
 
+#line 22642 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_suche_volltext() +§§§2 */
 DLL_EXPORT int lut_suche_volltext(char *such_wort,int *anzahl,int *base_name_idx,char ***base_name,
       int *zweigstellen_anzahl,int **start_idx,int **zweigstellen_base,int **blz_base)
@@ -24188,7 +24262,7 @@ DLL_EXPORT int lut_suche_blz(int such1,int such2,int *anzahl,int **start_idx,int
    return suche_int1(such1,such2,anzahl,start_idx,zweigstellen_base,blz_base,&blz_f,&sort_blz,qcmp_blz,cnt,0);
 }
 
-#line 22789 "konto_check.lxx"
+#line 22792 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktion lut_suche_bic() +§§§2 */
 DLL_EXPORT int lut_suche_bic(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
       char ***base_name,int **blz_base)
@@ -24242,6 +24316,7 @@ DLL_EXPORT int lut_suche_pz(int such1,int such2,int *anzahl,int **start_idx,int 
 {
    int retval;
 
+
    if(anzahl)*anzahl=0;
    if(such2 && such1>such2)return INVALID_SEARCH_RANGE;
    if((init_status&7)<7)return LUT2_NOT_INITIALIZED;
@@ -24255,6 +24330,7 @@ DLL_EXPORT int lut_suche_pz(int such1,int such2,int *anzahl,int **start_idx,int 
 /* Funktion lut_suche_plz() +§§§2 */
 DLL_EXPORT int lut_suche_plz(int such1,int such2,int *anzahl,int **start_idx,int **zweigstellen_base,int **base_name,int **blz_base)
 {
+
    if(anzahl)*anzahl=0;
    if(such2 && such1>such2)return INVALID_SEARCH_RANGE;
    if((init_status&7)<7)return LUT2_NOT_INITIALIZED;
@@ -24267,6 +24343,7 @@ DLL_EXPORT int lut_suche_plz(int such1,int such2,int *anzahl,int **start_idx,int
 /* Funktion lut_suche_regel() +§§§2 */
 DLL_EXPORT int lut_suche_regel(int such1,int such2,int *anzahl,int **start_idx,int **zweigstellen_base,int **base_name,int **blz_base)
 {
+
    if(anzahl)*anzahl=0;
    if(such2 && such1>such2)return INVALID_SEARCH_RANGE;
    if((init_status&7)<7)return LUT2_NOT_INITIALIZED;
@@ -24276,6 +24353,7 @@ DLL_EXPORT int lut_suche_regel(int such1,int such2,int *anzahl,int **start_idx,i
    return suche_int2(such1*100,such2*100+99,anzahl,start_idx,zweigstellen_base,blz_base,&iban_regel,&sort_iban_regel,qcmp_iban_regel,LUT2_IBAN_REGEL_SORT,0);
 }
 
+#line 22825 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion lut_suche_bic_h() +§§§2 */
 DLL_EXPORT int lut_suche_bic_h(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
@@ -24661,6 +24739,7 @@ DLL_EXPORT const char *iban_ort(char *iban,int filiale,int*retval)
 {
    return iban_fkt_s(iban,filiale,retval,lut_ort);
 }
+#line 22914 "perl/Business-KontoCheck/konto_check.lxx"
 
 static int bic_fkt_c(char *bic1,int mode,int filiale,int *retval,char *base,int error)
 {
@@ -25949,6 +26028,7 @@ DLL_EXPORT const char *pz2str(int pz,int *ret)
       default:   return "???";
    }
 }
+#line 23869 "perl/Business-KontoCheck/konto_check.lxx"
 
 /* Funktion lut_keine_iban_berechnung() +§§§1 */
 /*
@@ -26063,7 +26143,7 @@ DLL_EXPORT int lut_keine_iban_berechnung(char *iban_blacklist,char *lutfile,int 
 /* Funktion pz_aenderungen_enable() +§§§1 */
 /* ###########################################################################
  * # Die Funktion pz_aenderungen_enable() dient dazu, den Status des Flags   #
- * # pz_aenderungen_aktivieren_2017_12 abzufragen bzw. zu setzen. Falls die Variable #
+ * # pz_aenderungen_aktivieren_2018_09 abzufragen bzw. zu setzen. Falls die Variable #
  * # set 1 ist, werden die Änderungen aktiviert, falls sie 0 ist, werden     #
  * # die Änderungen deaktiviert. Bei allen anderen Werten wird das aktuelle  #
  * # Flag nicht verändert, sondern nur der Status zurückgegeben.             #
@@ -26079,8 +26159,8 @@ DLL_EXPORT int lut_keine_iban_berechnung(char *iban_blacklist,char *lutfile,int 
 
 DLL_EXPORT int pz_aenderungen_enable(int set)
 {
-   if(set==0 || set==1)pz_aenderungen_aktivieren_2017_12=set;
-   return pz_aenderungen_aktivieren_2017_12;
+   if(set==0 || set==1)pz_aenderungen_aktivieren_2018_09=set;
+   return pz_aenderungen_aktivieren_2018_09;
 }
 
 #if DEBUG>0
@@ -26112,6 +26192,7 @@ DLL_EXPORT char *kto_check_test_vars(char *txt,UINT4 i)
 #endif
 
 
+#line 24033 "perl/Business-KontoCheck/konto_check.lxx"
 /* Funktionen *_id() +§§§1 */
 /* ###########################################################################
  * # Die folgenden Funktionen sind die id-Varianten von Funktionen, die      #
@@ -26368,6 +26449,741 @@ DLL_EXPORT int kc_id_free(int handle)
    return INVALID_HANDLE;
 }
 
+/* Funktionen für den Zugriff auf das SCL-Verzeichnis +§§§1 */
+/* Hilfsfunktion für die SCL-Routinen +§§§2 */
+/* Funktion cmp_bic() +§§§3 */
+/* ###########################################################################
+ * # cmp_bic() ist die Vergleichsfunktion für bic_binsearch() und            #
+ * # lut_write_scl_blocks() (zum Sortieren der BICs).                        #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+static int cmp_bic(const void *ap,const void *bp)
+{
+   int a,b,r;
+
+   a=*((int *)ap);
+   b=*((int *)bp);
+   if((r=strcmp(scl_bic_array[a],scl_bic_array[b])))
+      return r;
+   else 
+      return a-b;
+}
+
+/* Funktion bic_binsearch() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bic_binsearch() implementiert eine binäre Suche im         #
+ * # BIC-Array (rekursiv)                                                    #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+static int bic_binsearch(int links,int rechts,char *bic)
+{
+   int cmp,mitte;
+
+    if(links>rechts)return -1;   /* nicht gefunden */
+    mitte=(rechts+links)/2;
+    if(!(cmp=strcmp(scl_bic_array[mitte],bic)))return mitte;  /* Element gefunden */
+    if(cmp>0)
+        return bic_binsearch(links,mitte-1,bic);
+    else
+        return bic_binsearch(mitte+1,rechts,bic);
+}
+
+/* Funktion scl_idx() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion scl_idx sucht den Index zu einem BIC innerhalb der SCL-    #
+ * # Arrays. Der BIC wird zunächst so gesucht wie er angegeben ist.          #
+ * # Falls diese Suche erfolglos ist, wird getestet, ob im BIC-Verzeichnis   #
+ * # ein BIC mit Übereinstimmung in den ersten 8 Stellen und XXX in den drei #
+ * # letzten Stellen existiert (Extension BIC); falls dieser auch nicht      #
+ * # existiert, wird als Letztes ein 8-stelliger BIC gesucht (Wildcard-BIC). #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+static int scl_idx(const char *bic,int *retval)
+{
+   char such_bic[12];
+   int i,idx;
+
+   if(!scl_cnt || !scl_bic_array){
+      if(retval)*retval=NO_SCL_BLOCKS_LOADED;
+      return -1;
+   }
+   strcpy(such_bic,bic);
+   for(i=0;i<11 && such_bic[i];i++)such_bic[i]=toupper(such_bic[i]);
+
+      /* zunächst den BIC suchen wie angegeben */
+   idx=bic_binsearch(0,scl_cnt,such_bic);
+   if(idx>=0){
+      if(retval)*retval=OK;
+      return idx;
+   }
+   else{
+      if(such_bic[8]==0){  /* Such-BIC 8-stellig angegeben; BIC mit XXX extension testen */
+         such_bic[8]=such_bic[9]=such_bic[10]='X';
+         such_bic[11]=0;
+         idx=bic_binsearch(0,scl_cnt,such_bic);
+         if(idx>=0){
+            if(retval)*retval=OK_SCL_EXTENSION_BIC_USED;
+            return idx;
+         }
+         else{
+            if(retval)*retval=SCL_BIC_NOT_FOUND;
+            return -1;
+         }
+      }
+      else{
+            /* Wildcard-BIC suchen */
+         such_bic[8]=0;
+         idx=bic_binsearch(0,scl_cnt,such_bic);
+         if(idx>=0){
+            if(retval)*retval=OK_SCL_WILDCARD_BIC_USED;
+            return idx;
+         }
+         else{
+            if(retval)*retval=SCL_BIC_NOT_FOUND;
+            return -1;
+         }
+      }
+   }
+}
+
+/* Externe Schnittstelle für die SCL-Routinen +§§§2 */
+/* Funktion lut_write_scl_blocks() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion lut_write_scl_blocks() liest ein SCL-Verzeichnis ein und   #
+ * # schreibt die Daten in die angegebene LUT-Datei.                         #
+ * #                                                                         #
+ * # Beschreibung und weitere Infos:                                         #
+ * #    https://www.bundesbank.de/Redaktion/DE/Standardartikel/Aufgaben/Unbarer_Zahlungsverkehr/emz_scl_directory_fuer_den_sepa_clearer.html                                                                     #
+ * #                                                                         #
+ * # direkter Download-Link:                                                 #
+ * #    https://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/SEPA/verzeichnis_der_erreichbaren_zahlungsdienstleister.csv?__blob=publicationFile
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
+{
+   char c,*ptr,buffer[512],*scl_name_block_s,*scl_bic_block_s,*scl_flags_block_s,*ptr1,*ptr2,*ptr3;
+   char scl_gueltigkeit[16],scl_gueltigkeit_iso[16];
+   int cnt,i,rv,j,*iptr,jahr,monat,tag;
+   FILE *in,*lut;
+   struct stat stat_buffer;
+   struct tm z;
+   time_t ts;
+
+   if(!(in=fopen(inputfile,"r")))RETURN(FILE_READ_ERROR);
+   fgets(buffer,512,in);
+   if(strncmp(buffer,"Gueltig ab / valid from ",24))return SCL_INPUT_FORMAT_ERROR;
+   for(ptr=buffer;!isdigit(*ptr);ptr++);
+   strncpy(scl_gueltigkeit,ptr,16);
+   scl_gueltigkeit[10]=0;
+   jahr=atoi(scl_gueltigkeit+6);
+   monat=(scl_gueltigkeit[3]-'0')*10+scl_gueltigkeit[4]-'0';
+   tag=(scl_gueltigkeit[0]-'0')*10+scl_gueltigkeit[1]-'0';
+   z.tm_sec=z.tm_min=0;
+   z.tm_hour=6;   /* Die SCL-Datei wird um 6 Uhr morgens veröffentlicht */
+   z.tm_mday=tag;
+   z.tm_mon=monat;
+   z.tm_year=jahr-1900;
+   ts=mktime(&z);
+   snprintf(scl_gueltigkeit_iso,16,"%4d-%02d-%02d",jahr,monat,tag);
+   fgets(buffer,512,in);
+   if(strncmp(buffer,"BIC;Name;Service SCT;Service SDD;Service COR1;Service B2B;Service SCC",69))RETURN(SCL_INPUT_FORMAT_ERROR);
+
+   stat(inputfile,&stat_buffer);
+   cnt=stat_buffer.st_size/163+100;    /* etwas großzügig die Anzahl rechnen */
+
+   scl_bic_array=calloc(sizeof(char*),cnt);
+   scl_name_array=calloc(sizeof(char*),cnt);
+   scl_flags_array=calloc(sizeof(char*),cnt);
+
+   scl_bic_block=ptr1=calloc(12,cnt);
+   scl_name_block=ptr2=calloc(150,cnt);
+   scl_flags_block=ptr3=calloc(6,cnt);
+
+   /* SCL-Datei einlesen */
+   for(cnt=0;fgets(buffer,512,in);){
+      scl_bic_array[cnt]=ptr1;
+      scl_name_array[cnt]=ptr2;
+      scl_flags_array[cnt]=ptr3;
+      cnt++;
+      for(ptr=buffer;*ptr!=';' && !isspace(*ptr);*ptr1++=*ptr++);
+      c=*ptr;
+      *ptr1++=0; /* bei Leerzeichen am Ende dieses löschen */
+      *ptr++=0;
+
+      if(c==' ')while(*ptr++!=';' && *ptr!='\n');  /* Fehler in der Datei abfangen (fehlendes Trennzeichen) */
+      while((*ptr2++=*ptr++)!=';');   /* ptr steht zu Beginn der Schleife auf dem Namen */
+      ptr2-=2;
+      while(isspace(*ptr2))ptr2--;
+      *++ptr2=0;
+      ptr2++;
+
+      /* ptr steht nun auf den Flags */
+      *ptr3++=*ptr;
+      *ptr3++=*(ptr+2);
+      *ptr3++=*(ptr+4);
+      *ptr3++=*(ptr+6);
+      *ptr3++=*(ptr+8);
+      *ptr3++=0;
+   }
+   fclose(in);
+
+   /* Sortierarray aufbauen */
+   iptr=calloc(sizeof(int),cnt);
+   for(i=0;i<cnt;i++)iptr[i]=i;
+
+   /* vor dem Abspeichern der Blocks nach BICs sortieren */
+   qsort(iptr,cnt,sizeof(int),cmp_bic);
+
+   ptr1=scl_bic_block_s=calloc(1,ptr1-scl_bic_block+16);
+   ptr2=scl_name_block_s=calloc(1,ptr2-scl_name_block+16);
+   ptr3=scl_flags_block_s=calloc(1,ptr3-scl_flags_block+16);
+   for(i=0;i<cnt;i++){
+      j=iptr[i];
+      for(ptr=scl_bic_array[j];(*ptr1++=*ptr++););
+      for(ptr=scl_name_array[j];(*ptr2++=*ptr++););
+      for(ptr=scl_flags_array[j];(*ptr3++=*ptr++););
+   }
+   free(iptr);
+
+   if(!(lut=fopen(lutfile,"rb+")))RETURN(FILE_WRITE_ERROR);
+
+      /* zunächst mal testen ob es auch eine LUT2 Datei ist */
+   if(!(ptr=fgets(buffer,SLOT_BUFFER,lut)))RETURN(FILE_READ_ERROR);
+   while(*ptr && *ptr!='\n')ptr++;
+   *--ptr=0;
+   if(!strcmp(buffer,"BLZ Lookup Table/Format 1."))RETURN(LUT1_FILE_USED); /* alte LUT-Datei */
+   if(strcmp(buffer,"BLZ Lookup Table/Format 2."))RETURN(INVALID_LUT_FILE); /* keine LUT-Datei */
+
+      /* nun die Blocks schreiben */
+   rewind(lut);
+   sprintf(buffer,"cnt: %d, TS: %ld, Gueltigkeit: %s %s",cnt,(long)ts,scl_gueltigkeit,scl_gueltigkeit_iso);
+   if((rv=write_lut_block_int(lut,LUT2_SCL_INFO,strlen(buffer)+1,buffer))!=OK){
+      fclose(lut);
+      FREE(scl_bic_block_s);
+      FREE(scl_name_block_s);
+      FREE(scl_flags_block_s);
+      RETURN(rv);
+   }
+   if((rv=write_lut_block_int(lut,LUT2_SCL_BIC,(UINT4)(ptr1-scl_bic_block_s+1),scl_bic_block_s))!=OK){
+      fclose(lut);
+      FREE(scl_bic_block_s);
+      FREE(scl_name_block_s);
+      FREE(scl_flags_block_s);
+      RETURN(rv);
+   }
+   if((rv=write_lut_block_int(lut,LUT2_SCL_NAME,(UINT4)(ptr2-scl_name_block_s+1),scl_name_block_s))!=OK){
+      fclose(lut);
+      FREE(scl_bic_block_s);
+      FREE(scl_name_block_s);
+      FREE(scl_flags_block_s);
+      RETURN(rv);
+   }
+   if((rv=write_lut_block_int(lut,LUT2_SCL_FLAGS,(UINT4)(ptr3-scl_flags_block_s+1),scl_flags_block_s))!=OK){
+      fclose(lut);
+      FREE(scl_bic_block_s);
+      FREE(scl_name_block_s);
+      FREE(scl_flags_block_s);
+      RETURN(rv);
+   }
+
+   fclose(lut);
+   FREE(scl_bic_block_s);
+   FREE(scl_name_block_s);
+   FREE(scl_flags_block_s);
+   RETURN(OK);
+}
+
+#line 24542 "perl/Business-KontoCheck/konto_check.lxx"
+/* Funktion lut_scl_init() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion lut_scl_init() liest die SCL-Blocks aus einer LUT-Datei    #
+ * # und initialisiert die zugehörigen internen Datenstrukturen.             #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_init(char *lut_name)
+{
+   char *ptr,*end;
+   int i,cnt,rv;
+   static UINT4 block_size_0,block_size_1,block_size_2,block_size_3;
+   FILE *lut;
+
+   if(scl_bic_array && scl_name_array && scl_flags_array)return OK;  /* schon initialisiert */
+
+   if(!(lut=fopen(lut_name,"rb")))RETURN(FILE_READ_ERROR);
+   if((rv=read_lut_block_int(lut,0,LUT2_SCL_INFO,&block_size_0,&scl_info_block))<0){
+      fclose(lut);
+      if(rv==LUT2_BLOCK_NOT_IN_FILE)
+         RETURN(NO_SCL_BLOCKS);
+      else
+         return rv;
+   }
+   if((rv=read_lut_block_int(lut,0,LUT2_SCL_BIC,&block_size_1,&scl_bic_block))<0){
+      fclose(lut);
+      if(rv==LUT2_BLOCK_NOT_IN_FILE)
+         RETURN(NO_SCL_BLOCKS);
+      else
+         return rv;
+   }
+   if((rv=read_lut_block_int(lut,0,LUT2_SCL_NAME,&block_size_2,&scl_name_block))<0){
+      fclose(lut);
+      if(rv==LUT2_BLOCK_NOT_IN_FILE)
+         RETURN(NO_SCL_BLOCKS);
+      else
+         return rv;
+   }
+   if((rv=read_lut_block_int(lut,0,LUT2_SCL_FLAGS,&block_size_3,&scl_flags_block))<0){
+      fclose(lut);
+      if(rv==LUT2_BLOCK_NOT_IN_FILE)
+         RETURN(NO_SCL_BLOCKS);
+      else
+         return rv;
+   }
+   fclose(lut);
+   if((i=sscanf(scl_info_block,"cnt: %d, TS: %ld, Gueltigkeit: %15s %15s",
+               &cnt,&scl_ts,(char *)&scl_gueltigkeit,(char *)&scl_gueltigkeit_iso))!=4)RETURN(INVALID_SCL_INFO_BLOCK);
+
+   scl_bic_array=calloc(sizeof(char*),cnt);
+   scl_name_array=calloc(sizeof(char*),cnt);
+   scl_flags_array=calloc(sizeof(char*),cnt);
+
+   for(i=0,ptr=scl_bic_block,end=scl_bic_block+block_size_1;i<cnt && ptr<end;i++){
+      scl_bic_array[i]=ptr;
+      while(*ptr++ && ptr<end);
+   }
+
+   for(i=0,ptr=scl_name_block,end=scl_name_block+block_size_2;i<cnt && ptr<end;){
+      scl_name_array[i++]=ptr;
+      while(*ptr++ && ptr<end);
+   }
+
+   for(i=0,ptr=scl_flags_block,end=scl_flags_block+block_size_3;i<cnt && ptr<end;){
+      scl_flags_array[i++]=ptr;
+      while(*ptr++ && ptr<end);
+   }
+   scl_cnt=cnt;
+   RETURN(OK);
+}
+
+/* Funktion lut_scl_info() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion lut_scl_info() gibt Infos über die Anzahl der Einträge im  #
+ * # SCL-Verzeichnis sowie das Datum, ab wann die Datei gültig ist.          #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_info(char *lutfile,int *cnt,const char **gueltigkeit,const char **gueltigkeit_iso)
+{
+   int s_cnt,i,rv;
+   UINT4 block_size;
+   FILE *lut;
+
+      /* falls noch nicht geschehen, den SCL-Infoblock holen */
+   if(!scl_cnt){
+      if(!(lut=fopen(lutfile,"rb")))RETURN(FILE_READ_ERROR);
+      if((rv=read_lut_block_int(lut,0,LUT2_SCL_INFO,&block_size,&scl_info_block))<0){
+         fclose(lut);
+         if(rv==LUT2_BLOCK_NOT_IN_FILE)
+            RETURN(NO_SCL_BLOCKS);
+         else
+            return rv;
+      }
+      if((i=sscanf(scl_info_block,"cnt: %d, TS: %ld, Gueltigkeit: %15s %15s",
+            &s_cnt,&scl_ts,(char *)&scl_gueltigkeit,(char *)&scl_gueltigkeit_iso))!=4)RETURN(INVALID_SCL_INFO_BLOCK);
+   }
+   else
+      s_cnt=scl_cnt;
+
+   if(s_cnt)*cnt=s_cnt;
+   if(gueltigkeit)*gueltigkeit=scl_gueltigkeit;
+   if(gueltigkeit_iso)*gueltigkeit_iso=scl_gueltigkeit_iso;
+   return OK;
+}
+
+/* Funktion lut_scl_multi() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion lut_scl_multi() gibt alle Einträge des SCL-Verzeichnisses  #
+ * # zu einem gegebenen BIC zurück.                                          #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_multi(char *bic,const char **scl_flags,const char **used_bic,const char **scl_name)
+{
+   int i,rv;
+
+   i=scl_idx(bic,&rv);
+   if(rv<0)return rv;
+   if(scl_flags)*scl_flags=scl_flags_array[i];
+   if(used_bic)*used_bic=scl_bic_array[i];
+   if(scl_name)*scl_name=scl_name_array[i];
+   return rv;
+}
+
+/* Funktion lut_scl_sct() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag SCT (SEPA Credit Transfer) des SCL-      #
+ * # Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.                     #
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_sct(char *bic,int *retval)
+{
+   char *flags;
+   int i,rv;
+
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   flags=scl_flags_array[i];
+   return flags[0]-'0';
+}
+
+/* Funktion lut_scl_sdd() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag SDD (SEPA CORE Direct Debit (SEPA-Basis- #
+ * # lastschrift) des SCL-Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.#
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_sdd(char *bic,int *retval)
+{
+   char *flags;
+   int i,rv;
+
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   flags=scl_flags_array[i];
+   return flags[1]-'0';
+}
+
+/* Funktion lut_scl_cor1() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag COR1 (SEPA COR1 Direct Debit (SEPA-Basis-#
+ * # lastschrift mit verkürzter Vorlagefrist) des SCL-Verzeichnisses und     #
+ * # gibt das Flag (0 bzw. 1) zurück.                                        #
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_cor1(char *bic,int *retval)
+{
+   char *flags;
+   int i,rv;
+
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   flags=scl_flags_array[i];
+   return flags[2]-'0';
+}
+
+/* Funktion lut_scl_b2b() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag BCB (SEPA B2B Direct Debit (Sepa-Firmen- #
+ * # lastschrift) des SCL-Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.#
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_b2b(char *bic,int *retval)
+{
+   char *flags;
+   int i,rv;
+
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   flags=scl_flags_array[i];
+   return flags[3]-'0';
+}
+
+/* Funktion lut_scl_scc() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag SCC (SEPA Card Clearing, SCC Karten-     #
+ * # einzüge) des SCL-Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.    #
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_scc(char *bic,int *retval)
+{
+   char *flags;
+   int i,rv;
+
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   flags=scl_flags_array[i];
+   return flags[4]-'0';
+}
+
+/* Funktion lut_scl_multi_blz() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion lut_scl_multi_blz() gibt alle Einträge des SCL-            #
+ * # Verzeichnisses zu einer gegebenen BLZ zurück. Da die BLZ zunächst in    #
+ * # einen BIC umgewandelt werden muß, müssen auch die Blocks BLZ und BIC    #
+ * # der LUT-Datei initialisiert sein, sonst wird ein Fehler zurückgegeben.  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_multi_blz(char *blz,const char **scl_flags,const char **used_bic,const char **scl_name)
+{
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic(blz,0,&rv);
+   if(rv<0)return rv;
+   i=scl_idx(bic,&rv);
+   if(rv<0)return rv;
+   if(scl_flags)*scl_flags=scl_flags_array[i];
+   if(used_bic)*used_bic=scl_bic_array[i];
+   if(scl_name)*scl_name=scl_name_array[i];
+   return rv;
+}
+
+/* Funktion lut_scl_sct_blz() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag SCT (SEPA Credit Transfer) des SCL-      #
+ * # Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.                     #
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_sct_blz(char *blz,int *retval,const char **used_bic)
+{
+   char *flags;
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic(blz,0,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   if(used_bic)*used_bic=scl_bic_array[i];
+   flags=scl_flags_array[i];
+   return flags[0]-'0';
+}
+
+/* Funktion lut_scl_sdd_blz() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag SDD (SEPA CORE Direct Debit (SEPA-Basis- #
+ * # lastschrift) des SCL-Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.#
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_sdd_blz(char *blz,int *retval,const char **used_bic)
+{
+   char *flags;
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic(blz,0,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   if(used_bic)*used_bic=scl_bic_array[i];
+   flags=scl_flags_array[i];
+   return flags[1]-'0';
+}
+
+/* Funktion lut_scl_cor1_blz() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag COR1 (SEPA COR1 Direct Debit (SEPA-Basis-#
+ * # lastschrift mit verkürzter Vorlagefrist) des SCL-Verzeichnisses und     #
+ * # gibt das Flag (0 bzw. 1) zurück.                                        #
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_cor1_blz(char *blz,int *retval,const char **used_bic)
+{
+   char *flags;
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic(blz,0,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   if(used_bic)*used_bic=scl_bic_array[i];
+   flags=scl_flags_array[i];
+   return flags[2]-'0';
+}
+
+/* Funktion lut_scl_b2b_blz() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag BCB (SEPA B2B Direct Debit (Sepa-Firmen- #
+ * # lastschrift) des SCL-Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.#
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_b2b_blz(char *blz,int *retval,const char **used_bic)
+{
+   char *flags;
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic(blz,0,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   if(used_bic)*used_bic=scl_bic_array[i];
+   flags=scl_flags_array[i];
+   return flags[3]-'0';
+}
+
+/* Funktion lut_scl_scc_blz() +§§§3 */
+/* ###########################################################################
+ * # Die Funktion bestimmt das Flag SCC (SEPA Card Clearing, SCC Karten-     #
+ * # einzüge) des SCL-Verzeichnisses und gibt das Flag (0 bzw. 1) zurück.    #
+ * # Im Fehlerfall wird -1 zurückgegeben und die Variable retval auf den     #
+ * # entsprechende Fehlercode (<0) gesetzt.                                  #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_scc_blz(char *blz,int *retval,const char **used_bic)
+{
+   char *flags;
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic(blz,0,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   i=scl_idx(bic,&rv);
+   if(rv<0){
+      if(retval)*retval=rv;
+      return -1;
+   }
+   else
+      if(retval)*retval=OK;
+   if(used_bic)*used_bic=scl_bic_array[i];
+   flags=scl_flags_array[i];
+   return flags[4]-'0';
+}
+
+/* Funktion lut_scl_multi_blz_i() +§§§3 */
+/* ###########################################################################
+ * # Diese Funktion entspricht der Funktion lut_scl_multi_blz(), nur wird    #
+ * # die BLZ als Integer-Wert statt als String übergeben.                    #
+ * #                                                                         #
+ * # Copyright (C) 2018 Michael Plugge <m.plugge@hs-mannheim.de>             #
+ * ###########################################################################
+ */
+DLL_EXPORT int lut_scl_multi_blz_i(int blz,const char **scl_flags,const char **used_bic,const char **scl_name)
+{
+   const char *bic;
+   int i,rv;
+
+   bic=lut_bic_i(blz,0,&rv);
+   if(rv<0)return rv;
+   i=scl_idx(bic,&rv);
+   if(rv<0)return rv;
+   if(scl_flags)*scl_flags=scl_flags_array[i];
+   if(used_bic)*used_bic=scl_bic_array[i];
+   if(scl_name)*scl_name=scl_name_array[i];
+   return rv;
+}
 
 #else /* !INCLUDE_KONTO_CHECK_DE */
 /* Leerdefinitionen für !INCLUDE_KONTO_CHECK_DE +§§§1 */
@@ -26553,4 +27369,20 @@ XI lut_keine_iban_berechnung(char *iban_blacklist,char *lutfile,int set)EXCLUDED
 XI pz_aenderungen_enable(int set)EXCLUDED
 XC kc_id2ptr(int handle,int *retval)EXCLUDED_S
 XI kc_id_free(int handle)EXCLUDED
+XI lut_scl_init(char *lut_name)EXCLUDED
+XI lut_scl_info(char *lutfile,int *cnt,const char **gueltigkeit,const char **gueltigkeit_iso)EXCLUDED_V
+XI lut_write_scl_blocks(char *inputfile,char *lutfile)EXCLUDED
+XI lut_scl_multi(char *bic,const char **used_bic,const char **scl_name,const char **scl_flags)EXCLUDED
+XI lut_scl_multi_blz(char *blz,const char **used_bic,const char **scl_name,const char **scl_flags)EXCLUDED
+XI lut_scl_multi_blz_i(int blz,const char **used_bic,const char **scl_name,const char **scl_flags)EXCLUDED
+XI lut_scl_sct(char *bic)EXCLUDED
+XI lut_scl_sdd(char *bic)EXCLUDED
+XI lut_scl_cor1(char *bic)EXCLUDED
+XI lut_scl_b2b(char *bic)EXCLUDED
+XI lut_scl_scc(char *bic)EXCLUDED
+XI lut_scl_sct_blz(char *blz)EXCLUDED
+XI lut_scl_sdd_blz(char *blz)EXCLUDED
+XI lut_scl_cor1_blz(char *blz)EXCLUDED
+XI lut_scl_b2b_blz(char *blz)EXCLUDED
+XI lut_scl_scc_blz(char *blz)EXCLUDED
 #endif

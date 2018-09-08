@@ -1,0 +1,17 @@
+0.003   2018-09-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention App::finquotehist and Finance::QuoteHist.
+
+
+0.002   2018-09-07 (PERLANCAR)
+
+	- [bugfix][doc] Show examples from Rinci metadata.
+
+
+0.001   2018-09-07 (PERLANCAR)
+
+        - First early release, for testing. All the sources that I tried with
+          Finance::Quote 1.47 returned empty: nasdaq, nyse, asia. I'm a bit
+          pessimistic with this module.

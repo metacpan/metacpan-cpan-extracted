@@ -13,7 +13,7 @@ use Devel::MAT;
 
 my $ADDR = qr/0x[0-9a-f]+/;
 
-my $DUMPFILE = "test.pmat";
+my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
 
 Devel::MAT::Dumper::dump( $DUMPFILE );
 END { unlink $DUMPFILE; }
@@ -48,20 +48,14 @@ BEGIN { our @AofA = ( [] ); }
 {
    my @pvs = grep { $_->desc =~ m/^SCALAR/ and
                     defined $_->pv and
-                    $_->pv eq "test.pmat" } $df->heap;
+                    $_->pv eq $DUMPFILE } $df->heap;
 
-   # There's likely 3 items in this list:
-   #   2 constants within the main code
+   # There's likely only one item in this list:
    #   1 value of the $DUMPFILE lexical itself
-   my @constants   = grep {
-      grep { $_->name eq 'a constant' } $_->inrefs
-   } @pvs;
-
    my ( $lexical ) = grep {
       grep { $_->name eq 'the lexical $DUMPFILE' } $_->inrefs
    } @pvs;
 
-   ok( scalar @constants, 'Found some constants' );
    ok( $lexical, 'Found the $DUMPFILE lexical' );
 }
 

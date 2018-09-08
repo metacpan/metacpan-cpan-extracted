@@ -1,3 +1,13 @@
+0.005   2018-09-07 (PERLANCAR)
+
+	- [build] Rebuild with App::lcpan 1.025 for fixed %authors_args.
+
+
+0.004   2018-09-07 (PERLANCAR)
+
+	- Allow multiple arguments (modules, dists, authors).
+
+
 0.003   2017-07-10 (PERLANCAR)
 
 	- No functional changes.

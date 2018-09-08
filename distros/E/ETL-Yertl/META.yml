@@ -37,49 +37,52 @@ no_index:
 provides:
   ETL::Yertl:
     file: lib/ETL/Yertl.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Adapter::graphite:
     file: lib/ETL/Yertl/Adapter/graphite.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Adapter::influxdb:
     file: lib/ETL/Yertl/Adapter/influxdb.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Command::ygrok:
     file: lib/ETL/Yertl/Command/ygrok.pm
-    version: '0.040'
-  ETL::Yertl::Command::yq:
-    file: lib/ETL/Yertl/Command/yq.pm
-    version: '0.040'
-  ETL::Yertl::Command::yq::Regex:
-    file: lib/ETL/Yertl/Command/yq/Regex.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Command::ysql:
     file: lib/ETL/Yertl/Command/ysql.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Command::yts:
     file: lib/ETL/Yertl/Command/yts.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Format:
     file: lib/ETL/Yertl/Format.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Format::csv:
     file: lib/ETL/Yertl/Format/csv.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Format::json:
     file: lib/ETL/Yertl/Format/json.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::Format::yaml:
     file: lib/ETL/Yertl/Format/yaml.pm
-    version: '0.040'
+    version: '0.041'
   ETL::Yertl::FormatStream:
     file: lib/ETL/Yertl/FormatStream.pm
-    version: '0.040'
+    version: '0.041'
+  ETL::Yertl::InputSeries:
+    file: lib/ETL/Yertl/InputSeries.pm
+    version: '0.041'
+  ETL::Yertl::LineStream:
+    file: lib/ETL/Yertl/LineStream.pm
+    version: '0.041'
   ETL::Yertl::Transform:
     file: lib/ETL/Yertl/Transform.pm
-    version: '0.040'
+    version: '0.041'
+  ETL::Yertl::Transform::Yq:
+    file: lib/ETL/Yertl/Transform/Yq.pm
+    version: '0.041'
   ETL::Yertl::Util:
     file: lib/ETL/Yertl/Util.pm
-    version: '0.040'
+    version: '0.041'
 recommends:
   DBD::SQLite: '0'
   DBI: '0'
@@ -116,7 +119,7 @@ resources:
   bugtracker: https://github.com/preaction/ETL-Yertl/issues
   homepage: https://github.com/preaction/ETL-Yertl
   repository: https://github.com/preaction/ETL-Yertl.git
-version: '0.040'
+version: '0.041'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Luke Triantafyllidis <ltriant@cpan.org>'

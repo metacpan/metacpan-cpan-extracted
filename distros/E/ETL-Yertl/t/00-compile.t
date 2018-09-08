@@ -6,15 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ETL/Yertl.pm',
     'ETL/Yertl/Adapter/graphite.pm',
     'ETL/Yertl/Adapter/influxdb.pm',
     'ETL/Yertl/Command/ygrok.pm',
-    'ETL/Yertl/Command/yq.pm',
-    'ETL/Yertl/Command/yq/Regex.pm',
     'ETL/Yertl/Command/ysql.pm',
     'ETL/Yertl/Command/yts.pm',
     'ETL/Yertl/Format.pm',
@@ -22,7 +20,10 @@ my @module_files = (
     'ETL/Yertl/Format/json.pm',
     'ETL/Yertl/Format/yaml.pm',
     'ETL/Yertl/FormatStream.pm',
+    'ETL/Yertl/InputSeries.pm',
+    'ETL/Yertl/LineStream.pm',
     'ETL/Yertl/Transform.pm',
+    'ETL/Yertl/Transform/Yq.pm',
     'ETL/Yertl/Util.pm'
 );
 

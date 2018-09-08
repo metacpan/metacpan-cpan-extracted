@@ -1,8 +1,6 @@
 package Net::Gitlab;
-
+$Net::Gitlab::VERSION = '0.08';
 ## no critic( ValuesAndExpressions::ProhibitAccessOfPrivateData )
-
-# ABSTRACT: Talk to a Gitlab installation via its API.
 
 
 use utf8;
@@ -18,8 +16,6 @@ use Params::Validate::Checks ':all';
 use Regexp::Common 'Email::Address';
 
 my $PASSWD_LENGTH = 6; ## no critic ( ValuesAndExpressions::ProhibitMagicNumbers )
-
-our $VERSION = '0.05'; # VERSION
 
 {  # Hide
 
@@ -637,11 +633,12 @@ __END__
 
 =head1 NAME
 
-Net::Gitlab - Talk to a Gitlab installation via its API.
+Net::Gitlab - Talk to a Gitlab installation via its API. (DEPRECATED)
 
-=head1 VERSION
+=head1 DEPRECATED
 
-  This document describes v0.05 of Net::Gitlab - released October 07, 2014 as part of Net-Gitlab.
+This module is no longer being maintained.
+Please see L<GitLab::API::v4> as an alternative.
 
 =head1 METHODS
 
@@ -655,12 +652,25 @@ See perlmodinstall for information and options on installing Perl modules.
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/harleypig/Net-Gitlab>
-and may be cloned from L<git://https://github.com/harleypig/Net-Gitlab.git>
+The development version is on github at L<https://github.com/bluefeet/Net-Gitlab>.
 
-=head1 AUTHOR
+=head1 ORIGINAL AUTHOR
 
-Alan Young <harleypig@gmail.com>
+Alan Young <harleypigE<64>gmail.com>
+
+=head1 CURRENT MAINTAINER
+
+Aran Clary Deltac <bluefeetE<64>gmail.com>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Mohammad S Anwar <mohammad.anwarE<64>yahoo.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

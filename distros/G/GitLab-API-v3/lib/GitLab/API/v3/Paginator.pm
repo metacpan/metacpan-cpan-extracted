@@ -1,5 +1,5 @@
 package GitLab::API::v3::Paginator;
-$GitLab::API::v3::Paginator::VERSION = '1.02';
+$GitLab::API::v3::Paginator::VERSION = '1.04';
 =head1 NAME
 
 GitLab::API::v3::Paginator - Iterate through paginated GitLab v3 API records.

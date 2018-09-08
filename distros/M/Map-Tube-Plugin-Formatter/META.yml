@@ -20,19 +20,19 @@ no_index:
 provides:
   Map::Tube::Plugin::Formatter:
     file: lib/Map/Tube/Plugin/Formatter.pm
-    version: '0.14'
+    version: '0.15'
   Map::Tube::Plugin::Formatter::Utils:
     file: lib/Map/Tube/Plugin/Formatter/Utils.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   JSON: '2.53'
   Map::Tube::Exception: '3.12'
   Moo::Role: '2.000000'
   XML::Twig: '3.48'
   YAML: '0.84'
-  namespace::clean: '0.24'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube-Plugin-Formatter.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

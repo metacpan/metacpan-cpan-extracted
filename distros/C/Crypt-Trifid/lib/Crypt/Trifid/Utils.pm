@@ -1,6 +1,6 @@
 package Crypt::Trifid::Utils;
 
-$Crypt::Trifid::Utils::VERSION   = '0.09';
+$Crypt::Trifid::Utils::VERSION   = '0.10';
 $Crypt::Trifid::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Trifid::Utils - Helper package for Crypt::Trifid.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 

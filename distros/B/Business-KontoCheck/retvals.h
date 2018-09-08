@@ -48,6 +48,12 @@ DLL_EXPORT const char *kto_check_retval2txt(int retval)
 DLL_EXPORT const char *kto_check_retval2iso(int retval)
 {
    switch(retval){
+      case NO_SCL_BLOCKS_LOADED: return "die SCL-Blocks wurden noch nicht eingelesen";
+      case NO_SCL_INFO_BLOCK: return "Der Info-Block des SCL-Verzeichnisses wurde noch nicht eingelesen";
+      case SCL_BIC_NOT_FOUND: return "Der BIC wurde im SCL-Verzeichnis nicht gefunden";
+      case INVALID_SCL_INFO_BLOCK: return "Ung¸ltiger SCL-Info-Block in der LUT-Datei";
+      case NO_SCL_BLOCKS: return "Keine SCL-Blocks in der LUT-Datei enthalten";
+      case SCL_INPUT_FORMAT_ERROR: return "Ung¸ltige Eingabewerte in der SCL-Datei";
       case INVALID_REGULAR_EXPRESSION_CNT: return "Ung¸ltiger Z‰hler in regul‰rem Ausdruck (innerhalb von {})";
       case INVALID_REGULAR_EXPRESSION: return "Ung¸ltiger regul‰rer Ausdruck (enth‰lt zwei Zeichen aus [+?*] nacheinander)";
       case INVALID_HANDLE: return "Ung¸ltiges Handle angegeben";
@@ -202,6 +208,8 @@ DLL_EXPORT const char *kto_check_retval2iso(int retval)
       case OK_KTO_REPLACED_NO_PZ: return "ok, die Kontonummer wurde ersetzt, die neue Kontonummer hat keine Pr¸fziffer";
       case OK_UNTERKONTO_ATTACHED: return "ok, es wurde ein (weggelassenes) Unterkonto angef¸gt";
       case OK_SHORT_BIC_USED: return "ok, f¸r den BIC wurde die Zweigstellennummer allerdings durch XXX ersetzt";
+      case OK_SCL_EXTENSION_BIC_USED: return "ok, f¸r den BIC wurde die Extension XXX angeh‰ngt";
+      case OK_SCL_WILDCARD_BIC_USED: return "ok, f¸r den BIC wurde die Wildcard-Version (8stellig) benutzt";
       default: return "ung¸ltiger R¸ckgabewert";
    }
 }
@@ -218,6 +226,12 @@ DLL_EXPORT const char *kto_check_retval2iso(int retval)
 DLL_EXPORT const char *kto_check_retval2dos(int retval)
 {
    switch(retval){
+      case NO_SCL_BLOCKS_LOADED: return "die SCL-Blocks wurden noch nicht eingelesen";
+      case NO_SCL_INFO_BLOCK: return "Der Info-Block des SCL-Verzeichnisses wurde noch nicht eingelesen";
+      case SCL_BIC_NOT_FOUND: return "Der BIC wurde im SCL-Verzeichnis nicht gefunden";
+      case INVALID_SCL_INFO_BLOCK: return "UngÅltiger SCL-Info-Block in der LUT-Datei";
+      case NO_SCL_BLOCKS: return "Keine SCL-Blocks in der LUT-Datei enthalten";
+      case SCL_INPUT_FORMAT_ERROR: return "UngÅltige Eingabewerte in der SCL-Datei";
       case INVALID_REGULAR_EXPRESSION_CNT: return "UngÅltiger ZÑ hler in regulÑ rem Ausdruck (innerhalb von {})";
       case INVALID_REGULAR_EXPRESSION: return "UngÅltiger regulÑ rer Ausdruck (enthÑ lt zwei Zeichen aus [+?*] nacheinander)";
       case INVALID_HANDLE: return "UngÅltiges Handle angegeben";
@@ -372,6 +386,8 @@ DLL_EXPORT const char *kto_check_retval2dos(int retval)
       case OK_KTO_REPLACED_NO_PZ: return "ok, die Kontonummer wurde ersetzt, die neue Kontonummer hat keine PrÅfziffer";
       case OK_UNTERKONTO_ATTACHED: return "ok, es wurde ein (weggelassenes) Unterkonto angefÅgt";
       case OK_SHORT_BIC_USED: return "ok, fÅr den BIC wurde die Zweigstellennummer allerdings durch XXX ersetzt";
+      case OK_SCL_EXTENSION_BIC_USED: return "ok, fÅr den BIC wurde die Extension XXX angehÑ ngt";
+      case OK_SCL_WILDCARD_BIC_USED: return "ok, fÅr den BIC wurde die Wildcard-Version (8stellig) benutzt";
       default: return "ungÅltiger RÅckgabewert";
    }
 }
@@ -388,6 +404,12 @@ DLL_EXPORT const char *kto_check_retval2dos(int retval)
 DLL_EXPORT const char *kto_check_retval2html(int retval)
 {
    switch(retval){
+      case NO_SCL_BLOCKS_LOADED: return "die SCL-Blocks wurden noch nicht eingelesen";
+      case NO_SCL_INFO_BLOCK: return "Der Info-Block des SCL-Verzeichnisses wurde noch nicht eingelesen";
+      case SCL_BIC_NOT_FOUND: return "Der BIC wurde im SCL-Verzeichnis nicht gefunden";
+      case INVALID_SCL_INFO_BLOCK: return "Ung&uuml;ltiger SCL-Info-Block in der LUT-Datei";
+      case NO_SCL_BLOCKS: return "Keine SCL-Blocks in der LUT-Datei enthalten";
+      case SCL_INPUT_FORMAT_ERROR: return "Ung&uuml;ltige Eingabewerte in der SCL-Datei";
       case INVALID_REGULAR_EXPRESSION_CNT: return "Ung&uuml;ltiger Z&auml;hler in regul&auml;rem Ausdruck (innerhalb von {})";
       case INVALID_REGULAR_EXPRESSION: return "Ung&uuml;ltiger regul&auml;rer Ausdruck (enth&auml;lt zwei Zeichen aus [+?*] nacheinander)";
       case INVALID_HANDLE: return "Ung&uuml;ltiges Handle angegeben";
@@ -542,6 +564,8 @@ DLL_EXPORT const char *kto_check_retval2html(int retval)
       case OK_KTO_REPLACED_NO_PZ: return "ok, die Kontonummer wurde ersetzt, die neue Kontonummer hat keine Pr&uuml;fziffer";
       case OK_UNTERKONTO_ATTACHED: return "ok, es wurde ein (weggelassenes) Unterkonto angef&uuml;gt";
       case OK_SHORT_BIC_USED: return "ok, f&uuml;r den BIC wurde die Zweigstellennummer allerdings durch XXX ersetzt";
+      case OK_SCL_EXTENSION_BIC_USED: return "ok, f&uuml;r den BIC wurde die Extension XXX angeh&auml;ngt";
+      case OK_SCL_WILDCARD_BIC_USED: return "ok, f&uuml;r den BIC wurde die Wildcard-Version (8stellig) benutzt";
       default: return "ung&uuml;ltiger R&uuml;ckgabewert";
    }
 }
@@ -558,6 +582,12 @@ DLL_EXPORT const char *kto_check_retval2html(int retval)
 DLL_EXPORT const char *kto_check_retval2utf8(int retval)
 {
    switch(retval){
+      case NO_SCL_BLOCKS_LOADED: return "die SCL-Blocks wurden noch nicht eingelesen";
+      case NO_SCL_INFO_BLOCK: return "Der Info-Block des SCL-Verzeichnisses wurde noch nicht eingelesen";
+      case SCL_BIC_NOT_FOUND: return "Der BIC wurde im SCL-Verzeichnis nicht gefunden";
+      case INVALID_SCL_INFO_BLOCK: return "Ung√ºltiger SCL-Info-Block in der LUT-Datei";
+      case NO_SCL_BLOCKS: return "Keine SCL-Blocks in der LUT-Datei enthalten";
+      case SCL_INPUT_FORMAT_ERROR: return "Ung√ºltige Eingabewerte in der SCL-Datei";
       case INVALID_REGULAR_EXPRESSION_CNT: return "Ung√ºltiger Z√§hler in regul√§rem Ausdruck (innerhalb von {})";
       case INVALID_REGULAR_EXPRESSION: return "Ung√ºltiger regul√§rer Ausdruck (enth√§lt zwei Zeichen aus [+?*] nacheinander)";
       case INVALID_HANDLE: return "Ung√ºltiges Handle angegeben";
@@ -712,6 +742,8 @@ DLL_EXPORT const char *kto_check_retval2utf8(int retval)
       case OK_KTO_REPLACED_NO_PZ: return "ok, die Kontonummer wurde ersetzt, die neue Kontonummer hat keine Pr√ºfziffer";
       case OK_UNTERKONTO_ATTACHED: return "ok, es wurde ein (weggelassenes) Unterkonto angef√ºgt";
       case OK_SHORT_BIC_USED: return "ok, f√ºr den BIC wurde die Zweigstellennummer allerdings durch XXX ersetzt";
+      case OK_SCL_EXTENSION_BIC_USED: return "ok, f√ºr den BIC wurde die Extension XXX angeh√§ngt";
+      case OK_SCL_WILDCARD_BIC_USED: return "ok, f√ºr den BIC wurde die Wildcard-Version (8stellig) benutzt";
       default: return "ung√ºltiger R√ºckgabewert";
    }
 }
@@ -728,6 +760,12 @@ DLL_EXPORT const char *kto_check_retval2utf8(int retval)
 DLL_EXPORT const char *kto_check_retval2txt_short(int retval)
 {
    switch(retval){
+      case NO_SCL_BLOCKS_LOADED: return "NO_SCL_BLOCKS_LOADED";
+      case NO_SCL_INFO_BLOCK: return "NO_SCL_INFO_BLOCK";
+      case SCL_BIC_NOT_FOUND: return "SCL_BIC_NOT_FOUND";
+      case INVALID_SCL_INFO_BLOCK: return "INVALID_SCL_INFO_BLOCK";
+      case NO_SCL_BLOCKS: return "NO_SCL_BLOCKS";
+      case SCL_INPUT_FORMAT_ERROR: return "SCL_INPUT_FORMAT_ERROR";
       case INVALID_REGULAR_EXPRESSION_CNT: return "INVALID_REGULAR_EXPRESSION_CNT";
       case INVALID_REGULAR_EXPRESSION: return "INVALID_REGULAR_EXPRESSION";
       case INVALID_HANDLE: return "INVALID_HANDLE";
@@ -882,6 +920,8 @@ DLL_EXPORT const char *kto_check_retval2txt_short(int retval)
       case OK_KTO_REPLACED_NO_PZ: return "OK_KTO_REPLACED_NO_PZ";
       case OK_UNTERKONTO_ATTACHED: return "OK_UNTERKONTO_ATTACHED";
       case OK_SHORT_BIC_USED: return "OK_SHORT_BIC_USED";
+      case OK_SCL_EXTENSION_BIC_USED: return "OK_SCL_EXTENSION_BIC_USED";
+      case OK_SCL_WILDCARD_BIC_USED: return "OK_SCL_WILDCARD_BIC_USED";
       default: return "UNDEFINED_RETVAL";
    }
 }

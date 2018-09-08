@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extension for accesing GPIO pins on a Raspberry Pi via the BCM 2835 GPIO'
+abstract: 'Perl extension for accessing GPIO pins on a Raspberry Pi via the BCM 2835 GPIO'
 author:
   - 'Mike McCauley <mikem@airspayce.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,4 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '1.93'
+version: '1.94'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@ package GeoIP2::Record::Location;
 use strict;
 use warnings;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006001';
 
 use Moo;
 
@@ -69,7 +69,7 @@ GeoIP2::Record::Location - Contains data for the location record associated with
 
 =head1 VERSION
 
-version 2.005001
+version 2.006001
 
 =head1 SYNOPSIS
 

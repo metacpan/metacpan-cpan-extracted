@@ -3,7 +3,7 @@ package GeoIP2::Error::WebService;
 use strict;
 use warnings;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006001';
 
 use Moo;
 
@@ -37,7 +37,7 @@ GeoIP2::Error::WebService - An explicit error from the GeoIP2 web service
 
 =head1 VERSION
 
-version 2.005001
+version 2.006001
 
 =head1 SYNOPSIS
 

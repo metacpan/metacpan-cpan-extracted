@@ -24,6 +24,7 @@ use_ok( 'Devel::MAT::Tool::Outrefs' );
 use_ok( 'Devel::MAT::Tool::Reachability' );
 use_ok( 'Devel::MAT::Tool::Show' );
 use_ok( 'Devel::MAT::Tool::Sizes' );
+use_ok( 'Devel::MAT::Tool::Summary' );
 use_ok( 'Devel::MAT::Tool::Symbols' );
 
 done_testing;

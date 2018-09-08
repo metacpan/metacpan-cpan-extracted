@@ -52,6 +52,7 @@
          },
          "requires" : {
             "Graph" : "0",
+            "List::Util" : "1.43",
             "Module::Runtime" : "0",
             "Moo" : "1.001000",
             "Path::Tiny" : "0.018",
@@ -78,7 +79,7 @@
    "provides" : {
       "File::Rotate::Simple" : {
          "file" : "lib/File/Rotate/Simple.pm",
-         "version" : "v0.2.3"
+         "version" : "v0.2.4"
       }
    },
    "release_status" : "stable",
@@ -92,7 +93,7 @@
          "web" : "https://github.com/robrwo/File-Rotate-Simple"
       }
    },
-   "version" : "v0.2.3",
+   "version" : "v0.2.4",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

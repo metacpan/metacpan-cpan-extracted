@@ -1,0 +1,30 @@
+---
+abstract: 'ensure that any code uses L<Email::Address::XS> instead of L<Email::Address>'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  Email::Address: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Address-UseXS
+requires:
+  Email::Address::XS: '0'
+resources:
+  repository: git://github.com/team-at-cpan/Email-Address-UseXS.git
+version: '1.000'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

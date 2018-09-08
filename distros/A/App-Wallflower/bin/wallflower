@@ -13,7 +13,7 @@ wallflower - Sorry I can't dance, I'm hanging on to my friend's purse
 
 =head1 VERSION
 
-version 1.012
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -153,12 +153,20 @@ unclear where to fix it, or if it can be fixed at all. See
 L<Wallflower::Tutorial/URI SEMANTICS COMPARED TO DIRECTORY SEMANTICS> for
 background on this.
 
-Any URL returning a status other than C<200> will be logged,
-but not saved. URLs returning a C<301> status (moved) are followed.
+Any response with a status other than C<200> will be logged,
+but not saved. Responses with a C<301> status (moved) are followed.
 
-Only the path component is used to fetch the response, so URLs
-pointing to other sites will likely return a C<404> (or fetch the
-I<local> page if it exists in the application).
+B<wallflower> sends the C<If-Modified-Since> header if the target
+file for a given URL already exists in the destination directory.
+If the application replies with a C<304> status, the file is not
+modified. If the 304 response contains a C<Content-Type> header
+and I<--follow> is enabled, the file will be searched for more
+links to follow.
+
+With the I<--host> option, it's possible to indicate to B<wallflower>
+that some fully qualified URL should also be processed via the application.
+Any URL with a hostname that doesn't match C<localhost>, the host in
+the I<--url> option or a host given with I<--host> will be skipped.
 
 =head1 ACKNOWLEDGEMENTS
 

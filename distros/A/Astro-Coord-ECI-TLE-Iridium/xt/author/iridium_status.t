@@ -31,7 +31,7 @@ my $ua = LWP::UserAgent->new(
 #    ssl_opts	=> { verify_hostname	=> 0 },	# Necessary until Perl recognizes McCants' cert.
 );
 
-my $asof = time_gm( 0, 0, 22, 27, 7, 2018 );
+my $asof = time_gm( 0, 0, 18, 4, 8, 2018 );
 
 foreach (
 	["T. S. Kelso's Iridium list",
@@ -42,7 +42,6 @@ foreach (
 24795IRIDIUM 5 [-]
 24796IRIDIUM 4 [-]
 24836IRIDIUM 914 [-]
-24837IRIDIUM 12 [-]
 24839IRIDIUM 10 [+]
 24841IRIDIUM 16 [-]
 24842IRIDIUM 911 [-]
@@ -69,11 +68,10 @@ foreach (
 25078IRIDIUM 44 [-]
 25104IRIDIUM 45 [+]
 25105IRIDIUM 24 [-]
-25106IRIDIUM 47 [-]
 25169IRIDIUM 52 [+]
 25170IRIDIUM 56 [P]
 25171IRIDIUM 54 [+]
-25172IRIDIUM 50 [+]
+25172IRIDIUM 50 [P]
 25173IRIDIUM 53 [+]
 25262IRIDIUM 51 [-]
 25263IRIDIUM 61 [B]
@@ -89,7 +87,6 @@ foreach (
 25320IRIDIUM 71 [-]
 25342IRIDIUM 70 [+]
 25344IRIDIUM 73 [-]
-25432IRIDIUM 76 [-]
 25467IRIDIUM 82 [-]
 25527IRIDIUM 2 [-]
 25528IRIDIUM 86 [P]
@@ -121,14 +118,22 @@ content="text/html; charset=iso-8859-1">
 
 <h1 align="center">Iridium Constellation Status</h1>
 
-<p align="center"><strong>** Updated 27 August 2018 **</strong></p>
+<p align="center"><strong>** 02 September 2018 **</strong></p>
 
 <p align="left"><strong>Latest changes </strong>(see below for
 earlier changes):</p>
 
-<p align="left">(27 August 2018): Iridium 164 (43577, 2018-061J)
-has entered the operational constellation at Plane 5, Slot 8, a
-few seconds behind Iridium 105 (41921, 2017-003E)!<br>
+<p align="left">(02 September 2018): <strong>Iridium 12 (24837,
+1997-030B) decayed on 02 September 2018.<br>
+</strong>(01 September 2018): <strong>Iridium 47 (25106,
+1997-082C) decayed on 01 September 2018.<br>
+</strong>(01 September 2018): <strong>The process of de-orbiting
+Iridium 50 (25172, 1998-010D) has started.<br>
+</strong>(28 August 2018): <strong>Iridium 76 (25432, 1998-048B)
+decayed on 28 August 2018.<br>
+</strong>(27 August 2018): Iridium 164 (43577, 2018-061J) has
+entered the operational constellation at Plane 5, Slot 8, a few
+seconds behind Iridium 105 (41921, 2017-003E)!<br>
 (24 August 2018): <strong>Iridium 98 (27451, 2002-031B) decayed
 on 24 August 2018.<br>
 </strong>(24 August 2018): Iridium 154 (43574, 2018-061F) has
@@ -203,7 +208,7 @@ href="iridium33collision.htm">91</a>    <strong>121</strong>    <strong>118</str
                                                                                        <em>Note that Iridium 128 was migrated from Plane 3 to Plane 4.</em>
 Plane 4: <strong>119</strong>    <strong>122</strong>    <strong>128    107</strong>   <strong> 132</strong>    <strong>129</strong>    <strong>127</strong>    <strong>133 </strong>   <strong>125</strong>    <strong>136</strong>    <strong>139</strong>     (97) (61) (35) <em>
 </em>
-Plane 5:50/<strong>158</strong>  <strong>160</strong>   52/<strong>159</strong> 53/<strong>163</strong> <a
+Plane 5: <strong>158</strong>    <strong>160</strong>   52/<strong>159</strong> 53/<strong>163</strong> <a
 href="iridium9and84.htm">84</a>/<strong>165</strong> 10/<strong>166</strong> 54/<strong>154</strong> <strong>105/164</strong> <strong>108</strong>   83/<strong>155</strong>  <strong>156</strong>     
                                                                            <strong>           </strong><em> Note that Iridiums 108 and 105 were migrated from Plane 6 to Plane 5. </em>
 Plane 6: <strong>102    112    104    114    103    109    106</strong>    <strong>152</strong>    <strong>147</strong>    <strong>110</strong>    <strong>111</strong>     <strong>162  161</strong>  (15)<strong>
@@ -213,13 +218,13 @@ Plane 6: <strong>102    112    104    114    103    109    106</strong>    <stro
 Orbital                     (but still in orbit)                                   (decayed)
 Plane                                	          <em>     </em>
 Plane 1:  73t  63                                                         74d  72d  21d  68d  67d  75d  65d  66d (Iridium 74 deliberately de-orbited. It was probably already a partial failure. Iridium 72, Iridium 21, Iridium 68, Iridium 67, Iridium 75, Iridium 65 and Iridium 66 deliberately de-orbited.)
-Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>   22   46   76   47                           48d   3d  49d  23d  94d  25d           (Iridium 48, Iridium 3, Iridium 49, Iridium 46, Iridium 23, Iridium 94, Iridium 25 and Iridium 47 deliberately de-orbited.)
+Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>   22   46                                     48d   3d  49d  23d  94d  25d  76d  47d (Iridium 48, Iridium 3, Iridium 49, Iridium 46, Iridium 23, Iridium 94, Iridium 25 and Iridium 47 deliberately de-orbited.)
 Plane 3:  <a href="iridium28and95.htm">28</a>   29<font
 color="#FF0000">   </font><a href="iridium33collision.htm"><font
 color="#FF0000">33</font></a>t  57           		                          27d  30d                               (Iridium 30 deliberately de-orbited.)
 Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7   51    5   96                                      8d   6d  34d  19d  37d                (Iridium  8, Iridium 51, Iridium 5, Iridium 6, Iridium 19, Iridium 34, Iridium 96 and Iridium 37 deliberately de-orbited. Iridium 7, Iridium 51 and Iridium 6 were probably already partial failures.)
-Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t  90   12 	86   56                           85d   <a
-href="iridium9and84.htm">9</a>d  13d                          (Iridium  9, Iridium 90, Iridium 13, Iridium 12, Iridium 86 and Iridium 56 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
+Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t  90   86   56   50                           85d   <a
+href="iridium9and84.htm">9</a>d  13d  12d                     (Iridium  9, Iridium 90, Iridium 13, Iridium 12, Iridium 86 and Iridium 56 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
 Plane 6: 920t 921t  44t  <a href="iridium38and82.htm">38</a>t  <a
 href="iridium17and77.htm">17</a>t  42t  39   40   82                      79d  77d  43d  81d  41d  80d  18d  98d (Iridium 40, Iridium 82, Iridium 43, Iridium 77, Iridium 18, Iridium 81, Iridium 41, Iridium 98 and Iridium 80 deliberately de-orbited.)</pre>
 

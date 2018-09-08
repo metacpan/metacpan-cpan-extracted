@@ -13,10 +13,10 @@ use Devel::MAT;
 
 my $ADDR = qr/0x[0-9a-f]+/;
 
-my $DUMPFILE = "test.pmat";
+my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
 
 Devel::MAT::Dumper::dump( $DUMPFILE );
-#END { unlink $DUMPFILE; }
+END { unlink $DUMPFILE; }
 
 my $pmat = Devel::MAT->load( $DUMPFILE );
 my $df = $pmat->dumpfile;
@@ -102,9 +102,11 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
       is( $cv->padnames_av->type, "PADNAMES", 'CV has padnames' );
    }
 
-   my $pad0 = $cv->pad(0);
-   is( $pad0->type, "PAD", 'CV has pad(0)' );
-   is( $pad0->padcv, $cv, 'PAD at 0 has padcv' );
+   my $pad0 = $cv->pad(1);
+   is( $pad0->type, "PAD", 'CV has pad(1)' );
+   is( $pad0->padcv, $cv, 'PAD at 1 has padcv' );
+
+   is( $pad0->lexvar( '$lexvar' ), $cv->lexvar( '$lexvar', 1 ), 'CV has lexvar' );
 }
 
 BEGIN { our @AofA = ( [] ); }

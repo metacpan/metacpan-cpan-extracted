@@ -23,7 +23,7 @@ WriteMakefile(
         'JSON'                 => '2.53',
         'XML::Twig'            => '3.48',
         'Moo::Role'            => '2.000000',
-        'namespace::clean'     => '0.24',
+        'namespace::autoclean' => '0.28',
         'Map::Tube::Exception' => '3.12',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -31,8 +31,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Plugin::Formatter'        => { file => 'lib/Map/Tube/Plugin/Formatter.pm',       version => '0.14' },
-            'Map::Tube::Plugin::Formatter::Utils' => { file => 'lib/Map/Tube/Plugin/Formatter/Utils.pm', version => '0.14' },
+            'Map::Tube::Plugin::Formatter'        => { file => 'lib/Map/Tube/Plugin/Formatter.pm',       version => '0.15' },
+            'Map::Tube::Plugin::Formatter::Utils' => { file => 'lib/Map/Tube/Plugin/Formatter/Utils.pm', version => '0.15' },
         },
         resources => {
             repository => {

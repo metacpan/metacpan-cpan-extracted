@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Frequency;
-$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.660';
+$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.661';
 #ABSTRACT: Role for the SCPI SENSe:FREQuency subsystem
 
 use Moose::Role;
@@ -90,7 +90,7 @@ Lab::Moose::Instrument::SCPI::Sense::Frequency - Role for the SCPI SENSe:FREQuen
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 METHODS
 

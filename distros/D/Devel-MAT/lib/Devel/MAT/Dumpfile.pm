@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -18,6 +18,10 @@ use List::Util qw( pairmap );
 
 use Devel::MAT::SV;
 use Devel::MAT::Context;
+
+use constant {
+   PMAT_SVxMAGIC => 0x80,
+};
 
 =head1 NAME
 
@@ -177,7 +181,7 @@ sub load
 
    $self->_read_u8 == 0 or die "Cannot read $path - format version major unrecognised";
 
-   ( $self->{format_minor} = $self->_read_u8 ) <= 3 or
+   ( $self->{format_minor} = $self->_read_u8 ) <= 4 or
       die "Cannot read $path - format version minor unrecognised ($self->{format_minor})";
 
    if( $self->{format_minor} < 1 ) {
@@ -189,6 +193,18 @@ sub load
    my $n_types = $self->_read_u8;
    my @sv_sizes = unpack "(a3)*", my $tmp = $self->_read( $n_types * 3 );
    $self->{sv_sizes} = [ map [ unpack "C C C", $_ ], @sv_sizes ];
+
+   if( $self->{format_minor} >= 4 ) {
+      my $n_extns = $self->_read_u8;
+      my @extn_sizes = unpack "(a3)*", my $tmp = $self->_read( $n_extns * 3 );
+      $self->{svx_sizes} = [ map [ unpack "C C C", $_ ], @extn_sizes ];
+   }
+   else {
+      # versions < 4 had just one, PMAT_SVxMAGIC
+      $self->{svx_sizes} = [
+         [ 2, 2, 0 ],  # PMAT_SVxMAGIC
+      ];
+   }
 
    if( $self->{format_minor} >= 2 ) {
       my $n_ctxs = $self->_read_u8;
@@ -373,20 +389,11 @@ sub _read_sv
       my $type = $self->_read_u8;
       return if !$type;
 
-      if( $type == 0x80 ) {
-         # magic
+      if( $type >= 0x80 ) {
+         my $sizes = $self->{svx_sizes}[$type - 0x80];
 
-         # file minor format zero magic had a different layout
-         if( $self->{format_minor} >= 1 ) {
-            my $sv_addr = $self->_read_ptr;
-            my $type    = chr $self->_read_u8;
-            my $flags   = $self->_read_u8;
-            my ( $obj, $ptr ) = $self->_read_ptrs(2);
-
-            my $sv = $self->sv_at( $sv_addr );
-            $sv->more_magic( $type => $flags, $obj, $ptr );
-         }
-         else {
+         if( $self->{format_minor} == 0 and $type == PMAT_SVxMAGIC ) {
+            # legacy magic support
             my ( $sv_addr, $obj ) = $self->_read_ptrs(2);
             my $type              = chr $self->_read_u8;
 
@@ -397,6 +404,22 @@ sub _read_sv
             # pretend all of them are refcounted objects.
             $sv->more_magic( $type => 0x01, $obj, 0 );
          }
+         elsif( !$sizes ) {
+            die sprintf "Unrecognised SV extension type %02x\n", $type;
+         }
+         else {
+            my $sv_addr = $self->_read_ptr;
+            my $sv = $self->sv_at( $sv_addr );
+
+            if( my $code = $self->can( sprintf "_read_svx_%02X", $type ) ) {
+               $self->$code( $sv, $self->_read_bytesptrsstrs( @$sizes ) );
+            }
+            else {
+               warn sprintf "Skipping unrecognised SVx 0x%02X\n", $type;
+               $self->_read_bytesptrsstrs( @$sizes ); # ignore
+            }
+         }
+
          next;
       }
 
@@ -414,6 +437,68 @@ sub _read_sv
 
       return $sv;
    }
+}
+
+sub _read_svx_80
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   my ( $type, $flags ) = unpack "A1 C", $bytes;
+
+   $sv->more_magic( $type => $flags, @$ptrs );
+}
+
+sub _read_svx_81
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   $sv->_more_saved( SCALAR => $ptrs->[0] );
+}
+
+sub _read_svx_82
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   $sv->_more_saved( ARRAY => $ptrs->[0] );
+}
+
+sub _read_svx_83
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   $sv->_more_saved( HASH => $ptrs->[0] );
+}
+
+sub _read_svx_84
+{
+   my $self = shift;
+   my ( $av, $bytes, $ptrs, $strs ) = @_;
+
+   my $index = unpack $self->{uint_fmt}, $bytes;
+
+   $av->isa( "Devel::MAT::SV::ARRAY" ) and
+      $av->_more_saved( $index, $ptrs->[0] );
+}
+
+sub _read_svx_85
+{
+   my $self = shift;
+   my ( $hv, $bytes, $ptrs, $strs ) = @_;
+
+   $hv->isa( "Devel::MAT::SV::HASH" ) and
+      $hv->_more_saved( $ptrs->[0], $ptrs->[1] );
+}
+
+sub _read_svx_86
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   $sv->_more_saved( CODE => $ptrs->[0] );
 }
 
 sub _read_ctx

@@ -1,7 +1,7 @@
 package Sah::SchemaR::isbn;
 
-our $DATE = '2018-08-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["str",[{description=>"\nNondigits [^0-9Xx] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",match=>"\\A(?:[0-9]{13}|[0-9]{9}[0-9Xx])\\z",summary=>"ISBN 10 or ISBN 13 number","x.perl.coerce_rules"=>["str_to_isbn"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::isbn - ISBN 10 or ISBN 13 number
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::isbn (from Perl distribution Sah-Schemas-ISBN), released on 2018-08-23.
+This document describes version 0.004 of Sah::SchemaR::isbn (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com///u1@198.58.100.202:/home/u1/repos/perl-Sah-Schemas-ISBN>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-ISBN>.
 
 =head1 BUGS
 

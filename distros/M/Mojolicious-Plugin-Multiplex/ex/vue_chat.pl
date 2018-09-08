@@ -155,5 +155,5 @@ __DATA__
   });
 </script>
 
-</body<
+</body>
 </html>

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::subnames_by_count;
 
-our $DATE = '2018-06-21'; # DATE
-our $VERSION = '1.023'; # VERSION
+our $DATE = '2018-09-08'; # DATE
+our $VERSION = '1.026'; # VERSION
 
 use 5.010;
 use strict;
@@ -78,7 +78,7 @@ App::lcpan::Cmd::subnames_by_count - List subroutine names ranked by number of o
 
 =head1 VERSION
 
-This document describes version 1.023 of App::lcpan::Cmd::subnames_by_count (from Perl distribution App-lcpan), released on 2018-06-21.
+This document describes version 1.026 of App::lcpan::Cmd::subnames_by_count (from Perl distribution App-lcpan), released on 2018-09-08.
 
 =head1 FUNCTIONS
 

@@ -8,7 +8,7 @@ use Test::More;
 use Devel::MAT::Dumper;
 use Devel::MAT;
 
-my $DUMPFILE = "test.pmat";
+my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
 
 our $EMPTY_SVIV = 123;
 our @EMPTY_AV = ();

@@ -18,146 +18,152 @@ name: Devel-MAT
 provides:
   Devel::MAT:
     file: lib/Devel/MAT.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Context:
     file: lib/Devel/MAT/Context.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Context::EVAL:
     file: lib/Devel/MAT/Context.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Context::SUB:
     file: lib/Devel/MAT/Context.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Context::TRY:
     file: lib/Devel/MAT/Context.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Dumpfile:
     file: lib/Devel/MAT/Dumpfile.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Graph:
     file: lib/Devel/MAT/Graph.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Graph::Node:
     file: lib/Devel/MAT/Graph.pm
   Devel::MAT::InternalTools:
     file: lib/Devel/MAT/InternalTools.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::ARRAY:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::CODE:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::FORMAT:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::GLOB:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::HASH:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::INVLIST:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::IO:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::Immortal:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::LVALUE:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::NO:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::PAD:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::PADLIST:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::PADNAMES:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::REF:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::REGEXP:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::SCALAR:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::STASH:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::UNDEF:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::Unknown:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::SV::YES:
     file: lib/Devel/MAT/SV.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool:
     file: lib/Devel/MAT/Tool.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Callstack:
     file: lib/Devel/MAT/Tool/Callstack.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Count:
     file: lib/Devel/MAT/Tool/Count.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Find:
     file: lib/Devel/MAT/Tool/Find.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Identify:
     file: lib/Devel/MAT/Tool/Identify.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Inrefs:
     file: lib/Devel/MAT/Tool/Inrefs.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Outrefs:
     file: lib/Devel/MAT/Tool/Outrefs.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Reachability:
     file: lib/Devel/MAT/Tool/Reachability.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Roots:
     file: lib/Devel/MAT/Tool/Roots.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Show:
     file: lib/Devel/MAT/Tool/Show.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::Sizes:
     file: lib/Devel/MAT/Tool/Sizes.pm
-    version: '0.39'
+    version: '0.40'
+  Devel::MAT::Tool::Summary:
+    file: lib/Devel/MAT/Tool/Summary.pm
+    version: '0.40'
   Devel::MAT::Tool::Symbols:
     file: lib/Devel/MAT/Tool/Symbols.pm
-    version: '0.39'
+    version: '0.40'
   Devel::MAT::Tool::help:
     file: lib/Devel/MAT/InternalTools.pm
   Devel::MAT::Tool::more:
+    file: lib/Devel/MAT/InternalTools.pm
+  Devel::MAT::Tool::time:
     file: lib/Devel/MAT/InternalTools.pm
 requires:
   Commandable::Invocation: '0.02'
   Devel::MAT::Dumper: '0.35'
   File::ShareDir: '1.00'
   File::Spec: '0'
+  Heap: '0'
   List::Util: '1.44'
   List::UtilsBy: '0'
   Module::Pluggable: '0'
   String::Tagged: '0.15'
-  String::Tagged::Terminal: '0'
+  String::Tagged::Terminal: '0.03'
   Struct::Dumb: '0.07'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

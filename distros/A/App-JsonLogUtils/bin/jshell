@@ -1,0 +1,304 @@
+#!perl
+# ABSTRACT: an interactive shell for monitoring JSON log files
+# PODNAME: jshell
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use List::Util qw(max);
+use Term::SimpleColor;
+use Term::SimpleColor qw(:background);
+use Term::ReadLine;
+use Iterator::Simple qw(iterator igrep imap);
+use App::JsonLogUtils qw(lines tail json_log);
+
+#-------------------------------------------------------------------------------
+# Parse command line options
+#-------------------------------------------------------------------------------
+my $help = 0;
+GetOptions('help' => \$help) or pod2usage(2);
+do{ pod2usage 1; exit 0; } if $help;
+
+#-------------------------------------------------------------------------------
+# Set up global environment
+#-------------------------------------------------------------------------------
+my $default_prompt = green . '$ ' . default ;
+my $prompt = $default_prompt;
+my $term = Term::ReadLine->new('jshell');
+my (@fields, %match, %skip);
+
+#-------------------------------------------------------------------------------
+# Utilities
+#-------------------------------------------------------------------------------
+sub out { print { $term->OUT } @_, default, "\n" }
+sub set_prompt { $prompt = shift || $default_prompt }
+
+#-------------------------------------------------------------------------------
+# Iterators
+#-------------------------------------------------------------------------------
+sub filtered {
+  my $json = shift;
+
+  return igrep{
+    my ($obj, $line) = @$_;
+
+    foreach my $key (keys %match) {
+      foreach my $pattern (@{ $match{$key} }) {
+        return unless ($obj->{$key} || '') =~ /$pattern/;
+      }
+    }
+
+    foreach my $key (keys %skip) {
+      foreach my $pattern (@{ $skip{$key} }) {
+        return unless ($obj->{$key} || '') !~ /$pattern/;
+      }
+    }
+
+    return 1;
+  } $json;
+}
+
+sub formatted {
+  my $filtered = shift;
+
+  imap{
+    my $obj  = $_->[0];
+    my @keys = @fields ? @fields : sort keys %$obj;
+    my $len  = max map{ length $_ } @keys;
+
+    join "\n", map{
+      sprintf("%s%s[%${len}s]%s%s %s", bg_green, black, $_, bg_default, default, $obj->{$_} || '')
+    } @keys;
+  } $filtered;
+}
+
+#-------------------------------------------------------------------------------
+# Commands
+#-------------------------------------------------------------------------------
+sub cmd_help {
+  out green, 'h[elp]                        Display commands';
+  out green, 'q[uit]                        Exits the program';
+  out green, 'f[ields] field1 [field2 ...]  Set the JSON object fields to display';
+  out green, 'g[rep] field pattern          Set a required match pattern for a field';
+  out green, '[grep]v field pattern         Set a forbidden match pattern for a field';
+  out green, '[i]nfo                        Display selected fields and patterns';
+  out green, '[r]eset                       Interactively reset fields and patterns';
+  out green, '[c]at                         Prints all matched lines to the terminal';
+  out green, '[t]ail                        Prints all matched lines to the terminal, continuing as the file is appended. Control-c returns to the shell.';
+  out;
+  out green, 'All patterns are case sensitive, except when using embedded match modifiers: (?i)..(?-i).';
+  out;
+}
+
+sub cmd_quit {
+  exit 0;
+}
+
+sub cmd_fields {
+  @fields = @_ if @_;
+  out green, 'Display fields:';
+  out green, "  $_" foreach @fields;
+  out;
+}
+
+sub cmd_grep {
+  if (my $field = shift) {
+    $match{$field} ||= [];
+    push @{$match{$field}},  "@_";
+  }
+
+  out green, 'grep:';
+
+  foreach my $field (keys %match) {
+    foreach my $pattern (@{ $match{$field} }) {
+      out green, "  $field: /$pattern/";
+    }
+  }
+
+  out;
+}
+
+sub cmd_grepv {
+  if (my $field = shift) {
+    $skip{$field} ||= [];
+    push @{$skip{$field}},  "@_";
+  }
+
+  out green, 'grep -v:';
+
+  foreach my $field (keys %skip) {
+    foreach my $pattern (@{ $skip{$field} }) {
+      out green, "  $field: /$pattern/";
+    }
+  }
+
+  out;
+}
+
+sub cmd_info {
+  cmd_fields;
+  cmd_grep;
+  cmd_grepv;
+}
+
+sub cmd_reset {
+  my $reset_fields = $term->readline("Clear fields? [y/n] ");
+  my $reset_match  = $term->readline("Clear grep?   [y/n] ");
+  my $reset_skip   = $term->readline("Clear grepv?  [y/n] ");
+
+  undef @fields if $reset_fields =~ /^y(es)?$/i;
+  undef %match  if $reset_match  =~ /^y(es)?$/i;
+  undef %skip   if $reset_skip   =~ /^y(es)?$/i;
+
+  cmd_info;
+}
+
+sub cmd_cat {
+  my $path    = shift;
+  my $entries = formatted filtered json_log lines $path;
+
+  while (my $entry = <$entries>) {
+    out $entry;
+    out;
+  }
+}
+
+sub cmd_tail {
+  my $path    = shift;
+  my $entries = formatted filtered json_log tail $path;
+
+  while (my $entry = <$entries>) {
+    out $entry;
+    out;
+  }
+}
+
+#-------------------------------------------------------------------------------
+# Aliases
+#-------------------------------------------------------------------------------
+sub cmd_c { goto \&cmd_cat    }
+sub cmd_f { goto \&cmd_fields }
+sub cmd_g { goto \&cmd_grep   }
+sub cmd_h { goto \&cmd_help   }
+sub cmd_i { goto \&cmd_info   }
+sub cmd_q { goto \&cmd_quit   }
+sub cmd_r { goto \&cmd_reset  }
+sub cmd_t { goto \&cmd_tail   }
+sub cmd_v { goto \&cmd_grepv  }
+
+#-------------------------------------------------------------------------------
+# Main loop
+#-------------------------------------------------------------------------------
+while (defined(my $input = $term->readline($prompt))) {
+  next unless $input;
+  chomp $input;
+
+  if ($input eq '!!') {
+    $input = $term->previous_history;
+    out $input;
+  }
+
+  my ($cmd, @args) = split /\s+/, $input;
+
+  if (__PACKAGE__->can("cmd_$cmd")) {
+    $term->addhistory($input);
+    __PACKAGE__->can("cmd_$cmd")->(@args);
+  }
+  else {
+    out red, "Invalid command; type help for a list of commands.";
+  }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+jshell - an interactive shell for monitoring JSON log files
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  jshell
+
+=head1 DESCRIPTION
+
+Opens a shell to interact with JSON-formatted log files.
+
+=head1 COMMANDS
+
+=head2 help | h
+
+Displays commands and their descriptions.
+
+=head2 quit | q
+
+Exits the program.
+
+=head2 fields | f
+
+Selects the fields to display from each line's JSON log object. If no fields are
+selected, all fields will be shown.
+
+  > fields timestamp priority message
+
+=head2 grep | g
+
+Adds a pattern which must be matched before a log entry is displayed.
+
+  > grep field somepattern
+
+Despite the name, patterns are perl regexes and matched against the string value
+of the field. Embedded modifiers are supported, so a case insensitive search is
+accomplished thusly:
+
+  > grep field (?i)somepattern
+
+=head2 grepv | v
+
+Adds a pattern which excludes entries whose field value matches.
+
+  > grepv field logswedonotwanttosee
+
+=head2 info | i
+
+Displays the current configuration of displayed fields and patterns.
+
+=head2 reset | r
+
+Interactively resets fields and patterns.
+
+=head2 cat | c
+
+Displays each entry in a file, showing only those fields selected. If no fields
+are selected, all fields are shown.
+
+  > cat /path/to/json.log
+
+=head2 tail | t
+
+Tails a log file, displaying new entries as they are appended to the file. Use
+control-c to stop output.
+
+  > tail /path/to/json.log
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

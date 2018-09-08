@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution GitLab-API-v3,
-version 1.02:
+version 1.04:
 
-  A complete GitLab API v3 client. (deprecated)
+  A complete GitLab API v3 client. (DEPRECATED)
 
-This software is copyright (c) 2017 by Aran Deltac.
+This software is copyright (c) 2018 by Aran Deltac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

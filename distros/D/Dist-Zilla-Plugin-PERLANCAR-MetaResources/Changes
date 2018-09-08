@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-PERLANCAR-MetaResources
+0.040   2018-09-08 (PERLANCAR)
+
+	- [bugfix] Fix checking of GitHub URL in .git/config.
+
 
 0.03     2014-08-26 (PERLANCAR)
 

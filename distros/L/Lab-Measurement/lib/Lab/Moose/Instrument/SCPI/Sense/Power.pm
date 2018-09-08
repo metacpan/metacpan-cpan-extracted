@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Power;
 #ABSTRACT: Role for the SCPI SENSe:POWer subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Power::VERSION = '3.660';
+$Lab::Moose::Instrument::SCPI::Sense::Power::VERSION = '3.661';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -41,7 +41,7 @@ Lab::Moose::Instrument::SCPI::Sense::Power - Role for the SCPI SENSe:POWer subsy
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 METHODS
 

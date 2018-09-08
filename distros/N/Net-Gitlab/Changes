@@ -1,5 +1,18 @@
 Revision history for Net-Gitlab
 
+0.08 2018-09-06
+
+ - Utilize the x_deprecated META flag.
+
+0.07 2018-09-06
+
+ - Oh, add (DEPRECATED) to the abstract.
+ - Fix $VERSION declaration.
+
+0.06 2018-09-06
+
+ - Add deprecation notice, telling users to check out GitLab::API::v4 instead.
+
 0.05      2014-10-07 04:45:58+00:00 UTC
 
 0.04      2014-09-03 04:28:17+00:00 UTC

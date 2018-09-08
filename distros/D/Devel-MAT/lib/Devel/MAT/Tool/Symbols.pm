@@ -10,7 +10,7 @@ use warnings;
 use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use constant CMD => "symbols";
 use constant CMD_DESC => "Display a list of the symbol table";
@@ -116,7 +116,7 @@ sub run
    }
 
    Devel::MAT::Tool::more->paginate( sub {
-      my $count = 30;
+      my ( $count ) = @_;
       while( $count and @queue ) {
          $_ = shift @queue;
          if( $_->[0]->isa( "Devel::MAT::SV::GLOB" ) ) {
@@ -147,18 +147,53 @@ use constant CMD_DESC => "Display a list of the packages in the symbol table";
 
 =head2 packages
 
+Prints a list of every package name in the symbol table.
+
+   pmat> packages
+   package CORE at STASH(1) at 0x55cde0f74240
+   package CORE::GLOBAL at STASH(0) at 0x55cde0f74270
+   package Carp at STASH(4) at 0x55cde0fa1508
+   ...
+
+Takes the following named options:
+
+=over 4
+
+=item --versions, -V
+
+Include the value of the I<$VERSION> of each package, if relevant.
+
+=back
+
 =cut
+
+use constant CMD_OPTS => (
+   versions => { help => "show the \$VERSION of each package",
+                 alias => "V" },
+);
+
+sub _versionof
+{
+   my ( $stash ) = @_;
+
+   # TODO: might be nice to have $stash->find_symbol
+   my $versiongv = $stash->value( 'VERSION' ) or return "";
+   my $versionsv = $versiongv->scalar or return "";
+
+   my $version = $versionsv->pv // $versionsv->nv // $versionsv->uv;
+   return " " . Devel::MAT::Cmd->format_value( $version );
+}
 
 sub run
 {
    my $self = shift;
+   my %opts = %{ +shift };
 
    my @queue = grep { $_->[1] ne "main::" }
       Devel::MAT::Tool::Symbols::extract_symbols( $self->df->defstash, "" );
 
    Devel::MAT::Tool::more->paginate( sub {
-      my $count = 30;
-
+      my ( $count ) = @_;
       while( $count and @queue ) {
          $_ = shift @queue;
          my ( $gv, $name ) = @$_;
@@ -167,7 +202,8 @@ sub run
 
          Devel::MAT::Cmd->printf( "%s %s at %s\n",
             Devel::MAT::Cmd->format_note( "package" ),
-            Devel::MAT::Cmd->format_symbol( $name =~ s/::$//r, $stash ),
+            Devel::MAT::Cmd->format_symbol( $name =~ s/::$//r, $stash ) .
+               ( $opts{versions} ? _versionof( $stash ) : "" ),
             Devel::MAT::Cmd->format_sv( $stash ),
          );
          $count--;

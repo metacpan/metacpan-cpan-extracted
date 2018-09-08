@@ -30,6 +30,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Graph' => '0',
+                                      'List::Util' => '1.43',
                                       'Module::Runtime' => '0',
                                       'Moo' => '1.001000',
                                       'Path::Tiny' => '0.018',

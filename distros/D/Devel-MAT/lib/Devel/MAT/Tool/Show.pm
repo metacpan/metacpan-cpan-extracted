@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use List::Util qw( max );
 
@@ -455,9 +455,10 @@ sub run
    my @keys = sort $hv->keys;
    splice @keys, 0, $skipcount if $skipcount;
 
-   Devel::MAT::Tool::more->paginate( sub {
+   Devel::MAT::Tool::more->paginate( { pagesize => $opts{count} }, sub {
+      my ( $count ) = @_;
       my @rows;
-      foreach my $key ( splice @keys, 0, $opts{count} ) {
+      foreach my $key ( splice @keys, 0, $count ) {
          my $sv = $hv->value( $key );
          push @rows, [
             "  " . Devel::MAT::Cmd->format_value( $key, key => 1,

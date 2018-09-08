@@ -1,0 +1,94 @@
+#!perl
+# ABSTRACT: filters output by pattern matching against JSON object fields
+# PODNAME: jgrep
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Iterator::Simple qw(igrep imap);
+use App::JsonLogUtils qw(lines json_grep);
+
+my $help    = 0;
+my $inverse = 0;
+my $nocase  = 0;
+my %match;
+
+GetOptions(
+  'help'          => \$help,
+  'match=s%'      => \%match,
+  'inverse|v'     => \$inverse,
+  'ignore-case|i' => \$nocase,
+) or pod2usage(2);
+
+if ($help) {
+  pod2usage(1);
+  exit 0;
+}
+
+$| = 1;
+
+$match{$_} = [ $nocase ? qr/$match{$_}/i : qr/$match{$_}/ ]
+  foreach keys %match;
+
+foreach (@ARGV ? @ARGV : (\*STDIN)) {
+  my $entries = json_grep \%match, $inverse, lines $_;
+  while (my $entry = <$entries>) {
+    print $entry->[1], "\n";
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+jgrep - filters output by pattern matching against JSON object fields
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  jgrep [-v] [-i] -m field1=pattern -m field2=pattern [/path/to/file1 /path/to/file2 ...]
+
+=head1 DESCRIPTION
+
+Filters JSON-formatted line input from supplied file path(s) or standard input
+if not provided.
+
+=head1 OPTIONS
+
+=head2 --match | -m
+
+Only include lines if the value of C<field> matches the regular expression
+C<pattern>. If the field is not present in the object, its value is treated as
+an empty string. This switch may be used multiple times.
+
+=head2 --ignore-case | -i
+
+Ignore case when performing matching.
+
+=head2 --inverse | -v
+
+Invert the meaning of patterns provided by C<--match>.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

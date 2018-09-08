@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-06-21'; # DATE
-our $VERSION = '1.023'; # VERSION
+our $DATE = '2018-09-08'; # DATE
+our $VERSION = '1.026'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,43 +63,37 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.023 of lcpan (from Perl distribution App-lcpan), released on 2018-06-21.
+This document describes version 1.026 of lcpan (from Perl distribution App-lcpan), released on 2018-09-08.
 
 =head1 SYNOPSIS
 
-=head2 Update (download and index) your local CPAN mirror
+=head2 Creating/updating your local CPAN mirror
 
- % lcpan update
+The first step to use C<lcpan> is to create/update your local CPAN mirror:
 
-A mini CPAN mirror will be downloaded in your C<~/cpan> directory. This will
-take a while (it downloads ~3.5GB of files, as of 2016-01-21; subsequent updates
-will of course take shorter time.)
+ % lcpan update --trace
 
-A SQLite database is also created/updated in C<~/cpan/index.db> which contains
-information about authors, modules/packages, distributions. This database is
-used to answer various queries.
+A mini CPAN mirror will be downloaded/updated in your C<~/cpan> directory. This
+will take a while, e.g. a couple of hours, depending on your Internet connection
+speed (as of 2018-09-08 the size of a mini CPAN mirror is ~10GB). Subsequent
+updates will of course take significantly shorter time.
 
-You can run the above command e.g. daily to keep your mirror up-to-date.
+After download, a SQLite database will also be created/updated at
+C<~/cpan/index.db> which will contain information about authors,
+modules/packages, distributions. This database will be used to answer queries
+you might issue later. During this "indexing" process, release files will be
+extracted to temporary directory and the source codes will be scanned. This
+process will again take a while for the first time, e.g. a few hours, depending
+on your computer and disk speed, but subsequent updates will be much faster.
 
-=head2 Inject additional modules to your local CPAN mirror
-
-Sometimes, you only want to add one or a few modules to the local CPAN mirror.
-For example, you are on a bad/expensive Internet connection and cannot afford a
-full mirror update. Or, you have a module that is not indexed on CPAN but want
-to add to your local mirror. To do that:
-
- % lcpan inject --author SOMEONE Foo-0.01.tar.gz Bar-Baz-2.34.tar.gz
-
-where C<SOMEONE> is an author ID (does not need to already exist) that you
-choose to put the modules under.
-
-This will add the files to the local mirror as well as update the index.
+You can run the above command e.g. daily to keep your mirror up-to-date. Omit
+the C<--trace> option to see less debugging messages.
 
 =head2 Using your local CPAN mirror to install modules
 
  % lcpanm -n Some::Module
 
-C<lcpanm> is a thin wrapper for C<cpanm>, the above command is equivalent to:
+C<lcpanm> is a thin wrapper for C<cpanm>. The above command is equivalent to:
 
  % cpanm --mirror ~/cpan --mirror-only -n Some::Module
 
@@ -126,7 +120,7 @@ Info about your local CPAN mirror:
 Add C<--verbose> if you want more stats which normally are skipped because they
 can take a while to get (e.g. disk-space).
 
-B<List modules:>
+B<Listing modules:>
 
  % lcpan modules                                ;# list all mods
  % lcpan mods <SOMEQUERY>... --detail           ;# show matching mods only (mods is alias for 'modules')
@@ -140,14 +134,14 @@ B<List modules:>
  % lcpan mods --namespace Getopt                ;# mods from certain namespace
  % lcpan mods --namespace Getopt --sort -rdeps  ;# list "popular" modules first (sort by number of reverse deps)
 
-B<List namespaces:>
+B<Listing namespaces:>
 
  % lcpan namespaces                             ;# list all namespaces
  % lcpan namespaces <SOMEQUERY>... --detail     ;# show matching namespaces only
  % lcpan namespaces --or --exact-match Win32 MacOSX --detail  ;# show detail for several namespaces
  % lcpan namespaces -l1 --detail --sort -num_modules ;# list top-level namespaces sorted by number of packages
 
-B<List distributions:>
+B<Listing distributions:>
 
  % lcpan dists                                  ;# list all dists
  % lcpan dists --latest                         ;# list all latest dists
@@ -155,32 +149,32 @@ B<List distributions:>
  % lcpan dists --or --exact-match Dist1 Dist2 --detail  ;# show detail for several dists
  % lcpan dists --author PERLANCAR               ;# dists from certain author only
 
-B<List authors:>
+B<Listing authors:>
 
  % lcpan authors                                ;# list all authors
  % lcpan authors <SOMEQUERY>... --detail        ;# list matching authors only
  % lcpan authors --or --exact-match PERLANCAR KENTNL --detail  ;# show detail for several authors
 
-B<List releases (tarballs):>
+B<Listing releases (tarballs):>
 
  % lcpan releases                               ;# list all releases
  % lcpan rels <SOMEQUERY>... --detail           ;# rels is alias for 'releases'
  % lcpan rels --or --exact-match Foo-1.23.tar.gz Bar-2.34.tar.gz --detail  ;# show detail for several rels
  % lcpan rels --author PERLANCAR                ;# rels from certain authors only
 
-B<List contents (files inside release archives):>
+B<Listing contents (files inside release archives):>
 
  % lcpan contents                               ;# WARNING: LOTS of output
  % lcpan contents <SOMEQUERY> ... --detail      ;# search, show detail
  % lcpan contents --dist File-Path              ;# list content of a single dist only
 
-B<List scripts:>
+B<Listing scripts:>
 
  % lcpan scripts                                ;# WARNING: lots of output
  % lcpan scripts <SOMEQUERY> ... --detail       ;# search, show detail
  % lcpan scripts --dist App-PMUtils             ;# list scripts of a single dist only
 
-B<Show dependencies and reverse dependencies>:
+B<Showing dependencies and reverse dependencies>:
 
  % lcpan deps Text::ANSITable    ;# which modules does Text::ANSITable depend on?
  % lcpan deps Text::ANSITable -R ;# recursive
@@ -190,7 +184,8 @@ B<Show dependencies and reverse dependencies>:
 
  % lcpan rdeps Text::ANSITable ;# which dists depend on Text::ANSITable?
 
-B<Show mentions (references to modules/scripts from POD files within releases)>:
+B<Showing mentions (references to modules/scripts from POD files within
+releases)>:
 
  % lcpan mentions --mentioned-module Path::Tiny ;# who mentions Path::Tiny module?
  % lcpan mentions --mentioned-script mpath      ;# who mentions mpath script?
@@ -245,7 +240,22 @@ B<Some other utilities>:
  % lcpan doc plackup -r       ;# dump the raw POD instead of rendering it
 
 More subcommands are available. lcpan is plugin-based, see/install
-C<App::lcpan::Cmd::*> modules for more subcommands.
+C<App::lcpan::CmdBundle::*> modules for more subcommands.
+
+=head2 Injecting additional modules to your local CPAN mirror
+
+Sometimes, you only want to add one or a few modules to the local CPAN mirror.
+For example, you are on a bad/expensive Internet connection and cannot afford a
+full mirror update. Or, you have a module that is not indexed on CPAN but want
+to add to your local mirror (creating a so-called DarkPAN based on an existing
+mini CPAN mirror). To do that:
+
+ % lcpan inject --author SOMEONE Foo-0.01.tar.gz Bar-Baz-2.34.tar.gz
+
+where C<SOMEONE> is an author ID (does not need to already exist) that you
+choose to put the modules under.
+
+This will add the files to the local mirror as well as update the index.
 
 =head1 DESCRIPTION
 
@@ -777,13 +787,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -832,7 +840,7 @@ Set output format to json.
 
 Set log level.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -972,7 +980,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1056,7 +1064,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1433,7 +1441,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1507,7 +1515,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -2315,7 +2323,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.26.1"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2471,7 +2479,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.26.1"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3215,7 +3223,18 @@ the C<--cpan> option everytime:
 
 =head2 Where is the SQLite database (the index) located?
 
-In C<$cpan/index.db>.
+By default at C<$cpan/index.db>. You can customize the name of the database
+using the C<--index-name> command-line option or the Cindex_name> configuration,
+e.g.:
+
+ --index-name lcpan.db
+
+which will create the database at C<$cpan/lcpan.db>. If you want to put the
+database file somewhere else (e.g. outside the CPAN repository structure),
+prepend a path (something that contains "/") to the index name, e.g. in
+configuration:
+
+ index_name = /home/ujang/lcpan.db
 
 =head2 How do I see the SQL statements/queries being issued while running lcpan?
 
@@ -3230,10 +3249,10 @@ Run C<lcpan reset> (or delete C<index.db>) and run C<lcpan update
 
 =head2 Indexing error: Out of memory!
 
-Could happen when there is a corrupt archive or an archive that is too big. To
-see which file is the culprit, try running C<lcpan update --noupdate-files> with
-C<--verbose> (or even C<--debug> or C<--trace>). Then, you can skip the file by
-using C<-F> or adding this entry to your C<lcpan.conf>:
+This could happen when there is a corrupt archive or an archive that is too big.
+To see which file is the culprit, try running C<lcpan update --noupdate-files>
+with C<--verbose> (or even C<--debug> or C<--trace>). Then, you can skip the
+file by using C<-F> or adding this entry to your C<lcpan.conf>:
 
  [update]
  skip_index_files=The-Culprit-1.23.tar.gz
@@ -3246,7 +3265,13 @@ Run C<lcpan update --noupdate-index>.
 
 =head2 How do I see how recent the mirror or the index is?
 
-Use C<lcpan stats>.
+Use C<lcpan stats> or C<lcpan stats-last-index-time>.
+
+=head2 Can I use lcpan with a DarkPAN?
+
+Yes. You can use C<lcpan> to index any CPAN-like repository. This include a mini
+CPAN mirror, a mini CPAN mirror with a few injected private modules, or a
+repository created by L<OrePAN> (or similar tools).
 
 =head1 CONFIGURATION FILE
 
@@ -3799,9 +3824,11 @@ feature.
 
 =head1 SEE ALSO
 
-L<setop>
+L<CPAN::Mini>
 
 L<cpan-outdated>
+
+L<lcpanm>
 
 =head1 AUTHOR
 

@@ -1,3 +1,20 @@
+0.101		2018-09-07	T. R. Wyant
+    Move nutation, obliquity, equation_of_time to Astro::Coord::ECI.
+    They become methods rather than subroutines so that they can be
+    overridden when higher accuracy is needed.
+
+    Install @CARP_NOT in all modules.
+
+    Have Moon and Star use correct Sun object for phase, aberration
+
+    Have the Sun's 'sun' attribute be itself. Access to it returns the
+    invocant, and mutations are ignored.
+
+    Add Utils functions rad2dms() and rad2hms()
+
+    In the script/satpass script, update all contained objects when the
+    'illum' or 'sun' settings are changed.
+
 0.100		2018-07-22	T. R. Wyant
     Add non-TLE attributes as optional hash reference to parse().
     Actually, this already worked for traditional TLEs, it just needed

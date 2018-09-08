@@ -17,6 +17,11 @@
 ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ObjectID` );
 ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ClassificationID` );
 
+-- ObjTitles
+
+ALTER TABLE `ObjTitles` ADD INDEX ( `ObjectID` );
+ALTER TABLE `ObjTitles` ADD INDEX ( `ClassificationID` );
+
 -- Classifications
 
 ALTER TABLE `Classifications` CHANGE `ClassificationID` `ClassificationID` VARCHAR( 255 ) NULL DEFAULT NULL;
@@ -189,4 +194,19 @@ INNER JOIN
     CITvgsrpObjTombstoneD_RO o ON o.ObjectID = ref.ID
 WHERE userFieldID = '48';
 
+-- VIEW ObjTitles
 
+CREATE OR REPLACE VIEW vobjtitles AS
+SELECT obj.ObjectNumber as _id, 
+    tit.titleID as titleid,
+    tit.Title as title
+FROM
+   Objects obj
+LEFT JOIN
+  ObjTitles tit ON tit.ObjectID = obj.ObjectID
+JOIN
+  DDLanguages lan ON tit.LanguageID = lan.LanguageID
+WHERE
+  lan.Label = 'Nederlands'
+AND tit.DisplayOrder = 1
+AND tit.Displayed = 1

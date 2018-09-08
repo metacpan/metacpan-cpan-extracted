@@ -8,7 +8,7 @@ package Devel::MAT::InternalTools;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 package Devel::MAT::Tool::help;
 
@@ -141,7 +141,8 @@ sub help_cmd
          [ map {
             my $arg = $_;
 
-            [ "  \$\U$arg->{name}" . ( $arg->{slurpy} ? "..." : "" ), $arg->{help} ],
+            [ "  \$\U$arg->{name}" . ( $arg->{slurpy} ? "..." :
+                                       $arg->{repeated} ? "*" : "" ), $arg->{help} ],
          } @argspec ],
          sep => "    ",
       );
@@ -170,7 +171,10 @@ sub run
 sub paginate
 {
    shift;
-   ( $more ) = @_;
+   my $opts = ( ref $_[0] eq "HASH" ) ? shift : {};
+   my ( $func ) = @_;
+
+   $more = sub { $func->( $opts->{pagesize} // 30 ) };
 
    $more->() or undef $more;
 }
@@ -178,6 +182,36 @@ sub paginate
 sub can_more
 {
    return defined $more;
+}
+
+package Devel::MAT::Tool::time;
+
+use base qw( Devel::MAT::Tool );
+
+use constant CMD => "time";
+use constant CMD_DESC => "Measure the runtime of a command";
+
+use Time::HiRes qw( gettimeofday tv_interval );
+
+sub run_cmd
+{
+   my $self = shift;
+   my ( $inv ) = @_;
+
+   my $cmd = $inv->pull_token;
+
+   my $starttime = [gettimeofday];
+
+   my $tool = $self->pmat->load_tool_for_command( $cmd );
+   my $loadtime = tv_interval( $starttime );
+
+   $tool->run_cmd( $inv );
+
+   my $runtime = tv_interval( $starttime );
+
+   Devel::MAT::Cmd->printf( "\nLoaded in %.03fs, ran in %.03fs\n",
+      $loadtime, $runtime - $loadtime,
+   );
 }
 
 0x55AA;

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use 5.12.0;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 $VERSION = eval $VERSION;
 
 use Mojo::Home;
@@ -220,6 +220,11 @@ title - sets the window title, not used on the title slide
 base - sets the C<< <base> >> tag for the document.
 Useful for hosting static pages at a location other than C</>.
 Defaults to C</>, if explicitly set to C<undef> the tag is not included.
+
+=item *
+
+hljs_theme_url - sets the url path for loading a css theme for highlight js.
+Defaults to a bundled zenburn theme.
 
 =back
 

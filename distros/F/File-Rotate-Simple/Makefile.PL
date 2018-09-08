@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "File::Rotate::Simple",
   "PREREQ_PM" => {
     "Graph" => 0,
+    "List::Util" => "1.43",
     "Module::Runtime" => 0,
     "Moo" => "1.001000",
     "Path::Tiny" => "0.018",
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Time::Piece" => 0
   },
-  "VERSION" => "v0.2.3",
+  "VERSION" => "v0.2.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Graph" => 0,
+  "List::Util" => "1.43",
   "Module::Metadata" => 0,
   "Module::Runtime" => 0,
   "Moo" => "1.001000",

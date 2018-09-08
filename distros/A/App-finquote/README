@@ -1,0 +1,82 @@
+NAME
+    App::finquote - Get stock and mutual fund quotes from various exchanges
+
+VERSION
+    This document describes version 0.003 of App::finquote (from Perl
+    distribution App-finquote), released on 2018-09-07.
+
+SYNOPSIS
+    See finquote script.
+
+FUNCTIONS
+  finquote
+    Usage:
+
+     finquote(%args) -> [status, msg, result, meta]
+
+    Get stock and mutual fund quotes from various exchanges.
+
+    Examples:
+
+    *   List available sources:
+
+         finquote( action => "list_sources");
+
+    *   Fetch quote for a few NASDAQ stocks:
+
+         finquote( symbols => ["AAPL", "AMZN", "MSFT"], sources => ["nasdaq"]);
+
+    *   Fetch quote for a few Indonesian stocks:
+
+         finquote( symbols => ["BBCA.JK", "BBRI.JK", "TLKM.JK"], sources => ["asia"]);
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "fetch")
+
+        Choose what action to perform. The default is 'fetch'. Other actions
+        include:
+
+        *   'list_sources' - List available sources.
+
+    *   sources => *array[str]*
+
+    *   symbols => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-finquote>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-finquote>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-finquote>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

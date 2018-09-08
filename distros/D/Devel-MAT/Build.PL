@@ -10,12 +10,13 @@ my $build = Module::Build->new(
       'Devel::MAT::Dumper' => '0.35',
       'File::ShareDir' => 0,
       'File::Spec' => 0,
+      'Heap' => 0,
       'List::Util' => '1.44', # uniq
       'List::UtilsBy' => 0,   # sort_by
       'Module::Pluggable' => 0,
       'perl' => '5.014',      # s///r
       'String::Tagged' => '0.15', # sprintf
-      'String::Tagged::Terminal' => 0,
+      'String::Tagged::Terminal' => '0.03',
       'Struct::Dumb' => '0.07',
    },
    test_requires => {

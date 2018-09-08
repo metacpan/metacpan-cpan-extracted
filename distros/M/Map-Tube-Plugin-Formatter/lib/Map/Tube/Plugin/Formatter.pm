@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Formatter;
 
-$Map::Tube::Plugin::Formatter::VERSION   = '0.14';
+$Map::Tube::Plugin::Formatter::VERSION   = '0.15';
 $Map::Tube::Plugin::Formatter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Formatter - Formatter plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
@@ -19,7 +19,7 @@ use JSON qw();
 use Map::Tube::Plugin::Formatter::Utils qw(xml get_data validate_object);
 
 use Moo::Role;
-use namespace::clean;
+use namespace::autoclean;
 
 =head1 DESCRIPTION
 

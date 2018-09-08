@@ -1,5 +1,5 @@
 package ETL::Yertl::Transform;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 # ABSTRACT: Transform a stream of documents
 
 #pod =head1 SYNOPSIS
@@ -275,11 +275,15 @@ sub write {
 sub run {
     my ( $self ) = @_;
 
+    if ( !$self->loop ) {
+        croak "Can't run(): Transform not added to loop";
+    }
+
     # Run the transforms until this point
     # Default on_read_eof exits the loop. This gets replaced by a new
     # on_read_eof when transforms are added as a source for another
     # transform
-    my $on_read_eof = $self->{on_read_eof} || sub { };
+    my $on_read_eof = $self->{on_read_eof} || $self->can( 'on_read_eof' ) || sub { };
     $self->configure(
         on_read_eof => sub {
             $on_read_eof->( @_ );
@@ -301,7 +305,7 @@ ETL::Yertl::Transform - Transform a stream of documents
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 
@@ -456,7 +460,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

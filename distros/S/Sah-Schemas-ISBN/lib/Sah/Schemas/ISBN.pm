@@ -1,7 +1,7 @@
 package Sah::Schemas::ISBN;
 
-our $DATE = '2018-08-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas related to ISBN (International Standard Book Number)
@@ -18,7 +18,7 @@ Sah::Schemas::ISBN - Various Sah schemas related to ISBN (International Standard
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::ISBN (from Perl distribution Sah-Schemas-ISBN), released on 2018-08-23.
+This document describes version 0.004 of Sah::Schemas::ISBN (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
 
 =head1 SAH SCHEMAS
 
@@ -64,7 +64,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com///u1@198.58.100.202:/home/u1/repos/perl-Sah-Schemas-ISBN>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-ISBN>.
 
 =head1 BUGS
 

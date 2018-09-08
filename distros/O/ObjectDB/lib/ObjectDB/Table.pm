@@ -3,7 +3,7 @@ package ObjectDB::Table;
 use strict;
 use warnings;
 
-our $VERSION = '3.26';
+our $VERSION = '3.27';
 
 use constant DEFAULT_PAGE_SIZE => 10;
 

@@ -14,10 +14,22 @@
       <foaf:mbox rdf:resource="mailto:dagolden@cpan.org" />
     </foaf:Person>
   </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
   <helper>
     <foaf:Person>
       <foaf:name>Peter Mottram</foaf:name>
       <foaf:mbox rdf:resource="mailto:peter@sysnix.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Pierre VIGIER</foaf:name>
+      <foaf:mbox rdf:resource="mailto:pierre.vigier@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -75,6 +87,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.005</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-11-05</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.006</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-03-06</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

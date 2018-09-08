@@ -234,21 +234,124 @@ command: SENS:FUNC 'VOLT'
 id: 44
 method: Write
 ---
-command: SENS:VOLT:RANG 0.1
+command: SENS:VOLT:IMP:AUTO 0
 id: 45
 method: Write
 ---
-command: SENS:VOLT:NPLC 10
+command: SENS:VOLT:IMP:AUTO?
 id: 46
+method: Query
+retval: '0
+
+'
+---
+command: SENS:VOLT:IMP:AUTO 1
+id: 47
+method: Write
+---
+command: SENS:VOLT:IMP:AUTO?
+id: 48
+method: Query
+retval: '1
+
+'
+---
+command: SENS:VOLT:IMP:AUTO 0
+id: 49
+method: Write
+---
+command: SENS:VOLT:IMP:AUTO?
+id: 50
+method: Query
+retval: '0
+
+'
+---
+command: SENS:VOLT:NULL:STATE 0
+id: 51
+method: Write
+---
+command: SENS:VOLT:NULL:STAT?
+id: 52
+method: Query
+retval: '0
+
+'
+---
+command: SENS:VOLT:NULL:STATE 1
+id: 53
+method: Write
+---
+command: SENS:VOLT:NULL:STAT?
+id: 54
+method: Query
+retval: '1
+
+'
+---
+command: SENS:VOLT:NULL:STATE 0
+id: 55
+method: Write
+---
+command: SENS:VOLT:NULL:STAT?
+id: 56
+method: Query
+retval: '0
+
+'
+---
+command: SENS:VOLT:NULL:VAL 0
+id: 57
+method: Write
+---
+command: SENS:VOLT:NULL:VAL?
+id: 58
+method: Query
+retval: '+0.00000000E+00
+
+'
+---
+command: SENS:VOLT:NULL:VAL 0.001
+id: 59
+method: Write
+---
+command: SENS:VOLT:NULL:VAL?
+id: 60
+method: Query
+retval: '+1.00000000E-03
+
+'
+---
+command: SENS:VOLT:NULL:VAL 0
+id: 61
+method: Write
+---
+command: SENS:VOLT:NULL:VAL?
+id: 62
+method: Query
+retval: '+0.00000000E+00
+
+'
+---
+command: SENS:FUNC 'VOLT'
+id: 63
+method: Write
+---
+command: SENS:VOLT:RANG 0.1
+id: 64
+method: Write
+---
+command: SENS:VOLT:NPLC 10
+id: 65
 method: Write
 ---
 command: :read?
-id: 47
+id: 66
 method: Query
-retval: '-1.46230558E-04
+retval: '-3.90505498E-07
 
 '
 ---
 command: '*RST'
-id: 48
+id: 67
 method: Write

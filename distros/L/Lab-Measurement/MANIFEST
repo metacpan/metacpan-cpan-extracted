@@ -187,6 +187,7 @@ lib/Lab/Moose/DataFile/Meta.pm
 lib/Lab/Moose/DataFile/Read.pm
 lib/Lab/Moose/DataFolder.pm
 lib/Lab/Moose/Instrument.pm
+lib/Lab/Moose/Instrument/AdjustRange.pm
 lib/Lab/Moose/Instrument/Agilent34410A.pm
 lib/Lab/Moose/Instrument/Cache.pm
 lib/Lab/Moose/Instrument/Common.pm
@@ -217,7 +218,9 @@ lib/Lab/Moose/Instrument/SCPI/Sense/Average.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Bandwidth.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Frequency.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Function.pm
+lib/Lab/Moose/Instrument/SCPI/Sense/Impedance.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/NPLC.pm
+lib/Lab/Moose/Instrument/SCPI/Sense/Null.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Power.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Protection.pm
 lib/Lab/Moose/Instrument/SCPI/Sense/Range.pm
@@ -351,6 +354,7 @@ xt/critic/lib.t
 xt/critic/moose.t
 xt/critic/tests.t
 xt/moose-plot-test-3d.pl
+xt/moose-plot-test-multiline.pl
 xt/moose-plot-test.pl
 xt/perltidy.pl
 xt/pod-manual-coverage.t

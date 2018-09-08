@@ -6,16 +6,16 @@ use warnings;
 
 =head1 NAME
 
-WebService :: MIAB - MIAB (Mail in a Box) helps you manage user and aliasaddressen
+WebService::MIAB - manage emails (users) and alias addresses on a mail-in-a-box server
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =cut
 
 use version;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Moo;
 with 'WebService::Client';
@@ -24,6 +24,7 @@ use LWP::UserAgent;
 use MIME::Base64;
 use Carp qw(croak);
 use re qw(is_regexp);
+use List::MoreUtils qw(uniq);
 
 use JSON;
 my $json = JSON->new->allow_nonref;
@@ -61,7 +62,7 @@ has '+deserializer' => (
         sub {
             my ($res, %args) = @_;
 			my $decoded = $res;
-			
+
 			if ($res->request->uri =~ /json/) {
 				$decoded = $json->decode($res->content);
 			}
@@ -73,7 +74,7 @@ has '+deserializer' => (
     },
 );
 
-################ Constructor ################
+
 sub BUILD(){
 	my ($self) = @_;
 	my $empty = q{};
@@ -81,62 +82,75 @@ sub BUILD(){
 	return $self->ua->default_header('Authorization' => 'Basic '.encode_base64($self->username.$colon.$self->pass , $empty));
 }
 
+
 =head1 SYNOPSIS
 
-use WebService::MIAB;
+	use WebService::MIAB;
 
-my $MIAB = WebService::MIAB->new(
-	username => 'Email@domain.com',
-	pass => 'ThisIsThePassword',
-	host => 'example.com',
-);
+	my $miab = WebService::MIAB->new(
+		username => 'adminuser@domain.com',
+		pass => 'adminpasswd',
+		host => 'domain.com',
+	);
 
-my $users = $MIAB->get_users();
-my $result = $MIAB->create_user(
-	{
-	email => 'bart.simpson@springfield.com',
-	password => 'EatMyShorts',
+	my $users = $miab->get_users();
+	my $result = $miab>create_user({
+		email => 'bart.simpson@domain.com',
+		password => 'EatMyShorts',
 	});
 
 =head1 DESCRIPTION
 
-WebService::MIAB is a Perl module that manages user and alias addresses from the mail server MIAB (Mail in a Box).
-The module is based on the WebService::Client module that is written from Naveed Massjouni.
+WebService::MIAB is a Perl module that manages user and alias addresses on a
+Mail-in-a-box (MIAB) server.
+
 You can list, create and remove user and alias addresses.
+
+The API methods to the DNS system of MIAB is not implemented, yet.
+Patches are welcome.
 
 =head1 METHODES
 
 =head2 User methods
 
-=head3 get_user()
+The user methods are to handle plain email adresses on a MIAB server.
+Each email address  is a user and has (limited) access to the MIAB server.
 
-The get_user function returns all users which are defined in JSON format.
-The function only need the Uri for gets the Users.
-MIAB->get_user()
+=head3 get_users
 
-sub get_users{
-	my ($self) = @_;
-	my $result = $self->get($self->user_get_uri);
-	return $result;
-}
+Returns all defined users in JSON format.
+
+	my $users = $miab->get_users();
 
 =cut
 
+
 sub get_users{
 	my ($self) = @_;
+
 	my $result = $self->get($self->user_get_uri);
+
 	return $result;
 }
 
-=head3 create_user($hashWithParam)
 
-The create_user function create a new User.
-The function receives the parameters email and password in form of a hash reference for creating an user.
-The create_user function consists only a post command that create the user.
-$MIAB->create_user(email => 'bart.simpson@springfield.com',password => 'EatMyShorts')
+=head3 create_user
+
+Creates a new user account. Expects the email address and the password in
+the parameter hash.
+Returns the answer from the webservice.
+
+	my $result = $miab->create_user({
+		email => 'bart.simpson@springfield.com',
+		password => 'EatMyShorts'
+	});
+
+=cut
+
 
 sub create_user{
-	my ($self,$param) = @_;
+	my ($self, $param) = @_;
+
 	my $result = $self->post($self->user_add_uri,
 				{
 					email => $param->{email},
@@ -144,64 +158,51 @@ sub create_user{
 				},
 				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
 	);
+
 	return $result;
 }
+
+
+=head3 remove_user
+
+Removes the email user account. Expects the email address in the parameter hash.
+Returns the answer from the webservice.
+
+	my result = $miab->remove_user({
+		email => bart.simpson@springfield.com
+	});
 
 =cut
 
-sub create_user{
-	my ($self,$param) = @_;
-	my $result = $self->post($self->user_add_uri,
-				{
-					email => $param->{email},
-					password => $param->{password},
-				},
-				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
-	);
-	return $result;
-}
-
-=head3 remove_user($hashWithParam)
-
-The remove_user function delete a User.
-The function receives the parameters email in form of a hash reference for deleting an user.
-The remove_user function consists only a post command that delete an user.
-$MIAB->remove_user(email => bart.simpson@springfield.com)
 
 sub remove_user{
 	my ($self, $param) = @_;
+
 	my $result = $self->post($self->user_remove_uri,
 				{
 					email => $param->{email},
 				},
 				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
 	);
+
 	return $result;
 }
+
+
+=head3 find_user
+
+Returns a list of users records matching its forward_to record
+to the given email_pattern and domain_pattern. The pattern can be a string
+that is evaluated to a regexp or a regexp.
+
+	my @users = $miab->find_user('email_pattern', qr/example.com/)
 
 =cut
 
-sub remove_user{
-	my ($self, $param) = @_;
-	my $result = $self->post($self->user_remove_uri,
-				{
-					email => $param->{email},
-				},
-				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
-	);
-	return $result;
-}
-
-=head3 find_user($email_pattern, $domain_pattern)
-
-The find_user function search an user.
-The function receives the parameters E-Mail and Domain to search the user.
-The function is_regexp checks if the given parameter are a regular expression.
-The function gets with get_users () all users that are present and then filters them according to the passed parameters.
-$MIAB->remove_user(email => bart.simpson@springfield.com)
 
 sub find_user {
 	my ($self, $email_pattern, $domain_pattern) = @_;
+
 	my @result;
 	if ( !is_regexp($email_pattern) ) {
 		$email_pattern = qr/$email_pattern/mxs;
@@ -227,102 +228,64 @@ sub find_user {
 			}
 		}
 	}
+
 	return @result;
 }
 
-=cut
 
-sub find_user {
-	my ($self, $email_pattern, $domain_pattern) = @_;
-	my @result;
-	if ( !is_regexp($email_pattern) ) {
-		$email_pattern = qr/$email_pattern/mxs;
-	}
-	if ($domain_pattern && !is_regexp($domain_pattern)) {
-		$domain_pattern = qr/$domain_pattern/mxs;
-	}
+=head2 Alias methods
 
-	my $users = $self->get_users();
-	foreach ( @{$users} ) {
-		if (!$domain_pattern || $_->{'domain'} =~ $domain_pattern) {
-			foreach (@{$_->{'users'}}) {
-				my $value = $_->{'email'};
+=head3 get_aliases
 
-				# filter list
-				push( @result,
-					grep {
-						$_ && $_ =~ $email_pattern
-					} ($value && 'ARRAY' eq ref $value)
-						? @{$value}
-						: ( $value )
-				);
-			}
-		}
-	}
-	return @result;
+Returns all aliases in JSON format.
 
-}
-
-=head2 Alias mehtods
-
-=head3 get_aliases()
-
-The get_aliases function returns all Aliasaddresses for all domains which exist in Json format.
-$MIAB->get_aliases()
-
-sub get_aliases{
-	my ($self) = @_;
-	my $result = $self->get($self->alias_get_uri);
-	return $result;
-}
+	my $aliases = $miab->get_aliases();
 
 =cut
 
+
 sub get_aliases{
 	my ($self) = @_;
+
 	my $result = $self->get($self->alias_get_uri);
+
 	return $result;
 }
 
-=head3 get_domains()
 
-The get_domains function returns all Domains which are defined.
-$MIAB->get_domains()
+=head3 get_domains
+
+Returns a list of all domains used in alias adresses.
+
+	my @domains = $miab->get_domains();
+
+=cut
+
 
 sub get_domains{
 	my ($self) = @_;
+
 	my $aliases = $self->get_aliases();
+
 	my @result;
 	map {
 		push( @result, $_->{'domain'} );
 	} @{$aliases};
-	return @result;
+
+	return (uniq @result);
 }
+
+
+=head3 find_forward_to_aliases
+
+Returns a list of alias records matching its forward_to record
+to the given alias_pattern and domain_pattern. The pattern can be a string
+that is evaluated to a regexp or a regexp.
+
+	my @aliases = $miab->find_forward_to_aliases('alias_pattern', qr/example.com/);
 
 =cut
 
-sub get_domains{
-	my ($self) = @_;
-	my $aliases = $self->get_aliases();
-	my @result;
-	map {
-		push( @result, $_->{'domain'} );
-	} @{$aliases};
-	return @result;
-}
-
-=head3 find_forward_to_aliases($alias_pattern, $domain_pattern)
-
-The function receives the parameters alias_pattern and domain_pattern.
-The find_forward_to_aliases function contains only one function call and a transfer of parameters
-MIAB->find_forward_to_aliases($alias_pattern, $domain_pattern)
-
-sub find_forward_to_aliases {
-	my ($self, $alias_pattern, $domain_pattern) = @_;
-	return $self->_find_aliases_generic('forwards_to', $alias_pattern, $domain_pattern);
-}
-
-=cut
 
 sub find_forward_to_aliases {
 	my ($self, $alias_pattern, $domain_pattern) = @_;
@@ -330,37 +293,35 @@ sub find_forward_to_aliases {
 	return $self->_find_aliases_generic('forwards_to', $alias_pattern, $domain_pattern);
 }
 
-=head3 find_permitted_sender_aliases($alias_pattern, $domain_pattern)
 
-The function receives the parameters alias_pattern and domain_pattern.
-The find_permitted_sender_aliases function contains only one function call and a transfer of parameters
-MIAB->find_permitted_sender_aliases($alias_pattern, $domain_pattern)
+=head3 find_permitted_sender_aliases
+
+Returns a list of alias records matching its permitted_sender record
+to the given alias_pattern and domain_pattern. The pattern can be a string
+that is evaluated to a regexp or a regexp.
+
+	my @aliases = $miab->find_permitted_sender_aliases('alias_pattern', qr/example.com/);
+
+=cut
+
 
 sub find_permitted_sender_aliases {
 	my ($self, $alias_pattern, $domain_pattern) = @_;
-	return $self->_find_aliases_generic('permitted_senders', $alias_pattern, $domain_pattern);
-}
-
-=cut
-
-sub find_permitted_sender_aliases {
-	my ($self, $alias_pattern, $domain_pattern) = @_;
 
 	return $self->_find_aliases_generic('permitted_senders', $alias_pattern, $domain_pattern);
 }
 
-=head3 find_aliases($alias_pattern, $domain_pattern)
 
-The function receives the parameters alias_pattern and domain_pattern.
-The find_aliases function contains only one function call and a transfer of parameters
-MIAB->find_aliases($alias_pattern, $domain_pattern)
+=head3 find_aliases
 
-sub find_aliases {
-	my ($self, $alias_pattern, $domain_pattern) = @_;
-	return $self->_find_aliases_generic('address', $alias_pattern, $domain_pattern);
-}
+Returns a list of alias records matching its address record the given
+alias_pattern and domain_pattern. The pattern can be a string that is
+evaluated to a regexp or a regexp.
+
+	my @aliases = $miab->find_aliases('alias_pattern', qr/example.com/);
 
 =cut
+
 
 sub find_aliases {
 	my ($self, $alias_pattern, $domain_pattern) = @_;
@@ -368,110 +329,63 @@ sub find_aliases {
 	return $self->_find_aliases_generic('address', $alias_pattern, $domain_pattern);
 }
 
-=head3 create_alias($param)
 
-The create_alias function create a new Aliasaddress.
-The function receives the parameters address and forwards_to or permitted_senders in form of a hash reference for create a Aliasaddress.
-The create_alias function consists a post command that create the Aliasaddress.
-$param = {
-	address => 'bart.simpson@springfield.com',
-	forwards_to => ['lisa.simpson@springfield.com','Maggie.simpson@springfield.com'],	# One of
-	permitted_senders => ['Homer.simpson@springfield.com','Marge.simpson@springfield.com'], # these
-};
-$MIAB->create_alias($param);
+=head3 create_alias
 
-sub create_alias{
-	my ($self,$param) = @_;
-	my $empty = q{};
-	my $point = q{,};
-	# Parameters normalizee
-	if (defined $param->{forwards_to} && ref $param->{forwards_to} ne 'ARRAY')
-	{
-		$param->{forwards_to} = [$param->{forwards_to}];
-	}
-	if (defined $param->{permitted_senders} && ref $param->{permitted_senders} ne 'ARRAY')
-	{
-		$param->{permitted_senders} = [$param->{permitted_senders}];
-	}
-	# Rest-Interface Paramter generieren
-	my $forward_address_for_request = defined $param->{forwards_to}
-		? join ($point, @{$param->{forwards_to}})
-		: $empty;
-	my $permittet_senders_for_request = defined $param->{permitted_senders}
-		? join ($point, @{$param->{permitted_senders}})
-		: $empty;
+Creates a new alias address.
 
-	# At least one alias parameter must exist
-	if(!length($forward_address_for_request.$permittet_senders_for_request))
-	{
-		croak 'forwardsaddress and permitted_sender are required';
-	}
-
-	my $result = $self->post($self->alias_add_uri,
-				{
-					address => $param->{address},
-					forwards_to => $forward_address_for_request,
-					permitted_senders => $permittet_senders_for_request,
-				},
-				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
-	);
-	return $result;
-}
+	$miab->create_alias({
+		address => 'bart.simpson@springfield.com',
+		forwards_to => ['lisa.simpson@springfield.com','Maggie.simpson@springfield.com'],
+		permitted_senders => ['Homer.simpson@springfield.com','Marge.simpson@springfield.com'],
+	});
 
 =cut
 
+
 sub create_alias{
-	my ($self,$param) = @_;
+	my ($self, $param) = @_;
 	my $empty = q{};
 	my $point = q{,};
-	# parameters normalize
+
 	if (defined $param->{forwards_to} && ref $param->{forwards_to} ne 'ARRAY'){
 		$param->{forwards_to} = [$param->{forwards_to}];
 	}
 	if (defined $param->{permitted_senders} && ref $param->{permitted_senders} ne 'ARRAY'){
 		$param->{permitted_senders} = [$param->{permitted_senders}];
 	}
-	# Rest-Interface Paramter generieren
+
 	my $forward_address_for_request = defined $param->{forwards_to}
 		? join ($point, @{$param->{forwards_to}})
 		: $empty;
-	my $permittet_senders_for_request = defined $param->{permitted_senders}
+	my $permitted_senders_for_request = defined $param->{permitted_senders}
 		? join ($point, @{$param->{permitted_senders}})
 		: $empty;
 
 	# One alias parameter must exist
-	if(!length($forward_address_for_request.$permittet_senders_for_request)){
-		croak 'forwardsaddress and permitted_sender are required';
+	if(!length($forward_address_for_request.$permitted_senders_for_request)){
+		croak 'forwards_to or permitted_sender are required';
 	}
 
 	my $result = $self->post($self->alias_add_uri,
 				{
 					address => $param->{address},
 					forwards_to => $forward_address_for_request,
-					permitted_senders => $permittet_senders_for_request,
+					permitted_senders => $permitted_senders_for_request,
 				},
 				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
 	);
 	return $result;
 }
 
-=head3 remove_alias($param)
 
-The remove_alias function delete a Aliasaddress.
-The function gets in form of a hash reference the parameter address for delete a Aliasaddress.
-The remove_alias function consists only a post command that delete a Aliasaddress.
-$MIAB->remove_alias(address => bart.simpson@springfield.com)
+=head3 remove_alias
 
-sub remove_alias{
-	my ($self, $param) = @_;
-	my $result = $self->post($self->alias_remove_uri,
-				{
-					address => $param->{address},
-				},
-				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' }
-	);
-	return $result;
-}
+Permanently deletes an alias address.
+
+  $miab->remove_alias({
+		address => bart.simpson@springfield.com
+	});
 
 =cut
 
@@ -483,8 +397,10 @@ sub remove_alias{
 				},
 				headers => { 'Content-Type' => 'application/x-www-form-urlencoded' }
 	);
+
 	return $result;
 }
+
 
 sub _find_aliases_generic {
 	my ($self, $param_name, $alias_pattern, $domain_pattern) = @_;
@@ -501,7 +417,7 @@ sub _find_aliases_generic {
 	# get all aliases
 	my $aliases = $self->get_aliases();
 
-	# filter	
+	# filter
 	foreach (@{$aliases}) {
 		if (!$domain_pattern || $_->{'domain'} =~ $domain_pattern)
 		{
@@ -524,10 +440,6 @@ sub _find_aliases_generic {
 	}
 	return @result;
 }
-
-=head1 AUTHOR
-
-Alexander Schneider, C<< <alexander.schneider at minati.de> >>
 
 =head1 BUGS
 
@@ -566,12 +478,18 @@ L<http://search.cpan.org/dist/WebService-MIAB/>
 =back
 
 
-=head1 ACKNOWLEDGEMENTS
+=head1 AUTHORS
+
+Alexander Scneider C<alexander.schneider@minati.de>, Mario Minati
+C<mario.minati@minati.de>.
+
+Currently maintained by Alexander Scneider C<alexander.schneider@minati.de>
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Alexander Schneider.
+Copyright 2018 Alexander Scneider C<alexander.schneider@minati.de>, Mario Minati
+C<mario.minati@minati.de>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -613,4 +531,3 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =cut
 
 1; # End of WebService::MIAB
-

@@ -21,7 +21,7 @@ WriteMakefile(
         "Carp" => '1.29',
         "Cwd"  => '3.40',
         'File::Basename' => '2.84',
-        'File::Find'     => '1.23',
+        'File::Find'     => '0',
         'File::Spec'     => '3.40',
         ($^O eq 'MSWin32' ? ('Win32::File' => '0') : ()),
     },

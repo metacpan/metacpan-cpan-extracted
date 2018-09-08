@@ -74,7 +74,7 @@ WHOSONFIRST: {
 				ok(ref($location) eq 'HASH');
 				# FIXME: Stop the different results
 				if($libpostal_is_installed) {
-					delta_within($location->{latitude}, 39.07, 1e-2);
+					delta_within($location->{latitude}, 39.06, 1e-2);
 					delta_within($location->{longitude}, -77.13, 1e-2);
 				} else {
 					delta_within($location->{latitude}, 39.06, 1e-2);

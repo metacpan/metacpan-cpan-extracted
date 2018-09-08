@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::KMSKA::TMS::Index;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Moo;
 use Catmandu;

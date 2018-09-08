@@ -19,16 +19,16 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Crypt-Trifid-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Crypt::Trifid'        => { file => 'lib/Crypt/Trifid.pm'      , version => '0.09' },
-            'Crypt::Trifid::Utils' => { file => 'lib/Crypt/Trifid/Utils.pm', version => '0.09' },
+            'Crypt::Trifid'        => { file => 'lib/Crypt/Trifid.pm'      , version => '0.10' },
+            'Crypt::Trifid::Utils' => { file => 'lib/Crypt/Trifid/Utils.pm', version => '0.10' },
         },
         resources => {
             repository => {

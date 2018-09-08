@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 27;
+use Test::Most tests => 30;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -38,20 +38,20 @@ SCANTEXT: {
 			@locations = $geocoder->geocode(scantext => "I was born at St Mary's Hospital in Newark, DE in 1987");
 			my $found = 0;
 			foreach $location(@locations) {
-				if($location->{'city'} ne 'NEWARK') {
-					next;
-				}
-				if($location->{'state'} ne 'DE') {
-					next;
-				}
-				if($location->{'country'} ne 'US') {
-					next;
-				}
+				# if($location->{'city'} ne 'NEWARK') {
+					# next;
+				# }
+				# if($location->{'state'} ne 'DE') {
+					# next;
+				# }
+				# if($location->{'country'} ne 'US') {
+					# next;
+				# }
+				next unless($location->{'location'} eq 'Newark, DE, USA');
 				$found++;
 				delta_within($location->{latitude}, 39.68, 1e-2);
 				delta_within($location->{longitude}, -75.76, 1e-2);
 				ok(defined($location->{'confidence'}));
-				ok($location->{'location'} eq 'Newark, DE, USA');
 
 			}
 			ok($found == 1);
@@ -61,33 +61,42 @@ SCANTEXT: {
 			# diag(Data::Dumper->new([\@locations])->Dump());
 			foreach $location(@locations) {
 				my $city;
+				# diag(__LINE__, $location->{'location'});
 				next if(!defined($city = $location->{'city'}));
 				# diag("$city: ", $location->{'confidence'});
-				if(defined($location->{'state'}) && $location->{'state'} ne 'IN') {
+				if(defined($location->{'state'}) && ($location->{'state'} ne 'IN')) {
 					next;
 				}
 				if($location->{'country'} ne 'US') {
 					next;
 				}
+
 				if($city eq 'GREENWOOD') {
+				# if($location->{'location'} =~ /^Greenwood, IN/i) {
 					if(!$found{'GREENWOOD'}) {
 						$found{'GREENWOOD'}++;
 						delta_within($location->{latitude}, 39.6, 1e-1);
 						delta_within($location->{longitude}, -86.2, 1e-1);
 						ok(defined($location->{'confidence'}));
+						ok($location->{'state'} eq 'IN');
 					}
 				} elsif($city eq 'INDIANAPOLIS') {
+				# } elsif($location->{'location'} =~ /^Indianapolis,/i) {
 					if(!$found{'INDIANAPOLIS'}) {
 						$found{'INDIANAPOLIS'}++;
 						delta_within($location->{latitude}, 39.8, 1e-1);
 						delta_within($location->{longitude}, -86.2, 1e-1);
+						ok(defined($location->{'confidence'}));
 						ok($location->{'state'} eq 'IN');
 					}
 				} elsif($city eq 'NOBLESVILLE') {
+				# } elsif($location->{'location'} =~ /^Noblesville,/i) {
 					if(!$found{'NOBLESVILLE'}) {
 						$found{'NOBLESVILLE'}++;
 						delta_within($location->{latitude}, 40.1, 1e-1);
 						delta_within($location->{longitude}, -86.1, 1e-1);
+						ok(defined($location->{'confidence'}));
+						ok($location->{'state'} eq 'IN');
 					}
 				}
 			}
@@ -96,7 +105,7 @@ SCANTEXT: {
 			ok($found{'INDIANAPOLIS'});
 		} else {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 26);
+			skip('Author tests not required for installation', 29);
 		}
 	}
 }

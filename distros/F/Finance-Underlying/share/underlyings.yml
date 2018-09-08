@@ -63,500 +63,6 @@ AS51:
   quoted_currency: AUD
   submarket: asia_oceania
   symbol: AS51
-AUAGL:
-  asset: AUAGL
-  display_name: AGL Energy Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUAGL
-AUAMC:
-  asset: AUAMC
-  display_name: Amcor Ltd
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUAMC
-AUANZ:
-  asset: AUANZ
-  display_name: ANZ Banking Group
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: au_otc_stock
-  symbol: AUANZ
-AUASX:
-  asset: AUASX
-  display_name: ASX Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUASX
-AUAWC:
-  asset: AUAWC
-  display_name: ALUMINA LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUAWC
-AUAZJ:
-  asset: AUAZJ
-  display_name: Aurizon Holdings Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUAZJ
-AUBHP:
-  asset: AUBHP
-  display_name: BHP Billiton
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: au_otc_stock
-  symbol: AUBHP
-AUCBA:
-  asset: AUCBA
-  display_name: Commonwealth Bank
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: au_otc_stock
-  symbol: AUCBA
-AUCCL:
-  asset: AUCCL
-  display_name: Coca-cola Amatil Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUCCL
-AUCSL:
-  asset: AUCSL
-  display_name: CSL Ltd
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUCSL
-AUCTX:
-  asset: AUCTX
-  display_name: Caltex Australia Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUCTX
-AUCWN:
-  asset: AUCWN
-  display_name: Crown Resorts Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUCWN
-AUFMG:
-  asset: AUFMG
-  display_name: Fortescue Metals Group
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUFMG
-AUGPT:
-  asset: AUGPT
-  display_name: GPT Group Stapled
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUGPT
-AULLC:
-  asset: AULLC
-  display_name: Lend Lease Group Stapled
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AULLC
-AUMGR:
-  asset: AUMGR
-  display_name: Mirvac Group Stapled
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUMGR
-AUMQG:
-  asset: AUMQG
-  display_name: Macquarie Group
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: au_otc_stock
-  symbol: AUMQG
-AUNAB:
-  asset: AUNAB
-  display_name: National Australia Bank Ltd
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUNAB
-AUNWS:
-  asset: AUNWS
-  display_name: NEWS CORPORATION.
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUNWS
-AUORG:
-  asset: AUORG
-  display_name: ORIGIN ENERGY LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUORG
-AUORI:
-  asset: AUORI
-  display_name: Orica Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUORI
-AUQAN:
-  asset: AUQAN
-  display_name: Qantas Airways
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: au_otc_stock
-  symbol: AUQAN
-AUQBE:
-  asset: AUQBE
-  display_name: QBE INSURANCE GROUP LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUQBE
-AURIO:
-  asset: AURIO
-  display_name: RIO TINTO LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AURIO
-AUSHL:
-  asset: AUSHL
-  display_name: Sonic Healthcare Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUSHL
-AUSTO:
-  asset: AUSTO
-  display_name: Santos LimitedStar Stock
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUSTO
-AUSUN:
-  asset: AUSUN
-  display_name: SUNCORP GROUP LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUSUN
-AUTLS:
-  asset: AUTLS
-  display_name: TELSTRA CORPORATION LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUTLS
-AUTPM:
-  asset: AUTPM
-  display_name: TPG Telecom Limited
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUTPM
-AUWBC:
-  asset: AUWBC
-  display_name: Westpac Banking Co.
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUWBC
-AUWES:
-  asset: AUWES
-  display_name: WESFARMERS LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUWES
-AUWOW:
-  asset: AUWOW
-  display_name: WOOLWORTHS LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUWOW
-AUWPL:
-  asset: AUWPL
-  display_name: WOODSIDE PETROLEUM LIMITED
-  exchange_name: ASX
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AUD
-  submarket: australia
-  symbol: AUWPL
-BBABI:
-  asset: BBABI
-  display_name: AB Inbev
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: belgium
-  symbol: BBABI
-BBBELG:
-  asset: BBBELG
-  display_name: Belgacom
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: belgium
-  symbol: BBBELG
-BBGBLB:
-  asset: BBGBLB
-  display_name: Groupe Bruxelles Lambert
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: belgium
-  symbol: BBGBLB
-BBKBC:
-  asset: BBKBC
-  display_name: KBC Groep
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: belgium
-  symbol: BBKBC
-BBUCB:
-  asset: BBUCB
-  display_name: UCB
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: belgium
-  symbol: BBUCB
 BFX:
   asset: BFX
   display_name: Belgian Index
@@ -596,357 +102,6 @@ BSESENSEX30:
   quoted_currency: INR
   submarket: asia_oceania
   symbol: BSESENSEX30
-DEACB:
-  asset: DEACB
-  display_name: Alpha Bank S.A.
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEACB
-DEADS:
-  asset: DEADS
-  display_name: ADIDAS AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEADS
-DEAIR:
-  asset: DEAIR
-  display_name: Airbus
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEAIR
-DEALV:
-  asset: DEALV
-  display_name: Allianz
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEALV
-DEAPC:
-  asset: DEAPC
-  display_name: Daimler AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEAPC
-DEBAYER:
-  asset: DEBAYER
-  display_name: Bayer AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEBAYER
-DEBEIERSDORF:
-  asset: DEBEIERSDORF
-  display_name: Beiersdorf AG O.N
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEBEIERSDORF
-DEBKP:
-  asset: DEBKP
-  display_name: Piraeus Bank SA
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEBKP
-DEBMW:
-  asset: DEBMW
-  display_name: BMW
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEBMW
-DECOMMBK:
-  asset: DECOMMBK
-  display_name: Commerzbank
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DECOMMBK
-DEDAI:
-  asset: DEDAI
-  display_name: Daimler
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEDAI
-DEDBK:
-  asset: DEDBK
-  display_name: Deutsche Bank
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEDBK
-DEDLG:
-  asset: DEDLG
-  display_name: Dialog Semiconductor plc
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEDLG
-DEDTELE:
-  asset: DEDTELE
-  display_name: Deutsche Telekom AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEDTELE
-DEDUE:
-  asset: DEDUE
-  display_name: Duerr AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEDUE
-DEEOAN:
-  asset: DEEOAN
-  display_name: E.ON
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEEOAN
-DEGGQ:
-  asset: DEGGQ
-  display_name: GOOGLE INC. A DL
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEGGQ
-DELHA:
-  asset: DELHA
-  display_name: Deutsche Lufthansa
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DELHA
-DEMETRO:
-  asset: DEMETRO
-  display_name: Metro AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEMETRO
-DENOT:
-  asset: DENOT
-  display_name: Novartis
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DENOT
-DERHO:
-  asset: DERHO
-  display_name: Roche Holding AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DERHO
-DERHOFIVE:
-  asset: DERHOFIVE
-  display_name: Roche Holding Ag-Genusschein
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DERHOFIVE
-DESAP:
-  asset: DESAP
-  display_name: SAP
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DESAP
-DESIE:
-  asset: DESIE
-  display_name: Siemens
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DESIE
-DETKAG:
-  asset: DETKAG
-  display_name: Thyssenkrupp SS
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DETKAG
-DETLO:
-  asset: DETLO
-  display_name: Tesla Motors Inc.
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DETLO
-DEVOWGEN:
-  asset: DEVOWGEN
-  display_name: Volkswagen AG
-  exchange_name: FSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: ge_otc_stock
-  symbol: DEVOWGEN
 DFMGI:
   asset: DFMGI
   display_name: Dubai Index
@@ -999,526 +154,6 @@ FCHI:
   quoted_currency: EUR
   submarket: europe_africa
   symbol: FCHI
-FPACA:
-  asset: FPACA
-  display_name: Credit Agricole
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPACA
-FPACC:
-  asset: FPACC
-  display_name: Accor S.A.
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPACC
-FPAI:
-  asset: FPAI
-  display_name: Air Liquide
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPAI
-FPAIR:
-  asset: FPAIR
-  display_name: Airbus Group
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPAIR
-FPALST:
-  asset: FPALST
-  display_name: Alstom industrial machinery
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPALST
-FPARC:
-  asset: FPARC
-  display_name: ArcelorMittal steel
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPARC
-FPBN:
-  asset: FPBN
-  display_name: Danone
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPBN
-FPBNP:
-  asset: FPBNP
-  display_name: BNP Paribas
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPBNP
-FPBO:
-  asset: FPBO
-  display_name: Bouygues heavy construction
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPBO
-FPCA:
-  asset: FPCA
-  display_name: Carrefour
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPCA
-FPCAP:
-  asset: FPCAP
-  display_name: Capgemini computer services
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPCAP
-FPCS:
-  asset: FPCS
-  display_name: AXA
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPCS
-FPDG:
-  asset: FPDG
-  display_name: Vinci
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPDG
-FPEDF:
-  asset: FPEDF
-  display_name: Electricite de France
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPEDF
-FPEI:
-  asset: FPEI
-  display_name: Essilor International
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPEI
-FPFP:
-  asset: FPFP
-  display_name: TOTAL
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPFP
-FPGEM:
-  asset: FPGEM
-  display_name: Gemalto cyber security
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPGEM
-FPGLE:
-  asset: FPGLE
-  display_name: Societe Generale
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPGLE
-FPGSZ:
-  asset: FPGSZ
-  display_name: GDF Suez
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPGSZ
-FPKER:
-  asset: FPKER
-  display_name: Kering
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPKER
-FPLEG:
-  asset: FPLEG
-  display_name: Legrand electrical components & equipm
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPLEG
-FPMC:
-  asset: FPMC
-  display_name: Moet Hennessy Louis Vuitton
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPMC
-FPMIC:
-  asset: FPMIC
-  display_name: Michelin
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPMIC
-FPOR:
-  asset: FPOR
-  display_name: L'Oreal
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPOR
-FPORA:
-  asset: FPORA
-  display_name: Orange
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPORA
-FPPE:
-  asset: FPPE
-  display_name: Peugeot S.A.
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPPE
-FPPUBL:
-  asset: FPPUBL
-  display_name: Publicis media agencies
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPPUBL
-FPRI:
-  asset: FPRI
-  display_name: Pernod Ricard
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPRI
-FPRNO:
-  asset: FPRNO
-  display_name: Renault
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPRNO
-FPSAF:
-  asset: FPSAF
-  display_name: Safran
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPSAF
-FPSAN:
-  asset: FPSAN
-  display_name: SANOFI
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPSAN
-FPSGO:
-  asset: FPSGO
-  display_name: Cie de Saint-Gobain
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPSGO
-FPSOLV:
-  asset: FPSOLV
-  display_name: Solvay chemicals
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPSOLV
-FPST:
-  asset: FPST
-  display_name: STMicroelectronics semiconductors
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPST
-FPSU:
-  asset: FPSU
-  display_name: Schneider Electric
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPSU
-FPTECHNIP:
-  asset: FPTECHNIP
-  display_name: Technip oil equipment and services
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPTECHNIP
-FPUNI:
-  asset: FPUNI
-  display_name: Unibail-Rodamco SE
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPUNI
-FPVALL:
-  asset: FPVALL
-  display_name: Vallourec SA
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPVALL
-FPVEO:
-  asset: FPVEO
-  display_name: Veolia Environnement water
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPVEO
-FPVIV:
-  asset: FPVIV
-  display_name: Vivendi
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: france
-  symbol: FPVIV
 FTSE:
   asset: FTSE
   display_name: UK Index
@@ -1545,643 +180,6 @@ FTSEMIB:
   quoted_currency: EUR
   submarket: europe_africa
   symbol: FTSEMIB
-FUTAEX_1:
-  asset: FUTAEX_1
-  display_name: AEX Future 1
-  exchange_name: EEI_AM
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTAEX_1
-FUTAEX_2:
-  asset: FUTAEX_2
-  display_name: AEX Future 2
-  exchange_name: EEI_AM
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTAEX_2
-FUTAS51_1:
-  asset: FUTAS51_1
-  display_name: AS51 Future 1
-  exchange_name: SFE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: AUD
-  submarket: asia_oceania_future
-  symbol: FUTAS51_1
-FUTAS51_2:
-  asset: FUTAS51_2
-  display_name: AS51 Future 2
-  exchange_name: SFE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: AUD
-  submarket: asia_oceania_future
-  symbol: FUTAS51_2
-FUTBFX_1:
-  asset: FUTBFX_1
-  display_name: BFX Future 1
-  exchange_name: EEI_BU
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTBFX_1
-FUTBFX_2:
-  asset: FUTBFX_2
-  display_name: BFX Future 2
-  exchange_name: EEI_BU
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTBFX_2
-FUTBSESENSEX30_1:
-  asset: FUTBSESENSEX30_1
-  display_name: BSESENX30 Future 1
-  exchange_name: BSE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: INR
-  submarket: asia_oceania_future
-  symbol: FUTBSESENSEX30_1
-FUTBSESENSEX30_2:
-  asset: FUTBSESENSEX30_2
-  display_name: BSESENX30 Future 2
-  exchange_name: BSE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: INR
-  submarket: asia_oceania_future
-  symbol: FUTBSESENSEX30_2
-FUTFCHI_1:
-  asset: FUTFCHI_1
-  display_name: FCHI Future 1
-  exchange_name: EEI_PA
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTFCHI_1
-FUTFCHI_2:
-  asset: FUTFCHI_2
-  display_name: FCHI Future 2
-  exchange_name: EEI_PA
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTFCHI_2
-FUTFTSE_1:
-  asset: FUTFTSE_1
-  display_name: FTSE Future 1
-  exchange_name: ICE_LIFFE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: GBP
-  submarket: europe_africa_future
-  symbol: FUTFTSE_1
-FUTFTSE_2:
-  asset: FUTFTSE_2
-  display_name: FTSE Future 2
-  exchange_name: ICE_LIFFE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: GBP
-  submarket: europe_africa_future
-  symbol: FUTFTSE_2
-FUTGAEX:
-  asset: FUTGAEX
-  display_name: AEX Generic Future
-  exchange_name: EEI_AM
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGAEX
-FUTGAS51:
-  asset: FUTGAS51
-  display_name: AS51 Generic Future
-  exchange_name: SFE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: AUD
-  submarket: asia_oceania_future
-  symbol: FUTGAS51
-FUTGBFX:
-  asset: FUTGBFX
-  display_name: BFX Generic Future
-  exchange_name: EEI_BU
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGBFX
-FUTGBSESENSEX30:
-  asset: FUTGBSESENSEX30
-  display_name: BSESENX30 Generic Future
-  exchange_name: BSE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: INR
-  submarket: asia_oceania_future
-  symbol: FUTGBSESENSEX30
-FUTGFCHI:
-  asset: FUTGFCHI
-  display_name: FCHI Generic Future
-  exchange_name: EEI_PA
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGFCHI
-FUTGFTSE:
-  asset: FUTGFTSE
-  display_name: FTSE Generic Future
-  exchange_name: ICE_LIFFE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: GBP
-  submarket: europe_africa_future
-  symbol: FUTGFTSE
-FUTGFTSEMIB:
-  asset: FUTGFTSEMIB
-  display_name: FTSEMIB Generic Future
-  exchange_name: IDM
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGFTSEMIB
-FUTGGDAXI:
-  asset: FUTGGDAXI
-  display_name: GDAXI Generic Future
-  exchange_name: EUREX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGGDAXI
-FUTGGDAXI2:
-  asset: FUTGGDAXI2
-  display_name: GDAXI Generic Future 2
-  exchange_name: EUREX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGGDAXI2
-FUTGHSI:
-  asset: FUTGHSI
-  display_name: HSI Generic Future
-  exchange_name: HKF
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: HKD
-  submarket: asia_oceania_future
-  symbol: FUTGHSI
-FUTGIBEX35:
-  asset: FUTGIBEX35
-  display_name: IBEX35 Generic Future
-  exchange_name: MEFF
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGIBEX35
-FUTGIBOV:
-  asset: FUTGIBOV
-  display_name: IBOV Generic Future
-  exchange_name: BMF
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: BRL
-  submarket: europe_africa_future
-  symbol: FUTGIBOV
-FUTGKOSPI2:
-  asset: FUTGKOSPI2
-  display_name: KOSPI2 Generic Future
-  exchange_name: KRX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: KRW
-  submarket: asia_oceania_future
-  symbol: FUTGKOSPI2
-FUTGMDJI:
-  asset: FUTGMDJI
-  display_name: Emini DJI Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGMDJI
-FUTGMN225Y:
-  asset: FUTGMN225Y
-  display_name: Emini N225 Yen Dominated Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: JPY
-  submarket: asia_oceania_future
-  symbol: FUTGMN225Y
-FUTGMNDX:
-  asset: FUTGMNDX
-  display_name: Emini Nasdaq 100 Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGMNDX
-FUTGMSP400:
-  asset: FUTGMSP400
-  display_name: Emini S&P MidCap 400 Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGMSP400
-FUTGMSPC:
-  asset: FUTGMSPC
-  display_name: Emini SPC Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGMSPC
-FUTGN225:
-  asset: FUTGN225
-  display_name: N225 Generic Future
-  exchange_name: OSE
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: JPY
-  submarket: asia_oceania_future
-  symbol: FUTGN225
-FUTGN225U:
-  asset: FUTGN225U
-  display_name: N225 USD Dominated Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: asia_oceania_future
-  symbol: FUTGN225U
-FUTGN225Y:
-  asset: FUTGN225Y
-  display_name: N225 Yen Dominated Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: JPY
-  submarket: asia_oceania_future
-  symbol: FUTGN225Y
-FUTGNDX:
-  asset: FUTGNDX
-  display_name: Nasdaq 100 Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGNDX
-FUTGPSI20:
-  asset: FUTGPSI20
-  display_name: PSI Generic Future
-  exchange_name: EEI_LI
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGPSI20
-FUTGSP400:
-  asset: FUTGSP400
-  display_name: S&P MidCap 400 Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGSP400
-FUTGSPC:
-  asset: FUTGSPC
-  display_name: Emini SPC Generic Future
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTGSPC
-FUTGSSMI:
-  asset: FUTGSSMI
-  display_name: SSMI Generic Future
-  exchange_name: EUREX_SWISS
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: CHF
-  submarket: europe_africa_future
-  symbol: FUTGSSMI
-FUTGSTI:
-  asset: FUTGSTI
-  display_name: STI Generic Future
-  exchange_name: SGX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: SGD
-  submarket: asia_oceania_future
-  symbol: FUTGSTI
-FUTGSX5E:
-  asset: FUTGSX5E
-  display_name: STOXX 50 Generic Future
-  exchange_name: EUREX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGSX5E
-FUTGSX5E2:
-  asset: FUTGSX5E2
-  display_name: STOXX 50 Generic Future 2
-  exchange_name: EUREX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTGSX5E2
-FUTHSI_1:
-  asset: FUTHSI_1
-  display_name: HSI Future 1
-  exchange_name: HKF
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: HKD
-  submarket: asia_oceania_future
-  symbol: FUTHSI_1
-FUTHSI_2:
-  asset: FUTHSI_2
-  display_name: HSI Future 2
-  exchange_name: HKF
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: HKD
-  submarket: asia_oceania_future
-  symbol: FUTHSI_2
-FUTMDJI_1:
-  asset: FUTMDJI_1
-  display_name: Emini DJI Future 1
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTMDJI_1
-FUTMDJI_2:
-  asset: FUTMDJI_2
-  display_name: Emini DJI Future 2
-  exchange_name: CME
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: americas_future
-  symbol: FUTMDJI_2
-FUTPSI20_1:
-  asset: FUTPSI20_1
-  display_name: PSI Future 1
-  exchange_name: EEI_LI
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTPSI20_1
-FUTPSI20_2:
-  asset: FUTPSI20_2
-  display_name: PSI Future 2
-  exchange_name: EEI_LI
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: EUR
-  submarket: europe_africa_future
-  symbol: FUTPSI20_2
-FUTSTI_1:
-  asset: FUTSTI_1
-  display_name: STI Future 1
-  exchange_name: SGX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: SGD
-  submarket: asia_oceania_future
-  symbol: FUTSTI_1
-FUTSTI_2:
-  asset: FUTSTI_2
-  display_name: STI Future 2
-  exchange_name: SGX
-  instrument_type: future
-  market: futures
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: SGD
-  submarket: asia_oceania_future
-  symbol: FUTSTI_2
 GDAXI:
   asset: GDAXI
   display_name: German Index
@@ -2247,136 +245,6 @@ IBOV:
   quoted_currency: BRL
   submarket: americas
   symbol: IBOV
-INBHARTIARTL:
-  asset: INBHARTIARTL
-  display_name: Bharti Airtel
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INBHARTIARTL
-INHDFC:
-  asset: INHDFC
-  display_name: HDFC Bank Ltd
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INHDFC
-INICICIBC:
-  asset: INICICIBC
-  display_name: ICICI Bank Ltd
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INICICIBC
-ININFO:
-  asset: ININFO
-  display_name: Infosys Ltd
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: ININFO
-INITC:
-  asset: INITC
-  display_name: ITC Ltd
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INITC
-INMARUTI:
-  asset: INMARUTI
-  display_name: Maruti Suzuki
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INMARUTI
-INRIL:
-  asset: INRIL
-  display_name: Reliance Industries
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INRIL
-INSUNPHARMA:
-  asset: INSUNPHARMA
-  display_name: Sun Pharma
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INSUNPHARMA
-INTATAMOTORS:
-  asset: INTATAMOTORS
-  display_name: Tata Motors
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INTATAMOTORS
-INTATASTEEL:
-  asset: INTATASTEEL
-  display_name: Tata Steel
-  exchange_name: BSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: india_otc_stock
-  symbol: INTATASTEEL
 ISEQ:
   asset: ISEQ
   display_name: Irish Index
@@ -2481,71 +349,6 @@ N225:
   quoted_currency: JPY
   submarket: asia_oceania
   symbol: N225
-NAASML:
-  asset: NAASML
-  display_name: ASML Holding
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: amsterdam
-  symbol: NAASML
-NAHEIA:
-  asset: NAHEIA
-  display_name: Heineken
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: amsterdam
-  symbol: NAHEIA
-NAINGA:
-  asset: NAINGA
-  display_name: ING
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: amsterdam
-  symbol: NAINGA
-NARDSA:
-  asset: NARDSA
-  display_name: Royal Dutch Shell
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: amsterdam
-  symbol: NARDSA
-NAUNA:
-  asset: NAUNA
-  display_name: Unilever
-  exchange_name: EURONEXT
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: amsterdam
-  symbol: NAUNA
 NDX:
   asset: NDX
   display_name: US Tech 100 Index
@@ -2587,7 +390,7 @@ OMXS30:
   symbol: OMXS30
 OTC_AEX:
   asset: OTC_AEX
-  display_name: Dutch OTC Index
+  display_name: Dutch Index
   exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
@@ -2596,11 +399,11 @@ OTC_AEX:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_AEX
 OTC_AS51:
   asset: OTC_AS51
-  display_name: Australian OTC Index
+  display_name: Australian Index
   exchange_name: ASX_OTC
   instrument_type: stockindex
   market: indices
@@ -2609,11 +412,11 @@ OTC_AS51:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: AUD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_AS51
 OTC_AS51_INVAST:
   asset: OTC_AS51_INVAST
-  display_name: Australian OTC Index
+  display_name: Australian Index
   exchange_name: ASX_OTC
   instrument_type: stockindex
   market: indices
@@ -2622,11 +425,11 @@ OTC_AS51_INVAST:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: AUD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_AS51_INVAST
 OTC_AS51_CFH:
   asset: OTC_AS51_CFH
-  display_name: Australian OTC Index
+  display_name: Australian Index
   exchange_name: ASX_OTC
   instrument_type: stockindex
   market: indices
@@ -2635,11 +438,11 @@ OTC_AS51_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: AUD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_AS51_CFH
 OTC_AS51_FXO:
   asset: OTC_AS51_FXO
-  display_name: Australian OTC Index
+  display_name: Australian Index
   exchange_name: ASX_OTC
   instrument_type: stockindex
   market: indices
@@ -2648,63 +451,11 @@ OTC_AS51_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: AUD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_AS51_FXO
-OTC_BFX:
-  asset: OTC_BFX
-  display_name: Belgian OTC Index
-  exchange_name: EURONEXT
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: otc_index
-  symbol: OTC_BFX
-OTC_BIST100:
-  asset: OTC_BIST100
-  display_name: Istanbul OTC Index
-  exchange_name: BIS
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: TRY
-  submarket: otc_index
-  symbol: OTC_BIST100
-OTC_BSESENSEX30:
-  asset: OTC_BSESENSEX30
-  display_name: Bombay OTC Index
-  exchange_name: BSE
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: INR
-  submarket: otc_index
-  symbol: OTC_BSESENSEX30
-OTC_DFMGI:
-  asset: OTC_DFMGI
-  display_name: Dubai OTC Index
-  exchange_name: DFM
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: AED
-  submarket: otc_index
-  symbol: OTC_DFMGI
 OTC_DJI:
   asset: OTC_DJI
-  display_name: Wall Street OTC Index
+  display_name: Wall Street Index
   exchange_name: NYSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2713,11 +464,11 @@ OTC_DJI:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_DJI
 OTC_DJI_CFH:
   asset: OTC_DJI_CFH
-  display_name: Wall Street OTC Index
+  display_name: Wall Street Index
   exchange_name: NYSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2726,11 +477,11 @@ OTC_DJI_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_DJI_CFH
 OTC_DJI_FXO:
   asset: OTC_DJI_FXO
-  display_name: Wall Street OTC Index
+  display_name: Wall Street Index
   exchange_name: NYSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2739,11 +490,11 @@ OTC_DJI_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_DJI_FXO
 OTC_DJI_GBE:
   asset: OTC_DJI_GBE
-  display_name: Wall Street OTC Index
+  display_name: Wall Street Index
   exchange_name: NYSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2752,11 +503,11 @@ OTC_DJI_GBE:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_DJI_GBE
 OTC_FCHI:
   asset: OTC_FCHI
-  display_name: French OTC Index
+  display_name: French Index
   exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
@@ -2765,11 +516,11 @@ OTC_FCHI:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FCHI
 OTC_FCHI_INVAST:
   asset: OTC_FCHI_INVAST
-  display_name: French OTC Index
+  display_name: French Index
   exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
@@ -2778,11 +529,11 @@ OTC_FCHI_INVAST:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FCHI_INVAST
 OTC_FCHI_CFH:
   asset: OTC_FCHI_CFH
-  display_name: French OTC Index
+  display_name: French Index
   exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
@@ -2791,11 +542,11 @@ OTC_FCHI_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FCHI_CFH
 OTC_FCHI_FXO:
   asset: OTC_FCHI_FXO
-  display_name: French OTC Index
+  display_name: French Index
   exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
@@ -2804,11 +555,11 @@ OTC_FCHI_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FCHI_FXO
 OTC_FTSE:
   asset: OTC_FTSE
-  display_name: UK OTC Index
+  display_name: UK Index
   exchange_name: LSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2817,11 +568,11 @@ OTC_FTSE:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: GBP
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FTSE
 OTC_FTSE_INVAST:
   asset: OTC_FTSE_INVAST
-  display_name: UK OTC Index
+  display_name: UK Index
   exchange_name: LSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2830,11 +581,11 @@ OTC_FTSE_INVAST:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: GBP
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FTSE_INVAST
 OTC_FTSE_CFH:
   asset: OTC_FTSE_CFH
-  display_name: UK OTC Index
+  display_name: UK Index
   exchange_name: LSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2843,11 +594,11 @@ OTC_FTSE_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: GBP
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FTSE_CFH
 OTC_FTSE_FXO:
   asset: OTC_FTSE_FXO
-  display_name: UK OTC Index
+  display_name: UK Index
   exchange_name: LSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2856,24 +607,11 @@ OTC_FTSE_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: GBP
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_FTSE_FXO
-OTC_FTSEMIB:
-  asset: OTC_FTSEMIB
-  display_name: Italian OTC Index
-  exchange_name: BI
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: otc_index
-  symbol: OTC_FTSEMIB
 OTC_GDAXI:
   asset: OTC_GDAXI
-  display_name: German OTC Index
+  display_name: German Index
   exchange_name: FSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2882,11 +620,11 @@ OTC_GDAXI:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_GDAXI
 OTC_GDAXI_CFH:
   asset: OTC_GDAXI_CFH
-  display_name: German OTC Index
+  display_name: German Index
   exchange_name: FSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2895,11 +633,11 @@ OTC_GDAXI_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_GDAXI_CFH
 OTC_GDAXI_FXO:
   asset: OTC_GDAXI_FXO
-  display_name: German OTC Index
+  display_name: German Index
   exchange_name: FSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2908,11 +646,11 @@ OTC_GDAXI_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_GDAXI_FXO
 OTC_GDAXI_GBE:
   asset: OTC_GDAXI_GBE
-  display_name: German OTC Index
+  display_name: German Index
   exchange_name: FSE_OTC
   instrument_type: stockindex
   market: indices
@@ -2921,12 +659,12 @@ OTC_GDAXI_GBE:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_GDAXI_GBE
 OTC_HSI:
   asset: OTC_HSI
-  display_name: Hong Kong OTC Index
-  exchange_name: HKSE
+  display_name: Hong Kong Index
+  exchange_name: HKSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2934,11 +672,11 @@ OTC_HSI:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: HKD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_HSI
 OTC_HSI_INVAST:
   asset: OTC_HSI_INVAST
-  display_name: Hong Kong OTC Index
+  display_name: Hong Kong Index
   exchange_name: HKSE
   instrument_type: stockindex
   market: indices
@@ -2947,11 +685,11 @@ OTC_HSI_INVAST:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: HKD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_HSI_INVAST
 OTC_HSI_CFH:
   asset: OTC_HSI_CFH
-  display_name: Hong Kong OTC Index
+  display_name: Hong Kong Index
   exchange_name: HKSE
   instrument_type: stockindex
   market: indices
@@ -2960,11 +698,11 @@ OTC_HSI_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: HKD
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_HSI_CFH
 OTC_IBEX35:
   asset: OTC_IBEX35
-  display_name: Spanish OTC Index
+  display_name: Spanish Index
   exchange_name: BM_OTC
   instrument_type: stockindex
   market: indices
@@ -2973,11 +711,11 @@ OTC_IBEX35:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_IBEX35
 OTC_IBEX35_CFH:
   asset: OTC_IBEX35_CFH
-  display_name: Spanish OTC Index
+  display_name: Spanish Index
   exchange_name: BM_OTC
   instrument_type: stockindex
   market: indices
@@ -2986,38 +724,12 @@ OTC_IBEX35_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_IBEX35_CFH
-OTC_IBOV:
-  asset: OTC_IBOV
-  display_name: Brazilian OTC Index
-  exchange_name: BOVESPA
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: BRL
-  submarket: otc_index
-  symbol: OTC_IBOV
-OTC_ISEQ:
-  asset: OTC_ISEQ
-  display_name: Irish OTC Index
-  exchange_name: ISE
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: europe_africa
-  symbol: OTC_ISEQ
-OTC_IXIC:
-  asset: OTC_IXIC
-  display_name: US Tech OTC Index
-  exchange_name: NASDAQ_INDEX
+OTC_NDX:
+  asset: OTC_NDX
+  display_name: US Tech Index
+  exchange_name: NASDAQ_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -3025,89 +737,50 @@ OTC_IXIC:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
-  symbol: OTC_IXIC
-OTC_JCI:
-  asset: OTC_JCI
-  display_name: Jakarta OTC Index
-  exchange_name: JSC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.001
-  quoted_currency: IDR
-  submarket: otc_index
-  symbol: OTC_JCI
-OTC_KOSPI2:
-  asset: OTC_KOSPI2
-  display_name: Korean OTC Index
-  exchange_name: KRX
+  submarket: americas_OTC
+  symbol: OTC_NDX
+OTC_NDX_CFH:
+  asset: OTC_NDX_CFH
+  display_name: US Tech 100 Index
+  exchange_name: NASDAQ_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
     delta_premium_adjusted: 0
     delta_style: spot_delta
   pip_size: 0.01
-  quoted_currency: KRW
-  submarket: otc_index
-  symbol: OTC_KOSPI2
-OTC_KWSEIDX:
-  asset: OTC_KWSEIDX
-  display_name: Kuwait OTC Index
-  exchange_name: KSE
+  quoted_currency: USD
+  submarket: americas_OTC
+  symbol: OTC_NDX_CFH
+OTC_NDX_FXO:
+  asset: OTC_NDX_FXO
+  display_name: US Tech 100 Index
+  exchange_name: NASDAQ_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
     delta_premium_adjusted: 0
     delta_style: spot_delta
   pip_size: 0.01
-  quoted_currency: KWD
-  submarket: otc_index
-  symbol: OTC_KWSEIDX
-OTC_MICEX:
-  asset: OTC_MICEX
-  display_name: Russian 10 OTC Index
-  exchange_name: MICEX
+  quoted_currency: USD
+  submarket: americas_OTC
+  symbol: OTC_NDX_FXO
+OTC_NDX_GBE:
+  asset: OTC_NDX_GBE
+  display_name: US Tech 100 Index
+  exchange_name: NASDAQ_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
     delta_premium_adjusted: 0
     delta_style: spot_delta
   pip_size: 0.01
-  quoted_currency: RUB
-  submarket: otc_index
-  symbol: OTC_MICEX
-OTC_N100:
-  asset: OTC_N100
-  display_name: Euro 100 OTC Index
-  exchange_name: EURONEXT
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: otc_index
-  symbol: OTC_N100
-OTC_N150:
-  asset: OTC_N150
-  display_name: Euro 150 OTC Index
-  exchange_name: EURONEXT
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: otc_index
-  symbol: OTC_N150
+  quoted_currency: USD
+  submarket: americas_OTC
+  symbol: OTC_NDX_GBE
 OTC_N225:
   asset: OTC_N225
-  display_name: Japanese OTC Index
+  display_name: Japanese Index
   exchange_name: TSE_OTC
   instrument_type: stockindex
   market: indices
@@ -3116,11 +789,11 @@ OTC_N225:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: JPY
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_N225
 OTC_N225_CFH:
   asset: OTC_N225_CFH
-  display_name: Japanese OTC Index
+  display_name: Japanese Index
   exchange_name: TSE_OTC
   instrument_type: stockindex
   market: indices
@@ -3129,11 +802,11 @@ OTC_N225_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: JPY
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_N225_CFH
 OTC_N225_FXO:
   asset: OTC_N225_FXO
-  display_name: Japanese OTC Index
+  display_name: Japanese Index
   exchange_name: TSE_OTC
   instrument_type: stockindex
   market: indices
@@ -3142,11 +815,11 @@ OTC_N225_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: JPY
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_N225_FXO
 OTC_N225_GBE:
   asset: OTC_N225_GBE
-  display_name: Japanese OTC Index
+  display_name: Japanese Index
   exchange_name: TSE_OTC
   instrument_type: stockindex
   market: indices
@@ -3155,102 +828,24 @@ OTC_N225_GBE:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: JPY
-  submarket: otc_index
+  submarket: asia_oceania_OTC
   symbol: OTC_N225_GBE
-OTC_NIFTY:
-  asset: OTC_NIFTY
-  display_name: Indian 50 OTC Index
-  exchange_name: NSE_OTC
+OTC_SSMI:
+  asset: OTC_SSMI
+  display_name: Swiss Index
+  exchange_name: SWX_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
     delta_premium_adjusted: 0
     delta_style: spot_delta
   pip_size: 0.01
-  quoted_currency: INR
-  submarket: otc_index
-  symbol: OTC_NIFTY
-OTC_OBX:
-  asset: OTC_OBX
-  display_name: Norwegian OTC Index
-  exchange_name: OSLO
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: NOK
-  submarket: otc_index
-  symbol: OTC_OBX
-OTC_OMXS30:
-  asset: OTC_OMXS30
-  display_name: Swedish OTC Index
-  exchange_name: OMX
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: SEK
-  submarket: otc_index
-  symbol: OTC_OMXS30
-OTC_PSI20:
-  asset: OTC_PSI20
-  display_name: Portuguese OTC Index
-  exchange_name: EURONEXT
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: EUR
-  submarket: otc_index
-  symbol: OTC_PSI20
-OTC_RTSI:
-  asset: OTC_RTSI
-  display_name: Russian Regular OTC Index
-  exchange_name: RTS
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: otc_index
-  symbol: OTC_RTSI
-OTC_SASEIDX:
-  asset: OTC_SASEIDX
-  display_name: Saudi Arabia OTC Index
-  exchange_name: SAS
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: SAR
-  submarket: otc_index
-  symbol: OTC_SASEIDX
-OTC_SHSZ300:
-  asset: OTC_SHSZ300
-  display_name: Shenzhen 300 OTC Index
-  exchange_name: SZSE
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.001
-  quoted_currency: CNY
-  submarket: otc_index
-  symbol: OTC_SHSZ300
+  quoted_currency: CHF
+  submarket: europe_africa_OTC
+  symbol: OTC_SSMI
 OTC_SSMI_GBE:
   asset: OTC_SSMI_GBE
-  display_name: Swiss OTC Index
+  display_name: Swiss Index
   exchange_name: SWX
   instrument_type: stockindex
   market: indices
@@ -3259,11 +854,11 @@ OTC_SSMI_GBE:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: CHF
-  submarket: europe_africa
+  submarket: europe_africa_OTC
   symbol: OTC_SSMI_GBE
 OTC_STI_INVAST:
   asset: OTC_STI_INVAST
-  display_name: Singapore OTC Index
+  display_name: Singapore Index
   exchange_name: SES
   instrument_type: stockindex
   market: indices
@@ -3272,11 +867,11 @@ OTC_STI_INVAST:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: SGD
-  submarket: asia_oceania
+  submarket: asia_oceania_OTC
   symbol: OTC_STI_INVAST
 OTC_SPC:
   asset: OTC_SPC
-  display_name: US OTC Index
+  display_name: US Index
   exchange_name: NYSE_SPC_OTC
   instrument_type: stockindex
   market: indices
@@ -3285,11 +880,11 @@ OTC_SPC:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_SPC
 OTC_SPC_CFH:
   asset: OTC_SPC_CFH
-  display_name: US OTC Index
+  display_name: US Index
   exchange_name: NYSE_SPC_OTC
   instrument_type: stockindex
   market: indices
@@ -3298,11 +893,11 @@ OTC_SPC_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_SPC_CFH
 OTC_SPC_FXO:
   asset: OTC_SPC_FXO
-  display_name: US OTC Index
+  display_name: US Index
   exchange_name: NYSE_SPC_OTC
   instrument_type: stockindex
   market: indices
@@ -3311,11 +906,11 @@ OTC_SPC_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_SPC_FXO
 OTC_SPC_GBE:
   asset: OTC_SPC_GBE
-  display_name: US OTC Index
+  display_name: US Index
   exchange_name: NYSE_SPC_OTC
   instrument_type: stockindex
   market: indices
@@ -3324,89 +919,11 @@ OTC_SPC_GBE:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: USD
-  submarket: otc_index
+  submarket: americas_OTC
   symbol: OTC_SPC_GBE
-OTC_SPC100:
-  asset: OTC_SPC100
-  display_name: US 100 OTC Index
-  exchange_name: NYSE_SPC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: otc_index
-  symbol: OTC_SPC100
-OTC_SPC100_CFH:
-  asset: OTC_SPC100_CFH
-  display_name: US 100 OTC Index
-  exchange_name: NYSE_SPC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: otc_index
-  symbol: OTC_SPC100_CFH
-OTC_SPC100_FXO:
-  asset: OTC_SPC100_FXO
-  display_name: US 100 OTC Index
-  exchange_name: NYSE_SPC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: otc_index
-  symbol: OTC_SPC100_FXO
-OTC_SPC100_GBE:
-  asset: OTC_SPC100_GBE
-  display_name: US 100 OTC Index
-  exchange_name: NYSE_SPC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: otc_index
-  symbol: OTC_SPC100_GBE
-OTC_SPTSX60:
-  asset: OTC_SPTSX60
-  display_name: Canadian OTC Index
-  exchange_name: TRSE_OTC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: CAD
-  submarket: otc_index
-  symbol: OTC_SPTSX60
-OTC_SSECOMP:
-  asset: OTC_SSECOMP
-  display_name: Shanghai OTC Index
-  exchange_name: SSE
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.001
-  quoted_currency: CNY
-  submarket: otc_index
-  symbol: OTC_SSECOMP
 OTC_SX5E:
   asset: OTC_SX5E
-  display_name: Euro 50 OTC Index
+  display_name: Euro 50 Index
   exchange_name: STOXX_OTC
   instrument_type: stockindex
   market: indices
@@ -3415,11 +932,11 @@ OTC_SX5E:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_SX5E
 OTC_SX5E_INVAST:
   asset: OTC_SX5E_INVAST
-  display_name: Euro 50 OTC Index
+  display_name: Euro 50 Index
   exchange_name: STOXX_OTC
   instrument_type: stockindex
   market: indices
@@ -3428,11 +945,11 @@ OTC_SX5E_INVAST:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_SX5E_INVAST
 OTC_SX5E_CFH:
   asset: OTC_SX5E_CFH
-  display_name: Euro 50 OTC Index
+  display_name: Euro 50 Index
   exchange_name: STOXX_OTC
   instrument_type: stockindex
   market: indices
@@ -3441,11 +958,11 @@ OTC_SX5E_CFH:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_SX5E_CFH
 OTC_SX5E_FXO:
   asset: OTC_SX5E_FXO
-  display_name: Euro 50 OTC Index
+  display_name: Euro 50 Index
   exchange_name: STOXX_OTC
   instrument_type: stockindex
   market: indices
@@ -3454,34 +971,8 @@ OTC_SX5E_FXO:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: otc_index
+  submarket: europe_africa_OTC
   symbol: OTC_SX5E_FXO
-OTC_SZSECOMP:
-  asset: OTC_SZSECOMP
-  display_name: Shenzhen OTC Index
-  exchange_name: SZSE
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.001
-  quoted_currency: CNY
-  submarket: otc_index
-  symbol: OTC_SZSECOMP
-OTC_TOP40:
-  asset: OTC_TOP40
-  display_name: South African OTC Index
-  exchange_name: JSE_OTC
-  instrument_type: stockindex
-  market: indices
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: ZAR
-  submarket: otc_index
-  symbol: OTC_TOP40
 PSI20:
   asset: PSI20
   display_name: Portuguese Index
@@ -3493,7 +984,7 @@ PSI20:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: europe_africa
+  submarket: europe_africa_OTC
   symbol: PSI20
 RDBEAR:
   asset: RDBEAR
@@ -3846,1943 +1337,6 @@ TOP40:
   quoted_currency: ZAR
   submarket: europe_africa
   symbol: TOP40
-UKAAL:
-  asset: UKAAL
-  display_name: Anglo American plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKAAL
-UKABF:
-  asset: UKABF
-  display_name: Associated British foods plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKABF
-UKANH:
-  asset: UKANH
-  display_name: Al Noor Hospitals Group plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKANH
-UKAZN:
-  asset: UKAZN
-  display_name: AstraZeneca plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKAZN
-UKBAIR:
-  asset: UKBAIR
-  display_name: International Consolidated Airlines Group SA
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKBAIR
-UKBARC:
-  asset: UKBARC
-  display_name: Barclays
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKBARC
-UKBATS:
-  asset: UKBATS
-  display_name: British American Tobacco
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKBATS
-UKBG:
-  asset: UKBG
-  display_name: BG Group plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKBG
-UKBP:
-  asset: UKBP
-  display_name: BP
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKBP
-UKBT:
-  asset: UKBT
-  display_name: BT
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKBT
-UKCMPS:
-  asset: UKCMPS
-  display_name: Compass Group plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKCMPS
-UKCTR:
-  asset: UKCTR
-  display_name: Centrica plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKCTR
-UKDGE:
-  asset: UKDGE
-  display_name: Diageo plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKDGE
-UKGLEN:
-  asset: UKGLEN
-  display_name: Glencore Xstrat
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKGLEN
-UKGSK:
-  asset: UKGSK
-  display_name: GlaxoSmithKline
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKGSK
-UKHSBA:
-  asset: UKHSBA
-  display_name: HSBC
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKHSBA
-UKIAG:
-  asset: UKIAG
-  display_name: ICAG (British Airways)
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKIAG
-UKIMT:
-  asset: UKIMT
-  display_name: Imperial Tobacco Group plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKIMT
-UKLLOY:
-  asset: UKLLOY
-  display_name: Lloyds Bank
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKLLOY
-UKMNS:
-  asset: UKMNS
-  display_name: Marks & Spencer Group plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKMNS
-UKNIVAL:
-  asset: UKNIVAL
-  display_name: Carnival plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKNIVAL
-UKNTG:
-  asset: UKNTG
-  display_name: National Grid plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKNTG
-UKPRDN:
-  asset: UKPRDN
-  display_name: Prudential plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKPRDN
-UKPSN:
-  asset: UKPSN
-  display_name: Pearson plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKPSN
-UKRB:
-  asset: UKRB
-  display_name: Reckitt Benckiser Group plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKRB
-UKRDSA:
-  asset: UKRDSA
-  display_name: Royal Dutch Shell plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKRDSA
-UKRIO:
-  asset: UKRIO
-  display_name: Rio Tinto
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKRIO
-UKRLSRYC:
-  asset: UKRLSRYC
-  display_name: Rolls-Royce Holdings plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKRLSRYC
-UKSAB:
-  asset: UKSAB
-  display_name: SABMiller plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKSAB
-UKSPX:
-  asset: UKSPX
-  display_name: Spirax-Sarco Engineering plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKSPX
-UKSTAN:
-  asset: UKSTAN
-  display_name: Standard Chartered
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKSTAN
-UKTSCO:
-  asset: UKTSCO
-  display_name: Tesco
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKTSCO
-UKULVR:
-  asset: UKULVR
-  display_name: Unilever plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKULVR
-UKVIV:
-  asset: UKVIV
-  display_name: Aviva plc
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKVIV
-UKVOD:
-  asset: UKVOD
-  display_name: Vodafone Group
-  exchange_name: LSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: GBP
-  submarket: uk_otc_stock
-  symbol: UKVOD
-USAAIR:
-  asset: USAAIR
-  display_name: American Airlines Group Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USAAIR
-USAAPL:
-  asset: USAAPL
-  display_name: Apple
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USAAPL
-USABBV:
-  asset: USABBV
-  display_name: AbbVie Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USABBV
-USAIG:
-  asset: USAIG
-  display_name: American International Group Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USAIG
-USALCA:
-  asset: USALCA
-  display_name: Alcoa Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USALCA
-USALIBA:
-  asset: USALIBA
-  display_name: Alibaba
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USALIBA
-USAMAT:
-  asset: USAMAT
-  display_name: Applied Materials Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USAMAT
-USAMX:
-  asset: USAMX
-  display_name: American Express
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USAMX
-USAMZN:
-  asset: USAMZN
-  display_name: Amazon.com
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USAMZN
-USARMR:
-  asset: USARMR
-  display_name: Under Armour Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USARMR
-USATHM:
-  asset: USATHM
-  display_name: Autohome Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USATHM
-USATNT:
-  asset: USATNT
-  display_name: AT&T
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USATNT
-USBDU:
-  asset: USBDU
-  display_name: Baidu Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USBDU
-USBNG:
-  asset: USBNG
-  display_name: Boeing
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USBNG
-USBOA:
-  asset: USBOA
-  display_name: Bank of America Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USBOA
-USBRKSHR:
-  asset: USBRKSHR
-  display_name: Berkshire Hathaway
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USBRKSHR
-USCAT:
-  asset: USCAT
-  display_name: Caterpillar
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCAT
-USCBS:
-  asset: USCBS
-  display_name: CBS Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCBS
-USCHMO:
-  asset: USCHMO
-  display_name: China Mobile Limited
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCHMO
-USCISCO:
-  asset: USCISCO
-  display_name: Cisco Systems Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCISCO
-USCT:
-  asset: USCT
-  display_name: Citigroup
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCT
-USCTRP:
-  asset: USCTRP
-  display_name: Ctrip.com International Ltd.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCTRP
-USCVX:
-  asset: USCVX
-  display_name: Chevron Co.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCVX
-USCYN:
-  asset: USCYN
-  display_name: Cynapsus Therapeutics
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USCYN
-USDANG:
-  asset: USDANG
-  display_name: E-Commerce China Dangdang Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USDANG
-USDD:
-  asset: USDD
-  display_name: E.I du Pont de Nemours & company
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USDD
-USDLT:
-  asset: USDLT
-  display_name: Delta Air Lines Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USDLT
-USEA:
-  asset: USEA
-  display_name: Electronic Arts
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USEA
-USEBY:
-  asset: USEBY
-  display_name: eBay Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USEBY
-USEDU:
-  asset: USEDU
-  display_name: New Oriental Edu & Tech Group Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USEDU
-USFB:
-  asset: USFB
-  display_name: Facebook
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USFB
-USFRD:
-  asset: USFRD
-  display_name: Ford Motor Comapny
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USFRD
-USFRRRI:
-  asset: USFRRRI
-  display_name: FERRARI N V COM
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USFRRRI
-USFTBT:
-  asset: USFTBT
-  display_name: Fitbit Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USFTBT
-USGE:
-  asset: USGE
-  display_name: General Electric Co
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGE
-USGLD:
-  asset: USGLD
-  display_name: Gilead Sciensec Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGLD
-USGLDSCH:
-  asset: USGLDSCH
-  display_name: Goldman Sachs
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGLDSCH
-USGM:
-  asset: USGM
-  display_name: General Motors Company
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGM
-USGMO:
-  asset: USGMO
-  display_name: Keurig Green Mountain Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGMO
-USGOOG:
-  asset: USGOOG
-  display_name: Alphabet
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGOOG
-USGPR:
-  asset: USGPR
-  display_name: GoPro Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGPR
-USGRPN:
-  asset: USGRPN
-  display_name: Groupon Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USGRPN
-USHAL:
-  asset: USHAL
-  display_name: Halliburton Company
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USHAL
-USHD:
-  asset: USHD
-  display_name: The Home Depot Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USHD
-USHPACK:
-  asset: USHPACK
-  display_name: Hewlett-Packard Company
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USHPACK
-USIBM:
-  asset: USIBM
-  display_name: IBM
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USIBM
-USILLM:
-  asset: USILLM
-  display_name: Illumina Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USILLM
-USINCT:
-  asset: USINCT
-  display_name: Incyte Corpoartion
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USINCT
-USINTC:
-  asset: USINTC
-  display_name: Intel
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USINTC
-USJD:
-  asset: USJD
-  display_name: JD.com Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USJD
-USJMEI:
-  asset: USJMEI
-  display_name: Jumei International Holding Limited
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USJMEI
-USJNJ:
-  asset: USJNJ
-  display_name: Johnson & Johnson
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USJNJ
-USJPM:
-  asset: USJPM
-  display_name: JP Morgan Chase & Co.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USJPM
-USKING:
-  asset: USKING
-  display_name: King Digital Entertainment plc
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USKING
-USKO:
-  asset: USKO
-  display_name: Coca-Cola Co
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USKO
-USLNKD:
-  asset: USLNKD
-  display_name: LinkedIn Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USLNKD
-USLVS:
-  asset: USLVS
-  display_name: Las Vegas Sands Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USLVS
-USMA:
-  asset: USMA
-  display_name: MasterCard
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMA
-USMANU:
-  asset: USMANU
-  display_name: Manchester United plc
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMANU
-USMCDON:
-  asset: USMCDON
-  display_name: McDonald's
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMCDON
-USMCT:
-  asset: USMCT
-  display_name: Micron Technology Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMCT
-USMMM:
-  asset: USMMM
-  display_name: 3M Company
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMMM
-USMOMO:
-  asset: USMOMO
-  display_name: MOMO Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMOMO
-USMRK:
-  asset: USMRK
-  display_name: Merck & Co. Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMRK
-USMS:
-  asset: USMS
-  display_name: Morgan Stanley
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMS
-USMSFT:
-  asset: USMSFT
-  display_name: Microsoft
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USMSFT
-USNDSK:
-  asset: USNDSK
-  display_name: Sandisk Corporation
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USNDSK
-USNKE:
-  asset: USNKE
-  display_name: Nike Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USNKE
-USNOKIA:
-  asset: USNOKIA
-  display_name: Nokia Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USNOKIA
-USNTES:
-  asset: USNTES
-  display_name: NetEase Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USNTES
-USNTFLX:
-  asset: USNTFLX
-  display_name: Netflix Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USNTFLX
-USNVAR:
-  asset: USNVAR
-  display_name: Univar Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USNVAR
-USORCL:
-  asset: USORCL
-  display_name: Oracle
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.0001
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USORCL
-USPANW:
-  asset: USPANW
-  display_name: Palo Alto Networks Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPANW
-USPBYI:
-  asset: USPBYI
-  display_name: Puma Biotechnology Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPBYI
-USPEP:
-  asset: USPEP
-  display_name: PepsiCo
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPEP
-USPETRO:
-  asset: USPETRO
-  display_name: PetroChina Limited
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPETRO
-USPFE:
-  asset: USPFE
-  display_name: Pfizer Inc
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPFE
-USPG:
-  asset: USPG
-  display_name: Procter & Gamble
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPG
-USPM:
-  asset: USPM
-  display_name: Philip Morris International
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPM
-USPPR:
-  asset: USPPR
-  display_name: Voya Prime Rate Trust.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPPR
-USPTSH:
-  asset: USPTSH
-  display_name: Potash Corp of Saskatchewan Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USPTSH
-USQCOM:
-  asset: USQCOM
-  display_name: QUALCOMM
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USQCOM
-USQHO:
-  asset: USQHO
-  display_name: Qihoo 360 Technology Company Limited
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USQHO
-USQQQQ:
-  asset: USQQQQ
-  display_name: PowerShares QQQ
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USQQQQ
-USSBUX:
-  asset: USSBUX
-  display_name: Starbucks Corporation
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSBUX
-USSFUN:
-  asset: USSFUN
-  display_name: SouFun Holdings Limited
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSFUN
-USSHU:
-  asset: USSHU
-  display_name: Sohu.com Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSHU
-USSINA:
-  asset: USSINA
-  display_name: Sina Corporation
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSINA
-USSLRCT:
-  asset: USSLRCT
-  display_name: SolarCity Corporation
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSLRCT
-USSONY:
-  asset: USSONY
-  display_name: Sony Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSONY
-USSRVNW:
-  asset: USSRVNW
-  display_name: ServiceNow Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USSRVNW
-USTEVA:
-  asset: USTEVA
-  display_name: Teva Pharmaceutical Industries Limited
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USTEVA
-USTRPADV:
-  asset: USTRPADV
-  display_name: TripAdvisor Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USTRPADV
-USTSLMTR:
-  asset: USTSLMTR
-  display_name: Tesla Motors Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USTSLMTR
-USTWRNR:
-  asset: USTWRNR
-  display_name: Time Warner Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USTWRNR
-USTWTR:
-  asset: USTWTR
-  display_name: Twitter Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USTWTR
-USTYTA:
-  asset: USTYTA
-  display_name: Toyota Motor Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USTYTA
-USUAL:
-  asset: USUAL
-  display_name: United Continental Holdings Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USUAL
-USUBS:
-  asset: USUBS
-  display_name: UBS AG
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USUBS
-USUKU:
-  asset: USUKU
-  display_name: Youku Tudou Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USUKU
-USVFC:
-  asset: USVFC
-  display_name: VF Corporation
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USVFC
-USVGUS:
-  asset: USVGUS
-  display_name: Virgin America Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USVGUS
-USVIPSHP:
-  asset: USVIPSHP
-  display_name: Vipshop Holdings Limited
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USVIPSHP
-USVISA:
-  asset: USVISA
-  display_name: VISA Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USVISA
-USVRTX:
-  asset: USVRTX
-  display_name: Vertex Pharmaceuticals Incorporated
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USVRTX
-USWFC:
-  asset: USWFC
-  display_name: Wells Fargo & Company
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USWFC
-USWLGRN:
-  asset: USWLGRN
-  display_name: Walgreens Boots Alliance Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USWLGRN
-USWMT:
-  asset: USWMT
-  display_name: Wal-Mart Stores Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USWMT
-USWRKD:
-  asset: USWRKD
-  display_name: Workday Inc.
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USWRKD
-USXOM:
-  asset: USXOM
-  display_name: Exxon Mobil
-  exchange_name: NYSE
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USXOM
-USYHOO:
-  asset: USYHOO
-  display_name: Yahoo! Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USYHOO
-USYNDX:
-  asset: USYNDX
-  display_name: Yandex N.V.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USYNDX
-USYY:
-  asset: USYY
-  display_name: YY Inc.
-  exchange_name: NASDAQ
-  instrument_type: individualstock
-  market: stocks
-  market_convention:
-    delta_premium_adjusted: 0
-    delta_style: spot_delta
-  pip_size: 0.01
-  quoted_currency: USD
-  submarket: us_otc_stock
-  symbol: USYY
 WLDAUD:
   asset: AUD
   display_name: AUD Index
@@ -6425,7 +1979,7 @@ frxEURSEK:
     rr: call-put
   pip_size: 0.0001
   quoted_currency: SEK
-  submarket: major_pairs
+  submarket: minor_pairs
   symbol: frxEURSEK
 frxEURSGD:
   asset: EUR
@@ -9211,4 +4765,323 @@ frxDAIXPT:
   quoted_currency: XPT
   submarket: minor_pairs
   symbol: frxDAIXPT
-
+frxUSTAED:
+  asset: UST
+  display_name: UST/AED
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: AED
+  submarket: minor_pairs
+  symbol: frxUSTAED
+frxUSTAUD:
+  asset: UST
+  display_name: UST/AUD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: AUD
+  submarket: minor_pairs
+  symbol: frxUSTAUD
+frxUSTBRL:
+  asset: UST
+  display_name: UST/BRL
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: BRL
+  submarket: minor_pairs
+  symbol: frxUSTBRL
+frxUSTCAD:
+  asset: UST
+  display_name: UST/CAD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CAD
+  submarket: minor_pairs
+  symbol: frxUSTCAD
+frxUSTCHF:
+  asset: UST
+  display_name: UST/CHF
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CHF
+  submarket: minor_pairs
+  symbol: frxUSTCHF
+frxUSTCNY:
+  asset: UST
+  display_name: UST/CNY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CNY
+  submarket: minor_pairs
+  symbol: frxUSTCNY
+frxUSTCZK:
+  asset: UST
+  display_name: UST/CZK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CZK
+  submarket: minor_pairs
+  symbol: frxUSTCZK
+frxUSTEGP:
+  asset: UST
+  display_name: UST/EGP
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: EGP
+  submarket: minor_pairs
+  symbol: frxUSTEGP
+frxUSTEUR:
+  asset: UST
+  display_name: UST/EUR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: minor_pairs
+  symbol: frxUSTEUR
+frxUSTGBP:
+  asset: UST
+  display_name: UST/GBP
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: GBP
+  submarket: minor_pairs
+  symbol: frxUSTGBP
+frxUSTHKD:
+  asset: UST
+  display_name: UST/HKD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: HKD
+  submarket: minor_pairs
+  symbol: frxUSTHKD
+frxUSTIDR:
+  asset: UST
+  display_name: UST/IDR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: IDR
+  submarket: minor_pairs
+  symbol: frxUSTIDR
+frxUSTINR:
+  asset: UST
+  display_name: UST/INR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: INR
+  submarket: minor_pairs
+  symbol: frxUSTINR
+frxUSTJPY:
+  asset: UST
+  display_name: UST/JPY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: JPY
+  submarket: minor_pairs
+  symbol: frxUSTJPY
+frxUSTKRW:
+  asset: UST
+  display_name: UST/KRW
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: KRW
+  submarket: minor_pairs
+  symbol: frxUSTKRW
+frxUSTKWD:
+  asset: UST
+  display_name: UST/KWD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: KWD
+  submarket: minor_pairs
+  symbol: frxUSTKWD
+frxUSTMXN:
+  asset: UST
+  display_name: UST/MXN
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: MXN
+  submarket: minor_pairs
+  symbol: frxUSTMXN
+frxUSTNOK:
+  asset: UST
+  display_name: UST/NOK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: NOK
+  submarket: minor_pairs
+  symbol: frxUSTNOK
+frxUSTNZD:
+  asset: UST
+  display_name: UST/NZD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: NZD
+  submarket: minor_pairs
+  symbol: frxUSTNZD
+frxUSTPLN:
+  asset: UST
+  display_name: UST/PLN
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: PLN
+  submarket: minor_pairs
+  symbol: frxUSTPLN
+frxUSTRUB:
+  asset: UST
+  display_name: UST/RUB
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: RUB
+  submarket: minor_pairs
+  symbol: frxUSTRUB
+frxUSTSAR:
+  asset: UST
+  display_name: UST/SAR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SAR
+  submarket: minor_pairs
+  symbol: frxUSTSAR
+frxUSTSEK:
+  asset: UST
+  display_name: UST/SEK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SEK
+  submarket: minor_pairs
+  symbol: frxUSTSEK
+frxUSTSGD:
+  asset: UST
+  display_name: UST/SGD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SGD
+  submarket: minor_pairs
+  symbol: frxUSTSGD
+frxUSTTRY:
+  asset: UST
+  display_name: UST/TRY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: TRY
+  submarket: minor_pairs
+  symbol: frxUSTTRY
+frxUSTUSD:
+  asset: UST
+  display_name: UST/USD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: minor_pairs
+  symbol: frxUSTUSD
+frxUSTXAG:
+  asset: UST
+  display_name: UST/XAG
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XAG
+  submarket: minor_pairs
+  symbol: frxUSTXAG
+frxUSTXAU:
+  asset: UST
+  display_name: UST/XAU
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XAU
+  submarket: minor_pairs
+  symbol: frxUSTXAU
+frxUSTZAR:
+  asset: UST
+  display_name: UST/ZAR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: ZAR
+  submarket: minor_pairs
+  symbol: frxUSTZAR
+frxUSTBRO:
+  asset: UST
+  display_name: UST/BRO
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: BRO
+  submarket: minor_pairs
+  symbol: frxUSTBRO
+frxUSTXPD:
+  asset: UST
+  display_name: UST/XPD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XPD
+  submarket: minor_pairs
+  symbol: frxUSTXPD
+frxUSTXPT:
+  asset: UST
+  display_name: UST/XPT
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XPT
+  submarket: minor_pairs
+  symbol: frxUSTXPT

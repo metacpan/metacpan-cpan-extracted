@@ -3,7 +3,7 @@ package GeoIP2::Error::Generic;
 use strict;
 use warnings;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006001';
 
 use Moo;
 
@@ -27,7 +27,7 @@ GeoIP2::Error::Generic - A generic exception
 
 =head1 VERSION
 
-version 2.005001
+version 2.006001
 
 =head1 SYNOPSIS
 

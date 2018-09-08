@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_logger;
 #ABSTRACT: XPRESS logging module
-$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.660';
+$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.661';
 
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -598,7 +598,7 @@ Lab::XPRESS::Data::XPRESS_logger - XPRESS logging module
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 COPYRIGHT AND LICENSE
 

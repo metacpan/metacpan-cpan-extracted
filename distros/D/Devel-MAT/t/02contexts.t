@@ -8,7 +8,7 @@ use Test::More;
 use Devel::MAT::Dumper;
 use Devel::MAT;
 
-my $DUMPFILE = "test.pmat";
+my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
 
 my $inner_l0 = __LINE__+1;
 sub inner {

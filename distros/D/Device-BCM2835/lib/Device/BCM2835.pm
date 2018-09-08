@@ -609,7 +609,7 @@ our @EXPORT = qw(
 	RPI_V2_GPIO_P5_06
 );
 
-our $VERSION = '1.93';
+our $VERSION = '1.94';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -647,7 +647,7 @@ __END__
 
 =head1 NAME
 
-Device::BCM2835 - Perl extension for accesing GPIO pins on a Raspberry Pi via the BCM 2835 GPIO
+Device::BCM2835 - Perl extension for accessing GPIO pins on a Raspberry Pi via the BCM 2835 GPIO
 
 =head1 SYNOPSIS
 
@@ -694,10 +694,10 @@ Provides access to
 GPIO and other IO functions on the Broadcom BCM 2835 chip as used on 
 Raspberry Pi (RPi) http://www.raspberrypi.org
 
-Allows access to the GPIO pins on the
+Allows accesss to the GPIO pins on the
 26 pin IDE plug on the RPi board so you can control and interface with various external devices.
 It provides functions for reading digital inputs and setting digital outputs.
-Pin event detection is supported by polling (interrupts not supported).
+Pin event detection is supported by polling (interrupts are not supported).
 
 Building this module requires the bcm2835 library to be installed. 
 You can get the latest version from  
@@ -902,6 +902,7 @@ clocking the mode in with Device::BCM2835::gpio_pud() and Device::BCM2835::gpio_
  pud The desired Pull-up/down mode. One of BCM2835_GPIO_PUD_* from bcm2835PUDControl
 
 =item Device::BCM2835::spi_begin();
+
 Start SPI operations.
 Forces RPi SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
 to alternate function ALT0, which enables those pins for SPI interface.
@@ -909,27 +910,32 @@ You should call spi_end() when all SPI funcitons are complete to return the pins
 their default functions
 
 =item Device::BCM2835::end();
+
 End SPI operations.
 SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), P1-24 (CE0) and P1-26 (CE1)
 are returned to their default INPUT behaviour.
 
 =item Device::BCM2835::setBitOrder($order);
+
 Sets the SPI bit order
 NOTE: has no effect. Not supported by SPI0.
 Defaults to 
  order The desired bit order, one of BCM2835_SPI_BIT_ORDER_*, see \ref bcm2835SPIBitOrder
 
 =item Device::BCM2835::setClockDivider($divider);
+
 Sets the SPI clock divider and therefore the 
 SPI clock speed. 
  divider The desired SPI clock divider, one of BCM2835_SPI_CLOCK_DIVIDER_*, see \ref bcm2835SPIClockDivider
 
 =item Device::BCM2835::setDataMode($mode);
+
 Sets the SPI data mode
 Sets the clock polariy and phase
  mode The desired data mode, one of BCM2835_SPI_MODE*, see \ref bcm2835SPIMode
 
 =item Device::BCM2835::chipSelect($cs);
+
 Sets the chip select pin(s)
 When an spi_transfer() is made, the selected pin(s) will be asserted during the
 transfer.
@@ -937,6 +943,7 @@ transfer.
   One of BCM2835_SPI_CS*, see \ref bcm2835SPIChipSelect
 
 =item Device::BCM2835::setChipSelectPolarity($cs, $active);
+
 Sets the chip select pin polarity for a given pin
 When an spi_transfer() occurs, the currently selected chip select pin(s) 
 will be asserted to the 
@@ -946,6 +953,7 @@ return to the complement (inactive) value.
  active Whether the chip select pin is to be active HIGH
 
 =item     my $data = spi_transfer($value);
+
 Transfers one byte to and from the currently selected SPI slave.
 Asserts the currently selected CS pins (as previously set by bcm2835_spi_chipSelect) 
 during the transfer.
@@ -956,6 +964,7 @@ polled transfer as per section 10.6.1 of teh BCM 2835 ARM Peripherls manual
  return The 8 bit byte simultaneously read from  MISO
 
 =item    spi_transfern($buf);
+
 Transfers any number of bytes to and from the currently selected SPI slave.
 Asserts the currently selected CS pins (as previously set by bcm2835_spi_chipSelect) 
 during the transfer.

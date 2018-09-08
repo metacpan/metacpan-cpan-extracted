@@ -1,6 +1,6 @@
 package Lab::Bus::Socket;
 #ABSTRACT: IP network socket bus
-$Lab::Bus::Socket::VERSION = '3.660';
+$Lab::Bus::Socket::VERSION = '3.661';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -237,7 +237,7 @@ Lab::Bus::Socket - IP network socket bus
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 COPYRIGHT AND LICENSE
 

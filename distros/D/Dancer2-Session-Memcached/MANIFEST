@@ -1,3 +1,4 @@
+CODE_OF_CONDUCT.md
 CONTRIBUTING
 CONTRIBUTORS
 Changes
@@ -8,7 +9,7 @@ META.json
 META.yml
 Makefile.PL
 README.mkdn
-SIGNATURE
+README.pod
 cpanfile
 dist.ini
 doap.xml

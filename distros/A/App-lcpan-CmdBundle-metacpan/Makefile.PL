@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::lcpan::CmdBundle::metacpan",
   "PREREQ_PM" => {
-    "App::lcpan" => "1.017",
+    "App::lcpan" => "1.025",
     "Browser::Open" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.023",
+    "Perinci::Object" => "0.26",
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,12 +38,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::lcpan" => "1.017",
+  "App::lcpan" => "1.025",
   "Browser::Open" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.023",
+  "Perinci::Object" => "0.26",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

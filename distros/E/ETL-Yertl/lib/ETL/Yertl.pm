@@ -1,5 +1,5 @@
 package ETL::Yertl;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 # ABSTRACT: ETL with a Shell
 
 use strict;
@@ -12,7 +12,7 @@ use ETL::Yertl::FormatStream;
 use ETL::Yertl::Format;
 use IO::Async::Loop;
 
-our @EXPORT = qw( stdin stdout transform file );
+our @EXPORT = qw( stdin stdout transform file yq );
 our @EXPORT_OK = qw( loop );
 
 sub loop;
@@ -194,6 +194,23 @@ sub file( $$;% ) {
     return stream( %args );
 }
 
+#pod =sub yq
+#pod
+#pod     my $xform = yq( $filter );
+#pod
+#pod Create a L<ETL::Yertl::Transform::Yq> object with the given filter. See
+#pod L<yq/SYNTAX> for full filter syntax.
+#pod
+#pod =cut
+
+sub yq( $ ) {
+    my ( $filter ) = @_;
+    return transform(
+        'ETL::Yertl::Transform::Yq',
+        filter => $filter,
+    );
+}
+
 #pod =sub loop
 #pod
 #pod     my $loop = loop();
@@ -223,7 +240,7 @@ ETL::Yertl - ETL with a Shell
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 
@@ -354,6 +371,13 @@ of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
 
 =back
 
+=head2 yq
+
+    my $xform = yq( $filter );
+
+Create a L<ETL::Yertl::Transform::Yq> object with the given filter. See
+L<yq/SYNTAX> for full filter syntax.
+
 =head2 loop
 
     my $loop = loop();
@@ -393,10 +417,6 @@ Parse lines of text into Yertl documents.
 =item L<ysql>
 
 Read/write documents from SQL databases.
-
-=item L<ymask>
-
-Filter documents with a mask, letting only matching fields through.
 
 =item L<yq>
 
@@ -484,7 +504,7 @@ Luke Triantafyllidis <ltriant@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

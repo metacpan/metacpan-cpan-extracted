@@ -1,6 +1,6 @@
 package Lab::Connection::VISA_GPIB;
 #ABSTRACT: GPIB-type connection class which uses NI VISA (L<Lab::VISA>) as backend
-$Lab::Connection::VISA_GPIB::VERSION = '3.660';
+$Lab::Connection::VISA_GPIB::VERSION = '3.661';
 use strict;
 use Lab::VISA;
 use Lab::Bus::VISA;
@@ -171,7 +171,7 @@ Lab::Connection::VISA_GPIB - GPIB-type connection class which uses NI VISA (L<La
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 SYNOPSIS
 

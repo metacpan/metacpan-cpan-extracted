@@ -1,0 +1,121 @@
+NAME
+    Finance::SE::IDX::Any - Get information from Indonesian Stock Exchange
+
+VERSION
+    This document describes version 0.001 of Finance::SE::IDX::Any (from
+    Perl distribution Finance-SE-IDX-Any), released on 2018-09-08.
+
+SYNOPSIS
+    Use like you would use Finance::SE::IDX.
+
+DESCRIPTION
+    This module provides the same functions as Finance::SE::IDX, e.g.
+    "list_idx_firms" and will call the Finance::SE::IDX version but will
+    fallback for a while (default: 4 hours) to the Finance::SE::IDX::Static
+    version when the functions fail.
+
+VARIABLES
+  $FALLBACK_PERIOD
+    Specify, in seconds, how long should the fallback (static) version be
+    used after a failure. Default is 4*3600 (4 hours).
+
+FUNCTIONS
+  list_idx_boards
+    Usage:
+
+     list_idx_boards() -> [status, msg, result, meta]
+
+    List boards.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_idx_firms
+    Usage:
+
+     list_idx_firms(%args) -> [status, msg, result, meta]
+
+    List firms.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   board => *str*
+
+    *   sector => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_idx_sectors
+    Usage:
+
+     list_idx_sectors() -> [status, msg, result, meta]
+
+    List sectors.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-SE-IDX-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-SE-IDX-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Finance::SE::IDX
+
+    Finance::SE::IDX::Static
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

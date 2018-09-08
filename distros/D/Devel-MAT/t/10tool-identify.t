@@ -10,7 +10,7 @@ use Devel::MAT::Dumper;
 use Devel::MAT;
 use Scalar::Util qw( refaddr );
 
-my $DUMPFILE = "test.pmat";
+my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
 
 our %HASH = (
    array => [ my $SCALAR = \"foobar" ],

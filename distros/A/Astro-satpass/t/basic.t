@@ -13,6 +13,7 @@ use Time::Local;
 use constant TIMFMT => '%d-%b-%Y %H:%M:%S';
 
 use constant ARRAY_REF	=> ref [];
+use constant HASH_REF	=> ref {};
 
 sub instantiate ($);
 sub u_cmp_eql (@);
@@ -53,6 +54,19 @@ u_cmp_eql rad2deg => 1, 57.295779513, '%.9f', 'rad2deg( 1 )';
 
 u_cmp_eql rad2deg => undef, undef, undef, 'rad2deg( undef )';
 
+SKIP: {
+
+    $] ge '5.008001'
+	or skip "Perl $] has insufficient Unicode support", 1;
+    u_cmp_eql rad2dms => 1, q<57°17'44".806>, { test => 'is' }, 'rad2dms( 1 )';
+}
+
+u_cmp_eql rad2dms => undef, undef, undef, 'rad2dms( undef )';
+
+u_cmp_eql rad2hms => 1, '3h49m10s.987', { test => 'is' }, 'rad2hms( 1 )';
+
+u_cmp_eql rad2hms => undef, undef, undef, 'rad2hms( undef )';
+
 u_cmp_eql acos => 1, 0, '%.6f', 'acos( 1 )';
 
 u_cmp_eql acos => 0, atan2( 1, 0 ), '%.6f', 'acos( 0 )';
@@ -91,6 +105,8 @@ u_cmp_eql theta0 => timegm( 0, 21, 19, 10, 3, 87 ), 3.450397,
 u_cmp_eql omega => timegm( 0, 0, 0, 10, 3, 87 ), .19640,
     '%.5f', 'omega: Midnight Nov 3 1987: Meeus ex 22.a';
 
+# TODO drop the following
+
 u_cmp_eql nutation_in_longitude => timegm( 0, 0, 0, 10, 3, 87 ),
     -1.8364e-5, '%.5f',	# Tolerance .5 seconds of arc
     'nutation_in_longitude: Midnight Nov 3 1987: Meeus ex 22.a';
@@ -99,12 +115,14 @@ u_cmp_eql nutation_in_obliquity => timegm( 0, 0, 0, 10, 3, 87 ),
     4.5781e-5, '%.6f',	# Tolerance .1 seconds of arc
     'nutation_in_obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
 
+u_cmp_eql obliquity => timegm( 0, 0, 0, 10, 3, 87 ), 0.409167475225493,
+    '%.5f', 'obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
+
 u_cmp_eql equation_of_time => timegm( 0, 0, 0, 13, 9, 92 ),
     13 * 60 + 42.7, '%.1f',	# Tolerance .1 second
     'equation_of_time: Midnight Oct 13 1992: Meeus ex 28b';
 
-u_cmp_eql obliquity => timegm( 0, 0, 0, 10, 3, 87 ), 0.409167475225493,
-    '%.5f', 'obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
+# TODO drop the preceding
 
 u_cmp_eql add_magnitudes => [ 4.73, 5.22, 5.60 ], 3.93, '%.2f',
     'add_magnitudes: Meeus ex 56.b';
@@ -301,6 +319,14 @@ sub instantiate ($) {
 
 sub u_cmp_eql (@) {
     my ( $sub, $arg, $want, $tplt, $title ) = @_;
+    my $opt;
+    if ( HASH_REF eq ref $tplt ) {
+	$opt = { %{ $tplt } };	# Shallow clone
+	$tplt = $opt->{template};
+    } else {
+	$opt = {};
+    }
+    $opt->{test} ||= ( defined $tplt && '%s' eq $tplt ) ? 'is' : 'numeric';
     ARRAY_REF eq ref $arg
 	or $arg = [ $arg ];
     if ( my $code = Astro::Coord::ECI::Utils->can( $sub ) ) {
@@ -322,12 +348,14 @@ sub u_cmp_eql (@) {
 	} else {
 	    defined $tplt
 		and ( $want, $got ) = map { sprintf $tplt, $_ } ( $want, $got );
-	    if ( defined $tplt && '%s' eq $tplt ) {
+	    if ( 'is' eq $opt->{test} ) {
 		@_ = ( $got, $want, $title );
 		goto &is;
-	    } else {
+	    } elsif ( 'numeric' eq $opt->{test} ) {
 		@_ = ( $got, '==', $want, $title );
 		goto &cmp_ok;
+	    } else {
+		die "Unknown test type '$opt->{test}'";
 	    }
 	}
     } else {

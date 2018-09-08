@@ -6,7 +6,7 @@ Wallflower::Tutorial - Turn your Plack app into a static site
 
 =head1 VERSION
 
-version 1.012
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -91,13 +91,17 @@ reachable from the C<deployment> environment.
 
 =head2 Speed up site regeneration by sending 304 responses
 
-As of version 1.008, if the application sends the C<Last-Modified> header,
-it we be used to set the modification time of the target file.
-
 Since version 1.002, if the target file exists, L<wallflower> will
 send the C<If-Modified-Since> header with its modification date. If the
 application sends a C<304 Not Modified> response, the target file will
 not be modified.
+
+As of version 1.008, if the application sends the C<Last-Modified> header,
+it we be used to set the modification time of the target file.
+
+As of version 1.014, if the C<304> response contains a C<Content-Type>
+header, and L<wallflower> was run with the I<--follow> option, it will
+looked for more links to follow in the existing file.
 
 Note that since L<wallflower> works without using the network, this
 feature is only really useful if the response generation takes time

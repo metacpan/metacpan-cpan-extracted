@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.660';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.661';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -207,6 +207,7 @@ sub _add_plot_handle {
         plot    => { isa => 'Lab::Moose::Plot' },
         type    => { isa => enum( [qw/2d pm3d/] ) },
         curves  => { isa => 'ArrayRef[HashRef]' },
+        legend  => { isa => 'Maybe[Str]' },
         refresh => { isa => 'Str' },
     );
 
@@ -225,19 +226,33 @@ sub _add_2d_plot {
         terminal_options => { isa => 'HashRef',           optional => 1 },
         plot_options     => { isa => 'HashRef',           default  => {} },
         curve_options    => { isa => 'HashRef',           default  => {} },
+        legend           => { isa => 'Str',               optional => 1 },
         refresh => { isa => 'Str', default => 'point' },
     );
 
-    my $error_msg = "Provide either 'x/y' or 'curves' arguments";
-    my $x_column  = delete $args{x};
-    my $y_column  = delete $args{y};
-    my $curves    = delete $args{curves};
+    my $error_msg     = "Provide either 'x/y' or 'curves' arguments";
+    my $x_column      = delete $args{x};
+    my $y_column      = delete $args{y};
+    my $legend_column = delete $args{legend};
+    my $curves        = delete $args{curves};
+
+    my %default_curve_options = (
+        with => 'points',
+    );
+
+    $args{curve_options}
+        = { %default_curve_options, %{ $args{curve_options} } };
 
     if ( defined $x_column ) {
         if ( not defined $y_column ) {
             croak $error_msg;
         }
-        $curves = [ { x => $x_column, y => $y_column } ];
+        $curves = [
+            {
+                x             => $x_column, y => $y_column,
+                curve_options => $args{curve_options}
+            }
+        ];
     }
     else {
         if ( not defined $curves ) {
@@ -255,18 +270,16 @@ sub _add_2d_plot {
     );
     $args{plot_options} = { %default_plot_options, %{ $args{plot_options} } };
 
-    my %default_curve_options = (
-        with => 'points',
-    );
-
-    $args{curve_options}
-        = { %default_curve_options, %{ $args{curve_options} } };
-
+    my @check_columns = ();
     for my $curve ( @{$curves} ) {
-        for my $column ( $curve->{x}, $curve->{y} ) {
-            if ( not any { $column eq $_ } @{ $self->columns } ) {
-                croak "column $column does not exist";
-            }
+        push @check_columns, ( $curve->{x}, $curve->{y} );
+    }
+    if ( defined $legend_column ) {
+        push @check_columns, $legend_column;
+    }
+    for my $column (@check_columns) {
+        if ( not any { $column eq $_ } @{ $self->columns } ) {
+            croak "column $column does not exist";
         }
     }
 
@@ -276,6 +289,7 @@ sub _add_2d_plot {
         plot    => $plot,
         type    => '2d',
         curves  => $curves,
+        legend  => $legend_column,
         refresh => $refresh,
     );
 }
@@ -442,10 +456,11 @@ sub _refresh_plot {
         croak "no plot with name at index $index";
     }
 
-    my $type         = $plot->{type};
-    my @curves       = @{ $plot->{curves} };
-    my $column_names = $self->columns();
-    my $num_columns  = @{ $self->columns() };
+    my $type          = $plot->{type};
+    my $legend_column = $plot->{legend};
+    my @curves        = @{ $plot->{curves} };
+    my $column_names  = $self->columns();
+    my $num_columns   = @{ $self->columns() };
 
     if ( $self->num_data_rows() < 2 ) {
         return;
@@ -454,12 +469,25 @@ sub _refresh_plot {
     my @data;
 
     if ( $type eq '2d' ) {
-        my @columns = read_gnuplot_format(
-            type        => 'columns',
+        my $blocks = read_gnuplot_format(
+            type        => 'bare',
             fh          => $self->filehandle(),
-            num_columns => $num_columns
+            num_columns => $num_columns,
         );
 
+        # $block is 3d PDL with dimensions (column, line, block)
+
+        # split along last dimension
+        my @blocks = $blocks->dog();
+
+        my $legend_index;
+        if ( defined $legend_column ) {
+            ($legend_index)
+                = grep { $column_names->[$_] eq $legend_column }
+                0 .. $#{$column_names};
+        }
+
+        # draw separate line for each curve
         for my $curve (@curves) {
             my $x             = $curve->{x};
             my $y             = $curve->{y};
@@ -468,8 +496,22 @@ sub _refresh_plot {
                 = grep { $column_names->[$_] eq $x } 0 .. $#{$column_names};
             my ($y_index)
                 = grep { $column_names->[$_] eq $y } 0 .. $#{$column_names};
-            push @data,
-                ( $curve_options, $columns[$x_index], $columns[$y_index] );
+
+            # draw separate line for each block
+            for my $block (@blocks) {
+                my %curve_options = %{$curve_options};
+                if ( defined $legend_column ) {
+                    my $legend_value = $block->at( $legend_index, 0 );
+                    %curve_options = ( %curve_options, legend =>
+                            sprintf( "$legend_column = %g", $legend_value ) );
+                }
+                push @data,
+                    (
+                    {%curve_options}, $block->slice("$x_index,:")->flat,
+                    $block->slice("$y_index,:")->flat
+                    );
+
+            }
         }
         $plot->{plot}->plot( data => \@data );
     }
@@ -554,7 +596,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 SYNOPSIS
 
@@ -698,9 +740,13 @@ Name of the column which is used for the x-axis.
 
 Name of the column which is used for the y-axis.
 
-=item * z (mandatory for 3d plot)
+=item * z (mandatory for 'pm3d' plot type)
 
 Name of the column which is used tor the cb-axis in a pm3d plot.
+
+=item * legend (only for '2d' plot type)
+
+For datafiles with multiple blocks, name of the column which is used to label the curves (See example in L<Lab::Measurement::Tutorial>).
 
 =item * terminal
 

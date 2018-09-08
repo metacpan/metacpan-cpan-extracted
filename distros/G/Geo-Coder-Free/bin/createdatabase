@@ -3,5 +3,4 @@
 set -x
 set -e
 
-cd lib/Geo/Coder/Free/MaxMind/databases
-../../bin/db2sql cities
+cd lib/Geo/Coder/Free/MaxMind/databases && ../../bin/db2sql cities

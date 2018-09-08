@@ -1,0 +1,85 @@
+#!perl
+# ABSTRACT: filters fields in JSON output
+# PODNAME: jcut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use JSON::XS qw(encode_json);
+use App::JsonLogUtils qw(lines json_cut);
+
+my $help    = 0;
+my $inverse = 0;
+my $fields  = '';
+
+GetOptions(
+  'help'       => \$help,
+  'fields=s'   => \$fields,
+  'complement' => \$inverse,
+) or pod2usage(2);
+
+if ($help) {
+  pod2usage(1);
+  exit 0;
+}
+
+$| = 1;
+
+foreach (@ARGV ? @ARGV : (\*STDIN)) {
+  my $entries = json_cut $fields, $inverse, lines $_;
+  while (my $entry = <$entries>) {
+    print encode_json($entry), "\n";
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+jcut - filters fields in JSON output
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  jcut --field "field1 field2 field3 ..." [--complement] [/path/to/file1 /path/to/file2 ...]
+
+=head1 DESCRIPTION
+
+Outputs JSON objects with only the selected fields from JSON-formatted line
+input from supplied file path(s) or standard input if not provided.
+
+=head1 OPTIONS
+
+=head2 --fields | -f
+
+Selects one or more fields to be included in the reformatted JSON output line.
+Multiple fields are separated with a space.
+
+=head2 --complement | -c
+
+Inverts the meaning of C<--fields>, including all object keys except for those
+specified by C<--fields>.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -18,4 +18,6 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.0368'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM.git
+version: '0.0369'

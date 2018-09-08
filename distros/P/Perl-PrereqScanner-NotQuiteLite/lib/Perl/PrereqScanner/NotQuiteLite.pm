@@ -6,7 +6,7 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
@@ -2087,13 +2087,13 @@ _debug("NO TOKENS: ".(Data::Dump::dump($tokens))) if DEBUG;
 
   my $c1 = substr($name, 0, 1);
   if ($c1 eq '5') {
-    $c->add(perl => $name);
+    $c->add_no(perl => $name);
     return;
   }
   if ($c1 eq 'v') {
     my $c2 = substr($name, 1, 1);
     if ($c2 eq '5') {
-      $c->add(perl => $name);
+      $c->add_no(perl => $name);
       return;
     }
     if ($c2 eq '6') {
@@ -2110,10 +2110,10 @@ _debug("NO TOKENS: ".(Data::Dump::dump($tokens))) if DEBUG;
     my $maybe_version_token = $tokens->[0];
     my $maybe_version_token_desc = $maybe_version_token->[1];
     if ($maybe_version_token_desc and ($maybe_version_token_desc eq 'NUMBER' or $maybe_version_token_desc eq 'VERSION_STRING')) {
-      $c->add($name => $maybe_version_token->[0]);
+      $c->add_no($name => $maybe_version_token->[0]);
       shift @$tokens;
     } else {
-      $c->add($name => 0);
+      $c->add_no($name => 0);
     }
   }
 
@@ -2143,7 +2143,9 @@ Perl::PrereqScanner::NotQuiteLite - a tool to scan your Perl code for its prereq
   );
   my $context = $scanner->scan_file('path/to/file');
   my $requirements = $context->requires;
+  my $recommends = $context->recommends;
   my $suggestions  = $context->suggests; # requirements in evals
+  my $noes = $context->noes;
 
 =head1 BACKWARD INCOMPATIBLILITY
 
@@ -2163,6 +2165,10 @@ L<Perl::PrereqScanner::Lite> (which uses an XS lexer).
 Perl::PrereqScanner::NotQuiteLite also recognizes C<eval>.
 Prerequisites in C<eval> are not considered as requirements, but you
 can collect them as suggestions.
+
+Conditional requirements or requirements loaded in a block are
+treated as recommends. Noed modules are stored separately (since 0.94).
+You may or may not need to merge them into requires.
 
 =head1 METHODS
 

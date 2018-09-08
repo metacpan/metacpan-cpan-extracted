@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw( tempdir );
 use Path::Tiny ();
 use List::Util qw( sum );
 use URI;
@@ -20,7 +19,7 @@ my @tests;
 
 push @tests, [
     'direct content',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     sub {
         [   200,
             [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
@@ -50,7 +49,7 @@ push @tests, [
 
 push @tests, [
     'content in a glob',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     sub {
         [   200,
             [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
@@ -70,7 +69,7 @@ push @tests, [
 
 push @tests, [
     'content in an object',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     sub {
         [   200,
             [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
@@ -93,7 +92,7 @@ push @tests, [
 
 push @tests, [
     'status in the URL',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     sub {
         my $env = shift;
         my ($status) = $env->{REQUEST_URI} =~ m{/(\d\d\d)$}g;
@@ -121,7 +120,7 @@ push @tests, [
 
 push @tests, [
     'app that dies',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     sub {die},
     [   '/' => 500,
         [ 'Content-Type' => 'text/plain', 'Content-Length' => 21 ], '', ''
@@ -131,9 +130,8 @@ push @tests, [
 my $last_modified = time2str( time - 10 );
 push @tests, [
     'app supporting If-Modified-Since',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     do {
-        my %date;
         sub {
             my $env = shift;
             my $since = $env->{HTTP_IF_MODIFIED_SINCE} || '';
@@ -159,12 +157,12 @@ push @tests, [
         'index.html',
         'Hello, World!'
     ],
-    [ '/' => 304, [], '', '' ],
+    [ '/' => 304, [], 'index.html', 'Hello, World!' ],
 ];
 
 push @tests, [
     'not respecting directory semantics',
-    tempdir( CLEANUP => 1 ),
+    Path::Tiny->tempdir( CLEANUP => 1 ),
     sub {
         [   200,
             [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
@@ -212,7 +210,7 @@ for my $t (@tests) {
             "app ($desc) for $url"
         );
 
-        if ( $status eq '200' ) {
+        if ( $status == 200 || $status == 304 ) {
             my $file_content
                 = do { local $/; local @ARGV = ( $result->[2] ); <> };
             is( $file_content, $content, "content ($desc) for $url" );

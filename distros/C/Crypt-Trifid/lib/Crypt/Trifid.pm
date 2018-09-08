@@ -1,6 +1,6 @@
 package Crypt::Trifid;
 
-$Crypt::Trifid::VERSION   = '0.09';
+$Crypt::Trifid::VERSION   = '0.10';
 $Crypt::Trifid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Trifid - Interface to the Trifid cipher.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use Crypt::Trifid::Utils qw(generate_chart);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'chart' => (is => 'ro', default => sub { generate_chart(); });
 

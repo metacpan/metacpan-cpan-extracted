@@ -12,6 +12,7 @@ lib/App/lcpan/Cmd/metacpan_dist.pm
 lib/App/lcpan/Cmd/metacpan_mod.pm
 lib/App/lcpan/CmdBundle/metacpan.pm
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-rinci.t

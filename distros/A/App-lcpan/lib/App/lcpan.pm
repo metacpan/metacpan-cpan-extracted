@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2018-06-21'; # DATE
-our $VERSION = '1.023'; # VERSION
+our $DATE = '2018-09-08'; # DATE
+our $VERSION = '1.026'; # VERSION
 
 use 5.010001;
 use strict;
@@ -91,7 +91,7 @@ _
                     word => $word,
                     starting_path => $args->{cpan},
                     filter => sub {
-                        # file or index.db*
+                        # dir (to dig down deeper) or index.db*
                         (-d $_[0]) || $_[0] =~ /index\.db/;
                     },
                 ),
@@ -336,6 +336,18 @@ our %author_args = (
         req => 1,
         pos => 0,
         completion => \&_complete_cpanid,
+    },
+);
+
+our %authors_args = (
+    authors => {
+        schema => ['array*', of=>'str*', min_len=>1],
+        'x.name.is_plural' => 1,
+        req => 1,
+        pos => 0,
+        greedy => 1,
+        cmdline_src => 'stdin_or_args',
+        element_completion => \&_complete_cpanid,
     },
 );
 
@@ -3981,7 +3993,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.023 of App::lcpan (from Perl distribution App-lcpan), released on 2018-06-21.
+This document describes version 1.026 of App::lcpan (from Perl distribution App-lcpan), released on 2018-09-08.
 
 =head1 SYNOPSIS
 
@@ -4152,7 +4164,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4334,7 +4346,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4486,7 +4498,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 

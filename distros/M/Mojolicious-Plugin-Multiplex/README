@@ -23,7 +23,7 @@ SYNOPSIS
     
       @@ index.html.ep
     
-      %= javascript 'websocket_multiplex';
+      %= javascript 'websocket_multiplex.js';
       <script>
         var ws = new WebSocket('<%= url_for('multiplex')->to_abs %>');
         var multiplex = new WebSocketMultiplex(ws);

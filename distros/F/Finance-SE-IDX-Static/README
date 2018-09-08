@@ -1,0 +1,52 @@
+NAME
+    Finance::SE::IDX::Static - Get information from Indonesian Stock
+    Exchange (static version)
+
+VERSION
+    This document describes version 20180907.1.1 of Finance::SE::IDX::Static
+    (from Perl distribution Finance-SE-IDX-Static), released on 2018-09-08.
+
+SYNOPSIS
+    Use like you would use Finance::SE::IDX.
+
+DESCRIPTION
+    This module is the static (offline) version of Finance::SE::IDX. It
+    provides the same functions and arguments, but the data is cached in the
+    source code. It is useful as a fallback when the source that
+    Finance::SE::IDX uses is unavailable. As a consequence, the data will be
+    somewhat out of date.
+
+FUNCTIONS
+  list_idx_boards
+  list_idx_firms
+  list_idx_sectors
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-SE-IDX-Static>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-SE-IDX-Static>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Static
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Finance::SE::IDX
+
+    Finance::SE::IDX::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

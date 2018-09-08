@@ -16,11 +16,12 @@ use LWP::UserAgent;
 use JSON qw/decode_json/;
 use URI::Escape qw(uri_escape_utf8 uri_unescape);
 use HTML::Entities qw(decode_entities encode_entities);
+use XML::Simple;
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 
 #use Data::Dumper;
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(
@@ -329,7 +330,14 @@ sub parse_doi {
       # seems like an incomplete entry
       return;
     }
-    $self->_setatitle($cc->{'titles'}->{'title'});
+    #$self->_setatitle($cc->{'titles'}->{'title'});
+    my $title;
+    if  (ref $cc->{titles} ne "HASH") {
+      $title =  $cc->{titles}->[0];
+    } else {
+      $title = $cc->{'titles'}->{'title'};
+    }
+    $self->_setatitle($title);
     $self->_setdoi($cc->{'doi_data'}->{'doi'});
     if (ref($cc->{'publication_date'}) eq "HASH") {
       $self->_setdate($cc->{'publication_date'}->{'year'});

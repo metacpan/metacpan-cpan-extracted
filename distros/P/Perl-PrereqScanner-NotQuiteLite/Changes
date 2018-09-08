@@ -1,5 +1,8 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.94 2018/09/08
+  - noes are now stored separately
+
 0.93 2018/04/26
   - silence a deprecation warning (RT-125191)
 

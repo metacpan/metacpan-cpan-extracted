@@ -10,7 +10,9 @@ use Astro::Coord::ECI::Utils qw{ :time deg2rad PERL2000 rad2deg };
 use My::Module::Test qw{ :tolerance velocity_sanity };
 use POSIX qw{strftime floor};
 use Test::More 0.88;
+use Time::Local;
 
+use constant CLASS	=> 'Astro::Coord::ECI';
 use constant EQUATORIALRADIUS => 6378.14;	# Meeus page 82.
 use constant TIMFMT => '%d-%b-%Y %H:%M:%S';
 
@@ -434,6 +436,43 @@ EOD
 	'Angle between two points as seen from a third';
 }
 
+# Nutation
+# Tests: nutation()
+
+{
+    my ( $delta_psi, $delta_epsilon ) = CLASS->nutation(
+	timegm( 0, 0, 0, 10, 3, 87 ) );
+
+    # Tolerance .5 seconds of arc
+    tolerance $delta_psi, -1.8364e-5, .00001,
+	'nutation in longitude: Midnight Nov 3 1987: Meeus ex 22.a';
+
+    # Tolerance .1 seconds of arc
+    tolerance $delta_epsilon, 4.5781e-5, .000001,
+	'nutation in obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
+}
+
+# Obliquity
+# Tests: obliquity()
+
+{
+    my $epsilon = CLASS->obliquity(
+	timegm( 0, 0, 0, 10, 3, 87 ) );
+
+    tolerance $epsilon, 0.409167475225493, .00001,
+	'obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
+}
+
+# Equation of time
+# Tests: equation_of_time
+
+{
+    my $got = CLASS->equation_of_time( timegm( 0, 0, 0, 13, 9, 92 ) );
+
+    tolerance $got, 13 * 60 + 42.7, .1,
+	'equation_of_time: Midnight Oct 13 1992: Meeus ex 28b';
+
+}
 
 # Precession of equinoxes.
 # Tests: precess()

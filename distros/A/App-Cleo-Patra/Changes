@@ -1,0 +1,36 @@
+Revision history for App-Cleo-Patra
+
+0.001 2018-09-06 14:00:00+02:00 Europe/Zurich
+ - Fork from App-Cleo commit 3e22cae6db3f54598990e8681eb0103376d067a4
+ - Rename to App-Cleo-Patra
+ - Updated documentation
+ - Support jumping to arbitrary command number
+ - Support multi line commands via -m switch
+
+Revision history for App-Cleo from Jeffrey Ryan Thalhammer (thaljef)
+
+0.005 2016-07-28 09:15:48 America/Los_Angeles
+
+	- Now supports multi-line commands.
+	- Use ... to show and run a command immediately.
+        - Use the 'c' command to run all remaining commands.
+
+0.004 2014-03-23 09:15:48 America/Los_Angeles
+
+    - Fixed off-by-one error
+
+0.003 2014-03-10 01:57:48 America/Los_Angeles
+
+    - Just minor POD edits and refactoring.
+
+0.002 2014-03-09 14:55:03 America/Los_Angeles
+
+    - The "?" and "!" playback controls have been removed,
+    since they didn't work as advertised anyway.
+
+    - Added "r" and "p" playback controls to redo the
+    current or previous commands.
+
+0.001 2014-03-09 12:04:46 America/Los_Angeles
+
+    - Initial release.

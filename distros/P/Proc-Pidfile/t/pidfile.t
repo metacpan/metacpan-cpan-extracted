@@ -5,6 +5,11 @@ use 5.006;
 use strict;
 use warnings;
 
+# A quick google said that this is the default value for maxpid
+# and if we can't find a pid in the first 32k, I suspect we won't
+# find one at all.
+my $MAXPID = 32768;
+
 use Test::More tests => 24;
 BEGIN { require_ok( 'Proc::Pidfile' ); }
 my ( $err, $obj, $pidfile, $ppid, $pid );
@@ -79,31 +84,36 @@ if ( $pid == 0 )
 ok( defined( $pid ), "fork successful" );
 is( $pid, waitpid( $pid, 0 ), "silent child exited" );
 is( $? >> 8, 0, "child spotted and ignored existing pidfile" );
+
 # check that bogus or zombie pidfile is ignored
-$pidfile = '/tmp/Proc-Pidfile.test.pid';
-unlink( $pidfile ) if -e $pidfile;
-ok( open( FH, ">$pidfile" ), "open pidfile" );
 
 $pid = find_unused_pid();
+SKIP: {
+    skip("can't find unused pid", 2) unless defined($pid);
 
-BAIL_OUT("Can't find unused pid -- this shouldn't happen!") if !defined($pid);
+    $pidfile = '/tmp/Proc-Pidfile.test.pid';
+    unlink( $pidfile ) if -e $pidfile;
+    ok( open( FH, ">$pidfile" ), "open pidfile" );
 
-print FH $pid;
-close( FH );
-eval { $obj = Proc::Pidfile->new( pidfile => $pidfile ); };
-$err = $@; undef $@;
-ok( ! $err, "bogus pidfile ignored" );
-undef $obj;
+    print FH $pid;
+    close( FH );
+    eval { $obj = Proc::Pidfile->new( pidfile => $pidfile ); };
+    $err = $@; undef $@;
+    ok( ! $err, "bogus pidfile ignored" );
+    undef $obj;
+}
+
 # check that pidfile created by somebody else works ...
-$pidfile = '/tmp/Proc-Pidfile.test.pid';
-unlink( $pidfile ) if -e $pidfile;
-ok( open( FH, ">$pidfile" ), "open pidfile" );
 
 $pid = find_pid_in_use_by_someone_else();
 
 SKIP: {
-    skip("can't find appropriate pid in use on this OS", 1)
+    skip("can't find appropriate pid in use on this OS", 2)
         unless defined($pid);
+
+    $pidfile = '/tmp/Proc-Pidfile.test.pid';
+    unlink( $pidfile ) if -e $pidfile;
+    ok( open( FH, ">$pidfile" ), "open pidfile" );
 
     print FH $pid;
     close( FH );
@@ -122,13 +132,13 @@ sub find_unused_pid
         my $table = Proc::ProcessTable->new()->table;
         my %processes = map { $_->pid => $_ } @$table;
 
-        $pid++ while $pid != 0 && exists($processes{$pid});
+        $pid++ while $pid <= $MAXPID && exists($processes{$pid});
     }
     else {
-        $pid++ while $pid != 0 && (kill(0, $pid) || $!{'EPERM'});
+        $pid++ while $pid <= $MAXPID && (kill(0, $pid) || $!{'EPERM'});
     }
 
-    return undef if $pid == 0;
+    return undef if $pid > $MAXPID;
     return $pid;
 }
 
@@ -141,13 +151,13 @@ sub find_pid_in_use_by_someone_else
         my $table = Proc::ProcessTable->new()->table;
         my %processes = map { $_->pid => $_ } @$table;
 
-        $pid++ until $pid == 0 || (    exists($processes{$pid})
-                                   and $processes{$pid}->uid != $<);
+        $pid++ until $pid > $MAXPID || (    exists($processes{$pid})
+                                        and $processes{$pid}->uid != $<);
     }
     else {
-        $pid++ until $pid == 0 || (!kill(0, $pid) && $!{'EPERM'});
+        $pid++ until $pid > $MAXPID || (!kill(0, $pid) && $!{'EPERM'});
     }
-    return undef if $pid == 0;
+    return undef if $pid > $MAXPID;
     return $pid;
 }
 

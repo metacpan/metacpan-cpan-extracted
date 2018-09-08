@@ -1,5 +1,9 @@
 Revision history for Datahub-Factory-VKC
 
+1.01  2018-09-07 17:00:39 CEST
+
+    - Changed: added objtitles table as sqlite.
+
 1.00  2018-09-03 14:18:59 CEST
 
     - Stable release.

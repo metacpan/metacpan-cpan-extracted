@@ -13,6 +13,15 @@ get '/' => {
   description => 'Everybody ❤️ Mojolicious',
 };
 
+get '/hljs' => {
+  template => 'hello_talk',
+  layout => 'revealjs',
+  hljs_theme_url => 'themes/cool_theme.css',
+  title => 'Hello World!',
+  author => 'JBERGER',
+  description => 'Everybody ❤️ Mojolicious',
+};
+
 under '/reveal';
 
 get '/nested_route' => {
@@ -28,6 +37,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')
   ->status_is(200)
   ->text_is(title => 'Hello World!')
+  ->element_exists('link[rel="stylesheet"][href="revealjs/css/reveal.css"]')
   ->element_exists('meta[name="author"][content="JBERGER"]')
   ->element_exists('meta[name="description"][content="Everybody ❤️ Mojolicious"]')
   ->text_is('.reveal .slides section:nth-child(1) h1' => 'A Mojolicious Hello World!')
@@ -55,6 +65,11 @@ $t->get_ok('/')
   ->element_exists('.reveal .slides section#sample-no-anno pre code[data-sample="code/section.pl"]')
   ->element_exists_not('.reveal .slides section#sample-no-anno p.sample-annotation')
 ;
+
+$t->get_ok('/hljs')
+  ->status_is(200)
+  ->text_is(title => 'Hello World!')
+  ->element_exists('link[rel="stylesheet"][href="themes/cool_theme.css"]');
 
 $t->get_ok('/reveal/nested_route')
   ->status_is(200)
@@ -107,3 +122,4 @@ __DATA__
 <section id="sample-no-anno">
   %= include_sample 'code/section.pl', annotation => undef
 </section>
+

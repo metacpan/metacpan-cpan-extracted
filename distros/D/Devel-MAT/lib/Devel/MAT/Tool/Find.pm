@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use constant CMD => "find";
 use constant CMD_DESC => "List SVs matching given criteria";
@@ -75,32 +75,49 @@ sub run_cmd
       push @filters, $self->build_filter( $inv );
    }
 
-   my $count = 0;
+   if( $opts{count} ) {
+      my $count = 0;
+      SV: foreach my $sv ( $self->df->heap ) {
+         foreach my $filter ( @filters ) {
+            $filter->( $sv ) or next SV;
+         }
 
-   SV: foreach my $sv ( $self->df->heap ) {
-      my @output;
-
-      # false => omit
-      # 1     => include
-      # else  => include with output value
-
-      foreach my $filter ( @filters ) {
-         my $o = $filter->( $sv ) or next SV;
-         push @output, $o unless $o eq "1";
+         $count++;
       }
 
-      my $fmt = "%s";
-      $fmt .= ": " . join( " ", ( "%s" ) x @output ) if @output;
-
-      $count++, next if $opts{count};
-
-      Devel::MAT::Cmd->printf( "$fmt\n",
-         Devel::MAT::Cmd->format_sv( $sv ),
-         @output
-      );
+      Devel::MAT::Cmd->printf( "Total: %s SVs\n", $count ) if $opts{count};
+      return;
    }
 
-   Devel::MAT::Cmd->printf( "Total: %s SVs\n", $count ) if $opts{count};
+   my @svs = $self->df->heap;
+   my ( $sv, @output );
+   Devel::MAT::Tool::more->paginate( sub {
+      my ( $count ) = @_;
+      SV: while( $sv = shift @svs ) {
+         @output = ();
+
+         # false => omit
+         # 1     => include
+         # else  => include with output value
+
+         foreach my $filter ( @filters ) {
+            my $o = $filter->( $sv ) or next SV;
+            push @output, $o unless $o eq "1";
+         }
+
+         my $fmt = "%s";
+         $fmt .= ": " . join( " ", ( "%s" ) x @output ) if @output;
+
+         Devel::MAT::Cmd->printf( "$fmt\n",
+            Devel::MAT::Cmd->format_sv( $sv ),
+            @output
+         );
+
+         last SV unless $count--;
+      }
+
+      return !!@svs;
+   } );
 }
 
 sub help_cmd

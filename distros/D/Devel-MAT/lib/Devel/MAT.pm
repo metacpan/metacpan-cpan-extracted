@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -247,12 +247,25 @@ sub inref_graph
          Devel::MAT::SV::Reference( "the symbol '" . Devel::MAT::Cmd->format_symbol( $name, $sv ) . "'", strong => undef ) );
       return $graph->get_sv_node( $sv );
    }
+   if( $elide_sym and $sv->type eq "GLOB" and $name = $sv->stashname ) {
+      $graph->add_root( $sv,
+         Devel::MAT::SV::Reference( "the glob '" . Devel::MAT::Cmd->format_symbol( "*$name", $sv ) . '"', strong => undef ) );
+      return $graph->get_sv_node( $sv );
+   }
 
    $graph->add_sv( $sv );
 
    my @inrefs = $opts{strong} ? $sv->inrefs_strong :
                 $opts{direct} ? $sv->inrefs_direct :
                                 $sv->inrefs;
+
+   # If we didn't find anything at the given option level, try harder
+   if( !@inrefs and $opts{strong} ) {
+      @inrefs = $sv->inrefs_direct;
+   }
+   if( !@inrefs and $opts{direct} ) {
+      @inrefs = $sv->inrefs;
+   }
 
    if( $elide_rv ) {
       @inrefs = map { sub {

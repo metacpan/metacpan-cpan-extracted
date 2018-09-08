@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 # shortcuts
 #  os and distros
@@ -608,7 +608,7 @@ sub mapping {
      [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::X509', 'Net::SSLeay', 'IO::Socket::SSL'],
       # freebsd has all libssl in the base system
       [like_debian,
-       [package => 'libssl-dev']],
+       [package => ['libssl-dev', 'zlib1g-dev']]],
       [like_fedora,
        [package => 'openssl-devel']],
       [os_windows,
@@ -2618,7 +2618,8 @@ sub mapping {
        [package => 'tk86 | tk85 | tk84']]], # XXX what about debian?
 
      [cpanmod => 'Tcl::Tk', # XXX maybe also Tkx?
-      # XXX what about freebsd?
+      [os_freebsd,
+       [package => 'tk86 | tk85 | tk84']],
       [like_debian,
        # tcllib is needed for the snit package
        [package => ['tk8.5-dev', 'tcllib']]],

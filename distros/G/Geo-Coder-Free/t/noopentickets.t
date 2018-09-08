@@ -17,10 +17,8 @@ NOBUGS: {
 				ok($rc[1] eq 'OK');
 				my @tickets = @{$rc[2]};
 
-				if(scalar(@tickets)) {
-					foreach my $ticket(@tickets) {
-						diag($ticket->{id}, ': ', $ticket->{title}, ', broken since ', $ticket->{'broken_in'}[0]);
-					}
+				foreach my $ticket(@tickets) {
+					diag($ticket->{id}, ': ', $ticket->{title}, ', broken since ', $ticket->{'broken_in'}[0]);
 				}
 				ok(scalar(@tickets) == 0);
 			} else {

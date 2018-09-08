@@ -4,7 +4,7 @@ Dancer2::Session::Memcached - Dancer 2 session storage with Cache::Memcached
 
 # VERSION
 
-version 0.006
+version 0.007
 
 # SYNOPSIS
 
@@ -34,9 +34,10 @@ state within Memcached using [Cache::Memcached](https://metacpan.org/pod/Cache::
 An array (or a comma-separated list) of reachable memcached 
 servers (can be either address:port or socket paths).
 
-# AUTHOR
+# AUTHORS
 
-David Golden <dagolden@cpan.org>
+- David Golden <dagolden@cpan.org>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
 
 # COPYRIGHT AND LICENSE
 

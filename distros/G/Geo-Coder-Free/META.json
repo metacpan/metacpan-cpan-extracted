@@ -43,6 +43,7 @@
       "runtime" : {
          "requires" : {
             "CHI" : "0",
+            "Carp" : "0",
             "DBD::CSV" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
@@ -53,6 +54,7 @@
             "File::pfopen" : "0.02",
             "Geo::StreetAddress::US" : "0",
             "Gzip::Faster" : "0",
+            "Lingua::EN::AddressParse" : "0",
             "List::MoreUtils" : "0",
             "Locale::CA" : "0",
             "Locale::Country" : "0",
@@ -88,6 +90,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

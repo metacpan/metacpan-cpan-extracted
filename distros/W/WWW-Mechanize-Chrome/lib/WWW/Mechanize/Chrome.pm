@@ -21,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -91,7 +91,11 @@ A premade L<Log::Log4perl> object
 Specify the path to the Chrome executable.
 
 The default is C<chrome> on Windows and C<google-chrome> elsewhere, as found via
-C<$ENV{PATH}>.
+C<$ENV{PATH}>. If you want to use Chromium, you need to specify that explicitly
+via:
+
+    launch_exe => 'chromium-browser', # if Chromium is named chromium-browser on your OS
+
 You can also provide this information from the outside to the class
 by setting C<$ENV{CHROME_BIN}>.
 
@@ -243,7 +247,10 @@ websocket implementation(s) as source of bugs.
 sub build_command_line {
     my( $class, $options )= @_;
 
-    $options->{ launch_exe } ||= $ENV{CHROME_BIN} || $class->find_executable();
+    my @program_names = $class->default_executable_names( $options->{launch_exe} );
+    my( $program, $error) = $class->find_executable(\@program_names);
+    croak $error if ! $program;
+
     $options->{ launch_arg } ||= [];
 
     $options->{port} ||= 9222
@@ -285,10 +292,9 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--hide-scrollbars";
     };
 
-    if( ! exists $options->{disable_prompt_on_repost}) {
-        push @{ $options->{ launch_arg }}, "--disable-prompt-on-repost";
-    } else {
+    if( exists $options->{disable_prompt_on_repost}) {
         carp "Option 'disable_prompt_on_repost' is deprecated, use prompt_on_repost instead";
+        $options->{prompt_on_repost} = !$options->{disable_prompt_on_repost};
     };
 
     for my $option (qw(
@@ -301,7 +307,6 @@ sub build_command_line {
         web_resources
         default_apps
         infobars
-        default_apps
         popup_blocking
         gpu
         save-password-bubble
@@ -320,9 +325,9 @@ sub build_command_line {
     push @{ $options->{ launch_arg }}, "$options->{start_url}"
         if exists $options->{start_url};
 
-    my $program = ($^O =~ /mswin/i and $options->{ launch_exe } =~ /[\s|<>&]/)
-        ?  qq("$options->{ launch_exe }")
-        :  $options->{ launch_exe };
+    my $quoted_program = ($^O =~ /mswin/i and $program =~ /[\s|<>&]/)
+        ?  qq("$program")
+        :  $program;
 
     my @cmd=( $program, @{ $options->{launch_arg}} );
 
@@ -335,51 +340,97 @@ sub build_command_line {
 
     my $chrome = WWW::Mechanize::Chrome->find_executable(
         'chromium.exe',
-        '.\\my-chrome-versions\\',
+        '.\\my-chrome-66\\',
     );
+
+    my( $chrome, $diagnosis ) = WWW::Mechanize::Chrome->find_executable(
+        ['chromium-browser','google-chrome'],
+        './my-chrome-66/',
+    );
+    die $diagnosis if ! $chrome;
 
 Finds the first Chrome executable in the path (C<$ENV{PATH}>). For Windows, it
 also looks in C<< $ENV{ProgramFiles} >>, C<< $ENV{ProgramFiles(x86)} >>
-and C<< $ENV{"ProgramFilesW6432"} >>.
+and C<< $ENV{"ProgramFilesW6432"} >>. For OSX it also looks in the user home
+directory as given through C<< $ENV{HOME} >>.
 
 This is used to find the default Chrome executable if none was given through
-the C<launch_exe> option.
+the C<launch_exe> option or if the executable is given and does not exist
+and does not contain a directory separator.
 
 =cut
 
-sub find_executable( $class, $program=undef, @search ) {
-    $program ||=
+sub default_executable_names( $class, @other ) {
+    my @program_names
+        = grep { defined($_) } (
+        $ENV{CHROME_BIN},
+        @other,
+    );
+    if( ! @other ) {
+        push @program_names,
           $^O =~ /mswin/i ? 'chrome.exe'
         : $^O =~ /darwin/i ? 'Google Chrome'
-        : 'google-chrome';
+        : ('google-chrome', 'chromium-browser')
+    };
+    @program_names
+}
 
-    push @search, File::Spec->path();
+sub find_executable( $class, $program=[$class->default_executable_names], @search) {
+    my $looked_for = '';
+    if( ! ref $program) {
+        $program = [$program]
+    };
+    my $program_name = join ", ", map { qq('$_') } @$program;
 
-    if( $^O =~ /MSWin/i ) {
-        push @search,
-            map { "$_\\Google\\Chrome\\Application\\" }
-            grep {defined}
-            ($ENV{'ProgramFiles'},
-             $ENV{'ProgramFiles(x86)'},
-             $ENV{"ProgramFilesW6432"},
-            );
-    } elsif( $^O =~ /darwin/i ) {
-        my $path = '/Applications/Google Chrome.app/Contents/MacOS';
-        push @search,
-            $path,
-            $ENV{"HOME"} . "/$path";
-    }
+    if( my($first_program) = grep { -x $_ } @$program) {
+        # We've got a complete path, done!
+        return $first_program
+    };
 
+    # Not immediately found, so we need to search
+    my @without_path = grep { !m![/\\]! } @$program;
+
+    if( @without_path) {
+        push @search, File::Spec->path();
+        if( $^O =~ /MSWin/i ) {
+            push @search,
+                map { "$_\\Google\\Chrome\\Application\\" }
+                grep {defined}
+                ($ENV{'ProgramFiles'},
+                 $ENV{'ProgramFiles(x86)'},
+                 $ENV{"ProgramFilesW6432"},
+                );
+        } elsif( $^O =~ /darwin/i ) {
+            my $path = '/Applications/Google Chrome.app/Contents/MacOS';
+            push @search,
+                $path,
+                $ENV{"HOME"} . "/$path";
+        }
+
+        $looked_for = ' in searchpath ' . join " ", @search;
+    };
 
     my $found;
+
     for my $path (@search) {
-        my $this = File::Spec->catfile( $path, $program );
-        if( -x $this ) {
-            $found = $this;
-            last;
+        for my $p (@without_path) {
+            my $this = File::Spec->catfile( $path, $p );
+            if( -x $this ) {
+                $found = $this;
+                last;
+            };
         };
-    }
-    return defined $found ? $found : ()
+    };
+
+    if( wantarray ) {
+        my $msg;
+        if( ! $found) {
+            $msg = "No Chrome executable like $program_name found$looked_for";
+        };
+        return $found, $msg
+    } else {
+        return $found
+    };
 }
 
 sub _find_free_port( $self, $start ) {
@@ -1127,6 +1178,7 @@ sub DESTROY {
     #    $_[0]->driver->send_message('Browser.close' )->get
     #};
 
+    local $@;
     eval {
         # Shut down our websocket connection
         if( $_[0]->{ driver }) {
@@ -1267,7 +1319,7 @@ sub _waitForNavigationEnd( $self, %options ) {
     $msg .= " or 'Network.loadingFailed' or 'Network.loadingFinished' for request '$requestId'"
         if $requestId;
 
-    $self->log('trace', $msg);
+    $self->log('debug', $msg);
     my $events_f = $self->_collectEvents( sub( $ev ) {
         # Let's assume that the first frame id we see is "our" frame
         $frameId ||= $self->_fetchFrameId($ev);
@@ -1278,6 +1330,13 @@ sub _waitForNavigationEnd( $self, %options ) {
         my $internal_navigation = (   $ev->{method} eq 'Page.navigatedWithinDocument'
                        && $requestId
                        && (! exists $ev->{params}->{requestId} or $ev->{params}->{requestId} eq $requestId));
+        # This is far too early, but some requests only send this?!
+        # Maybe this can be salvaged by setting a timeout when we see this?!
+        my $finished = (  1 # $options{ just_request }
+                       && $ev->{method} eq 'Network.responseReceived'
+                       && $requestId
+                       && $ev->{params}->{requestId} eq $requestId
+        );
         my $failed  = (   $ev->{method} eq 'Network.loadingFailed'
                        && $requestId
                        && $ev->{params}->{requestId} eq $requestId);
@@ -1287,7 +1346,7 @@ sub _waitForNavigationEnd( $self, %options ) {
                        && exists $ev->{params}->{response}->{headers}->{"Content-Disposition"}
                        && $ev->{params}->{response}->{headers}->{"Content-Disposition"} =~ m!^attachment\b!
                        );
-        return $stopped || $internal_navigation || $failed || $download;
+        return $stopped || $internal_navigation || $failed || $download #|| $finished;
     });
 
     $events_f;
@@ -1359,7 +1418,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                             statusText => 'faked response',
                     }}
                 })
-            
+
             } else {
                   $s->log('trace', "Navigation started, logging ($ev->{method})");
                   $navigated++;
@@ -1387,7 +1446,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     })->then( sub {
         my $f;
         my @events;
-        if( $navigated ) { #or $options{ navigates }) {
+        if( !$options{ intrapage } and $navigated ) {
             $f = $does_navigation->then( sub {
                 @events = @_;
                 # Handle all the events, by turning them into a ->response again
@@ -3511,6 +3570,50 @@ sub field {
     );
 }
 
+=head2 C<< $mech->sendkeys( %options ) >>
+
+    $mech->sendkeys( string => "Hello World" );
+
+Sends a series of keystrokes. The keystrokes can be either a string or a
+reference to an array containing the detailed data as hashes.
+
+=over 4
+
+=item B<string> - the string to send as keystrokes
+
+=item B<keys> - reference of the array to send as keystrokes
+
+=item B<delay> - delay in ms to sleep between keys
+
+=back
+
+=cut
+
+sub sendkeys_future( $self, %options ) {
+    $options{ keys } ||= [ map sub { type => 'char', text => $_ },
+                           split m//, $options{ string }
+                         ];
+
+    my $f = Future->done(1);
+
+    for my $key (@{ $options{ keys }}) {
+        $f = $f->then(sub {
+            $self->driver->send_message('Input.dispatchKeyEvent', %$key );
+        });
+        if( defined $options{ delay }) {
+            $f->then(sub {
+                $self->sleep( $options{ delay });
+            });
+        };
+    };
+
+    return $f
+};
+
+sub sendkeys( $self, %options ) {
+    $self->sendkeys_future( %options )->get
+}
+
 =head2 C<< $mech->upload( $selector, $value ) >>
 
   $mech->upload( user_picture => 'C:/Users/Joe/face.png' );
@@ -4060,8 +4163,8 @@ sub wait_until_invisible( $self, %options ) {
         # If $node goes away due to a page reload, ->is_visible could die:
         $v = eval { $self->is_visible($node) };
     } while ( $v
-           and (!$timeout_after or time < $timeout_after ));
-    if ($node and time >= $timeout_after) {
+           and (!$timeout or time < $timeout_after ));
+    if ($v and $timeout and time >= $timeout_after) {
         croak "Timeout of $timeout seconds reached while waiting for element to become invisible";
     };
 };
@@ -4519,7 +4622,7 @@ sub render_content( $self, %options ) {
 
     if( defined $filename ) {
         open my $fh, '>:raw', $filename
-            or croak "Couldn't create to '$filename': $!";
+            or croak "Couldn't create '$filename': $!";
         print {$fh} $payload;
     };
 
@@ -4541,7 +4644,13 @@ This method is specific to WWW::Mechanize::Chrome.
 
 sub content_as_pdf($self, %options) {
     my $base64 = $self->driver->send_message('Page.printToPDF', %options)->get->{data};
-    return decode_base64( $base64 );
+    my $payload = decode_base64( $base64 );
+    if( my $filename = delete $options{ filename } ) {
+        open my $fh, '>:raw', $filename
+            or croak "Couldn't create '$filename': $!";
+        print {$fh} $payload;
+    };
+    return $payload;
 };
 
 =head1 INTERNAL METHODS
@@ -4608,7 +4717,8 @@ out of them or dumps them to disk as sequential images.
 
   sub saveFrame {
       my( $mech, $framePNG ) = @_;
-      # just ignore this frame
+      print $framePNG->{data};
+
   }
 
   $mech->setScreenFrameCallback( \&saveFrame );

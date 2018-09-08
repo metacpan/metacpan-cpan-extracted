@@ -287,6 +287,10 @@
 #define LUT2_IBAN_REGEL              25
 #define LUT2_IBAN_REGEL_SORT         26
 #define LUT2_BIC_H_SORT              27
+#define LUT2_SCL_INFO                28
+#define LUT2_SCL_BIC                 29
+#define LUT2_SCL_NAME                30
+#define LUT2_SCL_FLAGS               31
 
 #define LUT2_2_BLZ                  101
 #define LUT2_2_FILIALEN             102
@@ -315,6 +319,10 @@
 #define LUT2_2_IBAN_REGEL           125
 #define LUT2_2_IBAN_REGEL_SORT      126
 #define LUT2_2_BIC_H_SORT           127
+#define LUT2_2_SCL_INFO             128
+#define LUT2_2_SCL_BIC              129
+#define LUT2_2_SCL_NAME             130
+#define LUT2_2_SCL_FLAGS            131
 
 #define LUT2_DEFAULT                501
 
@@ -331,6 +339,12 @@ extern const char *lut2_feld_namen[256];
  */
 
 #undef FALSE
+#define NO_SCL_BLOCKS_LOADED                  -158
+#define NO_SCL_INFO_BLOCK                     -157
+#define SCL_BIC_NOT_FOUND                     -156
+#define INVALID_SCL_INFO_BLOCK                -155
+#define NO_SCL_BLOCKS                         -154
+#define SCL_INPUT_FORMAT_ERROR                -153
 #define INVALID_REGULAR_EXPRESSION_CNT        -152
 #define INVALID_REGULAR_EXPRESSION            -151
 #define INVALID_HANDLE                        -150
@@ -484,6 +498,8 @@ extern const char *lut2_feld_namen[256];
 #define OK_KTO_REPLACED_NO_PZ                   24
 #define OK_UNTERKONTO_ATTACHED                  25
 #define OK_SHORT_BIC_USED                       26
+#define OK_SCL_EXTENSION_BIC_USED               27
+#define OK_SCL_WILDCARD_BIC_USED                28
 #line 279 "konto_check_h.lx"
 
 #define MAX_BLZ_CNT 30000  /* maximale Anzahl BLZ's in generate_lut() */
@@ -1091,6 +1107,24 @@ DLL_EXPORT int iban_bic_h_id(char *iban,int filiale,int*retval);
 DLL_EXPORT int iban_name_id(char *iban,int filiale,int*retval);
 DLL_EXPORT int iban_name_kurz_id(char *iban,int filiale,int*retval);
 DLL_EXPORT int iban_ort_id(char *iban,int filiale,int*retval);
+
+   /* Funktionen für das SCL-Verzeichnis */
+DLL_EXPORT int lut_scl_init(char *lut_name);
+DLL_EXPORT int lut_scl_info(char *lutfile,int *cnt,const char **gueltigkeit,const char **gueltigkeit_iso);
+DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile);
+DLL_EXPORT int lut_scl_multi(char *bic,const char **scl_flags,const char **used_bic,const char **scl_name);
+DLL_EXPORT int lut_scl_multi_blz(char *blz,const char **scl_flags,const char **used_bic,const char **scl_name);
+DLL_EXPORT int lut_scl_multi_blz_i(int blz,const char **scl_flags,const char **used_bic,const char **scl_name);
+DLL_EXPORT int lut_scl_sct(char *bic,int *retval);
+DLL_EXPORT int lut_scl_sdd(char *bic,int *retval);
+DLL_EXPORT int lut_scl_cor1(char *bic,int *retval);
+DLL_EXPORT int lut_scl_b2b(char *bic,int *retval);
+DLL_EXPORT int lut_scl_scc(char *bic,int *retval);
+DLL_EXPORT int lut_scl_sct_blz(char *blz,int *retval,const char **used_bic);
+DLL_EXPORT int lut_scl_sdd_blz(char *blz,int *retval,const char **used_bic);
+DLL_EXPORT int lut_scl_cor1_blz(char *blz,int *retval,const char **used_bic);
+DLL_EXPORT int lut_scl_b2b_blz(char *blz,int *retval,const char **used_bic);
+DLL_EXPORT int lut_scl_scc_blz(char *blz,int *retval,const char **used_bic);
 
 /*
  * ######################################################################

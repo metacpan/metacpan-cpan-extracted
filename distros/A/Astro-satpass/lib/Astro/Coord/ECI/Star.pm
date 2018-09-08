@@ -50,12 +50,11 @@ package Astro::Coord::ECI::Star;
 use strict;
 use warnings;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use base qw{Astro::Coord::ECI};
 
-use Astro::Coord::ECI::Sun;	# Need for abberation calc.
-use Astro::Coord::ECI::Utils qw{:all};
+use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
 use Data::Dumper;
 use POSIX qw{floor strftime};
@@ -225,9 +224,10 @@ time is set.
 The computation comes from Jean Meeus' "Astronomical Algorithms", 2nd
 Edition, Chapter 23, pages 149ff.
 
-B<Note>, however, that for consistency with the Astro::Coord::ECI::Sun
-and ::Moon classes, the position is precessed to the current time
-setting.
+B<Note>, however, that for consistency with the
+L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun> and
+L<Astro::Coord::ECI::Moon|Astro::Coord::ECI::Moon> classes, the position
+is precessed to the current time setting.
 
 =cut
 
@@ -270,16 +270,16 @@ eod
 #	Get ecliptic coordinates, and correct for nutation.
 
     my ($beta, $lambda) = $self->ecliptic ();
-    my $delta_psi = nutation_in_longitude ($self->dynamical);
+    my ( $delta_psi ) = $self->nutation();
     $lambda += $delta_psi;
 
 
-#	Calculate and add in the abberation terms (Meeus 23.2);
+#	Calculate and add in the aberration terms (Meeus 23.2);
 
     my $T = jcent2000 ($time);			# Meeus (22.1)
     my $e = (-0.0000001267 * $T - 0.000042037) * $T + 0.016708634;# Meeus (25.4)
     my $pi = deg2rad ((0.00046 * $T + 1.71946) * $T + 102.93735);
-    my $sun = $self->{_star_sun} ||= Astro::Coord::ECI::Sun->new ();
+    my $sun = $self->get( 'sun' );
     $sun->universal ($time);
 
     my $geoterm = $sun->geometric_longitude () - $lambda;

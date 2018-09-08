@@ -35,13 +35,13 @@
             "Carp" : "1.29",
             "Cwd" : "3.40",
             "File::Basename" : "2.84",
-            "File::Find" : "1.23",
+            "File::Find" : "0",
             "File::Spec" : "3.40",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

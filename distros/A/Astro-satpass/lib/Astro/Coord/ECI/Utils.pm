@@ -4,9 +4,28 @@ Astro::Coord::ECI::Utils - Utility routines for astronomical calculations
 
 =head1 SYNOPSIS
 
- use Astro::Coord::ECI::Utils qw{:all};
+ use Astro::Coord::ECI::Utils qw{ :all };
  my $now = time ();
  print "The current Julian day is ", julianday ($now);
+
+=head1 DEPRECATION NOTICE
+
+As of release [% next_version %], subroutines C<equation_of_time()>,
+C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
+C<obliquity()> are deprecated in favor of
+L<Astro::Coord::ECI|Asto::Coord::ECI> methods C<equation_of_time()>,
+C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
+C<obliquity()>.
+
+The motivation for this change is to give higher-accuracy classes a way
+to provide higher-accuracy versions of these calculations to the
+L<Astro::Coord::ECI|Astro::Coord::ECI> coordinate-transformation code.
+
+At the first release after February 25 2019 these will warn on the first
+use, as will the first attempt to call C<equation_of_time()> and
+C<obliquity()> as a subroutine (i.e. with a first argument that looks
+like a number). Six months later all calls will result in a warning, and
+six months after that all calls will be fatal.
 
 =head1 DESCRIPTION
 
@@ -29,6 +48,10 @@ following export tags may be used:
 =item :all
 
 This imports everything exportable into your name space.
+
+=item :mainstream
+
+This imports everything not deprecated into your name space.
 
 =item :params
 
@@ -113,7 +136,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -204,8 +227,19 @@ BEGIN {
     }
 }
 
+our @CARP_NOT = qw{
+    Astro::Coord::ECI
+    Astro::Coord::ECI::Mixin
+    Astro::Coord::ECI::Moon
+    Astro::Coord::ECI::Star
+    Astro::Coord::ECI::Sun
+    Astro::Coord::ECI::TLE
+    Astro::Coord::ECI::TLE::Set
+    Astro::Coord::ECI::Utils
+};
+
 our @EXPORT;
-our @EXPORT_OK = ( qw{
+my @all_external = ( qw{
 	AU $DATETIMEFORMAT $JD_GREGORIAN JD_OF_EPOCH LIGHTYEAR PARSEC
 	PERL2000 PI PIOVER2 SECSPERDAY SECS_PER_SIDERIAL_DAY
 	SPEED_OF_LIGHT TWOPI
@@ -218,17 +252,27 @@ our @EXPORT_OK = ( qw{
 	jcent2000 jd2date jd2datetime jday2000 julianday
 	keplers_equation load_module looks_like_number max min mod2pi
 	nutation_in_longitude nutation_in_obliquity obliquity omega
-	rad2deg tan theta0 thetag vector_cross_product
+	rad2deg rad2dms rad2hms tan theta0 thetag vector_cross_product
 	vector_dot_product vector_magnitude vector_unitize __classisa
-	__default_station __instance },
+	__default_station __instance __subroutine_deprecation },
 	@time_routines );
+our @EXPORT_OK = (
+    qw{ @CARP_NOT },	# Package-private, undocumented
+    @all_external,
+);
+
+my %deprecated_export = map { $_ => 1 } qw{
+    equation_of_time
+    nutation_in_longitude nutation_in_obliquity obliquity
+};
 
 our %EXPORT_TAGS = (
-    all => \@EXPORT_OK,
+    all => \@all_external,
+    mainstream => [ grep { ! $deprecated_export{$_} } @all_external ],
     params => [ qw{ __classisa __instance } ],
-    ref	=> [ grep { m/ [[:upper:]]+ _REF \z /smx } @EXPORT_OK ],
+    ref	=> [ grep { m/ [[:upper:]]+ _REF \z /smx } @all_external ],
     time => \@time_routines,
-    vector => [ grep { m/ \A vector_ /smx } @EXPORT_OK ],
+    vector => [ grep { m/ \A vector_ /smx } @all_external ],
 );
 
 use constant AU => 149597870;		# 1 astronomical unit, per
@@ -598,18 +642,23 @@ sub epoch2datetime {
 
 =item $seconds = equation_of_time ($time);
 
-This method returns the equation of time at the given B<dynamical>
+This subroutine returns the equation of time at the given B<dynamical>
 time.
 
 The algorithm is from W. S. Smart's "Text-Book on Spherical Astronomy",
 as reported in Jean Meeus' "Astronomical Algorithms", 2nd Edition,
 Chapter 28, page 185.
 
+This subroutine is deprecated in favor of the
+L<Astro::Coord::ECI|Astro::Coord::ECI> C<equation_of_time()> method.
+
 =cut
 
 sub equation_of_time {
 
     my $time = shift;
+
+    __subroutine_deprecation();
 
     my $epsilon = obliquity ($time);
     my $y = tan($epsilon / 2);
@@ -989,11 +1038,16 @@ The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
 Edition, Chapter 22, pages 143ff. Meeus states that it is good to
 0.5 seconds of arc.
 
+This subroutine is deprecated in favor of the
+L<Astro::Coord::ECI|Astro::Coord::ECI> C<nutation()> method.
+
 =cut
 
 sub nutation_in_longitude {
-
     my $time = shift;
+
+    __subroutine_deprecation();
+
     my $T = jcent2000 ($time);	# Meeus (22.1)
 
     my $omega = mod2pi (deg2rad ((($T / 450000 + .0020708) * $T -
@@ -1017,11 +1071,16 @@ The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
 Edition, Chapter 22, pages 143ff. Meeus states that it is good to
 0.1 seconds of arc.
 
+This subroutine is deprecated in favor of the
+L<Astro::Coord::ECI|Astro::Coord::ECI> C<nutation()> method.
+
 =cut
 
 sub nutation_in_obliquity {
-
     my $time = shift;
+
+    __subroutine_deprecation();
+
     my $T = jcent2000 ($time);	# Meeus (22.1)
 
     my $omega = mod2pi (deg2rad ((($T / 450000 + .0020708) * $T -
@@ -1045,13 +1104,17 @@ The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
 Edition, Chapter 22, pages 143ff. The conversion from universal to
 dynamical time comes from chapter 10, equation 10.2  on page 78.
 
+This subroutine is deprecated in favor of the
+L<Astro::Coord::ECI|Astro::Coord::ECI> C<obliquity()> method.
+
 =cut
 
 use constant E0BASE => (21.446 / 60 + 26) / 60 + 23;
 
 sub obliquity {
-
     my $time = shift;
+
+    __subroutine_deprecation();
 
     my $T = jcent2000 ($time);	# Meeus (22.1)
 
@@ -1088,6 +1151,81 @@ in degrees. If the argument is C<undef>, C<undef> will be returned.
 =cut
 
 sub rad2deg { return defined $_[0] ? $_[0] / PI * 180 : undef }
+
+=item $deg_min_sec = rad2dms( $radians, $decimals )
+
+This subroutine converts the given angle in radians to its equivalent in
+degrees, minutes and seconds, represented as a string. Degrees will be
+suppressed if zero, and minutes will be suppressed if both degrees and
+minutes are zero. If degrees are present the delimiter will be a degree
+sign (C<"\N{DEGREE SIGN}>, a.k.a. C<"\N{U+00B0}">). The delimiters for
+minutes and seconds are C<'> and C<"> respectively, with the C<">
+appearing before the decimal point.
+
+The optional C<$decimals> argument specifies the number of decimal
+places in the seconds value, and defaults to C<3>.
+
+=cut
+
+sub rad2dms {
+    my ( $rad, $dp ) = @_;
+    defined $rad
+	or return $rad;
+    defined $dp
+	or $dp = 3;
+    my $sec = rad2deg( $rad ) * 3600;
+    ( $sec, my $sgn ) = $sec < 0 ? ( - $sec, '-' ) : ( $sec, '' );
+    my $frc = sprintf "%.${dp}f", $sec;
+    $frc =~ s/ [^.]* //smx;
+    $sec = floor( $sec );
+    my $min = floor( $sec / 60 );
+    $sec %= 60;
+    my $deg = floor( $min / 60 );
+    $min %= 60;
+    $deg or $min
+	or return sprintf q<%s%d"%s>, $sgn, $sec, $frc;
+    $deg
+	or return sprintf q<%s%d'%02d"%s>, $sgn, $sec, $frc;
+    return sprintf qq<%s%d°%02d'%02d"%s>,
+	$sgn, $deg, $min, $sec, $frc;
+}
+
+=item $hr_min_sec = rad2hms( $radians, $decimals )
+
+This subroutine converts the given angle in radians to its equivalent in
+hours, minutes and seconds (presumably of right ascension), represented
+as a string. Hours will be suppressed if zero, and minutes will be
+suppressed if both hours and minutes are zero. The delimiters for hours,
+minutes, and seconds are C<'h'>, C<'m'>, and C<'s'> respectively, with
+the C<'s'> appearing before the decimal point.
+
+The optional C<$decimals> argument specifies the number of decimal
+places in the seconds value, and defaults to C<3>.
+
+=cut
+
+sub rad2hms {
+    my ( $rad, $dp ) = @_;
+    defined $rad
+	or return $rad;
+    defined $dp
+	or $dp = 3;
+    my $sec = $rad * 12 / PI * 3600;
+    ( $sec, my $sgn ) = $sec < 0 ? ( - $sec, '-' ) : ( $sec, '' );
+    my $frc = sprintf "%.${dp}f", $sec;
+    $frc =~ s/ [^.]* //smx;
+    $sec = floor( $sec );
+    my $min = floor( $sec / 60 );
+    $sec %= 60;
+    my $hr = floor( $min / 60 );
+    $min %= 60;
+    $hr or $min
+	or return sprintf q<%s%ds%s>, $sgn, $sec, $frc;
+    $hr
+	or return sprintf q<%s%dm%02ds%s>, $sgn, $sec, $frc;
+    return sprintf qq<%s%dh%02dm%02ds%s>,
+	$sgn, $hr, $min, $sec, $frc;
+}
 
 =item $value = tan ($angle)
 
@@ -1360,6 +1498,40 @@ sub __instance {
 	return $time + $offset;
     }
 
+}
+
+{
+    my %deprecate = (
+	equation_of_time	=> {
+	    level	=> 0,
+	},
+	nutation_in_longitude	=> {
+	    level	=> 0,
+	    method	=> 'nutation',
+	},
+	nutation_in_obliquity	=> {
+	    level	=> 0,
+	    method	=> 'nutation',
+	},
+	obliquity	=> {
+	    level	=> 0,
+	},
+    );
+
+    sub __subroutine_deprecation {
+	( my $sub = ( caller 1 )[3] ) =~ s/ .* :: //smx;
+	my $info = $deprecate{$sub} or return;
+	$info->{level}
+	    or return;
+	my $msg = "Subroutine $sub() deprecated in favor of @{[
+	    $info->{method} || $sub ]}() method";
+	$info->{level} >= 3
+	    and croak $msg;
+	carp $msg;
+	$info->{level} == 1
+	    and $info->{level} = 0;
+	return;
+    }
 }
 
 =item $year = __tle_year_to_Gregorian_year( $year )

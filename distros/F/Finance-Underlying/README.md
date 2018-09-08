@@ -50,7 +50,6 @@ Categorises the underlying, available values are:
 - commodities
 - forex
 - future
-- individualstock
 - smart\_fx
 - stockindex
 - synthetic
@@ -65,7 +64,6 @@ This will be one of the following:
 - forex
 - futures
 - indices
-- stocks
 - volidx
 
 ## market\_convention
@@ -126,7 +124,7 @@ How large the spot pip is.
 ## quoted\_currency
 
 The second half of a forex pair - indicates the currency that this underlying is quoted in,
-or the currency in which a stock or stock index is quoted.
+or the currency in which a  stock index is quoted.
 
 ## submarket
 

@@ -10,7 +10,7 @@ use warnings;
 use base qw( Devel::MAT::Tool );
 use utf8;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use List::Util qw( any pairs );
 use List::UtilsBy qw( nsort_by );

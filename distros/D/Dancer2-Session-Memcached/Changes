@@ -1,38 +1,45 @@
 Revision history for Dancer2-Session-Memcached
 
+0.007 2018-09-07
+ [BUG FIXES]
+ - Builder for memcache server was trying to coerce the already-coerced
+   values. [GH#6, pierre-vigier]
+
+ [STATISTICS]
+ - code churn: 6 files changed, 109 insertions(+), 27 deletions(-)
+
 0.006 2018-03-06
-  [ BUG FIXES ]
-    - Validate session ids before passing to Storable. [GH#5, veryrusty]
+ [BUG FIXES]
+ - Validate session ids before passing to Storable. [GH#5, veryrusty]
 
-  [ ENHANCEMENTS ]
-    - Optionnal croaking on cluster unreachable. [GH#4, pierre-vigier]
+ [ENHANCEMENTS]
+ - Optionnal croaking on cluster unreachable. [GH#4, pierre-vigier]
 
-  [ STATISTICS ]
-    - code churn: 3 files changed, 66 insertions(+), 6 deletions(-)
+ [STATISTICS]
+ - code churn: 3 files changed, 66 insertions(+), 6 deletions(-)
 
 0.005 2016-11-05
-  - tests are run even if memcached server is present on local host.
-  - memcached servers can be configured as an array or a comma-separated
-    list.
+ - tests are run even if memcached server is present on local host.
+ - memcached servers can be configured as an array or a comma-separated
+   list.
 
-  [ STATISTICS ]
-    - code churn: 4 files changed, 96 insertions(+), 38 deletions(-)
+ [STATISTICS]
+ - code churn: 4 files changed, 96 insertions(+), 38 deletions(-)
 
 0.004 2016-07-07
-  - Bump Dancer2 dependency to 0.150000 (Core::Context removal)
-  - Small dzil cleanup
-  - Convert tests from Test::TCP to Plack::Test
-  - add _change_id method for upcoming change_session_id method in
-    Dancer2::Core::App
+ - Bump Dancer2 dependency to 0.150000 (Core::Context removal)
+ - Small dzil cleanup
+ - Convert tests from Test::TCP to Plack::Test
+ - add _change_id method for upcoming change_session_id method in
+   Dancer2::Core::App
 
 0.003 2013-04-10T17:31:39Z Europe/London
-  [ FIXED ]
-    - Fixed up test bugs for latest Dancer2 session factory changes
+ - Fixed up test bugs for latest Dancer2 session factory changes
 
 0.002 2013-02-23T22:19:08Z America/New_York
-  - Renamed from Dancer-SessionFactory-Memcached to
-    Dancer2-Session-Memcached
-  - Internals updated for new Dancer2 release
+ - Renamed from Dancer-SessionFactory-Memcached to
+   Dancer2-Session-Memcached
+ - Internals updated for new Dancer2 release
 
 0.001 2013-01-25T17:30:45Z America/New_York
-  - First release
+ - First release

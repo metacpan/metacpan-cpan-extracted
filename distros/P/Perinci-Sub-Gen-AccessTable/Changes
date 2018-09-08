@@ -1,3 +1,10 @@
+0.580   2018-09-07 (PERLANCAR)
+
+	- No functional changes.
+
+        - [doc] Mention Perinci::Sub::Gen::AccessTable::Simple.
+
+
 0.57    2017-07-10 (PERLANCAR)
 
 	- [Bugfix] Remove debugging statement.

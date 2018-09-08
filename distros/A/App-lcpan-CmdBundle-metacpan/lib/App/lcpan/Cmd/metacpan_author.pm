@@ -1,12 +1,14 @@
 package App::lcpan::Cmd::metacpan_author;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use Perinci::Object;
 
 require App::lcpan;
 
@@ -24,24 +26,34 @@ existence in local index database.
 _
     args => {
         %App::lcpan::common_args,
-        %App::lcpan::author_args,
+        %App::lcpan::authors_args,
     },
 };
 sub handle_cmd {
     my %args = @_;
-    my $author = $args{author};
 
     my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my ($cpanid) = $dbh->selectrow_array(
-        "SELECT cpanid FROM author WHERE cpanid=?", {}, uc $author);
-    defined $cpanid or return [404, "No such author '$author'"];
+    my $envres = envresmulti();
+    for my $author (@{ $args{authors} }) {
+        my ($cpanid) = $dbh->selectrow_array(
+            "SELECT cpanid FROM author WHERE cpanid=?", {}, uc $author);
+        defined $cpanid or do {
+            $envres->add_result(404, "No such author '$author'");
+            next;
+        };
 
-    require Browser::Open;
-    my $err = Browser::Open::open_browser("https://metacpan.org/author/$cpanid");
-    return [500, "Can't open browser"] if $err;
-    [200];
+        require Browser::Open;
+        my $url = "https://metacpan.org/author/$cpanid";
+        my $err = Browser::Open::open_browser($url);
+        if ($err) {
+            $envres->add_result(500, "Can't open browser for URL $url");
+        } else {
+            $envres->add_result(200, "OK");
+        }
+    }
+    $envres->as_struct;
 }
 
 1;
@@ -59,7 +71,7 @@ App::lcpan::Cmd::metacpan_author - Open author page on MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::Cmd::metacpan_author (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-07-10.
+This document describes version 0.005 of App::lcpan::Cmd::metacpan_author (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2018-09-07.
 
 =head1 DESCRIPTION
 
@@ -86,7 +98,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<author>* => I<str>
+=item * B<authors>* => I<array[str]>
 
 =item * B<cpan> => I<dirname>
 
@@ -97,6 +109,11 @@ Defaults to C<~/cpan>.
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =back
 
@@ -133,7 +150,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

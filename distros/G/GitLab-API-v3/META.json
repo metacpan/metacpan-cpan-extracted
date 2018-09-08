@@ -1,0 +1,75 @@
+{
+   "abstract" : "A complete GitLab API v3 client. (DEPRECATED)",
+   "author" : [
+      "Aran Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GitLab-API-v3",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : "0",
+            "Data::Serializer" : "0",
+            "Getopt::Long" : "0",
+            "Log::Any" : "0.11",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Screen" : "0",
+            "Moo" : "1.006",
+            "Pod::Usage" : "0",
+            "Role::REST::Client" : "0.2",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "1",
+            "URI::Escape" : "0",
+            "YAML" : "0",
+            "namespace::clean" : "0",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Log::Any::Adapter::TAP" : "v0.2.0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/GitLab-API-v3/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/GitLab-API-v3",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bluefeet/GitLab-API-v3.git",
+         "web" : "https://github.com/bluefeet/GitLab-API-v3"
+      }
+   },
+   "version" : "1.04",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

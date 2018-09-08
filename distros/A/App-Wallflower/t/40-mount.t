@@ -67,12 +67,11 @@ for my $t (@tests) {
         my $result = $wf->get($url);
         is_deeply(
             $result,
-            [   $status, $headers, $file && File::Spec->catfile( $dir, $file )
-            ],
+            [ $status, $headers, $file && Path::Tiny->new( $dir, $file ) ],
             "app ($desc) for $url"
         );
 
-        if ( $status eq '200' ) {
+        if ( $status == 200 ) {
             my $file_content
                 = do { local $/; local @ARGV = ( $result->[2] ); <> };
             is( $file_content, $content, "content ($desc) for $url" );

@@ -8,7 +8,7 @@ package Devel::MAT::Tool;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use List::Util qw( any );
 use Commandable::Invocation;
@@ -190,10 +190,12 @@ sub get_args_from_inv
       my $val = $inv->pull_token;
       defined $val or !$argspec->{required} or
          die "Expected a value for '$argspec->{name}' argument\n";
+      defined $val or last;
       push @args, $val;
       if( $argspec->{slurpy} ) {
          push @args, $inv->pull_token while length $inv->remaining;
       }
+      redo if $argspec->{repeated};
    }
 
    return @args;

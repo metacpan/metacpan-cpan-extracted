@@ -44,12 +44,11 @@ package Astro::Coord::ECI::Moon;
 use strict;
 use warnings;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use base qw{Astro::Coord::ECI};
 
-use Astro::Coord::ECI::Sun;	# Need for phase of moon calc.
-use Astro::Coord::ECI::Utils qw{ :all };
+use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
 use POSIX qw{floor strftime};
 
@@ -364,7 +363,7 @@ eod
 
     $self->universal ($time) if $time;
 
-    my $sun = Astro::Coord::ECI::Sun->universal ($self->universal);
+    my $sun = $self->get( 'sun' )->universal( $self->universal() );
 
     my (undef, $longs) = $sun->ecliptic ();
     my (undef, $longm) = $self->ecliptic ();
@@ -500,7 +499,7 @@ eod
 
 #	Correct longitude for nutation (from Chapter 22, pg 144).
 
-    $lambda += nutation_in_longitude ($time);
+    $lambda += ( $self->nutation( $time ) )[0];
 
     $self->ecliptic ($beta, mod2pi( $lambda ), $delta);
     ## $self->set (equinox_dynamical => $time);

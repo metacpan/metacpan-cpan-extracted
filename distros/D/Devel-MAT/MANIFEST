@@ -27,6 +27,7 @@ lib/Devel/MAT/Tool/Reachability.pm
 lib/Devel/MAT/Tool/Roots.pm
 lib/Devel/MAT/Tool/Show.pm
 lib/Devel/MAT/Tool/Sizes.pm
+lib/Devel/MAT/Tool/Summary.pm
 lib/Devel/MAT/Tool/Symbols.pm
 lib/Devel/MAT/UI.pod
 lib/Devel/MAT/UserGuide.pod
@@ -72,6 +73,7 @@ share/icons/type-UNDEF.svg
 t/00use.t
 t/01self.t
 t/02contexts.t
+t/03local.t
 t/10tool-identify.t
 t/10tool-inrefs.t
 t/10tool-reachability.t

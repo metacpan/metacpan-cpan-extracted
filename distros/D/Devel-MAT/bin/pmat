@@ -6,7 +6,7 @@ use warnings;
 use Devel::MAT;
 use Getopt::Long qw( :config no_permute );
 use String::Tagged 0.15;  # sprintf
-use String::Tagged::Terminal;
+use String::Tagged::Terminal 0.03;  # ->print_to_terminal
 use Commandable::Invocation;
 
 use constant CAN_COLOUR => -t STDERR;
@@ -35,8 +35,8 @@ $progress->() if $progress;
 my $df = $pmat->dumpfile;
 
 if( !$QUIET ) {
-   print "Perl memory dumpfile from perl ", $df->perlversion, "\n";
-   print "Heap contains ", scalar $df->heap, " objects\n";
+   $pmat->load_tool_for_command( "summary" )
+      ->run_cmd( Commandable::Invocation->new( "" ) );
 }
 
 sub Devel::MAT::Cmd::printf
@@ -46,7 +46,7 @@ sub Devel::MAT::Cmd::printf
 
    my $str = String::Tagged::Terminal->from_sprintf( $fmt, @args );
 
-   print CAN_COLOUR ? $str->build_terminal : "$str";
+   CAN_COLOUR ? $str->print_to_terminal : print "$str";
 
    return length $str;
 }

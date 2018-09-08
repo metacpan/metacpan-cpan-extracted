@@ -17,7 +17,8 @@ WriteMakefile(
     'LWP::UserAgent' =>  0,
     'JSON' =>  0,
     'URI::Escape' =>  0,
-    'HTML::Entities' =>  0
+    'HTML::Entities' =>  0,
+    'XML::Simple' => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Bib-CrossRef-*' },

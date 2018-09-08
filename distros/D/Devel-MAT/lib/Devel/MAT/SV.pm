@@ -8,7 +8,7 @@ package Devel::MAT::SV;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -422,7 +422,7 @@ boolean true and false. They are
 
 package Devel::MAT::SV::Immortal;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant immortal => 1;
 use constant basetype => "SV";
 sub new {
@@ -436,13 +436,13 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::UNDEF;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
 package Devel::MAT::SV::YES;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 sub desc { "YES" }
 sub type { "SCALAR" }
 
@@ -456,7 +456,7 @@ sub is_weak { '' }
 
 package Devel::MAT::SV::NO;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 sub desc { "NO" }
 sub type { "SCALAR" }
 
@@ -470,7 +470,7 @@ sub is_weak { '' }
 
 package Devel::MAT::SV::Unknown;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 0xff );
 
 sub desc { "UNKNOWN" }
@@ -479,7 +479,7 @@ sub _outrefs {}
 
 package Devel::MAT::SV::GLOB;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
 use constant basetype => "GV";
@@ -645,12 +645,28 @@ sub _outrefs
       }
    }
 
+   foreach my $saved ( @{ $self->{saved} } ) {
+      my $sv = $self->df->sv_at( $saved->[1] );
+
+      push @outrefs, $no_desc ? ( inferred => $sv ) :
+         Devel::MAT::SV::Reference( "saved value of " . Devel::MAT::Cmd->format_note( $saved->[0] ) . " slot",
+            "inferred", $sv );
+   }
+
    return @outrefs;
+}
+
+sub _more_saved
+{
+   my $self = shift;
+   my ( $slot, $addr ) = @_;
+
+   push @{ $self->{saved} }, [ $slot => $addr ];
 }
 
 package Devel::MAT::SV::SCALAR;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
 use constant basetype => "SV";
@@ -812,7 +828,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REF;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
 use constant basetype => "SV";
@@ -904,7 +920,7 @@ sub _outrefs
 
 package Devel::MAT::SV::ARRAY;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
 use constant basetype => "AV";
@@ -932,6 +948,14 @@ sub load
       unpack "$df->{uint_fmt} C", $header;
 
    $self->_set_array_fields( $flags || 0, [ $n ? $df->_read_ptrs($n) : () ] );
+}
+
+sub _more_saved
+{
+   my $self = shift;
+   my ( $index, $addr ) = @_;
+
+   push @{ $self->{saved} }, [ $index => $addr ];
 }
 
 =head2 is_unreal
@@ -1040,13 +1064,21 @@ sub _outrefs
       }
    }
 
+   foreach my $saved ( @{ $self->{saved} } ) {
+      my $sv = $self->df->sv_at( $saved->[1] );
+
+      push @outrefs, $no_desc ? ( inferred => $sv ) :
+         Devel::MAT::SV::Reference( "saved value of element " . Devel::MAT::Cmd->format_value( $saved->[0], index => 1 ),
+            inferred => $sv );
+   }
+
    return @outrefs;
 }
 
 package Devel::MAT::SV::PADLIST;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant type => "PADLIST";
 use constant $CONSTANTS;
 
@@ -1095,7 +1127,7 @@ sub _outrefs
 package Devel::MAT::SV::PADNAMES;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant type => "PADNAMES";
 use constant $CONSTANTS;
 
@@ -1179,7 +1211,7 @@ sub _outrefs
 package Devel::MAT::SV::PAD;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant type => "PAD";
 use constant $CONSTANTS;
 
@@ -1225,6 +1257,23 @@ sub lexvars
    } 1 .. $#svs;
 }
 
+=head2 lexvar
+
+   $sv = $pad->lexvar( $padname )
+
+Returns the SV associated with the given padname.
+
+=cut
+
+sub lexvar
+{
+   my $self = shift;
+   my ( $padname ) = @_;
+
+   my $padix = $self->padcv->padix_from_padname( $padname ) or return undef;
+   return $self->elem( $padix );
+}
+
 # Totally different outrefs format than ARRAY
 sub _outrefs
 {
@@ -1253,7 +1302,7 @@ sub _outrefs
             $name = "the lexical " . Devel::MAT::Cmd->format_note( $name, 1 );
          }
          else {
-            $name = "element " . Devel::MAT::Cmd->format_value( $idx, index => 1 );
+            $name = "pad temporary $idx";
          }
       }
 
@@ -1272,7 +1321,7 @@ sub _outrefs
 
 package Devel::MAT::SV::HASH;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
 use constant basetype => "HV";
@@ -1314,6 +1363,14 @@ sub _fixup
    if( my $backrefs = $self->backrefs ) {
       $backrefs->_set_backrefs( 1 ) if $backrefs->type eq "ARRAY";
    }
+}
+
+sub _more_saved
+{
+   my $self = shift;
+   my ( $keyaddr, $valaddr ) = @_;
+
+   push @{ $self->{saved} }, [ $keyaddr, $valaddr ];
 }
 
 sub symname
@@ -1429,12 +1486,24 @@ sub _outrefs
       }
    }
 
+   foreach my $saved ( @{ $self->{saved} } ) {
+      my $keysv = $self->df->sv_at( $saved->[0] );
+      my $valsv = $self->df->sv_at( $saved->[1] );
+
+      push @outrefs, $no_desc ? ( inferred => $keysv ) :
+         Devel::MAT::SV::Reference( "a key for saved value",
+            inferred => $keysv );
+      push @outrefs, $no_desc ? ( inferred => $valsv ) :
+         Devel::MAT::SV::Reference( "saved value of value " . Devel::MAT::Cmd->format_value( $keysv->pv, key => 1 ),
+            inferred => $valsv );
+   }
+
    return @outrefs;
 }
 
 package Devel::MAT::SV::STASH;
 use base qw( Devel::MAT::SV::HASH );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
 
@@ -1574,7 +1643,7 @@ sub _outrefs
 
 package Devel::MAT::SV::CODE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
 use constant basetype => "CV";
@@ -1994,6 +2063,27 @@ sub pad
    return $self->{pads} ? $self->{pads}[$depth-1] : undef;
 }
 
+=head2 lexvar
+
+   $sv = $cv->lexvar( $padname, $depth )
+
+Returns the SV on the PAD associated with the given padname, at the
+optionally-given depth (1-based index). If I<$depth> is not provided, the
+topmost live PAD will be used.
+
+=cut
+
+sub lexvar
+{
+   my $self = shift;
+   my ( $padname, $depth ) = @_;
+
+   $depth //= $self->depth;
+   $depth or croak "Cannot fetch current pad of a non-live CODE";
+
+   return $self->pad( $depth )->lexvar( $padname );
+}
+
 sub desc
 {
    my $self = shift;
@@ -2093,7 +2183,7 @@ sub _outrefs
 
 package Devel::MAT::SV::IO;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
 use constant basetype => "IO";
@@ -2168,7 +2258,7 @@ sub _outrefs
 
 package Devel::MAT::SV::LVALUE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
 use constant basetype => "LV";
@@ -2210,7 +2300,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REGEXP;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant basetype => "REGEXP";
 __PACKAGE__->register_type( 10 );
 
@@ -2222,7 +2312,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::FORMAT;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant basetype => "PVFM";
 __PACKAGE__->register_type( 11 );
 
@@ -2234,7 +2324,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::INVLIST;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 use constant basetype => "INVLIST";
 __PACKAGE__->register_type( 12 );
 
@@ -2247,7 +2337,7 @@ sub _outrefs { () }
 # A hack to compress files
 package Devel::MAT::SV::_UNDEFSV;
 use base qw( Devel::MAT::SV::SCALAR );
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 __PACKAGE__->register_type( 13 );
 
 sub load

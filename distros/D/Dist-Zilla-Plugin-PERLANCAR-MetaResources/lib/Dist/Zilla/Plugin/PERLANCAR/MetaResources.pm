@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::PERLANCAR::MetaResources;
 
-our $DATE = '2014-08-26'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2018-09-08'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -96,11 +96,14 @@ sub _build__github {
     die "GitHubMeta: no url found for remote '$remote'\n"
         unless $url and length $url;
 
+    die "GitHubMeta: no github host found in URL '$url'\n"
+        unless $url =~ m!(:(//)?|\@)github\.com!i;
+
     my ($account, $project) = ($url =~ m{[:/](.+)/(.+)\.git$});
 
-    die "GitHubMeta: no github account name found in .git/config\n"
+    die "GitHubMeta: no github account name found in URL '$url'\n"
         unless $account and length $account;
-    die "GitHubMeta: no github repository (project) found in .git/config\n"
+    die "GitHubMeta: no github repository (project) found in URL '$url'\n"
         unless $project and length $project;
 
     return { account => $account, project => $project };
@@ -173,7 +176,7 @@ Dist::Zilla::Plugin::PERLANCAR::MetaResources - Set meta resources for dists
 
 =head1 VERSION
 
-This document describes version 0.03 of Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2014-08-26.
+This document describes version 0.040 of Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2018-09-08.
 
 =head1 SYNOPSIS
 
@@ -188,10 +191,6 @@ the defaults: in this plugin, homepage by default is set to MetaCPAN release
 page instead of github wiki.
 
 =for Pod::Coverage .+
-
-=head1 SEE ALSO
-
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>
 
 =head1 HOMEPAGE
 
@@ -209,13 +208,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -35,5 +35,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.0368"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM"
+      }
+   },
+   "version" : "0.0369"
 }

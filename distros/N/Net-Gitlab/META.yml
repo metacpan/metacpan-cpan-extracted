@@ -1,52 +1,33 @@
 ---
-abstract: 'Talk to a Gitlab installation via its API.'
+abstract: 'Talk to a Gitlab installation via its API. (DEPRECATED)'
 author:
   - 'Alan Young <harleypig@gmail.com>'
 build_requires:
-  Module::Build: '0.28'
-  Scalar::Util: '0'
-  Test::CheckDeps: '0.010'
-  Test::More: '0.94'
-  Test::Most: '0'
-  Test::NoWarnings: '0'
-  Test::UseAllModules: '0'
-  perl: '5.004'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Gitlab
-no_index:
-  directory:
-    - t
-    - xt
 requires:
   Carp: '0'
   HTTP::Request: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   Params::Validate::Checks: '0'
-  Pod::Weaver::Plugin::Encoding: '0'
-  Pod::Weaver::Plugin::EnsureUniqueSections: '0'
-  Pod::Weaver::Plugin::StopWords: '0'
-  Pod::Weaver::Section::Availability: '0'
-  Pod::Weaver::Section::Installation: '0'
-  Pod::Weaver::Section::SeeAlso: '0'
-  Pod::Weaver::Section::SourceGitHub: '0'
-  Pod::Weaver::Section::Support: '0'
-  Pod::Weaver::Section::WarrantyDisclaimer: '0'
   Regexp::Common: '0'
   Regexp::Common::Email::Address: '0'
   namespace::autoclean: '0'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
 resources:
-  bugtracker: http://github.com/harleypig/Net-Gitlab/issues
-  homepage: http://metacpan.org/release/Net-Gitlab
-  repository: https://github.com/harleypig/Net-Gitlab.git
-version: '0.05'
+  bugtracker: https://github.com/bluefeet/Net-Gitlab/issues
+  homepage: https://github.com/bluefeet/Net-Gitlab
+  repository: https://github.com/bluefeet/Net-Gitlab.git
+version: '0.08'
+x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.69'

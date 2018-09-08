@@ -20,7 +20,9 @@ subtest 'to_hash' => sub {
 };
 
 SKIP: {
-    skip 'JSON is required', 1 unless eval {require JSON; 1};
+    skip 'JSON is required', 1 unless eval { require JSON; 1 };
+    skip 'DBIx::Inspector is required', 1
+      unless eval { require DBIx::Inspector; 1 };
 
     subtest 'to_hash with types' => sub {
         _setup();

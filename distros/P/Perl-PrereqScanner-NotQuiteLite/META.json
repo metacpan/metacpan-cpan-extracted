@@ -69,6 +69,6 @@
          "url" : "git://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite"
       }
    },
-   "version" : "0.93",
+   "version" : "0.94",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

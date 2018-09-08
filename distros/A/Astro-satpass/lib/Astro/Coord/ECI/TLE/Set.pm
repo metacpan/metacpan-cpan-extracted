@@ -131,7 +131,7 @@ package Astro::Coord::ECI::TLE::Set;
 use strict;
 use warnings;
 
-use Astro::Coord::ECI::Utils qw{ :params :ref max };
+use Astro::Coord::ECI::Utils qw{ :params :ref max @CARP_NOT };
 use Carp;
 
 our @CARP_NOT = qw{
@@ -140,7 +140,7 @@ our @CARP_NOT = qw{
     Astro::Coord::ECI
 };
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use constant ERR_NOCURRENT => <<eod;
 Error - Can not call %s because there is no current member. Be

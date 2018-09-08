@@ -1,5 +1,5 @@
 package Wallflower;
-$Wallflower::VERSION = '1.012';
+$Wallflower::VERSION = '1.015';
 use strict;
 use warnings;
 
@@ -155,7 +155,7 @@ sub get {
     else { croak "Unknown response from application: $res"; }
 
     # save the content to a file
-    if ( $status eq '200' ) {
+    if ( $status == 200 ) {
         my $fh = defined $content && do {
             eval { _build_handle( $file = $target ) }
               or do { warn $@; return [ 999, [], '' ]; };
@@ -192,6 +192,9 @@ sub get {
             utime $epoch, $epoch, $file;
         }
     }
+    elsif ( $status == 304 ) {
+        $file = $target;
+    }
 
     return [ $status, $headers, $file ];
 }
@@ -208,7 +211,7 @@ Wallflower - Stick Plack applications to the wallpaper
 
 =head1 VERSION
 
-version 1.012
+version 1.015
 
 =head1 SYNOPSIS
 

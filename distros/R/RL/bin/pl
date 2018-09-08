@@ -17,6 +17,7 @@ if ($help) {
 
 RL::read_history("$ENV{HOME}/.pl_history");
 
+my $output;
 while (1) {
     my $line = RL::readline("");
     if (!defined $line) {
@@ -29,7 +30,7 @@ while (1) {
         next;
     }
     RL::add_history($line);
-    my $output = eval $line;
+    $_ = $output = eval $line;
     if ($@) {
         my $error = $@;
         $error =~ s/ at \(eval \d+\) line \d+(,|\.$)//gm;

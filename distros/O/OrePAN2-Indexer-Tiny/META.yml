@@ -26,17 +26,21 @@ no_index:
 provides:
   OrePAN2::Indexer::Tiny:
     file: lib/OrePAN2/Indexer/Tiny.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Archive::Extract: '0'
   CPAN::Meta: '0'
   File::pushd: '0'
+  IO::Uncompress::Gunzip: '0'
+  IO::Zlib: '0'
   Parse::LocalDistribution: '0'
 resources:
   bugtracker: https://github.com/akiym/OrePAN2-Indexer-Tiny/issues
   homepage: https://github.com/akiym/OrePAN2-Indexer-Tiny
   repository: git://github.com/akiym/OrePAN2-Indexer-Tiny.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:AKIYM
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

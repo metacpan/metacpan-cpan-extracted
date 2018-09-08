@@ -16,11 +16,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -99,6 +99,7 @@ sub new {
     # @locations = $geo_coder->geocode('Portland, USA');
     # diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
 
+    # Note that this yields many false positives and isn't useable yet
     my @matches = $geo_coder->geocode(scantext => 'arbitrary text', region => 'US');
 
 =cut

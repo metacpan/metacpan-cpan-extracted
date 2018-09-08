@@ -4,6 +4,12 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.661 2018-09-07
+  * Add Sense Impedance, Sense Null SCPI roles
+  * Add AdjustRange role
+  * Tutorial improvements
+  * 2D plots: allow labeling of curve for each block
+
 3.660 2018-07-09
 
   * SR830: Empty output buffer in device initialization
@@ -261,7 +267,7 @@ historical information).
   * Clean up xt directory
   * Do not put code before 'use strict'
 
-3.530 2016-11-04   [ _ needs condensing ]
+3.530 2016-11-04
 
   * XPRESS voltage sweep: Do not call active method for mode 'step' (speed gain)
   * Add minimal test for XPRESS voltage sweep with YokogawaGS200
@@ -271,31 +277,21 @@ historical information).
   * Minor edits to scpi parsing, to eliminate newlines
   * Clean up USBtmc code, add timeout handling
   * Fix LinuxGPIB and update tests
-  * Fix Example5_VNA_gate_and_frequency
+  * Many documentation and example improvements
   * Remove Test::Files dependency, as it breaks the tests on windows
   * Use Instrument function for VNA examples
   * Enable Lab::Moose::Instrument drivers in XPRESS::hub::Instrument
   * Remove all read_length stuff from Lab::Moose
-  * Clarify meaning of tolerance and std_dev in temp sweep examples
-  * Add examples to address both temperature sweep and VNA in XPRESS
   * Apply various workarounds for temperature sweep with one sensor and Socket 
     connection
-  * Add examples to set Triton temperature and do temperature sweep
   * Make OI_Triton able to do XPRESS temperature sweeps
   * Perltidy
-  * Fix docs in Moose/Instrument.pm
-  * Fix 'XPRESS with VNA' example
   * Add Moose version of LinuxGPIB connection
-  * Fix scpi value parsing to handle 'blank string' cases without failures
+  * Several improvements to SCPI parsing
   * Update MakeRPM to allow an (optional) parameter for setting the "release 
     number"
-  * Add docs for the Lab::Moose::Instrument::SCPIBlock role
-  * Add docs for Lab::Moose::Instrument::Common
   * Use delegation to get connection methods in Lab::Moose::Instrument
-  * Add examples script of VNA in XPRESS voltage sweep
   * Add RS_FSV: driver for Rohde & Schwartz FSV Signal and Spectrum Analyzer
-  * Improve docs of RS_ZVA and RS_ZVM
-  * Add docs for Lab::Moose::BlockData
   * Add files for automatically building rpm distribution packages from the 
     Lab::Measurement code
   * Add some more Perl::Critic policies from "Perl Best Practices"
@@ -303,15 +299,57 @@ historical information).
     get_{cache parameter} when read_mode is not otherwise specified
   * Add 'average' option to sparam_sweep
   * Fix command ordering in VNASweep
-  * Improve on RS_ZVM test
   * Moose tests: Add commandline options for mock tests
-  * Fix bug in scpi_canon: was ignoring 'shorter' form inputs, so not properly 
     shortening subsequent keywords
-  * Start documenting and testing the VNAs
   * Add connection logging and mock connection
-  * Turn off recursion warnings, because deep recursion is normal for SCPI parsing
-  * Remove prototypes from SCPI.pm routines
   * Get started with Moose version of RS_ZVM.
   * Add RS_ZVM driver. Factor out common code of RS_ZVA and RS_ZVM.
-  * Start documenting the SCPI roles.
   * Fix path creation in XPRESS datafile
+
+3.512 2016-07-08
+
+  * Add Alexei Iankilevic and Simon Reinhard to dist_author
+  * Remove Alois Dirnaichner from dist_author
+  * Cleanup; remove unused test data
+  * Fix gate_protect for sweeps with mode => 'step', jump => 1
+  * YokogawaGS200: Fixes
+  * Remove examples using old Lab::Measurement interface,
+    corresponding metadata scripts and tutorial
+  * Remove the old Measurement code that noone uses here anymore
+  * Remove the KnickS252 driver
+  * Increase Andeen-Hagerling timeout for measurements at low 
+    frequencies
+  * Documentation fixes
+
+3.511 2016-06-27
+
+  * Add tests for Yokogawa 7651 and SR830::AuxOut
+
+3.510 2016-06-23
+
+  * New driver SR830::AuxOut for the four rear panel DC outputs of 
+    the SR830
+  * New driver SR830::AuxIn for the four rear panel DC inputs of 
+    the SR830
+  * DEBUG bus, DummySource, and Source.pm bugfixes
+  * Agilent34410A driver and documentation clean-up
+  * Add support for SCPI keyword matching
+  * Documentation improvements
+  * Remove prototype '()' of stub methods in Source.pm (RT39745?)
+  * Update Linux installation instructions
+  * Add a generic Windows installation guide
+  * Add pod test and compile test, fix pod errors and dependencies
+  * Remove given/when constructs from code (now marked experimental)
+  * Shut up all broken tests
+  * Correct rate values of the 3 magnets of Cryo Weiss 3D
+  * Moved N-dimensional sweep modules to correct directory
+
+3.500 2016-02-02
+
+  * Fix Yokogawa 7651 support again
+  * Add instrument driver for Lakeshore224
+  * Allow the user to change the IO interface, so background jobs
+    work again
+  * Update Oxford Instruments IPS driver
+  * Enable (linear) sweeps in N-dimensional space (for the vector magnet)
+  * ...

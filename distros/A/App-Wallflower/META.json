@@ -63,10 +63,10 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Plack::Request" : "0",
+            "TAP::Parser" : "0",
             "Test::More" : "0",
             "Test::Output" : "0",
             "perl" : "5.006"
@@ -85,7 +85,7 @@
          "web" : "http://github.com/book/App-Wallflower"
       }
    },
-   "version" : "1.012",
+   "version" : "1.015",
    "x_contributors" : [
       "Ferruccio Zamuner <ferz@cpan.org>",
       "Vincent Pit <vpit@cpan.org>",

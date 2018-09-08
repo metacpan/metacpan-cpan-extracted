@@ -1,5 +1,8 @@
 Revision history for Crypt-Trifid
 
+0.10  Thu Sep 06 18:30:00 2018
+      - Used namespace::autoclean instead of namespace::clean.
+
 0.09  Sun Sep 24 12:50:00 2017
       - Improved method exporting.
 

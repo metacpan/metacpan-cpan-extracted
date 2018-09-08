@@ -53,6 +53,9 @@
 #include "spvm_runtime_info_switch_info.h"
 #include "spvm_runtime_info_case_info.h"
 
+#include "spvm_portable.h"
+#include "spvm_exe_csource_builder.h"
+
 SV* SPVM_XS_UTIL_new_sv_object(SPVM_ENV* env, SPVM_OBJECT* object, const char* package) {
   
   // Create object
@@ -141,7 +144,7 @@ DESTROY(...)
 
 MODULE = SPVM::Data::Array		PACKAGE = SPVM::Data::Array
 
-MODULE = SPVM::Build::Info		PACKAGE = SPVM::Build::Info
+MODULE = SPVM::Builder::Info		PACKAGE = SPVM::Builder::Info
 
 SV*
 get_subs(...)
@@ -152,7 +155,7 @@ get_subs(...)
   HV* hv_self = (HV*)SvRV(sv_self);
 
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -227,7 +230,7 @@ get_sub_names(...)
   HV* hv_self = (HV*)SvRV(sv_self);
 
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -272,7 +275,7 @@ get_package_names(...)
   HV* hv_self = (HV*)SvRV(sv_self);
 
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -313,7 +316,7 @@ get_package_load_path(...)
   HV* hv_self = (HV*)SvRV(sv_self);
 
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -339,7 +342,7 @@ get_package_load_path(...)
   XSRETURN(1);
 }
 
-MODULE = SPVM::Build		PACKAGE = SPVM::Build
+MODULE = SPVM::Builder		PACKAGE = SPVM::Builder
 
 SV*
 compile_spvm(...)
@@ -349,7 +352,7 @@ compile_spvm(...)
   
   SV* sv_self = ST(0);
   HV* hv_self = (HV*)SvRV(sv_self);
-
+  
   SPVM_COMPILER* compiler = SPVM_COMPILER_new();
   
   SV** sv_package_infos_ptr = hv_fetch(hv_self, "package_infos", strlen("package_infos"), 0);
@@ -388,7 +391,6 @@ compile_spvm(...)
       SPVM_LIST_push(compiler->op_use_stack, op_use_package);
     }
   }
-  
   
   // Add include paths
   AV* av_include_paths = get_av("main::INC", 0);;
@@ -436,10 +438,10 @@ compile_spvm(...)
   XSRETURN(1);
 }
 
-MODULE = SPVM::Build::CBuilder::Native		PACKAGE = SPVM::Build::CBuilder::Native
+MODULE = SPVM::Builder::C		PACKAGE = SPVM::Builder::C
 
 SV*
-bind_sub(...)
+bind_sub_native(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -450,7 +452,7 @@ bind_sub(...)
   SV* sv_native_address = ST(2);
 
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -473,10 +475,8 @@ bind_sub(...)
   XSRETURN(0);
 }
 
-MODULE = SPVM::Build::CBuilder::Precompile		PACKAGE = SPVM::Build::CBuilder::Precompile
-
 SV*
-build_package_csource(...)
+build_package_csource_precompile(...)
   PPCODE:
 {
   SV* sv_self = ST(0);
@@ -485,7 +485,7 @@ build_package_csource(...)
   const char* package_name = SvPV_nolen(sv_package_name);
   
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -507,13 +507,13 @@ build_package_csource(...)
   SV* sv_package_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   
   SPVM_STRING_BUFFER_free(string_buffer);
-  
+
   XPUSHs(sv_package_csource);
   XSRETURN(1);
 }
 
 SV*
-bind_sub(...)
+bind_sub_precompile(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -527,7 +527,7 @@ bind_sub(...)
   void* sub_precompile_address = INT2PTR(void*, SvIV(sv_sub_native_address));
   
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "build", strlen("build"), 0);
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
   HV* hv_build = (HV*)SvRV(sv_build);
   SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
@@ -2596,6 +2596,45 @@ get_array_elements_bin(...)
   XPUSHs(sv_bin);
   XSRETURN(1);
 }
+
+MODULE = SPVM::Builder::Exe		PACKAGE = SPVM::Builder::Exe
+
+SV*
+build_main_csource(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+  const char* package_name = SvPV_nolen(sv_package_name);
+  
+  // Env
+  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
+  SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
+  HV* hv_build = (HV*)SvRV(sv_build);
+  SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  SPVM_RUNTIME* runtime = env->runtime;
+  SPVM_PORTABLE* portable = runtime->portable;
+
+  // String buffer for csource
+  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
+
+  SPVM_EXE_CSOURCE_BUILDER_build_exe_csource(env, string_buffer, portable, package_name);
+
+  SV* sv_main_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
+
+  SPVM_STRING_BUFFER_free(string_buffer);
+  
+  XPUSHs(sv_main_csource);
+  XSRETURN(1);
+}
+
 
 MODULE = SPVM		PACKAGE = SPVM
 

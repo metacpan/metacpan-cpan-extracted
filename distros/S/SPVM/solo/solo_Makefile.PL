@@ -3,7 +3,7 @@ use warnings;
 use Config;
 
 use lib 'lib';
-use SPVM::Build::Util;
+use SPVM::Builder::Util;
 use Getopt::Long 'GetOptions';
 
 my @defines;
@@ -22,27 +22,27 @@ if ($optimize) {
   $optimize = "$optimize";
 }
 
-my $build_config = SPVM::Build::Util::new_default_build_config;
+my $build_config = SPVM::Builder::Util::new_default_build_config;
 $optimize ||= $build_config->get_config('optimize');
 
 my $ccflags = $build_config->get_ccflags;
 
-my $ldflags = $build_config->get_ldflags;
+my $lddlflags = $build_config->get_lddlflags;
 
-my $src_dir = "lib/SPVM/Build/src";
+my $src_dir = "lib/SPVM/Builder/src";
 my @csource_files = glob "$src_dir/*.c";
 my @object_files = map { my $object_file = $_; $object_file =~ s/\.c$/.o/; $object_file } @csource_files;
 
 my $object_dir = 'solo';
 
 my $cccmd = "cc -c @defines $ccflags $optimize";
-my $ldcmd = "cc $ldflags";
+my $ldcmd = "cc ";
 
 my $makefile = <<"EOS";
 
 all:
 	$cccmd -o solo/main.o solo/main.c
-	$ldcmd -o solo/main -lm -o solo/main solo/main.o @object_files
+	$ldcmd -o solo/main -lm -o solo/main solo/main.o @object_files blib/lib/SPVM/CORE.native/CORE.so
 
 test:
 	$cccmd -o solo/t/spvm_t_list solo/t/spvm_t_list.c spvm_list.o spvm_util_allocator.o

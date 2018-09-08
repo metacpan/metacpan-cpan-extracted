@@ -1,0 +1,90 @@
+NAME
+    App::colorxform - Transform colors on the CLI
+
+VERSION
+    This document describes version 0.002 of App::colorxform (from Perl
+    distribution App-colorxform), released on 2018-09-07.
+
+FUNCTIONS
+  colorxform
+    Usage:
+
+     colorxform(%args) -> [status, msg, result, meta]
+
+    Transform colors on the CLI.
+
+    Some CLI programs output horrible colors (e.g. hard to read on terminal
+    with black background) and the colors are either uncustomizable or
+    cumbersome to customize. This is where "colorxform" comes in. You pipe
+    the output and it will replace some colors with another, per your
+    specification.
+
+    An example, put this in your "~/.config/colorxform.conf":
+
+     [profile=ledger]
+     fg_transforms = {"blue":"#18b2b2", "red":"bold red"}
+
+    then:
+
+     % ledger -f myledger.dat --color --force-color balance | colorxform -P ledger
+
+    You can create a shell alias for convenience:
+
+     % function ledger() { C<which ledger> --color --force-color "$@" | colorxform -P ledger; }
+
+    so you can just issue this to get the colors transformed:
+
+     % ledger -f myledger.dat balance
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bg_transforms => *hash* (default: {})
+
+        List of background colors to replace with other colors. You can
+        specify color using RGB code (e.g. "#123456") or color names like
+        those recognized by Term::ANSIColor (e.g. "blue" or "bold blue").
+
+    *   fg_transforms => *hash* (default: {})
+
+        List of foreground colors to replace with other colors. You can
+        specify color code using RGB code (e.g. "#123456") or color names
+        like those recognized by Term::ANSIColor (e.g. "blue" or "bold
+        blue").
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-colorxform>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-colorxform>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-colorxform>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

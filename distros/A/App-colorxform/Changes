@@ -1,0 +1,12 @@
+0.002   2018-09-07 (PERLANCAR)
+
+	- [bugfix] Fix generated background code.
+
+	- [bugfix] Fix regex.
+
+	- [dist] Remove unnecessary dependency.
+
+
+0.001   2018-09-07 (PERLANCAR)
+
+        - First, early release.

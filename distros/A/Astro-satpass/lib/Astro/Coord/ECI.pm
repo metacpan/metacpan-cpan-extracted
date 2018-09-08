@@ -102,9 +102,9 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
-use Astro::Coord::ECI::Utils qw{:all};
+use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
 use Data::Dumper;
 use POSIX qw{floor strftime};
@@ -336,10 +336,9 @@ L<A NOTE ON VELOCITIES|/A NOTE ON VELOCITIES>, below, for details.
 If velocities are available I<and> you have provided a non-zero value
 for the C<frequency> attribute, you will get the Doppler shift as the
 seventh element of the returned array. The I<caveats> about velocity in
-recession apply to the Doppler shift as well. The frequency can come
-from either the C<$coord> or C<$coord2> object, but the C<$coord2> is
-preferred, and getting frequency from the C<$coord> object is being put
-through a deprecation cycle and removed.
+recession apply to the Doppler shift as well. The frequency is from the
+C<$coord2> object. Getting the frequency from the C<$coord> object used
+to be supported as a fallback, but now results in an exception.
 
 =item ( $azimuth, $elevation, $range ) = $coord->azel_offset( $offset );
 
@@ -774,7 +773,7 @@ Error - The ecliptic_cartesian() method must be called with either zero
         arguments (to set coordinates). There is currently no six or
         seven argument version.
 EOD
-	my $epsilon = obliquity( $self->dynamical() );
+	my $epsilon = $self->obliquity();
 	my $sin_epsilon = sin $epsilon;
 	my $cos_epsilon = cos $epsilon;
 	my @eci;
@@ -796,7 +795,7 @@ EOD
 		$self->{_ECI_cache}{inertial}{ecliptic_cartesian}
 	    };
 	my @eci = $self->eci();
-	my $epsilon = obliquity( $self->dynamical() );
+	my $epsilon = $self->obliquity();
 	my $sin_epsilon = sin $epsilon;
 	my $cos_epsilon = cos $epsilon;
 	my @ecliptic_cartesian;
@@ -891,6 +890,52 @@ is how it is implemented.
 sub ecliptic_longitude {
     my ( $self ) = @_;
     return ( $self->ecliptic() )[1];
+}
+
+
+=item $seconds = $self->equation_of_time( $time );
+
+This method returns the equation of time at the given B<dynamical>
+time.
+
+The algorithm is from W. S. Smart's "Text-Book on Spherical Astronomy",
+as reported in Jean Meeus' "Astronomical Algorithms", 2nd Edition,
+Chapter 28, page 185.
+
+=cut
+
+sub equation_of_time {
+    my ( $self, $time ) = @_;
+
+    if ( looks_like_number( $self ) ) {
+	( $self, $time ) = ( __PACKAGE__, $self );
+	__subroutine_deprecation();
+##	Carp::cluck( 'Subroutine call to equation_of_time() is deprecated' );
+    }
+    defined $time
+	or $time = $self->dynamical();
+
+    my $epsilon = $self->obliquity( $time );
+    my $y = tan($epsilon / 2);
+    $y *= $y;
+
+
+#	The following algorithm is from Meeus, chapter 25, page, 163 ff.
+
+    my $T = jcent2000( $time );				# Meeus (25.1)
+    my $L0 = mod2pi( deg2rad( (.0003032 * $T + 36000.76983 ) * $T
+	    + 280.46646 ) );	# Meeus (25.2)
+    my $M = mod2pi( deg2rad( ( ( -.0001537 ) * $T + 35999.05029 )
+	    * $T + 357.52911 ) );	# Meeus (25.3)
+    my $e = ( -0.0000001267 * $T - 0.000042037 ) * $T
+	    + 0.016708634;	# Meeus (25.4)
+
+    my $E = $y * sin( 2 * $L0 ) - 2 * $e * sin( $M ) +
+	4 * $e * $y * sin( $M ) * cos( 2 * $L0 ) -
+	$y * $y * .5 * sin( 4 * $L0 ) -
+	1.25 * $e * $e * sin( 2 * $M );				# Meeus (28.3)
+
+    return $E * SECSPERDAY / TWOPI;	# The formula gives radians.
 }
 
 
@@ -1566,9 +1611,8 @@ See L</Attributes> for a list of the attributes you can get.
 	ref $self or $self = \%static;
 	my @rslt;
 	foreach my $name (@args) {
-	    exists $mutator{$name} or croak <<eod;
-Error - Attribute '$name' does not exist.
-eod
+	    exists $mutator{$name}
+		or croak " Error - Attribute '$name' does not exist";
 	    if ($accessor{$name}) {
 		push @rslt, $accessor{$name}->($self, $name);
 	    } else {
@@ -1849,8 +1893,7 @@ This means that in formatting for output, you call
 
 sub local_time {
     my $self = shift;
-    my $dyntim = $self->dynamical();
-    return $self->local_mean_time() + equation_of_time($dyntim);
+    return $self->local_mean_time() + $self->equation_of_time();
 }
 
 =item ( $maidenhead_loc, $height ) = $coord->maidenhead( $precision );
@@ -2293,6 +2336,80 @@ EOD
     $body->universal ($end);
     $self->universal ($end);
     return wantarray ? ($end, $above) : $end;
+}
+
+=item ( $delta_psi, $delta_epsilon ) = $self->nutation( $time )
+
+This method calculates the nutation in longitude (delta psi) and
+obliquity (delta epsilon) for the given B<dynamical> time. If the time
+is unspecified or specified as C<undef>, the current B<dynamical> time
+of the object is used.
+
+The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
+Edition, Chapter 22, pages 143ff. Meeus states that it is good to
+0.5 seconds of arc.
+
+=cut
+
+
+sub nutation {
+    my ( $self, $time ) = @_;
+    defined $time
+	or $time = $self->dynamical();
+
+    my $T = jcent2000( $time );	# Meeus (22.1)
+
+    my $omega = mod2pi( deg2rad( ( ( $T / 450000 + .0020708 ) * $T -
+	    1934.136261 ) * $T + 125.04452 ) );
+
+    my $L = mod2pi( deg2rad( 36000.7698 * $T + 280.4665 ) );
+    my $Lprime = mod2pi( deg2rad( 481267.8813 * $T + 218.3165 ) );
+
+    my $delta_psi = deg2rad( ( -17.20 * sin( $omega )
+	    - 1.32 * sin( 2 * $L )
+	    - 0.23 * sin( 2 * $Lprime )
+	    + 0.21 * sin( 2 * $omega ) ) / 3600 );
+    my $delta_epsilon = deg2rad( ( 9.20 * cos( $omega )
+	    + 0.57 * cos( 2 * $L )
+	    + 0.10 * cos( 2 * $Lprime )
+	    - 0.09 * cos( 2 * $omega ) ) / 3600 );
+
+    return ( $delta_psi, $delta_epsilon );
+}
+
+
+=item $epsilon = $self->obliquity( $time )
+
+This method calculates the obliquity of the ecliptic in radians at the
+given B<dynamical> time. If the time is unspecified or specified as
+C<undef>, the current B<dynamical> time of the object is used.
+
+The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
+Edition, Chapter 22, pages 143ff. The conversion from universal to
+dynamical time comes from chapter 10, equation 10.2  on page 78.
+
+=cut
+
+use constant E0BASE => (21.446 / 60 + 26) / 60 + 23;
+
+sub obliquity {
+    my ( $self, $time ) = @_;
+
+    if ( looks_like_number( $self ) ) {
+	( $self, $time ) = ( __PACKAGE__, $self );
+	__subroutine_deprecation();
+##	Carp::cluck( 'Subroutine call to obliquity() is deprecated' );
+    }
+    defined $time
+	or $time = $self->dynamical();
+
+    my $T = jcent2000 ($time);	# Meeus (22.1)
+
+    my ( undef, $delta_epsilon ) = $self->nutation( $time );
+
+    my $epsilon0 = deg2rad( ( ( 0.001813 * $T - 0.00059 ) * $T - 46.8150 )
+	    * $T / 3600 + E0BASE);
+    return $epsilon0 + $delta_epsilon;
 }
 
 
@@ -3266,7 +3383,7 @@ sub _convert_eci_to_heliocentric_ecliptic_cartesian {
     # So we need to rotate z toward y by the obliquity of the ecliptic
 
     my $dynamical = $self->dynamical();
-    my $epsilon = obliquity( $dynamical );
+    my $epsilon = $self->obliquity( $dynamical );
     my $sin_epsilon = sin $epsilon;
     my $cos_epsilon = cos $epsilon;
 
@@ -3298,7 +3415,7 @@ sub _convert_heliocentric_ecliptic_cartesian_to_eci {
     # So we need to rotate z toward y by the obliquity of the ecliptic
 
     my $dynamical = $self->dynamical();
-    my $epsilon = obliquity( $dynamical );
+    my $epsilon = $self->obliquity( $dynamical );
     my $sin_epsilon = sin $epsilon;
     my $cos_epsilon = cos $epsilon;
 
@@ -3607,6 +3724,27 @@ documentation, and removed the relevant text as of version 0.051_01.
 The default is -6 degrees (or, actually, the equivalent in radians).
 
 =back
+
+=head1 SUBCLASSING
+
+This class is and will remain based on a hash reference.
+
+It is recommended that subclasses store their attributes in a separate
+hash hung off the main object in a key named after the subclass. That
+is, something like
+
+ sub subclass_method {
+     my ( $self ) = @_;
+     my $attr = $self->{ ref $self };
+     ...
+ }
+
+From outside the subclass, these attributes can be made accessible by
+overriding C<get()> and C<set()>.
+
+Subclasses B<must> initialize themselves by overriding the C<new()>
+method.  The override B<must> call C<< $class->SUPER::new() >>, passing
+it any arguments that were passed to the override.
 
 =head1 A NOTE ON VELOCITIES
 

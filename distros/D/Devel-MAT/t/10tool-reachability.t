@@ -11,7 +11,7 @@ use Scalar::Util qw( weaken );
 use Devel::MAT::Dumper;
 use Devel::MAT;
 
-my $DUMPFILE = "test.pmat";
+my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
 
 # Set up a reference cycle with an easy-to-find PV in it
 # Run this from an anonymous sub so we know the lexical is dropped

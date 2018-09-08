@@ -1,5 +1,18 @@
 Revision history for Devel-MAT
 
+0.40    2018-09-07 14:57:06
+        [CHANGES]
+         * Read dumpfile format v0.4 - SV extension size table
+         * Elide glob symbol names if possible in 'identify' output
+         * If `identify` doesn't find any SVs, try harder by ignoring
+           filtering options
+         * Track `local` modified variables
+         * Optionally print $VERSION in `packages` command
+         * Have `find` tool respect pagination
+
+        [BUGFIXES]
+         * Don't collide .pmat files during parallel build testing (RT126041)
+
 0.39    2018-08-09 13:37:24
         [BUGFIXES]
          * Fix unit test script for now-removed tool file (RT125994)

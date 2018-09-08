@@ -19,8 +19,6 @@ lib/ETL/Yertl.pm
 lib/ETL/Yertl/Adapter/graphite.pm
 lib/ETL/Yertl/Adapter/influxdb.pm
 lib/ETL/Yertl/Command/ygrok.pm
-lib/ETL/Yertl/Command/yq.pm
-lib/ETL/Yertl/Command/yq/Regex.pm
 lib/ETL/Yertl/Command/ysql.pm
 lib/ETL/Yertl/Command/yts.pm
 lib/ETL/Yertl/Format.pm
@@ -30,7 +28,10 @@ lib/ETL/Yertl/Format/yaml.pm
 lib/ETL/Yertl/FormatStream.pm
 lib/ETL/Yertl/Help/Cookbook.pod
 lib/ETL/Yertl/Help/ysql.pod
+lib/ETL/Yertl/InputSeries.pm
+lib/ETL/Yertl/LineStream.pm
 lib/ETL/Yertl/Transform.pm
+lib/ETL/Yertl/Transform/Yq.pm
 lib/ETL/Yertl/Util.pm
 site.yml
 site/blog/2015/01/11/initial-release.markdown
@@ -107,6 +108,7 @@ t/format/json.t
 t/format/yaml.t
 t/format_stream.t
 t/helpers.t
+t/input_series.t
 t/integration/parse_apache_log.t
 t/lib/ETL/Yertl/Adapter/test.pm
 t/lib/Local/AddHello.pm

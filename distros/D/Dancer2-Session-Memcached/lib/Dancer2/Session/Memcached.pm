@@ -4,7 +4,7 @@ use warnings;
 package Dancer2::Session::Memcached;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Dancer 2 session storage with Cache::Memcached
-$Dancer2::Session::Memcached::VERSION = '0.006';
+$Dancer2::Session::Memcached::VERSION = '0.007';
 use Moo;
 use Cache::Memcached;
 use Carp qw/ croak /;
@@ -84,21 +84,7 @@ sub _flush {
 sub _build__memcached {
     my ($self) = @_;
 
-    my $servers = $self->memcached_servers;
-
-    croak "The setting memcached_servers must be defined"
-      unless defined $servers;
-
-    $servers = [ split /,\s*/, $servers ];
-
-    # make sure the servers look good
-    foreach my $s (@$servers) {
-        if ( $s =~ /^\d+\.\d+\.\d+\.\d+$/ ) {
-            croak "server `$s' is invalid; port is missing, use `server:port'";
-        }
-    }
-
-    return Cache::Memcached->new( servers => $servers );
+    return Cache::Memcached->new( servers => $self->memcached_servers );
 }
 
 #--------------------------------------------------------------------------#
@@ -142,7 +128,7 @@ Dancer2::Session::Memcached - Dancer 2 session storage with Cache::Memcached
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -172,9 +158,19 @@ servers (can be either address:port or socket paths).
 
 =for Pod::Coverage method_names_here
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 David Golden <dagolden@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

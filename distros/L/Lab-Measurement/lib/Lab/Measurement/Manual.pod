@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 OVERVIEW
 
@@ -220,6 +220,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 =over
 
+=item * L<Lab::Moose::Instrument::AdjustRange>
+
 =item * L<Lab::Moose::Instrument::Common>
 
 =item * L<Lab::Moose::Instrument::LinearStepSweep>
@@ -254,7 +256,11 @@ contains support for temperature sensor and He/N2 level meters.
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Function>
 
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Impedance>
+
 =item * L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Null>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Power>
 

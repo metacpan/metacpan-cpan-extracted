@@ -1,12 +1,14 @@
 package App::lcpan::Cmd::metacpan_mod;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use Perinci::Object;
 
 require App::lcpan;
 
@@ -23,24 +25,34 @@ checked for existence in local index database.
 _
     args => {
         %App::lcpan::common_args,
-        %App::lcpan::mod_args,
+        %App::lcpan::mods_args,
     },
 };
 sub handle_cmd {
     my %args = @_;
-    my $mod = $args{module};
 
     my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my ($file_id) = $dbh->selectrow_array(
-        "SELECT file_id FROM module WHERE name=?", {}, $mod);
-    $file_id or return [404, "No such module '$mod'"];
+    my $envres = envresmulti();
+    for my $mod (@{ $args{modules} }) {
+        my ($file_id) = $dbh->selectrow_array(
+            "SELECT file_id FROM module WHERE name=?", {}, $mod);
+        $file_id or do {
+            $envres->add_result(404, "No such module '$mod'");
+            next;
+        };
 
-    require Browser::Open;
-    my $err = Browser::Open::open_browser("https://metacpan.org/pod/$mod");
-    return [500, "Can't open browser"] if $err;
-    [200];
+        require Browser::Open;
+        my $url = "https://metacpan.org/pod/$mod";
+        my $err = Browser::Open::open_browser($url);
+        if ($err) {
+            $envres->add_result(500, "Can't open browser for URL $url");
+        } else {
+            $envres->add_result(200, "OK");
+        }
+    }
+    $envres->as_struct;
 }
 
 1;
@@ -58,7 +70,7 @@ App::lcpan::Cmd::metacpan_mod - Open module POD on MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::Cmd::metacpan_mod (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-07-10.
+This document describes version 0.005 of App::lcpan::Cmd::metacpan_mod (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2018-09-07.
 
 =head1 DESCRIPTION
 
@@ -94,7 +106,12 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
-=item * B<module>* => I<perl::modname>
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
+=item * B<modules>* => I<array[perl::modname]>
 
 =back
 
@@ -131,7 +148,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

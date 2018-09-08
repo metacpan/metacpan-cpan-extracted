@@ -1,0 +1,82 @@
+# Create a clean local lib
+!!!perlbrew use perl-5.16.3
+!!!perlbrew lib delete perl-5.16.3@demo
+!!!perlbrew lib create perl-5.16.3@demo
+!!!exit
+
+# Trick cpanm into installing Pinto and a few prereqs
+!!!rm -rf ~/opt/local/pinto/lib/perl5/HTTP*
+!!!rm -rf ~/opt/local/pinto/lib/perl5/Pinto*
+!!!rm -rf ~/opt/local/pinto/lib/perl5/darwin-2level/auto/Pinto
+
+# Delete the Pinto repo
+!!!rm -rf MyModules
+
+# Final environment setup
+!!!perlbrew use perl-5.16.3@demo
+!!!export PERL_CPANM_OPT=--notest
+
+# Live portion starts here
+echo 'Here we go!'; clear
+
+# Install pinto
+curl -L http://getpinto.stratopan.com | bash
+
+# Create repository
+pinto %%%--root MyModules %%%init %%%--source file:///Users/jeff/tmp/CPAN-Today
+
+# Show repository structure
+find MyModules -type f
+
+# Set ENV var, so we can be lazy
+export PINTO_REPOSITORY_ROOT=$PWD/MyModules
+
+# Pull Dancer from CPAN and install
+pinto install%%% --do-pull%%% Dancer
+
+# Show stack contents
+pinto list
+clear
+
+# URI is broken so inject our patched one
+pinto add%%% ~/tmp/URI-1.58_PATCHED.tar.gz
+
+# Pin our URI so it doesn't change
+pinto pin%%% URI
+
+# Edit config file to travel forward in time
+(exec < /dev/tty vim MyModules/.pinto/config/pinto.ini)
+
+# Pull newer Dancer and install
+pinto install --do-pull Dancer%%%~1.3116
+
+# Show log to explain the pin
+pinto log
+
+# Make a copy of the stack
+pinto copy%%% master foo
+
+# Show the stack listing
+pinto stacks
+
+# Unpin URI on the copied stack
+pinto unpin%%% --stack foo%%% URI
+
+# Upgrade Dancer
+pinto install --do-pull --stack foo%%% Dancer~1.3116
+
+# Compare the stacks
+pinto diff%%% master foo
+
+# Unpin URI on master too
+pinto unpin URI
+
+# Pull Dancer to master
+pinto pull Dancer~1.3116
+
+# Compare stacks again
+pinto diff master foo
+
+# The end
+echo 'Thank You!'
+exit

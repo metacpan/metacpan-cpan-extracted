@@ -1,6 +1,6 @@
 package Lab::Data::Analysis::TekTDS;
 #ABSTRACT: Analysis routine for Tektronix TDS1000/TDS2000/etc. scopes
-$Lab::Data::Analysis::TekTDS::VERSION = '3.660';
+$Lab::Data::Analysis::TekTDS::VERSION = '3.661';
 use 5.006;
 use strict;
 use warnings;
@@ -321,7 +321,7 @@ Lab::Data::Analysis::TekTDS - Analysis routine for Tektronix TDS1000/TDS2000/etc
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 SUBROUTINES/METHODS
 

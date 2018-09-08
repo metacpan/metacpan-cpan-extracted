@@ -1,5 +1,5 @@
 package App::Wallflower;
-$App::Wallflower::VERSION = '1.012';
+$App::Wallflower::VERSION = '1.015';
 use strict;
 use warnings;
 
@@ -30,7 +30,15 @@ my @callbacks = (
             my ( $url, $response ) = @_;
             my ( $status, $headers, $file ) = @$response;
             return if $status == 200;
-            printf "$status %s\n", $url->path;
+            if ( $status == 301 ) {
+                my $i = 0;
+                $i += 2
+                  while $i < @$headers && lc( $headers->[$i] ) ne 'location';
+                printf "$status %s -> %s\n", $url->path, $headers->[ $i + 1 ] || '?';
+            }
+            else {
+                printf "$status %s\n", $url->path;
+            }
         },
     ],
     [
@@ -46,7 +54,18 @@ my @callbacks = (
         tap => sub {
             my ( $url, $response ) = @_;
             my ( $status, $headers, $file ) = @$response;
-            is( $status, 200, $url->path );
+            if ( $status == 301 ) {
+                my $i = 0;
+                $i += 2
+                  while $i < @$headers && lc( $headers->[$i] ) ne 'location';
+                note( "$url => " . ( $headers->[ $i + 1 ] || '?' ) );
+            }
+            elsif ( $status == 304 ) {
+              SKIP: { skip( $url, 1 ); }
+            }
+            else {
+                is( $status, 200, $url->path );
+            }
         },
     ],
 );
@@ -224,7 +243,7 @@ sub _aggregate_todo {
 
     # aggregate all child todo into ours and save it as __TODO__
     local *ARGV;
-    @ARGV = glob $self->{_ipc_dir_}->child('todo-*');
+    @ARGV = ( $TODO, glob $self->{_ipc_dir_}->child('todo-*') );
     no warnings 'inplace';    # some files may already be gone
     my $fh = File::Temp->new(
         TEMPLATE => "__TODO__-XXXX",
@@ -408,15 +427,15 @@ sub _process_queue {
 
         # obtain links to resources
         my ( $status, $headers, $file ) = @$response;
-        if ( $status eq '200' && $follow ) {
+        if ( ( $status == 200 || $status == 304 ) && $follow ) {
             $self->_push_todo( links_from( $response => $url ) );
         }
 
         # follow 301 Moved Permanently
-        elsif ( $status eq '301' ) {
+        elsif ( $status == 301 ) {
             require HTTP::Headers;
             my $l = HTTP::Headers->new(@$headers)->header('Location');
-            unshift @queue, $l if $l;
+            $self->_push_todo($l) if $l;
         }
     }
 }
@@ -441,7 +460,7 @@ App::Wallflower - Class performing the moves for the wallflower program
 
 =head1 VERSION
 
-version 1.012
+version 1.015
 
 =head1 SYNOPSIS
 

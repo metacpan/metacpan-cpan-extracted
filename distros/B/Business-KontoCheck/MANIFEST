@@ -13,7 +13,6 @@ examples/test1.pl
 examples/test2.pl
 examples/testkonten.blz
 examples/testkonten.txt
-t/austrian.t
 t/base.t
 t/bic_check.t
 t/encoding.t

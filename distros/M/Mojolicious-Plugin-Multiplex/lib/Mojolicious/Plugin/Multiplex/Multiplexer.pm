@@ -135,7 +135,7 @@ Note further that topics cannot contain a comma due to the limitations of the si
 
 =head1 EVENTS
 
-Inherits all of the events from L<Mojo::EventEmitted> and implements the following new ones.
+Inherits all of the events from L<Mojo::EventEmitter> and implements the following new ones.
 
 =head2 subscribe / unsubscribe
 

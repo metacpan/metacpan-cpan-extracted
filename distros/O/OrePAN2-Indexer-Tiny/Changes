@@ -1,5 +1,9 @@
 Revision history for Perl extension OrePAN2-Indexer-Tiny
 
+0.03 2018-09-06T02:03:18Z
+
+    - Added missing prereqs as reported by CPANTS. (@manwar)
+
 0.02 2018-09-05T17:05:00Z
 
     - add missing dependency

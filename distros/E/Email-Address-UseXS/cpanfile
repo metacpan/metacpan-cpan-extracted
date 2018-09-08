@@ -1,0 +1,8 @@
+requires 'Email::Address::XS', 0;
+
+on 'test' => sub {
+    requires 'Test::More', '>= 0.98';
+    requires 'Test::Fatal', 0;
+    requires 'Email::Address', 0;
+};
+

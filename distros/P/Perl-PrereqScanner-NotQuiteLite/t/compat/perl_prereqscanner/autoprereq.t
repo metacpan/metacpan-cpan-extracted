@@ -35,6 +35,7 @@ test("line ".__LINE__,
 
 test("line ".__LINE__,
   'no Import::IgnoreAPI require => 1;',
+  undef, undef, undef,
   { 'Import::IgnoreAPI' => 0 },
 );
 

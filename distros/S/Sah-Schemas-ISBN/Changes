@@ -1,3 +1,10 @@
+0.004   2018-09-08 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix repository URL.
+
+
 0.003   2018-08-23 (PERLANCAR)
 
         - Add schema: isbn (which accepts ISBN 10 or ISBN 13).

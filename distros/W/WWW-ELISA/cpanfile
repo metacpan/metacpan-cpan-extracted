@@ -11,3 +11,4 @@ requires 'Digest::MD5';
 requires 'HTTP::Request';
 requires 'JSON::XS';
 requires 'LWP::UserAgent';
+requires 'Try::Tiny';

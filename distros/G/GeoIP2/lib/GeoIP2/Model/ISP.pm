@@ -3,7 +3,7 @@ package GeoIP2::Model::ISP;
 use strict;
 use warnings;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006001';
 
 use Moo;
 
@@ -53,7 +53,7 @@ GeoIP2::Model::ISP - Model class for the GeoIP2 ISP database
 
 =head1 VERSION
 
-version 2.005001
+version 2.006001
 
 =head1 SYNOPSIS
 

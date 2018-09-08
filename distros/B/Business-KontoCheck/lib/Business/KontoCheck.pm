@@ -45,7 +45,7 @@ our @EXPORT_OK = qw(kto_check kto_check_str kto_check_blz
 
 our @EXPORT = qw( lut_init kto_check kto_check_blz kto_check_at %kto_retval );
 
-our $VERSION = '6.04';
+our $VERSION = '6.05';
 
 require XSLoader;
 XSLoader::load('Business::KontoCheck', $VERSION);
@@ -1311,6 +1311,12 @@ sub iban_iban_regel1
 
 
 %Business::KontoCheck::kto_retval = (
+-158 => 'die SCL-Blocks wurden noch nicht eingelesen',
+-157 => 'Der Info-Block des SCL-Verzeichnisses wurde noch nicht eingelesen',
+-156 => 'Der BIC wurde im SCL-Verzeichnis nicht gefunden',
+-155 => 'Ungültiger SCL-Info-Block in der LUT-Datei',
+-154 => 'Keine SCL-Blocks in der LUT-Datei enthalten',
+-153 => 'Ungültige Eingabewerte in der SCL-Datei',
 -152 => 'Ungültiger Zähler in regulärem Ausdruck (innerhalb von {})',
 -151 => 'Ungültiger regulärer Ausdruck (enthält zwei Zeichen aus [+?*] nacheinander)',
 -150 => 'Ungültiges Handle angegeben',
@@ -1464,7 +1470,15 @@ sub iban_iban_regel1
   24 => 'ok, die Kontonummer wurde ersetzt, die neue Kontonummer hat keine Prüfziffer',
   25 => 'ok, es wurde ein (weggelassenes) Unterkonto angefügt',
   26 => 'ok, für den BIC wurde die Zweigstellennummer allerdings durch XXX ersetzt',
+  27 => 'ok, für den BIC wurde die Extension XXX angehängt',
+  28 => 'ok, für den BIC wurde die Wildcard-Version (8stellig) benutzt',
 
+'NO_SCL_BLOCKS_LOADED'                   => 'die SCL-Blocks wurden noch nicht eingelesen',
+'NO_SCL_INFO_BLOCK'                      => 'Der Info-Block des SCL-Verzeichnisses wurde noch nicht eingelesen',
+'SCL_BIC_NOT_FOUND'                      => 'Der BIC wurde im SCL-Verzeichnis nicht gefunden',
+'INVALID_SCL_INFO_BLOCK'                 => 'Ungültiger SCL-Info-Block in der LUT-Datei',
+'NO_SCL_BLOCKS'                          => 'Keine SCL-Blocks in der LUT-Datei enthalten',
+'SCL_INPUT_FORMAT_ERROR'                 => 'Ungültige Eingabewerte in der SCL-Datei',
 'INVALID_REGULAR_EXPRESSION_CNT'         => 'Ungültiger Zähler in regulärem Ausdruck (innerhalb von {})',
 'INVALID_REGULAR_EXPRESSION'             => 'Ungültiger regulärer Ausdruck (enthält zwei Zeichen aus [+?*] nacheinander)',
 'INVALID_HANDLE'                         => 'Ungültiges Handle angegeben',
@@ -1618,9 +1632,17 @@ sub iban_iban_regel1
 'OK_KTO_REPLACED_NO_PZ'                  => 'ok, die Kontonummer wurde ersetzt, die neue Kontonummer hat keine Prüfziffer',
 'OK_UNTERKONTO_ATTACHED'                 => 'ok, es wurde ein (weggelassenes) Unterkonto angefügt',
 'OK_SHORT_BIC_USED'                      => 'ok, für den BIC wurde die Zweigstellennummer allerdings durch XXX ersetzt',
+'OK_SCL_EXTENSION_BIC_USED'              => 'ok, für den BIC wurde die Extension XXX angehängt',
+'OK_SCL_WILDCARD_BIC_USED'               => 'ok, für den BIC wurde die Wildcard-Version (8stellig) benutzt',
 );
 
 %Business::KontoCheck::kto_retval_kurz = (
+-158 => 'NO_SCL_BLOCKS_LOADED',
+-157 => 'NO_SCL_INFO_BLOCK',
+-156 => 'SCL_BIC_NOT_FOUND',
+-155 => 'INVALID_SCL_INFO_BLOCK',
+-154 => 'NO_SCL_BLOCKS',
+-153 => 'SCL_INPUT_FORMAT_ERROR',
 -152 => 'INVALID_REGULAR_EXPRESSION_CNT',
 -151 => 'INVALID_REGULAR_EXPRESSION',
 -150 => 'INVALID_HANDLE',
@@ -1774,6 +1796,8 @@ sub iban_iban_regel1
   24 => 'OK_KTO_REPLACED_NO_PZ',
   25 => 'OK_UNTERKONTO_ATTACHED',
   26 => 'OK_SHORT_BIC_USED',
+  27 => 'OK_SCL_EXTENSION_BIC_USED',
+  28 => 'OK_SCL_WILDCARD_BIC_USED',
 );
 
 END{ lut_cleanup(); }

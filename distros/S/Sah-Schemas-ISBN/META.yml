@@ -23,8 +23,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-ISBN
   homepage: https://metacpan.org/release/Sah-Schemas-ISBN
-  repository: git://github.com///u1@198.58.100.202:/home/u1/repos/perl-Sah-Schemas-ISBN.git
-version: '0.003'
+  repository: git://github.com/perlancar/perl-Sah-Schemas-ISBN.git
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -124,7 +124,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

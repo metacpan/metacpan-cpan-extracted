@@ -3,19 +3,19 @@ NAME
     MetaCPAN
 
 VERSION
-    This document describes version 0.003 of App::lcpan::CmdBundle::metacpan
+    This document describes version 0.005 of App::lcpan::CmdBundle::metacpan
     (from Perl distribution App-lcpan-CmdBundle-metacpan), released on
-    2017-07-10.
+    2018-09-07.
 
 SYNOPSIS
 DESCRIPTION
     This bundle provides the following lcpan subcommands:
 
+    *   lcpan metacpan-author
+
     *   lcpan metacpan-mod
 
     *   lcpan metacpan-dist
-
-    *   lcpan metacpan-author
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -42,7 +42,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

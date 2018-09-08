@@ -24,17 +24,19 @@ sub todo_test {
 }
 
 sub test {
-  my ($description, $string, $expected_requires, $expected_suggests, $expected_recommends) = @_;
+  my ($description, $string, $expected_requires, $expected_suggests, $expected_recommends, $expected_noes) = @_;
   subtest $description => sub {
     my $scanner = Perl::PrereqScanner::NotQuiteLite->new(
       parsers => $PARSERS || [qw/:bundled/],
       suggests => $expected_suggests ? 1 : 0,
     );
     ok my $context = $scanner->scan_string($string);
-    my $requires = $context->requires;
-    my $requires_hash = $requires ? $requires->as_string_hash : {};
-    is_deeply $requires_hash => $expected_requires, "requires ok";
-    note explain $requires_hash;
+    if ($expected_requires) {
+      my $requires = $context->requires;
+      my $requires_hash = $requires ? $requires->as_string_hash : {};
+      is_deeply $requires_hash => $expected_requires, "requires ok";
+      note explain $requires_hash;
+    }
     if ($expected_suggests) {
       my $suggests = $context->suggests;
       my $suggests_hash = $suggests ? $suggests->as_string_hash : {};
@@ -46,6 +48,12 @@ sub test {
       my $recommends_hash = $recommends ? $recommends->as_string_hash : {};
       is_deeply $recommends_hash => $expected_recommends, "recommends ok";
       note explain $recommends_hash;
+    }
+    if ($expected_noes) {
+      my $noes = $context->noes;
+      my $noes_hash = $noes ? $noes->as_string_hash : {};
+      is_deeply $noes_hash => $expected_noes, "noes ok";
+      note explain $noes_hash;
     }
     if ($EVAL) {
       eval "no strict; $string";

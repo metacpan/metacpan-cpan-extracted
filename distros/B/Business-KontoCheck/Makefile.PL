@@ -1,3 +1,8 @@
+
+############################################################
+### dies ist eine generierte Datei - nicht editieren!!!  ###
+############################################################
+
 use 5.006000;
 use ExtUtils::MakeMaker;
 use File::Find;

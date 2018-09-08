@@ -1,0 +1,72 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Dancer2::Session::Memcached - Dancer 2 session storage with Cache::Memcached
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+  # In Dancer 2 config.yml file
+
+  session: Memcached
+  engines:
+    session:
+      Memcached:
+        memcached_servers: 10.0.1.31:11211,10.0.1.32:11211,/var/sock/memcached
+        fatal_cluster_unreachable: 0
+
+=head1 DESCRIPTION
+
+This module implements a session factory for Dancer 2 that stores session
+state within Memcached using L<Cache::Memcached>.
+
+=head1 ATTRIBUTES
+
+=head2 memcached_servers (required)
+
+A comma-separated list of reachable memcached servers (can be either
+address:port or socket paths).
+
+=head2 fatal_cluster_unreachable (optional default 0)
+
+Boolean (0|1), if memcache cluster is not reachable and fatal_cluster_unreachable is set to 1, application will croak
+
+=for Pod::Coverage method_names_here
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/dancer2-session-memcached/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/dagolden/dancer2-session-memcached>
+
+  git clone git://github.com/dagolden/dancer2-session-memcached.git
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+

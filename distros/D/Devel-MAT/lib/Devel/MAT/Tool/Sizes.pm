@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use constant FOR_UI => 1;
 
@@ -264,6 +264,7 @@ By default, only the individual SV size is counted.
 use constant CMD => "largest";
 use constant CMD_DESC => "Find the largest SVs by size";
 
+use Heap;
 use List::UtilsBy qw( max_by );
 
 my %seen;
@@ -274,10 +275,13 @@ sub list_largest_svs
 
    my $method = $metric ? "${metric}_size" : "size";
 
+   my $heap = Heap::Fibonacci->new;
+   $heap->add( Devel::MAT::Tool::Sizes::_Elem->new( $_->$method, $_ ) ) for @$svlist;
+
    my $count = shift @counts;
    while( $count-- ) {
-      my $largest = max_by { $_->$method } grep { !$seen{$_->addr} } @$svlist;
-      defined $largest or last;
+      my $topelem = $heap->extract_top or last;
+      my $largest = $topelem->sv;
 
       $seen{$largest->addr}++;
 
@@ -317,15 +321,32 @@ sub list_largest_svs
    }
 }
 
+package Devel::MAT::Tool::Sizes::_Elem {
+   sub new { my ( $class, $val, $sv ) = @_; bless [ $val, $sv ], $class }
+
+   sub sv { my $self = shift; return $self->[1]; }
+   sub heap { my $self = shift; $self->[2] = shift if @_; return $self->[2] }
+
+   sub cmp { my ( $self, $other ) = @_; return $other->[0] <=> $self->[0] }
+}
+
 use constant CMD_OPTS => (
    struct => { help => "count SVs by structural size" },
    owned  => { help => "count SVs by owned size" },
+);
+
+use constant CMD_ARGS => (
+   { name => "count", help => "how many items to display",
+     repeated => 1 },
 );
 
 sub run
 {
    my $self = shift;
    my %opts = %{ +shift };
+
+   my @counts = ( 5, 3, 2 );
+   $counts[$_] = $_[$_] for 0 .. $#_;
 
    my $df = $self->df;
 
@@ -348,7 +369,7 @@ sub run
    $self->report_progress();
 
    undef %seen;
-   list_largest_svs( \@svs, $METRIC, "", 5, 3, 2 );
+   list_largest_svs( \@svs, $METRIC, "", @counts );
 }
 
 =head1 AUTHOR

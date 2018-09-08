@@ -52,6 +52,25 @@ scpi_set_get_test(
 );
 
 $dmm->sense_function( value => 'VOLT' );
+scpi_set_get_test(
+    instr  => $dmm,
+    func   => 'sense_impedance_auto',
+    values => [ 0, 1, 0 ],
+);
+
+scpi_set_get_test(
+    instr  => $dmm,
+    func   => 'sense_null_state',
+    values => [ 0, 1, 0 ],
+);
+
+scpi_set_get_test(
+    instr  => $dmm,
+    func   => 'sense_null_value',
+    values => [ 0, 0.001, 0 ]
+);
+
+$dmm->sense_function( value => 'VOLT' );
 $dmm->sense_range( value => 0.1 );
 $dmm->sense_nplc( value => 10 );
 my $value = $dmm->get_value();

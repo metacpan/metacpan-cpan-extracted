@@ -1,4 +1,5 @@
 requires "Graph" => "0";
+requires "List::Util" => "1.43";
 requires "Module::Runtime" => "0";
 requires "Moo" => "1.001000";
 requires "Path::Tiny" => "0.018";

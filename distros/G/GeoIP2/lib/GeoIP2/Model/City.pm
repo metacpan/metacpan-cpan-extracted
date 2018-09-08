@@ -3,7 +3,7 @@ package GeoIP2::Model::City;
 use strict;
 use warnings;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006001';
 
 use Moo;
 
@@ -36,7 +36,7 @@ GeoIP2::Model::City - Model class for GeoIP2 Precision: City and GeoIP2 City
 
 =head1 VERSION
 
-version 2.005001
+version 2.006001
 
 =head1 SYNOPSIS
 

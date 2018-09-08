@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.660
+version 3.661
 
 =head1 How to read the documentation
 
@@ -586,6 +586,56 @@ C<hard_copy> option:
 
 The C<hard_copy> attribute is mandatory if you add multiple plots to one datafile.
 
+=head3 Connection problems associated with persistent plot windows
+
+Some gnuplot terminals like B<qt> are always persistent, i.e. the live
+plot windows persist after the measurement script is finished. Some connection
+types like B<LinuxGPIB> only work after closing all plot windows. This might
+be caused by file locks which are inherited by the forked gnuplot processes even when
+the main perl process is finished. As an alternative to close the plot
+windows yourself, one can use terminals like B<x11> where one can set
+C<< persist => 0 >> in the C<terminal_options> attribute (see below).
+
+=head3 Labeling lines for different blocks
+
+Assume the following 2d sweep setup:
+
+ # outer sweep
+ my $gate_sweep = sweep(
+     type               => 'Step::Voltage',
+     instrument         => $gate_source,
+     list => [10, 20, 30],
+ );
+
+ # inner (fast) sweep
+ my $bias_sweep = sweep(
+     type                => 'Step::Voltage',
+     from                => -1,
+     to                  => 1,
+     step                => 0.01
+ );
+
+ my $datafile = datafile(columns => [qw/gate bias current/]);
+
+We create a current vs. bias plot with one curve for each value of the gate:
+
+ $datafile->add_plot(
+     x => 'bias',
+     y => 'current',
+     legend => 'gate',
+ );
+
+Setting the C<'legend'> attribute will create a key where each curve is labeled
+by its value of the gate parameter.
+
+Conversely, if we do not need different plotting styles for each block, we can set
+
+ $datafile->add_plot(
+     x => 'bias',
+     y => 'current',
+     curve_options => {linetype => 1},
+ );
+
 =head3 Multiple curves per plot
 
 We can draw multiple curves in a single plot window:
@@ -843,7 +893,7 @@ C<meta_data> attribute to the C<start> method:
 =head1 Writing new instrument drivers
 
 Detailed instructions for writing new instrument drivers are provided in
-L<Lab::Moose::Developer>.
+L<Lab::Measurement::Developer>.
 
 =head1 COPYRIGHT AND LICENSE
 

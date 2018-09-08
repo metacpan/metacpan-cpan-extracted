@@ -10,7 +10,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
@@ -62,6 +62,7 @@ If that parameter isn't given, the module will attempt to find the databases, bu
     # @locations = $geo_coder->geocode('Portland, USA');
     # diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
 
+    # Note that this yields many false positives and isn't useable yet
     my @matches = $geo_coder->geocode(scantext => 'arbitrary text', region => 'US');
 
 ## reverse\_geocode

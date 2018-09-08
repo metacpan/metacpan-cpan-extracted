@@ -1,0 +1,152 @@
+NAME
+    Perinci::Sub::Gen::AccessTable::Simple - Generate function (and its
+    metadata) to read table data
+
+VERSION
+    This document describes version 0.001 of
+    Perinci::Sub::Gen::AccessTable::Simple (from Perl distribution
+    Perinci-Sub-Gen-AccessTable-Simple), released on 2018-09-07.
+
+SYNOPSIS
+    In list_countries.pl:
+
+     #!perl
+     use strict;
+     use warnings;
+     use Perinci::CmdLine;
+     use Perinci::Sub::Gen::AccessTable::Simple qw(gen_read_table_func);
+
+     our %SPEC;
+
+     my $countries = [
+         ['cn', 'China', 'Cina'],
+         ['id', 'Indonesia', 'Indonesia'],
+         ['sg', 'Singapore', 'Singapura'],
+         ['us', 'United States of America', 'Amerika Serikat'],
+     ];
+
+     my $res = gen_read_table_func(
+         name          => 'list_countries',
+         summary       => 'func summary',     # optional
+         description   => 'func description', # optional
+         table_data    => $countries,
+         field_names   => [qw/code en_name id_name/],
+         filter_fields => ['code'],
+     );
+     die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+
+     Perinci::CmdLine->new(url=>'/main/list_countries')->run;
+
+    Now you can do:
+
+     # list all countries
+     % list_countries.pl
+     .--------------------------+------+-----------------.
+     | en_name                  | code | id_name         |
+     +--------------------------+------+-----------------+
+     | China                    | cn   | Indonesia       |
+     | Indonesia                | id   | Indonesia       |
+     | Singapore                | sg   | Singapura       |
+     | United States of America | us   | Amerika Serikat |
+     '--------------------------+------+-----------------'
+
+     # filter by code
+     % list_countries.pl --code id
+     .-----------+------+-----------.
+     | en_name   | code | id_name   |
+     +-----------+------+-----------+
+     | Indonesia | id   | Indonesia |
+     '-----------+------+-----------'
+
+     # unknown code
+     % list_countries.pl --code xx
+
+     # output json
+     % list_countries.pl --code id --json
+     [200, "OK", [{"en_name":"Indonesia","code":"id","id_name":"Indonesia"}]
+
+DESCRIPTION
+    This module is like Perinci::Sub::Gen::AccessTable, but simpler. No
+    table spec is needed, only list of fields ("field_names"). The function
+    does not do sorting or paging. Only the simplest filter (exact matching)
+    is created.
+
+    Some other differences:
+
+    *   Table data must be AoAoS (array of array of scalars)
+
+        AoH or coderef not accepted.
+
+    *   Function returns AoHoS, records are returned as HoS (hash of
+        scalars)
+
+FUNCTIONS
+  gen_read_table_func
+    Usage:
+
+     gen_read_table_func(%args) -> [status, msg, result, meta]
+
+    Generate function (and its metadata) to read table data.
+
+    The generated function acts like a simple single table SQL SELECT query,
+    featuring filtering by zero or more fields (exact matching). For more
+    features, see the Perinci::Sub::Gen::AccessTable variant. This routine
+    is a simplified version.
+
+    The resulting function returns an array of hashrefs and accepts these
+    arguments.
+
+    *   Filter arguments
+
+        They will be generated for each field specified in "filter_fields".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   field_names* => *array[str]*
+
+    *   filter_fields => *array[str]*
+
+    *   table_data* => *array[array]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: A hash containing generated function, metadata (hash)
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-Gen-AccessTable-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-Acces
+    sTable-Simple>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Perinci::Sub::Gen::AccessTable
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

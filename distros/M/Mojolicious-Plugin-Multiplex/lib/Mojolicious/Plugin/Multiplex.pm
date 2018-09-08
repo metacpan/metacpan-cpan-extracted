@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Multiplex;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 use Mojolicious::Plugin::Multiplex::Multiplexer;
@@ -49,7 +49,7 @@ Mojolicious::Plugin::Multiplex - A websocket multiplexing layer for Mojolicious 
 
   @@ index.html.ep
 
-  %= javascript 'websocket_multiplex';
+  %= javascript 'websocket_multiplex.js';
   <script>
     var ws = new WebSocket('<%= url_for('multiplex')->to_abs %>');
     var multiplex = new WebSocketMultiplex(ws);

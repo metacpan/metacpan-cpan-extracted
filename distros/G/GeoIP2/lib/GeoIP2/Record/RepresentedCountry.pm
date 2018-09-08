@@ -3,7 +3,7 @@ package GeoIP2::Record::RepresentedCountry;
 use strict;
 use warnings;
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006001';
 
 use Moo;
 
@@ -35,7 +35,7 @@ GeoIP2::Record::RepresentedCountry - Contains data for the represented country r
 
 =head1 VERSION
 
-version 2.005001
+version 2.006001
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use Moo 1.001000;
 extends 'Exporter';
 
 use Graph;
-use List::Util 1.35, qw/ first /;
+use List::Util 1.43, qw/ first /;
 use Module::Runtime qw/ require_module /;
 use Path::Tiny 0.015;
 use Ref::Util qw/ is_blessed_ref /;
@@ -13,7 +13,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.4';
 
 # ABSTRACT: no-frills file rotation
 
@@ -273,7 +273,7 @@ File::Rotate::Simple - no-frills file rotation
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.4
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,28 @@
+20180907.1.1  2018-09-08 (PERLANCAR)
+
+	      - No data changes.
+
+	      - [build] Rebuild to fix repository URL.
+
+
+20180907.1.0  2018-09-08 (PERLANCAR)
+
+	      - No data changes.
+
+	      - Add $data_mtime.
+
+
+20180907.0.1  2018-09-08 (PERLANCAR)
+
+	      - No data changes.
+
+	      - [doc] Mention Finance::SE::IDX::Any.
+
+	      - [doc] Tweak Abstract.
+
+              - [doc] Remove Rinci metadata and Synopsis to reduce duplication.
+
+
+20180907.0.0  2018-09-07 (PERLANCAR)
+
+              - First release.

@@ -1,8 +1,8 @@
 package GitLab::API::v3;
-$GitLab::API::v3::VERSION = '1.02';
+$GitLab::API::v3::VERSION = '1.04';
 =head1 NAME
 
-GitLab::API::v3 - A complete GitLab API v3 client. (deprecated)
+GitLab::API::v3 - A complete GitLab API v3 client. (DEPRECATED)
 
 =head1 SYNOPSIS
 

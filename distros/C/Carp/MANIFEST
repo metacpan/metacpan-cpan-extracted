@@ -8,11 +8,15 @@ t/arg_regexp.t
 t/arg_string.t
 t/baduni.t
 t/baduni_warnings.t
+t/broken_can.t
+t/broken_univ_can.t
 t/Carp.t
 t/Carp_overload.t
+t/Carp_overloadless.t
 t/errno.t
 t/heavy.t
 t/heavy_mismatch.t
+t/stack_after_err.t
 t/stash_deletion.t
 t/swash.t
 t/vivify_gv.t

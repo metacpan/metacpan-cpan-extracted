@@ -5,14 +5,18 @@ author:
 build_requires:
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Proc-Pidfile
+provides:
+  Proc::Pidfile:
+    file: lib/Proc/Pidfile.pm
+    version: '1.07'
 requires:
   Carp: '0'
   Fcntl: '0'
@@ -24,4 +28,5 @@ requires:
 resources:
   homepage: https://github.com/neilbowers/Proc-Pidfile
   repository: https://github.com/neilbowers/Proc-Pidfile.git
-version: '1.06'
+version: '1.07'
+x_serialization_backend: 'YAML::Tiny version 1.62'

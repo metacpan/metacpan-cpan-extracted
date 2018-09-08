@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::KMSKA;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Moo;
 use Catmandu;
@@ -51,6 +51,8 @@ sub prepare {
     $self->__representationpids();
     $self->logger->info('Adding "workpids" temporary table.');
     $self->__workpids();
+    $self->logger->info('Adding "objecttitles" temporary table.');
+    $self->__objtitles();
 }
 
 sub prepare_call {
@@ -147,6 +149,11 @@ sub __dimensions {
 sub __subjects {
     my $self = shift;
     $self->merge_call('SELECT * FROM vsubjects', 'subjects', 'subjects');
+}
+
+sub __objtitles {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
 }
 
 1;

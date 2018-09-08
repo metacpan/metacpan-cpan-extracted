@@ -1,6 +1,6 @@
 package WWW::ELISA;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
@@ -9,13 +9,11 @@ use Digest::MD5 qw( md5_hex );
 use HTTP::Request;
 use JSON::XS;
 use LWP::UserAgent;
+use Try::Tiny;
 
 sub new {
     my $class = shift;
-    my %args  = (
-        endpoint => 'https://elisa.hbz-nrw.de:8091/api/rest',
-        @_,
-    );
+    my %args = (endpoint => 'https://elisa.hbz-nrw.de:8091/api/rest', @_,);
 
     return bless {%args}, $class;
 }
@@ -59,7 +57,7 @@ sub _authenticate {
     my $auth = {
         callerID  => $self->{callerID},
         timestamp => $timestamp,
-        hash      => md5_hex($self->{callerID} . $timestamp2 . $self->{secret}),
+        hash => md5_hex($self->{callerID} . $timestamp2 . $self->{secret}),
     };
 
     my $res = $self->_do_request("/authenticate", $auth);
@@ -71,18 +69,23 @@ sub _do_request {
 
     my $endpoint = $self->{endpoint};
 
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout(20);
-    $ua->env_proxy;
-    $ua->ssl_opts(verify_hostname => 0, SSL_verify_mode => 0x00);
+    try {
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(20);
+        $ua->env_proxy;
+        $ua->ssl_opts(verify_hostname => 0, SSL_verify_mode => 0x00);
 
-    my $req = HTTP::Request->new('POST', $endpoint . $path);
-    $req->header('Content-Type' => 'application/json');
-    $req->content(encode_json($content));
+        my $req = HTTP::Request->new('POST', $endpoint . $path);
+        $req->header('Content-Type' => 'application/json');
+        $req->content(encode_json($content));
 
-    my $res = $ua->request($req);
+        my $res = $ua->request($req);
 
-    return decode_json($res->decoded_content);
+        return decode_json($res->decoded_content);
+    }
+    catch {
+        print STDERR "Error: " . $_;
+    }
 }
 
 1;
@@ -105,9 +108,9 @@ WWW::ELISA - a module for working the the REST API ELi:SA (https://elisa.hbz-nrw
         userID      => 'me@example.com',
         notepadName => "Wishlist_1",
         titleList => [
-            {title => {isbn => "9780822363804", notiz => "WWW::ELISA Test"}},
-            {title => {isbn => "9788793379312", notiz => "WWW::ELISA Test2"}},
-        ];
+            {title => {isbn => "9780822363804", notiz => "WWW::ELISA Test", notiz_intern => "Info"}},
+            {title => {isbn => "9788793379312", notiz => "WWW::ELISA Test2", notiz_intern => "Info2"}},
+        ],
     };
 
     $api->push($data);

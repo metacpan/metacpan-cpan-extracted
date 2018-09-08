@@ -1,5 +1,11 @@
 Revision history for WebService-MIAB
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.03    2018-09-07
+  - fix uniqueness for get_domain method
 
+0.02    2018-09-06
+  - Docs cleanup
+  - cpanfile improvements
+
+0.01    2018-09-05
+  - First version, released on an unsuspecting world.

@@ -1,16 +1,11 @@
 Device-BCM2835 version 0.01
 ===========================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Perl wrapper for the bcm2835 library, allowing you to use perl to do low level IO on a
+bcm2835 and similar chips uas used in
+Raspberry Pi (RPi) family of single board computers.
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+Supports all the functions provided in bcm2835
 
 INSTALLATION
 
@@ -25,11 +20,29 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  blah blah blah
+Perl
+
+bcm2835 from http://www.airspayce.com/mikem/bcm2835/
+Needs to be coimpiled and installed first:
+
+cd bcm2835
+./configure
+make
+make check
+make install
+
+Caution: if you get an error like:
+relocation R_X86_64_PC32 against symbol `bcm2835_peripherals' can not be used when making a shared object; recompile with -fPIC
+
+then you will need to build bcm2835 like this:
+
+cd bcm2835
+./configure CFLAGS=-fPIC CXXFLAGS=-fPIC
+make
+make check
+make install
 
 COPYRIGHT AND LICENCE
-
-Put the correct copyright and licence information here.
 
 Copyright (C) 2012 by Mike McCauley
 

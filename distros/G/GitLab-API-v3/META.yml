@@ -1,5 +1,5 @@
 ---
-abstract: 'A complete GitLab API v3 client. (deprecated)'
+abstract: 'A complete GitLab API v3 client. (DEPRECATED)'
 author:
   - 'Aran Deltac <bluefeet@gmail.com>'
 build_requires:
@@ -37,5 +37,6 @@ resources:
   bugtracker: https://github.com/bluefeet/GitLab-API-v3/issues
   homepage: https://github.com/bluefeet/GitLab-API-v3
   repository: https://github.com/bluefeet/GitLab-API-v3.git
-version: '1.02'
+version: '1.04'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.69'

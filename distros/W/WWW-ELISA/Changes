@@ -1,5 +1,8 @@
 Revision history for WWW-ELISA
 
+0.05  2018-09-07 20:13:01 CEST
+    - make requests fault tolerant
+
 0.04  2018-09-03 10:22:28 CEST
     - pod
 

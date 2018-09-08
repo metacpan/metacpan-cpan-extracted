@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 XSLoader::load();
 
 sub completion_helper {

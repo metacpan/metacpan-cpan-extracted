@@ -10,7 +10,7 @@ use Carp ();
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG} || 0;
 use constant DEFAULT_PORT => 6379;
 
-our $VERSION = '0.34';
+our $VERSION = '0.36';
 
 my $PROTOCOL_CLASS = do {
   my $class = $ENV{MOJO_REDIS_PROTOCOL}
@@ -336,11 +336,44 @@ for my $method (__PACKAGE__->_scan_operations) {
 
 =head1 NAME
 
-Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
+Mojo::Redis2 - (DEPRECATED) Pure-Perl non-blocking I/O Redis driver
 
 =head1 VERSION
 
-0.34
+0.36
+
+=head1 DEPRECATED
+
+Instead of using this module, you should use L<Mojo::Redis> instead. Because:
+
+=over 2
+
+=item *
+
+It has a connection pool, meaning you don't have to connect all the time.
+
+=item *
+
+L<Mojo::Redis/pubsub> follows the same API as L<Mojo::Pg>.
+
+=item *
+
+The blocking API is explicit and use another instance of L<Mojo::IOLoop>.
+
+=item *
+
+Has support for L<Mojo::Promise>.
+
+=item *
+
+Provides an easy way for caching complex data structures.
+
+=item *
+
+Not confusing if you use BLPOP (or friends) or pubsub commands, since it's
+always a different connection.
+
+=back
 
 =head1 DESCRIPTION
 
@@ -366,70 +399,10 @@ codebase from using L<Mojo::Redis2>.
 
 =head1 SYNOPSIS
 
-=head2 Blocking
+I decided to remove the L</SYNOPSIS> since I want people to use L</Mojo::Redis>
+instead.
 
-  use Mojo::Redis2;
-  my $redis = Mojo::Redis2->new;
-
-  # Will die() on error.
-  $res = $redis->set(foo => "42"); # $res = OK
-  $res = $redis->get("foo");       # $res = 42
-
-=head2 Non-blocking
-
-  Mojo::IOLoop->delay(
-    sub {
-      my ($delay) = @_;
-      $redis->ping($delay->begin)->get("foo", $delay->begin);
-    },
-    sub {
-      my ($delay, $ping_err, $ping, $get_err, $get) = @_;
-      # On error: $ping_err and $get_err is set to a string
-      # On success: $ping = "PONG", $get = "42";
-    },
-  );
-
-=head2 Pub/sub
-
-L<Mojo::Redis2> can L</subscribe> and re-use the same object to C<publish> or
-run other Redis commands, since it can keep track of multiple connections to
-the same Redis server. It will also re-use the same connection when you
-(p)subscribe multiple times.
-
-  $self->on(message => sub {
-    my ($self, $message, $channel) = @_;
-  });
-
-  $self->subscribe(["some:channel"], sub {
-    my ($self, $err) = @_;
-
-    return $self->publish("myapp:errors" => $err) if $err;
-    return $self->incr("subscribed:to:some:channel");
-  });
-
-=head2 Mojolicious app
-
-  use Mojolicious::Lite;
-
-  helper redis => sub { shift->stash->{redis} ||= Mojo::Redis2->new; };
-
-  get '/' => sub {
-    my $c = shift;
-
-    my $tx = $c->render_later->tx;
-    $c->redis->get('some:message', sub {
-      my ($redis, $err, $message) = @_;
-      $c->render(json => { error => $err, message => $message });
-      undef $tx;
-    });
-  };
-
-  app->start;
-
-=head2 Error handling
-
-C<$err> in this document is a string containing an error message or
-empty string on success.
+See L</DEPRECATED> for more details.
 
 =head1 EVENTS
 

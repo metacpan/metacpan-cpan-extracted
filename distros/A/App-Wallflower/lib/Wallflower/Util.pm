@@ -1,5 +1,5 @@
 package Wallflower::Util;
-$Wallflower::Util::VERSION = '1.012';
+$Wallflower::Util::VERSION = '1.015';
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ Wallflower::Util - Utility functions for Wallflower
 
 =head1 VERSION
 
-version 1.012
+version 1.015
 
 =head1 SYNOPSIS
 

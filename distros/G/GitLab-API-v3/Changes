@@ -1,5 +1,13 @@
 Revision history for Perl extension GitLab::API::v3.
 
+1.04 2018-09-06
+
+ - Utilize the x_deprecated META flag.
+
+1.03 2018-09-06
+
+ - Make deprecation notice uppercase.
+
 1.02 2017-12-09
 
  - Deprecated.

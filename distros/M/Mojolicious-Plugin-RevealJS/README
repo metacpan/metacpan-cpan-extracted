@@ -67,6 +67,9 @@ LAYOUTS
       static pages at a location other than /. Defaults to /, if explicitly
       set to undef the tag is not included.
 
+      * hljs_theme_url - sets the url path for loading a css theme for
+      highlight js. Defaults to a bundled zenburn theme.
+
   initialization parameters
 
     As mentioned above, the stash key init is a hashref that is merge into

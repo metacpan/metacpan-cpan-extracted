@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ygrok;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 # ABSTRACT: Parse lines of text into documents
 
 use ETL::Yertl;
@@ -315,7 +315,7 @@ ETL::Yertl::Command::ygrok - Parse lines of text into documents
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 AUTHOR
 
@@ -323,7 +323,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,20 @@
 Revision history for App-Wallflower
 
+1.015 2018-09-07 BOOK
+    - fixed a race condition that would lose parts of the to-do list
+      when using --filter in combination with --parallel
+    - improved output for 301 (show the redirect location)
+
+1.014 2018-09-07 BOOK
+    - improve handling of 304 responses, and documentation around
+      them and If-Modified-Since
+    - tests for 304 in TAP mode
+
+1.013 2018-09-06 BOOK
+    - fix handling of 301 in wallflower (broken in 1.010 .. 1.012)
+    - 301 redirects are not considered errors in TAP mode any more
+    - minor fixes in tests
+
 1.012 2018-09-05 BOOK
     - refactor parallel processing to more evenly distribute the work
       between children (the parent won't process any URL)
