@@ -22,7 +22,7 @@ sub _fork_tmpl {
     if ( $CHILD_PID = fork ) {
         Pcore::_CORE_INIT_AFTER_FORK();
 
-        require Pcore::AE::Handle;
+        require Pcore::Handle;
 
         close $read_fh or die $!;
     }
@@ -64,10 +64,13 @@ sub _tmpl_proc ( $fh ) {
 
     local $SIG{TERM} = sub { exit 128 + 15 };
 
-    while (1) {
-        sysread $fh, my $len, 4 or die $!;
+    while () {
 
-        sysread $fh, my $data, unpack 'L', $len or die $!;
+        # exit on fh close
+        sysread $fh, my $len, 4 or exit;
+
+        # exit on fh close
+        sysread $fh, my $data, unpack 'L', $len or exit;
 
         $data = from_cbor $data;
 
@@ -125,7 +128,7 @@ sub _forked_proc ( $data ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 23, 103              | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 23, 106              | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

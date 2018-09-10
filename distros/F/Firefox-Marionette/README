@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.64
+    Version 0.66
 
 SYNOPSIS
 
@@ -412,40 +412,32 @@ SUBROUTINES/METHODS
 
  script
 
-    accepts a scalar containing a javascript function that is executed in
-    the browser, and an optional hash as a second parameter. Allowed keys
-    are below;
+    accepts a scalar containing a javascript function body that is executed
+    in the browser, and an optional hash as a second parameter. Allowed
+    keys are below;
 
       * args - The reference to a list is the arguments passed to the
-      script.
+      function body.
 
-      * scriptTime - A timeout to override the default scripts timeout.
+      * timeout - A timeout to override the default script timeout, which,
+      by default is 30 seconds.
 
       * sandbox - Name of the sandbox to evaluate the script in. The
       sandbox is cached for later re-use on the same window
       <https://developer.mozilla.org/en-US/docs/Web/API/Window>object if
-      newSandbox is false. If he parameter is undefined, the script is
-      evaluated in a mutable sandbox. If the parameter is "system", it will
-      be evaluted in a sandbox with elevated system privileges, equivalent
-      to chrome space.
+      new is false. If he parameter is undefined, the script is evaluated
+      in a mutable sandbox. If the parameter is "system", it will be
+      evaluted in a sandbox with elevated system privileges, equivalent to
+      chrome space.
 
-      * newSandbox - Forces the script to be evaluated in a fresh sandbox.
-      Note that if it is undefined, the script will normally be evaluted in
-      a fresh sandbox.
+      * new - Forces the script to be evaluated in a fresh sandbox. Note
+      that if it is undefined, the script will normally be evaluted in a
+      fresh sandbox.
 
       * filename - Filename of the client's program where this script is
       evaluated.
 
       * line - Line in the client's program where this script is evaluated.
-
-      * debug_script - Attach an onerror
-      <https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror>
-      event handler on the window
-      <https://developer.mozilla.org/en-US/docs/Web/API/Window> object. It
-      does not differentiate content errors from chrome errors.
-
-      * directInject - Evaluate the script without wrapping it in a
-      function.
 
     Returns the result of the javascript function.
 
@@ -457,7 +449,7 @@ SUBROUTINES/METHODS
             # luckily!
         }
 
-    The executing javascript is subject to the scripts timeout, which, by
+    The executing javascript is subject to the script timeout, which, by
     default is 30 seconds.
 
  async_script
@@ -465,7 +457,7 @@ SUBROUTINES/METHODS
     accepts a scalar containing a javascript function that is executed in
     the browser. This method returns itself to aid in chaining methods.
 
-    The executing javascript is subject to the scripts timeout, which, by
+    The executing javascript is subject to the script timeout, which, by
     default is 30 seconds.
 
  html
@@ -809,8 +801,8 @@ SUBROUTINES/METHODS
  accept_connections
 
     Enables or disables accepting new socket connections. By calling this
-    method with `false` the server will not accept any further connections,
-    but existing connections will not be forcible closed. Use `true` to
+    method with false the server will not accept any further connections,
+    but existing connections will not be forcible closed. Use true to
     re-enable accepting connections.
 
     Please note that when closing the connection via the client you can

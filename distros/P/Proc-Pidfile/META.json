@@ -1,0 +1,57 @@
+{
+   "abstract" : "a simple OO Perl module for maintaining a process id file for the curent process",
+   "author" : [
+      "Ave Wrigley <awrigley@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Proc-Pidfile",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Proc::Pidfile" : {
+         "file" : "lib/Proc/Pidfile.pm",
+         "version" : "1.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/Proc-Pidfile",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/Proc-Pidfile.git",
+         "web" : "https://github.com/neilbowers/Proc-Pidfile"
+      }
+   },
+   "version" : "1.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

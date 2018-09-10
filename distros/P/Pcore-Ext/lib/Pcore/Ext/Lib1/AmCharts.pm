@@ -1,7 +1,6 @@
 package Pcore::Ext::Lib::AmCharts;
 
 use Pcore -class;
-use Pcore::Resources;
 
 sub EXT_panel ($ext) : Extend('panel') {
     return {

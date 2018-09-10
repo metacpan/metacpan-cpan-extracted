@@ -23,15 +23,6 @@
 
 #include <errmsg.h> /* Comes with MySQL-devel */
 
-/* For now, we hardcode this, but in the future,
- * we can detect capabilities of the MySQL libraries
- * we're talking to */
-#if defined(_WIN32)
-#define MYSQL_ASYNC 0
-#else
-#define MYSQL_ASYNC 1
-#endif
-
 
 /*
  * This is the version of MySQL wherer
@@ -234,13 +225,9 @@ struct imp_dbh_st {
                                */
     bool use_server_side_prepare;
     bool disable_fallback_for_server_prepare;
-#if MYSQL_ASYNC
     void* async_query_in_flight;
-#endif
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
     bool enable_utf8;
     bool enable_utf8mb4;
-#endif
     struct {
 	    unsigned int auto_reconnects_ok;
 	    unsigned int auto_reconnects_failed;
@@ -337,10 +324,7 @@ struct imp_sth_st {
     int   use_mysql_use_result;  /*  TRUE if execute should use     */
                           /* mysql_use_result rather than           */
                           /* mysql_store_result */
-
-#if MYSQL_ASYNC
     bool is_async;
-#endif
 };
 
 
@@ -375,10 +359,7 @@ struct imp_sth_st {
 #define do_error		mysql_dr_error
 #define dbd_db_type_info_all    mysql_db_type_info_all
 #define dbd_db_quote            mysql_db_quote
-
-#ifdef DBD_MYSQL_INSERT_ID_IS_GOOD /* prototype was broken in some versions of dbi */
 #define dbd_db_last_insert_id   mysql_db_last_insert_id
-#endif
 
 #include <dbd_xsh.h>
 void    do_error (SV* h, int rc, const char *what, const char *sqlstate);
@@ -427,7 +408,7 @@ extern MYSQL* mysql_dr_connect(SV*, MYSQL*, char*, char*, char*, char*, char*,
 
 extern int mysql_db_reconnect(SV*);
 int mysql_st_free_result_sets (SV * sth, imp_sth_t * imp_sth);
-#if MYSQL_ASYNC
 int mysql_db_async_result(SV* h, MYSQL_RES** resp);
 int mysql_db_async_ready(SV* h);
-#endif
+
+int mysql_socket_ready(my_socket fd);

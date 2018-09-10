@@ -7,7 +7,7 @@ use JSON::PP;
 use Text::Trim qw(trim rtrim);
 use XSLoader;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -108,7 +108,7 @@ JavaScript::V8::XS - Perl XS binding for the V8 Javascript embeddable engine
 
 =head1 VERSION
 
-Version 0.000006
+Version 0.000007
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,8 @@ Version 0.000006
     # from the Perl function will be converted to JS values.
     $vm->set('function_name', sub { my @args = @_; return \@args; });
     my $returned = $vm->eval('function_name(my.object.slot)');
+
+    $vm->dispatch_function_in_event_loop('function_name');
 
     my $stats_href = $vm->get_stats();
     $vm->reset_stats();
@@ -256,6 +258,16 @@ For now the XS object will both compile and run the JavaScript code when this
 method is invoked; in the future this might be split into separate functions.
 
 Any returned values will be treated in the same way as a call to C<get>.
+
+=head2 dispatch_function_in_event_loop
+
+Run a JavaScript function inside an event loop, and wait until all timers have
+been dispatched.  The argument is the function name.
+
+If the function name is 'X', this is equivalent to running the following piece
+of JavaScript code:
+
+    setTimeout(function() { X(); }, 0);
 
 =head2 get_stats
 

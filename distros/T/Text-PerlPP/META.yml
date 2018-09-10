@@ -22,7 +22,7 @@ build_requires:
   parent: '0'
   rlib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.46'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -38,5 +38,7 @@ requires:
   Getopt::Long: '2.5'
   Pod::Usage: '0'
   perl: '5.010'
-version: '0.500004'
+resources:
+  repository: https://github.com/interpreters/perlpp.git
+version: '0.600001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,8 +9,6 @@ use JavaScript::Beautifier qw[];
 
 with qw[Pcore::App::Controller];
 
-require Pcore::Resources;
-
 has ext_app   => undef;                 # name of the linked application, required
 has ext_title => 'ExtJS Application';
 has ext_theme => ();
@@ -82,15 +80,12 @@ sub _return_html ( $self, $req ) {
         my $resources = [ ( $self->build_resources( $req, $app->{ext_type} ) // [] )->@* ];
 
         # pcore/api.js
-        push $resources->@*, q[<script src="/static/pcore/api.js" integrity="" crossorigin="anonymous"></script>];
+        push $resources->@*, qq[<script src="@{[ $self->{app}->{cdn}->("/static/pcore/api.js") ]}" integrity="" crossorigin="anonymous"></script>];
 
-        # ExtJS resources
-        push $resources->@*, Pcore::Resources->ext(    #
-            $app->{ext_ver},
-            $app->{ext_type},
-            $theme,
-            $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN,
-            $self->{app}->{devel}
+        # CDN resources
+        push $resources->@*, $self->{app}->{cdn}->get_resources(
+            [ 'ext', $app->{ext_ver}, $app->{ext_type}, $theme, $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN, $self->{app}->{devel} ],
+            'fa',    # NOTE FontAwesme must be after ExtJS in resources or icons will not be displayed
         )->@*;
 
         # overrides
@@ -98,9 +93,6 @@ sub _return_html ( $self, $req ) {
 
         # TODO calc checksum 'sha384-' . P->digest->sha384_b64( $res->{body}->$* );
         push $resources->@*, qq[<script src="$self->{path}app.js" integrity="" crossorigin="anonymous"></script>];
-
-        # FontAwesome resources
-        push $resources->@*, Pcore::Resources->fontawesome;
 
         # generate HTML tmpl
         $self->{_cache}->{html}->{$theme} = \P->text->encode_utf8(

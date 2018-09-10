@@ -24,10 +24,11 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Regexp::Pattern" : "0.001"
          },
          "x_spec" : {
-            "Regexp::Pattern" : "v0.2.0"
+            "Regexp::Pattern" : "v0.2.7"
          }
       },
       "test" : {
@@ -51,7 +52,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-Pattern-CPAN"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -60,7 +61,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Regexp::Pattern",
             "name" : "Regexp::Pattern",
-            "version" : "0.003"
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -171,7 +172,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -381,7 +382,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Regexp::Pattern",
                         "name" : "-Regexp::Pattern",
-                        "version" : "0.001"
+                        "version" : "0.003"
                      }
                   ]
                }

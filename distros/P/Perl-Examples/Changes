@@ -1,4 +1,22 @@
-Revision history for Perl-Examples
+0.091   2018-09-10 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Edit Changes, change reference URL.
+
+
+0.090   2018-09-10 (PERLANCAR)
+
+	- No functional changes.
+
+        - Convert to x.yyy versioning. Ref:
+          https://perlancar.wordpress.com/2018/09/10/should-i-choose-x-yy-or-x-yyy-versioning-scheme-for-my-perl-module/
+
+
+0.08    2018-09-10 (PERLANCAR)
+
+	- POD::Link: Add source as well as rendered result.
+
 
 0.07    2016-06-26 (PERLANCAR)
 

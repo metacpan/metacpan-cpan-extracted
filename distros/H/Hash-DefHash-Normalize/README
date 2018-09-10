@@ -1,25 +1,54 @@
-SYNOPSIS
+NAME
+    Hash::DefHash::Normalize - Normalize DefHash
 
+VERSION
+    This document describes version 0.040 of Hash::DefHash::Normalize (from
+    Perl distribution Hash-DefHash-Normalize), released on 2018-09-10.
+
+SYNOPSIS
      use Hash::DefHash::Normalize qw(normalize_defhash);
-    
+
      my $ndh = normalize_defhash($dh);
 
 FUNCTIONS
-
- normalize_defhash($dh[, \%opts ]) => HASH
-
+  normalize_defhash($dh[, \%opts ]) => HASH
     Normalize and check DefHash $dh (a hashref). Return normalized hash,
     which is a shallow copy of $dh. Die on error.
 
     Available options:
 
-      * remove_internal_properties => BOOL (default: 0)
+    *   remove_internal_properties => BOOL (default: 0)
 
-      If set to 1, all properties and attributes starting with underscore
-      (_) with will be stripped. According to DefHash specification, they
-      are ignored and usually contain notes/comments/extra information.
+        If set to 1, all properties and attributes starting with underscore
+        ("_") with will be stripped. According to DefHash specification,
+        they are ignored and usually contain notes/comments/extra
+        information.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Hash-DefHash-Normalize>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Hash-DefHash-Normalize>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-DefHash-Normaliz
+    e>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     DefHash
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

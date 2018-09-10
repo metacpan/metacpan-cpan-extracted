@@ -1,5 +1,11 @@
 Revision history for perl module Lingua::EN::ABC
 
+0.08 2018-09-09
+
+* Add "spelling-only" option
+* Remove lasagne/lasagna entry - seems to have been an error
+* Remove unused $c_re
+
 0.07 2017-07-31
 
 * Simpler method of conversion

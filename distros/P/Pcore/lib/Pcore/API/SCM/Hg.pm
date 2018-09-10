@@ -7,8 +7,8 @@ use Pcore::Util::Scalar qw[weaken is_plain_arrayref];
 
 with qw[Pcore::API::SCM];
 
-has capabilities => ( is => 'ro', isa => Str, init_arg => undef );
-has _server_proc => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Sys::Proc'], init_arg => undef );
+has capabilities => ( init_arg => undef );
+has _server_proc => ( init_arg => undef );
 
 our $SERVER_PROC;
 
@@ -23,128 +23,88 @@ sub _build_upstream ($self) {
 }
 
 # https://www.mercurial-scm.org/wiki/CommandServer
-sub _server ( $self, $cb ) {
+sub _server ( $self ) {
     if ( exists $self->{_server_proc} ) {
-        $cb->( $self->{_server_proc} );
-
-        return;
+        return $self->{_server_proc};
     }
-    elsif ($SERVER_PROC) {
-        $self->{_server_proc} = $SERVER_PROC;
-
-        $cb->( $self->{_server_proc} );
-
-        return;
+    elsif ( defined $SERVER_PROC ) {
+        return $self->{_server_proc} = $SERVER_PROC;
     }
     else {
         local $ENV{HGENCODING} = 'UTF-8';
 
-        P->sys->run_proc(
+        $self->{_server_proc} = $SERVER_PROC = P->sys->run_proc(
             [qw[hg serve --config ui.interactive=True --cmdserver pipe]],
-            stdin    => 1,
-            stdout   => 1,
-            stderr   => 1,
-            on_ready => sub ($proc) {
-                $self->{_server_proc} = $proc;
-
-                $SERVER_PROC = $proc;
-
-                weaken $SERVER_PROC;
-
-                # read capabilities
-                $self->{capabilities} = $self->_read(
-                    sub ( $channel, $data ) {
-                        $self->{capabilities} = $data;
-
-                        $cb->( $self->{_server_proc} );
-
-                        return;
-                    }
-                );
-
-                return;
-            }
+            stdin  => 1,
+            stdout => 1,
+            stderr => 1,
         );
 
-        return;
+        undef $SERVER_PROC->{client_stdout};
+        undef $SERVER_PROC->{client_stderr};
+
+        weaken $SERVER_PROC;
+
+        # read capabilities
+        $self->{capabilities} = $self->_read->[1];
+
+        return $SERVER_PROC;
     }
 }
 
-sub _read ( $self, $cb ) {
-    $self->_server( sub($hg) {
-        $hg->stdout->push_read(
-            chunk => 5,
-            sub ( $h, $data ) {
-                my $channel = substr $data, 0, 1, q[];
+sub _read ( $self ) {
+    my $hg = $self->_server;
 
-                $h->push_read(
-                    chunk => unpack( 'L>', $data ),
-                    sub ( $h, $data ) {
-                        $cb->( $channel, $data );
+    my $header = $hg->{stdout}->read_chunk(5);
 
-                        return;
-                    }
-                );
+    my $channel = substr $header->$*, 0, 1, q[];
 
-                return;
-            }
-        );
+    my $data = $hg->{stdout}->read_chunk( unpack 'L>', $header->$* );
 
-        return;
-    } );
-
-    return;
+    return [ $channel, $data->$* ];
 }
 
 # NOTE status + pattern (status *.txt) not works under linux - http://bz.selenic.com/show_bug.cgi?id=4526
 sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
     my $buf = join "\x00", $cmd->@*;
 
     $buf .= "\x00--repository\x00$root" if $root;
 
     $buf = Encode::encode( $Pcore::WIN_ENC, $buf, Encode::FB_CROAK );
 
-    $self->_server( sub ($hg) {
-        $hg->stdin->push_write( qq[runcommand\x0A] . pack( 'L>', length $buf ) . $buf );
+    my $hg = $self->_server;
 
-        my $res = {};
+    $hg->{stdin}->write( qq[runcommand\x0A] . pack( 'L>', length $buf ) . $buf );
 
-        my $read = sub ( $channel, $data ) {
-            if ( $channel ne 'r' ) {
-                chomp $data;
+    my $res = {};
 
-                decode_utf8( $data, encoding => $Pcore::WIN_ENC );
+    while () {
+        my $data = $self->_read;
 
-                push $res->{$channel}->@*, $data;
+        if ( $data->[0] ne 'r' ) {
+            chomp $data->[1];
 
-                $self->_read(__SUB__);
-            }
+            decode_utf8( $data->[1], encoding => $Pcore::WIN_ENC );
 
-            # "r" channel - request is finished
-            else {
-                my $result;
+            push $res->{ $data->[0] }->@*, $data->[1];
 
-                if ( exists $res->{e} ) {
-                    $result = res [ 500, join q[ ], $res->{e}->@* ];
-                }
-                else {
-                    $result = res 200, $res->{o};
-                }
+            next;
+        }
 
-                $rouse_cb ? $cb ? $rouse_cb->( $cb->($result) ) : $rouse_cb->($result) : $cb ? $cb->($result) : ();
-            }
+        # "r" channel - request is finished
+        last;
+    }
 
-            return;
-        };
+    my $result;
 
-        $self->_read($read);
+    if ( exists $res->{e} ) {
+        $result = res [ 500, join q[ ], $res->{e}->@* ];
+    }
+    else {
+        $result = res 200, $res->{o};
+    }
 
-        return;
-    } );
-
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return $cb ? $cb->($result) : $result;
 }
 
 sub scm_cmd ( $self, $cmd, $cb = undef ) {
@@ -280,9 +240,9 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 103, 105, 110        | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 69, 71, 77           | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 164                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 124                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

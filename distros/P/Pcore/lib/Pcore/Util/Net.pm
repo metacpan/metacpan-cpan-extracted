@@ -1,7 +1,10 @@
 package Pcore::Util::Net;
 
-use Pcore;
+use Pcore -export;
+use Pcore::Util::Scalar qw[is_ref];
 use Pcore::Util::UUID qw[uuid_v4_str];
+
+our $EXPORT = [qw[hostname get_free_port]];
 
 sub hostname {
     state $hostname = do {
@@ -13,31 +16,7 @@ sub hostname {
     return $hostname;
 }
 
-sub resolve_listen ($listen) {
-    if ( !$listen ) {
-
-        # for windows use TCP loopback
-        if ($MSWIN) {
-            $listen = '127.0.0.1:' . get_free_port('127.0.0.1');
-        }
-
-        # for linux use abstract UDS
-        else {
-            $listen = "unix:\x00pcore-" . uuid_v4_str;
-        }
-    }
-    else {
-
-        # host without port
-        if ( $listen !~ /:/sm ) {
-            $listen = "$listen:" . get_free_port( $listen eq '*' ? () : $listen );
-        }
-    }
-
-    return $listen;
-}
-
-sub get_free_port ($ip = undef) {
+sub get_free_port : prototype(;$) ( $ip = undef ) {
     state $init = !!require Socket;
 
     if ($ip) {
@@ -69,7 +48,7 @@ sub get_free_port ($ip = undef) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 26, 47               | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 26                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

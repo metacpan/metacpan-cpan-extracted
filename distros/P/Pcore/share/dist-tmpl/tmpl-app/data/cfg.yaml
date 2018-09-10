@@ -1,0 +1,21 @@
+# api auth db connect uri, if not specified - no authentication will be used
+auth: pgsql://postgres:1@devel?db=test-api
+
+# database connect uri
+db: pgsql://postgres:1@devel?db=test
+
+# node config
+node:
+
+    # node server configuration
+    # if not defined or HashRef - local node server will be started
+    # if string - remote server uri
+    # eg:
+    # //<token>@/<path-to-unix-socket>
+    # //<token>@127.0.0.1:9999
+    # //<token>@ - no host / path specified, local server will be started
+    server:
+
+    # node listen address, if not defined - local listen address will be generated
+    # see node server uri examples above
+    listen:

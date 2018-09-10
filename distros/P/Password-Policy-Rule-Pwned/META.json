@@ -50,15 +50,15 @@
    "provides" : {
       "Password::Policy::Exception::Pwned" : {
          "file" : "lib/Password/Policy/Exception/Pwned.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Password::Policy::Exception::PwnedError" : {
          "file" : "lib/Password/Policy/Exception/PwnedError.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Password::Policy::Rule::Pwned" : {
          "file" : "lib/Password/Policy/Rule/Pwned.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -72,5 +72,5 @@
          "web" : "https://gitlab.com/openstrike/password-pwned"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02"
 }

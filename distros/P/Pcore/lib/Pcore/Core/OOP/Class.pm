@@ -14,15 +14,11 @@ sub import ( $self, $caller = undef ) {
 
     _defer_sub( $caller, new => sub { return _build_constructor($caller) } );
 
-    {
-        no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
-
-        *{"$caller\::does"}    = \&_does;
-        *{"$caller\::extends"} = \&_extends;
-        *{"$caller\::with"}    = \&_with;
-        *{"$caller\::has"}     = \&_has;
-        *{"$caller\::around"}  = \&_around;
-    }
+    *{"$caller\::does"}    = \&_does;
+    *{"$caller\::extends"} = \&_extends;
+    *{"$caller\::with"}    = \&_with;
+    *{"$caller\::has"}     = \&_has;
+    *{"$caller\::around"}  = \&_around;
 
     return;
 }
@@ -46,8 +42,6 @@ sub _extends (@superclasses) {
 
     for my $base (@superclasses) {
         load_class($base);
-
-        no strict qw[refs];
 
         push @{"$caller\::ISA"}, $base;
 
@@ -101,8 +95,6 @@ sub _with (@roles) {
 }
 
 sub export_methods ( $roles, $to ) {
-    no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
-
     my $is_role = $REG{$to}{is_role};
 
     my $to_role_methods;
@@ -301,7 +293,6 @@ sub $name {
         \$defer->[1] = \$code->();
 
         # install, if wasn't changed
-        no strict qw[refs];
         no warnings qw[redefine];
 
         *{'$caller\::$name'} = \$defer->[1] if *{'$caller\::$name'}{CODE} eq \$defer->[0];
@@ -310,8 +301,6 @@ sub $name {
     goto &{\$defer->[1]};
 };
 PERL
-
-    no strict qw[refs];
 
     $defer->[0] = *{"$caller\::$name"}{CODE};
 
@@ -416,15 +405,11 @@ PERL
     $new .= $default if $default;
 
     # build
-    {
-        no strict qw[refs];
-
-        for ( grep { defined *{"$_\::BUILD"} && *{"$_\::BUILD"}{CODE} } reverse mro::get_linear_isa($self)->@* ) {
-            $new .= <<"PERL";
+    for ( grep { defined *{"$_\::BUILD"} && *{"$_\::BUILD"}{CODE} } reverse mro::get_linear_isa($self)->@* ) {
+        $new .= <<"PERL";
     \$self->$_\::BUILD(\$args);
 
 PERL
-        }
     }
 
     # footer
@@ -444,12 +429,12 @@ PERL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 165, 245, 258, 272,  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |      | 294, 437             |                                                                                                                |
+## |    3 | 157, 237, 250, 264,  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |      | 286, 422             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 172                  | Subroutines::ProhibitExcessComplexity - Subroutine "add_attribute" with high complexity score (24)             |
+## |    3 | 164                  | Subroutines::ProhibitExcessComplexity - Subroutine "add_attribute" with high complexity score (24)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 172                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 164                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

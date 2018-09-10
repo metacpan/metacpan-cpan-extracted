@@ -1,0 +1,60 @@
+{
+   "abstract" : "Fulfill with the first fulfilled promise",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Promise-Role-HigherOrder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.34",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Mojolicious" : "7",
+            "Role::Tiny" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/mojo-promise-role-higherorder/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/mojo-promise-role-higherorder",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/mojo-promise-role-higherorder.git",
+         "web" : "https://github.com/briandfoy/mojo-promise-role-higherorder"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

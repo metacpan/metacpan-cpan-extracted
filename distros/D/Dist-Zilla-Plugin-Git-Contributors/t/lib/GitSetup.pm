@@ -3,7 +3,7 @@ use warnings;
 package GitSetup;
 
 use Test::More;
-use Git::Wrapper;
+use Git::Wrapper 0.038; # for handling of -c option
 use Sort::Versions;
 use Path::Tiny;
 

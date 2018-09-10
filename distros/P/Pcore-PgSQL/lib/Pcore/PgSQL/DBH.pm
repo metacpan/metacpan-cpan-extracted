@@ -733,9 +733,9 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     };
 
     if ( defined wantarray ) {
-        $self->_execute( $query, $bind, Coro::rouse_cb );
+        $self->_execute( $query, $bind, my $cv = P->cv );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( $query, $bind, $on_finish );
@@ -821,9 +821,9 @@ sub selectall ( $self, $query, @args ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $rouse_cb = Coro::rouse_cb );
+        $self->_execute( $query, $bind, my $cv = P->cv );
 
-        return $on_finish->( Coro::rouse_wait $rouse_cb);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( $query, $bind, $on_finish );
@@ -848,9 +848,9 @@ sub selectall_arrayref ( $self, $query, @args ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( $query, $bind, Coro::rouse_cb );
+        $self->_execute( $query, $bind, my $cv = P->cv );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( $query, $bind, $on_finish );
@@ -877,9 +877,9 @@ sub selectrow ( $self, $query, @args ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( $query, $bind, Coro::rouse_cb, max_rows => 1 );
+        $self->_execute( $query, $bind, my $cv = P->cv, max_rows => 1 );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
@@ -902,9 +902,9 @@ sub selectrow_arrayref ( $self, $query, @args ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( $query, $bind, Coro::rouse_cb, max_rows => 1 );
+        $self->_execute( $query, $bind, my $cv = P->cv, max_rows => 1 );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
@@ -980,9 +980,9 @@ sub selectcol ( $self, $query, @args ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( $query, $bind, Coro::rouse_cb );
+        $self->_execute( $query, $bind, my $cv = P->cv );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( $query, $bind, $on_finish );
@@ -998,9 +998,9 @@ sub begin_work ( $self, $cb = undef ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( 'BEGIN', undef, Coro::rouse_cb );
+        $self->_execute( 'BEGIN', undef, my $cv = P->cv );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( 'BEGIN', undef, $on_finish );
@@ -1017,9 +1017,9 @@ sub commit ( $self, $cb = undef ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( 'COMMIT', undef, Coro::rouse_cb );
+        $self->_execute( 'COMMIT', undef, my $cv = P->cv );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( 'COMMIT', undef, $on_finish );
@@ -1036,9 +1036,9 @@ sub rollback ( $self, $cb = undef ) {
     };
 
     if ( defined wantarray ) {
-        $self->_execute( 'ROLLBACK', undef, Coro::rouse_cb );
+        $self->_execute( 'ROLLBACK', undef, my $cv = P->cv );
 
-        return $on_finish->(Coro::rouse_wait);
+        return $on_finish->( $cv->recv );
     }
     else {
         $self->_execute( 'ROLLBACK', undef, $on_finish );

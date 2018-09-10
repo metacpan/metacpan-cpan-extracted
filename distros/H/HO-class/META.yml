@@ -21,10 +21,10 @@ provides:
     version: '0.01'
 requires:
   Class::ISA: '0.20'
-  Package::Subroutine: '0.022000'
+  Package::Subroutine: '0.022'
   perl: v5.6.0
 resources:
-  homepage: http://github.com/giftnuss/p5-ho-class/tree/master
-  repository: git://github.com/giftnuss/p5-ho-class.git
-version: '0.077'
+  homepage: https://github.com/p5-ho-develop/class/tree/master
+  repository: git://github.com/p5-ho-develop/class.git
+version: '0.078'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

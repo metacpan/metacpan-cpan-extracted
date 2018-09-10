@@ -4,19 +4,16 @@ use Pcore -class;
 
 with qw[Pcore::WebSocket::Handle];
 
-has on_connect    => ();    # Maybe [CodeRef], ($self)
 has on_disconnect => ();    # Maybe [CodeRef], ($self, $status)
 has on_text       => ();    # Maybe [CodeRef], ($self, \$payload)
 has on_binary     => ();    # Maybe [CodeRef], ($self, \$payload)
 
-sub _on_connect ( $self, $status ) {
-    $self->{on_connect}->( $self, $status ) if $self->{on_connect};
-
-    return;
+sub _on_connect ( $self ) {
+    return $self;
 }
 
-sub _on_disconnect ( $self, $status ) {
-    $self->{on_disconnect}->( $self, $status ) if $self->{on_disconnect};
+sub _on_disconnect ( $self ) {
+    $self->{on_disconnect}->($self) if $self->{on_disconnect};
 
     return;
 }
@@ -41,10 +38,10 @@ sub _on_binary ( $self, $data_ref ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 12                   | * Private subroutine/method '_on_connect' declared but not used                                                |
-## |      | 18                   | * Private subroutine/method '_on_disconnect' declared but not used                                             |
-## |      | 24                   | * Private subroutine/method '_on_text' declared but not used                                                   |
-## |      | 30                   | * Private subroutine/method '_on_binary' declared but not used                                                 |
+## |      | 11                   | * Private subroutine/method '_on_connect' declared but not used                                                |
+## |      | 15                   | * Private subroutine/method '_on_disconnect' declared but not used                                             |
+## |      | 21                   | * Private subroutine/method '_on_text' declared but not used                                                   |
+## |      | 27                   | * Private subroutine/method '_on_binary' declared but not used                                                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,3 +1,8 @@
+0.863   2018-09-10 (PERLANCAR)
+
+	- Observe 'doc' example property to allow skipping POD rendering.
+
+
 0.862   2017-12-09 (PERLANCAR)
 
 	- Update to Rinci 1.1.86 (don't require all example result to be

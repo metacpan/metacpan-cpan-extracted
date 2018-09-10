@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Format-Util/issues
   repository: git://github.com/binary-com/perl-Format-Util.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.66'

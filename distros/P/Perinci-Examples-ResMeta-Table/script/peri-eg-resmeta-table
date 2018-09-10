@@ -1,0 +1,108 @@
+#!perl
+
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Perinci::Examples::ResMeta::Table;
+use Perinci::Result::Format::Lite;
+
+my $examples = \%Perinci::Examples::ResMeta::Table::Examples;
+
+my %Opts = (
+);
+GetOptions(
+    'raw|r' => \$Opts{raw},
+    'list|l' => \$Opts{list},
+);
+
+if ($Opts{list}) {
+    print map { "$_\n" } sort keys %$examples;
+} elsif (!$ARGV[0]) {
+    die "Usage: $0 <example-name>\n";
+} elsif ($examples->{$ARGV[0]}) {
+    my $res = $examples->{$ARGV[0]}{result};
+    if ($Opts{raw}) {
+        require Data::Dump;
+        Data::Dump::dd($res);
+    } else {
+        print Perinci::Result::Format::Lite::format($res, 'text-pretty');
+    }
+} else {
+    die "Unknown example '$ARGV[0]'\n";
+}
+
+# ABSTRACT: Render example in Perinci::Examples::ResMeta::Table using Perinci::Result::Format::Lite
+# PODNAME: peri-eg-resmeta-table
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-eg-resmeta-table - Render example in Perinci::Examples::ResMeta::Table using Perinci::Result::Format::Lite
+
+=head1 VERSION
+
+This document describes version 0.003 of peri-eg-resmeta-table (from Perl distribution Perinci-Examples-ResMeta-Table), released on 2018-09-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % peri-eg-resmeta-table [OPTIONS] <example-name>
+ % peri-eg-resmeta-table --list
+
+Example:
+
+ % peri-eg-resmeta-table fields1
+
+To show raw, unformatted result:
+
+ % peri-eg-resmeta-table fields1 --raw
+
+=head1 OPTIONS
+
+=over
+
+=item * --raw, -r
+
+=item * --list, -l
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Examples-ResMeta-Table>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-ResMeta-Table>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-ResMeta-Table>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

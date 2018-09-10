@@ -33,7 +33,7 @@ sub get_storage ( $self, @ ) {
     }
 
     if ($lib) {
-        die qq[share lib "$lib" is not exists] if !exists $self->{_lib_idx}->{$lib};
+        die qq[share lib "$lib" does not exists] if !exists $self->{_lib_idx}->{$lib};
 
         return -d $self->{_lib_idx}->{$lib} . $path ? $self->{_lib_idx}->{$lib} . $path : ();
     }

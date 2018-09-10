@@ -1,4 +1,4 @@
-#!/bin/env perl -w
+#!/bin/env perl -wT
 # vim:filetype=perl
 
 use 5.006;

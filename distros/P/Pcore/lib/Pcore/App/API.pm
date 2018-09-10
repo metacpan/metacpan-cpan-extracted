@@ -64,8 +64,8 @@ around init => sub ( $orig, $self ) {
     say 'done';
 
     # setup events listeners
-    P->listen_events(
-        'APP.API.AUTH',
+    P->bind_events(
+        'app.api.auth',
         sub ($ev) {
             $self->{_auth_cache}->%* = ();
 
@@ -133,13 +133,13 @@ sub authenticate_private ( $self, $private_token ) {
     # token was cached
     return $auth if defined $auth;
 
-    my $rouse_cb = Coro::rouse_cb;
+    my $cv = P->cv;
 
     my $cache = $self->{_auth_cb_queue};
 
-    push $cache->{ $private_token->[2] }->@*, $rouse_cb;
+    push $cache->{ $private_token->[2] }->@*, $cv;
 
-    return Coro::rouse_wait $rouse_cb if $cache->{ $private_token->[2] }->@* > 1;
+    return $cv->recv if $cache->{ $private_token->[2] }->@* > 1;
 
     # authenticate on backend
     my $res = $self->do_authenticate_private($private_token);
@@ -180,7 +180,7 @@ sub authenticate_private ( $self, $private_token ) {
         $cb->($auth);
     }
 
-    return Coro::rouse_wait $rouse_cb;
+    return $cv->recv;
 }
 
 1;

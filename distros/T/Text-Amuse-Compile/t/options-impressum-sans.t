@@ -113,9 +113,9 @@ foreach my $option (qw/impressum sansfontsections/) {
                 like $texbody, qr{This will become};
                 if ($option eq 'impressum') {
                     if ($active) {
-                        like $texbody, qr{^\% impressum}m, "impressum is present in $basename";
+                        like $texbody, qr{^\s*\% impressum}m, "impressum is present in $basename";
                     } else {
-                        unlike $texbody, qr{^\% impressum}m, "impressum is not present in $basename";
+                        unlike $texbody, qr{^\s*\% impressum}m, "impressum is not present in $basename";
                     }
                 } elsif ($option eq 'sansfontsections') {
                     my $serif = qr[\\addtokomafont

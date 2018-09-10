@@ -4,79 +4,52 @@ use Pcore -res;
 use Pcore::Node;
 use Pcore::Util::Data qw[to_cbor];
 use if $MSWIN, 'Win32API::File';
+use Symbol;
 
+# TODO not working under windows if parent process killed in task manager
+# TODO "on_status" currently is not called from BUILD method, because $node is not defined
 sub run ( $type, $args ) {
     $ENV->scan_deps if $args->{scandeps};
 
     # ignore SIGINT
     $SIG->{INT} = AE::signal INT => sub { };
 
-    # create object
-    my $rpc = $type->new( $args->{buildargs} // () );
+    my $node;
 
-    $rpc->{node} = Pcore::Node->new(
-        server     => $args->{server},
-        is_service => 1,
-        listen     => $args->{listen},
-        type       => $type,
-        requires   => do {
-            no strict qw[refs];
+    $args->{buildargs}->{node} = Pcore::Node->new(
+        server   => $args->{server},
+        listen   => $args->{listen},
+        type     => $type,
+        requires => ${"$type\::NODE_REQUIRES"},
 
-            ${"$type\::NODE_REQUIRES"};
-        },
-        forward_events => do {
-            no strict qw[refs];
+        # TODO "on_status" currently is not called from BUILD method, because $node is not defined
+        on_status => do {
+            if ( $type->can('NODE_ON_STATUS') ) {
+                sub ( $self, $new_status, $old_status ) {
+                    return if !defined $node;
 
-            ${"$type\::NODE_FORWARD_EVENTS"};
-        },
-        subscribe_events => do {
-            no strict qw[refs];
+                    $node->NODE_ON_STATUS( $new_status, $old_status );
 
-            ${"$type\::NODE_SUBSCRIBE_EVENTS"};
-        },
-        on_subscribe => sub ( $h, $event ) {
-            if ( !$h->{auth} ) {
-                $h->disconnect( res 401 );
-
-                return;
+                    return;
+                };
             }
-
-            state $sub = $rpc->can('NODE_ON_SUBSCRIBE');
-
-            return $rpc->$sub($event) if $sub;
-
-            # silently subscribe to all events, if handler is not exists
-            return 1;
         },
-        on_event => sub ( $h, $ev ) {
-            if ( !$h->{auth} ) {
-                $h->disconnect( res 401 );
+        on_event => do {
+            if ( $type->can('NODE_ON_EVENT') ) {
+                sub ( $self, $ev ) {
+                    $node->NODE_ON_EVENT($ev);
 
-                return;
+                    return;
+                };
             }
-
-            state $sub = $rpc->can('NODE_ON_EVENT');
-
-            return $rpc->$sub($ev) if $sub;
-
-            # silently forward all events, if handler is not exists
-            P->forward_event($ev);
-
-            return;
         },
-        on_rpc => sub ( $h, $req, $tx ) {
-            if ( !$h->{auth} ) {
-                $h->disconnect( res 401 );
-
-                return;
-            }
-
+        on_rpc => sub ( $self, $req, $tx ) {
             my $method_name = "API_$tx->{method}";
 
-            if ( my $sub = $rpc->can($method_name) ) {
+            if ( my $sub = $node->can($method_name) ) {
 
                 # call method
-                eval { $rpc->$sub( $req, $tx->{args} ? $tx->{args}->@* : () ) };
+                eval { $node->$sub( $req, $tx->{args} ? $tx->{args}->@* : () ) };
 
                 $@->sendlog if $@;
             }
@@ -86,25 +59,40 @@ sub run ( $type, $args ) {
 
             return;
         },
-    )->run;
+    );
 
-    # open control handle
-    if ($MSWIN) {
-        Win32API::File::OsFHandleOpen( *FH, $args->{fh}, 'w' ) or die $!;
-    }
-    else {
-        open *FH, '>&=', $args->{fh} or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
-    }
+    # handshake
+    Coro::async_pool sub {
 
-    binmode *FH or die;
+        # open control handle
+        my $fh = gensym;
 
-    my $data = to_cbor {                           #
-        pid => $$,
+        if ($MSWIN) {
+            Win32API::File::OsFHandleOpen( $fh, $args->{fh}, 'rw' ) or die $!;
+        }
+        else {
+            open $fh, '+<&=', $args->{fh} or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+        }
+
+        binmode $fh or die;
+
+        $fh = P->handle($fh);
+
+        my $data = to_cbor { pid => $$ };
+
+        $fh->write( unpack( 'H*', $data->$* ) . $LF );
+
+        # blocks until $fh is closed
+        # TODO not working under windows if parent process killed in task manager
+        $fh->can_read(undef);
+
+        exit;
     };
 
-    syswrite *FH, unpack( 'H*', $data->$* ) . $LF or die $!;
+    # create object
+    $node = $type->new( $args->{buildargs} );
 
-    AE::cv->recv;
+    P->cv->recv;
 
     exit;
 }
@@ -116,7 +104,7 @@ sub run ( $type, $args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 79                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 52                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

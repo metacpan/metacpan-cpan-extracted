@@ -81,7 +81,7 @@ sub _login ( $self, $cb ) {
 }
 
 sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+    my $cv = P->cv;
 
     my $request = sub {
         P->http->$method(
@@ -94,7 +94,7 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
             sub ($res) {
                 my $api_res = res [ $res->{status}, $res->{reason} ], $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : ();
 
-                $rouse_cb ? $cb ? $rouse_cb->( $cb->($api_res) ) : $rouse_cb->($api_res) : $cb ? $cb->($api_res) : ();
+                $cv->( $cb ? $cb->($api_res) : $api_res );
 
                 return;
             }
@@ -119,14 +119,14 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
 
             # login failure
             else {
-                $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
+                $cv->( $cb ? $cb->($res) : $res );
             }
 
             return;
         } );
     }
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 # USER / NAMESPACE
@@ -403,19 +403,15 @@ sub get_autobuild_settings ( $self, $repo_id, $cb = undef ) {
 }
 
 sub unlink_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
     my ( $delete_autobuild_tag_status, $delete_tag_status );
 
-    my $cv = AE::cv {
+    my $cv = P->cv->begin( sub ($cv) {
         my $res = res [ 200, "autobuild: $delete_autobuild_tag_status->{reason}, tag: $delete_tag_status->{reason}" ];
 
-        $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
+        $cv->( $cb ? $cb->($res) : $res );
 
         return;
-    };
-
-    $cv->begin;
+    } );
 
     $cv->begin;
     $self->delete_autobuild_tag_by_name(
@@ -445,7 +441,7 @@ sub unlink_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
 
     $cv->end;
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 # AUTOBUILD TAGS
@@ -494,13 +490,9 @@ sub delete_autobuild_tag_by_id ( $self, $repo_id, $autobuild_tag_id, $cb = undef
 }
 
 sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+    my $cv = P->cv;
 
-    my $on_finish = sub ($res) {
-        $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
-
-        return;
-    };
+    my $on_finish = sub ($res) { $cv->( $cb ? $cb->($res) : $res ) };
 
     # get autobuild tags
     $self->get_autobuild_tags(
@@ -532,7 +524,7 @@ sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name, $cb = u
         }
     );
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 sub trigger_autobuild ( $self, $repo_id, $source_name, $source_type, $cb = undef ) {
@@ -549,13 +541,9 @@ sub trigger_autobuild ( $self, $repo_id, $source_name, $source_type, $cb = undef
 }
 
 sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+    my $cv = P->cv;
 
-    my $on_finish = sub ($res) {
-        $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
-
-        return;
-    };
+    my $on_finish = sub ($res) { $cv->( $cb ? $cb->($res) : $res ) };
 
     # get autobuild tags
     $self->get_autobuild_tags(
@@ -587,7 +575,7 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
         }
     );
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 1;
@@ -599,8 +587,8 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## |======+======================+================================================================================================================|
 ## |    3 | 83, 188, 316, 326,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |      | 342, 368, 372, 405,  |                                                                                                                |
-## |      | 473, 492, 496, 538,  |                                                                                                                |
-## |      | 551                  |                                                                                                                |
+## |      | 469, 488, 492, 530,  |                                                                                                                |
+## |      | 543                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 166                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

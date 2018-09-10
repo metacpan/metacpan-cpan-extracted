@@ -52,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2"
       }
    },
-   "version" : "1.54",
+   "version" : "1.55",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

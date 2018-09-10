@@ -94,6 +94,9 @@ sub start_firefox {
 		my ($package, $file, $line) = caller;
 		my $source = $package eq 'main' ? $file : $package;
 		diag("Exception in $source at line $line during new:$exception");
+		$skip_message = "SEGV detected.  No need to restart";
+	} elsif ((!defined $firefox) && ($major_version < 50)) {
+		$skip_message = "Failed to start Firefox:$exception";
 	}
 	if ($exception =~ /^(Firefox exited with a 11|Firefox killed by a SEGV signal \(11\))/) {
 		diag("Caught a SEGV type exception");
@@ -300,6 +303,7 @@ $profile->set_value('privacy.popups.disable_from_plugin', 0); # no restrictions
 $profile->set_value('security.OCSP.GET.enabled', 'false'); 
 $profile->clear_value('security.OCSP.enabled');  # just testing
 $profile->set_value('security.OCSP.enabled', 0); 
+my $correct_exit_status = 0;
 SKIP: {
 	($skip_message, $firefox) = start_firefox(0, debug => 1, profile => $profile, mime_types => [ 'application/pkcs10', 'application/pdf' ]);
 	if (!$skip_message) {
@@ -316,16 +320,22 @@ SKIP: {
 	my $capabilities = $firefox->capabilities();
 	ok(1, "\$capabilities->proxy() " . defined $capabilities->proxy() ? "shows an existing proxy setup" : "is undefined");
 	diag("Browser version is " . $capabilities->browser_version());
-	($major_version, $minor_version, $patch_version) = split /[.]/smx, $capabilities->browser_version(); 
+	($major_version, $minor_version, $patch_version) = split /[.]/smx, $capabilities->browser_version();
+	if (!defined $minor_version) {
+		$minor_version = '';
+	}
+	if (!defined $patch_version) {
+		$patch_version = '';
+	}
 	diag("Operating System is " . $capabilities->platform_name() . q[ ] . $capabilities->platform_version());
 	diag("Profile Directory is " . $capabilities->moz_profile());
-	diag("Mozilla PID is " . $capabilities->moz_process_id());
-	diag("Addons are " . $firefox->addons() ? 'working' : 'disabled');
+	diag("Mozilla PID is " . ($capabilities->moz_process_id() || 'Unknown'));
+	diag("Addons are " . ($firefox->addons() ? 'working' : 'disabled'));
 	if ($firefox->xvfb()) {
 		diag("Internal xvfb PID is " . $firefox->xvfb());
 	}
 	ok($firefox->application_type(), "\$firefox->application_type() returns " . $firefox->application_type());
-	ok($firefox->marionette_protocol(), "\$firefox->marionette_protocol() returns " . $firefox->marionette_protocol());
+	ok($firefox->marionette_protocol() =~ /^\d+$/smx, "\$firefox->marionette_protocol() returns " . $firefox->marionette_protocol());
 	TODO: {
 		local $TODO = $major_version >= 60 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_type()" : q[];
 		my $window_type;
@@ -340,37 +350,45 @@ SKIP: {
 	my $new_height = 452;
 	my $new_width = 326;
 	my $new = Firefox::Marionette::Window::Rect->new( pos_x => $new_x, pos_y => $new_y, height => $new_height, width => $new_width );
-	my $old = $firefox->window_rect($new);
-	TODO: {
-		local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
-		ok(defined $old->pos_x() && $old->pos_x() =~ /^\-?\d+([.]\d+)?$/, "Window used to have a X position of " . (defined $old->pos_x() ? $old->pos_x() : q[]));
-		ok(defined $old->pos_y() && $old->pos_y() =~ /^\-?\d+([.]\d+)?$/, "Window used to have a Y position of " . (defined $old->pos_y() ? $old->pos_y() : q[]));
+	my $old;
+	eval {
+		$old = $firefox->window_rect($new);
+	};
+	SKIP: {
+		if (($major_version < 50) && (!defined $old)) {
+			skip("Firefox $major_version does not appear to support the \$firefox->window_rect() method", 13);
+		}
+		TODO: {
+			local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
+			ok(defined $old->pos_x() && $old->pos_x() =~ /^\-?\d+([.]\d+)?$/, "Window used to have a X position of " . (defined $old->pos_x() ? $old->pos_x() : q[]));
+			ok(defined $old->pos_y() && $old->pos_y() =~ /^\-?\d+([.]\d+)?$/, "Window used to have a Y position of " . (defined $old->pos_y() ? $old->pos_y() : q[]));
+		}
+		ok($old->width() =~ /^\d+([.]\d+)?$/, "Window used to have a width of " . $old->width());
+		ok($old->height() =~ /^\d+([.]\d+)?$/, "Window used to have a height of " . $old->height());
+		my $new2 = $firefox->window_rect();
+		TODO: {
+			local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
+			ok(defined $new2->pos_x() && $new2->pos_x() == $new->pos_x(), "Window has a X position of " . $new->pos_x());
+			ok(defined $new2->pos_y() && $new2->pos_y() == $new->pos_y(), "Window has a Y position of " . $new->pos_y());
+		}
+		TODO: {
+			local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : q[];
+			ok($new2->width() == $new->width(), "Window has a width of " . $new->width() . ":" . $new2->width());
+		}
+		ok($new2->height() == $new->height(), "Window has a height of " . $new->height());
+		TODO: {
+			local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->wstate()" : q[];
+			ok(defined $old->wstate() && $old->wstate() =~ /^\w+$/, "Window has a state of " . ($old->wstate() || q[]));
+		}
+		my $rect = $firefox->window_rect();
+		TODO: {
+			local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
+			ok(defined $rect->pos_x() && $rect->pos_x() =~ /^[-]?\d+([.]\d+)?$/, "Window has a X position of " . ($rect->pos_x() || q[]));
+			ok(defined $rect->pos_y() && $rect->pos_y() =~ /^[-]?\d+([.]\d+)?$/, "Window has a Y position of " . ($rect->pos_y() || q[]));
+		}
+		ok($rect->width() =~ /^\d+([.]\d+)?$/, "Window has a width of " . $rect->width());
+		ok($rect->height() =~ /^\d+([.]\d+)?$/, "Window has a height of " . $rect->height());
 	}
-	ok($old->width() =~ /^\d+([.]\d+)?$/, "Window used to have a width of " . $old->width());
-	ok($old->height() =~ /^\d+([.]\d+)?$/, "Window used to have a height of " . $old->height());
-	my $new2 = $firefox->window_rect();
-	TODO: {
-		local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
-		ok(defined $new2->pos_x() && $new2->pos_x() == $new->pos_x(), "Window has a X position of " . $new->pos_x());
-		ok(defined $new2->pos_y() && $new2->pos_y() == $new->pos_y(), "Window has a Y position of " . $new->pos_y());
-	}
-	TODO: {
-		local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : q[];
-		ok($new2->width() == $new->width(), "Window has a width of " . $new->width() . ":" . $new2->width());
-	}
-	ok($new2->height() == $new->height(), "Window has a height of " . $new->height());
-	TODO: {
-		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->wstate()" : q[];
-		ok(defined $old->wstate() && $old->wstate() =~ /^\w+$/, "Window has a state of " . ($old->wstate() || q[]));
-	}
-	my $rect = $firefox->window_rect();
-	TODO: {
-		local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
-		ok(defined $rect->pos_x() && $rect->pos_x() =~ /^[-]?\d+([.]\d+)?$/, "Window has a X position of " . ($rect->pos_x() || q[]));
-		ok(defined $rect->pos_y() && $rect->pos_y() =~ /^[-]?\d+([.]\d+)?$/, "Window has a Y position of " . ($rect->pos_y() || q[]));
-	}
-	ok($rect->width() =~ /^\d+([.]\d+)?$/, "Window has a width of " . $rect->width());
-	ok($rect->height() =~ /^\d+([.]\d+)?$/, "Window has a height of " . $rect->height());
 	my $page_timeout = 45_043;
 	my $script_timeout = 48_021;
 	my $implicit_timeout = 41_001;
@@ -399,6 +417,9 @@ SKIP: {
 		diag("Firefox exited with a \$? of $child_error");
 	}
 	ok($child_error =~ /^\d+$/, "Firefox has closed with an integer exit status of " . $child_error);
+	if ($major_version < 50) {
+		$correct_exit_status = $child_error;
+	}
 	ok($firefox->child_error() == $child_error, "Firefox returns $child_error for the child error, matching the return value of quit():$child_error:" . $firefox->child_error());
 	ok(!$firefox->alive(), "Firefox is not still alive");
 }
@@ -459,25 +480,33 @@ SKIP: {
 	}
 	$capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
-	ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
-	ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
-	ok($capabilities->proxy()->https() eq 'proxy.example.org:4343', "\$capabilities->proxy()->https() is 'proxy.example.org:4343'");
-	ok($capabilities->proxy()->ftp() eq 'ftp.example.org:2121', "\$capabilities->proxy()->ftp() is 'ftp.example.org:2121'");
-	ok($capabilities->timeouts()->page_load() == 54_321, "\$capabilities->timeouts()->page_load() is '54,321'");
-	ok($capabilities->timeouts()->script() == 4567, "\$capabilities->timeouts()->script() is '4,567'");
-	ok($capabilities->timeouts()->implicit() == 6543, "\$capabilities->timeouts()->implicit() is '6,543'");
-	my $none = 0;
-	foreach my $host ($capabilities->proxy()->none()) {
-		$none += 1;
-	}
-	ok($capabilities->proxy()->socks() eq 'socks.example.org:1081', "\$capabilities->proxy()->socks() is 'socks.example.org:1081':" . $capabilities->proxy()->socks() );
-	ok($capabilities->proxy()->socks_version() == 5, "\$capabilities->proxy()->socks_version() is 5");
-	TODO: {
-		local $TODO = $major_version < 58 ? $capabilities->browser_version() . " does not have support for \$firefox->capabilities()->none()" : q[];
-		ok($none == 1, "\$capabilities->proxy()->none() is a reference to a list with 1 element");
+	SKIP: {
+		if (!$capabilities->proxy()) {
+			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 10);
+		}
+		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
+		ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
+		ok($capabilities->proxy()->https() eq 'proxy.example.org:4343', "\$capabilities->proxy()->https() is 'proxy.example.org:4343'");
+		ok($capabilities->proxy()->ftp() eq 'ftp.example.org:2121', "\$capabilities->proxy()->ftp() is 'ftp.example.org:2121'");
+		ok($capabilities->timeouts()->page_load() == 54_321, "\$capabilities->timeouts()->page_load() is '54,321'");
+		ok($capabilities->timeouts()->script() == 4567, "\$capabilities->timeouts()->script() is '4,567'");
+		ok($capabilities->timeouts()->implicit() == 6543, "\$capabilities->timeouts()->implicit() is '6,543'");
+		my $none = 0;
+		foreach my $host ($capabilities->proxy()->none()) {
+			$none += 1;
+		}
+		ok($capabilities->proxy()->socks() eq 'socks.example.org:1081', "\$capabilities->proxy()->socks() is 'socks.example.org:1081':" . $capabilities->proxy()->socks() );
+		ok($capabilities->proxy()->socks_version() == 5, "\$capabilities->proxy()->socks_version() is 5");
+		TODO: {
+			local $TODO = $major_version < 58 ? $capabilities->browser_version() . " does not have support for \$firefox->capabilities()->none()" : q[];
+			ok($none == 1, "\$capabilities->proxy()->none() is a reference to a list with 1 element");
+		}
 	}
 	SKIP: {
-		if ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
+		if (!$capabilities->proxy()) {
+			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 1);
+		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			my @sig_nums  = split q[ ], $Config{sig_num};
 			my @sig_names = split q[ ], $Config{sig_name};
 			my %signals_by_name;
@@ -538,7 +567,7 @@ SKIP: {
 			diag("No forking available for $^O");
 		}
 	}
-	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
+	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
 SKIP: {
@@ -552,10 +581,16 @@ SKIP: {
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
-	ok($capabilities->proxy()->type() eq 'pac', "\$capabilities->proxy()->type() is 'pac'");
-	ok($capabilities->proxy()->pac()->host() eq 'proxy.example.org', "\$capabilities->proxy()->pac()->host() is 'proxy.example.org'");
-        ok($capabilities->timeouts()->page_load() == 65432, "\$firefox->capabilities()->timeouts()->page_load() correctly reflects the page_load shortcut timeout");
-	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
+	SKIP: {
+		if (!$capabilities->proxy()) {
+			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 2);
+		}
+		ok($capabilities->proxy()->type() eq 'pac', "\$capabilities->proxy()->type() is 'pac'");
+		ok($capabilities->proxy()->pac()->host() eq 'proxy.example.org', "\$capabilities->proxy()->pac()->host() is 'proxy.example.org'");
+	}
+	ok($capabilities->timeouts()->page_load() == 65432, "\$firefox->capabilities()->timeouts()->page_load() correctly reflects the page_load shortcut timeout");
+	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
 SKIP: {
@@ -570,30 +605,59 @@ SKIP: {
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
 	ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
 	ok($firefox->window_handle() =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $firefox->window_handle());
-	ok($firefox->chrome_window_handle() =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $firefox->chrome_window_handle());
+	my $chrome_window_handle_supported;
+	eval {
+		$chrome_window_handle_supported = $firefox->chrome_window_handle();
+	};
+	SKIP: {
+		if (!$chrome_window_handle_supported) {
+			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		ok($chrome_window_handle_supported =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $firefox->chrome_window_handle());
+	}
         ok($firefox->capabilities()->timeouts()->script() == 5432, "\$firefox->capabilities()->timeouts()->script() correctly reflects the scripts shortcut timeout:" . $firefox->capabilities()->timeouts()->script());
-	ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
-	ok(scalar $firefox->chrome_window_handles() == 1, "There is one window/tab open at the moment");
+	SKIP: {
+		if (!$chrome_window_handle_supported) {
+			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 2);
+		}
+		ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
+		ok(scalar $firefox->chrome_window_handles() == 1, "There is one window/tab open at the moment");
+	}
 	ok(scalar $firefox->window_handles() == 1, "There is one actual window open at the moment");
-	my ($original_chrome_window_handle) = $firefox->chrome_window_handles();
-	foreach my $handle ($firefox->chrome_window_handles()) {
-		ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+	my $original_chrome_window_handle;
+	SKIP: {
+		if (!$chrome_window_handle_supported) {
+			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		($original_chrome_window_handle) = $firefox->chrome_window_handles();
+		foreach my $handle ($firefox->chrome_window_handles()) {
+			ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+		}
 	}
 	my ($original_window_handle) = $firefox->window_handles();
 	foreach my $handle ($firefox->window_handles()) {
 		ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 	}
 	ok(not($firefox->script('window.open("https://duckduckgo.com", "_blank");')), "Opening new window to duckduckgo.com via 'window.open' script");
-	ok(scalar $firefox->chrome_window_handles() == 2, "There are two windows/tabs open at the moment");
 	ok(scalar $firefox->window_handles() == 2, "There are two actual windows open at the moment");
 	my $new_chrome_window_handle;
-	foreach my $handle ($firefox->chrome_window_handles()) {
-		ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
-		if ($handle != $original_chrome_window_handle) {
-			$new_chrome_window_handle = $handle;
+	SKIP: {
+		if (!$chrome_window_handle_supported) {
+			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 4);
 		}
+		ok(scalar $firefox->chrome_window_handles() == 2, "There are two windows/tabs open at the moment");
+		foreach my $handle ($firefox->chrome_window_handles()) {
+			ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+			if ($handle != $original_chrome_window_handle) {
+				$new_chrome_window_handle = $handle;
+			}
+		}
+		ok($new_chrome_window_handle, "New chrome window handle $new_chrome_window_handle detected");
 	}
-	ok($new_chrome_window_handle, "New chrome window handle $new_chrome_window_handle detected");
 	my $new_window_handle;
 	foreach my $handle ($firefox->window_handles()) {
 		ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
@@ -611,7 +675,7 @@ SKIP: {
 			if (($@->isa('Firefox::Marionette::Exception')) && ($@ =~ /Only supported in Fennec.* in .* at line \d+/)) {
 				local $TODO = "Only supported in Fennec";
 				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
-			} elsif (($major_version < 52) || ($major_version >= 60)) {
+			} elsif ($major_version < 60) {
 				my $exception = "$@";
 				chomp $exception;
 				diag("\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception");
@@ -634,257 +698,368 @@ SKIP: {
 		local $TODO = "Switch to shadow root can be broken";
 		ok($element, "Switched to target1 shadow root");
 	}
-	ok($firefox->list('//frame[@name="target1"]')->switch_to_frame(), "Switched to target1 frame");
-	ok($firefox->active_frame()->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
-	ok($firefox->switch_to_parent_frame(), "Switched to parent frame");
-	foreach my $handle ($firefox->close_current_chrome_window_handle()) {
-		local $TODO = $major_version < 52 ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52" : "";
-		ok(defined $handle && $handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
+	SKIP: {
+		my $switch_to_frame;
+		eval { $switch_to_frame = $firefox->list('//frame[@name="target1"]')->switch_to_frame() };
+		if ((!$switch_to_frame) && ($major_version < 50)) {
+			diag("switch_to_frame is not supported for $major_version.$minor_version.$patch_version");
+			skip("switch_to_frame is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		ok($switch_to_frame, "Switched to target1 frame");
+	}
+	SKIP: {
+		my $active_frame;
+		eval { $active_frame = $firefox->active_frame() };
+		if ((!$active_frame) && ($major_version < 50)) {
+			diag("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		ok($active_frame->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
+	}
+	SKIP: {
+		my $switch_to_parent_frame;
+		eval {
+			$switch_to_parent_frame = $firefox->switch_to_parent_frame();
+		};
+		if ((!$switch_to_parent_frame) && ($major_version < 50)) {
+			diag("\$firefox->switch_to_parent_frame is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->switch_to_parent_frame is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		ok($switch_to_parent_frame, "Switched to parent frame");
+	}
+	SKIP: {
+		if (!$chrome_window_handle_supported) {
+			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		foreach my $handle ($firefox->close_current_chrome_window_handle()) {
+			local $TODO = $major_version < 52 ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52" : undef;
+			ok(defined $handle && $handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
+		}
 	}
 	ok($firefox->switch_to_window($new_window_handle), "\$firefox->switch_to_window() used to move back to the original window");
 	ok($firefox->go("https://metacpan.org/"), "metacpan.org has been loaded in the new window");
 	my $uri = $firefox->uri();
 	ok($uri eq 'https://metacpan.org/', "\$firefox->uri() is equal to https://metacpan.org/:$uri");
 	ok($firefox->title() =~ /Search/, "metacpan.org has a title containing Search");
-	ok($firefox->context('chrome') eq 'content', "Initial context of the browser is 'content'");
-	ok($firefox->context('content') eq 'chrome', "Changed context of the browser is 'chrome'");
+	my $context;
+	eval { $context = $firefox->context(); };
+	SKIP: {
+		if ((!$context) && ($major_version < 50)) {
+			chomp $@;
+			diag("\$firefox->context is not supported for $major_version.$minor_version.$patch_version:$@");
+			skip("\$firefox->context is not supported for $major_version.$minor_version.$patch_version", 2);
+		}
+		ok($firefox->context('chrome') eq 'content', "Initial context of the browser is 'content'");
+		ok($firefox->context('content') eq 'chrome', "Changed context of the browser is 'chrome'");
+	}
 	ok($firefox->page_source() =~ /lucky/smx, "metacpan.org contains the phrase 'lucky' in page source");
 	ok($firefox->html() =~ /lucky/smx, "metacpan.org contains the phrase 'lucky' in html");
 	ok($firefox->refresh(), "\$firefox->refresh()");
 	my $element = $firefox->active_element();
 	ok($element, "\$firefox->active_element() returns an element");
-	ok(not(defined $firefox->active_frame()), "\$firefox->active_frame() is undefined for " . $firefox->uri());
+	TODO: {
+		local $TODO = $major_version < 50 ? "\$firefox->active_frame() is not working for $major_version.$minor_version.$patch_version" : undef;
+		ok(not(defined $firefox->active_frame()), "\$firefox->active_frame() is undefined for " . $firefox->uri());
+	}
 	ok($firefox->find('//input[@id="search-input"]', BY_XPATH())->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
 	my $autofocus;
 	ok($autofocus = $firefox->find_element('//input[@id="search-input"]')->attribute('autofocus'), "The value of the autofocus attribute is '$autofocus'");
-	ok($autofocus = $firefox->find('//input[@id="search-input"]')->property('autofocus'), "The value of the autofocus property is '$autofocus'");
-	ok($firefox->find_by_class('main-content')->find('//input[@id="search-input"]')->property('id') eq 'search-input', "Correctly found nested element with find");
+	$autofocus = undef;
+	eval {
+		$autofocus = $firefox->find('//input[@id="search-input"]')->property('autofocus');
+	};
+	SKIP: {
+		if ((!$autofocus) && ($major_version < 50)) {
+			chomp $@;
+			diag("The property method is not supported for $major_version.$minor_version.$patch_version:$@");
+			skip("The property method is not supported for $major_version.$minor_version.$patch_version", 2);
+		}
+		ok($autofocus, "The value of the autofocus property is '$autofocus'");
+		ok($firefox->find_by_class('main-content')->find('//input[@id="search-input"]')->property('id') eq 'search-input', "Correctly found nested element with find");
+	}
 	my $count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list('//input[@id="search-input"]')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with list");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with list");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested list:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->find('//input[@id="search-input"]')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with find");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with find");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested find:$count");
 	$count = 0;
 	foreach my $element ($firefox->find('//input[@id="search-input"]')) {
-		ok($element->property('id') eq 'search-input', "Correctly found element with wantarray find");
+		ok($element->attribute('id') eq 'search-input', "Correctly found element with wantarray find");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find:$count");
-	ok($firefox->find('search-input', 'id')->property('id') eq 'search-input', "Correctly found element when searching by id");
-	ok($firefox->find('search-input', BY_ID())->property('id') eq 'search-input', "Correctly found element when searching by id");
-	ok($firefox->list_by_id('search-input')->property('id') eq 'search-input', "Correctly found element with list_by_id");
-	ok($firefox->find_by_id('search-input')->property('id') eq 'search-input', "Correctly found element with find_by_id");
-	ok($firefox->find_by_class('main-content')->find_by_id('search-input')->property('id') eq 'search-input', "Correctly found nested element with find_by_id");
-	ok($firefox->find_id('search-input')->property('id') eq 'search-input', "Correctly found element with find_id");
-	ok($firefox->find_class('main-content')->find_id('search-input')->property('id') eq 'search-input', "Correctly found nested element with find_id");
+	ok($firefox->find('search-input', 'id')->attribute('id') eq 'search-input', "Correctly found element when searching by id");
+	ok($firefox->find('search-input', BY_ID())->attribute('id') eq 'search-input', "Correctly found element when searching by id");
+	ok($firefox->list_by_id('search-input')->attribute('id') eq 'search-input', "Correctly found element with list_by_id");
+	ok($firefox->find_by_id('search-input')->attribute('id') eq 'search-input', "Correctly found element with find_by_id");
+	ok($firefox->find_by_class('main-content')->find_by_id('search-input')->attribute('id') eq 'search-input', "Correctly found nested element with find_by_id");
+	ok($firefox->find_id('search-input')->attribute('id') eq 'search-input', "Correctly found element with find_id");
+	ok($firefox->find_class('main-content')->find_id('search-input')->attribute('id') eq 'search-input', "Correctly found nested element with find_id");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_id('search-input')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with list_by_id");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with list_by_id");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested list_by_id:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->find_by_id('search-input')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with find_by_id");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with find_by_id");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested find_by_id:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_class('main-content')->find_id('search-input')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with find_id");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with find_id");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested find_id:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_id('search-input')) {
-		ok($element->property('id') eq 'search-input', "Correctly found element with wantarray find_by_id");
+		ok($element->attribute('id') eq 'search-input', "Correctly found element with wantarray find_by_id");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_id:$count");
-	ok($firefox->find('q', 'name')->property('id') eq 'search-input', "Correctly found element when searching by id");
-	ok($firefox->find('q', BY_NAME())->property('id') eq 'search-input', "Correctly found element when searching by id");
-	ok($firefox->list_by_name('q')->property('id') eq 'search-input', "Correctly found element with list_by_name");
-	ok($firefox->find_by_name('q')->property('id') eq 'search-input', "Correctly found element with find_by_name");
-	ok($firefox->find_by_class('main-content')->find_by_name('q')->property('id') eq 'search-input', "Correctly found nested element with find_by_name");
-	ok($firefox->find_name('q')->property('id') eq 'search-input', "Correctly found element with find_name");
-	ok($firefox->find_class('main-content')->find_name('q')->property('id') eq 'search-input', "Correctly found nested element with find_name");
+	ok($firefox->find('q', 'name')->attribute('id') eq 'search-input', "Correctly found element when searching by id");
+	ok($firefox->find('q', BY_NAME())->attribute('id') eq 'search-input', "Correctly found element when searching by id");
+	ok($firefox->list_by_name('q')->attribute('id') eq 'search-input', "Correctly found element with list_by_name");
+	ok($firefox->find_by_name('q')->attribute('id') eq 'search-input', "Correctly found element with find_by_name");
+	ok($firefox->find_by_class('main-content')->find_by_name('q')->attribute('id') eq 'search-input', "Correctly found nested element with find_by_name");
+	ok($firefox->find_name('q')->attribute('id') eq 'search-input', "Correctly found element with find_name");
+	ok($firefox->find_class('main-content')->find_name('q')->attribute('id') eq 'search-input', "Correctly found nested element with find_name");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_name('q')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with list_by_name");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with list_by_name");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested list_by_name:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->find_by_name('q')) {
-		ok($element->property('id') eq 'search-input', "Correctly found nested element with find_by_name");
+		ok($element->attribute('id') eq 'search-input', "Correctly found nested element with find_by_name");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested find_by_name:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_name('q')) {
-		ok($element->property('id') eq 'search-input', "Correctly found element with wantarray find_by_name");
+		ok($element->attribute('id') eq 'search-input', "Correctly found element with wantarray find_by_name");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_name:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_name('q')) {
-		ok($element->property('id') eq 'search-input', "Correctly found element with wantarray find_name");
+		ok($element->attribute('id') eq 'search-input', "Correctly found element with wantarray find_name");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_name:$count");
-	ok($firefox->find('input', 'tag name')->property('id'), "Correctly found element when searching by tag name");
-	ok($firefox->find('input', BY_TAG())->property('id'), "Correctly found element when searching by tag name");
-	ok($firefox->list_by_tag('input')->property('id'), "Correctly found element with list_by_tag");
-	ok($firefox->find_by_tag('input')->property('id'), "Correctly found element with find_by_tag");
-	ok($firefox->find_by_class('main-content')->find_by_tag('input')->property('id'), "Correctly found nested element with find_by_tag");
-	ok($firefox->find_tag('input')->property('id'), "Correctly found element with find_tag");
-	ok($firefox->find_class('main-content')->find_tag('input')->property('id'), "Correctly found nested element with find_tag");
+	ok($firefox->find('input', 'tag name')->attribute('id'), "Correctly found element when searching by tag name");
+	ok($firefox->find('input', BY_TAG())->attribute('id'), "Correctly found element when searching by tag name");
+	ok($firefox->list_by_tag('input')->attribute('id'), "Correctly found element with list_by_tag");
+	ok($firefox->find_by_tag('input')->attribute('id'), "Correctly found element with find_by_tag");
+	ok($firefox->find_by_class('main-content')->find_by_tag('input')->attribute('id'), "Correctly found nested element with find_by_tag");
+	ok($firefox->find_tag('input')->attribute('id'), "Correctly found element with find_tag");
+	ok($firefox->find_class('main-content')->find_tag('input')->attribute('id'), "Correctly found nested element with find_tag");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_tag('input')) {
-		ok($element->property('id'), "Correctly found nested element with list_by_tag");
+		ok($element->attribute('id'), "Correctly found nested element with list_by_tag");
 		$count += 1;
 	}
 	ok($count == 2, "Found elements with nested list_by_tag:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->find_by_tag('input')) {
-		ok($element->property('id'), "Correctly found nested element with find_by_tag");
+		ok($element->attribute('id'), "Correctly found nested element with find_by_tag");
 		$count += 1;
 	}
 	ok($count == 2, "Found elements with nested find_by_tag:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_tag('input')) {
-		ok($element->property('id'), "Correctly found element with wantarray find_by_tag");
+		ok($element->attribute('id'), "Correctly found element with wantarray find_by_tag");
 		$count += 1;
 	}
 	ok($count == 2, "Found elements with wantarray find_by_tag:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_tag('input')) {
-		ok($element->property('id'), "Correctly found element with wantarray find_tag");
+		ok($element->attribute('id'), "Correctly found element with wantarray find_tag");
 		$count += 1;
 	}
 	ok($count == 2, "Found elements with wantarray find_by_tag:$count");
-	ok($firefox->find('form-control home-search-input', 'class name')->property('id'), "Correctly found element when searching by class name");
-	ok($firefox->find('form-control home-search-input', BY_CLASS())->property('id'), "Correctly found element when searching by class name");
-	ok($firefox->list_by_class('form-control home-search-input')->property('id'), "Correctly found element with list_by_class");
-	ok($firefox->find_by_class('form-control home-search-input')->property('id'), "Correctly found element with find_by_class");
-	ok($firefox->find_by_class('main-content')->find_by_class('form-control home-search-input')->property('id'), "Correctly found nested element with find_by_class");
-	ok($firefox->find_class('form-control home-search-input')->property('id'), "Correctly found element with find_class");
-	ok($firefox->find_class('main-content')->find_class('form-control home-search-input')->property('id'), "Correctly found nested element with find_class");
+	ok($firefox->find('form-control home-search-input', 'class name')->attribute('id'), "Correctly found element when searching by class name");
+	ok($firefox->find('form-control home-search-input', BY_CLASS())->attribute('id'), "Correctly found element when searching by class name");
+	ok($firefox->list_by_class('form-control home-search-input')->attribute('id'), "Correctly found element with list_by_class");
+	ok($firefox->find_by_class('form-control home-search-input')->attribute('id'), "Correctly found element with find_by_class");
+	ok($firefox->find_by_class('main-content')->find_by_class('form-control home-search-input')->attribute('id'), "Correctly found nested element with find_by_class");
+	ok($firefox->find_class('form-control home-search-input')->attribute('id'), "Correctly found element with find_class");
+	ok($firefox->find_class('main-content')->find_class('form-control home-search-input')->attribute('id'), "Correctly found nested element with find_class");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_class('form-control home-search-input')) {
-		ok($element->property('id'), "Correctly found nested element with list_by_class");
+		ok($element->attribute('id'), "Correctly found nested element with list_by_class");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested find_by_class:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->find_by_class('form-control home-search-input')) {
-		ok($element->property('id'), "Correctly found element with wantarray find_by_class");
+		ok($element->attribute('id'), "Correctly found element with wantarray find_by_class");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_class:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_class('main-content')->find_class('form-control home-search-input')) {
-		ok($element->property('id'), "Correctly found element with wantarray find_class");
+		ok($element->attribute('id'), "Correctly found element with wantarray find_class");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_class:$count");
-	ok($firefox->find('input.home-search-input', 'css selector')->property('id'), "Correctly found element when searching by css selector");
-	ok($firefox->find('input.home-search-input', BY_SELECTOR())->property('id'), "Correctly found element when searching by css selector");
-	ok($firefox->list_by_selector('input.home-search-input')->property('id'), "Correctly found element with list_by_selector");
-	ok($firefox->find_by_selector('input.home-search-input')->property('id'), "Correctly found element with find_by_selector");
-	ok($firefox->find_by_class('main-content')->find_by_selector('input.home-search-input')->property('id'), "Correctly found nested element with find_by_selector");
-	ok($firefox->find_selector('input.home-search-input')->property('id'), "Correctly found element with find_selector");
-	ok($firefox->find_class('main-content')->find_selector('input.home-search-input')->property('id'), "Correctly found nested element with find_selector");
+	ok($firefox->find('input.home-search-input', 'css selector')->attribute('id'), "Correctly found element when searching by css selector");
+	ok($firefox->find('input.home-search-input', BY_SELECTOR())->attribute('id'), "Correctly found element when searching by css selector");
+	ok($firefox->list_by_selector('input.home-search-input')->attribute('id'), "Correctly found element with list_by_selector");
+	ok($firefox->find_by_selector('input.home-search-input')->attribute('id'), "Correctly found element with find_by_selector");
+	ok($firefox->find_by_class('main-content')->find_by_selector('input.home-search-input')->attribute('id'), "Correctly found nested element with find_by_selector");
+	ok($firefox->find_selector('input.home-search-input')->attribute('id'), "Correctly found element with find_selector");
+	ok($firefox->find_class('main-content')->find_selector('input.home-search-input')->attribute('id'), "Correctly found nested element with find_selector");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_selector('input.home-search-input')) {
-		ok($element->property('id'), "Correctly found nested element with list_by_selector");
+		ok($element->attribute('id'), "Correctly found nested element with list_by_selector");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested list_by_selector:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->find_by_selector('input.home-search-input')) {
-		ok($element->property('id'), "Correctly found nested element with find_by_selector");
+		ok($element->attribute('id'), "Correctly found nested element with find_by_selector");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with nested find_by_selector:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_by_selector('input.home-search-input')) {
-		ok($element->property('id'), "Correctly found wantarray element with find_by_selector");
+		ok($element->attribute('id'), "Correctly found wantarray element with find_by_selector");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_selector:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_selector('input.home-search-input')) {
-		ok($element->property('id'), "Correctly found wantarray element with find_selector");
+		ok($element->attribute('id'), "Correctly found wantarray element with find_selector");
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_selector:$count");
-	ok($firefox->find('API', 'link text')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by link text");
-	ok($firefox->find('API', BY_LINK())->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by link text");
-	ok($firefox->list_by_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with list_by_link");
-	ok($firefox->find_by_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_by_link");
-	ok($firefox->find_by_class('container-fluid')->find_by_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_by_link");
-	ok($firefox->find_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_link");
-	ok($firefox->find_class('container-fluid')->find_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_link");
+	ok($firefox->find('API', 'link text')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element when searching by link text");
+	ok($firefox->find('API', BY_LINK())->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element when searching by link text");
+	ok($firefox->list_by_link('API')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element with list_by_link");
+	ok($firefox->find_by_link('API')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element with find_by_link");
+	TODO: {
+		local $TODO = $major_version == 45 ? "Nested find_link can break for $major_version.$minor_version.$patch_version" : undef;
+		my $result;
+		eval {
+			$result = $firefox->find_by_class('container-fluid')->find_by_link('API')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx;
+		};
+		ok($result, "Correctly found nested element with find_by_link");
+	}
+	ok($firefox->find_link('API')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element with find_link");
+	TODO: {
+		local $TODO = $major_version == 45 ? "Nested find_link can break for $major_version.$minor_version.$patch_version" : undef;
+		my $result;
+		eval {
+			$result = $firefox->find_class('container-fluid')->find_link('API')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx;
+		};
+		ok($result, "Correctly found nested element with find_link");
+	}
 	$count = 0;
-	foreach my $element ($firefox->find_by_class('container-fluid')->list_by_link('API')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with list_by_link");
+	foreach my $element ($firefox->find_by_class('navbar navbar-default')->list_by_link('API')) {
+		ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found nested element with list_by_link");
 		$count += 1;
 	}
-	ok($count == 1, "Found elements with nested list_by_link:$count");
+	SKIP: {
+		if (($count == 0) && ($major_version < 50)) {
+			chomp $@;
+			diag("Nested list_by_link can break for $major_version.$minor_version.$patch_version:$@");
+			skip("Nested list_by_link can break for $major_version.$minor_version.$patch_version", 2);
+		}
+		ok($count == 1, "Found elements with nested list_by_link:$count");
+	}
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('container-fluid')->find_by_link('API')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_by_link");
+		ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found nested element with find_by_link");
 		$count += 1;
 	}
-	ok($count == 1, "Found elements with nested find_by_link:$count");
+	SKIP: {
+		if (($count == 0) && ($major_version < 50)) {
+			chomp $@;
+			diag("Nested find_by_link can break for $major_version.$minor_version.$patch_version:$@");
+			skip("Nested find_by_link can break for $major_version.$minor_version.$patch_version", 2);
+		}
+		ok($count == 1, "Found elements with nested find_by_link:$count");
+	}
 	$count = 0;
 	foreach my $element ($firefox->find_by_link('API')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found wantarray element with find_by_link");
+		ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found wantarray element with find_by_link");
 		$count += 1;
 	}
-	ok($count == 2, "Found elements with wantarray find_by_link:$count");
+	if (($count == 1) && ($major_version < 50)) {
+		SKIP: {
+			skip("Firefox $major_version.$minor_version.$patch_version does not correctly implement returning multiple elements for find_by_link", 2);
+		}
+	} else {
+		ok($count == 2, "Found elements with wantarray find_by_link:$count");
+	}
 	$count = 0;
 	foreach my $element ($firefox->find_link('API')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found wantarray element with find_link");
+		ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found wantarray element with find_link");
 		$count += 1;
 	}
-	ok($count == 2, "Found elements with wantarray find_by_link:$count");
-	ok($firefox->find('AP', 'partial link text')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by partial link text");
-	ok($firefox->find('AP', BY_PARTIAL())->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by partial link text");
-	ok($firefox->list_by_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with list_by_partial");
-	ok($firefox->find_by_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_by_partial");
-	ok($firefox->find_by_class('container-fluid')->find_by_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_by_partial");
-	ok($firefox->find_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_partial");
-	ok($firefox->find_class('container-fluid')->find_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_partial");
+	if (($count == 1) && ($major_version < 50)) {
+		SKIP: {
+			skip("Firefox $major_version.$minor_version.$patch_version does not correctly implement returning multiple elements for find_link", 2);
+		}
+	} else {
+		ok($count == 2, "Found elements with wantarray find_link:$count");
+	}
+	ok($firefox->find('AP', 'partial link text')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element when searching by partial link text");
+	ok($firefox->find('AP', BY_PARTIAL())->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element when searching by partial link text");
+	ok($firefox->list_by_partial('AP')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element with list_by_partial");
+	ok($firefox->find_by_partial('AP')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element with find_by_partial");
+	ok($firefox->find_by_class('container-fluid')->find_by_partial('AP')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found nested element with find_by_partial");
+	ok($firefox->find_partial('AP')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found element with find_partial");
+	ok($firefox->find_class('container-fluid')->find_partial('AP')->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found nested element with find_partial");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('container-fluid')->list_by_partial('AP')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with list_by_partial");
+		if ($count == 0) {
+			ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found nested element with list_by_partial");
+		}
 		$count +=1;
 	}
-	ok($count == 1, "Found elements with nested list_by_partial:$count");
+	if (($count == 2) && ($major_version < 50)) {
+		SKIP: {
+			skip("Firefox $major_version.$minor_version.$patch_version does not correctly implement returning multiple elements for list_by_partial", 1);
+		}
+	} else {
+		ok($count == 1, "Found elements with nested list_by_partial:$count");
+	}
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('container-fluid')->find_by_partial('AP')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_by_partial");
+		if ($count == 0) {
+			ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found nested element with find_by_partial");
+		}
 		$count +=1;
 	}
-	ok($count == 1, "Found elements with nested find_by_partial:$count");
+	if (($count == 2) && ($major_version < 50)) {
+		SKIP: {
+			skip("Firefox $major_version.$minor_version.$patch_version does not correctly implement returning multiple elements for find_by_partial", 1);
+		}
+	} else {
+		ok($count == 1, "Found elements with nested find_by_partial:$count");
+	}
 	$count = 0;
 	foreach my $element ($firefox->find_by_partial('AP')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found wantarray element with find_by_partial");
+		ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found wantarray element with find_by_partial");
 		$count +=1;
 	}
 	ok($count == 2, "Found elements with wantarray find_by_partial:$count");
 	$count = 0;
 	foreach my $element ($firefox->find_partial('AP')) {
-		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found wantarray element with find_partial");
+		ok($element->attribute('href') =~ /^https:\/\/fastapi[.]metacpan[.]org\/?$/smx, "Correctly found wantarray element with find_partial");
 		$count +=1;
 	}
 	ok($count == 2, "Found elements with wantarray find_partial:$count");
@@ -907,10 +1082,27 @@ SKIP: {
 	chomp $eval_string;
 	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_selected throws exception for bad parameters:$eval_string");
 	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
-	ok((!defined $firefox->find_id('search-input')->attribute('value')) && ($firefox->find_id('search-input')->property('value') eq ''), "Initial property and attribute values are empty for 'search-input'");
+	TODO: {
+		local $TODO = $major_version < 50 ? "property and attribute methods can have different values for empty" : undef;
+		ok((!defined $firefox->find_id('search-input')->attribute('value')) && ($firefox->find_id('search-input')->property('value') eq ''), "Initial property and attribute values are empty for 'search-input'");
+	}
 	ok($firefox->find('//input[@id="search-input"]')->send_keys('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
-	ok(!defined $firefox->find_id('search-input')->attribute('value'), "attribute for 'search-input' is still not defined ");
-	ok($firefox->find_id('search-input')->property('value') eq 'Test::More', "property for 'search-input' is now 'Test::More'");
+	TODO: {
+		local $TODO = $major_version < 50 ? "attribute method can have different values for empty" : undef;
+		ok(!defined $firefox->find_id('search-input')->attribute('value'), "attribute for 'search-input' is still not defined ");
+	}
+	my $property;
+	eval {
+		$property = $firefox->find_id('search-input')->property('value');
+	};
+	SKIP: {
+		if ((!$property) && ($major_version < 50)) {
+			chomp $@;
+			diag("The property method is not supported for $major_version.$minor_version.$patch_version:$@");
+			skip("The property method is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		ok($property eq 'Test::More', "property for 'search-input' is now 'Test::More'");
+	}
 	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
 	foreach my $element ($firefox->find_elements('//input[@id="search-input"]')) {
 		ok($firefox->send_keys($element, 'Test::More'), "Sent 'Test::More' to the 'search-input' field via the browser");
@@ -922,11 +1114,19 @@ SKIP: {
 	ok($text, "Read '$text' directly from 'Lucky' button");
 	my $tag_name = $firefox->find('//button[@name="lucky"]')->tag_name();
 	ok($tag_name, "'Lucky' button has a tag name of '$tag_name'");
-	my $rect = $firefox->find('//button[@name="lucky"]')->rect();
-	ok($rect->pos_x() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a X position of " . $rect->pos_x());
-	ok($rect->pos_y() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a Y position of " . $rect->pos_y());
-	ok($rect->width() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a width of " . $rect->width());
-	ok($rect->height() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a height of " . $rect->height());
+	my $rect;
+	eval {
+		$rect = $firefox->find('//button[@name="lucky"]')->rect();
+	};
+	SKIP: {
+		if (($major_version < 50) && (!defined $rect)) {
+			skip("Firefox $major_version does not appear to support the \$firefox->window_rect() method", 4);
+		}
+		ok($rect->pos_x() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a X position of " . $rect->pos_x());
+		ok($rect->pos_y() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a Y position of " . $rect->pos_y());
+		ok($rect->width() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a width of " . $rect->width());
+		ok($rect->height() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a height of " . $rect->height());
+	}
 	ok(((scalar $firefox->cookies()) >= 0), "\$firefox->cookies() shows cookies on " . $firefox->uri());
 	ok($firefox->delete_cookies() && ((scalar $firefox->cookies()) == 0), "\$firefox->delete_cookies() clears all cookies");
 	my $capabilities = $firefox->capabilities();
@@ -939,7 +1139,12 @@ SKIP: {
 	$handle->read($buffer, 20);
 	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->find('//button[\@name=\"lucky\"]')->selfie() returns a PNG file");
 	my $actual_digest = $firefox->selfie(hash => 1, highlights => [ $firefox->find('//button[@name="lucky"]') ]);
-	ok($actual_digest =~ /^[a-f0-9]+$/smx, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find('//button[\@name=\"lucky\"]') ]) returns a hex encoded SHA256 digest");
+	SKIP: {
+		if (($major_version < 50) && ($actual_digest !~ /^[a-f0-9]+$/smx)) {
+			skip("Firefox $major_version does not appear to support the hash parameter for the \$firefox->selfie method", 1);
+		}
+		ok($actual_digest =~ /^[a-f0-9]+$/smx, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find('//button[\@name=\"lucky\"]') ]) returns a hex encoded SHA256 digest");
+	}
 	$handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ]);
 	$buffer = undef;
 	$handle->read($buffer, 20);
@@ -960,6 +1165,7 @@ SKIP: {
 		}
 	}
 	ok($clicked, "Clicked the API link");
+        $firefox->sleep_time_in_ms(1_000);
 	ok($firefox->await(sub { $firefox->uri()->host() eq 'github.com' }), "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
 	while(!$firefox->loaded()) {
 		diag("Waiting for firefox to load after clicking on API link");
@@ -969,7 +1175,7 @@ SKIP: {
 	ok($cookies[0]->name() =~ /\w/, "The first cookie name is '" . $cookies[0]->name() . "'");
 	ok($cookies[0]->value() =~ /\w/, "The first cookie value is '" . $cookies[0]->value() . "'");
 	TODO: {
-		local $TODO = ($major_version < 56) ? "\$cookies[0]->expiry() does not function for Firefox versions less than 56" : q[];
+		local $TODO = ($major_version < 56) ? "\$cookies[0]->expiry() does not function for Firefox versions less than 56" : undef;
 		ok(defined $cookies[0]->expiry() && $cookies[0]->expiry() =~ /^\d+$/, "The first cookie name has an integer expiry date of '" . ($cookies[0]->expiry() || q[]) . "'");
 	}
 	ok($cookies[0]->http_only() =~ /^[01]$/, "The first cookie httpOnly flag is a boolean set to '" . $cookies[0]->http_only() . "'");
@@ -1036,16 +1242,45 @@ SKIP: {
 	ok($count == 1, "Downloaded 1 files:$count");
 
 	my $alert_text = 'testing alert';
-	$firefox->script(qq[alert('$alert_text')]);
-	ok($firefox->alert_text() eq $alert_text, "\$firefox->alert_text() correctly detects alert text");
-	ok($firefox->dismiss_alert(), "\$firefox->dismiss_alert() dismisses alert box");
+	SKIP: {
+		if ($major_version < 50) {
+			skip("Firefox $major_version may hang when executing \$firefox->script(qq[alert(...)])", 2);
+		}
+		$firefox->script(qq[alert('$alert_text')]);
+		ok($firefox->alert_text() eq $alert_text, "\$firefox->alert_text() correctly detects alert text");
+		ok($firefox->dismiss_alert(), "\$firefox->dismiss_alert() dismisses alert box");
+	}
 	$capabilities = $firefox->capabilities();
 	my $version = $capabilities->browser_version();
 	my ($major_version, $minor_version, $patch_version) = split /[.]/, $version;
 	ok($firefox->async_script(qq[prompt("Please enter your name", "John Cole");]), "Started async script containing a prompt");
-	ok($firefox->await(sub { $firefox->send_alert_text("Roland Grelewicz"); }), "\$firefox->send_alert_text() sends alert text:$@");
-	ok($firefox->accept_dialog(), "\$firefox->accept_dialog() accepts the dialog box");
-	ok($firefox->current_chrome_window_handle() =~ /^\d+$/, "Returned the current chrome window handle as an integer");
+	my $send_alert_text;
+	eval {
+		$send_alert_text = $firefox->await(sub { $firefox->send_alert_text("Roland Grelewicz"); });
+	};
+	SKIP: {
+		if (($major_version < 50) && (!defined $send_alert_text)) {
+			skip("Firefox $major_version does not appear to support the \$firefox->send_alert_text() method", 1);
+		}
+		ok($send_alert_text, "\$firefox->send_alert_text() sends alert text:$@");
+	}
+	my $accept_dialog;
+	eval {
+		$accept_dialog = $firefox->accept_dialog();
+	};
+	SKIP: {
+		if (($major_version < 50) && (!defined $accept_dialog)) {
+			skip("Firefox $major_version does not appear to support the \$firefox->send_alert_text() method", 1);
+		}
+		ok($accept_dialog, "\$firefox->accept_dialog() accepts the dialog box");
+	}
+	SKIP: {
+		if ((!$chrome_window_handle_supported) && ($major_version < 50)) {
+			diag("\$firefox->current_chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+			skip("\$firefox->current_chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+		}
+		ok($firefox->current_chrome_window_handle() =~ /^\d+$/, "Returned the current chrome window handle as an integer");
+	}
 	$capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	SKIP: {
@@ -1063,7 +1298,13 @@ SKIP: {
 		}
 		ok($capabilities->accept_insecure_certs() =~ /^(1|0)$/, "\$capabilities->accept_insecure_certs() is a boolean:" . $capabilities->accept_insecure_certs());
 	}
-	ok($capabilities->moz_process_id() =~ /^\d+$/, "\$capabilities->moz_process_id() is an integer:" . $capabilities->moz_process_id());
+	SKIP: {
+		if (!grep /^moz_process_id$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_process_id is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_process_id is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_process_id() =~ /^\d+$/, "\$capabilities->moz_process_id() is an integer:" . $capabilities->moz_process_id());
+	}
 	ok($capabilities->browser_name() =~ /^\w+$/, "\$capabilities->browser_name() is a string:" . $capabilities->browser_name());
 	ok($capabilities->rotatable() =~ /^(1|0)$/, "\$capabilities->rotatable() is a boolean:" . $capabilities->rotatable());
 	SKIP: {
@@ -1135,7 +1376,7 @@ SKIP: {
 		}
 		ok($result, "Refusing future connections");
 	}
-	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
+	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
 SKIP: {
@@ -1230,7 +1471,7 @@ SKIP: {
 			diag("No forking available for $^O");
 		}
 	}
-	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
+	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
 SKIP: {
@@ -1283,7 +1524,7 @@ SKIP: {
 		ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessibility_checks() is set to false");
 	}
 	ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
-	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
+	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
 SKIP: {
@@ -1303,10 +1544,16 @@ SKIP: {
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok(!$capabilities->moz_headless(), "\$capabilities->moz_headless() is set to false");
-	ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
-	ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
-	ok($capabilities->proxy()->https() eq 'proxy2.example.org:4343', "\$capabilities->proxy()->https() is 'proxy2.example.org:4343'");
-	ok($capabilities->proxy()->ftp() eq 'ftp2.example.org:2121', "\$capabilities->proxy()->ftp() is 'ftp2.example.org:2121'");
+	SKIP: {
+		if (!$capabilities->proxy()) {
+			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 4);
+		}
+		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
+		ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
+		ok($capabilities->proxy()->https() eq 'proxy2.example.org:4343', "\$capabilities->proxy()->https() is 'proxy2.example.org:4343'");
+		ok($capabilities->proxy()->ftp() eq 'ftp2.example.org:2121', "\$capabilities->proxy()->ftp() is 'ftp2.example.org:2121'");
+	}
 	SKIP: {
 		if ((exists $ENV{XAUTHORITY}) && (defined $ENV{XAUTHORITY}) && ($ENV{XAUTHORITY} =~ /xvfb/smxi)) {
 			skip("Unable to change firefox screen size when xvfb is running", 3);	
@@ -1345,8 +1592,8 @@ SKIP: {
 		alarm 0;
 		ok($maximise, "\$firefox->maximise()");
 	}
-	if ($^O eq 'MSWin32') {
-		ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
+	if (($^O eq 'MSWin32') || (!grep /^moz_process_id$/, $capabilities->enumerate())) {
+		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} else {
 		my @sig_nums  = split q[ ], $Config{sig_num};
 		my @sig_names = split q[ ], $Config{sig_name};

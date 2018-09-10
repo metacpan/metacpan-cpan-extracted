@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Regexp::Pattern;
 
-our $DATE = '2016-09-13'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -89,6 +89,7 @@ sub _process_module {
             push @pod, $patspec->{summary}, ".\n\n" if $patspec->{summary};
             push @pod, $self->_md2pod($patspec->{description})
                 if $patspec->{description};
+
             if ($patspec->{gen}) {
                 push @pod, "This is a dynamic pattern which will be generated on-demand.\n\n";
                 if ($patspec->{gen_args} && keys(%{$patspec->{gen_args}})) {
@@ -104,6 +105,49 @@ sub _process_module {
                     push @pod, "=back\n\n";
                 }
                 push @pod, "\n\n";
+            }
+
+          RENDER_EXAMPLES:
+            {
+                last unless $patspec->{examples};
+                my @eg;
+                for my $eg (@{ $patspec->{examples} }) {
+                    next unless $eg->{doc} // 1;
+                    push @eg, $eg;
+                }
+                last unless @eg;
+                push @pod, "Examples:\n\n";
+                for my $eg (@eg) {
+                    push @pod, " # $eg->{summary}\n" if defined $eg->{summary};
+
+                    push @pod, " ", dmp($eg->{str}), " =~ re(", dmp("$rp_package\::$patname"), ($eg->{gen_args} ? ", ".dmp($eg->{gen_args}) : ""), "); ";
+                    if (ref $eg->{matches} eq 'ARRAY') {
+                        if (@{ $eg->{matches} }) {
+                            push @pod, "# matches, ",
+                                join(", ", map {
+                                    "\$".($_+1)."=".dmp($eg->{matches}[$_])}
+                                     0..$#{$eg->{matches}});
+                        } else {
+                            push @pod, " # doesn't match";
+                        }
+                    } elsif (ref $eg->{matches} eq 'HASH') {
+                        if (keys %{ $eg->{matches} }) {
+                            push @pod, "# matches, ",
+                                join(", ", map {
+                                    "\$+{" . dmp($_) . "}=" . dmp($eg->{matches}{$_})}
+                                     sort keys %{$eg->{matches}});
+                        } else {
+                            push @pod, " # doesn't match";
+                        }
+                    } else {
+                        if ($eg->{matches}) {
+                            push @pod, " # matches";
+                        } else {
+                            push @pod, " # doesn't match";
+                        }
+                    }
+                    push @pod, "\n\n";
+                }
             }
         }
         push @pod, "=back\n\n";
@@ -152,7 +196,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2016-09-13.
+This document describes version 0.003 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -207,7 +251,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

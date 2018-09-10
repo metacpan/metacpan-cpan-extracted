@@ -25,6 +25,7 @@ t/bcor-sides.t
 t/beamer.t
 t/bidi-slides.t
 t/changes.t
+t/colophon.t
 t/compile-file.t
 t/compile-merged.t
 t/compile-with-fonts.t

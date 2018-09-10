@@ -70,10 +70,10 @@ sub update_all ( $self ) {
 
         undef $TLD;
 
-        say 'done';
+        say $res;
     }
     else {
-        say 'error';
+        say $res;
 
         return 0;
     }
@@ -126,10 +126,10 @@ sub update_all ( $self ) {
 
         undef $PUB_SUFFIX;
 
-        say 'done';
+        say $res;
     }
     else {
-        say 'error';
+        say $res;
 
         return 0;
     }
@@ -174,11 +174,11 @@ sub to_string ($self) {
 }
 
 sub _build_name_utf8 ($self) {
-    return domain_to_utf8( $self->name );
+    return domain_to_utf8( $self->{name} );
 }
 
 sub _build_is_ip ($self) {
-    if ( $self->name && ( $self->is_ipv4 || $self->is_ipv6 ) ) {
+    if ( $self->{name} && ( $self->is_ipv4 || $self->is_ipv6 ) ) {
         return 1;
     }
     else {
@@ -187,7 +187,7 @@ sub _build_is_ip ($self) {
 }
 
 sub _build_is_ipv4 ($self) {
-    if ( $self->name && AnyEvent::Socket::parse_ipv4( $self->name ) ) {
+    if ( $self->{name} && AnyEvent::Socket::parse_ipv4( $self->{name} ) ) {
         return 1;
     }
     else {
@@ -196,7 +196,7 @@ sub _build_is_ipv4 ($self) {
 }
 
 sub _build_is_ipv6 ($self) {
-    if ( $self->name && AnyEvent::Socket::parse_ipv6( $self->name ) ) {
+    if ( $self->{name} && AnyEvent::Socket::parse_ipv6( $self->{name} ) ) {
         return 1;
     }
     else {
@@ -205,7 +205,7 @@ sub _build_is_ipv6 ($self) {
 }
 
 sub _build_is_domain ($self) {
-    return 0 if $self->name eq q[];
+    return 0 if $self->{name} eq q[];
 
     return $self->is_ip ? 0 : 1;
 }
@@ -213,7 +213,7 @@ sub _build_is_domain ($self) {
 sub _build_is_valid ($self) {
     return 1 if $self->is_ip;
 
-    if ( my $name = $self->name ) {
+    if ( my $name = $self->{name} ) {
         return 0 if bytes::length($name) > 255;    # max length is 255 octets
 
         return 0 if $name =~ /[^[:alnum:]._-]/sm;  # allowed chars
@@ -236,7 +236,7 @@ sub _build_is_valid ($self) {
 sub _build_is_tld ($self) {
     return 0 unless $self->is_domain;
 
-    return $self->tld eq $self->name ? 1 : 0;
+    return $self->tld eq $self->{name} ? 1 : 0;
 }
 
 sub _build_tld ($self) {
@@ -244,7 +244,7 @@ sub _build_tld ($self) {
         return q[];
     }
     else {
-        return substr $self->name, rindex( $self->name, q[.] ) + 1;
+        return substr $self->{name}, rindex( $self->{name}, q[.] ) + 1;
     }
 }
 
@@ -257,7 +257,7 @@ sub _build_tld_is_valid ($self) {
 }
 
 sub _build_canon ($self) {
-    my $name = $self->name;
+    my $name = $self->{name};
 
     substr $name, 0, 4, q[] if $name && index( $name, 'www.' ) == 0;
 
@@ -271,7 +271,7 @@ sub _build_canon_utf8 ($self) {
 sub _build_is_pub_suffix ($self) {
     return 0 unless $self->is_domain;
 
-    return length( $self->pub_suffix ) == length( $self->name ) ? 1 : 0;
+    return length( $self->pub_suffix ) == length( $self->{name} ) ? 1 : 0;
 }
 
 # A public suffix is a set of DNS names or wildcards concatenated with dots.
@@ -284,7 +284,7 @@ sub _build_pub_suffix ($self) {
 
     my $pub_suffix;
 
-    if ( my $name = $self->name ) {
+    if ( my $name = $self->{name} ) {
         if ( exists $pub_suffixes->{$name} ) {
             $pub_suffix = $name;
         }
@@ -334,7 +334,7 @@ sub _build_pub_suffix_utf8 ($self) {
 sub _build_is_root_domain ($self) {
     return 0 unless $self->is_domain;
 
-    return length( $self->root_domain ) eq length( $self->name ) ? 1 : 0;
+    return length( $self->root_domain ) eq length( $self->{name} ) ? 1 : 0;
 }
 
 sub _build_root_domain ($self) {

@@ -39,5 +39,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/juliensobrier/Net-Google-SafeBrowsing4.git
-version: '0.7'
+version: '0.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

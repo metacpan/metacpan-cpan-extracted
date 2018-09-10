@@ -40,6 +40,17 @@ my %uris = (
 		domain.com/?source=3Demail
 		domain.com/
 	)},
+	# Empty query string
+	'http://www.domain.com/first/second?' =>  { map { $_ => 1 } qw(
+		www.domain.com/first/second?
+		www.domain.com/first/second
+		www.domain.com/first/
+		www.domain.com/
+		domain.com/first/second?
+		domain.com/first/second
+		domain.com/first/
+		domain.com/
+	)},
 );
 
 foreach my $uri (keys(%uris)) {

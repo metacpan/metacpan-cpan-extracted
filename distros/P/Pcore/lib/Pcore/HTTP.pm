@@ -5,6 +5,7 @@ use Pcore::Util::Scalar qw[is_ref is_glob is_plain_coderef is_blessed_ref is_cod
 use Pcore::Handle qw[:ALL];
 use Pcore::HTTP::Response;
 use Pcore::HTTP::Cookies;
+use Pcore::API::Proxy qw[:PROXY_TYPE];
 
 our $EXPORT = {
     METHODS => [],
@@ -79,8 +80,8 @@ for my $method ( keys $HTTP_METHODS->%* ) {
 PERL
 
     # create alias for export
-    no strict qw[refs];
     *{"http_$sub_name"} = \&{$sub_name};
+
     push $EXPORT->{METHODS}->@*, "http_$sub_name";
 }
 
@@ -159,7 +160,7 @@ sub request {
         tls_ctx         => $TLS_CTX_HIGH,
         bind_ip         => undef,
         read_size       => undef,
-        proxy           => undef,
+        proxy           => undef,           # string or InstanceOf['Pcore::API::Proxy']
 
         headers => undef,
         data    => undef,
@@ -172,7 +173,7 @@ sub request {
     );
 
     # parse url
-    $args{url} = P->uri( $args{url}, base => 'http://', authority => 1 ) if !is_ref $args{url};
+    $args{url} = P->uri( $args{url}, base => 'http://' ) if !is_ref $args{url};
 
     # proxy connections can't be persistent
     # TODO use proxy "persistent" attr
@@ -257,12 +258,11 @@ sub _request ($args) {
     while () {
 
         # validate url
-        $res->set_status( $HANDLE_STATUS_PROTOCOL_ERROR, q[Invalid url scheme] ) || last if !$res->{url}->is_http;
+        $res->set_status( $HANDLE_STATUS_PROTOCOL_ERROR, q[Invalid url scheme] ) || last if !$res->{url}->{is_http};
 
-        # connect
-        my $h = P->handle(
-            $res->{url},
-            persistent      => $args->{persistent},
+        my $h;
+
+        my @connect_args = (
             connect_timeout => $args->{connect_timeout},
             timeout         => $args->{timeout},
             tls_ctx         => $args->{tls_ctx},
@@ -270,11 +270,25 @@ sub _request ($args) {
             defined $args->{read_size} ? ( read_size => $args->{read_size} ) : (),
         );
 
+        # connect
+        if ( defined $args->{proxy} ) {
+            $args->{proxy} = Pcore::API::Proxy->new( $args->{proxy} ) if !is_ref $args->{proxy};
+
+            $h = $args->{proxy}->connect( $res->{url}, @connect_args );
+        }
+        else {
+            $h = P->handle(
+                $res->{url},
+                persistent => $args->{persistent},
+                @connect_args
+            );
+        }
+
         # connect error
         $res->set_status( $h->{status}, $h->{reason} ) || last if !$h;
 
         # start TLS, only if TLS is required and TLS is not established yet
-        if ( $res->{url}->is_secure && !$h->{tls} ) {
+        if ( $res->{url}->{is_secure} && !$h->{tls} ) {
             $h->starttls;
 
             # start TLS error
@@ -291,7 +305,9 @@ sub _request ($args) {
         _read_headers( $h, $args, $res ) || last;
 
         # read response data
-        _read_data( $h, $args, $res ) || last;
+        if ( $args->{method} ne 'HEAD' ) {
+            _read_data( $h, $args, $res ) || last;
+        }
 
         # TODO process persistent
 
@@ -332,14 +348,18 @@ sub _request ($args) {
     return $res;
 }
 
-# TODO use uri method to get request path
 sub _write_headers ( $h, $args, $res ) {
     my $request_path;
-
-    # TODO use uri method to get request path
-    $request_path = $res->{url}->path->to_uri . ( $res->{url}->query ? q[?] . $res->{url}->query : q[] );
-
     my $headers = q[];
+
+    if ( $h->{proxy_type} && $h->{proxy_type} == $PROXY_TYPE_HTTP ) {
+        $request_path = $res->{url}->{to_string};
+
+        $headers .= 'Proxy-Authorization:Basic ' . $h->{proxy}->{uri}->userinfo_b64 . $CRLF if $h->{proxy}->{uri}->{userinfo};
+    }
+    else {
+        $request_path = $res->{url}->path_query;
+    }
 
     # add "Host" header
     $headers .= 'Host:' . $res->{url}->host->name . $CRLF if !$args->{norm_headers}->{host};
@@ -363,11 +383,6 @@ sub _write_headers ( $h, $args, $res ) {
     if ( !$args->{persistent} ) {
         $headers .= 'Connection:close' . $CRLF;
     }
-
-    # TODO delete $args->{headers}->{PROXY_AUTHORIZATION};
-    # if ( $runtime->{h}->{proxy_type} && $runtime->{h}->{proxy_type} == $PROXY_TYPE_HTTP && $runtime->{h}->{proxy}->{uri}->userinfo ) {
-    #     $headers .= 'Proxy-Authorization:Basic ' . $runtime->{h}->{proxy}->{uri}->userinfo_b64 . $CRLF;
-    # }
 
     if ( $args->{cookies} && ( my $cookies = $args->{cookies}->get_cookies( $res->{url} ) ) ) {
         $headers .= 'Cookie:' . join( ';', $cookies->@* ) . $CRLF;
@@ -699,20 +714,20 @@ sub _get_on_progress_cb (%args) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 75                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 76                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 96                   | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 97                   | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 138                  | * Subroutine "request" with high complexity score (22)                                                         |
-## |      | 251                  | * Subroutine "_request" with high complexity score (21)                                                        |
-## |      | 476                  | * Subroutine "_read_data" with high complexity score (47)                                                      |
+## |      | 139                  | * Subroutine "request" with high complexity score (22)                                                         |
+## |      | 252                  | * Subroutine "_request" with high complexity score (25)                                                        |
+## |      | 491                  | * Subroutine "_read_data" with high complexity score (47)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 89                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 90                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 124                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 125                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 211                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 212                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

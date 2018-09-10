@@ -8,7 +8,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.137',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.143',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -42,7 +42,7 @@ do { my $x = {
                                       'Dist::Zilla' => '4.300039',
                                       'Dist::Zilla::Role::MetaProvider' => '0',
                                       'Dist::Zilla::Role::PrereqSource' => '0',
-                                      'Git::Wrapper' => '0.035',
+                                      'Git::Wrapper' => '0.038',
                                       'List::Util' => '1.33',
                                       'List::UtilsBy' => '0.04',
                                       'Moose' => '0',
@@ -65,6 +65,7 @@ do { my $x = {
                    'requires' => {
                                    'Exporter' => '5.57',
                                    'File::Spec' => '0',
+                                   'Git::Wrapper' => '0.038',
                                    'Module::Metadata' => '0',
                                    'Sort::Versions' => '0',
                                    'Test::DZil' => '0',
@@ -158,7 +159,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::UploadToCPAN' => '0',
                                            'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
                                            'Dist::Zilla::PluginBundle::Author::ETHER' => '0.103',
-                                           'Dist::Zilla::PluginBundle::Git::VersionManager' => '0',
+                                           'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
                                            'Software::License::Perl_5' => '0'
                                          }
                          }

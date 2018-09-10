@@ -1,3 +1,10 @@
+0.580   2018-09-10 (PERLANCAR)
+
+        - No functional changes.
+
+	- [dist] Remove unused module List::MoreUtils.
+
+
 0.57    2017-07-14 (PERLANCAR)
 
 	- [Bugfix] Test *before* unlinking temporary output file, not

@@ -1,5 +1,5 @@
 package Log::Log4perl::Shortcuts ;
-$Log::Log4perl::Shortcuts::VERSION = '0.011';
+$Log::Log4perl::Shortcuts::VERSION = '0.012';
 use 5.10.0;
 use Carp;
 use Log::Log4perl;
@@ -188,7 +188,7 @@ Log::Log4perl::Shortcuts - shortcut functions to make log4perl even easier
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 OVERVIEW
 

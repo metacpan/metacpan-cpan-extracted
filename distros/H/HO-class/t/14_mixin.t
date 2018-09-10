@@ -16,6 +16,8 @@
 
 ; use HO::mixin 'HOt::mixin::One'
 
+; use HO::class
+
 ; package HOt::Rapper
 
 ; use parent -norequire => 'HOt::Dandy'

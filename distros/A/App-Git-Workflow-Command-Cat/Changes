@@ -1,5 +1,17 @@
 Revision history for App-Git-Workflow-Command-Cat
 
+0.3   2018-09-09
+        Updating for release of version 0.3
+        Added perl 5.26 to travis build (Ivan Wills)
+        Adding Module::Build to requirements (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added lock file to be ignored (Ivan Wills)
+        Added .vtdie.yml to be ignored (Ivan Wills)
+        Removing perl 5.8 as git-workflow doesn't support it any more (Ivan Wills)
+        Adding vtide config (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
 0.2   2015-08-12
         Updating for release of version 0.2
         Removed creation of makefile (Ivan Wills)

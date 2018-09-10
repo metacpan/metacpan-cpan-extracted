@@ -1,3 +1,9 @@
+0.02 2018-09-10
+
+ - Improve POD: typos, links, synopsis, etc.
+ - Improve basic example with PwnedError check
+ - Expand tests to check both exception object and message
+
 0.01 2018-07-26
 
  - Test versions of all modules

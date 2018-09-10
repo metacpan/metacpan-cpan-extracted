@@ -7,7 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/HO/class.pm',
   'PREREQ_PM' => {
                    'Class::ISA' => '0.20',
-                   'Package::Subroutine' => '0.022000',
+                   'Package::Subroutine' => '0.022',
                    'Test::AbstractMethod' => 0,
                    'Test::Exception' => 0,
                    'Test::More' => 0

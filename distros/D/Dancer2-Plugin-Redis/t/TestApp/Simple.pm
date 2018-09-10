@@ -4,7 +4,7 @@ use strictures 1;
 #
 # This file is part of Dancer2-Plugin-Redis
 #
-# This software is Copyright (c) 2016 by BURNERSK <burnersk@cpan.org>.
+# This software is Copyright (c) 2018 by BURNERSK <burnersk@cpan.org>.
 #
 # This is free software, licensed under:
 #
@@ -18,10 +18,13 @@ BEGIN {
 use Dancer2;
 use Plack::Builder;
 use Dancer2::Plugin::Redis;
+use Safe::Isa;
 
 ############################################################################
 
-get q{/} => sub { 'Hello World' };
+get q{/} => sub {
+    redis_plugin->_redis->$_can('get') && return 'Hello World';
+};
 
 get q{/set} => sub {
   no warnings 'uninitialized';

@@ -1,0 +1,81 @@
+NAME
+    Test::Regexp::Pattern - Test Regexp::Pattern patterns
+
+VERSION
+    This document describes version 0.003 of Test::Regexp::Pattern (from
+    Perl distribution Test-Regexp-Pattern), released on 2018-09-10.
+
+SYNOPSIS
+    To check all regexp patterns in a module:
+
+     use Test::Regexp::Patterns tests=>1;
+     regexp_patterns_in_module_ok("Foo::Bar", {opt => ...}, $msg);
+
+    Alternatively, you can check all regexp patterns in all modules in a
+    distro:
+
+     # save in release-regexp-pattern.t, put in distro's t/ subdirectory
+     use Test::More;
+     plan skip_all => "Not release testing" unless $ENV{RELEASE_TESTING};
+     eval "use Test::Regexp::Pattern";
+     plan skip_all => "Test::Regexp::Pattern required for testing Regexp::Pattern patterns" if $@;
+     regexp_patterns_in_all_modules_ok({opt => ...}, $msg);
+
+DESCRIPTION
+    This module performs various checks on a module's Regexp::Pattern
+    patterns. It is recommended that you include something like
+    "release-regexp-pattern.t" in your distribution if you add regexp
+    patterns to your code. If you use Dist::Zilla to build your
+    distribution, there is [Test::Regexp::Pattern] to make it easy to do so.
+
+ACKNOWLEDGEMENTS
+    Some code taken from Test::Pod::Coverage by Andy Lester.
+
+FUNCTIONS
+    All these functions are exported by default.
+
+  regexp_patterns_in_module_ok($module [, \%opts ] [, $msg])
+    Load $module and perform test for regexp patterns (%RE) in the module.
+
+    Available options:
+
+    *   test_examples => bool (default: 1)
+
+  regexp_patterns_in_all_modules_ok([ \%opts ] [, $msg])
+    Look for modules in directory "lib" (or "blib" instead, if it exists),
+    and run "regexp_patterns_in_module_ok()" against each of them.
+
+    Options are the same as in "regexp_patterns_in_module_ok()".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Regexp-Pattern>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Regexp-Pattern>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Regexp-Pattern>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    test-regexp-pattern, a command-line interface for
+    "regexp_patterns_in_all_modules_ok()".
+
+    Regexp::Pattern
+
+    Dist::Zilla::Plugin::Test::Regexp::Pattern
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

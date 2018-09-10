@@ -1,5 +1,9 @@
 Revision history for HO-class
 
+0.078 - 2018-09-10
+* homepage update - ho development has it's own org
+* mixins are worky
+
 0.077 - 2018-09-05
 * add our to %classes declaration in HO::accessor::import
 * start HO::mixin helper

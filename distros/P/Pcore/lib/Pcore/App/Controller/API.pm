@@ -1,7 +1,7 @@
 package Pcore::App::Controller::API;
 
 use Pcore -role, -const;
-use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor from_uri_query];
+use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::WebSocket::pcore;
 
@@ -23,14 +23,15 @@ sub run ( $self, $req ) {
     if ( $req->is_websocket_connect_request ) {
 
         # create connection and accept websocket connect request
-        Pcore::WebSocket::pcore->new(
+        my $h = Pcore::WebSocket::pcore->accept(
+            $req,
             max_message_size => $WS_MAX_MESSAGE_SIZE,
             compression      => $WS_COMPRESSION,
             on_auth          => sub ( $h, $token ) {
                 return $self->{app}->{api}->authenticate($token);
             },
-            on_subscribe => sub ( $h, $event ) {
-                return $self->on_subscribe_event( $h, $event );
+            on_bind => sub ( $h, $binding ) {
+                return $self->on_bind( $h, $binding );
             },
             on_event => sub ( $h, $ev ) {
                 return $self->on_event( $h, $ev );
@@ -40,7 +41,7 @@ sub run ( $self, $req ) {
 
                 return;
             }
-        )->accept($req);
+        );
     }
 
     # HTTP API request
@@ -113,13 +114,11 @@ sub run ( $self, $req ) {
 sub _http_api_router ( $self, $auth, $data, $cb ) {
     my $response;
 
-    my $cv = AE::cv sub {
+    my $cv = P->cv->begin( sub {
         $cb->($response);
 
         return;
-    };
-
-    $cv->begin;
+    } );
 
     for my $tx ( is_plain_arrayref $data ? $data->@* : $data ) {
         next if !$tx->{type};

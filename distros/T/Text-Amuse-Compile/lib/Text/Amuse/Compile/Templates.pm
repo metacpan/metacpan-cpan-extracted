@@ -224,16 +224,45 @@ sub html {
   <hr />
   [% IF doc.wants_postamble %]
   <div id="impressum">
+
+    [% IF doc.header_defined.seriesname %]
+    [% IF doc.header_defined.seriesnumber %]
+    <div class="amw-impressum amw-text-series" id="amw-impressum-series">
+    [% doc.header_as_html.seriesname %] [% doc.header_as_html.seriesnumber %]
+    </div>
+    [% END %]
+    [% END %]
+
     [% IF doc.header_defined.source %]
-    <div class="amw-text-source" id="source">
+    <div class="amw-impressum amw-text-source" id="source">
     [% doc.header_as_html.source %]
     </div>
     [% END %]
     [% IF doc.header_defined.notes %]
-    <div class="amw-text-notes" id="notes">
+    <div class="amw-impressum amw-text-notes" id="notes">
     [% doc.header_as_html.notes %]
     </div>
     [% END %]
+
+    [% IF doc.header_defined.rights %]
+    <div class="amw-impressum amw-text-rights" id="amw-impressum-rights">
+    [% doc.header_as_html.rights %]
+    </div>
+    [% END %]
+
+    [% IF doc.header_defined.isbn %]
+    <div class="amw-impressum amw-text-isbn" id="amw-impressum-isbn">
+    ISBN [% doc.header_as_html.isbn %]
+    </div>
+    [% END %]
+
+    [% IF doc.header_defined.publisher %]
+    <div class="amw-impressum amw-text-publisher" id="amw-impressum-publisher">
+    [% doc.header_as_html.publisher %]
+    </div>
+    [% END %]
+
+
   </div>
   [% END %]
 </div>
@@ -529,6 +558,14 @@ p.fnline, p.secondary-fnline {
 }
 
 /* end footnotes */
+
+div.amw-impressum {
+    margin-top: 1em;
+}
+
+div.amw-impressum-container {
+    margin-top: 10em;
+}
 
 EOF
     return \$css;
@@ -885,6 +922,7 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 [% ELSE %]
   \begin{titlepage}
 [% END %]
+
   \strut\vskip 2em
   \begin{center}
 [% IF doc.wants_preamble %]
@@ -901,6 +939,7 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 [% ELSE %]
 \strut
 [% END %]
+
 [% UNLESS safe_options.nocoverpage %]
    [% IF safe_options.cover %]
       \vskip 3em
@@ -908,6 +947,7 @@ pdfkeywords={[% tex_metadata.keywords %]}%
    [% END %]
    \vfill
 [% END %]
+
 [% IF doc.wants_preamble %]
   [% IF doc.header_defined.date %]
   {\usekomafont{date}{[% doc.header_as_latex.date %]\par}}%
@@ -915,26 +955,56 @@ pdfkeywords={[% tex_metadata.keywords %]}%
     \strut\par
   [% END %]
 [% ELSE %]
-\strut
+  \strut
 [% END %]
+
   \end{center}
+
 [% IF safe_options.nocoverpage %]
   \vskip 3em
   \par
 [% ELSE %]
-  \end{titlepage}
-[% IF safe_options.impressum %]
-[% IF doc.header_defined.notes %]
-% impressum
-\thispagestyle{empty}
-\strut
-\vfill
-\begin{footnotesize}
-\noindent [% doc.header_as_latex.notes %]
-\end{footnotesize}
-[% END %]
-[% END %]
-\cleardoublepage
+     \end{titlepage}
+     [% IF safe_options.impressum %]
+          % impressum
+          \thispagestyle{empty}
+          \begin{center}
+          \begin{small}
+          \strut
+          \vfill
+
+               [% IF doc.header_defined.seriesname %]
+               [% IF doc.header_defined.seriesnumber %]
+                  [% doc.header_as_latex.seriesname %] [% doc.header_as_latex.seriesnumber %]
+                  \vfill
+               [% END %]
+               [% END %]
+
+               [% IF doc.header_defined.notes %]
+                  [% doc.header_as_latex.notes %]
+                  \bigskip
+               [% END %]
+
+               [% IF doc.header_defined.rights %]
+                 [% doc.header_as_latex.rights %]
+                 \bigskip
+               [% END %]
+
+               [% IF doc.header_defined.isbn %]
+                 ISBN [% doc.header_as_latex.isbn %]
+                 \bigskip
+               [% END %]
+
+               [% IF doc.header_defined.publisher %]
+                 [% doc.header_as_latex.publisher %]
+                 \bigskip
+               [% END %]
+
+          \strut
+          \end{small}
+          \end{center}
+     [% END %]
+     \cleardoublepage
 [% END %]
 
 [% IF safe_options.wants_toc %]
@@ -1006,7 +1076,31 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 [% IF doc.wants_postamble %]
 [% doc.header_as_latex.source     %]
    [% UNLESS safe_options.impressum  %]
-[% doc.header_as_latex.notes      %]
+
+       [% IF doc.header_defined.seriesname %]
+       [% IF doc.header_defined.seriesnumber %]
+         \noindent [% doc.header_as_latex.seriesname %] [% doc.header_as_latex.seriesnumber %]
+       [% END %]
+       [% END %]
+
+       [% IF doc.header_defined.notes %]
+         [% doc.header_as_latex.notes %]
+       [% END %]
+
+       [% IF doc.header_defined.rights %]
+         [% doc.header_as_latex.rights %]
+         \bigskip
+       [% END %]
+
+       [% IF doc.header_defined.isbn %]
+         ISBN [% doc.header_as_latex.isbn %]
+         \bigskip
+       [% END %]
+
+       [% IF doc.header_defined.publisher %]
+         [% doc.header_as_latex.publisher %]
+         \bigskip
+       [% END %]
    [% END %]
 [% ELSE %]
 \strut

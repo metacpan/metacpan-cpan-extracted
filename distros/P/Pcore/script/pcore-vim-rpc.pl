@@ -7,7 +7,7 @@ use Pcore::Util::Data qw[from_json to_json];
 use Pcore::Util::Text qw[decode_utf8 encode_utf8];
 use Pcore::Src::File;
 
-my $cv = AE::cv;
+my $cv = P->cv;
 
 AnyEvent::Socket::tcp_server( '127.0.0.1', 55_555, Coro::unblock_sub { on_accept(@_) } );
 

@@ -5,14 +5,16 @@ use Pcore::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
 use Pcore::App::API;
+use Pcore::CDN;
 
-has app_cfg => ( required => 1, isa => HashRef );
-has devel   => ( default  => 0, isa => Bool );
+has app_cfg => ( required => 1 );    # HashRef
+has devel => 0;                      # Bool
 
-has server => ( isa => InstanceOf ['Pcore::HTTP::Server'], init_arg => undef );
-has router => ( isa => InstanceOf ['Pcore::App::Router'],  init_arg => undef );
-has api => ( isa => Maybe [ ConsumerOf ['Pcore::App::API'] ], init_arg => undef );
-has node => ();    # InstanceOf ['Pcore::Node']
+has server => ( init_arg => undef ); # InstanceOf ['Pcore::HTTP::Server']
+has router => ( init_arg => undef ); # InstanceOf ['Pcore::App::Router']
+has api    => ( init_arg => undef ); # Maybe [ ConsumerOf ['Pcore::App::API'] ]
+has node   => ( init_arg => undef ); # InstanceOf ['Pcore::Node']
+has cdn    => ( init_arg => undef ); # InstanceOf['Pcore::CDN']
 
 sub BUILD ( $self, $args ) {
 
@@ -25,6 +27,9 @@ sub BUILD ( $self, $args ) {
         hosts => $self->{app_cfg}->{router},
     } );
 
+    # create CDN object
+    $self->{cdn} = Pcore::CDN->new( $self->{cfg}->{cdn} ) if $self->{cfg}->{cdn};
+
     # create API object
     $self->{api} = Pcore::App::API->new($self);
 
@@ -36,37 +41,63 @@ sub get_default_locale ( $self, $req ) {
 }
 
 around run => sub ( $orig, $self ) {
-    if ( $self->{api} ) {
 
-        # connect api
-        my $res = $self->{api}->init;
+    # create node
+    # TODO when to use node???
+    if (1) {
+        require Pcore::Node;
 
-        say 'API initialization ... ' . $res;
+        my $node_req = ${ ref($self) . '::NODE_REQUIRES' };
 
-        exit 3 if !$res;
+        my $requires = defined $node_req ? { $node_req->%* } : {};
+
+        $requires->{'Pcore::App::API::Node'} = undef if $self->{app_cfg}->{api}->{connect};
+
+        $self->{node} = Pcore::Node->new( {
+            type     => ref $self,
+            requires => $requires,
+            server   => $self->{app_cfg}->{node}->{server},
+            listen   => $self->{app_cfg}->{node}->{listen},
+            on_event => do {
+                if ( $self->can('NODE_ON_EVENT') ) {
+                    sub ( $node, $ev ) {
+                        $self->NODE_ON_EVENT($ev);
+
+                        return;
+                    };
+                }
+            },
+            on_rpc => do {
+                if ( $self->can('NODE_ON_RPC') ) {
+                    sub ( $node, $req, $tx ) {
+                        $self->NODE_ON_RPC( $req, $tx );
+
+                        return;
+                    };
+                }
+            },
+        } );
     }
-    else {
 
-        # die if API controller found, but no API server provided
-        die q[API is required] if $self->{router}->{host_api_path} && !$self->{api};
-    }
+    # connect api
+    my $res = $self->{api}->init;
+    say 'API initialization ... ' . $res;
+    exit 3 if !$res;
 
     # scan HTTP controllers
     print 'Scanning HTTP controllers ... ';
     $self->{router}->init;
     say 'done';
 
-    my $res = $self->$orig;
+    $res = $self->$orig;
     exit 3 if !$res;
 
     # start HTTP server
     if ( defined $self->{app_cfg}->{server}->{listen} ) {
         $self->{server} = Pcore::HTTP::Server->new( {
             $self->{app_cfg}->{server}->%*,    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
-            app => $self->{router}
+            on_request => $self->{router}
         } );
-
-        $self->{server}->run;
 
         say qq[Listen: $self->{app_cfg}->{server}->{listen}];
     }
@@ -88,11 +119,11 @@ sub nginx_cfg ($self) {
     my $params = {
         name              => lc( ref $self ) =~ s/::/-/smgr,
         data_dir          => $ENV->{DATA_DIR},
-        www_root_dir      => $www_storage ? $www_storage->[0] : undef,       # TODO
-        default_server    => 1,                                              # generate default server config
+        www_root_dir      => $www_storage ? $www_storage->[0] : undef,                                   # TODO
+        default_server    => 1,                                                                          # generate default server config
         nginx_default_key => $ENV->{share}->get('data/nginx/default.key'),
         nginx_default_pem => $ENV->{share}->get('data/nginx/default.pem'),
-        upstream          => $self->{app_cfg}->{server}->{listen},
+        upstream          => P->uri( $self->{app_cfg}->{server}->{listen} )->to_nginx_upstream_server,
     };
 
     for my $host ( keys $self->{router}->{_path_class_cache}->%* ) {
@@ -112,6 +143,8 @@ sub nginx_cfg ($self) {
 
             push $params->{host}->{$host_name}->{location}->@*, $ctrl->get_nginx_cfg;
         }
+
+        push $params->{host}->{$host_name}->{location}->@*, $self->{cdn}->get_nginx_cfg if defined $self->{cdn};
     }
 
     return P->tmpl->new->render( $self->{app_cfg}->{server}->{ssl} ? 'nginx/host_conf.nginx' : 'nginx/host_conf_no_ssl.nginx', $params );

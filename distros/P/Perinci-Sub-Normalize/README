@@ -1,35 +1,65 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::Normalize - Normalize Rinci function metadata
 
+VERSION
+    This document describes version 0.200 of Perinci::Sub::Normalize (from
+    Perl distribution Perinci-Sub-Normalize), released on 2018-09-10.
+
+SYNOPSIS
      use Perinci::Sub::Normalize qw(normalize_function_metadata);
-    
+
      my $nmeta = normalize_function_metadata($meta);
 
 FUNCTIONS
-
- normalize_function_metadata($meta[ , \%opts ]) => HASH
-
+  normalize_function_metadata($meta[ , \%opts ]) => HASH
     Normalize and check Rinci function metadata $meta. Return normalized
     metadata, which is a shallow copy of $meta. Die on error.
 
     Available options:
 
-      * allow_unknown_properties => BOOL (default: 0)
+    *   allow_unknown_properties => BOOL (default: 0)
 
-      If set to true, will die if there are unknown properties.
+        If set to true, will die if there are unknown properties.
 
-      * normalize_sah_schemas => BOOL (default: 1)
+    *   normalize_sah_schemas => BOOL (default: 1)
 
-      By default, Sah schemas e.g. in result/schema or args/*/schema
-      property is normalized using Data::Sah's normalize_schema. Set this
-      to 0 if you don't want this.
+        By default, Sah schemas e.g. in "result/schema" or "args/*/schema"
+        property is normalized using Data::Sah's "normalize_schema". Set
+        this to 0 if you don't want this.
 
-      * remove_internal_properties => BOOL (default: 0)
+    *   remove_internal_properties => BOOL (default: 0)
 
-      If set to 1, all properties and attributes starting with underscore
-      (_) with will be stripped. According to DefHash specification, they
-      are ignored and usually contain notes/comments/extra information.
+        If set to 1, all properties and attributes starting with underscore
+        ("_") with will be stripped. According to DefHash specification,
+        they are ignored and usually contain notes/comments/extra
+        information.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-Normalize>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-Normalize>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Normalize
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Rinci::function
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -26,18 +26,18 @@ WriteMakefile(
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
         'File::ShareDir'       => '1.114',
-        'Map::Tube'            => '3.55',
+        'Map::Tube'            => '3.56',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Madrid-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Madrid'            => { file => 'lib/Map/Tube/Madrid.pm'        ,  version => '0.17' },
-            'Map::Tube::Madrid::Line::L1'  => { file => 'lib/Map/Tube/Madrid/Line/L1.pm',  version => '0.17' },
-            'Map::Tube::Madrid::Line::L3'  => { file => 'lib/Map/Tube/Madrid/Line/L3.pm',  version => '0.17' },
-            'Map::Tube::Madrid::Line::L5'  => { file => 'lib/Map/Tube/Madrid/Line/L5.pm',  version => '0.17' },
-            'Map::Tube::Madrid::Line::L11' => { file => 'lib/Map/Tube/Madrid/Line/L11.pm', version => '0.17' },
+            'Map::Tube::Madrid'            => { file => 'lib/Map/Tube/Madrid.pm'        ,  version => '0.18' },
+            'Map::Tube::Madrid::Line::L1'  => { file => 'lib/Map/Tube/Madrid/Line/L1.pm',  version => '0.18' },
+            'Map::Tube::Madrid::Line::L3'  => { file => 'lib/Map/Tube/Madrid/Line/L3.pm',  version => '0.18' },
+            'Map::Tube::Madrid::Line::L5'  => { file => 'lib/Map/Tube/Madrid/Line/L5.pm',  version => '0.18' },
+            'Map::Tube::Madrid::Line::L11' => { file => 'lib/Map/Tube/Madrid/Line/L11.pm', version => '0.18' },
         },
         resources => {
             repository => {

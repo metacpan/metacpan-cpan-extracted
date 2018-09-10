@@ -6,8 +6,8 @@ use Pcore::API::SCM::Upstream;
 
 requires qw[_build_upstream scm_cmd scm_init scm_clone scm_id scm_releases scm_is_commited scm_addremove scm_commit scm_push scm_set_tag scm_get_changesets];
 
-has root => ( is => 'ro', isa => Str, required => 1 );
-has upstream => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::API::SCM::Upstream'] ], init_arg => undef );
+has root     => ( required => 1 );
+has upstream => ( is       => 'lazy' );    # InstanceOf ['Pcore::API::SCM::Upstream'] ]
 
 const our $SCM_TYPE_CLASS => {
     $SCM_TYPE_HG  => 'Pcore::API::SCM::Hg',

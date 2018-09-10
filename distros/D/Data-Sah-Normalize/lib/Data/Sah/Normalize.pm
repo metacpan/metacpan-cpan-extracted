@@ -4,8 +4,8 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $DATE = '2015-09-06'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -207,7 +207,7 @@ Data::Sah::Normalize - Normalize Sah schema
 
 =head1 VERSION
 
-This document describes version 0.04 of Data::Sah::Normalize (from Perl distribution Data-Sah-Normalize), released on 2015-09-06.
+This document describes version 0.050 of Data::Sah::Normalize (from Perl distribution Data-Sah-Normalize), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -240,17 +240,13 @@ original). Die on failure.
 
 TODO: recursively normalize clause which contains sah clauses (e.g. C<of>).
 
-=head1 SEE ALSO
-
-L<Sah>, L<Data::Sah>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-Normalize>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Sah-Normalize>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Sah-Normalize>.
 
 =head1 BUGS
 
@@ -260,13 +256,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Sah>, L<Data::Sah>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

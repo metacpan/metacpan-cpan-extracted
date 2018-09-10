@@ -925,18 +925,36 @@ HTML
 
     $epub->add_language($text->language_code);
 
-    if ($text->header_defined->{source}) {
-        my $source = $header->{source};
-        $epub->add_source($self->_clean_html($source));
-        $titlepage .= "<p>$source</p>" if $text->wants_postamble;
+    $titlepage .= qq{<div class="amw-impressum-container">\n};
+
+    if ($text->header_defined->{seriesname} && $text->header_defined->{seriesnumber}) {
+        $titlepage .= qq{<div class="amw-impressum amw-impressum-series">}
+          . $header->{seriesname} . ' ' . $header->{seriesnumber}
+          . qq{</div>};
     }
 
-    if ($text->header_defined->{notes}) {
-        my $notes = $header->{notes};
-        $epub->add_description($self->_clean_html($notes));
-        $titlepage .= "<p>$notes</p>" if $text->wants_postamble;
+    my @impressum_map = (
+                         [ source => [qw/add_source/],        ],
+                         [ notes => [qw/add_description/],    ],
+                         [ rights => [qw/add_rights/],       ],
+                         [ isbn => [qw/add_identifier ISBN/], ],
+                         [ publisher => [qw/add_publisher/],  ],
+                        );
+
+    foreach my $imp (@impressum_map) {
+        my $k = $imp->[0];
+        if ($text->header_defined->{$k}) {
+            my $str = $header->{$k};
+            my ($method, @additional_args) = @{$imp->[1]};
+            $epub->$method($self->_clean_html($str), @additional_args);
+            if ($k eq 'isbn') {
+                $str = 'ISBN ' . $str;
+            }
+            $titlepage .= qq{<div class="amw-impressum amw-impressum-$k">$str</div>\n}
+              if $text->wants_postamble;
+        }
     }
-    $titlepage .= "</div>\n";
+    $titlepage .= "</div>\n</div>\n";
     # create the front page
     my $firstpage = '';
     $self->tt->process($self->templates->minimal_html,

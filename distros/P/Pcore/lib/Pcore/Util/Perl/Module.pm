@@ -173,7 +173,7 @@ sub _build_auto_deps ($self) {
 
     my $deps;
 
-    for my $lib ( map { P->path($_)->to_string } $ENV->{INLINE_DIR} . 'lib/', @INC ) {
+    for my $lib ( map { P->path($_)->to_string } "$ENV->{INLINE_DIR}/lib", @INC ) {
         if ( -f "$lib/$auto_path" . $so_filename ) {
             $deps->{ $auto_path . $so_filename } = "$lib/$auto_path" . $so_filename;
 

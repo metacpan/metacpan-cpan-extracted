@@ -1,137 +1,113 @@
 package Pcore::Core::Event;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[weaken is_ref is_plain_arrayref is_plain_coderef];
-use Pcore::Core::Event::Listener;
-use Time::HiRes qw[];
+use Pcore::Util::Scalar qw[weaken is_ref is_plain_arrayref];
+use Pcore::Core::Event::Listener::Common;
 
-has listeners => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
-has senders   => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
-has mask_re   => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has _bindings_cache => ( init_arg => undef );                # HashRef
+has _listeners      => ( sub { {} }, init_arg => undef );    # HashRef
+has _bindings       => ( sub { {} }, init_arg => undef );    # HashRef
 
-sub listen_events ( $self, $masks, @listeners ) {
-    my $guard = defined wantarray ? [] : ();
+sub get_listener ( $self, $id ) {
+    return $self->{_listeners}->{$id};
+}
 
-    $masks = [$masks] if !is_plain_arrayref $masks;
+sub bind_events ( $self, $bindings, $listener ) {
 
-    for my $mask ( $masks->@* ) {
+    # create listener
+    if ( !is_ref $listener) {
+        my $uri = Pcore->uri($listener);
 
-        # get matched senders
-        my $senders = [ grep { $self->_compare( $_, $mask ) } keys $self->{senders}->%* ];
-
-        # create listeners
-        for my $listen (@listeners) {
-            my $cb;
-
-            if ( !is_ref $listen ) {
-                my $uri = Pcore->uri($listen);
-
-                my $class = Pcore->class->load( $uri->scheme, ns => 'Pcore::Core::Event::Listener::Pipe' );
-
-                $cb = $class->new( { uri => $uri } );
-            }
-            elsif ( is_plain_arrayref $listen ) {
-                my ( $uri, %args ) = $listen->@*;
-
-                $args{uri} = Pcore->uri($uri);
-
-                my $class = Pcore->class->load( $args{uri}->scheme, ns => 'Pcore::Core::Event::Listener::Pipe' );
-
-                $cb = $class->new( \%args );
-            }
-            elsif ( is_plain_coderef $listen ) {
-                $cb = $listen;
-            }
-            else {
-                die q[Invalid listener type];
-            }
-
-            my $listener = Pcore::Core::Event::Listener->new( {
-                broker => $self,
-                masks  => $masks,
-                cb     => $cb,
-            } );
-
-            $self->{listeners}->{$mask}->{ $listener->{id} } = $listener;
-
-            if ($guard) {
-                push $guard->@*, $listener;
-
-                weaken $self->{listeners}->{$mask}->{ $listener->{id} };
-            }
-
-            # add listener to matched senders
-            for my $key ( $senders->@* ) {
-                $self->{senders}->{$key}->{ $listener->{id} } = $listener;
-
-                weaken $self->{senders}->{$key}->{ $listener->{id} };
-            }
-        }
+        $listener = Pcore->class->load( $uri->{scheme}, ns => 'Pcore::Core::Event::Listener' )->new(
+            broker => $self,
+            uri    => $uri
+        );
     }
+    elsif ( is_plain_arrayref $listener) {
+        my $uri = Pcore->uri( shift $listener->@* );
 
-    return $guard;
-}
-
-sub has_listeners ( $self, $key ) {
-    $self->_register_sender($key) if !exists $self->{senders}->{$key};
-
-    return $self->{senders}->{$key}->%* ? 1 : 0;
-}
-
-sub _register_sender ( $self, $key ) {
-    return if exists $self->{senders}->{$key};
-
-    my $sender = $self->{senders}->{$key} = {};
-
-    for my $mask ( keys $self->{listeners}->%* ) {
-        if ( $self->_compare( $key, $mask ) ) {
-            for my $listener ( values $self->{listeners}->{$mask}->%* ) {
-                if ( !exists $sender->{ $listener->{id} } ) {
-                    $sender->{ $listener->{id} } = $listener;
-
-                    weaken $sender->{ $listener->{id} };
-                }
-            }
-        }
-    }
-
-    return;
-}
-
-# key always without wildcards
-# mask could contain wildcards:
-# * (star) can substitute for exactly one word
-# # (hash) can substitute for zero or more words
-# word = [^.]
-sub _compare ( $self, $key, $mask ) {
-    if ( index( $mask, '*' ) != -1 || index( $mask, '#' ) != -1 ) {
-        if ( !exists $self->{mask_re}->{$mask} ) {
-            my $re = quotemeta $mask;
-
-            $re =~ s/\\[#]/.*?/smg;
-
-            $re =~ s/\\[*]/[^.]+/smg;
-
-            $self->{mask_re}->{$mask} = qr/\A$re\z/sm;
-        }
-
-        return $key =~ $self->{mask_re}->{$mask};
+        $listener = Pcore->class->load( $uri->{scheme}, ns => 'Pcore::Core::Event::Listener' )->new(
+            $listener->@*,
+            broker => $self,
+            uri    => $uri
+        );
     }
     else {
-        return $mask eq $key;
+        $listener = Pcore::Core::Event::Listener::Common->new(
+            broker => $self,
+            cb     => $listener
+        );
     }
 
-    return;
+    if ( exists $self->{_listeners}->{ $listener->{id} } ) {
+        $listener = $self->{_listeners}->{ $listener->{id} };
+    }
+    else {
+        $self->{_listeners}->{ $listener->{id} } = $listener;
+
+        weaken $self->{_listeners}->{ $listener->{id} } if defined wantarray;
+    }
+
+    $listener->bind($bindings);
+
+    return $listener;
+}
+
+# TODO limit _bindings_cache size
+sub get_key_bindings ( $self, $key, $cache = undef ) {
+    $cache //= $self->{_bindings_cache} //= {};
+
+    state $gen = sub ( $bindings, $path, $words ) {
+        my $word = shift $words->@*;
+
+        $bindings->{ $path . '*.#' }     = 1;
+        $bindings->{ $path . "$word.#" } = 1;
+
+        if ( $words->@* ) {
+            __SUB__->( $bindings, $path . '*.',     [ $words->@* ] );
+            __SUB__->( $bindings, $path . "$word.", [ $words->@* ] );
+        }
+        else {
+            $bindings->{ $path . '*' } = 1;
+            $bindings->{ $path . $word } = 1;
+        }
+
+        return;
+    };
+
+    if ( !exists $cache->{$key} ) {
+        my $bindings = { $key => 1, '#' => 1 };
+
+        $gen->( $bindings, q[], [ split /[.]/sm, $key ] );
+
+        $cache->{$key} = [ keys $bindings->%* ];
+    }
+
+    return $cache->{$key};
+}
+
+sub has_bindings ( $self, $key ) {
+    return scalar $self->_get_listeners($key)->@*;
 }
 
 sub forward_event ( $self, $ev ) {
-    $self->_register_sender( $ev->{key} ) if !exists $self->{senders}->{ $ev->{key} };
+    for my $listener ( $self->_get_listeners( $ev->{key} )->@* ) {
+        next if $listener->{is_suspended};
 
-    for my $listener ( values $self->{senders}->{ $ev->{key} }->%* ) {
-        $listener->{cb}->($ev);
+        $listener->forward_event($ev);
     }
 
     return;
+}
+
+sub _get_listeners ( $self, $key ) {
+    my $listeners;
+
+    for my $binding_listeners ( grep {defined} $self->{_bindings}->@{ $self->get_key_bindings($key)->@* } ) {
+        $listeners->@{ keys $binding_listeners->%* } = values $binding_listeners->%*;
+    }
+
+    return [ values $listeners->%* ];
 }
 
 1;
@@ -146,20 +122,21 @@ Pcore::Core::Event - Pcore event broker
 
 =head1 SYNOPSIS
 
-    P->listen_events(
-        [ 'TEST1', 'TEST2.*.LOG', 'TEST3.#' ],                       # listen masks
+    P->bind_events(
+        [ 'test1', 'test2.*.log', 'test3.#' ],                       # bindings
         sub ( $ev ) {                                                # callback
             say dump $ev->{key};
             say dump $ev->{data};
 
             return;
         },
-        'stderr:',                                                   # pipe
-        [ 'stderr:',      tmpl => "<: \$key :>$LF<: \$text :>" ],    # pipe with params
-        [ 'file:123.log', tmpl => "<: \$key :>$LF<: \$text :>" ],    # pipe with params
     );
 
-    P->fire_event( 'TEST.1234.AAA', $data );
+    P->bind_events( 'log.test.*', 'stderr:' );                                                   # pipe
+    P->bind_events( 'log.test.*', [ 'stderr:',      tmpl => "<: \$key :>$LF<: \$text :>" ] );    # pipe with params
+    P->bind_events( 'log.test.*', [ 'file:123.log', tmpl => "<: \$key :>$LF<: \$text :>" ] );    # pipe with params
+
+    P->fire_event( 'test.1234.aaa', $data );
 
 =head1 DESCRIPTION
 

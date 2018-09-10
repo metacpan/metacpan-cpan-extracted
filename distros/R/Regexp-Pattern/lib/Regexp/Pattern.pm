@@ -1,13 +1,14 @@
 package Regexp::Pattern;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.2.3'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.2.7'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
 
 sub re {
     my $name = shift;
+    my %args = ref($_[0]) eq 'HASH' ? %{$_[0]} : @_;
 
     my ($mod, $patname) = $name =~ /(.+)::(.+)/
         or die "Invalid pattern name '$name', should be 'MODNAME::PATNAME'";
@@ -21,13 +22,20 @@ sub re {
     exists($var->{$patname})
         or die "No regexp pattern named '$patname' in package '$mod'";
 
+    my $pat;
     if ($var->{$patname}{pat}) {
-        return $var->{$patname}{pat};
+        $pat = $var->{$patname}{pat};
     } elsif ($var->{$patname}{gen}) {
-        return $var->{$patname}{gen}->(ref($_[0]) eq 'HASH' ? %{$_[0]} : @_);
+        $pat = $var->{$patname}{gen}->(%args);
     } else {
         die "Bug in module '$mod': pattern '$patname': no pat/gen declared";
     }
+
+    if ($args{-anchor}) {
+            $pat = qr/\A(?:$pat)\z/;
+    }
+
+    return $pat;
 }
 
 sub import {
@@ -129,11 +137,11 @@ Regexp::Pattern - Convention/framework for modules that contain collection of re
 
 =head1 SPECIFICATION VERSION
 
-0.2.0
+0.2
 
 =head1 VERSION
 
-This document describes version 0.2.3 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2018-04-03.
+This document describes version 0.2.7 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -182,7 +190,7 @@ your program.
  
  our %RE = (
      # the minimum spec
-     re1 => { pat => qr/\d{3}-\d{4}/ },
+     re1 => { pat => qr/\d{3}-\d{3}/ },
  
      # more complete spec
      re2 => {
@@ -192,8 +200,35 @@ your program.
  A longer description.
  
  _
-         pat => qr/.../,
+         pat => qr/\d{3}-\d{3}(?:-\d{5})?/,
          tags => ['A','B'],
+         examples => [
+             {
+                 str => '123-456',
+                 matches => 1,
+             },
+             {
+                 summary => 'Another example that matches',
+                 str => '123-456-78901',
+                 matches => 1,
+             },
+             {
+                 summary => 'An example that does not match',
+                 str => '123456',
+                 matches => 0,
+             },
+             {
+                 summary => 'An example that does not get tested',
+                 str => '123456',
+             },
+             {
+                 summary => 'Another example that does not get tested nor rendered to POD',
+                 str => '234567',
+                 matches => 0,
+                 test => 0,
+                 doc => 0,
+             },
+         ],
      },
  
      # dynamic (regexp generator)
@@ -222,6 +257,40 @@ your program.
              },
          },
          tags => ['B','C'],
+         examples => [
+             {
+                 summary => 'An example that matches',
+                 gen_args => {variant=>'A'},
+                 str => '123-456',
+                 matches => 1,
+             },
+             {
+                 summary => "An example that doesn't match",
+                 gen_args => {variant=>'B'},
+                 str => '123-456',
+                 matches => 0,
+             },
+         ],
+     },
+ 
+     re4 => {
+         summary => 'This is a regexp that does capturing',
+         tags => ['capturing'],
+         pat => qr/(\d{3})-(\d{3})/,
+         examples => [
+             {str=>'123-456', matches=>[123, 456]},
+             {str=>'foo-bar', matches=>[]},
+         ],
+     },
+ 
+     re5 => {
+         summary => 'This is another regexp that does (named) capturing and anchoring',
+         tags => ['capturing', 'anchored'],
+         pat => qr/^(?<cap1>\d{3})-(?<cap2>\d{3})/,
+         examples => [
+             {str=>'123-456', matches=>{cap1=>123, cap2=>456}},
+             {str=>'something 123-456', matches=>{}},
+         ],
      },
  );
 
@@ -248,7 +317,27 @@ description, tags, and so on, for example (taken from L<Regexp::Pattern::CPAN>):
      I'm not sure whether PAUSE allows digit for the first letter. For safety
      I'm assuming no.
      HERE
+     examples => [
+         {str=>'PERLANCAR', matches=>1},
+         {str=>'BAD ID', matches=>0},
+     ],
  }
+
+B<Examples>. Your regexp specification can include an C<examples> property (see
+above for example). The value of the C<examples> property is an array, each of
+which should be a defhash. For each example, at the minimum you should specify
+C<str> (string to be matched by the regexp), C<gen_args> (hash, arguments to use
+when generating dynamic regexp pattern), and C<matches> (a boolean value that
+specifies whether the regexp should match the string or not, or an array/hash
+that specifies the captures). You can of course specify other defhash properties
+(e.g. C<summary>, C<description>, etc). Other example properties might be
+introduced in the future.
+
+If you use L<Dist::Zilla> to build your distribution, you can use the plugin
+L<[Regexp::Pattern]|Dist::Zilla::Plugin::Regexp::Pattern> to test the examples
+during building, and the L<Pod::Weaver> plugin
+L<[-Regexp::Pattern]|Pod::Weaver::Plugin::Regexp::Pattern> to render the
+examples in your POD.
 
 =head2 Using a Regexp::Pattern::* module
 
@@ -362,6 +451,9 @@ I<PATTERN_NAME> is a key to the C<%RE> package global hash in the module. A
 dynamic pattern can accept arguments for its generator, and you can pass it as
 hashref in the second argument of C<re()>.
 
+B<Anchoring.> You can also put C<< -anchor => 1 >> in C<%args>. This will
+conveniently wraps the regex inside C<< qr/\A(?:...)\z/ >>.
+
 Die when pattern by name C<$name> cannot be found (either the module cannot be
 loaded or the pattern with that name is not found in the module).
 
@@ -401,6 +493,8 @@ If you use L<Dist::Zilla>: L<Dist::Zilla::Plugin::Regexp::Pattern>,
 L<Pod::Weaver::Plugin::Regexp::Pattern>,
 L<Dist::Zilla::Plugin::AddModule::RegexpCommon::FromRegexpPattern>,
 L<Dist::Zilla::Plugin::AddModule::RegexpPattern::FromRegexpCommon>.
+
+L<Test::Regexp::Pattern> and L<test-regexp-pattern>.
 
 =head1 AUTHOR
 

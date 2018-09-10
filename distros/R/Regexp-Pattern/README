@@ -3,11 +3,11 @@ NAME
     collection of regexes
 
 SPECIFICATION VERSION
-    0.2.0
+    0.2
 
 VERSION
-    This document describes version 0.2.3 of Regexp::Pattern (from Perl
-    distribution Regexp-Pattern), released on 2018-04-03.
+    This document describes version 0.2.7 of Regexp::Pattern (from Perl
+    distribution Regexp-Pattern), released on 2018-09-10.
 
 SYNOPSIS
     Subroutine interface:
@@ -53,7 +53,7 @@ DESCRIPTION
  
      our %RE = (
          # the minimum spec
-         re1 => { pat => qr/\d{3}-\d{4}/ },
+         re1 => { pat => qr/\d{3}-\d{3}/ },
  
          # more complete spec
          re2 => {
@@ -63,8 +63,35 @@ DESCRIPTION
      A longer description.
  
      _
-             pat => qr/.../,
+             pat => qr/\d{3}-\d{3}(?:-\d{5})?/,
              tags => ['A','B'],
+             examples => [
+                 {
+                     str => '123-456',
+                     matches => 1,
+                 },
+                 {
+                     summary => 'Another example that matches',
+                     str => '123-456-78901',
+                     matches => 1,
+                 },
+                 {
+                     summary => 'An example that does not match',
+                     str => '123456',
+                     matches => 0,
+                 },
+                 {
+                     summary => 'An example that does not get tested',
+                     str => '123456',
+                 },
+                 {
+                     summary => 'Another example that does not get tested nor rendered to POD',
+                     str => '234567',
+                     matches => 0,
+                     test => 0,
+                     doc => 0,
+                 },
+             ],
          },
  
          # dynamic (regexp generator)
@@ -93,6 +120,40 @@ DESCRIPTION
                  },
              },
              tags => ['B','C'],
+             examples => [
+                 {
+                     summary => 'An example that matches',
+                     gen_args => {variant=>'A'},
+                     str => '123-456',
+                     matches => 1,
+                 },
+                 {
+                     summary => "An example that doesn't match",
+                     gen_args => {variant=>'B'},
+                     str => '123-456',
+                     matches => 0,
+                 },
+             ],
+         },
+ 
+         re4 => {
+             summary => 'This is a regexp that does capturing',
+             tags => ['capturing'],
+             pat => qr/(\d{3})-(\d{3})/,
+             examples => [
+                 {str=>'123-456', matches=>[123, 456]},
+                 {str=>'foo-bar', matches=>[]},
+             ],
+         },
+ 
+         re5 => {
+             summary => 'This is another regexp that does (named) capturing and anchoring',
+             tags => ['capturing', 'anchored'],
+             pat => qr/^(?<cap1>\d{3})-(?<cap2>\d{3})/,
+             examples => [
+                 {str=>'123-456', matches=>{cap1=>123, cap2=>456}},
+                 {str=>'something 123-456', matches=>{}},
+             ],
          },
      );
 
@@ -120,7 +181,27 @@ DESCRIPTION
          I'm not sure whether PAUSE allows digit for the first letter. For safety
          I'm assuming no.
          HERE
+         examples => [
+             {str=>'PERLANCAR', matches=>1},
+             {str=>'BAD ID', matches=>0},
+         ],
      }
+
+    Examples. Your regexp specification can include an "examples" property
+    (see above for example). The value of the "examples" property is an
+    array, each of which should be a defhash. For each example, at the
+    minimum you should specify "str" (string to be matched by the regexp),
+    "gen_args" (hash, arguments to use when generating dynamic regexp
+    pattern), and "matches" (a boolean value that specifies whether the
+    regexp should match the string or not, or an array/hash that specifies
+    the captures). You can of course specify other defhash properties (e.g.
+    "summary", "description", etc). Other example properties might be
+    introduced in the future.
+
+    If you use Dist::Zilla to build your distribution, you can use the
+    plugin [Regexp::Pattern] to test the examples during building, and the
+    Pod::Weaver plugin [-Regexp::Pattern] to render the examples in your
+    POD.
 
   Using a Regexp::Pattern::* module
    Standalone
@@ -228,6 +309,9 @@ FUNCTIONS
     dynamic pattern can accept arguments for its generator, and you can pass
     it as hashref in the second argument of "re()".
 
+    Anchoring. You can also put "-anchor => 1" in %args. This will
+    conveniently wraps the regex inside "qr/\A(?:...)\z/".
+
     Die when pattern by name $name cannot be found (either the module cannot
     be loaded or the pattern with that name is not found in the module).
 
@@ -265,6 +349,8 @@ SEE ALSO
     Pod::Weaver::Plugin::Regexp::Pattern,
     Dist::Zilla::Plugin::AddModule::RegexpCommon::FromRegexpPattern,
     Dist::Zilla::Plugin::AddModule::RegexpPattern::FromRegexpCommon.
+
+    Test::Regexp::Pattern and test-regexp-pattern.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

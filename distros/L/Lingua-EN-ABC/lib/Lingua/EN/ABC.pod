@@ -23,13 +23,13 @@ produces output
     colour
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.07/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.08/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::EN::ABC version 0.07
-corresponding to git commit L<d68fab88e715c3e89d619f54129fa49bbcefc7d5|https://github.com/benkasminbullock/Lingua-EN-ABC/commit/d68fab88e715c3e89d619f54129fa49bbcefc7d5> released on Mon Jul 31 12:14:58 2017 +0900.
+This documents Lingua::EN::ABC version 0.08
+corresponding to git commit L<1ad79172950aee41684063de7666d55ac0bcf870|https://github.com/benkasminbullock/Lingua-EN-ABC/commit/1ad79172950aee41684063de7666d55ac0bcf870> released on Sun Sep 9 11:01:05 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -51,10 +51,36 @@ whether to use Oxford spelling (realize rather than realise):
 
     my $oxford_british = a2b ('realize', oxford => 1);
 
+This does not convert words with different pronunciations or words
+which are completely different between American and British uses.
+
 This cannot correctly convert ambiguous spellings like "program",
 which may be either "program" or "programme" in British English. See
 L</BUGS>. It tries to convert American formations like "gotten" into
 "got".
+
+An option C<s>, if true, results in a spelling-only conversion:
+
+    
+    use utf8;
+    use Lingua::EN::ABC ':all';
+    print a2b ('aluminum airplane labor center pajamas'), "\n";
+    print a2b ('aluminum airplane labor center pajamas', s => 1), "\n";
+    
+    
+
+
+produces output
+
+    aluminium aeroplane labour centre pyjamas
+    aluminum airplane labour centre pyjamas
+
+
+(This example is included as L<F<alairlab.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.08/examples/alairlab.pl> in the distribution.)
+
+
+In this case, word pairs like "burnt" and "burned" are not
+interchanged.
 
 =head2 b2a
 
@@ -66,26 +92,32 @@ British formations like "got" into "gotten" due to the grammatical
 ambiguity ("I've got a car" versus "I've gotten into an accident", or
 "I got into an accident").
 
+An option C<s>, if true, results in a spelling-only conversion. See
+L</a2b> for an example.
+
 =head2 a2c
 
     my $canadian = a2c ('the color');
     # $canadian = 'the colour'
 
-Convert American to Canadian spelling.
+Convert American to Canadian spelling. An option C<s>, if true,
+results in a spelling-only conversion. See L</a2b> for an example.
 
 =head2 c2a
 
     my $american = c2a ('the color');
     # $american = 'the colour'
 
-Convert Canadian to American spelling.
+Convert Canadian to American spelling. An option C<s>, if true,
+results in a spelling-only conversion. See L</a2b> for an example.
 
 =head2 b2c
 
     my $canadian = b2c ('the programme');
     # $canadian = 'the program'
 
-Convert British to Canadian spelling.
+Convert British to Canadian spelling. An option C<s>, if true,
+results in a spelling-only conversion. See L</a2b> for an example.
 
 =head2 c2b
 
@@ -95,6 +127,9 @@ Convert Canadian to British spelling. An option C<oxford> controls
 whether to use Oxford spelling (realize rather than realise):
 
     my $oxford_british = c2b ($canadian, oxford => 1);
+
+An option C<s>, if true, results in a spelling-only conversion. See
+L</a2b> for an example.
 
 =head1 DEPENDENCIES
 
@@ -128,7 +163,7 @@ that it's easy to search and check.
 
 C<respell> is a tool to convert English text from one spelling system
 to another. This used to be at http://membled.com/work/apps/respell,
-but that web site has now disappeared as of Mon Jul 31 12:14:58 2017 +0900.
+but that web site has now disappeared as of Sun Sep 9 11:01:05 2018 +0900.
 
 =back
 
@@ -185,6 +220,7 @@ was used in the preparation of the data. Nigel Horne (NJH) and Ed Avis
 (EDAVIS) contributed some word additions and other suggestions.
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -192,7 +228,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2013-2017
+2013-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

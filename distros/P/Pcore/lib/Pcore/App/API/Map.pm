@@ -14,13 +14,7 @@ sub init ($self) {
     my $method = {};
 
     # read api roles
-    my $roles = {
-        do {
-            no strict qw[refs];
-
-            map { $_ => 1 } ${ ref( $self->{app} ) . '::API_ROLES' }->@*;
-          }
-    };
+    my $roles = { map { $_ => 1 } ${ ref( $self->{app} ) . '::API_ROLES' }->@* };
 
     my $ns_path = ( ref( $self->{app} ) =~ s[::][/]smgr ) . '/API';
 
@@ -86,8 +80,6 @@ sub init ($self) {
                     $val = \@val;
                 }
 
-                no strict qw[refs];
-
                 ${"$pkg\::_API_MAP"}->{$ref}->{ lc $attr } = $val;
             }
             else {
@@ -102,8 +94,6 @@ sub init ($self) {
         my $class_name = $class->{$class_path};
 
         my $attrs = do {
-            no strict qw[refs];
-
             local *{"$class_name\::MODIFY_CODE_ATTRIBUTES"} = $MODIFY_CODE_ATTRIBUTES;
 
             P->class->load($class_name);
@@ -127,8 +117,6 @@ sub init ($self) {
 
             # get method permissions
             my $perms = do {
-                no strict qw[refs];
-
                 my $ref = *{"$class_name\::$method_name"}{CODE};
 
                 $attrs->{$ref}->{perms} // ${"$class_name\::API_NAMESPACE_PERMS"};
@@ -199,7 +187,7 @@ sub get_method ( $self, $method_id ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "init" with high complexity score (22)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 169, 175             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 157, 163             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

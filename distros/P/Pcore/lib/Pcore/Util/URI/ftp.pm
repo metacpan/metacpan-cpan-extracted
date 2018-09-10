@@ -5,6 +5,7 @@ use Pcore -class;
 extends qw[Pcore::Util::URI];
 
 has default_port => 21;
+has is_ftp       => 1;
 
 1;
 __END__

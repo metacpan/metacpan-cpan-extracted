@@ -12,7 +12,7 @@ our $tests = [
     ['http://user:password@host:9999/path?query=123#fragment'] => 'http://user:password@host:9999/path?query=123#fragment',
     ['//host:9999/path/']                                      => '//host:9999/path/',
     ['./path:path']                                            => './path:path',
-    ['scheme:./path:path']                                     => 'scheme:path:path',
+    ['scheme:./path:path']                                     => 'scheme:./path:path',
 
     # parsing with base
     [ '//host:9999/path/', base => 'http://' ]                     => 'http://host:9999/path/',
@@ -24,8 +24,8 @@ our $tests = [
     # file path
     ['file://user:password@host:9999/path?query=123#fragment'] => 'file://user:password@host:9999/path?query=123#fragment',
     [ '//user:password@host:9999/path?query=123#fragment', base => 'file://' ]           => 'file://user:password@host:9999/path?query=123#fragment',
-    [ 'path/path',                                         base => 'file://' ]           => 'file:/path/path',
-    [ 'path/path',                                         base => 'file:///base_path' ] => 'file:/path/path',
+    [ 'path/path',                                         base => 'file://' ]           => 'file:///path/path',
+    [ 'path/path',                                         base => 'file:///base_path' ] => 'file:///path/path',
 
     # inherit
     [ 'path/path?q#f', base => 'http://host/path/?bq#bf' ] => 'http://host/path/path/path?q#f',
@@ -53,9 +53,10 @@ for my $pair ( pairs( $tests->@* ) ) {
     my $uri = P->uri( $pair->key->@* );
 
     if ( $uri->to_string ne $pair->value ) {
-        say dump $uri;
+        my $src  = shift $pair->key->@*;
+        my %args = $pair->key->@*;
 
-        say 'RESULT:' . $uri->to_string . ', EXPECT: ' . $pair->value;
+        say sprintf qq["%s" + "%s" = "%s"\nEXPECTED: "%s"\n], $src, $args{base} // '', $uri->to_string, $pair->value;
     }
 
     ok( $uri->to_string eq $pair->value, 'p_util_uri_' . ++$i );
@@ -64,6 +65,16 @@ for my $pair ( pairs( $tests->@* ) ) {
 done_testing $TESTS;
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 59                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -266,13 +266,11 @@ sub _run_resolver ($self) {
     $self->{_timer} = AE::timer $self->{resolver_timeout}, 0, sub {
         undef $self->{_timer};
 
-        my $cv = AE::cv sub {
+        my $cv = P->cv->begin( sub {
             $self->_run_resolver;
 
             return;
-        };
-
-        $cv->begin;
+        } );
 
         for my $id ( keys $self->_pool->%* ) {
             $cv->begin;

@@ -224,14 +224,10 @@ sub BLESSED {
     my ( $tags, $dumped );
 
     # @ISA
-    {
-        no strict qw[refs];
+    if ( my @superclasses = @{ $ref . '::ISA' } ) {
+        $res .= $self->{_indent} . '@ISA: ' . join q[, ], map { $COLOR->{class} . $_ . $RESET } @superclasses;
 
-        if ( my @superclasses = @{ $ref . '::ISA' } ) {
-            $res .= $self->{_indent} . '@ISA: ' . join q[, ], map { $COLOR->{class} . $_ . $RESET } @superclasses;
-
-            $res .= ",\n";
-        }
+        $res .= ",\n";
     }
 
     # reafddr
@@ -566,7 +562,7 @@ package Pcore::Core::Dump::Dumper::_Item {
 ## |======+======================+================================================================================================================|
 ## |    2 | 86                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 76, 79, 231, 293     | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 76, 79, 228, 289     | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

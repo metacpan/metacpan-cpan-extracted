@@ -1,10 +1,17 @@
 package Regexp::Pattern::Twitter;
 
-our $DATE = '2017-01-22'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our %RE = (
-    username => { pat => qr/[0-9A-Za-z_]{1,15}/ },
+    username => {
+        pat => qr/[0-9A-Za-z_]{1,15}/,
+        examples => [
+            {str=>'perlancar', matches=>1},
+            {str=>'a234567890123456', gen_args=>{-anchor=>1}, matches=>0, summary=>'Too long'},
+            {str=>'perl ancar', gen_args=>{-anchor=>1}, matches=>0, summary=>'Contains whitespace'},
+        ],
+    },
 );
 
 1;
@@ -22,7 +29,7 @@ Regexp::Pattern::Twitter - Regexp patterns related to Twitter
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Pattern::Twitter (from Perl distribution Regexp-Pattern-Twitter), released on 2017-01-22.
+This document describes version 0.003 of Regexp::Pattern::Twitter (from Perl distribution Regexp-Pattern-Twitter), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -38,6 +45,16 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 =over
 
 =item * username
+
+Examples:
+
+ "perlancar" =~ re("Twitter::username");  # matches
+
+ # Too long
+ "a234567890123456" =~ re("Twitter::username", {-anchor=>1});  # doesn't match
+
+ # Contains whitespace
+ "perl ancar" =~ re("Twitter::username", {-anchor=>1});  # doesn't match
 
 =back
 
@@ -67,7 +84,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

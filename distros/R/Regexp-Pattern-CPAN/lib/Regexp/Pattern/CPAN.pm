@@ -1,7 +1,7 @@
 package Regexp::Pattern::CPAN;
 
-our $DATE = '2018-09-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our %RE = (
     pause_id => {
@@ -13,6 +13,13 @@ I'm not sure whether PAUSE allows digit for the first letter. For safety I'm
 assuming no.
 
 _
+        examples => [
+            {str=>'PERLANCAR', matches=>1},
+            {str=>'perlancar', summary=>'Only allows uppercase', matches=>0},
+            {str=>'A', summary=>'too short', matches=>0},
+            {str=>'PERL ANCAR', gen_args=>{-anchor=>1}, summary=>'contains whitespace', matches=>0},
+            {str=>'RANDALSCHWARTZ', gen_args=>{-anchor=>1}, summary=>'too long', matches=>0},
+        ],
     },
 );
 
@@ -31,7 +38,7 @@ Regexp::Pattern::CPAN - Regexp patterns related to CPAN
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Pattern::CPAN (from Perl distribution Regexp-Pattern-CPAN), released on 2018-09-02.
+This document describes version 0.003 of Regexp::Pattern::CPAN (from Perl distribution Regexp-Pattern-CPAN), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -53,6 +60,22 @@ PAUSE author ID, or PAUSE ID for short.
 I'm not sure whether PAUSE allows digit for the first letter. For safety I'm
 assuming no.
 
+
+Examples:
+
+ "PERLANCAR" =~ re("CPAN::pause_id");  # matches
+
+ # Only allows uppercase
+ "perlancar" =~ re("CPAN::pause_id");  # doesn't match
+
+ # too short
+ "A" =~ re("CPAN::pause_id");  # doesn't match
+
+ # contains whitespace
+ "PERL ANCAR" =~ re("CPAN::pause_id", {-anchor=>1});  # doesn't match
+
+ # too long
+ "RANDALSCHWARTZ" =~ re("CPAN::pause_id", {-anchor=>1});  # doesn't match
 
 =back
 

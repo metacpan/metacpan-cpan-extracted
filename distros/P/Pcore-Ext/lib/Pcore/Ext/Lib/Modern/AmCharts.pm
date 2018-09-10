@@ -1,7 +1,6 @@
 package Pcore::Ext::Lib::Modern::AmCharts;
 
 use Pcore -l10n;
-use Pcore::Resources;
 
 sub EXT_panel : Extend('Ext.Component') : Type('widget') {
     return {
@@ -53,8 +52,8 @@ JS
         _loadCharts => func [], <<"JS",
             var urls = [],
                 chartConfig = this.getChartConfig(),
-                chartsBaseUrl = '/static/amcharts/$Pcore::Resources::VER->{amcharts}/',
-                mapBaseUrl = '/static/ammap/$Pcore::Resources::VER->{ammap}/';
+                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts')->[0] ]}";
+                mapBaseUrl = "@{[ $cdn->get_resources('ammap')->[0] ]}";
 
             if (typeof AmCharts == 'undefined') {
                 urls.push( chartsBaseUrl + 'amcharts.js');

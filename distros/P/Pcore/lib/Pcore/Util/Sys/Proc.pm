@@ -1,40 +1,44 @@
 package Pcore::Util::Sys::Proc;
 
-use Pcore -class;
-use Config;
-use Pcore::AE::Handle;
-use Pcore::Util::Scalar qw[refcount weaken is_blessed_ref];
+use Pcore -const, -class;
+use Pcore::Util::Scalar qw[is_ref];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
+use POSIX qw[:sys_wait_h];
+use Config qw[%Config];
 use overload    #
-  q[bool] => sub {
-    return $_[0]->is_success;
-  },
-  q[0+] => sub {
-    return $_[0]->{status};
-  },
-  q[<=>] => sub {
-    return !$_[2] ? $_[0]->{status} <=> $_[1] : $_[1] <=> $_[0]->{status};
-  },
+  q[bool] => sub { return $_[0]->is_success },
+  q[<=>]  => sub { return !$_[2] ? $_[0]->_get_exit_code <=> $_[1] : $_[1] <=> $_[0]->_get_exit_code },
+  q[""]   => sub { return $_[0]->{status} . q[ ] . $_[0]->{reason} },
   fallback => undef;
 
-has pid => ( is => 'ro', isa => PositiveInt, init_arg => undef );
-has status => ( is => 'ro', isa => Maybe [Int], init_arg => undef );    # undef - process is still alive
-has reason => ( is => 'ro', isa => Str, init_arg => undef );
+has win32_alive_timeout => 0.5;
 
-has stdin  => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDIN, we can write
-has stdout => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDOUT, we can read
-has stderr => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDERR, we can read
+has stdin  => ();
+has stdout => ();
+has stderr => ();
 
-has _on_finish => ( is => 'ro', isa => Maybe [CodeRef], init_arg => undef );                 # on_finish callback
-has _win32_proc => ( is => 'ro', isa => InstanceOf ['Win32::Process'], init_arg => undef );  # MSWIN process descriptor
-has _sigchild => ( is => 'ro', isa => Object, init_arg => undef );
+has pid       => ();
+has exit_code => ();
+has status    => ();
+has reason    => ();
 
-our $CACHE = {};
+has _win32_proc => ();
+
+const our $PROC_STATUS_ACTIVE             => 0;
+const our $PROC_STATUS_TERMINATED_SUCCESS => 200;
+const our $PROC_STATUS_CREATE_ERROR       => 400;
+const our $PROC_STATUS_TERMINATED_ERROR   => 500;
+
+const our $STATUS_REASON => {
+    $PROC_STATUS_CREATE_ERROR       => 'Error creating process',
+    $PROC_STATUS_ACTIVE             => 'Active',
+    $PROC_STATUS_TERMINATED_SUCCESS => 'Success',
+    $PROC_STATUS_TERMINATED_ERROR   => 'Error',
+};
 
 sub DESTROY ( $self ) {
-    if ( $self->{pid} ) {
-
+    if ( !$self->{status} && $self->{pid} ) {
         if ($MSWIN) {
 
             # https://perldoc.perl.org/perlport.html#DOS-and-Derivatives
@@ -59,146 +63,104 @@ sub DESTROY ( $self ) {
         }
     }
 
-    $self->_on_exit( 128 + 9 ) if ${^GLOBAL_PHASE} ne 'DESTRUCT';
-
     return;
 }
 
-around new => sub ( $orig, $self, $cmd, @ ) {
-    $cmd = [$cmd] if !ref $cmd;
+around new => sub ( $orig, $self, $cmd, %args ) {
+    $cmd = [$cmd] if !is_ref $cmd;
 
-    my $blocking = defined wantarray;
+    $self = $self->$orig();
 
-    my %args = (
-        stdin                  => 0,
-        stdout                 => 0,
-        stderr                 => 0,        # NOTE 2 - merge STDERR with STDOUT
-        on_ready               => undef,    # CodeRef
-        on_finish              => undef,    # CodeRef
-        win32_cflags           => 0,        # NOTE not works if not 0, Win32::Process::CREATE_NO_WINDOW(),
-        win32_create_no_window => 0,        # NOTE preventing to redirect handles
-        win32_alive_timeout    => 0.5,
-        @_[ 3 .. $#_ ],
-    );
+    if ($MSWIN) {
+        $self->{win32_alive_timeout} = $args{win32_alive_timeout} if defined $args{win32_alive_timeout};
+        $args{win32_cflags} //= $args{win32_create_no_window} ? Win32::Process::CREATE_NO_WINDOW() : 0;    # NOTE handles redirect not works if not 0, Win32::Process::CREATE_NO_WINDOW(),
+    }
 
-    $args{win32_cflags} = Win32::Process::CREATE_NO_WINDOW() if $MSWIN && delete $args{win32_create_no_window};
+    my ( $child_stdin,  $child_stdout,  $child_stderr );
+    my ( $backup_stdin, $backup_stdout, $backup_stderr );
 
-    my $hdl = $self->_redirect_std( \%args );
+    # redirect STDIN
+    if ( $args{stdin} ) {
+        ( $child_stdin, my $parent_stdin ) = portable_socketpair();
+
+        $self->{stdin} = P->handle($parent_stdin);
+
+        # backup and redirect
+        open $backup_stdin, '<&', *STDIN       or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+        open *STDIN,        '<&', $child_stdin or die $!;
+    }
+
+    # redirect STDOUT
+    if ( $args{stdout} ) {
+        ( my $parent_stdout, $child_stdout ) = portable_socketpair();
+
+        $self->{child_stdout} = $child_stdout;
+
+        $self->{stdout} = P->handle($parent_stdout);
+
+        # backup and redirect
+        open $backup_stdout, '>&', *STDOUT       or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+        open *STDOUT,        '>&', $child_stdout or die $!;
+    }
+
+    # redirect STDERR
+    if ( $args{stderr} ) {
+
+        # redirect STDERR to STDOUT
+        if ( $args{stderr} == 2 ) {
+
+            # redirect STDERR to child STDOUT
+            if ( $args{stdout} ) {
+                $child_stderr = $child_stdout;
+            }
+
+            # redirect STDERR to parent STDOUT
+            else {
+                open $child_stderr, '>&', *STDOUT or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+            }
+        }
+        else {
+            ( my $parent_stderr, $child_stderr ) = portable_socketpair();
+
+            $self->{child_stderr} = $child_stderr;
+
+            $self->{stderr} = P->handle($parent_stderr);
+        }
+
+        # backup and redirect
+        open $backup_stderr, '>&', *STDERR       or die $!;     ## no critic qw[InputOutput::RequireBriefOpen]
+        open *STDERR,        '>&', $child_stderr or die $!;
+    }
 
     # create process
-    my $proc = $self->_create_process( $args{win32_cflags}, $cmd );
+    $self->_create_process(
+        $cmd,
+        $args{win32_cflags},
+        sub {
+            # restore old STD* handles
+            open *STDIN,  '<&', $backup_stdin  or die $! if defined $backup_stdin;
+            open *STDOUT, '>&', $backup_stdout or die $! if defined $backup_stdout;
+            open *STDERR, '>&', $backup_stderr or die $! if defined $backup_stderr;
 
-    # restore old STD* handles
-    open STDIN,  '<&', $hdl->{old_in}  or die if $hdl->{old_in};
-    open STDOUT, '>&', $hdl->{old_out} or die if $hdl->{old_out};
-    open STDERR, '>&', $hdl->{old_err} or die if $hdl->{old_err};
-
-    # handle error creating process
-    if ( !$proc->pid ) {
-        $proc->{status} = -1;
-
-        $proc->{reason} = 'Error creating process';
-
-        $args{on_finish}->($proc) if $args{on_finish};
-
-        if ($blocking) {
-            return $proc;
+            return;
         }
-        else {
-            die $proc->{reason};
-        }
-    }
+    );
 
-    # store proc attributes
-    $proc->{_on_finish} = $args{on_finish};
-
-    # create and store AE handles
-    $proc->_create_handles($hdl);
-
-    # create and start SIGCHILD listener
-    $proc->_create_sigchild( $args{win32_alive_timeout} ) if !$blocking;
-
-    # call on_ready callback if present
-    $args{on_ready}->($proc) if $args{on_ready};
-
-    $CACHE->{ $proc->{pid} } = $proc if !$blocking && refcount($proc) == 1;
-
-    if ($blocking) {
-        if ($MSWIN) {
-
-            # blocking wait
-            $proc->{_win32_proc}->Wait( Win32::Process::INFINITE() );
-
-            $proc->{_win32_proc}->GetExitCode( my $status );
-
-            $proc->_on_exit($status);
-        }
-        else {
-
-            # blocking wait
-            waitpid $proc->{pid}, 0 or die;
-
-            $proc->_on_exit( $? >> 8 );
-        }
-    }
-
-    return $blocking ? $proc : ();
+    return $self;
 };
 
-sub _redirect_std ( $self, $args ) {
-    my $hdl;
-
-    # create STDIN
-    if ( $args->{stdin} ) {
-        ( $hdl->{in_r}, $hdl->{in_w} ) = portable_socketpair();
-
-        # backup current STDIN handle
-        open $hdl->{old_in}, '<&', *STDIN or die;
-    }
-
-    # create STDOUT
-    if ( $args->{stdout} ) {
-        ( $hdl->{out_r}, $hdl->{out_w} ) = portable_socketpair();
-
-        # backup current STDOUT handle
-        binmode *STDOUT or die if $MSWIN;
-        open $hdl->{old_out}, '>&', *STDOUT or die;
-        Pcore::config_stdout(*STDOUT) if $MSWIN;
-    }
-
-    # create STDERR
-    if ( $args->{stderr} ) {
-        if ( $args->{stderr} == 2 ) {
-            ( $hdl->{out_r}, $hdl->{out_w} ) = portable_socketpair() if !$args->{stdout};
-        }
-        else {
-            ( $hdl->{err_r}, $hdl->{err_w} ) = portable_socketpair();
-        }
-
-        # backup current STDERR handle
-        binmode *STDERR or die if $MSWIN;
-        open $hdl->{old_err}, '>&', *STDERR or die;
-        Pcore::config_stdout(*STDERR) if $MSWIN;
-    }
-
-    # redirect STD* handles
-    open STDIN,  '<&', $hdl->{in_r}  or die if $args->{stdin};
-    open STDOUT, '>&', $hdl->{out_w} or die if $args->{stdout};
-    open STDERR, '>&', $args->{stderr} == 2 ? $hdl->{out_w} : $hdl->{err_w} or die if $args->{stderr};
-
-    return $hdl;
-}
-
-sub _create_process ( $self, $win32_cflags, $cmd ) {
+# TODO under windows run directly and handle process creation error
+sub _create_process ( $self, $cmd, $win32_cflags, $restore ) {
 
     # prepare environment
     local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
     local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
 
-    my $proc = bless {}, $self;
-
     # run process
     if ($MSWIN) {
+
+        # TODO unable to properly handle process creation error, when running via $ENV{COMSPEC}
+        # but when running directly - handles redirects not works
         Win32::Process::Create(    #
             my $win32_proc,
             $ENV{COMSPEC},
@@ -208,145 +170,170 @@ sub _create_process ( $self, $win32_cflags, $cmd ) {
             q[.]
         );
 
-        if ($win32_proc) {
-            $proc->{_win32_proc} = $win32_proc;
+        $restore->();
 
-            $proc->{pid} = $proc->{_win32_proc}->GetProcessID;
+        if ($win32_proc) {
+            $self->{_win32_proc} = $win32_proc;
+
+            # get PID
+            $self->{pid} = $win32_proc->GetProcessID;
+
+            # error creating process
+            if ( !$self->{pid} ) {
+                $self->_set_exit_code(-1);
+
+                return;
+            }
+        }
+
+        # error creating process
+        else {
+            $self->_set_exit_code(-1);
+
+            return;
         }
     }
     else {
-        unless ( $proc->{pid} = fork ) {
+        my ( $r, $w ) = portable_socketpair();
+
+        unless ( $self->{pid} = fork ) {
 
             # run process in own PGRP
             setpgrp;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
-            exec $cmd->@* or die $!;
+            local $SIG{__WARN__} = sub { };
+
+            exec $cmd->@* or do {
+                syswrite $w, "$!\n" or die $!;
+
+                POSIX::_exit(-1);
+            };
+        }
+        else {
+            $restore->();
+
+            close $w or die $!;
+
+            my $h = P->handle($r);
+
+            if ( my $err = $h->read_line("\n") ) {
+                $self->_set_exit_code( -1, $err->$* );
+
+                return;
+            }
         }
     }
 
-    return $proc;
-}
-
-sub _create_handles ( $self, $hdl ) {
-    weaken $self;
-
-    # create STDIN handle
-    if ( $hdl->{in_w} ) {
-        Pcore::AE::Handle->new(
-            fh         => $hdl->{in_w},
-            on_connect => sub ( $h, @ ) {
-                $self->{stdin} = $h;
-
-                return;
-            },
-        );
-    }
-
-    # create STDOUT handle
-    if ( $hdl->{out_r} ) {
-        Pcore::AE::Handle->new(
-            fh         => $hdl->{out_r},
-            on_connect => sub ( $h, @ ) {
-                $self->{stdout} = $h;
-
-                return;
-            },
-            on_error => sub ( $h, $fatal, $msg ) {
-                $self->{stdout} = delete $h->{rbuf};
-
-                return;
-            },
-            on_read => sub { },
-        );
-    }
-
-    # create STDERR handle
-    if ( $hdl->{err_r} ) {
-        Pcore::AE::Handle->new(
-            fh         => $hdl->{err_r},
-            on_connect => sub ( $h, @ ) {
-                $self->{stderr} = $h;
-
-                return;
-            },
-            on_error => sub ( $h, $fatal, $msg ) {
-                $self->{stderr} = delete $h->{rbuf};
-
-                return;
-            },
-            on_read => sub { },
-        );
-    }
+    $self->{status} = $PROC_STATUS_ACTIVE;
+    $self->{reason} = $STATUS_REASON->{$PROC_STATUS_ACTIVE};
 
     return;
 }
 
-sub _create_sigchild ( $self, $win32_alive_timeout ) {
-    weaken $self;
+sub wait ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    return $self if $self->{status} != $PROC_STATUS_ACTIVE;
+
+    my $cv = P->cv;
+
+    my $watcher;
 
     if ($MSWIN) {
-        $self->{_sigchild} = AE::timer 0, $win32_alive_timeout, sub {
-            $self->{_win32_proc}->GetExitCode( my $status );
+        $watcher = AE::timer 0, $self->{win32_alive_timeout}, sub {
 
-            if ( $status != Win32::Process::STILL_ACTIVE() ) {
-                undef $self->{_sigchild};    # remove timer
+            # -1 - pid is unknown, 0 - active, > 0 - terminated
+            if ( waitpid $self->{pid}, WNOHANG ) {
+                $self->{_win32_proc}->GetExitCode( my $exit_code );
 
-                $self->_on_exit($status);
+                $cv->($exit_code);
             }
 
             return;
         };
     }
     else {
-        $self->{_sigchild} = AE::child $self->pid, sub ( $pid, $status ) {
-            undef $self->{_sigchild};        # remove timer
-
-            $self->_on_exit( $status >> 8 );
+        $watcher = AE::child $self->{pid}, sub ( $pid, $exit_code ) {
+            $cv->( $exit_code >> 8 );
 
             return;
         };
     }
 
-    return;
+    $self->_set_exit_code( $cv->recv );
+
+    return $self;
+}
+
+sub capture ( $self, %args ) {
+    undef $self->{child_stdout};
+    $self->{stdout} = $self->{stdout}->read_eof( timeout => $args{timeout} ) if $self->{stdout};
+
+    undef $self->{child_stderr};
+    $self->{stderr} = $self->{stderr}->read_eof( timeout => $args{timeout} ) if $self->{stderr};
+
+    return $self;
+}
+
+sub is_active ($self) {
+    return if $self->{status} != $PROC_STATUS_ACTIVE;
+
+    # TRUE - terminated, -1 under linux, PID under windows
+    if ( waitpid $self->{pid}, WNOHANG ) {
+        my $exit_code;
+
+        if ($MSWIN) {
+            $self->{_win32_proc}->GetExitCode($exit_code);
+        }
+        else {
+            $exit_code = $? >> 8;
+        }
+
+        $self->_set_exit_code($exit_code);
+
+        return;
+    }
+    else {
+        return 1;
+    }
 }
 
 sub is_success ($self) {
-    return if !$self->pid;
+    $self->wait if $self->{status} == $PROC_STATUS_ACTIVE;
 
-    return !$self->{status};
+    return !$self->{exit_code};
 }
 
-sub _on_exit ( $self, $status ) {
-    return if defined $self->{status};
+sub is_error ($self) {
+    $self->wait if $self->{status} == $PROC_STATUS_ACTIVE;
 
-    # set status
-    $self->{status} = $status;
+    return !!$self->{exit_code};
+}
 
-    # set reason
-    $self->{reason} //= do {
-        if ( $self->{status} == 0 ) {
-            'OK';
-        }
-        else {
-            'Process terminated with exit code: ' . $self->{status};
-        }
-    };
+sub _get_exit_code ($self) {
+    $self->wait if $self->{status} == $PROC_STATUS_ACTIVE;
 
-    # cleanup
-    delete $self->@{qw[stdin _win32_proc _sigchild]};
+    return $self->{exit_code};
+}
 
-    delete $CACHE->{ $self->{pid} };
+sub _set_exit_code ( $self, $exit_code, $reason = undef ) {
+    return if $self->{status};
 
-    if ( $self->{stdout} && is_blessed_ref $self->{stdout} ) {
-        $self->{stdout} = delete $self->{stdout}->{rbuf};
+    $self->{exit_code} = $exit_code;
+
+    # success
+    if ( !$exit_code ) {
+        $self->{status} = $PROC_STATUS_TERMINATED_SUCCESS;
+        $self->{reason} = $reason // "$STATUS_REASON->{$PROC_STATUS_TERMINATED_SUCCESS}, exit code: 0";
     }
 
-    if ( $self->{stderr} && is_blessed_ref $self->{stderr} ) {
-        $self->{stderr} = delete $self->{stderr}->{rbuf};
+    elsif ( $exit_code == -1 ) {
+        $self->{status} = $PROC_STATUS_CREATE_ERROR;
+        $self->{reason} = $reason // $STATUS_REASON->{$PROC_STATUS_CREATE_ERROR};
     }
 
-    if ( my $on_finish = delete $self->{_on_finish} ) {
-        $on_finish->($self);
+    # error
+    else {
+        $self->{status} = $PROC_STATUS_TERMINATED_ERROR;
+        $self->{reason} = $reason // "$STATUS_REASON->{$PROC_STATUS_TERMINATED_ERROR}, exit code: $exit_code";
     }
 
     return;
@@ -359,9 +346,7 @@ sub _on_exit ( $self, $status ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (25)                               |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 148                  | Subroutines::ProhibitExcessComplexity - Subroutine "_redirect_std" with high complexity score (23)             |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (27)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -87,7 +87,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Git-Contributors",
-      "dist_version" => "0.034",
+      "dist_version" => "0.035",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Git::Contributors",
       "recursive_test_files" => 1,
@@ -96,7 +96,7 @@ EOW
         "Dist::Zilla" => "4.300039",
         "Dist::Zilla::Role::MetaProvider" => 0,
         "Dist::Zilla::Role::PrereqSource" => 0,
-        "Git::Wrapper" => "0.035",
+        "Git::Wrapper" => "0.038",
         "List::Util" => "1.33",
         "List::UtilsBy" => "0.04",
         "Moose" => 0,
@@ -114,6 +114,7 @@ EOW
       "test_requires" => {
         "Exporter" => "5.57",
         "File::Spec" => 0,
+        "Git::Wrapper" => "0.038",
         "Module::Metadata" => 0,
         "Sort::Versions" => 0,
         "Test::DZil" => 0,
@@ -133,6 +134,7 @@ EOW
     my %fallback_build_requires = (
       "Exporter" => "5.57",
       "File::Spec" => 0,
+      "Git::Wrapper" => "0.038",
       "Module::Metadata" => 0,
       "Sort::Versions" => 0,
       "Test::DZil" => 0,

@@ -1,13 +1,13 @@
 package Regexp::Pattern::Example;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.2.3'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.2.7'; # VERSION
 
 # BEGIN_BLOCK: def
 
 our %RE = (
     # the minimum spec
-    re1 => { pat => qr/\d{3}-\d{4}/ },
+    re1 => { pat => qr/\d{3}-\d{3}/ },
 
     # more complete spec
     re2 => {
@@ -17,8 +17,35 @@ our %RE = (
 A longer description.
 
 _
-        pat => qr/.../,
+        pat => qr/\d{3}-\d{3}(?:-\d{5})?/,
         tags => ['A','B'],
+        examples => [
+            {
+                str => '123-456',
+                matches => 1,
+            },
+            {
+                summary => 'Another example that matches',
+                str => '123-456-78901',
+                matches => 1,
+            },
+            {
+                summary => 'An example that does not match',
+                str => '123456',
+                matches => 0,
+            },
+            {
+                summary => 'An example that does not get tested',
+                str => '123456',
+            },
+            {
+                summary => 'Another example that does not get tested nor rendered to POD',
+                str => '234567',
+                matches => 0,
+                test => 0,
+                doc => 0,
+            },
+        ],
     },
 
     # dynamic (regexp generator)
@@ -47,6 +74,40 @@ _
             },
         },
         tags => ['B','C'],
+        examples => [
+            {
+                summary => 'An example that matches',
+                gen_args => {variant=>'A'},
+                str => '123-456',
+                matches => 1,
+            },
+            {
+                summary => "An example that doesn't match",
+                gen_args => {variant=>'B'},
+                str => '123-456',
+                matches => 0,
+            },
+        ],
+    },
+
+    re4 => {
+        summary => 'This is a regexp that does capturing',
+        tags => ['capturing'],
+        pat => qr/(\d{3})-(\d{3})/,
+        examples => [
+            {str=>'123-456', matches=>[123, 456]},
+            {str=>'foo-bar', matches=>[]},
+        ],
+    },
+
+    re5 => {
+        summary => 'This is another regexp that does (named) capturing and anchoring',
+        tags => ['capturing', 'anchored'],
+        pat => qr/^(?<cap1>\d{3})-(?<cap2>\d{3})/,
+        examples => [
+            {str=>'123-456', matches=>{cap1=>123, cap2=>456}},
+            {str=>'something 123-456', matches=>{}},
+        ],
     },
 );
 
@@ -67,7 +128,7 @@ Regexp::Pattern::Example - An example Regexp::Pattern::* module
 
 =head1 VERSION
 
-This document describes version 0.2.3 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2018-04-03.
+This document describes version 0.2.7 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -91,6 +152,19 @@ This is regexp for blah.
 A longer description.
 
 
+Examples:
+
+ "123-456" =~ re("Example::re2");  # matches
+
+ # Another example that matches
+ "123-456-78901" =~ re("Example::re2");  # matches
+
+ # An example that does not match
+ 123456 =~ re("Example::re2");  # doesn't match
+
+ # An example that does not get tested
+ 123456 =~ re("Example::re2");  # doesn't match
+
 =item * re3
 
 This is a regexp for blah blah.
@@ -111,6 +185,34 @@ Choose variant.
 =back
 
 
+
+Examples:
+
+ # An example that matches
+ "123-456" =~ re("Example::re3", {variant=>"A"});  # matches
+
+ # An example that doesn't match
+ "123-456" =~ re("Example::re3", {variant=>"B"});  # doesn't match
+
+=item * re4
+
+This is a regexp that does capturing.
+
+Examples:
+
+ "123-456" =~ re("Example::re4"); # matches, $1=123, $2=456
+
+ "foo-bar" =~ re("Example::re4");  # doesn't match
+
+=item * re5
+
+This is another regexp that does (named) capturing and anchoring.
+
+Examples:
+
+ "123-456" =~ re("Example::re5"); # matches, $+{"cap1"}=123, $+{"cap2"}=456
+
+ "something 123-456" =~ re("Example::re5");  # doesn't match
 
 =back
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.033-3-g6151582
+package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.034-6-g18fa0ce
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Add contributor names from git to your distribution
 # KEYWORDS: plugin distribution metadata git contributors authors commits
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -157,7 +157,11 @@ sub _build_contributors
     my @contributors = map { m/^\s*\d+\s*(.*)$/g; } @data;
 
     $self->log_debug([ 'extracted contributors from git: %s',
-        sub { require Data::Dumper; Data::Dumper->new([ \@contributors ])->Indent(2)->Terse(1)->Dump } ]);
+        sub {
+            require Data::Dumper;
+            chomp(my $str = Data::Dumper->new([ \@contributors ])->Indent(2)->Terse(1)->Dump);
+            $str;
+        } ]);
 
     my $fc = "$]" >= '5.016001'
         ? \&CORE::fc
@@ -173,8 +177,7 @@ sub _build_contributors
 
     if (not $self->include_authors)
     {
-        my @authors = $self->zilla->authors;
-        @authors = @{ $authors[0] } if @authors == 1 && ref $authors[0];
+        my @authors = eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->authors : @{ $self->zilla->authors };
 
         my @author_emails = map { /(<[^>]+>)/g } @authors;
         @contributors = grep {
@@ -267,7 +270,7 @@ Dist::Zilla::Plugin::Git::Contributors - Add contributor names from git to your 
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

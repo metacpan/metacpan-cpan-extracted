@@ -3,6 +3,7 @@ use Mojo::Base::Che; # один патч для хазов
 use Mojo::Base  'Mojolicious';#::Che
 use Mojo::Log::Che;
 use Mojo::Loader qw(load_class);
+#~ use Scalar::Util 'weaken';
 
 sub new {
   my ($class, %args) = @_;
@@ -48,7 +49,9 @@ sub new {
   $app->хуки();
   $app->спейсы();
   $app->маршруты();
-  
+  $app->задачи();
+
+
   return $app;
 
 }
@@ -225,6 +228,21 @@ sub спейсы {
   push @{$app->routes->namespaces}, @$ns;
 }
 
+sub задачи {
+  my $app = shift;
+  my $conf = $app->config;
+  my $tasks = $conf->{'jobs'} || $conf->{'tasks'} || $conf->{'задачи'}
+    or return;
+  
+  die "You have jobs and first enable plugin Minion"
+    unless $app->renderer->get_helper('minion');
+  
+  while (my ($name, $sub) = each %$tasks) {
+    $app->log->debug(sprintf("Applied task [%s] in [%s] from config", $name, $app->minion->add_task($name => $sub)));
+  }
+  #~ $app->minion->reset;
+}
+
 # overide only on my $path   = $req->url->path->to_route;# to_abs_string;
 sub Mojolicious::dispatch {
   my ($self, $c) = @_;
@@ -254,7 +272,7 @@ sub Mojolicious::dispatch {
 }
 
 
-our $VERSION = '0.035';
+our $VERSION = '0.040';
 
 =pod
 
@@ -268,7 +286,7 @@ our $VERSION = '0.035';
 
 =head1 VERSION
 
-0.035
+0.040
 
 =head1 NAME
 
@@ -369,6 +387,14 @@ Mojolicious::Che - Мой базовый модуль для приложени�
   routes => [
     [get=>'/', to=> {cb=>sub{shift->render(format=>'txt', text=>'Hello friend!');},}],
   ]
+  #~ 'задачи'=> {#first enable plugin Minion
+  jobs => {
+    slow_log => sub {
+      my ($job, $msg) = @_;
+      sleep 5;
+      $job->app->log->error(qq{slow_log "$msg"});
+    },
+  },
   };
 
 =head1 ATTRIBUTES
@@ -432,7 +458,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016-2017 Mikhail Che.
+Copyright 2016-2017+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

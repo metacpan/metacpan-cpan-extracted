@@ -15,7 +15,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '4.046';
+our $VERSION = '4.047';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -144,11 +144,8 @@ sub connect {
 				    ['database', 'host', 'port']);
 
 
-    if ($DBI::VERSION >= 1.49)
-    {
-      $dbi_imp_data = delete $attrhash->{dbi_imp_data};
-      $connect_ref->{'dbi_imp_data'} = $dbi_imp_data;
-    }
+    $dbi_imp_data = delete $attrhash->{dbi_imp_data};
+    $connect_ref->{'dbi_imp_data'} = $dbi_imp_data;
 
     if (!defined($this = DBI::_new_dbh($drh,
             $connect_ref,
@@ -1240,6 +1237,15 @@ connection to MySQL server if underlaying libmysqlclient library is
 vulnerable.  Option C<mysql_ssl_optional> can be used to make SSL
 connection vulnerable.
 
+=item mysql_server_pubkey
+
+Path to the RSA public key of the server. This is used for the
+sha256_password and caching_sha2_password authentication plugins.
+
+=item mysql_get_server_pubkey
+
+Setting C<mysql_get_server_pubkey> to true requests the public
+RSA key of the server.
 
 =item mysql_local_infile
 
@@ -1476,7 +1482,7 @@ against:
 
 =item mysql_dbd_stats
 
-  $info_hashref = $dhb->{mysql_dbd_stats};
+  $info_hashref = $dbh->{mysql_dbd_stats};
 
 DBD::mysql keeps track of some statistics in the mysql_dbd_stats attribute.
 The following stats are being maintained:
@@ -1725,6 +1731,11 @@ to DBD::mysql. The attribute list includes:
 this attribute determines whether a I<fetchrow> will chop preceding
 and trailing blanks off the column values. Chopping blanks does not
 have impact on the I<max_length> attribute.
+
+=item mysql_gtids
+
+Returns GTID(s) if GTID session tracking is ensabled in the server via
+session_track_gtids.
 
 =item mysql_insertid
 
@@ -1975,11 +1986,7 @@ to be completely thread safe, if the C libraries are thread safe
 and you don't share handles among threads.
 
 The obvious question is: Are the C libraries thread safe?
-In the case of MySQL the answer is "mostly" and, in theory, you should
-be able to get a "yes", if the C library is compiled for being thread
-safe (By default it isn't.) by passing the option -with-thread-safe-client
-to configure. See the section on I<How to make a threadsafe client> in
-the manual.
+In the case of MySQL the answer is yes, since MySQL 5.5 it is.
 
 
 =head1 ASYNCHRONOUS QUERIES

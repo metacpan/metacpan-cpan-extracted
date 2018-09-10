@@ -60,7 +60,7 @@ $Coro::State::DIEHOOK = sub {
 
 # catch warnings both in EV callbacks and Coro::async
 $Coro::State::WARNHOOK = sub {
-    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'ERROR', skip_frames => 1, with_trace => 1 );
+    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'WARN', skip_frames => 1, with_trace => 1 );
 
     {
         local $@;

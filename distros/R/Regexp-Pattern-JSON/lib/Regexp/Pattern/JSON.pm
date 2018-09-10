@@ -1,7 +1,7 @@
 package Regexp::Pattern::JSON;
 
-our $DATE = '2018-03-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our %RE;
 
@@ -15,6 +15,12 @@ $RE{number} = {
     (?: [eE] [-+]? [0-9]+ )?
   )
     )}x,
+    examples => [
+        {str=>'12', matches=>1},
+        {str=>'-34', matches=>1},
+        {str=>'1.23', matches=>1},
+        {str=>'-1.23e2', matches=>1},
+    ],
 };
 
 $RE{string} = {
@@ -34,6 +40,12 @@ $RE{string} = {
     )*
     "
     )}xms,
+    examples => [
+        {str=>q(""), matches=>1},
+        {str=>q(''), matches=>0, summary=>"Single quotes are not string delimiters"},
+        {str=>q("\\n"), matches=>1},
+        {str=>q("contains \\" double quote"), matches=>1},
+    ],
 };
 
 our $define = qr{
@@ -101,6 +113,11 @@ $RE{array} = {
     (?&ARRAY)
 $define
     )}xms,
+    examples => [
+        {str=>q([]), matches=>1},
+        {str=>q([1, true, "abc"]), matches=>1},
+        {str=>q([1), matches=>0, summary=>"Missing closing bracket"},
+    ],
 };
 
 $RE{object} = {
@@ -109,6 +126,12 @@ $RE{object} = {
     (?&OBJECT)
 $define
     )}xms,
+    examples => [
+        {str=>q({}), matches=>1},
+        {str=>q({"a":1}), matches=>1},
+        {str=>q({"a":1), matches=>0, summary=>"Missing closing curly bracket"},
+        {str=>q({a: 1}), matches=>0, summary=>"Unquoted key"},
+    ],
 };
 
 $RE{value} = {
@@ -117,6 +140,13 @@ $RE{value} = {
     (?&VALUE)
 $define
     )}xms,
+    examples => [
+        {str=>q(true), matches=>1},
+        {str=>q([]), matches=>1},
+        {str=>q({}), matches=>1},
+        {str=>q(-1), matches=>1},
+        {str=>q(""), matches=>1},
+    ],
 };
 
 1;
@@ -134,7 +164,7 @@ Regexp::Pattern::JSON - Regexp patterns to match JSON
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Pattern::JSON (from Perl distribution Regexp-Pattern-JSON), released on 2018-03-25.
+This document describes version 0.003 of Regexp::Pattern::JSON (from Perl distribution Regexp-Pattern-JSON), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -153,21 +183,75 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 
 Match a JSON array.
 
+Examples:
+
+ "[]" =~ re("JSON::array");  # matches
+
+ "[1, true, \"abc\"]" =~ re("JSON::array");  # matches
+
+ # Missing closing bracket
+ "[1" =~ re("JSON::array");  # doesn't match
+
 =item * number
 
 Match a JSON number literal.
+
+Examples:
+
+ 12 =~ re("JSON::number");  # matches
+
+ -34 =~ re("JSON::number");  # matches
+
+ 1.23 =~ re("JSON::number");  # matches
+
+ "-1.23e2" =~ re("JSON::number");  # matches
 
 =item * object
 
 Match a JSON object (a.k.a. hash/dictionary).
 
+Examples:
+
+ "{}" =~ re("JSON::object");  # matches
+
+ "{\"a\":1}" =~ re("JSON::object");  # matches
+
+ # Missing closing curly bracket
+ "{\"a\":1" =~ re("JSON::object");  # doesn't match
+
+ # Unquoted key
+ "{a: 1}" =~ re("JSON::object");  # doesn't match
+
 =item * string
 
 Match a JSON string literal.
 
+Examples:
+
+ "\"\"" =~ re("JSON::string");  # matches
+
+ # Single quotes are not string delimiters
+ "''" =~ re("JSON::string");  # doesn't match
+
+ "\"\\n\"" =~ re("JSON::string");  # matches
+
+ "\"contains \\\" double quote\"" =~ re("JSON::string");  # matches
+
 =item * value
 
 Match a JSON value.
+
+Examples:
+
+ "true" =~ re("JSON::value");  # matches
+
+ "[]" =~ re("JSON::value");  # matches
+
+ "{}" =~ re("JSON::value");  # matches
+
+ -1 =~ re("JSON::value");  # matches
+
+ "\"\"" =~ re("JSON::value");  # matches
 
 =back
 

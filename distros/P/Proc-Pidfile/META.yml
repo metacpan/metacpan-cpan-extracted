@@ -16,7 +16,7 @@ name: Proc-Pidfile
 provides:
   Proc::Pidfile:
     file: lib/Proc/Pidfile.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   Carp: '0'
   Fcntl: '0'
@@ -28,5 +28,5 @@ requires:
 resources:
   homepage: https://github.com/neilbowers/Proc-Pidfile
   repository: https://github.com/neilbowers/Proc-Pidfile.git
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'YAML::Tiny version 1.62'

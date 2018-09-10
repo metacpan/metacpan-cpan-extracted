@@ -1,9 +1,8 @@
-package Pcore::Ext v0.17.11;
+package Pcore::Ext v0.18.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
 use Pcore::Ext::Context;
-use Pcore::Resources;
 use Pcore::Util::Scalar qw[is_ref];
 use Package::Stash::XS qw[];
 
@@ -33,12 +32,12 @@ sub scan ( $self, $app, @namespaces ) {
 
                         # load class
                         my $context_cfg = do {
-                            no strict qw[refs];
 
                             # configure namespace
                             push @{"$namespace\::ISA"}, 'Pcore::Ext::Base';
                             *{"$namespace\::raw"}  = sub : prototype($) {die};
                             *{"$namespace\::func"} = sub                {die};
+                            *{"$namespace\::cdn"}  = \undef;
                             *{"$namespace\::api"}  = \undef;
                             *{"$namespace\::class"} = \undef;
                             *{"$namespace\::type"}  = \undef;
@@ -55,11 +54,7 @@ sub scan ( $self, $app, @namespaces ) {
                         my $context_path = "$root_namespace_path/" . $path =~ s/[.]pm\z//smr;
 
                         for my $name ( grep {/\AEXT_/sm} Package::Stash::XS->new($namespace)->list_all_symbols('CODE') ) {
-                            my $ref = do {
-                                no strict qw[refs];
-
-                                *{"$namespace\::$name"}{CODE};
-                            };
+                            my $ref = *{"$namespace\::$name"}{CODE};
 
                             $name =~ s/\AEXT_//sm;
 
@@ -145,7 +140,7 @@ sub _resolve_extend ( $self, $app, $tree ) {
                     my $ext_type = $APP->{ $class->{app_name} }->{ext_type};
 
                     # load extjs config, if not loaded
-                    $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg( 'Pcore-Resources', 'data', "ext-$ext_ver/$ext_type.json" ) if !exists $extjs->{$ext_ver}->{$ext_type};
+                    $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg( 'Pcore-Ext', 'data', "ext/$ext_ver/$ext_type.json" ) if !exists $extjs->{$ext_ver}->{$ext_type};
 
                     # base class is not exists
                     die qq[Invalid ExtJS class name "$class->{extend}"] if !exists $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };
@@ -291,7 +286,7 @@ sub _build_ext ( $self, $tree ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 84                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 79                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

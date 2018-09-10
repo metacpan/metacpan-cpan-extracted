@@ -1,0 +1,17 @@
+0.003   2018-09-10 (PERLANCAR)
+
+	- Use re() to retrieve the patterns.
+
+	- [dist] Bump prereq to Regexp::Pattern 0.2.7.
+
+
+0.002   2018-09-10 (PERLANCAR)
+
+	- Fix test-regexp-pattern.
+
+	- [bugfix] Forgot to require Test::More.
+
+
+0.001   2018-09-10 (PERLANCAR)
+
+        - First release.

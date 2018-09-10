@@ -113,7 +113,7 @@ sub BUILD ( $self, $args ) {
         # },
     };
 
-    my $dbname = $self->{uri}->path->to_string || ':memory:';
+    my $dbname = $self->{uri}->{path} ? $self->{uri}->{path}->to_string : ':memory:';
 
     my $dbh = DBI->connect( "dbi:SQLite:dbname=$dbname", q[], q[], $attr );
 

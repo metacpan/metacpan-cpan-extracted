@@ -1,0 +1,17 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use lib '/home/ben/projects/unicode-diacritic-strip/lib';
+use Unicode::Diacritic::Strip 'fast_strip';
+binmode STDIN, ":encoding(utf8)";
+binmode STDOUT, ":encoding(utf8)";
+while (<STDIN>) {
+    $_ = fast_strip ($_);
+    print;
+}
+
+# Local variables:
+# mode: perl
+# End:

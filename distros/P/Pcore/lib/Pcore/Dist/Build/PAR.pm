@@ -71,8 +71,9 @@ sub run ($self) {
         # add pardeps.json modules, skip eval modules
         $profile->{mod}->@{ grep { !/\A[(]eval\s/sm } $pardeps->@* } = ();
 
-        # replace Inline.pm with Pcore/Core/Inline.pm
-        $profile->{mod}->{'Pcore/Core/Inline.pm'} = undef if delete $profile->{mod}->{'Inline.pm'};
+        # remove Inline.pm
+        # TODO maybe remove all Inline::* family???
+        delete $profile->{mod}->{'Inline.pm'};
 
         # add Filter::Crypto::Decrypt deps if crypt mode is used
         $profile->{mod}->{'Filter/Crypto/Decrypt.pm'} = undef if $profile->{crypt};

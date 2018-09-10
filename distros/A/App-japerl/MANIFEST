@@ -1,0 +1,13 @@
+lib/App/japerl.pm
+bin/japerl.bat
+bin/Esjis.pm
+bin/Sjis.pm
+Changes
+Makefile.PL
+pmake.bat
+MANIFEST
+README
+META.yml
+LICENSE
+t/001_test.t
+t/hello.pl

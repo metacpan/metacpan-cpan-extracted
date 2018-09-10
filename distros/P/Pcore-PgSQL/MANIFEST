@@ -5,6 +5,7 @@ MANIFEST
 META.json
 README.md
 cpanfile
+lib/Pcore/AE/Handle.pm
 lib/Pcore/Handle/pgsql.pm
 lib/Pcore/PgSQL.pm
 lib/Pcore/PgSQL/DBH.pm

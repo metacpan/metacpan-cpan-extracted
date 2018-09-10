@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2017-12-09'; # DATE
-our $VERSION = '0.862'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.863'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -28,6 +28,7 @@ sub _md2pod {
 # because we need stuffs in parent's gen_doc_section_arguments() even to print
 # the name, we'll just do everything in after_gen_doc().
 sub after_gen_doc {
+    no warnings 'once';
     require Data::Dump::SortKeys;
     local $Data::Dump::SortKeys::REMOVE_PRAGMAS = 1;
 
@@ -83,6 +84,7 @@ sub after_gen_doc {
   EXAMPLE:
     for my $eg (@$examples) {
         $i++;
+        next if exists $eg->{doc} && !$eg->{doc};
         my $argsdump;
         if ($eg->{args}) {
             local $Data::Dump::SortKeys::SORT_KEYS = $arg_sorter;
@@ -427,7 +429,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.862 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2017-12-09.
+This document describes version 0.863 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -445,7 +447,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 
@@ -465,7 +467,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

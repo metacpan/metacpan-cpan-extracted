@@ -1,0 +1,173 @@
+#!perl
+
+our $DATE = '2018-09-09'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case);
+
+my %Opts = (
+    #backend => 'Math::Random::GaussianRange',
+    num => 1,
+    min => undef,
+    max => undef,
+    mean => undef,
+    stdev => undef,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'num|n=i'    => \$Opts{num},
+        'infinite'   => sub { $Opts{num} = -1 },
+        #'backend=s'  => \$Opts{backend},
+        'min=f'      => \$Opts{min},
+        'max=f'      => \$Opts{max},
+        'mean=f'     => \$Opts{mean},
+        'stdev=f'    => \$Opts{stdev},
+        'version|v'  => sub {
+            no warnings 'once';
+            print "nrand version ", ($main::VERSION || 'dev'),
+                " (", ($main::DATE // 'date'), ")\n";
+            exit 0;
+        },
+        'help|h' => sub {
+            print <<USAGE;
+Usage:
+  nrand [--num|-n N|--infinite] <(--min X --max Y) | (--mean X --stdev Y)>
+  nrand --help, -h
+  nrand --version, -v
+
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my $maxbatch = 10000;
+
+    my $n = $Opts{num};
+    if (defined $Opts{min} && defined $Opts{max}) {
+        require Math::Random::GaussianRange;
+        while (1) {
+            my $nbatch = $n < 0 || $n > $maxbatch ? $maxbatch : $n;
+            $n -= $nbatch if $n > 0;
+            my $nums = Math::Random::GaussianRange::generate_normal_range({
+                min   => $Opts{min},
+                max   => $Opts{max},
+                n     => $nbatch,
+                round => 0,
+            });
+            print "$_\n" for @$nums;
+            last if $n == 0;
+        }
+    } elsif (defined $Opts{mean} && defined $Opts{stdev}) {
+        require Math::Random::NormalDistribution;
+        my $gen = Math::Random::NormalDistribution::rand_nd_generator(
+            $Opts{mean}, $Opts{stdev});
+        while (1) {
+            print $gen->(), "\n";
+            $n-- if $n > 0;
+            last if $n == 0;
+        }
+    } else {
+        warn "Please specify --min and --max, or --mean and --stdev\n";
+        exit 99;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Generate normally distributed random numbers
+# PODNAME: nrand
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+nrand - Generate normally distributed random numbers
+
+=head1 VERSION
+
+This document describes version 0.001 of nrand (from Perl distribution App-nrand), released on 2018-09-09.
+
+=head1 SYNOPSIS
+
+ % nrand [--num|-n N|--infinite] <(--min X --max Y) | (--mean X --stdev Y)>
+ % nrand --help, -h
+ % nrand --version, -v
+
+=head1 DESCRIPTION
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --help, -h
+
+=item * --version, -v
+
+=item * --min float
+
+=item * --max float
+
+=item * --mean float
+
+=item * --stdev float
+
+=item * --num int
+
+=item * --infinite
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-nrand>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-nrand>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-nrand>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

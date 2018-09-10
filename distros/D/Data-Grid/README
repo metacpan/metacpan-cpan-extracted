@@ -1,0 +1,184 @@
+NAME
+    Data::Grid - Incremental read access to grid-based data
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Data::Grid;
+
+        # Have the parser guess the kind of file, using defaults.
+
+        my $grid = Data::Grid->parse('arbitrary.xls');
+
+        # or
+
+        my $grid = Data::Grid->parse(
+            source  => 'arbitrary.csv', # or xls, or xlsx, or filehandle...
+            header  => 1,               # first line is a header everywhere
+            columns => [qw(a b c)],     # override the header
+            options => \%options,       # driver-specific options
+        );
+
+        # Each object contains one or more tables.
+
+        for my $table ($grid->tables) {
+
+            # Each table has one or more rows.
+
+            while (my $row = $table->next) {
+
+                # The columns can be dereferenced as an array,
+
+                my @cols = @$row; # or just $row->columns
+
+                # or, if header is present or fields were named in the
+                # constructor, as a hash.
+
+                my %cols = %$row;
+
+                # Now we can do stuff.
+            }
+        }
+
+DESCRIPTION
+    Problem 1
+        You have a mountain of data files from two decades of using MS
+        Office (and other) products, and you want to collate their contents
+        into someplace sane.
+
+    Problem 2
+        The files are in numerous different formats, and a consistent
+        interface would really cut down on the effort of extracting them.
+
+    Problem 3
+        You've looked at Data::Table and Spreadsheet::Read, but deemed their
+        table-at-a-time strategy to be inappropriate for your purposes.
+
+    The goal of Data::Grid is to provide an extensible, uniform,
+    object-oriented interface to all kinds of grid-shaped data. A key
+    behaviour I'm after is to perform an incremental read over a potentially
+    large data source, so as not to unnecessarily gobble up system
+    resources.
+
+DEVELOPER RELEASE
+    Odds are I will probably decide to change the interface at some point
+    before locking in, and I don't want to guarantee consistency yet. If I
+    do, and you use this, your code will probably break.
+
+    Suffice to say this module is ALPHA QUALITY at best.
+
+METHODS
+  parse $FILE | %PARAMS
+    The principal way to instantiate a Data::Grid object is through the
+    "parse" factory method. You can either pass it a filelike thing or a set
+    of parameters. *Filelike thing* is either a filename, "GLOB" reference,
+    "SCALAR" reference or "ARRAY" reference of scalars. If the filelike
+    thing is passed alone, its type will be detected using File::MMagic. To
+    tune this behaviour, use the parameters:
+
+    source
+        This is equivalent to $file.
+
+    header
+        If you know that the document you're opening has a header, set this
+        flag to a true value and it will be consumed for use in "as_hash" in
+        Data::Grid::Row. If there is more than one table in the document,
+        set this value to an "ARRAY" reference of flags. This object will be
+        treated as a ring, meaning that, for instance, if the header
+        designation is "[1, 0]", the third table in the document will be
+        treated as having a header, fourth will not, the fifth will, and so
+        on.
+
+    columns
+        Specify a list of columns in lieu of a header, or otherwise override
+        any header, which is thrown away. A single "ARRAY" reference of
+        strings will be duplicated to each table in the document. An array
+        of arrays will be applied to each table with the same wrapping
+        behaviour as "header".
+
+    start
+        Set a row offset, i.e, a number of rows to skip *before* any header.
+        Since this is an offset, it starts with zero. Same rule applies for
+        multiple tables in the document.
+
+    skip
+        Set a number of rows to skip *after* the header, defaulting, of
+        course, to zero. Same multi-table rule applies.
+
+    options
+        This "HASH" reference will be passed as-is to the driver.
+
+    driver
+        Specify a driver and bypass type detection. Modules under the
+        Data::Grid namespace can be handed in as CSV, Excel, and
+        Excel::XLSX. Prefix with a "+" for other package namespaces.
+
+    checker
+        Specify either MMagic or MimeInfo to detect the type of file. MMagic
+        is the default. In lieu of the class name
+
+  tables
+    Generate and return the array of tables.
+
+  fh
+    Retrieve the document's file handle embedded in the grid object.
+
+EXTENSION INTERFACE
+    Take a look at Data::Grid::CSV or Data::Grid::Excel for clues on how to
+    extend this package.
+
+  table_class
+    Returns the class to use for instantiating tables. Defaults to
+    Data::Grid::Table, which is an abstract class. Override this accessor
+    and its neighbours with your own values for extensions.
+
+  row_class
+    Returns the class to use for instantiating rows. Defaults to
+    Data::Grid::Row.
+
+  cell_class
+    Returns the class to use for instantiating cells. Defaults to
+    Data::Grid::Cell, again an abstract class.
+
+  table_params $POSITION
+    Generate a set of parameters suitable for passing in as a constructor,
+    either as a hash or "HASH" reference, depending on calling context.
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+BUGS
+    Please report bugs to GitHub issues
+    <https://github.com/doriantaylor/p5-data-grid/issues>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Grid
+
+    Alternatively, you can read the documentation on MetaCPAN
+    <https://metacpan.org/release/Data::Grid>.
+
+SEE ALSO
+    *   Text::CSV
+
+    *   Spreadsheet::ParseExcel
+
+    *   Spreadsheet::ParseXLSX
+
+    *   Data::Table
+
+COPYRIGHT & LICENSE
+    Copyright 2010-2018 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

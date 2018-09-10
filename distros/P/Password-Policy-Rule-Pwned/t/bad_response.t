@@ -42,7 +42,7 @@ my @urls = (
 if ($ENV{NO_NETWORK_TESTING}) {
 	plan skip_all => 'NO_NETWORK_TESTING is set'
 } else {
-	plan tests => scalar @urls
+	plan tests => 2 * scalar @urls
 }
 
 my $pp = Password::Policy->new (config => 't/stock.yaml');
@@ -51,6 +51,8 @@ my $encpw = encode ('UTF-8', $pass);
 for my $try (@urls) {
 	$Password::Policy::Rule::Pwned::base_url = $try->{url};
 	throws_ok { $pp->process({ password => $encpw }) }
-		qr/Invalid response checking for pwned password/,
+		'Password::Policy::Exception::PwnedError',
 		"$try->{name} trapped";
+	like $@, qr/Invalid response checking for pwned password/,
+		'Expected error message received'
 }

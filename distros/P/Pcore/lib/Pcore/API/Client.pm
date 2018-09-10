@@ -21,7 +21,7 @@ has timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
 
 # WebSocket options
 has compression    => ( is => 'ro', isa => Bool, default => 0 );
-has listen_events  => ( is => 'ro', isa => ArrayRef );
+has bind_events    => ( is => 'ro', isa => ArrayRef );
 has forward_events => ( is => 'ro', isa => ArrayRef );
 has on_connect     => ( is => 'ro', isa => Maybe [CodeRef] );
 has on_disconnect  => ( is => 'ro', isa => Maybe [CodeRef] );
@@ -86,16 +86,16 @@ sub api_call ( $self, $method, @args ) {
     my $cb = is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? pop : undef;
 
     if ( defined wantarray ) {
-        my $rouse_cb = Coro::roouse_cb;
+        my $cv = P->cv;
 
         if ( $self->{_is_http} ) {
-            $self->_send_http( $method, \@args, $rouse_cb );
+            $self->_send_http( $method, \@args, $cv );
         }
         else {
-            $self->_send_ws( $method, \@args, $rouse_cb );
+            $self->_send_ws( $method, \@args, $cv );
         }
 
-        my $res = Coro::rouse_wait $rouse_cb;
+        my $res = $cv->recv;
 
         return $cb ? $cb->($res) : $res;
     }
@@ -197,7 +197,7 @@ sub _get_ws ( $self, $cb ) {
             tls_ctx          => $self->{tls_ctx},
             before_connect   => {
                 token          => $self->{token},
-                listen_events  => $self->{listen_events},
+                bind_events    => $self->{bind_events},
                 forward_events => $self->{forward_events},
             },
             on_listen_event => sub ( $ws, $mask ) {    # API server can listen client events

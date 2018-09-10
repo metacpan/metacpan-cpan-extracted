@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=depak
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.57'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.580'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,7 @@ depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.57 of depak (from Perl distribution App-depak), released on 2017-07-14.
+This document describes version 0.580 of depak (from Perl distribution App-depak), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -99,17 +99,15 @@ the fallback when some modules are not installed.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -799,7 +797,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

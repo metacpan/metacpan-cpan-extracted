@@ -1,4 +1,12 @@
-Revision history for Data-Sah-Normalize
+0.050   2018-09-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove unnecessary dependency to DefHash.
+
+	- [removed] Remove benchmark devscript, see
+	  Bencher::Scenario::DataSah::normalize_schema instead.
+
 
 0.04    2015-09-06 (PERLANCAR)
 

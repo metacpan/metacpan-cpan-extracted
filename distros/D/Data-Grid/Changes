@@ -1,0 +1,19 @@
+Revision history for Data-Grid
+
+0.03    Mon Sep 10 06:51:22 PDT 2018
+        guess CPAN doesn't index dev releases anymore?
+
+0.02_03 Sun Sep  9 19:33:02 PDT 2018
+        hey maybe why don't you actually run make test before releasing?
+
+0.02_02 Sun Sep  9 14:33:34 PDT 2018
+        changed makefile to do an end run around CPANTS
+
+0.02_01 Sun Sep  9 14:16:59 PDT 2018
+        moved to Moo, actually added functionality claimed by docs
+
+0.01_03 Sun 22 Apr 2018 21:55:33 PDT
+        added flag  $row->as_hash(1) to flatten elements
+
+0.01_02 Thu Mar 29 11:35:50 PDT 2018
+        solved the 'deep recursion' mystery of ::Row->as_hash

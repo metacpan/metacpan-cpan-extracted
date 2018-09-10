@@ -7,7 +7,7 @@ use vars qw($VERSION);
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
 
-$VERSION = '1.022';
+$VERSION = '1.023';
 
 =encoding utf8
 
@@ -228,13 +228,13 @@ sub cook {
 Returns the name for the ttree command from template, and croaks if
 that path does not exist or is not executable.
 
-The default path is F</usr/local/bin/ttree>. You can override this in
-a subclass.
+The default path is F</usr/local/bin/ttree>. Change this with the TTREE
+environment variable or you can override this in a subclass.
 
 =cut
 
 sub ttree_command {
-	my $path = "/usr/local/bin/ttree";
+	my $path = $ENV{'TTREE'} // "/usr/local/bin/ttree";
 
 	croak "Didn't find ttree at $path!\n" unless -e $path;
 	croak "$path is not executable!\n"    unless -x $path;

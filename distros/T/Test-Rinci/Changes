@@ -1,4 +1,7 @@
-Revision history for Test-Rinci
+0.150   2018-09-10 (PERLANCAR)
+
+	- test-rinci: Add Getopt::Long config bundling no_ignore_case.
+
 
 0.14    2016-03-06 (PERLANCAR)
 

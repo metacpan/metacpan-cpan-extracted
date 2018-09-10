@@ -24,5 +24,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2/issues
   homepage: https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2
   repository: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2.git
-version: '1.54'
+version: '1.55'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -186,7 +186,6 @@ in British English, or "vice" and "vise" in American English.
     | labor             | labour            | labour            |          |          |         |
     | laborer           | labourer          | labourer          |          |          |         |
     | lackluster        | lacklustre        | lacklustre        |          |          |         |
-    | lasagna           | lasagne           | lasagna           |          |          |         |
     | leaned            | leant             | leaned            |          |          |         |
     | learned           | learnt            | learned           |          |          |         |
     | legalize          | legalise          | legalize          |          |          | Y       |

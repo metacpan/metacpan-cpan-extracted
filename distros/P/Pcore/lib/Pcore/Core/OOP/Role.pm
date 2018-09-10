@@ -10,15 +10,11 @@ sub import ( $self, $caller = undef ) {
     # register role
     $Pcore::Core::OOP::Class::REG{$caller}{is_role} = 1;
 
-    {
-        no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
-
-        *{"$caller\::does"}     = \&Pcore::Core::OOP::Class::_does;
-        *{"$caller\::requires"} = \&_requires;
-        *{"$caller\::with"}     = \&_with;
-        *{"$caller\::has"}      = \&_has;
-        *{"$caller\::around"}   = \&_around;
-    }
+    *{"$caller\::does"}     = \&Pcore::Core::OOP::Class::_does;
+    *{"$caller\::requires"} = \&_requires;
+    *{"$caller\::with"}     = \&_with;
+    *{"$caller\::has"}      = \&_has;
+    *{"$caller\::around"}   = \&_around;
 
     return;
 }
@@ -91,7 +87,7 @@ sub _around ( $name, $code ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 16                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 13                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

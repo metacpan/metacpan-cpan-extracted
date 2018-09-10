@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.4;
+package Pcore::PDF v0.5.5;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -111,18 +111,9 @@ sub DESTROY ($self) {
 }
 
 sub generate_pdf ( $self, $html, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+    my $cv = P->cv;
 
-    my $on_finish = sub ($res) {
-        if ($rouse_cb) {
-            $rouse_cb->( $cb ? $cb->($res) : $res );
-        }
-        else {
-            $cb->($res) if $cb;
-        }
-
-        return;
-    };
+    my $on_finish = sub ($res) { $cv->( $cb ? $cb->($res) : $res ) };
 
     push $self->{_queue}->@*, [ $html, $on_finish ];
 
@@ -133,7 +124,7 @@ sub generate_pdf ( $self, $html, $cb = undef ) {
         $self->_run_thread;
     }
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 sub remove_logo ( $self, $pdf_ref ) {
@@ -278,9 +269,9 @@ sub _run_task ( $self, $task, $proc ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 288                  | * Link L<Pcore::Util::Result> on line 345 does not specify text                                                |
-## |      | 288                  | * Link L<Pcore::Util::Result> on line 355 does not specify text                                                |
-## |      | 288                  | * Link L<Pcore> on line 353 does not specify text                                                              |
+## |      | 279                  | * Link L<Pcore::Util::Result> on line 336 does not specify text                                                |
+## |      | 279                  | * Link L<Pcore::Util::Result> on line 346 does not specify text                                                |
+## |      | 279                  | * Link L<Pcore> on line 344 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

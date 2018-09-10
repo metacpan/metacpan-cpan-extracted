@@ -1,4 +1,9 @@
-Revision history for Perinci-Sub-Normalize
+0.200   2018-09-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Remove dependency to DefHash.
+
 
 0.19    2016-12-11 (PERLANCAR)
 

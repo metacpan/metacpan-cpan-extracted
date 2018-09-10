@@ -111,7 +111,6 @@ sub to_js ( $self ) {
               'Pcore::Ext::Context::L10N';
         };
 
-        no strict qw[refs];
         no warnings qw[redefine];
 
         local *{"$self->{ctx}->{namespace}\::raw"} = sub : prototype($) ($js) {
@@ -131,6 +130,9 @@ sub to_js ( $self ) {
                 'Pcore::Ext::Context::Func'
             ), @_;
         };
+
+        # CDN link
+        local ${"$self->{ctx}->{namespace}::cdn"} = $self->{app}->{cdn};
 
         tie my $api->%*,   'Pcore::Ext::Context::_TiedAttr', $self, '_ext_api_method';
         tie my $class->%*, 'Pcore::Ext::Context::_TiedAttr', $self, '_ext_class';
@@ -228,9 +230,9 @@ package Pcore::Ext::Context::_l10n {
 ## |      | 47                   | * Private subroutine/method '_ext_class' declared but not used                                                 |
 ## |      | 60                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 135, 136, 137, 145   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 137, 138, 139, 147   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 102, 117             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 102, 116             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

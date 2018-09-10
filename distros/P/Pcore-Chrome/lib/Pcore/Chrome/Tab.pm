@@ -42,20 +42,9 @@ sub _cmd ( $self, $cmd, @args ) {
 
     my $id = $_MSG_ID++;
 
-    my $rouse_cb;
+    my $cv = P->cv;
 
-    if ( defined wantarray ) {
-        $rouse_cb = Coro::rouse_cb;
-
-        $self->{_cb}->{$id} = sub ( $res ) {
-            $rouse_cb->( $cb ? $cb->($res) : $res );
-
-            return;
-        };
-    }
-    elsif ($cb) {
-        $self->{_cb}->{$id} = $cb;
-    }
+    $self->{_cb}->{$id} = sub ( $res ) { $cv->( $cb ? $cb->($res) : $res ) };
 
     $self->{_ws}->send_text( to_json {
         id     => $id,
@@ -63,7 +52,7 @@ sub _cmd ( $self, $cmd, @args ) {
         params => {@args},
     } );
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 sub _connect ( $self ) {

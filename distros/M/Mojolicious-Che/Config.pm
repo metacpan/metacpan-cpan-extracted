@@ -38,6 +38,7 @@ See raw this module content.
       #~ [charset => { charset => 'UTF-8' }, ],
       #~ ['HeaderCondition'],
       #~ ['ParamsArray'],
+      #~ [Minion => {Pg => 'postgresql://postgres@/test'}],
   ],
   #mojo_session
   'сессия'=> {cookie_name => 'ELK'},
@@ -89,5 +90,13 @@ SQL
   # routes
   'маршруты' => [
     [get=>'/', to=> {cb=>sub{shift->render(format=>'txt', text=>'Здорова!');},}],
-  ]
+  ],
+    #~ 'задачи'=> {#first enable plugin Minion
+  #~ jobs => {
+    #~ slow_log => sub {
+      #~ my ($job, $msg) = @_;
+      #~ sleep 5;
+      #~ $job->app->log->error(qq{slow_log "$msg"});
+    #~ },
+  #~ },
 };

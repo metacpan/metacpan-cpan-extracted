@@ -17,8 +17,6 @@ sub _build_upstream ($self) {
 }
 
 sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
     my $chdir_guard = $root ? P->file->chdir( $self->{root} ) : undef;
 
     my @cmd = ( 'git', $cmd->@* );
@@ -26,27 +24,22 @@ sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
     # git "clone" and "init" does not support --porcelain -z options
     push @cmd, qw[--porcelain -z] if $cmd->[0] ne 'init' && $cmd->[0] ne 'clone';
 
-    P->sys->run_proc(
+    my $proc = P->sys->run_proc(
         \@cmd,
-        stdout    => 1,
-        stderr    => 1,
-        on_finish => sub ($proc) {
-            my $res;
+        stdout => 1,
+        stderr => 1,
+    )->capture->wait;
 
-            if ( $proc->is_success ) {
-                $res = res 200, $proc->stdout ? [ split /\x00/sm, $proc->stdout ] : undef;
-            }
-            else {
-                $res = res [ 500, $proc->stderr ? ( $proc->stderr =~ /\A(.+?)\n/sm )[0] : () ];
-            }
+    my $res;
 
-            $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
+    if ( $proc->{is_success} ) {
+        $res = res 200, $proc->{stdout} ? [ split /\x00/sm, $proc->{stdout}->$* ] : undef;
+    }
+    else {
+        $res = res [ 500, $proc->{stderr} ? ( $proc->{stderr}->$* =~ /\A(.+?)\n/sm )[0] : () ];
+    }
 
-            return;
-        }
-    );
-
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return $cb ? $cb->($res) : $res;
 }
 
 sub scm_cmd ( $self, $cmd, $cb = undef ) {
@@ -116,8 +109,10 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 65, 71, 77, 83, 89,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |      | 95, 101, 107         |                                                                                                                |
+## |    3 | 58, 64, 70, 76, 82,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |      | 88, 94, 100          |                                                                                                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 27                   | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

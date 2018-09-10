@@ -6,11 +6,11 @@ my $builder = Module::Build->new(
     module_name         => 'HO::class',
     license             => 'perl',
     dist_author         => 'Sebastian Knapp <sknpp@cpan.org>',
-    dist_version        => '0.077',
+    dist_version        => '0.078',
     requires => {
         'perl' => '5.6.0',
         'Class::ISA' => '0.20',
-        'Package::Subroutine' => 'v0.22'
+        'Package::Subroutine' => '0.022'
     },
     configure_requires => {
         'Module::Build' => 0.42
@@ -24,8 +24,8 @@ my $builder = Module::Build->new(
     create_makefile_pl  => 'traditional',
     meta_add => {
         resources => {
-            repository => 'git://github.com/giftnuss/p5-ho-class.git',
-            homepage => 'http://github.com/giftnuss/p5-ho-class/tree/master'
+            repository => 'git://github.com/p5-ho-develop/class.git',
+            homepage => 'https://github.com/p5-ho-develop/class/tree/master'
         }
     }
 );

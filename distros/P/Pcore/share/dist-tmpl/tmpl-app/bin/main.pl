@@ -17,13 +17,24 @@ sub CLI {
     };
 }
 
-my $cfg = P->cfg->read("$ENV->{DATA_DIR}cfg.ini");
+# load app config
+my $cfg = P->cfg->read("$ENV->{DATA_DIR}cfg.yaml");
 
 my $app = <: $module_name :>->new( {    #
     app_cfg => {
         server => {                     # passed directly to the Pcore::HTTP::Server constructor
-            listen => 'unix:/var/run/<: $dist_path :>.sock',
+            listen => '/var/run/<: $dist_path :>.sock',
             ssl    => 0,
+        },
+        router => {                     # passed directly to the Pcore::App::Router
+            '*' => undef,
+
+            # 'host1.com' => 'Test::App::App1',
+            # 'host2.com' => 'Test::App::App2',
+        },
+        node => {
+            server => $cfg->{node}->{server},
+            listen => $cfg->{node}->{listen},
         },
         api => {
             connect => $cfg->{auth},
@@ -41,7 +52,7 @@ my $app = <: $module_name :>->new( {    #
     cfg   => $cfg,
 } );
 
-my $cv = AE::cv;
+my $cv = P->cv;
 
 $app->run;
 
@@ -58,7 +69,7 @@ $cv->recv;
 ## |======+======================+================================================================================================================|
 ## |    3 | 7                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 25                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 26                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

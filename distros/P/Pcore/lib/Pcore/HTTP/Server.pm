@@ -1,53 +1,43 @@
 package Pcore::HTTP::Server;
 
 use Pcore -class, -const, -res;
+use Pcore::Util::Scalar qw[is_ref];
 use AnyEvent::Socket qw[];
 use Pcore::HTTP::Server::Request;
 
 # listen:
-# - unix:/socket/path
-# - unix:abstract-socket-name
-# - *:80
-# - 127.0.0.1:80
+# - /socket/path
+# - abstract-socket-name
+# - //0.0.0.0:80
+# - //127.0.0.1:80
 
-has listen => ();    # ( is => 'ro', isa => Str, required => 1 );
-has app    => ();    # ( is => 'ro', isa => CodeRef | InstanceOf ['Pcore::App::Router'], required => 1 );
+has on_request => ( required => 1 );    # CodeRef->($req)
+has listen => ();
 
-has backlog      => 0;    # ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 0 );
-has so_no_delay  => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
-has so_keepalive => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
+has backlog      => 0;
+has so_no_delay  => 1;
+has so_keepalive => 1;
 
-has server_tokens         => qq[Pcore-HTTP-Server/$Pcore::VERSION];    # ( is => 'ro', isa => Maybe [Str] );
-has keepalive_timeout     => 60;                                       # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - disable keepalive
-has client_header_timeout => 60;                                       # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
-has client_body_timeout   => 60;                                       # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
-has client_max_body_size  => 0;                                        # 0 - do not check
+has server_tokens         => qq[Pcore-HTTP-Server/$Pcore::VERSION];
+has keepalive_timeout     => 60;                                      # 0 - disable keepalive
+has client_header_timeout => 60;                                      # undef - do not use
+has client_body_timeout   => 60;                                      # undef - do not use
+has client_max_body_size  => 0;                                       # 0 - do not check
 
-has _listen_socket => ();                                              # ( is => 'ro', isa => Object, init_arg => undef );
+has _listen_socket => ( init_arg => undef );
 
 # TODO implement shutdown and graceful shutdown
 
-sub run ($self) {
+sub BUILD ( $self, $args ) {
 
     # parse listen
-    if ( $self->{listen} =~ /\Aunix:(.+)/sm ) {
-        my $path = $1;
+    $self->{listen} = P->uri( $self->{listen}, base => 'tcp:', listen => 1 ) if !is_ref $self->{listen};
 
-        $self->{_listen_socket} = AnyEvent::Socket::tcp_server( 'unix/', $path, Coro::unblock_sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );
+    $self->{_listen_socket} = &AnyEvent::Socket::tcp_server( $self->{listen}->connect, Coro::unblock_sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
-        chmod oct 777, $path or die if substr( $path, 0, 1 ) eq '/';
-    }
-    else {
-        my ( $host, $port ) = split /:/sm, $self->{listen};
+    chmod( oct 777, $self->{listen}->{path} ) || die $! if !defined $self->{listen}->{host} && substr( $self->{listen}->{path}, 0, 2 ) ne "/\x00";
 
-        die qq[Invalid listen "$self->{listen}"] if !$host || !$port;
-
-        undef $host if $host eq '*';
-
-        $self->{_listen_socket} = AnyEvent::Socket::tcp_server( $host, $port, Coro::unblock_sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );
-    }
-
-    return $self;
+    return;
 }
 
 sub _on_prepare ( $self, $fh, $host, $port ) {
@@ -168,7 +158,7 @@ sub _on_accept ( $self, $fh, $host, $port ) {
         }
     };
 
-    my $rouse_cb = Coro::rouse_cb;
+    my $cv = P->cv;
 
     Coro::async_pool {
 
@@ -176,7 +166,7 @@ sub _on_accept ( $self, $fh, $host, $port ) {
         my $req = bless {
             _server          => $self,
             _h               => $h,
-            _cb              => $rouse_cb,
+            _cb              => $cv,
             env              => $env,
             data             => $data,
             keepalive        => $keepalive,
@@ -184,14 +174,12 @@ sub _on_accept ( $self, $fh, $host, $port ) {
           },
           'Pcore::HTTP::Server::Request';
 
-        # evaluate application
-        eval { $self->{app}->($req); 1; } or do {
-            $@->sendlog if $@;
-        };
+        # evaluate "on_request" callback
+        eval { $self->{on_request}->($req); 1; } or $@->sendlog;
     };
 
     # keep-alive
-    goto READ_HEADERS if !Coro::rouse_wait $rouse_cb && $keepalive;
+    goto READ_HEADERS if !$cv->recv && $keepalive;
 
     return;
 }
@@ -223,7 +211,9 @@ sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 57                   | Subroutines::ProhibitExcessComplexity - Subroutine "_on_accept" with high complexity score (33)                |
+## |    3 | 47                   | Subroutines::ProhibitExcessComplexity - Subroutine "_on_accept" with high complexity score (32)                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 38                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -30,10 +30,8 @@ requires 'IO::Socket::SSL';
 requires 'Net::DNS::Resolver';
 requires 'Guard';
 requires 'IO::FDPass';
-feature linux => sub {
-    requires 'AnyEvent::AIO';
-    requires 'IO::AIO';
-};
+requires 'IO::AIO';
+requires 'AnyEvent::AIO';
 
 # Inline
 requires 'Inline';
@@ -97,7 +95,6 @@ requires 'XML::Hash::XS';
 requires 'Crypt::CBC';
 requires 'Crypt::DES';
 requires 'Compress::Zlib';
-requires 'URI::Escape::XS';
 requires 'MIME::Base64';
 
 # Pcore::Util::Date

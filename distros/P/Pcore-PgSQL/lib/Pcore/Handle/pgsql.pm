@@ -265,15 +265,15 @@ sub encode_array ( $self, $var ) {
 }
 
 sub dbh ($self) {
-    $self->_get_dbh(Coro::rouse_cb);
+    my $cv = P->cv;
 
-    return Coro::rouse_wait;
+    $self->_get_dbh($cv);
+
+    return $cv->recv;
 }
 
 # DBI METHODS
 for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref selectcol]) {
-    no strict qw[refs];
-
     *$method = eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
         sub ( \$self, \@args ) {
             my \$cb = is_plain_coderef \$args[-1] ? \$args[-1] : undef;

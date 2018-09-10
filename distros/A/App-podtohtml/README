@@ -1,4 +1,86 @@
-SEE ALSO
+NAME
+    App::podtohtml - Convert POD to HTML
 
+VERSION
+    This document describes version 0.003 of App::podtohtml (from Perl
+    distribution App-podtohtml), released on 2018-09-10.
+
+FUNCTIONS
+  podtohtml
+    Usage:
+
+     podtohtml(%args) -> [status, msg, result, meta]
+
+    Convert POD to HTML.
+
+    Examples:
+
+    *   Convert POD file to HTML, print result to STDOUT:
+
+         podtohtml( infile => "some.pod");
+
+    *   Convert POD file to HTML, show result in browser:
+
+         podtohtml( infile => "some.pod", browser => 1);
+
+    This is a thin wrapper for Pod::Html and an alternative CLI to pod2html
+    to remove some annoyances that I experience with "pod2html", e.g. the
+    default cache directory being "." (so it leaves ".tmp" files around).
+    This CLI also offers tab completion.
+
+    It does not yet offer as many options as "pod2html".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   browser => *bool*
+
+        Instead of outputing HTML to STDOUT/file, view it in browser.
+
+    *   infile => *perl::pod_or_pm_filename* (default: "-")
+
+        Input file (POD).
+
+        If not found, will search in for .pod or .pm files in @INC.
+
+    *   outfile => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-podtohtml>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-podtohtml>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-podtohtml>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     pod2html, Pod::Html
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

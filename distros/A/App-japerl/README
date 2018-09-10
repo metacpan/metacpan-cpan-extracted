@@ -1,0 +1,65 @@
+NAME
+
+  japerl - JPerl-again Perl (glocalization scripting environment)
+
+SYNOPSIS
+
+  japerl [switches] [--] script.pl [arguments]
+
+DESCRIPTION
+
+  japerl was created with the intention of succeeding JPerl.
+  japerl provides glocalization script environment on both modern Perl
+  and traditional Perl by using Char::* software family.
+
+  This is often misunderstood, but japerl and jacode.pl have different
+  purposes and functions.
+
+       software
+  <<elder   younger>>     software purpose
+  ----------------------+---------------------------------------
+  jcode.pl  jacode.pl   | to convert encoding of data for I/O
+  ----------------------+---------------------------------------
+  jperl     japerl.bat  | to execute native encoding scripts
+                        | (NEVER convert script encoding)
+  ----------------------+---------------------------------------
+
+  This software can do the following.
+  - choose one perl interpreter in system
+  - select local use libraries
+  - execute script written in system native encoding
+
+  May you do good magic with japerl.
+
+INSTALLATION
+
+  1. Install a member of Char software family
+  2. Copy japerl.bat or japerl.sh to any directory
+  3. Customize japerl.bat or japerl.sh
+
+SEE ALSO
+
+  Glocalization - Wikipedia
+  http://en.wikipedia.org/wiki/Glocalization
+
+  Welcome to Modern Perl; No.31 encoding: To jperl lovers,
+  https://gihyo.jp/dev/serial/01/modern-perl/0031
+
+  JPerl - Japanized Perl or Japanese Perl
+  http://www.cpan.org/authors/id/W/WA/WATANABE/
+
+  Char - CPAN
+  http://search.cpan.org/dist/Char/
+
+  Jacode - CPAN
+  http://search.cpan.org/dist/Jacode/
+
+  Jacode4e - CPAN
+  http://search.cpan.org/dist/Jacode4e/
+
+  Modern::Open - CPAN
+  http://search.cpan.org/dist/Modern-Open/
+
+  BackPAN - A Complete History of CPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

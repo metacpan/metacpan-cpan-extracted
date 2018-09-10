@@ -2,8 +2,8 @@ NAME
     Regexp::Pattern::JSON - Regexp patterns to match JSON
 
 VERSION
-    This document describes version 0.002 of Regexp::Pattern::JSON (from
-    Perl distribution Regexp-Pattern-JSON), released on 2018-03-25.
+    This document describes version 0.003 of Regexp::Pattern::JSON (from
+    Perl distribution Regexp-Pattern-JSON), released on 2018-09-10.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -17,21 +17,75 @@ PATTERNS
 
         Match a JSON array.
 
+        Examples:
+
+         "[]" =~ re("JSON::array");  # matches
+
+         "[1, true, \"abc\"]" =~ re("JSON::array");  # matches
+
+         # Missing closing bracket
+         "[1" =~ re("JSON::array");  # doesn't match
+
     *   number
 
         Match a JSON number literal.
+
+        Examples:
+
+         12 =~ re("JSON::number");  # matches
+
+         -34 =~ re("JSON::number");  # matches
+
+         1.23 =~ re("JSON::number");  # matches
+
+         "-1.23e2" =~ re("JSON::number");  # matches
 
     *   object
 
         Match a JSON object (a.k.a. hash/dictionary).
 
+        Examples:
+
+         "{}" =~ re("JSON::object");  # matches
+
+         "{\"a\":1}" =~ re("JSON::object");  # matches
+
+         # Missing closing curly bracket
+         "{\"a\":1" =~ re("JSON::object");  # doesn't match
+
+         # Unquoted key
+         "{a: 1}" =~ re("JSON::object");  # doesn't match
+
     *   string
 
         Match a JSON string literal.
 
+        Examples:
+
+         "\"\"" =~ re("JSON::string");  # matches
+
+         # Single quotes are not string delimiters
+         "''" =~ re("JSON::string");  # doesn't match
+
+         "\"\\n\"" =~ re("JSON::string");  # matches
+
+         "\"contains \\\" double quote\"" =~ re("JSON::string");  # matches
+
     *   value
 
         Match a JSON value.
+
+        Examples:
+
+         "true" =~ re("JSON::value");  # matches
+
+         "[]" =~ re("JSON::value");  # matches
+
+         "{}" =~ re("JSON::value");  # matches
+
+         -1 =~ re("JSON::value");  # matches
+
+         "\"\"" =~ re("JSON::value");  # matches
 
 HOMEPAGE
     Please visit the project's homepage at

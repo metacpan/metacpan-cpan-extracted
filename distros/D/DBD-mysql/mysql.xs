@@ -15,15 +15,11 @@
 #include <errno.h>
 #include <string.h>
 
-#if MYSQL_ASYNC
-#  define ASYNC_CHECK_XS(h)\
+#define ASYNC_CHECK_XS(h)\
     if(imp_dbh->async_query_in_flight) {\
         do_error(h, 2000, "Calling a synchronous function on an asynchronous handle", "HY000");\
         XSRETURN_UNDEF;\
     }
-#else
-#  define ASYNC_CHECK_XS(h)
-#endif
 
 
 DBISTATE_DECLARE;
@@ -57,6 +53,7 @@ _ListDBs(drh, host=NULL, port=NULL, user=NULL, password=NULL)
   PPCODE:
 {
     MYSQL mysql;
+    mysql.net.fd = -1;
     MYSQL* sock = mysql_dr_connect(drh, &mysql, NULL, host, port, user, password,
 				   NULL, NULL);
     if (sock != NULL)
@@ -109,6 +106,7 @@ _admin_internal(drh,dbh,command,dbname=NULL,host=NULL,port=NULL,user=NULL,passwo
   }
   else
   {
+    mysql.net.fd = -1;
     sock = mysql_dr_connect(drh, &mysql, NULL, host, port, user,  password, NULL, NULL);
     if (sock == NULL)
     {
@@ -317,7 +315,6 @@ do(dbh, statement, attr=Nullsv, ...)
   (void)hv_store((HV*)SvRV(dbh), "Statement", 9, SvREFCNT_inc(statement), 0);
 
   if(SvTRUE(async)) {
-#if MYSQL_ASYNC
     if (disable_fallback_for_server_prepare)
     {
       do_error(dbh, ER_UNSUPPORTED_PS,
@@ -326,11 +323,6 @@ do(dbh, statement, attr=Nullsv, ...)
     }
     use_server_side_prepare = FALSE; /* for now */
     imp_dbh->async_query_in_flight = imp_dbh;
-#else
-    do_error(dbh, 2000,
-             "Async support was not built into this version of DBD::mysql", "HY000");
-    XSRETURN_UNDEF;
-#endif
   }
 
   if (use_server_side_prepare)
@@ -413,11 +405,20 @@ do(dbh, statement, attr=Nullsv, ...)
                                            stmt,
                                            bind,
                                            &has_binded);
+
       if (bind)
         Safefree(bind);
 
+      /*
+         as of 5.7, the end of package was deprecated, breaking
+         insertfetch with prepared statements enabled
+         no need for this as do() doesn't have a result set since
+         it's for DML statements only
+      */
+#if MYSQL_VERSION_ID < 50701
       mysql_stmt_close(stmt);
       stmt= NULL;
+#endif
 
       if (retval == -2) /* -2 means error */
       {
@@ -468,6 +469,7 @@ do(dbh, statement, attr=Nullsv, ...)
         result = mysql_use_result(imp_dbh->pmysql);
           if (result)
             mysql_free_result(result);
+            result = NULL;
           }
           if (next_result_rc > 0)
           {
@@ -500,15 +502,31 @@ ping(dbh)
   CODE:
     {
       int retval;
+/* MySQL 5.7 below 5.7.18 is affected by Bug #78778.
+ * MySQL 5.7.18 and higher (including 8.0.3) is affected by Bug #89139.
+ *
+ * Once Bug #89139 is fixed we can adjust the upper bound of this check.
+ *
+ * https://bugs.mysql.com/bug.php?id=78778
+ * https://bugs.mysql.com/bug.php?id=89139 */
+#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50718
+      unsigned long long insertid;
+#endif
 
       D_imp_dbh(dbh);
       ASYNC_CHECK_XS(dbh);
+#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50718
+      insertid = mysql_insert_id(imp_dbh->pmysql);
+#endif
       retval = (mysql_ping(imp_dbh->pmysql) == 0);
       if (!retval) {
 	if (mysql_db_reconnect(dbh)) {
 	  retval = (mysql_ping(imp_dbh->pmysql) == 0);
 	}
       }
+#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50718
+      imp_dbh->pmysql->insert_id = insertid;
+#endif
       RETVAL = boolSV(retval);
     }
   OUTPUT:
@@ -534,21 +552,22 @@ quote(dbh, str, type=NULL)
 	XSRETURN(1);
     }
 
-int mysql_fd(dbh)
+void mysql_fd(dbh)
     SV* dbh
-  CODE:
+  PPCODE:
     {
         D_imp_dbh(dbh);
-        RETVAL = imp_dbh->pmysql->net.fd;
+        if(imp_dbh->pmysql->net.fd != -1) {
+            XSRETURN_IV(imp_dbh->pmysql->net.fd);
+        } else {
+            XSRETURN_UNDEF;
+        }
     }
-  OUTPUT:
-    RETVAL
 
 void mysql_async_result(dbh)
     SV* dbh
   PPCODE:
     {
-#if MYSQL_ASYNC
         int retval;
 
         retval = mysql_db_async_result(dbh, NULL);
@@ -560,17 +579,12 @@ void mysql_async_result(dbh)
         } else {
             XSRETURN_UNDEF;
         }
-#else
-        do_error(dbh, 2000, "Async support was not built into this version of DBD::mysql", "HY000");
-        XSRETURN_UNDEF;
-#endif
     }
 
 void mysql_async_ready(dbh)
     SV* dbh
   PPCODE:
     {
-#if MYSQL_ASYNC
         int retval;
 
         retval = mysql_db_async_ready(dbh);
@@ -581,10 +595,6 @@ void mysql_async_ready(dbh)
         } else {
             XSRETURN_UNDEF;
         }
-#else
-        do_error(dbh, 2000, "Async support was not built into this version of DBD::mysql", "HY000");
-        XSRETURN_UNDEF;
-#endif
     }
 
 void _async_check(dbh)
@@ -672,14 +682,12 @@ rows(sth)
   CODE:
     D_imp_sth(sth);
     char buf[64];
-#if MYSQL_ASYNC
     D_imp_dbh_from_sth;
     if(imp_dbh->async_query_in_flight) {
         if(mysql_db_async_result(sth, &imp_sth->result) < 0) {
             XSRETURN_UNDEF;
         }
     }
-#endif
 
   /* fix to make rows able to handle errors and handle max value from 
      affected rows.
@@ -698,7 +706,6 @@ int mysql_async_result(sth)
     SV* sth
   CODE:
     {
-#if MYSQL_ASYNC
         D_imp_sth(sth);
         int retval;
 
@@ -713,11 +720,6 @@ int mysql_async_result(sth)
         } else {
             XSRETURN_UNDEF;
         }
-#else
-        do_error(sth, 2000,
-                 "Async support was not built into this version of DBD::mysql", "HY000");
-        XSRETURN_UNDEF;
-#endif
     }
   OUTPUT:
     RETVAL
@@ -726,7 +728,6 @@ void mysql_async_ready(sth)
     SV* sth
   PPCODE:
     {
-#if MYSQL_ASYNC
         int retval;
 
         retval = mysql_db_async_ready(sth);
@@ -737,11 +738,6 @@ void mysql_async_ready(sth)
         } else {
             XSRETURN_UNDEF;
         }
-#else
-        do_error(sth, 2000,
-                 "Async support was not built into this version of DBD::mysql", "HY000");
-        XSRETURN_UNDEF;
-#endif
     }
 
 void _async_check(sth)
@@ -787,10 +783,6 @@ dbd_mysql_get_info(dbh, sql_info_type)
     D_imp_dbh(dbh);
     IV type = 0;
     SV* retsv=NULL;
-#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709
-/* MariaDB 10 is not MySQL source level compatible so this only applies to MySQL*/
-    IV buffer_len;
-#endif 
 
     if (SvMAGICAL(sql_info_type))
         mg_get(sql_info_type);
@@ -819,15 +811,14 @@ dbd_mysql_get_info(dbh, sql_info_type)
 	    retsv = newSVpvn("`", 1);
 	    break;
 	case SQL_MAXIMUM_STATEMENT_LENGTH:
-#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709
-        /* MariaDB 10 is not MySQL source level compatible so this
-           only applies to MySQL*/
-	    /* mysql_get_option() was added in mysql 5.7.3 */
-	    /* MYSQL_OPT_NET_BUFFER_LENGTH was added in mysql 5.7.9 */
+        /* net_buffer_length macro is not defined in MySQL 5.7 and some MariaDB
+        versions - if it is not available, use newer mysql_get_option */
+#if !defined(net_buffer_length)
+            ;
+	    unsigned long buffer_len;
 	    mysql_get_option(NULL, MYSQL_OPT_NET_BUFFER_LENGTH, &buffer_len);
 	    retsv = newSViv(buffer_len);
 #else
-	    /* before mysql 5.7.9 use net_buffer_length macro */
 	    retsv = newSViv(net_buffer_length);
 #endif
 	    break;
@@ -842,21 +833,12 @@ dbd_mysql_get_info(dbh, sql_info_type)
 	    retsv= newSVpvn(imp_dbh->pmysql->host_info,strlen(imp_dbh->pmysql->host_info));
 	    break;
         case SQL_ASYNC_MODE:
-#if MYSQL_ASYNC
             retsv = newSViv(SQL_AM_STATEMENT);
-#else
-            retsv = newSViv(SQL_AM_NONE);
-#endif
             break;
         case SQL_MAX_ASYNC_CONCURRENT_STATEMENTS:
-#if MYSQL_ASYNC
             retsv = newSViv(1);
-#else
-            retsv = newSViv(0);
-#endif
             break;
     	default:
  		croak("Unknown SQL Info type: %i", mysql_errno(imp_dbh->pmysql));
     }
     ST(0) = sv_2mortal(retsv);
-

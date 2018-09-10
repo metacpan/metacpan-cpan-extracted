@@ -1,3 +1,42 @@
+2018-09-08 Daniël van Eeden, Patrick Galbraith, DBI/DBD community (4.047)
+* Add options needed for public key based security.
+* Allow several spaces after LIMIT clause.
+* Basic GTID tracking.
+* Fix GCC 8.1 warnings
+* Fix warning: unused variable ‘buffer_len’
+* Fix warning about bind->is_null assignment with incompatible pointer type
+* Get rid of warning about unused variable ssl_verify_set
+* Fix space/tab issue which leads to misleading indentation
+* Change spaces/tabs to get rid of GCC8 warning
+
+2018-03-09 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.046_01)
+* Updated documentation re. multithreading (Daniël van Eeden)
+* Remove #IFDEFs for code detecting ancient DBI versions. The minimum
+  DBI version we require is version 1.609 from 2009!
+* ChopBlanks should not trim binary fields (urcheon)
+* Skipped test which failed on OpenBSD because Proc::ProcessTable does not
+  come with a 'size' attribute on this platform (glasswalk3r, pali)
+* Improved test suite with regards to MySQL 8.0
+* Improved macOS installation notes.
+* Use Devel::CheckLib 1.09 or newer, fixes
+   https://github.com/perl5-dbi/DBD-mysql/issues/109
+* Specify bigint as test dependency
+* Add recommends and suggests tests dependencies (pali)
+* Check only for libs via Devel::CheckLib in Makefile.PL (pali)
+* Remove param --with-mysql from Makefile.PL documentation (pali)
+* Check if specified Makefile.PL settings are working (pali)
+   Fixes https://rt.cpan.org/Ticket/Display.html?id=119902
+* Remember mysql_config value for Makefile.PL (pali)
+* Locate MySQL libs using Devel::CheckLib (pali)
+* Added a fix for 30insertfetch failure when using server-side prepared
+  statements. The stmt was being freed for DML statements before
+  the handle attribute was read, mysql_info was reading back nulls
+
+
+2018-02-08 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.046)
+* Version bump because of issue with META file in 4.045 release.
+
+
 2018-02-06 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.045)
 * Use API function for reconnect; fixes compilation on MariaDB 10.2.6+.
   Fix provided by Pali.
@@ -6,8 +45,8 @@
 
 
 2018-01-22 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.044)
-* Reapply https://github.com/perl5-dbi/DBD-mysql/pull/114 
-  "Improve SSL settings, reflect changes for BACKRONYM and 
+* Reapply https://github.com/perl5-dbi/DBD-mysql/pull/114
+  "Improve SSL settings, reflect changes for BACKRONYM and
   Riddle vulnerabilities, enforce SSL encryption when mysql_ssl=1 is set"
   Thank you to Pali Rohar, Daniël van Eeden, Booking.com, et al:w
 * Fix parsing configure libs from mysql_config --libs output in Makefile.PL
@@ -1310,7 +1349,7 @@ Tokuhiro Matsuno!
 	  <leachcj@vegemite.mel.az.bp.com>.
 	* nodbd/statement.pm.in: Changed length to CORE::length in
 	  some cases to prevent 5.005 warnings.
-	* Added a section on multithrading to the manual.
+	* Added a section on multithreading to the manual.
 
 1998-07-07  Jochen Wiedmann  <joe@ispsoft.de> (1.19_21)
 

@@ -20,12 +20,14 @@ local $TODO = 'tests of git commits with unicode do not seem to work yet; see ge
     if $^O eq 'MSWin32';
 
 # diag uses todo_output if in_todo :/
-no warnings 'redefine';
-*::diag = sub {
+{
+  no warnings 'redefine';
+  *::diag = sub {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $tb = Test::Builder->new;
     $tb->_print_comment($tb->failure_output, @_);
-};
+  };
+}
 
 my $tempdir = no_git_tempdir();
 my $tzil = Builder->from_config(

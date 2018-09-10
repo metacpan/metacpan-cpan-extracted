@@ -1,3 +1,16 @@
+v0.21.1 2018-09-09T19:36:40Z
+ - Docker base image changed from "softvisio/pcore:v0.73.0" to
+   "softvisio/pcore:v0.73.1"
+
+v0.21.0 2018-09-09T18:57:53Z
+ - ported to the new run_proc
+ - Pcore::AE::Handle
+ - AE cache disabled
+ - strict refs removed
+ - P::cv
+ - Docker base image changed from "softvisio/pcore:v0.72.4" to
+   "softvisio/pcore:v0.73.0"
+
 v0.20.1 2018-08-13T19:25:19Z
  - Docker base image changed from "softvisio/pcore:v0.72.3" to
    "softvisio/pcore:v0.72.4"

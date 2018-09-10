@@ -14,11 +14,7 @@ sub import {
     my $caller = $import->{pragma}->{caller} // caller( $import->{pragma}->{level} // 0 );
 
     # export import method
-    {
-        no strict qw[refs];
-
-        *{"$caller\::import"} = \&_import;
-    }
+    *{"$caller\::import"} = \&_import;
 
     return;
 }
@@ -29,7 +25,6 @@ sub parse_import {
     my $res;
 
     my $export_pragma = do {
-        no strict qw[refs];
         no warnings qw[once];
 
         ${"$caller\::EXPORT_PRAGMA"};
@@ -73,11 +68,7 @@ sub _import {
     return if $to eq $from;
 
     if ( !exists $CACHE->{$to} ) {
-        my $export = do {
-            no strict qw[refs];
-
-            ${"$from\::EXPORT"};
-        };
+        my $export = ${"$from\::EXPORT"};
 
         $CACHE->{$from} = defined $export ? _parse_export( $from, $export ) : undef;
     }
@@ -214,19 +205,13 @@ sub _export_tags ( $from, $to, $import ) {
 
             my $alias = $symbols->{$sym} // $export_all->{$sym}->[0];
 
-            {
-                no strict qw[refs];
-
-                no warnings qw[once];
-
-                *{"$to\::$alias"}
-                  = $type eq q[]  ? \&{"$from\::$export_all->{$sym}->[0]"}
-                  : $type eq q[$] ? \${"$from\::$export_all->{$sym}->[0]"}
-                  : $type eq q[@] ? \@{"$from\::$export_all->{$sym}->[0]"}
-                  : $type eq q[%] ? \%{"$from\::$export_all->{$sym}->[0]"}
-                  : $type eq q[*] ? *{"$from\::$export_all->{$sym}->[0]"}
-                  :                 die;
-            }
+            *{"$to\::$alias"}
+              = $type eq q[]  ? \&{"$from\::$export_all->{$sym}->[0]"}
+              : $type eq q[$] ? \${"$from\::$export_all->{$sym}->[0]"}
+              : $type eq q[@] ? \@{"$from\::$export_all->{$sym}->[0]"}
+              : $type eq q[%] ? \%{"$from\::$export_all->{$sym}->[0]"}
+              : $type eq q[*] ? *{"$from\::$export_all->{$sym}->[0]"}
+              :                 die;
         }
     }
 
@@ -240,10 +225,10 @@ sub _export_tags ( $from, $to, $import ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 40, 52, 102, 119,    | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 152, 175, 193, 228   |                                                                                                                |
+## |    3 | 35, 47, 93, 110,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 143, 166, 184, 214   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 140                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
+## |    3 | 131                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

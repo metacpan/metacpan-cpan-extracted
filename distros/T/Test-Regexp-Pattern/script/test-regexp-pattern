@@ -1,0 +1,97 @@
+#!perl
+
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case auto_help auto_version);
+use Test::Regexp::Pattern;
+
+my %opts = (
+    #exclude_packages => [],
+    test_examples => 1,
+);
+GetOptions(
+    #'exclude-package=s' => $opts{exclude_packages},
+    #'exclude-function=s' => $opts{exclude_functions},
+    'E' => sub { $opts{test_examples} = 0 },
+);
+
+regexp_patterns_in_all_modules_ok(
+    \%opts,
+);
+
+1;
+# ABSTRACT: Test Regexp::Pattern patterns in all modules of your distro
+# PODNAME: test-regexp-pattern
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+test-regexp-pattern - Test Regexp::Pattern patterns in all modules of your distro
+
+=head1 VERSION
+
+This document describes version 0.003 of test-regexp-pattern (from Perl distribution Test-Regexp-Pattern), released on 2018-09-10.
+
+=head1 SYNOPSIS
+
+In your distro directory:
+
+ % test-regexp-pattern [options]
+
+=head1 DESCRIPTION
+
+This script is a command-line interface for L<Test::Regexp::Pattern>'s
+C<regexp_patterns_in_all_modules_ok()> function.
+
+=head1 OPTIONS
+
+=over
+
+=item * -E
+
+This sets C<test_examples> to 0.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Test-Regexp-Pattern>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Test-Regexp-Pattern>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Regexp-Pattern>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Test::Regexp::Pattern>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

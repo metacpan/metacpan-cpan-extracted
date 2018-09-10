@@ -1,6 +1,16 @@
 package Pcore::CDN::Bucket;
 
-use Pcore -class;
+use Pcore -role;
+use overload '&{}' => sub ( $self, @ ) {
+    return sub { $self->get_url(@_) }
+  },
+  fallback => 1;
+
+requires qw[get_nginx_cfg];
+
+has prefix => ( init_arg => undef );
+
+sub get_url ( $self, $path ) { return $self->{prefix} . $path }
 
 1;
 __END__

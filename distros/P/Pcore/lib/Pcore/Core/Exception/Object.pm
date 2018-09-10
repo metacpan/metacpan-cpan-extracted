@@ -18,18 +18,17 @@ use overload    #
   },
   fallback => undef;
 
-has msg => ( is => 'ro', isa => Str, required => 1 );
-has level => ( is => 'ro', isa => Enum [qw[ERROR WARN]], required => 1 );
-has call_stack => ( is => 'ro', isa => Maybe [ScalarRef], required => 1 );
-has timestamp => ( is => 'ro', isa => Num, required => 1 );
+has msg        => ( required => 1 );
+has level      => ( required => 1 );    # Enum [qw[ERROR WARN]]
+has call_stack => ( required => 1 );
+has timestamp  => ( required => 1 );
 
-has exit_code => ( is => 'lazy', isa => Int );
-has with_trace => ( is => 'ro', isa => Bool, default => 1 );
+has exit_code => ( is => 'lazy' );
+has with_trace => 1;
 
-has longmess  => ( is => 'lazy', isa => Str, init_arg => undef );
-has to_string => ( is => 'lazy', isa => Str, init_arg => undef );
-
-has is_logged => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
+has longmess  => ( is => 'lazy', init_arg => undef );
+has to_string => ( is => 'lazy', init_arg => undef );
+has is_logged => ( init_arg => undef );
 
 around new => sub ( $orig, $self, $msg, %args ) {
     $args{skip_frames} //= 0;
@@ -67,7 +66,7 @@ around new => sub ( $orig, $self, $msg, %args ) {
         chomp $msg;
     };
 
-    my $x = $args{skip_frames} + 3;
+    my $x = $args{skip_frames} + 2;
 
     my @frames;
 

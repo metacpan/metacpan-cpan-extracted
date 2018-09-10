@@ -1,7 +1,7 @@
 package Perinci::Examples::ResMeta::Table;
 
-our $DATE = '2017-05-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -111,7 +111,7 @@ Perinci::Examples::ResMeta::Table - Demonstrate the various table and table.* re
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::Examples::ResMeta::Table (from Perl distribution Perinci-Examples-ResMeta-Table), released on 2017-05-31.
+This document describes version 0.003 of Perinci::Examples::ResMeta::Table (from Perl distribution Perinci-Examples-ResMeta-Table), released on 2018-09-10.
 
 =head1 DESCRIPTION
 
@@ -147,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

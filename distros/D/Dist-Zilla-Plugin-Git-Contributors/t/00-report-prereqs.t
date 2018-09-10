@@ -61,7 +61,9 @@ sub _merge_prereqs {
 
 my @include = qw(
   Encode
+  File::Temp
   JSON::PP
+  Module::Runtime
   Pod::Coverage
   Sub::Name
   YAML

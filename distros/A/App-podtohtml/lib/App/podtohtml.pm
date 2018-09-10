@@ -1,7 +1,7 @@
 package App::podtohtml;
 
-our $DATE = '2017-02-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,6 +61,7 @@ _
             'x.doc.show_result' => 0,
         },
     ],
+    'cmdline.skip_format' => 1,
 };
 sub podtohtml {
     require File::Temp;
@@ -71,6 +72,13 @@ sub podtohtml {
     my $infile  = $args{infile} // '-';
     my $outfile = $args{outfile} // '-';
     my $browser = $args{browser};
+
+    # XXX Perinci::CmdLine::Inline does not support coercion yet
+    if ($infile =~ /\A\w+(::\w+)*\z/ && !(-f $infile)) {
+        require Module::Path::More;
+        my $path = Module::Path::More::module_path(module => $infile);
+        $infile = $path if defined $path;
+    }
 
     my $cachedir = File::Temp::tempdir(CLEANUP => 1);
 
@@ -95,7 +103,7 @@ sub podtohtml {
         local $/;
         open my $ofh, "<", "$tempoutfile.html";
         my $content = <$ofh>;
-        [200, "OK", $content, {'cmdline.skip_format' => 1}];
+        [200, "OK", $content];
     } else {
         [200, "OK"];
     }
@@ -116,7 +124,7 @@ App::podtohtml - Convert POD to HTML
 
 =head1 VERSION
 
-This document describes version 0.002 of App::podtohtml (from Perl distribution App-podtohtml), released on 2017-02-06.
+This document describes version 0.003 of App::podtohtml (from Perl distribution App-podtohtml), released on 2018-09-10.
 
 =head1 FUNCTIONS
 
@@ -207,7 +215,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,6 +2,7 @@
 bin/db-iris
 Build.PL
 Changelog
+examples/traintrack
 lib/Travel/Status/DE/IRIS.pm
 lib/Travel/Status/DE/IRIS/Result.pm
 lib/Travel/Status/DE/IRIS/Stations.pm

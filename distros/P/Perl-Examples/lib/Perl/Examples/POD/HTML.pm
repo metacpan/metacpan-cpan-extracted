@@ -15,7 +15,7 @@ Perl::Examples::POD::HTML - Embedding HTML in POD
 
 =head1 VERSION
 
-This document describes version 0.07 of Perl::Examples::POD::HTML (from Perl distribution Perl-Examples), released on 2016-06-26.
+This document describes version 0.091 of Perl::Examples::POD::HTML (from Perl distribution Perl-Examples), released on 2018-09-10.
 
 =head1 DESCRIPTION
 
@@ -37,9 +37,37 @@ This is explained in L<perlpod>.
 
 =for HTML <b>HTML snippet 1</b>
 
-=for text text snippet 1
+=begin text
 
-=for man man snippet 1
+text snippet 1.
+
+ foo bar
+
+ +-----------------+----------------+---------------------+-----------------------------------------+-----------------------------------------+
+ | scenario        | module_startup | time                | cpu                                     | filename                                |
+ +-----------------+----------------+---------------------+-----------------------------------------+-----------------------------------------+
+ | LogAny::Startup | 1              | 2016-01-07T15:05:13 | Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz | LogAny-Startup.2016-01-07T15-05-13.json |
+ | LogAny::Startup | 1              | 2016-01-07T15:10:51 | Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz | LogAny-Startup.2016-01-07T15-10-51.json |
+ | LogAny::Startup | 1              | 2016-01-10T22:27:48 | Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz | LogAny-Startup.2016-01-10T22-27-48.json |
+ +-----------------+----------------+---------------------+-----------------------------------------+-----------------------------------------+
+
+=end text
+
+=begin man
+
+man snippet 1
+
+ foo bar
+
+ +-----------------+----------------+---------------------+-----------------------------------------+-----------------------------------------+
+ | scenario        | module_startup | time                | cpu                                     | filename                                |
+ +-----------------+----------------+---------------------+-----------------------------------------+-----------------------------------------+
+ | LogAny::Startup | 1              | 2016-01-07T15:05:13 | Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz | LogAny-Startup.2016-01-07T15-05-13.json |
+ | LogAny::Startup | 1              | 2016-01-07T15:10:51 | Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz | LogAny-Startup.2016-01-07T15-10-51.json |
+ | LogAny::Startup | 1              | 2016-01-10T22:27:48 | Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz | LogAny-Startup.2016-01-10T22-27-48.json |
+ +-----------------+----------------+---------------------+-----------------------------------------+-----------------------------------------+
+
+=end man
 
 =head1 HOMEPAGE
 
@@ -63,7 +91,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

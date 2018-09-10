@@ -2,8 +2,8 @@ NAME
     Regexp::Pattern::CPAN - Regexp patterns related to CPAN
 
 VERSION
-    This document describes version 0.002 of Regexp::Pattern::CPAN (from
-    Perl distribution Regexp-Pattern-CPAN), released on 2018-09-02.
+    This document describes version 0.003 of Regexp::Pattern::CPAN (from
+    Perl distribution Regexp-Pattern-CPAN), released on 2018-09-10.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -19,6 +19,22 @@ PATTERNS
 
         I'm not sure whether PAUSE allows digit for the first letter. For
         safety I'm assuming no.
+
+        Examples:
+
+         "PERLANCAR" =~ re("CPAN::pause_id");  # matches
+
+         # Only allows uppercase
+         "perlancar" =~ re("CPAN::pause_id");  # doesn't match
+
+         # too short
+         "A" =~ re("CPAN::pause_id");  # doesn't match
+
+         # contains whitespace
+         "PERL ANCAR" =~ re("CPAN::pause_id", {-anchor=>1});  # doesn't match
+
+         # too long
+         "RANDALSCHWARTZ" =~ re("CPAN::pause_id", {-anchor=>1});  # doesn't match
 
 HOMEPAGE
     Please visit the project's homepage at

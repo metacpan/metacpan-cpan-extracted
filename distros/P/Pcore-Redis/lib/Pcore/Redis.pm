@@ -1,10 +1,10 @@
-package Pcore::Redis v0.13.2;
+package Pcore::Redis v0.14.1;
 
 use Pcore -dist, -class;
 
 has data_dir => ( is => 'ro', isa => Str, required => 1 );
 
-sub run ( $self, $cb ) {
+sub run ( $self ) {
     my $cfg;
 
     if ( -f "$self->{data_dir}/redis.json" ) {
@@ -35,16 +35,7 @@ sub run ( $self, $cb ) {
     my $log_dir = "$ENV->{DATA_DIR}";
 
     # run server
-    P->sys->run_proc(
-        [ 'redis-server', '--include', "$self->{data_dir}/redis.conf" ],
-        on_finish => sub ($proc) {
-            $cb->($proc);
-
-            return;
-        }
-    );
-
-    return;
+    return P->sys->run_proc( [ 'redis-server', '--include', "$self->{data_dir}/redis.conf" ] )->wait;
 }
 
 sub store_config ( $self, $cfg ) {
@@ -119,7 +110,7 @@ sub default_config ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 110                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 101                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -22,7 +22,7 @@ package Password::Policy::Exception::PwnedError;
  
 use parent 'Password::Policy::Exception';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub error { return 'Invalid response checking for pwned password'; }
 

@@ -1,4 +1,55 @@
-SEE ALSO
+NAME
+    Regexp::Pattern::Twitter - Regexp patterns related to Twitter
 
+VERSION
+    This document describes version 0.003 of Regexp::Pattern::Twitter (from
+    Perl distribution Regexp-Pattern-Twitter), released on 2018-09-10.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Twitter::username");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   username
+
+        Examples:
+
+         "perlancar" =~ re("Twitter::username");  # matches
+
+         # Too long
+         "a234567890123456" =~ re("Twitter::username", {-anchor=>1});  # doesn't match
+
+         # Contains whitespace
+         "perl ancar" =~ re("Twitter::username", {-anchor=>1});  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Twitter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Twitter>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Twitte
+    r>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Sah::Schemas::Twitter
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

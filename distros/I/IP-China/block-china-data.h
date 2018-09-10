@@ -10,7 +10,7 @@ cfunctions block-china-data.c
 #line 4 "block-china-data.c"
 extern int n_china_ips;
 
-#line 4647 "block-china-data.c"
+#line 4691 "block-china-data.c"
 extern ip_block_t china_ips[];
 
 #endif /* CFH_BLOCK_CHINA_DATA_H */

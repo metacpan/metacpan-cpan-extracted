@@ -12,7 +12,7 @@ use Storable qw(nstore retrieve);
 use List::BinarySearch qw(binsearch);
 
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 =head1 NAME
 
@@ -231,7 +231,7 @@ sub last_update {
 		# retrieve information from storage
 		my $file = path(join("/", $self->{path}, $self->{files}->{updates}));
 		$update = retrieve($file);
-		$self->{logger} && $self->{logger}->debug("Load $file (last_udpate)");
+		$self->{logger} && $self->{logger}->debug("Load $file (last_update)");
 
 		if ($self->{sticky}) {
 			$self->{data}->{ $self->{files}->{updates} } = $update;
@@ -289,7 +289,7 @@ sub updated {
 	}
 
 	$update->{next_update} = $next;
-	$update->{last_udpate} = $time;
+	$update->{last_update} = $time;
 	$update->{errors} = 0;
 
 	nstore($update, $file) or croak("Cannot save data to $file: $!\n");
@@ -321,7 +321,7 @@ sub update_error {
 	}
 
 	$update->{next_update} = $time + $wait;
-	$update->{last_udpate} = $time;
+	$update->{last_update} = $time;
 	$update->{errors}	= $errors;
 
 	nstore($update, $file) or croak("Cannot save data to $file: $!\n");
@@ -507,6 +507,10 @@ Initial release
 =item 0.3
 
 Add C<get_lists> and C<save_lists> methods.
+
+=item 0.4
+
+Fix typo last_udpate/last_update
 
 =back
 

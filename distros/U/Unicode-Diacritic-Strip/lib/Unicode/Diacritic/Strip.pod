@@ -22,13 +22,13 @@ produces output
     aAaAaceEeEeEeiiouUuuUがぎぐげご
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.09/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.11/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Unicode::Diacritic::Strip version 0.09
-corresponding to git commit L<3069a4a261cef77ec40ff6aebfd2243819e64b1f|https://github.com/benkasminbullock/Unicode-Diacritic-Strip/commit/3069a4a261cef77ec40ff6aebfd2243819e64b1f> released on Wed Apr 5 11:18:47 2017 +0900.
+This documents Unicode::Diacritic::Strip version 0.11
+corresponding to git commit L<221f13a3bc5f4a26a8b6c7f39cbad02c83b36010|https://github.com/benkasminbullock/Unicode-Diacritic-Strip/commit/221f13a3bc5f4a26a8b6c7f39cbad02c83b36010> released on Mon Sep 10 14:44:50 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ produces output
     í was converted to i
 
 
-(This example is included as L<F<strip-alphabet.pl>|https://api.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.09/examples/strip-alphabet.pl> in the distribution.)
+(This example is included as L<F<strip-alphabet.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.11/examples/strip-alphabet.pl> in the distribution.)
 
 
 This was added to the module in version 0.08. Prior to that it was in
@@ -106,7 +106,7 @@ produces output
     Bjorn Lodz
 
 
-(This example is included as L<F<ask.pl>|https://api.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.09/examples/ask.pl> in the distribution.)
+(This example is included as L<F<ask.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.11/examples/ask.pl> in the distribution.)
 
 
 This was added to the module in version 0.07. It has been in service
@@ -139,13 +139,11 @@ problems compiling on 64 bit systems.
 
 =item L<Text::StripAccents>
 
+=item L<Unicode::Homoglyph::Replace>
+
 =back
 
 =head2 Web pages
-
-The page at L<Strip diacritics from
-text|https://www.lemoda.net/tools/strip-diacritics/index.html> offers
-an online interface to this module.
 
 L<How to remove diacritic marks from
 characters|http://ahinea.com/en/tech/accented-translate.html> by Ivan
@@ -189,6 +187,7 @@ bouncing.)
 =back
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -196,7 +195,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

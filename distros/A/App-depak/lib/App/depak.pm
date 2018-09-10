@@ -1,7 +1,7 @@
 package App::depak;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.57'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.580'; # VERSION
 
 use 5.010001;
 use strict;
@@ -52,7 +52,6 @@ sub _build_lib {
     require File::Copy;
     require File::Find;
     require File::Path;
-    require List::MoreUtils;
     require Module::Path::More;
 
     my $self = shift;
@@ -908,7 +907,7 @@ App::depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.57 of App::depak (from Perl distribution App-depak), released on 2017-07-14.
+This document describes version 0.580 of App::depak (from Perl distribution App-depak), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -1204,7 +1203,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

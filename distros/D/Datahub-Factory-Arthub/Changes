@@ -1,5 +1,10 @@
 Revision history for Datahub-Factory-VKC
 
+1.02  2018-09-10 11:37:20 CEST
+
+    - Fixed: merge_call on objTitles throws uninit value error.
+    - Changed: added missing alter on ObjTitles.
+
 1.01  2018-09-07 17:00:39 CEST
 
     - Changed: added objtitles table as sqlite.

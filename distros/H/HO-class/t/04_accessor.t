@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 21;
+use Test::Exception;
 
 require_ok('HO::accessor');
 
@@ -41,6 +42,8 @@ Test::More::isa_ok($tw2,'T::one_without_constr');
         )
     }
 
+; package main
+
 ; my $e = new T::entity::
 ; $e->[$e->_name] = 'timestamp'
 ; $e->[$e->_href] = 'http://localhost:8091/time/'
@@ -49,10 +52,27 @@ Test::More::isa_ok($tw2,'T::one_without_constr');
 ; Test::More::is($e->href,'http://localhost:8091/time/')
 ; Test::More::is($e->version,'1.0')
 
-# TODO skip when profiling
+; throws_ok { T::entity->name }
+      qr/Not a class method 'name'\./
+
+; throws_ok { T::entity->version }
+      qr/Not a class method 'version'\./
+
 ; package T::plus
 ; use HO::class
-    _lvalue => val => '%'
+    _lvalue => val => '%',
+    _rw => data => '%',
+    init => 'hash'
 
+; package main
 ; Test::More::is_deeply((T::plus->new->val={}),{})
 
+; my $p = T::plus->new( data => {'key' => 'value'})
+; is($p->data->{'key'},'value','rw hash read')
+; is($p->data('key'),'value','rw hash read 2')
+; is_deeply($p->data('key','polar'),$p,'rw hash change')
+; is($p->data('key'),'polar','changed value')
+
+; is_deeply($p->data({'new' => 'values'}),$p,'rw hash complete change')
+; ok(!exists($p->data->{'key'}),'check 1')
+; is($p->data->{'new'},'values','check 2')

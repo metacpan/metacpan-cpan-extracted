@@ -1,6 +1,7 @@
-package Pcore v0.72.4;
+package Pcore v0.73.3;
 
 use v5.28.0;
+no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
 use common::header;
 use Pcore::Core::Exporter qw[];
 use Pcore::Core::Const qw[:CORE];
@@ -15,7 +16,6 @@ our $EXPORT_PRAGMA = {
     embedded => undef,    # run in embedded mode
     export   => undef,    # install standart import method
     forktmpl => undef,    # run fork template on startup
-    inline   => undef,    # package use Inline
     l10n     => undef,    # register package L10N domain
     res      => undef,    # export Pcore::Util::Result qw[res]
     role     => undef,    # package is a Moo role
@@ -73,14 +73,7 @@ sub import {
     common::header->import;
 
     # export P sub to avoid indirect calls
-    {
-        no strict qw[refs];
-
-        *{"$caller\::P"} = $P;
-
-        # flush the cache exactly once if we make any direct symbol table changes
-        # mro::method_changed_in($caller);
-    }
+    *{"$caller\::P"} = $P;
 
     # re-export core packages
     Pcore::Core::Const->import( -caller => $caller );
@@ -100,18 +93,11 @@ sub import {
         # process -export pragma
         Pcore::Core::Exporter->import( -caller => $caller ) if $import->{pragma}->{export};
 
-        # process -inline pragma
-        if ( $import->{pragma}->{inline} ) {
-            state $INLINE_INIT = !!require Pcore::Core::Inline;
-        }
-
         # process -dist pragma
         $ENV->register_dist($caller) if $import->{pragma}->{dist};
 
         # process -const pragma
         if ( $import->{pragma}->{const} ) {
-            no strict qw[refs];
-
             *{"$caller\::const"} = \&Const::Fast::const;
         }
 
@@ -336,8 +322,6 @@ sub AUTOLOAD ( $self, @ ) {    ## no critic qw[ClassHierarchies::ProhibitAutoloa
 
     require $class =~ s[::][/]smgr . '.pm';
 
-    no strict qw[refs];
-
     if ( $class->can('new') ) {
         eval <<"PERL";         ## no critic qw[BuiltinFunctions::ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval]
             *{$util} = sub {
@@ -357,8 +341,6 @@ PERL
 
             sub AUTOLOAD {
                 my \$method = our \$AUTOLOAD =~ s/\\A.*:://smr;
-
-                no strict qw[refs];
 
                 die qq[Sub "$class\::\$method" is not defined] if !defined &{"$class\::\$method"};
 
@@ -383,20 +365,20 @@ PERL
 }
 
 # EVENT
-sub _init_ev {
+sub ev ($self) {
     state $broker = do {
         require Pcore::Core::Event;
 
         my $_broker = Pcore::Core::Event->new;
 
-        # set default log channels
-        $_broker->listen_events( 'LOG.EXCEPTION.*', 'stderr:' );
+        # # set default log channels
+        $_broker->bind_events( 'log.EXCEPTION.*', 'stderr:' );
 
         # file logs are disabled by default for scripts, that are not part of the distribution
         if ( $ENV->dist ) {
-            $_broker->listen_events( 'LOG.EXCEPTION.FATAL', 'file:fatal.log' );
-            $_broker->listen_events( 'LOG.EXCEPTION.ERROR', 'file:error.log' );
-            $_broker->listen_events( 'LOG.EXCEPTION.WARN',  'file:warn.log' );
+            $_broker->bind_events( 'log.EXCEPTION.FATAL', 'file:fatal.log' );
+            $_broker->bind_events( 'log.EXCEPTION.ERROR', 'file:error.log' );
+            $_broker->bind_events( 'log.EXCEPTION.WARN',  'file:warn.log' );
         }
 
         $_broker;
@@ -405,39 +387,37 @@ sub _init_ev {
     return $broker;
 }
 
-sub listen_events ( $self, $masks, @listeners ) {
-    state $broker = _init_ev();
-
-    return $broker->listen_events( $masks, @listeners );
+sub get_listener ( $self, $id ) {
+    return $self->ev->get_listener($id);
 }
 
-sub has_listeners ( $self, $key ) {
-    state $broker = _init_ev();
+sub bind_events ( $self, $bindings, $listener ) {
+    return $self->ev->bind_events( $bindings, $listener );
+}
 
-    return $broker->has_listeners($key);
+sub has_bindings ( $self, $key ) {
+    return $self->ev->has_bindings($key);
 }
 
 sub forward_event ( $self, $ev ) {
-    state $broker = _init_ev();
+    $self->ev->forward_event($ev);
 
-    return $broker->forward_event($ev);
+    return;
 }
 
 sub fire_event ( $self, $key, $data = undef ) {
-    state $broker = _init_ev();
-
     my $ev = {
         key  => $key,
         data => $data,
     };
 
-    return $broker->forward_event($ev);
+    return $self->ev->forward_event($ev);
 }
 
 sub sendlog ( $self, $key, $title, $data = undef ) {
-    state $broker = _init_ev();
+    my $broker = $self->ev;
 
-    return if !$broker->has_listeners("LOG.$key");
+    return if !$broker->has_bindings("log.$key");
 
     my $ev;
 
@@ -445,7 +425,7 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 
     die q[Log level must be specified] unless $ev->{level};
 
-    $ev->{key}       = "LOG.$key";
+    $ev->{key}       = "log.$key";
     $ev->{timestamp} = Time::HiRes::time();
     \$ev->{title} = \$title;
     \$ev->{data}  = \$data;
@@ -454,6 +434,13 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 
     return;
 }
+
+# CV
+*cv = *P::cv = sub ( $self, $cb = undef ) {
+    state $init = !!require Pcore::Core::CV;
+
+    return bless [$cb], 'Pcore::Core::CV';
+};
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -464,13 +451,13 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 65                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 205, 234, 237, 241,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 273, 276, 281, 284,  |                                                                                                                |
-## |      | 309, 446             |                                                                                                                |
+## |    3 | 191, 220, 223, 227,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 259, 262, 267, 270,  |                                                                                                                |
+## |      | 295, 426             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 291                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 277                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 209                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 195                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

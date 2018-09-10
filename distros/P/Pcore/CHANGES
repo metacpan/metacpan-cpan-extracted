@@ -1,3 +1,53 @@
+v0.73.3 2018-09-10T00:46:22Z
+ - handle support arrayref
+
+v0.73.2 2018-09-09T19:39:38Z
+ - typo
+
+v0.73.1 2018-09-09T19:34:34Z
+ - use C -std=c11
+ - dockerfile
+
+v0.73.0 2018-09-09T18:52:02Z
+ - websocket server response status fixed
+ - websocket raw protocol fix
+ - websocket refactored
+ - Pcore::Handle improvements
+ - Pcore::Handle on_disconnect callback
+ - migrated to new proc run
+ - docker - do not update perl
+ - websocket handle improved
+ - linux UDS sockets support in URI improved
+ - uri serialize to json/cbor
+ - websocket handle call proto on_disconnect
+ - uri authority parameter removed:
+ - ForkTmpl improved
+ - handle detect unix socket
+ - net resolve_listen updated
+ - node updated
+ - syntax
+ - Pcore::AE::Handle removed
+ - Pcore::HTTP::Server app -> on_request
+ - core events updated
+ - exception level fixed
+ - IO::AIO win deps
+ - use lowercased events names
+ - app template updated
+ - strict refs removed
+ - node token combined with the listen
+ - uri to_nginx_upstream_server method
+ - http server run method removed
+ - P::cv
+ - uri
+ - inline pragma removed
+ - node
+ - app api ctrl
+ - cdn
+ - cdn resources
+ - s3 sync
+ - proxy
+ - set handle peername
+
 v0.72.4 2018-08-13T19:24:22Z
  - Pcore::Handle updated
  - Pcore::Util::Sys::Proc refactored

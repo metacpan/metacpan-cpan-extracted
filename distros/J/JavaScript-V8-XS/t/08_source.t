@@ -11,7 +11,8 @@ sub load_js_file {
     my ($file) = @_;
 
     my $path = Path::Tiny::path($file);
-    my $code = $path->slurp_utf8();
+    my $js_code = $path->slurp_utf8();
+    return $js_code;
 }
 
 sub save_tmp_file {
@@ -60,45 +61,52 @@ EOS
     ok(1, "saved to tmp file '$js_file'");
 
     foreach my $js_file (@js_files) {
-        my $code = load_js_file($js_file);
-        $vm->eval($code, $js_file);
+        my $js_code = load_js_file($js_file);
+        $vm->eval($js_code, $js_file);
         ok(1, "loaded file '$js_file'");
     }
 
-    my $call = 'main';
-    $vm->reset_msgs();
-    $vm->eval("$call()");
-    my $msgs = $vm->get_msgs();
-    # print STDERR Dumper($msgs);
+    my $name = 'main';
+    my %types = (
+        eval     => "%s()",
+        dispatch_function_in_event_loop => "%s",
+    );
+    foreach my $type (sort keys %types) {
+        my $format = $types{$type};
+        $vm->reset_msgs();
+        $vm->$type(sprintf($format, $name));
+        my $msgs = $vm->get_msgs();
+        # print STDERR Dumper($msgs);
 
-    ok($msgs, "got messages from JS");
-    next unless $msgs;
+        ok($msgs, "got messages from JS for type $type");
+        next unless $msgs;
 
-    ok($msgs->{stderr}, "got error messages from JS");
-    next unless $msgs->{stderr};
+        ok($msgs->{stderr}, "got error messages from JS for type $type");
+        next unless $msgs->{stderr};
 
-    my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2);
-    ok($contexts, "got parsed stacktrace");
-    next unless $contexts;
+        my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2);
+        ok($contexts, "got parsed stacktrace for type $type");
+        next unless $contexts;
 
-    my $context_no = 0;
-    foreach my $context (@$contexts) {
-        ++$context_no;
-        like($context->{message}, qr/:.*(not |un)defined/,
-             "context $context_no contains error message");
-        is(scalar @{ $context->{frames} }, 2,
-           "context $context_no contains correct number of frames");
-        my $frame_no = 0;
-        foreach my $frame (@{ $context->{frames} }) {
-            ++$frame_no;
-            ok(exists $frame->{file}, "frame $context_no.$frame_no has member file");
-            ok(exists $frame->{line}, "frame $context_no.$frame_no has member line");
-            ok(exists $frame->{line_offset}, "frame $context_no.$frame_no has member line_offset");
-            ok(ref( $frame->{lines} ) eq 'ARRAY', "frame $context_no.$frame_no has member lines as arrayref");
+        my $context_no = 0;
+        foreach my $context (@$contexts) {
+            ++$context_no;
+            like($context->{message}, qr/:.*(not |un)defined/,
+                 "context $context_no contains error message for type $type");
+            is(scalar @{ $context->{frames} }, 2,
+               "context $context_no contains correct number of frames for type $type");
+            my $frame_no = 0;
+            foreach my $frame (@{ $context->{frames} }) {
+                ++$frame_no;
+                ok(exists $frame->{file}, "frame $context_no.$frame_no has member file for type $type");
+                ok(exists $frame->{line}, "frame $context_no.$frame_no has member line for type $type");
+                ok(exists $frame->{line_offset}, "frame $context_no.$frame_no has member line_offset for type $type");
+                ok(ref( $frame->{lines} ) eq 'ARRAY', "frame $context_no.$frame_no has member lines as arrayref for type $type");
+            }
         }
-    }
 
-    # print STDERR Dumper($contexts);
+        # print STDERR Dumper($contexts);
+    }
 }
 
 sub test_multiple_errors {
@@ -132,30 +140,38 @@ EOS
 
     my @interesting_files;
     foreach my $js_file (@js_files) {
-        my $code = load_js_file($js_file);
-        $vm->eval($code, $js_file);
+        my $js_code = load_js_file($js_file);
+        $vm->eval($js_code, $js_file);
         ok(1, "loaded file '$js_file'");
         next if scalar @interesting_files > 0;
         push @interesting_files, $js_file;
     }
 
-    $vm->reset_msgs();
-    foreach my $seq (1..$top) {
-        my $js_func = sprintf("f_%d()", $seq);
-        $vm->eval($js_func);
+    my $name = 'f';
+    my %types = (
+        eval     => "%s_%d()",
+        dispatch_function_in_event_loop => "%s_%d",
+    );
+    foreach my $type (sort keys %types) {
+        my $format = $types{$type};
+        $vm->reset_msgs();
+        foreach my $seq (1..$top) {
+            my $js_func = sprintf($format, $name, $seq);
+            $vm->dispatch_function_in_event_loop($js_func);
+        }
+        my $msgs = $vm->get_msgs();
+        # print STDERR Dumper($msgs);
+        ok($msgs, "got messages from JS for type $type");
+        next unless $msgs;
+
+        ok($msgs->{stderr}, "got error messages from JS for type $type");
+        next unless $msgs->{stderr};
+
+        my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2, \@interesting_files);
+        ok($contexts, "got parsed stacktrace for type $type");
+        next unless $contexts;
+        # print STDERR Dumper($contexts);
     }
-    my $msgs = $vm->get_msgs();
-    # print STDERR Dumper($msgs);
-    ok($msgs, "got messages from JS");
-    return unless $msgs;
-
-    ok($msgs->{stderr}, "got error messages from JS");
-    return unless $msgs->{stderr};
-
-    my $contexts = $vm->parse_js_stacktrace($msgs->{stderr}, 2, \@interesting_files);
-    ok($contexts, "got parsed stacktrace");
-    return unless $contexts;
-    # print STDERR Dumper($contexts);
 }
 
 sub main {

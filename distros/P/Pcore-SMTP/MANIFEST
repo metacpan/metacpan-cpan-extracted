@@ -6,7 +6,7 @@ META.json
 README.md
 cpanfile
 lib/Build.PL
-lib/Pcore/Core/Event/Listener/Pipe/smtp.pm
+lib/Pcore/Core/Event/Listener/smtp.pm
 lib/Pcore/SMTP.pm
 share/dist-id.json
 share/dist.yaml

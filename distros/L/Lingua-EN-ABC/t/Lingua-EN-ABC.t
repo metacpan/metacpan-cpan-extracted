@@ -29,6 +29,14 @@ $canadian2 = b2c ($british);
 
 is ($canadian2, $canadian);
 
+my $aluminum_in = 'aluminum airplane';
+my $aluminum_out = a2b ($aluminum_in, s => 1);
+is ($aluminum_out, $aluminum_in, "spelling-only does not change $aluminum_in"); 
+
+my $aluminium_in = 'aluminium aeroplane';
+my $aluminium_out = a2b ($aluminium_in, s => 1);
+is ($aluminium_out, $aluminium_in, "spelling-only does not change $aluminium_in"); 
+
 # Github issue 1.
 
 TODO: {

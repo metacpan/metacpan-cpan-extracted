@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.22 2018-09-09
+
+ - Support directives: publisher, isbn, rights, seriesname,
+   seriesnumber for all the output formats.
+
 1.21 2018-07-29
 
  - Add RTL support for slides

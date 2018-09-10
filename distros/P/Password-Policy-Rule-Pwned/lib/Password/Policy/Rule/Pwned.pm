@@ -27,7 +27,7 @@ use Password::Policy::Exception::PwnedError;
 use LWP::UserAgent;
 use Digest::SHA 'sha1_hex';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 my $ua = __PACKAGE__ . '/' . $VERSION;
 my $timeout = 5;
 our $base_url = 'https://api.pwnedpasswords.com/range/';
@@ -66,16 +66,23 @@ Password::Policy::Rule::Pwned - Check passwords haven't been pwned
     try {
         $pp->process({ password => $pass });
     } catch {
-        warn "This password '$pass' is pwned - don't use it";
+        if ($_->isa ("Password::Policy::Exception::PwnedError")) {
+            warn "Unable to verify pwned status - try again later\n";
+            return;
+        }
+        warn "'$pass' failed checks: $_ - don't use it\n";
         # Other actions
     }
 
 =head1 DESCRIPTION
 
-Plug this rule into L<Password::Policy> to validate potential passwords
-against the list from L<api.pwnedpasswords.com>. It uses the recoomended
-range function to ensure that neither the password nor its full hash is
-ever transferred over the wire.
+Plug this rule into L<Password::Policy> to
+validate potential passwords against the list from
+L<haveibeenpwned.com|https://haveibeenpwned.com/API/v2>. It
+uses the recommended
+L<range|https://haveibeenpwned.com/API/v2#SearchingPwnedPasswordsByRange>
+function to ensure that neither the password nor its full hash is ever
+transferred over the wire.
 
 The Password::Policy configuration file should set the "pwned" attribute
 to 1 in any policy where this rule should apply. A trivial example of
@@ -92,6 +99,22 @@ exception to indicate an unsafe password. As it relies on a network
 service to operate it will also throw an exception if the service is
 unavailable for whatever reason. The two exceptions are different and
 may be interrogated to determine the difference.
+
+    try {
+        $pp->process({ password => $pass });
+    } catch {
+        if ($_->isa ("Password::Policy::Exception::Pwned")) {
+            warn "This password '$pass' is pwned - don't use it";
+        } elsif ($_->isa ("Password::Policy::Exception::PwnedError")) {
+            warn "Could not check if password is pwned - use at own risk";
+        } else {
+            warn "Password not pwned but still bad: $_";
+        }
+        # Other actions
+    }
+
+Alternatively the response may be stringified and the messages parsed for
+key phrases, although this will be less robust.
 
     try {
         $pp->process({ password => $pass });
@@ -145,7 +168,7 @@ L<https://gitlab.com/openstrike/password-pwned>
 This module is written and maintained by Pete Houston of Openstrike
 <cpan@openstrike.co.uk>
 
-=head1 COPYRIGHT INFORMATION
+=head1 COPYRIGHT
 
 Copyright 2018 by Pete Houston. All Rights Reserved.
 
@@ -157,6 +180,12 @@ appear in all copies and in supporting documentation.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify
+it under either the terms of the GNU Public License (GPL) version 1 or
+later, or under the Perl Artistic License.
+
+See L<https://dev.perl.org/licenses/>
 
 =cut
 

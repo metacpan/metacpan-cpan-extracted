@@ -31,13 +31,19 @@ package App {
 
 }
 
-my $node = Pcore::Node->new(
-    type       => 'main',
-    is_service => 1,
-    requires   => [ 'AutoStars::RPC::Worker', 'AutoStars::RPC::Log', 'Pcore::App::API::RPC::Hash' ],
-)->run;
-
-my $app = bless { app_cfg => { api => { connect => 'sqlite:', rpc => { workers => 1 } } }, node => $node }, 'App';
+my $app = bless {
+    app_cfg => {
+        api => {
+            connect => 'sqlite:',
+            rpc     => { workers => 1 }
+        }
+    },
+    node => Pcore::Node->new(
+        type     => 'main',
+        requires => { 'Pcore::App::API::Node' => undef },
+    ),
+  },
+  'App';
 
 my $api = Pcore::App::API->new($app);
 

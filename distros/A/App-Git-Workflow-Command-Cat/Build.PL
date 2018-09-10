@@ -12,9 +12,12 @@ my $builder = Module::Build->new(
         'App::Git::Workflow'          => '0.96011',
         'App::Git::Workflow::Command' => '0.96011',
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => '0.016',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'App-Git-Workflow-Command-Cat-*' ],
     create_license     => 1,

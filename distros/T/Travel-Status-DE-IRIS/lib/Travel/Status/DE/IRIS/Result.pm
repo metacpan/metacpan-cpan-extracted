@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -801,7 +801,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 DESCRIPTION
 
@@ -1064,7 +1064,7 @@ that. Does not contain realtime data.
 
 =item $result->route_pre
 
-List of station names the train passed (or will have passed) befoe this stop.
+List of station names the train passed (or will have passed) before this stop.
 
 =item $result->route_post
 

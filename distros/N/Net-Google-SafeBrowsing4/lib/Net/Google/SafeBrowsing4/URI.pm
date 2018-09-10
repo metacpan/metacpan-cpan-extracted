@@ -126,7 +126,7 @@ sub generate_lookupuris {
 		}
 	}
 	push(@paths, $path);
-	if ($query =~ /^\?./) {
+	if ($query =~ /^\?.*/) {
 		push(@paths, $path . $query);
 	}
 

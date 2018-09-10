@@ -23,7 +23,7 @@ BEGIN {
 	use_ok ('Password::Policy::Rule::Pwned');
 }
 
-my $ver = '0.01';
+my $ver = '0.02';
 
 is ($Password::Policy::Rule::Pwned::VERSION, $ver, 'Rule version');
 is ($Password::Policy::Exception::Pwned::VERSION, $ver, 'Pwned version');

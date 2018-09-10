@@ -1,4 +1,9 @@
-Revision history for Hash-DefHash-Normalize
+0.040   2018-09-10 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Fix dependency to DefHash (rel=x_spec).
+
 
 0.03    2015-09-06 (PERLANCAR)
 

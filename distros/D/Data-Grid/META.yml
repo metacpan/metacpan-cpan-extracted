@@ -1,0 +1,42 @@
+---
+abstract: 'Data::Grid provides basic, incremental access to grid-shaped data.'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::MMagic: '1.27'
+  File::MimeInfo: '0.27'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Grid
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Data::Table: '1.54'
+  File::MMagic: '1.27'
+  File::MimeInfo: '0.27'
+  Text::CSV_XS: '1.18'
+requires:
+  IO::Scalar: '2.110'
+  IO::ScalarArray: '2.110'
+  Moo: '2.0'
+  Spreadsheet::ParseExcel: '0.65'
+  Spreadsheet::ParseXLSX: '0.27'
+  Text::CSV: '1.18'
+  Type::Tiny: '1.0'
+  perl: 5.12.0
+resources:
+  bugtracker: https://github.com/doriantaylor/p5-data-grid/issues
+  homepage: https://github.com/doriantaylor/p5-data-grid
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  repository: git://github.com/doriantaylor/p5-data-grid.git
+version: '0.03'

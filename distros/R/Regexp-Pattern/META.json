@@ -24,7 +24,8 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Regexp::Pattern" : "0.001"
          },
          "x_spec" : {
             "DefHash" : "v1.0.11"
@@ -58,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-Pattern"
       }
    },
-   "version" : "0.2.3",
+   "version" : "0.2.7",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -67,7 +68,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Regexp::Pattern",
             "name" : "Regexp::Pattern",
-            "version" : "0.003"
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertBlock",
@@ -163,7 +164,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.592"
+            "version" : "0.593"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -183,7 +184,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -194,6 +195,22 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::PERLANCAR/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::PERLANCAR/CheckSelfDependency",
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
@@ -377,7 +394,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Regexp::Pattern",
                         "name" : "-Regexp::Pattern",
-                        "version" : "0.001"
+                        "version" : "0.003"
                      }
                   ]
                }
@@ -398,7 +415,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.13"
+            "version" : "0.142"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -472,7 +489,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
             "name" : "@Author::PERLANCAR/Prereqs::EnsureVersion",
-            "version" : "0.04"
+            "version" : "0.050"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",

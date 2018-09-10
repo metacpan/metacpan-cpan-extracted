@@ -1,10 +1,17 @@
 package Regexp::Pattern::YouTube;
 
-our $DATE = '2016-09-13'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our %RE = (
-    video_id => { pat => qr/[A-Za-z0-9_-]{11}/ },
+    video_id => {
+        pat => qr/[A-Za-z0-9_-]{11}/,
+        examples => [
+            {str=>'aNAtbYSxzuA', gen_args=>{-anchor=>1}, matches=>1},
+            {str=>'aNAtbYSxzuA-', gen_args=>{-anchor=>1}, matches=>0, summary=>'Incorrect length'},
+            {str=>'aNAtb+SxzuA', gen_args=>{-anchor=>1}, matches=>0, summary=>'Contains invalid character'},
+        ],
+    },
 );
 
 1;
@@ -22,7 +29,7 @@ Regexp::Pattern::YouTube - Regexp patterns related to YouTube
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Pattern::YouTube (from Perl distribution Regexp-Pattern-YouTube), released on 2016-09-13.
+This document describes version 0.003 of Regexp::Pattern::YouTube (from Perl distribution Regexp-Pattern-YouTube), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -38,6 +45,16 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 =over
 
 =item * video_id
+
+Examples:
+
+ "aNAtbYSxzuA" =~ re("YouTube::video_id", {-anchor=>1});  # matches
+
+ # Incorrect length
+ "aNAtbYSxzuA-" =~ re("YouTube::video_id", {-anchor=>1});  # doesn't match
+
+ # Contains invalid character
+ "aNAtb+SxzuA" =~ re("YouTube::video_id", {-anchor=>1});  # doesn't match
 
 =back
 
@@ -63,7 +80,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

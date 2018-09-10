@@ -20,10 +20,12 @@ has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );       
 
 has can_scan_deps => ( is => 'lazy', isa => Bool, init_arg => undef );
 
-_normalize_inc();
-
 # create $ENV object
 $ENV = __PACKAGE__->new;                                                                                 ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+_normalize_inc();
+
+$ENV->BUILD1;
 
 _configure_inc();
 
@@ -116,8 +118,59 @@ sub _configure_inc {
     return;
 }
 
+sub _init_inline ($self) {
+    if ( $self->{is_par} ) {
+        $INC{'Inline.pm'} = $INC{'Pcore/Core/Env.pm'};    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+        require XSLoader;
+
+        *Inline::import = sub {
+            my $caller = caller;
+
+            XSLoader::load $caller;
+
+            return;
+        };
+    }
+    else {
+        require Inline;
+
+        Inline->import(
+            config => (
+                directory         => $self->{INLINE_DIR},
+                autoname          => 0,
+                clean_after_build => 0,
+                clean_build_area  => 0,
+            )
+        );
+    }
+
+    return;
+}
+
 sub BUILD ( $self, $args ) {
     $self->{is_par} = $ENV{PAR_TEMP} ? 1 : 0;
+
+    $self->{USER_DIR} = $ENV{HOME} || $ENV{USERPROFILE};
+
+    $self->{PCORE_USER_DIR} = "$self->{USER_DIR}/.pcore/";
+    mkdir $self->{PCORE_USER_DIR} || die qq[Error creating user dir "$self->{PCORE_USER_DIR}"] if !-d $self->{PCORE_USER_DIR};
+    if ( !$self->{is_par} ) {
+        $self->{INLINE_DIR} = "$self->{PCORE_USER_DIR}inline/$Config{version}-$Config{archname}/";
+        mkdir "$self->{PCORE_USER_DIR}inline" || die qq[Error creating ""$self->{PCORE_USER_DIR}inline""] if !-d "$self->{PCORE_USER_DIR}inline";
+        mkdir $self->{INLINE_DIR} || die qq[Error creating "$self->{INLINE_DIR}"] if !-d $self->{INLINE_DIR};
+    }
+
+    $self->_init_inline;
+
+    return;
+}
+
+sub BUILD1 ($self) {
+
+    $self->{USER_DIR}       = P->path( $self->{USER_DIR},       is_dir => 1 );
+    $self->{PCORE_USER_DIR} = P->path( $self->{PCORE_USER_DIR}, is_dir => 1 );
+    $self->{INLINE_DIR}     = P->path( $self->{INLINE_DIR},     is_dir => 1 ) if $self->{INLINE_DIR};
 
     # init share
     $self->{share} = Pcore::Core::Env::Share->new;
@@ -141,10 +194,7 @@ sub BUILD ( $self, $args ) {
 
     $self->{SYS_TEMP_DIR} = P->path( File::Spec->tmpdir, is_dir => 1 )->to_string;
     $self->{TEMP_DIR} = P->file->tempdir( base => $self->{SYS_TEMP_DIR}, lazy => 1 );
-    $self->{USER_DIR} = P->path( $ENV{HOME} || $ENV{USERPROFILE}, is_dir => 1 );
-    $self->{PCORE_USER_DIR} = P->path( $self->{USER_DIR} . '.pcore/',     is_dir => 1, lazy => 1 );
-    $self->{PCORE_SYS_DIR}  = P->path( $self->{SYS_TEMP_DIR} . '.pcore/', is_dir => 1, lazy => 1 );
-    $self->{INLINE_DIR} = $self->{is_par} ? undef : P->path( $self->{PCORE_USER_DIR} . "inline/$Config{version}/$Config{archname}/", is_dir => 1, lazy => 1 );
+    $self->{PCORE_SYS_DIR} = P->path( $self->{SYS_TEMP_DIR} . '.pcore/', is_dir => 1, lazy => 1 );
 
     # CLI options
     $self->{SCAN_DEPS} = 0;
@@ -344,17 +394,17 @@ sub DESTROY ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 249                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 299                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 257                  | Subroutines::ProhibitExcessComplexity - Subroutine "DESTROY" with high complexity score (22)                   |
+## |    3 | 307                  | Subroutines::ProhibitExcessComplexity - Subroutine "DESTROY" with high complexity score (22)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 266                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 316                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 304                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 354                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 331                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 381                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 100                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 102                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

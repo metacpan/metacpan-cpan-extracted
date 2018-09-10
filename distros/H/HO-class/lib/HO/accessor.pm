@@ -3,10 +3,11 @@
 ; use strict; use warnings;
 our $VERSION='0.053';
 
-; use Class::ISA
-; require Carp
+; use Class::ISA ()
+; use Package::Subroutine ()
+; use Carp ()
 
-; my %classes
+; our %classes
 ; my %accessors
 ; my %methods
 
@@ -162,7 +163,7 @@ our $VERSION='0.053';
                                           : $typedefault
         }
     }
-
+; use Data::Dumper
 ; sub import
     { my ($package,$ac,$methods,$init,$new) = @_
     ; our %classes
@@ -170,10 +171,11 @@ our $VERSION='0.053';
 
     ; my $caller = $HO::accessor::class || CORE::caller
 
-    ; die "HO::accessor::import already called for class $caller."
-        if $classes{$caller}
+    ; Carp::croak "HO::accessor::import already called for class $caller."
+        if Package::Subroutine->isdefined($caller,'new') && $new
 
-    ; $classes{$caller}=$ac
+    ; $classes{$caller} = [] unless defined $classes{$caller}
+    ; push @{$classes{$caller}}, @$ac
 
     ; my @build = reverse Class::ISA::self_and_super_path($caller)
     ; my @constructor
@@ -218,7 +220,7 @@ our $VERSION='0.053';
           }
 
       ; foreach my $acc (@class_accessors)
-          { *{"${caller}::${acc}"}=$accessors{$caller}{$acc}
+          { *{"${caller}::${acc}"} = $accessors{$caller}{$acc}
           }
 
       ; my %class_methods = @$methods

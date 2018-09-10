@@ -23,13 +23,13 @@ no_index:
 provides:
   Password::Policy::Exception::Pwned:
     file: lib/Password/Policy/Exception/Pwned.pm
-    version: '0.01'
+    version: '0.02'
   Password::Policy::Exception::PwnedError:
     file: lib/Password/Policy/Exception/PwnedError.pm
-    version: '0.01'
+    version: '0.02'
   Password::Policy::Rule::Pwned:
     file: lib/Password/Policy/Rule/Pwned.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Digest::SHA: '0'
   LWP: '6.02'
@@ -39,4 +39,4 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Password-Policy-Rule-Pwned
   repository: git://gitlab.com/openstrike/password-pwned.git
-version: '0.01'
+version: '0.02'

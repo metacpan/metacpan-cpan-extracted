@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Class::ISA" : "0.20",
-            "Package::Subroutine" : "0.022000",
+            "Package::Subroutine" : "0.022",
             "perl" : "v5.6.0"
          }
       }
@@ -42,12 +42,12 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/giftnuss/p5-ho-class/tree/master",
+      "homepage" : "https://github.com/p5-ho-develop/class/tree/master",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/giftnuss/p5-ho-class.git"
+         "url" : "git://github.com/p5-ho-develop/class.git"
       }
    },
-   "version" : "0.077",
+   "version" : "0.078",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

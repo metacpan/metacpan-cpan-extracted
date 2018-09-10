@@ -154,7 +154,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016-2018 Mikhail Che.
+Copyright 2016-2018+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

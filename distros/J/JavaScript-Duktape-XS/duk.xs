@@ -271,6 +271,17 @@ eval(Duk* duk, const char* js, const char* file = 0)
   OUTPUT: RETVAL
 
 SV*
+dispatch_function_in_event_loop(Duk* duk, const char* func)
+  PREINIT:
+    Stats stats;
+  CODE:
+    TIMEOUT_RESET(duk);
+    pl_stats_start(aTHX_ duk, &stats);
+    RETVAL = newSViv(pl_run_function_in_event_loop(duk, func));
+    pl_stats_stop(aTHX_ duk, &stats, "dispatch");
+  OUTPUT: RETVAL
+
+SV*
 run_gc(Duk* duk)
   PREINIT:
     Stats stats;

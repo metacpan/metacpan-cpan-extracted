@@ -3,9 +3,9 @@ NAME
     Regexp::Pattern::* distribution
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Dist::Zilla::Plugin::Regexp::Pattern (from Perl distribution
-    Dist-Zilla-Plugin-Regexp-Pattern), released on 2018-03-24.
+    Dist-Zilla-Plugin-Regexp-Pattern), released on 2018-09-10.
 
 SYNOPSIS
     In dist.ini:
@@ -15,6 +15,9 @@ SYNOPSIS
 DESCRIPTION
     This plugin is to be used when building "Regexp::Pattern::*"
     distribution. It currently does the following:
+
+    *   Create "xt/release/regexp-pattern.t" test file which uses
+        Test::Regexp::Pattern to test yor regexp patterns
 
     *   Make sure that Regexp::Pattern is added as a (phase=develop,
         rel=x_spec) prerequisite

@@ -25,4 +25,5 @@ WriteMakefile (
         },
     },
     MIN_PERL_VERSION => '5.008009',
+    EXE_FILES => ['./script/critstrip',],
 );

@@ -1,7 +1,9 @@
+## no critic: ValuesAndExpressions::ProhibitCommaSeparatedStatements BuiltinFunctions::RequireBlockMap
+
 package Test::Rinci;
 
-our $DATE = '2016-03-06'; # DATE
-our $VERSION = '0.14'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.150'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +12,7 @@ use experimental 'smartmatch';
 #use Log::Any '$log';
 
 use File::Spec;
-use Perinci::Access::Perl 0.55;
+use Perinci::Access::Perl 0.87;
 #use SHARYANTO::Array::Util qw(match_array_or_regex); # we'll just use ~~
 use Test::Builder;
 use Test::More ();
@@ -323,7 +325,7 @@ Test::Rinci - Test Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.14 of Test::Rinci (from Perl distribution Test-Rinci), released on 2016-03-06.
+This document describes version 0.150 of Test::Rinci (from Perl distribution Test-Rinci), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -421,7 +423,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Test-Rinci
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Test-Rinci>.
+Source repository is at L<https://github.com/perlancar/perl-Test-Rinci>.
 
 =head1 BUGS
 
@@ -447,7 +449,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

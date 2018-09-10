@@ -1,4 +1,12 @@
-Revision history for Pod-Weaver-Plugin-Regexp-Pattern
+0.003   2018-09-10 (PERLANCAR)
+
+	- [bugfix] Show gen_args in examples for dynamic pattern.
+
+
+0.002   2018-09-10 (PERLANCAR)
+
+	- Render examples as POD (Regexp::Pattern 0.2.4).
+
 
 0.001   2016-09-13 (PERLANCAR)
 

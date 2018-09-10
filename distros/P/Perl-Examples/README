@@ -1,20 +1,51 @@
-DESCRIPTION
+NAME
+    Perl::Examples - A collection of various examples of Perl
+    modules/scripts
 
+VERSION
+    This document describes version 0.091 of Perl::Examples (from Perl
+    distribution Perl-Examples), released on 2018-09-10.
+
+DESCRIPTION
     EARLY RELEASE, MORE EXAMPLES TO COME, CONTRIBUTIONS WELCOME.
 
-    This distribution, as the name suggests, contains a random collection
-    of various Perl modules/scripts, mostly for testing. Some examples are:
+    This distribution, as the name suggests, contains a random collection of
+    various Perl modules/scripts, mostly for testing. Some examples are:
 
-      * script that generates warning
+    *   script that generates warning
 
-      * script that dies
+    *   script that dies
 
-      * script that contains an endless loop
+    *   script that contains an endless loop
 
-      * script that grows indefinitely
+    *   script that grows indefinitely
 
-      * module that contains POD examples
+    *   module that contains POD examples
 
-    As more examples are added they might get reorganized (renamed, spun
-    off to another dist, etc).
+    As more examples are added they might get reorganized (renamed, spun off
+    to another dist, etc).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perl-Examples>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perl-Examples>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Examples>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -11,7 +11,7 @@ use Carp;
 use JSON::Parse 'json_file_to_perl';
 use Convert::Moji 'make_regex';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Load the data from the file.
 
@@ -21,10 +21,13 @@ my $abc = json_file_to_perl ($json);
 
 # American
 my @a;
+my @as;
 # British
 my @b;
+my @bs;
 # Canadian
 my @c;
+my @cs;
 # British Oxford
 my @bo;
 # Map from either American or British version to its entry
@@ -57,44 +60,67 @@ for my $e (@$abc) {
     }
 }
 
+for my $k (keys %any2e) {
+    my $e = $any2e{$k};
+    if ($e->{s}) {
+	push @as, $e->{a};
+	push @bs, $e->{b};
+    }
+}
+
 # Word-matching regexes
 
 my $a_re = make_regex (@a);
 my $b_re = make_regex (@b);
-my $c_re = make_regex (@c);
 my $bo_re = make_regex (@bo);
+my $as_re = make_regex (@as);
+my $bs_re = make_regex (@bs);
 
 sub a2b
 {
     my ($text, %options) = @_;
-    my $oxford = $options{oxford};
-    if ($oxford) {
-	$text =~ s/\b($a_re)\b/$any2e{$1}{bo}/g;
+    my $re = $a_re;
+    my $out = 'b';
+    if ($options{oxford}) {
+	$out = 'bo';
     }
-    else {
-	$text =~ s/\b($a_re)\b/$any2e{$1}{b}/g;
+    if ($options{s}) {
+	$re = $as_re;
     }
+    $text =~ s/\b($re)\b/$any2e{$1}{$out}/g;
     return $text;
 }
 
 sub b2a
 {
-    my ($text) = @_;
-    $text =~ s/\b($b_re)\b/$any2e{$1}{ao}/g;
+    my ($text, %options) = @_;
+    my $re = $b_re;
+    if ($options{s}) {
+	$re = $bs_re;
+    }
+    $text =~ s/\b($re)\b/$any2e{$1}{ao}/g;
     return $text;
 }
 
 sub a2c
 {
-    my ($text) = @_;
-    $text =~ s/\b($a_re)\b/$any2e{$1}{co}/g;
+    my ($text, %options) = @_;
+    my $re = $a_re;
+    if ($options{s}) {
+	$re = $as_re;
+    }
+    $text =~ s/\b($re)\b/$any2e{$1}{co}/g;
     return $text;
 }
 
 sub c2a
 {
-    my ($text) = @_;
-    $text =~ s/\b($b_re)\b/$any2e{$1}{ao}/g;
+    my ($text, %options) = @_;
+    my $re = $b_re;
+    if ($options{s}) {
+	$re = $bs_re;
+    }
+    $text =~ s/\b($re)\b/$any2e{$1}{ao}/g;
     return $text;
 }
 
@@ -105,14 +131,22 @@ sub c2b
     if ($options{oxford}) {
 	$type = 'bo';
     }
-    $text =~ s/\b($a_re)\b/$any2e{$1}{$type}/g;
+    my $re = $a_re;
+    if ($options{s}) {
+	$re = $as_re;
+    }
+    $text =~ s/\b($re)\b/$any2e{$1}{$type}/g;
     return $text;
 }
 
 sub b2c
 {
-    my ($text) = @_;
-    $text =~ s/\b($b_re)\b/$any2e{$1}{co}/g;
+    my ($text, %options) = @_;
+    my $re = $b_re;
+    if ($options{s}) {
+	$re = $bs_re;
+    }
+    $text =~ s/\b($re)\b/$any2e{$1}{co}/g;
     return $text;
 }
 

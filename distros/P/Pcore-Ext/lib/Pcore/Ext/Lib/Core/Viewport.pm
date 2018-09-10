@@ -25,7 +25,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
 
         defaultMask => {
             transparent => \0,
-            html        => '<img src="/static/loader4.gif" width="100"/>',
+            html        => qq[<img src="@{[ $cdn->('/static/loader4.gif') ]}" width="100"/>],
         },
 
         listen => {

@@ -17,7 +17,7 @@ my $tests = 3; # keep on line 17 for ,i (increment and ,d (decrement)
 plan tests => $tests;
 
 my $file = 'yizkjweiasdkjadwkejfakdEWWW78ss.cfg';
-warnings_like { set_log_config($file) } qr/Configuration file unchanged\./, 'Rejects non existent file';
+warnings_like { set_log_config($file) } qr/Configuration file unchanged/, 'Rejects non existent file';
 
 my $package    = 'Log-Log4perl-Shortcuts';
 my $config = File::UserConfig->new(dist => $package);

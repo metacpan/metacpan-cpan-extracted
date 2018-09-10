@@ -24,11 +24,11 @@ Perl::LanguageServer - Language Server for Perl
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -242,15 +242,19 @@ sub mainloop
         my %header ;
         my $line ;
         my $cnt ;
+        my $loop ;
         header:
         while (1)
             {
-            print STDERR "start aio read\n" ;
-            $cnt = aio_read $fh, undef, 8192, $buffer, length ($buffer) ;
-            #$cnt = sysread STDIN, $buffer, 10000, length ($buffer) ;
-            print STDERR "end aio read cnt=$cnt\n" ;
-            die "read_error reading headers" if ($cnt < 0) ;
-            return if ($cnt == 0) ;
+            if (!$loop && length ($buffer) == 0)
+                {
+                print STDERR "start aio read\n" ;
+                $cnt = aio_read $fh, undef, 8192, $buffer, length ($buffer) ;
+                #$cnt = sysread STDIN, $buffer, 10000, length ($buffer) ;
+                print STDERR "end aio read cnt=$cnt\n" ;
+                die "read_error reading headers" if ($cnt < 0) ;
+                return if ($cnt == 0) ;
+                }
 
             while ($buffer =~ s/^(.*?)\R//)
                 {
@@ -259,6 +263,7 @@ sub mainloop
                 last header if ($line eq '') ;
                 $header{$1} = $2 if ($line =~ /(.+?):\s*(.+)/) ;
                 }
+            $loop = 1 ;
             }
 
         my $len = $header{'Content-Length'} ;

@@ -27,17 +27,9 @@ sub clear {
 }
 
 sub update_all ($cb = undef) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
     my $success_all = 1;
 
-    my $cv = AE::cv sub {
-        $rouse_cb ? $cb ? $rouse_cb->( $cb->($success_all) ) : $rouse_cb->($success_all) : $cb ? $cb->($success_all) : ();
-
-        return;
-    };
-
-    $cv->begin;
+    my $cv = P->cv->begin( sub ($cv) { $cv->( $cb ? $cb->($success_all) : $success_all ) } );
 
     for ( keys $RES->%* ) {
         $cv->begin;
@@ -56,7 +48,7 @@ sub update_all ($cb = undef) {
 
     $cv->end;
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return defined wantarray ? $cv->recv : ();
 }
 
 sub update ( $type, $cb = undef ) {
@@ -151,7 +143,7 @@ sub _get_h ($type) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 73                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 65                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

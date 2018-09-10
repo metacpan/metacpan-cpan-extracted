@@ -4,7 +4,7 @@ use strictures 1;
 #
 # This file is part of Dancer2-Plugin-Redis
 #
-# This software is Copyright (c) 2016 by BURNERSK <burnersk@cpan.org>.
+# This software is Copyright (c) 2018 by BURNERSK <burnersk@cpan.org>.
 #
 # This is free software, licensed under:
 #
@@ -89,7 +89,7 @@ Dancer2::Plugin::Redis::Serialization::Sereal - Dancer2::Plugin::Redis serializa
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ BURNERSK <burnersk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by BURNERSK <burnersk@cpan.org>.
+This software is Copyright (c) 2018 by BURNERSK <burnersk@cpan.org>.
 
 This is free software, licensed under:
 

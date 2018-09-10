@@ -4,6 +4,7 @@ use Test::NoWarnings;
 use Plack::Test;
 use HTTP::Request::Common;
 
+use lib '.';
 use t::Util;
 
 BEGIN { t::Util::setenv }

@@ -1,3 +1,39 @@
+0.2.7   2018-09-10 (PERLANCAR)
+
+	- Enable re() to return regex wrapped inside qr/\A(?:...)\z/ with
+	  -anchor=>1 argument.
+
+
+0.2.6   2018-09-10 (PERLANCAR)
+
+	- No spec changes.
+
+        - [build] Rebuild to fix POD that didn't show gen_args in examples for
+          dynamic pattern (PWP:Regexp::Pattern 0.002-).
+
+
+0.2.5   2018-09-10 (PERLANCAR)
+
+	- No spec changes.
+
+	- Mention about gen_args in example specification.
+
+        - [doc] Express specification version as 0.2 instead of 0.2.0.
+
+	- [doc] Mention Test::Regexp::Pattern and test-regexp-pattern.
+
+	- Regexp::Pattern::Example: Add sample regexes that do capturing and
+          anchoring, add matching examples.
+
+        - [build] Rebuild to create test file release-regexp-pattern.t and
+          render matching example PODs.
+
+
+0.2.4   2018-09-10 (PERLANCAR)
+
+	- Specify regexp examples.
+
+
 0.2.3   2018-04-03 (PERLANCAR)
 
 	- No spec changes.

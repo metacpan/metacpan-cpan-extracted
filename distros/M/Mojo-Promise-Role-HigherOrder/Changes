@@ -1,0 +1,6 @@
+# Changes for Mojo::Promise::Role::Any
+
+1.001 2018-09-10T07:42:55Z
+	* First release of some higher order roles for Mojo::Promise:
+	any(), none(), and some()
+

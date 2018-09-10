@@ -1,5 +1,15 @@
 Revision history for Dancer2::Plugin::Redis
 
+0.009 Sun  9 Sep 12:38:56 CEST 2018
+
+    * Revert change in use of InstanceOf to support older Type::Tiny
+
+0.008 Sat  8 Sep 18:27:08 CEST 2018
+
+    * Add dot to inc in tests for Perl 5.26+
+    * Add note to Pod explaining how to access underlying Redis object
+    * Simplify use of InstanceOf for _redis attribute
+
 0.007 Wed 10 Aug 15:45:02 CEST 2016
 
 	* Switch back to using Types::Standard

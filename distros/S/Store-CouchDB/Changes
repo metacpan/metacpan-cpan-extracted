@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2017-05-08 00:00:00 +0000 to present.
+Changes from 2017-09-10 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.2 at 2018-05-08 02:11:40 +0000
+version 4.3 at 2018-09-10 04:24:54 +0000
+----------------------------------------
+
+  Change: 378ae0b4b77325e7a0a122464f87eec71b212fbd
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-09-10 16:24:38 +0000
+
+    silence warning of nonexistent hash key 
+
+  Change: b575ac0438d70fdd8cd4dec662962555a65ab294
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-05-08 14:14:11 +0000
+
+    upload relases to github 
+
+----------------------------------------
+version 4.2 at 2018-05-08 02:11:16 +0000
 ----------------------------------------
 
   Change: ecf63b02203efe2ff8e12148af2e542d524b2c35
@@ -25,41 +41,12 @@ version 4.2 at 2018-05-08 02:11:40 +0000
     added flag to prevent result parsing when view returns an object/hash
     as value 
 
-----------------------------------------
-version 4.1 at 2017-10-25 08:04:58 +0000
-----------------------------------------
-
   Change: cff66745417109263ebc53647a3162cb53a43c78
   Author: Tobias Kirschstein <lev@ideegeo.com>
   Date : 2017-10-25 21:04:58 +0000
 
     upload to CPAN and do git release 
 
-  Change: 0338e100cef7f90134deb7a5a8f44b22a1abc7ca
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-10-26 15:32:28 +0000
-
-    satisfy Pod::Coverage 
-
-  Change: a49204867bbd35d6ccde8dc65d6fa0dad00cff36
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-10-26 15:28:31 +0000
-
-    fixed typo 
-
-  Change: 8fee69e917539336f34d59d5c8b099c2b5c4a0bb
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-10-26 15:07:10 +0000
-
-    version bump 
-
-  Change: 554d2d46fb5d404a8e7e4578378a26d8320e1e1f
-  Author: Tobias Kirschstein <lev@ideegeo.com>
-  Date : 2016-10-26 15:06:57 +0000
-
-    use LWP::Protocol::Net::Curl to fix an issue with default low level
-    protocols on linux 
-
 =================================================
-Plus 36 releases after 2017-05-08 00:00:00 +0000.
+Plus 37 releases after 2017-09-10 00:00:00 +0000.
 =================================================

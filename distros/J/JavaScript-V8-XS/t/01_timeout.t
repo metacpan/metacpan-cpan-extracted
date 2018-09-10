@@ -11,8 +11,8 @@ sub test_js_timeout {
     my ($vm) = @_;
 
     my $js = <<JS;
-var perl_ret = 'EMPTY';
-var perl_err = 'EMPTY';
+var perl_ret = '';
+var perl_err = '';
 
 function main() {
     perl_ret += 1
@@ -37,9 +37,20 @@ function main() {
 }
 JS
     my $got_eval = $vm->eval($js);
-    my $got_run = $vm->eval('main()');
-    my $perl_ret = $vm->get('perl_ret');
-    is($perl_ret, 'EMPTY1234567', "timeouts dispatched correctly");
+    my $name = 'main';
+    my %types = (
+        eval => "%s()",
+        dispatch_function_in_event_loop => "%s",
+    );
+    foreach my $type (sort keys %types) {
+        $vm->set('perl_ret', 'EMPTY');
+        $vm->set('perl_err', 'EMPTY');
+        my $format = $types{$type};
+        my $js = sprintf($format, $name);
+        my $got_run = $vm->$type($js);
+        my $perl_ret = $vm->get('perl_ret');
+        is($perl_ret, 'EMPTY1234567', "timeouts dispatched correctly for type $type");
+    }
 }
 
 sub test_timeout_with_error {
@@ -49,14 +60,23 @@ sub test_timeout_with_error {
 function main() {
     setTimeout(function () {
         var notdef;
-        console.log(notdef.length);
+        notdef.length = 2;
     })
 }
 JS
     my $got_eval = $vm->eval($js);
-    stderr_like sub { $vm->eval('main()'); },
-                qr/Error:/,
-                "got correct error from setTimeout";
+    my $name = 'main';
+    my %types = (
+        eval => "%s()",
+        dispatch_function_in_event_loop => "%s",
+    );
+    foreach my $type (sort keys %types) {
+        my $format = $types{$type};
+        my $js = sprintf($format, $name);
+        stderr_like sub { $vm->$type($js); },
+                    qr/Error:/,
+                    "got correct error from setTimeout for $type";
+    }
 }
 
 sub main {

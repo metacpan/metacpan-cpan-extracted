@@ -13,7 +13,8 @@ subtest "sub interface" => sub {
     subtest "static" => sub {
         my $re1 = re("Example::re1");
         ok $re1;
-        ok('123-4567' =~ $re1);
+        ok('123-456' =~ $re1);
+        ok(' 123-456' =~ $re1);
         ok(!('foo' =~ $re1));
     };
 
@@ -26,6 +27,13 @@ subtest "sub interface" => sub {
         ok $re3b;
         ok('123-45-67890' =~ $re3b);
         ok(!('123-456' =~ $re3b));
+    };
+
+    subtest "-anchor option" => sub {
+        my $re1 = re("Example::re1", -anchor=>1);
+        ok $re1;
+        ok('123-456' =~ $re1);
+        ok(!(' 123-456' =~ $re1));
     };
 };
 
@@ -57,7 +65,7 @@ subtest "hash interface" => sub {
     subtest "wildcard" => sub {
         %RE = ();
         Regexp::Pattern->import('Example::*');
-        is_deeply([sort keys %RE], [qw/re1 re2 re3/]);
+        is_deeply([sort keys %RE], [qw/re1 re2 re3 re4 re5/]);
     };
 
     subtest "-as" => sub {
@@ -73,7 +81,7 @@ subtest "hash interface" => sub {
     subtest "-prefix and -suffix" => sub {
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-prefix=>"p_"));
-        is_deeply([sort keys %RE], [qw/p_re1 p_re2 p_re3/]);
+        is_deeply([sort keys %RE], [qw/p_re1 p_re2 p_re3 p_re4 p_re5/]);
 
         # can also be applied to a single pattern
         %RE = ();
@@ -82,12 +90,12 @@ subtest "hash interface" => sub {
 
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-suffix=>"_b"));
-        is_deeply([sort keys %RE], [qw/re1_b re2_b re3_b/]);
+        is_deeply([sort keys %RE], [qw/re1_b re2_b re3_b re4_b re5_b/]);
 
         # combo of prefix & suffix
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-prefix=>"a_", -suffix=>"_b"));
-        is_deeply([sort keys %RE], [qw/a_re1_b a_re2_b a_re3_b/]);
+        is_deeply([sort keys %RE], [qw/a_re1_b a_re2_b a_re3_b a_re4_b a_re5_b/]);
     };
 
     subtest "-has_tag and -lacks_tag" => sub {
@@ -105,7 +113,7 @@ subtest "hash interface" => sub {
 
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-lacks_tag=>"A"));
-        is_deeply([sort keys %RE], [qw/re1 re3/]);
+        is_deeply([sort keys %RE], [qw/re1 re3 re4 re5/]);
 
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-has_tag=>"B", -lacks_tag=>"A"));

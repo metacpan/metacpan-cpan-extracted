@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -17,6 +17,19 @@ use List::UtilsBy qw(uniq_by);
 use LWP::UserAgent;
 use Travel::Status::DE::IRIS::Result;
 use XML::LibXML;
+
+sub try_load_xml {
+	my ($xml) = @_;
+
+	my $tree;
+
+	eval { $tree = XML::LibXML->load_xml( string => $xml ) };
+
+	if ($@) {
+		return ( undef, $@ );
+	}
+	return ( $tree, undef );
+}
 
 sub new {
 	my ( $class, %opt ) = @_;
@@ -31,7 +44,7 @@ sub new {
 		developer_mode => $opt{developer_mode},
 		iris_base      => $opt{iris_base}
 		  // 'http://iris.noncd.db.de/iris-tts/timetable',
-		lookahead  => $opt{lookahead}  // ( 2 * 60 ),
+		lookahead  => $opt{lookahead} //  ( 2 * 60 ),
 		lookbehind => $opt{lookbehind} // ( 0 * 60 ),
 		main_cache => $opt{main_cache},
 		rt_cache   => $opt{realtime_cache},
@@ -131,7 +144,7 @@ sub new {
 	}
 
 	@{ $self->{results} } = grep {
-		my $d = ( $_->departure // $_->arrival );
+		my $d  = ( $_->departure // $_->arrival );
 		my $sd = $_->sched_departure // $_->sched_arrival // $d;
 		$d  = $d->subtract_datetime( $self->{datetime} );
 		$sd = $sd->subtract_datetime( $self->{datetime} );
@@ -215,7 +228,11 @@ sub get_station {
 			}
 		}
 
-		my $xml_st = XML::LibXML->load_xml( string => $raw );
+		my ( $xml_st, $xml_err ) = try_load_xml($raw);
+		if ($xml_err) {
+			$self->{errstr} = 'Failed to parse station data: Invalid XML';
+			return;
+		}
 
 		my $station_node = ( $xml_st->findnodes('//station') )[0];
 
@@ -348,7 +365,12 @@ sub get_timetable {
 		return $self;
 	}
 
-	my $xml = XML::LibXML->load_xml( string => $raw );
+	my ( $xml, $xml_err ) = try_load_xml($raw);
+
+	if ($xml_err) {
+		$self->{warnstr} = 'Failed to parse a schedule part: Invalid XML';
+		return $self;
+	}
 
 	my $station = ( $xml->findnodes('/timetable') )[0]->getAttribute('station');
 
@@ -374,7 +396,12 @@ sub get_realtime {
 		return $self;
 	}
 
-	my $xml = XML::LibXML->load_xml( string => $raw );
+	my ( $xml, $xml_err ) = try_load_xml($raw);
+
+	if ($xml_err) {
+		$self->{warnstr} = 'Failed to parse realtime data: Invalid XML';
+		return $self;
+	}
 
 	my $station = ( $xml->findnodes('/timetable') )[0]->getAttribute('station');
 
@@ -576,7 +603,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 DESCRIPTION
 

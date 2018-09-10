@@ -7,23 +7,63 @@ use Firefox::Marionette::Exception::NoSuchAlert();
 use Firefox::Marionette::Exception::StaleElement();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.64';
+our $VERSION = '0.66';
 
-sub _TYPE_INDEX       { return 0 }
-sub _MESSAGE_ID_INDEX { return 1 }
-sub _ERROR_INDEX      { return 2 }
-sub _RESULT_INDEX     { return 3 }
+sub _TYPE_INDEX            { return 0 }
+sub _MESSAGE_ID_INDEX      { return 1 }
+sub _ERROR_INDEX           { return 2 }
+sub _RESULT_INDEX          { return 3 }
+sub _DEFAULT_RESPONSE_TYPE { return 1 }
 
 sub new {
     my ( $class, $message, $parameters ) = @_;
-    my $response = bless {
-        type       => $message->[ _TYPE_INDEX() ],
-        message_id => $message->[ _MESSAGE_ID_INDEX() ],
-        error      => $message->[ _ERROR_INDEX() ],
-        result     => $message->[ _RESULT_INDEX() ],
-    }, $class;
+    my $response;
+    if ( ref $message eq 'ARRAY' ) {
+        $response = bless {
+            type       => $message->[ _TYPE_INDEX() ],
+            message_id => $message->[ _MESSAGE_ID_INDEX() ],
+            error      => $message->[ _ERROR_INDEX() ],
+            result     => $message->[ _RESULT_INDEX() ],
+        }, $class;
+    }
+    else {
+        if ( $message->{error} ) {
+            my $error;
+            if ( ref $message->{error} ) {
+                $error = $message->{error};
+            }
+            else {
+                $error = $message;
+            }
+            if ( !defined $error->{error} ) {
+                $error->{error} = q[];
+            }
+            if ( !defined $error->{message} ) {
+                $error->{message} = q[];
+            }
+            $response = bless {
+                type       => _DEFAULT_RESPONSE_TYPE(),
+                message_id => undef,
+                error      => $error,
+                result     => undef,
+            }, $class;
+        }
+        else {
+            $response = bless {
+                type       => _DEFAULT_RESPONSE_TYPE(),
+                message_id => undef,
+                error      => undef,
+                result     => $message,
+            }, $class;
+        }
+    }
     if ( $response->error() ) {
-        if ( $response->error()->{error} eq 'no such element' ) {
+        if (
+            ( $response->error()->{error} eq 'no such element' )
+            || ( $response->error()->{message} =~
+                /^Unable[ ]to[ ]locate[ ]element/smx )
+          )
+        {
             Firefox::Marionette::Exception::NotFound->throw( $response,
                 $parameters );
         }
@@ -71,7 +111,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.64
+Version 0.66
 
 =head1 SYNOPSIS
 

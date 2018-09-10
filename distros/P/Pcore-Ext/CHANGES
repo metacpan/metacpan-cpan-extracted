@@ -1,3 +1,9 @@
+v0.18.0 2018-09-09T19:06:16Z
+ - strict refs removed
+ - ext moved
+ - cdn resources
+ - cdn
+
 v0.17.11 2018-07-10T06:14:10Z
  - code cleanup
  - perl-5.28

@@ -7,11 +7,14 @@ build_requires:
   Test::Deep: '0'
   Test::Simple: '0.90'
   Time::HiRes: '0'
+  bigint: '0'
 configure_requires:
   DBI: '1.609'
   Data::Dumper: '0'
+  Devel::CheckLib: '1.09'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,8 +34,9 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-mysql.git
-version: '4.046'
+version: '4.047'
 x_contributors:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexey Molchanov <alexey.molchanov@portaone.com>'
   - 'Amiri Barksdale at Home <amiri@roosterpirates.com>'
@@ -44,11 +48,11 @@ x_contributors:
   - 'Chris Hammond <chrishammond@ymail.com>'
   - 'Chris Weyl <cweyl@alumni.drew.edu>'
   - 'Christian Walde <walde.christian@googlemail.com>'
-  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'Dagfinn Ilmari Manns\x{00e5}ker <ilmari@ilmari.org>'
   - 'Daisuke Murase <typester@cpan.org>'
   - 'Damyan Ivanov <dmn@debian.org>'
   - 'Dan Book <grinnz@gmail.com>'
-  - 'Daniël van Eeden <daniel.vaneeden@booking.com>'
+  - 'Dani\x{00eb}l van Eeden <daniel.vaneeden@booking.com>'
   - 'Dave Lambley <davel@isosceles.(none)>'
   - 'David Farrell <davidnmfarrell@gmail.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
@@ -69,7 +73,8 @@ x_contributors:
   - 'Pali <pali@cpan.org>'
   - 'Patrick Galbraith <patg@patg.net>'
   - 'Perlover <perlover@perlover.com>'
-  - 'Petr Písař <ppisar@redhat.com>'
+  - 'Peter Botha <peterb@striata.com>'
+  - 'Petr P\x{00ed}sa\x{0159} <ppisar@redhat.com>'
   - 'Reini Urban <rurban@cpanel.net>'
   - 'Rob Hoelz <rhoelz@inoc.com>'
   - 'Rob Van Dam <rvandam00@gmail.com>'
@@ -83,7 +88,7 @@ x_contributors:
   - 'Taro Kobayashi <9re.3000@gmail.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tim Mullin <tim@cpanel.net>'
-  - 'Ville Skyttä <ville.skytta@iki.fi>'
+  - 'Ville Skytt\x{00e4} <ville.skytta@iki.fi>'
   - 'Vladimir Marek <vlmarek@volny.cz>'
   - 'katyavoid <katyavoid@gmail.com>'
   - 'kmx <kmx@cpan.org>'

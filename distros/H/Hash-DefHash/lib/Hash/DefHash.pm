@@ -1,7 +1,9 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Hash::DefHash;
 
-our $DATE = '2016-07-12'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2018-09-10'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 use 5.010001;
 use strict;
@@ -420,7 +422,7 @@ Hash::DefHash - Manipulate defhash
 
 =head1 VERSION
 
-This document describes version 0.06 of Hash::DefHash (from Perl distribution Hash-DefHash), released on 2016-07-12.
+This document describes version 0.070 of Hash::DefHash (from Perl distribution Hash-DefHash), released on 2018-09-10.
 
 =head1 SYNOPSIS
 
@@ -608,7 +610,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Hash-DefHa
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Hash-DefHash>.
+Source repository is at L<https://github.com/perlancar/perl-Hash-DefHash>.
 
 =head1 BUGS
 
@@ -628,7 +630,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,38 @@ use Pcore -dist, -class, -const, -res;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 use <: $module_name ~ "::Util" :>;
 
-has cfg => ( is => 'ro', isa => HashRef, required => 1 );
+has cfg => ( required => 1 );
 
 has util => ( is => 'ro', isa => InstanceOf ['<: $module_name :>::Util'], init_arg => undef );
 
 with qw[Pcore::App];
 
 const our $API_ROLES => [ 'admin', 'user' ];
+
+const our $NODE_REQUIRES => {
+    '<: $module_name :>::Node::Worker' => undef,
+    '<: $module_name :>::Node::Log'    => undef,
+};
+
+sub NODE_ON_EVENT ( $self, $ev ) {
+    P->forward_event($ev);
+
+    return;
+}
+
+sub NODE_ON_RPC ( $self, $ev ) {
+    return;
+}
+
+const our $LOCALES => {
+    en => 'English',
+    de => 'Deutsche',
+    ru => 'Русский',
+};
+
+sub get_locales ($self) {
+    return $LOCALES;
+}
 
 sub run ( $self ) {
     $self->{util} = <: $module_name ~ "::Util" :>->new;
@@ -23,32 +48,27 @@ sub run ( $self ) {
     # load settings
     $res = $self->{util}->load_settings;
 
-    # run RPC
-    print 'Starting RPC hub ... ';
+    # run local nodes
+    print 'Starting nodes ... ';
     say $self->{node}->run_node(
-        {   type           => '<: $module_name :>::RPC::Worker',
-            workers        => 1,
-            token          => undef,
-            listen_events  => undef,
-            forward_events => ['APP.SETTINGS_UPDATED'],
-            buildargs      => {                                    #
+        {   type      => '<: $module_name :>::Node::Worker',
+            workers   => 1,
+            buildargs => {
                 cfg  => $self->{cfg},
                 util => $self->{util},
             },
         },
-        {   type           => '<: $module_name :>::RPC::Log',
-            workers        => 1,
-            token          => undef,
-            listen_events  => undef,
-            forward_events => undef,
-            buildargs      => {                                    #
-                cfg  => $self->{cfg},
-                util => { settings => $self->{util}->{settings} },
-            },
-        },
+
+        # {   type      => '<: $module_name :>::Node::Log',
+        #     workers   => 1,
+        #     buildargs => {
+        #         cfg  => $self->{cfg},
+        #         util => { settings => $self->{util}->{settings} },
+        #     },
+        # },
     );
 
-    $self->{node}->wait_for_online;
+    $self->{node}->wait_online;
 
     # app ready
     return res 200;
@@ -63,9 +83,9 @@ sub run ( $self ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 4, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 9, 29, 39            | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 9, 16, 17, 54        | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 73                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 77 does not match the package declaration       |
+## |    1 | 93                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 97 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

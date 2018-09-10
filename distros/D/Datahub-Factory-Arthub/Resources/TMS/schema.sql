@@ -19,8 +19,8 @@ ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ClassificationID` );
 
 -- ObjTitles
 
+ALTER TABLE `ObjTitles` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ObjTitles` ADD INDEX ( `ObjectID` );
-ALTER TABLE `ObjTitles` ADD INDEX ( `ClassificationID` );
 
 -- Classifications
 

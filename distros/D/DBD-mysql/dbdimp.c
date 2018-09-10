@@ -1,8 +1,9 @@
 /*
  *  DBD::mysql - DBI driver for the mysql database
  *
- *  Copyright (c) 2004-2014 Patrick Galbraith
- *  Copyright (c) 2013-2014 Michiel Beijen 
+ *  Copyright (c) 2015-2017 Pali Rohár
+ *  Copyright (c) 2004-2017 Patrick Galbraith
+ *  Copyright (c) 2013-2017 Michiel Beijen 
  *  Copyright (c) 2004-2007 Alexey Stroganov 
  *  Copyright (c) 2003-2005  Rudolf Lippan
  *  Copyright (c) 1997-2003  Jochen Wiedmann
@@ -11,20 +12,9 @@
  *  License or the Artistic License, as specified in the Perl README file.
  */
 
-
-#ifdef WIN32
-#include "windows.h"
-#include "winsock.h"
-#endif
-
 #include "dbdimp.h"
 
-#if defined(WIN32)  &&  defined(WORD)
-#undef WORD
-typedef short WORD;
-#endif
-
-#ifdef WIN32
+#ifdef _WIN32
 #define MIN min
 #else
 #ifndef MIN
@@ -32,17 +22,11 @@ typedef short WORD;
 #endif
 #endif
 
-#if MYSQL_ASYNC
-#  include <poll.h>
-#  include <errno.h>
-#  define ASYNC_CHECK_RETURN(h, value)\
+#define ASYNC_CHECK_RETURN(h, value)\
     if(imp_dbh->async_query_in_flight) {\
         do_error(h, 2000, "Calling a synchronous function on an asynchronous handle", "HY000");\
         return (value);\
     }
-#else
-#  define ASYNC_CHECK_RETURN(h, value)
-#endif
 
 static int parse_number(char *string, STRLEN len, char **end);
 
@@ -621,8 +605,8 @@ static char *parse_params(
         it would be good to be able to handle any number of cases and orders
       */
       if ((*statement_ptr == 'l' || *statement_ptr == 'L') &&
-          (!strncmp(statement_ptr+1, "imit ?", 6) ||
-           !strncmp(statement_ptr+1, "IMIT ?", 6)))
+          (!strncmp(statement_ptr+1, "imit ", 5) ||
+           !strncmp(statement_ptr+1, "IMIT ", 5)))
       {
         limit_flag = 1;
       }
@@ -1695,7 +1679,7 @@ MYSQL *mysql_dr_connect(
     }
 #endif
 
-#ifdef MYSQL_NO_CLIENT_FOUND_ROWS
+#ifdef DBD_MYSQL_NO_CLIENT_FOUND_ROWS
     client_flag = 0;
 #else
     client_flag = CLIENT_FOUND_ROWS;
@@ -1907,8 +1891,6 @@ MYSQL *mysql_dr_connect(
                         imp_dbh->disable_fallback_for_server_prepare);
 #endif
 
-        /* HELMUT */
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
         if ((svp = hv_fetch(hv, "mysql_enable_utf8mb4", 20, FALSE)) && *svp && SvTRUE(*svp)) {
           mysql_options(sock, MYSQL_SET_CHARSET_NAME, "utf8mb4");
         }
@@ -1923,6 +1905,20 @@ MYSQL *mysql_dr_connect(
            PerlIO_printf(DBIc_LOGPIO(imp_xxh),
                          "mysql_options: MYSQL_SET_CHARSET_NAME=%s\n",
                          (SvTRUE(*svp) ? "utf8" : "latin1"));
+        }
+
+#if (MYSQL_VERSION_ID >= 50723) && (MYSQL_VERSION_ID < MARIADB_BASE_VERSION)
+        if ((svp = hv_fetch(hv, "mysql_get_server_pubkey", 23, FALSE)) && *svp && SvTRUE(*svp)) {
+          my_bool server_get_pubkey = 1;
+          mysql_options(sock, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &server_get_pubkey);
+        }
+#endif
+
+#if (MYSQL_VERSION_ID >= 50600) && (MYSQL_VERSION_ID < MARIADB_BASE_VERSION)
+        if ((svp = hv_fetch(hv, "mysql_server_pubkey", 19, FALSE)) && *svp) {
+          STRLEN plen;
+          char *server_pubkey = SvPV(*svp, plen);
+          mysql_options(sock, MYSQL_SERVER_PUBLIC_KEY, server_pubkey);
         }
 #endif
 
@@ -1939,20 +1935,24 @@ MYSQL *mysql_dr_connect(
 	    STRLEN lna;
 	    unsigned int ssl_mode;
 	    my_bool ssl_verify = 0;
+  #if defined(HAVE_SSL_VERIFY)
 	    my_bool ssl_verify_set = 0;
+  #endif
 
             /* Verify if the hostname we connect to matches the hostname in the certificate */
 	    if ((svp = hv_fetch(hv, "mysql_ssl_verify_server_cert", 28, FALSE)) && *svp) {
+  #if defined(HAVE_SSL_VERIFY)
+	      ssl_verify_set = 1;
+  #endif
   #if defined(HAVE_SSL_VERIFY) || defined(HAVE_SSL_MODE)
 	      ssl_verify = SvTRUE(*svp);
-	      ssl_verify_set = 1;
   #else
 	      set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is not supported");
 	      return NULL;
   #endif
 	    }
-        if ((svp = hv_fetch(hv, "mysql_ssl_optional", 18, FALSE)) && *svp)
-            ssl_enforce = !SvTRUE(*svp);
+	    if ((svp = hv_fetch(hv, "mysql_ssl_optional", 18, FALSE)) && *svp)
+	      ssl_enforce = !SvTRUE(*svp);
 
 	    if ((svp = hv_fetch(hv, "mysql_ssl_client_key", 20, FALSE)) && *svp)
 	      client_key = SvPV(*svp, lna);
@@ -2034,7 +2034,7 @@ MYSQL *mysql_dr_connect(
     #endif
 
 	    if (ssl_verify) {
-          if (!ssl_verify_usable() && ssl_enforce && ssl_verify_set) {
+	      if (!ssl_verify_usable() && ssl_enforce && ssl_verify_set) {
 	        set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is broken by current version of MySQL client");
 	        return NULL;
 	      }
@@ -2122,11 +2122,9 @@ MYSQL *mysql_dr_connect(
         imp_dbh->use_server_side_prepare = FALSE;
 #endif
 
-#if MYSQL_ASYNC
       if(imp_dbh) {
           imp_dbh->async_query_in_flight = NULL;
       }
-#endif
     }
     else {
       /* 
@@ -2225,6 +2223,7 @@ static int my_login(pTHX_ SV* dbh, imp_dbh_t *imp_dbh)
 
   if (!imp_dbh->pmysql) {
      Newz(908, imp_dbh->pmysql, 1, MYSQL);
+     imp_dbh->pmysql->net.fd = -1;
   }
   result = mysql_dr_connect(dbh, imp_dbh->pmysql, mysql_socket, host, port, user,
 			  password, dbname, imp_dbh) ? TRUE : FALSE;
@@ -2273,11 +2272,8 @@ int dbd_db_login(SV* dbh, imp_dbh_t* imp_dbh, char* dbname, char* user,
  /* Safer we flip this to TRUE perl side if we detect a mod_perl env. */
   imp_dbh->auto_reconnect = FALSE;
 
-  /* HELMUT */
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
   imp_dbh->enable_utf8 = FALSE;     /* initialize mysql_enable_utf8 */
   imp_dbh->enable_utf8mb4 = FALSE;  /* initialize mysql_enable_utf8mb4 */
-#endif
 
   if (!my_login(aTHX_ dbh, imp_dbh))
   {
@@ -2404,6 +2400,7 @@ int dbd_db_disconnect(SV* dbh, imp_dbh_t* imp_dbh)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "imp_dbh->pmysql: %p\n",
 		              imp_dbh->pmysql);
   mysql_close(imp_dbh->pmysql );
+  imp_dbh->pmysql->net.fd = -1;
 
   /* We don't free imp_dbh since a reference still exists    */
   /* The DESTROY method is the only one to 'free' memory.    */
@@ -2604,12 +2601,10 @@ dbd_db_STORE_attrib(
     imp_dbh->bind_type_guessing = bool_value;
   else if (kl == 31 && strEQ(key,"mysql_bind_comment_placeholders"))
     imp_dbh->bind_type_guessing = bool_value;
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
   else if (kl == 17 && strEQ(key, "mysql_enable_utf8"))
     imp_dbh->enable_utf8 = bool_value;
   else if (kl == 20 && strEQ(key, "mysql_enable_utf8mb4"))
     imp_dbh->enable_utf8mb4 = bool_value;
-#endif
 #if FABRIC_SUPPORT
   else if (kl == 22 && strEQ(key, "mysql_fabric_opt_group"))
     mysql_options(imp_dbh->pmysql, FABRIC_OPT_GROUP, (void *)SvPVbyte_nolen(valuesv));
@@ -2664,22 +2659,74 @@ dbd_db_STORE_attrib(
  *  Notes:   Do not forget to call sv_2mortal in the former case!
  *
  **************************************************************************/
-static SV*
-my_ulonglong2str(pTHX_ my_ulonglong val)
+
+#if IVSIZE < 8
+static char *
+my_ulonglong2str(my_ulonglong val, char *buf, STRLEN *len)
 {
-  char buf[64];
-  char *ptr = buf + sizeof(buf) - 1;
+  char *ptr = buf + *len - 1;
+
+  if (*len < 2)
+  {
+    *len = 0;
+    return NULL;
+  }
 
   if (val == 0)
-    return newSVpvn("0", 1);
+  {
+    buf[0] = '0';
+    buf[1] = '\0';
+    *len = 1;
+    return buf;
+  }
 
   *ptr = '\0';
   while (val > 0)
   {
+    if (ptr == buf)
+    {
+      *len = 0;
+      return NULL;
+    }
     *(--ptr) = ('0' + (val % 10));
     val = val / 10;
   }
-  return newSVpvn(ptr, (buf+ sizeof(buf) - 1) - ptr);
+
+  *len = (buf + *len - 1) - ptr;
+  return ptr;
+}
+
+static char*
+signed_my_ulonglong2str(my_ulonglong val, char *buf, STRLEN *len)
+{
+  char *ptr;
+
+  if (val <= LLONG_MAX)
+    return my_ulonglong2str(val, buf, len);
+
+  ptr = my_ulonglong2str(-val, buf, len);
+  if (!ptr || ptr == buf) {
+    *len = 0;
+    return NULL;
+  }
+
+  *(--ptr) = '-';
+  *len += 1;
+  return ptr;
+}
+#endif
+
+static SV*
+my_ulonglong2sv(pTHX_ my_ulonglong val)
+{
+#if IVSIZE >= 8
+  return newSVuv(val);
+#else
+  char buf[64];
+  STRLEN len = sizeof(buf);
+  char *ptr = my_ulonglong2str(val, buf, &len);
+  return newSVpvn(ptr, len);
+#endif
 }
 
 SV* dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
@@ -2733,7 +2780,7 @@ SV* dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
     }
     else if (kl == 13 && strEQ(key, "clientversion"))
     {
-      result= sv_2mortal(my_ulonglong2str(aTHX_ mysql_get_client_version()));
+      result= sv_2mortal(my_ulonglong2sv(aTHX_ mysql_get_client_version()));
     }
     break;
   case 'e':
@@ -2745,13 +2792,10 @@ SV* dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
       const char* msg = mysql_error(imp_dbh->pmysql);
       result= sv_2mortal(newSVpvn(msg, strlen(msg)));
     }
-    /* HELMUT */
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
     else if (kl == strlen("enable_utf8mb4") && strEQ(key, "enable_utf8mb4"))
         result = sv_2mortal(newSViv(imp_dbh->enable_utf8mb4));
     else if (kl == strlen("enable_utf8") && strEQ(key, "enable_utf8"))
         result = sv_2mortal(newSViv(imp_dbh->enable_utf8));
-#endif
     break;
 
   case 'd':
@@ -2776,6 +2820,28 @@ SV* dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
       result= sv_2mortal((newRV_noinc((SV*)hv)));
     }
 
+#if MYSQL_VERSION_ID >= 50708
+#if MYSQL_VERSION_ID != 60000 /* Connector/C 6.0.x */
+#ifndef MARIADB_BASE_VERSION
+/* SESSION_TRACK_GTIDS was added in commit c4f32d662 in MySQL 5.7.8-rc */
+  case 'g':
+    if (strEQ(key, "gtids"))
+    {
+      const char *data;
+      size_t length;
+      if (mysql_session_track_get_first(imp_dbh->pmysql, SESSION_TRACK_GTIDS, &data, &length) == 0)
+      {
+        result= sv_2mortal(newSVpvn(data, length));
+      }
+      else
+      {
+        result= &PL_sv_undef;
+      }
+    }
+    break;
+#endif
+#endif
+#endif
   case 'h':
     if (strEQ(key, "hostinfo"))
     {
@@ -2793,7 +2859,7 @@ SV* dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
     }
     else if (kl == 8  &&  strEQ(key, "insertid"))
       /* We cannot return an IV, because the insertid is a long. */
-      result= sv_2mortal(my_ulonglong2str(aTHX_ mysql_insert_id(imp_dbh->pmysql)));
+      result= sv_2mortal(my_ulonglong2sv(aTHX_ mysql_insert_id(imp_dbh->pmysql)));
     break;
   case 'n':
     if (kl == strlen("no_autocommit_cmd") &&
@@ -2813,11 +2879,12 @@ SV* dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
         sv_2mortal(newSVpvn(serverinfo, strlen(serverinfo))) : &PL_sv_undef;
     } 
     else if (kl == 13 && strEQ(key, "serverversion"))
-      result= sv_2mortal(my_ulonglong2str(aTHX_ mysql_get_server_version(imp_dbh->pmysql)));
+      result= sv_2mortal(my_ulonglong2sv(aTHX_ mysql_get_server_version(imp_dbh->pmysql)));
     else if (strEQ(key, "sock"))
       result= sv_2mortal(newSViv(PTR2IV(imp_dbh->pmysql)));
     else if (strEQ(key, "sockfd"))
-      result= sv_2mortal(newSViv((IV) imp_dbh->pmysql->net.fd));
+      result= (imp_dbh->pmysql->net.fd != -1) ?
+        sv_2mortal(newSViv((IV) imp_dbh->pmysql->net.fd)) : &PL_sv_undef;
     else if (strEQ(key, "stat"))
     {
       const char* stats = mysql_stat(imp_dbh->pmysql);
@@ -2924,7 +2991,6 @@ dbd_st_prepare(
     svp = DBD_ATTRIB_GET_SVP(attribs, "async", 5);
 
     if(svp && SvTRUE(*svp)) {
-#if MYSQL_ASYNC
         imp_sth->is_async = TRUE;
         if (imp_sth->disable_fallback_for_server_prepare)
         {
@@ -2933,11 +2999,6 @@ dbd_st_prepare(
           return 0;
         }
         imp_sth->use_server_side_prepare = FALSE;
-#else
-        do_error(sth, 2000,
-                 "Async support was not built into this version of DBD::mysql", "HY000");
-        return 0;
-#endif
     }
   }
 
@@ -3136,7 +3197,7 @@ dbd_st_prepare(
           bind->buffer_type=  MYSQL_TYPE_STRING;
           bind->buffer=       NULL;
           bind->length=       &(fbind->length);
-          bind->is_null=      (char*) &(fbind->is_null);
+          bind->is_null=      (_Bool*) &(fbind->is_null);
           fbind->is_null=     1;
           fbind->length=      0;
         }
@@ -3296,7 +3357,10 @@ int dbd_st_more_results(SV* sth, imp_sth_t* imp_sth)
 
   /* Release previous MySQL result*/
   if (imp_sth->result)
+  {
     mysql_free_result(imp_sth->result);
+    imp_sth->result= NULL;
+  }
 
   if (DBIc_ACTIVE(imp_sth))
     DBIc_ACTIVE_off(imp_sth);
@@ -3424,9 +3488,7 @@ my_ulonglong mysql_st_internal_execute(
   char *table;
   char *salloc;
   int htype;
-#if MYSQL_ASYNC
   bool async = FALSE;
-#endif
   my_ulonglong rows= 0;
   /* thank you DBI.c for this info! */
   D_imp_xxh(h);
@@ -3445,14 +3507,12 @@ my_ulonglong mysql_st_internal_execute(
   {
     D_imp_dbh(h);
     /* if imp_dbh is not available, it causes segfault (proper) on OpenBSD */
-    if (imp_dbh && imp_dbh->bind_type_guessing)
+    if (imp_dbh)
     {
       bind_type_guessing= imp_dbh->bind_type_guessing;
-      bind_comment_placeholders= bind_comment_placeholders;
+      bind_comment_placeholders= imp_dbh->bind_comment_placeholders;
     }
-#if MYSQL_ASYNC
     async = (bool) (imp_dbh->async_query_in_flight != NULL);
-#endif
   }
   /* h is a sth */
   else
@@ -3465,14 +3525,12 @@ my_ulonglong mysql_st_internal_execute(
       bind_type_guessing= imp_dbh->bind_type_guessing;
       bind_comment_placeholders= imp_dbh->bind_comment_placeholders;
     }
-#if MYSQL_ASYNC
     async = imp_sth->is_async;
     if(async) {
         imp_dbh->async_query_in_flight = imp_sth;
     } else {
         imp_dbh->async_query_in_flight = NULL;
     }
-#endif
   }
 
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
@@ -3538,7 +3596,6 @@ my_ulonglong mysql_st_internal_execute(
     return 0;
   }
 
-#if MYSQL_ASYNC
   if(async) {
     if((mysql_send_query(svsock, sbuf, slen)) &&
        (!mysql_db_reconnect(h) ||
@@ -3549,7 +3606,6 @@ my_ulonglong mysql_st_internal_execute(
         rows = 0;
     }
   } else {
-#endif
       if ((mysql_real_query(svsock, sbuf, slen))  &&
           (!mysql_db_reconnect(h)  ||
            (mysql_real_query(svsock, sbuf, slen))))
@@ -3571,9 +3627,7 @@ my_ulonglong mysql_st_internal_execute(
               rows = -2;
           }
       }
-#if MYSQL_ASYNC
   }
-#endif
 
   if (salloc)
     Safefree(salloc);
@@ -3832,12 +3886,10 @@ int dbd_st_execute(SV* sth, imp_sth_t* imp_sth)
                                                 imp_dbh->pmysql,
                                                 imp_sth->use_mysql_use_result
                                                );
-#if MYSQL_ASYNC
     if(imp_dbh->async_query_in_flight) {
         DBIc_ACTIVE_on(imp_sth);
         return 0;
     }
-#endif
   }
 
   if (imp_sth->row_num+1 != (my_ulonglong)-1)
@@ -3969,7 +4021,9 @@ int dbd_describe(SV* sth, imp_sth_t* imp_sth)
                       col_type);
       buffer->length= &(fbh->length);
       buffer->is_null= (my_bool*) &(fbh->is_null);
+#if MYSQL_VERSION_ID >= NEW_DATATYPE_VERSION
       buffer->error= (my_bool*) &(fbh->error);
+#endif
 
       if (fields[i].flags & ZEROFILL_FLAG)
         buffer->buffer_type = MYSQL_TYPE_STRING;
@@ -4052,13 +4106,11 @@ dbd_st_fetch(SV *sth, imp_sth_t* imp_sth)
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t-> dbd_st_fetch\n");
 
-#if MYSQL_ASYNC
   if(imp_dbh->async_query_in_flight) {
       if(mysql_db_async_result(sth, &imp_sth->result) <= 0) {
         return Nullav;
       }
   }
-#endif
 
 #if MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
   if (imp_sth->use_server_side_prepare)
@@ -4258,10 +4310,6 @@ process:
 
           sv_setpvn(sv, fbh->data, len);
 
-	/* UTF8 */
-        /*HELMUT*/
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
-
 #if MYSQL_VERSION_ID >= FIELD_CHARSETNR_VERSION 
   /* SHOW COLLATION WHERE Id = 63; -- 63 == charset binary, collation binary */
         if ((imp_dbh->enable_utf8 || imp_dbh->enable_utf8mb4) && fbh->charsetnr != 63)
@@ -4269,8 +4317,6 @@ process:
 	if ((imp_dbh->enable_utf8 || imp_dbh->enable_utf8mb4) && !(fbh->flags & BINARY_FLAG))
 #endif
 	  sv_utf8_decode(sv);
-#endif
-	/* END OF UTF8 */
           break;
 
         }
@@ -4372,6 +4418,11 @@ process:
         STRLEN len= lengths[i];
         if (ChopBlanks)
         {
+#if MYSQL_VERSION_ID >= FIELD_CHARSETNR_VERSION
+          if (fields[i].charsetnr != 63)
+#else
+          if (!(fields[i].flags & BINARY_FLAG))
+#endif
           while (len && col[len-1] == ' ')
           {	--len; }
         }
@@ -4414,15 +4465,10 @@ process:
 #endif
 
         default:
-	/* UTF8 */
-        /*HELMUT*/
-#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
-
-  /* see bottom of: http://www.mysql.org/doc/refman/5.0/en/c-api-datatypes.html */
+          /* TEXT columns can be returned as MYSQL_TYPE_BLOB, so always check for charset */
+          /* see bottom of: http://www.mysql.org/doc/refman/5.0/en/c-api-datatypes.html */
         if ((imp_dbh->enable_utf8 || imp_dbh->enable_utf8mb4) && fields[i].charsetnr != 63)
 	  sv_utf8_decode(sv);
-#endif
-	/* END OF UTF8 */
           break;
         }
       }
@@ -4479,12 +4525,10 @@ int dbd_st_finish(SV* sth, imp_sth_t* imp_sth) {
   dTHR;
 #endif
 
-#if MYSQL_ASYNC
   D_imp_dbh_from_sth;
   if(imp_dbh->async_query_in_flight) {
     mysql_db_async_result(sth, &imp_sth->result);
   }
-#endif
 
 #if MYSQL_VERSION_ID >= SERVER_PREPARE_VERSION
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
@@ -4923,7 +4967,7 @@ dbd_st_FETCH_internal(
         if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
           PerlIO_printf(DBIc_LOGPIO(imp_xxh), "INSERT ID %llu\n", imp_sth->insertid);
 
-        return sv_2mortal(my_ulonglong2str(aTHX_ imp_sth->insertid));
+        return sv_2mortal(my_ulonglong2sv(aTHX_ imp_sth->insertid));
       }
       break;
     case 15:
@@ -5459,9 +5503,7 @@ SV* dbd_db_quote(SV *dbh, SV *str, SV *type)
 
     ptr= SvPV(str, len);
     result= newSV(len*2+3);
-#ifdef SvUTF8
     if (SvUTF8(str)) SvUTF8_on(result);
-#endif
     sptr= SvPVX(result);
 
     *sptr++ = '\'';
@@ -5476,7 +5518,6 @@ SV* dbd_db_quote(SV *dbh, SV *str, SV *type)
   return result;
 }
 
-#ifdef DBD_MYSQL_INSERT_ID_IS_GOOD
 SV *mysql_db_last_insert_id(SV *dbh, imp_dbh_t *imp_dbh,
         SV *catalog, SV *schema, SV *table, SV *field, SV *attr)
 {
@@ -5491,11 +5532,9 @@ SV *mysql_db_last_insert_id(SV *dbh, imp_dbh_t *imp_dbh,
   attr= attr;
 
   ASYNC_CHECK_RETURN(dbh, &PL_sv_undef);
-  return sv_2mortal(my_ulonglong2str(aTHX_ mysql_insert_id(imp_dbh->pmysql)));
+  return sv_2mortal(my_ulonglong2sv(aTHX_ mysql_insert_id(imp_dbh->pmysql)));
 }
-#endif
 
-#if MYSQL_ASYNC
 int mysql_db_async_result(SV* h, MYSQL_RES** resp)
 {
   dTHX;
@@ -5544,6 +5583,7 @@ int mysql_db_async_result(SV* h, MYSQL_RES** resp)
       retval= mysql_num_rows(*resp);
       if(resp == &_res) {
         mysql_free_result(*resp);
+        *resp= NULL;
       }
     }
     if(htype == DBIt_ST) {
@@ -5592,17 +5632,10 @@ int mysql_db_async_ready(SV* h)
   }
 
   if(dbh->async_query_in_flight) {
-      if(dbh->async_query_in_flight == imp_xxh) {
-          struct pollfd fds;
-          int retval;
-
-          fds.fd = dbh->pmysql->net.fd;
-          fds.events = POLLIN;
-
-          retval = poll(&fds, 1, 0);
-
+      if(dbh->async_query_in_flight == imp_xxh && dbh->pmysql->net.fd != -1) {
+          int retval = mysql_socket_ready(dbh->pmysql->net.fd);
           if(retval < 0) {
-              do_error(h, errno, strerror(errno), "HY000");
+              do_error(h, -retval, strerror(-retval), "HY000");
           }
           return retval;
       } else {
@@ -5614,7 +5647,6 @@ int mysql_db_async_ready(SV* h)
       return -1;
   }
 }
-#endif
 
 static int parse_number(char *string, STRLEN len, char **end)
 {

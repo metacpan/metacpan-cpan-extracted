@@ -127,10 +127,7 @@ sub set_from_tag ( $self, $tag ) {
 sub status ( $self ) {
     my ( $tags, $build_history, $build_settings );
 
-    my $rouse_cb = Coro::rouse_cb;
-
-    my $cv = AE::cv { $rouse_cb->() };
-    $cv->begin;
+    my $cv = P->cv->begin;
 
     $cv->begin;
     $self->dockerhub_api->get_tags(
@@ -168,9 +165,7 @@ sub status ( $self ) {
         }
     );
 
-    $cv->end;
-
-    Coro::rouse_wait $rouse_cb;
+    $cv->end->recv;
 
     my $tbl = P->text->table(
         cols => [
@@ -313,10 +308,7 @@ sub build_status ( $self ) {
 
     my $repos;
 
-    my $rouse_cb = Coro::rouse_cb;
-
-    my $cv = AE::cv { $rouse_cb->() };
-    $cv->begin;
+    my $cv = P->cv->begin;
 
     for my $namespace ( $namespaces->@* ) {
         $cv->begin;
@@ -335,18 +327,13 @@ sub build_status ( $self ) {
         );
     }
 
-    $cv->end;
-
-    Coro::rouse_wait $rouse_cb;
+    $cv->end->recv;
 
     return if !$repos;
 
     my ( $build_history, $autobuild_tags );
 
-    $rouse_cb = Coro::rouse_cb;
-
-    $cv = AE::cv { $rouse_cb->() };
-    $cv->begin;
+    $cv = P->cv->begin;
 
     for my $repo_id ( $repos->@* ) {
         $cv->begin;
@@ -389,9 +376,7 @@ sub build_status ( $self ) {
         );
     }
 
-    $cv->end;
-
-    Coro::rouse_wait $rouse_cb;
+    $cv->end->recv;
 
     for my $repo_tag ( keys $build_history->%* ) {
         delete $build_history->{$repo_tag} if !exists $autobuild_tags->{$repo_tag};
@@ -584,11 +569,11 @@ sub trigger_build ( $self, $tag ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 127                  | * Subroutine "status" with high complexity score (28)                                                          |
-## |      | 307                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 302                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 494                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 479                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 271, 357, 487        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 266, 344, 472        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 0.2;
+our $VERSION  = 0.3;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -46,7 +46,7 @@ App::Git::Workflow::Command::Cat - Show the content of a git file.
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Command::Cat version 0.2
+This documentation refers to App::Git::Workflow::Command::Cat version 0.3
 
 =head1 SYNOPSIS
 

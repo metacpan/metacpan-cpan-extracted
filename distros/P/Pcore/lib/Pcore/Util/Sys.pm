@@ -80,12 +80,6 @@ sub run_proc (@) {
     return Pcore::Util::Sys::Proc->new(@_);
 }
 
-sub run_proc1 (@) {
-    state $init = !!require Pcore::Util::Sys::Proc1;
-
-    return Pcore::Util::Sys::Proc1->new(@_);
-}
-
 1;
 __END__
 =pod

@@ -4,7 +4,7 @@ use strictures 1;
 #
 # This file is part of Dancer2-Plugin-Redis
 #
-# This software is Copyright (c) 2016 by BURNERSK <burnersk@cpan.org>.
+# This software is Copyright (c) 2018 by BURNERSK <burnersk@cpan.org>.
 #
 # This is free software, licensed under:
 #

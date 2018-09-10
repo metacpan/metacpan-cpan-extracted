@@ -3,7 +3,7 @@ use strict;
 use warnings;
 require 5.6.0;
 
-my $release = '0.01';
+my $release = '0.02';
 my %MF = (
 	NAME            => 'Password::Policy::Rule::Pwned',
 	ABSTRACT        => 'Compare text to known pwned passwords list',

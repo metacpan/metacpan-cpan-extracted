@@ -4,7 +4,7 @@ use Moo;
 
 # ABSTRACT: Store::CouchDB - a simple CouchDB driver
 
-our $VERSION = '4.2'; # VERSION
+our $VERSION = '4.3'; # VERSION
 
 use MooX::Types::MooseLike::Base qw(:all);
 use experimental 'smartmatch';
@@ -519,7 +519,10 @@ sub get_view_array {
             next unless exists $doc->{value};
             if (ref($doc->{value}) eq 'HASH' and $parse_value_hash) {
                 $doc->{value}->{id} = $doc->{id}
-                    unless ($data->{opts}->{reduce} eq 'true');
+                    unless (exists $data->{opts}
+                    and ref($data->{opts}) eq 'HASH'
+                    and exists $data->{opts}->{reduce}
+                    and $data->{opts}->{reduce} eq 'true');
                 push(@result, $doc->{value});
             }
             else {
@@ -1014,7 +1017,7 @@ Store::CouchDB - Store::CouchDB - a simple CouchDB driver
 
 =head1 VERSION
 
-version 4.2
+version 4.3
 
 =head1 SYNOPSIS
 

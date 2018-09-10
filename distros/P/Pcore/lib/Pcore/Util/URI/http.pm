@@ -4,8 +4,8 @@ use Pcore -class;
 
 extends qw[Pcore::Util::URI];
 
-has is_http      => 1;
 has default_port => 80;
+has is_http      => 1;
 
 1;
 __END__

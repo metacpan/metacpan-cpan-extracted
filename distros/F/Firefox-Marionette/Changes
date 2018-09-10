@@ -1,5 +1,11 @@
 Revision history for Firefox-Marionette
 
+0.66  Mon Sep 10 20:32:00 2018
+       Improving synchronisation of commands for old and new marionette protocols
+
+0.65  Sun Sep  9 20:58:00 2018
+       Dropped the minimum acceptable firefox version to 31.8.0esr for solaris.  Accepting pre version 3 marionette.
+
 0.64  Fri Aug 31 20:12:00 2018
        Removed unnecessary debug statements from the script method
 

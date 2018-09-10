@@ -40,16 +40,17 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.64';
+our $VERSION = '0.66';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
 sub _DEFAULT_HOST                   { return 'localhost' }
+sub _MARIONETTE_PROTOCOL_VERSION_3  { return 3 }
 sub _WIN32_ERROR_SHARING_VIOLATION  { return 0x20 }
 sub _NUMBER_OF_MCOOKIE_BYTES        { return 16 }
 sub _MAX_DISPLAY_LENGTH             { return 10 }
 sub _NUMBER_OF_TERM_ATTEMPTS        { return 4 }
-sub _MIN_VERSION_FOR_NEW_CMDS       { return 56 }
+sub _MIN_VERSION_FOR_NEW_CMDS       { return 61 }
 sub _MIN_VERSION_FOR_NEW_SENDKEYS   { return 55 }
 sub _MIN_VERSION_FOR_HEADLESS       { return 55 }
 sub _MIN_VERSION_FOR_WD_HEADLESS    { return 56 }
@@ -62,6 +63,8 @@ sub _DEFAULT_PAGE_LOAD_TIMEOUT      { return 300_000 }
 sub _DEFAULT_SCRIPT_TIMEOUT         { return 30_000 }
 sub _DEFAULT_IMPLICIT_TIMEOUT       { return 0 }
 sub _WIN32_CONNECTION_REFUSED       { return 10_061 }
+sub _OLD_PROTOCOL_NAME_INDEX        { return 2 }
+sub _OLD_PROTOCOL_PARAMETERS_INDEX  { return 3 }
 
 sub BY_XPATH {
     Carp::carp(
@@ -121,13 +124,25 @@ sub BY_PARTIAL {
 
 sub _download_directory {
     my ($self) = @_;
-    my $context = $self->context();
-    $self->context('chrome');
-    my $directory =
-      $self->script( 'var branch = Components.classes["' . q[@]
-          . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
-      );
-    $self->context($context);
+    my $directory;
+    eval {
+        my $context = $self->context();
+        $self->context('chrome');
+        $directory =
+          $self->script( 'var branch = Components.classes["' . q[@]
+              . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
+          );
+        $self->context($context);
+    } or do {
+        chomp $EVAL_ERROR;
+        Carp::carp(
+"Firefox does not support dynamically determining download directory:$EVAL_ERROR"
+        );
+        my $profile =
+          Firefox::Marionette::Profile->parse(
+            File::Spec->catfile( $self->{profile_directory}, 'prefs.js' ) );
+        $directory = $profile->get_value('browser.download.downloadDir');
+    };
     return $directory;
 }
 
@@ -229,17 +244,30 @@ sub new {
 
     if ( ($session_id) && ($capabilities) && ( ref $capabilities ) ) {
     }
+    elsif (( $self->marionette_protocol() <= _MARIONETTE_PROTOCOL_VERSION_3() )
+        && ($capabilities)
+        && ( ref $capabilities ) )
+    {
+    }
     else {
         Firefox::Marionette::Exception->throw(
             'Failed to correctly setup the Firefox process');
     }
     if ( $OSNAME eq 'cygwin' ) {
     }
+    elsif ( $self->marionette_protocol() <= _MARIONETTE_PROTOCOL_VERSION_3() ) {
+    }
     elsif ( $self->_pid() != $capabilities->moz_process_id() ) {
         Firefox::Marionette::Exception->throw(
 'Failed to correctly determine the Firefox process id through the initial connection capabilities'
         );
     }
+    $self->_check_timeout_parameters(%parameters);
+    return $self;
+}
+
+sub _check_timeout_parameters {
+    my ( $self, %parameters ) = @_;
     if (   ( defined $parameters{implicit} )
         || ( defined $parameters{page_load} )
         || ( defined $parameters{script} ) )
@@ -267,7 +295,7 @@ sub new {
     elsif ( $parameters{timeouts} ) {
         $self->timeouts( $parameters{timeouts} );
     }
-    return $self;
+    return;
 }
 
 sub _check_addons {
@@ -503,7 +531,7 @@ sub _initialise_version {
         {
             $self->{_initial_version}->{major} = $1;
             $self->{_initial_version}->{minor} = $2;
-            $self->{_initial_version}->{patch} = $2;
+            $self->{_initial_version}->{patch} = $3;
         }
         else {
             Firefox::Marionette::Exception->throw(
@@ -1127,6 +1155,16 @@ sub _initial_socket_setup {
     my $initial_response = $self->_read_from_socket();
     $self->{marionette_protocol} = $initial_response->{marionetteProtocol};
     $self->{application_type}    = $initial_response->{applicationType};
+    if ( !defined $self->marionette_protocol() ) {
+        my $message_id = $self->_new_message_id();
+        $self->_send_request(
+            [
+                _COMMAND(), $message_id, 'getMarionetteID', 'to' => 'root'
+            ]
+        );
+        my $next_message = $self->_read_from_socket();
+        $self->{marionette_id} = $next_message->{id};
+    }
     return $self->new_session($capabilities);
 }
 
@@ -1292,8 +1330,15 @@ sub new_session {
     );
     my $response = $self->_get_response($message_id);
     $self->{session_id} = $response->result()->{sessionId};
-    my $new =
-      $self->_create_capabilities( $response->result()->{capabilities} );
+    my $new;
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        $new =
+          $self->_create_capabilities( $response->result()->{capabilities} );
+    }
+    else {
+        $new =
+          $self->_create_capabilities( $response->result()->{value} );
+    }
     $self->{_browser_version} = $new->browser_version();
 
     if ( ( defined $capabilities ) && ( defined $capabilities->timeouts() ) ) {
@@ -1309,7 +1354,7 @@ sub browser_version {
         return $self->{_browser_version};
     }
     else {
-        return join q[.], $self->{_initial_version}->{major},
+        return join q[.], map { defined } $self->{_initial_version}->{major},
           $self->{_initial_version}->{minor},
           $self->{_initial_version}->{patch};
     }
@@ -1585,7 +1630,12 @@ sub is_selected {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value} ? 1 : 0;
+    return $self->_response_result_value($response) ? 1 : 0;
+}
+
+sub _response_result_value {
+    my ( $self, $response ) = @_;
+    return $response->result()->{value};
 }
 
 sub is_enabled {
@@ -1610,7 +1660,7 @@ sub is_enabled {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value} ? 1 : 0;
+    return $self->_response_result_value($response) ? 1 : 0;
 }
 
 sub is_displayed {
@@ -1635,7 +1685,7 @@ sub is_displayed {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value} ? 1 : 0;
+    return $self->_response_result_value($response) ? 1 : 0;
 }
 
 sub send_keys {
@@ -1716,72 +1766,75 @@ sub refresh {
 }
 
 my %_deprecated_commands = (
-    'Marionette:Quit'                        => 'quitApplication',
-    'Marionette:SetContext'                  => 'setContext',
-    'Marionette:GetContext'                  => 'getContext',
-    'Marionette:AcceptConnections'           => 'acceptConnections',
-    'Addon:Install'                          => 'addon:install',
-    'Addon:Uninstall'                        => 'addon:uninstall',
-    'WebDriver:AcceptDialog'                 => 'acceptDialog',
-    'WebDriver:AddCookie'                    => 'addCookie',
-    'WebDriver:Back'                         => 'goBack',
-    'WebDriver:CloseChromeWindow'            => 'closeChromeWindow',
-    'WebDriver:CloseWindow'                  => 'close',
-    'WebDriver:DeleteAllCookies'             => 'deleteAllCookies',
-    'WebDriver:DeleteCookie'                 => 'deleteCookie',
-    'WebDriver:DeleteSession'                => 'deleteSession',
-    'WebDriver:DismissAlert'                 => 'dismissDialog',
-    'WebDriver:GetWindowType'                => 'getWindowType',
-    'WebDriver:DismissAlert'                 => 'dismissDialog',
-    'WebDriver:ElementClear'                 => 'clearElement',
-    'WebDriver:ElementClick'                 => 'clickElement',
-    'WebDriver:ElementSendKeys'              => 'sendKeysToElement',
-    'WebDriver:ExecuteAsyncScript'           => 'executeAsyncScript',
-    'WebDriver:ExecuteScript'                => 'executeScript',
-    'WebDriver:FindElement'                  => 'findElement',
-    'WebDriver:FindElements'                 => 'findElements',
-    'WebDriver:Forward'                      => 'goForward',
-    'WebDriver:FullscreenWindow'             => 'fullscreen',
-    'WebDriver:GetActiveElement'             => 'getActiveElement',
-    'WebDriver:GetActiveFrame'               => 'getActiveFrame',
-    'WebDriver:GetAlertText'                 => 'getTextFromDialog',
-    'WebDriver:GetCapabilities'              => 'getSessionCapabilities',
-    'WebDriver:GetChromeWindowHandle'        => 'getChromeWindowHandle',
-    'WebDriver:GetChromeWindowHandles'       => 'getChromeWindowHandles',
-    'WebDriver:GetCookies'                   => 'getCookies',
-    'WebDriver:GetCurrentChromeWindowHandle' => 'getChromeWindowHandle',
-    'WebDriver:GetCurrentURL'                => 'getCurrentUrl',
-    'WebDriver:GetElementAttribute'          => 'getElementAttribute',
-    'WebDriver:GetElementCSSValue'           => 'getElementValueOfCssProperty',
-    'WebDriver:GetElementProperty'           => 'getElementProperty',
-    'WebDriver:GetElementRect'               => 'getElementRect',
-    'WebDriver:GetElementTagName'            => 'getElementTagName',
-    'WebDriver:GetElementText'               => 'getElementText',
-    'WebDriver:GetPageSource'                => 'getPageSource',
-    'WebDriver:GetScreenOrientation'         => 'getScreenOrientation',
-    'WebDriver:GetTimeouts'                  => 'getTimeouts',
-    'WebDriver:GetTitle'                     => 'getTitle',
-    'WebDriver:GetWindowHandle'              => 'getWindowHandle',
-    'WebDriver:GetWindowHandles'             => 'getWindowHandles',
-    'WebDriver:GetWindowRect'                => 'getWindowSize',
-    'WebDriver:IsElementDisplayed'           => 'isElementDisplayed',
-    'WebDriver:IsElementEnabled'             => 'isElementEnabled',
-    'WebDriver:IsElementSelected'            => 'isElementSelected',
-    'WebDriver:MaximizeWindow'               => 'maximizeWindow',
-    'WebDriver:Navigate'                     => 'get',
-    'WebDriver:NewSession'                   => 'newSession',
-    'WebDriver:PerformActions'               => 'performActions',
-    'WebDriver:Refresh'                      => 'refresh',
-    'WebDriver:ReleaseActions'               => 'releaseActions',
-    'WebDriver:SendAlertText'                => 'sendKeysToDialog',
-    'WebDriver:SetScreenOrientation'         => 'setScreenOrientation',
-    'WebDriver:SetTimeouts'                  => 'setTimeouts',
-    'WebDriver:SetWindowRect'                => 'setWindowSize',
-    'WebDriver:SwitchToFrame'                => 'switchToFrame',
-    'WebDriver:SwitchToParentFrame'          => 'switchToParentFrame',
-    'WebDriver:SwitchToShadowRoot'           => 'switchToShadowRoot',
-    'WebDriver:SwitchToWindow'               => 'switchToWindow',
-    'WebDriver:TakeScreenshot'               => 'takeScreenshot',
+    'Marionette:Quit'                  => 'quitApplication',
+    'Marionette:SetContext'            => 'setContext',
+    'Marionette:GetContext'            => 'getContext',
+    'Marionette:AcceptConnections'     => 'acceptConnections',
+    'Marionette:GetScreenOrientation'  => 'getScreenOrientation',
+    'Marionette:SetScreenOrientation'  => 'setScreenOrientation',
+    'Addon:Install'                    => 'addon:install',
+    'Addon:Uninstall'                  => 'addon:uninstall',
+    'WebDriver:AcceptDialog'           => 'acceptDialog',
+    'WebDriver:AddCookie'              => 'addCookie',
+    'WebDriver:Back'                   => 'goBack',
+    'WebDriver:CloseChromeWindow'      => 'closeChromeWindow',
+    'WebDriver:CloseWindow'            => 'close',
+    'WebDriver:DeleteAllCookies'       => 'deleteAllCookies',
+    'WebDriver:DeleteCookie'           => 'deleteCookie',
+    'WebDriver:DeleteSession'          => 'deleteSession',
+    'WebDriver:DismissAlert'           => 'dismissDialog',
+    'WebDriver:GetWindowType'          => 'getWindowType',
+    'WebDriver:DismissAlert'           => 'dismissDialog',
+    'WebDriver:ElementClear'           => 'clearElement',
+    'WebDriver:ElementClick'           => 'clickElement',
+    'WebDriver:ElementSendKeys'        => 'sendKeysToElement',
+    'WebDriver:ExecuteAsyncScript'     => 'executeAsyncScript',
+    'WebDriver:ExecuteScript'          => 'executeScript',
+    'WebDriver:FindElement'            => 'findElement',
+    'WebDriver:FindElements'           => 'findElements',
+    'WebDriver:Forward'                => 'goForward',
+    'WebDriver:FullscreenWindow'       => 'fullscreen',
+    'WebDriver:GetActiveElement'       => 'getActiveElement',
+    'WebDriver:GetActiveFrame'         => 'getActiveFrame',
+    'WebDriver:GetAlertText'           => 'getTextFromDialog',
+    'WebDriver:GetCapabilities'        => 'getSessionCapabilities',
+    'WebDriver:GetChromeWindowHandle'  => 'getChromeWindowHandle',
+    'WebDriver:GetChromeWindowHandles' => 'getChromeWindowHandles',
+    'WebDriver:GetCookies'             => 'getCookies',
+    'WebDriver:GetCurrentChromeWindowHandle' =>
+      [ { command => 'getChromeWindowHandle', before_major => 60 } ],
+    'WebDriver:GetCurrentURL'       => 'getCurrentUrl',
+    'WebDriver:GetElementAttribute' => 'getElementAttribute',
+    'WebDriver:GetElementCSSValue'  => 'getElementValueOfCssProperty',
+    'WebDriver:GetElementProperty'  => 'getElementProperty',
+    'WebDriver:GetElementRect'      => 'getElementRect',
+    'WebDriver:GetElementTagName'   => 'getElementTagName',
+    'WebDriver:GetElementText'      => 'getElementText',
+    'WebDriver:GetPageSource'       => 'getPageSource',
+    'WebDriver:GetTimeouts'         => 'getTimeouts',
+    'WebDriver:GetTitle'            => 'getTitle',
+    'WebDriver:GetWindowHandle'     => 'getWindowHandle',
+    'WebDriver:GetWindowHandles'    => 'getWindowHandles',
+    'WebDriver:GetWindowRect' =>
+      [ { command => 'getWindowSize', before_major => 60 } ],
+    'WebDriver:IsElementDisplayed' => 'isElementDisplayed',
+    'WebDriver:IsElementEnabled'   => 'isElementEnabled',
+    'WebDriver:IsElementSelected'  => 'isElementSelected',
+    'WebDriver:MaximizeWindow'     => 'maximizeWindow',
+    'WebDriver:Navigate'           => 'get',
+    'WebDriver:NewSession'         => 'newSession',
+    'WebDriver:PerformActions'     => 'performActions',
+    'WebDriver:Refresh'            => 'refresh',
+    'WebDriver:ReleaseActions'     => 'releaseActions',
+    'WebDriver:SendAlertText'      => 'sendKeysToDialog',
+    'WebDriver:SetTimeouts'        => 'setTimeouts',
+    'WebDriver:SetWindowRect' =>
+      [ { command => 'setWindowSize', before_major => 60 } ],
+    'WebDriver:SwitchToFrame'       => 'switchToFrame',
+    'WebDriver:SwitchToParentFrame' => 'switchToParentFrame',
+    'WebDriver:SwitchToShadowRoot'  => 'switchToShadowRoot',
+    'WebDriver:SwitchToWindow'      => 'switchToWindow',
+    'WebDriver:TakeScreenshot'      => 'takeScreenshot',
 );
 
 sub _command {
@@ -1789,8 +1842,16 @@ sub _command {
     if ( defined $self->browser_version() ) {
         my ( $major, $minor, $patch ) = split /[.]/smx,
           $self->browser_version();
-        if ( $major < _MIN_VERSION_FOR_NEW_CMDS() ) {
-            if ( $_deprecated_commands{$command} ) {
+        if ( $_deprecated_commands{$command} ) {
+            if ( ref $_deprecated_commands{$command} ) {
+                foreach my $command ( @{ $_deprecated_commands{$command} } ) {
+                    if ( $major < $command->{before_major} ) {
+                        return $command->{command};
+                    }
+                }
+            }
+            elsif ( $major < _MIN_VERSION_FOR_NEW_CMDS() ) {
+
                 return $_deprecated_commands{$command};
             }
         }
@@ -1808,7 +1869,14 @@ sub capabilities {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $self->_create_capabilities( $response->result()->{capabilities} );
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        return $self->_create_capabilities(
+            $response->result()->{capabilities} );
+    }
+    else {
+        return $self->_create_capabilities( $response->result()->{value} );
+    }
+
 }
 
 sub delete_cookies {
@@ -1843,6 +1911,13 @@ sub cookies {
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetCookies') ] );
     my $response = $self->_get_response($message_id);
+    my @cookies;
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        @cookies = @{ $response->result() };
+    }
+    else {
+        @cookies = @{ $response->result()->{value} };
+    }
     return map {
         Firefox::Marionette::Cookie->new(
             http_only => $_->{httpOnly} ? 1 : 0,
@@ -1853,7 +1928,7 @@ sub cookies {
             expiry    => $_->{expiry},
             name      => $_->{name},
           )
-    } @{ $response->result() };
+    } @cookies;
 }
 
 sub tag_name {
@@ -1878,7 +1953,7 @@ sub tag_name {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response) ? 1 : 0;
 }
 
 sub window_rect {
@@ -1888,12 +1963,16 @@ sub window_rect {
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetWindowRect') ]
     );
     my $response = $self->_get_response($message_id);
-    my $old      = Firefox::Marionette::Window::Rect->new(
-        pos_x  => $response->result()->{x},
-        pos_y  => $response->result()->{y},
-        width  => $response->result()->{width},
-        height => $response->result()->{height},
-        wstate => $response->result()->{state},
+    my $result   = $response->result();
+    if ( $result->{value} ) {
+        $result = $result->{value};
+    }
+    my $old = Firefox::Marionette::Window::Rect->new(
+        pos_x  => $result->{x},
+        pos_y  => $result->{y},
+        width  => $result->{width},
+        height => $result->{height},
+        wstate => $result->{state},
     );
     if ( defined $new ) {
         $message_id = $self->_new_message_id();
@@ -1936,11 +2015,15 @@ sub rect {
         ]
     );
     my $response = $self->_get_response($message_id);
+    my $result   = $response->result();
+    if ( $result->{value} ) {
+        $result = $result->{value};
+    }
     return Firefox::Marionette::Element::Rect->new(
-        pos_x  => $response->result()->{x},
-        pos_y  => $response->result()->{y},
-        width  => $response->result()->{width},
-        height => $response->result()->{height},
+        pos_x  => $result->{x},
+        pos_y  => $result->{y},
+        width  => $result->{width},
+        height => $result->{height},
     );
 }
 
@@ -1965,7 +2048,7 @@ sub text {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub clear {
@@ -2114,8 +2197,14 @@ sub active_element {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return Firefox::Marionette::Element->new( $self,
-        %{ $response->result()->{value} } );
+    if ( ref $self->_response_result_value($response) ) {
+        return Firefox::Marionette::Element->new( $self,
+            %{ $self->_response_result_value($response) } );
+    }
+    else {
+        return Firefox::Marionette::Element->new( $self,
+            ELEMENT => $self->_response_result_value($response) );
+    }
 }
 
 sub uri {
@@ -2125,7 +2214,7 @@ sub uri {
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetCurrentURL') ]
     );
     my $response = $self->_get_response($message_id);
-    return URI->new( $response->result()->{value} );
+    return URI->new( $self->_response_result_value($response) );
 }
 
 sub full_screen {
@@ -2185,7 +2274,7 @@ sub alert_text {
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetAlertText') ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub selfie {
@@ -2224,7 +2313,7 @@ sub selfie {
     );
     my $response = $self->_get_response($message_id);
     if ( $extra{hash} ) {
-        return $response->result()->{value};
+        return $self->_response_result_value($response);
     }
     else {
         my $handle = File::Temp::tempfile(
@@ -2236,7 +2325,10 @@ sub selfie {
             "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
         binmode $handle;
         $handle->print(
-            MIME::Base64::decode_base64( $response->result()->{value} ) )
+            MIME::Base64::decode_base64(
+                $self->_response_result_value($response)
+            )
+          )
           or Firefox::Marionette::Exception->throw(
             "Failed to write to temporary file:$EXTENDED_OS_ERROR");
         $handle->seek( 0, Fcntl::SEEK_SET() )
@@ -2256,7 +2348,12 @@ sub current_chrome_window_handle {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    if (   ( defined $response->{result}->{ok} )
+        && ( $response->{result}->{ok} ) )
+    {
+        $response = $self->_get_response($message_id);
+    }
+    return $self->_response_result_value($response);
 }
 
 sub chrome_window_handle {
@@ -2269,7 +2366,7 @@ sub chrome_window_handle {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub chrome_window_handles {
@@ -2282,7 +2379,12 @@ sub chrome_window_handles {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return @{ $response->result() };
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        return @{ $response->result() };
+    }
+    else {
+        return @{ $response->result()->{value} };
+    }
 }
 
 sub window_handle {
@@ -2295,7 +2397,7 @@ sub window_handle {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub window_handles {
@@ -2308,7 +2410,12 @@ sub window_handles {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return @{ $response->result() };
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        return @{ $response->result() };
+    }
+    else {
+        return @{ $response->result()->{value} };
+    }
 }
 
 sub close_current_chrome_window_handle {
@@ -2322,7 +2429,7 @@ sub close_current_chrome_window_handle {
     );
     my $response = $self->_get_response($message_id);
     if ( ref $response->result() eq 'HASH' ) {
-        return ( $response->result()->{value} );
+        return ( $self->_response_result_value($response) );
     }
     else {
         return @{ $response->result() };
@@ -2355,7 +2462,7 @@ sub css {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub property {
@@ -2370,7 +2477,7 @@ sub property {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub attribute {
@@ -2384,7 +2491,7 @@ sub attribute {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub find_element {
@@ -2496,7 +2603,13 @@ sub _find {
     my $message_id = $self->_new_message_id();
     my $parameters = { using => $using, value => $value };
     if ( defined $from ) {
-        $parameters->{element} = $from->uuid();
+        if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() )
+        {
+            $parameters->{element} = $from->uuid();
+        }
+        else {
+            $parameters->{ELEMENT} = $from->uuid();
+        }
     }
     my $command =
       wantarray ? 'WebDriver:FindElements' : 'WebDriver:FindElement';
@@ -2505,13 +2618,31 @@ sub _find {
     my $response =
       $self->_get_response( $message_id, { using => $using, value => $value } );
     if (wantarray) {
-        return
-          map { Firefox::Marionette::Element->new( $self, %{$_} ) }
-          @{ $response->result() };
+        if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() )
+        {
+            return
+              map { Firefox::Marionette::Element->new( $self, %{$_} ) }
+              @{ $response->result() };
+        }
+        elsif (( ref $self->_response_result_value($response) )
+            && ( ( ref $self->_response_result_value($response) ) eq 'ARRAY' )
+            && ( ref $self->_response_result_value($response)->[0] )
+            && ( ( ref $self->_response_result_value($response)->[0] ) eq
+                'HASH' ) )
+        {
+            return
+              map { Firefox::Marionette::Element->new( $self, %{$_} ) }
+              @{ $self->_response_result_value($response) };
+        }
+        else {
+            return
+              map { Firefox::Marionette::Element->new( $self, ELEMENT => $_ ) }
+              @{ $self->_response_result_value($response) };
+        }
     }
     else {
         return Firefox::Marionette::Element->new( $self,
-            %{ $response->result()->{value} } );
+            %{ $self->_response_result_value($response) } );
     }
 }
 
@@ -2524,9 +2655,15 @@ sub active_frame {
         ]
     );
     my $response = $self->_get_response($message_id);
-    if ( defined $response->result()->{value} ) {
-        return Firefox::Marionette::Element->new( $self,
-            %{ $response->result()->{value} } );
+    if ( defined $self->_response_result_value($response) ) {
+        if ( ref $self->_response_result_value($response) ) {
+            return Firefox::Marionette::Element->new( $self,
+                %{ $self->_response_result_value($response) } );
+        }
+        else {
+            return Firefox::Marionette::Element->new( $self,
+                ELEMENT => $self->_response_result_value($response) );
+        }
     }
     else {
         return;
@@ -2539,7 +2676,7 @@ sub title {
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetTitle') ] );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub quit {
@@ -2639,7 +2776,8 @@ sub context {
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command('Marionette:GetContext') ] );
     my $response = $self->_get_response($message_id);
-    my $context  = $response->result()->{value};        # 'content' or 'chrome'
+    my $context =
+      $self->_response_result_value($response);    # 'content' or 'chrome'
     if ( defined $new ) {
         $message_id = $self->_new_message_id();
         $self->_send_request(
@@ -2744,7 +2882,7 @@ sub script {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub json {
@@ -2769,6 +2907,9 @@ sub strip {
     $header = quotemeta
 '<html><head><link rel="alternate stylesheet" type="text/css" href="resource://content-accessible/plaintext.css" title="Wrap Long Lines"></head><body><pre>';
     $content =~ s/^$header(.*)$footer$/$1/smx;
+    $header = quotemeta
+'<html xmlns="http://www.w3.org/1999/xhtml"><head><link title="Wrap Long Lines" href="resource://gre-resources/plaintext.css" type="text/css" rel="alternate stylesheet" /></head><body><pre>';
+    $content =~ s/^$header(.*)$footer$/$1/smx;
     return $content;
 }
 
@@ -2784,7 +2925,7 @@ sub html {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub page_source {
@@ -2818,11 +2959,11 @@ sub screen_orientation {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            $self->_command('WebDriver:GetScreenOrientation')
+            $self->_command('Marionette:GetScreenOrientation')
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub switch_to_parent_frame {
@@ -2845,7 +2986,7 @@ sub window_type {
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetWindowType') ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub switch_to_shadow_root {
@@ -2879,6 +3020,13 @@ sub switch_to_window {
 sub switch_to_frame {
     my ( $self, $element ) = @_;
     my $message_id = $self->_new_message_id();
+    my $parameters;
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        $parameters = { element => $element->uuid() };
+    }
+    else {
+        $parameters = { ELEMENT => $element->uuid() };
+    }
     $self->_send_request(
         [
             _COMMAND(), $message_id,
@@ -2993,7 +3141,7 @@ sub install {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    return $self->_response_result_value($response);
 }
 
 sub uninstall {
@@ -3011,7 +3159,7 @@ sub uninstall {
 
 sub marionette_protocol {
     my ($self) = @_;
-    return $self->{marionette_protocol};
+    return $self->{marionette_protocol} || 0;
 }
 
 sub application_type {
@@ -3035,8 +3183,22 @@ sub addons {
     return $self->{addons};
 }
 
+sub _convert_request_to_old_protocols {
+    my ( $self, $original ) = @_;
+    my $new;
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        $new = $original;
+    }
+    else {
+        $new->{name}       = $original->[ _OLD_PROTOCOL_NAME_INDEX() ];
+        $new->{parameters} = $original->[ _OLD_PROTOCOL_PARAMETERS_INDEX() ];
+    }
+    return $new;
+}
+
 sub _send_request {
     my ( $self, $object ) = @_;
+    $object = $self->_convert_request_to_old_protocols($object);
     my $json   = JSON::encode_json($object);
     my $length = length $json;
     if ( $self->_debug() ) {
@@ -3145,10 +3307,12 @@ sub _get_response {
     my $next_message = $self->_read_from_socket();
     my $response =
       Firefox::Marionette::Response->new( $next_message, $parameters );
-    while ( $response->message_id() < $message_id ) {
-        $next_message = $self->_read_from_socket();
-        $response =
-          Firefox::Marionette::Response->new( $next_message, $parameters );
+    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
+        while ( $response->message_id() < $message_id ) {
+            $next_message = $self->_read_from_socket();
+            $response =
+              Firefox::Marionette::Response->new( $next_message, $parameters );
+        }
     }
     return $response;
 }
@@ -3183,7 +3347,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.64
+Version 0.66
 
 =head1 SYNOPSIS
 

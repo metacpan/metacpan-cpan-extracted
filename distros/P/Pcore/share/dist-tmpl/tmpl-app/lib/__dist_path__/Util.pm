@@ -18,8 +18,8 @@ sub BUILD ( $self, $args ) {
     $self->{tmpl} = P->tmpl;
 
     # set settings listener
-    P->listen_events(
-        'APP.SETTINGS_UPDATED',
+    P->bind_events(
+        'app.settings-updated',
         sub ($ev) {
             $self->{settings} = $ev->{data};
 
@@ -105,7 +105,7 @@ SQL
 sub load_settings ( $self ) {
     my $settings = $self->{dbh}->selectrow(q[SELECT * FROM "settings" WHERE "id" = 1]);
 
-    P->fire_event( 'APP.SETTINGS_UPDATED', $settings->{data} ) if $settings;
+    P->fire_event( 'app.settings-updated', $settings->{data} ) if $settings;
 
     return $settings;
 }

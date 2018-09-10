@@ -1,26 +1,18 @@
 package <: $module_name ~ "::API::v1::Auth" :>;
 
-use Pcore -class;
+use Pcore -class, -const;
 use Pcore::App::API qw[:CONST];
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
-extends qw[Pcore::App::API::Role];
+extends qw[Pcore::App::API::Base];
 
-our $API_MAP = {    #
-    app_init => { permissions => undef, desc => 'get ext app init settings' },
-    signin   => { permissions => undef, desc => 'signin user' },
-    signout  => { permissions => q[*],  desc => 'signout user' },
-};
+const our $API_NAMESPACE_PERMS => undef;
 
-sub _build_api_map ($self) {
-    return $API_MAP;
-}
-
-sub API_app_init ( $self, $req, $data = undef ) {
+sub API_app_init : Perms('*') ( $self, $req, $data = undef ) {
     return $req->( 200, { user_name => $req->{auth} ? ( $req->{auth}->{user_name} ) : undef, } );
 }
 
-sub API_signin ( $self, $req, $data ) {
+sub API_signin : Perms('*') ( $self, $req, $data ) {
     my $auth = $self->{app}->{api}->authenticate( [ $data->{user_name}, $data->{password} ] );
 
     # authentication error
@@ -36,7 +28,7 @@ sub API_signin ( $self, $req, $data ) {
     return $req->( 200, { user_name => $data->{user_name}, token => $session->{data}->{token} } );
 }
 
-sub API_signout ( $self, $req, @ ) {
+sub API_signout : Perms('*') ( $self, $req, @ ) {
 
     # request is authenticated from session token
     if ( $req->{auth}->{private_token}->[0] && $req->{auth}->{private_token}->[0] == $TOKEN_TYPE_USER_SESSION ) {
@@ -58,7 +50,7 @@ sub API_signout ( $self, $req, @ ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 66                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 70 does not match the package declaration       |
+## |    1 | 58                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 62 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

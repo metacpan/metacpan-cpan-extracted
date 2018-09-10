@@ -1,6 +1,7 @@
 package Pcore::Handle;
 
 use Pcore -const, -class, -export;
+use Pcore::AE::DNS::Cache;
 use Pcore::Util::CA;
 use HTTP::Parser::XS qw[];
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
@@ -9,7 +10,7 @@ use Errno qw[];
 use IO::Socket::SSL qw[$SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE SSL_VERIFY_NONE SSL_VERIFY_PEER];
 use Coro::EV qw[];
 use overload    #
-  q[bool]  => sub { return substr( $_[0]->{status}, 0, 1 ) == 2 },
+  q[bool]  => sub { return $_[0]->{is_connected} },
   q[0+]    => sub { return $_[0]->{status} },
   q[""]    => sub { return $_[0]->{status} . q[ ] . $_[0]->{reason} },
   fallback => 1;
@@ -50,7 +51,7 @@ const our $HANDLE_STATUS_SOCKET_ERROR   => 598;
 const our $HANDLE_STATUS_EOF            => 599;
 
 const our $STATUS_REASON => {
-    $HANDLE_STATUS_OK             => 'OK',
+    $HANDLE_STATUS_OK             => 'Connected',
     $HANDLE_STATUS_TIMEOUT        => 'Timeout',
     $HANDLE_STATUS_CONNECT_ERROR  => 'Connect error',
     $HANDLE_STATUS_TLS_ERROR      => 'TLS handshake error',
@@ -74,9 +75,11 @@ has peername         => ();
 has so_no_delay      => 1;
 has so_keepalive     => 1;
 has so_oobinline     => 1;
+has on_disconnect    => ();              # CodeRef->($h)
 
-has rbuf => ();
-has tls  => ();
+has is_connected => 1;
+has rbuf         => ();
+has tls          => ();
 
 # TODO handle persistent
 sub DESTROY ($self) {
@@ -88,56 +91,58 @@ sub DESTROY ($self) {
 }
 
 # TODO persistent
-around new => sub ( $orig, $self, $connect, @args ) {
+around new => sub ( $orig, $self, $uri, @args ) {
 
     # wrap fh
-    if ( is_glob $connect) {
+    if ( is_glob $uri) {
         $self = $self->$orig(@args);
 
-        $self->{fh} = $connect;
+        $self->{fh} = $uri;
 
         $self->_set_status($HANDLE_STATUS_OK);
     }
 
     # connect
     else {
-        my ( $uri, $scheme );
+        my @connect;
 
-        # parse connect
-        if ( !is_ref $connect) {
-            $uri    = P->uri($connect);
-            $scheme = $uri->scheme;
+        if ( is_plain_arrayref $uri) {
+            @connect = $uri->@*;
 
-            $connect = [ $uri->host, $uri->port || $uri->default_port ];
+            $self = $self->$orig(@args);
+
+            $self->{peername} //= $connect[0];
         }
-        elsif ( !is_plain_arrayref $connect) {
-            $uri    = $connect;
-            $scheme = $connect->scheme;
+        else {
 
-            $connect = [ $connect->host, $connect->port || $connect->default_port ];
-        }
+            # convert to URI object
+            $uri = P->uri( $uri, base => 'tcp:' ) if !is_ref $uri;
 
-        if ($scheme) {
-            if ( !exists $SCHEME_CACHE->{$scheme} ) {
-                my $class = eval { P->class->load( $scheme, ns => 'Pcore::Handle' ) };
+            my $scheme = $uri->{scheme};
 
-                $SCHEME_CACHE->{$scheme} = $class;
+            if ($scheme) {
+                if ( !exists $SCHEME_CACHE->{$scheme} ) {
+                    my $class = eval { P->class->load( $scheme, ns => 'Pcore::Handle' ) };
+
+                    $SCHEME_CACHE->{$scheme} = $class;
+                }
+
+                return $SCHEME_CACHE->{$scheme}->new( { @args, uri => $uri } ) if $SCHEME_CACHE->{$scheme};    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
             }
 
-            return $SCHEME_CACHE->{$scheme}->new( { @args, uri => $uri } ) if $SCHEME_CACHE->{$scheme};    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+            $self = $self->$orig(@args);
+
+            $self->{peername} //= $uri->{host}->{name} if defined $uri->{host};
+
+            @connect = $uri->connect;
         }
-
-        $self = $self->$orig(@args);
-
-        $self->{peername} //= $connect->[0];
 
         my $bind_error;
 
-        my $rouse_cb = Coro::rouse_cb;
+        my $cv = P->cv;
 
-        AnyEvent::Socket::tcp_connect(
-            $connect->[0],
-            $connect->[1],
+        &AnyEvent::Socket::tcp_connect(    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+            @connect,
             sub ( $fh = undef, $host = undef, $port = undef, $retry = undef ) {
                 if ($fh) {
                     if ($bind_error) {
@@ -153,7 +158,7 @@ around new => sub ( $orig, $self, $connect, @args ) {
                     $self->_set_status( $HANDLE_STATUS_CONNECT_ERROR, $! );
                 }
 
-                $rouse_cb->();
+                $cv->();
 
                 return;
             },
@@ -164,7 +169,7 @@ around new => sub ( $orig, $self, $connect, @args ) {
             }
         );
 
-        Coro::rouse_wait $rouse_cb;
+        $cv->recv;
     }
 
     # configure fh
@@ -190,7 +195,7 @@ sub so_no_delay ( $self, $val ) {
 sub so_oobinline ( $self, $val ) {
     $self->{so_oobinline} = $val;
 
-    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_OOBINLINE(), $val or die $!;
+    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_OOBINLINE(), $val;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
     return;
 }
@@ -198,7 +203,7 @@ sub so_oobinline ( $self, $val ) {
 sub so_keepalive ( $self, $val ) {
     $self->{so_keepalive} = $val;
 
-    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_KEEPALIVE(), $val or die $!;
+    setsockopt $self->{fh}, Socket::SOL_SOCKET(), Socket::SO_KEEPALIVE(), $val;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
     return;
 }
@@ -229,7 +234,7 @@ sub _read ( $self, $read_size = undef, $timeout = undef ) {
     my $bytes;
 
     while () {
-        return if !$self;
+        return if !$self->{is_connected};
 
         $bytes = sysread $self->{fh}, $self->{rbuf}, $read_size || $self->{read_size}, length $self->{rbuf} // 0;
 
@@ -261,7 +266,7 @@ sub _read ( $self, $read_size = undef, $timeout = undef ) {
 # $args{timeout}
 # $args{read_size}
 sub read ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    return if !$self;
+    return if !$self->{is_connected};
 
     return \delete( $self->{rbuf} ) if length $self->{rbuf};
 
@@ -309,7 +314,7 @@ sub read_line ( $self, $eol, %args ) {
 
         # pattern not found
         else {
-            return if !$self;
+            return if !$self->{is_connected};
 
             $self->_read( $args{read_size}, $args{timeout} ) || last;
         }
@@ -341,7 +346,7 @@ sub read_chunk ( $self, $length, %args ) {
                 return $total_bytes if !$length;
             }
 
-            return if !$self;
+            return if !$self->{is_connected};
 
             $self->_read( $args{read_size}, $args{timeout} ) || last;
         }
@@ -359,7 +364,7 @@ sub read_chunk ( $self, $length, %args ) {
                 }
             }
 
-            return if !$self;
+            return if !$self->{is_connected};
 
             $self->_read( $args{read_size}, $args{timeout} ) || last;
         }
@@ -404,7 +409,7 @@ sub write ( $self, $buf, %args ) {    ## no critic qw[Subroutines::ProhibitBuilt
     my $size = length $buf_ref->$*;
 
     while () {
-        return if !$self;
+        return if !$self->{is_connected};
 
         my $bytes = syswrite $self->{fh}, $buf_ref->$*, $size, $ofs;
 
@@ -485,21 +490,33 @@ sub starttls ( $self, %args ) {
 }
 
 sub close ( $self ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    CORE::close $self->{fh};
+    return if !$self->{is_connected};
 
-    undef $self->{fh};
+    $self->{is_connected} = 0;
 
-    $self->_set_status( $HANDLE_STATUS_SOCKET_ERROR, 'Disconnected' );
+    CORE::close $self->{fh} if defined $self->{fh};
+
+    $self->{status} = $HANDLE_STATUS_SOCKET_ERROR;
+
+    $self->{reason} = 'Disconnected';
+
+    if ( my $cb = delete $self->{on_disconnect} ) { $cb->($self) }
 
     return;
 }
 
 sub shutdown ( $self, $type = 2 ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    CORE::shutdown $self->{fh}, $type;
+    return if !$self->{is_connected};
 
-    undef $self->{fh};
+    $self->{is_connected} = 0;
 
-    $self->_set_status( $HANDLE_STATUS_SOCKET_ERROR, 'Disconnected' );
+    CORE::shutdown $self->{fh}, $type if defined $self->{fh};
+
+    $self->{status} = $HANDLE_STATUS_SOCKET_ERROR;
+
+    $self->{reason} = 'Disconnected';
+
+    if ( my $cb = delete $self->{on_disconnect} ) { $cb->($self) }
 
     return;
 }
@@ -513,17 +530,19 @@ sub is_eof ($self)            { return $self->{status} == $HANDLE_STATUS_EOF }
 sub is_timeout ($self)        { return $self->{status} == $HANDLE_STATUS_TIMEOUT || $self->{status} == $HANDLE_STATUS_TIMEOUT_ERROR }
 
 sub _set_status ( $self, $status, $reason = undef ) {
-    return if $self->{status} && substr( $self->{status}, 0, 1 ) != 2;
+    return if !$self->{is_connected};
 
     $self->{status} = $status;
 
     $self->{reason} = $reason // $STATUS_REASON->{$status};
 
     # fatal error
-    if ( $self->{fh} && substr( $status, 0, 1 ) != 2 ) {
-        CORE::shutdown $self->{fh}, 2;
+    if ( substr( $status, 0, 1 ) != 2 ) {
+        $self->{is_connected} = 0;
 
-        undef $self->{fh};
+        CORE::shutdown $self->{fh}, 2 if defined $self->{fh};
+
+        if ( my $cb = delete $self->{on_disconnect} ) { $cb->($self) }
     }
 
     return;
@@ -767,13 +786,13 @@ sub read_http_chunked_data ( $self, %args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 487                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named subroutine "close"                               |
+## |    3 | 492                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named subroutine "close"                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 663                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
+## |    3 | 682                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 724                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 743                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 358                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 363                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

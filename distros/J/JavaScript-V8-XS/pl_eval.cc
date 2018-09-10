@@ -27,14 +27,26 @@ static void ReportException(pTHX_ V8Context* ctx, TryCatch* try_catch)
         // print the exception.
         Perl_sv_catpvf(aTHX_ buffer, "%s\n", exception_string);
     } else {
-        // Print (filename):(line number): (message).
-        String::Utf8Value filename(isolate,
-                message->GetScriptOrigin().ResourceName());
         Local<Context> context(isolate->GetCurrentContext());
-        const char* filename_string = ToCString(filename);
-        int linenum = message->GetLineNumber(context).FromJust();
-        Perl_sv_catpvf(aTHX_ buffer, "%s:%i: %s", filename_string, linenum, exception_string);
-        // Print line of source code.
+        Local<Value> stack_trace_string;
+        bool has_stack_trace = (
+            try_catch->StackTrace(context).ToLocal(&stack_trace_string) &&
+            stack_trace_string->IsString() &&
+            Local<String>::Cast(stack_trace_string)->Length() > 0);
+
+        if (!has_stack_trace) {
+            // Print (filename):(line number):
+            String::Utf8Value filename(isolate, message->GetScriptOrigin().ResourceName());
+            const char* filename_string = ToCString(filename);
+            int linenum = message->GetLineNumber(context).FromJust();
+            Perl_sv_catpvf(aTHX_ buffer, "%s:%i: ", filename_string, linenum);
+        }
+
+        // Print (message).
+        Perl_sv_catpvf(aTHX_ buffer, "error: %s\n", exception_string);
+
+#if 0
+        // Print offending line of source code.
         String::Utf8Value sourceline(
                 isolate, message->GetSourceLine(context).ToLocalChecked());
         const char* sourceline_string = ToCString(sourceline);
@@ -50,12 +62,10 @@ static void ReportException(pTHX_ V8Context* ctx, TryCatch* try_catch)
             Perl_sv_catpvf(aTHX_ buffer, "^");
         }
         Perl_sv_catpvf(aTHX_ buffer, "\n");
+#endif
 
         // Print stacktrace if any
-        Local<Value> stack_trace_string;
-        if (try_catch->StackTrace(context).ToLocal(&stack_trace_string) &&
-                stack_trace_string->IsString() &&
-                Local<String>::Cast(stack_trace_string)->Length() > 0) {
+        if (has_stack_trace) {
             String::Utf8Value stack_trace(isolate, stack_trace_string);
             const char* stack_trace_string = ToCString(stack_trace);
             Perl_sv_catpvf(aTHX_ buffer, "%s\n", stack_trace_string);

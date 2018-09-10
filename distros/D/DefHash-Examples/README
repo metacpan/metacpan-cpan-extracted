@@ -1,11 +1,40 @@
-DESCRIPTION
+NAME
+    DefHash::Examples - Example DefHash hashes
 
+VERSION
+    This document describes version 0.002 of DefHash::Examples (from Perl
+    distribution DefHash-Examples), released on 2018-09-10.
+
+DESCRIPTION
     This distribution contains various examples of DefHash hashes files in
     its per-dist share dir. It will also serve as a spectest.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DefHash-Examples>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DefHash-Examples>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DefHash-Examples>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     DefHash
 
     Hash::DefHash
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

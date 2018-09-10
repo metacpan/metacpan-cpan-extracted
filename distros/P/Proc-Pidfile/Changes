@@ -1,5 +1,16 @@
 Revision history for Perl module Proc::Pidfile
 
+1.08 2018-09-07 NEILB
+    - Fixes for when running in taint mode. One fix from Laurence Darby,
+      and one from me.
+    - Include META.json in releases
+    - Made the SEE ALSO mention of Proc::PID::File linked -- MANWAR.
+
+1.07_01 2018-09-07 NEILB
+    - Fixes for when running in taint mode. One fix from Laurence Darby,
+      and one from me.
+    - Include META.json in releases
+
 1.07 2018-09-06 NEILB
     - Added [MetaProvides::Package] to dist.ini to address Kwalitee
       suggestion. NAWGLAN++

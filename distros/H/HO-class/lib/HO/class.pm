@@ -1,14 +1,17 @@
   package HO::class
 # *****************
 ; use strict; use warnings;
-  our $VERSION='0.077';
+  our $VERSION='0.078';
 # ********************
 
 ; require HO::accessor
 ; require Carp
 
+; our (%mixin_classes,%class_args,%class_methods)
+
 ; sub import
     { my ($package,@args)=@_
+    ; our (%mixin_classes,%class_args,%class_methods)
     ; my $makeconstr = 1
     ; # uncoverable branch false
       # uncoverable condition right
@@ -21,6 +24,12 @@
     ; my @r_          # common accessors
     ; my $makeinit    # key for init method or subref used as init
     ; my @alias
+
+    ; $class_methods{$class} = {}
+    ; $class_args{$class} = [ @args ]
+    ; if($mixin_classes{$class})
+        { push @args, @{$mixin_classes{$class}}
+        }
 
     ; while(@args)
         { my $action = lc(shift @args)
@@ -89,6 +98,7 @@
     ; { no strict 'refs'
       ; while(@methods)
           { my ($name,$code) = splice(@methods,0,2)
+
           ; my ($nidx,$ncdx) = ("_$name","__$name")
           ; my $idx = HO::accessor::_value_of($class, $nidx)
           ; my $cdx = HO::accessor::_value_of($class, $ncdx)
@@ -107,6 +117,7 @@
                   ; return $self->[$idx]->($self,@_)
                   }
               }
+          ; $class_methods{$class}{$name} = "_method"
           }
 
       ; while(@lvalue)
@@ -117,14 +128,17 @@
                { my $self = shift();
                ; $self->[$self->$acc]
                }
+          ; $class_methods{$class}{$name} = "_lvalue"
           }
       ; while(my ($name,$subdata) = splice(@r_,0,2))
           { my ($coderef,$name,$class) = @$subdata
           ; *{join('::',$class,$name)} = $coderef->($name,$class)
+          ; $class_methods{$class}{$name} = "_data"
           }
       ; while(my ($new,$subname) = splice(@alias,0,2))
           { my $code = HO::accessor::_methods_code($class, $subname)
           ; *{join('::',$class,$new)} = $code
+          ; $class_methods{$class}{$new} = "_alias"
           }
       }
     }

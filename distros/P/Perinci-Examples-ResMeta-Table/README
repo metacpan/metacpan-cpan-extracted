@@ -1,12 +1,44 @@
-DESCRIPTION
+NAME
+    Perinci::Examples::ResMeta::Table - Demonstrate the various table and
+    table.* result metadata property/attributes
 
+VERSION
+    This document describes version 0.003 of
+    Perinci::Examples::ResMeta::Table (from Perl distribution
+    Perinci-Examples-ResMeta-Table), released on 2018-09-10.
+
+DESCRIPTION
     See the source code.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Examples-ResMeta-Table>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Examples-ResMeta-Table>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-ResM
+    eta-Table>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::Examples
 
     Perinci::Sub::Property::result::table
 
     Perinci::Result::Format::Lite
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

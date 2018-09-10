@@ -1,7 +1,7 @@
 
-Password::Policy::Rule::Pwned version 0.01
+Password::Policy::Rule::Pwned version 0.02
 
-Released: 26th July 2018
+Released: 10th September 2018
 
 
 INSTALLATION
@@ -31,15 +31,13 @@ Password::Policy::Rule::Pwned is a rule to extend Password::Policy to
 allow the checking of potential passwords against the list of known
 pwned passwords at https://api.pwnedpasswords.com/range/
 
-This is currently beta quality software and its interface may be subject to
-change.
-
 
 NEW SINCE LAST VERSION
 ----------------------
 
- - Test versions of all modules
- - Set release_status from version format
+ - Improve POD: typos, links, synopsis, etc.
+ - Improve basic example with PwnedError check
+ - Expand tests to check both exception object and message
 
 See the Changes file for a complete history.
 

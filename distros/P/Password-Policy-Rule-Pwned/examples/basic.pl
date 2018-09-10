@@ -29,6 +29,10 @@ while (my $pass = <STDIN>) {
 	try {
 		$pp->process({ password => $pass });
 	} catch {
+		if ($_->isa ("Password::Policy::Exception::PwnedError")) {
+			warn "Unable to verify pwned status - try again later\n";
+			return;
+		}
 		print "'$pass' failed checks: $_ - don't use it\n";
 	};
 }

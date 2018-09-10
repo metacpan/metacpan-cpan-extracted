@@ -2,26 +2,36 @@ package Pcore::Node::Proc;
 
 use Pcore -class;
 use Fcntl;
-use Pcore::AE::Handle;
-use AnyEvent::Util qw[portable_pipe];
+use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32API::File';
 use Pcore::Util::Data qw[to_cbor from_cbor];
+use Pcore::Util::Scalar qw[weaken];
 use Pcore::Util::Sys::Proc;
+
+has fh        => ();    # fh
+has on_finish => ();    # CodeRef->($self)
+
+sub DESTROY ($self) {
+    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
+        $self->{fh}->shutdown;
+    }
+
+    return;
+}
 
 around new => sub ( $orig, $self, $type, % ) {
     my %args = (
         server    => undef,    # node server credentials
-        listen    => undef,    # Node listen
+        listen    => undef,    # node listen
         buildargs => undef,    # class constructor arguments
-        on_ready  => undef,
         on_finish => undef,
         @_[ 3 .. $#_ ],
     );
 
     # create handles
-    my ( $fh_r, $fh_w ) = portable_pipe();
+    my ( $fh_r, $fh_w ) = portable_socketpair;
 
-    Pcore::AE::Handle->new( fh => $fh_r, on_connect => sub ( $h, @ ) { $fh_r = $h } );
+    $fh_r = P->handle($fh_r);
 
     my $boot_args = {
         script_path => $ENV->{SCRIPT_PATH},
@@ -36,32 +46,25 @@ around new => sub ( $orig, $self, $type, % ) {
         $boot_args->{fh} = Win32API::File::FdGetOsFHandle( fileno $fh_w );
     }
     else {
+
+        # do not close fh on exec
         fcntl $fh_w, Fcntl::F_SETFD, fcntl( $fh_w, Fcntl::F_GETFD, 0 ) & ~Fcntl::FD_CLOEXEC or die;
 
         $boot_args->{fh} = fileno $fh_w;
     }
 
+    my $proc;
+
+    # run via fork tmpl
     if ($Pcore::Util::Sys::ForkTmpl::CHILD_PID) {
         Pcore::Util::Sys::ForkTmpl::run_node( $type, $boot_args );
 
-        $self->_handshake(
-            $fh_r,
-            sub ($res) {
-                my $proc = bless {
-                    pid => $res->{pid},
-                    fh  => $fh_r,
-                  },
-                  'Pcore::Util::Sys::Proc';
+        my $res = $self->_handshake($fh_r);
 
-                $fh_r->on_error( sub { $args{on_finish}->($proc) } );
-                $fh_r->on_read( sub  { } );
-
-                $args{on_ready}->($proc);
-
-                return;
-            }
-        );
+        $proc = bless { pid => $res->{pid} }, 'Pcore::Util::Sys::Proc';
     }
+
+    # run via run_proc
     else {
         state $perl = do {
             if ( $ENV->{is_par} ) {
@@ -72,62 +75,49 @@ around new => sub ( $orig, $self, $type, % ) {
             }
         };
 
-        my $cmd = [];
-
-        if ($MSWIN) {
-            push $cmd->@*, $perl, "-MPcore::Node=$type";
-        }
-        else {
-            push $cmd->@*, $perl, "-MPcore::Node=$type";
-        }
-
         # create proc
-        P->sys->run_proc(
-            $cmd,
-            stdin    => 1,
-            on_ready => sub ($proc) {
+        $proc = P->sys->run_proc( [ $perl, "-MPcore::Node=$type" ], stdin => 1 );
 
-                # send configuration to proc STDIN
-                $proc->stdin->push_write( unpack( 'H*', to_cbor($boot_args)->$* ) . $LF );
+        # send configuration to the proc STDIN
+        $proc->{stdin}->write( unpack( 'H*', to_cbor($boot_args)->$* ) . $LF );
 
-                $self->_handshake(
-                    $fh_r,
-                    sub ($res) {
-                        undef $fh_r;
-
-                        $args{on_ready}->($proc);
-
-                        return;
-                    }
-                );
-
-                return;
-            },
-            on_finish => $args{on_finish}
-        );
+        my $res = $self->_handshake($fh_r);
     }
 
-    return;
-};
+    $self = bless {
+        proc      => $proc,
+        fh        => $fh_r,
+        on_finish => delete $args{on_finish},
+    }, $self;
 
-sub _handshake ( $self, $fh, $cb ) {
-    $fh->push_read(
-        line => $LF,
-        sub ( $h, $line, $eol ) {
-            my $res = eval { from_cbor pack 'H*', $line };
+    if ( $self->{on_finish} ) {
+        Coro::async_pool {
+            weaken $self;
 
-            if ($@) {
-                die 'Node handshake error' . $@;
-            }
-            else {
-                $cb->($res);
-            }
+            # blocks until $fh is closed
+            $fh_r->can_read(undef);
+
+            return if !defined $self;
+
+            $self->{on_finish}->($self);
 
             return;
-        }
-    );
+        };
+    }
 
-    return;
+    return $self;
+};
+
+sub _handshake ( $self, $fh ) {
+    my $data = $fh->read_line( $LF, timeout => undef );
+
+    die 'Node handshake error' if !$data;
+
+    my $res = eval { from_cbor pack 'H*', $data->$* };
+
+    die 'Node handshake error' . $@ if $@;
+
+    return $res;
 }
 
 1;

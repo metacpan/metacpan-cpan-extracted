@@ -1,3 +1,10 @@
+0.000073    2018-09-10
+            * Bring back dispatch_function_in_event_loop() to have an easy
+              migration path from this to eval(); we will remove it soon.
+
+0.000072    2018-08-30
+            * Get rid of parse_js_stacktrace -- too specific.
+
 0.000071    2018-08-28
             * Convert JS booleans into JSON::PP::Boolean objects.
               This allows us to roundtrip, especially for cases such as

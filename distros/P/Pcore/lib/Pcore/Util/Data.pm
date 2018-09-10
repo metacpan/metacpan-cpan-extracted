@@ -5,7 +5,6 @@ use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
 use Pcore::Util::List qw[pairs];
 use Sort::Naturally qw[nsort];
 use Pcore::Util::Scalar qw[is_ref is_blessed_ref is_plain_scalarref is_plain_arrayref is_plain_hashref];
-use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 our $EXPORT = {
     ALL   => [qw[encode_data decode_data]],
@@ -16,7 +15,7 @@ our $EXPORT = {
     XML   => [qw[to_xml from_xml]],
     INI   => [qw[to_ini from_ini]],
     B64   => [qw[to_b64 to_b64_url from_b64 from_b64_url]],
-    URI   => [qw[to_uri from_uri from_uri_query]],
+    URI   => [qw[to_uri to_uri_component to_uri_scheme to_uri_path to_uri_query to_uri_query_frag from_uri from_uri_utf8 from_uri_query from_uri_query_utf8]],
     XOR   => [qw[to_xor from_xor]],
     CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
     TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI]],
@@ -606,133 +605,6 @@ sub from_b64_url {
     return &MIME::Base64::decode_base64url;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
-# URI
-sub to_uri {
-    if ( ref $_[0] ) {
-        my $data = is_blessed_ref $_[0] && $_[0]->isa('Pcore::Util::Hash::Multivalue') ? $_[0]->get_hash : $_[0];
-
-        my @res;
-
-        if ( is_plain_arrayref $data ) {
-            for ( my $i = 0; $i <= $data->$#*; $i += 2 ) {
-                push @res, join q[=], defined $data->[$i] ? URI::Escape::XS::encodeURIComponent( $data->[$i] ) : q[], defined $data->[ $i + 1 ] ? URI::Escape::XS::encodeURIComponent( $data->[ $i + 1 ] ) : ();
-            }
-        }
-        else {
-            while ( my ( $k, $v ) = each $data->%* ) {
-                $k = URI::Escape::XS::encodeURIComponent($k);
-
-                if ( ref $v ) {
-
-                    # value is ArrayRef
-                    for my $v1 ( $v->@* ) {
-                        push @res, join q[=], $k, defined $v1 ? URI::Escape::XS::encodeURIComponent($v1) : ();
-                    }
-                }
-                else {
-                    push @res, join q[=], $k, defined $v ? URI::Escape::XS::encodeURIComponent($v) : ();
-                }
-            }
-        }
-
-        return join q[&], @res;
-    }
-    else {
-        return URI::Escape::XS::encodeURIComponent( $_[0] );
-    }
-}
-
-# always return scalar string
-sub from_uri {
-    my %args = (
-        encoding => 'UTF-8',
-        splice @_, 1,
-    );
-
-    my $u = URI::Escape::XS::decodeURIComponent( $_[0] );
-
-    if ( $args{encoding} ) {
-        state $encoding = {};
-
-        $encoding->{ $args{encoding} } //= Encode::find_encoding( $args{encoding} );
-
-        eval { $u = $encoding->{ $args{encoding} }->decode( $u, Encode::FB_CROAK | Encode::LEAVE_SRC ); 1; } or do {
-            utf8::upgrade($u) if $@;
-        };
-    }
-
-    if ( defined wantarray ) {
-        return $u;
-    }
-    else {
-        $_[0] = $u;
-
-        return;
-    }
-}
-
-# always return HashMultivalue
-sub from_uri_query {
-    my %args = (
-        encoding => 'UTF-8',
-        splice @_, 1,
-    );
-
-    my $enc;
-
-    if ( $args{encoding} ) {
-        state $encoding = {};
-
-        $encoding->{ $args{encoding} } //= Encode::find_encoding( $args{encoding} );
-
-        $enc = $encoding->{ $args{encoding} };
-    }
-
-    my $res = P->hash->multivalue;
-
-    my $hash = $res->get_hash;
-
-    for my $key ( split /&/sm, $_[0] ) {
-        my $val;
-
-        if ( ( my $idx = index $key, q[=] ) != -1 ) {
-            $val = substr $key, $idx, length $key, q[];
-
-            substr $val, 0, 1, q[];
-
-            $val = URI::Escape::XS::decodeURIComponent($val);
-        }
-
-        $key = URI::Escape::XS::decodeURIComponent($key);
-
-        if ($enc) {
-
-            # decode key
-            eval { $key = $enc->decode( $key, Encode::FB_CROAK | Encode::LEAVE_SRC ); 1; } or do {
-                utf8::upgrade($key) if $@;
-            };
-
-            # decode value
-            if ( defined $val ) {
-                eval { $val = $enc->decode( $val, Encode::FB_CROAK | Encode::LEAVE_SRC ); 1; } or do {
-                    utf8::upgrade($val) if $@;
-                };
-            }
-        }
-
-        push $hash->{$key}->@*, $val;
-    }
-
-    if ( defined wantarray ) {
-        return $res;
-    }
-    else {
-        $_[0] = $res;
-
-        return;
-    }
-}
-
 # XOR
 sub to_xor ( $buf, $mask ) {
     no feature qw[bitwise];
@@ -759,6 +631,408 @@ sub to_xor ( $buf, $mask ) {
 
 *from_xor = \&to_xor;
 
+# URI - NOTE https://tools.ietf.org/html/rfc3986#appendix-A
+use Inline(
+    C => <<'C',
+
+# define ALPHA                   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# define DIGIT                   "0123456789"
+# define UNRESERVED              DIGIT ALPHA "-._~"
+# define GEN_DELIMS              ":/?#[]@"
+# define SUB_DELIMS              "!$&'()*+,;="
+# define PCHAR                   UNRESERVED SUB_DELIMS ":@" // unreserved / pct-encoded / sub-delims / ":" / "@"
+
+# define SAFE_URI_COMPONENT UNRESERVED                      // encode everything, same as encodeURIComponent
+# define SAFE_SCHEME        DIGIT ALPHA "+-."               // ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+# define SAFE_USERINFO      UNRESERVED SUB_DELIMS ":"       // *( unreserved / pct-encoded / sub-delims / ":" )
+# define SAFE_PATH          PCHAR "/"                       // *( pchar / "/" )
+# define SAFE_QUERY_FRAG    PCHAR "/?"                      // *( pchar / "/" / "?" )
+
+typedef struct {
+    char inited;
+    char map[256];
+    const char* safe;
+} URIEscapeMap;
+
+static URIEscapeMap map_uri_component  = { .safe = SAFE_URI_COMPONENT };
+static URIEscapeMap map_uri_scheme     = { .safe = SAFE_SCHEME };
+static URIEscapeMap map_uri_path       = { .safe = SAFE_PATH };
+static URIEscapeMap map_uri_query_frag = { .safe = SAFE_QUERY_FRAG };
+
+static URIEscapeMap map_hexdigit   = { .safe = "0123456789abcdefABCDEF" };
+static URIEscapeMap map_unreserved = { .safe = UNRESERVED };
+
+static const char* escape_tbl[256] = {
+    "%00","%01","%02","%03","%04","%05","%06","%07","%08","%09","%0A","%0B","%0C","%0D","%0E","%0F",
+    "%10","%11","%12","%13","%14","%15","%16","%17","%18","%19","%1A","%1B","%1C","%1D","%1E","%1F",
+    "%20","%21","%22","%23","%24","%25","%26","%27","%28","%29","%2A","%2B","%2C","%2D","%2E","%2F",
+    "%30","%31","%32","%33","%34","%35","%36","%37","%38","%39","%3A","%3B","%3C","%3D","%3E","%3F",
+    "%40","%41","%42","%43","%44","%45","%46","%47","%48","%49","%4A","%4B","%4C","%4D","%4E","%4F",
+    "%50","%51","%52","%53","%54","%55","%56","%57","%58","%59","%5A","%5B","%5C","%5D","%5E","%5F",
+    "%60","%61","%62","%63","%64","%65","%66","%67","%68","%69","%6A","%6B","%6C","%6D","%6E","%6F",
+    "%70","%71","%72","%73","%74","%75","%76","%77","%78","%79","%7A","%7B","%7C","%7D","%7E","%7F",
+    "%80","%81","%82","%83","%84","%85","%86","%87","%88","%89","%8A","%8B","%8C","%8D","%8E","%8F",
+    "%90","%91","%92","%93","%94","%95","%96","%97","%98","%99","%9A","%9B","%9C","%9D","%9E","%9F",
+    "%A0","%A1","%A2","%A3","%A4","%A5","%A6","%A7","%A8","%A9","%AA","%AB","%AC","%AD","%AE","%AF",
+    "%B0","%B1","%B2","%B3","%B4","%B5","%B6","%B7","%B8","%B9","%BA","%BB","%BC","%BD","%BE","%BF",
+    "%C0","%C1","%C2","%C3","%C4","%C5","%C6","%C7","%C8","%C9","%CA","%CB","%CC","%CD","%CE","%CF",
+    "%D0","%D1","%D2","%D3","%D4","%D5","%D6","%D7","%D8","%D9","%DA","%DB","%DC","%DD","%DE","%DF",
+    "%E0","%E1","%E2","%E3","%E4","%E5","%E6","%E7","%E8","%E9","%EA","%EB","%EC","%ED","%EE","%EF",
+    "%F0","%F1","%F2","%F3","%F4","%F5","%F6","%F7","%F8","%F9","%FA","%FB","%FC","%FD","%FE","%FF",
+};
+
+static void __init_map ( URIEscapeMap *map ) {
+    map->inited = 1;
+
+    for( int i = 0; map->safe[i] != '\0'; i++ ) {
+        map->map[ map->safe[i] ] = 1;
+    }
+}
+
+static void __init_hexdigit () {
+    map_hexdigit.inited = 1;
+
+    for( int i = 0; i < 256; i++ ) {
+        map_hexdigit.map[i] = 0xFF;
+    }
+
+    // 0 .. 9
+    map_hexdigit.map[48] = 0;
+    map_hexdigit.map[49] = 1;
+    map_hexdigit.map[50] = 2;
+    map_hexdigit.map[51] = 3;
+    map_hexdigit.map[52] = 4;
+    map_hexdigit.map[53] = 5;
+    map_hexdigit.map[54] = 6;
+    map_hexdigit.map[55] = 7;
+    map_hexdigit.map[56] = 8;
+    map_hexdigit.map[57] = 9;
+
+    // A .. Z
+    map_hexdigit.map[65] = 10;
+    map_hexdigit.map[66] = 11;
+    map_hexdigit.map[67] = 12;
+    map_hexdigit.map[68] = 13;
+    map_hexdigit.map[69] = 14;
+    map_hexdigit.map[70] = 15;
+
+    // a .. z
+    map_hexdigit.map[97] = 10;
+    map_hexdigit.map[98] = 11;
+    map_hexdigit.map[99] = 12;
+    map_hexdigit.map[100] = 13;
+    map_hexdigit.map[101] = 14;
+    map_hexdigit.map[102] = 15;
+
+    return;
+}
+
+static SV *__to_uri ( SV *uri, URIEscapeMap *type ) {
+    if ( !type->inited ) __init_map(type);
+
+    /* call fetch() if a tied variable to populate the sv */
+    SvGETMAGIC(uri);
+
+    /* check for undef */
+    if ( uri == &PL_sv_undef ) return newSV(0);
+
+    U8 *src;
+    size_t slen;
+
+    /* copy the sv without the magic struct */
+    src = SvPV_nomg_const(uri, slen);
+
+    /* create result SV */
+    SV *result = newSV( slen * 3 + 1 );
+    SvPOK_on(result);
+
+    size_t dlen = 0;
+    U8 *dst = (U8 *)SvPV_nolen(result);
+
+    for ( size_t i = 0; i < slen; i++ ) {
+        if ( type->map[ src[i] ] ) {
+            dst[dlen++] = src[i];
+        }
+        else{
+            memcpy( &dst[dlen], escape_tbl[ src[i] ], 3 );
+
+            dlen += 3;
+        }
+    }
+
+    dst[dlen] = '\0'; /*  for sure; */
+
+    /* set the current length of resutl */
+    SvCUR_set(result, dlen);
+
+    return result;
+}
+
+SV *to_uri_component (SV *uri) {
+    return __to_uri( uri, &map_uri_component );
+}
+
+SV *to_uri_scheme (SV *uri) {
+    return __to_uri( uri, &map_uri_scheme );
+}
+
+SV *to_uri_path (SV *uri) {
+    return __to_uri( uri, &map_uri_path );
+}
+
+SV *to_uri_query_frag ( SV *uri ) {
+    if ( !map_hexdigit.inited ) __init_hexdigit();
+
+    if ( !map_unreserved.inited ) __init_map(&map_unreserved);
+
+    if ( !map_uri_query_frag.inited ) __init_map(&map_uri_query_frag);
+
+    /* call fetch() if a tied variable to populate the sv */
+    SvGETMAGIC(uri);
+
+    /* check for undef */
+    if ( uri == &PL_sv_undef ) return newSV(0);
+
+    U8 *src;
+    size_t slen;
+
+    /* copy the sv without the magic struct */
+    src = SvPV_nomg_const(uri, slen);
+
+    /* create result SV */
+    SV *result = newSV( slen * 3 + 1 );
+    SvPOK_on(result);
+
+    size_t dlen = 0;
+    U8 *dst = (U8 *)SvPV_nolen(result);
+
+    for ( size_t i = 0; i < slen; i++ ) {
+
+        // "%" character
+        if ( src[i] == '%' ) {
+            if ( i + 2 < slen ) {
+                const unsigned char v1 = map_hexdigit.map[ (unsigned char) src[ i + 1 ] ];
+                const unsigned char v2 = map_hexdigit.map[ (unsigned char) src[ i + 2 ] ];
+
+                // valid pct sequence
+                if ( (v1 | v2) != 0xFF) {
+
+                    // decode %xx
+                    const unsigned char c = (v1 << 4) | v2;
+
+                    // char is unreserved, store as char
+                    if ( map_unreserved.map[c] ) {
+                        dst[ dlen++ ] = c;
+                    }
+
+                    // char is reserved, store as %xx seq.
+                    else {
+                        memcpy( &dst[dlen], escape_tbl[c], 3 );
+
+                        dlen += 3;
+                    }
+
+                    i += 2;
+                }
+
+                // invalid pct seq., just escape "%"
+                else {
+                    memcpy( &dst[dlen], escape_tbl[ 0x25 ], 3 );
+
+                    dlen += 3;
+                }
+            }
+
+            // escape "%"
+            else {
+                memcpy( &dst[dlen], escape_tbl[ 0x25 ], 3 );
+
+                dlen += 3;
+            }
+        }
+
+        // character is allowed, copy as is
+        else if ( map_uri_query_frag.map[ src[i] ] ) {
+            dst[dlen++] = src[i];
+        }
+
+        // character is not allowed, percent encode
+        else{
+            memcpy( &dst[dlen], escape_tbl[ src[i] ], 3 );
+
+            dlen += 3;
+        }
+    }
+
+    dst[dlen] = '\0'; /*  for sure; */
+
+    /* set the current length of resutl */
+    SvCUR_set(result, dlen);
+
+    return result;
+}
+
+SV *from_uri (SV *uri) {
+    if ( !map_hexdigit.inited ) __init_hexdigit();
+
+    /* call fetch() if a tied variable to populate the sv */
+    SvGETMAGIC(uri);
+
+    /* check for undef */
+    if ( uri == &PL_sv_undef ) return newSV(0);
+
+    U8 *src;
+    size_t slen;
+
+    /* copy the sv without the magic struct */
+    src = SvPV_nomg_const(uri, slen);
+
+    /* create result SV */
+    SV *result = newSV(slen + 1);
+    SvPOK_on(result);
+
+    size_t dlen = 0;
+    U8 *dst = (U8 *)SvPV_nolen(result);
+
+    for ( size_t i = 0; i < slen; i++ ) {
+        if ( src[i] == '%' && i + 2 < slen ) {
+            const unsigned char v1 = map_hexdigit.map[ (unsigned char) src[ i + 1 ] ];
+            const unsigned char v2 = map_hexdigit.map[ (unsigned char) src[ i + 2 ] ];
+
+            /* skip invalid hex sequences */
+            if ( (v1 | v2) != 0xFF) {
+                dst[ dlen++ ] = (v1 << 4) | v2;
+
+                i += 2;
+            }
+            else {
+                dst[ dlen++ ] = '%';
+            }
+        }
+        else {
+            dst[ dlen++ ] = src[i];
+        }
+    }
+
+    dst[ dlen ] = '\0';
+
+    /* set the current length of resutl */
+    SvCUR_set( result, dlen );
+
+    return result;
+}
+
+SV *from_uri_utf8 (SV *uri) {
+    SV *res = from_uri( uri );
+
+    sv_utf8_decode(res);
+
+    return res;
+}
+
+C
+    ccflagsex  => '-Wall -Wextra -Ofast -std=c11',
+    prototypes => 'ENABLE',
+    prototype  => {
+        to_uri_component  => '$',
+        to_uri_scheme     => '$',
+        to_uri_path       => '$',
+        to_uri_query_frag => '$',
+        from_uri          => '$',
+        from_uri_utf8     => '$',
+    },
+);
+
+sub to_uri : prototype($) ($data) {
+    return to_uri_component $data if !is_ref $data;
+
+    return to_uri_query($data);
+}
+
+sub to_uri_query : prototype($) ($data) {
+    return to_uri_query_frag $data if !is_ref $data;
+
+    $data = $data->get_hash if is_blessed_ref $data && $data->isa('Pcore::Util::Hash::Multivalue');
+
+    my @res;
+
+    if ( is_plain_arrayref $data ) {
+        for ( my $i = 0; $i <= $data->$#*; $i += 2 ) {
+            push @res, join q[=], defined $data->[$i] ? to_uri_component $data->[$i] : q[], defined $data->[ $i + 1 ] ? to_uri_component $data->[ $i + 1 ] : ();
+        }
+    }
+    elsif ( is_plain_hashref $data) {
+        while ( my ( $k, $v ) = each $data->%* ) {
+            $k = to_uri_component $k;
+
+            if ( ref $v ) {
+
+                # value is ArrayRef
+                for my $v1 ( $v->@* ) {
+                    push @res, join q[=], $k, defined $v1 ? to_uri_component $v1 : ();
+                }
+            }
+            else {
+                push @res, join q[=], $k, defined $v ? to_uri_component $v : ();
+            }
+        }
+    }
+    else {
+        die 'Unsupported ref type';
+    }
+
+    return join q[&], @res;
+}
+
+# always returns HashMultivalue
+sub from_uri_query : prototype($) ($uri) {
+    my $res = P->hash->multivalue;
+
+    my $hash = $res->get_hash;
+
+    for my $key ( split /&/sm, $_[0] ) {
+        my $val;
+
+        if ( ( my $idx = index $key, q[=] ) != -1 ) {
+            $val = substr $key, $idx, length $key, q[];
+
+            substr $val, 0, 1, q[];
+
+            $val = from_uri $val;
+        }
+
+        $key = from_uri $key;
+
+        push $hash->{$key}->@*, $val;
+    }
+
+    return $res;
+}
+
+sub from_uri_query_utf8 : prototype($) ($uri) {
+    my $res = P->hash->multivalue;
+
+    my $hash = $res->get_hash;
+
+    for my $key ( split /&/sm, $_[0] ) {
+        my $val;
+
+        if ( ( my $idx = index $key, q[=] ) != -1 ) {
+            $val = substr $key, $idx, length $key, q[];
+
+            substr $val, 0, 1, q[];
+
+            $val = from_uri_utf8 $val;
+        }
+
+        $key = from_uri_utf8 $key;
+
+        push $hash->{$key}->@*, $val;
+    }
+
+    return $res;
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -767,14 +1041,14 @@ sub to_xor ( $buf, $mask ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 49                   | * Subroutine "encode_data" with high complexity score (26)                                                     |
-## |      | 160                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
+## |      | 48                   | * Subroutine "encode_data" with high complexity score (26)                                                     |
+## |      | 159                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 365, 418             | * Postfix control "for" used                                                                                   |
-## |      | 753                  | * Postfix control "while" used                                                                                 |
+## |      | 364, 417             | * Postfix control "for" used                                                                                   |
+## |      | 625                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 617                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 960                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

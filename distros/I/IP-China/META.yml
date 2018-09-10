@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/chinese-ip/issues
   repository: https://github.com/benkasminbullock/chinese-ip
-version: '20180807'
+version: '20180905'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

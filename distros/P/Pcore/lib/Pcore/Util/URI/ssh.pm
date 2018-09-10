@@ -4,7 +4,7 @@ use Pcore -class;
 
 extends qw[Pcore::Util::URI];
 
-has is_secure    => 1;
+has is_ssh       => 1;
 has default_port => 22;
 
 1;

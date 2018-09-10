@@ -2,8 +2,8 @@ NAME
     App::depak - Pack your dependencies onto your script file
 
 VERSION
-    This document describes version 0.57 of App::depak (from Perl
-    distribution App-depak), released on 2017-07-14.
+    This document describes version 0.580 of App::depak (from Perl
+    distribution App-depak), released on 2018-09-10.
 
 SYNOPSIS
     See depak.
@@ -296,7 +296,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

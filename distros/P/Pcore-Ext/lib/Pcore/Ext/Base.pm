@@ -9,8 +9,6 @@ sub MODIFY_CODE_ATTRIBUTES ( $pkg, $ref, @attrs ) {
         if ( $attr =~ /(Define|Ext|Extend|Override|Type) [(] (?:'(.+?)')? [)]/smxx ) {
             my ( $attr, $val ) = ( $1, $2 );
 
-            no strict qw[refs];
-
             ${"$pkg\::_EXT_MAP"}->{$ref}->{ lc $attr } = $val;
         }
         else {

@@ -17,7 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Dist::Zilla::Plugin::Regexp::Pattern",
   "PREREQ_PM" => {
+    "Dist::Zilla::File::InMemory" => 0,
     "Dist::Zilla::Role::AfterBuild" => 0,
+    "Dist::Zilla::Role::FileGatherer" => 0,
+    "Dist::Zilla::Role::PrereqSource" => 0,
     "Moose" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
@@ -29,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +40,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Dist::Zilla::File::InMemory" => 0,
   "Dist::Zilla::Role::AfterBuild" => 0,
+  "Dist::Zilla::Role::FileGatherer" => 0,
+  "Dist::Zilla::Role::PrereqSource" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
