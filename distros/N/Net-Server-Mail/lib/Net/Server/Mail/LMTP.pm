@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base qw(Net::Server::Mail::ESMTP);
 
-our $VERSION = "0.23";
+our $VERSION = "0.24";
 
 =pod
 
@@ -36,7 +36,7 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocol
         my($session, $recipient) = @_;
 
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }

@@ -1,0 +1,253 @@
+#!/usr/bin/env perl
+
+our $VERSION = '0.006';
+
+# Copyright 2018 National Library of Finland
+# This file is part of Hetula.
+#
+# Hetula is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# Hetula is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You find a copy of the GNU General Public License
+# here <http://www.gnu.org/licenses>.
+
+use Modern::Perl;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use Getopt::Long;
+use Hetula::Client;
+use Data::Printer;
+
+use IO::Prompter {
+  prompt_password => [-timeout=>120, -echo=>'*'],
+  prompt_string   => [-timeout=>120],
+};
+
+
+my %args;
+Getopt::Long::GetOptions(
+  'a|action:s'          => \$args{action},
+  'c|credentials:s'     => \$args{credentials},
+  'l|list'              => \$args{listActions},
+  'o|organization:s'    => \$args{organization},
+  'p|password:s'        => \$args{password},
+  'u|username:s'        => \$args{username},
+  'url=s'               => \$args{baseURL},
+  'a|action:s'          => \$args{action},
+  'version'             => sub { Getopt::Long::VersionMessage() },
+  'h|help'              => sub {
+  print <<HELP;
+
+NAME
+  $0 - Interface with Hetula
+
+SYNOPSIS
+Does things to Hetula.
+
+DESCRIPTION
+If you have problems with the SSL certificate not being accepted, you can
+bypass some of Mojolicious' checks with
+  MOJO_INSECURE=1
+
+For more information, see
+  perldoc Hetula::Client
+
+  -a --action String
+      Instead of using the built-in menu, trigger a single action from the
+      commandline.
+      Give the action name with the necessary parameters,
+      eg. ssnsBatchAddFromFile(/tmp/ssns.txt,/tmp/ssns.results.txt)
+          userDisableAccount(username)
+
+  -c --credentials File
+      Where to read the username and password, is more secure than passing them
+      as commandline arguments directly.
+      These credentials overload any other parameters given.
+      The credentials file must consist of up to 4 lines, with each line
+      specifying the following commandline argument replacements:
+        username
+        password
+        organization
+        url
+
+  -l --list
+      List actions that can be invoked with --action
+
+  -o --organization String
+      Code of the Hetula organization we are operating on behalf.
+  
+  -p --password String
+      Login to Hetula with this. Avoid using this, will be asked securely if
+      not supplied. Use --credentials instead.
+
+  -u --username String
+      Login to Hetula with this.
+
+  --url String
+      base url of the Hetula instance to connect to.
+      ex. https://hetula.example.com
+
+  -v level
+        Verbose output to the STDOUT,
+
+  --version
+        Print version info
+
+HELP
+  exit 0;
+},
+) or die("Error in command line arguments: $! $@"); #EO Getopt::Long::GetOptions()
+
+
+if ($args{listActions}) {
+  listActions();
+  exit 0;
+}
+
+Hetula::Client::slurpCredentials($args{credentials}, \%args) if $args{credentials};
+
+Hetula::Client::_detectKohaEnvironment(\%args); #If using Koha, try to get the configurations from Koha's config
+
+
+$args{username}     = prompt_string(  "Hetula username:").''     unless $args{username};
+$args{password}     = prompt_password("Hetula password:").''     unless $args{password};
+$args{organization} = prompt_string(  "Hetula organization:").'' unless $args{organization};
+$args{baseURL}      = prompt_string(  "Hetula base URL:").''     unless $args{baseURL};
+
+my $hc = Hetula::Client->new({
+  baseURL => $args{baseURL},
+});
+
+my $resp = $hc->login({
+  username => $args{username},
+  password => $args{password},
+  organization => $args{organization},
+});
+die Data::Printer::np($resp) if $resp->{error};
+
+
+print "Login to organization '$args{organization}' succeeded\n";
+
+
+if ($args{action}) {
+  my $ok = __doAction($args{action});
+  exit $ok ? 0 : 1;
+}
+
+my $menu = {
+  'Add a new user' => {
+    'basic'                       => 'userBasicAdd',
+    'with read permission'        => 'userReadAdd',
+  },
+  'Batch import ssns from file' => 'ssnsBatchAddFromFile',
+  'Change password'             => 'userChangePassword',
+  'Disable account'             => 'userDisableAccount',
+  'Exit'                        => 'Exit',
+  'List actions'                => 'listActions',
+};
+while (1) {
+  my $action = prompt_string("Choose action:", -menu => $menu);
+  if ($action eq 'Exit') {
+    last;
+  }
+  __doAction($action);
+}
+
+sub userBasicAdd($username=undef, $password=undef, $realname=undef) {
+  my $params = _promptNewUser($username, $password, $realname);
+  my $resp = $hc->userBasicAdd($params);
+  Data::Printer::p($resp);
+}
+
+sub userReadAdd($username=undef, $password=undef, $realname=undef) {
+  my $params = _promptNewUser($username, $password, $realname);
+  my $resp = $hc->userReadAdd($params);
+  Data::Printer::p($resp);
+}
+
+sub userChangePassword($username=undef, $password=undef) {
+  my $params = {
+    username => $username || prompt_string(   "Username:" ).'',
+    password => $password || prompt_password( "Password:" ).'',
+  };
+  my $resp = $hc->userChangePassword($params);
+  Data::Printer::p($resp);
+}
+
+sub userDisableAccount($username=undef) {
+  my $params = {
+    username => $username || prompt_string(   "Username:" ).'',
+  };
+  my $resp = $hc->userDisableAccount($params);
+  Data::Printer::p($resp);
+}
+
+sub ssnsBatchAddFromFile($filenameIn=undef, $filenameOut=undef, $batchSize=500) {
+  $filenameIn = prompt_string( "Path to the ssns-file:").'' unless $filenameIn;
+  $filenameOut = prompt_string("Path to the ssns results -file, leave empty for default ($filenameIn.hetula):").'' unless $filenameOut;
+  unless ($filenameOut) {
+    $filenameOut = $filenameIn.'.hetula';
+    print "Output file defaults to '$filenameOut'";
+  }
+
+  $hc->ssnsBatchAddFromFile($filenameIn, $filenameOut, $batchSize);
+}
+
+sub listActions {
+  open(my $FH, '<:encoding(UTF-8)', $0) or die("Couldn't read '$0' for introspection??: $!");
+  my @program = <$FH>;
+  my %actions = map {
+    _parseAction($_);
+  } grep {$_ =~ /^sub\s+[^_]/} @program;
+  print "Actions and their parameters:\n";
+  Data::Printer::p(%actions);
+}
+
+sub _promptNewUser($username=undef, $password=undef, $realname=undef) {
+  return {
+    username => $username || prompt_string(   "Username:"  ).'',
+    password => $password || prompt_password( "Password:"  ).'',
+    realname => $realname || prompt_string(   "Real name:" ).'',
+  };
+}
+
+sub _parseAction($action) {
+  die("Couldn't parse action '$action' to parts!") unless ($action =~ /^(?:sub\s+)?(\w+)(?:\((.+?)\))?/);
+  $action = $1;
+  my @parts;
+  if ($2) {
+    @parts = split(',', $2);
+    @parts = map {$_ =~ s/^\s+|\s+$//; $_;} @parts;
+  }
+  @parts = ($action, [@parts]);
+  return @parts;
+}
+
+sub __doAction($action) {
+  my @parts = _parseAction($action);
+  $action = $parts[0];
+  my @params = @{$parts[1]};
+
+  print "Doing action '$action'".(@params ? " with parameters '@params'" : "")."\n";
+  my $sub = __PACKAGE__->can($action);
+  if ($sub) {
+    eval {$sub->(@params)};
+    if ($@) {
+      warn $@;
+      return 1;
+    }
+    return 0;
+  }
+  else {
+    print "Action '$action' is not possible!\n";
+    return 1;
+  }
+}

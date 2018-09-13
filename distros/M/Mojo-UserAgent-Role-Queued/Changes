@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojo-UserAgent-Role-Queued
 
+1.11 2018-09-12T14:09:24Z
+    - change queue from state variable to attribute, fixes github issue #4
+
 1.10 2018-09-05T16:12:57Z
     - change internals to use helper class object
     - fixes problems with synopsis example reported by tyldis via irc

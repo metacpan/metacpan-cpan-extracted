@@ -7,7 +7,7 @@ use Types::Standard qw(ArrayRef HashRef InstanceOf Str);
 use namespace::autoclean;
 use Module::Pluggable::Object;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 has namespace => (
@@ -124,7 +124,7 @@ eris::role::pluggable - Implements the plumbing for an object to support plugins
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -186,7 +186,7 @@ class names, not instantiated objects.>
 =head2 plugins_config
 
 A HashRef of configs for passing along to our plugins. The init arg for this
-parameter is 'config' to simplify instantiation and config files.
+parameter is 'config' to simplify creation and config files.
 
 Special considerations are taken when processing the hash.  The C<namespace> and C<search_path> are
 automatically prepended to all keys to allow pretty config.  This means I can pass a config like this:

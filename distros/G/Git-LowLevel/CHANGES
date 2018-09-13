@@ -1,9 +1,71 @@
 ==================================================
-Changes from 2017-07-16 00:00:00 +0000 to present.
+Changes from 2017-09-11 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.1 at 2018-07-16 19:58:02 +0000
+version 0.3 at 2018-09-11 17:56:25 +0000
+----------------------------------------
+
+  Change: 9c32478fe410bbd0889893e9727bbb1e16d93032
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:51:34 +0000
+
+    FIX: removed debug output 
+
+  Change: 612add0a80408c41e046f05fa73ae3efc7b30eb2
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:51:01 +0000
+
+    FIX: fixed path management 
+
+----------------------------------------
+version 0.2 at 2018-09-10 20:27:25 +0000
+----------------------------------------
+
+  Change: 2977e9de9aed6f8df42c688de3e2ca1dd2e8e13c
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:27:25 +0000
+
+    ADD: ignore more files 
+
+  Change: 159ed90bccd1d020abfdb2ef277e9890c80e87c7
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:25:56 +0000
+
+    FIX: removed some debugging output 
+
+  Change: 914564cc257585430cef38512bc001f25acd8985
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:20:18 +0000
+
+    ADD: methods for timestamp and commiter identification 
+
+  Change: e11c24c77cc72b890beba23923aeefd96e15cb59
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 21:15:14 +0000
+
+    ADD: only generate new tree if tree has changed 
+
+  Change: e957cbe5ee493a661d69fea81537f8e38084d48b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 21:14:21 +0000
+
+    ADD: identify newly created trees as changed 
+
+  Change: 956cfba9fc5a8ad1565cea94f92f34750400efa6
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 20:14:43 +0000
+
+    FIX: fixed tree parent management 
+
+  Change: be6bf5cdff6edb71ed64d5d237ea51571189739d
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 20:11:19 +0000
+
+    FIX: fixed bug with finding and treeEntry generation 
+
+----------------------------------------
+version 0.1 at 2018-07-16 17:37:26 +0000
 ----------------------------------------
 
   Change: c59abc5f2465018d060545fc50433bee05459128

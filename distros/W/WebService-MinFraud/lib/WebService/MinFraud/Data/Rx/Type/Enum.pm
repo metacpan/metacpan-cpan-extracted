@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use parent 'Data::Rx::CommonType::EasyNew';
 
@@ -82,7 +82,7 @@ WebService::MinFraud::Data::Rx::Type::Enum - A type that defines an enumeration
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

@@ -1,0 +1,129 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Backend::YAML - Cards/deck definition via YAML file
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model;
+   use Ordeal::Model::Backend::YAML;
+
+   # definition in "decks.yml", cards in "cards/*" inside base_directory
+   my $backend = Ordeal::Model::Backend::YAML->new(
+      base_directory => '/path/to/base'
+   );
+   my $model = Ordeal::Model->new(backend => $backend);
+
+   # get identifiers of all decks
+   my @decks = $backend->decks; # OR
+      @decks = $model->get_deck_ids;
+
+   my $deck = $backend->deck($deck_id); # OR
+      $deck = $model->get_deck($deck_id);
+
+   my $card = $backend->card($card_id); # OR
+      $card = $model->get_card($card_id);
+
+   my $card_path = $backend->path_for(card => $card_id);
+
+   my $ct = $backend->content_type_for('jpg');
+
+=head1 DESCRIPTION
+
+This module is a simple file-based backend for L<Ordeal::Model>; cards
+are assumed to be files, while the definition of all decks is inside a
+YAML file.
+
+It is based on a directory with the following structure:
+
+   *
+   +- cards *
+   |        +- card1.jpg
+   |        +- card2.jpg
+   |        ...
+   |
+   +- decks.yml
+
+Cards are C<PNG>, C<JPG> or C<SVG> files.
+
+Decks are defined inside file C<decks.yml>, in YAML format, composed of
+an associative array whose keys are deck identifiers and the associated
+values are associative arrays themselves, each defining a deck with the
+following keys:
+
+=over
+
+=item C<cards>
+
+(mandatory) list of card identifiers, i.e. file names referred to the
+C<cards> sub-directory.
+
+=item C<description>
+
+(optional) description of the deck.
+
+=back
+
+Example of a C<decks.yml> file:
+
+   deck1:
+      description: foo
+      cards:
+         - card1.jpg
+         - card2.jpg
+   deck2:
+      cards:
+         - card3.jpg
+         - card1.jpg
+         - card4.jpg
+
+=head1 METHODS
+
+This class inherits from L<Ordeal::Model::Backend::PlainFile> so it has
+its methods.
+
+=begin COMMENT
+
+This part silences Pod::Coverage, relevant methods are all documented in
+base class.
+
+=over
+
+=item deck
+
+=item decks
+
+=back
+
+=end COMMENT
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

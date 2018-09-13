@@ -4,11 +4,11 @@ eris - Eris is the Greek Goddess of Chaos
 
 # VERSION
 
-version 0.006
+version 0.007
 
 # SYNOPSIS
 
-eris exists to transform unstructuted, chaotic log data into structured messages.
+eris exists to transform unstructured, chaotic log data into structured messages.
 
 Born out of disappointment and regret of existing solutions like Logstash,
 fluentd, and their kind, eris aims to make development and debugging of
@@ -20,16 +20,15 @@ how a log message will be restructured.
 
 # DESCRIPTION
 
-eris is structured to allow flexibility, extensibility, and visibility in
-every component.
+eris is structured to be flexible, extensible, and visible in every component.
 
 # CONCEPTS
 
 ## DECODER
 
-Decoders are pluggable thanks to [eris::role::pluggable](https://metacpan.org/pod/eris::role::pluggable) and they are searched for in the
-the default namespace `eris::log::decoder`.  To add other namespaces, use the `search_path` paramter
-in a config file:
+Decoders are pluggable thanks to [eris::role::pluggable](https://metacpan.org/pod/eris::role::pluggable) and they are searched
+for in the the default namespace `eris::log::decoder`.  To add other
+namespaces, use the `search_path` parameter in a config file:
 
     ---
     decoders:
@@ -89,19 +88,20 @@ are 4 major things to consider when implementing a new context.
     This specifies the field or fields that a matcher will operate on.  There are
     two special fields `*` and `_exists_`.  The `*` is used in conjunction with
     a matcher of `*` to match all messages.  The `_exists_` operator is used to
-    check for the existance of a key in the context.  A sample use of this field
+    check for the existence of a key in the context.  A sample use of this field
     specifier is used by the [eris::log::context::GeoIP](https://metacpan.org/pod/eris::log::context::GeoIP) context with an regex
     matcher to operate on any event data with field names matching `'_ip$'`.
 
 - **matcher**
 
     Can be `*`, a string, a regex ref, an array reference, or a code reference.
-    If `*` and `field` is `*` means match every message.  If a literal string,
-    or array reference, the literal string is checked against the value of in the
-    `field` specified above and returns 1 if they are equivalent.  If a regex
-    reference, the regex is applied to the value in the specified `field` and the
-    context is applied if the regex matches.  A code reference should return 1 if
-    the event is relevant to the context and 0 if it doesn't apply.
+    If `matcher` and `field` are set to `*`, every message matches.  If a
+    literal string, or array reference, the literal string is checked against the
+    value of in the `field` specified above and returns 1 if they are equivalent.
+    If a regex reference, the regex is applied to the value in the specified
+    `field` and the context is applied if the regex matches.  A code reference
+    should return 1 if the event is relevant to the context and 0 if it doesn't
+    apply.
 
 The default `field` is 'program', and the default matcher is a string with the
 value equal to the context's `name` attribute.  For instance,
@@ -131,7 +131,7 @@ with a value of 'sshd'.
 
 Dictionaries are used in conjunction with schemas to filter [eris::log](https://metacpan.org/pod/eris::log) contexts down to
 only the keys and values we want.  This allows better control of the data headed into storage
-to prevent key space explossons.
+to prevent key space explosions.
 
 ### SEE ALSO
 
@@ -178,7 +178,7 @@ transform unstructured logging data into structured data and then rules for
 taking that structured data and storing it somewhere.  That sounds cool, but
 there's nothing useful about it unless you can start playing with it now.
 
-This is why eris ship withs sample implementations.
+This is why eris ships with sample implementations.
 
 ## Scripts
 
@@ -209,7 +209,7 @@ breaking things.
 
         eris-context.pl -b /var/log/messsages
 
-    Via STDIN (for you crazy copy-pastafarians):
+    Via STDIN for testing or manually importing data:
 
         eris-context.pl -b
 

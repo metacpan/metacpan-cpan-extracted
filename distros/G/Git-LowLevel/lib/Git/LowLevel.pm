@@ -42,11 +42,8 @@ private_method _isGit => sub {
 sub BUILD {
   my $self = shift;
 
-  print "BUILD\n";
   die("directory does not exist (".$self->git_dir . " )") unless -d $self->git_dir();
   die("directory is not a git repository (" .$self->git_dir . " )") unless $self->_isGit();
-
-  print $self->_isGit() . "----\n";
 
   #update gitcmd attribute
   $self->gitcmd($self->gitcmd . ' --git-dir='.$self->git_dir());
@@ -82,7 +79,7 @@ Git::LowLevel - LowLevel Blob/Tree/Commit operations on a GIT Repository
 
 =head1 VERSION
 
-version 0.1
+version 0.3
 
 =head1 DESCRIPTION
 

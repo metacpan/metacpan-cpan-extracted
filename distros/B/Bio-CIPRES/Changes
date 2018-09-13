@@ -1,5 +1,8 @@
 Revision history for Bio-CIPRES
 
+0.004002 2018-09-10
+         Fix credential encoding bug
+
 0.004001 2018-09-01
          Improved checks and safeguards on file downloads
          Expanded test coverage

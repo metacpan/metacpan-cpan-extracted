@@ -19,3 +19,4 @@ Text-CSV-Easy_XS-*.tar.gz
 Easy_XS.c
 Easy_XS.o
 Easy_XS.bs
+*.bak

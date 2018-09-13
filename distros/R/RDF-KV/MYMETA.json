@@ -47,10 +47,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/doriantaylor/p5-rdf-kv/issues"
+      },
+      "homepage" : "https://github.com/doriantaylor/p5-rdf-kv",
       "license" : [
-         "http://apache.org/licenses/LICENSE-2.0"
-      ]
+         "http://www.apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doriantaylor/p5-rdf-kv.git"
+      }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

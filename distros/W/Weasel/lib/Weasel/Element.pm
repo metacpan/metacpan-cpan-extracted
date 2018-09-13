@@ -20,12 +20,19 @@ attributes and the tag name, etc.
 
 =cut
 
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::Element;
 
 use strict;
 use warnings;
 
 use Moose;
+use namespace::autoclean;
 
 =head1 ATTRIBUTES
 
@@ -40,7 +47,8 @@ belongs.  Used to access the session's driver to query element properties.x
 
 has session => (is => 'ro',
                 isa => 'Weasel::Session',
-                required => 1);
+                required => 1,
+    );
 
 =item _id
 
@@ -54,7 +62,7 @@ has _id => (is => 'ro',
 
 =back
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =over
 
@@ -135,7 +143,7 @@ sub has_class {
     my ($self, $class) = @_;
 
     return grep { $_ eq $class }
-        split /\s+/, ($self->get_attribute('class') // '');
+        split /\s+/x, ($self->get_attribute('class') // '');
 }
 
 =item is_displayed
@@ -159,7 +167,7 @@ Scrolls the element into the viewport and simulates it being clicked on.
 
 sub click {
     my ($self) = @_;
-    $self->session->click($self);
+    return $self->session->click($self);
 }
 
 =item send_keys(@keys)
@@ -174,7 +182,7 @@ number of strings containing unicode characters to be sent.  E.g.
 sub send_keys {
     my ($self, @keys) = @_;
 
-    $self->session->send_keys($self, @keys);
+    return $self->session->send_keys($self, @keys);
 }
 
 =item tag_name()
@@ -193,5 +201,44 @@ sub tag_name {
 
 =cut
 
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+ (C) 2016  Erik Huelsmann
+
+Licensed under the same terms as Perl.
+
+=cut
+
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+

@@ -1,8 +1,9 @@
 package Devel::ModuleBreaker;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 sub import {
     our @modules = @_[1..$#_];
-    require "perl5db.pl";
+    my $E = $ENV{PERL5DBX} || 'require "perl5db.pl"';
+    eval $E;
 }
 CHECK {
     for my $module (our @modules) {
@@ -20,7 +21,7 @@ simultaneously
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 
@@ -50,6 +51,30 @@ to automatically set breakpoints in any compile-time subroutine loaded from
 a filename that matches a regular expression
 
 =back
+
+=head1 ENVIRONMENT
+
+Perl normally reads the L<< C<PERL5DB> environment variable
+|perldebug/"Debugger Customization" >> when the C<-d> or C<-dt>
+switches are included in the C<perl> invocation. This environment
+variable is used to defined custom debugger subroutines or to
+get Perl to load a customized debugger script.
+
+When the switch is used like C<-d:>I<Module>, Perl overwrites
+the C<PERL5DB> environment variable before the debugging module
+is loaded. C<Devel::ModuleBreaker>, L<Devel::FileBreaker>, and
+L<Devel::SubBreaker> work around this by analyzing the
+C<PERL5DBX> environment variable to enable further customization
+of the debugger. For example, if you can invoke your custom debugger
+with the command line
+
+    PERL5DB='BEGIN{require "myperl5db.pl"}' perl -d myscript.pl
+
+then you could also use the debugger modules in this distribution
+with a command line like
+
+    PERL5DBX='BEGIN{require "myperl5db.pl"}' perl -d:ModuleBreaker=Module1 myscript.pl
+
 
 =head1 USAGE
 

@@ -40,10 +40,12 @@ my $db = DBI->connect( 'dbi:Pg:host=udd-mirror.debian.net;dbname=udd',
 verbose('Connected to UDD');
 my $st
     = $db->prepare(
-          "select package, version\n"
+          "with a as (select distinct source, source_version\n"
         . 'from packages_summary where maintainer_email in ('
         . join( ', ', ( ('?') x scalar(@opt_maintainer) ) )
-        . ') and distribution=? and release=?' );
+        . ") and distribution=? and release=?)\n"
+        . 'select source, max(source_version) from a group by 1'
+    );
 $st->execute( @opt_maintainer, $opt_distribution, $opt_release );
 
 my $rows = $st->fetchall_arrayref;

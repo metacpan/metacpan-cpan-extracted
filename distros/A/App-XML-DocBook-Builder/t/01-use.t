@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Test::Trap
     qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
@@ -301,6 +301,42 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
             ]
         ],
         "Testing xhtml-1_1",
+    );
+}
+
+{
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",            "--stringparam",
+                "empty.param=",  "-o",
+                "my-output-dir", "xhtml5",
+                "input.xml",
+            ]
+        }
+    );
+
+    # TEST
+    ok( $docmake, "xhtml5 docmake was constructed successfully" );
+
+    $docmake->run();
+
+    # TEST
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
+        [
+            [
+                "xsltproc",
+                "-o",
+                "my-output-dir/",
+                "--stringparam",
+                "empty.param",
+                "",
+"http://docbook.sourceforge.net/release/xsl/current/xhtml5/docbook.xsl",
+                "input.xml",
+            ]
+        ],
+        "Testing xhtml5",
     );
 }
 

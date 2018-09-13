@@ -11,7 +11,7 @@ ETL::Yertl::Help::ysql - A guide to using ysql to work with SQL databases
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 DESCRIPTION
 

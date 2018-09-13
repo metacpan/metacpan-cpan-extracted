@@ -6,7 +6,7 @@ package BSON::Types;
 # ABSTRACT: Helper functions to wrap BSON type classes
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -49,6 +49,8 @@ use BSON::Regex;        # bson_regex
 use BSON::String;       # bson_string
 use BSON::Time;         # bson_time
 use BSON::Timestamp;    # bson_timestamp
+use BSON::Symbol;
+use BSON::DBPointer;
 
 # deprecated, but load anyway
 use BSON::Bool;
@@ -335,7 +337,7 @@ BSON::Types - Helper functions to wrap BSON type classes
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 

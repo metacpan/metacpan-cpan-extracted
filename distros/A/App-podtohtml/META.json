@@ -16,12 +16,13 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
          }
       },
       "develop" : {
          "requires" : {
-            "Perinci::CmdLine::Inline" : "0.542",
+            "Perinci::CmdLine::Inline" : "0.543",
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -34,10 +35,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Tar" : "0",
             "Browser::Open" : "0",
+            "Complete::Util" : "0.57",
+            "File::ShareDir" : "0",
+            "File::Slurper" : "0",
             "File::Temp" : "0",
+            "File::chdir" : "0",
+            "FindBin" : "0",
             "Module::Path::More" : "0.32",
-            "Perinci::Sub::Property::cmdline" : "0",
             "Pod::Html" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -65,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-podtohtml"
       }
    },
-   "version" : "0.003",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -137,6 +137,75 @@ my $benzene =
 my $benz = $hack->read_string_mol($benzene,'xyz');
 is($benz->count_atoms, 12, '12 atoms read in using a string!' );
 
+my $viral_3j3q_cif =
+'ATOM 5385    N N   . VAL C   1 230 ? 324.140 958.751  380.503 1.0 0.00 ? 230 VAL ga N   1
+ATOM 5386    C CA  . VAL C   1 230 ? 325.000 959.272  379.469 1.0 0.00 ? 230 VAL ga CA  1
+ATOM 5387    C C   . VAL C   1 230 ? 324.380 959.228  378.117 1.0 0.00 ? 230 VAL ga C   1
+ATOM 5388    O O   . VAL C   1 230 ? 323.760 958.294  377.715 1.0 0.00 ? 230 VAL ga O   1
+ATOM 5389    C CB  . VAL C   1 230 ? 326.490 958.762  379.611 1.0 0.00 ? 230 VAL ga CB  1
+ATOM 5390    C CG1 . VAL C   1 230 ? 327.030 959.293  380.927 1.0 0.00 ? 230 VAL ga CG1 1
+ATOM 5391    C CG2 . VAL C   1 230 ? 326.490 957.239  379.477 1.0 0.00 ? 230 VAL ga CG2 1
+ATOM 5392    N N   . LEU C   1 231 ? 324.620 960.407  377.457 1.0 0.00 ? 231 LEU ga N   1
+ATOM 5393    C CA  . LEU C   1 231 ? 324.220 960.708  376.094 1.0 0.00 ? 231 LEU ga CA  1
+ATOM 5394    C C   . LEU C   1 231 ? 325.400 960.443  375.037 1.0 0.00 ? 231 LEU ga C   1
+ATOM 5395    O O   . LEU C   1 231 ? 325.420 959.347  374.423 1.0 0.00 ? 231 LEU ga O   1
+ATOM 5396    C CB  . LEU C   1 231 ? 323.590 962.118  376.020 1.0 0.00 ? 231 LEU ga CB  1
+ATOM 5397    C CG  . LEU C   1 231 ? 322.820 962.406  374.688 1.0 0.00 ? 231 LEU ga CG  1
+ATOM 5398    C CD1 . LEU C   1 231 ? 321.840 961.262  374.231 1.0 0.00 ? 231 LEU ga CD1 1
+ATOM 5399    C CD2 . LEU C   1 231 ? 322.070 963.693  375.125 1.0 0.00 ? 231 LEU ga CD2 1
+ATOM 5400    O OXT . LEU C   1 231 ? 326.370 961.240  374.918 1.0 0.00 ? 231 LEU ga OXT 1
+ATOM 5401    N N   . PRO D   1 1   ? 279.970 945.618  347.788 1.0 0.00 ? 1   PRO gb N   1
+ATOM 5402    C CA  . PRO D   1 1   ? 279.630 946.879  348.520 1.0 0.00 ? 1   PRO gb CA  1
+ATOM 5403    C C   . PRO D   1 1   ? 279.080 947.872  347.570 1.0 0.00 ? 1   PRO gb C   1
+ATOM 5404    O O   . PRO D   1 1   ? 279.240 947.647  346.388 1.0 0.00 ? 1   PRO gb O   1
+ATOM 5405    C CB  . PRO D   1 1   ? 280.940 947.248  349.276 1.0 0.00 ? 1   PRO gb CB  1
+ATOM 5406    C CG  . PRO D   1 1   ? 282.030 946.520  348.432 1.0 0.00 ? 1   PRO gb CG  1
+ATOM 5407    C CD  . PRO D   1 1   ? 281.400 945.145  348.003 1.0 0.00 ? 1   PRO gb CD  1
+ATOM 5408    N N   . ILE D   1 2   ? 278.460 948.915  348.086 1.0 0.00 ? 2   ILE gb N   1
+ATOM 5409    C CA  . ILE D   1 2   ? 277.980 949.997  347.340 1.0 0.00 ? 2   ILE gb CA  1
+ATOM 5410    C C   . ILE D   1 2   ? 278.720 951.208  347.794 1.0 0.00 ? 2   ILE gb C   1
+ATOM 5411    O O   . ILE D   1 2   ? 278.970 951.417  348.964 1.0 0.00 ? 2   ILE gb O   1
+ATOM 5412    C CB  . ILE D   1 2   ? 276.490 950.161  347.487 1.0 0.00 ? 2   ILE gb CB  1
+ATOM 5413    C CG1 . ILE D   1 2   ? 275.710 948.961  347.008 1.0 0.00 ? 2   ILE gb CG1 1
+ATOM 5414    C CG2 . ILE D   1 2   ? 276.010 951.525  346.925 1.0 0.00 ? 2   ILE gb CG2 1
+ATOM 5415    C CD1 . ILE D   1 2   ? 275.950 948.634  345.500 1.0 0.00 ? 2   ILE gb CD1 1
+ATOM 5385    N N   . VAL C   1 230 ? 324.140 958.751  380.503 1.0 0.00 ? 230 VAL ga N   2
+ATOM 5386    C CA  . VAL C   1 230 ? 325.000 959.272  379.469 1.0 0.00 ? 230 VAL ga CA  2
+ATOM 5387    C C   . VAL C   1 230 ? 324.380 959.228  378.117 1.0 0.00 ? 230 VAL ga C   2
+ATOM 5388    O O   . VAL C   1 230 ? 323.760 958.294  377.715 1.0 0.00 ? 230 VAL ga O   2
+ATOM 5389    C CB  . VAL C   1 230 ? 326.490 958.762  379.611 1.0 0.00 ? 230 VAL ga CB  2
+ATOM 5390    C CG1 . VAL C   1 230 ? 327.030 959.293  380.927 1.0 0.00 ? 230 VAL ga CG1 2
+ATOM 5391    C CG2 . VAL C   1 230 ? 326.490 957.239  379.477 1.0 0.00 ? 230 VAL ga CG2 2
+ATOM 5392    N N   . LEU C   1 231 ? 324.620 960.407  377.457 1.0 0.00 ? 231 LEU ga N   2
+ATOM 5393    C CA  . LEU C   1 231 ? 324.220 960.708  376.094 1.0 0.00 ? 231 LEU ga CA  2
+ATOM 5394    C C   . LEU C   1 231 ? 325.400 960.443  375.037 1.0 0.00 ? 231 LEU ga C   2
+ATOM 5395    O O   . LEU C   1 231 ? 325.420 959.347  374.423 1.0 0.00 ? 231 LEU ga O   2
+ATOM 5396    C CB  . LEU C   1 231 ? 323.590 962.118  376.020 1.0 0.00 ? 231 LEU ga CB  2
+ATOM 5397    C CG  . LEU C   1 231 ? 322.820 962.406  374.688 1.0 0.00 ? 231 LEU ga CG  2
+ATOM 5398    C CD1 . LEU C   1 231 ? 321.840 961.262  374.231 1.0 0.00 ? 231 LEU ga CD1 2
+ATOM 5399    C CD2 . LEU C   1 231 ? 322.070 963.693  375.125 1.0 0.00 ? 231 LEU ga CD2 2
+ATOM 5400    O OXT . LEU C   1 231 ? 326.370 961.240  374.918 1.0 0.00 ? 231 LEU ga OXT 2
+ATOM 5401    N N   . PRO D   1 1   ? 279.970 945.618  347.788 1.0 0.00 ? 1   PRO gb N   2
+ATOM 5402    C CA  . PRO D   1 1   ? 279.630 946.879  348.520 1.0 0.00 ? 1   PRO gb CA  2
+ATOM 5403    C C   . PRO D   1 1   ? 279.080 947.872  347.570 1.0 0.00 ? 1   PRO gb C   2
+ATOM 5404    O O   . PRO D   1 1   ? 279.240 947.647  346.388 1.0 0.00 ? 1   PRO gb O   2
+ATOM 5405    C CB  . PRO D   1 1   ? 280.940 947.248  349.276 1.0 0.00 ? 1   PRO gb CB  2
+ATOM 5406    C CG  . PRO D   1 1   ? 282.030 946.520  348.432 1.0 0.00 ? 1   PRO gb CG  2
+ATOM 5407    C CD  . PRO D   1 1   ? 281.400 945.145  348.003 1.0 0.00 ? 1   PRO gb CD  2
+ATOM 5408    N N   . ILE D   1 2   ? 278.460 948.915  348.086 1.0 0.00 ? 2   ILE gb N   2
+ATOM 5409    C CA  . ILE D   1 2   ? 277.980 949.997  347.340 1.0 0.00 ? 2   ILE gb CA  2
+ATOM 5410    C C   . ILE D   1 2   ? 278.720 951.208  347.794 1.0 0.00 ? 2   ILE gb C   2
+ATOM 5411    O O   . ILE D   1 2   ? 278.970 951.417  348.964 1.0 0.00 ? 2   ILE gb O   2
+ATOM 5412    C CB  . ILE D   1 2   ? 276.490 950.161  347.487 1.0 0.00 ? 2   ILE gb CB  2
+ATOM 5413    C CG1 . ILE D   1 2   ? 275.710 948.961  347.008 1.0 0.00 ? 2   ILE gb CG1 2
+ATOM 5414    C CG2 . ILE D   1 2   ? 276.010 951.525  346.925 1.0 0.00 ? 2   ILE gb CG2 2
+ATOM 5415    C CD1 . ILE D   1 2   ? 275.950 948.634  345.500 1.0 0.00 ? 2   ILE gb CD1 2';
+
+my $viral_chunk = $hack->read_string_mol($viral_3j3q_cif,'cif');
+is($viral_chunk->count_atoms, 31, '12 atoms read in viral_chunk a string!' );
+is($viral_chunk->get_atoms(30)->entity_id, 1, 'entity_id');
+is($viral_chunk->get_atoms(30)->auth_asym_id, 'gb', 'entity_id');
+
 }
 
 {    # croaking and carping

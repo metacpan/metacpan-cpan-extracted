@@ -5,7 +5,7 @@ CatalystX::InjectModule:
   path:
     - t/share/modulesX
     - t/share/modules
-#    - __INC__
+    - __NO_INC__
   inject:
-    - Template
+    - TemplateTT
   persistent_dir: t/var/

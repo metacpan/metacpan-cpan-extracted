@@ -20,11 +20,11 @@ my $file = 'yizkjweiasdkjadwkejfakdEWWW78ss.cfg';
 warnings_like { set_log_config($file) } qr/Configuration file unchanged/, 'Rejects non existent file';
 
 my $package    = 'Log-Log4perl-Shortcuts';
-my $config = File::UserConfig->new(dist => $package);
-my $config_dir = $config->configdir;
-my $file_abs         = path($config_dir, 'log_config', $file)->canonpath;
-my $default       = path($config_dir, 'log_config', 'default.cfg')->canonpath;
-copy ($default, $file_abs);
+my $config     = File::UserConfig->new(dist => $package);
+my $config_dir = $config->sharedir;
+my $file_abs   = path($config_dir, 'log_config', $file)->canonpath;
+my $default    = path('config', 'log_config', 'default.cfg')->canonpath;
+copy ($default, $file_abs) or die "Copy failed: $!";
 
-ok ( set_log_config($file) == 'success', 'config file changed');
+ok ( set_log_config($file_abs) == 'success', 'config file changed');
 unlink $file_abs;

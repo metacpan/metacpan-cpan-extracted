@@ -6,11 +6,13 @@ package BSON::DBRef;
 # ABSTRACT: BSON type wrapper for MongoDB DBRefs
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Tie::IxHash;
 use Moo 2.002004;
 use namespace::clean -except => 'meta';
+
+use BSON ();
 
 #pod =attr id
 #pod
@@ -116,7 +118,7 @@ sub _ordered {
 #pod =method TO_JSON
 #pod
 #pod If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     { "$ref": "<collection name>", "$id": "<id>" }
@@ -130,12 +132,27 @@ sub TO_JSON {
     my $self = shift;
 
     if ( $ENV{BSON_EXTJSON} ) {
-        return {
-            '$ref' => $self->ref,
-            '$id'  => $self->id,
-            ( defined($self->db) ? ( '$db' => $self->db ) : () ),
-            %{ $self->extra },
-        };
+        my $id = $self->id;
+
+        if (ref $id) {
+            $id = $id->TO_JSON;
+        }
+        else {
+            $id = BSON->perl_to_extjson($id);
+        }
+
+        my %data;
+        tie( %data, 'Tie::IxHash' );
+        $data{'$ref'} = $self->ref;
+        $data{'$id'} = $id;
+        $data{'$db'} = $self->db
+            if defined $self->db;
+
+        my $extra = $self->extra;
+        $data{$_} = $extra->{$_}
+            for keys %$extra;
+
+        return \%data;
     }
 
     Carp::croak( "The value '$self' is illegal in JSON" );
@@ -153,7 +170,7 @@ BSON::DBRef - BSON type wrapper for MongoDB DBRefs
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -216,7 +233,7 @@ B<USE OF THIS FIELD FOR NEW DBREFS IS NOT RECOMMENDED.>
 =head2 TO_JSON
 
 If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     { "$ref": "<collection name>", "$id": "<id>" }

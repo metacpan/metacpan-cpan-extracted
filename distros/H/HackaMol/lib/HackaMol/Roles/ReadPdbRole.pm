@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbRole;
-$HackaMol::Roles::ReadPdbRole::VERSION = '0.048';
+$HackaMol::Roles::ReadPdbRole::VERSION = '0.049';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -184,7 +184,7 @@ HackaMol::Roles::ReadPdbRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

@@ -14,6 +14,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Select" => "0";
   requires "Module::Metadata" => "0";
+  requires "Net::EmptyPort" => "0";
   requires "Test::More" => "0";
   requires "Test::Roo" => "0";
   requires "Test::Roo::DataDriven" => "0";

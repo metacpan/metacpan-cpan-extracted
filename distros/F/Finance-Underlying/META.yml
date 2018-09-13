@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Finance-Underlying/issues
   repository: git://github.com/binary-com/perl-Finance-Underlying.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.66'

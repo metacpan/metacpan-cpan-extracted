@@ -2,11 +2,15 @@ package ath;
 use strict;
 use warnings;
 use Math::Calc::Parser;
-our $VERSION = '1.001';
+use Encode ();
+our $VERSION = '1.002';
 use Filter::Simple sub {
-	$_ = 'print Math::Calc::Parser::calc "'.quotemeta($_).'", "\n";'
+	my $expr = quotemeta Encode::decode 'UTF-8', "$_", Encode::FB_CROAK | Encode::LEAVE_SRC;
+	$_ = 'use utf8; print Math::Calc::Parser::calc "' . $expr . '", "\n";'
 };
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -18,6 +22,7 @@ ath - Evaluate mathematical expressions in a compact one-liner
   $ perl -Math -e'5!'
   $ perl -Math -e'round e^(i*pi)'
   $ perl -Math -e'log 5rand'
+  $ perl -Math -e'2π'
 
 =head1 DESCRIPTION
 

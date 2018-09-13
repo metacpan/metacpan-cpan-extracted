@@ -79,7 +79,7 @@ my @num_tests = (
 subtest "compile option: no_modules" => sub {
     no warnings 'once';
     local $Data::Sah::Compiler::perl::NO_MODULES = 1;
-    lib::filter->import(allow_core=>0, allow_noncore=>0, allow_re=>'^(Data::Sah::Type::.+|Data::Sah::Compiler::(human|perl)::.+|Data::Sah::Coerce::perl::.+)$');
+    lib::filter->import(allow_core=>0, allow_noncore=>0, allow_re=>'^(Data::Sah::Type::.+|Data::Sah::Compiler::(human|perl)::.+|Data::Sah::Coerce::perl::.+|alias::module)$');
     test_sah_cases(\@num_tests);
     lib::filter->unimport;
 };

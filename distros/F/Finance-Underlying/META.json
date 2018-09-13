@@ -72,7 +72,7 @@
          "web" : "https://github.com/binary-com/perl-Finance-Underlying"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

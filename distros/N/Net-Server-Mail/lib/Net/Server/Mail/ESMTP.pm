@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use base qw(Net::Server::Mail::SMTP);
 
-our $VERSION = "0.23";
+our $VERSION = "0.24";
 
 =pod
 
@@ -40,7 +40,7 @@ Net::Server::Mail::ESMTP - A module to implement the ESMTP protocol
         my($session, $recipient) = @_;
 
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }

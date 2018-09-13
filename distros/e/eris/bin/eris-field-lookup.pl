@@ -7,15 +7,9 @@ use warnings;
 
 use CLI::Helpers qw(:output);
 use Data::Printer;
-use FindBin;
 use Getopt::Long::Descriptive;
-use Path::Tiny;
 use YAML;
 use eris::dictionary;
-
-#------------------------------------------------------------------------#
-# Path Setup
-my $path_base = path("$FindBin::Bin")->parent;
 
 #------------------------------------------------------------------------#
 # Argument Parsing
@@ -23,7 +17,7 @@ my ($opt,$usage) = describe_options(
     "%c %o <fields to lookup>",
     [ 'list|l',     "list all available fields" ],
     [],
-    [ 'config|c:s', "eris config file", {
+    [ 'config|c=s', "eris config file", {
         callbacks => { exists => sub { -f shift } }
     }],
 );
@@ -62,7 +56,7 @@ eris-field-lookup.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

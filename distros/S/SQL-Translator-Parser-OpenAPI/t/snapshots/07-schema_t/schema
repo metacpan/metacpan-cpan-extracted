@@ -1,0 +1,64 @@
+'SET foreign_key_checks=0;
+
+--
+-- Table: `classes`
+--
+CREATE TABLE `classes` (
+  `id` integer NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL,
+  INDEX `pk_id` (`id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+--
+-- Table: `errors`
+--
+CREATE TABLE `errors` (
+  `code` integer NOT NULL,
+  `id` integer NOT NULL auto_increment,
+  `message` varchar(255) NOT NULL,
+  INDEX `pk_id` (`id`),
+  PRIMARY KEY (`id`)
+);
+
+--
+-- Table: `students`
+--
+CREATE TABLE `students` (
+  `id` bigint NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL,
+  INDEX `pk_id` (`id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+--
+-- Table: `class_backupclass_student_participants`
+--
+CREATE TABLE `class_backupclass_student_participants` (
+  `classes_backupclass_id` bigint NOT NULL,
+  `id` integer NOT NULL auto_increment,
+  `students_participant_id` integer NOT NULL,
+  INDEX `pk_id` (`id`),
+  INDEX (`classes_backupclass_id`),
+  INDEX (`students_participant_id`),
+  PRIMARY KEY (`id`),
+  CONSTRAINT `class_backupclass_student_participants_fk` FOREIGN KEY (`classes_backupclass_id`) REFERENCES `classes` (`id`),
+  CONSTRAINT `class_backupclass_student_participants_fk_1` FOREIGN KEY (`students_participant_id`) REFERENCES `students` (`id`)
+) ENGINE=InnoDB;
+
+--
+-- Table: `class_mainclass_student_participants`
+--
+CREATE TABLE `class_mainclass_student_participants` (
+  `classes_mainclass_id` bigint NOT NULL,
+  `id` integer NOT NULL auto_increment,
+  `students_participant_id` integer NOT NULL,
+  INDEX `pk_id` (`id`),
+  INDEX (`classes_mainclass_id`),
+  INDEX (`students_participant_id`),
+  PRIMARY KEY (`id`),
+  CONSTRAINT `class_mainclass_student_participants_fk` FOREIGN KEY (`classes_mainclass_id`) REFERENCES `classes` (`id`),
+  CONSTRAINT `class_mainclass_student_participants_fk_1` FOREIGN KEY (`students_participant_id`) REFERENCES `students` (`id`)
+) ENGINE=InnoDB;
+
+SET foreign_key_checks=1;'

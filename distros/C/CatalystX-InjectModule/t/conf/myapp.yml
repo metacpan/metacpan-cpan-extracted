@@ -5,9 +5,10 @@ CatalystX::InjectModule:
   path:
     - t/share/modulesX
     - t/share/modules
-#    - __INC__
+    - __NO_INC__
   inject:
     - ViewTT
     - Ax
     - A
   persistent_dir: t/var/
+  

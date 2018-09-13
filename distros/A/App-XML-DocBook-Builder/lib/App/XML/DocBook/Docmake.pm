@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0406';
+$App::XML::DocBook::Docmake::VERSION = '0.0500';
 use strict;
 use warnings;
 
@@ -12,43 +12,39 @@ use Pod::Usage;
 use parent 'Class::Accessor';
 
 
-__PACKAGE__->mk_accessors(qw(
-    _base_path
-    _has_output
-    _input_path
-    _make_like
-    _mode
-    _output_path
-    _stylesheet
-    _verbose
-    _real_mode
-    _xslt_mode
-    _xslt_stringparams
-));
+__PACKAGE__->mk_accessors(
+    qw(
+        _base_path
+        _has_output
+        _input_path
+        _make_like
+        _mode
+        _output_path
+        _stylesheet
+        _verbose
+        _real_mode
+        _xslt_mode
+        _xslt_stringparams
+        )
+);
 
 
-my %modes =
-(
-    'fo' =>
-    {
-    },
-    'help' =>
-    {
+my %modes = (
+    'fo'   => {},
+    'help' => {
         standalone => 1,
     },
-    'xhtml' =>
-    {
-    },
-    'xhtml-1_1' =>
-    {
+    'xhtml'     => {},
+    'xhtml-1_1' => {
         real_mode => "xhtml",
     },
-    'rtf' =>
-    {
+    'xhtml5' => {
+        real_mode => "xhtml",
+    },
+    'rtf' => {
         xslt_mode => "fo",
     },
-    'pdf' =>
-    {
+    'pdf' => {
         xslt_mode => "fo",
     },
 );
@@ -56,7 +52,7 @@ my %modes =
 sub new
 {
     my $class = shift;
-    my $self = {};
+    my $self  = {};
 
     bless $self, $class;
 
@@ -67,7 +63,7 @@ sub new
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $argv = $args->{'argv'};
 
@@ -77,20 +73,21 @@ sub _init
     my @in_stringparams;
     my $base_path;
     my $make_like = 0;
-    my ($help, $man);
+    my ( $help, $man );
 
-    my $ret = GetOptionsFromArray($argv,
-        "o=s" => \$output_path,
-        "v|verbose" => \$verbose,
+    my $ret = GetOptionsFromArray(
+        $argv,
+        "o=s"            => \$output_path,
+        "v|verbose"      => \$verbose,
         "x|stylesheet=s" => \$stylesheet,
-        "stringparam=s" => \@in_stringparams,
-        "basepath=s" => \$base_path,
-        "make" => \$make_like,
-        'help|h' => \$help,
-        'man' => \$man,
+        "stringparam=s"  => \@in_stringparams,
+        "basepath=s"     => \$base_path,
+        "make"           => \$make_like,
+        'help|h'         => \$help,
+        'man'            => \$man,
     );
 
-    if (!$ret)
+    if ( !$ret )
     {
         pod2usage(2);
     }
@@ -100,15 +97,15 @@ sub _init
     }
     if ($man)
     {
-        pod2usage(-exitstatus => 0, -verbose => 2)
+        pod2usage( -exitstatus => 0, -verbose => 2 );
     }
 
     my @stringparams;
     foreach my $param (@in_stringparams)
     {
-        if ($param =~ m{\A([^=]+)=(.*)\z}ms)
+        if ( $param =~ m{\A([^=]+)=(.*)\z}ms )
         {
-            push @stringparams, [$1,$2];
+            push @stringparams, [ $1, $2 ];
         }
         else
         {
@@ -116,14 +113,11 @@ sub _init
         }
     }
 
-    $self->_has_output(
-        $self->_output_path($output_path) ? 1 : 0
-    );
-
+    $self->_has_output( $self->_output_path($output_path) ? 1 : 0 );
 
     $self->_verbose($verbose);
     $self->_stylesheet($stylesheet);
-    $self->_xslt_stringparams(\@stringparams);
+    $self->_xslt_stringparams( \@stringparams );
     $self->_make_like($make_like);
     $self->_base_path($base_path);
 
@@ -136,12 +130,12 @@ sub _init
         $self->_mode($mode);
 
         my $assign_secondary_mode = sub {
-            my ($struct_field, $attr) = @_;
-            $self->$attr($mode_struct->{$struct_field} || $mode);
+            my ( $struct_field, $attr ) = @_;
+            $self->$attr( $mode_struct->{$struct_field} || $mode );
         };
 
-        $assign_secondary_mode->('real_mode', '_real_mode');
-        $assign_secondary_mode->('xslt_mode', '_xslt_mode');
+        $assign_secondary_mode->( 'real_mode', '_real_mode' );
+        $assign_secondary_mode->( 'xslt_mode', '_xslt_mode' );
     }
     else
     {
@@ -150,7 +144,7 @@ sub _init
 
     my $input_path = shift(@$argv);
 
-    if (! (defined($input_path) || $mode_struct->{standalone}) )
+    if ( !( defined($input_path) || $mode_struct->{standalone} ) )
     {
         die "Input path not specified on command line";
     }
@@ -165,14 +159,15 @@ sub _init
 
 sub _exec_command
 {
-    my ($self, $cmd) = @_;
+    my ( $self, $cmd ) = @_;
 
-    if ($self->_verbose())
+    if ( $self->_verbose() )
     {
-        print (join(" ", @$cmd), "\n");
+        print( join( " ", @$cmd ), "\n" );
     }
 
-    if (system(@$cmd)) {
+    if ( system(@$cmd) )
+    {
         die qq/<<@$cmd>> failed./;
     }
 
@@ -220,17 +215,17 @@ sub _is_older
     my @stat1 = stat($file1);
     my @stat2 = stat($file2);
 
-    if (! @stat2)
+    if ( !@stat2 )
     {
         die "Input file '$file1' does not exist.";
     }
-    elsif (! @stat1)
+    elsif ( !@stat1 )
     {
         return 1;
     }
     else
     {
-        return ($stat1[9] <= $stat2[9]);
+        return ( $stat1[9] <= $stat2[9] );
     }
 }
 
@@ -239,7 +234,7 @@ sub _should_update_output
     my $self = shift;
     my $args = shift;
 
-    return $self->_is_older($args->{output}, $args->{input});
+    return $self->_is_older( $args->{output}, $args->{input} );
 }
 
 sub _run_mode_fo
@@ -250,7 +245,7 @@ sub _run_mode_fo
 
 sub _mkdir
 {
-    my ($self, $dir) = @_;
+    my ( $self, $dir ) = @_;
 
     mkpath($dir);
 }
@@ -260,7 +255,7 @@ sub _run_mode_xhtml
     my $self = shift;
 
     # Create the directory, because xsltproc requires it.
-    $self->_mkdir($self->_output_path());
+    $self->_mkdir( $self->_output_path() );
 
     return $self->_run_xslt();
 }
@@ -272,15 +267,16 @@ sub _calc_default_xslt_stylesheet
     my $mode = $self->_xslt_mode();
 
     return
-        "http://docbook.sourceforge.net/release/xsl/current/${mode}/docbook.xsl"
-        ;
+"http://docbook.sourceforge.net/release/xsl/current/${mode}/docbook.xsl";
 }
 
 sub _is_xhtml
 {
     my $self = shift;
 
-    return (($self->_mode() eq "xhtml") || ($self->_mode() eq "xhtml-1_1"));
+    return (   ( $self->_mode() eq "xhtml" )
+            || ( $self->_mode() eq "xhtml-1_1" )
+            || ( $self->_mode() eq "xhtml5" ) );
 }
 
 sub _calc_output_param_for_xslt
@@ -289,21 +285,21 @@ sub _calc_output_param_for_xslt
     my $args = shift;
 
     my $output_path = $self->_output_path();
-    if (defined($args->{output_path}))
+    if ( defined( $args->{output_path} ) )
     {
         $output_path = $args->{output_path};
     }
 
-    if (!defined($output_path))
+    if ( !defined($output_path) )
     {
         die "Output path not specified!";
     }
 
     # If it's XHTML, then it's a directory and xsltproc requires that
     # it will have a trailing slash.
-    if ($self->_is_xhtml)
+    if ( $self->_is_xhtml )
     {
-        if ($output_path !~ m{/\z})
+        if ( $output_path !~ m{/\z} )
         {
             $output_path .= "/";
         }
@@ -321,7 +317,7 @@ sub _calc_make_output_param_for_xslt
 
     # If it's XHTML, then we need to compare against the index.html
     # because the directory is freshly made.
-    if ($self->_is_xhtml)
+    if ( $self->_is_xhtml )
     {
         $output_path .= "index.html";
     }
@@ -331,21 +327,20 @@ sub _calc_make_output_param_for_xslt
 
 sub _pre_proc_command
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    my $input_file = $args->{input};
+    my $input_file  = $args->{input};
     my $output_file = $args->{output};
-    my $template = $args->{template};
+    my $template    = $args->{template};
 
-    return
-    [
-        map
-        {
-              (ref($_) eq '') ? $_
-            : $_->is_output() ? $output_file
-            : $_->is_input() ? $input_file
-            # Not supposed to happen
-            : do { die "Unknown Argument in Command Template."; }
+    return [
+        map {
+                  ( ref($_) eq '' ) ? $_
+                : $_->is_output()   ? $output_file
+                : $_->is_input()    ? $input_file
+
+                # Not supposed to happen
+                : do { die "Unknown Argument in Command Template."; }
         } @$template
     ];
 }
@@ -355,62 +350,59 @@ sub _run_input_output_cmd
     my $self = shift;
     my $args = shift;
 
-    my $input_file = $args->{input};
-    my $output_file = $args->{output};
+    my $input_file       = $args->{input};
+    my $output_file      = $args->{output};
     my $make_output_file = $args->{make_output};
 
-    if (!defined($make_output_file))
+    if ( !defined($make_output_file) )
     {
         $make_output_file = $output_file;
     }
 
     if (
-        (!$self->_make_like())
-            ||
-        $self->_should_update_output(
+        ( !$self->_make_like() )
+        || $self->_should_update_output(
             {
-                input => $input_file,
+                input  => $input_file,
                 output => $make_output_file,
             }
         )
-    )
+        )
     {
-        $self->_exec_command(
-            $self->_pre_proc_command($args),
-        );
+        $self->_exec_command( $self->_pre_proc_command($args), );
     }
 }
 
 sub _on_output
 {
-    my ($self, $meth, $args) = @_;
+    my ( $self, $meth, $args ) = @_;
 
     return $self->_has_output() ? $self->$meth($args) : ();
 }
 
 sub _calc_output_params
 {
-    my ($self,$args) = @_;
+    my ( $self, $args ) = @_;
 
-    return
-    (
-        output => $self->_calc_output_param_for_xslt($args),
+    return (
+        output      => $self->_calc_output_param_for_xslt($args),
         make_output => $self->_calc_make_output_param_for_xslt($args),
     );
 }
 
 sub _calc_template_o_flag
 {
-    my ($self,$args) = @_;
+    my ( $self, $args ) = @_;
 
-    return ("-o", $self->_output_cmd_comp());
+    return ( "-o", $self->_output_cmd_comp() );
 }
 
 sub _calc_template_string_params
 {
     my ($self) = @_;
 
-    return [map { ("--stringparam", @$_ ) } @{$self->_xslt_stringparams()}];
+    return [ map { ( "--stringparam", @$_ ) }
+            @{ $self->_xslt_stringparams() } ];
 }
 
 sub _run_xslt
@@ -418,33 +410,29 @@ sub _run_xslt
     my $self = shift;
     my $args = shift;
 
-    my @stylesheet_params = ($self->_calc_default_xslt_stylesheet());
+    my @stylesheet_params = ( $self->_calc_default_xslt_stylesheet() );
 
-    if (defined($self->_stylesheet()))
+    if ( defined( $self->_stylesheet() ) )
     {
-        @stylesheet_params = ($self->_stylesheet());
+        @stylesheet_params = ( $self->_stylesheet() );
     }
 
     my @base_path_params = ();
 
-    if (defined($self->_base_path()))
+    if ( defined( $self->_base_path() ) )
     {
         @base_path_params =
-        (
-            "--path",
-            ($self->_base_path() . '/' . $self->_xslt_mode()),
-        );
+            ( "--path", ( $self->_base_path() . '/' . $self->_xslt_mode() ), );
     }
 
     return $self->_run_input_output_cmd(
         {
             input => $self->_input_path(),
-            $self->_on_output('_calc_output_params', $args),
-            template =>
-            [
+            $self->_on_output( '_calc_output_params', $args ),
+            template => [
                 "xsltproc",
-                $self->_on_output('_calc_template_o_flag', $args),
-                @{$self->_calc_template_string_params()},
+                $self->_on_output( '_calc_template_o_flag', $args ),
+                @{ $self->_calc_template_string_params() },
                 @base_path_params,
                 @stylesheet_params,
                 $self->_input_cmd_comp(),
@@ -460,13 +448,13 @@ sub _run_xslt_and_from_fo
 
     my $xslt_output_path = $self->_output_path();
 
-    if (!defined ($xslt_output_path))
+    if ( !defined($xslt_output_path) )
     {
         die "No -o flag was specified. See the help.";
     }
 
     # TODO : do something meaningful if a period (".") is not present
-    if ($xslt_output_path !~ m{\.}ms)
+    if ( $xslt_output_path !~ m{\.}ms )
     {
         $xslt_output_path .= ".fo";
     }
@@ -475,18 +463,15 @@ sub _run_xslt_and_from_fo
         $xslt_output_path =~ s{\.([^\.]*)\z}{\.fo}ms;
     }
 
-    $self->_run_xslt({output_path => $xslt_output_path});
+    $self->_run_xslt( { output_path => $xslt_output_path } );
 
     return $self->_run_input_output_cmd(
         {
-            input => $xslt_output_path,
-            output => $self->_output_path(),
-            template =>
-            [
-                "fop",
-                ("-".$args->{fo_out_format}),
-                $self->_output_cmd_comp(),
-                $self->_input_cmd_comp(),
+            input    => $xslt_output_path,
+            output   => $self->_output_path(),
+            template => [
+                "fop", ( "-" . $args->{fo_out_format} ),
+                $self->_output_cmd_comp(), $self->_input_cmd_comp(),
             ],
         },
     );
@@ -520,7 +505,7 @@ sub _input_cmd_comp
 
     return App::XML::DocBook::Docmake::CmdComponent->new(
         {
-            is_input => 1,
+            is_input  => 1,
             is_output => 0,
         }
     );
@@ -532,20 +517,22 @@ sub _output_cmd_comp
 
     return App::XML::DocBook::Docmake::CmdComponent->new(
         {
-            is_input => 0,
+            is_input  => 0,
             is_output => 1,
         }
     );
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0406';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0500';
 use base 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(
-    is_input
-    is_output
-    ));
+__PACKAGE__->mk_accessors(
+    qw(
+        is_input
+        is_output
+        )
+);
 
 1;
 
@@ -564,7 +551,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.0406
+version 0.0500
 
 =head1 SYNOPSIS
 
@@ -576,7 +563,7 @@ version 0.0406
 
 =head1 VERSION
 
-version 0.0406
+version 0.0500
 
 =head1 FUNCTIONS
 

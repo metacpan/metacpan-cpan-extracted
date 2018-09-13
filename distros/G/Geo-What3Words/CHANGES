@@ -1,31 +1,35 @@
 Revision history for Perl module Geo::What3Words.
 
+2.1.0   2018-09-12
+        - replace JSON with JSON::XS
+        - utf8 encoding issues when running against w3w SDK (API 2.3.0)
+
 2.0.1   2016-06-15
-    - forgot to add Test::Warn as dependency
+        - forgot to add Test::Warn as dependency
 
 2.0.0   2016-06-15
-    - use what3words API version 2
-    - remove methods related to onewords
+        - use what3words API version 2
+        - remove methods related to onewords
 
 1.0.6   2014-09-18
-		- change test-suite to use recorded HTTP responses instead of
-		   calling the W3W API live
+        - change test-suite to use recorded HTTP responses instead of
+           calling the W3W API live
 
 1.0.5   2014-09-17
         - Remove default lang param
 
-1.0.4	2014-08-29
-		- also set MetaProvides in meta.yml
+1.0.4   2014-08-29
+        - also set MetaProvides in meta.yml
 
 1.0.3   2014-08-28
-		- add MANIFEST file
-		- set minimal required Perl version
+        - add MANIFEST file
+        - set minimal required Perl version
 
-1.0.2	2014-08-25
-		- set the github repository (useful for metapan), thanks to szabgab
+1.0.2   2014-08-25
+        - set the github repository (useful for metapan), thanks to szabgab
 
-1.0.1	2014-08-25
-		- set the $VERSION automatically during build
+1.0.1   2014-08-25
+        - set the $VERSION automatically during build
 
 1.0     2014-07-25
         - rename Geo::WhatThreeWords => Geo::What3Words

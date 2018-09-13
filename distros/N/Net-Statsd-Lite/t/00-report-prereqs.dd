@@ -46,6 +46,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Select' => '0',
                                    'Module::Metadata' => '0',
+                                   'Net::EmptyPort' => '0',
                                    'Test::More' => '0',
                                    'Test::Roo' => '0',
                                    'Test::Roo::DataDriven' => '0',

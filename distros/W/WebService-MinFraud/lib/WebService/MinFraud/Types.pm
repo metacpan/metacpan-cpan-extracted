@@ -4,13 +4,13 @@ package WebService::MinFraud::Types;
 use strict;
 use warnings;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use Sub::Quote qw( quote_sub );
 
 use namespace::clean;
 
-use GeoIP2::Types qw(
+use GeoIP2::Types 2.006001 qw(
     ArrayRef
     Bool
     BoolCoercion
@@ -100,7 +100,7 @@ WebService::MinFraud::Types - Custom types for the MaxMind minFraud service
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use FindBin;
-use Hash::Merge::Simple qw(clone_merge);
 use Getopt::Long::Descriptive;
 use Path::Tiny;
 use POE qw(
@@ -22,16 +21,16 @@ use Sys::Hostname qw(hostname);
 use YAML qw();
 
 my ($opt,$usage) = describe_options('%c - %o',
-    [ 'config:s',          'Eris YAML config file, required', { validate => { "Must be a readable file." => sub { -r $_[0] } } } ],
-    [ 'eris-host|eh:s',    'Eris Dispatcher Host, defaults to localhost' ],
-    [ 'eris-port|ep:s',    'Eris Dispatcher Port, defaults to 9514' ],
-    [ 'indexer:s',         'Script to run to handle indexing, defaults to the eris-es-indexer.pl script.' ],
-    [ 'workers|w:i',       'Number of workers to run, default 4', { default => 4 }  ],
+    [ 'config=s',          'Eris YAML config file, required', { validate => { "Must be a readable file." => sub { -r $_[0] } } } ],
+    [ 'eris-host|eh=s',    'Eris Dispatcher Host, defaults to localhost' ],
+    [ 'eris-port|ep=s',    'Eris Dispatcher Port, defaults to 9514' ],
+    [ 'indexer=s',         'Script to run to handle indexing, defaults to the eris-es-indexer.pl script.' ],
+    [ 'workers|w=i',       'Number of workers to run, default 4', { default => 4 }  ],
     [],
-    [ 'stats-interval:i',   'Interval to send statistics, in seconds, default: 60', { default => 60 }],
-    [ 'graphite-host|g:s',  'Graphite host to dispatch metrics to, default disabled' ],
-    [ 'graphite-port|gp:s', 'Graphite port to dispatch metrics to, default 2003', { default => 2003 }],
-    [ 'graphite-prefix:s',  'Graphite prefix, default: eris.client',              { default => "eris.client" }],
+    [ 'stats-interval=i',   'Interval to send statistics, in seconds, default: 60', { default => 60 }],
+    [ 'graphite-host|g=s',  'Graphite host to dispatch metrics to, default disabled' ],
+    [ 'graphite-port|gp=s', 'Graphite port to dispatch metrics to, default 2003', { default => 2003 }],
+    [ 'graphite-prefix=s',  'Graphite prefix, default: eris.client',              { default => "eris.client" }],
     [],
     [ 'help',  'Display this help' ],
 );
@@ -151,7 +150,7 @@ sub main_start {
         StatsHandler => sub {
             my ($stats) = @_;
             if( is_hashref($stats) ) {
-                foreach my $k ( $stats ) {
+                foreach my $k ( keys %$stats ) {
                     $heap->{stats}{$k} ||= 0;
                     $heap->{stats}{$k} += $stats->{$k};
                 }
@@ -219,7 +218,7 @@ eris-eris-client.pl - Simple wrapper to spawn workers for handling syslog stream
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

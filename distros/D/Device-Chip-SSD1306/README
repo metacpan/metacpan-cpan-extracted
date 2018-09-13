@@ -5,8 +5,9 @@ NAME
 DESCRIPTION
 
     This abstract Device::Chip subclass provides communication to an
-    SSD1306 or SH1106 chip attached by an adapter. To actually use it, you
-    should use one of the subclasses for the various interface types.
+    SSD1306, SSD1309 or SH1106 chip attached by an adapter. To actually use
+    it, you should use one of the subclasses for the various interface
+    types.
 
       * Device::Chip::SSD1306::I2C - I²C
 
@@ -28,6 +29,9 @@ DEVICE MODELS
 
       An SSD1306 driving a display with 128 columns and 64 rows. The most
       common of the display modules, often found with a 0.96 inch display.
+
+      This setting also drives the SSD1309 chip found in the larger 1.6 or
+      2.4 inch displays.
 
     SSD1306-128x32
 
@@ -104,6 +108,12 @@ METHODS
 
     Turn on or off the all-pixels-lit lamptest mode.
 
+ display_invert
+
+       $chip->display_invert( $enable )->get
+
+    Turn on or off the inverted output mode.
+
  send_display
 
        $chip->send_display( $pixels )->get
@@ -158,7 +168,7 @@ DRAWING METHODS
     display. Pixels corresponding to a spaces will be left alone, a hyphen
     will be cleared, and any other character (for example a #) will be set.
 
-    For example, to draw an upward-pointing arrow:
+    For example, to draw an rightward-pointing arrow:
 
        $chip->draw_blit( 20, 40,
           "   #  ",

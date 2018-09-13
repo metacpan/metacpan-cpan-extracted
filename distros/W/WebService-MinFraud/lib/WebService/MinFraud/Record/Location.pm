@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Location;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use WebService::MinFraud::Types qw( Str );
 
@@ -30,7 +30,7 @@ WebService::MinFraud::Record::Location - Contains data for the location record a
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SYNOPSIS
 

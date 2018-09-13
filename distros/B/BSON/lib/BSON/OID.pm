@@ -6,7 +6,7 @@ package BSON::OID;
 # ABSTRACT: BSON type wrapper for Object IDs
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp;
 use Config;
@@ -203,7 +203,7 @@ sub _get_pid {
 #pod Returns a string for this OID, with the OID given as 24 hex digits.
 #pod
 #pod If the C<BSON_EXTJSON> option is true, it will instead be compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     {"$oid" : "012345678901234567890123"}
@@ -244,7 +244,7 @@ BSON::OID - BSON type wrapper for Object IDs
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -345,7 +345,7 @@ represents seconds since the epoch.
 Returns a string for this OID, with the OID given as 24 hex digits.
 
 If the C<BSON_EXTJSON> option is true, it will instead be compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     {"$oid" : "012345678901234567890123"}

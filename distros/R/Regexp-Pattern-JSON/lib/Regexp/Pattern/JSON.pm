@@ -1,7 +1,9 @@
 package Regexp::Pattern::JSON;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
 
 our %RE;
 
@@ -164,7 +166,7 @@ Regexp::Pattern::JSON - Regexp patterns to match JSON
 
 =head1 VERSION
 
-This document describes version 0.003 of Regexp::Pattern::JSON (from Perl distribution Regexp-Pattern-JSON), released on 2018-09-10.
+This document describes version 0.004 of Regexp::Pattern::JSON (from Perl distribution Regexp-Pattern-JSON), released on 2018-09-12.
 
 =head1 SYNOPSIS
 

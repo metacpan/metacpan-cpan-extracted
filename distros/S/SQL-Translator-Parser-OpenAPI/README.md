@@ -51,6 +51,37 @@ Standard as per [SQL::Translator::Parser](https://metacpan.org/pod/SQL::Translat
 that can be understood as a [JSON::Validator
 specification](https://metacpan.org/pod/JSON::Validator#schema).
 
+## defs2mask
+
+Given a hashref that is a JSON pointer to an OpenAPI spec's
+`/definitions`, returns a hashref that maps each definition name to a
+bitmask. The bitmask is set from each property name in that definition,
+according to its order in the complete sorted list of all property names
+in the definitions. Not exported. E.g.
+
+    # properties:
+    my $defs = {
+      d1 => {
+        properties => {
+          p1 => 'string',
+          p2 => 'string',
+        },
+      },
+      d2 => {
+        properties => {
+          p2 => 'string',
+          p3 => 'string',
+        },
+      },
+    };
+    my $mask = SQL::Translator::Parser::OpenAPI::defs2mask($defs);
+    # all prop names, sorted: qw(p1 p2 p3)
+    # $mask:
+    {
+      d1 => (1 << 0) | (1 << 1),
+      d2 => (1 << 1) | (1 << 2),
+    }
+
 # DEBUGGING
 
 To debug, set environment variable `SQLTP_OPENAPI_DEBUG` to a true value.

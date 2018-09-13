@@ -12,6 +12,7 @@ use Log::Dispatch;
 use MojoX::Log::Dispatch::Simple;
 
 use Stor;
+use RmqPublishFactory;
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 524288000;    #the size of message: 500 MB
 
@@ -23,6 +24,13 @@ my $logger = MojoX::Log::Dispatch::Simple->new(
     level    => 'debug'
 );
 
+my $rmq_factory = RmqPublishFactory->new(
+    uri => $cfg->{rabbitmq_uri},
+    log => $logger,
+);
+
+$rmq_factory->create_mojo_heartbeat();
+
 my $stor = Stor->new(
     storage_pairs        => $cfg->{storage_pairs},
     statsite             => $statsite,
@@ -30,6 +38,7 @@ my $stor = Stor->new(
     s3_credentials       => $cfg->{s3_credentials},
     s3_enabled           => $cfg->{s3_enabled},
     writable_pairs_regex => $cfg->{writable_pairs_regex} // '.*',
+    rmq_publish_code     => $rmq_factory->create(),
 );
 
 app->plugin(
@@ -44,7 +53,6 @@ app->plugin(
 
 app->config(hypnotoad => { clients => $ENV{HYPNOTOAD_CLIENTS} // 100 });
 app->log($logger);
-
 
 start_cleanup_tempdir_task();
 

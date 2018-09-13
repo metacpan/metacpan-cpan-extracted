@@ -1,5 +1,6 @@
-requires 'perl' => '5.006'; # warnings
+requires 'perl' => '5.006'; # warnings, utf8
 requires 'Carp';
+requires 'Encode' => '1.50';
 requires 'Exporter';
 requires 'Filter::Simple';
 requires 'List::Util';

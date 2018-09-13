@@ -1,5 +1,11 @@
 Revision history for Device-Chip-SSD1306
 
+0.07    2018-09-10 16:53:16
+        [CHANGES]
+         * Remark that the driver also supports an SSD1309
+         * Fix description of the arrow bitmap
+         * Add ->display_invert to control inverted output mode
+
 0.06    2018-08-08 18:01:23
         [CHANGES]
          * Add a ->draw_blit method for rendering bitmaps onto the framebuffer

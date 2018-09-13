@@ -37,6 +37,8 @@ my %WriteMakefileArgs = (
     "File::Copy" => 0,
     "File::HomeDir" => 0,
     "File::Temp" => 0,
+    "File::UserConfig" => 0,
+    "Path::Tiny" => 0,
     "Test::Exception" => 0,
     "Test::Fatal" => 0,
     "Test::File::ShareDir::Dist" => 0,
@@ -49,7 +51,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }

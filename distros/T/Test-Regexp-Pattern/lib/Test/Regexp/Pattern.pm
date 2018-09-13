@@ -2,8 +2,8 @@
 
 package Test::Regexp::Pattern;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -261,7 +261,7 @@ Test::Regexp::Pattern - Test Regexp::Pattern patterns
 
 =head1 VERSION
 
-This document describes version 0.003 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2018-09-10.
+This document describes version 0.004 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2018-09-12.
 
 =head1 SYNOPSIS
 

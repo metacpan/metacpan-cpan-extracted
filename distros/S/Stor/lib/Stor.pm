@@ -1,7 +1,7 @@
 package Stor;
 use v5.20;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.5.2';
 
 use Mojo::Base -base, -signatures;
 use Syntax::Keyword::Try;
@@ -36,6 +36,7 @@ has 'bucket' => sub ($self) {
     return $s3->bucket('samples');
 };
 has 'writable_pairs_regex' => '.*';
+has 'rmq_publish_code';
 
 sub about ($self, $c) {
     $c->render(status => 200, text => "This is " . __PACKAGE__ . " $VERSION");
@@ -151,6 +152,10 @@ sub get ($self, $c) {
             msg     => "Given hash '$sha' isn't SHA256",
             payload => { statsite_key => 'error.get.malformed_sha.count' },
         }) if $sha !~ /^[A-Fa-f0-9]{64}$/;
+
+        if (ref $self->rmq_publish_code eq 'CODE')  {
+            $self->rmq_publish_code->($sha);
+        }
 
         my $found = 0;
         if ($self->s3_enabled && $self->get_from_s3($c, $sha)) {
@@ -419,7 +424,19 @@ Stor is an HTTP API to primary storage. You provide a SHA256 hash and get the fi
 
 we prefer L<hypnotoad|https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad> server
 
-=head2 configuration example
+=head2 configuration
+
+=over 4
+
+=item rabbitmq_uri
+
+(optional)
+
+if is set, then requested SHA are published to exchange (defined by URI - https://www.rabbitmq.com/uri-spec.html)
+
+=back
+
+=head3 configuration example
 
     {
         "statsite": {
@@ -440,7 +457,8 @@ we prefer L<hypnotoad|https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad> ser
         },
         "memcached_servers": ["MEMCACHED_SERVER1"],
         "secret": "https://mojolicious.org/perldoc/Mojolicious/Guides/FAQ#What-does-Your-secret-passphrase-needs-to-be-changed-mean",
-        "basic_auth": "writer:writer_pass"
+        "basic_auth": "writer:writer_pass",
+        "rabbitmq_uri": "amqp://"
     }
 
 =head2 Service Responsibility

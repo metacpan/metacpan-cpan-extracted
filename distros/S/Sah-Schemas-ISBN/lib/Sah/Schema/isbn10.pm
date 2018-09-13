@@ -1,7 +1,7 @@
 package Sah::Schema::isbn10;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'ISBN 10 number',
@@ -33,7 +33,7 @@ Sah::Schema::isbn10 - ISBN 10 number
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::isbn10 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
+This document describes version 0.005 of Sah::Schema::isbn10 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
 
 =head1 DESCRIPTION
 

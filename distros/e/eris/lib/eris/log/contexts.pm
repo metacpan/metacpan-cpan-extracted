@@ -13,7 +13,7 @@ with qw(
     eris::role::pluggable
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub _build_namespace { 'eris::log::context' }
@@ -107,7 +107,7 @@ eris::log::contexts - Discovery and access for context objects
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

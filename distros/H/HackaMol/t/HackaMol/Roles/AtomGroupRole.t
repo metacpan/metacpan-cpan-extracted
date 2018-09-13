@@ -132,6 +132,14 @@ is($group->count_atoms, 2, 'atom atom count 2');
 
 is_deeply($group->COM, V (0.5,0,0), 'Center of mass');
 is_deeply($group->COZ, V (0.5,0,0), 'Center of Z');
+my $com1 = $group->COM;
+my $com2 = $group->COM;
+ok( \$com1 != \$com2, 'Center of mass unique memory location');
+my $atom_com = HackaMol::Atom->new(Z=>1,coords=>[$group->COM]);
+my $com3 = $group->COM;
+my $xyz = $atom_com->xyz;
+ok( \$xyz  != \$com3, 'Center of mass unique memory location via atom->new');
+
 
 $group->push_atoms($atom6);
 
@@ -190,9 +198,9 @@ cmp_ok (abs(34.01468-$group->total_mass), '<', 1E-7, 'total mass'  );
 cmp_ok ($group->total_Z, '==', 18, 'total Z'  );
 
 #we have two copies of atom1 in the molecule
-my $xyz = $atom1->xyz;
+my $xyza = $atom1->xyz;
 $group->translate(V(1,0,0));
-is_deeply($atom1->xyz-$xyz, V(2,0,0), "two copies of an atom gets double the intended translations:beware ");
+is_deeply($atom1->xyz-$xyza, V(2,0,0), "two copies of an atom gets double the intended translations:beware ");
 
 $group->delete_atoms(3); #delete the copy of atom 1 
 

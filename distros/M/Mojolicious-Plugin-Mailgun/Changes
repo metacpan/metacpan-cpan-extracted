@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Mailgun
 
+0.08 2018-09-13T14:58:31+0200
+ - Fix mailgun test to work without deprecated delay helper
+
 0.07 2018-05-22T15:36:15+0200
  - Promise version needs to return a promise.
  - Add test for promise

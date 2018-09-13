@@ -8,7 +8,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub sample_messages {
@@ -60,7 +60,7 @@ eris::log::context::yum - Parse the yum syslog output into structured data
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 METHODS
 

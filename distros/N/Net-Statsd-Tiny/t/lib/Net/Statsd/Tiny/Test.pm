@@ -2,8 +2,12 @@ package Net::Statsd::Tiny::Test;
 
 use Test::Roo::Role;
 
+use Carp;
+use curry;
 use IO::Select;
-use Net::EmptyPort qw/ listen_socket /;
+use IO::Socket;
+use Net::EmptyPort qw/ empty_port /;
+use Socket qw/ SOCK_DGRAM /;
 
 use Net::Statsd::Tiny;
 
@@ -79,11 +83,17 @@ sub send_tests {
 sub test_udp {
     my ( $self, $callback ) = @_;
 
-    my $socket = listen_socket( { proto => $self->proto } )
-        or die $!;
+    my $port = empty_port( { proto => $self->proto } );
 
     my $pid = fork;
     if ($pid) {
+
+        my $socket = IO::Socket::INET->new(
+            LocalAddr => '127.0.0.1',
+            LocalPort => $port,
+            Proto     => $self->proto,
+            Type      => SOCK_DGRAM,
+        ) or croak $!;
 
         my $select = IO::Select->new;
         $select->add($socket);
@@ -106,7 +116,7 @@ sub test_udp {
     if ( defined $pid ) {
 
         my $client = Net::Statsd::Tiny->new(
-            port            => $socket->sockport,
+            port            => $port,
             host            => $self->host,
             proto           => $self->proto,
             prefix          => $self->prefix,
@@ -114,12 +124,14 @@ sub test_udp {
             autoflush       => $self->autoflush,
         );
 
+        sleep 1;    # wait for server to start
+
         $callback->($client);
 
         exit 0;
     }
     else {
-        die $!;
+        croak $!;
     }
 
 }

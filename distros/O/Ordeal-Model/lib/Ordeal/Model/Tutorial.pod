@@ -1,0 +1,665 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Tutorial - An introduction to Ordeal::Model
+
+=head1 SYNOPSIS
+
+Create a few directories for your stuff:
+
+   $ ORDEAL='/path/to/ordeal'
+   $ CARDS="$ORDEAL/cards"
+   $ DECKS="$ORDEAL/decks"
+   $ mkdir -p "$CARDS" "$DECKS"
+
+Put a few images in the C<cards> subdirectory:
+
+   $ cp /from/somewhere/* "$CARDS"
+   $ ls "$CARDS"
+   avocado.png  ball.svg   chocolate.jpg  doll.png
+   die-1.png    die-2.png  die-3.png      die-4.png
+   die-5.png    die-6.png  egg.png        fridge.png
+   lamp.svg     pizza.svg  skate.jpg      table.jpg
+
+Create decks:
+
+   $ echo die-{1,2,3,4,5,6}.png  
+      | sed -e 's/ /\n/g' > "$DECKS/die"
+   $ echo avocado.png chocolate.jpg egg.png pizza.svg \
+      | sed -e 's/ /\n/g' > "$DECKS/food"
+   $ echo ball.svg doll.png skate.jpg  \
+      | sed -e 's/ /\n/g' > "$DECKS/games"
+   $ echo fridge.png lamp.svg table.jpg \
+      | sed -e 's/ /\n/g' > "$DECKS/home"
+
+Note that there are 6 faces in the C<die>, the C<food> deck has four
+cards, and the other two have three cards each.
+
+Use them:
+
+   use Ordeal::Model;
+   my $ordeal = Ordeal::Model->new(
+      PlainFile => [base_directory => '/path/to/ordeal']
+   );
+
+   # Take:
+   # - 2 cards from "games"
+   # - 1 card either from food or home (accounting for differences
+   #   in the number of cards in the two decks)
+   # - outcome of 3 dice
+   my $expression = 'games@2 + (food@1 + home@1)@1 + 3 * die@1';
+
+   my $shuffle = $ordeal->evaluate($expression);
+   my ($game1, $game2, $other, @dice) = $shuffle->draw;
+
+
+=head1 WHAT IS THIS ABOUT? BASIC CONCEPTS
+
+L<Ordeal::Model> is about drawing cards randomly, in some fancy and
+complex way (hopefully, not complicated though).
+
+It derives from an interest I have in story-building systems. Think games
+like L<Rory's Story Cubes|https://www.storycubes.com/>, L<Tell
+Tale|http://www.blueorangegames.com/index.php/games/telltale>,
+L<Inventafavole|http://www.ilbarbagiannieditore.it/prodotto/linventafavole/>
+and the likes, or other more complex systems like those based on the works
+of L<Vladimir Propp|https://en.wikipedia.org/wiki/Vladimir_Propp> (e.g.
+L<StoryMaps|https://seanh.github.io/storymaps>).
+
+L<Ordeal::Model> has three main objects at its core:
+
+=over
+
+=item I<< cards >>
+
+these are the objects you want to draw. By default, they are represented
+by image files, but it should be easy to tweak things to represent
+basically... whatever. Until then, we'll stick with images.
+
+=item I<< decks >>
+
+these are I<ordered> collections of cards. Yes, like a brand new deck of
+cards that you might buy at a games store: they usually come ordered.
+Don't worry, there will be time for shuffling!
+
+=item I<< shuffles >>
+
+this is basically a shuffled view of a deck.
+
+=back
+
+Separating I<decks> and I<shuffles> allow you to re-create conditions,
+which you might find interesting.
+
+
+=head1 CREATE CARDS AND DECKS
+
+L<Ordeal::Model> comes with a pre-defined way to define your cards and
+decks, which is L<Ordeal::Model::Backend::PlainFile>. This is a simple
+representation where you put cards as files in a specific directory, then
+you define decks as files containing lists of card filenames in another
+specific directory.
+
+In particular, you will designate a directory to contain cards and decks.
+We will call this directory C<xmpl>, and it is structured like follows:
+
+   - xmpl 
+      - cards
+      - decks
+
+It's easy to create this structure in the shell, e.g. as a sub-directory
+in the current directory:
+
+      $ CARDS="xmpl/cards" DECKS="xmpl/decks"
+      $ mkdir -p "$CARDS" "$DECKS"
+
+As you can see, we defined a couple environment variables to ease the
+examples below.
+
+After you have the right directory structure, you can start putting your
+cards artwork in C<cards>:
+
+   $ cp /from/somewhere/* "$CARDS"
+   $ ls "$CARDS"
+   avocado.png  ball.svg   chocolate.jpg  doll.png
+   die-1.png    die-2.png  die-3.png      die-4.png
+   die-5.png    die-6.png  egg.png        fridge.png
+   lamp.svg     pizza.svg  skate.jpg      table.jpg
+
+In this example, we are assuming that there are cards for different
+purposes, representing food (4 cards), home-related stuff (3 cards), games
+(3 cards) and the six faces of a regular die (6 cards).
+
+Wait... what? A die? If you think about it, a die is just a deck of six
+cards, where you draw one randomly each time. So yes, dice apply too here,
+you just have to be careful how you draw cards from the associated deck.
+
+Now we are ready to create our decks, as plain files inside the C<decks>
+subdirectory, listing the files I<in the order we want them in the deck>
+one per line:
+
+   $ echo die-{1,2,3,4,5,6}.png  
+      | sed -e 's/ /\n/g' > "$DECKS/die"
+   $ echo avocado.png chocolate.jpg egg.png pizza.svg \
+      | sed -e 's/ /\n/g' > "$DECKS/food"
+   $ echo ball.svg doll.png skate.jpg  \
+      | sed -e 's/ /\n/g' > "$DECKS/games"
+   $ echo fridge.png lamp.svg table.jpg \
+      | sed -e 's/ /\n/g' > "$DECKS/home"
+
+This is it, your cards and decks are in place and ready to be used by
+L<Ordeal::Model>.
+
+=head1 PUT Ordeal::Model TO WORK
+
+Just one last technicality before going down the rabbit hole... let's see
+the basic code for drawing stuff with L<Ordeal::Model>, which we will use
+as a reference for the following:
+
+   #!/usr/bin/env perl
+   use strict;
+   use warnings;
+   use Ordeal::Model;
+   my $model = Ordeal::Model->new(PlainFile => [base_directory => 'xmpl']);
+
+   $|++;
+   my $prompt = 'expression> ';
+   print {*STDOUT} $prompt;
+   while (defined(my $expression = <>)) {
+      my $shuffle = $model->evaluate($expression);
+      my @cards = $shuffle->draw;
+      my $n_cards = @cards;
+      my $n_cards_length = length $n_cards;
+      my $format = "%${n_cards_length}d. %s\n";
+      for my $index (0 .. $#cards) {
+         printf {*STDOUT} $format, $index + 1, $cards[$index]->name;
+      }
+      print {*STDOUT} "\n$prompt";
+   }
+
+Save the code above and run it (or download it:
+L<xm.pl|https://github.com/polettix/Ordeal-Model/raw/master/eg/xm.pl>),
+then you are read to...
+
+=head1 EXPRESS YOURSELF
+
+Now you have to think... how would I like to extract cards from the decks
+I have? There are a few neat tricks you can do with L<Ordeal::Model>, so
+let's start simple and build complexity step by step.
+
+=head2 Unwrap The Deck
+
+By default, shuffles don't shuffle anything and just represents an
+unwrapped but otherwise brand new deck. Just name the deck you want to use
+and you will get it in the same order as it appears in the deck:
+
+   expression> die
+   1. die-1
+   2. die-2
+   3. die-3
+   4. die-4
+   5. die-5
+   6. die-6
+
+   expression> food
+   1. avocado
+   2. chocolate
+   3. egg
+   4. pizza
+
+=head2 Just Shuffle 'Em
+
+You are probably after a shuffled deck at the very least, right? All you
+have to do is append a C<@> character, which represents I<shuffling>.
+Example:
+
+   expression> food@
+   1. chocolate
+   2. pizza
+   3. egg
+   4. avocado
+
+=head2 Join Decks
+
+Decks can be joined with the C<+> operator:
+
+   expression> food + home
+   1. avocado
+   2. chocolate
+   3. egg
+   4. pizza
+   5. fridge
+   6. lamp
+   7. table
+
+   expression> food + games + home
+   1. avocado
+   2. chocolate
+   3. egg
+   4. pizza
+   5. ball
+   6. doll
+   7. skate
+   8. fridge
+   9. lamp
+  10. table
+
+As you can see, we get them back in order, both inside each deck, both in
+the ordering of decks. We already know how to shuffle a deck:
+
+   expression> food@ + games@ + home@
+   1. egg
+   2. chocolate
+   3. pizza
+   4. avocado
+   5. ball
+   6. doll
+   7. skate
+   8. fridge
+   9. lamp
+  10. table
+
+Well, it worked inside each deck, but the decks are still in the same
+order we put them, i.e. we got all food cards first, then the games, then
+the home-related cards. How to mix them all together? You have to resort
+to L</Grouping Expressions>.
+
+=head2 Grouping Expressions
+
+If you want to apply an operation to the I<result> of a whole expression,
+you can use parentheses around the expression. For example, the following
+one will mix up all cards in the three decks:
+
+   expression> (food + games + home)@
+   1. egg
+   2. lamp
+   3. doll
+   4. ball
+   5. pizza
+   6. table
+   7. chocolate
+   8. avocado
+   9. fridge
+  10. skate
+
+
+=head2 Getting N Items
+
+So far, we dealt all cards out of our shuffles, but you might want to only
+get a pre-defined number of cards. You just have to ask for that number.
+For example, this will get you only two cards out of a shuffled C<food>;
+
+   expression> food@2
+   1. avocado
+   2. pizza
+
+This works whenever you have an expression that gives you a shuffle, of
+course (which is pretty much everything). Example:
+
+   expression> food@2 + games@1 + home@1
+   1. avocado
+   2. chocolate
+   3. skate
+   4. table
+
+   expression> (food + games + home)@1
+   1. fridge
+
+You can mix-and-match of course:
+
+   expression> (food + games)@1        
+   1. avocado
+
+   expression> (food@1 + games@1)@1
+   1. skate
+
+Note the difference: the former mixes all cards together, then draws one;
+the latter extracts one card from both shuffles, I<then> chooses one
+between them. The former is biased towards C<food> (as it contains four
+items, while C<games> has three), the latter has equal chances to give
+back either one.
+
+=head2 Slices
+
+It turns out there is a more general way to get a subset out of a shuffle,
+namely using a slice. It works much like a Perl's slice, i.e. you use
+square brackets and separate items with a comma, like in the following
+example:
+
+   expression> food
+   1. avocado
+   2. chocolate
+   3. egg
+   4. pizza
+
+   expression> food[1,3]
+   1. chocolate
+   2. pizza
+
+Note that in the examples above we are I<not> shuffling things, to show
+you what's going on. As you guessed right, slices are zero-based. Negative
+values count from the end:
+
+   expression> food[-2,-1]
+   1. egg
+   2. pizza
+
+As a difference with respect to Perl slices, operations are modulo the
+number of items:
+
+   expression> food[1231,32432]
+   1. pizza
+   2. avocado
+
+=head2 Ranges in Slices
+
+You can also use ranges in a slice:
+
+   expression> die[1..3]
+   1. die-2
+   2. die-3
+   3. die-4
+
+and mix ranges and specific values:
+
+   expression> die[1..3,0,4..5]
+   1. die-2
+   2. die-3
+   3. die-4
+   4. die-1
+   5. die-5
+   6. die-6
+
+Negative values and modulo-operations work for ranges too, which might
+give you surprising results:
+
+   expression> die[0..5]
+   1. die-1
+   2. die-2
+   3. die-3
+   4. die-4
+   5. die-5
+   6. die-6
+
+   expression> die[0..6]
+   1. die-1
+
+The last one I<first> remaps C<6> onto C<0>, then extracts a range from
+C<0> to C<0>, i.e. the first card only.
+
+=head2 Randoms
+
+Whenever you can use an integer value (e.g. when asking for a certain
+number of cards, or in ranges) you can also draw a random number from
+a list, just put the list in curly brackets. The list follows the same
+rules as slices, i.e. you can put single items or ranges separated by
+commas:
+
+   expression> die[{0,1,2},{3..5}]
+   1. die-2
+   2. die-4
+
+   expression> die[{0..2}..{3..5}]
+   1. die-2
+   2. die-3
+   3. die-4
+   4. die-5
+   5. die-6
+
+In the first case, we asked for a slice of two random elements. In the
+second case, we asked for a range whose extremes were random, so we got
+five items out in that particular run. Another run would yield a different
+result in general:
+
+   expression> die[{0..2}..{3..5}]
+   1. die-2
+   2. die-3
+   3. die-4
+
+In this case, we got C<1> in the first draw, and C<3> in the second
+(remember that indexes are zero-based).
+
+You can recurse if you want and need it:
+
+   expression> die[{{0,1},{1,2}}]
+   1. die-2
+
+In the example, C<die-2> had 50% chances to come out (it's easy to calculate).
+
+=head2 Repeating Processes
+
+What if you want to roll three dice? Of course you can do this:
+
+   expression> die@1 + die@1 + die@1
+   1. die-6
+   2. die-2
+   3. die-4
+
+How boring. When you want to repeat a specific I<process> of an
+expression, you can use the C<*> operator:
+
+   expression> 3 * die@1
+   1. die-6
+   2. die-4
+   3. die-5
+
+It works both before and after a shuffle:
+
+   expression> die@1 * 3
+   1. die-2
+   2. die-5
+   3. die-3
+
+You can also use randoms, like anywhere else. This rolls a random number
+of dice, between 3 and 6:
+
+   expression> die@1 * {3,4..5,6}
+   1. die-2
+   2. die-3
+   3. die-4
+   4. die-4
+
+In this case, you can I<only> put strictly positive numbers in the
+alternatives and in the ranges, because the I<modulo wrapping> procedure
+cannot be performed (there is no reference amount of cards to consider in
+this context).
+
+=head2 Replicating Results
+
+Sometimes, you might just want to replicate a shuffle. For example, you
+might have a deck of French cards, and you would like to shuffle two of
+them. You can always use the C<+> operator, of course:
+
+   expression> food + food
+   1. avocado
+   2. chocolate
+   3. egg
+   4. pizza
+   5. avocado
+   6. chocolate
+   7. egg
+   8. pizza
+
+It might get tedious if you want to replicate multiple times, or a random
+number of positive times. In the simple case above you can use the
+repetition operator C<*> of course:
+
+   expression> food * 2
+   1. avocado
+   2. chocolate
+   3. egg
+   4. pizza
+   5. avocado
+   6. chocolate
+   7. egg
+   8. pizza
+
+This will not work when the result from an expression is not the same at
+every run, though, as we already saw when rolling multiple dice:
+
+   expression> die@1 * 2
+   1. die-4
+   2. die-3
+
+Even the C<+> operator will not help you here, because it's basically what
+C<*> generalizes:
+
+   expression> die@1 + die@1
+   1. die-3
+   2. die-6
+
+To help you in these situations you can use the C<x> operator, which takes
+the I<result> of an expression (that is, the outcome of the resulting
+I<shuffle>) and replicates it:
+
+   expression> die@1 x 2
+   1. die-5
+   2. die-5
+
+   expression> food@2 x 3
+   1. egg
+   2. avocado
+   3. egg
+   4. avocado
+   5. egg
+   6. avocado
+
+Also here you can ask for a random draw from positive integers:
+
+   expression> home@2 x {2..3}
+   1. fridge
+   2. table
+   3. fridge
+   4. table
+
+   expression> home@2 x {2..3}
+   1. lamp
+   2. fridge
+   3. lamp
+   4. fridge
+   5. lamp
+   6. fridge
+
+Is this useful? You are the judge, but please let us know!
+
+=head1 HACKING/EXTENDING
+
+If you want to hack on L<Ordeal::Model> it should be pretty easy, here's
+a simplified map of the code.
+
+=head2 Expressions
+
+If you're into modifying parsing and evaluation, the main entry points are
+the following:
+
+=over
+
+=item *
+
+I<parsing> is done by L<Ordeal::Model::Parser>. It is a purely functional
+module (no objects here), heavily inspired to L<Higher Order
+Perl|https://hop.perl.plover.com/> and bearing no dependencies on other
+modules. Its goal is simple: take a string representation of an
+expression, and give back an I<Abstract Syntax Tree> (AST). Not
+surprisingly, it exports a L<Ordeal::Model::Parser/PARSE> function.
+
+=item *
+
+I<evaluating> expressions is done by L<Ordeal::Model::Evaluator>. It is
+object oriented, although it exports an
+L<Ordeal::Model::Evaluator/EVALUATE> function that does all the
+heavylifting for you and it's your go-to facility most of the times.
+
+It is highly coupled to L<Ordeal::Model::Parser>, because it evaluates
+ASTs coming out of there. It goes to the point of calling it behind the
+scenes if you pass a text expression to evaluate, instead of an AST; if
+you pass an AST, though, it works on its own. Hence, should you invent
+a different syntax producing compatible ASTs, you can use it directly by
+just passing the AST instead of the expression.
+
+Last, evaluation heavily relies upon the main L<Ordeal::Model> instance,
+because it's what allows it to dynamically load decks when needed. As
+such, it implicitly relies upon the relevan backend you are using.
+
+=item *
+
+the encapsulation of the result of an expression is represented by an
+L<Ordeal::Model::Shuffle> object. It's a technical wrapper around a deck
+(even a virtual one, created on the fly) to easily manage shuffling and
+reordering, as well as overlooking drawing of cards from the deck. You
+should probably not need to bother with it.
+
+=back
+
+It's not designed for extensibility at the moment, but there's always
+space for discussion!
+
+=head2 Storage
+
+If you are happy with the modeling of cards and decks, but would like to
+store them differently, this is where the backend comes to help. This
+module is supposed to be object-oriented and provide two methods:
+
+=over
+
+=item C< card >
+
+   my $card = $object->card($id_of_card);
+
+retrieve a card, returning an L<Ordeal::Model::Card> object;
+
+=item C< deck >
+
+   my $deck = $object->deck($id_of_deck);
+
+retrieve a deck, returning an L<Ordeal::Model::Deck> object.
+
+=back
+
+This is still very basic, e.g. most probably there will be a requirement
+for backends to also provide at least a list of all available decks.
+
+Using an alternative backend is very easy, just set it during
+construction in some way (see L<Ordeal::Model/new> for all of them):
+
+   my $m1 = Ordeal::Model->new(
+      $backend_name => \@args_for_backend_constructor
+   );
+
+   my $backend = My::Backend->new(...);
+   my $m2 = Ordeal::Model->new(backend => $backend);
+
+There are a few tricks you can play with C<$backend_name>, see the gory
+details in the reference documentation at L<Ordeal::Model/new>.
+
+
+=head2 Representation
+
+The representation of cards and decks are done by L<Ordeal::Model::Card>
+and L<Ordeal::Model::Deck> respectively. They are pretty generic, allowing
+you to store at least an I<identifier>, a I<name> and a I<group> (which is
+there for your convenience should you need it, e.g.
+L<Ordeal::Model::Backend::PlainFile> does not use it).
+
+In addition to this, L<Ordeal::Model::Card> also exposes data manipulation
+facilities like L<Ordeal::Model::Card/data> and
+L<Ordeal::Model::Card/content_type>. In case of
+L<Ordeal::Model::Backend::PlainFile>, the content-type is restricted to
+a few image types.
+
+For L<Ordeal::Model::Deck>, there are facilities to manage a collection of
+cards.
+
+If you want to change these representations, your best chance is to create
+your own backend (see L</Storage> above) and make it return your
+representations, which should be compatible with the interface of the
+original ones.
+
+
+=cut

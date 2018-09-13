@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use Data::Validate::Domain qw( is_hostname );
 
@@ -52,7 +52,7 @@ WebService::MinFraud::Data::Rx::Type::Hostname - A type to check for a valid hos
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

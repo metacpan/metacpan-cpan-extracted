@@ -4,7 +4,7 @@ use 5.010;
 use Moo 1.004005;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use HTTP::Headers ();
 use HTTP::Request ();
@@ -342,7 +342,7 @@ WebService::MinFraud::Client - Perl API for MaxMind's minFraud Score and Insight
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SYNOPSIS
 

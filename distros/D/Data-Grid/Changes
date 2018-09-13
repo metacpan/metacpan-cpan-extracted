@@ -1,5 +1,11 @@
 Revision history for Data-Grid
 
+0.05    Wed 12 Sep 2018 08:38:14 PDT
+        added missing deps to makefile (i am really sucking at this these days)
+
+0.04    Mon Sep 10 21:49:22 PDT 2018
+        ugggh of course Types::XSD::Lite doesn't ship with Type::Tiny
+
 0.03    Mon Sep 10 06:51:22 PDT 2018
         guess CPAN doesn't index dev releases anymore?
 

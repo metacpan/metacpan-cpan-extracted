@@ -46,7 +46,6 @@ t/04_console.t
 t/05_stats.t
 t/06_stacktrace.t
 t/07_grab.t
-t/08_source.t
 t/09_encoding.t
 t/10_run_gc.t
 t/11_typeof.t
@@ -57,6 +56,8 @@ t/15_sandbox.t
 t/16_const.t
 t/17_remove.t
 t/18_boolean.t
+t/19_blessed.t
+t/20_references.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -29,6 +29,9 @@ Dave
 Finn
 Fish
 Fowler
+GenericExecutable
+GenericTransformer
+GenericValidator
 George
 Git
 Graham

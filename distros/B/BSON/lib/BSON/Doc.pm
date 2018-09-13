@@ -6,7 +6,7 @@ package BSON::Doc;
 # ABSTRACT: BSON type wrapper for ordered documents
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp qw/croak/;
 use Tie::IxHash;
@@ -53,7 +53,7 @@ BSON::Doc - BSON type wrapper for ordered documents
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 

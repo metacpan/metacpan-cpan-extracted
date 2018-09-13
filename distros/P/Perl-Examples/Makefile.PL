@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Perl::Examples",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Exporter" => "5.57",
     "Getopt::Long" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.091",
+  "VERSION" => "0.092",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Exporter" => "5.57",
   "File::Spec" => 0,
   "Getopt::Long" => 0,
   "IO::Handle" => 0,

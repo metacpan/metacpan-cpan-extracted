@@ -1,5 +1,5 @@
 package GitLab::API::v4;
-$GitLab::API::v4::VERSION = '0.11';
+$GitLab::API::v4::VERSION = '0.12';
 =encoding utf8
 
 =head1 NAME
@@ -60,7 +60,7 @@ don't want them to.
 
 =head2 Constants
 
-The GitLab API, in rare cases, uses a numeric value to represent a state.
+The GitLab API, in rare cases, uses a hard-coded value to represent a state.
 To make life easier the L<GitLab::API::v4::Constants> module exposes
 these states as named variables.
 
@@ -283,7 +283,7 @@ has sudo_user => (
 
 =head2 rest_client
 
-An instance of L<GitLab::API::v4::RESTClient> (or wharwever L</rest_client_class>
+An instance of L<GitLab::API::v4::RESTClient> (or whatever L</rest_client_class>
 is set to).  Typically you will not be setting this as it defaults to a new
 instance and customization should not be necessary.
 
@@ -378,11 +378,15 @@ sub sudo {
     );
 }
 
-=head1 AWARD EMOJI METHODS
+=head1 API METHODS
+
+=head2 Award Emoji
 
 See L<https://docs.gitlab.com/ce/api/award_emoji.html>.
 
-=head2 issue_award_emojis
+=over
+
+=item issue_award_emojis
 
     my $award_emojis = $api->issue_award_emojis(
         $project_id,
@@ -406,7 +410,7 @@ sub issue_award_emojis {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/award_emoji', [@_], $options );
 }
 
-=head2 merge_request_award_emojis
+=item merge_request_award_emojis
 
     my $award_emojis = $api->merge_request_award_emojis(
         $project_id,
@@ -430,7 +434,7 @@ sub merge_request_award_emojis {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/award_emoji', [@_], $options );
 }
 
-=head2 snippet_award_emojis
+=item snippet_award_emojis
 
     my $award_emojis = $api->snippet_award_emojis(
         $project_id,
@@ -454,7 +458,7 @@ sub snippet_award_emojis {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_id/award_emoji', [@_], $options );
 }
 
-=head2 issue_award_emoji
+=item issue_award_emoji
 
     my $award_emoji = $api->issue_award_emoji(
         $project_id,
@@ -476,7 +480,7 @@ sub issue_award_emoji {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 merge_request_award_emoji
+=item merge_request_award_emoji
 
     my $award_emoji = $api->merge_request_award_emoji(
         $project_id,
@@ -498,7 +502,7 @@ sub merge_request_award_emoji {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 snippet_award_emoji
+=item snippet_award_emoji
 
     my $award_emoji = $api->snippet_award_emoji(
         $project_id,
@@ -520,7 +524,7 @@ sub snippet_award_emoji {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 create_issue_award_emoji
+=item create_issue_award_emoji
 
     my $award_emoji = $api->create_issue_award_emoji(
         $project_id,
@@ -544,7 +548,7 @@ sub create_issue_award_emoji {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/award_emoji', [@_], $options );
 }
 
-=head2 create_merge_request_award_emoji
+=item create_merge_request_award_emoji
 
     my $award_emoji = $api->create_merge_request_award_emoji(
         $project_id,
@@ -568,7 +572,7 @@ sub create_merge_request_award_emoji {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/award_emoji', [@_], $options );
 }
 
-=head2 create_snippet_award_emoji
+=item create_snippet_award_emoji
 
     my $award_emoji = $api->create_snippet_award_emoji(
         $project_id,
@@ -588,7 +592,7 @@ sub create_snippet_award_emoji {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/snippets/:snippet_id/award_emoji', [@_], $options );
 }
 
-=head2 delete_issue_award_emoji
+=item delete_issue_award_emoji
 
     my $award_emoji = $api->delete_issue_award_emoji(
         $project_id,
@@ -610,7 +614,7 @@ sub delete_issue_award_emoji {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/issues/:issue_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 delete_merge_request_award_emoji
+=item delete_merge_request_award_emoji
 
     my $award_emoji = $api->delete_merge_request_award_emoji(
         $project_id,
@@ -632,7 +636,7 @@ sub delete_merge_request_award_emoji {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/merge_requests/:merge_request_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 delete_snippet_award_emoji
+=item delete_snippet_award_emoji
 
     my $award_emoji = $api->delete_snippet_award_emoji(
         $project_id,
@@ -654,7 +658,7 @@ sub delete_snippet_award_emoji {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/snippets/:snippet_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 issue_note_award_emojis
+=item issue_note_award_emojis
 
     my $award_emojis = $api->issue_note_award_emojis(
         $project_id,
@@ -676,7 +680,7 @@ sub issue_note_award_emojis {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/notes/:note_id/award_emoji', [@_], $options );
 }
 
-=head2 issue_note_award_emoji
+=item issue_note_award_emoji
 
     my $award_emoji = $api->issue_note_award_emoji(
         $project_id,
@@ -700,7 +704,7 @@ sub issue_note_award_emoji {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/notes/:note_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 create_issue_note_award_emoji
+=item create_issue_note_award_emoji
 
     my $award_emoji = $api->create_issue_note_award_emoji(
         $project_id,
@@ -726,7 +730,7 @@ sub create_issue_note_award_emoji {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/notes/:note_id/award_emoji', [@_], $options );
 }
 
-=head2 delete_issue_note_award_emoji
+=item delete_issue_note_award_emoji
 
     my $award_emoji = $api->delete_issue_note_award_emoji(
         $project_id,
@@ -750,7 +754,7 @@ sub delete_issue_note_award_emoji {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/issues/:issue_iid/notes/:note_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 merge_request_note_award_emojis
+=item merge_request_note_award_emojis
 
     my $award_emojis = $api->merge_request_note_award_emojis(
         $project_id,
@@ -772,7 +776,7 @@ sub merge_request_note_award_emojis {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/notes/:note_id/award_emoji', [@_], $options );
 }
 
-=head2 merge_request_note_award_emoji
+=item merge_request_note_award_emoji
 
     my $award_emoji = $api->merge_request_note_award_emoji(
         $project_id,
@@ -796,7 +800,7 @@ sub merge_request_note_award_emoji {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/notes/:note_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head2 create_merge_request_note_award_emoji
+=item create_merge_request_note_award_emoji
 
     my $award_emoji = $api->create_merge_request_note_award_emoji(
         $project_id,
@@ -822,7 +826,7 @@ sub create_merge_request_note_award_emoji {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/notes/:note_id/award_emoji', [@_], $options );
 }
 
-=head2 delete_merge_request_note_award_emoji
+=item delete_merge_request_note_award_emoji
 
     my $award_emoji = $api->delete_merge_request_note_award_emoji(
         $project_id,
@@ -846,11 +850,15 @@ sub delete_merge_request_note_award_emoji {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/merge_requests/:merge_request_iid/notes/:note_id/award_emoji/:award_id', [@_], $options );
 }
 
-=head1 BRANCH METHODS
+=back
 
-See L<https://doc.gitlab.com/ce/api/branches.html>.
+=head2 Branches
 
-=head2 branches
+See L<https://docs.gitlab.com/ce/api/branches.html>.
+
+=over
+
+=item branches
 
     my $branches = $api->branches(
         $project_id,
@@ -872,7 +880,7 @@ sub branches {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/branches', [@_], $options );
 }
 
-=head2 branch
+=item branch
 
     my $branch = $api->branch(
         $project_id,
@@ -892,7 +900,7 @@ sub branch {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/branches/:branch_name', [@_], $options );
 }
 
-=head2 create_branch
+=item create_branch
 
     my $branch = $api->create_branch(
         $project_id,
@@ -914,7 +922,7 @@ sub create_branch {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/repository/branches', [@_], $options );
 }
 
-=head2 delete_branch
+=item delete_branch
 
     $api->delete_branch(
         $project_id,
@@ -936,7 +944,7 @@ sub delete_branch {
     return;
 }
 
-=head2 delete_merged_branches
+=item delete_merged_branches
 
     $api->delete_merged_branches(
         $project_id,
@@ -956,11 +964,15 @@ sub delete_merged_branches {
     return;
 }
 
-=head1 BROADCAST MESSAGE METHODS
+=back
+
+=head2 Broadcast Messages
 
 See L<https://docs.gitlab.com/ce/api/broadcast_messages.html>.
 
-=head2 broadcast_messages
+=over
+
+=item broadcast_messages
 
     my $messages = $api->broadcast_messages(
         \%params,
@@ -980,7 +992,7 @@ sub broadcast_messages {
     return $self->_call_rest_client( 'GET', 'broadcast_messages', [@_], $options );
 }
 
-=head2 broadcast_message
+=item broadcast_message
 
     my $message = $api->broadcast_message(
         $message_id,
@@ -998,7 +1010,7 @@ sub broadcast_message {
     return $self->_call_rest_client( 'GET', 'broadcast_messages/:message_id', [@_], $options );
 }
 
-=head2 create_broadcast_message
+=item create_broadcast_message
 
     my $message = $api->create_broadcast_message(
         \%params,
@@ -1018,7 +1030,7 @@ sub create_broadcast_message {
     return $self->_call_rest_client( 'POST', 'broadcast_messages', [@_], $options );
 }
 
-=head2 edit_broadcast_message
+=item edit_broadcast_message
 
     my $message = $api->edit_broadcast_message(
         $message_id,
@@ -1040,7 +1052,7 @@ sub edit_broadcast_message {
     return $self->_call_rest_client( 'PUT', 'broadcast_messages/:message_id', [@_], $options );
 }
 
-=head2 delete_broadcast_message
+=item delete_broadcast_message
 
     $api->delete_broadcast_message(
         $message_id,
@@ -1060,11 +1072,15 @@ sub delete_broadcast_message {
     return;
 }
 
-=head1 PROJECT LEVEL VARIABLE METHODS
+=back
+
+=head2 Project-level Variables
 
 See L<https://docs.gitlab.com/ce/api/project_level_variables.html>.
 
-=head2 project_variables
+=over
+
+=item project_variables
 
     my $variables = $api->project_variables(
         $project_id,
@@ -1086,7 +1102,7 @@ sub project_variables {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/variables', [@_], $options );
 }
 
-=head2 project_variable
+=item project_variable
 
     my $variable = $api->project_variable(
         $project_id,
@@ -1106,7 +1122,7 @@ sub project_variable {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/variables/:variable_key', [@_], $options );
 }
 
-=head2 create_project_variable
+=item create_project_variable
 
     my $variable = $api->create_project_variable(
         $project_id,
@@ -1128,7 +1144,7 @@ sub create_project_variable {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/variables', [@_], $options );
 }
 
-=head2 edit_project_variable
+=item edit_project_variable
 
     my $variable = $api->edit_project_variable(
         $project_id,
@@ -1152,7 +1168,7 @@ sub edit_project_variable {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/variables/:variable_key', [@_], $options );
 }
 
-=head2 delete_project_variable
+=item delete_project_variable
 
     $api->delete_project_variable(
         $project_id,
@@ -1174,11 +1190,15 @@ sub delete_project_variable {
     return;
 }
 
-=head1 GROUP LEVEL VARIABLE METHODS
+=back
+
+=head2 Group-level Variables
 
 See L<https://docs.gitlab.com/ce/api/group_level_variables.html>.
 
-=head2 group_variables
+=over
+
+=item group_variables
 
     my $variables = $api->group_variables(
         $group_id,
@@ -1200,7 +1220,7 @@ sub group_variables {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/variables', [@_], $options );
 }
 
-=head2 group_variable
+=item group_variable
 
     my $variable = $api->group_variable(
         $group_id,
@@ -1220,7 +1240,7 @@ sub group_variable {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/variables/:variable_key', [@_], $options );
 }
 
-=head2 create_group_variable
+=item create_group_variable
 
     my $variable = $api->create_group_variable(
         $group_id,
@@ -1242,7 +1262,7 @@ sub create_group_variable {
     return $self->_call_rest_client( 'POST', 'groups/:group_id/variables', [@_], $options );
 }
 
-=head2 edit_group_variable
+=item edit_group_variable
 
     my $variable = $api->edit_group_variable(
         $group_id,
@@ -1266,7 +1286,7 @@ sub edit_group_variable {
     return $self->_call_rest_client( 'PUT', 'groups/:group_id/variables/:variable_key', [@_], $options );
 }
 
-=head2 delete_group_variable
+=item delete_group_variable
 
     $api->delete_group_variable(
         $group_id,
@@ -1288,11 +1308,156 @@ sub delete_group_variable {
     return;
 }
 
-=head1 COMMIT METHODS
+=back
 
-See L<https://doc.gitlab.com/ce/api/commits.html>.
+=head2 Snippets
 
-=head2 commits
+See L<https://docs.gitlab.com/ce/api/snippets.html>.
+
+=over
+
+=item snippets
+
+    my $snippets = $api->snippets();
+
+Sends a C<GET> request to C<snippets> and returns the decoded response content.
+
+=cut
+
+sub snippets {
+    my $self = shift;
+    croak "The snippets method does not take any arguments" if @_;
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'snippets', [@_], $options );
+}
+
+=item snippet
+
+    my $snippet = $api->snippet(
+        $snippet_id,
+    );
+
+Sends a C<GET> request to C<snippets/:snippet_id> and returns the decoded response content.
+
+=cut
+
+sub snippet {
+    my $self = shift;
+    croak 'snippet must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($snippet_id) to snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'snippets/:snippet_id', [@_], $options );
+}
+
+=item create_snippet
+
+    my $snippet = $api->create_snippet(
+        \%params,
+    );
+
+Sends a C<POST> request to C<snippets> and returns the decoded response content.
+
+=cut
+
+sub create_snippet {
+    my $self = shift;
+    croak 'create_snippet must be called with 0 to 1 arguments' if @_ < 0 or @_ > 1;
+    croak 'The last argument (\%params) to create_snippet must be a hash ref' if defined($_[0]) and ref($_[0]) ne 'HASH';
+    my $params = (@_ == 1) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'snippets', [@_], $options );
+}
+
+=item edit_snippet
+
+    my $snippet = $api->edit_snippet(
+        $snippet_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<snippets/:snippet_id> and returns the decoded response content.
+
+=cut
+
+sub edit_snippet {
+    my $self = shift;
+    croak 'edit_snippet must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($snippet_id) to edit_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to edit_snippet must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'PUT', 'snippets/:snippet_id', [@_], $options );
+}
+
+=item delete_snippet
+
+    $api->delete_snippet(
+        $snippet_id,
+    );
+
+Sends a C<DELETE> request to C<snippets/:snippet_id>.
+
+=cut
+
+sub delete_snippet {
+    my $self = shift;
+    croak 'delete_snippet must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($snippet_id) to delete_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'snippets/:snippet_id', [@_], $options );
+    return;
+}
+
+=item public_snippets
+
+    my $snippets = $api->public_snippets(
+        \%params,
+    );
+
+Sends a C<GET> request to C<snippets/public> and returns the decoded response content.
+
+=cut
+
+sub public_snippets {
+    my $self = shift;
+    croak 'public_snippets must be called with 0 to 1 arguments' if @_ < 0 or @_ > 1;
+    croak 'The last argument (\%params) to public_snippets must be a hash ref' if defined($_[0]) and ref($_[0]) ne 'HASH';
+    my $params = (@_ == 1) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'snippets/public', [@_], $options );
+}
+
+=item snippet_user_agent_detail
+
+    my $user_agent = $api->snippet_user_agent_detail(
+        $snippet_id,
+    );
+
+Sends a C<GET> request to C<snippets/:snippet_id/user_agent_detail> and returns the decoded response content.
+
+=cut
+
+sub snippet_user_agent_detail {
+    my $self = shift;
+    croak 'snippet_user_agent_detail must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($snippet_id) to snippet_user_agent_detail must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'snippets/:snippet_id/user_agent_detail', [@_], $options );
+}
+
+=back
+
+=head2 Commits
+
+See L<https://docs.gitlab.com/ce/api/commits.html>.
+
+=over
+
+=item commits
 
     my $commits = $api->commits(
         $project_id,
@@ -1314,7 +1479,7 @@ sub commits {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits', [@_], $options );
 }
 
-=head2 create_commit
+=item create_commit
 
     my $commit = $api->create_commit(
         $project_id,
@@ -1336,7 +1501,7 @@ sub create_commit {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/repository/commits', [@_], $options );
 }
 
-=head2 commit
+=item commit
 
     my $commit = $api->commit(
         $project_id,
@@ -1356,7 +1521,7 @@ sub commit {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits/:commit_sha', [@_], $options );
 }
 
-=head2 cherry_pick_commit
+=item cherry_pick_commit
 
     my $commit = $api->cherry_pick_commit(
         $project_id,
@@ -1380,7 +1545,7 @@ sub cherry_pick_commit {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/repository/commits/:commit_sha/cherry_pick', [@_], $options );
 }
 
-=head2 commit_diff
+=item commit_diff
 
     my $diff = $api->commit_diff(
         $project_id,
@@ -1404,7 +1569,7 @@ sub commit_diff {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits/:commit_sha/diff', [@_], $options );
 }
 
-=head2 commit_comments
+=item commit_comments
 
     my $comments = $api->commit_comments(
         $project_id,
@@ -1428,7 +1593,7 @@ sub commit_comments {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits/:commit_sha/comments', [@_], $options );
 }
 
-=head2 create_commit_comment
+=item create_commit_comment
 
     $api->create_commit_comment(
         $project_id,
@@ -1454,7 +1619,7 @@ sub create_commit_comment {
     return;
 }
 
-=head2 commit_statuses
+=item commit_statuses
 
     my $build_statuses = $api->commit_statuses(
         $project_id,
@@ -1478,7 +1643,7 @@ sub commit_statuses {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits/:commit_sha/statuses', [@_], $options );
 }
 
-=head2 create_commit_status
+=item create_commit_status
 
     my $build_status = $api->create_commit_status(
         $project_id,
@@ -1502,11 +1667,15 @@ sub create_commit_status {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/statuses/:commit_sha', [@_], $options );
 }
 
-=head1 CUSTOM ATTRIBUTE METHODS
+=back
+
+=head2 Custom Attributes
 
 See L<https://docs.gitlab.com/ce/api/custom_attributes.html>.
 
-=head2 custom_user_attributes
+=over
+
+=item custom_user_attributes
 
     my $attributes = $api->custom_user_attributes(
         $user_id,
@@ -1524,7 +1693,7 @@ sub custom_user_attributes {
     return $self->_call_rest_client( 'GET', 'users/:user_id/custom_attributes', [@_], $options );
 }
 
-=head2 custom_group_attributes
+=item custom_group_attributes
 
     my $attributes = $api->custom_group_attributes(
         $group_id,
@@ -1542,7 +1711,7 @@ sub custom_group_attributes {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/custom_attributes', [@_], $options );
 }
 
-=head2 custom_project_attributes
+=item custom_project_attributes
 
     my $attributes = $api->custom_project_attributes(
         $project_id,
@@ -1560,7 +1729,7 @@ sub custom_project_attributes {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/custom_attributes', [@_], $options );
 }
 
-=head2 custom_user_attribute
+=item custom_user_attribute
 
     my $attribute = $api->custom_user_attribute(
         $user_id,
@@ -1580,7 +1749,7 @@ sub custom_user_attribute {
     return $self->_call_rest_client( 'GET', 'users/:user_id/custom_attributes/:attribute_key', [@_], $options );
 }
 
-=head2 custom_group_attribute
+=item custom_group_attribute
 
     my $attribute = $api->custom_group_attribute(
         $group_id,
@@ -1600,7 +1769,7 @@ sub custom_group_attribute {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/custom_attributes/:attribute_key', [@_], $options );
 }
 
-=head2 custom_project_attribute
+=item custom_project_attribute
 
     my $attribute = $api->custom_project_attribute(
         $project_id,
@@ -1620,7 +1789,7 @@ sub custom_project_attribute {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/custom_attributes/:attribute_key', [@_], $options );
 }
 
-=head2 set_custom_user_attribute
+=item set_custom_user_attribute
 
     my $attribute = $api->set_custom_user_attribute(
         $user_id,
@@ -1644,7 +1813,7 @@ sub set_custom_user_attribute {
     return $self->_call_rest_client( 'PUT', 'users/:user_id/custom_attributes/:attribute_key', [@_], $options );
 }
 
-=head2 set_custom_group_attribute
+=item set_custom_group_attribute
 
     my $attribute = $api->set_custom_group_attribute(
         $group_id,
@@ -1668,7 +1837,7 @@ sub set_custom_group_attribute {
     return $self->_call_rest_client( 'PUT', 'groups/:group_id/custom_attributes/:attribute_key', [@_], $options );
 }
 
-=head2 set_custom_project_attribute
+=item set_custom_project_attribute
 
     my $attribute = $api->set_custom_project_attribute(
         $project_id,
@@ -1692,7 +1861,7 @@ sub set_custom_project_attribute {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/custom_attributes/:attribute_key', [@_], $options );
 }
 
-=head2 delete_custom_user_attribute
+=item delete_custom_user_attribute
 
     $api->delete_custom_user_attribute(
         $user_id,
@@ -1714,7 +1883,7 @@ sub delete_custom_user_attribute {
     return;
 }
 
-=head2 delete_custom_group_attribute
+=item delete_custom_group_attribute
 
     $api->delete_custom_group_attribute(
         $group_id,
@@ -1736,7 +1905,7 @@ sub delete_custom_group_attribute {
     return;
 }
 
-=head2 delete_custom_project_attribute
+=item delete_custom_project_attribute
 
     $api->delete_custom_project_attribute(
         $project_id,
@@ -1758,11 +1927,15 @@ sub delete_custom_project_attribute {
     return;
 }
 
-=head1 DEPLOYMENT METHODS
+=back
+
+=head2 Deployments
 
 See L<https://docs.gitlab.com/ce/api/deployments.html>.
 
-=head2 deployments
+=over
+
+=item deployments
 
     my $deployments = $api->deployments(
         $project_id,
@@ -1784,7 +1957,7 @@ sub deployments {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/deployments', [@_], $options );
 }
 
-=head2 deployment
+=item deployment
 
     my $deployment = $api->deployment(
         $project_id,
@@ -1804,11 +1977,15 @@ sub deployment {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/deployments/:deployment_id', [@_], $options );
 }
 
-=head1 DEPLOY KEY METHODS
+=back
+
+=head2 Deploy Keys
 
 See L<https://docs.gitlab.com/ce/api/deploy_keys.html>.
 
-=head2 all_deploy_keys
+=over
+
+=item all_deploy_keys
 
     my $keys = $api->all_deploy_keys(
         \%params,
@@ -1828,7 +2005,7 @@ sub all_deploy_keys {
     return $self->_call_rest_client( 'GET', 'deploy_keys', [@_], $options );
 }
 
-=head2 deploy_keys
+=item deploy_keys
 
     my $keys = $api->deploy_keys(
         $project_id,
@@ -1850,7 +2027,7 @@ sub deploy_keys {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/deploy_keys', [@_], $options );
 }
 
-=head2 deploy_key
+=item deploy_key
 
     my $key = $api->deploy_key(
         $project_id,
@@ -1870,7 +2047,7 @@ sub deploy_key {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/deploy_keys/:key_id', [@_], $options );
 }
 
-=head2 create_deploy_key
+=item create_deploy_key
 
     my $key = $api->create_deploy_key(
         $project_id,
@@ -1892,7 +2069,7 @@ sub create_deploy_key {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/deploy_keys', [@_], $options );
 }
 
-=head2 delete_deploy_key
+=item delete_deploy_key
 
     $api->delete_deploy_key(
         $project_id,
@@ -1914,7 +2091,7 @@ sub delete_deploy_key {
     return;
 }
 
-=head2 enable_deploy_key
+=item enable_deploy_key
 
     my $key = $api->enable_deploy_key(
         $project_id,
@@ -1934,11 +2111,15 @@ sub enable_deploy_key {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/deploy_keys/:key_id/enable', [@_], $options );
 }
 
-=head1 ENVIRONMENT METHODS
+=back
+
+=head2 Environments
 
 See L<https://docs.gitlab.com/ce/api/environments.html>.
 
-=head2 environments
+=over
+
+=item environments
 
     my $environments = $api->environments(
         $project_id,
@@ -1960,7 +2141,7 @@ sub environments {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/environments', [@_], $options );
 }
 
-=head2 create_environment
+=item create_environment
 
     my $environment = $api->create_environment(
         $project_id,
@@ -1982,7 +2163,7 @@ sub create_environment {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/environments', [@_], $options );
 }
 
-=head2 edit_environment
+=item edit_environment
 
     my $environment = $api->edit_environment(
         $project_id,
@@ -2006,7 +2187,7 @@ sub edit_environment {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/environments/:environments_id', [@_], $options );
 }
 
-=head2 delete_environment
+=item delete_environment
 
     $api->delete_environment(
         $project_id,
@@ -2028,7 +2209,7 @@ sub delete_environment {
     return;
 }
 
-=head2 stop_environment
+=item stop_environment
 
     my $environment = $api->stop_environment(
         $project_id,
@@ -2048,11 +2229,15 @@ sub stop_environment {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/environments/:environment_id/stop', [@_], $options );
 }
 
-=head1 EVENT METHODS
+=back
+
+=head2 Events
 
 See L<https://docs.gitlab.com/ce/api/events.html>.
 
-=head2 all_events
+=over
+
+=item all_events
 
     my $events = $api->all_events(
         \%params,
@@ -2072,7 +2257,7 @@ sub all_events {
     return $self->_call_rest_client( 'GET', 'events', [@_], $options );
 }
 
-=head2 user_events
+=item user_events
 
     my $events = $api->user_events(
         $user_id,
@@ -2094,7 +2279,7 @@ sub user_events {
     return $self->_call_rest_client( 'GET', 'users/:user_id/events', [@_], $options );
 }
 
-=head2 project_events
+=item project_events
 
     my $events = $api->project_events(
         $project_id,
@@ -2116,11 +2301,15 @@ sub project_events {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/events', [@_], $options );
 }
 
-=head1 FEATURE FLAG METHODS
+=back
+
+=head2 Feature flags
 
 See L<https://docs.gitlab.com/ce/api/features.html>.
 
-=head2 features
+=over
+
+=item features
 
     my $features = $api->features();
 
@@ -2135,7 +2324,7 @@ sub features {
     return $self->_call_rest_client( 'GET', 'features', [@_], $options );
 }
 
-=head2 set_feature
+=item set_feature
 
     my $feature = $api->set_feature(
         $name,
@@ -2157,11 +2346,15 @@ sub set_feature {
     return $self->_call_rest_client( 'POST', 'features/:name', [@_], $options );
 }
 
-=head1 GITIGNORES TEMPLATE METHODS
+=back
+
+=head2 Gitignores
 
 See L<https://docs.gitlab.com/ce/api/templates/gitignores.html>.
 
-=head2 gitignores_templates
+=over
+
+=item gitignores_templates
 
     my $templates = $api->gitignores_templates(
         \%params,
@@ -2181,7 +2374,7 @@ sub gitignores_templates {
     return $self->_call_rest_client( 'GET', 'templates/gitignores', [@_], $options );
 }
 
-=head2 gitignores_template
+=item gitignores_template
 
     my $template = $api->gitignores_template(
         $template_key,
@@ -2199,11 +2392,15 @@ sub gitignores_template {
     return $self->_call_rest_client( 'GET', 'templates/gitignores/:template_key', [@_], $options );
 }
 
-=head1 GITLAB CI CONFIG TEMPLATE METHODS
+=back
+
+=head2 GitLab CI YMLs
 
 See L<https://docs.gitlab.com/ce/api/templates/gitlab_ci_ymls.html>.
 
-=head2 gitlab_ci_ymls_templates
+=over
+
+=item gitlab_ci_ymls_templates
 
     my $templates = $api->gitlab_ci_ymls_templates(
         \%params,
@@ -2223,7 +2420,7 @@ sub gitlab_ci_ymls_templates {
     return $self->_call_rest_client( 'GET', 'templates/gitlab_ci_ymls', [@_], $options );
 }
 
-=head2 gitlab_ci_ymls_template
+=item gitlab_ci_ymls_template
 
     my $template = $api->gitlab_ci_ymls_template(
         $template_key,
@@ -2241,11 +2438,15 @@ sub gitlab_ci_ymls_template {
     return $self->_call_rest_client( 'GET', 'templates/gitlab_ci_ymls/:template_key', [@_], $options );
 }
 
-=head1 GROUP METHODS
+=back
+
+=head2 Groups
 
 See L<https://docs.gitlab.com/ce/api/groups.html>.
 
-=head2 groups
+=over
+
+=item groups
 
     my $groups = $api->groups(
         \%params,
@@ -2265,7 +2466,7 @@ sub groups {
     return $self->_call_rest_client( 'GET', 'groups', [@_], $options );
 }
 
-=head2 group_subgroups
+=item group_subgroups
 
     my $subgroups = $api->group_subgroups(
         $group_id,
@@ -2287,7 +2488,7 @@ sub group_subgroups {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/subgroups', [@_], $options );
 }
 
-=head2 group_projects
+=item group_projects
 
     my $projects = $api->group_projects(
         $group_id,
@@ -2309,7 +2510,7 @@ sub group_projects {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/projects', [@_], $options );
 }
 
-=head2 group
+=item group
 
     my $group = $api->group(
         $group_id,
@@ -2327,7 +2528,7 @@ sub group {
     return $self->_call_rest_client( 'GET', 'groups/:group_id', [@_], $options );
 }
 
-=head2 create_group
+=item create_group
 
     $api->create_group(
         \%params,
@@ -2349,7 +2550,7 @@ sub create_group {
     return;
 }
 
-=head2 transfer_project_to_group
+=item transfer_project_to_group
 
     $api->transfer_project_to_group(
         $group_id,
@@ -2371,7 +2572,7 @@ sub transfer_project_to_group {
     return;
 }
 
-=head2 edit_group
+=item edit_group
 
     my $group = $api->edit_group(
         $group_id,
@@ -2393,7 +2594,7 @@ sub edit_group {
     return $self->_call_rest_client( 'PUT', 'groups/:group_id', [@_], $options );
 }
 
-=head2 delete_group
+=item delete_group
 
     $api->delete_group(
         $group_id,
@@ -2413,7 +2614,7 @@ sub delete_group {
     return;
 }
 
-=head2 sync_group_with_ldap
+=item sync_group_with_ldap
 
     $api->sync_group_with_ldap(
         $group_id,
@@ -2433,7 +2634,7 @@ sub sync_group_with_ldap {
     return;
 }
 
-=head2 create_ldap_group_link
+=item create_ldap_group_link
 
     $api->create_ldap_group_link(
         $group_id,
@@ -2457,7 +2658,7 @@ sub create_ldap_group_link {
     return;
 }
 
-=head2 delete_ldap_group_link
+=item delete_ldap_group_link
 
     $api->delete_ldap_group_link(
         $group_id,
@@ -2479,7 +2680,7 @@ sub delete_ldap_group_link {
     return;
 }
 
-=head2 delete_ldap_provider_group_link
+=item delete_ldap_provider_group_link
 
     $api->delete_ldap_provider_group_link(
         $group_id,
@@ -2503,11 +2704,241 @@ sub delete_ldap_provider_group_link {
     return;
 }
 
-=head1 GROUP AND PROJECT MEMBER METHODS
+=back
+
+=head2 Group access requests
+
+See L<https://docs.gitlab.com/ce/api/access_requests.html>.
+
+=over
+
+=item group_access_requests
+
+    my $requests = $api->group_access_requests(
+        $group_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/access_requests> and returns the decoded response content.
+
+=cut
+
+sub group_access_requests {
+    my $self = shift;
+    croak 'group_access_requests must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($group_id) to group_access_requests must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to group_access_requests must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/access_requests', [@_], $options );
+}
+
+=item request_group_access
+
+    my $request = $api->request_group_access(
+        $group_id,
+    );
+
+Sends a C<POST> request to C<groups/:group_id/access_requests> and returns the decoded response content.
+
+=cut
+
+sub request_group_access {
+    my $self = shift;
+    croak 'request_group_access must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($group_id) to request_group_access must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'POST', 'groups/:group_id/access_requests', [@_], $options );
+}
+
+=item approve_group_access
+
+    my $request = $api->approve_group_access(
+        $group_id,
+        $user_id,
+    );
+
+Sends a C<PUT> request to C<groups/:group_id/access_requests/:user_id/approve> and returns the decoded response content.
+
+=cut
+
+sub approve_group_access {
+    my $self = shift;
+    croak 'approve_group_access must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to approve_group_access must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($user_id) to approve_group_access must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'PUT', 'groups/:group_id/access_requests/:user_id/approve', [@_], $options );
+}
+
+=item deny_group_access
+
+    $api->deny_group_access(
+        $group_id,
+        $user_id,
+    );
+
+Sends a C<DELETE> request to C<groups/:group_id/access_requests/:user_id>.
+
+=cut
+
+sub deny_group_access {
+    my $self = shift;
+    croak 'deny_group_access must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to deny_group_access must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($user_id) to deny_group_access must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'groups/:group_id/access_requests/:user_id', [@_], $options );
+    return;
+}
+
+=back
+
+=head2 Group badges
+
+See L<https://docs.gitlab.com/ce/api/group_badges.html>.
+
+=over
+
+=item group_badges
+
+    my $badges = $api->group_badges(
+        $group_id,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/badges> and returns the decoded response content.
+
+=cut
+
+sub group_badges {
+    my $self = shift;
+    croak 'group_badges must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($group_id) to group_badges must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/badges', [@_], $options );
+}
+
+=item group_badge
+
+    my $badge = $api->group_badge(
+        $group_id,
+        $badge_id,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/badges/:badge_id> and returns the decoded response content.
+
+=cut
+
+sub group_badge {
+    my $self = shift;
+    croak 'group_badge must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to group_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($badge_id) to group_badge must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/badges/:badge_id', [@_], $options );
+}
+
+=item create_group_badge
+
+    my $badge = $api->create_group_badge(
+        $group_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<groups/:group_id/badges> and returns the decoded response content.
+
+=cut
+
+sub create_group_badge {
+    my $self = shift;
+    croak 'create_group_badge must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($group_id) to create_group_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to create_group_badge must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'groups/:group_id/badges', [@_], $options );
+}
+
+=item edit_group_badge
+
+    my $badge = $api->edit_group_badge(
+        $group_id,
+        $badge_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<groups/:group_id/badges/:badge_id> and returns the decoded response content.
+
+=cut
+
+sub edit_group_badge {
+    my $self = shift;
+    croak 'edit_group_badge must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($group_id) to edit_group_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($badge_id) to edit_group_badge must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to edit_group_badge must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'PUT', 'groups/:group_id/badges/:badge_id', [@_], $options );
+}
+
+=item delete_group_badge
+
+    $api->delete_group_badge(
+        $group_id,
+        $badge_id,
+    );
+
+Sends a C<DELETE> request to C<groups/:group_id/badges/:badge_id>.
+
+=cut
+
+sub delete_group_badge {
+    my $self = shift;
+    croak 'delete_group_badge must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to delete_group_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($badge_id) to delete_group_badge must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'groups/:group_id/badges/:badge_id', [@_], $options );
+    return;
+}
+
+=item preview_group_badge
+
+    my $preview = $api->preview_group_badge(
+        $group_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/badges/render> and returns the decoded response content.
+
+=cut
+
+sub preview_group_badge {
+    my $self = shift;
+    croak 'preview_group_badge must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($group_id) to preview_group_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to preview_group_badge must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/badges/render', [@_], $options );
+}
+
+=back
+
+=head2 Group members
 
 See L<https://docs.gitlab.com/ce/api/members.html>.
 
-=head2 group_members
+=over
+
+=item group_members
 
     my $members = $api->group_members(
         $group_id,
@@ -2529,29 +2960,7 @@ sub group_members {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/members', [@_], $options );
 }
 
-=head2 project_members
-
-    my $members = $api->project_members(
-        $project_id,
-        \%params,
-    );
-
-Sends a C<GET> request to C<projects/:project_id/members> and returns the decoded response content.
-
-=cut
-
-sub project_members {
-    my $self = shift;
-    croak 'project_members must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
-    croak 'The #1 argument ($project_id) to project_members must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The last argument (\%params) to project_members must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
-    my $params = (@_ == 2) ? pop() : undef;
-    my $options = {};
-    $options->{query} = $params if defined $params;
-    return $self->_call_rest_client( 'GET', 'projects/:project_id/members', [@_], $options );
-}
-
-=head2 group_member
+=item group_member
 
     my $member = $api->group_member(
         $project_id,
@@ -2571,27 +2980,7 @@ sub group_member {
     return $self->_call_rest_client( 'GET', 'groups/:project_id/members/:user_id', [@_], $options );
 }
 
-=head2 project_member
-
-    my $member = $api->project_member(
-        $project_id,
-        $user_id,
-    );
-
-Sends a C<GET> request to C<projects/:project_id/members/:user_id> and returns the decoded response content.
-
-=cut
-
-sub project_member {
-    my $self = shift;
-    croak 'project_member must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($project_id) to project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($user_id) to project_member must be a scalar' if ref($_[1]) or (!defined $_[1]);
-    my $options = {};
-    return $self->_call_rest_client( 'GET', 'projects/:project_id/members/:user_id', [@_], $options );
-}
-
-=head2 add_group_member
+=item add_group_member
 
     my $member = $api->add_group_member(
         $group_id,
@@ -2613,29 +3002,7 @@ sub add_group_member {
     return $self->_call_rest_client( 'POST', 'groups/:group_id/members', [@_], $options );
 }
 
-=head2 add_project_member
-
-    my $member = $api->add_project_member(
-        $project_id,
-        \%params,
-    );
-
-Sends a C<POST> request to C<projects/:project_id/members> and returns the decoded response content.
-
-=cut
-
-sub add_project_member {
-    my $self = shift;
-    croak 'add_project_member must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
-    croak 'The #1 argument ($project_id) to add_project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The last argument (\%params) to add_project_member must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
-    my $params = (@_ == 2) ? pop() : undef;
-    my $options = {};
-    $options->{content} = $params if defined $params;
-    return $self->_call_rest_client( 'POST', 'projects/:project_id/members', [@_], $options );
-}
-
-=head2 update_group_member
+=item update_group_member
 
     my $member = $api->update_group_member(
         $group_id,
@@ -2659,31 +3026,7 @@ sub update_group_member {
     return $self->_call_rest_client( 'PUT', 'groups/:group_id/members/:user_id', [@_], $options );
 }
 
-=head2 update_project_member
-
-    my $member = $api->update_project_member(
-        $project_id,
-        $user_id,
-        \%params,
-    );
-
-Sends a C<PUT> request to C<projects/:project_id/members/:user_id> and returns the decoded response content.
-
-=cut
-
-sub update_project_member {
-    my $self = shift;
-    croak 'update_project_member must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
-    croak 'The #1 argument ($project_id) to update_project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($user_id) to update_project_member must be a scalar' if ref($_[1]) or (!defined $_[1]);
-    croak 'The last argument (\%params) to update_project_member must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
-    my $params = (@_ == 3) ? pop() : undef;
-    my $options = {};
-    $options->{content} = $params if defined $params;
-    return $self->_call_rest_client( 'PUT', 'projects/:project_id/members/:user_id', [@_], $options );
-}
-
-=head2 remove_group_member
+=item remove_group_member
 
     $api->remove_group_member(
         $group_id,
@@ -2705,33 +3048,15 @@ sub remove_group_member {
     return;
 }
 
-=head2 remove_project_member
+=back
 
-    $api->remove_project_member(
-        $project_id,
-        $user_id,
-    );
-
-Sends a C<DELETE> request to C<projects/:project_id/members/:user_id>.
-
-=cut
-
-sub remove_project_member {
-    my $self = shift;
-    croak 'remove_project_member must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($project_id) to remove_project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($user_id) to remove_project_member must be a scalar' if ref($_[1]) or (!defined $_[1]);
-    my $options = {};
-    $options->{decode} = 0;
-    $self->_call_rest_client( 'DELETE', 'projects/:project_id/members/:user_id', [@_], $options );
-    return;
-}
-
-=head1 ISSUE METHODS
+=head2 Issues
 
 See L<https://docs.gitlab.com/ce/api/issues.html>.
 
-=head2 global_issues
+=over
+
+=item global_issues
 
     my $issues = $api->global_issues(
         \%params,
@@ -2751,7 +3076,7 @@ sub global_issues {
     return $self->_call_rest_client( 'GET', 'issues', [@_], $options );
 }
 
-=head2 group_issues
+=item group_issues
 
     my $issues = $api->group_issues(
         $group_id,
@@ -2773,7 +3098,7 @@ sub group_issues {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/issues', [@_], $options );
 }
 
-=head2 issues
+=item issues
 
     my $issues = $api->issues(
         $project_id,
@@ -2795,7 +3120,7 @@ sub issues {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues', [@_], $options );
 }
 
-=head2 issue
+=item issue
 
     my $issue = $api->issue(
         $project_id,
@@ -2815,7 +3140,7 @@ sub issue {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid', [@_], $options );
 }
 
-=head2 create_issue
+=item create_issue
 
     my $issue = $api->create_issue(
         $project_id,
@@ -2837,7 +3162,7 @@ sub create_issue {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues', [@_], $options );
 }
 
-=head2 edit_issue
+=item edit_issue
 
     my $issue = $api->edit_issue(
         $project_id,
@@ -2861,7 +3186,7 @@ sub edit_issue {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/issues/:issue_iid', [@_], $options );
 }
 
-=head2 delete_issue
+=item delete_issue
 
     $api->delete_issue(
         $project_id,
@@ -2883,7 +3208,7 @@ sub delete_issue {
     return;
 }
 
-=head2 move_issue
+=item move_issue
 
     my $issue = $api->move_issue(
         $project_id,
@@ -2907,7 +3232,7 @@ sub move_issue {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/move', [@_], $options );
 }
 
-=head2 subscribe_to_issue
+=item subscribe_to_issue
 
     my $issue = $api->subscribe_to_issue(
         $project_id,
@@ -2927,7 +3252,7 @@ sub subscribe_to_issue {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/subscribe', [@_], $options );
 }
 
-=head2 unsubscribe_from_issue
+=item unsubscribe_from_issue
 
     my $issue = $api->unsubscribe_from_issue(
         $project_id,
@@ -2947,7 +3272,7 @@ sub unsubscribe_from_issue {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/unsubscribe', [@_], $options );
 }
 
-=head2 create_issue_todo
+=item create_issue_todo
 
     my $todo = $api->create_issue_todo(
         $project_id,
@@ -2967,7 +3292,7 @@ sub create_issue_todo {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/todo', [@_], $options );
 }
 
-=head2 set_issue_time_estimate
+=item set_issue_time_estimate
 
     my $tracking = $api->set_issue_time_estimate(
         $project_id,
@@ -2991,7 +3316,7 @@ sub set_issue_time_estimate {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/time_estimate', [@_], $options );
 }
 
-=head2 reset_issue_time_estimate
+=item reset_issue_time_estimate
 
     my $tracking = $api->reset_issue_time_estimate(
         $project_id,
@@ -3011,7 +3336,7 @@ sub reset_issue_time_estimate {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/reset_time_estimate', [@_], $options );
 }
 
-=head2 add_issue_spent_time
+=item add_issue_spent_time
 
     my $tracking = $api->add_issue_spent_time(
         $project_id,
@@ -3035,7 +3360,7 @@ sub add_issue_spent_time {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/add_spent_time', [@_], $options );
 }
 
-=head2 reset_issue_spent_time
+=item reset_issue_spent_time
 
     my $tracking = $api->reset_issue_spent_time(
         $project_id,
@@ -3055,7 +3380,7 @@ sub reset_issue_spent_time {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/reset_spent_time', [@_], $options );
 }
 
-=head2 issue_time_stats
+=item issue_time_stats
 
     my $tracking = $api->issue_time_stats(
         $project_id,
@@ -3075,7 +3400,7 @@ sub issue_time_stats {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/time_stats', [@_], $options );
 }
 
-=head2 issue_closed_by
+=item issue_closed_by
 
     my $merge_requests = $api->issue_closed_by(
         $project_id,
@@ -3095,7 +3420,7 @@ sub issue_closed_by {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/closed_by', [@_], $options );
 }
 
-=head2 issue_user_agent_detail
+=item issue_user_agent_detail
 
     my $user_agent = $api->issue_user_agent_detail(
         $project_id,
@@ -3115,11 +3440,15 @@ sub issue_user_agent_detail {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/user_agent_detail', [@_], $options );
 }
 
-=head1 ISSUE BOARD METHODS
+=back
+
+=head2 Issue Boards
 
 See L<https://docs.gitlab.com/ce/api/boards.html>.
 
-=head2 project_boards
+=over
+
+=item project_boards
 
     my $boards = $api->project_boards(
         $project_id,
@@ -3141,7 +3470,7 @@ sub project_boards {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/boards', [@_], $options );
 }
 
-=head2 project_board_lists
+=item project_board_lists
 
     my $lists = $api->project_board_lists(
         $project_id,
@@ -3165,7 +3494,7 @@ sub project_board_lists {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/boards/:board_id/lists', [@_], $options );
 }
 
-=head2 project_board_list
+=item project_board_list
 
     my $list = $api->project_board_list(
         $project_id,
@@ -3187,7 +3516,7 @@ sub project_board_list {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/boards/:board_id/lists/:list_id', [@_], $options );
 }
 
-=head2 create_project_board_list
+=item create_project_board_list
 
     my $list = $api->create_project_board_list(
         $project_id,
@@ -3211,7 +3540,7 @@ sub create_project_board_list {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/boards/:board_id/lists', [@_], $options );
 }
 
-=head2 edit_project_board_list
+=item edit_project_board_list
 
     my $list = $api->edit_project_board_list(
         $project_id,
@@ -3237,7 +3566,7 @@ sub edit_project_board_list {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/boards/:board_id/lists/:list_id', [@_], $options );
 }
 
-=head2 delete_project_board_list
+=item delete_project_board_list
 
     $api->delete_project_board_list(
         $project_id,
@@ -3261,11 +3590,177 @@ sub delete_project_board_list {
     return;
 }
 
-=head1 JOB METHODS
+=back
+
+=head2 Group Issue Boards
+
+See L<https://docs.gitlab.com/ce/api/group_boards.html>.
+
+=over
+
+=item group_boards
+
+    my $boards = $api->group_boards(
+        $group_id,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/boards> and returns the decoded response content.
+
+=cut
+
+sub group_boards {
+    my $self = shift;
+    croak 'group_boards must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($group_id) to group_boards must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/boards', [@_], $options );
+}
+
+=item group_board
+
+    my $board = $api->group_board(
+        $group_id,
+        $board_id,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/boards/:board_id> and returns the decoded response content.
+
+=cut
+
+sub group_board {
+    my $self = shift;
+    croak 'group_board must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to group_board must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($board_id) to group_board must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/boards/:board_id', [@_], $options );
+}
+
+=item group_board_lists
+
+    my $lists = $api->group_board_lists(
+        $group_id,
+        $board_id,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/boards/:board_id/lists> and returns the decoded response content.
+
+=cut
+
+sub group_board_lists {
+    my $self = shift;
+    croak 'group_board_lists must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($group_id) to group_board_lists must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($board_id) to group_board_lists must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/boards/:board_id/lists', [@_], $options );
+}
+
+=item group_board_list
+
+    my $list = $api->group_board_list(
+        $group_id,
+        $board_id,
+        $list_id,
+    );
+
+Sends a C<GET> request to C<groups/:group_id/boards/:board_id/lists/:list_id> and returns the decoded response content.
+
+=cut
+
+sub group_board_list {
+    my $self = shift;
+    croak 'group_board_list must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($group_id) to group_board_list must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($board_id) to group_board_list must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($list_id) to group_board_list must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'groups/:group_id/boards/:board_id/lists/:list_id', [@_], $options );
+}
+
+=item create_group_board_list
+
+    my $list = $api->create_group_board_list(
+        $group_id,
+        $board_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<groups/:group_id/boards/:board_id/lists> and returns the decoded response content.
+
+=cut
+
+sub create_group_board_list {
+    my $self = shift;
+    croak 'create_group_board_list must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($group_id) to create_group_board_list must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($board_id) to create_group_board_list must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to create_group_board_list must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'groups/:group_id/boards/:board_id/lists', [@_], $options );
+}
+
+=item edit_group_board_list
+
+    my $list = $api->edit_group_board_list(
+        $group_id,
+        $board_id,
+        $list_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<groups/:group_id/boards/:board_id/lists/:list_id> and returns the decoded response content.
+
+=cut
+
+sub edit_group_board_list {
+    my $self = shift;
+    croak 'edit_group_board_list must be called with 3 to 4 arguments' if @_ < 3 or @_ > 4;
+    croak 'The #1 argument ($group_id) to edit_group_board_list must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($board_id) to edit_group_board_list must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($list_id) to edit_group_board_list must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The last argument (\%params) to edit_group_board_list must be a hash ref' if defined($_[3]) and ref($_[3]) ne 'HASH';
+    my $params = (@_ == 4) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'PUT', 'groups/:group_id/boards/:board_id/lists/:list_id', [@_], $options );
+}
+
+=item delete_group_board_list
+
+    $api->delete_group_board_list(
+        $group_id,
+        $board_id,
+        $list_id,
+    );
+
+Sends a C<DELETE> request to C<groups/:group_id/boards/:board_id/lists/:list_id>.
+
+=cut
+
+sub delete_group_board_list {
+    my $self = shift;
+    croak 'delete_group_board_list must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($group_id) to delete_group_board_list must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($board_id) to delete_group_board_list must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($list_id) to delete_group_board_list must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'groups/:group_id/boards/:board_id/lists/:list_id', [@_], $options );
+    return;
+}
+
+=back
+
+=head2 Jobs
 
 See L<https://docs.gitlab.com/ce/api/jobs.html>.
 
-=head2 jobs
+=over
+
+=item jobs
 
     my $jobs = $api->jobs(
         $project_id,
@@ -3287,7 +3782,7 @@ sub jobs {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/jobs', [@_], $options );
 }
 
-=head2 pipeline_jobs
+=item pipeline_jobs
 
     my $jobs = $api->pipeline_jobs(
         $project_id,
@@ -3311,7 +3806,7 @@ sub pipeline_jobs {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pipelines/:pipeline_id/jobs', [@_], $options );
 }
 
-=head2 job
+=item job
 
     my $job = $api->job(
         $project_id,
@@ -3331,7 +3826,7 @@ sub job {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/jobs/:job_id', [@_], $options );
 }
 
-=head2 job_artifacts
+=item job_artifacts
 
     my $artifacts = $api->job_artifacts(
         $project_id,
@@ -3351,7 +3846,7 @@ sub job_artifacts {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/jobs/:job_id/artifacts', [@_], $options );
 }
 
-=head2 job_artifacts_archive
+=item job_artifacts_archive
 
     my $archive = $api->job_artifacts_archive(
         $project_id,
@@ -3375,7 +3870,7 @@ sub job_artifacts_archive {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/jobs/artifacts/:ref_name/download', [@_], $options );
 }
 
-=head2 job_artifacts_file
+=item job_artifacts_file
 
     my $file = $api->job_artifacts_file(
         $project_id,
@@ -3397,7 +3892,7 @@ sub job_artifacts_file {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/jobs/:job_id/artifacts/:artifact_path', [@_], $options );
 }
 
-=head2 job_trace_file
+=item job_trace_file
 
     my $file = $api->job_trace_file(
         $project_id,
@@ -3417,7 +3912,7 @@ sub job_trace_file {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/jobs/:job_id/trace', [@_], $options );
 }
 
-=head2 cancel_job
+=item cancel_job
 
     my $job = $api->cancel_job(
         $project_id,
@@ -3437,7 +3932,7 @@ sub cancel_job {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/jobs/:job_id/cancel', [@_], $options );
 }
 
-=head2 retry_job
+=item retry_job
 
     my $job = $api->retry_job(
         $project_id,
@@ -3457,7 +3952,7 @@ sub retry_job {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/jobs/:job_id/retry', [@_], $options );
 }
 
-=head2 erase_job
+=item erase_job
 
     my $job = $api->erase_job(
         $project_id,
@@ -3477,7 +3972,7 @@ sub erase_job {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/jobs/:job_id/erase', [@_], $options );
 }
 
-=head2 keep_job_artifacts
+=item keep_job_artifacts
 
     my $job = $api->keep_job_artifacts(
         $project_id,
@@ -3497,7 +3992,7 @@ sub keep_job_artifacts {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/jobs/:job_id/artifacts/keep', [@_], $options );
 }
 
-=head2 play_job
+=item play_job
 
     my $job = $api->play_job(
         $project_id,
@@ -3517,11 +4012,15 @@ sub play_job {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/jobs/:job_id/play', [@_], $options );
 }
 
-=head1 KEY METHODS
+=back
+
+=head2 Keys
 
 See L<https://docs.gitlab.com/ce/api/keys.html>.
 
-=head2 key
+=over
+
+=item key
 
     my $key = $api->key(
         $key_id,
@@ -3539,11 +4038,15 @@ sub key {
     return $self->_call_rest_client( 'GET', 'keys/:key_id', [@_], $options );
 }
 
-=head1 LABEL METHODS
+=back
+
+=head2 Labels
 
 See L<https://docs.gitlab.com/ce/api/labels.html>.
 
-=head2 labels
+=over
+
+=item labels
 
     my $labels = $api->labels(
         $project_id,
@@ -3565,7 +4068,7 @@ sub labels {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/labels', [@_], $options );
 }
 
-=head2 create_label
+=item create_label
 
     my $label = $api->create_label(
         $project_id,
@@ -3587,7 +4090,7 @@ sub create_label {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/labels', [@_], $options );
 }
 
-=head2 delete_label
+=item delete_label
 
     $api->delete_label(
         $project_id,
@@ -3611,7 +4114,7 @@ sub delete_label {
     return;
 }
 
-=head2 edit_label
+=item edit_label
 
     my $label = $api->edit_label(
         $project_id,
@@ -3633,7 +4136,7 @@ sub edit_label {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/labels', [@_], $options );
 }
 
-=head2 subscribe_to_label
+=item subscribe_to_label
 
     my $label = $api->subscribe_to_label(
         $project_id,
@@ -3653,7 +4156,7 @@ sub subscribe_to_label {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/labels/:label_id/subscribe', [@_], $options );
 }
 
-=head2 unsubscribe_from_label
+=item unsubscribe_from_label
 
     $api->unsubscribe_from_label(
         $project_id,
@@ -3675,11 +4178,43 @@ sub unsubscribe_from_label {
     return;
 }
 
-=head1 MERGE REQUEST METHODS
+=back
+
+=head2 Markdown
+
+See L<https://docs.gitlab.com/ce/api/markdown.html>.
+
+=over
+
+=item markdown
+
+    my $html = $api->markdown(
+        \%params,
+    );
+
+Sends a C<POST> request to C<markdown> and returns the decoded response content.
+
+=cut
+
+sub markdown {
+    my $self = shift;
+    croak 'markdown must be called with 0 to 1 arguments' if @_ < 0 or @_ > 1;
+    croak 'The last argument (\%params) to markdown must be a hash ref' if defined($_[0]) and ref($_[0]) ne 'HASH';
+    my $params = (@_ == 1) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'markdown', [@_], $options );
+}
+
+=back
+
+=head2 Merge requests
 
 See L<https://docs.gitlab.com/ce/api/merge_requests.html>.
 
-=head2 global_merge_requests
+=over
+
+=item global_merge_requests
 
     my $merge_requests = $api->global_merge_requests(
         \%params,
@@ -3699,7 +4234,7 @@ sub global_merge_requests {
     return $self->_call_rest_client( 'GET', 'merge_requests', [@_], $options );
 }
 
-=head2 merge_requests
+=item merge_requests
 
     my $merge_requests = $api->merge_requests(
         $project_id,
@@ -3721,7 +4256,7 @@ sub merge_requests {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests', [@_], $options );
 }
 
-=head2 merge_request
+=item merge_request
 
     my $merge_request = $api->merge_request(
         $project_id,
@@ -3741,7 +4276,7 @@ sub merge_request {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid', [@_], $options );
 }
 
-=head2 merge_request_commits
+=item merge_request_commits
 
     my $commits = $api->merge_request_commits(
         $project_id,
@@ -3761,7 +4296,7 @@ sub merge_request_commits {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/commits', [@_], $options );
 }
 
-=head2 merge_request_with_changes
+=item merge_request_with_changes
 
     my $merge_request = $api->merge_request_with_changes(
         $project_id,
@@ -3781,7 +4316,7 @@ sub merge_request_with_changes {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/changes', [@_], $options );
 }
 
-=head2 create_merge_request
+=item create_merge_request
 
     my $merge_request = $api->create_merge_request(
         $project_id,
@@ -3803,7 +4338,7 @@ sub create_merge_request {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests', [@_], $options );
 }
 
-=head2 edit_merge_request
+=item edit_merge_request
 
     my $merge_request = $api->edit_merge_request(
         $project_id,
@@ -3827,7 +4362,7 @@ sub edit_merge_request {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/merge_requests/:merge_request_iid', [@_], $options );
 }
 
-=head2 delete_merge_request
+=item delete_merge_request
 
     $api->delete_merge_request(
         $project_id,
@@ -3849,7 +4384,7 @@ sub delete_merge_request {
     return;
 }
 
-=head2 accept_merge_request
+=item accept_merge_request
 
     my $merge_request = $api->accept_merge_request(
         $project_id,
@@ -3873,7 +4408,7 @@ sub accept_merge_request {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/merge_requests/:merge_request_iid/merge', [@_], $options );
 }
 
-=head2 cancel_merge_when_pipeline_succeeds
+=item cancel_merge_when_pipeline_succeeds
 
     my $merge_request = $api->cancel_merge_when_pipeline_succeeds(
         $project_id,
@@ -3893,7 +4428,7 @@ sub cancel_merge_when_pipeline_succeeds {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/merge_requests/:merge_request_iid/cancel_merge_when_pipeline_succeeds', [@_], $options );
 }
 
-=head2 merge_request_closes_issues
+=item merge_request_closes_issues
 
     my $issues = $api->merge_request_closes_issues(
         $project_id,
@@ -3917,7 +4452,7 @@ sub merge_request_closes_issues {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/closes_issues', [@_], $options );
 }
 
-=head2 subscribe_to_merge_request
+=item subscribe_to_merge_request
 
     my $merge_request = $api->subscribe_to_merge_request(
         $project_id,
@@ -3937,7 +4472,7 @@ sub subscribe_to_merge_request {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/subscribe', [@_], $options );
 }
 
-=head2 unsubscribe_from_merge_request
+=item unsubscribe_from_merge_request
 
     my $merge_request = $api->unsubscribe_from_merge_request(
         $project_id,
@@ -3957,7 +4492,7 @@ sub unsubscribe_from_merge_request {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/unsubscribe', [@_], $options );
 }
 
-=head2 create_merge_request_todo
+=item create_merge_request_todo
 
     my $todo = $api->create_merge_request_todo(
         $project_id,
@@ -3977,7 +4512,7 @@ sub create_merge_request_todo {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/todo', [@_], $options );
 }
 
-=head2 merge_request_diff_versions
+=item merge_request_diff_versions
 
     my $versions = $api->merge_request_diff_versions(
         $project_id,
@@ -3997,7 +4532,7 @@ sub merge_request_diff_versions {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/versions', [@_], $options );
 }
 
-=head2 merge_request_diff_version
+=item merge_request_diff_version
 
     my $version = $api->merge_request_diff_version(
         $project_id,
@@ -4019,7 +4554,7 @@ sub merge_request_diff_version {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/versions/:version_id', [@_], $options );
 }
 
-=head2 set_merge_request_time_estimate
+=item set_merge_request_time_estimate
 
     my $tracking = $api->set_merge_request_time_estimate(
         $project_id,
@@ -4043,7 +4578,7 @@ sub set_merge_request_time_estimate {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/time_estimate', [@_], $options );
 }
 
-=head2 reset_merge_request_time_estimate
+=item reset_merge_request_time_estimate
 
     my $tracking = $api->reset_merge_request_time_estimate(
         $project_id,
@@ -4063,7 +4598,7 @@ sub reset_merge_request_time_estimate {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/reset_time_estimate', [@_], $options );
 }
 
-=head2 add_merge_request_spent_time
+=item add_merge_request_spent_time
 
     my $tracking = $api->add_merge_request_spent_time(
         $project_id,
@@ -4087,7 +4622,7 @@ sub add_merge_request_spent_time {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/add_spent_time', [@_], $options );
 }
 
-=head2 reset_merge_request_spent_time
+=item reset_merge_request_spent_time
 
     my $tracking = $api->reset_merge_request_spent_time(
         $project_id,
@@ -4107,7 +4642,7 @@ sub reset_merge_request_spent_time {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/reset_spent_time', [@_], $options );
 }
 
-=head2 merge_request_time_stats
+=item merge_request_time_stats
 
     my $tracking = $api->merge_request_time_stats(
         $project_id,
@@ -4127,11 +4662,15 @@ sub merge_request_time_stats {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/time_stats', [@_], $options );
 }
 
-=head1 PROJECT MILESTONE METHODS
+=back
+
+=head2 Milestones
 
 See L<https://docs.gitlab.com/ce/api/milestones.html>.
 
-=head2 project_milestones
+=over
+
+=item project_milestones
 
     my $milestones = $api->project_milestones(
         $project_id,
@@ -4153,7 +4692,7 @@ sub project_milestones {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/milestones', [@_], $options );
 }
 
-=head2 project_milestone
+=item project_milestone
 
     my $milestone = $api->project_milestone(
         $project_id,
@@ -4173,7 +4712,7 @@ sub project_milestone {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/milestones/:milestone_id', [@_], $options );
 }
 
-=head2 create_project_milestone
+=item create_project_milestone
 
     my $milestone = $api->create_project_milestone(
         $project_id,
@@ -4195,7 +4734,7 @@ sub create_project_milestone {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/milestones', [@_], $options );
 }
 
-=head2 edit_project_milestone
+=item edit_project_milestone
 
     my $milestone = $api->edit_project_milestone(
         $project_id,
@@ -4219,7 +4758,7 @@ sub edit_project_milestone {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/milestones/:milestone_id', [@_], $options );
 }
 
-=head2 project_milestone_issues
+=item project_milestone_issues
 
     my $issues = $api->project_milestone_issues(
         $project_id,
@@ -4243,7 +4782,7 @@ sub project_milestone_issues {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/milestones/:milestone_id/issues', [@_], $options );
 }
 
-=head2 project_milestone_merge_requests
+=item project_milestone_merge_requests
 
     my $merge_requests = $api->project_milestone_merge_requests(
         $project_id,
@@ -4267,11 +4806,15 @@ sub project_milestone_merge_requests {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/milestones/:milestone_id/merge_requests', [@_], $options );
 }
 
-=head1 GROUP MILESTONE METHODS
+=back
+
+=head2 Group milestones
 
 See L<https://docs.gitlab.com/ce/api/group_milestones.html>.
 
-=head2 group_milestones
+=over
+
+=item group_milestones
 
     my $milestones = $api->group_milestones(
         $group_id,
@@ -4293,7 +4836,7 @@ sub group_milestones {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/milestones', [@_], $options );
 }
 
-=head2 group_milestone
+=item group_milestone
 
     my $milestone = $api->group_milestone(
         $group_id,
@@ -4313,7 +4856,7 @@ sub group_milestone {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/milestones/:milestone_id', [@_], $options );
 }
 
-=head2 create_group_milestone
+=item create_group_milestone
 
     my $milestone = $api->create_group_milestone(
         $group_id,
@@ -4335,7 +4878,7 @@ sub create_group_milestone {
     return $self->_call_rest_client( 'POST', 'groups/:group_id/milestones', [@_], $options );
 }
 
-=head2 edit_group_milestone
+=item edit_group_milestone
 
     my $milestone = $api->edit_group_milestone(
         $group_id,
@@ -4359,7 +4902,7 @@ sub edit_group_milestone {
     return $self->_call_rest_client( 'PUT', 'groups/:group_id/milestones/:milestone_id', [@_], $options );
 }
 
-=head2 group_milestone_issues
+=item group_milestone_issues
 
     my $issues = $api->group_milestone_issues(
         $group_id,
@@ -4383,7 +4926,7 @@ sub group_milestone_issues {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/milestones/:milestone_id/issues', [@_], $options );
 }
 
-=head2 group_milestone_merge_requests
+=item group_milestone_merge_requests
 
     my $merge_requests = $api->group_milestone_merge_requests(
         $group_id,
@@ -4407,11 +4950,15 @@ sub group_milestone_merge_requests {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/milestones/:milestone_id/merge_requests', [@_], $options );
 }
 
-=head1 NAMESPACE METHODS
+=back
+
+=head2 Namespaces
 
 See L<https://docs.gitlab.com/ce/api/namespaces.html>.
 
-=head2 namespaces
+=over
+
+=item namespaces
 
     my $namespaces = $api->namespaces(
         \%params,
@@ -4431,7 +4978,7 @@ sub namespaces {
     return $self->_call_rest_client( 'GET', 'namespaces', [@_], $options );
 }
 
-=head2 namespace
+=item namespace
 
     my $namespace = $api->namespace(
         $namespace_id,
@@ -4449,11 +4996,15 @@ sub namespace {
     return $self->_call_rest_client( 'GET', 'namespaces/:namespace_id', [@_], $options );
 }
 
-=head1 NOTE METHODS
+=back
+
+=head2 Notes
 
 See L<https://docs.gitlab.com/ce/api/notes.html>.
 
-=head2 issue_notes
+=over
+
+=item issue_notes
 
     my $notes = $api->issue_notes(
         $project_id,
@@ -4477,7 +5028,7 @@ sub issue_notes {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/notes', [@_], $options );
 }
 
-=head2 issue_note
+=item issue_note
 
     my $note = $api->issue_note(
         $project_id,
@@ -4499,7 +5050,7 @@ sub issue_note {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/notes/:note_id', [@_], $options );
 }
 
-=head2 create_issue_note
+=item create_issue_note
 
     my $note = $api->create_issue_note(
         $project_id,
@@ -4523,7 +5074,7 @@ sub create_issue_note {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/notes', [@_], $options );
 }
 
-=head2 edit_issue_note
+=item edit_issue_note
 
     $api->edit_issue_note(
         $project_id,
@@ -4551,7 +5102,7 @@ sub edit_issue_note {
     return;
 }
 
-=head2 delete_issue_note
+=item delete_issue_note
 
     $api->delete_issue_note(
         $project_id,
@@ -4575,7 +5126,7 @@ sub delete_issue_note {
     return;
 }
 
-=head2 snippet_notes
+=item snippet_notes
 
     my $notes = $api->snippet_notes(
         $project_id,
@@ -4599,7 +5150,7 @@ sub snippet_notes {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/notes', [@_], $options );
 }
 
-=head2 snippet_note
+=item snippet_note
 
     my $note = $api->snippet_note(
         $project_id,
@@ -4621,7 +5172,7 @@ sub snippet_note {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/notes/:note_id', [@_], $options );
 }
 
-=head2 create_snippet_note
+=item create_snippet_note
 
     my $note = $api->create_snippet_note(
         $project_id,
@@ -4645,7 +5196,7 @@ sub create_snippet_note {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/snippets/:snippet_id/notes', [@_], $options );
 }
 
-=head2 edit_snippet_note
+=item edit_snippet_note
 
     $api->edit_snippet_note(
         $project_id,
@@ -4673,7 +5224,7 @@ sub edit_snippet_note {
     return;
 }
 
-=head2 delete_snippet_note
+=item delete_snippet_note
 
     $api->delete_snippet_note(
         $project_id,
@@ -4697,7 +5248,7 @@ sub delete_snippet_note {
     return;
 }
 
-=head2 merge_request_notes
+=item merge_request_notes
 
     my $notes = $api->merge_request_notes(
         $project_id,
@@ -4721,7 +5272,7 @@ sub merge_request_notes {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/notes', [@_], $options );
 }
 
-=head2 merge_request_note
+=item merge_request_note
 
     my $note = $api->merge_request_note(
         $project_id,
@@ -4743,7 +5294,7 @@ sub merge_request_note {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/notes/:note_id', [@_], $options );
 }
 
-=head2 create_merge_request_note
+=item create_merge_request_note
 
     my $note = $api->create_merge_request_note(
         $project_id,
@@ -4767,7 +5318,7 @@ sub create_merge_request_note {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/notes', [@_], $options );
 }
 
-=head2 edit_merge_request_note
+=item edit_merge_request_note
 
     $api->edit_merge_request_note(
         $project_id,
@@ -4795,7 +5346,7 @@ sub edit_merge_request_note {
     return;
 }
 
-=head2 delete_merge_request_note
+=item delete_merge_request_note
 
     $api->delete_merge_request_note(
         $project_id,
@@ -4819,11 +5370,759 @@ sub delete_merge_request_note {
     return;
 }
 
-=head1 NOTIFICATION SETTING METHODS
+=back
+
+=head2 Discussions
+
+See L<https://docs.gitlab.com/ce/api/discussions.html>.
+
+=over
+
+=item issue_discussions
+
+    my $discussions = $api->issue_discussions(
+        $project_id,
+        $issue_iid,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/issues/:issue_iid/discussions> and returns the decoded response content.
+
+=cut
+
+sub issue_discussions {
+    my $self = shift;
+    croak 'issue_discussions must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to issue_discussions must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to issue_discussions must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to issue_discussions must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/discussions', [@_], $options );
+}
+
+=item issue_discussion
+
+    my $discussion = $api->issue_discussion(
+        $project_id,
+        $issue_iid,
+        $discussion_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/issues/:issue_iid/discussions/:discussion_id> and returns the decoded response content.
+
+=cut
+
+sub issue_discussion {
+    my $self = shift;
+    croak 'issue_discussion must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($project_id) to issue_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to issue_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to issue_discussion must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/discussions/:discussion_id', [@_], $options );
+}
+
+=item create_issue_discussion
+
+    my $discussion = $api->create_issue_discussion(
+        $project_id,
+        $issue_iid,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/issues/:issue_iid/discussions> and returns the decoded response content.
+
+=cut
+
+sub create_issue_discussion {
+    my $self = shift;
+    croak 'create_issue_discussion must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to create_issue_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to create_issue_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to create_issue_discussion must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/discussions', [@_], $options );
+}
+
+=item create_issue_discussion_note
+
+    $api->create_issue_discussion_note(
+        $project_id,
+        $issue_iid,
+        $discussion_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/issues/:issue_iid/discussions/:discussion_id/notes>.
+
+=cut
+
+sub create_issue_discussion_note {
+    my $self = shift;
+    croak 'create_issue_discussion_note must be called with 3 to 4 arguments' if @_ < 3 or @_ > 4;
+    croak 'The #1 argument ($project_id) to create_issue_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to create_issue_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to create_issue_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The last argument (\%params) to create_issue_discussion_note must be a hash ref' if defined($_[3]) and ref($_[3]) ne 'HASH';
+    my $params = (@_ == 4) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'projects/:project_id/issues/:issue_iid/discussions/:discussion_id/notes', [@_], $options );
+    return;
+}
+
+=item edit_issue_discussion_note
+
+    $api->edit_issue_discussion_note(
+        $project_id,
+        $issue_iid,
+        $discussion_id,
+        $note_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/issues/:issue_iid/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub edit_issue_discussion_note {
+    my $self = shift;
+    croak 'edit_issue_discussion_note must be called with 4 to 5 arguments' if @_ < 4 or @_ > 5;
+    croak 'The #1 argument ($project_id) to edit_issue_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to edit_issue_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to edit_issue_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to edit_issue_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    croak 'The last argument (\%params) to edit_issue_discussion_note must be a hash ref' if defined($_[4]) and ref($_[4]) ne 'HASH';
+    my $params = (@_ == 5) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'PUT', 'projects/:project_id/issues/:issue_iid/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item delete_issue_discussion_note
+
+    $api->delete_issue_discussion_note(
+        $project_id,
+        $issue_iid,
+        $discussion_id,
+        $note_id,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/issues/:issue_iid/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub delete_issue_discussion_note {
+    my $self = shift;
+    croak 'delete_issue_discussion_note must be called with 4 arguments' if @_ != 4;
+    croak 'The #1 argument ($project_id) to delete_issue_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to delete_issue_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to delete_issue_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to delete_issue_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/issues/:issue_iid/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item project_snippet_discussions
+
+    my $discussions = $api->project_snippet_discussions(
+        $project_id,
+        $snippet_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/snippets/:snippet_id/discussions> and returns the decoded response content.
+
+=cut
+
+sub project_snippet_discussions {
+    my $self = shift;
+    croak 'project_snippet_discussions must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to project_snippet_discussions must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to project_snippet_discussions must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to project_snippet_discussions must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/discussions', [@_], $options );
+}
+
+=item project_snippet_discussion
+
+    my $discussion = $api->project_snippet_discussion(
+        $project_id,
+        $snippet_id,
+        $discussion_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/snippets/:snippet_id/discussions/:discussion_id> and returns the decoded response content.
+
+=cut
+
+sub project_snippet_discussion {
+    my $self = shift;
+    croak 'project_snippet_discussion must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($project_id) to project_snippet_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to project_snippet_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to project_snippet_discussion must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/discussions/:discussion_id', [@_], $options );
+}
+
+=item create_project_snippet_discussion
+
+    my $discussion = $api->create_project_snippet_discussion(
+        $project_id,
+        $snippet_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/snippets/:snippet_id/discussions> and returns the decoded response content.
+
+=cut
+
+sub create_project_snippet_discussion {
+    my $self = shift;
+    croak 'create_project_snippet_discussion must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to create_project_snippet_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to create_project_snippet_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to create_project_snippet_discussion must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/snippets/:snippet_id/discussions', [@_], $options );
+}
+
+=item create_project_snippet_discussion_note
+
+    $api->create_project_snippet_discussion_note(
+        $project_id,
+        $snippet_id,
+        $discussion_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/snippets/:snippet_id/discussions/:discussion_id/notes>.
+
+=cut
+
+sub create_project_snippet_discussion_note {
+    my $self = shift;
+    croak 'create_project_snippet_discussion_note must be called with 3 to 4 arguments' if @_ < 3 or @_ > 4;
+    croak 'The #1 argument ($project_id) to create_project_snippet_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to create_project_snippet_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to create_project_snippet_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The last argument (\%params) to create_project_snippet_discussion_note must be a hash ref' if defined($_[3]) and ref($_[3]) ne 'HASH';
+    my $params = (@_ == 4) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'projects/:project_id/snippets/:snippet_id/discussions/:discussion_id/notes', [@_], $options );
+    return;
+}
+
+=item edit_project_snippet_discussion_note
+
+    $api->edit_project_snippet_discussion_note(
+        $project_id,
+        $snippet_id,
+        $discussion_id,
+        $note_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/snippets/:snippet_id/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub edit_project_snippet_discussion_note {
+    my $self = shift;
+    croak 'edit_project_snippet_discussion_note must be called with 4 to 5 arguments' if @_ < 4 or @_ > 5;
+    croak 'The #1 argument ($project_id) to edit_project_snippet_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to edit_project_snippet_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to edit_project_snippet_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to edit_project_snippet_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    croak 'The last argument (\%params) to edit_project_snippet_discussion_note must be a hash ref' if defined($_[4]) and ref($_[4]) ne 'HASH';
+    my $params = (@_ == 5) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'PUT', 'projects/:project_id/snippets/:snippet_id/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item delete_project_snippet_discussion_note
+
+    $api->delete_project_snippet_discussion_note(
+        $project_id,
+        $snippet_id,
+        $discussion_id,
+        $note_id,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/snippets/:snippet_id/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub delete_project_snippet_discussion_note {
+    my $self = shift;
+    croak 'delete_project_snippet_discussion_note must be called with 4 arguments' if @_ != 4;
+    croak 'The #1 argument ($project_id) to delete_project_snippet_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to delete_project_snippet_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to delete_project_snippet_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to delete_project_snippet_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/snippets/:snippet_id/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item merge_request_discussions
+
+    my $discussions = $api->merge_request_discussions(
+        $project_id,
+        $merge_request_iid,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions> and returns the decoded response content.
+
+=cut
+
+sub merge_request_discussions {
+    my $self = shift;
+    croak 'merge_request_discussions must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to merge_request_discussions must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to merge_request_discussions must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to merge_request_discussions must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/discussions', [@_], $options );
+}
+
+=item merge_request_discussion
+
+    my $discussion = $api->merge_request_discussion(
+        $project_id,
+        $merge_request_iid,
+        $discussion_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id> and returns the decoded response content.
+
+=cut
+
+sub merge_request_discussion {
+    my $self = shift;
+    croak 'merge_request_discussion must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($project_id) to merge_request_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to merge_request_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to merge_request_discussion must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id', [@_], $options );
+}
+
+=item create_merge_request_discussion
+
+    my $discussion = $api->create_merge_request_discussion(
+        $project_id,
+        $merge_request_iid,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions> and returns the decoded response content.
+
+=cut
+
+sub create_merge_request_discussion {
+    my $self = shift;
+    croak 'create_merge_request_discussion must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to create_merge_request_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to create_merge_request_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to create_merge_request_discussion must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/discussions', [@_], $options );
+}
+
+=item resolve_merge_request_discussion
+
+    $api->resolve_merge_request_discussion(
+        $project_id,
+        $merge_request_iid,
+        $discussion_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id>.
+
+=cut
+
+sub resolve_merge_request_discussion {
+    my $self = shift;
+    croak 'resolve_merge_request_discussion must be called with 3 to 4 arguments' if @_ < 3 or @_ > 4;
+    croak 'The #1 argument ($project_id) to resolve_merge_request_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to resolve_merge_request_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to resolve_merge_request_discussion must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The last argument (\%params) to resolve_merge_request_discussion must be a hash ref' if defined($_[3]) and ref($_[3]) ne 'HASH';
+    my $params = (@_ == 4) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'PUT', 'projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id', [@_], $options );
+    return;
+}
+
+=item create_merge_request_discussion_note
+
+    $api->create_merge_request_discussion_note(
+        $project_id,
+        $merge_request_iid,
+        $discussion_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes>.
+
+=cut
+
+sub create_merge_request_discussion_note {
+    my $self = shift;
+    croak 'create_merge_request_discussion_note must be called with 3 to 4 arguments' if @_ < 3 or @_ > 4;
+    croak 'The #1 argument ($project_id) to create_merge_request_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to create_merge_request_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to create_merge_request_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The last argument (\%params) to create_merge_request_discussion_note must be a hash ref' if defined($_[3]) and ref($_[3]) ne 'HASH';
+    my $params = (@_ == 4) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes', [@_], $options );
+    return;
+}
+
+=item edit_merge_request_discussion_note
+
+    $api->edit_merge_request_discussion_note(
+        $project_id,
+        $merge_request_iid,
+        $discussion_id,
+        $note_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub edit_merge_request_discussion_note {
+    my $self = shift;
+    croak 'edit_merge_request_discussion_note must be called with 4 to 5 arguments' if @_ < 4 or @_ > 5;
+    croak 'The #1 argument ($project_id) to edit_merge_request_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to edit_merge_request_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to edit_merge_request_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to edit_merge_request_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    croak 'The last argument (\%params) to edit_merge_request_discussion_note must be a hash ref' if defined($_[4]) and ref($_[4]) ne 'HASH';
+    my $params = (@_ == 5) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'PUT', 'projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item delete_merge_request_discussion_note
+
+    $api->delete_merge_request_discussion_note(
+        $project_id,
+        $merge_request_iid,
+        $discussion_id,
+        $note_id,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub delete_merge_request_discussion_note {
+    my $self = shift;
+    croak 'delete_merge_request_discussion_note must be called with 4 arguments' if @_ != 4;
+    croak 'The #1 argument ($project_id) to delete_merge_request_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to delete_merge_request_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to delete_merge_request_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to delete_merge_request_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item commit_discussions
+
+    my $discussions = $api->commit_discussions(
+        $project_id,
+        $commit_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/commits/:commit_id/discussions> and returns the decoded response content.
+
+=cut
+
+sub commit_discussions {
+    my $self = shift;
+    croak 'commit_discussions must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to commit_discussions must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_id) to commit_discussions must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to commit_discussions must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/commits/:commit_id/discussions', [@_], $options );
+}
+
+=item commit_discussion
+
+    my $discussion = $api->commit_discussion(
+        $project_id,
+        $commit_id,
+        $discussion_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/commits/:commit_id/discussions/:discussion_id> and returns the decoded response content.
+
+=cut
+
+sub commit_discussion {
+    my $self = shift;
+    croak 'commit_discussion must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($project_id) to commit_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_id) to commit_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to commit_discussion must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/commits/:commit_id/discussions/:discussion_id', [@_], $options );
+}
+
+=item create_commit_discussion
+
+    my $discussion = $api->create_commit_discussion(
+        $project_id,
+        $commit_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/commits/:commit_id/discussions> and returns the decoded response content.
+
+=cut
+
+sub create_commit_discussion {
+    my $self = shift;
+    croak 'create_commit_discussion must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to create_commit_discussion must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_id) to create_commit_discussion must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to create_commit_discussion must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/commits/:commit_id/discussions', [@_], $options );
+}
+
+=item create_commit_discussion_note
+
+    $api->create_commit_discussion_note(
+        $project_id,
+        $commit_id,
+        $discussion_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/commits/:commit_id/discussions/:discussion_id/notes>.
+
+=cut
+
+sub create_commit_discussion_note {
+    my $self = shift;
+    croak 'create_commit_discussion_note must be called with 3 to 4 arguments' if @_ < 3 or @_ > 4;
+    croak 'The #1 argument ($project_id) to create_commit_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_id) to create_commit_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to create_commit_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The last argument (\%params) to create_commit_discussion_note must be a hash ref' if defined($_[3]) and ref($_[3]) ne 'HASH';
+    my $params = (@_ == 4) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'projects/:project_id/commits/:commit_id/discussions/:discussion_id/notes', [@_], $options );
+    return;
+}
+
+=item edit_commit_discussion_note
+
+    $api->edit_commit_discussion_note(
+        $project_id,
+        $commit_id,
+        $discussion_id,
+        $note_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/commits/:commit_id/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub edit_commit_discussion_note {
+    my $self = shift;
+    croak 'edit_commit_discussion_note must be called with 4 to 5 arguments' if @_ < 4 or @_ > 5;
+    croak 'The #1 argument ($project_id) to edit_commit_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_id) to edit_commit_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to edit_commit_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to edit_commit_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    croak 'The last argument (\%params) to edit_commit_discussion_note must be a hash ref' if defined($_[4]) and ref($_[4]) ne 'HASH';
+    my $params = (@_ == 5) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'PUT', 'projects/:project_id/commits/:commit_id/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=item delete_commit_discussion_note
+
+    $api->delete_commit_discussion_note(
+        $project_id,
+        $commit_id,
+        $discussion_id,
+        $note_id,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/commits/:commit_id/discussions/:discussion_id/notes/:note_id>.
+
+=cut
+
+sub delete_commit_discussion_note {
+    my $self = shift;
+    croak 'delete_commit_discussion_note must be called with 4 arguments' if @_ != 4;
+    croak 'The #1 argument ($project_id) to delete_commit_discussion_note must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_id) to delete_commit_discussion_note must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($discussion_id) to delete_commit_discussion_note must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    croak 'The #4 argument ($note_id) to delete_commit_discussion_note must be a scalar' if ref($_[3]) or (!defined $_[3]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/commits/:commit_id/discussions/:discussion_id/notes/:note_id', [@_], $options );
+    return;
+}
+
+=back
+
+=head2 Resource label events
+
+See L<https://docs.gitlab.com/ce/api/resource_label_events.html>.
+
+=over
+
+=item issue_resource_label_events
+
+    my $events = $api->issue_resource_label_events(
+        $project_id,
+        $issue_iid,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/issues/:issue_iid/resource_label_events> and returns the decoded response content.
+
+=cut
+
+sub issue_resource_label_events {
+    my $self = shift;
+    croak 'issue_resource_label_events must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to issue_resource_label_events must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to issue_resource_label_events must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/resource_label_events', [@_], $options );
+}
+
+=item issue_resource_label_event
+
+    my $event = $api->issue_resource_label_event(
+        $project_id,
+        $issue_iid,
+        $resource_label_event_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/issues/:issue_iid/resource_label_events/:resource_label_event_id> and returns the decoded response content.
+
+=cut
+
+sub issue_resource_label_event {
+    my $self = shift;
+    croak 'issue_resource_label_event must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($project_id) to issue_resource_label_event must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($issue_iid) to issue_resource_label_event must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($resource_label_event_id) to issue_resource_label_event must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/issues/:issue_iid/resource_label_events/:resource_label_event_id', [@_], $options );
+}
+
+=item merge_request_resource_label_events
+
+    my $events = $api->merge_request_resource_label_events(
+        $project_id,
+        $merge_request_iid,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/merge_requests/:merge_request_iid/resource_label_events> and returns the decoded response content.
+
+=cut
+
+sub merge_request_resource_label_events {
+    my $self = shift;
+    croak 'merge_request_resource_label_events must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to merge_request_resource_label_events must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to merge_request_resource_label_events must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/resource_label_events', [@_], $options );
+}
+
+=item merge_request_resource_label_event
+
+    my $event = $api->merge_request_resource_label_event(
+        $project_id,
+        $merge_request_iid,
+        $resource_label_event_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/merge_requests/:merge_request_iid/resource_label_events/:resource_label_event_id> and returns the decoded response content.
+
+=cut
+
+sub merge_request_resource_label_event {
+    my $self = shift;
+    croak 'merge_request_resource_label_event must be called with 3 arguments' if @_ != 3;
+    croak 'The #1 argument ($project_id) to merge_request_resource_label_event must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($merge_request_iid) to merge_request_resource_label_event must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The #3 argument ($resource_label_event_id) to merge_request_resource_label_event must be a scalar' if ref($_[2]) or (!defined $_[2]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/merge_requests/:merge_request_iid/resource_label_events/:resource_label_event_id', [@_], $options );
+}
+
+=back
+
+=head2 Notification settings
 
 See L<https://docs.gitlab.com/ce/api/notification_settings.html>.
 
-=head2 global_notification_settings
+=over
+
+=item global_notification_settings
 
     my $settings = $api->global_notification_settings();
 
@@ -4838,7 +6137,7 @@ sub global_notification_settings {
     return $self->_call_rest_client( 'GET', 'notification_settings', [@_], $options );
 }
 
-=head2 set_global_notification_settings
+=item set_global_notification_settings
 
     my $settings = $api->set_global_notification_settings(
         \%params,
@@ -4858,7 +6157,7 @@ sub set_global_notification_settings {
     return $self->_call_rest_client( 'PUT', 'notification_settings', [@_], $options );
 }
 
-=head2 group_notification_settings
+=item group_notification_settings
 
     my $settings = $api->group_notification_settings(
         $group_id,
@@ -4876,7 +6175,7 @@ sub group_notification_settings {
     return $self->_call_rest_client( 'GET', 'groups/:group_id/notification_settings', [@_], $options );
 }
 
-=head2 project_notification_settings
+=item project_notification_settings
 
     my $settings = $api->project_notification_settings(
         $project_id,
@@ -4894,7 +6193,7 @@ sub project_notification_settings {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/notification_settings', [@_], $options );
 }
 
-=head2 set_group_notification_settings
+=item set_group_notification_settings
 
     my $settings = $api->set_group_notification_settings(
         $group_id,
@@ -4916,7 +6215,7 @@ sub set_group_notification_settings {
     return $self->_call_rest_client( 'PUT', 'groups/:group_id/notification_settings', [@_], $options );
 }
 
-=head2 set_project_notification_settings
+=item set_project_notification_settings
 
     my $settings = $api->set_project_notification_settings(
         $project_id,
@@ -4938,11 +6237,15 @@ sub set_project_notification_settings {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/notification_settings', [@_], $options );
 }
 
-=head1 OPEN SOURCE LICENSE TEMPLATE METHODS
+=back
+
+=head2 Licenses
 
 See L<https://docs.gitlab.com/ce/api/templates/licenses.html>.
 
-=head2 license_templates
+=over
+
+=item license_templates
 
     my $templates = $api->license_templates(
         \%params,
@@ -4962,7 +6265,7 @@ sub license_templates {
     return $self->_call_rest_client( 'GET', 'templates/licenses', [@_], $options );
 }
 
-=head2 license_template
+=item license_template
 
     my $template = $api->license_template(
         $template_key,
@@ -4984,11 +6287,15 @@ sub license_template {
     return $self->_call_rest_client( 'GET', 'templates/licenses/:template_key', [@_], $options );
 }
 
-=head1 PAGE DOMAIN METHODS
+=back
+
+=head2 Pages domains
 
 See L<https://docs.gitlab.com/ce/api/pages_domains.html>.
 
-=head2 global_pages_domains
+=over
+
+=item global_pages_domains
 
     my $domains = $api->global_pages_domains(
         \%params,
@@ -5008,7 +6315,7 @@ sub global_pages_domains {
     return $self->_call_rest_client( 'GET', 'pages/domains', [@_], $options );
 }
 
-=head2 pages_domains
+=item pages_domains
 
     my $domains = $api->pages_domains(
         $project_id,
@@ -5030,7 +6337,7 @@ sub pages_domains {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pages/domains', [@_], $options );
 }
 
-=head2 pages_domain
+=item pages_domain
 
     my $domain = $api->pages_domain(
         $project_id,
@@ -5050,7 +6357,7 @@ sub pages_domain {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pages/domains/:domain', [@_], $options );
 }
 
-=head2 create_pages_domain
+=item create_pages_domain
 
     my $domain = $api->create_pages_domain(
         $project_id,
@@ -5072,7 +6379,7 @@ sub create_pages_domain {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pages/domains', [@_], $options );
 }
 
-=head2 edit_pages_domain
+=item edit_pages_domain
 
     my $domain = $api->edit_pages_domain(
         $project_id,
@@ -5096,7 +6403,7 @@ sub edit_pages_domain {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/pages/domains/:domain', [@_], $options );
 }
 
-=head2 delete_pages_domain
+=item delete_pages_domain
 
     $api->delete_pages_domain(
         $project_id,
@@ -5118,11 +6425,15 @@ sub delete_pages_domain {
     return;
 }
 
-=head1 PIPELINE METHODS
+=back
+
+=head2 Pipelines
 
 See L<https://docs.gitlab.com/ce/api/pipelines.html>.
 
-=head2 pipelines
+=over
+
+=item pipelines
 
     my $pipelines = $api->pipelines(
         $project_id,
@@ -5144,7 +6455,7 @@ sub pipelines {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pipelines', [@_], $options );
 }
 
-=head2 pipeline
+=item pipeline
 
     my $pipeline = $api->pipeline(
         $project_id,
@@ -5164,7 +6475,7 @@ sub pipeline {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pipelines/:pipeline_id', [@_], $options );
 }
 
-=head2 create_pipeline
+=item create_pipeline
 
     my $pipeline = $api->create_pipeline(
         $project_id,
@@ -5186,7 +6497,7 @@ sub create_pipeline {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipeline', [@_], $options );
 }
 
-=head2 retry_pipeline_jobs
+=item retry_pipeline_jobs
 
     my $pipeline = $api->retry_pipeline_jobs(
         $project_id,
@@ -5206,7 +6517,7 @@ sub retry_pipeline_jobs {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipelines/:pipeline_id/retry', [@_], $options );
 }
 
-=head2 cancel_pipeline_jobs
+=item cancel_pipeline_jobs
 
     my $pipeline = $api->cancel_pipeline_jobs(
         $project_id,
@@ -5226,11 +6537,15 @@ sub cancel_pipeline_jobs {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipelines/:pipeline_id/cancel', [@_], $options );
 }
 
-=head1 PIPELINE TRIGGER METHODS
+=back
+
+=head2 Pipeline triggers
 
 See L<https://docs.gitlab.com/ce/api/pipeline_triggers.html>.
 
-=head2 triggers
+=over
+
+=item triggers
 
     my $triggers = $api->triggers(
         $project_id,
@@ -5252,7 +6567,7 @@ sub triggers {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/triggers', [@_], $options );
 }
 
-=head2 trigger
+=item trigger
 
     my $trigger = $api->trigger(
         $project_id,
@@ -5272,7 +6587,7 @@ sub trigger {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/triggers/:trigger_id', [@_], $options );
 }
 
-=head2 create_trigger
+=item create_trigger
 
     my $trigger = $api->create_trigger(
         $project_id,
@@ -5294,7 +6609,7 @@ sub create_trigger {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/triggers', [@_], $options );
 }
 
-=head2 edit_trigger
+=item edit_trigger
 
     my $trigger = $api->edit_trigger(
         $project_id,
@@ -5318,7 +6633,7 @@ sub edit_trigger {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/triggers/:trigger_id', [@_], $options );
 }
 
-=head2 take_ownership_of_trigger
+=item take_ownership_of_trigger
 
     my $trigger = $api->take_ownership_of_trigger(
         $project_id,
@@ -5338,7 +6653,7 @@ sub take_ownership_of_trigger {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/triggers/:trigger_id/take_ownership', [@_], $options );
 }
 
-=head2 delete_trigger
+=item delete_trigger
 
     $api->delete_trigger(
         $project_id,
@@ -5360,11 +6675,15 @@ sub delete_trigger {
     return;
 }
 
-=head1 PIPELINE SCHEDULE METHODS
+=back
+
+=head2 Pipeline schedules
 
 See L<https://docs.gitlab.com/ce/api/pipeline_schedules.html>.
 
-=head2 pipeline_schedules
+=over
+
+=item pipeline_schedules
 
     my $schedules = $api->pipeline_schedules(
         $project_id,
@@ -5386,7 +6705,7 @@ sub pipeline_schedules {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pipeline_schedules', [@_], $options );
 }
 
-=head2 pipeline_schedule
+=item pipeline_schedule
 
     my $schedule = $api->pipeline_schedule(
         $project_id,
@@ -5406,7 +6725,7 @@ sub pipeline_schedule {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id', [@_], $options );
 }
 
-=head2 create_pipeline_schedule
+=item create_pipeline_schedule
 
     my $schedule = $api->create_pipeline_schedule(
         $project_id,
@@ -5428,7 +6747,7 @@ sub create_pipeline_schedule {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipeline_schedules', [@_], $options );
 }
 
-=head2 edit_pipeline_schedule
+=item edit_pipeline_schedule
 
     my $schedule = $api->edit_pipeline_schedule(
         $project_id,
@@ -5452,7 +6771,7 @@ sub edit_pipeline_schedule {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id', [@_], $options );
 }
 
-=head2 take_ownership_of_pipeline_schedule
+=item take_ownership_of_pipeline_schedule
 
     my $schedule = $api->take_ownership_of_pipeline_schedule(
         $project_id,
@@ -5472,7 +6791,7 @@ sub take_ownership_of_pipeline_schedule {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id/take_ownership', [@_], $options );
 }
 
-=head2 delete_pipeline_schedule
+=item delete_pipeline_schedule
 
     my $schedule = $api->delete_pipeline_schedule(
         $project_id,
@@ -5492,7 +6811,7 @@ sub delete_pipeline_schedule {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id', [@_], $options );
 }
 
-=head2 create_pipeline_schedule_variable
+=item create_pipeline_schedule_variable
 
     my $variable = $api->create_pipeline_schedule_variable(
         $project_id,
@@ -5516,7 +6835,7 @@ sub create_pipeline_schedule_variable {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id/variables', [@_], $options );
 }
 
-=head2 edit_pipeline_schedule_variable
+=item edit_pipeline_schedule_variable
 
     my $variable = $api->edit_pipeline_schedule_variable(
         $project_id,
@@ -5542,7 +6861,7 @@ sub edit_pipeline_schedule_variable {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id/variables/:variable_key', [@_], $options );
 }
 
-=head2 delete_pipeline_schedule_variable
+=item delete_pipeline_schedule_variable
 
     my $variable = $api->delete_pipeline_schedule_variable(
         $project_id,
@@ -5564,11 +6883,15 @@ sub delete_pipeline_schedule_variable {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/pipeline_schedules/:pipeline_schedule_id/variables/:variable_key', [@_], $options );
 }
 
-=head1 PROJECT METHODS
+=back
+
+=head2 Projects
 
 See L<https://docs.gitlab.com/ce/api/projects.html>.
 
-=head2 projects
+=over
+
+=item projects
 
     my $projects = $api->projects(
         \%params,
@@ -5588,7 +6911,7 @@ sub projects {
     return $self->_call_rest_client( 'GET', 'projects', [@_], $options );
 }
 
-=head2 user_projects
+=item user_projects
 
     my $projects = $api->user_projects(
         $user_id,
@@ -5610,7 +6933,7 @@ sub user_projects {
     return $self->_call_rest_client( 'GET', 'users/:user_id/projects', [@_], $options );
 }
 
-=head2 project
+=item project
 
     my $project = $api->project(
         $project_id,
@@ -5632,7 +6955,7 @@ sub project {
     return $self->_call_rest_client( 'GET', 'projects/:project_id', [@_], $options );
 }
 
-=head2 project_users
+=item project_users
 
     my $users = $api->project_users(
         $project_id,
@@ -5654,7 +6977,7 @@ sub project_users {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/users', [@_], $options );
 }
 
-=head2 create_project
+=item create_project
 
     my $project = $api->create_project(
         \%params,
@@ -5674,7 +6997,7 @@ sub create_project {
     return $self->_call_rest_client( 'POST', 'projects', [@_], $options );
 }
 
-=head2 create_project_for_user
+=item create_project_for_user
 
     $api->create_project_for_user(
         $user_id,
@@ -5698,7 +7021,7 @@ sub create_project_for_user {
     return;
 }
 
-=head2 edit_project
+=item edit_project
 
     $api->edit_project(
         $project_id,
@@ -5722,7 +7045,7 @@ sub edit_project {
     return;
 }
 
-=head2 fork_project
+=item fork_project
 
     $api->fork_project(
         $project_id,
@@ -5746,7 +7069,7 @@ sub fork_project {
     return;
 }
 
-=head2 project_forks
+=item project_forks
 
     my $forks = $api->project_forks(
         $project_id,
@@ -5768,7 +7091,7 @@ sub project_forks {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/forks', [@_], $options );
 }
 
-=head2 start_project
+=item start_project
 
     my $project = $api->start_project(
         $project_id,
@@ -5786,7 +7109,7 @@ sub start_project {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/star', [@_], $options );
 }
 
-=head2 unstar_project
+=item unstar_project
 
     my $project = $api->unstar_project(
         $project_id,
@@ -5804,7 +7127,7 @@ sub unstar_project {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/unstar', [@_], $options );
 }
 
-=head2 project_languages
+=item project_languages
 
     my $languages = $api->project_languages(
         $project_id,
@@ -5822,7 +7145,7 @@ sub project_languages {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/languages', [@_], $options );
 }
 
-=head2 archive_project
+=item archive_project
 
     my $project = $api->archive_project(
         $project_id,
@@ -5840,7 +7163,7 @@ sub archive_project {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/archive', [@_], $options );
 }
 
-=head2 unarchive_project
+=item unarchive_project
 
     my $project = $api->unarchive_project(
         $project_id,
@@ -5858,7 +7181,7 @@ sub unarchive_project {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/unarchive', [@_], $options );
 }
 
-=head2 delete_project
+=item delete_project
 
     $api->delete_project(
         $project_id,
@@ -5878,7 +7201,7 @@ sub delete_project {
     return;
 }
 
-=head2 upload_file_to_project
+=item upload_file_to_project
 
     my $upload = $api->upload_file_to_project(
         $project_id,
@@ -5902,7 +7225,7 @@ sub upload_file_to_project {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/uploads', [@_], $options );
 }
 
-=head2 share_project_with_group
+=item share_project_with_group
 
     $api->share_project_with_group(
         $project_id,
@@ -5926,7 +7249,7 @@ sub share_project_with_group {
     return;
 }
 
-=head2 unshare_project_with_group
+=item unshare_project_with_group
 
     $api->unshare_project_with_group(
         $project_id,
@@ -5948,7 +7271,7 @@ sub unshare_project_with_group {
     return;
 }
 
-=head2 project_hooks
+=item project_hooks
 
     my $hooks = $api->project_hooks(
         $project_id,
@@ -5966,7 +7289,7 @@ sub project_hooks {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/hooks', [@_], $options );
 }
 
-=head2 project_hook
+=item project_hook
 
     my $hook = $api->project_hook(
         $project_id,
@@ -5986,7 +7309,7 @@ sub project_hook {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/hooks/:hook_id', [@_], $options );
 }
 
-=head2 create_project_hook
+=item create_project_hook
 
     my $hook = $api->create_project_hook(
         $project_id,
@@ -6008,7 +7331,7 @@ sub create_project_hook {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/hooks', [@_], $options );
 }
 
-=head2 edit_project_hook
+=item edit_project_hook
 
     my $hook = $api->edit_project_hook(
         $project_id,
@@ -6032,7 +7355,7 @@ sub edit_project_hook {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/hooks/:hook_id', [@_], $options );
 }
 
-=head2 delete_project_hook
+=item delete_project_hook
 
     $api->delete_project_hook(
         $project_id,
@@ -6054,7 +7377,7 @@ sub delete_project_hook {
     return;
 }
 
-=head2 set_project_fork
+=item set_project_fork
 
     $api->set_project_fork(
         $project_id,
@@ -6076,7 +7399,7 @@ sub set_project_fork {
     return;
 }
 
-=head2 clear_project_fork
+=item clear_project_fork
 
     $api->clear_project_fork(
         $project_id,
@@ -6096,7 +7419,7 @@ sub clear_project_fork {
     return;
 }
 
-=head2 start_housekeeping
+=item start_housekeeping
 
     $api->start_housekeeping(
         $project_id,
@@ -6116,33 +7439,15 @@ sub start_housekeeping {
     return;
 }
 
-=head1 PROJECT ACCESS REQUEST METHODS
+=back
+
+=head2 Project access requests
 
 See L<https://docs.gitlab.com/ce/api/access_requests.html>.
 
-=head2 group_access_requests
+=over
 
-    my $requests = $api->group_access_requests(
-        $group_id,
-        \%params,
-    );
-
-Sends a C<GET> request to C<groups/:group_id/access_requests> and returns the decoded response content.
-
-=cut
-
-sub group_access_requests {
-    my $self = shift;
-    croak 'group_access_requests must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
-    croak 'The #1 argument ($group_id) to group_access_requests must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The last argument (\%params) to group_access_requests must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
-    my $params = (@_ == 2) ? pop() : undef;
-    my $options = {};
-    $options->{query} = $params if defined $params;
-    return $self->_call_rest_client( 'GET', 'groups/:group_id/access_requests', [@_], $options );
-}
-
-=head2 project_access_requests
+=item project_access_requests
 
     my $requests = $api->project_access_requests(
         $project_id,
@@ -6164,25 +7469,7 @@ sub project_access_requests {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/access_requests', [@_], $options );
 }
 
-=head2 request_group_access
-
-    my $request = $api->request_group_access(
-        $group_id,
-    );
-
-Sends a C<POST> request to C<groups/:group_id/access_requests> and returns the decoded response content.
-
-=cut
-
-sub request_group_access {
-    my $self = shift;
-    croak 'request_group_access must be called with 1 arguments' if @_ != 1;
-    croak 'The #1 argument ($group_id) to request_group_access must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    my $options = {};
-    return $self->_call_rest_client( 'POST', 'groups/:group_id/access_requests', [@_], $options );
-}
-
-=head2 request_project_access
+=item request_project_access
 
     my $request = $api->request_project_access(
         $project_id,
@@ -6200,27 +7487,7 @@ sub request_project_access {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/access_requests', [@_], $options );
 }
 
-=head2 approve_group_access
-
-    my $request = $api->approve_group_access(
-        $group_id,
-        $user_id,
-    );
-
-Sends a C<PUT> request to C<groups/:group_id/access_requests/:user_id/approve> and returns the decoded response content.
-
-=cut
-
-sub approve_group_access {
-    my $self = shift;
-    croak 'approve_group_access must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($group_id) to approve_group_access must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($user_id) to approve_group_access must be a scalar' if ref($_[1]) or (!defined $_[1]);
-    my $options = {};
-    return $self->_call_rest_client( 'PUT', 'groups/:group_id/access_requests/:user_id/approve', [@_], $options );
-}
-
-=head2 approve_project_access
+=item approve_project_access
 
     my $request = $api->approve_project_access(
         $project_id,
@@ -6240,29 +7507,7 @@ sub approve_project_access {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/access_requests/:user_id/approve', [@_], $options );
 }
 
-=head2 deny_group_access
-
-    $api->deny_group_access(
-        $group_id,
-        $user_id,
-    );
-
-Sends a C<DELETE> request to C<groups/:group_id/access_requests/:user_id>.
-
-=cut
-
-sub deny_group_access {
-    my $self = shift;
-    croak 'deny_group_access must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($group_id) to deny_group_access must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($user_id) to deny_group_access must be a scalar' if ref($_[1]) or (!defined $_[1]);
-    my $options = {};
-    $options->{decode} = 0;
-    $self->_call_rest_client( 'DELETE', 'groups/:group_id/access_requests/:user_id', [@_], $options );
-    return;
-}
-
-=head2 deny_project_access
+=item deny_project_access
 
     $api->deny_project_access(
         $project_id,
@@ -6284,13 +7529,379 @@ sub deny_project_access {
     return;
 }
 
-=head1 PROJECT SNIPPET METHODS
+=back
+
+=head2 Project badges
+
+See L<https://docs.gitlab.com/ce/api/project_badges.html>.
+
+=over
+
+=item project_badges
+
+    my $badges = $api->project_badges(
+        $project_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/badges> and returns the decoded response content.
+
+=cut
+
+sub project_badges {
+    my $self = shift;
+    croak 'project_badges must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($project_id) to project_badges must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/badges', [@_], $options );
+}
+
+=item project_badge
+
+    my $badge = $api->project_badge(
+        $project_id,
+        $badge_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/badges/:badge_id> and returns the decoded response content.
+
+=cut
+
+sub project_badge {
+    my $self = shift;
+    croak 'project_badge must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to project_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($badge_id) to project_badge must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/badges/:badge_id', [@_], $options );
+}
+
+=item create_project_badge
+
+    my $badge = $api->create_project_badge(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/badges> and returns the decoded response content.
+
+=cut
+
+sub create_project_badge {
+    my $self = shift;
+    croak 'create_project_badge must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to create_project_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to create_project_badge must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/badges', [@_], $options );
+}
+
+=item edit_project_badge
+
+    my $badge = $api->edit_project_badge(
+        $project_id,
+        $badge_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/badges/:badge_id> and returns the decoded response content.
+
+=cut
+
+sub edit_project_badge {
+    my $self = shift;
+    croak 'edit_project_badge must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to edit_project_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($badge_id) to edit_project_badge must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to edit_project_badge must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'PUT', 'projects/:project_id/badges/:badge_id', [@_], $options );
+}
+
+=item delete_project_badge
+
+    $api->delete_project_badge(
+        $project_id,
+        $badge_id,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/badges/:badge_id>.
+
+=cut
+
+sub delete_project_badge {
+    my $self = shift;
+    croak 'delete_project_badge must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to delete_project_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($badge_id) to delete_project_badge must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/badges/:badge_id', [@_], $options );
+    return;
+}
+
+=item preview_project_badge
+
+    my $preview = $api->preview_project_badge(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/badges/render> and returns the decoded response content.
+
+=cut
+
+sub preview_project_badge {
+    my $self = shift;
+    croak 'preview_project_badge must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to preview_project_badge must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to preview_project_badge must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/badges/render', [@_], $options );
+}
+
+=back
+
+=head2 Project import/export
+
+See L<https://docs.gitlab.com/ce/api/project_import_export.html>.
+
+=over
+
+=item schedule_project_export
+
+    $api->schedule_project_export(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/export>.
+
+=cut
+
+sub schedule_project_export {
+    my $self = shift;
+    croak 'schedule_project_export must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to schedule_project_export must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to schedule_project_export must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'projects/:project_id/export', [@_], $options );
+    return;
+}
+
+=item project_export_status
+
+    my $status = $api->project_export_status(
+        $project_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/export> and returns the decoded response content.
+
+=cut
+
+sub project_export_status {
+    my $self = shift;
+    croak 'project_export_status must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($project_id) to project_export_status must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/export', [@_], $options );
+}
+
+=item download_project_export
+
+    my $download = $api->download_project_export(
+        $project_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/export/download> and returns the decoded response content.
+
+=cut
+
+sub download_project_export {
+    my $self = shift;
+    croak 'download_project_export must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($project_id) to download_project_export must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/export/download', [@_], $options );
+}
+
+=item schedule_project_import
+
+    $api->schedule_project_import(
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/import>.
+
+=cut
+
+sub schedule_project_import {
+    my $self = shift;
+    croak 'schedule_project_import must be called with 0 to 1 arguments' if @_ < 0 or @_ > 1;
+    croak 'The last argument (\%params) to schedule_project_import must be a hash ref' if defined($_[0]) and ref($_[0]) ne 'HASH';
+    my $params = (@_ == 1) ? pop() : undef;
+    my $options = {};
+    $options->{decode} = 0;
+    $options->{content} = $params if defined $params;
+    $self->_call_rest_client( 'POST', 'projects/import', [@_], $options );
+    return;
+}
+
+=item project_import_status
+
+    my $status = $api->project_import_status(
+        $project_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/import> and returns the decoded response content.
+
+=cut
+
+sub project_import_status {
+    my $self = shift;
+    croak 'project_import_status must be called with 1 arguments' if @_ != 1;
+    croak 'The #1 argument ($project_id) to project_import_status must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/import', [@_], $options );
+}
+
+=back
+
+=head2 Project members
+
+See L<https://docs.gitlab.com/ce/api/members.html>.
+
+=over
+
+=item project_members
+
+    my $members = $api->project_members(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/members> and returns the decoded response content.
+
+=cut
+
+sub project_members {
+    my $self = shift;
+    croak 'project_members must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to project_members must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to project_members must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/members', [@_], $options );
+}
+
+=item project_member
+
+    my $member = $api->project_member(
+        $project_id,
+        $user_id,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/members/:user_id> and returns the decoded response content.
+
+=cut
+
+sub project_member {
+    my $self = shift;
+    croak 'project_member must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($user_id) to project_member must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/members/:user_id', [@_], $options );
+}
+
+=item add_project_member
+
+    my $member = $api->add_project_member(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/members> and returns the decoded response content.
+
+=cut
+
+sub add_project_member {
+    my $self = shift;
+    croak 'add_project_member must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to add_project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to add_project_member must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/members', [@_], $options );
+}
+
+=item update_project_member
+
+    my $member = $api->update_project_member(
+        $project_id,
+        $user_id,
+        \%params,
+    );
+
+Sends a C<PUT> request to C<projects/:project_id/members/:user_id> and returns the decoded response content.
+
+=cut
+
+sub update_project_member {
+    my $self = shift;
+    croak 'update_project_member must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to update_project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($user_id) to update_project_member must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to update_project_member must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'PUT', 'projects/:project_id/members/:user_id', [@_], $options );
+}
+
+=item remove_project_member
+
+    $api->remove_project_member(
+        $project_id,
+        $user_id,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/members/:user_id>.
+
+=cut
+
+sub remove_project_member {
+    my $self = shift;
+    croak 'remove_project_member must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to remove_project_member must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($user_id) to remove_project_member must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/members/:user_id', [@_], $options );
+    return;
+}
+
+=back
+
+=head2 Project snippets
 
 See L<https://docs.gitlab.com/ce/api/project_snippets.html>.
 
-=head2 snippets
+=over
 
-    my $snippets = $api->snippets(
+=item project_snippets
+
+    my $snippets = $api->project_snippets(
         $project_id,
         \%params,
     );
@@ -6299,20 +7910,20 @@ Sends a C<GET> request to C<projects/:project_id/snippets> and returns the decod
 
 =cut
 
-sub snippets {
+sub project_snippets {
     my $self = shift;
-    croak 'snippets must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
-    croak 'The #1 argument ($project_id) to snippets must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The last argument (\%params) to snippets must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    croak 'project_snippets must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to project_snippets must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to project_snippets must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
     my $params = (@_ == 2) ? pop() : undef;
     my $options = {};
     $options->{query} = $params if defined $params;
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets', [@_], $options );
 }
 
-=head2 snippet
+=item project_snippet
 
-    my $snippet = $api->snippet(
+    my $snippet = $api->project_snippet(
         $project_id,
         $snippet_id,
     );
@@ -6321,18 +7932,18 @@ Sends a C<GET> request to C<projects/:project_id/snippets/:snippet_id> and retur
 
 =cut
 
-sub snippet {
+sub project_snippet {
     my $self = shift;
-    croak 'snippet must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($project_id) to snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($snippet_id) to snippet must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'project_snippet must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to project_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to project_snippet must be a scalar' if ref($_[1]) or (!defined $_[1]);
     my $options = {};
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id', [@_], $options );
 }
 
-=head2 create_snippet
+=item create_project_snippet
 
-    $api->create_snippet(
+    $api->create_project_snippet(
         $project_id,
         \%params,
     );
@@ -6341,11 +7952,11 @@ Sends a C<POST> request to C<projects/:project_id/snippets>.
 
 =cut
 
-sub create_snippet {
+sub create_project_snippet {
     my $self = shift;
-    croak 'create_snippet must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
-    croak 'The #1 argument ($project_id) to create_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The last argument (\%params) to create_snippet must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    croak 'create_project_snippet must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to create_project_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to create_project_snippet must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
     my $params = (@_ == 2) ? pop() : undef;
     my $options = {};
     $options->{decode} = 0;
@@ -6354,9 +7965,9 @@ sub create_snippet {
     return;
 }
 
-=head2 edit_snippet
+=item edit_project_snippet
 
-    $api->edit_snippet(
+    $api->edit_project_snippet(
         $project_id,
         $snippet_id,
         \%params,
@@ -6366,12 +7977,12 @@ Sends a C<PUT> request to C<projects/:project_id/snippets/:snippet_id>.
 
 =cut
 
-sub edit_snippet {
+sub edit_project_snippet {
     my $self = shift;
-    croak 'edit_snippet must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
-    croak 'The #1 argument ($project_id) to edit_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($snippet_id) to edit_snippet must be a scalar' if ref($_[1]) or (!defined $_[1]);
-    croak 'The last argument (\%params) to edit_snippet must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    croak 'edit_project_snippet must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to edit_project_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to edit_project_snippet must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to edit_project_snippet must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
     my $params = (@_ == 3) ? pop() : undef;
     my $options = {};
     $options->{decode} = 0;
@@ -6380,9 +7991,9 @@ sub edit_snippet {
     return;
 }
 
-=head2 delete_snippet
+=item delete_project_snippet
 
-    $api->delete_snippet(
+    $api->delete_project_snippet(
         $project_id,
         $snippet_id,
     );
@@ -6391,20 +8002,20 @@ Sends a C<DELETE> request to C<projects/:project_id/snippets/:snippet_id>.
 
 =cut
 
-sub delete_snippet {
+sub delete_project_snippet {
     my $self = shift;
-    croak 'delete_snippet must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($project_id) to delete_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($snippet_id) to delete_snippet must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'delete_project_snippet must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to delete_project_snippet must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to delete_project_snippet must be a scalar' if ref($_[1]) or (!defined $_[1]);
     my $options = {};
     $options->{decode} = 0;
     $self->_call_rest_client( 'DELETE', 'projects/:project_id/snippets/:snippet_id', [@_], $options );
     return;
 }
 
-=head2 snippet_content
+=item project_snippet_content
 
-    my $content = $api->snippet_content(
+    my $content = $api->project_snippet_content(
         $project_id,
         $snippet_id,
     );
@@ -6413,18 +8024,18 @@ Sends a C<GET> request to C<projects/:project_id/snippets/:snippet_id/raw> and r
 
 =cut
 
-sub snippet_content {
+sub project_snippet_content {
     my $self = shift;
-    croak 'snippet_content must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($project_id) to snippet_content must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($snippet_id) to snippet_content must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'project_snippet_content must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to project_snippet_content must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to project_snippet_content must be a scalar' if ref($_[1]) or (!defined $_[1]);
     my $options = {};
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/raw', [@_], $options );
 }
 
-=head2 snippet_user_agent_detail
+=item project_snippet_user_agent_detail
 
-    my $user_agent = $api->snippet_user_agent_detail(
+    my $user_agent = $api->project_snippet_user_agent_detail(
         $project_id,
         $snippet_id,
     );
@@ -6433,20 +8044,24 @@ Sends a C<GET> request to C<projects/:project_id/snippets/:snippet_id/user_agent
 
 =cut
 
-sub snippet_user_agent_detail {
+sub project_snippet_user_agent_detail {
     my $self = shift;
-    croak 'snippet_user_agent_detail must be called with 2 arguments' if @_ != 2;
-    croak 'The #1 argument ($project_id) to snippet_user_agent_detail must be a scalar' if ref($_[0]) or (!defined $_[0]);
-    croak 'The #2 argument ($snippet_id) to snippet_user_agent_detail must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'project_snippet_user_agent_detail must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to project_snippet_user_agent_detail must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($snippet_id) to project_snippet_user_agent_detail must be a scalar' if ref($_[1]) or (!defined $_[1]);
     my $options = {};
     return $self->_call_rest_client( 'GET', 'projects/:project_id/snippets/:snippet_id/user_agent_detail', [@_], $options );
 }
 
-=head1 PROTECTED BRANCH METHODS
+=back
+
+=head2 Protected branches
 
 See L<https://docs.gitlab.com/ce/api/protected_branches.html>.
 
-=head2 protected_branches
+=over
+
+=item protected_branches
 
     my $branches = $api->protected_branches(
         $project_id,
@@ -6468,7 +8083,7 @@ sub protected_branches {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/protected_branches', [@_], $options );
 }
 
-=head2 protected_branch
+=item protected_branch
 
     my $branch = $api->protected_branch(
         $project_id,
@@ -6488,7 +8103,7 @@ sub protected_branch {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/protected_branches/:branch_name', [@_], $options );
 }
 
-=head2 protect_branch
+=item protect_branch
 
     my $branch = $api->protect_branch(
         $project_id,
@@ -6510,7 +8125,7 @@ sub protect_branch {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/protected_branches', [@_], $options );
 }
 
-=head2 unprotect_branch
+=item unprotect_branch
 
     $api->unprotect_branch(
         $project_id,
@@ -6532,11 +8147,109 @@ sub unprotect_branch {
     return;
 }
 
-=head1 REPOSITORY METHODS
+=back
+
+=head2 Protected tags
+
+See L<https://docs.gitlab.com/ce/api/protected_tags.html>.
+
+=over
+
+=item protected_tags
+
+    my $tags = $api->protected_tags(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/protected_tags> and returns the decoded response content.
+
+=cut
+
+sub protected_tags {
+    my $self = shift;
+    croak 'protected_tags must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to protected_tags must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to protected_tags must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/protected_tags', [@_], $options );
+}
+
+=item protected_tag
+
+    my $tag = $api->protected_tag(
+        $project_id,
+        $tag_name,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/protected_tags/:tag_name> and returns the decoded response content.
+
+=cut
+
+sub protected_tag {
+    my $self = shift;
+    croak 'protected_tag must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to protected_tag must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($tag_name) to protected_tag must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/protected_tags/:tag_name', [@_], $options );
+}
+
+=item protect_tag
+
+    my $tag = $api->protect_tag(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/protected_tags> and returns the decoded response content.
+
+=cut
+
+sub protect_tag {
+    my $self = shift;
+    croak 'protect_tag must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to protect_tag must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to protect_tag must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/protected_tags', [@_], $options );
+}
+
+=item unprotect_tag
+
+    $api->unprotect_tag(
+        $project_id,
+        $tag_name,
+    );
+
+Sends a C<DELETE> request to C<projects/:project_id/protected_tags/:tag_name>.
+
+=cut
+
+sub unprotect_tag {
+    my $self = shift;
+    croak 'unprotect_tag must be called with 2 arguments' if @_ != 2;
+    croak 'The #1 argument ($project_id) to unprotect_tag must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($tag_name) to unprotect_tag must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    my $options = {};
+    $options->{decode} = 0;
+    $self->_call_rest_client( 'DELETE', 'projects/:project_id/protected_tags/:tag_name', [@_], $options );
+    return;
+}
+
+=back
+
+=head2 Repositories
 
 See L<https://docs.gitlab.com/ce/api/repositories.html>.
 
-=head2 tree
+=over
+
+=item tree
 
     my $tree = $api->tree(
         $project_id,
@@ -6558,7 +8271,7 @@ sub tree {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/tree', [@_], $options );
 }
 
-=head2 blob
+=item blob
 
     my $blob = $api->blob(
         $project_id,
@@ -6578,7 +8291,7 @@ sub blob {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/blobs/:sha', [@_], $options );
 }
 
-=head2 raw_blob
+=item raw_blob
 
     my $raw_blob = $api->raw_blob(
         $project_id,
@@ -6598,7 +8311,7 @@ sub raw_blob {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/blobs/:sha/raw', [@_], $options );
 }
 
-=head2 archive
+=item archive
 
     my $archive = $api->archive(
         $project_id,
@@ -6620,7 +8333,7 @@ sub archive {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/archive', [@_], $options );
 }
 
-=head2 compare
+=item compare
 
     my $comparison = $api->compare(
         $project_id,
@@ -6642,7 +8355,7 @@ sub compare {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/compare', [@_], $options );
 }
 
-=head2 contributors
+=item contributors
 
     my $contributors = $api->contributors(
         $project_id,
@@ -6664,11 +8377,15 @@ sub contributors {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/contributors', [@_], $options );
 }
 
-=head1 REPOSITORY FILE METHODS
+=back
+
+=head2 Repository files
 
 See L<https://docs.gitlab.com/ce/api/repository_files.html>.
 
-=head2 file
+=over
+
+=item file
 
     my $file = $api->file(
         $project_id,
@@ -6692,7 +8409,7 @@ sub file {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/files/:file_path', [@_], $options );
 }
 
-=head2 raw_file
+=item raw_file
 
     my $content = $api->raw_file(
         $project_id,
@@ -6717,7 +8434,7 @@ sub raw_file {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/files/:file_path/raw', [@_], $options );
 }
 
-=head2 create_file
+=item create_file
 
     $api->create_file(
         $project_id,
@@ -6743,7 +8460,7 @@ sub create_file {
     return;
 }
 
-=head2 edit_file
+=item edit_file
 
     $api->edit_file(
         $project_id,
@@ -6769,7 +8486,7 @@ sub edit_file {
     return;
 }
 
-=head2 delete_file
+=item delete_file
 
     $api->delete_file(
         $project_id,
@@ -6795,11 +8512,15 @@ sub delete_file {
     return;
 }
 
-=head1 RUNNER METHODS
+=back
+
+=head2 Runners
 
 See L<https://docs.gitlab.com/ce/api/runners.html>.
 
-=head2 runners
+=over
+
+=item runners
 
     my $runners = $api->runners(
         \%params,
@@ -6819,7 +8540,7 @@ sub runners {
     return $self->_call_rest_client( 'GET', 'runners', [@_], $options );
 }
 
-=head2 all_runners
+=item all_runners
 
     my $runners = $api->all_runners(
         \%params,
@@ -6839,7 +8560,7 @@ sub all_runners {
     return $self->_call_rest_client( 'GET', 'runners/all', [@_], $options );
 }
 
-=head2 runner
+=item runner
 
     my $runner = $api->runner(
         $runner_id,
@@ -6857,7 +8578,7 @@ sub runner {
     return $self->_call_rest_client( 'GET', 'runners/:runner_id', [@_], $options );
 }
 
-=head2 update_runner
+=item update_runner
 
     my $runner = $api->update_runner(
         $runner_id,
@@ -6879,7 +8600,7 @@ sub update_runner {
     return $self->_call_rest_client( 'PUT', 'runners/:runner_id', [@_], $options );
 }
 
-=head2 delete_runner
+=item delete_runner
 
     my $runner = $api->delete_runner(
         $runner_id,
@@ -6897,7 +8618,7 @@ sub delete_runner {
     return $self->_call_rest_client( 'DELETE', 'runners/:runner_id', [@_], $options );
 }
 
-=head2 runner_jobs
+=item runner_jobs
 
     my $jobs = $api->runner_jobs(
         $runner_id,
@@ -6919,7 +8640,7 @@ sub runner_jobs {
     return $self->_call_rest_client( 'GET', 'runners/:runner_id/jobs', [@_], $options );
 }
 
-=head2 project_runners
+=item project_runners
 
     my $runners = $api->project_runners(
         $project_id,
@@ -6941,7 +8662,7 @@ sub project_runners {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/runners', [@_], $options );
 }
 
-=head2 enable_project_runner
+=item enable_project_runner
 
     my $runner = $api->enable_project_runner(
         $project_id,
@@ -6963,7 +8684,7 @@ sub enable_project_runner {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/runners', [@_], $options );
 }
 
-=head2 disable_project_runner
+=item disable_project_runner
 
     my $runner = $api->disable_project_runner(
         $project_id,
@@ -6983,11 +8704,43 @@ sub disable_project_runner {
     return $self->_call_rest_client( 'DELETE', 'projects/:project_id/runners/:runner_id', [@_], $options );
 }
 
-=head1 SERVICE METHODS
+=back
+
+=head2 Search
+
+See L<https://docs.gitlab.com/ce/api/search.html>.
+
+=over
+
+=item search
+
+    my $results = $api->search(
+        \%params,
+    );
+
+Sends a C<GET> request to C<search> and returns the decoded response content.
+
+=cut
+
+sub search {
+    my $self = shift;
+    croak 'search must be called with 0 to 1 arguments' if @_ < 0 or @_ > 1;
+    croak 'The last argument (\%params) to search must be a hash ref' if defined($_[0]) and ref($_[0]) ne 'HASH';
+    my $params = (@_ == 1) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'search', [@_], $options );
+}
+
+=back
+
+=head2 Services
 
 See L<https://docs.gitlab.com/ce/api/services.html>.
 
-=head2 project_service
+=over
+
+=item project_service
 
     my $service = $api->project_service(
         $project_id,
@@ -7007,7 +8760,7 @@ sub project_service {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/services/:service_name', [@_], $options );
 }
 
-=head2 edit_project_service
+=item edit_project_service
 
     $api->edit_project_service(
         $project_id,
@@ -7033,7 +8786,7 @@ sub edit_project_service {
     return;
 }
 
-=head2 delete_project_service
+=item delete_project_service
 
     $api->delete_project_service(
         $project_id,
@@ -7055,11 +8808,15 @@ sub delete_project_service {
     return;
 }
 
-=head1 SETTINGS METHODS
+=back
+
+=head2 Application settings
 
 See L<https://docs.gitlab.com/ce/api/settings.html>.
 
-=head2 settings
+=over
+
+=item settings
 
     my $settings = $api->settings();
 
@@ -7074,7 +8831,7 @@ sub settings {
     return $self->_call_rest_client( 'GET', 'application/settings', [@_], $options );
 }
 
-=head2 update_settings
+=item update_settings
 
     my $settings = $api->update_settings(
         \%params,
@@ -7094,11 +8851,15 @@ sub update_settings {
     return $self->_call_rest_client( 'PUT', 'application/settings', [@_], $options );
 }
 
-=head1 SIDEKIQ METRIC METHODS
+=back
+
+=head2 Sidekiq Metrics
 
 See L<https://docs.gitlab.com/ce/api/sidekiq_metrics.html>.
 
-=head2 queue_metrics
+=over
+
+=item queue_metrics
 
     my $metrics = $api->queue_metrics();
 
@@ -7113,7 +8874,7 @@ sub queue_metrics {
     return $self->_call_rest_client( 'GET', 'sidekiq/queue_metrics', [@_], $options );
 }
 
-=head2 process_metrics
+=item process_metrics
 
     my $metrics = $api->process_metrics();
 
@@ -7128,7 +8889,7 @@ sub process_metrics {
     return $self->_call_rest_client( 'GET', 'sidekiq/process_metrics', [@_], $options );
 }
 
-=head2 job_stats
+=item job_stats
 
     my $stats = $api->job_stats();
 
@@ -7143,7 +8904,7 @@ sub job_stats {
     return $self->_call_rest_client( 'GET', 'sidekiq/job_stats', [@_], $options );
 }
 
-=head2 compound_metrics
+=item compound_metrics
 
     my $metrics = $api->compound_metrics();
 
@@ -7158,11 +8919,15 @@ sub compound_metrics {
     return $self->_call_rest_client( 'GET', 'sidekiq/compound_metrics', [@_], $options );
 }
 
-=head1 SYSTEM HOOK METHODS
+=back
+
+=head2 System hooks
 
 See L<https://docs.gitlab.com/ce/api/system_hooks.html>.
 
-=head2 hooks
+=over
+
+=item hooks
 
     my $hooks = $api->hooks(
         \%params,
@@ -7182,7 +8947,7 @@ sub hooks {
     return $self->_call_rest_client( 'GET', 'hooks', [@_], $options );
 }
 
-=head2 create_hook
+=item create_hook
 
     $api->create_hook(
         \%params,
@@ -7204,7 +8969,7 @@ sub create_hook {
     return;
 }
 
-=head2 test_hook
+=item test_hook
 
     my $hook = $api->test_hook(
         $hook_id,
@@ -7222,7 +8987,7 @@ sub test_hook {
     return $self->_call_rest_client( 'GET', 'hooks/:hook_id', [@_], $options );
 }
 
-=head2 delete_hook
+=item delete_hook
 
     $api->delete_hook(
         $hook_id,
@@ -7242,11 +9007,15 @@ sub delete_hook {
     return;
 }
 
-=head1 TAG METHODS
+=back
+
+=head2 Tags
 
 See L<https://docs.gitlab.com/ce/api/tags.html>.
 
-=head2 tags
+=over
+
+=item tags
 
     my $tags = $api->tags(
         $project_id,
@@ -7268,7 +9037,7 @@ sub tags {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/tags', [@_], $options );
 }
 
-=head2 tag
+=item tag
 
     my $tag = $api->tag(
         $project_id,
@@ -7288,7 +9057,7 @@ sub tag {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/tags/:tag_name', [@_], $options );
 }
 
-=head2 create_tag
+=item create_tag
 
     my $tag = $api->create_tag(
         $project_id,
@@ -7310,7 +9079,7 @@ sub create_tag {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/repository/tags', [@_], $options );
 }
 
-=head2 delete_tag
+=item delete_tag
 
     $api->delete_tag(
         $project_id,
@@ -7332,7 +9101,7 @@ sub delete_tag {
     return;
 }
 
-=head2 create_release
+=item create_release
 
     $api->create_release(
         $project_id,
@@ -7358,7 +9127,7 @@ sub create_release {
     return;
 }
 
-=head2 edit_release
+=item edit_release
 
     $api->edit_release(
         $project_id,
@@ -7384,11 +9153,15 @@ sub edit_release {
     return;
 }
 
-=head1 TODO METHODS
+=back
+
+=head2 Todos
 
 See L<https://docs.gitlab.com/ce/api/todos.html>.
 
-=head2 todos
+=over
+
+=item todos
 
     my $todos = $api->todos(
         \%params,
@@ -7408,7 +9181,7 @@ sub todos {
     return $self->_call_rest_client( 'GET', 'todos', [@_], $options );
 }
 
-=head2 mark_todo_done
+=item mark_todo_done
 
     my $todo = $api->mark_todo_done(
         $todo_id,
@@ -7426,7 +9199,7 @@ sub mark_todo_done {
     return $self->_call_rest_client( 'POST', 'todos/:todo_id/mark_as_done', [@_], $options );
 }
 
-=head2 mark_all_todos_done
+=item mark_all_todos_done
 
     $api->mark_all_todos_done();
 
@@ -7443,11 +9216,15 @@ sub mark_all_todos_done {
     return;
 }
 
-=head1 USER METHODS
+=back
+
+=head2 Users
 
 See L<https://docs.gitlab.com/ce/api/users.html>.
 
-=head2 users
+=over
+
+=item users
 
     my $users = $api->users(
         \%params,
@@ -7467,7 +9244,7 @@ sub users {
     return $self->_call_rest_client( 'GET', 'users', [@_], $options );
 }
 
-=head2 user
+=item user
 
     my $user = $api->user(
         $user_id,
@@ -7485,7 +9262,7 @@ sub user {
     return $self->_call_rest_client( 'GET', 'users/:user_id', [@_], $options );
 }
 
-=head2 create_user
+=item create_user
 
     $api->create_user(
         \%params,
@@ -7507,7 +9284,7 @@ sub create_user {
     return;
 }
 
-=head2 edit_user
+=item edit_user
 
     $api->edit_user(
         $user_id,
@@ -7531,7 +9308,7 @@ sub edit_user {
     return;
 }
 
-=head2 delete_user
+=item delete_user
 
     $api->delete_user(
         $user_id,
@@ -7551,7 +9328,7 @@ sub delete_user {
     return;
 }
 
-=head2 current_user
+=item current_user
 
     my $user = $api->current_user();
 
@@ -7566,7 +9343,7 @@ sub current_user {
     return $self->_call_rest_client( 'GET', 'user', [@_], $options );
 }
 
-=head2 current_user_ssh_keys
+=item current_user_ssh_keys
 
     my $keys = $api->current_user_ssh_keys(
         \%params,
@@ -7586,7 +9363,7 @@ sub current_user_ssh_keys {
     return $self->_call_rest_client( 'GET', 'user/keys', [@_], $options );
 }
 
-=head2 user_ssh_keys
+=item user_ssh_keys
 
     my $keys = $api->user_ssh_keys(
         $user_id,
@@ -7608,7 +9385,7 @@ sub user_ssh_keys {
     return $self->_call_rest_client( 'GET', 'users/:user_id/keys', [@_], $options );
 }
 
-=head2 user_ssh_key
+=item user_ssh_key
 
     my $key = $api->user_ssh_key(
         $key_id,
@@ -7626,7 +9403,7 @@ sub user_ssh_key {
     return $self->_call_rest_client( 'GET', 'user/keys/:key_id', [@_], $options );
 }
 
-=head2 create_current_user_ssh_key
+=item create_current_user_ssh_key
 
     $api->create_current_user_ssh_key(
         \%params,
@@ -7648,7 +9425,7 @@ sub create_current_user_ssh_key {
     return;
 }
 
-=head2 create_user_ssh_key
+=item create_user_ssh_key
 
     $api->create_user_ssh_key(
         $user_id,
@@ -7672,7 +9449,7 @@ sub create_user_ssh_key {
     return;
 }
 
-=head2 delete_current_user_ssh_key
+=item delete_current_user_ssh_key
 
     $api->delete_current_user_ssh_key(
         $key_id,
@@ -7692,7 +9469,7 @@ sub delete_current_user_ssh_key {
     return;
 }
 
-=head2 delete_user_ssh_key
+=item delete_user_ssh_key
 
     $api->delete_user_ssh_key(
         $user_id,
@@ -7714,7 +9491,7 @@ sub delete_user_ssh_key {
     return;
 }
 
-=head2 current_user_gpg_keys
+=item current_user_gpg_keys
 
     my $keys = $api->current_user_gpg_keys(
         \%params,
@@ -7734,7 +9511,7 @@ sub current_user_gpg_keys {
     return $self->_call_rest_client( 'GET', 'user/gpg_keys', [@_], $options );
 }
 
-=head2 current_user_gpg_key
+=item current_user_gpg_key
 
     my $key = $api->current_user_gpg_key(
         $key_id,
@@ -7752,7 +9529,7 @@ sub current_user_gpg_key {
     return $self->_call_rest_client( 'GET', 'user/gpg_keys/:key_id', [@_], $options );
 }
 
-=head2 create_current_user_gpg_key
+=item create_current_user_gpg_key
 
     $api->create_current_user_gpg_key(
         \%params,
@@ -7774,7 +9551,7 @@ sub create_current_user_gpg_key {
     return;
 }
 
-=head2 delete_current_user_gpg_key
+=item delete_current_user_gpg_key
 
     $api->delete_current_user_gpg_key(
         $key_id,
@@ -7794,7 +9571,7 @@ sub delete_current_user_gpg_key {
     return;
 }
 
-=head2 user_gpg_keys
+=item user_gpg_keys
 
     my $keys = $api->user_gpg_keys(
         $user_id,
@@ -7816,7 +9593,7 @@ sub user_gpg_keys {
     return $self->_call_rest_client( 'GET', 'users/:user_id/gpg_keys', [@_], $options );
 }
 
-=head2 user_gpg_key
+=item user_gpg_key
 
     my $key = $api->user_gpg_key(
         $user_id,
@@ -7836,7 +9613,7 @@ sub user_gpg_key {
     return $self->_call_rest_client( 'GET', 'users/:user_id/gpg_keys/:key_id', [@_], $options );
 }
 
-=head2 create_user_gpg_key
+=item create_user_gpg_key
 
     my $keys = $api->create_user_gpg_key(
         $user_id,
@@ -7858,7 +9635,7 @@ sub create_user_gpg_key {
     return $self->_call_rest_client( 'POST', 'users/:user_id/gpg_keys', [@_], $options );
 }
 
-=head2 delete_user_gpg_key
+=item delete_user_gpg_key
 
     $api->delete_user_gpg_key(
         $user_id,
@@ -7880,7 +9657,7 @@ sub delete_user_gpg_key {
     return;
 }
 
-=head2 current_user_emails
+=item current_user_emails
 
     my $emails = $api->current_user_emails(
         \%params,
@@ -7900,7 +9677,7 @@ sub current_user_emails {
     return $self->_call_rest_client( 'GET', 'user/emails', [@_], $options );
 }
 
-=head2 user_emails
+=item user_emails
 
     my $emails = $api->user_emails(
         $user_id,
@@ -7922,7 +9699,7 @@ sub user_emails {
     return $self->_call_rest_client( 'GET', 'users/:user_id/emails', [@_], $options );
 }
 
-=head2 current_user_email
+=item current_user_email
 
     my $email = $api->current_user_email(
         $email_id,
@@ -7940,7 +9717,7 @@ sub current_user_email {
     return $self->_call_rest_client( 'GET', 'user/emails/:email_id', [@_], $options );
 }
 
-=head2 create_current_user_email
+=item create_current_user_email
 
     my $email = $api->create_current_user_email(
         \%params,
@@ -7960,7 +9737,7 @@ sub create_current_user_email {
     return $self->_call_rest_client( 'POST', 'user/emails', [@_], $options );
 }
 
-=head2 create_user_email
+=item create_user_email
 
     my $email = $api->create_user_email(
         $user_id,
@@ -7982,7 +9759,7 @@ sub create_user_email {
     return $self->_call_rest_client( 'POST', 'users/:user_id/emails', [@_], $options );
 }
 
-=head2 delete_current_user_email
+=item delete_current_user_email
 
     $api->delete_current_user_email(
         $email_id,
@@ -8002,7 +9779,7 @@ sub delete_current_user_email {
     return;
 }
 
-=head2 delete_user_email
+=item delete_user_email
 
     $api->delete_user_email(
         $user_id,
@@ -8024,7 +9801,7 @@ sub delete_user_email {
     return;
 }
 
-=head2 block_user
+=item block_user
 
     my $success = $api->block_user(
         $user_id,
@@ -8042,7 +9819,7 @@ sub block_user {
     return $self->_call_rest_client( 'POST', 'users/:user_id/block', [@_], $options );
 }
 
-=head2 unblock_user
+=item unblock_user
 
     my $success = $api->unblock_user(
         $user_id,
@@ -8060,7 +9837,7 @@ sub unblock_user {
     return $self->_call_rest_client( 'POST', 'users/:user_id/unblock', [@_], $options );
 }
 
-=head2 user_impersonation_tokens
+=item user_impersonation_tokens
 
     my $tokens = $api->user_impersonation_tokens(
         $user_id,
@@ -8082,7 +9859,7 @@ sub user_impersonation_tokens {
     return $self->_call_rest_client( 'GET', 'users/:user_id/impersonation_tokens', [@_], $options );
 }
 
-=head2 user_impersonation_token
+=item user_impersonation_token
 
     my $token = $api->user_impersonation_token(
         $user_id,
@@ -8102,7 +9879,7 @@ sub user_impersonation_token {
     return $self->_call_rest_client( 'GET', 'users/:user_id/impersonation_tokens/:impersonation_token_id', [@_], $options );
 }
 
-=head2 create_user_impersonation_token
+=item create_user_impersonation_token
 
     my $token = $api->create_user_impersonation_token(
         $user_id,
@@ -8124,7 +9901,7 @@ sub create_user_impersonation_token {
     return $self->_call_rest_client( 'POST', 'users/:user_id/impersonation_tokens', [@_], $options );
 }
 
-=head2 delete_user_impersonation_token
+=item delete_user_impersonation_token
 
     $api->delete_user_impersonation_token(
         $user_id,
@@ -8146,7 +9923,7 @@ sub delete_user_impersonation_token {
     return;
 }
 
-=head2 all_user_activities
+=item all_user_activities
 
     my $activities = $api->all_user_activities(
         \%params,
@@ -8166,11 +9943,15 @@ sub all_user_activities {
     return $self->_call_rest_client( 'GET', 'user/activities', [@_], $options );
 }
 
-=head1 VALIDATE CI CONFIGURATION METHODS
+=back
+
+=head2 Validate the .gitlab-ci.yml
 
 See L<https://docs.gitlab.com/ce/api/lint.html>.
 
-=head2 lint
+=over
+
+=item lint
 
     my $result = $api->lint(
         \%params,
@@ -8190,11 +9971,15 @@ sub lint {
     return $self->_call_rest_client( 'POST', 'lint', [@_], $options );
 }
 
-=head1 VERSION METHODS
+=back
+
+=head2 Version
 
 See L<https://docs.gitlab.com/ce/api/version.html>.
 
-=head2 version
+=over
+
+=item version
 
     my $version = $api->version();
 
@@ -8209,11 +9994,15 @@ sub version {
     return $self->_call_rest_client( 'GET', 'version', [@_], $options );
 }
 
-=head1 WIKI METHODS
+=back
+
+=head2 Wikis
 
 See L<https://docs.gitlab.com/ce/api/wikis.html>.
 
-=head2 wiki_pages
+=over
+
+=item wiki_pages
 
     my $pages = $api->wiki_pages(
         $project_id,
@@ -8235,7 +10024,7 @@ sub wiki_pages {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/wikis', [@_], $options );
 }
 
-=head2 wiki_page
+=item wiki_page
 
     my $pages = $api->wiki_page(
         $project_id,
@@ -8255,7 +10044,7 @@ sub wiki_page {
     return $self->_call_rest_client( 'GET', 'projects/:project_id/wikis/:slug', [@_], $options );
 }
 
-=head2 create_wiki_page
+=item create_wiki_page
 
     my $page = $api->create_wiki_page(
         $project_id,
@@ -8277,7 +10066,7 @@ sub create_wiki_page {
     return $self->_call_rest_client( 'POST', 'projects/:project_id/wikis', [@_], $options );
 }
 
-=head2 edit_wiki_page
+=item edit_wiki_page
 
     my $page = $api->edit_wiki_page(
         $project_id,
@@ -8301,7 +10090,7 @@ sub edit_wiki_page {
     return $self->_call_rest_client( 'PUT', 'projects/:project_id/wikis/:slug', [@_], $options );
 }
 
-=head2 delete_wiki_page
+=item delete_wiki_page
 
     $api->delete_wiki_page(
         $project_id,
@@ -8323,12 +10112,9 @@ sub delete_wiki_page {
     return;
 }
 
+=back
 
-sub raw_snippet {
-    my $self = shift;
-    warn "The raw_snippet method is deprecated, please use the snippet_content method instead";
-    return $self->snippet_content( @_ );
-}
+=cut
 
 1;
 __END__

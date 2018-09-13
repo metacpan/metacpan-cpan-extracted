@@ -21,12 +21,4 @@ use warnings;
         output      => "foo.places:Äland|s\n",
     },
 
-     {
-        description => "add_set (alias for set_add)",
-        autoflush   => 1,
-        prefix      => 'foo.',
-        input       => [ [qw/ add_set addresses 192.168.0.1 /], ],
-        output      => "foo.addresses:192.168.0.1|s\n",
-    },
-
 ]

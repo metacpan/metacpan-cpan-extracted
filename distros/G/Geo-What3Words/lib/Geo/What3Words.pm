@@ -2,16 +2,18 @@
 
 
 package Geo::What3Words;
-$Geo::What3Words::VERSION = '2.0.1';
+$Geo::What3Words::VERSION = '2.1.1';
 use strict;
 use warnings;
 use URI;
 use LWP::UserAgent;
 use LWP::Protocol::https;
-use JSON;
+use JSON::XS;
 use Data::Dumper;
 use Net::Ping;
 use Net::Ping::External;
+use Encode;
+my $JSONXS = JSON::XS->new->allow_nonref(1);
 
 
 
@@ -149,14 +151,6 @@ sub position_to_words {
 }
 
 
-
-
-
-
-
-
-
-
 sub get_languages {
   my $self = shift;
   my $position = shift;
@@ -164,31 +158,10 @@ sub get_languages {
   return $self->_query_remote_api('languages');
 }
 
-
-
-
-
-
-
-
-
-
-
 sub oneword_available {
   warn 'deprecated method: oneword_available';
   return;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 sub _query_remote_api {
   my $self        = shift;
@@ -219,11 +192,11 @@ sub _query_remote_api {
   }
 
   my $json = $response->decoded_content;
+  $json = decode_utf8($json);
   $self->_log($json);
 
-  return decode_json($json);
+  return $JSONXS->decode($json);
 }
-
 
 sub _log {
   my $self    = shift;
@@ -233,15 +206,12 @@ sub _log {
   if ( ref($self->{logging}) eq 'CODE' ){
     my $lc = $self->{logging};
     &$lc("Geo::What3Words -- " . $message);
-  } 
+  }
   else {
     print "Geo::What3Words -- " . $message . "\n";
   }
-  return
+  return;
 }
-
-
-
 
 
 1;
@@ -258,7 +228,7 @@ Geo::What3Words - turn WGS84 coordinates into three word addresses and vice-vers
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.1
 
 =head1 SYNOPSIS
 
@@ -456,7 +426,7 @@ mtmail <mtmail-cpan@gmx.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by OpenCage Data Limited.
+This software is copyright (c) 2018 by OpenCage Data Limited.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,47 @@
+NAME
+    App::lcpan::CmdBundle::cpantesters - More lcpan subcommands related to
+    CPAN Testers
+
+VERSION
+    This document describes version 0.001 of
+    App::lcpan::CmdBundle::cpantesters (from Perl distribution
+    App-lcpan-CmdBundle-cpantesters), released on 2018-09-12.
+
+SYNOPSIS
+DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan cpantesters-dist
+
+    *   lcpan cpantesters-author
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-cpantesters>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-cpantesters>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-c
+    pantesters>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    lcpan
+
+    <https://www.cpantesters.org>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

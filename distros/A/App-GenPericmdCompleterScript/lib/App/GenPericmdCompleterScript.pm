@@ -1,7 +1,7 @@
 package App::GenPericmdCompleterScript;
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.120'; # VERSION
 
 use 5.010001;
 use strict;
@@ -158,6 +158,11 @@ _
             schema => ['int*', in=>[0,1,2]],
             default => 1,
             tags => ['category:pericmd-attribute'],
+        },
+        strip => {
+            summary => 'Whether to strip source code using Perl::Stripper',
+            schema => 'bool*',
+            default => 0,
         },
     },
 };
@@ -395,21 +400,25 @@ sub gen_pericmd_completer_script {
 
         File::Slurper::write_text($tmp_unpacked_path, $code);
 
-        my $res = App::depak::depak(
+        my %depakargs = (
             include_prereq => [sort keys %used_modules],
             input_file     => $tmp_unpacked_path,
             output_file    => $tmp_packed_path,
             overwrite      => 1,
             trace_method   => 'none',
             pack_method    => 'datapack',
-
-            stripper         => 1,
-            stripper_pod     => 1,
-            stripper_comment => 1,
-            stripper_ws      => 1,
-            stripper_maintain_linum => 0,
-            stripper_log     => 0,
         );
+        if ($args{strip}) {
+            $depakargs{stripper} = 1;
+            $depakargs{stripper_pod}     = 1;
+            $depakargs{stripper_comment} = 1;
+            $depakargs{stripper_ws}      = 1;
+            $depakargs{stripper_maintain_linum} = 0;
+            $depakargs{stripper_log}     = 0;
+        } else {
+            $depakargs{stripper} = 0;
+        }
+        my $res = App::depak::depak(%depakargs);
         return $res unless $res->[0] == 200;
 
         $packed_code = File::Slurper::read_text($tmp_packed_path);
@@ -456,7 +465,7 @@ App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.11 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2017-07-08.
+This document describes version 0.120 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2018-09-11.
 
 =head1 FUNCTIONS
 
@@ -518,6 +527,10 @@ Program name that is being completed.
 =item * B<read_env> => I<bool>
 
 =item * B<skip_format> => I<bool>
+
+=item * B<strip> => I<bool> (default: 0)
+
+Whether to strip source code using Perl::Stripper.
 
 =item * B<subcommands> => I<hash>
 
@@ -589,7 +602,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

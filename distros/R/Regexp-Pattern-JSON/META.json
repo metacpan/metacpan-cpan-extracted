@@ -31,6 +31,11 @@
             "Regexp::Pattern" : "v0.2.7"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
       "test" : {
          "requires" : {
             "File::Spec" : "0",
@@ -54,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-Pattern-JSON"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -65,7 +65,7 @@ ok( ( tie %test, 'Config::IniFiles' ), "Tying is successful" );
 tied(%test)->SetFileName( t_file('test02.ini') );
 
 # Test 6
-# Also with pipes when using tied interface using vlaue of 0
+# Also with pipes when using tied interface using value of 0
 $test{'2'} = {};
 tied(%test)->_assert_invariants();
 $test{'2'}{'test'} = "sleep";

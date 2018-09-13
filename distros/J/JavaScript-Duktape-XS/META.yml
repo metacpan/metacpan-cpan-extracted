@@ -5,6 +5,7 @@ author:
 build_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
+  JSON::PP: '0'
   Path::Tiny: '0'
   Test::More: '0'
   Test::Output: '0'
@@ -29,5 +30,5 @@ requires:
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/JavaScript-Duktape-XS
-version: '0.000073'
+version: '0.000074'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

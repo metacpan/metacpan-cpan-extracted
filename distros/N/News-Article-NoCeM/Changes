@@ -1,5 +1,10 @@
 Revision history for Perl extension News::Article::NoCeM
 
+0.09  Mon Sep 10 13:20:19 PDT 2018
+	- ignore $version if it is uninitialized
+	- fix typo
+	Patch submitted by: florian.schlichting@fu-berlin.de
+
 0.08  Sat Jun 24 03:53:39 CST 2006
 	- getting married today :D
 	- indicate that it's encoding with SHA1

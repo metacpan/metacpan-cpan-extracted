@@ -104,9 +104,15 @@ containing the following items:
 
 IP address/hostname of the IRC server to connect to.
 
+=item use_ssl
+
+Whether to use SSL when connecting to the IRC server. Defaults to C<1>.
+
 =item port
 
 Port number to connect to.
+
+Defaults to C<6697> when B<use_ssl> is true and C<6667> otherwise.
 
 =item nick
 
@@ -250,6 +256,22 @@ The separator before the commit log. Default: none.
 
 =back
 
+=head2 webhook
+
+A map for enabling GitLab webook support. Possible keys:
+
+=over
+
+=item enabled
+
+Enable webhhok support by setting this to 1.
+
+=item allowed_networks
+
+A list of allowed IP networks. Required.
+
+=back
+
 =head2 short_url_service I<name>
 
 The name of a WWW::Shorten module to use for URL-shortening. The leading
@@ -331,6 +353,10 @@ Example: Debli
  # available colors: black, navy, green, red, brown, purple, orange, yellow,
  #  lime, teal, aqua, blue, fuchsia, gray, silver, white
  # available modifiers: bold underline reverse
+ webhook:
+  enabled: 1
+  allowed_networks:
+   - 127.0.0.1
  short_url_service: Debli
 
 =head1 SEE ALSO

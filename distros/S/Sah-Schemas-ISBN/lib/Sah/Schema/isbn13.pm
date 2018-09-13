@@ -1,7 +1,7 @@
 package Sah::Schema::isbn13;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'ISBN 13 number',
@@ -34,7 +34,7 @@ Sah::Schema::isbn13 - ISBN 13 number
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::isbn13 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
+This document describes version 0.005 of Sah::Schema::isbn13 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
 
 =head1 DESCRIPTION
 

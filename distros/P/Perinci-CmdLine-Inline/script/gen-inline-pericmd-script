@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2018-03-28'; # DATE
+our $DATE = '2018-09-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.542'; # VERSION
+our $VERSION = '0.543'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.542 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2018-03-28.
+This document describes version 0.543 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2018-09-11.
 
 =head1 SYNOPSIS
 
@@ -167,23 +167,25 @@ Whether CLI script should read environment variable that sets default options.
 
 Set shebang line.
 
+=item B<--stripper>
+
+Whether to strip code using Perl::Stripper.
+
 =back
 
 =head2 Configuration options
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -609,6 +611,7 @@ List of available configuration parameters:
  script_version_from_main_version (see --script-version-from-main-version)
  shebang (see --shebang)
  skip_format (see --skip-format)
+ stripper (see --stripper)
  sub_name (see --sub-name)
  subcommands (see --subcommands)
  tags (see --tags)

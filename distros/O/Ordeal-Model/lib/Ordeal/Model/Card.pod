@@ -1,0 +1,134 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Card - Class for representing cards
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model::Card;
+
+   my $card = Ordeal::Model::Card->new(
+      content_type => 'image/png',
+      group => 'whatever',
+      id => 'AAA-bb-1235',
+      name => 'three of clubs',
+      data => sub { return $some_blob_of_png_data },
+   );
+
+=head1 DESCRIPTION
+
+This class represents a card, with the goal of providing access to its
+representation (most probably an image file).
+
+L</id> should be a unique identifier for the card.
+
+L</content_type> and L</data> do what you think: provide you the data
+associated to the card, e.g. the image file contents, and the associated
+content type describing what kind of data is. If you set L</data> with
+a sub reference, it will be called when the contents of L</data> is
+needed, so it can be useful to defer loading data until you really need it
+(e.g. from a file).
+
+L</group> can be used to group cards together. You should probably use an
+L<Ordeal::Model::Deck> to create decks, not use this method. It might be
+useful if you want to partition your card space across different owners,
+but in any way it's just some data you can attach to a card.
+
+L</name> is a name you can associate to the card. Again, it's treated as
+opaque data, so you can abuse it.
+
+=head1 METHODS
+
+=head2 B<< compare_ne >>
+
+   my $bool = $obj->compare_ne($other_obj);
+
+compare against C<$other_obj>, returns I<true> if the two are different.
+Relies on comparison of L</id>s, but can be overloaded in subclasses.
+
+=head2 B<< content_type >>
+
+   my $ct = $card->content_type;
+   $card->content_type('image/svg+xml');
+
+accessor for the content-type to associate to L</data>.
+
+=head2 B<< data >>
+
+   my $data = $card->data;
+   $card->data($data);
+   $card->data(sub { load_data_from('/path/to/file.png') });
+
+accessor for the data associated to the card. When set to a sub reference,
+it will be called when the accessor is used for reading back the data;
+this allows you to defer actual loading/generation of the data until you
+really need it. The sub reference will be passed the card object as the
+only parameter.
+
+For example, you might want to load it from a file, using the L</id> as
+the filename:
+
+   sub load_data_from_id ($card) {
+      open my $fh, '<', $card->id or die "open(): $!";
+      binmode $fh, ':raw' or die "binmode(): $!";
+      local $/;
+      defined(my $data = <$fh>) or die "readline(): $!";
+      close $fh or die "close(): $!";
+      return $data;
+   }
+
+   # ... then, somewhere else...
+   $card->data(\&load_data_from_id);
+
+=head2 B<< group >>
+
+   my $group = $card->group;
+   $card->group($group);
+
+accessor for some c<group> metadata you might want to associate to the card.
+treated as opaque data.
+
+=head2 B<< id >>
+
+   my $id = $card->id;
+   $card->id($id);
+
+accessor for a unique identifer associated to the card.
+
+=head2 B<< name >>
+
+   my $name = $card->name;
+   $card->name($name);
+
+accessor for a name associated to the card.
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

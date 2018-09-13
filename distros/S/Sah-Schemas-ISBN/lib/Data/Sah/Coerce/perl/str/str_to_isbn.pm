@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_to_isbn;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,7 +57,7 @@ Data::Sah::Coerce::perl::str::str_to_isbn - Check and format ISBN 10 or ISBN 13 
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Coerce::perl::str::str_to_isbn (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
+This document describes version 0.005 of Data::Sah::Coerce::perl::str::str_to_isbn (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
 
 =head1 DESCRIPTION
 

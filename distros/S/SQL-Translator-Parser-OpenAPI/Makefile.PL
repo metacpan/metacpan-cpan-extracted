@@ -23,6 +23,7 @@ WriteMakefile(
     'String::CamelCase' => '0',
     'SQL::Translator::Schema::Constants' => 0,
     'Lingua::EN::Inflect::Number' => '0',
+    'Math::BigInt' => '0',
   },
   clean => { FILES => 'SQL-Translator-Parser-OpenAPI-*' },
   META_MERGE => {

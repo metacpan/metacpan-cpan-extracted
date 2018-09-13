@@ -3,16 +3,17 @@ package Code::TidyAll::Plugin::JSLint;
 use strict;
 use warnings;
 
-use IPC::Run3 qw(run3);
-use Text::ParseWords qw(shellwords);
-
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.70';
+has '+ok_exit_codes' => (
+    default => sub { [ 0, 1 ] },
+);
+
+our $VERSION = '0.71';
 
 sub _build_cmd {'jslint'}
 
@@ -24,8 +25,6 @@ sub validate_file {
 
     return;
 }
-
-sub _is_bad_exit_code { return $_[1] > 1 }
 
 1;
 
@@ -43,7 +42,7 @@ Code::TidyAll::Plugin::JSLint - Use jslint with tidyall
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

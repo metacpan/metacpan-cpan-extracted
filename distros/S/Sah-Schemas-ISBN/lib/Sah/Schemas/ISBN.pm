@@ -1,7 +1,7 @@
 package Sah::Schemas::ISBN;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas related to ISBN (International Standard Book Number)
@@ -18,7 +18,7 @@ Sah::Schemas::ISBN - Various Sah schemas related to ISBN (International Standard
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::ISBN (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
+This document describes version 0.005 of Sah::Schemas::ISBN (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
 
 =head1 SAH SCHEMAS
 

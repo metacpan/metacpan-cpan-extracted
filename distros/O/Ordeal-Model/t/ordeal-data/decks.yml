@@ -1,0 +1,19 @@
+'group1-01-public':
+  description: a simple deck
+  cards:
+    - public-00-bah.png
+    - public-01-bleh.png
+'group1-02-all':
+  description: another simple deck
+  cards:
+    - group1-01-whatevah.png
+    - group1-02-whateeeevah.jpg
+    - group1-03-wtf.svg
+    - public-00-bah.png
+    - public-01-bleh.png
+'group2-01-all':
+  description: last simple deck
+  cards:
+    - group2-05-bongo.jpg
+    - public-00-bah.png
+    - public-01-bleh.png

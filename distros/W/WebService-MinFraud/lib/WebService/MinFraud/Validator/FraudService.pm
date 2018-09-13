@@ -12,7 +12,7 @@ use WebService::MinFraud::Data::Rx::Type::Hostname;
 use WebService::MinFraud::Data::Rx::Type::IPAddress;
 use WebService::MinFraud::Data::Rx::Type::WebURI;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 extends 'WebService::MinFraud::Validator::Base';
 
@@ -234,8 +234,10 @@ sub _build_request_schema_definition {
                                 'orangepay',
                                 'other',
                                 'pacnet_services',
+                                'payeezy',
                                 'payfast',
                                 'paygate',
+                                'payment_express',
                                 'paymentwall',
                                 'payone',
                                 'paypal',
@@ -354,7 +356,7 @@ WebService::MinFraud::Validator::FraudService - Parent Validation for the minFra
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

@@ -6,7 +6,7 @@ package BSON::PP;
 # ABSTRACT: Pure Perl BSON implementation
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use B;
 use Carp;
@@ -51,6 +51,7 @@ use constant {
     BSON_REGEX => "Z*Z*",
     BSON_JSCODE => "",
     BSON_INT32 => "l<",
+    BSON_UINT32 => "L<",
     BSON_INT64 => "q<",
     BSON_8BYTES => "a8",
     BSON_16BYTES => "a16",
@@ -98,6 +99,8 @@ sub _ixhash_iterator {
 sub _hashlike_iterator {
     my $hashlike = shift;
     my @keys = keys %$hashlike;
+    @keys = sort @keys
+        if $ENV{BSON_TEST_SORT_HASH};
     return sub {
         my $k = shift @keys;
         return unless defined $k;
@@ -240,8 +243,10 @@ sub _encode_bson {
 
         # If the type is a subtype of BSON::*, use that instead
         if ( blessed $value ) {
-            my $parent = first { /\ABSON::\w+\z/ } reverse @{mro::get_linear_isa($type)};
-            $type = $parent if defined $parent;
+            if ($type !~ /\ABSON::\w+\z/) {
+                my $parent = first { /\ABSON::\w+\z/ } reverse @{mro::get_linear_isa($type)};
+                $type = $parent if defined $parent;
+            }
         }
 
         # Null
@@ -258,6 +263,16 @@ sub _encode_bson {
                 tie( my %h, 'Tie::IxHash' );
                 %h = map { $i++ => $_ } @$value;
                 $bson .= pack( BSON_TYPE_NAME, 0x04, $utf8_key ) . _encode_bson( \%h, $opt );
+            }
+
+            # special-cased deprecated DBPointer
+            elsif ($type eq 'BSON::DBPointer') {
+                my %data;
+                tie %data, 'Tie::IxHash';
+                $data{'$ref'} = $value->{'ref'};
+                $data{'$id'} = $value->{id};
+                $bson .= pack( BSON_TYPE_NAME, 0x03, $utf8_key )
+                    . _encode_bson(\%data, $opt);
             }
 
             # Document
@@ -379,7 +394,7 @@ sub _encode_bson {
             }
 
             # String (explicit)
-            elsif ( $type eq 'BSON::String' ) {
+            elsif ( $type eq 'BSON::String' || $type eq 'BSON::Symbol') {
                 $value = $value->value;
                 utf8::encode($value);
                 $bson .= pack( BSON_TYPE_NAME.BSON_STRING, 0x02, $utf8_key, $value );
@@ -753,7 +768,7 @@ sub _decode_bson {
 
         # Timestamp
         elsif ( $type == 0x11 ) {
-            ( my $sec, my $inc, $bson ) = unpack( BSON_INT32.BSON_INT32.BSON_REMAINING, $bson );
+            ( my $sec, my $inc, $bson ) = unpack( BSON_UINT32.BSON_UINT32.BSON_REMAINING, $bson );
             $value = BSON::Timestamp->new( $inc, $sec );
         }
 
@@ -812,7 +827,7 @@ BSON::PP - Pure Perl BSON implementation
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 DESCRIPTION
 

@@ -19,12 +19,13 @@ meta-spec:
   version: '1.4'
 name: Regexp-Pattern
 requires:
+  perl: '5.010001'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern
   homepage: https://metacpan.org/release/Regexp-Pattern
   repository: git://github.com/perlancar/perl-Regexp-Pattern.git
-version: 0.2.7
+version: 0.2.8
 x_Dist_Zilla:
   perl:
     version: '5.026001'

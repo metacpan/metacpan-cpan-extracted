@@ -161,6 +161,7 @@ csv_parse(string)
                 }
                 // an undef value: one,,three
                 else if (*ptr == ',') {
+                    EXTEND( SP, st_pos + 1 );
                     ST(st_pos++) = &PL_sv_undef;
                     field = NULL;
                     continue;
@@ -183,6 +184,7 @@ csv_parse(string)
             if ( !quoted ) {
                 switch (*ptr) {
                     case ',':
+                        EXTEND( SP, st_pos + 1 );
                         ST(st_pos++) = sv_2mortal( newSVpvn( field, ptr - field ) );
                         field = NULL;
                         break;
@@ -229,6 +231,7 @@ csv_parse(string)
                             // no additional processing required. just create a string.
                             SV *tmp = sv_2mortal( newSVpvn( field, ptr - field ) );
                             if (isutf8) SvUTF8_on(tmp);
+                            EXTEND( SP, st_pos + 1 );
                             ST(st_pos++) = tmp;
                         }
                         else {
@@ -250,6 +253,7 @@ csv_parse(string)
 
                             SV *tmpsv = sv_2mortal( newSVpvn( tmp, i ) );
                             if (isutf8) SvUTF8_on(tmpsv);
+                            EXTEND( SP, st_pos + 1 );
                             ST(st_pos++) = tmpsv;
 
                             Safefree(tmp);
@@ -279,6 +283,7 @@ csv_parse(string)
         // if we hit the end of the string, the last field will not have been
         // added if it's a non-quoted string.
         if (field != NULL && !quoted) {
+            EXTEND( SP, st_pos + 1 );
             ST(st_pos++) = sv_2mortal( newSVpvn( field, ptr - field ) );
         }
         // if field is not NULL, it means the string never terminated.
@@ -287,6 +292,7 @@ csv_parse(string)
         }
         // if there was a trailing comma, add an undef
         else if (*(ptr-1) == ',') {
+            EXTEND( SP, st_pos + 1 );
             ST(st_pos++) = &PL_sv_undef;
         }
 

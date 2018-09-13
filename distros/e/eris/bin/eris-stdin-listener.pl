@@ -17,7 +17,7 @@ use POE qw(
 );
 
 my ($opt,$usage) = describe_options('%c - %o',
-    [ 'config:s', 'Eris YAML config file, required', { required => 1, validate => { "Must be a readable file." => sub { -r $_[0] } } } ],
+    [ 'config=s', 'Eris YAML config file, required', { required => 1, validate => { "Must be a readable file." => sub { -r $_[0] } } } ],
     [],
     [ 'help',  'Display this help' ],
 );
@@ -58,15 +58,12 @@ sub main_start {
     );
 
     my $bindir = path( "$FindBin::RealBin" );
-    my $libdir = $bindir->parent->child('lib');
 
     $heap->{workers} = POE::Component::WheelRun::Pool->spawn(
         Alias       => 'pool',
         Program     => $^X,
         ProgramArgs => [
-            sprintf('-I%s',$libdir->stringify),
-            '--',
-            $bindir->child('send_to_elasticsearch.pl')->stringify,
+            $bindir->child('eris-es-indexer.pl')->stringify,
             '--config', $opt->config,
         ],
         StdinFilter  => POE::Filter::Line->new(),
@@ -135,7 +132,7 @@ eris-stdin-listener.pl - Simple wrapper to spawn workers for handling syslog str
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package News::Article::NoCeM;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 # -*- Perl -*- Sat Dec  4 21:11:45 CST 2004
 #############################################################################
@@ -117,7 +117,7 @@ push @EXPORT, qw( ihave );
 
 =item make_notice ( TYPE, NAME, GROUP, ISSUER, [ PREFIX ] )
 
-Retrive articles marked by hide with C<TYPE>, and make a notice
+Retrieve articles marked by hide with C<TYPE>, and make a notice
 fot them. If there's only one type within a container, then the container
 itself can be a notice. C<NAME> is the identifier of the issuer. C<GROUP> is
 the newsgroup the you will post nocem notice to. C<ISSUER> is the email address
@@ -205,7 +205,7 @@ sub sign
   $self->add_body($body);
   $self->add_body("");
   $self->add_body("-----BEGIN PGP SIGNATURE-----");
-  $self->add_body("Version: $version");
+  $self->add_body("Version: $version") if $version;
   $self->add_body("");
   $self->add_body($signature);
   $self->add_body("-----END PGP SIGNATURE-----");

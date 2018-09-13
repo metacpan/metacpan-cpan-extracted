@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base -base;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -11,6 +11,9 @@ our $VERSION = '0.07'; # VERSION
 BEGIN {
 	$ENV{'MOJO_REACTOR'} = 'Mojo::Reactor::Poll' unless $ENV{'MOJO_REACTOR'};
 }
+
+use feature 'state';
+
 # more Mojolicious
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
@@ -169,15 +172,10 @@ sub connect {
 	});
 
 	$self->log->debug('starting handshake');
-	#Mojo::IOLoop->singleton->reactor->one_tick while !defined $self->{auth};
+	
 	# fixme: catch signals?
-	my $reactor = Mojo::IOLoop->singleton->reactor;
-	$reactor->{running}++; # fixme: this assumes Mojo::Reactor::Poll
-	while (not defined $self->{auth} and $reactor->{running}) {
-		Mojo::IOLoop->singleton->reactor->one_tick;
-		#$self->log->debug('tick');
-	}
-	$reactor->{running}--;
+	$self->_loop(sub { not defined $self->{auth} });
+
 	$self->log->debug('done with handhake?');
 
 	Mojo::IOLoop->remove($tmr);
@@ -236,15 +234,7 @@ sub call {
 	};
 	$self->call_nb(%args);
 
-	my $reactor = Mojo::IOLoop->singleton->reactor;
-	$reactor->{running}++; # fixme: this assumes Mojo::Reactor::Poll
-	#$reactor->start unless $reactor->is_running;
-	#$reactor->one_tick while !$done and $reactor->is_running;
-	while (!$done and $reactor->{running}) {
-        	$self->log->debug('tick');
-        	$reactor->one_tick
-	}
-	$reactor->{running}--;
+	$self->_loop(sub { !$done });
 
 	return $status, $outargs;
 }
@@ -353,15 +343,7 @@ sub get_status {
 	);
 	$self->call_nb(%args);
 
-	my $reactor = Mojo::IOLoop->singleton->reactor;
-	#$reactor->start unless $reactor->is_running;
-	$reactor->{running}++; # fixme: this assumes Mojo::Reactor::Poll
-	#$reactor->one_tick while !$done and $reactor->is_running;
-	while (!$done and $reactor->{running}) {
-        	$self->log->debug('tick');
-        	$reactor->one_tick
-	}
-	$reactor->{running}--;
+	$self->_loop(sub { !$done });
 
 	return $status, $outargs;
 }
@@ -414,8 +396,7 @@ sub ping {
 	});
 
 	# we could recurse here
-	#Mojo::IOLoop->one_tick while !$done;
-	Mojo::IOLoop->singleton->reactor->one_tick while !$done;
+	$self->_loop(sub { !$done });
 
 	return $ret;
 }
@@ -446,6 +427,7 @@ sub work {
 	$self->log->debug(blessed($self) . ' starting work');
 	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 	$self->log->debug(blessed($self) . ' done?');
+	Mojo::IOLoop->remove($tmr) if $tmr;
 
 	return $self->{_exit};
 }
@@ -728,6 +710,37 @@ sub _create_pidfile {
 	}
 }
 
+# tick while Mojo::Reactor is still running and condition callback is true
+sub _loop {
+	warn __PACKAGE__." recursing into IO loop" if state $looping++;
+
+	my $reactor = Mojo::IOLoop->singleton->reactor;
+	my $err;
+
+	if (ref $reactor eq 'Mojo::Reactor::EV') {
+
+		my $active = 1;
+
+		$active = $reactor->one_tick while $_[1]->() && $active;
+
+	} elsif (ref $reactor eq 'Mojo::Reactor::Poll') {
+
+		$reactor->{running}++;
+
+		$reactor->one_tick while $_[1]->() && $reactor->is_running;
+
+		$reactor->{running} &&= $reactor->{running} - 1;
+
+	} else {
+
+		$err = "unknown reactor: ".ref $reactor;
+	}
+
+	$looping--;
+	die $err if $err;
+}
+
+
 #sub DESTROY {
 #	my ($self) = @_;
 #	say STDERR "destroying $self";
@@ -846,15 +859,11 @@ $connected = $client->connect();
 Connect (or reconnect) to the RPC-Switch.  Returns a true value if the
 connection succeeded.
 
-=back
-
 =head2 is_connected
 
 $connected = $client->is_connected();
 
 Returns a true value if the $client is connected.
-
-=back
 
 =head2 call
 

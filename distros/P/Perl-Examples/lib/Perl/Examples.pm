@@ -1,7 +1,7 @@
 package Perl::Examples;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.091'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.092'; # VERSION
 
 1;
 # ABSTRACT: A collection of various examples of Perl modules/scripts
@@ -18,7 +18,7 @@ Perl::Examples - A collection of various examples of Perl modules/scripts
 
 =head1 VERSION
 
-This document describes version 0.091 of Perl::Examples (from Perl distribution Perl-Examples), released on 2018-09-10.
+This document describes version 0.092 of Perl::Examples (from Perl distribution Perl-Examples), released on 2018-09-11.
 
 =head1 DESCRIPTION
 

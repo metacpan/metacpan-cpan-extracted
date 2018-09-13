@@ -4,7 +4,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # SYNOPSIS
 
@@ -197,11 +197,6 @@ $stats->set_add( $metric, $string );
 
 This adds the the `$string` to a set, for logging the number of
 unique things, e.g. IP addresses or usernames.
-
-## `add_set`
-
-This is an alias for ["set\_add"](#set_add). It is deprecated and will be removed
-in a later version.
 
 ## `flush`
 

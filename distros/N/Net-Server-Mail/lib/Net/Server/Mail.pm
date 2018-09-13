@@ -10,7 +10,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.23';
+$Net::Server::Mail::VERSION = '0.24';
 
 =pod
 
@@ -40,7 +40,7 @@ Net::Server::Mail - Class to easily create a mail server
         my($session, $recipient) = @_;
         
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }
@@ -67,7 +67,7 @@ Net::Server::Mail - Class to easily create a mail server
         return(0, 554, 'Error: no valid recipients')
             unless(@recipients);
         
-        my $msgid = add_queue($sender, \@recipients, $data);
+        my $msgid = add_queue($sender, \@recipients, $data)
           or return(0);
 
         return(1, 250, "message queued $msgid");
@@ -214,8 +214,7 @@ sub make_event {
     my %args = @_;
 
     my $name = $args{'name'} || confess('missing argument: \'name\'');
-    my $args =
-      defined $args{'arguments'}
+    my $args = defined $args{'arguments'}
       && ref $args{'arguments'} eq 'ARRAY' ? $args{'arguments'} : [];
 
     $self->init_dojob();
@@ -269,7 +268,8 @@ sub make_event {
         }
     }
 
-    die "return code `$code' isn't numeric" if ( defined $code && $code =~ /\D/ );
+    die "return code `$code' isn't numeric"
+      if ( defined $code && $code =~ /\D/ );
 
     $self->handle_reply( $name, $success, $code, $msg )
       if defined $code and length $code;
@@ -461,10 +461,12 @@ sub process {
             return $self->timeout;
         }
 
+        next
+          if ( not defined $rv and $! =~ /Resource temporarily unavailable/ );
         if ( ( not defined $rv ) or ( $rv == 0 ) ) {
 
             # read error or connection closed
-            return $self->stop_session((not defined $rv) ? ($!) : ());
+            return $self->stop_session( ( not defined $rv ) ? ($!) : () );
         }
 
         # process all terminated lines
@@ -678,7 +680,7 @@ sub timeout {
 
 This event append where connection is closed or an error occurs during reading from socket.
 
-Takes the error description as an argument if an error occured and the argument is undefined if the session was closed by peer.
+Takes the error description as an argument if an error occurred and the argument is undefined if the session was closed by peer.
 
     $mailserver->set_callback
     (
@@ -687,7 +689,7 @@ Takes the error description as an argument if an error occured and the argument 
             my($session, $err) = @_;
             if( defined $err )
             {
-                print "Error occured during processing: $err\n";
+                print "Error occurred during processing: $err\n";
             }
             else
             {
@@ -700,12 +702,12 @@ Takes the error description as an argument if an error occured and the argument 
 =cut
 
 sub stop_session {
-    my ($self, $err) = @_;
+    my ( $self, $err ) = @_;
 
     $self->make_event(
-        name          => 'stop_session',
-        arguments     => [$err],
-        no_reply      => 1,
+        name      => 'stop_session',
+        arguments => [$err],
+        no_reply  => 1,
     );
 
     return 1;

@@ -31,6 +31,16 @@ Weasel::WidgetHandlers - Mapping elements to widget handlers
 
 =cut
 
+=head1 DESCRIPTION
+
+=cut
+
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::WidgetHandlers;
 
 use strict;
@@ -43,8 +53,8 @@ use List::Util qw(max);
 
 our @EXPORT_OK = qw| register_widget_handler best_match_handler_class |;
 
-=head1 FUNCTIONS
-g
+=head1 SUBROUTINES/METHODS
+
 =over
 
 =item register_widget_handler($handler_class_name, $group_name, %conditions)
@@ -67,7 +77,7 @@ sub register_widget_handler {
     # make sure we can use the module by pre-loading it
     use_module $class;
 
-    push @{$widget_handlers{$group}}, {
+    return push @{$widget_handlers{$group}}, {
         class => $class,
         conditions => \%conditions,
     };
@@ -109,11 +119,11 @@ sub best_match_handler_class {
     my $elem_classes;
 
     my $tag = $driver->tag_name($_id);
-    for my $group (@$groups) {
+    for my $group (@{$groups}) {
         my $handlers = $widget_handlers{$group};
 
-      handler:
-        for my $handler (@$handlers) {
+      HANDLER:
+        for my $handler (@{$handlers}) {
             my $conditions = $handler->{conditions};
 
             next unless $tag eq $conditions->{tag_name};
@@ -122,19 +132,19 @@ sub best_match_handler_class {
             if (exists $conditions->{classes}) {
                 %{$elem_classes} =
                    map { $_ => 1 }
-                   split /\s+/, ($driver->get_attribute($_id, 'class')
+                   split /\s+/x, ($driver->get_attribute($_id, 'class')
                                  // '')
                        unless defined $elem_classes;
 
                 for my $class (@{$conditions->{classes}}) {
-                    next handler
+                    next HANDLER
                         unless exists $elem_classes->{$class};
                     $match_count++;
                 }
             }
 
             for my $att (keys %{$conditions->{attributes}}) {
-                next handler
+                next HANDLER
                     unless _att_eq(
                         $conditions->{attributes}->{$att},
                         _cached_elem_att(
@@ -162,5 +172,42 @@ sub best_match_handler_class {
 
 =cut
 
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+ (C) 2016  Erik Huelsmann
+
+Licensed under the same terms as Perl.
+
+=cut
+
 
 1;
+

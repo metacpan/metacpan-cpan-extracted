@@ -16,7 +16,7 @@ use Net::Statsd::Lite::Types -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.4';
+our $VERSION = 'v0.4.6';
 
 
 has host => (
@@ -212,7 +212,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.4.4
+version v0.4.6
 
 =head1 SYNOPSIS
 
@@ -375,6 +375,9 @@ L<Net::Statsd::Client>.
 This logs a value so that statistics about the metric can be
 gathered. The C<$value> must be a positive number, although the
 specification recommends that integers be used.
+
+This metric type is not supported by many StatsD daemons. You can use
+L</timing> for the same effect.
 
 =head2 C<set_add>
 

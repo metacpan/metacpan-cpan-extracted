@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Regexp-Pattern",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Regexp::Pattern",
   "PREREQ_PM" => {
     "strict" => 0
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "warnings" => 0
   },
-  "VERSION" => "0.2.7",
+  "VERSION" => "0.2.8",
   "test" => {
     "TESTS" => "t/*.t"
   }

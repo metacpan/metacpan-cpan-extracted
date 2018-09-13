@@ -1,5 +1,18 @@
 Revision history for Perl extension SQL-Translator-Parser-OpenAPI
 
+0.03	Wed 12 Sep 08:31:43 BST 2018
+ - PK is already unique
+ - use Math::BigInt to mean unlimited no of properties
+ - use MySQL as dump instead of YAML
+ - merge together allOf properties noting "discriminator" as superset
+ - handle enum
+ - no zap referenced definitions
+ - extract free-standing "object" into new "definition"
+ - turn additionalProperties objects into array of key/value pairs
+ - field comments
+ - extract array simple types
+ - create many-to-many tables where mutual array-rels
+
 0.02	Tue  4 Sep 17:51:10 BST 2018
  - update metadata for kwalitee (thanks @manwar!)
  - update metadata to dodge slight data-structure diffs

@@ -3,17 +3,13 @@ package Code::TidyAll::Plugin::JSBeautify;
 use strict;
 use warnings;
 
-use IPC::Run3 qw(run3);
-use Text::ParseWords qw(shellwords);
-use Try::Tiny;
-
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 sub _build_cmd {'js-beautify'}
 
@@ -42,7 +38,7 @@ Code::TidyAll::Plugin::JSBeautify - Use js-beautify with tidyall
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

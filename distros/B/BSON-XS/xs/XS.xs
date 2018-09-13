@@ -154,8 +154,8 @@ static SV* bson_parent_type(SV *sv);
  *
  */
 
-static SV * bson_doc_to_hashref(bson_iter_t * iter, HV *opts);
-static SV * bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts);
+static SV * bson_doc_to_hashref(bson_iter_t * iter, HV *opts, bool top);
+static SV * bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top);
 static SV * bson_array_to_arrayref(bson_iter_t * iter, HV *opts);
 static SV * bson_elem_to_sv(const bson_iter_t * iter, const char *key, HV *opts);
 static SV * bson_oid_to_sv(const bson_iter_t * iter);
@@ -1406,7 +1406,7 @@ bson_parent_type(SV* sv) {
  ********************************************************************/
 
 static SV *
-bson_doc_to_hashref(bson_iter_t * iter, HV *opts) {
+bson_doc_to_hashref(bson_iter_t * iter, HV *opts, bool top) {
   SV **svp;
   SV *wrap;
   SV *ordered;
@@ -1415,7 +1415,7 @@ bson_doc_to_hashref(bson_iter_t * iter, HV *opts) {
 
   /* delegate if 'ordered' option is true */
   if ( (ordered = _hv_fetchs_sv(opts, "ordered")) && SvTRUE(ordered) ) {
-    return bson_doc_to_tiedhash(iter, opts);
+    return bson_doc_to_tiedhash(iter, opts, top);
   }
 
   int is_dbref = 1;
@@ -1447,7 +1447,7 @@ bson_doc_to_hashref(bson_iter_t * iter, HV *opts) {
   ret = newRV_noinc ((SV *)hv);
 
   /* XXX shouldn't need to limit to size 3 */
-  if ( key_num >= 2 && is_dbref == 1
+  if ( ! top && key_num >= 2 && is_dbref == 1
       && (wrap = _hv_fetchs_sv(opts, "wrap_dbrefs")) && SvTRUE(wrap)
   ) {
     SV *class = sv_2mortal(newSVpvs("BSON::DBRef"));
@@ -1459,7 +1459,7 @@ bson_doc_to_hashref(bson_iter_t * iter, HV *opts) {
 }
 
 static SV *
-bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts) {
+bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top) {
   SV **svp;
   SV *wrap;
   SV *ret;
@@ -1501,7 +1501,7 @@ bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts) {
   ret = newRV_noinc((SV*) hv);
 
   /* XXX shouldn't need to limit to size 3 */
-  if ( key_num >= 2 && is_dbref == 1
+  if ( !top && key_num >= 2 && is_dbref == 1
       && (wrap = _hv_fetchs_sv(opts, "wrap_dbrefs")) && SvTRUE(wrap)
   ) {
     SV *class = sv_2mortal(newSVpvs("BSON::DBRef"));
@@ -1591,7 +1591,7 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
     bson_iter_t child;
     bson_iter_recurse(iter, &child);
 
-    value = bson_doc_to_hashref(&child, opts);
+    value = bson_doc_to_hashref(&child, opts, FALSE);
 
     break;
   }
@@ -1766,7 +1766,7 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
         croak("error iterating BSON type %d\n", bson_iter_type(iter));
     }
 
-    scope_sv = sv_2mortal(bson_doc_to_hashref(&child, opts));
+    scope_sv = sv_2mortal(bson_doc_to_hashref(&child, opts, TRUE));
     value = new_object_from_pairs("BSON::Code", "code", code_sv, "scope", scope_sv, NULL);
 
     break;
@@ -1898,7 +1898,7 @@ _decode_bson(msg, options)
           croak( "Error creating BSON iterator" );
         }
 
-        XPUSHs(sv_2mortal(bson_doc_to_hashref(&iter, opts)));
+        XPUSHs(sv_2mortal(bson_doc_to_hashref(&iter, opts, TRUE)));
 
 void
 _encode_bson(doc, options)

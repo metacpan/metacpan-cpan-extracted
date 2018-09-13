@@ -37,13 +37,13 @@ is( BSON::Timestamp->new( seconds => $seconds, increment => $increment )->second
 is( BSON::Timestamp->new( seconds => $seconds, increment => $increment )->increment  , $increment, "BSON::Timestamp->new(seconds, increment)->increment" );
 
 # test constructor range errors
-eval { bson_timestamp(2**31, $increment) };
-like( $@, qr/must be uint32/, "bson_timestamp(2**31, 42) fails" );
+eval { bson_timestamp(2**32, $increment) };
+like( $@, qr/must be uint32/, "bson_timestamp(2**32, 42) fails" );
 eval { bson_timestamp(-1, $increment) };
 like( $@, qr/must be uint32/, "bson_timestamp(-1, 42) fails" );
 
-eval { bson_timestamp($seconds, 2**31) };
-like( $@, qr/must be uint32/, "bson_timestamp(<time>, 2**31) fails" );
+eval { bson_timestamp($seconds, 2**32) };
+like( $@, qr/must be uint32/, "bson_timestamp(<time>, 2**32) fails" );
 eval { bson_timestamp($seconds, -1) };
 like( $@, qr/must be uint32/, "bson_timestamp(<time>, -1) fails" );
 
@@ -75,7 +75,7 @@ like( $@, qr/illegal in JSON/, 'json throws: bson_timestamp()' );
 # to extended JSON
 is(
     to_extjson( { a => bson_timestamp( $seconds, $increment ) } ),
-    qq[{"a":{"\$timestamp":{"i":$increment,"t":$seconds}}}],
+    qq[{"a":{"\$timestamp":{"t":$seconds,"i":$increment}}}],
     'extjson: bson_timestamp(<secs>,<inc>)'
 );
 

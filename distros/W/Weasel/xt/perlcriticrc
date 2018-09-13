@@ -1,2 +1,63 @@
+# Fail if listed policy modules are not available
+profile-strictness = fatal
+
+# 1 is the most strict setting, which is the
+# default when only == 1
+severity = 1
+
+verbose = %p in %f[%l:%c] = %m %r\n
+pager = less
+
+theme     =
+exclude   = 'OTRS::'
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-CodeLayout::RequireTidyCode]
+
+[ControlStructures::ProhibitPostfixControls]
+allow = for if unless
+
+[-Documentation::PodSpelling]
+
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodLinksIncludeText]
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | DEPENDENCIES | SUBROUTINES/METHODS | AUTHOR | BUGS AND LIMITATIONS | SOURCE | LICENSE AND COPYRIGHT
+
 [Modules::ProhibitEvilModules]
-modules = Carp::Always Data::Dumper
+modules = Carp::Always Data::Dumper Data::Printer
+
+[-Modules::RequireVersionVar]
+
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+[-RegularExpressions::RequireBracesForMultiline]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+# The following requires Critic 1.36. disable until released
+#[Subroutines::ProhibitUnusedPrivateSubroutines]
+#allow_name = _build_\w+
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+[Subroutines::RequireArgUnpacking]
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[Variables::ProhibitPunctuationVars]
+string_mode = thorough
+
+#--------------------------------------------------------------
+# I think these are really important, so always load them
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 1
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 1
+
+#--------------------------------------------------------------
+# For all other Policies, I accept the default severity,
+# so no additional configuration is required for them.
+

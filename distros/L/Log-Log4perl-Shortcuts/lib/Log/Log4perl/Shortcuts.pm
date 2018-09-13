@@ -1,5 +1,5 @@
 package Log::Log4perl::Shortcuts ;
-$Log::Log4perl::Shortcuts::VERSION = '0.012';
+$Log::Log4perl::Shortcuts::VERSION = '0.015';
 use 5.10.0;
 use Carp;
 use Log::Log4perl;
@@ -17,7 +17,7 @@ Exporter::export_ok_tags('all');
 
 my $package = __PACKAGE__;
 $package =~ s/::/-/g;
-my $config_dir = path(File::UserConfig->new(dist => $package)->configdir, 'log_config');
+my $config_dir = path(File::UserConfig->new(dist => $package)->sharedir, 'log_config');
 
 my $default_config_file = path($config_dir, 'default.cfg');
 
@@ -33,24 +33,54 @@ my $log_level = $TRACE;
 
 sub set_log_config {
   my $new_config = shift;
-  my $module = shift;
+  my $module = shift || '';
 
+  # must pass in name of a file
+  if (!$new_config) {
+    logw('No log config file passed. Configuration file unchanged');
+    return;
+  }
+
+  # try to get config file from path passed directly in
+  my $cf_path = path($new_config);
+  if ($cf_path->exists) {
+    return _init_config($cf_path);
+  }
+
+  # try to get the config from the module argument or pkg of caller
+  if (!$module) {
+    ($module) = caller;
+  }
+  $module =~ s/::/-/g;
   my $temp_config_dir;
-  if ($module) {
-    $module =~ s/::/-/g;
-    $temp_config_dir = path(File::UserConfig->new(dist => $module)->configdir, 'log_config');
-  } else {
-    $temp_config_dir = $config_dir;
+  eval {
+    my $share_dir = File::UserConfig->new(dist => $module)->sharedir;
+    if ($share_dir) {
+      $temp_config_dir = path(File::UserConfig->new(dist => $module)->sharedir, 'log_config');
+    }
+  };
+  if ($temp_config_dir) {
+    $cf_path = path($temp_config_dir, $new_config);
+    if ($cf_path->exists) {
+      return _init_config($cf_path);
+    }
   }
 
-  my $path = path($temp_config_dir, $new_config);
+  # Lastly, check the Log::Log4perl::Shortcuts module for config file
+  $temp_config_dir = $config_dir;
+  $cf_path = path($temp_config_dir, $new_config);
 
-  if (!$path->is_file) {
-    carp ("Configuration file $path->canonpath does not exist. Configuration file unchanged.");
+  if (! $cf_path->exists) {
+    carp ("Configuration file $new_config does not exist. Configuration file unchanged.");
   } else {
-    Log::Log4perl->init($path->canonpath);
-    return 'success';
+    return _init_config($cf_path);
   }
+}
+
+sub _init_config {
+  my $config = shift;
+  Log::Log4perl->init($config->canonpath);
+  return 'success';
 }
 
 sub set_log_level {
@@ -188,7 +218,7 @@ Log::Log4perl::Shortcuts - shortcut functions to make log4perl even easier
 
 =head1 VERSION
 
-version 0.012
+version 0.015
 
 =head1 OVERVIEW
 
@@ -211,19 +241,22 @@ You can save some keystrokes and do this:
   use Log::Log4perl::Shortcuts qw(:all);
 
   sub do_something {
-    logw('I am doing something.', 'my.category');
+    logi('I am doing something.', 'my.category');
   }
 
 =head1 DESCRIPTION
 
-This modules provides shortcut functions for the standard log levels provided by L<Log::Log4perl>
-plus some additional functionality to make it more convenient.
+This modules provides shortcut functions for the standard log levels provided by
+L<Log::Log4perl> plus some additional functionality to make it more convenient.
+
+All functions can be imported into your module or script with the C<:all> import
+tag or they can be individually imported.
 
 =head2 Log level functions
 
-There are the six log level functions provided, one for each of the standard log levels provided
-by the Log4perl module. Each of them accepts an argument for the log message
-plus an optional category argument.
+There are the six log level functions provided, one for each of the standard log
+levels provided by the Log4perl module. Each of them accepts an argument for the
+log message plus an optional category argument.
 
 The B<$category> arguments, if supplied, are appended to the name of the calling
 package where the log command was invoked. For example, if C<logi('Info log entry', 'my_category')>
@@ -272,18 +305,43 @@ Prints a message to the I<fatal> logger when the log level is set to B<FATAL> or
 Prints call stack when log level is set to B<TRACE> or above. Note that no
 message argument is used by this function.
 
-=head2 set_log_config ($filename)
+=head2 set_log_config ($file, ['MODULE::NAME'])
 
-Changes the log configuration file which must be placed in the C<~/perl/log_config> directory.
+Changes the log configuration file to the path and/or
+file name specified with C<$file>.
+
+C<Log::Log4perl::Shortcuts> will first try to locate the config file on your
+hard drive using the C<$file> argument by itself. If that's not
+successful, it will attempt to locate the file in the C<log_config> directory
+within your module's shared directory. If that fails, the C<log_config> directory
+for C<Log::Log4perl::Shortcuts> will be searched. This directory can be
+found in C<Log-Log4perl-Shortcuts> directory that L<File::UserConfig>
+installed in your home directory when you installed C<Log::Log4perl::Shortcuts>.
+
+You can also supply the name of another module installed on your system which
+has its logs located in a C<log_config> directory within that module's shared
+directory.
 
 =head2 set_log_level ($log_level)
 
-Change the log level. Should be one of 'trace', 'debug', 'info', 'warn', 'error', or 'fatal'.
+Change the log level. Should be one of 'trace', 'debug', 'info', 'warn', 'error',
+or 'fatal'.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-Place any custom log configuration files you'd like to use in C<~/perl/log_config> and use the
-C<set_log_config> function to switch to it.
+Custom log configuration files work seamlessly when C<Log::Log4perl::Shortcuts>
+is being called from within a module that uses the L<File::UserConfig> module
+to create a directory in your home directory for placing configuration files.
+If this is the case, place your custom log files into your module's C<log_config>
+directory so your custom log files can be found. On a Mac, by default, this
+directory is found in the C<Application Support/Your-Module-Name> in your
+user's home directory.
+
+You may still use C<Log::Log4perl::Shortcuts> with a custom log file without
+using the C<File::UserConfig> module, but you will need to specify the complete
+path to the custom log file when calling the C<set_log_config> function or place
+your custom log configuration files in the C<Log-Log4perl-Shortcuts/log_config>
+directory found in your home directory.
 
 =head1 REQUIRES
 

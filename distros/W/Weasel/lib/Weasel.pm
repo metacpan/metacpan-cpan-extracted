@@ -5,7 +5,7 @@ Weasel - Perl's php/Mink-inspired abstracted web-driver framework
 
 =head1 VERSION
 
-0.11
+0.14
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,11 @@ methods.
 
 =cut
 
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
 
 package Weasel;
 
@@ -109,8 +114,9 @@ use strict;
 use warnings;
 
 use Moose;
+use namespace::autoclean;
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 # From https://w3c.github.io/webdriver/webdriver-spec.html#keyboard-actions
 my %key_codes = (
@@ -173,6 +179,7 @@ my %key_codes = (
     ZENKAKU_HANKAKU => "\N{U+E040}",
     );
 
+=over
 
 =item KEYS
 
@@ -185,6 +192,8 @@ codes as the values.
 sub KEYS {
     return \%key_codes;
 }
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -200,7 +209,8 @@ no name argument is provided.
 
 has 'default_session' => (is => 'rw',
                           isa => 'Str',
-                          default => 'default');
+                          default => 'default',
+     );
 
 =item sessions
 
@@ -210,11 +220,12 @@ Holds the sessions registered with the C<Weasel> instance.
 
 has 'sessions' => (is => 'ro',
                    isa => 'HashRef[Weasel::Session]',
-                   default => sub { {} } );
+                   default => sub { {} },
+    );
 
 =back
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =over
 
@@ -239,9 +250,33 @@ sub session {
 
 =back
 
+=head1 AUTHOR
+
+Erik Huelsmann
+
 =head1 CONTRIBUTORS
 
 Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 MAINTAINERS
 
@@ -262,7 +297,7 @@ The source code repository for Weasel is at
 Community support is available through
 L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
  (C) 2016  Erik Huelsmann
 
@@ -271,4 +306,7 @@ Licensed under the same terms as Perl.
 =cut
 
 
+__PACKAGE__->meta->make_immutable;
+
 1;
+

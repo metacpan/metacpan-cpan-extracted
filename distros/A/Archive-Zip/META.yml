@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip
   repository: https://github.com/redhotpenguin/perl-Archive-Zip.git
-version: '1.63'
+version: '1.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

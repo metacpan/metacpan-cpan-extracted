@@ -21,21 +21,24 @@ my %WriteMakefileArgs = (
     "IO::Socket" => "1.18"
   },
   "TEST_REQUIRES" => {
+    "Carp" => 0,
     "Devel::StrictMode" => 0,
     "File::Spec" => 0,
     "IO::Select" => 0,
     "Module::Metadata" => 0,
     "Net::EmptyPort" => 0,
+    "Socket" => 0,
     "Test::More" => 0,
     "Test::Roo" => 0,
     "Test::Roo::DataDriven" => 0,
     "Test::Roo::Role" => 0,
     "Test::TCP" => "2.19",
+    "curry" => 0,
     "if" => 0,
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.3.1",
+  "VERSION" => "v0.3.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Class::Accessor::Fast" => 0,
   "Devel::StrictMode" => 0,
   "File::Spec" => 0,
@@ -50,11 +54,13 @@ my %FallbackPrereqs = (
   "IO::Socket" => "1.18",
   "Module::Metadata" => 0,
   "Net::EmptyPort" => 0,
+  "Socket" => 0,
   "Test::More" => 0,
   "Test::Roo" => 0,
   "Test::Roo::DataDriven" => 0,
   "Test::Roo::Role" => 0,
   "Test::TCP" => "2.19",
+  "curry" => 0,
   "if" => 0,
   "lib" => 0,
   "utf8" => 0

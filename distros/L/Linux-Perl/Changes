@@ -1,5 +1,8 @@
 Revision history for Perl module Linux::Perl
 
+0.15 Tue Sep 11 2018
+- Add fileno() to inotify.
+
 0.14 Tue Sep 4 2018
 - BREAKING CHANGE: epoll wait() now returns a list of key/value pairs
   rather than a list of hashes. (The new format is lighter in tight loops.)

@@ -184,6 +184,16 @@ for my $param (qw(account_id user_id)) {
     };
 }
 
+for my $key (qw(abcdef123456 abcdef123456abcd)) {
+    subtest "$key license key (" . length($key) . ' chars)' => sub {
+        my $client = WebService::MinFraud::Client->new(
+            account_id  => 42,
+            license_key => $key,
+        );
+        is( $client->license_key, $key, 'correct key set' );
+    };
+}
+
 subtest 'chargeback' => sub {
     my $service = 'chargeback';
     subtest 'test simple success' => sub {

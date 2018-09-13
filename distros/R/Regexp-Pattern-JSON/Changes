@@ -1,3 +1,10 @@
+0.004   2018-09-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- Require perl 5.010001 (uses 5.10 regex features) [CT].
+
+
 0.003   2018-09-10 (PERLANCAR)
 
 	- No functional changes.

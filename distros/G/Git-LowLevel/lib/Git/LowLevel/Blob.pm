@@ -17,6 +17,70 @@ has 'parent' => (is => 'rw', isa => 'Git::LowLevel::Tree');
 
 has '_content' => (is =>'rw');
 
+sub timestamp_added
+{
+  my $self  = shift;
+  my $help = readpipe($self->repository->gitcmd() . " log --follow --diff-filter=A --date=raw " . $self->reference->reference . " -- \"" . $self->path . "\" 2>/dev/null");
+  my @lines = split /\n/,$help;
+  for my $line (@lines)
+  {
+    if ($line =~ /^Date:\s+(\d+)\s([+-]\d+)$/)
+    {
+      return $1;
+    }
+  }
+
+  return $help;
+}
+
+sub timestamp_last
+{
+  my $self  = shift;
+  my $help = readpipe($self->repository->gitcmd() . " log --follow --date=raw " . $self->reference->reference . " -- \"" . $self->path . "\" 2>/dev/null");
+  my @lines = split /\n/,$help;
+  for my $line (@lines)
+  {
+    if ($line =~ /^Date:\s+(\d+)\s([+-]\d+)$/)
+    {
+      return $1;
+    }
+  }
+
+  return $help;
+}
+
+sub committer
+{
+  my $self  = shift;
+  my $help = readpipe($self->repository->gitcmd() . " log --follow --date=raw " . $self->reference->reference . " -- \"" . $self->path . "\" 2>/dev/null");
+  my @lines = split /\n/,$help;
+  for my $line (@lines)
+  {
+    if ($line =~ /^Author:\s(.*)$/)
+    {
+      return $1;
+    }
+  }
+
+  return $help;
+}
+
+sub mypath
+{
+  my $self = shift;
+  my $path = fileparse($self->path);
+  if (!defined($path) || length($path)==0)
+  {
+    $path = $self->path;
+  }
+
+  $path=~s/\///g;
+
+  return $path;
+}
+
+
+
 sub content
 {
   my $self = shift;
@@ -48,10 +112,12 @@ sub treeEntry
 {
   my $self = shift;
 
-  return "" unless defined($self->_content()) && length($self->_content)>0;
-  return "" unless defined($self->hash) && length($self->hash)>30;
+  if (defined($self->hash) && length($self->hash)>30 )
+  {
+    return "100644 blob " . $self->hash . "\t" . $self->mypath . "\n";
+  }
 
-  return "100644 blob " . $self->hash . "\t" . fileparse($self->path) . "\n";
+  return "";
 }
 
 sub find
@@ -59,7 +125,7 @@ sub find
   my $self  = shift;
   my $path  = shift;
 
-  return $self unless $self->path ne $path;
+  return $self unless $self->mypath ne $path;
 
   return;
 }
@@ -87,7 +153,7 @@ Git::LowLevel::Blob - class representing a GIT Blow Object
 
 =head1 VERSION
 
-version 0.1
+version 0.3
 
 =head1 DESCRIPTION
 
@@ -114,6 +180,22 @@ the path identifying the blob
 the parent of the object within the tree
 
 =head1 METHODS
+
+=head2 timestamp_added
+
+returns the timestamp of the commit where this object was added or undef if
+object has not been commited yet.
+
+=head2 timestamp_last
+
+returns the timestamp of the last commit of this object or undef if
+object has not been commited yet.
+
+=head2 committer
+
+returns the committer of the the object
+
+=head2 mypath
 
 =head2 content
 

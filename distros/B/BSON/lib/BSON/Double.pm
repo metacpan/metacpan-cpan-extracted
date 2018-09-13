@@ -6,7 +6,7 @@ package BSON::Double;
 # ABSTRACT: BSON type wrapper for Double
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp;
 
@@ -39,20 +39,60 @@ sub BUILD {
 
 #pod =method TO_JSON
 #pod
-#pod Returns a double, unless the value is 'Inf', '-Inf' or 'NaN'
-#pod (which are illegal in JSON), in which case an exception is thrown.
+#pod Returns a double.
+#pod
+#pod If the C<BSON_EXTJSON> environment variable is true and the
+#pod C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+#pod compatible with
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
+#pod format, which represents it as a document as follows:
+#pod
+#pod     {"$numberDouble" : "42.0"}
+#pod
+#pod If C<BSON_EXTJSON> is false and the value is 'Inf', '-Inf' or 'NaN'
+#pod (which are illegal in regular JSON), then an exception is thrown.
 #pod
 #pod =cut
 
+my $use_win32_specials = ($^O eq 'MSWin32' && $] lt "5.022");
+
 my $win32_specials = qr/-?1.\#IN[DF]/i;
 my $unix_specials = qr/-?(?:inf|nan)/i;
-my $illegal = $^O eq 'MSWin32' && $] lt "5.022" ? qr/^$win32_specials/ : qr/^$unix_specials/;
+my $illegal = $use_win32_specials ? qr/^$win32_specials/ : qr/^$unix_specials/;
+
+my $is_inf = $use_win32_specials ? qr/^1.\#INF/i : qr/^inf/i;
+my $is_ninf = $use_win32_specials ? qr/^-1.\#INF/i : qr/^-inf/i;
+my $is_nan = $use_win32_specials ? qr/^-?1.\#(?:IND|QNAN)/i : qr/^-?nan/i;
 
 sub TO_JSON {
     my $copy = "$_[0]->{value}"; # avoid changing value to PVNV
-    return $_[0]->{value}/1.0 unless $copy =~ $illegal;
 
-    croak( "The value '$copy' is illegal in JSON" );
+    if ($ENV{BSON_EXTJSON} && $ENV{BSON_EXTJSON_RELAXED}) {
+
+        return { '$numberDouble' => 'Infinity' }
+            if $copy =~ $is_inf;
+        return { '$numberDouble' => '-Infinity' }
+            if $copy =~ $is_ninf;
+        return { '$numberDouble' => 'NaN' }
+            if $copy =~ $is_nan;
+    }
+
+    if ($ENV{BSON_EXTJSON} && !$ENV{BSON_EXTJSON_RELAXED}) {
+
+        return { '$numberDouble' => 'Infinity' }
+            if $copy =~ $is_inf;
+        return { '$numberDouble' => '-Infinity' }
+            if $copy =~ $is_ninf;
+        return { '$numberDouble' => 'NaN' }
+            if $copy =~ $is_nan;
+        my $value = $_[0]->{value}/1.0;
+        return { '$numberDouble' => "$value" };
+    }
+
+    croak( "The value '$copy' is illegal in JSON" )
+        if $copy =~ $illegal;
+
+    return $_[0]->{value}/1.0;
 }
 
 use overload (
@@ -92,7 +132,7 @@ BSON::Double - BSON type wrapper for Double
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -116,8 +156,18 @@ will be coerced to Perl's numeric type.  The default is 0.0.
 
 =head2 TO_JSON
 
-Returns a double, unless the value is 'Inf', '-Inf' or 'NaN'
-(which are illegal in JSON), in which case an exception is thrown.
+Returns a double.
+
+If the C<BSON_EXTJSON> environment variable is true and the
+C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+compatible with
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
+format, which represents it as a document as follows:
+
+    {"$numberDouble" : "42.0"}
+
+If C<BSON_EXTJSON> is false and the value is 'Inf', '-Inf' or 'NaN'
+(which are illegal in regular JSON), then an exception is thrown.
 
 =for Pod::Coverage BUILD nInf pInf NaN
 

@@ -73,6 +73,7 @@ corpus/datetime.json
 corpus/datetime.t
 corpus/dbpointer.json
 corpus/dbpointer.t
+corpus/dbref.json
 corpus/decimal128-1.json
 corpus/decimal128-1.t
 corpus/decimal128-2.json
@@ -104,6 +105,8 @@ corpus/maxkey.json
 corpus/maxkey.t
 corpus/minkey.json
 corpus/minkey.t
+corpus/multi-type-deprecated.json
+corpus/multi-type.json
 corpus/null.json
 corpus/null.t
 corpus/oid.json
@@ -148,6 +151,7 @@ t/corpus/code_w_scope.t
 t/corpus/corpus.pl
 t/corpus/datetime.t
 t/corpus/dbpointer.t
+t/corpus/dbref.t
 t/corpus/decimal128-1.t
 t/corpus/decimal128-2.t
 t/corpus/decimal128-3.t
@@ -161,6 +165,7 @@ t/corpus/int32.t
 t/corpus/int64.t
 t/corpus/maxkey.t
 t/corpus/minkey.t
+t/corpus/multi-type.t
 t/corpus/null.t
 t/corpus/oid.t
 t/corpus/regex.t
@@ -188,6 +193,9 @@ t/mapping/string.t
 t/mapping/time.t
 t/mapping/timestamp.t
 t/pvtlib/CleanEnv.pm
+t/regression/boolean_copy.t
+t/regression/scalar_ref_value.t
+t/regression/undef_round_trip.t
 testing/build.pl
 testing/config.yml
 testing/test.pl

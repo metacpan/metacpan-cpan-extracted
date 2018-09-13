@@ -67,6 +67,7 @@
             "File::Spec" : "0",
             "IO::Select" : "0",
             "Module::Metadata" : "0",
+            "Net::EmptyPort" : "0",
             "Test::More" : "0",
             "Test::Roo" : "0",
             "Test::Roo::DataDriven" : "0",
@@ -81,11 +82,11 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.4.4"
+         "version" : "v0.4.6"
       },
       "Net::Statsd::Lite::Types" : {
          "file" : "lib/Net/Statsd/Lite/Types.pm",
-         "version" : "v0.4.4"
+         "version" : "v0.4.6"
       }
    },
    "release_status" : "stable",
@@ -99,7 +100,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.4.4",
+   "version" : "v0.4.6",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Toby Inkster <tobyink@cpan.org>"

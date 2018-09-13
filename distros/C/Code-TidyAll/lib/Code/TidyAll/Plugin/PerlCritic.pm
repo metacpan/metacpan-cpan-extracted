@@ -3,16 +3,13 @@ package Code::TidyAll::Plugin::PerlCritic;
 use strict;
 use warnings;
 
-use IPC::Run3 qw(run3);
-use Text::ParseWords qw(shellwords);
-
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 # On Windows only the batch file is actually executable.
 my $cmd = $^O eq 'MSWin32' ? 'perlcritic.bat' : 'perlcritic';
@@ -43,7 +40,7 @@ Code::TidyAll::Plugin::PerlCritic - Use perlcritic with tidyall
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.0406';
+$App::XML::DocBook::Builder::VERSION = '0.0500';
 use warnings;
 use strict;
 
@@ -52,7 +52,7 @@ App::XML::DocBook::Builder - Build DocBook/XML files.
 
 =head1 VERSION
 
-version 0.0406
+version 0.0500
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ version 0.0406
 
 =head1 VERSION
 
-version 0.0406
+version 0.0500
 
 =head1 FUNCTIONS
 

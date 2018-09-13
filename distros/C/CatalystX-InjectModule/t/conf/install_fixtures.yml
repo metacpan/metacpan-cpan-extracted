@@ -4,6 +4,7 @@ CatalystX::InjectModule:
   debug: 0
   path:
     - t/share/modules
+    - __NO_INC__
   inject:
     - Fixture
   persistent_dir: t/var/

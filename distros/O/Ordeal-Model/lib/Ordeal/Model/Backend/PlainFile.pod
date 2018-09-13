@@ -1,0 +1,121 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Backend::PlainFile - Cards/decks management via plain files
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model;
+   use Ordeal::Model::Backend::PlainFile;
+
+   my $backend = Ordeal::Model::Backend::PlainFile->new(
+      base_directory => '/path/to/base'
+   );
+   my $model = Ordeal::Model->new(backend => $backend);
+
+   my $card = $backend->card($card_id); # OR
+      $card = $model->get_card($card_id);
+
+   my $deck = $backend->deck($deck_id); # OR
+      $deck = $model->get_deck($deck_id);
+
+   my $card_path = $backend->path_for(card => $card_id);
+   my $deck_path = $backend->path_for(deck => $deck_id);
+
+   my $ct = $backend->content_type_for('jpg');
+
+=head1 DESCRIPTION
+
+This module is a simple file-based backend for L<Ordeal::Model>.
+
+It is based on a directory with the following structure:
+
+   *
+   +- cards *
+   |        +- card1.jpg
+   |        +- card2.jpg
+   |        ...
+   |
+   +- decks *
+            +- deck1
+            +- deck2
+            ...
+
+Cards are C<PNG>, C<JPG> or C<SVG> files.
+
+Decks are either directories with cards inside (or links to cards), or
+plain text files with the lists.
+
+=head1 METHODS
+
+=head2 B<< base_directory >>
+
+   my $dir = $obj->base_directory;
+   $obj->base_directory('/path/to/somewhere');
+
+accessor for the base directory where cards and decks are kept.
+
+=head2 B<< card >>
+
+   my $card = $obj->card($id);
+
+get a card by identifier. Returns a L<Ordeal::Model::Card> object.
+
+=head2 B<< content_type_for >>
+
+   my $ct = $obj->content_type_for($extension);
+
+get the Content-Type for the specific extension, supported ones are
+C<PNG>, C<JPG> or C<SVG>, case-insensitive.
+
+=head2 B<< deck >>
+
+   my $deck = $obj->deck($id);
+
+get a deck by identifier. The order of the cards in the deck is either
+lexicographic (for directory-based decks) or the order they are found in
+the plain text file.
+
+=head2 B<< decks >>
+
+   my $decks = $obj->decks;
+
+Get a list of all available decks.
+
+=head2 B<< path_for >>
+
+   my $deck_path = $obj->path_for(decks => $deck_id);
+   my $card_path = $obj->path_for(cards => $card_id);
+
+get path to the specific object, based on L</base_directory>.
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

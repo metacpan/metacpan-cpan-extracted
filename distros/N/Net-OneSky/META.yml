@@ -1,0 +1,32 @@
+---
+abstract: 'Simple interface to the OneSky API: http://developer.oneskyapp.com/'
+author:
+  - 'Erik Ogan <erik@change.org>'
+build_requires:
+  Test::MockModule: '0'
+  Test::MockObject: '0'
+  Test::More: '0.88'
+  Test::Trap: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OneSky
+requires:
+  Digest::MD5: '0'
+  File::Basename: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Time::Local: '0'
+  URI: '0'
+  constant: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+version: 0.0.1

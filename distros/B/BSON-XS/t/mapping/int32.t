@@ -95,10 +95,10 @@ is( to_myjson({a=>bson_int32(42)}), q[{"a":42}], 'bson_int32(42)' );
 SKIP: {
     skip "JSON::PP has trouble with TO_JSON being false", 1
         if ref JSON::MaybeXS->new eq 'JSON::PP';
-    is( to_extjson({a=>bson_int32(0)}), q[{"a":0}], 'extjson: bson_int32(0)' );
+    is( to_extjson({a=>bson_int32(0)}), q[{"a":{"$numberInt":"0"}}], 'extjson: bson_int32(0)' );
 }
 
-is( to_extjson({a=>bson_int32(42)}), q[{"a":42}], 'extjson: bson_int32(42)' );
+is( to_extjson({a=>bson_int32(42)}), q[{"a":{"$numberInt":"42"}}], 'extjson: bson_int32(42)' );
 
 done_testing;
 

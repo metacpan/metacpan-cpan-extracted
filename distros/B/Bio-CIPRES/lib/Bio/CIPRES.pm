@@ -15,7 +15,7 @@ use XML::LibXML;
 use Bio::CIPRES::Job;
 use Bio::CIPRES::Error;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 our $SERVER  = 'cipresrest.sdsc.edu';
 our $API     = 'cipresrest/v1';
 our $DOMAIN  = 'Cipres Authentication';
@@ -71,7 +71,7 @@ sub new {
 
     my %headers = ( 'cipres-appkey' => $self->{cfg}->{app_id} );
 
-    $self->{account} = $self->{cfg}->{user};
+    $self->{account} = uri_escape( $self->{cfg}->{user} );
 
     # UMBRELLA headers
     if (defined $self->{cfg}->{eu}) {
@@ -133,11 +133,6 @@ sub _parse_args {
         if (scalar @missing);
 
     # TODO: further parameter validation ???
-  
-    # Do necessary url-encoding
-    for (qw/user pass/) {
-        $self->{cfg}->{$_} = uri_escape( $self->{cfg}->{$_} );
-    }
 
     return 1;
 

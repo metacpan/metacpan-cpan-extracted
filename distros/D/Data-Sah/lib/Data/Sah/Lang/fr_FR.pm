@@ -1,7 +1,7 @@
 package Data::Sah::Lang::fr_FR;
 
-our $DATE = '2018-06-05'; # DATE
-our $VERSION = '0.892'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.893'; # VERSION
 
 use 5.010;
 use strict;
@@ -127,7 +127,7 @@ Data::Sah::Lang::fr_FR - fr_FR locale
 
 =head1 VERSION
 
-This document describes version 0.892 of Data::Sah::Lang::fr_FR (from Perl distribution Data-Sah), released on 2018-06-05.
+This document describes version 0.893 of Data::Sah::Lang::fr_FR (from Perl distribution Data-Sah), released on 2018-09-11.
 
 =for Pod::Coverage .+
 

@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_convert_perl_pm_to_path;
 
-our $DATE = '2018-06-04'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ sub coerce {
 
     my $res = {};
 
-    $res->{modules}{'Module::Path::More'} //= 0;
+    $res->{modules}{'Module::Path::More'} //= {version=>0, core=>0, pp=>1};
     $res->{expr_match} = "1";
     $res->{expr_coerce} = join(
         "",
@@ -55,7 +55,7 @@ Data::Sah::Coerce::perl::str::str_convert_perl_pm_to_path - Convert module name 
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Coerce::perl::str::str_convert_perl_pm_to_path (from Perl distribution Sah-Schemas-Perl), released on 2018-06-04.
+This document describes version 0.014 of Data::Sah::Coerce::perl::str::str_convert_perl_pm_to_path (from Perl distribution Sah-Schemas-Perl), released on 2018-09-11.
 
 =head1 DESCRIPTION
 

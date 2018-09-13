@@ -3,7 +3,7 @@ package WebService::MinFraud::Validator::Base;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use Carp;
 use Data::Rx;
@@ -58,7 +58,7 @@ WebService::MinFraud::Validator::Base - Abstract Base Validation for the minFrau
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

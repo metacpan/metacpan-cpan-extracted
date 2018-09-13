@@ -9,6 +9,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,10 +18,15 @@ meta-spec:
   version: '1.4'
 name: App-podtohtml
 requires:
+  Archive::Tar: '0'
   Browser::Open: '0'
+  Complete::Util: '0.57'
+  File::ShareDir: '0'
+  File::Slurper: '0'
   File::Temp: '0'
+  File::chdir: '0'
+  FindBin: '0'
   Module::Path::More: '0.32'
-  Perinci::Sub::Property::cmdline: '0'
   Pod::Html: '0'
   perl: '5.010001'
   strict: '0'
@@ -29,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-podtohtml
   homepage: https://metacpan.org/release/App-podtohtml
   repository: git://github.com/perlancar/perl-App-podtohtml.git
-version: '0.003'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

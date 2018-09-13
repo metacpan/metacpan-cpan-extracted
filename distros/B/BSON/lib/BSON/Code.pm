@@ -6,9 +6,10 @@ package BSON::Code;
 # ABSTRACT: BSON type wrapper for Javascript code
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp ();
+use Tie::IxHash;
 
 use Moo;
 
@@ -68,7 +69,7 @@ sub BUILD {
 #pod =method TO_JSON
 #pod
 #pod If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     {"$code" : "<code>"}
@@ -80,11 +81,14 @@ sub BUILD {
 #pod =cut
 
 sub TO_JSON {
+    require BSON;
     if ( $ENV{BSON_EXTJSON} ) {
-        return {
-            '$code' => $_[0]->{code},
-            ( defined $_[0]->{scope} ? ( '$scope' => $_[0]->{scope} ) : () ),
-        };
+        my %data;
+        tie( %data, 'Tie::IxHash' );
+        $data{'$code'} = $_[0]->{code};
+        $data{'$scope'} = BSON->perl_to_extjson($_[0]->{scope})
+            if defined $_[0]->{scope};
+        return \%data;
     }
 
     Carp::croak( "The value '$_[0]' is illegal in JSON" );
@@ -102,7 +106,7 @@ BSON::Code - BSON type wrapper for Javascript code
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -136,7 +140,7 @@ Returns the length of the C<code> attribute.
 =head2 TO_JSON
 
 If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     {"$code" : "<code>"}

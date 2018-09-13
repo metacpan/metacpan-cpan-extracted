@@ -11,7 +11,7 @@ use base qw/ Class::Accessor::Fast /;
 
 use IO::Socket 1.18 ();
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -96,7 +96,6 @@ BEGIN {
 
         *{"${class}::update"}    = \&counter;
         *{"${class}::timing_ms"} = \&timing;
-        *{"${class}::add_set"}   = \&set_add;
 
     }
 
@@ -162,7 +161,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -338,11 +337,6 @@ specification recommends that integers be used.
 
 This adds the the C<$string> to a set, for logging the number of
 unique things, e.g. IP addresses or usernames.
-
-=head2 C<add_set>
-
-This is an alias for L</set_add>. It is deprecated and will be removed
-in a later version.
 
 =head2 C<flush>
 

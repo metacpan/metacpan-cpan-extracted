@@ -4,6 +4,7 @@ use warnings;
 use Data::Dumper;
 use Time::HiRes;
 use Test::More;
+use JSON::PP;
 
 my $CLASS = 'JavaScript::Duktape::XS';
 
@@ -12,19 +13,25 @@ sub test_boolean {
     ok($vm, "created $CLASS object");
 
     my $name = 'foo';
-    my $js_code = "$name = { name: 'gonzo', male: true, plant: false }";
-    $vm->eval($js_code);
-    my $data = $vm->get($name);
-    # print Dumper($data);
-    isa_ok($data->{male}, "JSON::PP::Boolean");
-    is(!!$data->{male}, !!1, "male is true");
-    isa_ok($data->{plant}, "JSON::PP::Boolean");
-    is(!!$data->{plant}, !!0, "plant is false");
+    my $data = { name => 'gonzo', male => JSON::PP::true, plant => JSON::PP::false };
+    my $more = { human => JSON::PP::true, mineral => JSON::PP::false };
+    # printf STDERR ("CALLING SET %s", Dumper($data));
+    $vm->set($name, $data);
+    foreach my $key (keys %$more) {
+        $vm->eval(sprintf("%s.%s = %s", $name, $key, $more->{$key} ? 'true' : 'false'));
+        $data->{$key} = $more->{$key};
+    }
+    my $got = $vm->get($name);
+    # printf STDERR ("GOT %s", Dumper($got));
+    is_deeply($got, $data, "got correct boolean conversions");
 }
 
 sub main {
     use_ok($CLASS);
 
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Deepcopy = 1;
+    $Data::Dumper::Sortkeys = 1;
     test_boolean();
     done_testing;
     return 0;

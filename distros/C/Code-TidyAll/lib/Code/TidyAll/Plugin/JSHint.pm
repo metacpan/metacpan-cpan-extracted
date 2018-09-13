@@ -3,9 +3,7 @@ package Code::TidyAll::Plugin::JSHint;
 use strict;
 use warnings;
 
-use IPC::Run3 qw(run3);
 use Specio::Library::String;
-use Text::ParseWords qw(shellwords);
 
 use Moo;
 
@@ -19,7 +17,7 @@ has options => (
 
 with qw( Code::TidyAll::Role::RunsCommand Code::TidyAll::Role::Tempdir );
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 sub _build_cmd {'jshint'}
 
@@ -63,7 +61,7 @@ Code::TidyAll::Plugin::JSHint - Use jshint with tidyall
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

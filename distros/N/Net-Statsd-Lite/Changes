@@ -1,5 +1,14 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.6    2018-09-11 23:36:11+01:00 Europe/London
+  [Tests]
+  - Updated tests to be more Windows-friendly.
+
+v0.4.5    2018-09-11 23:22:09+01:00 Europe/London
+  [Documentation]
+  - Added a note about the histogram method not being supported
+    by most StatsD daemons.
+
 v0.4.4    2018-07-02 18:17:31+01:00 Europe/London
   [Bug Fixes]
   - fix inlined type constraints, #1 (thanks @tobyink).

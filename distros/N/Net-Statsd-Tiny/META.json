@@ -47,16 +47,19 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Carp" : "0",
             "Devel::StrictMode" : "0",
             "File::Spec" : "0",
             "IO::Select" : "0",
             "Module::Metadata" : "0",
             "Net::EmptyPort" : "0",
+            "Socket" : "0",
             "Test::More" : "0",
             "Test::Roo" : "0",
             "Test::Roo::DataDriven" : "0",
             "Test::Roo::Role" : "0",
             "Test::TCP" : "2.19",
+            "curry" : "0",
             "if" : "0",
             "lib" : "0",
             "utf8" : "0"
@@ -66,11 +69,7 @@
    "provides" : {
       "Net::Statsd::Tiny" : {
          "file" : "lib/Net/Statsd/Tiny.pm",
-         "version" : "v0.3.1"
-      },
-      "Net::Statsd::Tiny::Types" : {
-         "file" : "lib/Net/Statsd/Tiny/Types.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       }
    },
    "release_status" : "stable",
@@ -84,7 +83,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Tiny"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.3.2",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

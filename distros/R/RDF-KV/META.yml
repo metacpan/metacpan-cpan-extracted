@@ -30,5 +30,8 @@ requires:
   XML::RegExp: '0.04'
   perl: 5.10.0
 resources:
-  license: http://apache.org/licenses/LICENSE-2.0
-version: '0.06'
+  bugtracker: https://github.com/doriantaylor/p5-rdf-kv/issues
+  homepage: https://github.com/doriantaylor/p5-rdf-kv
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  repository: git://github.com/doriantaylor/p5-rdf-kv.git
+version: '0.07'

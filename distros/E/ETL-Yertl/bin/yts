@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package yts;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: Read/write time series data
 
 use ETL::Yertl;
@@ -44,7 +44,7 @@ yts - Read/write time series data
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

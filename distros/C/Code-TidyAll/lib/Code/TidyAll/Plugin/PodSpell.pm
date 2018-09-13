@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 use Capture::Tiny qw();
-use IPC::Run3;
-use List::SomeUtils qw(uniq);
+use IPC::Run3 qw(run3);
 use Pod::Spell;
 use Specio::Library::Builtins;
 use Specio::Library::String;
@@ -15,7 +14,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 has ispell_argv => (
     is      => 'ro',
@@ -80,7 +79,7 @@ Code::TidyAll::Plugin::PodSpell - Use Pod::Spell + ispell with tidyall
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

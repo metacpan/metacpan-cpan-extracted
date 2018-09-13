@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::obj::str_perl_version;
 
-our $DATE = '2018-06-04'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Data::Sah::Coerce::perl::obj::str_perl_version - Coerce perl::version from str
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Coerce::perl::obj::str_perl_version (from Perl distribution Sah-Schemas-Perl), released on 2018-06-04.
+This document describes version 0.014 of Data::Sah::Coerce::perl::obj::str_perl_version (from Perl distribution Sah-Schemas-Perl), released on 2018-09-11.
 
 =head1 DESCRIPTION
 

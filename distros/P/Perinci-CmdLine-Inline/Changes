@@ -1,3 +1,17 @@
+0.543   2018-09-11 (PERLANCAR)
+
+	- Add option: stripper.
+
+	- [incompatible change] Do not strip code by default, to speed up
+	  generation (stripping involves PPI).
+
+	- [bugfix] Schema validation was not being generated due to
+	  referring to wrong variable.
+
+	- [workaround] Stringify 'url' argument (URI object) to avoid JSON
+	  encoder croaking.
+
+
 0.542   2018-03-28 (PERLANCAR)
 
 	- [Bugfix] Embed Log::ger (required by Perinci::CmdLine::Util::Config)

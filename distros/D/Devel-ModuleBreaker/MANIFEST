@@ -9,7 +9,9 @@ t/00-load.t
 t/01-modulebreaker.t
 t/02-subbreaker.t
 t/03-filebreaker.t
+t/04-PERL5DBX.t
 t/bptracker.pl
+t/perl5dby.pl
 t/Foo/Some/Module.pm
 t/IncludeAll.pm
 t/Some/Module.pm

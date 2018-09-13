@@ -33,7 +33,15 @@ Stor is an HTTP API to primary storage. You provide a SHA256 hash and get the fi
 
 we prefer [hypnotoad](https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad) server
 
-## configuration example
+## configuration
+
+- rabbitmq\_uri
+
+    (optional)
+
+    if is set, then requested SHA are published to exchange (defined by URI - https://www.rabbitmq.com/uri-spec.html)
+
+### configuration example
 
     {
         "statsite": {
@@ -54,7 +62,8 @@ we prefer [hypnotoad](https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad) ser
         },
         "memcached_servers": ["MEMCACHED_SERVER1"],
         "secret": "https://mojolicious.org/perldoc/Mojolicious/Guides/FAQ#What-does-Your-secret-passphrase-needs-to-be-changed-mean",
-        "basic_auth": "writer:writer_pass"
+        "basic_auth": "writer:writer_pass",
+        "rabbitmq_uri": "amqp://"
     }
 
 ## Service Responsibility

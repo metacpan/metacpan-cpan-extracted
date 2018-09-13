@@ -2,8 +2,8 @@ NAME
     Regexp::Pattern::JSON - Regexp patterns to match JSON
 
 VERSION
-    This document describes version 0.003 of Regexp::Pattern::JSON (from
-    Perl distribution Regexp-Pattern-JSON), released on 2018-09-10.
+    This document describes version 0.004 of Regexp::Pattern::JSON (from
+    Perl distribution Regexp-Pattern-JSON), released on 2018-09-12.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()

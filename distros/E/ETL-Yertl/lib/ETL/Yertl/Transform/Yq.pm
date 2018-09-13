@@ -1,5 +1,5 @@
 package ETL::Yertl::Transform::Yq;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: A mini-language for transforming structured data
 
 use ETL::Yertl;
@@ -159,7 +159,8 @@ sub filter {
 
     # Function calls
     elsif ( my ( $func, @args ) = $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*(?:,\s*((?&EXPR))\s*)*\))?$GRAMMAR$/ ) {
-        diag( 1, "F: $func, ARGS: " . ( join( ', ', grep defined, @args ) || '' ) );
+        diag( 1, "F: $func, ARGS: " . ( join( ', ', map { defined $_ ? $_ : '<undef>' } @args ) || '' ) );
+        @args = grep defined, @args;
         if ( $func eq 'empty' ) {
             if ( @args ) {
                 warn "empty does not take arguments\n";
@@ -397,7 +398,7 @@ ETL::Yertl::Transform::Yq - A mini-language for transforming structured data
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 AUTHOR
 

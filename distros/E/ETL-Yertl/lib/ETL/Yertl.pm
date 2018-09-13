@@ -1,10 +1,10 @@
 package ETL::Yertl;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: ETL with a Shell
 
 use strict;
 use warnings;
-use feature qw( :5.10 );
+use 5.010;
 use base 'Import::Base', 'Exporter';
 use Carp qw( croak );
 use Module::Runtime qw( use_module );
@@ -19,11 +19,13 @@ sub loop;
 
 sub import {
     $_[0]->export_to_level( 1, undef, @EXPORT );
-    for my $i ( 1..$#_ ) {
+    # C-style for loop because we remove items from the array and need
+    # to keep comparing against $#_
+    for ( my $i = 1; $i <= $#_; $i++ ) {
         if ( grep { $_ eq $_[ $i ] } @EXPORT_OK ) {
             $_[0]->export_to_level( 1, undef, $_[ $i ] );
             splice @_, $i, 1;
-            redo;
+            redo unless $i > $#_;
         }
     }
     goto &Import::Base::import;
@@ -240,7 +242,7 @@ ETL::Yertl - ETL with a Shell
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -496,11 +498,21 @@ charts from your data.
 
 Doug Bell <preaction@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Luke Triantafyllidis
+=for stopwords James E Keenan Luke Triantafyllidis
+
+=over 4
+
+=item *
+
+James E Keenan <jkeenan@cpan.org>
+
+=item *
 
 Luke Triantafyllidis <ltriant@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

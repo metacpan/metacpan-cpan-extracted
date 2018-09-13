@@ -1,17 +1,20 @@
-.gitignore
 Changes
 Easy_XS.xs
-MANIFEST
-Makefile.PL
-README
 ignore.txt
 lib/Text/CSV/Easy_XS.pm
+Makefile.PL
+MANIFEST
 ppport.h
+README
 t/00-load.t
 t/boilerplate.t
+t/build.t
 t/csv_build.t
 t/csv_parse.t
 t/manifest.t
+t/parse_exceptions.t
+t/parse_rfc4180.t
+t/parse_utf8.t
 t/pod-coverage.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

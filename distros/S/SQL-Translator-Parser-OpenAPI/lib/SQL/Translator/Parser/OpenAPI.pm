@@ -4,11 +4,12 @@ use strict;
 use warnings;
 use JSON::Validator::OpenAPI;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 use constant DEBUG => $ENV{SQLTP_OPENAPI_DEBUG};
 use String::CamelCase qw(camelize decamelize wordsplit);
-use Lingua::EN::Inflect::Number qw(to_PL);
+use Lingua::EN::Inflect::Number qw(to_PL to_S);
 use SQL::Translator::Schema::Constants;
+use Math::BigInt;
 
 my %TYPE2SQL = (
   integer => 'int',
@@ -25,6 +26,7 @@ my %TYPE2SQL = (
   'date-time' => 'datetime',
   password => 'varchar',
 );
+my %SQL2TYPE = reverse %TYPE2SQL; # unreliable order but ok as still reversible
 
 # from GraphQL::Debug
 sub _debug {
@@ -39,7 +41,7 @@ sub _debug {
 # heuristic 1: strip out single-item objects
 sub _strip_thin {
   my ($defs) = @_;
-  my @thin = grep { keys(%{ $defs->{$_}{properties} }) <= 1 } keys %$defs;
+  my @thin = grep { keys(%{ $defs->{$_}{properties} }) == 1 } keys %$defs;
   if (DEBUG) {
     _debug("OpenAPI($_) thin, ignoring", $defs->{$_}{properties})
       for sort @thin;
@@ -49,18 +51,16 @@ sub _strip_thin {
 
 # heuristic 2: find objects with same propnames, drop those with longer names
 sub _strip_dup {
-  my ($defs) = @_;
-  my %name2sig = map {
-    ($_ => join "\0", sort keys %{ $defs->{$_}{properties} })
-  } keys %$defs;
+  my ($defs, $def2mask, $reffed) = @_;
   my %sig2names;
-  push @{ $sig2names{$name2sig{$_}} }, $_ for keys %name2sig;
+  push @{ $sig2names{$def2mask->{$_}} }, $_ for keys %$def2mask;
   DEBUG and _debug("OpenAPI sig2names", \%sig2names);
   my @nondups = grep @{ $sig2names{$_} } == 1, keys %sig2names;
   delete @sig2names{@nondups};
   my @dups;
   for my $sig (keys %sig2names) {
-    my @names = sort { length $a <=> length $b } @{ $sig2names{$sig} };
+    next if grep $reffed->{$_}, @{ $sig2names{$sig} };
+    my @names = sort { (length $a <=> length $b) } @{ $sig2names{$sig} };
     DEBUG and _debug("OpenAPI dup($sig)", \@names);
     shift @names; # keep the first i.e. shortest
     push @dups, @names;
@@ -68,31 +68,45 @@ sub _strip_dup {
   @dups;
 }
 
-# heuristic 3: find objects with set of propnames that is subset of
-#   another object's propnames
-sub _strip_subset {
+# sorted list of all propnames
+sub _get_all_propnames {
   my ($defs) = @_;
   my %allprops;
   for my $defname (keys %$defs) {
     $allprops{$_} = 1 for keys %{ $defs->{$defname}{properties} };
   }
-  my @allpropnames = sort keys %allprops;
+  [ sort keys %allprops ];
+}
+
+sub defs2mask {
+  my ($defs) = @_;
+  my $allpropnames = _get_all_propnames($defs);
   my $count = 0;
   my %prop2count;
-  for my $propname (@allpropnames) {
+  for my $propname (@$allpropnames) {
     $prop2count{$propname} = $count;
     $count++;
   }
   my %def2mask;
   for my $defname (keys %$defs) {
-    $def2mask{$defname} |= (1 << $prop2count{$_})
+    $def2mask{$defname} ||= Math::BigInt->new(0);
+    $def2mask{$defname} |= (Math::BigInt->new(1) << $prop2count{$_})
       for keys %{ $defs->{$defname}{properties} };
   }
+  \%def2mask;
+}
+
+# heuristic 3: find objects with set of propnames that is subset of
+#   another object's propnames
+sub _strip_subset {
+  my ($defs, $def2mask, $reffed) = @_;
   my %subsets;
   for my $defname (keys %$defs) {
-    my $thismask = $def2mask{$defname};
+    DEBUG and _debug("_strip_subset $defname maybe", $reffed);
+    next if $reffed->{$defname};
+    my $thismask = $def2mask->{$defname};
     for my $supersetname (grep $_ ne $defname, keys %$defs) {
-      my $supermask = $def2mask{$supersetname};
+      my $supermask = $def2mask->{$supersetname};
       next unless ($thismask & $supermask) == $thismask;
       DEBUG and _debug("mask $defname subset $supersetname");
       $subsets{$defname} = 1;
@@ -106,7 +120,13 @@ sub _prop2sqltype {
   my $format_type = $prop->{format} || $prop->{type};
   my $lookup = $TYPE2SQL{$format_type || ''};
   DEBUG and _debug("_prop2sqltype($format_type)($lookup)", $prop);
-  $lookup;
+  my %retval = (data_type => $lookup);
+  if (@{$prop->{enum} || []}) {
+    $retval{data_type} = 'enum';
+    $retval{extra} = { list => [ @{$prop->{enum}} ] };
+  }
+  DEBUG and _debug("_prop2sqltype(end)", \%retval);
+  \%retval;
 }
 
 sub _make_not_null {
@@ -121,7 +141,8 @@ sub _make_pk {
   $field->is_primary_key(1);
   $field->is_auto_increment(1);
   $table->add_constraint(type => $_, fields => $field)
-    for (PRIMARY_KEY, UNIQUE);
+    for (PRIMARY_KEY);
+  my $index = $table->add_index(name => "pk_${field}", fields => [ $field ]);
   _make_not_null($table, $field);
 }
 
@@ -145,14 +166,17 @@ sub _make_fk {
 }
 
 sub _fk_hookup {
-  my ($table, $propname, $ref) = @_;
-  my $fk_id = $propname . '_id';
-  my $foreign_ref = _ref2def($ref);
-  DEBUG and _debug("_def2table($propname)($fk_id)(ref)($foreign_ref)", $ref);
-  my $foreign_table = _def2tablename($foreign_ref);
-  DEBUG and _debug("ref($foreign_table)");
-  my $field = $table->add_field(name => $fk_id, data_type => 'int');
-  _make_fk($table, $field, $foreign_table, 'id');
+  my ($schema, $fromtable, $fromkey, $totable, $tokey, $required) = @_;
+  DEBUG and _debug("_fk_hookup $fromtable.$fromkey $totable.$tokey $required");
+  my $from_obj = $schema->get_table($fromtable);
+  my $to_obj = $schema->get_table($totable);
+  my $tokey_obj = $to_obj->get_field($tokey);
+  my $field = $from_obj->get_field($fromkey) || $from_obj->add_field(
+    name => $fromkey, data_type => $tokey_obj->data_type,
+  );
+  die $from_obj->error if !$field;
+  _make_fk($from_obj, $field, $totable, $tokey);
+  _make_not_null($from_obj, $field) if $required;
   $field;
 }
 
@@ -169,17 +193,33 @@ sub _def2table {
     $props->{id} = { type => 'integer' };
   }
   my %prop2required = map { ($_ => 1) } @{ $def->{required} || [] };
+  my (@fixups);
   for my $propname (sort keys %$props) {
     my $field;
+    my $thisprop = $props->{$propname};
     DEBUG and _debug("_def2table($propname)");
-    if (my $ref = $props->{$propname}{'$ref'}) {
-      $field = _fk_hookup($table, $propname, $ref);
-    } elsif (($props->{$propname}{type} // '') eq 'array') {
-      # if $ref, inject FK into it pointing at us
-      # if simple type, make a table with that and FK it to us
+    if (my $ref = $thisprop->{'$ref'}) {
+      push @fixups, {
+        to => _def2tablename(_ref2def($ref)), from => $tname,
+        tokey => 'id', fromkey => $propname . '_id',
+        required => $prop2required{$propname},
+        type => 'one',
+      };
+    } elsif (($thisprop->{type} // '') eq 'array') {
+      if (my $ref = $thisprop->{items}{'$ref'}) {
+        push @fixups, {
+          to => $tname, from => _ref2def(_def2tablename($ref)),
+          tokey => 'id', fromkey => to_S($propname) . "_id",
+          required => 1,
+          type => 'many',
+        };
+      }
+      DEBUG and _debug("_def2table(array)($propname)", \@fixups);
     } else {
-      my $sqltype = _prop2sqltype($props->{$propname});
-      $field = $table->add_field(name => $propname, data_type => $sqltype);
+      my $sqltype = _prop2sqltype($thisprop);
+      $field = $table->add_field(
+        name => $propname, %$sqltype, comments => $thisprop->{description},
+      );
       if ($propname eq 'id') {
         _make_pk($table, $field);
       }
@@ -188,7 +228,256 @@ sub _def2table {
       _make_not_null($table, $field);
     }
   }
-  $table;
+  ($table, \@fixups);
+}
+
+# mutates $def
+sub _merge_one {
+  my ($def, $from, $ignore_required) = @_;
+  DEBUG and _debug('OpenAPI._merge_one', $def, $from);
+  push @{ $def->{required} }, @{ $from->{required} || [] } if !$ignore_required;
+  $def->{properties} = { %{$def->{properties} || {}}, %{$from->{properties}} };
+  $def->{type} = $from->{type} if $from->{type};
+}
+
+sub _merge_allOf {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._merge_allOf', $defs);
+  my %def2discrim = map {
+    ($_ => 1)
+  } grep $defs->{$_}{discriminator}, keys %$defs;
+  my %def2referrers;
+  for my $defname (sort keys %$defs) {
+    my $thisdef = $defs->{$defname};
+    next if !exists $thisdef->{allOf};
+    for my $partial (@{ $thisdef->{allOf} }) {
+      next if !(my $ref = $partial->{'$ref'});
+      push @{ $def2referrers{_ref2def($ref)} }, $defname;
+    }
+  }
+  DEBUG and _debug('OpenAPI._merge_allOf(def2referrers)', \%def2referrers);
+  my %newdefs;
+  my %def2ignore;
+  for my $defname (sort grep $def2discrim{$_}, keys %def2referrers) {
+    # assimilate instead of be assimilated by
+    $def2ignore{$defname} = 1;
+    my $thisdef = $defs->{$defname};
+    my %new = %$thisdef;
+    for my $assimilee (@{ $def2referrers{$defname} }) {
+      $def2ignore{$assimilee} = 1;
+      my $assimileedef = $defs->{$assimilee};
+      my @all = @{ $assimileedef->{allOf} };
+      for my $partial (@all) {
+        next if exists $partial->{'$ref'};
+        _merge_one(\%new, $partial, 1);
+      }
+    }
+    $newdefs{$defname} = \%new;
+  }
+  for my $defname (sort grep !$def2ignore{$_}, keys %$defs) {
+    my $thisdef = $defs->{$defname};
+    my %new = %$thisdef;
+    if (exists $thisdef->{allOf}) {
+      my @all = @{ delete $thisdef->{allOf} };
+      for my $partial (@all) {
+        if (exists $partial->{'$ref'}) {
+          _merge_one(\%new, $defs->{ _ref2def($partial->{'$ref'}) }, 0);
+        } else {
+          _merge_one(\%new, $partial, 0);
+        }
+      }
+    }
+    $newdefs{$defname} = \%new;
+  }
+  DEBUG and _debug('OpenAPI._merge_allOf(end)', \%newdefs);
+  \%newdefs;
+}
+
+sub _find_referenced {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._find_referenced', $defs);
+  my %reffed;
+  for my $defname (sort keys %$defs) {
+    my $theseprops = $defs->{$defname}{properties} || {};
+    for my $propname (keys %$theseprops) {
+      if (my $ref = $theseprops->{$propname}{'$ref'}
+        || ($theseprops->{$propname}{items} && $theseprops->{$propname}{items}{'$ref'})
+      ) {
+        $reffed{ _ref2def($ref) } = 1;
+      }
+    }
+  }
+  DEBUG and _debug('OpenAPI._find_referenced(end)', \%reffed);
+  \%reffed;
+}
+
+sub _extract_objects {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._extract_objects', $defs);
+  my %newdefs = %$defs;
+  for my $defname (sort keys %$defs) {
+    my $theseprops = $defs->{$defname}{properties} || {};
+    for my $propname (keys %$theseprops) {
+      my $thisprop = $theseprops->{$propname};
+      next if $thisprop->{'$ref'}
+        or $thisprop->{items} && $thisprop->{items}{'$ref'};
+      my $ref;
+      if (($thisprop->{type} // '') eq 'object') {
+        $ref = $thisprop;
+      } elsif (
+        $thisprop->{items} && ($thisprop->{items}{type} // '') eq 'object'
+      ) {
+        $ref = $thisprop->{items};
+      } else {
+        next;
+      }
+      my $newtype = join '', map camelize($_), $defname, $propname;
+      $newdefs{$newtype} = { %$ref };
+      %$ref = ('$ref' => "#/definitions/$newtype");
+    }
+  }
+  DEBUG and _debug('OpenAPI._extract_objects(end)', \%newdefs);
+  \%newdefs;
+}
+
+sub _extract_array_simple {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._extract_array_simple', $defs);
+  my %newdefs = %$defs;
+  for my $defname (sort keys %$defs) {
+    my $theseprops = $defs->{$defname}{properties} || {};
+    for my $propname (keys %$theseprops) {
+      my $thisprop = $theseprops->{$propname};
+      next if $thisprop->{'$ref'};
+      next unless
+        $thisprop->{items} && ($thisprop->{items}{type} // '') ne 'object';
+      my $ref = $thisprop->{items};
+      my $newtype = join '', map camelize($_), $defname, $propname;
+      $newdefs{$newtype} = {
+        type => 'object',
+        properties => {
+          value => { %$ref }
+        },
+        required => [ 'value' ],
+      };
+      %$ref = ('$ref' => "#/definitions/$newtype");
+    }
+  }
+  DEBUG and _debug('OpenAPI._extract_array_simple(end)', \%newdefs);
+  \%newdefs;
+}
+
+sub _fixup_addProps {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._fixup_addProps', $defs);
+  my %def2aP = map {$_,1} grep $defs->{$_}{additionalProperties}, keys %$defs;
+  DEBUG and _debug("OpenAPI._fixup_addProps(d2aP)", \%def2aP);
+  for my $defname (sort keys %$defs) {
+    my $theseprops = $defs->{$defname}{properties} || {};
+    DEBUG and _debug("OpenAPI._fixup_addProps(arrayfix)($defname)", $theseprops);
+    for my $propname (keys %$theseprops) {
+      my $thisprop = $theseprops->{$propname};
+      DEBUG and _debug("OpenAPI._fixup_addProps(p)($propname)", $thisprop);
+      next unless $thisprop->{'$ref'}
+        or $thisprop->{items} && $thisprop->{items}{'$ref'};
+      DEBUG and _debug("OpenAPI._fixup_addProps(p)($propname)(y)");
+      my $ref;
+      if ($thisprop->{'$ref'}) {
+        $ref = $thisprop;
+      } elsif ($thisprop->{items} && $thisprop->{items}{'$ref'}) {
+        $ref = $thisprop->{items};
+      } else {
+        next;
+      }
+      my $refname = $ref->{'$ref'};
+      DEBUG and _debug("OpenAPI._fixup_addProps(p)($propname)(y2)($refname)", $ref);
+      next if !$def2aP{_ref2def($refname)};
+      %$ref = (type => 'array', items => { '$ref' => $refname });
+      DEBUG and _debug("OpenAPI._fixup_addProps(p)($propname)(y3)", $ref);
+    }
+  }
+  my %newdefs = %$defs;
+  for my $defname (keys %def2aP) {
+    my %kv = (type => 'object', properties => {
+      key => { type => 'string' },
+      value => { type => $defs->{$defname}{additionalProperties}{type} },
+    });
+    $newdefs{$defname} = \%kv;
+  }
+  DEBUG and _debug('OpenAPI._fixup_addProps(end)', \%newdefs);
+  \%newdefs;
+}
+
+sub _tuple2name {
+  my ($fixup) = @_;
+  my $from = $fixup->{from};
+  my $fromkey = $fixup->{fromkey};
+  $fromkey =~ s#_id$##;
+  camelize join '_', map to_S($_), $from, $fromkey;
+}
+
+sub _make_many2many {
+  my ($fixups, $schema) = @_;
+  my @manyfixups = grep $_->{type} eq 'many', @$fixups;
+  my %from_tos;
+  push @{ $from_tos{$_->{from}}{$_->{to}} }, $_ for @manyfixups;
+  my %to_froms;
+  push @{ $to_froms{$_->{to}}{$_->{from}} }, $_ for @manyfixups;
+  my %m2m;
+  my %ref2nonm2mfixup;
+  $ref2nonm2mfixup{$_} = $_ for @$fixups;
+  for my $from (keys %from_tos) {
+    for my $to (keys %{ $from_tos{$from} }) {
+      for my $fixup (@{ $from_tos{$from}{$to} }) {
+        for my $other (@{ $to_froms{$from}{$to} }) {
+          my ($f1, $f2) = sort { $a->{from} cmp $b->{from} } $fixup, $other;
+          $m2m{_tuple2name($f1)}{_tuple2name($f2)} = [ $f1, $f2 ];
+          delete $ref2nonm2mfixup{$_} for $f1, $f2;
+        }
+      }
+    }
+  }
+  my @replacefixups;
+  for my $n1 (sort keys %m2m) {
+    for my $n2 (sort keys %{ $m2m{$n1} }) {
+      my ($f1, $f2) = @{ $m2m{$n1}{$n2} };
+      my ($t1_obj, $t2_obj) = map $schema->get_table($_->{to}), $f1, $f2;
+      my ($table) = _def2table(
+        $n1.$n2,
+        {
+          type => 'object',
+          properties => {
+            $f1->{from}.'_'.$f1->{fromkey} => {
+              type => $SQL2TYPE{$t1_obj->get_field($f1->{tokey})->data_type}
+            },
+            $f2->{from}.'_'.$f2->{fromkey} => {
+              type => $SQL2TYPE{$t2_obj->get_field($f2->{tokey})->data_type}
+            },
+          },
+        },
+        $schema,
+      );
+      push @replacefixups, {
+        to => $f1->{from},
+        tokey => 'id',
+        from => $table->name,
+        fromkey => $f1->{from}.'_'.$f1->{fromkey},
+        required => 1,
+      }, {
+        to => $f2->{from},
+        tokey => 'id',
+        from => $table->name,
+        fromkey => $f2->{from}.'_'.$f2->{fromkey},
+        required => 1,
+      };
+    }
+  }
+  [
+    (sort {
+        $a->{from} cmp $b->{from} || $a->{fromkey} cmp $b->{fromkey}
+    } values %ref2nonm2mfixup),
+    @replacefixups,
+  ];
 }
 
 sub parse {
@@ -200,16 +489,32 @@ sub parse {
   my @thin = _strip_thin(\%defs);
   DEBUG and _debug("thin ret", \@thin);
   delete @defs{@thin};
-  my @dup = _strip_dup(\%defs);
+  %defs = %{ _merge_allOf(\%defs) };
+  my $def2mask = defs2mask(\%defs);
+  my $reffed = _find_referenced(\%defs);
+  my @dup = _strip_dup(\%defs, $def2mask, $reffed);
   DEBUG and _debug("dup ret", \@dup);
   delete @defs{@dup};
-  my @subset = _strip_subset(\%defs);
-  DEBUG and _debug("dup subset", [ sort @subset ]);
+  my @subset = _strip_subset(\%defs, $def2mask, $reffed);
+  DEBUG and _debug("subset ret", [ sort @subset ]);
   delete @defs{@subset};
   DEBUG and _debug("remaining", [ sort keys %defs ]);
+  %defs = %{ _extract_objects(\%defs) };
+  DEBUG and _debug("after _extract_objects", [ sort keys %defs ]);
+  %defs = %{ _extract_array_simple(\%defs) };
+  DEBUG and _debug("after _extract_array_simple", [ sort keys %defs ]);
+  my (@fixups);
+  %defs = %{ _fixup_addProps(\%defs) };
   for my $name (sort keys %defs) {
-    my $table = _def2table($name, $defs{$name}, $schema);
-    DEBUG and _debug("table", $table);
+    my ($table, $thesefixups) = _def2table($name, $defs{$name}, $schema);
+    push @fixups, @$thesefixups;
+    DEBUG and _debug("table", $table, $thesefixups);
+  }
+  DEBUG and _debug("tables to do", \@fixups);
+  my ($newfixups) = _make_many2many(\@fixups, $schema);
+  DEBUG and _debug("fixups still to do", $newfixups);
+  for my $fixup (@$newfixups) {
+    _fk_hookup($schema, @{$fixup}{qw(from fromkey to tokey required)});
   }
   1;
 }
@@ -284,6 +589,37 @@ None at present.
 Standard as per L<SQL::Translator::Parser>. The input $data is a scalar
 that can be understood as a L<JSON::Validator
 specification|JSON::Validator/schema>.
+
+=head2 defs2mask
+
+Given a hashref that is a JSON pointer to an OpenAPI spec's
+C</definitions>, returns a hashref that maps each definition name to a
+bitmask. The bitmask is set from each property name in that definition,
+according to its order in the complete sorted list of all property names
+in the definitions. Not exported. E.g.
+
+  # properties:
+  my $defs = {
+    d1 => {
+      properties => {
+        p1 => 'string',
+        p2 => 'string',
+      },
+    },
+    d2 => {
+      properties => {
+        p2 => 'string',
+        p3 => 'string',
+      },
+    },
+  };
+  my $mask = SQL::Translator::Parser::OpenAPI::defs2mask($defs);
+  # all prop names, sorted: qw(p1 p2 p3)
+  # $mask:
+  {
+    d1 => (1 << 0) | (1 << 1),
+    d2 => (1 << 1) | (1 << 2),
+  }
 
 =head1 DEBUGGING
 

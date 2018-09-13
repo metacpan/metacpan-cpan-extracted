@@ -1,7 +1,7 @@
 package Sah::SchemaR::isbn10;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-09-12'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $rschema = ["str",[{description=>"\nNondigits [^0-9Xx] will be removed during coercion.\n\n\"x\" will be converted to uppercase.\n\nChecksum digit must be valid.\n\n",match=>"\\A[0-9]{9}[0-9Xx]\\z",summary=>"ISBN 10 number","x.perl.coerce_rules"=>["str_to_isbn10"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::isbn10 - ISBN 10 number
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::isbn10 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-08.
+This document describes version 0.005 of Sah::SchemaR::isbn10 (from Perl distribution Sah-Schemas-ISBN), released on 2018-09-12.
 
 =head1 DESCRIPTION
 

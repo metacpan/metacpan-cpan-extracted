@@ -6,7 +6,7 @@ package BSON::Binary;
 # ABSTRACT: Legacy BSON type wrapper for binary data (DEPRECATED)
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 our $TYPE_SIMPLE       = 0x00;
 our $TYPE_BYTES        = 0x02;
@@ -46,6 +46,14 @@ sub to_s {
     return pack( 'l<C*', scalar(@data), $self->type, @data );
 }
 
+sub TO_JSON {
+    my %data;
+    tie( %data, 'Tie::IxHash' );
+    $data{base64} = $_[0]->to_s;
+    $data{subType} = $_[0]->{type};
+    return { '$binary' => \%data };
+}
+
 use overload '""' => \&to_s;
 
 1;
@@ -60,7 +68,7 @@ BSON::Binary - Legacy BSON type wrapper for binary data (DEPRECATED)
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 DESCRIPTION
 
@@ -71,7 +79,7 @@ implementation on CPAN.
 
 You are strongly encouraged to use L<BSON::Bytes> instead.
 
-=for Pod::Coverage new data type subtype to_s
+=for Pod::Coverage new data type subtype to_s TO_JSON
 
 =head1 AUTHORS
 

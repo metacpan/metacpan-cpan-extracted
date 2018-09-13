@@ -5,6 +5,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+lib/RmqPublishFactory.pm
 lib/Stor.pm
 minil.toml
 script/stor
@@ -13,5 +14,7 @@ t/01_upload_download.t
 t/02_status.t
 t/03_get.t
 t/04_read_only_regex.t
+t/05_publish.t
+t/06_rmq_publish_factory.t
 META.yml
 MANIFEST

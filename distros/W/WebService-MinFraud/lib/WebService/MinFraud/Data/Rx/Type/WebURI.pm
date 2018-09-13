@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 use Data::Validate::URI qw(is_web_uri);
 
@@ -53,7 +53,7 @@ WebService::MinFraud::Data::Rx::Type::WebURI - A type to check for a valid Web U
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

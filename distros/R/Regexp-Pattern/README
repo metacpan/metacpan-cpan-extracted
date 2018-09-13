@@ -6,8 +6,8 @@ SPECIFICATION VERSION
     0.2
 
 VERSION
-    This document describes version 0.2.7 of Regexp::Pattern (from Perl
-    distribution Regexp-Pattern), released on 2018-09-10.
+    This document describes version 0.2.8 of Regexp::Pattern (from Perl
+    distribution Regexp-Pattern), released on 2018-09-12.
 
 SYNOPSIS
     Subroutine interface:

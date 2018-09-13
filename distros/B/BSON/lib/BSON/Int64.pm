@@ -6,7 +6,7 @@ package BSON::Int64;
 # ABSTRACT: BSON type wrapper for Int64
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp;
 use Config;
@@ -81,8 +81,10 @@ BEGIN {
 #pod fail to serialize unless a C<TO_JSON> method is defined
 #pod for that or in package C<universal>.
 #pod
-#pod If the C<BSON_EXTJSON> option is true, it will instead
-#pod be compatible with MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod If the C<BSON_EXTJSON> environment variable is true and the
+#pod C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+#pod compatible with
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     {"$numberLong" : "223372036854775807"}
@@ -90,7 +92,7 @@ BEGIN {
 #pod =cut
 
 sub TO_JSON {
-    return int($_[0]->{value}) unless $ENV{BSON_EXTJSON};
+    return int($_[0]->{value}) if ! $ENV{BSON_EXTJSON} || $ENV{BSON_EXTJSON_RELAXED};
     return { '$numberLong' => "$_[0]->{value}" };
 }
 
@@ -131,7 +133,7 @@ BSON::Int64 - BSON type wrapper for Int64
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -164,8 +166,10 @@ will be returned as a Math::BigInt object, which will
 fail to serialize unless a C<TO_JSON> method is defined
 for that or in package C<universal>.
 
-If the C<BSON_EXTJSON> option is true, it will instead
-be compatible with MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+If the C<BSON_EXTJSON> environment variable is true and the
+C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+compatible with
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     {"$numberLong" : "223372036854775807"}

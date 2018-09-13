@@ -8,7 +8,7 @@ use Path::Tiny 0.098 qw(tempdir);
 
 use Exporter qw(import);
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 our @EXPORT_OK = qw(tempdir_simple);
 
@@ -55,7 +55,7 @@ Code::TidyAll::Util - Utility functions for internal use by Code::TidyAll
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SUPPORT
 

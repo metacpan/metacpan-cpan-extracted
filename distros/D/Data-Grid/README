@@ -2,7 +2,7 @@ NAME
     Data::Grid - Incremental read access to grid-based data
 
 VERSION
-    Version 0.03
+    Version 0.05
 
 SYNOPSIS
         use Data::Grid;

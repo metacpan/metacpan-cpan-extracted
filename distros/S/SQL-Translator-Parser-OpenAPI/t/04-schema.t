@@ -12,13 +12,15 @@ die "$file: $!" if !-f $file;
 
 my $translator = SQL::Translator->new;
 $translator->parser("OpenAPI");
-$translator->producer("YAML");
+$translator->producer("MySQL");
 
 my $data = do { open my $fh, $file or die "$file: $!"; local $/; <$fh> };
 
 my $got = $translator->translate(file => $file);
 if ($got) {
-  $got =~ s/^  version:[^\n]*\n//m; # remove SQLT version to dodge false negs
+  my @lines = split /\n/, $got;
+  splice @lines, 0, 4; # zap opening blurb to dodge false negs
+  $got = join "\n", @lines;
 } else {
   diag $translator->error;
 }

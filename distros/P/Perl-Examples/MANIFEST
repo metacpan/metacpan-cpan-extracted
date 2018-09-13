@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Perl/Examples.pm
+lib/Perl/Examples/Module/One.pm
 lib/Perl/Examples/POD/HTML.pm
 lib/Perl/Examples/POD/Link.pm
 lib/Perl/Examples/POD/Text.pm

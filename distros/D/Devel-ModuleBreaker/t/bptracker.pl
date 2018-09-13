@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#! /usr/bin/perl
 # bptracker.pl [options]
 # - a script that can report on breakpoints
 #   that have been set.
@@ -11,8 +11,7 @@
 #    -s :  report subroutines that have breakpoints set by Devel::XXXBreaker module
 #          NOTE: -s option works for subs where first line of code is on same line as
 #                the sub declaration. e.g., sub foo { 42 }  will work,  
-#                sub foo {\n42\n}  will not
-
+#                sub foo { <newline> 42 <newline> }  will not.
 
 use lib qw(blib/arch blib/lib lib t .);
 

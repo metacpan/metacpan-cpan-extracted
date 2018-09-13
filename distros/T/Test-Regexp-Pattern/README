@@ -2,8 +2,8 @@ NAME
     Test::Regexp::Pattern - Test Regexp::Pattern patterns
 
 VERSION
-    This document describes version 0.003 of Test::Regexp::Pattern (from
-    Perl distribution Test-Regexp-Pattern), released on 2018-09-10.
+    This document describes version 0.004 of Test::Regexp::Pattern (from
+    Perl distribution Test-Regexp-Pattern), released on 2018-09-12.
 
 SYNOPSIS
     To check all regexp patterns in a module:

@@ -3,8 +3,8 @@ NAME
     Standard Book Number)
 
 VERSION
-    This document describes version 0.004 of Sah::Schemas::ISBN (from Perl
-    distribution Sah-Schemas-ISBN), released on 2018-09-08.
+    This document describes version 0.005 of Sah::Schemas::ISBN (from Perl
+    distribution Sah-Schemas-ISBN), released on 2018-09-12.
 
 SAH SCHEMAS
     *   isbn

@@ -21,7 +21,13 @@ Weasel::DriverRole - API definition for driver wrappers
 This module defines the API for all Weasel drivers to be implemented.
 
 By using this role in the driver implementation module, an abstract
-method is implmented croak()ing if it's called.
+method is implemented croak()ing if it's called.
+
+=cut
+
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
 
 =cut
 
@@ -32,6 +38,7 @@ use warnings;
 
 use Carp;
 use Moose::Role;
+use namespace::autoclean;
 
 our $VERSION = '0.02';
 
@@ -51,11 +58,12 @@ The value managed by the C<start> and C<stop> methods.
 
 has 'started' => (is => 'rw',
                   isa => 'Bool',
-                  default => 0);
+                  default => 0,
+                 );
 
 =back
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =over
 
@@ -83,7 +91,7 @@ driver methods as per the Web driver methods section below.
 
 =cut
 
-sub start { my $self = shift; $self->started(1); }
+sub start { my $self = shift; return $self->started(1); }
 
 =item stop
 
@@ -93,7 +101,7 @@ in a restartable state.
 
 =cut
 
-sub stop { my $self = shift; $self->started(0); }
+sub stop { my $self = shift; return $self->started(0); }
 
 =item restart
 
@@ -102,7 +110,7 @@ This function stops (if started) and starts the driver.
 
 =cut
 
-sub restart { my $self = shift; $self->stop; $self->start; }
+sub restart { my $self = shift; $self->stop; return $self->start; }
 
 =back
 
@@ -129,7 +137,7 @@ Note: The driver should always accept an xpath locator as an id value
 
 =item find_all( $parent_id, $locator, $scheme )
 
-Returns the _id values for the elements to be instanciated, matching
+Returns the _id values for the elements to be instantiated, matching
 the C<$locator> using C<scheme>.
 
 Depending on array or scalar context, the return value is
@@ -141,7 +149,7 @@ is implemented on the C<Weasel::Session> level.
 =cut
 
 sub find_all {
-    croak "Abstract inteface method 'find_all' called";
+    croak q{Abstract inteface method 'find_all' called};
 }
 
 =item get( $url )
@@ -154,7 +162,7 @@ a registered prefix.
 =cut
 
 sub get {
-    croak "Abstract interface method 'get' called";
+    croak q{Abstract interface method 'get' called};
 }
 
 =item is_displayed($element_id)
@@ -165,7 +173,7 @@ C<$element_id> is interactable (can be selected, clicked on, etc)
 =cut
 
 sub is_displayed {
-    croak "Abstract interface method 'is_displayed' called";
+    croak q{Abstract interface method 'is_displayed' called};
 }
 
 =item wait_for( $callback, retry_timeout => $num, poll_delay => $num )
@@ -185,7 +193,7 @@ Note: The user should catch inside the callback any exceptions that are
 =cut
 
 sub wait_for {
-    croak "Abstract interface method 'wait_for' called";
+    croak q{Abstract interface method 'wait_for' called};
 }
 
 
@@ -197,7 +205,7 @@ mouse location otherwise.
 =cut
 
 sub clear {
-    croak "Abstract interface method 'clear' called";
+    croak q{Abstract interface method 'clear' called};
 }
 
 =item click( [ $element_id ] )
@@ -208,7 +216,7 @@ mouse location otherwise.
 =cut
 
 sub click {
-    croak "Abstract interface method 'click' called";
+    croak q{Abstract interface method 'click' called};
 }
 
 =item dblclick()
@@ -218,7 +226,7 @@ Double clicks on the current mouse location.
 =cut
 
 sub dblclick {
-     croak "Abstract interface method 'dblclick' called";
+     croak q{Abstract interface method 'dblclick' called};
 }
 
 =item get_attribute($element_id, $attribute_name)
@@ -229,7 +237,7 @@ of the element indicated by C<$element_id>.
 =cut
 
 sub get_attribute {
-    croak "Abstract interface method 'get_attribute' called";
+    croak q{Abstract interface method 'get_attribute' called};
 }
 
 =item get_page_source($fh)
@@ -239,7 +247,7 @@ Writes a get_page_source of the browser's window to the filehandle C<$fh>.
 =cut
 
 sub get_page_source {
-    croak "Abstract interface method 'get_page_source' called";
+    croak q{Abstract interface method 'get_page_source' called};
 }
 
 =item get_text($element_id)
@@ -250,7 +258,7 @@ the so-called 'innerHTML'.
 =cut
 
 sub get_text {
-    croak "Abstract interface method 'get_text' called";
+    croak q{Abstract interface method 'get_text' called};
 }
 
 =item set_attribute($element_id, $attribute_name, $value)
@@ -261,7 +269,7 @@ for the element identified by C<$element_id>.
 =cut
 
 sub set_attribute {
-    croak "Abstract interface method 'set_attribute' called";
+    croak q{Abstract interface method 'set_attribute' called};
 }
 
 =item get_selected($element_id)
@@ -269,7 +277,7 @@ sub set_attribute {
 =cut
 
 sub get_selected {
-    croak "Abstract interface method 'get_selected' called";
+    croak q{Abstract interface method 'get_selected' called};
 }
 
 =item set_selected($element_id, $value)
@@ -277,7 +285,7 @@ sub get_selected {
 =cut
 
 sub set_selected {
-    croak "Abstract interface method 'set_selected' called";
+    croak q{Abstract interface method 'set_selected' called};
 }
 
 =item screenshot($fh)
@@ -291,7 +299,7 @@ Note: In the current version of the driver, it's assumed the
 =cut
 
 sub screenshot {
-    croak "Abstract interface method 'screenshot' called";
+    croak q{Abstract interface method 'screenshot' called};
 }
 
 =item send_keys($element_id, @keys)
@@ -315,7 +323,7 @@ Note: Special keys are encoded according to the WebDriver spec.
 =cut
 
 sub send_keys {
-    croak "Abstract interface method 'send_keys' called";
+    croak q{Abstract interface method 'send_keys' called};
 }
 
 =item tag_name($element_id)
@@ -325,7 +333,7 @@ The name of the HTML tag identified by C<$element_id>.
 =cut
 
 sub tag_name {
-    croak "Abstract interface method 'tag_name' called";
+    croak q{Abstract interface method 'tag_name' called};
 }
 
 =back
@@ -334,7 +342,35 @@ sub tag_name {
 
 L<Weasel>
 
-=head1 COPYRIGHT
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
 
  (C) 2016  Erik Huelsmann
 
@@ -342,6 +378,5 @@ Licensed under the same terms as Perl.
 
 =cut
 
-
-
 1;
+

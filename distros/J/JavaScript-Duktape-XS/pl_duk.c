@@ -135,7 +135,7 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
     return ret;
 }
 
-static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
+static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int ref)
 {
     int ret = 1;
     if (!SvOK(value)) {
@@ -145,7 +145,11 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
         duk_push_boolean(ctx, val);
     } else if (SvIOK(value)) {
         int val = SvIV(value);
-        duk_push_int(ctx, val);
+        if (ref && (val == 0 || val == 1)) {
+            duk_push_boolean(ctx, val);
+        } else {
+            duk_push_int(ctx, val);
+        }
     } else if (SvNOK(value)) {
         double val = SvNV(value);
         duk_push_number(ctx, val);
@@ -156,7 +160,11 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
     } else if (SvROK(value)) {
         SV* ref = SvRV(value);
         int type = SvTYPE(ref);
-        if (type == SVt_PVAV) {
+        if (type < SVt_PVAV) {
+            if (!pl_perl_to_duk_impl(aTHX_ ref, ctx, seen, 1)) {
+                croak("Could not create JS element for reference\n");
+            }
+        } else if (type == SVt_PVAV) {
             AV* values = (AV*) ref;
             char kstr[100];
             int klen = sprintf(kstr, "%p", values);
@@ -181,7 +189,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                     if (!elem || !*elem) {
                         break; /* could not get element */
                     }
-                    if (!pl_perl_to_duk_impl(aTHX_ *elem, ctx, seen)) {
+                    if (!pl_perl_to_duk_impl(aTHX_ *elem, ctx, seen, 0)) {
                         croak("Could not create JS element for array\n");
                     }
                     if (!duk_put_prop_index(ctx, array_pos, count)) {
@@ -232,7 +240,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen)
                     }
                     SvUTF8_on(value); /* yes, always */
 
-                    if (!pl_perl_to_duk_impl(aTHX_ value, ctx, seen)) {
+                    if (!pl_perl_to_duk_impl(aTHX_ value, ctx, seen, 0)) {
                         croak("Could not create JS element for hash\n");
                     }
                     if (! duk_put_prop_lstring(ctx, hash_pos, kstr, klen)) {
@@ -274,7 +282,7 @@ SV* pl_duk_to_perl(pTHX_ duk_context* ctx, int pos)
 int pl_perl_to_duk(pTHX_ SV* value, duk_context* ctx)
 {
     HV* seen = newHV();
-    int ret = pl_perl_to_duk_impl(aTHX_ value, ctx, seen);
+    int ret = pl_perl_to_duk_impl(aTHX_ value, ctx, seen, 0);
     hv_undef(seen);
     return ret;
 }
@@ -461,10 +469,7 @@ int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* valu
 {
     int len = 0;
     int last_dot = 0;
-    if (sv_isobject(value)) {
-        SV* obj = newSVsv(value);
-        duk_push_pointer(ctx, obj);
-    } else if (!pl_perl_to_duk(aTHX_ value, ctx)) {
+    if (!pl_perl_to_duk(aTHX_ value, ctx)) {
         return 0;
     }
     last_dot = find_last_dot(name, &len);

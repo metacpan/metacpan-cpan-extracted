@@ -1,3 +1,13 @@
+** 0.14 / 2018-09-11
+   - Correctly update version numbers in all files
+
+** 0.13 / 2018-09-10
+   - Normalize space in tag content (text()) being compared
+     Removes the problem of leading and trailing space
+     preventing matches
+
+** 0.12 / 2016-10-03
+   - Make 'get_page_source' write to file
 
 ** 0.11 / 2017-04-21
    - Fix expansion of *text HTML expander when only one of 'id' or 'name' given

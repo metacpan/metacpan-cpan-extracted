@@ -1,3 +1,9 @@
+0.120   2018-09-11 (PERLANCAR)
+
+	- [incompatible change] Do not strip source code by default, to
+	  speed up generation.
+
+
 0.11    2017-07-08 (PERLANCAR)
 
 	- No functional changes.

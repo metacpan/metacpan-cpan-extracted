@@ -18,11 +18,13 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Regexp-Pattern-JSON
+requires:
+  perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-JSON
   homepage: https://metacpan.org/release/Regexp-Pattern-JSON
   repository: git://github.com/perlancar/perl-Regexp-Pattern-JSON.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

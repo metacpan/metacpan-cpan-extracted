@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 23;
+plan tests => 25;
 
 my @module_files = (
     'BSON.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'BSON/Bool.pm',
     'BSON/Bytes.pm',
     'BSON/Code.pm',
+    'BSON/DBPointer.pm',
     'BSON/DBRef.pm',
     'BSON/Decimal128.pm',
     'BSON/Doc.pm',
@@ -28,6 +29,7 @@ my @module_files = (
     'BSON/Raw.pm',
     'BSON/Regex.pm',
     'BSON/String.pm',
+    'BSON/Symbol.pm',
     'BSON/Time.pm',
     'BSON/Timestamp.pm',
     'BSON/Types.pm'

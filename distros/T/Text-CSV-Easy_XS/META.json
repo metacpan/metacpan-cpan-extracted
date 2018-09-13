@@ -4,13 +4,13 @@
       "Tom Peters <weters@me.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-CSV-Easy_XS",
    "no_index" : {
@@ -38,5 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.53"
+   "version" : "0.54",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

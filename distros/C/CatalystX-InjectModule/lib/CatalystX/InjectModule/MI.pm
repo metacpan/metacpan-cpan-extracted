@@ -1,6 +1,6 @@
 use utf8;
 package CatalystX::InjectModule::MI;
-$CatalystX::InjectModule::MI::VERSION = '0.14';
+$CatalystX::InjectModule::MI::VERSION = '0.17';
 # This plugin is inspired by :
 # - CatalystX::InjectComponent
 # - Catalyst::Plugin::AutoCRUD
@@ -21,6 +21,7 @@ use YAML qw(Dump DumpFile LoadFile);
 use Term::ANSIColor qw(:constants);
 use Path::Tiny;
 use Path::Class qw( file );
+use ExtUtils::Installed;
 
 has debug => (
               is       => 'rw',
@@ -66,6 +67,12 @@ has _static_dirs => (
               default  => sub { [] },
           );
 
+has libs => (
+             is       => 'rw',
+             isa      => 'ArrayRef',
+             default  => sub { [] },
+            );
+
 
 sub log {
     my($self, $msg, $level) = @_;
@@ -92,6 +99,7 @@ sub resolv {
     my $operation = shift;
     my $version   = shift;
 
+    next if ! $module;
     my $Module   = $self->get_module($module, $operation, $version );
     die "Module $module not found !" if ! defined $Module->{name};
 
@@ -112,20 +120,30 @@ sub load {
 
     $self->resolver(Dependency::Resolver->new(debug => $self->debug ));
 
+    # By default search also in INC
+    my $search_localy_only = 0;
+
     # search modules in 'path' directories
     for my $dir ( @{ $conf->{path} } ) {
-        if ( $dir eq '__INC__' ) {
-            pop(@INC) if $INC[-1] eq '.'; # do not search module in '.'
-            push(@{$conf->{path}}, @INC);
+        if ( $dir eq '__NO_INC__' ) {
+            $search_localy_only = 1;
             next;
         }
         $self->_load_modules_path($dir, $conf_filename);
     }
+    # Search modules in @INC
+    if ( ! $search_localy_only ){
+        for my $dir ( @INC ) {
+            next if ( $dir eq '.');
+            $self->_load_modules_path($dir, $conf_filename, 1);
+        }
+    }
+    
     # Merge config resolved modules ----------------
     $self->_merge_resolved_configs;
 
     $self->_build_local_config_file;
-  }
+}
 
 
 
@@ -150,8 +168,8 @@ sub modules_to_inject {
 sub inject {
     my $self         = shift;
     my $modules_name = shift;
-
     my $modules = $self->modules_to_inject($modules_name);
+
     $self->_add_to_modules_loaded($modules);
 
     for my $m ( @$modules) {
@@ -167,6 +185,7 @@ sub _add_to_modules_loaded {
     my $all = {};
     foreach my $m ( @$modules ) {
         next if ( $all->{$m->{name}} );
+        
         push(@{$self->modules_loaded},$m);
         $all->{$m->{name}} = 1;
     }
@@ -184,14 +203,13 @@ sub _load_modules_path{
     my $self           = shift;
     my $dir            = shift;
     my $conf_filename  = shift;
-
+    my $from_inc       = shift;
     $self->log("  - search modules in $dir ...");
 
     my $all_configs = $self->_search_in_path( $dir, "^$conf_filename\$" );
-
-    CONFIG: for my $config ( @$all_configs ) {
+  CONFIG: for my $config ( @$all_configs ) {
         my $cfg = Config::Any->load_files({files => [$config], use_ext => 1 })
-            or die "Error (conf: $config) : $!\n";
+          or die "Error (conf: $config) : $!\n";
 
         my($filename, $mod_config) = %{$cfg->[0]};
 
@@ -200,16 +218,48 @@ sub _load_modules_path{
 
         # next if module already added ( ex: path=share + share/modules)
         for my $m ( @{$self->resolver->modules->{$mod_config->{name}}} ) {
-            if ( $path eq $m->{path}){
+            if ( $path eq $m->{path}) {
                 next CONFIG;
-            };
+            }
+            ;
         }
 
         my $msg = "    - find module ". $mod_config->{name};
         $msg .= " v". $mod_config->{version} if defined $mod_config->{version};
+        $msg .= " from INC"  if $from_inc;
         $self->log($msg);
 
+        # for local module (cxim_config is in share/)
+        $path =~ s|/share$||;
         $mod_config->{path} = $path;
+
+        my $all_libs = [];
+        # use module localy
+        if ( -d $mod_config->{path} . '/lib') {
+            $mod_config->{libpath} = $mod_config->{path} . '/lib';
+            $all_libs = $self->_search_in_path( $mod_config->{libpath}, '.pm$' );
+        }
+        # or from installed packages
+        elsif ( -d $mod_config->{path} ) {
+            my $module_file = $mod_config->{name};
+            $module_file =~ s|::|/|g;
+            $module_file .= ".pm";
+            my ($inst) = ExtUtils::Installed->new( skip_cwd => 1 );
+            my @all_module_files = $inst->files($mod_config->{name});
+            foreach my $f ( @all_module_files ) {
+                push(@$all_libs,$f) if ( $f =~ /\.pm$/ ); 
+                if ( $f =~ s/$module_file$// ) {
+                    $mod_config->{libpath} = $f;
+                }
+            }
+            die "The $module_file file of the " . $mod_config->{name} . " module is non found !\n"
+              if ( ! $mod_config->{libpath} );
+        }
+        else {
+            return;
+        }
+
+        $mod_config->{config}->{all_libs} = $all_libs;
 
         $self->resolver->add($mod_config);
     }
@@ -219,6 +269,7 @@ sub _inject {
     my $self   = shift;
     my $module = shift;
 
+    
     $self->log(RED."InjectModule " . $module->{name}.CLEAR);
 
     # Inject lib and components ----------
@@ -233,13 +284,11 @@ sub _inject {
     # Inject static ----------------------
     $self->_load_static($module);
 
-    # install_module is used when all modules are loaded
-    #$self->install_module($module);
 }
 
 
 sub _merge_resolved_configs {
-	my ( $self, $module ) = @_;
+    my ( $self, $module ) = @_;
 
     $self->log("  - Merge all resolved modules config (" . $self->regex_conf_name . ')');
 
@@ -257,42 +306,44 @@ sub _merge_resolved_configs {
 }
 
 sub _build_local_config_file{
-  my $self  = shift;
+    my $self  = shift;
 
-  my $file = lc($self->ctx . "::local.yml");
-  $file    =~ s/::/_/g;
-  my $conf        = $self->ctx->config;
-  my $conf_path   = file( File::Spec->rel2abs($file) );
-  my $config_file = path($conf_path->relative);
+    my ($local_file) = grep $_ =~ /local/, $self->ctx->find_files;
 
-  # Generates the local configuration file if it doesnot exist
-  $config_file->spew_utf8( Dump($conf) )
-    if ! -e $file;
+    my $conf_path   = file( File::Spec->rel2abs($local_file) );
+    my $config_file = path($conf_path->relative);
 
+    # Generates the local configuration file if it doesnot exist
+    if ( ! -e $local_file ) {
+        my $conf = $self->ctx->config;
+        $config_file->spew_utf8( Dump($conf) )
+    } else {
+    # Merge loaded conf with local conf
+        my $newconf = LoadFile($config_file);
+        $self->ctx->config( Catalyst::Utils::merge_hashes( $newconf, $self->ctx->config ) );
+        $config_file->spew_utf8( Dump(Catalyst::Utils::merge_hashes( $newconf, $self->ctx->config) ));
+    }
 }
-
 sub _load_lib {
-  my ( $self, $module ) = @_;
+    my ( $self, $module ) = @_;
 
-  my $libpath = $module->{path} . '/lib';
-  return if ( ! -d $libpath);
+    my $all_libs = $module->{config}->{all_libs};
 
-  $self->log(BLUE."  - Add lib $libpath".CLEAR);
-  unshift( @INC, $libpath );
+    # Use same libpath
+    unshift( @INC, $module->{libpath} );
 
-  # Search and load components
-  my $all_libs = $self->_search_in_path( $module->{path}, '.pm$' );
+    $self->log(BLUE."  - Add lib "  . $module->{libpath} . CLEAR);
+    $self->libs(\@INC);
 
-  foreach my $file (@$all_libs) {
+    foreach my $file (@$all_libs) {
 
-    next if grep {/TraitFor/} $file;
+        next if grep {/TraitFor/} $file;
+        $self->_load_component( $module, $file )
+          if ( grep {/\/Model\/|\/View\/|\/Controller\//} $file );
 
-    $self->_load_component( $module, $file )
-      if ( grep {/Model|View|Controller/} $file );
-
-    push(@{$self->_view_files}, $file)
-      if ( grep {/\/View\/\w*\.pm/} $file );
-  }
+        push(@{$self->_view_files}, $file)
+          if ( grep {/\/View\/\w*\.pm/} $file );
+    }
 }
 
 sub install_module {
@@ -300,16 +351,17 @@ sub install_module {
     my $module = shift;
 
     my $module_name = $module->{name};
-    $module_name =~ s|::|/|;
+    my $module_path = $module_name;
+
+    $module_path =~ s|::|/|g;
 
     if ( $self->_is_installed($module) ) {
         $self->log("  - $module_name already installed", 2);
         return;
     }
 
-    my $module_path = $module->{path};
-    my $module_file = $module_path . '/lib/' . $module_name . '.pm';
-
+    my $module_libpath = $module->{libpath};
+    my $module_file    = $module_libpath . '/' . $module_path . '.pm';
     if ( -f $module_file ) {
         load_class($module_name);
         my $mod = $module_name->new( mi => $self);
@@ -326,15 +378,16 @@ sub uninstall_module {
     my $module = shift;
 
     my $module_name = $module->{name};
-    $module_name =~ s|::|/|;
+    my $module_path = $module_name;
+    $module_path =~ s|::|/|g;
 
     if ( ! $self->_is_installed($module) ) {
         $self->log("  - $module_name is not installed");
         return;
     }
 
-    my $module_path = $module->{path};
-    my $module_file = $module_path . '/lib/' . $module_name . '.pm';
+    my $module_libpath = $module->{libpath};
+    my $module_file = $module_libpath . '/' . $module_path . '.pm';
 
     if ( -f $module_file ) {
         load_class($module_name);
@@ -458,14 +511,12 @@ sub _load_catalyst_plugin {
 sub _load_template {
 	my ( $self, $module ) = @_;
 
-    foreach my $dir ( 'root/src', 'root/lib') {
+    foreach my $dir ( 'share/root/src', 'share/root/lib', 'root/src', 'root/lib') {
 
         my $template_dir = $module->{path} . "/$dir";
-
         if ( -d $template_dir ) {
             $self->log("  - Add template directory $template_dir");
             $module->{template_dir} = $template_dir;
-
             # Add template to TT view
             # TODO: Add template to others view ?
             push( @{ $self->ctx->view('TT')->config->{INCLUDE_PATH} }, $template_dir );
@@ -476,40 +527,41 @@ sub _load_template {
 
 sub _load_static {
     my ( $self, $module ) = @_;
-
+    
     my $static_dir = $module->{path} . "/root/static";
 
+    foreach my $static_dir ( $module->{path} . "/share/root/static", $module->{path} . "/root/static" ) {
 
-    if ( -d $static_dir ) {
-        $self->log("  - Add static directory");
-        $module->{static_dir} = $static_dir;
-        push(@{$self->_static_dirs}, $static_dir);
+        if ( -d $static_dir ) {
+            $self->log("  - Add static directory");
+            $module->{static_dir} = $static_dir;
+            push(@{$self->_static_dirs}, $static_dir);
+        }
     }
 }
 
 sub _load_component {
-	my ( $self, $module, $file ) = @_;
-
-	my $libpath = $module->{path} . '/lib';
-	my $comp    = $file;
-	$comp =~ s|$libpath/||;
-	$comp =~ s|\.pm$||;
-	$comp =~ s|/|::|g;
-
-    my $into = $self->ctx;
-    my $as  = $comp;
-    $as =~ s/.*(Model|View|Controller):://;
-	$self->log("  - Add Component into: $into comp:$comp as:$as");
-
-    Catalyst::Utils::inject_component( into => $into,
-                                       component => $comp,
-                                       as => $as );
-
-}
+        my ( $self, $module, $file ) = @_;
+         
+        my $libpath = $module->{libpath};
+        my $comp    = $file;
+        $comp =~ s|$libpath/?||;
+            $comp =~ s|\.pm$||;
+        $comp =~ s|/|::|g;
+         
+        my $into = $self->ctx;
+        my $as  = $comp;
+        $as =~ s/.*(Model|View|Controller):://;
+        $self->log("  - Add Component into: $into comp:$comp as:$as");
+         
+        Catalyst::Utils::inject_component( into => $into,
+                                               component => $comp,
+                                               as => $as );
+    }
 
 sub _search_in_path {
 	my $self  = shift;
-    my $path  = shift;
+        my $path  = shift;
 	my $regex = shift;
 
 	my @files;
@@ -518,8 +570,8 @@ sub _search_in_path {
 		return if !/$regex/;
 
 		my $file = $File::Find::name;
-		push @files, $file;
-	};
+                push @files, $file;
+            };
 
     find( $tf_finder, $path  );
 	return \@files;
@@ -532,7 +584,7 @@ CatalystX::InjectModule::MI Catalyst Module injector
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 

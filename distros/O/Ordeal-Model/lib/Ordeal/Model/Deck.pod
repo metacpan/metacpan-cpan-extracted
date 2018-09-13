@@ -1,0 +1,117 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Deck - Class for representing decks of cards
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model::Deck;
+
+   my $card = Ordeal::Model::Deck->new(
+      group => 'whatever',
+      id => 'AAA-bb-1235',
+      name => 'three of clubs',
+      cards => \@cards,
+   );
+
+=head1 DESCRIPTION
+
+This class represents a deck of cards. The representation is considered
+ordered, see L<Ordeal::Model::Shuffle> for a wrapper object for shuffling
+the cards.
+
+L</id> should be a unique identifier for the deck. L</cards> is the
+low-level accessor to the cards, although you shoud probably stick to the
+higher level interface provided by L</card_at> and L</n_cards>.
+
+L</group> can be used to group decks together, e.g. for assigning them to
+owners. All in all it is opaque data that you can use.
+
+L</name> is a name you can associate to the deck. Again, it's treated as
+opaque data, so you can abuse it.
+
+=head1 METHODS
+
+=begin COMMENT
+
+=head2 B<< BUILD >>
+
+Called upon construction.
+
+=end COMMENT
+
+
+=head2 B<< card_at >>
+
+   my $card = $deck->card_at($i);
+
+get the card in position C<$i>. Positions are assumed to start from 0 and
+arrive up to L</n_cards> minus one. Invalid indexes C<$i> trigger an
+exception.
+
+=head2 B<< cards >>
+
+   my @cards = $deck->cards;
+   $deck->cards(@cards);
+
+accessor for the list of cards. Note that it accepts and returns a list
+not an array reference.
+
+=head2 B<< group >>
+
+   my $group = $deck->group;
+   $deck->group($group);
+
+accessor for some c<group> metadata you might want to associate to the deck.
+Treated as opaque data.
+
+=head2 B<< id >>
+
+   my $id = $deck->id;
+   $deck->id($id);
+
+accessor for a unique identifer associated to the deck.
+
+=head2 B<< name >>
+
+   my $name = $deck->name;
+   $deck->name($name);
+
+accessor for a name associated to the deck.
+
+=head2 B<< n_cards >>
+
+   my $n = $deck->n_cards;
+
+returns the number of cards in the deck.
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

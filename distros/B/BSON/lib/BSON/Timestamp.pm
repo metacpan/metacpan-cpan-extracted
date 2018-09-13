@@ -6,9 +6,10 @@ package BSON::Timestamp;
 # ABSTRACT: BSON type wrapper for timestamps
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp ();
+use Tie::IxHash;
 
 use Moo;
 
@@ -31,6 +32,7 @@ has [qw/seconds increment/] => (
 use namespace::clean -except => 'meta';
 
 my $max_int32 = 2147483647;
+my $max_uint32 = 4_294_967_295;
 
 # Support back-compat 'sec' and inc' and legacy constructor shortcut
 sub BUILDARGS {
@@ -62,8 +64,8 @@ sub BUILD {
 
     for my $attr (qw/seconds increment/) {
         my $v = $self->$attr;
-        Carp::croak("BSON::Timestamp 'seconds' must be uint32")
-          unless $v >= 0 && $v <= $max_int32;
+        Carp::croak("BSON::Timestamp '$attr' must be uint32")
+          unless $v >= 0 && $v <= $max_uint32;
     }
 
     return;
@@ -79,7 +81,7 @@ sub BUILD {
 #pod =method TO_JSON
 #pod
 #pod If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     {"$timestamp" : { "t":<seconds>, "i":<increment> }}
@@ -91,7 +93,11 @@ sub BUILD {
 
 sub TO_JSON {
     if ( $ENV{BSON_EXTJSON} ) {
-        return { '$timestamp' => { t => $_[0]->{seconds}, i => $_[0]->{increment} } };
+        my %data;
+        tie %data, 'Tie::IxHash';
+        $data{t} = int($_[0]->{seconds});
+        $data{i} = int($_[0]->{increment});
+        return { '$timestamp' => \%data };
     }
 
     Carp::croak( "The value '$_[0]' is illegal in JSON" );
@@ -127,7 +133,7 @@ BSON::Timestamp - BSON type wrapper for timestamps
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -160,7 +166,7 @@ default is 0.
 =head2 TO_JSON
 
 If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     {"$timestamp" : { "t":<seconds>, "i":<increment> }}

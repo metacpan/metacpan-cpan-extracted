@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.892",
+  "VERSION" => "0.893",
   "test" => {
     "TESTS" => "t/*.t"
   }

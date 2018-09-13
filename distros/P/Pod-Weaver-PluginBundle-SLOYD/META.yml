@@ -16,13 +16,15 @@ name: Pod-Weaver-PluginBundle-SLOYD
 provides:
   Pod::Weaver::PluginBundle::SLOYD:
     file: lib/Pod/Weaver/PluginBundle/SLOYD.pm
-    version: '0.0001'
+    version: '0.0002'
 requires:
+  Pod::Elemental::Transformer::List: '0'
   Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::Include: '0'
   namespace::autoclean: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-Pod-Weaver-PluginBundle-SLOYD.git
-version: '0.0001'
+version: '0.0002'
 x_serialization_backend: 'YAML::Tiny version 1.70'

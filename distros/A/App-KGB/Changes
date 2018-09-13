@@ -1,5 +1,14 @@
-1.51 (2015-06-04)
-  [Damyan Ivanov]
+1.52 (2018-09-13)
+ [ gregor herrmann ]
+ * Add some documentation about the webhook configuration to kgb.conf(5).
+
+ [ Damyan Ivanov ]
+ * kgb-ci-report: avoid counting duplicate source packages in the UDD SQL query
+ * kgb-bot: add support to use_ssl configuration parameter (per network)
+   (defaults to 1)
+
+1.51 (2018-06-04)
+  [ Damyan Ivanov ]
   * kgb-ci-report: avoid boolean evaluation of Dpkg::Version object where a
     simple existence test is enough (Closes: #900699)
 

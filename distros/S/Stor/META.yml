@@ -30,9 +30,11 @@ no_index:
     - author
     - builder
 provides:
+  RmqPublishFactory:
+    file: lib/RmqPublishFactory.pm
   Stor:
     file: lib/Stor.pm
-    version: v1.4.0
+    version: v1.5.2
 requires:
   CHI::Driver::Memcached: '0.16'
   Cache::Memcached::Fast: '0.25'
@@ -45,18 +47,21 @@ requires:
   MojoX::Log::Dispatch::Simple: '0'
   Mojolicious: '7.77'
   Mojolicious::Plugin::CHI: '0.09'
+  Net::AMQP::RabbitMQ: '2.3'
   Net::Amazon::S3: '0'
   Net::Statsite::Client: '0'
   Path::Tiny: '0'
   Safe::Isa: '0'
   Syntax::Keyword::Try: '0'
+  Try::Tiny::Retry: '0'
+  URI::amqp: v0.1.3
   failures: '0'
   perl: v5.20.0
 resources:
   bugtracker: https://github.com/avast/Stor/issues
   homepage: https://github.com/avast/Stor
   repository: git://github.com/avast/Stor.git
-version: 1.4.0
+version: 1.5.2
 x_contributors:
   - 'Jan Seidl <janseidl@volny.cz>'
   - 'Jan Seidl <seidl@avast.com>'

@@ -1,7 +1,6 @@
 package eris::log::decoder::json;
 # ABSTRACT: Decodes any detected JSON in a log line from then opening curly brace
 
-use Const::Fast;
 use JSON::MaybeXS;
 use Moo;
 use namespace::autoclean;
@@ -10,7 +9,7 @@ with qw(
     eris::role::decoder
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub _build_priority { 99; }
@@ -46,7 +45,7 @@ eris::log::decoder::json - Decodes any detected JSON in a log line from then ope
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -57,7 +56,7 @@ and attempted to decode.
 This means the whole message doesn't need to be JSON, so you can syslog JSON
 and the L<eris::log::decoder::syslog> will properly handle the syslog headers
 and structure.  This decoder will then grab that JSON hashref and parse it
-correcty.
+correctly.
 
 =head1 ATTRIBUTES
 

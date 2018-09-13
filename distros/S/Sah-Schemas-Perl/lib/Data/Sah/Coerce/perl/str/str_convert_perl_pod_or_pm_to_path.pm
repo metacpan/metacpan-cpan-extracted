@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_convert_perl_pod_or_pm_to_path;
 
-our $DATE = '2018-06-04'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ sub coerce {
 
     my $res = {};
 
-    $res->{modules}{'Module::Path::More'} //= 0;
+    $res->{modules}{'Module::Path::More'} //= {version=>0, core=>0, pp=>1};
     $res->{expr_match} = "1";
     $res->{expr_coerce} = join(
         "",
@@ -55,7 +55,7 @@ Data::Sah::Coerce::perl::str::str_convert_perl_pod_or_pm_to_path - Convert POD/m
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Coerce::perl::str::str_convert_perl_pod_or_pm_to_path (from Perl distribution Sah-Schemas-Perl), released on 2018-06-04.
+This document describes version 0.014 of Data::Sah::Coerce::perl::str::str_convert_perl_pod_or_pm_to_path (from Perl distribution Sah-Schemas-Perl), released on 2018-09-11.
 
 =head1 DESCRIPTION
 
@@ -74,9 +74,6 @@ This rule is the same as
 L<Data::Sah::Coerce::perl::str::str_convert_perl_pm_or_pod_to_path> except that
 .pod is prioritized over .pm. If C<Foo.pm> and C<Foo.pod> are both found on the
 filesystem, C<Foo.pod> will be returned.
-
-Note that .pm is prioritized over .pod. If C<Foo.pm> and C<Foo.pod> are both
-found on the filesystem, C<Foo.pm> will be returned.
 
 =for Pod::Coverage ^(meta|coerce)$
 

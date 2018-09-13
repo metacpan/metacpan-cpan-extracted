@@ -1,6 +1,7 @@
 package eris::log::context::attacks::url;
 # ABSTRACT: Inspects URL's for common attack patterns
 
+use JSON::MaybeXS;
 use Const::Fast;
 use Moo;
 
@@ -9,45 +10,45 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
-# Web Attack Detection
-const my %WEIGHT => (
-    sqli    => 3,
-    xss     => 2,
-);
-my %_RAW = ();
+my %SUSPICIOUS = ();
 # Not significant on their own
-const my %NeedsMore => map { $_ => 1 } qw(select union update table sleep alter drop delete rand > \\), '&#';
+const my %NeedsMore => map { $_ => 1 } qw(select union update table sleep alter alert drop delete rand > \\), '&#';
 
-# Generic Attack Strings
-my @generic = map { quotemeta } qw(
-    etc/passwd etc/shadow /* */
-);
-push @generic, q{\\\\(?!x)}, q{bin/[a-z]*sh}, q{\w+\.(?:php|exe|dll|bat|cgi)\b};
-unshift @generic, q|\.\.(?:[\\\/]\.{0,2})+|;
-$_RAW{generic} = join '|', @generic;
 
-# SQL Injections
-$_RAW{sqli} =  join '|', map { qr/(?<=[^a-z_\-=])$_(?![a-z_\-=])/ } map { quotemeta } qw(
-    insert update delete drop alter select union table sleep concat rand
-), 'group by';
+sub BUILD {
 
-# XSS Attempts
-my @xss = map { qr/(?<=[^a-z_\-=])$_(?![a-z_\-=])/ } map { quotemeta } qw(
-    script alert onerror onload
-);
-push @xss, map { quotemeta } qw(
-    --> > ';
-), '&#';
-$_RAW{xss} = join('|', @xss);
+    # Initialize things to prevent running code at compile time
+    #
+    # Generic Attack Strings
+    my @Generic = map { quotemeta } qw(
+        etc/passwd etc/shadow /* */
+    );
+    push @Generic, q{\\\\(?!x)}, q{bin/[a-z]*sh}, q{\w+\.(?:exe|dll|bat|cgi)\b};
+    unshift @Generic, q|\.\.(?:[\\\/]\.{0,2})+|;
+    $SUSPICIOUS{generic} = join '|', @Generic;
 
-my %_SUSPICIOUS = ();
-foreach my $type (keys %_RAW) {
-    $_SUSPICIOUS{$type} = qr/($_RAW{$type})/;
+    # SQL Injections
+    my @SQLI = map { qr/(?<=[^a-z_\-=])$_(?![a-z_\-=])/ } map { quotemeta } qw(
+        insert update delete drop alter select union table sleep rand char chr
+    );
+    push @SQLI, qr/or\s+1=1\s*;\s*--/;
+    $SUSPICIOUS{sqli} =  join '|', @SQLI;
+
+    # XSS Attempts
+    my @XSS = map { qr/(?<=[^a-z_\-=])$_(?![a-z_\-=])/ } map { quotemeta } qw(
+        script alert onerror onload
+    );
+    push @XSS, map { quotemeta } qw(
+        --> > ';
+    ), '&#';
+    $SUSPICIOUS{xss} = join('|', @XSS);
+
+    const %SUSPICIOUS => %SUSPICIOUS;
+
 }
-const %_SUSPICIOUS => %_SUSPICIOUS;
 
 
 sub _build_priority { 100 }
@@ -56,12 +57,15 @@ sub _build_priority { 100 }
 sub _build_field { '_exists_' }
 
 
-sub _build_matcher { qr/(?:_url$)|(?:^(?:resource|referer)$)/ }
+sub _build_matcher { qr/(?:_ur[li]$)|(?:^resource$)/ }
 
 
 sub sample_messages {
-    my @msgs = split /\r?\n/, <<EOF;
-EOF
+    my @msgs = map { encode_json($_) } (
+        { resource => "https://www.example.com/?t='%20OR%201=1;--" },
+        { resource => "https://www.example.com/../../../etc/passwd" },
+        { resource => "https://www.example.com/?q='><script>alert(1);</script>" },
+    );
     return @msgs;
 }
 
@@ -69,57 +73,66 @@ EOF
 sub contextualize_message {
     my ($self,$log) = @_;
 
-    my $ctxt     = $log->context;
-    my $re       = $self->matcher;
-    my %add      = ();
-    my $score    = 0;
-    my $triggers = 0;
+    my $ctxt   = $log->context;
+    my $re     = $self->matcher;
+    my %add    = ();
+    my $score  = 0;
+    my %tokens = ();
+    my %tags   = ();
 
     foreach my $f ( keys %{ $ctxt } ) {
         next unless $f =~ /$re/o; # Optimize here, this will always be the same pattern
-        my %attack=();
-        my $score = 0;
+
         # Normalize (Lower casing, Unescaping)
-        my $url = $ctxt->{$f};
-        $url =~ s/%([0-9a-f]{2})/chr(hex($1))/eg;
-        $url=lc($url);
-        my @allmatches = ();
-        foreach my $type (keys %_SUSPICIOUS) {
-            next unless my @matches = ($url =~ /$_SUSPICIOUS{$type}/g);
-            my $weight = exists $WEIGHT{$type} ? $WEIGHT{$type} : 1;
-            $score += $attack{"${type}_score"} = $weight * @matches;
-            push @allmatches,@matches;
+        my $url = lc $ctxt->{$f} =~ s/%([0-9a-f]{2})/chr(hex($1))/reg;
+        my %attack  = ();
+        my @badness = ();
+
+        # We need to call each of these one at a time.  Since our regexes live
+        # in a hash, we can only optimize if they won't change.
+        if( my @sqli = ($url =~ /$SUSPICIOUS{sqli}/go ) ) {
+            push @badness, @sqli;
+            $attack{tags} = 'sqli';
+            $tags{sqli}   = 1;
         }
-        if( $score > 0 ) {
-            my %uniq = map { lc($_) =>1 } @allmatches;
-            my($t) = keys %uniq;
-            if( keys(%uniq) == 1 && exists $NeedsMore{$t} ) {
-                %attack=();
-            }
-            else {
-                # Make sure alerting checks the server status
-                my $multiplier = !exists $ctxt->{crit} ? 1 :
-                                 $ctxt->{crit} >= 500 ? 10 :
-                                 $ctxt->{crit} >= 400 ?  5 :
-                                 $ctxt->{crit} >= 300 ?  2 : 1;
-                # Total things up
-                $score    += $attack{score} = $score * $multiplier;
-                $triggers += $attack{triggers} = [ keys %uniq ];
-            }
+        elsif( my @xss = ($url =~ /$SUSPICIOUS{xss}/go ) ) {
+            push @badness, @xss;
+            $attack{tags} = 'xss';
+            $tags{xss}    = 1;
         }
-        $add{$f} = \%attack if keys %attack;
+        elsif( my @generic = ($url =~ /$SUSPICIOUS{generic}/go ) ) {
+            push @badness, @generic;
+            $attack{tags}  = 'generic';
+            $tags{generic} = 1;
+        }
+        next unless @badness;
+
+        # Extract the unique tokens for this field and globally
+        my %uniq;
+        foreach my $token (@badness) {
+            $uniq{$token} = $tokens{$token} = 1;
+        }
+        # Check that we're not squatting on a single english word
+        my($t) = keys %uniq;
+        if( keys(%uniq) == 1 && exists $NeedsMore{$t} ) {
+            next;
+        }
+        # Store the Score and Tokens
+        $score += $attack{score} = @badness;
+        $attack{tokens} = [ sort keys %uniq ];
+        $add{$f} = \%attack;
     }
 
     if( keys %add ) {
         # Continue summing incase other things added scores.
-        $score    += $ctxt->{attack_score}    if exists $ctxt->{attack_score};
-        $triggers += $ctxt->{attack_triggers} if exists $ctxt->{attack_triggers};
         $log->add_context($self->name, {
-            attacks         => \%add,
-            attack_score    => $score,
-            attack_triggers => $triggers,
+            attacks       => \%add,
+            attack_score  => $score,
+            attack_tokens => [ sort keys %tokens ],
+            attack_type   => [ sort keys %tags ],
         });
-        $log->add_tags(qw(security));
+        $tags{security} = 1;
+        $log->add_tags(keys %tags);
     }
 }
 
@@ -138,12 +151,12 @@ eris::log::context::attacks::url - Inspects URL's for common attack patterns
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
 This context matches any field ending in '_url' and inspects the URL for common
-attack patterns.  This is not sophisticated, but leverages the reconnaisance
+attack patterns.  This is not sophisticated, but leverages the reconnaissance
 stage of an attack in which attackers try unsophisticated things to look for
 weak spots in your infrastructure.
 
@@ -165,7 +178,7 @@ keys in the L<eris::log> context.
 
 =head2 matcher
 
-Defaults to matching the fields ending with '_url' or fields exact matching 'resource' or 'referer'
+Defaults to matching the fields ending with '_url', '_uri', or fields exact matching 'resource'.
 
 =head1 METHODS
 
@@ -195,6 +208,8 @@ This is a HashRef containing all the tokens and attack signatures tripped.
 =back
 
 Tags messages with 'security' if an attack string is detected.
+
+=for Pod::Coverage BUILD
 
 =for Pod::Coverage sample_messages
 

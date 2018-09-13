@@ -1,0 +1,131 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::ChaCha20 - Class for generating pseudo-random data
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model::ChaCha20;
+
+   my $rs = Ordeal::Model::ChaCha20->new(seed => 'abcdefg123456');
+
+=head1 DESCRIPTION
+
+This class is an adaptation from L<Math::Prime::Util::ChaCha> for shipping
+a pure-Perl cryptogrphic pseudo-random number generator to use for proper
+shuffling of decks. It is used by L<Ordeal::Model::Shuffle> as the default
+source for random data.
+
+The implementation of the core algorithm is taken from
+L<Math::Prime::Util::ChaCha>, adapted for proper "living" in an object.
+This allows having multiple independent random number generators at the
+same time. Additionally, the interface has been adapted for managing
+extraction of strings of bit in order to minimize the number of random
+data extracted and maximize the period (which is probably overkill for the
+goals of L<Ordeal::Model>, but whatever).
+
+The main method is L</int_rand>, which generates an integer between
+a minimum and a maximum value, both included.
+
+If you want to save the state of the generator for later restoring, e.g.
+because you want to pass it around as a Cookie, look for L</freeze> and
+L</restore>. It is also possible to L</reset> the generator to its initial
+state.
+
+Upon construction you can pass a L</seed> to influence the initial status
+of the generator.
+
+=head1 METHODS
+
+=begin COMMENT
+
+=head2 B<< BUILD >>
+
+This method is used during construction and is not to be called directly.
+
+=end COMMENT
+
+=head2 B<< clone >>
+
+   my $other = $rs->clone;
+
+create a clone of the random source, aligned at the very same state. The two
+sources will act independently after the cloning.
+
+=head2 B<< freeze >>
+
+   my $hex = $rs->freeze;
+
+generate an hex-encoded string representing the full state of the
+generator, for later restoring via L</restore>.
+
+=head2 B<< int_rand >>
+
+   my $n = $rs->int_rand($min, $max);
+
+generate a random integer value between C<$min> and C<$max>, both
+included.
+
+The algorithm uses the ChaCha20 algorithm behind the scenes to generate
+a stream of random bits. These bits are taken to generate a random integer
+value in an interval that contains C<< 0 .. ($max - $min + 1) >>, then
+applies a rejection method to eliminate bias.
+
+As an example, if you use it for rolling a die (C<$min = 1> and
+C<$max = 6>), it will take three random bits, generate a number between
+C<0> and C<7> and reject values C<6> and C<7>. The other ones will be
+mapped onto the allowed range C<1..6> with a simple addition of C<1>.
+
+=head2 B<< reset >>
+
+   $rs->reset;
+
+bring the generator back to the beginning state.
+
+=head2 B<< restore >>
+
+   $rs->restore($frozen_hex);
+
+restore the state of the generator from a previously frozen
+representation.
+
+=head2 B<< seed >>
+
+   my $seed = $rs->seed;
+   $rs->seed($seed);
+
+accessor for the seed. This is used during construction and also when
+L</reset> is called. It is suggested to set this value in the constructor
+and leave it at that. A seed will anyway be auto-generated when not
+available.
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -10,15 +10,16 @@ with qw(
     eris::role::decoder
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 # Configure Parse::Syslog::Line
-$Parse::Syslog::Line::DateTimeCreate = 0;
-$Parse::Syslog::Line::EpochCreate    = 1;
-$Parse::Syslog::Line::PruneRaw       = 1;
-$Parse::Syslog::Line::PruneEmpty     = 1;
-@Parse::Syslog::Line::PruneFields    = qw(
+$Parse::Syslog::Line::AutoDetectKeyValues = 1;
+$Parse::Syslog::Line::DateTimeCreate      = 0;
+$Parse::Syslog::Line::EpochCreate         = 1;
+$Parse::Syslog::Line::PruneRaw            = 1;
+$Parse::Syslog::Line::PruneEmpty          = 1;
+@Parse::Syslog::Line::PruneFields         = qw(
     date time date_str message offset
     preamble facility_int priority_int
 );
@@ -74,7 +75,7 @@ eris::log::decoder::syslog - Parse the syslog headers using Parse::Syslog::Line
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

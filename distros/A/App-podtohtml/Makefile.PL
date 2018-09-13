@@ -6,11 +6,18 @@ use 5.010001;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Convert POD to HTML",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "App-podtohtml",
   "EXE_FILES" => [
@@ -21,10 +28,15 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::podtohtml",
   "PREREQ_PM" => {
+    "Archive::Tar" => 0,
     "Browser::Open" => 0,
+    "Complete::Util" => "0.57",
+    "File::ShareDir" => 0,
+    "File::Slurper" => 0,
     "File::Temp" => 0,
+    "File::chdir" => 0,
+    "FindBin" => 0,
     "Module::Path::More" => "0.32",
-    "Perinci::Sub::Property::cmdline" => 0,
     "Pod::Html" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -35,7 +47,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,13 +55,18 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::Tar" => 0,
   "Browser::Open" => 0,
+  "Complete::Util" => "0.57",
+  "File::ShareDir" => 0,
+  "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
+  "File::chdir" => 0,
+  "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Path::More" => "0.32",
-  "Perinci::Sub::Property::cmdline" => 0,
   "Pod::Html" => 0,
   "Test::More" => 0,
   "strict" => 0,
@@ -67,3 +84,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

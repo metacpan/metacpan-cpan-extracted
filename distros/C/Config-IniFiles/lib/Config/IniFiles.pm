@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '2.98';
+our $VERSION = '3.000000';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -2381,7 +2381,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 2.98
+version 3.000000
 
 =head1 SYNOPSIS
 
@@ -2398,7 +2398,7 @@ sections can be grouped, and settings can be accessed from a tied hash.
 
 =head1 VERSION
 
-version 2.98
+version 3.000000
 
 =head1 FILE FORMAT
 
@@ -3165,9 +3165,9 @@ and
 
    ; overlay.ini
    [section1]
-   arg1=overriden
+   arg1=overridden
 
-Then C<< $overlay->val("section1", "arg1") >> is "overriden", while
+Then C<< $overlay->val("section1", "arg1") >> is "overridden", while
 C<< $overlay->val("section1", "arg0") >> is "unchanged from
 master.ini".
 
@@ -3342,7 +3342,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/Config-IniFiles/issues>
+L<https://github.com/shlomif/perl-Config-IniFiles/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -3451,8 +3451,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/Config-IniFiles>
+L<https://github.com/shlomif/perl-Config-IniFiles>
 
-  git clone git://github.com/shlomif/Config-IniFiles.git
+  git clone git://github.com/shlomif/perl-Config-IniFiles.git
 
 =cut

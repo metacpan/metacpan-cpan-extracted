@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2018-06-05'; # DATE
-our $VERSION = '0.892'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.893'; # VERSION
 
 use 5.010;
 use strict;
@@ -760,8 +760,10 @@ sub before_all_clauses {
             );
 
             if ($rule->{modules}) {
-                for (keys %{ $rule->{modules} }) {
-                    $self->add_runtime_module($cd, $_, {category=>'coerce'});
+                for my $mod (keys %{ $rule->{modules} }) {
+                    my $modspec = $rule->{modules}{$mod};
+                    $modspec = {version=>$modspec} unless ref $modspec eq 'HASH';
+                    $self->add_runtime_module($cd, $mod, {category=>'coerce', %$modspec});
                 }
             }
 
@@ -981,7 +983,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.892 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2018-06-05.
+This document describes version 0.893 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2018-09-11.
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ NAME
     BSON - BSON serialization and deserialization
 
 VERSION
-    version v1.6.7
+    version v1.8.0
 
 SYNOPSIS
         use BSON;
@@ -228,17 +228,44 @@ METHODS
     BSON codec. Alternative BSON codecs should define a similar class method
     that returns an Object ID of whatever type is appropriate.
 
-  inflate_extjson
-        use JSON::MaybeXS;
-        $data = decode_json( $json_string );
-        $bson->inflate_extjson( $data );
+  inflate_extjson (DEPRECATED)
+    This legacy method does not follow the MongoDB Extended JSON
+    <https://github.com/mongodb/specifications/blob/master/source/extended-j
+    son.rst> specification.
 
-    Given a hash reference, this method walks the hash, replacing any
-    MongoDB extended JSON
-    <https://docs.mongodb.org/manual/reference/mongodb-extended-json/> items
-    with BSON type-wrapper equivalents. Additionally, any JSON boolean
-    objects (e.g. "JSON::PP::Boolean") will be replaced with boolean.pm true
-    or false values.
+    Use "extjson_to_perl" instead.
+
+  perl_to_extjson
+        use JSON::MaybeXS;
+        my $ext = BSON->perl_to_extjson($data, \%options);
+        my $json = encode_json($ext);
+
+    Takes a perl data structure (i.e. hashref) and turns it into an MongoDB
+    Extended JSON
+    <https://github.com/mongodb/specifications/blob/master/source/extended-j
+    son.rst> structure. Note that the structure will still have to be
+    serialized.
+
+    Possible options are:
+
+    *   "relaxed" A boolean indicating if "relaxed extended JSON" should
+
+        be generated. If not set, the default value is taken from the
+        "BSON_EXTJSON_RELAXED" environment variable.
+
+  extjson_to_perl
+        use JSON::MaybeXS;
+        my $ext = decode_json($json);
+        my $data = $bson->extjson_to_perl($ext);
+
+    Takes an MongoDB Extended JSON
+    <https://github.com/mongodb/specifications/blob/master/source/extended-j
+    son.rst> data structure and inflates it into a Perl data structure. Note
+    that you have to decode the JSON string manually beforehand.
+
+    Canonically specified numerical values like "{"$numberInt":"23"}" will
+    be inflated into their respective "BSON::*" wrapper types. Plain numeric
+    values will be left as-is.
 
 FUNCTIONS
   encode
@@ -383,6 +410,13 @@ ENVIRONMENT
         backend implementation. It must implement the same API as
         "BSON::PP".
 
+    *   BSON_EXTJSON - if set, serializing BSON type wrappers via "TO_JSON"
+        will produce Extended JSON v2 output.
+
+    *   BSON_EXTJSON_RELAXED - if producing Extended JSON output, if this is
+        true, values will use the "Relaxed" form of Extended JSON, which
+        sacrifices type round-tripping for improved human readability.
+
 SEMANTIC VERSIONING SCHEME
     Starting with BSON "v0.999.0", this module is using a "tick-tock"
     three-part version-tuple numbering scheme: "vX.Y.Z"
@@ -433,6 +467,10 @@ CONTRIBUTORS
     *   Pat Gunn <pgunn@mongodb.com>
 
     *   Petr Písař <ppisar@redhat.com>
+
+    *   Robert Sedlacek <rs@474.at>
+
+    *   Thomas Bloor <tbsliver@shadow.cat>
 
     *   Yury Zavarin <yury.zavarin@gmail.com>
 

@@ -13,6 +13,7 @@ WriteMakefile(
     },
     TEST_REQUIRES  => {
         'Data::Dumper' => 0,
+        'JSON::PP'     => 0,
         'Path::Tiny'   => 0,
         'Test::More'   => 0,
         'Test::Output' => 0,

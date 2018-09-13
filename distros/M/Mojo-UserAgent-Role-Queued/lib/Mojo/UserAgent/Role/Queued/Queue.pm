@@ -8,7 +8,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 has jobs => sub { [] };
 has active => 0;
 has max_active => 4;
-has callback => sub { return sub { die "No Method set!"; } };
+has callback => undef;
 
 
 sub process {

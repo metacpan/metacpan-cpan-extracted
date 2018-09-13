@@ -1,5 +1,5 @@
 package HackaMol::Bond;
-$HackaMol::Bond::VERSION = '0.048';
+$HackaMol::Bond::VERSION = '0.049';
 #ABSTRACT: HackaMol Bond class
 use 5.008;
 use Moose;
@@ -76,7 +76,7 @@ HackaMol::Bond - HackaMol Bond class
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

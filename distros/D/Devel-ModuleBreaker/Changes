@@ -1,5 +1,8 @@
 Revision history for Devel-ModuleBreaker
 
+0.03	2018-09-12
+	Read PERL5DBX env variable for further debugging customization
+
 0.02	2018-01-30
 	Fix issue with perl 5.28 where stash entries are not necessarily
             typeglobs [RT#124240] (Patch from Father Chrysostomos)

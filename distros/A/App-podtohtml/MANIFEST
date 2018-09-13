@@ -10,6 +10,9 @@ dist.ini
 lib/App/podtohtml.pm
 script/_podtohtml
 script/podtohtml
+share/templates/metacpan-20180911.tar
+share/templates/perldoc_perl_org-20180911.tar
+share/templates/sco-20180123.tar
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

@@ -1,4 +1,15 @@
-Revision history for Software-Catalog
+1.0.1   2018-09-13 (PERLANCAR)
+
+	- Add role: VersionScheme::SemVer.
+
+
+1.0.0   2018-09-13 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Complete rewrite. Remove all routines from Software::Catalog, the
+          module becomes a specification.
+
 
 0.05    2015-09-04 (PERLANCAR)
 

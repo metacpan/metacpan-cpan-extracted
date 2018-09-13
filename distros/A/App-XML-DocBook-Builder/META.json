@@ -79,15 +79,15 @@
    "provides" : {
       "App::XML::DocBook::Builder" : {
          "file" : "lib/App/XML/DocBook/Builder.pm",
-         "version" : "0.0406"
+         "version" : "0.0500"
       },
       "App::XML::DocBook::Docmake" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.0406"
+         "version" : "0.0500"
       },
       "App::XML::DocBook::Docmake::CmdComponent" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.0406"
+         "version" : "0.0500"
       }
    },
    "release_status" : "stable",
@@ -103,10 +103,10 @@
          "web" : "https://github.com/shlomif/app-xml-docbook-builder"
       }
    },
-   "version" : "0.0406",
+   "version" : "0.0500",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028000"
       },
       "plugins" : [
          {
@@ -555,7 +555,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

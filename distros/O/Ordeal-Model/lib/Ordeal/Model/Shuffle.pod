@@ -1,0 +1,246 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Shuffle - Manage shuffling of Decks
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model::Shuffle;
+   use Ordeal::Model::Deck;
+
+   my $deck = Ordeal::Model::Deck->new(...);
+   my $shuffler = Ordeal::Model::Shuffle->new(
+      deck => Ordeal::Model::Deck->new(...),
+   );
+
+   my @three_cards = $shuffler->draw(3);
+   my $remaining = $shuffler->n_remaining;
+   my @rest = $shuffler->draw($remaining);
+
+   # start over, no reset on the random generator though
+   $shuffler->shuffle;
+   my $one_card = $shuffler->draw;
+
+   # shortcut to take the rest
+   my @rest2 = $shuffler->draw(0); # 0 => whatever remains
+
+   # set a different default number of cards for draw
+   $shuffler->default_n_draw(3); # take 3 cards by default
+   my @three = $shuffler->draw;
+
+   # restart from initial condition, with same seed
+   $shuffler->reset;
+
+   # Accessors
+   my $original_deck = $shuffler->deck;
+   my $n_default = $shuffler->default_n_draw;
+   my $chacha20_randomizer = $shuffler->random_source;
+   my $seed = $shuffler->seed;
+
+=head1 DESCRIPTION
+
+This class acts as a wrapper around an L<Ordeal::Model::Deck> to provide
+a shuffled version of its cards. You can access this via method L</deck>.
+
+Getting cards out of the shuffle is done via method L</draw>. You cannot
+ask for more cards than are left on the shuffled deck (they are virtually
+removed as long as you L</draw> them), you can check how many are left via
+method L</n_remaining>.
+
+Shuffling is performed using the Fisher-Yates algorithm, using
+a C<random_source> that defaults to an L<Ordeal::Model::ChaCha20> object,
+set at initialization. You can pass your own L</random_source> to the
+constructor if you want, the only requirement is that it supports an
+C<int_rand($min, $max)> method for generating integers between C<$min> and
+C<$max>, both included.
+
+You can reshuffle the deck via method L</shuffle>. You can also reset
+the whole thing to its initial state via method L</reset>; in this case,
+the L</random_source> MUST support a C<reset()> method as well.
+
+You can also set a I<sorted shuffle> by calling L</sort>. This will make so
+that L</draw> returns cards in the same order as they appear in L</deck>.
+Calling L</shuffle> reshuffles the cards again; this also happens if
+L</auto_reshuffle> is set (because it's called at the end of each L</draw>). By
+default, the constructor will give you a shuffled shuffle though, so L</sort>
+must be called explicitly.
+
+=head1 METHODS
+
+=begin COMMENT
+
+=head2 B<< BUILD >>
+
+This method is not really supposed to be called directly.
+
+=end COMMENT
+
+=head2 B<< auto_reshuffle >>
+
+   my $boolean = $shfl->auto_reshuffle;
+   $shfl->auto_reshuffle($boolean);
+
+accessor for a flag determining whether after each L</draw>
+a L</shuffle> should be called automatically. Setting this basically
+transforms the shuffle into a die.
+
+=head2 B<< clone >>
+
+   my $other = $shfl->clone(%args);
+
+clone the shuffle, including the current shuffling state (which is
+arguably overkill).
+
+You can pass the following overriding arguments:
+
+=over
+
+=item C<< auto_reshuffle >>
+
+whether L</shuffle> should be called upon each L</draw> or not.
+
+=item C<< default_n_draw >>
+
+the number of cards to draw by default.
+
+=item C<< random_source >>
+
+the random source object to use (or C<undef> if the default one is OK).
+If you don't pass this parameter, the L</clone> method will try to call
+a C<clone> method on whatever is set as random source in the generating
+object, to make sure it does support this operation.
+
+=back
+
+=head2 B<< deck >>
+
+   my $deck = $shfl->deck;
+   $shfl->deck($deck);
+
+accessor to the L<Ordeal::Model::Deck> object (or whatever supports its
+interface). You shouldn't really I<set> it after the object has been
+created; if you really want to, remember to at least L</shuffle>.
+
+=head2 B<< default_n_draw >>
+
+   my $default_n = $shfl->default_n_draw;
+   $shfl->default_n_draw($default_n);
+
+accessor for setting/getting the default number of cards to be taken per
+draw (i.e. when you don't pass an explicit number to L</draw>).
+
+=head2 B<< draw >>
+
+   my $card  = $shfl->draw;     # get 1 card
+   my @cards = $shfl->draw($n); # get n cards (n can be 1 of course)
+   my @all   = $shfl->draw(0);  # get all cards
+
+draw cards from the (possibly shuffled) deck.
+
+By default it returns L</default_n_draw>, honoring scalar context. You can
+optionally pass the number of cards you want, with the convention that C<0>
+means all the remaining ones.
+
+Depending on whether L</sort> or L</shuffle> was called last, the returned
+cards will be sorted or shuffled.
+
+If L</auto_reshuffle> is set, after drawing the cards, but before they are
+returned, L</shuffle> is called. Otherwise, the status is kept for the
+following call.
+
+The method will complain if the provided input is invalid, e.g. because
+it's not a number or it's out of range. You can check how many cards you
+can still draw via L</n_remaining>.
+
+=head2 B<< is_sorted >>
+
+   say 'sorted!' if $shfl->is_sorted;
+
+boolean flag to check whether a shuffle is sorted (i.e. L</sort> was
+called last) or not (i.e. L</shuffle> was called last).
+
+=head2 B<< n_remaining >>
+
+   my $n = $shfl->n_remaining;
+
+get the number of cards that still haven't been L</draw>n.
+
+=head2 B<< random_source >>
+
+   my $rs = $shfl->random_source;
+   $shfl->random_source($rs);
+
+The source of randomness for applying the Fisher-Yates algorithm. It MUST
+support a method with the following signature:
+
+   sub int_rand ($min, $max);
+
+for generating an integer between values C<$min> and C<$max>, both
+included. If you want to call L</reset>, the random source object MUST
+also support the following method:
+
+   sub reset;
+
+It defaults to an instance of L<Ordeal::Model::ChaCha20>, set at
+construction time.
+
+You can change this object at runtime, although your shuffling process
+might suffer from it because of the possible reduced randomness.
+
+=head2 B<< reset >>
+
+   $shfl->reset;
+
+completely reset the object. This means calling the C<reset> method over
+the L</random_source> object, as well as L</shuffle> the deck.
+
+=head2 B<< shuffle >>
+
+   $shfl->shuffle;
+
+(re)shuffle the shuffled deck, re-integrating all drawn cards (if any).
+
+As an example, if you have a deck with C<10> cards and you already called
+L</draw> to take C<7> of them, L</n_remaining> will tell you that there
+are C<3> left. Calling this method is the same as re-integrating the other
+C<7> into the deck, and shuffling it again.
+
+=head2 B<< sort >>
+
+   $shfl->sort;
+
+set a special shuffle mode where cards from L</draw> will appear in the same
+order as in L</deck>. Calling L</shuffle> (either directly, or implicitly via
+L</auto_shuffle>) resets the shuffle to a more random attitude. Calling this
+method always makes L</draw> restart from the first card in L</deck>.
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

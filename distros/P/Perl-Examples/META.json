@@ -30,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Exporter" : "5.57",
             "Getopt::Long" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -56,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Perl-Examples"
       }
    },
-   "version" : "0.091",
+   "version" : "0.092",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

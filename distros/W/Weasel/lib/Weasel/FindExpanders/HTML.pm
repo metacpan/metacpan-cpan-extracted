@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Weasel::FindExpanders::HTML - 
+Weasel::FindExpanders::HTML - Weasel FindExpanders HTML
 
 =head1 VERSION
 
@@ -15,6 +15,12 @@ Weasel::FindExpanders::HTML -
 
 =cut
 
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::FindExpanders::HTML;
 
 use strict;
@@ -23,6 +29,10 @@ use warnings;
 use Weasel::FindExpanders qw/ register_find_expander /;
 
 =head1 DESCRIPTION
+
+=cut
+
+=head1 SUBROUTINES/METHODS
 
 =over
 
@@ -46,7 +56,7 @@ sub button_expander {
     my @btn_clauses;
     if (defined $args{text}) {
         push @input_clauses, "(\@alt='$args{text}' or \@value='$args{text}')";
-        push @btn_clauses, "text()='$args{text}'";
+        push @btn_clauses, "normalize-space(text())=normalize-space('$args{text}')";
     }
 
     for my $clause (qw/ id name /) {
@@ -60,9 +70,10 @@ sub button_expander {
         (@input_clauses) ? join ' and ', ('', @input_clauses) : '';
     my $btn_clause =
         (@input_clauses) ? join ' and ', @btn_clauses : '';
-    return ".//input[(\@type='submit' or \@type='reset'
-                      or \@type='image' or \@type='button') $input_clause]
-            | .//button[$btn_clause]";
+    ##no critic(ProhibitInterpolationOfLiterals)
+    return ".//input[(\@type='submit' or \@type='reset'" .
+                     "or \@type='image' or \@type='button') $input_clause]" .
+            "| .//button[$btn_clause]";
 }
 
 =item checkbox_expander
@@ -98,7 +109,7 @@ sub contains_expander {
     my %args = @_;
 
     my $text = $args{text};
-    return ".//*[contains(.,'$text')][not(.//*[contains(.,'$text')])]";
+    return ".//*[contains(.,normalize-space('$text'))][not(.//*[contains(.,normalize-space('$text'))])]";
 }
 
 =item labeled_expander
@@ -114,9 +125,9 @@ Criteria:
 sub labeled_expander {
     my %args = @_;
 
-    my $tag = $args{tag_name} // '*';
+    my $tag = $args{tag_name} // q{*};
     my $text = $args{text};
-    return ".//${tag}[\@id=//label[text()='$text']/\@for]";
+    return ".//${tag}[\@id=//label[normalize-space(text())=normalize-space('$text')]/\@for]";
 }
 
 =item link_expander
@@ -133,7 +144,7 @@ sub link_expander {
 
     my $text = $args{text} // '';
     # A tags with not-"no href" (thus, with an href [any href])
-    return ".//a[not(not(\@href)) and text()='$text' or \@title='$text']";
+    return ".//a[not(not(\@href)) and normalize-space(text())=normalize-space('$text') or \@title='$text']";
 }
 
 =item option_expander
@@ -151,7 +162,7 @@ sub option_expander {
 
     my $text = $args{text} // '';
     my $value = $args{value} // '';
-    return ".//option[text()='$text' or \@value='$value']";
+    return ".//option[normalize-space(text())=normalize-space('$text') or \@value='$value']";
 }
 
 =item password_expander
@@ -217,7 +228,7 @@ sub select_expander {
     my @clauses;
     for my $clause (qw/ id name /) {
         push @clauses, "\@$clause='$args{$clause}'"
-            if defined $clause;
+            if defined $args{$clause};
     }
     my $clause = join ' and ', @clauses;
     return ".//select[$clause]";
@@ -259,5 +270,42 @@ register_find_expander($_->{name}, 'HTML', $_->{expander})
          {  name => 'text',     expander => \&text_expander      },
     );
 
+=back
+
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+ (C) 2016  Erik Huelsmann
+
+Licensed under the same terms as Perl.
+
+=cut
 
 1;

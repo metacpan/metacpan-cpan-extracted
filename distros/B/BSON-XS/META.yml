@@ -4,7 +4,7 @@ author:
   - 'David Golden <david@mongodb.com>'
 build_requires:
   B: '0'
-  BSON: '1.006006'
+  BSON: '1.008000'
   BSON::Types: '0'
   Carp: '0'
   Data::Dumper: '0'
@@ -13,11 +13,13 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   JSON::MaybeXS: '0'
+  JSON::PP: '2.97001'
   MIME::Base64: '0'
   Math::BigInt: '0'
   Path::Tiny: '0.054'
   Scalar::Util: '0'
   Test::Deep: '0'
+  Test::Fatal: '0'
   Test::More: '0.96'
   Tie::IxHash: '0'
   base: '0'
@@ -48,9 +50,9 @@ no_index:
 provides:
   BSON::XS:
     file: lib/BSON/XS.pm
-    version: v0.4.3
+    version: v0.4.4
 requires:
-  BSON: '1.006006'
+  BSON: '1.008000'
   XSLoader: '0'
   boolean: '0'
   perl: '5.010001'
@@ -61,7 +63,7 @@ resources:
   bugtracker: https://jira.mongodb.org/browse/PERL
   homepage: https://github.com/mongodb/mongo-perl-bson-xs
   repository: https://github.com/mongodb/mongo-perl-bson-xs.git
-version: v0.4.3
+version: v0.4.4
 x_authority: cpan:MONGODB
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,7 +1,42 @@
-SYNOPSIS
+NAME
+    App::PODUtils - Command-line utilities related to POD
 
+VERSION
+    This document describes version 0.040 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2018-09-11.
+
+SYNOPSIS
     This distribution provides the following command-line utilities related
     to Perl POD:
 
-    #INSERT_EXECS_LIST
+    *   elide-pod
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PODUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PODUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PODUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    pod2html
+
+    podtohtml from App::podtohtml
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

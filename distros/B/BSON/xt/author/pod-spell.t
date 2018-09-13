@@ -12,9 +12,11 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 BSON
 Binary
+Bloor
 Bool
 Bytes
 Code
+DBPointer
 DBRef
 Daniels
 David
@@ -46,8 +48,12 @@ Písař
 Raw
 Regex
 Riedel
+Robert
+Sedlacek
 Stefan
 String
+Symbol
+Thomas
 Time
 Timestamp
 Types
@@ -70,6 +76,8 @@ odc
 oid
 pgunn
 ppisar
+rs
 sharding
+tbsliver
 tock
 yury

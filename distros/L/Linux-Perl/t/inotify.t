@@ -101,6 +101,8 @@ sub _do_tests {
         die;
     }
 
+    like( $inotify->fileno(), qr<\A[1-9][0-9]*\z>, 'fileno()' );
+
     my $wd = $inotify->add( path => $dir, events => [ 'ONLYDIR', 'DONT_FOLLOW', 'ALL_EVENTS' ] );
 
     $inotify->read();

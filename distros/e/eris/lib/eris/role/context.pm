@@ -5,7 +5,7 @@ use Moo::Role;
 use Types::Standard qw(Str Defined Int);
 use namespace::autoclean;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 requires qw(
@@ -53,7 +53,7 @@ eris::role::context - Role for implementing a log context
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 ATTRIBUTES
 
@@ -163,14 +163,14 @@ This context will call C<contextualize_message> on documents with a field
 
 =head2 B<matcher>
 
-Maybe a B<String>, B<Regex>, B<ArrayRef>, or a B<CodeRef>. See documenation on
+Maybe a B<String>, B<Regex>, B<ArrayRef>, or a B<CodeRef>. See documentation on
 L<field> for information on the combinations and how to use them.
 
 =head1 INTERFACE
 
 =head2 contextualize_message
 
-This method will be called everytime a log matches this context.  It receives
+This method will be called every time a log matches this context.  It receives
 an C<eris::log> object.  Call C<eris::log->add_context> with the name of the
 context to add to the log context.
 

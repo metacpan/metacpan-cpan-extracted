@@ -3,14 +3,36 @@ use strict;
 use warnings;
 use Test::More 0.96;
 
+# Hijack the JSON::PP::USE_B constant to enable svtype detection
+BEGIN {
+    no warnings 'redefine';
+
+    require constant;
+    my $orig = constant->can('import');
+    local *constant::import = sub {
+        if ($_[1] eq 'USE_B') {
+            pop(@_);
+            push(@_, 1)
+        }
+        goto &$orig;
+    };
+
+    require JSON::PP;
+    die "TOO LATE"
+        unless JSON::PP::USE_B();
+}
+
 use B;
 use Carp qw/croak/;
 use Config;
-use JSON::MaybeXS;
+use JSON::PP ();
 
 use base 'Exporter';
-our @EXPORT =
-  qw/sv_type packed_is bytes_are to_extjson to_myjson try_or_fail INT64 INT32 FLOAT/;
+our @EXPORT = qw/
+    sv_type packed_is bytes_are to_extjson to_myjson try_or_fail
+    normalize_json
+    INT64 INT32 FLOAT
+/;
 
 use constant {
     INT64 => 'q<',
@@ -18,20 +40,24 @@ use constant {
     FLOAT => 'd<',
 };
 
-my $json_codec = JSON::MaybeXS->new(
-    ascii => 1,
-    pretty => 0,
-    canonical => 1,
-    allow_blessed => 1,
-    convert_blessed => 1,
-);
+my $json_codec = JSON::PP
+    ->new
+    ->ascii
+    ->allow_blessed
+    ->convert_blessed;
+
+sub normalize_json {
+    my $decoded = $json_codec->decode(shift);
+    return $json_codec->encode($decoded);
+}
 
 sub to_extjson {
-    local $ENV{BSON_EXTJSON} = 1;
-    return $json_codec->encode( shift );
+    my $data = BSON->perl_to_extjson($_[0], { relaxed => $_[1] });
+    return $json_codec->encode($data);
 }
 
 sub to_myjson {
+    local $ENV{BSON_EXTJSON} = 0;
     return $json_codec->encode( shift );
 }
 

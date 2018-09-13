@@ -6,6 +6,8 @@ use Carp;
 use curry;
 use IO::Select;
 use IO::Socket;
+use Net::EmptyPort qw/ empty_port /;
+use Socket qw/ SOCK_DGRAM /;
 
 use Net::Statsd::Lite;
 
@@ -80,14 +82,17 @@ sub send_tests {
 sub test_udp {
     my ( $self, $callback ) = @_;
 
-    my $socket = IO::Socket::INET->new(
-        LocalAddr => '127.0.0.1',
-        LocalPort => 0,
-        Proto     => $self->proto,
-    ) or croak $!;
+    my $port = empty_port( { proto => $self->proto } );
 
     my $pid = fork;
     if ($pid) {
+
+        my $socket = IO::Socket::INET->new(
+            LocalAddr => '127.0.0.1',
+            LocalPort => $port,
+            Proto     => $self->proto,
+            Type      => SOCK_DGRAM,
+        ) or croak $!;
 
         my $select = IO::Select->new;
         $select->add($socket);
@@ -110,7 +115,7 @@ sub test_udp {
     if ( defined $pid ) {
 
         my $client = Net::Statsd::Lite->new(
-            port            => $socket->sockport,
+            port            => $port,
             host            => $self->host,
             proto           => $self->proto,
             prefix          => $self->prefix,

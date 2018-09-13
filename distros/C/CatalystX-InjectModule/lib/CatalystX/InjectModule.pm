@@ -1,29 +1,27 @@
 use utf8;
 
 package CatalystX::InjectModule;
-$CatalystX::InjectModule::VERSION = '0.14';
+$CatalystX::InjectModule::VERSION = '0.17';
 use Moose::Role;
 use namespace::autoclean;
 use CatalystX::InjectModule::MI;
 use List::MoreUtils qw(uniq);
 
 after 'finalize_config' => sub {
-	my $c = shift;
+    my $c = shift;
 
     my $conf = $c->config->{'CatalystX::InjectModule'};
 
-    $c->mk_classdata('mi'); # we will use this name in Catalyst
+    $c->mk_classdata('mi');     # we will use this name in Catalyst
 
     # module injector
-	my $mi = $c->mi( CatalystX::InjectModule::MI->new(ctx => $c) );
+    my $mi = $c->mi( CatalystX::InjectModule::MI->new(ctx => $c) );
 
     $mi->load($conf);
-
-
 };
 
 after 'setup_components' => sub {
-	my $c = shift;
+    my $c = shift;
 
     my $conf = $c->config->{'CatalystX::InjectModule'};
 
@@ -45,7 +43,7 @@ after 'setup_components' => sub {
     # push templates path (.../root/static/)
     if ( $c->mi->_static_dirs ) {
         push( @{$c->mi->_static_dirs}, 'root/static' )
-                  if -d 'root/static';
+          if -d 'root/static';
         foreach my $static_dir ( reverse @{$c->mi->_static_dirs} ) {
             # XXX : And if Static::Simple is not used ?
             $static_dir =~ s|/static||;
@@ -69,7 +67,7 @@ CatalystX::InjectModule - injects modules containing components, plugins, config
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 This module is at EXPERIMENTAL stage, so use with caution.
 

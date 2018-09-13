@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perl/Examples.pm',
+    'Perl/Examples/Module/One.pm',
     'Perl/Examples/POD/HTML.pm',
     'Perl/Examples/POD/Link.pm',
     'Perl/Examples/POD/Text.pm'

@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "GeoIP2::Record::Location" => 0,
     "GeoIP2::Role::Model::HasSubdivisions" => 0,
     "GeoIP2::Role::Model::Location" => "2.004000",
-    "GeoIP2::Types" => 0,
+    "GeoIP2::Types" => "2.006001",
     "HTTP::Headers" => 0,
     "HTTP::Request" => 0,
     "JSON::MaybeXS" => 0,
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.008000",
+  "VERSION" => "1.009000",
   "test" => {
     "TESTS" => "t/*.t t/WebService/MinFraud/*.t t/WebService/MinFraud/Model/*.t t/WebService/MinFraud/Record/*.t"
   }
@@ -90,7 +90,7 @@ my %FallbackPrereqs = (
   "GeoIP2::Record::Location" => 0,
   "GeoIP2::Role::Model::HasSubdivisions" => 0,
   "GeoIP2::Role::Model::Location" => "2.004000",
-  "GeoIP2::Types" => 0,
+  "GeoIP2::Types" => "2.006001",
   "HTTP::Headers" => 0,
   "HTTP::Request" => 0,
   "HTTP::Response" => 0,

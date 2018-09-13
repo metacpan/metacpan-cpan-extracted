@@ -3,7 +3,7 @@ package WebService::MinFraud::Validator::Score;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 extends 'WebService::MinFraud::Validator::FraudService';
 
@@ -23,7 +23,7 @@ WebService::MinFraud::Validator::Score - Validation for the minFraud Score
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

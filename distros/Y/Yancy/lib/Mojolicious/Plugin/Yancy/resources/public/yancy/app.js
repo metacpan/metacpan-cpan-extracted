@@ -305,10 +305,14 @@ var app = new Vue({
                 }
 
                 if ( !definition[ 'x-list-columns' ] ) {
+                    var seen = {}; // keep track of columns seen in list
                     definition[ 'x-list-columns' ] = [
-                        'id', 'name', 'username', 'title', 'slug'
+                        definition[ 'x-id-field' ] || 'id', 'name', 'username', 'title', 'slug'
                     ].filter( function (x) {
-                        return !!definition.properties[x];
+                        if ( !seen[x] ) { seen[x] = 0 }
+                        // do not allow duplicate columns, if for
+                        // example the `x-id-field` is "name" or "username"
+                        return !seen[x]++ && definition.properties[x];
                     } );
                 }
 
@@ -510,9 +514,13 @@ var app = new Vue({
                 }
             ).done(
                 function ( data, status, jqXHR ) {
+                    var id = coll.operations['add'].schema['x-id-field'] || 'id';
+                    var urlParams = {};
+                    urlParams[ id ] = data;
+
                     $.ajax(
                         {
-                            url: self.fillUrl( coll.operations['get'].url, { id: data } ),
+                            url: self.fillUrl( coll.operations['get'].url, urlParams ),
                             method: 'GET',
                             dataType: 'json'
                         }

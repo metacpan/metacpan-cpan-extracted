@@ -60,7 +60,14 @@ sub getTree
     $help="empty";
   }
 
-  $self->tree(Git::LowLevel::Tree->new(repository=> $self->repository, reference=> $self, hash => $help));
+  if ($help eq "empty")
+  {
+    $self->tree(Git::LowLevel::Tree->new(repository=> $self->repository, reference=> $self, hash => $help));
+  }
+  else
+  {
+    $self->tree(Git::LowLevel::Tree->new(repository=> $self->repository, reference=> $self, hash => $help, changed=>1));
+  }
   return $self->tree;
 }
 
@@ -114,7 +121,7 @@ Git::LowLevel::Reference - class representing a reference in a git repository
 
 =head1 VERSION
 
-version 0.1
+version 0.3
 
 =head1 DESCRIPTION
 

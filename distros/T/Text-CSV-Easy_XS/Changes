@@ -1,5 +1,8 @@
 Revision history for Text-CSV-Easy_XS
 
+0.54    2018-09-12
+        Bug fix: properly extend stack (H.Merijn Brand)
+
 0.53    2014-01-14
         Adds more unit tests.
 

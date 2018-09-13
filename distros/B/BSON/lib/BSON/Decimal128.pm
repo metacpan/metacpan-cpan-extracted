@@ -6,7 +6,7 @@ package BSON::Decimal128;
 # ABSTRACT: BSON type wrapper for Decimal128
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp;
 use Math::BigInt;
@@ -165,7 +165,7 @@ sub _string_to_bid {
     my $s = shift;
 
     # Check special values
-    return $bidNaN    if $s =~ /\A NaN \z/ix;
+    return $bidNaN    if $s =~ /\A -? NaN \z/ix;
     return $bidPosInf if $s =~ /\A \+?Inf(?:inity)? \z/ix;
     return $bidNegInf if $s =~ /\A -Inf(?:inity)? \z/ix;
 
@@ -252,7 +252,7 @@ sub _string_to_bid {
 #pod Returns the value as a string.
 #pod
 #pod If the C<BSON_EXTJSON> option is true, it will instead
-#pod be compatible with MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod be compatible with MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     {"$numberDecimal" : "2.23372036854775807E+57"}
@@ -281,7 +281,7 @@ BSON::Decimal128 - BSON type wrapper for Decimal128
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -326,7 +326,7 @@ demand.
 Returns the value as a string.
 
 If the C<BSON_EXTJSON> option is true, it will instead
-be compatible with MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+be compatible with MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     {"$numberDecimal" : "2.23372036854775807E+57"}

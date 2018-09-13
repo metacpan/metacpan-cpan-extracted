@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 
@@ -21,9 +21,9 @@ C<Device::Chip::SSD1306> - chip driver for monochrome OLED modules
 
 =head1 DESCRIPTION
 
-This abstract L<Device::Chip> subclass provides communication to an F<SSD1306>
-or F<SH1106> chip attached by an adapter. To actually use it, you should use
-one of the subclasses for the various interface types.
+This abstract L<Device::Chip> subclass provides communication to an
+F<SSD1306>, F<SSD1309> or F<SH1106> chip attached by an adapter. To actually
+use it, you should use one of the subclasses for the various interface types.
 
 =over 4
 
@@ -55,6 +55,9 @@ constructor, which should take one of the following values:
 
 An F<SSD1306> driving a display with 128 columns and 64 rows. The most common
 of the display modules, often found with a 0.96 inch display.
+
+This setting also drives the F<SSD1309> chip found in the larger 1.6 or 2.4
+inch displays.
 
 =item C<SSD1306-128x32>
 
@@ -285,6 +288,22 @@ sub display_lamptest
    $self->send_cmd( CMD_DISPLAY_LAMPTEST + !!$enable );
 }
 
+=head2 display_invert
+
+   $chip->display_invert( $enable )->get
+
+Turn on or off the inverted output mode.
+
+=cut
+
+sub display_invert
+{
+   my $self = shift;
+   my ( $enable ) = @_;
+
+   $self->send_cmd( CMD_DISPLAY_INVERT + !!$enable );
+}
+
 =head2 send_display
 
    $chip->send_display( $pixels )->get
@@ -427,7 +446,7 @@ data, each character corresponding to a single pixel of the display. Pixels
 corresponding to a spaces will be left alone, a hyphen will be cleared, and
 any other character (for example a C<#>) will be set.
 
-For example, to draw an upward-pointing arrow:
+For example, to draw an rightward-pointing arrow:
 
    $chip->draw_blit( 20, 40,
       "   #  ",

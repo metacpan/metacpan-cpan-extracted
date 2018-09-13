@@ -17,16 +17,16 @@ name: Device-Chip-SSD1306
 provides:
   Device::Chip::SSD1306:
     file: lib/Device/Chip/SSD1306.pm
-    version: '0.06'
+    version: '0.07'
   Device::Chip::SSD1306::I2C:
     file: lib/Device/Chip/SSD1306/I2C.pm
-    version: '0.06'
+    version: '0.07'
   Device::Chip::SSD1306::SPI4:
     file: lib/Device/Chip/SSD1306/SPI4.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Device::Chip: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -36,8 +36,9 @@ requires:
   Test::Warn: '0.30'
   Time::HiRes: '1.975'
   YAML::XS: '0.69'
+  namespace::autoclean: '0'
 resources:
   homepage: https://github.com/demianriccardi/p5-HackaMol
   repository: https://github.com/demianriccardi/p5-HackaMol.git
-version: '0.048'
+version: '0.049'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -279,7 +279,8 @@ sub read_conf ($) {
         $conf->{networks}{$_}{nick}     ||= "KGB";
         $conf->{networks}{$_}{ircname}  ||= "KGB bot";
         $conf->{networks}{$_}{username} ||= "kgb";
-        $conf->{networks}{$_}{port}     ||= 6667;
+        $conf->{networks}{$_}{use_ssl}  //= 1;
+        $conf->{networks}{$_}{port}     ||= $conf->{networks}{$_}{use_ssl} ? 6697 : 6667;
         die "Missing server name in network $_\n"
             unless $conf->{networks}{$_}{server};
     }
@@ -937,7 +938,9 @@ sub _irc_reconnect {
             or ( $new->{nickserv_password} || "" ) ne
             ( $old->{nickserv_password} || "" )
             or $new->{server} ne $old->{server}
-            or $new->{port}   ne $old->{port} )
+            or $new->{port}   ne $old->{port}
+            or ( $new->{use_ssl} // '' ) ne ( $old->{use_ssl} // '' )
+    )
         {
             push @to_restart, $net;
         }
@@ -1033,6 +1036,7 @@ sub irc_registered {
             Username => $opts->{username},
             Password => $opts->{password},
             Flood    => $opts->{flood},
+            UseSSL   => $opts->{use_ssl},
         }
     );
     undef;

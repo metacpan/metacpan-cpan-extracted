@@ -1,5 +1,20 @@
 Revision history for BSON-XS
 
+v0.4.4    2018-09-12 23:14:04-04:00 America/New_York
+
+    [Bug fixes]
+
+    - PERL-998 Don't wrap top-level documents in a BSON::DBRef, even
+      if they have keys that resemble it
+
+    [Testing]
+
+    - Synchronize tests with BSON.pm
+
+    [Prereqs]
+
+    - Requires BSON.pm v1.8.0
+
 v0.4.3    2018-07-10 09:51:48-04:00 America/New_York
 
     [Testing]

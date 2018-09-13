@@ -6,7 +6,7 @@ use namespace::autoclean;
 use WebService::MinFraud::Data::Rx::Type::Enum;
 use WebService::MinFraud::Data::Rx::Type::IPAddress;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 extends 'WebService::MinFraud::Validator::Base';
 
@@ -77,7 +77,7 @@ WebService::MinFraud::Validator::Chargeback - Validation for the minFraud Charge
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SUPPORT
 

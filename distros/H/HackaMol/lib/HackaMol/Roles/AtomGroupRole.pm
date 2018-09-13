@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.048';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.049';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -412,13 +412,13 @@ sub string_pdb  {
 	my $string;
 	$string .= sprintf( "MODEL       %2i\n", $t + 1 ) unless $self->qcat_print;
 
-    my $atform = "%-6s%5i  %-3s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
+    my $atform = "%-6s%5i  %-3s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
 
     foreach my $at (@atoms) {
         # front pad one space if name length is < 4
         my $form = $atform;
         if (length $at->name > 3){
-          $form = "%-6s%5i %4s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n"
+          $form = "%-6s%5i %4s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n"
         }
         $string .= sprintf (
             $form,
@@ -528,7 +528,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ use Specio::Library::String;
 
 use Moo;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 has error => (
     is  => 'ro',
@@ -54,7 +54,7 @@ Code::TidyAll::Result - Result returned from processing a file/source
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

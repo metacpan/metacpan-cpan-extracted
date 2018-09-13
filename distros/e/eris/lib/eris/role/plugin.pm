@@ -4,7 +4,7 @@ package eris::role::plugin;
 use Moo::Role;
 use Types::Standard qw(Bool Int Str);
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 
@@ -61,12 +61,12 @@ eris::role::plugin - Common interface for implementing an eris plugin
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
 Sprinkled into other plugins in the eris project to set
-expectatations for the plugin loaders
+expectations for the plugin loaders
 
     package eris::role::context;
 
@@ -78,7 +78,7 @@ expectatations for the plugin loaders
 =head2 name
 
 The name of the plugin.  Defaults to stripping the plugin namespace from the
-object's class name and replacing '::' withn an underscore.
+object's class name and replacing '::' within an underscore.
 
 =head2 priority
 

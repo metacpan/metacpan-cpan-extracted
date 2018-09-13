@@ -1,9 +1,139 @@
 ==================================================
-Changes from 2015-12-05 00:00:00 +0000 to present.
+Changes from 2016-09-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2017-12-04 00:18:54 +0000
+version 0.007 at 2018-09-10 17:17:05 +0000
+------------------------------------------
+
+  Change: 51913f0aa78af31273482c567517fa9b1bbcd69f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-10 10:16:35 +0000
+
+    Don't track .json files in the directory 
+
+  Change: 508c2bfa7a736316c4e72d1161c75c64b13a1a22
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-10 10:04:50 +0000
+
+    RunExtraTests
+
+    Pass Pod::Coverage and Test::Pod::Spelling while we're at it. 
+
+  Change: 9e850d8b2c1eefa1bbc9ed7e8d776c2e13412abd
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-10 10:04:50 +0000
+
+    Extracting more complete information from the postfix logs 
+
+  Change: 7da992827392170656da09463dc05cab20a63f99
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-10 10:04:50 +0000
+
+    Allow the eris-context.pl tool to output the filtered document.
+
+    Added a method to_document() to the eris::schemas class to facilitate
+    displaying what would be indexed using a particular schema configuration. 
+
+  Change: 44e3cdb3bda3b73f69835fdad4713b6748fcb306
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-07 12:26:45 +0000
+
+    Override the program name in the iptables context 
+
+  Change: a2fbb8c14c72dec1bbcc34a21d41a8bea619e309
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-07 11:49:47 +0000
+
+    Allow output of data as JSON 
+
+  Change: 25f243908896b92c4678bfd2e814f64fc724b969
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-07 11:26:39 +0000
+
+    Fix option specifications for the tools 
+
+  Change: ddd4beb6ce8435e8c37cb638a3dda696e051d823
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-29 16:30:06 +0000
+
+    Use SDATA in eris::log::context::sshd 
+
+  Change: 643f89c2ceeb342ebc1921c71ed177e0c40227a8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-29 16:29:49 +0000
+
+    Optimize and improve eris::log::context::attacks::url
+
+    Add some samples to test detection with, optimize the regexes a bit,
+    restructure how data is added to the context so it's more useful. 
+
+  Change: 751b7b844eb677a6a33a4f6ef7b76443c7728074
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-29 16:11:07 +0000
+
+    Rewrite eris::log::context::sudo to use sdata store 
+
+  Change: cc318c95c8920a64c319d5111cd8f7766b3f25a9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-24 10:41:12 +0000
+
+    Set dependency on Parse::Syslog::Line v4.4
+
+    Fixed the AutoDetectKeyValues function in the 4.4 release of
+    Parse::Syslog::Line to the point this can be useful in this code base as
+    well. Enable AutoDetectKeyValues in eris::log::decoder::syslog. 
+
+  Change: 7a0f101bdbe16cf3ebecf40b7d081fd252dd106d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-02 22:26:56 +0000
+
+    Handle the Flush Interval correctly 
+
+  Change: 2bb36264edb35a6a200282afeb5a1e40f400f4be
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-02 22:14:59 +0000
+
+    Allow better configuration of the POE::Component::ElasticSearch::Indexer 
+
+  Change: 7736413ff8082279feb8347f60c7e0b80b3da3fc
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-02 16:26:11 +0000
+
+    Remove unused module 
+
+  Change: 3ceff2929a1ff27e0c74472b6ee76c98eae64c3c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-22 21:45:50 +0000
+
+    More housekeeping in the sessions. 
+
+  Change: 85a281a15062c3a6b6fab56aab174d119c048e75
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-22 21:36:00 +0000
+
+    Add Assertions for Debugging 
+
+  Change: 6cf03712bb4d8b0c5807bea84003df679addcb7d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-22 21:05:56 +0000
+
+    Shutdown the ElasticSearch Indexer 
+
+  Change: 4440e6900cea1f04801c143891f1a7b4b08caa64
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-22 20:58:20 +0000
+
+    Convert to POE::Component::ElasticSearch::Indexer 
+
+  Change: 04cf50c8fc63e3ee1168007a855fc9d4776ac57d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-02 20:02:41 +0000
+
+    Remove unnecessary code and squash a bug in stats reporting 
+
+------------------------------------------
+version 0.006 at 2017-12-04 00:18:50 +0000
 ------------------------------------------
 
   Change: b1231e5a3f970d07f07ec4e00cc4746634293c09

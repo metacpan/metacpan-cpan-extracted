@@ -24,6 +24,16 @@ Weasel::FindExpanders - Mapping find patterns to xpath locators
 
 =cut
 
+=head1 DESCRIPTION
+
+=cut
+
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::FindExpanders;
 
 use strict;
@@ -34,7 +44,7 @@ use Carp;
 
 our @EXPORT_OK = qw| register_find_expander expand_finder_pattern |;
 
-=head1 FUNCTIONS
+=head1 SUBROUTINES/METHODS
 
 =over
 
@@ -55,7 +65,7 @@ my %find_expanders;
 sub register_find_expander {
     my ($pattern_name, $group, $expander_function) = @_;
 
-    push @{$find_expanders{$group}{$pattern_name}}, $expander_function;
+    return push @{$find_expanders{$group}{$pattern_name}}, $expander_function;
 }
 
 =item expand_finder_pattern($pattern, $args, $groups)
@@ -72,9 +82,11 @@ is returned as the only list/arrayref element.
 sub expand_finder_pattern {
     my ($pattern, $args, $groups) = @_;
 
+    ##no critic(ProhibitCaptureWithoutTest)
     return $pattern
-        if ! ($pattern =~ m/^\*([^\|]+)/);
+        if ! ($pattern =~ m/^\*([^\|]+)/x);
     my $name = $1;
+    ##critic(ProhibitCaptureWithoutTest)
 
     croak "No expansions registered (while expanding '$pattern')"
         if scalar(keys %find_expanders) == 0;
@@ -84,11 +96,11 @@ sub expand_finder_pattern {
 
     my @matches;
 
-    for my $group (@$groups) {
+    for my $group (@{$groups}) {
         next if ! exists $find_expanders{$group}{$name};
 
         push @matches,
-          reverse map { $_->(%$args) } @{$find_expanders{$group}{$name}};
+          reverse map { $_->(%{$args}) } @{$find_expanders{$group}{$name}};
     }
 
     croak "No expansions matching '$pattern'"
@@ -101,5 +113,42 @@ sub expand_finder_pattern {
 
 =cut
 
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+ (C) 2016  Erik Huelsmann
+
+Licensed under the same terms as Perl.
+
+=cut
+
 
 1;
+

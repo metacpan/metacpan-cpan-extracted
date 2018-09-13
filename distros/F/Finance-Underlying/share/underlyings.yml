@@ -5085,3 +5085,323 @@ frxUSTXPT:
   quoted_currency: XPT
   submarket: minor_pairs
   symbol: frxUSTXPT
+frxUSBAED:
+  asset: USB
+  display_name: USB/AED
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: AED
+  submarket: minor_pairs
+  symbol: frxUSBAED
+frxUSBAUD:
+  asset: USB
+  display_name: USB/AUD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: AUD
+  submarket: minor_pairs
+  symbol: frxUSBAUD
+frxUSBBRL:
+  asset: USB
+  display_name: USB/BRL
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: BRL
+  submarket: minor_pairs
+  symbol: frxUSBBRL
+frxUSBCAD:
+  asset: USB
+  display_name: USB/CAD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CAD
+  submarket: minor_pairs
+  symbol: frxUSBCAD
+frxUSBCHF:
+  asset: USB
+  display_name: USB/CHF
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CHF
+  submarket: minor_pairs
+  symbol: frxUSBCHF
+frxUSBCNY:
+  asset: USB
+  display_name: USB/CNY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CNY
+  submarket: minor_pairs
+  symbol: frxUSBCNY
+frxUSBCZK:
+  asset: USB
+  display_name: USB/CZK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CZK
+  submarket: minor_pairs
+  symbol: frxUSBCZK
+frxUSBEGP:
+  asset: USB
+  display_name: USB/EGP
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: EGP
+  submarket: minor_pairs
+  symbol: frxUSBEGP
+frxUSBEUR:
+  asset: USB
+  display_name: USB/EUR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: minor_pairs
+  symbol: frxUSBEUR
+frxUSBGBP:
+  asset: USB
+  display_name: USB/GBP
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: GBP
+  submarket: minor_pairs
+  symbol: frxUSBGBP
+frxUSBHKD:
+  asset: USB
+  display_name: USB/HKD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: HKD
+  submarket: minor_pairs
+  symbol: frxUSBHKD
+frxUSBIDR:
+  asset: USB
+  display_name: USB/IDR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: IDR
+  submarket: minor_pairs
+  symbol: frxUSBIDR
+frxUSBINR:
+  asset: USB
+  display_name: USB/INR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: INR
+  submarket: minor_pairs
+  symbol: frxUSBINR
+frxUSBJPY:
+  asset: USB
+  display_name: USB/JPY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: JPY
+  submarket: minor_pairs
+  symbol: frxUSBJPY
+frxUSBKRW:
+  asset: USB
+  display_name: USB/KRW
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: KRW
+  submarket: minor_pairs
+  symbol: frxUSBKRW
+frxUSBKWD:
+  asset: USB
+  display_name: USB/KWD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: KWD
+  submarket: minor_pairs
+  symbol: frxUSBKWD
+frxUSBMXN:
+  asset: USB
+  display_name: USB/MXN
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: MXN
+  submarket: minor_pairs
+  symbol: frxUSBMXN
+frxUSBNOK:
+  asset: USB
+  display_name: USB/NOK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: NOK
+  submarket: minor_pairs
+  symbol: frxUSBNOK
+frxUSBNZD:
+  asset: USB
+  display_name: USB/NZD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: NZD
+  submarket: minor_pairs
+  symbol: frxUSBNZD
+frxUSBPLN:
+  asset: USB
+  display_name: USB/PLN
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: PLN
+  submarket: minor_pairs
+  symbol: frxUSBPLN
+frxUSBRUB:
+  asset: USB
+  display_name: USB/RUB
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: RUB
+  submarket: minor_pairs
+  symbol: frxUSBRUB
+frxUSBSAR:
+  asset: USB
+  display_name: USB/SAR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SAR
+  submarket: minor_pairs
+  symbol: frxUSBSAR
+frxUSBSEK:
+  asset: USB
+  display_name: USB/SEK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SEK
+  submarket: minor_pairs
+  symbol: frxUSBSEK
+frxUSBSGD:
+  asset: USB
+  display_name: USB/SGD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SGD
+  submarket: minor_pairs
+  symbol: frxUSBSGD
+frxUSBTRY:
+  asset: USB
+  display_name: USB/TRY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: TRY
+  submarket: minor_pairs
+  symbol: frxUSBTRY
+frxUSBUSD:
+  asset: USB
+  display_name: USB/USD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: minor_pairs
+  symbol: frxUSBUSD
+frxUSBXAG:
+  asset: USB
+  display_name: USB/XAG
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XAG
+  submarket: minor_pairs
+  symbol: frxUSBXAG
+frxUSBXAU:
+  asset: USB
+  display_name: USB/XAU
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XAU
+  submarket: minor_pairs
+  symbol: frxUSBXAU
+frxUSBZAR:
+  asset: USB
+  display_name: USB/ZAR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: ZAR
+  submarket: minor_pairs
+  symbol: frxUSBZAR
+frxUSBBRO:
+  asset: USB
+  display_name: USB/BRO
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: BRO
+  submarket: minor_pairs
+  symbol: frxUSBBRO
+frxUSBXPD:
+  asset: USB
+  display_name: USB/XPD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XPD
+  submarket: minor_pairs
+  symbol: frxUSBXPD
+frxUSBXPT:
+  asset: USB
+  display_name: USB/XPT
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XPT
+  submarket: minor_pairs
+  symbol: frxUSBXPT

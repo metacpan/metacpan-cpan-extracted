@@ -3,6 +3,9 @@ abstract: 'Various Sah schemas related to ISBN (International Standard Book Numb
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
+  Algorithm::CheckDigits: '0'
+  Algorithm::CheckDigits::M10_004: '0'
+  Algorithm::CheckDigits::M11_001: '0'
   Data::Sah::Coerce: '0.025'
   File::Spec: '0'
   IO::Handle: '0'
@@ -24,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-ISBN
   homepage: https://metacpan.org/release/Sah-Schemas-ISBN
   repository: git://github.com/perlancar/perl-Sah-Schemas-ISBN.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

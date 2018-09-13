@@ -3,16 +3,13 @@ package Code::TidyAll::Plugin::PHPCodeSniffer;
 use strict;
 use warnings;
 
-use IPC::Run3;
-use Text::ParseWords qw(shellwords);
-
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 sub _build_cmd {'phpcs'}
 
@@ -40,7 +37,7 @@ Code::TidyAll::Plugin::PHPCodeSniffer - Use phpcs with tidyall
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

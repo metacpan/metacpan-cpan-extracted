@@ -188,6 +188,8 @@ C<MASK_ADD>, C<ONESHOT>
 
 Note that your kernel may not recognize all of these.
 
+=back
+
 =cut
 
 sub add {
@@ -211,6 +213,16 @@ sub add {
         0 + $events_mask,
     );
 }
+
+#----------------------------------------------------------------------
+
+=head2 I<OBJ>->fileno()
+
+Returns the inotify instance’s file descriptor number.
+
+=cut
+
+sub fileno { return $_[0][0] }
 
 #----------------------------------------------------------------------
 

@@ -3,16 +3,13 @@ package Code::TidyAll::Plugin::CSSUnminifier;
 use strict;
 use warnings;
 
-use IPC::System::Simple qw(run);
-use Text::ParseWords qw(shellwords);
-
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 sub _build_cmd {'cssunminifier'}
 

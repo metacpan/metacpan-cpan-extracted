@@ -1,5 +1,20 @@
 Revision history for BSON
 
+v1.8.0    2018-09-12 20:57:40-04:00 America/New_York
+
+    [*** Deprecations ***]
+
+    - Deprecated the 'inflate_extjson' method in favor of the new
+      'extjson_to_perl' method.
+
+    [Added]
+
+    - PERL-747 Added support for Extended JSON v2
+
+    [Testing]
+
+    - PERL-738 Added regression tests for Perl->BSON edge cases
+
 v1.6.7    2018-07-10 09:58:56-04:00 America/New_York
 
     [Testing]

@@ -54,6 +54,8 @@ examples/Zmatrix/ethane_ss.pl
 examples/Zmatrix/propane_ss.pl
 examples/Zmatrix/valine.zmat
 examples/Zmatrix/zmat.pl
+examples/cif/parse_dump.pl
+examples/cif/parse_dump_mols.pl
 examples/group_rot.pl
 examples/hackamol_synopsis.pl
 examples/store.pl
@@ -81,8 +83,10 @@ lib/HackaMol/Roles/PdbRole.pm
 lib/HackaMol/Roles/PhysVecMVRRole.pm
 lib/HackaMol/Roles/QmAtomRole.pm
 lib/HackaMol/Roles/QmMolRole.pm
+lib/HackaMol/Roles/RcsbRole.pm
 lib/HackaMol/Roles/ReadPdbRole.pm
 lib/HackaMol/Roles/ReadPdbqtRole.pm
+lib/HackaMol/Roles/ReadPdbxRole.pm
 lib/HackaMol/Roles/ReadXyzRole.pm
 lib/HackaMol/Roles/ReadYAMLRole.pm
 lib/HackaMol/Roles/ReadZmatRole.pm
@@ -104,6 +108,7 @@ t/HackaMol/Roles/FileRole.t
 t/HackaMol/Roles/PdbRole.t
 t/HackaMol/Roles/PhysVecMVRRole.t
 t/HackaMol/Roles/QmRole.t
+t/HackaMol/Roles/RcsbRole.t
 t/HackaMol/Roles/SelectionRole.t
 t/lib/1L2Y.xyz
 t/lib/1L2Y_mod123.pdb

@@ -1,5 +1,5 @@
 package HackaMol::Roles::PdbRole;
-$HackaMol::Roles::PdbRole::VERSION = '0.048';
+$HackaMol::Roles::PdbRole::VERSION = '0.049';
 #ABSTRACT: PdbRole of lazy attributes for HackaMol atoms
 use Moose::Role;
 use Carp;
@@ -29,22 +29,33 @@ sub aa321 {
 
 has 'record_name', is => 'rw', isa => 'Str', lazy => 1, default => 'HETATM';
 has 'occ',         is => 'rw', isa => 'Num', lazy => 1, default => 1.0;
-has 'bfact',       is => 'rw', isa => 'Num', lazy => 1, default => 20.0;
+has 'bfact',       is => 'rw', isa => 'Num', lazy => 1, default => 20.0; 
+# b_iso
+# b_aniso (vector) would be better here
 has 'bfp',         is => 'rw', isa => 'Num'  ; # bfactor profile 
                                                          # (10.1016/j.jmb.2015.09.024)
 has 'resname',     is => 'rw', isa => 'Str', lazy => 1, default => 'UNK';
+# cif label_asym_id
 has 'chain',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
+# cif label_alt_id
 has 'altloc',      is => 'rw', isa => 'Str', lazy => 1, default => ' ';
 has 'icode',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
 has 'pdbid',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
+# cif label_seq_id 
 has 'segid',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
 has 'iatom',       is => 'rw', isa => 'Int', lazy => 1, default => 0;
-has 'resid',       is => 'rw', isa => 'Int', lazy => 1, default => 1;
+has 'resid',       is => 'rw', isa => 'Str', lazy => 1, default => 1;
 has 'serial',      is => 'rw', isa => 'Int', lazy => 1, default => 1;
 has 'sasa',        is => 'rw', isa => 'Num', lazy => 1, default => 0.0;
+has 'model_num',   is => 'rw', isa => 'Num'; # cif
+has 'auth_seq_id', is => 'rw', isa => 'Int'; # cif, -> author fudged resid
+has 'auth_comp_id', is => 'rw', isa => 'Str'; # cif, -> author fudged resname
+has 'auth_asym_id', is => 'rw', isa => 'Str'; # cif
+has 'auth_atom_id', is => 'rw', isa => 'Str'; # cif  -> author fudged name
+has 'entity_id',    is => 'rw', isa => 'Int'; # cif, e.g. virus, main chains of 1 entity
+has 'pdb_formal_charge',    is => 'rw', isa => 'Num'; # cif, e.g. virus, main chains of 1 entity
 
-#lifted from Bio::PDB::Structure::Atom. Thank you, Raul Alcantara Aragon!
-
+#following map lifted from Bio::PDB::Structure::Atom
 
 my %pdb_atom_names = (
     'C'    => ' C  ',
@@ -247,7 +258,7 @@ HackaMol::Roles::PdbRole - PdbRole of lazy attributes for HackaMol atoms
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

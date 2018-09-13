@@ -15,6 +15,7 @@ corpus/code.json
 corpus/code_w_scope.json
 corpus/datetime.json
 corpus/dbpointer.json
+corpus/dbref.json
 corpus/decimal128-1.json
 corpus/decimal128-2.json
 corpus/decimal128-3.json
@@ -33,6 +34,8 @@ corpus/int32.json
 corpus/int64.json
 corpus/maxkey.json
 corpus/minkey.json
+corpus/multi-type-deprecated.json
+corpus/multi-type.json
 corpus/null.json
 corpus/oid.json
 corpus/regex.json
@@ -50,6 +53,7 @@ lib/BSON/Binary.pm
 lib/BSON/Bool.pm
 lib/BSON/Bytes.pm
 lib/BSON/Code.pm
+lib/BSON/DBPointer.pm
 lib/BSON/DBRef.pm
 lib/BSON/Decimal128.pm
 lib/BSON/Doc.pm
@@ -64,6 +68,7 @@ lib/BSON/PP.pm
 lib/BSON/Raw.pm
 lib/BSON/Regex.pm
 lib/BSON/String.pm
+lib/BSON/Symbol.pm
 lib/BSON/Time.pm
 lib/BSON/Timestamp.pm
 lib/BSON/Types.pm
@@ -85,6 +90,7 @@ t/corpus/code_w_scope.t
 t/corpus/corpus.pl
 t/corpus/datetime.t
 t/corpus/dbpointer.t
+t/corpus/dbref.t
 t/corpus/decimal128-1.t
 t/corpus/decimal128-2.t
 t/corpus/decimal128-3.t
@@ -98,6 +104,7 @@ t/corpus/int32.t
 t/corpus/int64.t
 t/corpus/maxkey.t
 t/corpus/minkey.t
+t/corpus/multi-type.t
 t/corpus/null.t
 t/corpus/oid.t
 t/corpus/regex.t
@@ -136,6 +143,9 @@ t/mapping/time.t
 t/mapping/timestamp.t
 t/pvtlib/CleanEnv.pm
 t/pvtlib/PPSubclass.pm
+t/regression/boolean_copy.t
+t/regression/scalar_ref_value.t
+t/regression/undef_round_trip.t
 t/wrapper_apis.t
 xt/author/00-compile.t
 xt/author/critic.t

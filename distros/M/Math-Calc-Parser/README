@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
 
       use Math::Calc::Parser 'calc';
+      use utf8; # for π in source code
       
       my $result = calc '2 + 2'; # 4
       my $result = calc 'int rand 5'; # Random integer between 0 and 4
@@ -14,7 +15,7 @@ SYNOPSIS
       
       # Class methods
       my $result = Math::Calc::Parser->evaluate('2 + 2'); # 4
-      my $result = Math::Calc::Parser->evaluate('3pi^2'); # 29.608813203268
+      my $result = Math::Calc::Parser->evaluate('3π^2'); # 29.608813203268
       my $result = Math::Calc::Parser->evaluate('0.7(ln 4)'); # 0.970406052783923
       
       # With more advanced error handling
@@ -36,8 +37,8 @@ SYNOPSIS
       my $result = $parser->try_evaluate('triple triple'); # undef (Malformed expression)
       die $parser->error unless defined $result;
       
-      $parser->remove_functions('pi', 'e');
-      $parser->evaluate('3pi'); # Invalid function exception
+      $parser->remove_functions('π', 'e');
+      $parser->evaluate('3π'); # Invalid function exception
 
 DESCRIPTION
 
@@ -97,22 +98,23 @@ METHODS
 
  try_evaluate
 
-      if (defined (my $result = Math::Calc::Parser->evaluate('floor 2.5'))) {
+      if (defined (my $result = Math::Calc::Parser->try_evaluate('floor 2.5'))) {
         print "Result: $result\n";
       } else {
         print "Error: ".Math::Calc::Parser->error."\n";
       }
       
-      if (defined (my $result = $parser->evaluate('log(5'))) {
+      if (defined (my $result = $parser->try_evaluate('log(5'))) {
             print "Result: $result\n";
       } else {
             print "Error: ".$parser->error."\n";
       }
 
     Same as "evaluate" but instead of throwing an exception on failure,
-    returns undef and sets the "error" attribute to the error message. The
-    error message for the most recent "try_evaluate" call can also be
-    retrieved from the package variable $Math::Calc::Parser::ERROR.
+    returns undef. The "error" method can then be used to retrieve the
+    error message. The error message for the most recent "try_evaluate"
+    call can also be retrieved from the package variable
+    $Math::Calc::Parser::ERROR.
 
  error
 
@@ -217,6 +219,10 @@ DEFAULT FUNCTIONS
     pi
 
       π
+
+    π
+
+      π (this must be the decoded Unicode character)
 
     rand
 

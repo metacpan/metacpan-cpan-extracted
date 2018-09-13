@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION=1.0008;
+our $VERSION=1.0009;
 
 our $HANDLE_SQL_STRING=\&stub_function;
 our $HANDLE_EXECUTE=\&handle_execute;
@@ -21,6 +21,12 @@ sub handle_execute {
 }
 
 our $CACHE={};
+
+has cache_sth=>(
+  isa=>Bool,
+  is=>'ro',
+  default=>1,
+);
 
 has sth_cache=>(
   isa=>HashRef,
@@ -83,6 +89,7 @@ The session should be set to "DatabasePlugin" in order to use this session engin
         session_table: "SESSIONS"
         id_column:     "SESSION_ID"
         data_column:   "SESSION_DATA"
+        cache_sth:     1 # default 1, when set to 0 statement handles are not cached
 
   plugins:
     Database:
@@ -249,6 +256,9 @@ sub get_sth($) {
   my $sth;
   $HANDLE_SQL_STRING->($method,$query,$self->dbh,$sth);
   $sth=$self->dbh->prepare($query) unless defined($sth);
+
+  # only cache the statement handle if we are told too
+  return $sth unless $self->cache_sth;
   return $self->sth_cache->{$method}=$sth;
 }
 

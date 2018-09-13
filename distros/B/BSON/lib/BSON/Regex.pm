@@ -6,9 +6,10 @@ package BSON::Regex;
 # ABSTRACT: BSON type wrapper for regular expressions
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp ();
+use Tie::IxHash;
 
 use Moo;
 
@@ -82,10 +83,10 @@ sub try_compile {
 #pod =method TO_JSON
 #pod
 #pod If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
-#pod     {"$regex" : "<pattern>", "$options" : "<flags>"}
+#pod     {"$regularExpression" : { pattern: "<pattern>", "options" : "<flags>"} }
 #pod
 #pod If the C<BSON_EXTJSON> option is false, an error is thrown, as this value
 #pod can't otherwise be represented in JSON.
@@ -94,7 +95,13 @@ sub try_compile {
 
 sub TO_JSON {
     if ( $ENV{BSON_EXTJSON} ) {
-        return { '$regex' => $_[0]->{pattern}, '$options' => $_[0]->{flags} };
+        my %data;
+        tie( %data, 'Tie::IxHash' );
+        $data{pattern} = $_[0]->{pattern};
+        $data{options} = $_[0]->{flags};
+        return {
+            '$regularExpression' => \%data,
+        };
     }
 
     Carp::croak( "The value '$_[0]' is illegal in JSON" );
@@ -113,7 +120,7 @@ BSON::Regex - BSON type wrapper for regular expressions
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -158,10 +165,10 @@ to read L<re> and never to use untrusted input with C<try_compile>.
 =head2 TO_JSON
 
 If the C<BSON_EXTJSON> option is true, returns a hashref compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
-    {"$regex" : "<pattern>", "$options" : "<flags>"}
+    {"$regularExpression" : { pattern: "<pattern>", "options" : "<flags>"} }
 
 If the C<BSON_EXTJSON> option is false, an error is thrown, as this value
 can't otherwise be represented in JSON.

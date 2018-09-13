@@ -1,3 +1,9 @@
+0.893   2018-09-11 (PERLANCAR)
+
+	- Allow coerce module to supply information about whether a Perl
+	  module is core or pp.
+
+
 0.892   2018-06-05 (PERLANCAR)
 
 	- No functional changes.

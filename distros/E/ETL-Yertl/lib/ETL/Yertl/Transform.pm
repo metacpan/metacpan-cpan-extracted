@@ -1,5 +1,5 @@
 package ETL::Yertl::Transform;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: Transform a stream of documents
 
 #pod =head1 SYNOPSIS
@@ -305,7 +305,7 @@ ETL::Yertl::Transform - Transform a stream of documents
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

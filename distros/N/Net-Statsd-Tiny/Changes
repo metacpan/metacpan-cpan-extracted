@@ -1,5 +1,16 @@
 Revision history for Net-Statsd-Tiny
 
+v0.3.2    2018-09-13 18:24:59+01:00 Europe/London
+  [Incompatable Changes]
+  - Removed deprecated add_set method.
+
+  [Other Changes]
+  - Removed stub Net::Statsd::Tiny::Types module.
+
+  [Tests]
+  - Updated tests to be more Windows-friendly (backported from
+    Net-Statsd-Lite).
+
 v0.3.1    2018-05-02 20:58:00+01:00 Europe/London
   [Documentation]
   - Rewrote the section about data validation.

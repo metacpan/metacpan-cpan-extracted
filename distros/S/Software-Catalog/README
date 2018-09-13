@@ -1,30 +1,48 @@
+NAME
+    Software::Catalog - Software catalog
+
+VERSION
+    This document describes version 1.0.1 of Software::Catalog (from Perl
+    distribution Software-Catalog), released on 2018-09-13.
+
 SYNOPSIS
-
-     use Software::Catalog qw(list_software get_software_info);
-     my $res = list_software();
-     $res    = get_software_info(software_id => 'wordpress');
-
-STATUS
-
-    Proof of concept. Incomplete catalog.
-
 DESCRIPTION
+    STATUS: experimental.
 
-    This module contains catalog of software.
+    Software::Catalog is a specification for "Software::Catalog::SW::*"
+    modules. Each "Software::Catalog::SW::*" module describes a software
+    (e.g. firefox), including:
 
-    Currently the main use for this module is to establish a common name
-    for a software and find the Debian source package name(s) (and possibly
-    others too in the future, like Fedora package, FreeBSD port, etc) for
-    it.
+    *   how to find out the latest version of the software
 
-    Eventually, if the project takes off, this will also contain
-    summary/description/URL/license for each software.
+    *   where to download it
+
+    *   possibly other information in the future
 
 FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Software-Catalog>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Software-Catalog>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Catalog>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    Software::Release::Watch
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014, 2012 by
+    perlancar@cpan.org.
 
-    Software::Installation::Detect
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

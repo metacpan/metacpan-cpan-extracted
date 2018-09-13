@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 
@@ -30,6 +30,12 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =cut
 
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::Session;
 
 
@@ -37,12 +43,13 @@ use strict;
 use warnings;
 
 use Moose;
+use namespace::autoclean;
 
 use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 ATTRIBUTES
@@ -62,14 +69,15 @@ has 'driver' => (is => 'ro',
                      'stop' => 'stop',
                      'restart' => 'restart',
                      'started' => 'started',
-                 });
+                 },
+    );
 
 =item widget_groups
 
 Contains the list of widget groups to be used with the session, or
 uses all groups when undefined.
 
-Note: this functionality allows to load multiple groups into the running
+Note: this functionality allows one to load multiple groups into the running
 perl instance, while using different groups in various sessions.
 
 =cut
@@ -88,7 +96,8 @@ If it is not an environment variable, it will be used as is.
 
 has 'base_url' => (is => 'rw',
                    isa => 'Str',
-                   default => '' );
+                   default => '',
+    );
 
 =item page
 
@@ -98,10 +107,11 @@ Holds the root element of the target HTML page (the 'html' tag).
 
 has 'page' => (is => 'ro',
                isa => 'Weasel::Element::Document',
-               builder => '_page_builder',
-               lazy => 1);
+               builder => '_build_page',
+               lazy => 1,
+    );
 
-sub _page_builder {
+sub _build_page {
     my $self = shift;
     my $class = use_module($self->page_class);
 
@@ -117,7 +127,8 @@ Upon instantiation can be set to log consumer; a function of 3 arguments:
 =cut
 
 has 'log_hook' => (is => 'ro',
-                   isa => 'Maybe[CodeRef]');
+                   isa => 'Maybe[CodeRef]',
+    );
 
 =item page_class
 
@@ -128,7 +139,8 @@ attribute.
 
 has 'page_class' => (is => 'ro',
                      isa => 'Str',
-                     default => 'Weasel::Element::Document');
+                     default => 'Weasel::Element::Document',
+    );
 
 =item retry_timeout
 
@@ -156,7 +168,7 @@ has 'poll_delay' => (is => 'rw',
 
 =back
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 
 =over
@@ -171,7 +183,7 @@ textarea elements and input elements of type text and password.
 sub clear {
     my ($self, $element) = @_;
 
-    $self->_logged(sub { $self->driver->clear($element->_id); },
+    return $self->_logged(sub { $self->driver->clear($element->_id); },
                    'clear', 'clearing input element');
 }
 
@@ -186,7 +198,7 @@ current mouse location.
 sub click {
     my ($self, $element) = @_;
 
-    $self->_logged(
+    return $self->_logged(
         sub {
             $self->driver->click(($element) ? $element->_id : undef);
         },
@@ -242,11 +254,12 @@ sub find_all {
         'find_all',
         sub {
             my ($rv) = @_;
-            return "found " . scalar(@$rv) . " elements for $pattern "
-                . (join(', ', %args)) . "\n"
-                . (join("\n",
+            ##no critic(ProhibitUselessTopic)
+            return 'found ' . scalar(@{$rv}) . " elements for $pattern "
+                . (join ', ', %args) . "\n"
+                . (join "\n",
                         map { ' - ' . ref($_)
-                                  . ' (' . $_->tag_name . ")" } @$rv));
+                                  . ' (' . $_->tag_name . ')' } @{$rv});
         },
         "pattern: $pattern");
     return wantarray ? @rv : \@rv;
@@ -263,13 +276,13 @@ after prefixing with C<base_url>.
 sub get {
     my ($self, $url) = @_;
 
-    my $base = $self->base_url =~ /\$\{([a-zA-Z0-9_]+)\}/
-             ? $ENV{$1} // "http://localhost:5000"
+    my $base = $self->base_url =~ /\$\{(\w+)\}/x
+             ? $ENV{$1} // 'http://localhost:5000'
              : $self->base_url;
     $url = $base . $url;
     ###TODO add logging warning of urls without protocol part
     # which might indicate empty 'base_url' where one is assumed to be set
-    $self->_logged(
+    return $self->_logged(
         sub {
             return $self->driver->get($url);
         }, 'get', "loading URL: $url");
@@ -338,7 +351,7 @@ Note: this version assumes pictures of type PNG will be written;
 sub screenshot {
     my ($self, $fh) = @_;
 
-    $self->_logged(
+    return $self->_logged(
         sub {
             $self->driver->screenshot($fh);
         }, 'screenshot', 'screenshot');
@@ -351,11 +364,11 @@ Writes a get_page_source of the browser's window to the filehandle C<$fh>.
 =cut
 
 sub get_page_source {
-    my ($self) = @_;
+    my ($self,$fh) = @_;
 
-    $self->_logged(
+    return $self->_logged(
         sub {
-            $self->driver->get_page_source();
+            $self->driver->get_page_source($fh);
         }, 'get_page_source', 'get_page_source');
 }
 
@@ -369,11 +382,11 @@ simulating keyboard input.
 sub send_keys {
     my ($self, $element, @keys) = @_;
 
-    $self->_logged(
+    return $self->_logged(
         sub {
             $self->driver->send_keys($element->_id, @keys);
         },
-        'send_keys', 'sending keys: ' . join('', @keys // ()));
+        'send_keys', 'sending keys: ' . (join '', @keys // ()));
 }
 
 =item tag_name($element)
@@ -404,7 +417,7 @@ session-global settings.
 sub wait_for {
     my ($self, $callback, %args) = @_;
 
-    $self->_logged(
+    return $self->_logged(
         sub {
             $self->driver->wait_for($callback,
                                     retry_timeout => $self->retry_timeout,
@@ -419,8 +432,8 @@ before 'BUILDARGS', sub {
     my ($class, @args) = @_;
     my $args = (ref $args[0]) ? $args[0] : { @args };
 
-    confess "Driver used to construct session object uses old API version;
-some functionality may not work correctly"
+    confess "Driver used to construct session object uses old API version;\n" .
+            'some functionality may not work correctly'
         if ($args->{driver}
             && $args->{driver}->implements < $Weasel::DriverRole::VERSION);
 };
@@ -500,7 +513,35 @@ sub _wrap_widget {
 
 L<Weasel>
 
-=head1 COPYRIGHT
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
 
  (C) 2016  Erik Huelsmann
 
@@ -509,4 +550,7 @@ Licensed under the same terms as Perl.
 =cut
 
 
+__PACKAGE__->meta->make_immutable;
+
 1;
+

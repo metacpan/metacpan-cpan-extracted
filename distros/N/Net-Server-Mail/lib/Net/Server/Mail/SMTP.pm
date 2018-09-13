@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
-our $VERSION = "0.23";
+our $VERSION = "0.24";
 
 =pod
 
@@ -34,7 +34,7 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocol
         my($session, $recipient) = @_;
 
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }

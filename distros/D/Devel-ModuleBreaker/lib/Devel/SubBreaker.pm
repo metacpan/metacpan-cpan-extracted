@@ -1,8 +1,9 @@
 package Devel::SubBreaker;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 sub import {
     our @patterns = @_[1..$#_];
-    require "perl5db.pl";
+    my $E = $ENV{PERL5DBX} || 'require "perl5db.pl"';
+    eval $E;
 }
 CHECK { # expect compile-time mods have been loaded before CHECK phase
     foreach my $sub (sort keys %DB::sub) {
@@ -53,7 +54,7 @@ Devel::SubBreaker - set breakpoints in many arbitrary subroutines simultaneously
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 

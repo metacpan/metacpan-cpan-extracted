@@ -4,7 +4,7 @@ package eris;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 
@@ -20,11 +20,11 @@ eris - Eris is the Greek Goddess of Chaos
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
-eris exists to transform unstructuted, chaotic log data into structured messages.
+eris exists to transform unstructured, chaotic log data into structured messages.
 
 Born out of disappointment and regret of existing solutions like Logstash,
 fluentd, and their kind, eris aims to make development and debugging of
@@ -36,16 +36,15 @@ how a log message will be restructured.
 
 =head1 DESCRIPTION
 
-eris is structured to allow flexibility, extensibility, and visibility in
-every component.
+eris is structured to be flexible, extensible, and visible in every component.
 
 =head1 CONCEPTS
 
 =head2 DECODER
 
-Decoders are pluggable thanks to L<eris::role::pluggable> and they are searched for in the
-the default namespace C<eris::log::decoder>.  To add other namespaces, use the C<search_path> paramter
-in a config file:
+Decoders are pluggable thanks to L<eris::role::pluggable> and they are searched
+for in the the default namespace C<eris::log::decoder>.  To add other
+namespaces, use the C<search_path> parameter in a config file:
 
     ---
     decoders:
@@ -111,19 +110,20 @@ data to use in testing and enhancing your context.
 This specifies the field or fields that a matcher will operate on.  There are
 two special fields C<*> and C<_exists_>.  The C<*> is used in conjunction with
 a matcher of C<*> to match all messages.  The C<_exists_> operator is used to
-check for the existance of a key in the context.  A sample use of this field
+check for the existence of a key in the context.  A sample use of this field
 specifier is used by the L<eris::log::context::GeoIP> context with an regex
 matcher to operate on any event data with field names matching C<'_ip$'>.
 
 =item B<matcher>
 
 Can be C<*>, a string, a regex ref, an array reference, or a code reference.
-If C<*> and C<field> is C<*> means match every message.  If a literal string,
-or array reference, the literal string is checked against the value of in the
-C<field> specified above and returns 1 if they are equivalent.  If a regex
-reference, the regex is applied to the value in the specified C<field> and the
-context is applied if the regex matches.  A code reference should return 1 if
-the event is relevant to the context and 0 if it doesn't apply.
+If C<matcher> and C<field> are set to C<*>, every message matches.  If a
+literal string, or array reference, the literal string is checked against the
+value of in the C<field> specified above and returns 1 if they are equivalent.
+If a regex reference, the regex is applied to the value in the specified
+C<field> and the context is applied if the regex matches.  A code reference
+should return 1 if the event is relevant to the context and 0 if it doesn't
+apply.
 
 =back
 
@@ -159,7 +159,7 @@ Selected example contexts
 
 Dictionaries are used in conjunction with schemas to filter L<eris::log> contexts down to
 only the keys and values we want.  This allows better control of the data headed into storage
-to prevent key space explossons.
+to prevent key space explosions.
 
 =head3 SEE ALSO
 
@@ -214,7 +214,7 @@ transform unstructured logging data into structured data and then rules for
 taking that structured data and storing it somewhere.  That sounds cool, but
 there's nothing useful about it unless you can start playing with it now.
 
-This is why eris ship withs sample implementations.
+This is why eris ships with sample implementations.
 
 =head2 Scripts
 
@@ -247,7 +247,7 @@ Via a file:
 
     eris-context.pl -b /var/log/messsages
 
-Via STDIN (for you crazy copy-pastafarians):
+Via STDIN for testing or manually importing data:
 
     eris-context.pl -b
 

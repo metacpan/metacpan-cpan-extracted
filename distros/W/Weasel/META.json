@@ -4,7 +4,7 @@
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -24,7 +24,9 @@
             "File::Find" : "0",
             "File::Util" : "0",
             "Perl::Critic" : "0",
-            "Test::Pod::Coverage" : "0"
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
@@ -46,13 +48,14 @@
       "bugtracker" : {
          "web" : "https://github.com/ehuelsmann/weasel/issues"
       },
+      "homepage" : "https://weasel.pm/",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/ehuelsmann/weasel.git",
          "web" : "https://github.com/ehuelsmann/weasel"
       }
    },
-   "version" : "0.11",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

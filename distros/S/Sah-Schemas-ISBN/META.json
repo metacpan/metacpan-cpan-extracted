@@ -38,6 +38,9 @@
       },
       "test" : {
          "requires" : {
+            "Algorithm::CheckDigits" : "0",
+            "Algorithm::CheckDigits::M10_004" : "0",
+            "Algorithm::CheckDigits::M11_001" : "0",
             "Data::Sah::Coerce" : "0.025",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -58,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-ISBN"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

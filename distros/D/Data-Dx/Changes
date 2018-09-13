@@ -43,3 +43,8 @@ Revision history for Data-Dx
 
     Fixed (I hope!) segfaulting on large data structures
     (Thanks, Joel)
+
+
+0.000009  Thu Sep 13 09:45:11 2018
+
+    Now automatically uses utf8

@@ -1,0 +1,139 @@
+NAME
+    App::swcat - Software catalog
+
+VERSION
+    This document describes version 0.001 of App::swcat (from Perl
+    distribution App-swcat), released on 2018-09-13.
+
+SYNOPSIS
+    See swcat script.
+
+DESCRIPTION
+    swcat is a CLI for Software::Catalog.
+
+FUNCTIONS
+  download_url
+    Usage:
+
+     download_url(%args) -> [status, msg, result, meta]
+
+    Get download URL(s) of a software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   cache_period => *int* (default: 86400)
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  latest_version
+    Usage:
+
+     latest_version(%args) -> [status, msg, result, meta]
+
+    Get latest version of a software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   cache_period => *int* (default: 86400)
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list
+    Usage:
+
+     list(%args) -> [status, msg, result, meta]
+
+    List known software in the catalog.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   cache_period => *int* (default: 86400)
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-swcat>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-swcat>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-swcat>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Software::Catalog
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

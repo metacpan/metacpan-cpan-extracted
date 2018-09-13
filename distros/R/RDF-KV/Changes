@@ -1,5 +1,14 @@
 Revision history for RDF-KV
 
+0.07    2018-09-10
+        Removed constraint for ->isa('RDF::Trine::Model') in
+        RDF::KV::Patch->apply because it doesn't work with
+        Catalyst::Model::RDF.
+
+0.06_01 2018-07-11
+        Datatype literals as URI objects would crash. Not sure how this
+        was missed.
+
 0.06    2018-07-10
         Added direct access to add/remove triples in RDF::KV::Patch::apply
 

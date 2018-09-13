@@ -8,7 +8,7 @@ with qw(
 use Types::Standard qw(HashRef);
 use namespace::autoclean;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 
@@ -40,6 +40,16 @@ sub as_bulk {
     return @schemas ? map { $_->as_bulk($log) } @schemas : ();
 }
 
+
+sub to_document {
+    my ($self,$log) = @_;
+    # Find the matching schemas
+    my @schemas = $self->find($log);
+    # Return the document or the empty list
+    return @schemas ? $schemas[0]->to_document($log) : ();
+}
+
+
 1;
 
 __END__
@@ -54,7 +64,7 @@ eris::schemas - Discovery and access for schemas
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -94,6 +104,13 @@ Takes an instance of an L<eris::log> to index into ElasticSearch.
 Using the C<find()> method, return a list of the commands necessary to
 bulk index the instance of an L<eris::log> object as an array of new-line delimited
 JSON.
+
+=head2 to_document()
+
+Takes an instance of an L<eris::log> to index into ElasticSearch.
+
+Using the C<find()> method, return the first document to be created from the
+L<eris::log> entry.
 
 =head1 AUTHOR
 

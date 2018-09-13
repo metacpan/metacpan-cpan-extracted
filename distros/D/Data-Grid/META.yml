@@ -26,17 +26,20 @@ recommends:
   File::MimeInfo: '0.27'
   Text::CSV_XS: '1.18'
 requires:
+  Class::Load: '0.23'
   IO::Scalar: '2.110'
   IO::ScalarArray: '2.110'
   Moo: '2.0'
   Spreadsheet::ParseExcel: '0.65'
   Spreadsheet::ParseXLSX: '0.27'
+  String::RewritePrefix: '0.007'
   Text::CSV: '1.18'
   Type::Tiny: '1.0'
+  Types::XSD::Lite: '0.005'
   perl: 5.12.0
 resources:
   bugtracker: https://github.com/doriantaylor/p5-data-grid/issues
   homepage: https://github.com/doriantaylor/p5-data-grid
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-data-grid.git
-version: '0.03'
+version: '0.05'

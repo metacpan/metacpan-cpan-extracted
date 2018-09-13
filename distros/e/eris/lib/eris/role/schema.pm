@@ -12,7 +12,7 @@ with qw(
     eris::role::plugin
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 
@@ -95,6 +95,36 @@ has 'flatten' => (
 sub _build_flatten        { 1 }
 
 
+has 'es_version' => (
+    is      => 'ro',
+    isa     => Str,
+    default => sub { '6.4' },
+);
+
+
+has 'es_template' => (
+    is  => 'lazy',
+    isa => HashRef,
+);
+sub _build_es_template {
+    my $self = shift;
+
+    return {
+        ($self->es_version > 6 ? 'index_pattern' : 'template' ) => sprintf "%s-*", $self->name,
+        mapping => {
+            dynamic_properties => [
+                {
+                },
+            ],
+            properties => {
+                timestamp => { type => 'datetime' },
+                time      => { type => 'datetime' },
+            },
+        }
+    };
+}
+
+
 sub as_bulk {
     my ($self,$log) = @_;
 
@@ -139,7 +169,7 @@ eris::role::schema - Role for implementing a schema
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -214,6 +244,14 @@ to ensure the schema is early enough in the chain to accept the document.
 
 Boolean, defaults to true.  If true only the B<context> hash from the L<eris::log> object
 is indexed.  If set to false, the C<complete> hash is used instead.
+
+=head2 es_version
+
+The ElasticSearch version to target for commands and mappings.  Defaults to B<6.4>.
+
+=head2 es_template
+
+The ElasticSearch index template definition from this schema.
 
 =head1 METHODS
 

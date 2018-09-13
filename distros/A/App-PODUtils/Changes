@@ -1,3 +1,11 @@
+0.040   2018-09-11 (PERLANCAR)
+
+	- [removed] Remove view-pod-in-browser (duplicate functionality
+	  with podtohtml).
+
+	- [doc] Mention pod2html and podtohtml.
+
+
 0.03    2017-01-29 (PERLANCAR)
 
 	- [ux] view-pod-in-browser: Accept STDIN.

@@ -21,3 +21,5 @@
 1.008
   -- added support for manual bind operations. IE Oracle doesn't handle dynamic bind type correctly and needs to.
   -- pod examples to support this.
+1.009
+  -- added feature to disable db statement handle caching

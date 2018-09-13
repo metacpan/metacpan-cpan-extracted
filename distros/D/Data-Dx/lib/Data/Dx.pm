@@ -4,7 +4,7 @@ use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use Keyword::Declare;
 
@@ -56,6 +56,7 @@ sub import {
     keyword Dx (Expr $expr) { _dx($expr) }
     keyword Dₓ (Expr $expr) { _dx($expr) }
 
+    utf8->import();
 }
 
 sub unimport {
@@ -149,7 +150,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000008
+This document describes Data::Dx version 0.000009
 
 
 =head1 SYNOPSIS

@@ -2,8 +2,8 @@ NAME
     App::podtohtml - Convert POD to HTML
 
 VERSION
-    This document describes version 0.003 of App::podtohtml (from Perl
-    distribution App-podtohtml), released on 2018-09-10.
+    This document describes version 0.006 of App::podtohtml (from Perl
+    distribution App-podtohtml), released on 2018-09-11.
 
 FUNCTIONS
   podtohtml
@@ -23,10 +23,35 @@ FUNCTIONS
 
          podtohtml( infile => "some.pod", browser => 1);
 
+    *   Convert POD file to HTML, show result in browser using the MetaCPAN
+        template to give an idea how it will look on MetaCPAN:
+
+         podtohtml( infile => "some.pod", browser => 1, template => "metacpan-20180911");
+
+    *   Convert POD file to HTML, show result in browser using the sco
+        template to give an idea how it will look on (now-dead)
+        search.cpan.org:
+
+         podtohtml( infile => "some.pod", browser => 1, template => "sco-20180123");
+
+    *   Convert POD file to HTML, show result in browser using the
+        perldoc.perl.org template to give an idea how it will look on
+        perldoc.perl.org:
+
+         podtohtml(
+           infile   => "some.pod",
+           browser  => 1,
+           template => "perldoc_perl_org-20180911"
+         );
+
+    *   List which templates are available:
+
+         podtohtml( list_templates => 1);
+
     This is a thin wrapper for Pod::Html and an alternative CLI to pod2html
     to remove some annoyances that I experience with "pod2html", e.g. the
     default cache directory being "." (so it leaves ".tmp" files around).
-    This CLI also offers tab completion.
+    This CLI also offers templates and tab completion.
 
     It does not yet offer as many options as "pod2html".
 
@@ -44,7 +69,15 @@ FUNCTIONS
 
         If not found, will search in for .pod or .pm files in @INC.
 
+    *   list_templates => *bool*
+
+        List available templates.
+
     *   outfile => *filename*
+
+    *   template => *str*
+
+        Pick a template to use, only relevant with --browser.
 
     Returns an enveloped result (an array).
 

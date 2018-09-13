@@ -1,9 +1,14 @@
-#!/usr/bin/env perl
+#! /usr/bin/env perl
 #PODNAME: anki_import
 use strict;
 use warnings;
 use Cwd;
 use Anki::Import;
+
+# suppress success_msg
+#my $suppress = grep { $_ eq '--quiet' } @ARGV;
+#print $suppress . "\n";
+#push @ARGV, '--no-quiet' if $suppress;
 
 eval { anki_import(@ARGV) };
 
@@ -24,7 +29,7 @@ anki_import - command line command for the Anki::Import module
 
 =head1 VERSION
 
-version 0.022
+version 0.025
 
 =head1 SYNOPSIS
 

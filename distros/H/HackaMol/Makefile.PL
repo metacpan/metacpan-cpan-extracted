@@ -38,9 +38,10 @@ my %WriteMakefileArgs = (
     "Test::Output" => "1.03",
     "Test::Warn" => "0.30",
     "Time::HiRes" => "1.975",
-    "YAML::XS" => "0.69"
+    "YAML::XS" => "0.69",
+    "namespace::autoclean" => 0
   },
-  "VERSION" => "0.048",
+  "VERSION" => "0.049",
   "test" => {
     "TESTS" => "t/*.t t/HackaMol/*.t t/HackaMol/Roles/*.t"
   }
@@ -70,7 +71,8 @@ my %FallbackPrereqs = (
   "Test::Output" => "1.03",
   "Test::Warn" => "0.30",
   "Time::HiRes" => "1.975",
-  "YAML::XS" => "0.69"
+  "YAML::XS" => "0.69",
+  "namespace::autoclean" => 0
 );
 
 

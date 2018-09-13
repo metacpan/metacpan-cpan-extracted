@@ -75,7 +75,7 @@ like( $@, qr/illegal in JSON/, 'json throws: bson_regex()' );
 (my $pattern_json = $pattern) =~ s{\\}{\\\\}g;
 is(
     to_extjson( { a => bson_regex( $pattern, $flags ) } ),
-    qq[{"a":{"\$options":"$sorted_flags","\$regex":"$pattern_json"}}],
+    qq[{"a":{"\$regularExpression":{"pattern":"$pattern_json","options":"$sorted_flags"}}}],
     'extjson: bson_regex(<pattern>,<flags>)'
 );
 

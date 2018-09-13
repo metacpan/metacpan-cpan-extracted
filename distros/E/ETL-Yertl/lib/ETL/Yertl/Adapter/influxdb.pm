@@ -1,5 +1,5 @@
 package ETL::Yertl::Adapter::influxdb;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: Adapter to read/write from InfluxDB time series database
 
 #pod =head1 SYNOPSIS
@@ -251,7 +251,7 @@ ETL::Yertl::Adapter::influxdb - Adapter to read/write from InfluxDB time series 
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

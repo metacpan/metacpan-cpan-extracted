@@ -43,7 +43,8 @@
             "Test::Output" : "1.03",
             "Test::Warn" : "0.30",
             "Time::HiRes" : "1.975",
-            "YAML::XS" : "0.69"
+            "YAML::XS" : "0.69",
+            "namespace::autoclean" : "0"
          }
       }
    },
@@ -56,7 +57,7 @@
          "web" : "https://github.com/demianriccardi/p5-HackaMol"
       }
    },
-   "version" : "0.048",
+   "version" : "0.049",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

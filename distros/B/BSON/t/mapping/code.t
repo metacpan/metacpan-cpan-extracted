@@ -89,7 +89,7 @@ like( $@, qr/illegal in JSON/, 'json throws: bson_code()' );
 
 # to extended JSON
 (my $code_json = $code) =~ s{"}{\\"}g;
-my $scope_json = to_myjson($scope);
+my $scope_json = to_extjson({%$scope});
 is( to_extjson({a=>bson_code($code)}), qq[{"a":{"\$code":"$code_json"}}], 'extjson: bson_code(<code>)' );
 is(
     to_extjson( { a => bson_code( $code, $scope ) } ),

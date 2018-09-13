@@ -1,0 +1,427 @@
+#!perl
+
+our $DATE = '2018-09-13'; # DATE
+our $VERSION = '0.000'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
+
+use Perinci::CmdLine::Any;
+
+my $prefix = "/App/instopt/";
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => $prefix,
+    log => 1,
+    subcommands => {
+        'list-installed'  => {url=>"${prefix}list_installed"},
+        'list-downloaded' => {url=>"${prefix}list_downloaded"},
+        'download'        => {url=>"${prefix}download"},
+        'update'          => {url=>"${prefix}update"},
+        'update_all'      => {url=>"${prefix}update_all"},
+    },
+);
+$cli->run;
+
+# ABSTRACT: Download and install software
+# PODNAME: instopt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+instopt - Download and install software
+
+=head1 VERSION
+
+This document describes version 0.000 of instopt (from Perl distribution App-instopt), released on 2018-09-13.
+
+=head1 SYNOPSIS
+
+ # List all installed software in /opt
+ % instopt list-installed
+ % instopt list-installed -l
+
+ # Download a software (e.g. firefox), will be put in $ARCHIVE/f/firefox/<VERSION>/<ARCH>/
+ % instopt download firefox
+
+ # List downloaded versions/archs of a software
+ % instopt list-downloaded firefox
+
+ # Update (download + install) a software in /opt
+ % instopt update firefox
+
+ # Update all software in /opt
+ % instopt update-all
+
+=head1 DESCRIPTION
+
+B<STATUS:> Early release. Most things are not yet implemented.
+
+B<instopt> is an opinionated tool to automate downloading and installing
+software binaries (by default to F</opt>, hence the name: "B<inst>all to
+/B<opt>"). To describe how it works, I'll describe how I install my software to
+F</opt>.
+
+Normally, I depend on the package manager of my OS (Linux distribution) to
+install software. But some software need to be updated more often. Let's take as
+example B<firefox>, where the OS version is usually too old for my taste. I'll
+usually do this:
+
+=over
+
+=item 1.
+
+Go to the Mozilla download page and download the latest firefox binary, let's
+say F<firefox-99.1.2.tar.bz2>.
+
+=item 2.
+
+Save this file to F<~/software/f/firefox/99.1.2/linux-x86_64/>, so I can share
+this with my other laptops and PC, to avoid redownloading the same stuff.
+
+=item 3.
+
+To install, I do the rest of the steps as root. I extract the tarball to
+F</opt/firefox-99.1.2/>.
+
+=item 4.
+
+I create (or update) symlink F</opt/firefox> to point to F</opt/firefox-99.1.2>.
+
+=item 5.
+
+I create (or update) symlink F</usr/local/bin/firefox> to
+F</opt/firefox/firefox>.
+
+=back
+
+When a new version of Firefox comes out, I do the following:
+
+=over
+
+=item 1.
+
+Go to the Mozilla website. Download the latest Firefox tarball, e.g.
+F<firefox-99.1.3.tar.bz2>.
+
+=item 2.
+
+Save it to F<~/software/f/firefox/99.1.3/linux-x86_64/>.
+
+=item 3.
+
+Extract the tarball to F</opt/firefox-99.1.3>.
+
+=item 4.
+
+Update the symlink F</opt/firefox> to point to F</opt/firefox-99.1.3>.
+
+=item 5.
+
+Optionally delete F</opt/firefox-99.1.2>.
+
+=back
+
+B<instopt> is the tool I wrote to automate the above tasks. Now I only need to
+do:
+
+ # instopt update firefox
+
+This will download the latest firefox, save the tarball to the appropriate
+location, extract it to F</opt>, and create/update the symlinks.
+
+You can customize the target directory (F</opt>) and the software archive
+directory (F<~/software>).
+
+To start using B<instopt>, first install it from CPAN. Also install the catalog
+module for the software that you want/need, e.g. for firefox
+L<Software::Catalog::SW::firefox>. This module tells B<instopt> how to find out
+the latest version, where the download URL is, and so on.
+
+You might also want to create a configuration file F<~/.config/instopt.conf>
+containing:
+
+ # if not the default ~/software
+ archive_dir = /mnt/shared/software
+
+ # if not the default /opt
+ target_dir = /usr/local/opt
+
+After that, install away.
+
+=head1 SUBCOMMANDS
+
+=head2 B<download>
+
+Download latest version of software.
+
+=head2 B<list-downloaded>
+
+List all downloaded software.
+
+=head2 B<list-installed>
+
+List all installed software.
+
+=head2 B<update>
+
+Update a software to latest version.
+
+=head2 B<update_all>
+
+Update all installed software.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--arch>=I<s>
+
+=item B<--archive-dir>=I<s>
+
+=item B<--config-path>=I<filename>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand download
+
+=over
+
+=item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand list-downloaded
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand update
+
+=over
+
+=item B<--software>=I<s>*
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C instopt instopt
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete instopt 'p/*/`instopt`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/instopt.conf>, F<~/instopt.conf>, or F</etc/instopt.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ arch (see --arch)
+ archive_dir (see --archive-dir)
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand download
+
+ software (see --software)
+
+=head2 Configuration for subcommand list-downloaded
+
+ detail (see --detail)
+ software (see --software)
+
+=head2 Configuration for subcommand list-installed
+
+
+=head2 Configuration for subcommand update
+
+ software (see --software)
+
+=head2 Configuration for subcommand update_all
+
+=head1 ENVIRONMENT
+
+=head2 INSTOPT_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/instopt.conf>
+
+F<~/instopt.conf>
+
+F</etc/instopt.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-instopt>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-instopt>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<swcat> from L<App::swcat>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

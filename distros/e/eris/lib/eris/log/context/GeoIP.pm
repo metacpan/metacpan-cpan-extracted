@@ -1,5 +1,5 @@
 package eris::log::context::GeoIP;
-# ABSTRACT: Apply MaxMind GeoIPv2 Data to events
+# ABSTRACT: Apply MaxMind GeoIP Data to events
 
 use Const::Fast;
 use GeoIP2::Database::Reader;
@@ -11,7 +11,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub _build_priority { 1000 }
@@ -125,11 +125,11 @@ __END__
 
 =head1 NAME
 
-eris::log::context::GeoIP - Apply MaxMind GeoIPv2 Data to events
+eris::log::context::GeoIP - Apply MaxMind GeoIP Data to events
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ A regex matching any string ending in '_ip'.
 
 =head2 geo_db
 
-The file location for the GeoIPv2 Databases, defaults to
+The file location for the GeoIP version 2 databases, defaults to
 '/usr/share/GeoIP/GeoLite2-City.mmdb'.  Set in the config:
 
     ---

@@ -4,18 +4,38 @@ use warnings;
 use Test::More 0.96;
 use Test::Deep qw/!blessed/;
 
+# Hijack the JSON::PP::USE_B constant to enable svtype detection
+BEGIN {
+    no warnings 'redefine';
+
+    require constant;
+    my $orig = constant->can('import');
+    local *constant::import = sub {
+        if ($_[1] eq 'USE_B') {
+            pop(@_);
+            push(@_, 1)
+        }
+        goto &$orig;
+    };
+
+    require JSON::PP;
+    die "TOO LATE"
+        unless JSON::PP::USE_B();
+}
+
+use JSON::PP 2.97001;
+
 use BSON;
 use BSON::Types ':all';
 use Config;
 use Path::Tiny 0.054; # better basename
-use JSON::MaybeXS;
 use Data::Dumper;
 
 # from t/lib
 use TestUtils;
 
 use constant {
-    IS_JSON_PP => ref( JSON::MaybeXS->new ) eq 'JSON::PP'
+    IS_JSON_PP => 1,
 };
 
 use base 'Exporter';
@@ -23,6 +43,24 @@ our @EXPORT = qw/test_corpus_file/;
 
 binmode( Test::More->builder->$_, ":utf8" )
   for qw/output failure_output todo_output/;
+
+# overridden to allow Tie::IxHash hashes to be created by JSON::PP
+my $orig = JSON::PP->can("object")
+    or die "Unable to find JSON::PP::object to override";
+do {
+    no warnings 'redefine';
+    *JSON::PP::object = sub {
+        tie my %hash, 'Tie::IxHash';
+        my $value = $orig->(\%hash);
+        return $value;
+    };
+};
+
+my $JSON = JSON::PP
+    ->new
+    ->ascii
+    ->allow_blessed
+    ->convert_blessed;
 
 sub test_corpus_file {
     my ($file) = @_;
@@ -38,15 +76,10 @@ sub test_corpus_file {
         return;
     }
 
-    if ( $json->{deprecated} ) {
-        $f = path( "corpus", "deprecated", $file );
-        $json = eval { decode_json( $f->slurp ) };
-        if ( my $err = $@ ) {
-            fail("deprecaed/$base failed to load");
-            diag($err);
-            return;
-        }
-    }
+    subtest 'JSON::PP Tie::IxHash injection' => sub {
+        my $data = $JSON->decode('{"x":23}');
+        ok defined(tied %$data), 'JSON::PP returns tied objects';
+    };
 
     _validity_tests($json);
     _decode_error_tests($json);
@@ -60,82 +93,179 @@ sub _validity_tests {
     # suppress caching that throws off Test::Deep
     local $BSON::Types::NoCache = 1;
 
-    # aggressively force ext-json representation, even for int32 and double
-    local $ENV{BSON_EXTJSON_FORCE} = 1;
-
     my $bson_type = $json->{bson_type};
+    my $deprecated = $json->{deprecated};
 
     for my $case ( @{ $json->{valid} } ) {
-        local $Data::Dumper::Useqq = 1;
+        subtest 'case: '.$case->{description} => sub {
+            local $Data::Dumper::Useqq = 1;
 
-        my $desc = $case->{description};
-        my $wrap = $bson_type =~ /\A(?:0x01|0x10|0x12)\z/;
-        my $codec = BSON->new( prefer_numeric => 1, wrap_numbers => $wrap, ordered => 1 );
-        my $lossy = $case->{lossy};
+            my $wrap = $bson_type =~ /\A(?:0x00|0x01|0x10|0x12)\z/;
+            my $codec = BSON->new( prefer_numeric => 1, wrap_numbers => $wrap, ordered => 1 );
+            my $lossy = $case->{lossy};
 
-        my $B = $case->{bson};
-        my $E = $case->{extjson}; # could be undef
+            my $canonical_bson = $case->{canonical_bson};
+            my $converted_bson = $case->{converted_bson};
+            my $degenerate_bson = $case->{degenerate_bson};
 
-        my $cB = exists($case->{canonical_bson}) ? $case->{canonical_bson} : $B;
-        my $cE = exists($case->{canonical_extjson}) ? $case->{canonical_extjson} : $E;
+            $canonical_bson = pack('H*', $canonical_bson);
+            $converted_bson = pack('H*', $converted_bson)
+                if defined $converted_bson;
+            $degenerate_bson = pack('H*', $degenerate_bson)
+                if defined $degenerate_bson;
 
-        my $skip_extjson = !(defined($E) && _extjson_ok($bson_type, $E));
+            my $canonical_json = $case->{canonical_extjson};
+            my $converted_json = $case->{converted_extjson};
+            my $degenerate_json = $case->{degenerate_extjson};
+            my $relaxed_json = $case->{relaxed_extjson};
 
-        $B = pack( "H*", $B );
-        $cB = pack( "H*", $cB );
+            $canonical_json = _normalize(
+                $canonical_json,
+                '$desc: normalizing canonical extjson',
+            );
+            $converted_json = _normalize(
+                $converted_json,
+                '$desc: normalizing converted extjson',
+            );
+            $degenerate_json = _normalize(
+                $degenerate_json,
+                '$desc: normalizing degenerate extjson',
+            );
+            $relaxed_json = _normalize(
+                $relaxed_json,
+                '$desc: normalizing relaxed extjson',
+            );
 
-        $E = _normalize( $E, "$desc: normalizing E"  );
-        $cE = _normalize( $cE, "$desc: normalizing cE"  );
+            ##
+            ## for cB input (canonical BSON)
+            ##
 
-        _bson_to_bson( $codec, $B, $cB, "$desc: B->cB" );
+            bytes_are(
+                _native_to_bson($codec,
+                    _bson_to_native($codec, $canonical_bson),
+                ),
+                $deprecated
+                    ? $converted_bson
+                    : $canonical_bson,
+                'native_to_bson(bson_to_native(cB)) = cB',
+            );
 
-        if ($B ne $cB) {
-            _bson_to_bson( $codec, $cB, $cB, "$desc: cB->cB" );
-        }
+            is(
+                _normalize_numbers(
+                    _native_to_canonical_extended_json($codec,
+                        _bson_to_native($codec, $canonical_bson),
+                    )
+                ),
+                _normalize_numbers(
+                    $deprecated
+                        ? $converted_json
+                        : $canonical_json,
+                ),
+                'native_to_canonical_extended_json(bson_to_native(cB)) = cEJ',
+            );
 
-        if ( ! $skip_extjson ) {
-            _bson_to_extjson( $codec, $B, $cE, "$desc: B->cE" );
-            _extjson_to_extjson( $codec, $E, $cE, "$desc: E->cE" );
+            is(
+                _normalize_numbers(
+                    _native_to_relaxed_extended_json($codec,
+                        _bson_to_native($codec, $canonical_bson),
+                    )
+                ),
+                _normalize_numbers($relaxed_json),
+                'native_to_relaxed_extended_json(bson_to_native(cB)) = rEJ',
+            ) unless not defined $relaxed_json;
 
-            if ($B ne $cB) {
-                _bson_to_extjson( $codec, $cB, $cE, "$desc: cB->cE" );
+            ##
+            ## for cEJ input (canonical Extended JSON)
+            ##
+
+            is(
+                _normalize_numbers(
+                    _native_to_canonical_extended_json($codec,
+                        _extjson_to_native($codec, $canonical_json),
+                    )
+                ),
+                _normalize_numbers(
+                    $deprecated
+                        ? $converted_json
+                        : $canonical_json,
+                ),
+                'native_to_canonical_extended_json(json_to_native(cEJ)) = cEJ',
+            );
+
+            bytes_are(
+                _native_to_bson($codec,
+                    _extjson_to_native($codec, $canonical_json),
+                ),
+                $deprecated
+                    ? $converted_bson
+                    : $canonical_bson,
+                'native_to_bson(json_to_native(cEJ)) = cB'
+            ) unless $lossy;
+
+            ##
+            ## for dB input (degenerate BSON)
+            ##
+
+            if (defined $degenerate_bson) {
+                bytes_are(
+                    _native_to_bson($codec,
+                        _bson_to_native($codec, $degenerate_bson),
+                    ),
+                    $canonical_bson,
+                    'native_to_bson(bson_to_native(dB)) = cB',
+                )
             }
 
-            if ($E ne $cE) {
-                _extjson_to_extjson( $codec, $cE, $cE, "$desc: cE->cE" );
+            ##
+            ## for dEJ input (degenerate Extended JSON)
+            ##
+
+            if (defined $degenerate_json) {
+
+                is(
+                    _normalize_numbers(
+                        _native_to_canonical_extended_json($codec,
+                            _extjson_to_native($codec, $degenerate_json),
+                        )
+                    ),
+                    _normalize_numbers(
+                        $deprecated
+                            ? $converted_json
+                            : $canonical_json,
+                    ),
+                    'native_to_canonical_extended_json(json_to_native(dEJ)) = cEJ',
+                );
+
+                bytes_are(
+                    _native_to_bson($codec,
+                        _extjson_to_native($codec, $degenerate_json),
+                    ),
+                    $deprecated
+                        ? $converted_bson
+                        : $canonical_bson,
+                    'native_to_bson(json_to_native(dEJ)) = cB'
+                ) unless $lossy;
             }
 
-            if ( ! $lossy ) {
-                _extjson_to_bson( $codec, $E, $cB, "$desc: E->cB" );
+            ##
+            ## for rEJ input (relaxed Extended JSON)
+            ##
 
-                if ($E ne $cE) {
-                    _extjson_to_bson( $codec, $E, $cB, "$desc: cE->cB" );
-                }
-
+            if (defined $relaxed_json) {
+                is(
+                    _normalize_numbers(
+                        _native_to_relaxed_extended_json($codec,
+                            _extjson_to_native($codec, $relaxed_json),
+                        )
+                    ),
+                    _normalize_numbers($relaxed_json),
+                    'native_to_relaxed_extended_json(json_to_native(rEJ)) = rEJ',
+                );
             }
-        }
+        };
     }
 
     return;
-}
-
-# this handle special cases that just don't work will in perl
-sub _extjson_ok {
-    my ($type, $E) = @_;
-
-    if ( $type eq "0x01" ) {
-        return if $E =~ /\d\.0\D/; # trailing zeros wind up as integers
-        return if $E =~ '-0(\.0)?'; # negative zero not preserved in Perl
-    }
-
-    # JSON::PP has trouble when TO_JSON returns a false value; in our case
-    # it could stringify 0 as "0" rather than treat it as a number; see
-    # https://github.com/makamaka/JSON-PP/pull/23
-    if ( ( $type eq "0x10" || $type eq "0x12" ) && IS_JSON_PP ) {
-        return if $E =~ /:\s*0/;
-    }
-
-    return 1;
 }
 
 sub _normalize {
@@ -144,7 +274,7 @@ sub _normalize {
 
     try_or_fail(
         sub {
-            $json = to_myjson( decode_json( $json ) );
+            $json = to_myjson( $JSON->decode( $json ) );
         },
         $desc
     ) or next;
@@ -152,76 +282,107 @@ sub _normalize {
     return $json;
 }
 
-sub _bson_to_bson {
-    my ($codec, $input, $expected, $label) = @_;
+sub _normalize_numbers {
+    my ($value) = @_;
+    return undef unless defined $value;
 
-    my ($decoded,$got);
+    $value =~ s{"0.0"}{"0"}g;
+    $value =~ s{"-0.0"}{"0"}g;
+    $value =~ s{"-0"}{"0"}g;
+    $value =~ s{"1.0"}{"1"}g;
+    $value =~ s{"-1.0"}{"-1"}g;
 
-    try_or_fail(
-        sub { $decoded = $codec->decode_one( $input ) },
-        "$label: Couldn't decode BSON"
-    ) or return;
+    $value =~ s[{"d":-0.0}][{"d":0}]g;
+    $value =~ s[{"d":-0}][{"d":0}]g;
+    $value =~ s[{"d":0.0}][{"d":0}]g;
 
-    try_or_fail(
-        sub { $got = $codec->encode_one( $decoded ) },
-        "$label: Couldn't encode BSON from BSON"
-    ) or return;
+    $value =~ s[(-?)1\.2345\d+(?:[eE]\+\d+)?][${1}1234567890...]g;
+    $value =~ s[-1234567890123456768][-1234567890...]g;
+    $value =~ s[1234567890123456768][1234567890...]g;
 
-    return bytes_are( $got, $expected, $label );
+    # Power8 specific normalization
+    $value =~ s[-1234567890123456770][-1234567890...]g;
+    $value =~ s[1234567890123456770][1234567890...]g;
+
+    return $value;
 }
 
-sub _bson_to_extjson {
-    my ($codec, $input, $expected, $label) = @_;
+sub _native_to_bson {
+    my ($codec, $native) = @_;
 
-    my ($decoded,$got);
-
+    my $bson;
     try_or_fail(
-        sub { $decoded = $codec->decode_one( $input ) },
-        "$label: Couldn't decode BSON"
-    ) or return;
+        sub { $bson = $codec->encode_one($native) },
+        q{Couldn't convert from native Perl to BSON},
+    ) or return undef;
 
-    try_or_fail(
-        sub { $got = to_extjson( $decoded ) },
-        "$label: Couldn't encode ExtJSON from BSON"
-    ) or return;
-
-    return is($got, $expected, $label);
+    return $bson;
 }
 
-sub _extjson_to_bson {
-    my ($codec, $input, $expected, $label) = @_;
+sub _bson_to_native {
+    my ($codec, $bson) = @_;
 
-    my ($decoded,$got);
-
+    my $native;
     try_or_fail(
-        sub { $decoded = $codec->inflate_extjson( decode_json( $input ) ) },
-        "$label: Couldn't decode ExtJSON"
-    ) or return;
+        sub { $native = $codec->decode_one($bson) },
+        q{Couldn't convert from BSON to native Perl},
+    ) or return undef;
 
-    try_or_fail(
-        sub { $got = $codec->encode_one( $decoded ) },
-        "$label: Couldn't encode BSON from BSON"
-    ) or return;
-
-    return bytes_are( $got, $expected, $label );
+    return $native;
 }
 
-sub _extjson_to_extjson {
-    my ($codec, $input, $expected, $label) = @_;
+sub _extjson_to_native {
+    my ($codec, $extjson) = @_;
 
-    my ($decoded,$got);
-
+    my $native_extjson;
     try_or_fail(
-        sub { $decoded = $codec->inflate_extjson( decode_json( $input ) ) },
-        "$label: Couldn't decode ExtJSON"
-    ) or return;
+        sub { $native_extjson = $JSON->decode($extjson) },
+        q{Couldn't decode JSON to native ExtJSON},
+    ) or return undef;
 
+    my $native;
     try_or_fail(
-        sub { $got = to_extjson( $decoded ) },
-        "$label: Couldn't encode ExtJSON from BSON"
-    ) or return;
+        sub { $native = $codec->extjson_to_perl($native_extjson) },
+        q{Couldn't convert from native ExtJSON to native Perl},
+    ) or return undef;
 
-    return is($got, $expected, $label);
+    return $native;
+}
+
+sub _native_to_relaxed_extended_json {
+    my ($codec, $native) = @_;
+
+    my $native_extjson;
+    try_or_fail(
+        sub { $native_extjson = $codec->perl_to_extjson($native, {relaxed => 1}) },
+        q{Couldn't convert from native Perl to native relaxed ExtJSON},
+    ) or return undef;
+
+    my $extjson;
+    try_or_fail(
+        sub { $extjson = $JSON->encode($native_extjson) },
+        q{Couldn't encode native ExtJSON as JSON},
+    ) or return undef;
+
+    return $extjson;
+}
+
+sub _native_to_canonical_extended_json {
+    my ($codec, $native) = @_;
+
+    my $native_extjson;
+    try_or_fail(
+        sub { $native_extjson = $codec->perl_to_extjson($native, {relaxed => 0}) },
+        q{Couldn't convert from native Perl to native canonical ExtJSON},
+    ) or return undef;
+
+    my $extjson;
+    try_or_fail(
+        sub { $extjson = $JSON->encode($native_extjson) },
+        q{Couldn't encode native ExtJSON as JSON},
+    ) or return undef;
+
+    return $extjson;
 }
 
 sub _decode_error_tests {
@@ -239,6 +400,7 @@ sub _decode_error_tests {
 }
 
 my %PARSER = (
+    '0x00' => sub { bson_doc(shift) },
     '0x13' => sub { bson_decimal128(shift) },
 );
 

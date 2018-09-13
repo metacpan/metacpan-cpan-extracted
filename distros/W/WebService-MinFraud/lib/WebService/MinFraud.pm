@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.008000';
+our $VERSION = '1.009000';
 
 1;
 
@@ -22,7 +22,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 =head1 VERSION
 
-version 1.008000
+version 1.009000
 
 =head1 SYNOPSIS
 
@@ -118,7 +118,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Christopher Bothwell Dave Rolsky Florian Ragwitz Greg Oschwald Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro William Storey
+=for stopwords Andy Jack Christopher Bothwell Dave Rolsky Florian Ragwitz Greg Oschwald Mark Fowler Narsimham Chelluri Olaf Alders Patrick Cronin Ruben Navarro William Storey
 
 =over 4
 
@@ -145,6 +145,10 @@ Greg Oschwald <goschwald@maxmind.com>
 =item *
 
 Mark Fowler <mark@twoshortplanks.com>
+
+=item *
+
+Narsimham Chelluri <nchelluri@maxmind.com>
 
 =item *
 

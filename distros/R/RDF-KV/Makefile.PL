@@ -6,6 +6,13 @@ readme_from 'lib/RDF/KV.pm';
 author      q{Dorian Taylor <dorian@cpan.org>};
 license     'apache';
 
+resources (
+   homepage   => 'https://github.com/doriantaylor/p5-rdf-kv',
+   license    => 'http://www.apache.org/licenses/LICENSE-2.0',
+   repository => 'git://github.com/doriantaylor/p5-rdf-kv.git',
+   bugtracker => 'https://github.com/doriantaylor/p5-rdf-kv/issues',
+);
+
 build_requires 'Test::More';
 
 requires 'Moose'              => '2.0';

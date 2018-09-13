@@ -1,6 +1,7 @@
 package Math::Calc::Parser;
 use strict;
 use warnings;
+use utf8;
 use Carp 'croak';
 use Exporter ();
 use List::Util 'reduce';
@@ -8,7 +9,7 @@ use Math::Complex;
 use POSIX qw/ceil floor/;
 use Scalar::Util qw/blessed looks_like_number/;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 our @ISA = 'Exporter';
 our @EXPORT_OK = 'calc';
 our $ERROR;
@@ -74,13 +75,16 @@ use constant ROUND_HALF => 0.50000000000008;
 		'/'   => { args => 2, code => sub { $_[0] / $_[1] } },
 		'%'   => { args => 2, code => sub { _real($_[0]) % _real($_[1]) } },
 		'^'   => { args => 2, code => sub { $_[0] ** $_[1] } },
-		'!'   => { args => 1, code => sub { die 'Factorial of negative number' if _real($_[0]) < 0;
-		                                    die 'Factorial of infinity' if _real($_[0]) == 'inf';
-		                                    reduce { $a * $b } 1, 1.._real($_[0]) } },
+		'!'   => { args => 1, code => sub { my $r = _real($_[0]);
+		                                    die 'Factorial of negative number' if $r < 0;
+		                                    die 'Factorial of infinity' if $r == 'inf';
+		                                    die 'Factorial of NaN' if $r != $r;
+		                                    reduce { $a * $b } 1, 1..$r } },
 		'u-'  => { args => 1, code => sub { -$_[0] } },
 		'u+'  => { args => 1, code => sub { +$_[0] } },
 		sqrt  => { args => 1, code => sub { sqrt $_[0] } },
 		pi    => { args => 0, code => sub { pi } },
+		'π'   => { args => 0, code => sub { pi } },
 		i     => { args => 0, code => sub { i } },
 		e     => { args => 0, code => sub { exp 1 } },
 		ln    => { args => 1, code => sub { log $_[0] } },
@@ -349,6 +353,7 @@ Math::Calc::Parser - Parse and evaluate mathematical expressions
 =head1 SYNOPSIS
 
   use Math::Calc::Parser 'calc';
+  use utf8; # for π in source code
   
   my $result = calc '2 + 2'; # 4
   my $result = calc 'int rand 5'; # Random integer between 0 and 4
@@ -358,7 +363,7 @@ Math::Calc::Parser - Parse and evaluate mathematical expressions
   
   # Class methods
   my $result = Math::Calc::Parser->evaluate('2 + 2'); # 4
-  my $result = Math::Calc::Parser->evaluate('3pi^2'); # 29.608813203268
+  my $result = Math::Calc::Parser->evaluate('3π^2'); # 29.608813203268
   my $result = Math::Calc::Parser->evaluate('0.7(ln 4)'); # 0.970406052783923
   
   # With more advanced error handling
@@ -380,8 +385,8 @@ Math::Calc::Parser - Parse and evaluate mathematical expressions
   my $result = $parser->try_evaluate('triple triple'); # undef (Malformed expression)
   die $parser->error unless defined $result;
   
-  $parser->remove_functions('pi', 'e');
-  $parser->evaluate('3pi'); # Invalid function exception
+  $parser->remove_functions('π', 'e');
+  $parser->evaluate('3π'); # Invalid function exception
 
 =head1 DESCRIPTION
 
@@ -440,22 +445,22 @@ failure.
 
 =head2 try_evaluate
 
-  if (defined (my $result = Math::Calc::Parser->evaluate('floor 2.5'))) {
+  if (defined (my $result = Math::Calc::Parser->try_evaluate('floor 2.5'))) {
     print "Result: $result\n";
   } else {
     print "Error: ".Math::Calc::Parser->error."\n";
   }
   
-  if (defined (my $result = $parser->evaluate('log(5'))) {
+  if (defined (my $result = $parser->try_evaluate('log(5'))) {
   	print "Result: $result\n";
   } else {
   	print "Error: ".$parser->error."\n";
   }
 
 Same as L</"evaluate"> but instead of throwing an exception on failure, returns
-undef and sets the L</"error"> attribute to the error message. The error
-message for the most recent L</"try_evaluate"> call can also be retrieved from
-the package variable C<$Math::Calc::Parser::ERROR>.
+undef. The L</"error"> method can then be used to retrieve the error message.
+The error message for the most recent L</"try_evaluate"> call can also be
+retrieved from the package variable C<$Math::Calc::Parser::ERROR>.
 
 =head2 error
 
@@ -560,6 +565,10 @@ Log with arbitrary base given as second argument.
 =item pi
 
 π
+
+=item π
+
+π (this must be the decoded Unicode character)
 
 =item rand
 

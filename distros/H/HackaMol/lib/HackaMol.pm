@@ -1,5 +1,5 @@
 package HackaMol;
-$HackaMol::VERSION = '0.048';
+$HackaMol::VERSION = '0.049';
 #ABSTRACT: HackaMol: Object-Oriented Library for Molecular Hacking
 use 5.008;
 use Moose;
@@ -28,7 +28,8 @@ with
   'HackaMol::Roles::PathRole',
   'HackaMol::Roles::ExeRole',
   'HackaMol::Roles::FileFetchRole',
-  'HackaMol::Roles::NERFRole';
+  'HackaMol::Roles::NERFRole',
+  'HackaMol::Roles::RcsbRole';
 
 
 
@@ -666,7 +667,7 @@ HackaMol - HackaMol: Object-Oriented Library for Molecular Hacking
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 DESCRIPTION
 
@@ -945,19 +946,23 @@ L<VMD|http://www.ks.uiuc.edu/Research/vmd/>
 
 =item * L<HackaMol::Roles::NameRole>
 
-=item * L<HackaMol::Roles::NameRole|HackaMol::Roles::MolReadRole|HackaMol::Roles::PathRole|HackaMol::Roles::ExeRole|HackaMol::Roles::FileFetchRole|HackaMol::Roles::NERFRole>
+=item * L<HackaMol::Roles::NameRole|HackaMol::Roles::MolReadRole|HackaMol::Roles::PathRole|HackaMol::Roles::ExeRole|HackaMol::Roles::FileFetchRole|HackaMol::Roles::NERFRole|HackaMol::Roles::RcsbRole>
 
 =item * L<HackaMol::Roles::PathRole>
+
+=item * L<HackaMol::Roles::RcsbRole>
 
 =item * L<HackaMol::Roles::ReadPdbRole>
 
 =item * L<HackaMol::Roles::ReadPdbqtRole>
 
+=item * L<HackaMol::Roles::ReadPdbxRole>
+
 =item * L<HackaMol::Roles::ReadXyzRole>
 
 =item * L<HackaMol::Roles::ReadYAMLRole>
 
-=item * L<HackaMol::Roles::ReadYAMLRole|HackaMol::Roles::ReadZmatRole|HackaMol::Roles::ReadPdbRole|HackaMol::Roles::ReadPdbqtRole|HackaMol::Roles::ReadXyzRole>
+=item * L<HackaMol::Roles::ReadYAMLRole|HackaMol::Roles::ReadZmatRole|HackaMol::Roles::ReadPdbRole|HackaMol::Roles::ReadPdbxRole|HackaMol::Roles::ReadPdbqtRole|HackaMol::Roles::ReadXyzRole>
 
 =item * L<HackaMol::Roles::ReadZmatRole>
 

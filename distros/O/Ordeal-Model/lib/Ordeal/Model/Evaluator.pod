@@ -1,0 +1,88 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Evaluator - Evaluate shuffling expressions
+
+=head1 DESCRIPTION
+
+Avoid using this module directly, see L<Ordeal::Model> instead.
+
+=head1 METHODS
+
+=begin COMMENT
+
+=head2 B<< BUILD >>
+
+constructor stuff.
+
+=end COMMENT
+
+=head2 B<< EVALUATE >>
+
+Evaluate an AST.
+
+=head2 B<< Evaluation-specific methods >>
+
+The following methods define operations that are executed as the result of
+the visit of the AST during L</EVALUATE>:
+
+=over
+
+=item B<< math_subtract >>
+
+=item B<< random >>
+
+=item B<< range >>
+
+=item B<< repeat >>
+
+=item B<< replicate >>
+
+=item B<< resolve >>
+
+=item B<< shuffle >>
+
+=item B<< slice >>
+
+=item B<< sort >>
+
+=item B<< subtract >>
+
+=item B<< sum >>
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 SEE ALSO
+
+L<Ordeal::Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

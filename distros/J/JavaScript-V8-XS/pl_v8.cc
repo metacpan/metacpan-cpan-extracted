@@ -198,7 +198,7 @@ static SV* pl_v8_to_perl_impl(pTHX_ V8Context* ctx, const Local<Object>& object,
     return ret;
 }
 
-static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, MapP2J& seen)
+static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, MapP2J& seen, int ref)
 {
     Local<Object> ret = Local<Object>::Cast(Null(ctx->isolate));
     if (!SvOK(value)) {
@@ -207,7 +207,11 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
         ret = Local<Object>::Cast(Boolean::New(ctx->isolate, val));
     } else if (SvIOK(value)) {
         int val = SvIV(value);
-        ret = Local<Object>::Cast(Number::New(ctx->isolate, val));
+        if (ref && (val == 0 || val == 1)) {
+            ret = Local<Object>::Cast(Boolean::New(ctx->isolate, val));
+        } else {
+            ret = Local<Object>::Cast(Number::New(ctx->isolate, val));
+        }
     } else if (SvNOK(value)) {
         double val = SvNV(value);
         ret = Local<Object>::Cast(Number::New(ctx->isolate, val));
@@ -217,7 +221,10 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
         ret = Local<Object>::Cast(String::NewFromUtf8(ctx->isolate, vstr, NewStringType::kNormal).ToLocalChecked());
     } else if (SvROK(value)) {
         SV* ref = SvRV(value);
-        if (SvTYPE(ref) == SVt_PVAV) {
+        int type = SvTYPE(ref);
+        if (type < SVt_PVAV) {
+            ret = pl_perl_to_v8_impl(aTHX_ ref, ctx, seen, 1);
+        } else if (type == SVt_PVAV) {
             AV* values = (AV*) ref;
             MapP2J::iterator k = seen.find(values);
             if (k != seen.end()) {
@@ -233,13 +240,13 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
                     if (!elem || !*elem) {
                         break; /* could not get element */
                     }
-                    const Local<Object> nested = pl_perl_to_v8_impl(aTHX_ *elem, ctx, seen);
+                    const Local<Object> nested = pl_perl_to_v8_impl(aTHX_ *elem, ctx, seen, 0);
                     // TODO: check for validity
                     //  croak("Could not create JS element for array\n");
                     array->Set(j, nested);
                 }
             }
-        } else if (SvTYPE(ref) == SVt_PVHV) {
+        } else if (type == SVt_PVHV) {
             HV* values = (HV*) ref;
             MapP2J::iterator k = seen.find(values);
             if (k != seen.end()) {
@@ -275,7 +282,7 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
                     }
                     SvUTF8_on(value); /* yes, always */ // TODO: only for strings?
 
-                    const Local<Object> nested = pl_perl_to_v8_impl(aTHX_ value, ctx, seen);
+                    const Local<Object> nested = pl_perl_to_v8_impl(aTHX_ value, ctx, seen, 0);
                     // TODO: check for validity
                     //  croak("Could not create JS element for hash\n");
 
@@ -283,7 +290,7 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
                     object->Set(v8_key, nested);
                 }
             }
-        } else if (SvTYPE(ref) == SVt_PVCV) {
+        } else if (type == SVt_PVCV) {
             FuncData* data = new FuncData(ctx, value);
             Local<Value> val = External::New(ctx->isolate, data);
             Local<FunctionTemplate> ft = FunctionTemplate::New(ctx->isolate, perl_caller, val);
@@ -310,7 +317,7 @@ SV* pl_v8_to_perl(pTHX_ V8Context* ctx, const Local<Object>& object)
 const Local<Object> pl_perl_to_v8(pTHX_ SV* value, V8Context* ctx)
 {
     MapP2J seen;
-    Local<Object> ret = pl_perl_to_v8_impl(aTHX_ value, ctx, seen);
+    Local<Object> ret = pl_perl_to_v8_impl(aTHX_ value, ctx, seen, 0);
     return ret;
 }
 

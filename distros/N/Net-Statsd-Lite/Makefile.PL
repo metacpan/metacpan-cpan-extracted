@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Select" => 0,
     "Module::Metadata" => 0,
+    "Net::EmptyPort" => 0,
     "Test::More" => 0,
     "Test::Roo" => 0,
     "Test::Roo::DataDriven" => 0,
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.4.4",
+  "VERSION" => "v0.4.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Moo" => "1.000000",
   "MooX::TypeTiny" => 0,
+  "Net::EmptyPort" => 0,
   "Sub::Quote" => 0,
   "Sub::Util" => "1.40",
   "Test::More" => 0,

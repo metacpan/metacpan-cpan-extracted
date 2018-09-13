@@ -1,4 +1,16 @@
+0.2.8   2018-09-12 (PERLANCAR)
+
+        - No spec changes.
+
+        - No functional changes.
+
+	- Require perl 5.010001 (named capture is a Perl 5.10 feature)
+	  [CT].
+
+
 0.2.7   2018-09-10 (PERLANCAR)
+
+        - No spec changes.
 
 	- Enable re() to return regex wrapped inside qr/\A(?:...)\z/ with
 	  -anchor=>1 argument.
@@ -7,6 +19,8 @@
 0.2.6   2018-09-10 (PERLANCAR)
 
 	- No spec changes.
+
+	- No functional changes.
 
         - [build] Rebuild to fix POD that didn't show gen_args in examples for
           dynamic pattern (PWP:Regexp::Pattern 0.002-).

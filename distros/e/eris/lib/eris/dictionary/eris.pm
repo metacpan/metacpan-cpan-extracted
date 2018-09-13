@@ -7,7 +7,7 @@ with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub _build_priority { 100; }
@@ -38,7 +38,7 @@ eris::dictionary::eris - Contains fields eris adds to events
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ This dictionary adds fields the L<eris::log::contextualizer> may add to a docume
 
 =head2 priority
 
-Defaults to 100, or lastish.
+Defaults to 100, or near the end
 
 =for Pod::Coverage hash
 

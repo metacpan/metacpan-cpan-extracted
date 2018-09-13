@@ -31,6 +31,12 @@ matches any of the given regular expressions
 After setting its breakpoints, each of these packages
 then turns over control to the regular perl debugger.
 
+The modules in this distribution respect the PERL5DBX environment
+variable for further customizing the debugger
+
+    $ export PERL5DBX='BEGIN{require"my_debugger.pl"}'
+    $ perl -d:SubBreaker=pattern3,pattern4 my_script.pl
+
 
 This distribution was inspired by a questions on StackOverflow:
     https://stackoverflow.com/questions/48229672

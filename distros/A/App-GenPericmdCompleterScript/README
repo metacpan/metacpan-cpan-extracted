@@ -3,9 +3,9 @@ NAME
     script
 
 VERSION
-    This document describes version 0.11 of App::GenPericmdCompleterScript
+    This document describes version 0.120 of App::GenPericmdCompleterScript
     (from Perl distribution App-GenPericmdCompleterScript), released on
-    2017-07-08.
+    2018-09-11.
 
 FUNCTIONS
   gen_pericmd_completer_script
@@ -62,6 +62,10 @@ FUNCTIONS
     *   read_env => *bool*
 
     *   skip_format => *bool*
+
+    *   strip => *bool* (default: 0)
+
+        Whether to strip source code using Perl::Stripper.
 
     *   subcommands => *hash*
 
@@ -130,7 +134,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

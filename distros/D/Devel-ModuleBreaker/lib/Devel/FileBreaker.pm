@@ -1,8 +1,10 @@
 package Devel::FileBreaker;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 sub import {
     our @patterns = @_[1..$#_];
-    require "perl5db.pl";
+    my $E = $ENV{PERL5DBX} || 'require "perl5db.pl"';
+    #open TTY,">/dev/tty";print TTY "\$E is $E\n";close TTY;
+    eval $E;
 }
 CHECK { # expect compile-time mods have been loaded before CHECK phase
     while (my ($sub,$file) = each %DB::sub) {
@@ -17,7 +19,7 @@ Devel::FileBreaker - set breakpoints in all subroutines in one or more files
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 

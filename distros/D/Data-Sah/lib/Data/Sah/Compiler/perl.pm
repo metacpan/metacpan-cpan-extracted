@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl;
 
-our $DATE = '2018-06-05'; # DATE
-our $VERSION = '0.892'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.893'; # VERSION
 
 use 5.010;
 use strict;
@@ -121,6 +121,14 @@ our %known_modules = (
 
 sub add_module {
     my ($self, $cd, $name, $extra_keys, $allow_duplicate) = @_;
+
+    if (exists $extra_keys->{core}) {
+        $known_modules{$name}{core} = $extra_keys->{core};
+    }
+
+    if (exists $extra_keys->{pp}) {
+        $known_modules{$name}{pp} = $extra_keys->{pp};
+    }
 
     if ($extra_keys->{phase} eq 'runtime') {
         if ($cd->{args}{no_modules}) {
@@ -452,7 +460,7 @@ Data::Sah::Compiler::perl - Compile Sah schema to Perl code
 
 =head1 VERSION
 
-This document describes version 0.892 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2018-06-05.
+This document describes version 0.893 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2018-09-11.
 
 =head1 SYNOPSIS
 

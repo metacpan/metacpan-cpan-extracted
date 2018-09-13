@@ -12,7 +12,7 @@ use Type::Utils -all;
 
 BEGIN { extends "Types::Standard" }
 
-our $VERSION = 'v0.4.4';
+our $VERSION = 'v0.4.6';
 
 
 # See also Types::Common::Numeric PositiveOrZeroInt
@@ -54,7 +54,7 @@ Net::Statsd::Lite::Types - A type library for Net::Statsd::Lite
 
 =head1 VERSION
 
-version v0.4.4
+version v0.4.6
 
 =head1 DESCRIPTION
 

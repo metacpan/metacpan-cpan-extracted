@@ -6,7 +6,7 @@ package BSON::Time;
 # ABSTRACT: BSON type wrapper for date and time
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp qw/croak/;
 use Config;
@@ -214,16 +214,44 @@ use overload (
 #pod Returns a string formatted by L</as_iso8601>.
 #pod
 #pod If the C<BSON_EXTJSON> option is true, it will instead be compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
+#pod format, which represents it as a document as follows:
+#pod
+#pod
+#pod If the C<BSON_EXTJSON> environment variable is true and the
+#pod C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+#pod compatible with
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
 #pod     {"$date" : { "$numberLong": "22337203685477580" } }
 #pod
+#pod If the C<BSON_EXTJSON> and C<BSON_EXTJSON_RELAXED> environment variables are
+#pod both true, then it will return a hashref with an ISO-8601 string for dates
+#pod after the Unix epoch and before the year 10,000 and a C<$numberLong> style
+#pod value otherwise.
+#pod
+#pod     {"$date" : "2012-12-24T12:15:30.500Z"}
+#pod     {"$date" : { "$numberLong": "-10000000" } }
+#pod
 #pod =cut
 
 sub TO_JSON {
-    return $_[0]->as_iso8601 unless $ENV{BSON_EXTJSON};
-    return { '$date' => { '$numberLong' => "$_[0]->{value}"} };
+    return $_[0]->as_iso8601
+        if ! $ENV{BSON_EXTJSON};
+
+    return { '$date' => { '$numberLong' => "$_[0]->{value}"} }
+        if ! $ENV{BSON_EXTJSON_RELAXED};
+
+    # Relaxed form is human readable for positive epoch to year 10k
+    my $year = (gmtime($_[0]->epoch))[5];
+    $year += 1900;
+    if ($year >= 1970 and $year <= 9999) {
+        return { '$date' => $_[0]->as_iso8601 };
+    }
+    else {
+        return { '$date' => { '$numberLong' => "$_[0]->{value}" } };
+    }
 }
 
 1;
@@ -238,7 +266,7 @@ BSON::Time - BSON type wrapper for date and time
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -297,10 +325,24 @@ Loads L<Time::Moment> and returns the C<value> as a L<Time::Moment> object.
 Returns a string formatted by L</as_iso8601>.
 
 If the C<BSON_EXTJSON> option is true, it will instead be compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
+format, which represents it as a document as follows:
+
+If the C<BSON_EXTJSON> environment variable is true and the
+C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+compatible with
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
     {"$date" : { "$numberLong": "22337203685477580" } }
+
+If the C<BSON_EXTJSON> and C<BSON_EXTJSON_RELAXED> environment variables are
+both true, then it will return a hashref with an ISO-8601 string for dates
+after the Unix epoch and before the year 10,000 and a C<$numberLong> style
+value otherwise.
+
+    {"$date" : "2012-12-24T12:15:30.500Z"}
+    {"$date" : { "$numberLong": "-10000000" } }
 
 =for Pod::Coverage op_eq BUILDARGS
 

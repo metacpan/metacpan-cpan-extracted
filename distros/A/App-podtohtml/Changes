@@ -1,3 +1,30 @@
+0.006   2018-09-11 (PERLANCAR)
+
+	- [ux] Provide completion for --template (-t).
+
+	- [Bugfix] Fix searching templates in dist share dir.
+
+	- Tweak order of template search paths.
+
+	- [doc] Mention templates as feature of podtohtml.
+
+
+0.005   2018-09-11 (PERLANCAR)
+
+	- Add templating functionality to give an idea how the rendered POD will
+	  look on various sites (MetaCPAN, search.cpan.org, perldoc.perl.org).
+	  Warning: currently very rough and quick-and-dirty implementation.
+
+
+0.004   2018-09-11 (PERLANCAR)
+
+	- [ux] Add short option shortcuts for --infile (-i), --outfile
+	  (-o), --browser (-b).
+
+        - [build] Rebuild with updated Perinci::CmdLine::Inline which enabled
+          the generation of argument validation code.
+
+
 0.003   2018-09-10 (PERLANCAR)
 
 	- [ux] Use inline Perinci::CmdLine to minimize dependency, skip

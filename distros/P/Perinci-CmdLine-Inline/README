@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.542 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2018-03-28.
+    This document describes version 0.543 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2018-09-11.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
@@ -254,6 +254,10 @@ FUNCTIONS
 
         Assume that function returns raw text that need no formatting, do
         not offer --format, --json, --naked-res.
+
+    *   stripper => *bool* (default: 0)
+
+        Whether to strip code using Perl::Stripper.
 
     *   sub_name => *str*
 

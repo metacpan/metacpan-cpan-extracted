@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/GenPericmdCompleterScript/gen_pericmd_completer_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# Note: This script is a CLI for Riap function /App/GenPericmdCompleterScript/gen_pericmd_completer_script
+# and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2017-07-08'; # DATE
+our $DATE = '2018-09-11'; # DATE
 our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.120'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +13,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GenPericmdCompleterScript/gen_pericmd_completer_script",
     program_name => "gen-pericmd-completer",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Generate Perinci::CmdLine completer script
 # PODNAME: gen-pericmd-completer
@@ -33,7 +35,7 @@ gen-pericmd-completer - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.11 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2017-07-08.
+This document describes version 0.120 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2018-09-11.
 
 =head1 SYNOPSIS
 
@@ -77,6 +79,10 @@ Can be specified multiple times.
 
 Program name that is being completed.
 
+=item B<--strip>
+
+Whether to strip source code using Perl::Stripper.
+
 =item B<--subcommands-from-package-functions>
 
 Form subcommands from functions under package's URL.
@@ -103,17 +109,15 @@ then the subcommands become:
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -192,7 +196,7 @@ See C<--completion>.
 
 =item B<--default-subcommand>=I<s>
 
-=item B<--get-subcommand-from-arg>=I<i>
+=item B<--get-subcommand-from-arg>=I<s>
 
 Default value:
 
@@ -320,6 +324,7 @@ List of available configuration parameters:
  read_config (see --read-config)
  read_env (see --read-env)
  skip_format (see --skip-format)
+ strip (see --strip)
  subcommands (see --subcommands)
  subcommands_from_package_functions (see --subcommands-from-package-functions)
  url (see --url)
@@ -360,7 +365,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

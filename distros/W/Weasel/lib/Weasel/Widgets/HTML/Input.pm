@@ -13,6 +13,12 @@ Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION and BUTTON wrappers
 
 =cut
 
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::Widgets::HTML::Input;
 
 
@@ -23,7 +29,7 @@ use Moose;
 use Weasel::Element;
 use Weasel::WidgetHandlers qw/ register_widget_handler /;
 extends 'Weasel::Element';
-
+use namespace::autoclean;
 
 register_widget_handler(
     __PACKAGE__, 'HTML',
@@ -41,7 +47,7 @@ register_widget_handler(
     });
 
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =over
 
@@ -52,7 +58,7 @@ register_widget_handler(
 sub clear {
     my ($self) = @_;
 
-    $self->session->clear($self);
+    return $self->session->clear($self);
 }
 
 =item value([$value])
@@ -71,5 +77,45 @@ sub value {
     return $self->session->get_attribute($self, 'value');
 }
 
+=back
+
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+ (C) 2016  Erik Huelsmann
+
+Licensed under the same terms as Perl.
+
+=cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+

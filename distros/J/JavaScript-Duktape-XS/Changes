@@ -1,3 +1,12 @@
+0.000074    2018-09-11
+            * Treat references with more care:
+              + Recursively dereference any references.
+              + For \0 and \1, convert into false and true.
+              + For any other references, use the underlying data.
+            * Allow passing blessed objects to JS and back; ignore the fact
+              that they are blessed and treat them as data.
+            * Improve tests.
+
 0.000073    2018-09-10
             * Bring back dispatch_function_in_event_loop() to have an easy
               migration path from this to eval(); we will remove it soon.

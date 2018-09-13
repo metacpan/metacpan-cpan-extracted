@@ -6,7 +6,7 @@ package BSON::Int32;
 # ABSTRACT: BSON type wrapper for Int32
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use Carp;
 use Moo;
@@ -39,11 +39,19 @@ sub BUILD {
 #pod
 #pod Returns the value as an integer.
 #pod
+#pod If the C<BSON_EXTJSON> environment variable is true and the
+#pod C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+#pod compatible with
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
+#pod format, which represents it as a document as follows:
+#pod
+#pod     {"$numberInt" : "42"}
+#pod
 #pod =cut
 
-# BSON_EXTJSON_FORCE is for testing; not needed for normal operation
 sub TO_JSON {
-    return int($_[0]->{value});
+    return int($_[0]->{value}) if ! $ENV{BSON_EXTJSON} || $ENV{BSON_EXTJSON_RELAXED};
+    return { '$numberInt' => "$_[0]->{value}" };
 }
 
 use overload (
@@ -83,7 +91,7 @@ BSON::Int32 - BSON type wrapper for Int32
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -109,6 +117,14 @@ A numeric scalar.  It will be coerced to an integer.  The default is 0.
 =head2 TO_JSON
 
 Returns the value as an integer.
+
+If the C<BSON_EXTJSON> environment variable is true and the
+C<BSON_EXTJSON_RELAXED> environment variable is false, returns a hashref
+compatible with
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
+format, which represents it as a document as follows:
+
+    {"$numberInt" : "42"}
 
 =for Pod::Coverage BUILD
 

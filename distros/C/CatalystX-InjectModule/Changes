@@ -1,5 +1,17 @@
 Revision history for CatalystX-InjectModule
 
+0.17 2018-09-13
+     - change $module_file to pass uninstall module test
+
+0.16 2018-09-12
+     - load only modules libpath
+     - corrects conflict with Template package name
+     - use c->find_files to retrieve local config file
+     - all the tests pass
+
+0.15 2018-09-11
+     - we can now use cpan modules as a Catapulse module
+
 0.14 2018-08-21
      - build local config file (myapp_local.yml)
 

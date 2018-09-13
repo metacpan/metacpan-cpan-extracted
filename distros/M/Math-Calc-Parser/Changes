@@ -1,3 +1,7 @@
+1.002     2018-09-13 11:50:48 EDT
+  - Throw explicit error when taking the factorial of NaN
+  - Support π as alias for pi
+
 1.001     2015-10-30 15:54:16 EDT
   - Improved error messages to specify function that threw exception
   - More tests, cleanup of code and docs

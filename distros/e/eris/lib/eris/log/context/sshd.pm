@@ -8,7 +8,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub sample_messages {
@@ -30,14 +30,19 @@ EOF
 
 const my %RE => (
     extract_details => qr/(?:Accepted|Failed) (\S+) for (\S+) from (\S+) port (\S+) (\S+)/,
+    IPv4            => qr/\d{1,3}(?:\.\d{1,3}){3}/,
 );
 const my %F => (
     extract_details => [qw(driver acct src_ip src_port proto_app)],
 );
+const my %SDATA => qw(
+    user  acct
+);
 
 sub contextualize_message {
     my ($self,$log) = @_;
-    my $str = $log->context->{message};
+    my $c   = $log->context;
+    my $str = $c->{message};
 
     my %ctxt = ();
     $ctxt{status} = $str =~ /Accepted/ ? 'success'
@@ -55,6 +60,15 @@ sub contextualize_message {
     }
     else {
         delete $ctxt{status};
+    }
+    if( exists $c->{sdata} ) {
+        foreach my $k (keys %SDATA) {
+            $ctxt{$SDATA{$k}} = $c->{sdata}{$k} if exists $c->{sdata}{$k};
+        }
+        if( exists $c->{sdata}{rhost} ) {
+            my $k = $c->{sdata}{rhost} =~ /^$RE{IPv4}$/o ? 'src_ip' : 'src_host';
+            $ctxt{$k} = $c->{sdata}{rhost};
+        }
     }
 
     $log->add_context($self->name,\%ctxt) if keys %ctxt;
@@ -75,7 +89,7 @@ eris::log::context::sshd - Parse sshd logs into structured data
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

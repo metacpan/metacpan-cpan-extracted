@@ -1,7 +1,7 @@
 package Data::Sah::Type::BaseType;
 
-our $DATE = '2018-06-05'; # DATE
-our $VERSION = '0.892'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.893'; # VERSION
 
 # why name it BaseType instead of Base? because I'm sick of having 5 files named
 # Base.pm in my editor (there would be Type::Base and the various
@@ -173,7 +173,7 @@ Data::Sah::Type::BaseType - Base type
 
 =head1 VERSION
 
-This document describes version 0.892 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2018-06-05.
+This document describes version 0.893 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2018-09-11.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

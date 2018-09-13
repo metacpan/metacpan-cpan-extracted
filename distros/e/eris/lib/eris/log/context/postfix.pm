@@ -9,7 +9,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 sub _build_matcher { qr/^postfix/ }
@@ -43,13 +43,17 @@ EOF
 
 
 const my %MAP => qw(
-    from src
+    from src_user
+    to   dst_user
+    proto proto_app
     size in_bytes
+    helo src
 );
 
 sub contextualize_message {
     my ($self,$log) = @_;
-    my $str = $log->context->{message};
+    my $c = $log->context;
+    my $str = $c->{message};
 
     $log->add_tags(qw(mail));
     my %ctxt = ();
@@ -76,6 +80,19 @@ sub contextualize_message {
         if( my @conn = ($str =~ /(?>\b(from|to) ([^\[]+)\[([^\]]+)\])/) ) {
             my @fields = shift @conn eq 'from' ? qw(src src_ip) : qw(dst dst_ip);
             @ctxt{@fields} = @conn;
+            if ( $str =~ /NOQUEUE: ([^:]+):/ ) {
+                $ctxt{status} = $1;
+            }
+        }
+    }
+    if( index($c->{program}, '/') > 0 ) {
+        @ctxt{qw(program proc)} = split m{/}, $c->{program}, 2;
+    }
+    # install the /v pairs
+    if ( $c->{sdata} ) {
+        foreach my $k (sort keys %MAP) {
+            next unless exists $c->{sdata}{$k};
+            $ctxt{$MAP{$k}} = $c->{sdata}{$k};
         }
     }
 
@@ -97,7 +114,7 @@ eris::log::context::postfix - Parses postfix messages into structured data
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -113,9 +130,19 @@ A regex starting with the word 'postfix'
 
 =head2 contextualize_message
 
-Parses a postfic messages into a structured thing
+Parses a postfix messages into a structured document, extracting status
+information, IP addresses, and email addresses.
 
-TODO: Update these docs with the keys/values
+    action    => Connect/Disconnect, etc.
+    dst_ip    => Receiver IP
+    dst_user  => "To" email address
+    proc      => Postfix daemon issuing the message, e.g.: smtpd, anvil
+    program   => Set to 'postfix' for simplicity
+    proto_app => ESMTP, SMTP, LMTP, etc.
+    src       => Advertised server name taking action
+    src_ip    => Sender IP
+    src_user  => "From" email address
+    status    => Whether the operation was successful
 
 Tags messages with 'mail'
 

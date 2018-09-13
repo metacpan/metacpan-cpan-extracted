@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2018-03-28'; # DATE
-our $VERSION = '0.542'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.543'; # VERSION
 
 # line 820, don't know how to turn off this warning?
 ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
@@ -324,7 +324,8 @@ sub _gen_pci_check_args {
                 if (defined $arg_spec->{default}) {
                     push @l3, "        $arg_term //= ".dmp($arg_spec->{default}).";\n";
                 }
-                if ($arg_schema && $cd->{args}{validate_args}) {
+
+                if ($arg_schema && $cd->{gen_args}{validate_args}) {
                     $has_validation++;
                     my $dsah_cd = _dsah_plc->compile(
                         schema => $arg_schema,
@@ -971,12 +972,18 @@ _
             schema => 'bool',
             tags => ['category:output'],
         },
+        stripper => {
+            summary => 'Whether to strip code using Perl::Stripper',
+            schema => 'bool*',
+            default => 0,
+        },
     },
 };
 sub gen_inline_pericmd_script {
     require Data::Sah::Util::Type;
 
     my %args = @_;
+    $args{url} = "$args{url}"; # stringify URI object to avoid JSON encoder croaking
 
     # XXX schema
     $args{validate_args} //= 1;
@@ -1389,7 +1396,7 @@ _
             require Module::DataPack;
             my $dp_res = Module::DataPack::datapack_modules(
                 module_srcs => $cd->{module_srcs},
-                stripper    => 1,
+                stripper    => $args{stripper},
             );
             return [500, "Can't datapack: $dp_res->[0] - $dp_res->[1]"]
                 unless $dp_res->[0] == 200;
@@ -1557,7 +1564,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.542 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2018-03-28.
+This document describes version 0.543 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2018-09-11.
 
 =head1 SYNOPSIS
 
@@ -1802,6 +1809,10 @@ Set shebang line.
 =item * B<skip_format> => I<bool> (default: 0)
 
 Assume that function returns raw text that need no formatting, do not offer --format, --json, --naked-res.
+
+=item * B<stripper> => I<bool> (default: 0)
+
+Whether to strip code using Perl::Stripper.
 
 =item * B<sub_name> => I<str>
 

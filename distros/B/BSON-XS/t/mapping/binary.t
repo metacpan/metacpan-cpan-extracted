@@ -68,8 +68,8 @@ my $b64_data = encode_base64($test_data, "");
 is( to_myjson({a=>bson_bytes($test_data)}), qq[{"a":"$b64_data"}], 'json: bson_bytes(<data>)' );
 
 # to extended JSON
-is( to_extjson({a=>bson_bytes($test_data)}), qq[{"a":{"\$binary":"$b64_data","\$type":"00"}}], 'extjson: bson_bytes(<data>)' );
-is( to_extjson({a=>bson_bytes($test_data,128)}), qq[{"a":{"\$binary":"$b64_data","\$type":"80"}}], 'extjson: bson_bytes(<data>,128)' );
+is( to_extjson({a=>bson_bytes($test_data)}), qq[{"a":{"\$binary":{"base64":"$b64_data","subType":"00"}}}], 'extjson: bson_bytes(<data>)' );
+is( to_extjson({a=>bson_bytes($test_data,128)}), qq[{"a":{"\$binary":{"base64":"$b64_data","subType":"80"}}}], 'extjson: bson_bytes(<data>,128)' );
 
 done_testing;
 

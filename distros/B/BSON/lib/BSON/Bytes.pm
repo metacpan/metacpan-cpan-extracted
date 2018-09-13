@@ -6,9 +6,10 @@ package BSON::Bytes;
 # ABSTRACT: BSON type wrapper for binary byte strings
 
 use version;
-our $VERSION = 'v1.6.7';
+our $VERSION = 'v1.8.0';
 
 use MIME::Base64 ();
+use Tie::IxHash;
 
 use Moo;
 
@@ -41,18 +42,23 @@ sub BUILD {
 #pod Returns Base64 encoded string equivalent to the data attribute.
 #pod
 #pod If the C<BSON_EXTJSON> option is true, it will instead be compatible with
-#pod MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+#pod MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 #pod format, which represents it as a document as follows:
 #pod
-#pod     {"$binary" : "<base64 data>", "$type" : "<type>"}
+#pod     {"$binary" : { "base64": "<base64 data>", "subType" : "<type>"} }
 #pod
 #pod =cut
 
 sub TO_JSON {
     return MIME::Base64::encode_base64($_[0]->{data}, "") unless $ENV{BSON_EXTJSON};
+
+    my %data;
+    tie( %data, 'Tie::IxHash' );
+    $data{base64} = MIME::Base64::encode_base64($_[0]->{data}, "");
+    $data{subType} = sprintf("%02x",$_[0]->{subtype});
+
     return {
-        '$binary' => MIME::Base64::encode_base64($_[0]->{data}, ""),
-        '$type' => sprintf("%02x",$_[0]->{subtype}),
+        '$binary' => \%data,
     };
 }
 
@@ -76,7 +82,7 @@ BSON::Bytes - BSON type wrapper for binary byte strings
 
 =head1 VERSION
 
-version v1.6.7
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -109,10 +115,10 @@ should not be modified.  Subtypes 128 to 255 are "user-defined".
 Returns Base64 encoded string equivalent to the data attribute.
 
 If the C<BSON_EXTJSON> option is true, it will instead be compatible with
-MongoDB's L<extended JSON|https://docs.mongodb.org/manual/reference/mongodb-extended-json/>
+MongoDB's L<extended JSON|https://github.com/mongodb/specifications/blob/master/source/extended-json.rst>
 format, which represents it as a document as follows:
 
-    {"$binary" : "<base64 data>", "$type" : "<type>"}
+    {"$binary" : { "base64": "<base64 data>", "subType" : "<type>"} }
 
 =for Pod::Coverage BUILD type
 

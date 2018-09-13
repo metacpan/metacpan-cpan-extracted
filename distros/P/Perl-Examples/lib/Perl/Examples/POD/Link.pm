@@ -15,7 +15,7 @@ Perl::Examples::POD::Link - Show the various examples of links
 
 =head1 VERSION
 
-This document describes version 0.091 of Perl::Examples::POD::Link (from Perl distribution Perl-Examples), released on 2018-09-10.
+This document describes version 0.092 of Perl::Examples::POD::Link (from Perl distribution Perl-Examples), released on 2018-09-11.
 
 =head1 DESCRIPTION
 

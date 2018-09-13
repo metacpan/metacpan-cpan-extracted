@@ -17,6 +17,66 @@ has 'tree' => (is => 'rw',isa=> 'ArrayRef', default=> sub {return [];});
 
 has 'parent' => (is => 'rw', isa => 'Git::LowLevel::Tree');
 
+
+has 'changed' => (is => 'rw', isa => 'Bool', default=>0);
+
+sub timestamp_added
+{
+  my $self  = shift;
+  my $help = readpipe($self->repository->gitcmd() . " log --follow --diff-filter=A --date=raw " . $self->reference->reference . " -- \"" . $self->path . "\" 2>/dev/null");
+  my @lines = split /\n/,$help;
+  for my $line (@lines)
+  {
+    if ($line =~ /^Date:\s+(\d+)\s([+-]\d+)$/)
+    {
+      return $1;
+    }
+  }
+
+  return $help;
+}
+
+sub timestamp_last
+{
+  my $self  = shift;
+  my $help = readpipe($self->repository->gitcmd() . " log --follow --date=raw " . $self->reference->reference . " -- \"" . $self->path . "\" 2>/dev/null");
+  my @lines = split /\n/,$help;
+  for my $line (@lines)
+  {
+    if ($line =~ /^Date:\s+(\d+)\s([+-]\d+)$/)
+    {
+      return $1;
+    }
+  }
+
+  return $help;
+}
+
+sub committer
+{
+  my $self  = shift;
+  my $help = readpipe($self->repository->gitcmd() . " log --follow --date=raw " . $self->reference->reference . " -- \"" . $self->path . "\" 2>/dev/null");
+  my @lines = split /\n/,$help;
+  for my $line (@lines)
+  {
+    if ($line =~ /^Author:\s(.*)$/)
+    {
+      return $1;
+    }
+  }
+
+  return $help;
+}
+
+
+sub mypath
+{
+  my $self = shift;
+  my $path = basename($self->path);
+
+  return $path;
+}
+
 sub get
 {
   my $self = shift;
@@ -24,7 +84,7 @@ sub get
 
   return @{$self->tree} unless @{$self->tree} == 0;
 
-  my $help = readpipe($self->repository->gitcmd() . " ls-tree " . $self->reference->reference . " \"" . $self->path . "\" 2>/dev/null");
+  my $help = readpipe($self->repository->gitcmd() . " ls-tree " . $self->reference->reference . " \"" . $self->path . "/\" 2>/dev/null");
   my @lines = split /\n/,$help;
   for my $line (@lines)
   {
@@ -32,11 +92,11 @@ sub get
 
     if ($2 eq "blob")
     {
-      push(@ret, Git::LowLevel::Blob->new(repository=>$self->repository, hash => $3, path => $4));
+      push(@ret, Git::LowLevel::Blob->new(repository=>$self->repository, hash => $3, path => $4, parent=>$self));
     }
     else
     {
-      push(@ret, Git::LowLevel::Tree->new(repository=>$self->repository, reference=> $self->reference, hash => $3, path => $4 . "/"));
+      push(@ret, Git::LowLevel::Tree->new(repository=>$self->repository, reference=> $self->reference, hash => $3, path => $4 . "/", parent=>$self));
     }
 
   }
@@ -69,7 +129,7 @@ sub newTree
 {
   my $self  = shift;
 
-  return Git::LowLevel::Tree->new(repository => $self->repository, reference => $self->reference, hash=>"empty");
+  return Git::LowLevel::Tree->new(repository => $self->repository, reference => $self->reference, hash=>"empty", changed => 1);
 }
 
 sub add
@@ -86,6 +146,7 @@ sub add
   }
 
   $self->get();
+  $self->changed(1);
   $elem->parent($self);
   push(@{$self->tree}, $elem);
 }
@@ -121,7 +182,7 @@ sub del
     }
 
   }
-
+  $self->changed(1);
   $self->tree(\@tree);
 
 }
@@ -131,16 +192,18 @@ sub save
   my $self  = shift;
   my $str   = "";
 
-  return unless defined($self->tree);
-
   for my $t (@{$self->tree})
   {
     $t->save;
     $str .= $t->treeEntry;
   }
-  my $help = readpipe("/bin/echo -e \"" . $str. "\" | " .  $self->repository->gitcmd() . " mktree --batch ");
-  chomp($help);
-  $self->hash($help);
+
+  if ($self->changed()) {
+    my $help = readpipe("/bin/echo -e \"" . $str. "\" | " .  $self->repository->gitcmd() . " mktree --batch ");
+    chomp($help);
+    $self->hash($help);
+    $self->changed(0);
+  }
 
 }
 sub treeEntry
@@ -149,15 +212,7 @@ sub treeEntry
 
   return "" unless $self->hash ne "empty";
 
-  my $path = fileparse($self->path);
-  if (length($path)==0)
-  {
-    $path=substr($self->path,0,length($self->path)-1);
-  }
-
-
-
-  return "040000 tree " . $self->hash . "\t" . $path . "\n";
+  return "040000 tree " . $self->hash . "\t" . $self->mypath() . "\n";
 }
 
 
@@ -166,7 +221,7 @@ sub find
   my $self  = shift;
   my $path  = shift;
 
-  return $self unless $self->path ne $path;
+  return $self unless $self->mypath ne $path;
 
   $self->get();
   for my $t (@{$self->tree})
@@ -195,7 +250,7 @@ Git::LowLevel::Tree - class representing a tree object in a GIT Repository
 
 =head1 VERSION
 
-version 0.1
+version 0.3
 
 =head1 ATTRIBUTES
 
@@ -223,7 +278,28 @@ the tree entries
 
 the parent of the object within the tree
 
+=head2 changed
+
+identifies if the tree has been changed
+add,del or initial create of the tree
+
 =head1 METHODS
+
+=head2 timestamp_added
+
+returns the timestamp of the commit where this object was added or undef if
+object has not been commited yet.
+
+=head2 timestamp_last
+
+returns the timestamp of the last commit of this object or undef if
+object has not been commited yet.
+
+=head2 committer
+
+returns the committer of the the object
+
+=head2 mypath
 
 =head2 get
 

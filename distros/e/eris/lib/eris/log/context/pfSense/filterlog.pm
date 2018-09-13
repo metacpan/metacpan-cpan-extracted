@@ -1,5 +1,5 @@
 package eris::log::context::pfSense::filterlog;
-# ABSTRACT: Parse the pfsense filterlog
+# ABSTRACT: Parse the pfSense filterlog
 
 use Moo;
 with qw(
@@ -9,7 +9,7 @@ use Text::CSV_XS;
 use Types::Standard qw(InstanceOf);
 use namespace::autoclean;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 
 has 'parser' => (
@@ -92,11 +92,11 @@ __END__
 
 =head1 NAME
 
-eris::log::context::pfSense::filterlog - Parse the pfsense filterlog
+eris::log::context::pfSense::filterlog - Parse the pfSense filterlog
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

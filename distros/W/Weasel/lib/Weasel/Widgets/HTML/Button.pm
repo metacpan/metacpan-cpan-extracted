@@ -17,6 +17,12 @@ Weasel::Widgets::HTML::Button - Wrapper for button-like INPUT and BUTTON tags
 
 =cut
 
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
 package Weasel::Widgets::HTML::Button;
 
 
@@ -27,6 +33,11 @@ use Moose;
 use Weasel::WidgetHandlers qw/ register_widget_handler /;
 
 extends 'Weasel::Widgets::HTML::Input';
+use namespace::autoclean;
+
+=head1 SUBROUTINES/METHODS
+
+=cut
 
 register_widget_handler(
     __PACKAGE__, 'HTML',
@@ -42,6 +53,44 @@ register_widget_handler(
     );
 
 
+=head1 AUTHOR
 
+Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+Erik Huelsmann
+Yves Lavoie
+
+=head1 MAINTAINERS
+
+Erik Huelsmann
+
+=head1 BUGS AND LIMITATIONS
+
+Bugs can be filed in the GitHub issue tracker for the Weasel project:
+ https://github.com/perl-weasel/weasel/issues
+
+=head1 SOURCE
+
+The source code repository for Weasel is at
+ https://github.com/perl-weasel/weasel
+
+=head1 SUPPORT
+
+Community support is available through
+L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+ (C) 2016  Erik Huelsmann
+
+Licensed under the same terms as Perl.
+
+=cut
+
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+

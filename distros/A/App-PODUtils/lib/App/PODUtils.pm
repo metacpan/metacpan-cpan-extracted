@@ -1,7 +1,7 @@
 package App::PODUtils;
 
-our $DATE = '2017-01-29'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2018-09-11'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 1;
 # ABSTRACT: Command-line utilities related to POD
@@ -18,7 +18,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.03 of App::PODUtils (from Perl distribution App-PODUtils), released on 2017-01-29.
+This document describes version 0.040 of App::PODUtils (from Perl distribution App-PODUtils), released on 2018-09-11.
 
 =head1 SYNOPSIS
 
@@ -28,8 +28,6 @@ POD:
 =over
 
 =item * L<elide-pod>
-
-=item * L<view-pod-in-browser>
 
 =back
 
@@ -49,13 +47,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<pod2html>
+
+L<podtohtml> from L<App::podtohtml>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
