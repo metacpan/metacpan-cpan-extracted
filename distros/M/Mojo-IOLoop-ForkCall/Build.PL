@@ -20,6 +20,7 @@ my $build = Module::Build->new(
       repository => 'https://github.com/jberger/Mojo-IOLoop-ForkCall',
       bugtracker => 'https://github.com/jberger/Mojo-IOLoop-ForkCall/issues',
     },
+    x_deprecated => 1,
   },
 );
 

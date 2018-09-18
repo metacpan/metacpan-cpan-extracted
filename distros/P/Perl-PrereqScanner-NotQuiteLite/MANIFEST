@@ -13,6 +13,7 @@ lib/Perl/PrereqScanner/NotQuiteLite/Parser/ClassAutouse.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/ClassLoad.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Core.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Inline.pm
+lib/Perl/PrereqScanner/NotQuiteLite/Parser/KeywordDeclare.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Later.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Mixin.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/ModuleRuntime.pm
@@ -49,6 +50,7 @@ t/aliased.t
 t/app/basic.t
 t/app/cpanfile.t
 t/autouse.t
+t/begin_exit.t
 t/catalyst.t
 t/class_autouse.t
 t/class_load.t
@@ -66,6 +68,7 @@ t/module_runtime.t
 t/mojo_base.t
 t/moose/any_moose.t
 t/moose/class_accessor.t
+t/moose/extends_inner_package.t
 t/moose/moose.t
 t/moose/no_moose.t
 t/moose/with_variable.t
@@ -83,6 +86,7 @@ t/scan/function_parameters.t
 t/scan/glob.t
 t/scan/heredoc.t
 t/scan/if.t
+t/scan/keyword_declare.t
 t/scan/map.t
 t/scan/method.t
 t/scan/moosex_declare/attribute_issues.t
@@ -95,6 +99,7 @@ t/scan/print.t
 t/scan/qq.t
 t/scan/qr.t
 t/scan/re.t
+t/scan/recursion.t
 t/scan/sub.t
 t/scan/syntax/qs.t
 t/scan/trycatch.t

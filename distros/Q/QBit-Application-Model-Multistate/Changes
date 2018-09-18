@@ -1,79 +1,25 @@
 ==================================================
-Changes from 2015-12-19 00:00:00 +0000 to present.
+Changes from 2017-09-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.008 at 2016-12-18 23:08:53 +0000
+version 0.009 at 2018-09-15 13:59:33 +0000
 ------------------------------------------
 
-  Change: 55166821888101cd6c799575fdf52bb990a380d1
+  Change: 8cf90d69dcd173dc38ea7f55f35a435df35f9ab8
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:08:17 +0000
+  Date : 2018-09-15 16:58:43 +0000
 
-    Merge pull request #9 from Madskill/fix_exceptions
+    Merge pull request #10 from Madskill/speed_up
 
-    Fix exceptions 
+    speed up 
 
-  Change: f6c169ecf8fca8ad9a2155e36b2599b0a6083667
+  Change: 2cb32a81c504bf0fd5db5893113c097b5078aeea
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:07:15 +0000
+  Date : 2018-09-15 16:55:33 +0000
 
-    Merge remote-tracking branch 'upstream/master' into fix_exceptions 
-
-  Change: d7bcbd66e17728586b6076461ab7f3f447a008eb
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:06:41 +0000
-
-    fix exceptions 
-
-------------------------------------------
-version 0.007 at 2016-12-07 19:26:34 +0000
-------------------------------------------
-
-  Change: c7ee7a7e3c758fc57f9e31971c2858cfb38559e7
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-07 22:26:34 +0000
-
-    Version 0.007 
-
-  Change: 0fedb1d2e9304c22c2bcfc4e56f5a70b165a9c45
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-07 22:25:47 +0000
-
-    Merge pull request #8 from Madskill/fix_depends
-
-    fix depends 
-
-  Change: fa574027516f60cfe18cfe4c66bb67224626f51a
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-07 22:24:49 +0000
-
-    fix depends 
-
-------------------------------------------
-version 0.006 at 2016-09-04 20:06:09 +0000
-------------------------------------------
-
-  Change: 9a5ea200b44c19b8107175c81d3259857a729c33
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:06:09 +0000
-
-    Version 0.006 
-
-  Change: 17263c5f0d5be1c12acf5f7dd5bde240142ef126
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-05 00:04:51 +0000
-
-    Merge pull request #7 from Madskill/upload_to_cpan
-
-    upload to cpan 
-
-  Change: db6705e9f847c54c718ca5bcf8a76f185ecbf5c2
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:04:01 +0000
-
-    upload to cpan 
+    speed up 
 
 ================================================
-Plus 5 releases after 2015-12-19 00:00:00 +0000.
+Plus 8 releases after 2017-09-15 00:00:00 +0000.
 ================================================

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -851,15 +851,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 
@@ -1349,14 +1347,6 @@ regular expressions.  Those patterns are:
 
 Brad Lhotsky <brad@divisionbyzero.net>
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2012 by Brad Lhotsky.
-
-This is free software, licensed under:
-
-  The (three-clause) BSD License
-
 =head1 CONTRIBUTORS
 
 =for stopwords Alexey Shatlovsky Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Samit Badle Takumi Sakamoto
@@ -1422,17 +1412,37 @@ L<https://metacpan.org/release/App-ElasticSearch-Utilities>
 
 =item *
 
-RT: CPAN's Bug Tracker
+CPAN Testers
 
-The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ElasticSearch-Utilities>
+L<http://www.cpantesters.org/distro/A/App-ElasticSearch-Utilities>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=App-ElasticSearch-Utilities>
 
 =back
+
+=head2 Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/es-utils/issues>
 
 =head2 Source Code
 
 This module's source code is available by visiting:
 L<https://github.com/reyjrar/es-utils>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
 
 =cut

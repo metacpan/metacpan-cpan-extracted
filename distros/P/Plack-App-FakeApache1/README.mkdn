@@ -4,7 +4,7 @@ Plack::App::FakeApache1 - Perl distro to aid in mod\_perl1->PSGI migration
 
 # VERSION
 
-version 0.0.5
+version 0.0.6
 
 # AUTHOR
 

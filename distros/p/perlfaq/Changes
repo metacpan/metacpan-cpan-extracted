@@ -1,5 +1,9 @@
 Revision history for perlfaq
 
+5.20180915  2018-09-15 22:28:25Z
+  * use '.' in paths in example 'require' clauses, as . is no longer
+    guaranteed to be in @INC
+
 5.20180913  2018-09-13 04:33:27Z
   * updated references to web frameworks in perlfaq9 (thanks, Dan Book!)
 

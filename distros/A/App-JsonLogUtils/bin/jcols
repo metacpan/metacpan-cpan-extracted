@@ -5,6 +5,8 @@
 use strict;
 use warnings;
 
+$0 = 'jcols';
+
 use Getopt::Long;
 use Pod::Usage;
 use App::JsonLogUtils qw(lines json_cols);
@@ -46,7 +48,7 @@ jcols - transforms JSON into tabular fields suitable for column
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

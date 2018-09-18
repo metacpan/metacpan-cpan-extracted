@@ -1,3 +1,7 @@
+0.03 2018-09-14
+-set program name in command line utilities
+-set default path with "jshell --path /path/to/log"
+
 0.02 2018-09-07
 -moved script functionality into exported iterator routines
 -silenced warning in jshell when matching field not present in entry

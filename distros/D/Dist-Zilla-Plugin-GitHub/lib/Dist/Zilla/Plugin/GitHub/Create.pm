@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Create;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use JSON::MaybeXS;
 use Moose;
@@ -206,7 +206,7 @@ Dist::Zilla::Plugin::GitHub::Create - Create a new GitHub repo on dzil new
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 

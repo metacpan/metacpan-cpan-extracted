@@ -1,0 +1,79 @@
+{
+   "abstract" : "build rakudo Perl6",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl6-Build",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "0",
+            "File::pushd" : "0",
+            "HTTP::Tinyish" : "0",
+            "IPC::Run3" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Perl6::Build" : {
+         "file" : "lib/Perl6/Build.pm",
+         "version" : "0.002"
+      },
+      "Perl6::Build::Builder" : {
+         "file" : "lib/Perl6/Build/Builder.pm"
+      },
+      "Perl6::Build::Builder::RakudoStar" : {
+         "file" : "lib/Perl6/Build/Builder/RakudoStar.pm"
+      },
+      "Perl6::Build::Builder::Source" : {
+         "file" : "lib/Perl6/Build/Builder/Source.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/perl6-build/issues"
+      },
+      "homepage" : "https://github.com/skaji/perl6-build",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/perl6-build.git",
+         "web" : "https://github.com/skaji/perl6-build"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "x_static_install" : 1
+}
+

@@ -1,5 +1,8 @@
 Revision history for Perl extension RocksDB
 
+0.05 2018-09-16T17:28:10Z
+    - Update rocksdb (5.15.10)
+
 0.04 2015-02-15T15:54:16Z
     - Update rocksdb (3.9.1)
     - Support options for Block-based, plain and Cuckoo table

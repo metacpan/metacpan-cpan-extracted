@@ -29,21 +29,20 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "Exporter" => 0,
     "Getopt::Args" => 0,
-    "Log::Log4perl::Shortcuts" => "0.015",
-    "Path::Tiny" => 0,
+    "Log::Log4perl::Shortcuts" => "0.021",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
     "File::Path" => 0,
     "File::Spec" => 0,
+    "Getopt::Args" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Output" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.029",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,13 +51,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cwd" => 0,
-  "Data::Dumper" => 0,
   "Exporter" => 0,
   "File::Path" => 0,
   "File::Spec" => 0,
   "Getopt::Args" => 0,
-  "Log::Log4perl::Shortcuts" => "0.015",
-  "Path::Tiny" => 0,
+  "Log::Log4perl::Shortcuts" => "0.021",
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Output" => 0,

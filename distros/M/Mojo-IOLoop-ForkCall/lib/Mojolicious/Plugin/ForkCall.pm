@@ -18,7 +18,8 @@ sub register {
     my $cb = pop;
     my @args = @_;
 
-    $c->delay(
+    my $tx = $c->render_later->tx;
+    Mojo::IOLoop->delay(
       sub{
         my $end = shift->begin;
         my $once = sub { $end->(@_) if $end; undef $end };
@@ -31,7 +32,10 @@ sub register {
         die $err if $err;
         $c->$cb(@return);
       }
-    );
+    )->catch(sub{
+      $c->helpers->reply->exception(pop);
+      undef $tx;
+    })->wait;
   });
 }
 
@@ -39,8 +43,7 @@ sub register {
 
 =head1 NAME
 
-Mojolicious::Plugin::ForkCall - run blocking code asynchronously in Mojolicious
-applications by forking
+Mojolicious::Plugin::ForkCall - (DEPRECATED) run blocking code asynchronously in Mojolicious applications by forking
 
 =head1 SYNOPSIS
 
@@ -69,6 +72,10 @@ applications by forking
  app->start;
 
 =head1 DESCRIPTION
+
+DEPRECATED!
+The main module L<Mojo::IOLoop::ForkCall> is deprecated in favor of the L<Mojolicious> core module L<Mojo::IOLoop::Subprocess>.
+This module is also deprecated but in favor of the CPAN module L<Mojolicious::Plugin::Subprocess> which does approximately what this module does but in terms of the core module.
 
 Registering L<Mojolicious::Plugin::ForkCall> adds a helper method C<fork_call>
 to your L<Mojolicious> application, making it easy to start code in a forked
@@ -103,18 +110,17 @@ be passed to the child code, and a required code reference to be run in the
 parent as a callback. The callback is passed the controler instance and return
 values of the child.
 
-The helper relies on the L<Mojolicious> core helper
-L<Mojolicious::Plugin::DefaultHelpers/delay> and as such it will render an
-exception (500) page if any uncaught exception occurs in the child process or
-in the parent callback. This also means that the parent callback will not be
-called if the child process encounters an exception.
+The helper emulates the former L<Mojolicious> core C<delay> helper and as such
+it will render an exception (500) page if any uncaught exception occurs in the
+child process or in the parent callback. This also means that the parent
+callback will not be called if the child process encounters an exception.
 
 This helper is a convenience only and is not indended for complex cases.
 If you need to configure the L<Mojo::IOLoop::ForkCall> instance or want to
 "fork and forget" a child, you should use the class directly rather than this
 helper. If more complicated delays are required, you should use the
-L<Mojolicious::Plugin::DefaultHelpers/delay> helper or L<Mojo::IOLoop/delay>
-method directly, along with an instance of L<Mojo::IOLoop::ForkCall>.
+L<Mojo::IOLoop/delay> method directly, along with an instance of
+L<Mojo::IOLoop::ForkCall>.
 
 =cut
 

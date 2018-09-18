@@ -329,6 +329,20 @@ options:
 
 See L<URPM> for callback parameters
 
+There's 2 callbacks that are specific to C<urpm::install> though:
+
+=over
+
+=item * open_helper($data, $type, $id)
+
+=item * close_helper($db, $data, $type, $id)
+
+=back
+
+Those are called when opening/closing a package file, whether when rpmlib verify or install packages.
+
+The C<close_helper> callback receives an extra $db parameter used in eg: drakx to check whether a package really was installed through a DB query.
+
 =cut
 
 #- side-effects: uses a $urpm->{readmes}

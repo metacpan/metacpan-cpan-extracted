@@ -21,6 +21,20 @@ subtest 'IntstanceOf[DateTime]' => sub {
 
 };
 
+subtest 'IntstanceOf[DateTime::Tiny]' => sub {
+
+    my $type = InstanceOf['DateTime::Tiny'];
+
+    isa_ok $type => 'Type::Tiny';
+
+    my %info = column_info_from_type($type);
+
+    is_deeply \%info => { data_type => 'datetime' },
+      'column_info'
+      or note( explain \%info );
+
+};
+
 subtest 'Maybe InstanceOf[DateTime]' => sub {
 
     my $type = Maybe [InstanceOf['DateTime']];

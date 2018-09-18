@@ -6,6 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+use Test::Mojo;
 use Test::More;
 
 use FindBin;
@@ -18,7 +19,6 @@ use Mojo::Home;
 use Mojo::IOLoop;
 use Mojolicious;
 use Mojolicious::Controller;
-use Test::Mojo;
 
 # Missing config file
 {
@@ -73,7 +73,11 @@ is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 is_deeply $t->app->commands->namespaces,
-  [qw(Mojolicious::Command MojoliciousTest::Command)], 'right namespaces';
+  [
+  'Mojolicious::Command', 'Mojolicious::Command::Author',
+  'MojoliciousTest::Command'
+  ],
+  'right namespaces';
 is $t->app, $t->app->commands->app, 'applications are equal';
 is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a development static file!\n", 'right content';
@@ -484,11 +488,14 @@ $t->get_ok('/just/some/template')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("Development template with high precedence.\n");
 
-# Check default development mode log level
-is(Mojolicious->new->log->level, 'debug', 'right log level');
+{
+  # Check default development mode log level
+  local $ENV{MOJO_LOG_LEVEL};
+  is(Mojolicious->new->log->level, 'debug', 'right log level');
 
-# Check non-development mode log level
-is(Mojolicious->new->mode('test')->log->level, 'info', 'right log level');
+  # Check non-development mode log level
+  is(Mojolicious->new->mode('test')->log->level, 'info', 'right log level');
+}
 
 # Make sure we can override attributes with constructor arguments
 is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');

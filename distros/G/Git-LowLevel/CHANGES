@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2017-09-11 00:00:00 +0000 to present.
+Changes from 2017-09-15 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.3 at 2018-09-11 17:56:25 +0000
+version 0.4 at 2018-09-15 22:49:30 +0000
+----------------------------------------
+
+  Change: 5fdc656c2198956708886ffe556e4b7c4ffd0c29
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-16 00:47:47 +0000
+
+    ADD: improved tests 
+
+  Change: 9edddb7ff1cb32b97d82c641d3a135e4cadfb201
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-12 23:40:57 +0000
+
+    ADD: reworked del method 
+
+----------------------------------------
+version 0.3 at 2018-09-10 20:51:34 +0000
 ----------------------------------------
 
   Change: 9c32478fe410bbd0889893e9727bbb1e16d93032

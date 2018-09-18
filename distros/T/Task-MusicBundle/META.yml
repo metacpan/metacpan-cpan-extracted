@@ -28,6 +28,7 @@ requires:
   MIDI: '0'
   MIDI::Drummer::Tiny: '0'
   MIDI::Morph: '0'
+  MIDI::Ngram: '0'
   MIDI::Pitch: '0'
   MIDI::Praxis::Variation: '0'
   MIDI::Simple::Drummer: '0'
@@ -67,7 +68,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-MusicBundle
   repository: https://github.com/ology/Task-MusicBundle
-version: '0.14'
+version: '0.15'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

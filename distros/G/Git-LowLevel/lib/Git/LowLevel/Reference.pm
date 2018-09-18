@@ -121,7 +121,7 @@ Git::LowLevel::Reference - class representing a reference in a git repository
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 DESCRIPTION
 

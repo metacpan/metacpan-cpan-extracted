@@ -1,5 +1,8 @@
 Revision history for Struct-Path-JsonPointer
 
+0.03    2018-09-17
+        - delete, expand and insert modes added
+
 0.02    2018-01-15
         - Dist fixed (testing depends)
 

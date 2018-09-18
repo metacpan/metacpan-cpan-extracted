@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008001;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Pod-Weaver-PluginBundle-SHLOMIF",
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.008001",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Pod::Weaver::PluginBundle::SHLOMIF",
   "PREREQ_PM" => {
     "Pod::Elemental::PerlMunger" => "0.200001",
@@ -33,14 +33,11 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "File::pushd" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Path::Tiny" => 0,
-    "Test::DZil" => 0,
-    "Test::More" => "0.96"
+    "Test::More" => "0.88"
   },
-  "VERSION" => "0.001000",
+  "VERSION" => "0.001001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,11 +46,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
-  "File::pushd" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
-  "Path::Tiny" => 0,
   "Pod::Elemental::PerlMunger" => "0.200001",
   "Pod::Elemental::Transformer::List" => "0.102000",
   "Pod::Weaver" => 4,
@@ -61,8 +56,7 @@ my %FallbackPrereqs = (
   "Pod::Weaver::Plugin::WikiDoc" => 0,
   "Pod::Weaver::Section::Contributors" => "0.008",
   "Pod::Weaver::Section::Support" => "1.001",
-  "Test::DZil" => 0,
-  "Test::More" => "0.96",
+  "Test::More" => "0.88",
   "strict" => 0,
   "warnings" => 0
 );

@@ -4,7 +4,7 @@
       "Jiro Nishiguchi <jiro@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "bsd"
    ],
@@ -34,7 +34,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.4005"
          }
       },
       "develop" : {
@@ -64,7 +64,7 @@
    "provides" : {
       "RocksDB" : {
          "file" : "lib/RocksDB.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -78,5 +78,10 @@
          "web" : "https://github.com/spiritloose/RocksDB"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_contributors" : [
+      "Jiro Nishiguchi <spiritloose@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 0
 }

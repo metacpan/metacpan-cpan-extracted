@@ -3,6 +3,7 @@ use Config;
 use ExtUtils::MakeMaker;
 
 #system 'pod2text lib/Class/Accessor/Inherited/XS.pm > README';
+#system 'pod2github lib/Class/Accessor/Inherited/XS.pm > README.md';
 
 my $CCFLAGS = join(' ',$Config{ccflags},'-x c++', '-fno-exceptions', '-fno-rtti');
 

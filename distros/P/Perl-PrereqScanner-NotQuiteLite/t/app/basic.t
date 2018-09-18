@@ -61,6 +61,28 @@ use Foo;
 END
 }, {exclude_core => 1}, { runtime => { requires => { Foo => 0 }}});
 
+test_app('ignore core modules for higher perl version', sub {
+  my $tmpdir = shift;
+
+  test_file("$tmpdir/MyTest.pm", <<'END');
+use 5.020;
+use strict;
+use warnings;
+use experimental qw/signatures/;
+use Foo;
+END
+}, {exclude_core => 1}, { runtime => { requires => { Foo => 0, perl => '5.020' }}});
+
+test_app('ignore Makefile.PL under t', sub {
+  my $tmpdir = shift;
+
+  test_file("$tmpdir/t/Makefile.PL", <<'END');
+use strict;
+use warnings;
+use Foo;
+END
+}, {});
+
 test_app('dedupe requires from recommends/suggests', sub {
   my $tmpdir = shift;
 

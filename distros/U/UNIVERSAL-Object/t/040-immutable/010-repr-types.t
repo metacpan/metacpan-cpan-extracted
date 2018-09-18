@@ -118,3 +118,31 @@ BEGIN {
     ok(!$@, '... got the expected (lack of) error');
     is($result, 10, '... got the expected value');
 }
+
+{
+    {
+        package My::OverloadedInstance::Test;
+
+        use strict;
+        use warnings;
+
+        our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object::Immutable') }
+
+        use overload '""' => 'to_string';
+
+        sub REPR   { +{} }
+        sub CREATE { $_[0]->REPR }
+
+        sub to_string { __PACKAGE__.'::<<>>' }
+    }
+
+    my $instance;
+
+    $@ = undef;
+    eval { $instance = My::OverloadedInstance::Test->new };
+    ok(!$@, '... got lack of error');
+
+    isa_ok($instance, 'My::OverloadedInstance::Test');
+}
+
+

@@ -54,6 +54,7 @@ examples/Zmatrix/ethane_ss.pl
 examples/Zmatrix/propane_ss.pl
 examples/Zmatrix/valine.zmat
 examples/Zmatrix/zmat.pl
+examples/cif/horrible_no_good_regression_tests.pl
 examples/cif/parse_dump.pl
 examples/cif/parse_dump_mols.pl
 examples/group_rot.pl

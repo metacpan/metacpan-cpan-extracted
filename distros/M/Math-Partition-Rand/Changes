@@ -1,5 +1,10 @@
 Revision history for Math-Partition-Rand
 
+0.0302 2018-09-14 22:29:21
+    - Add a "top=10" test.
+    - Remove the unused label variable.
+    - Improve documentation.
+
 0.0301 2017-02-23 16:35:19
     - Improve package description.  Thanks to Dana Jacobsen.
 

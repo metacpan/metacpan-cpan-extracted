@@ -1,8 +1,9 @@
 package Plack::App::FakeModPerl1::Dispatcher;
+
 {
   $Plack::App::FakeModPerl1::Dispatcher::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeModPerl1::Dispatcher::VERSION = '0.0.5';
+$Plack::App::FakeModPerl1::Dispatcher::VERSION = '0.0.6';
 # ABSTRACT: Mimic Apache mod_perl1's dispatcher
 use 5.10.1;
 use Moose;
@@ -173,11 +174,8 @@ sub _require_handler_module {
 
     say "require($module)"
         if $self->debug;
-    try {
-        eval "require $module";
-        if (my $e=$@) { die $e; }
-    }
-    catch ($e) {
+    eval "require $module";
+    if (my $e=$@) {
         say "failed to require($module): $e";
         warn "failed to require($module): $e";
     }
@@ -270,7 +268,7 @@ Plack::App::FakeModPerl1::Dispatcher - Mimic Apache mod_perl1's dispatcher
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =begin explanation
 

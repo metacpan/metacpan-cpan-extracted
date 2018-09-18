@@ -6,7 +6,7 @@ use Test::More;
 use Perl::PrereqScanner::NotQuiteLite;
 use Exporter qw/import/;
 
-our @EXPORT = (@Test::More::EXPORT, qw/test/);
+our @EXPORT = (@Test::More::EXPORT, qw/test test_with_error/);
 
 sub test {
   my $string = shift;
@@ -15,6 +15,15 @@ sub test {
   );
   my $c = $scanner->scan_string($string);
   ok !@{$c->{errors}} or note explain $c;
+}
+
+sub test_with_error {
+  my $string = shift;
+  my $scanner = Perl::PrereqScanner::NotQuiteLite->new(
+    parsers => [':bundled'],
+  );
+  my $c = $scanner->scan_string($string);
+  ok @{$c->{errors}};
 }
 
 1;

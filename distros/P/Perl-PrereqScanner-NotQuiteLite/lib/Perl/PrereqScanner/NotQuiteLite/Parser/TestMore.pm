@@ -10,6 +10,11 @@ sub register { return {
   },
 }}
 
+sub register_fqfn { return +{
+  'Test::More::done_testing' => 'parse_done_testing_args',
+  'Test::More::plan' => 'parse_plan_args',
+}}
+
 sub parse_test_more_args {
   my ($class, $c, $used_module, $raw_tokens) = @_;
 

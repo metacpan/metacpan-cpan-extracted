@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use Moo;
 use strictures 2;
@@ -29,11 +29,11 @@ sub fetch {
         $query = join '&', map { "$_=$args{query}->{$_}" } keys %{ $args{query} };
     }
 
-    my $ua = Mojo::UserAgent->new;
-
     my $url = $self->base . '/'. $args{mbid} . '/'. $args{endpoint};
     $url .= '?' . $query
         if $query;
+
+    my $ua = Mojo::UserAgent->new;
 
     my $tx = $ua->get($url);
 
@@ -80,7 +80,7 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0103
+version 0.0104
 
 =head1 SYNOPSIS
 

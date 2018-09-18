@@ -1,5 +1,8 @@
 Revision history for Task-MusicBundle
 
+0.15 2018-09-14 20:09:59
+    - Added MIDI::Ngram.
+
 0.14 2018-04-06 15:30:42
     - Added Music::ScaleNote.
 

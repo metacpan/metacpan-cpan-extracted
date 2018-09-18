@@ -1,3 +1,5 @@
+# Test the regex subroutine InKana provided by LJM.
+
 use warnings;
 use strict;
 use Test::More;
@@ -17,7 +19,7 @@ my @kana = (qw/
               /);
 
 for (@kana) {
-    ok (/^\p{InKana}+$/, "matches");
+    ok (/^\p{InKana}+$/, "Strings of various types of kana match \\p{InKana}.");
 }
 
 my @not_kana = (qw/
@@ -27,14 +29,13 @@ abcdefg
 /);
 
 for (@not_kana) {
-    ok (!/\p{InKana}/, "not matches InKana");
+    ok (!/\p{InKana}/, "Non-kana input does not match InKana");
 }
 
-unlike ('・', qr/\p{InKana}/, "katakana middle dot is not kana");
+unlike ('・', qr/\p{InKana}/, "Katakana middle dot is not kana");
 
 TODO: {
     local $TODO = 'bugs';
-
 };
 
 done_testing ();

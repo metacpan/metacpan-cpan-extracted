@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Random floating point additive partitions
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 use strict;
 use warnings;
@@ -27,9 +27,8 @@ sub choose {
 
     my @distribution;
 
-    my $label = 0;
-    my $top   = $self->{top};
-    my $n     = $self->{n};
+    my $top = $self->{top};
+    my $n   = $self->{n};
 
     for my $i ( 1 .. $n ) {
         my $curr = rand($top);
@@ -38,7 +37,6 @@ sub choose {
         push @distribution, $i == $n ? $top : $next;
 
         $top = $curr;
-        $label++;
     }
 
     return \@distribution;
@@ -58,7 +56,7 @@ Math::Partition::Rand - Random floating point additive partitions
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 SYNOPSIS
 
@@ -69,8 +67,9 @@ version 0.0301
 
 =head1 DESCRIPTION
 
-A C<Math::Partition::Rand> object does one thing: it partitions a number (B<top>) into a given number of
-"random addition sequences" (B<n>).
+A C<Math::Partition::Rand> object does one thing: it partitions a number
+(B<top>) into a given number of "random addition sequences" (B<n>).  That is,
+the sequences add up to the original number.
 
 =head1 METHODS
 
@@ -90,7 +89,7 @@ Arguments and defaults:
   $distribution = $partition->choose;
   # [ 0.3161932258724, 0.683806774127597 ] for instance
 
-Partition the given number B<top> into addition B<n> sequences.
+Partition the given number B<top> into B<n> addition sequences.
 
 =head1 AUTHOR
 

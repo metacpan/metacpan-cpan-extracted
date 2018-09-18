@@ -22,11 +22,12 @@ TODO:
     our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') };
     our %HAS; BEGIN { %HAS = (foo => sub { 'FOO' }) };
 
+    our %TRACKED;
+
     sub REPR {
         my $class = shift;
         my $instance = {};
-        $instance->{__CLASS__} = $class;
-        $instance->{__IDENT__} = 0+$instance;
+        $TRACKED{ 0+$instance } = $instance;
         return $instance;
     }
 }
@@ -39,11 +40,8 @@ TODO:
     ok(exists $o->{foo}, '... got the expected slot');
     is($o->{foo}, 'FOO', '... the expected slot has the expected value');
 
-    ok(exists $o->{__CLASS__}, '... got the expected slot');
-    is($o->{__CLASS__}, 'Foo', '... the expected slot has the expected value');
-
-    ok(exists $o->{__IDENT__}, '... got the expected slot');
-    is($o->{__IDENT__}, 0+$o, '... the expected slot has the expected value');
+    is($Foo::TRACKED{ 0+$o }, $o, '... got the expected tracked instance');
+    is(scalar keys %Foo::TRACKED, 1, '... there is only one tracked instance');
 }
 
 {
@@ -54,11 +52,8 @@ TODO:
     ok(exists $o->{foo}, '... got the expected slot');
     is($o->{foo}, 'BAR', '... the expected slot has the expected value');
 
-    ok(exists $o->{__CLASS__}, '... got the expected slot');
-    is($o->{__CLASS__}, 'Foo', '... the expected slot has the expected value');
-
-    ok(exists $o->{__IDENT__}, '... got the expected slot');
-    is($o->{__IDENT__}, 0+$o, '... the expected slot has the expected value');
+    is($Foo::TRACKED{ 0+$o }, $o, '... got the expected tracked instance');
+    is(scalar keys %Foo::TRACKED, 2, '... there are two tracked instances');
 }
 
 

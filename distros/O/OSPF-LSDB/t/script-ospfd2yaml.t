@@ -15,7 +15,7 @@ my %tmpargs = (
 
 my $tmp = File::Temp->new(%tmpargs);
 
-$0 = "script/ospfd2yaml";
+$0 = "./script/ospfd2yaml";
 @ARGV = (
     '-B', "example/ospfd.boundary",
     '-E', "example/ospfd.external",

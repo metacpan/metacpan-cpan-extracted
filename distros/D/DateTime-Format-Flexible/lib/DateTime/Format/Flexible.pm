@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use base 'DateTime::Format::Builder';
 
@@ -284,6 +284,8 @@ my $formats =
 
  { length => [7..12],  params => $MDY,      regex => qr{\A$XMMXDDYYYY\z},                 postprocess => \&_fix_year },
  { length => [12..21], params => $MDYHMS,   regex => qr{\A$XMMXDDYYYY\s$HMS\z},           postprocess => \&_fix_year },
+ { length => [14..17], params => $MDYHM,   regex => qr{\A$XMMXDDYYYY\s$HM\z},
+   postprocess => sub { my %args = @_; $args{parsed}{second} = 0; _fix_year(%args) } },
  { length => [14..24], params => $MDYHMSAP, regex => qr{\A$XMMXDDYYYY\s$HMS\s?$AMPM\z},   postprocess => [ \&_fix_year , \&_fix_ampm ] },
 
  # YYYY-mon-D, YYYY-mon-DD, YYYY-mon

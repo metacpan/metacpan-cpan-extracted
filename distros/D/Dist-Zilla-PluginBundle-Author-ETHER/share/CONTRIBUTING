@@ -41,8 +41,8 @@ However, you can run tests directly using the 'prove' tool:
   $ prove -lv t/some_test_file.t
   $ prove -lvr t/
 
-In most cases, 'prove' is entirely sufficient for you to test any
-patches you have.
+In most cases, 'prove' is entirely sufficient for you to test any patches you
+have.
 NO_XS
 } }}
 You may need to satisfy some dependencies.  The easiest way to satisfy
@@ -106,7 +106,15 @@ You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request. Detailed
 instructions for doing that is available here:
 
-https://help.github.com/articles/creating-a-pull-request' }
+https://help.github.com/articles/creating-a-pull-request'
+.
+(-f '.travis.yml' ?
+"\n\n" . 'All pull requests for this distribution will be automatically tested on Linux
+by Travis at: https://travis-ci.com/' . join('/', (split('/', $link))[-2,-1])
+. "\n" . 'All results will be visible in the pull request on GitHub. Follow the
+appropriate links for details when tests fail.'
+: '')
+}
 }}
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
@@ -131,8 +139,8 @@ wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
 
 
-This file was generated via {{ ref($plugin) . ' ' . ($plugin->VERSION || '<self>') }} from a
-template file originating in {{
+This file was generated via {{ ref($plugin) . ' ' . ($plugin->VERSION || '<self>') }}
+from a template file originating in {{
     (my $module = $plugin->dist) =~ s/-/::/g;
     eval "require $module";
     $plugin->dist . '-' . $module->VERSION

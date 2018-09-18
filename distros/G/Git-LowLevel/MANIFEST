@@ -11,6 +11,7 @@ lib/Git/LowLevel/Blob.pm
 lib/Git/LowLevel/Commit.pm
 lib/Git/LowLevel/Reference.pm
 lib/Git/LowLevel/Tree.pm
+t/00_git.t
 t/01_base.t
 t/02_blob.t
 t/03_tree.t

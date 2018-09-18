@@ -10,7 +10,7 @@ use Scalar::Util 'blessed';
 use Role::Tiny::With;
 with 'WWW::OAuth::Request';
 
-our $VERSION = '0.006';
+our $VERSION = '1.000';
 
 sub method {
 	my $self = shift;
@@ -59,8 +59,20 @@ sub header {
 sub request_with {
 	my ($self, $ua, $cb) = @_;
 	croak 'Unknown user-agent object' unless blessed $ua and $ua->isa('Mojo::UserAgent');
-	my $tx = $ua->build_tx($self->method, $self->url, $self->request->headers->to_hash, $self->content);
-	return $ua->start($tx, $cb);
+	return $ua->start($self->_build_tx($ua), $cb);
+}
+
+sub request_with_p {
+	my ($self, $ua) = @_;
+	croak 'Unknown user-agent object' unless blessed $ua and $ua->isa('Mojo::UserAgent');
+	my $has_promises = do { local $@; eval { require Mojolicious; Mojolicious->VERSION('7.54'); 1 } };
+	croak 'Mojolicious 7.54 required for request_with_p' unless $has_promises;
+	return $ua->start_p($self->_build_tx($ua));
+}
+
+sub _build_tx {
+	my ($self, $ua) = @_;
+	return $ua->build_tx($self->method, $self->url, $self->request->headers->to_hash, $self->content);
 }
 
 1;
@@ -72,7 +84,11 @@ WWW::OAuth::Request::Mojo - HTTP Request container for Mojo::Message::Request
 =head1 SYNOPSIS
 
  my $req = WWW::OAuth::Request::Mojo->new(request => $mojo_request);
- my $tx = $req->request_with(Mojo::UserAgent->new);
+ my $ua = Mojo::UserAgent->new;
+ my $tx = $req->request_with($ua);
+ $req->request_with_p($ua)->then(sub {
+   my $tx = shift;
+ });
 
 =head1 DESCRIPTION
 
@@ -140,8 +156,8 @@ and values.
 
 =head2 request_with
 
- my $tx = $req->request_with(Mojo::UserAgent->new);
- $req->request_with(Mojo::UserAgent->new, sub {
+ my $tx = $req->request_with($ua);
+ $req->request_with($ua, sub {
    my ($ua, $tx) = @_;
    ...
  });
@@ -149,6 +165,18 @@ and values.
 Run request with passed L<Mojo::UserAgent> user-agent object, and return
 L<Mojo::Transaction> object, as in L<Mojo::UserAgent/"start">. A callback can
 be passed to perform the request non-blocking.
+
+=head2 request_with_p
+
+ my $p = $req->request_with_p($ua)->then(sub {
+   my $tx = shift;
+   ...
+ });
+
+Run non-blocking request with passed L<Mojo::UserAgent> user-agent object, and
+return a L<Mojo::Promise> which will be resolved with the successful
+transaction or rejected on a connection error, as in
+L<Mojo::UserAgent/"start_p">.
 
 =head2 url
 

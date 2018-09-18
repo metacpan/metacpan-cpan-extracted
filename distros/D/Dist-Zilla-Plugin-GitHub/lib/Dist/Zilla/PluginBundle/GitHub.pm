@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::GitHub;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Moose;
 
@@ -128,7 +128,9 @@ has meta_home => (
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This bundle automatically adds all the GitHub plugins.
+#pod This bundle automatically adds the plugins
+#pod L<GitHub::Meta|Dist::Zilla::Plugin::GitHub::Meta>
+#pod and L<[GitHub::Update|Dist::Zilla::Plugin::GitHub::Update>.
 #pod
 #pod =cut
 
@@ -170,7 +172,7 @@ Dist::Zilla::PluginBundle::GitHub - GitHub plugins all-in-one
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -194,7 +196,9 @@ then, in your F<dist.ini>:
 
 =head1 DESCRIPTION
 
-This bundle automatically adds all the GitHub plugins.
+This bundle automatically adds the plugins
+L<GitHub::Meta|Dist::Zilla::Plugin::GitHub::Meta>
+and L<[GitHub::Update|Dist::Zilla::Plugin::GitHub::Update>.
 
 =head1 ATTRIBUTES
 

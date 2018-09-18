@@ -96,7 +96,7 @@ Pod::Weaver::PluginBundle::SHLOMIF - SHLOMIF's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.001000
+version 0.001001
 
 =head1 DESCRIPTION
 

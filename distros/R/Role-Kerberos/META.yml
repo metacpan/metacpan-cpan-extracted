@@ -1,0 +1,34 @@
+---
+abstract: 'Bolt-on Kerberos ticket management'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Term::ReadPassword: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Role-Kerberos
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Authen::Krb5: '1.9'
+  Moo: '1.006'
+  perl: 5.01
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Role-Kerberos
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  repository: git://github.com/doriantaylor/p5-role-kerberos.git
+version: '0.02'

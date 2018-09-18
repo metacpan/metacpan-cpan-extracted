@@ -12,7 +12,7 @@
                 |_|          |___/ 
 
 
-This is the README for Image::PNG::Libpng version 0.45.
+This is the README for Image::PNG::Libpng version 0.46.
 
 Image::PNG::Libpng is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -34,18 +34,16 @@ Image::PNG::Libpng - Perl interface to libpng
 
 Image::PNG::Libpng is a Perl library for accessing the contents of PNG
 (Portable Network Graphics) images. Image::PNG::Libpng enables Perl to
-use the "libpng" library for reading and writing files in the PNG
-format. Image::PNG::Libpng does not contain "libpng". "libpng" must be
-installed on the computer prior to installing Image::PNG::Libpng.
+use the "libpng" library to read and write files in PNG
+format. Image::PNG::Libpng does not contain libpng. It must be
+installed prior to installing Image::PNG::Libpng.
 
 Image::PNG::Libpng consists of Perl subroutines which mirror
 the C functions in libpng, plus helper subroutines to make it easier
 to read and write PNG data in Perl. 
 
-For those familiar with libpng, to know what the differences between
-this module and libpng are, please go to the section "Differences
-from libpng". For those not familiar with libpng, the module basically
-mirrors the C interface of libpng.
+For those familiar with libpng, the section "Differences
+from libpng" explains the differences with libpng.
 
 -----------------------------------------------------------------------------
 
@@ -78,11 +76,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::PNG::Libpng
 
-To install the module from the source file, Image-PNG-Libpng-0.45.tar.gz,
+To install the module from the source file, Image-PNG-Libpng-0.46.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Image-PNG-Libpng-0.45.tar.gz
-    cd Image-PNG-Libpng-0.45
+    tar xfz Image-PNG-Libpng-0.46.tar.gz
+    cd Image-PNG-Libpng-0.46
     perl Makefile.PL
     make
     make install
@@ -107,6 +105,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Jan  4 12:55:53 2018.
+This README was written on Sat Sep 15 20:34:07 2018.
 
 -----------------------------------------------------------------------------

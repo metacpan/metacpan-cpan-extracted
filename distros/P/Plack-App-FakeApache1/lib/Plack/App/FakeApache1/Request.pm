@@ -1,8 +1,9 @@
 package Plack::App::FakeApache1::Request;
+
 {
   $Plack::App::FakeApache1::Request::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeApache1::Request::VERSION = '0.0.5';
+$Plack::App::FakeApache1::Request::VERSION = '0.0.6';
 # ABSTRACT: Mimic Apache1 requests
 use Moose;
 
@@ -147,10 +148,11 @@ __PACKAGE__->meta->make_immutable;
 
 
 package Moose::APR::Table;
+
 {
   $Moose::APR::Table::DIST = 'Plack-App-FakeApache1';
 }
-$Moose::APR::Table::VERSION = '0.0.5';
+$Moose::APR::Table::VERSION = '0.0.6';
 use Moose;
 no Moose;
 
@@ -173,7 +175,7 @@ Plack::App::FakeApache1::Request - Mimic Apache1 requests
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head2 finalize
 

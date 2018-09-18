@@ -8,6 +8,7 @@ WriteMakefile(
     VERSION_FROM        => 'lib/Statistics/Sampler/Multinomial.pm',
     ABSTRACT_FROM       => 'lib/Statistics/Sampler/Multinomial.pm',
     MIN_PERL_VERSION    => '5.014',
+    LICENSE             => 'perl_5',
     PL_FILES            => {},
     PREREQ_PM => {
         'Carp'         => 0,

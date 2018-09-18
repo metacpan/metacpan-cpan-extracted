@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -212,15 +212,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

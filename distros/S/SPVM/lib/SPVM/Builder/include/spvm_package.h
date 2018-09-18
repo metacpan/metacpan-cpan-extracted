@@ -6,8 +6,13 @@
 enum {
   SPVM_PACKAGE_C_CATEGORY_CLASS,
   SPVM_PACKAGE_C_CATEGORY_INTERFACE,
-  SPVM_PACKAGE_C_CATEGORY_POINTER,
   SPVM_PACKAGE_C_CATEGORY_VALUE_T,
+};
+
+enum {
+  SPVM_PACKAGE_C_FLAG_IS_PRIVATE = 1,
+  SPVM_PACKAGE_C_FLAG_IS_ANON = 2,
+  SPVM_PACKAGE_C_FLAG_IS_POINTER = 4,
 };
 
 extern const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[];
@@ -28,13 +33,11 @@ struct SPVM_package {
   SPVM_LIST* object_field_indexes;
   SPVM_LIST* package_var_signatures;
   SPVM_HASH* package_var_signature_symtable;
-  SPVM_HASH* has_interface_cache_symtable;
   SPVM_SUB* sub_destructor;
   const char* load_path;
   SPVM_OP* op_type;
   int32_t id;
-  _Bool is_private;
-  _Bool is_anon;
+  int32_t flag;
   int32_t category;
   const char* name;
 };

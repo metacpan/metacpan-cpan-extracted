@@ -1,6 +1,6 @@
 package Data::Grid::Excel::XLSX;
 
-use 5.012;
+use 5.014;
 use strict;
 use warnings FATAL => 'all';
 
@@ -16,11 +16,11 @@ Data::Grid::Excel::XLSX - OOXML standard Excel driver for Data::Grid
 
 =head1 VERSION
 
-Version 0.02_01
+Version 0.06
 
 =cut
 
-our $VERSION = '0.02_01';
+our $VERSION = '0.06';
 
 sub _init {
     my ($self, $options) = @_;

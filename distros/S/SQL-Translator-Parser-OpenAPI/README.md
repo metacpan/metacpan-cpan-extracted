@@ -33,11 +33,24 @@ tables in an RDBMS with suitable columns and types.
 
 To try to make the data model represent the "real" data, it applies heuristics:
 
-- to remove object definitions that only have one property
+- to remove object definitions that only have one property (which the
+author calls "thin objects")
+- for definitions that have `allOf`, either merge them together if there
+is a `discriminator`, or absorb properties from referred definitions
 - to find object definitions that have all the same properties as another,
 and remove all but the shortest-named one
 - to remove object definitions whose properties are a strict subset
 of another
+- creates object definitions for any properties that are an object
+- creates object definitions for any properties that are an array of simple
+OpenAPI types (e.g. `string`)
+- creates object definitions for any objects that are
+`additionalProperties` (i.e. freeform key/value pairs), that are
+key/value rows
+- absorbs any definitions that are in fact not objects, into the referring
+property
+- injects foreign-key relationships for array-of-object properties, and
+creates many-to-many tables for any two-way array relationships
 
 # ARGUMENTS
 

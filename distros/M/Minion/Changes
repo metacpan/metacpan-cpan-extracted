@@ -1,4 +1,7 @@
 
+9.04  2018-09-15
+  - Update project metadata.
+
 9.03  2018-04-19
   - Removed hour value from daily history data.
   - Improved 24 hour history graph on Mojolicious::Plugin::Minion::Admin

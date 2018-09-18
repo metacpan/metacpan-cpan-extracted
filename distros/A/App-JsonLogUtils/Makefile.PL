@@ -30,7 +30,8 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => 0,
     "Term::ReadLine" => 0,
     "Term::SimpleColor" => 0,
-    "Time::HiRes" => 0
+    "Time::HiRes" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +62,8 @@ my %FallbackPrereqs = (
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,
-  "Time::HiRes" => 0
+  "Time::HiRes" => 0,
+  "parent" => 0
 );
 
 

@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use File::Find;
 
-my @scripts = map { local $_ = $_; "script/$_" } qw(
+my @scripts = map { local $_ = $_; "./script/$_" } qw(
     ciscoospf2yaml
     gated2yaml
     ospf2dot
@@ -39,4 +39,4 @@ sub wanted {
     ok($files{$File::Find::name}, "$File::Find::name file")
 	or diag("Executable file $File::Find::name not in script list");
 }
-find(\&wanted, "script");
+find(\&wanted, "./script");

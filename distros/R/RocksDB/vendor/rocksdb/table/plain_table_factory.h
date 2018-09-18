@@ -9,6 +9,7 @@
 #include <string>
 #include <stdint.h>
 
+#include "options/options_helper.h"
 #include "rocksdb/options.h"
 #include "rocksdb/table.h"
 
@@ -142,53 +143,69 @@ class PlainTableFactory : public TableFactory {
   // huge_page_tlb_size determines whether to allocate hash indexes from huge
   // page TLB and the page size if allocating from there. See comments of
   // Arena::AllocateAligned() for details.
-  explicit PlainTableFactory(const PlainTableOptions& options =
-                                 PlainTableOptions())
-      : user_key_len_(options.user_key_len),
-        bloom_bits_per_key_(options.bloom_bits_per_key),
-        hash_table_ratio_(options.hash_table_ratio),
-        index_sparseness_(options.index_sparseness),
-        huge_page_tlb_size_(options.huge_page_tlb_size),
-        encoding_type_(options.encoding_type),
-        full_scan_mode_(options.full_scan_mode),
-        store_index_in_file_(options.store_index_in_file) {}
+  explicit PlainTableFactory(
+      const PlainTableOptions& _table_options = PlainTableOptions())
+      : table_options_(_table_options) {}
+
   const char* Name() const override { return "PlainTable"; }
-  Status NewTableReader(
-      const ImmutableCFOptions& options, const EnvOptions& soptions,
-      const InternalKeyComparator& internal_comparator,
-      unique_ptr<RandomAccessFile>&& file, uint64_t file_size,
-      unique_ptr<TableReader>* table) const override;
+  Status NewTableReader(const TableReaderOptions& table_reader_options,
+                        unique_ptr<RandomAccessFileReader>&& file,
+                        uint64_t file_size, unique_ptr<TableReader>* table,
+                        bool prefetch_index_and_filter_in_cache) const override;
+
   TableBuilder* NewTableBuilder(
-      const ImmutableCFOptions& options,
-      const InternalKeyComparator& icomparator,
-      WritableFile* file,
-      const CompressionType,
-      const CompressionOptions&) const override;
+      const TableBuilderOptions& table_builder_options,
+      uint32_t column_family_id, WritableFileWriter* file) const override;
 
   std::string GetPrintableTableOptions() const override;
 
-  static const char kValueTypeSeqId0 = 0xFF;
+  const PlainTableOptions& table_options() const;
+
+  static const char kValueTypeSeqId0 = char(~0);
 
   // Sanitizes the specified DB Options.
-  Status SanitizeOptions(const DBOptions& db_opts,
-                         const ColumnFamilyOptions& cf_opts) const override {
-    if (db_opts.allow_mmap_reads == false) {
-      return Status::NotSupported(
-          "PlainTable with allow_mmap_reads == false is not supported.");
-    }
+  Status SanitizeOptions(
+      const DBOptions& /*db_opts*/,
+      const ColumnFamilyOptions& /*cf_opts*/) const override {
+    return Status::OK();
+  }
+
+  void* GetOptions() override { return &table_options_; }
+
+  Status GetOptionString(std::string* /*opt_string*/,
+                         const std::string& /*delimiter*/) const override {
     return Status::OK();
   }
 
  private:
-  uint32_t user_key_len_;
-  int bloom_bits_per_key_;
-  double hash_table_ratio_;
-  size_t index_sparseness_;
-  size_t huge_page_tlb_size_;
-  EncodingType encoding_type_;
-  bool full_scan_mode_;
-  bool store_index_in_file_;
+  PlainTableOptions table_options_;
 };
+
+static std::unordered_map<std::string, OptionTypeInfo> plain_table_type_info = {
+    {"user_key_len",
+     {offsetof(struct PlainTableOptions, user_key_len), OptionType::kUInt32T,
+      OptionVerificationType::kNormal, false, 0}},
+    {"bloom_bits_per_key",
+     {offsetof(struct PlainTableOptions, bloom_bits_per_key), OptionType::kInt,
+      OptionVerificationType::kNormal, false, 0}},
+    {"hash_table_ratio",
+     {offsetof(struct PlainTableOptions, hash_table_ratio), OptionType::kDouble,
+      OptionVerificationType::kNormal, false, 0}},
+    {"index_sparseness",
+     {offsetof(struct PlainTableOptions, index_sparseness), OptionType::kSizeT,
+      OptionVerificationType::kNormal, false, 0}},
+    {"huge_page_tlb_size",
+     {offsetof(struct PlainTableOptions, huge_page_tlb_size),
+      OptionType::kSizeT, OptionVerificationType::kNormal, false, 0}},
+    {"encoding_type",
+     {offsetof(struct PlainTableOptions, encoding_type),
+      OptionType::kEncodingType, OptionVerificationType::kByName, false, 0}},
+    {"full_scan_mode",
+     {offsetof(struct PlainTableOptions, full_scan_mode), OptionType::kBoolean,
+      OptionVerificationType::kNormal, false, 0}},
+    {"store_index_in_file",
+     {offsetof(struct PlainTableOptions, store_index_in_file),
+      OptionType::kBoolean, OptionVerificationType::kNormal, false, 0}}};
 
 }  // namespace rocksdb
 #endif  // ROCKSDB_LITE

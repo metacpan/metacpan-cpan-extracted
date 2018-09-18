@@ -21,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -366,13 +366,34 @@ sub default_executable_names( $class, @other ) {
         $ENV{CHROME_BIN},
         @other,
     );
-    if( ! @other ) {
+    if( ! @program_names ) {
         push @program_names,
           $^O =~ /mswin/i ? 'chrome.exe'
         : $^O =~ /darwin/i ? 'Google Chrome'
         : ('google-chrome', 'chromium-browser')
     };
     @program_names
+}
+
+# Returns additional directories where the default executable can be found
+# on this OS
+sub additional_executable_search_directories( $class, $os_style=$^O ) {
+    my @search;
+    if( $os_style =~ /MSWin/i ) {
+        push @search,
+            map { "$_\\Google\\Chrome\\Application\\" }
+            grep {defined}
+            ($ENV{'ProgramFiles'},
+             $ENV{'ProgramFiles(x86)'},
+             $ENV{"ProgramFilesW6432"},
+            );
+    } elsif( $os_style =~ /darwin/i ) {
+        my $path = '/Applications/Google Chrome.app/Contents/MacOS';
+        push @search,
+            $path,
+            $ENV{"HOME"} . "/$path";
+    }
+    @search
 }
 
 sub find_executable( $class, $program=[$class->default_executable_names], @search) {
@@ -392,21 +413,7 @@ sub find_executable( $class, $program=[$class->default_executable_names], @searc
 
     if( @without_path) {
         push @search, File::Spec->path();
-        if( $^O =~ /MSWin/i ) {
-            push @search,
-                map { "$_\\Google\\Chrome\\Application\\" }
-                grep {defined}
-                ($ENV{'ProgramFiles'},
-                 $ENV{'ProgramFiles(x86)'},
-                 $ENV{"ProgramFilesW6432"},
-                );
-        } elsif( $^O =~ /darwin/i ) {
-            my $path = '/Applications/Google Chrome.app/Contents/MacOS';
-            push @search,
-                $path,
-                $ENV{"HOME"} . "/$path";
-        }
-
+        push @search, $class->additional_executable_search_directories();
         $looked_for = ' in searchpath ' . join " ", @search;
     };
 
@@ -425,7 +432,7 @@ sub find_executable( $class, $program=[$class->default_executable_names], @searc
     if( wantarray ) {
         my $msg;
         if( ! $found) {
-            $msg = "No Chrome executable like $program_name found$looked_for";
+            $msg = "No executable like $program_name found$looked_for";
         };
         return $found, $msg
     } else {
@@ -601,15 +608,30 @@ sub new($class, %options) {
     );
     # Synchronously connect here, just for easy API compatibility
 
-    my $err;
+    $self->_connect(%options);
+
+    $self
+};
+
+sub _setup_driver_future( $self, %options ) {
     $self->driver->connect(
         new_tab => !$options{ reuse },
         tab     => $options{ tab },
     )->catch( sub(@args) {
-        $err = $args[0];
+        my $err = $args[0];
         if( ref $args[1] eq 'HASH') {
             $err .= $args[1]->{Reason};
         };
+        Future->fail( $err );
+    })
+}
+
+# This (tries to) connects to the devtools in the browser
+sub _connect( $self, %options ) {
+    my $err;
+    $self->_setup_driver_future( %options )
+        ->catch( sub(@args) {
+        $err = $args[0];
         Future->done( @args );
     })->get;
 
@@ -637,10 +659,13 @@ sub new($class, %options) {
     $self->new_generation;
 
     my @setup = (
+        $self->driver->send_message('DOM.enable'),
         $self->driver->send_message('Page.enable'),    # capture DOMLoaded
         $self->driver->send_message('Network.enable'), # capture network
         $self->driver->send_message('Runtime.enable'), # capture console messages
         $self->set_download_directory_future($self->{download_directory}),
+
+        keys %{$options{ extra_headers }} ? $self->_set_extra_headers_future( %{$options{ extra_headers }} ) : (),
     );
 
     if( my $agent = delete $options{ user_agent }) {
@@ -655,9 +680,7 @@ sub new($class, %options) {
     if( ! (exists $options{ tab } )) {
         $self->get($options{ start_url }); # Reset to clean state, also initialize our frame id
     };
-
-    $self
-};
+}
 
 sub _handleConsoleAPICall( $self, $msg ) {
     if( $self->{report_js_errors}) {
@@ -1273,6 +1296,8 @@ sub _collectEvents( $self, @info ) {
     $self->driver->on_message( sub( $message ) {
         push @events, $message;
         if( $predicate->( $events[-1] )) {
+            my $frameId = $events[-1]->{params}->{frameId};
+            $s->log( 'debug', "Received final message, unwinding", sprintf "(%s)", $frameId || '-');
             $s->log( 'trace', "Received final message, unwinding", $events[-1] );
             $s->driver->on_message( undef );
             $done->done( @info, @events );
@@ -1332,11 +1357,11 @@ sub _waitForNavigationEnd( $self, %options ) {
                        && (! exists $ev->{params}->{requestId} or $ev->{params}->{requestId} eq $requestId));
         # This is far too early, but some requests only send this?!
         # Maybe this can be salvaged by setting a timeout when we see this?!
-        my $finished = (  1 # $options{ just_request }
-                       && $ev->{method} eq 'Network.responseReceived'
-                       && $requestId
-                       && $ev->{params}->{requestId} eq $requestId
+        my $domcontent = (  1 # $options{ just_request }
+                       && $ev->{method} eq 'Page.domContentEventFired', # this should be the only one we need (!)
+                       # but we never learn which page (!). So this does not play well with iframes :(
         );
+
         my $failed  = (   $ev->{method} eq 'Network.loadingFailed'
                        && $requestId
                        && $ev->{params}->{requestId} eq $requestId);
@@ -1346,7 +1371,7 @@ sub _waitForNavigationEnd( $self, %options ) {
                        && exists $ev->{params}->{response}->{headers}->{"Content-Disposition"}
                        && $ev->{params}->{response}->{headers}->{"Content-Disposition"} =~ m!^attachment\b!
                        );
-        return $stopped || $internal_navigation || $failed || $download #|| $finished;
+        return $stopped || $internal_navigation || $failed || $download # || $domcontent;
     });
 
     $events_f;
@@ -1920,10 +1945,16 @@ Note that currently, we only support one value per header.
 
 =cut
 
-sub _set_extra_headers( $self, %headers ) {
+sub _set_extra_headers_future( $self, %headers ) {
     $self->log('debug',"Setting additional headers", \%headers);
     $self->driver->send_message('Network.setExtraHTTPHeaders',
         headers => \%headers
+    );
+};
+
+sub _set_extra_headers( $self, %headers ) {
+    $self->_set_extra_headers_future(
+        %headers
     )->get;
 };
 
@@ -1973,7 +2004,7 @@ resilience in face of bad network conditions.
 =cut
 
 sub block_urls( $self, @urls ) {
-    $self->driver->send_message( 'Network.setBlockedUrls',
+    $self->driver->send_message( 'Network.setBlockedURLs',
         urls => \@urls
     )->get;
 }
@@ -3008,6 +3039,9 @@ sub _fetchNode( $self, $nodeId, $attributes = undef ) {
             _generation => $self->_generation,
         };
         Future->done( WWW::Mechanize::Chrome::Node->new( $node ));
+    })->catch(sub {
+        warn "Node has gone away in the meantime, could not resolve";
+        Future->done( WWW::Mechanize::Chrome::Node->new( {} ) );
     });
 }
 
@@ -3043,45 +3077,30 @@ sub xpath( $self, $query, %options) {
 
     my @res;
 
-    # Save the current frame, because maybe we switch frames while searching
-    # We should ideally save the complete path here, not just the current position
     if( $options{ document }) {
         warn sprintf "Document %s", $options{ document }->{id};
     };
 
-    DOCUMENTS: {
-        my $doc= $options{ document } || $self->document;
+    my $doc= $options{ document } ? Future->done( $options{ document } ) : $self->document_future;
 
-        # This stores the path to this document
-        # $doc->{__path}||= [];
+    $doc->then( sub {
+        my $q = join "|", @$query;
 
-        # @documents stores pairs of (containing document element, child element)
-        my @documents= ($doc);
-
-        # recursively join the results of sub(i)frames if wanted
-
-        while (@documents) {
-            my $doc = shift @documents;
-
-            #$self->activate_container( $doc );
-
-            my $q = join "|", @$query;
-            #warn $q;
-
-            my @found;
-            my $id;
-            if ($options{ node }) {
-                $id = $options{ node }->backendNodeId;
-            };
-            @found = Future->wait_all(
-                map {
-                    $self->_performSearch( query => $_, backendNodeId => $id )
-                } @$query
-            )->get;
-            @found = map { my @r = $_->get; @r ? map { $_->get } @r : () } @found;
-            push @res, @found;
+        my @found;
+        my $id;
+        if ($options{ node }) {
+            $id = $options{ node }->backendNodeId;
         };
-    };
+        Future->wait_all(
+            map {
+                $self->_performSearch( query => $_, backendNodeId => $id )
+            } @$query
+        );
+    })->then( sub {
+        my @found = map { my @r = $_->get; @r ? map { $_->get } @r : () } @_;
+        push @res, @found;
+        Future->done( 1 );
+    })->get;
 
     # Determine if we want only one element
     #     or a list, like WWW::Mechanize::Chrome
@@ -3590,7 +3609,7 @@ reference to an array containing the detailed data as hashes.
 =cut
 
 sub sendkeys_future( $self, %options ) {
-    $options{ keys } ||= [ map sub { type => 'char', text => $_ },
+    $options{ keys } ||= [ map +{ type => 'char', text => $_ },
                            split m//, $options{ string }
                          ];
 
@@ -4203,7 +4222,7 @@ sub wait_until_visible( $self, %options ) {
     my $sleep = delete $options{ sleep } || 0.3;
     my $timeout = delete $options{ timeout } || 0;
 
-    _default_limiter( 'maybe', \%options );
+    _default_limiter( 'any', \%options );
 
     my $timeout_after;
     if ($timeout) {

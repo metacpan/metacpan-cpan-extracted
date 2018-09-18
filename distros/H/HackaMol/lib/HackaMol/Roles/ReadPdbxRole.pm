@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbxRole;
-$HackaMol::Roles::ReadPdbxRole::VERSION = '0.049';
+$HackaMol::Roles::ReadPdbxRole::VERSION = '0.050';
 # ABSTRACT: parse PDBx/mmCIF files
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -9,25 +9,27 @@ use Carp;
 requires 'readline_func';
 
 sub read_cif_info {
+    # EXPERIMENTAL: use with caution, getting to work, then need to refactor to min DRY
     my $self    = shift;
     my $fh      = shift;
     my $info    = shift;
     my $in_loop = 0;
+    my $atom_site_position = 0;
 
     while (<$fh>) {
 
         # set loop flag if loop is open
-        if (/loop_/) {
+        if (/^loop_/) {
             $in_loop = 1;
         }
-        if ( /\#/ && $in_loop ) {
+        if ( /^#/ && $in_loop ) {
             $in_loop = 0;
         }
 
-        if (/_pdbx_database_status.recvd_initial_deposition_date\s+(\S+)/) {
+        if (/^_pdbx_database_status.recvd_initial_deposition_date\s+(\S+)/) {
             $info->{deposition_date} = $1;
         }
-        if (/_pdbx_audit_revision_history.revision_date\s*(\S+)?/) {
+        if (/^_pdbx_audit_revision_history.revision_date\s*(\S+)?/) {
             my $revision_date = $1;
             if ($in_loop) {
                 while ( my $line = <$fh> ) {
@@ -44,108 +46,243 @@ sub read_cif_info {
             }
             $info->{last_revision_date} = $revision_date;
         }
-        if (/^_struct_conn.id\s*$/) {
-            die "assumed loop exception" unless $in_loop;
-            my @labels = ("_struct_conn.id");
-
-            while ( my $line = <$fh> ) {
-                if ( $line =~ /(_struct\S+)/ ) {
-                    push @labels, $1;
-                    next;
-                }
-                if ( $line =~ /^\#/ ) {
-                    $in_loop = 0;
-                    last;
-                }
-
-                chomp($line);
-                my @tokens = split /\s+/, $line;
-
-                # suck up lines until @tokens == @lables
-                while ( scalar(@tokens) < scalar(@labels) ) {
-                    my $next_line = <$fh>;
-                    chomp($next_line);
-                    push @tokens, split /\s+/, $next_line;
-                }
-                die "too many tokens!" if scalar(@tokens) != scalar(@labels);
-
-                my $connect;
-                foreach my $i ( 1 .. $#labels ) {
-                    next if ( $tokens[$i] eq '.' || $tokens[$i] eq '?' );
-                    $connect->{ $labels[$i] } = $tokens[$i];
-                }
-                $info->{connect}{ $tokens[0] } = $connect;
+        if (/^_pdbx_struct_assembly_gen.asym_id_list\s*(\S+)?/){
+			my @asym_list;
+            if ($1){
+                @asym_list = split /\s*,\s*/, $1;
+            }
+            else {
+            	while (my $line = <$fh>){
+					chomp($line);
+                    last if $line =~ /^(;\s*$|#)/;
+					if( $line =~ /^;/ ){
+						@asym_list = split /\s*,\s*/, $line;
+					}
+					@asym_list = split /\s*,\s*/, $line;
+				}
 
             }
-        }
-        if (/_entity_poly.entity_id\s*(\d+)?/) {
+            $info->{auth_asym_id_list}{$_} = 0 foreach @asym_list; # use hash to connect with entities?
+        } 
+    # this works for 3j7p and others but not using for now because not needed by me   
+    #   if (/^_struct_conn.id\s*$/) {
+    #       die "assumed loop exception" unless $in_loop;
+    #       my @labels = ("_struct_conn.id");
 
+    #       while ( my $line = <$fh> ) {
+    #           if ( $line =~ /^(_struct\S+)/ ) {
+    #               push @labels, $1;
+    #               next;
+    #           }
+    #           if ( $line =~ /^#/ ) {
+    #               $in_loop = 0;
+    #               last;
+    #           }
+
+    #           chomp($line);
+
+    #           # watch out for things like 'C-U MISPAIR' in 3j7p
+	#   		$line = _quote_hack($line);
+    #           my @tokens = split /\s+/, $line;
+
+    #           # suck up lines until @tokens == @lables
+    #           while ( scalar(@tokens) < scalar(@labels) ) {
+    #               my $next_line = <$fh>;
+    #               chomp($next_line);
+	#   			$next_line = _quote_hack($next_line);
+    #               push @tokens, split /\s+/, $next_line;
+    #           }
+    #           die "too many tokens! [@labels] [@tokens] " if scalar(@tokens) != scalar(@labels);
+	#   	    next unless ($tokens[0] =~ /disulf/);	
+    #           my $connect;
+    #           foreach my $i ( 1 .. $#labels ) {
+    #               next if ( $tokens[$i] eq '.' || $tokens[$i] eq '?' );
+    #               $connect->{ $labels[$i] } = _unhack_quote($tokens[$i]);
+    #           }
+    #           $info->{connect}{ $tokens[0] } = $connect;
+
+    #       }
+    #   }
+        if (/^_entity_poly.entity_id\s*(\d+)?/) {
+            chomp;
             # suck up the entity sequences, do it until # if in a loop
             my $entity_id = $1;
 
-            #my $line = <$fh>;
-
-            my $pdbx_seq_one_letter_code;
-            my $seq;
-
             if ($entity_id) {
                 die "should not be in loop..." if $in_loop;
+                my $seq;
+                my $seq_can;
                 while ( my $line = <$fh> ) {
                     chomp($line);
-                    if ( $line =~ /_entity_poly.pdbx_seq_one_letter_code\s*$/ )
+                    if ( $line =~ /^_entity_poly\.pdbx_seq_one_letter_code\s+(\S+)?\s*$/ )
                     {
-                        $pdbx_seq_one_letter_code = 1;
-                        next;
+                        if ($1){
+                            $seq = $1;
+                        }
+                        else {
+                            while (my $next_line = <$fh>){
+                                chomp $next_line;
+                                last if $next_line =~ /^;\s*$/;
+                                $seq .= $next_line;
+                            }
+                        }
                     }
 
-                    if ( $line =~ /_entity_poly.pdbx_seq_one_letter_code_can/ )
-                    {
-                        $pdbx_seq_one_letter_code = 0;
-                        last;
+                    if ( $line =~ /^_entity_poly\.pdbx_seq_one_letter_code_can\s+(\S+)?\s*$/ )
+                    {   
+                        if ($1){ 
+                            $seq_can = $1;
+                        }
+                        else {
+                            while (my $next_line = <$fh>){
+                                chomp $next_line;
+                                last if $next_line =~ /^;\s*$/;
+                                $seq_can .= $next_line;
+                            }
+                        }
                     }
-
-                    if ($pdbx_seq_one_letter_code) {
-                        $seq .= $line;
-                    }
+                    
+                    last if $line =~ /^#/;
+                    
                 }
-                $seq =~ s/(\;|\s+)//g;
-                $info->{entity}{$entity_id} = $seq;
+                $seq =~ s/[;'"]//g;
+                $seq_can =~ s/[;'"]//g;
+                $info->{entity}{$entity_id}{'_entity_poly.pdbx_seq_one_letter_code'} = $seq;
+                $info->{entity}{$entity_id}{'_entity_poly.pdbx_seq_one_letter_code_can'} = $seq_can;
             }
             else {
+                die "expected loop exception" unless ($in_loop);
                 # we are in a loop
-                $pdbx_seq_one_letter_code = 0;
-                while ( my $line = <$fh> ) {
-                    chomp($line);
-                    if ( $line =~ /^(\d+)\s/ ) {
-                        $pdbx_seq_one_letter_code = 1;
-                        $entity_id                = $1;
-                        next;
-                    }
-                    if ($pdbx_seq_one_letter_code) {
-                        if ( $line =~ /^;$/ )
-                        {    # taking the first sequence that ends with ^;\n
-                            $pdbx_seq_one_letter_code = 0;
-                            next;
+                my @labels = ($_); 
+                #my @labels = ("_entity_poly.entity_id");
+				# TODO FACTOR OUT DRY
+            	while ( my $line = <$fh> ) {
+                	if ( $line =~ /^(_entity_poly.\S+)/ ) {
+                    	push @labels, $1;
+                    	next;
+                	}
+                	if ( $line =~ /^\#/ ) {
+                    	$in_loop = 0;
+                    	last;
+               	 	}
+                	chomp($line);
+                    $line =  _quote_hack($line);
+                	my @tokens = split /\s+/, $line;
+                	# suck up lines until @tokens == @lables
+                	while ( scalar(@tokens) < scalar(@labels) ) {
+                        my $next_line = <$fh>;
+                        $next_line = _quote_hack ($next_line);
+						chomp $next_line;
+                        my $seq;
+                        if( $next_line =~ /^;/ ){
+                            $seq .= $next_line; 
+                            while (my $seq_line = <$fh>){
+								chomp($seq_line);
+                                #$seq_line = _quote_hack($seq_line);
+                                last if $seq_line =~ /;\s*$/;
+                                $seq .= $seq_line;
+                            }
+                            $tokens[$#tokens+1] = $seq;
                         }
-                        $seq = $line;
-                        $seq =~ s/(\s|;)//g;
-                        $info->{entity}{$entity_id} .= $seq;
-                    }
-                    if ( $line =~ /^\#/ ) {
+                        else {
+
+                    	        push @tokens, split /\s+/, $next_line;
+                        }
+                	}
+                    
+                	die "too many tokens! [@labels] [@tokens]" if scalar(@tokens) != scalar(@labels);
+
+                	my $entity;
+                	foreach my $i ( 1 .. $#labels ) {
+                    	next if ( $tokens[$i] eq '.' || $tokens[$i] eq '?' );
+                    	($entity->{ $labels[$i] } = _unhack_quote($tokens[$i])) =~ s/[;'"]//g;
+                	}
+                	$info->{entity}{ $tokens[0] } = $entity;
+				}
+
+        #       $pdbx_seq_one_letter_code = 0;
+        #       while ( my $line = <$fh> ) {
+        #           chomp($line);
+        #           if ( $line =~ /^(\d+)\s/ ) {
+        #               $pdbx_seq_one_letter_code = 1;
+        #               $entity_id                = $1;
+        #               next;
+        #           }
+        #           if ($pdbx_seq_one_letter_code) {
+        #               if ( $line =~ /^;$/ )
+        #               {    # taking the first sequence that ends with ^;\n
+        #                   $pdbx_seq_one_letter_code = 0;
+        #                   next;
+        #               }
+        #               $seq = $line;
+        #               $seq =~ s/(\s|;)//g;
+        #               $info->{entity}{$entity_id} .= $seq;
+        #           }
+        #           if ( $line =~ /^\#/ ) {
+        #               $in_loop = 0;
+        #               last;
+        #           }
+        #       }
+            }
+        }
+        if (/^_struct_keywords.text\s*(?:\'?(.+)\'?)?\s*$/) {
+            if ($1){
+                $info->{keywords} = $1;
+            }
+            else {
+                while (my $line = <$fh>){
+                    chomp($line);
+                    last if $line =~ /^#/;
+                    $info->{keywords} .= $line
+                }
+            }
+            $info->{keywords} =~ s/^;|;$|['"]|\s+$//g;
+        }
+        if (/^_exptl\.(\S+)\s*(?:\'(.+)\')?/){ # 2ah8 changes order
+            if ($1 eq 'method'){
+                $info->{exp_method} = $2;
+            }
+            elsif ($in_loop){
+                my @labels = ($_);
+                my $exptl = {};
+                while (my $line = <$fh>){
+           	     	if ( $line =~ /^(_exptl\S+)/ ) {
+                    	push @labels, $1;
+                    	next;
+                	}
+
+					if ( $line =~ /^\#/ ) {
                         $in_loop = 0;
                         last;
                     }
+                    chomp($line);
+                    $line =  _quote_hack($line);
+                    my @tokens = split /\s+/, $line;
+                    die "too many tokens! [@labels] [@tokens]" if scalar(@tokens) != scalar(@labels);
+
+                    foreach my $i (0 .. $#labels){
+                        push @{$exptl->{$labels[$i]}},$tokens[$i]
+                    }
+                }
+               
+                $info->{exp_method} = join ';', map {
+                                                     my $str = _unhack_quote($_); 
+                                                     $str =~ s/['"]//g; $str  } @{$exptl->{'_exptl.method'}};
+            }
+            else {
+                while (my $line = <$fh>){
+                    last if $line =~ /^#/;
+                    if ($line =~ /_exptl\.method\s+(?:\'(.+)\')?/) {
+                        die "unable to parse exp_method" unless($1);
+                        $info->{exp_method} = $1;
+                        last;
+                    }
+                    
                 }
             }
         }
-        if (/_struct_keywords.text\s+\'(.+)\'/) {
-            $info->{keywords} = $1;
-        }
-        if (/_exptl\.method\s+\'(.+)\'/) {
-            $info->{exp_method} = $1;
-        }
         if (/_refine_hist\.d_res_high\s+(\d+\.\d+)/) {
-            $info->{resolution} = $1;
+            $info->{resolution} = sprintf("%s",$1);
         }
         if (/_em_3d_reconstruction.resolution\s+(\d+\.\d+)/) {
             $info->{resolution} = $1;
@@ -153,12 +290,37 @@ sub read_cif_info {
         if (/_citation.pdbx_database_id_DOI\s+(\S+)/) {
             $info->{doi} = $1;
         }
-        last if (/_atom_site.group_PDB/);
+        if (/_atom_site.group_PDB/){
+            $atom_site_position = $.;
+            $info->{fh_position_atom_site} = $atom_site_position;
+        }
     }
+   
+    # move $fh to atom_site_position
+    seek ($fh, 0, 0 );
+    $. = 0;
+    my $LINE;
+    do { $LINE = <$fh> } until $. == $atom_site_position || eof;
 
-    #use Data::Dumper;
-    #print Dumper $info;
     return $info;
+}
+
+sub _quote_hack {
+    # watch out for things like 'C-U MISPAIR' in 3j7p
+    my $line = shift;
+    my @q_strs = $line =~ /['"](?:[^"'\\]++|\\.)*+["']/g; # via man perlre 
+    foreach my $q_str (@q_strs){
+        (my $hack_str = $q_str) =~ s/(\s+)/__HACK__/g;
+        $line =~ s/$q_str/$hack_str/; 
+    }
+    return $line;
+}
+
+sub _unhack_quote {
+    # watch out for things like 'C-U MISPAIR' in 3j7p
+    my $line = shift;
+    $line =~ s/__HACK__/ /g ;
+    return $line;
 }
 
 sub read_cif_atoms {
@@ -181,7 +343,6 @@ sub _read_cif_atoms {
     my $fh   = shift;
     my @atoms;
     my %track_models;
-    my $atom_line_flag = 0;    #this is needed to parse after atom coord loop
 
     while (<$fh>) {
         if ( $self->has_readline_func ) {
@@ -213,8 +374,6 @@ sub _read_cif_atoms {
 #_atom_site.pdbx_PDB_model_num   (model_num)
 #ATOM 1       N N   . PRO A   1 1   ? 393.230 1016.300 385.017 1.0 0.00 ? 1   PRO g8 N   1
         if (/^(?:HETATM|ATOM)/) {
-            $atom_line_flag = 1;
-
             my (
                 $record_name, $serial,       $element,      $name,
                 $altloc,      $res_name,     $chain_id,     $entity_id,
@@ -252,12 +411,6 @@ sub _read_cif_atoms {
             $track_models{$model_num}++;
             push @atoms, $atom;
         }
-        elsif ($atom_line_flag) {
-
-            # stops reading cif after leaving the atom coordinate loop
-            # leaves $. at that point; not done to save time
-            last;
-        }
     }
 
     my %model_atom_count = reverse %track_models;
@@ -284,7 +437,7 @@ HackaMol::Roles::ReadPdbxRole - parse PDBx/mmCIF files
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 

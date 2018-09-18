@@ -2,7 +2,7 @@ package Mojo::IOLoop::ForkCall;
 
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 $VERSION = eval $VERSION;
 
 use Mojo::IOLoop;
@@ -144,7 +144,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::ForkCall - run blocking functions asynchronously by forking
+Mojo::IOLoop::ForkCall - (DEPRECATED) run blocking functions asynchronously by forking
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,12 @@ Mojo::IOLoop::ForkCall - run blocking functions asynchronously by forking
  $fc->ioloop->start unless $fc->ioloop->is_running;
 
 =head1 DESCRIPTION
+
+DEPRECATED!
+
+This module is deprecated in favor of the L<Mojolicious> core module L<Mojo::IOLoop::Subprocess>, which was inspired by this module.
+While the author does not intend to remove this module from CPAN it will certainly receive less effort and new code should use the core module.
+Possibly in the future this will just be an alias to that core module.
 
 Asynchronous programming can be benefitial for performance, however not all functions are
 written for nonblocking interaction and external processes almost never are.

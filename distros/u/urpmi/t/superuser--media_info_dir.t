@@ -52,7 +52,7 @@ sub urpmi_force_skip_unknown {
 sub rpm_v3 {
     my @names = qw(libtermcap nls p2c);
 
-    system_("rpm --root $::pwd/root -i --ignorearch --noscripts media/rpm-v3/*.i386.rpm");
+    system_("rpm --noverify --root $::pwd/root -i --ignorearch --noscripts media/rpm-v3/*.i386.rpm");
     check_installed_names(@names);
 
     foreach ('/lib/libtermcap.so.2.0.8', '/usr/lib/libp2c.so.1.2.0', '/usr/X11R6/lib/X11/nls/C') {

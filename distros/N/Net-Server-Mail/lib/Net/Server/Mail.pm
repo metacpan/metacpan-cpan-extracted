@@ -7,10 +7,11 @@ use Sys::Hostname;
 use IO::Select;
 use IO::Handle;
 use Carp;
+use Errno;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.24';
+$Net::Server::Mail::VERSION = '0.25';
 
 =pod
 
@@ -461,8 +462,10 @@ sub process {
             return $self->timeout;
         }
 
+        # No data available at the moment
         next
-          if ( not defined $rv and $! =~ /Resource temporarily unavailable/ );
+          if ( not defined $rv
+            and ( $! =~ /Resource temporarily unavailable/ or $!{'EAGAIN'} ) );
         if ( ( not defined $rv ) or ( $rv == 0 ) ) {
 
             # read error or connection closed

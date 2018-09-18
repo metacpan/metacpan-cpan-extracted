@@ -14,7 +14,7 @@ sub parse_catalyst_args {
   my ($class, $c, $used_module, $raw_tokens) = @_;
 
   my @copied_tokens = @$raw_tokens;
-  if ($copied_tokens[0][1] eq '()') {
+  if (($copied_tokens[0][1] || '') eq '()') {
     my $token = shift @copied_tokens;
     unshift @copied_tokens, @{$token->[0]};
   }

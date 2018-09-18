@@ -1,0 +1,167 @@
+==================================================
+Changes from 2017-09-13 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2018-09-13 20:53:57 +0000
+----------------------------------------
+
+  Change: 2eba1f74e5bd272cd2716c3da6a5521681e2622e
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:53:34 +0000
+
+    ADD: ignore more files 
+
+  Change: fde9cd704b43014dab922dbf1bf3e733af98e007
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:52:55 +0000
+
+    ADD: added Pod::Weaver config file 
+
+  Change: dc15920daa66833be7a9e36d132266d7f20d69fe
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:52:42 +0000
+
+    ADD: added bugtracking information 
+
+  Change: deedd18a7567ac04680905c7758d8de9be745013
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:52:22 +0000
+
+    FIX: renamed license file because of clash with dzil 
+
+  Change: 1b23bcdbaec6ea15a8e20defa7f9975c16e4d915
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:17:09 +0000
+
+    ADD: a Readme file 
+
+  Change: b3c8797d458ce5b44d50aaeb580a1265add188ab
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:16:13 +0000
+
+    ADD: add a license file 
+
+  Change: 3f88504d2b16683d5dfaa6a7139f40cf7b3a530b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 22:06:59 +0000
+
+    ADD: improve perl documentation 
+
+  Change: 50e5ccdfe156db8480fbc0fb396965617eb4235b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 21:28:17 +0000
+
+    FIX: fixed changing issue keys 
+
+  Change: 5f4f7638ca32c1c8614fb64bfad9b45a9f5ee771
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-11 20:41:12 +0000
+
+    ADD: method to close an issue 
+
+  Change: cad6c3276a3a62d0476bd8686f783a6747acbad5
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-11 20:31:15 +0000
+
+    FIX: fixed not setting of status within listing 
+
+  Change: 5a3e0dcfcc587edec65246fc5320dbe9b95bf987
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-11 20:18:53 +0000
+
+    ADD: method to delete an issue from the issue list 
+
+  Change: 221512e4190f4d54fb0210277455b9d0ca9e75ba
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-11 19:58:50 +0000
+
+    ADD: ignore some files 
+
+  Change: 067e6140c1671a3c73660e673b6227018735531d
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:41:49 +0000
+
+    ADD: reworked adding and listing 
+
+  Change: 994fa9818b9f057a6b5719a75fa4000b3028abb5
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:41:23 +0000
+
+    ADD: improved issue saving 
+
+  Change: 62b07b3cc9383814a200ae21f17667bcc9b670dd
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-09 21:17:13 +0000
+
+    ADD: close an issue 
+
+  Change: bec857ca91a20b2cc7fcee28a6c9004f6313ce60
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 18:33:22 +0000
+
+    ADD: updated dist.ini 
+
+  Change: 36c1c3d9628c8e887b0fc3cef08afa07da1d0613
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 18:33:10 +0000
+
+    ADD: removed code duplication 
+
+  Change: 37e09b68ff4434af36fc7a07444e9db2149ca6ab
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 16:17:12 +0000
+
+    ADD: added issue delete method 
+
+  Change: b6f404f4dfb55f5d41e88e3a3ffc24b7c0bcb45f
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 16:16:35 +0000
+
+    FIX: fixed attribute trigger 
+
+  Change: a25e9b2c1ef61a7c3b03134c2d2f23acef20e034
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 11:07:46 +0000
+
+    ADD: added parsing of working and estimated time 
+
+  Change: 552e304c0e2a9c2a991cdfa2f2d2b5f156a1a4c5
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 11:07:33 +0000
+
+    FIX: fixed typos 
+
+  Change: 54cee92dd837cbb4e123dec619935c2a5278292d
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 11:02:52 +0000
+
+    ADD: added attributes for estimated and working time 
+
+  Change: 9f4b0e1abf56a0a459d9241abacbd4f0851f43bc
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 10:53:17 +0000
+
+    ADD: ignore some files 
+
+  Change: 60010249eeee32c13877aaaa3a5302202d3bd53e
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 10:46:13 +0000
+
+    ADD: added issue class 
+
+  Change: c57dea44a36c4d0a9ffa43a0fa933efedc5df8db
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-01 00:24:54 +0000
+
+    ADD: updated dist.ini 
+
+  Change: 1934cc3b68ab063c24bedc5f17e77edd8382f0a7
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-01 00:22:09 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

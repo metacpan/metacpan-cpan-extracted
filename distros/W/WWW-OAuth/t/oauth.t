@@ -74,7 +74,7 @@ my $verify_request = _request(GET => $verify_url);
 
 $auth->token($token);
 $auth->token_secret($token_secret);
-$auth->authenticate($verify_request);
+$auth->authenticate($verify_request, { realm => 'foo' });
 $auth_header = $verify_request->header('Authorization');
 ok defined $auth_header, 'Authorization header has been set';
 
@@ -86,6 +86,7 @@ ok defined($oauth_params->{oauth_timestamp}), 'oauth_timestamp is set';
 is $oauth_params->{oauth_version}, '1.0', 'oauth_version is set to 1.0';
 ok defined($oauth_params->{oauth_signature}), 'oauth_signature is set';
 is $oauth_params->{oauth_token}, $token, 'oauth_token is set to API access token';
+is $oauth_params->{realm}, 'foo', 'realm is set';
 
 $test_signature = _test_signature('GET', $verify_url, $oauth_params, $api_secret, $token_secret);
 is $test_signature, $oauth_params->{oauth_signature}, 'signature formed correctly';

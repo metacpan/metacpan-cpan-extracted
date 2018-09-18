@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Mojolicious' => '6.0'
+                                        'Mojolicious' => '7.54'
                                       },
                       'requires' => {
                                       'HTTP::Request' => '0',

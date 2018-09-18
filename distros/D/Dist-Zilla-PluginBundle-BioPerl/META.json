@@ -4,13 +4,13 @@
       "BioPerl Team <bioperl-l@lists.open-bio.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-PluginBundle-BioPerl",
    "prereqs" : {
@@ -31,6 +31,15 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Elemental::Transformer::List" : "0",
+            "Test::EOL" : "0",
+            "Test::Mojibake" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         },
          "requires" : {
             "Dist::Zilla::Plugin::AutoMetaResources" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
@@ -86,7 +95,6 @@
             "Test::DZil" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.006"
          }
       }
@@ -104,10 +112,10 @@
          "web" : "https://github.com/bioperl/dist-zilla-pluginbundle-bioperl"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.024001"
+         "version" : "5.026002"
       },
       "plugins" : [
          {
@@ -119,7 +127,7 @@
                }
             },
             "name" : "dzil plugin bundle (direct)",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -130,18 +138,29 @@
                }
             },
             "name" : "podweaver plugin bundle (direct)",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
                   "phase" : "runtime",
-                  "type" : "requires"
+                  "type" : "recommends"
                }
             },
             "name" : "podweaver plugin bundle (indirect)",
-            "version" : "6.008"
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "author-only tests dependencies",
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -157,42 +176,42 @@
                }
             },
             "name" : "@BioPerl/@Filter/GatherDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@BioPerl/@Filter/PruneCruft",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@BioPerl/@Filter/ManifestSkip",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@BioPerl/@Filter/MetaYAML",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@BioPerl/@Filter/License",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@BioPerl/@Filter/ExtraTests",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@BioPerl/@Filter/ExecDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@BioPerl/@Filter/ShareDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -202,47 +221,47 @@
                }
             },
             "name" : "@BioPerl/@Filter/MakeMaker",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@BioPerl/@Filter/Manifest",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@BioPerl/@Filter/TestRelease",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@BioPerl/@Filter/ConfirmRelease",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@BioPerl/@Filter/UploadToCPAN",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@BioPerl/MetaConfig",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@BioPerl/MetaJSON",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@BioPerl/PkgVersion",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@BioPerl/PodSyntaxTests",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::NoTabs",
@@ -263,7 +282,7 @@
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : "0",
+                  "bail_out_on_fail" : 0,
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "t/00-compile.t",
@@ -280,12 +299,12 @@
                }
             },
             "name" : "@BioPerl/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@BioPerl/PodCoverageTests",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MojibakeTests",
@@ -295,7 +314,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@BioPerl/AutoPrereqs",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoMetaResources",
@@ -305,7 +324,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@BioPerl/MetaResources",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -326,7 +345,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Encoding",
             "name" : "@BioPerl/Encoding",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -464,7 +483,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@BioPerl/NextRelease",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -481,12 +500,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.18.0",
                   "repo_root" : "."
                }
             },
             "name" : "@BioPerl/Git::Check",
-            "version" : "2.041"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -504,7 +523,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.18.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -512,7 +531,7 @@
                }
             },
             "name" : "@BioPerl/Git::Commit",
-            "version" : "2.041"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -521,12 +540,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "Dist-Zilla-PluginBundle-BioPerl-v0.26",
+                  "tag" : "Dist-Zilla-PluginBundle-BioPerl-v0.27",
                   "tag_format" : "%N-v%v",
                   "tag_message" : "%N-v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.18.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -534,67 +553,68 @@
                }
             },
             "name" : "@BioPerl/Git::Tag",
-            "version" : "2.041"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          }
       ],
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
-         "version" : "6.008"
+         "version" : "6.012"
       }
    },
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

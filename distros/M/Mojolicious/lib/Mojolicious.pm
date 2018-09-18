@@ -37,6 +37,7 @@ has log              => sub {
     if -d $home->child('log') && -w _;
 
   # Reduced log output outside of development mode
+  return $log->level($ENV{MOJO_LOG_LEVEL}) if $ENV{MOJO_LOG_LEVEL};
   return $mode eq 'development' ? $log : $log->level('info');
 };
 has 'max_request_size';
@@ -64,8 +65,8 @@ has ua       => sub {
 };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Doughnut';
-our $VERSION  = '7.94';
+our $CODENAME = 'Supervillain';
+our $VERSION  = '8.0';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -260,8 +261,7 @@ L<Mojolicious> will emit the following hooks in the listed order.
 
 Emitted right before the application server is started, for web servers that
 support it, which includes all the built-in ones (except for
-L<Mojo::Server::CGI>). Note that this hook is EXPERIMENTAL and might change
-without warning!
+L<Mojo::Server::CGI>).
 
   $app->hook(before_server_start => sub {
     my ($server, $app) = @_;
@@ -447,9 +447,10 @@ which stringifies to the actual path.
   $app    = $app->log(Mojo::Log->new);
 
 The logging layer of your application, defaults to a L<Mojo::Log> object. The
-level will default to C<debug> if the L</mode> is C<development>, or C<info>
-otherwise. All messages will be written to C<STDERR>, or a C<log/$mode.log> file
-if a C<log> directory exists.
+level will default to either the C<MOJO_LOG_LEVEL> environment variable,
+C<debug> if the L</mode> is C<development>, or C<info> otherwise. All messages
+will be written to C<STDERR>, or a C<log/$mode.log> file if a C<log> directory
+exists.
 
   # Log debug message
   $app->log->debug('It works');
@@ -1019,6 +1020,8 @@ Ian Goodacre
 
 Ilya Chesnokov
 
+Ilya Rassadin
+
 James Duncan
 
 Jan Jona Javorsek
@@ -1208,7 +1211,7 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<https://github.com/kraih/mojo>, L<Mojolicious::Guides>,
+L<https://github.com/mojolicious/mojo>, L<Mojolicious::Guides>,
 L<https://mojolicious.org>.
 
 =cut

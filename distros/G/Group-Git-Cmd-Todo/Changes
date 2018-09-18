@@ -1,5 +1,14 @@
 Revision history for Group-Git-Cmd-Todo
 
+0.0.4   2018-09-16
+        Updating for release of version 0.0.4
+        Added perl 5.26 to .travis build (Ivan Wills)
+        Fixning config dependencies (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added ignoring lock files (Ivan Wills)
+        License update (Ivan Wills)
+        Fixed tabs (Ivan Wills)
+
 0.0.3   2018-01-01
         Updating for release of version 0.0.3
         De-supporting old perl (Ivan Wills)

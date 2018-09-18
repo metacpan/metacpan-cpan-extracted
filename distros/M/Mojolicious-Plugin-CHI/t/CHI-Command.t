@@ -22,11 +22,11 @@ $app->plugin(Config => {
     CHI => {
       first => {
         driver => 'Memory',
-	datastore => $hash1
+  datastore => $hash1
       },
       MySecondCache => {
         driver => 'Memory',
-	datastore => $hash2
+  datastore => $hash2
       }
     }
   }
@@ -37,9 +37,15 @@ $app->plugin('CHI');
 my $cmds = $app->commands;
 
 ok(grep/::CHI/, @{$cmds->namespaces}, 'Namespace is set');
-is_deeply(
-  $cmds->namespaces,
-  [qw/Mojolicious::Command Mojolicious::Plugin::CHI/],
+is(
+  $cmds->namespaces->[0],
+  'Mojolicious::Command',
+  'Namespace is set'
+);
+
+is(
+  $cmds->namespaces->[-1],
+  'Mojolicious::Plugin::CHI',
   'Namespace is set'
 );
 
@@ -96,9 +102,15 @@ $app->plugin(CHI => {
 });
 
 $cmds = $app->commands;
-is_deeply(
-  $cmds->namespaces,
-  [qw/Mojolicious::Command Mojolicious::Plugin::CHI/],
+is(
+  $cmds->namespaces->[0],
+  'Mojolicious::Command',
+  'Namespace is set only once'
+);
+
+is(
+  $cmds->namespaces->[-1],
+  'Mojolicious::Plugin::CHI',
   'Namespace is set only once'
 );
 

@@ -34,9 +34,10 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Time::Piece" => "1.16",
     "Time::Seconds" => 0,
+    "Types::Common::Numeric" => 0,
     "if" => 0
   },
-  "VERSION" => "v0.1.3",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Time::Seconds" => 0,
   "Type::Library" => 0,
   "Type::Utils" => "0.44",
+  "Types::Common::Numeric" => 0,
   "Types::Standard" => 0,
   "if" => 0,
   "strict" => 0,

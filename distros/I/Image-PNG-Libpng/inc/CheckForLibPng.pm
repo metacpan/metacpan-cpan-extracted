@@ -41,13 +41,14 @@ my $png_include_dir;
 
 # The following variable switches on printing of non-error messages
 
+#my $verbose = 1;
 my $verbose;
 
 sub msg
 {
-    my ($msg) = @_;
+    my (undef, $file, $line) = caller (0);
     if ($verbose) {
-	print __PACKAGE__ . ": " . $msg . ".\n";
+	printf ("%s:%d: @_.\n", $file, $line);
     }
 }
 
@@ -77,9 +78,11 @@ sub find_program
 
 sub check_for_libpng
 {
-    ($verbose) = @_;
+    if ($_[0]) {
+	$verbose = 1;
+    }
 
-    msg ("Debugging messages in check_for_libpng are switched on");
+    msg ("Debugging messages in 'check_for_libpng' are switched on");
 
     # $inc is a flag for the C compiler to tell it where to find header
     # files.
@@ -87,6 +90,9 @@ sub check_for_libpng
     my $inc = '';
     if ($png_include_dir) {
 	$inc = "-I $png_include_dir";
+    }
+    if ($inc) {
+	msg ("\$inc is '$inc'");
     }
 
     # $libs is a flag for the C compiler to tell it where to find library
@@ -119,7 +125,7 @@ sub check_for_libpng
 #include <stdlib.h>
 #include <stdio.h>
 #include "png.h"
-void failburger (const char * message)
+void fatal_error (const char * message)
 {
     fprintf (stderr, "%s.\n", message);
     exit (1);
@@ -131,19 +137,20 @@ int main ()
    png_infop info_ptr;
    FILE * file;
    png_uint_32 libpng_vn = png_access_version_number();
-   printf ("IMAGE-PNG LIBPNG VERSION: <<%s>>\n", png_get_libpng_ver (0));
+   printf ("%s:%d: IMAGE-PNG LIBPNG VERSION: <<%s>>\n",
+	   __FILE__, __LINE__, png_get_libpng_ver (0));
    /* Create a file because there are some CPAN testers who seem to have bogus libpngs. */
 /*   file = fopen ("temporary.png", "wb");
    if (! file) {
-       failburger ("cannot open file");
+       fatal_error ("cannot open file");
    }*/
    png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
    if (! png_ptr) {
-       failburger ("cannot create write struct");
+       fatal_error ("cannot create write struct");
    }
    info_ptr = png_create_info_struct (png_ptr);
    if (! png_ptr) {
-       failburger ("cannot create info struct");
+       fatal_error ("cannot create info struct");
    }
 //   png_init_io (png_ptr, file);
    return 0;
@@ -167,12 +174,17 @@ EOF
 	my $ldflags = $Config{ldflags};
 	#    my $ccflags;
 	my $ccflags = $Config{ccflags};
+	# The C compiler to use
+	my $cc = $Config{cc};
+	if (! $cc) {
+	    die "I cannot find a C compiler in your \%Config";
+	}
 	open my $output, ">", $c_file_name
             or die "Error opening file '$c_file_name' for writing: $!";
 	print $output $test_c;
 	close $output
             or die "Error closing file '$c_file_name': $!";
-	my $compile = "cc $ccflags $inc -o $exe_file_name $c_file_name $ldflags $libs";
+	my $compile = "$cc $ccflags $inc -o $exe_file_name $c_file_name $ldflags $libs";
 	msg ("The compile command is '$compile'");
 	$compile_ok = (system ($compile) == 0);
 	if ($compile_ok) {

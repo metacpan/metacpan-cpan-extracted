@@ -4,6 +4,7 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+README
 cpanfile
 ex/basic.pl
 lib/Mojo/ACME.pm

@@ -11,7 +11,7 @@ use URPM::Resolve;
 use URPM::Signature;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = '5.18';
+our $VERSION = '5.20';
 
 URPM->bootstrap($VERSION);
 
@@ -874,6 +874,7 @@ Recognized options are:
     callback_open   => sub { ... }
     callback_trans  => sub { ... }
     callback_uninst => sub { ... }
+    callback_verify => sub { ... }
     delta => used for progress callbacks (trans, uninst, inst)
     excludedocs => 0 / 1
     force => 0 / 1

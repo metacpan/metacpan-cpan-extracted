@@ -37,8 +37,6 @@ typedef struct perl_libpng
     /* Number of times we have called "calloc"-like functions, for
        detecting memory leaks. */
     int memory_gets;
-    /* Pointer to rows we copied. */
-    AV * copied_rows;
     /* Transforms to apply. */
     int transforms;
 
@@ -51,6 +49,7 @@ typedef struct perl_libpng
     STRLEN data_length;
     /* How much of the data in "image_data" we have read. */
     int read_position;
+    unsigned char * all_rows;
     /* If the following variable is set to a true value, the module
        prints messages about what it is doing. */
     int verbosity : 1;
@@ -273,10 +272,10 @@ perl_png_destroy (perl_libpng_t * png)
     if (! png) {
         return;
     }
-    /* Allow whatever copied rows to be freed. */
-    if (png->copied_rows) {
-	SvREFCNT_dec ((SV *) png->copied_rows);
-	png->copied_rows = 0;
+    /* Free row data. */
+    if (png->all_rows) {
+	PERL_PNG_FREE (png->all_rows);
+	png->all_rows = 0;
     }
     if (png->type == perl_png_write_obj) {
         png_destroy_write_struct (& png->png, & png->info);
@@ -1435,7 +1434,7 @@ static SV * perl_png_get_tRNS (perl_libpng_t * png)
     else {
 	HV * trans_hv;
 	trans_hv = newHV ();
-#line 1438 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1437 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	HASH_STORE_IV_MEMBER (trans_hv, red, trans_values);
 	
@@ -1445,7 +1444,7 @@ static SV * perl_png_get_tRNS (perl_libpng_t * png)
 	
 	HASH_STORE_IV_MEMBER (trans_hv, gray, trans_values);
 	
-#line 1443 "perl-libpng.c.tmpl"
+#line 1442 "perl-libpng.c.tmpl"
 	return newRV_noinc ((SV *) trans_hv);
     }
 #else
@@ -1500,7 +1499,7 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
 	    /* unhandled error */
 	}
 	trans_hv = (HV *) SvRV (tRNS);
-#line 1503 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1502 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	    HASH_FETCH_IV_MEMBER (trans_hv, red, (& trans_values));
 	
@@ -1510,7 +1509,7 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
 	
 	    HASH_FETCH_IV_MEMBER (trans_hv, gray, (& trans_values));
 	
-#line 1502 "perl-libpng.c.tmpl"
+#line 1501 "perl-libpng.c.tmpl"
 	num_trans = 1;
 	png_set_tRNS (pngi, trans, num_trans, & trans_values); 
     }
@@ -1538,14 +1537,14 @@ perl_png_spalette_to_hv (png_sPLT_tp spalette)
 	png_sPLT_entry * entry;
 	entry = spalette->entries + i;
 	perl_entry = newHV ();
-#line 1541 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1540 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 		HASH_STORE_IV_MEMBER (perl_entry, red, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, green, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, blue, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, alpha, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, frequency, entry);
 	
-#line 1534 "perl-libpng.c.tmpl"
+#line 1533 "perl-libpng.c.tmpl"
 	av_push (entries, newRV_noinc ((SV *) perl_entry));
     }
     HASH_STORE_AV (perl_spalette, entries);
@@ -1649,14 +1648,14 @@ static void perl_png_set_sPLT (perl_libpng_t * png, AV * sPLT_entries)
 	    }
 	    MESSAGE ("Copying entry %d", j);
 	    e = entry->entries + j;
-#line 1652 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1651 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
  	    	    HASH_FETCH_IV_MEMBER (perl_entry, red, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, green, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, blue, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, alpha, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, frequency, e);
 	    
-#line 1642 "perl-libpng.c.tmpl"
+#line 1641 "perl-libpng.c.tmpl"
 	}
     }
     MESSAGE ("Setting the entries");
@@ -1769,7 +1768,7 @@ static SV * perl_png_get_sBIT (perl_libpng_t * png)
 	if (status != PNG_INFO_sBIT) {
 	    /* error */
 	}
-#line 1772 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1771 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	HASH_STORE_IV_MEMBER (sig_bit, red, colours);
 	
@@ -1781,7 +1780,7 @@ static SV * perl_png_get_sBIT (perl_libpng_t * png)
 	
 	HASH_STORE_IV_MEMBER (sig_bit, alpha, colours);
 	
-#line 1759 "perl-libpng.c.tmpl"
+#line 1758 "perl-libpng.c.tmpl"
         return newRV_noinc ((SV *) sig_bit);
     }
     return & PL_sv_undef;
@@ -1963,9 +1962,9 @@ static SV * perl_png_get_valid (perl_libpng_t * png)
     valid = png_get_valid (pngi, 0xFFFFFFFF);
 #define V(x) \
     (void) hv_store (perl_valid, #x, strlen (#x), newSViv (valid & PNG_INFO_ ## x), 0)
-#line 1966 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1965 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 V(bKGD);V(cHRM);V(gAMA);V(hIST);V(iCCP);V(IDAT);V(oFFs);V(pCAL);V(pHYs);V(PLTE);V(sBIT);V(sCAL);V(sPLT);V(sRGB);V(tIME);V(tRNS);
-#line 1943 "perl-libpng.c.tmpl"
+#line 1942 "perl-libpng.c.tmpl"
 #undef V
 
     return newRV_noinc ((SV *) perl_valid);
@@ -2092,6 +2091,7 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
     png_uint_32 height;
     png_uint_32 width;
     int bit_depth;
+    int channels;
 
     /* All of the following are ignored. */
     int color_type;
@@ -2100,15 +2100,32 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
     int filter_method;
     /* libpng return value */
     int status;
+    /* Minimum number of bytes we need to store one row. */
+    int rbytes;
+    /* Number of bytes in all the rows. */
+    int arbytes;
+    /* All the rows. */
+    unsigned char * ar;
+    /* Our row. */
+    unsigned char * r;
 
     status = png_get_IHDR (pngi, & width, & height,
                            & bit_depth, & color_type, & interlace_method,
                            & compression_method, & filter_method);
 
+    channels = png_get_channels (pngi);
+    rbytes = width * bit_depth * channels;
+    if (rbytes % 8 == 0) {
+	rbytes /= 8;
+    }
+    else {
+	rbytes = rbytes / 8 + 1;
+    }
+
     if (png->row_pointers) {
         /* There was an attempt to set the rows of an image after they
            had already been set. */
-        croak ("Row pointers already allocated");
+        croak ("Row pointers already set");
     }
     /* Check that this is the same as the height of the image. */
     n_rows = av_len (rows) + 1;
@@ -2119,20 +2136,36 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
     }
     MESSAGE ("%d rows.\n", n_rows);
     GET_MEMORY (row_pointers, n_rows, unsigned char *);
+    arbytes = height * rbytes;
+    GET_MEMORY (ar, arbytes, unsigned char); 
+    r = ar;
     for (i = 0; i < n_rows; i++) {
         /* Need to check that this is the same as the width of the image. */
         STRLEN length;
         SV * row_i;
+	/* The data from Perl's row. */
+	unsigned char * pr;
         row_i = * av_fetch (rows, i, 0);
-        row_pointers[i] = (unsigned char *) SvPV (row_i, length);
+	pr = (unsigned char *) SvPV (row_i, length);
+	if (length > rbytes) {
+	    warn ("Row %d is %d bytes, which is too long; truncating to %d",
+		  i, length, rbytes);
+	    length = rbytes;
+	}
+	memcpy (r, pr, length);
+        row_pointers[i] = r;
         MESSAGE ("Copying row %d, length %d", i, length);
+	r += rbytes;
+    }
+    if (r != ar + arbytes) {
+	croak ("%s:%d: Mismatch %p != %p", __FILE__, __LINE__,
+	       r, ar + arbytes);
     }
     png_set_rows (pngi, row_pointers);
     /* "png" keeps a record of the allocated memory in order to free
        it. */
     png->row_pointers = row_pointers;
-    png->copied_rows = rows;
-    SvREFCNT_inc ((SV *) rows);
+    png->all_rows = ar;
 }
 
 /*  __  __                                                                      
@@ -2305,7 +2338,7 @@ static void perl_png_set_unknown_chunks (perl_libpng_t * png, AV * chunk_list)
 
 int perl_png_libpng_supports (const char * what)
 {
-#line 2308 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2341 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
     if (strcmp (what, "iTXt") == 0) {
 #ifdef PNG_iTXt_SUPPORTED
         return 1;
@@ -2460,7 +2493,7 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* tRNS */
     }
-#line 2297 "perl-libpng.c.tmpl"
+#line 2330 "perl-libpng.c.tmpl"
 
     /* sCAL is a special case. */
 
@@ -2566,7 +2599,7 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
 #ifdef PNG_cHRM_SUPPORTED
     if (VALID (cHRM)) {
         HV * ice;
-#line 2569 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2602 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         double white_x;
         double white_y;
         double red_x;
@@ -2575,10 +2608,10 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
         double green_y;
         double blue_x;
         double blue_y;
-#line 2407 "perl-libpng.c.tmpl"
+#line 2440 "perl-libpng.c.tmpl"
         png_get_cHRM (pngi , & white_x, & white_y, & red_x, & red_y, & green_x, & green_y, & blue_x, & blue_y);
         ice = newHV ();
-#line 2581 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2614 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         (void) hv_store (ice, "white_x", strlen ("white_x"),
                          newSVnv (white_x), 0);
         (void) hv_store (ice, "white_y", strlen ("white_y"),
@@ -2595,7 +2628,7 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
                          newSVnv (blue_x), 0);
         (void) hv_store (ice, "blue_y", strlen ("blue_y"),
                          newSVnv (blue_y), 0);
-#line 2416 "perl-libpng.c.tmpl"
+#line 2449 "perl-libpng.c.tmpl"
         return newRV_noinc ((SV *) ice);
     }
     return & PL_sv_undef;
@@ -2610,7 +2643,7 @@ static void perl_png_set_cHRM (perl_libpng_t * png, HV * cHRM)
 {
 #ifdef PNG_cHRM_SUPPORTED
     SV ** key_sv_ptr;
-#line 2613 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2646 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
     double white_x = 0.0;
     double white_y = 0.0;
     double red_x = 0.0;
@@ -2651,9 +2684,9 @@ static void perl_png_set_cHRM (perl_libpng_t * png, HV * cHRM)
     if (key_sv_ptr) {
         blue_y = SvNV (* key_sv_ptr);
     }
-#line 2441 "perl-libpng.c.tmpl"
+#line 2474 "perl-libpng.c.tmpl"
     png_set_cHRM (pngi, white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
-#line 2444 "perl-libpng.c.tmpl"
+#line 2477 "perl-libpng.c.tmpl"
 #else
     /* libpng was compiled without this option. */
     UNSUPPORTED(cHRM);
@@ -2687,7 +2720,7 @@ static void perl_png_copy_row_pointers (perl_libpng_t * png, SV * row_pointers)
     png_set_rows (pngi, png->row_pointers);
 }
 
-#line 2690 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2723 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 
 static int
 perl_png_get_image_width (perl_libpng_t * png)
@@ -2701,7 +2734,7 @@ perl_png_get_image_height (perl_libpng_t * png)
     return png_get_image_height (pngi);
 }
 
-#line 2486 "perl-libpng.c.tmpl"
+#line 2519 "perl-libpng.c.tmpl"
 
 
 static void

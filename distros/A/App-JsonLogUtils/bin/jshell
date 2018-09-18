@@ -5,6 +5,8 @@
 use strict;
 use warnings;
 
+$0 = 'jshell';
+
 use Getopt::Long;
 use Pod::Usage;
 use List::Util qw(max);
@@ -18,7 +20,13 @@ use App::JsonLogUtils qw(lines tail json_log);
 # Parse command line options
 #-------------------------------------------------------------------------------
 my $help = 0;
-GetOptions('help' => \$help) or pod2usage(2);
+my $path;
+
+GetOptions(
+  'help'   => \$help,
+  'path=s' => \$path,
+) or pod2usage(2);
+
 do{ pod2usage 1; exit 0; } if $help;
 
 #-------------------------------------------------------------------------------
@@ -80,6 +88,7 @@ sub formatted {
 sub cmd_help {
   out green, 'h[elp]                        Display commands';
   out green, 'q[uit]                        Exits the program';
+  out green, '[p]ath                        Sets the default file path for cat and tail';
   out green, 'f[ields] field1 [field2 ...]  Set the JSON object fields to display';
   out green, 'g[rep] field pattern          Set a required match pattern for a field';
   out green, '[grep]v field pattern         Set a forbidden match pattern for a field';
@@ -94,6 +103,23 @@ sub cmd_help {
 
 sub cmd_quit {
   exit 0;
+}
+
+sub cmd_path {
+  my $file = shift;
+
+  if ($file) {
+    unless (-f $file) {
+      out yellow, "Path does not exist: $file";
+    }
+
+    $path = $file;
+    out green, "Path set to $file";
+    out;
+  }
+  else {
+    out green, "Default path: ", $path || 'none';
+  }
 }
 
 sub cmd_fields {
@@ -156,8 +182,10 @@ sub cmd_reset {
 }
 
 sub cmd_cat {
-  my $path    = shift;
-  my $entries = formatted filtered json_log lines $path;
+  my $file = shift || $path;
+  $path = $file if defined $path;
+
+  my $entries = formatted filtered json_log lines $file;
 
   while (my $entry = <$entries>) {
     out $entry;
@@ -166,8 +194,10 @@ sub cmd_cat {
 }
 
 sub cmd_tail {
-  my $path    = shift;
-  my $entries = formatted filtered json_log tail $path;
+  my $file = shift || $path;
+  $path = $file if defined $path;
+
+  my $entries = formatted filtered json_log tail $file;
 
   while (my $entry = <$entries>) {
     out $entry;
@@ -179,6 +209,7 @@ sub cmd_tail {
 # Aliases
 #-------------------------------------------------------------------------------
 sub cmd_c { goto \&cmd_cat    }
+sub cmd_p { goto \&cmd_path   }
 sub cmd_f { goto \&cmd_fields }
 sub cmd_g { goto \&cmd_grep   }
 sub cmd_h { goto \&cmd_help   }
@@ -223,15 +254,21 @@ jshell - an interactive shell for monitoring JSON log files
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
-  jshell
+  jshell [--path /path/to/log/file]
 
 =head1 DESCRIPTION
 
 Opens a shell to interact with JSON-formatted log files.
+
+=head1 OPTIONS
+
+=head2 path
+
+Optionally sets the default path to work with.
 
 =head1 COMMANDS
 
@@ -242,6 +279,10 @@ Displays commands and their descriptions.
 =head2 quit | q
 
 Exits the program.
+
+=head2 path | p
+
+Sets or displays the default path.
 
 =head2 fields | f
 
@@ -279,14 +320,16 @@ Interactively resets fields and patterns.
 =head2 cat | c
 
 Displays each entry in a file, showing only those fields selected. If no fields
-are selected, all fields are shown.
+are selected, all fields are shown. If no path is specified, the default path
+will be used if set.
 
   > cat /path/to/json.log
 
 =head2 tail | t
 
 Tails a log file, displaying new entries as they are appended to the file. Use
-control-c to stop output.
+control-c to stop output. If no path is specified, the default path will be
+used if set.
 
   > tail /path/to/json.log
 

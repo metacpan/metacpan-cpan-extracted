@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,22 +29,22 @@ no_index:
 provides:
   WWW::OAuth:
     file: lib/WWW/OAuth.pm
-    version: '0.006'
+    version: '1.000'
   WWW::OAuth::Request:
     file: lib/WWW/OAuth/Request.pm
-    version: '0.006'
+    version: '1.000'
   WWW::OAuth::Request::Basic:
     file: lib/WWW/OAuth/Request/Basic.pm
-    version: '0.006'
+    version: '1.000'
   WWW::OAuth::Request::HTTP_Request:
     file: lib/WWW/OAuth/Request/HTTP_Request.pm
-    version: '0.006'
+    version: '1.000'
   WWW::OAuth::Request::Mojo:
     file: lib/WWW/OAuth/Request/Mojo.pm
-    version: '0.006'
+    version: '1.000'
   WWW::OAuth::Util:
     file: lib/WWW/OAuth/Util.pm
-    version: '0.006'
+    version: '1.000'
 recommends:
   WWW::Form::UrlEncoded::XS: '0.23'
 requires:
@@ -63,15 +63,15 @@ resources:
   bugtracker: https://github.com/Grinnz/WWW-OAuth/issues
   homepage: https://github.com/Grinnz/WWW-OAuth
   repository: https://github.com/Grinnz/WWW-OAuth.git
-version: '0.006'
+version: '1.000'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.028000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::DBOOK/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -82,11 +82,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenerateFile
       name: '@Author::DBOOK/Generate_Contrib'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::DBOOK/MetaConfig'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -95,18 +95,18 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::DBOOK/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.008'
+              version: '6.012'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
-          version: '0.004'
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@Author::DBOOK/MetaProvides::Package'
-      version: '2.004002'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@Author::DBOOK/Prereqs::FromCPANfile'
@@ -115,21 +115,21 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 1.7.1
+          git_version: 2.14.4
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::DBOOK/Git::Contributors'
-      version: '0.029'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::DBOOK/CheckChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -143,10 +143,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 1.7.1
+          git_version: 2.14.4
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -158,11 +158,11 @@ x_Dist_Zilla:
           global: 0
           skip_version_provider: 0
       name: '@Author::DBOOK/RewriteVersion'
-      version: '0.015'
+      version: '0.018'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::DBOOK/NextRelease'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -196,12 +196,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 1.7.1
+          git_version: 2.14.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Commit'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -209,16 +209,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.006
+          tag: v1.000
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 1.7.1
+          git_version: 2.14.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Tag'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -229,7 +229,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 0
       name: '@Author::DBOOK/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.018'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -244,12 +244,12 @@ x_Dist_Zilla:
             - (?^:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 1.7.1
+          git_version: 2.14.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Commit_Version_Bump'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -258,22 +258,22 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 1.7.1
+          git_version: 2.14.4
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::DBOOK/PodCoverageTests'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::DBOOK/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -295,7 +295,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::DBOOK/Git::GatherDir'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:
@@ -304,29 +304,29 @@ x_Dist_Zilla:
             - '@Author::DBOOK/Readme_Github'
             - '@Author::DBOOK/CopyFilesFromRelease'
         Dist::Zilla::Role::Regenerator:
-          $Dist::Zilla::Role::Regenerator::VERSION: '0.001000'
+          $Dist::Zilla::Role::Regenerator::VERSION: '0.001001'
       name: '@Author::DBOOK/Regenerate::AfterReleasers'
-      version: '0.001000'
+      version: '0.001001'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::DBOOK/PruneCruft'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::DBOOK/ManifestSkip'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::DBOOK/MetaYAML'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::DBOOK/MetaJSON'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::DBOOK/License'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -337,22 +337,22 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::DBOOK/ExecDir'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::DBOOK/ShareDir'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::DBOOK/ScriptDir'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::DBOOK/MakeMaker'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -363,72 +363,73 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::DBOOK/InstallGuide'
-      version: '1.200007'
+      version: '1.200011'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::DBOOK/Manifest'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::DBOOK/TestRelease'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::DBOOK/ConfirmRelease'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::DBOOK/UploadToCPAN'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.008'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::DBOOK/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.008'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.008'
+    version: '6.012'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

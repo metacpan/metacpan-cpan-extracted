@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use JSON::Validator::OpenAPI;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 use constant DEBUG => $ENV{SQLTP_OPENAPI_DEBUG};
 use String::CamelCase qw(camelize decamelize wordsplit);
 use Lingua::EN::Inflect::Number qw(to_PL to_S);
@@ -65,6 +65,7 @@ sub _strip_dup {
     shift @names; # keep the first i.e. shortest
     push @dups, @names;
   }
+  DEBUG and _debug("dup ret", \@dups);
   @dups;
 }
 
@@ -112,7 +113,9 @@ sub _strip_subset {
       $subsets{$defname} = 1;
     }
   }
-  keys %subsets;
+  my @subset = keys %subsets;
+  DEBUG and _debug("subset ret", [ sort @subset ]);
+  @subset;
 }
 
 sub _prop2sqltype {
@@ -130,20 +133,27 @@ sub _prop2sqltype {
 }
 
 sub _make_not_null {
-  my ($table, $field) = @_;
-  $field->is_nullable(0);
-  $table->add_constraint(type => $_, fields => $field)
+  my ($table, $field_in) = @_;
+  my @fields = ref($field_in) eq 'ARRAY' ? @$field_in : $field_in;
+  for my $field (@fields) {
+    $field->is_nullable(0);
+  }
+  $table->add_constraint(type => $_, fields => \@fields)
     for (NOT_NULL);
 }
 
 sub _make_pk {
-  my ($table, $field) = @_;
-  $field->is_primary_key(1);
-  $field->is_auto_increment(1);
-  $table->add_constraint(type => $_, fields => $field)
+  my ($table, $field_in) = @_;
+  my @fields = ref($field_in) eq 'ARRAY' ? @$field_in : $field_in;
+  $_->is_primary_key(1) for @fields;
+  $fields[0]->is_auto_increment(1) if @fields == 1;
+  $table->add_constraint(type => $_, fields => \@fields)
     for (PRIMARY_KEY);
-  my $index = $table->add_index(name => "pk_${field}", fields => [ $field ]);
-  _make_not_null($table, $field);
+  my $index = $table->add_index(
+    name => join('_', 'pk', map $_->name, @fields),
+    fields => \@fields,
+  );
+  _make_not_null($table, \@fields);
 }
 
 sub _def2tablename {
@@ -181,14 +191,14 @@ sub _fk_hookup {
 }
 
 sub _def2table {
-  my ($name, $def, $schema) = @_;
+  my ($name, $def, $schema, $m2m) = @_;
   my $props = $def->{properties};
   my $tname = _def2tablename($name);
-  DEBUG and _debug("_def2table($name)($tname)", $props);
+  DEBUG and _debug("_def2table($name)($tname)($m2m)", $props);
   my $table = $schema->add_table(
     name => $tname, comments => $def->{description},
   );
-  if (!$props->{id}) {
+  if (!$props->{id} and !$m2m) {
     # we need a relational id
     $props->{id} = { type => 'integer' };
   }
@@ -200,16 +210,20 @@ sub _def2table {
     DEBUG and _debug("_def2table($propname)");
     if (my $ref = $thisprop->{'$ref'}) {
       push @fixups, {
-        to => _def2tablename(_ref2def($ref)), from => $tname,
-        tokey => 'id', fromkey => $propname . '_id',
+        from => $tname,
+        fromkey => $propname . '_id',
+        to => _def2tablename(_ref2def($ref)),
+        tokey => 'id',
         required => $prop2required{$propname},
         type => 'one',
       };
     } elsif (($thisprop->{type} // '') eq 'array') {
       if (my $ref = $thisprop->{items}{'$ref'}) {
         push @fixups, {
-          to => $tname, from => _ref2def(_def2tablename($ref)),
-          tokey => 'id', fromkey => to_S($propname) . "_id",
+          from => _ref2def(_def2tablename($ref)),
+          fromkey => to_S($propname) . "_id",
+          to => $tname,
+          tokey => 'id',
           required => 1,
           type => 'many',
         };
@@ -228,6 +242,10 @@ sub _def2table {
       _make_not_null($table, $field);
     }
   }
+  if ($m2m) {
+    _make_pk($table, scalar $table->get_fields);
+  }
+  DEBUG and _debug("table", $table, \@fixups);
   ($table, \@fixups);
 }
 
@@ -336,7 +354,7 @@ sub _extract_objects {
       %$ref = ('$ref' => "#/definitions/$newtype");
     }
   }
-  DEBUG and _debug('OpenAPI._extract_objects(end)', \%newdefs);
+  DEBUG and _debug('OpenAPI._extract_objects(end)', [ sort keys %newdefs ], \%newdefs);
   \%newdefs;
 }
 
@@ -363,7 +381,7 @@ sub _extract_array_simple {
       %$ref = ('$ref' => "#/definitions/$newtype");
     }
   }
-  DEBUG and _debug('OpenAPI._extract_array_simple(end)', \%newdefs);
+  DEBUG and _debug('OpenAPI._extract_array_simple(end)', [ sort keys %newdefs ], \%newdefs);
   \%newdefs;
 }
 
@@ -408,6 +426,42 @@ sub _fixup_addProps {
   \%newdefs;
 }
 
+sub _absorb_nonobject {
+  my ($defs) = @_;
+  DEBUG and _debug('OpenAPI._absorb_nonobject', $defs);
+  my %def2nonobj = map {$_,1} grep $defs->{$_}{type} ne 'object', keys %$defs;
+  DEBUG and _debug("OpenAPI._absorb_nonobject(d2nonobj)", \%def2nonobj);
+  for my $defname (sort keys %$defs) {
+    my $theseprops = $defs->{$defname}{properties} || {};
+    DEBUG and _debug("OpenAPI._absorb_nonobject(t)($defname)", $theseprops);
+    for my $propname (keys %$theseprops) {
+      my $thisprop = $theseprops->{$propname};
+      DEBUG and _debug("OpenAPI._absorb_nonobject(p)($propname)", $thisprop);
+      next unless $thisprop->{'$ref'}
+        or $thisprop->{items} && $thisprop->{items}{'$ref'};
+      DEBUG and _debug("OpenAPI._absorb_nonobject(p)($propname)(y)");
+      my $ref;
+      if ($thisprop->{'$ref'}) {
+        $ref = $thisprop;
+      } elsif ($thisprop->{items} && $thisprop->{items}{'$ref'}) {
+        $ref = $thisprop->{items};
+      } else {
+        next;
+      }
+      my $refname = $ref->{'$ref'};
+      DEBUG and _debug("OpenAPI._absorb_nonobject(p)($propname)(y2)($refname)", $ref);
+      my $refdef = _ref2def($refname);
+      next if !$def2nonobj{$refdef};
+      %$ref = %{ $defs->{$refdef} };
+      DEBUG and _debug("OpenAPI._absorb_nonobject(p)($propname)(y3)", $ref);
+    }
+  }
+  my %newdefs = %$defs;
+  delete @newdefs{ keys %def2nonobj };
+  DEBUG and _debug('OpenAPI._absorb_nonobject(end)', \%newdefs);
+  \%newdefs;
+}
+
 sub _tuple2name {
   my ($fixup) = @_;
   my $from = $fixup->{from};
@@ -418,6 +472,7 @@ sub _tuple2name {
 
 sub _make_many2many {
   my ($fixups, $schema) = @_;
+  DEBUG and _debug("tables to do", $fixups);
   my @manyfixups = grep $_->{type} eq 'many', @$fixups;
   my %from_tos;
   push @{ $from_tos{$_->{from}}{$_->{to}} }, $_ for @manyfixups;
@@ -447,37 +502,40 @@ sub _make_many2many {
         {
           type => 'object',
           properties => {
-            $f1->{from}.'_'.$f1->{fromkey} => {
+            $f1->{fromkey} => {
               type => $SQL2TYPE{$t1_obj->get_field($f1->{tokey})->data_type}
             },
-            $f2->{from}.'_'.$f2->{fromkey} => {
+            $f2->{fromkey} => {
               type => $SQL2TYPE{$t2_obj->get_field($f2->{tokey})->data_type}
             },
           },
         },
         $schema,
+        1,
       );
       push @replacefixups, {
         to => $f1->{from},
         tokey => 'id',
         from => $table->name,
-        fromkey => $f1->{from}.'_'.$f1->{fromkey},
+        fromkey => $f1->{fromkey},
         required => 1,
       }, {
         to => $f2->{from},
         tokey => 'id',
         from => $table->name,
-        fromkey => $f2->{from}.'_'.$f2->{fromkey},
+        fromkey => $f2->{fromkey},
         required => 1,
       };
     }
   }
-  [
+  my @newfixups = (
     (sort {
         $a->{from} cmp $b->{from} || $a->{fromkey} cmp $b->{fromkey}
     } values %ref2nonm2mfixup),
     @replacefixups,
-  ];
+  );
+  DEBUG and _debug("fixups still to do", \@newfixups);
+  \@newfixups;
 }
 
 sub parse {
@@ -486,6 +544,7 @@ sub parse {
   my %defs = %{ $openapi_schema->get("/definitions") };
   DEBUG and _debug('OpenAPI.definitions', \%defs);
   my $schema = $tr->schema;
+  DEBUG and $schema->translator(undef); # reduce debug output
   my @thin = _strip_thin(\%defs);
   DEBUG and _debug("thin ret", \@thin);
   delete @defs{@thin};
@@ -493,26 +552,19 @@ sub parse {
   my $def2mask = defs2mask(\%defs);
   my $reffed = _find_referenced(\%defs);
   my @dup = _strip_dup(\%defs, $def2mask, $reffed);
-  DEBUG and _debug("dup ret", \@dup);
   delete @defs{@dup};
   my @subset = _strip_subset(\%defs, $def2mask, $reffed);
-  DEBUG and _debug("subset ret", [ sort @subset ]);
   delete @defs{@subset};
-  DEBUG and _debug("remaining", [ sort keys %defs ]);
   %defs = %{ _extract_objects(\%defs) };
-  DEBUG and _debug("after _extract_objects", [ sort keys %defs ]);
   %defs = %{ _extract_array_simple(\%defs) };
-  DEBUG and _debug("after _extract_array_simple", [ sort keys %defs ]);
   my (@fixups);
   %defs = %{ _fixup_addProps(\%defs) };
+  %defs = %{ _absorb_nonobject(\%defs) };
   for my $name (sort keys %defs) {
-    my ($table, $thesefixups) = _def2table($name, $defs{$name}, $schema);
+    my ($table, $thesefixups) = _def2table($name, $defs{$name}, $schema, 0);
     push @fixups, @$thesefixups;
-    DEBUG and _debug("table", $table, $thesefixups);
   }
-  DEBUG and _debug("tables to do", \@fixups);
   my ($newfixups) = _make_many2many(\@fixups, $schema);
-  DEBUG and _debug("fixups still to do", $newfixups);
   for my $fixup (@$newfixups) {
     _fk_hookup($schema, @{$fixup}{qw(from fromkey to tokey required)});
   }
@@ -564,7 +616,13 @@ To try to make the data model represent the "real" data, it applies heuristics:
 
 =item *
 
-to remove object definitions that only have one property
+to remove object definitions that only have one property (which the
+author calls "thin objects")
+
+=item *
+
+for definitions that have C<allOf>, either merge them together if there
+is a C<discriminator>, or absorb properties from referred definitions
 
 =item *
 
@@ -575,6 +633,31 @@ and remove all but the shortest-named one
 
 to remove object definitions whose properties are a strict subset
 of another
+
+=item *
+
+creates object definitions for any properties that are an object
+
+=item *
+
+creates object definitions for any properties that are an array of simple
+OpenAPI types (e.g. C<string>)
+
+=item *
+
+creates object definitions for any objects that are
+C<additionalProperties> (i.e. freeform key/value pairs), that are
+key/value rows
+
+=item *
+
+absorbs any definitions that are in fact not objects, into the referring
+property
+
+=item *
+
+injects foreign-key relationships for array-of-object properties, and
+creates many-to-many tables for any two-way array relationships
 
 =back
 

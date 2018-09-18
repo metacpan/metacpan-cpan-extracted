@@ -29,9 +29,9 @@
 #include "spvm_object.h"
 #include "spvm_native.h"
 #include "spvm_opcode_builder.h"
-#include "spvm_csource_builder.h"
+#include "spvm_csource_builder_precompile.h"
 #include "spvm_list.h"
-#include "spvm_csource_builder.h"
+#include "spvm_csource_builder_precompile.h"
 #include "spvm_string_buffer.h"
 #include "spvm_use.h"
 #include "spvm_limit.h"
@@ -54,7 +54,7 @@
 #include "spvm_runtime_info_case_info.h"
 
 #include "spvm_portable.h"
-#include "spvm_exe_csource_builder.h"
+#include "spvm_csource_builder_exe.h"
 
 SV* SPVM_XS_UTIL_new_sv_object(SPVM_ENV* env, SPVM_OBJECT* object, const char* package) {
   
@@ -438,6 +438,24 @@ compile_spvm(...)
   XSRETURN(1);
 }
 
+SV*
+DESTROY(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+  
+  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  if (SvOK(sv_env)) {
+    SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+    SPVM_RUNTIME_free(env);
+    free(env);
+  }
+}
+
 MODULE = SPVM::Builder::C		PACKAGE = SPVM::Builder::C
 
 SV*
@@ -502,7 +520,7 @@ build_package_csource_precompile(...)
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
   
   // Build package csource
-  SPVM_CSOURCE_BUILDER_build_package_csource(env, string_buffer, package_name);
+  SPVM_CSOURCE_BUILDER_PRECOMPILE_build_package_csource(env, string_buffer, package_name);
   
   SV* sv_package_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   
@@ -903,7 +921,7 @@ call_sub(...)
   int32_t ref_stack_ids[SPVM_LIMIT_C_STACK_MAX];
   
   // Arguments
-  _Bool args_contain_ref = 0;
+  int32_t args_contain_ref = 0;
   {
     // If class method, first argument is ignored
     if (runtime_sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD) {
@@ -920,9 +938,9 @@ call_sub(...)
     for (arg_index = 0; arg_index < runtime_sub->arg_ids_length; arg_index++) {
       SPVM_RUNTIME_MY* runtime_arg = &runtime->args[runtime_sub->arg_ids_base + arg_index];
 
-      _Bool arg_type_is_value_type = SPVM_RUNTIME_API_is_value_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      _Bool arg_type_is_object_type = SPVM_RUNTIME_API_is_object_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      _Bool arg_type_is_ref_type = SPVM_RUNTIME_API_is_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+      int32_t arg_type_is_value_type = SPVM_RUNTIME_API_is_value_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+      int32_t arg_type_is_object_type = SPVM_RUNTIME_API_is_object_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+      int32_t arg_type_is_ref_type = SPVM_RUNTIME_API_is_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
 
       SV* sv_value = ST(arg_index + arg_start);
       
@@ -934,8 +952,8 @@ call_sub(...)
       
       if (arg_type_is_ref_type) {
         args_contain_ref = 1;
-        _Bool arg_type_is_numeric_ref_type = SPVM_RUNTIME_API_is_numeric_ref_type(env, arg_basic_type_id, arg_type_dimension, arg_type_flag);
-        _Bool arg_type_is_value_ref_type = SPVM_RUNTIME_API_is_value_ref_type(env, arg_basic_type_id, arg_type_dimension, arg_type_flag);
+        int32_t arg_type_is_numeric_ref_type = SPVM_RUNTIME_API_is_numeric_ref_type(env, arg_basic_type_id, arg_type_dimension, arg_type_flag);
+        int32_t arg_type_is_value_ref_type = SPVM_RUNTIME_API_is_value_ref_type(env, arg_basic_type_id, arg_type_dimension, arg_type_flag);
         
         if (arg_type_is_numeric_ref_type) {
           SV* sv_value_deref = SvRV(sv_value);
@@ -1124,10 +1142,9 @@ call_sub(...)
         else {
           if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::Data")) {
             SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
-            
-            _Bool check_cast = env->check_cast(env, arg_basic_type_id, arg_type_dimension, object);
-            if (!check_cast) {
-              croak("Can't cast %dth argument", arg_index);
+
+            if (!(object->basic_type_id == arg_basic_type_id && object->type_dimension == arg_type_dimension)) {
+              croak("%dth argument is invalid object type", arg_index);
             }
             
             stack[arg_var_id].oval = object;
@@ -1322,9 +1339,9 @@ call_sub(...)
 
       SPVM_RUNTIME_MY* runtime_arg = &runtime->args[runtime_sub->arg_ids_base + arg_index];
 
-      _Bool arg_type_is_value_type = SPVM_RUNTIME_API_is_value_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      _Bool arg_type_is_object_type = SPVM_RUNTIME_API_is_object_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      _Bool arg_type_is_ref_type = SPVM_RUNTIME_API_is_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+      int32_t arg_type_is_value_type = SPVM_RUNTIME_API_is_value_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+      int32_t arg_type_is_object_type = SPVM_RUNTIME_API_is_object_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+      int32_t arg_type_is_ref_type = SPVM_RUNTIME_API_is_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
       
       int32_t arg_basic_type_id = runtime_arg->basic_type_id;
       int32_t arg_type_dimension = runtime_arg->type_dimension;
@@ -1335,8 +1352,8 @@ call_sub(...)
       if (arg_type_is_ref_type) {
         int32_t ref_stack_id = ref_stack_ids[arg_index];
         
-        _Bool arg_type_is_numeric_ref_type = SPVM_RUNTIME_API_is_numeric_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-        _Bool arg_type_is_value_ref_type = SPVM_RUNTIME_API_is_value_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+        int32_t arg_type_is_numeric_ref_type = SPVM_RUNTIME_API_is_numeric_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
+        int32_t arg_type_is_value_ref_type = SPVM_RUNTIME_API_is_value_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
         
         if (arg_type_is_numeric_ref_type) {
           SV* sv_value_deref = SvRV(sv_value);
@@ -1430,7 +1447,7 @@ call_sub(...)
     int32_t length = env->get_array_length(env, exception);
     const char* exception_bytes = (char*)env->get_byte_array_elements(env, exception);
     SV* sv_exception = sv_2mortal(newSVpvn((char*)exception_bytes, length));
-    croak("%s", SvPV_nolen(sv_exception));
+    croak("%s\n ", SvPV_nolen(sv_exception));
   }
   // Success
   else {
@@ -1572,13 +1589,11 @@ set_array_elements(...)
         else if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::Data")) {
           SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
           
-          int32_t check_cast = env->check_cast(env, array_basic_type_id, element_type_dimension, object);
-          
-          if (check_cast) {
+          if (object->basic_type_id == array_basic_type_id && object->type_dimension == element_type_dimension) {
             env->set_object_array_element(env, array, index, object);
           }
           else {
-            croak("Element must be cast");
+            croak("Element is invalid object type");
           }
         }
         else {
@@ -1981,13 +1996,11 @@ set_array_element(...)
       else if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::Data")) {
         SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
         
-        int32_t check_cast = env->check_cast(env, basic_type_id, element_type_dimension, object);
-        
-        if (check_cast) {
+        if (object->basic_type_id == basic_type_id && object->type_dimension == element_type_dimension) {
           env->set_object_array_element(env, array, index, object);
         }
         else {
-          croak("Element must be cast");
+          croak("Element is invalid object type");
         }
       }
       else {
@@ -2113,7 +2126,7 @@ get_array_element(...)
   int32_t is_array_type = SPVM_RUNTIME_API_is_array_type(env, basic_type_id, dimension, 0);
 
   SV* sv_value = NULL;
-  _Bool is_object = 0;
+  int32_t is_object = 0;
   if (is_array_type) {
     int32_t element_type_dimension = dimension - 1;
     int32_t element_type_is_value_type = SPVM_RUNTIME_API_is_value_type(env, basic_type_id, element_type_dimension, 0);
@@ -2625,7 +2638,7 @@ build_main_csource(...)
   // String buffer for csource
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
 
-  SPVM_EXE_CSOURCE_BUILDER_build_exe_csource(env, string_buffer, portable, package_name);
+  SPVM_CSOURCE_BUILDER_EXE_build_exe_csource(env, string_buffer, portable, package_name);
 
   SV* sv_main_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
 

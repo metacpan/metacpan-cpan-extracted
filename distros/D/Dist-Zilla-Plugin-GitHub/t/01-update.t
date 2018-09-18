@@ -14,7 +14,7 @@ use Test::Deep::JSON;
     use Dist::Zilla::Plugin::GitHub;
     package Dist::Zilla::Plugin::GitHub;
     no warnings 'redefine';
-    sub _build_credentials { return {login => 'bob', pass => q{}, otp => q{}} }
+    sub _build_credentials { return {login => 'bob', pass => q{} } }
     sub _get_repo_name { 'bob/My-Stuff' }
 }
 

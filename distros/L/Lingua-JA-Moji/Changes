@@ -1,5 +1,15 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.52 2018-09-18
+
+* "smallize_kana" now converts burituji to burijji
+* More documentation of hentaigana functions
+
+0.51 2018-09-15
+
+* yurei_moji now works
+* cleanup_kana converts kanji "two", "strong" to similar kana
+
 0.50 2018-08-16
 
 * Document yurei_moji and bad_kanji

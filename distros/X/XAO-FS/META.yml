@@ -3,6 +3,7 @@ abstract: 'XAO Database Layer'
 author:
   - 'Andrew Maltsev, https://ejelta.com/xao/'
 build_requires:
+  ExtUtils::MakeMaker: '6.64'
   Pod::Usage: '1.12'
   XAO::Base: '1.20'
 configure_requires:
@@ -19,9 +20,8 @@ no_index:
     - t
     - inc
 requires:
-  DBD::mysql: '2.0414'
   DBI: '1.13'
   Error: '0.15'
   XAO::Base: '1.20'
   perl: '5.010001'
-version: '1.21'
+version: '1.22'

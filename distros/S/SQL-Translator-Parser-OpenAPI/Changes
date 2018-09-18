@@ -1,5 +1,11 @@
 Revision history for Perl extension SQL-Translator-Parser-OpenAPI
 
+0.04	Sat 15 Sep 22:39:33 BST 2018
+ - absorb non-object definitions
+ - many-to-many tables now have composite PK, not separate "id", and
+   columns named so DCSL names rels right
+ - update docs
+
 0.03	Wed 12 Sep 08:31:43 BST 2018
  - PK is already unique
  - use Math::BigInt to mean unlimited no of properties

@@ -28,7 +28,7 @@ cpanm https://github.com/QBitFramework/QBit-Application-Model-DB.git
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.029';
+$QBit::Application::Model::DB::VERSION = '0.030';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -279,6 +279,9 @@ sub make_tables {
             my $table_name_template = blessed($table_meta) ? $table_meta->name : $table_meta;
 
             $meta //= $self->get_all_meta();
+
+            throw gettext('Table "%s" not found', $table_name_template)
+              unless exists($meta->{'tables'}{$table_name_template});
 
             %table = %{$meta->{'tables'}{$table_name_template}};
         }

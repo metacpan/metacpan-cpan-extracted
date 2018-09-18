@@ -1,14 +1,13 @@
 package UNIVERSAL::Object;
 # ABSTRACT: A useful base class
-
+use 5.008;
 use strict;
 use warnings;
 
-use 5.006;
+use Carp       ();
+use Hash::Util ();
 
-use Carp ();
-
-our $VERSION   = '0.14';
+our $VERSION   = '0.15';
 our $AUTHORITY = 'cpan:STEVAN';
 
 BEGIN { $] >= 5.010 ? require mro : require MRO::Compat }
@@ -16,9 +15,19 @@ BEGIN { $] >= 5.010 ? require mro : require MRO::Compat }
 sub new {
     my $class = shift;
        $class = ref $class if ref $class;
+
     my $proto = $class->BUILDARGS( @_ );
-    my $self  = $class->BLESS( $proto );
+
+    Carp::confess('BUILDARGS must return a HASH reference, not '.$proto)
+        unless $proto && ref $proto eq 'HASH';
+
+    my $self = $class->BLESS( $proto );
+
+    Carp::confess('BLESS must return a blessed reference, not '.$self)
+        unless defined $self && UNIVERSAL::isa( $self, 'UNIVERSAL' );
+
     $self->can('BUILD') && UNIVERSAL::Object::Util::BUILDALL( $self, $proto );
+
     return $self;
 }
 
@@ -42,9 +51,27 @@ sub BLESS {
     my $proto = $_[1];
 
     Carp::confess('Invalid BLESS args for '.$class.', You must specify an instance prototype as a HASH ref')
-        unless $proto && ref $proto eq 'HASH';
+        unless defined $proto && ref $proto eq 'HASH';
 
-    return bless $class->CREATE( $proto ) => $class;
+    my $instance = $class->CREATE( $proto );
+
+    Carp::confess('CREATE must return a reference to bless, not '.$instance)
+        unless defined $instance && ref $instance;
+
+    my $repr = ref   $instance;
+    my $self = bless $instance => $class;
+
+    # So,... for HASH based instances we'll
+    # lock the set of keys so as to prevent
+    # typos and other such silliness, if
+    # you use other $repr types, you are
+    # on your own, ... sorry ¯\_(ツ)_/¯
+    if ( $repr eq 'HASH' ) {
+        my %slots = $self->SLOTS;
+        Hash::Util::lock_keys( %$self, keys %slots );
+    }
+
+    return $self;
 }
 
 sub CREATE {
@@ -54,6 +81,12 @@ sub CREATE {
 
     my $self  = $class->REPR( $proto );
     my %slots = $class->SLOTS;
+
+    # NOTE:
+    # We could check the return values of SLOTS
+    # and REPR, but they might change and so it
+    # is not something we would always know.
+    # - SL
 
     $self->{ $_ } = exists $proto->{ $_ }
         ? $proto->{ $_ }
@@ -112,7 +145,7 @@ UNIVERSAL::Object - A useful base class
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -256,11 +289,17 @@ C<CREATE>, passing it the C<$proto> instance. Then it will take
 the return value of C<CREATE> and C<bless> it into the C<$class>.
 
 B<NOTE:>
-This method is mostly here to make it easier to override the
-C<CREATE> method, which, along with the C<REPR> method, can be
-used to change the behavior and/or type of the instance
-structure. By keeping the C<bless> work here we make the work
-done in C<CREATE> simpler with less mechanics.
+This method will, if the C<REPR> type is a C<HASH> reference,
+proceed to lock the set of allowed keys in the C<HASH>. Things
+should "Just Work" as long as you do not attempt to access a
+slot that you have not defined.
+
+B<NOTE:>
+Aside from the above, this method is mostly here to make it
+easier to override the C<CREATE> method, which, along with the
+C<REPR> method, can be used to change the behavior and/or type
+of the instance structure. By keeping the C<bless> work here we
+make the work done in C<CREATE> simpler with less mechanics.
 
 =head2 C<CREATE ($class, $proto)>
 
@@ -327,7 +366,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016, 2017 by Stevan Little.
+This software is copyright (c) 2016, 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

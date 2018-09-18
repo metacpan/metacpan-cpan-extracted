@@ -72,6 +72,7 @@ struct s_TransactionData {
   SV* callback_inst;
   SV* callback_error;
   SV* callback_elem;
+  SV* callback_verify;
   long min_delta;
   SV *data; /* chain with another data user provided */
 };
@@ -1252,6 +1253,14 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
       callback = td->callback_uninst;
       callback_type = "uninst";
       break;
+#ifdef RPM4_14_2
+    case RPMCALLBACK_VERIFY_START:
+    case RPMCALLBACK_VERIFY_PROGRESS:
+    case RPMCALLBACK_VERIFY_STOP:
+      callback = td->callback_verify;
+      callback_type = "verify";
+      break;
+#endif
     case RPMCALLBACK_INST_START:
     case RPMCALLBACK_INST_PROGRESS:
     case RPMCALLBACK_INST_STOP:
@@ -1281,15 +1290,21 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
 
   if (callback != NULL) {
     switch (what) {
+      case RPMCALLBACK_INST_START:
       case RPMCALLBACK_TRANS_START:
       case RPMCALLBACK_UNINST_START:
-      case RPMCALLBACK_INST_START:
+#ifdef RPM4_14_2
+      case RPMCALLBACK_VERIFY_START:
+#endif
 	callback_subtype = "start";
 	gettimeofday(&tprev, NULL);
 	break;
+      case RPMCALLBACK_INST_PROGRESS:
       case RPMCALLBACK_TRANS_PROGRESS:
       case RPMCALLBACK_UNINST_PROGRESS:
-      case RPMCALLBACK_INST_PROGRESS:
+#ifdef RPM4_14_2
+      case RPMCALLBACK_VERIFY_PROGRESS:
+#endif
 	callback_subtype = "progress";
 	gettimeofday(&tcurr, NULL);
 	delta = 1000000 * (tcurr.tv_sec - tprev.tv_sec) + (tcurr.tv_usec - tprev.tv_usec);
@@ -1301,6 +1316,9 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
       case RPMCALLBACK_INST_STOP:
       case RPMCALLBACK_TRANS_STOP:
       case RPMCALLBACK_UNINST_STOP:
+#ifdef RPM4_14_2
+      case RPMCALLBACK_VERIFY_STOP:
+#endif
 	callback_subtype = "stop";
 	break;
       case RPMCALLBACK_CPIO_ERROR:
@@ -2690,7 +2708,7 @@ Trans_run(trans, data, ...)
   URPM::Transaction trans
   SV *data
   PREINIT:
-  struct s_TransactionData td = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, 100000, data };
+  struct s_TransactionData td = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 100000, data };
   rpmtransFlags transFlags = RPMTRANS_FLAG_NONE;
   int probFilter = 0;
   int translate_message = 0, raw_message = 0;
@@ -2745,6 +2763,8 @@ Trans_run(trans, data, ...)
 	if (SvROK(ST(i+1))) td.callback_trans = ST(i+1);
       } else if (len == 9+6 && !memcmp(s+9, "uninst", 6)) {
 	if (SvROK(ST(i+1))) td.callback_uninst = ST(i+1);
+      } else if (len == 9+6 && !memcmp(s+9, "verify", 6)) {
+	if (SvROK(ST(i+1))) td.callback_verify = ST(i+1);
       } else if (len == 9+4 && !memcmp(s+9, "inst", 4)) {
 	if (SvROK(ST(i+1))) td.callback_inst = ST(i+1);
       } else if (len == 9+5 && !memcmp(s+9, "error", 5)) {

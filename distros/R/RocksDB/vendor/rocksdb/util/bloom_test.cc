@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2012 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -10,21 +10,22 @@
 #ifndef GFLAGS
 #include <cstdio>
 int main() {
-  fprintf(stderr, "Please install gflags to run rocksdb tools\n");
-  return 1;
+  fprintf(stderr, "Please install gflags to run this test... Skipping...\n");
+  return 0;
 }
 #else
 
-#include <gflags/gflags.h>
 #include <vector>
 
 #include "rocksdb/filter_policy.h"
+#include "table/full_filter_bits_builder.h"
+#include "util/arena.h"
+#include "util/gflags_compat.h"
 #include "util/logging.h"
 #include "util/testharness.h"
 #include "util/testutil.h"
-#include "util/arena.h"
 
-using GFLAGS::ParseCommandLineFlags;
+using GFLAGS_NAMESPACE::ParseCommandLineFlags;
 
 DEFINE_int32(bits_per_key, 10, "");
 
@@ -33,7 +34,9 @@ namespace rocksdb {
 static const int kVerbose = 1;
 
 static Slice Key(int i, char* buffer) {
-  memcpy(buffer, &i, sizeof(i));
+  std::string s;
+  PutFixed32(&s, static_cast<uint32_t>(i));
+  memcpy(buffer, s.c_str(), sizeof(i));
   return Slice(buffer, sizeof(i));
 }
 
@@ -50,7 +53,7 @@ static int NextLength(int length) {
   return length;
 }
 
-class BloomTest {
+class BloomTest : public testing::Test {
  private:
   const FilterPolicy* policy_;
   std::string filter_;
@@ -119,12 +122,12 @@ class BloomTest {
   }
 };
 
-TEST(BloomTest, EmptyFilter) {
+TEST_F(BloomTest, EmptyFilter) {
   ASSERT_TRUE(! Matches("hello"));
   ASSERT_TRUE(! Matches("world"));
 }
 
-TEST(BloomTest, Small) {
+TEST_F(BloomTest, Small) {
   Add("hello");
   Add("world");
   ASSERT_TRUE(Matches("hello"));
@@ -133,7 +136,7 @@ TEST(BloomTest, Small) {
   ASSERT_TRUE(! Matches("foo"));
 }
 
-TEST(BloomTest, VaryingLengths) {
+TEST_F(BloomTest, VaryingLengths) {
   char buffer[sizeof(int)];
 
   // Count number of filters that significantly exceed the false positive rate
@@ -174,7 +177,7 @@ TEST(BloomTest, VaryingLengths) {
 
 // Different bits-per-byte
 
-class FullBloomTest {
+class FullBloomTest : public testing::Test {
  private:
   const FilterPolicy* policy_;
   std::unique_ptr<FilterBitsBuilder> bits_builder_;
@@ -191,6 +194,10 @@ class FullBloomTest {
 
   ~FullBloomTest() {
     delete policy_;
+  }
+
+  FullFilterBitsBuilder* GetFullFilterBitsBuilder() {
+    return dynamic_cast<FullFilterBitsBuilder*>(bits_builder_.get());
   }
 
   void Reset() {
@@ -233,13 +240,26 @@ class FullBloomTest {
   }
 };
 
-TEST(FullBloomTest, FullEmptyFilter) {
+TEST_F(FullBloomTest, FilterSize) {
+  uint32_t dont_care1, dont_care2;
+  auto full_bits_builder = GetFullFilterBitsBuilder();
+  for (int n = 1; n < 100; n++) {
+    auto space = full_bits_builder->CalculateSpace(n, &dont_care1, &dont_care2);
+    auto n2 = full_bits_builder->CalculateNumEntry(space);
+    ASSERT_GE(n2, n);
+    auto space2 =
+        full_bits_builder->CalculateSpace(n2, &dont_care1, &dont_care2);
+    ASSERT_EQ(space, space2);
+  }
+}
+
+TEST_F(FullBloomTest, FullEmptyFilter) {
   // Empty filter is not match, at this level
   ASSERT_TRUE(!Matches("hello"));
   ASSERT_TRUE(!Matches("world"));
 }
 
-TEST(FullBloomTest, FullSmall) {
+TEST_F(FullBloomTest, FullSmall) {
   Add("hello");
   Add("world");
   ASSERT_TRUE(Matches("hello"));
@@ -248,7 +268,7 @@ TEST(FullBloomTest, FullSmall) {
   ASSERT_TRUE(!Matches("foo"));
 }
 
-TEST(FullBloomTest, FullVaryingLengths) {
+TEST_F(FullBloomTest, FullVaryingLengths) {
   char buffer[sizeof(int)];
 
   // Count number of filters that significantly exceed the false positive rate
@@ -292,9 +312,10 @@ TEST(FullBloomTest, FullVaryingLengths) {
 }  // namespace rocksdb
 
 int main(int argc, char** argv) {
+  ::testing::InitGoogleTest(&argc, argv);
   ParseCommandLineFlags(&argc, &argv, true);
 
-  return rocksdb::test::RunAllTests();
+  return RUN_ALL_TESTS();
 }
 
 #endif  // GFLAGS

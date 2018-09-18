@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -10,14 +10,17 @@
 #include "db/version_edit.h"
 
 #include "db/version_set.h"
-#include "util/coding.h"
 #include "rocksdb/slice.h"
+#include "util/coding.h"
+#include "util/event_logger.h"
+#include "util/string_util.h"
+#include "util/sync_point.h"
 
 namespace rocksdb {
 
 // Tag numbers for serialized VersionEdit.  These numbers are written to
 // disk and should not be changed.
-enum Tag {
+enum Tag : uint32_t {
   kComparator = 1,
   kLogNumber = 2,
   kNextFileNumber = 3,
@@ -27,15 +30,31 @@ enum Tag {
   kNewFile = 7,
   // 8 was used for large value refs
   kPrevLogNumber = 9,
+  kMinLogNumberToKeep = 10,
 
   // these are new formats divergent from open source leveldb
   kNewFile2 = 100,
   kNewFile3 = 102,
+  kNewFile4 = 103,      // 4th (the latest) format version of adding files
   kColumnFamily = 200,  // specify column family for version edit
   kColumnFamilyAdd = 201,
   kColumnFamilyDrop = 202,
   kMaxColumnFamily = 203,
 };
+
+enum CustomTag : uint32_t {
+  kTerminate = 1,  // The end of customized fields
+  kNeedCompaction = 2,
+  // Since Manifest is not entirely currently forward-compatible, and the only
+  // forward-compatbile part is the CutsomtTag of kNewFile, we currently encode
+  // kMinLogNumberToKeep as part of a CustomTag as a hack. This should be
+  // removed when manifest becomes forward-comptabile.
+  kMinLogNumberToKeepHack = 3,
+  kPathId = 65,
+};
+// If this bit for the custom tag is set, opening DB should fail if
+// we don't know this field.
+uint32_t kCustomTagNonSafeIgnoreMask = 1 << 6;
 
 uint64_t PackFileNumberAndPathId(uint64_t number, uint64_t path_id) {
   assert(number <= kFileNumberMask);
@@ -50,12 +69,14 @@ void VersionEdit::Clear() {
   last_sequence_ = 0;
   next_file_number_ = 0;
   max_column_family_ = 0;
+  min_log_number_to_keep_ = 0;
   has_comparator_ = false;
   has_log_number_ = false;
   has_prev_log_number_ = false;
   has_next_file_number_ = false;
   has_last_sequence_ = false;
   has_max_column_family_ = false;
+  has_min_log_number_to_keep_ = false;
   deleted_files_.clear();
   new_files_.clear();
   column_family_ = 0;
@@ -70,60 +91,105 @@ bool VersionEdit::EncodeTo(std::string* dst) const {
     PutLengthPrefixedSlice(dst, comparator_);
   }
   if (has_log_number_) {
-    PutVarint32(dst, kLogNumber);
-    PutVarint64(dst, log_number_);
+    PutVarint32Varint64(dst, kLogNumber, log_number_);
   }
   if (has_prev_log_number_) {
-    PutVarint32(dst, kPrevLogNumber);
-    PutVarint64(dst, prev_log_number_);
+    PutVarint32Varint64(dst, kPrevLogNumber, prev_log_number_);
   }
   if (has_next_file_number_) {
-    PutVarint32(dst, kNextFileNumber);
-    PutVarint64(dst, next_file_number_);
+    PutVarint32Varint64(dst, kNextFileNumber, next_file_number_);
   }
   if (has_last_sequence_) {
-    PutVarint32(dst, kLastSequence);
-    PutVarint64(dst, last_sequence_);
+    PutVarint32Varint64(dst, kLastSequence, last_sequence_);
   }
   if (has_max_column_family_) {
-    PutVarint32(dst, kMaxColumnFamily);
-    PutVarint32(dst, max_column_family_);
+    PutVarint32Varint32(dst, kMaxColumnFamily, max_column_family_);
   }
-
   for (const auto& deleted : deleted_files_) {
-    PutVarint32(dst, kDeletedFile);
-    PutVarint32(dst, deleted.first /* level */);
-    PutVarint64(dst, deleted.second /* file number */);
+    PutVarint32Varint32Varint64(dst, kDeletedFile, deleted.first /* level */,
+                                deleted.second /* file number */);
   }
 
+  bool min_log_num_written = false;
   for (size_t i = 0; i < new_files_.size(); i++) {
     const FileMetaData& f = new_files_[i].second;
     if (!f.smallest.Valid() || !f.largest.Valid()) {
       return false;
     }
-    if (f.fd.GetPathId() == 0) {
+    bool has_customized_fields = false;
+    if (f.marked_for_compaction || has_min_log_number_to_keep_) {
+      PutVarint32(dst, kNewFile4);
+      has_customized_fields = true;
+    } else if (f.fd.GetPathId() == 0) {
       // Use older format to make sure user can roll back the build if they
       // don't config multiple DB paths.
       PutVarint32(dst, kNewFile2);
     } else {
       PutVarint32(dst, kNewFile3);
     }
-    PutVarint32(dst, new_files_[i].first);  // level
-    PutVarint64(dst, f.fd.GetNumber());
-    if (f.fd.GetPathId() != 0) {
+    PutVarint32Varint64(dst, new_files_[i].first /* level */, f.fd.GetNumber());
+    if (f.fd.GetPathId() != 0 && !has_customized_fields) {
+      // kNewFile3
       PutVarint32(dst, f.fd.GetPathId());
     }
     PutVarint64(dst, f.fd.GetFileSize());
     PutLengthPrefixedSlice(dst, f.smallest.Encode());
     PutLengthPrefixedSlice(dst, f.largest.Encode());
-    PutVarint64(dst, f.smallest_seqno);
-    PutVarint64(dst, f.largest_seqno);
+    PutVarint64Varint64(dst, f.smallest_seqno, f.largest_seqno);
+    if (has_customized_fields) {
+      // Customized fields' format:
+      // +-----------------------------+
+      // | 1st field's tag (varint32)  |
+      // +-----------------------------+
+      // | 1st field's size (varint32) |
+      // +-----------------------------+
+      // |    bytes for 1st field      |
+      // |  (based on size decoded)    |
+      // +-----------------------------+
+      // |                             |
+      // |          ......             |
+      // |                             |
+      // +-----------------------------+
+      // | last field's size (varint32)|
+      // +-----------------------------+
+      // |    bytes for last field     |
+      // |  (based on size decoded)    |
+      // +-----------------------------+
+      // | terminating tag (varint32)  |
+      // +-----------------------------+
+      //
+      // Customized encoding for fields:
+      //   tag kPathId: 1 byte as path_id
+      //   tag kNeedCompaction:
+      //        now only can take one char value 1 indicating need-compaction
+      //
+      if (f.fd.GetPathId() != 0) {
+        PutVarint32(dst, CustomTag::kPathId);
+        char p = static_cast<char>(f.fd.GetPathId());
+        PutLengthPrefixedSlice(dst, Slice(&p, 1));
+      }
+      if (f.marked_for_compaction) {
+        PutVarint32(dst, CustomTag::kNeedCompaction);
+        char p = static_cast<char>(1);
+        PutLengthPrefixedSlice(dst, Slice(&p, 1));
+      }
+      if (has_min_log_number_to_keep_ && !min_log_num_written) {
+        PutVarint32(dst, CustomTag::kMinLogNumberToKeepHack);
+        std::string varint_log_number;
+        PutFixed64(&varint_log_number, min_log_number_to_keep_);
+        PutLengthPrefixedSlice(dst, Slice(varint_log_number));
+        min_log_num_written = true;
+      }
+      TEST_SYNC_POINT_CALLBACK("VersionEdit::EncodeTo:NewFile4:CustomizeFields",
+                               dst);
+
+      PutVarint32(dst, CustomTag::kTerminate);
+    }
   }
 
   // 0 is default and does not need to be explicitly written
   if (column_family_ != 0) {
-    PutVarint32(dst, kColumnFamily);
-    PutVarint32(dst, column_family_);
+    PutVarint32Varint32(dst, kColumnFamily, column_family_);
   }
 
   if (is_column_family_add_) {
@@ -147,7 +213,7 @@ static bool GetInternalKey(Slice* input, InternalKey* dst) {
   }
 }
 
-bool VersionEdit::GetLevel(Slice* input, int* level, const char** msg) {
+bool VersionEdit::GetLevel(Slice* input, int* level, const char** /*msg*/) {
   uint32_t v;
   if (GetVarint32(input, &v)) {
     *level = v;
@@ -158,6 +224,74 @@ bool VersionEdit::GetLevel(Slice* input, int* level, const char** msg) {
   } else {
     return false;
   }
+}
+
+const char* VersionEdit::DecodeNewFile4From(Slice* input) {
+  const char* msg = nullptr;
+  int level;
+  FileMetaData f;
+  uint64_t number;
+  uint32_t path_id = 0;
+  uint64_t file_size;
+  // Since this is the only forward-compatible part of the code, we hack new
+  // extension into this record. When we do, we set this boolean to distinguish
+  // the record from the normal NewFile records.
+  if (GetLevel(input, &level, &msg) && GetVarint64(input, &number) &&
+      GetVarint64(input, &file_size) && GetInternalKey(input, &f.smallest) &&
+      GetInternalKey(input, &f.largest) &&
+      GetVarint64(input, &f.smallest_seqno) &&
+      GetVarint64(input, &f.largest_seqno)) {
+    // See comments in VersionEdit::EncodeTo() for format of customized fields
+    while (true) {
+      uint32_t custom_tag;
+      Slice field;
+      if (!GetVarint32(input, &custom_tag)) {
+        return "new-file4 custom field";
+      }
+      if (custom_tag == kTerminate) {
+        break;
+      }
+      if (!GetLengthPrefixedSlice(input, &field)) {
+        return "new-file4 custom field lenth prefixed slice error";
+      }
+      switch (custom_tag) {
+        case kPathId:
+          if (field.size() != 1) {
+            return "path_id field wrong size";
+          }
+          path_id = field[0];
+          if (path_id > 3) {
+            return "path_id wrong vaue";
+          }
+          break;
+        case kNeedCompaction:
+          if (field.size() != 1) {
+            return "need_compaction field wrong size";
+          }
+          f.marked_for_compaction = (field[0] == 1);
+          break;
+        case kMinLogNumberToKeepHack:
+          // This is a hack to encode kMinLogNumberToKeep in a
+          // forward-compatbile fashion.
+          if (!GetFixed64(&field, &min_log_number_to_keep_)) {
+            return "deleted log number malformatted";
+          }
+          has_min_log_number_to_keep_ = true;
+          break;
+        default:
+          if ((custom_tag & kCustomTagNonSafeIgnoreMask) != 0) {
+            // Should not proceed if cannot understand it
+            return "new-file4 custom field not supported";
+          }
+          break;
+      }
+    }
+  } else {
+    return "new-file4 entry";
+  }
+  f.fd = FileDescriptor(number, path_id, file_size);
+  new_files_.push_back(std::make_pair(level, f));
+  return nullptr;
 }
 
 Status VersionEdit::DecodeFrom(const Slice& src) {
@@ -220,6 +354,14 @@ Status VersionEdit::DecodeFrom(const Slice& src) {
           has_max_column_family_ = true;
         } else {
           msg = "max column family";
+        }
+        break;
+
+      case kMinLogNumberToKeep:
+        if (GetVarint64(&input, &min_log_number_to_keep_)) {
+          has_min_log_number_to_keep_ = true;
+        } else {
+          msg = "min log number to kee";
         }
         break;
 
@@ -303,6 +445,11 @@ Status VersionEdit::DecodeFrom(const Slice& src) {
         break;
       }
 
+      case kNewFile4: {
+        msg = DecodeNewFile4From(&input);
+        break;
+      }
+
       case kColumnFamily:
         if (!GetVarint32(&input, &column_family_)) {
           if (!msg) {
@@ -359,8 +506,12 @@ std::string VersionEdit::DebugString(bool hex_key) const {
     AppendNumberTo(&r, prev_log_number_);
   }
   if (has_next_file_number_) {
-    r.append("\n  NextFile: ");
+    r.append("\n  NextFileNumber: ");
     AppendNumberTo(&r, next_file_number_);
+  }
+  if (has_min_log_number_to_keep_) {
+    r.append("\n  MinLogNumberToKeep: ");
+    AppendNumberTo(&r, min_log_number_to_keep_);
   }
   if (has_last_sequence_) {
     r.append("\n  LastSeq: ");
@@ -402,6 +553,80 @@ std::string VersionEdit::DebugString(bool hex_key) const {
   }
   r.append("\n}\n");
   return r;
+}
+
+std::string VersionEdit::DebugJSON(int edit_num, bool hex_key) const {
+  JSONWriter jw;
+  jw << "EditNumber" << edit_num;
+
+  if (has_comparator_) {
+    jw << "Comparator" << comparator_;
+  }
+  if (has_log_number_) {
+    jw << "LogNumber" << log_number_;
+  }
+  if (has_prev_log_number_) {
+    jw << "PrevLogNumber" << prev_log_number_;
+  }
+  if (has_next_file_number_) {
+    jw << "NextFileNumber" << next_file_number_;
+  }
+  if (has_last_sequence_) {
+    jw << "LastSeq" << last_sequence_;
+  }
+
+  if (!deleted_files_.empty()) {
+    jw << "DeletedFiles";
+    jw.StartArray();
+
+    for (DeletedFileSet::const_iterator iter = deleted_files_.begin();
+         iter != deleted_files_.end();
+         ++iter) {
+      jw.StartArrayedObject();
+      jw << "Level" << iter->first;
+      jw << "FileNumber" << iter->second;
+      jw.EndArrayedObject();
+    }
+
+    jw.EndArray();
+  }
+
+  if (!new_files_.empty()) {
+    jw << "AddedFiles";
+    jw.StartArray();
+
+    for (size_t i = 0; i < new_files_.size(); i++) {
+      jw.StartArrayedObject();
+      jw << "Level" << new_files_[i].first;
+      const FileMetaData& f = new_files_[i].second;
+      jw << "FileNumber" << f.fd.GetNumber();
+      jw << "FileSize" << f.fd.GetFileSize();
+      jw << "SmallestIKey" << f.smallest.DebugString(hex_key);
+      jw << "LargestIKey" << f.largest.DebugString(hex_key);
+      jw.EndArrayedObject();
+    }
+
+    jw.EndArray();
+  }
+
+  jw << "ColumnFamily" << column_family_;
+
+  if (is_column_family_add_) {
+    jw << "ColumnFamilyAdd" << column_family_name_;
+  }
+  if (is_column_family_drop_) {
+    jw << "ColumnFamilyDrop" << column_family_name_;
+  }
+  if (has_max_column_family_) {
+    jw << "MaxColumnFamily" << max_column_family_;
+  }
+  if (has_min_log_number_to_keep_) {
+    jw << "MinLogNumberToKeep" << min_log_number_to_keep_;
+  }
+
+  jw.EndObject();
+
+  return jw.Get();
 }
 
 }  // namespace rocksdb

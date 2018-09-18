@@ -29,7 +29,7 @@ anki_import - command line command for the Anki::Import module
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 SYNOPSIS
 

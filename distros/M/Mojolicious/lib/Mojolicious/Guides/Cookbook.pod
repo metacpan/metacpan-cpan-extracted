@@ -1221,7 +1221,7 @@ file with L<Mojo::Asset::File/"move_to">.
 
   # Fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
-  my $tx = $ua->get('https://www.github.com/kraih/mojo/tarball/master');
+  my $tx = $ua->get('https://www.github.com/mojolicious/mojo/tarball/master');
   $tx->result->content->asset->move_to('mojo.tar.gz');
 
 To protect you from excessively large files there is also a limit of 2GiB by
@@ -1745,7 +1745,9 @@ actually much easier than you might think.
   $ mv templates lib/MyApp/
 
 The trick is to move the C<public> and C<templates> directories so they can get
-automatically installed with the modules.
+automatically installed with the modules. Additionally author commands from the
+C<Mojolicious::Command::Author> namespace are not usually wanted by an
+installed application so they can be excluded.
 
   # Application
   package MyApp;
@@ -1768,6 +1770,9 @@ automatically installed with the modules.
 
     # Switch to installable "templates" directory
     $self->renderer->paths->[0] = $self->home->child('templates');
+
+    # Exclude author commands
+    $self->commands->namespaces(['Mojolicious::Commands']);
 
     $self->plugin('PODRenderer');
 
@@ -1835,15 +1840,15 @@ And you can use all the commands from L<Mojolicious::Commands>.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot more
-documentation and examples by many different authors.
+L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
+lot more documentation and examples by many different authors.
 
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
 L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>
-(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
+channel C<#mojo> on C<irc.freenode.net> (L<chat
+now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
 
 =cut

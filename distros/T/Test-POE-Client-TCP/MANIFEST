@@ -13,6 +13,7 @@ lib/Test/POE/Client/TCP.pm
 t/00-compile.t
 t/00_use.t
 t/01_spawn.t
+t/01_spawn_ipv6.t
 t/02_register.t
 t/03_register.t
 t/04_multiple.t

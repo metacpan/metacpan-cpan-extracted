@@ -7,9 +7,9 @@ build_requires:
   Test::More: '0.98'
   Test::Warn: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,11 +29,15 @@ no_index:
 provides:
   RocksDB:
     file: lib/RocksDB.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/spiritloose/RocksDB/issues
   homepage: https://github.com/spiritloose/RocksDB
   repository: git://github.com/spiritloose/RocksDB.git
-version: '0.04'
+version: '0.05'
+x_contributors:
+  - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

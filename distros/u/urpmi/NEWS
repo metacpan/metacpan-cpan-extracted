@@ -1,3 +1,13 @@
+Version 8.114 - 17 September 2018
+
+- enhanced doc
+- fix testsuite with rpm-4.14.2
+
+Version 8.113 - 14 September 2018
+
+- adapt testsuite to rpm-4.14.0~rc1
+- add support for verify callback when installing (mga#23531)
+
 Version 8.112 - 14 June 2018
 
 - cpan testers:

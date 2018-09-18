@@ -5,6 +5,8 @@
 use strict;
 use warnings;
 
+$0 = 'jgrep';
+
 use Getopt::Long;
 use Pod::Usage;
 use Iterator::Simple qw(igrep imap);
@@ -53,7 +55,7 @@ jgrep - filters output by pattern matching against JSON object fields
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

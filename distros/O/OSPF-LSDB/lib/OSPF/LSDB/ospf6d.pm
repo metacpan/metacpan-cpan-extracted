@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2012,2018 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -310,7 +310,7 @@ sub parse_link {
 	} elsif (/^LS Type: ([\w ()]+)$/) {
 	    die "$_ Type of link-LSA is $1 and not Link in area $area.\n"
 	      if $1 ne "Link";
-	} elsif (/^Link State ID: $IP \(Interface ID of Advertising Router\)$/){
+	} elsif (/^Link State ID: $IP \(Interface ID of Advertising Router\)$/) {
 	    $l->{interface} = $1;
 	    $link = $1;
 	} elsif (/^Advertising Router: $IP$/) {
@@ -369,7 +369,7 @@ sub parse_intra {
 	} elsif (/^LS Type: ([\w ()]+)$/) {
 	    die "$_ Type of intra-area-prefix-LSA is $1 and not Intra Area ".
 	      "(Prefix) in area $area.\n" if $1 ne "Intra Area (Prefix)";
-	} elsif (/^Link State ID: $IP$/){
+	} elsif (/^Link State ID: $IP$/) {
 	    $i->{address} = $1;
 	    $intra = $1;
 	} elsif (/^Advertising Router: $IP$/) {
@@ -395,13 +395,15 @@ sub parse_intra {
 	    $i->{router} = $1;
 	} elsif (/^Number of Prefixes: $RE{num}{int}{-keep}$/) {
 	    $pnum = $1;
-	} elsif (/^    Prefix: $PREFIX($| Options:)/) {
+	} elsif (/^    Prefix: $PREFIX(?: Options: \S+)?(?: Metric: $RE{num}{int}{-keep})?$/) {
 	    if (! $prefixes) {
 		$prefixes = [];
 		$i->{prefixes} = $prefixes;
 	    }
 	    $pnum-- if defined $pnum ;
-	    push @$prefixes, { prefixaddress => $1, prefixlength => $2 };
+	    my %pfx = (prefixaddress => $1, prefixlength => $2);
+	    $pfx{metric} = $5 if defined $5;
+	    push @$prefixes, \%pfx;
 	} elsif (! /^(Checksum|Length):/) {
 	    die "$_ Unknown line at intra-area-prefix $intra in area $area.\n";
 	}

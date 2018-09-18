@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -30,10 +30,17 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
+            "EV" : "4",
+            "IO::Socket::SSL" : "2.009",
+            "IO::Socket::Socks" : "0.64",
+            "Mojo::Pg" : "0",
             "Mojolicious" : "0",
+            "Net::DNS::Native" : "0.15",
             "Redis" : "0",
+            "Role::Tiny" : "0",
             "Sereal" : "0",
             "XML::Twig" : "0",
             "local::lib" : "0",
@@ -49,14 +56,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/briandfoy/Task-MojoLearningEnvironment/issues"
+         "web" : "https://github.com/briandfoy/task-mojolearningenvironment.git/issues"
       },
-      "homepage" : "https://github.com/briandfoy/Task-MojoLearningEnvironment",
+      "homepage" : "https://github.com/briandfoy/task-mojolearningenvironment.git",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/Task-MojoLearningEnvironment.git",
-         "web" : "https://github.com/briandfoy/Task-MojoLearningEnvironment"
+         "url" : "https://github.com/briandfoy/task-mojolearningenvironment.git.git",
+         "web" : "https://github.com/briandfoy/task-mojolearningenvironment.git"
       }
    },
-   "version" : "0.002"
+   "version" : "20180917.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

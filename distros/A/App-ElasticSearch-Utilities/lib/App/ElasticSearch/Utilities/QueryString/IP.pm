@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::IP;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use Net::CIDR::Lite;
 use namespace::autoclean;
@@ -34,15 +34,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities::QueryString::IP - Expand IP CIDR Notation to ES ranges
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

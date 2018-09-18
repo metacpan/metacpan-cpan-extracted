@@ -1,21 +1,24 @@
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 #pragma once
+
 #include <algorithm>
-#include <set>
-#include <memory>
 #include <atomic>
 #include <map>
+#include <memory>
+#include <set>
 #include <string>
+#include <utility>
 
-#include "rocksdb/table.h"
-#include "table/table_reader.h"
-#include "table/table_builder.h"
+#include "util/kv_map.h"
 #include "port/port.h"
+#include "rocksdb/comparator.h"
+#include "rocksdb/table.h"
+#include "table/internal_iterator.h"
+#include "table/table_builder.h"
+#include "table/table_reader.h"
 #include "util/mutexlock.h"
 #include "util/testharness.h"
 #include "util/testutil.h"
@@ -23,24 +26,29 @@
 namespace rocksdb {
 namespace mock {
 
-typedef std::map<std::string, std::string> MockFileContents;
-// NOTE this currently only supports bitwise comparator
+stl_wrappers::KVMap MakeMockFile(
+    std::initializer_list<std::pair<const std::string, std::string>> l = {});
 
 struct MockTableFileSystem {
   port::Mutex mutex;
-  std::map<uint32_t, MockFileContents> files;
+  std::map<uint32_t, stl_wrappers::KVMap> files;
 };
 
 class MockTableReader : public TableReader {
  public:
-  explicit MockTableReader(const MockFileContents& table) : table_(table) {}
+  explicit MockTableReader(const stl_wrappers::KVMap& table) : table_(table) {}
 
-  Iterator* NewIterator(const ReadOptions&, Arena* arena) override;
+  InternalIterator* NewIterator(const ReadOptions&,
+                                const SliceTransform* prefix_extractor,
+                                Arena* arena = nullptr,
+                                bool skip_filters = false,
+                                bool for_compaction = false) override;
 
-  Status Get(const ReadOptions&, const Slice& key,
-             GetContext* get_context) override;
+  Status Get(const ReadOptions& readOptions, const Slice& key,
+             GetContext* get_context, const SliceTransform* prefix_extractor,
+             bool skip_filters = false) override;
 
-  uint64_t ApproximateOffsetOf(const Slice& key) override { return 0; }
+  uint64_t ApproximateOffsetOf(const Slice& /*key*/) override { return 0; }
 
   virtual size_t ApproximateMemoryUsage() const override { return 0; }
 
@@ -51,32 +59,38 @@ class MockTableReader : public TableReader {
   ~MockTableReader() {}
 
  private:
-  const MockFileContents& table_;
+  const stl_wrappers::KVMap& table_;
 };
 
-class MockTableIterator : public Iterator {
+class MockTableIterator : public InternalIterator {
  public:
-  explicit MockTableIterator(const MockFileContents& table) : table_(table) {
+  explicit MockTableIterator(const stl_wrappers::KVMap& table) : table_(table) {
     itr_ = table_.end();
   }
 
-  bool Valid() const { return itr_ != table_.end(); }
+  bool Valid() const override { return itr_ != table_.end(); }
 
-  void SeekToFirst() { itr_ = table_.begin(); }
+  void SeekToFirst() override { itr_ = table_.begin(); }
 
-  void SeekToLast() {
+  void SeekToLast() override {
     itr_ = table_.end();
     --itr_;
   }
 
-  void Seek(const Slice& target) {
+  void Seek(const Slice& target) override {
     std::string str_target(target.data(), target.size());
     itr_ = table_.lower_bound(str_target);
   }
 
-  void Next() { ++itr_; }
+  void SeekForPrev(const Slice& target) override {
+    std::string str_target(target.data(), target.size());
+    itr_ = table_.upper_bound(str_target);
+    Prev();
+  }
 
-  void Prev() {
+  void Next() override { ++itr_; }
+
+  void Prev() override {
     if (itr_ == table_.begin()) {
       itr_ = table_.end();
     } else {
@@ -84,21 +98,23 @@ class MockTableIterator : public Iterator {
     }
   }
 
-  Slice key() const { return Slice(itr_->first); }
+  Slice key() const override { return Slice(itr_->first); }
 
-  Slice value() const { return Slice(itr_->second); }
+  Slice value() const override { return Slice(itr_->second); }
 
-  Status status() const { return Status::OK(); }
+  Status status() const override { return Status::OK(); }
 
  private:
-  const MockFileContents& table_;
-  MockFileContents::const_iterator itr_;
+  const stl_wrappers::KVMap& table_;
+  stl_wrappers::KVMap::const_iterator itr_;
 };
 
 class MockTableBuilder : public TableBuilder {
  public:
   MockTableBuilder(uint32_t id, MockTableFileSystem* file_system)
-      : id_(id), file_system_(file_system) {}
+      : id_(id), file_system_(file_system) {
+    table_ = MakeMockFile({});
+  }
 
   // REQUIRES: Either Finish() or Abandon() has been called.
   ~MockTableBuilder() {}
@@ -125,36 +141,38 @@ class MockTableBuilder : public TableBuilder {
 
   uint64_t FileSize() const override { return table_.size(); }
 
+  TableProperties GetTableProperties() const override {
+    return TableProperties();
+  }
+
  private:
   uint32_t id_;
   MockTableFileSystem* file_system_;
-  MockFileContents table_;
+  stl_wrappers::KVMap table_;
 };
 
 class MockTableFactory : public TableFactory {
  public:
   MockTableFactory();
   const char* Name() const override { return "MockTable"; }
-  Status NewTableReader(const ImmutableCFOptions& ioptions,
-                        const EnvOptions& env_options,
-                        const InternalKeyComparator& internal_key,
-                        unique_ptr<RandomAccessFile>&& file, uint64_t file_size,
-                        unique_ptr<TableReader>* table_reader) const;
-
+  Status NewTableReader(
+      const TableReaderOptions& table_reader_options,
+      unique_ptr<RandomAccessFileReader>&& file, uint64_t file_size,
+      unique_ptr<TableReader>* table_reader,
+      bool prefetch_index_and_filter_in_cache = true) const override;
   TableBuilder* NewTableBuilder(
-      const ImmutableCFOptions& ioptions,
-      const InternalKeyComparator& internal_key, WritableFile* file,
-      const CompressionType compression_type,
-      const CompressionOptions& compression_opts) const;
+      const TableBuilderOptions& table_builder_options,
+      uint32_t column_familly_id, WritableFileWriter* file) const override;
 
   // This function will directly create mock table instead of going through
-  // MockTableBuilder. MockFileContents has to have a format of <internal_key,
-  // value>. Those key-value pairs will then be inserted into the mock table
+  // MockTableBuilder. file_contents has to have a format of <internal_key,
+  // value>. Those key-value pairs will then be inserted into the mock table.
   Status CreateMockTable(Env* env, const std::string& fname,
-                         MockFileContents file_contents);
+                         stl_wrappers::KVMap file_contents);
 
-  virtual Status SanitizeOptions(const DBOptions& db_opts,
-                                 const ColumnFamilyOptions& cf_opts) const {
+  virtual Status SanitizeOptions(
+      const DBOptions& /*db_opts*/,
+      const ColumnFamilyOptions& /*cf_opts*/) const override {
     return Status::OK();
   }
 
@@ -164,12 +182,12 @@ class MockTableFactory : public TableFactory {
 
   // This function will assert that only a single file exists and that the
   // contents are equal to file_contents
-  void AssertSingleFile(const MockFileContents& file_contents);
-  void AssertLatestFile(const MockFileContents& file_contents);
+  void AssertSingleFile(const stl_wrappers::KVMap& file_contents);
+  void AssertLatestFile(const stl_wrappers::KVMap& file_contents);
 
  private:
-  uint32_t GetAndWriteNextID(WritableFile* file) const;
-  uint32_t GetIDFromFile(RandomAccessFile* file) const;
+  uint32_t GetAndWriteNextID(WritableFileWriter* file) const;
+  uint32_t GetIDFromFile(RandomAccessFileReader* file) const;
 
   mutable MockTableFileSystem file_system_;
   mutable std::atomic<uint32_t> next_id_;

@@ -1,8 +1,9 @@
 package Plack::App::FakeApache1::Handler;
+
 {
   $Plack::App::FakeApache1::Handler::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeApache1::Handler::VERSION = '0.0.5';
+$Plack::App::FakeApache1::Handler::VERSION = '0.0.6';
 # ABSTRACT: Mimic Apache's handler
 use strict;
 use warnings;
@@ -152,7 +153,7 @@ Plack::App::FakeApache1::Handler - Mimic Apache's handler
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head2 new
 

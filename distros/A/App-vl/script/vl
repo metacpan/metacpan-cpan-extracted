@@ -1,0 +1,140 @@
+#!perl
+use strict;
+use warnings;
+use App::vl;
+
+App::vl->new(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+vl - Makes CUI table vertical
+
+=head1 SYNOPSIS
+
+For example,
+
+    $ docker images
+    REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+    bayacker            latest              44fd67eaeafb        2 hours ago         1.281 GB
+    mysql               5.7                 9c0ab5bbe2c0        2 weeks ago         372 MB
+    mysql               latest              ded2a40fbc1f        2 weeks ago         484.5 MB
+    centos              centos6.7           41a82537e470        3 weeks ago         190.6 MB
+
+Be vertical by L<vl>
+
+    $ docker images | vl
+    ********** 1 ********************
+      REPOSITORY: bayacker
+             TAG: latest
+        IMAGE ID: 44fd67eaeafb
+         CREATED: 2 hours ago
+    VIRTUAL SIZE: 1.281 GB
+    ********** 2 ********************
+      REPOSITORY: mysql
+             TAG: 5.7
+        IMAGE ID: 9c0ab5bbe2c0
+         CREATED: 2 weeks ago
+    VIRTUAL SIZE: 372 MB
+    ********** 3 ********************
+      REPOSITORY: mysql
+             TAG: latest
+        IMAGE ID: ded2a40fbc1f
+         CREATED: 2 weeks ago
+    VIRTUAL SIZE: 484.5 MB
+    ********** 4 ********************
+      REPOSITORY: centos
+             TAG: centos6.7
+        IMAGE ID: 41a82537e470
+         CREATED: 3 weeks ago
+    VIRTUAL SIZE: 190.6 MB
+
+By default, C<vl> is invoked with PAGER via ENV:PAGER.
+
+=head2 OPTIONS
+
+=head3 no-pager
+
+By default, B<vl> uses Pager. The C<no-pager> option turns off it.
+
+=head3 grep
+
+Just grep simply. This option enables to find lines by case-insensitive.
+
+    $ docker images | vl --grep mysql
+    ********** 2 ********************
+      REPOSITORY: mysql
+             TAG: 5.7
+        IMAGE ID: 9c0ab5bbe2c0
+         CREATED: 2 weeks ago
+    VIRTUAL SIZE: 372 MB
+    ********** 3 ********************
+      REPOSITORY: mysql
+             TAG: latest
+        IMAGE ID: ded2a40fbc1f
+         CREATED: 2 weeks ago
+    VIRTUAL SIZE: 484.5 MB
+
+=head3 label
+
+filtering labels to show. If you'd like to multiple keywords, you might use comma to concat keywords.
+
+    $ docker images | vl --label tag,image
+    ********** 1 ********************
+             TAG: latest
+        IMAGE ID: 44fd67eaeafb
+    ********** 2 ********************
+             TAG: 5.7
+        IMAGE ID: 9c0ab5bbe2c0
+    ********** 3 ********************
+             TAG: latest
+        IMAGE ID: ded2a40fbc1f
+    ********** 4 ********************
+             TAG: centos6.7
+        IMAGE ID: 41a82537e470
+
+
+=head3 ps
+
+Parse lines by simple spaces delimiter. It's for C<ps> command.
+
+    $ ps | head -n3
+      PID TTY          TIME CMD
+      605 pts/6    00:00:00 bash
+     2561 pts/6    00:00:00 ps
+    $ ps | head -n3 | vl
+    ********** 1 ********************
+     PID: 605
+     TTY: pts/6
+    TIME: 00:00:00
+     CMD: bash
+    ********** 2 ********************
+     PID: 2574
+     TTY: pts/6
+    TIME: 00:00:00
+     CMD: ps
+
+=head3 separator
+
+By default, this is ': '
+
+=head3 line-char
+
+By default, this is '*'
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<App::vl>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

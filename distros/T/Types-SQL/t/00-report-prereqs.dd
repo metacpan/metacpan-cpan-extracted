@@ -51,6 +51,7 @@ do { my $x = {
                                    'Test::Most' => '0',
                                    'Time::Piece' => '1.16',
                                    'Time::Seconds' => '0',
+                                   'Types::Common::Numeric' => '0',
                                    'if' => '0'
                                  }
                  }

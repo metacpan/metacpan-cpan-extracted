@@ -1,5 +1,5 @@
 package Log::Log4perl::Shortcuts ;
-$Log::Log4perl::Shortcuts::VERSION = '0.015';
+$Log::Log4perl::Shortcuts::VERSION = '0.021';
 use 5.10.0;
 use Carp;
 use Log::Log4perl;
@@ -11,12 +11,13 @@ use Data::Dumper qw(Dumper);
 
 require Exporter;
 @ISA = Exporter;
-@EXPORT_OK = qw(logc logt logd logi logw loge logf set_log_config set_log_level);
-%EXPORT_TAGS = ( all => [qw(logc logt logd logi logw loge logf set_log_config set_log_level)] );
+@EXPORT_OK = qw(logc logt logd logi logw loge logf set_log_config set_log_level get_log_config);
+%EXPORT_TAGS = ( all => [qw(logc logt logd logi logw loge logf set_log_config set_log_level get_log_config)] );
 Exporter::export_ok_tags('all');
 
 my $package = __PACKAGE__;
 $package =~ s/::/-/g;
+my $config_file;
 my $config_dir = path(File::UserConfig->new(dist => $package)->sharedir, 'log_config');
 
 my $default_config_file = path($config_dir, 'default.cfg');
@@ -25,11 +26,16 @@ if (!$default_config_file->exists) {
   carp ("Unable to load default Log::Log4perl::Shortcuts configuration file. Aborting");
 } else {
   Log::Log4perl->init_once($default_config_file->canonpath);
+  $config_file = $default_config_file->canonpath;
 }
 
 my $log_level = $TRACE;
 
 ### Public methods ###
+
+sub get_log_config {
+  return $config_file;
+}
 
 sub set_log_config {
   my $new_config = shift;
@@ -80,6 +86,7 @@ sub set_log_config {
 sub _init_config {
   my $config = shift;
   Log::Log4perl->init($config->canonpath);
+  $config_file = $config->canonpath;
   return 'success';
 }
 
@@ -218,7 +225,7 @@ Log::Log4perl::Shortcuts - shortcut functions to make log4perl even easier
 
 =head1 VERSION
 
-version 0.015
+version 0.021
 
 =head1 OVERVIEW
 

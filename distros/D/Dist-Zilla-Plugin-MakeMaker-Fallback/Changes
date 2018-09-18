@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.030     2018-09-16 05:39:52Z
+          - bump prereq of [MakeMaker::Awesome] to ensure options are fixed
+
 0.029     2018-08-25 05:43:12Z
           - fix handling of options defined in [MakeMaker::Awesome]
 

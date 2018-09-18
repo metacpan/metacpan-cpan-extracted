@@ -160,15 +160,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-storage-overview.pl - Index Storage Overview by Index Name without Dates
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

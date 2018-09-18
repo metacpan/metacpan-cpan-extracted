@@ -18,7 +18,7 @@ my %params = (
     AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
     VERSION_FROM => 'lib/Game/DijkstraMap.pm',
 
-    MIN_PERL_VERSION => '5.10.0',
+    MIN_PERL_VERSION => '5.24.0',
 
     LICENSE  => 'bsd',
     PL_FILES => {},
@@ -34,7 +34,7 @@ my %params = (
     },
     PREREQ_PM => {
         'Carp'             => 0,
-        'List::Util'       => 0,
+        'List::Util'       => 1.26,
         'Moo'              => 0,
         'namespace::clean' => 0,
         'Scalar::Util'     => 0,

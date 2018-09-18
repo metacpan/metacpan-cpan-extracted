@@ -10,7 +10,7 @@ use POE qw(
 );
 use Sys::Hostname qw(hostname);
 
-our $VERSION = '2.5';
+our $VERSION = '2.6';
 
 my @_STREAM_NAMES = qw(subscribers match debug full regex);
 my %_STREAM_ASSISTERS = (
@@ -96,6 +96,7 @@ sub spawn {
         ListenPort      => 9514,
         GraphitePort    => 2003,
         GraphitePrefix  => 'eris.dispatcher',
+        MaxLineLength   => 16384,
         @_
     );
 
@@ -259,6 +260,8 @@ sub flush_stats {
 sub dispatch_message {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
 
+    # Clear the timer
+    $kernel->delay( 'dispatch_message' );
     _dispatch_messages($kernel, $heap, [$msg]);
 }
 
@@ -275,14 +278,42 @@ sub _dispatch_messages {
     my $dispatched = 0;
     my $bytes = 0;
 
-    # Handle fullfeeds
-    foreach my $sid ( keys %{ $heap->{full} } ) {
-        push @{ $heap->{buffers}{$sid} }, @$msgs;
-        $dispatched += @$msgs;
-        $bytes += length $_ for @$msgs;
+    # Handle Multiline data
+    my @entries = ();
+    my $entry = exists $heap->{buffered} ? delete $heap->{buffered} : '';
+    foreach my $line ( @$msgs ) {
+        if( $line && $line =~ /^\s+/ ) {
+            $entry = join "\n", grep { defined && length } ($entry,$line);
+        }
+        else {
+            push @entries, $entry if $entry;
+            $entry = $line;
+        }
+    }
+    if( $entry ) {
+        if( length($entry) >= $heap->{config}{MaxLineLength} ) {
+            # Clear the buffer, lines are too long
+            push @entries, $entry;
+        }
+        else {
+            # stash the last line
+            $heap->{buffered} = $entry if $entry;
+            # We might ned to flush this entry
+            $kernel->delay( dispatch_message => 1 );
+        }
     }
 
-    foreach my $msg ( @$msgs ) {
+    # If there's no logs, do nothing
+    return unless @entries;
+
+    # Handle fullfeeds
+    foreach my $sid ( keys %{ $heap->{full} } ) {
+        push @{ $heap->{buffers}{$sid} }, @entries;
+        $dispatched += @entries;
+        $bytes += length $_ for @entries;
+    }
+
+    foreach my $msg ( @entries ) {
         # Grab statitics;
         $heap->{stats}{received}++;
         $heap->{stats}{received_bytes} += length $msg;
@@ -324,7 +355,7 @@ sub _dispatch_messages {
             my %hit = ();
             foreach my $sid (keys %{ $heap->{regex} } ) {
                 foreach my $re ( keys %{ $heap->{regex}{$sid} } ) {
-                    if( $hit{$re} || $msg =~ /$re/ ) {
+                    if( $hit{$re} || $msg =~ /$re/m ) {
                         $hit{$re} = 1;
                         push @{ $heap->{buffers}{$sid} }, $msg;
                         $dispatched++;
@@ -775,15 +806,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 POE::Component::Server::eris - POE eris message dispatcher
 
 =head1 VERSION
 
-version 2.5
+version 2.6
 
 =head1 SYNOPSIS
 
@@ -805,6 +834,7 @@ rsyslog are included in the examples directory!
             GraphiteHost        => undef,               #default
             GraphitePort        => 2003,                #default
             GraphitePrefix      => 'eris.dispatcher',   #default
+            MaxLineLength       => 16384,               #default
     );
 
     # $SESSION = { alias => 'eris_dispatch', ID => POE::Session->ID };
@@ -827,31 +857,44 @@ rsyslog are included in the examples directory!
 
 =head2 spawn
 
-Creates the POE::Session for the eris correlator.
+Creates the POE::Session for the eris message dispatcher.
 
 Parameters:
-    ListenAddress           => 'localhost',         #default
-    ListenPort              => '9514',              #default
 
-=head1 ACKNOWLEDGEMENTS
+=over 2
 
-=over 4
+=item ListenAddress
 
-=item Mattia Barbon
+Defaults to C<localhost>.
+
+=item ListenPort
+
+Defaults to C<9514>, this is the port that clients can connect to request
+subscriptions from the service.
+
+=item GraphitePort
+
+Defaults to C<2003>, this is the port to submit graphite metrics from the
+daemon.
+
+=item GraphitePrefix
+
+Defaults to C<eris.dispatcher>, all generated metrics will use this prefix.
+
+=item GraphiteHost
+
+This parameter is required to enable the graphite output.  Without it, metrics
+will not be sent anywhere.
+
+=item MaxLineLength
+
+Defaults to C<16384>, this does not truncate log lines, but anytime a line
+exceeds this length the line will immediately be flushed from the buffer.
+
+This only affects multi-line logging as multi-line logs longer than this
+setting will be split up into more than one message.
 
 =back
-
-=head1 AUTHOR
-
-Brad Lhotsky <brad@divsionbyzero.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2017 by Brad Lhotsky.
-
-This is free software, licensed under:
-
-  The (three-clause) BSD License
 
 =head1 EVENTS
 
@@ -975,6 +1018,18 @@ Display the help message
 
 PoCo::Server::TCP Client Termination
 
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Mattia Barbon
+
+=back
+
+=head1 AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
@@ -992,21 +1047,41 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/POE-Component-Server-eris>
+L<https://metacpan.org/release/POE-Component-Server-eris>
 
 =item *
 
-RT: CPAN's Bug Tracker
+CPAN Testers
 
-The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-eris>
+L<http://www.cpantesters.org/distro/P/POE-Component-Server-eris>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=POE-Component-Server-eris>
 
 =back
+
+=head2 Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/POE-Component-Server-eris/issues>
 
 =head2 Source Code
 
 This module's source code is available by visiting:
 L<https://github.com/reyjrar/POE-Component-Server-eris>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
 
 =cut

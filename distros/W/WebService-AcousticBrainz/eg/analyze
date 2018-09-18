@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use WebService::AcousticBrainz;
+
+my $mbid = shift || 'c51f788f-f2ac-4d4e-aa72-205f002b8752';
+
+my $w = WebService::AcousticBrainz->new;
+
+my $r = $w->fetch(
+    mbid     => $mbid,
+    endpoint => 'high-level',
+);
+
+my $stats = {};
+
+for my $stat ( keys %{ $r->{metadata}{tags} } ) {
+    my $val = ref($r->{metadata}{tags}{$stat}) eq 'ARRAY'
+        ? $r->{metadata}{tags}{$stat}[0]
+        : $r->{metadata}{tags}{$stat};
+    $stats->{$stat} = $val;
+}
+
+for my $stat ( keys %{ $r->{'highlevel'} } ) {
+    $stats->{$stat} = $r->{'highlevel'}{$stat}{value};
+}
+
+use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$stats);

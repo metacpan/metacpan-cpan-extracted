@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -29,9 +29,9 @@ my @files = (
     't/50-app/testapp.conf',
     't/50-app/testapp.psgi',
     't/author-no-tabs.t',
-    't/release-kwalitee.t',
-    't/release-pod-coverage.t',
-    't/release-pod-syntax.t'
+    't/author-pod-coverage.t',
+    't/author-pod-syntax.t',
+    't/release-kwalitee.t'
 );
 
 notabs_ok($_) foreach @files;

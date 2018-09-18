@@ -57,7 +57,7 @@
          "web" : "https://github.com/demianriccardi/p5-HackaMol"
       }
    },
-   "version" : "0.049",
+   "version" : "0.050",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

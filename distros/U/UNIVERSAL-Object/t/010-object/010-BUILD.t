@@ -15,7 +15,6 @@ TODO:
 - tests for BUILD under multiple-inheritance
 - tests where BUILD alters the instance
     - test this under inheritance
-- test with %HAS values
 
 =cut
 
@@ -24,12 +23,7 @@ TODO:
     use strict;
     use warnings;
     our @ISA = ('UNIVERSAL::Object');
-
-    sub CREATE {
-        my ($class, $proto) = @_;
-        $proto->{collector} = [];
-        $class->next::method( $proto );
-    }
+    our %HAS = (collector => sub {});
 
     sub BUILD {
         $_[0]->collect( 'Foo' );
@@ -46,6 +40,7 @@ TODO:
     use strict;
     use warnings;
     our @ISA = ('Foo');
+    our %HAS = (%Foo::HAS);
 
     sub BUILD {
         $_[0]->collect( 'Bar' );
@@ -55,6 +50,7 @@ TODO:
     use strict;
     use warnings;
     our @ISA = ('Bar');
+    our %HAS = (%Bar::HAS);
 
     sub BUILD {
         $_[0]->collect( 'Baz' );

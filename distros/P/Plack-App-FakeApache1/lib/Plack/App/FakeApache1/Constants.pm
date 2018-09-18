@@ -1,8 +1,9 @@
 package Plack::App::FakeApache1::Constants;
+
 {
   $Plack::App::FakeApache1::Constants::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeApache1::Constants::VERSION = '0.0.5';
+$Plack::App::FakeApache1::Constants::VERSION = '0.0.6';
 # ABSTRACT: Define Apache1 constants
 use strict;
 use warnings;
@@ -130,7 +131,7 @@ Plack::App::FakeApache1::Constants - Define Apache1 constants
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 2xx Status Codes
 

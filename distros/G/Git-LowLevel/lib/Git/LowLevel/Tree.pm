@@ -162,21 +162,7 @@ sub del
   my @tree;
   for my $t (@{$self->tree})
   {
-    my $path = fileparse($t->path);
-    if (length($path)==0)
-    {
-      $path = $t->path;
-      $path =~ s/\///;
-    }
-
-    my $path2 = fileparse($elem->path);
-    if (length($path2)==0)
-    {
-      $path2 = $elem->path;
-      $path2 =~ s/\///;
-    }
-
-    if ($path ne $path2)
+    if ($t->mypath ne $elem->mypath)
     {
       push(@tree,$t);
     }
@@ -224,6 +210,7 @@ sub find
   return $self unless $self->mypath ne $path;
 
   $self->get();
+
   for my $t (@{$self->tree})
   {
     my $r = $t->find($path);
@@ -250,7 +237,7 @@ Git::LowLevel::Tree - class representing a tree object in a GIT Repository
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 ATTRIBUTES
 

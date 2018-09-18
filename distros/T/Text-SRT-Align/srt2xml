@@ -1,0 +1,960 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+# convert srt files (movie subtitles) to tokenized XML (utf8)
+# (very simple tokenization & sentence splitting)
+#
+# usage: ./srt2xml [-l lang-code] srt-file > xmlfile
+#
+# -e encoding ....
+# -r file  ....... raw xml output file (without tokenizations)
+# -s ............. always start a new sentence at new time frames
+
+#
+# 
+#
+
+=encoding UTF-8
+
+=head1 NAME
+
+srt2xml - script for converting SRT-files (subtitles) to tokenized XML
+
+=head1 USAGE
+
+ srt2xml [OPTIONS] < input.srt > output.xml
+
+=head1 OPTIONS
+
+ -e encoding ......... specify the character encoding of the SRT file
+ -l lang-id .......... use non-breaking prefixes for the given language
+ -r filename ......... save an untokenized version in <filename>
+ -s .................. always start a new sentence at each time frame
+
+=head1 DESCRIPTION
+
+This script detects sentence boundaries and tokenizes the text in given SRT movie subtitle files and creates XML output.
+
+=head1 TODO
+
+Automatic detection of character encodings.
+
+=cut 
+
+
+use strict;
+use utf8;
+
+use Getopt::Std;
+use IPC::Open3;
+use FindBin qw($Bin);
+use File::BOM qw( :all );
+use File::ShareDir;
+use Encode qw(decode encode);
+use Locale::Codes::Language 3.26;
+
+
+use vars qw/$opt_l $opt_e $opt_r $opt_s/;
+
+$opt_l = 'unknown';
+getopts('l:e:r:s');
+
+# make a three-letter language code
+if (length($opt_l) == 2){
+    $opt_l = language_code2code($opt_l, 'alpha-2', 'alpha-3');
+}
+
+our $SHARED_HOME = File::ShareDir::dist_dir('Text-SRT-Align'); 
+
+my $PAUSETHR1 = 1;       # > 1 second --> most probably new sentence
+my $PAUSETHR2 = 3;       # > 3 second --> definitely new sentence
+
+
+# for some languages: always split sentences at new time frames
+# (because we have no good sentence splitter implemented for them)
+
+my %SPLIT_AT_TIMEFRAME = (
+    'heb' => 1,
+    'ara' => 1,
+    'sin' => 1,
+    'tha' => 1,
+    'urd' => 1,
+    'zho' => 1,
+    'chi' => 1,
+    'far' => 1,
+    'kor' => 1,
+    'jpn' => 1
+    );
+
+
+## read (non-breaking) abbreviations (if the file exists)
+## check also if Uplug is installed and use abbreviation lists from there
+
+my %NONBREAKING=();
+read_non_breaking($SHARED_HOME.'/nonbreaking_prefix.'.$opt_l,\%NONBREAKING);
+eval{
+    my $SHARED_UPLUG = File::ShareDir::dist_dir('Uplug');
+    my $LangID = language_code2code($opt_l, 'alpha-2', 'alpha-3');
+    read_non_breaking($SHARED_UPLUG.
+		      '/lang/nonbreaking_prefixes/nonbreaking_prefix.'.
+		      $LangID,
+		      \%NONBREAKING);
+};
+
+
+# For Chinese: need text segmentation
+#
+# old way: require this module (but it's a non-standard one!)
+# use Lingua::ZH::Segmenter qw/:all/;
+#
+# new way: use this module only if it is available (otherwise split on characters)
+if ($opt_l=~/^(chi|zho)$/){
+    eval{
+	require Lingua::ZH::Segmenter;
+	Lingua::ZH::Segmenter->import(':all');
+    };
+    if ($@){
+	eval { sub segmentline{ return split(//,$_[0]); } };
+    }
+}
+
+use Encode::Locale;
+# Encode::Locale::decode_argv;
+use open qw(:std :locale);
+
+
+my $enc = $opt_e || LangEncoding($opt_l);
+
+# binmode(STDIN,":encoding($enc)");
+binmode(STDIN);
+binmode(STDOUT,':encoding(utf8)');
+
+# open second output file for raw, untokenized XML
+
+if ($opt_r){
+    if ($opt_r=~/\.gz$/){
+	open F,"| grep '.' | gzip -c > $opt_r" || warn "cannot open $opt_r";
+    }
+    else{
+	open F,"| grep '.' > $opt_r" || warn "cannot open $opt_r";
+    }
+    binmode(F,':encoding(utf8)');
+}
+
+print_xml_header();
+
+my $sid = 1;
+print "  <s id=\"$sid\">\n";
+print F "  <s id=\"$sid\">\n" if ($opt_r);
+$sid++;
+my $s_ended = 0;
+
+##
+## these RE's are not used at all ...
+##
+#my $s_start = '([\"\']?[\¿\¡\p{Lu}])';
+#my $s_start_maybe = '(\-?\s*[\"\'\¿\¡]?[\p{N}\p{Ps}])';
+#my $s_end = "([^\.]\.[\"\']?|[\.\!\?\:][\"\']?)";
+#my $s_end_maybe = "([^\.]\.[\"\'\]\}\)]?\-?\s*|[\.\!\?\:][\"\'\]\}\)]?\-?\s*)";
+
+# Greek: ';' is a question mark!
+
+if ($opt_l eq 'ell'){
+    my $s_end = "([^\.]\.[\"\']?|[\.\!\?\:\;][\"\']?)";
+}
+
+
+
+my $start=undef;
+my $end=undef;
+my $lastend = undef;
+my $id=undef;
+my $wid = 0;
+
+my $newchunk = 0;
+
+my @opentags=();
+my @closedtags=();
+
+my $first=1;
+
+while (my $line = <>){
+
+    # check if the first line has a BOM
+    # --~ try to detect encoding!
+    if ($first){
+	my $check;
+	($line, $enc) = decode_from_bom($line,$enc,$check);
+	binmode(STDIN,":encoding($enc)");
+	$first=0;
+    }
+
+    # remove dos line endings
+    $line=~s/\r\n$/\n/;
+    # some additional cleanup, see: http://stackoverflow.com/questions/1016910/how-can-i-strip-invalid-xml-characters-from-strings-in-perl
+    $line=~tr/\e\x00-\x08\x0A\x0B\x0C\x0E-\x19//d;
+
+    if (not defined $id){
+	if ($line=~/^\s*([0-9]+)$/){
+	    $id = $1;
+	    next;
+	}
+    }
+    elsif (not defined $start){
+	if ($line=~/^([0-9:,]+) --> ([0-9:,]+)/){
+	    $start = $1;
+	    $end = $2;
+#	    print "    <time id=\"start$id\" value=\"$start\" />\n";
+	    $newchunk = 1;
+	    if ($lastend){
+		if (time2sec($start)-time2sec($lastend) > $PAUSETHR1){
+		    if (not $s_ended){$s_ended = 2;}
+		    elsif ($s_ended < 3){$s_ended++;}
+#		$s_ended = 2;
+		}
+		if (time2sec($start)-time2sec($lastend) > $PAUSETHR2){
+		    $s_ended = 3;
+		}
+	    }
+	    next;
+	}
+    }
+
+    if ($line=~/^\s*$/){
+	if ($end){
+	    # always close all open tags at end of time frame
+	    closetags();
+	    @closedtags = (); # flush tag-stack ....
+
+	    print "    <time id=\"T${id}E\" value=\"$end\" />\n";
+	    print F "\n    <time id=\"T${id}E\" value=\"$end\" />\n" if ($opt_r);
+	    $lastend = $end;
+	    $id=undef;
+	    $start=undef;
+	    $end=undef;
+	    ## new fragment -> always a possible sentence end!
+	    if (not $s_ended){$s_ended = 1;}
+	    ## for some languages: always split here!
+	    if ($SPLIT_AT_TIMEFRAME{$opt_l} || $opt_s){$s_ended = 3;}
+	}
+    }
+    else{
+
+	# some strange markup in curly brackets in some files
+	$line=~s/\{.*?\}\#?//gs;
+
+	$line = fix_punctuation($line);
+	if ($opt_l eq 'en' || $opt_l eq 'eng'){
+	    $line = fix_eng_ocr_errors($line);
+	}
+
+	## ignore formatting tags!
+	my $plain = $line;
+	$plain =~s/\<[^\>]+\>//gs;
+
+	## if a sentence has been ended before
+
+	if ($s_ended){
+
+	    if ($s_ended == 3){
+		closetags();
+		print "  </s>\n";
+		print "  <s id=\"$sid\">\n";
+		if ($opt_r){
+		    print F "\n  </s>\n";
+		    print F "  <s id=\"$sid\">\n";
+		}
+		reopentags();
+		$sid++;
+		$wid=0;
+	    }
+
+	    elsif ($plain=~/^\s*([\"\'\[]?|[\*\#\']*\s*)[\¿\¡\p{Lu}l]/){
+		closetags();
+		print "  </s>\n";
+		print "  <s id=\"$sid\">\n";
+		if ($opt_r){
+		    print F "\n  </s>\n";
+		    print F "  <s id=\"$sid\">\n";
+		}
+		reopentags();
+		$sid++;
+		$wid=0;
+	    }
+#	    elsif (($s_ended==2) && 
+#		   ($plain=~/^(\-?\s*[\"\']?[\p{N}\p{Ps}\p{Lu}l])/)){
+	    elsif (($s_ended==2) && 
+		   ($plain=~/^(\s*[\-\#\*\']*\s*[\"\'\[]?[\p{N}\p{Ps}\p{Lu}l])/)){
+
+		closetags();
+		print "  </s>\n";
+		print "  <s id=\"$sid\">\n";
+		if ($opt_r){
+		    print F "\n  </s>\n";
+		    print F "  <s id=\"$sid\">\n";
+		}
+		reopentags();
+		$sid++;
+		$wid=0;
+	    }
+
+	    ## new sentence if previous sentence ended with '...'
+	    ## and this one starts with bullets of quotes
+	    elsif (($s_ended==1) && ($plain=~/^\s*[\-\#\*\'\"]/)){
+		closetags();
+		print "  </s>\n";
+		print "  <s id=\"$sid\">\n";
+		if ($opt_r){
+		    print F "\n  </s>\n";
+		    print F "  <s id=\"$sid\">\n";
+		}
+		reopentags();
+		$sid++;
+		$wid=0;
+	    }
+
+	    # elsif ($opt_l=~/^(chi|kor|jpn|zho)$/){
+	    # 	closetags();
+	    # 	print "  </s>\n";
+	    # 	print "  <s id=\"$sid\">\n";
+	    # 	if ($opt_r){
+	    # 	    print F "  </s>\n";
+	    # 	    print F "  <s id=\"$sid\">\n";
+	    # 	}
+	    # 	reopentags();
+	    # 	$sid++;
+	    # 	$wid=0;
+	    # }
+	}
+	if ($newchunk && $start){
+	    print "    <time id=\"T${id}S\" value=\"$start\" />\n";
+	    if ($opt_r){
+		print F "\n    <time id=\"T${id}S\" value=\"$start\" />\n";
+	    }
+	}
+	$newchunk=0;
+
+	## if there are sentence boundaries within one line:
+	## - add sentence boundaries
+	## - tokenize and print text from previous sentence
+
+	while ($line=~/^(.*?[.!?:\]])([^.!?:].*)$/s){
+
+	    my $before=$1;
+	    my $after=$2;
+
+	    my $plain_before = $before;
+	    my $plain_after = $after;
+
+	    $plain_before =~s/\<[^\>]+\>//gs;
+	    $plain_after =~s/\<[^\>]+\>//gs;
+
+	    my $sentence_boundary = 0;
+	    if ($plain_before=~/([^.]\.|[!?:])[\'\"]?\s*$/){
+#		if ($plain_after=~/^\s+\-?\s*[\"\']?[\p{N}\p{Ps}\p{Lu}]/){
+		if ($plain_after=~/^\s+[\-\*\#]*\s*[\¿\¡\"\'\[]?[\p{N}\p{Ps}\p{Lu}]/){
+		    $sentence_boundary = 1;
+		}
+	    }
+	    elsif ($plain_before=~/([.!?:])[\"\'\]\}\)]?\-?\s*$/){
+		if ($plain_after=~/^\s+[\"\']?[\¿\¡\p{Lu}]/){
+		    $sentence_boundary = 1;
+		}
+	    }
+	    elsif ($plain_before=~/\s*\]\s*$/){
+		if ($plain_after=~/^\s*[\-\*\#]*\s*[\"\']?[\p{N}\p{Ps}\p{Lu}]/){		    
+		    $sentence_boundary = 1;
+		}
+	    }
+	    elsif ($plain_before=~/^\s*[\-\*\#]*\s*\[.{0,20}\]\s*$/s){
+		$sentence_boundary = 1;
+	    }
+
+
+	    # ## for chinese/korean/japanese -> always split
+	    # if ($opt_l=~/^(chi|kor|jpn|zho)$/){
+	    # 	$sentence_boundary = 1;
+	    # }
+
+	    ## tokenize
+	    my $last_token='';
+	    ($wid,$last_token) = print_tokens($before,$sid-1,$wid);
+
+	    # check if last token is a non-breaking one
+	    # --> don't start a new sentence!
+	    $last_token=~s/\.$//;
+	    if (exists $NONBREAKING{$last_token}){
+		$sentence_boundary = 0;
+	    }
+
+	    $line = $after;
+	    if ($sentence_boundary){
+		closetags();
+		print "  <\/s>\n  <s id=\"$sid\">\n";
+		print F "\n  <\/s>\n  <s id=\"$sid\">\n" if ($opt_r);
+		reopentags();
+		$sid++;
+		$wid=0;
+	    }
+	}
+
+
+	## background info --> keep separate
+
+	if ($plain=~/^\s*[\-\*\#]*\s*\[.{0,20}\]\s*$/){
+	    $s_ended = 3;
+	}
+
+	# sentence-end detected at end-of-string:
+	# - either
+	#   + non-dot followed by a dot
+	#   + one of the following punctuations: [!?:]
+	# - possibly followed by quotes or closing brackets ["'\]\}\)]?
+	# - followed by 0 or more spaces before end-of-string
+
+	elsif ($plain=~/([^.]\.|[!?:])[\'\"]?\s*$/){
+	    $s_ended=2;
+#	    print "=================ended $1\n";
+	}
+
+	## very weak sentence ending: '...'
+	elsif ($plain=~/\.\.\.\s*$/){
+	    $s_ended=1;
+	}
+
+	# possible sentence ending:
+	# - one of the punctutation characters [.!?:]
+	# - possibly followed by quotes or closing brackets ["'\]\}\)]?
+	# - possibly followed by a hyphen
+	# - followed by 0 or more spaces before end-of-string
+	elsif ($plain=~/([.!?:\]])[\"\'\]\}\)]?\-?\s*$/){
+	    $s_ended=2;
+#	    print "===============maybe ended $1\n";
+	}
+
+	else{
+	    $s_ended=0;
+	}
+
+	## tokenize and print remaining text
+	## (add a final space to keep spaces between tokens in raw output)
+
+	my $last_token='';
+	($wid,$last_token) = print_tokens($line.' ',$sid-1,$wid);
+	# check if last token is a non-breaking one
+	# --> don't start a new sentence!
+	$last_token=~s/\.$//;
+	if (exists $NONBREAKING{$last_token}){
+	    $s_ended = 0;
+	}
+#	print;
+    }
+}
+
+closetags();
+print "  </s>\n";
+print F "\n  </s>\n" if ($opt_r);
+
+print_xml_footer();
+
+####################################################################
+
+
+sub closetags{
+    while (my $tag=pop(@opentags)){
+	print "    </$tag>\n";
+#	print F "    </$tag>\n" if ($opt_r);
+	push(@closedtags,$tag);
+    }
+}
+
+sub reopentags{
+    while (my $tag=pop(@closedtags)){
+	print "    <$tag>\n";
+#	print F "    <$tag>\n" if ($opt_r);
+	push(@opentags,$tag);
+    }
+}
+
+sub print_raw_string{
+    my $string = shift;
+    $string=~s/\<.*?\>//gs;  # remove all XML tags to keep it simple
+    $string=~s/&/&amp;/g;
+    $string=~s/</&lt;/g;
+    $string=~s/>/&gt;/g;
+    print F $string;
+#    print F $string," ";
+#    $string=~s/\s*$//;
+#    print F $string,"\n" if ($string);
+}
+
+
+sub print_word{
+    my ($w,$sid,$wid)=@_;
+    $w=~s/&/&amp;/g;
+    $w=~s/</&lt;/g;
+    $w=~s/>/&gt;/g;
+    print "    <w id=\"$sid.$wid\">",$w,"</w>\n";
+}
+
+sub print_tokens{
+    my ($string,$sid,$wid)=@_;
+
+    # without tokenization
+    print_raw_string($string) if ($opt_r);
+
+    # chinese tokenization
+    if ($opt_l=~/^(chi|zho)$/){
+	return print_chinese_tokens($string,$sid,$wid);
+    }
+    # no japanese tokenization (leave it to subsequent processes)
+    if ($opt_l=~/^jpn$/){
+	$string=~s/\<.*?\>//gs;  # remove all XML tags to keep it simple
+	$string=~s/&/&amp;/g;
+	$string=~s/</&lt;/g;
+	$string=~s/>/&gt;/g;
+	print $string;
+	return ($wid,$string);
+    }
+
+    my @tokens=();
+
+    # FIXME: this does not seem to work anymore ....
+    # (get error messages from tokenize script ...)
+    #
+    # Dutch tokenization using Alpino
+    # if (($opt_l eq 'dut') && 
+    # 	(-e "$ENV{ALPINO_HOME}/Tokenization/tokenize.sh")){
+    # 	@tokens = tokenize_dutch($string);
+    # }
+
+    # # all other languages .... (which is most probably very bad!)
+    # else{ 
+    # 	@tokens = tokenize($string);
+    # }
+
+    @tokens = tokenize($string);
+
+    foreach my $t (@tokens){
+
+	## it's an opening tag --> store in open-tags
+	if ($t =~/^\<([^\/]\S*)(\s.*)?\>$/){
+#	    print "found opening tag: $1\n";
+	    push(@opentags,$1);
+	    print "    ".$t."\n";
+	}
+	## it's a closing tag --> close open tags if they are not the same
+	elsif ($t =~/^\<\/(\S+)\>$/){
+#	    print "found closing tag: $1\n";
+	    my $tagname=$1;
+	    my $tag=pop(@opentags);
+	    while ($tag && $tagname ne $tag){  # while not the same
+		print "    </$tag>\n";         # print closing tag!
+		$tag=pop(@opentags);
+		if (not $tag){last;}        # no more tag open anymore -> bad!
+	    }
+	    if ($tagname ne $tag){          # last tag is not the one we need:
+		print "    <$tagname>\n";   # create an opening tag (ugly!)
+	    }
+	    print "    ".$t."\n";           # finally: print closing tag
+	}
+	else{
+	    $wid++;
+	    print "    <w id=\"$sid.$wid\">".$t."</w>\n";
+	}
+    }
+    return ($wid,$tokens[-1]);
+}
+
+
+sub print_chinese_tokens{
+    my ($string,$sid,$wid)=@_;
+    chomp($string);
+
+    # find XML tags (TODO: is this save enough?)
+    while ($string=~s/^(.*?)(\<.*?\>)//){
+	my ($str,$tag) = ($1,$2);
+	if ($str){
+	    my $new_string='';
+	    ($wid,$new_string) = print_more_chinese_tokens($str,$sid,$wid);
+	}
+	print '     '.$tag,"\n";
+    }
+    if ($string){
+	print_more_chinese_tokens($string,$sid,$wid);
+    }
+}
+
+sub print_more_chinese_tokens{
+    my ($string,$sid,$wid)=@_;
+
+    my @tok = ();
+    @tok = segmentline($string);
+    @tok = split(//,$string) unless (@tok);
+
+    foreach my $t (@tok){
+	$wid++;
+	$t=~s/&/&amp;/g;
+	$t=~s/</&lt;/g;
+	$t=~s/>/&gt;/g;
+	print "      <w id=\"$sid.$wid\">",$t,"</w>\n";
+    }
+    return ($wid,$string);
+}
+
+
+
+
+
+
+
+sub print_xml_header{
+    print '<?xml version="1.0" encoding="utf-8"?>'."\n";
+    print "<document>\n";
+    if ($opt_r){
+	print F '<?xml version="1.0" encoding="utf-8"?>'."\n";
+	print F "<document>\n";
+    }
+}
+
+
+sub print_xml_footer{
+    print "</document>\n";
+    if ($opt_r){
+	print F "</document>\n";
+    }
+}
+
+
+sub tokenize{
+    my $string=shift;
+
+    ## some special formatting tags used in srt-files:
+    ## <i>, <b>, <font ...>
+    ## convert them to '[...]' and convert them back later (quite a hack ..)
+    ##
+    ## (now done in split_on_whitespace)
+
+    $string=~s/<(\/?[ib])>/ [$1] /gs;
+    $string=~s/<(\/?font[^>]*?)>/ [$1] /gs;
+
+    # a little hack to treat contractions later:
+    # replace various apostrophes with one that does not count as punctuation
+    # (to keep it together for later splitting - see below)
+    $string=~s/(\P{P})'(\P{P})/$1´$2/gs;
+
+    # \p{P} ==> punctuations
+    # \P{P} ==> non-punctuations
+
+    # non-P + P + (P or \s or \Z)
+    $string=~s/(\P{P})(\p{P}[\p{P}\s]|\p{P}\Z)/$1 $2/gs;  
+    # (\A or P or \s) + P + non-P
+    $string=~s/(\A\p{P}|[\p{P}\s]\p{P})(\P{P})/$1 $2/gs;
+    # special treatment for ``
+    $string=~s/(``)(\S)'/$1 $2/;    # '
+
+    # separate punctuations if they are not the same
+    # (use negative look-ahead for that!)
+
+    $string=~s/(\p{P})(?!\1)/$1 $2/gs;
+
+    # TODO: check if this causes a lot of mistakes ....
+    # TODO: is it OK to normalize to use ' only?
+    # continue treating contractions:
+    # - for English: contraction is always the second part (are there exceptions?)
+    if ($opt_l eq 'eng'){
+      $string=~s/(\P{P})(['`´])(\P{P})/$1 '$3/gs;
+    }
+    # - for French: contraction is always the first part (are there exceptions?)
+    elsif ($opt_l eq 'fre'){
+      $string=~s/(\P{P})(['`´])(\P{P})/$1' $3/gs;
+    }
+    # - for other languages: contraction is the shorter part (is that a good heuristics)
+    else{
+      $string=~s/(\A|\s|\p{P})(\p{L}+)(['`´])(\p{L}+)(\Z|\s|\p{P})/(length($2) >= length($4))?"$1$2 '$4$5":"$1$2' $4$5"/egs;
+    }
+
+
+    # delete multiple spaces
+    $string=~s/\s+/ /;
+    $string=~s/^\s*//;
+    $string=~s/\s*$//;
+
+    $string=~s/&/&amp;/g;
+    $string=~s/</&lt;/g;
+    $string=~s/>/&gt;/g;
+
+    ## convert formatting tags back to 'normal'
+
+    $string=~s/\[\s*(\/?)\s*([ib])\s*\]/<$1$2>/gs;
+    $string=~s/\[\s*(\/?)\s*(font[^>]*?)\s*\]/<$1$2>/gs;
+
+    return split_on_whitespaces($string);
+}
+
+
+sub split_on_whitespaces{
+    my $string = shift;
+
+    ## remove spaces in formatting tags
+    ## (quite a hack)
+    $string=~s/<\s*(\/?)\s*([ib])\s*>/ <$1$2> /gs;
+    $string=~s/<\s*(\/?)\s*(font[^>]*?)\s*>/ <$1$2> /gs;
+    $string=~s/^\s*//;
+    $string=~s/\s*$//;
+
+    ## space within tags are not token delimiters!
+    ## --> change them to '&nbsp;' (another hack)
+    do{}
+    until (not $string=~s/\<([^>]*)\s([^>]*)\>/<$1&nbsp;$2>/gs);
+
+    ## split on whitespaces
+    my @tokens = split(/\s+/,$string);
+
+    ## change '&nbsp;' back to spaces 
+    map ($_=~s/\&nbsp;/ /,@tokens);
+
+    ## merge (nonbreaking) abbreviations with following '.'
+    my @tokens2=();
+    while (@tokens){
+	my $tok = shift(@tokens);
+	if ((exists $NONBREAKING{$tok}) && ($tokens[0] eq '.')){
+	    if ($NONBREAKING{$tok} == 2){
+		if ($tokens[1]=~/^[0-9\.\,\s]+$/){
+		    shift(@tokens);
+		    push(@tokens2,$tok.'.');
+		}
+		else{
+		    push(@tokens2,$tok);
+		}
+	    }
+	    else{
+		shift(@tokens);
+		push(@tokens2,$tok.'.');
+	    }
+	}
+	else{
+	    push(@tokens2,$tok);
+	}
+    }
+    return @tokens2;
+}
+
+
+
+## see http://perldoc.perl.org/Encode.html#Handling-Malformed-Data
+sub escape_wide{sprintf "\\u%04X", shift}
+
+sub tokenize_dutch{
+    my $text=shift;
+
+    my $TOKCOMMAND = "$ENV{ALPINO_HOME}/Tokenization/tokenize.sh";
+    my ($TOKIN,$TOKOUT,$TOKERR);
+    my $TOKPID=open3($TOKIN,$TOKOUT,$TOKERR,$TOKCOMMAND);
+
+    # the verson installed on opus seems to require utf8 ...
+    #
+#    binmode($TOKIN, ":encoding(iso-8859-1)");
+#    binmode($TOKOUT, ":encoding(iso-8859-1)");
+    binmode($TOKIN, ":encoding(utf8)");
+    binmode($TOKOUT, ":encoding(utf8)");
+
+
+    ## some europarl specific pre-preprocessing
+    $text =~ s/\' ([a-zA-Z][^a-zA-Z])/\'$1/gs;
+    $text =~ s/\n\n+/\n/sg;
+    $text =~ s/^\(Applaus\)(.*)/\(Applaus\)\n$1/gs;
+
+    # the following is not necessary anymore as the version on OPUS takes utf8
+
+    ## escape wide unicode characters
+    ## using reference to existing subroutines avoids memory leak!
+#
+#    my $octets = encode('iso-8859-1', $text,\&escape_wide);
+#    $text = decode('iso-8859-1', $octets);
+
+
+    print $TOKIN $text;
+    close $TOKIN;
+    $text = '';
+	
+    while (my $l = <$TOKOUT>){
+
+	## some europarl specific post-processing
+	$l=~s/ \' ([a-zA-Z][a-zA-Z]*\'-)/ \'$1/g;
+	$l=~s/\( ([a-zA-Z][a-zA-Z]*\))/\($1/g;
+	# from $ALPINO_HOME/Tokenize/streepjes;
+	if ($l=~/[ ][-]([^ ][^-]*[^ ])[-][ ]/) {
+	    my $prefix=$`;
+	    my $middle=$1;
+	    my $suffix=$';   # '
+	    if ($prefix !~ /(en |of )$/ &&
+		$suffix !~ /^(en |of )/) {
+		$l = "$prefix - $middle - $suffix";
+	    } 
+	}
+
+	$text.=$l;
+    }
+    
+    close $TOKOUT;
+    close $TOKERR if ref($TOKERR);
+    waitpid $TOKPID,0;
+
+    return split_on_whitespaces($text);
+}
+## end of Alpino tokenizer ....
+##--------------------------------------------------------------------
+
+
+
+
+
+sub time2sec{
+    my $time=shift;
+    my ($h,$m,$s,$ms)=split(/[^0-9\-]/,$time);
+    my $sec = 3600*$h+60*$m+$s+$ms/1000;
+    return $sec;
+}
+
+
+
+
+
+## in some english subtitle files 'I' is confused with 'l'
+## in I'm and even for It!
+## (e.g. in en/2003/1114-v1.srt.gz
+
+sub fix_eng_ocr_errors{
+    my $line=shift;
+    $line=~s/(\A|\s+|[\"\'\[\(\-\#\*])l(t?)(\'[a-z]{1,2}|\s+|,\s+|\.\.\.)/$1I$2$3/gs;
+
+    ## some cases in eng/Comedy/1994/3965_82856_110413_postino_il.xml
+    $line=~s/([^aeiuo])[lI]{3}/$1ill/gs;    # stlll, wlll (too general?)
+    $line=~s/([^AEIOUaeiuo\s])ll/$1il/gs;   # exlled
+    $line=~s/I(ove[d\s])/l$1/gs;            # Ioved
+    $line=~s/llke/like/gs;                  # llke --> like
+    $line=~s/([a-zA-Z])I([^I\sl])/$1l$2/gs; # onIy, AIfredo
+    $line=~s/([a-zA-Z])\'il/$1\'ll/gs;      # we'il, I'il ...
+    return $line;
+}
+
+sub fix_punctuation{
+    my $line = shift;
+    ## replace 2x single quote with double quotes
+    $line=~s/\'\'/\"/g;
+    ## found in eng/Comedy/1995/1690_84526_112988_four_rooms.xml.gz:
+    ## 2 double quotes ... 
+    $line=~s/\"\"+/\"/g;
+    return $line;
+}
+
+
+
+sub read_non_breaking{
+    my $file = shift;
+    my $hash = shift;
+    if (-e "$file") {
+	open(PREFIX, "<:utf8", "$file");
+	while (<PREFIX>) {
+	    my $item = $_;
+	    chomp($item);
+	    if (($item) && (substr($item,0,1) ne "#")) {
+		if ($item =~ /(.*)[\s]+(\#NUMERIC_ONLY\#)/) {
+		    $$hash{$1} = 2;
+		} else {
+		    $$hash{$item} = 1;
+		}
+	    }
+	}
+	close(PREFIX);
+    }
+}
+
+
+# default character encodings for some languages
+# (TODO: this is awful and should be removed!!!)
+
+sub LangEncoding{
+    my $lang = shift;
+
+# supported by Perl Encode:
+# http://perldoc.perl.org/Encode/Supported.html
+
+    return 'utf-8' if ($lang=~/^(utf8)$/);
+    return 'iso-8859-4' if ($lang=~/^(ice)$/);
+    ## what is scc?
+    return 'cp1250' if ($lang=~/^(alb|bos|cze|pol|rum|scc|scr|slv|hrv)$/); 
+#    return 'iso-8859-2' if ($lang=~/^(alb|bos)$/);
+    return 'cp1251' if ($lang=~/^(bul|mac|rus|bel)$/);
+#    return 'cp1252' if ($lang=~/^(dan|dut|epo|est|fin|fre|ger|hun|ita|nor|pob|pol|por|spa|swe)$/);
+    return 'cp1253' if ($lang=~/^(ell|gre)$/);
+    return 'cp1254' if ($lang=~/^(tur)$/);
+    return 'cp1255' if ($lang=~/^(heb)$/);
+    return 'cp1256' if ($lang=~/^(ara)$/);
+    return 'cp1257' if ($lang=~/^(lat|lit)$/);  # correct?
+    return 'big5-eten' if ($lang=~/^(chi|zho)$/);
+#    return 'utf-8' if ($lang=~/^(jpn)$/);
+    return 'shiftjis' if ($lang=~/^(jpn)$/);
+#    return 'cp932' if ($lang=~/^(jpn)$/);
+    return 'euc-kr' if ($lang=~/^(kor)$/);
+#    return 'cp949' if ($lang=~/^(kor)$/);
+    return 'cp1252';
+#    return 'iso-8859-6' if ($lang=~/^(ara)$/);
+#    return 'iso-8859-7' if ($lang=~/^(ell|gre)$/);
+#    return 'iso-8859-1';
+
+## unknown: haw (hawaiian), hrv (crotioan), amh (amharic) gai (borei)
+##          ind (indonesian), max (North Moluccan Malay), may (Malay?)
+}
+
+
+
+
+__END__
+
+=head1 AUTHOR
+
+Jörg Tiedemann, L<https://bitbucket.org/tiedemann>
+
+=head1 BUGS AND SUPPORT
+
+Please report any bugs or feature requests to
+L<https://bitbucket.org/tiedemann/subalign>.
+
+=head1 SEE ALSO
+
+Check L<Text::SRT::Align> and L<srtalign> for the alignment of translated movie subtitles.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Jörg Tiedemann.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

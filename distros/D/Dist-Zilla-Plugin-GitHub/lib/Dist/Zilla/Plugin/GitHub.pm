@@ -1,9 +1,9 @@
-package Dist::Zilla::Plugin::GitHub; # git description: v0.45-15-g0dd51d0
+package Dist::Zilla::Plugin::GitHub; # git description: v0.46-4-gf3f9437
 # ABSTRACT: Plugins to integrate Dist::Zilla with GitHub
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use JSON::MaybeXS;
 use Moose;
@@ -51,20 +51,24 @@ has _credentials => (
 
 #pod =head1 DESCRIPTION
 #pod
-#pod B<Dist::Zilla::Plugin::GitHub> is a set of plugins for L<Dist::Zilla> intended
+#pod B<Dist-Zilla-Plugin-GitHub> is a set of plugins for L<Dist::Zilla> intended
 #pod to more easily integrate L<GitHub|https://github.com> in the C<dzil> workflow.
 #pod
 #pod The following is the list of the plugins shipped in this distribution:
 #pod
 #pod =over 4
 #pod
-#pod =item * L<Dist::Zilla::Plugin::GitHub::Create> Create GitHub repo on dzil new
+#pod =item * L<Dist::Zilla::Plugin::GitHub::Create> Create GitHub repo on C<dzil new>
 #pod
 #pod =item * L<Dist::Zilla::Plugin::GitHub::Update> Update GitHub repo info on release
 #pod
-#pod =item * L<Dist::Zilla::Plugin::GitHub::Meta> Add GitHub repo info to META.{yml,json}
+#pod =item * L<Dist::Zilla::Plugin::GitHub::Meta> Add GitHub repo info to F<META.{yml,json}>
 #pod
 #pod =back
+#pod
+#pod This distribution also provides a plugin bundle, L<Dist::Zilla::PluginBundle::GitHub>,
+#pod which provides L<GitHub::Meta|Dist::Zilla::Plugin::GitHub::Meta> and
+#pod L<[GitHub::Update|Dist::Zilla::Plugin::GitHub::Update> together in one convenient bundle.
 #pod
 #pod This distribution also provides an additional C<dzil> command (L<dzil
 #pod gh|Dist::Zilla::App::Command::gh>) and a L<plugin
@@ -101,7 +105,7 @@ sub _build_login {
 sub _build_credentials {
     my $self = shift;
 
-    my ($login, $pass, $token, $otp);
+    my ($login, $pass, $token);
 
     $login = $self->_login;
 
@@ -133,14 +137,7 @@ sub _build_credentials {
         );
     }
 
-    if ($self->prompt_2fa) {
-        $otp = $self->zilla->chrome->prompt_str(
-            "GitHub two-factor authentication code for '$login'",
-            { noecho => 1 },
-        );
-    }
-
-    return {login => $login, pass => $pass, otp => $otp};
+    return {login => $login, pass => $pass};
 }
 
 sub _has_credentials {
@@ -160,8 +157,16 @@ sub _auth_headers {
         $headers{Authorization} = "Basic $basic";
     }
 
+    # This can't be done at object creation because we autodetect the
+    # need for 2FA when GitHub says we need it, so we won't know to
+    # prompt at object creation time.
     if ($self->prompt_2fa) {
-        $headers{'X-GitHub-OTP'} = $credentials->{otp};
+        my $otp = $self->zilla->chrome->prompt_str(
+            "GitHub two-factor authentication code for '$credentials->{login}'",
+            { noecho => 1 },
+        );
+
+        $headers{'X-GitHub-OTP'} = $otp;
         $self->log([ "Using two-factor authentication" ]);
     }
 
@@ -242,24 +247,28 @@ Dist::Zilla::Plugin::GitHub - Plugins to integrate Dist::Zilla with GitHub
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 DESCRIPTION
 
-B<Dist::Zilla::Plugin::GitHub> is a set of plugins for L<Dist::Zilla> intended
+B<Dist-Zilla-Plugin-GitHub> is a set of plugins for L<Dist::Zilla> intended
 to more easily integrate L<GitHub|https://github.com> in the C<dzil> workflow.
 
 The following is the list of the plugins shipped in this distribution:
 
 =over 4
 
-=item * L<Dist::Zilla::Plugin::GitHub::Create> Create GitHub repo on dzil new
+=item * L<Dist::Zilla::Plugin::GitHub::Create> Create GitHub repo on C<dzil new>
 
 =item * L<Dist::Zilla::Plugin::GitHub::Update> Update GitHub repo info on release
 
-=item * L<Dist::Zilla::Plugin::GitHub::Meta> Add GitHub repo info to META.{yml,json}
+=item * L<Dist::Zilla::Plugin::GitHub::Meta> Add GitHub repo info to F<META.{yml,json}>
 
 =back
+
+This distribution also provides a plugin bundle, L<Dist::Zilla::PluginBundle::GitHub>,
+which provides L<GitHub::Meta|Dist::Zilla::Plugin::GitHub::Meta> and
+L<[GitHub::Update|Dist::Zilla::Plugin::GitHub::Update> together in one convenient bundle.
 
 This distribution also provides an additional C<dzil> command (L<dzil
 gh|Dist::Zilla::App::Command::gh>) and a L<plugin
@@ -282,7 +291,7 @@ Alessandro Ghedini <alexbio@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Rafael Kitover Jeffrey Ryan Thalhammer Doherty Mohammad S Anwar Ricardo Signes Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Joelle Maslak Jose Luis Perez Diez
+=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Jeffrey Ryan Thalhammer Rafael Kitover Joelle Maslak Doherty Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Jose Luis Perez Diez Mohammad S Anwar Ricardo Signes
 
 =over 4
 
@@ -304,23 +313,19 @@ Mike Friedman <mike.friedman@10gen.com>
 
 =item *
 
-Rafael Kitover <rkitover@cpan.org>
-
-=item *
-
 Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =item *
 
+Rafael Kitover <rkitover@cpan.org>
+
+=item *
+
+Joelle Maslak <jmaslak@antelope.net>
+
+=item *
+
 Mike Doherty <doherty@cs.dal.ca>
-
-=item *
-
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
-
-=item *
-
-Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
@@ -344,11 +349,15 @@ Ioan Rogers <ioan.rogers@gmail.com>
 
 =item *
 
-Joelle Maslak <jmaslak@antelope.net>
+Jose Luis Perez Diez <jluis@escomposlinux.org>
 
 =item *
 
-Jose Luis Perez Diez <jluis@escomposlinux.org>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
 
 =back
 

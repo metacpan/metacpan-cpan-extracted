@@ -22,7 +22,7 @@ my %tmpargs = (
     UNLINK => 1,
 );
 
-my $tests = [ do "t/dot6-tests.pl" ];
+my $tests = [ do "./t/dot6-tests.pl" ];
 
 foreach my $t (@$tests) {
     next if $ARGV[0] && $ARGV[0] ne $t->{id};

@@ -11,7 +11,8 @@ WriteMakefile(
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
     'Test::More' => 0,
-    'Test::Output' => 1.0
+    'Test::Output' => 1.0,
+    'Test::Memory::Cycle' => 1.06
   },
   PREREQ_PM => {
     'Mojolicious' => 4.77,

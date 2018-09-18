@@ -1,5 +1,5 @@
 package Net::OneSky;
-$Net::OneSky::VERSION = '0.0.1';
+
 use strict;
 use warnings;
 
@@ -10,11 +10,14 @@ use LWP::UserAgent;
 use HTTP::Request::Common qw(GET POST);
 
 use Digest::MD5 qw(md5_hex);
-
 use Net::OneSky::Project;
 
 use URI;
 use Time::Local;
+
+use Cwd qw(getcwd abs_path);
+use File::Basename;
+use IPC::Open3;
 
 # Do not specify version in the base URL, to allow clients to specify as needed
 use constant BASE_URL => URI->new('https://platform.api.onesky.io/');
@@ -86,9 +89,25 @@ sub user_agent {
   return $self->{_user_agent};
 }
 
-
 sub version_string {
-  return $Net::OneSky::VERSION || `git rev-parse --short HEAD`
+  return $Net::OneSky::VERSION if (defined($Net::OneSky::VERSION) && $Net::OneSky::VERSION);
+
+  my $prev_dir = _untaint_cwd();
+  my $dir = (fileparse(__FILE__))[1];
+
+  eval {
+    my $out;
+    chdir($dir);
+    open3('</dev/null', $out, '>/dev/null', qw(git rev-parse --short HEAD));
+    $Net::OneSky::VERSION = <$out>;
+    chomp($Net::OneSky::VERSION);
+  };
+
+  chdir($prev_dir);
+
+  return $Net::OneSky::VERSION if $Net::OneSky::VERSION;
+
+  $Net::OneSky::VERSION = 'version unknown';
 }
 
 
@@ -110,7 +129,28 @@ sub authenticate {
   return $data;
 }
 
+sub _untaint_cwd {
+  my $dir = getcwd;
+  my $orig = $dir;
+
+  my $valid = (-R $dir && -X $dir);
+
+  while ($valid && $dir) {
+    $valid = -X $dir;
+    ($dir = (fileparse($dir))[1]) =~ s{/$}{}; # skips /, but that should be fine.
+  }
+
+  die 'chdir with elevated privileges!' unless $valid;
+
+  $orig =~ /^(.*)$/;
+  $1;
+}
+
+
+
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
+
+
 
 # ABSTRACT: Simple interface to the OneSky API: http://developer.oneskyapp.com/
 1;
@@ -127,7 +167,7 @@ Net::OneSky - Simple interface to the OneSky API: http://developer.oneskyapp.com
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 

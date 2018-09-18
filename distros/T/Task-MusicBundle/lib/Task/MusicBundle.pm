@@ -5,7 +5,7 @@ BEGIN {
 # ABSTRACT: A bundle of MIDI and music modules
 use strict;
 use warnings;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 1;
 
 __END__
@@ -20,7 +20,7 @@ Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,8 @@ L<MIDI>
 L<MIDI::Drummer::Tiny>
 
 L<MIDI::Morph> - Jun 04, 2005
+
+L<MIDI::Ngram>
 
 L<MIDI::Pitch> - Nov 30, 2005
 
@@ -147,8 +149,6 @@ L<GD::Tab::Guitar>,
 L<MIDI::XML> - Jan 24, 2003 - This has Tk as a dependency - for an XML module. Sorry not including.
 
 L<Music::Image::Chord> - Oct 03, 2003,
-
-L<Music::PitchNum>
 
 L<PDL::Audio>,
 

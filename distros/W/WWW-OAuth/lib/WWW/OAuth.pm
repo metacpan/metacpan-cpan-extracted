@@ -21,7 +21,7 @@ use URI;
 use URI::Escape 'uri_escape_utf8';
 use WWW::OAuth::Util 'oauth_request';
 
-our $VERSION = '0.006';
+our $VERSION = '1.000';
 
 sub authenticate {
 	my $self = shift;
@@ -67,7 +67,8 @@ sub authorization_header {
 	# Extra parameters passed to authenticate()
 	if (defined $extra_params) {
 		croak 'OAuth parameters must be specified as a hashref' unless ref $extra_params eq 'HASH';
-		croak 'OAuth parameters must all begin with "oauth_"' unless all { m/^oauth_/ } keys %$extra_params;
+		croak 'OAuth parameters other than "realm" must all begin with "oauth_"'
+		  unless all { $_ eq 'realm' or m/^oauth_/ } keys %$extra_params;
 		%oauth_params = (%oauth_params, %$extra_params);
 	}
 	
@@ -102,7 +103,8 @@ sub _signer_hmac_sha1 {
 sub _signature_base_string {
 	my ($req, $oauth_params) = @_;
 	
-	my @all_params = (@{$req->query_pairs}, %$oauth_params);
+	my @all_params = @{$req->query_pairs};
+	push @all_params, map { ($_ => $oauth_params->{$_}) } grep { $_ ne 'realm' } keys %$oauth_params;
 	push @all_params, @{$req->body_pairs} if $req->content_is_form;
 	my @pairs = pairs map { uri_escape_utf8 $_ } @all_params;
 	@pairs = sort { ($a->[0] cmp $b->[0]) or ($a->[1] cmp $b->[1]) } @pairs;
@@ -299,10 +301,11 @@ through to L</"authorization_header">. Returns the container object.
 
 Forms an OAuth 1.0 signed Authorization header for the passed request. As in
 L</"authenticate">, the request may be specified in any form accepted by
-L<WWW::OAuth::Util/"oauth_request">. OAuth parameters (starting with C<oauth_>)
-may be optionally specified in a hashref and will override any generated OAuth
-parameters of the same name (they should not be present in the request URL or
-body parameters). Returns the signed header value.
+L<WWW::OAuth::Util/"oauth_request">. OAuth protocol parameters (starting with
+C<oauth_> or the special parameter C<realm>) may be optionally specified in a
+hashref and will override any generated protocol parameters of the same name
+(they should not be present in the request URL or body parameters). Returns the
+signed header value.
 
 =head1 HTTP REQUEST CONTAINERS
 

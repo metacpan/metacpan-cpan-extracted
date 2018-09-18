@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2012 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -41,7 +41,9 @@ class BlockBasedFilterBlockBuilder : public FilterBlockBuilder {
   virtual bool IsBlockBased() override { return true; }
   virtual void StartBlock(uint64_t block_offset) override;
   virtual void Add(const Slice& key) override;
-  virtual Slice Finish() override;
+  virtual size_t NumAdded() const override { return num_added_; }
+  virtual Slice Finish(const BlockHandle& tmp, Status* status) override;
+  using FilterBlockBuilder::Finish;
 
  private:
   void AddKey(const Slice& key);
@@ -55,12 +57,16 @@ class BlockBasedFilterBlockBuilder : public FilterBlockBuilder {
   const SliceTransform* prefix_extractor_;
   bool whole_key_filtering_;
 
+  size_t prev_prefix_start_;        // the position of the last appended prefix
+                                    // to "entries_".
+  size_t prev_prefix_size_;         // the length of the last appended prefix to
+                                    // "entries_".
   std::string entries_;             // Flattened entry contents
   std::vector<size_t> start_;       // Starting index in entries_ of each entry
-  uint32_t added_to_start_;         // To indicate if key is added
   std::string result_;              // Filter data computed so far
   std::vector<Slice> tmp_entries_;  // policy_->CreateFilter() argument
   std::vector<uint32_t> filter_offsets_;
+  size_t num_added_;                // Number of keys added
 
   // No copying allowed
   BlockBasedFilterBlockBuilder(const BlockBasedFilterBlockBuilder&);
@@ -74,18 +80,26 @@ class BlockBasedFilterBlockReader : public FilterBlockReader {
   // REQUIRES: "contents" and *policy must stay live while *this is live.
   BlockBasedFilterBlockReader(const SliceTransform* prefix_extractor,
                               const BlockBasedTableOptions& table_opt,
-                              BlockContents&& contents);
+                              bool whole_key_filtering,
+                              BlockContents&& contents, Statistics* statistics);
   virtual bool IsBlockBased() override { return true; }
-  virtual bool KeyMayMatch(const Slice& key,
-                           uint64_t block_offset = kNotValid) override;
-  virtual bool PrefixMayMatch(const Slice& prefix,
-                              uint64_t block_offset = kNotValid) override;
+
+  virtual bool KeyMayMatch(
+      const Slice& key, const SliceTransform* prefix_extractor,
+      uint64_t block_offset = kNotValid, const bool no_io = false,
+      const Slice* const const_ikey_ptr = nullptr) override;
+  virtual bool PrefixMayMatch(
+      const Slice& prefix, const SliceTransform* prefix_extractor,
+      uint64_t block_offset = kNotValid, const bool no_io = false,
+      const Slice* const const_ikey_ptr = nullptr) override;
   virtual size_t ApproximateMemoryUsage() const override;
+
+  // convert this object to a human readable form
+  std::string ToString() const override;
 
  private:
   const FilterPolicy* policy_;
   const SliceTransform* prefix_extractor_;
-  bool whole_key_filtering_;
   const char* data_;    // Pointer to filter data (at block-start)
   const char* offset_;  // Pointer to beginning of offset array (at block-end)
   size_t num_;          // Number of entries in offset array

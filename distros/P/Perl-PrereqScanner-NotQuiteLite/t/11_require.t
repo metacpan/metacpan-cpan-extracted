@@ -38,6 +38,10 @@ test('require Module in sub', <<'END', {}, {}, {'Test::More' => 0});
 sub foo { require Test::More; }
 END
 
+test('require Module in sub without explicit semicolon', <<'END', {}, {}, {'Test::More' => 0});
+sub foo { require Test::More }
+END
+
 test('require Module in sub', <<'END', {'Test::More' => 0});
 BEGIN { require Test::More; }
 END

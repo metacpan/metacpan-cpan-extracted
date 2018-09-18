@@ -33,7 +33,7 @@ test_rpm_different_transactions();
 test_urpmi_same_transaction();
 test_urpmi_different_transactions();
 
-sub test_rpm_same_transaction {
+sub test_rpm_same_transaction() {
 
     test_rpm_i_fail('a', 'b');
     check_nothing_installed();
@@ -57,7 +57,7 @@ sub test_rpm_same_transaction {
     check_installed_and_remove('h', 'i');
 }
 
-sub test_rpm_different_transactions {
+sub test_rpm_different_transactions() {
     test_rpm_i_succeeds('a');
     test_rpm_i_fail('b');
     check_installed_names('a');
@@ -103,7 +103,7 @@ sub test_rpm_different_transactions {
     check_installed_and_remove('h', 'i');
 }
 
-sub test_urpmi_same_transaction {
+sub test_urpmi_same_transaction() {
     test_urpmi_fail('a b');
     check_nothing_installed();
 
@@ -126,7 +126,7 @@ sub test_urpmi_same_transaction {
     check_installed_and_remove('h', 'i');
 }
 
-sub test_urpmi_different_transactions {
+sub test_urpmi_different_transactions() {
     urpmi('a');
     test_urpmi_fail('b');
     check_installed_names('a');
@@ -184,7 +184,7 @@ sub test_rpm_i_fail {
     system_should_fail("rpm --root $::pwd/root -i $rpms");
 }
 sub check_no_etc_files() {
-    if (my @l = grep { !m!/urpmi$! } glob("$::pwd/root/etc/*")) {
+    if (my @l = grep { !m!/urpmi|rpm$! } glob("$::pwd/root/etc/*")) {
 	fail(join(' ', @l) . " files should not be there");
     }
 }

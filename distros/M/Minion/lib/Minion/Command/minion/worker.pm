@@ -47,7 +47,6 @@ Minion::Command::minion::worker - Minion worker command
   Usage: APPLICATION minion worker [OPTIONS]
 
     ./myapp.pl minion worker
-    ./myapp.pl minion worker -f
     ./myapp.pl minion worker -m production -I 15 -C 5 -R 3600 -j 10
     ./myapp.pl minion worker -q important -q default
 
@@ -149,6 +148,6 @@ Run this command.
 
 =head1 SEE ALSO
 
-L<Minion>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Minion>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

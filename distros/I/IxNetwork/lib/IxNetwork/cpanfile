@@ -1,0 +1,7 @@
+requires 'IO::Socket::SSL';
+requires 'LWP::UserAgent';
+requires 'Protocol::WebSocket::Client';
+requires 'JSON::PP';
+requires 'URI::Escape';
+requires 'Time::Seconds';
+requires 'LWP::Protocol::https';

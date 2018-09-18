@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #ifndef ROCKSDB_LITE
 
@@ -31,6 +31,7 @@
 #include "rocksdb/utilities/stackable_db.h"
 #include "util/coding.h"
 #include "utilities/spatialdb/utils.h"
+#include "port/port.h"
 
 namespace rocksdb {
 namespace spatial {
@@ -65,28 +66,56 @@ inline bool GetSpatialIndexName(const std::string& column_family_name,
 
 }  // namespace
 
-Variant::Variant(const Variant& v) : type_(v.type_) {
+void Variant::Init(const Variant& v, Data& d) {
   switch (v.type_) {
     case kNull:
       break;
     case kBool:
-      data_.b = v.data_.b;
+      d.b = v.data_.b;
       break;
     case kInt:
-      data_.i = v.data_.i;
+      d.i = v.data_.i;
       break;
     case kDouble:
-      data_.d = v.data_.d;
+      d.d = v.data_.d;
       break;
     case kString:
-      new (&data_.s) std::string(v.data_.s);
+      new (d.s) std::string(*GetStringPtr(v.data_));
       break;
     default:
       assert(false);
   }
 }
 
-bool Variant::operator==(const Variant& rhs) {
+Variant& Variant::operator=(const Variant& v) {
+  // Construct first a temp so exception from a string ctor
+  // does not change this object
+  Data tmp;
+  Init(v, tmp);
+
+  Type thisType = type_;
+  // Boils down to copying bits so safe
+  std::swap(tmp, data_);
+  type_ = v.type_;
+
+  Destroy(thisType, tmp);
+
+  return *this;
+}
+
+Variant& Variant::operator=(Variant&& rhs) {
+  Destroy(type_, data_);
+  if (rhs.type_ == kString) {
+    new (data_.s) std::string(std::move(*GetStringPtr(rhs.data_)));
+  } else {
+    data_ = rhs.data_;
+  }
+  type_ = rhs.type_;
+  rhs.type_ = kNull;
+  return *this;
+}
+
+bool Variant::operator==(const Variant& rhs) const {
   if (type_ != rhs.type_) {
     return false;
   }
@@ -101,15 +130,13 @@ bool Variant::operator==(const Variant& rhs) {
     case kDouble:
       return data_.d == rhs.data_.d;
     case kString:
-      return data_.s == rhs.data_.s;
+      return *GetStringPtr(data_) == *GetStringPtr(rhs.data_);
     default:
       assert(false);
   }
   // it will never reach here, but otherwise the compiler complains
   return false;
 }
-
-bool Variant::operator!=(const Variant& rhs) { return !(*this == rhs); }
 
 FeatureSet* FeatureSet::Set(const std::string& key, const Variant& value) {
   map_.insert({key, value});
@@ -577,7 +604,7 @@ class SpatialDBImpl : public SpatialDB {
     Status s;
     int threads_running = 0;
 
-    std::vector<std::thread> threads;
+    std::vector<port::Thread> threads;
 
     for (auto cfh : column_families) {
       threads.emplace_back([&, cfh] {
@@ -589,7 +616,7 @@ class SpatialDBImpl : public SpatialDB {
 
           Status t = Flush(FlushOptions(), cfh);
           if (t.ok()) {
-            t = CompactRange(cfh, nullptr, nullptr);
+            t = CompactRange(CompactRangeOptions(), cfh, nullptr, nullptr);
           }
 
           {
@@ -658,7 +685,7 @@ class SpatialDBImpl : public SpatialDB {
 };
 
 namespace {
-DBOptions GetDBOptions(const SpatialDBOptions& options) {
+DBOptions GetDBOptionsFromSpatialDBOptions(const SpatialDBOptions& options) {
   DBOptions db_options;
   db_options.max_open_files = 50000;
   db_options.max_background_compactions = 3 * options.num_threads / 4;
@@ -671,14 +698,13 @@ DBOptions GetDBOptions(const SpatialDBOptions& options) {
   db_options.statistics = CreateDBStatistics();
   if (options.bulk_load) {
     db_options.stats_dump_period_sec = 600;
-    db_options.disableDataSync = true;
   } else {
     db_options.stats_dump_period_sec = 1800;  // 30min
   }
   return db_options;
 }
 
-ColumnFamilyOptions GetColumnFamilyOptions(const SpatialDBOptions& options,
+ColumnFamilyOptions GetColumnFamilyOptions(const SpatialDBOptions& /*options*/,
                                            std::shared_ptr<Cache> block_cache) {
   ColumnFamilyOptions column_family_options;
   column_family_options.write_buffer_size = 128 * 1024 * 1024;  // 128MB
@@ -687,7 +713,7 @@ ColumnFamilyOptions GetColumnFamilyOptions(const SpatialDBOptions& options,
   column_family_options.target_file_size_base = 64 * 1024 * 1024;      // 64MB
   column_family_options.level0_file_num_compaction_trigger = 2;
   column_family_options.level0_slowdown_writes_trigger = 16;
-  column_family_options.level0_slowdown_writes_trigger = 32;
+  column_family_options.level0_stop_writes_trigger = 32;
   // only compress levels >= 2
   column_family_options.compression_per_level.resize(
       column_family_options.num_levels);
@@ -760,7 +786,7 @@ class MetadataStorage {
 Status SpatialDB::Create(
     const SpatialDBOptions& options, const std::string& name,
     const std::vector<SpatialIndexOptions>& spatial_indexes) {
-  DBOptions db_options = GetDBOptions(options);
+  DBOptions db_options = GetDBOptionsFromSpatialDBOptions(options);
   db_options.create_if_missing = true;
   db_options.create_missing_column_families = true;
   db_options.error_if_exists = true;
@@ -805,7 +831,7 @@ Status SpatialDB::Create(
 
 Status SpatialDB::Open(const SpatialDBOptions& options, const std::string& name,
                        SpatialDB** db, bool read_only) {
-  DBOptions db_options = GetDBOptions(options);
+  DBOptions db_options = GetDBOptionsFromSpatialDBOptions(options);
   auto block_cache = NewLRUCache(options.cache_size);
   ColumnFamilyOptions column_family_options =
       GetColumnFamilyOptions(options, block_cache);

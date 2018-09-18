@@ -16,8 +16,9 @@
     after call_sv().
 */
 
+#define TYPE_INHERITED (type == InheritedCb || type == InheritedCbNamed)
+
 #define PUSH_PAYLOAD_KEY \
-    if (opts & PushName) {                      \
     /* METHOD_NAMED path won't give us a free SP slot */ \
     EXTEND(SP, items + 1);                      \
     *(SP += items + 1) = payload->hash_key;     \
@@ -26,15 +27,16 @@
         re-enable when messing with stack for tests
         assert(PL_curstackinfo->si_stack_hwm >= PL_stack_sp - PL_stack_base);
     */ \
-    }
 
 
 #define CALL_READ_CB(result)                        \
-    if (type == InheritedCb && payload->read_cb) {  \
+    if (TYPE_INHERITED && payload->read_cb) {  \
         ENTER;                                      \
         PUSHMARK(SP);                               \
         *(SP+1) = result;                           \
-        PUSH_PAYLOAD_KEY; \
+        if (type == InheritedCbNamed) {             \
+            PUSH_PAYLOAD_KEY;                       \
+        }                                           \
         call_sv(payload->read_cb, G_SCALAR);        \
         LEAVE;                                      \
     } else {                                        \
@@ -42,10 +44,12 @@
     }                                               \
 
 #define CALL_WRITE_CB(slot, need_alloc)             \
-    if (type == InheritedCb && payload->write_cb) { \
+    if (TYPE_INHERITED && payload->write_cb) { \
         ENTER;                                      \
         PUSHMARK(SP);                               \
-    if (1) { PUSH_PAYLOAD_KEY; }                    \
+        if (type == InheritedCbNamed) {             \
+            PUSH_PAYLOAD_KEY;                       \
+        }                                           \
         call_sv(payload->write_cb, G_SCALAR);       \
         SPAGAIN;                                    \
         LEAVE;                                      \
@@ -66,7 +70,7 @@
     assert(type == Inherited || type == PrivateClass || type == ObjectOnly || type == LazyClass)
 
 #define READONLY_CROAK_CHECK                            \
-    if (type != InheritedCb && (opts & IsReadonly)) {   \
+    if (!TYPE_INHERITED && (opts & IsReadonly)) {   \
         READONLY_TYPE_ASSERT;                           \
         croak("Can't set value in readonly accessor");  \
         return;                                         \
@@ -307,7 +311,7 @@ static void CAIXS_accessor(pTHX_ SV** SP, CV* cv, HV* stash) {
     return;
 }};
 
-/* covers type = {Inherited, InheritedCb, ObjectOnly} */
+/* covers type = {Inherited, InheritedCb, InheritedCbNamed, ObjectOnly} */
 template <AccessorType type, AccessorOpts opts>
 struct FImpl {
 static void CAIXS_accessor(pTHX_ SV** SP, CV* cv, HV* stash) {

@@ -52,8 +52,8 @@ sub new ($%) {
     my $self=$proto->SUPER::new($args);
 
     my $dsn=$args->{'dsn'};
-    $dsn || $self->throw("new - required parameter missed 'dsn'");
-    $dsn=~/^OS:(\w+):(\w+)(;.*)?$/ || $self->throw("new - bad format of 'dsn' ($dsn)");
+    $dsn || $self->throw("- required parameter missed 'dsn'");
+    $dsn=~/^OS:(\w+):(\w+)(;.*)?$/ || $self->throw("- bad format of 'dsn' ($dsn)");
     my $driver=$1;
     my $dbname=$2;
     my $options=$3 || '';
@@ -67,16 +67,26 @@ sub new ($%) {
         if($pair =~ /^table_type\s*=\s*(.*?)\s*$/) {
             $self->{'table_type'}=lc($1);
         }
+        elsif($pair =~ /^dbi(?:_driver)?\s*=\s*(.*?)\s*$/) {
+            $self->{'dbi_driver'}=$1;
+        }
         else {
             $dbopts.=';' . $pair;
         }
     }
 
     $driver =~ '^MySQL' ||
-        throw $self "new - wrong driver type ($driver)";
+        throw $self "- wrong driver type ($driver)";
+
+    # What specific DBI driver to use? Supporting DBD::mysql and
+    # DBD::MariaDB
+    #
+    my $dbi_driver=lc($self->{'dbi_driver'} || 'mysql');
+    $dbi_driver='MariaDB' if $dbi_driver eq 'mariadb' || $dbi_driver eq 'dbd::mariadb';
+    $dbi_driver='mysql'   if $dbi_driver eq 'mysql'   || $dbi_driver eq 'dbd::mysql';
 
     $self->connector->sql_connect(
-        dsn         => "DBI:mysql:$dbname$dbopts",
+        dsn         => "DBI:$dbi_driver:$dbname$dbopts",
         user        => $args->{'user'},
         password    => $args->{'password'},
     );

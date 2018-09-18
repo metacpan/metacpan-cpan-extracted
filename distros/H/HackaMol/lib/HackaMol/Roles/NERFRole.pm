@@ -1,6 +1,6 @@
 package HackaMol::Roles::NERFRole;
  # ABSTRACT: Role providing Natural extension reference frame implementation for molecular building 
-$HackaMol::Roles::NERFRole::VERSION = '0.049';
+$HackaMol::Roles::NERFRole::VERSION = '0.050';
 use 5.008;
 use Moose::Role;
 use Math::Vector::Real;
@@ -65,7 +65,7 @@ HackaMol::Roles::NERFRole - Role providing Natural extension reference frame imp
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 

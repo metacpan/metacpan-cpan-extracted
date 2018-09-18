@@ -164,8 +164,8 @@ organized CPAN distribution to maximize maintainability.
         +- welcome.html.ep   # Template for "welcome" action
 
 Both application skeletons can be automatically generated with the commands
-L<Mojolicious::Command::generate::lite_app> and
-L<Mojolicious::Command::generate::app>.
+L<Mojolicious::Command::Author::generate::lite_app> and
+L<Mojolicious::Command::Author::generate::app>.
 
   $ mojo generate lite_app myapp.pl
   $ mojo generate app MyApp
@@ -373,11 +373,11 @@ L<Mojo::DOM>.
   done_testing();
 
 Your application won't pass these tests, but from now on you can use them to
-check your progress with the command L<Mojolicious::Command::test>.
+check your progress.
 
-  $ ./myapp.pl test
-  $ ./myapp.pl test t/login.t
-  $ ./myapp.pl test -v t/login.t
+  $ prove -l
+  $ prove -l t/login.t
+  $ prove -l -v t/login.t
 
 Or perform quick requests right from the command line with
 L<Mojolicious::Command::get>.
@@ -556,7 +556,7 @@ possibilities.
 
 All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
-directories with the command L<Mojolicious::Command::inflate>.
+directories with the command L<Mojolicious::Command::Author::inflate>.
 
   $ ./myapp.pl inflate
 
@@ -821,15 +821,15 @@ powerful tool.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot more
-documentation and examples by many different authors.
+L<Mojolicious wiki|http://github.com/mojolicious/mojo/wiki>, which contains a
+lot more documentation and examples by many different authors.
 
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't
 hesitate to ask on the
 L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>
-(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
+channel C<#mojo> on C<irc.freenode.net> (L<chat
+now!|https://kiwiirc.com/nextclient/#irc://irc.freenode.net/mojo?nick=guest-?>).
 
 =cut

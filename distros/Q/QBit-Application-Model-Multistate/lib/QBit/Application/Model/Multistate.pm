@@ -1,5 +1,5 @@
 package QBit::Application::Model::Multistate;
-$QBit::Application::Model::Multistate::VERSION = '0.008';
+$QBit::Application::Model::Multistate::VERSION = '0.009';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -60,8 +60,6 @@ sub multistates_graph {
     while (!$prev_multistates_cnt || $prev_multistates_cnt != keys(%{$pkg_stash->{'__MULTISTATES__'}})) {
         $prev_multistates_cnt = keys(%{$pkg_stash->{'__MULTISTATES__'}});
         foreach my $action (@{$meta{'multistate_actions'} || []}) {
-            $action->{'action'} = $action->{'action'};
-
             throw gettext('Unknown action "%s"', $action->{'action'})
               unless exists($pkg_stash->{'__ACTIONS__'}{$action->{'action'}});
 
@@ -306,9 +304,9 @@ __END__
 =encoding utf8
 
 =head1 Name
- 
+
 QBit::Application::Model::Multistate - Class for working with multistates.
- 
+
 =head1 GitHub
 
 https://github.com/QBitFramework/QBit-Application-Model-Multistate
@@ -316,7 +314,7 @@ https://github.com/QBitFramework/QBit-Application-Model-Multistate
 =head1 Install
 
 =over
- 
+
 =item *
 
 cpanm QBit::Application::Model::Multistate

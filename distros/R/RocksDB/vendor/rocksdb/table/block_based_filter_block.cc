@@ -1,33 +1,55 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2012 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 #include "table/block_based_filter_block.h"
+#include <algorithm>
 
 #include "db/dbformat.h"
+#include "monitoring/perf_context_imp.h"
 #include "rocksdb/filter_policy.h"
 #include "util/coding.h"
+#include "util/string_util.h"
 
 namespace rocksdb {
 
 namespace {
-bool SamePrefix(const SliceTransform* prefix_extractor,
-                const Slice& key1, const Slice& key2) {
-  if (!prefix_extractor->InDomain(key1) &&
-      !prefix_extractor->InDomain(key2)) {
-    return true;
-  } else if (!prefix_extractor->InDomain(key1) ||
-             !prefix_extractor->InDomain(key2)) {
-    return false;
-  } else {
-    return (prefix_extractor->Transform(key1) ==
-            prefix_extractor->Transform(key2));
+
+void AppendItem(std::string* props, const std::string& key,
+                const std::string& value) {
+  char cspace = ' ';
+  std::string value_str("");
+  size_t i = 0;
+  const size_t dataLength = 64;
+  const size_t tabLength = 2;
+  const size_t offLength = 16;
+
+  value_str.append(&value[i], std::min(size_t(dataLength), value.size()));
+  i += dataLength;
+  while (i < value.size()) {
+    value_str.append("\n");
+    value_str.append(offLength, cspace);
+    value_str.append(&value[i], std::min(size_t(dataLength), value.size() - i));
+    i += dataLength;
   }
+
+  std::string result("");
+  if (key.size() < (offLength - tabLength))
+    result.append(size_t((offLength - tabLength)) - key.size(), cspace);
+  result.append(key);
+
+  props->append(result + ": " + value_str + "\n");
+}
+
+template <class TKey>
+void AppendItem(std::string* props, const TKey& key, const std::string& value) {
+  std::string key_str = rocksdb::ToString(key);
+  AppendItem(props, key_str, value);
 }
 }  // namespace
 
@@ -43,7 +65,10 @@ BlockBasedFilterBlockBuilder::BlockBasedFilterBlockBuilder(
     const BlockBasedTableOptions& table_opt)
     : policy_(table_opt.filter_policy.get()),
       prefix_extractor_(prefix_extractor),
-      whole_key_filtering_(table_opt.whole_key_filtering) {
+      whole_key_filtering_(table_opt.whole_key_filtering),
+      prev_prefix_start_(0),
+      prev_prefix_size_(0),
+      num_added_(0) {
   assert(policy_);
 }
 
@@ -56,18 +81,18 @@ void BlockBasedFilterBlockBuilder::StartBlock(uint64_t block_offset) {
 }
 
 void BlockBasedFilterBlockBuilder::Add(const Slice& key) {
-  added_to_start_ = 0;
-  if (whole_key_filtering_) {
-    AddKey(key);
-    added_to_start_ = 1;
-  }
   if (prefix_extractor_ && prefix_extractor_->InDomain(key)) {
     AddPrefix(key);
+  }
+
+  if (whole_key_filtering_) {
+    AddKey(key);
   }
 }
 
 // Add key to filter if needed
 inline void BlockBasedFilterBlockBuilder::AddKey(const Slice& key) {
+  num_added_++;
   start_.push_back(entries_.size());
   entries_.append(key.data(), key.size());
 }
@@ -76,24 +101,23 @@ inline void BlockBasedFilterBlockBuilder::AddKey(const Slice& key) {
 inline void BlockBasedFilterBlockBuilder::AddPrefix(const Slice& key) {
   // get slice for most recently added entry
   Slice prev;
-  if (start_.size() > added_to_start_) {
-    size_t prev_start = start_[start_.size() - 1 - added_to_start_];
-    const char* base = entries_.data() + prev_start;
-    size_t length = entries_.size() - prev_start;
-    prev = Slice(base, length);
+  if (prev_prefix_size_ > 0) {
+    prev = Slice(entries_.data() + prev_prefix_start_, prev_prefix_size_);
   }
 
-  // this assumes prefix(prefix(key)) == prefix(key), as the last
-  // entry in entries_ may be either a key or prefix, and we use
-  // prefix(last entry) to get the prefix of the last key.
-  if (prev.size() == 0 || !SamePrefix(prefix_extractor_, key, prev)) {
-    Slice prefix = prefix_extractor_->Transform(key);
-    start_.push_back(entries_.size());
-    entries_.append(prefix.data(), prefix.size());
+  Slice prefix = prefix_extractor_->Transform(key);
+  // insert prefix only when it's different from the previous prefix.
+  if (prev.size() == 0 || prefix != prev) {
+    prev_prefix_start_ = entries_.size();
+    prev_prefix_size_ = prefix.size();
+    AddKey(prefix);
   }
 }
 
-Slice BlockBasedFilterBlockBuilder::Finish() {
+Slice BlockBasedFilterBlockBuilder::Finish(const BlockHandle& /*tmp*/,
+                                           Status* status) {
+  // In this impl we ignore BlockHandle
+  *status = Status::OK();
   if (!start_.empty()) {
     GenerateFilter();
   }
@@ -134,14 +158,17 @@ void BlockBasedFilterBlockBuilder::GenerateFilter() {
   tmp_entries_.clear();
   entries_.clear();
   start_.clear();
+  prev_prefix_start_ = 0;
+  prev_prefix_size_ = 0;
 }
 
 BlockBasedFilterBlockReader::BlockBasedFilterBlockReader(
     const SliceTransform* prefix_extractor,
-    const BlockBasedTableOptions& table_opt, BlockContents&& contents)
-    : policy_(table_opt.filter_policy.get()),
+    const BlockBasedTableOptions& table_opt, bool _whole_key_filtering,
+    BlockContents&& contents, Statistics* stats)
+    : FilterBlockReader(contents.data.size(), stats, _whole_key_filtering),
+      policy_(table_opt.filter_policy.get()),
       prefix_extractor_(prefix_extractor),
-      whole_key_filtering_(table_opt.whole_key_filtering),
       data_(nullptr),
       offset_(nullptr),
       num_(0),
@@ -158,8 +185,10 @@ BlockBasedFilterBlockReader::BlockBasedFilterBlockReader(
   num_ = (n - 5 - last_word) / 4;
 }
 
-bool BlockBasedFilterBlockReader::KeyMayMatch(const Slice& key,
-                                              uint64_t block_offset) {
+bool BlockBasedFilterBlockReader::KeyMayMatch(
+    const Slice& key, const SliceTransform* /* prefix_extractor */,
+    uint64_t block_offset, const bool /*no_io*/,
+    const Slice* const /*const_ikey_ptr*/) {
   assert(block_offset != kNotValid);
   if (!whole_key_filtering_) {
     return true;
@@ -167,12 +196,11 @@ bool BlockBasedFilterBlockReader::KeyMayMatch(const Slice& key,
   return MayMatch(key, block_offset);
 }
 
-bool BlockBasedFilterBlockReader::PrefixMayMatch(const Slice& prefix,
-                                                 uint64_t block_offset) {
+bool BlockBasedFilterBlockReader::PrefixMayMatch(
+    const Slice& prefix, const SliceTransform* /* prefix_extractor */,
+    uint64_t block_offset, const bool /*no_io*/,
+    const Slice* const /*const_ikey_ptr*/) {
   assert(block_offset != kNotValid);
-  if (!prefix_extractor_) {
-    return true;
-  }
   return MayMatch(prefix, block_offset);
 }
 
@@ -184,7 +212,14 @@ bool BlockBasedFilterBlockReader::MayMatch(const Slice& entry,
     uint32_t limit = DecodeFixed32(offset_ + index * 4 + 4);
     if (start <= limit && limit <= (uint32_t)(offset_ - data_)) {
       Slice filter = Slice(data_ + start, limit - start);
-      return policy_->KeyMayMatch(entry, filter);
+      bool const may_match = policy_->KeyMayMatch(entry, filter);
+      if (may_match) {
+        PERF_COUNTER_ADD(bloom_sst_hit_count, 1);
+        return true;
+      } else {
+        PERF_COUNTER_ADD(bloom_sst_miss_count, 1);
+        return false;
+      }
     } else if (start == limit) {
       // Empty filters do not match any entries
       return false;
@@ -196,4 +231,25 @@ bool BlockBasedFilterBlockReader::MayMatch(const Slice& entry,
 size_t BlockBasedFilterBlockReader::ApproximateMemoryUsage() const {
   return num_ * 4 + 5 + (offset_ - data_);
 }
+
+std::string BlockBasedFilterBlockReader::ToString() const {
+  std::string result;
+  result.reserve(1024);
+
+  std::string s_bo("Block offset"), s_hd("Hex dump"), s_fb("# filter blocks");
+  AppendItem(&result, s_fb, rocksdb::ToString(num_));
+  AppendItem(&result, s_bo, s_hd);
+
+  for (size_t index = 0; index < num_; index++) {
+    uint32_t start = DecodeFixed32(offset_ + index * 4);
+    uint32_t limit = DecodeFixed32(offset_ + index * 4 + 4);
+
+    if (start != limit) {
+      result.append(" filter block # " + rocksdb::ToString(index + 1) + "\n");
+      Slice filter = Slice(data_ + start, limit - start);
+      AppendItem(&result, start, filter.ToString(true));
+    }
+  }
+  return result;
 }
+}  // namespace rocksdb

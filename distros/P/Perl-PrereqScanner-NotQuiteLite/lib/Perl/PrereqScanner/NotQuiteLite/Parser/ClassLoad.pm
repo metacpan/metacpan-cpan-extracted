@@ -104,7 +104,7 @@ sub parse_load_first_existing_class_args {
       $version = 0;
       next;
     }
-    if (ref $token and $token->[1] eq '{}') {
+    if (ref $token and ($token->[1] || '') eq '{}') {
       my $tokens_in_hashref = convert_string_tokens($token->[0]);
       while(my ($key, undef, $value, undef) = splice @$tokens_in_hashref, 0, 4) {
         if (ref $key and $key->[0] eq '-version' and is_version($value)) {

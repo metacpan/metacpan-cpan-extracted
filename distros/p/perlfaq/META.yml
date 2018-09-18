@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/perl-doc-cats/perlfaq/issues
   homepage: https://metacpan.org/release/perlfaq
   repository: https://github.com/perl-doc-cats/perlfaq.git
-version: '5.20180913'
+version: '5.20180915'
 x_Dist_Zilla:
   perl:
     version: '5.029002'
@@ -330,7 +330,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.20180913
+          tag: v5.20180915
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

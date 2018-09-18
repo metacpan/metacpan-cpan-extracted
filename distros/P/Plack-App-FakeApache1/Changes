@@ -1,5 +1,10 @@
 Revision history for Plack-App-FakeApache1
 
+0.0.6     2018-09-14 12:13:38+01:00 Europe/London
+ - Merged pull-request #17 from @tomhukins
+   - Remove an unused variable
+   - Remove a pointless use of try / catch
+
 0.0.5     2015-11-15 22:41:32+00:00 UTC
 
  - Merged pull-requests from Paul Cochrane:

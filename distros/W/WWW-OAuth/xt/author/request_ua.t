@@ -3,8 +3,10 @@ use warnings;
 
 use if $^O eq 'MSWin32', 'Test::More' => skip_all => 'Forking may be problematic on Windows';
 
+BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
+
 use Test::More;
-use Test::Needs { Mojolicious => '6.0' };
+use Test::Needs { Mojolicious => '7.54' };
 use Test::TCP;
 use HTTP::Tiny;
 use HTTP::Request;
@@ -50,6 +52,36 @@ my $mojo_req = oauth_request($tx->req);
 $tx = $mojo_req->request_with($ua);
 ok $tx->success, 'request succeeded';
 is $tx->res->body, 'foo', 'got response';
+
+$tx = $ua->build_tx(GET => "http://127.0.0.1:$port");
+$mojo_req = oauth_request($tx->req);
+my $got_response;
+$mojo_req->request_with($ua, sub {
+	my ($ua, $tx) = @_;
+	ok $tx->success, 'request succeeded';
+	is $tx->res->body, 'foo', 'got response';
+	$got_response = 1;
+	Mojo::IOLoop->stop;
+});
+my $timeout = Mojo::IOLoop->timer(1 => sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->start;
+Mojo::IOLoop->remove($timeout);
+ok $got_response, 'response was handled';
+
+$tx = $ua->build_tx(GET => "http://127.0.0.1:$port");
+$mojo_req = oauth_request($tx->req);
+undef $got_response;
+$mojo_req->request_with_p($ua)->then(sub {
+	my $tx = shift;
+	ok $tx->success, 'request succeeded';
+	is $tx->res->body, 'foo', 'got response';
+	$got_response = 1;
+	Mojo::IOLoop->stop;
+});
+$timeout = Mojo::IOLoop->timer(1 => sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->start;
+Mojo::IOLoop->remove($timeout);
+ok $got_response, 'response was handled';
 
 undef $server;
 

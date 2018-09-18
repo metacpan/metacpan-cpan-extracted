@@ -22,6 +22,7 @@ struct shared_keys {
 enum AccessorType {
     Inherited,
     InheritedCb,
+    InheritedCbNamed,
     PrivateClass,
     ObjectOnly,
     Constructor,
@@ -33,17 +34,18 @@ enum AccessorOpts {
     None       = 0,
     IsReadonly = 1,
     IsWeak     = 2,
-    PushName   = 4,
+    // flags below are not for instantiation
+    IsNamed    = 128,
 };
 
 /* 2 * last_element - 1 for template instantiation */
-#define AccessorOptsBF ((AccessorOpts)7)
+#define AccessorOptsBF ((AccessorOpts)3)
 
 /*
     - last indicies, so add '1' to obtain elements count
     - must have a value for each AccessorType element
     - '-2' will croak in av_extend() and is used as a guard
 */
-const int ALLOC_SIZE[] = {3, 3, 0, 0, -2, 1};
+const int ALLOC_SIZE[] = {3, 3, 3, 0, 0, -2, 1};
 
 #endif /* __INHERITED_XS_TYPES_H_ */

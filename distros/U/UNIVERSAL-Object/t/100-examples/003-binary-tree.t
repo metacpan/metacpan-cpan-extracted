@@ -52,6 +52,10 @@ Make the parent a weak-ref ... it is not right now.
     my $t = BinaryTree->new;
     ok($t->isa('BinaryTree'), '... this is a BinaryTree object');
 
+    is($t->node, undef, '... there is no node value');
+    $t->node(10);
+    is($t->node, 10, '... there is a node value now');
+
     ok(!$t->has_parent, '... this tree has no parent');
 
     ok(!$t->has_left, '... left node has not been created yet');
@@ -80,6 +84,7 @@ Make the parent a weak-ref ... it is not right now.
     use warnings;
 
     our @ISA; BEGIN { @ISA = ('BinaryTree') }
+    our %HAS; BEGIN { %HAS = (%BinaryTree::HAS) }
 }
 
 {

@@ -250,8 +250,7 @@ sub parse_summary {
 	    $summary{routerid} = _s2lIP($1);
 	    $summary{age}      = _time2sec($3);
 	    $summary{sequence} = "0x$4";
-	} elsif
-	  (/^LSID: $SIP\s+Network: $SIP\s+Netmask: $SIP\s+Cost: $DEC$/){
+	} elsif (/^LSID: $SIP\s+Network: $SIP\s+Netmask: $SIP\s+Cost: $DEC$/) {
 	    $summary{address} = _s2lIP($1);
 	    $summary{netmask} = _s2lIP($3);
 	    $summary{metric}  = $4;
@@ -283,7 +282,7 @@ sub parse_boundary {
 	    $boundary{routerid} = _s2lIP($1);
 	    $boundary{age}      = _time2sec($3);
 	    $boundary{sequence} = "0x$4";
-	} elsif (/^RouterID: $SIP\s+Cost: $DEC$/){
+	} elsif (/^RouterID: $SIP\s+Cost: $DEC$/) {
 	    $boundary{asbrouter} = _s2lIP($1);
 	    $boundary{metric}  = $2;
 	} elsif (/^Nexthops\b/) {
@@ -369,8 +368,7 @@ sub parse_externals {
 		age      => _time2sec($3),
 		sequence => "0x$4",
 	    };
-	} elsif
-	  (/^LSID: $SIP\s+Network: $SIP\s+Netmask: $SIP\s+Cost: $DEC$/){
+	} elsif (/^LSID: $SIP\s+Network: $SIP\s+Netmask: $SIP\s+Cost: $DEC$/) {
 	    $externals[-1]{address} = _s2lIP($1);
 	    $externals[-1]{netmask} = _s2lIP($3);
 	    $externals[-1]{metric}  = $4;

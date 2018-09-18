@@ -15,7 +15,7 @@ my %tmpargs = (
 
 my $tmp = File::Temp->new(%tmpargs);
 
-$0 = "script/gated2yaml";
+$0 = "./script/gated2yaml";
 @ARGV = ('-D', "example/gated.dump", $tmp->filename);
 my $done = do $0;
 ok(!$@, "$0 parse") or diag("Parse $0 failed: $@");

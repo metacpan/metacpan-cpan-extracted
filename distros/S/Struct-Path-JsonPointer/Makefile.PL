@@ -17,7 +17,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Clone'         => 0,
-        'Struct::Path'  => "0.80",
+        'Struct::Path'  => "0.82",
         'Test::More'    => 0,
     },
     PREREQ_PM => {

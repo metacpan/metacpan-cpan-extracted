@@ -1,12 +1,13 @@
 package Test::POE::Client::TCP;
-$Test::POE::Client::TCP::VERSION = '1.22';
+$Test::POE::Client::TCP::VERSION = '1.24';
 #ABSTRACT: A POE Component providing TCP client services for test cases
 
 use strict;
 use warnings;
 use POE qw(Wheel::SocketFactory Wheel::ReadWrite Filter::Line);
 use POSIX qw[ETIMEDOUT];
-use Socket;
+use Socket qw(AF_INET AF_INET6 SOCK_STREAM inet_ntoa inet_ntop inet_pton
+              unpack_sockaddr_in unpack_sockaddr_in6);
 use Carp qw(carp croak);
 
 our $GOT_SSL;
@@ -159,6 +160,8 @@ sub _connect {
     return;
   }
 
+  $self->{domain} =
+    defined( inet_pton( AF_INET6, $self->{address} ) ) ? AF_INET6 : AF_INET;
   $self->{factory} = POE::Wheel::SocketFactory->new(
     RemoteAddress  => $self->{address},
     RemotePort     => $self->{port},
@@ -166,7 +169,7 @@ sub _connect {
     ( defined $self->{port} ? ( BindPort => $self->{localport} ) : () ),
     SuccessEvent   => '_socket_up',
     FailureEvent   => '_socket_fail',
-    SocketDomain   => AF_INET,             # Sets the socket() domain
+    SocketDomain   => $self->{domain},     # Sets the socket() domain
     SocketType     => SOCK_STREAM,         # Sets the socket() type
     SocketProtocol => 'tcp',               # Sets the socket() protocol
     Reuse          => 'yes',               # Lets the port be reused
@@ -178,9 +181,12 @@ sub _connect {
 
 sub _socket_up {
   my ($kernel,$self,$socket,$peeraddr,$peerport) = @_[KERNEL,OBJECT,ARG0..ARG2];
-  my $sockaddr = inet_ntoa( ( unpack_sockaddr_in ( CORE::getsockname $socket ) )[1] );
-  my $sockport = ( unpack_sockaddr_in ( CORE::getsockname $socket ) )[0];
-  $peeraddr = inet_ntoa( $peeraddr );
+  my @sockaddr = ( $self->{domain} == AF_INET6 )
+               ? unpack_sockaddr_in6 ( CORE::getsockname $socket )
+               : unpack_sockaddr_in  ( CORE::getsockname $socket );
+  my $sockaddr = inet_ntop( $self->{domain}, $sockaddr[1] );
+  my $sockport = $sockaddr[0];
+  $peeraddr = inet_ntop( $self->{domain}, $peeraddr );
   $kernel->delay( '_timeout' );
 
   delete $self->{factory};
@@ -505,7 +511,7 @@ Test::POE::Client::TCP - A POE Component providing TCP client services for test 
 
 =head1 VERSION
 
-version 1.22
+version 1.24
 
 =head1 SYNOPSIS
 

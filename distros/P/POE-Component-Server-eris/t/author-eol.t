@@ -22,6 +22,7 @@ my @files = (
     't/author-critic.t',
     't/author-eol.t',
     't/author-pod-coverage.t',
+    't/author-pod-spell.t',
     't/author-pod-syntax.t'
 );
 

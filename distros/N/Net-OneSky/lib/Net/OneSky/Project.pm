@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Net::OneSky::Project;
-$Net::OneSky::Project::VERSION = '0.0.1';
+$Net::OneSky::Project::VERSION = '0.0.2';
 use namespace::autoclean;
 use Moose;
 
@@ -140,7 +140,7 @@ Net::OneSky::Project - OneSky Project interface https://github.com/onesky/api-do
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 

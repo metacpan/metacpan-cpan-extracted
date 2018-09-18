@@ -98,7 +98,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 
@@ -299,7 +299,7 @@ sub image_data_diff
 	}
     }
     # No difference.
-    return;
+    return undef;
 }
 
 sub png_compare

@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -92,6 +92,10 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ( $^O =~ /win/i ) {
+	$WriteMakefileArgs{PREREQ_PM}{'Log::Log4perl'} = $FallbackPrereqs{'Log::Log4perl'} = '<= 1.47';
+}
 
 WriteMakefile(%WriteMakefileArgs);
 

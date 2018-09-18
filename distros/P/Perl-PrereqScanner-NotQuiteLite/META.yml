@@ -19,11 +19,10 @@ no_index:
   directory:
     - t
     - inc
-recommends:
-  Data::Dump: '0'
 requires:
   CPAN::Meta::Prereqs: '2.150010'
   CPAN::Meta::Requirements: '2.140'
+  Data::Dump: '0'
   Exporter: '5.57'
   Module::CPANfile: '1.1003'
   Module::CoreList: '2.99'
@@ -33,5 +32,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: git://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite
-version: '0.94'
+version: '0.96'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,8 +1,9 @@
 package Plack::App::FakeModPerl1;
+
 {
   $Plack::App::FakeModPerl1::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeModPerl1::VERSION = '0.0.5';
+$Plack::App::FakeModPerl1::VERSION = '0.0.6';
 # ABSTRACT: Mimic Apache's mod_perl1
 use 5.10.1;
 use Moose;
@@ -25,7 +26,6 @@ sub handle_psgi {
     my $env         = shift;
     my $config_file = shift;
     my $plack = Plack::App::FakeModPerl1->new( env => $env );
-    my $session = $env->{'psgix.session'};
 
     # derive where to dispatch to based on <Location>s in apache config
     my $dispatcher = Plack::App::FakeModPerl1::Dispatcher->new(
@@ -167,7 +167,7 @@ Plack::App::FakeModPerl1 - Mimic Apache's mod_perl1
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 BORROWED HEAVILY FROM
 

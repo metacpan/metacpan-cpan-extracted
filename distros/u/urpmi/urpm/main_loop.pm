@@ -223,6 +223,7 @@ sub _init_common_options {
       callback_open_helper => $callbacks->{open_helper},
       callback_trans => $callbacks->{trans},
       callback_uninst => $callbacks->{uninst},
+      callback_verify => $callbacks->{verify},
       raw_message => 1,
   );
 }

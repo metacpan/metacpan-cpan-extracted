@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use ExtUtils::Manifest;
 
 my %d;
@@ -33,6 +33,13 @@ EOT
     }
     else {
         print <<EOT;
+
+Both DBD::MariaDB and DBD::mysql are supported by MySQL_DBI driver. The
+default is DBD::mysql. To use DBD::MariaDB add dbi_driver=mariadb option
+to DSN (e.g. OS:MySQL_DBI:test_fs;dbi_driver=MariaDB;table_type=InnoDB).
+
+The DBI driver needs to be installed separately, it is not pulled in by
+XAO::FS.
 
 Enter database connection parameters.
 
@@ -87,12 +94,12 @@ WriteMakefile(
     'VERSION_FROM'      => 'FS.pm',
     'MIN_PERL_VERSION'  => '5.10.1',
     'PREREQ_PM'         => {
-        'DBD::mysql'        => '2.0414',
         'DBI'               => '1.13',
         'Error'             => '0.15',
         'XAO::Base'         => '1.20',
     },
     'BUILD_REQUIRES' => {
+        'ExtUtils::MakeMaker' => '6.64',
         'Pod::Usage'        => '1.12',
     },
     'TEST_REQUIRES' => {

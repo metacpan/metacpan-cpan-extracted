@@ -4,7 +4,7 @@ package Types::ElasticSearch;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use Type::Library -base;
 use Type::Tiny;
@@ -24,15 +24,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Types::ElasticSearch - Types for working with ElasticSearch
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 AUTHOR
 

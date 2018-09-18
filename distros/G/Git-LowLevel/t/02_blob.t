@@ -10,6 +10,10 @@ require_ok( 'Git::LowLevel::Reference') or BAIL_OUT "Can't load Git::LowLevel::R
 require_ok( 'Git::LowLevel::Tree')      or BAIL_OUT "Can't load Git::LowLevel::Tree";
 require_ok( 'Git::LowLevel::Blob')      or BAIL_OUT "Can't load Git::LowLevel::Blob";
 
+# for more debug information get us git version
+my $git_version=readpipe("git --version");
+chomp($git_version);
+$git_version = "(" . $git_version . ")";
 
 #get us a temporary directory for the test git repository
 my $git_dir     = tempdir( CLEANUP => 1 );
@@ -25,27 +29,27 @@ my $tree       = $ref->getTree();
 my $blob=$tree->newBlob();
 $blob->path("test");
 $blob->_content("this is a test");
-lives_ok {$tree->add($blob)} "add Git::LowLevel::Blob object to tree";
-dies_ok {$tree->add("string")} "add a string to tree";
+lives_ok {$tree->add($blob)} "add Git::LowLevel::Blob object to tree " . $git_version;
+dies_ok {$tree->add("string")} "add a string to tree" . $git_version;
 
 # check if tree is not empty anymore
-ok(!$tree->empty(),"tree not empty after adding blob");
+ok(!$tree->empty(),"tree not empty after adding blob" . $git_version);
 
 #commit the tree to the reference
-lives_ok {$ref->commit("added blob")} "commit the tree to the reference";
+lives_ok {$ref->commit("added blob")} "commit the tree to the reference " . $git_version;
 
 # create a new repository object and check if everything just created exist
 my $repository2 = Git::LowLevel->new(git_dir=>$git_dir);
 my $ref2        = $repository2->getReference("refs/heads/branch");
 
 #now check if the reference exist
-ok($ref2->exist(), "creating/commiting worked");
+ok($ref2->exist(), "creating/commiting worked" . $git_version);
 
 my $tree2 = $ref2->getTree();
-ok(!$tree2->empty(), "tree ist not empty after creating blob");
+ok(!$tree2->empty(), "tree ist not empty after creating blob " . $git_version );
 
 #check if we can find the blob
 my $file = $tree->find("test");
 
-ok(defined($file), "blob test found");
-ok($file->content() eq "this is a test", "check correct content of blob");
+ok(defined($file), "blob test found " . $git_version);
+ok($file->content() eq "this is a test", "check correct content of blob " .$git_version);

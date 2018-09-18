@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use JSON::MaybeXS;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
@@ -52,15 +52,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities::HTTPRequest - Allow for strange content elements for Elasticsearch APIs
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

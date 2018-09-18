@@ -1,9 +1,13 @@
-//  Copyright (c) 2014, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #include "util/sync_point.h"
+#include "util/sync_point_impl.h"
+
+int rocksdb_kill_odds = 0;
+std::vector<std::string> rocksdb_kill_prefix_blacklist;
 
 #ifndef NDEBUG
 namespace rocksdb {
@@ -13,51 +17,51 @@ SyncPoint* SyncPoint::GetInstance() {
   return &sync_point;
 }
 
-void SyncPoint::LoadDependency(const std::vector<Dependency>& dependencies) {
-  successors_.clear();
-  predecessors_.clear();
-  cleared_points_.clear();
-  for (const auto& dependency : dependencies) {
-    successors_[dependency.predecessor].push_back(dependency.successor);
-    predecessors_[dependency.successor].push_back(dependency.predecessor);
-  }
+SyncPoint::SyncPoint() : 
+  impl_(new Data) {
 }
 
-bool SyncPoint::PredecessorsAllCleared(const std::string& point) {
-  for (const auto& pred : predecessors_[point]) {
-    if (cleared_points_.count(pred) == 0) {
-      return false;
-    }
-  }
-  return true;
+SyncPoint:: ~SyncPoint() {
+  delete impl_;
+}
+
+void SyncPoint::LoadDependency(const std::vector<SyncPointPair>& dependencies) {
+  impl_->LoadDependency(dependencies);
+}
+
+void SyncPoint::LoadDependencyAndMarkers(
+  const std::vector<SyncPointPair>& dependencies,
+  const std::vector<SyncPointPair>& markers) {
+  impl_->LoadDependencyAndMarkers(dependencies, markers);
+}
+
+void SyncPoint::SetCallBack(const std::string& point,
+  const std::function<void(void*)>& callback) {
+  impl_->SetCallBack(point, callback);
+}
+
+void SyncPoint::ClearCallBack(const std::string& point) {
+  impl_->ClearCallBack(point);
+}
+
+void SyncPoint::ClearAllCallBacks() {
+  impl_->ClearAllCallBacks();
 }
 
 void SyncPoint::EnableProcessing() {
-  std::unique_lock<std::mutex> lock(mutex_);
-  enabled_ = true;
+  impl_->EnableProcessing();
 }
 
 void SyncPoint::DisableProcessing() {
-  std::unique_lock<std::mutex> lock(mutex_);
-  enabled_ = false;
+  impl_->DisableProcessing();
 }
 
 void SyncPoint::ClearTrace() {
-  std::unique_lock<std::mutex> lock(mutex_);
-  cleared_points_.clear();
+  impl_->ClearTrace();
 }
 
-void SyncPoint::Process(const std::string& point) {
-  std::unique_lock<std::mutex> lock(mutex_);
-
-  if (!enabled_) return;
-
-  while (!PredecessorsAllCleared(point)) {
-    cv_.wait(lock);
-  }
-
-  cleared_points_.insert(point);
-  cv_.notify_all();
+void SyncPoint::Process(const std::string& point, void* cb_arg) {
+  impl_->Process(point, cb_arg);
 }
 
 }  // namespace rocksdb

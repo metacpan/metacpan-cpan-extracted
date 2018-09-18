@@ -1,11 +1,9 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Test::Mojo;
+use Test::Memory::Cycle;
 use File::Temp qw/:POSIX tempdir/;
-
-use lib 'lib';
-use lib '../lib';
 
 use_ok 'Mojolicious::Plugin::CHI';
 
@@ -60,3 +58,5 @@ ok($c->chi->set('key_3' => '-Wert 3'), '-Wert3');
 is($c->chi->get('key_1'), '-Wert 1', '-Wert 1');
 is($c->chi->get('key_2'), '-Wert 2', '-Wert 2');
 is($c->chi->get('key_3'), '-Wert 3', '-Wert 3');
+
+memory_cycle_ok($app, 'Test for memory cycle');

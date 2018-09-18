@@ -217,15 +217,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

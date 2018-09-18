@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -469,25 +469,13 @@ Defaults to 10.
 
 Defaults to 1.
 
-=item expanded_compaction_factor :Int
+=item max_compaction_bytes: Int
 
-Defaults to 25.
-
-=item source_compaction_factor :Int
-
-Defaults to 1.
-
-=item max_grandparent_overlap_factor :Int
-
-Defaults to 10.
+Defaults to target_file_size_base * 25.
 
 =item enable_statistics :Bool
 
 Defaults to false. See L<RocksDB::Statistics>.
-
-=item disableDataSync :Bool
-
-Defaults to false.
 
 =item use_fsync :Bool
 
@@ -545,10 +533,6 @@ Defaults to MAX_INT.
 
 Defaults to 4.
 
-=item table_cache_remove_scan_count_limit :Int
-
-Defaults to 16.
-
 =item arena_block_size :Int
 
 Defaults to 0.
@@ -570,10 +554,6 @@ Defaults to 0.
 Defaults to 4MB.
 
 =item purge_redundant_kvs_while_flush :Bool
-
-Defaults to true.
-
-=item allow_os_buffer :Bool
 
 Defaults to true.
 
@@ -626,10 +606,6 @@ Defaults to 'level'. It can be specified using the following arguments.
   universal
   fifo
 
-=item verify_checksums_in_compaction :Bool
-
-Defaults to true.
-
 =item compaction_options_universal :HashRef
 
 See 'Universal compaction options' section below.
@@ -637,10 +613,6 @@ See 'Universal compaction options' section below.
 =item compaction_options_fifo :HashRef
 
 See 'FIFO compaction options' section below.
-
-=item filter_deletes :Bool
-
-Defaults to false.
 
 =item max_sequential_skip_in_iterations :Int
 
@@ -654,17 +626,9 @@ Defaults to false.
 
 Defaults to 10000, if inplace_update_support = true, else 0.
 
-=item memtable_prefix_bloom_bits :Int
+=item memtable_prefix_bloom_size_ratio :Int
 
-If prefix_extractor is set and bloom_bits is not 0, create prefix bloom for memtable.
-
-=item memtable_prefix_bloom_probes :Int
-
-Number of hash probes per key.
-
-=item memtable_prefix_bloom_huge_page_tlb_size :Int
-
-Page size for huge page TLB for bloom in memtable. If <=0, not allocate from huge page TLB but from malloc.
+Defaults to 0 (disable).
 
 =item bloom_locality :Int
 
@@ -673,10 +637,6 @@ Defaults to 0.
 =item max_successive_merges :Int
 
 Defaults to 0 (disabled).
-
-=item min_partial_merge_operands :Int
-
-Defaults to 2.
 
 =item block_based_table_options :HashRef
 
@@ -907,10 +867,6 @@ Defaults to false.
 =item disableWAL :Bool
 
 Defaults to false.
-
-=item timeout_hint_us :Int
-
-Defaults to 0.
 
 =back
 

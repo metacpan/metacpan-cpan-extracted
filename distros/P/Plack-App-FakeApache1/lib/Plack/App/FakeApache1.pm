@@ -1,8 +1,9 @@
 package Plack::App::FakeApache1;
+
 {
   $Plack::App::FakeApache1::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeApache1::VERSION = '0.0.5';
+$Plack::App::FakeApache1::VERSION = '0.0.6';
 # ABSTRACT: Perl distro to aid in mod_perl1->PSGI migration
 use strict;
 use warnings;
@@ -75,7 +76,7 @@ Plack::App::FakeApache1 - Perl distro to aid in mod_perl1->PSGI migration
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 AUTHOR
 

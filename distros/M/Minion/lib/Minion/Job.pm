@@ -271,9 +271,9 @@ exception otherwise.
   my $bool = $job->fail('Something went wrong!');
   my $bool = $job->fail({whatever => 'Something went wrong!'});
 
-Transition from C<active> to C<failed> state, and if there are attempts
-remaining, transition back to C<inactive> with a delay based on
-L<Minion/"backoff">.
+Transition from C<active> to C<failed> state with or without a result, and if
+there are attempts remaining, transition back to C<inactive> with a delay based
+on L<Minion/"backoff">.
 
 =head2 finish
 
@@ -281,7 +281,7 @@ L<Minion/"backoff">.
   my $bool = $job->finish('All went well!');
   my $bool = $job->finish({whatever => 'All went well!'});
 
-Transition from C<active> to C<finished> state.
+Transition from C<active> to C<finished> state with or without a result.
 
 =head2 info
 
@@ -510,6 +510,6 @@ Stop job performed with L</"start"> immediately.
 
 =head1 SEE ALSO
 
-L<Minion>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Minion>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

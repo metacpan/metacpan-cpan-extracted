@@ -8,6 +8,10 @@ use Perl::PrereqScanner::NotQuiteLite::Util;
 
 my %defined_keywords = _keywords();
 
+my %default_conditional_keywords = map {$_ => 1} qw(
+  if elsif unless else
+);
+
 my %default_expects_expr_block = map {$_ => 1} qw(
   if elsif unless given when
   for foreach while until
@@ -294,12 +298,34 @@ sub token_expects_word {
   return 0;
 }
 
+sub token_is_conditional {
+  my ($self, $token) = @_;
+  return 1 if exists $default_conditional_keywords{$token};
+  return 0 if !exists $self->{is_conditional_keyword};
+  return 1 if exists $self->{is_conditional_keyword}{$token};
+  return 0;
+}
+
 sub token_is_keyword {
   my ($self, $token) = @_;
   return 1 if exists $defined_keywords{$token};
   return 0 if !exists $self->{defined_keywords};
   return 1 if exists $self->{defined_keywords}{$token};
   return 0;
+}
+
+sub register_keywords {
+  my ($self, @keywords) = @_;
+  for my $keyword (@keywords) {
+    $self->{defined_keywords}{$keyword} = 0;
+  }
+}
+
+sub remove_keywords {
+  my ($self, @keywords) = @_;
+  for my $keyword (@keywords) {
+    delete $self->{defined_keywords}{$keyword} if exists $self->{defined_keywords}{$keyword} and !$self->{defined_keywords}{$keyword};
+  }
 }
 
 sub register_sub_keywords {
@@ -323,6 +349,26 @@ sub token_defines_sub {
 sub enables_utf8 {
   my ($self, $module) = @_;
   exists $enables_utf8{$module} ? 1 : 0;
+}
+
+sub add_package {
+  my ($self, $package) = @_;
+  $self->{packages}{$package} = 1;
+}
+
+sub packages {
+  my $self = shift;
+  keys %{$self->{packages} || {}};
+}
+
+sub remove_inner_packages_from_requirements {
+  my $self = shift;
+  for my $package ($self->packages) {
+    for my $rel (qw/requires recommends suggests noes/) {
+      next unless $self->{$rel};
+      $self->{$rel}->clear_requirement($package);
+    }
+  }
 }
 
 sub _keywords {(

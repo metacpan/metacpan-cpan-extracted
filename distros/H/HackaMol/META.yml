@@ -40,5 +40,5 @@ requires:
 resources:
   homepage: https://github.com/demianriccardi/p5-HackaMol
   repository: https://github.com/demianriccardi/p5-HackaMol.git
-version: '0.049'
+version: '0.050'
 x_serialization_backend: 'YAML::Tiny version 1.70'

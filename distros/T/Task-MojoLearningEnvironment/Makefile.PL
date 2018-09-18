@@ -40,7 +40,7 @@ use File::Spec::Functions qw(catfile);
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/briandfoy/Task-MojoLearningEnvironment';
+my $github    = 'https://github.com/briandfoy/task-mojolearningenvironment.git';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'	       => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'LICENSE'      => 'perl',
+	'LICENSE'      => 'artistic_2',
 	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
 
 	'EXE_FILES' => [ qw() ],
@@ -66,13 +66,20 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
-		'local::lib'   => '0',
-		'Mojolicious'  => '0',
-		'Redis'        => '0',
-		'DBI'          => '0',
-		'DBD::SQLite'  => '0',
-		'Sereal'       => '0',
-		'XML::Twig'    => '0',
+		'Carp'              => '0',
+		'DBD::SQLite'       => '0',
+		'DBI'               => '0',
+		'EV'                => '4',
+		'IO::Socket::Socks' => '0.64',
+		'IO::Socket::SSL'   => '2.009',
+		'local::lib'        => '0',
+		'Mojo::Pg'          => '0',
+		'Mojolicious'       => '0',
+		'Net::DNS::Native'  => '0.15',
+		'Redis'             => '0',
+		'Role::Tiny'        => '0',
+		'Sereal'            => '0',
+		'XML::Twig'         => '0',
 		},
 
 	'META_MERGE' => {

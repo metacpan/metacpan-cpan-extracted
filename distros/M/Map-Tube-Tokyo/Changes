@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Tokyo
 
+0.50  Fri Sep 14 18:30:00 2018
+      - Updated dependency on Map::Tube v3.56.
+
 0.49  Sun Aug 19 13:30:00 2018
       - Updated dependency on Map::Tube v3.55.
 

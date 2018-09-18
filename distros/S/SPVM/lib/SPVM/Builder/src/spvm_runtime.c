@@ -27,6 +27,7 @@
 #include "spvm_runtime_info_type.h"
 #include "spvm_runtime_info_switch_info.h"
 #include "spvm_runtime_info_case_info.h"
+#include "spvm_portable.h"
 
 // Only use for constant value
 #include "spvm_type.h"
@@ -279,16 +280,39 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
       case SPVM_OPCODE_C_ID_LE_DOUBLE:
         condition_flag = *(double*)&vars[opcode->operand0] <= *(double*)&vars[opcode->operand1];
         break;
-      case SPVM_OPCODE_C_ID_ISA:
-      {
+      case SPVM_OPCODE_C_ID_ISA_OBJECT: {
         void* object = *(void**)&vars[opcode->operand0];
-
         int32_t rel_id = opcode->operand1;
         SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
-        int32_t basic_type_id = type->basic_type_id;
-        int32_t dimension = type->dimension;
+        int32_t check_basic_type_id = type->basic_type_id;
+        int32_t check_type_dimension = type->dimension;
         
-        condition_flag = (*(int32_t*)(object + (intptr_t)env->object_basic_type_id_byte_offset) == basic_type_id && *(int32_t*)(object + (intptr_t)env->object_type_dimension_byte_offset) == dimension);
+        if (object) {
+          int32_t object_basic_type_id = *(int32_t*)(object + (intptr_t)env->object_basic_type_id_byte_offset);
+          int32_t object_type_dimension = *(int32_t*)(object + (intptr_t)env->object_type_dimension_byte_offset);
+          condition_flag = (object_basic_type_id == check_basic_type_id && object_type_dimension == check_type_dimension);
+        }
+        else {
+          condition_flag = 0;
+        }
+        
+        break;
+      }
+      case SPVM_OPCODE_C_ID_ISA_INTERFACE: {
+        void* object = *(void**)&vars[opcode->operand0];
+        int32_t rel_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t check_basic_type_id = type->basic_type_id;
+        int32_t check_type_dimension = type->dimension;
+        
+        if (object) {
+          int32_t object_basic_type_id = *(int32_t*)(object + (intptr_t)env->object_basic_type_id_byte_offset);
+          int32_t object_type_dimension = *(int32_t*)(object + (intptr_t)env->object_type_dimension_byte_offset);
+          condition_flag = env->has_interface(env, object_basic_type_id, object_type_dimension, check_basic_type_id, check_type_dimension);
+        }
+        else {
+          condition_flag = 0;
+        }
         
         break;
       }
@@ -812,6 +836,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
       case SPVM_OPCODE_C_ID_ARRAY_FETCH_OBJECT: {
         void* array = *(void**)&vars[opcode->operand1];
         int32_t index = *(SPVM_VALUE_int*)&vars[opcode->operand2];
+        
         if (__builtin_expect(!array, 0)) {
           void* exception = env->new_string_raw(env, "Array must not be undef", 0);
           env->set_exception(env, exception);
@@ -1771,14 +1796,16 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_BYTE_ARRAY: {
-        
-        // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand1];
-        
-        void* object = env->new_byte_array_raw(env, length);
-        
-        // Set array
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_byte_array_raw(env, length);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_SHORT_ARRAY: {
@@ -1786,10 +1813,17 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand1];
         
-        void* object = env->new_short_array_raw(env, length);
-        
-        // Set array
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_short_array_raw(env, length);
+          
+          // Set array
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_INT_ARRAY: {
@@ -1797,43 +1831,60 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand1];
         
-        void* object = env->new_int_array_raw(env, length);
+        if (length >= 0) {
+          void* object = env->new_int_array_raw(env, length);
+          
+          // Set array
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         
-        // Set array
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_LONG_ARRAY: {
         
-        // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand1];
-        
-        void* object = env->new_long_array_raw(env, length);
-        
-        // Set array
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_long_array_raw(env, length);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_FLOAT_ARRAY: {
         
-        // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand1];
-        
-        void* object = env->new_float_array_raw(env, length);
-        
-        // Set array
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_float_array_raw(env, length);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_DOUBLE_ARRAY: {
         
-        // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand1];
-        
-        void* object = env->new_double_array_raw(env, length);
-        
-        // Set array
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_double_array_raw(env, length);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT_ARRAY: {
@@ -1841,13 +1892,16 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
         int32_t basic_type_id = type->basic_type_id;
         
-        // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand2];
-        
-        void* object = env->new_object_array_raw(env, basic_type_id, length);
-        
-        // Set object
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_object_array_raw(env, basic_type_id, length);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_MULTI_ARRAY: {
@@ -1856,13 +1910,16 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         int32_t basic_type_id = type->basic_type_id;
         int32_t element_dimension = type->dimension - 1;
         
-        // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand2];
-        
-        void* object = env->new_multi_array_raw(env, basic_type_id, element_dimension, length);
-        
-        // Set object
-        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_multi_array_raw(env, basic_type_id, element_dimension, length);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_VALUE_T_ARRAY: {
@@ -1873,10 +1930,17 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         // length
         int32_t length = *(SPVM_VALUE_int*)&vars[opcode->operand2];
         
-        void* object = env->new_value_t_array_raw(env, basic_type_id, length);
-        
-        // Set object
-        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (length >= 0) {
+          void* object = env->new_value_t_array_raw(env, basic_type_id, length);
+          
+          // Set object
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        }
+        else {
+          void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_STRING: {
@@ -1914,12 +1978,22 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         break;
       }
       case SPVM_OPCODE_C_ID_CONCAT: {
-        void* concat_string = env->concat(env, *(void**)&vars[opcode->operand1], *(void**)&vars[opcode->operand2]);
-        if (concat_string == NULL) {
+        
+        void* string1 = *(void**)&vars[opcode->operand1];
+        void* string2 = *(void**)&vars[opcode->operand2];
+        if (string1 == NULL) {
+          void* exception = env->new_string_raw(env, "\".\" operater left value must be defined", 0);
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else if (string2 == NULL) {
+          void* exception = env->new_string_raw(env, "\".\" operater right value must be defined", 0);
+          env->set_exception(env, exception);
           exception_flag = 1;
         }
         else {
-          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], concat_string);
+          void* string3 = env->concat(env, string1, string2);
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], string3);
         }
         
         break;
@@ -1981,22 +2055,50 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         call_sub_arg_stack_top++;
         
         break;
-      case SPVM_OPCODE_C_ID_CAST: {
+      case SPVM_OPCODE_C_ID_CHECK_OBJECT_TYPE: {
         void* object = *(void**)&vars[opcode->operand1];
-
-        int32_t rel_id = opcode->operand2;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
-        int32_t cast_basic_type_id = type->basic_type_id;
-        int32_t cast_type_dimension = type->dimension;
         
-        _Bool can_cast = env->check_cast(env, cast_basic_type_id, cast_type_dimension, object);
-        if (can_cast) {
-          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+        if (object != NULL) {
+          int32_t rel_id = opcode->operand2;
+          SPVM_RUNTIME_INFO_TYPE* check_type = &runtime->info_types[sub->info_types_base + rel_id];
+          int32_t check_basic_type_id = check_type->basic_type_id;
+          int32_t check_type_dimension = check_type->dimension;
+          
+          int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+          int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+          
+          if (object_basic_type_id == check_basic_type_id && object_type_dimension_id == check_type_dimension) {
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)&vars[opcode->operand1]);
+          }
+          else {
+            void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
         }
-        else {
-          void* exception = env->new_string_raw(env, "Can't cast uncompatible type.", 0);
-          env->set_exception(env, exception);
-          exception_flag = 1;
+        
+        break;
+      }
+      case SPVM_OPCODE_C_ID_CHECK_INTERFACE_TYPE: {
+        void* object = *(void**)&vars[opcode->operand1];
+        
+        if (object != NULL) {
+          int32_t rel_id = opcode->operand2;
+          SPVM_RUNTIME_INFO_TYPE* interface_type = &runtime->info_types[sub->info_types_base + rel_id];
+          int32_t interface_basic_type_id = interface_type->basic_type_id;
+          int32_t interface_type_dimension = interface_type->dimension;
+          
+          int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+          int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+          
+          if (env->has_interface(env, object_basic_type_id, object_type_dimension_id, interface_basic_type_id, interface_type_dimension)) {
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)&vars[opcode->operand1]);
+          }
+          else {
+            void* exception = env->new_string_raw(env, "Can't convert imcompatible interface type.", 0);
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
         }
         
         break;
@@ -2182,9 +2284,6 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         }
         
         continue;
-      }
-      case SPVM_OPCODE_C_ID_END_SUB: {
-        goto label_END_SUB;
       }
       case SPVM_OPCODE_C_ID_REF:
         *(void**)&vars[opcode->operand0] = &vars[opcode->operand1];
@@ -2668,6 +2767,204 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
             
             break;
           }
+          case SPVM_OPCODE_C_ID_END_SUB: {
+            goto label_END_SUB;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_BYTE_OBJECT: {
+            SPVM_VALUE_byte value = *(SPVM_VALUE_byte*)&vars[opcode->operand1];
+            int32_t basic_type_id = (intptr_t)(void*)env->basic_type_id_byte_object;
+            
+            void* object = env->new_object_raw(env, basic_type_id);
+            SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+            *(SPVM_VALUE_byte*)&fields[0] = value;
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_SHORT_OBJECT: {
+            SPVM_VALUE_short value = *(SPVM_VALUE_short*)&vars[opcode->operand1];
+            int32_t basic_type_id = (intptr_t)(void*)env->basic_type_id_short_object;
+            void* object = env->new_object_raw(env, basic_type_id);
+            SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+            *(SPVM_VALUE_short*)&fields[0] = value;
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_INT_TO_INT_OBJECT: {
+            SPVM_VALUE_int value = *(SPVM_VALUE_int*)&vars[opcode->operand1];
+            int32_t basic_type_id = (intptr_t)(void*)env->basic_type_id_int_object;
+            void* object = env->new_object_raw(env, basic_type_id);
+            SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+            *(SPVM_VALUE_int*)&fields[0] = value;
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_LONG_OBJECT: {
+            SPVM_VALUE_long value = *(SPVM_VALUE_long*)&vars[opcode->operand1];
+            int32_t basic_type_id = (intptr_t)(void*)env->basic_type_id_long_object;
+            void* object = env->new_object_raw(env, basic_type_id);
+            SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+            *(SPVM_VALUE_long*)&fields[0] = value;
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_FLOAT_OBJECT: {
+            SPVM_VALUE_float value = *(SPVM_VALUE_float*)&vars[opcode->operand1];
+            int32_t basic_type_id = (intptr_t)(void*)env->basic_type_id_float_object;
+            void* object = env->new_object_raw(env, basic_type_id);
+            SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+            *(SPVM_VALUE_float*)&fields[0] = value;
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_DOUBLE_OBJECT: {
+            SPVM_VALUE_double value = *(SPVM_VALUE_double*)&vars[opcode->operand1];
+            int32_t basic_type_id = (intptr_t)(void*)env->basic_type_id_double_object;
+            void* object = env->new_object_raw(env, basic_type_id);
+            SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+            *(SPVM_VALUE_double*)&fields[0] = value;
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_BYTE_OBJECT_TO_BYTE: {
+            void* object = *(void**)&vars[opcode->operand1];
+            if (object == NULL) {
+              void* exception = env->new_string_raw(env, "Can't convert undef value.", 0);
+              env->set_exception(env, exception);
+              exception_flag = 1;
+            }
+            else {
+              int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+              int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+              if (object_basic_type_id == (intptr_t)(void*)env->basic_type_id_byte_object && object_type_dimension_id == 0) {
+                SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+                *(SPVM_VALUE_byte*)&vars[opcode->operand0] = *(SPVM_VALUE_byte*)&fields[0];
+              }
+              else {
+                void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+                env->set_exception(env, exception);
+                exception_flag = 1;
+              }
+            }
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_SHORT_OBJECT_TO_SHORT: {
+            void* object = *(void**)&vars[opcode->operand1];
+            if (object == NULL) {
+              void* exception = env->new_string_raw(env, "Can't convert undef value.", 0);
+              env->set_exception(env, exception);
+              exception_flag = 1;
+            }
+            else {
+              int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+              int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+              if (object_basic_type_id == (intptr_t)(void*)env->basic_type_id_short_object && object_type_dimension_id == 0) {
+                SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+                *(SPVM_VALUE_short*)&vars[opcode->operand0] = *(SPVM_VALUE_short*)&fields[0];
+              }
+              else {
+                void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+                env->set_exception(env, exception);
+                exception_flag = 1;
+              }
+            }
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_INT_OBJECT_TO_INT: {
+            void* object = *(void**)&vars[opcode->operand1];
+            if (object == NULL) {
+              void* exception = env->new_string_raw(env, "Can't convert undef value.", 0);
+              env->set_exception(env, exception);
+              exception_flag = 1;
+            }
+            else {
+              int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+              int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+              if (object_basic_type_id == (intptr_t)(void*)env->basic_type_id_int_object && object_type_dimension_id == 0) {
+                SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+                *(SPVM_VALUE_int*)&vars[opcode->operand0] = *(SPVM_VALUE_int*)&fields[0];
+              }
+              else {
+                void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+                env->set_exception(env, exception);
+                exception_flag = 1;
+              }
+            }
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_LONG_OBJECT_TO_LONG: {
+            void* object = *(void**)&vars[opcode->operand1];
+            if (object == NULL) {
+              void* exception = env->new_string_raw(env, "Can't convert undef value.", 0);
+              env->set_exception(env, exception);
+              exception_flag = 1;
+            }
+            else {
+              int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+              int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+              if (object_basic_type_id == (intptr_t)(void*)env->basic_type_id_long_object && object_type_dimension_id == 0) {
+                SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+                *(SPVM_VALUE_long*)&vars[opcode->operand0] = *(SPVM_VALUE_long*)&fields[0];
+              }
+              else {
+                void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+                env->set_exception(env, exception);
+                exception_flag = 1;
+              }
+            }
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_FLOAT_OBJECT_TO_FLOAT: {
+            void* object = *(void**)&vars[opcode->operand1];
+            if (object == NULL) {
+              void* exception = env->new_string_raw(env, "Can't convert undef value.", 0);
+              env->set_exception(env, exception);
+              exception_flag = 1;
+            }
+            else {
+              int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+              int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+              if (object_basic_type_id == (intptr_t)(void*)env->basic_type_id_float_object && object_type_dimension_id == 0) {
+                SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+                *(SPVM_VALUE_float*)&vars[opcode->operand0] = *(SPVM_VALUE_float*)&fields[0];
+              }
+              else {
+                void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+                env->set_exception(env, exception);
+                exception_flag = 1;
+              }
+            }
+            
+            break;
+          }
+          case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_OBJECT_TO_DOUBLE: {
+            void* object = *(void**)&vars[opcode->operand1];
+            if (object == NULL) {
+              void* exception = env->new_string_raw(env, "Can't convert undef value.", 0);
+              env->set_exception(env, exception);
+              exception_flag = 1;
+            }
+            else {
+              int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_byte_offset);
+              int32_t object_type_dimension_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_byte_offset);
+              if (object_basic_type_id == (intptr_t)(void*)env->basic_type_id_double_object && object_type_dimension_id == 0) {
+                SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
+                *(SPVM_VALUE_double*)&vars[opcode->operand0] = *(SPVM_VALUE_double*)&fields[0];
+              }
+              else {
+                void* exception = env->new_string_raw(env, "Can't convert imcompatible object type.", 0);
+                env->set_exception(env, exception);
+                exception_flag = 1;
+              }
+            }
+            
+            break;
+          }
         }
       }
     }
@@ -2703,7 +3000,58 @@ void SPVM_RUNTIME_free(SPVM_ENV* env) {
   // Free exception
   SPVM_RUNTIME_API_set_exception(env, NULL);
   
+  // Free portable
+  SPVM_PORTABLE_free(runtime->portable);
+  
+  free(runtime->sub_native_addresses);
+  free(runtime->sub_precompile_addresses);
+  
+  if (runtime->exception != NULL) {
+    free(runtime->exception);
+  }
+  
+  free(runtime->mortal_stack);
+  
+  SPVM_HASH_free(runtime->basic_type_symtable);
+  SPVM_HASH_free(runtime->field_symtable);
+  SPVM_HASH_free(runtime->sub_symtable);
+  
+  for (int32_t switch_index = 0; switch_index < runtime->info_switch_infos->length; switch_index++) {
+    SPVM_RUNTIME_INFO_SWITCH_INFO* info_switch_info = SPVM_LIST_fetch(runtime->info_switch_infos, switch_index);
+    
+    SPVM_LIST* case_infos = info_switch_info->case_infos;
+    for (int32_t case_index = 0; case_index < case_infos->length; case_index++) {
+      SPVM_RUNTIME_INFO_CASE_INFO* info_case_info = SPVM_LIST_fetch(case_infos, case_index);
+      free(info_case_info);
+    }
+    SPVM_LIST_free(info_switch_info->case_infos);
+  }
+  SPVM_LIST_free(runtime->info_switch_infos);
+
+  for (int32_t package_id = 0; package_id < runtime->packages_length; package_id++) {
+    
+    SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
+    
+    SPVM_LIST_free(package->fields);
+    SPVM_LIST_free(package->field_signatures);
+    SPVM_LIST_free(package->package_vars);
+    SPVM_LIST_free(package->package_var_signatures);
+    SPVM_LIST_free(package->subs);
+    SPVM_LIST_free(package->sub_signatures);
+    SPVM_LIST_free(package->object_field_indexes);
+
+    SPVM_HASH_free(package->field_symtable);
+    SPVM_HASH_free(package->field_signature_symtable);
+    SPVM_HASH_free(package->package_var_symtable);
+    SPVM_HASH_free(package->package_var_signature_symtable);
+    SPVM_HASH_free(package->sub_symtable);
+    SPVM_HASH_free(package->sub_signature_symtable);
+  }
+  SPVM_HASH_free(runtime->package_symtable);
+
+  // Free package variables heap
   free(runtime->package_vars_heap);
   
+  // Free runtime
   free(runtime);
 }

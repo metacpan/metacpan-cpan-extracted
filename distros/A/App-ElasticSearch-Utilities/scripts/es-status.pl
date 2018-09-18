@@ -207,15 +207,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-status.pl - Simple ElaticSearch Status Checks
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Nested;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use App::ElasticSearch::Utilities::QueryString;
 use CLI::Helpers qw(:output);
@@ -59,15 +59,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities::QueryString::Nested - Implement the proposed Elasticsearch nested query syntax
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

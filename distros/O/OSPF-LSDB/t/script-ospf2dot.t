@@ -15,7 +15,7 @@ my %tmpargs = (
 
 my $tmp = File::Temp->new(%tmpargs);
 
-$0 = "script/ospf2dot";
+$0 = "./script/ospf2dot";
 @ARGV = ('-cBSE', "example/all.yaml", $tmp->filename);
 my $done = do $0;
 ok(!$@, "$0 parse") or diag("Parse $0 failed: $@");

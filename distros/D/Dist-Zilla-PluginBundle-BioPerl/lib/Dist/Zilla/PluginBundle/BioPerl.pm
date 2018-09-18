@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::BioPerl;
-$Dist::Zilla::PluginBundle::BioPerl::VERSION = '0.26';
+$Dist::Zilla::PluginBundle::BioPerl::VERSION = '0.27';
 use utf8;
 
 # ABSTRACT: Build your distributions like Bioperl does
@@ -157,7 +157,7 @@ Dist::Zilla::PluginBundle::BioPerl - Build your distributions like Bioperl does
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -257,7 +257,7 @@ Run `dzil release'
 
 =item 5
 
-Run `git push --tags'
+Run `git push --follow-tags'
 
 =back
 
@@ -349,14 +349,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org              - General discussion
-  http://bioperl.org/Support.html    - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem

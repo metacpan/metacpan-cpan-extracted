@@ -72,6 +72,22 @@ sub run {
     next;
   }
 
+  # add test requirements by .pm files used in .t files
+  if (my $test_reqs = $self->{prereqs}->requirements_for('test', 'requires')) {
+    my @required_modules = $test_reqs->required_modules;
+    for my $module (@required_modules) {
+      my $relpath = $self->{possible_modules}{$module} or next;
+      my $context = $self->{_test_pm}{$relpath} or next;
+      $test_reqs->add_requirements($context->requires);
+      if ($self->{recommends} or $self->{suggests}) {
+        $self->{prereqs}->requirements_for('test', 'recommends')->add_requirements($context->recommends);
+      }
+      if ($self->{suggests}) {
+        $self->{prereqs}->requirements_for('test', 'suggests')->add_requirements($context->suggests);
+      }
+    }
+  }
+
   $self->_exclude_local_modules;
 
   if ($self->{exclude_core}) {
@@ -170,22 +186,33 @@ sub _exclude_local_modules {
 sub _exclude_core_prereqs {
   my $self = shift;
 
-  my $perl_version = $self->{perl_version} || '5.008001';
-  if ($perl_version =~ /^v?5\.([1-9][0-9]?)(?:\.([0-9]))?$/) {
+  my $perl_version = $self->{perl_version} || $self->_find_used_perl_version || '5.008001';
+  if ($perl_version =~ /^v?5\.(0?[1-9][0-9]?)(?:\.([0-9]))?$/) {
     $perl_version = sprintf '5.%03d%03d', $1, $2 || 0;
   }
   $perl_version = '5.008001' unless exists $Module::CoreList::version{$perl_version};
 
   for my $req ($self->_requirements) {
     for my $module ($req->required_modules) {
-      if (Module::CoreList::is_core($module) and
-          !Module::CoreList::deprecated_in($module)
+      if (Module::CoreList::is_core($module, undef, $perl_version) and
+          !Module::CoreList::deprecated_in($module, undef, $perl_version)
       ) {
         my $core_version = $Module::CoreList::version{$perl_version}{$module} or next;
         $req->clear_requirement($module) if $req->accepts_module($module => $core_version);
       }
     }
   }
+}
+
+sub _find_used_perl_version {
+  my $self = shift;
+  my @perl_versions;
+  my $perl_requirements = CPAN::Meta::Requirements->new;
+  for my $req ($self->_requirements) {
+    my $perl_req = $req->requirements_for_module('perl');
+    $perl_requirements->add_string_requirement('perl', $perl_req) if $perl_req;
+  }
+  return $perl_requirements->is_simple ? $perl_requirements->requirements_for_module('perl') : undef;
 }
 
 sub _dedupe {
@@ -238,12 +265,18 @@ sub _scan_file {
     }
   }
 
-  if ($relpath =~ m!(?:^|[\\/])(?:Makefile|Build)\.PL$!) {
-    $self->_add($prereqs, configure => $context);
-  } elsif ($relpath =~ m!(?:^|[\\/])t[\\/]!) {
-    $self->_add($prereqs, test => $context);
+  if ($relpath =~ m!(?:^|[\\/])t[\\/]!) {
+    if ($relpath =~ /\.t$/) {
+      $self->_add($prereqs, test => $context);
+    } elsif ($relpath =~ /\.pm$/) {
+      $self->{_test_pm}{$relpath} = $context;
+    }
   } elsif ($relpath =~ m!(?:^|[\\/])(?:xt|inc|author)[\\/]!) {
     $self->_add($prereqs, develop => $context);
+  } elsif ($relpath =~ m!(?:(?:^|[\\/])Makefile|^Build)\.PL$!) {
+    $self->_add($prereqs, configure => $context);
+  } elsif ($relpath =~ m!(?:^|[\\/])(?:.+)\.PL$!) {
+    $self->_add($prereqs, build => $context);
   } else {
     $self->_add($prereqs, runtime => $context);
   }
@@ -252,11 +285,11 @@ sub _scan_file {
     my $module = $relpath;
     $module =~ s!\.pm$!!;
     $module =~ s![\\/]!::!g;
-    $self->{possible_modules}{$module} = 1;
+    $self->{possible_modules}{$module} = $relpath;
     $module =~ s!^(?:inc|blib|x?t)::!!;
-    $self->{possible_modules}{$module} = 1;
+    $self->{possible_modules}{$module} = $relpath;
     $module =~ s!^lib::!!;
-    $self->{possible_modules}{$module} = 1;
+    $self->{possible_modules}{$module} = $relpath;
   }
 }
 

@@ -45,8 +45,8 @@ CAIXS_install_cv(pTHX_ SV* full_name) {
 template <AccessorType type, AccessorOpts opts>
 struct CImpl {
 static shared_keys* CAIXS_install_accessor(pTHX_ AccessorOpts val, SV* full_name) {
-    if (type != InheritedCb && (opts & PushName)) goto next;
-    if (type == InheritedCb && (opts & IsReadonly)) goto next;
+    if (TYPE_INHERITED && (opts & IsReadonly)) goto next;
+    if ((opts & (IsReadonly | IsWeak)) == (IsReadonly | IsWeak)) goto next;
     if (type == Constructor) goto next;
 
     if ((val & opts) == opts) {

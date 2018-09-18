@@ -1,8 +1,9 @@
 package Plack::App::FakeModPerl1::Server;
+
 {
   $Plack::App::FakeModPerl1::Server::DIST = 'Plack-App-FakeApache1';
 }
-$Plack::App::FakeModPerl1::Server::VERSION = '0.0.5';
+$Plack::App::FakeModPerl1::Server::VERSION = '0.0.6';
 # ABSTRACT: Mimic Apache mod_perl1's server
 use strict;
 use warnings;
@@ -47,7 +48,7 @@ Plack::App::FakeModPerl1::Server - Mimic Apache mod_perl1's server
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head2 new
 

@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "MIDI" => 0,
     "MIDI::Drummer::Tiny" => 0,
     "MIDI::Morph" => 0,
+    "MIDI::Ngram" => 0,
     "MIDI::Pitch" => 0,
     "MIDI::Praxis::Variation" => 0,
     "MIDI::Simple::Drummer" => 0,
@@ -68,7 +69,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -88,6 +89,7 @@ my %FallbackPrereqs = (
   "MIDI" => 0,
   "MIDI::Drummer::Tiny" => 0,
   "MIDI::Morph" => 0,
+  "MIDI::Ngram" => 0,
   "MIDI::Pitch" => 0,
   "MIDI::Praxis::Variation" => 0,
   "MIDI::Simple::Drummer" => 0,

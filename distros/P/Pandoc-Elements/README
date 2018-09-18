@@ -43,8 +43,8 @@ DESCRIPTION
 PANDOC VERSIONS
 
     The Pandoc document model is defined in file Text.Pandoc.Definition
-    <https://hackage.haskell.org/package/pandoc-types/docs/Text-Pandoc-Defi
-    nition.html> as part of Haskell package pandoc-types.
+    <https://hackage.haskell.org/package/pandoc-types/docs/Text-Pandoc-Definition.html>
+    as part of Haskell package pandoc-types.
 
     Pandoc::Elements is compatible with pandoc-types 1.12.3 (released with
     pandoc 1.12.1) up to at least pandoc-types-1.17.0.4 (first releases
@@ -104,12 +104,13 @@ FUNCTIONS
  citation { ... }
 
     A citation as part of document element Cite must be a hash reference
-    with fields citationID (string), citationPrefix (list of inline
+    with fields citationId (string), citationPrefix (list of inline
     elements) citationSuffix (list of inline elements), citationMode (one
     of NormalCitation, AuthorInText, SuppressAuthor), citationNoteNum
     (integer), and citationHash (integer). The helper method citation can
-    be used to construct such hash by filling in default values and using
-    shorter field names (id, prefix, suffix, mode, note, and hash):
+    be used to construct such a hash by filling in default values and
+    optionally using shorter field names (id, prefix, suffix, mode, note,
+    and hash):
 
         citation {
             id => 'foo',
@@ -120,6 +121,12 @@ FUNCTIONS
         # in Pandoc Markdown
     
         [see @foo p. 42]
+
+    The values returned by this function, as well as any citations
+    contained in document objects returned by pandoc_json, are blessed
+    hashrefs with getter/setter accessors corresponding to both the full
+    and short field names, so that e.g. $citation->citationId(...) and
+    $citation->id(...) get or set the same value.
 
  pandoc_version( [ $document ] )
 

@@ -41,19 +41,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kraih/minion/issues"
+         "web" : "https://github.com/mojolicious/minion/issues"
       },
-      "homepage" : "http://mojolicious.org",
+      "homepage" : "https://mojolicious.org",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kraih/minion.git",
-         "web" : "https://github.com/kraih/minion"
+         "url" : "https://github.com/mojolicious/minion.git",
+         "web" : "https://github.com/mojolicious/minion"
       },
-      "x_IRC" : "irc://irc.perl.org/#mojo"
+      "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "9.03",
+   "version" : "9.04",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

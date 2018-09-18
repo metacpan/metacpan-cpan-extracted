@@ -18,7 +18,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.03';
+our $VERSION = '9.04';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -177,7 +177,7 @@ Minion - Job queue
 
 <p>
   <img alt="Screenshot"
-    src="https://raw.github.com/kraih/minion/master/examples/admin.png?raw=true"
+    src="https://raw.github.com/kraih/mojolicious/master/examples/admin.png?raw=true"
     width="600px">
 </p>
 
@@ -187,9 +187,9 @@ L<Minion> is a high performance job queue for the Perl programming language,
 with support for multiple named queues, priorities, delayed jobs, job
 dependencies, job progress, job results, retries with backoff, rate limiting,
 unique jobs, statistics, distributed workers, parallel processing, autoscaling,
-remote control, L<Mojolicious|http://mojolicious.org> admin ui, resource leak
+remote control, L<Mojolicious|https://mojolicious.org> admin ui, resource leak
 protection and multiple backends (such as
-L<PostgreSQL|http://www.postgresql.org>).
+L<PostgreSQL|https://www.postgresql.org>).
 
 Job queues allow you to process time and/or computationally intensive tasks in
 background processes, outside of the request/response lifecycle of web
@@ -292,7 +292,8 @@ Which are loaded like any other plugin from your application.
 
 This distribution also contains a great example application you can use for
 inspiration. The
-L<link checker|https://github.com/kraih/minion/tree/master/examples/linkcheck>
+L<link
+checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck>
 will show you how to integrate background jobs into well-structured
 L<Mojolicious> applications.
 
@@ -883,7 +884,7 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<https://github.com/kraih/minion>, L<Mojolicious::Guides>,
-L<http://mojolicious.org>.
+L<https://github.com/mojolicious/minion>, L<Mojolicious::Guides>,
+L<https://mojolicious.org>.
 
 =cut

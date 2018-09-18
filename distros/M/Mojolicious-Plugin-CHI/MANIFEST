@@ -6,6 +6,7 @@ t/CHI-Log.t
 t/CHI-Command.t
 t/CHI-NoIOLoop.t
 Changes
+Readme.pod
 MANIFEST
 LICENSE
 Makefile.PL

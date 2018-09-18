@@ -31,22 +31,22 @@ no_index:
 provides:
   Dist::Zilla::App::Command::gh:
     file: lib/Dist/Zilla/App/Command/gh.pm
-    version: '0.46'
+    version: '0.47'
   Dist::Zilla::Plugin::GitHub:
     file: lib/Dist/Zilla/Plugin/GitHub.pm
-    version: '0.46'
+    version: '0.47'
   Dist::Zilla::Plugin::GitHub::Create:
     file: lib/Dist/Zilla/Plugin/GitHub/Create.pm
-    version: '0.46'
+    version: '0.47'
   Dist::Zilla::Plugin::GitHub::Meta:
     file: lib/Dist/Zilla/Plugin/GitHub/Meta.pm
-    version: '0.46'
+    version: '0.47'
   Dist::Zilla::Plugin::GitHub::Update:
     file: lib/Dist/Zilla/Plugin/GitHub/Update.pm
-    version: '0.46'
+    version: '0.47'
   Dist::Zilla::PluginBundle::GitHub:
     file: lib/Dist/Zilla/PluginBundle/GitHub.pm
-    version: '0.46'
+    version: '0.47'
 requires:
   Class::Load: '0'
   Dist::Zilla::App: '0'
@@ -75,10 +75,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GitHub
   homepage: https://github.com/ghedo/p5-Dist-Zilla-Plugin-GitHub
   repository: https://github.com/ghedo/p5-Dist-Zilla-Plugin-GitHub.git
-version: '0.46'
+version: '0.47'
 x_Dist_Zilla:
   perl:
-    version: '5.029001'
+    version: '5.029002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -468,11 +468,13 @@ x_Dist_Zilla:
           version: '6.012'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
           version: '0.47'
+        Dist::Zilla::Plugin::MakeMaker::Fallback:
+          skip_release_testing: 0
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
           version: '6.012'
       name: '@Author::ETHER/MakeMaker::Fallback'
-      version: '0.027'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
       config:
@@ -507,7 +509,7 @@ x_Dist_Zilla:
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -568,7 +570,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20180720'
+          Module::CoreList: '5.20180820'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -731,7 +733,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.46
+          tag: v0.47
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -804,7 +806,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@Author::ETHER/GitHub::Update'
-      version: '0.45'
+      version: '0.46'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -938,18 +940,18 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Mike Friedman <mike.friedman@10gen.com>'
-  - 'Rafael Kitover <rkitover@cpan.org>'
   - 'Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>'
+  - 'Rafael Kitover <rkitover@cpan.org>'
+  - 'Joelle Maslak <jmaslak@antelope.net>'
   - 'Mike Doherty <doherty@cs.dal.ca>'
-  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-  - 'Ricardo Signes <rjbs@cpan.org>'
   - 'Vyacheslav Matyukhin <mmcleric@yandex-team.ru>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Brian Phillips <bphillips@cpan.org>'
   - 'Chris Weyl <cweyl@alumni.drew.edu>'
   - 'Ioan Rogers <ioan.rogers@gmail.com>'
-  - 'Joelle Maslak <jmaslak@antelope.net>'
   - 'Jose Luis Perez Diez <jluis@escomposlinux.org>'
-x_generated_by_perl: v5.29.1
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+x_generated_by_perl: v5.29.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

@@ -1,5 +1,5 @@
 package Pod::Weaver::PluginBundle::BioPerl;
-$Pod::Weaver::PluginBundle::BioPerl::VERSION = '0.26';
+$Pod::Weaver::PluginBundle::BioPerl::VERSION = '0.27';
 use utf8;
 
 # ABSTRACT: Configure your POD like Bioperl does
@@ -58,15 +58,14 @@ sub fback_lists {
           "Bioperl modules. Send your comments and suggestions preferably to",
           "the Bioperl mailing list.  Your participation is much appreciated.",
           "",
-          "  {{\$bugtracker_email}}              - General discussion",
-          "  http://bioperl.org/Support.html    - About the mailing lists",
+          "  {{\$bugtracker_email}}               - General discussion",
+          "  https://bioperl.org/Support.html    - About the mailing lists",
           ];
 }
 
 sub fback_support {
   return ["Please direct usage questions or support issues to the mailing list:",
           "I<{{\$bugtracker_email}}>",
-          "",
           "rather than to the module maintainer directly. Many experienced and",
           "reponsive experts will be able look at the problem and quickly",
           "address it. Please include a thorough description of the problem",
@@ -97,7 +96,7 @@ Pod::Weaver::PluginBundle::BioPerl - Configure your POD like Bioperl does
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -174,14 +173,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org              - General discussion
-  http://bioperl.org/Support.html    - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem

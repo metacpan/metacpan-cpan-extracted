@@ -1,17 +1,17 @@
 package Lingua::JA::Moji;
 
-require Exporter;
-@ISA = qw(Exporter);
-
 use warnings;
 use strict;
+use utf8;
 
-our $VERSION = '0.50';
+require Exporter;
+our @ISA = qw(Exporter);
+
+our $VERSION = '0.52';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
 use JSON::Parse 'json_file_to_perl';
-use utf8;
 
 our @EXPORT_OK = qw/
 		    bad_kanji
@@ -300,7 +300,7 @@ for my $vowel (keys %dan) {
 
 # Kana gyou which can be preceded by a sokuon (small tsu).
 
-# Added d to the list for ウッド BKB 2010-07-20 23:27:07
+# Added d to the list for ウッド
 # Added z for "badge" etc.
 # Added g for ドッグ etc.
 
@@ -685,7 +685,7 @@ sub is_voiced
         return 1;
     }
     else {
-        return;
+        return undef;
     }
 }
 
@@ -1480,7 +1480,7 @@ sub smallize_kana
 			ヨ ョ
 		    /);
     $kana =~ s/([キギシジチヂニヒビピミリ])([ヤユヨ])/$1$yayuyo{$2}/g;
-    $kana =~ s/ツ([カキクケコガギグゲゴサシスセソタチツテトパビプペポ])/ッ$1/g;
+    $kana =~ s/ツ([カキクケコガギグゲゴサシスセソタチツテトパビプペポジ])/ッ$1/g;
     if ($kana ne $orig) {
 	return $kana;
     }
@@ -1498,14 +1498,16 @@ sub cleanup_kana
 	$kana = romaji2kana ($kana);
     }
     $kana = kana2katakana ($kana);
-    $kana =~ s/一/ー/g;
+    # Translate kanjis into kana where "naive user" has inserted kanji
+    # not kana.
+    $kana =~ tr/力二一/カニー/;
     return $kana;
 }
 
 sub load_kanji
 {
     my ($file) = @_;
-    my $bkfile = getdistfile ('bad-kanji');
+    my $bkfile = getdistfile ($file);
     open my $in, "<:encoding(utf8)", $bkfile
         or die "Error opening '$bkfile': $!";
     my @bk;

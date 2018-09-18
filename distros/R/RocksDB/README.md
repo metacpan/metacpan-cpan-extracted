@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/spiritloose/RocksDB.svg?branch=master)](https://travis-ci.org/spiritloose/RocksDB)
 # NAME
 
 RocksDB - Perl extension for RocksDB
@@ -41,7 +42,7 @@ RocksDB - Perl extension for RocksDB
 
 # DESCRIPTION
 
-__RocksDB__ is a Perl extension for RocksDB.
+**RocksDB** is a Perl extension for RocksDB.
 
 RocksDB is an embeddable persistent key-value store for fast storage.
 
@@ -405,6 +406,7 @@ For details, see the documentation for RocksDB itself.
 - compression\_per\_level :ArrayRef\[Str\]
 
         ['snappy', 'zlib', 'zlib', 'bzip2', 'lz4', 'lz4hc' ...]
+
 - prefix\_extractor :RocksDB::SliceTransform
 
     Defaults to undef. See [RocksDB::SliceTransform](https://metacpan.org/pod/RocksDB::SliceTransform), [RocksDB::FixedPrefixTransform](https://metacpan.org/pod/RocksDB::FixedPrefixTransform).
@@ -449,25 +451,13 @@ For details, see the documentation for RocksDB itself.
 
     Defaults to 1.
 
-- expanded\_compaction\_factor :Int
+- max\_compaction\_bytes: Int
 
-    Defaults to 25.
-
-- source\_compaction\_factor :Int
-
-    Defaults to 1.
-
-- max\_grandparent\_overlap\_factor :Int
-
-    Defaults to 10.
+    Defaults to target\_file\_size\_base \* 25.
 
 - enable\_statistics :Bool
 
     Defaults to false. See [RocksDB::Statistics](https://metacpan.org/pod/RocksDB::Statistics).
-
-- disableDataSync :Bool
-
-    Defaults to false.
 
 - use\_fsync :Bool
 
@@ -525,10 +515,6 @@ For details, see the documentation for RocksDB itself.
 
     Defaults to 4.
 
-- table\_cache\_remove\_scan\_count\_limit :Int
-
-    Defaults to 16.
-
 - arena\_block\_size :Int
 
     Defaults to 0.
@@ -550,10 +536,6 @@ For details, see the documentation for RocksDB itself.
     Defaults to 4MB.
 
 - purge\_redundant\_kvs\_while\_flush :Bool
-
-    Defaults to true.
-
-- allow\_os\_buffer :Bool
 
     Defaults to true.
 
@@ -606,10 +588,6 @@ For details, see the documentation for RocksDB itself.
         universal
         fifo
 
-- verify\_checksums\_in\_compaction :Bool
-
-    Defaults to true.
-
 - compaction\_options\_universal :HashRef
 
     See 'Universal compaction options' section below.
@@ -617,10 +595,6 @@ For details, see the documentation for RocksDB itself.
 - compaction\_options\_fifo :HashRef
 
     See 'FIFO compaction options' section below.
-
-- filter\_deletes :Bool
-
-    Defaults to false.
 
 - max\_sequential\_skip\_in\_iterations :Int
 
@@ -634,17 +608,9 @@ For details, see the documentation for RocksDB itself.
 
     Defaults to 10000, if inplace\_update\_support = true, else 0.
 
-- memtable\_prefix\_bloom\_bits :Int
+- memtable\_prefix\_bloom\_size\_ratio :Int
 
-    If prefix\_extractor is set and bloom\_bits is not 0, create prefix bloom for memtable.
-
-- memtable\_prefix\_bloom\_probes :Int
-
-    Number of hash probes per key.
-
-- memtable\_prefix\_bloom\_huge\_page\_tlb\_size :Int
-
-    Page size for huge page TLB for bloom in memtable. If <=0, not allocate from huge page TLB but from malloc.
+    Defaults to 0 (disable).
 
 - bloom\_locality :Int
 
@@ -653,10 +619,6 @@ For details, see the documentation for RocksDB itself.
 - max\_successive\_merges :Int
 
     Defaults to 0 (disabled).
-
-- min\_partial\_merge\_operands :Int
-
-    Defaults to 2.
 
 - block\_based\_table\_options :HashRef
 
@@ -859,10 +821,6 @@ For details, see the documentation for RocksDB itself.
 - disableWAL :Bool
 
     Defaults to false.
-
-- timeout\_hint\_us :Int
-
-    Defaults to 0.
 
 ## Flush options
 

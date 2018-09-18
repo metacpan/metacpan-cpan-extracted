@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use local::lib;
+use Mojolicious::Lite;
+
+use Cwd qw(getcwd);
+use File::Spec::Functions qw(catfile);
+
+my $cwd = getcwd;
+
+app->static->paths->[0] = catfile( $cwd, 'shared_files', 'html' );
+app->log->path( '/dev/null' );
+
+any '/' => sub {
+  shift->reply->static('index.html');
+};
+
+app->start;

@@ -1,10 +1,14 @@
 Build.PL
 CHANGELOG.rst
 CONTRIBUTING.rst
-IxNetwork.pm
+lib/IxNetwork/IxNetwork.pm
+lib/IxNetwork/IxNetworkLegacy.pm
+lib/IxNetwork/IxNetworkSecure.pm
+lib/IxNetwork/checkDependencies.pm
+lib/IxNetwork/cpanfile
 LICENSE
-MANIFEST			This list of files
+MANIFEST
 README.rst
-Makefile.PL
 META.yml
 META.json
+Makefile.PL

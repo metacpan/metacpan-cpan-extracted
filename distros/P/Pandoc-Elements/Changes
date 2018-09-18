@@ -1,5 +1,8 @@
 Revision history for Pandoc-Elements
 
+0.38  2018-09-15 23:45:46 CEST
+    - Introduce Citation object with accessors
+
 0.37  2018-05-12 22:42:29 CEST
     - Let multifilter find filter directory also on Windows 
     - Support fully compliant JSON Pointers in metavalues

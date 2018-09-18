@@ -8,7 +8,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.143',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.144',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -38,7 +38,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Dist::Zilla::Plugin::MakeMaker::Awesome' => '0.26',
+                                      'Dist::Zilla::Plugin::MakeMaker::Awesome' => '0.47',
                                       'Dist::Zilla::Role::AfterBuild' => '0',
                                       'List::Util' => '0',
                                       'Moose' => '0',

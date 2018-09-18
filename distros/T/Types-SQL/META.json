@@ -66,6 +66,7 @@
             "Test::Most" : "0",
             "Time::Piece" : "1.16",
             "Time::Seconds" : "0",
+            "Types::Common::Numeric" : "0",
             "if" : "0"
          }
       }
@@ -73,11 +74,11 @@
    "provides" : {
       "Types::SQL" : {
          "file" : "lib/Types/SQL.pm",
-         "version" : "v0.1.3"
+         "version" : "v0.2.0"
       },
       "Types::SQL::Util" : {
          "file" : "lib/Types/SQL/Util.pm",
-         "version" : "v0.1.3"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -91,7 +92,7 @@
          "web" : "https://github.com/robrwo/Types-SQL"
       }
    },
-   "version" : "v0.1.3",
+   "version" : "v0.2.0",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

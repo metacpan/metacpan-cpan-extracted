@@ -1,3 +1,6 @@
+** 0.15 / 2018-09-16
+   - Explicitly declare dependency on namespace::autoclean
+
 ** 0.14 / 2018-09-11
    - Correctly update version numbers in all files
 
@@ -6,7 +9,7 @@
      Removes the problem of leading and trailing space
      preventing matches
 
-** 0.12 / 2016-10-03
+** 0.12 / 2017-07-12
    - Make 'get_page_source' write to file
 
 ** 0.11 / 2017-04-21

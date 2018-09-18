@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.26
+    version 2.28
 
 SYNOPSIS
 
@@ -183,11 +183,21 @@ DESCRIPTION
     ADDRESS
 
       This value will be passed to POE::Wheel::SocketFactory to bind to,
-      will use INADDR_ANY if it is nothing is provided.
+      will use INADDR_ANY if it is nothing is provided (or IN6ADDR_ANY if
+      DOMAIN is AF_INET6). For UNIX domain sockets, it should be a path
+      describing the socket's filename.
+
+      If neither DOMAIN nor ADDRESS are specified, it will use IN6ADDR_ANY
+      and AF_INET6.
 
     PORT
 
       This value will be passed to POE::Wheel::SocketFactory to bind to.
+
+    DOMAIN
+
+      This value will be passed to POE::Wheel::SocketFactory to define the
+      socket domain used (AF_INET, AF_INET6, AF_UNIX).
 
     HOSTNAME
 
@@ -561,7 +571,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Apocalypse, Chris Williams,
+    This software is copyright (c) 2018 by Apocalypse, Chris Williams,
     Eriam Schaffter, Marlon Bailey and Philip Gwyn.
 
     This is free software; you can redistribute it and/or modify it under

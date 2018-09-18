@@ -30,14 +30,15 @@ be based on DBI/DBD foundation.
 ###############################################################################
 package XAO::DO::FS::Glue::Connect_DBI;
 use strict;
+use warnings;
 use XAO::Objects;
 use XAO::Utils;
+use Encode;
 use DBI;
 
 use base XAO::Objects->load(objname => 'FS::Glue::Connect_SQL');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Connect_DBI.pm,v 2.2 2008/02/21 02:22:15 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.003';
 
 ###############################################################################
 
@@ -56,16 +57,22 @@ sub sql_connect ($%) {
     my $args=get_args(\@_);
 
     if(%$args) {
-        $self->{'dsn'}=$args->{'dsn'} || throw $self "sql_connect - no 'dsn' given";
+        $self->{'dsn'}=$args->{'dsn'} || throw $self "- no 'dsn' given";
         $self->{'user'}=$args->{'user'};
         $self->{'password'}=$args->{'password'};
+        $self->{'driver'}=lc($args->{'driver'} // '');
+    }
+
+    if(!$self->{'driver'}) {
+        $self->{'dsn'}=~/DBI:(\w+):/i || throw $self "- invalid dsn '$self->{'dsn'}' and no driver";
+        $self->{'driver'}=lc($1);
     }
 
     $self->{'sql'}=DBI->connect(
         $self->{'dsn'},
         $self->{'user'},
         $self->{'password'},
-    ) || throw $self "sql_connect - can't connect to dsn='$self->{'dsn'}'";
+    ) || throw $self "- can't connect to dsn='$self->{'dsn'}'";
 }
 
 ###############################################################################
@@ -118,18 +125,32 @@ argument.
 sub sql_do ($$;@) {
     my ($self,$query,@values)=@_;
 
+    ### dprint "SQL: $query";
     ### use Data::Dumper;
-    if(@values && ref $values[0]) {
-        ### dprint "SQL: $query";
-        ### dprint Dumper($values[0]);
-        $self->{'sql'}->do($query,undef,@{$values[0]}) ||
-            throw $self "sql_do - SQL error: ".$self->{'sql'}->errstr;
+
+    if(!@values) {
+        $self->{'sql'}->do($query) ||
+            throw $self "- SQL error: ".$self->{'sql'}->errstr;
     }
     else {
-        ### dprint "SQL: $query";
+        @values=@{$values[0]} if ref $values[0];
         ### dprint Dumper(\@values);
-        $self->{'sql'}->do($query,undef,@values) ||
-            throw $self "sql_do - SQL error: ".$self->{'sql'}->errstr;
+
+        if($self->{'driver'} eq 'mysql') {
+            $self->{'sql'}->do($query,undef,@values) ||
+                throw $self "- SQL error: ".$self->{'sql'}->errstr;
+        }
+        else {
+            my $dbh=$self->{'sql'};
+            my $sth=$dbh->prepare($query);
+            my $i=1;
+            foreach my $v (@values) {
+                $sth->bind_param($i++, $v, Encode::is_utf8($v) ? undef : DBI::SQL_BINARY);
+            }
+            $sth->execute() ||
+                throw $self "- SQL error: ".$self->{'sql'}->errstr;
+            $sth->finish();
+        }
     }
 }
 
@@ -172,17 +193,24 @@ sql_execute() as a parameter.
 =cut
 
 sub sql_execute ($$;@) {
-    my ($self,$pq,@values)=@_;
+    my ($self,$sth,@values)=@_;
 
-    $pq=$self->sql_prepare($pq) unless ref $pq;
+    $sth=$self->sql_prepare($sth) unless ref $sth;
 
     ### use Data::Dumper;
     ### dprint "Executed with: ".Dumper(@values && ref($values[0]) ? $values[0] : \@values);
 
-    $pq->execute(@values && ref($values[0]) ? @{$values[0]} : @values) ||
-        throw $self "sql_execute - SQL error: ".$pq->errstr;
+    if(@values) {
+        my $i=1;
+        foreach my $v (@values && ref($values[0]) ? @{$values[0]} : @values) {
+            $sth->bind_param($i++, $v, Encode::is_utf8($v) ? undef : DBI::SQL_BINARY);
+        }
+    }
 
-    return $pq;
+    $sth->execute() ||
+        throw $self "- SQL error: ".$sth->errstr;
+
+    return $sth;
 }
 
 ###############################################################################
@@ -275,7 +303,7 @@ sub sql_prepare ($$) {
     my ($self,$query)=@_;
     ### dprint "SQL_PREPARE: $query";
     return $self->{'sql'}->prepare($query) ||
-        throw $self "sql_prepare - SQL error: ".$self->{'sql'}->errstr;
+        throw $self "- SQL error: ".$self->{'sql'}->errstr;
 }
 
 ###############################################################################

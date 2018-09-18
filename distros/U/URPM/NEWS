@@ -1,3 +1,11 @@
+Version 5.20 - 16 September 2018
+
+- restore support for rpm < 4.14.2
+
+Version 5.19 - 14 September 2018
+
+- add support for verify callback when installing (mga#23531)
+
 Version 5.18 - 25 June 2018
 
 - Don't select an obsolete package to resolve dependencies/conflicts

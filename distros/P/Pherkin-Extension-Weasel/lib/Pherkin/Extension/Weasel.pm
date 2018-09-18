@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
   use Weasel::FindExpanders::HTML;
 
   Then qr/I see an input element with label XYZ/, sub {
-    S->{ext_wsl}->page->find('*labelled', text => 'XYZ');
+    S->{ext_wsl}->page->find('*labeled', text => 'XYZ');
   };
 
 =cut
@@ -45,7 +45,7 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 use Module::Runtime qw(use_module);
@@ -240,7 +240,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2018  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

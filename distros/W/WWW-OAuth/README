@@ -187,11 +187,11 @@ METHODS
 
     Forms an OAuth 1.0 signed Authorization header for the passed request.
     As in "authenticate", the request may be specified in any form accepted
-    by "oauth_request" in WWW::OAuth::Util. OAuth parameters (starting with
-    oauth_) may be optionally specified in a hashref and will override any
-    generated OAuth parameters of the same name (they should not be present
-    in the request URL or body parameters). Returns the signed header
-    value.
+    by "oauth_request" in WWW::OAuth::Util. OAuth protocol parameters
+    (starting with oauth_ or the special parameter realm) may be optionally
+    specified in a hashref and will override any generated protocol
+    parameters of the same name (they should not be present in the request
+    URL or body parameters). Returns the signed header value.
 
 HTTP REQUEST CONTAINERS
 

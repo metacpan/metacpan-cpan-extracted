@@ -4,14 +4,11 @@ author:
   - 'Shlomi Fish <shlomif@cpan.org>'
 build_requires:
   File::Spec: '0'
-  File::pushd: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Module::Build: '0.28'
-  Path::Tiny: '0'
-  Test::DZil: '0'
-  Test::More: '0.96'
-  perl: '5.008001'
+  Test::More: '0.88'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
@@ -25,7 +22,7 @@ name: Pod-Weaver-PluginBundle-SHLOMIF
 provides:
   Pod::Weaver::PluginBundle::SHLOMIF:
     file: lib/Pod/Weaver/PluginBundle/SHLOMIF.pm
-    version: '0.001000'
+    version: '0.001001'
 requires:
   Pod::Elemental::PerlMunger: '0.200001'
   Pod::Elemental::Transformer::List: '0.102000'
@@ -40,7 +37,7 @@ resources:
   bugtracker: https://github.com/shlomif/pod-weaver-pluginbundle-shlomif/issues
   homepage: http://metacpan.org/release/Pod-Weaver-PluginBundle-SHLOMIF
   repository: git://github.com/shlomif/pod-weaver-pluginbundle-shlomif.git
-version: '0.001000'
+version: '0.001001'
 x_Dist_Zilla:
   perl:
     version: '5.028000'

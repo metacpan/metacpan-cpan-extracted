@@ -1,3 +1,9 @@
+libqbit-application-model-db-perl (0.030) raring; urgency=low
+
+  * added simple alter for table
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 15 Sep 2018 16:50:56 +0300
+
 libqbit-application-model-db-perl (0.029) raring; urgency=low
 
   * fix version

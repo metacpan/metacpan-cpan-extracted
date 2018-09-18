@@ -28,11 +28,11 @@ syntax frontend for L<Struct::Path|Struct::Path>
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -123,32 +123,35 @@ Convert JsonPointer to L<Struct::Path|Struct::Path> path.
 
 # some steps (numbers, dash) should be evaluated using structure
 sub _hook {
-    my $step = $_[0];
+    my ($step, $last) = @_;
 
     return sub {
-        my $i = @{$_[0]}; # step number
-
         if (ref $_ eq 'ARRAY') {
             if ($step eq '-') {
                 $step = @{$_}; # Hyphen as array index should append new item
             } else {
-                croak "Unsigned int without leading zeros allowed only, step #$i"
+                croak "Incorrect array index, step #" . @{$_[0]}
                     unless ($step eq abs(int($step)));
 
-                croak "Index is out of range, step #$i"
-                    if ($step > $#{$_});
+                croak "Index is out of range, step #" . @{$_[0]}
+                    if ($step > ($_{opts}->{expand} ? @{$_} : $#{$_}));
             }
+
+            splice @{$_}, $step, 0, undef if ($last and $_{opts}->{insert});
 
             push @{$_[0]}, [$step]; # update path
             push @{$_[1]}, \$_->[$step]; # update refs stack
+
+            splice @{$_}, $step, 1 if ($last and $_{opts}->{delete});
+
         } elsif (ref $_ eq 'HASH') { # HASH
-            croak "'$step' key doesn't exist, step #$i"
-                unless (exists $_->{$step});
+            croak "'$step' key doesn't exist, step #" . @{$_[0]}
+                unless (exists $_->{$step} or $_{opts}->{expand});
 
             push @{$_[0]}, {K => [$step]}; # update path
             push @{$_[1]}, \$_->{$step}; # update refs stack
         } else {
-            croak "Structure doesn't match, step #$i";
+            croak "Structure doesn't match, step #" . @{$_[0]};
         }
 
         return 1;
@@ -163,7 +166,7 @@ sub str2path {
 
     for my $step (@steps) {
         if (looks_like_number($step) or $step eq '-') {
-            push @path, _hook($step);
+            push @path, _hook($step, @path == $#steps);
         } else { # hash
             $step =~ s|~1|/|g;
             $step =~ s|~0|~|g;

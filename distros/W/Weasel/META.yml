@@ -13,14 +13,17 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Weasel
+recommends:
+  Weasel::Driver::Selenium2: '0'
 requires:
   List::Util: '0'
   Module::Runtime: '0'
   Moose: '0'
+  namespace::autoclean: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/ehuelsmann/weasel/issues
   homepage: https://weasel.pm/
   repository: https://github.com/ehuelsmann/weasel.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.70'

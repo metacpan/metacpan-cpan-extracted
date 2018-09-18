@@ -1,5 +1,8 @@
 Revision history for Perl module Mojo-ACME
 
+0.13 2018-09-14
+  - Protect against removal of delay helper in Mojolicious 7.90
+
 0.12 2018-02-13
   - Protect against changes in Mojo::IOLoop::Delay->catch
 

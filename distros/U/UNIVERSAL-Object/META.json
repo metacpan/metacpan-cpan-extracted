@@ -22,7 +22,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "perl" : "v5.6.0"
+            "Hash::Util" : "0",
+            "perl" : "v5.8.0"
          }
       },
       "test" : {
@@ -42,7 +43,7 @@
          "web" : "https://github.com/stevan/p5-UNIVERSAL-Object"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -62,7 +62,7 @@ upgrade the file.
 
 =cut
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =pod
 

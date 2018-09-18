@@ -5,7 +5,7 @@ use WWW::OAuth::Util 'form_urldecode';
 
 use Role::Tiny;
 
-our $VERSION = '0.006';
+our $VERSION = '1.000';
 
 requires 'method', 'url', 'content', 'content_is_form', 'header', 'request_with';
 

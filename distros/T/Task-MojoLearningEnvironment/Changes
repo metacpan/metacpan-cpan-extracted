@@ -1,5 +1,9 @@
 # changes for Task::MojoLearningEnvironment
 
+20180917.001 2018-09-17T18:52:11Z
+	* Update some optional modules for Mojo
+	* Change to the Artistic License 2.0
+
 0.002 2015-04-23T02:53:33Z
 	* Fix my MANIFEST-challenged first release
 

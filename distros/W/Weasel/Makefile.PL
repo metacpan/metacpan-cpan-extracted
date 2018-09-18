@@ -19,12 +19,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "List::Util" => 0,
     "Module::Runtime" => 0,
-    "Moose" => 0
+    "Moose" => 0,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +36,8 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "namespace::autoclean" => 0
 );
 
 

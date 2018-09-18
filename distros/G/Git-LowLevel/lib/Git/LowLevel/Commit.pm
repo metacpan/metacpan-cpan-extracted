@@ -21,7 +21,7 @@ Git::LowLevel::Commit - class representing a rerference in a git repository
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 

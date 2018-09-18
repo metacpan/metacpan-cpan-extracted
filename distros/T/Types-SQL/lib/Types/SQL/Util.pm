@@ -7,7 +7,7 @@ use Exporter qw/ import /;
 
 use PerlX::Maybe;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.2.0';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -18,9 +18,10 @@ our @EXPORT    = qw/ column_info_from_type /;
 our @EXPORT_OK = @EXPORT;
 
 my %CLASS_TYPES = (
-    'DateTime'     => 'datetime',
-    'Time::Moment' => 'datetime',
-    'Time::Piece'  => 'datetime',
+    'DateTime'       => 'datetime',
+    'DateTime::Tiny' => 'datetime',
+    'Time::Moment'   => 'datetime',
+    'Time::Piece'    => 'datetime',
 );
 
 sub column_info_from_type {
@@ -56,6 +57,12 @@ sub column_info_from_type {
         );
     }
 
+    if ( $name eq 'ArrayRef' ) {
+        my %type = column_info_from_type( $type->type_parameter );
+        $type{data_type} .= '[]';
+        return %type;
+    }
+
     if (   $name eq 'Object'
         && $type->display_name =~ /^InstanceOf\[['"](.+)['"]\]$/ )
     {
@@ -71,6 +78,26 @@ sub column_info_from_type {
 
     if ( $name eq 'Int' ) {
         return ( data_type => 'integer', is_numeric => 1 );
+    }
+
+    if ( $name eq 'PositiveOrZeroInt' ) {
+        return (
+            data_type  => 'integer',
+            is_numeric => 1,
+            extra      => { unsigned => 1 }
+        );
+    }
+
+    if ( $name eq 'Num' ) {
+        return ( data_type => 'numeric', is_numeric => 1 );
+    }
+
+    if ( $name eq 'PositiveOrZeroNum' ) {
+        return (
+            data_type  => 'numeric',
+            is_numeric => 1,
+            extra      => { unsigned => 1 }
+        );
     }
 
     if ( $name eq 'Bool' ) {
@@ -100,7 +127,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.1.3
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -129,11 +156,15 @@ C<add_column> method of L<DBIx::Class::ResultSource>, based on the
 type.
 
 Besides the types from L<Types::SQL>, it also supports the following
-types from L<Types::Standard>:
+types from L<Types::Standard> and C<Types::Common::Numeric>:
 
-=head2 C<Bool>
+=head3 C<ArrayRef>
 
-This is trated as a C<boolean> type.
+This treats the type as an array.
+
+=head3 C<Bool>
+
+This is treated as a C<boolean> type.
 
 =head3 C<Enum>
 
@@ -142,8 +173,8 @@ L<DBIx::Class::InflateColumn::Object::Enum>.
 
 =head3 C<InstanceOf>
 
-For L<DateTime>, L<Time::Moment> and L<Time::Piece> objects, this is
-treated as a C<datetime>.
+For L<DateTime>, L<DateTime::Tiny>, L<Time::Moment> and L<Time::Piece>
+objects, this is treated as a C<datetime>.
 
 =head3 C<Int>
 
@@ -152,6 +183,18 @@ This is treated as an C<integer> without a precision.
 =head3 C<Maybe>
 
 This treats the type in the parameter as nullable.
+
+=head3 C<Num>
+
+This is treated as a C<numeric> without a precision.
+
+=head3 C<PositiveOrZeroInt>
+
+This is treated as an C<unsigned integer> without a precision.
+
+=head3 C<PositiveOrZeroNum>
+
+This is treated as an C<unsigned numeric> without a precision.
 
 =head3 C<Str>
 

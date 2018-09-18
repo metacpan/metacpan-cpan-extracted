@@ -27,6 +27,7 @@ but this serves as our baseline.
     use strict;
     use warnings;
     our @ISA = ('UNIVERSAL::Object');
+    our %HAS = (bar => sub {});
 
     sub bar {
         my ($self, $x) = @_;

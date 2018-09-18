@@ -29,7 +29,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.143",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.145",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -127,7 +127,7 @@
             "Dist::Zilla::Plugin::InstallGuide" : "1.200005",
             "Dist::Zilla::Plugin::Keywords" : "0.004",
             "Dist::Zilla::Plugin::License" : "5.038",
-            "Dist::Zilla::Plugin::MakeMaker::Fallback" : "0.012",
+            "Dist::Zilla::Plugin::MakeMaker::Fallback" : "0.029",
             "Dist::Zilla::Plugin::Manifest" : "0",
             "Dist::Zilla::Plugin::MetaConfig" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
@@ -175,27 +175,27 @@
    "provides" : {
       "Dist::Zilla::App::Command::gh" : {
          "file" : "lib/Dist/Zilla/App/Command/gh.pm",
-         "version" : "0.46"
+         "version" : "0.47"
       },
       "Dist::Zilla::Plugin::GitHub" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHub.pm",
-         "version" : "0.46"
+         "version" : "0.47"
       },
       "Dist::Zilla::Plugin::GitHub::Create" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHub/Create.pm",
-         "version" : "0.46"
+         "version" : "0.47"
       },
       "Dist::Zilla::Plugin::GitHub::Meta" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHub/Meta.pm",
-         "version" : "0.46"
+         "version" : "0.47"
       },
       "Dist::Zilla::Plugin::GitHub::Update" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHub/Update.pm",
-         "version" : "0.46"
+         "version" : "0.47"
       },
       "Dist::Zilla::PluginBundle::GitHub" : {
          "file" : "lib/Dist/Zilla/PluginBundle/GitHub.pm",
-         "version" : "0.46"
+         "version" : "0.47"
       }
    },
    "release_status" : "stable",
@@ -213,10 +213,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.46",
+   "version" : "0.47",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.029001"
+         "version" : "5.029002"
       },
       "plugins" : [
          {
@@ -719,13 +719,16 @@
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.47"
                },
+               "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
+                  "skip_release_testing" : 0
+               },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 9,
                   "version" : "6.012"
                }
             },
             "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.027"
+            "version" : "0.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
@@ -774,7 +777,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",
@@ -857,7 +860,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20180720"
+                  "Module::CoreList" : "5.20180820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1074,7 +1077,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.46",
+                  "tag" : "v0.47",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1175,7 +1178,7 @@
                }
             },
             "name" : "@Author::ETHER/GitHub::Update",
-            "version" : "0.45"
+            "version" : "0.46"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
@@ -1352,21 +1355,21 @@
       "Karen Etheridge <ether@cpan.org>",
       "Dave Rolsky <autarch@urth.org>",
       "Mike Friedman <mike.friedman@10gen.com>",
-      "Rafael Kitover <rkitover@cpan.org>",
       "Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>",
+      "Rafael Kitover <rkitover@cpan.org>",
+      "Joelle Maslak <jmaslak@antelope.net>",
       "Mike Doherty <doherty@cs.dal.ca>",
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Ricardo Signes <rjbs@cpan.org>",
       "Vyacheslav Matyukhin <mmcleric@yandex-team.ru>",
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Brian Phillips <bphillips@cpan.org>",
       "Chris Weyl <cweyl@alumni.drew.edu>",
       "Ioan Rogers <ioan.rogers@gmail.com>",
-      "Joelle Maslak <jmaslak@antelope.net>",
-      "Jose Luis Perez Diez <jluis@escomposlinux.org>"
+      "Jose Luis Perez Diez <jluis@escomposlinux.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Ricardo Signes <rjbs@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.29.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_generated_by_perl" : "v5.29.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_use_unsafe_inc" : 0
 }
 

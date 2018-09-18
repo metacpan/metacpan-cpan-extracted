@@ -1,5 +1,5 @@
 ---
-abstract: 'run blocking functions asynchronously by forking'
+abstract: '(DEPRECATED) run blocking functions asynchronously by forking'
 author:
   - 'Joel Berger <joel.a.berger@gmail.com>'
 build_requires: {}
@@ -15,7 +15,7 @@ name: Mojo-IOLoop-ForkCall
 provides:
   Mojo::IOLoop::ForkCall:
     file: lib/Mojo/IOLoop/ForkCall.pm
-    version: '0.19'
+    version: '0.20'
   Mojolicious::Plugin::ForkCall:
     file: lib/Mojolicious/Plugin/ForkCall.pm
 requires:
@@ -26,5 +26,6 @@ resources:
   bugtracker: https://github.com/jberger/Mojo-IOLoop-ForkCall/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/jberger/Mojo-IOLoop-ForkCall
-version: '0.19'
+version: '0.20'
+x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

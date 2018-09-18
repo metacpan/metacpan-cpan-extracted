@@ -55,15 +55,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

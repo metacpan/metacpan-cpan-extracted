@@ -21,13 +21,13 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  List::Util: '0'
+  List::Util: '1.26'
   Moo: '0'
   Scalar::Util: '0'
   namespace::clean: '0'
-  perl: '5.010000'
+  perl: '5.024000'
   strict: '0'
-version: '0.04'
+version: '0.08'
 x_homepageresources:
   repository:
     type: git

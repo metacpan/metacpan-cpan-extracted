@@ -7,12 +7,13 @@ use File::Temp;
 
 my %optimize_options = (
     IncreaseParallelism => undef,
-    PrepareForBulkLoad => undef,
     OptimizeForPointLookup => 16,
-    OptimizeLevelStyleCompaction => undef,
+    # requires Snappy
+    # OptimizeLevelStyleCompaction => undef,
     OptimizeUniversalStyleCompaction => undef,
+    PrepareForBulkLoad => undef,
 );
-for my $opt (keys %optimize_options) {
+for my $opt (sort keys %optimize_options) {
     my $name = File::Temp::tmpnam;
     my $db = RocksDB->new($name, {
         $opt => $optimize_options{$opt},

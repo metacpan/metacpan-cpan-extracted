@@ -11,7 +11,7 @@ sub new {
     %args = (get_options => { 'with-included-rocksdb' => { type => '!' } }, %args);
     my $self = $class->SUPER::new(%args);
     $self->check_compiler or die 'C++11 compiler required';
-    my $build_config = $self->parse_build_config();
+    my $make_config = $self->parse_make_config();
     my @extra_compiler_flags = (
         qw(-x c++ -std=gnu++11 -I.),
         qw(
@@ -23,13 +23,13 @@ sub new {
             -Wno-literal-suffix
             -Wno-unknown-warning-option
         ),
-        split(/\s+/, $build_config->{PLATFORM_CXXFLAGS}),
+        split(/\s+/, $make_config->{PLATFORM_CXXFLAGS}),
     );
     my @extra_linker_flags = (
         qw(-lstdc++ -lrocksdb),
-        split(/\s+/, $build_config->{PLATFORM_LDFLAGS}),
+        split(/\s+/, $make_config->{PLATFORM_LDFLAGS}),
     );
-    if ($self->args('with-included-rocksdb') || !$self->have_rocksdb($build_config)) {
+    if ($self->args('with-included-rocksdb') || !$self->have_rocksdb($make_config)) {
         push @extra_compiler_flags, "-I$ROCKSDB_DIR/include";
         push @extra_linker_flags, "-L$ROCKSDB_DIR";
     }
@@ -61,10 +61,10 @@ END_SRC
     !$failed;
 }
 
-sub parse_build_config {
+sub parse_make_config {
     my $self = shift;
-    my $file = File::Spec->catfile($ROCKSDB_DIR, 'build_config.mk');
-    -f $file or $self->make_build_config();
+    my $file = File::Spec->catfile($ROCKSDB_DIR, 'make_config.mk');
+    -f $file or $self->gen_make_config();
     open my $fh, '<', $file or die $!;
     my %config;
     while (defined(my $line = <$fh>)) {
@@ -78,7 +78,7 @@ sub parse_build_config {
     \%config;
 }
 
-sub make_build_config {
+sub gen_make_config {
     my $self = shift;
     require Cwd;
     my $script = File::Spec->catfile('build_tools', 'build_detect_platform');
@@ -86,7 +86,7 @@ sub make_build_config {
     my $cwd = Cwd::getcwd;
     chdir $ROCKSDB_DIR or die $!;
     local $ENV{ROCKSDB_ROOT} = Cwd::getcwd;
-    system '/bin/sh', $script, 'build_config.mk' and die $!;
+    system $script, 'make_config.mk' and die $!;
     chdir $cwd or die $!;
 }
 
@@ -146,7 +146,7 @@ sub ACTION_typemap {
 
 sub ACTION_build {
     my $self = shift;
-    $self->do_system('make' => '-C', $ROCKSDB_DIR, 'librocksdb.a', 'OPT=-fPIC');
+    $self->do_system('make' => '-C', $ROCKSDB_DIR, 'static_lib', 'OPT=-fPIC', 'USE_RTTI=1');
     $self->SUPER::ACTION_build();
 }
 

@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,16 +18,24 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
   DBD::SQLite: '0'
   DBI: '0'
+  EV: '4'
+  IO::Socket::SSL: '2.009'
+  IO::Socket::Socks: '0.64'
+  Mojo::Pg: '0'
   Mojolicious: '0'
+  Net::DNS::Native: '0.15'
   Redis: '0'
+  Role::Tiny: '0'
   Sereal: '0'
   XML::Twig: '0'
   local::lib: '0'
   perl: '5.014'
 resources:
-  bugtracker: https://github.com/briandfoy/Task-MojoLearningEnvironment/issues
-  homepage: https://github.com/briandfoy/Task-MojoLearningEnvironment
-  repository: https://github.com/briandfoy/Task-MojoLearningEnvironment.git
-version: '0.002'
+  bugtracker: https://github.com/briandfoy/task-mojolearningenvironment.git/issues
+  homepage: https://github.com/briandfoy/task-mojolearningenvironment.git
+  repository: https://github.com/briandfoy/task-mojolearningenvironment.git.git
+version: '20180917.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

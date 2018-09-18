@@ -15,9 +15,10 @@ meta-spec:
 name: UNIVERSAL-Object
 requires:
   Carp: '0'
-  perl: v5.6.0
+  Hash::Util: '0'
+  perl: v5.8.0
 resources:
   bugtracker: https://github.com/stevan/p5-UNIVERSAL-Object/issues
   repository: https://github.com/stevan/p5-UNIVERSAL-Object.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.70'

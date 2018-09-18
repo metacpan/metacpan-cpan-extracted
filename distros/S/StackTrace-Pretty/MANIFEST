@@ -1,0 +1,23 @@
+Changes
+ignore.txt
+images/readme_normal.png
+images/readme_using_tool.png
+lib/StackTrace/Pretty.pm
+lib/StackTrace/Pretty/LogState.pm
+lib/StackTrace/Pretty/Printer.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+stacktrace-pretty
+t/00-load.t
+t/00-use_ok.t
+t/11-log-state.t
+t/21-printer.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Util.pm
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

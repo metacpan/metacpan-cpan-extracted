@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -9,6 +9,8 @@
 
 #pragma once
 #include <memory>
+#include "rocksdb/slice_transform.h"
+#include "table/internal_iterator.h"
 
 namespace rocksdb {
 
@@ -19,6 +21,7 @@ class Arena;
 struct ReadOptions;
 struct TableProperties;
 class GetContext;
+class InternalIterator;
 
 // A Table is a sorted map from strings to strings.  Tables are
 // immutable and persistent.  A Table may be safely accessed from
@@ -34,7 +37,18 @@ class TableReader {
   //        When destroying the iterator, the caller will not call "delete"
   //        but Iterator::~Iterator() directly. The destructor needs to destroy
   //        all the states but those allocated in arena.
-  virtual Iterator* NewIterator(const ReadOptions&, Arena* arena = nullptr) = 0;
+  // skip_filters: disables checking the bloom filters even if they exist. This
+  //               option is effective only for block-based table format.
+  virtual InternalIterator* NewIterator(const ReadOptions&,
+                                        const SliceTransform* prefix_extractor,
+                                        Arena* arena = nullptr,
+                                        bool skip_filters = false,
+                                        bool for_compaction = false) = 0;
+
+  virtual InternalIterator* NewRangeTombstoneIterator(
+      const ReadOptions& /*read_options*/) {
+    return nullptr;
+  }
 
   // Given a key, return an approximate byte offset in the file where
   // the data for that key begins (or would begin if the key were
@@ -51,7 +65,7 @@ class TableReader {
   virtual std::shared_ptr<const TableProperties> GetTableProperties() const = 0;
 
   // Prepare work that can be done before the real Get()
-  virtual void Prepare(const Slice& target) {}
+  virtual void Prepare(const Slice& /*target*/) {}
 
   // Report an approximation of how much memory has been used.
   virtual size_t ApproximateMemoryUsage() const = 0;
@@ -65,8 +79,37 @@ class TableReader {
   //
   // readOptions is the options for the read
   // key is the key to search for
+  // skip_filters: disables checking the bloom filters even if they exist. This
+  //               option is effective only for block-based table format.
   virtual Status Get(const ReadOptions& readOptions, const Slice& key,
-                     GetContext* get_context) = 0;
+                     GetContext* get_context,
+                     const SliceTransform* prefix_extractor,
+                     bool skip_filters = false) = 0;
+
+  // Prefetch data corresponding to a give range of keys
+  // Typically this functionality is required for table implementations that
+  // persists the data on a non volatile storage medium like disk/SSD
+  virtual Status Prefetch(const Slice* begin = nullptr,
+                          const Slice* end = nullptr) {
+    (void) begin;
+    (void) end;
+    // Default implementation is NOOP.
+    // The child class should implement functionality when applicable
+    return Status::OK();
+  }
+
+  // convert db file to a human readable form
+  virtual Status DumpTable(WritableFile* /*out_file*/,
+                           const SliceTransform* /*prefix_extractor*/) {
+    return Status::NotSupported("DumpTable() not supported");
+  }
+
+  // check whether there is corruption in this db file
+  virtual Status VerifyChecksum() {
+    return Status::NotSupported("VerifyChecksum() not supported");
+  }
+
+  virtual void Close() {}
 };
 
 }  // namespace rocksdb

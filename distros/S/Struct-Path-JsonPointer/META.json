@@ -23,7 +23,7 @@
       "build" : {
          "requires" : {
             "Clone" : "0",
-            "Struct::Path" : "0.80",
+            "Struct::Path" : "0.82",
             "Test::More" : "0"
          }
       },
@@ -41,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "version" : "0.03"
 }

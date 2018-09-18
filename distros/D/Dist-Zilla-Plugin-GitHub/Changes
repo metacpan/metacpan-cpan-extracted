@@ -1,8 +1,12 @@
 Revision history for Dist-Zilla-Plugin-GitHub
 
+0.47      2018-09-16 22:43:24Z
+
+  - Fix infinite loop when using 2FA (Joelle Maslak, #55)
+
 0.46      2018-08-05 01:19:21Z
 
-  - Fix error in calculating github credentials (J.Maslak, #52)
+  - Fix error in calculating github credentials (Joelle Maslak, #52)
   - the 'cpan' option in [GitHub::Update] is now deprecated, and will now
     behave as if the 'metacpan' option was set instead.
 

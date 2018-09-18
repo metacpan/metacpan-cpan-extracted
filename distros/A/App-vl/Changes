@@ -1,0 +1,7 @@
+Revision history for Perl extension App::vl
+
+0.02    Mon Sep 17 12:59:19 JST 2018
+        - Fix dependency
+
+0.01    Sat Sep 15 21:06:18 JST 2018
+        - original version

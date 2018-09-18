@@ -8,8 +8,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Pod/Weaver/PluginBundle/SHLOMIF.pm',
-    't/00-compile.t',
-    't/dagolden.t'
+    't/00-compile.t'
 );
 
 notabs_ok($_) foreach @files;

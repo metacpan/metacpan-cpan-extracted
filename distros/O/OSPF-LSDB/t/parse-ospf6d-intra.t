@@ -26,6 +26,35 @@ Number of Prefixes: 2
     Prefix: fdd7:e83e:66bc:0:a00:20ff:fece:a11c/128 Options: *|*|*|-|-|x|LA|-
     Prefix: 2a01:198:24d:0:a00:20ff:fece:a11c/128 Options: *|*|*|-|-|x|LA|-
 
+LS age: 1647
+LS Type: Intra Area (Prefix)
+Link State ID: 0.0.0.1
+Advertising Router: 10.188.0.10
+LS Seq Number: 0x80000007
+Checksum: 0x34f3
+Length: 68
+Referenced LS Type: Network
+Referenced Link State ID: 0.0.0.1
+Referenced Advertising Router: 10.188.0.10
+Number of Prefixes: 3
+    Prefix: 2a01:198:24d:2::/64 Metric: 0
+    Prefix: fdd7:e83e:66bc:1::/64 Metric: 0
+    Prefix: fdd7:e83e:66bc:2::/64 Metric: 0
+
+LS age: 1647
+LS Type: Intra Area (Prefix)
+Link State ID: 1.0.0.0
+Advertising Router: 10.188.0.10
+LS Seq Number: 0x8000002f
+Checksum: 0x7028
+Length: 72
+Referenced LS Type: Router
+Referenced Link State ID: 0.0.0.0
+Referenced Advertising Router: 10.188.0.10
+Number of Prefixes: 2
+    Prefix: fdd7:e83e:66bc:0:215:58ff:fe7c:cb62/128 Options: *|*|*|-|-|x|LA|- Metric: 0
+    Prefix: 2a01:198:262:0:215:58ff:fe7c:cb62/128 Options: *|*|*|-|-|x|LA|- Metric: 0
+
 LS age: 1173
 LS Type: Intra Area (Prefix)
 Link State ID: 0.0.0.1
@@ -88,6 +117,24 @@ is_deeply($ospf->{ospf}{database}{intrarouters}, [
     },
     {
 	address => '1.0.0.0',
+	age => '1647',
+	area => '10.188.0.0',
+	interface => '0.0.0.0',
+	router => '10.188.0.10',
+	routerid => '10.188.0.10',
+	sequence => '0x8000002f',
+	prefixes => [ {
+	    prefixaddress   => 'fdd7:e83e:66bc:0:215:58ff:fe7c:cb62',
+	    prefixlength    => 128,
+	    metric          => 0,
+	}, {
+	    prefixaddress   => '2a01:198:262:0:215:58ff:fe7c:cb62',
+	    prefixlength    => 128,
+	    metric          => 0,
+	} ],
+    },
+    {
+	address => '1.0.0.0',
 	age => '1173',
 	area => '10.188.0.0',
 	interface => '0.0.0.0',
@@ -104,6 +151,28 @@ is_deeply($ospf->{ospf}{database}{intrarouters}, [
     },
 ], "intrarouter");
 is_deeply($ospf->{ospf}{database}{intranetworks}, [
+    {
+	address => '0.0.0.1',
+	age => '1647',
+	area => '10.188.0.0',
+	interface => '0.0.0.1',
+	router => '10.188.0.10',
+	routerid => '10.188.0.10',
+	sequence => '0x80000007',
+	prefixes => [ {
+	    prefixaddress   => '2a01:198:24d:2::',
+	    prefixlength    => 64,
+	    metric          => 0,
+	}, {
+	    prefixaddress   => 'fdd7:e83e:66bc:1::',
+	    prefixlength    => 64,
+	    metric          => 0,
+	}, {
+	    prefixaddress   => 'fdd7:e83e:66bc:2::',
+	    prefixlength    => 64,
+	    metric          => 0,
+	} ],
+    },
     {
 	address => '0.0.0.1',
 	age => '1173',
@@ -136,8 +205,8 @@ foreach (@{$ospf->{intra}}) {
     s/^ +Prefix: 2a01:198:24d:0:a00:20ff:fece:a11c\/128.*/ Intra Area Prefix Link States (Area 51.0.0.0)/;
 }
 eval { $ospf->parse_intra() };
-ok($@, "error intra area not finished") or diag "parse_intra did not die";
-like($@, qr/51.0.0.0.*\n Prefixes of intra-area-prefix 1.0.0.0\@10.188.0.16 in area 10.188.0.0 not finished./, " prefix area not finished");
+ok($@, "error prefix area not finished") or diag "parse_intra did not die";
+like($@, qr/51.0.0.0.*\n Prefixes of intra-area-prefix 1.0.0.0\@10.188.0.16 in area 10.188.0.0 not finished./, "prefix area not finished");
 
 $ospf->{intra} = [ @intras ];
 foreach (@{$ospf->{intra}}) {
@@ -145,7 +214,7 @@ foreach (@{$ospf->{intra}}) {
 }
 eval { $ospf->parse_intra() };
 ok($@, "error intra area not finished") or diag "parse_intra did not die";
-like($@, qr/51.0.0.0.*\n Intra-area-prefix 1.0.0.0\@10.188.0.16 in area 10.188.0.0 not finished./, " intra area not finished");
+like($@, qr/51.0.0.0.*\n Intra-area-prefix 1.0.0.0\@10.188.0.16 in area 10.188.0.0 not finished./, "intra area not finished");
 
 $ospf->{intra} = [ @intras ];
 foreach (@{$ospf->{intra}}) {

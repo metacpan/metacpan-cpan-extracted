@@ -10,13 +10,13 @@ use Mojo::Template;
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description';
 has 'quiet';
-has template => sub { {} };
+has template => sub { {vars => 1} };
 has usage => "Usage: APPLICATION\n";
 
 sub chmod_file {
-  my ($self, $path, $mod) = @_;
-  chmod $mod, $path or croak qq{Can't chmod file "$path": $!};
-  return $self->_loud("  [chmod] $path " . sprintf('%lo', $mod));
+  my ($self, $path, $mode) = @_;
+  path($path)->chmod($mode);
+  return $self->_loud("  [chmod] $path " . sprintf('%lo', $mode));
 }
 
 sub chmod_rel_file { $_[0]->chmod_file($_[0]->rel_file($_[1]), $_[2]) }
@@ -150,7 +150,7 @@ Limited command output.
   $command     = $command->template({vars => 1});
 
 Attribute values passed to L<Mojo::Template> objects used to render templates
-with L</"render_data">.
+with L</"render_data">, defaults to activating C<vars>.
 
 =head2 usage
 

@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-FS
 ----------------------------------
 
+commit aa9473e424b1372e29e8c74b9071f904946fc296
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Jul 7 09:19:59 2018 -0700
+
+    1.21 Build fix, no functional changes
+
 commit 53e66ebe5058546675bb1b079c856fba84974e7f
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jul 6 19:20:12 2018 -0700
@@ -80,13 +86,4 @@ Date:   Fri May 5 12:45:20 2017 -0700
     
     It's useful to have an all Atom derived objects and does not conflict
     with anything.
-
-commit 599756314f68630b28687f238a773de5d47d4bbe
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Apr 19 17:35:32 2017 -0700
-
-    Changes for CPAN - testcases name space
-    
-    Uploaded all the most recent changes to CPAN, which resulted in
-    conflicts because of namespace reuse in test cases. Fixed that.
 

@@ -1,5 +1,5 @@
 package POE::Component::Server::SimpleHTTP::Response;
-$POE::Component::Server::SimpleHTTP::Response::VERSION = '2.26';
+$POE::Component::Server::SimpleHTTP::Response::VERSION = '2.28';
 #ABSTRACT: Emulates a HTTP::Response object, used for SimpleHTTP
 
 use strict;
@@ -102,7 +102,7 @@ POE::Component::Server::SimpleHTTP::Response - Emulates a HTTP::Response object,
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ Apocalypse <APOCAL@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
+This software is copyright (c) 2018 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

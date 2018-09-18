@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AcousticBrainz
   repository: https://github.com/ology/WebService-AcousticBrainz
-version: '0.0103'
+version: '0.0104'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

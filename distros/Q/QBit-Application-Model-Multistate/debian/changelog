@@ -1,3 +1,9 @@
+libqbit-application-model-multistate-perl (0.009) raring; urgency=low
+
+  * speed up
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 15 Sep 2018 16:59:34 +0300
+
 libqbit-application-model-multistate-perl (0.008) raring; urgency=low
 
   * fix exceptions

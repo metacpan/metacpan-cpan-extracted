@@ -22,7 +22,12 @@ CAIXS_install_inherited_accessor(pTHX_ SV* full_name, SV* hash_key, SV* pkg_key,
 
     if (need_cb) {
         assert(pkg_key != NULL);
-        payload = CAIXS_install_accessor<InheritedCb>(aTHX_ full_name, (AccessorOpts)opts);
+
+        if (opts & IsNamed) {
+            payload = CAIXS_install_accessor<InheritedCbNamed>(aTHX_ full_name, (AccessorOpts)(opts & ~IsNamed));
+        } else {
+            payload = CAIXS_install_accessor<InheritedCb>(aTHX_ full_name, (AccessorOpts)opts);
+        }
 
     } else if (pkg_key != NULL) {
         payload = CAIXS_install_accessor<Inherited>(aTHX_ full_name, (AccessorOpts)opts);
@@ -163,7 +168,7 @@ BOOT:
     RGSTR(None);
     RGSTR(IsReadonly);
     RGSTR(IsWeak);
-    RGSTR(PushName);
+    RGSTR(IsNamed);
 
     AV* isa = get_av("Class::Accessor::Inherited::XS::Constants::ISA", GV_ADD);
     av_push(isa, newSVpvs("Exporter"));

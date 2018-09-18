@@ -31,7 +31,7 @@
 #include "spvm_use.h"
 #include "spvm_package_var.h"
 #include "spvm_package_var_access.h"
-#include "spvm_csource_builder.h"
+#include "spvm_csource_builder_precompile.h"
 #include "spvm_block.h"
 #include "spvm_basic_type.h"
 #include "spvm_case_info.h"
@@ -217,7 +217,7 @@ SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_T
   return op_var;
 }
 
-_Bool SPVM_OP_is_rel_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
+int32_t SPVM_OP_is_rel_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
   (void)compiler;
   
   switch (op->id) {
@@ -276,7 +276,7 @@ SPVM_OP* SPVM_OP_build_var(SPVM_COMPILER* compiler, SPVM_OP* op_var_name) {
   // Package variable
   else if (isupper(var_name[1]) || strchr(var_name, ':')) {
     
-    _Bool is_invalid = 0;
+    int32_t is_invalid = 0;
     int32_t length = (int32_t)strlen(var_name);
     
     // only allow two colon
@@ -425,13 +425,13 @@ SPVM_OP* SPVM_OP_get_parent(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
   return op_parent;
 }
 
-void SPVM_OP_get_before(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP** op_before_ptr, _Bool* next_is_child_ptr) {
+void SPVM_OP_get_before(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP** op_before_ptr, int32_t* next_is_child_ptr) {
 
   // Get parent
   SPVM_OP* op_parent = SPVM_OP_get_parent(compiler, op_target);
   
   SPVM_OP* op_before;
-  _Bool next_is_child = 0;
+  int32_t next_is_child = 0;
   if (op_parent->first == op_target) {
     op_before = op_parent;
     next_is_child = 1;
@@ -459,10 +459,10 @@ void SPVM_OP_replace_op(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP* op
   // Get parent op
   SPVM_OP* op_parent = SPVM_OP_get_parent(compiler, op_target);
   
-  _Bool op_target_is_last_child = op_parent->last == op_target;
+  int32_t op_target_is_last_child = op_parent->last == op_target;
 
   // Get before op
-  _Bool next_is_child;
+  int32_t next_is_child;
   SPVM_OP* op_before;
   SPVM_OP_get_before(compiler, op_target, &op_before, &next_is_child);
   
@@ -494,10 +494,10 @@ SPVM_OP* SPVM_OP_cut_op(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
   // Get parent op
   SPVM_OP* op_parent = SPVM_OP_get_parent(compiler, op_target);
   
-  _Bool op_target_is_last_child = op_parent->last == op_target;
+  int32_t op_target_is_last_child = op_parent->last == op_target;
 
   // Get before op
-  _Bool next_is_child;
+  int32_t next_is_child;
   SPVM_OP* op_before;
   SPVM_OP_get_before(compiler, op_target, &op_before, &next_is_child);
   
@@ -975,6 +975,7 @@ SPVM_OP* SPVM_OP_build_new(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM_OP* op
   if (op_list_elements) {
     SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, op_list_elements->file, op_list_elements->line);
     SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_list_elements);
+    SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_type);
     
     return op_array_init;
   }
@@ -1370,7 +1371,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   
   if (!op_type) {
     // Package is anon
-    package->is_anon = 1;
+    package->flag |= SPVM_PACKAGE_C_FLAG_IS_ANON;
     
     // Anon package name
     char* name_package = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, strlen("anon2147483647") + 1);
@@ -1384,7 +1385,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   
   const char* package_name = op_type->uv.type->basic_type->name;
   
-  if (!package->is_anon && islower(package_name[0])) {
+  if (!(package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON) && islower(package_name[0])) {
     SPVM_yyerror_format(compiler, "Package name must start with upper case \"%s\" at %s line %d\n", package_name, op_package->file, op_package->line);
   }
 
@@ -1414,7 +1415,8 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           duplicate_descriptors++;
           break;
         case SPVM_DESCRIPTOR_C_ID_POINTER:
-          package->category = SPVM_PACKAGE_C_CATEGORY_POINTER;
+          package->category = SPVM_PACKAGE_C_CATEGORY_CLASS;
+          package->flag |= SPVM_PACKAGE_C_FLAG_IS_POINTER;
           duplicate_descriptors++;
           break;
         case SPVM_DESCRIPTOR_C_ID_VALUE_T:
@@ -1422,10 +1424,9 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           duplicate_descriptors++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
-          package->is_private = 1;
+          package->flag |= SPVM_PACKAGE_C_FLAG_IS_PRIVATE;
           break;
         case SPVM_DESCRIPTOR_C_ID_PUBLIC:
-          package->is_private = 0;
           break;
         default:
           SPVM_yyerror_format(compiler, "Invalid package descriptor %s at %s line %d\n", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_package->file, op_package->line);
@@ -1475,7 +1476,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   {
     int32_t i;
     for (i = 0; i < package->fields->length; i++) {
-      if (package->category == SPVM_PACKAGE_C_CATEGORY_POINTER) {
+      if (package->flag & SPVM_PACKAGE_C_FLAG_IS_POINTER) {
         SPVM_yyerror_format(compiler, "Pointer package can't have field at %s line %d\n", op_decl->file, op_decl->line);
         continue;
       }
@@ -1590,7 +1591,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       }
       else if (package->subs->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
         SPVM_yyerror_format(compiler, "Too many sub declarations at %s line %d\n", sub_name, sub->op_sub->file, sub->op_sub->line);
-        
       }
       // Unknown sub
       else {
@@ -1612,6 +1612,13 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         
         SPVM_HASH_insert(package->sub_symtable, sub->op_name->uv.name, strlen(sub->op_name->uv.name), sub);
       }
+    }
+  }
+  
+  // Interface must have only one method
+  if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
+    if (package->subs->length != 1) {
+      SPVM_yyerror_format(compiler, "Interface must have only one method at %s line %d\n", op_package->file, op_package->line);
     }
   }
   
@@ -1688,7 +1695,7 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op
   
   package_var->name = op_var->uv.var->op_name->uv.name;
   
-  _Bool invalid_name = 0;
+  int32_t invalid_name = 0;
   if (op_var->id != SPVM_OP_C_ID_PACKAGE_VAR_ACCESS) {
     invalid_name = 1;
   }

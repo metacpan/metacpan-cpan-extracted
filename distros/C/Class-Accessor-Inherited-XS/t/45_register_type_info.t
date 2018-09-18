@@ -1,6 +1,7 @@
 use strict;
 use Test::More;
 use Class::Accessor::Inherited::XS;
+use Class::Accessor::Inherited::XS::Constants;
 
 my $type;
 my $counter = 0;
@@ -12,7 +13,7 @@ sub foo {}
 
 BEGIN {
     Class::Accessor::Inherited::XS::register_types(
-        nmd => {write_cb => \&wrt, read_cb => \&rdt, opts => 4},
+        nmd => {write_cb => \&wrt, read_cb => \&rdt, opts => IsNamed},
         stb => {write_cb => \&foo, read_cb => \&foo},
     );
 }

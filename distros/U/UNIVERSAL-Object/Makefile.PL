@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006000;
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,15 +14,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "UNIVERSAL-Object",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006000",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "UNIVERSAL::Object",
   "PREREQ_PM" => {
-    "Carp" => 0
+    "Carp" => 0,
+    "Hash::Util" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t t/010-object/*.t t/020-slots/*.t t/030-instance/*.t t/040-immutable/*.t t/100-examples/*.t"
   }
@@ -31,6 +32,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Hash::Util" => 0,
   "Test::More" => 0
 );
 

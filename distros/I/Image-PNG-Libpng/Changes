@@ -1,3 +1,9 @@
+0.46 2018-09-15
+
+- Change set_rows to copy the data
+- Bug fix for Strawberry Perl builds
+- Documentation
+
 0.45 2018-01-04
 
 - Provisional support for png_set_compression_level removed

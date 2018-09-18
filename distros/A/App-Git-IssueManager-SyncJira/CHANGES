@@ -1,0 +1,35 @@
+==================================================
+Changes from 2017-09-16 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2018-09-16 10:29:54 +0000
+----------------------------------------
+
+  Change: 83e89cd85053340b0634303f47044028612b91f6
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-16 12:29:50 +0000
+
+    ADD: ignore files 
+
+  Change: 57d985025bed47341e9375fd949859bb128b9711
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-16 12:25:52 +0000
+
+    ADD: dist::zilla configuration 
+
+  Change: 281cd77fcbb994d28603644412fce07015a0d29b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-16 12:23:03 +0000
+
+    ADD: first implementation of sync_jira command 
+
+  Change: 37ddff886c04aba3ab000ccad45d479435dbad52
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-16 10:31:46 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

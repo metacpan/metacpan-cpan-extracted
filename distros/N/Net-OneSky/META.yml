@@ -17,9 +17,11 @@ meta-spec:
   version: '1.4'
 name: Net-OneSky
 requires:
+  Cwd: '0'
   Digest::MD5: '0'
   File::Basename: '0'
   HTTP::Request::Common: '0'
+  IPC::Open3: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   Moose: '0'
@@ -29,4 +31,4 @@ requires:
   namespace::autoclean: '0'
   strict: '0'
   warnings: '0'
-version: 0.0.1
+version: 0.0.2

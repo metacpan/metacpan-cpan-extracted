@@ -30,10 +30,14 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Weasel::Driver::Selenium2" : "0"
+         },
          "requires" : {
             "List::Util" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
+            "namespace::autoclean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -55,7 +59,7 @@
          "web" : "https://github.com/ehuelsmann/weasel"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

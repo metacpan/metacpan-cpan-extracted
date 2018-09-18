@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.142-3-g9e4cf08
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.144-2-g67011e3
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.143';
+our $VERSION = '0.145';
 
 use Moose;
 with
@@ -150,7 +150,7 @@ has plugin_prereq_relationship => (
 my %extra_args = (
     'Dist::Zilla::Plugin::MakeMaker' => { 'eumm_version' => '0' },
     'Dist::Zilla::Plugin::ModuleBuildTiny' => { ':version' => '0.012', version_method => 'conservative', static => 'auto' },
-    'Dist::Zilla::Plugin::MakeMaker::Fallback' => { ':version' => '0.012' },
+    'Dist::Zilla::Plugin::MakeMaker::Fallback' => { ':version' => '0.029' },
     # default_jobs is no-op until Dist::Zilla 5.014
     'Dist::Zilla::Role::TestRunner' => { default_jobs => 9 },
     'Dist::Zilla::Plugin::ModuleBuild' => { mb_version => '0.28' },
@@ -616,7 +616,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.143
+version 0.145
 
 =head1 SYNOPSIS
 

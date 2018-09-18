@@ -1,7 +1,7 @@
-// Copyright (c) 2014, Facebook, Inc. All rights reserved.
-// This source code is licensed under the BSD-style license found in the
-// LICENSE file in the root directory of this source tree. An additional grant
-// of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2011-present, Facebook, Inc. All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #ifndef ROCKSDB_LITE
 #include "table/cuckoo_table_factory.h"
@@ -12,12 +12,14 @@
 
 namespace rocksdb {
 
-Status CuckooTableFactory::NewTableReader(const ImmutableCFOptions& ioptions,
-    const EnvOptions& env_options, const InternalKeyComparator& icomp,
-    std::unique_ptr<RandomAccessFile>&& file, uint64_t file_size,
-    std::unique_ptr<TableReader>* table) const {
-  std::unique_ptr<CuckooTableReader> new_reader(new CuckooTableReader(ioptions,
-      std::move(file), file_size, icomp.user_comparator(), nullptr));
+Status CuckooTableFactory::NewTableReader(
+    const TableReaderOptions& table_reader_options,
+    unique_ptr<RandomAccessFileReader>&& file, uint64_t file_size,
+    std::unique_ptr<TableReader>* table,
+    bool /*prefetch_index_and_filter_in_cache*/) const {
+  std::unique_ptr<CuckooTableReader> new_reader(new CuckooTableReader(
+      table_reader_options.ioptions, std::move(file), file_size,
+      table_reader_options.internal_comparator.user_comparator(), nullptr));
   Status s = new_reader->status();
   if (s.ok()) {
     *table = std::move(new_reader);
@@ -26,15 +28,19 @@ Status CuckooTableFactory::NewTableReader(const ImmutableCFOptions& ioptions,
 }
 
 TableBuilder* CuckooTableFactory::NewTableBuilder(
-    const ImmutableCFOptions& ioptions,
-    const InternalKeyComparator& internal_comparator,
-    WritableFile* file, const CompressionType,
-    const CompressionOptions&) const {
+    const TableBuilderOptions& table_builder_options, uint32_t column_family_id,
+    WritableFileWriter* file) const {
+  // Ignore the skipFIlters flag. Does not apply to this file format
+  //
+
   // TODO: change builder to take the option struct
-  return new CuckooTableBuilder(file, table_options_.hash_table_ratio, 64,
-      table_options_.max_search_depth, internal_comparator.user_comparator(),
+  return new CuckooTableBuilder(
+      file, table_options_.hash_table_ratio, 64,
+      table_options_.max_search_depth,
+      table_builder_options.internal_comparator.user_comparator(),
       table_options_.cuckoo_block_size, table_options_.use_module_hash,
-      table_options_.identity_as_first_hash, nullptr);
+      table_options_.identity_as_first_hash, nullptr /* get_slice_hash */,
+      column_family_id, table_builder_options.column_family_name);
 }
 
 std::string CuckooTableFactory::GetPrintableTableOptions() const {

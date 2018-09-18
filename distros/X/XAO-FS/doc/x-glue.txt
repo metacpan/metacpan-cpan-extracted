@@ -48,10 +48,18 @@ PUBLIC METHODS
         name and optionally port number, hostname and so on. It is
         recommended to pass user name and password too. Example:
 
-         my $odb=XAO::Objects->new(objname => 'FS::Glue',
-                                   dsn => 'OS:MySQL:ostest;hostname=dbserver'
-                                   user => 'user',
-                                   password => 'pAsSwOrD');
+         my $odb=XAO::Objects->new(
+            objname  => 'FS::Glue',
+            dsn      => 'OS:MySQL_DBI:ostest;dbi_driver=MariaDB;hostname=dbserver'
+            user     => 'user',
+            password => 'pAsSwOrD',
+         );
+
+        Most database options are passed to the implementation driver as is
+        (e.g. hostname, etc), but some are special:
+
+            * dbi_driver    - mysql (for DBD::mysql) or MariaDB (for DBD::MariaDB)
+            * table_type    - MyISAM or InnoDB
 
         In order to get objects connected to that database you should call
         new on $odb with the following syntax:

@@ -99,7 +99,6 @@ struct SPVM_env {
   void* (*concat)(SPVM_ENV* env, void* string1, void* string2);
   int32_t (*weaken_object_field)(SPVM_ENV* env, void* object, int32_t field_rel_id);
   void* (*create_exception_stack_trace)(SPVM_ENV* env, void* excetpion, const char* package_name, const char* sub_name, const char* file, int32_t line);
-  int32_t (*check_cast)(SPVM_ENV* env, int32_t cast_basic_type_id, int32_t cast_type_dimension, void* object);
   void* object_header_byte_size;
   void* object_ref_count_byte_offset;
   void* object_basic_type_id_byte_offset;
@@ -124,5 +123,12 @@ struct SPVM_env {
   int32_t (*get_package_var_id)(SPVM_ENV* env, const char* package_name, const char* signature);
   void* runtime_package_vars_heap_byte_offset;
   void* runtime;
+  int32_t (*has_interface)(SPVM_ENV*, int32_t package_basic_type_id, int32_t package_type_dimension, int32_t interface_basic_type_id, int32_t interface_type_dimension);
+  void* basic_type_id_byte_object;
+  void* basic_type_id_short_object;
+  void* basic_type_id_int_object;
+  void* basic_type_id_long_object;
+  void* basic_type_id_float_object;
+  void* basic_type_id_double_object;
 };
 #endif

@@ -1,5 +1,5 @@
 package HackaMol::Roles::QmMolRole;
-$HackaMol::Roles::QmMolRole::VERSION = '0.049';
+$HackaMol::Roles::QmMolRole::VERSION = '0.050';
 #ABSTRACT: provides attributes needed for quantum chemistry calculations
 # this will need updating as needs arise
 use Moose::Role;
@@ -67,7 +67,7 @@ HackaMol::Roles::QmMolRole - provides attributes needed for quantum chemistry ca
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 

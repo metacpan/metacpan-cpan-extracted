@@ -1,6 +1,6 @@
 package Map::Tube::Tokyo::Line::Asakusa;
 
-$Map::Tube::Tokyo::Line::Asakusa::VERSION   = '0.49';
+$Map::Tube::Tokyo::Line::Asakusa::VERSION   = '0.50';
 $Map::Tube::Tokyo::Line::Asakusa::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -14,7 +14,7 @@ Map::Tube::Tokyo::Line::Asakusa - Tokyo Subway Map: Asakusa Line.
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =head1 DESCRIPTION
 

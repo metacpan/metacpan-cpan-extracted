@@ -41,7 +41,7 @@
 #include "spvm_my.h"
 #include "spvm_portable.h"
 
-#include "spvm_exe_csource_builder.h"
+#include "spvm_csource_builder_exe.h"
 #include "spvm_string_buffer.h"
 
 
@@ -152,7 +152,6 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_concat,
     SPVM_RUNTIME_API_weaken_object_field,
     SPVM_RUNTIME_API_create_exception_stack_trace,
-    SPVM_RUNTIME_API_check_cast,
     (void*)(intptr_t)sizeof(SPVM_OBJECT), // object_header_byte_size
     (void*)(intptr_t)offsetof(SPVM_OBJECT, ref_count), // object_ref_count_byte_offset
     (void*)(intptr_t)offsetof(SPVM_OBJECT, basic_type_id), // object_basic_type_id_byte_offset
@@ -177,13 +176,20 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_get_package_var_id,
     (void*)(intptr_t)offsetof(SPVM_RUNTIME, package_vars_heap), // runtime_package_vars_heap_byte_offset
     runtime,
+    SPVM_RUNTIME_API_has_interface,
+    (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_BYTE_OBJECT,
+    (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_SHORT_OBJECT,
+    (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_INT_OBJECT,
+    (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_LONG_OBJECT,
+    (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_FLOAT_OBJECT,
+    (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_DOUBLE_OBJECT,
   };
   
-  int32_t env_length = 79;
-  void** env = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(void*) * env_length);
+  int32_t env_length = 85;
+  SPVM_ENV* env = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(void*) * env_length);
   memcpy(&env[0], &env_init[0], sizeof(void*) * env_length);
   
-  return (SPVM_ENV*)env;
+  return env;
 }
 
 SPVM_ENV* SPVM_RUNTIME_BUILDER_build_runtime_env(SPVM_PORTABLE* portable) {
@@ -196,6 +202,7 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_build_runtime_env(SPVM_PORTABLE* portable) {
   
   // Share runtime information with portable
   runtime->symbols = portable->symbols;
+  runtime->symbols_length = portable->symbols_length;
   runtime->basic_types = (SPVM_RUNTIME_BASIC_TYPE*)portable->basic_types;
   runtime->basic_types_length = portable->basic_types_length;
   runtime->fields = (SPVM_RUNTIME_FIELD*)portable->fields;
@@ -215,6 +222,7 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_build_runtime_env(SPVM_PORTABLE* portable) {
   runtime->info_long_values = portable->info_long_values;
   runtime->info_double_values = portable->info_double_values;
   runtime->info_string_values = portable->info_string_values;
+  runtime->info_string_values_length = portable->info_string_values_length;
   runtime->info_string_lengths = portable->info_string_lengths;
 
   // Native sub addresses
@@ -248,14 +256,6 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_build_runtime_env(SPVM_PORTABLE* portable) {
     SPVM_LIST_push(runtime->info_switch_infos, runtime_info_switch_info);
   }
 
-  // build package variable symtable
-  runtime->package_var_symtable = SPVM_HASH_new(0);
-  for (int32_t package_var_id = 0; package_var_id < runtime->package_vars_length; package_var_id++) {
-    SPVM_RUNTIME_PACKAGE_VAR* runtime_package_var = &runtime->package_vars[package_var_id];
-    const char* runtime_package_var_name = runtime->symbols[runtime_package_var->name_id];
-    SPVM_HASH_insert(runtime->package_var_symtable, runtime_package_var_name, strlen(runtime_package_var_name), runtime_package_var);
-  }
-
   // build packages
   runtime->packages_length = portable->packages_length;
   runtime->packages = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_RUNTIME_PACKAGE) * (runtime->packages_length + 1));
@@ -268,6 +268,7 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_build_runtime_env(SPVM_PORTABLE* portable) {
     runtime_package->destructor_sub_id = portable_package[2];
     runtime_package->category = portable_package[3];
     runtime_package->load_path_id = portable_package[4];
+    runtime_package->flag = portable_package[5];
   }
 
   // build package symtable
@@ -291,7 +292,6 @@ SPVM_ENV* SPVM_RUNTIME_BUILDER_build_runtime_env(SPVM_PORTABLE* portable) {
     package->sub_symtable = SPVM_HASH_new(0);
     package->sub_signatures = SPVM_LIST_new(0);
     package->sub_signature_symtable = SPVM_HASH_new(0);
-    package->has_interface_cache_symtable = SPVM_HASH_new(0);
   }
 
   // Register field info to package

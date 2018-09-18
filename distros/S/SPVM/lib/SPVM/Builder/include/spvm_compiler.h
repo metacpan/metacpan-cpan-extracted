@@ -27,7 +27,7 @@ struct SPVM_compiler {
   char* befbufptr;
 
   // Expect subroutine name
-  _Bool expect_sub_name;
+  int32_t expect_sub_name;
   
   // Current enum value
   int32_t current_enum_value;
@@ -100,6 +100,9 @@ struct SPVM_compiler {
 
   // Method signature symbol table
   SPVM_HASH* signature_symtable;
+  
+  char buffer1[UINT16_MAX * 2];
+  char buffer2[UINT16_MAX * 2];
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();

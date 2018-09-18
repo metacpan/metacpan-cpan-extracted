@@ -6,14 +6,14 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.94';
+our $VERSION = '0.96';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
-  ClassAutouse ClassLoad Core Inline Later Mixin ModuleRuntime
-  MojoBase Moose MooseXDeclare Only Plack POE Prefork
-  Superclass Syntax SyntaxCollector TestClassMost TestMore
-  TestRequires UniversalVersion Unless
+  ClassAutouse ClassLoad Core Inline KeywordDeclare Later
+  Mixin ModuleRuntime MojoBase Moose MooseXDeclare Only
+  Plack POE Prefork Superclass Syntax SyntaxCollector
+  TestClassMost TestMore TestRequires UniversalVersion Unless
 /;
 our @DEFAULT_PARSERS = qw/Core Moose/;
 
@@ -22,15 +22,20 @@ our @DEFAULT_PARSERS = qw/Core Moose/;
 use constant DEBUG => !!$ENV{PERL_PSNQL_DEBUG} || 0;
 use constant DEBUG_RE => DEBUG > 3 ? 1 : 0;
 
+sub _debug {}
+sub _error {}
+sub _dump_stack {}
+
 if (DEBUG) {
   require Data::Dump; Data::Dump->import(qw/dump/);
-  sub _debug { print @_, "\n" }
-  sub _error { print @_, "*" x 50, "\n" }
-  sub _dump_stack {
+  no warnings 'redefine';
+  *_debug = sub { print @_, "\n" };
+  *_error = sub { print @_, "*" x 50, "\n" };
+  *_dump_stack = sub {
     my ($c, $char) = @_;
     my $stacked = join '', map {($_->[2] ? "($_->[2])" : '').$_->[0]} @{$c->{stack}};
     _debug("$char \t\t\t\t stacked: $stacked");
-  }
+  };
 }
 
 sub _match_error {
@@ -42,7 +47,6 @@ sub _match_error {
 ### Global Variables To Be Sorted Out Later
 
 my %unsupported_packages = map {$_ => 1} qw(
-  Perl6::Attributes
 );
 
 my %sub_keywords = (
@@ -280,6 +284,8 @@ sub scan_string {
     push @{$c->{errors}}, Data::Dump::dump($c->{stack});
   }
 
+  $c->remove_inner_packages_from_requirements;
+
   $c;
 }
 
@@ -302,6 +308,11 @@ sub _skim_string {
 
 sub _scan {
   my ($self, $c, $rstr, $parent_scope) = @_;
+
+  if (@{$c->{stack}} > 90) {
+    _error("deep recursion found");
+    $c->{ended} = 1;
+  }
 
   _dump_stack($c, "BEGIN SCOPE") if DEBUG;
 
@@ -1385,23 +1396,6 @@ sub _scan {
         }
         $stack = undef;
       }
-      if ($unstack and @{$c->{stack}}) {
-        my $stacked = pop @{$c->{stack}};
-        my $stacked_type = substr($stacked->[0], -1);
-        if (
-          ($unstack eq '}' and $stacked_type ne '{') or
-          ($unstack eq ']' and $stacked_type ne '[') or
-          ($unstack eq ')' and $stacked_type ne '(')
-        ) {
-          my $prev_pos = $stacked->[1] || 0;
-          die "mismatch $stacked_type $unstack\n" .
-              substr($$rstr, $prev_pos, pos($$rstr) - $prev_pos);
-        }
-        _dump_stack($c, $unstack) if DEBUG;
-        $current_scope |= F_SCOPE_END;
-        $unstack = undef;
-      }
-
       if ($current_scope & F_SENTENCE_END) {
         if (($current_scope & F_KEEP_TOKENS) and @tokens) {
           my $first_token = $tokens[0][0];
@@ -1473,6 +1467,22 @@ sub _scan {
         $caller_package = undef;
         $token = $token_type = '';
         _debug('END SENTENSE') if DEBUG;
+      }
+      if ($unstack and @{$c->{stack}}) {
+        my $stacked = pop @{$c->{stack}};
+        my $stacked_type = substr($stacked->[0], -1);
+        if (
+          ($unstack eq '}' and $stacked_type ne '{') or
+          ($unstack eq ']' and $stacked_type ne '[') or
+          ($unstack eq ')' and $stacked_type ne '(')
+        ) {
+          my $prev_pos = $stacked->[1] || 0;
+          die "mismatch $stacked_type $unstack\n" .
+              substr($$rstr, $prev_pos, pos($$rstr) - $prev_pos);
+        }
+        _dump_stack($c, $unstack) if DEBUG;
+        $current_scope |= F_SCOPE_END;
+        $unstack = undef;
       }
 
       last if $current_scope & F_SCOPE_END;

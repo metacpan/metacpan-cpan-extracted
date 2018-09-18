@@ -1,5 +1,9 @@
 Revision history for Data-Grid
 
+0.06    Thu Sep 13 14:41:12 PDT 2018
+        did very little besides normalize all the versions (apparently
+        CPANTS complains?) also bumped perl prereq to 5.14
+
 0.05    Wed 12 Sep 2018 08:38:14 PDT
         added missing deps to makefile (i am really sucking at this these days)
 

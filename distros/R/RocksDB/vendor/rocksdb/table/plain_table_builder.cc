@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #ifndef ROCKSDB_LITE
 #include "table/plain_table_builder.h"
@@ -26,6 +26,7 @@
 #include "table/meta_blocks.h"
 #include "util/coding.h"
 #include "util/crc32c.h"
+#include "util/file_reader_writer.h"
 #include "util/stop_watch.h"
 
 namespace rocksdb {
@@ -35,11 +36,8 @@ namespace {
 // a utility that helps writing block content to the file
 //   @offset will advance if @block_contents was successfully written.
 //   @block_handle the block handle this particular block.
-Status WriteBlock(
-    const Slice& block_contents,
-    WritableFile* file,
-    uint64_t* offset,
-    BlockHandle* block_handle) {
+Status WriteBlock(const Slice& block_contents, WritableFileWriter* file,
+                  uint64_t* offset, BlockHandle* block_handle) {
   block_handle->set_offset(*offset);
   block_handle->set_size(block_contents.size());
   Status s = file->Append(block_contents);
@@ -59,26 +57,30 @@ extern const uint64_t kPlainTableMagicNumber = 0x8242229663bf9564ull;
 extern const uint64_t kLegacyPlainTableMagicNumber = 0x4f3418eb7a8f13b8ull;
 
 PlainTableBuilder::PlainTableBuilder(
-    const ImmutableCFOptions& ioptions, WritableFile* file,
-    uint32_t user_key_len, EncodingType encoding_type, size_t index_sparseness,
-    uint32_t bloom_bits_per_key, uint32_t num_probes, size_t huge_page_tlb_size,
-    double hash_table_ratio, bool store_index_in_file)
+    const ImmutableCFOptions& ioptions, const MutableCFOptions& moptions,
+    const std::vector<std::unique_ptr<IntTblPropCollectorFactory>>*
+        int_tbl_prop_collector_factories,
+    uint32_t column_family_id, WritableFileWriter* file, uint32_t user_key_len,
+    EncodingType encoding_type, size_t index_sparseness,
+    uint32_t bloom_bits_per_key, const std::string& column_family_name,
+    uint32_t num_probes, size_t huge_page_tlb_size, double hash_table_ratio,
+    bool store_index_in_file)
     : ioptions_(ioptions),
+      moptions_(moptions),
       bloom_block_(num_probes),
       file_(file),
       bloom_bits_per_key_(bloom_bits_per_key),
       huge_page_tlb_size_(huge_page_tlb_size),
-      encoder_(encoding_type, user_key_len, ioptions.prefix_extractor,
+      encoder_(encoding_type, user_key_len, moptions.prefix_extractor.get(),
                index_sparseness),
       store_index_in_file_(store_index_in_file),
-      prefix_extractor_(ioptions.prefix_extractor) {
+      prefix_extractor_(moptions.prefix_extractor.get()) {
   // Build index block and save it in the file if hash_table_ratio > 0
   if (store_index_in_file_) {
     assert(hash_table_ratio > 0 || IsTotalOrderMode());
-    index_builder_.reset(
-        new PlainTableIndexBuilder(&arena_, ioptions, index_sparseness,
-                                   hash_table_ratio, huge_page_tlb_size_));
-    assert(bloom_bits_per_key_ > 0);
+    index_builder_.reset(new PlainTableIndexBuilder(
+        &arena_, ioptions, moptions.prefix_extractor.get(), index_sparseness,
+        hash_table_ratio, huge_page_tlb_size_));
     properties_.user_collected_properties
         [PlainTablePropertyNames::kBloomVersion] = "1";  // For future use
   }
@@ -93,22 +95,20 @@ PlainTableBuilder::PlainTableBuilder(
   // To support roll-back to previous version, now still use version 0 for
   // plain encoding.
   properties_.format_version = (encoding_type == kPlain) ? 0 : 1;
-
-  if (ioptions_.prefix_extractor) {
-    properties_.user_collected_properties
-        [PlainTablePropertyNames::kPrefixExtractorName] =
-        ioptions_.prefix_extractor->Name();
-  }
+  properties_.column_family_id = column_family_id;
+  properties_.column_family_name = column_family_name;
+  properties_.prefix_extractor_name = moptions_.prefix_extractor != nullptr
+                                          ? moptions_.prefix_extractor->Name()
+                                          : "nullptr";
 
   std::string val;
   PutFixed32(&val, static_cast<uint32_t>(encoder_.GetEncodingType()));
   properties_.user_collected_properties
       [PlainTablePropertyNames::kEncodingType] = val;
 
-  for (auto& collector_factories :
-       ioptions.table_properties_collector_factories) {
+  for (auto& collector_factories : *int_tbl_prop_collector_factories) {
     table_properties_collectors_.emplace_back(
-        collector_factories->CreateTablePropertiesCollector());
+        collector_factories->CreateIntTblPropCollector(column_family_id));
   }
 }
 
@@ -121,15 +121,22 @@ void PlainTableBuilder::Add(const Slice& key, const Slice& value) {
   size_t meta_bytes_buf_size = 0;
 
   ParsedInternalKey internal_key;
-  ParseInternalKey(key, &internal_key);
+  if (!ParseInternalKey(key, &internal_key)) {
+    assert(false);
+    return;
+  }
+  if (internal_key.type == kTypeRangeDeletion) {
+    status_ = Status::NotSupported("Range deletion unsupported");
+    return;
+  }
 
   // Store key hash
   if (store_index_in_file_) {
-    if (ioptions_.prefix_extractor == nullptr) {
+    if (moptions_.prefix_extractor == nullptr) {
       keys_or_prefixes_hashes_.push_back(GetSliceHash(internal_key.user_key));
     } else {
       Slice prefix =
-          ioptions_.prefix_extractor->Transform(internal_key.user_key);
+          moptions_.prefix_extractor->Transform(internal_key.user_key);
       keys_or_prefixes_hashes_.push_back(GetSliceHash(prefix));
     }
   }
@@ -161,8 +168,8 @@ void PlainTableBuilder::Add(const Slice& key, const Slice& value) {
   properties_.raw_value_size += value.size();
 
   // notify property collectors
-  NotifyCollectTableCollectorsOnAdd(key, value, table_properties_collectors_,
-                                    ioptions_.info_log);
+  NotifyCollectTableCollectorsOnAdd(
+      key, value, offset_, table_properties_collectors_, ioptions_.info_log);
 }
 
 Status PlainTableBuilder::status() const { return status_; }
@@ -184,37 +191,40 @@ Status PlainTableBuilder::Finish() {
 
   if (store_index_in_file_ && (properties_.num_entries > 0)) {
     assert(properties_.num_entries <= std::numeric_limits<uint32_t>::max());
-    bloom_block_.SetTotalBits(
-        &arena_,
-        static_cast<uint32_t>(properties_.num_entries) * bloom_bits_per_key_,
-        ioptions_.bloom_locality, huge_page_tlb_size_, ioptions_.info_log);
-
-    PutVarint32(&properties_.user_collected_properties
-                     [PlainTablePropertyNames::kNumBloomBlocks],
-                bloom_block_.GetNumBlocks());
-
-    bloom_block_.AddKeysHashes(keys_or_prefixes_hashes_);
+    Status s;
     BlockHandle bloom_block_handle;
-    auto finish_result = bloom_block_.Finish();
+    if (bloom_bits_per_key_ > 0) {
+      bloom_block_.SetTotalBits(
+          &arena_,
+          static_cast<uint32_t>(properties_.num_entries) * bloom_bits_per_key_,
+          ioptions_.bloom_locality, huge_page_tlb_size_, ioptions_.info_log);
 
-    properties_.filter_size = finish_result.size();
-    auto s = WriteBlock(finish_result, file_, &offset_, &bloom_block_handle);
+      PutVarint32(&properties_.user_collected_properties
+                       [PlainTablePropertyNames::kNumBloomBlocks],
+                  bloom_block_.GetNumBlocks());
 
-    if (!s.ok()) {
-      return s;
+      bloom_block_.AddKeysHashes(keys_or_prefixes_hashes_);
+
+      Slice bloom_finish_result = bloom_block_.Finish();
+
+      properties_.filter_size = bloom_finish_result.size();
+      s = WriteBlock(bloom_finish_result, file_, &offset_, &bloom_block_handle);
+
+      if (!s.ok()) {
+        return s;
+      }
+      meta_index_builer.Add(BloomBlockBuilder::kBloomBlock, bloom_block_handle);
     }
-
     BlockHandle index_block_handle;
-    finish_result = index_builder_->Finish();
+    Slice index_finish_result = index_builder_->Finish();
 
-    properties_.index_size = finish_result.size();
-    s = WriteBlock(finish_result, file_, &offset_, &index_block_handle);
+    properties_.index_size = index_finish_result.size();
+    s = WriteBlock(index_finish_result, file_, &offset_, &index_block_handle);
 
     if (!s.ok()) {
       return s;
     }
 
-    meta_index_builer.Add(BloomBlockBuilder::kBloomBlock, bloom_block_handle);
     meta_index_builer.Add(PlainTableIndexBuilder::kPlainTableIndexBlock,
                           index_block_handle);
   }
@@ -258,7 +268,7 @@ Status PlainTableBuilder::Finish() {
 
   // Write Footer
   // no need to write out new footer if we're using default checksum
-  Footer footer(kLegacyPlainTableMagicNumber);
+  Footer footer(kLegacyPlainTableMagicNumber, 0);
   footer.set_metaindex_handle(metaindex_block_handle);
   footer.set_index_handle(BlockHandle::NullBlockHandle());
   std::string footer_encoding;

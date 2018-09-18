@@ -6,6 +6,7 @@ use Data::Dumper;
 use Test::Exception;
 use Test::NoWarnings;
 use Test::Output;
+use Path::Tiny;
 use Test::File::ShareDir::Dist { 'Log-Log4perl-Shortcuts' => 'config/' };
 use Test::File::ShareDir::Module { 'Log::Log4perl::Shortcuts' => 'config/' };
 use lib '/Users/stevedondley/perl/modules/Log-Log4perl-Shortcuts/lib';

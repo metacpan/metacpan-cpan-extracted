@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.50
-corresponding to git commit L<98af863a76470c4f63745726a52518bcfbc53f30|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/98af863a76470c4f63745726a52518bcfbc53f30> made on Fri Aug 17 14:31:28 2018 +0900.
+This document describes Lingua::JA::Moji version 0.52
+corresponding to git commit L<56c50cb8279294bb1cdafd88b2a9d4339e643782|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/56c50cb8279294bb1cdafd88b2a9d4339e643782> made on Tue Sep 18 11:47:22 2018 +0900.
 
 =head1 説明
 
@@ -737,6 +737,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
     use Lingua::JA::Moji 'hentai2kanji';
 
+    $kanji = hentai2kanji ('𛀢');
+    # $kanji = '家'
+
 
 
 変体仮名を漢字に変換します。
@@ -753,6 +756,13 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
     use Lingua::JA::Moji 'kanji2hentai';
 
+    $kanji = kanji2hentai ('家');
+    # $kanji = '𛀢'
+
+
+
+あてはまる変体仮名があるかぎり、漢字を変体仮名に変換します。
+
 
 
 
@@ -764,6 +774,13 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
     use Lingua::JA::Moji 'kana2hentai';
+
+    $hentai = kana2hentai ('ケンブ');
+    # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞ぶ'
+
+
+
+あてはまる変体仮名があるかぎり、普通の仮名を変体仮名に変換します。複数の仮名があれば、「・」で分けます。
 
 
 

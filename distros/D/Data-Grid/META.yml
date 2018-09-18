@@ -36,10 +36,10 @@ requires:
   Text::CSV: '1.18'
   Type::Tiny: '1.0'
   Types::XSD::Lite: '0.005'
-  perl: 5.12.0
+  perl: 5.14.0
 resources:
   bugtracker: https://github.com/doriantaylor/p5-data-grid/issues
   homepage: https://github.com/doriantaylor/p5-data-grid
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-data-grid.git
-version: '0.05'
+version: '0.06'

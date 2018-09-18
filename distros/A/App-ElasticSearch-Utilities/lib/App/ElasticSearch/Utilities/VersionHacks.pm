@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::VersionHacks;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use Const::Fast;
 use CLI::Helpers qw(:all);
@@ -156,15 +156,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all the things
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 AUTHOR
 

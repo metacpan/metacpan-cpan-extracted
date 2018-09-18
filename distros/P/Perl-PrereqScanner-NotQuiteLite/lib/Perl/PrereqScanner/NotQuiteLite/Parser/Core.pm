@@ -10,6 +10,10 @@ sub register { return {
     base => 'parse_base_args',
     parent => 'parse_parent_args',
   },
+  keyword => {
+    package => 'parse_package',
+    exit => 'parse_begin_exit',
+  },
 }}
 
 sub parse_if_args {
@@ -83,6 +87,36 @@ sub parse_parent_args {
       $module = $module->[0][0];
     }
     $c->add($module => 0) if is_module_name($module);
+  }
+}
+
+sub parse_begin_exit {
+  my ($class, $c, $raw_tokens) = @_;
+
+  my @stack = @{$c->{stack} || []};
+  if (grep {$_->[0] eq '{' and $_->[2] eq 'BEGIN'} @stack) {
+    if (grep {$c->token_is_conditional($_->[0])} @$raw_tokens) {
+      $c->{force_cond} = 1;
+    } elsif (grep {$_->[0] eq '{' and $c->token_is_conditional($_->[2])} @stack) {
+      $c->{force_cond} = 1;
+    } else {
+      $c->{ended} = 1;
+      @{$c->{stack}} = ();
+    }
+  }
+}
+
+sub parse_package {
+  my ($class, $c, $raw_tokens) = @_;
+
+  my $tokens = convert_string_tokens($raw_tokens);
+  shift @$tokens; # drop "package"
+  my $package;
+  for my $token (@$tokens) {
+    if (ref $token && $token->[1] eq 'WORD') {
+      $c->add_package($token->[0]);
+      last;
+    }
   }
 }
 

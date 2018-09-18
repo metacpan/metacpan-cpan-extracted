@@ -9,11 +9,11 @@ build_requires:
   IPC::Open3: '0'
   POE::Filter::HTTP::Parser: '1.06'
   Test::More: '0.47'
-  Test::POE::Client::TCP: '0.1'
+  Test::POE::Client::TCP: '1.24'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,5 +34,6 @@ requires:
 resources:
   homepage: https://github.com/bingos/poe-component-server-simplehttp
   repository: https://github.com/bingos/poe-component-server-simplehttp.git
-version: '2.26'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '2.28'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

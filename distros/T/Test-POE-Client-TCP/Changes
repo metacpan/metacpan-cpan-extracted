@@ -1,6 +1,22 @@
 ==================================================
-Changes from 2013-07-16 00:00:00 +0000 to present.
+Changes from 2013-09-18 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.24 at 2018-09-17 09:02:56 +0000
+-----------------------------------------
+
+  Change: e388b5a07feb6fcf272c916236f0698ffbbd1a91
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-09-17 10:02:56 +0000
+
+    Release engineering for 1.24 
+
+  Change: a0d662f7225e68faf8dd8f4d76ec85e7f3af1490
+  Author: Damyan Ivanov <dmn@debian.org>
+  Date : 2018-09-16 20:49:45 +0000
+
+    add support for IPv6 
 
 -----------------------------------------
 version 1.22 at 2018-07-15 12:24:13 +0000
@@ -70,5 +86,5 @@ version 1.14 at 2018-05-29 08:22:21 +0000
     Added accessor for 'context' and update documentation 
 
 ================================================
-Plus 7 releases after 2013-07-16 00:00:00 +0000.
+Plus 7 releases after 2013-09-18 00:00:00 +0000.
 ================================================

@@ -85,9 +85,9 @@ sub test_app {
     %{$args || {}},
   )->run->as_string_hash;
 
-  for my $phase (sort keys %$prereqs) {
-    for my $type (sort keys %{$prereqs->{$phase}}) {
-      for my $module (sort keys %{$prereqs->{$phase}{$type}}) {
+  for my $phase (sort keys %$expected) {
+    for my $type (sort keys %{$expected->{$phase}}) {
+      for my $module (sort keys %{$expected->{$phase}{$type}}) {
         is $prereqs->{$phase}{$type}{$module} => $expected->{$phase}{$type}{$module}, "found $module as $phase $type";
       }
     }

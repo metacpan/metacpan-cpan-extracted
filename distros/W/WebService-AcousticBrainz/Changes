@@ -1,5 +1,8 @@
 Revision history for WebService-AcousticBrainz
 
+0.0104 2018-09-15 18:06:27
+    - Added eg/analyze.
+
 0.0103 2018-05-27 13:00:19
     - Fixed POD again!
 

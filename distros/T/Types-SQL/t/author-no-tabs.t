@@ -27,6 +27,7 @@ my @files = (
     't/100-enum.t',
     't/100-int.t',
     't/100-integer.t',
+    't/100-num.t',
     't/100-numeric.t',
     't/100-serial.t',
     't/100-str.t',

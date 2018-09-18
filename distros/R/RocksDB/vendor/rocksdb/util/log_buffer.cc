@@ -1,11 +1,12 @@
-//  Copyright (c) 2014, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #include "util/log_buffer.h"
 
-#include <sys/time.h>
+#include "port/sys_time.h"
+#include "port/port.h"
 
 namespace rocksdb {
 
@@ -33,8 +34,15 @@ void LogBuffer::AddLogToBuffer(size_t max_log_size, const char* format,
     va_list backup_ap;
     va_copy(backup_ap, ap);
     auto n = vsnprintf(p, limit - p, format, backup_ap);
+#ifndef OS_WIN
+    // MS reports -1 when the buffer is too short
     assert(n >= 0);
-    p += n;
+#endif
+    if (n > 0) {
+      p += n;
+    } else {
+      p = limit;
+    }
     va_end(backup_ap);
   }
 
@@ -52,11 +60,12 @@ void LogBuffer::FlushBufferToLog() {
   for (BufferedLog* log : logs_) {
     const time_t seconds = log->now_tv.tv_sec;
     struct tm t;
-    localtime_r(&seconds, &t);
-    Log(log_level_, info_log_,
-        "(Original Log Time %04d/%02d/%02d-%02d:%02d:%02d.%06d) %s",
-        t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min,
-        t.tm_sec, static_cast<int>(log->now_tv.tv_usec), log->message);
+    if (localtime_r(&seconds, &t) != nullptr) {
+      Log(log_level_, info_log_,
+          "(Original Log Time %04d/%02d/%02d-%02d:%02d:%02d.%06d) %s",
+          t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min,
+          t.tm_sec, static_cast<int>(log->now_tv.tv_usec), log->message);
+    }
   }
   logs_.clear();
 }

@@ -6,7 +6,7 @@ use Test::More;
 use Mojo::IOLoop::TLS;
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS};
+  unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
 plan skip_all => 'IO::Socket::SSL 2.009+ required for this test!'
   unless Mojo::IOLoop::TLS->can_tls;
 
@@ -28,7 +28,7 @@ $client->once(upgrade => $delay->begin);
 $client->once(error => sub { warn pop });
 $client->negotiate(tls_verify => 0x00);
 my ($client_result, $server_result);
-$delay->on(finish => sub { (undef, $server_result, $client_result) = @_ });
+$delay->then(sub { ($server_result, $client_result) = @_ });
 $delay->wait;
 is ref $client_result, 'IO::Socket::SSL', 'right class';
 is ref $server_result, 'IO::Socket::SSL', 'right class';
@@ -49,7 +49,7 @@ $client->once(upgrade => $delay->begin);
 $client->once(error => sub { warn pop });
 $client->negotiate(tls_verify => 0x00);
 $client_result = $server_result = undef;
-$delay->on(finish => sub { (undef, $server_result, $client_result) = @_ });
+$delay->then(sub { ($server_result, $client_result) = @_ });
 $delay->wait;
 is ref $client_result, 'IO::Socket::SSL', 'right class';
 is $client_result->get_cipher, 'AES256-SHA', 'AES256-SHA has been negotiatied';

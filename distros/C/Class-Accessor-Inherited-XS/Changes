@@ -1,5 +1,9 @@
 Revision history for Class::Accessor::Inherited::XS.
 
+0.36 Sun Sep 16 00:14:21 MSK 2018
+    - change named callbacks implementation
+    - add named callbacks to public API
+
 0.35 Sun Aug 26 00:45:39 MSK 2018
     - added c++ backend for weak accessors
     - added c++ backend for named inherited accessors

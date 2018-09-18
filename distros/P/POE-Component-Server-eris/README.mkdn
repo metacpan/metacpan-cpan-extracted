@@ -4,7 +4,7 @@ POE::Component::Server::eris - POE eris message dispatcher
 
 # VERSION
 
-version 2.5
+version 2.6
 
 # SYNOPSIS
 
@@ -26,6 +26,7 @@ rsyslog are included in the examples directory!
             GraphiteHost        => undef,               #default
             GraphitePort        => 2003,                #default
             GraphitePrefix      => 'eris.dispatcher',   #default
+            MaxLineLength       => 16384,               #default
     );
 
     # $SESSION = { alias => 'eris_dispatch', ID => POE::Session->ID };
@@ -48,27 +49,40 @@ rsyslog are included in the examples directory!
 
 ## spawn
 
-Creates the POE::Session for the eris correlator.
+Creates the POE::Session for the eris message dispatcher.
 
 Parameters:
-    ListenAddress           => 'localhost',         #default
-    ListenPort              => '9514',              #default
 
-# ACKNOWLEDGEMENTS
+- ListenAddress
 
-- Mattia Barbon
+    Defaults to `localhost`.
 
-# AUTHOR
+- ListenPort
 
-Brad Lhotsky <brad@divsionbyzero.net>
+    Defaults to `9514`, this is the port that clients can connect to request
+    subscriptions from the service.
 
-# COPYRIGHT AND LICENSE
+- GraphitePort
 
-This software is Copyright (c) 2017 by Brad Lhotsky.
+    Defaults to `2003`, this is the port to submit graphite metrics from the
+    daemon.
 
-This is free software, licensed under:
+- GraphitePrefix
 
-    The (three-clause) BSD License
+    Defaults to `eris.dispatcher`, all generated metrics will use this prefix.
+
+- GraphiteHost
+
+    This parameter is required to enable the graphite output.  Without it, metrics
+    will not be sent anywhere.
+
+- MaxLineLength
+
+    Defaults to `16384`, this does not truncate log lines, but anytime a line
+    exceeds this length the line will immediately be flushed from the buffer.
+
+    This only affects multi-line logging as multi-line logs longer than this
+    setting will be split up into more than one message.
 
 # EVENTS
 
@@ -192,6 +206,14 @@ Display the help message
 
 PoCo::Server::TCP Client Termination
 
+# ACKNOWLEDGEMENTS
+
+- Mattia Barbon
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
 # SUPPORT
 
 ## Websites
@@ -203,15 +225,33 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/POE-Component-Server-eris](http://metacpan.org/release/POE-Component-Server-eris)
+    [https://metacpan.org/release/POE-Component-Server-eris](https://metacpan.org/release/POE-Component-Server-eris)
 
-- RT: CPAN's Bug Tracker
+- CPAN Testers
 
-    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+    The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
-    [https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-eris](https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-eris)
+    [http://www.cpantesters.org/distro/P/POE-Component-Server-eris](http://www.cpantesters.org/distro/P/POE-Component-Server-eris)
+
+- CPAN Testers Matrix
+
+    The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+    [http://matrix.cpantesters.org/?dist=POE-Component-Server-eris](http://matrix.cpantesters.org/?dist=POE-Component-Server-eris)
+
+## Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: [https://github.com/reyjrar/POE-Component-Server-eris/issues](https://github.com/reyjrar/POE-Component-Server-eris/issues)
 
 ## Source Code
 
 This module's source code is available by visiting:
 [https://github.com/reyjrar/POE-Component-Server-eris](https://github.com/reyjrar/POE-Component-Server-eris)
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License

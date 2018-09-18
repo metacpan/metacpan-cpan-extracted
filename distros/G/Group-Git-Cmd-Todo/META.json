@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Group::Git::Cmd::Todo" : {
          "file" : "lib/Group/Git/Cmd/Todo.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "git://github.com/ivanwills/Group-Git-Cmd-Todo.git"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

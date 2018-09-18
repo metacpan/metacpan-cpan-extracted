@@ -1,0 +1,8 @@
+Revision history for Perl6-Build
+
+0.002  2018-09-16 04:50:29 JST
+  - Requires perl 5.10.1
+  - Add pods to script/perl6-build
+
+0.001  2018-09-16 02:13:59 JST
+  - Initial version

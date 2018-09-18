@@ -1,0 +1,128 @@
+NAME
+    Role::Kerberos - A role for managing Kerberos 5 credentials
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+      package My::Kerbject;
+
+      use Moo;
+      with 'Role::Kerberos';
+
+      has other_stuff => (
+          # ...
+      );
+
+      # go nuts...
+
+      # ...elsewhere:
+
+      package Somewhere::Else;
+
+      my $krb = My::Kerbject->new(
+          principal   => 'robot@ELITE.REALM',
+          keytab      => '/etc/robot/creds.keytab',
+          ccache      => '/var/lib/robot/krb5cc',
+          other_stuff => 'derp',
+      );
+
+DESCRIPTION
+    Authen::Krb5 is kind of unwieldy. Authen::Krb5::Simple is too simple (no
+    keytabs). Authen::Krb5::Effortless requires too much effort (can't
+    specify keytabs/ccaches outside of environment variables) and
+    Authen::Krb5::Easy hasn't been touched in 13 years.
+
+    The purpose of this module is to enable you to strap onto an existing
+    Moo(se) object the functionality necessary to acquire and maintain a
+    Kerberos TGT. My own impetus for writing this module involves making
+    connections authenticated via Authen::SASL and GSSAPI where the keys
+    come from a keytab in a non-default location and the consistency of %ENV
+    is not reliable (that is, in a Web app).
+
+METHODS
+  new %PARAMS
+    As with all roles, these parameters get integrated into your class's
+    constructor, and also serve as accessor methods. Every one is read-only,
+    and every one is optional except "principal".
+
+    realm
+        The default realm. Taken from the default principal, or otherwise
+        the system default realm if not defined.
+
+    principal
+        The default principal. Can (should) also contain a realm. If a realm
+        is missing from the principal, it will be added from "realm".
+        Coerced from a string into a "Authen::Krb5::Principal" in
+        Authen::Krb5 object. Required.
+
+    keytab
+        A keytab, if other than $ENV{KRB5_KTNAME}. Will default to that or
+        the system default (e.g. "/etc/krb5.keytab"). Coerced from a file
+        path into an "Authen::Krb5::Keytab" in Authen::Krb5 object.
+
+    password
+        The password for the default principal. Don't use this. Use a
+        keytab.
+
+    ccache
+        The locator (e.g. file path) of a credential cache, if different
+        from $ENV{KRB5CCNAME} or the system default. Coerced into an
+        "Authen::Krb5::Ccache" in Authen::Krb5 object.
+
+  kinit %PARAMS
+    Log in to Kerberos. Parameters are optional.
+
+    principal
+        The principal, if different from that in the constructor.
+
+    realm
+        The realm, if different from that in the constructor. Ignored if the
+        principal contains a realm.
+
+    password
+        The Kerberos password, if logging in with a password. (See
+        Term::ReadPassword for a handy way of ingesting a password from the
+        command line.)
+
+    keytab
+        A keytab, if different from that in the constructor or
+        $ENV{KRB5_KTNAME}. Will be coerced from a file name.
+
+    service
+        A service principal, if different from "krbtgt/REALM@REALM".
+
+  klist %PARAMS
+  kexpired
+    Returns true if any tickets in the cache are expired.
+
+  kdestroy
+    Destroy the credentials cache (if there is something to destroy).
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+SEE ALSO
+    Authen::Krb5
+    Moo::Role
+
+BUGS
+    Please report any bugs or feature requests to "bug-role-kerberos at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Role-Kerberos>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+LICENSE AND COPYRIGHT
+    Copyright 2015 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

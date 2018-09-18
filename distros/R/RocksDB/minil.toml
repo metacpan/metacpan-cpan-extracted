@@ -1,4 +1,7 @@
+name = "RocksDB"
 license = "bsd"
+module_maker = "ModuleBuild"
+badges = ['travis']
 [build]
 build_class = "builder::MyBuilder"
 [no_index]

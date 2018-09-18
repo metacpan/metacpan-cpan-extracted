@@ -165,7 +165,7 @@ is(
                 $PREREQ_PHASE_DEFAULT => superhashof({
                     $PREREQ_RELATIONSHIP_DEFAULT => superhashof({
                         'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback' => '0.018',
-                        'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.012',
+                        'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.029',
                         'Dist::Zilla::PluginBundle::Author::ETHER' => '0.002',
                     }),
                 }),
@@ -294,7 +294,7 @@ like(
 my $version = Dist::Zilla::PluginBundle::Author::ETHER->VERSION;
 like(
     $contributing,
-    qr/^template file originating in Dist-Zilla-PluginBundle-Author-ETHER-$version\.$/m,
+    qr/^from a template file originating in Dist-Zilla-PluginBundle-Author-ETHER-$version\.$/m,
     'name of this bundle distribution and its version properly inserted into CONTRIBUTING',
 );
 

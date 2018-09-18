@@ -1,0 +1,3 @@
+package TestCase::Interface1 : interface {
+  sub foo : int ($self : self, $var1 : int, $var2 : long);
+}

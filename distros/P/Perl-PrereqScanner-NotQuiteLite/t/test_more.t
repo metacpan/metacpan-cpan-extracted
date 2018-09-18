@@ -53,4 +53,15 @@ sub BEGIN {
 use strict;
 END
 
+test('plan(skip_all => ...)', <<'END', {}, {}, {'strict' => 0, 'Test::More' => 0}); # INGY/perl5-0.21/t/release-pod-syntax.t
+BEGIN {
+  unless ($ENV{RELEASE_TESTING}) {
+    require Test::More;
+    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+  }
+}
+
+use strict;
+END
+
 done_testing;

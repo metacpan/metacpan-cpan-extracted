@@ -1,9 +1,34 @@
 ==================================================
-Changes from 2016-08-20 00:00:00 +0000 to present.
+Changes from 2016-09-18 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.0 at 2018-08-20 20:29:07 +0000
+version 6.1 at 2018-09-18 03:10:49 +0000
+----------------------------------------
+
+  Change: 020fddc36e35230b1a275c87c8edddae2fbb7c7b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-17 20:10:27 +0000
+
+    Updates for the documentation for 6.1 release 
+
+  Change: 263e77f276c95dbf1f90bba6b77264547e4b7390
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-17 20:09:05 +0000
+
+    Add --bg-filter option for es-search.pl
+
+    If significant_terms is used for the --top aggregation, this option is able
+    to inject a background_filter into the significant_terms aggregation. 
+
+  Change: e76897d8eefee23d70b9fd5b3e6bd26bd7494b95
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-17 20:08:24 +0000
+
+    Update to using GitHub::Meta and rearrange Pod::Weaver configs 
+
+----------------------------------------
+version 6.0 at 2018-07-28 00:45:25 +0000
 ----------------------------------------
 
   Change: e58dcf2f190a1db3e1e10f8799b67c7f9a8abcc4
@@ -478,5 +503,5 @@ version 5.1 at 2016-11-16 02:30:42 +0000
     Fix case sensitivity bug in the --top option of es-search.pl 
 
 =================================================
-Plus 57 releases after 2016-08-20 00:00:00 +0000.
+Plus 57 releases after 2016-09-18 00:00:00 +0000.
 =================================================

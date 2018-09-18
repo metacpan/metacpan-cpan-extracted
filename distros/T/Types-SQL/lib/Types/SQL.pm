@@ -18,7 +18,7 @@ use PerlX::Maybe;
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.2.0';
 
 
 our $Blob = _generate_type(
@@ -181,7 +181,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.1.3
+version v0.2.0
 
 =head1 SYNOPSIS
 

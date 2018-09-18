@@ -13,7 +13,7 @@
 
 package IO::Socket::SSL;
 
-our $VERSION = '2.059';
+our $VERSION = '2.060';
 
 use IO::Socket;
 use Net::SSLeay 1.46;
@@ -111,6 +111,20 @@ my $algo2digest = do {
 	};
     }
 };
+
+my $CTX_tlsv1_3_new;
+if ( defined &Net::SSLeay::CTX_set_min_proto_version
+    and defined &Net::SSLeay::CTX_set_max_proto_version
+    and my $tls13 = eval { Net::SSLeay::TLS1_3_VERSION() }
+) {
+    $CTX_tlsv1_3_new = sub {
+	my $ctx = Net::SSLeay::CTX_new();
+	return $ctx if Net::SSLeay::CTX_set_min_proto_version($ctx,$tls13)
+	    && Net::SSLeay::CTX_set_max_proto_version($ctx,$tls13);
+	Net::SSLeay::CTX_free($ctx);
+	return;
+    };
+}
 
 
 # global defaults
@@ -268,7 +282,8 @@ BEGIN{
 # get constants for SSL_OP_NO_* now, instead calling the related functions
 # every time we setup a connection
 my %SSL_OP_NO;
-for(qw( SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv11:TLSv1_1 TLSv1_2 TLSv12:TLSv1_2 )) {
+for(qw( SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv11:TLSv1_1 TLSv1_2 TLSv12:TLSv1_2
+        TLSv1_3 TLSv13:TLSv1_3 )) {
     my ($k,$op) = m{:} ? split(m{:},$_,2) : ($_,$_);
     my $sub = "Net::SSLeay::OP_NO_$op";
     local $SIG{__DIE__};
@@ -1893,6 +1908,7 @@ sub get_sslversion {
     my $ssl = shift()->_get_ssl_object || return;
     my $version = Net::SSLeay::version($ssl) or return;
     return
+	$version == 0x0304 ? 'TLSv1_3' :
 	$version == 0x0303 ? 'TLSv1_2' :
 	$version == 0x0302 ? 'TLSv1_1' :
 	$version == 0x0301 ? 'TLSv1'   :
@@ -2338,7 +2354,7 @@ sub new {
 
     my $ver;
     for (split(/\s*:\s*/,$arg_hash->{SSL_version})) {
-	m{^(!?)(?:(SSL(?:v2|v3|v23|v2/3))|(TLSv1(?:_?[12])?))$}i
+	m{^(!?)(?:(SSL(?:v2|v3|v23|v2/3))|(TLSv1(?:_?[123])?))$}i
 	or croak("invalid SSL_version specified");
 	my $not = $1;
 	( my $v = lc($2||$3) ) =~s{^(...)}{\U$1};
@@ -2353,14 +2369,17 @@ sub new {
 	}
     }
 
-    my $ctx_new_sub =  UNIVERSAL::can( 'Net::SSLeay',
-	$ver eq 'SSLv2'   ? 'CTX_v2_new' :
-	$ver eq 'SSLv3'   ? 'CTX_v3_new' :
-	$ver eq 'TLSv1'   ? 'CTX_tlsv1_new' :
-	$ver eq 'TLSv1_1' ? 'CTX_tlsv1_1_new' :
-	$ver eq 'TLSv1_2' ? 'CTX_tlsv1_2_new' :
-	'CTX_new'
-    ) or return IO::Socket::SSL->_internal_error("SSL Version $ver not supported",9);
+    my $ctx_new_sub =
+	$ver eq 'TLSv1_3' ? $CTX_tlsv1_3_new :
+	UNIVERSAL::can( 'Net::SSLeay',
+	    $ver eq 'SSLv2'   ? 'CTX_v2_new' :
+	    $ver eq 'SSLv3'   ? 'CTX_v3_new' :
+	    $ver eq 'TLSv1'   ? 'CTX_tlsv1_new' :
+	    $ver eq 'TLSv1_1' ? 'CTX_tlsv1_1_new' :
+	    $ver eq 'TLSv1_2' ? 'CTX_tlsv1_2_new' :
+	    'CTX_new'
+	)
+	or return IO::Socket::SSL->_internal_error("SSL Version $ver not supported",9);
 
     # For SNI in server mode we need a separate context for each certificate.
     my %ctx;

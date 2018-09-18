@@ -1,4 +1,10 @@
 Revision History for POE-Component-Server-eris
+2.6     2018-09-16 Brad Lhotsky <brad@divisionbyzero.net>
+        - Allow multi-line input to the server
+        - Fix variable name in the TCP reference implementation
+        - Fix documentation and packaging
+        - Fix option specs of the included reference utilities
+
 2.5     2017-12-03 Brad Lhotsky <brad@divisionbyzero.net>
         - Fix shebang lines on the installed utilities
 

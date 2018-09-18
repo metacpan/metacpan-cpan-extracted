@@ -4,7 +4,7 @@
       "Patrick Galbraith <patg@patg.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -72,7 +72,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "4.047",
+   "version" : "4.048",
    "x_contributors" : [
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",
       "Alexandr Ciornii <alexchorny@gmail.com>",
@@ -86,11 +86,11 @@
       "Chris Hammond <chrishammond@ymail.com>",
       "Chris Weyl <cweyl@alumni.drew.edu>",
       "Christian Walde <walde.christian@googlemail.com>",
-      "Dagfinn Ilmari Manns\x{00e5}ker <ilmari@ilmari.org>",
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
       "Daisuke Murase <typester@cpan.org>",
       "Damyan Ivanov <dmn@debian.org>",
       "Dan Book <grinnz@gmail.com>",
-      "Dani\x{00eb}l van Eeden <daniel.vaneeden@booking.com>",
+      "Daniël van Eeden <daniel.vaneeden@booking.com>",
       "Dave Lambley <davel@isosceles.(none)>",
       "David Farrell <davidnmfarrell@gmail.com>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
@@ -112,7 +112,7 @@
       "Patrick Galbraith <patg@patg.net>",
       "Perlover <perlover@perlover.com>",
       "Peter Botha <peterb@striata.com>",
-      "Petr P\x{00ed}sa\x{0159} <ppisar@redhat.com>",
+      "Petr Písař <ppisar@redhat.com>",
       "Reini Urban <rurban@cpanel.net>",
       "Rob Hoelz <rhoelz@inoc.com>",
       "Rob Van Dam <rvandam00@gmail.com>",
@@ -126,13 +126,12 @@
       "Taro Kobayashi <9re.3000@gmail.com>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Tim Mullin <tim@cpanel.net>",
-      "Ville Skytt\x{00e4} <ville.skytta@iki.fi>",
+      "Ville Skyttä <ville.skytta@iki.fi>",
       "Vladimir Marek <vlmarek@volny.cz>",
       "katyavoid <katyavoid@gmail.com>",
       "kmx <kmx@cpan.org>",
       "tokuhirom <tokuhirom@gmail.com>",
       "zefram <zefram@fysh.org>",
       "zentooo <ankerasoy@gmail.com>"
-   ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   ]
 }

@@ -19,7 +19,8 @@ do { my $x = {
                                       'Pod::Usage' => '0',
                                       'Term::ReadLine' => '0',
                                       'Term::SimpleColor' => '0',
-                                      'Time::HiRes' => '0'
+                                      'Time::HiRes' => '0',
+                                      'parent' => '0'
                                     }
                     },
        'test' => {

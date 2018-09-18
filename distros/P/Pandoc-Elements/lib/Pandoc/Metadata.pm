@@ -22,7 +22,7 @@ use Carp;
     }
 
     sub TO_JSON {
-        return { map { $_ => $_[0]->{$_} } keys %{ $_[0] } };
+        return { %{ $_[0] } }
     }
 
     sub value {

@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -9,8 +9,9 @@
 
 #include "db/file_indexer.h"
 #include <algorithm>
-#include "rocksdb/comparator.h"
+#include <functional>
 #include "db/version_edit.h"
+#include "rocksdb/comparator.h"
 
 namespace rocksdb {
 
@@ -20,6 +21,9 @@ FileIndexer::FileIndexer(const Comparator* ucmp)
 size_t FileIndexer::NumLevelIndex() const { return next_level_index_.size(); }
 
 size_t FileIndexer::LevelIndexSize(size_t level) const {
+  if (level >= next_level_index_.size()) {
+    return 0;
+  }
   return next_level_index_[level].num_index;
 }
 

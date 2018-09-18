@@ -1,7 +1,7 @@
-// Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-// This source code is licensed under the BSD-style license found in the
-// LICENSE file in the root directory of this source tree. An additional grant
-// of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // This file contains the interface that must be implemented by any collection
 // to be used as the backing store for a MemTable. Such a collection must
@@ -36,18 +36,22 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 #include <stdint.h>
+#include <stdlib.h>
+#include <rocksdb/slice.h>
 
 namespace rocksdb {
 
 class Arena;
-class MemTableAllocator;
+class Allocator;
 class LookupKey;
-class Slice;
 class SliceTransform;
 class Logger;
 
 typedef void* KeyHandle;
+
+extern Slice GetLengthPrefixedSlice(const char* data);
 
 class MemTableRep {
  public:
@@ -55,6 +59,14 @@ class MemTableRep {
   // concatenated with values.
   class KeyComparator {
    public:
+    typedef rocksdb::Slice DecodedType;
+
+    virtual DecodedType decode_key(const char* key) const {
+      // The format of key is frozen and can be terated as a part of the API
+      // contract. Refer to MemTable::Add for details.
+      return GetLengthPrefixedSlice(key);
+    }
+
     // Compare a and b. Return a negative value if a is less than b, 0 if they
     // are equal, and a positive value if a is greater than b
     virtual int operator()(const char* prefix_len_key1,
@@ -66,25 +78,70 @@ class MemTableRep {
     virtual ~KeyComparator() { }
   };
 
-  explicit MemTableRep(MemTableAllocator* allocator) : allocator_(allocator) {}
+  explicit MemTableRep(Allocator* allocator) : allocator_(allocator) {}
 
-  // Allocate a buf of len size for storing key. The idea is that a specific
-  // memtable representation knows its underlying data structure better. By
-  // allowing it to allocate memory, it can possibly put correlated stuff
-  // in consecutive memory area to make processor prefetching more efficient.
+  // Allocate a buf of len size for storing key. The idea is that a
+  // specific memtable representation knows its underlying data structure
+  // better. By allowing it to allocate memory, it can possibly put
+  // correlated stuff in consecutive memory area to make processor
+  // prefetching more efficient.
   virtual KeyHandle Allocate(const size_t len, char** buf);
 
   // Insert key into the collection. (The caller will pack key and value into a
   // single buffer and pass that in as the parameter to Insert).
   // REQUIRES: nothing that compares equal to key is currently in the
-  // collection.
+  // collection, and no concurrent modifications to the table in progress
   virtual void Insert(KeyHandle handle) = 0;
+
+  // Same as ::Insert
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual bool InsertKey(KeyHandle handle) {
+    Insert(handle);
+    return true;
+  }
+
+  // Same as Insert(), but in additional pass a hint to insert location for
+  // the key. If hint points to nullptr, a new hint will be populated.
+  // otherwise the hint will be updated to reflect the last insert location.
+  //
+  // Currently only skip-list based memtable implement the interface. Other
+  // implementations will fallback to Insert() by default.
+  virtual void InsertWithHint(KeyHandle handle, void** /*hint*/) {
+    // Ignore the hint by default.
+    Insert(handle);
+  }
+
+  // Same as ::InsertWithHint
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual bool InsertKeyWithHint(KeyHandle handle, void** hint) {
+    InsertWithHint(handle, hint);
+    return true;
+  }
+
+  // Like Insert(handle), but may be called concurrent with other calls
+  // to InsertConcurrently for other handles.
+  //
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual void InsertConcurrently(KeyHandle handle);
+
+  // Same as ::InsertConcurrently
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual bool InsertKeyConcurrently(KeyHandle handle) {
+    InsertConcurrently(handle);
+    return true;
+  }
 
   // Returns true iff an entry that compares equal to key is in the collection.
   virtual bool Contains(const char* key) const = 0;
 
-  // Notify this table rep that it will no longer be added to. By default, does
-  // nothing.
+  // Notify this table rep that it will no longer be added to. By default,
+  // does nothing.  After MarkReadOnly() is called, this table rep will
+  // not be written to (ie No more calls to Allocate(), Insert(),
+  // or any writes done directly to entries accessed through the iterator.)
   virtual void MarkReadOnly() { }
 
   // Look up key from the mem table, since the first key in the mem table whose
@@ -92,6 +149,7 @@ class MemTableRep {
   // callback_args directly forwarded as the first parameter, and the mem table
   // key as the second parameter. If the return value is false, then terminates.
   // Otherwise, go through the next key.
+  //
   // It's safe for Get() to terminate after having finished all the potential
   // key for the k.user_key(), or not.
   //
@@ -101,8 +159,13 @@ class MemTableRep {
   virtual void Get(const LookupKey& k, void* callback_args,
                    bool (*callback_func)(void* arg, const char* entry));
 
+  virtual uint64_t ApproximateNumEntries(const Slice& /*start_ikey*/,
+                                         const Slice& /*end_key*/) {
+    return 0;
+  }
+
   // Report an approximation of how much memory has been used other than memory
-  // that was allocated through the allocator.
+  // that was allocated through the allocator.  Safe to call from any thread.
   virtual size_t ApproximateMemoryUsage() = 0;
 
   virtual ~MemTableRep() { }
@@ -132,6 +195,10 @@ class MemTableRep {
 
     // Advance to the first entry with a key >= target
     virtual void Seek(const Slice& internal_key, const char* memtable_key) = 0;
+
+    // retreat to the first entry with a key <= target
+    virtual void SeekForPrev(const Slice& internal_key,
+                             const char* memtable_key) = 0;
 
     // Position at the first entry in collection.
     // Final state of iterator is Valid() iff collection is not empty.
@@ -172,7 +239,7 @@ class MemTableRep {
   // user key.
   virtual Slice UserKey(const char* key) const;
 
-  MemTableAllocator* allocator_;
+  Allocator* allocator_;
 };
 
 // This is the base class for all factories that are used by RocksDB to create
@@ -180,11 +247,28 @@ class MemTableRep {
 class MemTableRepFactory {
  public:
   virtual ~MemTableRepFactory() {}
+
   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
-                                         MemTableAllocator*,
-                                         const SliceTransform*,
+                                         Allocator*, const SliceTransform*,
                                          Logger* logger) = 0;
+  virtual MemTableRep* CreateMemTableRep(
+      const MemTableRep::KeyComparator& key_cmp, Allocator* allocator,
+      const SliceTransform* slice_transform, Logger* logger,
+      uint32_t /* column_family_id */) {
+    return CreateMemTableRep(key_cmp, allocator, slice_transform, logger);
+  }
+
   virtual const char* Name() const = 0;
+
+  // Return true if the current MemTableRep supports concurrent inserts
+  // Default: false
+  virtual bool IsInsertConcurrentlySupported() const { return false; }
+
+  // Return true if the current MemTableRep supports detecting duplicate
+  // <key,seq> at insertion time. If true, then MemTableRep::Insert* returns
+  // false when if the <key,seq> already exists.
+  // Default: false
+  virtual bool CanHandleDuplicatedKey() const { return false; }
 };
 
 // This uses a skip list to store keys. It is the default.
@@ -198,11 +282,15 @@ class SkipListFactory : public MemTableRepFactory {
  public:
   explicit SkipListFactory(size_t lookahead = 0) : lookahead_(lookahead) {}
 
+  using MemTableRepFactory::CreateMemTableRep;
   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
-                                         MemTableAllocator*,
-                                         const SliceTransform*,
+                                         Allocator*, const SliceTransform*,
                                          Logger* logger) override;
   virtual const char* Name() const override { return "SkipListFactory"; }
+
+  bool IsInsertConcurrentlySupported() const override { return true; }
+
+  bool CanHandleDuplicatedKey() const override { return true; }
 
  private:
   const size_t lookahead_;
@@ -222,10 +310,12 @@ class VectorRepFactory : public MemTableRepFactory {
 
  public:
   explicit VectorRepFactory(size_t count = 0) : count_(count) { }
+
+  using MemTableRepFactory::CreateMemTableRep;
   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
-                                         MemTableAllocator*,
-                                         const SliceTransform*,
+                                         Allocator*, const SliceTransform*,
                                          Logger* logger) override;
+
   virtual const char* Name() const override {
     return "VectorRepFactory";
   }
@@ -266,7 +356,7 @@ extern MemTableRepFactory* NewHashLinkListRepFactory(
 
 // This factory creates a cuckoo-hashing based mem-table representation.
 // Cuckoo-hash is a closed-hash strategy, in which all key/value pairs
-// are stored in the bucket array itself intead of in some data structures
+// are stored in the bucket array itself instead of in some data structures
 // external to the bucket array.  In addition, each key in cuckoo hash
 // has a constant number of possible buckets in the bucket array.  These
 // two properties together makes cuckoo hash more memory efficient and

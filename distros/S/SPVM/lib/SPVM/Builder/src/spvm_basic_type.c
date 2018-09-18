@@ -17,19 +17,12 @@ const char* const SPVM_BASIC_TYPE_C_ID_NAMES[] = {
   "float",
   "double",
   "object",
-};
-
-const char* const SPVM_BASIC_TYPE_C_CATEGORY_NAMES[] = {
-  "unknown",
-  "undef",
-  "void",
-  "numeric_ref",
-  "numeric",
-  "any_object",
-  "class",
-  "interface",
-  "pointer",
-  "value_t",
+  "SPVM::Byte",
+  "SPVM::Short",
+  "SPVM::Int",
+  "SPVM::Long",
+  "SPVM::Float",
+  "SPVM::Double",
 };
 
 SPVM_BASIC_TYPE* SPVM_BASIC_TYPE_new(SPVM_COMPILER* compiler) {

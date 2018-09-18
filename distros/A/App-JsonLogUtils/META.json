@@ -34,7 +34,8 @@
             "Pod::Usage" : "0",
             "Term::ReadLine" : "0",
             "Term::SimpleColor" : "0",
-            "Time::HiRes" : "0"
+            "Time::HiRes" : "0",
+            "parent" : "0"
          }
       },
       "test" : {
@@ -63,7 +64,7 @@
          "web" : "https://github.com/sysread/App-JsonLogUtils"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

@@ -34,25 +34,19 @@ class AdaptiveTableFactory : public TableFactory {
   const char* Name() const override { return "AdaptiveTableFactory"; }
 
   Status NewTableReader(
-      const ImmutableCFOptions& ioptions, const EnvOptions& env_options,
-      const InternalKeyComparator& internal_comparator,
-      unique_ptr<RandomAccessFile>&& file, uint64_t file_size,
-      unique_ptr<TableReader>* table) const override;
+      const TableReaderOptions& table_reader_options,
+      unique_ptr<RandomAccessFileReader>&& file, uint64_t file_size,
+      unique_ptr<TableReader>* table,
+      bool prefetch_index_and_filter_in_cache = true) const override;
 
   TableBuilder* NewTableBuilder(
-      const ImmutableCFOptions& ioptions,
-      const InternalKeyComparator& icomparator,
-      WritableFile* file,
-      const CompressionType compression_type,
-      const CompressionOptions& compression_opts) const override;
+      const TableBuilderOptions& table_builder_options,
+      uint32_t column_family_id, WritableFileWriter* file) const override;
 
   // Sanitizes the specified DB Options.
-  Status SanitizeOptions(const DBOptions& db_opts,
-                         const ColumnFamilyOptions& cf_opts) const override {
-    if (db_opts.allow_mmap_reads == false) {
-      return Status::NotSupported(
-          "AdaptiveTable with allow_mmap_reads == false is not supported.");
-    }
+  Status SanitizeOptions(
+      const DBOptions& /*db_opts*/,
+      const ColumnFamilyOptions& /*cf_opts*/) const override {
     return Status::OK();
   }
 

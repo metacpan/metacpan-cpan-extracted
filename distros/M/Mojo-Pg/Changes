@@ -1,4 +1,7 @@
 
+4.10  2018-09-15
+  - Updated project metadata.
+
 4.09  2018-08-02
   - Added support for -json unary op to SQL::Abstract::Pg.
   - Added support for multi-column unique constraints in upserts to

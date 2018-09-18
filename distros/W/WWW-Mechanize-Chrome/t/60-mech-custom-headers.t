@@ -24,13 +24,16 @@ if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
     exit
 } else {
-    plan tests => 20*@instances;
+    plan tests => 21*@instances;
 };
 
 sub new_mech {
     #use Mojolicious;
     WWW::Mechanize::Chrome->new(
         autodie => 1,
+        extra_headers => {
+            'X-My-Initial-Header' => '1',
+        },
         @_,
     );
 };
@@ -89,6 +92,7 @@ t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 20, sub
     {
         local $TODO = "Chrome v63.0.84+ doesn't send the Host header..."
             if $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ($1 == 63 and $3 >= 84);
+        like $headers, qr!^X-My-Initial-Header: 1$!m, "We can add completely custom headers at start";
         like $headers, qr!^Host: www.example.com\s*$!m, "We can add custom Host: headers";
     }
     $mech->submit_form; # retrieve the JS window.navigator.userAgent value

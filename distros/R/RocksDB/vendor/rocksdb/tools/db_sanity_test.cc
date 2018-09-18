@@ -1,7 +1,7 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #include <cstdio>
 #include <cstdlib>
@@ -38,7 +38,7 @@ class SanityTest {
     options.create_if_missing = true;
     std::string dbname = path_ + Name();
     DestroyDB(dbname, options);
-    DB* db;
+    DB* db = nullptr;
     Status s = DB::Open(options, dbname, &db);
     std::unique_ptr<DB> db_guard(db);
     if (!s.ok()) {
@@ -55,7 +55,7 @@ class SanityTest {
     return db->Flush(FlushOptions());
   }
   Status Verify() {
-    DB* db;
+    DB* db = nullptr;
     std::string dbname = path_ + Name();
     Status s = DB::Open(GetOptions(), dbname, &db);
     std::unique_ptr<DB> db_guard(db);
@@ -85,12 +85,12 @@ class SanityTest {
 class SanityTestBasic : public SanityTest {
  public:
   explicit SanityTestBasic(const std::string& path) : SanityTest(path) {}
-  virtual Options GetOptions() const {
+  virtual Options GetOptions() const override {
     Options options;
     options.create_if_missing = true;
     return options;
   }
-  virtual std::string Name() const { return "Basic"; }
+  virtual std::string Name() const override { return "Basic"; }
 };
 
 class SanityTestSpecialComparator : public SanityTest {
@@ -100,20 +100,23 @@ class SanityTestSpecialComparator : public SanityTest {
     options_.comparator = new NewComparator();
   }
   ~SanityTestSpecialComparator() { delete options_.comparator; }
-  virtual Options GetOptions() const { return options_; }
-  virtual std::string Name() const { return "SpecialComparator"; }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "SpecialComparator"; }
 
  private:
   class NewComparator : public Comparator {
    public:
-    virtual const char* Name() const { return "rocksdb.NewComparator"; }
-    virtual int Compare(const Slice& a, const Slice& b) const {
+    virtual const char* Name() const override {
+      return "rocksdb.NewComparator";
+    }
+    virtual int Compare(const Slice& a, const Slice& b) const override {
       return BytewiseComparator()->Compare(a, b);
     }
-    virtual void FindShortestSeparator(std::string* s, const Slice& l) const {
+    virtual void FindShortestSeparator(std::string* s,
+                                       const Slice& l) const override {
       BytewiseComparator()->FindShortestSeparator(s, l);
     }
-    virtual void FindShortSuccessor(std::string* key) const {
+    virtual void FindShortSuccessor(std::string* key) const override {
       BytewiseComparator()->FindShortSuccessor(key);
     }
   };
@@ -126,8 +129,67 @@ class SanityTestZlibCompression : public SanityTest {
       : SanityTest(path) {
     options_.compression = kZlibCompression;
   }
-  virtual Options GetOptions() const { return options_; }
-  virtual std::string Name() const { return "ZlibCompression"; }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "ZlibCompression"; }
+
+ private:
+  Options options_;
+};
+
+class SanityTestZlibCompressionVersion2 : public SanityTest {
+ public:
+  explicit SanityTestZlibCompressionVersion2(const std::string& path)
+      : SanityTest(path) {
+    options_.compression = kZlibCompression;
+    BlockBasedTableOptions table_options;
+#if ROCKSDB_MAJOR > 3 || (ROCKSDB_MAJOR == 3 && ROCKSDB_MINOR >= 10)
+    table_options.format_version = 2;
+#endif
+    options_.table_factory.reset(NewBlockBasedTableFactory(table_options));
+  }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override {
+    return "ZlibCompressionVersion2";
+  }
+
+ private:
+  Options options_;
+};
+
+class SanityTestLZ4Compression : public SanityTest {
+ public:
+  explicit SanityTestLZ4Compression(const std::string& path)
+      : SanityTest(path) {
+    options_.compression = kLZ4Compression;
+  }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "LZ4Compression"; }
+
+ private:
+  Options options_;
+};
+
+class SanityTestLZ4HCCompression : public SanityTest {
+ public:
+  explicit SanityTestLZ4HCCompression(const std::string& path)
+      : SanityTest(path) {
+    options_.compression = kLZ4HCCompression;
+  }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "LZ4HCCompression"; }
+
+ private:
+  Options options_;
+};
+
+class SanityTestZSTDCompression : public SanityTest {
+ public:
+  explicit SanityTestZSTDCompression(const std::string& path)
+      : SanityTest(path) {
+    options_.compression = kZSTD;
+  }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "ZSTDCompression"; }
 
  private:
   Options options_;
@@ -143,8 +205,8 @@ class SanityTestPlainTableFactory : public SanityTest {
     options_.allow_mmap_reads = true;
   }
   ~SanityTestPlainTableFactory() {}
-  virtual Options GetOptions() const { return options_; }
-  virtual std::string Name() const { return "PlainTable"; }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "PlainTable"; }
 
  private:
   Options options_;
@@ -159,8 +221,8 @@ class SanityTestBloomFilter : public SanityTest {
     options_.table_factory.reset(NewBlockBasedTableFactory(table_options));
   }
   ~SanityTestBloomFilter() {}
-  virtual Options GetOptions() const { return options_; }
-  virtual std::string Name() const { return "BloomFilter"; }
+  virtual Options GetOptions() const override { return options_; }
+  virtual std::string Name() const override { return "BloomFilter"; }
 
  private:
   Options options_;
@@ -168,9 +230,17 @@ class SanityTestBloomFilter : public SanityTest {
 
 namespace {
 bool RunSanityTests(const std::string& command, const std::string& path) {
+  bool result = true;
+// Suppress false positive clang static anaylzer warnings.
+#ifndef __clang_analyzer__
   std::vector<SanityTest*> sanity_tests = {
-      new SanityTestBasic(path), new SanityTestSpecialComparator(path),
+      new SanityTestBasic(path),
+      new SanityTestSpecialComparator(path),
       new SanityTestZlibCompression(path),
+      new SanityTestZlibCompressionVersion2(path),
+      new SanityTestLZ4Compression(path),
+      new SanityTestLZ4HCCompression(path),
+      new SanityTestZSTDCompression(path),
 #ifndef ROCKSDB_LITE
       new SanityTestPlainTableFactory(path),
 #endif  // ROCKSDB_LITE
@@ -193,12 +263,13 @@ bool RunSanityTests(const std::string& command, const std::string& path) {
     fprintf(stderr, "%s\n", s.ToString().c_str());
     if (!s.ok()) {
       fprintf(stderr, "FAIL\n");
-      return false;
+      result = false;
     }
 
     delete sanity_test;
   }
-  return true;
+#endif  // __clang_analyzer__
+  return result;
 }
 }  // namespace
 

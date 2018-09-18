@@ -1,6 +1,6 @@
 package App::JsonLogUtils;
 # ABSTRACT: Command line utilities for dealing with JSON-formatted log files
-$App::JsonLogUtils::VERSION = '0.02';
+$App::JsonLogUtils::VERSION = '0.03';
 
 
 use strict;
@@ -34,7 +34,7 @@ sub _open {
   my $path = shift || return;
   return $path if ref $path;
 
-  open my $fh, '<', $path or do{
+  open(my $fh, '<', $path) || return do{
     log_warn $!;
     return;
   };
@@ -46,7 +46,7 @@ sub _open {
 
 sub lines ($) {
   my $path = shift;
-  my $fh   = _open $path || return;
+  my $fh   = _open($path) || return iter([]);
   imap{ chomp $_; $_ } iter $fh;
 }
 
@@ -54,7 +54,7 @@ sub lines ($) {
 
 sub tail ($) {
   my $path = shift;
-  my $fh   = _open $path || return;
+  my $fh   = _open($path) || return iter([]);
   my $pos  = 0;
   my $stop = 0;
 
@@ -213,7 +213,7 @@ App::JsonLogUtils - Command line utilities for dealing with JSON-formatted log f
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

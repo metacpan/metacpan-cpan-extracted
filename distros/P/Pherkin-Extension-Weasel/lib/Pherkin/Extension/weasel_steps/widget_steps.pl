@@ -109,6 +109,7 @@ When qr/I enter (([^"].*)|"(.*)") into "(.*)"/, sub {
     ok($element, "found element with label '$label'");
     $value ||= C->stash->{feature}->{$param};
     $element->click;
+    $element->clear;
     $element->send_keys($value);
 };
 
@@ -121,6 +122,7 @@ When qr/I enter these values:/, sub {
         }
         else {
             $elm->click;
+            $elm->clear;
             $elm->send_keys($field->{value});
         }
     }

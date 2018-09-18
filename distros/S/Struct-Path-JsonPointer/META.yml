@@ -4,7 +4,7 @@ author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
   Clone: 0
-  Struct::Path: 0.80
+  Struct::Path: 0.82
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
@@ -23,4 +23,4 @@ requires:
   Carp: 0
   Scalar::Util: 0
   perl: 5.006
-version: 0.02
+version: 0.03

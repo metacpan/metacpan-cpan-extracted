@@ -4,14 +4,14 @@
 # Translators:
 # Francesc Pinyol Margalef, 2012-2014
 # Davidmp <medipas@gmail.com>, 2015-2018
-# Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017
+# Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017-2018
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2018-04-20 12:39+0000\n"
-"Last-Translator: Davidmp <medipas@gmail.com>\n"
+"PO-Revision-Date: 2018-09-02 15:48+0000\n"
+"Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/MageiaLinux/mageia/language/"
 "ca/)\n"
 "Language: ca\n"
@@ -3305,4 +3305,4 @@ msgstr "Executa l'instal·lador de paquets de Mageia"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
-msgstr "Cal autenticació per executar l'instal·lador de paquets del Mageia"
+msgstr "Cal autenticació per executar l'instal·lador de paquets de Mageia"

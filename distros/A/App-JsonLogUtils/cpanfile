@@ -7,6 +7,7 @@ requires 'Pod::Usage'        => 0;
 requires 'Term::ReadLine'    => 0;
 requires 'Term::SimpleColor' => 0;
 requires 'Time::HiRes'       => 0;
+requires 'parent'            => 0;
 
 on test => sub {
   requires 'Test2::V0' => '0';

@@ -1,38 +1,47 @@
-//  Copyright (c) 2013, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 
 #pragma once
 
 #include <stdint.h>
-#include <deque>
+#include <atomic>
+#include <mutex>
 #include <set>
-#include <vector>
 
 namespace rocksdb {
 
 class ColumnFamilyData;
 
-// This class is thread-compatible. It's should only be accessed from single
-// write thread (between BeginWrite() and EndWrite())
+// Unless otherwise noted, all methods on FlushScheduler should be called
+// only with the DB mutex held or from a single-threaded recovery context.
 class FlushScheduler {
  public:
-  FlushScheduler() = default;
-  ~FlushScheduler() = default;
+  FlushScheduler() : head_(nullptr) {}
 
+  // May be called from multiple threads at once, but not concurrent with
+  // any other method calls on this instance
   void ScheduleFlush(ColumnFamilyData* cfd);
-  // Returns Ref()-ed column family. Client needs to Unref()
-  ColumnFamilyData* GetNextColumnFamily();
+
+  // Removes and returns Ref()-ed column family. Client needs to Unref().
+  // Filters column families that have been dropped.
+  ColumnFamilyData* TakeNextColumnFamily();
 
   bool Empty();
 
   void Clear();
 
  private:
-  std::deque<ColumnFamilyData*> column_families_;
+  struct Node {
+    ColumnFamilyData* column_family;
+    Node* next;
+  };
+
+  std::atomic<Node*> head_;
 #ifndef NDEBUG
-  std::set<ColumnFamilyData*> column_families_set_;
+  std::mutex checking_mutex_;
+  std::set<ColumnFamilyData*> checking_set_;
 #endif  // NDEBUG
 };
 

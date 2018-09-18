@@ -11,7 +11,7 @@ use Data::Dumper;
 use Regexp::Common('RE_ALL', 'Email::Address', 'URI', 'time');
 use Scalar::Util qw(looks_like_number blessed weaken reftype);
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub new {
     my ($class, %args) = @_;
@@ -140,9 +140,10 @@ sub compile {
     my $is_required = $opts{is_required} // $type eq 'object' || 0;
     my $val_func    = "_validate_$type";
     my $val_expr    = $self->$val_func($input_sym, $schema, "", $is_required);
-    return wantarray
-        ? ($val_expr, map {$_ => [sort keys %{$self->{required_modules}{$_}}]} keys %{$self->{required_modules}})
-        : $val_expr;
+    return
+      wantarray
+      ? ($val_expr, map {$_ => [sort keys %{$self->{required_modules}{$_}}]} keys %{$self->{required_modules}})
+      : $val_expr;
 }
 
 # type: six primitive types ("null", "boolean", "object", "array", "number", or "string"), or "integer"
@@ -171,23 +172,23 @@ sub _guess_schema_type {    ## no critic (Subroutines::ProhibitExcessComplexity)
     }
     return $shmpt->{type} if $shmpt->{type};
     return 'object'
-        if defined $shmpt->{additionalProperties}
-        or $shmpt->{patternProperties}
-        or $shmpt->{properties}
-        or defined $shmpt->{minProperties}
-        or defined $shmpt->{maxProperties};
+      if defined $shmpt->{additionalProperties}
+      or $shmpt->{patternProperties}
+      or $shmpt->{properties}
+      or defined $shmpt->{minProperties}
+      or defined $shmpt->{maxProperties};
     return 'array'
-        if defined $shmpt->{additionalItems}
-        or defined $shmpt->{uniqueItems}
-        or $shmpt->{items}
-        or defined $shmpt->{minItems}
-        or defined $shmpt->{maxItems};
+      if defined $shmpt->{additionalItems}
+      or defined $shmpt->{uniqueItems}
+      or $shmpt->{items}
+      or defined $shmpt->{minItems}
+      or defined $shmpt->{maxItems};
     return 'number'
-        if defined $shmpt->{minimum}
-        or defined $shmpt->{maximum}
-        or exists $shmpt->{exclusiveMinimum}
-        or exists $shmpt->{exclusiveMaximum}
-        or defined $shmpt->{multipleOf};
+      if defined $shmpt->{minimum}
+      or defined $shmpt->{maximum}
+      or exists $shmpt->{exclusiveMinimum}
+      or exists $shmpt->{exclusiveMaximum}
+      or defined $shmpt->{multipleOf};
     return 'string';
 }
 
@@ -239,9 +240,9 @@ sub _validate_boolean {
         $r .= "  }\n";
     }
     if ($self->{to_json}) {
-        $r = "  $sympt = (($sympt)? \\1: \\0);\n";
+        $r .= "  $sympt = (($sympt)? \\1: \\0);\n";
     } elsif ($self->{coersion}) {
-        $r = "  $sympt = (($sympt)? 1: 0);\n";
+        $r .= "  $sympt = (($sympt)? 1: 0);\n";
     }
     $r .= "}\n";
     if ($is_required) {
@@ -316,8 +317,8 @@ sub _validate_any_number {    ## no critic (Subroutines::ProhibitManyArgs Subrou
     $r .= $self->_validate_schemas_array($sympt, $schmpt, $path);
     $r .= "  {\n";
     $r .= "  if($sympt !~ /^$re\$/){ push \@\$errors, '$path does not look like $ntype number'; last }\n";
-    my ($minimum, $exclusiveMinimum, $maximum, $exclusiveMaximum)
-        = @{$schmpt}{qw(minimum exclusiveMinimum maximum exclusiveMaximum)};
+    my ($minimum, $exclusiveMinimum, $maximum, $exclusiveMaximum) =
+      @{$schmpt}{qw(minimum exclusiveMinimum maximum exclusiveMaximum)};
     if (defined $minimum && $exclusiveMinimum) {
         $exclusiveMinimum = $minimum;
         undef $minimum;
@@ -403,7 +404,7 @@ sub _validate_all_of {
     $r .= "  {  my \@allOf = " . $self->_make_schemas_array($schmpt->{allOf}, $rpath, $schmpt->{type}) . ";\n";
     $r .= "    my \$stored_arg = ${sympt};\n";
     $r .= "    push \@\$errors, \"$rpath doesn't match all required schemas\" "
-        . "if notall { \$_->(\$stored_arg, \"$rpath\") } \@allOf;\n";
+      . "if notall { \$_->(\$stored_arg, \"$rpath\") } \@allOf;\n";
     $r .= "  }\n";
     return $r;
 }
@@ -415,7 +416,7 @@ sub _validate_any_of {
     $r .= "  {  my \@anyOf = " . $self->_make_schemas_array($schmpt->{anyOf}, $rpath, $schmpt->{type}) . ";\n";
     $r .= "    my \$stored_arg = ${sympt};\n";
     $r .= "    push \@\$errors, \"$rpath doesn't match any required schema\""
-        . " if none { \$_->(\$stored_arg, \"$rpath\") } \@anyOf;\n";
+      . " if none { \$_->(\$stored_arg, \"$rpath\") } \@anyOf;\n";
     $r .= "  }\n";
     return $r;
 }
@@ -438,7 +439,7 @@ sub _validate_not_of {
     $r .= "  {  my \@notOf = " . $self->_make_schemas_array($schmpt->{not}, $rpath, $schmpt->{type}) . ";\n";
     $r .= "    my \$stored_arg = ${sympt};\n";
     $r .= "    push \@\$errors, \"$rpath matches a schema when must not\" "
-        . " if any { \$_->(\$stored_arg, \"$rpath\") } \@notOf;\n";
+      . " if any { \$_->(\$stored_arg, \"$rpath\") } \@notOf;\n";
     $r .= "  }\n";
     return $r;
 }
@@ -495,7 +496,8 @@ sub _validate_object {    ## no critic (Subroutines::ProhibitExcessComplexity)
     if (defined $schmpt->{patternProperties}) {
         for my $pt (keys %{$schmpt->{patternProperties}}) {
             my $type;
-            $type = $schmpt->{patternProperties}{$pt}{type} // _guess_schema_type($schmpt->{patternProperties}{$pt});
+            $type = $schmpt->{patternProperties}{$pt}{type}
+              // _guess_schema_type($schmpt->{patternProperties}{$pt});
             my $val_func = "_validate_$type";
             (my $upt = $pt) =~ s/"/\\"/g;
             $upt =~ s/\\Q(.*?)\\E/quotemeta($1)/eg;
@@ -526,7 +528,10 @@ sub _validate_object {    ## no critic (Subroutines::ProhibitExcessComplexity)
                 $r .= "    my %allowed_props = (" . join(", ", map {$_ => "undef"} keys %apr) . ");\n";
                 $r .= "    my \@unallowed_props = grep {!exists \$allowed_props{\$_} } keys %{${sympt}};\n";
                 if (@pt) {
-                    $r .= "    \@unallowed_props = grep { " . join("&&", map {"!/$_/"} @pt) . " } \@unallowed_props;\n";
+                    $r .=
+                        "    \@unallowed_props = grep { "
+                      . join("&&", map {"!/$_/"} @pt)
+                      . " } \@unallowed_props;\n";
                 }
                 $r .= "    push \@\$errors, \"$rpath contains not allowed properties: \@unallowed_props\" ";
                 $r .= " if \@unallowed_props;\n";

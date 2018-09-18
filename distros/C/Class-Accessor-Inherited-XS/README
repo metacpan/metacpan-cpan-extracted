@@ -112,8 +112,9 @@ PERFORMANCE
 EXTENDING
         package MyAccessor;
         # 'register_type' isn't exported
+        use Class::Accessor::Inherited::XS::Constants;
         Class::Accessor::Inherited::XS::register_type(
-            inherited_cb => {on_read => sub {}, on_write => sub{}},
+            inherited_cb => {on_read => sub {}, on_write => sub{}, opts => $bitset},
         );
 
         package MyClass;
@@ -136,6 +137,11 @@ EXTENDING
     on_write callback receives original accessor's arguments, and it's
     return value is stored as usual. Exceptions thrown from this callback
     will cancel store and will leave old value unchanged.
+
+    You can specify additional flags with the 'opts' key. Currently only
+    IsNamed is supported - with it the accessor callback is invoked with
+    it's name passed as an additional argument. This can be useful when
+    creating a proxy.
 
 PROFILING WITH Devel::NYTProf
     To perform it's task, Devel::NYTProf hooks into the perl interpreter by

@@ -16,7 +16,7 @@ name: Mojo-ACME
 provides:
   Mojo::ACME:
     file: lib/Mojo/ACME.pm
-    version: '0.12'
+    version: '0.13'
   Mojo::ACME::CA:
     file: lib/Mojo/ACME/CA.pm
   Mojo::ACME::ChallengeServer:
@@ -49,5 +49,5 @@ resources:
   bugtracker: http://github.com/jberger/Mojo-ACME/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-ACME
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

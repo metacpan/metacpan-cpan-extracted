@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/analyze
 lib/WebService/AcousticBrainz.pm
 t/00-compile.t
 t/01-methods.t

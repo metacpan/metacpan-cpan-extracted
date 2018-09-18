@@ -1,5 +1,5 @@
 package POE::Component::Server::SimpleHTTP;
-$POE::Component::Server::SimpleHTTP::VERSION = '2.26';
+$POE::Component::Server::SimpleHTTP::VERSION = '2.28';
 #ABSTRACT: Perl extension to serve HTTP requests in POE.
 
 use strict;
@@ -12,7 +12,7 @@ use POE::Filter::HTTPD;
 use POE::Filter::Stream;
 
 use Carp qw( croak );
-use Socket;
+use Socket qw( AF_INET AF_INET6 INADDR_ANY IN6ADDR_ANY inet_pton );
 
 use HTTP::Date qw( time2str );
 
@@ -38,6 +38,10 @@ use Moose::Util::TypeConstraints;
 
 
 has 'alias' => (
+  is => 'ro',
+);
+
+has 'domain' => (
   is => 'ro',
 );
 
@@ -315,18 +319,39 @@ event 'start_listener' => sub {
 
       $self->inc_retry unless $noinc;
 
+      my $domain = $self->domain;
+      my $bindaddress = $self->address;
+      if ( not defined $bindaddress and not defined $domain ) {
+         $domain = AF_INET6;
+         $bindaddress = IN6ADDR_ANY;
+      } elsif ( not defined $bindaddress ) {
+         if ( $domain == AF_INET6 ) {
+            $bindaddress = IN6ADDR_ANY;
+         } elsif ( $domain == AF_INET ) {
+            $bindaddress = INADDR_ANY;
+         }
+      } else {
+         if ( defined inet_pton(AF_INET6, $bindaddress) ) {
+            $domain = AF_INET6;
+         } elsif ( defined inet_pton(AF_INET, $bindaddress) ) {
+            $domain = AF_INET;
+         }
+      }
+
       # Create our own SocketFactory Wheel :)
       my $factory = POE::Wheel::SocketFactory->new(
+         ( $domain ? ( SocketDomain => $domain ) : () ),
+         ( $bindaddress ? ( BindAddress => $bindaddress ) : () ),
          BindPort     => $self->port,
-         ( $self->address ? ( BindAddress => $self->address ) : () ),
          Reuse        => 'yes',
          SuccessEvent => 'got_connection',
          FailureEvent => 'listener_error',
       );
 
-      my ( $port, $address ) =
-        sockaddr_in( $factory->getsockname );
-      $self->_set_port( $port ) if $self->port == 0;
+      my ( $family, $address, $port, $straddress ) =
+      POE::Component::Server::SimpleHTTP::Connection->get_sockaddr_info(
+         $factory->getsockname );
+      $self->_set_port( $port ) if ( $self->port == 0 and $port );
 
       $self->_set_factory( $factory );
 
@@ -475,8 +500,11 @@ sub MassageHandlers {
 # 'Got_Connection'
 # The actual manager of connections
 event 'got_connection' => sub {
-   my ($kernel,$self,$socket,$peeraddr,$peerport) = @_[KERNEL,OBJECT,ARG0..ARG2];
+   my ( $kernel, $self, $socket ) = @_[KERNEL, OBJECT, ARG0];
 
+   my ( $family, $address, $port, $straddress ) =
+   POE::Component::Server::SimpleHTTP::Connection->get_sockaddr_info(
+      getpeername($socket) );
 
    # Should we SSLify it?
    if ( $self->sslkeycert ) {
@@ -484,9 +512,7 @@ event 'got_connection' => sub {
       # SSLify it!
       eval { $socket = Server_SSLify($socket) };
       if ($@) {
-         warn "Unable to turn on SSL for connection from "
-           . Socket::inet_ntoa( $peeraddr )
-           . " -> $@";
+         warn "Unable to turn on SSL for connection from $straddress -> $@";
          close $socket;
          return 1;
       }
@@ -1184,7 +1210,7 @@ POE::Component::Server::SimpleHTTP - Perl extension to serve HTTP requests in PO
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -1362,11 +1388,21 @@ This will default to "SimpleHTTP"
 
 =item C<ADDRESS>
 
-This value will be passed to POE::Wheel::SocketFactory to bind to, will use INADDR_ANY if it is nothing is provided.
+This value will be passed to POE::Wheel::SocketFactory to bind to, will use
+INADDR_ANY if it is nothing is provided (or IN6ADDR_ANY if DOMAIN is AF_INET6).
+For UNIX domain sockets, it should be a path describing the socket's filename.
+
+If neither DOMAIN nor ADDRESS are specified, it will use IN6ADDR_ANY and
+AF_INET6.
 
 =item C<PORT>
 
 This value will be passed to POE::Wheel::SocketFactory to bind to.
+
+=item C<DOMAIN>
+
+This value will be passed to POE::Wheel::SocketFactory to define the socket
+domain used (AF_INET, AF_INET6, AF_UNIX).
 
 =item C<HOSTNAME>
 
@@ -1733,7 +1769,7 @@ Apocalypse <APOCAL@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
+This software is copyright (c) 2018 by Apocalypse, Chris Williams, Eriam Schaffter, Marlon Bailey and Philip Gwyn.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

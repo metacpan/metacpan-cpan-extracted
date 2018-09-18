@@ -23,13 +23,14 @@ sub need_root_and_prepare() {
 
     system('rm -rf root');
     isnt(-d 'root', "test root dir can not be removed $!");
-    mkdir 'root';
+    system('mkdir -p root/etc/rpm');
+    system('echo "%_pkgverify_level none" >root/etc/rpm/macros');
     $using_root = 1;
     $ENV{LC_ALL} = 'C';
 }
 
 my $server_pid;
-sub httpd_port { 6969 }
+sub httpd_port() { 6969 }
 sub start_httpd() {
     system('perl -MNet::Server::Single -e 1') == 0 or die "module Net::Server::Single is missing (package perl-Net-Server)\n";
     $server_pid = fork();

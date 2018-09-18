@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use File::Basename;
+use File::Spec;
+
+use lib File::Spec->catdir(File::Basename::dirname(-l __FILE__ ? readlink(__FILE__) : __FILE__), 'lib');
+
+use StackTrace::Pretty::Printer;
+use StackTrace::Pretty::LogState;
+
+my $CARP_OUTPUT_PATTERN = qr/(\S+)(?: called)? at (\S+) line (\d+)\.?$/;
+
+my %printer_params = ();
+
+my $excluded_modules_str = $ENV{STACKTRACE_PRETTY_EXCLUDED_MODULES};
+if ($excluded_modules_str) {
+    my @excluded_modules = split /,/, $excluded_modules_str;
+    $printer_params{excluded_modules} = \@excluded_modules;
+}
+
+my $printer = StackTrace::Pretty::Printer->new(\%printer_params);
+
+main();
+exit(0);
+
+sub main {
+    my $filename = $ARGV[0];
+
+    if ($filename) {
+        from_file($filename);
+    }
+    else {
+        from_stdin();
+    }
+}
+
+sub from_file {
+    my ($filename) = @_;
+
+    open my $IN, '<', $filename or die "Failed to open file $filename : $!";
+    process_input($IN);
+    close $IN;
+}
+
+sub from_stdin {
+    my $IN = *STDIN;
+
+    process_input($IN);
+}
+
+sub process_input {
+    my ($IN) = @_;
+
+    my $log_state = StackTrace::Pretty::LogState->new();
+
+    while (my $line = <$IN>) {
+        chomp($line);
+
+        $log_state->read($line);
+        if ($log_state->is_in_stack_trace) {
+            $printer->print({
+                line => $line,
+                depth => $log_state->line_num,
+            });
+        }
+        else {
+            print "$line\n";
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+stacktrace-pretty - Convert stacktrace to more readable one
+
+=head1 SYNOPSIS
+
+    stacktrace-pretty sample.log
+    perl sample.pl 2>&1 | stacktrace-pretty
+
+=head1 DESCRIPTION
+
+This tool converts text which includes stack trace of perl into more readable one.
+
+=head2 INSTALL
+
+    cpanm https://github.com/egawata/stacktrace-pretty.git
+
+=head1 OPTIONS
+
+Use C<STACKTRACE_PRETTY_EXCLUDED_MODULES> environment variable. It is a part of module/function names. You can specify more than one names by separating comma C<,>.
+
+    export STACKTRACE_PRETTY_EXCLUDED_MODULES=Some::Module,Another::Module
+
+=head1 AUTHOR
+
+egawata (L<https://github.com/egawata>)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c)2018 egawata All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

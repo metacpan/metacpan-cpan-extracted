@@ -16,9 +16,11 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Net::OneSky",
   "PREREQ_PM" => {
+    "Cwd" => 0,
     "Digest::MD5" => 0,
     "File::Basename" => 0,
     "HTTP::Request::Common" => 0,
+    "IPC::Open3" => 0,
     "JSON" => 0,
     "LWP::UserAgent" => 0,
     "Moose" => 0,
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::Trap" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,9 +45,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cwd" => 0,
   "Digest::MD5" => 0,
   "File::Basename" => 0,
   "HTTP::Request::Common" => 0,
+  "IPC::Open3" => 0,
   "JSON" => 0,
   "LWP::UserAgent" => 0,
   "Moose" => 0,

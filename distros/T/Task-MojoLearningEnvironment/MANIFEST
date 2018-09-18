@@ -1,14 +1,22 @@
+bin/mojo_static
 Changes
 CONTRIBUTING
+html/index.html
+INSTALL.SKIP
 lib/Task/MojoLearningEnvironment.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+start-from-scratch.sh
 t/load.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest
+vagrant-prepare-package.sh
+vagrant-provision.sh
+Vagrantfile
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

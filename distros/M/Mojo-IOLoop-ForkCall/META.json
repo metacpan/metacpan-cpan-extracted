@@ -1,5 +1,5 @@
 {
-   "abstract" : "run blocking functions asynchronously by forking",
+   "abstract" : "(DEPRECATED) run blocking functions asynchronously by forking",
    "author" : [
       "Joel Berger <joel.a.berger@gmail.com>"
    ],
@@ -30,7 +30,7 @@
    "provides" : {
       "Mojo::IOLoop::ForkCall" : {
          "file" : "lib/Mojo/IOLoop/ForkCall.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Mojolicious::Plugin::ForkCall" : {
          "file" : "lib/Mojolicious/Plugin/ForkCall.pm"
@@ -48,6 +48,7 @@
          "url" : "https://github.com/jberger/Mojo-IOLoop-ForkCall"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
+   "x_deprecated" : 1,
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

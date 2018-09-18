@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::Flexible
 
+0.31 Mon Sep 17 2018
+  - add support for Sep 10, 2018 12:58, Sep 10, 18 12:58
+    - thanks Ian! D. Allen
+
 0.30 Fri Mar 09 2018
   - add support for bare times with am/pm
     - thanks Rod Taylor rt #124567

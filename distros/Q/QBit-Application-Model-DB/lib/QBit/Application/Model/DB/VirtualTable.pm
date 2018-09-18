@@ -10,7 +10,7 @@ Base class for DB virtual tables.
 =cut
 
 package QBit::Application::Model::DB::VirtualTable;
-$QBit::Application::Model::DB::VirtualTable::VERSION = '0.029';
+$QBit::Application::Model::DB::VirtualTable::VERSION = '0.030';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::FileExpansion;
 use strict;
 use warnings;
 
-our $VERSION = '6.0'; # VERSION
+our $VERSION = '6.1'; # VERSION
 
 use CLI::Helpers qw(:output);
 use File::Slurp::Tiny qw(read_lines);
@@ -92,15 +92,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities::QueryString::FileExpansion - Build a terms query from unique values in a column of a file
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,47 @@
 
+8.0  2018-09-15
+  - Code name "Supervillain", this is a major release.
+  - Changed query method in Mojo::URL to merge with hash references and append
+    with array references instead of the other way around. Because appended
+    pairs should be able to preserve order.
+  - Changed template attribute in Mojolicious::Command to acivate vars by
+    default.
+  - Removed test command.
+  - Removed deprecated expect_close attribute from Mojo::Content.
+  - Removed deprecated error and finish events from Mojo::IOLoop::Delay.
+  - Removed experimental status from server_timing method in Mojo::Headers.
+  - Removed experimental status from tag_to_html function in Mojo::DOM::HTML.
+  - Removed experimental status from tag method in Mojo::DOM::HTML.
+  - Removed experimental status from bytes_read and bytes_written methods in
+    Mojo::IOLoop::Stream.
+  - Removed experimental status from before_server_start hook.
+  - Removed experimental status from timing->* helpers.
+  - Added clone method to Mojo::Promise.
+  - Added chmod method to Mojo::File.
+  - Added prepare event to Mojo::UserAgent.
+  - Added Mojolicious::Command::Author default namespace in
+    Mojolicious::Commands.
+  - Moved Mojolicious::Command::cpanify to
+    Mojolicious::Command::Author::cpanify.
+  - Moved Mojolicious::Command::generate to
+    Mojolicious::Command::Author::generate.
+  - Moved Mojolicious::Command::generate::app to
+    Mojolicious::Command::Author::generate::app.
+  - Moved Mojolicious::Command::generate::lite_app to
+    Mojolicious::Command::Author::generate::lite_app.
+  - Moved Mojolicious::Command::generate::makefile to
+    Mojolicious::Command::Author::generate::makefile.
+  - Moved Mojolicious::Command::generate::plugin to
+    Mojolicious::Command::Author::generate::plugin.
+  - Moved Mojolicious::Command::inflate to
+    Mojolicious::Command::Author::inflate.
+  - Updated project metadata.
+  - Improved Mojo::Promise to allow for reject and resolve methods to be used as
+    class methods.
+  - Reduced memory usage of Mojo::IOLoop::Stream.
+  - Fixed a bug that prevented permessage-deflate WebSocket compression to work
+    with newer versions of Chrome. (elcamlost)
+
 7.94  2018-08-27
   - Added EXPERIMENTAL content_type and file_type methods to Mojolicious::Types.
   - Fixed a bug where the reply->file helper would not try to set a Content-Type

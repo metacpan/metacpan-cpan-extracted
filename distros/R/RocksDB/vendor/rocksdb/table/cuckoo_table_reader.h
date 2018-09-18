@@ -1,7 +1,7 @@
-//  Copyright (c) 2014, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -15,23 +15,25 @@
 #include <vector>
 
 #include "db/dbformat.h"
+#include "options/cf_options.h"
 #include "rocksdb/env.h"
 #include "rocksdb/options.h"
 #include "table/table_reader.h"
+#include "util/file_reader_writer.h"
 
 namespace rocksdb {
 
 class Arena;
 class TableReader;
+class InternalIterator;
 
 class CuckooTableReader: public TableReader {
  public:
-  CuckooTableReader(
-      const ImmutableCFOptions& ioptions,
-      std::unique_ptr<RandomAccessFile>&& file,
-      uint64_t file_size,
-      const Comparator* user_comparator,
-      uint64_t (*get_slice_hash)(const Slice&, uint32_t, uint64_t));
+  CuckooTableReader(const ImmutableCFOptions& ioptions,
+                    std::unique_ptr<RandomAccessFileReader>&& file,
+                    uint64_t file_size, const Comparator* user_comparator,
+                    uint64_t (*get_slice_hash)(const Slice&, uint32_t,
+                                               uint64_t));
   ~CuckooTableReader() {}
 
   std::shared_ptr<const TableProperties> GetTableProperties() const override {
@@ -40,24 +42,29 @@ class CuckooTableReader: public TableReader {
 
   Status status() const { return status_; }
 
-  Status Get(const ReadOptions& read_options, const Slice& key,
-             GetContext* get_context) override;
+  Status Get(const ReadOptions& readOptions, const Slice& key,
+             GetContext* get_context, const SliceTransform* prefix_extractor,
+             bool skip_filters = false) override;
 
-  Iterator* NewIterator(const ReadOptions&, Arena* arena = nullptr) override;
+  InternalIterator* NewIterator(const ReadOptions&,
+                                const SliceTransform* prefix_extractor,
+                                Arena* arena = nullptr,
+                                bool skip_filters = false,
+                                bool for_compaction = false) override;
   void Prepare(const Slice& target) override;
 
   // Report an approximation of how much memory has been used.
   size_t ApproximateMemoryUsage() const override;
 
   // Following methods are not implemented for Cuckoo Table Reader
-  uint64_t ApproximateOffsetOf(const Slice& key) override { return 0; }
+  uint64_t ApproximateOffsetOf(const Slice& /*key*/) override { return 0; }
   void SetupForCompaction() override {}
   // End of methods not implemented.
 
  private:
   friend class CuckooTableIterator;
   void LoadAllKeys(std::vector<std::pair<Slice, uint32_t>>* key_to_bucket_id);
-  std::unique_ptr<RandomAccessFile> file_;
+  std::unique_ptr<RandomAccessFileReader> file_;
   Slice file_data_;
   bool is_last_level_;
   bool identity_as_first_hash_;

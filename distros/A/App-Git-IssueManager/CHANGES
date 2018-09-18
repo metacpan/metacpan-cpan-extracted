@@ -1,0 +1,131 @@
+==================================================
+Changes from 2017-09-13 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2018-09-13 21:21:52 +0000
+----------------------------------------
+
+  Change: 69797d983ea1908415632d3cd7e118f6e812aed9
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 23:21:41 +0000
+
+    ADD: added Readme.md 
+
+  Change: 8674503a12acc2fb283f960bde57377cd23a82ba
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 23:18:15 +0000
+
+    FIX: added abstract documentation 
+
+  Change: a2c368c0378b2b7b51485020c671cc96d04a7ab9
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 23:17:40 +0000
+
+    ADD: added configuration for Pod::Weaver 
+
+  Change: 83f8f1004ce5d4d787604d749972e06289d4a361
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 23:17:28 +0000
+
+    ADD: added License file 
+
+  Change: 65476e322e1778ad9763192f438bec208d8ae7fe
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 23:17:10 +0000
+
+    ADD: added bugtracking email address 
+
+  Change: c257af77a7bb226eb3bfcbf7056619fded5092aa
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 23:16:47 +0000
+
+    ADD: added some pod documentation 
+
+  Change: 09dc088144932cab7890d6e8791085f5e89f3614
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 21:30:11 +0000
+
+    ADD: command to start an issue 
+
+  Change: 595614e8a03672a6d6843a56ab958ae62abb605d
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 21:30:01 +0000
+
+    ADD: command to reopen an issue 
+
+  Change: 59433c506b8ed3e22402795bdeb712803a892b1e
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 21:29:49 +0000
+
+    ADD: command to assign a worker to an issue 
+
+  Change: 7b271603a514438c026f91c9709c49313311b0f9
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 21:24:15 +0000
+
+    FIX: check listing parameter 
+
+  Change: 9774167d160a9e698211fa3dd7d4be93d7ba27f0
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-13 21:14:50 +0000
+
+    FIX: check listing parameter 
+
+  Change: 51c07253f5b1c3fda3e049d82384507c9cc7ec7e
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-09-10 22:43:42 +0000
+
+    ADD: reworked IssueManager 
+
+  Change: 3b0786e21d5210f9cfc6c3366e3e0a95ae0da8ab
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-09 21:18:41 +0000
+
+    ADD: added close issue command 
+
+  Change: 4e9c713f192e5c5a3733294d8c4073a9f9c242fb
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-09 21:18:30 +0000
+
+    ADD: allow commandline argument for issue description 
+
+  Change: 61d2e879e97b3dacdbe7f229dd4686d9ec1be6dd
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-09 21:17:47 +0000
+
+    FIX: ignore Config module 
+
+  Change: 8003594e21442823bd00520bb88abdbc7f1af785
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 16:17:31 +0000
+
+    ADD: added delete command 
+
+  Change: 77e560cfe9aad8140e29d8e12d921483f6cecabb
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 10:54:18 +0000
+
+    ADD: ignore some files 
+
+  Change: 9d1814c16bf760d9f8d719b2b2c5b662eb254824
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 10:45:42 +0000
+
+    ADD: first version for listing and adding issues 
+
+  Change: 5fbb5a4baaea0ac1b379292f2d484e0088f81eb3
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-04 10:45:02 +0000
+
+    ADD: updated dist.ini 
+
+  Change: 8b80855f7effab08d641ff2497c6275e0ebde713
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-07-03 17:39:05 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -72,7 +72,6 @@ sub test_8bit_transparency {
     my $global=$odb->fetch('/');
     $self->assert(ref($global), "Failure getting / reference");
 
-    ##
     # For compatibility no charset means binary transparency, checking for it
     #
     $global->add_placeholder(
@@ -91,9 +90,12 @@ sub test_8bit_transparency {
         type        => 'blob',
         maxlength   => 3,
     );
+
     use bytes;
+
     foreach my $code (0..31,128..255) {
         my $char=chr($code).chr($code).chr($code);
+
         foreach my $fname (qw(text tbin bin)) {
             $global->put($fname => $char);
             my $got=$global->get($fname);

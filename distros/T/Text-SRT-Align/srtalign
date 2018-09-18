@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+# sentence aligner for subtitle files based on aligning time intervals
+#
+
+=encoding UTF-8
+
+=head1 NAME
+
+srtalign - align movie subtitles based on time overlaps
+
+=head1 USAGE
+
+ srtalign [OPTIONS] source-file.xml target-file.xml > aligned.xml
+
+
+=head1 OPTIONS
+
+ -S source-lang . source language ID
+ -T target-lang . target language ID
+ -c score ....... use cognates with LCSR>=score
+ -r score-range . use cognates in a certain range 1..score and take best
+ -l length ...... set minimal length of cognates (if used)
+ -i len ......... use identical strings with length>=len
+ -w size ........ set size for sliding window
+ -d dic ......... use dictionary in file 'dic'
+ -u ............. cognates/identicals that start with upper case only
+ -r char_set .... define a set of characters to be used for matching
+ -q ............. normalize length scores with (current) word frequencies
+ -b ............. use "best" alignment (least empty alignments)
+ -p nr .......... stop after <nr> candidates (when using -b)
+ -m MAX ......... in "best" alignment: use only MAX first & MAX last
+                  (default = 10; 0 = all)
+ -f uplug-conf .. use fallback aligner if necessary
+ -P ............. use proportion of non-empty alignments as scoring function
+ -v ............. verbose output
+
+The aligner uses the installed dictionaries if source language (-S) AND target language (-T) are given AND a dictionary for the given language pair is installed on the system (in the shared dir of the Text::SRT::Align package). If a dictionary is found it also assumes the best-align-mode (usually set by -b)
+
+Cognates/identicals are used to set time ratio + time offset!
+They define reference points that will be used to compute 
+ - time scaling factor
+ - time offset
+between source and target subtitles.
+The script looks for these anchor points in the beginning and at the end
+of each subtitle file (size of the windows defines how far from the start
+and the end it'll look).
+The similarity score is normailzed by the distances from start/end
+only two points will be used (one from the begiining and one from the end
+with the best scores)
+
+=cut 
+
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+use Getopt::Std;
+use Text::SRT::Align qw/:all/;
+
+use vars qw($opt_b $opt_l $opt_c $opt_w $opt_d $opt_i $opt_v $opt_u $opt_h 
+	    $opt_s $opt_t $opt_q $opt_f $opt_r $opt_m $opt_S $opt_T $opt_P);
+
+getopts('c:w:l:i:d:vuh:s:t:qbf:r:m:IS:T:P');
+
+my $srcfile = shift(@ARGV);
+my $trgfile = shift(@ARGV);
+my @alignments = ();
+
+my ($score,$overlap) = 
+    &align($srcfile,$trgfile,\@alignments,
+	   SOURCE_LANG => $opt_S,   # setting source and target language enables
+	   TARGET_LANG => $opt_T,   # dic-lookup & also sets BEST_ALIGN (!!)
+	   SCORE_PROPORTION => $opt_P,
+	   FALLBACK => $opt_f,
+	   VERBOSE => $opt_v,
+	   BEST_ALIGN => $opt_b,
+	   USE_WORDFREQ => $opt_q,
+	   USE_IDENTICAL => $opt_i,  # use cognate filter (identical words)
+	   CHAR_SET => $opt_s,
+	   TOK_LEN => $opt_t,
+	   MAX_MATCHES => $opt_m,
+	   USE_COGNATES => $opt_c,   # use cognate filter (lcsr)
+	   COGNATE_RANGE => $opt_r,  # use cognate fillter (1..score)
+	   USE_DICTIONARY => $opt_d, # use dictionary filter
+	   UPPER_CASE => $opt_u,     # cognate filter with upper case words only
+	   MINLENGTH => $opt_l,      # minimum token length (default=5)
+	   WINDOW => $opt_w);        # window for lexical matching (default=25)
+
+print STDERR "overlap = $overlap\n";
+print STDERR "ratio = $score\n";
+
+&print_ces($srcfile,$trgfile,\@alignments);
+
+
+__END__
+
+=head1 AUTHOR
+
+Jörg Tiedemann, L<https://bitbucket.org/tiedemann>
+
+=head1 BUGS AND SUPPORT
+
+Please report any bugs or feature requests to
+L<https://bitbucket.org/tiedemann/subalign>.
+
+=head1 SEE ALSO
+
+More information can be found in L<Text::SRT::Align>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Jörg Tiedemann.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

@@ -118,52 +118,58 @@ STRUCTURE
     Here is a short example of how to create simple structure similar to the
     one above from absolutely empty database:
 
-     ##
-     # Creating minimal required supporting tables
+     # Creating minimal required supporting tables.
      #
-     my $odb=XAO::Objects->new(objname => 'FS::Glue',
-                               dsn => 'OS:MySQL_DBI:testdatabase',
-                               empty_database => 'confirm');
+     my $odb=XAO::Objects->new(
+        objname => 'FS::Glue',
+        dsn     => 'OS:MySQL_DBI:testdatabase',
+        empty_database => 'confirm',
+     );
 
-     ##
      # Retrieving top level object which is empty at that time.
      #
      my $global=$odb->fetch('/');
 
-     ##
      # Creating place holders on top level
      #
-     $global->add_placeholder(name        => 'Customers',
-                              type        => 'list',
-                              class       => 'Data::Customer',
-                              key         => 'customer_id');
+     $global->add_placeholder(
+        name        => 'Customers',
+        type        => 'list',
+        class       => 'Data::Customer',
+        key         => 'customer_id',
+     );
 
-     ##
      # Creating customer detached object.
      #
      my $customer_list=$global->get('Customers');
      my $customer=$customer_list->get_new();
 
-     ##
      # Adding some properties to the customer
      #
-     $customer->add_placeholder(name      => 'first_name',
-                                type      => 'text',
-                                maxlength => 50);
-     $customer->add_placeholder(name      => 'Addresses',
-                                type      => 'list',
-                                class     => 'Data::CustomerAddress',
-                                key       => 'address_id');
+     $customer->add_placeholder(
+        name      => 'first_name',
+        type      => 'text',
+        maxlength => 50,
+     );
+     $customer->add_placeholder(
+        name      => 'Addresses',
+        type      => 'list',
+        class     => 'Data::CustomerAddress',
+        key       => 'address_id',
+     );
 
-     ##
      # Creating detached customer address object. The same as get_new()
      # above but does not require reference to the list.
      #
-     my $address=XAO::Objects->new(objname => 'Data::CustomerAddress',
-                                        glue => $odb);
-     $address->add_placeholder(name       => 'zipcode',
-                               type       => 'text',
-                               maxlength  => 10);
+     my $address=XAO::Objects->new(
+        objname => 'Data::CustomerAddress',
+        glue => $odb,
+     );
+     $address->add_placeholder(
+        name       => 'zipcode',
+        type       => 'text',
+        maxlength  => 10,
+     );
 
     After execution of that script you will have structure able to
     manipulate with arbitrary number of customers each of them having

@@ -25,21 +25,28 @@ XSPROTO(CAIXS_entersub_wrapper) {
 
 #ifdef CAIX_OPTIMIZE_OPMETHOD
 
+#define AMAP_ENTRY(type, opts) \
+    accessor_cb_pair_t(&CAIXS_entersub_wrapper<type, opts>, &CAIXS_accessor<type, opts>)
+
 /* catchy place, don't forget to add new types here */
-#define ACCESSOR_MAP_SIZE 12
+#define ACCESSOR_MAP_SIZE 16
 static accessor_cb_pair_t accessor_map[ACCESSOR_MAP_SIZE] = {
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<Inherited, IsReadonly>, &CAIXS_accessor<Inherited, IsReadonly>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<Inherited, None>, &CAIXS_accessor<Inherited, None>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<InheritedCb, IsReadonly>, &CAIXS_accessor<InheritedCb, IsReadonly>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<InheritedCb, None>, &CAIXS_accessor<InheritedCb, None>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<PrivateClass, IsReadonly>, &CAIXS_accessor<PrivateClass, IsReadonly>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<PrivateClass, None>, &CAIXS_accessor<PrivateClass, None>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<LazyClass, IsReadonly>, &CAIXS_accessor<LazyClass, IsReadonly>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<LazyClass, None>, &CAIXS_accessor<LazyClass, None>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<ObjectOnly, IsReadonly>, &CAIXS_accessor<ObjectOnly, IsReadonly>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<ObjectOnly, None>, &CAIXS_accessor<ObjectOnly, None>),
-    accessor_cb_pair_t(&CAIXS_entersub_wrapper<Constructor, None>, &CAIXS_accessor<Constructor, None>),
-    accessor_cb_pair_t(NULL, NULL) /* sentinel */
+    AMAP_ENTRY(Inherited, IsReadonly),
+    AMAP_ENTRY(Inherited, IsWeak),
+    AMAP_ENTRY(Inherited, None),
+    AMAP_ENTRY(InheritedCb, None),
+    AMAP_ENTRY(InheritedCbNamed, None),
+    AMAP_ENTRY(PrivateClass, IsReadonly),
+    AMAP_ENTRY(PrivateClass, IsWeak),
+    AMAP_ENTRY(PrivateClass,None),
+    AMAP_ENTRY(LazyClass, IsReadonly),
+    AMAP_ENTRY(LazyClass, IsWeak),
+    AMAP_ENTRY(LazyClass, None),
+    AMAP_ENTRY(ObjectOnly, IsReadonly),
+    AMAP_ENTRY(ObjectOnly, IsWeak),
+    AMAP_ENTRY(ObjectOnly, None),
+    AMAP_ENTRY(Constructor, None),
+    accessor_cb_pair_t(NULL, NULL), /* sentinel */
 };
 
 static int

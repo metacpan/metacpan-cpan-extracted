@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => "JSV::Compiler",
     AUTHOR           => "Anton Petrusevich",
-    VERSION          => "0.04",
+    VERSION          => "0.05",
     INSTALLDIRS      => 'site',
     LICENSE          => "artistic_2",
     MIN_PERL_VERSION => "5.008000",

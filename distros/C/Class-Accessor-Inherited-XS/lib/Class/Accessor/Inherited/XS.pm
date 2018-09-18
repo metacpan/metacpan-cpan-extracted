@@ -8,7 +8,7 @@ use Class::Accessor::Inherited::XS::Compat qw/mk_type_accessors mk_inherited_acc
 our $PREFIX = '__cag_';
 
 BEGIN {
-    our $VERSION = '0.35';
+    our $VERSION = '0.36';
 
     require XSLoader;
     XSLoader::load('Class::Accessor::Inherited::XS', $VERSION);
@@ -249,8 +249,9 @@ class_caix       31300776/s          13286%   2960%   2303%        391%         
 
     package MyAccessor;
     # 'register_type' isn't exported
+    use Class::Accessor::Inherited::XS::Constants;
     Class::Accessor::Inherited::XS::register_type(
-        inherited_cb => {on_read => sub {}, on_write => sub{}},
+        inherited_cb => {on_read => sub {}, on_write => sub{}, opts => $bitset},
     );
 
     package MyClass;
@@ -270,6 +271,9 @@ is the new accessor's return value (and it isn't stored anywhere).
 
 B<on_write> callback receives original accessor's arguments, and it's return value is stored as usual.
 Exceptions thrown from this callback will cancel store and will leave old value unchanged.
+
+You can specify additional flags with the 'opts' key. Currently only IsNamed is supported - with it the accessor callback
+is invoked with it's name passed as an additional argument. This can be useful when creating a proxy.
 
 =head1 PROFILING WITH Devel::NYTProf
 

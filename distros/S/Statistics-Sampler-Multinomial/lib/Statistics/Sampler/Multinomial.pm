@@ -4,7 +4,7 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '0.7';
+our $VERSION = '0.82';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
@@ -20,9 +20,11 @@ sub new {
       if !defined $data;
     croak 'data argument is not an array ref'
       if !is_arrayref ($data);
+    croak 'data argument is an empty array'
+      if !scalar @$data;
 
     my $first_neg_idx = first_index {$_ < 0} @$data;
-    croak "negative values passed in data array"
+    croak "negative values passed in data array ($data->[$first_neg_idx] at index $first_neg_idx)\n"
       if $first_neg_idx >= 0;
     
 
@@ -113,18 +115,23 @@ sub draw_n_samples {
     my ($sum_p, $sum_n) = (0, 0);
 
     foreach my $kk (0..($K-1)) {
-        if (!$data->[$kk]) {
+        #  avoid repeated derefs below - unbenchmarked micro-optimisation
+        my $data_kk = $data->[$kk];
+        if (!$data_kk) {
             $draws[$kk] = 0;
             next;
         }
 
+        my $prob = $data_kk / ($norm - $sum_p);
+        #  MRMA does not like p>1
+        # so if p>1 then we get 1, otherwise the original value
+        # the int-or approach is ~10% faster than min(1,$prob) when $prob<1
         my $res = $prng->binomial (
-            #  MRMA does not like p>1
-            min (1, $data->[$kk] / ($norm - $sum_p)),
+            int ($prob) || $prob,
             ($n - $sum_n),
         );
         $draws[$kk] = $res;
-        $sum_p += $data->[$kk];
+        $sum_p += $data_kk;
         $sum_n += $res;
     }
 

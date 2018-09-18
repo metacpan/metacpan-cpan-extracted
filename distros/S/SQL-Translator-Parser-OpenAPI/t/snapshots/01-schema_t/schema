@@ -52,15 +52,6 @@ CREATE TABLE `environment_toolchains` (
 ) ENGINE=InnoDB;
 
 --
--- Table: `grades`
---
-CREATE TABLE `grades` (
-  `id` integer NOT NULL auto_increment,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB comment=\'The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.\';
-
---
 -- Table: `languages`
 --
 CREATE TABLE `languages` (
@@ -164,6 +155,7 @@ CREATE TABLE `reports` (
 CREATE TABLE `report_summaries` (
   `date` varchar(255) NULL comment \'The date/time of the report in ISO8601 format\',
   `dist` varchar(255) NULL comment \'The name of the distribution tested\',
+  `grade` enum(\'pass\', \'fail\', \'na\', \'unknown\') NULL comment \'The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.\',
   `guid` varchar(255) NULL comment \'The GUID of the full report this data came from\',
   `id` integer NOT NULL auto_increment,
   `osname` varchar(255) NULL comment \'The name of the operating system, like \'\'linux\'\', \'\'MSWin32\'\', \'\'darwin\'\'\',
@@ -172,12 +164,9 @@ CREATE TABLE `report_summaries` (
   `platform` varchar(255) NULL comment \'The Perl platform that ran the tests, like \'\'x86_64-linux\'\'\',
   `reporter` varchar(255) NULL comment \'The name/email of the reporter who submitted this report\',
   `version` varchar(255) NULL comment \'The version of the distribution tested\',
-  `grade_id` integer NULL,
   INDEX `pk_id` (`id`),
-  INDEX (`grade_id`),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `report_summaries_fk` FOREIGN KEY (`grade_id`) REFERENCES `grades` (`id`)
-) ENGINE=InnoDB comment=\'Flattened summary data from the test report data structure\';
+  PRIMARY KEY (`id`)
+) comment=\'Flattened summary data from the test report data structure\';
 
 --
 -- Table: `reporters`
@@ -196,21 +185,19 @@ CREATE TABLE `reporters` (
 CREATE TABLE `results` (
   `duration` integer NULL,
   `failures` integer NULL,
+  `grade` enum(\'pass\', \'fail\', \'na\', \'unknown\') NOT NULL comment \'The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.\',
   `id` integer NOT NULL auto_increment,
   `skipped` integer NULL,
   `tests` integer NULL,
   `warnings` integer NULL,
-  `grade_id` integer NOT NULL,
   `output_id` integer NOT NULL,
   `todo_id` integer NULL,
   INDEX `pk_id` (`id`),
-  INDEX (`grade_id`),
   INDEX (`output_id`),
   INDEX (`todo_id`),
   PRIMARY KEY (`id`),
-  CONSTRAINT `results_fk` FOREIGN KEY (`grade_id`) REFERENCES `grades` (`id`),
-  CONSTRAINT `results_fk_1` FOREIGN KEY (`output_id`) REFERENCES `test_outputs` (`id`),
-  CONSTRAINT `results_fk_2` FOREIGN KEY (`todo_id`) REFERENCES `result_todoes` (`id`)
+  CONSTRAINT `results_fk` FOREIGN KEY (`output_id`) REFERENCES `test_outputs` (`id`),
+  CONSTRAINT `results_fk_1` FOREIGN KEY (`todo_id`) REFERENCES `result_todoes` (`id`)
 ) ENGINE=InnoDB;
 
 --

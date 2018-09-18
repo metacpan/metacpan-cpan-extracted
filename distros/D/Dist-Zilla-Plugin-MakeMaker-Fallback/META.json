@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.143",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.144",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -69,7 +69,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.26",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.47",
             "Dist::Zilla::Role::AfterBuild" : "0",
             "List::Util" : "0",
             "Moose" : "0",
@@ -188,7 +188,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
          "file" : "lib/Dist/Zilla/Plugin/MakeMaker/Fallback.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       }
    },
    "release_status" : "stable",
@@ -206,7 +206,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.029",
+   "version" : "0.030",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.029002"
@@ -794,7 +794,7 @@
                }
             },
             "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.029"
+            "version" : "0.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
@@ -843,7 +843,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",
@@ -1143,7 +1143,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.029",
+                  "tag" : "v0.030",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },

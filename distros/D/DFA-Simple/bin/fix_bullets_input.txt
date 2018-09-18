@@ -1,0 +1,14 @@
+o Major bullet points
+    - each line is a point
+    - a leading "o " is removed
+o Minor bullet points
+    - indicated by a leading "- "
+    - may not start a list
+    - only one level of minor points is supported
+o Future enhancements
+    - numbering of points
+    - handling of paragraphs
+
+o Start a new group of points
+    - a blank line indicates end of old group
+    - old group is closed, new one opened

@@ -1,16 +1,17 @@
 package UNIVERSAL::Object::Immutable;
 # ABSTRACT: Another useful base class
-
+use 5.008;
 use strict;
 use warnings;
 
-use 5.008;
-
-use Carp ();
+use Carp         ();
+use overload     ();
+use Hash::Util   ();
+use Scalar::Util ();
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.14';
+our $VERSION   = '0.15';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -18,23 +19,22 @@ our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
 sub new {
     my $class = shift;
     my $self  = $class->SUPER::new( @_ );
+    my $repr  = overload::StrVal($self);
 
-    if ( $self =~ /\=HASH\(0x/ ) {
-        require Hash::Util;
-        Hash::Util::lock_hash( $self );
+    if ( $repr =~ /\=HASH\(0x/ ) {
+        Hash::Util::lock_hash( %$self );
     }
-    elsif ( $self =~ /\=ARRAY\(0x/ ) {
+    elsif ( $repr =~ /\=ARRAY\(0x/ ) {
         Internals::SvREADONLY( @$self, 1 );
     }
-    elsif ( $self =~ /\=SCALAR\(0x/ or $self =~ /\=REF\(0x/ ) {
+    elsif ( $repr =~ /\=SCALAR\(0x/ or $repr =~ /\=REF\(0x/ ) {
         Internals::SvREADONLY( $$self, 1 );
     }
-    elsif ( $self =~ /\=CODE\(0x/ ) {
+    elsif ( $repr =~ /\=CODE\(0x/ ) {
         # NOTE: do nothing here, because – ignoring
         # closures – CODE refs are immutable anyway
     }
     else {
-        require Scalar::Util;
         Carp::confess('Invalid BLESS args for '.Scalar::Util::blessed($self).', unsupported REPR type ('.Scalar::Util::reftype($self).')');
     }
 
@@ -53,7 +53,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ You can use this class in the same manner that you would use
 L<UNIVERSAL::Object>, the only difference is that the instances
 created will be immutable.
 
-=head2 When are thing made Immutable?
+=head2 When are instances made Immutable?
 
 Obviously we need to create and initialize the instance before
 we make it immutable, it is only after that when we want it to be
@@ -168,7 +168,7 @@ the same effect as the multiple inheritance.
 
     our @ISA  = ('My::Super::Class');
     our @DOES = ('UNIVERSAL::Object::Immutable');
-    # make sure something performs the role composition ...
+    # MOP::Util can be used to performs the role composition
 
 =back
 
@@ -187,7 +187,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016, 2017 by Stevan Little.
+This software is copyright (c) 2016, 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

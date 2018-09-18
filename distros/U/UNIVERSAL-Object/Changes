@@ -1,5 +1,15 @@
 Revision history for Perl extension UNIVERSAL::Object
 
+0.15 2018-16-09
+    - improve some error messages
+    - Immutable objects now correctly work with overloaded
+      objects by accessing the overload::StrVal instead of
+      the overloaded string
+    - If your REPR type is a HASH then we will lock the set
+      of keys to be those of your set of SLOTS. This should
+      not break anything if you were not already violating
+      encapsulation somehow ;)
+
 0.14 2018-01-25
     - adding in Travis CI integration
         - thanks to JJ Merelo for this

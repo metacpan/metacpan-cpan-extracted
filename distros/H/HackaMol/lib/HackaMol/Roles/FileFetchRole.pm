@@ -1,5 +1,5 @@
 package HackaMol::Roles::FileFetchRole;
-$HackaMol::Roles::FileFetchRole::VERSION = '0.049';
+$HackaMol::Roles::FileFetchRole::VERSION = '0.050';
 #ABSTRACT: Role for using LWP::Simple to fetch files from www 
 use Moose::Role;
 use Carp;
@@ -70,7 +70,7 @@ HackaMol::Roles::FileFetchRole - Role for using LWP::Simple to fetch files from 
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 

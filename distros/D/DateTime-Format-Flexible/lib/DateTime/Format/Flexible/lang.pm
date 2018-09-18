@@ -282,12 +282,12 @@ sub _fix_alpha_month
 
         elsif( $date =~ m{\b$month_name\d.*\b}mxi )
         {
-          $p->{ month } = $month_number;
-          $date =~ s{\b$month_name(\d.*)\b}{X${month_number}X$1}mxi;
+            $p->{ month } = $month_number;
+            $date =~ s{\b$month_name(\d.*)\b}{X${month_number}X$1}mxi;
 
-          return ( $date , $p );
+            return ( $date , $p );
         }
-      }
+    }
     return ( $date , $p );
 }
 

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Pod-Weaver-PluginBundle-SHLOMIF",
-  "dist_version" => "0.001000",
+  "dist_version" => "0.001001",
   "license" => "apache",
   "module_name" => "Pod::Weaver::PluginBundle::SHLOMIF",
   "recursive_test_files" => 1,
@@ -36,27 +36,21 @@ my %module_build_args = (
   },
   "test_requires" => {
     "File::Spec" => 0,
-    "File::pushd" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Path::Tiny" => 0,
-    "Test::DZil" => 0,
-    "Test::More" => "0.96",
-    "perl" => "5.008001"
+    "Test::More" => "0.88",
+    "perl" => "5.006"
   }
 );
 
 
 my %fallback_build_requires = (
   "File::Spec" => 0,
-  "File::pushd" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
-  "Path::Tiny" => 0,
-  "Test::DZil" => 0,
-  "Test::More" => "0.96",
-  "perl" => "5.008001"
+  "Test::More" => "0.88",
+  "perl" => "5.006"
 );
 
 

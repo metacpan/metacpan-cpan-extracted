@@ -1,11 +1,10 @@
 package Anki::Import ;
-$Anki::Import::VERSION = '0.025';
+$Anki::Import::VERSION = '0.029';
 use strict;
 use warnings;
 use Cwd;
-use Path::Tiny;
 use Getopt::Args;
-use Log::Log4perl::Shortcuts 0.015 qw(:all);
+use Log::Log4perl::Shortcuts 0.021 qw(:all);
 use Exporter qw(import);
 our @EXPORT = qw(anki_import);
 
@@ -75,11 +74,14 @@ sub anki_import {
 
   # get and load the source file
   logi('Loading file');
-  my $path  = path($file); logd($path);
-  if (!path($file)->exists) {
-    logf("Aborting: Source file named '$file' does not exist.");
+  my $path  = File::Spec->catfile($file); logd($path);
+  if (! -e $path) {
+    logf("Aborting: Source file named '$path' does not exist.");
   };
-  @lines = $path->lines_utf8; logi('Source file loaded.');
+  open (my $handle, "<:encoding(UTF-8)", $path) or logf("Could not open $path");;
+  chomp(@lines = <$handle>);
+  close $handle;
+  logi('Source file loaded.');
 
   # pad data with a blank line to make it easier to process
   push @lines, '';
@@ -203,9 +205,14 @@ sub generate_importable_files {
 
   logi('Writing notes out to file');
   foreach my $file ( keys %filenames ) {
-    my $out_path = path($pd, "anki_import_files/$file")->touchpath;
+    my $dir = File::Spec->catfile($pd, 'anki_import_files');
+    mkdir $dir || logf("Could not make directory: $dir, $!");
+    logd($dir);
+    my $out_path = File::Spec->catfile($dir, $file);
+    open (my $handle, ">>:encoding(UTF-8)", $out_path) or logf("Could not create file: $out_path");
     chomp $filenames{$file}{content};
-    $out_path->spew($filenames{$file}{content});
+    print $handle $filenames{$file}{content};
+    close $handle;
   }
 }
 
@@ -366,7 +373,7 @@ Anki::Import - Anki note generation made easy.
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 OVERVIEW
 
@@ -764,8 +771,6 @@ for further details on these installation methods.
 =item * L<Getopt::Args|Getopt::Args>
 
 =item * L<Log::Log4perl::Shortcuts|Log::Log4perl::Shortcuts>
-
-=item * L<Path::Tiny|Path::Tiny>
 
 =item * L<strict|strict>
 

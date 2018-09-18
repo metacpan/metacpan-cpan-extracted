@@ -54,7 +54,7 @@ $data = {
 @tests = (
     "/0/1"      => 1,
     "/0/2"      => bless({E => qr/^Index is out of range, step #1 /}, 'EXCEPTION'),
-    "/0/00"     => bless({E => qr/^Unsigned int without leading zeros allowed only, step #1/}, 'EXCEPTION'),
+    "/0/00"     => bless({E => qr/^Incorrect array index, step #1 /}, 'EXCEPTION'),
     "/0/1/-"    => bless({E => qr/^Structure doesn't match, step #2 /}, 'EXCEPTION'),
     "/0/-"      => undef, # should be new array item
     "/-"        => {k => 'v'},
@@ -78,5 +78,32 @@ is_deeply(
     [0, 1, undef],
     "Hyphen as array index should append new undef item to array"
 );
+
+# delete tests
+$data = [0,1,2];
+eval { path($data, str2path('/2'), delete => 1) };
+is_deeply($data, [0,1], 'Last item should be removed');
+
+# expand tests
+eval { path([0,1,2], str2path('/3'), expand => 1) };
+is($@, '', 'last idx + 1 is allowed to expand');
+
+eval { path([0,1,2], str2path('/4'), expand => 1) };
+like($@, qr/Index is out of range, step #0 /, 'last idx + 2 and more is not allowed to expand');
+
+eval { path({}, str2path('/2'), expand => 1) };
+is($@, '');
+
+eval { path({}, str2path('/2'), expand => 0) };
+like($@, qr/'2' key doesn't exist, step #0 /);
+
+# insert tests
+$data = [0,1,2];
+eval { path($data, str2path('/2'), assign => 'new value') };
+is_deeply($data, [0,1,'new value'], 'Replace array item');
+
+$data = [0,1,2];
+eval { path($data, str2path('/2'), assign => 'new value', insert => 1) };
+is_deeply($data, [0,1,'new value',2], 'Insert array item');
 
 done_testing();

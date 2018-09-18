@@ -1,5 +1,5 @@
 package HackaMol::Roles::PdbRole;
-$HackaMol::Roles::PdbRole::VERSION = '0.049';
+$HackaMol::Roles::PdbRole::VERSION = '0.050';
 #ABSTRACT: PdbRole of lazy attributes for HackaMol atoms
 use Moose::Role;
 use Carp;
@@ -258,7 +258,7 @@ HackaMol::Roles::PdbRole - PdbRole of lazy attributes for HackaMol atoms
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Linux::Epoll;
-$Linux::Epoll::VERSION = '0.015';
+$Linux::Epoll::VERSION = '0.016';
 use 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -24,7 +24,7 @@ Linux::Epoll - O(1) multiplexing for Linux
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,8 @@ There is urgent data available for reading.
 =item * et
 
 Set edge triggered behavior for the associated filehandle. The default behavior is level triggered. See you L<epoll(7)> documentation for more information on what this means.
+
+Take note that when using edge triggered events, exceptions out of the wait can easily cause events to be lost (when consuming to more than one event at a time).
 
 =item * hup
 

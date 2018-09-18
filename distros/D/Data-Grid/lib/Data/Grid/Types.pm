@@ -1,6 +1,6 @@
 package Data::Grid::Types;
 
-use 5.012;
+use 5.014;
 use strict;
 use warnings FATAL => 'all';
 

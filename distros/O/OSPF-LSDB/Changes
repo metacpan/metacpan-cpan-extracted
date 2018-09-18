@@ -1,3 +1,8 @@
+1.09 2018-09-17
+    - Use dot directory in tests for newer Perl.
+    - Optionally parse options and metric in ospf6d intra area
+      prefixes as the output format has changed.
+
 1.08 2018-07-11
     - Add CGI prerequisite, it has been removed from base Perl.
     - Sort keys when working with hashes.  This gives reproducible

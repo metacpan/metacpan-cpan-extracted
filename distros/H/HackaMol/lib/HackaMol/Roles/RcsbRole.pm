@@ -1,5 +1,5 @@
 package HackaMol::Roles::RcsbRole;
-$HackaMol::Roles::RcsbRole::VERSION = '0.049';
+$HackaMol::Roles::RcsbRole::VERSION = '0.050';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsPaths/;
@@ -55,6 +55,26 @@ has 'ftp_password' => (
     lazy => 1,
 );
 
+sub pdbid_local_path {
+    my $self  = shift;
+    my $pdbid = lc( shift );
+
+    die "Invocation: ->pdb_id_local_path(pdbid,[cif|pdb]?)" 
+        unless length($pdbid) == 4;
+    
+    my $type = shift || 'cif';
+
+    my $path_method = "local_${type}_path";
+
+    # may or may not exist
+    my $path = $self->$path_method->child(
+                                substr( $pdbid, 1, 2 ) . "/$pdbid.$type" );
+
+    return $path;    
+
+}
+
+
 sub local_pdbs { shift->_local_cifs_pdbs('pdb') }
 sub local_cifs { shift->_local_cifs_pdbs('cif') }
 
@@ -87,7 +107,7 @@ sub rcsb_sync_local {
         }
     }  
 
-    return unless @pdbids;
+    return ([],[]) unless @pdbids;
     print "syncing @{[scalar @pdbids]} $type files\n";
     my ($synced_pdbids,$missed_pdbids) = $self->rcsb_ftp_fetch($type, \@pdbids );
     return ($synced_pdbids,$missed_pdbids);
@@ -171,7 +191,7 @@ HackaMol::Roles::RcsbRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 AUTHOR
 
