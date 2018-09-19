@@ -1,4 +1,9 @@
 Revision history for Alien-libcmark_gfm
+3.00      2018-09-18 17:30:00 -0400
+  - bump the version a lot to account for a mistake.
+
+0.02      2018-09-18 15:41:00 -0400
+  - pin to version 0.28.3.gfm.16
 
 0.01      2018-01-07 17:34:00 -0500
   - initial version

@@ -1,3 +1,11 @@
+v0.74.0 2018-09-18T15:58:56Z
+ - http authorization header
+ - http2
+ - starttls http2 ctx option added
+ - http response headers
+ - response status improved
+ - http2 integrated
+
 v0.73.3 2018-09-10T00:46:22Z
  - handle support arrayref
 

@@ -4,7 +4,7 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,7 +13,14 @@
       "version" : "2"
    },
    "name" : "Try-Tiny-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {},
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -24,7 +31,8 @@
             "Try::Tiny" : "0",
             "perl" : "5.005_04"
          }
-      }
+      },
+      "test" : {}
    },
    "release_status" : "stable",
    "resources" : {
@@ -37,6 +45,10 @@
          "web" : "https://github.com/ap/Try-Tiny-Tiny"
       }
    },
-   "version" : "0.001"
+   "version" : "0.002",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2017
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }
-

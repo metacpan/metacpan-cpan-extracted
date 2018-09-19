@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use MDV::Distribconf;
 
-our $VERSION = (qq$Revision: 224942 $ =~ /(\d+)/)[0];
+our $VERSION = (qq$Revision$ =~ /(\d+)/)[0];
 
 =head1 NAME
 
@@ -46,6 +46,10 @@ refers to a global value (distribution version, arch...)
 refers to a value specific to the media (name, ...)
 
 =back
+
+=head2 4
+
+This version support xml files as replacement of hdlist/synthesis.
 
 =head1 VALUE
 
@@ -143,11 +147,44 @@ No documentation
 
 =cut
 
+$value->{cdmode} = { section => 'media_info' };
+
+=head3 cdmode
+
+If set, indexes located into global directory should be used
+instead of per media ones.
+
+=cut
+
+$value->{'synthesis-filter'} = { section => 'media_info' };
+
+=head3 synthesis-filter
+
+Compression filter used for synthesis
+
+=cut
+
+$value->{'xml-info'} = { section => 'media_info' };
+
+=head3 xml-info
+
+The distribution handle xml format
+
+=cut
+
+$value->{'xml-info-filter'} = { section => 'media_info' };
+
+=head3 xml-info-filter
+
+Compression filter used for xml-info
+
+=cut
+
 =head2 MEDIA VALUES
 
 =cut
 
-foreach (qw(hdlist name synthesis pubkey)) {
+foreach (qw(hdlist name synthesis pubkey media_info)) {
     $value->{$_} = { };
 }
 
@@ -166,6 +203,13 @@ The synthesis file holding rpm infos for the media
 =head3 pubkey
 
 The file holding public gpg key used to sign rpms in this media.
+
+=cut
+
+=head3 media_type
+
+Contains a comma-separated list of tags meant to help tools to better
+describe the media
 
 =cut
 
@@ -243,7 +287,7 @@ The size of the media. The value is suffixed by the unit.
 sub _valid_param {
     my ($media, $var, $val) = @_[-3..-1];
     if (!exists($value->{$var})) {
-        return ("unknow var");
+        return ("unknown var");
     }
     $media ||= 'media_info'; # assume default
     my @errors;

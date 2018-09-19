@@ -16,6 +16,6 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_like(qr/Hello Mojo!/);
 
 $t->get_ok('/metrics')->status_is(200)->content_type_like(qr(^text/plain))
-  ->content_like(qr/http_request_size_bytes_count\{worker="\d+",method="GET"\} 2/);
+  ->content_like(qr/http_request_size_bytes_count\{worker="\d+",method="GET"\} 1/);
 
 done_testing();

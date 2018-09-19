@@ -2,11 +2,17 @@
 # $Id$
 
 use strict;
-use Test::More tests => 4;
+use Test::More;
 use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use File::Copy;
 use RPM4;
+
+if (-e '/etc/debian_version' || `uname -a` =~ /BSD/i) {
+    plan skip_all => "*BSD/Debian/Ubuntu do not have a system wide rpmdb";
+} else {
+    plan tests => 4;
+}
 
 my $passphrase = "RPM4";
 

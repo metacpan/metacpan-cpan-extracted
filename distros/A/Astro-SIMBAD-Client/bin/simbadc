@@ -11,7 +11,9 @@ use Text::ParseWords;
 local $Data::Dumper::Terse = 1;
 local $Data::Dumper::Sortkeys = 1;
 
-my $VERSION = '0.018';
+my $VERSION = '0.037';
+
+use constant HASH_REF	=> ref {};
 
 my $class = 'Astro::SIMBAD::Client';
 my $simbad = $class->new ();
@@ -184,7 +186,7 @@ sub _cmd_default {	## no critic (ProhibitUnusedPrivateSubroutines)
     @args or @args = $simbad->attributes();
     foreach my $name (@args) {
 	my $val = $class->get ($name);
-	$val->{clear} = 1 if ref $val eq 'HASH';
+	$val->{clear} = 1 if HASH_REF eq ref $val;
 	$simbad->set ($name, $val);
     }
     return $simbad;
@@ -313,7 +315,7 @@ sub _cmd_show {	## no critic (ProhibitUnusedPrivateSubroutines)
     my @rslt;
     foreach my $name (@args) {
 	my $val = $object->get ($name);
-	if (ref $val eq 'HASH') {
+	if ( HASH_REF eq ref $val ) {
 	    foreach my $key (sort keys %$val) {
 		push @rslt, _quote (@verb, $name,
 		    defined $val->{$key} ? "$key=$val->{$key}" : "$key=");
@@ -414,7 +416,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2016 Thomas R. Wyant, III
+Copyright (C) 2005-2018 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -1,0 +1,807 @@
+NAME
+    App::StockExchangeUtils - Command-line utilities related to stock
+    exchanges
+
+VERSION
+    This document describes version 0.001 of App::StockExchangeUtils (from
+    Perl distribution App-StockExchangeUtils), released on 2018-09-19.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes several utilities related to stock exchanges:
+
+    *   list-stock-exchanges
+
+FUNCTIONS
+  list_stock_exchanges
+    Usage:
+
+     list_stock_exchanges(%args) -> [status, msg, result, meta]
+
+    Catalog (list) of stock exchanges.
+
+    REPLACE ME
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_codes => *str*
+
+        Only return records where the 'add_codes' field equals specified
+        value.
+
+    *   add_codes.contains => *str*
+
+        Only return records where the 'add_codes' field contains specified
+        text.
+
+    *   add_codes.in => *array[str]*
+
+        Only return records where the 'add_codes' field is in the specified
+        values.
+
+    *   add_codes.is => *str*
+
+        Only return records where the 'add_codes' field equals specified
+        value.
+
+    *   add_codes.isnt => *str*
+
+        Only return records where the 'add_codes' field does not equal
+        specified value.
+
+    *   add_codes.max => *str*
+
+        Only return records where the 'add_codes' field is less than or
+        equal to specified value.
+
+    *   add_codes.min => *str*
+
+        Only return records where the 'add_codes' field is greater than or
+        equal to specified value.
+
+    *   add_codes.not_contains => *str*
+
+        Only return records where the 'add_codes' field does not contain
+        specified text.
+
+    *   add_codes.not_in => *array[str]*
+
+        Only return records where the 'add_codes' field is not in the
+        specified values.
+
+    *   add_codes.xmax => *str*
+
+        Only return records where the 'add_codes' field is less than
+        specified value.
+
+    *   add_codes.xmin => *str*
+
+        Only return records where the 'add_codes' field is greater than
+        specified value.
+
+    *   add_names => *str*
+
+        Only return records where the 'add_names' field equals specified
+        value.
+
+    *   add_names.contains => *str*
+
+        Only return records where the 'add_names' field contains specified
+        text.
+
+    *   add_names.in => *array[str]*
+
+        Only return records where the 'add_names' field is in the specified
+        values.
+
+    *   add_names.is => *str*
+
+        Only return records where the 'add_names' field equals specified
+        value.
+
+    *   add_names.isnt => *str*
+
+        Only return records where the 'add_names' field does not equal
+        specified value.
+
+    *   add_names.max => *str*
+
+        Only return records where the 'add_names' field is less than or
+        equal to specified value.
+
+    *   add_names.min => *str*
+
+        Only return records where the 'add_names' field is greater than or
+        equal to specified value.
+
+    *   add_names.not_contains => *str*
+
+        Only return records where the 'add_names' field does not contain
+        specified text.
+
+    *   add_names.not_in => *array[str]*
+
+        Only return records where the 'add_names' field is not in the
+        specified values.
+
+    *   add_names.xmax => *str*
+
+        Only return records where the 'add_names' field is less than
+        specified value.
+
+    *   add_names.xmin => *str*
+
+        Only return records where the 'add_names' field is greater than
+        specified value.
+
+    *   add_yf_codes => *str*
+
+        Only return records where the 'add_yf_codes' field equals specified
+        value.
+
+    *   add_yf_codes.contains => *str*
+
+        Only return records where the 'add_yf_codes' field contains
+        specified text.
+
+    *   add_yf_codes.in => *array[str]*
+
+        Only return records where the 'add_yf_codes' field is in the
+        specified values.
+
+    *   add_yf_codes.is => *str*
+
+        Only return records where the 'add_yf_codes' field equals specified
+        value.
+
+    *   add_yf_codes.isnt => *str*
+
+        Only return records where the 'add_yf_codes' field does not equal
+        specified value.
+
+    *   add_yf_codes.max => *str*
+
+        Only return records where the 'add_yf_codes' field is less than or
+        equal to specified value.
+
+    *   add_yf_codes.min => *str*
+
+        Only return records where the 'add_yf_codes' field is greater than
+        or equal to specified value.
+
+    *   add_yf_codes.not_contains => *str*
+
+        Only return records where the 'add_yf_codes' field does not contain
+        specified text.
+
+    *   add_yf_codes.not_in => *array[str]*
+
+        Only return records where the 'add_yf_codes' field is not in the
+        specified values.
+
+    *   add_yf_codes.xmax => *str*
+
+        Only return records where the 'add_yf_codes' field is less than
+        specified value.
+
+    *   add_yf_codes.xmin => *str*
+
+        Only return records where the 'add_yf_codes' field is greater than
+        specified value.
+
+    *   city => *str*
+
+        Only return records where the 'city' field equals specified value.
+
+    *   city.contains => *str*
+
+        Only return records where the 'city' field contains specified text.
+
+    *   city.in => *array[str]*
+
+        Only return records where the 'city' field is in the specified
+        values.
+
+    *   city.is => *str*
+
+        Only return records where the 'city' field equals specified value.
+
+    *   city.isnt => *str*
+
+        Only return records where the 'city' field does not equal specified
+        value.
+
+    *   city.max => *str*
+
+        Only return records where the 'city' field is less than or equal to
+        specified value.
+
+    *   city.min => *str*
+
+        Only return records where the 'city' field is greater than or equal
+        to specified value.
+
+    *   city.not_contains => *str*
+
+        Only return records where the 'city' field does not contain
+        specified text.
+
+    *   city.not_in => *array[str]*
+
+        Only return records where the 'city' field is not in the specified
+        values.
+
+    *   city.xmax => *str*
+
+        Only return records where the 'city' field is less than specified
+        value.
+
+    *   city.xmin => *str*
+
+        Only return records where the 'city' field is greater than specified
+        value.
+
+    *   code => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.contains => *str*
+
+        Only return records where the 'code' field contains specified text.
+
+    *   code.in => *array[str]*
+
+        Only return records where the 'code' field is in the specified
+        values.
+
+    *   code.is => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.isnt => *str*
+
+        Only return records where the 'code' field does not equal specified
+        value.
+
+    *   code.max => *str*
+
+        Only return records where the 'code' field is less than or equal to
+        specified value.
+
+    *   code.min => *str*
+
+        Only return records where the 'code' field is greater than or equal
+        to specified value.
+
+    *   code.not_contains => *str*
+
+        Only return records where the 'code' field does not contain
+        specified text.
+
+    *   code.not_in => *array[str]*
+
+        Only return records where the 'code' field is not in the specified
+        values.
+
+    *   code.xmax => *str*
+
+        Only return records where the 'code' field is less than specified
+        value.
+
+    *   code.xmin => *str*
+
+        Only return records where the 'code' field is greater than specified
+        value.
+
+    *   country => *str*
+
+        Only return records where the 'country' field equals specified
+        value.
+
+    *   country.contains => *str*
+
+        Only return records where the 'country' field contains specified
+        text.
+
+    *   country.in => *array[str]*
+
+        Only return records where the 'country' field is in the specified
+        values.
+
+    *   country.is => *str*
+
+        Only return records where the 'country' field equals specified
+        value.
+
+    *   country.isnt => *str*
+
+        Only return records where the 'country' field does not equal
+        specified value.
+
+    *   country.max => *str*
+
+        Only return records where the 'country' field is less than or equal
+        to specified value.
+
+    *   country.min => *str*
+
+        Only return records where the 'country' field is greater than or
+        equal to specified value.
+
+    *   country.not_contains => *str*
+
+        Only return records where the 'country' field does not contain
+        specified text.
+
+    *   country.not_in => *array[str]*
+
+        Only return records where the 'country' field is not in the
+        specified values.
+
+    *   country.xmax => *str*
+
+        Only return records where the 'country' field is less than specified
+        value.
+
+    *   country.xmin => *str*
+
+        Only return records where the 'country' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   eng_name => *str*
+
+        Only return records where the 'eng_name' field equals specified
+        value.
+
+    *   eng_name.contains => *str*
+
+        Only return records where the 'eng_name' field contains specified
+        text.
+
+    *   eng_name.in => *array[str]*
+
+        Only return records where the 'eng_name' field is in the specified
+        values.
+
+    *   eng_name.is => *str*
+
+        Only return records where the 'eng_name' field equals specified
+        value.
+
+    *   eng_name.isnt => *str*
+
+        Only return records where the 'eng_name' field does not equal
+        specified value.
+
+    *   eng_name.max => *str*
+
+        Only return records where the 'eng_name' field is less than or equal
+        to specified value.
+
+    *   eng_name.min => *str*
+
+        Only return records where the 'eng_name' field is greater than or
+        equal to specified value.
+
+    *   eng_name.not_contains => *str*
+
+        Only return records where the 'eng_name' field does not contain
+        specified text.
+
+    *   eng_name.not_in => *array[str]*
+
+        Only return records where the 'eng_name' field is not in the
+        specified values.
+
+    *   eng_name.xmax => *str*
+
+        Only return records where the 'eng_name' field is less than
+        specified value.
+
+    *   eng_name.xmin => *str*
+
+        Only return records where the 'eng_name' field is greater than
+        specified value.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   founded => *str*
+
+        Only return records where the 'founded' field equals specified
+        value.
+
+    *   founded.contains => *str*
+
+        Only return records where the 'founded' field contains specified
+        text.
+
+    *   founded.in => *array[str]*
+
+        Only return records where the 'founded' field is in the specified
+        values.
+
+    *   founded.is => *str*
+
+        Only return records where the 'founded' field equals specified
+        value.
+
+    *   founded.isnt => *str*
+
+        Only return records where the 'founded' field does not equal
+        specified value.
+
+    *   founded.max => *str*
+
+        Only return records where the 'founded' field is less than or equal
+        to specified value.
+
+    *   founded.min => *str*
+
+        Only return records where the 'founded' field is greater than or
+        equal to specified value.
+
+    *   founded.not_contains => *str*
+
+        Only return records where the 'founded' field does not contain
+        specified text.
+
+    *   founded.not_in => *array[str]*
+
+        Only return records where the 'founded' field is not in the
+        specified values.
+
+    *   founded.xmax => *str*
+
+        Only return records where the 'founded' field is less than specified
+        value.
+
+    *   founded.xmin => *str*
+
+        Only return records where the 'founded' field is greater than
+        specified value.
+
+    *   local_name => *str*
+
+        Only return records where the 'local_name' field equals specified
+        value.
+
+    *   local_name.contains => *str*
+
+        Only return records where the 'local_name' field contains specified
+        text.
+
+    *   local_name.in => *array[str]*
+
+        Only return records where the 'local_name' field is in the specified
+        values.
+
+    *   local_name.is => *str*
+
+        Only return records where the 'local_name' field equals specified
+        value.
+
+    *   local_name.isnt => *str*
+
+        Only return records where the 'local_name' field does not equal
+        specified value.
+
+    *   local_name.max => *str*
+
+        Only return records where the 'local_name' field is less than or
+        equal to specified value.
+
+    *   local_name.min => *str*
+
+        Only return records where the 'local_name' field is greater than or
+        equal to specified value.
+
+    *   local_name.not_contains => *str*
+
+        Only return records where the 'local_name' field does not contain
+        specified text.
+
+    *   local_name.not_in => *array[str]*
+
+        Only return records where the 'local_name' field is not in the
+        specified values.
+
+    *   local_name.xmax => *str*
+
+        Only return records where the 'local_name' field is less than
+        specified value.
+
+    *   local_name.xmin => *str*
+
+        Only return records where the 'local_name' field is greater than
+        specified value.
+
+    *   mic => *str*
+
+        Only return records where the 'mic' field equals specified value.
+
+    *   mic.contains => *str*
+
+        Only return records where the 'mic' field contains specified text.
+
+    *   mic.in => *array[str]*
+
+        Only return records where the 'mic' field is in the specified
+        values.
+
+    *   mic.is => *str*
+
+        Only return records where the 'mic' field equals specified value.
+
+    *   mic.isnt => *str*
+
+        Only return records where the 'mic' field does not equal specified
+        value.
+
+    *   mic.max => *str*
+
+        Only return records where the 'mic' field is less than or equal to
+        specified value.
+
+    *   mic.min => *str*
+
+        Only return records where the 'mic' field is greater than or equal
+        to specified value.
+
+    *   mic.not_contains => *str*
+
+        Only return records where the 'mic' field does not contain specified
+        text.
+
+    *   mic.not_in => *array[str]*
+
+        Only return records where the 'mic' field is not in the specified
+        values.
+
+    *   mic.xmax => *str*
+
+        Only return records where the 'mic' field is less than specified
+        value.
+
+    *   mic.xmin => *str*
+
+        Only return records where the 'mic' field is greater than specified
+        value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   status => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.contains => *str*
+
+        Only return records where the 'status' field contains specified
+        text.
+
+    *   status.in => *array[str]*
+
+        Only return records where the 'status' field is in the specified
+        values.
+
+    *   status.is => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.isnt => *str*
+
+        Only return records where the 'status' field does not equal
+        specified value.
+
+    *   status.max => *str*
+
+        Only return records where the 'status' field is less than or equal
+        to specified value.
+
+    *   status.min => *str*
+
+        Only return records where the 'status' field is greater than or
+        equal to specified value.
+
+    *   status.not_contains => *str*
+
+        Only return records where the 'status' field does not contain
+        specified text.
+
+    *   status.not_in => *array[str]*
+
+        Only return records where the 'status' field is not in the specified
+        values.
+
+    *   status.xmax => *str*
+
+        Only return records where the 'status' field is less than specified
+        value.
+
+    *   status.xmin => *str*
+
+        Only return records where the 'status' field is greater than
+        specified value.
+
+    *   types => *str*
+
+        Only return records where the 'types' field equals specified value.
+
+    *   types.contains => *str*
+
+        Only return records where the 'types' field contains specified text.
+
+    *   types.in => *array[str]*
+
+        Only return records where the 'types' field is in the specified
+        values.
+
+    *   types.is => *str*
+
+        Only return records where the 'types' field equals specified value.
+
+    *   types.isnt => *str*
+
+        Only return records where the 'types' field does not equal specified
+        value.
+
+    *   types.max => *str*
+
+        Only return records where the 'types' field is less than or equal to
+        specified value.
+
+    *   types.min => *str*
+
+        Only return records where the 'types' field is greater than or equal
+        to specified value.
+
+    *   types.not_contains => *str*
+
+        Only return records where the 'types' field does not contain
+        specified text.
+
+    *   types.not_in => *array[str]*
+
+        Only return records where the 'types' field is not in the specified
+        values.
+
+    *   types.xmax => *str*
+
+        Only return records where the 'types' field is less than specified
+        value.
+
+    *   types.xmin => *str*
+
+        Only return records where the 'types' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    *   yf_code => *str*
+
+        Only return records where the 'yf_code' field equals specified
+        value.
+
+    *   yf_code.contains => *str*
+
+        Only return records where the 'yf_code' field contains specified
+        text.
+
+    *   yf_code.in => *array[str]*
+
+        Only return records where the 'yf_code' field is in the specified
+        values.
+
+    *   yf_code.is => *str*
+
+        Only return records where the 'yf_code' field equals specified
+        value.
+
+    *   yf_code.isnt => *str*
+
+        Only return records where the 'yf_code' field does not equal
+        specified value.
+
+    *   yf_code.max => *str*
+
+        Only return records where the 'yf_code' field is less than or equal
+        to specified value.
+
+    *   yf_code.min => *str*
+
+        Only return records where the 'yf_code' field is greater than or
+        equal to specified value.
+
+    *   yf_code.not_contains => *str*
+
+        Only return records where the 'yf_code' field does not contain
+        specified text.
+
+    *   yf_code.not_in => *array[str]*
+
+        Only return records where the 'yf_code' field is not in the
+        specified values.
+
+    *   yf_code.xmax => *str*
+
+        Only return records where the 'yf_code' field is less than specified
+        value.
+
+    *   yf_code.xmin => *str*
+
+        Only return records where the 'yf_code' field is greater than
+        specified value.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-StockExchangeUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-StockExchangeUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-StockExchangeUtil
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -32,6 +32,10 @@ use 5.014;
 use strict;
 use warnings;
 
+use utf8;
+use Encode;
+use open IO => ':utf8';
+
 use Pod::Usage;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
@@ -40,6 +44,9 @@ use List::Util qw(uniq max);
 use Text::ParseWords qw(shellwords);
 use IO::File;
 use TOML;
+
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
 
 our $rcloader;
 our $debug;
@@ -66,7 +73,7 @@ my $config_file = $ENV{$env_CONFIG} || "$config_dir/config.toml";
 ##
 my $config = sub {
     my $file = shift;
-    my $fh = new IO::File $file or return {};
+    my $fh = new IO::File $file, "<:encoding(UTF-8)" or return {};
     my $toml = do { local $/; <$fh> };
     my($data, $err) = from_toml $toml;
     die "$file: $err\n" unless $data;
@@ -299,6 +306,8 @@ sub _symlink {
     }
 }
 
+use Text::VisualWidth::PP 'vwidth';
+
 sub _ls {
     my($argv, $op) = @_;
 
@@ -306,6 +315,7 @@ sub _ls {
     my $dir = IO::Dir->new($bin_dir) or die "$bin_dir: $!\n";
     my @dirent = do {
 	sort { $a cmp $b }
+	map  { decode 'utf8', $_ }
 	grep { not /^\./ }
 	$dir->read;
     };
@@ -313,7 +323,7 @@ sub _ls {
 
     my @aliases = sort keys %{$alias};
 
-    my $max = max map length, @dirent, @aliases;
+    my $max = max map { vwidth $_ } @dirent, @aliases;
 
     print "[link]\n";
     for my $ent (@dirent) {
@@ -322,7 +332,7 @@ sub _ls {
 	    print "\t";
 	    print $op->{path} ? $path : $ent;
 	    if ($op->{long}) {
-		print ' ' x ($max - length $ent);
+		print ' ' x ($max - vwidth $ent);
 		my $target = do {
 	#	    if (my $val = $alias->{$ent}) {
 	#		ref($val) eq 'ARRAY' ? join(' ', @$val) : $val;
@@ -344,7 +354,7 @@ sub _ls {
 	print "\t";
 	print $key;
 	if ($op->{long}) {
-	    print ' ' x ($max - length $key);
+	    print ' ' x ($max - vwidth $key);
 	    printf " => %s", $command;
 	}
 	print "\n";

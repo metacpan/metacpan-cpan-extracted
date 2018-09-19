@@ -2,10 +2,11 @@ package Mojolicious::Plugin::Prometheus;
 use Mojo::Base 'Mojolicious::Plugin';
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
+use IPC::ShareLite;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.2.1';
 
-has prometheus => sub { state $prom = _init_prometheus() };
+has prometheus => sub { Net::Prometheus->new(disable_process_collector => 1) };
 has route => sub {undef};
 has http_request_duration_seconds => sub {
   undef;
@@ -20,20 +21,16 @@ has http_requests_total => sub {
   undef;
 };
 
-sub _init_prometheus {
-  my $prom = Net::Prometheus->new(disable_process_collector => 1);
-  Mojo::IOLoop->next_tick(
-    sub {
-      my $process_collector
-        = Net::Prometheus::ProcessCollector->new(labels => [worker => $$]);
-      $prom->register($process_collector);
-    }
-  );
-  return $prom;
-}
 
 sub register {
   my ($self, $app, $config) = @_;
+
+  $self->{key} = $config->{shm_key} || '12345';
+
+  $app->helper(prometheus => sub { $self->prometheus });
+
+  # Only the two built-in servers are supported for now
+  $app->hook(before_server_start => sub { $self->_start(@_, $config) });
 
   $self->http_request_duration_seconds(
     $self->prometheus->new_histogram(
@@ -81,11 +78,17 @@ sub register {
     )
   );
 
-  $self->route($app->routes->get($config->{path} // '/metrics'));
-  $self->route->to(
-    cb => sub {
+  # Collect stats
+  $app->hook(
+    after_render => sub {
       my ($c) = @_;
-      $c->render(text => $c->prometheus->render, format => 'txt');
+      $self->_guard->_change(
+        sub {
+          $_->{$$} = $app->prometheus->render;
+        }
+      );
+
+      #$self->_guard->_store({$$ => $app->prometheus->render});
     }
   );
 
@@ -110,14 +113,90 @@ sub register {
     after_dispatch => sub {
       my ($c) = @_;
       $self->http_requests_total->inc($$, $c->req->method, $c->res->code);
-      $self->http_response_size_bytes->observe($$, $c->req->method, $c->res->code,
-        $c->res->content->body_size);
+      $self->http_response_size_bytes->observe($$, $c->req->method,
+        $c->res->code, $c->res->content->body_size);
     }
   );
 
-  $app->helper(prometheus => sub { $self->prometheus });
+
+  $self->route($app->routes->get($config->{path} // '/metrics'));
+  $self->route->to(
+    cb => sub {
+      my ($c) = @_;
+      $c->render(
+        text => join("\n",
+          map { ($self->_guard->_fetch->{$_}) }
+          sort keys %{$self->_guard->_fetch}),
+        format => 'txt'
+      );
+    }
+  );
 
 }
+
+sub _guard {
+  my $self = shift;
+
+  my $share = $self->{share}
+    ||= IPC::ShareLite->new(-key => $self->{key}, -create => 1, -destroy => 0)
+    || die $!;
+
+  return Mojolicious::Plugin::Mojolicious::_Guard->new(share => $share);
+}
+
+sub _start {
+
+  #my ($self, $app, $config) = @_;
+  my ($self, $server, $app, $config) = @_;
+  return unless $server->isa('Mojo::Server::Daemon');
+
+  Mojo::IOLoop->next_tick(
+    sub {
+      $self->prometheus->register(
+        Net::Prometheus::ProcessCollector->new(labels => [worker => $$]));
+      $self->_guard->_store({$$ => $self->prometheus->render});
+    }
+  );
+
+  # Remove stopped workers
+  $server->on(
+    reap => sub {
+      my ($server, $pid) = @_;
+      $self->_guard->_change(sub { delete $_->{$pid} });
+    }
+  ) if $server->isa('Mojo::Server::Prefork');
+}
+
+
+package Mojolicious::Plugin::Mojolicious::_Guard;
+use Mojo::Base -base;
+
+use Fcntl ':flock';
+use Sereal qw(get_sereal_decoder get_sereal_encoder);
+
+my ($DECODER, $ENCODER) = (get_sereal_decoder, get_sereal_encoder);
+
+sub DESTROY { shift->{share}->unlock }
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->{share}->lock(LOCK_EX);
+  return $self;
+}
+
+sub _change {
+  my ($self, $cb) = @_;
+  my $stats = $self->_fetch;
+  $cb->($_) for $stats;
+  $self->_store($stats);
+}
+
+sub _fetch {
+  return {} unless my $data = shift->{share}->fetch;
+  return $DECODER->decode($data);
+}
+
+sub _store { shift->{share}->store($ENCODER->encode(shift)) }
 
 1;
 __END__
@@ -201,6 +280,10 @@ Override buckets for request duration histogram.
 
 Default: C<(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10)> (actually see L<Net::Prometheus|https://metacpan.org/source/PEVANS/Net-Prometheus-0.05/lib/Net/Prometheus/Histogram.pm#L19>)
 
+=item * shm_key
+
+Key used for shared memory access between workers, see L<$key in IPc::ShareLite|https://metacpan.org/pod/IPC::ShareLite> for details.
+
 =back
 
 =head1 METRICS
@@ -220,21 +303,15 @@ this plugin will also expose
 
 =back
 
-=head1 RUNNING UNDER HYPNOTOAD
-
-When running under a preforking daemon like L<Hypnotoad|Mojo::Server::Hypnotoad>, you will not get global metrics but only the metrics of each worker, randomly.
-
-The C<worker> label will include the pid of the current worker so metrics can be aggregated per worker in Prometheus.
-
-If you prefer to get the global metrics from any worker, then see L<Mojolicious::Plugin::Prometheus::Shared::FastMmap> for a possible solution.
-
 =head1 AUTHOR
 
 Vidar Tyldum
 
+(the IPC::ShareLite parts of this code is shamelessly stolen from L<Mojolicious::Plugin::Status> written by Sebastian Riedel and mangled into something that works for me)
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017, Vidar Tyldum
+Copyright (C) 2018, Vidar Tyldum
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
@@ -243,9 +320,9 @@ the terms of the Artistic License version 2.0.
 
 =over 2
 
-=item L<Mojolicious::Plugin::Prometheus::Shared::FastMmap>
-
 =item L<Net::Prometheus>
+
+=item L<Mojolicious::Plugin::Status>
 
 =item L<Mojolicious>
 

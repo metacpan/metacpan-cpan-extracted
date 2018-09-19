@@ -116,6 +116,7 @@
             "Perl::Tidy" : "0",
             "PerlIO::Layers" : "0",
             "Pod::Markdown" : "0",
+            "Protocol::HTTP2" : "v1.9.0",
             "Ref::Util" : "0",
             "Ref::Util::XS" : "0",
             "Regexp::Util" : "0",
@@ -157,6 +158,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.73.3",
+   "version" : "v0.74.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

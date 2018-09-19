@@ -1549,6 +1549,54 @@ if ($^O eq 'cygwin') {
    while ($count++!=5) { $blanklines.="\n" }
 }
 
+sub get {
+
+   my @topcaller=caller;
+   print "\nINFO: main::get() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if !$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG
+      "\nmain::get() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   return File_Transfer::get(@_);
+
+}
+
+sub put {
+
+   my @topcaller=caller;
+   print "\nINFO: main::put() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if !$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG
+      "\nmain::put() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   return File_Transfer::put(@_);
+
+}
+
+sub lcd {
+
+   my @topcaller=caller;
+   print "\nINFO: main::lcd() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if !$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG
+      "\nmain::lcd() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   return File_Transfer::lcd(@_);
+
+}
+
 sub old_cpan {
    foreach my $inc (@INC) {
       if (-e $inc.'/CPAN/Config.pm') {

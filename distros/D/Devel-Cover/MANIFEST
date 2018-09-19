@@ -14,6 +14,7 @@ README.md
 bin/cover
 bin/cpancover
 bin/gcov2perl
+bin/queue
 dist.ini
 docs/BUGS
 docs/CONTRIBUTING.md
@@ -64,6 +65,7 @@ lib/Devel/Cover/Truth_Table.pm
 lib/Devel/Cover/Tutorial.pod
 lib/Devel/Cover/Util.pm
 lib/Devel/Cover/Web.pm
+queue.db
 t/internal/criteria.t
 t/internal/inc_filter.t
 t/internal/inc_filter/cwd/lib/.dummy
@@ -77,8 +79,10 @@ test_output/cover/alias1.5.010000
 test_output/cover/and.5.010000
 test_output/cover/and.5.012000
 test_output/cover/bigint.5.010000
+test_output/cover/bigint.5.026000
 test_output/cover/branch_return_sub.5.010000
 test_output/cover/change.5.010000
+test_output/cover/circular_ref.5.010000
 test_output/cover/cond_and.5.010000
 test_output/cover/cond_branch.5.010000
 test_output/cover/cond_branch.5.012000
@@ -125,6 +129,7 @@ test_output/cover/module_import.5.010000
 test_output/cover/module_relative.5.010000
 test_output/cover/module_statements.5.010000
 test_output/cover/moo_cond.5.010000
+test_output/cover/moo_cond.5.022000
 test_output/cover/moose_basic.5.010000
 test_output/cover/moose_cond.5.010000
 test_output/cover/moose_constraint.5.010000
@@ -175,6 +180,7 @@ tests/and
 tests/bigint
 tests/branch_return_sub
 tests/change.t
+tests/circular_ref
 tests/cond_and
 tests/cond_branch
 tests/cond_chained
@@ -256,6 +262,7 @@ utils/dc
 utils/install_dev_modules
 utils/mail_contributors
 utils/makeh
+utils/queue.conf
 utils/scanuncov
 utils/setup
 utils/typemap

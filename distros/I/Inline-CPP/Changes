@@ -1,5 +1,8 @@
 Revision history for Perl extension Inline::CPP.
 
+0.75 2018-09-18
+  - Fix info (print_info) to call super. (https://github.com/daoswald/Inline-CPP/issues/40)
+
 0.74 2015-09-10
   - Require ExtUtils::CppGuess v0.11 or newer.
 

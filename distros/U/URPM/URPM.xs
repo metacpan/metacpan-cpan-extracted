@@ -119,6 +119,14 @@ typedef struct s_Package* URPM__Package;
 #define FILTER_MODE_DOC_FILES     1
 #define FILTER_MODE_CONF_FILES    2
 
+#ifdef RPM4_11_0
+#ifndef RPM4_12_0
+#define RPMTAG_RECOMMENDNAME RPMTAG_SUGGESTSNAME
+#define RPMTAG_RECOMMENDFLAGS RPMTAG_SUGGESTSFLAGS
+#define RPMTAG_RECOMMENDVERSION RPMTAG_SUGGESTSVERSION
+#endif
+#endif
+
 static ssize_t write_nocheck(int fd, const void *buf, size_t count) {
   return write(fd, buf, count);
 }

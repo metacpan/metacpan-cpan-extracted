@@ -9,3 +9,5 @@ badges = ['metacpan']
 [FileGatherer]
 include_dotfiles = false
 
+[Metadata]
+x_deprecated = 1

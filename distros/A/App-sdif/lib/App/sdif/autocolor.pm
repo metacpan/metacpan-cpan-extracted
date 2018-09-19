@@ -29,6 +29,12 @@ package App::sdif::autocolor;
 use strict;
 use warnings;
 use v5.14;
+use Data::Dumper;
+
+use Exporter 'import';
+our @EXPORT      = qw();
+our %EXPORT_TAGS = ();
+our @EXPORT_OK   = qw(rgb_to_brightness);
 
 sub rgb_to_brightness {
     my($r, $g, $b) = @_;

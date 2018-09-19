@@ -1,39 +1,95 @@
-SYNOPSIS
+NAME
+    File::Util::Tempdir - Cross-platform way to get system-wide & user
+    private temporary directory
 
+VERSION
+    This document describes version 0.030 of File::Util::Tempdir (from Perl
+    distribution File-Util-Tempdir), released on 2018-09-19.
+
+SYNOPSIS
      use File::Util::Tempdir qw(get_tempdir);
-    
+
      my $dir = get_tempdir();
 
 DESCRIPTION
-
 FUNCTIONS
-
     None are exported by default, but they are exportable.
 
- get_tempdir() => str
+  get_tempdir
+    Usage:
+
+     my $dir = get_tempdir();
 
     A cross-platform way to get system-wide temporary directory.
 
     On Windows: it first looks for one of these environment variables in
-    this order and return the first value that is set: TMP, TEMP, TMPDIR,
-    TEMPDIR. If none are set, will look at these directories in this order
-    and return the first value that is set: C:\TMP, C:\TEMP. If none are
-    set, will die.
+    this order and return the first value that is set: "TMP", "TEMP",
+    "TMPDIR", "TEMPDIR". If none are set, will look at these directories in
+    this order and return the first value that is set: "C:\TMP", "C:\TEMP".
+    If none are set, will die.
 
     On Unix: it first looks for one of these environment variables in this
-    order and return the first value that is set: TMPDIR, TEMPDIR, TMP,
-    TEMP. If none are set, will look at these directories in this order and
-    return the first value that is set: /tmp, /var/tmp. If none are set,
-    will die.
+    order and return the first value that is set: "TMPDIR", "TEMPDIR",
+    "TMP", "TEMP". If none are set, will look at these directories in this
+    order and return the first value that is set: "/tmp", "/var/tmp". If
+    none are set, will die.
+
+  get_user_tempdir
+    Usage:
+
+     my $dir = get_user_tempdir();
+
+    Get user's private temporary directory.
+
+    When you use world-writable temporary directory like /tmp, you usually
+    need to create randomly named temporary files, such as those created by
+    File::Temp. If you try to create a temporary file with guessable name,
+    other users can intercept this and you can either: 1) fail to
+    create/write your temporary file; 2) be tricked to read malicious data;
+    3) be tricked to write to other location (e.g. via symlink).
+
+    This routine is like "get_tempdir" except: on Unix, it will look for
+    "XDG_RUNTIME_DIR" first (which on a Linux system with systemd will have
+    value like "/run/user/1000" which points to a RAM-based tmpfs). Also,
+    "get_user_tempdir" will first check that the temporary directory is
+    owned by the running user. If not, it will create a subdirectory named
+    $EUID ($>) with permission mode 0700 and return that. If that
+    subdirectory already exists and is not owned by the user, will try
+    "$EUID.1" and so on.
+
+    It will die on failure.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Util-Tempdir>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Util-Tempdir>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Util-Tempdir>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-    File::Spec has tmpdir function. It also tries to look at environment
-    variables, e.g. on Unix it will look at TMPDIR (but not TEMPDIR) and
-    then falls back to /tmp (but not /var/tmp).
+    File::Spec has "tmpdir" function. It also tries to look at environment
+    variables, e.g. on Unix it will look at "TMPDIR" (but not "TEMPDIR") and
+    then falls back to "/tmp" (but not "/var/tmp").
 
     File::HomeDir, a cross-platform way to get user's home directory and a
     few other related directories.
 
     File::Temp to create a temporary directory.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

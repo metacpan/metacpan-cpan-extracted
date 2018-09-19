@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: 10-route.t 3 2008-11-25 19:56:47Z gomor $
+# $Id$
 #
 
 use Test;

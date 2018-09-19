@@ -6,7 +6,7 @@ use MDV::Packdrakeng;
 use Digest::MD5;
 use Devel::Peek;
 
-our ($VERSION) = (qq$Revision: 232705 $ =~ /(\d+)/)[0];
+our ($VERSION) = (qq$Revision$ =~ /(\d+)/)[0];
 
 =head1 NAME
 

@@ -1,6 +1,6 @@
-use strict;
-use warnings;
+use strictures 2;
 
+use Log::Any::Adapter ('TAP');
 use POSIX qw(tzset);
 use Test::Differences;
 use Test::MockObject;
@@ -31,7 +31,7 @@ $borg->mock('list_archive', sub {
 	} );
 
 # Call the actual function we want to test
-my $app = App::BorgRestore->new({borg => $borg, db => $db});
+my $app = App::BorgRestore->new_no_defaults({borg => $borg, db => $db}, {cache => {prepare_data_in_memory => 1}});
 $app->_handle_added_archives(['archive-1']);
 
 # Check if $db->add_path has been called properly

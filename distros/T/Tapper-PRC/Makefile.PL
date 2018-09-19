@@ -16,12 +16,14 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "bin/tapper-automatic-test.pl",
     "bin/tapper-client",
-    "bin/tapper-client-no-fork"
+    "bin/tapper-client-no-fork",
+    "bin/tapper-minion-worker"
   ],
   "LICENSE" => "open_source",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Tapper::PRC",
   "PREREQ_PM" => {
+    "Data::Dumper" => 0,
     "English" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
@@ -29,32 +31,34 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IO::Socket::INET" => 0,
     "IPC::Open3" => 0,
+    "IPC::Run" => 0,
     "Log::Log4perl" => 0,
+    "Minion" => 0,
     "Moose" => 0,
     "MooseX::Log::Log4perl" => 0,
     "Proc::Killfam" => 0,
     "Proc::ProcessTable" => "0.53",
     "Sys::Hostname" => 0,
     "Tapper::Base" => 0,
+    "Tapper::Config" => 0,
     "Tapper::Installer::Base" => 0,
     "Tapper::Remote::Config" => 0,
     "Tapper::Remote::Net" => 0,
     "URI::Escape" => 0,
     "YAML" => 0,
     "YAML::Syck" => 0,
+    "constant" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Cwd" => 0,
-    "Data::Dumper" => 0,
-    "Tapper::Config" => 0,
     "Test::Deep" => 0,
     "Test::MockModule" => 0,
     "Test::More" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "5.0.2",
+  "VERSION" => "5.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +75,9 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IO::Socket::INET" => 0,
   "IPC::Open3" => 0,
+  "IPC::Run" => 0,
   "Log::Log4perl" => 0,
+  "Minion" => 0,
   "Moose" => 0,
   "MooseX::Log::Log4perl" => 0,
   "Proc::Killfam" => 0,
@@ -89,6 +95,7 @@ my %FallbackPrereqs = (
   "URI::Escape" => 0,
   "YAML" => 0,
   "YAML::Syck" => 0,
+  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

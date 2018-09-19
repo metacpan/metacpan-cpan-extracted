@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 use FindBin;
 use lib "$FindBin::Bin/inc";
 use ILCPPConfig::CompilerGuess 'guess_compiler';
-use Fcntl qw( :DEFAULT :flock );
+use Fcntl qw(:DEFAULT :flock);
 use strict;
 use 5.008001;
 
@@ -14,7 +14,7 @@ use 5.008001;
 
 # The next line is verified via t/13version_numbers.t. Retain single quoting.
 
-my $DIST_VERSION    = '0.74';                        # DRY in Makefile.PL.
+my $DIST_VERSION    = '0.75';                        # DRY in Makefile.PL.
 
 my $CPP_Config_path = 'lib/Inline/CPP/Config.pm';
 
@@ -32,17 +32,17 @@ my %PREREQ_PM = (
 );
 
 
-check_prereqs( \%PREREQ_PM ) or warn "!!! PREREQUISITES NOT MET !!!";
+check_prereqs(\%PREREQ_PM) or warn "!!! PREREQUISITES NOT MET !!!";
 
-my( $cc_guess, $libs_guess ) = guess_compiler();
+my($cc_guess, $libs_guess) = guess_compiler();
 
 my $cpp_compiler
-  = prompt( "What C++ compiler would you like to use?", $cc_guess );
+  = prompt("What C++ compiler would you like to use?", $cc_guess);
 
 my $libs
-  = prompt( "What default libraries would you like to include?", $libs_guess );
+  = prompt("What default libraries would you like to include?", $libs_guess);
 
-configure_distribution( $test_cpp_filename, $cpp_compiler, $libs );
+configure_distribution($test_cpp_filename, $cpp_compiler, $libs);
 
 WriteMakefile(
   NAME           => 'Inline::CPP',
@@ -95,8 +95,12 @@ WriteMakefile(
     },
   },
   MIN_PERL_VERSION => '5.008001',  # Modern Inline versions require 5.8.1.
-  test  => { RECURSIVE_TEST_FILES => 1 },
-  clean => { FILES => '_Inline/ t/_Inline t/classes/_Inline t/grammar/_Inline t/namespace/_Inline Inline-CPP-*/' }, # Paths can be space delimited.
+  test  => {RECURSIVE_TEST_FILES => 1},
+  clean => {FILES => join q{ }, qw{
+    _Inline/            t/_Inline
+    t/classes/_Inline   t/grammar/_Inline
+    t/namespace/_Inline Inline-CPP-*/
+  }}, # Paths can be space delimited.
 );
 
 #============================================================================
@@ -108,7 +112,7 @@ sub check_prereqs {
   my $prereq_pm_href = shift;
   my $prereqs_ok = 1;
 
-  for( sort keys %{$prereq_pm_href} ) {
+  for(sort keys %$prereq_pm_href) {
     ## no critic (eval);
     eval "require $_";
 
@@ -119,7 +123,7 @@ sub check_prereqs {
 
     my $want = eval $prereq_pm_href->{$_};
 
-    if( $@  or  $have < $want ) {
+    if($@ || $have < $want) {
       warn "Warning: prerequisite $_ version $prereq_pm_href->{$_} not found.";
       $prereqs_ok = 0;
     }
@@ -160,19 +164,21 @@ sub configure_distribution {
 
   # Compile our test C++ program that includes the <iostream> header.
   my $result;
-  if ( $cpp_compiler =~ m/^cl/ ) {
+  if ($cpp_compiler =~ m/^cl/) {
     # MS compilers don't support -o (or -o is deprecated for them).
-    $result = system( qq{$cpp_compiler -Fe:$test_cpp_filename.exe }
-      . qq{$test_cpp_filename.cpp} );
+    $result = system(
+        qq{$cpp_compiler -Fe:$test_cpp_filename.exe $test_cpp_filename.cpp}
+    );
   }
   else {
-    $result = system( qq{$cpp_compiler -o $test_cpp_filename.exe }
-      . qq{$test_cpp_filename.cpp} );
+    $result = system(
+        qq{$cpp_compiler -o $test_cpp_filename.exe $test_cpp_filename.cpp}
+    );
   }
 
   my $iostream_fname = 'iostream';
   my $comment        = '';
-  if ( $result != 0 ) {
+  if ($result != 0) {
     # Compiling with <iostream> failed, so we'll assume .h headers.
     print "Detected <iostream.h> style headers. ('.h' needed.)\n";
     $iostream_fname = 'iostream.h';
@@ -188,35 +194,35 @@ sub configure_distribution {
 
   # Apply the distribution defaults:
 
-  open CPP_Config, $CPP_Config_path
+  open CPP_CONFIG, '<', $CPP_Config_path
     or die "Makefile.PL: Can't read from $CPP_Config_path"
          . " for configuration!\n$!";
 
-  my @lines = <CPP_Config>;
+  my @lines = <CPP_CONFIG>;
 
-  close CPP_Config;
+  close CPP_CONFIG;
 
   for (@lines) {
-    s{ ( our \s* \$compiler    \s* = \s* ['"] ) [^'"]+ } {$1$cpp_compiler}x;
-    s{ ( our \s* \$libs        \s* = \s* ['"] ) [^'"]+ } {$1$libs}x;
-    s{ ( our \s* \$iostream_fn \s* = \s* ['"] ) [^'"]+ } {$1$iostream_fname}x;
-    s{ ^ [^#]* ( \#define \s+ __INLINE_CPP_NAMESPACE_STD    ) } {$comment$1}x;
-    s{ ^ [^#]* ( \#define \s+ __INLINE_CPP_STANDARD_HEADERS ) } {$comment$1}x;
+    s{(our \s* \$compiler    \s* = \s* ['"]) [^'"]+}{$1$cpp_compiler}x;
+    s{(our \s* \$libs        \s* = \s* ['"]) [^'"]+}{$1$libs}x;
+    s{(our \s* \$iostream_fn \s* = \s* ['"]) [^'"]+}{$1$iostream_fname}x;
+    s{^ [^#]* (\#define \s+ __INLINE_CPP_NAMESPACE_STD   )}{$comment$1}x;
+    s{^ [^#]* (\#define \s+ __INLINE_CPP_STANDARD_HEADERS)}{$comment$1}x;
   }
 
 
   # Lock friendly open for output.
-  sysopen CPP_Config, $CPP_Config_path, O_WRONLY | O_CREAT
+  sysopen CPP_CONFIG, $CPP_Config_path, O_WRONLY | O_CREAT
     or die "Makefile.PL: Can't open $CPP_Config_path "
          . "to write configuration:\n$!";
 
-  truncate CPP_Config, 0
+  truncate CPP_CONFIG, 0
     or die "Makefile.PL: Can't truncate $CPP_Config_path to write config:\n$!";
 
-  print CPP_Config @lines
+  print CPP_CONFIG @lines
     or die "Can't write to $CPP_Config_path for configuration!\n$!";
 
-  close CPP_Config
+  close CPP_CONFIG
     or die "Can't close $CPP_Config_path after config output!\n$!";
 
   close TESTCPP_LOCK; # Release lock only after test compilation, and output to

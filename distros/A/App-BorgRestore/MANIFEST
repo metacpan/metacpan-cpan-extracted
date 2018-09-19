@@ -9,6 +9,8 @@ lib/App/BorgRestore.pm
 lib/App/BorgRestore/Borg.pm
 lib/App/BorgRestore/DB.pm
 lib/App/BorgRestore/Helper.pm
+lib/App/BorgRestore/PathTimeTable/DB.pm
+lib/App/BorgRestore/PathTimeTable/Memory.pm
 lib/App/BorgRestore/Settings.pm
 minil.toml
 script/borg-restore.pl
@@ -17,6 +19,7 @@ t/compile.t
 t/find_archives.t
 t/find_archives_mocked.t
 t/handle_added_archives.t
+t/handle_added_archives_with_db.t
 t/helper/untaint.t
 t/pod.t
 t/pod_coverage.t

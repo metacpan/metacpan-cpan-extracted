@@ -1,6 +1,6 @@
 package My::Module::Meta;
 
-use 5.006002;
+use 5.008;
 
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ sub distribution {
 }
 
 sub meta_merge {
+    my ( undef, @extra ) = @_;
     return {
 	'meta-spec'	=> {
 	    version	=> 2,
@@ -39,7 +40,7 @@ sub meta_merge {
 	resources => {
 	    bugtracker	=> {
 		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client',
-                mailto  => 'wyant@cpan.org',
+#                mailto  => 'wyant@cpan.org',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
@@ -48,7 +49,19 @@ sub meta_merge {
 		web	=> 'https://github.com/trwyant/perl-Astro-SIMBAD-Client',
 	    },
 	},
+	@extra,
     };
+}
+
+sub provides {
+    -d 'lib'
+	or return;
+    local $@ = undef;
+    my $provides = eval {
+	require Module::Metadata;
+	Module::Metadata->provides( version => 2, dir => 'lib' );
+    } or return;
+    return ( provides => $provides );
 }
 
 sub requires {
@@ -57,6 +70,7 @@ sub requires {
 ##  }
     return +{
 	'HTTP::Request::Common'	=> 0,
+	'LWP::Protocol'	=> 0,	# Comes with LWP, but ...
 	'LWP::UserAgent' => 0,
 ##	'SOAP::Lite' => 0,
 	'Scalar::Util' => 1.01,	# Not in Perl 5.6
@@ -134,6 +148,18 @@ This method returns a reference to a hash describing the meta-data which
 has to be provided by making use of the builder's C<meta_merge>
 functionality. This includes the C<no_index> and C<resources> data.
 
+Any arguments will be appended to the generated array.
+
+=head2 provides
+
+ use YAML;
+ print Dump( [ $meta->provides() ] );
+
+This method attempts to load L<Module::Metadata|Module::Metadata>. If
+this succeeds, it returns a C<provides> entry suitable for inclusion in
+L<meta_merge()|/meta_merge> data (i.e. C<'provides'> followed by a hash
+reference). If it can not load the required module, it returns nothing.
+
 =head2 requires
 
  use YAML;
@@ -169,7 +195,7 @@ information makes it into F<META.yml>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<http://rt.cpan.org/>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -177,7 +203,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2016 by Thomas R. Wyant, III
+Copyright (C) 2010-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

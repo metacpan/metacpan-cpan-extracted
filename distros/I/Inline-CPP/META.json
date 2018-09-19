@@ -4,13 +4,13 @@
       "David Oswald <davido@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Inline-CPP",
    "no_index" : {
@@ -50,15 +50,15 @@
    "provides" : {
       "Inline::CPP" : {
          "file" : "lib/Inline/CPP.pm",
-         "version" : "0.74"
+         "version" : "0.75"
       },
       "Inline::CPP::Config" : {
          "file" : "lib/Inline/CPP/Config.pm",
-         "version" : "0.74"
+         "version" : "0.75"
       },
       "Inline::CPP::Parser::RecDescent" : {
          "file" : "lib/Inline/CPP/Parser/RecDescent.pm",
-         "version" : "0.74"
+         "version" : "0.75"
       }
    },
    "release_status" : "stable",
@@ -73,5 +73,6 @@
          "web" : "http://github.com/daoswald/Inline-CPP"
       }
    },
-   "version" : "0.74"
+   "version" : "0.75",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

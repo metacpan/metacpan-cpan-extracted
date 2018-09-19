@@ -1,0 +1,16 @@
+uint32_t                T_UV
+pcg32_random_t *        O_OBJECT
+
+OUTPUT
+O_OBJECT
+  sv_setref_pv($arg, CLASS, (void*)$var);
+
+INPUT
+O_OBJECT
+  SV* sv = $arg;
+  if (sv_isobject(sv)) {
+    $var = INT2PTR( $type, SvUV((SV*)SvRV(sv)) );
+    *$var = *$var; /* tell the compiler that $var is not NULL */
+  }
+  else
+    $var = NULL;

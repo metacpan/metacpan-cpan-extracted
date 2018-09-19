@@ -1,6 +1,6 @@
 package Map::Tube::Madrid;
 
-$Map::Tube::Madrid::VERSION   = '0.18';
+$Map::Tube::Madrid::VERSION   = '0.20';
 $Map::Tube::Madrid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Madrid - Interface to the Madrid Metro Map.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.20
 
 =cut
 
@@ -29,11 +29,13 @@ Built and released while giving talk on the topic "Introduction to Map::Tube" at
 German Perl Workshop 2018.
 Source: L<map|https://www.planometromadrid.org/mapas-metro/plano-metro-madrid-2018-01.png>
 
-It currently only covers 4 metro lines.
+It currently only covers the following metro lines.
 
 =over 4
 
 =item * L<L1|Map::Tube::Madrid::Line::L1>
+
+=item * L<L2|Map::Tube::Madrid::Line::L2>
 
 =item * L<L3|Map::Tube::Madrid::Line::L3>
 
@@ -46,8 +48,6 @@ It currently only covers 4 metro lines.
 =head1 TODO (Metro Lines)
 
 =over 4
-
-=item * L2
 
 =item * L4
 

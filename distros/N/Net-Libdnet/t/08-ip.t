@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: 08-ip.t 3 2008-11-25 19:56:47Z gomor $
+# $Id$
 #
 
 use Test;

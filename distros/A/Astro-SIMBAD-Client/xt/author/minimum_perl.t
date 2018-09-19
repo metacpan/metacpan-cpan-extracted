@@ -1,6 +1,6 @@
 package main;
 
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
@@ -17,10 +17,16 @@ eval {
     1;
 } or plan skip_all => 'Unable to load Perl::MinimumVersion';
 
+eval {
+    require version;
+    1;
+} or plan skip_all => 'Unable to load version';
+
 use lib qw{ inc };
 use My::Module::Meta;
 
 my $min_perl = My::Module::Meta->requires_perl();
+my $min_perl_vers = version->parse( $min_perl );
 
 my $manifest = ExtUtils::Manifest::maniread();
 
@@ -32,6 +38,15 @@ foreach my $fn ( sort keys %{ $manifest } ) {
     my $doc = Perl::MinimumVersion->new( $fn );
     cmp_ok $doc->minimum_version(), 'le', $min_perl,
 	"$fn works under Perl $min_perl";
+    my $ppi_doc = $doc->Document();
+    foreach my $inc (
+	@{ $ppi_doc->find( 'PPI::Statement::Include' ) || [] } ) {
+	my $vers = $inc->version()
+	    or next;
+	cmp_ok( version->parse( $vers ), '==', $min_perl_vers,
+	    "$fn has use $min_perl, rather than some other version" );
+	last;
+    }
 }
 
 done_testing;

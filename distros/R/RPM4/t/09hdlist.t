@@ -2,10 +2,16 @@
 # $Id$
 
 use strict;
-use Test::More tests => 6;
+use Test::More;
 use FindBin qw($Bin);
 use File::Temp qw(tempdir);
 use File::Glob;
+
+if (-e '/etc/debian_version' || `uname -a` =~ /BSD/i) {
+    plan skip_all => "*BSD/Debian/Ubuntu do not have a system wide rpmdb";
+} else {
+    plan tests => 6;
+}
 
 my $testdir = tempdir(CLEANUP => 1);
 

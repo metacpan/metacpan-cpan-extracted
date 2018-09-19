@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::ServeFile.
 
+0.004 - 2018-09-18
+  - Allow one to configure the default path root (**Danger Will Robinson)
+  - Fixed issue with reading global configuration
+  - More debugging messages.
+
 0.003 - 2018-05-01
   - Allow you to set the default status
 

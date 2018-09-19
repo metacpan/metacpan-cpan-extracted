@@ -19,7 +19,7 @@ use File::Copy qw(cp);
 use Digest::MD5;
 
 use base qw(MDV::Distribconf MDV::Distribconf::Checks);
-our $VERSION = (qq$Revision: 224942 $ =~ /(\d+)/)[0];
+our $VERSION = (qq$Revision$ =~ /(\d+)/)[0];
 
 =item MDV::Distribconf::Build->new($root_of_distrib)
 
@@ -295,9 +295,9 @@ sub write_version {
 
     my @gmt = gmtime(time);
 
-    printf($h_version "Mandriva Linux %s %s-%s-%s%s %s\n",
-        $distrib->getvalue(undef, 'version') || 'cooker',
-        $distrib->getvalue(undef, 'branch') || 'cooker',
+    printf($h_version "Mageia %s %s-%s-%s%s %s\n",
+        $distrib->getvalue(undef, 'version') || 'cauldron',
+        $distrib->getvalue(undef, 'branch') || 'cauldron',
         $distrib->getvalue(undef, 'arch') || 'noarch',
         $distrib->getvalue(undef, 'product'),
         $distrib->getvalue(undef, 'tag') ? '-' . $distrib->getvalue(undef, 'tag') : '',

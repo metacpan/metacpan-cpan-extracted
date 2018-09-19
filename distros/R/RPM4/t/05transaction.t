@@ -2,12 +2,18 @@
 # $Id$
 
 use strict;
-use Test::More tests => 45;
+use Test::More;
 use FindBin qw($Bin);
 use File::Path;
 use File::Temp qw(tempdir);
 use RPM4;
 use RPM4::Transaction::Problems;
+
+if (-e '/etc/debian_version' || `uname -a` =~ /BSD/i) {
+    plan skip_all => "*BSD/Debian/Ubuntu do not have a system wide rpmdb";
+} else {
+    plan tests => 45;
+}
 
 # Test on wrong db
 RPM4::add_macro("_dbpath /dev/null");

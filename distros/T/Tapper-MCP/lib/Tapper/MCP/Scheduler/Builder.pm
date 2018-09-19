@@ -2,7 +2,7 @@
 package Tapper::MCP::Scheduler::Builder;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Generate Testruns
-$Tapper::MCP::Scheduler::Builder::VERSION = '5.0.6';
+$Tapper::MCP::Scheduler::Builder::VERSION = '5.0.7';
 use Moose;
 
 
@@ -51,7 +51,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

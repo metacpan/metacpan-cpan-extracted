@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: dnet.pl 19 2008-12-06 17:06:25Z gomor $
+# $Id: dnet.pl,v 5ae6e0a9ef87 2008/12/06 17:06:25 gomor $
 #
 use strict; use warnings;
 

@@ -18,6 +18,7 @@ my @files = (
     'bin/tapper-automatic-test.pl',
     'bin/tapper-client',
     'bin/tapper-client-no-fork',
+    'bin/tapper-minion-worker',
     'lib/Tapper/PRC.pm',
     'lib/Tapper/PRC/Testcontrol.pm',
     't/00-load.t',

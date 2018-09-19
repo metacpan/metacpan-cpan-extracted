@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojolicious-Plugin-Prometheus
 
+2.0.0 2018-09-18T19:16:46Z
+    - Deprecated
+
 1.0.1 2018-06-13T18:52:31Z
     - Require minimum version of M::P::Prometheus (thanks Slaven Rezić)
 

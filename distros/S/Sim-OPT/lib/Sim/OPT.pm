@@ -1,5 +1,5 @@
 package Sim::OPT;
-# Copyright (C) 2008-2017 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by block coordinate search.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -67,7 +67,7 @@ report newretrieve newreport
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios @totalcases @pinwinneritems
 );
 
-$VERSION = '0.75.41';
+$VERSION = '0.79.15';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################

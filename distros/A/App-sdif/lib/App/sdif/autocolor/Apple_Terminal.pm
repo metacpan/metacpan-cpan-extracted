@@ -28,9 +28,9 @@ package App::sdif::autocolor::Apple_Terminal;
 
 use strict;
 use warnings;
-
 use Data::Dumper;
-use App::sdif::autocolor;
+
+use App::sdif::autocolor qw(rgb_to_brightness);
 
 sub rgb {
     my $app = "Terminal";
@@ -45,7 +45,7 @@ sub brightness {
     if (grep { not /^\d+$/ } @rgb) {
 	undef;
     } else {
-	App::sdif::autocolor::rgb_to_brightness(@rgb);
+	rgb_to_brightness @rgb;
     }
 }
 

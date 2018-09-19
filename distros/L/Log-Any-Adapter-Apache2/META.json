@@ -1,0 +1,77 @@
+{
+   "abstract" : "Log::Any adapter for Apache2::Log",
+   "author" : [
+      "Mikhail Ivanov <m.ivanych@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Any-Adapter-Apache2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any" : "0",
+            "mod_perl2" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Any::Adapter::Apache2" : {
+         "file" : "lib/Log/Any/Adapter/Apache2.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ivanych/Log-Any-Adapter-Apache2/issues"
+      },
+      "homepage" : "https://github.com/ivanych/Log-Any-Adapter-Apache2",
+      "repository" : {
+         "url" : "git://github.com/ivanych/Log-Any-Adapter-Apache2.git",
+         "web" : "https://github.com/ivanych/Log-Any-Adapter-Apache2"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:IVANYCH",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

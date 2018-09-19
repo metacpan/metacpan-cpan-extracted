@@ -44,8 +44,8 @@ option --light {NOP}
 option --dark  --dark-green
 
 option	--green \
-	--cm ?COMMAND=010/555;S		\
-	--cm    ?FILE=010/555;SD	\
+	--cm ?COMMAND=555/010;		\
+	--cm    ?FILE=555/010;D		\
 	--cm    ?MARK=010/444		\
 	--cm    UMARK=			\
 	--cm    ?LINE=220		\

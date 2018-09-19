@@ -10,9 +10,11 @@ Astro::SIMBAD::Client - Fetch astronomical data from SIMBAD 4.
 
 =head1 NOTICE
 
-As of release 0.027_01 the SOAP interface is deprecated. The
-University of Strasbourg has announced that this interface will not be
-supported after April 1 2014.
+As of release 0.027_01 the SOAP interface is deprecated. The +University
+of Strasbourg has announced at
++L<http://cds.u-strasbg.fr/resources/doku.php?id=soap> that this
++interface will not be maintained after April 1 2014, and that +B<this
+interface will be stopped on December 31 2018>.
 
 Because the SOAP interface is still sort of functional (except for
 VO-format queries) as of June 4 2014, I have revised the transition plan
@@ -42,12 +44,12 @@ will -- otherwise SOAP will become unsupported.
 =head1 DESCRIPTION
 
 This package implements several query interfaces to version 4 of the
-SIMBAD on-line astronomical catalog, as documented at
+SIMBAD on-line astronomical database, as documented at
 L<http://simbad.u-strasbg.fr/simbad4.htx>. B<This package will not work
 with SIMBAD version 3.> Its primary purpose is to obtain SIMBAD data,
 though some rudimentary parsing functionality also exists.
 
-There are three ways to access this data.
+There are three ways to access these data.
 
 - URL queries are essentially page scrapers, but their use is
 documented, and output is available as HTML, text, or VOTable. URL
@@ -65,8 +67,8 @@ deprecated. See the L<NOTICE|/NOTICE> section above for the deprecation
 schedule.
 
 Astro::SIMBAD::Client is object-oriented, with the object supplying not
-only the SIMBAD server name, but the default format and output type for
-URL and web service queries.
+only the URL scheme and SIMBAD server name, but the default format and
+output type for URL and web service queries.
 
 A simple command line client application is also provided, as are
 various examples in the F<eg> directory.
@@ -91,11 +93,15 @@ use warnings;
 
 use Carp;
 use LWP::UserAgent;
+use LWP::Protocol;
 use HTTP::Request::Common qw{POST};
 use Scalar::Util 1.01 qw{looks_like_number};
 use URI::Escape ();
 use XML::DoubleEncodedEntities;
 # use Astro::SIMBAD::Client::WSQueryInterfaceService;
+
+use constant ARRAY_REF	=> ref [];
+use constant CODE_REF	=> ref sub {};
 
 my $have_time_hires;
 BEGIN {
@@ -110,7 +116,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -191,13 +197,22 @@ my %static = (
 	script => '',
     },
     post => 1,
-##    server => 'simweb.u-strasbg.fr',
+    # lc(...) per https://tools.ietf.org/html/rfc3986#section-3.1
+    scheme => lc( $ENV{ASTRO_SIMBAD_CLIENT_SCHEME} || 'http' ),
 ##    server => 'simbad.u-strasbg.fr',
     server => $ENV{ASTRO_SIMBAD_CLIENT_SERVER} || 'simbad.u-strasbg.fr',
     type => 'txt',
     url_args => {},
     verbatim => 0,
 );
+
+if ( my $msg = _is_scheme_valid(
+	$static{scheme},
+	q<Unsupported ASTRO_SIMBAD_CLIENT_SCHEME '%s'; falling back to 'http'>,
+    ) ) {
+    carp $msg;
+    $static{scheme} = 'http';
+}
 
 =item $simbad = Astro::SIMBAD::Client->new ();
 
@@ -430,20 +445,20 @@ eod
 		    if ($element->[0] eq 'TABLE') {
 			my (@meta, @data, @descr);
 			foreach (@$element) {
-			    next unless ref $_ eq 'ARRAY';
+			    next unless ARRAY_REF eq ref $_;
 			    if ($_->[0] eq 'FIELD') {
 				push @meta, $_;
 				push @descr, $_;
 			    } elsif ($_->[0] eq 'DATA') {
 				foreach (@$_) {
-				    next unless ref $_ eq 'ARRAY';
+				    next unless ARRAY_REF eq ref $_;
 				    next unless $_->[0] eq 'TABLEDATA';
 				    foreach (@$_) {
-					next unless ref $_ eq 'ARRAY';
+					next unless ARRAY_REF eq ref $_;
 					next unless $_->[0] eq 'TR';
 					my @row;
 					foreach (@$_) {
-					    next unless ref $_ eq 'ARRAY';
+					    next unless ARRAY_REF eq ref $_;
 					    next unless $_->[0] eq 'TD';
 					    my @inf = grep {!ref $_} @$_;
 					    shift @inf;
@@ -502,7 +517,7 @@ sub _strip_empty {
     while (--$inx >= 0) {
 	my $val = $ref->[$inx];
 	my $typ = ref $val;
-	if ($typ eq 'ARRAY') {
+	if ( ARRAY_REF eq $typ ) {
 	    _strip_empty ($val);
 	} elsif (!$typ) {
 	    splice @$ref, $inx, 1 unless $val =~ m/\S/ms;
@@ -660,8 +675,8 @@ EOD
 	SOAP::Lite->import (+trace => $debug ? 'all' : '-all');
 	$self->_delay ();
 ##	$debug and SOAP::Trace->import ('all');
-	my $resp = Astro::SIMBAD::Client::WSQueryInterfaceService->$method (
-	    $self->get ('server'), @args);
+	my $resp = Astro::SIMBAD::Client::WSQueryInterfaceService->$method(
+	    $self, @args);
 	return unless defined $resp;
 	$resp = XML::DoubleEncodedEntities::decode ($resp);
 	return wantarray ? ($parser->($resp)) : [$parser->($resp)]
@@ -674,9 +689,9 @@ EOD
 
 =item $value = $simbad->queryObjectByBib ($bibcode, $format, $type);
 
-This method is B<deprecated>, and will cease to work in April 2014.
-Please choose a method that does not use SOAP. See the L<NOTICE|/NOTICE>
-above for details.
+This method is B<deprecated>, and will cease to work on December 31
+2018. Please choose a method that does not use SOAP. See the
+L<NOTICE|/NOTICE> above for details.
 
 This method is just a convenience wrapper for
 
@@ -693,9 +708,9 @@ sub queryObjectByBib {
 
 =item $value = $simbad->queryObjectByCoord ($coord, $radius, $format, $type);
 
-This method is B<deprecated>, and will cease to work in April 2014.
-Please choose a method that does not use SOAP. See the L<NOTICE|/NOTICE>
-above for details.
+This method is B<deprecated>, and will cease to work on December 31
+2018. Please choose a method that does not use SOAP. See the
+L<NOTICE|/NOTICE> above for details.
 
 This method is just a convenience wrapper for
 
@@ -712,9 +727,9 @@ sub queryObjectByCoord {
 
 =item $value = $simbad->queryObjectById ($id, $format, $type);
 
-This method is B<deprecated>, and will cease to work in April 2014.
-Please choose a method that does not use SOAP. See the L<NOTICE|/NOTICE>
-above for details.
+This method is B<deprecated>, and will cease to work on December 31
+2018. Please choose a method that does not use SOAP. See the
+L<NOTICE|/NOTICE> above for details.
 
 This method is just a convenience wrapper for
 
@@ -758,8 +773,7 @@ after 'Release:' (case-insensitive).
 
 sub release {
     my $self = shift;
-    my $rslt = $self->_retrieve ('http://' . $self->{server} . '/simbad/');
-    $rslt->is_success or croak "Error - ", $rslt->status_line;
+    my $rslt = $self->_retrieve( 'simbad/' );
     my ($rls) = $rslt->content =~
 	m{Release:.*?</td>.*?<td.*?>(.*?)</td>}sxi
 	or croak "Error - Release information not found";
@@ -834,21 +848,14 @@ sub script {
 
 	my $debug = $self->get( 'debug' );
 
-	my $server = $self->get ('server');
-
-	my $url = "http://$server/simbad/sim-script";
-
 	$debug
 	    and warn "Debug - script\n$arg{script} ";
 
-	my $resp = $self->_retrieve( $url, {
+	my $resp = $self->_retrieve( 'simbad/sim-script', {
 		submit	=> 'submit+script',
 		script	=> $arg{script},
 	    },
 	);
-
-	$resp->is_success
-	    or croak $resp->status_line;
 
 	my $rslt = $resp->content
 	    or return;
@@ -895,8 +902,7 @@ output.
 sub script_file {
     my ( $self, $file ) = @_;
 
-    my $server = $self->get ('server');
-    my $url = "http://$server/simbad/sim-script";
+    my $url = $self->__build_url( 'simbad/sim-script' );
     my $rqst = POST $url, 
 	Content_Type => 'form-data',
 	Content => [
@@ -904,9 +910,7 @@ sub script_file {
 	    scriptFile => [$file, undef],
     	    # May need to specify Content_Type => application/octet-stream.
 	];
-    my $resp = $self->_retrieve ($rqst);
-
-    $resp->is_success or croak $resp->status_line;
+    my $resp = $self->_retrieve( $rqst );
 
     my $rslt = $resp->content or return;
     unless ($self->get ('verbatim')) {
@@ -942,6 +946,7 @@ it sets the default value of the attribute.
     my %mutator = (
 	format => \&_set_hash,
 	parser => \&_set_hash,
+	scheme	=> \&_set_scheme,
 	url_args => \&_set_hash,
     );
 
@@ -967,7 +972,7 @@ it sets the default value of the attribute.
 		    $val = $pkg . '::' . $val;
 		}
 		$self->_get_coderef ($val);	# Just to see if we can.
-	    } elsif (ref $val ne 'CODE') {
+	    } elsif ( CODE_REF ne ref $val ) {
 		croak "Error - $_[1] value must be scalar or code reference";
 	    }
 	    $val;
@@ -1015,6 +1020,16 @@ it sets the default value of the attribute.
 		$hash->{$name}{$key} = '';
 	    }
 	}
+	return;
+    }
+
+    sub _set_scheme {
+	my ( $self, $name, $value ) = @_;
+	if ( my $msg = _is_scheme_valid( $value ) ) {
+	    croak $msg;
+	}
+	my $hash = ref $self ? $self : \%static;
+	$hash->{$name} = lc $value;
 	return;
     }
 
@@ -1086,8 +1101,6 @@ Error - url_query needs an even number of arguments after the query
 eod
 	my ($self, $query, %args) = @_;
 ###	my $debug = $self->get ('debug');
-	my $url = 'http://' . $self->get ('server') . '/simbad/sim-' .
-	    $query;
 	my $dflt = $self->get ('url_args');
 	foreach my $key (keys %$dflt) {
 	    exists ($args{$key}) or $args{$key} = $dflt->{$key};
@@ -1096,9 +1109,8 @@ eod
 	    my $type = $self->get ('type');
 	    $args{'output.format'} = $type_map{$type} || $type;
 	}
-	my $resp = $self->_retrieve ($url, \%args);
+	my $resp = $self->_retrieve( "simbad/sim-$query", \%args );
 
-	$resp->is_success or croak $resp->status_line;
 	$resp = XML::DoubleEncodedEntities::decode ($resp->content);
 
 	my $parser;
@@ -1118,6 +1130,23 @@ eod
 #
 #	Utility routines
 #
+
+#	__build_url
+#
+#	Builds a URL based on the currently-set scheme and server, and
+#	the fragment provided as an argument. If the fragment is an
+#	HTTP::Request object it is simply returned.
+
+sub __build_url {
+    my ( $self, $fragment ) = @_;
+    defined $fragment
+	or $fragment = '';
+    eval { $fragment->isa( 'HTTP::Request' ) }
+	and return $fragment;
+    $fragment =~ s< \A / ><>smx;	# Defensive programming
+    return sprintf '%s://%s/%s', $self->get( 'scheme' ),
+	$self->get( 'server' ), $fragment;
+}
 
 #	_callers_caller();
 #
@@ -1247,6 +1276,31 @@ sub _get_parser {
     return $self->_get_coderef ($self->get ('parser')->{$type});
 }
 
+# Return false if the argument is a URI scheme we know how to deal with;
+# otherwise return an error message. The optional second argument is a
+# template for the message, with a single '%s' that gets the actual
+# value of the scheme.
+
+{
+    my %supported;
+
+    BEGIN {
+	%supported = map { $_ => 1 } qw{ http https };
+    }
+
+    sub _is_scheme_valid {
+	my ( $scheme, $msg ) = @_;
+	$scheme = lc( $scheme || '' );
+	$msg ||= q<Unsupported scheme '%s'>;
+	$supported{$scheme}
+	    or return sprintf $msg, $scheme;
+	LWP::Protocol::implementor( $scheme )
+	    and return;
+	$msg .= "; have you installed LWP::Protocol::$scheme?";
+	return sprintf $msg, $scheme;
+    }
+}
+
 #	$rslt = _load_module($name)
 #
 #	This subroutine loads the named module using 'require'. It
@@ -1274,7 +1328,8 @@ sub _get_parser {
 #	appended in parentheses.
 
 sub _get_user_agent {
-    my $ua = LWP::UserAgent->new ();
+    my $ua = LWP::UserAgent->new (
+    );
 ##    $ua->agent ($ua->_agent . ' (' . __PACKAGE__ . ' ' . $VERSION .
 ##	')');
     $ua->agent (&agent);
@@ -1314,10 +1369,15 @@ eod
     return wantarray ? ($pkg, $code) : $pkg;
 }
 
-#	my $resp = $self->_retrieve( $url, \%args );
+#	my $resp = $self->_retrieve( $fragment, \%args );
 #
-#	Retrieve the data from the given URL. The \%args argument is
-#	optional. The return is an HTTP::Response object.
+#	Build a URL from the contents of the 'scheme' and 'server'
+#	attributes, and the given fragment, and retrieve the data from
+#	that URL.  The \%args argument is optional.
+#
+#	The return is an HTTP::Response object. If the response is
+#	indicates that the request is unsuccessful we croak with the URL
+#	(if that can be retrieved) and the status line.
 #
 #	The details depend on the arguments and the state of the
 #	invocant as follows:
@@ -1333,7 +1393,8 @@ eod
 #	get() is done to the URL.
 
 sub _retrieve {
-    my ($self, $url, $args) = @_;
+    my ($self, $fragment, $args) = @_;
+    my $url = $self->__build_url( $fragment );
     $args ||= {};
     my $debug = $self->get ('debug');
     my $ua = _get_user_agent ();
@@ -1365,7 +1426,14 @@ sub _retrieve {
     }
     $debug
 	and print 'Debug - request: ', $resp->request()->as_string(), "\n";
-    return $resp;
+
+    $resp->is_success()
+	and return $resp;
+
+    my $rq = $resp->request()
+	or croak $resp->status_line();
+    my $u = $rq->uri();
+    croak "$u: ", $resp->status_line();
 }
 
 1;
@@ -1532,13 +1600,24 @@ a POST request. If false, a GET request is used.
 
 The default is 1 (i.e. true).
 
+=for html <a name="scheme"></a>
+
+=item scheme (string)
+
+This attribute specifies the server's URI scheme to be used. As of
+January 27 2017, either C<'http'> or C<'https'> is valid.
+
+The default is the value of environment variable
+C<ASTRO_SIMBAD_CLIENT_SCHEME>, or C<'http'> if the environment variable
+is not set, or if it contains a value other than C<'http'> or
+C<'https'>, case-insensitive.
+
 =for html <a name="server"></a>
 
 =item server (string)
 
-This attribute specifies the server to be used. As of January 26 2007,
-only 'simbad.u-strasbg.fr' is valid, since as of that date Harvard
-University has not yet converted their mirror to SIMBAD 4.
+This attribute specifies the server to be used. As of March 10 2010,
+either C<'simbad.u-strasbg.fr'> or C<'simbad.cfa.harvard.edu'> is valid.
 
 The default is the value of environment variable
 ASTRO_SIMBAD_CLIENT_SERVER, or C<'simbad.u-strasbg.fr'> if the
@@ -1551,9 +1630,9 @@ environment variable is not set.
 This attribute specifies the default output type. Note that although
 SIMBAD only defined types 'txt' and 'vo', we do not validate this,
 since the SIMBAD web site hints at more types to come. SIMBAD appears
-to treat an unrecognized type as 'txt'.
+to treat an unrecognized type as C<'txt'>.
 
-The default is 'txt'.
+The default is C<'txt'>.
 
 =for html <a name="url_args"></a>
 
@@ -1583,11 +1662,18 @@ including the '::data:::::' line is removed before passing the output to
 the parser or returning it to the user. If true, the script output is
 passed to the parser or returned to the user unmodified.
 
-The default is 0 (i.e. false)
+The default is C<0> (i.e. false).
 
 =back
 
 =head1 ENVIRONMENT
+
+=head2 ASTRO_SIMBAD_CLIENT_SCHEME
+
+If assigned a true value, this environment variable specifies the
+default for the C<'scheme'> attribute. It is read when the module is
+loaded. If you want to change the default after the module has been
+loaded, make a static call to C<set()>.
 
 =head2 ASTRO_SIMBAD_CLIENT_SERVER
 
@@ -1596,13 +1682,38 @@ default for the C<'server'> attribute. It is read when the module is
 loaded. If you want to change the default after the module has been
 loaded, make a static call to C<set()>.
 
+=head2 L<LWP::UserAgent|LWP::UserAgent>
+
+The following environment variables control use of a proxy server. They
+are implemented by L<LWP::UserAgent|LWP::UserAgent>, but are documented
+fairly obscurely, so I have chosen to say a few words about them here:
+
+=head3 PERL_LWP_ENV_PROXY
+
+If this environment variable is set to a true value,
+L<LWP::UserAgent|LWP::UserAgent> will take proxy settings for each URL
+scheme from environment variables named C<xxxx_proxy> (yes, lower-case),
+where the C<'xxxx'> is the scheme name. The content of each
+scheme-specific environment variables is the URL (scheme, host, and
+port) of the proxy. The following are relevant to users of this module:
+
+=head3 http_proxy
+
+This environment variable is set to the URL of the C<http:> proxy
+server.
+
+=head2 https_proxy
+
+This environment variable is set to the URL of the C<http:> proxy
+server.
+
 =head1 AUTHOR
 
 Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2016 by Thomas R. Wyant, III
+Copyright (C) 2005-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

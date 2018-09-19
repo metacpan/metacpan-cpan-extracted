@@ -1,0 +1,61 @@
+NAME
+    Finance::SE::Catalog - Catalog (list) of stock exchanges
+
+VERSION
+    This document describes version 20180919.1.0 of Finance::SE::Catalog
+    (from Perl distribution Finance-SE-Catalog), released on 2018-09-19.
+
+SYNOPSIS
+     use Finance::SE::Catalog;
+
+     my $cat = Finance::SE::Catalog->new;
+
+     my $record = $cat->by_code("IDX");                      # => { code=>"IDX", mic=>"XIDX", eng_name=>"Indonesia Stock Exchange", ...}
+     my $record = $cat->by_code("BEI");                      # can also search by MIC or additional codes
+     my $record = $cat->by_name("Indonesia Stock Exchange"); # note: case-sensitive
+
+     my @codes = $cat->all_codes(); # => ("NYSE", "NASDAQ", "IDX", ...) # only primary code
+
+     my @data = $cat->all_data; # => ({code=>"IDX", mic=>"XIDX", ...}, {...}, ...)
+
+DESCRIPTION
+    STATUS: Very incomplete. I currently focus only on markets supported by
+    Yahoo! Finance, and even from that subset I currently have only included
+    a few.
+
+    This class attempts to provide a list/catalog of stock exchanges around
+    the world.
+
+METHODS
+  new
+  by_code
+  by_name
+  all_codes
+  all_data
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-SE-Catalog>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-SE-Catalog>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-Catalog>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    "Finance::SE::*" modules, e.g. Finance::SE::IDX.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

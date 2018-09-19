@@ -1,13 +1,14 @@
 package App::BorgRestore;
 use v5.14;
-use strict;
-use warnings;
+use strictures 2;
 
-our $VERSION = "3.1.0";
+our $VERSION = "3.2.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
 use App::BorgRestore::Helper;
+use App::BorgRestore::PathTimeTable::DB;
+use App::BorgRestore::PathTimeTable::Memory;
 use App::BorgRestore::Settings;
 
 use autodie;
@@ -88,16 +89,14 @@ L<App::BorgRestore::DB>
 =cut
 
 method new($class: $deps = {}) {
-	my $self = {};
-	bless $self, $class;
+	$deps->{settings} //= App::BorgRestore::Settings->new();
 
-	my $db_path = App::BorgRestore::Settings::get_db_path();
-	my $cache_size = $App::BorgRestore::Settings::sqlite_cache_size;
+	my $config = $deps->{settings}->get_config();
 
-	$self->{borg} = $deps->{borg} // App::BorgRestore::Borg->new($App::BorgRestore::Settings::borg_repo);
-	$self->{db} = $deps->{db} // App::BorgRestore::DB->new($db_path, $cache_size);
+	$deps->{borg} //= App::BorgRestore::Borg->new($config->{borg}->{repo});
+	$deps->{db} //= App::BorgRestore::DB->new($config->{cache}->{database_path}, $config->{cache}->{sqlite_memory_cache_size});
 
-	return $self;
+	return $class->new_no_defaults($deps, $config);
 }
 
 =head3 new_no_defaults
@@ -107,12 +106,12 @@ their default values. This is probably only useful for tests.
 
 =cut
 
-method new_no_defaults($class: $deps) {
+method new_no_defaults($class: $deps, $config = {}) {
 	my $self = {};
 	bless $self, $class;
 
-	$self->{borg} = $deps->{borg};
-	$self->{db} = $deps->{db};
+	$self->{deps} = $deps;
+	$self->{config} = $config;
 
 	return $self;
 }
@@ -155,7 +154,7 @@ Returns the mapped path (string).
 method map_path_to_backup_path($abs_path) {
 	my $backup_path = $abs_path;
 
-	for my $backup_prefix (@App::BorgRestore::Settings::backup_prefixes) {
+	for my $backup_prefix (@{$self->{config}->{borg}->{path_prefixes}}) {
 		if ($backup_path =~ m/$backup_prefix->{regex}/) {
 			$backup_path =~ s/$backup_prefix->{regex}/$backup_prefix->{replacement}/;
 			last;
@@ -182,7 +181,7 @@ method find_archives($path) {
 
 	$log->debugf("Searching for archives containing '%s'", $path);
 
-	my $archives = $self->{db}->get_archives_for_path($path);
+	my $archives = $self->{deps}->{db}->get_archives_for_path($path);
 
 	for my $archive (@$archives) {
 		my $modtime = $archive->{modification_time};
@@ -218,7 +217,7 @@ method get_all_archives() {
 
 	$log->debugf("Fetching list of all archives");
 
-	my $archives = $self->{borg}->borg_list_time();
+	my $archives = $self->{deps}->{borg}->borg_list_time();
 
 	for my $archive (@$archives) {
 		push @ret, $archive;
@@ -242,7 +241,7 @@ Returns 1 if the cache contains any archive data, 0 otherwise.
 =cut
 
 method cache_contains_data() {
-	my $existing_archives = $self->{db}->get_archive_names();
+	my $existing_archives = $self->{deps}->{db}->get_archive_names();
 	return @{$existing_archives}+0 > 0 ? 1 : 0;
 }
 
@@ -347,7 +346,7 @@ method restore($path, $archive, $destination) {
 		$final_destination = App::BorgRestore::Helper::untaint($final_destination, qr(.*));
 		$log->debugf("Removing %s", $final_destination);
 		File::Path::remove_tree($final_destination);
-		$self->{borg}->restore($components_to_strip, $archive_name, $path);
+		$self->{deps}->{borg}->restore($components_to_strip, $archive_name, $path);
 	}
 	$log->debugf("CWD is %s", getcwd());
 }
@@ -376,32 +375,6 @@ method restore_simple($path, $timespec, $destination) {
 	$self->restore($backup_path, $selected_archive, $destination);
 }
 
-method _add_path_to_hash($hash, $path, $time) {
-	my @components = split /\//, $path;
-
-	my $node = $hash;
-
-	if ($path eq ".") {
-		if ($time > $$node[1]) {
-			$$node[1] = $time;
-		}
-		return;
-	}
-
-	# each node is an arrayref of the format [$hashref_of_children, $mtime]
-	# $hashref_of_children is undef if there are no children
-	for my $component (@components) {
-		if (!defined($$node[0]->{$component})) {
-			$$node[0]->{$component} = [undef, $time];
-		}
-		# update mtime per child
-		if ($time > $$node[1]) {
-			$$node[1] = $time;
-		}
-		$node = $$node[0]->{$component};
-	}
-}
-
 =head3 search_path
 
  my $paths = $app->search_path($pattern)
@@ -414,7 +387,7 @@ automatically wrapped between two % so it may match anywhere in the path.
 
 method search_path($pattern) {
 	$pattern = '%'.$pattern.'%' if $pattern !~ m/%/;
-	return $self->{db}->search_path($pattern);
+	return $self->{deps}->{db}->search_path($pattern);
 }
 
 =head3 get_missing_items
@@ -439,7 +412,7 @@ method get_missing_items($have, $want) {
 method _handle_removed_archives($borg_archives) {
 	my $start = Time::HiRes::gettimeofday();
 
-	my $existing_archives = $self->{db}->get_archive_names();
+	my $existing_archives = $self->{deps}->{db}->get_archive_names();
 
 	# TODO this name is slightly confusing, but it works as expected and
 	# returns elements that are in the previous list, but missing in the new
@@ -449,11 +422,11 @@ method _handle_removed_archives($borg_archives) {
 	if (@$remove_archives) {
 		for my $archive (@$remove_archives) {
 			$log->infof("Removing archive %s", $archive);
-			$self->{db}->begin_work;
-			$self->{db}->remove_archive($archive);
-			$self->{db}->commit;
-			$self->{db}->vacuum;
-			$self->{db}->verify_cache_fill_rate_ok();
+			$self->{deps}->{db}->begin_work;
+			$self->{deps}->{db}->remove_archive($archive);
+			$self->{deps}->{db}->commit;
+			$self->{deps}->{db}->vacuum;
+			$self->{deps}->{db}->verify_cache_fill_rate_ok();
 		}
 
 		my $end = Time::HiRes::gettimeofday();
@@ -462,16 +435,22 @@ method _handle_removed_archives($borg_archives) {
 }
 
 method _handle_added_archives($borg_archives) {
-	my $archives = $self->{db}->get_archive_names();
+	my $archives = $self->{deps}->{db}->get_archive_names();
 	my $add_archives = $self->get_missing_items($archives, $borg_archives);
 
 	for my $archive (@$add_archives) {
 		my $start = Time::HiRes::gettimeofday();
-		my $lookuptable = [{}, 0];
+		my $lookuptable_class = $self->{config}->{cache}->{prepare_data_in_memory} == 1 ? "Memory" : "DB";
+		$log->debugf("Using '%s' class for PathTimeTable", $lookuptable_class);
+		my $lookuptable = "App::BorgRestore::PathTimeTable::$lookuptable_class"->new({db => $self->{deps}->{db}});
 
 		$log->infof("Adding archive %s", $archive);
+		$self->{deps}->{db}->begin_work;
+		$self->{deps}->{db}->add_archive_name($archive);
+		my $archive_id = $self->{deps}->{db}->get_archive_id($archive);
+		$lookuptable->set_archive_id($archive_id);
 
-		$self->{borg}->list_archive($archive, sub {
+		$self->{deps}->{borg}->list_archive($archive, sub {
 			my $line = shift;
 			# roll our own parsing of timestamps for speed since we will be parsing
 			# a huge number of lines here
@@ -480,38 +459,21 @@ method _handle_added_archives($borg_archives) {
 			if ($line =~ m/^.{4} (?<year>....)-(?<month>..)-(?<day>..) (?<hour>..):(?<minute>..):(?<second>..) (?<path>.+)$/) {
 				my $time = POSIX::mktime($+{second},$+{minute},$+{hour},$+{day},$+{month}-1,$+{year}-1900);
 				#$log->debugf("Adding path %s with time %s", $+{path}, $time);
-				$self->_add_path_to_hash($lookuptable, $+{path}, $time);
+				$lookuptable->add_path($+{path}, $time);
 			}
 		});
 
 		my $borg_time = Time::HiRes::gettimeofday;
 
-		$self->{db}->begin_work;
-		$self->{db}->add_archive_name($archive);
-		my $archive_id = $self->{db}->get_archive_id($archive);
-		$self->_save_node($archive_id,  undef, $lookuptable);
-		$self->{db}->commit;
-		$self->{db}->vacuum;
-		$self->{db}->verify_cache_fill_rate_ok();
+		$lookuptable->save_nodes();
+		$self->{deps}->{db}->commit;
+		$self->{deps}->{db}->vacuum;
+		$self->{deps}->{db}->verify_cache_fill_rate_ok();
 
 		my $end = Time::HiRes::gettimeofday();
 		$log->debugf("Adding archive finished after: %.5fs (parsing borg output took %.5fs)", $end - $start, $borg_time - $start);
 	}
 }
-
-method _save_node($archive_id, $prefix, $node) {
-	for my $child (keys %{$$node[0]}) {
-		my $path;
-		$path = $prefix."/" if defined($prefix);
-		$path .= $child;
-
-		my $time = $$node[0]->{$child}[1];
-		$self->{db}->add_path($archive_id, $path, $time);
-
-		$self->_save_node($archive_id, $path, $$node[0]->{$child});
-	}
-}
-
 
 =head3 update_cache
 
@@ -522,7 +484,7 @@ Updates the database used by e.g. C<find_archives>.
 =cut
 
 method update_cache() {
-	my $v2_basedir = App::BorgRestore::Settings::get_cache_base_dir_path("v2");
+	my $v2_basedir = $self->{deps}->{settings}->get_cache_base_dir_path("v2");
 	if (-e $v2_basedir) {
 		$log->info("Removing old v2 cache directory: $v2_basedir");
 		path($v2_basedir)->remove_tree;
@@ -530,15 +492,15 @@ method update_cache() {
 
 	$log->debug("Updating cache if required");
 
-	my $borg_archives = $self->{borg}->borg_list();
+	my $borg_archives = $self->{deps}->{borg}->borg_list();
 
 	# write operations benefit from the large cache so set the cache size here
-	$self->{db}->set_cache_size();
+	$self->{deps}->{db}->set_cache_size();
 	$self->_handle_removed_archives($borg_archives);
 	$self->_handle_added_archives($borg_archives);
 
-	$log->debugf("DB contains information for %d archives in %d rows", scalar(@{$self->{db}->get_archive_names()}), $self->{db}->get_archive_row_count());
-	$self->{db}->verify_cache_fill_rate_ok();
+	$log->debugf("DB contains information for %d archives in %d rows", scalar(@{$self->{deps}->{db}->get_archive_names()}), $self->{deps}->{db}->get_archive_row_count());
+	$self->{deps}->{db}->verify_cache_fill_rate_ok();
 }
 
 
@@ -547,7 +509,7 @@ __END__
 
 =head1 LICENSE
 
-Copyright (C) 2016-2017  Florian Pritz E<lt>bluewind@xinu.atE<gt>
+Copyright (C) 2016-2018  Florian Pritz E<lt>bluewind@xinu.atE<gt>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

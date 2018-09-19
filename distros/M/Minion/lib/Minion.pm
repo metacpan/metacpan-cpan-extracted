@@ -18,7 +18,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.04';
+our $VERSION = '9.05';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -177,7 +177,7 @@ Minion - Job queue
 
 <p>
   <img alt="Screenshot"
-    src="https://raw.github.com/kraih/mojolicious/master/examples/admin.png?raw=true"
+    src="https://raw.github.com/mojolicious/minion/master/examples/admin.png?raw=true"
     width="600px">
 </p>
 

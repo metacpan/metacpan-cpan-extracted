@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.2.2 2018-09-18T09:12:11Z
+
+    - Support UTF-8 file name and alias.
+
 v0.2.1 2018-08-17T04:38:31Z
 
     - Declare MSWin32 as unsupported.

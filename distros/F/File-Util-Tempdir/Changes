@@ -1,4 +1,7 @@
-Revision history for File-Util-Tempdir
+0.030   2018-09-19 (PERLANCAR)
+
+	- Add get_user_tempdir().
+
 
 0.02    2016-02-16 (PERLANCAR)
 

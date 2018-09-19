@@ -5,16 +5,10 @@ use Pcore::Util::Result::Status;
 use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 use Pcore::Util::Result::Status;
 
-use overload    #
-  q[bool] => sub {
-    return substr( $_[0]->{status}, 0, 1 ) == 2;
-  },
-  q[0+] => sub {
-    return $_[0]->{status};
-  },
-  q[""] => sub {
-    return $_[0]->{status} . q[ ] . $_[0]->{reason};
-  },
+use overload
+  bool     => sub { substr( $_[0]->{status}, 0, 1 ) == 2 },
+  '0+'     => sub { $_[0]->{status} },
+  q[""]    => sub {"$_[0]->{status} $_[0]->{reason}"},
   fallback => 1;
 
 our $EXPORT = [qw[res]];

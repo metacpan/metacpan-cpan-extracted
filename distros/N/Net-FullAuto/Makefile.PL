@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000417';
+our $VERSION='1.0000418';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1916,8 +1916,11 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('Net::HTTP','install','Makefile');
    &fa_install_module('Data::Dump','install','Makefile');
    &fa_install_module('File::HomeDir','install','Makefile');
-   &fa_install_module('LWP','install','Makefile');
+   &fa_install_module('Test::Fatal','install','Makefile');
+   &fa_install_module('Test::Needs','install','Makefile');
+   &fa_install_module('Test::RequiresInternet','install','Makefile');
    &fa_install_module('Try::Tiny','install','Makefile');
+   &fa_install_module('LWP','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    eval {
       local $SIG{__DIE__}; # No sigdie handler
@@ -2077,7 +2080,6 @@ END
    &fa_install_module('Sub::Defer','install','Makefile');
    &fa_install_module('Sub::Quote','install','Makefile');
    &fa_install_module('Moo','install','Makefile');
-   &fa_install_module('Test::Fatal','install','Makefile');
    &fa_install_module('MooX::Types::MooseLike','install','Makefile');
    &fa_install_module('MooX::Types::MooseLike::Base','install','Makefile');
    &fa_install_module('Devel::StackTrace','install','Makefile');

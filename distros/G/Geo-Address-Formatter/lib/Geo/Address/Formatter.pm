@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.65';
+$Geo::Address::Formatter::VERSION = '1.67';
 use strict;
 use warnings;
 use feature qw(say);
@@ -384,6 +384,7 @@ sub _fix_country {
 }
 
 # sets and returns a state code
+# note may also set other values in some odd edge cases
 sub _add_state_code {
     my $self          = shift;
     my $rh_components = shift;
@@ -432,6 +433,11 @@ sub _add_code {
                                 last;
                             }
                         }
+                    }
+                    if ($rh_components->{state} =~ m/^washington,? d\.?c\.?/i){
+                        $rh_components->{state_code} = 'DC';
+                        $rh_components->{state} = 'District of Columbia';
+                        $rh_components->{city} = 'Washington';
                     }
                 }
             }
@@ -628,7 +634,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.65
+version 1.67
 
 =head1 SYNOPSIS
 

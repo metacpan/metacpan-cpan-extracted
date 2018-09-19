@@ -1,4 +1,4 @@
-# Copyright 2011-2017, Paul Johnson (paul@pjcj.net)
+# Copyright 2011-2018, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::DB::IO;
 use strict;
 use warnings;
 
-our $VERSION = '1.30'; # VERSION
+our $VERSION = '1.31'; # VERSION
 
 my $Format;
 
@@ -45,7 +45,7 @@ Devel::Cover::DB::IO - IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2011-2017, Paul Johnson (paul@pjcj.net)
+Copyright 2011-2018, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

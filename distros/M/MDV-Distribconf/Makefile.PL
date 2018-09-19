@@ -1,4 +1,4 @@
-# $Id: Makefile.PL 231527 2007-11-14 21:39:03Z nanardon $
+# $Id$
 
 use 5.008;
 use strict;
@@ -20,7 +20,7 @@ MAKE
 WriteMakefile(
     NAME	 => 'MDV::Distribconf',
     VERSION_FROM => 'lib/MDV/Distribconf.pm',
-    dist => { DIST_DEFAULT => 'change_dist' },
+    dist => { DIST_DEFAULT => 'change_dist', COMPRESS => "xz -f", SUFFIX => ".xz" },
     EXE_FILES => [ qw(bin/checkdistrib) ],
     PREREQ_PM => {
         'Config::IniFiles' => undef,

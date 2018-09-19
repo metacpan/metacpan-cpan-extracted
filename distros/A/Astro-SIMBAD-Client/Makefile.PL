@@ -81,7 +81,9 @@ my %attr = (
 $mmv >= 6.31 and $attr{LICENSE} = 'perl';
 
 $mmv >= 6.4501
-    and $attr{META_MERGE} = $meta->meta_merge();
+    and $attr{META_MERGE} = $meta->meta_merge(
+	$meta->provides(),
+    );
 
 $mmv >= 6.4701 and $attr{MIN_PERL_VERSION} = $meta->requires_perl();
 

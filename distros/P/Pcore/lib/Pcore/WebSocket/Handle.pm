@@ -213,14 +213,14 @@ sub connect ( $self, $uri, %args ) {    ## no critic qw[Subroutines::ProhibitBui
     return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, 'Invalid HTTP response status' ) if $headers->{status} != 101;
 
     # check response connection headers
-    return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, q[WebSocket handshake error] ) if !$res_headers->{CONNECTION} || !$res_headers->{UPGRADE} || $res_headers->{CONNECTION} !~ /\bupgrade\b/smi || $res_headers->{UPGRADE} !~ /\bwebsocket\b/smi;
+    return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, q[WebSocket handshake error] ) if !$res_headers->{connection} || !$res_headers->{upgrade} || $res_headers->{connection} !~ /\bupgrade\b/smi || $res_headers->{upgrade} !~ /\bwebsocket\b/smi;
 
     # validate SEC_WEBSOCKET_ACCEPT
-    return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, q[Invalid SEC_WEBSOCKET_ACCEPT header] ) if !$res_headers->{SEC_WEBSOCKET_ACCEPT} || $res_headers->{SEC_WEBSOCKET_ACCEPT} ne $self->_get_challenge($sec_websocket_key);
+    return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, q[Invalid SEC_WEBSOCKET_ACCEPT header] ) if !$res_headers->{'sec-websocket-accept'} || $res_headers->{'sec-websocket-accept'} ne $self->_get_challenge($sec_websocket_key);
 
     # check protocol
-    if ( $res_headers->{SEC_WEBSOCKET_PROTOCOL} ) {
-        return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, qq[WebSocket server returned unsupported protocol "$res_headers->{SEC_WEBSOCKET_PROTOCOL}"] ) if !$protocol || $res_headers->{SEC_WEBSOCKET_PROTOCOL} !~ /\b$protocol\b/smi;
+    if ( $res_headers->{'sec-websocket-protocol'} ) {
+        return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, qq[WebSocket server returned unsupported protocol "$res_headers->{'sec-websocket-protocol'}"] ) if !$protocol || $res_headers->{'sec-websocket-protocol'} !~ /\b$protocol\b/smi;
     }
     elsif ($protocol) {
         return $on_error->( $self, $Pcore::Handle::HANDLE_STATUS_PROTOCOL_ERROR, q[WebSocket server returned no protocol] );
@@ -230,10 +230,10 @@ sub connect ( $self, $uri, %args ) {    ## no critic qw[Subroutines::ProhibitBui
     $self->{_compression} = 0;
 
     # check compression support
-    if ( $res_headers->{SEC_WEBSOCKET_EXTENSIONS} ) {
+    if ( $res_headers->{'sec-websocket-extensions'} ) {
 
         # use compression, if server and client support compression
-        if ( $self->{compression} && $res_headers->{SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi ) {
+        if ( $self->{compression} && $res_headers->{'sec-websocket-extensions'} =~ /\bpermessage-deflate\b/smi ) {
             $self->{_compression} = 1;
         }
     }

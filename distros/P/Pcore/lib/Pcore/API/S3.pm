@@ -403,7 +403,7 @@ sub get_metadata ( $self, $path, @args ) {
         path   => $path,
         cb     => sub ($res) {
             if ($res) {
-                $res->{headers}->{ETAG} =~ s/"//smg;
+                $res->{headers}->{etag} =~ s/"//smg;
 
                 $res = res 200, $res->{headers};
             }

@@ -1,7 +1,6 @@
 package App::BorgRestore::Borg;
 use v5.14;
-use warnings;
-use strict;
+use strictures 2;
 
 use App::BorgRestore::Helper;
 

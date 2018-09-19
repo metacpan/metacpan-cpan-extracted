@@ -442,6 +442,7 @@ sub write ( $self, $buf, %args ) {    ## no critic qw[Subroutines::ProhibitBuilt
     return $total_bytes;
 }
 
+# args: timeout, http2
 sub starttls ( $self, %args ) {
     die q[TLS is already started] if $self->{tls};
 
@@ -462,6 +463,8 @@ sub starttls ( $self, %args ) {
     $ctx{SSL_startHandshake} = 0;
     $ctx{SSL_hostname}       = $ctx{SSL_verifycn_name} = $self->{peername};
     $ctx{SSL_dh}             = $DH_PARAM->{ delete $ctx{dh} } if $ctx{dh};
+
+    $ctx{SSL_npn_protocols} = ['h2'] if $args{http2};
 
     $self->{fh} = IO::Socket::SSL->start_SSL( $self->{fh}, %ctx );
 
@@ -613,11 +616,12 @@ sub read_http_res_headers ( $self, %args ) {
     }
 }
 
-# TODO update HTTP::Parser::XS
 sub _parse_http_headers ( $self, $buf ) {
     my $res;
 
     ( $res->{len}, $res->{minor_version}, $res->{status}, $res->{reason}, $res->{headers} ) = HTTP::Parser::XS::parse_http_response( $buf, HTTP::Parser::XS::HEADERS_AS_HASHREF );
+
+    $res->{version} = "1.$res->{minor_version}" if defined $res->{minor_version};
 
     # fallback to pure-perl parser in case of errors
     # TODO can be removed after this issue will be fixed - https://github.com/kazuho/p5-http-parser-xs/issues/10
@@ -661,13 +665,6 @@ sub _parse_http_headers ( $self, $buf ) {
     #         $len = -1;
     #     }
     # }
-
-    if ( $res->{len} > 0 ) {
-
-        # repack headers
-        # TODO update HTTP::Parser::XS
-        $res->{headers} = { map { uc s/-/_/smgr, $res->{headers}->{$_} } keys $res->{headers}->%* };    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
-    }
 
     return $res;
 }
@@ -786,11 +783,11 @@ sub read_http_chunked_data ( $self, %args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 492                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named subroutine "close"                               |
+## |    3 | 495                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named subroutine "close"                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 682                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
+## |    3 | 679                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 743                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 740                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 363                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

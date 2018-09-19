@@ -59,8 +59,7 @@ use Getopt::EX::Long;
 Getopt::Long::Configure(qw(bundling require_order));
 GetOptions(@optargs) || usage({status => 1});
 
-my %colormap;
-pairmap { $colormap{$a} = $b } qw(
+my %colormap = qw(
     APPEND	K/544
     DELETE	K/544
     OCHANGE	K/445
@@ -98,10 +97,11 @@ my @diffcmd = do {
 	use Text::ParseWords;
 	shellwords $opt_diff;
     } else {
-	(
-	 @default_diff,
-	 $opt_mark ? () : qw(--no-mark),
-	 $opt_old  ? () : qw(--no-old),
+	( @default_diff,
+	  map  { $_->[1] }
+	  grep { $_->[0] }
+	  [ ! $opt_mark => '--no-mark' ],
+	  [ ! $opt_old  => '--no-old' ],
 	);
     }
 };

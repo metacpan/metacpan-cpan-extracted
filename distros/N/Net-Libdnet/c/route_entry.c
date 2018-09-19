@@ -1,4 +1,4 @@
-/* $Id: route_entry.c 57 2012-11-02 16:39:39Z gomor $ */
+/* $Id$ */
 
 /*
  * Copyright (c) 2008-2012 Patrice <GomoR> Auffret

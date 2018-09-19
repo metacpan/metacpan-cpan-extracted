@@ -3,22 +3,12 @@ package Pcore::Util::Result::Status;
 use Pcore -const, -role;
 use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 
-use overload    #
-  q[bool] => sub {
-    return $_[0]->{status} >= 200 && $_[0]->{status} < 300;
-  },
-  q[0+] => sub {
-    return $_[0]->{status};
-  },
-  q[""] => sub {
-    return "$_[0]->{status} $_[0]->{reason}";
-  },
-  q[<=>] => sub {
-    return !$_[2] ? $_[0]->{status} <=> $_[1] : $_[1] <=> $_[0]->{status};
-  },
-  q[@{}] => sub {
-    return [ $_[0]->{status}, $_[0]->{reason} ];
-  },
+use overload
+  bool  => sub { $_[0]->{status} >= 200 && $_[0]->{status} < 300 },
+  '0+'  => sub { $_[0]->{status} },
+  q[""] => sub {"$_[0]->{status} $_[0]->{reason}"},
+  '<=>' => sub { !$_[2] ? $_[0]->{status} <=> $_[1] : $_[1] <=> $_[0]->{status} },
+  '@{}' => sub { [ $_[0]->{status}, $_[0]->{reason} ] },
   fallback => undef;
 
 has status => ( is => 'ro', isa => PositiveOrZeroInt, required => 1 );
@@ -104,6 +94,8 @@ const our $STATUS_REASON => {
     510   => 'Not Extended',
     511   => 'Network Authentication Required',
 };
+
+sub BUILDARGS ( $self, $args ) { return $args }
 
 around BUILDARGS => sub ( $orig, $self, $args ) {
     $args->{status} //= 0;

@@ -9,16 +9,28 @@ use My::Module::Test;
 
 access;
 
-TODO: {
+foreach my $scheme ( qw{ http https } ) {
 
-    local $TODO = 'Release information missing as of September 6 2016';
+    call set => scheme => $scheme;
 
-    call 'release';
-    test qr{ \A SIMBAD4 \b }smxi, 'Scalar release()';
+    echo <<"EOD";
 
-    call_a 'release';
-    deref 0;
-    test 4, 'Major version number';
+The following tests use the $scheme: URL scheme
+
+EOD
+
+    TODO: {
+
+	local $TODO = 'Release information missing as of September 6 2016';
+
+	call 'release';
+	test qr{ \A SIMBAD4 \b }smxi, 'Scalar release()';
+
+	call_a 'release';
+	deref 0;
+	test 4, 'Major version number';
+
+    }
 
 }
 

@@ -85,7 +85,7 @@ my $opt_d;
 my $opt_truncate = 0;
 my $opt_onword = 1;
 my $opt_cdif = 1;
-my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc);
+my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc --no-uc);
 my @opt_cdifopts;
 my $opt_env = 1;
 my @opt_colormap;
@@ -177,6 +177,7 @@ if ($opt_ambiguous =~ /^(?:wide|full)/) {
 my %colormap = do {
     my $col = $opt_256 ? 0 : 1;
     pairmap { $a => (ref $b eq 'ARRAY') ? $b->[$col] : $b } (
+	UNKNOWN  =>    ""         ,
 	OCOMMAND =>  [ "555/010"  , "GS"  ],
 	NCOMMAND =>  [ "555/010"  , "GS"  ],
 	MCOMMAND =>  [ "555/010"  , "GS"  ],
@@ -321,6 +322,9 @@ if ($opt_cdif) {
     open(DIFF, $DIFF) || die "cannot open diff: $!\n";
 }
 
+my @boundary = $opt_onword ? (boundary => 'word') : ();
+my $color_re = qr{ \e \[ [\d;]* [mK] }x;
+
 my $oline = 1;
 my $nline = 1;
 my $mline = 1;
@@ -448,7 +452,7 @@ while (<DIFF>) {
 	flush_buffer_3(@buf);
     }
     else {
-	print;
+	print $painter->('UNKNOWN', $_);
     }
 }
 
@@ -645,6 +649,8 @@ sub linenum {
     defined $n ? (sprintf $num_format, $n) : (' ' x $opt_digit);
 }
 
+use Text::ANSI::Fold qw(ansi_fold);
+
 sub print_column_23 {
     my $column = @_ / 2;
     my $width = column_width $column;
@@ -678,15 +684,15 @@ sub print_column_23 {
 	if $column >= 3;
 
     while (1) {
-	(my $o, $old) = fold($old,
-			     max(1, $width - length($onum . $nspace)),
-			     onword => $opt_onword, pad => 1);
-	(my $n, $new) = fold($new,
-			     max(1, $width - length($nnum . $nspace)),
-			     onword => $opt_onword, pad => 1);
-	(my $m, $mrg) = fold($mrg,
-			     max(1, $width - length($mnum . $nspace)),
-			     onword => $opt_onword, pad => 1)
+	(my $o, $old) = ansi_fold($old,
+				  max(1, $width - length($onum . $nspace)),
+				  @boundary, padding => 1);
+	(my $n, $new) = ansi_fold($new,
+				  max(1, $width - length($nnum . $nspace)),
+				  @boundary, padding => 1);
+	(my $m, $mrg) = ansi_fold($mrg,
+				  max(1, $width - length($mnum . $nspace)),
+				  @boundary, padding => 1)
 	    if $column >= 3;
 
 	my @f;
@@ -732,7 +738,7 @@ sub print_command_n {
 	    chomp $_;
 	    $_ = expand_tab($_);
 	}
-	($_) = fold($_, $width, pad => 1);
+	($_) = ansi_fold($_, $width, padding => 1);
 	my %f;
 	my $color = $i < @color ? $color[$i] : $color[-1];
 	$f{TEXT} = $painter->($color, $_);
@@ -756,149 +762,6 @@ sub print_field_n {
 	$_ = $f->{"MARK"} and print if $markpos eq RIGHT;
     }
     print "\n";
-}
-
-my $alphanum_re;
-my $reset_re;
-my $color_re;
-my $control_re;
-BEGIN {
-    $alphanum_re = qr{ [_\d\p{Latin}] }x;
-    $reset_re    = qr{ \e \[ [0;]* m (?: \e \[ [0;]* [mK])* }x;
-    $color_re    = qr{ \e \[ [\d;]* [mK] }x;
-    $control_re  = qr{ \e \] [\;\:\/0-9a-z]* \e \\ }x;
-}
-
-sub IsWideSpacing {
-    return <<"END";
-+utf8::East_Asian_Width=Wide
-+utf8::East_Asian_Width=FullWidth
--utf8::Nonspacing_Mark
-END
-}
-
-sub IsWideAmbiguousSpacing {
-    return <<"END";
-+utf8::East_Asian_Width=Wide
-+utf8::East_Asian_Width=FullWidth
-+utf8::East_Asian_Width=Ambiguous
--utf8::Nonspacing_Mark
-END
-}
-
-sub _startWideSpacing {
-    # look at $_
-    if ($Text::VisualWidth::PP::EastAsian) {
-	/^\p{IsWideAmbiguousSpacing}/;
-    } else {
-	/^\p{IsWideSpacing}/;
-    }
-}
-
-sub fold {
-    local $_ = shift // "";
-    my $width = shift;
-    my %opt = @_ ? @_ : {};
-
-    $width < 1 and croak "width should be greater than 0";
-
-    my $folded = '';
-    my $room = $width;
-    my @color_stack;
-    while (length) {
-
-	if (s/^([\f\r]+)//) {
-	    $folded .= $1;
-	    $room = $width;
-	    next;
-	}
-	if (s/^($control_re)//) {
-	    $folded .= $1;
-	    next;
-	}
-	if (s/^($reset_re)//) {
-	    $folded .= $1;
-	    @color_stack = ();
-	    next;
-	}
-
-	last if $room < 1;
-	last if $room != $width and &_startWideSpacing and $room < 2;
-
-	if (s/^($color_re)//) {
-	    $folded .= $1;
-	    push @color_stack, $1;
-	    next;
-	}
-
-	if (s/^(\e*[^\e\f\r]+)//) {
-	    my $s = $1;
-	    if ((my $w = vwidth($s)) <= $room) {
-		$folded .= $s;
-		$room -= $w;
-		next;
-	    }
-	    my($a, $b, $w) = simple_fold($s, $room);
-	    if ($w > $room and $room < $width) {
-		$_ = $s . $_;
-		last;
-	    }
-	    ($folded, $_) = ($folded . $a, $b . $_);
-	    $room -= $w;
-	} else {
-	    die "panic ($_)";
-	}
-    }
-
-    if ($opt{onword}
-	and my($tail) = /^(${alphanum_re}+)/o
-	and $folded =~ m{
-		^
-		( (?: [^\e]* $color_re ) *+ )
-		( .*? )
-		( ${alphanum_re}+ )
-		$
-	}xo
-	) {
-	## Break line before word only when enough space will be
-	## provided for the word in the next call.
-	my($s, $e) = ($-[3], $+[3]);
-	my $l = $e - $s;
-	if ($room + $l < $width and $l + length($tail) <= $width) {
-	    $_ = substr($folded, $s, $l, '') . $_;
-	    $room += $l;
-	}
-    }
-
-    if (@color_stack) {
-	$folded .= SGR_RESET;
-	$_ = join '', @color_stack, $_ if $_ ne '';
-    }
-
-    $folded .= ' ' x $room if $room > 0 and $opt{pad};
-
-    ($folded, $_);
-}
-
-##
-## Trim off one or more *logical* characters from the top.
-##
-sub simple_fold {
-    my $orig = shift;
-    my $width = shift;
-    $width <= 0 and croak "parameter error";
-
-    my($s1, $s2) = $orig =~ m/^(\X{0,$width})(.*)/ or die;
-
-    my $w = vwidth($s1);
-    while ($w > $width) {
-	my $trim = int(($w - $width) / 2 + 0.5) || 1;
-	$s1 =~ s/\X \K ( \X{$trim} ) \z//x or last;
-	$s2 = $1 . $s2;
-	$w -= vwidth($1);
-    }
-
-    ($s1, $s2, $w);
 }
 
 sub read_line {

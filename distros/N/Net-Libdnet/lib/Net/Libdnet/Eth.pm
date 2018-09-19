@@ -1,5 +1,5 @@
 #
-# $Id: Eth.pm 57 2012-11-02 16:39:39Z gomor $
+# $Id: Eth.pm,v c181470c4357 2018/09/18 14:59:41 gomor $
 #
 package Net::Libdnet::Eth;
 use strict; use warnings;
@@ -80,7 +80,7 @@ Sets the hardware address specified by scalar of used network interface. Returns
 
 =item B<send> (scalar)
 
-Sends the raw data specified by scalar to the network interface. Returns the number of bytes sent on sucess, undef on error.
+Sends the raw data specified by scalar to the network interface. Returns the number of bytes sent on success, undef on error.
 
 =back
 

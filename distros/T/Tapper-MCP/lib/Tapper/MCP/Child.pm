@@ -1,7 +1,7 @@
 package Tapper::MCP::Child;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Control one specific testrun on MCP side
-$Tapper::MCP::Child::VERSION = '5.0.6';
+$Tapper::MCP::Child::VERSION = '5.0.7';
 use 5.010;
 use strict;
 use warnings;
@@ -61,6 +61,7 @@ sub wait_for_testrun
  MESSAGE:
         while (1) {
                 my $msg = $self->get_messages($timeout_span);
+                $self->log->debug('wait_for_testrun loop');
                 ($error, $timeout_span) = $self->state->update_state($msg);
                 if ($error) {
                         last MESSAGE if $self->state->testrun_finished;
@@ -97,6 +98,7 @@ sub generate_configs
                 for (my $i=0; $i<= $#{$testconfigs}; $i++ ) {
                         my $prc_config = merge($common_config, $testconfigs->[$i]);
                         $prc_config->{guest_number} = $i;
+                        $prc_config->{test_type} = $mcpconfig->mcp_info->test_type;
                         my $suffix = "test-prc$i";
                         $suffix   .= "-".$self->testrun->id;
 
@@ -153,7 +155,7 @@ sub handle_error
 sub start_testrun
 {
         no if $] >= 5.017011, warnings => 'experimental::smartmatch';
-        my ($self, $config) = @_;
+        my ($self, $config, $revive) = @_;
 
         my $net    = Tapper::MCP::Net->new();
         $net->cfg->{testrun_id} = $self->testrun->id;
@@ -191,6 +193,20 @@ sub start_testrun
                                 $self->handle_error("Starting Tapper locally", $local_retval);
                                 return ("Starting Tapper locally failed: $local_retval");
                         }
+                }
+                when('minion') {
+                        $self->log->debug("Starting MINION testrun on $hostname");
+                        my $local_retval;
+                        my $tr_id = $self->testrun->id;
+                        my $path_to_config = $self->mcp_info->skip_install ?
+                          $config->{paths}{localdata_path}."/$hostname-test-prc0-$tr_id" :
+                            $config->{paths}{localdata_path}."/$hostname-install-$tr_id";
+                        $local_retval = $net->start_minion($path_to_config, $revive);
+                        if ($local_retval) {
+                                $self->handle_error("Starting Tapper via Minion", $local_retval);
+                                return ("Starting Tapper via Minion failed: $local_retval");
+                        }
+                        $self->log->debug("Returned from start_minion.");
                 }
                 default {
                         $self->log->debug("Write grub file for $hostname");
@@ -277,6 +293,35 @@ sub kill_local_prc_processes
 }
 
 
+sub cancel_minion_prc_processes
+{
+    my ($self, $net) = @_;
+
+    if (lc($self->mcp_info->test_type) eq 'minion')
+    {
+
+        my $hostname = $self->testrun->testrun_scheduling->host->name;
+        my $testrun_id = $self->testrun->id;
+        my $local_retval = $net->stop_minion($testrun_id, $hostname);
+    }
+}
+
+
+
+sub wait_for_minion_testrun
+{
+    my ($self, $net) = @_;
+
+    if (lc($self->mcp_info->test_type) eq 'minion')
+    {
+        my $hostname = $self->testrun->testrun_scheduling->host->name;
+        my $testrun_id = $self->testrun->id;
+        #my $local_retval = $net->wait_for_minion_job($testrun_id, $hostname);
+    }
+}
+
+
+
 sub runtest_handling
 {
 
@@ -311,7 +356,7 @@ sub runtest_handling
         $self->state->state_init($self->mcp_info->get_state_config, $revive );
 
         if ($self->state->compare_given_state('reboot_install') == 1) { # before reboot_install?
-                my $error = $self->start_testrun($config);
+                my $error = $self->start_testrun($config, $revive);
                 return $error if $error;
 
                 my $message = model('TestrunDB')->resultset('Message')->new
@@ -327,8 +372,10 @@ sub runtest_handling
 
         $self->log->debug('waiting for test to finish');
         $self->wait_for_testrun();
-        $self->report_mcp_results();
+        $self->cancel_minion_prc_processes($net);
+        $self->wait_for_minion_testrun($net);
         $self->kill_local_prc_processes();
+        $self->report_mcp_results();
         return 0;
 
 }
@@ -395,6 +442,7 @@ Sends a tap report because an error occured.
 Start Installer on testmachine based on the type of testrun.
 
 @param hash ref - config
+@param bool     - revive mode
 
 @return success - 0
 @return error   - error string
@@ -418,6 +466,20 @@ Kill remaining processes from this testrun. Only done wfor testruns
 that run 'local'.
 
 @param Tapper::MC::Net object
+
+=head2 cancel_minion_prc_processes
+
+Kill remaining processes from this testrun. Only done wfor testruns
+that run 'minion'
+
+@param Tapper::MCP::Net object
+
+=head2 cancel_minion_prc_processes
+
+Kill remaining processes from this testrun. Only done for testruns
+that run 'minion'.
+
+@param Tapper::MCP::Net object
 
 =head2 runtest_handling
 
@@ -467,7 +529,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

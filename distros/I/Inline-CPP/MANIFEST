@@ -27,6 +27,7 @@ t/12custom_libs.t
 t/13version_numbers.t
 t/14changes.t
 t/15config_case.t
+t/16info.t
 t/classes/01empty_ns_is_main.t
 t/classes/02main_ns_is_main.t
 t/classes/03baz_ns_is_baz.t

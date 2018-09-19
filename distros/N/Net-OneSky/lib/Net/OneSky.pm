@@ -100,7 +100,7 @@ sub version_string {
     chdir($dir);
     open3('</dev/null', $out, '>/dev/null', qw(git rev-parse --short HEAD));
     $Net::OneSky::VERSION = <$out>;
-    chomp($Net::OneSky::VERSION);
+    chomp($Net::OneSky::VERSION) if defined($Net::OneSky::VERSION);
   };
 
   chdir($prev_dir);
@@ -167,7 +167,7 @@ Net::OneSky - Simple interface to the OneSky API: http://developer.oneskyapp.com
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 

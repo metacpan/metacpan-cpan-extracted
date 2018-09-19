@@ -69,6 +69,7 @@
             "List::Util" : "0",
             "LockFile::Simple" : "0",
             "Log::Log4perl" : "0",
+            "Minion" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "MooseX::ClassAttribute" : "0",
@@ -143,7 +144,7 @@
          "web" : "http://github.com/tapper/Tapper-MCP"
       }
    },
-   "version" : "5.0.6",
+   "version" : "5.0.7",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -482,7 +483,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.0.6",
+                  "tag" : "v5.0.7",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

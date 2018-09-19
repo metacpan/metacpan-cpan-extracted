@@ -1,0 +1,43 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Alien::Build' => '0.40',
+                                    'Alien::Build::MM' => '0.40',
+                                    'ExtUtils::MakeMaker' => '6.52'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Alien::Build' => '0.40',
+                                        'Alien::Build::MM' => '0.40',
+                                        'ExtUtils::MakeMaker' => '6.52'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '6.52',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

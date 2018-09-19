@@ -1,0 +1,52 @@
+#
+# $Id: alienfile 60 2018-09-18 01:47:22Z stro $
+#
+
+use alienfile;
+
+probe sub {
+  my ($build) = @_;
+};
+
+share {
+  plugin Download => (
+    url     => 'http://www.airspayce.com/mikem/bcm2835/bcm2835-1.56.tar.gz',
+    version => qr/^bcm2835-([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin Extract => 'tar.gz';
+
+  requires 'Path::Tiny' => '0.077';
+
+  patch sub {
+    my($build) = @_;
+
+    my $pc = Path::Tiny->new('bcm2835-1.56.pc.in');
+    if(-f $pc)
+    {
+      $pc->edit_lines(sub {
+        s/^Cflags:\s*$/Cflags: -I\${includedir}\n/;
+      });
+    }
+  };
+
+
+  plugin 'Build::Autoconf' => ();
+
+  ffi {
+
+    build [
+      '%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic',
+      '%{make}',
+      '%{make} install',
+    ];
+
+  };
+
+  meta->after_hook(
+    gather_share => sub {
+      my($build) = @_;
+      $build->runtime_prop->{$_} .= ' -DYAML_DECLARE_STATIC ' for qw( cflags cflags_static );
+    },
+  );
+
+};

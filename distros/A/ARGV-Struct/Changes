@@ -8,3 +8,7 @@
  - More tests
 0.03 2015-08-05 23:45:00
  - Compatibility with pre 5.14 Perls (GH Issue #1)
+0.04 2018-09-18 22:33:00
+ - Migrate to Moo and Type::Tiny
+0.05 2018-09-18 23:10:00
+ - Changes to dist.ini resulted in Makefile.PL not being generated

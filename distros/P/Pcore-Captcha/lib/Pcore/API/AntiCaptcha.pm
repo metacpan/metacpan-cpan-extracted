@@ -5,20 +5,13 @@ use Pcore::Captcha;
 use Pcore::Util::Data qw[to_b64 to_json from_json];
 use Pcore::Util::Scalar qw[weaken is_plain_scalarref];
 
+with qw[Pcore::Captcha::API];
+
 has api_key => ( required => 1 );
-has soft_id => ();    # AppCenter Application ID used for comission earnings
+has api_soft_id => ();    # AppCenter Application ID used for comission earnings
 
-has _signal  => sub { Coro::Signal->new };
+has _signal => sub { Coro::Signal->new };
 has _threads => ();
-has _queue   => sub { {} };
-
-# QUEUE ID
-# 1 - standart ImageToText, English language
-# 2 - standart ImageToText, Russian language
-# 3 - square recaptcha images
-# 4 - audio captcha
-# 5 - Recaptcha NoCaptcha tasks
-# 6 - Recaptcha Proxyless task
 
 const our $STATUS_REASON => {
     1  => [ 'ERROR_KEY_DOES_NOT_EXIST',        'Account authorization key not found in the system' ],
@@ -71,61 +64,132 @@ sub DESTROY ($self) {
     return;
 }
 
-sub resolve_image ( $self, $image, @args ) {
-    my $cb = pop @args;
+sub new_image ( $self, $image, %args ) {
 
-    my %args = @args;
-
-    my $body = {
-        clientKey    => $self->{api_key},
-        softId       => $self->{soft_id},
-        languagePool => $args{is_russian} ? 'ru' : 'en',
-        task         => {
-            type      => 'ImageToTextTask',
-            body      => to_b64( is_plain_scalarref $image ? $image->$* : $image, q[] ),
-            phrase    => $args{phrase} ? \1 : \0,
-            case      => $args{case_sensitive} ? \1 : \0,
-            numeric   => $args{numeric},
-            math      => $args{math} ? \1 : \0,
-            minLength => $args{min_length},
-            maxLength => $args{max_length},
-        },
-    };
-
-    $self->_resolve( $body, $cb );
-
-    return;
+    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    return Pcore::Captcha->new( {
+        %args,
+        type  => $args{is_russian}         ? $ANTICAPTCHA_QUEUE_IMAGE_RU : $ANTICAPTCHA_QUEUE_IMAGE_EN,
+        image => is_plain_scalarref $image ? $image                      : \$image,
+        api   => $self,
+    } );
 }
 
-sub resolve_nocaptcha ( $self, @ ) {
-    my $cb = $_[-1];
+sub new_nocaptcha ( $self, %args ) {
 
-    my %args = (
-        website_url => undef,
-        website_key => undef,
-        @_[ 1 .. $#_ - 1 ]
-    );
-
-    my $body = {
-        clientKey => $self->{api_key},
-        task      => {
-            type       => 'NoCaptchaTaskProxyless',
-            websiteURL => $args{website_url},
-            websiteKey => $args{website_key},
-        },
-    };
-
-    $self->_resolve( $body, $cb );
-
-    return;
+    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    return Pcore::Captcha->new( {
+        %args,
+        type => $ANTICAPTCHA_QUEUE_NOCAPTCHA,
+        api  => $self,
+    } );
 }
 
-sub report_image ( $self, $id ) {
+sub resolve ( $self, $captcha, $cb = undef ) {
+    weaken $captcha if defined wantarray;
+
+    my $cv = defined wantarray ? P->cv : undef;
+
+    my $on_finish = sub ( $status, $result = undef, $data = undef ) {
+        return if !defined $captcha;
+
+        $captcha->{is_finished} = 1;
+
+        $captcha->set_status($status);
+
+        if ( defined $result ) {
+            $captcha->{is_resolved} = 1;
+
+            $captcha->{result} = $result;
+        }
+
+        $captcha->{data} = $data;
+
+        $captcha = $cb->($captcha) if defined $cb;
+
+        $cv->($captcha) if defined $cv;
+
+        return $captcha;
+    };
+
+    my $task;
+
+    if ( $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_EN || $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_RU ) {
+        $task = {
+            languagePool => $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_EN ? 'en' : 'ru',
+            task => {
+                type      => 'ImageToTextTask',
+                body      => to_b64( $captcha->{image}->$*, q[] ),
+                phrase    => $captcha->{phrase} ? \1 : \0,
+                case      => $captcha->{case_sensitive} ? \1 : \0,
+                numeric   => $captcha->{numeric},
+                math      => $captcha->{math} ? \1 : \0,
+                minLength => $captcha->{min_length},
+                maxLength => $captcha->{max_length},
+            },
+        };
+    }
+    elsif ( $captcha->{type} == $ANTICAPTCHA_QUEUE_NOCAPTCHA ) {
+        $task = {
+            task => {
+                type       => 'NoCaptchaTaskProxyless',
+                websiteURL => $captcha->{website_url},
+                websiteKey => $captcha->{website_key},
+            },
+        };
+    }
+    else {
+        return $on_finish->( [ 400, 'Invalid captcha type' ] );
+    }
+
+    $task->{clientKey} = $self->{api_key};
+    $task->{softId}    = $self->{api_soft_id};
+
+    $task = to_json $task;
+
+  REPEAT:
+    my $res = P->http->post( 'https://api.anti-captcha.com/createTask', data => $task );
+
+    # HTTP error
+    return $on_finish->( [ $res->{status}, $res->{reason} ] ) if !$res;
+
+    my $data = eval { from_json $res->{data}->$* };
+
+    # error
+    if ( $data->{errorId} ) {
+
+        # no slot available
+        if ( $data->{errorId} == 2 ) {
+            goto REPEAT;
+        }
+
+        # error
+        else {
+            return $on_finish->( [ 500, $STATUS_REASON->{ $data->{errorId} }->[1] ] );
+        }
+    }
+
+    # accepted
+    $captcha->{id} = $data->{taskId};
+
+    $self->{_queue}->{ $captcha->{id} } = $on_finish;
+
+    if ( !$self->{_threads} ) {
+        $self->_run_resolver_thread;
+    }
+    elsif ( $self->{_signal}->awaited ) {
+        $self->{_signal}->send;
+    }
+
+    return defined $cv ? $cv->recv : ();
+}
+
+sub report_invalid ( $self, $captcha ) {
     my $res = P->http->post(
         'https://api.anti-captcha.com/reportIncorrectImageCaptcha',
         data => to_json( {    #
             clientKey => $self->{api_key},
-            taskId    => $id,
+            taskId    => $captcha->{id},
         } )
     );
 
@@ -134,6 +198,8 @@ sub report_image ( $self, $id ) {
 
         # OK
         if ( !$data->{errorId} ) {
+            $captcha->{is_reported} = 1;
+
             $res = res 200, $data->{balance};
         }
 
@@ -197,49 +263,6 @@ sub get_queue_stats ( $self, $queue_id ) {
     return $res;
 }
 
-sub _resolve ( $self, $body, $cb ) {
-
-  REPEAT:
-    my $res = P->http->post( 'https://api.anti-captcha.com/createTask', data => to_json($body) );
-
-    # HTTP ERROR
-    if ( !$res ) {
-        $cb->($res);
-
-        return;
-    }
-
-    my $data = from_json $res->{data}->$*;
-
-    # error
-    if ( $data->{errorId} ) {
-
-        # no slot available
-        if ( $data->{errorId} == 2 ) {
-            goto REPEAT;
-        }
-
-        # error
-        else {
-            $cb->( res [ 500, $STATUS_REASON->{ $data->{errorId} }->[1] ] );
-
-            return;
-        }
-    }
-
-    # accepted
-    $self->{_queue}->{ $data->{taskId} } = $cb;
-
-    if ( !$self->{_threads} ) {
-        $self->_run_resolver_thread;
-    }
-    elsif ( $self->{_signal}->awaited ) {
-        $self->{_signal}->send;
-    }
-
-    return;
-}
-
 sub _run_resolver_thread ($self) {
     weaken $self;
 
@@ -255,6 +278,8 @@ sub _run_resolver_thread ($self) {
                 my $cv = P->cv->begin;
 
                 for my $id ( keys $self->{_queue}->%* ) {
+                    $cv->begin;
+
                     P->http->post(
                         'https://api.anti-captcha.com/getTaskResult',
                         data => to_json( {
@@ -265,27 +290,30 @@ sub _run_resolver_thread ($self) {
                             if ($res) {
                                 my $data = from_json $res->{data}->$*;
 
-                                # error
-                                if ( $data->{errorId} ) {
-                                    if ( my $cb = delete $self->{_queue}->{$id} ) {
-                                        $cb->( res [ 500, $STATUS_REASON->{ $data->{errorId} }->[1] ], id => $id );
-                                    }
-                                }
+                                # task finished
+                                if ( $data->{errorId} || $data->{status} eq 'ready' ) {
 
-                                # resolved
-                                elsif ( $data->{status} eq 'ready' ) {
+                                    # captcha is present in the queue
                                     if ( my $cb = delete $self->{_queue}->{$id} ) {
-                                        $cb->(
-                                            res 200,
-                                            {   id          => $id,
-                                                result      => $data->{solution}->{text} // $data->{solution}->{gRecaptchaResponse},
-                                                cost        => $data->{cost},
-                                                ip          => $data->{ip},
-                                                create_time => $data->{createTime},
-                                                end_time    => $data->{endTime},
-                                                solve_count => $data->{solveCount},
-                                            }
-                                        );
+
+                                        # error
+                                        if ( $data->{errorId} ) {
+                                            $cb->( [ 500, $STATUS_REASON->{ $data->{errorId} }->[1] ] );
+                                        }
+
+                                        # resolved
+                                        elsif ( $data->{status} eq 'ready' ) {
+                                            $cb->(
+                                                200,
+                                                $data->{solution}->{text} // $data->{solution}->{gRecaptchaResponse},
+                                                {   cost        => $data->{cost},
+                                                    ip          => $data->{ip},
+                                                    create_time => $data->{createTime},
+                                                    end_time    => $data->{endTime},
+                                                    solve_count => $data->{solveCount},
+                                                }
+                                            );
+                                        }
                                     }
                                 }
                             }
@@ -299,7 +327,7 @@ sub _run_resolver_thread ($self) {
 
                 $cv->end->recv;
 
-                next;
+                next if defined $self && $self->{_queue}->%*;
             }
 
             $self->{_signal}->wait;
@@ -318,9 +346,9 @@ sub _run_resolver_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 270, 277             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 88                   | Subroutines::ProhibitExcessComplexity - Subroutine "resolve" with high complexity score (22)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 103                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    3 | 297, 300             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

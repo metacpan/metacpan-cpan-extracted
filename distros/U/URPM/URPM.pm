@@ -11,7 +11,7 @@ use URPM::Resolve;
 use URPM::Signature;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = '5.20';
+our $VERSION = '5.21';
 
 URPM->bootstrap($VERSION);
 
@@ -887,13 +887,13 @@ Recognized options are:
 
 They roughly correspond to command-line options to rpm(1).
 
-'callback_open' signature is (C<$data>, C<$cb_type>, C<$pkg_id>, C<pkg_name>). It _must_ return a file handler for the asked package.
+'callback_open' signature is (C<$data>, C<$cb_type>, C<$pkg_id>). It _must_ return a file handler for the asked package.
 
-'callback_close' signature is (C<$data>, C<$cb_type>, C<$pkg_id>, C<pkg_name>). It is called just before URPM close the fd for the installed package.
+'callback_close' signature is (C<$data>, C<$cb_type>, C<$pkg_id>). It is called just before URPM close the fd for the installed package.
 
 C<$cb_type> is one of 'open' or 'close'.
 
-Other Callbacks signature is callback(C<$data>, C<$cb_type>, C<$pkg_id>, C<$subtype>, C<$amout>, C<$total>, C<pkg_name>)
+Other Callbacks signature is callback(C<$data>, C<$cb_type>, C<$pkg_id>, C<$subtype>, C<$amout>, C<$total>)
 
 C<$cb_type> is one of 'elem', 'error', 'inst', 'trans' or 'uninst'. C<$subtype> can be 'start', 'progress' or 'stop'.
 For 'error', it can be 'cpio', 'script' or 'unpack'.

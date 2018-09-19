@@ -1,5 +1,5 @@
 {
-   "abstract" : "Mojolicious Plugin",
+   "abstract" : "Mojolicious Plugin (DEPRECATED)",
    "author" : [
       "Vidar Tyldum"
    ],
@@ -64,7 +64,7 @@
       },
       "Mojolicious::Plugin::Prometheus::Shared::FastMmap" : {
          "file" : "lib/Mojolicious/Plugin/Prometheus/Shared/FastMmap.pm",
-         "version" : "v1.0.1"
+         "version" : "v2.0.0"
       }
    },
    "release_status" : "stable",
@@ -78,9 +78,10 @@
          "web" : "https://github.com/tyldum/Mojolicious-Plugin-Prometheus-Shared-FastMmap"
       }
    },
-   "version" : "1.0.1",
+   "version" : "2.0.0",
    "x_authority" : "cpan:TYLDUM",
    "x_contributors" : [
       "Vidar Tyldum <vidar@tyldum.com>"
-   ]
+   ],
+   "x_deprecated" : 1
 }

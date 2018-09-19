@@ -1,6 +1,5 @@
 #!/usr/bin/perl -T
-use warnings;
-use strict;
+use strictures 2;
 
 =head1 NAME
 

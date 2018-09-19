@@ -1,17 +1,29 @@
 package ARGV::Struct;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/ArrayRef/;
+
+  our $VERSION = '0.05';
 
   has argv => (
     is => 'ro', 
-    isa => 'ArrayRef', 
+    isa => ArrayRef, 
     default => sub { [ @ARGV ] }, 
-    traits => [ 'Array' ],
-    handles => {
-      argcount => 'count',
-      arg => 'get',
-      args => 'elements',
-    }
   );
+
+  sub argcount {
+    my $self = shift;
+    return scalar(@{ $self->argv });
+  }
+
+  sub arg {
+    my ($self, $i) = @_;
+    return $self->argv->[ $i ];
+  }
+
+  sub args {
+    my $self = shift;
+    return @{ $self->argv };
+  }
 
   sub parse {
     my ($self) = @_;

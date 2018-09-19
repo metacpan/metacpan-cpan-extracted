@@ -1,6 +1,6 @@
 package Tapper::MCP::Config;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Config::VERSION = '5.0.6';
+$Tapper::MCP::Config::VERSION = '5.0.7';
 use strict;
 use warnings;
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
@@ -67,6 +67,10 @@ sub parse_hint_preconditions
                 $self->mcp_info->test_type('local');
                 $config->{prcs}->[0]->{skip_startscript} = 1;
                 $self->mcp_info->skip_install(1) if $precondition->{skip_install};
+        } elsif ($precondition->{minion}) {
+                $self->mcp_info->test_type('minion');
+                $config->{prcs}->[0]->{skip_startscript} = 1;
+                $self->mcp_info->skip_install(1);
         }
         return $config;
 }
@@ -1044,7 +1048,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

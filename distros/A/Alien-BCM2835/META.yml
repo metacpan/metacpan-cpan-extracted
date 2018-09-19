@@ -1,0 +1,40 @@
+---
+abstract: 'Alien installation of bcm2835 library'
+author:
+  - 'Serguei Trouchelle <stro@cpan.org>'
+build_requires:
+  Alien::Build: '0.40'
+  Alien::Build::MM: '0.40'
+  ExtUtils::MakeMaker: '6.52'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Build: '0.40'
+  Alien::Build::MM: '0.40'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-BCM2835
+version: '1.056'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Zlib: '0'
+      Path::Tiny: '0.077'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

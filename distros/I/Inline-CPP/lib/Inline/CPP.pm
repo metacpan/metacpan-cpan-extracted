@@ -19,7 +19,7 @@ our @ISA = qw( Inline::C );    ## no critic (ISA)
 # Development releases will have a _0xx version suffix.
 # We eval the version number to accommodate dev. version numbering, as
 # described in perldoc perlmodstyle.
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 # $VERSION = eval $VERSION; ## no critic (eval)
 
 my $TYPEMAP_KIND;
@@ -222,7 +222,7 @@ sub _add_libs {
 #============================================================================
 sub info {
   my $o    = shift;
-  my $info = q{};
+  my $info = $o->SUPER::info;
 
   $o->parse unless $o->{ILSM}{parser};
   my $data = $o->{ILSM}{parser}{data};

@@ -23,5 +23,13 @@ sub static :Path(static) Args {
   };
 }
 
+sub absolute :Path(absolute) Args(0) {
+  my ($self, $c) = @_;
+  $c->serve_file("a.txt", +{root=>'/var'}) || do {
+    $c->res->status(404);
+    $c->res->body('Not Found!');
+  };
+}
+
 __PACKAGE__->config(namespace=>'');
 __PACKAGE__->meta->make_immutable;

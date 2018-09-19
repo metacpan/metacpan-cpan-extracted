@@ -1,7 +1,7 @@
 {
    "abstract" : "Restore paths from borg backups",
    "author" : [
-      "-2017  Florian Pritz <bluewind@xinu.at>"
+      "-2018  Florian Pritz <bluewind@xinu.at>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.2",
@@ -64,7 +64,8 @@
             "Pod::Usage" : "0",
             "Version::Compare" : "0",
             "autodie" : "0",
-            "perl" : "v5.14.0"
+            "perl" : "v5.14.0",
+            "strictures" : "0"
          }
       },
       "test" : {
@@ -83,7 +84,7 @@
    "provides" : {
       "App::BorgRestore" : {
          "file" : "lib/App/BorgRestore.pm",
-         "version" : "v3.1.0"
+         "version" : "v3.2.0"
       },
       "App::BorgRestore::Borg" : {
          "file" : "lib/App/BorgRestore/Borg.pm"
@@ -93,6 +94,12 @@
       },
       "App::BorgRestore::Helper" : {
          "file" : "lib/App/BorgRestore/Helper.pm"
+      },
+      "App::BorgRestore::PathTimeTable::DB" : {
+         "file" : "lib/App/BorgRestore/PathTimeTable/DB.pm"
+      },
+      "App::BorgRestore::PathTimeTable::Memory" : {
+         "file" : "lib/App/BorgRestore/PathTimeTable/Memory.pm"
       },
       "App::BorgRestore::Settings" : {
          "file" : "lib/App/BorgRestore/Settings.pm"
@@ -109,7 +116,7 @@
          "web" : "https://github.com/Bluewind/App-BorgRestore"
       }
    },
-   "version" : "3.1.0",
+   "version" : "3.2.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 0
 }

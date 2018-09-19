@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -18,8 +18,8 @@ use File::Copy;
 
 $| = 1;
 
-my $Version  = "1.30";
-my $Latest_t = "5.029000";
+my $Version  = "1.31";
+my $Latest_t = "5.029002";
 my $Author   = 'paul@pjcj.net';
 my @perlbug  = ("perlbug", "-a", $Author,
                            "-s", "Installation of Devel::Cover $Version");
@@ -31,7 +31,7 @@ my @inc      = sort keys %inc;
 open I, ">lib/Devel/Cover/Inc.pm"
     or die "Cannot open lib/Devel/Cover/Inc.pm: $!";
 print I <<"EOI";
-# Copyright 2001-2017, Paul Johnson (paul\@pjcj.net)
+# Copyright 2001-2018, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -86,7 +86,7 @@ my @tests;
 opendir D, "tests" or die "Cannot opendir tests: $!";
 for my $t (readdir D) {
     next unless -f "tests/$t";
-    next if $t =~ /\.(pm|pl|org|bak|uncoverable)$/;
+    next if $t =~ /\.(pm|pl|org|bak|uncoverable|swp)$/;
     next if $t =~ /~$/;
 
     push @tests, $t;
@@ -101,7 +101,7 @@ for my $t (readdir D) {
     print T <<EOT;
 #!$^X
 
-# Copyright 2002-2017, Paul Johnson (paul\@pjcj.net)
+# Copyright 2002-2018, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 

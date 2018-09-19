@@ -1,0 +1,1116 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/StockExchangeUtils/list_stock_exchanges
+# and generated automatically using Perinci::CmdLine::Gen version 0.486
+
+our $DATE = '2018-09-19'; # DATE
+our $DIST = 'App-StockExchangeUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/StockExchangeUtils/list_stock_exchanges",
+    program_name => "list-stock-exchanges",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Catalog (list) of stock exchanges
+# PODNAME: list-stock-exchanges
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-stock-exchanges - Catalog (list) of stock exchanges
+
+=head1 VERSION
+
+This document describes version 0.001 of list-stock-exchanges (from Perl distribution App-StockExchangeUtils), released on 2018-09-19.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-stock-exchanges [options] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for add_codes options
+
+=over
+
+=item B<--add-codes-contains>=I<s>
+
+Only return records where the 'add_codes' field contains specified text.
+
+=item B<--add-codes-in-json>=I<s>
+
+Only return records where the 'add_codes' field is in the specified values (JSON-encoded).
+
+See C<--add-codes-in>.
+
+=item B<--add-codes-in>=I<s@>
+
+Only return records where the 'add_codes' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--add-codes-is>=I<s>
+
+Only return records where the 'add_codes' field equals specified value.
+
+=item B<--add-codes-isnt>=I<s>
+
+Only return records where the 'add_codes' field does not equal specified value.
+
+=item B<--add-codes-max>=I<s>
+
+Only return records where the 'add_codes' field is less than or equal to specified value.
+
+=item B<--add-codes-min>=I<s>
+
+Only return records where the 'add_codes' field is greater than or equal to specified value.
+
+=item B<--add-codes-not-contains>=I<s>
+
+Only return records where the 'add_codes' field does not contain specified text.
+
+=item B<--add-codes-not-in-json>=I<s>
+
+Only return records where the 'add_codes' field is not in the specified values (JSON-encoded).
+
+See C<--add-codes-not-in>.
+
+=item B<--add-codes-not-in>=I<s@>
+
+Only return records where the 'add_codes' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--add-codes-xmax>=I<s>
+
+Only return records where the 'add_codes' field is less than specified value.
+
+=item B<--add-codes-xmin>=I<s>
+
+Only return records where the 'add_codes' field is greater than specified value.
+
+=item B<--add-codes>=I<s>
+
+Only return records where the 'add_codes' field equals specified value.
+
+=back
+
+=head2 Filtering for add_names options
+
+=over
+
+=item B<--add-names-contains>=I<s>
+
+Only return records where the 'add_names' field contains specified text.
+
+=item B<--add-names-in-json>=I<s>
+
+Only return records where the 'add_names' field is in the specified values (JSON-encoded).
+
+See C<--add-names-in>.
+
+=item B<--add-names-in>=I<s@>
+
+Only return records where the 'add_names' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--add-names-is>=I<s>
+
+Only return records where the 'add_names' field equals specified value.
+
+=item B<--add-names-isnt>=I<s>
+
+Only return records where the 'add_names' field does not equal specified value.
+
+=item B<--add-names-max>=I<s>
+
+Only return records where the 'add_names' field is less than or equal to specified value.
+
+=item B<--add-names-min>=I<s>
+
+Only return records where the 'add_names' field is greater than or equal to specified value.
+
+=item B<--add-names-not-contains>=I<s>
+
+Only return records where the 'add_names' field does not contain specified text.
+
+=item B<--add-names-not-in-json>=I<s>
+
+Only return records where the 'add_names' field is not in the specified values (JSON-encoded).
+
+See C<--add-names-not-in>.
+
+=item B<--add-names-not-in>=I<s@>
+
+Only return records where the 'add_names' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--add-names-xmax>=I<s>
+
+Only return records where the 'add_names' field is less than specified value.
+
+=item B<--add-names-xmin>=I<s>
+
+Only return records where the 'add_names' field is greater than specified value.
+
+=item B<--add-names>=I<s>
+
+Only return records where the 'add_names' field equals specified value.
+
+=back
+
+=head2 Filtering for add_yf_codes options
+
+=over
+
+=item B<--add-yf-codes-contains>=I<s>
+
+Only return records where the 'add_yf_codes' field contains specified text.
+
+=item B<--add-yf-codes-in-json>=I<s>
+
+Only return records where the 'add_yf_codes' field is in the specified values (JSON-encoded).
+
+See C<--add-yf-codes-in>.
+
+=item B<--add-yf-codes-in>=I<s@>
+
+Only return records where the 'add_yf_codes' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--add-yf-codes-is>=I<s>
+
+Only return records where the 'add_yf_codes' field equals specified value.
+
+=item B<--add-yf-codes-isnt>=I<s>
+
+Only return records where the 'add_yf_codes' field does not equal specified value.
+
+=item B<--add-yf-codes-max>=I<s>
+
+Only return records where the 'add_yf_codes' field is less than or equal to specified value.
+
+=item B<--add-yf-codes-min>=I<s>
+
+Only return records where the 'add_yf_codes' field is greater than or equal to specified value.
+
+=item B<--add-yf-codes-not-contains>=I<s>
+
+Only return records where the 'add_yf_codes' field does not contain specified text.
+
+=item B<--add-yf-codes-not-in-json>=I<s>
+
+Only return records where the 'add_yf_codes' field is not in the specified values (JSON-encoded).
+
+See C<--add-yf-codes-not-in>.
+
+=item B<--add-yf-codes-not-in>=I<s@>
+
+Only return records where the 'add_yf_codes' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--add-yf-codes-xmax>=I<s>
+
+Only return records where the 'add_yf_codes' field is less than specified value.
+
+=item B<--add-yf-codes-xmin>=I<s>
+
+Only return records where the 'add_yf_codes' field is greater than specified value.
+
+=item B<--add-yf-codes>=I<s>
+
+Only return records where the 'add_yf_codes' field equals specified value.
+
+=back
+
+=head2 Filtering for city options
+
+=over
+
+=item B<--city-contains>=I<s>
+
+Only return records where the 'city' field contains specified text.
+
+=item B<--city-in-json>=I<s>
+
+Only return records where the 'city' field is in the specified values (JSON-encoded).
+
+See C<--city-in>.
+
+=item B<--city-in>=I<s@>
+
+Only return records where the 'city' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--city-is>=I<s>
+
+Only return records where the 'city' field equals specified value.
+
+=item B<--city-isnt>=I<s>
+
+Only return records where the 'city' field does not equal specified value.
+
+=item B<--city-max>=I<s>
+
+Only return records where the 'city' field is less than or equal to specified value.
+
+=item B<--city-min>=I<s>
+
+Only return records where the 'city' field is greater than or equal to specified value.
+
+=item B<--city-not-contains>=I<s>
+
+Only return records where the 'city' field does not contain specified text.
+
+=item B<--city-not-in-json>=I<s>
+
+Only return records where the 'city' field is not in the specified values (JSON-encoded).
+
+See C<--city-not-in>.
+
+=item B<--city-not-in>=I<s@>
+
+Only return records where the 'city' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--city-xmax>=I<s>
+
+Only return records where the 'city' field is less than specified value.
+
+=item B<--city-xmin>=I<s>
+
+Only return records where the 'city' field is greater than specified value.
+
+=item B<--city>=I<s>
+
+Only return records where the 'city' field equals specified value.
+
+=back
+
+=head2 Filtering for code options
+
+=over
+
+=item B<--code-contains>=I<s>
+
+Only return records where the 'code' field contains specified text.
+
+=item B<--code-in-json>=I<s>
+
+Only return records where the 'code' field is in the specified values (JSON-encoded).
+
+See C<--code-in>.
+
+=item B<--code-in>=I<s@>
+
+Only return records where the 'code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-is>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=item B<--code-isnt>=I<s>
+
+Only return records where the 'code' field does not equal specified value.
+
+=item B<--code-max>=I<s>
+
+Only return records where the 'code' field is less than or equal to specified value.
+
+=item B<--code-min>=I<s>
+
+Only return records where the 'code' field is greater than or equal to specified value.
+
+=item B<--code-not-contains>=I<s>
+
+Only return records where the 'code' field does not contain specified text.
+
+=item B<--code-not-in-json>=I<s>
+
+Only return records where the 'code' field is not in the specified values (JSON-encoded).
+
+See C<--code-not-in>.
+
+=item B<--code-not-in>=I<s@>
+
+Only return records where the 'code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-xmax>=I<s>
+
+Only return records where the 'code' field is less than specified value.
+
+=item B<--code-xmin>=I<s>
+
+Only return records where the 'code' field is greater than specified value.
+
+=item B<--code>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=back
+
+=head2 Filtering for country options
+
+=over
+
+=item B<--country-contains>=I<s>
+
+Only return records where the 'country' field contains specified text.
+
+=item B<--country-in-json>=I<s>
+
+Only return records where the 'country' field is in the specified values (JSON-encoded).
+
+See C<--country-in>.
+
+=item B<--country-in>=I<s@>
+
+Only return records where the 'country' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--country-is>=I<s>
+
+Only return records where the 'country' field equals specified value.
+
+=item B<--country-isnt>=I<s>
+
+Only return records where the 'country' field does not equal specified value.
+
+=item B<--country-max>=I<s>
+
+Only return records where the 'country' field is less than or equal to specified value.
+
+=item B<--country-min>=I<s>
+
+Only return records where the 'country' field is greater than or equal to specified value.
+
+=item B<--country-not-contains>=I<s>
+
+Only return records where the 'country' field does not contain specified text.
+
+=item B<--country-not-in-json>=I<s>
+
+Only return records where the 'country' field is not in the specified values (JSON-encoded).
+
+See C<--country-not-in>.
+
+=item B<--country-not-in>=I<s@>
+
+Only return records where the 'country' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--country-xmax>=I<s>
+
+Only return records where the 'country' field is less than specified value.
+
+=item B<--country-xmin>=I<s>
+
+Only return records where the 'country' field is greater than specified value.
+
+=item B<--country>=I<s>
+
+Only return records where the 'country' field equals specified value.
+
+=back
+
+=head2 Filtering for eng_name options
+
+=over
+
+=item B<--eng-name-contains>=I<s>
+
+Only return records where the 'eng_name' field contains specified text.
+
+=item B<--eng-name-in-json>=I<s>
+
+Only return records where the 'eng_name' field is in the specified values (JSON-encoded).
+
+See C<--eng-name-in>.
+
+=item B<--eng-name-in>=I<s@>
+
+Only return records where the 'eng_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--eng-name-is>=I<s>
+
+Only return records where the 'eng_name' field equals specified value.
+
+=item B<--eng-name-isnt>=I<s>
+
+Only return records where the 'eng_name' field does not equal specified value.
+
+=item B<--eng-name-max>=I<s>
+
+Only return records where the 'eng_name' field is less than or equal to specified value.
+
+=item B<--eng-name-min>=I<s>
+
+Only return records where the 'eng_name' field is greater than or equal to specified value.
+
+=item B<--eng-name-not-contains>=I<s>
+
+Only return records where the 'eng_name' field does not contain specified text.
+
+=item B<--eng-name-not-in-json>=I<s>
+
+Only return records where the 'eng_name' field is not in the specified values (JSON-encoded).
+
+See C<--eng-name-not-in>.
+
+=item B<--eng-name-not-in>=I<s@>
+
+Only return records where the 'eng_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--eng-name-xmax>=I<s>
+
+Only return records where the 'eng_name' field is less than specified value.
+
+=item B<--eng-name-xmin>=I<s>
+
+Only return records where the 'eng_name' field is greater than specified value.
+
+=item B<--eng-name>=I<s>
+
+Only return records where the 'eng_name' field equals specified value.
+
+=back
+
+=head2 Filtering for founded options
+
+=over
+
+=item B<--founded-contains>=I<s>
+
+Only return records where the 'founded' field contains specified text.
+
+=item B<--founded-in-json>=I<s>
+
+Only return records where the 'founded' field is in the specified values (JSON-encoded).
+
+See C<--founded-in>.
+
+=item B<--founded-in>=I<s@>
+
+Only return records where the 'founded' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--founded-is>=I<s>
+
+Only return records where the 'founded' field equals specified value.
+
+=item B<--founded-isnt>=I<s>
+
+Only return records where the 'founded' field does not equal specified value.
+
+=item B<--founded-max>=I<s>
+
+Only return records where the 'founded' field is less than or equal to specified value.
+
+=item B<--founded-min>=I<s>
+
+Only return records where the 'founded' field is greater than or equal to specified value.
+
+=item B<--founded-not-contains>=I<s>
+
+Only return records where the 'founded' field does not contain specified text.
+
+=item B<--founded-not-in-json>=I<s>
+
+Only return records where the 'founded' field is not in the specified values (JSON-encoded).
+
+See C<--founded-not-in>.
+
+=item B<--founded-not-in>=I<s@>
+
+Only return records where the 'founded' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--founded-xmax>=I<s>
+
+Only return records where the 'founded' field is less than specified value.
+
+=item B<--founded-xmin>=I<s>
+
+Only return records where the 'founded' field is greater than specified value.
+
+=item B<--founded>=I<s>
+
+Only return records where the 'founded' field equals specified value.
+
+=back
+
+=head2 Filtering for local_name options
+
+=over
+
+=item B<--local-name-contains>=I<s>
+
+Only return records where the 'local_name' field contains specified text.
+
+=item B<--local-name-in-json>=I<s>
+
+Only return records where the 'local_name' field is in the specified values (JSON-encoded).
+
+See C<--local-name-in>.
+
+=item B<--local-name-in>=I<s@>
+
+Only return records where the 'local_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--local-name-is>=I<s>
+
+Only return records where the 'local_name' field equals specified value.
+
+=item B<--local-name-isnt>=I<s>
+
+Only return records where the 'local_name' field does not equal specified value.
+
+=item B<--local-name-max>=I<s>
+
+Only return records where the 'local_name' field is less than or equal to specified value.
+
+=item B<--local-name-min>=I<s>
+
+Only return records where the 'local_name' field is greater than or equal to specified value.
+
+=item B<--local-name-not-contains>=I<s>
+
+Only return records where the 'local_name' field does not contain specified text.
+
+=item B<--local-name-not-in-json>=I<s>
+
+Only return records where the 'local_name' field is not in the specified values (JSON-encoded).
+
+See C<--local-name-not-in>.
+
+=item B<--local-name-not-in>=I<s@>
+
+Only return records where the 'local_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--local-name-xmax>=I<s>
+
+Only return records where the 'local_name' field is less than specified value.
+
+=item B<--local-name-xmin>=I<s>
+
+Only return records where the 'local_name' field is greater than specified value.
+
+=item B<--local-name>=I<s>
+
+Only return records where the 'local_name' field equals specified value.
+
+=back
+
+=head2 Filtering for mic options
+
+=over
+
+=item B<--mic-contains>=I<s>
+
+Only return records where the 'mic' field contains specified text.
+
+=item B<--mic-in-json>=I<s>
+
+Only return records where the 'mic' field is in the specified values (JSON-encoded).
+
+See C<--mic-in>.
+
+=item B<--mic-in>=I<s@>
+
+Only return records where the 'mic' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--mic-is>=I<s>
+
+Only return records where the 'mic' field equals specified value.
+
+=item B<--mic-isnt>=I<s>
+
+Only return records where the 'mic' field does not equal specified value.
+
+=item B<--mic-max>=I<s>
+
+Only return records where the 'mic' field is less than or equal to specified value.
+
+=item B<--mic-min>=I<s>
+
+Only return records where the 'mic' field is greater than or equal to specified value.
+
+=item B<--mic-not-contains>=I<s>
+
+Only return records where the 'mic' field does not contain specified text.
+
+=item B<--mic-not-in-json>=I<s>
+
+Only return records where the 'mic' field is not in the specified values (JSON-encoded).
+
+See C<--mic-not-in>.
+
+=item B<--mic-not-in>=I<s@>
+
+Only return records where the 'mic' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--mic-xmax>=I<s>
+
+Only return records where the 'mic' field is less than specified value.
+
+=item B<--mic-xmin>=I<s>
+
+Only return records where the 'mic' field is greater than specified value.
+
+=item B<--mic>=I<s>
+
+Only return records where the 'mic' field equals specified value.
+
+=back
+
+=head2 Filtering for status options
+
+=over
+
+=item B<--status-contains>=I<s>
+
+Only return records where the 'status' field contains specified text.
+
+=item B<--status-in-json>=I<s>
+
+Only return records where the 'status' field is in the specified values (JSON-encoded).
+
+See C<--status-in>.
+
+=item B<--status-in>=I<s@>
+
+Only return records where the 'status' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-is>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=item B<--status-isnt>=I<s>
+
+Only return records where the 'status' field does not equal specified value.
+
+=item B<--status-max>=I<s>
+
+Only return records where the 'status' field is less than or equal to specified value.
+
+=item B<--status-min>=I<s>
+
+Only return records where the 'status' field is greater than or equal to specified value.
+
+=item B<--status-not-contains>=I<s>
+
+Only return records where the 'status' field does not contain specified text.
+
+=item B<--status-not-in-json>=I<s>
+
+Only return records where the 'status' field is not in the specified values (JSON-encoded).
+
+See C<--status-not-in>.
+
+=item B<--status-not-in>=I<s@>
+
+Only return records where the 'status' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--status-xmax>=I<s>
+
+Only return records where the 'status' field is less than specified value.
+
+=item B<--status-xmin>=I<s>
+
+Only return records where the 'status' field is greater than specified value.
+
+=item B<--status>=I<s>
+
+Only return records where the 'status' field equals specified value.
+
+=back
+
+=head2 Filtering for types options
+
+=over
+
+=item B<--types-contains>=I<s>
+
+Only return records where the 'types' field contains specified text.
+
+=item B<--types-in-json>=I<s>
+
+Only return records where the 'types' field is in the specified values (JSON-encoded).
+
+See C<--types-in>.
+
+=item B<--types-in>=I<s@>
+
+Only return records where the 'types' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--types-is>=I<s>
+
+Only return records where the 'types' field equals specified value.
+
+=item B<--types-isnt>=I<s>
+
+Only return records where the 'types' field does not equal specified value.
+
+=item B<--types-max>=I<s>
+
+Only return records where the 'types' field is less than or equal to specified value.
+
+=item B<--types-min>=I<s>
+
+Only return records where the 'types' field is greater than or equal to specified value.
+
+=item B<--types-not-contains>=I<s>
+
+Only return records where the 'types' field does not contain specified text.
+
+=item B<--types-not-in-json>=I<s>
+
+Only return records where the 'types' field is not in the specified values (JSON-encoded).
+
+See C<--types-not-in>.
+
+=item B<--types-not-in>=I<s@>
+
+Only return records where the 'types' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--types-xmax>=I<s>
+
+Only return records where the 'types' field is less than specified value.
+
+=item B<--types-xmin>=I<s>
+
+Only return records where the 'types' field is greater than specified value.
+
+=item B<--types>=I<s>
+
+Only return records where the 'types' field equals specified value.
+
+=back
+
+=head2 Filtering for yf_code options
+
+=over
+
+=item B<--yf-code-contains>=I<s>
+
+Only return records where the 'yf_code' field contains specified text.
+
+=item B<--yf-code-in-json>=I<s>
+
+Only return records where the 'yf_code' field is in the specified values (JSON-encoded).
+
+See C<--yf-code-in>.
+
+=item B<--yf-code-in>=I<s@>
+
+Only return records where the 'yf_code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--yf-code-is>=I<s>
+
+Only return records where the 'yf_code' field equals specified value.
+
+=item B<--yf-code-isnt>=I<s>
+
+Only return records where the 'yf_code' field does not equal specified value.
+
+=item B<--yf-code-max>=I<s>
+
+Only return records where the 'yf_code' field is less than or equal to specified value.
+
+=item B<--yf-code-min>=I<s>
+
+Only return records where the 'yf_code' field is greater than or equal to specified value.
+
+=item B<--yf-code-not-contains>=I<s>
+
+Only return records where the 'yf_code' field does not contain specified text.
+
+=item B<--yf-code-not-in-json>=I<s>
+
+Only return records where the 'yf_code' field is not in the specified values (JSON-encoded).
+
+See C<--yf-code-not-in>.
+
+=item B<--yf-code-not-in>=I<s@>
+
+Only return records where the 'yf_code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--yf-code-xmax>=I<s>
+
+Only return records where the 'yf_code' field is less than specified value.
+
+=item B<--yf-code-xmin>=I<s>
+
+Only return records where the 'yf_code' field is greater than specified value.
+
+=item B<--yf-code>=I<s>
+
+Only return records where the 'yf_code' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-stock-exchanges list-stock-exchanges
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-stock-exchanges 'p/*/`list-stock-exchanges`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-StockExchangeUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-StockExchangeUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-StockExchangeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

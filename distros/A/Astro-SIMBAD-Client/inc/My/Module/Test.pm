@@ -6,7 +6,12 @@ use warnings;
 use Astro::SIMBAD::Client;
 use Test::More 0.88;
 
-use base qw{ Exporter };
+use Exporter ();
+our @ISA = qw{ Exporter };
+
+use constant ARRAY_REF	=> ref [];
+use constant HASH_REF	=> ref {};
+use constant REGEXP_REF	=> ref qr{};
 
 our @EXPORT_OK = qw{
     access
@@ -50,8 +55,8 @@ sub access () {	## no critic (ProhibitSubroutinePrototypes)
 	require LWP::UserAgent;
 	1;
     } or plan skip_all => 'Can not load LWP::UserAgent';
-    my $svr = Astro::SIMBAD::Client->get ('server');
-    my $resp = LWP::UserAgent->new->get ("http://$svr/simbad/");
+    my $resp = LWP::UserAgent->new(
+    )->get( Astro::SIMBAD::Client->__build_url( 'simbad/' ) );
     $resp->is_success
 	or plan skip_all => "@{[$resp->status_line]}";
     return;
@@ -64,7 +69,7 @@ sub call (@) {	## no critic (ProhibitSubroutinePrototypes)
 	$got = $obj->$method( @args );
 	1;
     } or do {
-	_method_failure( $method );
+	_method_failure( $method, @args );
 	$got = $@;
     };
     $ref = ref $got ? $got : undef;
@@ -78,7 +83,7 @@ sub call_a (@) {	## no critic (ProhibitSubroutinePrototypes)
 	$got = [ $obj->$method( @args ) ];
 	1;
     } or do {
-	_method_failure( $method );
+	_method_failure( $method. @args );
 	$got = $@;
     };
     $ref = ref $got ? $got : undef;
@@ -90,9 +95,9 @@ sub canned (@) {	## no critic (ProhibitSubroutinePrototypes)
     my $want = $canned;
     foreach my $key (@args) {
 	my $ref = ref $want;
-	if ($ref eq 'ARRAY') {
+	if ( ARRAY_REF eq $ref ) {
 	    $want = $want->[$key];
-	} elsif ($ref eq 'HASH') {
+	} elsif ( HASH_REF eq $ref ) {
 	    $want = $want->{$key};
 	} elsif ($ref) {
 	    die "Loaded data contains unexpected $ref reference for key $key\n";
@@ -111,7 +116,7 @@ sub clear (@) {	## no critic (ProhibitSubroutinePrototypes)
 }
 
 sub count () {	## no critic (ProhibitSubroutinePrototypes)
-    if ( 'ARRAY' eq ref $got ) {
+    if ( ARRAY_REF eq ref $got ) {
 	$got = @{ $got };
     } else {
 	$got = undef;
@@ -128,9 +133,9 @@ sub deref_curr (@) {	## no critic (ProhibitSubroutinePrototypes)
     my ( @args ) = @_;
     foreach my $key (@args) {
 	my $type = ref $got;
-	if ($type eq 'ARRAY') {
+	if ( ARRAY_REF eq $type ) {
 	    $got = $got->[$key];
-	} elsif ($type eq 'HASH') {
+	} elsif ($type eq HASH_REF) {
 	    $got = $got->{$key};
 	} else {
 	    $got = undef;
@@ -161,14 +166,14 @@ sub end () {	## no critic (ProhibitSubroutinePrototypes)
 sub find (@) {	## no critic (ProhibitSubroutinePrototypes)
     my ( @args ) = @_;
     my $target = pop @args;
-    if (ref $got eq 'ARRAY') {
+    if ( ARRAY_REF eq ref $got ) {
 	foreach my $item ( @{ $got } ) {
 	    my $test = $item;
 	    foreach my $key ( @args ) {
 		my $type = ref $test;
-		if ($type eq 'ARRAY') {
+		if ( ARRAY_REF eq $type ) {
 		    $test = $test->[$key];
-		} elsif ($type eq 'HASH') {
+		} elsif ( HASH_REF eq $type ) {
 		    $test = $test->{$key};
 		} else {
 		    $test = undef;
@@ -189,18 +194,10 @@ sub hidden ($) {
 }
 
 sub load_data ($) {	## no critic (ProhibitSubroutinePrototypes)
-    my ( @args ) = @_;
-    if ( @args ) {
-	my $fn = $args[0];
-	open (my $fh, '<', $fn) or die "Failed to open $fn: $!\n";
-	local $/ = undef;
-	# Perl::Critic does not like string evals, but the
-	# following needs to load arbitrary data dumped with
-	# Data::Dumper. I could switch to YAML, but that is
-	# not a core module.
-	$canned = eval scalar <$fh>;	## no critic (ProhibitStringyEval)
-	$canned or die $@;
-	close $fh;
+    my ( $arg ) = @_;
+    if ( defined $arg ) {
+	local @INC = ( @INC, '.' );
+	$canned = do $arg;
     } else {
 	$canned = undef;
     }
@@ -286,7 +283,7 @@ sub _test {		## no critic (RequireArgUnpacking)
 	SKIP: {
 	    skip $skip, 1;
 	}
-    } elsif (ref $want eq 'Regexp') {
+    } elsif ( REGEXP_REF eq ref $want ) {
 	@_ = ( $got, $want, $title );
 	goto $type ? \&like : \&unlike;
     } elsif (_numberp ($want) && _numberp ($got)) {
@@ -302,17 +299,28 @@ sub _test {		## no critic (RequireArgUnpacking)
 ##################################################################
 
 sub _method_failure {
-    my ( $method ) = @_;
+    my ( $method, @args ) = @_;
     $skip
 	and $silent
 	and return;
     my $msg = $skip ? ' ($skip set)' : '';
-    diag "$method failed$msg: $@";
+    @args = map { _quote() } @args;
+    local $" = ', ';
+    diag "$method( @args ) failed$msg: $@";
     return;
 }
 
 sub _numberp {
     return ($_[0] =~ m/^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/);
+}
+
+sub _quote {
+    defined $_
+	or return 'undef';
+    _numberp( $_ )
+	and return $_;
+    s/ ( ['\\] ) /\\$1/smx;
+    return "'$_'";
 }
 
 1;
@@ -498,7 +506,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016 by Thomas R. Wyant, III
+Copyright (C) 2011-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

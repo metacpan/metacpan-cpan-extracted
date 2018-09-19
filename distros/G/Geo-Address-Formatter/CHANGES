@@ -1,5 +1,11 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.67   2018-09-19
+       - more Washington DC improvements
+
+1.66   2018-09-19
+       - deal better with Washington DC edge case (is both a city and a state)
+       
 1.65   2018-07-23
        - better error message for the case when we are unable to abbreviate
          due to not being supplied a country_code

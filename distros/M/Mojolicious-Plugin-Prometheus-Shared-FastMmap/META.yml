@@ -1,5 +1,5 @@
 ---
-abstract: 'Mojolicious Plugin'
+abstract: 'Mojolicious Plugin (DEPRECATED)'
 author:
   - 'Vidar Tyldum'
 build_requires:
@@ -28,7 +28,7 @@ provides:
     file: lib/Mojolicious/Plugin/Prometheus/Role/SharedFastMmap.pm
   Mojolicious::Plugin::Prometheus::Shared::FastMmap:
     file: lib/Mojolicious/Plugin/Prometheus/Shared/FastMmap.pm
-    version: v1.0.1
+    version: v2.0.0
 requires:
   CHI::Driver::FastMmap: '0'
   Cache::FastMmap: '0'
@@ -40,7 +40,8 @@ resources:
   bugtracker: https://github.com/tyldum/Mojolicious-Plugin-Prometheus-Shared-FastMmap/issues
   homepage: https://github.com/tyldum/Mojolicious-Plugin-Prometheus-Shared-FastMmap
   repository: git://github.com/tyldum/Mojolicious-Plugin-Prometheus-Shared-FastMmap.git
-version: 1.0.1
+version: 2.0.0
 x_authority: cpan:TYLDUM
 x_contributors:
   - 'Vidar Tyldum <vidar@tyldum.com>'
+x_deprecated: 1

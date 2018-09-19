@@ -1,4 +1,4 @@
-# Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.30'; # VERSION
+our $VERSION = '1.31'; # VERSION
 }
 
 use DynaLoader ();
@@ -1025,6 +1025,11 @@ sub deparse {
             # Collect everything under here
             local ($File, $Line) = ($File, $Line);
             # print STDERR "Collecting $$op under $File:$Line\n";
+            no warnings "redefine";
+            my $use_dumper = $class eq 'SVOP' && $name eq 'const';
+            local *B::Deparse::const = \&B::Deparse::const_dumper
+              if $use_dumper;
+            require Data::Dumper if $use_dumper;
             $deparse = eval { local $^W; $Original{deparse}->($self, @_) };
             $deparse =~ s/^\010+//mg if defined $deparse;
             $deparse = "Deparse error: $@" if $@;
@@ -1284,7 +1289,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 
@@ -1803,7 +1808,7 @@ Please report new bugs on Github.
 
 =head1 LICENCE
 
-Copyright 2001-2017, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2018, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

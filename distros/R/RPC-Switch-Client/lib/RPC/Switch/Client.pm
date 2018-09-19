@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base -base;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -40,7 +40,7 @@ use MojoX::NetstringStream 0.06;
 
 
 has [qw(
-	actions address auth channels clientid conn daemon pidfile debug json lastping
+	actions address auth channels clientid conn debug json lastping
 	log method ns ping_timeout port rpc timeout tls token who
 )];
 
@@ -60,37 +60,24 @@ sub new {
 	my ($class, %args) = @_;
 	my $self = $class->SUPER::new();
 
-	my $address = $args{address} // '127.0.0.1';
 	my $debug = $args{debug} // 0; # or 1?
-	my $json = $args{json} // 1;
 	my $log = $args{log} // Mojo::Log->new(level => ($debug) ? 'debug' : 'info');
-	my $method = $args{method} // 'password';
-	my $port = $args{port} // 6551;
-	my $timeout = $args{timeout} // 60;
-	my $tls = $args{tls} // 0;
-	my $tls_ca = $args{tls_ca};
-	my $tls_cert = $args{tls_cert};
-	my $tls_key = $args{tls_key};
-	my $token = $args{token} or croak 'no token?';
-	my $who = $args{who} or croak 'no who?';
 
-	$self->{address} = $address;
+	$self->{address} = $args{address} // '127.0.0.1';
 	$self->{channels} = {}; # per channel hash of waitids
-	$self->{daemon} = $args{daemon} // 0;
-	$self->{pidfile} = $args{pidfile};
-	$self->{debug} = $args{debug} // 1;
-	$self->{json} = $json;
+	$self->{debug} = $debug;
+	$self->{json} = $args{json} // 1;
 	$self->{ping_timeout} = $args{ping_timeout} // 300;
 	$self->{log} = $log;
-	$self->{method} = $method;
-	$self->{port} = $port;
-	$self->{timeout} = $timeout;
-	$self->{tls} = $tls;
-	$self->{tls_ca} = $tls_ca;
-	$self->{tls_cert} = $tls_cert;
-	$self->{tls_key} = $tls_key;
-	$self->{token} = $token;
-	$self->{who} = $who;
+	$self->{method} = $args{method} // 'password';
+	$self->{port} = $args{port} // 6551;
+	$self->{timeout} = $args{timeout} // 60;
+	$self->{tls} = $args{tls} // 0;
+	$self->{tls_ca} = $args{tls_ca};
+	$self->{tls_cert} = $args{tls_cert};
+	$self->{tls_key} = $args{tls_key};
+	$self->{token} = $args{token} or croak 'no token?';
+	$self->{who} = $args{who} or croak 'no who?';
 	$self->{autoconnect} = $args{autoconnect} // 1;
 
 	return $self unless $self->{autoconnect};
@@ -153,6 +140,10 @@ sub connect {
 			$ns->close if $err[0];
 		});
 		$ns->on(close => sub {
+			# this cb is called during global destruction, at
+			# least on old perls where
+			# Mojo::Util::_global_destruction() won't work
+			return unless $conn;
 			$conn->close;
 			$self->log->info('connection to rpcswitch closed');
 			$self->{_exit} = WORK_CONNECTION_CLOSED; # todo: doc
@@ -364,8 +355,8 @@ sub rpc_result {
 
 sub rpc_channel_gone {
 	my ($self, $c, $a) = @_;
-	$self->log->debug('got channel_gone: ' . Dumper($a));
 	my $ch = $a->{channel};
+	$self->log->debug("got channel_gone: $ch");
 	return unless $ch;
 	my $wl = delete $self->{channels}->{$ch};
 	return unless $wl;
@@ -403,11 +394,6 @@ sub ping {
 
 sub work {
 	my ($self) = @_;
-	if ($self->daemon) {
-		_daemonize($self->pidfile);
-	} else {
-		_create_pidfile($self->pidfile);
-	}
 
 	my $pt = $self->ping_timeout;
 	my $tmr;
@@ -430,6 +416,12 @@ sub work {
 	Mojo::IOLoop->remove($tmr) if $tmr;
 
 	return $self->{_exit};
+}
+
+sub stop {
+	my ($self, $exit) = @_;
+	$self->{_exit} = $exit;
+	Mojo::IOLoop->stop;
 }
 
 sub announce {
@@ -652,64 +644,6 @@ sub close {
 	%$self = ();
 }
 
-# originally copied from Mojo::Server
-sub _daemonize {
-	my $pidfile = shift;
-
-	use POSIX;
-
-	# handles for IPC and checking success of child
-	pipe my ( $in, $out );
-
-	# Fork and kill parent
-	die "Can't fork: $!" unless defined(my $pid = fork);
-
-	if ($pid) {
-
-		# read if child was successful before exiting
-
-		CORE::close $out;
-
-		my $success = readline $in;
-
-		CORE::close $in;
-
-		exit ($success ? 0 : 1);
-
-	} else {
-
-		# close the handle that the parent will read on
-		CORE::close $in;
-
-	}
-
-	_create_pidfile($pidfile);
-
-	POSIX::setsid or die "Can't start a new session: $!";
-
-	# Close filehandles
-	open STDIN,  '</dev/null';
-	open STDOUT, '>/dev/null';
-	open STDERR, '>&STDOUT';
-
-	say $out 1; # notify success 
-
-	CORE::close $out;
-}
-
-sub _create_pidfile {
-	my $pidfile = shift;
-
-	if ($pidfile) {
-		open my $pid_fh, '>', $pidfile 
-			or die "Unable to open pid file for writing '$pidfile': $!";
-
-		say $pid_fh $$;
-
-		CORE::close $pid_fh;
-	}
-}
-
 # tick while Mojo::Reactor is still running and condition callback is true
 sub _loop {
 	warn __PACKAGE__." recursing into IO loop" if state $looping++;
@@ -773,7 +707,7 @@ RPC::Switch::Client - Connect to the RPC-Switch using Mojo.
 =head1 DESCRIPTION
 
 L<RPC::Switch::Client> is a class to build a client to connect to the
-L<RPC-Switch>.  The client can be used to iniate and inspect rpcs as well as
+L<RPC-Switch>.  The client can be used to initiate and inspect rpcs as well as
 for providing 'worker' services to the RPC-Switch.
 
 =head1 METHODS
@@ -846,7 +780,7 @@ connection will be closed and the work() method will return
 
 (default: 5 minutes)
 
-=item = autoconnect: automatically connect to the RPC-Switch.
+=item - autoconnect: automatically connect to the RPC-Switch.
 
 (default: true)
 
@@ -875,7 +809,7 @@ Valid arguments are:
 
 =over 4
 
-=item - method: name of the methodw to call (required)
+=item - method: name of the method to call (required)
 
 =item - inargs: input arguments for the workflow (if any)
 
@@ -1010,9 +944,25 @@ suggested format is something like:
 
 =head2 work
 
+  $client->work();
+
 Starts the L<Mojo::IOLoop>.  Returns a non-zero value when the IOLoop was
 stopped due to some error condition (like a lost connection or a ping
 timeout).
+
+=head3 Possible work() exit codes
+
+The RPC::Switch:Client library currently defines the following exit codes:
+
+        WORK_OK
+        WORK_PING_TIMEOUT
+        WORK_CONNECTION_CLOSED
+
+=head2 stop
+
+  $client->stop($exit);
+
+Makes the work() function exit with the provided exit code.
 
 =head1 REMOTE METHOD INFORMATION
 
@@ -1023,7 +973,7 @@ callable via the RPC-Switch.
 
 =over 4
 
-=item - rpcswitch.get_methods
+=item - B<rpcswitch.get_methods>
 
 Produces a list of all methods that are callable by the current role with a
 short description text if available
@@ -1042,7 +992,7 @@ Example:
 	  ...
         ];
 
-=item - rpcswitch.get_method_details
+=item - B<rpcswitch.get_method_details>
 
 Gives detailed information about a specific method.  Details can include the
 'backend' (b) method that a worker needs to provide, a short descrption (d)
@@ -1077,8 +1027,6 @@ L<Mojo::IOLoop>, L<Mojo::IOLoop::Stream>, L<http://mojolicious.org>: the L<Mojol
 =item *
 
 L<examples/rpc-switch-client>, L<examples/rpc-switch-worker>
-
-=item *
 
 =back
 

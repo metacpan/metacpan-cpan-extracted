@@ -1,6 +1,6 @@
 package Tapper::MCP::State;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::State::VERSION = '5.0.6';
+$Tapper::MCP::State::VERSION = '5.0.7';
 use 5.010;
 use strict;
 use warnings;
@@ -500,7 +500,7 @@ sub msg_error_testprogram
         if ($msg->{testprogram} != $current_test_number) {
                 my $result = {error => 1,
                               msg => "Invalid order of testprograms in PRC $nr. ".
-                              "Expected $current_test_number, got $msg->{testprograms}"
+                              "Expected $current_test_number, got $msg->{testprogram}"
                              };
                 $self->state_details->prc_results($nr, $result);
                 $self->state_details->results($result);
@@ -910,7 +910,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

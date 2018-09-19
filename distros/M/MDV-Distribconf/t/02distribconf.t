@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: 02distribconf.t 10976 2005-10-09 20:56:53Z othauvin $
+# $Id$
 
 use strict;
 use Test::More tests => 7;
@@ -10,8 +10,8 @@ use_ok('MDV::Distribconf::Build');
 my $dconfb = MDV::Distribconf::Build->new();
 ok($dconfb, "can create new MDV::Distribconf::Build object");
 
-$dconfb->setvalue(undef, 'version', 'cooker');
-ok($dconfb->getvalue(undef, 'version') eq 'cooker', "Can set global value");
+$dconfb->setvalue(undef, 'version', 'cauldron');
+ok($dconfb->getvalue(undef, 'version') eq 'cauldron', "Can set global value");
 
 $dconfb->setvalue('main');
 ok(grep { $_ eq 'main' } $dconfb->listmedia, "Can add a media");

@@ -9,7 +9,7 @@ plugin 'PkgConfig' => (
 
 share {
   meta->prop->{out_of_source} = 1;
-  meta->prop->{start_url} = 'https://github.com/github/cmark.git#master';
+  meta->prop->{start_url} = 'https://github.com/github/cmark.git#0.28.3.gfm.16';
   plugin 'Download::Git';
   plugin 'Build::CMake';
 

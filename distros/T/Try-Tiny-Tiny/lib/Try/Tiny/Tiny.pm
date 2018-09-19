@@ -1,6 +1,6 @@
 package Try::Tiny::Tiny; use strict; use warnings;
-$Try::Tiny::Tiny::VERSION = '0.001';
-# ABSTRACT: slim Try::Tiny down as far as reasonably possible
+
+$Try::Tiny::Tiny::VERSION = '0.002';
 
 my $effective;
 
@@ -30,30 +30,48 @@ __END__
 
 Try::Tiny::Tiny - slim Try::Tiny down as far as reasonably possible
 
-=head1 VERSION
-
-version 0.001
-
 =head1 SYNOPSIS
 
  export PERL5OPT=-MTry::Tiny::Tiny
 
 =head1 DESCRIPTION
 
-The reason this module exists is that L<Try::Tiny> will try naming the blocks
-it is passed, if it can load a module for doing so. This takes meaningful time,
-is only useful in stack traces, and then may defeat code that tries to examine
-the stack to print a more helpful error message.
+This module slims down L<Try::Tiny> as much as possible,
+currently by preventing L<Try::Tiny> from giving somewhat more human-friendly
+names to the code references it is passed.
 
-Now, you yourself can avoid using L<Try::Tiny> in the first place, but you will
-almost inevitably still pull it in through your dependency chain, and it is not
-likely to be feasible to scrub it out.
+This is done by blocking L<Try::Tiny> from finding any of the utility modules
+it needs for this feature.
+As a result, you must use this module before using any other module that loads
+L<Try::Tiny>.
+In practice that means you probably want to load it as early as possible, such
+as through L<PERL5OPT|perlrun/PERL5OPT>.
 
-This module helps sanitise your dependency chain a bit without patching all of
-it by loading L<Try::Tiny> in such a way that it is forced to skip naming its
-callbacks. In order to be useful, you must use this module before using any
-other module that loads L<Try::Tiny>. In practice that means you probably want
-to load it as early as possible, such as through L<PERL5OPT|perlrun/PERL5OPT>.
+=head1 RATIONALE
+
+=head2 Overall
+
+L<Try::Tiny> is very heavy compared to raw L<C<eval>|perlfunc/eval>.
+It is also used all across the CPAN.
+You yourself could avoid using it in your own code (and if you write CPAN
+modules, please do), but your applications will almost invariably wind up
+loading it anyway due to its pervasive use.
+It is not likely to be feasible to completely avoid depending on it, nor to
+send patches to remove it from every one of your dependencies (and then get
+all of the patches accepted).
+
+With this module, you can at least sanitise your dependency chain a little,
+without patching anything.
+
+=head2 Current effect
+
+There are several reasons to not want L<Try::Tiny> to name the coderefs it is passed:
+it takes meaningful time on every invocation,
+and it requires modules that may otherwise not have been loaded,
+yet it is useful only in stack traces,
+and then only to a human looking at the stack trace directly,
+whereas other code may be impeded in examining the stack
+(e.g. to print more helpful error messages in certain scenarios).
 
 =head1 DIAGNOSTICS
 

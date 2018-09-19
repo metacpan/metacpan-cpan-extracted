@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.21.1;
+package Pcore::PgSQL v0.22.0;
 
 use Pcore -dist, -class;
 
@@ -44,18 +44,27 @@ sub run ( $self ) {
             ]
         );
 
-        P->file->append_text(
-            "$db_dir/postgresql.conf",
-            [                                     #
-                q[listen_addresses='*'],
-                q[unix_socket_directories='/var/run/postgresql'],
-            ]
-        );
+        P->file->mkdir("$db_dir/conf.d") or die;
+        chown $uid, $uid, "$db_dir/conf.d" or die;
+
+        P->file->append_text( "$db_dir/postgresql.conf", [q[include_dir = 'conf.d']] );
     }
 
+    # default listen settings
+    my $postgres_conf = [                         #
+        q[listen_addresses='*'],
+        q[unix_socket_directories='/var/run/postgresql'],
+    ];
+
+    # timescaledb extension
+    push $postgres_conf->@*, q[shared_preload_libraries = 'timescaledb'] if $ENV{TIMESCALEDB};
+
+    P->file->write_text( "$db_dir/conf.d/00init.conf", $postgres_conf );
+    chown $uid, $uid, "$db_dir/conf.d/00init.conf" or die;
+
     # create and prepare unix socket dir
-    P->file->mkdir('/var/run/postgresql/') if !-d '/var/run/postgresql';
-    chown $uid, $uid, '/var/run/postgresql/' or die;
+    P->file->mkdir('/var/run/postgresql') if !-d '/var/run/postgresql';
+    chown $uid, $uid, '/var/run/postgresql' or die;
 
     # run server
     return P->sys->run_proc( [ 'su', 'postgres', '-c', "postgres -D $db_dir" ] )->wait;

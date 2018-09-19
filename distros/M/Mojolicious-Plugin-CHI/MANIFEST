@@ -5,6 +5,7 @@ t/CHI-File.t
 t/CHI-Log.t
 t/CHI-Command.t
 t/CHI-NoIOLoop.t
+t/CHI-Class.t
 Changes
 Readme.pod
 MANIFEST

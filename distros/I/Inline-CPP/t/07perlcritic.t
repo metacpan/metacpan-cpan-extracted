@@ -28,11 +28,7 @@ if ( $EVAL_ERROR ) {
 
 # We want to test the primary module components (blib/) as well as the
 # test suite (t/ and grammar/t/).
-my @directories = qw{
-    blib/      t/       grammar/t/
-};
+my @directories = qw{blib/ t/};
 
 
-Test::Perl::Critic::all_critic_ok( @directories );
-
-done_testing();
+Test::Perl::Critic::all_critic_ok(@directories);

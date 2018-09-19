@@ -1,0 +1,246 @@
+#! /usr/bin/env perl
+# -*- mode: cperl -*-
+# ABSTRACT: Minion worker using PRC
+# PODNAME: tapper-minion-worker
+
+use 5.010;
+
+use Minion;
+use Data::Dumper;
+use Tapper::Config;
+use File::Temp 'tempfile';
+use Log::Log4perl;
+use YAML;
+use IPC::Run 'run';
+
+use constant { FAIL => 0, PASS => 1 };
+
+local $Data::Dumper::Terse = 1;
+local $Data::Dumper::Sortkeys = 1;
+
+# Configuration
+my $tapper_script = 'tapper-client-no-fork';
+my $logconf =
+  "log4perl.rootlogger                               = DEBUG, root\n" .
+  "log4perl.appender.root                            = Log::Log4perl::Appender::File\n" .
+  "log4perl.appender.root.layout                     = PatternLayout\n" .
+  "log4Perl.appender.root.mode                       = clobber\n" .
+  "log4Perl.appender.root.filename                   = /tmp/tapper-minion-worker.log\n" .
+  "log4perl.appender.Screen.layout.ConversionPattern = %d %p %c - %m in %F{2} (%L)%n\n"
+  ;
+Log::Log4perl::init(\$logconf);
+
+my $tapper_cfg = Tapper::Config->subconfig;
+
+# Connect to backend
+my $minion_cfg = $tapper_cfg->{minion}{worker}{Minion};
+my $minion     = Minion->new(%$minion_cfg);
+
+# Start a worker to perform jobs, potentially concurrently
+my $worker     = $minion->worker;
+
+# ========== Auxiliary functions ==========
+
+# Get a process tree, via Perl or a Bash fallback
+sub get_ps_tree
+{
+  my ($pid) = @_;
+
+  return () unless $pid && $pid > 1;
+
+  my @pids = ($pid);
+  eval {
+    require Proc::Killfam;
+    require Proc::ProcessTable;
+    @pids = Proc::Killfam::get_pids
+      ([grep { $_->state ne 'defunct' }
+        @{Proc::ProcessTable->new->table}
+      ], $pid);
+  };
+  if ($@) {
+    # no Proc::Killfam available; use external 'pstree';
+    #
+    # 'echo' turns deeper pstree output into one line;
+    # pids are in (parens), so 'split' on '()' and take every 2nd entry
+    my @pstree = map { split(/[()]/) } qx{echo \$(pstree -lp $pid)};
+    @pids = @pstree[grep $_ % 2, 0..$#pstree];
+    @pids = grep {
+      # ignore zombies
+      system("ps -ax -o pid=,stat= | grep -q '^$_ Z\$'") != 0
+    } @pids;
+  }
+  return @pids;
+}
+
+# Kill a process tree beginning from the leaf nodes;
+sub kill_ps_tree
+{
+  my ($pid) = @_;
+
+  return unless $pid > 1;
+
+  while (my @pids = get_ps_tree($pid)) {
+    my $innerpid = $pids[-1];
+    if ($innerpid) {
+      kill 'SIGTERM', $innerpid;
+      waitpid $innerpid, 0;
+    }
+  }
+  kill 'SIGTERM', $pid;
+  waitpid $pid, 0;
+}
+
+# Send report and status back to Tapper
+sub tapper_testrun_finished {
+  my ($job, $prc_cfg, $success) = @_;
+
+  require Tapper::PRC;
+
+  # Report what happened to Tapper
+  my $hostname   = $prc_cfg->{hostname};
+  my $testrun_id = $prc_cfg->{testrun_id};
+  my $not        = $success ? "" : "not ";
+  my $prc        = Tapper::PRC->new(cfg => $prc_cfg);
+  my $report     = "
+TAP Version 13
+# Test-suite-name: PRC0-Minion-Overview
+# Test-section: prc-minion-overview
+# Test-machine-name: $hostname
+# Test-reportgroup-testrun: $testrun_id
+# Test-moreinfo-url: /minion/admin/jobs?id=@{[$job->id]}
+1..1
+${not}ok - tapper-minion-worker - job execution
+# Test-minion-job-id: @{[$job->id]}
+";
+
+  # typical Tapper PRC cleanup sequence
+  my ($error, $message) = $prc->tap_report_away($report);
+  warn "Error during tap_report_away: $error, message: $messsage"
+    if $error;
+
+  unlink $path_to_config;
+}
+
+# monkey-patch the original too hard "KILL" signal away
+local *Minion::Job::stop = sub { kill 'INT', shift->{pid} };
+
+# Add tasks for Tapper testrun execution using Tapper::PRC
+$minion->add_task
+  (tapper_testrun => sub {
+     my ($job, @args) = @_;
+
+     eval {                     # --- try ---
+
+       # Tapper config
+       my %args = @args;
+       my $prc_cfg = $args{prc_cfg};
+
+       # provide testrun config as file to PRC
+       my ($FH, $path_to_config) = tempfile(
+         UNLINK   => 1,
+         TMPDIR   => 1,
+         TEMPLATE => "tmp-tapper-minion"
+           ."-j".$job->id
+           ."-tr".$prc_cfg->{testrun_id}
+           ."-pid$$-XXXX");
+       YAML::DumpFile($path_to_config, $prc_cfg);
+
+       # The actual job command
+       my @job_cmd = ("$tapper_script", '--config', $path_to_config);
+
+       # Log format
+       my $l = " Job %10s pid:$$ job:%d testrun:%d ";
+
+       # Signal handler for graceful finish
+       my $job_kill = sub {
+         my $signal = shift;
+         print "\n";
+         say localtime.sprintf(
+           $l,
+           "**KILLED",
+           $job->id,
+           $prc_cfg->{testrun_id}
+         );
+         kill_ps_tree ($$);
+         tapper_testrun_finished ($job, $prc_cfg, FAIL);
+         $job->fail({ reason  => 'signal',
+                      signal  => $signal,
+                      command => \@job_cmd,
+                    });
+         exit 1;
+       };
+       local $SIG{INT}  = $job_kill;
+
+       # Log print callbacks
+       for my $e (qw(failed finished reap spawn start)) # skip experimental 'finish'
+         {
+           $job->on($e => sub {
+                      say localtime.sprintf(
+                        $l,
+                        uc($e),
+                        $job->id,
+                        $prc_cfg->{testrun_id}
+                      )});
+         }
+
+       # Start Tapper client (PRC aka. Program Run Control)
+       say localtime.sprintf($l, "started", $job->id, $prc_cfg->{testrun_id});
+       local $ENV{TAPPER_MINION_WORKER_JOB_ID} = $job->id;
+       # We use IPC::Run because system() blocks signals
+       run \@job_cmd;
+
+       # finish and cleanup
+       tapper_testrun_finished ($job, $prc_cfg, PASS);
+       $job->finish({ tapper_testrun_id => $prc_cfg->{testrun_id} });
+     };
+
+     if ($@)                    # --- catch ---
+       {
+         warn $@;
+       }
+
+   });
+
+# worker configuration
+my $queues     = $tapper_cfg->{minion}{worker}{queues} || ['undefined_minion.worker.queues'];
+my $arg_queues = $ENV{TAPPER_MINION_WORKER_QUEUES};
+$queues = [split(",", $arg_queues)] if $arg_queues;
+$worker->status({ queues => $queues, jobs => scalar(@$queues) });
+
+# main loop
+say "Tapper::PRC::Minion::Worker pid:$$ started: " . Dumper($worker->status);
+$worker->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tapper-minion-worker - Minion worker using PRC
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=item *
+
+Tapper Team <tapper-ops@amazon.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut

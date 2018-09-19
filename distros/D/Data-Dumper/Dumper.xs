@@ -12,6 +12,14 @@
 #  define DD_USE_OLD_ID_FORMAT
 #endif
 
+#ifndef strlcpy
+#  ifdef my_strlcpy
+#    define strlcpy(d,s,l) my_strlcpy(d,s,l)
+#  else
+#    define strlcpy(d,s,l) strcpy(d,s)
+#  endif
+#endif
+
 /* These definitions are ASCII only.  But the pure-perl .pm avoids
  * calling this .xs file for releases where they aren't defined */
 
@@ -41,6 +49,17 @@
                           || (((UV) (c)) >= '0' && ((UV) (c)) <= '9'))
 #endif
 
+/* SvPVCLEAR only from perl 5.25.6 */
+#ifndef SvPVCLEAR
+#  define SvPVCLEAR(sv) sv_setpvs((sv), "")
+#endif
+
+#ifndef memBEGINs
+#  define memBEGINs(s1, l, s2)                                              \
+            (   (l) >= sizeof(s2) - 1                                       \
+             && memEQ(s1, "" s2 "", sizeof(s2)-1))
+#endif
+
 /* This struct contains almost all the user's desired configuration, and it
  * is treated as constant by the recursive function. This arrangement has
  * the advantage of needing less memory than passing all of them on the
@@ -63,12 +82,16 @@ typedef struct {
     I32 useqq;
     int use_sparse_seen_hash;
     int trailingcomma;
+    int deparse;
 } Style;
 
 static STRLEN num_q (const char *s, STRLEN slen);
 static STRLEN esc_q (char *dest, const char *src, STRLEN slen);
 static STRLEN esc_q_utf8 (pTHX_ SV *sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq);
 static bool globname_needs_quote(const char *s, STRLEN len);
+#ifndef GvNAMEUTF8
+static bool globname_supra_ascii(const char *s, STRLEN len);
+#endif
 static bool key_needs_quote(const char *s, STRLEN len);
 static bool safe_decimal_number(const char *p, STRLEN len);
 static SV *sv_x (pTHX_ SV *sv, const char *str, STRLEN len, I32 n);
@@ -134,9 +157,10 @@ Perl_utf8_to_uvchr_buf(pTHX_ U8 *s, U8 *send, STRLEN *retlen)
 
 /* does a glob name need to be protected? */
 static bool
-globname_needs_quote(const char *s, STRLEN len)
+globname_needs_quote(const char *ss, STRLEN len)
 {
-    const char *send = s+len;
+    const U8 *s = (const U8 *) ss;
+    const U8 *send = s+len;
 TOP:
     if (s[0] == ':') {
 	if (++s<send) {
@@ -160,6 +184,22 @@ TOP:
 
     return FALSE;
 }
+
+#ifndef GvNAMEUTF8
+/* does a glob name contain supra-ASCII characters? */
+static bool
+globname_supra_ascii(const char *ss, STRLEN len)
+{
+    const U8 *s = (const U8 *) ss;
+    const U8 *send = s+len;
+    while (s < send) {
+        if (!isASCII(*s))
+            return TRUE;
+        s++;
+    }
+    return FALSE;
+}
+#endif
 
 /* does a hash key need to be quoted (to the left of => ).
    Previously this used (globname_)needs_quote() which accepted strings
@@ -366,15 +406,16 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
         *r++ = '"';
 
         for (s = src; s < send; s += increment) {
+            U8 c0 = *(U8 *)s;
             UV k;
 
             if (do_utf8
-                && ! isASCII(*(U8*)s)
+                && ! isASCII(c0)
                     /* Exclude non-ASCII low ordinal controls.  This should be
                      * optimized out by the compiler on ASCII platforms; if not
                      * could wrap it in a #ifdef EBCDIC, but better to avoid
                      * #if's if possible */
-                && *(U8*)s > ' '
+                && c0 > ' '
             ) {
 
                 /* When in UTF-8, we output all non-ascii chars as \x{}
@@ -387,11 +428,11 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
                 increment = (k == 0 && *s != '\0') ? 1 : UTF8SKIP(s);
 
 #if PERL_VERSION < 10
-                sprintf(r, "\\x{%"UVxf"}", k);
+                sprintf(r, "\\x{%" UVxf "}", k);
                 r += strlen(r);
                 /* my_sprintf is not supported by ppport.h */
 #else
-                r = r + my_sprintf(r, "\\x{%"UVxf"}", k);
+                r = r + my_sprintf(r, "\\x{%" UVxf "}", k);
 #endif
                 continue;
             }
@@ -505,6 +546,68 @@ sv_x(pTHX_ SV *sv, const char *str, STRLEN len, I32 n)
     return sv;
 }
 
+static SV *
+deparsed_output(pTHX_ SV *val)
+{
+    SV *text;
+    int n;
+    dSP;
+
+    /* This is passed to load_module(), which decrements its ref count and
+     * modifies it (so we also can't reuse it below) */
+    SV *pkg = newSVpvs("B::Deparse");
+
+    /* Commit ebdc88085efa6fca8a1b0afaa388f0491bdccd5a (first released as part
+     * of 5.19.7) changed core S_process_special_blocks() to use a new stack
+     * for anything using a BEGIN block, on the grounds that doing so "avoids
+     * the stack moving underneath anything that directly or indirectly calls
+     * Perl_load_module()". If we're in an older Perl, we can't rely on that
+     * stack, and must create a fresh sacrificial stack of our own. */
+#if PERL_VERSION < 20
+    PUSHSTACKi(PERLSI_REQUIRE);
+#endif
+
+    load_module(PERL_LOADMOD_NOIMPORT, pkg, 0);
+
+#if PERL_VERSION < 20
+    POPSTACK;
+    SPAGAIN;
+#endif
+
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    mXPUSHs(newSVpvs("B::Deparse"));
+    PUTBACK;
+
+    n = call_method("new", G_SCALAR);
+    SPAGAIN;
+
+    if (n != 1) {
+        croak("B::Deparse->new returned %d items, but expected exactly 1", n);
+    }
+
+    PUSHMARK(SP - n);
+    XPUSHs(val);
+    PUTBACK;
+
+    n = call_method("coderef2text", G_SCALAR);
+    SPAGAIN;
+
+    if (n != 1) {
+        croak("$b_deparse->coderef2text returned %d items, but expected exactly 1", n);
+    }
+
+    text = POPs;
+    SvREFCNT_inc(text);         /* the caller will mortalise this */
+
+    FREETMPS;
+
+    PUTBACK;
+
+    return text;
+}
+
 /*
  * This ought to be split into smaller functions. (it is one long function since
  * it exactly parallels the perl version, which was one long thing for
@@ -565,14 +668,14 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
             i = perl_call_method(SvPVX_const(style->freezer), G_EVAL|G_VOID|G_DISCARD);
 	    SPAGAIN;
 	    if (SvTRUE(ERRSV))
-		warn("WARNING(Freezer method call failed): %"SVf"", ERRSV);
+		warn("WARNING(Freezer method call failed): %" SVf, ERRSV);
 	    PUTBACK; FREETMPS; LEAVE;
 	}
 	
 	ival = SvRV(val);
 	realtype = SvTYPE(ival);
 #ifdef DD_USE_OLD_ID_FORMAT
-        idlen = my_snprintf(id, sizeof(id), "0x%"UVxf, PTR2UV(ival));
+        idlen = my_snprintf(id, sizeof(id), "0x%" UVxf, PTR2UV(ival));
 #else
 	id_buffer = PTR2UV(ival);
 	idlen = sizeof(id_buffer);
@@ -630,7 +733,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 #ifdef DD_USE_OLD_ID_FORMAT
 		    warn("ref name not found for %s", id);
 #else
-		    warn("ref name not found for 0x%"UVxf, PTR2UV(ival));
+		    warn("ref name not found for 0x%" UVxf, PTR2UV(ival));
 #endif
 		    return 0;
 		}
@@ -803,7 +906,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	    SV * const ixsv = newSViv(0);
 	    /* allowing for a 24 char wide array index */
 	    New(0, iname, namelen+28, char);
-	    (void)strcpy(iname, name);
+	    (void) strlcpy(iname, name, namelen+28);
 	    inamelen = namelen;
 	    if (name[0] == '@') {
 		sv_catpvs(retval, "(");
@@ -848,10 +951,10 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		ilen = inamelen;
 		sv_setiv(ixsv, ix);
 #if PERL_VERSION < 10
-                (void) sprintf(iname+ilen, "%"IVdf, (IV)ix);
+                (void) sprintf(iname+ilen, "%" IVdf, (IV)ix);
 		ilen = strlen(iname);
 #else
-                ilen = ilen + my_sprintf(iname+ilen, "%"IVdf, (IV)ix);
+                ilen = ilen + my_sprintf(iname+ilen, "%" IVdf, (IV)ix);
 #endif
 		iname[ilen++] = ']'; iname[ilen] = '\0';
                 if (style->indent >= 3) {
@@ -886,7 +989,6 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	    SV *sname;
 	    HE *entry = NULL;
 	    char *key;
-	    STRLEN klen;
 	    SV *hval;
 	    AV *keys = NULL;
 	
@@ -976,6 +1078,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
                 char *nkey_buffer = NULL;
                 STRLEN nticks = 0;
 		SV* keysv;
+                STRLEN klen;
 		STRLEN keylen;
                 STRLEN nlen;
 		bool do_utf8 = FALSE;
@@ -1029,7 +1132,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
                 if (style->quotekeys || key_needs_quote(key,keylen)) {
                     if (do_utf8 || style->useqq) {
                         STRLEN ocur = SvCUR(retval);
-                        nlen = esc_q_utf8(aTHX_ retval, key, klen, do_utf8, style->useqq);
+                        klen = nlen = esc_q_utf8(aTHX_ retval, key, klen, do_utf8, style->useqq);
                         nkey = SvPVX(retval) + ocur;
                     }
                     else {
@@ -1095,9 +1198,41 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	    SvREFCNT_dec(totpad);
 	}
 	else if (realtype == SVt_PVCV) {
-	    sv_catpvs(retval, "sub { \"DUMMY\" }");
-            if (style->purity)
-		warn("Encountered CODE ref, using dummy placeholder");
+            if (style->deparse) {
+                SV *deparsed = sv_2mortal(deparsed_output(aTHX_ val));
+                SV *fullpad = sv_2mortal(newSVsv(style->sep));
+                const char *p;
+                STRLEN plen;
+                I32 i;
+
+                sv_catsv(fullpad, style->pad);
+                sv_catsv(fullpad, apad);
+                for (i = 0; i < level; i++) {
+                    sv_catsv(fullpad, style->xpad);
+                }
+
+                sv_catpvs(retval, "sub ");
+                p = SvPV(deparsed, plen);
+                while (plen > 0) {
+                    const char *nl = (const char *) memchr(p, '\n', plen);
+                    if (!nl) {
+                        sv_catpvn(retval, p, plen);
+                        break;
+                    }
+                    else {
+                        size_t n = nl - p;
+                        sv_catpvn(retval, p, n);
+                        sv_catsv(retval, fullpad);
+                        p += n + 1;
+                        plen -= n + 1;
+                    }
+                }
+            }
+            else {
+                sv_catpvs(retval, "sub { \"DUMMY\" }");
+                if (style->purity)
+                    warn("Encountered CODE ref, using dummy placeholder");
+            }
 	}
 	else {
 	    warn("cannot handle ref type %d", (int)realtype);
@@ -1144,7 +1279,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	
 	if (namelen) {
 #ifdef DD_USE_OLD_ID_FORMAT
-	    idlen = my_snprintf(id, sizeof(id), "0x%"UVxf, PTR2UV(val));
+	    idlen = my_snprintf(id, sizeof(id), "0x%" UVxf, PTR2UV(val));
 #else
 	    id_buffer = PTR2UV(val);
 	    idlen = sizeof(id_buffer);
@@ -1184,9 +1319,9 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
         if (DD_is_integer(val)) {
             STRLEN len;
 	    if (SvIsUV(val))
-	      len = my_snprintf(tmpbuf, sizeof(tmpbuf), "%"UVuf, SvUV(val));
+	      len = my_snprintf(tmpbuf, sizeof(tmpbuf), "%" UVuf, SvUV(val));
 	    else
-	      len = my_snprintf(tmpbuf, sizeof(tmpbuf), "%"IVdf, SvIV(val));
+	      len = my_snprintf(tmpbuf, sizeof(tmpbuf), "%" IVdf, SvIV(val));
             if (SvPOK(val)) {
               /* Need to check to see if this is a string such as " 0".
                  I'm assuming from sprintf isn't going to clash with utf8. */
@@ -1205,7 +1340,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	else if (realtype == SVt_PVGV) {/* GLOBs can end up with scribbly names */
 	    c = SvPV(val, i);
 	    if(i) ++c, --i;			/* just get the name */
-	    if (i >= 6 && strncmp(c, "main::", 6) == 0) {
+	    if (memBEGINs(c, i, "main::")) {
 		c += 4;
 #if PERL_VERSION < 7
 		if (i == 6 || (i == 7 && c[6] == '\0'))
@@ -1215,37 +1350,30 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		    i = 0; else i -= 4;
 	    }
             if (globname_needs_quote(c,i)) {
-#ifdef GvNAMEUTF8
-	      if (GvNAMEUTF8(val)) {
-		sv_grow(retval, SvCUR(retval)+2);
+		sv_grow(retval, SvCUR(retval)+3);
 		r = SvPVX(retval)+SvCUR(retval);
-		r[0] = '*'; r[1] = '{';
+		r[0] = '*'; r[1] = '{'; r[2] = 0;
 		SvCUR_set(retval, SvCUR(retval)+2);
-                esc_q_utf8(aTHX_ retval, c, i, 1, style->useqq);
+                i = 3 + esc_q_utf8(aTHX_ retval, c, i,
+#ifdef GvNAMEUTF8
+			!!GvNAMEUTF8(val), style->useqq
+#else
+			0, style->useqq || globname_supra_ascii(c, i)
+#endif
+			);
 		sv_grow(retval, SvCUR(retval)+2);
 		r = SvPVX(retval)+SvCUR(retval);
 		r[0] = '}'; r[1] = '\0';
-		i = 1;
-	      }
-	      else
-#endif
-	      {
-		sv_grow(retval, SvCUR(retval)+6+2*i);
-		r = SvPVX(retval)+SvCUR(retval);
-		r[0] = '*'; r[1] = '{';	r[2] = '\'';
-		i += esc_q(r+3, c, i);
-		i += 3;
-		r[i++] = '\''; r[i++] = '}';
-		r[i] = '\0';
-	      }
+		SvCUR_set(retval, SvCUR(retval)+1);
+		r = r+1 - i;
 	    }
 	    else {
 		sv_grow(retval, SvCUR(retval)+i+2);
 		r = SvPVX(retval)+SvCUR(retval);
-		r[0] = '*'; strcpy(r+1, c);
+		r[0] = '*'; strlcpy(r+1, c, SvLEN(retval));
 		i++;
+		SvCUR_set(retval, SvCUR(retval)+i);
 	    }
-	    SvCUR_set(retval, SvCUR(retval)+i);
 
             if (style->purity) {
 		static const char* const entries[] = { "{SCALAR}", "{ARRAY}", "{HASH}" };
@@ -1412,53 +1540,55 @@ Data_Dumper_Dumpxs(href, ...)
 		&& (hv = (HV*)SvRV((SV*)href))
 		&& SvTYPE(hv) == SVt_PVHV)		{
 
-		if ((svp = hv_fetch(hv, "seen", 4, FALSE)) && SvROK(*svp))
+		if ((svp = hv_fetchs(hv, "seen", FALSE)) && SvROK(*svp))
 		    seenhv = (HV*)SvRV(*svp);
                 else
                     style.use_sparse_seen_hash = 1;
-		if ((svp = hv_fetch(hv, "noseen", 6, FALSE)))
+		if ((svp = hv_fetchs(hv, "noseen", FALSE)))
                     style.use_sparse_seen_hash = (SvOK(*svp) && SvIV(*svp) != 0);
-		if ((svp = hv_fetch(hv, "todump", 6, FALSE)) && SvROK(*svp))
+		if ((svp = hv_fetchs(hv, "todump", FALSE)) && SvROK(*svp))
 		    todumpav = (AV*)SvRV(*svp);
-		if ((svp = hv_fetch(hv, "names", 5, FALSE)) && SvROK(*svp))
+		if ((svp = hv_fetchs(hv, "names", FALSE)) && SvROK(*svp))
 		    namesav = (AV*)SvRV(*svp);
-		if ((svp = hv_fetch(hv, "indent", 6, FALSE)))
+		if ((svp = hv_fetchs(hv, "indent", FALSE)))
                     style.indent = SvIV(*svp);
-		if ((svp = hv_fetch(hv, "purity", 6, FALSE)))
+		if ((svp = hv_fetchs(hv, "purity", FALSE)))
                     style.purity = SvIV(*svp);
-		if ((svp = hv_fetch(hv, "terse", 5, FALSE)))
+		if ((svp = hv_fetchs(hv, "terse", FALSE)))
 		    terse = SvTRUE(*svp);
-		if ((svp = hv_fetch(hv, "useqq", 5, FALSE)))
+		if ((svp = hv_fetchs(hv, "useqq", FALSE)))
                     style.useqq = SvTRUE(*svp);
-		if ((svp = hv_fetch(hv, "pad", 3, FALSE)))
+		if ((svp = hv_fetchs(hv, "pad", FALSE)))
                     style.pad = *svp;
-		if ((svp = hv_fetch(hv, "xpad", 4, FALSE)))
+		if ((svp = hv_fetchs(hv, "xpad", FALSE)))
                     style.xpad = *svp;
-		if ((svp = hv_fetch(hv, "apad", 4, FALSE)))
+		if ((svp = hv_fetchs(hv, "apad", FALSE)))
 		    apad = *svp;
-		if ((svp = hv_fetch(hv, "sep", 3, FALSE)))
+		if ((svp = hv_fetchs(hv, "sep", FALSE)))
                     style.sep = *svp;
-		if ((svp = hv_fetch(hv, "pair", 4, FALSE)))
+		if ((svp = hv_fetchs(hv, "pair", FALSE)))
                     style.pair = *svp;
-		if ((svp = hv_fetch(hv, "varname", 7, FALSE)))
+		if ((svp = hv_fetchs(hv, "varname", FALSE)))
 		    varname = *svp;
-		if ((svp = hv_fetch(hv, "freezer", 7, FALSE)))
+		if ((svp = hv_fetchs(hv, "freezer", FALSE)))
                     style.freezer = *svp;
-		if ((svp = hv_fetch(hv, "toaster", 7, FALSE)))
+		if ((svp = hv_fetchs(hv, "toaster", FALSE)))
                     style.toaster = *svp;
-		if ((svp = hv_fetch(hv, "deepcopy", 8, FALSE)))
+		if ((svp = hv_fetchs(hv, "deepcopy", FALSE)))
                     style.deepcopy = SvTRUE(*svp);
-		if ((svp = hv_fetch(hv, "quotekeys", 9, FALSE)))
+		if ((svp = hv_fetchs(hv, "quotekeys", FALSE)))
                     style.quotekeys = SvTRUE(*svp);
-                if ((svp = hv_fetch(hv, "trailingcomma", 13, FALSE)))
+                if ((svp = hv_fetchs(hv, "trailingcomma", FALSE)))
                     style.trailingcomma = SvTRUE(*svp);
-		if ((svp = hv_fetch(hv, "bless", 5, FALSE)))
+                if ((svp = hv_fetchs(hv, "deparse", FALSE)))
+                    style.deparse = SvTRUE(*svp);
+		if ((svp = hv_fetchs(hv, "bless", FALSE)))
                     style.bless = *svp;
-		if ((svp = hv_fetch(hv, "maxdepth", 8, FALSE)))
+		if ((svp = hv_fetchs(hv, "maxdepth", FALSE)))
                     style.maxdepth = SvIV(*svp);
-		if ((svp = hv_fetch(hv, "maxrecurse", 10, FALSE)))
+		if ((svp = hv_fetchs(hv, "maxrecurse", FALSE)))
                     style.maxrecurse = SvIV(*svp);
-		if ((svp = hv_fetch(hv, "sortkeys", 8, FALSE))) {
+		if ((svp = hv_fetchs(hv, "sortkeys", FALSE))) {
                     SV *sv = *svp;
                     if (! SvTRUE(sv))
                         style.sortkeys = NULL;
@@ -1525,9 +1655,10 @@ Data_Dumper_Dumpxs(href, ...)
 		    }
 		    else {
 			STRLEN nchars;
-			sv_setpvn(name, "$", 1);
+			sv_setpvs(name, "$");
 			sv_catsv(name, varname);
-			nchars = my_snprintf(tmpbuf, sizeof(tmpbuf), "%"IVdf, (IV)(i+1));
+			nchars = my_snprintf(tmpbuf, sizeof(tmpbuf), "%" IVdf,
+                                                                     (IV)(i+1));
 			sv_catpvn(name, tmpbuf, nchars);
 		    }
 		
@@ -1575,7 +1706,7 @@ Data_Dumper_Dumpxs(href, ...)
 			sv_catpvs(retval, ";");
                         sv_catsv(retval, style.sep);
 		    }
-		    sv_setpvn(valstr, "", 0);
+		    SvPVCLEAR(valstr);
 		    if (gimme == G_ARRAY) {
 			XPUSHs(sv_2mortal(retval));
 			if (i < imax)	/* not the last time thro ? */

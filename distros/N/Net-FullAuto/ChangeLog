@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2018-09-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000418 released
+
+        * Added LWP dependencies to Makefile.PL.
+
+	* Added sub put, get and lcd to main package.
+
+
 2018-09-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000417 released

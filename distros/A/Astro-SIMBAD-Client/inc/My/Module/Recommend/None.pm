@@ -5,12 +5,13 @@ use 5.008;
 use strict;
 use warnings;
 
-use base qw{ My::Module::Recommend::Any };
+use My::Module::Recommend::Any;
+our @ISA = qw{ My::Module::Recommend::Any };
 
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 our @EXPORT_OK = qw{ __none };
 
@@ -56,7 +57,7 @@ way.
 
 I am using this rather than the usual install tools' recommendation
 machinery for greater flexibility, and because I personally have found
-their output rather Draconian, and my correspondance indicates that my
+their output rather Draconian, and my correspondence indicates that my
 users do too.
 
 =head1 METHODS
@@ -83,7 +84,7 @@ This method simply returns.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<http://rt.cpan.org/>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -91,7 +92,7 @@ Tom Wyant (wyant at cpan dot org)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Thomas R. Wyant, III
+Copyright (C) 2016-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

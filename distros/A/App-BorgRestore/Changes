@@ -1,5 +1,11 @@
 Revision history for Perl extension App-BorgRestore
 
+3.2.0 2018-09-19T11:46:35Z
+	- Write data directly to DB instead of preparing it in memory first. The
+	  new algorithm should be faster and uses constant memory. If you want the
+	  old one back for any reason look at the '$prepare_data_in_memory' config
+	  option. This option is deprecated and will be removed in the future.
+
 3.1.0 2018-08-25T09:46:27Z
 	- Add --json option
 	- Add --detail option

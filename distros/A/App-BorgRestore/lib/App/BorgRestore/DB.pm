@@ -1,7 +1,6 @@
 package App::BorgRestore::DB;
 use v5.14;
-use strict;
-use warnings;
+use strictures 2;
 
 use App::BorgRestore::Helper;
 
@@ -156,14 +155,24 @@ method get_archives_for_path($path) {
 	return \@ret;
 }
 
-
-method add_path($archive_id, $path, $time) {
+method _insert_path($archive_id, $path, $time) {
 	my $st = $self->{dbh}->prepare_cached('insert or ignore into `files` (`path`, `'.$archive_id.'`)
 		values(?, ?)');
 	$st->execute($path, $time);
+}
 
-	$st = $self->{dbh}->prepare_cached('update files set `'.$archive_id.'` = ? where `path` = ?');
+method add_path($archive_id, $path, $time) {
+	$self->_insert_path($archive_id, $path, $time);
+
+	my $st = $self->{dbh}->prepare_cached('update files set `'.$archive_id.'` = ? where `path` = ?');
 	$st->execute($time, $path);
+}
+
+method update_path_if_greater($archive_id, $path, $time) {
+	$self->_insert_path($archive_id, $path, $time);
+
+	my $st = $self->{dbh}->prepare_cached('update files set `'.$archive_id.'` = ? where `path` = ? and (`'.$archive_id.'` < ? or `'.$archive_id.'` is null)');
+	$st->execute($time, $path, $time);
 }
 
 method begin_work() {

@@ -1,5 +1,5 @@
 #
-# $Id: Arp.pm 57 2012-11-02 16:39:39Z gomor $
+# $Id: Arp.pm,v c181470c4357 2018/09/18 14:59:41 gomor $
 #
 package Net::Libdnet::Arp;
 use strict; use warnings;
@@ -64,10 +64,10 @@ Net::Libdnet::Arp - high level API to access libdnet arp_* functions
 
    use Net::Libdnet::Arp;
 
-   my $h      = Net::Libdnet::Arp->new;
-   my $mac    = $h->get('10.0.0.1');
-   my $sucess = $h->add('10.0.0.1', '00:11:22:33:44:55');
-   my $sucess = $h->delete('10.0.0.1', '00:11:22:33:44:55');
+   my $h       = Net::Libdnet::Arp->new;
+   my $mac     = $h->get('10.0.0.1');
+   my $success = $h->add('10.0.0.1', '00:11:22:33:44:55');
+   my $success = $h->delete('10.0.0.1', '00:11:22:33:44:55');
 
    my $data;
    $h->loop(\&arp_print, \$data);

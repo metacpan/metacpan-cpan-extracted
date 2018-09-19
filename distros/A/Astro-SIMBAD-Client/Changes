@@ -1,3 +1,16 @@
+0.037		2018-09-18	T. R. Wyant
+    Add support for https:. Thanks to Christian Carey for making me
+    aware of this, and providing patches.
+
+    Update POD re SOAP deprecation and removal, plus general cleanup.
+    Thanks to Christian Carey for the POD patches, which were accepted
+    pretty much verbatim except for a few I thought were matters of
+    style.
+
+    Document use of LWP::UserAgent proxy environment variables. This
+    really does not belong here, but I think the informaton gets lost in
+    the libwww-perl documentation.
+
 0.036		2016-09-26	T. R. Wyant
   SIMBAD now lists "Arcturus", not "ARCTURUS".
     Change tests to reflect this.

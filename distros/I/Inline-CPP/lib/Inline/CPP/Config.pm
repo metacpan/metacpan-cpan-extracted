@@ -5,13 +5,13 @@ package Inline::CPP::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 #$VERSION = eval $VERSION; ## no critic (eval)
 
 
 # DO NOT MANUALLY ALTER THE FOLLOWING TWO LINES: Makefile.PL locates them by
 # matching their syntax and identifier names.
-our $compiler = 'g++ -xc++  -D_FILE_OFFSET_BITS=64';
+our $compiler = 'g++ -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -xc++';
 our $libs     = '-lstdc++';
 
 

@@ -1,4 +1,9 @@
 Release history for Try-Tiny-Tiny
 
+0.002 Tue 18 Sep 2018
+	- No functional changes
+	- Expanded documentation with better structure
+	- Testing without Test::More
+
 0.001 Fri 14 Apr 2017
 	- Initial release

@@ -1,13 +1,12 @@
-use strict;
-use warnings;
+use strictures 2;
 
+use Log::Any::Adapter ('TAP');
 use Test::More;
 use Test::MockObject;
 use Test::Differences;
 
 use App::BorgRestore;
 use App::BorgRestore::DB;
-use Log::Any::Adapter ('TAP');
 
 my $db = App::BorgRestore::DB->new(":memory:", 0);
 my $app = App::BorgRestore->new_no_defaults({db => $db});

@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "LockFile::Simple" => 0,
     "Log::Log4perl" => 0,
+    "Minion" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "MooseX::ClassAttribute" => 0,
@@ -94,7 +95,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "5.0.6",
+  "VERSION" => "5.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -124,6 +125,7 @@ my %FallbackPrereqs = (
   "LockFile::Simple" => 0,
   "Log::Log4perl" => 0,
   "MRO::Compat" => 0,
+  "Minion" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "MooseX::ClassAttribute" => 0,

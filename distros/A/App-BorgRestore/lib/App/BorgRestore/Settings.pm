@@ -1,11 +1,11 @@
 package App::BorgRestore::Settings;
 use v5.14;
-use strict;
-use warnings;
+use strictures 2;
 
 use App::BorgRestore::Helper;
 
 use autodie;
+use Function::Parameters;
 use Sys::Hostname;
 
 =encoding utf-8
@@ -79,6 +79,19 @@ The size of the in-memory cache of sqlite in kibibytes. Increasing this may
 reduce disk IO and improve performance on certain systems when updating the
 cache.
 
+=item C<$prepare_data_in_memory>
+
+Default: 0
+
+When new archives are added to the cache, the modification time of each parent
+directory for a file's path are updated. If this setting is set to 1, these
+updates are done in memory before data is written to the database. If it is set
+to 0, any changes are written directly to the database. Many values are updated
+multiple time, thus writing directly to the database is slower, but preparing
+the data in memory may require a substaintial amount of memory.
+
+New in version 3.2.0. Deprecated in v3.2.0 for future removal possibly in v4.0.0.
+
 =back
 
 =head2 Example Configuration
@@ -92,17 +105,22 @@ cache.
  	{regex => "^/", replacement => "mnt/snapshots/root/"},
  );
  $sqlite_cache_size = 2097152;
+ $prepare_data_in_memory = 0;
 
  1; #ensure positive return value
 
 =head1 LICENSE
 
-Copyright (C) 2016-2017  Florian Pritz E<lt>bluewind@xinu.atE<gt>
+Copyright (C) 2016-2018  Florian Pritz E<lt>bluewind@xinu.atE<gt>
 
 Licensed under the GNU General Public License version 3 or later.
 See LICENSE for the full license text.
 
 =cut
+
+method new($class: $deps = {}) {
+	return $class->new_no_defaults($deps);
+}
 
 our $borg_repo = "backup:borg-".hostname;
 our $cache_path_base;
@@ -110,54 +128,69 @@ our @backup_prefixes = (
 	{regex => "^/", replacement => ""},
 );
 our $sqlite_cache_size = 102400;
-my @configfiles;
+our $prepare_data_in_memory = 0;
 
-if (defined $ENV{XDG_CONFIG_HOME} or defined $ENV{HOME}) {
-	push @configfiles, sprintf("%s/borg-restore.cfg", $ENV{XDG_CONFIG_HOME} // $ENV{HOME}."/.config");
+method new_no_defaults($class: $deps = {}) {
+	my $self = {};
+	bless $self, $class;
+	$self->{deps} = $deps;
+
+
+	if (defined $ENV{XDG_CACHE_HOME} or defined $ENV{HOME}) {
+		$cache_path_base = sprintf("%s/borg-restore.pl", $ENV{XDG_CACHE_HOME} // $ENV{HOME} ."/.cache");
+	}
+
+	load_config_files();
+
+	if (not defined $cache_path_base) {
+		die "Error: \$cache_path_base is not defined. This is most likely because the\n"
+		."environment variables \$HOME and \$XDG_CACHE_HOME are not set. Consider setting\n"
+		."the path in the config file or ensure that the variables are set.";
+	}
+
+	$cache_path_base = App::BorgRestore::Helper::untaint($cache_path_base, qr/.*/);
+
+	return $self;
 }
-push @configfiles, "/etc/borg-restore.cfg";
 
-if (defined $ENV{XDG_CACHE_HOME} or defined $ENV{HOME}) {
-	$cache_path_base = sprintf("%s/borg-restore.pl", $ENV{XDG_CACHE_HOME} // $ENV{HOME} ."/.cache");
+method get_config() {
+	return {
+		borg => {
+			repo => $borg_repo,
+			path_prefixes => [@backup_prefixes],
+		},
+		cache => {
+			base_path => $cache_path_base,
+			database_path => "$cache_path_base/v3/archives.db",
+			prepare_data_in_memory => $prepare_data_in_memory,
+			sqlite_memory_cache_size => $sqlite_cache_size,
+		}
+	};
 }
 
-for my $configfile (@configfiles) {
-	$configfile = App::BorgRestore::Helper::untaint($configfile, qr/.*/);
-	if (-e $configfile) {
-		unless (my $return = do $configfile) {
-			die "couldn't parse $configfile: $@" if $@;
-			die "couldn't do $configfile: $!"    unless defined $return;
-			die "couldn't run $configfile"       unless $return;
+fun load_config_files() {
+	my @configfiles;
+
+	if (defined $ENV{XDG_CONFIG_HOME} or defined $ENV{HOME}) {
+		push @configfiles, sprintf("%s/borg-restore.cfg", $ENV{XDG_CONFIG_HOME} // $ENV{HOME}."/.config");
+	}
+	push @configfiles, "/etc/borg-restore.cfg";
+
+	for my $configfile (@configfiles) {
+		$configfile = App::BorgRestore::Helper::untaint($configfile, qr/.*/);
+		if (-e $configfile) {
+			unless (my $return = do $configfile) {
+				die "couldn't parse $configfile: $@" if $@;
+				die "couldn't do $configfile: $!"    unless defined $return;
+				die "couldn't run $configfile"       unless $return;
+			}
 		}
 	}
 }
 
-if (not defined $cache_path_base) {
-	die "Error: \$cache_path_base is not defined. This is most likely because the\n"
-	."environment variables \$HOME and \$XDG_CACHE_HOME are not set. Consider setting\n"
-	."the path in the config file or ensure that the variables are set.";
-}
-
-$cache_path_base = App::BorgRestore::Helper::untaint($cache_path_base, qr/.*/);
-
-sub get_cache_base_dir_path {
-	my $path = shift;
+method get_cache_base_dir_path($path) {
 	return "$cache_path_base/$path";
 }
-
-sub get_cache_dir {
-	return "$cache_path_base/v3";
-}
-
-sub get_cache_path {
-	my $item = shift;
-	return get_cache_dir()."/$item";
-}
-
-sub get_db_path {
-	return get_cache_path('archives.db');
-}
-
 
 1;
 

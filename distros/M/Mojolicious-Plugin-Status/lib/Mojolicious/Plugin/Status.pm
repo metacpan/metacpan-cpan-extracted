@@ -7,7 +7,7 @@ use Time::HiRes 'time';
 use Mojo::File 'path';
 use Mojo::IOLoop;
 
-our $VERSION = '0.03';
+our $VERSION = '1.0';
 
 sub register {
   my ($self, $app, $config) = @_;
@@ -100,6 +100,7 @@ sub _request {
     finish => sub {
       my $tx = shift;
       $self->_guard->_change(sub {
+        return unless $_->{workers}{$$};
         $_->{workers}{$$}{connections}{$id}{request}{finished} = time;
         $_->{workers}{$$}{connections}{$id}{request}{status}   = $tx->res->code;
       });
@@ -150,11 +151,11 @@ sub _stream {
   my $stream = Mojo::IOLoop->stream($id);
   $stream->on(
     close => sub {
-      $self->_guard->_change(sub { delete $_->{workers}{$$}{connections}{$id} }
+      $self->_guard->_change(
+        sub { delete $_->{workers}{$$}{connections}{$id} if $_->{workers}{$$} }
       );
     }
   );
-  $stream->on(transition => sub { $self->_stream($id) });
 }
 
 sub _table {
@@ -284,7 +285,7 @@ Mojolicious::Plugin::Status - Mojolicious server status
 
 <p>
   <img alt="Screenshot"
-    src="https://raw.github.com/kraih/mojo-status/master/examples/status.png?raw=true"
+    src="https://raw.github.com/mojolicious/mojo-status/master/examples/status.png?raw=true"
     width="600px">
 </p>
 

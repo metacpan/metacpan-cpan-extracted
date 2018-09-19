@@ -72,6 +72,10 @@ Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) applicati
 
     Default: `(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10)` (actually see [Net::Prometheus](https://metacpan.org/source/PEVANS/Net-Prometheus-0.05/lib/Net/Prometheus/Histogram.pm#L19))
 
+- shm\_key
+
+    Key used for shared memory access between workers, see [$key in IPc::ShareLite](https://metacpan.org/pod/IPC::ShareLite) for details.
+
 # METRICS
 
 In addition to exposing the default process metrics that [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) already expose
@@ -82,29 +86,23 @@ this plugin will also expose
 - `http_request_size_bytes`, request size histogram partitioned over HTTP method
 - `http_response_size_bytes`, response size histogram partitioned over HTTP method
 
-# RUNNING UNDER HYPNOTOAD
-
-When running under a preforking daemon like [Hypnotoad](https://metacpan.org/pod/Mojo::Server::Hypnotoad), you will not get global metrics but only the metrics of each worker, randomly.
-
-The `worker` label will include the pid of the current worker so metrics can be aggregated per worker in Prometheus.
-
-If you prefer to get the global metrics from any worker, then see [Mojolicious::Plugin::Prometheus::Shared::FastMmap](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus::Shared::FastMmap) for a possible solution.
-
 # AUTHOR
 
 Vidar Tyldum
 
+(the IPC::ShareLite parts of this code is shamelessly stolen from [Mojolicious::Plugin::Status](https://metacpan.org/pod/Mojolicious::Plugin::Status) written by Sebastian Riedel and mangled into something that works for me)
+
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2017, Vidar Tyldum
+Copyright (C) 2018, Vidar Tyldum
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
-- [Mojolicious::Plugin::Prometheus::Shared::FastMmap](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus::Shared::FastMmap)
 - [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus)
+- [Mojolicious::Plugin::Status](https://metacpan.org/pod/Mojolicious::Plugin::Status)
 - [Mojolicious](https://metacpan.org/pod/Mojolicious)
 - [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides)
 - [http://mojolicious.org](http://mojolicious.org)

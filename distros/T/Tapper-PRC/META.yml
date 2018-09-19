@@ -5,8 +5,6 @@ author:
   - 'Tapper Team <tapper-ops@amazon.com>'
 build_requires:
   Cwd: '0'
-  Data::Dumper: '0'
-  Tapper::Config: '0'
   Test::Deep: '0'
   Test::MockModule: '0'
   Test::More: '0'
@@ -21,6 +19,7 @@ meta-spec:
   version: '1.4'
 name: Tapper-PRC
 requires:
+  Data::Dumper: '0'
   English: '0'
   File::Basename: '0'
   File::Copy: '0'
@@ -28,19 +27,23 @@ requires:
   IO::Handle: '0'
   IO::Socket::INET: '0'
   IPC::Open3: '0'
+  IPC::Run: '0'
   Log::Log4perl: '0'
+  Minion: '0'
   Moose: '0'
   MooseX::Log::Log4perl: '0'
   Proc::Killfam: '0'
   Proc::ProcessTable: '0.53'
   Sys::Hostname: '0'
   Tapper::Base: '0'
+  Tapper::Config: '0'
   Tapper::Installer::Base: '0'
   Tapper::Remote::Config: '0'
   Tapper::Remote::Net: '0'
   URI::Escape: '0'
   YAML: '0'
   YAML::Syck: '0'
+  constant: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
@@ -48,7 +51,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-PRC
   homepage: http://metacpan.org/release/Tapper-PRC
   repository: git://github.com/tapper/Tapper-PRC.git
-version: 5.0.2
+version: 5.0.3
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -300,7 +303,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.0.2
+          tag: v5.0.3
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

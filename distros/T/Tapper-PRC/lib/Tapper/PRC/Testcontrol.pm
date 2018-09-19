@@ -1,6 +1,6 @@
 package Tapper::PRC::Testcontrol;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::PRC::Testcontrol::VERSION = '5.0.2';
+$Tapper::PRC::Testcontrol::VERSION = '5.0.3';
 use 5.010;
 use warnings;
 use strict;
@@ -98,8 +98,8 @@ sub upload_files
 
         my $s_reportfile =  $s_file;
            $s_reportfile =~ s|^$s_path/*||;
-           $s_reportfile =~ s|^./||;
-           $s_reportfile =~ s|[^A-Za-z0-9_-]|_|g;
+           #$s_reportfile =~ s|^./||;
+           #$s_reportfile =~ s|[^A-Za-z0-9_-]|_|g;
 
         my $or_server = IO::Socket::INET->new(
             PeerAddr => $s_host,
@@ -115,7 +115,7 @@ sub upload_files
         }
         close($fh_file);
         $or_server->close();
-
+        unlink $s_file; # so we don't upload file again when MCP uploads remaining bits
     }
 
     return 0;
@@ -250,10 +250,18 @@ sub testprogram_execute
                 close $write;
 
                 my $killed;
-                local $SIG{ALRM} = sub {
+                my $sig_name;
+                my $signal_kill = sub {
                     $killed = 1;
+                    ($sig_name) = @_;
+                    $self->log->warn("Catched signal $sig_name");
                     kill_process_tree ($pid);
                 };
+                local $SIG{ALRM} = $signal_kill;
+                local $SIG{TERM} = $signal_kill;
+                local $SIG{KILL} = $signal_kill;
+                local $SIG{QUIT} = $signal_kill;
+                local $SIG{INT}  = $signal_kill;
 
                 alarm ($test_program->{timeout} || 0);
                 waitpid($pid,0);
@@ -282,7 +290,16 @@ sub testprogram_execute
                         return $error_msg if $b_error;
                 }
 
-                return "Killed $program after $test_program->{timeout} seconds" if $killed;
+                if ($killed) {
+                    return
+                        "Killed $program after SIG:$sig_name"
+                        .(
+                          $sig_name eq "ALRM"
+                            ? " (timeout ".$test_program->{timeout}." seconds)"
+                            : ""
+                        );
+                }
+
                 if ( $retval ) {
                         my $error;
                         sysread($read,$error, $MAXREAD);
@@ -372,12 +389,15 @@ sub guest_start
         return 0;
 }
 
-        
+
 sub create_log
 {
         my ($self) = @_;
         my $testrun = $self->cfg->{test_run};
-        my $outdir  = $self->cfg->{paths}{output_dir}."/$testrun/test/";
+        my $output_dir = ($self->cfg->{test_type} || '') eq 'minion'
+          ? $self->cfg->{paths}{minion_output_dir}
+          : $self->cfg->{paths}{output_dir};
+        my $outdir  = "$output_dir/$testrun/test/";
         my ($error, $retval);
 
         for (my $i = 0; $i <= $#{$self->cfg->{guests}}; $i++) {
@@ -437,7 +457,10 @@ sub control_testprogram
         }
 
         my $test_run         = $self->cfg->{test_run};
-        my $out_dir          = $self->cfg->{paths}{output_dir}."/$test_run/test/";
+        my $output_dir       = ($self->cfg->{test_type} || '') eq 'minion'
+          ? $self->cfg->{paths}{minion_output_dir}
+          : $self->cfg->{paths}{output_dir};
+        my $out_dir          = "$output_dir/$test_run/test/";
         my @testprogram_list;
            @testprogram_list = @{$self->cfg->{testprogram_list}} if $self->cfg->{testprogram_list};
 
@@ -667,7 +690,18 @@ sub run
 
         }
 
-        sleep 1; # make sure last end-testing can't overtake last end-testprogram (Yes, this did happen)
+        # TODO: too cheap work-around
+        #
+        # Make sure last end-testing can't overtake last
+        # end-testprogram (Yes, this did happen).
+        #
+        # Wait at least as long as the MCP loop time is, see
+        # tapper.cfg:
+        #  - mcp.child.get_message_sleep_interval
+        #  - times.poll_intervall
+
+
+        sleep ($ENV{HARNESS_ACTIVE} ? 1 : 10);
 
         # send attachment report
         my ( $b_error, $s_error_msg ) = $self->send_attachements();
@@ -849,7 +883,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

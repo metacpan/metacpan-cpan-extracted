@@ -68,7 +68,7 @@ if ($pid == 0) {
         };
         is ($@, '', 'Getting data from file upload');
 
-        my $msg = "#! upload 23 install_prove plain\ncontent\n";
+        my $msg = "#! upload 23 install/prove plain\ncontent\n";
         is($content, $msg, 'File content from upload');
 
         waitpid($pid,0);

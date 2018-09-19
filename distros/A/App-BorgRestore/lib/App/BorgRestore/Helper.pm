@@ -1,7 +1,6 @@
 package App::BorgRestore::Helper;
 use v5.14;
-use strict;
-use warnings;
+use strictures 2;
 
 use autodie;
 use Function::Parameters;

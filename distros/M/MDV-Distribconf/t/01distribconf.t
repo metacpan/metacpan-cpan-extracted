@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: 01distribconf.t 231445 2007-11-09 13:46:44Z nanardon $
+# $Id$
 
 use strict;
 use Test::More;
@@ -12,7 +12,7 @@ my %testdpath = (
     'http://server/path/' => 'testdata/test/media/media_info/media.cfg',
 );
 
-plan tests => 14 + 29 * scalar(keys %testdpath);
+plan tests => 22 + 29 * scalar(keys %testdpath);
 
 use_ok('MDV::Distribconf');
 
@@ -115,3 +115,42 @@ like($dconf->getpath(undef, 'media_info'), qr!^/*infodir/?$!, "Can get media_inf
         'getvalue works'
     );
 }
+
+{
+    my $dc = MDV::Distribconf->new('testdata/test');
+    $dc->load();
+    is( $dc->getdpath('main', 'hdlist'),
+        $dc->getmediapath('main', 'hdlist'),
+        "Can get default path w/o cdmode"
+    );
+    is ( $dc->getdpath('main', 'info'),
+         'media/main/media_info/info.xml.lzma',
+         'Can get xml "info" path'
+    );
+    is ( $dc->getdpath('main', 'files'),
+         'media/main/media_info/files.xml.lzma',
+         'Can get xml "files" path'
+    );
+    is ( $dc->getdpath('main', 'changelog'),
+         'media/main/media_info/changelog.xml.lzma',
+         'Can get xml "changelog" path'
+    );
+    $dc->{cfg}->newval('media_info', 'cdmode', 1);
+    is( $dc->getdpath('main', 'hdlist'),
+        $dc->getpath('main', 'hdlist'),
+        "Can get default path w/ cdmode"
+    );
+    is ( $dc->getdpath('main', 'info'),
+         'media/media_info/info.main.xml.lzma',
+         'Can get xml "info" path'
+    );
+    is ( $dc->getdpath('main', 'files'),
+         'media/media_info/files.main.xml.lzma',
+         'Can get xml "files" path'
+    );
+    is ( $dc->getdpath('main', 'changelog'),
+         'media/media_info/changelog.main.xml.lzma',
+         'Can get xml "changelog" path'
+    );
+}
+

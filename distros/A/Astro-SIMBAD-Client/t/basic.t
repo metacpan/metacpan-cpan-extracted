@@ -22,12 +22,21 @@ is $smb->get( 'debug' ), 1, 'Able to set debug to 1';
 
 $smb->set( debug => 0 );
 
+{
+    my $scheme = Astro::SIMBAD::Client::_is_scheme_valid(
+	$ENV{ASTRO_SIMBAD_CLIENT_SCHEME} ) ?
+	    'http' :
+	    lc $ENV{ASTRO_SIMBAD_CLIENT_SCHEME};
+    is $smb->get( 'scheme' ), $scheme, "Default scheme is '$scheme'";
+}
+
+
 eval {
-    diag join ': ', $smb->get( 'server' ), scalar $smb->release();
+    diag join ': ', $smb->__build_url(), scalar $smb->release();
     1;
 } or do {
     my $err = $@;
-    diag join ': ', $smb->get( 'server' ), $err;
+    diag join ': ', $smb->__build_url(), $err;
 };
 
 done_testing;

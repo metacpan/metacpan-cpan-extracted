@@ -42,6 +42,13 @@ use Test::Most;
 {
   ok my $res = request '/static/a/d.txt';
   is $res->code, 404;
+  like $res->content,qr/Not Found/;
+}
+
+{
+  ok my $res = request '/absolute';
+  is $res->code, 404;
+  like $res->content,qr/Not Found/;
 }
 
 done_testing;

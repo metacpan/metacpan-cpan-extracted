@@ -1,0 +1,31 @@
+---
+abstract: 'minimal PCG random number generator'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::Most: '0'
+configure_requires:
+  CPAN::Meta: '2.142060'
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Random-PCG32
+provides:
+  Math::Random::PCG32:
+    file: lib/Math/Random/PCG32.pm
+    version: '0.02'
+requires:
+  perl: '5.014000'
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+version: '0.02'
+x_homepageresources:
+  type: git
+  url: git://github.com/thrig/Math-Random-PCG32.git
+  web: https://github.com/thrig/Math-Random-PCG32
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

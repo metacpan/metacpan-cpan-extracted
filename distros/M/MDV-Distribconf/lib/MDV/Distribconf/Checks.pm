@@ -198,7 +198,7 @@ sub check_media_coherency {
     foreach my $media ($distrib->listmedia) {
 	-d $distrib->getfullpath($media, 'path') or $error += _report_err(
 	    $fhout,
-		'MISSING_MEDIADIR', "dir %s does't exist for media `%s'",
+		'MISSING_MEDIADIR', "dir %s doesn't exist for media `%s'",
 	    $distrib->getpath($media, 'path'),
 	    $media
 	);
@@ -217,6 +217,16 @@ sub check_media_coherency {
 		$media
 	    );
 	}
+    if ($distrib->getvalue($media, 'xml-info')) {
+        foreach (qw/info files changelog/) {
+            -f $distrib->getfulldpath($media, $_) or $error += _report_err(
+            $fhout,
+            'MISSING_INDEX', "$_ %s doesn't exist for media `%s'",
+            $distrib->getfulldpath($media, $_),
+            $media
+            );
+        }
+    }
     foreach (qw/pubkey/) {
 	    -f $distrib->getfullpath($media, $_) or $error += _report_err(
         $fhout,
@@ -277,9 +287,14 @@ Return 1 if no error were found.
 
 sub check_media_md5 {
     my ($self, $media) = @_;
+    my @indexes = map { $self->getfullmediapath($media, $_) } (qw(hdlist synthesis));
+    if ($self->getvalue($media, 'xml-info') && !$self->getvalue($media, 'cdmode')) {
+       push(@indexes, map { $self->getfullmediapath($media, $_) }
+          (qw(info files changelog)));
+    } 
     my ($unsync) = MDV::Distribconf::Utils::checkmd5(
         $self->getfullmediapath($media, 'MD5SUM'),
-        map { $self->getfullmediapath($media, $_) } (qw(hdlist synthesis))
+        @indexes
     );
     if (@{$unsync || []}) {
         return 0;
@@ -292,8 +307,18 @@ sub check_global_md5 {
     my ($self) = @_;
     my @indexes;
     foreach my $media ($self->listmedia()) {
-        push(@indexes, map { $self->getfullpath($media, $_) } (qw(hdlist synthesis)));
+        push(
+            @indexes, 
+            map { $self->getfulldpath($media, $_) } (qw(hdlist synthesis))
+        );
+        if ($self->getvalue($media, 'xml-info') && $self->getvalue($media, 'cdmode')) {
+            push(
+                @indexes, 
+                map { $self->getfulldpath($media, $_) } (qw(info files changelog))
+            );
+        }
     }
+    
     my ($unsync) = MDV::Distribconf::Utils::checkmd5(
         $self->getfullpath(undef, 'MD5SUM'),
         @indexes,

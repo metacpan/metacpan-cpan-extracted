@@ -1,0 +1,9 @@
+20180919.1.0  2018-09-19 (PERLANCAR)
+
+	  - [Incompatible change] Rename fields country->country_code,
+	    founded->year_founded.
+
+
+20180919  2018-09-19 (PERLANCAR)
+
+          - First, early release.
