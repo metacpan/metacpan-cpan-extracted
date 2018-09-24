@@ -1,70 +1,76 @@
 NAME
+
     Text::Bidi - Unicode bidi algorithm using libfribidi
 
 VERSION
-    version 2.12
+
+    version 2.14
 
 SYNOPSIS
+
         # Each displayed line is a "paragraph"
         use Text::Bidi qw(log2vis);
         ($par, $map, $visual) = log2vis($logical);
         # or just
         $visual = log2vis(...);
-
+    
         # For real paragraphs, need to specify the display width
         ($par, $map, $visual) = log2vis($logical, $width);
-
+    
         # object oriented approach allows one to display line by line
         $p = new Text::Bidi::Paragraph $logical;
         $visual = $p->visual($off, $len);
 
 EXPORT
+
     The following functions can be exported (nothing is exported by
     default):
 
-    *   "log2vis"
+      * "log2vis"
 
-    *   "is_bidi"
+      * "is_bidi"
 
-    *   "get_mirror_char"
+      * "get_mirror_char"
 
-    *   "get_bidi_type_name"
+      * "get_bidi_type_name"
 
-    *   "fribidi_version"
+      * "fribidi_version"
 
-    *   "unicode_version"
+      * "unicode_version"
 
-    *   "fribidi_version_num"
+      * "fribidi_version_num"
 
-    All of them can be exported together using the ":all" tag.
+    All of them can be exported together using the :all tag.
 
 DESCRIPTION
+
     This module provides basic support for the Unicode bidirectional (Bidi)
-    text algorithm, for displaying text consisting of both left-to-right and
-    right-to-left written languages (such as Hebrew and Arabic.) It does so
-    via a *swig* interface file to the *libfribidi* library.
+    text algorithm, for displaying text consisting of both left-to-right
+    and right-to-left written languages (such as Hebrew and Arabic.) It
+    does so via a swig interface file to the libfribidi library.
 
     The fundamental purpose of the bidi algorithm is to reorder text given
     in logical order into text in visually correct order, suitable for
     display using standard printing commands. ``Logical order'' means that
     the characters are given in the order in which they would be read if
-    printed correctly. The direction of the text is determined by properties
-    of the Unicode characters, usually without additional hints. See
-    <http://www.unicode.org/unicode/reports/tr9/> for more details on the
+    printed correctly. The direction of the text is determined by
+    properties of the Unicode characters, usually without additional hints.
+    See http://www.unicode.org/unicode/reports/tr9/ for more details on the
     problem and the algorithm.
 
-  Standard usage
+ Standard usage
+
     The bidi algorithm works in two stages. The first is on the level of a
-    paragraph, where the direction of each character is computed. The second
-    is on the level of the lines to be displayed. The main practical
+    paragraph, where the direction of each character is computed. The
+    second is on the level of the lines to be displayed. The main practical
     difference is that the first stage requires only the text of the
     paragraph, while the second requires knowledge of the width of the
     displayed lines. The module (or the library) does not determine how the
     text is broken into paragraphs.
 
     The full interface is provided by Text::Bidi::Paragraph, see there for
-    details. This module provides an abbreviation, "log2vis", which combines
-    creating a paragraph object with calling "visual" in
+    details. This module provides an abbreviation, "log2vis", which
+    combines creating a paragraph object with calling "visual" in
     Text::Bidi::Paragraph on it. It is particularly useful in the case that
     the whole paragraph should be displayed at once, and the display width
     is known:
@@ -73,10 +79,11 @@ DESCRIPTION
 
     There are more options (see "log2vis"), but this is essentially it. The
     rest of this documentation will probably be useful only to people who
-    are familiar with *libfribidi* and who wish to extend or modify the
+    are familiar with libfribidi and who wish to extend or modify the
     module.
 
-  The object-oriented approach
+ The object-oriented approach
+
     All functions here can be called using either a procedural or an object
     oriented approach. For example, you may do either
 
@@ -88,19 +95,22 @@ DESCRIPTION
             $visual = $bidi->log2vis($logical);
 
     The advantages of the second form is that it is easier to move to a
-    sub-class, and that two or more objects with different parameters can be
-    used simultaneously. If you are interested in deriving from this class,
-    please see "SUBCLASSING".
+    sub-class, and that two or more objects with different parameters can
+    be used simultaneously. If you are interested in deriving from this
+    class, please see "SUBCLASSING".
 
 FUNCTIONS
-  get_bidi_type_name
+
+ get_bidi_type_name
+
         say $tb->get_bidi_type_name($Text::Bidi::Type::LTR); # says 'LTR'
 
     Return the string representation of a Bidi character type, as in
     fribidi_get_bidi_type_name(3). Note that for the above example, one
     needs to use Text::Bidi::Constants.
 
-  log2vis
+ log2vis
+
         ($p, $visual) = log2vis($logical[,$width[,$dir[,$flags]]]);
 
     Convert the input paragraph $logical to visual. This constructs a
@@ -114,34 +124,40 @@ FUNCTIONS
     The output consists of the Text::Bidi::Paragraph object $p and the
     visual string $visual.
 
-  is_bidi()
+ is_bidi()
+
         my $bidi = is_bidi($logical);
 
     Returns true if the input $logical contains bidi characters. Otherwise,
     the output of the bidi algorithm will be identical to the input, hence
     this helps if we want to short-circuit.
 
-  get_mirror_char()
+ get_mirror_char()
+
         my $mir = get_mirror_char('['); # $mir == ']'
 
     Return the mirror character of the input, possibly itself.
 
-  fribidi_version
+ fribidi_version
+
         say fribidi_version();
 
     Returns the version information for the fribidi library
 
-  fribidi_version_num
+ fribidi_version_num
+
         say fribidi_version_num();
 
     Returns the version number for the fribidi library
 
-  unicode_version
+ unicode_version
+
         say unicode_version();
 
     Returns the Unicode version used by the fribidi library
 
 SUBCLASSING
+
     The rest of the documentation is only interesting if you would like to
     derive from this class. The methods listed under "METHODS" are wrappers
     around the similarly named functions in libfribidi, and may be useful
@@ -155,63 +171,72 @@ SUBCLASSING
     in your module.
 
 METHODS
-  new
+
+ new
+
         $tb = new Text::Bidi [tie_byte => ..., tie_long => ...];
 
-    Create a new Text::Bidi object. If the *tie_byte* or *tie_long* options
-    are given, they should be the names (strings) of the classes used as
-    dual life arrays, most probably derived class of Text::Bidi::Array::Byte
-    and Text::Bidi::Array::Long, respectively.
+    Create a new Text::Bidi object. If the tie_byte or tie_long options are
+    given, they should be the names (strings) of the classes used as dual
+    life arrays, most probably derived class of Text::Bidi::Array::Byte and
+    Text::Bidi::Array::Long, respectively.
 
     This method is probably of little interest for standard (procedural)
     use.
 
-  utf8_to_internal
+ utf8_to_internal
+
         $la = $tb->utf8_to_internal($str);
 
-    Convert the Perl string *$str* into the representation used by
+    Convert the Perl string $str into the representation used by
     libfribidi. The result will be a Text::Bidi::Array::Long.
 
-  internal_to_utf8
+ internal_to_utf8
+
         $str = $tb->internal_to_utf8($la);
 
-    Convert the long array *$la*, representing a string encoded in to format
-    used by libfribidi, into a Perl string. The array *$la* can be either a
+    Convert the long array $la, representing a string encoded in to format
+    used by libfribidi, into a Perl string. The array $la can be either a
     Text::Bidi::Array::Long, or anything that can be used to construct it.
 
-  get_bidi_types
+ get_bidi_types
+
         $types = $tb->get_bidi_types($internal);
 
     Returns a Text::Bidi::Array::Long with the list of Bidi types of the
     text given by $internal, a representation of the paragraph text, as
     returned by utf8_to_internal(). Wraps fribidi_get_bidi_types(3).
 
-  get_joining_types
+ get_joining_types
+
         $types = $tb->get_joining_types($internal);
 
     Returns a Text::Bidi::Array::Byte with the list of joining types of the
     text given by $internal, a representation of the paragraph text, as
     returned by "utf8_to_internal". Wraps fribidi_get_joining_types(3).
 
-  get_joining_type_name
+ get_joining_type_name
+
         say $tb->get_joining_type_name($Text::Bidi::Joining::U); # says 'U'
 
     Return the string representation of a joining character type, as in
     fribidi_get_joining_type_name(3). Note that for the above example, one
     needs to use Text::Bidi::Constants.
 
-  get_par_embedding_levels
+ get_par_embedding_levels
+
        ($odir, $lvl) = $tb->get_par_embedding_levels($types[, $dir]);
 
     Return the embedding levels of the characters, whose types are given by
-    *$types*. *$types* is a Text::Bidi::Array::Long of Bidi types, as
-    returned by "get_bidi_types". *$dir* is the base paragraph direction. If
-    not given, it defaults to "FRIBIDI_PAR_ON" (neutral).
+    $types. $types is a Text::Bidi::Array::Long of Bidi types, as returned
+    by "get_bidi_types". $dir is the base paragraph direction. If not
+    given, it defaults to FRIBIDI_PAR_ON (neutral).
 
-    The output is the resolved paragraph direction *$odir*, and the
-    Text::Bidi::Array::Byte array *$lvl* of embedding levels.
+    The output is the resolved paragraph direction $odir, and the
+    Text::Bidi::Array::Byte array $lvl of embedding levels.
 
-  join_arabic
+ join_arabic
+
         $props = $tb->join_arabic($bidi_types, $lvl, $join_types);
 
     Returns a Text::Bidi::Array::Byte with $props, as returned by
@@ -220,28 +245,32 @@ METHODS
     $join_types as returned by "get_joining_types". Wraps
     fribidi_join_arabic(3).
 
-  shaped
+ shaped
+
         ($newp, $shaped) = $tb->shaped($flags, $lvl, $prop, $internal);
 
     Returns the internal representation of the paragraph, with shaping
     applied. The internal representation of the original paragraph (as
-    returned by "utf8_to_internal") should be passed in $internal, while the
-    embedding levels (as returned by "get_par_embedding_levels") should be
-    in $lvl. See the documentation of fribidi-arabic.h for $flags, but as a
-    special case, a value of "undef" here skips shaping (returning ($prop,
-    $internal)), while any other false value becomes the default. $prop is
-    as returned by "join_arabic". This method wraps fribidi_shape_arabic(3).
+    returned by "utf8_to_internal") should be passed in $internal, while
+    the embedding levels (as returned by "get_par_embedding_levels") should
+    be in $lvl. See the documentation of fribidi-arabic.h for $flags, but
+    as a special case, a value of undef here skips shaping (returning
+    ($prop, $internal)), while any other false value becomes the default.
+    $prop is as returned by "join_arabic". This method wraps
+    fribidi_shape_arabic(3).
 
-  mirrored
+ mirrored
+
         $mirrored = $tb->mirrored($lvl, $internal);
 
     Returns the internal representation of the paragraph, with mirroring
     applied. The internal representation of the original paragraph (as
-    returned by "utf8_to_internal") should be passed in $internal, while the
-    embedding levels (as returned by "get_par_embedding_levels") should be
-    in $lvl. This method wraps fribidi_shape_mirroring(3).
+    returned by "utf8_to_internal") should be passed in $internal, while
+    the embedding levels (as returned by "get_par_embedding_levels") should
+    be in $lvl. This method wraps fribidi_shape_mirroring(3).
 
-  reorder
+ reorder
+
         $str = $tb->reorder($in, $map[, $offset[, $len]]);
         say $tb->reorder([qw(A B C)], [2, 0, 1]); # says CAB
 
@@ -250,39 +279,45 @@ METHODS
     string. If $offset and $len are given, returns only that part of the
     resulting string.
 
-  reorder_map
+ reorder_map
+
         ($elout, $mout) = $tb->reorder_map($types, $offset, $len, $par,
                                            $map, $el, $flags);
 
     Compute the reordering map for bidi types given by $types, for the
     interval starting with $offset of length $len. Note that this part of
     the algorithm depends on the interval in an essential way. $types is an
-    array of types, as computed by "get_bidi_types". The other arguments are
-    optional:
+    array of types, as computed by "get_bidi_types". The other arguments
+    are optional:
 
     $par
-        The base paragraph direction. Computed via
-        "get_par_embedding_levels" if not defined.
+
+      The base paragraph direction. Computed via "get_par_embedding_levels"
+      if not defined.
 
     $map
-        An array ref (or a Text::Bidi::Array::Long) from a previous call
-        (with a different interval). The method is called repeatedly for the
-        same paragraph, with different intervals, and the reordering map is
-        updated for the given interval. If not defined, initialised to the
-        identity map.
 
-    $el The embedding levels. If not given, computed by a call to
-        "get_par_embedding_levels".
+      An array ref (or a Text::Bidi::Array::Long) from a previous call
+      (with a different interval). The method is called repeatedly for the
+      same paragraph, with different intervals, and the reordering map is
+      updated for the given interval. If not defined, initialised to the
+      identity map.
+
+    $el
+
+      The embedding levels. If not given, computed by a call to
+      "get_par_embedding_levels".
 
     $flags
-        A specification of flags, as described in fribidi_reorder_line(3).
-        The flags can be given either as a number (using
-        "$Text::Bidi::Flags::.." from Text::Bidi::Constants), or as a
-        hashref of the form "{REORDER_NSM => 1}". Defaults to
-        "FRIBIDI_FLAGS_DEFAULT".
+
+      A specification of flags, as described in fribidi_reorder_line(3).
+      The flags can be given either as a number (using
+      $Text::Bidi::Flags::.. from Text::Bidi::Constants), or as a hashref
+      of the form {REORDER_NSM => 1}. Defaults to FRIBIDI_FLAGS_DEFAULT.
 
     The output consists of the modified map $mout (a
-    Text::Bidi::Array::Long), and possibly modified embedding levels $elout.
+    Text::Bidi::Array::Long), and possibly modified embedding levels
+    $elout.
 
     method remove_bidi_marks
 
@@ -297,16 +332,18 @@ METHODS
 
         @$from[@$map] = 0..$#$map
 
-    Each of the arguments can be "undef", in which case it will be skipped.
+    Each of the arguments can be undef, in which case it will be skipped.
     This implements step X9, see fribidi_remove_bidi_marks(3).
 
 BUGS
+
     There are no real tests for any of this.
 
-    Shaping is not supported (probably), since I don't know what it is. Help
-    welcome!
+    Shaping is not supported (probably), since I don't know what it is.
+    Help welcome!
 
 SEE ALSO
+
     Text::Bidi::Paragraph
 
     Text::Bidi::Constants
@@ -317,12 +354,15 @@ SEE ALSO
 
     Swig <http://www.swig.org>
 
-    The unicode bidi algorithm <http://www.unicode.org/unicode/reports/tr9/>
+    The unicode bidi algorithm
+    <http://www.unicode.org/unicode/reports/tr9/>
 
 AUTHOR
+
     Moshe Kamensky <kamensky@cpan.org>
 
 COPYRIGHT AND LICENSE
+
     This software is copyright (c) 2015 by Moshe Kamensky.
 
     This is free software; you can redistribute it and/or modify it under

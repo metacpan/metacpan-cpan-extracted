@@ -10,7 +10,7 @@
 
 use strict;
 use warnings;
-require 5.014;
+use 5.014;
 
 use utf8;
 use Carp;
@@ -42,7 +42,7 @@ sub read_until (&$) {
 ## options
 ##
 my $opt_B;
-my $opt_d;
+my @opt_d;
 my $opt_q;
 my $opt_n;
 my $opt_mecab;
@@ -91,7 +91,7 @@ if ($opt_env and my $env = $ENV{'CDIFOPTS'}) {
 }
 
 my @optargs = (
-    "d=s" => \$opt_d,
+    "d=s" => \@opt_d,
     "B|char" => \$opt_B,
     "diff=s" => \$diff,
     "subdiff=s" => \$sub_diff,
@@ -133,7 +133,7 @@ Getopt::Long::Configure("bundling");
 GetOptions(@optargs) || usage({status => 1});
 
 my %opt_d;
-if ($opt_d) {
+for my $opt_d (@opt_d) {
     map { $opt_d{$_}++ } split //, $opt_d;
 }
 
@@ -542,10 +542,8 @@ sub context {
 	print STDERR "****************************** .\n";
     }
 
-    my %c = (a => 0, d => 0, c => 0);
-    my @owlist = maketmp($T1, $old);
-    my @nwlist = maketmp($T2, $new);
-    my @command = ();
+    my @owlist = wordlist($old);
+    my @nwlist = wordlist($new);
 
     if ($opt_d{w}) {
 	print STDERR "****************************** Comparing ...\n";
@@ -555,9 +553,14 @@ sub context {
 	print STDERR "****************************** .\n";
     }
 
+    maketmp($T1, @owlist);
+    maketmp($T2, @nwlist);
+
     my $diff = sprintf "$sub_diff @sub_diffopts %s %s", $T1->path, $T2->path;
     open(CDIF, "$diff |") || die "diff: $!\n";
     binmode CDIF, ":encoding(utf8)";
+    my @command;
+    my %c = (a => 0, d => 0, c => 0);
     while (<CDIF>) {
 	warn $_ if $opt_d{d};
 
@@ -584,29 +587,37 @@ sub context {
     }
 
     my($obuf, $nbuf) = makebuf(\@owlist, \@nwlist, \@command);
-    die "illegal status of subprocess\n" if ($?>>8) > 1;
+    my $status = $?>>8;
+    die "Unexpected status of subprocess ($status)\n" if $status > 1;
 
     ($obuf, $nbuf);
 }
 
-##
-## Divide given text into word list.  Then write them into temporary
-## file `$file' which include the word list one on each line.  The list
-## itself is returned as a result of subroutine.
-##
-sub maketmp {
-    my $tmpfile = shift;
+sub wordlist {
+    my $text = shift;
+    if (!$opt_B and $opt_mecab and $text =~ /\P{ASCII}/) {
+	mecab_words($text);
+    } else {
+	normal_words($text);
+    }
+}
+
+sub normal_words {
     my $text = shift;
     my @words;
-    my @notspace = (0);
+    while ($text =~ /\G($w_pattern)/g) {
+	push @words, $1;
+    }
+    @words;
+}
 
-  MECAB:
+sub mecab_words {
+    my $text = shift;
 
-    goto NORMAL unless $opt_mecab;
-    goto NORMAL unless $text =~ /\P{ASCII}/;
+    state $tmpfile = new App::cdif::Tmpfile;
 
     my $pid = open(MECAB, '|-');
-    goto NORMAL if not defined $pid;
+    return normal_words($text) if not defined $pid;
 
     my $eos = "EOS" . "000";
     $eos++ while $text =~ /$eos/;
@@ -624,8 +635,8 @@ sub maketmp {
 	    warn "EXEC: @mecab\n" if $opt_d{m};
 	    exec @mecab;
 	}
-	while ($text =~ /($w_pattern)/g) {
-	    my $w = $1;
+	warn "Fail to exec mecab command.\n";
+	for my $w (normal_words($text)) {
 	    $w =~ s/^[ \t]*\n/$eos/;
 	    $tmpfile->write($w, "\n");
 	}
@@ -633,6 +644,7 @@ sub maketmp {
     }
     close MECAB;
 
+    my @words;
     $tmpfile->rewind;
     while (my $s = $tmpfile->fh->getline) {
 	warn "MECAB: $s" if $opt_d{m};
@@ -642,37 +654,18 @@ sub maketmp {
 	push @words, $s;
     }
 
-    goto DONE;
+    return @words;
+}
 
-  NORMAL:
-
-    while ($text =~ /($w_pattern)/g) {
-	local $_ = $1;
-	if ($opt_w) {
-	    push(@notspace, !/\s/);
-	    if (shift(@notspace) && $notspace[0]) {
-		push @words, '';
-		$tmpfile->write("\n");
-	    }
-	}
-	if (s/^(\s*)\n/\n/ && (length($1) || $opt_b || $opt_w)) {
-	    #     ^ This have to be *.  Don't change to +.
-	    $tmpfile->write(($opt_b || $opt_w) ? "\n" : "$1\n");
-	    push @words, $1;
-	}
-	push @words, $_;
-    }
-
-  DONE:
-
+sub maketmp {
+    my($tmpfile, @list) = @_;
     $tmpfile->reset;
-    for (@words) {
+    for (@list) {
+	s/[ \t]+// if $opt_b || $opt_w;
 	$tmpfile->write($_);
 	$tmpfile->write("\n") unless /\n\z/;
     }
     $tmpfile->flush->rewind;
-
-    @words;
 }
 
 ##

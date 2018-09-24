@@ -17,6 +17,8 @@ use Path::Tiny 0.009;
         is => 'ro', isa => 'Str',
         default => 'foo default',
     );
+
+    has _somename => ( is => 'ro', isa => 'Str', required => 1, init_arg => 'somename' );
 }
 
 {
@@ -33,6 +35,11 @@ use Path::Tiny 0.009;
         $obj->foo,
         'foo value',
         'value is read in from the config file',
+    );
+    is(
+        $obj->_somename,
+        "franz",
+        'public value is read in from the config file and goes through init_arg to private attribute',
     );
 }
 

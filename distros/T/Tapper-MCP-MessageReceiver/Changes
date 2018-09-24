@@ -1,5 +1,8 @@
 Revision history for Tapper-MCP-MessageReceiver
 
+5.0.1     2018-09-20
+        - updated to latest Mojolicious route syntax
+
 5.0.0     2016-02-15
         - version bump for v5
 

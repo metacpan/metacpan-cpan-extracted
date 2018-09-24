@@ -2,8 +2,8 @@ NAME
     App::swcat - Software catalog
 
 VERSION
-    This document describes version 0.001 of App::swcat (from Perl
-    distribution App-swcat), released on 2018-09-13.
+    This document describes version 0.003 of App::swcat (from Perl
+    distribution App-swcat), released on 2018-09-21.
 
 SYNOPSIS
     See swcat script.
@@ -25,7 +25,7 @@ FUNCTIONS
 
     *   arch => *software::arch*
 
-    *   cache_period => *int* (default: 86400)
+    *   cache_period => *int*
 
     *   db_path => *filename*
 
@@ -58,7 +58,7 @@ FUNCTIONS
 
     *   arch => *software::arch*
 
-    *   cache_period => *int* (default: 86400)
+    *   cache_period => *int*
 
     *   db_path => *filename*
 
@@ -91,7 +91,7 @@ FUNCTIONS
 
     *   arch => *software::arch*
 
-    *   cache_period => *int* (default: 86400)
+    *   cache_period => *int*
 
     *   db_path => *filename*
 

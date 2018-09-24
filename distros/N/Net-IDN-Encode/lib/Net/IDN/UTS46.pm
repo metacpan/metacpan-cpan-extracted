@@ -8,7 +8,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 $VERSION = eval $VERSION;
 
 our @ISA = ('Exporter');
@@ -61,10 +61,9 @@ sub _process {
 #   - disallowed
 #
   if($param{'AllowUnassigned'}) {
-    $label =~ m/^(\P{IsDisallowed}}|\P{Assigned})*$/ and croak sprintf('disallowed character U+%04X', ord($1));
+    $label =~ m/(\p{Is_DisallowedAssigned})/ and croak sprintf('disallowed character U+%04X', ord($1));
   } else {
     $label =~ m/(\p{IsDisallowed})/ and croak sprintf('disallowed character U+%04X', ord($1));
-    $label =~ m/(\P{Assigned})/ and croak sprintf('unassigned character U+%04X (in this version of perl)', ord($1));
   }
 
   if($param{'UseSTD3ASCIIRules'}) {
@@ -113,7 +112,6 @@ sub _process {
 
       _validate_label($l, %param,
 	'TransitionalProcessing' => 0,
-	'AllowUnassigned' => 0,			## keep the Punycode version
       ) unless $@;
     } else {
       _validate_label($l,%param,'_AssumeNFC' => 1);
@@ -432,7 +430,7 @@ Claus FE<auml>rber <CFAERBER@cpan.org>
 
 =head1 LICENSE
 
-Copyright 2011-2014 Claus FE<auml>rber.
+Copyright 2011-2018 Claus FE<auml>rber.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

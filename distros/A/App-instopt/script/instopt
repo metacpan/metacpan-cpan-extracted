@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-13'; # DATE
-our $VERSION = '0.000'; # VERSION
+our $DATE = '2018-09-20'; # DATE
+our $VERSION = '0.001'; # VERSION
 
 use 5.010;
 use strict;
@@ -20,7 +20,7 @@ my $cli = Perinci::CmdLine::Any->new(
         'list-downloaded' => {url=>"${prefix}list_downloaded"},
         'download'        => {url=>"${prefix}download"},
         'update'          => {url=>"${prefix}update"},
-        'update_all'      => {url=>"${prefix}update_all"},
+        'update-all'      => {url=>"${prefix}update_all"},
     },
 );
 $cli->run;
@@ -40,9 +40,22 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.000 of instopt (from Perl distribution App-instopt), released on 2018-09-13.
+This document describes version 0.001 of instopt (from Perl distribution App-instopt), released on 2018-09-20.
 
 =head1 SYNOPSIS
+
+In F<~/.config/instopt.conf>:
+
+ # if not the default ~/software
+ download_dir = /home/ujang/software
+
+ # if not the default /opt
+ install_dir = !path ~/opt
+
+ # if not the default /usr/local/bin
+ program_dir = !path ~/bin
+
+Then:
 
  # List all installed software in /opt
  % instopt list-installed
@@ -62,7 +75,7 @@ This document describes version 0.000 of instopt (from Perl distribution App-ins
 
 =head1 DESCRIPTION
 
-B<STATUS:> Early release. Most things are not yet implemented.
+B<STATUS:> Early, experimental release. Many things can change without notice.
 
 B<instopt> is an opinionated tool to automate downloading and installing
 software binaries (by default to F</opt>, hence the name: "B<inst>all to
@@ -137,8 +150,8 @@ do:
 This will download the latest firefox, save the tarball to the appropriate
 location, extract it to F</opt>, and create/update the symlinks.
 
-You can customize the target directory (F</opt>) and the software archive
-directory (F<~/software>).
+You can customize the install directory (F</opt>) and the download directory
+(F<~/software>).
 
 To start using B<instopt>, first install it from CPAN. Also install the catalog
 module for the software that you want/need, e.g. for firefox
@@ -149,10 +162,10 @@ You might also want to create a configuration file F<~/.config/instopt.conf>
 containing:
 
  # if not the default ~/software
- archive_dir = /mnt/shared/software
+ download_dir = /mnt/shared/software
 
  # if not the default /opt
- target_dir = /usr/local/opt
+ install_dir = /usr/local/opt
 
 After that, install away.
 
@@ -172,9 +185,9 @@ List all installed software.
 
 =head2 B<update>
 
-Update a software to latest version.
+Update a software to the latest version.
 
-=head2 B<update_all>
+=head2 B<update-all>
 
 Update all installed software.
 
@@ -185,10 +198,6 @@ C<*> marks required options.
 =head2 Common options
 
 =over
-
-=item B<--arch>=I<s>
-
-=item B<--archive-dir>=I<s>
 
 =item B<--config-path>=I<filename>, B<-c>
 
@@ -202,6 +211,8 @@ Set configuration profile to use.
 
 Shortcut for --log-level=debug.
 
+=item B<--download-dir>=I<s>
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -213,6 +224,8 @@ Default value:
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
+
+=item B<--install-dir>=I<s>
 
 =item B<--json>
 
@@ -251,6 +264,8 @@ Do not use any configuration file.
 
 Do not read environment for default options.
 
+=item B<--program-dir>=I<s>
+
 =item B<--quiet>
 
 Shortcut for --log-level=error.
@@ -277,6 +292,8 @@ Display program's version and exit.
 
 =over
 
+=item B<--arch>=I<s>
+
 =item B<--software>=I<s>*
 
 =back
@@ -288,6 +305,14 @@ Display program's version and exit.
 =item B<--detail>, B<-l>
 
 =item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand list-installed
+
+=over
+
+=item B<--detail>, B<-l>
 
 =back
 
@@ -355,14 +380,16 @@ List of available configuration parameters:
 
 =head2 Common for all subcommands
 
- arch (see --arch)
- archive_dir (see --archive-dir)
+ download_dir (see --download-dir)
  format (see --format)
+ install_dir (see --install-dir)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ program_dir (see --program-dir)
 
 =head2 Configuration for subcommand download
 
+ arch (see --arch)
  software (see --software)
 
 =head2 Configuration for subcommand list-downloaded
@@ -372,12 +399,13 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand list-installed
 
+ detail (see --detail)
 
 =head2 Configuration for subcommand update
 
  software (see --software)
 
-=head2 Configuration for subcommand update_all
+=head2 Configuration for subcommand update-all
 
 =head1 ENVIRONMENT
 

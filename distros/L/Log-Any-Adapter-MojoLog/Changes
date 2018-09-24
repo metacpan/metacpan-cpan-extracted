@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Log::Any::Adapter::MojoLog.
 
+0.04 2018-09-21
+  - Fix tests for Mojolicious 8.0
+
 0.03 2017-12-06
   - Fix bug when Mojolicious isn't already loaded by the application (Grinnz)
 

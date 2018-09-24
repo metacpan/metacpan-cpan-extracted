@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
-use JSON;
+use JSON::PP;
 
 while (<DATA>) {
     chomp;
@@ -10,7 +10,7 @@ while (<DATA>) {
     my ($s,$t) = split /\s+=>\s/, $_,2;
     $s =~ s/'//g;
     my $param = parse_urlencoded_arrayref($s);
-    is JSON::encode_json($param), $t, $s;
+    is JSON::PP::encode_json($param), $t, $s;
 }
 
 done_testing();

@@ -1,5 +1,18 @@
 Revision history for Map::Tube::Madrid
 
+0.24  2018-09-24
+      - Updated section "NOTE" for Line L1.
+      - Updated map for Line L1 showing new connections.
+
+0.23  2018-09-23
+      - Fixed test script t/map.t.
+
+0.22  2018-09-22
+      - Added map route test.
+
+0.21  2018-09-20
+      - Added more load test.
+
 0.20  2018-09-19
       - Added package Map::Tube::Madrid::Line::L2
       - Added map image for Line L2.

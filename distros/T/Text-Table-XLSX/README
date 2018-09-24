@@ -1,0 +1,54 @@
+NAME
+    Text::Table::XLSX - Generate XLSX worksheet
+
+VERSION
+    This document describes version 0.001 of Text::Table::XLSX (from Perl
+    distribution Text-Table-XLSX), released on 2018-09-23.
+
+SYNOPSIS
+     use Text::Table::XLSX;
+
+     my $rows = [
+         # header row
+         ['Name', 'Rank', 'Serial'],
+         # rows
+         ['alice', 'pvt', '123456'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     print Text::Table::XLSX::table(rows => $rows, header_row => 1);
+
+DESCRIPTION
+    This module provides a single function, "table", which takes a
+    two-dimensional array of data and generate an XLSX data stream from it.
+    It's basically a very thin wrapper for Spreadsheet::GenerateXLSX.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-XLSX>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-XLSX>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-XLSX>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Spreadsheet::GenerateXLSX
+
+    Text::Table::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

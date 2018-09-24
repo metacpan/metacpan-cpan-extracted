@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.16",
+   "generated_by" : "Minilla/v3.1.1",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Cookie::Baker::XS" : {
          "file" : "lib/Cookie/Baker/XS.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,7 @@
          "web" : "https://github.com/kazeburo/Cookie-Baker-XS"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 0
 }

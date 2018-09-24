@@ -1,9 +1,9 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1623 2018-01-26 14:23:54Z willem $
+# $Id: Parameters.pm 1714 2018-09-21 14:14:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1623 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
 
 
 ################################################
@@ -362,7 +362,7 @@ __END__
 
 =head1 NAME
 
-    Net::DNS::Parameters - DNS parameter assignments
+Net::DNS::Parameters - DNS parameter assignments
 
 
 =head1 SYNOPSIS

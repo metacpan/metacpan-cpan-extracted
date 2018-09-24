@@ -1,9 +1,14 @@
-# $Id: 01-resolver-flags.t 1444 2016-01-05 10:01:10Z willem $  -*-perl-*-
+# $Id: 01-resolver-flags.t 1709 2018-09-07 08:03:09Z willem $  -*-perl-*-
 
 use strict;
 use Test::More tests => 23;
 
-use Net::DNS;
+use Net::DNS::Resolver;
+
+local $ENV{'RES_NAMESERVERS'};
+local $ENV{'RES_SEARCHLIST'};
+local $ENV{'LOCALDOMAIN'};
+local $ENV{'RES_OPTIONS'};
 
 
 my $res = Net::DNS::Resolver->new();

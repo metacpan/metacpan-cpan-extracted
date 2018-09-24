@@ -18,7 +18,7 @@ name: Locale-TextDomain-OO-Extract
 provides:
   Locale::TextDomain::OO::Extract:
     file: lib/Locale/TextDomain/OO/Extract.pm
-    version: '2.014'
+    version: '2.015'
   Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor:
     file: lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm
     version: '2.007'
@@ -33,7 +33,7 @@ provides:
     version: '2.011'
   Locale::TextDomain::OO::Extract::Process:
     file: lib/Locale/TextDomain/OO/Extract/Process.pm
-    version: '2.014'
+    version: '2.015'
   Locale::TextDomain::OO::Extract::Process::Plugin::MO:
     file: lib/Locale/TextDomain/OO/Extract/Process/Plugin/MO.pm
     version: '2.007'
@@ -75,5 +75,5 @@ requires:
   perl: '5.009005'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.014'
+version: '2.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

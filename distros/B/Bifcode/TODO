@@ -1,0 +1,5 @@
+Data types that might be easily added if the need arose:
+    - tuples: (1,2,2,3)
+    - sets: <1,2,3>
+    - Complex numbers: ???
+    - fractional numbers: /1/2,

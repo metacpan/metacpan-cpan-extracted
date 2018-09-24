@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Patch::Cache - Cache HTTP::Tiny responses
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Patch::Cache (from
-    Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-02-05.
+    This document describes version 0.002 of HTTP::Tiny::Patch::Cache (from
+    Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-09-20.
 
 SYNOPSIS
     From Perl:
@@ -27,7 +27,7 @@ SYNOPSIS
      % CACHE_MAX_AGE=0 perl -MHTTP::Tiny::Patch::Cache ...
 
     Or you can delete *$tempdir/http_tiny_patch_cache/*, where *$tempdir* is
-    retrieved from File::Util::Tempdir's "get_tempdir()".
+    retrieved from File::Util::Tempdir's "get_user_tempdir()".
 
 DESCRIPTION
     This module patches HTTP::Tiny to cache responses. Currently only GET

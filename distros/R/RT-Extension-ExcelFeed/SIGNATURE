@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 62d5c72b5b61f4c309c73a2019f7b1aab1eba68f Changes
+SHA1 af911dea30af976583a46cf60d7a1f62e639a197 MANIFEST
+SHA1 09b5577b650b495f76f7e519e1792ab44948ba8c META.yml
+SHA1 846566b64e25184980f384f01e9c09020f758469 Makefile.PL
+SHA1 34ee78f3264f1843cb293911b7d3874e84a80e41 README
+SHA1 2fa0aa414d366ac60c7bb291971d8cddd28a0e42 etc/chart_callback.patch
+SHA1 4d7138911b8827941e3c3d5c118f575ff8503adf etc/subscription_callbacks.patch
+SHA1 91c0ebf0dc417b59d03590bc02fd795d2abf726e etc/tabs_privileged_callback.patch
+SHA1 f619315b486ccfcc021bb5210a8b40a74389a642 etc/tabs_privileged_callback_44.patch
+SHA1 4e3452bb6e72ee2bd43a395192802ece1a7f28d3 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/MassageSubscriptionFields
+SHA1 62cc2ad67ef63d44d4e815260a1f5132e41370a8 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/SubscriptionFields
+SHA1 21f51970fabacc0bd025f9063600c700f8daadf0 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/SubscriptionFormEnd
+SHA1 11728a32e491f092772f6adeba0bc02680c07a3e html/Callbacks/RT-Extension-ExcelFeed/Elements/Tabs/Privileged
+SHA1 670cc8b19cdee72a875ee92e5cceb4a4a46dc3b6 html/Callbacks/RT-Extension-ExcelFeed/Search/Elements/Chart/AfterChartTable
+SHA1 a7b3e995a18be33a26a65c89105f3fbccc37fb13 html/Elements/XLSXExport
+SHA1 62c577c227cd48c29f6154d5a2e78ddb671c1f85 html/Search/Chart.xlsx
+SHA1 06bd091ee253e750e314299fa22cfd2e452bc2a0 html/Search/Results.xlsx
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 0771221f89b940bd9523987126a5ad8938f2eade inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 d3383635af6463580e15ce7248340820921928e4 lib/RT/Dashboard/Mailer_Vendor.pm
+SHA1 8991a3acd7b35a9060bcacc9b94caa3adcba253a lib/RT/Extension/ExcelFeed.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbpPM6AAoJEA3wooP+rICygYIH/2YvgRJmSdlTWWkLtvbPGPEg
+7KkT3G5PDWoM6eY69dwdXzaAfhfNPfpe279qNsTE3ufS0nnE3ndTNhdcq326gss9
+17Wp7EyZ/c3oyFDAoqvon7OZZKy2st9zuaFzJDjrlo0KRknEPoDr1ZePkRkxteO9
+KzqJnE2gV6gPYdjRU7ZQOm2B7c2PrfmcqePnHv5rfb4E6s0ZAzyhFuYTCU8MR0pG
+uo0UjFiD6n3mnLihz51O0mD6xB865Li18SzfpN1kVheDyCVKZtia95M49REdDTbr
+/DSBrf6Bryox5z052nSiR7ZWj6UZuDmZQWYmGYoAC8h1CNKXbrUbvvhi45WMbR4=
+=Iyxf
+-----END PGP SIGNATURE-----

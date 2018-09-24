@@ -1,41 +1,40 @@
 ---
 abstract: 'Bundle of modules useful for developers'
 author:
-  - 'Martin Becker, C<< <mhasch at cpan.org> >>'
+  - 'Martin Becker <mhasch at cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.82'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Task-Devel-Essentials
 no_index:
   directory:
+    - t
     - inc
     - maint
-    - t
 recommends:
   List::MoreUtils::XS: '0.428'
   Term::ReadLine::Gnu: '1.35'
 requires:
   App::CPANTS::Lint: '0.05'
-  Archive::Tar: '2.30'
-  Archive::Zip: '1.60'
-  Assert::Conditional: '0.008'
+  Archive::Tar: '2.32'
+  Archive::Zip: '1.64'
+  Assert::Conditional: '0.009'
   CPAN: '2.16'
   CPAN::Reporter: '1.2018'
   Contextual::Return: '0.004014'
-  Data::Dumper: '2.161'
+  Data::Dumper: '2.172'
   Data::Dumper::Simple: '0.11'
   Data::Printer: '0.40'
-  DateTime: '1.49'
-  Devel::Cover: '1.29'
+  DateTime: '1.50'
+  Devel::Cover: '1.31'
   Devel::NYTProf: '6.06'
   Devel::StackTrace: '2.03'
   Digest::SHA: '6.02'
@@ -45,8 +44,8 @@ requires:
   ExtUtils::MakeMaker: '7.34'
   File::HomeDir: '1.004'
   File::ShareDir: '1.116'
-  File::Spec: '3.74'
-  File::Temp: '0.2306'
+  File::Spec: '3.75'
+  File::Temp: '0.2308'
   File::Which: '1.22'
   Getopt::Long: '2.5'
   IO::Compress::Base: '2.081'
@@ -55,20 +54,20 @@ requires:
   Iterator::Diamond: '1.01'
   JSON: '2.97001'
   Kwalify: '1.22'
-  LWP: '6.34'
+  LWP: '6.35'
   List::MoreUtils: '0.428'
   MIME::Base64: '3.15'
   MIME::Lite: '3.030'
-  Modern::Perl: '1.20170117'
+  Modern::Perl: '1.20180901'
   Module::CPANTS::Analyse: '0.96'
-  Module::CoreList: '5.20180622'
+  Module::CoreList: '5.20180820'
   Module::Install: '1.19'
-  Module::Signature: '0.81'
+  Module::Signature: '0.83'
   Module::Starter: '1.75'
   Module::Version: '0.12'
   Moo: '2.003004'
   Moose: '2.2011'
-  Mouse: '2.005004'
+  Mouse: '2.005006'
   Net::FTP: '3.11'
   Params::Check: '0.38'
   Parse::CPAN::Meta: '2.150010'
@@ -79,14 +78,14 @@ requires:
   Scalar::Util: '1.50'
   Term::ReadKey: '2.37'
   Term::ReadLine: '1.14'
-  Test2::Suite: '0.000114'
+  Test2::Suite: '0.000115'
   Test::Class: '0.50'
   Test::Differences: '0.64'
   Test::Exception: '0.43'
   Test::Fatal: '0.014'
   Test::Harness: '3.42'
-  Test::MockModule: '0.15'
-  Test::More: '1.302136'
+  Test::MockModule: v0.170.0
+  Test::More: '1.302140'
   Test::NoWarnings: '1.04'
   Test::Output: '1.031'
   Test::Pod: '1.52'
@@ -96,14 +95,13 @@ requires:
   Test::Reporter::Transport::Metabase: '1.999010'
   Test::Requires: '0.10'
   Test::Signature: '1.11'
-  Test::Simple: '1.302136'
+  Test::Simple: '1.302140'
   Test::Warn: '0.36'
   Text::Glob: '0.11'
   Try::Tiny: '0.30'
-  Type::Tiny: '1.002002'
+  Type::Tiny: '1.004002'
   YAML: '1.26'
   YAML::Syck: '1.30'
-  perl: 5.6.0
-resources:
-  license: http://dev.perl.org/licenses/
-version: '0.009'
+  perl: '5.006'
+version: '0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

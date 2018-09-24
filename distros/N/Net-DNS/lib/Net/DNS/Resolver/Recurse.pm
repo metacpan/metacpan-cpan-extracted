@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Recurse;
 
 #
-# $Id: Recurse.pm 1623 2018-01-26 14:23:54Z willem $
+# $Id: Recurse.pm 1709 2018-09-07 08:03:09Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1623 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
 
 
 =head1 NAME
@@ -196,32 +196,9 @@ sub _callback {
 sub recursion_callback { &callback; }				# uncoverable pod
 
 
-########################################
-
-{
-	require Net::DNS::ZoneFile;
-
-	my $dug = new Net::DNS::ZoneFile( \*DATA );
-	my @rr	= $dug->read;
-
-	my @auth = grep $_->type eq 'NS', @rr;
-	my %auth = map { lc $_->nsdname => 1 } @auth;
-	my %glue;
-	my @glue = grep $auth{lc $_->name}, @rr;
-	foreach ( grep $_->can('address'), @glue ) {
-		push @{$glue{lc $_->name}}, $_->address;
-	}
-	my @ip = map @$_, values %glue;
-
-
-	sub _hints {			## default hints
-		splice @ip, 0, 0, splice( @ip, int( rand scalar @ip ) );    # cut deck
-		return @ip;
-	}
-}
-
-
 1;
+
+__END__
 
 
 =head1 ACKNOWLEDGEMENT
@@ -264,63 +241,4 @@ DEALINGS IN THE SOFTWARE.
 L<Net::DNS::Resolver>
 
 =cut
-
-
-__DATA__	## DEFAULT HINTS
-
-; <<>> DiG 9.9.4-P2-RedHat-9.9.4-18.P2.fc20 <<>> @b.root-servers.net . -t NS
-; (2 servers found)
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 47020
-;; flags: qr aa rd; QUERY: 1, ANSWER: 13, AUTHORITY: 0, ADDITIONAL: 27
-;; WARNING: recursion requested but not available
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 4096
-;; QUESTION SECTION:
-;.				IN	NS
-
-;; ANSWER SECTION:
-.			518400	IN	NS	c.root-servers.net.
-.			518400	IN	NS	k.root-servers.net.
-.			518400	IN	NS	l.root-servers.net.
-.			518400	IN	NS	j.root-servers.net.
-.			518400	IN	NS	b.root-servers.net.
-.			518400	IN	NS	g.root-servers.net.
-.			518400	IN	NS	h.root-servers.net.
-.			518400	IN	NS	d.root-servers.net.
-.			518400	IN	NS	a.root-servers.net.
-.			518400	IN	NS	f.root-servers.net.
-.			518400	IN	NS	i.root-servers.net.
-.			518400	IN	NS	m.root-servers.net.
-.			518400	IN	NS	e.root-servers.net.
-
-;; ADDITIONAL SECTION:
-a.root-servers.net.	3600000	IN	A	198.41.0.4
-b.root-servers.net.	3600000	IN	A	192.228.79.201
-c.root-servers.net.	3600000	IN	A	192.33.4.12
-d.root-servers.net.	3600000	IN	A	199.7.91.13
-e.root-servers.net.	3600000	IN	A	192.203.230.10
-f.root-servers.net.	3600000	IN	A	192.5.5.241
-g.root-servers.net.	3600000	IN	A	192.112.36.4
-h.root-servers.net.	3600000	IN	A	198.97.190.53
-i.root-servers.net.	3600000	IN	A	192.36.148.17
-j.root-servers.net.	3600000	IN	A	192.58.128.30
-k.root-servers.net.	3600000	IN	A	193.0.14.129
-l.root-servers.net.	3600000	IN	A	199.7.83.42
-m.root-servers.net.	3600000	IN	A	202.12.27.33
-a.root-servers.net.	3600000	IN	AAAA	2001:503:ba3e::2:30
-b.root-servers.net.	3600000	IN	AAAA	2001:500:84::b
-c.root-servers.net.	3600000	IN	AAAA	2001:500:2::c
-d.root-servers.net.	3600000	IN	AAAA	2001:500:2d::d
-e.root-servers.net.	3600000	IN	AAAA	2001:500:a8::e
-f.root-servers.net.	3600000	IN	AAAA	2001:500:2f::f
-g.root-servers.net.	3600000	IN	AAAA	2001:500:12::d0d
-h.root-servers.net.	3600000	IN	AAAA	2001:500:1::53
-i.root-servers.net.	3600000	IN	AAAA	2001:7fe::53
-j.root-servers.net.	3600000	IN	AAAA	2001:503:c27::2:30
-k.root-servers.net.	3600000	IN	AAAA	2001:7fd::1
-l.root-servers.net.	3600000	IN	AAAA	2001:500:9f::42
-m.root-servers.net.	3600000	IN	AAAA	2001:dc3::35
 

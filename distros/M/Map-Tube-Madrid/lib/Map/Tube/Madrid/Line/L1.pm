@@ -1,6 +1,6 @@
 package Map::Tube::Madrid::Line::L1;
 
-$Map::Tube::Madrid::Line::L1::VERSION   = '0.20';
+$Map::Tube::Madrid::Line::L1::VERSION   = '0.24';
 $Map::Tube::Madrid::Line::L1::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::Madrid::Line::L1 - Madrid Metro Map: L1 Line.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.24
 
 =encoding utf8
 
@@ -62,11 +62,15 @@ Madrid Metro Map: L1 Line.
 
 =over 2
 
-=item * The station Gran Vía is also part of
+=item * The station "Cuatro Caminos" is also part of
+          L<L2 Line|Map::Tube::Madrid::Line::L2>
+
+=item * The station "Gran Vía" is also part of
           L<L5 Line|Map::Tube::Madrid::Line::L5>
 
-=item * The station Sol is also part of
-          L<L3 Line|Map::Tube::Madrid::Line::L3>
+=item * The station "Sol" is also part of
+          L<L2 Line|Map::Tube::Madrid::Line::L2>
+        | L<L3 Line|Map::Tube::Madrid::Line::L3>
 
 =back
 

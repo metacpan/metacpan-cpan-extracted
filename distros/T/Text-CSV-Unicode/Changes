@@ -60,3 +60,11 @@ Revision history for Perl extension Text::CSV::Unicode.
 	perl 5.15.5 fails due to faulty installation:
 	put in explicit require/skip_all for charnames
 
+0.200 2018-19-21
+	Completely rewritten to use Text::CSV
+	Allow unicode but not Cntrl in Text::CSV::Unicode
+	Allow all unicode with binary=>1, by dropping through to Text::CSV
+	combine() with undef produces different output: t/combine-undef.t
+	version() provided by Text::CSV::Version 
+		- test as class method: t/unicode.t
+

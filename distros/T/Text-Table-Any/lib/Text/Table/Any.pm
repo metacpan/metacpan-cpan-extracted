@@ -1,7 +1,7 @@
 package Text::Table::Any;
 
-our $DATE = '2018-07-23'; # DATE
-our $VERSION = '0.092'; # VERSION
+our $DATE = '2018-09-23'; # DATE
+our $VERSION = '0.093'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -128,6 +128,10 @@ sub table {
         my $t = Text::TabularDisplay->new(@{ $rows->[0] });
         $t->add(@{ $rows->[$_] }) for 1..@$rows-1;
         return $t->render . "\n";
+    } elsif ($backend eq 'Text::Table::XLSX') {
+        require Text::Table::XLSX;
+        return Text::Table::XLSX::table(
+            rows => $rows, header_row => $header_row);
     } else {
         die "Unknown backend '$backend'";
     }
@@ -148,7 +152,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.092 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2018-07-23.
+This document describes version 0.093 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2018-09-23.
 
 =head1 SYNOPSIS
 
@@ -303,6 +307,8 @@ Optional. Pick a backend module. Supported backends:
 =item * Text::Table::TinyColorWide
 
 =item * Text::Table::TinyWide
+
+=item * Text::Table::XLSX
 
 =item * Text::TabularDisplay
 

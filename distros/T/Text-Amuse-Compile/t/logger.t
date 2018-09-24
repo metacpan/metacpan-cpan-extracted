@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 8;
+use Test::More tests => 12;
 use Data::Dumper;
 use File::Spec;
 use Text::Amuse::Compile::File;
@@ -60,11 +60,17 @@ INTERCEPT: {
 
 ok (!@warnings, "No warnings") or diag Dumper(\@warnings);
 
-is (scalar(@report), 4, "4 missing characters") or diag Dumper(\@report);
+is scalar(@report), 8, "8 lines found" or die;
 
-foreach my $r (@report) {
-    like $r, qr/Missing character: There is no . in font/, "Found $r";
+foreach my $i (4..7) {
+    like $report[$i], qr/Missing character: There is no . in font/, "Found $report[$i]";
 }
+diag $report[$_] for 0..3;
+
+like $report[0], qr/overfull/i;
+unlike $report[1], qr/overfull/i;
+like $report[2], qr/overfull/i;
+unlike $report[3], qr/overfull/i;
 
 # there was an infinite loop here
 if ($ENV{RELEASE_TESTING}) {

@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testrun;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testrun::VERSION = '5.0.8';
+$Tapper::Cmd::Testrun::VERSION = '5.0.9';
 use Moose;
 use Tapper::Model 'model';
 use DateTime;
@@ -509,7 +509,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

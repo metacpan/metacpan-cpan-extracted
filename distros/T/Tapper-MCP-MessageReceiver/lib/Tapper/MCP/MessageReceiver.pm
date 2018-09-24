@@ -1,9 +1,9 @@
 package Tapper::MCP::MessageReceiver;
-# git description: v4.1.4-5-g460fee0
+# git description: v5.0.0-1-gc14688d
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Message receiver for Tapper MCP
-$Tapper::MCP::MessageReceiver::VERSION = '5.0.0';
+$Tapper::MCP::MessageReceiver::VERSION = '5.0.1';
 1; # End of Tapper::MCP::MessageReceiver
 
 __END__
@@ -32,7 +32,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

@@ -18,10 +18,13 @@ BEGIN {
 
         our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object::Immutable') }
 
-        sub REPR   { qr// }
+        sub foo;
+
+        # GLOB refs are unsupported in all versions
+        sub REPR   { \*foo }
         sub CREATE { $_[0]->REPR }
     }
 
     eval { This::Will::Not::Work->new };
-    like($@, qr/^Invalid BLESS args for This\:\:Will\:\:Not\:\:Work\, unsupported REPR type/, '... got the expected error');
+    like($@, qr/^Invalid BLESS args for This\:\:Will\:\:Not\:\:Work\, unsupported REPR type \(GLOB\)/, '... got the expected error');
 }

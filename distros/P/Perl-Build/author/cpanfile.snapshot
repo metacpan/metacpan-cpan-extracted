@@ -1,9 +1,9 @@
 # carton snapshot format: version 1.0
 DISTRIBUTIONS
-  CPAN-Perl-Releases-3.70
-    pathname: B/BI/BINGOS/CPAN-Perl-Releases-3.70.tar.gz
+  CPAN-Perl-Releases-3.76
+    pathname: B/BI/BINGOS/CPAN-Perl-Releases-3.76.tar.gz
     provides:
-      CPAN::Perl::Releases 3.70
+      CPAN::Perl::Releases 3.76
     requirements:
       ExtUtils::MakeMaker 0
       Test::More 0.47
@@ -18,11 +18,11 @@ DISTRIBUTIONS
       JSON::PP 0
       Module::Build::Tiny 0.034
       perl 5.008001
-  Carp-1.38
-    pathname: R/RJ/RJBS/Carp-1.38.tar.gz
+  Carp-1.50
+    pathname: X/XS/XSAWYERX/Carp-1.50.tar.gz
     provides:
-      Carp 1.38
-      Carp::Heavy 1.38
+      Carp 1.50
+      Carp::Heavy 1.50
     requirements:
       Config 0
       Exporter 0
@@ -45,10 +45,10 @@ DISTRIBUTIONS
       MIME::Base64 0
       Module::Pluggable 0
       perl 5.006000
-  Exporter-5.72
-    pathname: T/TO/TODDR/Exporter-5.72.tar.gz
+  Exporter-5.73
+    pathname: T/TO/TODDR/Exporter-5.73.tar.gz
     provides:
-      Exporter 5.72
+      Exporter 5.73
       Exporter::Heavy 5.73
     requirements:
       Carp 1.05
@@ -121,10 +121,10 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  HTTP-Tiny-0.070
-    pathname: D/DA/DAGOLDEN/HTTP-Tiny-0.070.tar.gz
+  HTTP-Tiny-0.076
+    pathname: D/DA/DAGOLDEN/HTTP-Tiny-0.076.tar.gz
     provides:
-      HTTP::Tiny 0.070
+      HTTP::Tiny 0.076
     requirements:
       Carp 0
       ExtUtils::MakeMaker 6.17
@@ -137,10 +137,10 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  HTTP-Tinyish-0.14
-    pathname: M/MI/MIYAGAWA/HTTP-Tinyish-0.14.tar.gz
+  HTTP-Tinyish-0.15
+    pathname: M/MI/MIYAGAWA/HTTP-Tinyish-0.15.tar.gz
     provides:
-      HTTP::Tinyish 0.14
+      HTTP::Tinyish 0.15
       HTTP::Tinyish::Base undef
       HTTP::Tinyish::Curl undef
       HTTP::Tinyish::HTTPTiny undef
@@ -187,20 +187,20 @@ DISTRIBUTIONS
       if 0
       perl 5.00503
       strict 0
-  PathTools-3.74
-    pathname: X/XS/XSAWYERX/PathTools-3.74.tar.gz
+  PathTools-3.75
+    pathname: X/XS/XSAWYERX/PathTools-3.75.tar.gz
     provides:
-      Cwd 3.74
-      File::Spec 3.74
-      File::Spec::AmigaOS 3.74
-      File::Spec::Cygwin 3.74
-      File::Spec::Epoc 3.74
-      File::Spec::Functions 3.74
-      File::Spec::Mac 3.74
-      File::Spec::OS2 3.74
-      File::Spec::Unix 3.74
-      File::Spec::VMS 3.74
-      File::Spec::Win32 3.74
+      Cwd 3.75
+      File::Spec 3.75
+      File::Spec::AmigaOS 3.75
+      File::Spec::Cygwin 3.75
+      File::Spec::Epoc 3.75
+      File::Spec::Functions 3.75
+      File::Spec::Mac 3.75
+      File::Spec::OS2 3.75
+      File::Spec::Unix 3.75
+      File::Spec::VMS 3.75
+      File::Spec::Win32 3.75
     requirements:
       Carp 0
       ExtUtils::MakeMaker 0
@@ -285,75 +285,75 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       File::Spec 0
       Test::Harness 1.1601
-  Test-Simple-1.302138
-    pathname: E/EX/EXODIST/Test-Simple-1.302138.tar.gz
+  Test-Simple-1.302140
+    pathname: E/EX/EXODIST/Test-Simple-1.302140.tar.gz
     provides:
-      Test2 1.302138
-      Test2::API 1.302138
-      Test2::API::Breakage 1.302138
-      Test2::API::Context 1.302138
-      Test2::API::Instance 1.302138
-      Test2::API::Stack 1.302138
-      Test2::Event 1.302138
-      Test2::Event::Bail 1.302138
-      Test2::Event::Diag 1.302138
-      Test2::Event::Encoding 1.302138
-      Test2::Event::Exception 1.302138
-      Test2::Event::Fail 1.302138
-      Test2::Event::Generic 1.302138
-      Test2::Event::Note 1.302138
-      Test2::Event::Ok 1.302138
-      Test2::Event::Pass 1.302138
-      Test2::Event::Plan 1.302138
-      Test2::Event::Skip 1.302138
-      Test2::Event::Subtest 1.302138
-      Test2::Event::TAP::Version 1.302138
-      Test2::Event::V2 1.302138
-      Test2::Event::Waiting 1.302138
-      Test2::EventFacet 1.302138
-      Test2::EventFacet::About 1.302138
-      Test2::EventFacet::Amnesty 1.302138
-      Test2::EventFacet::Assert 1.302138
-      Test2::EventFacet::Control 1.302138
-      Test2::EventFacet::Error 1.302138
-      Test2::EventFacet::Hub 1.302138
-      Test2::EventFacet::Info 1.302138
-      Test2::EventFacet::Meta 1.302138
-      Test2::EventFacet::Parent 1.302138
-      Test2::EventFacet::Plan 1.302138
-      Test2::EventFacet::Render 1.302138
-      Test2::EventFacet::Trace 1.302138
-      Test2::Formatter 1.302138
-      Test2::Formatter::TAP 1.302138
-      Test2::Hub 1.302138
-      Test2::Hub::Interceptor 1.302138
-      Test2::Hub::Interceptor::Terminator 1.302138
-      Test2::Hub::Subtest 1.302138
-      Test2::IPC 1.302138
-      Test2::IPC::Driver 1.302138
-      Test2::IPC::Driver::Files 1.302138
-      Test2::Tools::Tiny 1.302138
-      Test2::Util 1.302138
-      Test2::Util::ExternalMeta 1.302138
-      Test2::Util::Facets2Legacy 1.302138
-      Test2::Util::HashBase 1.302138
-      Test2::Util::Trace 1.302138
-      Test::Builder 1.302138
-      Test::Builder::Formatter 1.302138
+      Test2 1.302140
+      Test2::API 1.302140
+      Test2::API::Breakage 1.302140
+      Test2::API::Context 1.302140
+      Test2::API::Instance 1.302140
+      Test2::API::Stack 1.302140
+      Test2::Event 1.302140
+      Test2::Event::Bail 1.302140
+      Test2::Event::Diag 1.302140
+      Test2::Event::Encoding 1.302140
+      Test2::Event::Exception 1.302140
+      Test2::Event::Fail 1.302140
+      Test2::Event::Generic 1.302140
+      Test2::Event::Note 1.302140
+      Test2::Event::Ok 1.302140
+      Test2::Event::Pass 1.302140
+      Test2::Event::Plan 1.302140
+      Test2::Event::Skip 1.302140
+      Test2::Event::Subtest 1.302140
+      Test2::Event::TAP::Version 1.302140
+      Test2::Event::V2 1.302140
+      Test2::Event::Waiting 1.302140
+      Test2::EventFacet 1.302140
+      Test2::EventFacet::About 1.302140
+      Test2::EventFacet::Amnesty 1.302140
+      Test2::EventFacet::Assert 1.302140
+      Test2::EventFacet::Control 1.302140
+      Test2::EventFacet::Error 1.302140
+      Test2::EventFacet::Hub 1.302140
+      Test2::EventFacet::Info 1.302140
+      Test2::EventFacet::Meta 1.302140
+      Test2::EventFacet::Parent 1.302140
+      Test2::EventFacet::Plan 1.302140
+      Test2::EventFacet::Render 1.302140
+      Test2::EventFacet::Trace 1.302140
+      Test2::Formatter 1.302140
+      Test2::Formatter::TAP 1.302140
+      Test2::Hub 1.302140
+      Test2::Hub::Interceptor 1.302140
+      Test2::Hub::Interceptor::Terminator 1.302140
+      Test2::Hub::Subtest 1.302140
+      Test2::IPC 1.302140
+      Test2::IPC::Driver 1.302140
+      Test2::IPC::Driver::Files 1.302140
+      Test2::Tools::Tiny 1.302140
+      Test2::Util 1.302140
+      Test2::Util::ExternalMeta 1.302140
+      Test2::Util::Facets2Legacy 1.302140
+      Test2::Util::HashBase 1.302140
+      Test2::Util::Trace 1.302140
+      Test::Builder 1.302140
+      Test::Builder::Formatter 1.302140
       Test::Builder::IO::Scalar 2.114
-      Test::Builder::Module 1.302138
-      Test::Builder::Tester 1.302138
-      Test::Builder::Tester::Color 1.302138
-      Test::Builder::Tester::Tie 1.302138
-      Test::Builder::TodoDiag 1.302138
-      Test::More 1.302138
-      Test::Simple 1.302138
-      Test::Tester 1.302138
-      Test::Tester::Capture 1.302138
-      Test::Tester::CaptureRunner 1.302138
-      Test::Tester::Delegate 1.302138
-      Test::use::ok 1.302138
-      ok 1.302138
+      Test::Builder::Module 1.302140
+      Test::Builder::Tester 1.302140
+      Test::Builder::Tester::Color 1.302140
+      Test::Builder::Tester::Tie 1.302140
+      Test::Builder::TodoDiag 1.302140
+      Test::More 1.302140
+      Test::Simple 1.302140
+      Test::Tester 1.302140
+      Test::Tester::Capture 1.302140
+      Test::Tester::CaptureRunner 1.302140
+      Test::Tester::Delegate 1.302140
+      Test::use::ok 1.302140
+      ok 1.302140
     requirements:
       ExtUtils::MakeMaker 0
       File::Spec 0

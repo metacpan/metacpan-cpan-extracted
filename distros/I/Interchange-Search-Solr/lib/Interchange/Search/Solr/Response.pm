@@ -2,7 +2,7 @@ package Interchange::Search::Solr::Response;
 
 use strict;
 use warnings;
-use Any::Moose;
+use Moo;
 extends 'WebService::Solr::Response';
 
 =head1 NAME

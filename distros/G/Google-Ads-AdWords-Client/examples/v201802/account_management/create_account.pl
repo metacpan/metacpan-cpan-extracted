@@ -46,13 +46,7 @@ sub create_account {
   # Create the operation
   my $operation = Google::Ads::AdWords::v201802::ManagedCustomerOperation->new({
       operator => "ADD",
-      operand  => $account,
-      # For whitelisted users only, uncomment the inviteeEmail and inviteeRole
-      # to invite a user to have access to an account on an ADD. An email
-      # will be sent inviting the user to have access to the newly created
-      # account.
-      # inviteeEmail => "invited_user1@example.com",
-      # inviteeRole  => "ADMINISTRATIVE"
+      operand  => $account
   });
 
   # Perform the operation. It is possible to create multiple accounts with one

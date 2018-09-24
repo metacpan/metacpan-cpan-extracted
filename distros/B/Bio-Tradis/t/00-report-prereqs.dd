@@ -29,7 +29,7 @@ do { my $x = {
                                       'Getopt::Long' => '0',
                                       'Moose' => '0',
                                       'Text::CSV' => '0',
-                                      'TryCatch' => '0',
+                                      'Try::Tiny' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -39,7 +39,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Env::Path' => '0',
+                                   'Env::Path' => '0.18',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::Exception' => '0',

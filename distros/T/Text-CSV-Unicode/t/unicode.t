@@ -16,7 +16,7 @@ BEGIN{
         plan skip_all => 'charnames required'
                 unless eval{ require charnames }; 
     }
-    plan tests => 25;
+    plan tests => 29;
     use_ok('Text::CSV::Unicode')
 }
 my $tester=Test::More->builder;
@@ -74,10 +74,28 @@ ok (($csv->parse(qq("","I said,\t""Hi!""","")) and
   ok ($csv->status(),		"success - test $test should have succeeded");
 }
 
-is( $csv->version(), $Text::CSV::Unicode::VERSION,
-				'inheritted version() works properly');
+ok( $csv->version(), 'inheritted version() works');
 
-my $csv1 = Text::CSV::Unicode->new( { binary => 1 } );
+my $warning;
+sub _warning(&) {
+    my $sub = shift;
+    local $SIG{__WARN__} = sub { $warning .= shift; };
+    $warning = '';
+    return $sub->();
+}
+
+_warning { 
+    no warnings qw(deprecated);
+    Text::CSV::Unicode->new( { binary => 1 } )
+};
+diag $warning if $warning;
+ok (!$warning, 'no deprecated warning');
+
+my $csv1 = _warning { Text::CSV::Unicode->new( { binary => 1 } ) };
+my $warnok = $warning and $warning =~ /\bbinary\sis\sdeprecated\b/;
+diag $warning unless $warnok;
+ok ( $warnok, 'binary is deprecated warning' );
+
 ok ($csv1->parse(qq("abc\nc")),	'success - \n allowed');
 
 { my $test = $tester->current_test;
@@ -93,6 +111,10 @@ ok (($csv1->parse(qq("","I said,\n""Hi!""","")) and
   ok ($csv1->status(),		"success - test $test should have succeeded");
 }
 
+ok( $csv1->version(), 'inheritted version() works - binary`');
+
+is( Text::CSV::Unicode->VERSION(), $Text::CSV::Unicode::VERSION,
+				'class version() works properly');
 #
 # empty subclass test
 #
@@ -104,4 +126,4 @@ my $empty = Empty_Subclass->new();
 ok (($empty->version() and $empty->parse('') and $empty->combine('')),
 				'empty subclass test');
 
-# $Id: unicode.t 290 2012-02-19 22:25:30Z robin $
+# $Id$

@@ -1,9 +1,9 @@
 package Net::DNS::ZoneFile;
 
 #
-# $Id: ZoneFile.pm 1623 2018-01-26 14:23:54Z willem $
+# $Id: ZoneFile.pm 1709 2018-09-07 08:03:09Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1623 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
 
 
 =head1 NAME
@@ -48,6 +48,9 @@ use integer;
 use Carp;
 use IO::File;
 
+use base qw(Exporter);
+our @EXPORT = qw(parse read readfh);
+
 use constant PERLIO => defined eval 'require PerlIO';
 
 require Net::DNS::Domain;
@@ -85,14 +88,14 @@ sub new {
 	$self->_origin(shift);
 
 	if ( ref($file) ) {
-		$self->{filename} = $self->{handle} = $file;
+		$self->{filename} = $self->{filehandle} = $file;
 		$self->{fileopen} = {};
 		return $self if ref($file) =~ /IO::File|FileHandle|GLOB|Text/;
 		croak 'argument not a file handle';
 	}
 
 	$self->{filename} = $file ||= '';
-	$self->{handle} = new IO::File($file) or croak "$! $file";
+	$self->{filehandle} = new IO::File($file) or croak "$! $file";
 	$self->{fileopen}{$file}++;
 	return $self;
 }
@@ -166,7 +169,7 @@ Returns the number of the last line read from the current zone file.
 sub line {
 	my $self = shift;
 	return $self->{eom} if defined $self->{eom};
-	return $self->{handle}->input_line_number;
+	return $self->{filehandle}->input_line_number;
 }
 
 
@@ -203,15 +206,18 @@ sub ttl {
 Applications which depended on the defunct Net::DNS::ZoneFile 1.04
 CPAN distribution will continue to operate with minimal change using
 the compatibility interface described below.
+New application code should use the object-oriented interface.
 
     use Net::DNS::ZoneFile;
 
     $listref = Net::DNS::ZoneFile->read( $filename );
     $listref = Net::DNS::ZoneFile->read( $filename, $include_dir );
 
-    $listref = Net::DNS::ZoneFile->readfh( $handle, $include_dir );
+    $listref = Net::DNS::ZoneFile->readfh( $filehandle );
+    $listref = Net::DNS::ZoneFile->readfh( $filehandle, $include_dir );
 
     $listref = Net::DNS::ZoneFile->parse(  $string );
+    $listref = Net::DNS::ZoneFile->parse( \$string );
     $listref = Net::DNS::ZoneFile->parse(  $string, $include_dir );
     $listref = Net::DNS::ZoneFile->parse( \$string, $include_dir );
 
@@ -225,18 +231,17 @@ be obtained directly by calling any of these methods in list context.
 
     @rr = Net::DNS::ZoneFile->read( $filename, $include_dir );
 
+The partial result is returned if an error is encountered by the parser.
+
 
 =head2 read
 
+    $listref = Net::DNS::ZoneFile->read( $filename );
     $listref = Net::DNS::ZoneFile->read( $filename, $include_dir );
-    @rr = Net::DNS::ZoneFile->read( $filename, $include_dir );
 
-read() parses the specified zone file and returns a reference to the
-list of Net::DNS::RR objects representing the RRs in the file.
-The return value is undefined if the zone data can not be parsed.
-
-When called in list context, the partial result is returned if an
-error is encountered by the parser.
+read() parses the contents of the specified file
+and returns a reference to the list of Net::DNS::RR objects.
+The return value is undefined if an error is encountered by the parser.
 
 =cut
 
@@ -248,7 +253,7 @@ sub _filename {				## rebase unqualified filename
 	return $name unless $include_dir;
 	require File::Spec;
 	return $name if File::Spec->file_name_is_absolute($name);
-	return $name if -f $name;
+	return $name if -f $name;	## file in current directory
 	return File::Spec->catfile( $include_dir, $name );
 }
 
@@ -305,11 +310,12 @@ sub _read {
 
 =head2 readfh
 
-    $listref = Net::DNS::ZoneFile->readfh( $handle, $include_dir );
+    $listref = Net::DNS::ZoneFile->readfh( $filehandle );
+    $listref = Net::DNS::ZoneFile->readfh( $filehandle, $include_dir );
 
-readfh() parses data from the specified file handle and returns a
-reference to the list of Net::DNS::RR objects representing the RRs
-in the file.
+readfh() parses data from the specified file handle
+and returns a reference to the list of Net::DNS::RR objects.
+The return value is undefined if an error is encountered by the parser.
 
 =cut
 
@@ -320,17 +326,21 @@ sub readfh {
 
 =head2 parse
 
+    $listref = Net::DNS::ZoneFile->parse(  $string );
+    $listref = Net::DNS::ZoneFile->parse( \$string );
     $listref = Net::DNS::ZoneFile->parse(  $string, $include_dir );
     $listref = Net::DNS::ZoneFile->parse( \$string, $include_dir );
 
-parse() interprets the zone file text in the argument string and
-returns a reference to the list of Net::DNS::RR objects representing
-the RRs.
+parse() interprets the text in the argument string
+and returns a reference to the list of Net::DNS::RR objects.
+The return value is undefined if an error is encountered by the parser.
 
 =cut
 
 sub parse {
-	my ($text) = reverse @_;
+	my ($arg1) = @_;
+	shift if !ref($arg1) && $arg1 eq __PACKAGE__;
+	my $text = shift;
 	return &readfh( new Net::DNS::ZoneFile::Text($text), @_ );
 }
 
@@ -416,7 +426,7 @@ sub _generate {				## expand $GENERATE into input stream
 
 	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link
-	$self->{handle} = $handle;
+	$self->{filehandle} = $handle;
 }
 
 
@@ -425,7 +435,7 @@ my $LEX_REGEX = q/("[^"]*"|"[^"]*$)|;[^\n]*|([()])|(^\s)|[ \t\n\r\f]/;
 sub _getline {				## get line from current source
 	my $self = shift;
 
-	my $fh = $self->{handle};
+	my $fh = $self->{filehandle};
 	while (<$fh>) {
 		next if /^\s*;/;				# discard comment line
 		next unless /\S/;				# discard blank line
@@ -523,7 +533,7 @@ sub _include {				## open $INCLUDE file
 	my $opened = {%{$self->{fileopen}}};
 	croak qq(recursive \$INCLUDE $file) if $opened->{$file}++;
 
-	my @discipline = PERLIO ? ( join ':', '<', PerlIO::get_layers $self->{handle} ) : ();
+	my @discipline = PERLIO ? ( join ':', '<', PerlIO::get_layers $self->{filehandle} ) : ();
 	my $handle = new IO::File( $file, @discipline ) or croak "$! $file";
 
 	delete $self->{latest};					# forget previous owner
@@ -531,7 +541,7 @@ sub _include {				## open $INCLUDE file
 	$self->{context}  = origin Net::DNS::Domain($root) if $root;
 	$self->{filename} = $file;
 	$self->{fileopen} = $opened;
-	return $self->{handle} = $handle;
+	return $self->{filehandle} = $handle;
 }
 
 

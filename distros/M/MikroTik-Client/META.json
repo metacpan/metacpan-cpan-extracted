@@ -52,6 +52,6 @@
          "web" : "https://github.com/anparker/mikrotik-client"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,0 +1,5 @@
+gonzo/.*
+trash/.*
+\.git/.*
+.*\.sw.*
+.*.tar.gz

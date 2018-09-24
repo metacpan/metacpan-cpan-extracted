@@ -11,5 +11,6 @@ t/02-encode-bifcode.t
 t/03-diff-bifcode.t
 t/lib/Test/Bifcode.pm
 t/synopsis.pl
+TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

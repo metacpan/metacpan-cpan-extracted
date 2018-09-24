@@ -1,3 +1,21 @@
+1.002 (2018-09-23)
+
+    Packaging:
+        - Remove ".readme_from" file from distribution
+
+1.001 (2018-09-21)
+
+    Packaging:
+        - Generate README file using githook-perltidy's .readme_from
+          support.
+
+1.001_1 (2018-09-21)
+
+    Enhancements:
+        - Use boolean::isBoolean for tighter true/false detection
+        - Work around Carp::croak's failure to handle exception
+          objects
+
 1.0 (2017-11-13)
 
     First stable release.

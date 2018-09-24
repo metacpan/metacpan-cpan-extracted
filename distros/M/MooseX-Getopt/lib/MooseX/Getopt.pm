@@ -1,8 +1,8 @@
-package MooseX::Getopt; # git description: v0.72-7-g5d00040
+package MooseX::Getopt; # git description: v0.73-5-g75272b6
 # ABSTRACT: A Moose role for processing command line options
 # KEYWORDS: moose extension command line options attributes executable flags switches arguments
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Moose::Role 0.56;
 use namespace::autoclean;
@@ -23,7 +23,7 @@ MooseX::Getopt - A Moose role for processing command line options
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -114,8 +114,9 @@ options (true if any of these options were passed on the command line).
 =head2 C<print_usage_text>
 
 This method is called internally when the C<help_flag> state is true.
-It prints the text from the C<usage> object (see above) to C<STDOUT> and then the
-program terminates normally.  You can apply a method modification (see
+It prints the text from the C<usage> object (see above) to C<STDOUT>
+(and then after this method is called, the
+program terminates normally).  You can apply a method modification (see
 L<Moose::Manual::MethodModifiers>) if different behaviour is desired, for
 example to include additional text.
 
@@ -327,7 +328,7 @@ Stevan Little <stevan@iinteractive.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Tomas Doran Stevan Little Yuval Kogman Florian Ragwitz Brandon L Black Shlomi Fish Olaf Alders Hans Dieter Pearcey Ryan D Johnson Nelo Onyiah Dave Rolsky Ricardo SIGNES Ævar Arnfjörð Bjarmason Hinrik Örn Sigurðsson Damien Krotkine Jose Luis Martinez Chris Prather Devin Austin Gregory Oschwald Todd Hepler Michael Schout Andreas Koenig Jonathan Swartz John Goulah Jesse Luehrs Gordon Irving Stuart A Johnston Dagfinn Ilmari Mannsåker Drew Taylor Damyan Ivanov Justin Hunter
+=for stopwords Karen Etheridge Tomas Doran Stevan Little Yuval Kogman Florian Ragwitz Brandon L Black Shlomi Fish Hans Dieter Pearcey Olaf Alders Nelo Onyiah Ryan D Johnson Dave Rolsky Ricardo SIGNES Ævar Arnfjörð Bjarmason Hinrik Örn Sigurðsson Damien Krotkine Todd Hepler Devin Austin Jose Luis Martinez Gregory Oschwald Chris Prather Jonathan Swartz Andreas König Dagfinn Ilmari Mannsåker Damyan Ivanov Drew Taylor Gordon Irving Jesse Luehrs John Goulah Koenig Justin Hunter Michael Schout Stuart A Johnston
 
 =over 4
 
@@ -361,19 +362,19 @@ Shlomi Fish <shlomif@cpan.org>
 
 =item *
 
-Olaf Alders <olaf@wundersolutions.com>
-
-=item *
-
 Hans Dieter Pearcey <hdp@weftsoar.net>
 
 =item *
 
-Ryan D Johnson <ryan@innerfence.com>
+Olaf Alders <olaf@wundersolutions.com>
 
 =item *
 
 Nelo Onyiah <nelo.onyiah@gmail.com>
+
+=item *
+
+Ryan D Johnson <ryan@innerfence.com>
 
 =item *
 
@@ -397,11 +398,7 @@ Damien Krotkine <dkrotkine@weborama.com>
 
 =item *
 
-Jose Luis Martinez <jlmartinez@capside.com>
-
-=item *
-
-Chris Prather <chris@prather.org>
+Todd Hepler <thepler@employees.org>
 
 =item *
 
@@ -409,19 +406,15 @@ Devin Austin <dhoss@cpan.org>
 
 =item *
 
+Jose Luis Martinez <jlmartinez@capside.com>
+
+=item *
+
 Gregory Oschwald <goschwald@maxmind.com>
 
 =item *
 
-Todd Hepler <thepler@employees.org>
-
-=item *
-
-Michael Schout <mschout@gkg.net>
-
-=item *
-
-Andreas Koenig <andk@cpan.org>
+Chris Prather <chris@prather.org>
 
 =item *
 
@@ -429,11 +422,43 @@ Jonathan Swartz <swartz@pobox.com>
 
 =item *
 
-John Goulah <jgoulah@cpan.org>
+Andreas König <Andreas.Koenig.extern@telecolumbus.de>
+
+=item *
+
+Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+=item *
+
+Damyan Ivanov <dmn@debian.org>
+
+=item *
+
+Drew Taylor <drew@drewtaylor.com>
+
+=item *
+
+Gordon Irving <goraxe@goraxe.me.uk>
 
 =item *
 
 Jesse Luehrs <doy@tozt.net>
+
+=item *
+
+John Goulah <jgoulah@cpan.org>
+
+=item *
+
+Andreas Koenig <andk@cpan.org>
+
+=item *
+
+Justin Hunter <justin.d.hunter@gmail.com>
+
+=item *
+
+Michael Schout <mschout@gkg.net>
 
 =item *
 
@@ -445,27 +470,7 @@ Stevan Little <stevan.little@gmail.com>
 
 =item *
 
-Gordon Irving <goraxe@goraxe.me.uk>
-
-=item *
-
 Stuart A Johnston <saj_git@thecommune.net>
-
-=item *
-
-Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
-
-=item *
-
-Drew Taylor <drew@drewtaylor.com>
-
-=item *
-
-Damyan Ivanov <dmn@debian.org>
-
-=item *
-
-Justin Hunter <justin.d.hunter@gmail.com>
 
 =back
 

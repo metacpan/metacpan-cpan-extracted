@@ -102,7 +102,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -2809,8 +2809,9 @@ use constant SUN_CLASS => 'Astro::Coord::ECI::Sun';
 
 sub _set_sun {
     my ( $self, $name, $value ) = @_;
-    embodies( $value, SUN_CLASS() )
-	or croak 'The value of the sun attribute must represent the Sun';
+    embodies( $value, $self->SUN_CLASS() )
+	or croak sprintf 'The sun attribute must be a %s',
+	    $self->SUN_CLASS();
     ref $value
 	or $value = $value->new();
     $self->{$name} = $value;
@@ -2921,6 +2922,56 @@ sub __clear_time {
 	}
     }
     return;
+}
+
+sub __event_name {
+    my ( $self, $event, $tplt ) = @_;
+    ARRAY_REF eq ref $tplt
+	or confess 'Programming error - $tplt must be array ref';
+    return __sprintf( $tplt->[$event], $self->__object_name() );
+}
+
+sub __horizon_name {
+    my ( $self, $event, $tplt ) = @_;
+    return $self->__event_name(
+	$event,
+	$tplt || $self->__horizon_name_tplt(),
+    );
+}
+
+sub __horizon_name_tplt {
+    return [ '%s sets', '%s rises' ];
+}
+
+sub __transit_name {
+    my ( $self, $event, $tplt ) = @_;
+    return $self->__event_name(
+	$event,
+	$tplt || $self->__transit_name_tplt(),
+    );
+}
+
+sub __transit_name_tplt {
+    return [ undef, '%s transits meridian' ];
+}
+
+sub __object_name {
+    my ( $self ) = @_;
+    return $self->get( 'name' ) || $self->get( 'id' ) || (
+	$self->{_name} ||= do {
+	    ( my $name = ref $self || $self ) =~ s/ .* :: //smx;
+	    $name;
+	}
+    );
+}
+
+sub __object_is_self_named {
+    my ( $self ) = @_;
+    $self->{_name_re} ||= do {
+	( my $re = ref $self || $self ) =~ s/ .* :: //smx;
+	qr< \A \Q$re\E \z >smxi;
+    };
+    return $self->__object_name() =~ $self->{_name_re};
 }
 
 
@@ -3703,6 +3754,12 @@ this in general, I have decided to rely on just politely recommending
 that It Is Better Not. But specific pernicious cases B<will> throw
 exceptions, and I reserve the right to do the work and throw exceptions
 in all cases if it becomes a problem.
+
+=item sun (Astro::Coord::ECI::Sun class or object)
+
+This attribute represents the Sun. This is typically used to determine
+ambient lighting conditions and other Sun-related phenomena. Subclasses
+may place more stringent restrictions on this attribute.
 
 =item twilight (numeric, radians)
 

@@ -1,8 +1,12 @@
 See also the git repository.
 
-0.02    TODO
-        Bugfixes.
+0.05    2018-09-19
+        Mostly build improvements.
+
+0.02    2018-09-19
+        Bugfixes. Improve performance via the imitation of the XS
+        present in Math::Random::MTwist. Build.PL changes and (the very
+        old now) Perl 5.14 as a minimum bar.
 
 0.01    2018-09-18
         First version, released on an unsuspecting world.
-

@@ -1,29 +1,37 @@
 package Set::Hash::Keys;
 
+use strict;
+use warnings;
+
 =head1 NAME
 
 Set::Hash::Keys - Treat Hashes as Sets, based on the keys only
 
-=head1 VERSION 0.01
+=head1 VERSION 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use List::Util 'reduce';
 
-=SYNOPSIS
+=head1 SYNOPSIS
 
     use Set::Hash::Keys;
+    
     my $set1 = Set::Hash::Keys->new(
         foo => 'blue',
         bar => 'july',
     );
-    my $set2 = Set::Hash::Keys->new(
-        foo => 'bike',
-        baz => 'fish',
-    );
+
+or
+
+    use Set::Hash::Keys;
     
+    my $set2 = set_hash( foo => 'bike', baz => 'fish' );
+
+and later
+
     my $set3 = $set1 + $set2; # union
     #   foo => 'bike', # only the last remains
     #   bar => 'july',
@@ -35,7 +43,7 @@ use List::Util 'reduce';
     my $set5 = $set1 - $set2; # difference
     #   bar => 'july',
     
-    my ($sub1, $sub2) = $set1 / $set2;
+    my ($sub1, $sub2) = $set1 / $set2; # exclusive or symmitrical difference
     
     my $set5 += { qux => 'moon', ... }; # add new elements
     #   bar => 'july',
@@ -61,11 +69,11 @@ sets.
 =cut
 
 use overload(
-    '+'   => sub { pop @_ ?        union($_[1],$_[0]) :        union($_[0],$_[1]) },
-    '-'   => sub { pop @_ ?   difference($_[1],$_[0]) :   difference($_[0],$_[1]) },
-    '*'   => sub { pop @_ ? intersection($_[1],$_[0]) : intersection($_[0],$_[1]) },
-    '/'   => sub { pop @_ ?    exclusive($_[1],$_[0]) :    exclusive($_[0],$_[1]) },
-    '%'   => sub {                                       symmetrical($_[0],$_[1]) },
+    q{+} => sub { pop @_ ?        union($_[1],$_[0]) :        union($_[0],$_[1]) },
+    q{-} => sub { pop @_ ?   difference($_[1],$_[0]) :   difference($_[0],$_[1]) },
+    q{*} => sub { pop @_ ? intersection($_[1],$_[0]) : intersection($_[0],$_[1]) },
+    q{/} => sub { pop @_ ?    exclusive($_[1],$_[0]) :    exclusive($_[0],$_[1]) },
+    q{%} => sub {                                       symmetrical($_[0],$_[1]) },
 );
 
 =head1 IMPORTS
@@ -82,11 +90,11 @@ C<:all> tag.
 
 use Exporter 'import';
 
-@EXPORT = qw (
+our @EXPORT = qw (
     &set_hash
 );
 
-@EXPORT_OK = qw (
+our @EXPORT_OK = qw (
     &union
     &intersection
     &difference
@@ -94,7 +102,7 @@ use Exporter 'import';
     &symmetrical
 );
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK,
 );
 
@@ -115,6 +123,21 @@ sub new {
 
 =head2 new
 
+A class method to construct a new C<Set::Hash::Keys>-object
+
+    my $set_h = Set::Hash::Keys->new(
+        foo => 'soap',
+        bar => 'blue',
+    );
+
+=cut
+
+=head2 set_hash
+
+A convenience function to construct a new C<Set::Hash::Keys>-object
+
+    my $set_h = set_hash( foo => 'soap', bar => 'blue' );
+
 =cut
 
 =head1 SET OPERATIONS
@@ -126,7 +149,7 @@ the function or set-operator will return a single L<Set::Hash::Keys> object. But
 L<difference>, and L<exclusive> will return a list off object when evaluated in
 list context. See below for how to use each and every set-operation.
 
-See L<https://en.wikipedia.org/wiki/Set_(mathematics)#Basic_operations|Basic Set operations>
+See L<Basic Set Operations|https://en.wikipedia.org/wiki/Set_(mathematics)#Basic_operations>
 
 =cut
 
@@ -165,10 +188,10 @@ sub union {
     return unless defined $_[0];
 
     my $hash_ref = reduce {
-        +{ %$a, %$b }
+        +{ %{$a}, %{$b} }
     } @_;
     
-    __PACKAGE__->new( %$hash_ref );
+    __PACKAGE__->new( %{$hash_ref} );
 }
 
 =head2 intersection
@@ -207,14 +230,14 @@ sub intersection {
     my $hash_ref = reduce {
         +{
             map {
-                $_, $b->{$_}
+                $_ => $b->{$_}
             } grep {
                 exists $b->{$_}
-            } keys %$a
+            } keys %{$a}
         }
     } @_;
     
-    __PACKAGE__->new( %$hash_ref );
+    __PACKAGE__->new( %{$hash_ref} );
 }
 
 =head2 difference
@@ -271,28 +294,28 @@ NOTE: it will retain the key/value pairs from the first set.
 sub difference {
     return unless defined $_[0];
     
-    if ( wantarray() ) {
+    if ( wantarray ) {
         my $sets_ref = [];
         for my $i ( 0 .. $#_ ) {
             my @other = @_; # make a clone, since splice mutates it
-            my $set_i = splice( @other, $i, 1 );
+            my $set_i = splice @other, $i, 1 ;
             my $set_d = difference( $set_i, @other );   
-            push @$sets_ref, $set_d;
+            push @{$sets_ref}, $set_d;
         }
-        return @$sets_ref
+        return @{$sets_ref}
     }
     
     my $hash_ref = reduce {
         +{
             map {
-                $_, $a->{$_}
+                $_ => $a->{$_}
             } grep {
                 !exists $b->{$_}
-            } keys %$a
+            } keys %{$a}
         }
     } @_;
     
-    __PACKAGE__->new( %$hash_ref )
+    __PACKAGE__->new( %{$hash_ref} )
 }
 
 =head2 exclusive

@@ -1,4 +1,4 @@
-# $Id: 08-recurse.t 1549 2017-03-08 09:54:14Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1709 2018-09-07 08:03:09Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -34,7 +34,7 @@ eval {
 	exit plan skip_all => "No nameservers" unless $resolver->nameservers;
 
 	my $reply = $resolver->send(qw(. NS IN)) || die;
-	my $from = $reply->answerfrom();
+	my $from = $reply->from();
 
 	my @ns = grep $_->type eq 'NS', $reply->answer;
 	exit plan skip_all => "No NS RRs in response from $from" unless scalar @ns;
@@ -105,7 +105,7 @@ SKIP: {
 	my $reply = $res->send( ".", "NS" );
 	ok( $reply, 'got response to priming query' );
 	skip( 'no response to priming query', 3 ) unless $reply;
-	my $from = $reply->answerfrom();
+	my $from = $reply->from();
 
 	ok( $reply->header->aa, "authoritative response from $from" );
 

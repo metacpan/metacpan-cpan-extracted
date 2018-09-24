@@ -1,0 +1,16 @@
+.gitignore
+Changes
+graphql.xs
+lib/Parser/GraphQL/XS.pm
+bin/release.sh
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+ppport.h
+README.md
+typemap
+t/00_basic.t
+t/01_parse.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

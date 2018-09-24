@@ -1,4 +1,12 @@
-Revision history for Dancer2::Session::DBI
+Revision history for Dancer2::Session::DBIC
+
+0.120 Sat Sep 22 10:50:04 2018 CEST
+
+    [BUG FIXES]
+
+    * Fix typos in main POD (Adam Leskis, GH #17).
+    * Remove handles hash (Henk van Oers, GH #15).
+    * Remove unused variables (Henk van Oers, GH #14).
 
 0.110 Thu Jul  7 18:37:35 2016 CEST
 

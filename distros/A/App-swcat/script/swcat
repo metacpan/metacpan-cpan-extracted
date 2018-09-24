@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-13'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-21'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010;
 use strict;
@@ -38,7 +38,7 @@ swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.001 of swcat (from Perl distribution App-swcat), released on 2018-09-13.
+This document describes version 0.003 of swcat (from Perl distribution App-swcat), released on 2018-09-21.
 
 =head1 SYNOPSIS
 
@@ -77,10 +77,6 @@ C<*> marks required options.
 =over
 
 =item B<--cache-period>=I<s>
-
-Default value:
-
- 86400
 
 =item B<--config-path>=I<filename>, B<-c>
 

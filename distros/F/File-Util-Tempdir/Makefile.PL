@@ -22,12 +22,14 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Perl::osnames" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.033",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,8 +39,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Perl::osnames" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "strict" => 0,

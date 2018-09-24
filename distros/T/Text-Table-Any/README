@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.092 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2018-07-23.
+    This document describes version 0.093 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2018-09-23.
 
 SYNOPSIS
      use Text::Table::Any;
@@ -150,6 +150,8 @@ FUNCTIONS
         *   Text::Table::TinyColorWide
 
         *   Text::Table::TinyWide
+
+        *   Text::Table::XLSX
 
         *   Text::TabularDisplay
 

@@ -78,7 +78,7 @@ Minion::Command::minion::worker - Minion worker command
 L<Minion::Command::minion::worker> starts a L<Minion> worker. You can have as
 many workers as you like.
 
-=head1 SIGNALS
+=head1 WORKER SIGNALS
 
 The L<Minion::Command::minion::worker> process can be controlled at runtime
 with the following signals.
@@ -90,6 +90,21 @@ Stop gracefully after finishing the current jobs.
 =head2 QUIT
 
 Stop immediately without finishing the current jobs.
+
+=head1 JOB SIGNALS
+
+The job processes spawned by the L<Minion::Command::minion::worker> process can
+be controlled at runtime with the following signals.
+
+=head2 INT
+
+This signal starts out with the operating system default and allows for jobs to
+install a custom signal handler to stop gracefully.
+
+=head2 USR1, USR2
+
+These signals start out being ignored and allow for jobs to install custom
+signal handlers.
 
 =head1 REMOTE CONTROL COMMANDS
 
@@ -106,6 +121,15 @@ Instruct one or more workers to change the number of jobs to perform
 concurrently. Setting this value to C<0> will effectively pause the worker. That
 means all current jobs will be finished, but no new ones accepted, until the
 number is increased again.
+
+=head2 kill
+
+  $ ./myapp.pl minion job -b kill -a '["INT", 10025]'
+  $ ./myapp.pl minion job -b kill -a '["INT", 10025]' 23
+
+Instruct one or more workers to send a signal to a job that is currently being
+performed. This command will be ignored by workers that do not have a job
+matching the id. That means it is safe to broadcast this command to all workers.
 
 =head2 stop
 

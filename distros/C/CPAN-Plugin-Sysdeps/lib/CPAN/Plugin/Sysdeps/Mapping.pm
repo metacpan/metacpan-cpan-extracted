@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 # shortcuts
 #  os and distros
@@ -772,9 +772,9 @@ sub mapping {
       [os_openbsd,
        [package => 'mariadb-client']],
       [like_debian,
-       [linuxdistrocodename => 'stretch',
-	[package => 'default-libmysqlclient-dev']],
-       [package => 'libmysqlclient-dev']],
+       [before_debian_stretch,
+	[package => 'libmysqlclient-dev']],
+       [package => 'default-libmysqlclient-dev']],
       [like_fedora,
        [linuxdistroversion => qr{^6\.},
 	[package => 'mysql-devel']],
@@ -2639,9 +2639,12 @@ sub mapping {
       [like_debian,
        [package => 'libedit-dev']]],
 
-     [cpanmod => 'Term::ReadLine::Gnu',
+     [cpanmod => ['RL', 'Term::ReadLine::Gnu'],
       [like_debian,
-       [package => 'libreadline6-dev']],
+       [before_debian_stretch,
+	[package => 'libreadline6-dev']],
+       [package => 'libreadline-dev']],
+
       [like_fedora,
        [package => 'readline-devel']],
       # XXX what about freebsd?
@@ -2879,7 +2882,7 @@ sub mapping {
 	[package => []]],
        [package => 'npm']]],
 
-     [cpanmod => 'WWW::Curl',
+     [cpanmod => ['WWW::Curl', 'Net::Curl'],
       [os_openbsd,
 	# doesn't work
        [package => 'curl']],

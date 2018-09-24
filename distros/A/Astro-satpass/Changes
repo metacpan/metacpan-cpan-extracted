@@ -1,3 +1,15 @@
+0.102		2018-09-24	T. R. Wyant
+    Almanac descriptions are now sensitive to object name. That is to
+    say, if for some reason you designate a different name for the Sun,
+    almanac descriptions will reflect that.
+
+    The mutator for the 'sun' attribute now requires the new value to be
+    a member of $self->SUN_CLASS(), rather than SUN_CLASS. This way a
+    subclass can place more stringent restrictions on it.
+
+    Also it turns out that the 'sun' attribute was never documented. So it
+    is now.
+
 0.101		2018-09-07	T. R. Wyant
     Move nutation, obliquity, equation_of_time to Astro::Coord::ECI.
     They become methods rather than subroutines so that they can be
@@ -53,7 +65,7 @@
 
 0.097		2018-06-04	T. R. Wyant
     Large canned status update:
-    
+
     - Iridium 7 failed
     - Iridium 11 spare
     - Iridium 15 spare
@@ -182,7 +194,7 @@ operational).
 0.083		2017-09-13	T. R. Wyant
 
     Add -decayed to eg/visual.
-    
+
     This eliminates decayed bodies. I decided not to remove these from
     the magnitude table because of historical interest.
 
@@ -1200,7 +1212,7 @@ operational).
 
     * Add the 'refraction' parameter, to allow the user to turn off
       atmospheric refraction (it is on by default).
-  
+
 0.026		2009-10-02	T. R. Wyant
   Astro::Coord::ECI 0.026:
 

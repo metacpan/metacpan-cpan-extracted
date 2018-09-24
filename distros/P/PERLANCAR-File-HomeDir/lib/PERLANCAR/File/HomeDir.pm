@@ -1,7 +1,7 @@
 package PERLANCAR::File::HomeDir;
 
-our $DATE = '2017-01-05'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2018-09-20'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,6 +10,7 @@ use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(
                        get_my_home_dir
+                       get_user_home_dir
                );
 
 our $DIE_ON_FAILURE = 0;
@@ -38,7 +39,7 @@ sub get_my_home_dir {
 }
 
 # borrowed from File::HomeDir, with some modifications
-sub get_users_home_dir {
+sub get_user_home_dir {
     my ($name) = @_;
 
     if ($^O eq 'MSWin32') {
@@ -77,15 +78,15 @@ PERLANCAR::File::HomeDir - Lightweight way to get current user's home directory
 
 =head1 VERSION
 
-This document describes version 0.05 of PERLANCAR::File::HomeDir (from Perl distribution PERLANCAR-File-HomeDir), released on 2017-01-05.
+This document describes version 0.060 of PERLANCAR::File::HomeDir (from Perl distribution PERLANCAR-File-HomeDir), released on 2018-09-20.
 
 =head1 SYNOPSIS
 
- use PERLANCAR::Home::Dir qw(get_my_home_dir users_home);
+ use PERLANCAR::File::HomeDir qw(get_my_home_dir get_user_home_dir);
 
- my $dir = get_my_home_dir();
+ my $dir = get_my_home_dir(); # e.g. "/home/ujang"
 
- $dir = users_home("ujang");
+ $dir = get_user_home_dir("ujang");
 
 =head1 DESCRIPTION
 
@@ -104,12 +105,22 @@ failure.
 
 None are exported by default, but they are exportable.
 
-=head2 get_my_home_dir() => str
+=head2 get_my_home_dir
 
-Try several ways to get home directory. Return undef or die (depends on
-C<$DIE_ON_FAILURE>) if everything fails.
+Usage:
 
-=head2 get_users_home_dir($username) => str
+ my $home_dir = get_my_home_dir();
+
+Try several ways to get home directory of the current user. Return undef or die
+(depends on C<$DIE_ON_FAILURE>) if everything fails.
+
+=head2 get_user_home_dir
+
+Usage:
+
+ my $home_dir = get_user_home_dir($username);
+
+Try several ways to get home directory of a specified user (C<$username>).
 
 =head1 HOMEPAGE
 
@@ -137,7 +148,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

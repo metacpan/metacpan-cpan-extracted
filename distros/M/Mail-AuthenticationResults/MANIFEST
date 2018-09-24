@@ -36,6 +36,8 @@ t/02-set.t
 t/02-tokens.t
 t/03-parser-bogus.t
 t/03-parser.t
+t/03-search-authserv-id.t
+t/03-search-has.t
 t/03-search.t
 t/04-aol.t
 t/04-fastmail.t

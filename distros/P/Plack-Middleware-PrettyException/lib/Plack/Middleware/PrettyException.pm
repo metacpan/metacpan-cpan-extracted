@@ -2,7 +2,7 @@ package Plack::Middleware::PrettyException;
 
 # ABSTRACT: Capture exceptions and present them as HTML or JSON
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 use 5.010;
 use strict;
@@ -116,7 +116,7 @@ sub call {
             else {
                 $err_headers->set(
                     'content-type' => 'text/html;charset=utf-8' );
-                $err_body = $self->render_html_error( $r->[0], $error, $exception );
+                $err_body = $self->render_html_error( $r->[0], $error, $exception, $env );
             }
             $r->[1] = $err_headers->headers;
             $r->[2] = [$err_body];
@@ -126,7 +126,7 @@ sub call {
 }
 
 sub render_html_error {
-    my ( $self, $status, $error, $exception ) = @_;
+    my ( $self, $status, $error, $exception, $env ) = @_;
 
     $status ||= 'unknown HTTP status code';
     $error  ||= 'unknown error';
@@ -136,6 +136,7 @@ sub render_html_error {
         my @more;
         if ($exception->does('Throwable::X')) {
             push(@more, "<li><strong>".$exception->ident."</strong></li>");
+            push(@more, "<li><strong>".$exception->message."</strong></li>");
             my $payload = $exception->payload;
             while (my ($k, $v) = each %$payload) {
                 push(@more,sprintf("<li>%s: %s</li>", $k, $v // ''));
@@ -172,7 +173,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -329,9 +330,9 @@ negitiation and a new C<default_response_encoding> field.
 The default HTML is rather basic^wugly. To finetune this, just
 subclass C<Plack::Middleware::PrettyException> and implement a method
 called C<render_html_error>. This method will be called with the HTTP
-status code, the stringified error message and the original exception
-object (if there was one!), and you can then render it as fancy as you
-(or your graphic designer) wants.
+status code, the stringified error message, the original exception
+object (if there was one!) and the original request C<$env>. You can
+then render it as fancy as you (or your graphic designer) wants.
 
 Here's an example:
 
@@ -344,7 +345,7 @@ Here's an example:
   use Plack::Util::Accessor qw(html_page_model renderer);
   
   sub render_html_error {
-      my ( $self, $status, $message, $exception ) = @_;
+      my ( $self, $status, $message, $exception, $env ) = @_;
   
       my %data = (base=>'/',title=>'Error '.$status, error => $message, code => $status );
       eval {

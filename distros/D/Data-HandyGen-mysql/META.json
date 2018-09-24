@@ -4,7 +4,7 @@
       "Takashi Egawa <egawa.takashi@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
@@ -40,8 +40,9 @@
             "Getopt::Long" : "0",
             "JSON" : "0",
             "SQL::Maker" : "0",
+            "String::Random" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.87_01",
+            "Test::More" : "0.96",
             "Test::Warn" : "0",
             "Test::mysqld" : "0",
             "YAML" : "0"
@@ -49,5 +50,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.2"
+   "version" : "v0.0.4"
 }

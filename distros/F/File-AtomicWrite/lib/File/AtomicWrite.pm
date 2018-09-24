@@ -4,9 +4,6 @@
 # file, and offers various degrees of more paranoid write handling, and
 # means to set Unix file permissions and ownerships on the resulting
 # file. Run perldoc(1) on this module for more information.
-#
-# This module is free software; you can redistribute it and/or modify it
-# under the Artistic license.
 
 package File::AtomicWrite;
 
@@ -19,7 +16,7 @@ use File::Path qw/mkpath/;
 use File::Temp qw/tempfile/;
 use IO::Handle;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 # Default options
 my %default_params = ( MKPATH => 0, template => ".tmp.XXXXXXXXXX" );
@@ -32,81 +29,81 @@ my %default_params = ( MKPATH => 0, template => ".tmp.XXXXXXXXXX" );
 # a filehandle or scalar ref, and handles all the details in a
 # single shot.
 sub write_file {
-  my $class = shift;
-  my $user_params = shift || {};
+    my $class = shift;
+    my $user_params = shift || {};
 
-  if ( !exists $user_params->{input} ) {
-    croak "missing 'input' option";
-  }
-
-  my ( $tmp_fh, $tmp_filename, $params_ref, $digest ) = _init($user_params);
-
-  # Attempt cleanup if things go awry (use the OO interface and custom
-  # signal handlers of your own if this is a problem)
-  local $SIG{TERM} = sub { _cleanup( $tmp_fh, $tmp_filename ); exit };
-  local $SIG{INT}  = sub { _cleanup( $tmp_fh, $tmp_filename ); exit };
-  local $SIG{__DIE__} = sub { _cleanup( $tmp_fh, $tmp_filename ) };
-
-  my $input_ref = ref $params_ref->{input};
-  unless ( $input_ref eq 'SCALAR' or $input_ref eq 'GLOB' ) {
-    croak "invalid type for input option: " . ref $input_ref;
-  }
-
-  my $input = $params_ref->{input};
-  if ( $input_ref eq 'SCALAR' ) {
-    unless ( print $tmp_fh $$input ) {
-      my $save_errstr = $!;
-      _cleanup( $tmp_fh, $tmp_filename );
-      croak "error printing to temporary file: $save_errstr";
-    }
-    if ( exists $params_ref->{CHECKSUM}
-      and !exists $params_ref->{checksum} ) {
-      $digest->add($$input);
+    if ( !exists $user_params->{input} ) {
+        croak "missing 'input' option";
     }
 
-  } elsif ( $input_ref eq 'GLOB' ) {
-    while ( my $line = <$input> ) {
-      unless ( print $tmp_fh $line ) {
-        my $save_errstr = $!;
-        _cleanup( $tmp_fh, $tmp_filename );
-        croak "error printing to temporary file: $save_errstr";
-      }
+    my ( $tmp_fh, $tmp_filename, $params_ref, $digest ) = _init($user_params);
 
-      if ( exists $params_ref->{CHECKSUM}
-        and !exists $params_ref->{checksum} ) {
-        $digest->add($$input);
-      }
+    # Attempt cleanup if things go awry (use the OO interface and custom
+    # signal handlers of your own if this is a problem)
+    local $SIG{TERM} = sub { _cleanup( $tmp_fh, $tmp_filename ); exit };
+    local $SIG{INT}  = sub { _cleanup( $tmp_fh, $tmp_filename ); exit };
+    local $SIG{__DIE__} = sub { _cleanup( $tmp_fh, $tmp_filename ) };
+
+    my $input_ref = ref $params_ref->{input};
+    unless ( $input_ref eq 'SCALAR' or $input_ref eq 'GLOB' ) {
+        croak "invalid type for input option: " . ref $input_ref;
     }
-  }
 
-  _resolve( $tmp_fh, $tmp_filename, $params_ref, $digest );
+    my $input = $params_ref->{input};
+    if ( $input_ref eq 'SCALAR' ) {
+        unless ( print $tmp_fh $$input ) {
+            my $save_errstr = $!;
+            _cleanup( $tmp_fh, $tmp_filename );
+            croak "error printing to temporary file: $save_errstr";
+        }
+        if ( exists $params_ref->{CHECKSUM}
+            and !exists $params_ref->{checksum} ) {
+            $digest->add($$input);
+        }
+
+    } elsif ( $input_ref eq 'GLOB' ) {
+        while ( my $line = <$input> ) {
+            unless ( print $tmp_fh $line ) {
+                my $save_errstr = $!;
+                _cleanup( $tmp_fh, $tmp_filename );
+                croak "error printing to temporary file: $save_errstr";
+            }
+
+            if ( exists $params_ref->{CHECKSUM}
+                and !exists $params_ref->{checksum} ) {
+                $digest->add($$input);
+            }
+        }
+    }
+
+    _resolve( $tmp_fh, $tmp_filename, $params_ref, $digest );
 }
 
 sub new {
-  my $class      = shift;
-  my $self       = {};
-  my $user_param = shift || {};
+    my $class      = shift;
+    my $self       = {};
+    my $user_param = shift || {};
 
-  croak "option 'input' only for write_file class method"
-    if exists $user_param->{input};
+    croak "option 'input' only for write_file class method"
+      if exists $user_param->{input};
 
-  @{$self}{qw/_tmp_fh _tmp_filename _params _digest/} = _init($user_param);
+    @{$self}{qw/_tmp_fh _tmp_filename _params _digest/} = _init($user_param);
 
-  bless $self, $class;
-  return $self;
+    bless $self, $class;
+    return $self;
 }
 
 sub safe_level {
-  my $class = shift;
-  my $level = shift || croak 'safe_level() requires a value';
-  File::Temp->safe_level($level);
+    my $class = shift;
+    my $level = shift || croak 'safe_level() requires a value';
+    File::Temp->safe_level($level);
 }
 
 sub set_template {
-  my $class = shift;
-  my $template = shift || croak 'set_template() requires a template';
-  $default_params{template} = $template;
-  return;
+    my $class = shift;
+    my $template = shift || croak 'set_template() requires a template';
+    $default_params{template} = $template;
+    return;
 }
 
 ######################################################################
@@ -114,332 +111,334 @@ sub set_template {
 # Instance methods
 
 sub fh {
-  shift->{_tmp_fh};
+    shift->{_tmp_fh};
 }
 
 sub filename {
-  shift->{_tmp_filename};
+    shift->{_tmp_filename};
 }
 
 sub checksum {
-  my $self = shift;
-  $self->{_params}->{checksum} = shift
-    || croak 'checksum requires an argument';
+    my $self = shift;
+    $self->{_params}->{checksum} = shift
+      || croak 'checksum requires an argument';
 
-  if ( !$self->{_digest} ) {
-    $self->{_params}->{CHECKSUM} = 1;
-    $self->{_digest} = _init_checksum( $self->{_params} );
-  }
+    if ( !$self->{_digest} ) {
+        $self->{_params}->{CHECKSUM} = 1;
+        $self->{_digest} = _init_checksum( $self->{_params} );
+    }
 
-  return $self;
+    return $self;
 }
 
 sub commit {
-  my $self = shift;
-  _resolve( @{$self}{qw/_tmp_fh _tmp_filename _params _digest/} );
+    my $self = shift;
+    _resolve( @{$self}{qw/_tmp_fh _tmp_filename _params _digest/} );
 }
 
 sub DESTROY {
-  my $self = shift;
-  _cleanup( @{$self}{qw/_tmp_fh _tmp_filename/} );
+    my $self = shift;
+    _cleanup( @{$self}{qw/_tmp_fh _tmp_filename/} );
 }
 
 # For when (if) things go awry
 sub _cleanup {
-  my ( $tmp_fh, $tmp_filename ) = @_;
-  # recommended by perlport(1) prior to unlink/rename calls
-  close $tmp_fh if defined $tmp_fh;
-  unlink $tmp_filename if defined $tmp_filename;
+    my ( $tmp_fh, $tmp_filename ) = @_;
+    # recommended by perlport(1) prior to unlink/rename calls
+    close $tmp_fh if defined $tmp_fh;
+    unlink $tmp_filename if defined $tmp_filename;
 }
 
 sub _init {
-  my $user_params = shift || {};
-  my $params_ref = { %default_params, %$user_params };
+    my $user_params = shift || {};
+    my $params_ref = { %default_params, %$user_params };
 
-  if ( !exists $params_ref->{file}
-    or !defined $params_ref->{file} ) {
-    croak q{missing 'file' option};
-  }
-
-  my $digest = _init_checksum($params_ref);
-
-  $params_ref->{_dir} = dirname( $params_ref->{file} );
-  if ( !-d $params_ref->{_dir} ) {
-    _mkpath( $params_ref->{MKPATH}, $params_ref->{_dir} );
-  }
-
-  if ( exists $params_ref->{tmpdir} ) {
-    if ( !-d $params_ref->{tmpdir}
-      and $params_ref->{tmpdir} ne $params_ref->{_dir} ) {
-      _mkpath( $params_ref->{MKPATH}, $params_ref->{tmpdir} );
-
-      # partition sanity check
-      my @dev_ids = map { ( stat $params_ref->{$_} )[0] } qw/_dir tmpdir/;
-      if ( $dev_ids[0] != $dev_ids[1] ) {
-        croak 'tmpdir and file directory on different partitions';
-      }
+    if (   !exists $params_ref->{file}
+        or !defined $params_ref->{file} ) {
+        croak q{missing 'file' option};
     }
-  } else {
-    $params_ref->{tmpdir} = $params_ref->{_dir};
-  }
 
-  if ( exists $params_ref->{safe_level} ) {
-    File::Temp->safe_level( $params_ref->{safe_level} );
-  }
+    my $digest = _init_checksum($params_ref);
 
-  my ( $tmp_fh, $tmp_filename ) = tempfile(
-    $params_ref->{template},
-    DIR    => $params_ref->{tmpdir},
-    UNLINK => 0
-  );
-  if ( !defined $tmp_fh ) {
-    die "unable to obtain temporary filehandle\n";
-  }
+    $params_ref->{_dir} = dirname( $params_ref->{file} );
+    if ( !-d $params_ref->{_dir} ) {
+        _mkpath( $params_ref->{MKPATH}, $params_ref->{_dir} );
+    }
 
-  if ( exists $params_ref->{binmode_layer}
-    and defined $params_ref->{binmode_layer} ) {
-    binmode( $tmp_fh, $params_ref->{binmode_layer} );
-  } elsif ( exists $params_ref->{BINMODE} and $params_ref->{BINMODE} ) {
-    binmode($tmp_fh);
-  }
+    if ( exists $params_ref->{tmpdir} ) {
+        if ( !-d $params_ref->{tmpdir}
+            and $params_ref->{tmpdir} ne $params_ref->{_dir} ) {
+            _mkpath( $params_ref->{MKPATH}, $params_ref->{tmpdir} );
 
-  return $tmp_fh, $tmp_filename, $params_ref, $digest;
+            # partition sanity check
+            my @dev_ids = map { ( stat $params_ref->{$_} )[0] } qw/_dir tmpdir/;
+            if ( $dev_ids[0] != $dev_ids[1] ) {
+                croak 'tmpdir and file directory on different partitions';
+            }
+        }
+    } else {
+        $params_ref->{tmpdir} = $params_ref->{_dir};
+    }
+
+    if ( exists $params_ref->{safe_level} ) {
+        File::Temp->safe_level( $params_ref->{safe_level} );
+    }
+
+    my ( $tmp_fh, $tmp_filename ) = tempfile(
+        $params_ref->{template},
+        DIR    => $params_ref->{tmpdir},
+        UNLINK => 0
+    );
+    if ( !defined $tmp_fh ) {
+        die "unable to obtain temporary filehandle\n";
+    }
+
+    if ( exists $params_ref->{binmode_layer}
+        and defined $params_ref->{binmode_layer} ) {
+        binmode( $tmp_fh, $params_ref->{binmode_layer} );
+    } elsif ( exists $params_ref->{BINMODE} and $params_ref->{BINMODE} ) {
+        binmode($tmp_fh);
+    }
+
+    return $tmp_fh, $tmp_filename, $params_ref, $digest;
 }
 
 sub _init_checksum {
-  my $params_ref = shift;
-  my $digest     = 0;
+    my $params_ref = shift;
+    my $digest     = 0;
 
-  if ( exists $params_ref->{CHECKSUM} and $params_ref->{CHECKSUM} ) {
-    eval { require Digest::SHA1; };
-    if ($@) {
-      croak 'cannot checksum as lack Digest::SHA1';
+    if ( exists $params_ref->{CHECKSUM} and $params_ref->{CHECKSUM} ) {
+        eval { require Digest::SHA1; };
+        if ($@) {
+            croak 'cannot checksum as lack Digest::SHA1';
+        }
+        $digest = Digest::SHA1->new;
+    } else {
+        # so can rely on 'exists' test elsewhere hereafter
+        delete $params_ref->{CHECKSUM};
     }
-    $digest = Digest::SHA1->new;
-  } else {
-    # so can rely on 'exists' test elsewhere hereafter
-    delete $params_ref->{CHECKSUM};
-  }
 
-  return $digest;
+    return $digest;
 }
 
 sub _resolve {
-  my $tmp_fh       = shift;
-  my $tmp_filename = shift;
-  my $params_ref   = shift;
-  my $digest       = shift;
+    my $tmp_fh       = shift;
+    my $tmp_filename = shift;
+    my $params_ref   = shift;
+    my $digest       = shift;
 
-  if ( exists $params_ref->{CHECKSUM}
-    and !exists $params_ref->{checksum} ) {
-    $params_ref->{checksum} = $digest->hexdigest;
-  }
-
-  # Help the bits reach the disk
-  $tmp_fh->flush() or die "flush() error: $!\n";
-  # TODO may need eval or exclude on other platforms
-  if ( $^O !~ m/Win32/ ) {
-    $tmp_fh->sync() or die "sync() error: $!\n";
-  }
-
-  eval {
-    if ( exists $params_ref->{min_size} ) {
-      _check_min_size( $tmp_fh, $params_ref->{min_size} );
+    if ( exists $params_ref->{CHECKSUM}
+        and !exists $params_ref->{checksum} ) {
+        $params_ref->{checksum} = $digest->hexdigest;
     }
-    if ( exists $params_ref->{CHECKSUM} ) {
-      _check_checksum( $tmp_fh, $params_ref->{checksum} );
+
+    # Help the bits reach the disk
+    $tmp_fh->flush() or die "flush() error: $!\n";
+    # TODO may need eval or exclude on other platforms
+    if ( $^O !~ m/Win32/ ) {
+        $tmp_fh->sync() or die "sync() error: $!\n";
     }
-  };
-  if ($@) {
-    _cleanup( $tmp_fh, $tmp_filename );
-    die $@;
-  }
 
-  # recommended by perlport(1) prior to unlink/rename calls.
-  #
-  # TODO I've seen false positives from close() calls, though certain
-  # file systems only report errors at close() time. If someone can
-  # document a false positive, instead create an option and let the
-  # caller decide.
-  close($tmp_fh) or die "problem closing filehandle: $!\n";
-
-  # spare subsequent useless close attempts, if any
-  undef $tmp_fh;
-
-  if ( exists $params_ref->{mode} ) {
-    my $mode = $params_ref->{mode};
-    croak 'invalid mode data'
-      if !defined $mode
-      or $mode !~ m/^[0-9]+$/;
-
-    my $int_mode = substr( $mode, 0, 1 ) eq '0' ? oct($mode) : ( $mode + 0 );
-
-    my $count = chmod( $int_mode, $tmp_filename );
-    if ( $count != 1 ) {
-      my $save_errstr = $!;
-      _cleanup( $tmp_fh, $tmp_filename );
-      die "unable to chmod temporary file: $save_errstr\n";
-    }
-  }
-
-  if ( exists $params_ref->{owner} ) {
-    eval { _set_ownership( $tmp_filename, $params_ref->{owner} ); };
+    eval {
+        if ( exists $params_ref->{min_size} ) {
+            _check_min_size( $tmp_fh, $params_ref->{min_size} );
+        }
+        if ( exists $params_ref->{CHECKSUM} ) {
+            _check_checksum( $tmp_fh, $params_ref->{checksum} );
+        }
+    };
     if ($@) {
-      _cleanup( $tmp_fh, $tmp_filename );
-      die $@;
+        _cleanup( $tmp_fh, $tmp_filename );
+        die $@;
     }
-  }
 
-  if ( exists $params_ref->{mtime} ) {
-    croak 'invalid mtime data'
-      if !defined $params_ref->{mtime}
-      or $params_ref->{mtime} !~ m/^[0-9]+$/;
+    # recommended by perlport(1) prior to unlink/rename calls.
+    #
+    # TODO I've seen false positives from close() calls, though certain
+    # file systems only report errors at close() time. If someone can
+    # document a false positive, instead create an option and let the
+    # caller decide.
+    close($tmp_fh) or die "problem closing filehandle: $!\n";
 
-    my ($file_atime) = ( stat $tmp_filename )[8];
-    my $count = utime( $file_atime, $params_ref->{mtime}, $tmp_filename );
-    if ( $count != 1 ) {
-      my $save_errstr = $!;
-      _cleanup( $tmp_fh, $tmp_filename );
-      die "unable to utime temporary file: $save_errstr\n";
+    # spare subsequent useless close attempts, if any
+    undef $tmp_fh;
+
+    if ( exists $params_ref->{mode} ) {
+        my $mode = $params_ref->{mode};
+        croak 'invalid mode data'
+          if !defined $mode
+          or $mode !~ m/^[0-9]+$/;
+
+        my $int_mode = substr( $mode, 0, 1 ) eq '0' ? oct($mode) : ( $mode + 0 );
+
+        my $count = chmod( $int_mode, $tmp_filename );
+        if ( $count != 1 ) {
+            my $save_errstr = $!;
+            _cleanup( $tmp_fh, $tmp_filename );
+            die "unable to chmod temporary file: $save_errstr\n";
+        }
     }
-  }
 
-  # If the file does not exist, but the backup does;
-  # the backup is left unmodified
-  if ( exists $params_ref->{backup} && -f $params_ref->{file} ) {
-    croak 'invalid backup suffix'
-      if !defined $params_ref->{backup}
-      or $params_ref->{backup} eq '';
+    if ( exists $params_ref->{owner} ) {
+        eval { _set_ownership( $tmp_filename, $params_ref->{owner} ); };
+        if ($@) {
+            _cleanup( $tmp_fh, $tmp_filename );
+            die $@;
+        }
+    }
 
-    # The backup file will be hardlinked in same directory as original
-    my $backup_filename = $params_ref->{file} . $params_ref->{backup};
-    if ( -f $backup_filename ) {
-      my $count = unlink($backup_filename);
-      if ( $count != 1 ) {
+    if ( exists $params_ref->{mtime} ) {
+        croak 'invalid mtime data'
+          if !defined $params_ref->{mtime}
+          or $params_ref->{mtime} !~ m/^[0-9]+$/;
+
+        my ($file_atime) = ( stat $tmp_filename )[8];
+        my $count = utime( $file_atime, $params_ref->{mtime}, $tmp_filename );
+        if ( $count != 1 ) {
+            my $save_errstr = $!;
+            _cleanup( $tmp_fh, $tmp_filename );
+            die "unable to utime temporary file: $save_errstr\n";
+        }
+    }
+
+    # If the file does not exist, but the backup does;
+    # the backup is left unmodified
+    if ( exists $params_ref->{backup} && -f $params_ref->{file} ) {
+        croak 'invalid backup suffix'
+          if !defined $params_ref->{backup}
+          or $params_ref->{backup} eq '';
+
+        # The backup file will be hardlinked in same directory as original
+        my $backup_filename = $params_ref->{file} . $params_ref->{backup};
+        if ( -f $backup_filename ) {
+            my $count = unlink($backup_filename);
+            if ( $count != 1 ) {
+                my $save_errstr = $!;
+                _cleanup( $tmp_fh, $tmp_filename );
+                die "unable to unlink existing backup file: $save_errstr\n";
+            }
+        }
+
+        # Make hardlink -- Haiku OS does not appear to support these;
+        # http://www.cpantesters.org/cpan/report/7c2a3994-bc30-11e8-83ca-8681f4fbe649
+        # which is warned about in the perlport POD
+        if ( !link( $params_ref->{file}, $backup_filename ) ) {
+            my $save_errstr = $!;
+            _cleanup( $tmp_fh, $tmp_filename );
+            die "unable to link existing file to backup file: $save_errstr\n";
+        }
+    }
+
+    unless ( rename( $tmp_filename, $params_ref->{file} ) ) {
         my $save_errstr = $!;
         _cleanup( $tmp_fh, $tmp_filename );
-        die "unable to unlink existing backup file: $save_errstr\n";
-      }
+        croak "unable to rename file: $save_errstr";
     }
 
-    # Make hardlink
-    if ( !link( $params_ref->{file}, $backup_filename ) ) {
-      my $save_errstr = $!;
-      _cleanup( $tmp_fh, $tmp_filename );
-      die "unable to link existing file to backup file: $save_errstr\n";
-    }
-  }
+    # spare subsequent useless unlink attempts, if any
+    undef $tmp_filename;
 
-  unless ( rename( $tmp_filename, $params_ref->{file} ) ) {
-    my $save_errstr = $!;
-    _cleanup( $tmp_fh, $tmp_filename );
-    croak "unable to rename file: $save_errstr";
-  }
-
-  # spare subsequent useless unlink attempts, if any
-  undef $tmp_filename;
-
-  return 1;
+    return 1;
 }
 
 sub _mkpath {
-  my $mkpath    = shift;
-  my $directory = shift;
+    my $mkpath    = shift;
+    my $directory = shift;
 
-  if ($mkpath) {
-    mkpath($directory);
-    if ( !-d $directory ) {
-      croak "could not create parent directory";
+    if ($mkpath) {
+        mkpath($directory);
+        if ( !-d $directory ) {
+            croak "could not create parent directory";
+        }
+    } else {
+        croak "parent directory does not exist";
     }
-  } else {
-    croak "parent directory does not exist";
-  }
 
-  return 1;
+    return 1;
 }
 
 sub _check_checksum {
-  my $tmp_fh   = shift;
-  my $checksum = shift;
+    my $tmp_fh   = shift;
+    my $checksum = shift;
 
-  seek( $tmp_fh, 0, 0 )
-    or die("tmp fh seek() error: $!\n");
+    seek( $tmp_fh, 0, 0 )
+      or die("tmp fh seek() error: $!\n");
 
-  my $digest = Digest::SHA1->new;
-  $digest->addfile($tmp_fh);
+    my $digest = Digest::SHA1->new;
+    $digest->addfile($tmp_fh);
 
-  my $on_disk_checksum = $digest->hexdigest;
+    my $on_disk_checksum = $digest->hexdigest;
 
-  if ( $on_disk_checksum ne $checksum ) {
-    croak 'temporary file SHA1 hexdigest does not match supplied checksum';
-  }
+    if ( $on_disk_checksum ne $checksum ) {
+        croak 'temporary file SHA1 hexdigest does not match supplied checksum';
+    }
 
-  return 1;
+    return 1;
 }
 
 sub _check_min_size {
-  my $tmp_fh   = shift;
-  my $min_size = shift;
+    my $tmp_fh   = shift;
+    my $min_size = shift;
 
-  # Must seek, as OO method allows the fh or filename to be passed off
-  # and used by who knows what first.
-  seek( $tmp_fh, 0, 2 )
-    or die("tmp fh seek() error: $!\n");
+    # Must seek, as OO method allows the fh or filename to be passed off
+    # and used by who knows what first.
+    seek( $tmp_fh, 0, 2 )
+      or die("tmp fh seek() error: $!\n");
 
-  my $written = tell($tmp_fh);
-  if ( $written == -1 ) {
-    die("tmp fh tell() error: $!\n");
-  } elsif ( $written < $min_size ) {
-    croak 'bytes written failed to exceed min_size required';
-  }
+    my $written = tell($tmp_fh);
+    if ( $written == -1 ) {
+        die("tmp fh tell() error: $!\n");
+    } elsif ( $written < $min_size ) {
+        croak 'bytes written failed to exceed min_size required';
+    }
 
-  return 1;
+    return 1;
 }
 
 # Accepts "0" or "user:group" type ownership details and a filename,
 # attempts to set ownership rights on that filename. croak()s if
 # anything goes awry.
 sub _set_ownership {
-  my $filename = shift;
-  my $owner    = shift;
+    my $filename = shift;
+    my $owner    = shift;
 
-  croak 'invalid owner data' if !defined $owner or length $owner < 1;
+    croak 'invalid owner data' if !defined $owner or length $owner < 1;
 
-  # defaults if nothing comes of the subsequent parsing
-  my ( $uid, $gid ) = ( -1, -1 );
+    # defaults if nothing comes of the subsequent parsing
+    my ( $uid, $gid ) = ( -1, -1 );
 
-  my ( $user_name, $group_name ) = split /[:.]/, $owner, 2;
+    my ( $user_name, $group_name ) = split /[:.]/, $owner, 2;
 
-  my ( $login, $pass, $user_uid, $user_gid );
+    my ( $login, $pass, $user_uid, $user_gid );
 
-  # Only customize user if have something from caller
-  if ( defined $user_name and $user_name ne '' ) {
-    if ( $user_name =~ m/^([0-9]+)$/ ) {
-      $uid = $1;
-    } else {
-      ( $login, $pass, $user_uid, $user_gid ) = getpwnam($user_name)
-        or croak 'user not in password database';
-      $uid = $user_uid;
+    # Only customize user if have something from caller
+    if ( defined $user_name and $user_name ne '' ) {
+        if ( $user_name =~ m/^([0-9]+)$/ ) {
+            $uid = $1;
+        } else {
+            ( $login, $pass, $user_uid, $user_gid ) = getpwnam($user_name)
+              or croak 'user not in password database';
+            $uid = $user_uid;
+        }
     }
-  }
 
-  # Only customize group if have something from caller
-  if ( defined $group_name and $group_name ne '' ) {
-    if ( $group_name =~ m/^([0-9]+)$/ ) {
-      $gid = $1;
-    } else {
-      my ( $group_name, $pass, $group_gid ) = getgrnam($group_name)
-        or croak 'group not in group database';
-      $gid = $group_gid;
+    # Only customize group if have something from caller
+    if ( defined $group_name and $group_name ne '' ) {
+        if ( $group_name =~ m/^([0-9]+)$/ ) {
+            $gid = $1;
+        } else {
+            my ( $group_name, $pass, $group_gid ) = getgrnam($group_name)
+              or croak 'group not in group database';
+            $gid = $group_gid;
+        }
     }
-  }
 
-  my $count = chown( $uid, $gid, $filename );
-  if ( $count != 1 ) {
-    die "unable to chown temporary file\n";
-  }
+    my $count = chown( $uid, $gid, $filename );
+    if ( $count != 1 ) {
+        die "unable to chown temporary file\n";
+    }
 
-  return 1;
+    return 1;
 }
 
 42;
@@ -813,6 +812,10 @@ This isn't easy:
 
 L<http://danluu.com/file-consistency/>
 
+L<https://homes.cs.washington.edu/~lijl/papers/ferrite-asplos16.pdf>
+
+L<https://unix.stackexchange.com/questions/464382>
+
 =head1 AUTHOR
 
 thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
@@ -821,9 +824,9 @@ C<mtime> and other features contributed by Stijn De Weirdt.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009-2016 Jeremy Mates
+Copyright (C) 2009-2016,2018 Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
 
 =cut

@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '0.06';
+$HTTP::API::Client::VERSION = '0.08';
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ HTTP::API::Client - API Client
  use HTTP::API::Client;
 
  my $ua1 = HTTP::API::Client->new;
- my $ua2 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_deinfed_headers => { X_COMPANY => 'ABC LTD' } );
+ my $ua2 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_defined_headers => { X_COMPANY => 'ABC LTD' } );
  my $ua3 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_defined_data => { api_key => 123 } );
 
  $ua->send( $method, $url, \%data, \%header );
@@ -73,6 +73,7 @@ use HTTP::Headers;
 use HTTP::Request;
 use JSON::XS;
 use LWP::UserAgent;
+use Net::Curl::Simple;
 use Mouse;
 use Try::Tiny;
 use URI;
@@ -143,19 +144,35 @@ sub _build_content_type {
     return "application/json; charset=$charset";
 }
 
+has engine => (
+    is      => "ro",
+    isa     => "Str",
+    default => "LWP::UserAgent",
+);
+
 has ua => (
     is         => "rw",
-    isa        => "LWP::UserAgent",
+    isa        => "Any",
     lazy_build => 1,
 );
 
 sub _build_ua {
     my $self       = shift;
     my $ssl_verify = $self->ssl_verify;
-    my $ua =
-      LWP::UserAgent->new( ssl_opts => { verify_hostname => $ssl_verify } );
-    $ua->agent( $self->browser_id );
-    $ua->timeout( $self->timeout );
+    my $engine     = $self->engine;
+
+    my $ua;
+
+    if ( $engine eq "LWP::UserAgent" ) {
+        $ua = LWP::UserAgent->new( ssl_opts => { verify_hostname => $ssl_verify } );
+        $ua->agent( $self->browser_id );
+        $ua->timeout( $self->timeout );
+    }
+    elsif ( $engine eq "CURL" ) {
+        $ua = Net::Curl::Simple->new( timeout => $self->timeout );
+        $ua->ua->setopt( useragent => $self->browser_id );
+    }
+
     return $ua;
 }
 
@@ -285,21 +302,23 @@ sub send {
     my $path         = shift;
     my $data         = shift || {};
     my $headers      = shift || {};
-    my $ua           = $self->ua;
-    my $base_url     = $self->base_url;
-    my $url          = $base_url ? $base_url . $path : $path;
-    my $req          = $self->_request( $method, $url, $data, $headers );
-    my $retry_count  = _smart_or( $self->retry->{count}, 1 );
-    my %retry_status = %{ $self->retry->{status} || {} };
-    my $retry_delay  = _smart_or( $self->retry->{delay}, 5 );
-    my %debug        = %{ $self->debug_flags || {} };
 
     if ( my $pd = $self->pre_defined_data ) {
         %$data = ( %$pd, %$data );
     }
+
     if ( my $ph = $self->pre_defined_headers ) {
         %$headers = ( %$ph, %$headers );
     }
+
+    my $ua           = $self->ua;
+    my $base_url     = $self->base_url;
+    my $url          = $base_url ? $base_url . $path : $path;
+    my $retry_count  = _smart_or( $self->retry->{count}, 1 );
+    my %retry_status = %{ $self->retry->{status} || {} };
+    my $retry_delay  = _smart_or( $self->retry->{delay}, 5 );
+    my %debug        = %{ $self->debug_flags || {} };
+    my $eng          = $self->engine;
 
     my $response;
 
@@ -307,7 +326,13 @@ sub send {
     foreach my $retry ( 0 .. $retry_count ) {
         my $started_time = time;
 
-        $response = $ua->request($req);
+        if ( $eng eq 'LWP::UserAgent' ) {
+            my $req   = $self->_request( $method, $url, $data, $headers );
+            $response = $ua->request($req);
+        }
+        elsif ( $eng eq 'CURL' ) {
+            $response = $ua->$method
+        }
 
         if ( $debug{in_out} || $debug{send_out} ) {
             print STDERR "-- REQUEST --\n";

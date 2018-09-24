@@ -3,7 +3,7 @@ use warnings;
 
 use 5.010000;
 
-use ExtUtils::MakeMaker 6.30;
+use ExtUtils::MakeMaker ;
 
 my (%fribidi, $libs, $cflags);
 eval { require ExtUtils::PkgConfig };
@@ -45,48 +45,47 @@ Text/Bidi/Array/Byte.pm
 );
 
 my %WriteMakefileArgs = (
-                       'test' => {
-                                   'TESTS' => 't/*.t'
-                                 },
                        'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'NAME' => 'Text::Bidi::private',
                        'DISTNAME' => 'Text-Bidi',
-                       'BUILD_REQUIRES' => {},
                        'TEST_REQUIRES' => {
                                             'File::Temp' => '0',
                                             'Test::More' => '0',
-                                            'ExtUtils::MakeMaker' => '0',
                                             'version' => '0.77',
-                                            'IO::Handle' => '0',
-                                            'charnames' => '0',
+                                            'File::Spec' => '0',
                                             'IPC::Open3' => '0',
+                                            'charnames' => '0',
                                             'Data::Dumper' => '0',
-                                            'File::Spec' => '0'
+                                            'IO::Handle' => '0',
+                                            'ExtUtils::MakeMaker' => '0'
                                           },
+                       'VERSION' => '2.14',
+                       'MIN_PERL_VERSION' => '5.010000',
                        'LICENSE' => 'perl',
-                       'PREREQ_PM' => {
-                                        'Carp' => '0',
-                                        'Encode' => '0',
-                                        'integer' => '0',
-                                        'Getopt::Long' => '0',
-                                        'overload' => '0',
-                                        'base' => '0',
-                                        'warnings' => '0',
-                                        'open' => '0',
-                                        'strict' => '0',
-                                        'DynaLoader' => '0',
-                                        'Exporter' => '0',
-                                        'Tie::Array' => '0'
-                                      },
                        'EXE_FILES' => [
                                         'bin/fribidi.pl'
                                       ],
-                       'NAME' => 'Text::Bidi::private',
                        'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
                        'CONFIGURE_REQUIRES' => {
-                                                 'ExtUtils::MakeMaker' => '6.30'
+                                                 'ExtUtils::MakeMaker' => '0'
                                                },
-                       'MIN_PERL_VERSION' => '5.010000',
-                       'VERSION' => '2.12'
+                       'PREREQ_PM' => {
+                                        'Tie::Array' => '0',
+                                        'Carp' => '0',
+                                        'Getopt::Long' => '0',
+                                        'warnings' => '0',
+                                        'Encode' => '0',
+                                        'Exporter' => '0',
+                                        'base' => '0',
+                                        'integer' => '0',
+                                        'DynaLoader' => '0',
+                                        'overload' => '0',
+                                        'strict' => '0',
+                                        'open' => '0'
+                                      },
+                       'test' => {
+                                   'TESTS' => 't/*.t'
+                                 }
                      );
 
 

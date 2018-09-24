@@ -7,13 +7,13 @@ use Scalar::Util 'blessed';
 use Module::Runtime 'use_module';
 use Try::Tiny;
 
-our %dbic_handles;
+our $_schema;
 
 use Moo;
 with 'Dancer2::Core::Role::SessionFactory';
 use namespace::clean;
 
-our $VERSION = '0.110';
+our $VERSION = '0.120';
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ Dancer2::Session::DBIC - DBIx::Class session engine for Dancer2
 
 =head1 VERSION
 
-0.110
+0.120
 
 =head1 DESCRIPTION
 
@@ -234,7 +234,7 @@ sub _build_serializer_object {
 
 =head2 serialize_options
 
-Options to be passed to the constructor of the the C<serializer> class
+Options to be passed to the constructor of the C<serializer> class
 as a hash reference.
 
 =cut
@@ -247,7 +247,7 @@ has serialize_options => (
 
 =head2 deserialize_options
 
-Options to be passed to the constructor of the the C<deserializer> class
+Options to be passed to the constructor of the C<deserializer> class
 as a hash reference.
 
 =cut
@@ -272,10 +272,9 @@ Write the session to the database. Returns the session object.
 
 sub _flush {
     my ($self, $id, $session) = @_;
-    my $handle = $self->_dbic;
 
-    my %session_data = ($handle->{id_column} => $id,
-                        $handle->{data_column} => $self->serializer_object->serialize($session),
+    my %session_data = ($self->id_column => $id,
+                        $self->data_column => $self->serializer_object->serialize($session),
                        );
 
     $self->_rset->update_or_create(\%session_data);
@@ -356,63 +355,40 @@ sub _destroy {
 sub _dbic {
     my $self = shift;
 
-    # To be fork safe and thread safe, use a combination of the PID and TID (if
-    # running with use threads) to make sure no two processes/threads share
-    # handles.  Implementation based on DBIx::Connector by David E. Wheeler.
-    my $pid_tid = $$;
-    $pid_tid .= '_' . threads->tid if $INC{'threads.pm'};
-
-    # OK, see if we have a matching handle
-    my $handle = $dbic_handles{$pid_tid};
-
-    if ($handle->{schema}) {
-        return $handle;
-    }
+    return $_schema if $_schema;
 
     # Prefer an active schema over a schema class.
     my $schema = $self->schema;
 
     if (defined $schema) {
         if (blessed $schema) {
-            $handle->{schema} = $schema;
+            $_schema = $schema;
         }
         else {
-            $handle->{schema} = $schema->();
+            $_schema = $schema->();
         }
     }
     elsif ( $self->db_connection_name ) {
-        $handle->{schema} = DBICx::Sugar::schema($self->db_connection_name);
+        $_schema = DBICx::Sugar::schema($self->db_connection_name);
     }
     elsif (! defined $self->schema_class) {
         die "No schema class defined.";
     }
     else {
-        my $schema_class = $self->schema_class;
-
-	my $settings = {};
- 
-        $handle->{schema} = $self->_load_schema_class($schema_class,
+        $_schema = $self->_load_schema_class($self->schema_class,
                                                       $self->dsn,
                                                       $self->user,
                                                       $self->password);
     }
 
-    $handle->{resultset} = $self->resultset;
-    $handle->{id_column} = $self->id_column;
-    $handle->{data_column} = $self->data_column;
-
-    $dbic_handles{$pid_tid} = $handle;
-
-    return $handle;
+    return $_schema;
 }
 
 # Returns specific resultset
 sub _rset {
-    my ($self, $name) = @_;
+    my ($self) = @_;
 
-    my $handle = $self->_dbic;
-
-    return $handle->{schema}->resultset($handle->{resultset});
+    return $self->_dbic->resultset($self->resultset);
 }
 
 # Loads schema class

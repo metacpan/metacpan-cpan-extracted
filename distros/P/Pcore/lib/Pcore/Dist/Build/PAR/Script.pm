@@ -53,6 +53,7 @@ sub _build_exe_filename ($self) {
     return $filename . q[-] . join( q[-], @attrs ) . $self->par_suffix;
 }
 
+# TODO enable repack
 sub run ($self) {
     say qq[\nBuilding ] . ( $self->crypt ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . q[ ] . $BLACK . $ON_GREEN . ( $self->clean ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}$LF];
 
@@ -116,7 +117,12 @@ sub run ($self) {
 
     say 'done';
 
-    my $repacked_path = $self->_repack_parl( $parl_path, $zip );
+    # TODO enable
+    # my $repacked_path = $self->_repack_parl( $parl_path, $zip );
+    my $repacked_path = $parl_path;
+
+    # patch windows exe icon
+    $self->_patch_icon("$repacked_path");
 
     my $target_exe = $self->dist->root . 'data/' . $self->exe_filename;
 
@@ -386,6 +392,7 @@ sub _add_dist ( $self, $dist ) {
     return;
 }
 
+# TODO temporary not used
 sub _repack_parl ( $self, $parl_path, $zip ) {
     print 'repacking parl ... ';
 
@@ -529,15 +536,17 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 179                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 185                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 311                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 317                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 400                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 396                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 484, 487             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    3 | 407                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 417, 423             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    2 | 491, 494             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 424, 430             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

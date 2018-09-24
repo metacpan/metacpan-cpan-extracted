@@ -67,7 +67,7 @@ report newretrieve newreport
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios @totalcases @pinwinneritems
 );
 
-$VERSION = '0.79.15';
+$VERSION = '0.81';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -1173,6 +1173,111 @@ sub readsweeps
 	return ( \@struct, \@sourcestruct );
 }
 
+
+
+sub gencen
+{
+  my @varnums =  @_;
+  my @newmids;
+  foreach my $hs_ref ( @varnums )
+  {
+    my %newhs;
+    my %hs = %{ $hs_ref };
+    foreach my $key ( sort { $a <=> $b } ( keys %hs ) )
+    {
+      my $newval = ( int( $hs{$key} / 2 ) + 1 );
+      $newhs{$key} = $newval;
+    }
+    push( @newmids, \%newhs );
+  }
+  return( @newmids );
+}
+
+
+sub genextremes
+{
+  my @varnums =  @_;
+  my @newmids;
+  foreach my $hs_ref ( @varnums )
+  {
+    my %newhs;
+    my %hs = %{ $hs_ref };
+    foreach my $key ( sort { $a <=> $b } ( keys %hs ) )
+    {
+      my $newval = 1 ;
+      $newhs{$key} = $newval;
+    }
+    push( @newmids, \%newhs );
+
+    push( @newmids, \%hs );
+  }
+  return( @newmids );
+}
+
+
+sub gencentres
+{
+  my ( $vars_ref ) =  @_;
+  my @vars = @{ $vars_ref };
+  my @varcopy = @vars;
+  my $numelts = scalar( @vars );
+  my $numcases = ( $numelts / 2 );
+  my $c = 0;
+  while ( $c < ( $numelts -1 ) )
+  {
+    my %newhs;
+    my @box;
+    my %hsmin = %{ $vars[$c] };
+    my %hsmax = %{ $vars[$c+1] };
+    my $signal = 0;
+    my $inv;
+    foreach my $key ( sort { $a <=> $b } ( keys %hsmax ) )
+    {
+      my $newval = ( int( ( $hsmax{$key} - $hsmin{$key} ) / 2 ) + $hsmin{$key} ) ; #say "\$newval: " . dump ( $newval );
+
+      #say "\$signal: " . dump ( $signal );
+      if ( ( $newval == $hsmax{$key} ) or ( $newval == $hsmin{$key} ) )
+      {
+        my @newpair;
+        my $answer = odd__( $signal ); #say "\$answer: " . dump ( $answer );
+        if ( $answer eq "even" )
+        {
+          $value = $array[ int(rand(@array)) ];
+          my @ar = ( $hsmax{$key}, $hsmin{$key} );
+          $newval = $ar[ int( rand( @ar ) ) ]; #say "newpair1: " . dump ( @newpair );
+          if ( $hsmax{$key} == $newval )
+          {
+            $inv = "no";
+          }
+          else
+          {
+            $inv = "yes";
+          }
+        }
+        else
+        { #say "newpair 2: " . dump ( @newpair );
+          if ( $inv = "no" )
+          {
+            @newpair = ( $hsmin{$key}, $hsmax{$key} ); #say "newpair 2: " . dump ( @newpair );
+          }
+          else
+          {
+            @newpair = ( $hsmax{$key}, $hsmin{$key} ); #say "newpair 3: " . dump ( @newpair );
+          }
+          $newval = $newpair[0];
+        }
+        $signal++;
+      }
+      $newhs{$key} = $newval;
+    }
+    splice( @varcopy, ( ( $c * 2 ) + 1 ), 0, \%newhs );
+    $c++;
+  }
+  return( @varcopy );
+}
+
+
+
 ###########################################################################################
 
 sub opt
@@ -1223,6 +1328,7 @@ sub opt
 
   my $i = 0;
   my @newarr;
+
   if ( $dowhat{randomdirs} eq "yes" )
   { #IT SHUFFLES  $dowhat{direction} UNDER APPROPRIATE SETTINGS.
     foreach my $directionref ( @{ $dowhat{direction} } )
@@ -1318,8 +1424,6 @@ sub opt
 		}
 	}
 
-
-
 	@chanceseed = convchanceseed(@chanceseed);
 	@caseseed = convcaseseed( { caseseed => \@caseseed, chanceseed => \@chanceseed } );
 
@@ -1348,43 +1452,115 @@ sub opt
 	{
 		#my  $itersnum = $varinumbers[$countcase]{$varinumber}; say "\$itersnum: $itersnum";
 
-		my ( $sweepz_ref, $sourcesweeps_ref ) = readsweeps( @sweeps );
-		my @sweepz = @$sweepz_ref;
-		my @sourcesweeps = @$sourcesweeps_ref;
-		if ( @sweepz )
+		if ( $dowhat{subdivisions} ne "" )
 		{
-			@sweeps = @sweepz;
+			if ( $dowhat{subdivisions} == 1 )
+			{
+				$dowhat{starpositions} = gencen( @varinumbers );
+			}
+
+			if ( $dowhat{subdivisions} > 1 )
+			{
+				$dowhat{starpositions} = genextremes( @varinumbers );
+
+				my $i = 0;
+				while ( $i < $dowhat{subdivisions} )
+				{
+					$dowhat{starpositions} = gencentres( $dowhat{starpositions} );
+					$i++;
+				}
+			}
 		}
 
-		calcoverlaps( @sweeps ); # PRODUCES @calcoverlaps WHICH IS global. ZZZ
+		if ( $dowhat{starpositions} ne "" )
+		{
+		  foreach my $sequence_ref ( @{ $dowhat{starpositions} } )
+			{
+				$dowhat{direction} => [ [ "star" ] ], #if direction "<", ascent
+				$dowhat{randomsweeps} => "no", # to randomize the order specified in @sweeps.
+				$dowhat{randominit} => "no", # to randomize the init levels specified in @mediumiters.
+				$dowhat{randomdirs} => "no", # to randomize the directions of descent.
+				my @mediumiters = ( $sequence_ref );
+				my ( $sweepz_ref, $sourcesweeps_ref ) = readsweeps( @sweeps );
+				my @sweepz = @$sweepz_ref;
+				my @sourcesweeps = @$sourcesweeps_ref;
+				if ( @sweepz )
+				{
+					@sweeps = @sweepz;
+				}
 
-                #@mediumiters = @pinmediumiters; say $tee "###############MEDIUMITERS: " . dump ( @mediumiters );
-		
-                if ( scalar( @mediumiters ) == 0 ) { calcmediumiters( @varinumbers ); }
-		#$itersnum = getitersnum($countcase, $varinumber, @varinumbers);
+				calcoverlaps( @sweeps ); # PRODUCES @calcoverlaps WHICH IS global. ZZZ
 
-		@rootnames = definerootcases( \@sweeps, \@mediumiters );
+		                #@mediumiters = @pinmediumiters; say $tee "###############MEDIUMITERS: " . dump ( @mediumiters );
 
-		my $countcase = 0;
-		my $countblock = 0;
-		my %datastruc;
-		my @rescontainer;
+		                if ( scalar( @mediumiters ) == 0 ) { calcmediumiters( @varinumbers ); }
+				#$itersnum = getitersnum($countcase, $varinumber, @varinumbers);
 
-		my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
-                
-                my $count = 0;
-                my @arr;
-                foreach ( @varinumbers )
-                {
-                  my $elt = getitem(\@winneritems, $count, 0); 
-                  push ( @arr, $elt );
-                  $count++;
-                }
-                $datastruc{pinwinneritem} = [ @arr ];
-                
+				@rootnames = definerootcases( \@sweeps, \@mediumiters );
 
-		callcase( { countcase => $countcase, rootnames => \@rootnames, countblock => $countblock,
-		miditers => \@mediumiters, winneritems => \@winneritems, sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, datastruc => \%datastruc, rescontainer => \@rescontainer } ); #EVERYTHING HAS TO BEGIN IN SOME WAY
+				my $countcase = 0;
+				my $countblock = 0;
+				my %datastruc;
+				my @rescontainer;
+
+				my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
+
+        my $count = 0;
+        my @arr;
+        foreach ( @varinumbers )
+        {
+          my $elt = getitem(\@winneritems, $count, 0);
+          push ( @arr, $elt );
+          $count++;
+        }
+        $datastruc{pinwinneritem} = [ @arr ];
+
+
+				callcase( { countcase => $countcase, rootnames => \@rootnames, countblock => $countblock,
+				miditers => \@mediumiters, winneritems => \@winneritems, sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, datastruc => \%datastruc, rescontainer => \@rescontainer } ); #EVERYTHING HAS TO BEGIN IN SOME WAY
+			}
+		}
+		else
+		{
+			my @mediumiters = ( $sequence_ref );
+			my ( $sweepz_ref, $sourcesweeps_ref ) = readsweeps( @sweeps );
+			my @sweepz = @$sweepz_ref;
+			my @sourcesweeps = @$sourcesweeps_ref;
+			if ( @sweepz )
+			{
+				@sweeps = @sweepz;
+			}
+
+			calcoverlaps( @sweeps ); # PRODUCES @calcoverlaps WHICH IS global. ZZZ
+
+									#@mediumiters = @pinmediumiters; say $tee "###############MEDIUMITERS: " . dump ( @mediumiters );
+
+									if ( scalar( @mediumiters ) == 0 ) { calcmediumiters( @varinumbers ); }
+			#$itersnum = getitersnum($countcase, $varinumber, @varinumbers);
+
+			@rootnames = definerootcases( \@sweeps, \@mediumiters );
+
+			my $countcase = 0;
+			my $countblock = 0;
+			my %datastruc;
+			my @rescontainer;
+
+			my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
+
+			my $count = 0;
+			my @arr;
+			foreach ( @varinumbers )
+			{
+				my $elt = getitem(\@winneritems, $count, 0);
+				push ( @arr, $elt );
+				$count++;
+			}
+			$datastruc{pinwinneritem} = [ @arr ];
+
+
+			callcase( { countcase => $countcase, rootnames => \@rootnames, countblock => $countblock,
+			miditers => \@mediumiters, winneritems => \@winneritems, sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, datastruc => \%datastruc, rescontainer => \@rescontainer } ); #EVERYTHING HAS TO BEGIN IN SOME WAY
+		}
 	}
 	elsif ( ( $target eq "parcoord3d" ) and (@chancedata) and ( $dimchance ) )
 	{

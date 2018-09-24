@@ -5,10 +5,11 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 # to escape an open parenthesis in a re use \x28, close is \x29
+# parseCommandLineArguments should take a hash as the final parameter to explain parameters
 
 package Data::Table::Text;
-use v5.8.0;
-our $VERSION = '20180818';
+use v5.24.0;
+our $VERSION = '20180922';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -24,6 +25,7 @@ use Storable qw(store retrieve);
 use String::Numeric qw(is_float);
 use Time::HiRes qw(gettimeofday);
 use utf8;
+sub ˢ(&);                                                                       # Immediately executed inline sub to allow a code block before B<if>.
 
 #D1 Time stamps                                                                 # Date and timestamps as used in logs of long running commands.
 
@@ -105,15 +107,36 @@ sub zzz($;$$$)                                                                  
   $r
  }
 
-sub parseCommandLineArguments(&$;$)                                             # Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by this sub.
+sub parseCommandLineArguments(&$;$)                                             # Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub. The keywords names will be validated if  B<$valid> is either a reference to an array of valid keywords names or a hash of valid keyword names => textual descriptions. Confess with a table of valid keywords definitions if the B<$valid> keywords are specified and an invalid one is presented.
  {my ($sub, $args, $valid) = @_;                                                # Sub to call, list of arguments to parse, optional list of valid parameters else all parameters will be accepted
-  my %valid = $valid ? map {lc($_)=>1} @$valid : ();                            # Hash of valid normalized parameters
-  my %hash;
+  my %valid =                                                                   # Valid keywords
+   ˢ{return () unless $valid;                                                   # No keywords definitions
+     return map {lc($_)=>0} @$valid if ref($valid) =~ m(array)is;               # Keyword names as an array but with no explanation
+     %$valid                                                                    # Hash of keyword name=>explanation
+    };
+ my %hash;
   my @array;
   for my $arg(@$args)                                                           # Each arg
    {if ($arg =~ m/\A-+(\S+?)(=(.+))?\Z/)                                        # Keyword parameter
-     {confess "Invalid parameter: $arg\n" if $valid and !$valid{lc($1)};        # Optionally validate parameters
-      $hash{lc($1)} = $3;                                                       # Save  valid parameter
+     {if ($valid and !defined($valid{lc($1)}))                                  # Validate keyword name
+       {my @s;
+        for my $k(sort keys %valid)                                             # Create a table of valid keywords
+         {if (my $v = $valid{$k})
+           {push @s, [$k, $v];
+           }
+          else
+           {push @s, [$k];
+           }
+         }
+        if (@s)                                                                 # Format error message
+         {my $s = formatTable(\@s, [qw(Keyword Description)]);
+          confess "Invalid parameter: $arg\nValid keyword parameters are:\n$s\n";
+         }
+        else
+         {confess "Invalid parameter: $arg\n";
+         }
+       }
+      $hash{lc($1)} = $3;                                                       # Save valid keyword parameter
      }
     else                                                                        # Positional parameter
      {push @array, $arg;
@@ -572,12 +595,6 @@ sub evalGZipFile($)                                                             
   $res
  } # evalGZipFile
 
-sub dumpGZipFile($$)                                                            # Write a data structure through B<gzip> to a file.
- {my ($file, $data) = @_;                                                       # File to write, reference to data
-  ref($data) or confess "\$data must contain a reference to data, not a scalar";
-  writeGZipFile($file, dump($data));
- } # dumpGZipFile
-
 sub readUtf16File($)                                                            #P Read a file containing unicode in utf-16 format.
  {my ($file) = @_;                                                              # Name of file to read
   defined($file) or
@@ -657,6 +674,11 @@ sub writeFile($$)                                                               
   &overWriteFile(@_);
  } # writeFile
 
+sub dumpFile($$)                                                                # Dump a data structure to a file
+ {my ($file, $struct) = @_;                                                     # File to write to or B<undef> for a temporary file,  address of data structure to write
+  overWriteFile($file, dump($struct));
+ } # writeFile
+
 sub writeGZipFile($$)                                                           # Write a unicode utf8 string through gzip to a file.
  {my ($file, $string) = @_;                                                     # File to write to, string to write
   makePath($file);
@@ -668,6 +690,12 @@ sub writeGZipFile($$)                                                           
   -e $file or confess "Failed to write to file:\n$file\n";
   $file
  } # writeGZipFile
+
+sub dumpGZipFile($$)                                                            # Write a data structure through B<gzip> to a file.
+ {my ($file, $data) = @_;                                                       # File to write, reference to data
+  ref($data) or confess "\$data must contain a reference to data, not a scalar";
+  writeGZipFile($file, dump($data));
+ } # dumpGZipFile
 
 sub writeFiles($;$)                                                             # Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
  {my ($hash, $folder) = @_;                                                     # Hash of key value pairs representing files and data, optional folder to contain files else the current folder
@@ -1037,7 +1065,7 @@ sub formatTableMultiLine($;$)                                                   
     for my $col(0..$#$row)                                                      # Each column
      {my $m = $width[$col];                                                     # Maximum width
       for my $i(split /\n/, $row->[$col]//'')                                   # Each line of item
-       {if ($i !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/)     # Not a number - left justify
+       {if ($i !~ /\A\s*[-+]?\s*(\d|[,])+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/)   # Not a number - left justify
          {push @{$row[$col]}, substr($i.(' 'x$m), 0, $m);
          }
         else                                                                    # Number - right justify
@@ -1086,7 +1114,7 @@ sub formatTableBasic($)                                                         
     for my $col(0..$#$row)
      {my $m = $width[$col];                                                     # Maximum width
       my $i = $row->[$col]//'';                                                 # Current item
-      if ($i !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/)       # Not a number - left justify
+      if ($i !~ /\A\s*[-+]?\s*(\d|[,])+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/)     # Not a number - left justify
        {$text .= substr($i.(' 'x$m), 0, $m)."  ";
        }
       else                                                                      # Number - right justify
@@ -1177,9 +1205,10 @@ sub formatTableH($;$)                                                           
   formatTableBasic($d);
  }
 
-sub formatTable($;$%)                                                           # Format various data structures as a table. Optionally create a report from the table using the following optional report options:\mB<file=E<gt>$file> the name of a file to write the report to.\mB<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time and NNNN will be replaced with the number of rows in the table.\mParameters:
+sub formatTable($;$%)                                                           # Format various data structures as a table. Optionally create a report from the table using the following optional report options:\mB<file=E<gt>$file> the name of a file to write the report to.\mB<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time and NNNN will be replaced with the number of rows in the table.\mB<zero=E<gt>$zero> if true the report will be written to the specified file even if empty.\mParameters:
  {my ($data, $title, %options) = @_;                                            # Data to be formatted, optional reference to an array of titles, options
-  my ($a, $h, $o) = (0, 0, 0);
+
+  my ($a, $h, $o) = (0, 0, 0);                                                  # Check structure of input data
   my $checkStructure = sub
    {for(@_)
      {my $r = ref($_[0]);
@@ -1222,7 +1251,7 @@ END
   push @report, qq(This file: $file),                           q() if $file;
   push @report, $formattedTable;
   my $report = join "\n", @report;
-  overWriteFile($file, $report) if $file;
+  overWriteFile($file, $report) if $file and $a+$h+$o;                          # Only write the report if there is some data in it or the zero option has been specified to write it regardless.
 
   $report
  }
@@ -1374,12 +1403,31 @@ sub genHash($%)                                                                 
   for my $m(sort keys %attributes)                                              # Add any attributes not already present
    {next if $h->can($m);
     $s .= 'sub '.$bless.'::'.$m. ':lvalue {$_[0]{"'.$m.'"}}';                   # LValue version for get and set
+    $s .= 'sub '.$bless.'::'.$m. 'X       {$_[0]{"'.$m.'"}//q()}';              # Default to blank for get
    }
   if ($s)                                                                       # Add any new methods needed
    {eval $s;
     confess $@ if $@;
    }
   $h
+ }
+
+sub loadHash($%)                                                                # Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>. Confess to any unknown attribute names.
+ {my ($hash, %attributes) = @_;                                                 # Hash, hash of attribute names and values to be loaded
+  for my $m(sort keys %attributes)                                              # Add any attributes not already present
+   {$hash->can($m) or confess "Cannot load attribute: $m\n";                    # Unknown attribute
+    $hash->{$m} = $attributes{$m};                                              # Load known attribute
+   }
+  $hash                                                                         # Return loaded hash
+ }
+
+sub assertPackageRefs($@)                                                       # Confirm that the specified references are to the specified package
+ {my ($package, @refs) = @_;                                                    # Package, references
+  for(@refs)                                                                    # Check each reference
+   {my $r = ref($_);
+    $r && $r eq $package or confess "Wanted reference to $package, but got $r\n";
+   }
+  1
  }
 
 sub assertRef(@)                                                                # Confirm that the specified references are to the package into which this routine has been exported.
@@ -1446,13 +1494,6 @@ sub stringsAreNotEqual($$)                                                      
   (join(q(), @a), join(q(), @b))
  }
 
-sub boldString($)                                                               # Bold a string.
- {my ($string) = @_;                                                            # String to bold
-  $string =~ tr(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ)
-               (𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭);
-  $string
- }
-
 sub javaPackage($)                                                              # Extract the package name from a java string or file.
  {my ($java) = @_;                                                              # Java file if it exists else the string of java
 
@@ -1489,7 +1530,95 @@ sub numberOfLinesInString($)                                                    
   scalar split /\n/, $string;
  }
 
+
+#D1 Unicode                                                                     # Translate ascii alphanumerics in strings to various Unicode blocks.
+
+sub boldString($)                                                               # Convert alphanumerics in a string to bold.
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(A-Za-z0-9)
+               (𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵);
+  $string
+ }
+
+sub boldStringUndo($)                                                           # Undo alphanumerics in a string to bold.
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵)
+               (A-Za-z0-9);
+  $string
+ }
+
+sub enclosedString($)                                                           # Convert alphanumerics in a string to enclosed alphanumerics.
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(A-Za-z0-9)
+               (ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⓪①②③④⑤⑥⑦⑧⑨);
+  $string
+ }
+
+sub enclosedStringUndo($)                                                       # Undo alphanumerics in a string to enclosed alphanumerics.
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⓪①②③④⑤⑥⑦⑧⑨)
+               (A-Za-z0-9);
+  $string
+ }
+
+sub enclosedReversedString($)                                                   # Convert alphanumerics in a string to enclosed reversed alphanumerics.
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(A-Za-z0-9)
+               (🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩⓿➊➋➌➍➎➏➐➑➒);
+  $string
+ }
+
+sub enclosedReversedStringUndo($)                                               # Undo alphanumerics in a string to enclosed reversed alphanumerics.
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩⓿➊➋➌➍➎➏➐➑➒)
+               (A-Za-z0-9);
+  $string
+ }
+
+sub superScriptString($)                                                        # Convert alphanumerics in a string to super scripts
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(A-Za-z0-9)
+               (ᴬᴮCᴰᴱFᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿSᵀᵁⱽᵂXYZᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹);
+  $string
+ }
+
+sub superScriptStringUndo($)                                                    # Undo alphanumerics in a string to super scripts
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(ᴬᴮCᴰᴱFᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿSᵀᵁⱽᵂXYZᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹)
+               (A-Za-z0-9);
+  $string
+ }
+
+sub subScriptString($)                                                          # Convert alphanumerics in a string to sub scripts
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(a-z0-9)
+               (ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz₀₁₂₃₄₅₆₇₈₉);
+  $string
+ }
+
+sub subScriptStringUndo($)                                                      # Undo alphanumerics in a string to sub scripts
+ {my ($string) = @_;                                                            # String to convert
+  $string =~ tr(ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz₀₁₂₃₄₅₆₇₈₉)
+               (a-z0-9);
+  $string
+ }
+
 #D1 Cloud Cover                                                                 # Useful for operating across the cloud.
+
+sub makeDieConfess                                                              # Force die to confess where the death occurred
+ {$SIG{__DIE__} = sub
+   {confess shift;
+   };
+ }
+
+sub ipAddressViaArp($)                                                          # Get the ip address of a server on the local network by hostname via arp
+ {my ($hostName) = @_;                                                          # Host name
+  my ($line) = grep {/$hostName/i} qx(arp -a 2>&1);                             # Search for host name in arp output
+  return undef unless $line;                                                    # No such host
+  my (undef, $ip) = split / /, $line;                                           # Get ip address
+  $ip =~ s(\(|\)) ()gs;                                                         # Remove brackets around ip address
+  $ip                                                                           # Return ip address
+ }
 
 sub saveCodeToS3($$$;$)                                                         # Save source code files.
  {my ($saveCodeEvery, $zipFileName, $bucket, $S3Parms) = @_;                    # Save every seconds, zip file name, bucket/key, additional S3 parameters like profile or region as a string
@@ -1588,9 +1717,32 @@ sub waitForAllStartedProcessesToFinish(\%)                                      
  {my ($pids) = @_;                                                              # Hash of started process ids
   while(keys %$pids)                                                            # Remaining processes
    {my $p = waitpid 0,0;
-    $$pids{$p} or confess "Pid $p not defined in ".dump($pids)."\n";
+    $$pids{$p} or cluck "Pid $p not defined in ".dump($pids)."\n";
     delete $$pids{$p}
    }
+ }
+
+sub newServiceIncarnation($;$)                                                  # Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+ {my ($service, $file) = @_;                                                    # Service name, optional details file
+  $file ||= fpe($ENV{HOME},                                                     # File to log service details in
+    qw(.config com.appaapps services), $service, q(txt));                       # Service specification file
+  my $t = genHash(q(Data::Exchange::Service),                                   # Service details.
+    service=> $service,                                                         # The name of the service.
+    start  => time + (-e $file ? 1 : 0),                                        # The time this service was started time plus a minor hack to simplify testing.
+    file   => $file,                                                            # The file in which the service start details is being recorded.
+   );
+  dumpFile($file, $t);                                                          # Write details
+  $t                                                                            # Return service details
+ }
+
+sub Data::Exchange::Service::check($$)                                          # Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>. If the optional B<$continue> flag has been set then return the service details if this is the current service incarnation else B<undef>. Otherwise if the B<$continue> flag is false confess unless this is the current service incarnation thus bringing the earlier version of this service to an abrupt end.
+ {my ($s, $continue) = @_;                                                      # Current service details, return result if B<$continue> is true else confess if the service has been replaced
+  my $t = evalFile($s->file);                                                   # Latest service details
+  return $t if $t->start   == $s->start   and                                   # Check service details match
+               $t->service eq $s->service and
+               $t->file    eq $t->file;
+  confess $t->service. " replaced by a newer version\n" unless $continue;       # Replaced by a newer incarnation
+  undef                                                                         # Not the current incarnation but continue specified
  }
 
 #D1 Documentation                                                               # Extract, format and update documentation for a perl module.
@@ -1644,6 +1796,7 @@ sub updateDocumentation(;$)                                                     
   my %comment;                                                                  # The line comment associated with a method
   my %examples;                                                                 # Examples for each method
   my %genHashs;                                                                 # Attributes in objects defined by genHash
+  my %genHash;                                                                  # Attributes in objects defined by genHash
   my %genHashPackage;                                                           # Packages defined by genHash
   my %iUseful;                                                                  # Immediately useful methods
   my %methods;                                                                  # Methods that have been coded as opposed to being generated
@@ -1756,13 +1909,14 @@ END
   for my $l(keys @lines)                                                        # Generated objects
    {my $M = $maxLinesInExample;
     my $line = $lines[$l];
-    if ($line =~ m(genHash\s*\x28\s*q\x28(.+)\x29.+?# (.+)\Z))
-     {my $package = $1;
-      $genHashPackage{$package} = $2;
+    if ($line =~ m(genHash\s*\x28\s*(q\x28.+\x29|__PACKAGE__).+?# (.+)\Z))
+     {my $p = $1; my $c = $2;
+         $p = $p =~ s(q[qw]?\x28|\x29) ()gsr =~ s(__PACKAGE__) ($package)gsr;
+      $genHashPackage{$p} = $c;
       for(my ($L, $N) = ($l + 1, 0); $L < @lines; ++$L, ++$N)
        {my $nextLine = $lines[$L];
         if ($nextLine =~ m(\A\s+(\w+)\s*=>\s*.+?# (.*)\Z))
-         {$genHashs{$package}{$1} = $2;
+         {$genHashs{$p}{$1} = $2;
          }
         last if $nextLine =~ m/\A\s*\);/;                                       # Finish on closing bracket
         $N < $M or confess                                                      # Prevent overruns
@@ -2206,13 +2360,14 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(
-absFromAbsPlusRel addCertificate addLValueScalarMethods appendFile assertRef
-binModeAllUtf8
+absFromAbsPlusRel addCertificate addLValueScalarMethods appendFile assertRef assertPackageRefs
+binModeAllUtf8 boldString boldStringUndo
 call checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
 convertDocxToFodt convertImageToJpx convertUnicodeToXml
 createEmptyFile currentDirectory currentDirectoryAbove cutOutImagesInFodtFile
-dateStamp dateTimeStamp decodeJson decodeBase64 dumpGZipFile
+dateStamp dateTimeStamp decodeJson decodeBase64 dumpFile dumpGZipFile
+enclosedString enclosedStringUndo enclosedReversedString enclosedReversedStringUndo
 encodeJson encodeBase64 evalFile evalGZipFile
 fileList fileModTime fileOutOfDate
 filePath filePathDir filePathExt fileSize findDirs findFiles
@@ -2223,13 +2378,14 @@ genClass genHash
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 hostName htmlToc
-imageSize indentString isBlank
+imageSize indentString ipAddressViaArp isBlank
 javaPackage javaPackageAsFileName
 keyCount
 loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines
-loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
+loadHash loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
+makeDieConfess
 makePath matchPath max microSecondsSinceEpoch min
-numberOfLinesInFile numberOfLinesInString
+newServiceIncarnation numberOfLinesInFile numberOfLinesInString
 nws
 overWriteFile owf
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
@@ -2237,6 +2393,7 @@ quoteFile
 readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs removeBOM removeFilePrefix
 saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
 setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords startProcess
+superScriptString superScriptStringUndo subScriptString subScriptStringUndo
 temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
 updateDocumentation updatePerlModuleDocumentation userId
 versionCode versionCodeDashed
@@ -2543,7 +2700,7 @@ Example:
 
 =head2 parseCommandLineArguments(&$$)
 
-Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by this sub.
+Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub. The keywords names will be validated if  B<$valid> is either a reference to an array of valid keywords names or a hash of valid keyword names => textual descriptions. Confess with a table of valid keywords definitions if the B<$valid> keywords are specified and an invalid one is presented.
 
      Parameter  Description
   1  $sub       Sub to call
@@ -3225,7 +3382,7 @@ Read a file containing unicode in utf8, evaluate it, confess to any errors and t
 Example:
 
 
-    my $f = writeFile(undef, q([qw(aaa bbb ccc)]));
+    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);
 
     my $s = evalFile($f);
 
@@ -3238,27 +3395,6 @@ Read a file containing compressed utf8, evaluate it, confess to any errors or re
 
      Parameter  Description
   1  $file      File to read
-
-Example:
-
-
-  if (1) {
-    my $d = [1, 2, 3=>{a=>4, b=>5}];
-    my $file = dumpGZipFile(q(zzz.zip), $d);
-    ok -e $file;
-    my $D = evalGZipFile($file);
-    is_deeply $d, $D;
-    unlink $file;
-   }
-
-
-=head3 dumpGZipFile($$)
-
-Write a data structure through B<gzip> to a file.
-
-     Parameter  Description
-  1  $file      File to write
-  2  $data      Reference to data
 
 Example:
 
@@ -3343,7 +3479,7 @@ Write a unicode utf8 string to a file after creating a path to the file if neces
 Example:
 
 
-    my $f = writeFile(undef, q([qw(aaa bbb ccc)]));
+    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);
 
     ok overWriteFile($f, q({qw(aaa bbb ccc)]));
 
@@ -3375,6 +3511,24 @@ Example:
     ok $S eq "aaabbb";
 
 
+=head3 dumpFile($$)
+
+Dump a data structure to a file
+
+     Parameter  Description
+  1  $file      File to write to or B<undef> for a temporary file
+  2  $struct    Address of data structure to write
+
+Example:
+
+
+    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);
+
+    my $s = evalFile($f);
+
+    is_deeply $s, [qw(aaa bbb ccc)];
+
+
 =head3 writeGZipFile($$)
 
 Write a unicode utf8 string through gzip to a file.
@@ -3393,6 +3547,27 @@ Example:
     my $S = readGZipFile($file);
     ok $s eq $S;
     ok length($s) == length($S);
+    unlink $file;
+   }
+
+
+=head3 dumpGZipFile($$)
+
+Write a data structure through B<gzip> to a file.
+
+     Parameter  Description
+  1  $file      File to write
+  2  $data      Reference to data
+
+Example:
+
+
+  if (1) {
+    my $d = [1, 2, 3=>{a=>4, b=>5}];
+    my $file = dumpGZipFile(q(zzz.zip), $d);
+    ok -e $file;
+    my $D = evalGZipFile($file);
+    is_deeply $d, $D;
     unlink $file;
    }
 
@@ -3845,6 +4020,8 @@ Format various data structures as a table. Optionally create a report from the t
 B<file=E<gt>$file> the name of a file to write the report to.
 
 B<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time and NNNN will be replaced with the number of rows in the table.
+
+B<zero=E<gt>$zero> if true the report will be written to the specified file even if empty.
 
 Parameters:
 
@@ -4308,6 +4485,63 @@ Example:
     ok $p->a =  q(aa);
     ok $p->a eq q(aa);
     is_deeply $p, {a=>"aa", c=>"cc"};
+
+    loadHash($p, a=>11, b=>22);                                                   # Load the hash
+    is_deeply $p, {a=>11, b=>22, c=>"cc"};
+
+    my $r = eval {loadHash($p, d=>44)};                                           # Try to load the hash
+    ok $@ =~ m(Cannot load attribute: d);
+   }
+
+
+=head2 loadHash($%)
+
+Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>. Confess to any unknown attribute names.
+
+     Parameter    Description
+  1  $hash        Hash
+  2  %attributes  Hash of attribute names and values to be loaded
+
+Example:
+
+
+  if (1) {
+    my $o = genHash(q(TestHash),                                                  # Definition of a blessed hash.
+        a=>q(aa),                                                                 # Definition of attribute aa.
+        b=>q(bb),                                                                 # Definition of attribute bb.
+       );
+    ok $o->a eq q(aa);
+    is_deeply $o, {a=>"aa", b=>"bb"};
+    my $p = genHash(q(TestHash),
+      c=>q(cc),                                                                   # Definition of attribute cc.
+     );
+    ok $p->c eq q(cc);
+    ok $p->a =  q(aa);
+    ok $p->a eq q(aa);
+    is_deeply $p, {a=>"aa", c=>"cc"};
+
+    loadHash($p, a=>11, b=>22);                                                   # Load the hash
+    is_deeply $p, {a=>11, b=>22, c=>"cc"};
+
+    my $r = eval {loadHash($p, d=>44)};                                           # Try to load the hash
+    ok $@ =~ m(Cannot load attribute: d);
+   }
+
+
+=head2 assertPackageRefs($@)
+
+Confirm that the specified references are to the specified package
+
+     Parameter  Description
+  1  $package   Package
+  2  @refs      References
+
+Example:
+
+
+  if (1) {
+    eval q{assertPackageRefs(q(bbb), bless {}, q(aaa))};
+    ok $@ =~ m(\AWanted reference to bbb, but got aaa);
    }
 
 
@@ -4321,9 +4555,10 @@ Confirm that the specified references are to the package into which this routine
 Example:
 
 
-    eval q{assertRef(my $r = bless {}, q(aaa))};
-
+  if (1) {
+    eval q{assertRef(bless {}, q(aaa))};
     ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);
+   }
 
 
 =head2 ˢ(&)
@@ -4475,19 +4710,6 @@ Example:
    }
 
 
-=head2 boldString($)
-
-Bold a string.
-
-     Parameter  Description
-  1  $string    String to bold
-
-Example:
-
-
-  ok boldString(q(zZ)) eq q(𝘇𝗭);
-
-
 =head2 javaPackage($)
 
 Extract the package name from a java string or file.
@@ -4569,9 +4791,202 @@ b
 ") == 2;
 
 
+=head1 Unicode
+
+Translate ascii alphanumerics in strings to various Unicode blocks.
+
+=head2 boldString($)
+
+Convert alphanumerics in a string to bold.
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  ok boldString(q(zZ)) eq q(𝘇𝗭);
+
+
+=head2 boldStringUndo($)
+
+Undo alphanumerics in a string to bold.
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  if (1)
+   {my $n = 1234567890;
+    ok boldStringUndo            (boldString($n))             == $n;
+    ok enclosedStringUndo        (enclosedString($n))         == $n;
+    ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+    ok superScriptStringUndo     (superScriptString($n))      == $n;
+    ok subScriptStringUndo       (subScriptString($n))        == $n;
+   }
+
+
+=head2 enclosedString($)
+
+Convert alphanumerics in a string to enclosed alphanumerics.
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  ok enclosedString(q(hello world 1234)) eq q(ⓗⓔⓛⓛⓞ ⓦⓞⓡⓛⓓ ①②③④);
+
+
+=head2 enclosedStringUndo($)
+
+Undo alphanumerics in a string to enclosed alphanumerics.
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  if (1)
+   {my $n = 1234567890;
+    ok boldStringUndo            (boldString($n))             == $n;
+    ok enclosedStringUndo        (enclosedString($n))         == $n;
+    ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+    ok superScriptStringUndo     (superScriptString($n))      == $n;
+    ok subScriptStringUndo       (subScriptString($n))        == $n;
+   }
+
+
+=head2 enclosedReversedString($)
+
+Convert alphanumerics in a string to enclosed reversed alphanumerics.
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  ok enclosedReversedString(q(hello world 1234)) eq q(🅗🅔🅛🅛🅞 🅦🅞🅡🅛🅓 ➊➋➌➍);
+
+
+=head2 enclosedReversedStringUndo($)
+
+Undo alphanumerics in a string to enclosed reversed alphanumerics.
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  if (1)
+   {my $n = 1234567890;
+    ok boldStringUndo            (boldString($n))             == $n;
+    ok enclosedStringUndo        (enclosedString($n))         == $n;
+    ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+    ok superScriptStringUndo     (superScriptString($n))      == $n;
+    ok subScriptStringUndo       (subScriptString($n))        == $n;
+   }
+
+
+=head2 superScriptString($)
+
+Convert alphanumerics in a string to super scripts
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  ok superScriptString(1234567890) eq q(¹²³⁴⁵⁶⁷⁸⁹⁰);
+
+
+=head2 superScriptStringUndo($)
+
+Undo alphanumerics in a string to super scripts
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  if (1)
+   {my $n = 1234567890;
+    ok boldStringUndo            (boldString($n))             == $n;
+    ok enclosedStringUndo        (enclosedString($n))         == $n;
+    ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+    ok superScriptStringUndo     (superScriptString($n))      == $n;
+    ok subScriptStringUndo       (subScriptString($n))        == $n;
+   }
+
+
+=head2 subScriptString($)
+
+Convert alphanumerics in a string to sub scripts
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  ok subScriptString(1234567890)   eq q(₁₂₃₄₅₆₇₈₉₀);
+
+
+=head2 subScriptStringUndo($)
+
+Undo alphanumerics in a string to sub scripts
+
+     Parameter  Description
+  1  $string    String to convert
+
+Example:
+
+
+  if (1)
+   {my $n = 1234567890;
+    ok boldStringUndo            (boldString($n))             == $n;
+    ok enclosedStringUndo        (enclosedString($n))         == $n;
+    ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+    ok superScriptStringUndo     (superScriptString($n))      == $n;
+    ok subScriptStringUndo       (subScriptString($n))        == $n;
+   }
+
+
 =head1 Cloud Cover
 
 Useful for operating across the cloud.
+
+=head2 makeDieConfess()
+
+Force die to confess where the death occurred
+
+
+Example:
+
+
+    makeDieConfess
+
+
+=head2 ipAddressViaArp($)
+
+Get the ip address of a server on the local network by hostname via arp
+
+     Parameter  Description
+  1  $hostName  Host name
+
+Example:
+
+
+    ipAddressViaArp(q(secarias));
+
 
 =head2 saveCodeToS3($$$$)
 
@@ -4675,6 +5090,50 @@ Example:
    }
 
 
+=head2 newServiceIncarnation($$)
+
+Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+
+     Parameter  Description
+  1  $service   Service name
+  2  $file      Optional details file
+
+Example:
+
+
+  if (1)
+   {my $s = newServiceIncarnation("aaa", q(bbb.txt));
+    is_deeply $s->check, $s;
+    my $t = newServiceIncarnation("aaa", q(bbb.txt));
+    is_deeply $t->check, $t;
+    ok $t->start >= $s->start+1;
+    ok !$s->check(1);
+    unlink q(bbb.txt);
+   }
+
+
+=head2 Data::Exchange::Service::check($$)
+
+Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>. If the optional B<$continue> flag has been set then return the service details if this is the current service incarnation else B<undef>. Otherwise if the B<$continue> flag is false confess unless this is the current service incarnation thus bringing the earlier version of this service to an abrupt end.
+
+     Parameter  Description
+  1  $s         Current service details
+  2  $continue  Return result if B<$continue> is true else confess if the service has been replaced
+
+Example:
+
+
+  if (1)
+   {my $s = newServiceIncarnation("aaa", q(bbb.txt));
+    is_deeply $s->check, $s;
+    my $t = newServiceIncarnation("aaa", q(bbb.txt));
+    is_deeply $t->check, $t;
+    ok $t->start >= $s->start+1;
+    ok !$s->check(1);
+    unlink q(bbb.txt);
+   }
+
+
 =head1 Documentation
 
 Extract, format and update documentation for a perl module.
@@ -4691,16 +5150,16 @@ Example:
 
 
   ok nws(htmlToc("XXXX", <<END)), 'htmlToc'
-  <h1 id="1">Chapter 1</h1>
-    <h2 id="11">Section 1</h1>
-  <h1 id="2">Chapter 2</h1>
+  <h1 id="1" otherprops="1">Chapter 1</h1>
+    <h2 id="11" otherprops="11">Section 1</h1>
+  <h1 id="2" otherprops="2">Chapter 2</h1>
   XXXX
   END
 
     eq nws(<<END);
-  <h1 id="1">Chapter 1</h1>
-    <h2 id="11">Section 1</h1>
-  <h1 id="2">Chapter 2</h1>
+  <h1 id="1" otherprops="1">Chapter 1</h1>
+    <h2 id="11" otherprops="11">Section 1</h1>
+  <h1 id="2" otherprops="2">Chapter 2</h1>
   <table cellspacing=10 border=0>
   <tr><td>&nbsp;
   <tr><td align=right>1<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#1">Chapter 1</a>
@@ -4821,6 +5280,20 @@ Example:
 
 =head1 Hash Definitions
 
+
+
+
+=head2 Data::Exchange::Service Definition
+
+
+Service details.
+
+
+B<file> - The file in which the service start details is being recorded.
+
+B<service> - The name of the service.
+
+B<start> - The time this service was started time plus a minor hack to simplify testing.
 
 
 
@@ -5004,265 +5477,297 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 4 L<appendFile|/appendFile> - Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
 
-5 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
+5 L<assertPackageRefs|/assertPackageRefs> - Confirm that the specified references are to the specified package
 
-6 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
+6 L<assertRef|/assertRef> - Confirm that the specified references are to the package into which this routine has been exported.
 
-7 L<boldString|/boldString> - Bold a string.
+7 L<binModeAllUtf8|/binModeAllUtf8> - Set STDOUT and STDERR to accept utf8 without complaint.
 
-8 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
+8 L<boldString|/boldString> - Convert alphanumerics in a string to bold.
 
-9 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
+9 L<boldStringUndo|/boldStringUndo> - Undo alphanumerics in a string to bold.
 
-10 L<checkKeys|/checkKeys> - Check the keys in a hash.
+10 L<call|/call> - Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
 
-11 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
+11 L<checkFile|/checkFile> - Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
 
-12 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
+12 L<checkKeys|/checkKeys> - Check the keys in a hash.
 
-13 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
+13 L<clearFolder|/clearFolder> - Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
 
-14 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
+14 L<containingPowerOfTwo|/containingPowerOfTwo> - Find log two of the lowest power of two greater than or equal to a number.
 
-15 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+15 L<contains|/contains> - Returns the indices at which an item matches elements of the specified array.
 
-16 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.
+16 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
 
-17 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
+17 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
 
-18 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+18 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.
 
-19 L<currentDirectory|/currentDirectory> - Get the current working directory.
+19 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
 
-20 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+20 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
 
-21 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
+21 L<currentDirectory|/currentDirectory> - Get the current working directory.
+
+22 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+
+23 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
   <image href="$imageFile" outputclass="imageType">
 
 This conversion requires that you have both L<Imagemagick|/https://www.imagemagick.org/script/index.php> and L<unoconv|/https://github.
 
-22 L<dateStamp|/dateStamp> - Year-monthName-day
+24 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
 
-23 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
+25 L<dateStamp|/dateStamp> - Year-monthName-day
 
-24 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
+26 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
 
-25 L<decodeJson|/decodeJson> - Decode Perl from Json.
+27 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
 
-26 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
+28 L<decodeJson|/decodeJson> - Decode Perl from Json.
 
-27 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
+29 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
 
-28 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
+30 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
 
-29 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
+31 L<dumpFile|/dumpFile> - Dump a data structure to a file
 
-30 L<encodeJson|/encodeJson> - Encode Perl to Json.
+32 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
 
-31 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+33 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
 
-32 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+34 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
 
-33 L<extractTest|/extractTest> - Remove example markers from test code.
+35 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
 
-34 L<fe|/fe> - Get extension of file name.
+36 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
 
-35 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
+37 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
 
-36 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
+38 L<encodeJson|/encodeJson> - Encode Perl to Json.
 
-37 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
+39 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
-38 L<filePath|/filePath> - Create a file name from an array of file name components.
+40 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
 
-39 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
+41 L<extractTest|/extractTest> - Remove example markers from test code.
 
-40 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
+42 L<fe|/fe> - Get extension of file name.
 
-41 L<fileSize|/fileSize> - Get the size of a file.
+43 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
 
-42 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
+44 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
 
-43 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
+45 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
 
-44 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
+46 L<filePath|/filePath> - Create a file name from an array of file name components.
 
-45 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
+47 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-46 L<firstNChars|/firstNChars> - First N characters of a string.
+48 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-47 L<fn|/fn> - Remove path and extension from file name.
+49 L<fileSize|/fileSize> - Get the size of a file.
 
-48 L<fne|/fne> - Remove path from file name.
+50 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
 
-49 L<formatTable|/formatTable> - Format various data structures as a table.
+51 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
 
-50 L<formatTableA|/formatTableA> - Tabularize an array.
+52 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
 
-51 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+53 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
-52 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+54 L<firstNChars|/firstNChars> - First N characters of a string.
 
-53 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
+55 L<fn|/fn> - Remove path and extension from file name.
 
-54 L<formatTableH|/formatTableH> - Tabularize a hash.
+56 L<fne|/fne> - Remove path from file name.
 
-55 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+57 L<formatTable|/formatTable> - Format various data structures as a table.
 
-56 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+58 L<formatTableA|/formatTableA> - Tabularize an array.
 
-57 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+59 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-58 L<fp|/fp> - Get path from file name.
+60 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-59 L<fpn|/fpn> - Remove extension from file name.
+61 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-60 L<fullFileName|/fullFileName> - Full name of a file.
+62 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-61 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes>.
+63 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-62 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+64 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-63 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+65 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-64 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
+66 L<fp|/fp> - Get path from file name.
 
-65 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+67 L<fpn|/fpn> - Remove extension from file name.
 
-66 L<hostName|/hostName> - The name of the host we are running on.
+68 L<fullFileName|/fullFileName> - Full name of a file.
 
-67 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+69 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes>.
 
-68 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+70 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-69 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+71 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-70 L<isBlank|/isBlank> - Test whether a string is blank.
+72 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-71 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+73 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-72 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+74 L<hostName|/hostName> - The name of the host we are running on.
 
-73 L<keyCount|/keyCount> - Count keys down to the specified level.
+75 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-74 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+76 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
 
-75 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+77 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-76 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
+78 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-77 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+79 L<isBlank|/isBlank> - Test whether a string is blank.
 
-78 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+80 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-79 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+81 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-80 L<makePath|/makePath> - Make the path for the specified file name or folder.
+82 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-81 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+83 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-82 L<max|/max> - Find the maximum number in a list.
+84 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-83 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+85 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
 
-84 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+86 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-85 L<min|/min> - Find the minimum number in a list.
+87 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-86 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+88 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-87 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+89 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-88 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+90 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred
 
-89 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+91 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-90 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+92 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-91 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by this sub.
+93 L<max|/max> - Find the maximum number in a list.
 
-92 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+94 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-93 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+95 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-94 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+96 L<min|/min> - Find the minimum number in a list.
 
-95 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+97 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-96 L<printQw|/printQw> - Print an array of words in qw() format.
+98 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-97 L<quoteFile|/quoteFile> - Quote a file name.
+99 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-98 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+100 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-99 L<readFile|/readFile> - Read a file containing unicode in utf8.
+101 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-100 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+102 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-101 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+103 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-102 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+104 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-103 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+105 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-104 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+106 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-105 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+107 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-106 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+108 L<printQw|/printQw> - Print an array of words in qw() format.
 
-107 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+109 L<quoteFile|/quoteFile> - Quote a file name.
 
-108 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
+110 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-109 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
+111 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-110 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+112 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-111 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the two non equal tails of non equal strings or an empty list if the strings are equal.
+113 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-112 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+114 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-113 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+115 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-114 L<timeStamp|/timeStamp> - hours:minute:seconds
+116 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-115 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
+117 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-116 L<trackFiles|/trackFiles> - Track the existence of files.
+118 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-117 L<trim|/trim> - Remove any white space from the front and end of a string.
+119 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-118 L<updateDocumentation|/updateDocumentation> - Update documentation from the comments in a perl script.
+120 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
 
-119 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+121 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
 
-120 L<userId|/userId> - The userid we are currently running under.
+122 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-121 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+123 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the two non equal tails of non equal strings or an empty list if the strings are equal.
 
-122 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+124 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-123 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+125 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-124 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
+126 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-125 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+127 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-126 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+128 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-127 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+129 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-128 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+130 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-129 L<xxx|/xxx> - Execute a shell command.
+131 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
 
-130 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+132 L<trackFiles|/trackFiles> - Track the existence of files.
 
-131 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+133 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-132 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+134 L<updateDocumentation|/updateDocumentation> - Update documentation from the comments in a perl script.
+
+135 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+
+136 L<userId|/userId> - The userid we are currently running under.
+
+137 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+
+138 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+
+139 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+
+140 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
+
+141 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+
+142 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+
+143 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+
+144 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+
+145 L<xxx|/xxx> - Execute a shell command.
+
+146 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+147 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+148 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -5325,7 +5830,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 354;
+use Test::More tests => 370;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
 
@@ -5748,7 +6253,7 @@ END
   unlink $f;
  }
 
-if (!$windows)                                                                  # Ignore windows for this test
+if (0)                                                                          # Ignore windows for this test
  {ok xxx("echo aaa")       =~ /aaa/;                                            #Txxx
   ok xxx("a=bbb;echo \$a") =~ /bbb/;
 
@@ -5904,9 +6409,14 @@ if (1) {
   ok $d eq firstFileThatExists("$d/$d", $d);                                    #TfirstFileThatExists
  }
 
-if (1) {
-  eval q{assertRef(my $r = bless {}, q(aaa))};                                  #TassertRef
-  ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);             #TassertRef
+if (1) {                                                                        #TassertRef
+  eval q{assertRef(bless {}, q(aaa))};
+  ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);
+ }
+
+if (1) {                                                                        #TassertPackageRefs
+  eval q{assertPackageRefs(q(bbb), bless {}, q(aaa))};
+  ok $@ =~ m(\AWanted reference to bbb, but got aaa);
  }
 
 # Relative and absolute files
@@ -6152,18 +6662,20 @@ if (0) {
   cutOutImagesInFodtFile(fpe(qw(source fodt)), fpd(qw(images)), q(image));      #TcutOutImagesInFodtFile
   userId;                                                                       #TuserId
   hostName;                                                                     #ThostName
+  makeDieConfess                                                                #TmakeDieConfess
+  ipAddressViaArp(q(secarias));                                                 #TipAddressViaArp
  }
 
 ok nws(htmlToc("XXXX", <<END)), 'htmlToc'                                       #ThtmlToc
-<h1 id="1">Chapter 1</h1>
-  <h2 id="11">Section 1</h1>
-<h1 id="2">Chapter 2</h1>
+<h1 id="1" otherprops="1">Chapter 1</h1>
+  <h2 id="11" otherprops="11">Section 1</h1>
+<h1 id="2" otherprops="2">Chapter 2</h1>
 XXXX
 END
   eq nws(<<END);                                                                #ThtmlToc
-<h1 id="1">Chapter 1</h1>
-  <h2 id="11">Section 1</h1>
-<h1 id="2">Chapter 2</h1>
+<h1 id="1" otherprops="1">Chapter 1</h1>
+  <h2 id="11" otherprops="11">Section 1</h1>
+<h1 id="2" otherprops="2">Chapter 2</h1>
 <table cellspacing=10 border=0>
 <tr><td>&nbsp;
 <tr><td align=right>1<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#1">Chapter 1</a>
@@ -6209,9 +6721,9 @@ END
  }
 
 if (1) {
-  my $f = writeFile(undef, q([qw(aaa bbb ccc)]));                               #TevalFile #ToverWriteFile
-  my $s = evalFile($f);                                                         #TevalFile
-  is_deeply $s, [qw(aaa bbb ccc)];                                              #TevalFile
+  my $f = dumpFile(undef, [qw(aaa bbb ccc)]);                                   #TdumpFile #TevalFile #ToverWriteFile
+  my $s = evalFile($f);                                                         #TdumpFile #TevalFile
+  is_deeply $s, [qw(aaa bbb ccc)];                                              #TdumpFile #TevalFile
 
   ok overWriteFile($f, q({qw(aaa bbb ccc)]));                                   #ToverWriteFile
   $s = eval q{ evalFile($f) };
@@ -6226,6 +6738,20 @@ ccc
 END
 
 ok boldString(q(zZ)) eq q(𝘇𝗭);                                                  #TboldString
+ok enclosedString(q(hello world 1234)) eq q(ⓗⓔⓛⓛⓞ ⓦⓞⓡⓛⓓ ①②③④);        #TenclosedString
+ok enclosedReversedString(q(hello world 1234)) eq q(🅗🅔🅛🅛🅞 🅦🅞🅡🅛🅓 ➊➋➌➍);  #TenclosedReversedString
+
+ok superScriptString(1234567890) eq q(¹²³⁴⁵⁶⁷⁸⁹⁰);                              #TsuperScriptString
+ok subScriptString(1234567890)   eq q(₁₂₃₄₅₆₇₈₉₀);                              #TsubScriptString
+
+if (1)                                                                          #TboldStringUndo #TenclosedStringUndo #TenclosedReversedStringUndo #TsuperScriptStringUndo #TsubScriptStringUndo
+ {my $n = 1234567890;
+  ok boldStringUndo            (boldString($n))             == $n;
+  ok enclosedStringUndo        (enclosedString($n))         == $n;
+  ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+  ok superScriptStringUndo     (superScriptString($n))      == $n;
+  ok subScriptStringUndo       (subScriptString($n))        == $n;
+ }
 
 if (!$windows) {
 if (1) {                                                                        #TwriteGZipFile #TreadGZipFile
@@ -6489,7 +7015,7 @@ if (1) {                                                                        
   is_deeply [stringsAreNotEqual(q(ab),  q(abd))], ['', q(d)];
  }
 
-if (1) {                                                                        #TgenHash
+if (1) {                                                                        #TgenHash #TloadHash
   my $o = genHash(q(TestHash),                                                  # Definition of a blessed hash.
       a=>q(aa),                                                                 # Definition of attribute aa.
       b=>q(bb),                                                                 # Definition of attribute bb.
@@ -6503,6 +7029,22 @@ if (1) {                                                                        
   ok $p->a =  q(aa);
   ok $p->a eq q(aa);
   is_deeply $p, {a=>"aa", c=>"cc"};
+
+  loadHash($p, a=>11, b=>22);                                                   # Load the hash
+  is_deeply $p, {a=>11, b=>22, c=>"cc"};
+
+  my $r = eval {loadHash($p, d=>44)};                                           # Try to load the hash
+  ok $@ =~ m(Cannot load attribute: d);
+ }
+
+if (1)                                                                          #TnewServiceIncarnation #TData::Exchange::Service::check
+ {my $s = newServiceIncarnation("aaa", q(bbb.txt));
+  is_deeply $s->check, $s;
+  my $t = newServiceIncarnation("aaa", q(bbb.txt));
+  is_deeply $t->check, $t;
+  ok $t->start >= $s->start+1;
+  ok !$s->check(1);
+  unlink q(bbb.txt);
  }
 
 #tttt

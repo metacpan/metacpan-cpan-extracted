@@ -3,12 +3,25 @@ package URI::Template;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use URI;
 use URI::Escape        ();
 use Unicode::Normalize ();
 use overload '""' => \&template;
+
+use Exporter 'import';
+
+our @EXPORT = qw ( );
+
+our @EXPORT_OK = qw (
+    template_process
+    template_process_to_string
+);
+
+our %EXPORT_TAGS = (
+    'all' => \@EXPORT_OK,
+);
 
 my $RESERVED = q(:/?#\[\]\@!\$\&'\(\)\*\+,;=);
 my %TOSTRING = (
@@ -344,6 +357,14 @@ sub process_to_string {
     return $str;
 }
 
+sub template_process {
+    __PACKAGE__->new(shift)->process(@_)
+}
+
+sub template_process_to_string {
+    __PACKAGE__->new(shift)->process_to_string(@_)
+}
+
 1;
 
 __END__
@@ -358,7 +379,7 @@ URI::Template - Object for handling URI templates (RFC 6570)
    
     my $template = URI::Template->new( 'http://example.com/{x}' );
     my $uri      = $template->process( x => 'y' );
-
+    
     # or
     
     my $template = URI::Template->new();
@@ -366,6 +387,12 @@ URI::Template - Object for handling URI templates (RFC 6570)
     my $uri      = $template->process( x => 'y' );
     
     # uri is a URI object with value 'http://example.com/y'
+
+or
+
+    use URI::Template ':template_process'
+    
+    my $uri = template_process ( 'http://example.com/{x}', x => 'y' );
 
 =head1 DESCRIPTION
 
@@ -411,6 +438,19 @@ substitute them in to the template. Returns a URI object.
 Processes input like the C<process> method, but doesn't inflate the result to a
 URI object.
 
+=head1 EXPORTED FUNCTIONS
+
+=head2 template_process( $template => \%vars )
+
+This is the same as C<< URI::Template->new($template)->process(\%vars) >> But
+shorter, and usefull for quick and easy genrating a nice URI form parameters.
+
+Returns an L<URI> object
+
+=head2 template_process_as_string( $template => \%vars )
+
+Same as above, but obviously, returns a string.
+
 =head1 AUTHORS
 
 =over 4
@@ -421,9 +461,15 @@ URI object.
 
 =back
 
+=head1 CONTRIBUTERS
+
+=over 4
+
+=item * Theo van Hoesel E<lt>Th.J.v.Hoesel@THEMA-MEDIA.nlE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2015 by Brian Cassidy
+Copyright 2007-2018 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

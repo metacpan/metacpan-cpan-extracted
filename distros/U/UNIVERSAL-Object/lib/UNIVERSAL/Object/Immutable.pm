@@ -11,7 +11,7 @@ use Scalar::Util ();
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.15';
+our $VERSION   = '0.16';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -27,7 +27,7 @@ sub new {
     elsif ( $repr =~ /\=ARRAY\(0x/ ) {
         Internals::SvREADONLY( @$self, 1 );
     }
-    elsif ( $repr =~ /\=SCALAR\(0x/ or $repr =~ /\=REF\(0x/ ) {
+    elsif ( $repr =~ /\=SCALAR\(0x/ or $repr =~ /\=REF\(0x/ or $repr =~ /\=REGEXP\(0x/ ) {
         Internals::SvREADONLY( $$self, 1 );
     }
     elsif ( $repr =~ /\=CODE\(0x/ ) {
@@ -53,7 +53,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

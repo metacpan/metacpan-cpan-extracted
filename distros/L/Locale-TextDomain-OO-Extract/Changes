@@ -1,5 +1,8 @@
 Revision history for Perl extension Locale::TextDomain:OO::Extract.
 
+2.015  Fri Sep 21 14:48:58 2018
+- fixed https://rt.cpan.org/Ticket/Display.html?id=127160
+
 2.014  Fri Nov  3 13:57:54 2017
 - more flexible Extract Process (fixed)
 

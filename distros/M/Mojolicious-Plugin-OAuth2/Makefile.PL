@@ -2,7 +2,7 @@
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'Mojolicious::Plugin::OAuth2',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Marcus Ramberg <marcus.ramberg@gmail.com>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Mojolicious/Plugin/OAuth2.pm',
   VERSION_FROM   => 'lib/Mojolicious/Plugin/OAuth2.pm',
@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'IO::Socket::SSL' => '1.94',
-  'Mojolicious' => '6.0'
+  'Mojolicious' => '7.53'
 }
 ,
   META_MERGE     => {
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
+  test => {S => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {

@@ -36,11 +36,11 @@ There is no XS implementation of bake\_cookie yet.
     Generates a cookie string for an HTTP response header.
     The first argument is the cookie's name and the second argument is a plain string or hash reference that
     can contain keys such as `value`, `domain`, `expires`, `path`, `httponly`, `secure`,
-    `max-age`.
+    `max-age`, `samesite`.
 
     - value
 
-        Cookie's value
+        Cookie's value.
 
     - domain
 
@@ -48,7 +48,7 @@ There is no XS implementation of bake\_cookie yet.
 
     - expires
 
-        Cookie's expires date time. Several formats are supported
+        Cookie's expires date time. Several formats are supported:
 
             expires => time + 24 * 60 * 60 # epoch time
             expires => 'Wed, 03-Nov-2010 20:54:16 GMT'
@@ -59,6 +59,10 @@ There is no XS implementation of bake\_cookie yet.
             expires => '+3M'  # in three months
             expires => '+10y' # in ten years time (60*60*24*365*10 seconds)
             expires => 'now'  #immediately
+
+    - max-age
+
+        If defined, sets the max-age for the cookie.
 
     - path
 
@@ -71,6 +75,12 @@ There is no XS implementation of bake\_cookie yet.
     - secure
 
         If true, sets secure flag. false by default.
+
+    - samesite
+
+        If defined as 'lax' or 'strict' (case-insensitive), sets the SameSite restriction for the cookie as described in the
+        [draft proposal](https://tools.ietf.org/html/draft-west-first-party-cookies-07), which is already implemented in
+        Chrome (v51), Opera (v38) and Firefox (v60).
 
 - crush\_cookie
 

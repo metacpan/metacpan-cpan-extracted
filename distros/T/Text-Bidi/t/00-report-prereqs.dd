@@ -1,12 +1,13 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.30'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
                       'requires' => {
                                       'Test::CPAN::Meta' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Version' => '2.00'

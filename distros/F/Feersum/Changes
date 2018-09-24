@@ -1,5 +1,9 @@
 Revision history for Perl extension Feersum
 
+1.406 Fri Sep 21 08:15:32 2018 -0400
+        Bugfixes
+        - Fix tests by depending on HTTP::Entity::Parser 0.20+ (ltriant++)
+
 1.405 Sun Jun 18 00:55:56 2017 +0800
         Features
         - Handle server_ready option in plack handler (haarg++)

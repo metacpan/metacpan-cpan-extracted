@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base qw(Net::Server::Mail::ESMTP);
 
-our $VERSION = "0.25";
+our $VERSION = "0.26";
 
 =pod
 
@@ -150,7 +150,7 @@ sub lhlo {
 
 =head2 DATA
 
-Overide the default DATA event by a per recipient response. It will
+Override the default DATA event by a per recipient response. It will
 be called for each recipients with data (in a scalar reference) as 
 first argument followed by the current recipient.
 

@@ -1,3 +1,8 @@
+0.002   2018-09-20 (PERLANCAR)
+
+	- Use get_user_tempdir() instead of get_tempdir().
+
+
 0.001   2018-02-05 (PERLANCAR)
 
         - First release.

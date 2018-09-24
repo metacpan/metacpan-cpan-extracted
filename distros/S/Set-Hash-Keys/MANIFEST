@@ -3,9 +3,9 @@ cpanfile
 lib/Set/Hash/Keys.pm
 Makefile.PL
 MANIFEST
+MYMETA.json
+MYMETA.yml
 README.md
-META.json
-META.yml
 t/00-load.t
 t/01-new.t
 t/01-set_hash.t
@@ -15,3 +15,9 @@ t/04-difference.t
 t/05-exclusive.t
 t/06-symmetrical.t
 t/07-overloading.t
+t/08-exports.t
+xt/perl-critic.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

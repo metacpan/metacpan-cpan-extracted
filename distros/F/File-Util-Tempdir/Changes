@@ -1,3 +1,30 @@
+0.033   2018-09-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Make it clear that when checking/creating $EUID subdir,
+	  group-/world-writability is also checked.
+
+	- [doc] Mention URL that specifies XDG_RUNTIME_DIR.
+
+
+0.032   2018-09-20 (PERLANCAR)
+
+	- [Bugfix] Make sure that the tempdirs are not group- and
+	  world-writable.
+
+	- [Bugfix] Fix checking stat() success.
+
+	- Add tests.
+
+
+0.031   2018-09-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Show get_user_tempdir() in Synopsis.
+
+
 0.030   2018-09-19 (PERLANCAR)
 
 	- Add get_user_tempdir().

@@ -4,7 +4,7 @@
       "Marco Pessotto <melmothx@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -37,7 +37,7 @@
             "Lingua::StopWords" : "0.09",
             "Moo" : "0",
             "Type::Tiny" : "1",
-            "WebService::Solr" : "0",
+            "WebService::Solr" : "0.40",
             "XML::LibXML" : "0",
             "namespace::clean" : "0"
          }
@@ -53,5 +53,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#interchange"
    },
-   "version" : "0.13"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

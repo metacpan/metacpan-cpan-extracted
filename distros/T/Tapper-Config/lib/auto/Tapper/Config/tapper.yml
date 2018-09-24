@@ -140,6 +140,7 @@ paths:
    metareport_path:        /data/tapper/live/metareports/
    nfsroot:                165.204.15.222:/data/tapper/live/nfsroot/installation_base/
    output_dir:             /data/tapper/live/output/
+   minion_output_dir:      /data/tapper/live/minion_output/
    package_dir:            /data/tapper/live/repository/packages/
    pids_path:              /var/run
    prc_nfs_mountdir:       /data/tapper/
@@ -199,6 +200,7 @@ development:
   paths:
     nfsroot:                165.204.15.222:/data/tapper/development/nfsroot/installation_base/
     output_dir:             /tmp/output/
+    minion_output_dir:      /tmp/minion_output/
     temare_path:            /data/tapper/development/tools/temare
     sync_path:              /data/tapper/development/sync/
     config_path:            /data/tapper/development/configs/
@@ -274,6 +276,7 @@ test:
     metareport_path:        t/tmp/
     nfsroot:                t/tmp/
     output_dir:             t/file_upload/
+    minion_output_dir:      t/minion_file_upload/
     package_dir:            t/tmp/
     pids_path:              t/tmp/
     prc_nfs_mountdir:       t/tmp/

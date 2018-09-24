@@ -15,9 +15,9 @@ sub UNITCHECK {				## restore %SIG after compilation
 package Net::DNS::RR::SIG;
 
 #
-# $Id: SIG.pm 1690 2018-07-03 09:02:10Z willem $
+# $Id: SIG.pm 1709 2018-09-07 08:03:09Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1690 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
 
 
 use strict;
@@ -44,15 +44,19 @@ use constant DEBUG => 0;
 
 use constant UTIL => defined eval 'use Scalar::Util 1.25; 1;';
 
-use constant PRIVATE => defined eval 'require Net::DNS::SEC::Private';
+# IMPORTANT: Distros MUST NOT create dependencies on Net::DNS::SEC	(Prohibited in many territories)
+use constant PRIVATE => 'Net::DNS::SEC::Private';
+use constant DSA     => 'Net::DNS::SEC::DSA';
+use constant RSA     => 'Net::DNS::SEC::RSA';
+use constant ECDSA   => 'Net::DNS::SEC::ECDSA';
+use constant EdDSA   => 'Net::DNS::SEC::EdDSA';
+use constant ECCGOST => 'Net::DNS::SEC::ECCGOST';
 
-use constant DSA => defined eval 'require Net::DNS::SEC::DSA';
-use constant RSA => defined eval 'require Net::DNS::SEC::RSA';
+use constant EXISTS => join '', qw(r e q u i r e);		# Defeat static analysers and grep
+use constant DNSSEC => defined( eval join ' ', EXISTS, PRIVATE );
 
-use constant DNSSEC => PRIVATE && ( RSA || DSA );
-
-my $DSA = DSA ? 'Net::DNS::SEC::DSA' : 0;
-my $RSA = RSA ? 'Net::DNS::SEC::RSA' : 0;
+my ($DSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } DSA;
+my ($RSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } RSA;
 
 my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 
@@ -704,8 +708,8 @@ that comes with the ISC BIND distribution.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigin  => 20171201010101,	# signature inception
-	sigex  => 20171201011101,	# signature expiration
+	sigin  => 20181201010101,	# signature inception
+	sigex  => 20181201011101,	# signature expiration
 	sigval => 10,			# validity window (minutes)
 
 The sigin and sigex values may be specified as Perl time values or as

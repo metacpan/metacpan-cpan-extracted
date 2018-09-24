@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
 
 package Future;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -647,19 +647,13 @@ sub fail
       $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->state." and cannot be ->fail'ed";
       $self->{subs} and Carp::croak "${\$self->__selfstr} is not a leaf Future, cannot be ->fail'ed";
       $self->{failure} = [ $exception, @details ];
-      $self->_mark_ready( "fail" );
+      $self->_mark_ready( "failed" );
    }
    else {
       $self = $self->new;
       $self->{ready} = 1;
-      $self->{ready_at} = _shortmess "fail" if DEBUG;
+      $self->{ready_at} = _shortmess "failed" if DEBUG;
       $self->{failure} = [ $exception, @details ];
-   }
-
-   if( DEBUG ) {
-      my $at = Carp::shortmess( "failed" );
-      chomp $at; $at =~ s/\.$//;
-      $self->{ready_at} = $at;
    }
 
    return $self;
@@ -705,17 +699,16 @@ sub die :method
    $future->on_cancel( $code )
 
 If the future is not yet ready, adds a callback to be invoked if the future is
-cancelled by the C<cancel> method. If the future is already ready, throws an
-exception.
+cancelled by the C<cancel> method. If the future is already ready the method
+is ignored.
 
-If the future is cancelled, the callbacks will be invoked in the reverse order
-to that in which they were registered.
+If the future is later cancelled, the callbacks will be invoked in the reverse
+order to that in which they were registered.
 
  $on_cancel->( $future )
 
 If passed another C<Future> instance, the passed instance will be cancelled
-when the original future is cancelled. This method does nothing if the future
-is already complete.
+when the original future is cancelled.
 
 =cut
 
@@ -912,9 +905,13 @@ sub on_done
 
    $exception, @details = $future->failure
 
-Returns the exception passed to the C<fail> method, C<undef> if the future
-completed successfully via the C<done> method, or raises an exception if
-called on a future that is not yet ready.
+If the future is ready, returns the exception passed to the C<fail> method or
+C<undef> if the future completed successfully via the C<done> method.
+
+If it is not yet ready and is not of a subclass that provides an C<await>
+method an exception is thrown. If it is subclassed to provide an C<await>
+method then this is used to wait for the future to be ready, before returning
+the result or propagating its failure exception.
 
 If called in list context, will additionally yield a list of the details
 provided to the C<fail> method.
@@ -1578,7 +1575,7 @@ sub _new_convergent
    my ( $subs ) = @_;
 
    foreach my $sub ( @$subs ) {
-      blessed $sub and $sub->isa( "Future" ) or Carp::croak "Expected a Future, got $_";
+      blessed $sub and $sub->isa( "Future" ) or Carp::croak "Expected a Future, got $sub";
    }
 
    # Find the best prototype. Ideally anything derived if we can find one.
@@ -2249,7 +2246,7 @@ Because the C<get> method re-raises the passed exception if the future failed,
 it can be used to control a C<try>/C<catch> block directly. (This is sometimes
 called I<Exception Hoisting>).
 
- use Try::Tiny;
+ use Syntax::Keyword::Try;
 
  $f->on_ready( sub {
     my $f = shift;
@@ -2258,7 +2255,7 @@ called I<Exception Hoisting>).
     }
     catch {
        say "The operation failed with: ", $_;
-    };
+    }
  } );
 
 Even neater still may be the separate use of the C<on_done> and C<on_fail>

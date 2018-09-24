@@ -29,6 +29,9 @@ my @tests = (
     [ 'foo', { value => 'val',expires => 'foo' }, 'foo=val; expires=foo'],
     [ 'foo', { value => 'val','max-age' => '1000' }, 'foo=val; max-age=1000'],
     [ 'foo', { value => 'val','max-age' => '0' }, 'foo=val; max-age=0'],
+    [ 'foo', { value => 'val', samesite => 'lax' }, 'foo=val; SameSite=Lax'],
+    [ 'foo', { value => 'val', samesite => 'strict' }, 'foo=val; SameSite=Strict'],
+    [ 'foo', { value => 'val', samesite => 'invalid value' }, 'foo=val'],
 );
 
 for my $test (@tests) {

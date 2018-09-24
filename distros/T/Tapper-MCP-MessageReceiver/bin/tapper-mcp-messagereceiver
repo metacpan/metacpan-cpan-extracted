@@ -28,7 +28,7 @@ sub get_params
 
 }
 
-get '/state/:state/(*optional)' => sub {
+get '/state/:state/*optional' => sub {
         my $self      = shift;
         my %params    = get_params($self);
         my $db = model('TestrunDB')->resultset('Message')->new({testrun_id => $params{testrun_id},
@@ -40,7 +40,7 @@ get '/state/:state/(*optional)' => sub {
         $self->render(text => '');
 };
 
-get '/action/(*optional)' => sub {
+get '/action/*optional' => sub {
         my $self      = shift;
         my %params    = get_params($self);
         my $db = model('TestrunDB')->resultset('Message')->new({type       => 'action',
@@ -119,7 +119,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

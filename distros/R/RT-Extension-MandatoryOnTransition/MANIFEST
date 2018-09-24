@@ -1,5 +1,6 @@
 Changes
 html/Callbacks/RT-Extension-MandatoryOnTransition/Elements/EditCustomFields/BeforeCustomFields
+html/Callbacks/RT-Extension-MandatoryOnTransition/Elements/EditCustomFields/MassageCustomFields
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/create/BeforeCreate
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/AfterWorked
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/BeforeUpdate
@@ -34,6 +35,8 @@ po/fr.po
 po/mandatoryontransition.pot
 README
 xt/basic.t
+xt/immutable_core_for_update.t
 xt/mandatory_on_create.t
+xt/queue_change.t
 xt/required_fields.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

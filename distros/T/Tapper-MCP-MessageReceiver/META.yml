@@ -24,7 +24,7 @@ requires:
   File::Spec::Functions: '0'
   Log::Log4perl: '0'
   Module::Find: '0.11'
-  Mojolicious: '4.63'
+  Mojolicious: '8.0'
   Mojolicious::Lite: '0'
   Tapper::Config: '0'
   Tapper::Model: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-MCP-MessageReceiver
   homepage: http://metacpan.org/release/Tapper-MCP-MessageReceiver
   repository: git://github.com/tapper/Tapper-MCP-MessageReceiver.git
-version: 5.0.0
+version: 5.0.1
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -302,7 +302,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.0.0
+          tag: v5.0.1
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -36,8 +36,8 @@ You should be able to find the distribution at
 =head2 Why does $resolver->query() return undef when the answer section is empty?
 
 The short answer is, do not use query().
-$resolver->send() will always return the answer packet,
-as long as an answer was received.
+$resolver->send() will always return the response packet,
+as long as a response was received.
 
 The longer answer is that query() is modeled after the res_query() function
 from the libresolv C library, which has similar behavior.
@@ -45,5 +45,5 @@ from the libresolv C library, which has similar behavior.
 
 =head1 VERSION
 
- $Id: FAQ.pod 1365 2015-06-26 08:46:01Z willem $
+ $Id: FAQ.pod 1709 2018-09-07 08:03:09Z willem $
  

@@ -16,7 +16,8 @@ lib/Pcore/Ext/Context/Raw.pm
 lib/Pcore/Ext/Lib/Classic/README.txt
 lib/Pcore/Ext/Lib/Core/README.txt
 lib/Pcore/Ext/Lib/Core/Viewport.pm
-lib/Pcore/Ext/Lib/Modern/AmCharts.pm
+lib/Pcore/Ext/Lib/Modern/AmCharts3.pm
+lib/Pcore/Ext/Lib/Modern/AmCharts4.pm
 lib/Pcore/Ext/Lib/Modern/Plugin.pm
 lib/Pcore/Ext/Lib/Overrides/Classic.pm
 lib/Pcore/Ext/Lib/Overrides/Core.pm

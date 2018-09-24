@@ -1,3 +1,16 @@
+0.003   2018-09-21 (PERLANCAR)
+
+	- latest-version: Supply 'arch' to get_latest_version.
+
+        - Bump database version from 1->2: change the structure of sw_cache
+	  table.
+
+
+0.002   2018-09-20 (PERLANCAR)
+
+        - Some tweaks to make App::swcat more suitable to use as library.
+
+
 0.001   2018-09-13 (PERLANCAR)
 
         - First version.

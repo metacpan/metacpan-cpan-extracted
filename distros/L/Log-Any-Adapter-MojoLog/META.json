@@ -35,7 +35,7 @@
    "provides" : {
       "Log::Any::Adapter::MojoLog" : {
          "file" : "lib/Log/Any/Adapter/MojoLog.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "http://github.com/jberger/Log-Any-Adapter-MojoLog"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

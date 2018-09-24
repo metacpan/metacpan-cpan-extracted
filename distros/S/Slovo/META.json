@@ -1,5 +1,5 @@
 {
-   "abstract" : "В началѣ бѣ Слово",
+   "abstract" : "Искони бѣ Слово",
    "author" : [
       "Красимир Беров (berov@cpan.org)"
    ],
@@ -63,6 +63,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.09.15",
+   "version" : "v2018.09.22",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

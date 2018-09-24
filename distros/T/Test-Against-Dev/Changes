@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Against::Dev
 
+0.13 Sun Sep 23 19:13:32 EDT 2018
+    - Properly document Test::Against::Build::analyze_json_logs().
+      No change in functionality.
+
 0.12 Sat Jul 21 08:01:13 EDT 2018
     - Introduce Test::Against::Dev::Salvage.  This package provides methods
       that can be used when a test-against-dev run exits after completing

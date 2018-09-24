@@ -1,44 +1,71 @@
+#!perl
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+# http://www.cpantesters.org/cpan/report/7c2a3994-bc30-11e8-83ca-8681f4fbe649
+if ( $^O =~ m/haiku/i ) {
+    print "Haiku OS does not support link() function\n";
+    exit(0);
+}
+
+sub merge_key_into {
+    my ( $href, $target, $source ) = @_;
+    %{ $href->{$target} } = ( %{ $href->{$target} }, %{ delete $href->{$source} } );
+}
+
 my %params = (
-  NAME         => 'File::AtomicWrite',
-  VERSION_FROM => 'lib/File/AtomicWrite.pm',
-  PREREQ_PM    => {
-    Carp           => 0,
-    'File::Path'   => 0,
-    'File::Temp'   => 0.18,
-    'IO::Handle'   => 0,
-    'Digest::SHA1' => 0,
-    'Test::More'   => 0,
-    'File::Spec'   => 0
-  },
-  ( $] >= 5.005
-    ? (
-      ABSTRACT_FROM => 'lib/File/AtomicWrite.pm',      # retrieve abstract from module
-      AUTHOR        => 'Jeremy Mates <jmates@cpan.org>'
-      )
-    : ()
-  ),
+    NAME         => 'File::AtomicWrite',
+    ABSTRACT     => 'writes files atomically via rename()',
+    AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
+    VERSION_FROM => 'lib/File/AtomicWrite.pm',
+
+    LICENSE  => 'bsd',
+    PL_FILES => {},
+
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '6.48',
+        'strict'              => 0,
+    },
+    BUILD_REQUIRES => {},
+    TEST_REQUIRES  => {
+        'Test::More' => 0,
+        'lib'        => 0,
+    },
+    PREREQ_PM => {
+        Carp           => 0,
+        'Digest::SHA1' => 0,
+        'File::Path'   => 0,
+        'File::Spec'   => 0,
+        'File::Temp'   => 0.18,
+        'IO::Handle'   => 0,
+    },
+
+    META_MERGE => {
+        'resources' => { repository => 'https://github.com/thrig/File-AtomicWrite', },
+    },
 );
 
-if ( $ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/ and $ExtUtils::MakeMaker::VERSION > 6.30 ) {
-  $params{LICENSE} = 'artistic_2';
+(   my $mm_version = ExtUtils::MakeMaker->VERSION(
+        $params{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'}
+    )
+) =~ tr/_//d;
+
+if ( $mm_version < 6.67_04 ) {
+    *ExtUtils::MM_Any::_add_requirements_to_meta_v1_4 =
+      \&ExtUtils::MM_Any::_add_requirements_to_meta_v2;
 }
 
-if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
-  $params{META_MERGE} = {
-    resources => {
-      homepage   => 'https://github.com/thrig/File-AtomicWrite',
-      license    => 'http://dev.perl.org/licenses/',
-      repository => 'https://github.com/thrig/File-AtomicWrite',
-    }
-  };
+if ( $mm_version < 6.63_03 ) {
+    merge_key_into \%params, 'BUILD_REQUIRES', 'TEST_REQUIRES';
 }
 
-if ( $ExtUtils::MakeMaker::VERSION ge '6.48' ) {
-  $params{MIN_PERL_VERSION} = 5.000000;
+if ( $mm_version < 6.55_01 ) {
+    merge_key_into \%params, 'CONFIGURE_REQUIRES', 'BUILD_REQUIRES';
+}
+
+if ( $mm_version < 6.51_03 ) {
+    merge_key_into \%params, 'PREREQ_PM', 'CONFIGURE_REQUIRES';
 }
 
 WriteMakefile( ( MM->can('signature_target') ? ( SIGN => 1 ) : () ), %params );

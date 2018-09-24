@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use base qw(Net::Server::Mail::SMTP);
 
-our $VERSION = "0.25";
+our $VERSION = "0.26";
 
 =pod
 
@@ -190,7 +190,7 @@ deprecated to override this reply.
 
 You can rebuild extension list with get_extensions() method.
 
-Exemple:
+Example:
 
     my @extends;
     foreach my $extend ($esmtp->get_extensions())

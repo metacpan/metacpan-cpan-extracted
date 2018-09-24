@@ -1,5 +1,4 @@
 .ship.conf
-.vstags
 Changes
 cpanfile
 lib/Mojolicious/Plugin/PromiseActions.pm

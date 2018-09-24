@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::Task::CheckingModuleInstalledLoadable;
 
-our $DATE = '2018-06-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'Checking if a module is installed or loadable',
@@ -72,7 +72,7 @@ Acme::CPANModules::PERLANCAR::Task::CheckingModuleInstalledLoadable - Checking i
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PERLANCAR::Task::CheckingModuleInstalledLoadable (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-06-11.
+This document describes version 0.003 of Acme::CPANModules::PERLANCAR::Task::CheckingModuleInstalledLoadable (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-09-20.
 
 =head1 DESCRIPTION
 

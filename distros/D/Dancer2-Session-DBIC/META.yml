@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,4 +34,5 @@ resources:
   IRC: irc://irc.perl.org/#dancer
   bugtracker: https://github.com/interchange/Dancer2-Session-DBIC/issues
   repository: https://github.com/interchange/Dancer2-Session-DBIC.git
-version: '0.110'
+version: '0.120'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

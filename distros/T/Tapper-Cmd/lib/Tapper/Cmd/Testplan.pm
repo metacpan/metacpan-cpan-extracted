@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testplan::VERSION = '5.0.8';
+$Tapper::Cmd::Testplan::VERSION = '5.0.9';
 use 5.010;
 use Moose;
 
@@ -88,6 +88,20 @@ sub del {
         }
         $testplan->delete();
         return 0;
+}
+
+
+sub cancel {
+    my ($self, $id, $comment) = @_;
+
+    $comment ||= 'Testplan cancelled';
+    my $testplan = model('TestrunDB')->resultset('TestplanInstance')->find($id);
+    my $cmd = Tapper::Cmd::Testrun->new;
+    my $testruns = $testplan->testruns;
+    while(my $testrun = $testruns->next) {
+        $cmd->cancel($testrun->id, $comment);
+    }
+    return 0;
 }
 
 
@@ -257,6 +271,17 @@ not remove the associated testruns.
 
 @throws die()
 
+=head2 cancel
+
+Cancel testplan by canceling all of its testruns.
+
+@param int - testplan instance id
+
+@return success - 0
+@return error - exception
+
+@throws die()
+
 =head2 rerun
 
 Reapply the evaluated testplan of the given testplan instance.
@@ -351,7 +376,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

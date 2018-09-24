@@ -1,5 +1,9 @@
 Revision history for Perl extension Cookie-Baker-XS
 
+0.10 2018-09-21T07:41:42Z
+
+  - just bump up version. PP requires newer version number
+
 0.09 2018-03-03T04:37:36Z
 
    - just bump up version. PP requires newer version number

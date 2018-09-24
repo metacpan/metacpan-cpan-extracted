@@ -27,8 +27,8 @@ requires:
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
-  File::HomeDir: '0'
   Log::ger: '0.023'
+  PERLANCAR::File::HomeDir: '0'
   PERLANCAR::Module::List: '0'
   Perinci::CmdLine::Any: '0'
   PerlX::Maybe: '0'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-swcat
   homepage: https://metacpan.org/release/App-swcat
   repository: git://github.com/perlancar/perl-App-swcat.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

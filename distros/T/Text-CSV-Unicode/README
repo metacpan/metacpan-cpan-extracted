@@ -5,23 +5,17 @@ Description:
     composition and decomposition of comma-separated values.  
     Text::CSV::Unicode handles input that includes 8-bit (and more) data.
 
-    It is based on version 0.01 of Text::CSV, but later versions of that
-    module are not compatible with Text::CSV::Unicode, so Text-CSV-0.01
-    has been integrated into this distribution as lib/Text/CSV/Base.pm 
-    and t/base.t; specifically
-	% perl -pwe 's/Text::CSV/Text::CSV::Base/ && s/ {6}\#/\#/' \ 
-		../Text-CSV-0.01/CSV.pm  > lib/Text/CSV/Base.pm
-	% perl -pwe 's/Text::CSV/Text::CSV::Base/'		   \
-		../Text-CSV-0.01/test.pl > t/base.t
+    It is based on version 0.01 of Text::CSV, but has been reimplemented
+    to use the current Text::CSV.
 
 Copying:
-    Copyright (c) 2007, 2008, 2010, 2011, 2012 Robin Barker.  
+    Copyright (c) 2007, 2008, 2010, 2011, 2012, 2018 Robin Barker.  
     All rights reserved.
 
     This program is free software; you can redistribute it
     and/or modify it under the same terms as Perl itself.
 
-    lib/Text/CSV/Base.pm (version 0.1) was a direct copy of 
+    lib/Text/CSV/Base.pm (version 0.01) was a direct copy of 
     Text-CSV-0.01/CSV.pm, and t/base.t was a direct copy of
     Text-CSV-0.01/test.pl, with only the module name changed
     (and white-space changes), and these files are
@@ -44,6 +38,9 @@ Build/Installation:
 	make install
 
 Recent Changes:
+    Version 0.200
+	Reimplemented to use Text::CSV 
+
     Version 0.115 2012/02/19
 	requires/skip_all for charnames
 
@@ -53,13 +50,4 @@ Recent Changes:
     Version 0.113 2011/08/24
 	Text::CSV::Base 0.041
 	allow undef input values in combine, without warnings
-
-    Version 0.112 2010/02/17
-	change to align with perl 5.12 unicode properties
-
-    Version 0.111 2008/04/08
-	changes to improve kwalite (see cpants.perl.org)
-
-    Version 0.110 2008/01/01
-	allow unicode in combine
 

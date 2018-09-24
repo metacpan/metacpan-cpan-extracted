@@ -19,7 +19,7 @@ WriteMakefile(
         'DateTime' => 0,
     },
     PREREQ_PM => {
-                  'WebService::Solr' => 0,
+                  'WebService::Solr' => '0.40',
                   'Lingua::StopWords' => 0.09, # also on debian
                   'Type::Tiny' => 1,
                   'namespace::clean' => 0,

@@ -1,0 +1,12 @@
+Revision history for HTML-T5
+
+0.003  2018-09-20
+    - Fix configure_requires.
+
+0.002  2018-09-20
+    - Make the build deps hard configure_reqs.
+        - to avoid test/cpan -i failures.
+
+0.001  2018-09-20
+    - First version, released on an unsuspecting world
+        - Forked from HTML::Tid5 - thanks!

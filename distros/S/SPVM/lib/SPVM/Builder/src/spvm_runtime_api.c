@@ -411,8 +411,18 @@ void SPVM_RUNTIME_API_free_weaken_back_refs(SPVM_ENV* env, void** weaken_back_re
   SPVM_RUNTIME_ALLOCATOR_free_memory_block(runtime, weaken_back_refs);
 }
 
+int32_t SPVM_RUNTIME_API_isweak(SPVM_ENV* env, SPVM_OBJECT** object_address) {
+  (void)env;
+  
+  int32_t isweak = (intptr_t)*object_address & 1;
+  
+  return isweak;
+}
+
 void SPVM_RUNTIME_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   (void)env;
+  
+  assert(object_address);
 
   SPVM_RUNTIME* runtime = env->runtime;
   
@@ -420,7 +430,7 @@ void SPVM_RUNTIME_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
     return;
   }
   
-  if (SPVM_RUNTIME_API_isweak(env, *object_address)) {
+  if (SPVM_RUNTIME_API_isweak(env, object_address)) {
     return;
   }
   
@@ -472,22 +482,16 @@ void SPVM_RUNTIME_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   object->weaken_back_refs_length++;
 }
 
-int32_t SPVM_RUNTIME_API_isweak(SPVM_ENV* env, SPVM_OBJECT* object) {
-  (void)env;
-  
-  int32_t isweak = (intptr_t)object & 1;
-  
-  return isweak;
-}
-
 void SPVM_RUNTIME_API_unweaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   (void)env;
+
+  assert(object_address);
   
   if (*object_address == NULL) {
     return;
   }
   
-  if (!SPVM_RUNTIME_API_isweak(env, *object_address)) {
+  if (!SPVM_RUNTIME_API_isweak(env, object_address)) {
     return;
   }
   
@@ -1060,7 +1064,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_get_object_array_element(SPVM_ENV* env, SPVM_OBJEC
   assert(index >= 0);
   assert(index <= object->elements_length);
   
-  SPVM_OBJECT* oval = (*(SPVM_VALUE_object**)&(*(void**)object))[index];
+  SPVM_OBJECT* oval = SPVM_RUNTIME_C_INLINE_GET_OBJECT_NO_WEAKEN_ADDRESS((*(SPVM_VALUE_object**)&(*(void**)object))[index]);
   
   return oval;
 }
@@ -1103,6 +1107,9 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
   assert(object != NULL);
   assert(object->ref_count > 0);
   
+  // Not weakened
+  assert((((intptr_t)object) & 1) == 0);
+  
   if (object->ref_count < 1) {
     fprintf(stderr, "Found invalid reference count object(SPVM_RUNTIME_API_dec_ref_count())");
     abort();
@@ -1137,7 +1144,14 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
         for (index = 0; index < length; index++) {
           SPVM_OBJECT** object_field_address = (SPVM_OBJECT**)&((*(SPVM_VALUE_object**)&(*(void**)object))[index]);
           if (*object_field_address != NULL) {
-            SPVM_RUNTIME_API_dec_ref_count(env, *object_field_address);
+            // If object is weak, unweaken
+            if (SPVM_RUNTIME_API_isweak(env, object_field_address)) {
+              SPVM_RUNTIME_API_unweaken(env, object_field_address);
+              (*object_field_address)->ref_count--;
+            }
+            else {
+              SPVM_RUNTIME_API_dec_ref_count(env, *object_field_address);
+            }
           }
         }
       }
@@ -1172,8 +1186,9 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
           SPVM_OBJECT** object_field_address = (SPVM_OBJECT**)&fields[object_field_index];
           if (*object_field_address != NULL) {
             // If object is weak, unweaken
-            if (SPVM_RUNTIME_API_isweak(env, *object_field_address)) {
+            if (SPVM_RUNTIME_API_isweak(env, object_field_address)) {
               SPVM_RUNTIME_API_unweaken(env, object_field_address);
+              (*object_field_address)->ref_count--;
             }
             else {
               SPVM_RUNTIME_API_dec_ref_count(env, *object_field_address);
@@ -1181,9 +1196,9 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
           }
         }
       }
-      if (object->weaken_back_refs != NULL) {
-        SPVM_RUNTIME_API_free_weaken_back_refs(env, object->weaken_back_refs, object->weaken_back_refs_length);
-      }
+    }
+    if (object->weaken_back_refs != NULL) {
+      SPVM_RUNTIME_API_free_weaken_back_refs(env, object->weaken_back_refs, object->weaken_back_refs_length);
     }
     
     // Free object body
@@ -1377,28 +1392,9 @@ SPVM_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_ENV* env, SPVM_OBJECT* objec
 
   SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
   
-  void* value = *(SPVM_VALUE_object*)&fields[field_index];
+  void* value = SPVM_RUNTIME_C_INLINE_GET_OBJECT_NO_WEAKEN_ADDRESS(*(SPVM_VALUE_object*)&fields[field_index]);
   
   return value;
-}
-
-int32_t SPVM_RUNTIME_API_weaken_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_index) {
-
-  if (!object) {
-    SPVM_OBJECT* exception = env->new_string_raw(env, "Object to weaken an object field must not be undefined.", 0);
-    env->set_exception(env, exception);
-    return SPVM_EXCEPTION;
-  }
-
-  SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
-  SPVM_OBJECT** object_field_address = (SPVM_OBJECT**)&fields[field_index];
-  
-  // Weaken object field
-  if (*object_field_address != NULL) {
-    SPVM_RUNTIME_API_weaken(env, object_field_address);
-  }
-  
-  return SPVM_SUCCESS;
 }
 
 void SPVM_RUNTIME_API_set_byte_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_index, int8_t value) {

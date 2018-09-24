@@ -6,6 +6,7 @@ lib/Future/Mutex.pm
 lib/Future/Phrasebook.pod
 lib/Future/Utils.pm
 lib/Test/Future.pm
+lib/Test/Future/Deferred.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -36,5 +37,6 @@ t/35utils-map-void.t
 t/36utils-map.t
 t/40mutex.t
 t/50test-future.t
+t/51test-future-deferred.t
 t/90legacy.t
 t/99pod.t

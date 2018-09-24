@@ -10,6 +10,5 @@ WriteMakefile(
                   'DBD::CSV'                => 0,    #for tests
                   'Tie::Cache'              => 0,    #for prepare cache
                   'File::Basename'          => 0,    #for connect
-                  'List::MoreUtils'         => 0.07, #for mesh function
                  },
 );

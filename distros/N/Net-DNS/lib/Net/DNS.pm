@@ -1,13 +1,13 @@
 package Net::DNS;
 
 #
-# $Id: DNS.pm 1700 2018-07-24 20:18:14Z willem $
+# $Id: DNS.pm 1715 2018-09-21 14:17:46Z willem $
 #
 require 5.006;
 our $VERSION;
-$VERSION = '1.17';
+$VERSION = '1.18';
 $VERSION = eval $VERSION;
-our $SVNVERSION = (qw$LastChangedRevision: 1700 $)[1];
+our $SVNVERSION = (qw$LastChangedRevision: 1715 $)[1];
 
 
 =head1 NAME
@@ -24,9 +24,8 @@ Net::DNS is a collection of Perl modules that act as a Domain Name System
 (DNS) resolver. It allows the programmer to perform DNS queries that are
 beyond the capabilities of "gethostbyname" and "gethostbyaddr".
 
-The programmer should be somewhat familiar with the format of a DNS packet
-and its various sections. See RFC 1035 or DNS and BIND (Albitz & Liu) for
-details.
+The programmer should be familiar with the structure of a DNS packet.
+See RFC 1035 or DNS and BIND (Albitz & Liu) for details.
 
 =cut
 
@@ -63,8 +62,8 @@ sub rr {
 	my ($arg1) = @_;
 	my $res = ref($arg1) ? shift : new Net::DNS::Resolver();
 
-	my $ans = $res->query(@_);
-	my @list = $ans ? $ans->answer : ();
+	my $reply = $res->query(@_);
+	my @list = $reply ? $reply->answer : ();
 }
 
 
@@ -193,7 +192,7 @@ __END__
 =head2 Resolver Objects
 
 A resolver object is an instance of the L<Net::DNS::Resolver> class.
-A program can have multiple resolver objects, each maintaining its
+A program may have multiple resolver objects, each maintaining its
 own state information such as the nameservers to be queried, whether
 recursion is desired, etc.
 
@@ -201,29 +200,29 @@ recursion is desired, etc.
 =head2 Packet Objects
 
 L<Net::DNS::Resolver> queries return L<Net::DNS::Packet> objects.
-Packet objects have five sections:
+A packet object has five sections:
 
 =over 3
 
 =item *
 
-The header section, a L<Net::DNS::Header> object.
+header, represented by a L<Net::DNS::Header> object
 
 =item *
 
-The question section, a list of L<Net::DNS::Question> objects.
+question, a list of no more than one L<Net::DNS::Question> object
 
 =item *
 
-The answer section, a list of L<Net::DNS::RR> objects.
+answer, a list of L<Net::DNS::RR> objects
 
 =item *
 
-The authority section, a list of L<Net::DNS::RR> objects.
+authority, a list of L<Net::DNS::RR> objects
 
 =item *
 
-The additional section, a list of L<Net::DNS::RR> objects.
+additional, a list of L<Net::DNS::RR> objects
 
 =back
 
@@ -232,15 +231,16 @@ The additional section, a list of L<Net::DNS::RR> objects.
 L<Net::DNS::Update> is a subclass of L<Net::DNS::Packet>
 used to create dynamic update requests.
 
-=head2 Header Objects
 
-L<Net::DNS::Header> objects represent the header
-section of a DNS packet.
+=head2 Header Object
 
-=head2 Question Objects
+The L<Net::DNS::Header> object mediates access to the header data
+which resides within the corresponding L<Net::DNS::Packet>.
 
-L<Net::DNS::Question> objects represent the content of the question
-section of a DNS packet.
+=head2 Question Object
+
+The L<Net::DNS::Question> object represents the content of the question
+section of the DNS packet.
 
 =head2 RR Objects
 
@@ -253,10 +253,12 @@ The type of an RR object must be checked before calling any methods.
 
 =head1 METHODS
 
-See the manual pages listed above for other class-specific methods.
+Net::DNS exports methods and auxiliary functions to support
+DNS updates, zone serial number management, and simple DNS queries.
 
 =head2 version
 
+    use Net::DNS;
     print Net::DNS->version, "\n";
 
 Returns the version of Net::DNS.
@@ -316,13 +318,13 @@ update packet.	There are two forms, value-independent and
 value-dependent:
 
     # RRset exists (value-independent)
-    $update->push(pre => yxrrset("host.example.com A"));
+    $update->push( pre => yxrrset("host.example.com A") );
 
 Meaning:  At least one RR with the specified name and type must
 exist.
 
     # RRset exists (value-dependent)
-    $update->push(pre => yxrrset("host.example.com A 10.1.2.3"));
+    $update->push( pre => yxrrset("host.example.com A 10.1.2.3") );
 
 Meaning:  At least one RR with the specified name and type must
 exist and must have matching data.
@@ -335,7 +337,7 @@ be created.
 Use this method to add an "RRset does not exist" prerequisite to
 a dynamic update packet.
 
-    $update->push(pre => nxrrset("host.example.com A"));
+    $update->push( pre => nxrrset("host.example.com A") );
 
 Meaning:  No RRs with the specified name and type can exist.
 
@@ -347,7 +349,7 @@ be created.
 Use this method to add a "name is in use" prerequisite to a dynamic
 update packet.
 
-    $update->push(pre => yxdomain("host.example.com"));
+    $update->push( pre => yxdomain("host.example.com") );
 
 Meaning:  At least one RR with the specified name must exist.
 
@@ -359,7 +361,7 @@ be created.
 Use this method to add a "name is not in use" prerequisite to a
 dynamic update packet.
 
-    $update->push(pre => nxdomain("host.example.com"));
+    $update->push( pre => nxdomain("host.example.com") );
 
 Meaning:  No RR with the specified name can exist.
 
@@ -370,7 +372,7 @@ be created.
 
 Use this method to add RRs to a zone.
 
-    $update->push(update => rr_add("host.example.com A 10.1.2.3"));
+    $update->push( update => rr_add("host.example.com A 10.1.2.3") );
 
 Meaning:  Add this RR to the zone.
 
@@ -387,19 +389,19 @@ Use this method to delete RRs from a zone.  There are three forms:
 delete all RRsets, delete an RRset, and delete a specific RR.
 
     # Delete all RRsets.
-    $update->push(update => rr_del("host.example.com"));
+    $update->push( update => rr_del("host.example.com") );
 
 Meaning:  Delete all RRs having the specified name.
 
     # Delete an RRset.
-    $update->push(update => rr_del("host.example.com A"));
+    $update->push( update => rr_del("host.example.com A") );
 
 Meaning:  Delete all RRs having the specified name and type.
 
     # Delete a specific RR.
-    $update->push(update => rr_del("host.example.com A 10.1.2.3"));
+    $update->push( update => rr_del("host.example.com A 10.1.2.3") );
 
-Meaning:  Delete all RRs having the specified name, type, and data.
+Meaning:  Delete the RR which matches the specified argument.
 
 RR objects created by this method should be added to the "update"
 section of a dynamic update packet.
@@ -441,7 +443,7 @@ date information to remain useful.
 =head1 Sorting of RR arrays
 
 C<rrsort()> provides functionality to help you sort RR arrays. In most cases
-this will give you the answer that you want, but you can specify your
+this will give you the result that you expect, but you can specify your
 own sorting method by using the C<< Net::DNS::RR::FOO->set_rrsort_func() >>
 class method. See L<Net::DNS::RR> for details.
 
@@ -574,7 +576,7 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
     my $socket = $res->bgsend("host.example.com");
 
     while ( $res->bgbusy($socket) ) {
-	# do some work here while waiting for the answer
+	# do some work here while waiting for the response
 	# ...and some more here
     }
 

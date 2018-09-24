@@ -33,14 +33,17 @@ lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black.png
 lib/Mojolicious/Plugin/Minion/resources/public/minion/moment/moment.js
 lib/Mojolicious/Plugin/Minion/resources/public/minion/popper/popper.js
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.eot
+lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.svg
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.ttf
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.woff
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.woff2
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-regular-400.eot
+lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-regular-400.svg
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-regular-400.ttf
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-regular-400.woff
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-regular-400.woff2
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-solid-900.eot
+lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-solid-900.svg
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-solid-900.ttf
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-solid-900.woff
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-solid-900.woff2

@@ -1346,6 +1346,11 @@ msgstr ""
 msgid "January"
 msgstr "Jänner"
 
+#. thing => 'text'
+#: files_to_extract_for_process/gettext_loc.pl:15
+msgid "This is a new {thing}."
+msgstr ""
+
 EOT
     },
 );

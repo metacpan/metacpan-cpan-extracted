@@ -4,6 +4,8 @@ use strict;
 use base 'FB3::Convert';
 use XML::LibXML;
 use File::Basename;
+use Image::ExifTool qw(:Public);
+use Image::Size;
 use Clone qw(clone);
 use FB3::Euristica;
 use utf8;
@@ -228,7 +230,7 @@ sub Reaper {
   my $AllowElements = $X->{'allow_elements'};
 ### Обработчики нод для epub
   $AllowElements->{'img'} = {
-    'allow_attributes' => ['src','href'],
+    'allow_attributes' => ['src','id','alt','width','min-width','max-width'],
     'processor' => \&ProcessImg,
   };
   $AllowElements->{'a'} = {
@@ -1106,9 +1108,15 @@ sub CleanNodeEmptyId {
           } elsif ($Link eq '') {
             $X->Msg("Find node '$El' without id\n","w");
           }
-          
+
           next unless $El =~ /^(a|span)$/;
-          if ($El eq 'a' && $Link ne '') { #<a> c линками оставим
+          #<a> c действующими линками оставим
+          if ($El eq 'a' && $Link ne ''
+            && (
+              $Link !~ /^#link_/ #только ссылки внутри section нам интересны
+              || exists $X->{'id_list'}->{$X->CutLinkDiez($Link)} #ссылка живая
+            )
+          ) {
             $X->Msg("Find link [$Link]. Skip\n","w");
             next;
           }
@@ -1126,6 +1134,7 @@ sub CleanNodeEmptyId {
 #Процессоры обработки нод
 
 # Копируем картинки, перерисовывает атрибуты картинок на новые
+my %ImgChecked;
 sub ProcessImg {
   my $X = shift;
   my %Args = @_;
@@ -1135,8 +1144,47 @@ sub ProcessImg {
   my $ImgList = $X->{'STRUCTURE'}->{'IMG_LIST'};
   my $Src = $Node->getAttribute('src');
 
+  unless ($Src) {
+    $X->Msg("Can't find img src. Remove img\n","w");
+    my $Doc = XML::LibXML::Document->new('1.0', 'utf-8');
+    my $Text = $Doc->createTextNode('');
+    return $Text;
+  }
+
   #честный абсолютный путь к картинке
-  my $ImgSrcFile = $X->RealPath(FB3::Convert::dirname($X->RealPath( $RelPath ? $X->{'ContentDir'}.'/'.$RelPath : $X->{'ContentDir'})).'/'.$Src);
+  my $SkipExists = 1; #не падать, если файл отсутствует
+  my $ImgSrcFile = $X->RealPath(
+    FB3::Convert::dirname($X->RealPath( $RelPath ? $X->{'ContentDir'}.'/'.$RelPath : $X->{'ContentDir'}, undef, $SkipExists)).'/'.$Src,
+  undef,$SkipExists);
+
+  unless (-f $ImgSrcFile) { #не нашли картинку
+    $X->Msg("Can't find img".$ImgSrcFile." Replace to text [no image in epub file]\n","w");
+    my $Doc = XML::LibXML::Document->new('1.0', 'utf-8');
+    my $Text = $Doc->createTextNode('[no image in epub file]');
+    return $Text;
+  }
+
+  unless (exists $ImgChecked{$ImgSrcFile}) {
+    $X->_bs('img_info','Тип IMG');
+    my $ImgInfo;
+    my $ImgType;
+    if ($ImgSrcFile =~ /.svg$/) {
+      $ImgInfo = Image::ExifTool::ImageInfo($ImgSrcFile);
+      $ImgType = ref $ImgInfo eq 'HASH' ? $ImgInfo->{'FileType'} : undef;
+    } else {
+      $ImgInfo = [Image::Size::imgsize($ImgSrcFile)];
+      $ImgType = $ImgInfo->[2];
+    }
+    $X->_be('img_info');
+
+    if ( !$ImgType || !$X->isAllowedImageType($ImgType) ) { #неизвестный формат
+      $X->Msg("Can't detect img".$ImgSrcFile." Replace to text [bad img format]\n","w");
+      my $Doc = XML::LibXML::Document->new('1.0', 'utf-8');
+      my $Text = $Doc->createTextNode('[bad img format]');
+      return $Text;
+    }
+  }
+  $ImgChecked{$ImgSrcFile} = 1;
 
   $X->Msg("Find img, try transform: ".$Src."\n","w");
 
@@ -1159,7 +1207,7 @@ sub ProcessImg {
     $X->Msg("copy $ImgSrcFile -> $ImgDestFile\n");
     $X->_bs('img_copy','Копирование IMG');
     FB3::Convert::copy($ImgSrcFile, $ImgDestFile) or $X->Error($!." [copy $ImgSrcFile -> $ImgDestFile]");        
-    $X->_be('img_copy','Копирование IMG');
+    $X->_be('img_copy');
   }
 
   $Node->setAttribute('src' => $ImgID);
@@ -1302,9 +1350,9 @@ sub FB3Creator {
  # print Data::Dumper::Dumper($Structure);
  # exit;
   
-  my $GlobalID = $Structure->{'DESCRIPTION'}->{'DOCUMENT-INFO'}->{'ID'};
+  my $GlobalID  = $Structure->{'DESCRIPTION'}->{'DOCUMENT-INFO'}->{'ID'};
   my $TitleInfo = $Structure->{'DESCRIPTION'}->{'TITLE-INFO'};
-  my $DocInfo = $Structure->{'DESCRIPTION'}->{'DOCUMENT-INFO'};
+  my $DocInfo   = $Structure->{'DESCRIPTION'}->{'DOCUMENT-INFO'};
   
   #Пишем body
   $X->Msg("FB3: Create /fb3/body.xml\n","w");
@@ -1366,19 +1414,19 @@ sub FB3Creator {
   open FHcore, ">$FNcore" or $X->Error("$FNcore: $!");
   print FHcore qq{<?xml version="1.0" encoding="UTF-8"?>
   <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.fictionbook.org/FictionBook3/description" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/">
-    <dc:title>}.$TitleInfo->{'BOOK-TITLE'}.qq{</dc:title>
-    <dc:subject>}.$TitleInfo->{'ANNOTATION'}.qq{</dc:subject>
+    <dc:title>}   . FB3::Convert::xmlescape($TitleInfo->{'BOOK-TITLE'}) . qq{</dc:title>
+    <dc:subject>} . FB3::Convert::xmlescape($TitleInfo->{'ANNOTATION'}) . qq{</dc:subject>
     <dc:creator>};
   
   my $c=1;         
   foreach (@{$TitleInfo->{'AUTHORS'}}) {
-    print FHcore $_->{'first-name'}." ".$_->{'last-name'};
+    print FHcore FB3::Convert::xmlescape($_->{'first-name'}." ".$_->{'last-name'});
     print FHcore ", " if $c < scalar @{$TitleInfo->{'AUTHORS'}};
     $c++;
   }
   
   print FHcore qq{</dc:creator>
-    <dc:description>}.$TitleInfo->{'ANNOTATION'}.qq{</dc:description>
+    <dc:description>}.FB3::Convert::xmlescape($TitleInfo->{'ANNOTATION'}).qq{</dc:description>
     <cp:keywords>XML, FictionBook, eBook, OPC</cp:keywords>
     <cp:revision>1.00</cp:revision>
     }.
@@ -1389,7 +1437,7 @@ sub FB3Creator {
   
   $c=1;         
   foreach (@{$TitleInfo->{'GENRES'}}) {
-    print FHcore $_;
+    print FHcore FB3::Convert::xmlescape($_);
     print FHcore ", " if $c < scalar @{$TitleInfo->{'GENRES'}};
     $c++;
   }
@@ -1402,11 +1450,11 @@ sub FB3Creator {
   my $FNdesc="$FB3Path/fb3/description.xml";
   open FHdesc, ">$FNdesc" or $X->Error("$FNdesc: $!");
   print FHdesc qq{<?xml version="1.0" encoding="UTF-8"?>
-<fb3-description xmlns="http://www.fictionbook.org/FictionBook3/description" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" id="}.$GlobalID.qq{" version="1.0">
+<fb3-description xmlns="http://www.fictionbook.org/FictionBook3/description" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" id="}.FB3::Convert::xmlescape($GlobalID).qq{" version="1.0">
   };
 
   print FHdesc qq{<title>
-    <main>}.$TitleInfo->{'BOOK-TITLE'}.qq{</main>
+    <main>} . FB3::Convert::xmlescape($TitleInfo->{'BOOK-TITLE'}) . qq{</main>
   </title>
   };
     
@@ -1415,9 +1463,9 @@ sub FB3Creator {
 
   foreach (@{$TitleInfo->{'AUTHORS'}}) {
 
-    my $First = $_->{'first-name'};
-    my $Middle = $_->{'middle-name'};
-    my $Last = $_->{'last-name'}||"Unknown";
+    my $First  = FB3::Convert::xmlescape($_->{'first-name'} );
+    my $Middle = FB3::Convert::xmlescape($_->{'middle-name'});
+    my $Last   = FB3::Convert::xmlescape($_->{'last-name'}  ) || "Unknown";
 
     print FHdesc qq{<subject link="author" id="}.($_->{'id'}||'00000000-0000-0000-0000-000000000000').qq{">
       <title>
@@ -1439,20 +1487,18 @@ sub FB3Creator {
   print FHdesc qq{</fb3-relations>
   };
 
-  
   print FHdesc qq{<fb3-classification>
     };
   foreach (@{$TitleInfo->{'GENRES'}}) {
-    print FHdesc qq{<subject>}.(exists $GenreTranslate{$_}?$GenreTranslate{$_}:$_).qq{</subject>
+    print FHdesc qq{<subject>} . ( exists $GenreTranslate{$_} ? $GenreTranslate{$_} : FB3::Convert::xmlescape($_) ) . qq{</subject>
     };
   }
   print FHdesc qq{</fb3-classification>
   };
   
-
   print FHdesc qq{<lang>}.$DocInfo->{'LANGUAGE'}.qq{</lang>
   <written>
-    <lang>}.$DocInfo->{'LANGUAGE'}.qq{</lang>
+    <lang>} . FB3::Convert::xmlescape($DocInfo->{'LANGUAGE'}) . qq{</lang>
   </written>
   };
 
@@ -1461,7 +1507,7 @@ sub FB3Creator {
 };
 
   print FHdesc qq{  <annotation>
-    <p>}.$TitleInfo->{'ANNOTATION'}.qq{</p>
+    <p>} . FB3::Convert::xmlescape($TitleInfo->{'ANNOTATION'}) . qq{</p>
   </annotation>
 } if $TitleInfo->{'ANNOTATION'};
 

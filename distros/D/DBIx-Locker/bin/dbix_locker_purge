@@ -10,21 +10,27 @@ use Log::Dispatchouli;
 
 my ($opt, $usage) = describe_options(
   '%c %o',
-  [ 'locker-class=s', 'locker class to purge (default: $DBIX_LOCKER_CLASS)',
-    { default => $ENV{DBIX_LOCKER_CLASS}, required => 1}  ],
+  [ 'locker-class=s', 'locker class to purge (default: $DBIX_LOCKER_CLASS)' ],
 );
 
-eval "require $opt->{locker_class};" or die $@;
+my $locker_class = $opt->{locker_class} || $ENV{DBIX_LOCKER_CLASS};
+if (!$locker_class) {
+  print "required option --locker-class not provided\n\n";
+  print $usage->text;
+  exit;
+}
+
+eval "require $locker_class;" or die $@;
 
 my $logger = Log::Dispatchouli->new({
-  program_name => 'dbix_locker_purge',
-  facility     => 'daemon',
-  to_stdout    => 1,
+  ident     => 'dbix_locker_purge',
+  facility  => 'daemon',
+  to_stdout => 1,
 });
 
-my $locks = $opt->{locker_class}->new->purge_expired_locks;
+my $locks = $locker_class->new->purge_expired_locks;
 
-$logger->([ 'purged %s locks', $locks ]);
+$logger->([ 'purged %d locks', $locks ]);
 
 __END__
 
@@ -38,7 +44,7 @@ dbix_locker_purge - purge old locks
 
 =head1 VERSION
 
-version 0.100119
+version 0.100120
 
 =head1 AUTHOR
 

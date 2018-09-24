@@ -1,0 +1,13 @@
+The packdrake module allows you to manipulate hdlist/synthesis files
+It is a compatibility wrapper around the new MDV::Packdrakeng module.
+
+genhdlist2 is used to generate an hdlist and an associated synthesis file for
+one repository (medium in urpmi language).
+A medium is from a set of RPM packages found in the directory.
+It will put the hdlist and synthesis files in media_info/ sub-directory.
+
+gendistrib is a wrapper above genhdlist2, it works on all media at once, in
+order to generate a mirror tree for a distribution
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

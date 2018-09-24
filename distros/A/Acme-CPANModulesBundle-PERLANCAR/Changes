@@ -1,3 +1,8 @@
+0.003   2018-09-20 (PERLANCAR)
+
+	- Mention get_user_tempdir() from File::Util::Tempdir.
+
+
 0.002   2018-06-11 (PERLANCAR)
 
 	- Add list: PERLANCAR::Task::AliasingModuleName.

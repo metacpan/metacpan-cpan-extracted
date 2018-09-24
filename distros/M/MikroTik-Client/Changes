@@ -1,6 +1,6 @@
-0.30
+0.31
     - Adopt new namespase. I perfectly aware that's a foul practice, but
-      initial name was a realy bad choice. Sorry.
+      initial name was a realy bad choice.
     - Allow new login scheme introduced in v6.43.
 
 0.24    2018-02-14

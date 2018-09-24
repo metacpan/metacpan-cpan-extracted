@@ -3,6 +3,24 @@ Revision history for Perl module DBIx-Array
 TODO:
   - Do we need to $dbh->quote_identifier($column) in bulkinsert methods?
 
+0.62 2018-07-29
+  - Updated lib/DBIx/Array.pm
+    - Documentation
+    - White space refactor
+    - Fixed assignment in sqlsort if statement
+    - Refactored update/sqlupdate names
+    - Refactored sqlhashhash method
+      - Dropped requirement for List::MoreUtils
+
+0.61 2018-07-25
+  - Updated lib/DBIx/Array.pm
+    - Update sqlwhere methods to not require my forked version of SQL::Abstract
+  - Added t/013_sqlwhere.t
+
+0.60 2018-07-18
+  - Updated lib/DBIx/Array.pm
+    - Added sqlwhere methods
+
 0.59 2018-06-24
   - Updated t/011_bulk_updates.t to pass when SQL::Abstract not installed
 

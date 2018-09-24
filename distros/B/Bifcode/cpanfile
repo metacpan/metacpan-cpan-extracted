@@ -9,7 +9,10 @@ requires 'warnings';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker::CPANfile';
-    requires 'Pod::Text';
+};
+
+on develop => sub {
+    requires 'App::githook::perltidy';
 };
 
 on test => sub {

@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+(our $VERSION) = q$Id: dumpdistribconf 12157 2005-11-15 11:22:04Z rgarciasuarez $ =~ /(\d+\.\d+)/;
+
+use strict;
+use Getopt::Long;
+use MDV::Distribconf::Build;
+use Pod::Usage;
+
+sub usage () {
+    pod2usage({ -verbose => 1 });
+    exit 0;
+}
+
+my ($out, $outputtype) = (\*STDOUT, 'm');
+GetOptions(
+    s => sub { $outputtype = 's' },
+    m => sub { $outputtype = 'm' },
+    d => sub { undef $out },
+    'v|version' => sub { warn "$0 version $VERSION\n"; exit 0 },
+    'h|help' => \&usage,
+);
+
+@ARGV or usage;
+
+foreach (@ARGV) {
+    warn "Using root $_...\n";
+    my $d = MDV::Distribconf::Build->new($_);
+    $d->load or do {
+	warn "Can't load configuration from $_\n";
+	next;
+    };
+    if ($outputtype eq 's') {
+	$d->write_hdlists($out) or warn "Can't write hdlists file\n";
+    } else {
+	$d->write_mediacfg($out) or warn "Can't write media.cfg file\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+dumpdistribconf - dumps a media.cfg from a distribution tree
+
+=head1 SYNOPSIS
+
+    dumpdistribconf [-s|-m] [-d] path [path...]
+
+=head1 DESCRIPTION
+
+This will dump a F<media.cfg> (or an F<hdlists> file if B<-s> is
+specified) from a Mandriva Linux distribution tree. By default
+it's dumped to the standard output.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-s>
+
+Dump an F<hdlists> file.
+
+=item B<-m>
+
+Dump a F<media.cfg> file (default)
+
+=item B<-d>
+
+Instead of writing to the standard output, write to a file placed in the
+standard location (e.g. F<< <root>/media/media_info/media.cfg >>).
+
+=back
+
+=cut

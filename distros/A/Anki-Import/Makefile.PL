@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
     "File::Path" => 0,
     "File::Spec" => 0,
     "Getopt::Args" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Output" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.029",
+  "VERSION" => "0.030",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cwd" => 0,
+  "Data::Dumper" => 0,
   "Exporter" => 0,
   "File::Path" => 0,
   "File::Spec" => 0,

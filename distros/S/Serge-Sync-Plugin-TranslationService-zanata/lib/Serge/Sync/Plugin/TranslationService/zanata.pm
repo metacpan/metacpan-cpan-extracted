@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.902.0');
+our $VERSION = qv('0.903.0');
 
 sub name {
     return 'Zanata translation server (http://zanata.org/) synchronization plugin';
@@ -38,9 +38,7 @@ sub init {
         # Whether to purge the cache before performing the pull operation
         purge_cache    => 'BOOLEAN',
         # File types to locate and transmit to the server when using project type 'file'
-        file_types     => 'ARRAY',
-        # JAVA_HOME environment variable
-        java_home      => 'STRING'
+        file_types     => 'ARRAY'
     });
 }
 
@@ -69,10 +67,6 @@ sub validate_data {
         die "'user_config', which is set to '$self->{data}->{user_config}', does not point to a valid file.\n" unless -f $self->{data}->{user_config};
     }
 
-    if (defined $self->{data}->{java_home}) {
-        die "'java_home', which is set to '$self->{data}->{java_home}', does not point to a valid dir.\n" unless -d $self->{data}->{java_home};
-    }
-
     if (!(defined $self->{data}->{push_type})) {
         $self->{data}->{push_type} = 'both';
     }
@@ -88,10 +82,6 @@ sub run_zanata_cli {
     my $command = '--batch-mode '.$action;
 
     $command .= ' --project-config '.$self->{data}->{project_config};
-
-    if (defined $self->{data}->{java_home}) {
-        $ENV{'JAVA_HOME'} = $self->{data}->{java_home};
-    }
 
     if (defined $self->{data}->{user_config}) {
         $command .= ' --user-config '.$self->{data}->{user_config};

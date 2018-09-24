@@ -1,0 +1,11 @@
+MANIFEST.bak
+.git\/
+^.gitignore
+^.travis.yml
+blib\/
+MYMETA\..*
+^XML-Invisible-\d.*
+^Makefile$
+^Makefile.bak$
+pm_to_blib
+\.swp$

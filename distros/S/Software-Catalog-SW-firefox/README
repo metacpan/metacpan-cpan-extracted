@@ -1,0 +1,33 @@
+NAME
+    Software::Catalog::SW::firefox - Firefox
+
+VERSION
+    This document describes version 0.002 of Software::Catalog::SW::firefox
+    (from Perl distribution Software-Catalog-SW-firefox), released on
+    2018-09-20.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Software-Catalog-SW-firefox>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Software-Catalog-SW-firefox>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Catalog-SW-f
+    irefox>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

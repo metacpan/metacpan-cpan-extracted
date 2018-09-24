@@ -12,7 +12,7 @@ use MooX::Types::MooseLike::Base qw(HashRef Str);
 use Set::Scalar;
 use namespace::autoclean;
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 has category => (
     is      => 'rw',
@@ -222,7 +222,7 @@ sub merge_extract {
             my $to_regex = sub {
                 my $any = shift;
                 my @parts
-                    = map { ref $_ eq 'Regex' ? $_ : qr{\Q$_\E}xmsi }
+                    = map { ref $_ eq 'Regexp' ? $_ : qr{\Q$_\E}xmsi }
                     grep { defined && length }
                     ref $any eq 'ARRAY' ? @{$any} : $any;
                 return @parts
@@ -285,13 +285,13 @@ __END__
 Locale::TextDomain::OO::Extract::Process
 - Prepare PO/MO files for extraction and store them back after extraction
 
-$Id: Process.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: Process.pm 719 2018-09-21 12:58:00Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/Process.pm $
 
 =head1 VERSION
 
-2.014
+2.015
 
 =head1 DESCRIPTION
 
@@ -554,7 +554,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

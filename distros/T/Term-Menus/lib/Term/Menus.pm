@@ -2,7 +2,7 @@ package Term::Menus;
 
 #    Menus.pm
 #
-#    Copyright (C) 2000-2016
+#    Copyright (C) 2000-2018
 #
 #    by Brian M. Kelly. <Brian.Kelly@fullautosoftware.net>
 #
@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.015';
+our $VERSION = '3.016';
 
 
 use 5.006;
@@ -6451,6 +6451,13 @@ END
                                     $Net::FullAuto::FA_Core::makeplan->{$n},
                                   Item   => "&$subfile$sub" }
                         }
+                        $sub=&transform_sicm($sub,$numbor,
+                           \@all_menu_items_array,\%picks,\%pn,
+                           $return_from_child_menu,$log_handle,
+                           $MenuUnit_hash_ref->{Name});
+                        $sub=&transform_pmsi($sub,
+                           $Conveyed,$SaveMMap,
+                           $picks_from_parent);
                         eval "\@resu=\&$subfile$sub";
                         my $firsterr=$@||'';
                         if ((-1<index $firsterr,'Undefined subroutine') &&

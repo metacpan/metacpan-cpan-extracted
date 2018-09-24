@@ -61,7 +61,7 @@
          "web" : "http://github.com/tapper/Tapper-Config"
       }
    },
-   "version" : "5.0.3",
+   "version" : "5.0.4",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -405,7 +405,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.0.3",
+                  "tag" : "v5.0.4",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

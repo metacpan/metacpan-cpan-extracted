@@ -1,5 +1,5 @@
 Name:           perl-DBIx-Array
-Version:        0.59
+Version:        0.62
 Release:        1%{?dist}
 Summary:        DBI Wrapper with Perl style data structure interfaces
 License:        BSD
@@ -10,7 +10,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 Requires:       perl(DBI)
 Requires:       perl(Tie::Cache)
-Requires:       perl(List::MoreUtils) >= 0.07
 BuildRequires:  perl(DBD::CSV)
 BuildRequires:  perl(DBI)
 BuildRequires:  perl(Tie::Cache)
@@ -21,7 +20,6 @@ BuildRequires:  perl(SQL::Abstract)
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  perl(Text::CSV_XS)
 BuildRequires:  perl(XML::Simple)
-BuildRequires:  perl(List::MoreUtils) >= 0.07
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description

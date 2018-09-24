@@ -1,5 +1,10 @@
 Revision history for Perl extension Cookie-Baker
 
+0.10 2018-09-21T07:40:25Z
+
+   - Add samesite https://github.com/kazeburo/Cookie-Baker/pull/13
+   - Documentation cleanup
+
 0.09 2018-03-03T04:33:20Z
 
    - +Ny means +N*60*60*24*365 seconds

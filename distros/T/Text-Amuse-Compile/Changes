@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.23 2018-09-22
+
+ - Report overfull boxes
+
 1.22 2018-09-09
 
  - Support directives: publisher, isbn, rights, seriesname,

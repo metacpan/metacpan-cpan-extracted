@@ -24,8 +24,8 @@ However, you can run tests directly using the 'prove' tool:
   $ prove -lv t/some_test_file.t
   $ prove -lvr t/
 
-In most cases, 'prove' is entirely sufficient for you to test any
-patches you have.
+In most cases, 'prove' is entirely sufficient for you to test any patches you
+have.
 
 You may need to satisfy some dependencies.  The easiest way to satisfy
 dependencies is to install the last release -- this is available at
@@ -82,6 +82,11 @@ instructions for doing that is available here:
 
 https://help.github.com/articles/creating-a-pull-request
 
+All pull requests for this distribution will be automatically tested on Linux
+by Travis at: https://travis-ci.com/moose/MooseX-Getopt
+All results will be visible in the pull request on GitHub. Follow the
+appropriate links for details when tests fail.
+
 If you have found a bug, but do not have an accompanying patch to fix it, you
 can submit an issue report here:
 https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Getopt
@@ -99,5 +104,5 @@ wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
 
 
-This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.014 from a
-template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.143.
+This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.014
+from a template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.145.

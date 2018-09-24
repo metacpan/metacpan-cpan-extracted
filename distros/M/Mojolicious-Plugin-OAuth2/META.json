@@ -1,16 +1,16 @@
 {
    "abstract" : "Auth against OAuth2 APIs",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Marcus Ramberg <marcus.ramberg@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Mojolicious-Plugin-OAuth2",
    "no_index" : {
@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::SSL" : "1.94",
-            "Mojolicious" : "6.0"
+            "Mojolicious" : "7.53"
          }
       },
       "test" : {
@@ -52,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/Mojolicious-Plugin-OAuth2"
       }
    },
-   "version" : "1.55",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.57",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

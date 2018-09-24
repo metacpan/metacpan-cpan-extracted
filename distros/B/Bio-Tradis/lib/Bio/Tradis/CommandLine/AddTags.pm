@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::AddTags;
-$Bio::Tradis::CommandLine::AddTags::VERSION = '1.4.0';
+$Bio::Tradis::CommandLine::AddTags::VERSION = '1.4.1';
 # ABSTRACT: Add given tags to the start of the sequence
 
 
@@ -90,7 +90,7 @@ Bio::Tradis::CommandLine::AddTags - Add given tags to the start of the sequence
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

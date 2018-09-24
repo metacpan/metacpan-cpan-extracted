@@ -1,3 +1,11 @@
+v0.74.2 2018-09-22T11:12:27Z
+ - cdn resources updated
+
+v0.74.1 2018-09-22T10:57:49Z
+ - docker wrapper improved
+ - amcharts4
+ - PAR fixed
+
 v0.74.0 2018-09-18T15:58:56Z
  - http authorization header
  - http2

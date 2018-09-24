@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017 IP2Location.com
+# Copyright (C) 2013-2018 MailboxValidator.com
 # All Rights Reserved
 #
 # This library is free software: you can redistribute it and/or
@@ -22,7 +22,7 @@ use LWP::Simple;
 use URI::Escape;
 use JSON::Parse 'parse_json';
 
-$VERSION = '1.03';
+$VERSION = '1.11';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -40,6 +40,40 @@ sub ValidateEmail
 {
 	my ($self, $email) = @_;
 	my $url = 'http://api.mailboxvalidator.com/v1/validation/single?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
+	
+	my $contents = get($url);
+	
+	if (defined($contents))
+	{
+		return parse_json($contents);
+	}
+	else
+	{
+		return; # error calling API
+	}
+}
+
+sub DisposableEmail
+{
+	my ($self, $email) = @_;
+	my $url = 'http://api.mailboxvalidator.com/v1/email/disposable?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
+	
+	my $contents = get($url);
+	
+	if (defined($contents))
+	{
+		return parse_json($contents);
+	}
+	else
+	{
+		return; # error calling API
+	}
+}
+
+sub FreeEmail
+{
+	my ($self, $email) = @_;
+	my $url = 'http://api.mailboxvalidator.com/v1/email/free?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
 	
 	my $contents = get($url);
 	
@@ -100,6 +134,41 @@ MailboxValidator::SingleValidation - Email verification module for Perl using Ma
 		print 'error_message = ' . $results->{error_message} . "\n";
 	}
 	
+	my $results = $mbv->DisposableEmail('example@example.com');
+	
+	if (!defined($results))
+	{
+		print "Error connecting to API.\n";
+	}
+	elsif ($results->{error_code} eq '')
+	{
+		print 'email_address = ' . $results->{email_address} . "\n";
+		print 'is_disposable = ' . $results->{is_disposable} . "\n";
+		print 'credits_available = ' . $results->{credits_available} . "\n";
+	}
+	else
+	{
+		print 'error_code = ' . $results->{error_code} . "\n";
+		print 'error_message = ' . $results->{error_message} . "\n";
+	}
+	
+	my $results = $mbv->FreeEmail('example@example.com');
+	
+	if (!defined($results))
+	{
+		print "Error connecting to API.\n";
+	}
+	elsif ($results->{error_code} eq '')
+	{
+		print 'email_address = ' . $results->{email_address} . "\n";
+		print 'is_free = ' . $results->{is_free} . "\n";
+		print 'credits_available = ' . $results->{credits_available} . "\n";
+	}
+	else
+	{
+		print 'error_code = ' . $results->{error_code} . "\n";
+		print 'error_message = ' . $results->{error_message} . "\n";
+	}
 
 =head1 DESCRIPTION
 
@@ -111,13 +180,13 @@ This module can be used in many types of projects such as:
  - cleaning your mailing list prior to an email marketing campaign
  - a form of fraud check
 
-Go to L<MailboxValidator API documentation page|http://www.mailboxvalidator.com/api-single-validation> for more info.
+Go to L<MailboxValidator API documentation page|https://www.mailboxvalidator.com/api-single-validation> for more info.
 
 =head1 DEPENDENCIES
 
 An API key is required for this module to function.
 
-Go to L<MailboxValidator API plans page|http://www.mailboxvalidator.com/plans#api> to sign up for FREE API plan and you'll be given an API key.
+Go to L<MailboxValidator API plans page|https://www.mailboxvalidator.com/plans#api> to sign up for FREE API plan and you'll be given an API key.
 
 
 =head1 CLASS METHODS
@@ -136,21 +205,37 @@ Constructs a new MailboxValidator::SingleValidation object with the specified AP
 
 =item $results = $mbv->ValidateEmail('example@example.com');
 
-Returns the MailboxValidator API validation results. See L<MailboxValidator API documentation|http://www.mailboxvalidator.com/api-single-validation> for more details.
+Returns the MailboxValidator Email Validation API validation results. See L<MailboxValidator Email Validation API documentation|https://www.mailboxvalidator.com/api-single-validation> for more details.
+
+=back
+
+=over 4
+
+=item $results = $mbv->DisposableEmail('example@example.com');
+
+Returns the MailboxValidator Disposable Email API results. See L<MailboxValidator Disposable Email API documentation|https://www.mailboxvalidator.com/api-email-disposable> for more details.
+
+=back
+
+=over 4
+
+=item $results = $mbv->FreeEmail('example@example.com');
+
+Returns the MailboxValidator Free Email API results. See L<MailboxValidator Free Email API documentation|https://www.mailboxvalidator.com/api-email-free> for more details.
 
 =back
 
 =head1 SEE ALSO
 
-L<MailboxValidator Website|http://www.mailboxvalidator.com>
+L<MailboxValidator Website|https://www.mailboxvalidator.com>
 
 =head1 VERSION
 
-1.03
+1.11
 
 =head1 AUTHOR
 
-Copyright (c) 2017 MailboxValidator.com
+Copyright (c) 2018 MailboxValidator.com
 
 All rights reserved. This package is free software; It is licensed under the GPL.
 

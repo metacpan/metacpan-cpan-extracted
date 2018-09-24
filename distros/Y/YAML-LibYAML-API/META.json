@@ -1,0 +1,61 @@
+{
+   "abstract" : "Wrapper around the C libyaml library",
+   "author" : [
+      "Tina M\u00fcller <tinita@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "YAML-LibYAML-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.98",
+            "YAML::PP::Parser" : "0",
+            "blib" : "1.01",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "YAML::LibYAML::API" : {
+         "file" : "lib/YAML/LibYAML/API.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlpunk/YAML-LibYAML-API-p5/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perlpunk/YAML-LibYAML-API-p5",
+         "web" : "https://github.com/perlpunk/YAML-LibYAML-API-p5"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

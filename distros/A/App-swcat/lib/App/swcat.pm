@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2018-09-13'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-21'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -14,9 +14,30 @@ use vars '%Config';
 our %SPEC;
 
 our $db_schema_spec = {
-    latest_v => 1,
+    latest_v => 2,
 
     install => [
+        'CREATE TABLE sw_cache (
+             software VARCHAR(128) NOT NULL,
+             name VARCHAR(64) NOT NULL,
+             value TEXT NOT NULL,
+             mtime INT NOT NULL
+         )',
+        'CREATE UNIQUE INDEX ix_sw_cache__software_name ON sw_cache(software,name)',
+    ], # install
+
+    upgrade_to_v2 => [
+        'DROP TABLE sw_cache', # remove all cache
+        'CREATE TABLE sw_cache (
+             software VARCHAR(128) NOT NULL,
+             name VARCHAR(64) NOT NULL,
+             value TEXT NOT NULL,
+             mtime INT NOT NULL
+         )',
+        'CREATE UNIQUE INDEX ix_sw_cache__software_name ON sw_cache(software,name)',
+    ],
+
+    install_v1 => [
         'CREATE TABLE sw_cache (
              software VARCHAR(128) NOT NULL PRIMARY KEY,
              latest_version VARCHAR(32),
@@ -34,7 +55,6 @@ our %args_common = (
     },
     cache_period => {
         schema => 'int*',
-        default => 86400,
         tags => ['common'],
         cmdline_aliases => {
             no_cache => {summary => 'Alias for --cache-period=-1', is_flag=>1, code=>sub { $_[0]{cache_period} = -1 }},
@@ -63,7 +83,7 @@ our %arg0_software = (
     },
 );
 
-our %arg_arch = (
+our %argopt_arch = (
     arch => {
         schema => ['software::arch*'],
     },
@@ -127,11 +147,15 @@ sub _detect_arch {
 sub _set_args_default {
     my $args = shift;
     if (!$args->{db_path}) {
-        require File::HomeDir;
-        $args->{db_path} = File::HomeDir->my_home . '/.cache/swcat.db';
+        require PERLANCAR::File::HomeDir;
+        $args->{db_path} = PERLANCAR::File::HomeDir::get_my_home_dir() .
+            '/.cache/swcat.db';
     }
     if (!$args->{arch}) {
         $args->{arch} = _detect_arch;
+    }
+    if (!defined $args->{cache_period}) {
+        $args->{cache_period} = 86400;
     }
 }
 
@@ -157,8 +181,25 @@ sub _cache_result {
     my $res;
   RETRIEVE: {
         my $cache_exists;
-        log_trace "Getting value from cache ($args{table}, $args{column}, $args{pk}) ...";
-        my @row = $args{dbh}->selectrow_array("SELECT $args{column}, $args{mtime_column} FROM $args{table} WHERE $args{pk_column}=?", {}, $args{pk});
+        log_trace "Getting value from cache (table=%s, column=%s, pk=%s) ...", $args{table}, $args{column}, $args{pk};
+
+        my $sqlwhere;
+        my $sqlcolumns;
+        my $sqlbinds;
+        my @bind;
+        if (ref $args{pk_column} eq 'ARRAY') {
+            $sqlwhere = join(" AND ", map {"$_=?"} @{ $args{pk_column} });
+            $sqlcolumns = join(",", @{ $args{pk_column} });
+            $sqlbinds = join(",", map {"?"} @{ $args{pk_column} });
+            push @bind, @{ $args{pk} };
+        } else {
+            $sqlwhere = "$args{pk_column}=?";
+            $sqlcolumns = $args{pk_column};
+            $sqlbinds = "?";
+            push @bind, $args{pk};
+        }
+
+        my @row = $args{dbh}->selectrow_array("SELECT $args{column}, $args{mtime_column} FROM $args{table} WHERE $sqlwhere", {}, @bind);
         if (!@row) {
             log_trace "Cache doesn't exist yet";
         } elsif ($row[1] < $now - $args{cache_period}) {
@@ -173,9 +214,9 @@ sub _cache_result {
         if ($res->[0] == 200) {
             log_trace "Updating cache ...";
             if ($cache_exists) {
-                $args{dbh}->do("UPDATE $args{table} SET $args{column}=?, $args{mtime_column}=? WHERE $args{pk_column}=?", {}, $res->[2], $now, $args{pk});
+                $args{dbh}->do("UPDATE $args{table} SET $args{column}=?, $args{mtime_column}=? WHERE $sqlwhere", {}, $res->[2], $now, $args{pk}, @bind);
             } else {
-                $args{dbh}->do("INSERT INTO $args{table} ($args{pk_column}, $args{column}, $args{mtime_column}) VALUES (?,?,?)", {}, $args{pk}, $res->[2], $now);
+                $args{dbh}->do("INSERT INTO $args{table} ($sqlcolumns, $args{column}, $args{mtime_column}) VALUES ($sqlbinds, ?,?)", {}, @bind, $res->[2], $now);
             }
         }
     }
@@ -235,14 +276,14 @@ sub latest_version {
 
     my $mod = _load_swcat_mod($args{software});
     _cache_result(
-        code => sub { $mod->get_latest_version },
+        code => sub { $mod->get_latest_version(arch => $args{arch}) },
         dbh => $state->{dbh},
         cache_period => $args{cache_period},
         table => 'sw_cache',
-        pk_column => 'software',
-        pk => $args{software},
-        column => 'latest_version',
-        mtime_column => 'check_latest_version_mtime',
+        pk_column => ['software', 'name'],
+        pk => [$args{software}, "latest_version.$args{arch}"],
+        column => 'value',
+        mtime_column => 'mtime',
     );
 }
 
@@ -253,7 +294,7 @@ $SPEC{download_url} = {
         %args_common,
         %arg0_software,
         #%arg_version,
-        %arg_arch,
+        %argopt_arch,
     },
 };
 sub download_url {
@@ -261,7 +302,7 @@ sub download_url {
     my $state = _init(\%args, 'ro');
 
     my $mod = _load_swcat_mod($args{software});
-    $mod->get_download_url(
+    my $res = $mod->get_download_url(
         maybe arch => $args{arch},
     );
 }
@@ -281,7 +322,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.001 of App::swcat (from Perl distribution App-swcat), released on 2018-09-13.
+This document describes version 0.003 of App::swcat (from Perl distribution App-swcat), released on 2018-09-21.
 
 =head1 SYNOPSIS
 
@@ -310,7 +351,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
-=item * B<cache_period> => I<int> (default: 86400)
+=item * B<cache_period> => I<int>
 
 =item * B<db_path> => I<filename>
 
@@ -348,7 +389,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
-=item * B<cache_period> => I<int> (default: 86400)
+=item * B<cache_period> => I<int>
 
 =item * B<db_path> => I<filename>
 
@@ -386,7 +427,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
-=item * B<cache_period> => I<int> (default: 86400)
+=item * B<cache_period> => I<int>
 
 =item * B<db_path> => I<filename>
 

@@ -1,6 +1,6 @@
 package Bio::Tradis::Analysis::InsertSite;
 # ABSTRACT: Take in a bam file and plot the start position of each read
-$Bio::Tradis::Analysis::InsertSite::VERSION = '1.4.0';
+$Bio::Tradis::Analysis::InsertSite::VERSION = '1.4.1';
 
 
 use Moose;
@@ -201,7 +201,7 @@ Bio::Tradis::Analysis::InsertSite - Take in a bam file and plot the start positi
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

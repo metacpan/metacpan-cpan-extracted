@@ -4,19 +4,19 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub register {
   my ($elf, $app, $config) = @_;
   $app->hook(
     around_action => sub {
       my ($next, $c) = @_;
-      my $res = $next->();
-      if (blessed($res) && $res->can('then')) {
-        my $tx = $c->render_later;
-        $res->then(undef, sub { $c->reply->exception(pop) and undef $tx });
+      my (@args) = $next->();
+      if (blessed($args[0]) && $args[0]->can('then')) {
+        my $tx = $c->render_later->tx;
+        $args[0]->then(undef, sub { $c->reply->exception(pop) and undef $tx });
       }
-      return $res;
+      return @args;
     }
   );
 }

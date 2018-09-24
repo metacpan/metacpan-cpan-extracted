@@ -153,6 +153,7 @@ OUTSTR(char, utf8out);
 %}
 
 %apply const FriBidiChar* str { const char* s }
+%apply const FriBidiBracketType* bracket_types { const char* s }
 
 %apply int { FriBidiStrIndex }
 %apply unsigned long { FriBidiFlags, FriBidiParType, FriBidiCharType }
@@ -173,6 +174,7 @@ OUTSTR(char, utf8out);
 
 %include "fribidi-joining.h"
 %include "fribidi-arabic.h"
+%include "fribidi-deprecated.h"
 
 %apply FriBidiStrIndex *map { FriBidiStrIndex *positions_to_this, 
                               FriBidiStrIndex *position_from_this_list }

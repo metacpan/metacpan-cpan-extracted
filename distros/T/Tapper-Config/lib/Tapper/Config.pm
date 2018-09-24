@@ -1,9 +1,9 @@
 package Tapper::Config;
-# git description: v5.0.2-1-g2d181a9
+# git description: v5.0.3-1-g35a4479
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Context sensitive configuration hub for all Tapper libs
-$Tapper::Config::VERSION = '5.0.3';
+$Tapper::Config::VERSION = '5.0.4';
 use 5.010;
 
 use strict;
@@ -189,7 +189,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

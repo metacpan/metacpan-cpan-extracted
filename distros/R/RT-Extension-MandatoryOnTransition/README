@@ -18,7 +18,8 @@ DESCRIPTION
 
   Supported fields
     This extension only enforces mandatory-ness on defined status
-    transitions.
+    transitions. It also supports defining mandatory fields when
+    transitioning a ticket from one queue to another.
 
    Basics
     Currently the following are supported:
@@ -55,6 +56,11 @@ CAVEATS
 
     On 4.0, Basics and Jumbo are not supported because they do not have the
     needed code, which is present in 4.2.
+
+  Multiple-entry CFs do not play well with must_be and must_not_be
+    The must_be and must_not_be configurations are currently not
+    well-defined for multiply-valued CFs. At current, only their first value
+    is validated against the configured whitelist or blacklist.
 
 INSTALLATION
     perl Makefile.PL
@@ -108,12 +114,34 @@ CONFIGURATION
                 '* -> resolved' => ['TimeWorked', 'CF.Resolution'],
             },
             '*' => {
-                '* -> resolved' => 'CF.Category',
+                '* -> resolved' => ['CF.Category'],
             },
         );
 
     The transition syntax is similar to that found in RT's Lifecycles. See
     perldoc /opt/rt4/etc/RT_Config.pm.
+
+  Restrictions on Queue Transitions
+    The default behavior for MandatoryOnTransition operates on status
+    transitions, so a change from new to open or from open to resolved. It
+    also supports making fields mandatory when transitioning from one queue
+    to another. To define fields that are required when changing the queue
+    for a ticket, add an entry to the configuration like this:
+
+        Set( %MandatoryOnTransition,
+            Helpdesk => {
+                'Engineering' => ['CF.Category'],
+            },
+        );
+
+    The key is the destination queue and the values are the mandatory
+    fields. In this case, before a user can move a ticket from the Helpdesk
+    queue to the Engineering queue, they must provide a value for Category,
+    possibly something like "bug" or "feature request".
+
+    Note that this configuration makes the most sense if the custom fields
+    are applied to both queues. Otherwise the users on the destination queue
+    won't be able to see the required values.
 
   Requiring or Restricting Specific Values
     Sometimes you want to restrict a transition if a field has a specific
@@ -250,7 +278,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MandatoryOnTransition>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2012-2014 by Best Pracical Solutions,
+    This software is Copyright (c) 2012-2018 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

@@ -1,14 +1,14 @@
 package HTTP::Tiny::Patch::Cache;
 
-our $DATE = '2018-02-05'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-20'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use Module::Patch 0.26 qw();
+use Module::Patch qw();
 use base qw(Module::Patch);
 
 our %config;
@@ -28,7 +28,7 @@ my $p_request = sub {
         return $orig->(@_);
     }
 
-    my $tempdir = File::Util::Tempdir::get_tempdir();
+    my $tempdir = File::Util::Tempdir::get_user_tempdir();
     my $cachedir = "$tempdir/http_tiny_patch_cache";
     log_trace "Cache dir is %s", $cachedir;
     unless (-d $cachedir) {
@@ -90,7 +90,7 @@ HTTP::Tiny::Patch::Cache - Cache HTTP::Tiny responses
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::Patch::Cache (from Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-02-05.
+This document describes version 0.002 of HTTP::Tiny::Patch::Cache (from Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-09-20.
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ To clear cache, you can temporarily set cache period to 0:
  % CACHE_MAX_AGE=0 perl -MHTTP::Tiny::Patch::Cache ...
 
 Or you can delete I<$tempdir/http_tiny_patch_cache/>, where I<$tempdir> is
-retrieved from L<File::Util::Tempdir>'s C<get_tempdir()>.
+retrieved from L<File::Util::Tempdir>'s C<get_user_tempdir()>.
 
 =head1 DESCRIPTION
 

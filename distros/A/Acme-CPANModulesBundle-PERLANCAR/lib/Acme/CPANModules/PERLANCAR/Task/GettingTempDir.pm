@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::Task::GettingTempDir;
 
-our $DATE = '2018-06-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-09-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'Getting system-wide temporary directory in a portable way',
@@ -15,6 +15,13 @@ Then there's <pm:File::Util::Tempdir> which tries a little harder. On Unix, its
 `get_tempdir` will look at `TMPDIR`, then also `TEMPDIR`, `TMP`, `TEMP`. If none
 of those are set, it will return the first existing directory from the list:
 `/tmp`, `/var/tmp`. If everything fails, will die.
+
+File::Util::Tempdir also provides `get_user_tempdir` which returns a
+user-private temporary directory, which can be useful if you want to create
+temporary file with predetermined names. It will return temporary directory
+pointed by `XDG_RUNTIME_DIR` (e.g. `/run/user/1000`) or, if unavailable, will
+create a subdirectory under the world-writable temporary directory (e.g.
+`/tmp/1000`).
 
 _
     tags => ['task'],
@@ -43,7 +50,7 @@ Acme::CPANModules::PERLANCAR::Task::GettingTempDir - Getting system-wide tempora
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PERLANCAR::Task::GettingTempDir (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-06-11.
+This document describes version 0.003 of Acme::CPANModules::PERLANCAR::Task::GettingTempDir (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-09-20.
 
 =head1 DESCRIPTION
 
@@ -57,6 +64,13 @@ Then there's L<File::Util::Tempdir> which tries a little harder. On Unix, its
 C<get_tempdir> will look at C<TMPDIR>, then also C<TEMPDIR>, C<TMP>, C<TEMP>. If none
 of those are set, it will return the first existing directory from the list:
 C</tmp>, C</var/tmp>. If everything fails, will die.
+
+File::Util::Tempdir also provides C<get_user_tempdir> which returns a
+user-private temporary directory, which can be useful if you want to create
+temporary file with predetermined names. It will return temporary directory
+pointed by C<XDG_RUNTIME_DIR> (e.g. C</run/user/1000>) or, if unavailable, will
+create a subdirectory under the world-writable temporary directory (e.g.
+C</tmp/1000>).
 
 =head1 INCLUDED MODULES
 

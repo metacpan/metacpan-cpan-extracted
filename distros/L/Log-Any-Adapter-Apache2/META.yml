@@ -27,7 +27,7 @@ no_index:
 provides:
   Log::Any::Adapter::Apache2:
     file: lib/Log/Any/Adapter/Apache2.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Log::Any: '0'
   mod_perl2: '0'
@@ -36,6 +36,6 @@ resources:
   bugtracker: https://github.com/ivanych/Log-Any-Adapter-Apache2/issues
   homepage: https://github.com/ivanych/Log-Any-Adapter-Apache2
   repository: git://github.com/ivanych/Log-Any-Adapter-Apache2.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:IVANYCH
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

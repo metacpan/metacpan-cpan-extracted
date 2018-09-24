@@ -1,4 +1,4 @@
-# $Id: 37-NSEC3-encloser.t 1690 2018-07-03 09:02:10Z willem $	-*-perl-*-
+# $Id: 37-NSEC3-encloser.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -39,7 +39,7 @@ my $nextcloser;
 my $wildcard;
 foreach my $nsec3 (@nsec3) {
 	for ( $nsec3->encloser('a.c.x.w.example') ) {
-		next if length($encloser) > length;
+		next if $encloser && length($encloser) > length;
 		$encloser   = $_;
 		$nextcloser = $nsec3->nextcloser;
 		$wildcard   = $nsec3->wildcard;

@@ -50,7 +50,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use base qw{Astro::Coord::ECI};
 
@@ -170,14 +170,14 @@ sub __almanac_event_type_iterator {
     my $horizon = $station->__get_almanac_horizon();
 
     my @events = (
-	[ $station, next_elevation => [ $self, $horizon, 1 ], 'horizon',
-		[ 'Sunset', 'Sunrise' ] ],
-	[ $station, next_meridian => [ $self ], 'transit',
-		[ 'local midnight', 'local noon' ] ],
+	[ $station, next_elevation => [ $self, $horizon, 1 ],
+	    horizon => '__horizon_name' ],
+	[ $station, next_meridian => [ $self ],
+	    transit => '__transit_name' ],
 	[ $station, next_elevation =>
 	    [ $self, $self->get( 'twilight' ) + $horizon, 0 ],
-		'twilight', ['end twilight', 'begin twilight'] ],
-	[ $self, next_quarter => [], 'quarter', '__quarter_name', ],
+	    twilight => '__twilight_name' ],
+	[ $self, next_quarter => [], quarter => '__quarter_name', ],
     );
 
     return sub {
@@ -493,20 +493,43 @@ per Appendix I (pg 408) of Jean Meeus' "Astronomical Algorithms,"
 
 sub period {return 31558149.7632}	# 365.256363 * 86400
 
-{
+sub __horizon_name_tplt {
+    my ( $self ) = @_;
+    return $self->__object_is_self_named() ?
+	[ '%sset', '%srise' ] :
+	$self->SUPER::__horizon_name_tplt();
+}
 
-    my @quarters = ('Spring equinox', 'Summer solstice',
-	'Fall equinox', 'Winter solstice');
+sub __quarter_name {
+    my ( $self, $event, $tplt ) = @_;
+    $tplt ||= $self->__object_is_self_named() ?
+    [
+	'Spring equinox', 'Summer solstice',
+	'Fall equinox', 'Winter solstice',
+    ] : [
+	'%s Spring equinox', '%s Summer solstice',
+	'%s Fall equinox', '%s Winter solstice',
+    ];
+    my $station;
+    $station = $self->get( 'station' )
+	and ( $station->geodetic() )[0] < 0
+	and $event = ( $event + @{ $tplt } / 2 ) % @{ $tplt };
+    return $self->__event_name( $event, $tplt );
+}
 
-    sub __quarter_name {
-	my ( $self, $quarter, $name ) = @_;
-	$name ||= \@quarters;
-	my $station;
-	$station = $self->get( 'station' )
-	    and ( $station->geodetic() )[0] < 0
-	    and $quarter = ( $quarter + @{ $name } / 2 ) % @{ $name };
-	return $name->[$quarter];
-    }
+sub __transit_name_tplt {
+    my ( $self ) = @_;
+    return $self->__object_is_self_named() ?
+	[ 'local midnight', 'local noon' ] :
+	[ '%s transits nadir', '%s transits meridian' ];
+}
+
+sub __twilight_name {
+    my ( $self, $event, $tplt ) = @_;
+    $tplt ||= $self->__object_is_self_named() ?
+	[ 'end twilight', 'begin twilight' ] :
+	[ 'end %s twilight', 'begin %s twilight' ];
+    return $self->__event_name( $event, $tplt );
 }
 
 =begin comment

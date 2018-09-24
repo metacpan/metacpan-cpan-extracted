@@ -38,7 +38,7 @@ no warnings;
 
 our @EXPORT = qw( descend ); # our @EXPORT = qw( );
 
-$VERSION = '0.59.9'; # our $VERSION = '';
+$VERSION = '0.59.11'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -500,7 +500,14 @@ sub descend
     my ( $weighttwo, $sortmixed ) = @_;
     say $tee "Processing results for case $countcaseplus, block $contblocksplus.";
     open( WEIGHTTWO, $weighttwo ) or die( "$!" );
-    open( SORTMIXED_, ">$sortmixed" ) or die( "$!" );
+    if ( $dowhat{starpositions} ne "" )
+    {
+      open( SORTMIXED_, ">>$sortmixed" ) or die( "$!" );
+    }
+    else
+    {
+      open( SORTMIXED_, ">$sortmixed" ) or die( "$!" );
+    }
     my @lines = <WEIGHTTWO>;
     close WEIGHTTWO;
 

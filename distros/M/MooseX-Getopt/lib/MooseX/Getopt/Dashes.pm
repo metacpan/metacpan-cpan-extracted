@@ -1,7 +1,7 @@
 package MooseX::Getopt::Dashes;
 # ABSTRACT: convert underscores in attribute names to dashes
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Moose::Role;
 with 'MooseX::Getopt';
@@ -33,7 +33,7 @@ MooseX::Getopt::Dashes - convert underscores in attribute names to dashes
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

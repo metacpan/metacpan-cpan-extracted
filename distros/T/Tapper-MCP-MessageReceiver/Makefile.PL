@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Log::Log4perl" => 0,
     "Module::Find" => "0.11",
-    "Mojolicious" => "4.63",
+    "Mojolicious" => "8.0",
     "Mojolicious::Lite" => 0,
     "Tapper::Config" => 0,
     "Tapper::Model" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "5.0.0",
+  "VERSION" => "5.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "IO::Socket::INET" => 0,
   "Log::Log4perl" => 0,
   "Module::Find" => "0.11",
-  "Mojolicious" => "4.63",
+  "Mojolicious" => "8.0",
   "Mojolicious::Lite" => 0,
   "Tapper::Config" => 0,
   "Tapper::Model" => 0,

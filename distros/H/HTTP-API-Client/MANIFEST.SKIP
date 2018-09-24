@@ -12,3 +12,5 @@ Vagrantfile
 dist.ini
 cpanfile.*
 HTTP-API-Client-.*
+Dockerfile
+docker-compose.yml

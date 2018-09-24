@@ -1,4 +1,4 @@
-# $Id: 07-zonefile.t 1601 2017-10-10 14:17:01Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
 
 use strict;
 use IO::File;
@@ -416,14 +416,14 @@ EOF
 
 {
 	my $listref = Net::DNS::ZoneFile::read( $zonefile->name, '.' );
-	ok( scalar(@$listref), 'read(): called as subroutine (not object-oriented)' );
+	ok( scalar(@$listref), 'read(): direct subroutine call (not object-oriented)' );
 }
 
 
 {
 	my $string  = "";
-	my $listref = Net::DNS::ZoneFile->parse( \$string );
-	is( scalar(@$listref), 0, 'parse(): empty string' );
+	my $listref = Net::DNS::ZoneFile::parse( \$string );
+	is( scalar(@$listref), 0, 'parse(): direct subroutine call (not object-oriented)' );
 }
 
 

@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-PromiseActions
 
+0.06 2018-09-24T17:10:17+0200
+
+- Ensure we actually hold on to the tx
+- Return all arguments passed from the action.
+
 0.05 2018-05-23T10:47:41+0200
 - Update required Mojolicious version
 

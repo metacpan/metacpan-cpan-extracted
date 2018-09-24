@@ -1,5 +1,9 @@
 Revision history for Perl extension Log-Any-Adapter-Apache2
 
+0.02 2018-09-20T14:36:52Z
+
+    - Logger is retrieved for each request
+
 0.01 2018-09-18T10:25:41Z
 
     - original version

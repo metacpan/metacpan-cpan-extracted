@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1692 2018-07-06 08:55:39Z willem $	-*-perl-*-
+# $Id: 00-load.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -36,6 +36,7 @@ my @diag;
 foreach my $module (@module) {
 	eval "require $module";
 	my $version = eval { $module->VERSION } || next;
+	$version =~ s/(\.\d)$/${1}0/;
 	push @diag, sprintf "%-25s  %s", $module, $version;
 }
 diag join "\n\t", "\nThese tests were run using:", @diag;

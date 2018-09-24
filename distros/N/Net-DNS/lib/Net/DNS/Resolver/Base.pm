@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1698 2018-07-24 15:29:05Z willem $
+# $Id: Base.pm 1709 2018-09-07 08:03:09Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1698 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
 
 
 #
@@ -281,11 +281,11 @@ sub nameservers {
 			$defres->{persistent} = $self->{persistent};
 
 			my $names  = {};
-			my $packet = $defres->search( $ns, 'A' );
+			my $packet = $defres->send( $ns, 'A' );
 			my @iplist = _cname_addr( $packet, $names );
 
 			if (IPv6) {
-				$packet = $defres->search( $ns, 'AAAA' );
+				$packet = $defres->send( $ns, 'AAAA' );
 				push @iplist, _cname_addr( $packet, $names );
 			}
 
@@ -321,7 +321,7 @@ sub nameservers {
 	return @nameservers;
 }
 
-sub nameserver { &nameservers; }				# uncoverable pod
+sub nameserver { &nameservers; }
 
 sub _cname_addr {
 
@@ -340,11 +340,12 @@ sub _cname_addr {
 }
 
 
-sub answerfrom {
-	my $self = shift;
-	$self->{answerfrom} = shift if scalar @_;
-	return $self->{answerfrom};
+sub replyfrom {
+	return shift->{replyfrom};
 }
+
+sub answerfrom { &replyfrom; }					# uncoverable pod
+
 
 sub _reset_errorstring {
 	shift->{errorstring} = '';
@@ -389,7 +390,7 @@ sub search {
 		my $fqname = $suffix ? join( '.', $name, $suffix ) : $name;
 		$self->_diag( 'search(', $fqname, @_, ')' );
 		my $packet = $self->send( $fqname, @_ ) || next;
-		return $packet->header->ancount ? $packet : next;
+		return $packet if $packet->header->ancount;
 	}
 
 	return undef;
@@ -404,10 +405,10 @@ sub send {
 	return $self->_send_tcp( $packet, $packet_data )
 			if $self->{usevc} || length $packet_data > $self->_packetsz;
 
-	my $ans = $self->_send_udp( $packet, $packet_data ) || return;
+	my $reply = $self->_send_udp( $packet, $packet_data ) || return;
 
-	return $ans if $self->{igntc};
-	return $ans unless $ans->header->tc;
+	return $reply if $self->{igntc};
+	return $reply unless $reply->header->tc;
 
 	$self->_diag('packet truncated: retrying using TCP');
 	$self->_send_tcp( $packet, $packet_data );
@@ -421,7 +422,7 @@ sub _send_tcp {
 
 	my $tcp_packet = pack 'n a*', length($query_data), $query_data;
 	my @ns = $self->nameservers();
-	my $lastanswer;
+	my $fallback;
 	my $timeout = $self->{tcp_timeout};
 
 	foreach my $ip (@ns) {
@@ -433,33 +434,31 @@ sub _send_tcp {
 		$socket->send($tcp_packet);
 		$self->errorstring($!);
 
-		next unless $select->can_read($timeout);	# uncoverable branch
+		next unless $select->can_read($timeout);	# uncoverable branch true
 
 		my $buffer = _read_tcp($socket);
-		$self->answerfrom($ip);
-		$self->_diag( 'answer from', "[$ip]", length($buffer), 'bytes' );
+		$self->{replyfrom} = $ip;
+		$self->_diag( 'reply from', "[$ip]", length($buffer), 'bytes' );
 
 		my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 		$self->errorstring($@);
 		next unless $self->_accept_reply( $reply, $query );
-		$reply->answerfrom($ip);
+		$reply->from($ip);
 
 		if ( $self->{tsig_rr} && !$reply->verify($query) ) {
 			$self->errorstring( $reply->verifyerr );
 			next;
 		}
 
-		$lastanswer = $reply;
-
 		my $rcode = $reply->header->rcode;
-		$self->errorstring($rcode);			# historical quirk
 		return $reply if $rcode eq 'NOERROR';
 		return $reply if $rcode eq 'NXDOMAIN';
+		$fallback = $reply;
 	}
 
-	$self->{errorstring} = $lastanswer->header->rcode if $lastanswer;
+	$self->{errorstring} = $fallback->header->rcode if $fallback;
 	$self->errorstring('query timed out') unless $self->{errorstring};
-	return $lastanswer;
+	return $fallback;
 }
 
 
@@ -474,7 +473,7 @@ sub _send_udp {
 	my $retry   = $self->{retry} || 1;
 	my $servers = scalar(@ns);
 	my $timeout = $servers ? do { no integer; $retrans / $servers } : 0;
-	my $lastanswer;
+	my $fallback;
 
 	# Perform each round of retries.
 RETRY: for ( 1 .. $retry ) {					# assumed to be a small number
@@ -507,16 +506,16 @@ NAMESERVER: foreach my $ns (@ns) {
 			my $reply;
 			while ( my ($socket) = $select->can_read($timeout) ) {
 				my $peer = $socket->peerhost;
-				$self->answerfrom($peer);
+				$self->{replyfrom} = $peer;
 
 				my $buffer = _read_udp( $socket, $self->_packetsz );
-				$self->_diag( "answer from [$peer]", length($buffer), 'bytes' );
+				$self->_diag( "reply from [$peer]", length($buffer), 'bytes' );
 
 				my $packet = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 				$self->errorstring($@);
 				next unless $self->_accept_reply( $packet, $query );
 				$reply = $packet;
-				$reply->answerfrom($peer);
+				$reply->from($peer);
 				last;
 			}					#SELECT LOOP
 
@@ -527,12 +526,10 @@ NAMESERVER: foreach my $ns (@ns) {
 				next;
 			}
 
-			$lastanswer = $reply;
-
 			my $rcode = $reply->header->rcode;
-			$self->errorstring($rcode);		# historical quirk
 			return $reply if $rcode eq 'NOERROR';
 			return $reply if $rcode eq 'NXDOMAIN';
+			$fallback = $reply;
 			$$ns[3] = $rcode;
 		}						#NAMESERVER LOOP
 
@@ -540,9 +537,9 @@ NAMESERVER: foreach my $ns (@ns) {
 		$timeout += $timeout;
 	}							#RETRY LOOP
 
-	$self->{errorstring} = $lastanswer->header->rcode if $lastanswer;
+	$self->{errorstring} = $fallback->header->rcode if $fallback;
 	$self->errorstring('query timed out') unless $self->{errorstring};
-	return $lastanswer;
+	return $fallback;
 }
 
 
@@ -663,17 +660,16 @@ sub _bgread {
 		return;
 	}
 
-	my $peer = $handle->peerhost;
-	$self->answerfrom($peer);
+	my $peer = $self->{replyfrom} = $handle->peerhost;
 
 	my $dgram = $handle->socktype() == SOCK_DGRAM;
 	my $buffer = $dgram ? _read_udp( $handle, $self->_packetsz ) : _read_tcp($handle);
-	$self->_diag( "answer from [$peer]", length($buffer), 'bytes' );
+	$self->_diag( "reply from [$peer]", length($buffer), 'bytes' );
 
 	my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 	$self->errorstring($@);
 	return unless $self->_accept_reply( $reply, $query );
-	$reply->answerfrom($peer);
+	$reply->from($peer);
 
 	return $reply unless $self->{tsig_rr} && !$reply->verify($query);
 	$self->errorstring( $reply->verifyerr );
@@ -690,7 +686,9 @@ sub _accept_reply {
 	return unless $header->qr;
 
 	return 1 unless $query;					# SpamAssassin 3.4.1 workaround
-	return $header->id == $query->header->id;
+
+	return unless $header->id == $query->header->id;
+	$self->errorstring( $header->rcode );			# historical quirk
 }
 
 
@@ -795,7 +793,7 @@ sub _axfr_next {
 	my ($socket) = $select->can_read( $self->{tcp_timeout} );
 	croak $self->errorstring('timed out') unless $socket;
 
-	$self->answerfrom( $socket->peerhost );
+	$self->{replyfrom} = $socket->peerhost;
 
 	my $buffer = _read_tcp($socket);
 	$self->_diag( 'received', length($buffer), 'bytes' );
@@ -1089,6 +1087,33 @@ sub _diag {				## debug output
 }
 
 
+{
+	my $parse_dig = sub {
+		require Net::DNS::ZoneFile;
+
+		my $dug = new Net::DNS::ZoneFile( \*DATA );
+		my @rr	= $dug->read;
+
+		my @auth = grep $_->type eq 'NS', @rr;
+		my %auth = map { lc $_->nsdname => 1 } @auth;
+		my %glue;
+		my @glue = grep $auth{lc $_->name}, @rr;
+		foreach ( grep $_->can('address'), @glue ) {
+			push @{$glue{lc $_->name}}, $_->address;
+		}
+		map @$_, values %glue;
+	};
+
+	my @ip;
+
+	sub _hints {			## default hints
+		@ip = &$parse_dig unless scalar @ip;		# once only, on demand
+		splice @ip, 0, 0, splice( @ip, int( rand scalar @ip ) );    # cut deck
+		return @ip;
+	}
+}
+
+
 our $AUTOLOAD;
 
 sub DESTROY { }				## Avoid tickling AUTOLOAD (in cleanup)
@@ -1114,8 +1139,6 @@ sub AUTOLOAD {				## Default method
 
 1;
 
-__END__
-
 
 =head1 NAME
 
@@ -1136,13 +1159,15 @@ for all your resolving needs.
 
 =head1 METHODS
 
-=head2 new, domain, searchlist, nameservers, print, string, errorstring,
+=head2 new, domain, searchlist, nameserver, nameservers,
 
-=head2 search, query, send, bgsend, bgbusy, bgread, axfr, answerfrom,
+=head2 search, query, send, bgsend, bgbusy, bgread, axfr,
 
 =head2 force_v4, force_v6, prefer_v4, prefer_v6,
 
-=head2 dnssec, srcaddr, tsig, udppacketsize
+=head2 dnssec, srcaddr, tsig, udppacketsize,
+
+=head2 print, string, errorstring, replyfrom
 
 See L<Net::DNS::Resolver>.
 
@@ -1182,4 +1207,70 @@ DEALINGS IN THE SOFTWARE.
 L<perl>, L<Net::DNS>, L<Net::DNS::Resolver>
 
 =cut
+
+
+########################################
+
+__DATA__	## DEFAULT HINTS
+
+; <<>> DiG 9.11.4-RedHat-9.11.4-4.fc28 <<>> @b.root-servers.net . -t NS
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 44111
+;; flags: qr aa rd; QUERY: 1, ANSWER: 13, AUTHORITY: 0, ADDITIONAL: 27
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;.				IN	NS
+
+;; ANSWER SECTION:
+.			518400	IN	NS	c.root-servers.net.
+.			518400	IN	NS	k.root-servers.net.
+.			518400	IN	NS	l.root-servers.net.
+.			518400	IN	NS	j.root-servers.net.
+.			518400	IN	NS	b.root-servers.net.
+.			518400	IN	NS	g.root-servers.net.
+.			518400	IN	NS	h.root-servers.net.
+.			518400	IN	NS	d.root-servers.net.
+.			518400	IN	NS	a.root-servers.net.
+.			518400	IN	NS	f.root-servers.net.
+.			518400	IN	NS	i.root-servers.net.
+.			518400	IN	NS	m.root-servers.net.
+.			518400	IN	NS	e.root-servers.net.
+
+;; ADDITIONAL SECTION:
+a.root-servers.net.	3600000	IN	A	198.41.0.4
+b.root-servers.net.	3600000	IN	A	199.9.14.201
+c.root-servers.net.	3600000	IN	A	192.33.4.12
+d.root-servers.net.	3600000	IN	A	199.7.91.13
+e.root-servers.net.	3600000	IN	A	192.203.230.10
+f.root-servers.net.	3600000	IN	A	192.5.5.241
+g.root-servers.net.	3600000	IN	A	192.112.36.4
+h.root-servers.net.	3600000	IN	A	198.97.190.53
+i.root-servers.net.	3600000	IN	A	192.36.148.17
+j.root-servers.net.	3600000	IN	A	192.58.128.30
+k.root-servers.net.	3600000	IN	A	193.0.14.129
+l.root-servers.net.	3600000	IN	A	199.7.83.42
+m.root-servers.net.	3600000	IN	A	202.12.27.33
+a.root-servers.net.	3600000	IN	AAAA	2001:503:ba3e::2:30
+b.root-servers.net.	3600000	IN	AAAA	2001:500:200::b
+c.root-servers.net.	3600000	IN	AAAA	2001:500:2::c
+d.root-servers.net.	3600000	IN	AAAA	2001:500:2d::d
+e.root-servers.net.	3600000	IN	AAAA	2001:500:a8::e
+f.root-servers.net.	3600000	IN	AAAA	2001:500:2f::f
+g.root-servers.net.	3600000	IN	AAAA	2001:500:12::d0d
+h.root-servers.net.	3600000	IN	AAAA	2001:500:1::53
+i.root-servers.net.	3600000	IN	AAAA	2001:7fe::53
+j.root-servers.net.	3600000	IN	AAAA	2001:503:c27::2:30
+k.root-servers.net.	3600000	IN	AAAA	2001:7fd::1
+l.root-servers.net.	3600000	IN	AAAA	2001:500:9f::42
+m.root-servers.net.	3600000	IN	AAAA	2001:dc3::35
+
+;; Query time: 173 msec
+;; SERVER: 199.9.14.201#53(199.9.14.201)
+;; WHEN: Fri Aug 10 19:03:11 BST 2018
+;; MSG SIZE  rcvd: 811
 

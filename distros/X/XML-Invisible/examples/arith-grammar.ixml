@@ -1,0 +1,9 @@
+expr: +open -arith +close
+open: /( LPAREN )/
+close: /( RPAREN )/
+arith: left -op right
+left: +name
+right: -name
+name: /(a)/ | /(b)/
+op: +sign
+sign: /( PLUS )/

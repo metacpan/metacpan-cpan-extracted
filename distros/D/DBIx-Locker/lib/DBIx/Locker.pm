@@ -4,7 +4,7 @@ use 5.008;
 
 package DBIx::Locker;
 # ABSTRACT: locks for db resources that might not be totally insane
-$DBIx::Locker::VERSION = '0.100119';
+$DBIx::Locker::VERSION = '0.100120';
 use Carp ();
 use DBI;
 use Data::GUID ();
@@ -261,7 +261,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100119
+version 0.100120
 
 =head1 DESCRIPTION
 
@@ -358,7 +358,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Chris Nehren Hans Dieter Pearcey Sergiy Borodych
+=for stopwords Arthur Axel 'fREW' Schmidt Chris Nehren Hans Dieter Pearcey Rob N ★ Sergiy Borodych
 
 =over 4
 
@@ -373,6 +373,10 @@ Chris Nehren <apeiron@cpan.org>
 =item *
 
 Hans Dieter Pearcey <hdp@cpan.org>
+
+=item *
+
+Rob N ★ <robn@robn.io>
 
 =item *
 

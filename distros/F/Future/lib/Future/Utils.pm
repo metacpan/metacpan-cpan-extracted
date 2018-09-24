@@ -8,7 +8,7 @@ package Future::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Exporter 'import';
 # Can't import the one from Exporter as it relies on package inheritance
@@ -61,7 +61,7 @@ Z<>
 
  my $eventual_f = repeat {
     ...
-    return $trail_f;
+    return $trial_f;
  } until => sub { my $f = shift; return acceptable($f) };
 
  my $eventual_f = repeat {

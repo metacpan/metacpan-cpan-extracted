@@ -26,10 +26,10 @@ no_index:
 provides:
   Perl::Build:
     file: lib/Perl/Build.pm
-    version: '1.25'
+    version: '1.27'
   Perl::Build::Built:
     file: lib/Perl/Build/Built.pm
-    version: '1.25'
+    version: '1.27'
 requires:
   CPAN::Perl::Releases: '3.58'
   CPAN::Perl::Releases::MetaCPAN: '0.006'
@@ -37,7 +37,7 @@ requires:
   File::Temp: '0'
   File::pushd: '0'
   Getopt::Long: '0'
-  HTTP::Tinyish: '0'
+  HTTP::Tinyish: '0.15'
   JSON::PP: '0'
   Pod::Usage: '1.63'
   perl: '5.008001'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Perl-Build/issues
   homepage: https://github.com/tokuhirom/Perl-Build
   repository: git://github.com/tokuhirom/Perl-Build.git
-version: '1.25'
+version: '1.27'
 x_contributors:
   - 'Akihiro Uchida <uchida@ike-dyn.ritsumei.ac.jp>'
   - 'AnaTofuZ <anatofuz@gmail.com>'
@@ -61,6 +61,7 @@ x_contributors:
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Masahiro Chiba <nihen@megabbs.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
   - 'Mitch McCracken <mrmccrac@gmail.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Przemysław Wesołek <jest@go.art.pl>'

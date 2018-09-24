@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use RT::Extension::MandatoryOnTransition::Test tests => 32;
+use RT::Extension::MandatoryOnTransition::Test tests => 38;
 
 use_ok('RT::Extension::MandatoryOnTransition');
 
@@ -32,7 +32,7 @@ diag "Test mandatory fields on create";
                           fields => { Queue => 'General',},
                         }, 'Click button to create ticket');
 
-    if (RT::Extension::MandatoryOnTransition::Test::RTAtorNewerThan('4.4.0')){
+    if (RT::Handle::cmp_version( '4.4.0', $RT::VERSION) <= 0) {
         $m->title_is('Create a new ticket in General');
     }
     else{
@@ -42,6 +42,14 @@ diag "Test mandatory fields on create";
 
     $m->submit_form_ok( { form_name => 'TicketCreate',
                           fields => { Status => 'resolved' },
+                        }, 'Submit with resolved status');
+
+    $m->content_contains('Time Worked is required when changing Status to resolved');
+    $m->content_contains('Test Field is required when changing Status to resolved');
+
+    $m->submit_form_ok( { form_name => 'TicketCreate',
+                          fields => { Status => 'resolved',
+                                    "Object-RT::Ticket--CustomField-$id-Values" => '    '},
                         }, 'Submit with resolved status');
 
     $m->content_contains('Time Worked is required when changing Status to resolved');
@@ -73,6 +81,14 @@ diag "Test mandatory fields on create for mobile";
 
     $m->submit_form_ok( { form_name => 'TicketCreate',
                           fields => { Status => 'resolved' },
+                        }, 'Submit with resolved status');
+
+    $m->content_contains('Time Worked is required when changing Status to resolved');
+    $m->content_contains('Test Field is required when changing Status to resolved');
+
+    $m->submit_form_ok( { form_name => 'TicketCreate',
+                          fields => { Status => 'resolved',
+                                    "Object-RT::Ticket--CustomField-$id-Values" => '    '},
                         }, 'Submit with resolved status');
 
     $m->content_contains('Time Worked is required when changing Status to resolved');

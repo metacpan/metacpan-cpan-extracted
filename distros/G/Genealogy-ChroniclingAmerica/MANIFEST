@@ -1,0 +1,27 @@
+Changes
+lib/Genealogy/ChroniclingAmerica.pm
+LICENCE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/10-new.t
+t/chronicling.t
+t/coverage.t
+t/dist.t
+t/kwalitee.t
+t/links.t
+t/manifest.t
+t/no404s.t
+t/noopentickets.t
+t/pod-cm.t
+t/pod.t
+t/port.t
+t/snippets.t
+t/spelling.t
+t/strict.t
+t/unused.t
+t/used.t
+t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

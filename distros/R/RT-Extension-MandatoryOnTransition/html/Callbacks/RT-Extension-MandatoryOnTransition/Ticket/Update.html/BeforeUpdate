@@ -5,7 +5,6 @@ $skip_update
 $results => []
 </%args>
 <%init>
-
 my $errors_ref = RT::Extension::MandatoryOnTransition->CheckMandatoryFields(
     ARGSRef => $ARGSRef,
     Ticket  => $TicketObj,

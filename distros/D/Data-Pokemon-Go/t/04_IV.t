@@ -2,7 +2,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Test::More 1.302 tests => 6;
+use Test::More 1.302 tests => 7;
 use Path::Tiny;
 use YAML::XS;
 
@@ -25,6 +25,9 @@ subtest 'Johto' => sub{ IVs('Johto') };                                 # 4
 subtest 'Hoenn' => sub{ IVs('Hoenn') };                                 # 5
 subtest 'Alola' => sub{ IVs('Alola') };                                 # 6
 
+ok( 1, "Sinnoh region will be added soon" );
+#subtest 'Sinnoh' => sub{ IVs('Sinnoh') };                               # 7
+
 done_testing();
 
 exit;
@@ -39,23 +42,25 @@ sub IVs {
     foreach my $name (@pokemons) {
         next unless $pg->exists($name);
         $pg->name($name);
-        SKIP: {
-            skip "is Not Available", 2 if $pg->isNotAvailable();
-            my $id = $pg->id;
-            note $pg->name . "($id)は" . join( '／', @{$pg->types()} ) . "タイプ";
-            note '種族値は';
-            note 'HPが' . $pg->stamina();
-            note '攻撃が' . $pg->attack();
-            note '防御が' . $pg->defense();
-            my $CP = $IV->_calculate_CP( name => $name, LV => 20, ST => 15, AT => 15, DF => 15 );
+        my $id = $pg->id;
+        note $pg->name . "($id)は" . join( '／', @{$pg->types()} ) . "タイプ";
+        note '種族値は';
+        note 'HPが' . $pg->stamina();
+        note '攻撃が' . $pg->attack();
+        note '防御が' . $pg->defense();
+        my $CP;
+        if ( $pg->isNotAvailable() ) {
+            $CP = $IV->_calculate_CP( name => $name, LV => 40, ST => 15, AT => 15, DF => 15 );
+            note "MAX成長時の個体値完璧の時のCPは$CP";
+            is $CP, $pg->max('Grown'), "calculate CP for $name is ok";
+            ok( 1, "${\$name}は未実装のポケモンのため検算を省略します。" );
+        }else{
+            $CP = $IV->_calculate_CP( name => $name, LV => 20, ST => 15, AT => 15, DF => 15 );
             note "孵化時の個体値完璧の時のCPは$CP";
-            is $CP, $pg->hatchedMAX(), "calculate CP for $name is ok";
-            SKIP: {
-                skip "isNotWild", 1 if $pg->isNotWild();
-                $CP = $IV->_calculate_CP( name => $name, LV => 25, ST => 15, AT => 15, DF => 15 );
-                note "ブースト時の個体値完璧の時のCPは$CP";
-                is $CP, $pg->boostedMAX(), "calculate CP for $name is ok";
-            }
+            is $CP, $pg->max('Hatched'), "calculate CP for $name is ok";
+            $CP = $IV->_calculate_CP( name => $name, LV => 25, ST => 15, AT => 15, DF => 15 );
+            note "ブースト時の個体値完璧の時のCPは$CP";
+            is $CP, $pg->max('Boosted'), "calculate CP for $name is ok";
         }
     }
 };

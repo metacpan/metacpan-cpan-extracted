@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,11 +23,12 @@ requires:
   Lingua::StopWords: '0.09'
   Moo: '0'
   Type::Tiny: '1'
-  WebService::Solr: '0'
+  WebService::Solr: '0.40'
   XML::LibXML: '0'
   namespace::clean: '0'
 resources:
   IRC: irc://irc.freenode.net/#interchange
   bugtracker: https://github.com/interchange/Interchange-Search-Solr/issues
   repository: https://github.com/interchange/Interchange-Search-Solr.git
-version: '0.13'
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

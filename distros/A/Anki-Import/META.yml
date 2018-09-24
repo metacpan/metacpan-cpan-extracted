@@ -3,6 +3,7 @@ abstract: 'Anki note generation made easy.'
 author:
   - 'Steve Dondley <s@dondley.com>'
 build_requires:
+  Data::Dumper: '0'
   File::Path: '0'
   File::Spec: '0'
   Getopt::Args: '0'
@@ -30,6 +31,6 @@ requires:
 resources:
   bugtracker: https://github.com/sdondley/Anki-Import/issues
   repository: git://github.com/sdondley/Anki-Import.git
-version: '0.029'
+version: '0.030'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.70'

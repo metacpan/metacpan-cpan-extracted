@@ -47,37 +47,37 @@ no_index:
 provides:
   MooseX::Getopt:
     file: lib/MooseX/Getopt.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Basic:
     file: lib/MooseX/Getopt/Basic.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Dashes:
     file: lib/MooseX/Getopt/Dashes.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::GLD:
     file: lib/MooseX/Getopt/GLD.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Meta::Attribute:
     file: lib/MooseX/Getopt/Meta/Attribute.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Meta::Attribute::NoGetopt:
     file: lib/MooseX/Getopt/Meta/Attribute/NoGetopt.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Meta::Attribute::Trait:
     file: lib/MooseX/Getopt/Meta/Attribute/Trait.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Meta::Attribute::Trait::NoGetopt:
     file: lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::OptionTypeMap:
     file: lib/MooseX/Getopt/OptionTypeMap.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::ProcessedArgv:
     file: lib/MooseX/Getopt/ProcessedArgv.pm
-    version: '0.73'
+    version: '0.74'
   MooseX::Getopt::Strict:
     file: lib/MooseX/Getopt/Strict.pm
-    version: '0.73'
+    version: '0.74'
 requires:
   Carp: '0'
   Getopt::Long: '2.37'
@@ -99,10 +99,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Getopt
   homepage: https://github.com/moose/MooseX-Getopt
   repository: https://github.com/moose/MooseX-Getopt.git
-version: '0.73'
+version: '0.74'
 x_Dist_Zilla:
   perl:
-    version: '5.029002'
+    version: '5.029003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -536,7 +536,7 @@ x_Dist_Zilla:
           default_jobs: 9
           version: '6.012'
       name: '@Author::ETHER/MakeMaker::Fallback'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
       config:
@@ -571,7 +571,7 @@ x_Dist_Zilla:
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -632,7 +632,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20180820'
+          Module::CoreList: '5.20180920'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -795,7 +795,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.73
+          tag: v0.74
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -868,7 +868,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@Author::ETHER/GitHub::Update'
-      version: '0.46'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -1012,34 +1012,35 @@ x_contributors:
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Brandon L Black <blblack@gmail.com>'
   - 'Shlomi Fish <shlomif@cpan.org>'
-  - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
-  - 'Ryan D Johnson <ryan@innerfence.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Nelo Onyiah <nelo.onyiah@gmail.com>'
+  - 'Ryan D Johnson <ryan@innerfence.com>'
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Ricardo SIGNES <rjbs@cpan.org>'
   - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'
   - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
   - 'Damien Krotkine <dkrotkine@weborama.com>'
-  - 'Jose Luis Martinez <jlmartinez@capside.com>'
-  - 'Chris Prather <chris@prather.org>'
-  - 'Devin Austin <dhoss@cpan.org>'
-  - 'Gregory Oschwald <goschwald@maxmind.com>'
   - 'Todd Hepler <thepler@employees.org>'
-  - 'Michael Schout <mschout@gkg.net>'
-  - 'Andreas Koenig <andk@cpan.org>'
+  - 'Devin Austin <dhoss@cpan.org>'
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
+  - 'Chris Prather <chris@prather.org>'
   - 'Jonathan Swartz <swartz@pobox.com>'
-  - 'John Goulah <jgoulah@cpan.org>'
+  - 'Andreas König <Andreas.Koenig.extern@telecolumbus.de>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'Damyan Ivanov <dmn@debian.org>'
+  - 'Drew Taylor <drew@drewtaylor.com>'
+  - 'Gordon Irving <goraxe@goraxe.me.uk>'
   - 'Jesse Luehrs <doy@tozt.net>'
+  - 'John Goulah <jgoulah@cpan.org>'
+  - 'Andreas Koenig <andk@cpan.org>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'Michael Schout <mschout@gkg.net>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'Stevan Little <stevan.little@gmail.com>'
-  - 'Gordon Irving <goraxe@goraxe.me.uk>'
   - 'Stuart A Johnston <saj_git@thecommune.net>'
-  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
-  - 'Drew Taylor <drew@drewtaylor.com>'
-  - 'Damyan Ivanov <dmn@debian.org>'
-  - 'Justin Hunter <justin.d.hunter@gmail.com>'
-x_generated_by_perl: v5.29.2
+x_generated_by_perl: v5.29.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1
 x_use_unsafe_inc: 0

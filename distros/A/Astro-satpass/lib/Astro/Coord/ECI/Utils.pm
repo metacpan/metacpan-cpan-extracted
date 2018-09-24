@@ -136,7 +136,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -254,7 +254,9 @@ my @all_external = ( qw{
 	nutation_in_longitude nutation_in_obliquity obliquity omega
 	rad2deg rad2dms rad2hms tan theta0 thetag vector_cross_product
 	vector_dot_product vector_magnitude vector_unitize __classisa
-	__default_station __instance __subroutine_deprecation },
+	__default_station __instance __subroutine_deprecation
+	__sprintf
+	},
 	@time_routines );
 our @EXPORT_OK = (
     qw{ @CARP_NOT },	# Package-private, undocumented
@@ -1498,6 +1500,41 @@ sub __instance {
 	return $time + $offset;
     }
 
+}
+
+{
+    # The following ugliness is because in 5.21.2 P5P decided to
+    # introduce a new warnings category, 'redundant' and have sprintf
+    # log that warning if the template did not use all arguments. The
+    # following is to my mind the least bad way to restore the old
+    # behavior. The rejected alternatives were:
+    # * Disable all warnings
+    #   This prohibits possible other warnings from being reported
+    # * Install a $SIG{__WARN__} hook
+    #   I would either have to quash all warnings (giving the above
+    #   behavior with its problems plus a run-time penalty) or analyze
+    #   the warning and decide what to do with it (fragile, since I know
+    #   of no contract not to change warning messages)
+    # * Preprocess the template and truncate the arguments based on
+    #   substitutions found
+    #   This strikes me as complex and fragile, though given the
+    #   template semantics it may be the next-best alternative.
+    #
+    # This mess may end up being exposed, even named as it is, but for
+    # the moment it is private to me.
+    my $no_redundant = $] ge '5.021002' ? 'no warnings qw{ redundant };' : '';
+    eval <<"EOD"	## no critic (ProhibitStringyEval)
+sub __sprintf (\$\@) {
+    my ( \$tplt, \@args ) = \@_;
+    defined \$tplt
+	or return undef;	## no critic (ProhibitReturnUndef)
+    $no_redundant
+    return sprintf \$tplt, \@args;
+}
+
+1
+EOD
+	or die $@;
 }
 
 {

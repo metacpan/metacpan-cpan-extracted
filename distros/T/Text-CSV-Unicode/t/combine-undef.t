@@ -17,7 +17,7 @@ $array[3] = 'world';
 
 my $csv = Text::CSV::Base->new;
 ok $csv->combine(@array), "combine with undef values"; 
-is $csv->string, q{"","hello","","world"}, 
+is $csv->string, q{,"hello",,"world"}, 
 	"combine with undef values - output";
 is $warn, q{}, "combine with undef values - no warnings";
 

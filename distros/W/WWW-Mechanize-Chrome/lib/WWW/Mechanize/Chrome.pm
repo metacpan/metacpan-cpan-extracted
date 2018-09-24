@@ -21,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -440,7 +440,7 @@ sub find_executable( $class, $program=[$class->default_executable_names], @searc
     };
 }
 
-sub _find_free_port( $self, $start ) {
+sub _find_free_port( $class, $start ) {
     my $port = $start;
     while (1) {
         $port++, next unless IO::Socket::INET->new(
@@ -454,7 +454,7 @@ sub _find_free_port( $self, $start ) {
     $port;
 }
 
-sub _wait_for_socket_connection( $self, $host, $port, $timeout ) {
+sub _wait_for_socket_connection( $class, $host, $port, $timeout ) {
     my $wait = time + ($timeout || 20);
     while ( time < $wait ) {
         my $t = time;
@@ -483,12 +483,11 @@ sub spawn_child_posix( $self, @cmd ) {
     # daemonize
     defined(my $pid = fork())   || die "can't fork: $!";
     if( $pid ) {    # non-zero now means I am the parent
-        $self->log('debug', "Spawned child as $pid");
         return $pid;
     };
-    chdir("/")                  || die "can't chdir to /: $!";
 
     # We are the child, close about everything, then exec
+    chdir("/")                  || die "can't chdir to /: $!";
     (setsid() != -1)            || die "Can't start a new session: $!";
     open(STDERR, ">&STDOUT")    || die "can't dup stdout: $!";
     open(STDIN,  "< /dev/null") || die "can't read /dev/null: $!";
@@ -497,16 +496,15 @@ sub spawn_child_posix( $self, @cmd ) {
     exit 1;
 }
 
-sub spawn_child( $self, $localhost, @cmd ) {
+sub spawn_child( $self, @cmd ) {
     my ($pid);
     if( $^O =~ /mswin/i ) {
         $pid = $self->spawn_child_win32(@cmd)
     } else {
         $pid = $self->spawn_child_posix(@cmd)
     };
+    $self->log('debug', "Spawned child as $pid");
 
-    # Just to give Chrome time to start up, make sure it accepts connections
-    $self->_wait_for_socket_connection( $localhost, $self->{port}, $self->{startup_timeout} || 20);
     return $pid
 }
 
@@ -555,24 +553,30 @@ sub new($class, %options) {
         $options{ transport } ||= $ENV{ WWW_MECHANIZE_CHROME_TRANSPORT };
     };
 
-    my $self= bless \%options => $class;
-    my $host = $options{ host } || '127.0.0.1';
-    $self->{log} ||= $self->_build_log;
-
     $options{start_url} = 'about:blank'
         unless exists $options{start_url};
 
-    $options{ reuse } ||= defined $options{ tab };
-    unless ($options{pid} or $options{reuse}) {
+    my $host = $options{ host } || '127.0.0.1';
 
+    $options{ reuse } ||= defined $options{ tab };
+    $options{ extra_headers } ||= {};
+
+    if( $options{ tab } and $options{ tab } eq 'current' ) {
+        $options{ tab } = 0; # use tab at index 0
+    };
+
+    my $self= bless \%options => $class;
+    $self->{log} ||= $self->_build_log;
+
+    unless ($options{pid} or $options{reuse}) {
         unless ( defined $options{ port } ) {
             # Find free port for Chrome to listen on
-            $options{ port } = $self->_find_free_port( 9222 );
+            $options{ port } = $class->_find_free_port( 9222 );
         };
 
         my @cmd= $class->build_command_line( \%options );
         $self->log('debug', "Spawning", \@cmd);
-        $self->{pid} = $self->spawn_child( $host, @cmd );
+        $self->{pid} = $self->spawn_child( @cmd );
         $self->{ kill_pid } = 1;
 
         # Just to give Chrome time to start up, make sure it accepts connections
@@ -582,12 +586,6 @@ sub new($class, %options) {
         # Assume some defaults for the already running Chrome executable
         $options{ port } //= 9222;
     };
-
-    if( $options{ tab } and $options{ tab } eq 'current' ) {
-        $options{ tab } = 0; # use tab at index 0
-    };
-
-    $options{ extra_headers } ||= {};
 
     # Connect to it
     $options{ driver } ||= Chrome::DevToolsProtocol->new(
@@ -606,8 +604,8 @@ sub new($class, %options) {
         transport => $options{ transport },
         log => $options{ log },
     );
-    # Synchronously connect here, just for easy API compatibility
 
+    # Synchronously connect here, just for easy API compatibility
     $self->_connect(%options);
 
     $self
@@ -3165,6 +3163,10 @@ the following keys are recognized:
 
 =item *
 
+C<text> - Find the element to click by its contained text
+
+=item *
+
 C<selector> - Find the element to click by the CSS selector
 
 =item *
@@ -3210,6 +3212,10 @@ sub click {
         %options = %$name;
     } else {
         $options{ name } = $name;
+    };
+
+    if( exists $options{ text }) {
+        $options{ xpath } = sprintf q{//*[text() = "%s"]}, quote_xpath( $options{ text });
     };
 
     if (exists $options{ name }) {

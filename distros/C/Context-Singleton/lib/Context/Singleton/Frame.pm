@@ -1,11 +1,11 @@
 
-
+use v5.10;
 use strict;
 use warnings;
 
 package Context::Singleton::Frame;
 
-our $VERSION = v1.0.4;
+our $VERSION = v1.0.5;
 
 use List::Util;
 use Scalar::Util;

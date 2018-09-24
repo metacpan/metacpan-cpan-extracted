@@ -17,6 +17,7 @@ t/010_objects.t
 t/011_bulk_inserts.t
 t/011_bulk_updates.t
 t/012_bulk_inserts_cursor.t
+t/013_sqlwhere.t
 Todo
 scripts/DBIx-Array-tablename.pl
 scripts/DBIx-Array-bind_param.pl

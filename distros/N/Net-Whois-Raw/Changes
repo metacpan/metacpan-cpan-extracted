@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99019  Sep 24 2018 Alexander Nalobin
+    - fix precedence in 2.99016 fix, thanx to Slaven Rezić.
+
 2.99018  Aug 29 2018 Eugeny Subachev
     - - Fixed/added 'not found' patterns of hn com.hn cd TLDs.
 

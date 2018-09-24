@@ -8,6 +8,7 @@ use_ok('RT::Extension::MandatoryOnTransition');
 diag "Test RequiredFields without a ticket";
 {
     my ($core, $cf) = RT::Extension::MandatoryOnTransition->RequiredFields(
+			   Queue => 'General',
                            From => 'open',
                            To   => 'resolved',
                        );

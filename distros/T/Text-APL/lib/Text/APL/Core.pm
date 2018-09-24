@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Text::APL::Base';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Text::APL::Compiler;
 use Text::APL::Context;

@@ -1,5 +1,9 @@
 Revision history for perl module Text::APL
 
+0.09 2018-09-23T14:56:22Z
+
+ - add license name (Mohammad S Anwar)
+
 0.08 2018-01-10T19:11:43Z
 
  - escape quotes and double quotes

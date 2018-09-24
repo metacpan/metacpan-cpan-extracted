@@ -1,7 +1,7 @@
 package Test::Against::Build;
 use strict;
 use 5.14.0;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -620,11 +620,47 @@ sub analyze_cpanm_build_logs {
 
 =item * Purpose
 
+Tabulate the grades (C<PASS>, C<FAIL>, etc.) assigned to each CPAN
+distribution analyzed in C<analyze_cpanm_build_logs()> and write to a
+separator-delimited file.
+
 =item * Arguments
+
+    $fcdvfile = $self->analyze_json_logs( { verbose => 1, sep_char => '|' } );
+
+Hash reference which, at the present time, can only take only two elements:
+
+=over 4
+
+=item * C<verbose>
+
+Extra information provided on STDOUT.  Optional; defaults to being off;
+provide a Perl-true value to turn it on.  Scope is limited to this method.
+
+=item * C<sep_char>
+
+The separator character used to delimit columns in the output file.  Optional;
+two possibilities:
+
+=over 4
+
+=item * C<|>
+
+Pipe -- in which case the file extension will be C<.psv> (default).
+
+=item * C<,>
+
+Comma -- in which case the file extension will be C<.csv>.
+
+=back
+
+=back
 
 =item * Return Value
 
-=item * Comment
+String holding absolute path to the separator-delimited file created by this
+method.  This file will be placed in the F<storage/> directory in the results
+tree as described above.
 
 =back
 
@@ -724,27 +760,6 @@ sub analyze_json_logs {
 
     return $fcdvfile;
 }
-
-
-=pod
-
-    my $gzipped_build_log = $self->run_cpanm( {
-        module_file => '/path/to/cpan-river-file.txt',
-        title       => 'cpan-river-1000',
-        verbose     => 1,
-    } );
-
-    $ranalysis_dir = $self->analyze_cpanm_build_logs( { verbose => 1 } );
-
-    $fcdvfile = $self->analyze_json_logs( { verbose => 1, sep_char => '|' } );
-
-    834:sub setup_results_directories {
-    933:sub run_cpanm {
-    1010:sub gzip_cpanm_build_log {
-
-=cut
-
-
 
 1;
 

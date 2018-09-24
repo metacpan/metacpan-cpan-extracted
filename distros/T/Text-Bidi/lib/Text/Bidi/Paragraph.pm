@@ -9,7 +9,7 @@ use strict;
 
 package Text::Bidi::Paragraph;
 # ABSTRACT: Run the bidi algorithm on one paragraph
-$Text::Bidi::Paragraph::VERSION = '2.12';
+$Text::Bidi::Paragraph::VERSION = '2.14';
 
 use Text::Bidi;
 
@@ -121,7 +121,7 @@ Text::Bidi::Paragraph - Run the bidi algorithm on one paragraph
 
 =head1 VERSION
 
-version 2.12
+version 2.14
 
 =head1 SYNOPSIS
 

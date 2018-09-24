@@ -1,7 +1,7 @@
 package Acme::CPANModules::CryptoExchange::API;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-22'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => "Modules that interface to cryptocurrency exchanges",
@@ -13,7 +13,7 @@ our $LIST = {
             module => 'WebService::Binance',
         },
         {
-            module => 'Finance::BTCIndo',
+            module => 'Finance::Indodax',
         },
         {
             module => 'Finance::BitFlip',
@@ -32,6 +32,12 @@ our $LIST = {
         },
         {
             module => 'Finance::GDAX::API',
+            summary => 'Last time I tried, not working',
+            alternate_modules => ['Finance::GDAX::Lite'],
+        },
+        {
+            module => 'Finance::GDAX::Lite',
+            summary => 'An alternative which I wrote because Finance::GDAX::API was not working',
         },
         {
             module => 'Finance::LocalBitcoins::API',
@@ -54,7 +60,7 @@ Acme::CPANModules::CryptoExchange::API - Modules that interface to cryptocurrenc
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::CryptoExchange::API (from Perl distribution Acme-CPANModules-CryptoExchange-API), released on 2018-01-09.
+This document describes version 0.003 of Acme::CPANModules::CryptoExchange::API (from Perl distribution Acme-CPANModules-CryptoExchange-API), released on 2018-09-22.
 
 =head1 DESCRIPTION
 
@@ -68,7 +74,7 @@ Modules that interface to cryptocurrency exchanges.
 
 =item * L<WebService::Binance>
 
-=item * L<Finance::BTCIndo>
+=item * L<Finance::Indodax>
 
 =item * L<Finance::BitFlip>
 
@@ -80,7 +86,11 @@ Modules that interface to cryptocurrency exchanges.
 
 =item * L<Finance::BitStamp::API>
 
-=item * L<Finance::GDAX::API>
+=item * L<Finance::GDAX::API> - Last time I tried, not working
+
+Alternate modules: L<Finance::GDAX::Lite>
+
+=item * L<Finance::GDAX::Lite> - An alternative which I wrote because Finance::GDAX::API was not working
 
 =item * L<Finance::LocalBitcoins::API>
 

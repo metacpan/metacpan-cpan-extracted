@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -7981,12 +7981,14 @@ sub _looks_like_real {
 	$output .= _make_tle_checksum ('1%6s%s %-8s %-14s %10s %8s %8s %s %4s',
 	    $oid, $self->get('classification'),
 	    $self->get('international'),
-	    @ele{qw{epoch firstderivative secondderivative bstardrag}},
+	    ( map { $ele{$_} } qw{ epoch firstderivative
+		secondderivative bstardrag} ),
 	    $self->get('ephemeristype'), $self->get('elementnumber'),
 	);
 	$output .= _make_tle_checksum ('2%6s%9.4f%9.4f %-7s%9.4f%9.4f%12.8f%5s',
-	    $oid, @ele{qw{inclination ascendingnode eccentricity
-		argumentofperigee meananomaly meanmotion revolutionsatepoch}},
+	    $oid, ( map { $ele{$_} } qw{ inclination ascendingnode
+		eccentricity argumentofperigee meananomaly meanmotion
+		revolutionsatepoch } ),
 	);
 	return $output;
     }

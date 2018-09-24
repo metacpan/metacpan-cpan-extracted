@@ -1,5 +1,5 @@
 package Bio::Tradis::Map;
-$Bio::Tradis::Map::VERSION = '1.4.0';
+$Bio::Tradis::Map::VERSION = '1.4.1';
 # ABSTRACT: Perform mapping
 
 
@@ -94,7 +94,7 @@ Bio::Tradis::Map - Perform mapping
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

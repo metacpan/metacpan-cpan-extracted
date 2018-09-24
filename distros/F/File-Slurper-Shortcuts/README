@@ -1,0 +1,53 @@
+NAME
+    File::Slurper::Shortcuts - Some convenience additions for File::Slurper
+
+VERSION
+    This document describes version 0.002 of File::Slurper::Shortcuts (from
+    Perl distribution File-Slurper-Shortcuts), released on 2018-09-22.
+
+SYNOPSIS
+     use File::Slurper::Shortcuts qw(replace_text replace_binary);
+     replace_text("dist.ini", sub { s/One/Two/ });
+
+DESCRIPTION
+FUNCTIONS
+  replace_text
+    Usage:
+
+     replace_text($filename, $code, $encoding, $crlf);
+
+    This is like File::Slurper's "write_text" except that instead of
+    $content in the second argument, this routine accepts $code. Code should
+    modify $_ (which contains the content of the file) and return true. This
+    routine will die if: file can't be read with "read_text()", code does
+    not return true, file can't be written to with "write_text()".
+
+  replace_binary
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Slurper-Shortcuts>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Slurper-Shortcuts>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper-Shortcut
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::Slurper
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

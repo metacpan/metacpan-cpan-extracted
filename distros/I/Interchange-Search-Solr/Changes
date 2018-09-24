@@ -1,5 +1,12 @@
 Revision history for Interchange-Search-Solr
 
+0.14 Fri Sep 21 13:21:50 2018 CEST
+
+     [BUG FIXES]
+
+     * Get rid of the Any::Moose prerequisite
+       (Stefan Hornburg/Racke, GH #5).
+
 0.13 Tue Aug 16 08:44:24 2016 CEST
 
      [ENHANCEMENTS]

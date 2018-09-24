@@ -3,13 +3,15 @@ NAME
     private temporary directory
 
 VERSION
-    This document describes version 0.030 of File::Util::Tempdir (from Perl
-    distribution File-Util-Tempdir), released on 2018-09-19.
+    This document describes version 0.033 of File::Util::Tempdir (from Perl
+    distribution File-Util-Tempdir), released on 2018-09-20.
 
 SYNOPSIS
-     use File::Util::Tempdir qw(get_tempdir);
+     use File::Util::Tempdir qw(get_tempdir get_user_tempdir);
 
-     my $dir = get_tempdir();
+     my $tmpdir = get_tempdir(); # => e.g. "/tmp"
+
+     my $mytmpdir = get_tempdir(); # => e.g. "/run/user/1000", or "/tmp/1000"
 
 DESCRIPTION
 FUNCTIONS
@@ -51,11 +53,11 @@ FUNCTIONS
     This routine is like "get_tempdir" except: on Unix, it will look for
     "XDG_RUNTIME_DIR" first (which on a Linux system with systemd will have
     value like "/run/user/1000" which points to a RAM-based tmpfs). Also,
-    "get_user_tempdir" will first check that the temporary directory is
-    owned by the running user. If not, it will create a subdirectory named
-    $EUID ($>) with permission mode 0700 and return that. If that
-    subdirectory already exists and is not owned by the user, will try
-    "$EUID.1" and so on.
+    "get_user_tempdir" will first check that the temporary directory is: 1)
+    owned by the running user; 2) not group- and world-writable. If not, it
+    will create a subdirectory named $EUID ($>) with permission mode 0700
+    and return that. If that subdirectory already exists and is not owned by
+    the user or is group-/world-writable, will try "$EUID.1" and so on.
 
     It will die on failure.
 
@@ -83,6 +85,9 @@ SEE ALSO
     few other related directories.
 
     File::Temp to create a temporary directory.
+
+    <https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest
+    .html> for the specification of "XDG_RUNTIME_DIR".
 
 AUTHOR
     perlancar <perlancar@cpan.org>

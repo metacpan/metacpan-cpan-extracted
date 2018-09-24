@@ -1,4 +1,4 @@
-Locale-TextDomain-OO-Extract version 2.014
+Locale-TextDomain-OO-Extract version 2.015
 ==========================================
 
 Perl OO Interface to Uniforum Message Translation
@@ -38,7 +38,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2009 - 2017,
+Copyright (c) 2009 - 2018,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

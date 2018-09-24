@@ -9,7 +9,7 @@ use Test::More;
 use Log::Any::Adapter::MojoLog;
 use Log::Any qw($log);
 
-my $mojo_log = Mojo::Log->new;
+my $mojo_log = Mojo::Log->new->level('debug');
 $mojo_log->unsubscribe('message');
 my @messages;
 $mojo_log->on(message => sub {
@@ -17,8 +17,6 @@ $mojo_log->on(message => sub {
   push @messages, [@_];
 });
 Log::Any->set_adapter( 'MojoLog', logger => $mojo_log );
-
-$ENV{MOJO_LOG_LEVEL} = 'debug';
 
 _test_log( 'trace',     'debug', 'TEST trace',     'trace' );
 _test_log( 'debug',     'debug', 'TEST debug',     'debug' );
@@ -41,7 +39,7 @@ is( $log->is_alert,     1, 'is_alert' );
 is( $log->is_emergency, 1, 'is_emergency' );
 
 # Set level to error only
-$ENV{MOJO_LOG_LEVEL} = 'error';
+$mojo_log->level('error');
 
 is( $log->is_trace,     '', 'is_trace' );
 is( $log->is_debug,     '', 'is_debug' );

@@ -1,7 +1,12 @@
 # Revision history for URI-Amazon-APA
 #
-# $Id: Changes,v 0.5 2013/07/16 18:32:01 dankogai Exp dankogai $
-$Revision: 0.5 $ $Date: 2013/07/16 18:32:01 $
+# $Id: Changes,v 0.6 2018/09/22 14:19:06 dankogai Exp dankogai $
+$Revision: 0.6 $ $Date: 2018/09/22 14:19:06 $
+! lib/URI/Amazon/APA.pm
+  Support https scheme
+  https://github.com/dankogai/p5-uri-amazon-apa/issues/2
+
+0.5 2013/07/16 18:32:01
 ! lib/URI/Amazon/APA.pm
   Merged: #85910 (URI::query_form has potential to double encode)
   https://github.com/dankogai/p5-uri-amazon-apa/pull/1

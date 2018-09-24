@@ -1,5 +1,5 @@
 package Bio::Tradis::Parser::Cigar;
-$Bio::Tradis::Parser::Cigar::VERSION = '1.4.0';
+$Bio::Tradis::Parser::Cigar::VERSION = '1.4.1';
 # ABSTRACT: Take in a cigar string and output start and end relative to the reference sequence
 
 
@@ -71,7 +71,7 @@ Bio::Tradis::Parser::Cigar - Take in a cigar string and output start and end rel
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

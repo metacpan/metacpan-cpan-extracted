@@ -3,32 +3,33 @@ abstract: 'Generates test data for mysql easily.'
 author:
   - 'Takashi Egawa <egawa.takashi@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.132140'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-HandyGen-mysql
 no_index:
   directory:
     - t
     - inc
 requires:
-  Class::Accessor::Lite: 0
-  DBD::mysql: 0
-  DBI: 1.38
-  Data::Dumper: 0
-  DateTime: 0
-  Getopt::Long: 0
-  JSON: 0
-  SQL::Maker: 0
-  Test::Exception: 0
-  Test::More: 0.87_01
-  Test::Warn: 0
-  Test::mysqld: 0
-  YAML: 0
-version: v0.0.2
+  Class::Accessor::Lite: '0'
+  DBD::mysql: '0'
+  DBI: '1.38'
+  Data::Dumper: '0'
+  DateTime: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  SQL::Maker: '0'
+  String::Random: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Test::Warn: '0'
+  Test::mysqld: '0'
+  YAML: '0'
+version: v0.0.4

@@ -1,0 +1,40 @@
+{
+   "abstract" : "Piecemeal wrapper around Text::CSV for constructing csv files",
+   "author" : [
+      "Richard Newsham <richard@simperl.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-CSV-Piecemeal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::CSV" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://gitlab.com/rnewsham/text-csv-piecemeal.git",
+         "web" : "https://gitlab.com/rnewsham/text-csv-piecemeal"
+      }
+   },
+   "version" : "v0.0001",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

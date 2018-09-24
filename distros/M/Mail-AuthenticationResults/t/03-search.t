@@ -33,6 +33,9 @@ my $Entry = $Parsed->search({ 'isa' => 'entry' });
 is ( $Entry->as_string(), 'one=two three=four (comment) five=six', 'Entry search' );
 is ( scalar @{$Entry->children()}, 1, 'One found' );
 
+my $Header = $Parsed->search({ 'isa' => 'header' });
+is ( $Header->as_string(), "test.example.com;\n    one=two three=four (comment) five=six", 'Entry search' );
+
 my $SubEntry = $Parsed->search({ 'isa' => 'subentry' });
 is ( $SubEntry->as_string(), "three=four (comment);\nfive=six", 'SubEntry search' );
 is ( scalar @{$SubEntry->children()}, 2, 'Two found' );

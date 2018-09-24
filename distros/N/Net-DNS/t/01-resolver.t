@@ -1,7 +1,14 @@
-# $Id: 01-resolver.t 1593 2017-09-04 14:23:26Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 27;
+
+use Net::DNS::Resolver;
+
+local $ENV{'RES_NAMESERVERS'};
+local $ENV{'RES_SEARCHLIST'};
+local $ENV{'LOCALDOMAIN'};
+local $ENV{'RES_OPTIONS'};
 
 
 BEGIN {
@@ -10,9 +17,6 @@ BEGIN {
 		close(TOUCH);
 	};
 }
-
-
-use Net::DNS;
 
 
 my $resolver = Net::DNS::Resolver->new();

@@ -7,7 +7,7 @@ use base qw/Exporter/;
 use URI::Escape;
 
 BEGIN {
-    our $VERSION = "0.09";
+    our $VERSION = "0.10";
     our @EXPORT = qw/bake_cookie crush_cookie/;
     my $use_pp = $ENV{COOKIE_BAKER_PP};
     if (!$use_pp) {
@@ -39,6 +39,9 @@ sub bake_cookie {
     $cookie .= 'path='. $args{path} . '; '       if $args{path};
     $cookie .= 'expires=' . _date($args{expires}) . '; ' if exists $args{expires} && defined $args{expires};
     $cookie .= 'max-age=' . $args{"max-age"} . '; ' if exists $args{"max-age"};
+    if (exists $args{samesite} && $args{samesite} =~ m/^(?:lax|strict)/i) {
+        $cookie .= 'SameSite=' . ucfirst(lc($args{samesite})) . '; '
+    }
     $cookie .= 'secure; '                     if $args{secure};
     $cookie .= 'HttpOnly; '                   if $args{httponly};
     substr($cookie,-2,2,'');
@@ -152,14 +155,14 @@ There is no XS implementation of bake_cookie yet.
 Generates a cookie string for an HTTP response header.
 The first argument is the cookie's name and the second argument is a plain string or hash reference that
 can contain keys such as C<value>, C<domain>, C<expires>, C<path>, C<httponly>, C<secure>,
-C<max-age>.
+C<max-age>, C<samesite>.
 
 
 =over 4
 
 =item value
 
-Cookie's value
+Cookie's value.
 
 =item domain
 
@@ -167,7 +170,7 @@ Cookie's domain.
 
 =item expires
 
-Cookie's expires date time. Several formats are supported
+Cookie's expires date time. Several formats are supported:
 
   expires => time + 24 * 60 * 60 # epoch time
   expires => 'Wed, 03-Nov-2010 20:54:16 GMT'
@@ -178,6 +181,10 @@ Cookie's expires date time. Several formats are supported
   expires => '+3M'  # in three months
   expires => '+10y' # in ten years time (60*60*24*365*10 seconds)
   expires => 'now'  #immediately
+
+=item max-age
+
+If defined, sets the max-age for the cookie.
 
 =item path
 
@@ -190,6 +197,12 @@ If true, sets HttpOnly flag. false by default.
 =item secure
 
 If true, sets secure flag. false by default.
+
+=item samesite
+
+If defined as 'lax' or 'strict' (case-insensitive), sets the SameSite restriction for the cookie as described in the
+L<draft proposal|https://tools.ietf.org/html/draft-west-first-party-cookies-07>, which is already implemented in
+Chrome (v51), Opera (v38) and Firefox (v60).
 
 =back
 

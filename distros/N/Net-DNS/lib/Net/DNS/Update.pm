@@ -1,9 +1,9 @@
 package Net::DNS::Update;
 
 #
-# $Id: Update.pm 1571 2017-06-03 20:14:15Z willem $
+# $Id: Update.pm 1714 2018-09-21 14:14:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1571 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
 
 
 =head1 NAME
@@ -52,8 +52,8 @@ dynamic update.	 Specifically, it creates a packet with the header
 opcode set to UPDATE and the zone record type to SOA (per RFC 2136,
 Section 2.3).
 
-Programs must use the push() method to add RRs to the prerequisite,
-update, and additional sections before performing the update.
+Programs must use the push() method to add RRs to the prerequisite
+and update sections before performing the update.
 
 Arguments are the zone name and the class.  The zone and class may
 be undefined or omitted and default to the default domain from the

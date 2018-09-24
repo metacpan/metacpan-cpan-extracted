@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 use v5.20;
 use strict;
 use Getopt::Long;
@@ -26,7 +26,7 @@ my $unsplash_key;
 my $providers;
 my $viewer;
 my $version;
-my $viewer_default = 'eog';
+my @viewer_default = ('feh', 'eog');
 
 GetOptions('show-url'       => \$show_url,
 	   'list-sources'   => \$list_sources,
@@ -51,6 +51,22 @@ if ($help)         { &help; exit }
 if ($version)      { say $VERSION; exit }
 if ($list_sources) { &list_sources; exit }
 
+##
+## Make sure we have an image viewer
+##
+if (!defined $viewer) {
+    foreach (@viewer_default) {
+	chop($viewer = `which $_`);
+	last if $viewer;
+    }
+}
+unless ($gnome3) {
+    die 'No image viewer found' unless $viewer;
+}
+
+##
+## Make image output directories if we need to
+##
 if (!$output_dir || $output_dir eq '/' || $output_dir eq $ENV{'HOME'}) {
     die "Unlikely output dir $output_dir";
 }
@@ -110,12 +126,12 @@ while (!$quit) {
     if ($delete_after && !$no_delete) {
         remove_files($output_dir, $filename);
     }
-    
+
+    ## Set the desktop background OR view it with a viewer
+    ##
     if ($gnome3) {
         `gsettings set org.gnome.desktop.background picture-uri "file:///$output_dir$filename"`;
-    }
-    if (defined $viewer) {
-        $viewer = $viewer ? $viewer : $viewer_default;
+    } else {
         system("$viewer $output_dir$filename &");
     }
 
@@ -124,9 +140,6 @@ while (!$quit) {
 	if ($saveit) {
 	    say "saving $filename to $save_to_dir";
 	    copy($output_dir.$filename, $save_to_dir);
-	    if ($gnome3) {
-		`gsettings set org.gnome.desktop.background picture-uri "file:///$save_to_dir$filename"`;
-	    }
 	}
     }
 
@@ -138,6 +151,11 @@ while (!$quit) {
     print "\n";
 }
 
+
+
+##
+## Remove files
+##
 sub remove_files {
     my ($dir, $keep_file) = @_;
     return unless -d $dir;
@@ -151,6 +169,9 @@ sub remove_files {
     closedir $dirh;
 }
 
+##
+## List image sources
+##
 sub list_sources {
     my $source = Image::Randim::Source->new;
     map say, @{$source->list};
@@ -188,7 +209,7 @@ Download a random image from a random Internet source.
 --gnome3
     Set the desktop background to the image in Gnome3
 
---viewer [<program>] (default: $viewer_default)
+--viewer [<program>] (defaults: feh and eog)
     Display image in default viewer or the one specified.
 
 --unsplash-key <key>

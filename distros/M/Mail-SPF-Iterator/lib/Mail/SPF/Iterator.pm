@@ -212,7 +212,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.116';
+our $VERSION = '1.117';
 
 use fields (
     # values given in or derived from params to new()
@@ -1294,7 +1294,7 @@ sub _parse_spf {
 	if ($r == 1) {
 	    # looks like a pass all rule
 	    $self->{result} = [
-		$self->{opt}{pass_all},
+		$self->{opt}{pass_all}, "",
 		{ problem => "record designed to allow every sender" }
 	    ];
 	    _update_result_info($self);

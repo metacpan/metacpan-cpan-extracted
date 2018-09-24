@@ -1,5 +1,5 @@
 package Anki::Import ;
-$Anki::Import::VERSION = '0.029';
+$Anki::Import::VERSION = '0.030';
 use strict;
 use warnings;
 use Cwd;
@@ -303,6 +303,18 @@ sub process_note {
 
     # handle formatting codes in text, preserve escaped characters
 
+    # preserve angle brackets between backticks
+    my $parts = [ split /[^\\]`|^`/, $field, -1];
+
+    my $count = 0;
+    foreach my $part (@$parts) {
+      $count++;
+      next if ($count % 2);  # only substitute on odd number array items
+      $part =~ s/</&lt;/g;
+    }
+
+    $field = join '`', @$parts;
+
     # backticked characters
     $field =~ s/(?<!\\)`(.*?)`/<span style="font-family: courier; weight: bold;">$1<\/span>/gm;
     $field =~ s/\\`/`/g;
@@ -373,7 +385,7 @@ Anki::Import - Anki note generation made easy.
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 OVERVIEW
 

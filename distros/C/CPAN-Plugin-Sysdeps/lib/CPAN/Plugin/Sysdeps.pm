@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 use List::Util 'first';
 
@@ -230,6 +230,16 @@ sub _detect_linux_distribution_fallback {
 		 7 => 'wheezy',
 		 8 => 'jessie',
 		 9 => 'stretch',
+		}->{$info{linuxdistroversion}};
+	    return \%info;
+	} elsif ($line =~ m{^(Ubuntu) (\d+\.\d+)}) {
+	    my %info = (linuxdistro => $1, linuxdistroversion => $2);
+	    $info{linuxdistrocodename} =
+		{
+		 '12.04' => 'precise',
+		 '14.04' => 'trusty',
+		 '16.04' => 'xenial',
+		 '18.04' => 'bionic',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} else {

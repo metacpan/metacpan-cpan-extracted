@@ -1,36 +1,72 @@
-SYNOPSIS
+NAME
+    PERLANCAR::File::HomeDir - Lightweight way to get current user's home
+    directory
 
-     use PERLANCAR::Home::Dir qw(get_my_home_dir users_home);
-    
-     my $dir = get_my_home_dir();
-    
-     $dir = users_home("ujang");
+VERSION
+    This document describes version 0.060 of PERLANCAR::File::HomeDir (from
+    Perl distribution PERLANCAR-File-HomeDir), released on 2018-09-20.
+
+SYNOPSIS
+     use PERLANCAR::File::HomeDir qw(get_my_home_dir get_user_home_dir);
+
+     my $dir = get_my_home_dir(); # e.g. "/home/ujang"
+
+     $dir = get_user_home_dir("ujang");
 
 DESCRIPTION
-
     This is a (temporary?) module to get user's home directory. It is a
-    lightweight version of File::HomeDir with fewer OS support (only
-    Windows and Unix) and fewer logic/heuristic.
+    lightweight version of File::HomeDir with fewer OS support (only Windows
+    and Unix) and fewer logic/heuristic.
 
 VARIABLES
-
- $DIE_ON_FAILURE => bool (default: 0)
-
-    If set to true, will die on failure. Else, function usually return
-    undef on failure.
+  $DIE_ON_FAILURE => bool (default: 0)
+    If set to true, will die on failure. Else, function usually return undef
+    on failure.
 
 FUNCTIONS
-
     None are exported by default, but they are exportable.
 
- get_my_home_dir() => str
+  get_my_home_dir
+    Usage:
 
-    Try several ways to get home directory. Return undef or die (depends on
-    $DIE_ON_FAILURE) if everything fails.
+     my $home_dir = get_my_home_dir();
 
- get_users_home_dir($username) => str
+    Try several ways to get home directory of the current user. Return undef
+    or die (depends on $DIE_ON_FAILURE) if everything fails.
+
+  get_user_home_dir
+    Usage:
+
+     my $home_dir = get_user_home_dir($username);
+
+    Try several ways to get home directory of a specified user ($username).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PERLANCAR-File-HomeDir>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-PERLANCAR-File-HomeDir>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PERLANCAR-File-HomeDi
+    r>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     File::HomeDir
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

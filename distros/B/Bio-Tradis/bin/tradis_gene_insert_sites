@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::GeneInsertSites;
-$Bio::Tradis::Bin::GeneInsertSites::VERSION = '1.4.0';
+$Bio::Tradis::Bin::GeneInsertSites::VERSION = '1.4.1';
 # ABSTRACT: Generate insertion site details from TraDIS pipeline plots
 
 # PODNAME: tradis_gene_insert_sites
@@ -319,7 +319,7 @@ tradis_gene_insert_sites - Generate insertion site details from TraDIS pipeline 
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

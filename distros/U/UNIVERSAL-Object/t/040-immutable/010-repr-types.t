@@ -121,6 +121,28 @@ BEGIN {
 
 {
     {
+        package My::RegExpInstance::Test;
+
+        use strict;
+        use warnings;
+
+        our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object::Immutable') }
+
+        sub REPR   { qr// }
+        sub CREATE { $_[0]->REPR }
+    }
+
+    my $instance;
+
+    $@ = undef;
+    eval { $instance = My::RegExpInstance::Test->new };
+    ok(!$@, '... got lack of error');
+
+    isa_ok($instance, 'My::RegExpInstance::Test');
+}
+
+{
+    {
         package My::OverloadedInstance::Test;
 
         use strict;

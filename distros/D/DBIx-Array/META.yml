@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               DBIx-Array
-version:            0.59
+version:            0.62
 abstract:           DBI Wrapper with Perl style data structure interfaces
 author:
     - Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)
@@ -11,12 +11,11 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    DBD::CSV:         0
-    DBI:              0
-    File::Basename:   0
-    List::MoreUtils:  0.07
-    Test::Simple:     0
-    Tie::Cache:       0
+    DBD::CSV:        0
+    DBI:             0
+    File::Basename:  0
+    Test::Simple:    0
+    Tie::Cache:      0
 no_index:
     directory:
         - t

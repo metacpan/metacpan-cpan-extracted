@@ -44,7 +44,7 @@ package Astro::Coord::ECI::Moon;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use base qw{Astro::Coord::ECI};
 
@@ -176,11 +176,11 @@ sub __almanac_event_type_iterator {
     my $horizon = $station->__get_almanac_horizon();
 
     my @events = (
-	[ $station, next_elevation => [ $self, $horizon, 1 ], 'horizon',
-		[ 'Moon set', 'Moon rise' ] ],
-	[ $station, next_meridian => [ $self ], 'transit',
-		[ undef, 'Moon transits meridian' ] ],
-	[ $self, next_quarter => [], 'quarter', '__quarter_name' ],
+	[ $station, next_elevation => [ $self, $horizon, 1 ],
+	    horizon	=> '__horizon_name' ],
+	[ $station, next_meridian => [ $self ],
+	    transit	=> '__transit_name' ],
+	[ $self, next_quarter => [], quarter => '__quarter_name' ],
     );
 
     return sub {
@@ -307,16 +307,17 @@ This method returns the sidereal period of the Moon, per Appendix I
 
 sub period {return 2360591.5968}	# 27.321662 * 86400
 
-{
+sub __horizon_name_tplt {
+    my ( $self ) = @_;
+    return $self->__object_is_self_named() ?
+	[ '%s set', '%s rise' ] :
+	$self->SUPER::__horizon_name_tplt();
+}
 
-    my @quarters = ('New Moon', 'First quarter Moon', 'Full Moon',
-	'Last quarter Moon');
-
-    sub __quarter_name {
-	my ( undef, $quarter, $name ) = @_;	# Invocant unused
-	$name ||= \@quarters;
-	return $name->[$quarter];
-    }
+sub __quarter_name {
+    my ( $self, $event, $tplt ) = @_;
+    $tplt ||= [ 'New %s', 'First quarter %s', 'Full %s', 'Last quarter %s' ];
+    return $self->__event_name( $event, $tplt );
 }
 
 

@@ -1,7 +1,7 @@
 package File::Util::Tempdir;
 
-our $DATE = '2018-09-19'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $DATE = '2018-09-20'; # DATE
+our $VERSION = '0.033'; # VERSION
 
 use strict;
 use warnings;
@@ -35,8 +35,8 @@ sub get_user_tempdir {
         my $dir = $ENV{XDG_RUNTIME_DIR} ?
             $ENV{XDG_RUNTIME_DIR} : get_tempdir();
         my @st = stat($dir);
-        die "Can't stat tempdir '$dir': $!" if $!;
-        return $dir if $st[4] == $>;
+        die "Can't stat tempdir '$dir': $!" unless @st;
+        return $dir if $st[4] == $> && !($st[2] & 022);
         my $i = 0;
         while (1) {
             my $subdir = "$dir/$>" . ($i ? ".$i" : "");
@@ -45,7 +45,7 @@ sub get_user_tempdir {
             if (!@stsub) {
                 mkdir $subdir, 0700 or die "Can't mkdir '$subdir': $!";
                 return $subdir;
-            } elsif ($is_dir && $stsub[4] == $>) {
+            } elsif ($is_dir && $stsub[4] == $> && !($stsub[2] & 022)) {
                 return $subdir;
             } else {
                 $i++;
@@ -69,13 +69,15 @@ File::Util::Tempdir - Cross-platform way to get system-wide & user private tempo
 
 =head1 VERSION
 
-This document describes version 0.030 of File::Util::Tempdir (from Perl distribution File-Util-Tempdir), released on 2018-09-19.
+This document describes version 0.033 of File::Util::Tempdir (from Perl distribution File-Util-Tempdir), released on 2018-09-20.
 
 =head1 SYNOPSIS
 
- use File::Util::Tempdir qw(get_tempdir);
+ use File::Util::Tempdir qw(get_tempdir get_user_tempdir);
 
- my $dir = get_tempdir();
+ my $tmpdir = get_tempdir(); # => e.g. "/tmp"
+
+ my $mytmpdir = get_tempdir(); # => e.g. "/run/user/1000", or "/tmp/1000"
 
 =head1 DESCRIPTION
 
@@ -119,10 +121,11 @@ other location (e.g. via symlink).
 This routine is like L</"get_tempdir"> except: on Unix, it will look for
 C<XDG_RUNTIME_DIR> first (which on a Linux system with systemd will have value
 like C</run/user/1000> which points to a RAM-based tmpfs). Also,
-C<get_user_tempdir> will first check that the temporary directory is owned by
-the running user. If not, it will create a subdirectory named C<$EUID> (C<< $>
->>) with permission mode 0700 and return that. If that subdirectory already
-exists and is not owned by the user, will try C<$EUID.1> and so on.
+C<get_user_tempdir> will first check that the temporary directory is: 1) owned
+by the running user; 2) not group- and world-writable. If not, it will create a
+subdirectory named C<$EUID> (C<< $> >>) with permission mode 0700 and return
+that. If that subdirectory already exists and is not owned by the user or is
+group-/world-writable, will try C<$EUID.1> and so on.
 
 It will die on failure.
 
@@ -152,6 +155,9 @@ L<File::HomeDir>, a cross-platform way to get user's home directory and a few
 other related directories.
 
 L<File::Temp> to create a temporary directory.
+
+L<https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html>
+for the specification of C<XDG_RUNTIME_DIR>.
 
 =head1 AUTHOR
 

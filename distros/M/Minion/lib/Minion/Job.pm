@@ -40,6 +40,8 @@ sub is_finished {
   return 1;
 }
 
+sub kill { CORE::kill($_[1], $_[0]->{pid}) }
+
 sub note {
   my $self = shift;
   return $self->minion->backend->note($self->id, {@_});
@@ -70,13 +72,14 @@ sub start {
   # Reset event loop
   Mojo::IOLoop->reset;
   local @{$SIG}{qw(CHLD INT TERM QUIT)} = ('default') x 4;
+  local @{$SIG}{qw(USR1 USR2)}          = ('ignore') x 2;
 
   # Child
   if (defined(my $err = $self->execute)) { $self->fail($err) }
   POSIX::_exit(0);
 }
 
-sub stop { kill 'KILL', shift->{pid} }
+sub stop { shift->kill('KILL') }
 
 sub _handle {
   my $self = shift;
@@ -411,6 +414,12 @@ Id of worker that is processing the job.
   my $bool = $job->is_finished;
 
 Check if job performed with L</"start"> is finished.
+
+=head2 kill
+
+  $job->kill('INT');
+
+Send a signal to job performed with L</"start">.
 
 =head2 note
 

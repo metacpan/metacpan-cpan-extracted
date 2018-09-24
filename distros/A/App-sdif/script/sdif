@@ -20,6 +20,7 @@ sdif file_1 file_2
 
 diff ... | sdif
 
+    -i, --ignore-case
     -b, --ignore-space-change
     -w, --ignore-all-space
     -B, --ignore-blank-lines
@@ -143,6 +144,7 @@ my @optargs = (
     "nocolor|no-color" => sub { $opt_color = 'never' },
     "colormap|cm=s" => \@opt_colormap,
     "256!" => \$opt_256,
+    "i|ignore-case"         => sub { push @opt_diffopts, '-i'; push @opt_cdifopts, '-i' },
     "b|ignore-space-change" => sub { push @opt_diffopts, '-b'; push @opt_cdifopts, '-w' },
     "w|ignore-all-space"    => sub { push @opt_diffopts, '-w'; push @opt_cdifopts, '-w' },
     "B|ignore-blank-lines"  => sub { push @opt_diffopts, '-B' },
@@ -974,6 +976,8 @@ Default false.
 
 Line number is displayed in 4 digits by default.  Use this option to
 change it.
+
+=item B<-i>, B<--ignore-case>
 
 =item B<-b>, B<--ignore-space-change>
 

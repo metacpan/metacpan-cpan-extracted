@@ -55,6 +55,44 @@ SPVM::Test - SPVM test module
 
   sub main : int ($args : string[]) {
     {
+      my $nums = new int[2];
+    
+      my $var2 = $nums->[0] = $nums->[1] = 1;
+    }
+    {
+      my $nums = new int[1];
+      my $var2 = $nums->[0] = 5;
+      
+      warn($var2);
+    }
+
+    {
+      my $v1 : int;
+      my $v2 : int;
+      my $v3 : int;
+      
+      $v3 = $v2 = $v1 = 543;
+      warn($v2);
+      warn($v3);
+    }
+
+    {
+      my $nums = new int[1];
+      
+      my $var1 = 5;
+      my $var2 = $nums->[0] = $var1;
+      
+      warn($var2);
+    }
+    {
+      my $objects1 = new object[1];
+      
+      $objects1->[0] = $objects1;
+      
+      weaken $objects1->[0];
+      
+    }
+    {
       my $num : string = 1;
     }
     
@@ -163,7 +201,6 @@ SPVM::Test - SPVM test module
       $nums1->[5] = $nums2;
       print($nums1->[5]{re} . "\n");
       print($nums1->[5]{im} . "\n");
-      
     }
     
     {
@@ -1575,11 +1612,11 @@ SPVM::Test - SPVM test module
   sub receive_undef : void ($test_case : TestCase) {
     
   }
-  sub ref_sum : double ($x_in1 : double, $x_in2 : double, $x_out : &double) {
+  sub ref_sum : double ($x_in1 : double, $x_in2 : double, $x_out : double&) {
     $$x_out = $x_in1 + $x_in2;
   }
   
-  sub ref_sum_complex : double ($x_in1 : SPVM::Complex_d2, $x_in2 : SPVM::Complex_d2, $x_out : &SPVM::Complex_d2) {
+  sub ref_sum_complex : double ($x_in1 : SPVM::Complex_d2, $x_in2 : SPVM::Complex_d2, $x_out : SPVM::Complex_d2&) {
     $x_out->{re} = $x_in1->{re} + $x_in2->{re};
     $x_out->{im} = $x_in1->{im} + $x_in2->{im};
   }

@@ -1,0 +1,256 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use MDV::Distribconf::Build;
+use Term::ReadLine;
+use Text::ParseWords;
+use Getopt::Long;
+
+(our $VERSION) = q$Id: editdistrib 12165 2005-11-16 14:28:27Z rgarciasuarez $ =~ /(\d+\.\d+)/;
+
+my @distribs;
+
+# list of available commands
+# name => coderef
+
+my $commands = {
+
+    load => sub {
+        my ($param, @path) = @_;
+        if ($param->{current}{help}) {
+            print "unload path1 [path2 [...]]\n";
+            print "Try to load distrib configuration from given path\n";
+            return;
+        }
+        foreach (@path) {
+            my $dbuild = MDV::Distribconf::Build->new($_);
+            $dbuild->load() or do {
+                print STDERR "Can't load distrib from $_\n";
+                next;
+            };
+            push(@distribs, $dbuild);
+        }
+    },
+
+    unload => sub {
+        my ($param, @ids) = @_;
+        if ($param->{current}{help}) {
+            print "unload ID1 [ID2 [...]]\n";
+            print "Unload tree\n";
+            return;
+        }
+        my @new;
+        foreach my $id (0 .. $#distribs) {
+            grep { $id == $_ } @ids and next;
+            push(@new, $distribs[$id]);
+        }
+        @distribs = @new;
+        $param->{selected} = undef;
+    },
+
+    list => sub {
+        my ($param) = @_;
+        if ($param->{current}{help}) {
+            print "list current load distrib tree\n";
+            return;
+        }
+        foreach (0 .. $#distribs) {
+            my $d = $distribs[$_];
+            printf "%3d %s\n", $_, $d->getpath(undef, "root");
+        }
+    },
+
+    show => sub {
+        my ($param) = shift(@_);
+        local @ARGV = @_;
+        GetOptions(
+            'm=s' => \my @medias,
+            'a' => \my $allmedia,
+        );
+
+        if ($param->{current}{help}) {
+            print "show [-m medianame [-m ...]] [-a] value\n";
+            print "show a value for each distrib\n";
+            print " -a list a value for all media\n";
+            print " -m show the value only for given media\n";
+            print "Default action is to give the global value\n";
+            return;
+        }
+
+        foreach (@{$param->{distrib}}) {
+            my $d = $distribs[$_];
+            printf "%3d %s\n", $_, $d->getpath(undef, "root");
+            my $m;
+
+            if ($allmedia) {
+                $m = [ $d->listmedia ];
+            } elsif (@medias) {
+                $m = \@medias;
+            }
+            if ($m) {
+                foreach my $med (@{$m}) {
+                    foreach my $var (@ARGV) {
+                        printf
+                            " %10s [%10s]: %s\n",
+                            $var,
+                            $med ? $med : "(global)",
+                            $d->getvalue($med, $var);
+                    }
+                }
+            } else {
+                foreach my $var (@ARGV) {
+                    printf
+                        " %10s: %s\n",
+                            $var,
+                            $d->getvalue(undef, $var);
+                }
+            }
+        }
+    },
+
+    addmedia => sub {
+        my ($param, $m, $name) = @_;
+        foreach (@{$param->{distrib}}) {
+            $distribs[$_]->setvalue($m);
+        }
+    },
+
+    delmedia => sub {
+        my ($param, $m) = @_;
+        foreach (@{$param->{distrib}}) {
+            $distribs[$_]->delvalue($m);
+        }
+    },
+
+    sel => sub {
+        my $param = shift(@_);
+        local @ARGV = @_;
+        GetOptions(
+            e => \my $empty,
+        );
+        if ($empty) {
+            $param->{selected} = {};
+        }
+
+        foreach (@ARGV) {
+            if ($_ < 0 || $_ > $#distribs) {
+                next;
+            }
+            $param->{selected}{$_} = 1;
+        }
+    },
+
+    set => sub {
+        my $param = shift(@_);
+        local @ARGV = @_;
+        GetOptions(
+            'm=s' => \my $media,
+            'a' => \my $allmedia,
+        );
+        my ($var, $val) = @ARGV;
+        foreach my $d (@{$param->{distrib}}) {
+            if ($media || $allmedia) {
+                foreach my $m ($distribs[$d]->listmedia) {
+                    if ($media && $m ne $media) {
+                        next;
+                    }
+                    $distribs[$d]->setvalue($m, $var, $val);
+                }
+            } else {
+                $distribs[$d]->setvalue(undef, $var, $val);
+            }
+        }
+    },
+
+    del => sub {
+        my $param = shift(@_);
+        local @ARGV = @_;
+        GetOptions(
+            'm=s' => \my $media,
+            'a' => \my $allmedia,
+        );
+        my ($var) = @ARGV;
+        foreach my $d (@{$param->{distrib}}) {
+            if ($media || $allmedia) {
+                foreach my $m ($distribs[$d]->listmedia) {
+                    if ($media && $m ne $media) {
+                        next;
+                    }
+                    $distribs[$d]->delvalue($m, $var);
+                }
+            } else {
+                $distribs[$d]->delvalue(undef, $var);
+            }
+        }
+    },
+
+    check => sub {
+        my $param = shift(@_);
+        local @ARGV = @_;
+        GetOptions(
+        );
+
+        foreach my $d (@{$param->{distrib}}) {
+            printf "%3d %s\n", $d, $distribs[$d]->getpath(undef, "root");
+            $distribs[$d]->check();
+        }
+    },
+
+    save => sub {
+        my $param = shift(@_);
+        local @ARGV = @_;
+        GetOptions(
+        );
+        foreach my $d (@{$param->{distrib}}) {
+            $distribs[$d]->write_mediacfg();
+        }
+    },
+
+    quit => sub { exit(0) },
+    version => sub { print "version: $VERSION\n" },
+
+};
+
+
+$commands->{load}->(undef, @ARGV);
+
+my $session_param;
+my $term = new Term::ReadLine 'editdistrib';
+my $prompt = '(all) > ';
+while ( defined ($_ = $term->readline($prompt)) ) {
+    local @ARGV = &shellwords($_);
+    my $command = shift(@ARGV);
+    $command ||= ""; # avoid undef
+
+    if ($command eq 'help') {
+        print "Available commands:\n ";
+        print join(' ', sort keys %$commands) . "\n";
+        next;
+    }
+
+    $session_param->{current} = {};
+    my $gl = new Getopt::Long::Parser config => [ qw(pass_through no_auto_abbrev) ];
+    $gl->getoptions(
+        all => \$session_param->{current}{all},
+        'h|help' => \$session_param->{current}{help},
+    );
+
+
+    if ($session_param->{current}{all} || ! $session_param->{selected}) {
+        @{$session_param->{distrib}} = (0 .. $#distribs);
+    } else {
+        @{$session_param->{distrib}} = keys %{$session_param->{selected}};
+    }
+
+    if (defined($commands->{$command})) {
+        $commands->{$command}->($session_param, @ARGV);
+    } else {
+        print STDERR "Unknown command '$command'\n";
+    }
+
+    $prompt = sprintf("(%s) > ",
+        $session_param->{selected} ? join(' ', sort keys %{$session_param->{selected}}) : "all");
+
+}

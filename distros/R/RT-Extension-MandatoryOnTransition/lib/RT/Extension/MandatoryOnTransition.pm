@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.13';
+our $VERSION = '0.16';
 
 =head1 NAME
 
@@ -27,6 +27,8 @@ See the configuration example under L</INSTALLATION>.
 =head2 Supported fields
 
 This extension only enforces mandatory-ness on defined status transitions.
+It also supports defining mandatory fields when transitioning a ticket
+from one queue to another.
 
 =head3 Basics
 
@@ -73,6 +75,12 @@ SelfService, for example.  See L</TODO> for others.
 
 On 4.0, Basics and Jumbo are not supported because they do not have the
 needed code, which is present in 4.2.
+
+=head2 Multiple-entry CFs do not play well with C<must_be> and C<must_not_be>
+
+The C<must_be> and C<must_not_be> configurations are currently not
+well-defined for multiply-valued CFs.  At current, only their first
+value is validated against the configured whitelist or blacklist.
 
 =head1 INSTALLATION
 
@@ -136,12 +144,35 @@ Category selection before resolving tickets in every other queue.
             '* -> resolved' => ['TimeWorked', 'CF.Resolution'],
         },
         '*' => {
-            '* -> resolved' => 'CF.Category',
+            '* -> resolved' => ['CF.Category'],
         },
     );
 
 The transition syntax is similar to that found in RT's Lifecycles.  See
 C<perldoc /opt/rt4/etc/RT_Config.pm>.
+
+=head2 Restrictions on Queue Transitions
+
+The default behavior for C<MandatoryOnTransition> operates on status transitions,
+so a change from C<new> to C<open> or from C<open> to C<resolved>. It also supports
+making fields mandatory when transitioning from one queue to another. To define
+fields that are required when changing the queue for a ticket, add an entry to
+the configuration like this:
+
+    Set( %MandatoryOnTransition,
+        Helpdesk => {
+            'Engineering' => ['CF.Category'],
+        },
+    );
+
+The key is the destination queue and the values are the mandatory fields. In this
+case, before a user can move a ticket from the Helpdesk queue to the
+Engineering queue, they must provide a value for Category, possibly something like
+"bug" or "feature request".
+
+Note that this configuration makes the most sense if the custom fields are applied
+to both queues. Otherwise the users on the destination queue won't be able to see
+the required values.
 
 =head2 Requiring or Restricting Specific Values
 
@@ -261,25 +292,40 @@ sub RequiredFields {
         Queue   => undef,
         From    => undef,
         To      => undef,
+        NewQueue => undef,
+        ToQueue => undef,
         @_,
     );
 
     if ($args{Ticket}) {
-        $args{Queue} ||= $args{Ticket}->QueueObj->Name;
+        $args{Queue} ||= $args{Ticket}->QueueObj->__Value('Name');
         $args{From}  ||= $args{Ticket}->Status;
     }
     my ($from, $to) = @args{qw(From To)};
-    return ([], []) unless $from and $to;
 
-    my %config = $self->Config($args{Queue});
+    if ($args{NewQueue}) {
+        my $queue = RT::Queue->new(RT->SystemUser);
+        $queue->Load($args{NewQueue});
+        $args{ToQueue} = $queue->Name;
+    }
+
+    my ($from_queue, $to_queue) = ($args{Queue}, $args{ToQueue} || $args{Queue});
+
+    return ([], []) unless ($from and $to) or ($from_queue and $to_queue );
+
+    my %config = ();
+    %config = $self->Config($args{Queue});
+
     return ([], []) unless %config;
 
-    # No transition.
-    return ([], []) if $from eq $to;
+   $to ||= '';
+   $from ||= '';
+   $to_queue ||= '*';
 
     my $required = $config{"$from -> $to"}
                 || $config{"* -> $to"}
                 || $config{"$from -> *"}
+		|| $config{$to_queue}
                 || [];
 
     my %core_supported = map { $_ => 1 } @CORE_SUPPORTED;
@@ -344,6 +390,20 @@ sub CheckMandatoryFields {
     my $ARGSRef = $args{'ARGSRef'};
     my @errors;
 
+    # Labels for error messages
+    my %field_label;
+    $field_label{'Status'} = $ARGSRef->{'Status'};
+
+    if ( $ARGSRef->{'Queue'} ){
+        # Provide queue name instead of id for errors and retain
+        # status handling.
+        my $dest_queue_obj = RT::Queue->new(RT->SystemUser);
+        my ($ret, $msg) = $dest_queue_obj->Load($ARGSRef->{'Queue'});
+        RT::Logger->error("Unable to load queue for id " . $ARGSRef->{'Queue'} . " $msg")
+            unless $ret;
+        $field_label{'Queue'} = $dest_queue_obj->Name;
+    }
+
     # Some convenience variables set depending on what gets passed
     my ($CFs, $CurrentUser);
     if ( $args{'Ticket'} ){
@@ -364,16 +424,29 @@ sub CheckMandatoryFields {
         Queue   => $args{'Queue'} ? $args{'Queue'}->Name : undef,
         From    => $args{'From'},
         To      => $args{'To'},
+        NewQueue => $$ARGSRef{'Queue'},
     );
 
     return \@errors unless @$core or @$cfs;
+
+    my $transition =  ($args{'From'} ||'') ne ($args{'To'} || '') ? 'Status' : 'Queue';
+
+    # If we were called from Modify.html (Basics) or ModifyAll.html
+    # (Jumbo), where the SubmitTicket button goes by 'Save Changes',
+    # then set the form field name for Time Worked to 'TimeWorked' in
+    # our local copy of %CORE_FOR_UPDATE
+    my %CORE_FOR_UPDATE_COPY = %CORE_FOR_UPDATE;
+    if ( exists $ARGSRef->{'SubmitTicket'} && $ARGSRef->{'SubmitTicket'} eq 'Save Changes' ) {
+        $CORE_FOR_UPDATE_COPY{'TimeWorked'} = 'TimeWorked';
+        $CORE_FOR_UPDATE_COPY{'TimeTaken'} = 'TimeWorked';
+    }
 
     # Check core fields, after canonicalization for update
     for my $field (@$core) {
 
         # Will we have a value on update/create?
         my $arg = $args{'Ticket'}
-            ? $CORE_FOR_UPDATE{$field}
+            ? $CORE_FOR_UPDATE_COPY{$field}
             : $CORE_FOR_CREATE{$field};
         next unless $arg;
         next if defined $ARGSRef->{$arg} and length $ARGSRef->{$arg};
@@ -385,8 +458,8 @@ sub CheckMandatoryFields {
 
         (my $label = $field) =~ s/(?<=[a-z])(?=[A-Z])/ /g; # /
         push @errors,
-          $CurrentUser->loc("[_1] is required when changing Status to [_2]",
-                                     $label, $CurrentUser->loc($ARGSRef->{Status}));
+          $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",
+            $label, $CurrentUser->loc($transition),  $CurrentUser->loc($field_label{$transition}));
     }
 
     return \@errors unless @$cfs;
@@ -428,11 +501,29 @@ sub CheckMandatoryFields {
             my $submitted = $CFArgs->{$cf->id};
             # Pick the first grouping
             $submitted = $submitted ? $submitted->{(sort keys %$submitted)[0]} : {};
-            $value = $submitted->{Values} // $submitted->{Value};
+
+            my @values;
+            for my $argtype (qw/Values Value/) {
+                next if @values;
+                @values = HTML::Mason::Commands::_NormalizeObjectCustomFieldValue(
+                    CustomField => $cf,
+                    Param => "Object-RT::Ticket-".$TicketId."-CustomField-".$cf->Id."-".$argtype,
+                    Value => $submitted->{$argtype},
+                );
+            }
+            # TODO: Understand multi-value CFs
+            ($value) = @values;
         }
         else {
             my $arg   = "Object-RT::Ticket-".$TicketId."-CustomField-".$cf->Id."-Value";
             $value = ($ARGSRef->{"${arg}s-Magic"} and exists $ARGSRef->{"${arg}s"}) ? $ARGSRef->{$arg . "s"} : $ARGSRef->{$arg};
+            ($value) = grep length, map {
+                s/\r+\n/\n/g;
+                s/^\s+//;
+                s/\s+$//;
+                $_;
+                }
+                grep defined, $value;
         }
 
         # Check for specific values
@@ -441,6 +532,7 @@ sub CheckMandatoryFields {
 
             if ( not defined $cf_value and $args{'Ticket'} ){
                 # Fetch the current value if we didn't receive a new one
+                # TODO: Understand multi-value CFs
                 $cf_value = $args{'Ticket'}->FirstCustomFieldValue($cf->Name);
             }
 
@@ -452,13 +544,13 @@ sub CheckMandatoryFields {
                 my $valid_values = join ", ", @must_be;
                 if ( @must_be > 1 ){
                     push @errors,
-                        $CurrentUser->loc("[_1] must be one of: [_3] when changing Status to [_2]",
-                        $cf->Name, $CurrentUser->loc($ARGSRef->{Status}), $valid_values);
+                        $CurrentUser->loc("[_1] must be one of: [_4] when changing [_2] to [_3]",
+                        $cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 else{
                     push @errors,
-                        $CurrentUser->loc("[_1] must be [_3] when changing Status to [_2]",
-                        $cf->Name, $CurrentUser->loc($ARGSRef->{Status}), $valid_values);
+                        $CurrentUser->loc("[_1] must be [_4] when changing [_2] to [_3]",
+                        $cf->Name, $CurrentUser->loc($transition),  $CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 next;
             }
@@ -471,13 +563,13 @@ sub CheckMandatoryFields {
                 my $valid_values = join ", ", @must_not_be;
                 if ( @must_not_be > 1 ){
                     push @errors,
-                        $CurrentUser->loc("[_1] must not be one of: [_3] when changing Status to [_2]",
-                        $cf->Name, $CurrentUser->loc($ARGSRef->{Status}), $valid_values);
+                        $CurrentUser->loc("[_1] must not be one of: [_4] when changing [_2] to [_3]",
+                        $cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 else{
                     push @errors,
-                        $CurrentUser->loc("[_1] must not be [_3] when changing Status to [_2]",
-                        $cf->Name, $CurrentUser->loc($ARGSRef->{Status}), $valid_values);
+                        $CurrentUser->loc("[_1] must not be [_4] when changing [_2] to [_3]",
+                        $cf->Name, $CurrentUser->loc($transition),$CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 next;
             }
@@ -491,8 +583,8 @@ sub CheckMandatoryFields {
         next if $args{'Ticket'} && $cf->ValuesForObject($args{'Ticket'})->Count;
 
         push @errors,
-          $CurrentUser->loc("[_1] is required when changing Status to [_2]",
-                                     $cf->Name, $CurrentUser->loc($ARGSRef->{Status}));
+          $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",
+                                     $cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}));
     }
 
     return \@errors;
@@ -558,7 +650,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2014 by Best Pracical Solutions, LLC.
+This software is Copyright (c) 2012-2018 by Best Pracical Solutions, LLC.
 
 This is free software, licensed under:
 

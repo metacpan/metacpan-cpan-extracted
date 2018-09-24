@@ -1,4 +1,4 @@
-# $Id: 65-RRSIG-RSASHA1.t 1679 2018-05-24 12:09:36Z willem $	-*-perl-*-
+# $Id: 65-RRSIG-RSASHA1.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -9,7 +9,6 @@ my @prerequisite = qw(
 		Time::Local
 		Net::DNS::RR::RRSIG
 		Net::DNS::SEC
-		Net::DNS::SEC::RSA
 		);
 
 foreach my $package (@prerequisite) {

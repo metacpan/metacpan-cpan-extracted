@@ -1,0 +1,39 @@
+---
+abstract: 'Generates hdlist and synthesis files + compatibility wrapper around the new MDV::Packdrakeng'
+author:
+  - unknown
+build_requires:
+  Digest::MD5: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: rpmtools
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  rpmtools:
+    file: packdrake.pm
+    version: '7.06'
+requires:
+  ExtUtils::MakeMaker: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  MDV::Distribconf: '4.100'
+  MDV::Packdrakeng: '1.13'
+  Pod::Usage: '0'
+  Term::ReadLine: '0'
+  Text::ParseWords: '0'
+  URPM: '5.16'
+resources:
+  repository: git://git.mageia.org/software/rpm/rpmtools/
+version: '7.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

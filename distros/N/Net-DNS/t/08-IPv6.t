@@ -1,4 +1,4 @@
-# $Id: 08-IPv6.t 1628 2018-02-01 13:29:13Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1709 2018-09-07 08:03:09Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -13,21 +13,7 @@ use IO::Select;
 
 my $debug = 0;
 
-my @hints = qw(
-		2001:503:ba3e::2:30
-		2001:500:84::b
-		2001:500:2::c
-		2001:500:2d::d
-		2001:500:a8::e
-		2001:500:2f::f
-		2001:500:12::d0d
-		2001:500:1::53
-		2001:7fe::53
-		2001:503:c27::2:30
-		2001:7fd::1
-		2001:500:9f::42
-		2001:dc3::35
-		);
+my @hints = new Net::DNS::Resolver()->_hints;
 
 my $NOIP = qw(::);
 
@@ -60,10 +46,11 @@ eval {
 
 eval {
 	my $resolver = new Net::DNS::Resolver( nameservers => [@hints] );
+	$resolver->force_v6(1);
 	exit plan skip_all => 'No IPv6 transport' unless $resolver->nameservers;
 
 	my $reply = $resolver->send(qw(. NS IN)) || die;
-	my $from = $reply->answerfrom();
+	my $from = $reply->from();
 
 	my @ns = grep $_->type eq 'NS', $reply->answer, $reply->authority;
 	exit plan skip_all => "Unexpected response from $from" unless scalar @ns;
@@ -348,10 +335,12 @@ SKIP: {
 
 {
 	my $resolver = Net::DNS::Resolver->new();
-	$resolver->searchlist('net');
-
 	my @query = (qw(us SOA IN));
+
+	$resolver->searchlist('net');
 	ok( $resolver->query(@query),  '$resolver->query( name, ... )' );
+
+	$resolver->searchlist('example.com', 'net');
 	ok( $resolver->search(@query), '$resolver->search( name, ... )' );
 
 	$resolver->defnames(0);
@@ -460,7 +449,6 @@ SKIP: {
 	my $axfr_start = $resolver->axfr_start('net-dns.org');
 	ok( $axfr_start, '$resolver->axfr_start()	(historical)' );
 	ok( eval { $resolver->axfr_next() }, '$resolver->axfr_next()	(historical)' );
-	ok( $resolver->answerfrom(), '$resolver->answerfrom() works' );
 
 	$resolver->srcport(-1);
 	my @badsocket = $resolver->axfr();
@@ -580,6 +568,11 @@ SKIP: {
 	ok( !$resolver->_send_udp( $mismatch, $packet->data ), '_send_udp()	id mismatch' );
 	my $handle = $resolver->_bgsend_udp( $mismatch, $packet->data );
 	ok( !$resolver->bgread($handle), 'bgbusy()	id mismatch' );
+}
+
+
+{					## exercise error path in _cname_addr()
+	is( scalar( Net::DNS::Resolver::Base::_cname_addr( undef, undef ) ), 0, '_cname_addr()	no reply packet' );
 }
 
 

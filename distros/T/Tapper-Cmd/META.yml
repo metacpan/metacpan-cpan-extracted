@@ -51,7 +51,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-Cmd
   homepage: http://metacpan.org/release/Tapper-Cmd
   repository: git://github.com/tapper/Tapper-Cmd.git
-version: 5.0.8
+version: 5.0.9
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -314,7 +314,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.0.8
+          tag: v5.0.9
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

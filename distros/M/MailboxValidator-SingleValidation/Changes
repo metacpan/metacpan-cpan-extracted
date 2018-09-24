@@ -11,3 +11,9 @@ Revision history for Perl extension MailboxValidator::SingleValidation.
 
 1.03  12th July 2017
       Configured Makefile.PL with pre-requisites modules
+
+1.10  20th September 2018
+      Added new DisposableEmail and FreeEmail
+
+1.11  20th September 2018
+      Fixed make issue

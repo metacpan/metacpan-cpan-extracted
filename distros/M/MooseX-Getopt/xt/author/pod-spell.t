@@ -58,6 +58,7 @@ Karen
 Koenig
 Kogman
 Krotkine
+König
 Little
 Luehrs
 Luis

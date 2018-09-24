@@ -6,7 +6,7 @@ SYNOPSIS
    
         my $template = URI::Template->new( 'http://example.com/{x}' );
         my $uri      = $template->process( x => 'y' );
-
+    
         # or
     
         my $template = URI::Template->new();
@@ -14,6 +14,12 @@ SYNOPSIS
         my $uri      = $template->process( x => 'y' );
     
         # uri is a URI object with value 'http://example.com/y'
+
+    or
+
+        use URI::Template ':template_process'
+    
+        my $uri = template_process ( 'http://example.com/{x}', x => 'y' );
 
 DESCRIPTION
     This module provides a wrapper around URI templates as described in RFC
@@ -52,13 +58,27 @@ METHODS
     Processes input like the "process" method, but doesn't inflate the
     result to a URI object.
 
+EXPORTED FUNCTIONS
+  template_process( $template => \%vars )
+    This is the same as "URI::Template->new($template)->process(\%vars)" But
+    shorter, and usefull for quick and easy genrating a nice URI form
+    parameters.
+
+    Returns an URI object
+
+  template_process_as_string( $template => \%vars )
+    Same as above, but obviously, returns a string.
+
 AUTHORS
     *   Brian Cassidy <bricas@cpan.org>
 
     *   Ricardo SIGNES <rjbs@cpan.org>
 
+CONTRIBUTERS
+    *   Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>
+
 COPYRIGHT AND LICENSE
-    Copyright 2007-2015 by Brian Cassidy
+    Copyright 2007-2018 by Brian Cassidy
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

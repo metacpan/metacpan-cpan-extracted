@@ -1151,13 +1151,22 @@ sub parse_tex_log_file {
           or $self->log_fatal("Couldn't open $logfile $!");
 
         my %errors;
+        my $continue = 0;
 
         while (my $line = <$fh>) {
+            chomp $line;
             if ($line =~ m/^missing character/i) {
-                chomp $line;
                 # if we get the warning, nothing we can do about it,
                 # but shouldn't happen.
                 $errors{$line} = 1;
+            }
+            elsif ($line =~ m/^Overfull/) {
+                $self->log_info(decode_utf8($line) . "\n");
+                $continue++;
+            }
+            elsif ($continue) {
+                $self->log_info(decode_utf8($line) . "\n\n");
+                $continue = 0;
             }
         }
         close $fh;

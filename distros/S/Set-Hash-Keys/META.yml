@@ -16,4 +16,4 @@ no_index:
     - inc
 resources:
   repository: https://github.com/THEMA-MEDIA/Set-Hash-Keys.git
-version: 0.01
+version: 0.02

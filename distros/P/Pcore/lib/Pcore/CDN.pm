@@ -59,9 +59,7 @@ sub get_resources ( $self, @resources ) {
 }
 
 # TODO
-sub _get_res_fa ( $self, $ver = undef ) {
-    $ver ||= 'v5.3.1';
-
+sub _get_res_fa ( $self, $ver = 'v5.3.1' ) {
     return [qq[<link rel="stylesheet" href="@{[ $self->("/static/fa-$ver/css/all.min.css") ]}" integrity="" crossorigin="anonymous" />]];
 }
 
@@ -99,17 +97,26 @@ sub _get_res_ext ( $self, $ver, $type, $theme, $default_theme, $debug = undef ) 
 }
 
 # TODO
-sub _get_res_amcharts ( $self, $ver = undef ) {
-    $ver ||= 'v3.21.13';
-
+sub _get_res_amcharts3 ( $self, $ver = 'v3.21.13' ) {
     return [ $self->("/static/amcharts-$ver/") ];
 }
 
 # TODO
-sub _get_res_ammap ( $self, $ver = undef ) {
-    $ver ||= 'v3.21.13';
-
+sub _get_res_ammap3 ( $self, $ver = 'v3.21.13' ) {
     return [ $self->("/static/ammap-$ver/") ];
+}
+
+# TODO
+sub _get_res_amcharts4 ( $self, $ver = 'v4.0.0.b51' ) {
+    return [ $self->("/static/amcharts-$ver/") ];
+}
+
+sub _get_res_amcharts4_geodata ( $self, $ver = 'v4.0.11' ) {
+    return [ $self->("/static/amcharts-geodata-$ver/") ];
+}
+
+sub _get_res_jquery ( $self, $ver = 'v3.3.1' ) {
+    return [qq[<script src="@{[ $self->("/static/jquery-$ver.min.js") ]}" integrity="" crossorigin="anonymous"></script>]];
 }
 
 1;
@@ -121,11 +128,14 @@ sub _get_res_ammap ( $self, $ver = undef ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
 ## |      | 62                   | * Private subroutine/method '_get_res_fa' declared but not used                                                |
-## |      | 69                   | * Private subroutine/method '_get_res_ext' declared but not used                                               |
-## |      | 102                  | * Private subroutine/method '_get_res_amcharts' declared but not used                                          |
-## |      | 109                  | * Private subroutine/method '_get_res_ammap' declared but not used                                             |
+## |      | 67                   | * Private subroutine/method '_get_res_ext' declared but not used                                               |
+## |      | 100                  | * Private subroutine/method '_get_res_amcharts3' declared but not used                                         |
+## |      | 105                  | * Private subroutine/method '_get_res_ammap3' declared but not used                                            |
+## |      | 110                  | * Private subroutine/method '_get_res_amcharts4' declared but not used                                         |
+## |      | 114                  | * Private subroutine/method '_get_res_amcharts4_geodata' declared but not used                                 |
+## |      | 118                  | * Private subroutine/method '_get_res_jquery' declared but not used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 69                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 67                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

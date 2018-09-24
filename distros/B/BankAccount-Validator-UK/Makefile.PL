@@ -33,8 +33,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'BankAccount::Validator::UK'       => { file => 'lib/BankAccount/Validator/UK.pm'     , version => '0.42' },
-            'BankAccount::Validator::UK::Rule' => { file => 'lib/BankAccount/Validator/UK/Rule.pm', version => '0.42' },
+            'BankAccount::Validator::UK'       => { file => 'lib/BankAccount/Validator/UK.pm'     , version => '0.43' },
+            'BankAccount::Validator::UK::Rule' => { file => 'lib/BankAccount/Validator/UK/Rule.pm', version => '0.43' },
         },
         resources => {
             repository => {

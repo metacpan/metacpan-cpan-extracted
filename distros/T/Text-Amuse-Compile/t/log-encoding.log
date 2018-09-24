@@ -1236,3 +1236,22 @@ Here is how much of TeX's memory you used:
  48i,8n,55p,1750b,325s stack positions out of 5000i,500n,10000p,200000b,50000s
 
 Output written on prova.pdf (27 pages).
+/tmp/test.log
+Underfull \hbox (badness 1033) in paragraph at lines 7820--7821
+[]\TU/FreeSerif(0)/m/n/12 – Sì, ma mi mancano gli scarponi. Devo averli
+ []
+
+[253] [254] [255] [256] [257]
+Overfull \hbox (2.99321pt too wide) in paragraph at lines 7988--7989
+[]\TU/FreeSerif(0)/m/n/12 Nonostante le promesse Antonia aveva riempito un’in-
+ []
+
+[258] [259] [260] [261] [262]
+Overfull \hbox (47.63322pt too wide) in paragraph at lines 8159--8160
+[]\TU/FreeSerif(0)/m/n/12 – Dunque, eravamo rimasti al cosiddetto “pre-condizio
+namento
+ []
+
+[263] [264] [265] [266] [267] [268] [269] [270] [271] [272] [273] [274]
+Underfull \hbox (badness 1009) in paragraph at lines 8534--8535
+[]\TU/FreeSerif(0)/m/n/12 – Ah, mi dispiace… Ma non vedo come posso

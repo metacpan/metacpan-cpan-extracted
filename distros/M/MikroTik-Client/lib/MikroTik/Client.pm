@@ -13,7 +13,7 @@ use constant CONN_TIMEOUT => $ENV{MIKROTIK_CLIENT_CONNTIMEOUT};
 use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
 use constant PROMISES     => !!(eval { require Mojo::Promise; 1 });
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 has error     => '';
 has host      => '192.168.88.1';
@@ -366,11 +366,9 @@ object.
   my $new_login = $api->new_login;
   $api          = $api->new_login(1);
 
-Use new login scheme introduced in RouterOS C<v6.43>. Since it's requires clear
-text password, it will be default only for L</tls> connections.
-
-Cause C<v6.43> actually accepts both schemes, it's kinda lax change. Future
-behaviour will depend on MikroTik policies.
+Use new login scheme introduced in RouterOS C<v6.43> and fallback to previous
+one for older systems. Since in this mode a password will be send in clear text,
+for some time, it will be default only for L</tls> connections.
 
 =head2 password
 

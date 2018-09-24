@@ -1,0 +1,16 @@
+Changes
+examples/arith-grammar.ixml
+lib/XML/Invisible.pm
+lib/XML/Invisible/Receiver.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-report-prereqs.t
+t/language-parser.t
+t/lib/JTTest.pm
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

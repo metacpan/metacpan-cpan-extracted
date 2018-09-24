@@ -1,16 +1,16 @@
-# $Id: 01-resolver-file.t 1573 2017-06-12 11:03:59Z willem $
+# $Id: 01-resolver-file.t 1709 2018-09-07 08:03:09Z willem $
 
 use strict;
 use File::Spec;
 use Test::More tests => 16;
 
-use Net::DNS;
-
+use Net::DNS::Resolver;
 
 local $ENV{'RES_NAMESERVERS'};
 local $ENV{'RES_SEARCHLIST'};
 local $ENV{'LOCALDOMAIN'};
 local $ENV{'RES_OPTIONS'};
+
 
 my $class = 'Net::DNS::Resolver';
 

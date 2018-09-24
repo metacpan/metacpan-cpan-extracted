@@ -1,9 +1,9 @@
 package Net::DNS::Question;
 
 #
-# $Id: Question.pm 1530 2017-01-27 10:40:37Z willem $
+# $Id: Question.pm 1714 2018-09-21 14:14:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1530 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
 
 
 =head1 NAME
@@ -202,7 +202,7 @@ sub name {
     $qname = $question->qname;
     $zname = $question->zname;
 
-Canonical ASCII domain name as required for the query subject
+Fully qualified domain name in the form required for a query
 transmitted to a nameserver.  In dynamic update packets, this
 attribute is known as zname() and refers to the zone name.
 

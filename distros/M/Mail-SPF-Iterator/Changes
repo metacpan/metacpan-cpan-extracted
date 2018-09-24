@@ -1,3 +1,7 @@
+1.117 2018-09-24
+- fixed mail header when pass_all matched to include reason etc
+- add --passall option to samples/spflookup.pl
+
 1.116 2018-09-01
 - New option 'pass_all'. This can be used to override the 'pass' outcome
   in case a policy was detected which is designed to pass everything (very crude

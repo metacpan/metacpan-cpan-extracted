@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
 
 package RT::Extension::MandatoryOnTransition::Test;
 
@@ -30,7 +30,7 @@ sub import {
         $args{'testing'} = 'RT::Extension::MandatoryOnTransition';
     }
 
-    $args{'config'} =<<CONFIG;
+    $args{'config'} ||=<<CONFIG;
 Set( %MandatoryOnTransition,
     '*' => {
         'open -> resolved' => [qw(TimeWorked TimeTaken)]
@@ -46,16 +46,6 @@ CONFIG
     $class->export_to_level(1);
 
     require RT::Extension::MandatoryOnTransition;
-}
-
-sub RTAtorNewerThan{
-    my $version = shift;
-    my ($my_major, $my_minor, $my_sub) = split(/\./, $version);
-    my ($major, $minor, $sub) = split(/\./, $RT::VERSION);
-    return ($my_major >= $major
-            and $my_minor >= $minor
-            and $my_sub >= $sub)
-            ? 1 : 0;
 }
 
 1;

@@ -1597,6 +1597,22 @@ sub lcd {
 
 }
 
+sub ftpcmd {
+
+   my @topcaller=caller;
+   print "\nINFO: main::ftpcmd() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if !$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG
+      "\nmain::ftpcmd() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   return File_Transfer::ftpcmd(@_);
+
+}
+
 sub old_cpan {
    foreach my $inc (@INC) {
       if (-e $inc.'/CPAN/Config.pm') {

@@ -2,8 +2,8 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.000 of App::instopt (from Perl
-    distribution App-instopt), released on 2018-09-13.
+    This document describes version 0.001 of App::instopt (from Perl
+    distribution App-instopt), released on 2018-09-20.
 
 SYNOPSIS
     See instopt script.
@@ -22,7 +22,11 @@ FUNCTIONS
 
     *   arch => *software::arch*
 
-    *   archive_dir => *dirname*
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
 
     *   software* => *str*
 
@@ -48,11 +52,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   arch => *software::arch*
-
-    *   archive_dir => *dirname*
-
     *   detail => *bool*
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
 
     *   software* => *str*
 
@@ -78,9 +84,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   arch => *software::arch*
+    *   detail => *true*
 
-    *   archive_dir => *dirname*
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
 
     Returns an enveloped result (an array).
 
@@ -98,15 +108,17 @@ FUNCTIONS
 
      update(%args) -> [status, msg, result, meta]
 
-    Update a software to latest version.
+    Update a software to the latest version.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   arch => *software::arch*
+    *   download_dir => *dirname*
 
-    *   archive_dir => *dirname*
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
 
     *   software* => *str*
 
@@ -132,9 +144,11 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   arch => *software::arch*
+    *   download_dir => *dirname*
 
-    *   archive_dir => *dirname*
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
 
     Returns an enveloped result (an array).
 

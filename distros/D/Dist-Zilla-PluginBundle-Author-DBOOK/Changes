@@ -1,3 +1,6 @@
+0.037     2018-09-20 13:12:36 EDT
+  - Add perl 5.28 to travis config in minting profile
+
 0.036     2018-06-05 17:51:17 EDT
   - Update source licensing of generated CONTRIBUTING.md
 

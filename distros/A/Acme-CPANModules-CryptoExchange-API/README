@@ -3,9 +3,9 @@ NAME
     cryptocurrency exchanges
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.003 of
     Acme::CPANModules::CryptoExchange::API (from Perl distribution
-    Acme-CPANModules-CryptoExchange-API), released on 2018-01-09.
+    Acme-CPANModules-CryptoExchange-API), released on 2018-09-22.
 
 DESCRIPTION
     Modules that interface to cryptocurrency exchanges.
@@ -15,7 +15,7 @@ INCLUDED MODULES
 
     *   WebService::Binance
 
-    *   Finance::BTCIndo
+    *   Finance::Indodax
 
     *   Finance::BitFlip
 
@@ -27,7 +27,12 @@ INCLUDED MODULES
 
     *   Finance::BitStamp::API
 
-    *   Finance::GDAX::API
+    *   Finance::GDAX::API - Last time I tried, not working
+
+        Alternate modules: Finance::GDAX::Lite
+
+    *   Finance::GDAX::Lite - An alternative which I wrote because
+        Finance::GDAX::API was not working
 
     *   Finance::LocalBitcoins::API
 

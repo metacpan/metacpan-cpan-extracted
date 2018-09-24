@@ -1,7 +1,7 @@
 package URI::Amazon::APA;
 use warnings;
 use strict;
-our $VERSION = sprintf "%d.%02d", q$Revision: 0.5 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 0.6 $ =~ /(\d+)/g;
 use Carp;
 use Digest::SHA qw(hmac_sha256_base64);
 use URI::Escape;
@@ -11,7 +11,9 @@ use base 'URI::http';
 sub new{
     my $class = shift;
     my $self  = URI->new(@_);
-    ref $self eq 'URI::http' or carp "must be http";
+    $self->scheme =~ /^https?$/ or carp "must be http or https";
+    # we need the following or URI resets the port to 80.
+    $self->port(443) if $self->scheme eq 'https' && $self->port == 443;
     bless $self, $class;
 }
 
@@ -56,7 +58,7 @@ URI::Amazon::APA - URI to access Amazon Product Advertising API
 
 =head1 VERSION
 
-$Id: APA.pm,v 0.5 2013/07/16 18:31:07 dankogai Exp $
+$Id: APA.pm,v 0.6 2018/09/22 14:19:06 dankogai Exp dankogai $
 
 =head1 SYNOPSIS
 
@@ -70,6 +72,7 @@ $Id: APA.pm,v 0.5 2013/07/16 18:31:07 dankogai Exp $
 
   use URI::Amazon::APA; # instead of URI
   my $u = URI::Amazon::APA->new('http://webservices.amazon.com/onca/xml');
+  # or                           https://webservices.amazon.com/onca/xml
   $u->query_form(
     Service     => 'AWSECommerceService',
     Operation   => 'ItemSearch',

@@ -1,4 +1,19 @@
-$Id: Changes 1700 2018-07-24 20:18:14Z willem $                       -*-text-*-
+$Id: Changes 1715 2018-09-21 14:17:46Z willem $                       -*-text-*-
+
+
+**** 1.18 Sep 21, 2018
+
+	Documentation revised to remove ambigous use of "answer" which
+	has been used to refer to both the answer section of a packet
+	and the entire reply packet received from a nameserver.
+
+Fix rt.cpan.org #127018
+
+	Net::DNS::ZoneFile->parse() fails if include directory specified.
+
+Fix rt.cpan.org #127012
+
+	DNS resolution broken when options ndots used in /etc/resolv.conf
 
 
 **** 1.17 Jul 25, 2018
@@ -1725,7 +1740,7 @@ Feature async nameserver behaviour.
       their own select loop.
 
    He also supplied example code for which he is hereby acknowledged.
-   The patch was not used because simultaneously Robert Martin-Legène
+   The patch was not used because simultaneously Robert Martin-LegÃ¨ne
    supplied a patch to Nameservers.pm that allowed the same async
    functionality through the use of loop_once method. Robert M-L's 
    code also carefully manages the TCP sockets, so that they can 
@@ -1808,7 +1823,7 @@ Fix rt.cpan.org 13534
 
 Doc rt.cpan.org 13387
 
-    Documented the BUG caught by Robert Martin-Legène
+    Documented the BUG caught by Robert Martin-LegÃ¨ne
     Net::DNS::Nameserver running with multiple IP interfaces might
     violate section 4 of RFC2181.
 

@@ -323,16 +323,15 @@ IMPLEMENTATION METHODS
 
     If the future is not yet ready, adds a callback to be invoked if the
     future is cancelled by the cancel method. If the future is already
-    ready, throws an exception.
+    ready the method is ignored.
 
-    If the future is cancelled, the callbacks will be invoked in the
+    If the future is later cancelled, the callbacks will be invoked in the
     reverse order to that in which they were registered.
 
      $on_cancel->( $future )
 
     If passed another Future instance, the passed instance will be
-    cancelled when the original future is cancelled. This method does
-    nothing if the future is already complete.
+    cancelled when the original future is cancelled.
 
 USER METHODS
 
@@ -421,9 +420,13 @@ USER METHODS
     
        $exception, @details = $future->failure
 
-    Returns the exception passed to the fail method, undef if the future
-    completed successfully via the done method, or raises an exception if
-    called on a future that is not yet ready.
+    If the future is ready, returns the exception passed to the fail method
+    or undef if the future completed successfully via the done method.
+
+    If it is not yet ready and is not of a subclass that provides an await
+    method an exception is thrown. If it is subclassed to provide an await
+    method then this is used to wait for the future to be ready, before
+    returning the result or propagating its failure exception.
 
     If called in list context, will additionally yield a list of the
     details provided to the fail method.
@@ -1035,7 +1038,7 @@ EXAMPLES
     failed, it can be used to control a try/catch block directly. (This is
     sometimes called Exception Hoisting).
 
-     use Try::Tiny;
+     use Syntax::Keyword::Try;
     
      $f->on_ready( sub {
         my $f = shift;
@@ -1044,7 +1047,7 @@ EXAMPLES
         }
         catch {
            say "The operation failed with: ", $_;
-        };
+        }
      } );
 
     Even neater still may be the separate use of the on_done and on_fail

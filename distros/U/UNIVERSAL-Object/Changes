@@ -1,5 +1,8 @@
 Revision history for Perl extension UNIVERSAL::Object
 
+0.16 2018-22-09
+    - fix some errors in 5.10 and 5.8 that were annoying me
+
 0.15 2018-16-09
     - improve some error messages
     - Immutable objects now correctly work with overloaded

@@ -4,13 +4,13 @@
       "Jeremy Stashewsky <stash@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Feersum",
    "no_index" : {
@@ -27,9 +27,7 @@
             "AnyEvent" : "5.261",
             "Guard" : "1.012",
             "Test::Fatal" : "0.003",
-            "Test::LeakTrace" : "0.13",
-            "Test::More" : "0.94",
-            "Test::TCP" : "1.12"
+            "Test::More" : "0.94"
          }
       },
       "configure" : {
@@ -39,11 +37,15 @@
          }
       },
       "runtime" : {
-         "recommends" : {},
+         "recommends" : {
+            "Plack" : "0.995",
+            "Test::LeakTrace" : "0.13",
+            "Test::TCP" : "1.12"
+         },
          "requires" : {
             "EV" : "4",
+            "HTTP::Entity::Parser" : "0.20",
             "JSON::XS" : "2",
-            "Plack" : "0.995",
             "Scalar::Util" : "1.19"
          }
       }
@@ -54,9 +56,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/stash/Feersum.git"
       }
    },
-   "version" : "1.405",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.406"
 }

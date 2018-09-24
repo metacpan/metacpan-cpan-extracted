@@ -14,6 +14,59 @@ my $file = 't/' . basename $0;
 use FindBin;
 use lib "$FindBin::Bin/default/lib";
 
+# Weaken
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Weaken::HashNotObject');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Weaken::ArrayNotObject');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+# Comparison operator
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::ComparisonOperator::GtNotNumeric');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::ComparisonOperator::GeNotNumeric');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::ComparisonOperator::LtNotNumeric');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::ComparisonOperator::LeNotNumeric');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Bool
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Bool::NotNumericObject');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
 # Assign
 {
   {

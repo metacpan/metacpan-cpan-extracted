@@ -1,15 +1,15 @@
-# $Id: 01-resolver-env.t 1412 2015-10-12 08:19:51Z willem $  -*-perl-*-
+# $Id: 01-resolver-env.t 1709 2018-09-07 08:03:09Z willem $  -*-perl-*-
 
 use strict;
-
 use Test::More tests => 10;
+
+use Net::DNS::Resolver;
 
 local $ENV{'RES_NAMESERVERS'} = '10.0.3.128 10.0.4.128';
 local $ENV{'RES_SEARCHLIST'}  = 'net-dns.org lib.net-dns.org';
 local $ENV{'LOCALDOMAIN'}     = 'net-dns.org';
 local $ENV{'RES_OPTIONS'}     = 'retrans:3 retry:2 debug bogus';
 
-use Net::DNS;
 
 my $res = Net::DNS::Resolver->new;
 ok( $res->isa('Net::DNS::Resolver'), 'new() created object' );

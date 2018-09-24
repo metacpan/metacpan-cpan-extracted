@@ -6,7 +6,7 @@ use strict 'vars';
 
 package Text::Bidi;
 # ABSTRACT: Unicode bidi algorithm using libfribidi
-$Text::Bidi::VERSION = '2.12';
+$Text::Bidi::VERSION = '2.14';
 use Exporter;
 use base qw(Exporter);
 use Carp;
@@ -241,7 +241,7 @@ sub log2vis {
 }
 
 
-sub is_bidi { $_[0] =~ /\p{bc=R}/ }
+sub is_bidi { $_[0] =~ /\p{bc=R}|\p{bc=AL}/ }
 
 
 sub get_mirror_char {
@@ -281,7 +281,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =head1 VERSION
 
-version 2.12
+version 2.14
 
 =head1 SYNOPSIS
 

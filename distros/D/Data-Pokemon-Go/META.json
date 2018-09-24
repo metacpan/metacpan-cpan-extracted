@@ -62,7 +62,7 @@
    "provides" : {
       "Data::Pokemon::Go" : {
          "file" : "lib/Data/Pokemon/Go.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Data::Pokemon::Go::IV" : {
          "file" : "lib/Data/Pokemon/Go/IV.pm"
@@ -100,7 +100,7 @@
          "web" : "https://github.com/worthmine/Data-Pokemon-Go"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "AnaTofuZ <anatofuz@gmail.com>",

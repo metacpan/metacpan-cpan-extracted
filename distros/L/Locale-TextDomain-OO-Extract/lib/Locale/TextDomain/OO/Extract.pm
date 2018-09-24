@@ -3,7 +3,7 @@ package Locale::TextDomain::OO::Extract; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 1;
 
@@ -12,13 +12,13 @@ __END__
 =head1 NAME
 Locale::TextDomain::OO::Extract - Extracts internationalization data
 
-$Id: Extract.pm 709 2017-11-03 10:40:26Z steffenw $
+$Id: Extract.pm 719 2018-09-21 12:58:00Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract.pm $
 
 =head1 VERSION
 
-2.014
+2.015
 
 =head1 DESCRIPTION
 
@@ -329,7 +329,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

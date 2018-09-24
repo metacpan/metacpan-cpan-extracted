@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::IDN::Encode
 
+2.401 (2018-09-20)
+	- FIXES: #127056: [PATCH 1/2] Fix domain_to_ascii AllowUnassigned param
+	  (report and patch by SKJM)
+	- FIXES: #127057: [PATCH 2/2] Fix domain_to_unicode AllowUnassigned
+	  param (report and patch by SKJM)
+
 2.400 (2017-01-01)
 	- new release version
 	- remove author tests

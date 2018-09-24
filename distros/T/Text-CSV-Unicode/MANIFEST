@@ -12,5 +12,5 @@ t/combine-undef.t
 t/pod-coverage.t
 t/pod.t
 t/unicode.t
-META.yml                                 Module meta-data (added by MakeMaker)
-META.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

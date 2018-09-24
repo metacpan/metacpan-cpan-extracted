@@ -1,5 +1,9 @@
 Revision history for Perl extension URI::Template
 
+0.24 2018-09-20
+ - add exported functions template_process and template_process_string
+   for simple usage (GH #9)
+
 0.23 2018-07-10
  - Fix Makefile.PL with no '.' in @INC (GH #5, RT #121036)
  - Ensure we don't re-encode pre-encoded values for +var and #var 

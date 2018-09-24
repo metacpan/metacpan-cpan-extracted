@@ -1,5 +1,5 @@
 package Bio::Tradis::RunTradis;
-$Bio::Tradis::RunTradis::VERSION = '1.4.0';
+$Bio::Tradis::RunTradis::VERSION = '1.4.1';
 # ABSTRACT: Perform all steps required for a tradis analysis
 
 
@@ -472,7 +472,7 @@ Bio::Tradis::RunTradis - Perform all steps required for a tradis analysis
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

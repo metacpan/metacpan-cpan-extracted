@@ -1,6 +1,6 @@
 package Tapper::Cmd::Precondition;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Precondition::VERSION = '5.0.8';
+$Tapper::Cmd::Precondition::VERSION = '5.0.9';
 use Moose;
 
 use YAML::Syck;
@@ -169,7 +169,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

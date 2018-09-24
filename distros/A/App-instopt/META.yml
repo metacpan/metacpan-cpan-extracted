@@ -18,14 +18,25 @@ meta-spec:
 name: App-instopt
 requires:
   App::swcat: '0'
+  Archive::Any: '0'
   Data::Sah::Coerce::perl::str::str_strip_trailing_slash: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  File::MoreUtil: '0'
+  File::Path: '0'
+  File::chdir: '0'
+  Filename::Archive: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
   Log::ger: '0.023'
+  PERLANCAR::File::HomeDir: '0'
   Perinci::CmdLine::Any: '0'
+  Perinci::Object: '0.26'
   PerlX::Maybe: '0'
   Sah::Schema::dirname: '0'
   Sah::Schema::software::arch: '0'
+  Sah::Schema::true: '0'
+  URI::Escape: '0'
   perl: '5.010001'
   strict: '0'
   vars: '0'
@@ -34,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt
   homepage: https://metacpan.org/release/App-instopt
   repository: git://github.com/perlancar/perl-App-instopt.git
-version: '0.000'
+version: '0.001'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

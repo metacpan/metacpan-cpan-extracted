@@ -1,3 +1,15 @@
+0.16 2018-09-19
+ - Don't check permission to get queue name from ticket in RequiredFields
+
+0.15 2017-05-04
+ - Fix an issue where ticket updates would alter
+   %CORE_FOR_UPDATE. This prevented status transitions when the config
+   requires Time Worked and the user has entered a value for Time
+   Worked.
+
+0.14 2016-10-14
+ - Add ability to mark fields as mandatory on queue transitions
+
 0.13 2016-07-14
 - Packaging fixes; reinstate latest Module::Install::RTx.  Fixes
   cpan#116138.

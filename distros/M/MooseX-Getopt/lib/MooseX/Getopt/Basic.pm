@@ -1,7 +1,7 @@
 package MooseX::Getopt::Basic;
 # ABSTRACT: MooseX::Getopt::Basic - role to implement the Getopt::Long functionality
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 use Moose::Role;
 
@@ -77,7 +77,7 @@ sub process_argv {
         options => [
             $class->_attrs_to_options( $config_from_file )
         ],
-        params => $constructor_params,
+        params => $config_from_file ? { %$config_from_file, %$constructor_params } : $constructor_params,
     );
 
     my $params = $config_from_file ? { %$config_from_file, %{$processed{params}} } : $processed{params};
@@ -294,7 +294,7 @@ MooseX::Getopt::Basic - MooseX::Getopt::Basic - role to implement the Getopt::Lo
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

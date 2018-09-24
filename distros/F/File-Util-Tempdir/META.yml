@@ -4,8 +4,10 @@ author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
   File::Spec: '0'
+  File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Perl::osnames: '0'
   Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
@@ -25,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Util-Tempdir
   homepage: https://metacpan.org/release/File-Util-Tempdir
   repository: git://github.com/perlancar/perl-File-Util-Tempdir.git
-version: '0.030'
+version: '0.033'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

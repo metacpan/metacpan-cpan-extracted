@@ -1,7 +1,1 @@
-<%INIT>
-# CORE_FOR_UPDATE assumes that any update to a Ticket is coming from Update.html
-# which calls TimeWorked UpdateTimeWorked
-$RT::Extension::MandatoryOnTransition::CORE_FOR_UPDATE{TimeWorked} = "TimeWorked";
-$RT::Extension::MandatoryOnTransition::CORE_FOR_UPDATE{TimeTaken} = "TimeWorked";
-</%INIT>
 <& /Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/BeforeUpdate, %ARGS &>

@@ -54,7 +54,7 @@ foreach my $serializer ( 'JSON', 'Sereal', 'YAML' ) {
 }
 
 sub test_session_schema {
-    %Dancer2::Session::DBIC::dbic_handles = ();
+    $Dancer2::Session::DBIC::_schema = undef;
     my ($schema_class, $schema_options) = @_;
 
     note "Testing $schema_class";

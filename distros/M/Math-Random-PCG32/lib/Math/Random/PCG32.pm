@@ -9,7 +9,7 @@ package Math::Random::PCG32;
 use warnings;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load( 'Math::Random::PCG32', $VERSION );

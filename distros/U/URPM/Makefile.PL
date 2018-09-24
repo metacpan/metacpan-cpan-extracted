@@ -72,6 +72,12 @@ WriteMakefile(
     },
     META_MERGE => {
 	'meta-spec' => { version => 2 },
+	# For proper CPAN indexation:
+	provides => {
+	    'URPM::Resolve' => {
+		file => 'URPM/Resolve.pm',
+	    },
+	},
         resources => {
             repository  => {
 		type => 'git',

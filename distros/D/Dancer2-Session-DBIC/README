@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.110
+    0.120
 
 DESCRIPTION
 
@@ -122,13 +122,13 @@ ATTRIBUTES
 
  serialize_options
 
-    Options to be passed to the constructor of the the serializer class as
-    a hash reference.
+    Options to be passed to the constructor of the serializer class as a
+    hash reference.
 
  deserialize_options
 
-    Options to be passed to the constructor of the the deserializer class
-    as a hash reference.
+    Options to be passed to the constructor of the deserializer class as a
+    hash reference.
 
 METHODS
 

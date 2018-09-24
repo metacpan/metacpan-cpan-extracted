@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Entry;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180518'; # VERSION
+our $VERSION = '1.20180923'; # VERSION
 use Scalar::Util qw{ refaddr };
 use Carp;
 
@@ -37,7 +37,7 @@ Mail::AuthenticationResults::Header::Entry - Class modelling Main Entry parts of
 
 =head1 VERSION
 
-version 1.20180518
+version 1.20180923
 
 =head1 DESCRIPTION
 

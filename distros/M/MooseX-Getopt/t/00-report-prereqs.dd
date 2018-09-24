@@ -11,7 +11,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.143',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.145',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -120,7 +120,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::InstallGuide' => '1.200005',
                                            'Dist::Zilla::Plugin::Keywords' => '0.004',
                                            'Dist::Zilla::Plugin::License' => '5.038',
-                                           'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.012',
+                                           'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.029',
                                            'Dist::Zilla::Plugin::Manifest' => '0',
                                            'Dist::Zilla::Plugin::MetaConfig' => '0',
                                            'Dist::Zilla::Plugin::MetaJSON' => '0',

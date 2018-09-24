@@ -1,14 +1,14 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::MergePlots;
-$Bio::Tradis::Bin::MergePlots::VERSION = '1.4.0';
+$Bio::Tradis::Bin::MergePlots::VERSION = '1.4.1';
 # ABSTRACT: 
 
 # PODNAME: tradis_merge_plots
 
 
 package TraDISMergePlots::Main;
-$TraDISMergePlots::Main::VERSION = '1.4.0';
+$TraDISMergePlots::Main::VERSION = '1.4.1';
 use Moose;
 use Getopt::Long;
 use File::Basename;
@@ -90,7 +90,7 @@ tradis_merge_plots -
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

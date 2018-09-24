@@ -50,7 +50,7 @@ package Astro::Coord::ECI::Star;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use base qw{Astro::Coord::ECI};
 
@@ -122,12 +122,11 @@ sub __almanac_event_type_iterator {
 
     my $horizon = $station->__get_almanac_horizon();
 
-    my $name = $self->get ('name') || $self->get ('id') || 'star';
     my @events = (
-	[ $station, next_elevation => [ $self, $horizon, 1 ], 'horizon',
-		[ "$name sets", "$name rises"] ],
-	[ $station, next_meridian => [ $self ], 'transit',
-		[ undef, "$name transits meridian"] ],
+	[ $station, next_elevation => [ $self, $horizon, 1 ],
+	    horizon => '__horizon_name' ],
+	[ $station, next_meridian => [ $self ],
+	    transit => '__transit_name' ],
     );
 
     return sub {

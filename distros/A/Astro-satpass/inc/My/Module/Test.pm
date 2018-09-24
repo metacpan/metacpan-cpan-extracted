@@ -5,7 +5,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Exporter qw{ import };
 
@@ -153,8 +153,8 @@ sub tolerance (@) {
    Tolerance: $tolerance
 EOD
     chomp $title;
-    @_ = ( $rslt, $title );
-    goto &ok;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return ok( $rslt, $title );
 }
 
 sub tolerance_frac (@) {

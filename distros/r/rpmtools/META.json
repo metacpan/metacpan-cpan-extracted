@@ -1,0 +1,69 @@
+{
+   "abstract" : "Generates hdlist and synthesis files + compatibility wrapper around the new MDV::Packdrakeng",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "rpmtools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "MDV::Distribconf" : "4.100",
+            "MDV::Packdrakeng" : "1.13",
+            "Pod::Usage" : "0",
+            "Term::ReadLine" : "0",
+            "Text::ParseWords" : "0",
+            "URPM" : "5.16"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "rpmtools" : {
+         "file" : "packdrake.pm",
+         "version" : "7.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.mageia.org/software/rpm/rpmtools/",
+         "web" : "http://gitweb.mageia.org/software/rpm/rpmtools/"
+      }
+   },
+   "version" : "7.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

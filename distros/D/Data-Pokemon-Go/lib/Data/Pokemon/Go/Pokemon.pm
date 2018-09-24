@@ -128,18 +128,15 @@ sub defense {
     return $all->{$name}{Defense};
 }
 
-sub hatchedMAX {
+sub max {
     my $self = shift;
-    my $name = $self->name();
-    croak "'Hatched' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Hatched'};
-    return $all->{$name}{'MAXCP'}{'Hatched'};
-}
+    my $when = shift;
+     croak "Unvalid param $when into sub max()"
+    unless $when =~ /(:?Boosted|Hatched|Grown)/;
 
-sub boostedMAX {
-    my $self = shift;
     my $name = $self->name();
-    croak "'Boosted' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Boosted'};
-    return $all->{$name}{'MAXCP'}{'Boosted'};
+    croak "'$when' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{$when};
+    return $all->{$name}{'MAXCP'}{$when};
 }
 
 sub isNotWild {

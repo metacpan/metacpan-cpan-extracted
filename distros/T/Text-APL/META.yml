@@ -7,7 +7,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -25,7 +25,7 @@ no_index:
 provides:
   Text::APL:
     file: lib/Text/APL.pm
-    version: '0.08'
+    version: '0.09'
   Text::APL::Base:
     file: lib/Text/APL/Base.pm
   Text::APL::Compiler:
@@ -34,7 +34,7 @@ provides:
     file: lib/Text/APL/Context.pm
   Text::APL::Core:
     file: lib/Text/APL/Core.pm
-    version: '0.08'
+    version: '0.09'
   Text::APL::Parser:
     file: lib/Text/APL/Parser.pm
   Text::APL::Reader:
@@ -51,7 +51,8 @@ resources:
   bugtracker: https://github.com/vti/text-apl/issues
   homepage: https://github.com/vti/text-apl
   repository: git://github.com/vti/text-apl.git
-version: '0.08'
+version: '0.09'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'vti <viacheslav.t@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

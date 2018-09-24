@@ -1,10 +1,11 @@
 
+use v5.10;
 use strict;
 use warnings;
 
 package Context::Singleton::Frame::Builder::Array;
 
-our $VERSION = v1.0.4;
+our $VERSION = v1.0.5;
 
 use parent qw[ Context::Singleton::Frame::Builder::Base ];
 

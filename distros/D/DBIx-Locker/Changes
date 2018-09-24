@@ -1,5 +1,8 @@
 Revision history for DBIx-Locker
 
+0.100120  2018-09-19 22:25:42-04:00 America/New_York
+        - a few small bug fixes from Rob N ★
+
 0.100119  2018-08-02 16:19:13-04:00 America/New_York
         - make ->lock in void context fatal
 

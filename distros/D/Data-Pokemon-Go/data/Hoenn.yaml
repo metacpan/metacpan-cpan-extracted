@@ -487,6 +487,7 @@
     Defense: 153
     isNotAvailable: 1
     MAXCP:
+        Grown: 674
         Hatched:
         Boosted:
 テッカニン:    #-------------------------------------------------------------
@@ -501,6 +502,7 @@
     Defense: 114
     isNotAvailable: 1
     MAXCP:
+        Grown: 1751
         Hatched:
         Boosted:
 ヌケニン:    #--------------------------------------------------------------
@@ -515,6 +517,7 @@
     Defense: 80
     isNotAvailable: 1
     MAXCP:
+        Grown: 421
         Hatched:
         Boosted:
 ゴニョニョ:    #-------------------------------------------------------------
@@ -590,6 +593,7 @@
     isNotWild: 1
     MAXCP:
         Hatched: 181
+        Boosted: 226
 ノズパス:    #--------------------------------------------------------------
     ID: 299
     Types:
@@ -947,10 +951,10 @@
     Stamina: 120
     Attack: 116
     Defense: 116
-    isNotAvailable: 1
+    isNotWild: 1
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 621
+        Boosted: 777
 ナックラー:    #-------------------------------------------------------------
     ID: 328
     Types:
@@ -1243,7 +1247,7 @@
     isNotWild: 1
     MAXCP:
         Hatched: 1695
-        Boosted:
+        Boosted: 2119
 ポワルン:    #---------------------------------------------------------------
     ID: 351
     Types:  # TODO フォルム別に調べるようにする（アローラの応用）
@@ -1267,6 +1271,7 @@
     Defense: 212
     isNotAvailable: 1
     MAXCP:
+        Grown: 1924
         Hatched:
         Boosted:
 カゲボウズ:    #-------------------------------------------------------------
@@ -1366,6 +1371,7 @@
     isNotWild: 1
     MAXCP:
         Hatched: 287
+        Boosted: 359
 ユキワラシ:    #-------------------------------------------------------------
     ID: 361
     Types:
@@ -1440,6 +1446,7 @@
     Defense: 149
     isNotAvailable: 1
     MAXCP:
+        Grown: 1091
         Hatched:
         Boosted:
 ハンテール:    #-------------------------------------------------------------
@@ -1453,6 +1460,7 @@
     Defense: 194
     isNotAvailable: 1
     MAXCP:
+        Grown: 2140
         Hatched:
         Boosted:
 サクラビス:    #-------------------------------------------------------------
@@ -1466,6 +1474,7 @@
     Defense: 194
     isNotAvailable: 1
     MAXCP:
+        Grown: 2281
         Hatched:
         Boosted:
 ジーランス:    #-------------------------------------------------------------
@@ -1578,10 +1587,10 @@
     Stamina: 160
     Attack: 179
     Defense: 356
-    isNotAvailable: 1
     MAXCP:
-        Hatched:
-        Boosted:
+        Grown: 3087
+        Hatched: 1764
+        Boosted: 2205
 レジアイス:    #-------------------------------------------------------------
     ID: 378
     Types:
@@ -1681,6 +1690,7 @@
     Defense: 210
     isNotAvailable: 1
     MAXCP:
+        Grown: 3090
         Hatched:
         Boosted:
 デオキシス:    #-------------------------------------------------------------
@@ -1689,10 +1699,9 @@
         - エスパー
     From:
     To:
-    Stamina:
-    Attack:
-    Defense:
-    isNotAvailable: 1
+    Stamina: 100
+    Attack: 345
+    Defense: 115
     MAXCP:
-    Hatched:
-    Boosted:
+        Hatched: 1570
+        Boosted: 1963

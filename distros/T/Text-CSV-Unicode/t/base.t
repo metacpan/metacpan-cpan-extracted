@@ -138,4 +138,4 @@ if ($csv->status()) {  # success - test #19 should have succeeded
   print "not ok 20\n";  
 }
 
-# $Id: base.t 290 2012-02-19 22:25:30Z robin $
+# $Id$

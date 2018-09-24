@@ -14,11 +14,15 @@ my $builder = Module::Build->new(
         'CPAN::Meta'    => '2.142060',
         'Module::Build' => '0.4004',     # test_requires
     },
-    requires       => { 'perl'       => '5.014000', },
-    test_requires  => { 'Test::Most' => 0, },
+    requires      => { 'perl' => '5.014000', },
+    test_requires => {
+        'Test::Most' => 0,
+        'Test::More' => '0.88',          # done_testing
+    },
     sign           => 1,
     create_readme  => 0,
     create_license => 0,
+    dynamic_config => 0,
     add_to_cleanup => ['Math-Random-PCG32-*'],
     auto_features  => {
         dist_authoring => {
@@ -30,12 +34,7 @@ my $builder = Module::Build->new(
         },
     },
     meta_merge => {
-        'meta-spec'       => { version => 2 },
-        homepageresources => {
-            url  => 'git://github.com/thrig/Math-Random-PCG32.git',
-            web  => 'https://github.com/thrig/Math-Random-PCG32',
-            type => 'git',
-        }
+        resources => { repository => 'https://github.com/thrig/Math-Random-PCG32' }
     },
 );
 

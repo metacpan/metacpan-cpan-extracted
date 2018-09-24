@@ -1,7 +1,7 @@
 package Test::Against::Dev::Salvage;
 use strict;
 use 5.14.0;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our @ISA = ('Test::Against::Dev');
 use Carp;
 use Cwd;

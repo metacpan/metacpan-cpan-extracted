@@ -1,3 +1,8 @@
+0.093   2018-09-23 (PERLANCAR)
+
+	- Add backend: Text::Table::XLSX.
+
+
 0.092   2018-07-23 (PERLANCAR)
 
 	- Add backend: Text::Table::ASV.

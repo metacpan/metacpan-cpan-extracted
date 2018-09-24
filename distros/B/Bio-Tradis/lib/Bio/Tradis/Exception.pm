@@ -1,6 +1,6 @@
 package Bio::Tradis::Exception;
 # ABSTRACT: Exceptions for input data 
-$Bio::Tradis::Exception::VERSION = '1.4.0';
+$Bio::Tradis::Exception::VERSION = '1.4.1';
 
 
 use Exception::Class (
@@ -22,7 +22,7 @@ Bio::Tradis::Exception - Exceptions for input data
 
 =head1 VERSION
 
-version 1.4.0
+version 1.4.1
 
 =head1 SYNOPSIS
 

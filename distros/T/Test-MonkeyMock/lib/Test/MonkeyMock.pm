@@ -5,7 +5,7 @@ use warnings;
 
 require Carp;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $registry      = {};
 my $magic_counter = 0;

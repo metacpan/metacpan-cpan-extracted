@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+use strict;
+use packdrake;
+
+#- general information.
+my $default_size = 400000;
+my $default_ratio = 6;
+
+sub usage () {
+    eval {
+	require Pod::Usage;
+	Pod::Usage->import();
+	pod2usage({ -verbose => 1 });
+    };
+    exit 0;
+}
+
+my ($file, $mode, $dir, $size, $method, $compress, $uncompress, $ratio, $quiet);
+my @nextargv = (\$file);
+my @list;
+
+#- some quite useful error message.
+my $error_mode = "packdrake: choose only --build, --extract, --list or --cat\n";
+foreach (@ARGV) {
+    /^--help$/       and usage();
+    /^--version$/    and do { print "$0 version $packdrake::VERSION\n"; exit 0 };
+    /^--build$/      and do { $mode and die $error_mode; $mode = "build"; @nextargv = (\$file); next };
+    /^--extract$/    and do { $mode and die $error_mode; $mode = "extract"; @nextargv = (\$file, \$dir); next };
+    /^--list$/       and do { $mode and die $error_mode; $mode = "list"; @nextargv = (\$file); next };
+    /^--cat$/        and do { $mode and die $error_mode; $mode = "cat"; @nextargv = (\$file); next };
+    /^--dir$/        and do { push @nextargv, \$dir; next };
+    /^--size$/       and do { push @nextargv, \$size; next };
+    /^--method$/     and do { push @nextargv, \$method; next };
+    /^--compress$/   and do { push @nextargv, \$compress; next };
+    /^--uncompress$/ and do { push @nextargv, \$uncompress; next };
+    /^--quiet$/	 and $quiet = 1, next;
+    /^-(.*)$/ and do { foreach (split //, $1) {
+	    /[1-9]/  and do { $ratio = $_; next };
+	    /b/      and do { $mode and die $error_mode; $mode = "build"; @nextargv = (\$file); next };
+	    /x/      and do { $mode and die $error_mode; $mode = "extract"; @nextargv = (\$file, \$dir); next };
+	    /l/      and do { $mode and die $error_mode; $mode = "list"; @nextargv = (\$file); next };
+	    /c/      and do { $mode and die $error_mode; $mode = "cat"; @nextargv = (\$file); next };
+	    /d/      and do { push @nextargv, \$dir; next };
+	    /s/      and do { push @nextargv, \$size; next };
+	    /m/      and do { push @nextargv, \$method; next };
+	    die qq(packdrake: unknown option "-$1", check usage with --help\n) } next };
+    $mode =~ /extract|list|cat/
+	or @nextargv
+	or die qq(packdrake: unknown option "$_", check usage with --help\n);
+    my $ref = shift @nextargv;
+    $ref ? ($$ref = $_) : push @list, $_;
+    $mode ||= "list";
+}
+
+#- examine and lauch.
+$file or die "packdrake: no archive filename given, check usage with --help\n";
+$size ||= $default_size;
+$ratio ||= $default_ratio;
+
+unless ($method) {
+    $file =~ /\.cz$/  and $method = "gzip";
+    $file =~ /\.cz2$/ and $method = "bzip2";
+}
+
+$compress ||= "$method -$ratio";
+$uncompress ||= "$method -d";
+
+$mode =~ /extract/ && !$dir && !@list and ($mode, @list) = ('list', $file);
+for ($mode) {
+    /build/   and do { packdrake::build_archive(\*STDIN, $dir, $file, $size, $compress, $uncompress); last };
+    /extract/ and do {
+	my $packer = new packdrake($file, quiet => $quiet);
+	$packer->extract_archive($dir, @list);
+	last;
+    };
+    /list/    and do { packdrake::list_archive($file, @list); last };
+    /cat/     and do { packdrake::cat_archive($file, @list); last };
+    die "packdrake: internal error, unable to select right mode?\n";
+}
+
+__END__
+
+=head1 NAME
+
+packdrake - manipulates archives
+
+=head1 SYNOPSIS
+
+    packdrake [options] [--build|-b] file
+    packdrake [options] [--extract|-x] file
+    packdrake [options] [--list|-l] file
+    packdrake [options] [--cat|-c] file
+
+=head1 OPTIONS
+
+=over 2
+
+=item --build file
+
+Build mode; build archive file with filenames given on standard input.
+Sub-options are:
+
+=over 4
+
+=item -1 .. -9
+
+Select appropriate compression ratio.
+
+=item --dir srcdir
+
+set source directory where to search files, C<.> by default.
+
+=item --size
+
+Set maximum chunk size, 400000 by default.
+
+=item --method
+
+Select standard compression command method.
+Default is deduced from the archive filename (gzip or bzip2).
+
+=item --compress cmd
+
+Select compression command (e.g. C<gzip -9>).
+
+=back
+
+=item --extract file dir file1...fileN
+
+Extracts archive file to specified directory.
+Specific files to extract may be given on the command line.
+
+=over 4
+
+=item --uncompress cmd
+
+Select uncompression command.
+
+=back
+
+=item --list file
+
+Lists contents of archive.
+
+=item --cat file
+
+Dumps archive to standard output.
+
+=item General options
+
+=over 4
+
+=item --quiet
+
+Silent mode.
+
+=back
+
+=back
+
+=head1 DESCRIPTION
+
+Packdrake is a simple indexed archive builder and extractor using
+standard compression methods.
+
+=head1 SEE ALSO
+
+L<MDV::Packdrakeng>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000-2005 Mandrakesoft.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+=cut

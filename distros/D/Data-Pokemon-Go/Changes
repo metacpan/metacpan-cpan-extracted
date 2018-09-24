@@ -1,5 +1,8 @@
 Revision history for Perl extension Data-Pokemon-Go
 
+0.05 2018-09-20T12:49:58Z
+    - fixed the data, tests and script for recent changes in the game
+
 0.04 2018-07-20T11:25:48Z
     - update datas and script for Alola region
 

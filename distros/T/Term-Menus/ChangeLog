@@ -1,3 +1,10 @@
+2018-09-22  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.016
+
+        * Fixed missing filtering code when subfile.
+
+
 2016-10-30  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
         * Version 3.015

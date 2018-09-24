@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use WWW::Form::UrlEncoded qw/build_urlencoded build_urlencoded_utf8/;
-use JSON;
+use JSON::PP;
 
 my @data = (
     ['a'=>'b'] => 'a=b',
@@ -29,7 +29,7 @@ my @data = (
 while ( @data ) {
     my $data = shift @data;
     my $test = shift @data;
-    is( build_urlencoded(@$data), $test, JSON::encode_json($data));
+    is( build_urlencoded(@$data), $test, JSON::PP::encode_json($data));
 }
 
 is( build_urlencoded([ foo => "\xE5", bar => "\x{263A}" ]), 'foo=%E5&bar=%E2%98%BA'); 

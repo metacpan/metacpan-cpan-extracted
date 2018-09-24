@@ -1,13 +1,11 @@
-# $Id: 04-packet.t 1449 2016-02-01 12:27:12Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
 
 use strict;
 
-BEGIN {
-	use Test::More tests => 99;
+use Test::More tests => 101;
 
-	use_ok('Net::DNS');
-}
 
+use_ok('Net::DNS::Packet');
 
 #	new() class constructor method must return object of appropriate class
 my $object = Net::DNS::Packet->new();
@@ -110,13 +108,15 @@ $update->push( 'answer', Net::DNS::RR->new('VW.XY TXT ""') );
 my $buffer = $update->data;
 my $decoded = eval { Net::DNS::Packet->new( \$buffer ) };
 ok( $decoded, 'new() from data buffer works' );
-is( $decoded->answersize, length($buffer), '$decoded->answersize() works' );
-$decoded->answerfrom('local');
-ok( $decoded->answerfrom(), '$decoded->answerfrom() works' );
-ok( $decoded->string(),	    '$decoded->string() works' );
+is( $decoded->size, length($buffer), '$decoded->size() works' );
+$decoded->from('local');
+ok( $decoded->from(),	'$decoded->from() works' );
+ok( $decoded->string(), '$decoded->string() works' );
 foreach my $count (qw(qdcount ancount nscount arcount)) {
 	is( $decoded->header->$count, $update->header->$count, "check header->$count correct" );
 }
+ok( $decoded->answersize, 'answersize() alias works' );
+ok( $decoded->answerfrom, 'answerfrom() alias works' );
 
 
 foreach my $section (qw(question)) {
