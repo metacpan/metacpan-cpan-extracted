@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99020  Sep 24 2018 Alexander Nalobin
+    - fix recursive whois regexp. Now matches \r\n line endings. 
+
 2.99019  Sep 24 2018 Alexander Nalobin
     - fix precedence in 2.99016 fix, thanx to Slaven Rezić.
 

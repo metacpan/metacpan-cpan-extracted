@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub register {
   my ($elf, $app, $config) = @_;
@@ -15,6 +15,7 @@ sub register {
       if (blessed($args[0]) && $args[0]->can('then')) {
         my $tx = $c->render_later->tx;
         $args[0]->then(undef, sub { $c->reply->exception(pop) and undef $tx });
+        $args[0]->can('wait') && $args[0]->wait;
       }
       return @args;
     }

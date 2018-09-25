@@ -80,6 +80,7 @@ S<[ B<-v> ]>
 S<[ B<-0> ]>
 S<[ B<-n> ]>
 S<[ B<-f> ]>
+S<[ B<-d> ]>
 S<[ B<-e>|B<-E> I<perlexpr>]*|I<perlexpr>>
 S<[ I<files> ]>
 
@@ -109,31 +110,39 @@ To translate uppercase names to lower, you'd use
 
 =over 8
 
-=item B<-v>, B<-verbose>
+=item B<-v>, B<--verbose>
 
 Verbose: print names of files successfully renamed.
 
-=item B<-0>, B<-null>
+=item B<-0>, B<--null>
 
 Use \0 as record separator when reading from STDIN.
 
-=item B<-n>, B<-nono>
+=item B<-n>, B<--nono>
 
 No action: print names of files to be renamed, but don't rename.
 
-=item B<-f>, B<-force>
+=item B<-f>, B<--force>
 
 Over write: allow existing files to be over-written.
 
-=item B<-h>, B<-help>
+=item B<--path>, B<--fullpath>
+
+Rename full path: including any directory component.  DEFAULT
+
+=item B<-d>, B<--filename>, B<--nopath>, B<--nofullpath>
+
+Do not rename directory: only rename filename component of path.
+
+=item B<-h>, B<--help>
 
 Help: print SYNOPSIS and OPTIONS.
 
-=item B<-m>, B<-man>
+=item B<-m>, B<--man>
 
 Manual: print manual page.
 
-=item B<-V>, B<-version>
+=item B<-V>, B<--version>
 
 Version: show version number.
 
@@ -172,7 +181,6 @@ The original
 C<rename>
 did not check for the existence of target filenames,
 so had to be used with care.
-I hope I've fixed that (Robin Barker).
 
 =cut
 

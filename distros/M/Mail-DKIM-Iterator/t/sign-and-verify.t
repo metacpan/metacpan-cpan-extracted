@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Mail::DKIM::Iterator;
 
-plan tests => 16;
+plan tests => 17;
 
 # basic tests with different canonicalizations and algorithms
 for my $c (qw(
@@ -23,6 +23,18 @@ for my $c (qw(
 	my $err = $@ || ($ok ? '':'unknown error');
 	is( $err,'', "c=$c a=$algo");
     }
+}
+
+# verification should succeed with warning if not all critical
+# headers are properly covered
+{
+    my $ok = eval {
+	my $m = sign([mail()], h => 'from:from:to:subject');
+	verify([$m],dns());
+    };
+    my $err = $@ || ($ok ? '':'unknown error');
+    is($err,"valid warning=incomplete header protection for content-transfer-encoding,content-type,subject\n",
+	"unsigned header fields");
 }
 
 # expect verification perm-fail because of wrong pubkey
@@ -81,7 +93,6 @@ sub sign {
     my $dkim = Mail::DKIM::Iterator->new( sign => {
 	d => 'example.com',
 	s => 'good',
-	h => 'from:to:subject',
 	':key' => priv_key_pem(),
 	%args,
     });
@@ -133,6 +144,8 @@ sub verify {
     $rv->[0]->status == DKIM_SUCCESS or die 
 	"status status=" . ($rv->[0]->status//'<undef>')
 	. " error=" . ($rv->[0]->error//'') . "\n";
+    $rv->[0]->warning eq ''
+	or die "valid warning=".$rv->[0]->warning."\n";
     1;
 }
 

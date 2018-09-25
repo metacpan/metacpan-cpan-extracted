@@ -15,12 +15,12 @@ name: Flip-Flop
 provides:
   Flip::Flop:
     file: lib/Flip/Flop.pm
-    version: '20180726'
+    version: '20180925'
 requires:
   Carp: '0'
-  Data::Table::Text: '20170820'
+  Data::Table::Text: '20180924'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180726'
+version: '20180925'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

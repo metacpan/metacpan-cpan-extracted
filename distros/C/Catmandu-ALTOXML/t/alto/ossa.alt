@@ -1,0 +1,544 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v2#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Description>
+    <MeasurementUnit>pixel</MeasurementUnit>
+    <OCRProcessing ID="IdOcr">
+      <ocrProcessingStep>
+        <processingDateTime>2015-05-26</processingDateTime>
+        <processingSoftware>
+          <softwareCreator>ABBYY</softwareCreator>
+          <softwareName>ABBYY FineReader Engine</softwareName>
+          <softwareVersion>11</softwareVersion>
+        </processingSoftware>
+      </ocrProcessingStep>
+    </OCRProcessing>
+  </Description>
+  <Styles>
+    <TextStyle ID="font0" FONTFAMILY="Segoe UI" FONTSIZE="28" />
+    <TextStyle ID="font1" FONTFAMILY="Sylfaen" FONTSIZE="13" />
+    <TextStyle ID="font2" FONTFAMILY="Times New Roman" FONTSIZE="11" />
+  </Styles>
+  <Layout>
+    <Page ID="Page1" PHYSICAL_IMG_NR="1" HEIGHT="3316" WIDTH="2904">
+      <TopMargin HEIGHT="502" WIDTH="2904" VPOS="0" HPOS="0">
+      </TopMargin>
+      <LeftMargin HEIGHT="2589" WIDTH="631" VPOS="502" HPOS="0">
+      </LeftMargin>
+      <RightMargin HEIGHT="2589" WIDTH="402" VPOS="502" HPOS="2502">
+      </RightMargin>
+      <BottomMargin HEIGHT="225" WIDTH="2904" VPOS="3091" HPOS="0">
+      </BottomMargin>
+      <PrintSpace HEIGHT="2589" WIDTH="1871" VPOS="502" HPOS="631">
+        <TextBlock ID="Page1_Block1" HEIGHT="205" WIDTH="1608" VPOS="502" HPOS="634" language="fr" STYLEREFS="font0">
+          <TextLine BASELINE="614" HEIGHT="102" WIDTH="1578" VPOS="517" HPOS="651">
+            <String WC="0.9390000105" CONTENT="L’OSSATURE" HEIGHT="80" WIDTH="740" VPOS="537" HPOS="651" />
+            <SP WIDTH="80" VPOS="541" HPOS="1392" />
+            <String WC="0.8320000172" CONTENT="MÉTALLIQUE" HEIGHT="102" WIDTH="756" VPOS="517" HPOS="1473" />
+          </TextLine>
+          <TextLine BASELINE="683" HEIGHT="44" WIDTH="1583" VPOS="640" HPOS="649" STYLEREFS="font2">
+            <String WC="0.84375" CONTENT="BULLETIN" HEIGHT="35" WIDTH="241" VPOS="648" HPOS="649" />
+            <SP WIDTH="50" VPOS="648" HPOS="891" />
+            <String WC="0.7200000286" CONTENT="DE" HEIGHT="33" WIDTH="57" VPOS="649" HPOS="942" />
+            <SP WIDTH="49" VPOS="649" HPOS="1000" />
+            <String WC="0.8835714459" CONTENT="DOCUMENTATION." HEIGHT="36" WIDTH="517" VPOS="648" HPOS="1050" />
+            <SP WIDTH="47" VPOS="650" HPOS="1568" />
+            <String WC="0.8100000024" CONTENT="NUMÉRO" HEIGHT="44" WIDTH="233" VPOS="640" HPOS="1616" />
+            <SP WIDTH="35" VPOS="649" HPOS="1850" />
+            <String WC="0.25" CONTENT="U" HEIGHT="33" WIDTH="27" VPOS="651" HPOS="1886" />
+            <SP WIDTH="43" VPOS="649" HPOS="1914" />
+            <String WC="0.9175000191" CONTENT="MARS" HEIGHT="35" WIDTH="139" VPOS="649" HPOS="1958" />
+            <SP WIDTH="37" VPOS="649" HPOS="2098" />
+            <String WC="0.8899999857" CONTENT="1932" HEIGHT="35" WIDTH="96" VPOS="649" HPOS="2136" />
+          </TextLine>
+        </TextBlock>
+        <TextBlock ID="Page1_Block2" HEIGHT="139" WIDTH="1625" VPOS="1268" HPOS="631" language="fr" STYLEREFS="font0">
+          <TextLine BASELINE="1374" HEIGHT="80" WIDTH="1574" VPOS="1297" HPOS="653">
+            <String WC="0.9066666961" CONTENT="INTRODUCTION" HEIGHT="80" WIDTH="1574" VPOS="1297" HPOS="653" />
+          </TextLine>
+        </TextBlock>
+        <TextBlock ID="Page1_Block3" HEIGHT="1241" WIDTH="773" VPOS="1445" HPOS="634" language="fr" STYLEREFS="font2">
+          <TextLine BASELINE="1505" HEIGHT="41" WIDTH="686" VPOS="1472" HPOS="688">
+            <String WC="0.8999999762" CONTENT="Le" HEIGHT="31" WIDTH="44" VPOS="1472" HPOS="688" />
+            <SP WIDTH="23" VPOS="1482" HPOS="733" />
+            <String WC="0.8514285684" CONTENT="présent" HEIGHT="40" WIDTH="138" VPOS="1473" HPOS="757" />
+            <SP WIDTH="23" VPOS="1473" HPOS="896" />
+            <String WC="0.9049999714" CONTENT="bulletin" HEIGHT="33" WIDTH="149" VPOS="1472" HPOS="920" />
+            <SP WIDTH="25" VPOS="1473" HPOS="1070" />
+            <String WC="1." CONTENT="de" HEIGHT="32" WIDTH="41" VPOS="1473" HPOS="1096" />
+            <SP WIDTH="23" VPOS="1473" HPOS="1138" />
+            <String WC="0.9160000086" CONTENT="documenta-" HEIGHT="33" WIDTH="212" VPOS="1473" HPOS="1162" />
+          </TextLine>
+          <TextLine BASELINE="1561" HEIGHT="38" WIDTH="726" VPOS="1529" HPOS="645">
+            <String WC="0.976000011" CONTENT="tion," HEIGHT="37" WIDTH="85" VPOS="1530" HPOS="645" />
+            <SP WIDTH="17" VPOS="1539" HPOS="731" />
+            <String WC="0.9399999976" CONTENT="consacré" HEIGHT="30" WIDTH="164" VPOS="1531" HPOS="749" />
+            <SP WIDTH="13" VPOS="1531" HPOS="914" />
+            <String WC="0.349999994" CONTENT="à" HEIGHT="30" WIDTH="19" VPOS="1531" HPOS="928" />
+            <SP WIDTH="13" VPOS="1529" HPOS="948" />
+            <String WC="0.5450000167" CONTENT="la" HEIGHT="32" WIDTH="33" VPOS="1529" HPOS="962" />
+            <SP WIDTH="13" VPOS="1540" HPOS="996" />
+            <String WC="0.9183333516" CONTENT="construction" HEIGHT="31" WIDTH="239" VPOS="1531" HPOS="1010" />
+            <SP WIDTH="15" VPOS="1541" HPOS="1250" />
+            <String WC="0.9216666818" CONTENT="métal-" HEIGHT="32" WIDTH="105" VPOS="1530" HPOS="1266" />
+          </TextLine>
+          <TextLine BASELINE="1619" HEIGHT="42" WIDTH="741" VPOS="1585" HPOS="647">
+            <String WC="0.8849999905" CONTENT="lique," HEIGHT="42" WIDTH="106" VPOS="1585" HPOS="647" />
+            <SP WIDTH="40" VPOS="1596" HPOS="754" />
+            <String WC="0.9800000191" CONTENT="puise" HEIGHT="40" WIDTH="98" VPOS="1587" HPOS="795" />
+            <SP WIDTH="36" VPOS="1596" HPOS="894" />
+            <String WC="0.8333333135" CONTENT="ses" HEIGHT="21" WIDTH="50" VPOS="1597" HPOS="931" />
+            <SP WIDTH="37" VPOS="1597" HPOS="982" />
+            <String WC="0.9028571248" CONTENT="résumés" HEIGHT="31" WIDTH="154" VPOS="1588" HPOS="1020" />
+            <SP WIDTH="37" VPOS="1588" HPOS="1175" />
+            <String WC="0.9190000296" CONTENT="d’articles" HEIGHT="33" WIDTH="175" VPOS="1587" HPOS="1213" />
+          </TextLine>
+          <TextLine BASELINE="1676" HEIGHT="43" WIDTH="742" VPOS="1642" HPOS="646">
+            <String WC="0.8500000238" CONTENT="dans" HEIGHT="32" WIDTH="86" VPOS="1642" HPOS="646" />
+            <SP WIDTH="19" VPOS="1653" HPOS="733" />
+            <String WC="1." CONTENT="un" HEIGHT="21" WIDTH="48" VPOS="1653" HPOS="753" />
+            <SP WIDTH="21" VPOS="1653" HPOS="802" />
+            <String WC="0.8483333588" CONTENT="nombre" HEIGHT="32" WIDTH="148" VPOS="1643" HPOS="824" />
+            <SP WIDTH="19" VPOS="1645" HPOS="973" />
+            <String WC="0.8633333445" CONTENT="important" HEIGHT="40" WIDTH="195" VPOS="1645" HPOS="993" />
+            <SP WIDTH="17" VPOS="1644" HPOS="1189" />
+            <String WC="1." CONTENT="de" HEIGHT="33" WIDTH="41" VPOS="1644" HPOS="1207" />
+            <SP WIDTH="17" VPOS="1655" HPOS="1249" />
+            <String WC="0.7616666555" CONTENT="revues" HEIGHT="22" WIDTH="121" VPOS="1655" HPOS="1267" />
+          </TextLine>
+          <TextLine BASELINE="1731" HEIGHT="35" WIDTH="345" VPOS="1699" HPOS="646">
+            <String WC="1." CONTENT="du" HEIGHT="32" WIDTH="47" VPOS="1699" HPOS="646" />
+            <SP WIDTH="23" VPOS="1710" HPOS="694" />
+            <String WC="0.8579999804" CONTENT="monde" HEIGHT="32" WIDTH="129" VPOS="1700" HPOS="718" />
+            <SP WIDTH="22" VPOS="1710" HPOS="848" />
+            <String WC="0.9499999881" CONTENT="entier." HEIGHT="33" WIDTH="120" VPOS="1701" HPOS="871" />
+          </TextLine>
+          <TextLine BASELINE="1789" HEIGHT="44" WIDTH="699" VPOS="1755" HPOS="690">
+            <String WC="0.9039999843" CONTENT="L’ossature" HEIGHT="33" WIDTH="195" VPOS="1755" HPOS="690" />
+            <SP WIDTH="23" VPOS="1767" HPOS="886" />
+            <String WC="0.9689999819" CONTENT="métallique" HEIGHT="41" WIDTH="204" VPOS="1757" HPOS="910" />
+            <SP WIDTH="21" VPOS="1768" HPOS="1115" />
+            <String WC="0.8199999928" CONTENT="veut" HEIGHT="28" WIDTH="82" VPOS="1762" HPOS="1137" />
+            <SP WIDTH="21" VPOS="1762" HPOS="1220" />
+            <String WC="0.7785714269" CONTENT="remplir" HEIGHT="41" WIDTH="147" VPOS="1758" HPOS="1242" />
+          </TextLine>
+          <TextLine BASELINE="1846" HEIGHT="43" WIDTH="728" VPOS="1813" HPOS="646">
+            <String WC="0.8299999833" CONTENT="son" HEIGHT="21" WIDTH="62" VPOS="1823" HPOS="646" />
+            <SP WIDTH="21" VPOS="1813" HPOS="709" />
+            <String WC="0.7900000215" CONTENT="but" HEIGHT="32" WIDTH="63" VPOS="1813" HPOS="731" />
+            <SP WIDTH="20" VPOS="1814" HPOS="795" />
+            <String WC="0.6800000072" CONTENT="de" HEIGHT="31" WIDTH="40" VPOS="1814" HPOS="816" />
+            <SP WIDTH="21" VPOS="1824" HPOS="857" />
+            <String WC="0.8740000129" CONTENT="propagande" HEIGHT="40" WIDTH="225" VPOS="1815" HPOS="879" />
+            <SP WIDTH="20" VPOS="1825" HPOS="1105" />
+            <String WC="0.7925000191" CONTENT="pour" HEIGHT="30" WIDTH="90" VPOS="1826" HPOS="1126" />
+            <SP WIDTH="20" VPOS="1815" HPOS="1217" />
+            <String WC="0.8050000072" CONTENT="le" HEIGHT="32" WIDTH="32" VPOS="1815" HPOS="1238" />
+            <SP WIDTH="18" VPOS="1816" HPOS="1271" />
+            <String WC="0.871999979" CONTENT="déve-" HEIGHT="31" WIDTH="84" VPOS="1816" HPOS="1290" />
+          </TextLine>
+          <TextLine BASELINE="1904" HEIGHT="43" WIDTH="736" VPOS="1870" HPOS="649">
+            <String WC="1." CONTENT="loppement" HEIGHT="41" WIDTH="203" VPOS="1870" HPOS="649" />
+            <SP WIDTH="38" VPOS="1872" HPOS="853" />
+            <String WC="1." CONTENT="de" HEIGHT="31" WIDTH="42" VPOS="1872" HPOS="892" />
+            <SP WIDTH="37" VPOS="1872" HPOS="935" />
+            <String WC="0.9262499809" CONTENT="l’emploi" HEIGHT="42" WIDTH="157" VPOS="1871" HPOS="973" />
+            <SP WIDTH="39" VPOS="1872" HPOS="1131" />
+            <String WC="1." CONTENT="de" HEIGHT="32" WIDTH="42" VPOS="1872" HPOS="1171" />
+            <SP WIDTH="39" VPOS="1872" HPOS="1214" />
+            <String WC="0.8924999833" CONTENT="l’acier," HEIGHT="39" WIDTH="131" VPOS="1872" HPOS="1254" />
+          </TextLine>
+          <TextLine BASELINE="1961" HEIGHT="42" WIDTH="727" VPOS="1927" HPOS="648">
+            <String WC="0.9179999828" CONTENT="d’une" HEIGHT="33" WIDTH="107" VPOS="1927" HPOS="648" />
+            <SP WIDTH="32" VPOS="1938" HPOS="756" />
+            <String WC="0.8324999809" CONTENT="part" HEIGHT="37" WIDTH="77" VPOS="1932" HPOS="789" />
+            <SP WIDTH="31" VPOS="1932" HPOS="867" />
+            <String WC="0.8849999905" CONTENT="en" HEIGHT="21" WIDTH="42" VPOS="1939" HPOS="899" />
+            <SP WIDTH="34" VPOS="1939" HPOS="942" />
+            <String WC="0.9166666865" CONTENT="aidant" HEIGHT="32" WIDTH="119" VPOS="1929" HPOS="977" />
+            <SP WIDTH="33" VPOS="1928" HPOS="1097" />
+            <String WC="0.8833333254" CONTENT="les" HEIGHT="33" WIDTH="47" VPOS="1928" HPOS="1131" />
+            <SP WIDTH="32" VPOS="1939" HPOS="1179" />
+            <String WC="0.8044444323" CONTENT="construc-" HEIGHT="27" WIDTH="163" VPOS="1934" HPOS="1212" />
+          </TextLine>
+          <TextLine BASELINE="2017" HEIGHT="40" WIDTH="741" VPOS="1985" HPOS="646">
+            <String WC="0.7879999876" CONTENT="teurs" HEIGHT="29" WIDTH="94" VPOS="1988" HPOS="646" />
+            <SP WIDTH="35" VPOS="1986" HPOS="741" />
+            <String WC="1." CONTENT="à" HEIGHT="31" WIDTH="18" VPOS="1986" HPOS="777" />
+            <SP WIDTH="35" VPOS="1986" HPOS="796" />
+            <String WC="0.9488888979" CONTENT="améliorer" HEIGHT="33" WIDTH="185" VPOS="1985" HPOS="832" />
+            <SP WIDTH="35" VPOS="1985" HPOS="1018" />
+            <String WC="0.9649999738" CONTENT="leur" HEIGHT="33" WIDTH="75" VPOS="1985" HPOS="1054" />
+            <SP WIDTH="35" VPOS="1986" HPOS="1130" />
+            <String WC="0.9316666722" CONTENT="fabrication," HEIGHT="39" WIDTH="221" VPOS="1986" HPOS="1166" />
+          </TextLine>
+          <TextLine BASELINE="2074" HEIGHT="42" WIDTH="726" VPOS="2041" HPOS="648">
+            <String WC="0.9642857313" CONTENT="d’autre" HEIGHT="32" WIDTH="135" VPOS="2041" HPOS="648" />
+            <SP WIDTH="29" VPOS="2052" HPOS="784" />
+            <String WC="0.8725000024" CONTENT="part" HEIGHT="36" WIDTH="77" VPOS="2047" HPOS="814" />
+            <SP WIDTH="28" VPOS="2047" HPOS="892" />
+            <String WC="1." CONTENT="en" HEIGHT="21" WIDTH="43" VPOS="2053" HPOS="921" />
+            <SP WIDTH="31" VPOS="2053" HPOS="965" />
+            <String WC="0.9225000143" CONTENT="montrant" HEIGHT="28" WIDTH="182" VPOS="2047" HPOS="997" />
+            <SP WIDTH="28" VPOS="2047" HPOS="1180" />
+            <String WC="0.9366666675" CONTENT="aux" HEIGHT="21" WIDTH="68" VPOS="2054" HPOS="1209" />
+            <SP WIDTH="29" VPOS="2054" HPOS="1278" />
+            <String WC="1." CONTENT="con-" HEIGHT="21" WIDTH="66" VPOS="2054" HPOS="1308" />
+          </TextLine>
+          <TextLine BASELINE="2131" HEIGHT="39" WIDTH="743" VPOS="2102" HPOS="646">
+            <String WC="0.9318181872" CONTENT="sommateurs," HEIGHT="34" WIDTH="244" VPOS="2104" HPOS="646" />
+            <SP WIDTH="49" VPOS="2111" HPOS="891" />
+            <String WC="0.926666677" CONTENT="aux" HEIGHT="21" WIDTH="68" VPOS="2111" HPOS="941" />
+            <SP WIDTH="45" VPOS="2102" HPOS="1010" />
+            <String WC="0.8736363649" CONTENT="ingénieurs," HEIGHT="39" WIDTH="215" VPOS="2102" HPOS="1056" />
+            <SP WIDTH="48" VPOS="2111" HPOS="1272" />
+            <String WC="0.8166666627" CONTENT="aux" HEIGHT="21" WIDTH="68" VPOS="2111" HPOS="1321" />
+          </TextLine>
+          <TextLine BASELINE="2189" HEIGHT="43" WIDTH="742" VPOS="2156" HPOS="646">
+            <String WC="0.9218181968" CONTENT="architectes" HEIGHT="33" WIDTH="202" VPOS="2156" HPOS="646" />
+            <SP WIDTH="35" VPOS="2167" HPOS="849" />
+            <String WC="1." CONTENT="et" HEIGHT="27" WIDTH="33" VPOS="2162" HPOS="885" />
+            <SP WIDTH="33" VPOS="2162" HPOS="919" />
+            <String WC="1." CONTENT="aux" HEIGHT="21" WIDTH="69" VPOS="2168" HPOS="953" />
+            <SP WIDTH="33" VPOS="2168" HPOS="1023" />
+            <String WC="0.8446153998" CONTENT="propriétaires" HEIGHT="40" WIDTH="246" VPOS="2159" HPOS="1057" />
+            <SP WIDTH="36" VPOS="2158" HPOS="1304" />
+            <String WC="0.7699999809" CONTENT="les" HEIGHT="32" WIDTH="47" VPOS="2158" HPOS="1341" />
+          </TextLine>
+          <TextLine BASELINE="2246" HEIGHT="42" WIDTH="655" VPOS="2214" HPOS="646">
+            <String WC="0.7666666508" CONTENT="possibilités" HEIGHT="40" WIDTH="211" VPOS="2214" HPOS="646" />
+            <SP WIDTH="20" VPOS="2225" HPOS="858" />
+            <String WC="1." CONTENT="que" HEIGHT="31" WIDTH="67" VPOS="2225" HPOS="879" />
+            <SP WIDTH="19" VPOS="2214" HPOS="947" />
+            <String WC="0.8924999833" CONTENT="leur" HEIGHT="33" WIDTH="76" VPOS="2214" HPOS="967" />
+            <SP WIDTH="18" VPOS="2225" HPOS="1044" />
+            <String WC="0.6940000057" CONTENT="offre" HEIGHT="32" WIDTH="87" VPOS="2215" HPOS="1063" />
+            <SP WIDTH="19" VPOS="2215" HPOS="1151" />
+            <String WC="0.9962499738" CONTENT="l’acier." HEIGHT="33" WIDTH="130" VPOS="2215" HPOS="1171" />
+          </TextLine>
+          <TextLine BASELINE="2303" HEIGHT="34" WIDTH="684" VPOS="2270" HPOS="691">
+            <String WC="0.9750000238" CONTENT="Le" HEIGHT="33" WIDTH="44" VPOS="2270" HPOS="691" />
+            <SP WIDTH="18" VPOS="2272" HPOS="736" />
+            <String STYLE="italics" WC="0.8162500262" CONTENT="Bulletin" HEIGHT="33" WIDTH="154" VPOS="2271" HPOS="755" />
+            <SP WIDTH="18" VPOS="2272" HPOS="910" />
+            <String STYLE="italics" WC="0.6850000024" CONTENT="de" HEIGHT="32" WIDTH="41" VPOS="2272" HPOS="929" />
+            <SP WIDTH="16" VPOS="2273" HPOS="971" />
+            <String STYLE="italics" WC="0.716923058" CONTENT="Documentation" HEIGHT="33" WIDTH="298" VPOS="2271" HPOS="988" />
+            <SP WIDTH="18" VPOS="2282" HPOS="1287" />
+            <String WC="0.9399999976" CONTENT="clas-" HEIGHT="32" WIDTH="69" VPOS="2272" HPOS="1306" />
+          </TextLine>
+          <TextLine BASELINE="2360" HEIGHT="41" WIDTH="728" VPOS="2327" HPOS="647">
+            <String WC="0.9250000119" CONTENT="sera" HEIGHT="22" WIDTH="75" VPOS="2337" HPOS="647" />
+            <SP WIDTH="18" VPOS="2327" HPOS="723" />
+            <String WC="0.8475000262" CONTENT="donc" HEIGHT="33" WIDTH="91" VPOS="2327" HPOS="742" />
+            <SP WIDTH="20" VPOS="2338" HPOS="834" />
+            <String WC="0.7766666412" CONTENT="ses" HEIGHT="22" WIDTH="50" VPOS="2338" HPOS="855" />
+            <SP WIDTH="19" VPOS="2338" HPOS="906" />
+            <String WC="0.8849999905" CONTENT="matières" HEIGHT="30" WIDTH="160" VPOS="2330" HPOS="926" />
+            <SP WIDTH="19" VPOS="2328" HPOS="1087" />
+            <String WC="1." CONTENT="de" HEIGHT="32" WIDTH="41" VPOS="2328" HPOS="1107" />
+            <SP WIDTH="20" VPOS="2328" HPOS="1149" />
+            <String WC="1." CONTENT="façon" HEIGHT="40" WIDTH="102" VPOS="2328" HPOS="1170" />
+            <SP WIDTH="19" VPOS="2329" HPOS="1273" />
+            <String WC="0.2599999905" CONTENT="à" HEIGHT="31" WIDTH="20" VPOS="2329" HPOS="1293" />
+            <SP WIDTH="18" VPOS="2328" HPOS="1314" />
+            <String WC="1." CONTENT="dé-" HEIGHT="32" WIDTH="42" VPOS="2328" HPOS="1333" />
+          </TextLine>
+          <TextLine BASELINE="2417" HEIGHT="43" WIDTH="731" VPOS="2384" HPOS="645">
+            <String WC="0.8899999857" CONTENT="gager" HEIGHT="30" WIDTH="107" VPOS="2395" HPOS="645" />
+            <SP WIDTH="12" VPOS="2384" HPOS="753" />
+            <String WC="0.8799999952" CONTENT="les" HEIGHT="33" WIDTH="47" VPOS="2384" HPOS="766" />
+            <SP WIDTH="13" VPOS="2395" HPOS="814" />
+            <String WC="0.8650000095" CONTENT="sujets" HEIGHT="40" WIDTH="105" VPOS="2386" HPOS="828" />
+            <SP WIDTH="11" VPOS="2387" HPOS="934" />
+            <String WC="0.9136363864" CONTENT="intéressant" HEIGHT="31" WIDTH="207" VPOS="2386" HPOS="946" />
+            <SP WIDTH="11" VPOS="2389" HPOS="1154" />
+            <String WC="0.7250000238" CONTENT="plus" HEIGHT="42" WIDTH="80" VPOS="2385" HPOS="1166" />
+            <SP WIDTH="13" VPOS="2396" HPOS="1247" />
+            <String WC="0.9528571367" CONTENT="spécia-" HEIGHT="40" WIDTH="115" VPOS="2387" HPOS="1261" />
+          </TextLine>
+          <TextLine BASELINE="2475" HEIGHT="43" WIDTH="742" VPOS="2441" HPOS="649">
+            <String WC="0.9866666794" CONTENT="lement" HEIGHT="33" WIDTH="132" VPOS="2441" HPOS="649" />
+            <SP WIDTH="29" VPOS="2446" HPOS="782" />
+            <String WC="1." CONTENT="ses" HEIGHT="21" WIDTH="51" VPOS="2453" HPOS="812" />
+            <SP WIDTH="31" VPOS="2443" HPOS="864" />
+            <String WC="0.9599999785" CONTENT="différentes" HEIGHT="32" WIDTH="199" VPOS="2443" HPOS="896" />
+            <SP WIDTH="31" VPOS="2453" HPOS="1096" />
+            <String WC="0.9269999862" CONTENT="catégories" HEIGHT="40" WIDTH="189" VPOS="2444" HPOS="1128" />
+            <SP WIDTH="30" VPOS="2443" HPOS="1318" />
+            <String WC="1." CONTENT="de" HEIGHT="32" WIDTH="42" VPOS="2443" HPOS="1349" />
+          </TextLine>
+          <TextLine BASELINE="2532" HEIGHT="35" WIDTH="738" VPOS="2498" HPOS="648">
+            <String WC="0.8911111355" CONTENT="lecteurs." HEIGHT="34" WIDTH="157" VPOS="2498" HPOS="648" />
+            <SP WIDTH="22" VPOS="2499" HPOS="806" />
+            <String WC="0.8600000143" CONTENT="L’ordre" HEIGHT="33" WIDTH="143" VPOS="2499" HPOS="829" />
+            <SP WIDTH="20" VPOS="2510" HPOS="973" />
+            <String WC="0.8971428275" CONTENT="suivant" HEIGHT="31" WIDTH="140" VPOS="2501" HPOS="994" />
+            <SP WIDTH="19" VPOS="2504" HPOS="1135" />
+            <String WC="1." CONTENT="a" HEIGHT="22" WIDTH="19" VPOS="2510" HPOS="1155" />
+            <SP WIDTH="19" VPOS="2501" HPOS="1175" />
+            <String WC="0.9333333373" CONTENT="été" HEIGHT="31" WIDTH="51" VPOS="2501" HPOS="1195" />
+            <SP WIDTH="18" VPOS="2502" HPOS="1247" />
+            <String WC="0.854285717" CONTENT="arrêté." HEIGHT="33" WIDTH="120" VPOS="2500" HPOS="1266" />
+          </TextLine>
+          <TextLine BASELINE="2609" HEIGHT="41" WIDTH="683" VPOS="2576" HPOS="693">
+            <String WC="0.9350000024" CONTENT="1." HEIGHT="31" WIDTH="30" VPOS="2577" HPOS="693" />
+            <SP />
+            <String WC="0.8022222519" CONTENT="Matériaux" HEIGHT="33" WIDTH="191" VPOS="2576" HPOS="750" />
+            <SP WIDTH="26" VPOS="2588" HPOS="942" />
+            <String WC="1." CONTENT="—" HEIGHT="5" WIDTH="46" VPOS="2597" HPOS="969" />
+            <SP WIDTH="27" VPOS="2587" HPOS="1016" />
+            <String WC="0.8974999785" CONTENT="calculs," HEIGHT="40" WIDTH="141" VPOS="2577" HPOS="1044" />
+            <SP WIDTH="30" VPOS="2596" HPOS="1186" />
+            <String WC="1." CONTENT="—" HEIGHT="6" WIDTH="46" VPOS="2596" HPOS="1217" />
+            <SP WIDTH="27" VPOS="2587" HPOS="1264" />
+            <String WC="0.8999999762" CONTENT="cons-" HEIGHT="22" WIDTH="84" VPOS="2587" HPOS="1292" />
+          </TextLine>
+          <TextLine BASELINE="2666" HEIGHT="32" WIDTH="346" VPOS="2635" HPOS="647">
+            <String WC="0.9487500191" CONTENT="truction" HEIGHT="31" WIDTH="153" VPOS="2635" HPOS="647" />
+            <SP WIDTH="22" VPOS="2644" HPOS="801" />
+            <String WC="1." CONTENT="et" HEIGHT="28" WIDTH="32" VPOS="2638" HPOS="824" />
+            <SP WIDTH="20" VPOS="2638" HPOS="857" />
+            <String WC="0.7214285731" CONTENT="essais." HEIGHT="32" WIDTH="115" VPOS="2635" HPOS="878" />
+          </TextLine>
+        </TextBlock>
+        <TextBlock ID="Page1_Block4" HEIGHT="1330" WIDTH="773" VPOS="1442" HPOS="1473" language="fr" STYLEREFS="font2">
+          <TextLine BASELINE="1506" HEIGHT="42" WIDTH="684" VPOS="1474" HPOS="1532">
+            <String STYLE="italics" WC="0.7950000167" CONTENT="2." HEIGHT="31" WIDTH="31" VPOS="1475" HPOS="1532" />
+            <SP WIDTH="27" VPOS="1474" HPOS="1564" />
+            <String WC="0.9499999881" CONTENT="Description" HEIGHT="42" WIDTH="220" VPOS="1474" HPOS="1592" />
+            <SP WIDTH="54" VPOS="1475" HPOS="1813" />
+            <String WC="0.8769999743" CONTENT="d’ouvrages" HEIGHT="41" WIDTH="208" VPOS="1474" HPOS="1868" />
+            <SP WIDTH="54" VPOS="1485" HPOS="2077" />
+            <String WC="0.9399999976" CONTENT="cons-" HEIGHT="22" WIDTH="84" VPOS="1485" HPOS="2132" />
+          </TextLine>
+          <TextLine BASELINE="1563" HEIGHT="41" WIDTH="344" VPOS="1532" HPOS="1487">
+            <String WC="0.7666666508" CONTENT="truits" HEIGHT="30" WIDTH="101" VPOS="1532" HPOS="1487" />
+            <SP WIDTH="17" VPOS="1541" HPOS="1589" />
+            <String WC="1." CONTENT="ou" HEIGHT="21" WIDTH="46" VPOS="1542" HPOS="1607" />
+            <SP WIDTH="15" VPOS="1542" HPOS="1654" />
+            <String WC="0.8922222257" CONTENT="projetés." HEIGHT="40" WIDTH="161" VPOS="1533" HPOS="1670" />
+          </TextLine>
+          <TextLine BASELINE="1640" HEIGHT="46" WIDTH="698" VPOS="1604" HPOS="1529">
+            <String WC="0.7599999905" CONTENT="3." HEIGHT="32" WIDTH="30" VPOS="1605" HPOS="1529" />
+            <SP WIDTH="24" VPOS="1604" HPOS="1560" />
+            <String WC="0.9344444275" CONTENT="Matériaux" HEIGHT="34" WIDTH="191" VPOS="1604" HPOS="1585" />
+            <SP WIDTH="17" VPOS="1607" HPOS="1777" />
+            <String WC="1." CONTENT="de" HEIGHT="31" WIDTH="41" VPOS="1607" HPOS="1795" />
+            <SP WIDTH="16" VPOS="1617" HPOS="1837" />
+            <String WC="0.8490909338" CONTENT="remplissage" HEIGHT="42" WIDTH="227" VPOS="1608" HPOS="1854" />
+            <SP WIDTH="23" VPOS="1608" HPOS="2082" />
+            <String WC="0.9433333278" CONTENT="(hour-" HEIGHT="40" WIDTH="121" VPOS="1608" HPOS="2106" />
+          </TextLine>
+          <TextLine BASELINE="1696" HEIGHT="42" WIDTH="743" VPOS="1662" HPOS="1486">
+            <String WC="0.9125000238" CONTENT="dis," HEIGHT="39" WIDTH="65" VPOS="1662" HPOS="1486" />
+            <SP WIDTH="25" VPOS="1673" HPOS="1552" />
+            <String WC="0.8725000024" CONTENT="murs" HEIGHT="22" WIDTH="97" VPOS="1673" HPOS="1578" />
+            <SP WIDTH="23" VPOS="1674" HPOS="1676" />
+            <String WC="1." CONTENT="et" HEIGHT="28" WIDTH="32" VPOS="1668" HPOS="1700" />
+            <SP WIDTH="21" VPOS="1668" HPOS="1733" />
+            <String WC="0.8666666746" CONTENT="cloisons," HEIGHT="41" WIDTH="162" VPOS="1663" HPOS="1755" />
+            <SP WIDTH="25" VPOS="1676" HPOS="1918" />
+            <String WC="0.8772727251" CONTENT="revêtements" HEIGHT="33" WIDTH="229" VPOS="1665" HPOS="1944" />
+            <SP WIDTH="22" VPOS="1676" HPOS="2174" />
+            <String WC="1." CONTENT="et" HEIGHT="28" WIDTH="32" VPOS="1670" HPOS="2197" />
+          </TextLine>
+          <TextLine BASELINE="1752" HEIGHT="39" WIDTH="147" VPOS="1719" HPOS="1487">
+            <String WC="0.9225000143" CONTENT="divers)." HEIGHT="39" WIDTH="147" VPOS="1719" HPOS="1487" />
+          </TextLine>
+          <TextLine BASELINE="1831" HEIGHT="42" WIDTH="684" VPOS="1797" HPOS="1533">
+            <String WC="0.8799999952" CONTENT="4." HEIGHT="30" WIDTH="30" VPOS="1798" HPOS="1533" />
+            <SP WIDTH="26" VPOS="1797" HPOS="1564" />
+            <String WC="0.8716666698" CONTENT="Etudes" HEIGHT="33" WIDTH="126" VPOS="1797" HPOS="1591" />
+            <SP WIDTH="26" VPOS="1809" HPOS="1718" />
+            <String WC="0.823333323" CONTENT="générales" HEIGHT="40" WIDTH="178" VPOS="1799" HPOS="1745" />
+            <SP WIDTH="26" VPOS="1810" HPOS="1924" />
+            <String WC="1." CONTENT="et" HEIGHT="28" WIDTH="32" VPOS="1804" HPOS="1951" />
+            <SP WIDTH="26" VPOS="1802" HPOS="1984" />
+            <String WC="0.8983333111" CONTENT="études" HEIGHT="31" WIDTH="118" VPOS="1801" HPOS="2011" />
+            <SP WIDTH="26" VPOS="1802" HPOS="2130" />
+            <String WC="0.9649999738" CONTENT="éco-" HEIGHT="30" WIDTH="60" VPOS="1802" HPOS="2157" />
+          </TextLine>
+          <TextLine BASELINE="1887" HEIGHT="40" WIDTH="198" VPOS="1856" HPOS="1488">
+            <String WC="0.9144444466" CONTENT="nomiques." HEIGHT="40" WIDTH="198" VPOS="1856" HPOS="1488" />
+          </TextLine>
+          <TextLine BASELINE="1980" HEIGHT="47" WIDTH="699" VPOS="1944" HPOS="1532">
+            <String WC="0.8974999785" CONTENT="Nous" HEIGHT="33" WIDTH="93" VPOS="1944" HPOS="1532" />
+            <SP WIDTH="33" VPOS="1956" HPOS="1626" />
+            <String WC="0.8012499809" CONTENT="espérons" HEIGHT="40" WIDTH="163" VPOS="1948" HPOS="1660" />
+            <SP WIDTH="34" VPOS="1958" HPOS="1824" />
+            <String WC="0.9137499928" CONTENT="réaliser" HEIGHT="33" WIDTH="140" VPOS="1948" HPOS="1859" />
+            <SP WIDTH="34" VPOS="1960" HPOS="2000" />
+            <String WC="0.823333323" CONTENT="par" HEIGHT="31" WIDTH="62" VPOS="1960" HPOS="2035" />
+            <SP WIDTH="32" VPOS="1961" HPOS="2098" />
+            <String WC="0.9100000262" CONTENT="notre" HEIGHT="28" WIDTH="100" VPOS="1955" HPOS="2131" />
+          </TextLine>
+          <TextLine BASELINE="2037" HEIGHT="48" WIDTH="742" VPOS="2001" HPOS="1489">
+            <String WC="0.875" CONTENT="Bulletin" HEIGHT="33" WIDTH="152" VPOS="2001" HPOS="1489" />
+            <SP WIDTH="23" VPOS="2013" HPOS="1642" />
+            <String WC="0.9766666889" CONTENT="une" HEIGHT="21" WIDTH="70" VPOS="2014" HPOS="1666" />
+            <SP WIDTH="22" VPOS="2014" HPOS="1737" />
+            <String WC="0.7279999852" CONTENT="œuvre" HEIGHT="23" WIDTH="120" VPOS="2014" HPOS="1760" />
+            <SP WIDTH="21" VPOS="2016" HPOS="1881" />
+            <String WC="0.9559999704" CONTENT="utile" HEIGHT="32" WIDTH="86" VPOS="2006" HPOS="1903" />
+            <SP WIDTH="22" VPOS="2008" HPOS="1990" />
+            <String WC="0.9262499809" CONTENT="inspirée" HEIGHT="41" WIDTH="151" VPOS="2008" HPOS="2013" />
+            <SP WIDTH="23" VPOS="2008" HPOS="2165" />
+            <String WC="0.9649999738" CONTENT="de" HEIGHT="32" WIDTH="42" VPOS="2008" HPOS="2189" />
+          </TextLine>
+          <TextLine BASELINE="2094" HEIGHT="40" WIDTH="728" VPOS="2062" HPOS="1488">
+            <String WC="0.8159999847" CONTENT="notre" HEIGHT="27" WIDTH="99" VPOS="2064" HPOS="1488" />
+            <SP WIDTH="14" VPOS="2070" HPOS="1588" />
+            <String WC="0.9250000119" CONTENT="unique" HEIGHT="40" WIDTH="135" VPOS="2062" HPOS="1603" />
+            <SP WIDTH="14" VPOS="2071" HPOS="1739" />
+            <String WC="0.9200000167" CONTENT="souci" HEIGHT="31" WIDTH="96" VPOS="2063" HPOS="1754" />
+            <SP WIDTH="15" VPOS="2063" HPOS="1851" />
+            <String WC="1." CONTENT=":" HEIGHT="21" WIDTH="6" VPOS="2073" HPOS="1867" />
+            <SP WIDTH="15" VPOS="2063" HPOS="1874" />
+            <String WC="0.9639999866" CONTENT="documenter" HEIGHT="34" WIDTH="229" VPOS="2063" HPOS="1890" />
+            <SP WIDTH="13" VPOS="2075" HPOS="2120" />
+            <String WC="1." CONTENT="exac-" HEIGHT="22" WIDTH="82" VPOS="2075" HPOS="2134" />
+          </TextLine>
+          <TextLine BASELINE="2153" HEIGHT="37" WIDTH="742" VPOS="2119" HPOS="1488">
+            <String WC="0.926666677" CONTENT="tement" HEIGHT="29" WIDTH="131" VPOS="2121" HPOS="1488" />
+            <SP WIDTH="13" VPOS="2122" HPOS="1620" />
+            <String WC="0.9866666794" CONTENT="nos" HEIGHT="21" WIDTH="64" VPOS="2129" HPOS="1634" />
+            <SP WIDTH="15" VPOS="2119" HPOS="1699" />
+            <String WC="0.8774999976" CONTENT="lecteurs" HEIGHT="33" WIDTH="145" VPOS="2119" HPOS="1715" />
+            <SP WIDTH="14" VPOS="2131" HPOS="1861" />
+            <String WC="0.7533333302" CONTENT="sur" HEIGHT="22" WIDTH="59" VPOS="2131" HPOS="1876" />
+            <SP WIDTH="14" VPOS="2121" HPOS="1936" />
+            <String WC="0.9200000167" CONTENT="les" HEIGHT="32" WIDTH="47" VPOS="2121" HPOS="1951" />
+            <SP WIDTH="13" VPOS="2132" HPOS="1999" />
+            <String WC="0.8675000072" CONTENT="réalisations" HEIGHT="35" WIDTH="217" VPOS="2121" HPOS="2013" />
+          </TextLine>
+          <TextLine BASELINE="2209" HEIGHT="45" WIDTH="743" VPOS="2176" HPOS="1488">
+            <String WC="0.8069230914" CONTENT="intéressantes" HEIGHT="32" WIDTH="242" VPOS="2176" HPOS="1488" />
+            <SP WIDTH="20" VPOS="2177" HPOS="1731" />
+            <String WC="0.8933333158" CONTENT="faites" HEIGHT="32" WIDTH="98" VPOS="2177" HPOS="1752" />
+            <SP WIDTH="20" VPOS="2178" HPOS="1851" />
+            <String WC="0.8799999952" CONTENT="dans" HEIGHT="32" WIDTH="86" VPOS="2178" HPOS="1872" />
+            <SP WIDTH="17" VPOS="2183" HPOS="1959" />
+            <String WC="0.7774999738" CONTENT="tous" HEIGHT="28" WIDTH="78" VPOS="2183" HPOS="1977" />
+            <SP WIDTH="21" VPOS="2179" HPOS="2056" />
+            <String WC="1." CONTENT="les" HEIGHT="32" WIDTH="47" VPOS="2179" HPOS="2078" />
+            <SP WIDTH="20" VPOS="2190" HPOS="2126" />
+            <String WC="0.6850000024" CONTENT="pays" HEIGHT="31" WIDTH="84" VPOS="2190" HPOS="2147" />
+          </TextLine>
+          <TextLine BASELINE="2266" HEIGHT="45" WIDTH="743" VPOS="2232" HPOS="1488">
+            <String WC="1." CONTENT="et" HEIGHT="27" WIDTH="32" VPOS="2236" HPOS="1488" />
+            <SP WIDTH="18" VPOS="2232" HPOS="1521" />
+            <String WC="0.8299999833" CONTENT="les" HEIGHT="33" WIDTH="47" VPOS="2232" HPOS="1540" />
+            <SP WIDTH="18" VPOS="2243" HPOS="1588" />
+            <String WC="0.8740000129" CONTENT="aider" HEIGHT="32" WIDTH="95" VPOS="2233" HPOS="1607" />
+            <SP WIDTH="17" VPOS="2244" HPOS="1703" />
+            <String WC="0.9539999962" CONTENT="ainsi" HEIGHT="31" WIDTH="90" VPOS="2235" HPOS="1721" />
+            <SP WIDTH="18" VPOS="2236" HPOS="1812" />
+            <String WC="0.3799999952" CONTENT="à" HEIGHT="30" WIDTH="19" VPOS="2236" HPOS="1831" />
+            <SP WIDTH="17" VPOS="2236" HPOS="1851" />
+            <String WC="0.9499999881" CONTENT="adopter" HEIGHT="42" WIDTH="143" VPOS="2235" HPOS="1869" />
+            <SP WIDTH="18" VPOS="2236" HPOS="2013" />
+            <String WC="0.9474999905" CONTENT="dans" HEIGHT="32" WIDTH="86" VPOS="2236" HPOS="2032" />
+            <SP WIDTH="19" VPOS="2237" HPOS="2119" />
+            <String WC="0.8999999762" CONTENT="leurs" HEIGHT="32" WIDTH="92" VPOS="2237" HPOS="2139" />
+          </TextLine>
+          <TextLine BASELINE="2324" HEIGHT="36" WIDTH="739" VPOS="2290" HPOS="1489">
+            <String WC="0.8142856956" CONTENT="travaux" HEIGHT="29" WIDTH="145" VPOS="2292" HPOS="1489" />
+            <SP WIDTH="27" VPOS="2290" HPOS="1635" />
+            <String WC="0.8733333349" CONTENT="les" HEIGHT="32" WIDTH="47" VPOS="2290" HPOS="1663" />
+            <SP WIDTH="28" VPOS="2301" HPOS="1711" />
+            <String WC="0.8977777958" CONTENT="solutions" HEIGHT="33" WIDTH="171" VPOS="2291" HPOS="1740" />
+            <SP WIDTH="28" VPOS="2292" HPOS="1912" />
+            <String WC="0.8799999952" CONTENT="les" HEIGHT="33" WIDTH="47" VPOS="2292" HPOS="1941" />
+            <SP WIDTH="28" VPOS="2303" HPOS="1989" />
+            <String WC="0.7972727418" CONTENT="meilleures." HEIGHT="33" WIDTH="210" VPOS="2293" HPOS="2018" />
+          </TextLine>
+          <TextLine BASELINE="2382" HEIGHT="37" WIDTH="698" VPOS="2346" HPOS="1532">
+            <String WC="0.7950000167" CONTENT="Nous" HEIGHT="33" WIDTH="92" VPOS="2346" HPOS="1532" />
+            <SP WIDTH="15" VPOS="2358" HPOS="1625" />
+            <String WC="0.924444437" CONTENT="recevrons" HEIGHT="23" WIDTH="183" VPOS="2358" HPOS="1641" />
+            <SP WIDTH="17" VPOS="2359" HPOS="1825" />
+            <String WC="0.7799999714" CONTENT="volontiers" HEIGHT="33" WIDTH="190" VPOS="2349" HPOS="1843" />
+            <SP WIDTH="17" VPOS="2354" HPOS="2034" />
+            <String WC="0.875" CONTENT="toutes" HEIGHT="29" WIDTH="112" VPOS="2354" HPOS="2052" />
+            <SP WIDTH="17" VPOS="2351" HPOS="2165" />
+            <String WC="0.8933333158" CONTENT="les" HEIGHT="32" WIDTH="47" VPOS="2351" HPOS="2183" />
+          </TextLine>
+          <TextLine BASELINE="2438" HEIGHT="41" WIDTH="742" VPOS="2406" HPOS="1488">
+            <String WC="0.9445454478" CONTENT="suggestions" HEIGHT="39" WIDTH="220" VPOS="2406" HPOS="1488" />
+            <SP WIDTH="26" VPOS="2416" HPOS="1709" />
+            <String WC="0.9200000167" CONTENT="qu’on" HEIGHT="41" WIDTH="109" VPOS="2406" HPOS="1736" />
+            <SP WIDTH="26" VPOS="2417" HPOS="1846" />
+            <String WC="0.8650000095" CONTENT="voudra" HEIGHT="32" WIDTH="134" VPOS="2408" HPOS="1873" />
+            <SP WIDTH="23" VPOS="2408" HPOS="2008" />
+            <String WC="0.8424999714" CONTENT="bien" HEIGHT="32" WIDTH="81" VPOS="2408" HPOS="2032" />
+            <SP WIDTH="26" VPOS="2419" HPOS="2114" />
+            <String WC="0.8525000215" CONTENT="nous" HEIGHT="22" WIDTH="89" VPOS="2419" HPOS="2141" />
+          </TextLine>
+          <TextLine BASELINE="2495" HEIGHT="44" WIDTH="741" VPOS="2461" HPOS="1489">
+            <String WC="0.8740000129" CONTENT="faire" HEIGHT="32" WIDTH="84" VPOS="2461" HPOS="1489" />
+            <SP WIDTH="25" VPOS="2472" HPOS="1574" />
+            <String WC="1." CONTENT="quant" HEIGHT="36" WIDTH="110" VPOS="2467" HPOS="1600" />
+            <SP WIDTH="23" VPOS="2464" HPOS="1711" />
+            <String WC="0.2899999917" CONTENT="à" HEIGHT="31" WIDTH="19" VPOS="2464" HPOS="1735" />
+            <SP WIDTH="24" VPOS="2463" HPOS="1755" />
+            <String WC="0.8050000072" CONTENT="la" HEIGHT="32" WIDTH="32" VPOS="2463" HPOS="1780" />
+            <SP WIDTH="23" VPOS="2474" HPOS="1813" />
+            <String WC="0.948333323" CONTENT="présentation" HEIGHT="39" WIDTH="236" VPOS="2466" HPOS="1837" />
+            <SP WIDTH="25" VPOS="2465" HPOS="2074" />
+            <String WC="1." CONTENT="de" HEIGHT="32" WIDTH="42" VPOS="2465" HPOS="2100" />
+            <SP WIDTH="23" VPOS="2476" HPOS="2143" />
+            <String WC="1." CONTENT="nos" HEIGHT="22" WIDTH="63" VPOS="2476" HPOS="2167" />
+          </TextLine>
+          <TextLine BASELINE="2552" HEIGHT="40" WIDTH="742" VPOS="2520" HPOS="1489">
+            <String WC="0.7811111212" CONTENT="matières," HEIGHT="38" WIDTH="172" VPOS="2521" HPOS="1489" />
+            <SP WIDTH="26" VPOS="2520" HPOS="1662" />
+            <String WC="0.8725000024" CONTENT="leur" HEIGHT="32" WIDTH="75" VPOS="2520" HPOS="1689" />
+            <SP WIDTH="21" VPOS="2531" HPOS="1765" />
+            <String WC="0.8633333445" CONTENT="choix," HEIGHT="40" WIDTH="115" VPOS="2520" HPOS="1787" />
+            <SP WIDTH="26" VPOS="2520" HPOS="1903" />
+            <String WC="0.7049999833" CONTENT="la" HEIGHT="33" WIDTH="32" VPOS="2520" HPOS="1930" />
+            <SP WIDTH="22" VPOS="2532" HPOS="1963" />
+            <String WC="0.9866666794" CONTENT="rédaction" HEIGHT="32" WIDTH="178" VPOS="2522" HPOS="1986" />
+            <SP WIDTH="24" VPOS="2523" HPOS="2165" />
+            <String WC="1." CONTENT="de" HEIGHT="31" WIDTH="41" VPOS="2523" HPOS="2190" />
+          </TextLine>
+          <TextLine BASELINE="2609" HEIGHT="42" WIDTH="742" VPOS="2576" HPOS="1489">
+            <String WC="0.8299999833" CONTENT="nos" HEIGHT="22" WIDTH="63" VPOS="2586" HPOS="1489" />
+            <SP WIDTH="24" VPOS="2586" HPOS="1553" />
+            <String WC="0.8000000119" CONTENT="articles," HEIGHT="40" WIDTH="147" VPOS="2576" HPOS="1578" />
+            <SP WIDTH="26" VPOS="2588" HPOS="1726" />
+            <String WC="1." CONTENT="etc.," HEIGHT="37" WIDTH="77" VPOS="2581" HPOS="1753" />
+            <SP WIDTH="27" VPOS="2587" HPOS="1831" />
+            <String WC="1." CONTENT="en" HEIGHT="22" WIDTH="42" VPOS="2587" HPOS="1859" />
+            <SP WIDTH="23" VPOS="2589" HPOS="1902" />
+            <String WC="0.5833333135" CONTENT="vue" HEIGHT="22" WIDTH="66" VPOS="2588" HPOS="1926" />
+            <SP WIDTH="23" VPOS="2578" HPOS="1993" />
+            <String WC="0.8855555654" CONTENT="d’arriver" HEIGHT="33" WIDTH="171" VPOS="2578" HPOS="2017" />
+            <SP WIDTH="22" VPOS="2580" HPOS="2189" />
+            <String WC="0.5500000119" CONTENT="à" HEIGHT="31" WIDTH="19" VPOS="2580" HPOS="2212" />
+          </TextLine>
+          <TextLine BASELINE="2666" HEIGHT="34" WIDTH="550" VPOS="2634" HPOS="1488">
+            <String WC="1." CONTENT="mieux" HEIGHT="31" WIDTH="120" VPOS="2634" HPOS="1488" />
+            <SP WIDTH="14" VPOS="2645" HPOS="1609" />
+            <String WC="0.8349999785" CONTENT="servir" HEIGHT="31" WIDTH="109" VPOS="2635" HPOS="1624" />
+            <SP WIDTH="16" VPOS="2644" HPOS="1734" />
+            <String WC="0.9900000095" CONTENT="nos" HEIGHT="22" WIDTH="64" VPOS="2644" HPOS="1751" />
+            <SP WIDTH="17" VPOS="2636" HPOS="1816" />
+            <String WC="0.9254545569" CONTENT="intentions." HEIGHT="32" WIDTH="204" VPOS="2636" HPOS="1834" />
+          </TextLine>
+          <TextLine BASELINE="2749" HEIGHT="40" WIDTH="563" VPOS="2716" HPOS="1666">
+            <String WC="0.8130000234" CONTENT="L’OSSATURE" HEIGHT="33" WIDTH="263" VPOS="2716" HPOS="1666" />
+            <SP WIDTH="13" VPOS="2717" HPOS="1930" />
+            <String WC="0.7418181896" CONTENT="METALLIQUE." HEIGHT="39" WIDTH="285" VPOS="2717" HPOS="1944" />
+          </TextLine>
+        </TextBlock>
+        <TextBlock ID="Page1_Block5" HEIGHT="63" WIDTH="114" VPOS="2713" HPOS="2294" language="fr" STYLEREFS="font1">
+          <TextLine BASELINE="2755" HEIGHT="38" WIDTH="17" VPOS="2717" HPOS="2349">
+            <String WC="0.2800000012" CONTENT="1" HEIGHT="38" WIDTH="17" VPOS="2717" HPOS="2349" />
+          </TextLine>
+        </TextBlock>
+        <Illustration ID="Page1_Block6" HEIGHT="284" WIDTH="260" VPOS="2807" HPOS="2242" />
+      </PrintSpace>
+    </Page>
+  </Layout>
+</alto>

@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojolicious-Plugin-PromiseActions
 
+0.07 2018-09-24T22:15:52+0200
+
+- Call wait on promise if it supports it
+
 0.06 2018-09-24T17:10:17+0200
 
 - Ensure we actually hold on to the tx

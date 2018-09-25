@@ -70,7 +70,7 @@ sub create_spreadsheet {
     my ($self) = @_;
 
     $self->_text_csv_obj->print( $self->_output_fh, $self->_header );
-    for my $filename ( keys %{ $self->gene_occurances->gene_name_hashes } ) {
+    for my $filename (sort keys %{ $self->gene_occurances->gene_name_hashes } ) {
         $self->_text_csv_obj->print( $self->_output_fh, $self->_row($filename) );
     }
     $self->_text_csv_obj->print( $self->_output_fh, $self->_totals );
@@ -86,13 +86,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation::SpreadsheetOfGeneOccurances - Output a spreadsheet with the gene occurances per file
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

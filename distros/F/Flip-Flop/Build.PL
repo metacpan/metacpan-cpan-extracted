@@ -11,7 +11,7 @@ my $b = Module::Build->new(
   perl               => '5.8.0',
   requires           => {
     Carp=>0,
-    'Data::Table::Text'=>20170820,
+    'Data::Table::Text'=>20180924,
     'Test::More'=>0,
    },
  );

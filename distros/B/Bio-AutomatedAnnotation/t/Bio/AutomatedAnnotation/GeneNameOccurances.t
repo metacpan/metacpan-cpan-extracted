@@ -148,16 +148,16 @@ is_deeply(
 );
 
 is_deeply($obj->sorted_all_gene_names, [
+          'yfnB',
           'speH',
           'hly',
-          'arcC1',
-          'yfnB',
           'argF',
-          'another_argF',
-          'another_hly',
+          'arcC1',
           'another_yfnB',
-          'another_arcC1',
-          'another_speH'
+          'another_speH',
+          'another_hly',
+          'another_argF',
+          'another_arcC1'
         ], 'gene names sorted by value desc');
 
 

@@ -1,0 +1,103 @@
+#!perl
+
+our $DATE = '2018-09-25'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint completer=1 for=ssh
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use AppLib::sshwrap;
+use Getopt::Long::Complete; # just so it can be detected as Getopt::Long script by Getopt::Long::Util
+use ShellCompleter::Util qw(run_shell_completer_for_getopt_long_app);
+
+my $optspec = \%AppLib::sshwrap::optspec;
+
+$optspec->{'{arg}'} = {
+    completion => sub {
+        require App::sshwrap::hostcolor;
+        require Complete::Util;
+
+        my %args = @_;
+        if ($args{argpos} == 0) {
+            # lookup user@host from history file
+            my $history = App::sshwrap::hostcolor::read_history_file();
+            my $ans = Complete::Util::complete_array_elem(
+                array => [keys %$history], word => $args{word});
+            if ($ans && ref($ans) eq 'ARRAY' && @$ans == 1 &&
+                    $history->{$ans->[0]}) {
+                require XTerm::Util;
+                log_trace "Setting background color for $ans->[0] ($history->{$ans->[0]}) ...";
+                XTerm::Util::set_term_bgcolor($history->{$ans->[0]});
+            }
+            $ans;
+        } else {
+            return undef;
+        }
+    }
+};
+
+run_shell_completer_for_getopt_long_app(%$optspec);
+
+# ABSTRACT: Shell completer for ssh (sshwrap-hostcolor)
+# PODNAME: _sshwrap-hostcolor
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_sshwrap-hostcolor - Shell completer for ssh (sshwrap-hostcolor)
+
+=head1 VERSION
+
+This document describes version 0.001 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-09-25.
+
+=head1 SYNOPSIS
+
+To install, install the CPAN distribution this command comes in with, and then
+in your bash (and/or bash startup file):
+
+ complete -C _sshwrap-hostcolor ssh
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now B<ssh> has bash completion:
+
+ % ssh -p <tab>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-sshwrap-hostcolor>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-sshwrap-hostcolor>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-sshwrap-hostcolor>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

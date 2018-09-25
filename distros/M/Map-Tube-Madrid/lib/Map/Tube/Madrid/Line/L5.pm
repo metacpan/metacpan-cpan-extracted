@@ -1,6 +1,6 @@
 package Map::Tube::Madrid::Line::L5;
 
-$Map::Tube::Madrid::Line::L5::VERSION   = '0.24';
+$Map::Tube::Madrid::Line::L5::VERSION   = '0.25';
 $Map::Tube::Madrid::Line::L5::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::Madrid::Line::L5 - Madrid Metro Map: L5 Line.
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =encoding utf8
 
@@ -61,22 +61,28 @@ Madrid Metro Map: L5 Line.
 
 =over 2
 
-=item * The station "Pueblo Nuevo" is also part of L7.
+=item * The station "Callao" is also part of
+          L<L3 Line|Map::Tube::Madrid::Line::L3>
 
-=item * The station "Ventas" is also part of L2.
+=item * The station "Gran Vía" is also part of
+          L<L1 Line|Map::Tube::Madrid::Line::L1>
+
+=item * The station "Opera" is also part of
+          L<L2 Line|Map::Tube::Madrid::Line::L2>
+
+=item * The station "Oporto" is also part of
+          L<L6 Line|Map::Tube::Madrid::Line::L6>
+
+=item * The station "Ventas" is also part of
+          L<L2 Line|Map::Tube::Madrid::Line::L2>
+
+=item * The station "Pueblo Nuevo" is also part of L7.
 
 =item * The station "Diego de León" is also part of L4.
 
 =item * The station "Núñez de Balboa" is also part of L9.
 
 =item * The station "Alonso Martínez" is also part of L4 | L10.
-
-=item * The station "Gran Via" is also part of L1.
-
-=item * The station "Callao" is also part of
-         L<L3 Line|Map::Tube::Madrid::Line::L3>
-
-=item * The station "Opera" is also part of L2.
 
 =back
 

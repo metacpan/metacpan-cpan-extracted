@@ -1,6 +1,5 @@
 package Bio::ASN1::EntrezGene::Indexer;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Bio::ASN1::EntrezGene::Indexer::VERSION = '1.72';
+$Bio::ASN1::EntrezGene::Indexer::VERSION = '1.73';
 use utf8;
 use strict;
 use warnings;
@@ -89,7 +88,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -97,7 +96,7 @@ Bio::ASN1::EntrezGene::Indexer - Indexes NCBI Sequence files.
 
 =head1 VERSION
 
-version 1.72
+version 1.73
 
 =head1 SYNOPSIS
 
@@ -210,8 +209,8 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org              - General discussion
+  http://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
@@ -229,7 +228,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://redmine.open-bio.org/projects/bioperl/
+  https://github.com/bioperl/bio-asn1-entrezgene/issues
 
 =head1 AUTHOR
 

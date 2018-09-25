@@ -139,13 +139,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation::CommandLine::ParseGenesFromGFFs - provide a commandline interface to pull out genes from multiple GFF files
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

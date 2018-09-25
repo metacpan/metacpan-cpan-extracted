@@ -14,9 +14,9 @@
 
 =head1 The Mojo::Promise::Role::HigherOrder module
 
-This is the I<README> for the L<Mojo::Promise::Role::HigherOrder>, and
-umbrella module for the C<::Any>, C<::None>, and C<::Some> Mojolicious
-roles..
+This is the I<README> for the L<Mojo::Promise::Role::HigherOrder>, an
+umbrella module for the C<::Any>, C<::None>, and C<::Some> roles for
+C<Mojo::Promise>.
 
 You're probably looking at this because you don't know where else to
 find what you're looking for. Read this once and you might never have

@@ -1,5 +1,9 @@
 Revision history for HTML-T5
 
+0.004  2018-09-25
+    - Fix tests under non-en_US locales.
+        - See http://www.cpantesters.org/cpan/report/625063e4-c05a-11e8-98d5-bb14e5798fec
+
 0.003  2018-09-20
     - Fix configure_requires.
 

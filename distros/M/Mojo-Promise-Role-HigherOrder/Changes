@@ -1,5 +1,8 @@
 # Changes for Mojo::Promise::Role::Any
 
+1.002 2018-09-25T08:29:35Z
+	* none() actually resolves if every promise is rejected.
+
 1.001 2018-09-10T07:42:55Z
 	* First release of some higher order roles for Mojo::Promise:
 	any(), none(), and some()

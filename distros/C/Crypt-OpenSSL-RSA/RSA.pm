@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;    # Removing carp will break the XS code.
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 our $AUTOLOAD;
 use AutoLoader 'AUTOLOAD';

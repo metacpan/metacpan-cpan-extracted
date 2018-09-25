@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Reader;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 sub input { return $_[0]->{input} }
 sub set_input { $_[0]->{input} = $_[1] }
@@ -17,7 +17,11 @@ sub new {
 }
 
 sub read {
-    return $_[0]->{input};
+    my ($self) = @_;
+    my $pos = pos $self->{input} || 0;
+    my $yaml = substr($self->{input}, $pos);
+    $self->{input} = '';
+    return $yaml;
 }
 
 sub readline {
@@ -25,9 +29,15 @@ sub readline {
     unless (length $self->{input}) {
         return;
     }
-    $self->{input} =~ s/\A([^\r\n]*(?:[\r\n]|\z))// or die "Unexpected";
-    my $line = $1;
-    return $line;
+    if ( $self->{input} =~ m/\G(.*\n?)/g ) {
+        my $line = $1;
+        unless (length $line) {
+            $self->{input} = '';
+            return;
+        }
+        return $line;
+    }
+    return;
 }
 
 package YAML::PP::Reader::File;

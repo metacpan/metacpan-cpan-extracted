@@ -20,6 +20,8 @@ has 'genus'             => ( is => 'ro', isa => 'Maybe[Str]' );
 has 'accession_number'  => ( is => 'ro', isa => 'Maybe[Str]' );
 has 'kingdom'           => ( is => 'ro', isa => 'Maybe[Str]' );
 has 'cpus'              => ( is => 'ro', isa => 'Int', default => 1 );
+has 'gcode'             => ( is => 'ro', isa => 'Int', default => 11 );
+has 'keep_original_order_and_names' => ( is => 'ro', isa => 'Bool', default => 0 );
 
 has '_annotation_pipeline_class' =>
   ( is => 'ro', isa => 'Str', lazy => 1, builder => '_build__annotation_pipeline_class' );
@@ -74,6 +76,8 @@ sub annotate {
         cleanup_prod   => 0,
         cpus           => $self->cpus,
         rfam           => 1,
+        gcode          => $self->gcode,
+        keep_original_order_and_names => $self->keep_original_order_and_names,
     );
 
     if ( defined( $self->genus ) ) {
@@ -101,13 +105,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation - Automated annotation of assemblies
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

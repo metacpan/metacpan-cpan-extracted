@@ -5,11 +5,11 @@
 # the SWIG interface file instead.
 
 package Text::Bidi::private;
-$Text::Bidi::private::VERSION = '2.14';
+$Text::Bidi::private::VERSION = '2.15';
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Text::Bidi::privatec;
-$Text::Bidi::privatec::VERSION = '2.14';
+$Text::Bidi::privatec::VERSION = '2.15';
 bootstrap Text::Bidi::private;
 package Text::Bidi::private;
 @EXPORT = qw();
@@ -244,7 +244,7 @@ Text::Bidi::private
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 AUTHOR
 

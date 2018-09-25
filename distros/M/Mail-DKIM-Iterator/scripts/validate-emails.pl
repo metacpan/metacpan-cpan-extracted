@@ -66,7 +66,7 @@ while ( my $mail = $mbox->nextmail ) {
 		# successful lookup
 		($rv,@todo) = $dkim->next({
 		    $todo => [
-			map { $_->type eq 'TXT' ? ($_->txtdata) : () }
+			map { $_->type eq 'TXT' ? (join('',$_->txtdata)) : () }
 			$q->answer
 		    ]
 		});

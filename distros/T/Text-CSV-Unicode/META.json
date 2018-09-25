@@ -39,7 +39,7 @@
       },
       "Text::CSV::Unicode" : {
          "file" : "lib/Text/CSV/Unicode.pm",
-         "version" : "0.200"
+         "version" : "0.201"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.200",
+   "version" : "0.201",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

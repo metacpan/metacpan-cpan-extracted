@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 BEGIN { unshift( @INC, './lib' ) }
 
@@ -24,7 +24,7 @@ ok(
 );
 is($obj->output_file, 'output.yfnB.fa', 'create outputfilename');
 ok($obj->create_fasta_file, 'Create a fasta file');
-is(read_file('output.yfnB.fa'), read_file('t/data/expected_output.yfnB.fa'), 'output fasta is as expected');
+is(read_text('output.yfnB.fa'), read_text('t/data/expected_output.yfnB.fa'), 'output fasta is as expected');
 is($obj->files_without_hits, 0, 'no files were without hits');
 is($obj->files_with_hits, 1, '1 file had hits');
 unlink('output.yfnB.fa');
@@ -39,7 +39,7 @@ ok(
     'initialise obj and output amino acids'
 );
 ok($obj->create_fasta_file, 'Create a fasta file with translated amino acids');
-is(read_file('output.yfnB.fa'), read_file('t/data/expected_aa_output.yfnB.fa'), 'output fasta with amino acids as expected');
+is(read_text('output.yfnB.fa'), read_text('t/data/expected_aa_output.yfnB.fa'), 'output fasta with amino acids as expected');
 unlink('output.yfnB.fa');
 
 ok(
@@ -52,7 +52,7 @@ ok(
 );
 is($obj->output_file, 'output.hypothetical.fa', 'create outputfilename');
 ok($obj->create_fasta_file, 'Create a fasta file containing all hypothetical proteins');
-is(read_file('output.hypothetical.fa'), read_file('t/data/expected_output.hypothetical.fa'), 'output fasta is as expected with all hypothetical proteins');
+is(read_text('output.hypothetical.fa'), read_text('t/data/expected_output.hypothetical.fa'), 'output fasta is as expected with all hypothetical proteins');
 unlink('output.hypothetical.fa');
 
 ok(
@@ -65,7 +65,7 @@ ok(
 );
 is($obj->output_file, 'output.16SribosomalRNA.fa', 'create outputfilename for search with spaces');
 ok($obj->create_fasta_file, 'Create a fasta file containing all hypothetical proteins');
-is(read_file('output.16SribosomalRNA.fa'), read_file('t/data/expected_output.16SribosomalRNA.fa'), 'output fasta is as expected with all 16S');
+is(read_text('output.16SribosomalRNA.fa'), read_text('t/data/expected_output.16SribosomalRNA.fa'), 'output fasta is as expected with all 16S');
 unlink('output.16SribosomalRNA.fa');
 
 
@@ -78,7 +78,7 @@ ok(
     'initialise obj where we are only looking for genes not products'
 );
 ok($obj->create_fasta_file, 'Create an empty fasta file');
-is(read_file('output.16SribosomalRNA.fa'), '', 'Create an empty fasta file and check its empty');
+is(read_text('output.16SribosomalRNA.fa'), '', 'Create an empty fasta file and check its empty');
 unlink('output.16SribosomalRNA.fa');
 
 
@@ -93,7 +93,7 @@ ok(
 );
 
 ok($obj->create_fasta_file, 'Create a fasta file');
-is(read_file('output.yfnB.fa'), read_file('t/data/expected_output.yfnB.fa'), 'output fasta is as expected');
+is(read_text('output.yfnB.fa'), read_text('t/data/expected_output.yfnB.fa'), 'output fasta is as expected');
 is($obj->files_without_hits, 1, '1 file had no hits');
 is($obj->files_with_hits, 1, '1 file had hits');
 unlink('output.yfnB.fa');

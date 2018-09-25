@@ -2,9 +2,25 @@ use strict;
 use warnings;
 package YAML::PP::Highlight;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
+our @EXPORT_OK = qw/ Dump /;
+
+use base 'Exporter';
+use YAML::PP;
+use YAML::PP::Parser;
 use Encode;
+
+sub Dump {
+    my (@docs) = @_;
+    my $yp = YAML::PP->new;
+    my $yaml = $yp->dump_string(@docs);
+
+    my ($error, $tokens) = YAML::PP::Parser->yaml_to_tokens(string => $yaml);
+    my $highlighted = YAML::PP::Highlight->ansicolored($tokens);
+    encode_utf8 $highlighted;
+}
+
 
 my %ansicolors = (
     ANCHOR => [qw/ green /],
@@ -143,4 +159,40 @@ sub transform {
     }
     return @list;
 }
+
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+YAML::PP::Highlight - Syntax highlighting utilities
+
+=head1 SYNOPSIS
+
+
+    use YAML::PP::Highlight qw/ Dump /;
+
+    my $highlighted = Dump $data;
+
+=head1 FUNCTIONS
+
+=over
+
+=item Dump
+
+=back
+
+    use YAML::PP::Highlight qw/ Dump /;
+
+    my $highlighted = Dump $data;
+    my $highlighted = Dump @docs;
+
+It will dump the given data, and then parse it again to create tokens, which
+are then highlighted with ansi colors.
+
+The return value is ansi colored YAML.

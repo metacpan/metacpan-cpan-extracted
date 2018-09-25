@@ -1,0 +1,176 @@
+#!perl
+
+our $DATE = '2018-09-25'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use App::sshwrap::hostcolor;
+use AppLib::sshwrap;
+use Getopt::Long qw(:config bundling no_ignore_case);
+use XTerm::Util qw(get_term_bgcolor set_term_bgcolor);
+
+my $userhost;
+sub parse_cmdline {
+    local @ARGV = @ARGV;
+    local $SIG{__WARN__} = sub {};
+
+    my %go_spec = map { $_ => sub {} } keys %AppLib::sshwrap::optspec;
+    delete $go_spec{'{arg}'};
+    $go_spec{'<>'} = sub {
+        $userhost //= $_[0];
+        #log_trace "Setting userhost to %s", $userhost;
+    };
+    GetOptions(%go_spec);
+}
+
+my $origcolor;
+sub init {
+    parse_cmdline();
+    $origcolor = get_term_bgcolor();
+}
+
+my $history;
+sub read_history {
+    $history = App::sshwrap::hostcolor::read_history_file();
+    #log_trace "history=%s", $history;
+}
+
+sub write_history {
+    return unless $history;
+    App::sshwrap::hostcolor::write_history_file($history);
+}
+
+sub set_hostcolor {
+    return unless defined $userhost;
+    read_history();
+    if ($history->{$userhost}) {
+        log_info "Setting host color ($userhost -> $history->{$userhost})";
+        set_term_bgcolor($history->{$userhost});
+    }
+}
+
+sub get_hostcolor {
+    return unless defined $userhost;
+
+    require XTerm::Util;
+    my $color = XTerm::Util::get_term_bgcolor();
+    if ($color) {
+        log_info "Recording host color $userhost -> $color";
+        $history->{$userhost} = $color;
+        write_history();
+    }
+    if ($origcolor) {
+        XTerm::Util::set_term_bgcolor($origcolor);
+    }
+}
+
+my $exitcode;
+sub run_ssh {
+    my @cmd = ('ssh', @ARGV);
+    log_info "Executing ssh: %s", \@cmd;
+    system {$cmd[0]} @cmd;
+    $exitcode = $?;
+}
+
+### main
+
+log_info "start";
+init;
+set_hostcolor;
+run_ssh;
+get_hostcolor;
+log_info "end";
+exit $exitcode;
+
+# ABSTRACT: SSH wrapper script to remember the terminal background you use for each host
+# PODNAME: sshwrap-hostcolor
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sshwrap-hostcolor - SSH wrapper script to remember the terminal background you use for each host
+
+=head1 VERSION
+
+This document describes version 0.001 of sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-09-25.
+
+=head1 SYNOPSIS
+
+Use like you would B<ssh>:
+
+ % sshwrap-hostcolor -v ujang@host1.example
+
+For convenience, alias this script to B<ssh>. In your Unix shell:
+
+ alias ssh=sshwrap-hostcolor
+
+then you can use it like this:
+
+ % ssh -v ujang@host1.example
+
+After you ssh to the remote host, change the background color of your terminal
+(e.g. to dark blue). Upon exit, the script will retrieve the terminal's current
+background color and record this line to F<~/sshwrap-hostcolor.history>:
+
+ ujang@host1.example     00002b
+
+Next time you ssh to the same host (the same I<user@host> combination, to be
+exact), the script will set the terminal's background color to dark blue.
+
+As a bonus, you can also activate the completion script L<_sshwrap-hostcolor>:
+
+ complete -C _sshwrap-hostcolor ssh
+
+this will let you complete C<user@host> and immediately change the background
+color to the remembered one.
+
+=head1 DESCRIPTION
+
+=head1 FAQ
+
+=head2 The script doesn't work!
+
+To get and set terminal background color programmatically, an xterm-compatible
+terminal is required. Please see the list here: L<XTerm::Util>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-sshwrap-hostcolor>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-sshwrap-hostcolor>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-sshwrap-hostcolor>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<ssh>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

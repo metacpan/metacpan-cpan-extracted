@@ -44,7 +44,7 @@ my $github    = 'https://github.com/briandfoy/mojo-promise-role-higherorder';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.026',
+	'MIN_PERL_VERSION' => '5.022',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
@@ -67,7 +67,7 @@ my %WriteMakefile = (
 	'PREREQ_PM' => {
 		'Carp'        => '0',
 		'Mojolicious' => '7',
-		'Role::Tiny'  => '0',
+		'Role::Tiny'  => '2.000001',
 		},
 
 	'META_MERGE' => {

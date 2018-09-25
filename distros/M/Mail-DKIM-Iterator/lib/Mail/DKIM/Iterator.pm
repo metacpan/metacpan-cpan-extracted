@@ -1,12 +1,21 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use strict;
 use warnings;
 use Crypt::OpenSSL::RSA;
 use Scalar::Util 'dualvar';
+
+# critical header fields which should be well protected
+my @critical_headers = qw(from subject content-type content-transfer-encoding);
+my $critical_headers_rx = do {
+    my $rx = join("|",@critical_headers);
+    qr{$rx}i;
+};
+# all header fields which should be included in the signature
+my @sign_headers = (@critical_headers, 'to', 'cc');
 
 use Exporter 'import';
 our @EXPORT =qw(
@@ -365,7 +374,7 @@ sub sign {
 	# relevant headers are covered and no additional important headers can
 	# be added
 	my @h;
-	for my $k (qw(from to cc subject content-type content-transfer-encoding)) {
+	for my $k (@sign_headers) {
 	    for($hdr =~m{^($k):}mgi) {
 		push @h,$k; # cover each instance in header
 	    }
@@ -374,6 +383,7 @@ sub sign {
 	$sig->{h} = join(':',@h);
     }
     $sig = parse_signature($sig,$error,1) or return;
+
 
     my %sig = %$sig;
     $sig{t} = time() if !$sig{t} && exists $sig{t};
@@ -436,15 +446,16 @@ sub sign {
     };
     $priv->use_no_padding;
 
-     my $data = _encode64($priv->decrypt(
+    my $data = _encode64($priv->decrypt(
 	_emsa_pkcs1_v15($sig->{'a:hash'},$hash,$priv->size)));
 
     my $x80 = 80 - ($dkh =~m{\n([^\n]+)\z} && length($1));
     while ($data ne '') {
-	$dkh .= substr($data,0,$x80,'')."\r\n" if $x80>10;
-	$dkh .= " " if $data ne '';
+	$dkh .= substr($data,0,$x80,'') if $x80>10;
+	$dkh .= "\r\n " if $data ne '';
 	$x80 = 80;
     }
+    $dkh .= "\r\n";
     return $dkh;
 }
 
@@ -490,7 +501,7 @@ sub _verify_sig {
 	# warn "encrypt="._encode64($bencrypt)."\n";
 	return ($FAIL,'header sig mismatch');
     }
-    return (DKIM_SUCCESS);
+    return (DKIM_SUCCESS, $sig->{':warning'} // '');
 }
 
 # parse the header and extract
@@ -499,12 +510,21 @@ sub _parse_header {
     my @sig;
     while ( $hdr =~m{^(DKIM-Signature:\s*(.*\n(?:[ \t].*\n)*))}mig ) {
 	my $dkh = $1; # original value to exclude it when computing hash
+	my $down_hdr = substr($hdr,$+[1]); # headers below signature
 
 	my $error;
 	my $sig = parse_signature($2,\$error);
 	if ($sig) {
 	    $sig->{'h:hash'} = _compute_hdrhash($hdr,
 		$sig->{'h:list'},$sig->{'a:hash'},$sig->{'c:hdr'},$dkh);
+
+	    my %critical = map { $_ => 0 } @critical_headers;
+	    $critical{$_}++ for @{$sig->{'h:list'}};
+	    $critical{lc($_)}-- for $down_hdr =~m{^($critical_headers_rx):}mig;
+	    if (my @h = grep { $critical{$_} <= 0 } keys %critical) {
+		$sig->{':warning'} =
+		    "incomplete header protection for ".join(",",sort @h);
+	    }
 	} else {
 	    $sig = { error => "invalid DKIM-Signature header: $error" };
 	}
@@ -799,7 +819,8 @@ sub sig       { shift->[0] }
 sub domain    { shift->[0]{d} }
 sub dnsname   { shift->[1] }
 sub status    { shift->[2] }
-sub error     { shift->[3] }
+sub error     { $_[0]->[2] >0 ? undef : $_[0]->[3] }
+sub warning   { $_[0]->[2] >0 ? $_[0]->[3] : undef }
 
 # ResultRecord for signing.
 package Mail::DKIM::Iterator::SignRecord;
@@ -885,7 +906,7 @@ Iterativ validation of DKIM records or DKIM signing of mails.
 	    print STDERR "$mailfile: $name UNKNOWN\n";
 	} elsif ($status == DKIM_SUCCESS) {
 	    # fully validated
-	    print STDERR "$mailfile: $name OK\n";
+	    print STDERR "$mailfile: $name OK ".$_->warning".\n";
 	} elsif ($status == DKIM_PERMFAIL) {
 	    # hard error
 	    print STDERR "$mailfile: $name FAIL ".$_->error."\n";
@@ -1041,6 +1062,19 @@ A SignRecord has additionally the following methods:
 =item signature - the DKIM-Signature value, only if DKIM_SUCCESS
 
 =back
+
+A VerifyRecord has additionally the following methods:
+
+=over 8
+
+=item warning - possible warnings if DKIM_SUCCESS
+
+Currently this is used to provide information if critical header fields are not
+properly included (i.e. covering all plus one instance, see RFC 6376, 5.4.2) in
+the signature.
+
+=back
+
 
 =item filter($sub)
 

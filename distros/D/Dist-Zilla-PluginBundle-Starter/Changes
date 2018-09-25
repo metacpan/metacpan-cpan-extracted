@@ -1,3 +1,10 @@
+v3.0.0    2018-09-25 00:11:17 EDT
+  - Bump [Test::ReportPrereqs] dependency to 0.027 to prevent
+    t/00-report-prereqs.dd from being pruned.
+  - Revision 3 added.
+    - Added managed_versions and regenerate options. Check documentation for details.
+    - Added support for subclassing bundle.
+
 0.005     2017-04-06 21:36:59 EDT
   - Revision 2 added. Please check documentation for details.
     - [Pod2Readme] used to generate standard README instead of [ReadmeAnyFromPod].

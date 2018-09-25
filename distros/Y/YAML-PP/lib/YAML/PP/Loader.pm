@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Loader;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use YAML::PP::Parser;
 use YAML::PP::Constructor;
@@ -13,7 +13,7 @@ sub new {
     my ($class, %args) = @_;
 
     my $cyclic_refs = delete $args{cyclic_refs} || 'allow';
-    my $schema = delete $args{schema} // YAML::PP->default_schema(
+    my $schema = delete $args{schema} || YAML::PP->default_schema(
         boolean => 'perl',
     );
 
@@ -40,23 +40,23 @@ sub schema { return $_[0]->{schema} }
 
 sub load_string {
     my ($self, $yaml) = @_;
-    $self->parser->lexer->set_reader(YAML::PP::Reader->new);
-    $self->load($yaml);
+    $self->parser->set_reader(YAML::PP::Reader->new( input => $yaml ));
+    $self->load();
 }
 
 sub load_file {
     my ($self, $file) = @_;
-    $self->parser->lexer->set_reader(YAML::PP::Reader::File->new);
-    $self->load($file);
+    $self->parser->set_reader(YAML::PP::Reader::File->new( input => $file ));
+    $self->load();
 }
 
 sub load {
-    my ($self, $yaml) = @_;
+    my ($self) = @_;
     my $parser = $self->parser;
     my $constructor = $self->constructor;
 
     $constructor->init;
-    $parser->parse($yaml);
+    $parser->parse();
 
     my $docs = $constructor->docs;
     return wantarray ? @$docs : $docs->[0];

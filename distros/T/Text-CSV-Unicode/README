@@ -38,16 +38,19 @@ Build/Installation:
 	make install
 
 Recent Changes:
-    Version 0.200
-	Reimplemented to use Text::CSV 
 
-    Version 0.115 2012/02/19
-	requires/skip_all for charnames
+    v0.200 2018-09-21
+	Completely rewritten to use Text::CSV
+	Allow unicode but not Cntrl in Text::CSV::Unicode
+	Allow all unicode with binary=>1, by dropping through to Text::CSV
+	combine() with undef produces different output: t/combine-undef.t
+	version() provided by Text::CSV::Version 
+		- test as class method: t/unicode.t
 
-    Version 0.114 2012/02/06
-	strictness in tests
-
-    Version 0.113 2011/08/24
-	Text::CSV::Base 0.041
-	allow undef input values in combine, without warnings
-
+    v0.201 2018-09-25
+	Add C<use warnings> to t/unicode.t: 
+		deprecate was not a default warning before perl 5.18.0, 
+		so the 'deprecated' test had been failing on earlier perls.
+	Use C<warnings::warnif()>
+	Better punctuation in the t/unicode.t tests
+	

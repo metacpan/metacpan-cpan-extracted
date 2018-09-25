@@ -52,6 +52,6 @@
          "web" : "https://github.com/marcusramberg/mojolicious-plugin-promiseactions"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -5,15 +5,13 @@ use warnings;
 
 use base qw(Text::CSV::Base);
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 
 sub new {
     my ($self, $hash) = @_;
     if ( $hash and $hash -> {binary} ) {
-        if (warnings::enabled("deprecated")) {
-            warnings::warn("deprecated",
+        warnings::warnif("deprecated",
                 "binary is deprecated: use Text::CSV");
-        }
 	return Text::CSV::Base->new( $hash );
     }
     return $self->SUPER::new( { binary => 1, %{ $hash || {} } } );

@@ -1,7 +1,7 @@
 package TestHelper;
 use Moose::Role;
 use Test::Most;
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 
 sub mock_execute_script_and_check_output {
@@ -25,8 +25,9 @@ sub mock_execute_script_and_check_output {
             eval($cmd);
             my $actual_output_file_name = $scripts_and_expected_files->{$script_parameters}->[0];
             my $expected_output_file_name = $scripts_and_expected_files->{$script_parameters}->[1];
+            #`cp $actual_output_file_name $expected_output_file_name`;
             ok(-e $actual_output_file_name, "Actual output file exists $actual_output_file_name");
-            is(read_file($actual_output_file_name), read_file($expected_output_file_name), "Actual and expected output match for '$script_parameters'");
+            is(read_text($actual_output_file_name), read_text($expected_output_file_name), "Actual and expected output match for '$script_parameters'");
             unlink($actual_output_file_name);
         }
         close STDOUT;

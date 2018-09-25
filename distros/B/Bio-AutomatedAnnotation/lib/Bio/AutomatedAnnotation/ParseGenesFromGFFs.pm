@@ -13,6 +13,7 @@ has 'search_qualifiers' => ( is => 'ro', isa => 'ArrayRef', required => 1 );
 has 'codontable_id'     => ( is => 'ro', isa => 'Int',      default  => 11 );
 has 'amino_acids'       => ( is => 'ro', isa => 'Bool',     default  => 0 );
 has 'output_file'       => ( is => 'ro', isa => 'Str',      lazy     => 1, builder => '_build_output_file' );
+has 'output_base'       => ( is => 'rw', isa => 'Str',      default  => 'output' );
 has '_parser_objects'   => ( is => 'ro', isa => 'ArrayRef', lazy     => 1, builder => '_build__parser_objects' );
 
 has 'files_with_hits'    => ( is => 'rw', isa => 'Int',     default  => 0 );
@@ -22,7 +23,7 @@ sub _build_output_file {
     my ($self) = @_;
     my $file_suffix = $self->search_query;
     $file_suffix =~ s!\W!!gi;
-    return join( '.', ( 'output', $file_suffix, 'fa' ) );
+    return join( '.', ( $self->output_base, $file_suffix, 'fa' ) );
 }
 
 sub _build__parser_objects {
@@ -82,13 +83,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation::ParseGenesFromGFFs - Parse GFF files and efficiency extract the gene sequence.
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

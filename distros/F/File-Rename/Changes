@@ -1,5 +1,22 @@
 Revision history for Perl extension File::Rename.
 
+1.10	Robin Barker 2018-09-25
+	Added option --filename [-d] to rename filename component only
+	Added option --fullpath [--path] to rename any part of path 
+
+1.09_04 Robin Barker 2018-09-19
+	Added CONTRIBUTING
+	Fixed file 'log' which was supposed to be deleted
+
+1.09_03	Robin Barker 2018-09-17
+	Change options to closer align to original feature request
+
+1.09_02	Robin Barker 2018-09-16
+	Fix test failure for perl 5.14
+
+1.09_01	Robin Barker 2018-09-16
+	Option for renaming file component only: filename-only/-d
+
 1.00	Robin Barker 2018-07-03
 	File::Rename::Options module 
 

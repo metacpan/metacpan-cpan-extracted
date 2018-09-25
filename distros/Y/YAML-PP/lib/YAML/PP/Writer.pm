@@ -3,14 +3,15 @@ use strict;
 use warnings;
 package YAML::PP::Writer;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 sub output { return $_[0]->{output} }
 sub set_output { $_[0]->{output} = $_[1] }
 
 sub new {
     my ($class, %args) = @_;
-    my $output = delete $args{output} // '';
+    my $output = delete $args{output};
+    $output = '' unless defined $output;
     return bless {
         output => $output,
     }, $class;

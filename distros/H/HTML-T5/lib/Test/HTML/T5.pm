@@ -24,11 +24,11 @@ Test::HTML::T5 - Test::More-style wrapper around HTML::T5
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 my $TB = Test::Builder->new;
 

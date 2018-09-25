@@ -6,6 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use strict;
+use warnings;
 use Test::More;
 
 BEGIN{ 
@@ -89,12 +90,14 @@ _warning {
     Text::CSV::Unicode->new( { binary => 1 } )
 };
 diag $warning if $warning;
-ok (!$warning, 'no deprecated warning');
+ok (!$warning, q(no 'deprecated' warning) );
 
 my $csv1 = _warning { Text::CSV::Unicode->new( { binary => 1 } ) };
-my $warnok = $warning and $warning =~ /\bbinary\sis\sdeprecated\b/;
-diag $warning unless $warnok;
-ok ( $warnok, 'binary is deprecated warning' );
+{
+    my $warnok = $warning && $warning =~ /\bbinary\sis\sdeprecated\b/;
+    diag( $warning || '(no warning)' ) unless $warnok;
+    ok ( $warnok, q('binary is deprecated' warning) );
+}
 
 ok ($csv1->parse(qq("abc\nc")),	'success - \n allowed');
 

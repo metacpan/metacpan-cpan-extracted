@@ -1,7 +1,8 @@
 package Mojolicious::Plugin::SecurityHeader;
+# ABSTRACT: Mojolicious Plugin
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub register {
     my ($self, $app, $headers) = @_;
@@ -62,6 +63,7 @@ sub register {
                $security_headers{$last_header} = $header_value // $headers_default{$last_header};
            }
 
+           undef $header_value;
            $last_header = $header;
        }
        elsif ( $last_header ) {
@@ -182,11 +184,11 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::SecurityHeader
+Mojolicious::Plugin::SecurityHeader - Mojolicious Plugin
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -206,10 +208,6 @@ version 0.04
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::SecurityHeader> is a L<Mojolicious> plugin.
-
-=head1 NAME
-
-Mojolicious::Plugin::SecurityHeader - Mojolicious Plugin
 
 =head1 SECURITY HEADER
 

@@ -55,6 +55,8 @@ t/31.schema.t
 t/32.cyclic-refs.t
 t/33.schema-dump.t
 t/34.emit-scalar-styles.t
+t/35.highlight.t
+t/36.debug.t
 t/data/simple.yaml
 t/invalid/i032/===
 t/invalid/i032/in.yaml
@@ -169,6 +171,10 @@ yaml-test-suite/4CQQ/in.json
 yaml-test-suite/4CQQ/in.yaml
 yaml-test-suite/4CQQ/out.yaml
 yaml-test-suite/4CQQ/test.event
+yaml-test-suite/4EJS/===
+yaml-test-suite/4EJS/error
+yaml-test-suite/4EJS/in.yaml
+yaml-test-suite/4EJS/test.event
 yaml-test-suite/4GC6/===
 yaml-test-suite/4GC6/in.json
 yaml-test-suite/4GC6/in.yaml
@@ -327,6 +333,11 @@ yaml-test-suite/6JWB/in.json
 yaml-test-suite/6JWB/in.yaml
 yaml-test-suite/6JWB/out.yaml
 yaml-test-suite/6JWB/test.event
+yaml-test-suite/6KGN/===
+yaml-test-suite/6KGN/in.json
+yaml-test-suite/6KGN/in.yaml
+yaml-test-suite/6KGN/out.yaml
+yaml-test-suite/6KGN/test.event
 yaml-test-suite/6LVF/===
 yaml-test-suite/6LVF/in.json
 yaml-test-suite/6LVF/in.yaml
@@ -673,9 +684,8 @@ yaml-test-suite/CUP7/in.yaml
 yaml-test-suite/CUP7/out.yaml
 yaml-test-suite/CUP7/test.event
 yaml-test-suite/CXX2/===
-yaml-test-suite/CXX2/in.json
+yaml-test-suite/CXX2/error
 yaml-test-suite/CXX2/in.yaml
-yaml-test-suite/CXX2/out.yaml
 yaml-test-suite/CXX2/test.event
 yaml-test-suite/D49Q/===
 yaml-test-suite/D49Q/error
@@ -1365,6 +1375,11 @@ yaml-test-suite/XW4D/===
 yaml-test-suite/XW4D/in.yaml
 yaml-test-suite/XW4D/out.yaml
 yaml-test-suite/XW4D/test.event
+yaml-test-suite/Y2GN/===
+yaml-test-suite/Y2GN/in.json
+yaml-test-suite/Y2GN/in.yaml
+yaml-test-suite/Y2GN/out.yaml
+yaml-test-suite/Y2GN/test.event
 yaml-test-suite/YD5X/===
 yaml-test-suite/YD5X/in.json
 yaml-test-suite/YD5X/in.yaml

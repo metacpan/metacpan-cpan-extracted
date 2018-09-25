@@ -11,11 +11,14 @@ SYNOPSIS
       version = 0.001
   
       [@Starter]           ; all that is needed to start
-      revision = 2         ; always defaults to revision 1
+      revision = 3         ; always defaults to revision 1
   
       ; configuring examples
+      installer = ModuleBuildTiny
       -remove = GatherDir  ; to use [Git::GatherDir] instead, for example
       ExecDir.dir = script ; change the directory used by [ExecDir]
+      managed_versions = 1 ; uses the main module version, and bumps module versions after release
+      regenerate = LICENSE ; copy LICENSE to root after release or dzil regenerate
 
 DESCRIPTION
     The "[@Starter]" plugin bundle for Dist::Zilla is designed to do the
@@ -46,8 +49,13 @@ DESCRIPTION
 
       $ FAKE_RELEASE=1 dzil release
 
+    For a detailed overview of how this plugin bundle works, see "PHASES".
+
     For one-line initialization of a new "[@Starter]"-based distribution,
     try Dist::Zilla::MintingProfile::Starter.
+
+    For a variant of this bundle with built-in support for a git-based
+    workflow, see [@Starter::Git].
 
     Another simple way to use Dist::Zilla is with Dist::Milla, an
     opinionated bundle that requires no configuration and performs all of
@@ -97,6 +105,51 @@ OPTIONS
     will be set to mark the script/ directory for executables instead of the
     default bin/.
 
+  managed_versions
+    Requires revision 3 or higher.
+
+      [@Starter]
+      revision = 3
+      managed_versions = 1
+
+    With "managed_versions" set, "[@Starter]" will use an additional set of
+    plugins to manage your module versions when releasing, while leaving
+    them in place in the source files.
+
+    [RewriteVersion] will read the distribution version from the main
+    module, and set all other module versions to match in the build.
+    [NextRelease] replaces "{{$NEXT}}" in your Changes file with a line
+    containing the distribution version and build date/time. Finally,
+    [BumpVersionAfterRelease] will bump the versions in your module files
+    after a release.
+
+    When using this option, you must have the distribution version set in
+    your main module in a form like "our $VERSION = '1.234';", rather than
+    in dist.ini. Only modules and scripts which have similar version
+    declarations will be versioned in the build. You can set your
+    distribution's version manually by changing the version of your main
+    module, or by setting the "V" environment variable when building or
+    releasing. See the documentation for each plugin mentioned above for
+    details on configuring them, which can be done in the usual
+    config-slicing way as shown in "CONFIGURING".
+
+  regenerate
+    Requires revision 3 or higher.
+
+      [@Starter]
+      revision = 3
+      regenerate = INSTALL
+      regenerate = README
+
+    The specified generated files will be copied to the root directory upon
+    release using [CopyFilesFromRelease], and excluded from the
+    "[GatherDir]" plugin in use. Note: if you remove the built-in
+    "[GatherDir]" plugin to use one separately, you must exclude copied
+    files from that plugin yourself. Additionally,
+    [Regenerate::AfterReleasers] is applied to "[CopyFilesFromRelease]" to
+    allow these files to be generated and copied on demand outside of a
+    release using "dzil regenerate".
+
 REVISIONS
     The "[@Starter]" plugin bundle supports the following revisions.
 
@@ -105,10 +158,24 @@ REVISIONS
     plugins:
 
     [GatherDir]
+    [MetaYAML]
+    [MetaJSON]
+    [License]
+    [ReadmeAnyFromPod]
+    [PodSyntaxTests]
+    [Test::ReportPrereqs]
+    [Test::Compile]
+        xt_mode = 1
+
+    [MakeMaker]
+    [Manifest]
     [PruneCruft]
     [ManifestSkip]
+    [RunExtraTests]
+    [TestRelease]
+    [ConfirmRelease]
+    [UploadToCPAN]
     [MetaConfig]
-    [MetaProvides::Package]
     [MetaNoIndex]
         directory = t
         directory = xt
@@ -117,23 +184,9 @@ REVISIONS
         directory = eg
         directory = examples
 
-    [MetaYAML]
-    [MetaJSON]
-    [License]
-    [ReadmeAnyFromPod]
-    [ExecDir]
+    [MetaProvides::Package]
     [ShareDir]
-    [PodSyntaxTests]
-    [Test::ReportPrereqs]
-    [Test::Compile]
-        xt_mode = 1
-
-    [MakeMaker]
-    [Manifest]
-    [TestRelease]
-    [RunExtraTests]
-    [ConfirmRelease]
-    [UploadToCPAN]
+    [ExecDir]
 
     This revision differs from [@Basic] as follows:
 
@@ -141,9 +194,9 @@ REVISIONS
 
     * Uses [RunExtraTests] instead of [ExtraTests].
 
-    * Includes the following additional plugins: [MetaJSON], [MetaConfig],
-      [MetaProvides::Package], [MetaNoIndex], [PodSyntaxTests],
-      [Test::ReportPrereqs], [Test::Compile].
+    * Includes the following additional plugins: [MetaJSON],
+      [PodSyntaxTests], [Test::ReportPrereqs], [Test::Compile],
+      [MetaConfig], [MetaNoIndex], [MetaProvides::Package].
 
   Revision 2
     Revision 2 is similar to Revision 1, with these differences:
@@ -161,6 +214,11 @@ REVISIONS
     * The "installer" option is now supported to change the installer
       plugin.
 
+  Revision 3
+    Revision 3 is similar to Revision 2, but additionally supports the
+    "managed_versions" and "regenerate" options, and variant bundles like
+    [@Starter::Git].
+
 CONFIGURING
     By using the PluginRemover or Config::Slicer role options, the
     "[@Starter]" bundle's included plugins can be customized as desired.
@@ -168,7 +226,9 @@ CONFIGURING
 
   GatherDir
     If the distribution is using git source control, it is often helpful to
-    replace the default [GatherDir] plugin with [Git::GatherDir].
+    replace the default [GatherDir] plugin with [Git::GatherDir]. (Note: The
+    [@Starter::Git] variant of this bundle uses "[Git::GatherDir]" by
+    default.)
 
       [Git::GatherDir]
       [@Starter]
@@ -205,13 +265,9 @@ CONFIGURING
       [ReadmeAnyFromPod / Pod_Readme]
       type = pod
       location = root ; do not include pod readmes in the build!
-
-  ExecDir
-    Some distributions use the script/ directory instead of bin/ (the
-    [ExecDir] default) for executable scripts.
-
-      [@Starter]
-      ExecDir.dir = script
+      phase = release ; avoid changing files in the root with dzil build or dzil test
+      [Regenerate::AfterReleasers] ; allows regenerating with dzil regenerate
+      plugin = Pod_Readme
 
   MetaNoIndex
     The distribution may include additional files or directories that should
@@ -245,11 +301,141 @@ CONFIGURING
       MetaProvides::Package.inherit_version = 0
       MetaProvides::Package.inherit_missing = 0
 
+  ExecDir
+    Some distributions use the script/ directory instead of bin/ (the
+    [ExecDir] default) for executable scripts.
+
+      [@Starter]
+      ExecDir.dir = script
+
+  Versions
+    When using the "managed_versions" option, the added plugins can be
+    directly configured in various ways to suit your versioning needs.
+
+      [@Starter]
+      revision = 3
+      managed_versions = 1
+  
+      ; configuration examples
+      RewriteVersion.global = 1
+      BumpVersionAfterRelease.munge_makefile_pl = 0
+      NextRelease.filename = ChangeLog
+      NextRelease.format = %-5v %{yyyy-MM-dd}d
+
+PHASES
+    The plugins in this bundle, and any additional plugins you include in
+    dist.ini, each execute code within one or more phases when a Dist::Zilla
+    command such as "dzil test" is run. You can see a full listing of the
+    phases used by the plugins in your dist.ini with the command "dzil
+    dumpphases".
+
+  BeforeBuild
+    The distribution build consists of several phases, starting with
+    -BeforeBuild. No plugins in this bundle execute during this phase by
+    default.
+
+  FileGatherer
+    In the -FileGatherer phase, many plugins add files to the distribution;
+    in "[@Starter]" this includes the plugins [GatherDir], [MetaYAML],
+    [MetaJSON], [License], [Pod2Readme], [PodSyntaxTests],
+    [Test::ReportPrereqs], [Test::Compile], [MakeMaker] (or the configured
+    installer plugin), and [Manifest].
+
+  EncodingProvider
+    In the -EncodingProvider phase, a plugin may set the encoding for
+    gathered files. No plugins in this bundle execute during this phase by
+    default.
+
+  FilePruner
+    In the -FilePruner phase, gathered files may be excluded from the
+    distribution. In "[@Starter]" this is handled by the plugins
+    [PruneCruft] and [ManifestSkip].
+
+  FileMunger
+    In the -FileMunger phase, files in the distribution may be modified. In
+    "[@Starter]" the plugin [Test::Compile] runs during this phase in order
+    to update its test file to test all gathered modules and scripts. When
+    using the "managed_versions" option, the [RewriteVersion] and
+    [NextRelease] plugins also operate during this phase.
+
+  PrereqSource
+    In the -PrereqSource phase, plugins can add prerequisites to the
+    distribution. In "[@Starter]" the plugins [PodSyntaxTests],
+    [Test::ReportPrereqs], [Test::Compile], and [MakeMaker] (or the
+    configured installer plugin) add prereqs during this phase.
+
+  InstallTool
+    In the -InstallTool phase, the installer's Makefile.PL or Build.PL is
+    generated in the distribution. In "[@Starter]", [MakeMaker] or the
+    configured installer plugin handles this phase.
+
+  AfterBuild
+    The -AfterBuild phase concludes the distribution build. No plugins in
+    this bundle execute during this phase by default.
+
+  BuildRunner
+    The -BuildRunner phase executes the configure and build phases of the
+    "Phases" in CPAN::Meta::Spec in a built distribution. In "[@Starter]",
+    [MakeMaker] or the configured installer plugin handles this phase.
+
+  TestRunner
+    The -TestRunner phase executes the test phase of the "Phases" in
+    CPAN::Meta::Spec. In "[@Starter]", [MakeMaker] (or the configured
+    installer plugin) and [RunExtraTests] handle this phase.
+
+  BeforeRelease
+    The -BeforeRelease phase prepares a built distribution for release. In
+    "[@Starter]", the plugins [TestRelease], [ConfirmRelease], and
+    [UploadToCPAN] (to ensure PAUSE username and password are available)
+    execute during this phase. In [@Starter::Git], the plugin [Git::Check]
+    executes during this phase.
+
+  Releaser
+    The -Releaser phase releases the distribution to CPAN. In "[@Starter]",
+    [UploadToCPAN] (or [FakeRelease]) handles this phase.
+
+  AfterRelease
+    The -AfterRelease phase concludes the distribution release process. No
+    plugins in this bundle execute during this phase by default. When using
+    the "managed_versions" option, the [NextRelease] and
+    [BumpVersionAfterRelease] plugins execute during this phase. When using
+    the "regenerate" option, the [CopyFilesFromRelease] plugin executes
+    during this phase. In [@Starter::Git], the plugins [Git::Commit],
+    [Git::Tag], and [Git::Push] execute during this phase.
+
+  MetaProvider
+    The -MetaProvider phase executes when required rather than at a specific
+    time. In "[@Starter]", the [MetaConfig], [MetaProvides::Package], and
+    [MetaNoIndex] plugins provide metadata in this phase.
+
+  VersionProvider
+    The -VersionProvider phase executes when required rather than at a
+    specific time. No plugins in this bundle execute during this phase by
+    default. When using the "managed_versions" option, the [RewriteVersion]
+    plugin acts as version provider.
+
+  ShareDir
+    The -ShareDir phase executes when required rather than at a specific
+    time. In "[@Starter]", the [ShareDir] plugin handles this phase.
+
+  Regenerator
+    The -Regenerator phase is a quasi-phase which executes when "dzil
+    regenerate" is run. When using the "regenerate" option, the
+    [Regenerate::AfterReleasers] plugin promotes [CopyFilesFromRelease] to
+    also execute during this phase.
+
+  Other
+    The operation of some plugins may not neatly fit into a particular
+    phase. In "[@Starter]", the [ExecDir] plugin marks a directory as
+    containing executables, which can be used by installer plugins such as
+    [MakeMaker].
+
 EXTENDING
     This bundle includes a basic set of plugins for releasing a
     distribution, but there are many more common non-intrusive tasks that
     Dist::Zilla can help with simply by using additional plugins in the
-    dist.ini.
+    dist.ini. You can install all plugins required by a dist.ini by running
+    "dzil authordeps --missing | cpanm" or with "dzil installdeps".
 
   Name
     To automatically set the distribution name from the current directory,
@@ -259,29 +445,15 @@ EXTENDING
     To extract the license and copyright information from the main module,
     and optionally set the author as well, use [LicenseFromModule].
 
-  Versions
-    A common approach to maintaining versions in Dist::Zilla-managed
-    distributions is to automatically extract the distribution's version
-    from the main module, maintain uniform module versions, and bump the
-    version during or after each release. To extract the main module
-    version, use [RewriteVersion] (which also rewrites your module versions
-    to match the main module version when building) or
-    [VersionFromMainModule]. To automatically increment module versions in
-    the repository after each release, use [BumpVersionAfterRelease].
-    Alternatively, you can use [ReversionOnRelease] to automatically
-    increment your versions in the release build, then copy the updated
-    modules back to the repository with [CopyFilesFromRelease]. Don't mix
-    these two version increment methods!
-
   Changelog
     To automatically add the new release version to the distribution
     changelog, use [NextRelease]. To ensure the release has changelog
     entries, use [CheckChangesHasContent].
 
   Git
-    To better integrate with a git workflow, use the plugins from [@Git]. To
-    automatically add contributors to metadata from git commits, use
-    [Git::Contributors].
+    To better integrate with a git workflow, use the plugins from [@Git], as
+    the [@Starter::Git] variant of this bundle does. To automatically add
+    contributors to metadata from git commits, use [Git::Contributors].
 
   Resources
     To automatically set resource metadata from an associated GitHub
@@ -306,6 +478,7 @@ COPYRIGHT AND LICENSE
       The Artistic License 2.0 (GPL Compatible)
 
 SEE ALSO
-    Dist::Zilla, Dist::Zilla::PluginBundle::Basic, Dist::Milla,
+    Dist::Zilla, Dist::Zilla::PluginBundle::Basic,
+    Dist::Zilla::PluginBundle::Starter::Git, Dist::Milla,
     Dist::Zilla::MintingProfile::Starter
 

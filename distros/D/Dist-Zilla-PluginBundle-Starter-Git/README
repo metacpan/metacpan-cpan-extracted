@@ -1,0 +1,135 @@
+NAME
+    Dist::Zilla::PluginBundle::Starter::Git - A minimal Dist::Zilla plugin
+    bundle for git workflows
+
+SYNOPSIS
+      ; dist.ini
+      name    = My-Cool-Distribution
+      author  = Example Jones <jones@example.com>
+      license = Perl_5
+      copyright_holder = Example Jones
+      copyright_year   = 2017
+      version = 0.001
+  
+      [@Starter::Git]      ; all that is needed to start
+      revision = 3         ; always defaults to revision 3
+  
+      ; configuring examples
+      installer = ModuleBuildTiny
+      -remove = Pod2Readme ; to use [Readme::Brief] instead, for example
+      ExecDir.dir = script ; change the directory used by [ExecDir]
+      managed_versions = 1 ; uses the main module version, and bumps module versions after release
+      regenerate = LICENSE ; copy LICENSE to repository after release or dzil regenerate
+
+DESCRIPTION
+    The "[@Starter::Git]" plugin bundle for Dist::Zilla is a subclass of the
+    [@Starter] plugin bundle designed to support a Git-based workflow. See
+    the documentation for [@Starter] for further details.
+
+    For one-line initialization of a new "[@Starter::Git]"-based
+    distribution, try Dist::Zilla::MintingProfile::Starter::Git.
+
+OPTIONS
+    "[@Starter::Git]" inherits the options from [@Starter], and can
+    similarly be further configured by the composed roles, as in
+    "CONFIGURING".
+
+  revision
+      [@Starter::Git]
+      revision = 3
+
+    As in "revision" in Dist::Zilla::PluginBundle::Starter, but defaults to
+    revision 3. "[@Starter::Git]" requires at least revision 3.
+
+  installer
+    As in "installer" in Dist::Zilla::PluginBundle::Starter.
+
+  managed_versions
+    As in "managed_versions" in Dist::Zilla::PluginBundle::Starter, and
+    additionally uses [Git::Commit] a second time after
+    [BumpVersionAfterRelease] to commit the bumped versions (with the plugin
+    name "Version_Bump_Commit").
+
+  regenerate
+    As in "regenerate" in Dist::Zilla::PluginBundle::Starter, and allows
+    changes to the copied files to be committed in the "Release_Commit".
+
+REVISIONS
+    The "[@Starter::Git]" plugin bundle supports the following revisions.
+
+  Revision 3
+    Revision 3 is the default and is equivalent to using the following
+    plugins:
+
+    [Git::GatherDir]
+    [MetaYAML]
+    [MetaJSON]
+    [License]
+    [Pod2Readme]
+    [PodSyntaxTests]
+    [Test::ReportPrereqs]
+    [Test::Compile]
+        xt_mode = 1
+
+    [MakeMaker]
+    [Manifest]
+    [PruneCruft]
+    [ManifestSkip]
+    [RunExtraTests]
+    [Git::Check]
+        allow_dirty = dist.ini
+        allow_dirty = Changes
+
+    [TestRelease]
+    [ConfirmRelease]
+    [UploadToCPAN]
+    [Git::Commit / Release_Commit]
+        allow_dirty = dist.ini
+        allow_dirty = Changes
+        add_files_in = /
+        commit_msg = %v%n%n%c
+
+    [Git::Tag]
+        tag_format = %v
+        tag_message = %v
+
+    [Git::Push]
+    [MetaConfig]
+    [MetaNoIndex]
+        directory = t
+        directory = xt
+        directory = inc
+        directory = share
+        directory = eg
+        directory = examples
+
+    [MetaProvides::Package]
+        inherit_version = 0
+
+    [ShareDir]
+    [ExecDir]
+
+    This revision differs from Revision 3 in [@Starter] as follows:
+
+    * Uses [Git::GatherDir] instead of [GatherDir].
+
+    * Includes the following additional plugins: [Git::Check],
+      [Git::Commit], [Git::Tag], [Git::Push].
+
+BUGS
+    Report any issues on the public bugtracker.
+
+AUTHOR
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+    Dist::Zilla, Dist::Zilla::PluginBundle::Starter, Dist::Milla,
+    Dist::Zilla::MintingProfile::Starter::Git
+

@@ -77,27 +77,27 @@
    "provides" : {
       "Text::Bidi" : {
          "file" : "lib/Text/Bidi.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       },
       "Text::Bidi::Array" : {
          "file" : "lib/Text/Bidi/Array.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       },
       "Text::Bidi::Array::Byte" : {
          "file" : "lib/Text/Bidi/Array/Byte.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       },
       "Text::Bidi::Array::Long" : {
          "file" : "lib/Text/Bidi/Array/Long.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       },
       "Text::Bidi::Constants" : {
          "file" : "lib/Text/Bidi/Constants.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       },
       "Text::Bidi::Paragraph" : {
          "file" : "lib/Text/Bidi/Paragraph.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       }
    },
    "release_status" : "stable",
@@ -113,7 +113,7 @@
          "web" : "https://github.com/mkamensky/Text-Bidi"
       }
    },
-   "version" : "2.14",
+   "version" : "2.15",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

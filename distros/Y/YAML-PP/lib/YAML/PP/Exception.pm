@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Exception;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use overload '""' => \&to_string;
 
@@ -32,9 +32,10 @@ sub to_string {
         $column = $token->{column} unless defined $column;
         $yaml .= $token->{value};
     }
-    $column //= '???';
+    $column = '???' unless defined $column;
 
-    my $remaining_yaml = $self->{yaml}->[0] // '';
+    my $remaining_yaml = $self->{yaml}->[0];
+    $remaining_yaml = '' unless defined $remaining_yaml;
     $yaml .= $remaining_yaml;
     {
         local $@; # avoid bug in old Data::Dumper

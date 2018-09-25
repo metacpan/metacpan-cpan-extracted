@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = '0.005';
+our $VERSION = 'v3.0.0';
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -21,16 +21,14 @@ Dist::Zilla::MintingProfile::Starter - A minimal Dist::Zilla minting profile
 
 =head1 DESCRIPTION
 
-This minting profile for L<C<dzil new>|Dist::Zilla::App::Command::new> creates
-a minimal new distribution consisting of a basic C<dist.ini> using the
+This minting profile for L<< C<dzil new>|Dist::Zilla::App::Command::new >>
+creates a minimal new distribution consisting of a basic C<dist.ini> using the
 L<[@Starter]|Dist::Zilla::PluginBundle::Starter> plugin bundle, and a skeleton
 for the main module and its documentation. The author, license, and copyright
 will be populated in the C<dist.ini> and documentation from the current dzil
 C<config.ini>, which can be initialized using
-L<C<dzil setup>|Dist::Zilla::App::Command::setup>. The version is initialized
-statically as C<0.001>. See L<Dist::Zilla::PluginBundle::Starter/"Versions">
-for ways to automatically manage distribution versions between releases with
-L<Dist::Zilla>.
+L<< C<dzil setup>|Dist::Zilla::App::Command::setup >>. The version is
+initialized statically as C<0.001>.
 
 =head1 CUSTOMIZING
 

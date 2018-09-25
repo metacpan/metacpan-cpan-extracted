@@ -62,7 +62,7 @@ sub run {
     if ( defined( $self->output_filename ) ) {
         $input_params{output_filename} = $self->output_filename;
     }
-    
+
     my $spreadsheet_obj = Bio::AutomatedAnnotation::SpreadsheetOfGeneOccurances->new(\%input_params);
     $spreadsheet_obj->create_spreadsheet;
     
@@ -95,13 +95,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation::CommandLine::GeneNameOccurances - Create a spreadsheet with gene name occurances
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

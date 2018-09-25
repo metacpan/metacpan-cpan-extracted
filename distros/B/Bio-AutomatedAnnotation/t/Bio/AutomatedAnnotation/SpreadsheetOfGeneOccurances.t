@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 BEGIN { unshift( @INC, './lib' ) }
 
@@ -25,8 +25,9 @@ ok(  $obj = Bio::AutomatedAnnotation::SpreadsheetOfGeneOccurances->new(
 ok($obj->create_spreadsheet,'Create a spreadsheet with multiple input files');
 
 ok( -e 'example.csv', 'spreadsheet file exists');
-my  $actual_file_content = read_file('example.csv');
-my $expected_file_content = read_file('t/data/expected_example.csv'); 
+
+my $actual_file_content = read_text('example.csv');
+my $expected_file_content = read_text('t/data/expected_example.csv'); 
 is_deeply($actual_file_content, $expected_file_content, 'Spredsheet data as expected');
 
 unlink('example.csv');

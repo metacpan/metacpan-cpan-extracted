@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use 5.010;
 use Test::More;
 use FindBin '$Bin';
 use Data::Dumper;
@@ -50,7 +49,7 @@ for my $char (sort keys %chars) {
     chomp $display;
     my $title = "Invalid literal control char: >>$display<<";
     eval {
-        $ypp->parse($yaml);
+        $ypp->parse_string($yaml);
     };
     if ($@) {
         #diag "Error: $@";

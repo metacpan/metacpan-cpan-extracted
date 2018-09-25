@@ -14,6 +14,9 @@ These modules have quite high performance and error reporting capabilities.
 Additionally, one could dump the data structure generated from extracted
 NCBI object records into XML extremely easily using XML::Simple's XMLout().
 
+COPYRIGHT
+---------
+
 Written by Dr. Mingyi Liu <mingyiliu@gmail.com>.
 Copyright (c) 2005 Mingyi Liu, GPC Biotech, Altana Research Institute.
 
@@ -23,12 +26,10 @@ it under the same terms as Perl itself.
 INSTALLATION
 ------------
 
-Bio::ASN1::EntrezGene package can be installed & tested as follows:
+Bio::ASN1::EntrezGene package can be installed and tested as follows:
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+    dzill test # or dzil test --all
+    dzil install
 
 DOCUMENTATION
 -------------

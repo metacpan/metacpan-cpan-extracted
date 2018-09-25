@@ -1,3 +1,6 @@
+0.016 - 2018/09/25
+- detects if header field protection is incomplete, check VerifyResult::warning
+- small improvements to scripts
 0.015 - 2016/12/18
 - fix signing/validation: only a single header (starting from the bottom) should
   be checked for each entry in [h]eader.

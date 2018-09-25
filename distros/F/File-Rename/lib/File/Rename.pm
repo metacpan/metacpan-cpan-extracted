@@ -4,7 +4,7 @@ use strict;
 BEGIN { eval { require warnings; warnings->import } }
 
 our @EXPORT_OK = qw( rename );
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 sub import {
     require Exporter;
@@ -22,7 +22,16 @@ sub rename_files {
     my $errors;
     for (@_) {
         my $was = $_;
-	$code->();
+	if ( $options->{filename_only} ) {
+	    require File::Spec;
+	    my($vol, $dir, $file) = File::Spec->splitpath($_);
+	    $code->() for ($file);
+	    $_ = File::Spec->catpath($vol, $dir, $file);
+	}
+	else {
+	    $code->();
+	}
+
     	if( $was eq $_ ){ }		# ignore quietly
     	elsif( -e $_ and not $options->{over_write} ) { 
 	    if (/\s/ or $was =~ /\s/ ) {
@@ -207,6 +216,11 @@ Print names of files to be renamed, but do not rename
 =item B<over_write>
 
 Allow files to be over-written by the renaming, provided by B<-f>. 
+
+=item B<filename_only>
+
+Only apply renaming to the filename component of the path, 
+provided by B<-d>.
 
 =item B<show_help>
 

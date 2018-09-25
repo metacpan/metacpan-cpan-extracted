@@ -64,11 +64,7 @@ SV* make_rsa_obj(SV* p_proto, RSA* p_rsa)
 
     CHECK_NEW(rsa, 1, rsaData);
     rsa->rsa = p_rsa;
-#ifdef SHA512_DIGEST_LENGTH
-    rsa->hashMode = NID_sha256;
-#else
     rsa->hashMode = NID_sha1;
-#endif
     rsa->padding = RSA_PKCS1_OAEP_PADDING;
     return sv_bless(
         newRV_noinc(newSViv((IV) rsa)),

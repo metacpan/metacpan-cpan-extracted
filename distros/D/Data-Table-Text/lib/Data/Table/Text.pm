@@ -5,11 +5,10 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 # to escape an open parenthesis in a re use \x28, close is \x29
-# parseCommandLineArguments should take a hash as the final parameter to explain parameters
 
 package Data::Table::Text;
-use v5.24.0;
-our $VERSION = '20180922';
+use v5.8.0;
+our $VERSION = '20180924';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -1533,73 +1532,71 @@ sub numberOfLinesInString($)                                                    
 
 #D1 Unicode                                                                     # Translate ascii alphanumerics in strings to various Unicode blocks.
 
+my $normalString = join '', 'A'..'Z', 'a'..'z', '0'..'9';
+my $boldString   = q(𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵);
+my $circleString = q(ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⓪①②③④⑤⑥⑦⑧⑨);
+my $darkString   = q(🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩⓿➊➋➌➍➎➏➐➑➒);
+my $superString  = q(ᴬᴮCᴰᴱFᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿSᵀᵁⱽᵂXYZᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹);
+my $lowsubString = q(ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz₀₁₂₃₄₅₆₇₈₉);
+my $lowerString  = join '', 'a'..'z', '0'..'9';
+
 sub boldString($)                                                               # Convert alphanumerics in a string to bold.
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(A-Za-z0-9)
-               (𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵);
+  eval qq(\$string =~ tr($normalString) ($boldString));                         # Some Perls cannot do this and complain but wI want to avoid excluding all the other methods in this file just because some perls cannot do this one operation.
   $string
  }
 
 sub boldStringUndo($)                                                           # Undo alphanumerics in a string to bold.
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵)
-               (A-Za-z0-9);
+  eval qq(\$string =~ tr($boldString) ($normalString));
   $string
  }
 
 sub enclosedString($)                                                           # Convert alphanumerics in a string to enclosed alphanumerics.
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(A-Za-z0-9)
-               (ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⓪①②③④⑤⑥⑦⑧⑨);
+  eval qq(\$string =~ tr($normalString) ($circleString));
   $string
  }
 
 sub enclosedStringUndo($)                                                       # Undo alphanumerics in a string to enclosed alphanumerics.
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⓪①②③④⑤⑥⑦⑧⑨)
-               (A-Za-z0-9);
+  eval qq(\$string =~ tr($circleString) ($normalString));
   $string
  }
 
 sub enclosedReversedString($)                                                   # Convert alphanumerics in a string to enclosed reversed alphanumerics.
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(A-Za-z0-9)
-               (🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩⓿➊➋➌➍➎➏➐➑➒);
+  eval qq(\$string =~ tr($normalString) ($darkString));
   $string
  }
 
 sub enclosedReversedStringUndo($)                                               # Undo alphanumerics in a string to enclosed reversed alphanumerics.
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩⓿➊➋➌➍➎➏➐➑➒)
-               (A-Za-z0-9);
+  eval qq(\$string =~ tr($darkString)   ($normalString));
   $string
  }
 
 sub superScriptString($)                                                        # Convert alphanumerics in a string to super scripts
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(A-Za-z0-9)
-               (ᴬᴮCᴰᴱFᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿSᵀᵁⱽᵂXYZᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹);
+  eval qq(\$string =~ tr($normalString) ($superString));
   $string
  }
 
 sub superScriptStringUndo($)                                                    # Undo alphanumerics in a string to super scripts
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(ᴬᴮCᴰᴱFᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿSᵀᵁⱽᵂXYZᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖqʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹)
-               (A-Za-z0-9);
+  eval qq(\$string =~ tr($superString)  ($normalString));
   $string
  }
 
 sub subScriptString($)                                                          # Convert alphanumerics in a string to sub scripts
- {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(a-z0-9)
-               (ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz₀₁₂₃₄₅₆₇₈₉);
+ {my ($string) = @_;                                                           # String to convert
+  eval qq(\$string =~ tr($lowerString)  ($lowsubString));
   $string
  }
 
 sub subScriptStringUndo($)                                                      # Undo alphanumerics in a string to sub scripts
  {my ($string) = @_;                                                            # String to convert
-  $string =~ tr(ₐbcdₑfgₕᵢⱼₖₗₘₙₒₚqᵣₛₜᵤᵥwₓyz₀₁₂₃₄₅₆₇₈₉)
-               (a-z0-9);
+  eval qq(\$string =~ tr($lowsubString) ($lowerString));
   $string
  }
 

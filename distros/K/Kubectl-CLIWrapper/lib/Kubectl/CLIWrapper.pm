@@ -4,29 +4,38 @@ package Kubectl::CLIWrapper {
   use IPC::Open3;
   use Kubectl::CLIWrapper::Result;
 
-  our $VERSION = '0.02';
+  our $VERSION = '0.03';
 
-  has server => (is => 'ro', isa => 'Str');
-  has username => (is => 'ro', isa => 'Str');
-  has password => (is => 'ro', isa => 'Str');
-  has token => (is => 'ro', isa => 'Str');
-  has insecure_tls => (is => 'ro', isa => 'Bool', default => 0);
-  has namespace => (is => 'ro', isa => 'Str', default => 'default');
-
+  has kubeconfig => (is => 'ro', isa => 'Str', predicate => 'has_kubeconfig');
   has kubectl => (is => 'ro', isa => 'Str', default => 'kubectl');
+  has namespace => (is => 'ro', isa => 'Str', predicate => 'has_namespace');
+  has password => (is => 'ro', isa => 'Str', predicate => 'has_password');
+  has server => (is => 'ro', isa => 'Str', predicate => 'has_server');
+  has token => (is => 'ro', isa => 'Str', predicate => 'has_token');
+  has username => (is => 'ro', isa => 'Str', predicate => 'has_username');
 
-  has kube_options => (is => 'ro', isa => 'ArrayRef[Str]', lazy => 1, default => sub {
+  has insecure_tls => (is => 'ro', isa => 'Bool', default => 0);
+
+  has kube_options => (
+        is      => 'ro',
+        isa     => 'ArrayRef[Str]',
+        lazy    => 1,
+        builder => 'build_options',
+  );
+
+  sub build_options {
     my $self = shift;
-
     my %options = ();
-    $options{ server } = $self->server if (defined $self->server);
-    $options{ username } = $self->username if (defined $self->username);
-    $options{ password } = $self->password if (defined $self->password);
-    $options{ namespace } = $self->namespace;
-    $options{ 'insecure-skip-tls-verify' } = 'true' if ($self->insecure_tls);
+
+    $options{server}     = $self->server     if $self->has_server;
+    $options{username}   = $self->username   if $self->has_username;
+    $options{password}   = $self->password   if $self->has_password;
+    $options{namespace}  = $self->namespace  if $self->has_namespace;
+    $options{kubeconfig} = $self->kubeconfig if $self->has_kubeconfig;
+    $options{'insecure-skip-tls-verify'} = 'true' if $self->insecure_tls;
 
     return [ map { "--$_=$options{ $_ }" } keys %options ];
-  });
+  }
 
   sub command_for {
     my ($self, @params) = @_;
@@ -139,6 +148,10 @@ line (loading ~/.kube/config) which may be already set to point to a Kubernetes 
 By default initialized to C<kubectl>. It will try to find kubectl in the PATH. You can
 set it explicitly to specific kubectl excecutable.
 
+=head2 kubeconfig
+
+Path to your kube configuration, defaults to C<$HOME/.kube/config> via kubectl.
+
 =head2 server
 
 The URL of the Kubernetes service
@@ -161,7 +174,7 @@ A Boolean flag that tells kubectl to not verify the certificate of the server it
 
 =head2 namespace
 
-The Kubernetes namespace to operate in. Defaults to C<default>.
+The Kubernetes namespace to operate in.
 
 =head1 METHODS
 
@@ -187,11 +200,15 @@ C<success> will be set accordingly.
 
 L<https://kubernetes.io/docs/tasks/tools/install-kubectl/>
 
-L<K8s::IO>
+L<IO::K8s>
 
 L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/>
 
 L<Net::Kubernetes>
+
+=head1 CONTRIBUTORS
+
+waterkip: adding the possiblity to set a kubeconfig file
 
 =head1 AUTHOR
 

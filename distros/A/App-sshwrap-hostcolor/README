@@ -1,0 +1,39 @@
+NAME
+    App::sshwrap::hostcolor - SSH wrapper script to remember the terminal
+    background you use for each host
+
+VERSION
+    This document describes version 0.001 of App::sshwrap::hostcolor (from
+    Perl distribution App-sshwrap-hostcolor), released on 2018-09-25.
+
+SYNOPSIS
+    See the included script sshwrap-hostcolor.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-sshwrap-hostcolor>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-sshwrap-hostcolor>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-sshwrap-hostcolor
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ssh
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

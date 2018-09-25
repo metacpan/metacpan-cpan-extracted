@@ -1,7 +1,7 @@
 package ShellCompleter::Util;
 
-our $DATE = '2016-10-21'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2018-09-25'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,14 +9,20 @@ use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(
-               );
 our @EXPORT_OK = qw(
                     run_shell_completer_for_getopt_long_app
                );
 
 sub _complete {
-    my ($comp, $args) = @_;
+    my ($comp0, $args) = @_;
+
+    my $comp;
+    if(ref($comp0) eq 'HASH') {
+        $comp = $comp0->{completion};
+    } else {
+        $comp = $comp0;
+    }
+
     if (ref($comp) eq 'ARRAY') {
         require Complete::Util;
         return Complete::Util::complete_array_elem(
@@ -73,7 +79,7 @@ ShellCompleter::Util - Utility routines for App::ShellCompleter::*
 
 =head1 VERSION
 
-This document describes version 0.02 of ShellCompleter::Util (from Perl distribution ShellCompleter-Util), released on 2016-10-21.
+This document describes version 0.030 of ShellCompleter::Util (from Perl distribution ShellCompleter-Util), released on 2018-09-25.
 
 =head1 SYNOPSIS
 
@@ -117,7 +123,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

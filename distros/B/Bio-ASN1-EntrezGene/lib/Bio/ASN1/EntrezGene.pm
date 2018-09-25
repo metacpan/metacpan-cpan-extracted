@@ -1,6 +1,5 @@
 package Bio::ASN1::EntrezGene;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Bio::ASN1::EntrezGene::VERSION = '1.72';
+$Bio::ASN1::EntrezGene::VERSION = '1.73';
 use utf8;
 use strict;
 use warnings;
@@ -88,7 +87,7 @@ sub next_seq
   {
     chomp;
     next unless /\S/;
-    my $tmp = (/^\s*Entrezgene(-Set)? ::= ({.*)/si)? $2 : "{" . $_; # get rid of the 'Entrezgene ::= ' at the beginning of Entrez Gene record
+    my $tmp = (/^\s*Entrezgene(-Set)? ::= (\{.*)/si)? $2 : "{" . $_; # get rid of the 'Entrezgene ::= ' at the beginning of Entrez Gene record
     return $self->parse($tmp, $compact, 1); # 1 species no resetting line number
   }
 }
@@ -306,7 +305,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -314,7 +313,7 @@ Bio::ASN1::EntrezGene - Regular expression-based Perl Parser for NCBI Entrez Gen
 
 =head1 VERSION
 
-version 1.72
+version 1.73
 
 =head1 SYNOPSIS
 
@@ -440,7 +439,7 @@ retrieve and parse arbitrary records.
                 please see comment for the trimdata method. An option
                 of 2 is recommended and default
               The acceptable values for $trimopt include:
-                1 - trim as much as possibile
+                1 - trim as much as possible
                 2 (or 0, undef) - trim to an easy-to-use structure
                 3 - no trimming (in version 1.06, prior to version
                     1.06, 0 or undef means no trimming)
@@ -458,7 +457,7 @@ retrieve and parse arbitrary records.
   Notes:      This function is useful to compact a data structure produced by
                 Bio::ASN1::EntrezGene::parse.
               The acceptable values for $trimopt include:
-                1 - trim as much as possibile
+                1 - trim as much as possible
                 2 (or 0, undef) - trim to an easy-to-use structure
                 3 - no trimming (in version 1.06, prior to version
                     1.06, 0 or undef means no trimming)
@@ -535,8 +534,8 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org              - General discussion
+  http://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
@@ -554,7 +553,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://redmine.open-bio.org/projects/bioperl/
+  https://github.com/bioperl/bio-asn1-entrezgene/issues
 
 =head1 AUTHOR
 

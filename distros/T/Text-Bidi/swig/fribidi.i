@@ -153,7 +153,6 @@ OUTSTR(char, utf8out);
 %}
 
 %apply const FriBidiChar* str { const char* s }
-%apply const FriBidiBracketType* bracket_types { const char* s }
 
 %apply int { FriBidiStrIndex }
 %apply unsigned long { FriBidiFlags, FriBidiParType, FriBidiCharType }
@@ -236,20 +235,6 @@ FriBidiLevel reorder_map (const FriBidiFlags flags,
   return fribidi_reorder_line(
       flags, bd_types, length, off, base_dir, emb_levels, NULL, map);
 }
-
-/* This is from fribidi-deprecated.h. According to
- * http://permalink.gmane.org/gmane.comp.internationalization.fribidi/531
- * and in contrast with the docs, this is not deprecated
- */
-FriBidiStrIndex fribidi_remove_bidi_marks (
-  FriBidiChar *strl,             /* input string to clean */
-  const FriBidiStrIndex len,    /* input string length */
-  FriBidiStrIndex *positions_to_this,   /* list mapping positions to the
-                                           order used in str */
-  FriBidiStrIndex *position_from_this_list, /* list mapping positions 
-                                                  from the order used in str */
-  FriBidiLevel *emb_levels        /* list of embedding levels */
-);
 
 
 extern const char *fribidi_version_info;

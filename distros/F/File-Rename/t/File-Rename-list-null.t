@@ -46,7 +46,7 @@ diag_rename;
 
 s/\W// for @target;
 is_deeply( [ sort(listdir('.')) ],
-	[sort(q(log), $file, @target)],
+	[sort($file, @target)],
 	'rename - list - null' );
 
 END { 	chdir File::Spec->rootdir; 

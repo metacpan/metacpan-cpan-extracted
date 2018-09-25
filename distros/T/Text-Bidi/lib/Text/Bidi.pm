@@ -6,7 +6,7 @@ use strict 'vars';
 
 package Text::Bidi;
 # ABSTRACT: Unicode bidi algorithm using libfribidi
-$Text::Bidi::VERSION = '2.14';
+$Text::Bidi::VERSION = '2.15';
 use Exporter;
 use base qw(Exporter);
 use Carp;
@@ -281,7 +281,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 SYNOPSIS
 

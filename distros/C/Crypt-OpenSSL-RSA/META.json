@@ -4,7 +4,7 @@
       "Ian Robertson <iroberts@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,6 +56,6 @@
          "url" : "http://github.com/toddr/Crypt-OpenSSL-RSA"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,10 +1,10 @@
 NAME
 
-    Mojolicious::Plugin::SecurityHeader
+    Mojolicious::Plugin::SecurityHeader - Mojolicious Plugin
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -24,10 +24,6 @@ SYNOPSIS
 DESCRIPTION
 
     Mojolicious::Plugin::SecurityHeader is a Mojolicious plugin.
-
-NAME
-
-    Mojolicious::Plugin::SecurityHeader - Mojolicious Plugin
 
 SECURITY HEADER
 

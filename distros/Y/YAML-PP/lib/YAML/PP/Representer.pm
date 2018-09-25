@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Representer;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use YAML::PP::Emitter;
 use YAML::PP::Writer;
@@ -15,7 +15,7 @@ sub new {
         refs => {},
         seen => {},
         emitter => YAML::PP::Emitter->new(
-            indent => $args{indent} // 2,
+            indent => $args{indent} || 2,
         ),
     }, $class;
     return $self;

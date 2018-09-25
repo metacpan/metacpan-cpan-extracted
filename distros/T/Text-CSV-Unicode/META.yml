@@ -19,12 +19,12 @@ provides:
     version: '0.10'
   Text::CSV::Unicode:
     file: lib/Text/CSV/Unicode.pm
-    version: '0.200'
+    version: '0.201'
 requires:
   Text::CSV: '1'
   charnames: '1'
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.200'
+version: '0.201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

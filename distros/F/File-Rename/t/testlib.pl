@@ -63,23 +63,14 @@ sub test_rename_list {
 
 sub test_rename_function {
   my ($function, $warning, $printed) = @_;
-  our($found, $print, $warn);
+  our($found, $print, $warn) = ();
 
   { local *STDOUT;
-    open STDOUT, '>'. 'log' or die "Can't create log file: $!\n";
-    undef $warn;
+    open STDOUT, '>', \$print or die;
     $function -> ();
     close STDOUT or die;
   }
 
-  { local *READ; 
-    open READ, '<'. 'log' or die "Can't read log file: $!\n";
-    local $/;
-    $print = <READ>; 
-    close READ or die;
-  }
-
-    undef $found;
     if( $warning ) {
 	if( $warn ) {
 	    if( $warn =~ s/^\Q$warning\E\b.*\n//sm ) { $found ++ }
@@ -110,4 +101,15 @@ sub diag_rename {
     if( our $print ) { $print =~ s/^/PRINT: /mg; diag $print; }
 }
 
+sub options {
+    local @ARGV = @_;
+    my $opt = do {
+	    require File::Rename::Options; 
+	    File::Rename::Options::GetOptions(1);
+    };
+    die "Bad options '@_'" unless $opt;
+    die "Not options '@ARGV'" if @ARGV;
+    return $opt;
+}
+    
 1;

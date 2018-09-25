@@ -1,0 +1,12 @@
+0.03 2018-09-25
+ - Ability to set a kubeconfig via an attribute (waterkip)
+   The namespace parameter no longer gets a default value (if
+   you don't specify it, it will get it's default value from
+   kubectl, which is normally 'default', but can be overwritten
+   in the kubeconfig file)
+
+0.02 2018-05-15
+ - Add Test::Exception to test dependencies
+
+0.01 2018-05-10
+ - First release into an unsuspecting world

@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 =encoding utf8
 
@@ -22,6 +22,8 @@ Mojo::Promise::Role::HigherOrder - Fulfill with the first fulfilled promise
 
 =head1 DESCRIPTION
 
+This module is an umbrella for L<Mojo::Promise::Role::Any>,
+L<Mojo::Promise::Role::None>, and L<Mojo::Promise::Role::Some>.
 
 =head1 SEE ALSO
 
@@ -33,7 +35,7 @@ L<http://bluebirdjs.com/docs/api/promise.any.html>
 
 This source is in Github:
 
-	https://github.com/briandfoy/mojo-promise-any-none-some
+	https://github.com/briandfoy/mojo-promise-role-higherorder
 
 =head1 AUTHOR
 

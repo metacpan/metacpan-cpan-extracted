@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.18  Tue Sep 25 15:45:00 2018
+      - Added exception for invalid color name.
+
 3.17  Mon Jul 30 15:10:00 2018
       - Added exception for invalid background color.
 

@@ -17,13 +17,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 parse_genes_from_gffs - Parse genes out of gff files
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

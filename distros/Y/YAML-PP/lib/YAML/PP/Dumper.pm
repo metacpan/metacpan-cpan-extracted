@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Dumper;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use YAML::PP;
 use YAML::PP::Representer;
@@ -10,7 +10,7 @@ use YAML::PP::Representer;
 sub new {
     my ($class, %args) = @_;
 
-    my $schema = delete $args{schema} // YAML::PP->default_schema(
+    my $schema = delete $args{schema} || YAML::PP->default_schema(
         boolean => 'perl',
     );
 

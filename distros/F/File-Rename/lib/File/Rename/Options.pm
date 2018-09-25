@@ -6,8 +6,7 @@ BEGIN { eval { require warnings; warnings->import } }
 use Getopt::Long ();
 
 use vars qw($VERSION);
-$VERSION = '1.00';	
-# VERSION 0.33 was in file File/Rename.pm
+$VERSION = '1.10';	
 
 eval{ Getopt::Long::Configure qw(
 	posix_default
@@ -16,7 +15,9 @@ eval{ Getopt::Long::Configure qw(
 ); 1 } or do { require Carp; Carp::carp($@) };
 
 sub GetOptions {
+    my ($no_code) = @_;
     my @expression;
+    my $fullpath = 1;
     Getopt::Long::GetOptions(
 	'-v|verbose'	=> \my $verbose,
 	'-0|null'	=> \my $null,
@@ -25,6 +26,8 @@ sub GetOptions {
 	'-h|?|help'	=> \my $help,
 	'-m|man'	=> \my $man,
 	'-V|version'	=> \my $version,
+	'-d|filename'	=> sub { undef $fullpath },
+	'-path|fullpath!' => \$fullpath,
 	'-e=s'		=> \@expression,
 	'-E=s'		=>
 	    sub {
@@ -39,10 +42,12 @@ sub GetOptions {
 	input_null	=> $null,
 	no_action	=> $nono,
 	over_write	=> $force,
+	filename_only	=> !$fullpath,
 	show_help	=> $help,
 	show_manual	=> $man,
 	show_version	=> $version,
     };
+    return $options if $no_code;
     return $options if $help or $man or $version;
 	 
     if( @expression ) {

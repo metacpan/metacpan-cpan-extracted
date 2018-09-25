@@ -18,6 +18,7 @@ lib/Map/Tube/Exception/FoundUnsupportedMapDataFormat.pm
 lib/Map/Tube/Exception/FoundUnsupportedObject.pm
 lib/Map/Tube/Exception/InvalidBackgroundColor.pm
 lib/Map/Tube/Exception/InvalidColorHexCode.pm
+lib/Map/Tube/Exception/InvalidColorName.pm
 lib/Map/Tube/Exception/InvalidLineColor.pm
 lib/Map/Tube/Exception/InvalidLineId.pm
 lib/Map/Tube/Exception/InvalidLineName.pm

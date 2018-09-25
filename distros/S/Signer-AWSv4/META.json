@@ -1,0 +1,51 @@
+{
+   "abstract" : "Implements the AWS v4 signature algorithm",
+   "author" : [
+      "Jose Luis Martinez <joseluis.martinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Signer-AWSv4",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "Moo" : "0",
+            "Type::Tiny" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/AWSv4Signer/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/AWSv4Signer.git",
+         "web" : "https://github.com/pplu/AWSv4Signer"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.22.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

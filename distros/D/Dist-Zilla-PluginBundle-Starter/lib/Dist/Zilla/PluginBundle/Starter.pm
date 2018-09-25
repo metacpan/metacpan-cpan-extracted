@@ -6,56 +6,80 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = '0.005';
+our $VERSION = 'v3.0.0';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
 my %revisions = (
   1 => [
     'GatherDir',
-    'PruneCruft',
-    'ManifestSkip',
-    'MetaConfig',
-    'MetaProvides::Package',
-    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
     'MetaYAML',
     'MetaJSON',
     'License',
     'ReadmeAnyFromPod',
-    'ExecDir',
-    'ShareDir',
     'PodSyntaxTests',
     'Test::ReportPrereqs',
     ['Test::Compile' => { xt_mode => 1 }],
     'MakeMaker',
     'Manifest',
-    'TestRelease',
+    'PruneCruft',
+    'ManifestSkip',
     'RunExtraTests',
+    'TestRelease',
     'ConfirmRelease',
-    \&_releaser,
+    sub { $_[0]->pluginset_releaser },
+    'MetaConfig',
+    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
+    'MetaProvides::Package',
+    'ShareDir',
+    'ExecDir',
   ],
   2 => [
     'GatherDir',
-    'PruneCruft',
-    'ManifestSkip',
-    'MetaConfig',
-    ['MetaProvides::Package' => { inherit_version => 0 }],
-    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
     'MetaYAML',
     'MetaJSON',
     'License',
     'Pod2Readme',
-    \&_execdir,
-    'ShareDir',
     'PodSyntaxTests',
     'Test::ReportPrereqs',
     ['Test::Compile' => { xt_mode => 1 }],
-    \&_installer,
+    sub { $_[0]->pluginset_installer },
     'Manifest',
-    'TestRelease',
+    'PruneCruft',
+    'ManifestSkip',
     'RunExtraTests',
+    'TestRelease',
     'ConfirmRelease',
-    \&_releaser,
+    sub { $_[0]->pluginset_releaser },
+    'MetaConfig',
+    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
+    ['MetaProvides::Package' => { inherit_version => 0 }],
+    'ShareDir',
+    sub { $_[0]->pluginset_execdir },
+  ],
+  3 => [
+    sub { $_[0]->pluginset_gatherer },
+    'MetaYAML',
+    'MetaJSON',
+    'License',
+    'Pod2Readme',
+    'PodSyntaxTests',
+    'Test::ReportPrereqs',
+    ['Test::Compile' => { xt_mode => 1 }],
+    sub { $_[0]->pluginset_installer },
+    'Manifest',
+    'PruneCruft',
+    'ManifestSkip',
+    'RunExtraTests',
+    sub { $_[0]->pluginset_release_management }, # before test/confirm for before-release verification
+    'TestRelease',
+    'ConfirmRelease',
+    sub { $_[0]->pluginset_releaser },
+    'MetaConfig',
+    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
+    ['MetaProvides::Package' => { inherit_version => 0 }],
+    'ShareDir',
+    sub { $_[0]->pluginset_execdir },
   ],
 );
 
@@ -68,21 +92,48 @@ my %allowed_installers = (
 
 my %option_requires = (
   installer => 2,
+  managed_versions => 3,
+  regenerate => 3,
 );
+
+has revision => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { $_[0]->payload->{revision} // 1 },
+);
+
+has installer => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { $_[0]->payload->{installer} // 'MakeMaker' },
+);
+
+has managed_versions => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { $_[0]->payload->{managed_versions} // 0 },
+);
+
+has regenerate => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { $_[0]->payload->{regenerate} // [] },
+);
+
+sub mvp_multivalue_args { qw(regenerate) }
 
 sub configure {
   my $self = shift;
-  my $revision = $self->payload->{revision};
-  $revision = '1' unless defined $revision;
-  die "Unknown [\@Starter] revision specified: $revision\n"
+  my $name = $self->name;
+  my $revision = $self->revision;
+  die "Unknown [$name] revision specified: $revision\n"
     unless exists $revisions{$revision};
   my @plugins = @{$revisions{$revision}};
   
   foreach my $option (keys %option_requires) {
     my $required = $option_requires{$option};
-    my $value = $self->payload->{$option};
     die "Option $option requires revision $required\n"
-      if defined $value and $required > $revision;
+      if exists $self->payload->{$option} and $required > $revision;
   }
   
   foreach my $plugin (@plugins) {
@@ -94,28 +145,52 @@ sub configure {
   }
 }
 
-sub _execdir {
+sub gather_plugin { 'GatherDir' }
+
+sub pluginset_gatherer {
   my ($self) = @_;
-  my $installer = $self->payload->{installer};
-  if (defined $installer and $installer =~ m/^ModuleBuildTiny/) {
+  my @copy = @{$self->regenerate};
+  return [$self->gather_plugin => { exclude_filename => [@copy] }] if @copy;
+  return $self->gather_plugin;
+}
+
+sub pluginset_installer {
+  my ($self) = @_;
+  my $installer = $self->installer;
+  die "Unsupported installer $installer\n"
+    unless $allowed_installers{$installer};
+  return "$installer";
+}
+
+sub pluginset_release_management {
+  my ($self) = @_;
+  my $versions = $self->managed_versions;
+  my @copy_files = @{$self->regenerate};
+  my @plugins;
+  push @plugins, 'RewriteVersion',
+    [NextRelease => { format => '%-9v %{yyyy-MM-dd HH:mm:ss VVV}d%{ (TRIAL RELEASE)}T' }]
+    if $versions;
+  push @plugins,
+    [CopyFilesFromRelease => { filename => [@copy_files] }],
+    ['Regenerate::AfterReleasers' => { plugin => $self->name . '/CopyFilesFromRelease' }],
+    if @copy_files;
+  push @plugins, 'BumpVersionAfterRelease' if $versions;
+  return @plugins;
+}
+
+sub pluginset_releaser {
+  my ($self) = @_;
+  return $ENV{FAKE_RELEASE} ? 'FakeRelease' : 'UploadToCPAN';
+}
+
+sub pluginset_execdir {
+  my ($self) = @_;
+  my $installer = $self->installer;
+  if ($installer =~ m/^ModuleBuildTiny/) {
     return ['ExecDir' => {dir => 'script'}];
   } else {
     return 'ExecDir';
   }
-}
-
-sub _installer {
-  my ($self) = @_;
-  my $installer = $self->payload->{installer};
-  return 'MakeMaker' unless defined $installer;
-  die "Unsupported installer $installer\n"
-    unless $allowed_installers{$installer};
-  return $installer;
-}
-
-sub _releaser {
-  my ($self) = @_;
-  return $ENV{FAKE_RELEASE} ? 'FakeRelease' : 'UploadToCPAN';
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -136,11 +211,14 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   version = 0.001
   
   [@Starter]           ; all that is needed to start
-  revision = 2         ; always defaults to revision 1
+  revision = 3         ; always defaults to revision 1
   
   ; configuring examples
+  installer = ModuleBuildTiny
   -remove = GatherDir  ; to use [Git::GatherDir] instead, for example
   ExecDir.dir = script ; change the directory used by [ExecDir]
+  managed_versions = 1 ; uses the main module version, and bumps module versions after release
+  regenerate = LICENSE ; copy LICENSE to root after release or dzil regenerate
 
 =head1 DESCRIPTION
 
@@ -174,8 +252,13 @@ uploading to CPAN.
 
   $ FAKE_RELEASE=1 dzil release
 
+For a detailed overview of how this plugin bundle works, see L</"PHASES">.
+
 For one-line initialization of a new C<[@Starter]>-based distribution, try
 L<Dist::Zilla::MintingProfile::Starter>.
+
+For a variant of this bundle with built-in support for a git-based workflow,
+see L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
 
 Another simple way to use L<Dist::Zilla> is with L<Dist::Milla>, an opinionated
 bundle that requires no configuration and performs all of the tasks in
@@ -228,6 +311,54 @@ When using a L<Module::Build::Tiny>-based installer, the
 L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> plugin will be set to mark the
 F<script/> directory for executables instead of the default F<bin/>.
 
+=head2 managed_versions
+
+Requires revision 3 or higher.
+
+  [@Starter]
+  revision = 3
+  managed_versions = 1
+
+With C<managed_versions> set, C<[@Starter]> will use an additional set of
+plugins to manage your module versions when releasing, while leaving them in
+place in the source files.
+
+L<[RewriteVersion]|Dist::Zilla::Plugin::RewriteVersion> will read the
+distribution version from the main module, and set all other module versions to
+match in the build. L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> replaces
+C<{{$NEXT}}> in your F<Changes> file with a line containing the distribution
+version and build date/time. Finally,
+L<[BumpVersionAfterRelease]|Dist::Zilla::Plugin::BumpVersionAfterRelease> will
+bump the versions in your module files after a release.
+
+When using this option, you B<must> have the distribution version set in your
+main module in a form like C<our $VERSION = '1.234';>, rather than in
+F<dist.ini>. Only modules and scripts which have similar version declarations
+will be versioned in the build. You can set your distribution's version
+manually by changing the version of your main module, or by setting the C<V>
+environment variable when building or releasing. See the documentation for each
+plugin mentioned above for details on configuring them, which can be done in
+the usual config-slicing way as shown in L</"CONFIGURING">.
+
+=head2 regenerate
+
+Requires revision 3 or higher.
+
+  [@Starter]
+  revision = 3
+  regenerate = INSTALL
+  regenerate = README
+
+The specified generated files will be copied to the root directory upon
+release using L<[CopyFilesFromRelease]|Dist::Zilla::Plugin::CopyFilesFromRelease>,
+and excluded from the C<[GatherDir]> plugin in use. Note: if you remove the
+built-in C<[GatherDir]> plugin to use one separately, you must exclude copied
+files from that plugin yourself. Additionally,
+L<[Regenerate::AfterReleasers]|Dist::Zilla::Plugin::Regenerate::AfterReleasers>
+is applied to C<[CopyFilesFromRelease]> to allow these files to be generated
+and copied on demand outside of a release using
+L<< C<dzil regenerate>|Dist::Zilla::App::Command::regenerate >>.
+
 =head1 REVISIONS
 
 The C<[@Starter]> plugin bundle supports the following revisions.
@@ -240,23 +371,6 @@ Revision 1 is the default and is equivalent to using the following plugins:
 
 =item L<[GatherDir]|Dist::Zilla::Plugin::GatherDir>
 
-=item L<[PruneCruft]|Dist::Zilla::Plugin::PruneCruft>
-
-=item L<[ManifestSkip]|Dist::Zilla::Plugin::ManifestSkip>
-
-=item L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>
-
-=item L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>
-
-=item L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>
-
-  directory = t
-  directory = xt
-  directory = inc
-  directory = share
-  directory = eg
-  directory = examples
-
 =item L<[MetaYAML]|Dist::Zilla::Plugin::MetaYAML>
 
 =item L<[MetaJSON]|Dist::Zilla::Plugin::MetaJSON>
@@ -264,10 +378,6 @@ Revision 1 is the default and is equivalent to using the following plugins:
 =item L<[License]|Dist::Zilla::Plugin::License>
 
 =item L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod>
-
-=item L<[ExecDir]|Dist::Zilla::Plugin::ExecDir>
-
-=item L<[ShareDir]|Dist::Zilla::Plugin::ShareDir>
 
 =item L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>
 
@@ -281,13 +391,34 @@ Revision 1 is the default and is equivalent to using the following plugins:
 
 =item L<[Manifest]|Dist::Zilla::Plugin::Manifest>
 
-=item L<[TestRelease]|Dist::Zilla::Plugin::TestRelease>
+=item L<[PruneCruft]|Dist::Zilla::Plugin::PruneCruft>
+
+=item L<[ManifestSkip]|Dist::Zilla::Plugin::ManifestSkip>
 
 =item L<[RunExtraTests]|Dist::Zilla::Plugin::RunExtraTests>
+
+=item L<[TestRelease]|Dist::Zilla::Plugin::TestRelease>
 
 =item L<[ConfirmRelease]|Dist::Zilla::Plugin::ConfirmRelease>
 
 =item L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
+
+=item L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>
+
+=item L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>
+
+  directory = t
+  directory = xt
+  directory = inc
+  directory = share
+  directory = eg
+  directory = examples
+
+=item L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>
+
+=item L<[ShareDir]|Dist::Zilla::Plugin::ShareDir>
+
+=item L<[ExecDir]|Dist::Zilla::Plugin::ExecDir>
 
 =back
 
@@ -310,12 +441,12 @@ L<[ExtraTests]|Dist::Zilla::Plugin::ExtraTests>.
 
 Includes the following additional plugins:
 L<[MetaJSON]|Dist::Zilla::Plugin::MetaJSON>,
-L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>,
-L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>,
-L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>,
 L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>,
 L<[Test::ReportPrereqs]|Dist::Zilla::Plugin::Test::ReportPrereqs>,
-L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>.
+L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>,
+L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>,
+L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>,
+L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>.
 
 =back
 
@@ -346,6 +477,12 @@ The L</"installer"> option is now supported to change the installer plugin.
 
 =back
 
+=head2 Revision 3
+
+Revision 3 is similar to Revision 2, but additionally supports the
+L</"managed_versions"> and L</"regenerate"> options, and variant bundles like
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
+
 =head1 CONFIGURING
 
 By using the L<PluginRemover|Dist::Zilla::Role::PluginBundle::PluginRemover> or
@@ -357,7 +494,9 @@ are some examples:
 
 If the distribution is using git source control, it is often helpful to replace
 the default L<[GatherDir]|Dist::Zilla::Plugin::GatherDir> plugin with
-L<[Git::GatherDir]|Dist::Zilla::Plugin::Git::GatherDir>.
+L<[Git::GatherDir]|Dist::Zilla::Plugin::Git::GatherDir>. (Note: The
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git> variant of this
+bundle uses C<[Git::GatherDir]> by default.)
 
   [Git::GatherDir]
   [@Starter]
@@ -397,14 +536,9 @@ in CPAN installation tools.
   [ReadmeAnyFromPod / Pod_Readme]
   type = pod
   location = root ; do not include pod readmes in the build!
-
-=head2 ExecDir
-
-Some distributions use the F<script/> directory instead of F<bin/> (the
-L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> default) for executable scripts.
-
-  [@Starter]
-  ExecDir.dir = script
+  phase = release ; avoid changing files in the root with dzil build or dzil test
+  [Regenerate::AfterReleasers] ; allows regenerating with dzil regenerate
+  plugin = Pod_Readme
 
 =head2 MetaNoIndex
 
@@ -440,11 +574,199 @@ specified for it in metadata, by setting C<inherit_missing> to 0 as well.
   MetaProvides::Package.inherit_version = 0
   MetaProvides::Package.inherit_missing = 0
 
+=head2 ExecDir
+
+Some distributions use the F<script/> directory instead of F<bin/> (the
+L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> default) for executable scripts.
+
+  [@Starter]
+  ExecDir.dir = script
+
+=head2 Versions
+
+When using the L</"managed_versions"> option, the added plugins can be directly
+configured in various ways to suit your versioning needs.
+
+  [@Starter]
+  revision = 3
+  managed_versions = 1
+  
+  ; configuration examples
+  RewriteVersion.global = 1
+  BumpVersionAfterRelease.munge_makefile_pl = 0
+  NextRelease.filename = ChangeLog
+  NextRelease.format = %-5v %{yyyy-MM-dd}d
+
+=head1 PHASES
+
+The plugins in this bundle, and any additional plugins you include in
+F<dist.ini>, each execute code within one or more phases when a L<Dist::Zilla>
+command such as L<< C<dzil test>|Dist::Zilla::App::Command::test >> is run. You
+can see a full listing of the phases used by the plugins in your F<dist.ini>
+with the command L<< C<dzil dumpphases>|Dist::Zilla::App::Command::dumpphases >>.
+
+=head2 BeforeBuild
+
+The distribution build consists of several phases, starting with
+L<-BeforeBuild|Dist::Zilla::Role::BeforeBuild>. No plugins in this bundle
+execute during this phase by default.
+
+=head2 FileGatherer
+
+In the L<-FileGatherer|Dist::Zilla::Role::FileGatherer> phase, many plugins add
+files to the distribution; in C<[@Starter]> this includes the plugins
+L<[GatherDir]|Dist::Zilla::Plugin::GatherDir>,
+L<[MetaYAML]|Dist::Zilla::Plugin::MetaYAML>, 
+L<[MetaJSON]|Dist::Zilla::Plugin::MetaJSON>,
+L<[License]|Dist::Zilla::Plugin::License>,
+L<[Pod2Readme]|Dist::Zilla::Plugin::Pod2Readme>,
+L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>,
+L<[Test::ReportPrereqs]|Dist::Zilla::Plugin::Test::ReportPrereqs>,
+L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>,
+L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
+plugin), and L<[Manifest]|Dist::Zilla::Plugin::Manifest>.
+
+=head2 EncodingProvider
+
+In the L<-EncodingProvider|Dist::Zilla::Role::EncodingProvider> phase, a plugin
+may set the encoding for gathered files. No plugins in this bundle execute
+during this phase by default.
+
+=head2 FilePruner
+
+In the L<-FilePruner|Dist::Zilla::Role::FilePruner> phase, gathered files may
+be excluded from the distribution. In C<[@Starter]> this is handled by the
+plugins L<[PruneCruft]|Dist::Zilla::Plugin::PruneCruft> and
+L<[ManifestSkip]|Dist::Zilla::Plugin::ManifestSkip>.
+
+=head2 FileMunger
+
+In the L<-FileMunger|Dist::Zilla::Role::FileMunger> phase, files in the
+distribution may be modified. In C<[@Starter]> the plugin
+L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile> runs during this phase
+in order to update its test file to test all gathered modules and scripts. When
+using the L</"managed_versions"> option, the
+L<[RewriteVersion]|Dist::Zilla::Plugin::RewriteVersion> and
+L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> plugins also operate during
+this phase.
+
+=head2 PrereqSource
+
+In the L<-PrereqSource|Dist::Zilla::Role::PrereqSource> phase, plugins can add
+prerequisites to the distribution. In C<[@Starter]> the plugins
+L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>,
+L<[Test::ReportPrereqs]|Dist::Zilla::Plugin::Test::ReportPrereqs>,
+L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>, and
+L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
+plugin) add prereqs during this phase.
+
+=head2 InstallTool
+
+In the L<-InstallTool|Dist::Zilla::Role::InstallTool> phase, the installer's
+F<Makefile.PL> or F<Build.PL> is generated in the distribution. In
+C<[@Starter]>, L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> or the configured
+installer plugin handles this phase.
+
+=head2 AfterBuild
+
+The L<-AfterBuild|Dist::Zilla::Role::AfterBuild> phase concludes the
+distribution build. No plugins in this bundle execute during this phase by
+default.
+
+=head2 BuildRunner
+
+The L<-BuildRunner|Dist::Zilla::Role::BuildRunner> phase executes the configure
+and build phases of the L<CPAN::Meta::Spec/"Phases"> in a built distribution.
+In C<[@Starter]>, L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> or the
+configured installer plugin handles this phase.
+
+=head2 TestRunner
+
+The L<-TestRunner|Dist::Zilla::Role::TestRunner> phase executes the test phase
+of the L<CPAN::Meta::Spec/"Phases">. In C<[@Starter]>,
+L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
+plugin) and L<[RunExtraTests]|Dist::Zilla::Plugin::RunExtraTests> handle this
+phase.
+
+=head2 BeforeRelease
+
+The L<-BeforeRelease|Dist::Zilla::Role::BeforeRelease> phase prepares a built
+distribution for release. In C<[@Starter]>, the plugins
+L<[TestRelease]|Dist::Zilla::Plugin::TestRelease>,
+L<[ConfirmRelease]|Dist::Zilla::Plugin::ConfirmRelease>, and
+L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> (to ensure PAUSE username
+and password are available) execute during this phase. In
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>, the plugin
+L<[Git::Check]|Dist::Zilla::Plugin::Git::Check> executes during this phase.
+
+=head2 Releaser
+
+The L<-Releaser|Dist::Zilla::Role::Releaser> phase releases the distribution to
+CPAN. In C<[@Starter]>, L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> (or
+L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>) handles this phase.
+
+=head2 AfterRelease
+
+The L<-AfterRelease|Dist::Zilla::Plugin::AfterRelease> phase concludes the
+distribution release process. No plugins in this bundle execute during this
+phase by default. When using the L</"managed_versions"> option, the
+L<[NextRelease]|Dist::Zilla::Plugin::NextRelease> and
+L<[BumpVersionAfterRelease]|Dist::Zilla::Plugin::BumpVersionAfterRelease>
+plugins execute during this phase. When using the L</"regenerate"> option, the
+L<[CopyFilesFromRelease]|Dist::Zilla::Plugin::CopyFilesFromRelease> plugin
+executes during this phase. In
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>, the plugins
+L<[Git::Commit]|Dist::Zilla::Plugin::Git::Commit>,
+L<[Git::Tag]|Dist::Zilla::Plugin::Git::Tag>, and
+L<[Git::Push]|Dist::Zilla::Plugin::Git::Push> execute during this phase.
+
+=head2 MetaProvider
+
+The L<-MetaProvider|Dist::Zilla::Role::MetaProvider> phase executes when
+required rather than at a specific time. In C<[@Starter]>, the
+L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>,
+L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>, and
+L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex]> plugins provide metadata in
+this phase.
+
+=head2 VersionProvider
+
+The L<-VersionProvider|Dist::Zilla::Role::VersionProvider> phase executes when
+required rather than at a specific time. No plugins in this bundle execute
+during this phase by default. When using the L</"managed_versions"> option, the
+L<[RewriteVersion]|Dist::Zilla::Plugin::RewriteVersion> plugin acts as version
+provider.
+
+=head2 ShareDir
+
+The L<-ShareDir|Dist::Zilla::Role::ShareDir> phase executes when required
+rather than at a specific time. In C<[@Starter]>, the
+L<[ShareDir]|Dist::Zilla::Plugin::ShareDir> plugin handles this phase.
+
+=head2 Regenerator
+
+The L<-Regenerator|Dist::Zilla::Role::Regenerator> phase is a quasi-phase which
+executes when L<< C<dzil regenerate>|Dist::Zilla::App::Command::regenerate >>
+is run. When using the L</"regenerate"> option, the
+L<[Regenerate::AfterReleasers]|Dist::Zilla::Plugin::Regenerate::AfterReleasers>
+plugin promotes L<[CopyFilesFromRelease]|Dist::Zilla::Plugin::CopyFilesFromRelease>
+to also execute during this phase.
+
+=head2 Other
+
+The operation of some plugins may not neatly fit into a particular phase. In
+C<[@Starter]>, the L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> plugin marks a
+directory as containing executables, which can be used by installer plugins
+such as L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker>.
+
 =head1 EXTENDING
 
 This bundle includes a basic set of plugins for releasing a distribution, but
 there are many more common non-intrusive tasks that L<Dist::Zilla> can help
-with simply by using additional plugins in the F<dist.ini>.
+with simply by using additional plugins in the F<dist.ini>. You can install all
+plugins required by a F<dist.ini> by running
+C<dzil authordeps --missing | cpanm> or with
+L<< C<dzil installdeps>|Dist::Zilla::App::Command::installdeps >>.
 
 =head2 Name
 
@@ -457,24 +779,6 @@ To extract the license and copyright information from the main module, and
 optionally set the author as well, use
 L<[LicenseFromModule]|Dist::Zilla::Plugin::LicenseFromModule>.
 
-=head2 Versions
-
-A common approach to maintaining versions in L<Dist::Zilla>-managed
-distributions is to automatically extract the distribution's version from the
-main module, maintain uniform module versions, and bump the version during or
-after each release. To extract the main module version, use
-L<[RewriteVersion]|Dist::Zilla::Plugin::RewriteVersion> (which also rewrites
-your module versions to match the main module version when building) or
-L<[VersionFromMainModule]|Dist::Zilla::Plugin::VersionFromMainModule>. To
-automatically increment module versions in the repository after each release,
-use L<[BumpVersionAfterRelease]|Dist::Zilla::Plugin::BumpVersionAfterRelease>.
-Alternatively, you can use
-L<[ReversionOnRelease]|Dist::Zilla::Plugin::ReversionOnRelease> to
-automatically increment your versions in the release build, then copy the
-updated modules back to the repository with
-L<[CopyFilesFromRelease]|Dist::Zilla::Plugin::CopyFilesFromRelease>. Don't mix
-these two version increment methods!
-
 =head2 Changelog
 
 To automatically add the new release version to the distribution changelog,
@@ -485,8 +789,10 @@ L<[CheckChangesHasContent]|Dist::Zilla::Plugin::CheckChangesHasContent>.
 =head2 Git
 
 To better integrate with a git workflow, use the plugins from
-L<[@Git]|Dist::Zilla::PluginBundle::Git>. To automatically add contributors to
-metadata from git commits, use L<[Git::Contributors]|Dist::Zilla::Plugin::Git::Contributors>.
+L<[@Git]|Dist::Zilla::PluginBundle::Git>, as the
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git> variant of this
+bundle does. To automatically add contributors to metadata from git commits,
+use L<[Git::Contributors]|Dist::Zilla::Plugin::Git::Contributors>.
 
 =head2 Resources
 
@@ -518,5 +824,6 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-L<Dist::Zilla>, L<Dist::Zilla::PluginBundle::Basic>, L<Dist::Milla>,
+L<Dist::Zilla>, L<Dist::Zilla::PluginBundle::Basic>,
+L<Dist::Zilla::PluginBundle::Starter::Git>, L<Dist::Milla>,
 L<Dist::Zilla::MintingProfile::Starter>

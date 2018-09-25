@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Constructor;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use YAML::PP;
 
@@ -95,7 +95,7 @@ sub mapping_end_event {
 
     for (my $i = 0; $i < @$ref; $i += 2) {
         my ($key, $value) = @$ref[ $i, $i + 1 ];
-        $key //= '';
+        $key = '' unless defined $key;
         if (ref $key) {
             $key = $self->stringify_complex($key);
         }

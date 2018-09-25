@@ -2,14 +2,14 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
-use constant DEBUG => $ENV{YAML_PP_EMIT_DEBUG};
+use constant DEBUG => $ENV{YAML_PP_EMIT_DEBUG} ? 1 : 0;
 
 sub new {
     my ($class, %args) = @_;
     my $self = bless {
-        indent => $args{indent} // 2,
+        indent => $args{indent} || 2,
     }, $class;
     return $self;
 }
@@ -308,7 +308,7 @@ sub scalar_event {
 
     my $style = $info->{style};
     DEBUG and local $Data::Dumper::Useqq = 1;
-    $value //= '';
+    $value = '' unless defined $value;
     if (not $style and $value eq '') {
         $style = "'";
     }

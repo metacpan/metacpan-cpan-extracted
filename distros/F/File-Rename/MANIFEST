@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING
 Build.PL
 Makefile.PL
 MANIFEST
@@ -7,6 +8,7 @@ README
 t/File-Rename.t
 t/File-Rename-E.t
 t/File-Rename-files.t
+t/File-Rename-filename-only.t
 t/File-Rename-import.t
 t/File-Rename-no-order.t
 t/File-Rename-Options.t

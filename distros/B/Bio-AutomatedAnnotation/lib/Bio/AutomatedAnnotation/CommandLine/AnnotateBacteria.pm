@@ -12,7 +12,7 @@ has 'script_name' => ( is => 'ro', isa => 'Str',      required => 1 );
 has 'help'        => ( is => 'rw', isa => 'Bool',     default  => 0 );
 
 has 'sample_name'       => ( is => 'rw', isa => 'Str'  );
-has 'dbdir'             => ( is => 'rw', isa => 'Str', default => '/lustre/scratch108/pathogen/pathpipe/prokka'  );
+has 'dbdir'             => ( is => 'rw', isa => 'Str', default => '/lustre/scratch118/infgen/pathogen/pathpipe/prokka'  );
 has 'assembly_file'     => ( is => 'rw', isa => 'Str'  );
 has 'annotation_tool'   => ( is => 'rw', isa => 'Str', default  => 'Prokka' );
 has 'tmp_directory'     => ( is => 'rw', isa => 'Str', default  => '/tmp' );
@@ -21,12 +21,15 @@ has 'accession_number'  => ( is => 'rw', isa => 'Maybe[Str]' );
 has 'genus'             => ( is => 'rw', isa => 'Str' );
 has 'kingdom'           => ( is => 'rw', isa => 'Str', default  => 'Bacteria' );
 has 'cpus'              => ( is => 'rw', isa => 'Int', default  => 1);
+has 'gcode'             => ( is => 'rw', isa => 'Int', default  => 11 );
+has 'outdir'            => ( is => 'rw', isa => 'Str', default  => 'annotation' );
+has 'keep_original_order_and_names' => ( is => 'rw', isa => 'Bool', default => 0 );
 
 sub BUILD {
     my ($self) = @_;
 
-    my ( $sample_name, $kingdom, $dbdir, $assembly_file, $annotation_tool, $tmp_directory, $sequencing_centre, $accession_number,$genus, $cpus,
-        $help );
+    my ( $sample_name, $kingdom, $dbdir, $assembly_file, $annotation_tool, $tmp_directory, $sequencing_centre, $accession_number,$genus, $cpus, $gcode,
+        $help, $keep_original_order_and_names, $outdir );
 
     GetOptionsFromArray(
         $self->args,
@@ -41,6 +44,9 @@ sub BUILD {
         'i|cpus=s'              => \$cpus,
         'n|accession_number=s'  => \$accession_number,
         'h|help'                => \$help,
+				'o|outdir=s'            => \$outdir,
+        'gcode=i'               => \$gcode,
+        'keep_original_order_and_names' => \$keep_original_order_and_names,
     );
 
     $self->sample_name($sample_name)             if ( defined($sample_name) );
@@ -53,7 +59,9 @@ sub BUILD {
     $self->genus($genus)                         if ( defined($genus) );
     $self->kingdom($kingdom)                     if ( defined($kingdom) );
     $self->cpus($cpus)                           if ( defined($cpus) );
-
+    $self->gcode($gcode)                         if ( defined($gcode) );
+		$self->outdir($outdir)                       if ( defined($outdir) );
+    $self->keep_original_order_and_names($keep_original_order_and_names) if ( defined($keep_original_order_and_names) );
 }
 
 sub run {
@@ -69,7 +77,10 @@ sub run {
           tmp_directory    => $self->tmp_directory,
           genus            => $self->genus,
           kingdom          => $self->kingdom,
-          cpus             => $self->cpus
+          cpus             => $self->cpus,
+          gcode            => $self->gcode,
+					outdir           => $self->outdir,
+          keep_original_order_and_names => $self->keep_original_order_and_names,
     );
     $obj->annotate;
 
@@ -83,17 +94,28 @@ sub usage_text {
     Usage: $script_name [options]
     Annotate bacteria with Prokka
     
+    Seemann T. Prokka: rapid prokaryotic genome annotation. Bioinformatics. 2014 Jul 15;30(14):2068-9. PMID:24642063
+    
     # Annotate a bacteria with a genus specific database (recommended usage)
-    $script_name -a contigs.fa  --sample_name Sample123  --genus Klebsiella
+    $script_name -a contigs.fa --sample_name Sample123  --genus Klebsiella
     
     # Annotate a bacteria without a genus specific database
-    $script_name -a contigs.fa  --sample_name Sample123
+    $script_name -a contigs.fa --sample_name Sample123
     
     # Use multiple processors (faster)
-    $script_name -a contigs.fa  --sample_name Sample123 --cpus 10
+    $script_name -a contigs.fa --sample_name Sample123 --cpus 10
 
-    # Annotate a virus - unvalidated
-    $script_name -a contigs.fa  --sample_name Sample123  --kingdom Viruses
+    # Use a different translation table (defaults to 11)
+    $script_name -a contigs.fa --sample_name Sample123 --gcode 1
+
+    # Annotate a virus
+    $script_name -a contigs.fa --sample_name Sample123 --kingdom Viruses
+    
+    # Keep original order and names of sequences from input assembly
+    $script_name -a contigs.fa --sample_name Sample123 --keep_original_order_and_names
+		
+		# Set output directory
+		$script_name -a contigs.fa --sample_name Sample123 -o output_dir
     
     # This help message
     annotate_bacteria -h
@@ -122,13 +144,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation::CommandLine::AnnotateBacteria - provide a commandline interface to the annotation wrappers
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

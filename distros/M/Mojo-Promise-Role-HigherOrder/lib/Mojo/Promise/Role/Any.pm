@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 =encoding utf8
 
@@ -66,7 +66,7 @@ L<http://bluebirdjs.com/docs/api/promise.any.html>
 
 This source is in Github:
 
-	https://github.com/briandfoy/mojo-promise-any-none-some
+	https://github.com/briandfoy/mojo-promise-role-higherorder
 
 =head1 AUTHOR
 

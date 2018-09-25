@@ -4,6 +4,11 @@ use 5.010001;
 use strict;
 use warnings;
 
+BEGIN
+{
+    $ENV{LC_ALL} = 'C';
+};
+
 use Test::More tests => 9;
 
 use HTML::T5;

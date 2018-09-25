@@ -20,7 +20,7 @@ sub _build_sorted_all_gene_names
   my ($self) = @_;
   my %all_gene_names = %{$self->all_gene_names};
   
-  my @sorted_gene_names = sort { $all_gene_names{$b} <=> $all_gene_names{$a} } keys %all_gene_names;
+  my @sorted_gene_names = sort { $b cmp $a } keys %all_gene_names;
   return \@sorted_gene_names;
 }
 
@@ -66,13 +66,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Bio::AutomatedAnnotation::GeneNameOccurances - Parse the gene names from multiple GFF files and provide a matrix of matches.
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

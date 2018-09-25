@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "bin/yamlpp5-parse-emit"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "YAML::PP",
   "PREREQ_PM" => {
     "B" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "blib" => "1.01",
     "lib" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }

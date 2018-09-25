@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidSupportedObject;
 $Map::Tube::Exception::InvalidSupportedObject::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidSupportedObject::VERSION = '3.17';
+$Map::Tube::Exception::InvalidSupportedObject::VERSION = '3.18';
 =head1 NAME
 
 Map::Tube::Exception::InvalidSupportedObject - Represent 'invalid supported object' exception.
 
 =head1 VERSION
 
-version 3.17
+version 3.18
 
 =cut
 

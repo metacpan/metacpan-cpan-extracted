@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 =encoding utf8
 
@@ -31,7 +31,8 @@ rejects otherwise.
 Takes a lists of promises (or thenables) and returns another promise
 that fulfills when all of the promises are rejected.
 
-If none of the promises reject, the none promise rejects.
+If none of the promises reject, the none promise rejects. If all of the
+promises resolve then this is rejected.
 
 If you pass no promises, the none promise fulfills.
 
@@ -41,7 +42,11 @@ sub none {
 	my( $self, @promises ) = @_;
 	my $none = $self->new;
 
-	$_->then( sub { $none->reject( @_ ) } ) foreach @promises;
+	my $count = 0;
+	$_->then(
+		sub { $none->reject( @_ ) },
+		sub { $count++; $none->resolve if $count == @promises }
+		) foreach @promises;
 
 	return @promises ? $none : $none->resolve;
 	}
@@ -56,7 +61,7 @@ L<Mojolicious>, L<Mojo::Promise>, L<Role::Tiny>
 
 This source is in Github:
 
-	https://github.com/briandfoy/mojo-promise-any-none-some
+	https://github.com/briandfoy/mojo-promise-role-higherorder
 
 =head1 AUTHOR
 

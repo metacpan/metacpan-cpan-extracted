@@ -17,13 +17,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 gene_name_occurances - Create a spreadsheet with gene name occurances
 
 =head1 VERSION
 
-version 1.133090
+version 1.182680
 
 =head1 SYNOPSIS
 

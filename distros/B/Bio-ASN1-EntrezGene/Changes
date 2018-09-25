@@ -1,6 +1,13 @@
 Revision history for Bio-ASN1-Entrezgene
 
-1.72      2016-09-02 06:50:53-05:00 America/Chicago
+1.73      2018-09-24 21:31:26-05:00 America/Chicago
+  * Fix regex warnings for Perl 5.28.
+  * New module 'Bio::SeqIO::entrezgene' imported from the BioPerl
+    distribution.  This means Bio-ASN1-Entrezgene now "Enhances"
+    BioPerl's Bio::SeqIO instead of being a hard dependency of
+    BioPerl.
+
+1.72      2016-09-02 06:49:48-05:00 America/Chicago
   * Full release (no changes from 1.71 beyond version)
 
 1.71      2016-09-01 22:57:25-05:00 America/Chicago (TRIAL RELEASE)

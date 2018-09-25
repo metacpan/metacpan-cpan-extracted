@@ -1,0 +1,6 @@
+0.02 2018-09-25
+ - Correct some POD
+
+0.01 2018-09-25
+ - First release into an unsuspecting world.
+ - EKS, RDS and S3 modules

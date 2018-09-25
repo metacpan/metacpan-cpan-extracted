@@ -1,4 +1,9 @@
-Revision history for ShellCompleter-Util
+0.030   2018-09-25 (PERLANCAR)
+
+	- Allow hash as %go_spec pair values (and find the completion
+	  array/routine in the 'completion' key of the hash), so one can
+	  put other stuff in %go_spec.
+
 
 0.02    2016-10-21 (PERLANCAR)
 

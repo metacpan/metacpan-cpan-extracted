@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MissingSupportedMap;
 $Map::Tube::Exception::MissingSupportedMap::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MissingSupportedMap::VERSION = '3.17';
+$Map::Tube::Exception::MissingSupportedMap::VERSION = '3.18';
 =head1 NAME
 
 Map::Tube::Exception::MissingSupportedMap - Represent 'missing supported map' exception.
 
 =head1 VERSION
 
-version 3.17
+version 3.18
 
 =cut
 

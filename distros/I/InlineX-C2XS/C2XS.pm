@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(c2xs context);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 #$VERSION = eval $VERSION;
 
 use InlineX::C2XS::Context;

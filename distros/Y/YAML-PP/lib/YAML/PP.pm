@@ -4,7 +4,7 @@ use warnings;
 package YAML::PP;
 use B;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;
@@ -12,9 +12,11 @@ our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;
 sub new {
     my ($class, %args) = @_;
 
-    my $bool = delete $args{boolean} // 'perl';
+    my $bool = delete $args{boolean};
+    $bool = 'perl' unless defined $bool;
     my $schemas = delete $args{schema} || ['Core'];
     my $cyclic_refs = delete $args{cyclic_refs} || 'allow';
+    my $parser = delete $args{parser};
 
     my $schema = YAML::PP::Schema->new(
         boolean => $bool,
@@ -25,34 +27,32 @@ sub new {
         boolean => $bool,
         schema => $schema,
         cyclic_refs => $cyclic_refs,
+        parser => $parser,
     }, $class;
     return $self;
 }
 
 sub boolean { return $_[0]->{boolean} }
 sub cyclic_refs { return $_[0]->{cyclic_refs} }
+sub parser { return $_[0]->{parser} }
 
 sub loader {
     if (@_ > 1) {
         $_[0]->{loader} = $_[1]
     }
-    else {
-        return $_[0]->{loader}
-    }
+    return $_[0]->{loader};
 }
 
 sub dumper {
     if (@_ > 1) {
         $_[0]->{dumper} = $_[1]
     }
-    else {
-        return $_[0]->{dumper}
-    }
+    return $_[0]->{dumper};
 }
 
 sub schema {
     if (@_ > 1) { $_[0]->{schema} = $_[1] }
-    else { return $_[0]->{schema} }
+    return $_[0]->{schema};
 }
 
 sub default_schema {
@@ -72,6 +72,7 @@ sub load_string {
         $loader = YAML::PP::Loader->new(
             schema => $self->schema,
             cyclic_refs => $self->cyclic_refs,
+            parser => $self->parser,
         );
         $self->loader($loader);
     }
@@ -143,7 +144,8 @@ package YAML::PP::Schema;
 sub new {
     my ($class, %args) = @_;
 
-    my $bool = delete $args{boolean} // 'perl';
+    my $bool = delete $args{boolean};
+    $bool = 'perl' unless defined $bool;
     if (keys %args) {
         die "Unexpected arguments: " . join ', ', sort keys %args;
     }
@@ -197,7 +199,8 @@ sub add_resolver {
     my $rule = $args{match};
     my $resolvers = $self->resolvers;
     my ($type, $match, $value) = @$rule;
-    my $implicit = $args{implicit} // 1;
+    my $implicit = $args{implicit};
+    $implicit = 1 unless defined $implicit;
     my @resolvers;
     if ($tag) {
         my $res = $resolvers->{tag}->{ $tag } ||= {};
@@ -249,7 +252,8 @@ sub add_representer {
 sub load_scalar_tag {
     my ($self, $event) = @_;
     my $tag = $event->{tag};
-    my $value = $event->{value} // '';
+    my $value = $event->{value};
+    $value = '' unless defined $value;
     my $resolvers = $self->resolvers;
     my $res = $resolvers->{tag}->{ $tag };
 
@@ -283,7 +287,7 @@ sub load_scalar {
     }
     my $resolvers = $self->resolvers;
     my $res = $resolvers->{value};
-    $value //= '';
+    $value = '' unless defined $value;
 
     if (my $equals = $res->{equals}) {
         if (exists $equals->{ $value }) {
@@ -913,6 +917,40 @@ File will be written UTF-8 encoded
 
 =back
 
+=head1 FUNCTIONS
+
+The functions C<Load>, C<LoadFile>, C<Dump> and C<DumpFile> are provided
+as a drop-in replacement for other existing YAML processors.
+No function is exported by default.
+
+=over
+
+=item Load
+
+    use YAML::PP qw/ Load /;
+    my $doc = Load($yaml);
+    my @docs = Load($yaml);
+
+=item LoadFile
+
+    use YAML::PP qw/ LoadFile /;
+    my $doc = LoadFile($file);
+    my @docs = LoadFile($file);
+
+=item Dump
+
+    use YAML::PP qw/ Dump /;
+    my $yaml = Dump($doc);
+    my $yaml = Dump(@docs);
+
+=item DumpFile
+
+    use YAML::PP qw/ DumpFile /;
+    DumpFile($file, $doc);
+    DumpFile($file, @docs);
+
+=back
+
 =head1 NUMBERS
 
 Compare the output of the following YAML Loaders and JSON::PP dump:
@@ -1074,10 +1112,30 @@ You can find the latest build at L<http://matrix.yaml.io>
 As of this writing, the test matrix only contains valid test cases.
 Invalid ones will be added.
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item Ingy döt Net
+
+Ingy is one of the creators of YAML. In 2016 he started the YAML Test Suite
+and the YAML Editor. He also made useful suggestions on the class
+hierarchy of YAML::PP.
+
+=item Felix "flyx" Krause
+
+Felix answered countless questions about the YAML Specification.
+
+=back
+
+=head1 SPONSORS
+
+The Perl Foundation L<https://www.perlfoundation.org/> sponsored this project
+(and the YAML Test Suite) with a grant of 2500 USD in 2017-2018.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 by Tina Müller
+Copyright 2018 by Tina Müller
 
 This library is free software and may be distributed under the same terms
 as perl itself.

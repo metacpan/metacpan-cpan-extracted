@@ -29,7 +29,7 @@
    "provides" : {
       "Mojolicious::Plugin::SecurityHeader" : {
          "file" : "lib/Mojolicious/Plugin/SecurityHeader.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -44,8 +44,9 @@
          "web" : "http://github.com/reneeb/Mojolicious-Plugin-SecurityHeader"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <info@perl-services.de>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"

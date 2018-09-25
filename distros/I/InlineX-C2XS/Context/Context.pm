@@ -3,7 +3,7 @@ package InlineX::C2XS::Context;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 ###################################
 ###################################
@@ -19,6 +19,7 @@ sub apply_context_args {
 
   open RD, '<', $_[0] or die $!;
   my @xs = <RD>;
+  close RD or die $!;
   open WR, '>', $_[0] or die $!;
 
   my($aTHX_warn, $pTHX_warn) = (0, 0);

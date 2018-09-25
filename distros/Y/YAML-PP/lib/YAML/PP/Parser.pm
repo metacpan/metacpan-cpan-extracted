@@ -3,10 +3,10 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
-use constant TRACE => $ENV{YAML_PP_TRACE};
-use constant DEBUG => $ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE};
+use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
+use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
 
 use YAML::PP::Render;
 use YAML::PP::Lexer;
@@ -46,7 +46,11 @@ sub set_receiver {
     $self->{callback} = $callback;
     $self->{receiver} = $receiver;
 }
-sub reader { return $_[0]->{reader} }
+sub reader { return $_[0]->lexer->{reader} }
+sub set_reader {
+    my ($self, $reader) = @_;
+    $self->lexer->set_reader($reader);
+}
 sub lexer { return $_[0]->{lexer} }
 sub callback { return $_[0]->{callback} }
 sub set_callback { $_[0]->{callback} = $_[1] }
@@ -67,6 +71,7 @@ sub set_event_stack { $_[0]->{event_stack} = $_[1] }
 sub rule { return $_[0]->{rule} }
 sub set_rule {
     my ($self, $name) = @_;
+    no warnings 'uninitialized';
     DEBUG and $self->info("set_rule($name)");
     $self->{rule} = $name;
 }
@@ -85,12 +90,20 @@ sub init {
     $self->lexer->init;
 }
 
-sub parse {
+sub parse_string {
     my ($self, $yaml) = @_;
-    my $reader = $self->lexer->reader;
-    if (defined $yaml) {
-        $reader->set_input($yaml);
-    }
+    $self->lexer->reader->set_input( $yaml );
+    $self->parse();
+}
+
+sub parse_file {
+    my ($self, $file) = @_;
+    $self->lexer->reader->set_input( $file );
+    $self->parse();
+}
+
+sub parse {
+    my ($self) = @_;
     $self->init;
     $self->lexer->init;
     eval {
@@ -126,6 +139,13 @@ sub parse_stream {
             last;
         }
 
+        if (@$next_tokens and $next_tokens->[0]->{name} eq 'DOC_END') {
+            if (not $start) {
+                $implicit = 0;
+                $self->parse_document_end($next_tokens);
+                next;
+            }
+        }
         $self->start_document(not $start);
 
         my $new_type = 'FULLNODE';
@@ -136,13 +156,7 @@ sub parse_stream {
 
         if (@$next_tokens and $next_tokens->[0]->{name} eq 'DOC_END') {
             $implicit = 0;
-            push @{ $self->tokens }, shift @$next_tokens;
-            if (@$next_tokens and $next_tokens->[0]->{name} eq 'EOL') {
-                push @{ $self->tokens }, shift @$next_tokens;
-            }
-            else {
-                $self->exception("Expected EOL");
-            }
+            $self->parse_document_end($next_tokens);
         }
         else {
             $implicit = 1;
@@ -214,6 +228,17 @@ sub parse_document_head {
         $self->exception("Expected ---");
     }
     return ($start, $start_line);
+}
+
+sub parse_document_end {
+    my ($self, $next_tokens) = @_;
+    push @{ $self->tokens }, shift @$next_tokens;
+    if (@$next_tokens and $next_tokens->[0]->{name} eq 'EOL') {
+        push @{ $self->tokens }, shift @$next_tokens;
+    }
+    else {
+        $self->exception("Expected EOL after document end");
+    }
 }
 
 my %nodetypes = (
@@ -754,6 +779,28 @@ sub alias_event {
     $event_types->[-1] = $next_event{ $event_types->[-1] };
 }
 
+sub yaml_to_tokens {
+    my ($class, $type, $input) = @_;
+    my $yp = YAML::PP::Parser->new( receiver => sub {} );
+    my @docs = eval {
+        $type eq 'string' ? $yp->parse_string($input) : $yp->parse_file($input);
+    };
+    my $error = $@;
+
+    my $tokens = $yp->tokens;
+    my $next = $yp->lexer->next_tokens;
+    if ($error) {
+        push @$tokens, map { +{ %$_, name => 'ERROR' } } @$next;
+        my $remaining = $yp->reader->read;
+        $remaining = '' unless defined $remaining;
+        push @$tokens, { name => "ERROR", value => $remaining };
+    }
+    else {
+        push @$tokens, @$next;
+    }
+    return $error, $tokens;
+}
+
 sub event_to_test_suite {
     my ($self, $event) = @_;
     if (ref $event) {
@@ -821,7 +868,7 @@ sub event_to_test_suite {
             else {
                 $content = '';
             }
-            $string .= ' ' . $info->{style} . ($content // '');
+            $string .= ' ' . $info->{style} . $content;
         }
         elsif ($ev eq 'alias_event') {
             $string = "=ALI *$content";
@@ -859,8 +906,9 @@ sub debug_yaml {
 
 sub debug_next_line {
     my ($self) = @_;
-    my $next_line = $self->lexer->next_line // [];
-    my $line = $next_line->[0] // '';
+    my $next_line = $self->lexer->next_line || [];
+    my $line = $next_line->[0];
+    $line = '' unless defined $line;
     $line =~ s/( +)$/'·' x length $1/e;
     $line =~ s/\t/▸/g;
     $self->note("NEXT LINE: >>$line<<");
@@ -868,20 +916,23 @@ sub debug_next_line {
 
 sub note {
     my ($self, $msg) = @_;
-    require Term::ANSIColor;
-    warn Term::ANSIColor::colored(["yellow"], "============ $msg"), "\n";
+    $self->_colorize_warn(["yellow"], "============ $msg");
 }
 
 sub info {
     my ($self, $msg) = @_;
-    require Term::ANSIColor;
-    warn Term::ANSIColor::colored(["cyan"], "============ $msg"), "\n";
+    $self->_colorize_warn(["cyan"], "============ $msg");
 }
 
 sub got {
     my ($self, $msg) = @_;
+    $self->_colorize_warn(["green"], "============ $msg");
+}
+
+sub _colorize_warn {
+    my ($self, $colors, $text) = @_;
     require Term::ANSIColor;
-    warn Term::ANSIColor::colored(["green"], "============ $msg"), "\n";
+    warn Term::ANSIColor::colored($colors, $text), "\n";
 }
 
 sub debug_event {

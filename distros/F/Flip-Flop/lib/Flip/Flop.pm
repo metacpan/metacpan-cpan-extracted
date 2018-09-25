@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Flip::Flop;
-our $VERSION = 20180726;
+our $VERSION = 20180925;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -31,7 +31,7 @@ END
           $s =~ s($F)($f)gs;                                                    # Reset switch
          }
        }
-      writeFile($0, $s) if $s ne $S;                                            # Update source file if any switches were reset
+      overWriteFile($0, $s) if $s ne $S;                                        # Update source file if any switches were reset
      }
    }
  }
