@@ -1,3 +1,11 @@
+Version 7.10 - 3 October 2018, by Thierry Vignaud
+
+- cpan_testers:
+  o add dummy package so that rpmtools can be installed for urpmi testers
+  o need List::Util >= 1.33 for "any"
+
+Version 7.05 - 21 September 2018, by Thierry Vignaud
+
 - CPAN: add README
 
 Version 7.03 - 19 September 2018, by Thierry Vignaud

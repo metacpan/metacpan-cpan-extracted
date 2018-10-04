@@ -235,6 +235,13 @@ subtest 'scalar ref' => sub {
 
 };
 
+subtest 'interpreter_options' => sub {
+
+  script_runs 't/bin/warnon.pl', { interpreter_options => [ '-w' ] }, 'as array reference';
+  script_runs 't/bin/warnon.pl', { interpreter_options => '-w' }, 'as string';
+
+};
+
 script_runs 't/bin/taint.pl';
 
 done_testing;

@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::ParseGenesFromGFFs;
-
+$Bio::AutomatedAnnotation::ParseGenesFromGFFs::VERSION = '1.182770';
 # ABSTRACT: Parse GFF files and efficiency extract the gene sequence.
 
 
@@ -91,7 +91,7 @@ Bio::AutomatedAnnotation::ParseGenesFromGFFs - Parse GFF files and efficiency ex
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

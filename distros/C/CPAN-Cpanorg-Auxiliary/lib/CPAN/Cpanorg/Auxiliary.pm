@@ -1,7 +1,7 @@
 package CPAN::Cpanorg::Auxiliary;
 use 5.14.0;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 use Carp;
 use Cwd;
 use File::Basename qw(basename dirname);

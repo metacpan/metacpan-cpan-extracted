@@ -1,5 +1,14 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.21 2018-10-03T16:19:00+0900
+ - Fix failing tests after Mojolicious::Plugin::OpenAPI 2.00 #15
+
+0.20 2018-09-30T22:04:20+0900
+ - Fix skip tests when getting "Service Unavailable"
+
+0.19 2018-09-26T13:56:14+0900
+ - Skip tests when getting "Service Unavailable"
+
 0.18 2018-09-02T14:13:51+0200
  - Add "after_build_tx" event
  - Add "opeartionId_p" methods for promise based API

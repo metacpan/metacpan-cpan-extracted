@@ -63,14 +63,16 @@ my @std_opts = (
     '--set' => 'ON_ERROR_STOP=1',
     '--set' => 'registry=sqitch',
 );
-is_deeply [$pg->psql], [$client, @std_opts],
-    'psql command should be std opts-only';
+my $sysuser = $sqitch->sysuser;
+is_deeply [$pg->psql], [$client, '--dbname', "user=$sysuser", @std_opts],
+    'psql command should be conninfo, and std opts-only';
 
 isa_ok $pg = $CLASS->new(sqitch => $sqitch, target => $target), $CLASS;
 ok $pg->set_variables(foo => 'baz', whu => 'hi there', yo => 'stellar'),
     'Set some variables';
 is_deeply [$pg->psql], [
     $client,
+    '--dbname', "user=$sysuser",
     '--set' => 'foo=baz',
     '--set' => 'whu=hi there',
     '--set' => 'yo=stellar',
@@ -83,12 +85,17 @@ ENV: {
     # Make sure we override system-set vars.
     local $ENV{PGDATABASE};
     local $ENV{PGUSER};
-    for my $env (qw(PGDATABASE PGUSER)) {
+    local $ENV{PGPASSWORD};
+    for my $env (qw(PGDATABASE PGUSER PGPASSWORD)) {
         my $pg = $CLASS->new(sqitch => $sqitch, target => $target);
         local $ENV{$env} = "\$ENV=whatever";
         is $pg->target->uri, "db:pg:", "Target should not read \$$env";
         is $pg->registry_destination, $pg->destination,
-            'Meta target should be the same as destination';
+            'Registry target should be the same as destination';
+        is $pg->username, $ENV{PGUSER} || $sysuser,
+            "Should have username when $env set";
+        is $pg->password, $ENV{PGPASSWORD},
+            "Should have password when $env set";
     }
 
     my $mocker = Test::MockModule->new('App::Sqitch');
@@ -96,13 +103,13 @@ ENV: {
     my $pg = $CLASS->new(sqitch => $sqitch, target => $target);
     is $pg->target->uri, 'db:pg:', 'Target should not fall back on sysuser';
     is $pg->registry_destination, $pg->destination,
-        'Meta target should be the same as destination';
+        'Registry target should be the same as destination';
 
     $ENV{PGDATABASE} = 'mydb';
     $pg = $CLASS->new(sqitch => $sqitch, username => 'hi', target => $target);
     is $pg->target->uri, 'db:pg:',  'Target should be the default';
     is $pg->registry_destination, $pg->destination,
-        'Meta target should be the same as destination';
+        'Registry target should be the same as destination';
 }
 
 ##############################################################################
@@ -124,7 +131,8 @@ is $pg->uri->as_string, 'db:pg://localhost/try?sslmode=disable&connect_timeout=5
 is $pg->registry, 'meta', 'registry should be as configured';
 is_deeply [$pg->psql], [
     '/path/to/psql',
-    'dbname=try host=localhost connect_timeout=5 sslmode=disable',
+    '--dbname',
+    "user=$sysuser dbname=try host=localhost connect_timeout=5 sslmode=disable",
 @std_opts], 'psql command should be configured from URI config';
 
 ##############################################################################
@@ -146,7 +154,8 @@ is $pg->registry_destination, $pg->destination,
 is $pg->registry, 'meta', 'registry should still be as configured';
 is_deeply [$pg->psql], [
     '/some/other/psql',
-    'dbname=try host=localhost connect_timeout=5 sslmode=disable',
+    '--dbname',
+    "user=$sysuser dbname=try host=localhost connect_timeout=5 sslmode=disable",
 @std_opts], 'psql command should be as optioned';
 
 ##############################################################################
@@ -245,10 +254,10 @@ $mock_config->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
-ok my $ts2char = $CLASS->can('_ts2char'), "$CLASS->can('_ts2char')";
-is $ts2char->('foo'),
+ok my $ts2char = $CLASS->can('_ts2char_format'), "$CLASS->can('_ts2char_format')";
+is sprintf($ts2char->(), 'foo'),
     q{to_char(foo AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD:"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')},
-    '_ts2char should work';
+    '_ts2char_format should work';
 
 ok my $dtfunc = $CLASS->can('_dt'), "$CLASS->can('_dt')";
 isa_ok my $dt = $dtfunc->(
@@ -261,6 +270,22 @@ is $dt->hour,   15, 'DateTime hour should be set';
 is $dt->minute,  7, 'DateTime minute should be set';
 is $dt->second,  1, 'DateTime second should be set';
 is $dt->time_zone->name, 'UTC', 'DateTime TZ should be set';
+
+##############################################################################
+# Test _psql_major_version.
+for my $spec (
+    ['11beta3', 11],
+    ['11.3', 11],
+    ['10', 10],
+    ['9.6.3', 9],
+    ['8.4.2', 8],
+    ['9.0.19', 9],
+) {
+    $mock_sqitch->mock(probe => "psql (PostgreSQL) $spec->[0]");
+    is $pg->_psql_major_version, $spec->[1],
+        "Should find major version $spec->[1] in $spec->[0]";
+}
+$mock_sqitch->unmock('probe');
 
 ##############################################################################
 # Can we do live tests?
@@ -279,10 +304,12 @@ END {
     $dbh->do("DROP DATABASE $db") if $dbh->{Active};
 }
 
+my $pguser = $ENV{PGUSER} || 'postgres';
+
 my $err = try {
     $pg->_capture('--version');
     $pg->use_driver;
-    $dbh = DBI->connect('dbi:Pg:dbname=template1', 'postgres', '', {
+    $dbh = DBI->connect('dbi:Pg:dbname=template1', $pguser, '', {
         PrintError => 0,
         RaiseError => 1,
         AutoCommit => 1,
@@ -304,11 +331,11 @@ DBIEngineTest->run(
         plan_file   => Path::Class::file(qw(t engine sqitch.plan))->stringify,
     }],
     target_params => [
-        uri => URI::db->new("db:pg://postgres@/$db"),
+        uri => URI::db->new("db:pg://$pguser\@/$db"),
     ],
     alt_target_params => [
         registry => '__sqitchtest',
-        uri => URI::db->new("db:pg://postgres@/$db"),
+        uri => URI::db->new("db:pg://$pguser\@/$db"),
     ],
     skip_unless       => sub {
         my $self = shift;

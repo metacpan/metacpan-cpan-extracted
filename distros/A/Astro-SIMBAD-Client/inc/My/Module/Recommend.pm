@@ -8,6 +8,11 @@ use My::Module::Recommend::Any qw{ __any };
 use My::Module::Recommend::None qw{ __none };
 
 my @optionals = (
+    __any( 'LWP::Protocol::https' => <<'EOD' ),
+      This module is required if you want to use the https: URL scheme
+      to access SIMBAD. If you intend to use only the default http:
+      scheme this module is not needed.
+EOD
     __any( 'SOAP::Lite'	=> <<'EOD' ),
       This module is required for the query() method. If you do not
       intend to use this method, SOAP::Lite is not needed.

@@ -116,9 +116,9 @@ my %meta_merge = (
                     mailto  => 'bug-Glib [at] rt.cpan.org',
             },
             repository  => {
-                    url     => 'git://git.gnome.org/perl-Glib',
+                    url     => 'git@gitlab.gnome.org:GNOME/perl-glib.git',
                     type    => 'git',
-                    web     => 'http://git.gnome.org/browse/perl-Glib',
+                    web     => 'https://gitlab.gnome.org/GNOME/perl-glib',
             },
         },
         prereqs => {

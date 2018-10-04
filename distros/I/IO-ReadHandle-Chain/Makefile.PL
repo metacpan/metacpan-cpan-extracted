@@ -1,3 +1,4 @@
+
 use 5.006;
 use strict;
 use warnings;
@@ -7,10 +8,9 @@ WriteMakefile(
     NAME             => 'IO::ReadHandle::Chain',
     AUTHOR           => q{Louis Strous <lstrous@cpan.org>},
     VERSION_FROM     => 'lib/IO/ReadHandle/Chain.pm',
-    ABSTRACT_FROM    => 'lib/IO/ReadHandle/Chain.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.014',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Entry-point for Kusarigama's hook scripts
-$Taskwarrior::Kusarigama::Hook::VERSION = '0.9.2';
+$Taskwarrior::Kusarigama::Hook::VERSION = '0.9.3';
 
 use 5.10.0;
 
@@ -127,7 +127,7 @@ Taskwarrior::Kusarigama::Hook - Entry-point for Kusarigama's hook scripts
 
 =head1 VERSION
 
-version 0.9.2
+version 0.9.3
 
 =head1 SYNOPSIS
 

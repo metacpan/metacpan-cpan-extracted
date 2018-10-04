@@ -18,13 +18,14 @@ meta-spec:
 name: App-sshwrap-hostcolor
 requires:
   AppLib::sshwrap: '0'
+  Color::RGB::Util: '0'
   Complete::Util: '0.57'
   Getopt::Long: '0'
   Getopt::Long::Complete: '0'
   Log::ger: '0.023'
   PERLANCAR::File::HomeDir: '0'
   ShellCompleter::Util: '0.030'
-  XTerm::Util: '0'
+  XTerm::Util: '0.002'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-sshwrap-hostcolor
   homepage: https://metacpan.org/release/App-sshwrap-hostcolor
   repository: git://github.com/perlancar/perl-App-sshwrap-hostcolor.git
-version: '0.001'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

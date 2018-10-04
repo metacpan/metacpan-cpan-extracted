@@ -57,7 +57,6 @@ __DATA__
         "tags": [ "user" ],
         "summary": "Log in a user based on email and password.",
         "operationId": "loginUser",
-        "x-mojo-to": "user#login",
         "parameters": [
           {
             "name": "body",

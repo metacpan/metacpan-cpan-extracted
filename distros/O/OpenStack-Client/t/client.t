@@ -370,6 +370,26 @@ Test::OpenStack::Client->run_client_tests({
     }
 }, {
     'responses' => [{
+        'content' => JSON::encode_json({})
+    }],
+
+    'test' => sub {
+        my ($client, $ua) = @_;
+
+        my $ran = 0;
+
+        my $sub = sub {
+            $ran = 1;
+        };
+
+        lives_ok {
+            $client->call('PUT', {}, '/foo', $sub);
+        } "\$client->call() doesn't die when passed a CODE ref request body";
+
+        is $ua->{'requests'}->[0]->{'content'} => $sub, "\$client->call() passes CODE ref request body appropriately";
+    }
+}, {
+    'responses' => [{
         'content' => JSON::encode_json({
             'items' => []
         })

@@ -13,19 +13,21 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.01';
+our $VERSION = '1.07';
 
-has output_path    => ( is => 'ro', required => 1, default => sub { '.' } );
-has file           => ( is => 'ro', required => 1 );
-has uppercase      => ( is => 'ro' );
-has namespace      => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
-has schema_name    => ( is => 'rwp', isa => sub { $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
-has version_add    => ( is => 'ro', required => 1, default => sub { 0.01 } );
-has column_details => ( is => 'ro', required => 1, default => sub { 0 } );
-has use_fake_dbic  => ( is => 'ro', required => 1, default => sub { 0 } );
-has skip_indexes   => ( is => 'ro', required => 1, default => sub { 0 } );
-has table_comments => ( is => 'ro', required => 1, default => sub { 0 } );
-
+has output_path         => ( is => 'ro', required => 1, default => sub { '.' } );
+has file                => ( is => 'ro', required => 1 );
+has uppercase           => ( is => 'ro' );
+has inherit_from_core   => ( is => 'ro' );
+has namespace           => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
+has result_namespace    => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
+has resultset_namespace => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
+has schema_name         => ( is => 'rwp', isa => sub { $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
+has version_add         => ( is => 'ro', required => 1, default => sub { 0.01 } );
+has column_details      => ( is => 'ro', required => 1, default => sub { 0 } );
+has use_fake_dbic       => ( is => 'ro', required => 1, default => sub { 0 } );
+has skip_indexes        => ( is => 'ro', required => 1, default => sub { 0 } );
+has table_comments      => ( is => 'ro', required => 1, default => sub { 0 } );
 has belongs_to_prefix   => ( is => 'ro', required => 1, default => sub { '' } );
 has has_many_prefix     => ( is => 'ro', required => 1, default => sub { '' } );
 has has_one_prefix      => ( is => 'ro', required => 1, default => sub { '' } );
@@ -44,11 +46,11 @@ before new => sub {
 
 sub create_schema{
     my $self = shift;
-    
-    my $parser = MySQL::Workbench::Parser->new( file => $self->file ); 
+
+    my $parser = MySQL::Workbench::Parser->new( file => $self->file );
     my @tables = @{ $parser->tables };
 
-    my @classes;    
+    my @classes;
     my %relations;
     for my $table ( @tables ){
         my $name = $table->name;
@@ -63,17 +65,17 @@ sub create_schema{
     }
 
     $self->_set_classes( \@classes );
-    
+
     my @scheme = $self->_main_template;
-    
+
     my @files;
     for my $table ( @tables ){
         my $custom_code = $self->_custom_code( $table );
         push @files, $self->_class_template( $table, $relations{$table->name}, $custom_code );
     }
-    
+
     push @files, @scheme;
-    
+
     $self->_write_files( @files );
 }
 
@@ -83,7 +85,9 @@ sub _custom_code {
     my $path = File::Spec->catfile(
         $self->output_path || (),
         (split /::/, $self->namespace),
-        $self->schema_name, 'Result',
+        $self->schema_name,
+        $self->result_namespace,
+        'Result',
         $table->name . '.pm'
     );
 
@@ -106,16 +110,16 @@ sub _custom_code {
 
 sub _write_files{
     my ($self, %files) = @_;
-    
+
     for my $package ( keys %files ){
         my @path;
         push @path, $self->output_path if $self->output_path;
         push @path, split /::/, $package;
         my $file = pop @path;
         my $dir  = File::Spec->catdir( @path );
-        
+
         $dir = $self->_untaint_path( $dir );
-        
+
         unless( -e $dir ){
             $self->_mkpath( $dir );
         }
@@ -142,9 +146,9 @@ sub _untaint_path{
 
 sub _mkpath{
     my ($self, $path) = @_;
-    
+
     my @parts = split /[\\\/]/, $path;
-    
+
     for my $i ( 0..$#parts ){
         my $dir = File::Spec->catdir( @parts[ 0..$i ] );
         $dir = $self->_untaint_path( $dir );
@@ -161,14 +165,20 @@ sub _has_many_template{
     if ( $self->uppercase ) {
         $to_class = join '', map{ ucfirst $_ }split /[_-]/, $to;
     }
-    
-    my $package = $self->namespace . '::' . $self->schema_name . '::Result::' . $to_class;
-       $package =~ s/^:://;
-    my $name    = $to;
+
+    my $package = join '::', (
+       ( $self->namespace ? $self->namespace : () ),
+       $self->schema_name,
+       ( length $self->result_namespace ? $self->result_namespace : () ),
+       'Result',
+       $to_class,
+    );
+
+    my $name = $to;
 
     my %has_many_rels;
     my $counter = 1;
-    
+
     my $string = '';
     for my $field ( @{ $rels || [] } ) {
         my $me_field      = $field->{foreign};
@@ -180,7 +190,7 @@ sub _has_many_template{
         }
 
         $has_many_rels{$temp_field}++;
-    
+
         $string .= qq~
 __PACKAGE__->has_many($temp_field => '$package',
              { 'foreign.$foreign_field' => 'self.$me_field' });
@@ -198,13 +208,19 @@ sub _belongs_to_template{
         $from_class = join '', map{ ucfirst $_ }split /[_-]/, $from;
     }
 
-    my $package = $self->namespace . '::' . $self->schema_name . '::Result::' . $from_class;
-       $package =~ s/^:://;
-    my $name    = $from;
-    
+    my $package = join '::', (
+       ( $self->namespace ? $self->namespace : () ),
+       $self->schema_name,
+       ( length $self->result_namespace ? $self->result_namespace : () ),
+       'Result',
+       $from_class,
+    );
+
+    my $name = $from;
+
     my %belongs_to_rels;
     my $counter = 1;
-    
+
     my $string = '';
     for my $field ( @{ $rels || [] } ) {
         my $me_field      = $field->{me};
@@ -216,7 +232,7 @@ sub _belongs_to_template{
         }
 
         $belongs_to_rels{$temp_field}++;
-    
+
         $string .= qq~
 __PACKAGE__->belongs_to($temp_field => '$package',
              { 'foreign.$foreign_field' => 'self.$me_field' });
@@ -228,16 +244,21 @@ __PACKAGE__->belongs_to($temp_field => '$package',
 
 sub _class_template{
     my ($self, $table, $relations, $custom_code) = @_;
-    
+
     my $name    = $table->name;
     my $class   = $name;
     if ( $self->uppercase ) {
         $class = join '', map{ ucfirst $_ }split /[_-]/, $name;
     }
 
-    my $package = $self->namespace . '::' . $self->schema_name . '::Result::' . $class;
-       $package =~ s/^:://;
-    
+    my $package = join '::', (
+       ( $self->namespace ? $self->namespace : () ),
+       $self->schema_name,
+       ( length $self->result_namespace ? $self->result_namespace : () ),
+       'Result',
+       $class,
+    );
+
     my ($has_many, $belongs_to) = ('','');
 
     my $comment = $table->comment // '{}';
@@ -247,23 +268,25 @@ sub _class_template{
         $data = JSON->new->utf8(1)->decode( $comment );
     };
 
-    my $components = ( $data && $data->{components} ) ?
-        join( ' ', '', @{ $data->{components} } ) :
-        '';
+    $data //= {};
+
+    my @core_components = $self->inherit_from_core ? () : qw(PK::Auto Core);
+    my $components      = join( ' ', @core_components, @{ $data->{components} || [] } ) // '';
+    my $load_components = $components ? "__PACKAGE__->load_components( qw/$components/ );" : '';
 
     my %foreign_keys;
-    
-    for my $to_table ( keys %{ $relations->{to} } ){
+
+    for my $to_table ( sort keys %{ $relations->{to} } ){
         $has_many .= $self->_has_many_template( $to_table, $relations->{to}->{$to_table} );
     }
 
-    for my $from_table ( keys %{ $relations->{from} } ){
+    for my $from_table ( sort keys %{ $relations->{from} } ){
         $belongs_to .= $self->_belongs_to_template( $from_table, $relations->{from}->{$from_table} );
 
         my @foreign_key_names = map{ $_->{me} }@{ $relations->{from}->{$from_table} };
         @foreign_keys{ @foreign_key_names } = (1) x @foreign_key_names;
     }
-    
+
     my @columns = map{ $_->name }@{ $table->columns };
     my $column_string = '';
 
@@ -338,16 +361,17 @@ sub _class_template{
 
     my $primary_key   = join " ", @{ $table->primary_key };
     my $version       = $self->version;
-    
+    my $inherit_from  = $self->inherit_from_core ? '::Core' : '';
+
     my $template = qq~package $package;
-    
+
 use strict;
 use warnings;
-use base qw(DBIx::Class);
+use base qw(DBIx::Class$inherit_from);
 
 our \$VERSION = $version;
 
-__PACKAGE__->load_components( qw/PK::Auto Core$components/ );
+$load_components
 __PACKAGE__->table( '$name' );
 __PACKAGE__->add_columns(
 $column_string
@@ -401,7 +425,9 @@ sub _indexes_template {
 sub sqlt_deploy_hook {
     my (\$self, \$table) = \@_;
 
-$hooks}
+$hooks
+    return 1;
+}
 ~;
 
     return $sub_string;
@@ -409,26 +435,28 @@ $hooks}
 
 sub _main_template{
     my ($self) = @_;
-    
+
     my @class_names  = @{ $self->classes };
     my $classes      = join "\n", map{ "    " . $_ }@class_names;
-    
+
     my $schema_name  = $self->schema_name;
-    my @schema_names = qw(DBIC_Schema Database DBIC MySchema MyDatabase DBIxClass_Schema);
-    
-    for my $schema ( @schema_names ){
-        last if $schema_name;
-        unless( grep{ $_ eq $schema }@class_names ){
-            $schema_name = $schema;
-            last;
+
+    unless ($schema_name) {
+        my @schema_names = qw(DBIC_Schema Database DBIC MySchema MyDatabase DBIxClass_Schema);
+
+        for my $schema ( @schema_names ){
+            unless( grep{ $_ eq $schema }@class_names ){
+                $schema_name = $schema;
+                last;
+            }
         }
     }
 
     croak "couldn't determine a package name for the schema" unless $schema_name;
 
-    
+
     $self->_set_schema_name( $schema_name );
-    
+
     my $namespace  = $self->namespace . '::' . $schema_name;
        $namespace  =~ s/^:://;
 
@@ -443,6 +471,14 @@ sub _main_template{
         1;
     } or warn $@;
 
+    my %all_namespaces_to_load;
+    if ( $self->resultset_namespace ) {
+        $all_namespaces_to_load{resultset_namespace} = $self->resultset_namespace;
+    }
+    if ( $self->result_namespace ) {
+        $all_namespaces_to_load{result_namespace} = $self->result_namespace;
+    }
+
     if ( $version ) {
         $version += $self->version_add || 0.01;
     }
@@ -450,14 +486,26 @@ sub _main_template{
     $version ||= ($self->version_add || 0.01);
 
     $self->_set_version( $version );
-       
+
+    my $namespaces_to_load = '';
+    if ( %all_namespaces_to_load ) {
+        $namespaces_to_load = "(" .
+            ( join '', map{
+                "\n    " . $_ . " => '" . $all_namespaces_to_load{$_} . "',"
+            }sort keys %all_namespaces_to_load ) .
+            "\n)";
+    }
+
     my $template = qq~package $namespace;
+
+use strict;
+use warnings;
 
 use base qw/DBIx::Class::Schema/;
 
 our \$VERSION = $version;
 
-__PACKAGE__->load_namespaces;
+__PACKAGE__->load_namespaces$namespaces_to_load;
 
 1;~;
 
@@ -479,7 +527,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.01
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -507,6 +555,7 @@ to new:
     output_path       => '/path/to/dir',
     input_file        => '/path/to/dbdesigner.file',
     namespace         => 'MyApp::Database',
+    result_namespace  => 'Core',
     version_add       => 0.001,
     schema_name       => 'MySchema',
     column_details    => 1,
@@ -577,11 +626,11 @@ correctly.
 
 =head2 version_add
 
-The files should be versioned (e.g. to deploy the DB via C<DBIx::Class::DeploymentHandler>). On the first run 
+The files should be versioned (e.g. to deploy the DB via C<DBIx::Class::DeploymentHandler>). On the first run
 the version is set to "0.01". When the schema file already exists, the version is increased by the value
 of C<version_add> (default: 0.01)
 
-=head2 schema_name 
+=head2 schema_name
 
 sets a new name for the schema. By default on of these names is used:
 
@@ -591,11 +640,21 @@ sets a new name for the schema. By default on of these names is used:
 
 sets / gets the name of the namespace. If you set the namespace to 'Test' and you
 have a table named 'MyTable', the main module is named 'Test::DBIC_Scheme' and
-the class for 'MyTable' is named 'Test::DBIC_Scheme::MyTable'
+the class for 'MyTable' is named 'Test::DBIC_Scheme::Result::MyTable'
+
+=head2 result_namespace
+
+sets / gets the name of an optional result namespace. If you set the result_namespace to 'Core' and you
+have a table named 'MyTable', the class for 'MyTable' is named 'Test::DBIC_Scheme::Core::Result::MyTable'
+
+=head2 resultset_namespace
+
+sets / gets the name of an optional resultset namespace. If you set the resultset_namespace to 'Core' and you
+have a table named 'MyTable', the resultset class for 'MyTable' is named 'Test::DBIC_Scheme::Core::ResultSet::MyTable'
 
 =head2 prefix
 
-In relationships the accessor for the objects of the "other" table shouldn't have the name of the column. 
+In relationships the accessor for the objects of the "other" table shouldn't have the name of the column.
 Otherwise it is very clumsy to get the orginial value of this table.
 
   'belongs_to' => 'fk_'
@@ -635,6 +694,12 @@ When C<skip_indexes> is true, the sub C<sqlt_deploy_hook> that adds the indexes 
 When this flag is used, C<MySQL::Workbench::DBIC> assumes that (some) tables
 have stored extra information for columns in the table comments. This must
 be in JSON format.
+
+=head2 inherit_from_core
+
+By default, the classes inherit from C<DBIx::Class> and they load the components
+C<PK::Auto> and C<Core>. If you set I<inherit_from_core>, the classes inherit
+from C<DBIx::Class::Core>. and no extra components are loaded.
 
 =head1 AUTHOR
 

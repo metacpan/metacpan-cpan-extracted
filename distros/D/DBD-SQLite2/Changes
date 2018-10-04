@@ -1,5 +1,8 @@
 Revision history for Perl extension DBD::SQLite2.
 
+0.38 2018-09-29 rurban
+     - Fix tests without . in @INC [cpan #127241]
+
 0.37 2015-12-08 rurban
     - Fix handling of 64bit int and double result types [cpan #28448].
       We promote now overlong integers to double, not strings.

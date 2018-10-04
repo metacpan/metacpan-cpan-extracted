@@ -3,7 +3,7 @@ package Test::Base;
 use 5.006001;
 use Spiffy 0.30 -Base;
 use Spiffy ':XXX';
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my @test_more_exports;
 BEGIN {

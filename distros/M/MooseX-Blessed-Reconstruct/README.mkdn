@@ -4,69 +4,84 @@ MooseX::Blessed::Reconstruct - A [Data::Visitor](https://metacpan.org/pod/Data::
 
 # VERSION
 
-version 1.00
+version 1.01
 
 # SYNOPSIS
 
-        use MooseX::Blessed::Reconstruct;
+```perl
+    use MooseX::Blessed::Reconstruct;
 
 
-        my $obj = bless( {
-                init_arg_foo => "Blah",
-                arf => "yay",
-        }, "Foo" );
+    my $obj = bless( {
+            init_arg_foo => "Blah",
+            arf => "yay",
+    }, "Foo" );
 
-        my $proper = MooseX::Blessed::Reconstruct->new->visit($obj);
+    my $proper = MooseX::Blessed::Reconstruct->new->visit($obj);
 
 
+    # equivalent to:
 
-        # equivalent to:
+    my $proper = Foo->meta->new_object(%$obj);
 
-        my $proper = Foo->meta->new_object(%$obj);
-
-        # but recursive (and works with shared references)
+    # but recursive (and works with shared references)
+```
 
 # DESCRIPTION
 
 The purpose of this module is to "fix up" blessed data into a real Moose
 object.
 
-This is used internally by [MooseX::YAML](https://metacpan.org/pod/MooseX::YAML) but has no implementation details
-having to do with [YAML](https://metacpan.org/pod/YAML) itself.
-
 # METHODS
 
 See [Data::Visitor](https://metacpan.org/pod/Data::Visitor)
 
-- visit\_object $object
+## new 
 
-    Calls ["load\_class" in Class::MOP](https://metacpan.org/pod/Class::MOP#load_class) on the `ref` of $object.
+Constructor. 
 
-    If there's a metaclass, calls `visit_object_with_meta`, otherwise `visit_ref`
-    is used to walk the object brutishly.
+### arguments
 
-    Returns a deep clone of the input structure with all the [Moose](https://metacpan.org/pod/Moose) objects
-    reconstructed "properly".
+- load\_classes 
 
-- visit\_object\_with\_meta $obj, $meta
+    If `true` (which is the default), we will try to require its class 
+    when the target object is `visit`ed. 
 
-    Uses the metaclass `$meta` to create a new instance, registers the instance
-    with [Data::Visitor](https://metacpan.org/pod/Data::Visitor)'s cycle tracking, and then inflates it using
-    ["new\_object" in Moose::Meta::Class](https://metacpan.org/pod/Moose::Meta::Class#new_object).
+## load\_classes 
 
-- prepare\_args $obj
+Read/write accessor to the `load_classes` attribute.
+If `true`, we try to require its class when a target object is `visit`ed. 
 
-    Collapses $obj into key value pairs to be used as init args to
-    ["new\_object" in Moose::Meta::Class](https://metacpan.org/pod/Moose::Meta::Class#new_object).
+## visit\_object $object
+
+Calls ["load\_class" in Class::MOP](https://metacpan.org/pod/Class::MOP#load_class) on the `ref` of $object.
+
+If there's a metaclass, calls `visit_object_with_meta`, otherwise `visit_ref`
+is used to walk the object brutishly.
+
+Returns a deep clone of the input structure with all the [Moose](https://metacpan.org/pod/Moose) objects
+reconstructed "properly".
+
+## visit\_object\_with\_meta $obj, $meta
+
+Uses the metaclass `$meta` to create a new instance, registers the instance
+with [Data::Visitor](https://metacpan.org/pod/Data::Visitor)'s cycle tracking, and then inflates it using
+["new\_object" in Moose::Meta::Class](https://metacpan.org/pod/Moose::Meta::Class#new_object).
+
+## prepare\_args $obj
+
+Collapses $obj into key value pairs to be used as init args to
+["new\_object" in Moose::Meta::Class](https://metacpan.org/pod/Moose::Meta::Class#new_object).
 
 # AUTHORS
 
 - Yuval Kogman <nothingmuch@woobling.org>
 - Jonathan Rockway <jrockway@cpan.org>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2008 by Infinity Interactive, Yuval Kogman.
+This software is copyright (c) 2018, 2014 by Infinity Interactive, Yuval Kogman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

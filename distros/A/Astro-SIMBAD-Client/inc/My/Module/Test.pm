@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Astro::SIMBAD::Client;
-use Test::More 0.88;
+use Test::More 0.96;	# Because of subtest()
 
 use Exporter ();
 our @ISA = qw{ Exporter };
@@ -27,6 +27,7 @@ our @EXPORT_OK = qw{
     echo
     end
     find
+    have_scheme
     hidden
     load_data
     load_module
@@ -36,6 +37,7 @@ our @EXPORT_OK = qw{
     plan
     returned_value
     silent
+    subtest
     test
     test_false
     $TODO
@@ -184,6 +186,15 @@ sub find (@) {	## no critic (ProhibitSubroutinePrototypes)
 	}
     }
     return;
+}
+
+sub have_scheme ($) {
+    my ( $protocol ) = @_;
+    local $@ = undef;
+    return eval {
+	require "LWP/Protocol/$protocol.pm";
+	1;
+    };
 }
 
 sub hidden ($) {

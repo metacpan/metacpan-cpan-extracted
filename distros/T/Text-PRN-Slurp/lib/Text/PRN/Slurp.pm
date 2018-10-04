@@ -5,20 +5,20 @@ use warnings;
 
 use IO::File;
 use IO::Scalar;
-
+use Data::Dumper;
 =head1 NAME
 
 Text::PRN::Slurp - Parse and read .PRN File Extension
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
 use vars qw/$VERSION/;
 
-$VERSION = 1.04;
+$VERSION = 1.05;
 
 
 =head1 SYNOPSIS
@@ -50,7 +50,7 @@ PRN, short name for Printable, is used as the file extension for files padded wi
 
 sub new {
     my ( $class ) = @_;
-    return bless {}, $class;
+    return bless { 'options' => {} }, $class;
 }
 
 =head2 load
@@ -100,56 +100,104 @@ sub load {
         delete $opt{'string'};
     }
 
-    return _from_io_handler($io,\%opt);
+    $self->{'options'} = \%opt;
+
+    return $self->_from_io_handler($io,\%opt);
 }
 
 sub _from_io_handler {
-    my ( $io, $opt_ref ) = @_;
+    my ( $self, $io, $opt_ref ) = @_;
 
-    my @file_header = @{ $opt_ref->{'file_headers'} };
-    my ( %col_length_map, @file_data_as_array);
+    die "File headers not found" unless $self->file_headers;
 
-    my $row_count = 1;
-    while (my $row = <$io>) {
-        chomp $row;
-        ## Assume first row is heading
-        if ( $row_count == 1 ) {
-            foreach my $col_heading ( @file_header ) {
-                $row =~m{($col_heading\s+)}i;
-                $row =~m{($col_heading\s?)}i if not $1;
-                if ( $1 ) {
-                    my $table_column = $1;
-                    my $table_column_length = length $table_column;
-                    # remove leading and trailing spaces
-                    $table_column =~s{^\s+|\s+$}{}g;
-                    $col_length_map{ $table_column } = $table_column_length;
-                }
-                else {
-                    warn q{Columns doesn't seems to be matching};
-                }
-            }
-        }
-        else {
-            my $string_offset = 0;
-            my %extracted_row_data;
-            for( my $col_index=0; $col_index<=$#file_header; $col_index++ ) {
-                my $col = $file_header[$col_index];
-                my $col_length = $col_length_map{ $col } || 0;
-                if ( $col_length ) {
-                    my $col_data = substr $row, $string_offset, $col_length;
-                    # remove leading and trailing spaces
-                    $col_data =~s{^\s+|\s+$}{}g;
-                    $extracted_row_data{ $col } = $col_data;
-                    $string_offset += $col_length;
-                }
-            }
+    ## Assume first row is heading
+    my $first_row = <$io>;
+    $self->_parse_header( $first_row );
 
-            push @file_data_as_array, \%extracted_row_data;
-        }
-        $row_count++;
+    die "File headers not matching" unless $self->columns_map;
+
+    my @file_data_as_array;
+    while ( my $row = <$io> ) {
+        push @file_data_as_array, $self->_parse_row( $row );
     }
 
     return \@file_data_as_array;
+}
+
+sub _parse_header {
+    my ( $self, $row ) = @_;
+
+    chomp $row;
+    my @file_header = @{ $self->file_headers };
+
+    my %col_length_map;
+    foreach my $col_heading ( @file_header ) {
+        $row =~m{($col_heading\s+)}i;
+        $row =~m{($col_heading\s?)}i if not $1;
+
+        warn q{Columns doesn't seems to be matching} unless $1;
+        next unless $1;
+
+        my $table_column = $1;
+        my $table_column_length = length $table_column;
+        # remove leading and trailing spaces
+        $table_column =~s{^\s+|\s+$}{}g;
+        $col_length_map{ $table_column } = $table_column_length;
+    }
+    $self->{'options'}->{'col_length_map'} = \%col_length_map;
+    return 1;
+}
+
+sub _parse_row {
+    my ( $self, $row ) = @_;
+
+    chomp $row;
+    my @file_header    = @{ $self->file_headers };
+    my $col_length_map = $self->columns_map;
+    my $string_offset  = 0;
+    my %extracted_row_data;
+
+    foreach my $col ( @file_header ) {
+        my $col_length = $col_length_map->{ $col } || 0;
+        next unless $col_length;
+
+        my $col_data = substr $row, $string_offset, $col_length;
+        # remove leading and trailing spaces
+        $col_data =~s{^\s+|\s+$}{}g;
+        $extracted_row_data{ $col } = $col_data;
+        $string_offset += $col_length;
+    }
+    return \%extracted_row_data;
+}
+
+=head2 file_headers
+
+    Returns an arrayref of file headers
+
+=cut
+
+sub file_headers {
+    my ( $self ) = @_;
+    return unless $self->{'options'};
+    return unless ref $self->{'options'} eq 'HASH';
+    return $self->{'options'}->{'file_headers'};
+}
+
+=head2 columns_map
+
+    Returns an hashref of file headers with string offset
+
+=cut
+
+sub columns_map {
+    my ( $self ) = @_;
+    return unless $self->{'options'};
+    return unless ref $self->{'options'} eq 'HASH';
+
+    my $col_length_map = $self->{'options'}->{'col_length_map'};
+    return unless $col_length_map;
+    return unless scalar keys %$col_length_map;
+    return $col_length_map;
 }
 
 =head1 AUTHOR

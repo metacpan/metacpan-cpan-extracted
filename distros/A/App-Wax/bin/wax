@@ -7,7 +7,7 @@ use App::Wax;
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v2.2.1');
+use version; our $VERSION = version->declare('v2.3.0');
 
 exit App::Wax->new({ app_version => $VERSION })->run(\@ARGV);
 
@@ -172,7 +172,7 @@ Node.js man-page viewer
 
 As with any command-line programs that take URL parameters, care should be taken to ensure that
 special shell characters are suitably quoted. As a general rule, URLs that contain C<&>, C<~>,
-C<E<lt>>, C<E<gt>>, C<$> &c. should be quoted in shells on Unix-like systems and quoted with
+C<E<lt>>, C<E<gt>>, C<$> etc. should be quoted in shells on Unix-like systems and quoted with
 embedded escapes in Windows C<cmd>/C<command.exe>-like shells.
 
 It's worth checking that a program actually needs waxing. Many command-line programs already support
@@ -184,19 +184,21 @@ URLs e.g:
     $ perldoc -F "http://www.pair.com/~comdog/brian's_guide.pod"
     $ vim http://www.vim.org/
 
-&c.
+etc.
 
 =head1 VERSION
 
-2.2.1
+2.3.0
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<rlwrap|http://utopia.knoware.nl/~hlub/uck/rlwrap/#rlwrap>
+=item * L<The Parrot Virtual File System|http://ccl.cse.nd.edu/software/parrot/>
 
-=item * L<sshfs|http://fuse.sourceforge.net/sshfs.html>
+=item * L<SSHFS|https://github.com/libfuse/sshfs>
+
+=item * L<tmpin|https://github.com/sindresorhus/tmpin>
 
 =item * L<zsh completion script|https://github.com/chocolateboy/App-Wax/wiki/Zsh-completion-script>
 

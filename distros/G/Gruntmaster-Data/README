@@ -1,0 +1,43 @@
+Gruntmaster-Data version 6000.001
+=================================
+
+This distribution contains:
+
+* Gruntmaster::Data, a library for interacting with the
+  Gruntmaster 6000 database
+* gm, a command-line tool for viewing and editing the database
+* gruntmaster-opener, a command-line tool that reads an access log and
+  marks problems as being opened.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* App::Cmd
+* Date::Parse
+* DBI
+* DBIx::Simple
+* DBD::Pg
+* File::Slurp
+* IO::Prompter
+* JSON::MaybeXS
+* PerlX::Maybe
+* SQL::Abstract
+* Test::Deep (for testing)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "EPFL-Service-Open",
    "prereqs" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "EPFL::Service::Open" : {
          "file" : "lib/EPFL/Service/Open.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "url" : "https://github.com/epfl-devrun/epfl-service-open"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

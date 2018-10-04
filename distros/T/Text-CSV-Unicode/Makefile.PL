@@ -3,15 +3,14 @@ require 5.008;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'NAME' => 'Text::CSV::Unicode',
   'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'Text::CSV' => 1,
-                   'charnames' => 1,
-                   'Test::More' => 0
+                   'Test::More' => 0,
+                   'Text::CSV' => 1
                  },
-  'NAME' => 'Text::CSV::Unicode',
-  'EXE_FILES' => [],
-  'VERSION_FROM' => 'lib/Text/CSV/Unicode.pm'
+  'VERSION_FROM' => 'lib/Text/CSV/Unicode.pm',
+  'INSTALLDIRS' => 'site'
 )
 ;

@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "strict" => 0
   },
-  "VERSION" => "1.182680",
+  "VERSION" => "1.182770",
   "test" => {
     "TESTS" => "t/*.t t/Bio/*.t t/Bio/AutomatedAnnotation/*.t t/Bio/AutomatedAnnotation/CommandLine/*.t t/Bio/AutomatedAnnotation/External/*.t"
   }

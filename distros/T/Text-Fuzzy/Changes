@@ -1,5 +1,10 @@
 Revision history for perl module Text::Fuzzy
 
+0.28 2018-10-05
+
+* Simpler file structure (fewer C files in distro)
+* Internals improved for transposition matching
+
 0.27 2017-08-15
 
 * Safety measure for 64 bit systems

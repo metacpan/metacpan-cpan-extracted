@@ -4,7 +4,8 @@ use warnings;
 
 package Test::NoXS;
 # ABSTRACT: Prevent a module from loading its XS code
-our $VERSION = '1.03'; # VERSION
+
+our $VERSION = '1.04';
 
 use Module::CoreList 3.00;
 require DynaLoader;
@@ -92,7 +93,7 @@ Test::NoXS - Prevent a module from loading its XS code
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -172,11 +173,13 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTOR
 
+=for stopwords Sam Kaufman
+
 Sam Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by David Golden.
+This software is Copyright (c) 2018 by David Golden.
 
 This is free software, licensed under:
 

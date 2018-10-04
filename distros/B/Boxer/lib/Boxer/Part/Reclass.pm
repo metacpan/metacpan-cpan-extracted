@@ -24,11 +24,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.8
+Version v1.1.11
 
 =cut
 
-our $VERSION = version->declare("v1.1.8");
+our $VERSION = version->declare("v1.1.11");
 
 =head1 DESCRIPTION
 
@@ -64,22 +64,22 @@ has pkg => (
 	isa => ArrayRef [Str],
 );
 
-has pkg_auto => (
+has 'pkg-auto' => (
 	is  => 'ro',
 	isa => ArrayRef [Str],
 );
 
-has pkg_avoid => (
+has 'pkg-avoid' => (
 	is  => 'ro',
 	isa => ArrayRef [Str],
 );
 
-has pkg_nonfree => (
+has 'pkg-nonfree' => (
 	is  => 'ro',
 	isa => ArrayRef [Str],
 );
 
-has pkg_nonfree_auto => (
+has 'pkg-nonfree-auto' => (
 	is  => 'ro',
 	isa => ArrayRef [Str],
 );

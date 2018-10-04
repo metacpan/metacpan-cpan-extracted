@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 #-------------------------------------------------------------------------------
-# Write data in tabular text format
+# Write data in tabular text format.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
-# to escape an open parenthesis in a re use \x28, close is \x29
+# To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180924';
+our $VERSION = q(20181002);                                                     # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -144,7 +144,7 @@ sub parseCommandLineArguments(&$;$)                                             
   $sub->([@array], {%hash})
  }
 
-sub call(&@)                                                                    # Call the specified sub in a separate process, wait for it to complete, copy back the named L<our> variables, free the memory used.
+sub call(&;@)                                                                   # Call the specified sub in a separate process, wait for it to complete, copy back the named L<our> variables, free the memory used.
  {my ($sub, @our) = @_;                                                         # Sub to call, our variable names with preceding sigils to copy back
   my ($package)   = caller;                                                     # Caller's package
   unless(my $pid  = fork)                                                       # Fork - child
@@ -180,8 +180,9 @@ END
      }
     my $save = join "\n", @save;
     eval $save;                                                                 # Evaluate perl code
+    my $r = $@;                                                                 # Save result
     unlink $_ for @file;                                                        # Remove transfer files
-    confess "$@\n$save\n" if $@;                                                # Confess to any errors
+    confess "$r\n$save\n" if $r;                                                # Confess to any errors
    }
  }
 
@@ -867,7 +868,7 @@ sub convertDocxToFodt($$)                                                       
  }
 
 # Tests in: /home/phil/perl/z/unoconv/testCutOutImagesInFodtFile.pl
-sub cutOutImagesInFodtFile($$$)                                                 # Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:\m  <image href="$imageFile" outputclass="imageType">\mThis conversion requires that you have both L<Imagemagick> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:\m    sudo apt install sharutils  imagemagick unoconv\mParameters:
+sub cutOutImagesInFodtFile($$$)                                                 # Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:\m  <image href="$imageFile" outputclass="imageType">.\mThis conversion requires that you have both L<Imagemagick> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:\m    sudo apt install sharutils  imagemagick unoconv\mParameters:
  {my ($inputFile, $outputFolder, $imagePrefix) = @_;                            # Input file,  output folder for images, a prefix to be added to image file names
   my $source = readFile($inputFile);                                            # Read .fodt file
   say STDERR "Start image location in string of ", length($source);
@@ -1542,7 +1543,7 @@ my $lowerString  = join '', 'a'..'z', '0'..'9';
 
 sub boldString($)                                                               # Convert alphanumerics in a string to bold.
  {my ($string) = @_;                                                            # String to convert
-  eval qq(\$string =~ tr($normalString) ($boldString));                         # Some Perls cannot do this and complain but wI want to avoid excluding all the other methods in this file just because some perls cannot do this one operation.
+  eval qq(\$string =~ tr($normalString) ($boldString));                         # Some Perls cannot do this and complain but I want to avoid excluding all the other methods in this file just because some perls cannot do this one operation.
   $string
  }
 
@@ -1602,7 +1603,7 @@ sub subScriptStringUndo($)                                                      
 
 #D1 Cloud Cover                                                                 # Useful for operating across the cloud.
 
-sub makeDieConfess                                                              # Force die to confess where the death occurred
+sub makeDieConfess                                                              # Force die to confess where the death occurred.
  {$SIG{__DIE__} = sub
    {confess shift;
    };
@@ -1613,7 +1614,7 @@ sub ipAddressViaArp($)                                                          
   my ($line) = grep {/$hostName/i} qx(arp -a 2>&1);                             # Search for host name in arp output
   return undef unless $line;                                                    # No such host
   my (undef, $ip) = split / /, $line;                                           # Get ip address
-  $ip =~ s(\(|\)) ()gs;                                                         # Remove brackets around ip address
+  $ip =~ s(\x28|\x29) ()gs;                                                     # Remove brackets around ip address
   $ip                                                                           # Return ip address
  }
 
@@ -1698,7 +1699,7 @@ sub startProcess(&\%$)                                                          
  {my ($sub, $pids, $maximum) = @_;                                              # Sub to start, hash in which to record the process ids, maximum number of processes to run at a time
   while(keys(%$pids) >= $maximum)                                               # Wait for enough processes to terminate to bring us below the maximum number of processes allowed.
    {my $p = waitpid 0,0;
-    $$pids{$p} or confess "Pid $p not defined in ".dump($pids)."\n";
+#   $$pids{$p} or confess "Pid $p not defined in ".dump($pids)."\n";
     delete $$pids{$p}
    }
   if (my $pid = fork)                                                           # Create new process
@@ -1714,9 +1715,70 @@ sub waitForAllStartedProcessesToFinish(\%)                                      
  {my ($pids) = @_;                                                              # Hash of started process ids
   while(keys %$pids)                                                            # Remaining processes
    {my $p = waitpid 0,0;
-    $$pids{$p} or cluck "Pid $p not defined in ".dump($pids)."\n";
+#   $$pids{$p} or cluck "Pid $p not defined in ".dump($pids)."\n";
     delete $$pids{$p}
    }
+ }
+
+sub newProcessStarter($;$)                                                      # Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their results from the folder named by B<$transferArea>.
+ {my ($maximumNumberOfProcesses, $transferArea) = @_;                           # Maximum number of processes to start, optional folder to be used to save results.
+  genHash(q(Data::Table::Text::Starter),                                        # Process starter definition.
+    transferArea             => $transferArea,                                  # The name of the folder in which files transferring results from the child to the parent process will be stored.
+    maximumNumberOfProcesses => $maximumNumberOfProcesses,                      # The maximum number of processes to start in parallel at one time. If this limit is exceeded, the start of subsequent processes will be delayed until processes started earlier have finished.
+    pids                     => {},                                             #P A hash of pids representing processes started but not yet completed.
+    resultsArray             => [],                                             #P Consolidated array of results
+   );
+ }
+
+sub Data::Table::Text::Starter::start($$)                                       # Start a new process to run the specified B<$sub>.
+ {my ($starter, $sub) = @_;                                                     # Starter, sub to be run.
+
+  while(keys(%{$starter->pids}) >= $starter->maximumNumberOfProcesses)          # Wait for enough processes to terminate to bring us below the maximum number of processes allowed.
+   {$starter->waitOne;
+   }
+
+  if (my $pid = fork)                                                           # Create new process
+   {$starter->pids->{$pid}++                                                    # Update pids
+   }
+  else                                                                          # Run sub in new process
+   {my $results = &$sub;                                                        # Execute sub and address results
+    if (my $t = $starter->transferArea)                                         # Transfer folder
+     {my $f = fpe($t, $$, q(data));                                             # Transfer file in transfer folder
+      makePath($f);
+      my $e = qq(store [\$results], \$f);                                       # Store data
+      eval $e;                                                                  # Execute
+      $@ and confess "$@\n$e\n";                                                # Confess to any errors
+     }
+    exit;
+   }
+ }
+
+sub Data::Table::Text::Starter::waitOne($)                                      #P Wait for one process to finish and consolidate its results.
+ {my ($starter) = @_;                                                           # Starter
+
+  if (my $p = waitpid 0,0)                                                      # Wait for a process to finish
+   {if ($starter->pids->{$p})                                                   # One of ours and it has data to transfer
+     {if (my $t = $starter->transferArea)                                       # Transfer folder
+       {my $f = fpe($t, $p, q(data));                                           # Transfer file in transfer folder
+        my $d = retrieve $f;                                                    # Retrieve data
+        my $s = q(@);                                                           # At sign
+        my $e = qq(push ${s}{\$starter->resultsArray}, $s\$d);                  # Save data in parent
+        eval $e;                                                                # Execute
+        $@ and confess "$@\n$e\n";                                              # Confess to any errors
+       }
+     }
+    delete $starter->pids->{$p};
+   }
+ }
+
+sub Data::Table::Text::Starter::finish($)                                       # Wait for all started processes to finish and return their consolidated results.
+ {my ($starter) = @_;                                                           # Starter
+
+  while(keys(%{$starter->pids}) > 0)                                            # Wait for all started processes to terminate
+   {$starter->waitOne;
+   }
+
+  @{$starter->resultsArray}                                                     # Return results
  }
 
 sub newServiceIncarnation($;$)                                                  # Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
@@ -1922,10 +1984,10 @@ END
      }
    }
 
-  if (0)                                                                        # Bold method name
+  if (1)                                                                        # Bold method name in examples to make it easier to pick out with the slight disadvantage that the exampels can no longer be cut and paste without modification.
    {for my $m(sort keys %examples)
      {my $M = boldString($m);
-      s($m) ($M)g for @{$examples{$m}};
+      s(\b$m\b) ($M)g for @{$examples{$m}};
      }
    }
 
@@ -2072,14 +2134,14 @@ END
        "\n".$userFlags{$name}[0]."\n"          if $userFlags{$name}[0];
 
       push @method,                                                             # Add example
-       "\nExample:\n\n  $example"              if $example;
+       "\nB<Example:>\n\n  $example"           if $example;
 
       push @method,                                                             # Produces
        "\n$produces"                           if $produces;
 
       if (my $examples = $examples{$name})                                      # Format examples
        {if (my @examples = @$examples)
-         {push @method, '\nExample:\m', map {"  $_"} @examples;
+         {push @method, '\nB<Example:>\m', map {"  $_"} @examples;
          }
        }
 
@@ -2382,7 +2444,7 @@ loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines
 loadHash loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
 makeDieConfess
 makePath matchPath max microSecondsSinceEpoch min
-newServiceIncarnation numberOfLinesInFile numberOfLinesInString
+newServiceIncarnation newProcessStarter numberOfLinesInFile numberOfLinesInString
 nws
 overWriteFile owf
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
@@ -2399,7 +2461,7 @@ xxx XXX
 zzz
 ˢ
 );
-%EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
+%EXPORT_TAGS = (all=>[@EXPORT, @EXPORT_OK]);
 
 #D
 # podDocumentation
@@ -2582,66 +2644,66 @@ Date and timestamps as used in logs of long running commands.
 Year-monthNumber-day at hours:minute:seconds
 
 
-Example:
+B<Example:>
 
 
-  ok dateTimeStamp     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z);
-
+  ok 𝗱𝗮𝘁𝗲𝗧𝗶𝗺𝗲𝗦𝘁𝗮𝗺𝗽     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z);               
+  
 
 =head2 dateStamp()
 
 Year-monthName-day
 
 
-Example:
+B<Example:>
 
 
-  ok dateStamp         =~ m(\A\d{4}-\w{3}-\d\d\Z);
-
+  ok 𝗱𝗮𝘁𝗲𝗦𝘁𝗮𝗺𝗽         =~ m(\A\d{4}-\w{3}-\d\d\Z);                                
+  
 
 =head2 versionCode()
 
 YYYYmmdd-HHMMSS
 
 
-Example:
+B<Example:>
 
 
-  ok versionCode       =~ m(\A\d{8}-\d{6}\Z);
-
+  ok 𝘃𝗲𝗿𝘀𝗶𝗼𝗻𝗖𝗼𝗱𝗲       =~ m(\A\d{8}-\d{6}\Z);                                     
+  
 
 =head2 versionCodeDashed()
 
 YYYY-mm-dd-HH:MM:SS
 
 
-Example:
+B<Example:>
 
 
-  ok versionCodeDashed =~ m(\A\d{4}-\d\d-\d\d-\d\d:\d\d:\d\d\Z);
-
+  ok 𝘃𝗲𝗿𝘀𝗶𝗼𝗻𝗖𝗼𝗱𝗲𝗗𝗮𝘀𝗵𝗲𝗱 =~ m(\A\d{4}-\d\d-\d\d-\d\d:\d\d:\d\d\Z);                  
+  
 
 =head2 timeStamp()
 
 hours:minute:seconds
 
 
-Example:
+B<Example:>
 
 
-  ok timeStamp         =~ m(\A\d\d:\d\d:\d\d\Z);
-
+  ok 𝘁𝗶𝗺𝗲𝗦𝘁𝗮𝗺𝗽         =~ m(\A\d\d:\d\d:\d\d\Z);                                  
+  
 
 =head2 microSecondsSinceEpoch()
 
 Micro seconds since unix epoch.
 
 
-Example:
+B<Example:>
 
 
-  ok microSecondsSinceEpoch > 47*365*24*60*60*1e6;
-
+  ok 𝗺𝗶𝗰𝗿𝗼𝗦𝗲𝗰𝗼𝗻𝗱𝘀𝗦𝗶𝗻𝗰𝗲𝗘𝗽𝗼𝗰𝗵 > 47*365*24*60*60*1e6;                                
+  
 
 =head1 Command execution
 
@@ -2654,11 +2716,11 @@ Execute a shell command. The command to execute is specified as one or more stri
      Parameter  Description
   1  @cmd       Command to execute followed by an optional regular expression to test the results
 
-Example:
+B<Example:>
 
 
-   {ok xxx("echo aaa")       =~ /aaa/;
-
+   {ok 𝘅𝘅𝘅("echo aaa")       =~ /aaa/;                                            
+  
 
 =head2 yyy($)
 
@@ -2667,14 +2729,14 @@ Execute a block of shell commands line by line after removing comments - stop if
      Parameter  Description
   1  $cmd       Commands to execute separated by new lines
 
-Example:
+B<Example:>
 
 
-    ok !yyy <<END;
+    ok !𝘆𝘆𝘆 <<END;                                                                
   echo aaa
   echo bbb
   END
-
+  
 
 =head2 zzz($$$$)
 
@@ -2686,14 +2748,14 @@ Execute lines of commands after replacing new lines with && then check that the 
   3  $returnCode  Optional regular expression to check the acceptable return codes
   4  $message     Message of explanation if any of the checks fail
 
-Example:
+B<Example:>
 
 
-  ok zzz(<<END, qr(aaa\s*bbb)s);
+  ok 𝘇𝘇𝘇(<<END, qr(aaa\s*bbb)s);                                                  
   echo aaa
   echo bbb
   END
-
+  
 
 =head2 parseCommandLineArguments(&$$)
 
@@ -2704,21 +2766,21 @@ Classify the specified array of words referred to by B<$args> into positional an
   2  $args      List of arguments to parse
   3  $valid     Optional list of valid parameters else all parameters will be accepted
 
-Example:
+B<Example:>
 
 
-    my $r = parseCommandLineArguments {[@_]}
-
-     [qw( aaa bbb -c --dd --eee=EEEE -f=F), q(--gg=g g), q(--hh=h h)];
-
-    is_deeply $r,
-
-      [["aaa", "bbb"],
-
-       {c=>undef, dd=>undef, eee=>"EEEE", f=>"F", gg=>"g g", hh=>"h h"},
-
-      ];
-
+    my $r = 𝗽𝗮𝗿𝘀𝗲𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝗟𝗶𝗻𝗲𝗔𝗿𝗴𝘂𝗺𝗲𝗻𝘁𝘀 {[@_]}                                      
+  
+     [qw( aaa bbb -c --dd --eee=EEEE -f=F), q(--gg=g g), q(--hh=h h)];            
+  
+    is_deeply $r,                                                                 
+  
+      [["aaa", "bbb"],                                                            
+  
+       {c=>undef, dd=>undef, eee=>"EEEE", f=>"F", gg=>"g g", hh=>"h h"},          
+  
+      ];                                                                          
+  
 
 =head2 call(&@)
 
@@ -2728,22 +2790,22 @@ Call the specified sub in a separate process, wait for it to complete, copy back
   1  $sub       Sub to call
   2  @our       Our variable names with preceding sigils to copy back
 
-Example:
+B<Example:>
 
 
-  ˢ{our $a = q(1);
+  ˢ{our $a = q(1);                                                                
     our @a = qw(1);
     our %a = (a=>1);
     our $b = q(1);
     for(2..4) {
-      call {$a = $_  x 1000; $a[0] = $_; $a{a} = $_; $b = 2;} qw($a @a %a);
+      𝗰𝗮𝗹𝗹 {$a = $_  x 1000; $a[0] = $_; $a{a} = $_; $b = 2;} qw($a @a %a);
       ok $a    == $_ x 1000;
       ok $a[0] == $_;
       ok $a{a} == $_;
       ok $b    == 1;
      }
    };
-
+  
 
 =head1 Files and paths
 
@@ -2760,13 +2822,13 @@ Get the size of a file.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-    my $f = writeFile("zzz.data", "aaa");
-
-    ok fileSize($f) == 3;
-
+    my $f = writeFile("zzz.data", "aaa");                                         
+  
+    ok 𝗳𝗶𝗹𝗲𝗦𝗶𝘇𝗲($f) == 3;                                                         
+  
 
 =head3 fileModTime($)
 
@@ -2775,11 +2837,11 @@ Get the modified time of a file in seconds since the epoch.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok fileModTime($0) =~ m(\A\d+\Z)s;
-
+  ok 𝗳𝗶𝗹𝗲𝗠𝗼𝗱𝗧𝗶𝗺𝗲($0) =~ m(\A\d+\Z)s;                                              
+  
 
 =head3 fileOutOfDate(&$@)
 
@@ -2790,43 +2852,43 @@ Calls the specified sub once for each source file that is missing, then calls th
   2  $target    Target file
   3  @source    Source files
 
-Example:
+B<Example:>
 
 
-  if (0) {
+  if (0) {                                                                        
     my @Files = qw(a b c);
     my @files = (@Files, qw(d));
     writeFile($_, $_), sleep 1 for @Files;
-
+  
     my $a = '';
-    my @a = fileOutOfDate {$a .= $_} q(a), @files;
+    my @a = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {$a .= $_} q(a), @files;
     ok $a eq 'da';
     is_deeply [@a], [qw(d a)];
-
+  
     my $b = '';
-    my @b = fileOutOfDate {$b .= $_} q(b), @files;
+    my @b = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {$b .= $_} q(b), @files;
     ok $b eq 'db';
     is_deeply [@b], [qw(d b)];
-
+  
     my $c = '';
-    my @c = fileOutOfDate {$c .= $_} q(c), @files;
+    my @c = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {$c .= $_} q(c), @files;
     ok $c eq 'dc';
     is_deeply [@c], [qw(d c)];
-
+  
     my $d = '';
-    my @d = fileOutOfDate {$d .= $_} q(d), @files;
+    my @d = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {$d .= $_} q(d), @files;
     ok $d eq 'd';
     is_deeply [@d], [qw(d)];
-
-    my @A = fileOutOfDate {} q(a), @Files;
-    my @B = fileOutOfDate {} q(b), @Files;
-    my @C = fileOutOfDate {} q(c), @Files;
+  
+    my @A = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {} q(a), @Files;
+    my @B = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {} q(b), @Files;
+    my @C = 𝗳𝗶𝗹𝗲𝗢𝘂𝘁𝗢𝗳𝗗𝗮𝘁𝗲 {} q(c), @Files;
     is_deeply [@A], [qw(a)];
     is_deeply [@B], [qw(b)];
     is_deeply [@C], [];
     unlink for @Files;
    }
-
+  
 
 =head3 firstFileThatExists(@)
 
@@ -2835,13 +2897,13 @@ Returns the name of the first file that exists or B<undef> if none of the named 
      Parameter  Description
   1  @files     Files to check
 
-Example:
+B<Example:>
 
 
-    my $d = temporaryFolder;
-
-    ok $d eq firstFileThatExists("$d/$d", $d);
-
+    my $d = temporaryFolder;                                                      
+  
+    ok $d eq 𝗳𝗶𝗿𝘀𝘁𝗙𝗶𝗹𝗲𝗧𝗵𝗮𝘁𝗘𝘅𝗶𝘀𝘁𝘀("$d/$d", $d);                                    
+  
 
 =head2 Components
 
@@ -2858,22 +2920,22 @@ Create a file name from an array of file name components. If all the components 
      Parameter  Description
   1  @file      File name components
 
-Example:
+B<Example:>
 
 
-  if (1) {
-    ok filePath   (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
+  if (1) {                                                                             
+    ok 𝗳𝗶𝗹𝗲𝗣𝗮𝘁𝗵   (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
     ok filePathDir(qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
     ok filePathDir('', qw(aaa))              eq "aaa/";
     ok filePathDir('')                       eq "";
     ok filePathExt(qw(aaa xxx))              eq "aaa.xxx";
     ok filePathExt(qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
-
+  
     ok fpd        (qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
     ok fpf        (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
     ok fpe        (qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
    }
-
+  
 
 B<fpf> is a synonym for L<filePath|/filePath>.
 
@@ -2885,22 +2947,22 @@ Create a directory name from an array of file name components. If all the compon
      Parameter  Description
   1  @file      Directory name components
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                             
     ok filePath   (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
-    ok filePathDir(qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
-    ok filePathDir('', qw(aaa))              eq "aaa/";
-    ok filePathDir('')                       eq "";
+    ok 𝗳𝗶𝗹𝗲𝗣𝗮𝘁𝗵𝗗𝗶𝗿(qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
+    ok 𝗳𝗶𝗹𝗲𝗣𝗮𝘁𝗵𝗗𝗶𝗿('', qw(aaa))              eq "aaa/";
+    ok 𝗳𝗶𝗹𝗲𝗣𝗮𝘁𝗵𝗗𝗶𝗿('')                       eq "";
     ok filePathExt(qw(aaa xxx))              eq "aaa.xxx";
     ok filePathExt(qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
-
+  
     ok fpd        (qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
     ok fpf        (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
     ok fpe        (qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
    }
-
+  
 
 B<fpd> is a synonym for L<filePathDir|/filePathDir>.
 
@@ -2912,22 +2974,22 @@ Create a file name from an array of file name components the last of which is an
      Parameter  Description
   1  @File      File name components and extension
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                             
     ok filePath   (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
     ok filePathDir(qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
     ok filePathDir('', qw(aaa))              eq "aaa/";
     ok filePathDir('')                       eq "";
-    ok filePathExt(qw(aaa xxx))              eq "aaa.xxx";
-    ok filePathExt(qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
-
+    ok 𝗳𝗶𝗹𝗲𝗣𝗮𝘁𝗵𝗘𝘅𝘁(qw(aaa xxx))              eq "aaa.xxx";
+    ok 𝗳𝗶𝗹𝗲𝗣𝗮𝘁𝗵𝗘𝘅𝘁(qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
+  
     ok fpd        (qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
     ok fpf        (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
     ok fpe        (qw(aaa bbb xxx))          eq "aaa/bbb.xxx";
    }
-
+  
 
 B<fpe> is a synonym for L<filePathExt|/filePathExt>.
 
@@ -2943,11 +3005,11 @@ Get path from file name.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok fp (q(a/b/c.d.e))  eq q(a/b/);
-
+  ok 𝗳𝗽 (q(a/b/c.d.e))  eq q(a/b/);                                               
+  
 
 =head4 fpn($)
 
@@ -2956,11 +3018,11 @@ Remove extension from file name.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok fpn(q(a/b/c.d.e))  eq q(a/b/c.d);
-
+  ok 𝗳𝗽𝗻(q(a/b/c.d.e))  eq q(a/b/c.d);                                            
+  
 
 =head4 fn($)
 
@@ -2969,11 +3031,11 @@ Remove path and extension from file name.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok fn (q(a/b/c.d.e))  eq q(c.d);
-
+  ok 𝗳𝗻 (q(a/b/c.d.e))  eq q(c.d);                                                
+  
 
 =head4 fne($)
 
@@ -2982,11 +3044,11 @@ Remove path from file name.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok fne(q(a/b/c.d.e))  eq q(c.d.e);
-
+  ok 𝗳𝗻𝗲(q(a/b/c.d.e))  eq q(c.d.e);                                              
+  
 
 =head4 fe($)
 
@@ -2995,11 +3057,11 @@ Get extension of file name.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok fe (q(a/b/c.d.e))  eq q(e);
-
+  ok 𝗳𝗲 (q(a/b/c.d.e))  eq q(e);                                                  
+  
 
 =head4 checkFile($)
 
@@ -3008,21 +3070,21 @@ Return the name of the specified file if it exists, else confess the maximum ext
      Parameter  Description
   1  $file      File to check
 
-Example:
+B<Example:>
 
 
-    my $d = filePath   (my @d = qw(a b c d));
-
-    my $f = filePathExt(qw(a b c d e x));
-
-    my $F = filePathExt(qw(a b c e d));
-
-    createEmptyFile($f);
-
-    ok checkFile($d);
-
-    ok checkFile($f);
-
+    my $d = filePath   (my @d = qw(a b c d));                                      
+  
+    my $f = filePathExt(qw(a b c d e x));                                         
+  
+    my $F = filePathExt(qw(a b c e d));                                           
+  
+    createEmptyFile($f);                                                          
+  
+    ok 𝗰𝗵𝗲𝗰𝗸𝗙𝗶𝗹𝗲($d);                                                             
+  
+    ok 𝗰𝗵𝗲𝗰𝗸𝗙𝗶𝗹𝗲($f);                                                             
+  
 
 =head4 quoteFile($)
 
@@ -3031,11 +3093,11 @@ Quote a file name.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-  ok quoteFile(fpe(qw(a b c))) eq q("a/b.c");
-
+  ok 𝗾𝘂𝗼𝘁𝗲𝗙𝗶𝗹𝗲(fpe(qw(a b c))) eq q("a/b.c");                                     
+  
 
 =head4 removeFilePrefix($@)
 
@@ -3045,13 +3107,13 @@ Removes a file prefix from an array of files.
   1  $prefix    File prefix
   2  @files     Array of file names
 
-Example:
+B<Example:>
 
 
-  is_deeply [qw(a b)], [&removeFilePrefix(qw(a/ a/a a/b))];
-
-  is_deeply [qw(b)],   [&removeFilePrefix("a/", "a/b")];
-
+  is_deeply [qw(a b)], [&𝗿𝗲𝗺𝗼𝘃𝗲𝗙𝗶𝗹𝗲𝗣𝗿𝗲𝗳𝗶𝘅(qw(a/ a/a a/b))];                       
+  
+  is_deeply [qw(b)],   [&𝗿𝗲𝗺𝗼𝘃𝗲𝗙𝗶𝗹𝗲𝗣𝗿𝗲𝗳𝗶𝘅("a/", "a/b")];                          
+  
 
 =head4 titleToUniqueFileName($$$$)
 
@@ -3063,30 +3125,30 @@ Create a file name from a title that is unique within the set %uniqueNames.
   3  $suffix           File name suffix
   4  $ext              File extension
 
-Example:
+B<Example:>
 
 
-  ˢ{my $f = {};
-    ok q(a_p.txt)   eq &titleToUniqueFileName($f, qw(a p txt));
-    ok q(a_p_2.txt) eq &titleToUniqueFileName($f, qw(a p txt));
-    ok q(a_p_3.txt) eq &titleToUniqueFileName($f, qw(a p txt));
-    ok q(a_q.txt)   eq &titleToUniqueFileName($f, qw(a q txt));
-    ok q(a_q_5.txt) eq &titleToUniqueFileName($f, qw(a q txt));
-    ok q(a_q_6.txt) eq &titleToUniqueFileName($f, qw(a q txt));
+  ˢ{my $f = {};                                                                   
+    ok q(a_p.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
+    ok q(a_p_2.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
+    ok q(a_p_3.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
+    ok q(a_q.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
+    ok q(a_q_5.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
+    ok q(a_q_6.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
    };
-
-    ok q(a_p.txt)   eq &titleToUniqueFileName($f, qw(a p txt));
-
-    ok q(a_p_2.txt) eq &titleToUniqueFileName($f, qw(a p txt));
-
-    ok q(a_p_3.txt) eq &titleToUniqueFileName($f, qw(a p txt));
-
-    ok q(a_q.txt)   eq &titleToUniqueFileName($f, qw(a q txt));
-
-    ok q(a_q_5.txt) eq &titleToUniqueFileName($f, qw(a q txt));
-
-    ok q(a_q_6.txt) eq &titleToUniqueFileName($f, qw(a q txt));
-
+  
+    ok q(a_p.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
+  
+    ok q(a_p_2.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
+  
+    ok q(a_p_3.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
+  
+    ok q(a_q.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
+  
+    ok q(a_q_5.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
+  
+    ok q(a_q_6.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
+  
 
 =head2 Position
 
@@ -3097,22 +3159,22 @@ Position in the file system.
 Get the current working directory.
 
 
-Example:
+B<Example:>
 
 
-    currentDirectory;
-
+    𝗰𝘂𝗿𝗿𝗲𝗻𝘁𝗗𝗶𝗿𝗲𝗰𝘁𝗼𝗿𝘆;                                                             
+  
 
 =head3 currentDirectoryAbove()
 
 The path to the folder above the current working folder.
 
 
-Example:
+B<Example:>
 
 
-    currentDirectoryAbove;
-
+    𝗰𝘂𝗿𝗿𝗲𝗻𝘁𝗗𝗶𝗿𝗲𝗰𝘁𝗼𝗿𝘆𝗔𝗯𝗼𝘃𝗲;                                                        
+  
 
 =head3 parseFileName($)
 
@@ -3121,22 +3183,22 @@ Parse a file name into (path, name, extension).
      Parameter  Description
   1  $file      File name to parse
 
-Example:
+B<Example:>
 
 
-    is_deeply [parseFileName "a.b/c.d.e"],            [qw(a.b/ c.d e)];
-
+    is_deeply [𝗽𝗮𝗿𝘀𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲 "a.b/c.d.e"],            [qw(a.b/ c.d e)];           
+  
 
 =head3 fullFileName()
 
 Full name of a file.
 
 
-Example:
+B<Example:>
 
 
-    fullFileName(fpe(qw(a txt)));
-
+    𝗳𝘂𝗹𝗹𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲(fpe(qw(a txt)));                                                 
+  
 
 =head3 absFromAbsPlusRel($$)
 
@@ -3146,13 +3208,13 @@ Create an absolute file from an absolute file and a relative file.
   1  $a         Absolute file name
   2  $f         Relative file name
 
-Example:
+B<Example:>
 
 
-  ok "/home/la/perl/aaa.pl"   eq absFromAbsPlusRel("/home/la/perl/bbb",      "aaa.pl");
-
-  ok "/home/la/perl/aaa.pl"   eq absFromAbsPlusRel("/home/il/perl/bbb.pl",   "../../la/perl/aaa.pl");
-
+  ok "/home/la/perl/aaa.pl"   eq 𝗮𝗯𝘀𝗙𝗿𝗼𝗺𝗔𝗯𝘀𝗣𝗹𝘂𝘀𝗥𝗲𝗹("/home/la/perl/bbb",      "aaa.pl");                 
+  
+  ok "/home/la/perl/aaa.pl"   eq 𝗮𝗯𝘀𝗙𝗿𝗼𝗺𝗔𝗯𝘀𝗣𝗹𝘂𝘀𝗥𝗲𝗹("/home/il/perl/bbb.pl",   "../../la/perl/aaa.pl");    
+  
 
 =head3 relFromAbsAgainstAbs($$)
 
@@ -3162,13 +3224,13 @@ Derive a relative file name for the first absolute file name relative to the sec
   1  $f         Absolute file to be made relative
   2  $a         Absolute file name to make relative to.
 
-Example:
+B<Example:>
 
 
-  ok "bbb.pl"                 eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/perl/aaa.pl");
-
-  ok "../perl/bbb.pl"         eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/java/aaa.jv");
-
+  ok "bbb.pl"                 eq 𝗿𝗲𝗹𝗙𝗿𝗼𝗺𝗔𝗯𝘀𝗔𝗴𝗮𝗶𝗻𝘀𝘁𝗔𝗯𝘀("/home/la/perl/bbb.pl", "/home/la/perl/aaa.pl");  
+  
+  ok "../perl/bbb.pl"         eq 𝗿𝗲𝗹𝗙𝗿𝗼𝗺𝗔𝗯𝘀𝗔𝗴𝗮𝗶𝗻𝘀𝘁𝗔𝗯𝘀("/home/la/perl/bbb.pl", "/home/la/java/aaa.jv");  
+  
 
 =head2 Temporary
 
@@ -3179,22 +3241,22 @@ Temporary files and folders
 Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
 
-Example:
+B<Example:>
 
 
-    my $f = temporaryFile;
-
+    my $f = 𝘁𝗲𝗺𝗽𝗼𝗿𝗮𝗿𝘆𝗙𝗶𝗹𝗲;                                                        
+  
 
 =head3 temporaryFolder()
 
 Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
+    my $D = 𝘁𝗲𝗺𝗽𝗼𝗿𝗮𝗿𝘆𝗙𝗼𝗹𝗱𝗲𝗿;                                                            
+  
 
 B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder>.
 
@@ -3211,17 +3273,17 @@ Find all the files under a folder and optionally filter the selected files with 
   1  $dir       Folder to start the search with
   2  $filter    Optional regular expression to filter files
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
-    my $d = fpd($D, q(ddd));
-
-    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
-
-    is_deeply [sort map {fne $_} findFiles($d, qr(txt\Z))], [qw(a.txt b.txt c.txt)];
-
+    my $D = temporaryFolder;                                                            
+  
+    my $d = fpd($D, q(ddd));                                                                             
+  
+    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                       
+  
+    is_deeply [sort map {fne $_} 𝗳𝗶𝗻𝗱𝗙𝗶𝗹𝗲𝘀($d, qr(txt\Z))], [qw(a.txt b.txt c.txt)];                                          
+  
 
 =head3 findDirs($$)
 
@@ -3231,17 +3293,17 @@ Find all the folders under a folder and optionally filter the selected folders w
   1  $dir       Folder to start the search with
   2  $filter    Optional regular expression to filter files
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
-    my $d = fpd($D, q(ddd));
-
-    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
-
-    is_deeply [findDirs($D)], [$D, $d];
-
+    my $D = temporaryFolder;                                                            
+  
+    my $d = fpd($D, q(ddd));                                                                             
+  
+    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                       
+  
+    is_deeply [𝗳𝗶𝗻𝗱𝗗𝗶𝗿𝘀($D)], [$D, $d];                                                                                                                                                           
+  
 
 =head3 fileList($)
 
@@ -3250,19 +3312,19 @@ Files that match a given search pattern handed to bsd_glob.
      Parameter  Description
   1  $pattern   Search pattern
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
-    my $d = fpd($D, q(ddd));
-
-    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
-
-    is_deeply [sort map {fne $_} fileList("$d/*.txt")],
-
-              ["a.txt", "b.txt", "c.txt"];
-
+    my $D = temporaryFolder;                                                            
+  
+    my $d = fpd($D, q(ddd));                                                                             
+  
+    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                       
+  
+    is_deeply [sort map {fne $_} 𝗳𝗶𝗹𝗲𝗟𝗶𝘀𝘁("$d/*.txt")],                                                                             
+  
+              ["a.txt", "b.txt", "c.txt"];                                                                                          
+  
 
 =head3 searchDirectoryTreesForMatchingFiles(@)
 
@@ -3271,19 +3333,19 @@ Search the specified directory trees for the files (not folders) that match the 
      Parameter              Description
   1  @foldersandExtensions  Mixture of folder names and extensions
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
-    my $d = fpd($D, q(ddd));
-
-    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
-
-    is_deeply [sort map {fne $_} searchDirectoryTreesForMatchingFiles($d)],
-
-              ["a.txt", "b.txt", "c.txt"];
-
+    my $D = temporaryFolder;                                                            
+  
+    my $d = fpd($D, q(ddd));                                                                             
+  
+    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                       
+  
+    is_deeply [sort map {fne $_} 𝘀𝗲𝗮𝗿𝗰𝗵𝗗𝗶𝗿𝗲𝗰𝘁𝗼𝗿𝘆𝗧𝗿𝗲𝗲𝘀𝗙𝗼𝗿𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗙𝗶𝗹𝗲𝘀($d)],                                                                                     
+  
+              ["a.txt", "b.txt", "c.txt"];                                                                                                                 
+  
 
 =head3 matchPath($)
 
@@ -3292,13 +3354,13 @@ Given an absolute path find out how much of the path actually exists.
      Parameter  Description
   1  $file      File name
 
-Example:
+B<Example:>
 
 
-    my $d = filePath   (my @d = qw(a b c d));
-
-    ok matchPath($d) eq $d;
-
+    my $d = filePath   (my @d = qw(a b c d));                                      
+  
+    ok 𝗺𝗮𝘁𝗰𝗵𝗣𝗮𝘁𝗵($d) eq $d;                                                       
+  
 
 =head3 findFileWithExtension($@)
 
@@ -3308,15 +3370,15 @@ Find the first extension from the specified extensions that produces a file that
   1  $file      File name minus extensions
   2  @ext       Possible extensions
 
-Example:
+B<Example:>
 
 
-    my $f = createEmptyFile(fpe(my $d = temporaryFolder, qw(a jpg)));
-
-    my $F = findFileWithExtension(fpf($d, q(a)), qw(txt data jpg));
-
-    ok $F eq "jpg";
-
+    my $f = createEmptyFile(fpe(my $d = temporaryFolder, qw(a jpg)));             
+  
+    my $F = 𝗳𝗶𝗻𝗱𝗙𝗶𝗹𝗲𝗪𝗶𝘁𝗵𝗘𝘅𝘁𝗲𝗻𝘀𝗶𝗼𝗻(fpf($d, q(a)), qw(txt data jpg));               
+  
+    ok $F eq "jpg";                                                               
+  
 
 =head3 clearFolder($$)
 
@@ -3326,21 +3388,21 @@ Remove all the files and folders under and including the specified folder as lon
   1  $folder      Folder
   2  $limitCount  Maximum number of files to remove to limit damage
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
-    my $d = fpd($D, q(ddd));
-
-    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
-
-    clearFolder($D, 5);
-
-    ok !-e $_ for @f;
-
-    ok !-d $D;
-
+    my $D = temporaryFolder;                                                            
+  
+    my $d = fpd($D, q(ddd));                                                                             
+  
+    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);                                       
+  
+    𝗰𝗹𝗲𝗮𝗿𝗙𝗼𝗹𝗱𝗲𝗿($D, 5);                                                                                               
+  
+    ok !-e $_ for @f;                                                                                                 
+  
+    ok !-d $D;                                                                                                        
+  
 
 =head2 Read and write files
 
@@ -3353,21 +3415,21 @@ Read a file containing unicode in utf8.
      Parameter  Description
   1  $file      Name of file to read
 
-Example:
+B<Example:>
 
 
-    my $f = writeFile(undef, "aaa");
-
-    my $s = readFile($f);
-
-    ok $s eq "aaa";
-
-    appendFile($f, "bbb");
-
-    my $S = readFile($f);
-
-    ok $S eq "aaabbb";
-
+    my $f = writeFile(undef, "aaa");                                                
+  
+    my $s = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲($f);                                                           
+  
+    ok $s eq "aaa";                                                                 
+  
+    appendFile($f, "bbb");                                                          
+  
+    my $S = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲($f);                                                           
+  
+    ok $S eq "aaabbb";                                                              
+  
 
 =head3 evalFile($)
 
@@ -3376,15 +3438,15 @@ Read a file containing unicode in utf8, evaluate it, confess to any errors and t
      Parameter  Description
   1  $file      File to read
 
-Example:
+B<Example:>
 
 
-    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);
-
-    my $s = evalFile($f);
-
-    is_deeply $s, [qw(aaa bbb ccc)];
-
+    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);                                     
+  
+    my $s = 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲($f);                                                          
+  
+    is_deeply $s, [qw(aaa bbb ccc)];                                               
+  
 
 =head3 evalGZipFile($)
 
@@ -3393,18 +3455,18 @@ Read a file containing compressed utf8, evaluate it, confess to any errors or re
      Parameter  Description
   1  $file      File to read
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                         
     my $d = [1, 2, 3=>{a=>4, b=>5}];
     my $file = dumpGZipFile(q(zzz.zip), $d);
     ok -e $file;
-    my $D = evalGZipFile($file);
+    my $D = 𝗲𝘃𝗮𝗹𝗚𝗭𝗶𝗽𝗙𝗶𝗹𝗲($file);
     is_deeply $d, $D;
     unlink $file;
    }
-
+  
 
 =head3 readBinaryFile($)
 
@@ -3413,15 +3475,15 @@ Read binary file - a file whose contents are not to be interpreted as unicode.
      Parameter  Description
   1  $file      File to read
 
-Example:
+B<Example:>
 
 
-    my $f = writeBinaryFile(undef, 0xff x 8);
-
-    my $s = readBinaryFile($f);
-
-    ok $s eq 0xff x 8;
-
+    my $f = writeBinaryFile(undef, 0xff x 8);                                      
+  
+    my $s = 𝗿𝗲𝗮𝗱𝗕𝗶𝗻𝗮𝗿𝘆𝗙𝗶𝗹𝗲($f);                                                    
+  
+    ok $s eq 0xff x 8;                                                             
+  
 
 =head3 readGZipFile($)
 
@@ -3430,19 +3492,19 @@ Read the specified B<$file>, containing compressed utf8, through gzip
      Parameter  Description
   1  $file      File to read.
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                         
     my $s = '𝝰'x1e3;
     my $file = writeGZipFile(q(zzz.zip), $s);
     ok -e $file;
-    my $S = readGZipFile($file);
+    my $S = 𝗿𝗲𝗮𝗱𝗚𝗭𝗶𝗽𝗙𝗶𝗹𝗲($file);
     ok $s eq $S;
     ok length($s) == length($S);
     unlink $file;
    }
-
+  
 
 =head3 makePath($)
 
@@ -3451,19 +3513,19 @@ Make the path for the specified file name or folder.
      Parameter  Description
   1  $file      File
 
-Example:
+B<Example:>
 
 
-    my $d = fpd(my $D = temporaryDirectory, qw(a));
-
-    my $f = fpe($d, qw(bbb txt));
-
-    ok !-d $d;
-
-    makePath($f);
-
-    ok -d $d;
-
+    my $d = fpd(my $D = temporaryDirectory, qw(a));                                
+  
+    my $f = fpe($d, qw(bbb txt));                                                 
+  
+    ok !-d $d;                                                                    
+  
+    𝗺𝗮𝗸𝗲𝗣𝗮𝘁𝗵($f);                                                                 
+  
+    ok -d $d;                                                                     
+  
 
 =head3 overWriteFile($$)
 
@@ -3473,13 +3535,13 @@ Write a unicode utf8 string to a file after creating a path to the file if neces
   1  $file      File to write to or B<undef> for a temporary file
   2  $string    Unicode string to write
 
-Example:
+B<Example:>
 
 
-    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);
-
-    ok overWriteFile($f, q({qw(aaa bbb ccc)]));
-
+    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);                                     
+  
+    ok 𝗼𝘃𝗲𝗿𝗪𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲($f, q({qw(aaa bbb ccc)]));                                   
+  
 
 B<owf> is a synonym for L<overWriteFile|/overWriteFile>.
 
@@ -3492,21 +3554,21 @@ Write a unicode utf8 string to a new file that does not already exist after crea
   1  $file      New file to write to or B<undef> for a temporary file
   2  $string    String to write
 
-Example:
+B<Example:>
 
 
-    my $f = writeFile(undef, "aaa");
-
-    my $s = readFile($f);
-
-    ok $s eq "aaa";
-
-    appendFile($f, "bbb");
-
-    my $S = readFile($f);
-
-    ok $S eq "aaabbb";
-
+    my $f = 𝘄𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲(undef, "aaa");                                                
+  
+    my $s = readFile($f);                                                           
+  
+    ok $s eq "aaa";                                                                 
+  
+    appendFile($f, "bbb");                                                          
+  
+    my $S = readFile($f);                                                           
+  
+    ok $S eq "aaabbb";                                                              
+  
 
 =head3 dumpFile($$)
 
@@ -3516,15 +3578,15 @@ Dump a data structure to a file
   1  $file      File to write to or B<undef> for a temporary file
   2  $struct    Address of data structure to write
 
-Example:
+B<Example:>
 
 
-    my $f = dumpFile(undef, [qw(aaa bbb ccc)]);
-
-    my $s = evalFile($f);
-
-    is_deeply $s, [qw(aaa bbb ccc)];
-
+    my $f = 𝗱𝘂𝗺𝗽𝗙𝗶𝗹𝗲(undef, [qw(aaa bbb ccc)]);                                     
+  
+    my $s = evalFile($f);                                                          
+  
+    is_deeply $s, [qw(aaa bbb ccc)];                                               
+  
 
 =head3 writeGZipFile($$)
 
@@ -3534,19 +3596,19 @@ Write a unicode utf8 string through gzip to a file.
   1  $file      File to write to
   2  $string    String to write
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                         
     my $s = '𝝰'x1e3;
-    my $file = writeGZipFile(q(zzz.zip), $s);
+    my $file = 𝘄𝗿𝗶𝘁𝗲𝗚𝗭𝗶𝗽𝗙𝗶𝗹𝗲(q(zzz.zip), $s);
     ok -e $file;
     my $S = readGZipFile($file);
     ok $s eq $S;
     ok length($s) == length($S);
     unlink $file;
    }
-
+  
 
 =head3 dumpGZipFile($$)
 
@@ -3556,18 +3618,18 @@ Write a data structure through B<gzip> to a file.
   1  $file      File to write
   2  $data      Reference to data
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                         
     my $d = [1, 2, 3=>{a=>4, b=>5}];
-    my $file = dumpGZipFile(q(zzz.zip), $d);
+    my $file = 𝗱𝘂𝗺𝗽𝗚𝗭𝗶𝗽𝗙𝗶𝗹𝗲(q(zzz.zip), $d);
     ok -e $file;
     my $D = evalGZipFile($file);
     is_deeply $d, $D;
     unlink $file;
    }
-
+  
 
 =head3 writeFiles($$)
 
@@ -3577,27 +3639,27 @@ Write the values of a hash into files identified by the key of each value using 
   1  $hash      Hash of key value pairs representing files and data
   2  $folder    Optional folder to contain files else the current folder
 
-Example:
+B<Example:>
 
 
-    my $h =
-
-     {"aaa/1.txt"=>"1111",
-
-      "aaa/2.txt"=>"2222",
-
-     };
-
-    writeFiles($h);
-
-    for(sort keys %$h)
-
-     {ok -e $_;
-
-      ok readFile($_) eq $h->{$_};
-
-     }
-
+    my $h =                                                                       
+  
+     {"aaa/1.txt"=>"1111",                                                        
+  
+      "aaa/2.txt"=>"2222",                                                        
+  
+     };                                                                           
+  
+    𝘄𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲𝘀($h);                                                               
+  
+    for(sort keys %$h)                                                            
+  
+     {ok -e $_;                                                                   
+  
+      ok readFile($_) eq $h->{$_};                                                
+  
+     }                                                                            
+  
 
 =head3 appendFile($$)
 
@@ -3607,21 +3669,21 @@ Append a unicode utf8 string to a file, possibly creating the file and the path 
   1  $file      File to append to
   2  $string    String to append
 
-Example:
+B<Example:>
 
 
-    my $f = writeFile(undef, "aaa");
-
-    my $s = readFile($f);
-
-    ok $s eq "aaa";
-
-    appendFile($f, "bbb");
-
-    my $S = readFile($f);
-
-    ok $S eq "aaabbb";
-
+    my $f = writeFile(undef, "aaa");                                                
+  
+    my $s = readFile($f);                                                           
+  
+    ok $s eq "aaa";                                                                 
+  
+    𝗮𝗽𝗽𝗲𝗻𝗱𝗙𝗶𝗹𝗲($f, "bbb");                                                          
+  
+    my $S = readFile($f);                                                           
+  
+    ok $S eq "aaabbb";                                                              
+  
 
 =head3 writeBinaryFile($$)
 
@@ -3631,15 +3693,15 @@ Write a non unicode string to a file in after creating a path to the file if nec
   1  $file      File to write to or B<undef> for a temporary file
   2  $string    Non unicode string to write
 
-Example:
+B<Example:>
 
 
-    my $f = writeBinaryFile(undef, 0xff x 8);
-
-    my $s = readBinaryFile($f);
-
-    ok $s eq 0xff x 8;
-
+    my $f = 𝘄𝗿𝗶𝘁𝗲𝗕𝗶𝗻𝗮𝗿𝘆𝗙𝗶𝗹𝗲(undef, 0xff x 8);                                      
+  
+    my $s = readBinaryFile($f);                                                    
+  
+    ok $s eq 0xff x 8;                                                             
+  
 
 =head3 createEmptyFile($)
 
@@ -3648,17 +3710,17 @@ Create an empty file - L<writeFile|/writeFile> complains if no data is written t
      Parameter  Description
   1  $file      File to create or B<undef> for a temporary file
 
-Example:
+B<Example:>
 
 
-    my $D = temporaryFolder;
-
-    my $d = fpd($D, q(ddd));
-
-    my @f = map {createEmptyFile(fpe($d, $_, qw(txt)))} qw(a b c);
-
-    is_deeply [sort map {fne $_} findFiles($d, qr(txt\Z))], [qw(a.txt b.txt c.txt)];
-
+    my $D = temporaryFolder;                                                            
+  
+    my $d = fpd($D, q(ddd));                                                                             
+  
+    my @f = map {𝗰𝗿𝗲𝗮𝘁𝗲𝗘𝗺𝗽𝘁𝘆𝗙𝗶𝗹𝗲(fpe($d, $_, qw(txt)))} qw(a b c);                                       
+  
+    is_deeply [sort map {fne $_} findFiles($d, qr(txt\Z))], [qw(a.txt b.txt c.txt)];                                          
+  
 
 =head3 numberOfLinesInFile($)
 
@@ -3667,15 +3729,15 @@ The number of lines in a file
      Parameter  Description
   1  $file      File
 
-Example:
+B<Example:>
 
 
     my $f = writeFile(undef, "a
 b
-");
-
-    ok numberOfLinesInFile($f) == 2;
-
+");                                           
+  
+    ok 𝗻𝘂𝗺𝗯𝗲𝗿𝗢𝗳𝗟𝗶𝗻𝗲𝘀𝗜𝗻𝗙𝗶𝗹𝗲($f) == 2;                                              
+  
 
 =head1 Images
 
@@ -3688,11 +3750,11 @@ Return (width, height) of an image obtained via L<Imagemagick|/https://www.image
      Parameter  Description
   1  $image     File containing image
 
-Example:
+B<Example:>
 
 
-    my ($width, $height) = imageSize(fpe(qw(a image jpg)));
-
+    my ($width, $height) = 𝗶𝗺𝗮𝗴𝗲𝗦𝗶𝘇𝗲(fpe(qw(a image jpg)));                       
+  
 
 =head2 convertImageToJpx($$$)
 
@@ -3703,11 +3765,11 @@ Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/
   2  $target    Target folder (as multiple files will be created)
   3  $Size      Optional size of each tile - defaults to 256
 
-Example:
+B<Example:>
 
 
-    convertImageToJpx(fpe(qw(a image jpg)), fpe(qw(a image jpg)), 256);
-
+    𝗰𝗼𝗻𝘃𝗲𝗿𝘁𝗜𝗺𝗮𝗴𝗲𝗧𝗼𝗝𝗽𝘅(fpe(qw(a image jpg)), fpe(qw(a image jpg)), 256);           
+  
 
 =head2 convertDocxToFodt($$)
 
@@ -3721,17 +3783,17 @@ Parameters:
   1  $inputFile   Input file
   2  $outputFile  Output file
 
-Example:
+B<Example:>
 
 
-    convertDocxToFodt(fpe(qw(a docx)), fpe(qw(a fodt)));
-
+    𝗰𝗼𝗻𝘃𝗲𝗿𝘁𝗗𝗼𝗰𝘅𝗧𝗼𝗙𝗼𝗱𝘁(fpe(qw(a docx)), fpe(qw(a fodt)));                          
+  
 
 =head2 cutOutImagesInFodtFile($$$)
 
 Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
-  <image href="$imageFile" outputclass="imageType">
+  <image href="$imageFile" outputclass="imageType">.
 
 This conversion requires that you have both L<Imagemagick|/https://www.imagemagick.org/script/index.php> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:
 
@@ -3744,11 +3806,11 @@ Parameters:
   2  $outputFolder  Output folder for images
   3  $imagePrefix   A prefix to be added to image file names
 
-Example:
+B<Example:>
 
 
-    cutOutImagesInFodtFile(fpe(qw(source fodt)), fpd(qw(images)), q(image));
-
+    𝗰𝘂𝘁𝗢𝘂𝘁𝗜𝗺𝗮𝗴𝗲𝘀𝗜𝗻𝗙𝗼𝗱𝘁𝗙𝗶𝗹𝗲(fpe(qw(source fodt)), fpd(qw(images)), q(image));      
+  
 
 =head1 Encoding and Decoding
 
@@ -3761,15 +3823,15 @@ Encode Perl to Json.
      Parameter  Description
   1  $string    Data to encode
 
-Example:
+B<Example:>
 
 
-    my $A = encodeJson(my $a = {a=>1,b=>2, c=>[1..2]});
-
-    my $b = decodeJson($A);
-
-    is_deeply $a, $b;
-
+    my $A = 𝗲𝗻𝗰𝗼𝗱𝗲𝗝𝘀𝗼𝗻(my $a = {a=>1,b=>2, c=>[1..2]});                            
+  
+    my $b = decodeJson($A);                                                        
+  
+    is_deeply $a, $b;                                                              
+  
 
 =head2 decodeJson($)
 
@@ -3778,15 +3840,15 @@ Decode Perl from Json.
      Parameter  Description
   1  $string    Data to decode
 
-Example:
+B<Example:>
 
 
-    my $A = encodeJson(my $a = {a=>1,b=>2, c=>[1..2]});
-
-    my $b = decodeJson($A);
-
-    is_deeply $a, $b;
-
+    my $A = encodeJson(my $a = {a=>1,b=>2, c=>[1..2]});                            
+  
+    my $b = 𝗱𝗲𝗰𝗼𝗱𝗲𝗝𝘀𝗼𝗻($A);                                                        
+  
+    is_deeply $a, $b;                                                              
+  
 
 =head2 encodeBase64($)
 
@@ -3795,15 +3857,15 @@ Encode a string in base 64.
      Parameter  Description
   1  $string    String to encode
 
-Example:
+B<Example:>
 
 
-    my $A = encodeBase64(my $a = "Hello World" x 10);
-
-    my $b = decodeBase64($A);
-
-    ok $a eq $b;
-
+    my $A = 𝗲𝗻𝗰𝗼𝗱𝗲𝗕𝗮𝘀𝗲𝟲𝟰(my $a = "Hello World" x 10);                              
+  
+    my $b = decodeBase64($A);                                                      
+  
+    ok $a eq $b;                                                                   
+  
 
 =head2 decodeBase64($)
 
@@ -3812,15 +3874,15 @@ Decode a string in base 64.
      Parameter  Description
   1  $string    String to decode
 
-Example:
+B<Example:>
 
 
-    my $A = encodeBase64(my $a = "Hello World" x 10);
-
-    my $b = decodeBase64($A);
-
-    ok $a eq $b;
-
+    my $A = encodeBase64(my $a = "Hello World" x 10);                              
+  
+    my $b = 𝗱𝗲𝗰𝗼𝗱𝗲𝗕𝗮𝘀𝗲𝟲𝟰($A);                                                      
+  
+    ok $a eq $b;                                                                   
+  
 
 =head2 convertUnicodeToXml($)
 
@@ -3829,11 +3891,11 @@ Convert a string with unicode points that are not directly representable in asci
      Parameter  Description
   1  $s         String to convert
 
-Example:
+B<Example:>
 
 
-  ok convertUnicodeToXml('setenta e três') eq q(setenta e tr&#234;s);
-
+  ok 𝗰𝗼𝗻𝘃𝗲𝗿𝘁𝗨𝗻𝗶𝗰𝗼𝗱𝗲𝗧𝗼𝗫𝗺𝗹('setenta e três') eq q(setenta e tr&#234;s);             
+  
 
 =head1 Numbers
 
@@ -3846,17 +3908,17 @@ Test whether a number is a power of two, return the power if it is else B<undef>
      Parameter  Description
   1  $n         Number to check
 
-Example:
+B<Example:>
 
 
-  ok  powerOfTwo(1) == 0;
-
-  ok  powerOfTwo(2) == 1;
-
-  ok !powerOfTwo(3);
-
-  ok  powerOfTwo(4) == 2;
-
+  ok  𝗽𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(1) == 0;                                                         
+  
+  ok  𝗽𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(2) == 1;                                                         
+  
+  ok !𝗽𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(3);                                                              
+  
+  ok  𝗽𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(4) == 2;                                                         
+  
 
 =head2 containingPowerOfTwo($)
 
@@ -3865,17 +3927,17 @@ Find log two of the lowest power of two greater than or equal to a number.
      Parameter  Description
   1  $n         Number to check
 
-Example:
+B<Example:>
 
 
-  ok  containingPowerOfTwo(1) == 0;
-
-  ok  containingPowerOfTwo(2) == 1;
-
-  ok  containingPowerOfTwo(3) == 2;
-
-  ok  containingPowerOfTwo(4) == 2;
-
+  ok  𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝗶𝗻𝗴𝗣𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(1) == 0;                                               
+  
+  ok  𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝗶𝗻𝗴𝗣𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(2) == 1;                                               
+  
+  ok  𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝗶𝗻𝗴𝗣𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(3) == 2;                                               
+  
+  ok  𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝗶𝗻𝗴𝗣𝗼𝘄𝗲𝗿𝗢𝗳𝗧𝘄𝗼(4) == 2;                                               
+  
 
 =head1 Sets
 
@@ -3889,13 +3951,13 @@ Intersection of two arrays of words.
   1  $a         Reference to first array of words
   2  $b         Reference to second array of words
 
-Example:
+B<Example:>
 
 
-  is_deeply [qw(a b c)],
-
-    [setIntersectionOfTwoArraysOfWords([qw(e f g a b c )], [qw(a A b B c C)])];
-
+  is_deeply [qw(a b c)],                                                          
+  
+    [𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝗳𝗧𝘄𝗼𝗔𝗿𝗿𝗮𝘆𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀([qw(e f g a b c )], [qw(a A b B c C)])];   
+  
 
 =head2 setUnionOfTwoArraysOfWords($$)
 
@@ -3905,13 +3967,13 @@ Union of two arrays of words.
   1  $a         Reference to first array of words
   2  $b         Reference to second array of words
 
-Example:
+B<Example:>
 
 
-  is_deeply [qw(a b c)],
-
-    [setUnionOfTwoArraysOfWords([qw(a b c )], [qw(a b)])];
-
+  is_deeply [qw(a b c)],                                                          
+  
+    [𝘀𝗲𝘁𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗧𝘄𝗼𝗔𝗿𝗿𝗮𝘆𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀([qw(a b c )], [qw(a b)])];                        
+  
 
 =head2 contains($@)
 
@@ -3921,17 +3983,17 @@ Returns the indices at which an item matches elements of the specified array. If
   1  $item      Item
   2  @array     Array
 
-Example:
+B<Example:>
 
 
-  is_deeply [1],       [contains(1,0..1)];
-
-  is_deeply [1,3],     [contains(1, qw(0 1 0 1 0 0))];
-
-  is_deeply [0, 5],    [contains('a', qw(a b c d e a b c d e))];
-
-  is_deeply [0, 1, 5], [contains(qr(a+), qw(a baa c d e aa b c d e))];
-
+  is_deeply [1],       [𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀(1,0..1)];                                        
+  
+  is_deeply [1,3],     [𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀(1, qw(0 1 0 1 0 0))];                            
+  
+  is_deeply [0, 5],    [𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀('a', qw(a b c d e a b c d e))];                  
+  
+  is_deeply [0, 1, 5], [𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀(qr(a+), qw(a baa c d e aa b c d e))];            
+  
 
 =head1 Minima and Maxima
 
@@ -3944,13 +4006,13 @@ Find the minimum number in a list.
      Parameter  Description
   1  @n         Numbers
 
-Example:
+B<Example:>
 
 
-  ok min(1) == 1;
-
-  ok min(5,4,2,3) == 2;
-
+  ok 𝗺𝗶𝗻(1) == 1;                                                                 
+  
+  ok 𝗺𝗶𝗻(5,4,2,3) == 2;                                                           
+  
 
 =head2 max(@)
 
@@ -3959,15 +4021,15 @@ Find the maximum number in a list.
      Parameter  Description
   1  @n         Numbers
 
-Example:
+B<Example:>
 
 
-  ok !max;
-
-  ok max(1) == 1;
-
-  ok max(1,4,2,3) == 4;
-
+  ok !𝗺𝗮𝘅;                                                                        
+  
+  ok 𝗺𝗮𝘅(1) == 1;                                                                 
+  
+  ok 𝗺𝗮𝘅(1,4,2,3) == 4;                                                           
+  
 
 =head1 Format
 
@@ -3980,15 +4042,15 @@ Find the longest line in a string
      Parameter  Description
   1  $string    String of lines of text
 
-Example:
+B<Example:>
 
 
-  ok 3 == maximumLineLength(<<END);
+  ok 3 == 𝗺𝗮𝘅𝗶𝗺𝘂𝗺𝗟𝗶𝗻𝗲𝗟𝗲𝗻𝗴𝘁𝗵(<<END);                                               
   a
   bb
   ccc
   END
-
+  
 
 =head2 formatTableBasic($)
 
@@ -3997,18 +4059,18 @@ Tabularize an array of arrays of text.
      Parameter  Description
   1  $data      Reference to an array of arrays of data to be formatted as a table.
 
-Example:
+B<Example:>
 
 
-    my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
-
-    ok formatTableBasic($d) eq <<END;
+    my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];             
+  
+    ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲𝗕𝗮𝘀𝗶𝗰($d) eq <<END;                                             
   a        1
   bb      22
   ccc    333
   dddd  4444
   END
-
+  
 
 =head2 formatTable($$%)
 
@@ -4027,20 +4089,20 @@ Parameters:
   2  $title     Optional reference to an array of titles
   3  %options   Options
 
-Example:
+B<Example:>
 
 
-  ok formatTable
-
-   ([[qw(A    B    C    D   )],
-
-     [qw(AA   BB   CC   DD  )],
-
-     [qw(AAA  BBB  CCC  DDD )],
-
-     [qw(AAAA BBBB CCCC DDDD)],
-
-     [qw(1    22   333  4444)]], [qw(aa bb cc)]) eq <<END;
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲                                                                  
+  
+   ([[qw(A    B    C    D   )],                                                   
+  
+     [qw(AA   BB   CC   DD  )],                                                   
+  
+     [qw(AAA  BBB  CCC  DDD )],                                                   
+  
+     [qw(AAAA BBBB CCCC DDDD)],                                                   
+  
+     [qw(1    22   333  4444)]], [qw(aa bb cc)]) eq <<END;                        
      aa    bb    cc
   1  A     B     C     D
   2  AA    BB    CC    DD
@@ -4048,91 +4110,91 @@ Example:
   4  AAAA  BBBB  CCCC  DDDD
   5     1    22   333  4444
   END
-
-  ok formatTable
-
-   ([[qw(1     B   C)],
-
-     [qw(22    BB  CC)],
-
-     [qw(333   BBB CCC)],
-
-     [qw(4444  22  333)]], [qw(aa bb cc)]) eq <<END;
+  
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲                                                                  
+  
+   ([[qw(1     B   C)],                                                           
+  
+     [qw(22    BB  CC)],                                                          
+  
+     [qw(333   BBB CCC)],                                                         
+  
+     [qw(4444  22  333)]], [qw(aa bb cc)]) eq <<END;                              
      aa    bb   cc
   1     1  B    C
   2    22  BB   CC
   3   333  BBB  CCC
   4  4444   22  333
   END
-
-  ok formatTable
-
-   ([{aa=>'A',   bb=>'B',   cc=>'C'},
-
-     {aa=>'AA',  bb=>'BB',  cc=>'CC'},
-
-     {aa=>'AAA', bb=>'BBB', cc=>'CCC'},
-
-     {aa=>'1',   bb=>'22',  cc=>'333'}
-
-     ]) eq <<END;
+  
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲                                                                  
+  
+   ([{aa=>'A',   bb=>'B',   cc=>'C'},                                             
+  
+     {aa=>'AA',  bb=>'BB',  cc=>'CC'},                                            
+  
+     {aa=>'AAA', bb=>'BBB', cc=>'CCC'},                                           
+  
+     {aa=>'1',   bb=>'22',  cc=>'333'}                                            
+  
+     ]) eq <<END;                                                                 
      aa   bb   cc
   1  A    B    C
   2  AA   BB   CC
   3  AAA  BBB  CCC
   4    1   22  333
   END
-
-  ok formatTable
-
-   ({''=>[qw(aa bb cc)],
-
-      1=>[qw(A B C)],
-
-      22=>[qw(AA BB CC)],
-
-      333=>[qw(AAA BBB CCC)],
-
-      4444=>[qw(1 22 333)]}) eq <<END;
+  
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲                                                                  
+  
+   ({''=>[qw(aa bb cc)],                                                          
+  
+      1=>[qw(A B C)],                                                             
+  
+      22=>[qw(AA BB CC)],                                                         
+  
+      333=>[qw(AAA BBB CCC)],                                                     
+  
+      4444=>[qw(1 22 333)]}) eq <<END;                                            
         aa   bb   cc
      1  A    B    C
     22  AA   BB   CC
    333  AAA  BBB  CCC
   4444    1   22  333
   END
-
-  ok formatTable
-
-   ({1=>{aa=>'A', bb=>'B', cc=>'C'},
-
-     22=>{aa=>'AA', bb=>'BB', cc=>'CC'},
-
-     333=>{aa=>'AAA', bb=>'BBB', cc=>'CCC'},
-
-     4444=>{aa=>'1', bb=>'22', cc=>'333'}}) eq <<END;
+  
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲                                                                  
+  
+   ({1=>{aa=>'A', bb=>'B', cc=>'C'},                                              
+  
+     22=>{aa=>'AA', bb=>'BB', cc=>'CC'},                                          
+  
+     333=>{aa=>'AAA', bb=>'BBB', cc=>'CCC'},                                      
+  
+     4444=>{aa=>'1', bb=>'22', cc=>'333'}}) eq <<END;                             
         aa   bb   cc
      1  A    B    C
     22  AA   BB   CC
    333  AAA  BBB  CCC
   4444    1   22  333
   END
-
-  ok formatTable({aa=>'A', bb=>'B', cc=>'C'}, [qw(aaaa bbbb)]) eq <<END;
+  
+  ok 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲({aa=>'A', bb=>'B', cc=>'C'}, [qw(aaaa bbbb)]) eq <<END;          
   aaaa  bbbb
   aa    A
   bb    B
   cc    C
   END
-
-  if (1) {
+  
+  if (1) {                                                                        
     my $file = fpe(qw(report txt));                                               # Create a report
-    my $t = formatTable
+    my $t = 𝗳𝗼𝗿𝗺𝗮𝘁𝗧𝗮𝗯𝗹𝗲
      ([["a",undef], [undef, "b0ac"]],                                           # Data - please replace 0a with a new line
       [undef, "BC"],                                                              # Column titles
       file=>$file,                                                                # Output file
       head=><<END);                                                               # Header
   Sample report.
-
+  
   Table has NNNN rows.
   END
     ok -e $file;
@@ -4140,19 +4202,19 @@ Example:
     unlink $file;
     ok $t eq <<END;
   Sample report.
-
+  
   Table has 2 rows.
-
-
+  
+  
   This file: report.txt
-
+  
         BC
   1  a
   2     b
         c
   END
    }
-
+  
 
 =head2 keyCount($$)
 
@@ -4162,17 +4224,17 @@ Count keys down to the specified level.
   1  $maxDepth  Maximum depth to count to
   2  $ref       Reference to an array or a hash
 
-Example:
+B<Example:>
 
 
-    my $a = [[1..3],       {map{$_=>1} 1..3}];
-
-    my $h = {a=>[1..3], b=>{map{$_=>1} 1..3}};
-
-    ok keyCount(2, $a) == 6;
-
-    ok keyCount(2, $h) == 6;
-
+    my $a = [[1..3],       {map{$_=>1} 1..3}];                                    
+  
+    my $h = {a=>[1..3], b=>{map{$_=>1} 1..3}};                                    
+  
+    ok 𝗸𝗲𝘆𝗖𝗼𝘂𝗻𝘁(2, $a) == 6;                                                      
+  
+    ok 𝗸𝗲𝘆𝗖𝗼𝘂𝗻𝘁(2, $h) == 6;                                                      
+  
 
 =head1 Lines
 
@@ -4185,21 +4247,21 @@ Load an array from lines of text in a string.
      Parameter  Description
   1  $string    The string of lines from which to create an array
 
-Example:
+B<Example:>
 
 
-    my $s = loadArrayFromLines <<END;
+    my $s = 𝗹𝗼𝗮𝗱𝗔𝗿𝗿𝗮𝘆𝗙𝗿𝗼𝗺𝗟𝗶𝗻𝗲𝘀 <<END;                                             
   a a
   b b
   END
-
-    is_deeply $s, [q(a a), q(b b)];
-
-    ok formatTable($s) eq <<END;
+  
+    is_deeply $s, [q(a a), q(b b)];                                               
+  
+    ok formatTable($s) eq <<END;                                                  
   0  a a
   1  b b
   END
-
+  
 
 =head2 loadHashFromLines($)
 
@@ -4208,21 +4270,21 @@ Load a hash: first word of each line is the key and the rest is the value.
      Parameter  Description
   1  $string    The string of lines from which to create a hash
 
-Example:
+B<Example:>
 
 
-    my $s = loadHashFromLines <<END;
+    my $s = 𝗹𝗼𝗮𝗱𝗛𝗮𝘀𝗵𝗙𝗿𝗼𝗺𝗟𝗶𝗻𝗲𝘀 <<END;                                              
   a 10 11 12
   b 20 21 22
   END
-
-    is_deeply $s, {a => q(10 11 12), b =>q(20 21 22)};
-
-    ok formatTable($s) eq <<END;
+  
+    is_deeply $s, {a => q(10 11 12), b =>q(20 21 22)};                            
+  
+    ok formatTable($s) eq <<END;                                                  
   a  10 11 12
   b  20 21 22
   END
-
+  
 
 =head2 loadArrayArrayFromLines($)
 
@@ -4231,21 +4293,21 @@ Load an array of arrays from lines of text: each line is an array of words.
      Parameter  Description
   1  $string    The string of lines from which to create an array of arrays
 
-Example:
+B<Example:>
 
 
-    my $s = loadArrayArrayFromLines <<END;
+    my $s = 𝗹𝗼𝗮𝗱𝗔𝗿𝗿𝗮𝘆𝗔𝗿𝗿𝗮𝘆𝗙𝗿𝗼𝗺𝗟𝗶𝗻𝗲𝘀 <<END;                                        
   A B C
   AA BB CC
   END
-
-    is_deeply $s, [[qw(A B C)], [qw(AA BB CC)]];
-
-    ok formatTable($s) eq <<END;
+  
+    is_deeply $s, [[qw(A B C)], [qw(AA BB CC)]];                                  
+  
+    ok formatTable($s) eq <<END;                                                  
   1  A   B   C
   2  AA  BB  CC
   END
-
+  
 
 =head2 loadHashArrayFromLines($)
 
@@ -4254,21 +4316,21 @@ Load a hash of arrays from lines of text: the first word of each line is the key
      Parameter  Description
   1  $string    The string of lines from which to create a hash of arrays
 
-Example:
+B<Example:>
 
 
-    my $s = loadHashArrayFromLines <<END;
+    my $s = 𝗹𝗼𝗮𝗱𝗛𝗮𝘀𝗵𝗔𝗿𝗿𝗮𝘆𝗙𝗿𝗼𝗺𝗟𝗶𝗻𝗲𝘀 <<END;                                         
   a A B C
   b AA BB CC
   END
-
-    is_deeply $s, {a =>[qw(A B C)], b => [qw(AA BB CC)] };
-
-    ok formatTable($s) eq <<END;
+  
+    is_deeply $s, {a =>[qw(A B C)], b => [qw(AA BB CC)] };                        
+  
+    ok formatTable($s) eq <<END;                                                  
   a  A   B   C
   b  AA  BB  CC
   END
-
+  
 
 =head2 loadArrayHashFromLines($)
 
@@ -4277,22 +4339,22 @@ Load an array of hashes from lines of text: each line is an hash of words.
      Parameter  Description
   1  $string    The string of lines from which to create an array of arrays
 
-Example:
+B<Example:>
 
 
-    my $s = loadArrayHashFromLines <<END;
+    my $s = 𝗹𝗼𝗮𝗱𝗔𝗿𝗿𝗮𝘆𝗛𝗮𝘀𝗵𝗙𝗿𝗼𝗺𝗟𝗶𝗻𝗲𝘀 <<END;                                         
   A 1 B 2
   AA 11 BB 22
   END
-
-    is_deeply $s, [{A=>1, B=>2}, {AA=>11, BB=>22}];
-
-    ok formatTable($s) eq <<END;
+  
+    is_deeply $s, [{A=>1, B=>2}, {AA=>11, BB=>22}];                               
+  
+    ok formatTable($s) eq <<END;                                                  
      A  AA  B  BB
   1  1      2
   2     11     22
   END
-
+  
 
 =head2 loadHashHashFromLines($)
 
@@ -4301,22 +4363,22 @@ Load a hash of hashes from lines of text: the first word of each line is the key
      Parameter  Description
   1  $string    The string of lines from which to create a hash of arrays
 
-Example:
+B<Example:>
 
 
-    my $s = loadHashHashFromLines <<END;
+    my $s = 𝗹𝗼𝗮𝗱𝗛𝗮𝘀𝗵𝗛𝗮𝘀𝗵𝗙𝗿𝗼𝗺𝗟𝗶𝗻𝗲𝘀 <<END;                                          
   a A 1 B 2
   b AA 11 BB 22
   END
-
-    is_deeply $s, {a=>{A=>1, B=>2}, b=>{AA=>11, BB=>22}};
-
-    ok formatTable($s) eq <<END;
+  
+    is_deeply $s, {a=>{A=>1, B=>2}, b=>{AA=>11, BB=>22}};                         
+  
+    ok formatTable($s) eq <<END;                                                  
      A  AA  B  BB
   a  1      2
   b     11     22
   END
-
+  
 
 =head2 checkKeys($$)
 
@@ -4326,13 +4388,13 @@ Check the keys in a hash.
   1  $test       The hash to test
   2  $permitted  A hash of the permitted keys and their meanings
 
-Example:
+B<Example:>
 
 
-    eval q{checkKeys({a=>1, b=>2, d=>3}, {a=>1, b=>2, c=>3})};
-
-    ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);
-
+    eval q{𝗰𝗵𝗲𝗰𝗸𝗞𝗲𝘆𝘀({a=>1, b=>2, d=>3}, {a=>1, b=>2, c=>3})};                    
+  
+    ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);       
+  
 
 =head1 LVALUE methods
 
@@ -4345,27 +4407,27 @@ Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scala
      Parameter  Description
   1  @names     List of method names
 
-Example:
+B<Example:>
 
 
-    package Scalars;
-
-    my $a = bless{};
-
-    Data::Table::Text::genLValueScalarMethods(qw(aa bb cc));
-
-    $a->aa = 'aa';
-
-    Test::More::ok  $a->aa eq 'aa';
-
-    Test::More::ok !$a->bb;
-
-    Test::More::ok  $a->bbX eq q();
-
-    $a->aa = undef;
-
-    Test::More::ok !$a->aa;
-
+    package Scalars;                                                              
+  
+    my $a = bless{};                                                              
+  
+    Data::Table::Text::𝗴𝗲𝗻𝗟𝗩𝗮𝗹𝘂𝗲𝗦𝗰𝗮𝗹𝗮𝗿𝗠𝗲𝘁𝗵𝗼𝗱𝘀(qw(aa bb cc));                      
+  
+    $a->aa = 'aa';                                                                
+  
+    Test::More::ok  $a->aa eq 'aa';                                               
+  
+    Test::More::ok !$a->bb;                                                       
+  
+    Test::More::ok  $a->bbX eq q();                                               
+  
+    $a->aa = undef;                                                               
+  
+    Test::More::ok !$a->aa;                                                       
+  
 
 =head2 addLValueScalarMethods(@)
 
@@ -4374,27 +4436,27 @@ Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scala
      Parameter  Description
   1  @names     List of method names
 
-Example:
+B<Example:>
 
 
-    my $class = "Data::Table::Text::Test";
-
-    my $a = bless{}, $class;
-
-    addLValueScalarMethods(qq(${class}::$_)) for qw(aa bb aa bb);
-
-    $a->aa = 'aa';
-
-    ok  $a->aa eq 'aa';
-
-    ok !$a->bb;
-
-    ok  $a->bbX eq q();
-
-    $a->aa = undef;
-
-    ok !$a->aa;
-
+    my $class = "Data::Table::Text::Test";                                        
+  
+    my $a = bless{}, $class;                                                      
+  
+    𝗮𝗱𝗱𝗟𝗩𝗮𝗹𝘂𝗲𝗦𝗰𝗮𝗹𝗮𝗿𝗠𝗲𝘁𝗵𝗼𝗱𝘀(qq(${class}::$_)) for qw(aa bb aa bb);                 
+  
+    $a->aa = 'aa';                                                                
+  
+    ok  $a->aa eq 'aa';                                                           
+  
+    ok !$a->bb;                                                                   
+  
+    ok  $a->bbX eq q();                                                           
+  
+    $a->aa = undef;                                                               
+  
+    ok !$a->aa;                                                                   
+  
 
 =head2 genLValueScalarMethodsWithDefaultValues(@)
 
@@ -4403,17 +4465,17 @@ Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scala
      Parameter  Description
   1  @names     List of method names
 
-Example:
+B<Example:>
 
 
-    package ScalarsWithDefaults;
-
-    my $a = bless{};
-
-    Data::Table::Text::genLValueScalarMethodsWithDefaultValues(qw(aa bb cc));
-
-    Test::More::ok $a->aa eq 'aa';
-
+    package ScalarsWithDefaults;                                                  
+  
+    my $a = bless{};                                                              
+  
+    Data::Table::Text::𝗴𝗲𝗻𝗟𝗩𝗮𝗹𝘂𝗲𝗦𝗰𝗮𝗹𝗮𝗿𝗠𝗲𝘁𝗵𝗼𝗱𝘀𝗪𝗶𝘁𝗵𝗗𝗲𝗳𝗮𝘂𝗹𝘁𝗩𝗮𝗹𝘂𝗲𝘀(qw(aa bb cc));     
+  
+    Test::More::ok $a->aa eq 'aa';                                                
+  
 
 =head2 genLValueArrayMethods(@)
 
@@ -4422,19 +4484,19 @@ Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array
      Parameter  Description
   1  @names     List of method names
 
-Example:
+B<Example:>
 
 
-    package Arrays;
-
-    my $a = bless{};
-
-    Data::Table::Text::genLValueArrayMethods(qw(aa bb cc));
-
-    $a->aa->[1] = 'aa';
-
-    Test::More::ok $a->aa->[1] eq 'aa';
-
+    package Arrays;                                                               
+  
+    my $a = bless{};                                                              
+  
+    Data::Table::Text::𝗴𝗲𝗻𝗟𝗩𝗮𝗹𝘂𝗲𝗔𝗿𝗿𝗮𝘆𝗠𝗲𝘁𝗵𝗼𝗱𝘀(qw(aa bb cc));                       
+  
+    $a->aa->[1] = 'aa';                                                           
+  
+    Test::More::ok $a->aa->[1] eq 'aa';                                           
+  
 
 =head2 genLValueHashMethods(@)
 
@@ -4443,19 +4505,19 @@ Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash 
      Parameter  Description
   1  @names     Method names
 
-Example:
+B<Example:>
 
 
-    package Hashes;
-
-    my $a = bless{};
-
-    Data::Table::Text::genLValueHashMethods(qw(aa bb cc));
-
-    $a->aa->{a} = 'aa';
-
-    Test::More::ok $a->aa->{a} eq 'aa';
-
+    package Hashes;                                                               
+  
+    my $a = bless{};                                                              
+  
+    Data::Table::Text::𝗴𝗲𝗻𝗟𝗩𝗮𝗹𝘂𝗲𝗛𝗮𝘀𝗵𝗠𝗲𝘁𝗵𝗼𝗱𝘀(qw(aa bb cc));                        
+  
+    $a->aa->{a} = 'aa';                                                           
+  
+    Test::More::ok $a->aa->{a} eq 'aa';                                           
+  
 
 =head2 genHash($%)
 
@@ -4465,31 +4527,31 @@ Return a B<$bless>ed hash with the specified B<$attributes>. L<updateDocumentati
   1  $bless       Package name
   2  %attributes  Hash of attribute names and values
 
-Example:
+B<Example:>
 
 
-  if (1) {
-    my $o = genHash(q(TestHash),                                                  # Definition of a blessed hash.
+  if (1) {                                                                         
+    my $o = 𝗴𝗲𝗻𝗛𝗮𝘀𝗵(q(TestHash),                                                  # Definition of a blessed hash.
         a=>q(aa),                                                                 # Definition of attribute aa.
         b=>q(bb),                                                                 # Definition of attribute bb.
        );
     ok $o->a eq q(aa);
     is_deeply $o, {a=>"aa", b=>"bb"};
-    my $p = genHash(q(TestHash),
+    my $p = 𝗴𝗲𝗻𝗛𝗮𝘀𝗵(q(TestHash),
       c=>q(cc),                                                                   # Definition of attribute cc.
      );
     ok $p->c eq q(cc);
     ok $p->a =  q(aa);
     ok $p->a eq q(aa);
     is_deeply $p, {a=>"aa", c=>"cc"};
-
+  
     loadHash($p, a=>11, b=>22);                                                   # Load the hash
     is_deeply $p, {a=>11, b=>22, c=>"cc"};
-
+  
     my $r = eval {loadHash($p, d=>44)};                                           # Try to load the hash
     ok $@ =~ m(Cannot load attribute: d);
    }
-
+  
 
 =head2 loadHash($%)
 
@@ -4499,10 +4561,10 @@ Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attribute
   1  $hash        Hash
   2  %attributes  Hash of attribute names and values to be loaded
 
-Example:
+B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                         
     my $o = genHash(q(TestHash),                                                  # Definition of a blessed hash.
         a=>q(aa),                                                                 # Definition of attribute aa.
         b=>q(bb),                                                                 # Definition of attribute bb.
@@ -4516,14 +4578,14 @@ Example:
     ok $p->a =  q(aa);
     ok $p->a eq q(aa);
     is_deeply $p, {a=>"aa", c=>"cc"};
-
-    loadHash($p, a=>11, b=>22);                                                   # Load the hash
+  
+    𝗹𝗼𝗮𝗱𝗛𝗮𝘀𝗵($p, a=>11, b=>22);                                                   # Load the hash
     is_deeply $p, {a=>11, b=>22, c=>"cc"};
-
-    my $r = eval {loadHash($p, d=>44)};                                           # Try to load the hash
+  
+    my $r = eval {𝗹𝗼𝗮𝗱𝗛𝗮𝘀𝗵($p, d=>44)};                                           # Try to load the hash
     ok $@ =~ m(Cannot load attribute: d);
    }
-
+  
 
 =head2 assertPackageRefs($@)
 
@@ -4533,14 +4595,14 @@ Confirm that the specified references are to the specified package
   1  $package   Package
   2  @refs      References
 
-Example:
+B<Example:>
 
 
-  if (1) {
-    eval q{assertPackageRefs(q(bbb), bless {}, q(aaa))};
+  if (1) {                                                                        
+    eval q{𝗮𝘀𝘀𝗲𝗿𝘁𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗥𝗲𝗳𝘀(q(bbb), bless {}, q(aaa))};
     ok $@ =~ m(\AWanted reference to bbb, but got aaa);
    }
-
+  
 
 =head2 assertRef(@)
 
@@ -4549,14 +4611,14 @@ Confirm that the specified references are to the package into which this routine
      Parameter  Description
   1  @refs      References
 
-Example:
+B<Example:>
 
 
-  if (1) {
-    eval q{assertRef(bless {}, q(aaa))};
+  if (1) {                                                                        
+    eval q{𝗮𝘀𝘀𝗲𝗿𝘁𝗥𝗲𝗳(bless {}, q(aaa))};
     ok $@ =~ m(\AWanted reference to Data::Table::Text, but got aaa);
    }
-
+  
 
 =head2 ˢ(&)
 
@@ -4565,23 +4627,23 @@ Immediately executed inline sub to allow a code block before B<if>.
      Parameter  Description
   1  $sub       Sub enclosed in {} without the word "sub"
 
-Example:
+B<Example:>
 
 
-  ok ˢ{1} == 1;
-
-  ok ˢ{1};
-
-  ˢ{my $s =
+  ok ˢ{1} == 1;                                                                   
+  
+  ok ˢ{1};                                                                        
+  
+  ˢ{my $s =                                                                       
     ˢ{if (1)
        {return q(aa) if 1;
         q(bb);
        }
      };
-
+  
     ok $s eq q(aa);
    };
-
+  
 
 =head1 Strings
 
@@ -4595,20 +4657,20 @@ Indent lines contained in a string or formatted table by the specified string.
   1  $string    The string of lines to indent
   2  $indent    The indenting string
 
-Example:
+B<Example:>
 
 
-    my $t = [qw(aa bb cc)];
-
-    my $d = [[qw(A B C)], [qw(AA BB CC)], [qw(AAA BBB CCC)],  [qw(1 22 333)]];
-
-    ok $s eq <<END;
+    my $t = [qw(aa bb cc)];                                                       
+  
+    my $d = [[qw(A B C)], [qw(AA BB CC)], [qw(AAA BBB CCC)],  [qw(1 22 333)]];    
+  
+    ok $s eq <<END;                                                               
     1  A    B    C
     2  AA   BB   CC
     3  AAA  BBB  CCC
     4    1   22  333
   END
-
+  
 
 =head2 isBlank($)
 
@@ -4617,14 +4679,14 @@ Test whether a string is blank.
      Parameter  Description
   1  $string    String
 
-Example:
+B<Example:>
 
 
-  ok isBlank("");
-
-  ok isBlank("
- ");
-
+  ok 𝗶𝘀𝗕𝗹𝗮𝗻𝗸("");                                                                 
+  
+  ok 𝗶𝘀𝗕𝗹𝗮𝗻𝗸(" 
+ ");                                                             
+  
 
 =head2 trim($)
 
@@ -4633,11 +4695,11 @@ Remove any white space from the front and end of a string.
      Parameter  Description
   1  $string    String
 
-Example:
+B<Example:>
 
 
-  ok trim(" a b ") eq join ' ', qw(a b);
-
+  ok 𝘁𝗿𝗶𝗺(" a b ") eq join ' ', qw(a b);                                          
+  
 
 =head2 pad($$$)
 
@@ -4648,15 +4710,15 @@ Pad a string with blanks or the specified padding character  to a multiple of a 
   2  $length    Tab width
   3  $pad       Padding char
 
-Example:
+B<Example:>
 
 
-  ok  pad('abc  ', 2).'='       eq "abc =";
-
-  ok  pad('abc  ', 3).'='       eq "abc=";
-
-  ok  pad('abc  ', 4, q(.)).'=' eq "abc.=";
-
+  ok  𝗽𝗮𝗱('abc  ', 2).'='       eq "abc =";                                       
+  
+  ok  𝗽𝗮𝗱('abc  ', 3).'='       eq "abc=";                                        
+  
+  ok  𝗽𝗮𝗱('abc  ', 4, q(.)).'=' eq "abc.=";                                       
+  
 
 =head2 firstNChars($$)
 
@@ -4666,13 +4728,13 @@ First N characters of a string.
   1  $string    String
   2  $length    Length
 
-Example:
+B<Example:>
 
 
-  ok firstNChars(q(abc), 2) eq q(ab);
-
-  ok firstNChars(q(abc), 4) eq q(abc);
-
+  ok 𝗳𝗶𝗿𝘀𝘁𝗡𝗖𝗵𝗮𝗿𝘀(q(abc), 2) eq q(ab);                                             
+  
+  ok 𝗳𝗶𝗿𝘀𝘁𝗡𝗖𝗵𝗮𝗿𝘀(q(abc), 4) eq q(abc);                                            
+  
 
 =head2 nws($$)
 
@@ -4682,11 +4744,11 @@ Normalize white space in a string to make comparisons easier. Leading and traili
   1  $string    String to normalize
   2  $length    Maximum length of result
 
-Example:
+B<Example:>
 
 
-  ok nws(qq(a  b    c)) eq q(a b c);
-
+  ok 𝗻𝘄𝘀(qq(a  b    c)) eq q(a b c);                                              
+  
 
 =head2 stringsAreNotEqual($$)
 
@@ -4696,16 +4758,16 @@ Return the two non equal tails of non equal strings or an empty list if the stri
   1  $a         First string
   2  $b         Second string
 
-Example:
+B<Example:>
 
 
-  if (1) {
-    ok        !stringsAreNotEqual(q(abc), q(abc));
-    ok         stringsAreNotEqual(q(abc), q(abd));
-    is_deeply [stringsAreNotEqual(q(abc), q(abd))], [qw(c d)];
-    is_deeply [stringsAreNotEqual(q(ab),  q(abd))], ['', q(d)];
+  if (1) {                                                                        
+    ok        !𝘀𝘁𝗿𝗶𝗻𝗴𝘀𝗔𝗿𝗲𝗡𝗼𝘁𝗘𝗾𝘂𝗮𝗹(q(abc), q(abc));
+    ok         𝘀𝘁𝗿𝗶𝗻𝗴𝘀𝗔𝗿𝗲𝗡𝗼𝘁𝗘𝗾𝘂𝗮𝗹(q(abc), q(abd));
+    is_deeply [𝘀𝘁𝗿𝗶𝗻𝗴𝘀𝗔𝗿𝗲𝗡𝗼𝘁𝗘𝗾𝘂𝗮𝗹(q(abc), q(abd))], [qw(c d)];
+    is_deeply [𝘀𝘁𝗿𝗶𝗻𝗴𝘀𝗔𝗿𝗲𝗡𝗼𝘁𝗘𝗾𝘂𝗮𝗹(q(ab),  q(abd))], ['', q(d)];
    }
-
+  
 
 =head2 javaPackage($)
 
@@ -4714,16 +4776,16 @@ Extract the package name from a java string or file.
      Parameter  Description
   1  $java      Java file if it exists else the string of java
 
-Example:
+B<Example:>
 
 
-    overWriteFile($f, <<END);
+    overWriteFile($f, <<END);                                                      
   // Test
   package com.xyz;
   END
-
-    ok javaPackage($f)           eq "com.xyz";
-
+  
+    ok 𝗷𝗮𝘃𝗮𝗣𝗮𝗰𝗸𝗮𝗴𝗲($f)           eq "com.xyz";                                    
+  
 
 =head2 javaPackageAsFileName($)
 
@@ -4732,16 +4794,16 @@ Extract the package name from a java string or file and convert it to a file nam
      Parameter  Description
   1  $java      Java file if it exists else the string of java
 
-Example:
+B<Example:>
 
 
-    overWriteFile($f, <<END);
+    overWriteFile($f, <<END);                                                      
   // Test
   package com.xyz;
   END
-
-    ok javaPackageAsFileName($f) eq "com/xyz";
-
+  
+    ok 𝗷𝗮𝘃𝗮𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗔𝘀𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f) eq "com/xyz";                                    
+  
 
 =head2 perlPackage($)
 
@@ -4750,15 +4812,15 @@ Extract the package name from a perl string or file.
      Parameter  Description
   1  $perl      Perl file if it exists else the string of perl
 
-Example:
+B<Example:>
 
 
-    overWriteFile($f, <<END);
+    overWriteFile($f, <<END);                                                     
   package a::b;
   END
-
-    ok perlPackage($f)           eq "a::b";
-
+  
+    ok 𝗽𝗲𝗿𝗹𝗣𝗮𝗰𝗸𝗮𝗴𝗲($f)           eq "a::b";                                       
+  
 
 =head2 printQw(@)
 
@@ -4767,11 +4829,11 @@ Print an array of words in qw() format.
      Parameter  Description
   1  @words     Array of words
 
-Example:
+B<Example:>
 
 
-  ok printQw(qw(a b c)) eq q(qw(a b c));
-
+  ok 𝗽𝗿𝗶𝗻𝘁𝗤𝘄(qw(a b c)) eq q(qw(a b c));                                          
+  
 
 =head2 numberOfLinesInString($)
 
@@ -4780,13 +4842,13 @@ The number of lines in a string.
      Parameter  Description
   1  $string    String
 
-Example:
+B<Example:>
 
 
-    ok numberOfLinesInString("a
+    ok 𝗻𝘂𝗺𝗯𝗲𝗿𝗢𝗳𝗟𝗶𝗻𝗲𝘀𝗜𝗻𝗦𝘁𝗿𝗶𝗻𝗴("a
 b
-") == 2;
-
+") == 2;                                      
+  
 
 =head1 Unicode
 
@@ -4799,11 +4861,11 @@ Convert alphanumerics in a string to bold.
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  ok boldString(q(zZ)) eq q(𝘇𝗭);
-
+  ok 𝗯𝗼𝗹𝗱𝗦𝘁𝗿𝗶𝗻𝗴(q(zZ)) eq q(𝘇𝗭);                                                  
+  
 
 =head2 boldStringUndo($)
 
@@ -4812,18 +4874,18 @@ Undo alphanumerics in a string to bold.
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  if (1)
+  if (1)                                                                              
    {my $n = 1234567890;
-    ok boldStringUndo            (boldString($n))             == $n;
+    ok 𝗯𝗼𝗹𝗱𝗦𝘁𝗿𝗶𝗻𝗴𝗨𝗻𝗱𝗼            (boldString($n))             == $n;
     ok enclosedStringUndo        (enclosedString($n))         == $n;
     ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
     ok superScriptStringUndo     (superScriptString($n))      == $n;
     ok subScriptStringUndo       (subScriptString($n))        == $n;
    }
-
+  
 
 =head2 enclosedString($)
 
@@ -4832,11 +4894,11 @@ Convert alphanumerics in a string to enclosed alphanumerics.
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  ok enclosedString(q(hello world 1234)) eq q(ⓗⓔⓛⓛⓞ ⓦⓞⓡⓛⓓ ①②③④);
-
+  ok 𝗲𝗻𝗰𝗹𝗼𝘀𝗲𝗱𝗦𝘁𝗿𝗶𝗻𝗴(q(hello world 1234)) eq q(ⓗⓔⓛⓛⓞ ⓦⓞⓡⓛⓓ ①②③④);        
+  
 
 =head2 enclosedStringUndo($)
 
@@ -4845,18 +4907,18 @@ Undo alphanumerics in a string to enclosed alphanumerics.
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  if (1)
+  if (1)                                                                              
    {my $n = 1234567890;
     ok boldStringUndo            (boldString($n))             == $n;
-    ok enclosedStringUndo        (enclosedString($n))         == $n;
+    ok 𝗲𝗻𝗰𝗹𝗼𝘀𝗲𝗱𝗦𝘁𝗿𝗶𝗻𝗴𝗨𝗻𝗱𝗼        (enclosedString($n))         == $n;
     ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
     ok superScriptStringUndo     (superScriptString($n))      == $n;
     ok subScriptStringUndo       (subScriptString($n))        == $n;
    }
-
+  
 
 =head2 enclosedReversedString($)
 
@@ -4865,11 +4927,11 @@ Convert alphanumerics in a string to enclosed reversed alphanumerics.
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  ok enclosedReversedString(q(hello world 1234)) eq q(🅗🅔🅛🅛🅞 🅦🅞🅡🅛🅓 ➊➋➌➍);
-
+  ok 𝗲𝗻𝗰𝗹𝗼𝘀𝗲𝗱𝗥𝗲𝘃𝗲𝗿𝘀𝗲𝗱𝗦𝘁𝗿𝗶𝗻𝗴(q(hello world 1234)) eq q(🅗🅔🅛🅛🅞 🅦🅞🅡🅛🅓 ➊➋➌➍);  
+  
 
 =head2 enclosedReversedStringUndo($)
 
@@ -4878,18 +4940,18 @@ Undo alphanumerics in a string to enclosed reversed alphanumerics.
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  if (1)
+  if (1)                                                                              
    {my $n = 1234567890;
     ok boldStringUndo            (boldString($n))             == $n;
     ok enclosedStringUndo        (enclosedString($n))         == $n;
-    ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
+    ok 𝗲𝗻𝗰𝗹𝗼𝘀𝗲𝗱𝗥𝗲𝘃𝗲𝗿𝘀𝗲𝗱𝗦𝘁𝗿𝗶𝗻𝗴𝗨𝗻𝗱𝗼(enclosedReversedString($n)) == $n;
     ok superScriptStringUndo     (superScriptString($n))      == $n;
     ok subScriptStringUndo       (subScriptString($n))        == $n;
    }
-
+  
 
 =head2 superScriptString($)
 
@@ -4898,11 +4960,11 @@ Convert alphanumerics in a string to super scripts
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  ok superScriptString(1234567890) eq q(¹²³⁴⁵⁶⁷⁸⁹⁰);
-
+  ok 𝘀𝘂𝗽𝗲𝗿𝗦𝗰𝗿𝗶𝗽𝘁𝗦𝘁𝗿𝗶𝗻𝗴(1234567890) eq q(¹²³⁴⁵⁶⁷⁸⁹⁰);                              
+  
 
 =head2 superScriptStringUndo($)
 
@@ -4911,18 +4973,18 @@ Undo alphanumerics in a string to super scripts
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  if (1)
+  if (1)                                                                              
    {my $n = 1234567890;
     ok boldStringUndo            (boldString($n))             == $n;
     ok enclosedStringUndo        (enclosedString($n))         == $n;
     ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
-    ok superScriptStringUndo     (superScriptString($n))      == $n;
+    ok 𝘀𝘂𝗽𝗲𝗿𝗦𝗰𝗿𝗶𝗽𝘁𝗦𝘁𝗿𝗶𝗻𝗴𝗨𝗻𝗱𝗼     (superScriptString($n))      == $n;
     ok subScriptStringUndo       (subScriptString($n))        == $n;
    }
-
+  
 
 =head2 subScriptString($)
 
@@ -4931,11 +4993,11 @@ Convert alphanumerics in a string to sub scripts
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  ok subScriptString(1234567890)   eq q(₁₂₃₄₅₆₇₈₉₀);
-
+  ok 𝘀𝘂𝗯𝗦𝗰𝗿𝗶𝗽𝘁𝗦𝘁𝗿𝗶𝗻𝗴(1234567890)   eq q(₁₂₃₄₅₆₇₈₉₀);                              
+  
 
 =head2 subScriptStringUndo($)
 
@@ -4944,18 +5006,18 @@ Undo alphanumerics in a string to sub scripts
      Parameter  Description
   1  $string    String to convert
 
-Example:
+B<Example:>
 
 
-  if (1)
+  if (1)                                                                              
    {my $n = 1234567890;
     ok boldStringUndo            (boldString($n))             == $n;
     ok enclosedStringUndo        (enclosedString($n))         == $n;
     ok enclosedReversedStringUndo(enclosedReversedString($n)) == $n;
     ok superScriptStringUndo     (superScriptString($n))      == $n;
-    ok subScriptStringUndo       (subScriptString($n))        == $n;
+    ok 𝘀𝘂𝗯𝗦𝗰𝗿𝗶𝗽𝘁𝗦𝘁𝗿𝗶𝗻𝗴𝗨𝗻𝗱𝗼       (subScriptString($n))        == $n;
    }
-
+  
 
 =head1 Cloud Cover
 
@@ -4963,14 +5025,14 @@ Useful for operating across the cloud.
 
 =head2 makeDieConfess()
 
-Force die to confess where the death occurred
+Force die to confess where the death occurred.
 
 
-Example:
+B<Example:>
 
 
-    makeDieConfess
-
+    𝗺𝗮𝗸𝗲𝗗𝗶𝗲𝗖𝗼𝗻𝗳𝗲𝘀𝘀                                                                
+  
 
 =head2 ipAddressViaArp($)
 
@@ -4979,11 +5041,11 @@ Get the ip address of a server on the local network by hostname via arp
      Parameter  Description
   1  $hostName  Host name
 
-Example:
+B<Example:>
 
 
-    ipAddressViaArp(q(secarias));
-
+    𝗶𝗽𝗔𝗱𝗱𝗿𝗲𝘀𝘀𝗩𝗶𝗮𝗔𝗿𝗽(q(secarias));                                                 
+  
 
 =head2 saveCodeToS3($$$$)
 
@@ -4995,11 +5057,11 @@ Save source code files.
   3  $bucket         Bucket/key
   4  $S3Parms        Additional S3 parameters like profile or region as a string
 
-Example:
+B<Example:>
 
 
-    saveCodeToS3(1200, q(projectName), q(bucket/folder), q(--only-show-errors));
-
+    𝘀𝗮𝘃𝗲𝗖𝗼𝗱𝗲𝗧𝗼𝗦𝟯(1200, q(projectName), q(bucket/folder), q(--only-show-errors));  
+  
 
 =head2 addCertificate($)
 
@@ -5008,33 +5070,33 @@ Add a certificate to the current ssh session.
      Parameter  Description
   1  $file      File containing certificate
 
-Example:
+B<Example:>
 
 
-    addCertificate(fpf(qw(.ssh cert)));
-
+    𝗮𝗱𝗱𝗖𝗲𝗿𝘁𝗶𝗳𝗶𝗰𝗮𝘁𝗲(fpf(qw(.ssh cert)));                                           
+  
 
 =head2 hostName()
 
 The name of the host we are running on.
 
 
-Example:
+B<Example:>
 
 
-    hostName;
-
+    𝗵𝗼𝘀𝘁𝗡𝗮𝗺𝗲;                                                                     
+  
 
 =head2 userId()
 
 The userid we are currently running under.
 
 
-Example:
+B<Example:>
 
 
-    userId;
-
+    𝘂𝘀𝗲𝗿𝗜𝗱;                                                                       
+  
 
 =head2 wwwEncode($)
 
@@ -5043,11 +5105,11 @@ Replace spaces in a string with %20 .
      Parameter  Description
   1  $string    String
 
-Example:
+B<Example:>
 
 
-  ok wwwEncode(q(a  b c)) eq q(a%20%20b%20c);
-
+  ok 𝘄𝘄𝘄𝗘𝗻𝗰𝗼𝗱𝗲(q(a  b c)) eq q(a%20%20b%20c);                                     
+  
 
 =head2 startProcess(&\%$)
 
@@ -5058,16 +5120,16 @@ Start new processes while the number of child processes recorded in B<%$pids> is
   2  $pids      Hash in which to record the process ids
   3  $maximum   Maximum number of processes to run at a time
 
-Example:
+B<Example:>
 
 
-  if (0) {
+  if (0) {                                                                         
     my %pids;
-    ˢ{startProcess {} %pids, 1; ok 1 >= keys %pids} for 1..8;
+    ˢ{𝘀𝘁𝗮𝗿𝘁𝗣𝗿𝗼𝗰𝗲𝘀𝘀 {} %pids, 1; ok 1 >= keys %pids} for 1..8;
     waitForAllStartedProcessesToFinish(%pids);
     ok !keys(%pids)
    }
-
+  
 
 =head2 waitForAllStartedProcessesToFinish(\%)
 
@@ -5076,16 +5138,87 @@ Wait until all the processes started by L<startProcess|/startProcess> have finis
      Parameter  Description
   1  $pids      Hash of started process ids
 
-Example:
+B<Example:>
 
 
-  if (0) {
+  if (0) {                                                                         
     my %pids;
     ˢ{startProcess {} %pids, 1; ok 1 >= keys %pids} for 1..8;
-    waitForAllStartedProcessesToFinish(%pids);
+    𝘄𝗮𝗶𝘁𝗙𝗼𝗿𝗔𝗹𝗹𝗦𝘁𝗮𝗿𝘁𝗲𝗱𝗣𝗿𝗼𝗰𝗲𝘀𝘀𝗲𝘀𝗧𝗼𝗙𝗶𝗻𝗶𝘀𝗵(%pids);
     ok !keys(%pids)
    }
+  
 
+=head2 newProcessStarter($$)
+
+Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their results from the folder named by B<$transferArea>.
+
+     Parameter                  Description
+  1  $maximumNumberOfProcesses  Maximum number of processes to start
+  2  $transferArea              Optional folder to be used to save results.
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {my $N = 100;
+    my $s = 𝗻𝗲𝘄𝗣𝗿𝗼𝗰𝗲𝘀𝘀𝗦𝘁𝗮𝗿𝘁𝗲𝗿(4, q(processes));
+    for my $i(1..$N)
+     {Data::Table::Text::Starter::start($s, sub{$i*$i});
+     }
+    is_deeply
+     [sort {$a <=> $b} Data::Table::Text::Starter::finish($s)],
+     [map {$_**2} 1..$N];
+    clearFolder($s->transferArea, 1e2);
+   }
+  
+
+=head2 Data::Table::Text::Starter::start($$)
+
+Start a new process to run the specified B<$sub>.
+
+     Parameter  Description
+  1  $starter   Starter
+  2  $sub       Sub to be run.
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {my $N = 100;
+    my $s = newProcessStarter(4, q(processes));
+    for my $i(1..$N)
+     {𝗗𝗮𝘁𝗮::𝗧𝗮𝗯𝗹𝗲::𝗧𝗲𝘅𝘁::𝗦𝘁𝗮𝗿𝘁𝗲𝗿::𝘀𝘁𝗮𝗿𝘁($s, sub{$i*$i});
+     }
+    is_deeply
+     [sort {$a <=> $b} Data::Table::Text::Starter::finish($s)],
+     [map {$_**2} 1..$N];
+    clearFolder($s->transferArea, 1e2);
+   }
+  
+
+=head2 Data::Table::Text::Starter::finish($)
+
+Wait for all started processes to finish and return their consolidated results.
+
+     Parameter  Description
+  1  $starter   Starter
+
+B<Example:>
+
+
+  if (1)                                                                            
+   {my $N = 100;
+    my $s = newProcessStarter(4, q(processes));
+    for my $i(1..$N)
+     {Data::Table::Text::Starter::start($s, sub{$i*$i});
+     }
+    is_deeply
+     [sort {$a <=> $b} 𝗗𝗮𝘁𝗮::𝗧𝗮𝗯𝗹𝗲::𝗧𝗲𝘅𝘁::𝗦𝘁𝗮𝗿𝘁𝗲𝗿::𝗳𝗶𝗻𝗶𝘀𝗵($s)],
+     [map {$_**2} 1..$N];
+    clearFolder($s->transferArea, 1e2);
+   }
+  
 
 =head2 newServiceIncarnation($$)
 
@@ -5095,19 +5228,19 @@ Create a new service incarnation to record the start up of a new instance of a s
   1  $service   Service name
   2  $file      Optional details file
 
-Example:
+B<Example:>
 
 
-  if (1)
-   {my $s = newServiceIncarnation("aaa", q(bbb.txt));
+  if (1)                                                                           
+   {my $s = 𝗻𝗲𝘄𝗦𝗲𝗿𝘃𝗶𝗰𝗲𝗜𝗻𝗰𝗮𝗿𝗻𝗮𝘁𝗶𝗼𝗻("aaa", q(bbb.txt));
     is_deeply $s->check, $s;
-    my $t = newServiceIncarnation("aaa", q(bbb.txt));
+    my $t = 𝗻𝗲𝘄𝗦𝗲𝗿𝘃𝗶𝗰𝗲𝗜𝗻𝗰𝗮𝗿𝗻𝗮𝘁𝗶𝗼𝗻("aaa", q(bbb.txt));
     is_deeply $t->check, $t;
     ok $t->start >= $s->start+1;
     ok !$s->check(1);
     unlink q(bbb.txt);
    }
-
+  
 
 =head2 Data::Exchange::Service::check($$)
 
@@ -5117,10 +5250,10 @@ Check that we are the current incarnation of the named service with details obta
   1  $s         Current service details
   2  $continue  Return result if B<$continue> is true else confess if the service has been replaced
 
-Example:
+B<Example:>
 
 
-  if (1)
+  if (1)                                                                           
    {my $s = newServiceIncarnation("aaa", q(bbb.txt));
     is_deeply $s->check, $s;
     my $t = newServiceIncarnation("aaa", q(bbb.txt));
@@ -5129,7 +5262,7 @@ Example:
     ok !$s->check(1);
     unlink q(bbb.txt);
    }
-
+  
 
 =head1 Documentation
 
@@ -5143,17 +5276,17 @@ Generate a table of contents for some html.
   1  $replace   Sub-string within the html to be replaced with the toc
   2  $html      String of html
 
-Example:
+B<Example:>
 
 
-  ok nws(htmlToc("XXXX", <<END)), 'htmlToc'
+  ok nws(𝗵𝘁𝗺𝗹𝗧𝗼𝗰("XXXX", <<END)), '𝗵𝘁𝗺𝗹𝗧𝗼𝗰'                                       
   <h1 id="1" otherprops="1">Chapter 1</h1>
     <h2 id="11" otherprops="11">Section 1</h1>
   <h1 id="2" otherprops="2">Chapter 2</h1>
   XXXX
   END
-
-    eq nws(<<END);
+  
+    eq nws(<<END);                                                                
   <h1 id="1" otherprops="1">Chapter 1</h1>
     <h2 id="11" otherprops="11">Section 1</h1>
   <h1 id="2" otherprops="2">Chapter 2</h1>
@@ -5165,7 +5298,7 @@ Example:
   <tr><td align=right>3<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#2">Chapter 2</a>
   </table>
   END
-
+  
 
 =head2 updateDocumentation($)
 
@@ -5240,39 +5373,39 @@ Parameters:
      Parameter    Description
   1  $perlModule  Optional file name with caller's file being the default
 
-Example:
+B<Example:>
 
 
-   {my $s = updateDocumentation(<<'END' =~ s(#) (#)gsr =~ s(~) ()gsr);
+   {my $s = 𝘂𝗽𝗱𝗮𝘁𝗲𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻(<<'END' =~ s(#) (#)gsr =~ s(~) ()gsr);            
   package Sample::Module;
-
+  
   #D1 Samples                                                                      # Sample methods.
-
+  
   sub sample($@)                                                                  #R Documentation for the:  sample() method.  See also L<Data::Table::Text::sample2|/Data::Table::Text::sample2>. #Tsample
    {my ($node, @context) = @_;                                                    # Node, optional context
     1
    }
-
+  
   ~BEGIN{*smpl=*sample}
-
+  
   sub Data::Table::Text::sample2(\&@)                                             #PS Documentation for the sample2() method.
    {my ($sub, @context) = @_;                                                     # Sub to call, context.
     1
    }
-
+  
   ok sample(undef, qw(a b c)) == 1;                                               #Tsample
-
+  
   if (1)                                                                          #Tsample
    {ok sample(q(a), qw(a b c))  == 2;
     ok sample(undef, qw(a b c)) == 1;
    }
-
+  
   ok sample(<<END2)) == 1;                                                        #Tsample
   sample data
   END2
-
-    ok $s =~ m'=head2 sample28\$\@29';
-
+  
+    ok $s =~ m'=head2 sample28\$\@29';                                        
+  
 
 
 =head1 Hash Definitions
@@ -5291,6 +5424,18 @@ B<file> - The file in which the service start details is being recorded.
 B<service> - The name of the service.
 
 B<start> - The time this service was started time plus a minor hack to simplify testing.
+
+
+
+=head2 Data::Table::Text::Starter Definition
+
+
+Process starter definition.
+
+
+B<maximumNumberOfProcesses> - The maximum number of processes to start in parallel at one time. If this limit is exceeded, the start of subsequent processes will be delayed until processes started earlier have finished.
+
+B<transferArea> - The name of the folder in which files transferring results from the child to the parent process will be stored.
 
 
 
@@ -5347,11 +5492,11 @@ Read a file containing unicode in utf-16 format.
 Set STDOUT and STDERR to accept utf8 without complaint.
 
 
-Example:
+B<Example:>
 
 
-    binModeAllUtf8;
-
+    𝗯𝗶𝗻𝗠𝗼𝗱𝗲𝗔𝗹𝗹𝗨𝘁𝗳𝟴;                                                               
+  
 
 =head2 convertImageToJpx690($$$)
 
@@ -5423,6 +5568,13 @@ Save source code.
      Parameter               Description
   1  $aws                    Aws target file and keywords
   2  $saveIntervalInSeconds  Save internal
+
+=head2 Data::Table::Text::Starter::waitOne($)
+
+Wait for one process to finish and consolidate its results.
+
+     Parameter  Description
+  1  $starter   Starter
 
 =head2 extractTest($)
 
@@ -5512,259 +5664,265 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 23 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
-  <image href="$imageFile" outputclass="imageType">
-
-This conversion requires that you have both L<Imagemagick|/https://www.imagemagick.org/script/index.php> and L<unoconv|/https://github.
+  <image href="$imageFile" outputclass="imageType">.
 
 24 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
 
-25 L<dateStamp|/dateStamp> - Year-monthName-day
+25 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their consolidated results.
 
-26 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
+26 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
 
-27 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
+27 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for one process to finish and consolidate its results.
 
-28 L<decodeJson|/decodeJson> - Decode Perl from Json.
+28 L<dateStamp|/dateStamp> - Year-monthName-day
 
-29 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
+29 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
 
-30 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
+30 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
 
-31 L<dumpFile|/dumpFile> - Dump a data structure to a file
+31 L<decodeJson|/decodeJson> - Decode Perl from Json.
 
-32 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
+32 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
 
-33 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
+33 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
 
-34 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
+34 L<dumpFile|/dumpFile> - Dump a data structure to a file
 
-35 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
+35 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
 
-36 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
+36 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
 
-37 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
+37 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
 
-38 L<encodeJson|/encodeJson> - Encode Perl to Json.
+38 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
 
-39 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+39 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
 
-40 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+40 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
 
-41 L<extractTest|/extractTest> - Remove example markers from test code.
+41 L<encodeJson|/encodeJson> - Encode Perl to Json.
 
-42 L<fe|/fe> - Get extension of file name.
+42 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
-43 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
+43 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
 
-44 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
+44 L<extractTest|/extractTest> - Remove example markers from test code.
 
-45 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
+45 L<fe|/fe> - Get extension of file name.
 
-46 L<filePath|/filePath> - Create a file name from an array of file name components.
+46 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
 
-47 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
+47 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
 
-48 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
+48 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
 
-49 L<fileSize|/fileSize> - Get the size of a file.
+49 L<filePath|/filePath> - Create a file name from an array of file name components.
 
-50 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
+50 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-51 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
+51 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-52 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
+52 L<fileSize|/fileSize> - Get the size of a file.
 
-53 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
+53 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
 
-54 L<firstNChars|/firstNChars> - First N characters of a string.
+54 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
 
-55 L<fn|/fn> - Remove path and extension from file name.
+55 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
 
-56 L<fne|/fne> - Remove path from file name.
+56 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
-57 L<formatTable|/formatTable> - Format various data structures as a table.
+57 L<firstNChars|/firstNChars> - First N characters of a string.
 
-58 L<formatTableA|/formatTableA> - Tabularize an array.
+58 L<fn|/fn> - Remove path and extension from file name.
 
-59 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+59 L<fne|/fne> - Remove path from file name.
 
-60 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+60 L<formatTable|/formatTable> - Format various data structures as a table.
 
-61 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
+61 L<formatTableA|/formatTableA> - Tabularize an array.
 
-62 L<formatTableH|/formatTableH> - Tabularize a hash.
+62 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-63 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+63 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-64 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+64 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-65 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+65 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-66 L<fp|/fp> - Get path from file name.
+66 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-67 L<fpn|/fpn> - Remove extension from file name.
+67 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-68 L<fullFileName|/fullFileName> - Full name of a file.
+68 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-69 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes>.
+69 L<fp|/fp> - Get path from file name.
 
-70 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+70 L<fpn|/fpn> - Remove extension from file name.
 
-71 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+71 L<fullFileName|/fullFileName> - Full name of a file.
 
-72 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
+72 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes>.
 
-73 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+73 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-74 L<hostName|/hostName> - The name of the host we are running on.
+74 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-75 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+75 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-76 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+76 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-77 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+77 L<hostName|/hostName> - The name of the host we are running on.
 
-78 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+78 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-79 L<isBlank|/isBlank> - Test whether a string is blank.
+79 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
 
-80 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+80 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-81 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+81 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-82 L<keyCount|/keyCount> - Count keys down to the specified level.
+82 L<isBlank|/isBlank> - Test whether a string is blank.
 
-83 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+83 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-84 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+84 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-85 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
+85 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-86 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+86 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-87 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+87 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-88 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+88 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
 
-89 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+89 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-90 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred
+90 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-91 L<makePath|/makePath> - Make the path for the specified file name or folder.
+91 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-92 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+92 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-93 L<max|/max> - Find the maximum number in a list.
+93 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
 
-94 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+94 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-95 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+95 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-96 L<min|/min> - Find the minimum number in a list.
+96 L<max|/max> - Find the maximum number in a list.
 
-97 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+97 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-98 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+98 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-99 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+99 L<min|/min> - Find the minimum number in a list.
 
-100 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+100 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their results from the folder named by B<$transferArea>.
 
-101 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+101 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-102 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+102 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-103 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
+103 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-104 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+104 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-105 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+105 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-106 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+106 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-107 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+107 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-108 L<printQw|/printQw> - Print an array of words in qw() format.
+108 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-109 L<quoteFile|/quoteFile> - Quote a file name.
+109 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-110 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+110 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-111 L<readFile|/readFile> - Read a file containing unicode in utf8.
+111 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-112 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+112 L<printQw|/printQw> - Print an array of words in qw() format.
 
-113 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+113 L<quoteFile|/quoteFile> - Quote a file name.
 
-114 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+114 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-115 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+115 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-116 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+116 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-117 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+117 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-118 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+118 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-119 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+119 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-120 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
+120 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-121 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
+121 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-122 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+122 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-123 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the two non equal tails of non equal strings or an empty list if the strings are equal.
+123 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-124 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+124 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
 
-125 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+125 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
 
-126 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+126 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-127 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+127 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the two non equal tails of non equal strings or an empty list if the strings are equal.
 
-128 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+128 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-129 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+129 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-130 L<timeStamp|/timeStamp> - hours:minute:seconds
+130 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-131 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
+131 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-132 L<trackFiles|/trackFiles> - Track the existence of files.
+132 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-133 L<trim|/trim> - Remove any white space from the front and end of a string.
+133 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-134 L<updateDocumentation|/updateDocumentation> - Update documentation from the comments in a perl script.
+134 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-135 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+135 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
 
-136 L<userId|/userId> - The userid we are currently running under.
+136 L<trackFiles|/trackFiles> - Track the existence of files.
 
-137 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+137 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-138 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+138 L<updateDocumentation|/updateDocumentation> - Update documentation from the comments in a perl script.
 
-139 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+139 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-140 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
+140 L<userId|/userId> - The userid we are currently running under.
 
-141 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+141 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-142 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+142 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-143 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+143 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-144 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+144 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
 
-145 L<xxx|/xxx> - Execute a shell command.
+145 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
-146 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+146 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
 
-147 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+147 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
 
-148 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+148 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+
+149 L<xxx|/xxx> - Execute a shell command.
+
+150 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+151 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+152 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -5827,7 +5985,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 370;
+use Test::More tests => 371;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
 
@@ -7042,6 +7200,18 @@ if (1)                                                                          
   ok $t->start >= $s->start+1;
   ok !$s->check(1);
   unlink q(bbb.txt);
+ }
+
+if (1)                                                                          #TnewProcessStarter #TData::Table::Text::Starter::start #TData::Table::Text::Starter::finish
+ {my $N = 100;
+  my $s = newProcessStarter(4, q(processes));
+  for my $i(1..$N)
+   {Data::Table::Text::Starter::start($s, sub{$i*$i});
+   }
+  is_deeply
+   [sort {$a <=> $b} Data::Table::Text::Starter::finish($s)],
+   [map {$_**2} 1..$N];
+  clearFolder($s->transferArea, 1e2);
  }
 
 #tttt

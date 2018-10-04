@@ -3,8 +3,8 @@ NAME
     background you use for each host
 
 VERSION
-    This document describes version 0.001 of App::sshwrap::hostcolor (from
-    Perl distribution App-sshwrap-hostcolor), released on 2018-09-25.
+    This document describes version 0.005 of App::sshwrap::hostcolor (from
+    Perl distribution App-sshwrap-hostcolor), released on 2018-09-26.
 
 SYNOPSIS
     See the included script sshwrap-hostcolor.
@@ -24,9 +24,6 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    ssh
 
 AUTHOR
     perlancar <perlancar@cpan.org>

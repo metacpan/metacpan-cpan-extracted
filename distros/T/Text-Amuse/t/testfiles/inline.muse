@@ -1,9 +1,9 @@
 #title Inline
 
 *em* <br> **strong** <br> ***emStrong*** =code= <em>em</em>
-<strong>strong</strong> <em><strong>EmStrong</em></strong>
+<strong>strong</strong> <em><strong>EmStrong</strong></em>
 *em* **strong** ***emStrong*** =code= <em>em</em>
-<strong>strong</strong> <em><strong>EmStrong</em></strong>
+<strong>strong</strong> <em><strong>EmStrong</strong></em>
 
 <script>alert("hacked!")</script><em><strong>
 

@@ -1,6 +1,6 @@
 package Twitter::API::Trait::NormalizeBooleans;
 # ABSTRACT: Normalize Booleans
-$Twitter::API::Trait::NormalizeBooleans::VERSION = '1.0003';
+$Twitter::API::Trait::NormalizeBooleans::VERSION = '1.0005';
 use 5.14.1;
 use Moo::Role;
 use namespace::clean;
@@ -62,7 +62,7 @@ Twitter::API::Trait::NormalizeBooleans - Normalize Booleans
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 

@@ -4,23 +4,15 @@ Boxer installation
 Preparations
 ------------
 
-On Debian 8+ (Jessie or newer), or Debian unstable (Sid), simply install
-boxer:
+On Debian 8+ (Jessie or newer), or Debian unstable (Sid),
+boxer is available as a regular package:
 
     apt install boxer
 
-On Debian 8 (Jessie), you can alternatively install a backport of newer
-boxer:
+Alternatively install from CPAN, and only a helper tool from Debian:
 
-    echo deb http://debian.jones.dk/ jessie boxer > /etc/apt/sources.list.d/boxer.list
-    apt update
-    apt install boxer
-
-On Debian Wheezy, you can install a backport of boxer:
-
-    echo deb http://debian.jones.dk/ wheezy boxer > /etc/apt/sources.list.d/boxer.list
-    apt-get update
-    apt-get install boxer
+    cpanm Boxer
+    apt install reclass
 
 
 Usage
@@ -36,7 +28,7 @@ of example file and environment variables PATH PYTHONPATH PERL5LIB.
 Development
 -----------
 
-    git clone git://git.debian.org/boxer/Boxer
+    git clone https://salsa.debian.org/boxer-team/boxer
     cd Boxer
     PERL5LIB=lib bin/boxer compose --skeldir share/skel --datadir examples parl-greens
 

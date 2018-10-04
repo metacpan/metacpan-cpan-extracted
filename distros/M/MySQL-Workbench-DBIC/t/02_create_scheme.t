@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 use FindBin ();
 
 BEGIN {
@@ -38,11 +38,25 @@ ok( -e $subpath . '/DBIC_Schema/Result/Gefa_User.pm', 'Gefa_User' );
 ok( -e $subpath . '/DBIC_Schema/Result/UserRole.pm', 'UserRole' );
 ok( -e $subpath . '/DBIC_Schema/Result/Role.pm', 'Role' );
 
+my $module  = $subpath . '/DBIC_Schema/Result/Role.pm';
+my $content = do { local ( @ARGV, $/ ) = $module; <> };
+like $content, qr{use base qw\(DBIx::Class\)}, 'Check correct inheritance';
+like $content, qr{->load_components\( qw/PK::Auto Core/ \)}, 'Check correct component loading';
+
+my $schema_content = do {
+    local ( @ARGV, $/ ) = $subpath . '/DBIC_Schema.pm';
+    <>;
+};
+
+like $schema_content, qr/->load_namespaces;/;
+
 eval{
     rmtree( $output_path );
     $output_path = _untaint_path( $output_path );
     rmdir $output_path;
 };
+
+done_testing();
 
 sub rmtree{
     my ($path) = @_;

@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPPRC;
-$Finance::AMEX::Transaction::EPPRC::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPPRC::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -105,7 +105,7 @@ Finance::AMEX::Transaction::EPPRC - Parse AMEX Transaction/Invoice Level Reconci
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

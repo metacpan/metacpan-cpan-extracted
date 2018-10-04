@@ -60,7 +60,7 @@ is $vta->client, $client, 'client should default to vsql';
 is $vta->registry, 'sqitch', 'registry default should be "sqitch"';
 is $vta->uri, $uri, 'DB URI should be "db:vertica:"';
 my $dest_uri = $uri->clone;
-$dest_uri->dbname($ENV{VERTICADATABASE} || $ENV{VERTICAUSER} || $sqitch->sysuser);
+$dest_uri->dbname($ENV{VSQL_DATABASE} || $ENV{VSQL_USER} || $sqitch->sysuser);
 is $vta->destination, $dest_uri->as_string,
     'Destination should fall back on environment variables';
 is $vta->registry_destination, $vta->destination,
@@ -74,8 +74,8 @@ my @std_opts = (
     '--set' => 'ON_ERROR_STOP=1',
     '--set' => 'registry=sqitch',
 );
-is_deeply [$vta->vsql], [$client, @std_opts],
-    'vsql command should be std opts-only';
+is_deeply [$vta->vsql], [$client, '--username', $sqitch->sysuser, @std_opts],
+    'vsql command should be username and std opts-only';
 
 isa_ok $vta = $CLASS->new(
     sqitch => $sqitch,
@@ -85,6 +85,7 @@ ok $vta->set_variables(foo => 'baz', whu => 'hi there', yo => 'stellar'),
     'Set some variables';
 is_deeply [$vta->vsql], [
     $client,
+    '--username', $sqitch->sysuser,
     '--set' => 'foo=baz',
     '--set' => 'whu=hi there',
     '--set' => 'yo=stellar',
@@ -95,14 +96,19 @@ is_deeply [$vta->vsql], [
 # Test other configs for the target.
 ENV: {
     # Make sure we override system-set vars.
-    local $ENV{VERTICADATABASE};
-    local $ENV{VERTICAUSER};
-    for my $env (qw(VERTICADATABASE VERTICAUSER)) {
+    local $ENV{VSQL_DATABASE};
+    local $ENV{VSQL_USER};
+    local $ENV{VSQL_PASSWORD};
+    for my $env (qw(VSQL_DATABASE VSQL_USER VSQL_PASSWORD)) {
         my $vta = $CLASS->new(sqitch => $sqitch, target => $target);
         local $ENV{$env} = "\$ENV=whatever";
         is $vta->target->name, "db:vertica:", "Target name should not read \$$env";
         is $vta->registry_destination, $vta->destination,
-            'Meta target should be the same as destination';
+            'Registry target should be the same as destination';
+        is $vta->username, $ENV{VSQL_USER} || $sqitch->sysuser,
+            "Should have username when $env set";
+        is $vta->password, $ENV{VSQL_PASSWORD},
+            "Should have password when $env set";
     }
 
     my $mocker = Test::MockModule->new('App::Sqitch');
@@ -111,13 +117,13 @@ ENV: {
     is $vta->target->name, 'db:vertica:',
         'Target name should not fall back on sysuser';
     is $vta->registry_destination, $vta->destination,
-        'Meta target should be the same as destination';
+        'Registry target should be the same as destination';
 
-    $ENV{VERTICADATABASE} = 'mydb';
+    $ENV{VSQL_DATABASE} = 'mydb';
     $vta = $CLASS->new(sqitch => $sqitch, username => 'hi', target => $target);
     is $vta->target->name, 'db:vertica:',  'Target name should be the default';
     is $vta->registry_destination, $vta->destination,
-        'Meta target should be the same as destination';
+        'Registry target should be the same as destination';
 }
 
 ##############################################################################
@@ -138,11 +144,13 @@ is $vta->client, '/path/to/vsql', 'client should be as configured';
 is $vta->uri->as_string, 'db:vertica://localhost/try',
     'uri should be as configured';
 is $vta->registry, 'meta', 'registry should be as configured';
-is_deeply [$vta->vsql], [qw(
-    /path/to/vsql
-    --dbname   try
-    --host     localhost
-), @std_opts], 'vsql command should be configured from URI config';
+is_deeply [$vta->vsql], [
+    '/path/to/vsql',
+    '--username', $sqitch->sysuser,
+    '--dbname',   'try',
+    '--host',     'localhost',
+    @std_opts
+], 'vsql command should be configured from URI config';
 
 ##############################################################################
 # Now make sure that (deprecated?) Sqitch options override configurations.
@@ -158,11 +166,13 @@ ok $vta = $CLASS->new(sqitch => $sqitch, target => $target),
     'Create a vertica with sqitch with options';
 
 is $vta->client, '/some/other/vsql', 'client should be as optioned';
-is_deeply [$vta->vsql], [qw(
-    /some/other/vsql
-    --dbname   try
-    --host     localhost
-), @std_opts], 'vsql command should be as optioned';
+is_deeply [$vta->vsql], [
+    '/some/other/vsql',
+    '--username', $sqitch->sysuser,
+    '--dbname',   'try',
+    '--host',     'localhost',
+    @std_opts
+], 'vsql command should be as optioned';
 
 ##############################################################################
 # Test _run(), _capture(), and _spool().
@@ -260,10 +270,10 @@ $mock_config->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
-ok my $ts2char = $CLASS->can('_ts2char'), "$CLASS->can('_ts2char')";
-is $ts2char->('foo'),
+ok my $ts2char = $CLASS->can('_ts2char_format'), "$CLASS->can('_ts2char_format')";
+is sprintf($ts2char->(), 'foo'),
     q{to_char(foo AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD:"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')},
-    '_ts2char should work';
+    '_ts2char_format should work';
 
 ok my $dtfunc = $CLASS->can('_dt'), "$CLASS->can('_dt')";
 isa_ok my $dt = $dtfunc->(
@@ -295,7 +305,7 @@ END {
     );
 }
 
-$uri = URI->new($ENV{VSQL_URI} || 'db:dbadmin:password@localhost/dbadmin');
+$uri = URI->new($ENV{VSQL_URI} || 'db:vertica://dbadmin:password@localhost/dbadmin');
 my $err = try {
     $vta->use_driver;
     $dbh = DBI->connect($uri->dbi_dsn, $uri->user, $uri->password, {

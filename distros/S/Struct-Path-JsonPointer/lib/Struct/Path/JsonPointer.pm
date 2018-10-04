@@ -28,11 +28,11 @@ syntax frontend for L<Struct::Path|Struct::Path>
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ sub _hook {
 
             splice @{$_}, $step, 1 if ($last and $_{opts}->{delete});
 
-        } elsif (ref $_ eq 'HASH') { # HASH
+        } elsif (ref $_ eq 'HASH') {
             croak "'$step' key doesn't exist, step #" . @{$_[0]}
                 unless (exists $_->{$step} or $_{opts}->{expand});
 
@@ -159,19 +159,23 @@ sub _hook {
 };
 
 sub str2path {
+    croak "Undefined JSON Pointer passed" unless (defined $_[0]);
+
     my @steps = split('/', $_[0], -1);
-    shift @steps if (substr($_[0], 0, 1) eq '/');
+
+    croak "JSON Pointer should start with a slash or be empty"
+        if (shift @steps and substr($_[0], 0, 1) ne '/');
 
     my @path;
 
-    for my $step (@steps) {
-        if (looks_like_number($step) or $step eq '-') {
-            push @path, _hook($step, @path == $#steps);
+    for (@steps) {
+        if (looks_like_number($_) or $_ eq '-') {
+            push @path, _hook($_, @path == $#steps);
         } else { # hash
-            $step =~ s|~1|/|g;
-            $step =~ s|~0|~|g;
+            s|~1|/|g;
+            s|~0|~|g;
 
-            push @path, {K => [$step]};
+            push @path, {K => [$_]};
         }
     }
 

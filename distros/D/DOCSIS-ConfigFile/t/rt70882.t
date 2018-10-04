@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use Test::More;
-use DOCSIS::ConfigFile qw( encode_docsis decode_docsis );
+use DOCSIS::ConfigFile qw(encode_docsis decode_docsis);
 
 plan skip_all => 'cannot find test-files' unless -e 't/data/rt70882/encoded.cm.zero';
 

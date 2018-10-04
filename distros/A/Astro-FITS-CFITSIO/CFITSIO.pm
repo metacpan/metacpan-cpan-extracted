@@ -1,5 +1,5 @@
 package Astro::FITS::CFITSIO;
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 use strict;
 use Carp;
@@ -530,6 +530,7 @@ my %__names = (
 	       fficls => 'fits_insert_cols',
 	       ffdcol => 'fits_delete_col',
 	       ffcpcl => 'fits_copy_col',
+	       ffccls => 'fits_copy_cols',
 	       ffcprw => 'fits_copy_rows',
 	       ffmvec => 'fits_modify_vector_len',
 	       ffgics => 'fits_read_img_coord',

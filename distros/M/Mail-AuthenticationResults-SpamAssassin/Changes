@@ -1,0 +1,6 @@
+Change log for Mail::AuthenticationResults::SpamAssassin
+
+1.20180927 2018-09-27 10:58:48+10:00 Australia/Melbourne
+        - Forked from Mail::AuthenticationResults into own repo.
+        - Added a SpamAssassin plugin for parsing headers.
+

@@ -1058,7 +1058,7 @@ Bio::AutomatedAnnotation::Prokka - Prokka class for bacterial annotation
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Twitter::API::Trait::DecodeHtmlEntities;
 # ABSTRACT: Decode HTML entities in strings
-$Twitter::API::Trait::DecodeHtmlEntities::VERSION = '1.0003';
+$Twitter::API::Trait::DecodeHtmlEntities::VERSION = '1.0005';
 use Moo::Role;
 use HTML::Entities qw/decode_entities/;
 use Scalar::Util qw/refaddr/;
@@ -48,7 +48,7 @@ Twitter::API::Trait::DecodeHtmlEntities - Decode HTML entities in strings
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 

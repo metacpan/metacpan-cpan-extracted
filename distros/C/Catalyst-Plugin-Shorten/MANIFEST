@@ -1,0 +1,24 @@
+Changes
+lib/Catalyst/Plugin/Shorten.pm
+lib/Catalyst/Plugin/Shorten/Store/Dummy.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basic.t
+t/02-cb.t
+t/03-config.t
+t/04-link-url.t
+t/05-fails.t
+t/06-delete.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Shorten.pm
+t/lib/TestAppConfig.pm
+t/lib/TestAppConfig/Controller/Shorten.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Root.pm
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

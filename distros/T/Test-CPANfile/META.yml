@@ -3,6 +3,7 @@ abstract: 'see if cpanfile lists every used modules'
 author:
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
 build_requires:
+  CPAN::Common::Index: '0'
   ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
   Test::UseAllModules: '0.17'
@@ -22,8 +23,7 @@ no_index:
 requires:
   Exporter: '5.57'
   Module::CPANfile: '0'
-  Perl::PrereqScanner::NotQuiteLite: '0.91'
-  Perl::PrereqScanner::NotQuiteLite::App: '0'
+  Perl::PrereqScanner::NotQuiteLite: '0.96'
 resources: {}
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,35 @@
+---
+abstract: 'The great ancient URI shortner!'
+author:
+  - 'LNATION <thisusedtobeanemail@gmail.com>'
+build_requires:
+  JSON: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Metadata: '1.000033'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Shorten
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Catalyst::Plugin::Shorten:
+    file: lib/Catalyst/Plugin/Shorten.pm
+    version: '0.02'
+  Catalyst::Plugin::Shorten::Store::Dummy:
+    file: lib/Catalyst/Plugin/Shorten/Store/Dummy.pm
+requires:
+  Bijection: '0.04'
+  Catalyst::Runtime: '5.80001'
+  perl: '5.006'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Catalyst-Plugin-Shorten.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

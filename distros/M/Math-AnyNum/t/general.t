@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 93;
+plan tests => 99;
 
 {
     use Math::AnyNum qw(:overload);
@@ -146,7 +146,13 @@ plan tests => 93;
     is(Math::AnyNum->new('ff',    16), '255');
     is(Math::AnyNum->new('ff/ae', 16), '85/58');
 
-    #is(2.5, 5/2);
+    # Tests for a leading plus sign
+    is(Math::AnyNum->new('+3/4'), '3/4');
+    is(Math::AnyNum->new('+3/4',   36), '3/4');
+    is(Math::AnyNum->new('+ff/aa', 36), '3/2');
+    is(Math::AnyNum->new('+ff',    36), '555');
+    is(Math::AnyNum->new('+42'), '42');
+    is(Math::AnyNum->new('+42', 16), '66');
 
     # Stringification of very small values
     like(1 / exp(Math::AnyNum->new('459')), qr/^4\.5586138580111498673250123473364\d*e-200\z/);

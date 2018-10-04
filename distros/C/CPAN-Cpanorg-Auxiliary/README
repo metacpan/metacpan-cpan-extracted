@@ -1,15 +1,32 @@
-pod2text CPAN::Cpanorg::Auxiliary.pm > README
+README for Perl extension CPAN::Cpanorg::Auxiliary
 
-If this is still here it means the programmer was too lazy to create the readme file.
+NAME
+CPAN::Cpanorg::Auxiliary - Methods used in cpan.org infrastructure
 
-You can create it now by using the command shown above from this directory.
+USAGE
+    use CPAN::Cpanorg::Auxiliary;
 
-At the very least you should be able to use this set of instructions
-to install the module...
+DESCRIPTION
+The objective of this library is to provide methods which can be used to
+write replacements for programs used on the CPAN master server and
+stored in github.com in the perlorg/cpanorg and devel/cpanorg-generators
+repositories.
 
-perl Makefile.PL
-make
-make test
-make install
+In particular, each of those repositories has an executable program with
+subroutines identical, or nearly so, to subroutines found in a program
+in the other. Those programs are:
 
-If you are on a windows box you should use 'nmake' rather than 'make'.
+*   cpanorg-generators: bin/perl-sorter.pl
+    <https://github.com/devel/cpanorg-generators/blob/master/bin/perl-sorter.pl>
+
+*   cpanorg: bin/cpanorg_perl_releases
+    <https://github.com/perlorg/cpanorg/blob/master/bin/cpanorg_perl_releases>
+
+By extracting these subroutines into a single package, we hope to
+improve the maintainability of code running on the CPAN infrastructure.
+
+METHODS
+
+See documentation for individual methods.  After installation:
+
+    perldoc CPAN::Cpanorg::Auxiliary

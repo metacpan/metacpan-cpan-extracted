@@ -25,15 +25,15 @@ requires:
   RPi::BMP180: '2.3604'
   RPi::Const: '1.04'
   RPi::DAC::MCP4922: '2.3605'
-  RPi::DHT11: '1.03'
+  RPi::DHT11: '1.04'
   RPi::DigiPot::MCP4XXXX: '2.3604'
-  RPi::GPIOExpander::MCP23017: '0.01'
+  RPi::GPIOExpander::MCP23017: '1'
   RPi::HCSR04: '2.3604'
-  RPi::I2C: '2.3606'
+  RPi::I2C: '2.3607'
   RPi::LCD: '2.3603'
   RPi::Pin: '2.3606'
   RPi::RTC::DS3231: '0.01'
-  RPi::SPI: '2.3608'
+  RPi::SPI: '2.3609'
   RPi::Serial: '2.3603'
   RPi::StepperMotor: '2.3604'
   WiringPi::API: '2.3616'
@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/rpi-wiringpi/issues
   repository: https://github.com/stevieb9/rpi-wiringpi.git
-version: '2.3628'
+version: '2.3629'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

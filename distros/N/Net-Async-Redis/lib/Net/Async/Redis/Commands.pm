@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.009'; # VERSION
 
 =head1 NAME
 
@@ -98,7 +98,7 @@ sub cluster_delslots : method {
 
 =head2 cluster_failover
 
-Forces a slave to perform a manual failover of its master.
+Forces a replica to perform a manual failover of its master.
 
 =over 4
 
@@ -223,7 +223,7 @@ sub cluster_nodes : method {
 
 =head2 cluster_replicate
 
-Reconfigure a node as a slave of the specified master node.
+Reconfigure a node as a replica of the specified master node.
 
 =over 4
 
@@ -316,7 +316,7 @@ sub cluster_setslot : method {
 
 =head2 cluster_slaves
 
-List slave nodes of the specified master node.
+List replica nodes of the specified master node.
 
 =over 4
 
@@ -331,6 +331,25 @@ L<https://redis.io/commands/cluster-slaves>
 sub cluster_slaves : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(CLUSTER SLAVES) => @args)
+}
+
+=head2 cluster_replicas
+
+List replica nodes of the specified master node.
+
+=over 4
+
+=item * node-id
+
+=back
+
+L<https://redis.io/commands/cluster-replicas>
+
+=cut
+
+sub cluster_replicas : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLUSTER REPLICAS) => @args)
 }
 
 =head2 cluster_slots
@@ -348,7 +367,7 @@ sub cluster_slots : method {
 
 =head2 readonly
 
-Enables read queries for a connection to a cluster slave node.
+Enables read queries for a connection to a cluster replica node.
 
 L<https://redis.io/commands/readonly>
 
@@ -361,7 +380,7 @@ sub readonly : method {
 
 =head2 readwrite
 
-Disables read queries for a connection to a cluster slave node.
+Disables read queries for a connection to a cluster replica node.
 
 L<https://redis.io/commands/readwrite>
 
@@ -952,7 +971,7 @@ Wait for the synchronous replication of all the write commands sent in the conte
 
 =over 4
 
-=item * numslaves
+=item * numreplicas
 
 =item * timeout
 
@@ -2543,6 +2562,92 @@ sub lastsave : method {
     $self->execute_command(qw(LASTSAVE) => @args)
 }
 
+=head2 memory_doctor
+
+Outputs memory problems report.
+
+L<https://redis.io/commands/memory-doctor>
+
+=cut
+
+sub memory_doctor : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(MEMORY DOCTOR) => @args)
+}
+
+=head2 memory_help
+
+Show helpful text about the different subcommands.
+
+L<https://redis.io/commands/memory-help>
+
+=cut
+
+sub memory_help : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(MEMORY HELP) => @args)
+}
+
+=head2 memory_malloc_stats
+
+Show allocator internal stats.
+
+L<https://redis.io/commands/memory-malloc-stats>
+
+=cut
+
+sub memory_malloc_stats : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(MEMORY MALLOC-STATS) => @args)
+}
+
+=head2 memory_purge
+
+Ask the allocator to release memory.
+
+L<https://redis.io/commands/memory-purge>
+
+=cut
+
+sub memory_purge : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(MEMORY PURGE) => @args)
+}
+
+=head2 memory_stats
+
+Show memory usage details.
+
+L<https://redis.io/commands/memory-stats>
+
+=cut
+
+sub memory_stats : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(MEMORY STATS) => @args)
+}
+
+=head2 memory_usage
+
+Estimate the memory usage of a key.
+
+=over 4
+
+=item * key
+
+=item * [SAMPLES count]
+
+=back
+
+L<https://redis.io/commands/memory-usage>
+
+=cut
+
+sub memory_usage : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(MEMORY USAGE) => @args)
+}
+
 =head2 monitor
 
 Listen for all requests received by the server in real time.
@@ -2603,7 +2708,7 @@ sub shutdown : method {
 
 =head2 slaveof
 
-Make the server a slave of another instance, or promote it as master.
+Make the server a replica of another instance, or promote it as master. Deprecated starting with Redis 5. Use REPLICAOF instead.
 
 =over 4
 
@@ -2620,6 +2725,27 @@ L<https://redis.io/commands/slaveof>
 sub slaveof : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(SLAVEOF) => @args)
+}
+
+=head2 replicaof
+
+Make the server a replica of another instance, or promote it as master.
+
+=over 4
+
+=item * host
+
+=item * port
+
+=back
+
+L<https://redis.io/commands/replicaof>
+
+=cut
+
+sub replicaof : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(REPLICAOF) => @args)
 }
 
 =head2 slowlog
@@ -2984,6 +3110,48 @@ sub sscan : method {
 
 =head1 METHODS - Sorted_set
 
+=head2 bzpopmin
+
+Remove and return the member with the lowest score from one or more sorted sets, or block until one is available.
+
+=over 4
+
+=item * key [key ...]
+
+=item * timeout
+
+=back
+
+L<https://redis.io/commands/bzpopmin>
+
+=cut
+
+sub bzpopmin : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BZPOPMIN) => @args)
+}
+
+=head2 bzpopmax
+
+Remove and return the member with the highest score from one or more sorted sets, or block until one is available.
+
+=over 4
+
+=item * key [key ...]
+
+=item * timeout
+
+=back
+
+L<https://redis.io/commands/bzpopmax>
+
+=cut
+
+sub bzpopmax : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BZPOPMAX) => @args)
+}
+
 =head2 zadd
 
 Add one or more members to a sorted set, or update its score if it already exists.
@@ -3124,6 +3292,48 @@ L<https://redis.io/commands/zlexcount>
 sub zlexcount : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(ZLEXCOUNT) => @args)
+}
+
+=head2 zpopmax
+
+Remove and return members with the highest scores in a sorted set.
+
+=over 4
+
+=item * key
+
+=item * [count]
+
+=back
+
+L<https://redis.io/commands/zpopmax>
+
+=cut
+
+sub zpopmax : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZPOPMAX) => @args)
+}
+
+=head2 zpopmin
+
+Remove and return members with the lowest scores in a sorted set.
+
+=over 4
+
+=item * key
+
+=item * [count]
+
+=back
+
+L<https://redis.io/commands/zpopmin>
+
+=cut
+
+sub zpopmin : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZPOPMIN) => @args)
 }
 
 =head2 zrange
@@ -3483,6 +3693,337 @@ L<https://redis.io/commands/zscan>
 sub zscan : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(ZSCAN) => @args)
+}
+
+=head1 METHODS - Stream
+
+=head2 xinfo
+
+Get information on streams and consumer groups.
+
+=over 4
+
+=item * [CONSUMERS key groupname]
+
+=item * [GROUPS key]
+
+=item * [STREAM key]
+
+=item * [HELP]
+
+=back
+
+L<https://redis.io/commands/xinfo>
+
+=cut
+
+sub xinfo : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XINFO) => @args)
+}
+
+=head2 xadd
+
+Appends a new entry to a stream.
+
+=over 4
+
+=item * key
+
+=item * ID
+
+=item * field string [field string ...]
+
+=back
+
+L<https://redis.io/commands/xadd>
+
+=cut
+
+sub xadd : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XADD) => @args)
+}
+
+=head2 xtrim
+
+Trims the stream to (approximately if '~' is passed) a certain size.
+
+=over 4
+
+=item * key
+
+=item * MAXLEN
+
+=item * [~]
+
+=item * count
+
+=back
+
+L<https://redis.io/commands/xtrim>
+
+=cut
+
+sub xtrim : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XTRIM) => @args)
+}
+
+=head2 xdel
+
+Removes the specified entries from the stream. Returns the number of items actually deleted, that may be different from the number of IDs passed in case certain IDs do not exist.
+
+=over 4
+
+=item * key
+
+=item * ID [ID ...]
+
+=back
+
+L<https://redis.io/commands/xdel>
+
+=cut
+
+sub xdel : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XDEL) => @args)
+}
+
+=head2 xrange
+
+Return a range of elements in a stream, with IDs matching the specified IDs interval.
+
+=over 4
+
+=item * key
+
+=item * start
+
+=item * end
+
+=item * [COUNT count]
+
+=back
+
+L<https://redis.io/commands/xrange>
+
+=cut
+
+sub xrange : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XRANGE) => @args)
+}
+
+=head2 xrevrange
+
+Return a range of elements in a stream, with IDs matching the specified IDs interval, in reverse order (from greater to smaller IDs) compared to XRANGE.
+
+=over 4
+
+=item * key
+
+=item * end
+
+=item * start
+
+=item * [COUNT count]
+
+=back
+
+L<https://redis.io/commands/xrevrange>
+
+=cut
+
+sub xrevrange : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XREVRANGE) => @args)
+}
+
+=head2 xlen
+
+Return the number of entires in a stream.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/xlen>
+
+=cut
+
+sub xlen : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XLEN) => @args)
+}
+
+=head2 xread
+
+Return never seen elements in multiple streams, with IDs greater than the ones reported by the caller for each stream. Can block.
+
+=over 4
+
+=item * [COUNT count]
+
+=item * [BLOCK milliseconds]
+
+=item * STREAMS
+
+=item * key [key ...]
+
+=item * ID [ID ...]
+
+=back
+
+L<https://redis.io/commands/xread>
+
+=cut
+
+sub xread : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XREAD) => @args)
+}
+
+=head2 xgroup
+
+Create, destroy, and manage consumer groups.
+
+=over 4
+
+=item * [CREATE key groupname id-or-$]
+
+=item * [SETID key id-or-$]
+
+=item * [DESTROY key groupname]
+
+=item * [DELCONSUMER key groupname consumername]
+
+=back
+
+L<https://redis.io/commands/xgroup>
+
+=cut
+
+sub xgroup : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XGROUP) => @args)
+}
+
+=head2 xreadgroup
+
+Return new entries from a stream using a consumer group, or access the history of the pending entries for a given consumer. Can block.
+
+=over 4
+
+=item * GROUP group consumer
+
+=item * [COUNT count]
+
+=item * [BLOCK milliseconds]
+
+=item * STREAMS
+
+=item * key [key ...]
+
+=item * ID [ID ...]
+
+=back
+
+L<https://redis.io/commands/xreadgroup>
+
+=cut
+
+sub xreadgroup : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XREADGROUP) => @args)
+}
+
+=head2 xack
+
+Marks a pending message as correctly processed, effectively removing it from the pending entries list of the consumer group. Return value of the command is the number of messages successfully acknowledged, that is, the IDs we were actually able to resolve in the PEL.
+
+=over 4
+
+=item * key
+
+=item * group
+
+=item * ID [ID ...]
+
+=back
+
+L<https://redis.io/commands/xack>
+
+=cut
+
+sub xack : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XACK) => @args)
+}
+
+=head2 xclaim
+
+Changes (or acquires) ownership of a message in a consumer group, as if the message was delivered to the specified consumer.
+
+=over 4
+
+=item * key
+
+=item * group
+
+=item * consumer
+
+=item * min-idle-time
+
+=item * ID [ID ...]
+
+=item * [IDLE ms]
+
+=item * [TIME ms-unix-time]
+
+=item * [RETRYCOUNT count]
+
+=item * [FORCE]
+
+=item * [JUSTID]
+
+=back
+
+L<https://redis.io/commands/xclaim>
+
+=cut
+
+sub xclaim : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XCLAIM) => @args)
+}
+
+=head2 xpending
+
+Return information and entries from a stream consumer group pending entries list, that are messages fetched but never acknowledged.
+
+=over 4
+
+=item * key
+
+=item * group
+
+=item * [start end count]
+
+=item * [consumer]
+
+=back
+
+L<https://redis.io/commands/xpending>
+
+=cut
+
+sub xpending : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XPENDING) => @args)
 }
 
 =head1 METHODS - String
@@ -3879,9 +4420,7 @@ Set the string value of a key.
 
 =item * value
 
-=item * [EX seconds]
-
-=item * [PX milliseconds]
+=item * [expiration EX seconds|PX milliseconds]
 
 =item * [NX|XX]
 

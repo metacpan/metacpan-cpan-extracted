@@ -1,10 +1,38 @@
 
+8.02  2018-10-01
+  - Deprecated Mojo::Transaction::success in favor of Mojo::Transaction::result
+    and Mojo::Transaction::error. Unfortunately this method is used a lot in
+    legacy code, so this deprecation will be in effect until the next major
+    release.
+  - Added support for gzip compression of dynamically generated responses
+    (enable with $app->renderer->compress(1)).
+  - Added EXPERIMENTAL compress attribute to Mojolicious::Renderer.
+  - Added compressed attribute to Mojo::UserAgent::Transactor.
+  - Added EXPERIMENTAL respond method to Mojolicious::Renderer.
+  - Added save_to method to Mojo::Message.
+  - Added gunzip and gzip methods to Mojo::ByteStream.
+  - Added gunzip and gzip functions to Mojo::Util.
+  - Improved HTML5.2 compliance of Mojo::DOM::HTML.
+  - Fixed a bug in Mojo::Transaction::HTTP that prevented the finish event in
+    Mojo::Message::Request from getting emitted sometimes.
+  - Fixed a bug in Mojo::Promise where the ioloop attribute was not a weakened
+    reference after object construction.
+  - Fixed a bug where the is_fresh helper could only handle If-None-Match
+    headers with a single etag value.
+
+8.01  2018-09-25
+  - Updated jQuery to version 3.3.1.
+  - Fixed order of command namespaces so Mojolicious can be upgraded without
+    uninstalling first.
+  - Fixed a small problem in one of the TLS tests where an error message check
+    was too picky.
+
 8.0  2018-09-15
   - Code name "Supervillain", this is a major release.
   - Changed query method in Mojo::URL to merge with hash references and append
     with array references instead of the other way around. Because appended
     pairs should be able to preserve order.
-  - Changed template attribute in Mojolicious::Command to acivate vars by
+  - Changed template attribute in Mojolicious::Command to activate vars by
     default.
   - Removed test command.
   - Removed deprecated expect_close attribute from Mojo::Content.

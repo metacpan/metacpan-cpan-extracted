@@ -1,0 +1,16 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+*.swp
+pm_to_blib
+blib/
+Mojolicious-Plugin-PNGCast-*
+Mojolicious-Plugin-PNGCast-*/
+.releaserc
+cover_db
+firefox-versions/
+chrome-versions/
+MYMETA.*
+frame-*.png
+*.pl

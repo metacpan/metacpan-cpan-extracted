@@ -1,6 +1,6 @@
 package Apache2_4::AuthCookieMultiDBI;
 
-$VERSION = 0.02;
+$VERSION = 0.04;
 $DATE = "01 June 2018";
 
 use strict;
@@ -57,7 +57,7 @@ Apache2_4::AuthCookieMultiDBI - An AuthCookie module backed by a DBI database fo
 
 =head1 VERSION
 
-    This is version 0.01
+    This is version 0.4
 
 
 =head1 SYNOPSIS
@@ -768,13 +768,21 @@ sub authen_cred ($$\@) {
     my $auth_name = $r->auth_name;
     ( $user, $password ) = _defined_or_empty( $user, $password );
     
+    $user = trim($user);
     if ( !length $user ) {
     $r->server->log_error( "${self} no username supplied for auth realm $auth_name" );
     return;
     }
     if ( !length $password ) {
-    $r->server->log_error( "${self} no password supplied for auth realm #auth_name" );
+    $r->server->log_error( "${self} no password supplied for auth realm $auth_name" );
     return;
+    }
+
+    if ( !$self->user_is_active( $r, $user ) ) {
+        my $message
+            = "${self}\tUser '$user' is not active for auth realm $auth_name.";
+        $r->server->log_error( $message );
+        return;
     }
 
     # get the configuration information.
@@ -793,7 +801,7 @@ sub authen_cred ($$\@) {
     }
 
     # Successful login
-    my $message = "${self} Successful login for $user";
+    my $message = "${self} Successful login for $user for auth realm $auth_name";
     $r->server->log_error( $message );
 
     # Create the expire time for the ticket.
@@ -855,6 +863,11 @@ sub get_client_name {
     my @metching = ($uri =~ /$uri_regx/);
     return $metching[$c{'DBI_URIClientPos'}];
 }
+
+##
+# trim value
+##
+sub trim { my $s = shift; $s =~ s/^\s+|\s+$//g; return $s };
 
 # sub get_cookie_path {
 #     my $self = shift;

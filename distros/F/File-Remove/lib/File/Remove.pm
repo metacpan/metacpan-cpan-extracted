@@ -4,13 +4,15 @@ use 5.00503;
 use strict;
 use warnings;
 
-use vars qw{ $VERSION @ISA @EXPORT_OK };
+use vars qw{ @ISA @EXPORT_OK };
 use vars qw{ $DEBUG $unlink $rmdir    };
+
+our $VERSION = '1.58';
+
 BEGIN {
-	$VERSION   = '1.57';
-	# $VERSION   = eval $VERSION;
-	@ISA       = qw{ Exporter };
-	@EXPORT_OK = qw{ remove rm clear trash };
+    # $VERSION   = eval $VERSION;
+    @ISA       = qw{ Exporter };
+    @EXPORT_OK = qw{ remove rm clear trash };
 }
 
 use File::Path ();
@@ -47,175 +49,175 @@ my $glue;
 my @CLEANUP = ();
 
 sub clear (@) {
-	my @files = expand( @_ );
+    my @files = expand( @_ );
 
-	# Do the initial deletion
-	foreach my $file ( @files ) {
-		next unless -e $file;
-		remove( \1, $file );
-	}
+    # Do the initial deletion
+    foreach my $file ( @files ) {
+        next unless -e $file;
+        remove( \1, $file );
+    }
 
-	# Delete again at END-time.
-	# Save the current PID so that forked children
-	# won't delete things that the parent expects to
-	# live until their end-time.
-	push @CLEANUP, map { [ $$, $_ ] } @files;
+    # Delete again at END-time.
+    # Save the current PID so that forked children
+    # won't delete things that the parent expects to
+    # live until their end-time.
+    push @CLEANUP, map { [ $$, $_ ] } @files;
 }
 
 END {
-	foreach my $file ( @CLEANUP ) {
-		next unless $file->[0] == $$;
-		next unless -e $file->[1];
-		remove( \1, $file->[1] );
-	}
+    foreach my $file ( @CLEANUP ) {
+        next unless $file->[0] == $$;
+        next unless -e $file->[1];
+        remove( \1, $file->[1] );
+    }
 }
 
 # Acts like unlink would until given a directory as an argument, then
 # it acts like rm -rf ;) unless the recursive arg is zero which it is by
 # default
 sub remove (@) {
-	my $recursive = (ref $_[0] eq 'SCALAR') ? shift : \0;
+    my $recursive = (ref $_[0] eq 'SCALAR') ? shift : \0;
     my $opts = (ref $_[0] eq 'HASH') ? shift : { glob => 1 };
-	my @files     = _expand_with_opts ($opts, @_);
+    my @files     = _expand_with_opts ($opts, @_);
 
-	# Iterate over the files
-	my @removes;
-	foreach my $path ( @files ) {
-		# need to check for symlink first
-		# could be pointing to nonexisting/non-readable destination
-		if ( -l $path ) {
-			print "link: $path\n" if DEBUG;
-			if ( $unlink ? $unlink->($path) : unlink($path) ) {
-				push @removes, $path;
-			}
-			next;
-		}
-		unless ( -e $path ) {
-			print "missing: $path\n" if DEBUG;
-			push @removes, $path; # Say we deleted it
-			next;
-		}
-		my $can_delete;
-		if ( IS_VMS ) {
-			$can_delete = VMS::Filespec::candelete($path);
-		} elsif ( IS_WIN32 ) {
-			# Assume we can delete it for the moment
-			$can_delete = 1;
-		} elsif ( -w $path ) {
-			# We have write permissions already
-			$can_delete = 1;
-		} elsif ( $< == 0 ) {
-			# Unixy and root
-			$can_delete = 1;
-		} elsif ( (lstat($path))[4] == $< ) {
-			# I own the file
-			$can_delete = 1;
-		} else {
-			# I don't think we can delete it
-			$can_delete = 0;
-		}
-		unless ( $can_delete ) {
-			print "nowrite: $path\n" if DEBUG;
-			next;
-		}
+    # Iterate over the files
+    my @removes;
+    foreach my $path ( @files ) {
+        # need to check for symlink first
+        # could be pointing to nonexisting/non-readable destination
+        if ( -l $path ) {
+            print "link: $path\n" if DEBUG;
+            if ( $unlink ? $unlink->($path) : unlink($path) ) {
+                push @removes, $path;
+            }
+            next;
+        }
+        unless ( -e $path ) {
+            print "missing: $path\n" if DEBUG;
+            push @removes, $path; # Say we deleted it
+            next;
+        }
+        my $can_delete;
+        if ( IS_VMS ) {
+            $can_delete = VMS::Filespec::candelete($path);
+        } elsif ( IS_WIN32 ) {
+            # Assume we can delete it for the moment
+            $can_delete = 1;
+        } elsif ( -w $path ) {
+            # We have write permissions already
+            $can_delete = 1;
+        } elsif ( $< == 0 ) {
+            # Unixy and root
+            $can_delete = 1;
+        } elsif ( (lstat($path))[4] == $< ) {
+            # I own the file
+            $can_delete = 1;
+        } else {
+            # I don't think we can delete it
+            $can_delete = 0;
+        }
+        unless ( $can_delete ) {
+            print "nowrite: $path\n" if DEBUG;
+            next;
+        }
 
-		if ( -f $path ) {
-			print "file: $path\n" if DEBUG;
-			unless ( -w $path ) {
-				# Make the file writable (implementation from File::Path)
-				(undef, undef, my $rp) = lstat $path or next;
-				$rp &= 07777; # Don't forget setuid, setgid, sticky bits
-				$rp |= 0600;  # Turn on user read/write
-				chmod $rp, $path;
-			}
-			if ( $unlink ? $unlink->($path) : unlink($path) ) {
-				# Failed to delete the file
-				next if -e $path;
-				push @removes, $path;
-			}
+        if ( -f $path ) {
+            print "file: $path\n" if DEBUG;
+            unless ( -w $path ) {
+                # Make the file writable (implementation from File::Path)
+                (undef, undef, my $rp) = lstat $path or next;
+                $rp &= 07777; # Don't forget setuid, setgid, sticky bits
+                $rp |= 0600;  # Turn on user read/write
+                chmod $rp, $path;
+            }
+            if ( $unlink ? $unlink->($path) : unlink($path) ) {
+                # Failed to delete the file
+                next if -e $path;
+                push @removes, $path;
+            }
 
-		} elsif ( -d $path ) {
-			print "dir: $path\n" if DEBUG;
-			my $dir = File::Spec->canonpath($path);
+        } elsif ( -d $path ) {
+            print "dir: $path\n" if DEBUG;
+            my $dir = File::Spec->canonpath($path);
 
-			# Do we need to move our cwd out of the location
-			# we are planning to delete?
-			my $chdir = _moveto($dir);
-			if ( length $chdir ) {
-				chdir($chdir) or next;
-			}
+            # Do we need to move our cwd out of the location
+            # we are planning to delete?
+            my $chdir = _moveto($dir);
+            if ( length $chdir ) {
+                chdir($chdir) or next;
+            }
 
-			if ( $$recursive ) {
-				if ( File::Path::rmtree( [ $dir ], DEBUG, 0 ) ) {
-					# Failed to delete the directory
-					next if -e $path;
-					push @removes, $path;
-				}
+            if ( $$recursive ) {
+                if ( File::Path::rmtree( [ $dir ], DEBUG, 0 ) ) {
+                    # Failed to delete the directory
+                    next if -e $path;
+                    push @removes, $path;
+                }
 
-			} else {
-				my ($save_mode) = (stat $dir)[2];
-				chmod $save_mode & 0777, $dir; # just in case we cannot remove it.
-				if ( $rmdir ? $rmdir->($dir) : rmdir($dir) ) {
-					# Failed to delete the directory
-					next if -e $path;
-					push @removes, $path;
-				}
-			}
+            } else {
+                my ($save_mode) = (stat $dir)[2];
+                chmod $save_mode & 0777, $dir; # just in case we cannot remove it.
+                if ( $rmdir ? $rmdir->($dir) : rmdir($dir) ) {
+                    # Failed to delete the directory
+                    next if -e $path;
+                    push @removes, $path;
+                }
+            }
 
-		} else {
-			print "???: $path\n" if DEBUG;
-		}
-	}
+        } else {
+            print "???: $path\n" if DEBUG;
+        }
+    }
 
-	return @removes;
+    return @removes;
 }
 
 sub rm (@) {
-	goto &remove;
+    goto &remove;
 }
 
 sub trash (@) {
-	local $unlink = $unlink;
-	local $rmdir  = $rmdir;
+    local $unlink = $unlink;
+    local $rmdir  = $rmdir;
 
-	if ( ref $_[0] eq 'HASH' ) {
-		my %options = %{+shift @_};
-		$unlink = $options{unlink};
-		$rmdir  = $options{rmdir};
+    if ( ref $_[0] eq 'HASH' ) {
+        my %options = %{+shift @_};
+        $unlink = $options{unlink};
+        $rmdir  = $options{rmdir};
 
-	} elsif ( IS_WIN32 ) {
-		local $@;
-		eval 'use Win32::FileOp ();';
-		die "Can't load Win32::FileOp to support the Recycle Bin: \$@ = $@" if length $@;
-		$unlink = \&Win32::FileOp::Recycle;
-		$rmdir  = \&Win32::FileOp::Recycle;
+    } elsif ( IS_WIN32 ) {
+        local $@;
+        eval 'use Win32::FileOp ();';
+        die "Can't load Win32::FileOp to support the Recycle Bin: \$@ = $@" if length $@;
+        $unlink = \&Win32::FileOp::Recycle;
+        $rmdir  = \&Win32::FileOp::Recycle;
 
-	} elsif ( IS_MAC ) {
-		unless ( $glue ) {
-			local $@;
-			eval 'use Mac::Glue ();';
-			die "Can't load Mac::Glue::Finder to support the Trash Can: \$@ = $@" if length $@;
-			$glue = Mac::Glue->new('Finder');
-		}
-		my $code = sub {
-			my @files = map {
-				Mac::Glue::param_type(
-					Mac::Glue::typeAlias() => $_
-				)
-			} @_;
-			$glue->delete(\@files);
-		};
-		$unlink = $code;
-		$rmdir  = $code;
-	} else {
-		die "Support for trash() on platform '$^O' not available at this time.\n";
-	}
+    } elsif ( IS_MAC ) {
+        unless ( $glue ) {
+            local $@;
+            eval 'use Mac::Glue ();';
+            die "Can't load Mac::Glue::Finder to support the Trash Can: \$@ = $@" if length $@;
+            $glue = Mac::Glue->new('Finder');
+        }
+        my $code = sub {
+            my @files = map {
+                Mac::Glue::param_type(
+                    Mac::Glue::typeAlias() => $_
+                )
+            } @_;
+            $glue->delete(\@files);
+        };
+        $unlink = $code;
+        $rmdir  = $code;
+    } else {
+        die "Support for trash() on platform '$^O' not available at this time.\n";
+    }
 
-	remove(@_);
+    remove(@_);
 }
 
 sub undelete (@) {
-	goto &trash;
+    goto &trash;
 }
 
 
@@ -231,43 +233,43 @@ sub _expand_with_opts {
 }
 
 sub expand (@) {
-	map { -e $_ ? $_ : File::Glob::bsd_glob($_) } @_;
+    map { -e $_ ? $_ : File::Glob::bsd_glob($_) } @_;
 }
 
 # Do we need to move to a different directory to delete a directory,
 # and if so which.
 sub _moveto {
-	my $remove = File::Spec->rel2abs(shift);
-	my $cwd    = @_ ? shift : Cwd::cwd();
+    my $remove = File::Spec->rel2abs(shift);
+    my $cwd    = @_ ? shift : Cwd::cwd();
 
-	# Do everything in absolute terms
-	$remove = Cwd::abs_path( $remove );
-	$cwd    = Cwd::abs_path( $cwd    );
+    # Do everything in absolute terms
+    $remove = Cwd::abs_path( $remove );
+    $cwd    = Cwd::abs_path( $cwd    );
 
-	# If we are on a different volume we don't need to move
-	my ( $cv, $cd ) = File::Spec->splitpath( $cwd,    1 );
-	my ( $rv, $rd ) = File::Spec->splitpath( $remove, 1 );
-	return '' unless $cv eq $rv;
+    # If we are on a different volume we don't need to move
+    my ( $cv, $cd ) = File::Spec->splitpath( $cwd,    1 );
+    my ( $rv, $rd ) = File::Spec->splitpath( $remove, 1 );
+    return '' unless $cv eq $rv;
 
-	# If we have to move, it's to one level above the deletion
-	my @cd = File::Spec->splitdir($cd);
-	my @rd = File::Spec->splitdir($rd);
+    # If we have to move, it's to one level above the deletion
+    my @cd = File::Spec->splitdir($cd);
+    my @rd = File::Spec->splitdir($rd);
 
-	# Is the current directory the same as or inside the remove directory?
-	unless ( @cd >= @rd ) {
-		return '';
-	}
-	foreach ( 0 .. $#rd ) {
-		$cd[$_] eq $rd[$_] or return '';
-	}
+    # Is the current directory the same as or inside the remove directory?
+    unless ( @cd >= @rd ) {
+        return '';
+    }
+    foreach ( 0 .. $#rd ) {
+        $cd[$_] eq $rd[$_] or return '';
+    }
 
-	# Confirmed, the current working dir is in the removal dir
-	pop @rd;
-	return File::Spec->catpath(
-		$rv,
-		File::Spec->catdir(@rd),
-		''
-	);
+    # Confirmed, the current working dir is in the removal dir
+    pop @rd;
+    return File::Spec->catpath(
+        $rv,
+        File::Spec->catdir(@rd),
+        ''
+    );
 }
 
 1;
@@ -282,7 +284,7 @@ File::Remove - Remove files and directories
 
 =head1 VERSION
 
-version 1.57
+version 1.58
 
 =head1 SYNOPSIS
 
@@ -313,6 +315,10 @@ It also accepts wildcards, * and ?, as arguments for filenames.
 B<File::Remove::trash> accepts the same arguments as B<remove>, with
 the addition of an optional, infrequently used "other platforms"
 hashref.
+
+=head1 VERSION
+
+version 1.58
 
 =head1 SUBROUTINES
 
@@ -432,8 +438,8 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Remove or by email to
-bug-file-remove@rt.cpan.org.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Remove> or by email to
+L<bug-file-remove@rt.cpan.org|mailto:bug-file-remove@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -462,7 +468,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/File-Remove>
+L<https://metacpan.org/release/File-Remove>
 
 =item *
 
@@ -498,14 +504,6 @@ L<http://cpanratings.perl.org/d/File-Remove>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/File-Remove>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -516,7 +514,7 @@ L<http://cpants.cpanauthors.org/dist/File-Remove>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/F/File-Remove>
 

@@ -7,7 +7,7 @@ plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 my $link;
 my $embedder = LinkEmbedder->new;
 
-$link = $embedder->get('http://catoverflow.com/cats/r4cIt4z.gif');
+$embedder->get_p('http://catoverflow.com/cats/r4cIt4z.gif')->then(sub { $link = shift })->wait;
 is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
 is_deeply $link->TO_JSON,
   {
@@ -24,7 +24,7 @@ is_deeply $link->TO_JSON,
   },
   'json for catoverflow.com';
 
-$link = $embedder->get('http://thorsen.pm/blog/');
+$embedder->get_p('http://thorsen.pm/blog/')->then(sub { $link = shift })->wait;
 is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
 is_deeply $link->TO_JSON,
   {
@@ -39,8 +39,8 @@ is_deeply $link->TO_JSON,
   },
   'json for thorsen.pm';
 
-$link = $embedder->get(
-  'http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html');
+$embedder->get_p('http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html')
+  ->then(sub { $link = shift })->wait;
 is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
 is_deeply $link->TO_JSON,
   {
@@ -58,7 +58,7 @@ is_deeply $link->TO_JSON,
   url     => 'http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html',
   version => '1.0'
   },
-  'json for twitter';
+  'json for aftenposten';
 
 done_testing;
 

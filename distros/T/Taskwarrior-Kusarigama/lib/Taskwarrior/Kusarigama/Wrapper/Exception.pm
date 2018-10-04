@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Wrapper::Exception;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Exception class for Taskwarrior::Kusarigama::Wrapper
-$Taskwarrior::Kusarigama::Wrapper::Exception::VERSION = '0.9.2';
+$Taskwarrior::Kusarigama::Wrapper::Exception::VERSION = '0.9.3';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Taskwarrior::Kusarigama::Wrapper::Exception - Exception class for Taskwarrior::K
 
 =head1 VERSION
 
-version 0.9.2
+version 0.9.3
 
 =head1 AUTHOR
 

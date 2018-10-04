@@ -60,6 +60,9 @@
       "App::cdif::Command" : {
          "file" : "lib/App/cdif/Command.pm"
       },
+      "App::cdif::Command::Mecab" : {
+         "file" : "lib/App/cdif/Command/Mecab.pm"
+      },
       "App::cdif::Tmpfile" : {
          "file" : "lib/App/cdif/Tmpfile.pm"
       },
@@ -74,7 +77,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.5.3"
+         "version" : "v4.5.4"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
@@ -106,7 +109,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.5.3",
+   "version" : "4.5.4",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>",

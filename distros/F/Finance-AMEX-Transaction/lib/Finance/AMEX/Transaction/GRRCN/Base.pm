@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::GRRCN::Base;
-$Finance::AMEX::Transaction::GRRCN::Base::VERSION = '0.002';
+$Finance::AMEX::Transaction::GRRCN::Base::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -97,7 +97,7 @@ Finance::AMEX::Transaction::GRRCN::Base - Parse AMEX Global Reconciliation (GRRC
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

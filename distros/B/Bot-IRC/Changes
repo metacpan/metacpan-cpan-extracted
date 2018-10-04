@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.22      2018-10-01 16:30:33-07:00 America/Los_Angeles
+        - POD error correction; spotted by Ralf (Thanks!)
+
 1.21      2018-06-23 14:34:52-07:00 America/Los_Angeles
         - Update POD to be more clear with structure examples
         - Update store-sqlite unit test

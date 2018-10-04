@@ -37,7 +37,10 @@ sub new {
   
   my $class = ref $self;
   
-  $self->dict( $DICT_CACHE{$class} ||= DBIx::Mojo::Template->new($class, mt=> $self->mt, vars => $self->template_vars) )
+  # pass extra class files (inside the class): our $DATA=['foo.txt', 'bar.txt'];
+  my $data_files = do {   no strict 'refs'; ${"$class\::DATA"} };
+  
+  $self->dict( $DICT_CACHE{$class} ||= DBIx::Mojo::Template->new($class, mt => $self->mt, vars => $self->template_vars, $data_files ? (data => $data_files) : (), ) )
     unless $self->dict;
   weaken $self->{dict};
   
@@ -95,6 +98,9 @@ In child model must define SQL dict in __DATA__ of model package:
 
   package Model::Foo;
   use Mojo::Base 'DBIx::Mojo::Model';
+  
+  # optional outside dict __DATA__
+  our $DATA = ['Foo.pm.sql'];
   
   sub new {
     state $self = shift->SUPER::new(mt=>{tag_start=>'{%', tag_end=>'%}'}, @_);

@@ -20,6 +20,7 @@
 package Games::Axmud::Gtk::Simple::List;
 
 use strict;
+use warnings;
 use Carp;
 use Gtk2;
 

@@ -1,11 +1,15 @@
 ---
-abstract: 'Cunning adapter for logging to a duplicate of'
+abstract: 'Cunning adapter for logging to a duplicate of STDOUT or STDERR'
 author:
-  - 'Mikhail Ivanov <m.ivanych@gmail.com>'
-  - 'Anastasia Zherebtsova <zherebtsova@gmail.com>'
-build_requires: {}
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001'
+  - '=over 4'
+build_requires:
+  Test::More: '0.98'
+  Test::Perl::Critic: '0'
+  Test::PerlTidy: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,9 +18,34 @@ name: Log-Any-Adapter-Dupstd
 no_index:
   directory:
     - t
+    - xt
     - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Any::Adapter::Duperr:
+    file: lib/Log/Any/Adapter/Duperr.pm
+    version: '0.03'
+  Log::Any::Adapter::Dupout:
+    file: lib/Log/Any/Adapter/Dupout.pm
+    version: '0.03'
+  Log::Any::Adapter::Dupstd:
+    file: lib/Log/Any/Adapter/Dupstd.pm
+    version: '0.03'
+requires:
+  Log::Any: '0'
+  perl: '5.008001'
+  utf8::all: '0'
 resources:
   bugtracker: https://github.com/ivanych/Log-Any-Adapter-Dupstd/issues
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/ivanych/Log-Any-Adapter-Dupstd.git
-version: '0.02'
+  homepage: https://github.com/ivanych/Log-Any-Adapter-Dupstd
+  repository: git://github.com/ivanych/Log-Any-Adapter-Dupstd.git
+version: '0.03'
+x_authority: cpan:IVANYCH
+x_contributors:
+  - 'Mikhail Ivanov <m.ivanov@i-free.com>'
+  - 'Mikhail Ivanov <m.ivanych@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

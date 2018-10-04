@@ -1,3 +1,6 @@
+4.002     2018-10-03 13:58:15 EDT
+  - Optimize repair query (yrjustice, #15, #16)
+
 4.001     2018-04-21 19:29:24 EDT
   - Implement EXPERIMENTAL history method used for Minion Admin plugin history graph.
 

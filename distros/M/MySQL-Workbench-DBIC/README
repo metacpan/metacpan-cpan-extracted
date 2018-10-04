@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.01
+    version 1.07
 
 SYNOPSIS
 
@@ -33,6 +33,7 @@ METHODS
         output_path       => '/path/to/dir',
         input_file        => '/path/to/dbdesigner.file',
         namespace         => 'MyApp::Database',
+        result_namespace  => 'Core',
         version_add       => 0.001,
         schema_name       => 'MySchema',
         column_details    => 1,
@@ -120,7 +121,20 @@ ATTRIBUTES
     sets / gets the name of the namespace. If you set the namespace to
     'Test' and you have a table named 'MyTable', the main module is named
     'Test::DBIC_Scheme' and the class for 'MyTable' is named
-    'Test::DBIC_Scheme::MyTable'
+    'Test::DBIC_Scheme::Result::MyTable'
+
+ result_namespace
+
+    sets / gets the name of an optional result namespace. If you set the
+    result_namespace to 'Core' and you have a table named 'MyTable', the
+    class for 'MyTable' is named 'Test::DBIC_Scheme::Core::Result::MyTable'
+
+ resultset_namespace
+
+    sets / gets the name of an optional resultset namespace. If you set the
+    resultset_namespace to 'Core' and you have a table named 'MyTable', the
+    resultset class for 'MyTable' is named
+    'Test::DBIC_Scheme::Core::ResultSet::MyTable'
 
  prefix
 
@@ -167,6 +181,12 @@ ATTRIBUTES
     When this flag is used, MySQL::Workbench::DBIC assumes that (some)
     tables have stored extra information for columns in the table comments.
     This must be in JSON format.
+
+ inherit_from_core
+
+    By default, the classes inherit from DBIx::Class and they load the
+    components PK::Auto and Core. If you set inherit_from_core, the classes
+    inherit from DBIx::Class::Core. and no extra components are loaded.
 
 AUTHOR
 

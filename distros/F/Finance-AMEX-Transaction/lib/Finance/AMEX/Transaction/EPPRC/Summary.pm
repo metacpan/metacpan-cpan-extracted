@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPPRC::Summary;
-$Finance::AMEX::Transaction::EPPRC::Summary::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPPRC::Summary::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Finance::AMEX::Transaction::EPPRC::Summary - Parse AMEX Transaction/Invoice Leve
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

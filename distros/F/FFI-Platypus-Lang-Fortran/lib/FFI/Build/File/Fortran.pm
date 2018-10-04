@@ -7,7 +7,7 @@ use base qw( FFI::Build::File::C );
 use constant default_suffix => '.f';
 use constant default_encoding => ':utf8';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 

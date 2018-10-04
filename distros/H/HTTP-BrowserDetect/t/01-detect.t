@@ -42,12 +42,21 @@ foreach my $ua ( sort ( keys %{$tests} ) ) {
             'device_beta', 'device_name',  'device_string',  'engine',
             'engine_beta', 'engine_string', 'language', 'os', 'os_beta',
             'os_string', 'robot', 'robot_beta', 'robot_name', 'robot_string',
-            ) {
-            if ( $test->{$method} ) {
-                cmp_ok(
-                    $detected->$method || q{}, 'eq', $test->{$method},
-                    "$method: $test->{$method}"
-                );
+            'webview',
+        ) {
+            if ( exists $test->{$method} ) {
+                if ( defined $test->{$method} ) {
+                    eq_or_diff(
+                        $detected->$method, $test->{$method},
+                        "$method: $test->{$method}"
+                    );
+                }
+                else {
+                    eq_or_diff(
+                        $detected->$method, $test->{$method},
+                        "$method: undef"
+                    );
+                }
             }
         }
 
@@ -71,7 +80,7 @@ foreach my $ua ( sort ( keys %{$tests} ) ) {
             ios
             tablet
             )
-            ) {
+        ) {
 
             if (    exists $test->{$method}
                 and defined $test->{$method}
@@ -99,7 +108,7 @@ foreach my $ua ( sort ( keys %{$tests} ) ) {
         # for now, avoid having to add robot_id to a bunch of profiles
         eq_or_diff(
             [
-                sort grep { $_ !~ m{\Arobot_id\z} }
+                sort grep { $_ !~ m{\Arobot_id\z} && $_ !~ m{\Awebview\z} }
                     $detected->browser_properties()
             ],
             [ sort grep { $_ !~ m{\Arobot_id\z} } @{ $test->{match} } ],
@@ -138,7 +147,7 @@ subtest $detected->user_agent, sub {
         device_name
         gecko_version
         )
-        ) {
+    ) {
         is_deeply(
             [ $detected->$method ],
             [undef], "$method should return undef in list context"

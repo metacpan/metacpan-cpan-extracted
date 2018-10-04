@@ -9,27 +9,30 @@ use strict;
 use warnings;
 use utf8::all;
 
+use Carp;
 use Log::Any::Adapter::Util ();
 
 use base qw/Log::Any::Adapter::Base/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 #---
 
 # Duplicate STDERR
-open( my $duperr, '>&', STDERR ) or die "Can't dup STDERR: $!";
+open( my $duperr, '>&', STDERR ) or croak "Can't dup STDERR: $!";    ## no critic [InputOutput::RequireBriefOpen]
 
 sub init {
     my ($self) = @_;
 
     if ( exists $self->{log_level} ) {
         $self->{log_level} = Log::Any::Adapter::Util::numeric_level( $self->{log_level} )
-            unless $self->{log_level} =~ /^\d+$/;
+            unless $self->{log_level} =~ /^\d+$/x;
     }
     else {
         $self->{log_level} = Log::Any::Adapter::Util::numeric_level('trace');
     }
+
+    return;
 }
 
 foreach my $method ( Log::Any::Adapter::Util::logging_methods() ) {

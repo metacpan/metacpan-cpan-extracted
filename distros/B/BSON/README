@@ -2,7 +2,7 @@ NAME
     BSON - BSON serialization and deserialization
 
 VERSION
-    version v1.8.0
+    version v1.8.1
 
 SYNOPSIS
         use BSON;

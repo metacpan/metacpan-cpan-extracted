@@ -1,0 +1,104 @@
+{
+   "abstract" : "defines RGB values for common color names",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "color"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graphics-ColorNames",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Module::Load" : "0.10",
+            "Module::Loaded" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FileHandle" : "0",
+            "IO::File" : "0",
+            "Module::Metadata" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "constant" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::ColorNames" : {
+         "file" : "lib/Graphics/ColorNames.pm",
+         "version" : "v3.2.0"
+      },
+      "Graphics::ColorNames::HTML" : {
+         "file" : "lib/Graphics/ColorNames/HTML.pm",
+         "version" : "v3.2.0"
+      },
+      "Graphics::ColorNames::Windows" : {
+         "file" : "lib/Graphics/ColorNames/Windows.pm",
+         "version" : "v3.2.0"
+      },
+      "Graphics::ColorNames::X" : {
+         "file" : "lib/Graphics/ColorNames/X.pm",
+         "version" : "v3.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Graphics-ColorNames@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Graphics-ColorNames.git",
+         "web" : "https://github.com/robrwo/Graphics-ColorNames"
+      }
+   },
+   "version" : "v3.2.0",
+   "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Alan D. Salewski <alans@cji.com>",
+      "Steve Pomeroy <xavier@cpan.org>",
+      "\"chemboy\" <chemboy@perlmonk.org>",
+      "Magnus Cedergren <magnus@mbox604.swipnet.se>",
+      "Gary Vollink <gary@vollink.com>",
+      "Claus F\u00e4rber <cfaerber@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20180125'; # VERSION
+our $VERSION = '1.20181001'; # VERSION
 use strict;
 use warnings;
 
@@ -172,8 +172,8 @@ sub get_report_id {
     # Reports submitted by our local MTA will not have a report ID
     # They aggregate on the From domain, where the DMARC policy was discovered
         $ids = $self->query(
-        'SELECT id FROM report WHERE from_domain_id=? AND end > ?',
-        [ $from_dom_id, time ]
+        'SELECT id FROM report WHERE from_domain_id=? AND end > ? AND author_id=?',
+        [ $from_dom_id, time, $author_id ]
         );
     };
 
@@ -729,7 +729,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20180125
+version 1.20181001
 
 =head1 DESCRIPTION
 
@@ -759,7 +759,7 @@ Davide Migliavacca <shari@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matt Simerson.
+This software is copyright (c) 2018 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

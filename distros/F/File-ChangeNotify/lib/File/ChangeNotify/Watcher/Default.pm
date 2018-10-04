@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use File::Find qw( finddepth );
 use File::Spec;
@@ -174,7 +174,7 @@ File::ChangeNotify::Watcher::Default - Fallback default watcher subclass
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 DESCRIPTION
 

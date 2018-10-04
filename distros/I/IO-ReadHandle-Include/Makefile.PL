@@ -9,7 +9,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/IO/ReadHandle/Include.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010', # we use //, RT bug 125993
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

@@ -2654,7 +2654,7 @@ list_signals (class, package)
 	sigids = g_signal_list_ids (package_type, &num);
 	if (!num)
 		XSRETURN_EMPTY;
-	EXTEND(SP, num);
+	EXTEND(SP, (int) num);
 	for (i = 0; i < num; i++) {
 		g_signal_query (sigids[i], &siginfo);
 		PUSHs (sv_2mortal (newSVGSignalQuery (&siginfo)));

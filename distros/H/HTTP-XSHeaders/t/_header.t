@@ -4,8 +4,9 @@ use warnings;
 use Test::More;
 plan tests => 7;
 
+use lib 't/lib';
 use HTTP::XSHeaders;
-use t::lib::Utils;
+use MyTestUtils;
 
 sub j { join('|', @_) }
 
@@ -34,25 +35,25 @@ is_deeply(
 );
 
 like(
-    t::lib::Utils::_try(sub { HTTP::XSHeaders::_header() }),
+    MyTestUtils::_try(sub { HTTP::XSHeaders::_header() }),
     qr/\QUsage: HTTP::XSHeaders::_header\E/,
     'HTTP::XSHeaders::_header() without args',
 );
 
 like(
-    t::lib::Utils::_try(sub { HTTP::XSHeaders::_header(undef) }),
+    MyTestUtils::_try(sub { HTTP::XSHeaders::_header(undef) }),
     qr/\Qis not an instance of HTTP::XSHeaders\E/,
     'HTTP::XSHeaders::_header() with undef',
 );
 
 like(
-    t::lib::Utils::_try(sub { $h->_header() }),
+    MyTestUtils::_try(sub { $h->_header() }),
     qr/\Q_header not called with one argument\E/,
     '_header() without args',
 );
 
 like(
-    t::lib::Utils::_try(sub { $h->_header(undef) }),
+    MyTestUtils::_try(sub { $h->_header(undef) }),
     qr/\Q_header not called with one string argument\E/,
     '_header() with undef',
 );

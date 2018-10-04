@@ -56,6 +56,7 @@ lives_ok(
                     <li>Things</li>
                 </ul>
             },
+            width => 0,
         )
     },
     'Email::Mailer->new->send(...) HTML + auto-text',
@@ -84,6 +85,7 @@ lives_ok(
                     <li>Things</li>
                 </ul>
             },
+            width => 0,
         )->send
     },
     'Email::Mailer->new(...)->send HTML + auto-text',
@@ -113,6 +115,7 @@ lives_ok(
                     <li>Things</li>
                 </ul>
             },
+            width => 0,
         )
     },
     'Email::Mailer->new->send(...) HTML + auto-text',
@@ -137,6 +140,7 @@ lives_ok(
                     with regard to some stuff and things:
                 </p>
             },
+            width => 0,
         )
     },
     'Email::Mailer->send HTML + text',
@@ -186,6 +190,7 @@ lives_ok(
             from    => 'from@example.com',
             subject => 'Test Email',
             html    => '<p>This is a generic message for <b>testing purposes only</b>.</p>',
+            width   => 0,
         )->send(
             { to => 'person_0@example.com' },
             {

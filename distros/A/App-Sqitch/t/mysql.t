@@ -17,13 +17,16 @@ use DBIEngineTest;
 
 my $CLASS;
 
+my $mm = eval { Test::MockModule->new('MySQL::Config') };
+$mm->mock(parse_defaults => {}) if $mm;
+
 BEGIN {
     $CLASS = 'App::Sqitch::Engine::mysql';
     require_ok $CLASS or die;
     $ENV{SQITCH_CONFIG}        = 'nonexistent.conf';
     $ENV{SQITCH_SYSTEM_CONFIG} = 'nonexistent.user';
     $ENV{SQITCH_USER_CONFIG}   = 'nonexistent.sys';}
-    delete $ENV{MYSQL_PWD};
+    delete $ENV{$_} for qw(MYSQL_PWD MYSQL_HOST MYSQL_TCP_PORT);
 
 
 is_deeply [$CLASS->config_vars], [
@@ -59,8 +62,8 @@ my @std_opts = (
 my $mock_sqitch = Test::MockModule->new('App::Sqitch');
 my $warning;
 $mock_sqitch->mock(warn => sub { shift; $warning = [@_] });
-is_deeply [$mysql->mysql], [$client, @std_opts],
-    'mysql command should be std opts-only';
+is_deeply [$mysql->mysql], [$client, '--user', $sqitch->sysuser, @std_opts],
+    'mysql command should be user and std opts-only';
 is_deeply $warning, [__x
     'Database name missing in URI "{uri}"',
      uri => $mysql->uri
@@ -75,6 +78,20 @@ isa_ok $mysql = $CLASS->new(
     sqitch => $sqitch,
     target => $target,
 ), $CLASS;
+
+##############################################################################
+# Make sure environment variables are read.
+ENV: {
+    local $ENV{MYSQL_PWD} = '__KAMALA';
+    local $ENV{MYSQL_HOST} = 'sqitch.sql';
+    local $ENV{MYSQL_TCP_PORT} = 11238;
+    ok my $mysql = $CLASS->new(sqitch => $sqitch, target => $target),
+        'Create engine with MYSQL_PWD set';
+    is $mysql->password, $ENV{MYSQL_PWD},
+        'Password should be set from environment';
+    is $mysql->uri->host, $ENV{MYSQL_HOST}, 'URI should reflect MYSQL_HOST';
+    is $mysql->uri->port, $ENV{MYSQL_TCP_PORT}, 'URI should reflect MYSQL_TCP_PORT';
+}
 
 ##############################################################################
 # Make sure config settings override defaults.
@@ -101,11 +118,13 @@ is $mysql->registry_uri->as_string, 'db:mysql://foo.com/meta',
     'Sqitch DB URI should be the same as uri but with DB name "meta"';
 is $mysql->registry_destination, $mysql->registry_uri->as_string,
     'registry_destination should be the sqitch DB URL';
-is_deeply [$mysql->mysql], [qw(
-    /path/to/mysql
-    --database widgets
-    --host     foo.com
-), @std_opts], 'mysql command should be configured';
+is_deeply [$mysql->mysql], [
+    '/path/to/mysql',
+    '--user', $sqitch->sysuser,
+    '--database', 'widgets',
+    '--host',     'foo.com',
+    @std_opts
+], 'mysql command should be configured';
 
 ##############################################################################
 # Make sure URI params get passed through to the client.
@@ -131,6 +150,7 @@ ok $mysql = $CLASS->new(sqitch => $sqitch, target => $target),
     'Create a mysql with query params';
 is_deeply [$mysql->mysql], [qw(
     /path/to/mysql
+), '--user', $sqitch->sysuser, qw(
     --database widgets
     --host     foo.com
 ), @std_opts, qw(
@@ -161,6 +181,7 @@ ok $mysql = $CLASS->new(sqitch => $sqitch, target => $target),
     'Create a mysql with disabled query params';
 is_deeply [$mysql->mysql], [qw(
     /path/to/mysql
+), '--user', $sqitch->sysuser, qw(
     --database widgets
     --host     foo.com
 ), @std_opts, qw(
@@ -189,6 +210,7 @@ is $mysql->registry_destination, 'db:mysql://foo.com/meta',
 is $mysql->registry, 'meta', 'registry should still be as configured';
 is_deeply [$mysql->mysql], [qw(
     /some/other/mysql
+), '--user', $sqitch->sysuser, qw(
     --database widgets
     --host     foo.com
 ), @std_opts], 'mysql command should be as optioned';
@@ -349,6 +371,72 @@ is $dt->hour,   15, 'DateTime hour should be set';
 is $dt->minute,  7, 'DateTime minute should be set';
 is $dt->second,  1, 'DateTime second should be set';
 is $dt->time_zone->name, 'UTC', 'DateTime TZ should be set';
+
+##############################################################################
+# Test SQL helpers.
+is $mysql->_listagg_format, q{GROUP_CONCAT(%s SEPARATOR ' ')}, 'Should have _listagg_format';
+is $mysql->_regex_op, 'REGEXP', 'Should have _regex_op';
+is $mysql->_simple_from, '', 'Should have _simple_from';
+is $mysql->_limit_default, '18446744073709551615', 'Should have _limit_default';
+
+SECS: {
+    my $mock = Test::MockModule->new($CLASS);
+    my $dbh = {mysql_serverinfo => 'foo', mysql_serverversion => 50604};
+    $mock->mock(dbh => $dbh);
+    is $mysql->_ts_default, 'utc_timestamp(6)',
+        'Should have _ts_default with fractional seconds';
+
+    $dbh->{mysql_serverversion} = 50101;
+    my $my51 = $CLASS->new(sqitch => $sqitch, target => $target);
+    is $my51->_ts_default, 'utc_timestamp',
+        'Should have _ts_default without fractional seconds on 5.1';
+
+    $dbh->{mysql_serverversion} = 50604;
+    $dbh->{mysql_serverinfo} = 'Something about MariaDB man';
+    my $maria = $CLASS->new(sqitch => $sqitch, target => $target);
+    is $maria->_ts_default, 'utc_timestamp',
+        'Should have _ts_default without fractional seconds on mariadb';
+}
+
+DBI: {
+    local *DBI::state;
+    local *DBI::err;
+    ok !$mysql->_no_table_error, 'Should have no table error';
+    ok !$mysql->_no_column_error, 'Should have no column error';
+
+    $DBI::state = '42S02';
+    ok $mysql->_no_table_error, 'Should now have table error';
+    ok !$mysql->_no_column_error, 'Still should have no column error';
+
+    $DBI::state = '42000';
+    $DBI::err = '1049';
+    ok $mysql->_no_table_error, 'Should again have table error';
+    ok !$mysql->_no_column_error, 'Still should have no column error';
+
+    $DBI::state = '42S22';
+    $DBI::err = '1054';
+    ok !$mysql->_no_table_error, 'Should again have no table error';
+    ok $mysql->_no_column_error, 'Should now have no column error';
+}
+
+is_deeply [$mysql->_limit_offset(8, 4)],
+    [['LIMIT ?', 'OFFSET ?'], [8, 4]],
+    'Should get limit and offset';
+is_deeply [$mysql->_limit_offset(0, 2)],
+    [['LIMIT ?', 'OFFSET ?'], [18446744073709551615, 2]],
+    'Should get limit and offset when offset only';
+is_deeply [$mysql->_limit_offset(12, 0)], [['LIMIT ?'], [12]],
+    'Should get only limit with 0 offset';
+is_deeply [$mysql->_limit_offset(12)], [['LIMIT ?'], [12]],
+    'Should get only limit with noa offset';
+is_deeply [$mysql->_limit_offset(0, 0)], [[], []],
+    'Should get no limit or offset for 0s';
+is_deeply [$mysql->_limit_offset()], [[], []],
+    'Should get no limit or offset for no args';
+
+is_deeply [$mysql->_regex_expr('corn', 'Obama$')],
+    ['corn REGEXP ?', 'Obama$'],
+    'Should use REGEXP for regex expr';
 
 ##############################################################################
 # Can we do live tests?

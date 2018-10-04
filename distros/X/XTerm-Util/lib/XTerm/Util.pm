@@ -1,7 +1,7 @@
 package XTerm::Util;
 
-our $DATE = '2018-09-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-26'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,6 +14,44 @@ our @EXPORT_OK = qw(
                        set_term_bgcolor
                );
 
+our %SPEC;
+
+$SPEC{get_term_bgcolor} = {
+    v => 1.1,
+    summary => 'Get terminal background color',
+    description => <<'_',
+
+Get the terminal's current background color, or undef if unavailable. This uses
+the following xterm control sequence:
+
+    \e]11;?\a
+
+and a compatible terminal will issue back the same sequence but with the
+question mark replaced by the RGB code, e.g.:
+
+    \e]11;rgb:0000/0000/0000\a
+
+I have tested this works on the following terminal software (and version) on
+Linux:
+
+    MATE Terminal (1.18.2)
+    GNOME Terminal (3.18.3)
+    Konsole (16.04.3)
+
+And does not work with the following terminal software (and version) on Linux:
+
+    LXTerminal (0.2.0)
+    rxvt (2.7.10)
+
+A 6-hexdigit RGB value will be returned, e.g.:
+
+    000000
+    310035
+
+_
+    args => {},
+    result_naked => 1,
+};
 sub get_term_bgcolor {
     return undef unless -x "/bin/sh";
 
@@ -49,13 +87,47 @@ echo $result >}.$fname2;
     $rgb;
 }
 
+$SPEC{set_term_bgcolor} = {
+    v => 1.1,
+    summary => 'Set terminal background color',
+    description => <<'_',
+
+Set terminal background color. This prints the following xterm control sequence
+to STDOUT (or STDERR, if ~stderr~ is set to true:
+
+    \e]11;#123456\a
+
+where *123456* is the 6-hexdigit RGB color code.
+
+_
+    args_as => 'array',
+    args => {
+        rgb => {
+            schema => 'color::rgb24*',
+            req => 1,
+            pos => 0,
+        },
+        stderr => {
+            schema => 'true*',
+            pos => 1,
+        },
+
+    },
+    result_naked => 1,
+};
 sub set_term_bgcolor {
-    my $rgb = shift;
+    my ($rgb, $stderr) = @_;
     $rgb =~ s/\A#?([0-9A-Fa-f]{6})\z/$1/
         or die "Invalid RGB code '$rgb'";
 
     local $| = 1;
-    print "\e]11;#$rgb\a";
+    my $str = "\e]11;#$rgb\a";
+    if ($stderr) {
+        print STDERR $str;
+    } else {
+        print $str;
+    }
+    return;
 }
 
 1;
@@ -73,7 +145,7 @@ XTerm::Util - Utility routines for xterm-compatible terminal (emulator)s
 
 =head1 VERSION
 
-This document describes version 0.001 of XTerm::Util (from Perl distribution XTerm-Util), released on 2018-09-25.
+This document describes version 0.003 of XTerm::Util (from Perl distribution XTerm-Util), released on 2018-09-26.
 
 =head1 SYNOPSIS
 
@@ -97,11 +169,14 @@ Keywords: xterm, xterm-256color, terminal
 
 =head1 FUNCTIONS
 
+
 =head2 get_term_bgcolor
 
 Usage:
 
- my $rgb = get_term_bgcolor();
+ get_term_bgcolor() -> any
+
+Get terminal background color.
 
 Get the terminal's current background color, or undef if unavailable. This uses
 the following xterm control sequence:
@@ -125,27 +200,46 @@ And does not work with the following terminal software (and version) on Linux:
  LXTerminal (0.2.0)
  rxvt (2.7.10)
 
-The function will return a 6-hexdigit RGB value, e.g.:
+A 6-hexdigit RGB value will be returned, e.g.:
 
  000000
  310035
 
-which you can feed to, e.g.: L</"set_term_bgcolor"> to set background color of
-terminal, or L<Color::ANSI::Util>'s C<ansibg> to produce an appropriate escape
-sequance to set background color of text.
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Return value:  (any)
+
 
 =head2 set_term_bgcolor
 
 Usage:
 
- set_term_bgcolor("000000");
+ set_term_bgcolor($rgb, $stderr) -> any
+
+Set terminal background color.
 
 Set terminal background color. This prints the following xterm control sequence
-to STDOUT:
+to STDOUT (or STDERR, if ~stderr~ is set to true:
 
  \e]11;#123456\a
 
-where C<123456> is the 6-hexdigit RGB color code.
+where I<123456> is the 6-hexdigit RGB color code.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$rgb>* => I<color::rgb24>
+
+=item * B<$stderr> => I<true>
+
+=back
+
+Return value:  (any)
 
 =head1 HOMEPAGE
 

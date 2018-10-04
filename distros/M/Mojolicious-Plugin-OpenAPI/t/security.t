@@ -9,6 +9,8 @@ post '/global' => sub {
   },
   'global';
 
+post('/fail_escape' => sub { shift->render(openapi => {ok => 1}) }, 'fail_escape');
+
 post '/simple' => sub {
   my $c = shift->openapi->valid_input or return;
   $c->render(openapi => {ok => 1});
@@ -141,10 +143,7 @@ my $t = Test::Mojo->new;
 {
   local $ENV{DUMMY_DB_ERROR} = 1;
   $t->post_ok('/api/fail_or_pass' => json => {})->status_is(500)
-    ->json_is('/errors/0/message', 'Internal server error.');
-
-  local $TODO = 'Is this leaking too much information?';
-  $t->json_is('/errors/0/path', '/security/1/pass1');
+    ->json_is('/errors/0/message', 'Internal Server Error.')->json_is('/errors/0/path', '/');
 }
 
 {

@@ -23,12 +23,11 @@ t/headers.t
 t/memory_leak.t
 t/_header.t
 t/validate_invocant.t
-t/lib/Utils.pm
+t/lib/MyTestUtils.pm
 util.c
 util.h
 XSHeaders.xs
 Changes
 typemap
-t/lib/Utils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

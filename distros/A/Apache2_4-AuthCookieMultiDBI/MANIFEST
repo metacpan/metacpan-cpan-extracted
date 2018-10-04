@@ -1,4 +1,7 @@
 Apache2_4-AuthCookieMultiDBI-0.01.tar.gz
+Apache2_4-AuthCookieMultiDBI-0.02.tar.gz
+Apache2_4-AuthCookieMultiDBI-0.03.tar
+Apache2_4-AuthCookieMultiDBI-0.03.tar.gz
 lib/Apache2_4/AuthCookieMultiDBI.pm
 LICENSE
 Makefile.PL

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 625;
+plan tests => 663;
 
 {
     use Math::AnyNum;
@@ -146,6 +146,61 @@ plan tests => 625;
     is(1 + Math::AnyNum->new(-5),  -4);
     is(-1 + Math::AnyNum->new(5),  4);
     is(1 + Math::AnyNum->new(5),   6);
+
+    #
+    ## Division (Scalar / AnyNum)
+    #
+
+    is(0 / $q,  0);
+    is(-1 / $q, -($q->inv));
+    is(42 / $q, 21);
+
+    is(1 / Math::AnyNum->new_q('4/3'),    '3/4');
+    is(-1 / Math::AnyNum->new_q('4/3'),   '-3/4');
+    is(42 / Math::AnyNum->new_q('4/3'),   '63/2');
+    is(-42 / Math::AnyNum->new_q('4/3'),  '-63/2');
+    is(-13 / Math::AnyNum->new_q('-4/3'), '39/4');
+    is(13 / Math::AnyNum->new_q('-4/3'),  '-39/4');
+
+    is(12 / $z,  4);
+    is(-12 / $z, -4);
+
+    is(1 / $z,  $z->inv);
+    is(-1 / $z, -($z->inv));
+    is(1 / $c,  $c->inv);
+    is(-1 / $c, -($c->inv));
+
+    is(3 / Math::AnyNum->new_si('-5'),  '-3/5');
+    is(-3 / Math::AnyNum->new_si('-5'), '3/5');
+
+    is(3 / Math::AnyNum->new_q(0),  'Inf');
+    is(-3 / Math::AnyNum->new_q(0), '-Inf');
+
+    is(3 / Math::AnyNum->new_ui(0),  'Inf');
+    is(-3 / Math::AnyNum->new_ui(0), '-Inf');
+
+    is(3 / Math::AnyNum->new_f(0),  'Inf');
+    is(-3 / Math::AnyNum->new_f(0), '-Inf');
+
+    is(3 / Math::AnyNum->new_c(0),  Math::AnyNum->new_z('3') / Math::AnyNum->new_c(0));
+    is(-3 / Math::AnyNum->new_c(0), Math::AnyNum->new_z('-3') / Math::AnyNum->new_c(0));
+
+    is(23 / Math::AnyNum->new_c('3', '4'), '2.76-3.68i');
+    is(-23 / Math::AnyNum->new_c('3', '4'), '-2.76+3.68i');
+
+    is(-13 / Math::AnyNum->new_c('-3', '-4'), '1.56-2.08i');
+    is(-13 / Math::AnyNum->new_c('-3', '4'),  '1.56+2.08i');
+    is(-13 / Math::AnyNum->new_c('3',  '-4'), '-1.56-2.08i');
+
+    is(13 / Math::AnyNum->new_c('-3', '-4'), '-1.56+2.08i');
+    is(13 / Math::AnyNum->new_c('-3', '4'),  '-1.56-2.08i');
+    is(13 / Math::AnyNum->new_c('3',  '-4'), '1.56+2.08i');
+
+    is(0 / Math::AnyNum->new_ui(0),   'NaN');
+    is(0 / Math::AnyNum->new_f(0),    'NaN');
+    is(0 / Math::AnyNum->new_f('-0'), 'NaN');
+    is(0 / Math::AnyNum->new_c('0'),  Math::AnyNum->new_ui(0) / Math::AnyNum->new_c('0'));
+    is(0 / Math::AnyNum->new_c('-0'), Math::AnyNum->new_ui(0) / Math::AnyNum->new_c('-0'));
 
     #
     ## Multiplication

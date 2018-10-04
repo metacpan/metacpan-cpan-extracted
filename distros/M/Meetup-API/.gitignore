@@ -1,0 +1,12 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+Meetup-API-*
+Meetup-API-*/
+.releaserc
+cover_db
+MYMETA.*
+*.credentials

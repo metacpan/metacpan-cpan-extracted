@@ -1,5 +1,5 @@
 package School::Evaluation::Gibbmers;
-$School::Evaluation::Gibbmers::VERSION = '0.002';
+$School::Evaluation::Gibbmers::VERSION = '0.004';
 use strict;
 use warnings;
 # No guarantee given, use at own risk and will
@@ -19,7 +19,7 @@ School::Evaluation::Gibbmers - create an evaluation poll over local network
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

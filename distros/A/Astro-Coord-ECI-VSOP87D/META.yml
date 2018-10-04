@@ -1,0 +1,70 @@
+---
+abstract: 'Implement the VSOP87D position model.'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  File::Basename: '0'
+  File::Glob: '0'
+  Test::More: '0.88'
+  Time::Local: '0'
+  lib: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-Coord-ECI-VSOP87D
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Astro::Coord::ECI::VSOP87D:
+    file: lib/Astro/Coord/ECI/VSOP87D.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Jupiter:
+    file: lib/Astro/Coord/ECI/VSOP87D/Jupiter.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Mars:
+    file: lib/Astro/Coord/ECI/VSOP87D/Mars.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Mercury:
+    file: lib/Astro/Coord/ECI/VSOP87D/Mercury.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Neptune:
+    file: lib/Astro/Coord/ECI/VSOP87D/Neptune.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Saturn:
+    file: lib/Astro/Coord/ECI/VSOP87D/Saturn.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Sun:
+    file: lib/Astro/Coord/ECI/VSOP87D/Sun.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Uranus:
+    file: lib/Astro/Coord/ECI/VSOP87D/Uranus.pm
+    version: '0.001'
+  Astro::Coord::ECI::VSOP87D::Venus:
+    file: lib/Astro/Coord/ECI/VSOP87D/Venus.pm
+    version: '0.001'
+requires:
+  Astro::Coord::ECI: '0.102'
+  Astro::Coord::ECI::Mixin: '0.102'
+  Astro::Coord::ECI::Sun: '0.102'
+  Astro::Coord::ECI::Utils: '0.102'
+  Carp: '0'
+  Exporter: '0'
+  POSIX: '0'
+  Storable: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87A
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87A.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::AutomatedAnnotation::Main::BacteriaAutomatedAnnotation;
-
+$Bio::AutomatedAnnotation::Main::BacteriaAutomatedAnnotation::VERSION = '1.182770';
 # ABSTRACT: Annotate some bacteria
 # PODNAME: annotate_bacteria
 
@@ -25,7 +25,7 @@ annotate_bacteria - Annotate some bacteria
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

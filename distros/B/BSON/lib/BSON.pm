@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use Carp;
 use Config;
@@ -530,6 +530,15 @@ sub perl_to_extjson {
         return $data;
     }
 
+    if (
+        blessed($data) and (
+            $data->isa('Math::BigInt') or
+            $data->isa('Math::BigFloat')
+        )
+    ) {
+        return $data;
+    }
+
     die sprintf "Unsupported ref value (%s)", ref($data);
 }
 
@@ -912,7 +921,7 @@ sub _iso8601_to_epochms {
         my $frac = $s - int($s);
         my $epoch = Time::Local::timegm(int($s), $m, $h, $D, $M, $Y) - $zone_offset;
         $epoch = HAS_INT64 ? 1000 * $epoch : Math::BigInt->new($epoch) * 1000;
-        $epoch += $frac * 1000;
+        $epoch += int($frac * 1000);
         return $epoch;
     }
     else {
@@ -932,7 +941,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 SYNOPSIS
 

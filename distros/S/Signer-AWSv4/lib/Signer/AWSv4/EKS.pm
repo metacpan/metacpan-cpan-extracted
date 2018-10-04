@@ -113,6 +113,12 @@ The source code is located here: L<https://github.com/pplu/AWSv4Signer>
 
 Please report bugs to: L<https://github.com/pplu/AWSv4Signer/issues>
 
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
 =head1 COPYRIGHT and LICENSE
 
 Copyright (c) 2018 by CAPSiDE

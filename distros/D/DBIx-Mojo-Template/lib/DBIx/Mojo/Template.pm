@@ -3,8 +3,9 @@ use Mojo::Base -base;
 use Mojo::Loader qw(data_section);
 use Mojo::Template;
 use Mojo::URL;
-use Mojo::Util qw(url_unescape);
-
+use Mojo::Util qw(url_unescape b64_decode class_to_path);#
+use Mojo::File;
+use Scalar::Util 'weaken';
 
 #~ has debug => $ENV{DEBUG_DBIx_Mojo_Template} || 0;
 #~ my $pkg = __PACKAGE__;
@@ -26,17 +27,25 @@ sub data {
   my ($class, $pkg, %arg) = @_;
   die "Package not defined!"
     unless $pkg;
-  my $data = {};
-  #~ weaken $data;
-  while ( my ($k, $t) = each %{data_section $pkg})  {
+  my $dict = {};
+  my $data = data_section($pkg) || {};
+  my $extra = $class->_data_dict_files($pkg => @{$arg{data} || []});
+    #~ if ref($arg{data}) eq 'ARRAY';#$pkg ne 'main' && 
+  #~ @$data{keys %$extra} = values %$extra
+    #~ if ref($extra) eq 'HASH';
+  #prio: near over far
+  @$extra{keys %$data} = values %$data;
+  
+  while ( my ($k, $t) = each %$extra)  {
     my $url = Mojo::URL->new($k);
     my ($name, $param) = (url_unescape($url->path), $url->query->to_hash);
     utf8::decode($name);
-    $data->{$name} = DBIx::Mojo::Statement->new(dict=>$data, name=>$name, sql=>$t, param=>$param, mt=>_mt(%{$arg{mt} || {}}), vars=>$arg{vars} || {});
+    $dict->{$name} = DBIx::Mojo::Statement->new(dict=>$dict, name=>$name, raw=>$t, param=>$param, mt=>_mt(%{$arg{mt} || {}}), vars=>$arg{vars} || {});
+    weaken $dict->{$name}->{dict};
   }
   die "None DATA dict in package [$pkg]"
-    unless %$data;
-  return $data;
+    unless %$dict;
+  return $dict;
 }
 
 sub _mt {
@@ -53,19 +62,57 @@ sub render {
   
 }
 
-our $VERSION = '0.056';
+# можно задать для модуля доп файлы словаря
+# $self->_data_dict_files('Foo::Bar'=>'Bar.pm.dict.sql')
+# на входе модуль и список имен доп файлов ОТНОСИТЕЛЬНО папки модуля
+# @return hashref dict
+sub _data_dict_files {
+  my ($self, $pkg, @files) = @_;
+  #~ require Module::Path;
+  #~ Module::Path->import('module_path');module_path($pkg)
+  my $dir = Mojo::File->new($INC{class_to_path($pkg)} || '.')->dirname;## 
+  my $dict = {};
+  for my $file (@files) {
+    my $path = Mojo::File->new($file);
+    $path = $dir->child($file)
+      unless $path->is_abs;
+    next unless -f $path && -r _;
+    
+    my $data = $path->slurp;
+    utf8::decode($data);
+    
+    ## copy-paste from Mojo::Loader
+    # Ignore everything before __DATA__ (some versions seek to start of file)
+    $data =~ s/^.*\n__DATA__\r?\n/\n/s;
+ 
+    # Ignore everything after __END__
+    $data =~ s/\n__END__\r?\n.*$/\n/s;
+ 
+    # Split files
+    (undef, my @f) = split /^@@\s*(.+?)\s*\r?\n/m, $data;
+ 
+    # Find data
+    while (@f) {
+      my ($name, $data) = splice @f, 0, 2;
+      $dict->{$name} = $name =~ s/\s*\(\s*base64\s*\)$// ? b64_decode($data) : $data;
+    }
+  }
+  return $dict;
+}
+
+our $VERSION = '0.060';
 
 #=============================================
 package DBIx::Mojo::Statement;
 #=============================================
 use Mojo::Base -base;
 use Hash::Merge qw(merge);
-#~ use Scalar::Util 'weaken';
+use Scalar::Util 'weaken';
 
-has [qw(dict name sql param mt vars sth)];
+has [qw(dict name raw param mt vars sth)];
 # sth - attr for save cached dbi statement
 
-use overload '""' => sub { shift->sql };
+use overload '""' => sub { shift->raw };
 
 sub template { shift->render(@_) }
 
@@ -75,9 +122,10 @@ sub render {
   my $merge = merge($vars, $self->vars);
   $merge->{dict} ||= $self->dict;
   $merge->{DICT} = $self->dict;
-  #~ weaken $self->dict;
+  $merge->{st} = $self;
+  weaken $merge->{st};
   
-  $self->mt->render($self->sql, $merge);#%$vars ? %{$self->vars} ? merge($vars, $self->vars) : $vars : $self->vars
+  $self->mt->render($self->raw, $merge);#%$vars ? %{$self->vars} ? merge($vars, $self->vars) : $vars : $self->vars
   
 }
 
@@ -93,11 +141,11 @@ sub render {
 
 =head1 NAME
 
-DBIx::Mojo::Template - Render SQL statements templates by Mojo::Template
+DBIx::Mojo::Template - Render SQL statements by Mojo::Template
 
 =head1 VERSION
 
-0.056
+0.060
 
 =head1 SYNOPSIS
 
@@ -106,6 +154,8 @@ DBIx::Mojo::Template - Render SQL statements templates by Mojo::Template
   my $dict = DBIx::Mojo::Template->new(__PACKAGE__,mt=>{tag_start=>'%{', tag_end=>'%}',});
   
   my $sql = $dict->{'foo'}->render(table=>'foo', where=> 'where id=?');
+  # or same
+  my $sql = $dict->render('bar', where=> 'where id=?');
   
   __DATA__
   @@ foo?cache=1
@@ -139,9 +189,13 @@ For Mojo::Template object attributes. See L<Mojo::Template#ATTRIBUTES>.
 
   mt=>{ line_start=>'+', }
 
-Defaults attrs:
+Defaults <mt> attrs:
 
   mt=> {vars => 1, prepend=>'no strict qw(vars); no warnings qw(uninitialized);',}
+
+=item * data (arrayref) - optional
+
+Define extra data files for dictionary. Absolute or relative to path of the module $pkg file point.
 
 =back
 

@@ -34,8 +34,7 @@
       "runtime" : {
          "requires" : {
             "File::Copy" : "0",
-            "Term::ReadKey" : "0",
-            "Term::ReadLine::Gnu" : "0",
+            "Term::ReadLine" : "0",
             "perl" : "5.006000"
          }
       }
@@ -52,6 +51,6 @@
          "web" : "https://github.com/plicease/Term-Clui"
       }
    },
-   "version" : "1.73",
+   "version" : "1.75",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

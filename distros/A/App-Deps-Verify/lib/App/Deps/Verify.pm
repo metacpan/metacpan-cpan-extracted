@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.0.1';
+$App::Deps::Verify::VERSION = '0.2.1';
 # ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 
 use strict;
@@ -13,13 +13,31 @@ use File::Which qw/ which /;
 use YAML::XS qw/ LoadFile /;
 use Path::Tiny qw/ path /;
 
+sub _load_yamls
+{
+    my ( $self, $args ) = @_;
+
+    return [ map { LoadFile($_) } @{ $args->{filenames} } ];
+}
+
 sub verify_deps_in_yamls
 {
     my ( $self, $args ) = @_;
 
     return $self->find_deps(
         {
-            inputs => [ map { LoadFile($_) } @{ $args->{filenames} } ]
+            inputs => $self->_load_yamls($args),
+        }
+    );
+}
+
+sub list_perl5_modules_in_yamls
+{
+    my ( $self, $args ) = @_;
+
+    return $self->list_perl5_modules(
+        {
+            inputs => $self->_load_yamls($args),
         }
     );
 }
@@ -54,6 +72,31 @@ sub _find_exes
         exit(-1);
     }
     return;
+}
+
+sub list_perl5_modules
+{
+    my ( $self, $args ) = @_;
+
+    my $inputs = $args->{inputs};
+    my $map    = sub {
+        my ($key) = @_;
+        return [ map { $_->{required}->{$key} } @$inputs ];
+    };
+
+    my $args_m = sub {
+        my ($key) = @_;
+        return +{ inputs => $map->($key), };
+    };
+    my $reqs = +{};
+    foreach my $required_modules ( @{ $args_m->('perl5_modules')->{inputs} } )
+    {
+        foreach my $m ( keys(%$required_modules) )
+        {
+            $reqs->{$m} = 1;
+        }
+    }
+    return +{ perl5_modules => [ sort { $a cmp $b } keys %$reqs ] };
 }
 
 sub _find_perl5_modules
@@ -304,7 +347,7 @@ App::Deps::Verify - An app and API to verify the presence of dependencies (Perl
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -344,6 +387,16 @@ Verify the presence of deps in all the input hashes.
 =head2 $obj->write_rpm_spec_text_from_yaml_file_to_fh({deps_fn => $path, out_fh => $fh});
 
 =head2 $obj->write_rpm_spec_text_to_fh({data => $yaml_data, out_fh => $fh});
+
+=head2 $obj->list_perl5_modules({inputs => [\%hash1, \%hash2, ...]})
+
+List the perl5 modules dependencies.
+
+Added in version 0.2.0.
+
+=head2 $obj->list_perl5_modules_in_yamls({filenames => [@FILENAMES]})
+
+Added in version 0.2.0.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

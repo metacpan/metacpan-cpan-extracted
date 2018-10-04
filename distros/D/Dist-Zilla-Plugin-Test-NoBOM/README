@@ -1,0 +1,41 @@
+SYNOPSIS
+
+    In your dist.ini:
+
+        [Test::NoBOM]
+        finder = my_finder
+        finder = other_finder
+
+DESCRIPTION
+
+    This is a plugin that runs at the gather files stage, providing the
+    file xt/author/no-bom.t. This test program use Test::BOM to make sure
+    that the files in your distribution don't start with a byte-order-mark
+    (BOM).
+
+CONFIGURATION OPTIONS
+
+    This plugin accepts the following options:
+
+ finder
+
+    This is the name of a FileFinder for finding files to check. The
+    default value is :InstallModules, :ExecFiles (see also
+    Dist::Zilla::Plugin::ExecDir) and :TestFiles; this option can be used
+    more than once.
+
+    Other predefined finders are listed in "default_finders" in
+    Dist::Zilla::Role::FileFinderUser. You can define your own with the
+    [FileFinder::ByName] plugin.
+
+ file
+
+    a filename to also test, in addition to any files found earlier. This
+    option can be repeated to specify multiple additional files.
+
+ filename
+
+    The filename of the test to add - defaults to xt/author/no-bom.t.
+
+SEE ALSO
+

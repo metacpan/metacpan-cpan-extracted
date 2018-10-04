@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::AndAfter;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create a subsequent task
-$Taskwarrior::Kusarigama::Plugin::Command::AndAfter::VERSION = '0.9.2';
+$Taskwarrior::Kusarigama::Plugin::Command::AndAfter::VERSION = '0.9.3';
 
 use 5.10.0;
 
@@ -41,7 +41,7 @@ Taskwarrior::Kusarigama::Plugin::Command::AndAfter - create a subsequent task
 
 =head1 VERSION
 
-version 0.9.2
+version 0.9.3
 
 =head1 SYNOPSIS
 

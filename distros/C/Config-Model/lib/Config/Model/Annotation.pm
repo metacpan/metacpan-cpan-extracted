@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Annotation;
-$Config::Model::Annotation::VERSION = '2.126';
+$Config::Model::Annotation::VERSION = '2.127';
 use Mouse;
 use English;
 use Mouse::Util::TypeConstraints;
@@ -163,7 +163,7 @@ Config::Model::Annotation - Read and write configuration annotations
 
 =head1 VERSION
 
-version 2.126
+version 2.127
 
 =head1 SYNOPSIS
 

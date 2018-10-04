@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Finance-AMEX-Transaction",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Finance::AMEX::Transaction",
   "PREREQ_PM" => {
     "Text::CSV" => 0
@@ -22,7 +23,7 @@ my %WriteMakefileArgs = (
     "JSON" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

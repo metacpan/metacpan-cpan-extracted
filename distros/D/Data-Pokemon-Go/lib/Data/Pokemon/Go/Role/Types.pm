@@ -18,11 +18,11 @@ has types => ( is => 'rw', default => 'ノーマル', isa => 'Type' );
 no Moose::Role;
 
 # initialize ==============================================================
-use Path::Tiny;
 use YAML::XS;
+use File::Share 'dist_dir';
+my $dir = dist_dir('Data-Pokemon-Go');
 
-my $relation = path( 'data', 'Relations.yaml' );
-our $Ref_Advantage = YAML::XS::LoadFile($relation);
+our $Ref_Advantage = YAML::XS::LoadFile("$dir/Relations.yaml");
 our $Relations = {};
 
 while( my( $type, $ref ) = each %$Ref_Advantage ){

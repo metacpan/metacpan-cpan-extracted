@@ -8,9 +8,11 @@ WriteMakefile(
     LICENSE        => 'mit',
     MIN_PERL_VERSION => 5.008009,
     PREREQ_PM      => {
-        'Test::More' => 0,
         'Exporter'   => '5.57',
         'XSLoader'   => 0,
+    },
+    TEST_REQUIRES  => {
+        'Test::More' => 0,
     },
     AUTHOR         => [
         'Gonzalo Diethelm (gonzus@cpan.org)',
@@ -23,8 +25,8 @@ WriteMakefile(
     INC            => '-I.',
     OBJECT         => '$(O_FILES)',
     META_MERGE     => {
-        'meta-spec' => { version => 2 },
-        resources   => {
+        'meta-spec'  => { version => 2 },
+        resources    => {
             repository => {
                 type => 'git',
                 url  => 'git@github.com:p5pclub/http-xsheaders.git',
@@ -34,7 +36,7 @@ WriteMakefile(
     },
 );
 
-# Add -Wall to CCFLAGS without overwriting the defaults
+# Add options CCFLAGS without overwriting the defaults
 package MY;
 sub cflags {
     my $self   = shift;
@@ -43,10 +45,6 @@ sub cflags {
 
     $self->{CCFLAGS} .= ' -Wall';     # Flag all warnings
     $self->{CCFLAGS} .= ' -std=c89';  # Compile according to C99 standard
-
-    # $self->{CCFLAGS} .= ' -pedantic'; # Be pedantic about warnings - no GNU extensions
-    # These warnings show up in internal XSUB code, so just shut them up.
-    # $self->{CCFLAGS} .= ' -Wno-gnu-statement-expression';
 
     foreach (@cflags) {
         $_ = "CCFLAGS = $self->{CCFLAGS}" if /^CCFLAGS/;

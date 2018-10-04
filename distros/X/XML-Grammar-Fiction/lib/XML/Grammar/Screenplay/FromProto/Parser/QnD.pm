@@ -1,5 +1,5 @@
 package XML::Grammar::Screenplay::FromProto::Parser::QnD;
-
+$XML::Grammar::Screenplay::FromProto::Parser::QnD::VERSION = 'v0.15.0';
 use strict;
 use warnings;
 
@@ -12,8 +12,6 @@ use XML::Grammar::FictionBase::Event;
 
 use List::Util ();
 use List::MoreUtils ();
-
-our $VERSION = 'v0.14.12';
 
 has "_in_saying" => (isa => "Bool", is => "rw");
 has "_prev_line_is_empty" => (isa => "Bool", is => "rw", default => 1);
@@ -614,15 +612,15 @@ __END__
 XML::Grammar::Screenplay::FromProto::Parser::QnD - Quick and Dirty parser
 for the Screenplay-XML proto-text.
 
+=head1 VERSION
+
+version v0.15.0
+
+=head1 VERSION
+
+version v0.15.0
+
 B<For internal use only>.
-
-=head1 VERSION
-
-version v0.14.12
-
-=head1 VERSION
-
-0.11.0
 
 =head1 METHODS
 
@@ -669,7 +667,7 @@ feature.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc XML::Grammar::Fiction
+  perldoc XML::Grammar::Screenplay::FromProto::Parser::QnD
 
 =head2 Websites
 
@@ -684,7 +682,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/XML-Grammar-Fiction>
+L<https://metacpan.org/release/XML-Grammar-Fiction>
 
 =item *
 
@@ -720,14 +718,6 @@ L<http://cpanratings.perl.org/d/XML-Grammar-Fiction>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/XML-Grammar-Fiction>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -738,7 +728,7 @@ L<http://cpants.cpanauthors.org/dist/XML-Grammar-Fiction>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/X/XML-Grammar-Fiction>
 

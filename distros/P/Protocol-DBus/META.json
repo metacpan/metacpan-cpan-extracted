@@ -1,0 +1,67 @@
+{
+   "abstract" : "D-Bus in pure Perl",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-DBus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Call::Context" : "0",
+            "IO::Framed" : "0",
+            "Module::Load" : "0",
+            "Socket::MsgHdr" : "0",
+            "X::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Deep" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/FGasper/p5-Protocol-DBus/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/FGasper/p5-Protocol-DBus.git",
+         "web" : "https://github.com/FGasper/p5-Protocol-DBus"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

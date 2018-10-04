@@ -8,9 +8,10 @@ use MooseX::Storage::Engine;
 with Storage( base => 'SerializedClass' );
 
 my @MAPPED_CLASSES = qw(
-	MongoDB::OID
-	MongoDB::DBRef
-	MongoDB::BSON::Binary
+	BSON::OID
+	BSON::DBRef
+	BSON::Bytes
+	BSON::Regex
 	DateTime
 );
 

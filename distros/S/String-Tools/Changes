@@ -1,5 +1,13 @@
 Revision history for String::Tools.
 
+v0.18.270 2018-09-27
+
+ - Change `define` to a defined value by using the constant `!!undef`
+   (Which causes it work in both the string and numeric contexts correctly).
+ - Added/improved several tests.
+ - Added the `$SUBST_VAR` variable for the `subst()` function.
+ - Added the `trim_lines()` function.
+
 0.14.163  2014-06-12
 
  - Updated to use several Dist::Zilla features and plugins.

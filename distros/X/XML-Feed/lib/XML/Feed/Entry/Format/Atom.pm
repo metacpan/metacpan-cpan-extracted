@@ -20,7 +20,7 @@ sub format { 'Atom' }
 
 sub title { shift->{entry}->title(@_) }
 sub source { shift->{entry}->source(@_) }
-sub updated { shift->{entry}->updated(@_) }
+sub updated { shift->modified(@_) }
 sub base { shift->{entry}->base(@_) }
 
 sub link {
@@ -107,7 +107,7 @@ sub content {
         }
 
         XML::Feed::Content->wrap({ type => $type,
-                                   base => $c ? $c->base : undef, 
+                                   base => $c ? $c->base : undef,
                                    body => $c ? $c->body : undef });
     }
 }
@@ -117,7 +117,7 @@ sub category {
     my $ns = XML::Atom::Namespace->new(dc => 'http://purl.org/dc/elements/1.1/');
     if (@_) {
         $entry->{entry}->add_category({ term => $_ }) for @_;
-        return 1
+        return 1;
     } else {
 
 
@@ -199,7 +199,11 @@ sub enclosure {
     } else {
         my @links = grep { defined $_->rel && $_->rel eq 'enclosure' } $entry->{entry}->link;
         return unless @links;
-        my @encs = map { XML::Feed::Enclosure->new({ url => $_->href, length => $_->length, type => $_->type }) } @links ;
+        my @encs = map {
+            XML::Feed::Enclosure->new({
+                url => $_->href, length => $_->length, type => $_->type
+            })
+        } @links ;
         return ($XML::Feed::MULTIPLE_ENCLOSURES)? @encs : $encs[-1];
     }
 }

@@ -20,14 +20,15 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::XTermUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.811",
     "Perinci::CmdLine::Classic" => "1.770",
     "Sah::Schema::color::rgb24" => 0,
-    "XTerm::Util" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Sah::Schema::true" => 0,
+    "XTerm::Util" => "0.003"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -51,10 +54,9 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Base" => "1.811",
   "Perinci::CmdLine::Classic" => "1.770",
   "Sah::Schema::color::rgb24" => 0,
+  "Sah::Schema::true" => 0,
   "Test::More" => 0,
-  "XTerm::Util" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "XTerm::Util" => "0.003"
 );
 
 

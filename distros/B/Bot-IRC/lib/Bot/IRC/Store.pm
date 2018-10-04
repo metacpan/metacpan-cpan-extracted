@@ -7,7 +7,7 @@ use warnings;
 
 use YAML::XS qw( LoadFile DumpFile );
 
-our $VERSION = '1.21'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -64,7 +64,7 @@ Bot::IRC::Store - Bot::IRC persistent data storage with YAML
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ methods. These operate just like you would expect.
 
 =head2 get
 
-    my $score = $bot->store->set('user')->{score};
+    my $score = $bot->store->get('user')->{score};
 
 =head1 PSEUDO SUB-CLASSES
 

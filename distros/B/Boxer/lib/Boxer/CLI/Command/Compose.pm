@@ -18,11 +18,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.8
+Version v1.1.11
 
 =cut
 
-our $VERSION = version->declare("v1.1.8");
+our $VERSION = version->declare("v1.1.11");
 
 use constant {
 	abstract   => q[compose system recipe from reclass node],
@@ -31,7 +31,7 @@ use constant {
 
 sub description
 {
-	<<'DESCRIPTION'
+	<<'DESCRIPTION';
 Compose a system recipe.
 
 Resolve a recipe to build a system.  Input is one or more reclass nodes

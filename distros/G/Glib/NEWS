@@ -1,3 +1,11 @@
+Overview of changes in Glib 1.328 (stable)
+============================================
+
+* Makefile.PL: changed location of Git repo/web page
+* Add wrappers for GVariantDict
+* Add a few integer casts to quell compiler warnings
+* Rename DOAP file to appease pre-commit hook
+
 Overview of changes in Glib 1.327 (stable)
 ============================================
 

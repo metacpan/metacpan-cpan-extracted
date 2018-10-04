@@ -9,7 +9,7 @@ my @said;
 Mojo::Util::monkey_patch('Mojolicious::Command::openapi', _say => sub { push @said, @_ });
 
 my $cmd = Mojolicious::Command::openapi->new;
-$cmd->run('http://petstore.swagger.io/v2/swagger.json', 'getInventory');
-like "@said", qr{Available}, 'getInventory';
+$cmd->run('http://petstore.swagger.io/v2/swagger.json', 'getPetById', -p => 'petId=1');
+like "@said", qr{"id":1}, 'getPetById';
 
 done_testing;

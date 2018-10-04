@@ -2,8 +2,8 @@ NAME
     Color::ANSI::Util - Routines for dealing with ANSI colors
 
 VERSION
-    This document describes version 0.160 of Color::ANSI::Util (from Perl
-    distribution Color-ANSI-Util), released on 2017-12-03.
+    This document describes version 0.161 of Color::ANSI::Util (from Perl
+    distribution Color-ANSI-Util), released on 2018-09-26.
 
 SYNOPSIS
      use Color::ANSI::Util qw(
@@ -265,6 +265,10 @@ FUNCTIONS
   ansibg($rgb) => STR
     Alias for rgb_to_ansi_bg_code().
 
+  ansi_reset
+    Returns "\e[0m", which is the ANSI escape sequence to reset color.
+    Normally you print this sequence after you print colored text.
+
 ENVIRONMENT
   COLOR => bool
     Can be used to explicitly disable color by setting it to 0.
@@ -283,7 +287,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Color-ANSI-Util>.
+    <https://github.com/perlancar/perl-Color-ANSI-Util>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -301,7 +305,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

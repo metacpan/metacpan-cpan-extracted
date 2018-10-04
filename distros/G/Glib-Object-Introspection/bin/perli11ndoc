@@ -381,7 +381,7 @@ sub format_namespace {
     next unless @$entries;
     $text .= "$heading\n\n";
     foreach my $entry (@$entries) {
-      $text .= '  ' . $entry->{name} . "\n";
+      $text .= sprintf "  [%s](%s)\n", $entry->{name}, $entry->{path};
     }
     $text .= "\n";
   }
@@ -832,9 +832,10 @@ sub format_sub_constructors {
     $text .= "\nCONSTRUCTORS\n\n";
     foreach my $ctor ($ctor_list->get_nodelist) {
       my $name = $self->find_attribute ($ctor, 'name');
+      my $path = $ctor->nodePath;
       my $flags = $self->format_callable_flags ($ctor,
                                                 qw/introspectable version/);
-      $text .= "  • $name$flags\n";
+      $text .= "  • [$name]($path)$flags\n";
     }
   }
   return $text;
@@ -848,10 +849,11 @@ sub format_sub_fields {
     $text .= "\nFIELDS\n\n";
     foreach my $field ($field_list->get_nodelist) {
       my $name = $self->find_attribute ($field, 'name');
+      my $path = $field->nodePath;
       my $type_name = $self->find_type_name ($field);
       my $full_type_name = $self->format_full_type_name ($type_name);
       my $flags = $self->format_field_flags ($field, qw/introspectable/);
-      $text .= "  • $name: $full_type_name$flags\n";
+      $text .= "  • [$name]($path): $full_type_name$flags\n";
     }
   }
   return $text;
@@ -865,9 +867,10 @@ sub format_sub_functions {
     $text .= "\n$heading\n\n";
     foreach my $function ($function_list->get_nodelist) {
       my $name = $self->find_attribute ($function, 'name');
+      my $path = $function->nodePath;
       my $flags = $self->format_callable_flags ($function,
                                                 qw/introspectable version/);
-      $text .= "  • $name$flags\n";
+      $text .= "  • [$name]($path)$flags\n";
     }
   }
   return $text;
@@ -900,9 +903,10 @@ sub format_sub_methods {
     $text .= "\nMETHODS\n\n";
     foreach my $method ($method_list->get_nodelist) {
       my $name = $self->find_attribute ($method, 'name');
+      my $path = $method->nodePath;
       my $flags = $self->format_callable_flags ($method,
                                                 qw/introspectable version/);
-      $text .= "  • $name$flags\n";
+      $text .= "  • [$name]($path)$flags\n";
     }
   }
   return $text;
@@ -916,10 +920,11 @@ sub format_sub_properties {
     $text .= "\nPROPERTIES\n\n";
     foreach my $property ($property_list->get_nodelist) {
       my $name = $self->find_attribute ($property, 'name');
+      my $path = $property->nodePath;
       my $type_name = $self->find_type_name ($property);
       my $full_type_name = $self->format_full_type_name ($type_name);
       my $flags = $self->format_property_flags ($property, qw/version/);
-      $text .= "  • $name: $full_type_name$flags\n";
+      $text .= "  • [$name]($path): $full_type_name$flags\n";
     }
   }
   return $text;
@@ -933,8 +938,9 @@ sub format_sub_signals {
     $text .= "\nSIGNALS\n\n";
     foreach my $signal ($signal_list->get_nodelist) {
       my $name = $self->find_attribute ($signal, 'name');
+      my $path = $signal->nodePath;
       my $flags = $self->format_signal_flags ($signal, qw/version/);
-      $text .= "  • $name$flags\n";
+      $text .= "  • [$name]($path)$flags\n";
     }
   }
   return $text;
@@ -948,8 +954,9 @@ sub format_sub_virtual_methods {
     $text .= "\nVIRTUAL METHODS\n\n";
     foreach my $vfunc ($vfunc_list->get_nodelist) {
       my $name = $self->find_attribute ($vfunc, 'name');
+      my $path = $vfunc->nodePath;
       my $flags = $self->format_virtual_method_flags ($vfunc);
-      $text .= "  • $name$flags\n";
+      $text .= "  • [$name]($path)$flags\n";
     }
   }
   return $text;
@@ -1314,7 +1321,35 @@ sub filter_gir_view {
 
 sub display_results {
   my ($self, $results) = @_;
-  $self->{result_buffer}->set_text ($results);
+
+  my $b = $self->{result_buffer};
+  $b->delete ($b->get_start_iter (), $b->get_end_iter ());
+
+  my $iter = $b->get_start_iter ();
+  my $insert_part = sub {
+    my ($start, $end) = @_;
+    $b->insert ($iter, substr ($results, $start, $end - $start));
+  };
+
+  my ($prev_match_start, $prev_match_end) = (0, 0);
+  while ($results =~ m/\[([^\n\]]+)\]\(([^\n\)]+)\)/g) {
+    my ($link_text, $link_target) = ($1, $2);
+    my ($match_start, $match_end) = ($-[0], $+[0]);
+
+    if ($match_start != $prev_match_end) {
+      $insert_part->($prev_match_end, $match_start);
+    }
+
+    my $tag = $b->create_tag (undef, foreground => 'blue');
+    $tag->{__target} = $link_target;
+    $b->insert_with_tags ($iter, $link_text, $tag);
+
+    ($prev_match_start, $prev_match_end) = ($match_start, $match_end);
+  }
+  my $end_offset = length ($results);
+  if ($prev_match_end != $end_offset) {
+    $insert_part->($prev_match_end, $end_offset);
+  }
 }
 
 sub run {
@@ -1409,7 +1444,7 @@ sub setup_gir_view {
   });
 
   $gir_view->get_selection->signal_connect (changed => sub {
-    $self->update_results_from_selection
+    $self->go_to_selection
       unless $self->{suppress_gir_view_selection_changes};
   });
 
@@ -1431,9 +1466,19 @@ sub setup_path_bar {
 sub setup_search_entry {
   my ($self) = @_;
 
+  my $wait_time_ms = 500;
   my $search_entry = Gtk3::SearchEntry->new;
   $search_entry->signal_connect (search_changed => sub {
-    $self->filter_gir_view ($search_entry->get_text);
+    # Use a timeout which is reset when the search text changes so that we do
+    # not filter the view too often.
+    if (defined $search_entry->{__timer_id}) {
+      Glib::Source->remove ($search_entry->{__timer_id});
+    }
+    $search_entry->{__timer_id} = Glib::Timeout->add ($wait_time_ms, sub {
+      $self->filter_gir_view ($search_entry->get_text);
+      $search_entry->{__timer_id} = undef;
+      return Glib::SOURCE_REMOVE ();
+    });
   });
 
   $self->{search_entry} = $search_entry;
@@ -1443,8 +1488,65 @@ sub setup_result_view {
   my ($self) = @_;
 
   my $result_buffer = Gtk3::TextBuffer->new (undef);
+
   my $result_view = Gtk3::TextView->new_with_buffer ($result_buffer);
   $result_view->set (editable => FALSE, margin => 2);
+
+  my $display = $result_view->get_display ();
+  $result_view->{__hand_cursor} = Gtk3::Gdk::Cursor->new_from_name ($display, 'pointer');
+  $result_view->{__regular_cursor} = Gtk3::Gdk::Cursor->new_from_name ($display, 'text');
+
+  my $hovering_over_link = sub {
+    my ($event) = @_;
+    my ($x, $y) = $result_view->window_to_buffer_coords ('widget', $event->x, $event->y);
+    my $iter = $result_view->get_iter_at_location ($x, $y);
+    if (!$iter) {
+      return undef;
+    }
+    my $tags = $iter->get_tags ();
+    foreach my $tag (@$tags) {
+      if (defined $tag->{__target}) {
+        return $tag;
+      }
+    }
+    return undef;
+  };
+
+  $result_view->{__hovering} = FALSE;
+  $result_view->signal_connect (motion_notify_event => sub {
+    my ($result_view, $event) = @_;
+    my $hovering = defined $hovering_over_link->($event);
+    if ($result_view->{__hovering} != $hovering) {
+      $result_view->{__hovering} = $hovering;
+      $result_view->get_window ('text')->set_cursor (
+        $hovering ? $result_view->{__hand_cursor} : $result_view->{__regular_cursor});
+    }
+    return Gtk3::EVENT_PROPAGATE ();
+  });
+
+  my $handle_button = sub {
+    my ($event, $cb) = @_;
+    if ($event->button == Gtk3::Gdk::BUTTON_PRIMARY ()) {
+      my $tag = $hovering_over_link->($event);
+      if (defined $tag) {
+        if (defined $cb) {
+          $cb->($tag);
+        }
+        return Gtk3::EVENT_STOP ();
+      }
+    }
+    return Gtk3::EVENT_PROPAGATE ();
+  };
+  $result_view->signal_connect (button_press_event => sub {
+    my ($result_view, $event) = @_;
+    return $handle_button->($event);
+  });
+  $result_view->signal_connect (button_release_event => sub {
+    my ($result_view, $event) = @_;
+    return $handle_button->($event, sub {
+      $self->go_to_path ($_[0]->{__target});
+    });
+  });
 
   $self->{result_buffer} = $result_buffer;
   $self->{result_view} = $result_view;
@@ -1457,6 +1559,7 @@ sub update_gir_view {
 
   $self->{gir_model}->clear;
   $self->{search_entry}->set_text ('');
+  $self->{path_bar}->clear;
 
   my $inserter = sub {
     my ($iter, $text, $path, $is_cat, $is_vis) = @_;
@@ -1502,7 +1605,7 @@ sub update_gir_view {
   $self->display_results ($self->{parser}->format_namespace);
 }
 
-sub update_results_from_selection {
+sub go_to_selection {
   my ($self) = @_;
   my $selection = $self->{gir_view}->get_selection;
   my ($model, $iter) = $selection->get_selected;
@@ -1510,28 +1613,36 @@ sub update_results_from_selection {
     $self->display_results ($self->{parser}->format_namespace);
   } elsif (!$model->get ($iter, GIR_VIEW_COL_IS_CATEGORY)) {
     my $path = $model->get ($iter, GIR_VIEW_COL_PATH);
-    my $name = $self->{parser}->format_node_name_by_path ($path);
-    $self->{path_bar}->append ($name, $path); # indirectly calls update_results
+    $self->go_to_path ($path);
   }
+}
+
+sub go_to_path {
+  my ($self, $path) = @_;
+  my $name = $self->{parser}->format_node_name_by_path ($path);
+  $self->{path_bar}->append ($name, $path); # indirectly calls update_results
 }
 
 sub update_results {
   my ($self, $path) = @_;
   $self->display_results ($self->{parser}->format_node_by_path ($path));
 
-  # If display and selection are out-of-sync, clear the selection.
-  my $selection = $self->{gir_view}->get_selection;
-  my ($model, $iter) = $selection->get_selected;
-  if (defined $iter) {
-    my $sel_path = $model->get ($iter, GIR_VIEW_COL_PATH);
-    if ($sel_path ne $path) {
+  # Show and select the correponding tree entry.
+  $self->{gir_model}->foreach (sub {
+    my ($model, $tree_path, $iter) = @_;
+    my $this_path = $model->get ($iter, GIR_VIEW_COL_PATH);
+    if (defined $this_path && $this_path eq $path) {
+      $self->{gir_view}->expand_to_path ($tree_path);
+      $self->{gir_view}->scroll_to_cell ($tree_path, undef, FALSE, 0.0, 0.0);
       $self->{suppress_gir_view_selection_changes} = TRUE;
       {
-        $selection->unselect_all;
+        $self->{gir_view}->get_selection ()->select_path ($tree_path);
       }
       $self->{suppress_gir_view_selection_changes} = FALSE;
+      return TRUE; # stop
     }
-  }
+    return FALSE; # continue
+  });
 }
 
 sub quit {
@@ -1588,6 +1699,12 @@ sub INIT_INSTANCE {
   return $self;
 }
 
+sub clear {
+  my ($self) = @_;
+  $self->{path_label}->clear ();
+  $self->update_buttons ();
+}
+
 sub append {
   my ($self, $name, $path) = @_;
   $self->{path_label}->append ($name, $path);
@@ -1619,20 +1736,35 @@ sub INIT_INSTANCE {
     my (undef, $index) = @_;
     $self->{current_child} = $index;
     $self->update;
-    return TRUE; # handled
+    return Gtk3::EVENT_STOP ();
   });
   $self->set_track_visited_links (FALSE);
 
+  $self->clear ();
+}
+
+sub clear {
+  my ($self) = @_;
   $self->{children} = [];
   $self->{current_child} = undef;
   $self->{natural_width} = 0;
+  $self->update ();
 }
 
 sub append {
   my ($self, $name, $path) = @_;
-  if (defined $self->{current_child} &&
-      $self->{current_child} < $#{$self->{children}}) {
-    splice @{$self->{children}}, $self->{current_child}+1;
+  my $cur = $self->{current_child};
+  # If the new entry is equal to the current entry, do nothing.
+  if (defined $cur) {
+    my $child = $self->{children}->[$cur];
+    if ($child->{name} eq $name && $child->{path} eq $path) {
+      return;
+    }
+  }
+  # If the current entry is not the last entry, remove all entries after the
+  # current one before appending the new entry.
+  if (defined $cur && $cur < $#{$self->{children}}) {
+    splice @{$self->{children}}, $cur+1;
   }
   push @{$self->{children}}, {name => $name, path => $path};
   $self->{current_child} = $#{$self->{children}};
@@ -1641,12 +1773,12 @@ sub append {
 
 sub can_go_back {
   my ($self) = @_;
-  return $self->{current_child} > 0;
+  return defined $self->{current_child} && $self->{current_child} > 0;
 }
 
 sub can_go_forward {
   my ($self) = @_;
-  return $self->{current_child} < $#{$self->{children}};
+  return defined $self->{current_child} && $self->{current_child} < $#{$self->{children}};
 }
 
 sub go_back {
@@ -1671,7 +1803,7 @@ sub set_update_func {
 sub update {
   my ($self) = @_;
   $self->set_markup ($self->_format_children);
-  if (defined $self->{update_func}) {
+  if (defined $self->{current_child} && defined $self->{update_func}) {
     my $child = $self->{children}->[$self->{current_child}];
     $self->{update_func}->($child->{name}, $child->{path});
   }
@@ -1687,7 +1819,6 @@ sub GET_PREFERRED_WIDTH {
 sub SIZE_ALLOCATE {
   #say 'SIZE_ALLOCATE';
   my ($self, $allocation) = @_;
-  #print "$_ => $allocation->{$_}, " for sort keys %$allocation; print "\n";
   if ($self->{natural_width} > $allocation->{width}) {
     my @selected = ($self->{current_child});
     while (1) {
@@ -1715,6 +1846,9 @@ sub SIZE_ALLOCATE {
  # Use undef as an indicator for left-out children.
 sub _add_omission_markers {
   my ($self, @indices) = @_;
+  if (!@indices) {
+    return @indices;
+  }
   if ($indices[0] > 0) {
     unshift @indices, undef;
   }

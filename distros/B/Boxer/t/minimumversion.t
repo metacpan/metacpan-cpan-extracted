@@ -7,4 +7,4 @@ use strictures 2;
 use Test::More;
 use Test::MinimumVersion;
 
-all_minimum_version_from_metayml_ok;
+all_minimum_version_ok('5.014');

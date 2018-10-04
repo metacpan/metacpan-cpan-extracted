@@ -7,10 +7,43 @@ use parent 'WiringPi::API';
 use JSON;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3628';
+our $VERSION = '2.3629';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
+}
+sub io_led {
+    my ($self, $tweak) = @_;
+
+    if (! $tweak){
+        # turn off the green LED from being on full-time
+        `echo 0 | sudo tee /sys/class/leds/led0/brightness`;
+        # start disk activity operating the green LED
+        `echo mmc0 | sudo tee /sys/class/leds/led0/trigger`;
+    }
+    else {
+        # stop disk activity from operating the green LED
+        `echo none | sudo tee /sys/class/leds/led0/trigger`;
+        # turn on the green LED full-time
+        `echo 1 | sudo tee /sys/class/leds/led0/brightness`;
+    }
+}
+sub pwr_led {
+    my ($self, $tweak) = @_;
+
+    if (! $tweak){
+        # low power input to operate the red power LED
+        `echo input | sudo tee /sys/class/leds/led1/trigger`;
+    }
+    else {
+        # turn off the red power LED
+        `echo 0 | sudo tee /sys/class/leds/led1/brightness`;
+    }
+}
+sub label {
+    my ($self, $label) = @_;
+    $self->{label} = $label if defined $label;
+    return $self->{label} // '';
 }
 sub pin_to_gpio {
     my ($self, $pin, $scheme) = @_;
@@ -203,6 +236,53 @@ used independently.
 =head2 gpio_layout()
 
 Returns the GPIO layout which indicates the board revision number.
+
+=head2 io_led($tweak)
+
+This is a helper method to better help you identify which Raspberry Pi board
+you're currently working on, by allowing you to turn the green disk IO LED
+on constantly.
+
+WARNING: This method calls system command line commands using C<sudo>
+internally.
+
+Parameters:
+
+    $tweak
+
+Optional: Sending in a true value (eg C<1>) will turn the green disk activity
+LED on constantly (ie. no blinking on activity). Sending in a false value or
+omitting the parameter will restore the disk activity LED back to default state.
+
+=head2 pwr_led($tweak)
+
+This is a helper method to better help you identify which Raspberry Pi board
+you're currently working on, by allowing you to turn the red power LED off.
+
+WARNING: This method calls system command line commands using C<sudo>
+internally.
+
+Parameters:
+
+    $tweak
+
+Optional: Sending in a true value (eg: C<1>) will turn the red power LED off.
+Sending in a false value (or omitting the parameter) will restore the power LED
+back to default state.
+
+=head2 label($label)
+
+Allows you to set and retrieve a label (aka name) for your Raspberry Pi object.
+
+Parameters:
+
+    $label
+
+Optional, String: Send in a string parameter to set a label/name for your Pi
+object.
+
+Return: The label/name you've previously set. If one has not been set, return
+will be the empty string.
 
 =head2 pin_scheme([$scheme])
 

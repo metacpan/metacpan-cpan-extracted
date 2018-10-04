@@ -4,7 +4,7 @@ File::ChangeNotify - Watch for changes to files, cross-platform style
 
 # VERSION
 
-version 0.28
+version 0.29
 
 # SYNOPSIS
 

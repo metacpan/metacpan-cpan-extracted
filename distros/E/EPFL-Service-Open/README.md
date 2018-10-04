@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.org/epfl-devrun/epfl-sciper-list">
+  <a href="https://travis-ci.org/epfl-devrun/epfl-service-open">
     <img alt="Travis Status" src="https://travis-ci.org/epfl-devrun/epfl-service-open.svg?branch=master">
   </a>
   <a href="https://coveralls.io/github/epfl-devrun/epfl-service-open?branch=master">
@@ -26,10 +26,10 @@
 Install
 -------
 
-Via CPAN with :
+Via CPAN with:
 
 ```bash
-$ cpan install EPFL::Service::Open
+cpan install EPFL::Service::Open
 ```
 
 Usage
@@ -38,7 +38,7 @@ Usage
 ### Command Line
 
 ```bash
-$ epfl-service-open --help
+epfl-service-open --help
 Usage:
   epfl-service-open --help
   epfl-service-open

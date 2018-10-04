@@ -9,7 +9,7 @@ use Text::ParseWords qw( shellwords );
 use File::Spec;
 use base qw( Module::Build::FFI );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -35,6 +35,11 @@ L<Module::Build::FFI>
 Returns true if Fortran is available.
 
 =cut
+
+sub _filter
+{
+  grep { $_ ne '-no-cpp-precomp' && $_ !~ /^-[DI]/ } @_;
+}
 
 sub ffi_have_compiler
 {
@@ -92,7 +97,7 @@ sub ffi_build_dynamic_lib
   $dest_dir ||= $dirs->[0];
   
   my $f77_config = $self->_f77_config;
-  my @cflags = grep !/^-[DI]/, (
+  my @cflags = _filter (
     shellwords($f77_config->{cflags}),
     # hopefully the Fortran compiler understands the same flags as the C compiler
     shellwords($Config{ccflags}),

@@ -10,12 +10,11 @@ if ($mm_ver =~ /_/) { # dev version
 WriteMakefile(
     NAME              => 'Tk::WaitBoxFixed',
     VERSION_FROM      => 'lib/Tk/WaitBoxFixed.pm', # finds $VERSION
-    PREREQ_PM         => {
+    ABSTRACT_FROM  => 'lib/Tk/WaitBoxFixed.pm', # retrieve abstract from module
+	AUTHOR         => 'Rene Schickbauer <rene.schickbauer@magnapowertrain.com>',
+	PREREQ_PM         => {
             Tk  => 804.0, 
     }, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Tk/WaitBoxFixed.pm', # retrieve abstract from module
-       AUTHOR         => 'Rene Schickbauer <rene.schickbauer@magnapowertrain.com>') : ()),
     ($mm_ver <= 6.45
         ? ()
         : (META_MERGE => {
@@ -23,8 +22,8 @@ WriteMakefile(
             resources => {
                 repository  => {
                     type => 'hg',
-                    web  => 'https://sourceforge.net/p/tk-waitboxfixed/code/ci/default/tree/',
-                    url  => 'http://hg.code.sf.net/p/tk-waitboxfixed/code tk-waitboxfixed-code',
+                    web  => 'https://cavac.at/public/mercurial/Tk-WaitBoxFixed/',
+                    url  => 'https://cavac.at/public/mercurial/Tk-WaitBoxFixed/file/',
                 },
             },
           })
@@ -32,5 +31,9 @@ WriteMakefile(
     ($mm_ver <= 6.31
         ? ()
         : (LICENSE => 'perl_5')
+    ),
+    ($mm_ver <= 6.48
+        ? ()
+        : (MIN_PERL_VERSION => 5.010)
     ),
 );

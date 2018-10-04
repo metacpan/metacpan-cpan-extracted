@@ -1,5 +1,10 @@
 Revision history for Struct-Path-JsonPointer
 
+0.04    2018-09-26
+        - throw error for json pointer without leading slash
+        - throw error if undef passed for json pointer
+        - refactoring, dist corrected
+
 0.03    2018-09-17
         - delete, expand and insert modes added
 

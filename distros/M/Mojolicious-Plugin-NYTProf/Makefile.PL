@@ -13,7 +13,7 @@ WriteMakefile(
   AUTHOR        => 'Lee Johnson <leejo@cpan.org>',
   LICENSE       => 'perl',
   PREREQ_PM => {
-    'Devel::NYTProf'        => '5.07',
+    'Devel::NYTProf'        => '6.06',
     'Mojolicious'           => '6.00',
     'File::Which'           => '1.09',
     'File::Temp'            => '0.22',

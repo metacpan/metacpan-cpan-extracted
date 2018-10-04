@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnCommand;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins implementing custom commands
-$Taskwarrior::Kusarigama::Hook::OnCommand::VERSION = '0.9.2';
+$Taskwarrior::Kusarigama::Hook::OnCommand::VERSION = '0.9.3';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Taskwarrior::Kusarigama::Hook::OnCommand - Role for plugins implementing custom 
 
 =head1 VERSION
 
-version 0.9.2
+version 0.9.3
 
 =head1 SYNOPSIS
 

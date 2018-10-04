@@ -17,8 +17,8 @@ Convert various types of Japanese characters into one another.
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.52
-corresponding to git commit L<56c50cb8279294bb1cdafd88b2a9d4339e643782|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/56c50cb8279294bb1cdafd88b2a9d4339e643782> made on Tue Sep 18 11:47:22 2018 +0900.
+This document describes Lingua::JA::Moji version 0.53
+corresponding to git commit L<4d331013d110c3c316c352bd2409a6b609e6e214|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4d331013d110c3c316c352bd2409a6b609e6e214> made on Wed Oct 3 15:41:13 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -114,13 +114,29 @@ combinations of large kana + small vowel kana into the commonest
 romanized form. For example "ジェット" becomes "jetto" and "ウェ"
 becomes "we".
 
+=item passport
+
+Passport romaji. Long "o" vowels get turned into "oh".
+
 =back
 
 =item use_m
 
 If this is true, L</syllabic n>s (ん) which come before "b" or "p"
 sounds, such as the first "n" in "shinbun" (しんぶん, newspaper) will
-be converted into "m" rather than "n".
+be converted into "m" rather than "n". 
+
+It is automatically set to a true value if you choose L</hepburn> or
+L</passport> styles of romanisation, but you can override that by
+setting it to a false, but not undefined, value, something like this:
+
+    my $romaji = kana2romaji ($hiragana,
+			  {style => 'hepburn', 
+			   ve_type => 'wapuro',
+			   use_m => 0,});
+
+I apologise for the convoluted interface. See L</HISTORY> for more on
+the haphazard design of the module.
 
 =item ve_type
 
@@ -488,8 +504,10 @@ Convert kana to katakana.
 
 
 
-This converts any of katakana, L</halfwidth katakana>, circled katakana
-and hiragana to full width katakana.
+This converts any of katakana, L</halfwidth katakana>, circled
+katakana and hiragana to full width katakana. It also joins dakuten
+and handakuten marks to kana where possible, or removes them, using
+L</join_sound_marks>.
 
 
 
@@ -697,10 +715,15 @@ useful for looping over the kana or sorting.
 
 This breaks the given string into syllables. If the string is broken
 up character by character, it becomes 'ソ', 'ー', 'シ', 'ャ', 'ル'.
-This breaks the string up into meaningful syllables, so that
+However, by themselves, 'ー' and 'ャ' can't be spoken.
+
+This breaks the string up into pronouncable syllables, so that
 C<$syllables> becomes 'ソー', 'シャ', 'ル'. A L</syllabic n> is
 attached to the preceding sequence, so for example フラナガン is
 broken up into four syllables, フ, ラ, ナ, ガン.
+
+This routine is used as the basis of this L<Change your name to kanji
+web application|https://www.sljfaq.org/cgi/name-kanji.cgi>.
 
 
 
@@ -714,7 +737,7 @@ broken up into four syllables, フ, ラ, ナ, ガン.
 
     use Lingua::JA::Moji 'InKana';
 
-    $is_kana = ('あいうえお' =~ /^\p{InKana}+$/);
+    $is_kana = ('アイウエオ' =~ /^\p{InKana}+$/);
     # $is_kana = '1'
 
 
@@ -824,6 +847,53 @@ This was added to the module in version 0.46.
 
 
 
+=head2 join_sound_marks 
+
+
+
+    use Lingua::JA::Moji 'join_sound_marks';
+
+    $joined = join_sound_marks ('か゛は゜つ゛');
+    # $joined = 'がぱづ'
+
+
+
+Join dakuten and handakuten (Unicode U+3099-U+309C) to kana where
+possible. Where they cannot be joined, strip them out.
+
+This was added to the module in version 0.53.
+
+
+
+
+
+
+
+=head2 split_sound_marks 
+
+
+
+    use Lingua::JA::Moji 'split_sound_marks';
+
+    $split = split_sound_marks ('ガパヅ');
+    # $split = 'カ゛ハ゜ツ゛'
+
+
+
+Split dakuten and handakuten from kana where possible. U+309B and
+U+309C are chosen rather than U+3099 and U+309A. (This choice was
+somewhat arbitrary. I'm not sure which of the pairs should be used. I
+chose these because they were the ones already in use internally in
+the module in L</kana2braille> and L</kana2morse>.)
+
+This was added to the module in version 0.53.
+
+
+
+
+
+
+
 
 
 =head1 HENTAIGANA
@@ -903,12 +973,14 @@ This was added to the module in version 0.43.
     use Lingua::JA::Moji 'kana2hentai';
 
     $hentai = kana2hentai ('ケンブ');
-    # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞ぶ'
+    # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞𛂰・𛂱・𛂲゛'
 
 
 
 Convert kana to equivalent hentaigana. If more than one hentaigana
-exists, they are returned joined with a middle dot.
+exists, they are returned joined with a middle dot. Dakuten and
+handakuten are split out of the kana using L</split_sound_marks>
+before the conversion.
 
 This was added to the module in version 0.43.
 
@@ -1001,14 +1073,14 @@ Convert kana to Japanese morse code (wabun code).
 
     use Lingua::JA::Moji 'kana2morse';
 
-    $morse = kana2morse ('しょっちゅう');
+    $morse = kana2morse ('ショッチュウ');
     # $morse = '--.-. -- .--. ..-. -..-- ..-'
 
 
 
 Convert Japanese kana into Morse code. Japanese morse code does not
 have any way of representing small kana characters, so converting to
-and then from morse code will result in しょっちゅう becoming シヨツチユウ.
+and then from morse code will result in ショッチュウ becoming シヨツチユウ.
 
 
 
@@ -1032,11 +1104,6 @@ Convert Japanese Morse code into kana. Each Morse code element must be separated
 
 
 
-=head3 Bugs
-
-This has not been extensively tested.
-
-
 
 
 
@@ -1058,11 +1125,10 @@ forms.
 
 =head3 Bugs
 
-This has not been extensively tested. This is not an adequate Japanese
-braille convertor. Creating Japanese braille requires breaking
-Japanese sentences up into individual words, but this does not attempt
-to do that. People who are interested in building a Perl braille
-convertor could start here.
+This is not an adequate Japanese braille converter. Creating Japanese
+braille requires breaking Japanese sentences up into individual words,
+but this does not attempt to do that. People who are interested in
+building a Perl braille converter could start here.
 
 
 
@@ -1092,8 +1158,8 @@ Convert kana to circled katakana.
 
     use Lingua::JA::Moji 'kana2circled';
 
-    $circled = kana2circled ('あいうえお');
-    # $circled = '㋐㋑㋒㋓㋔'
+    $circled = kana2circled ('アイウエオガン');
+    # $circled = '㋐㋑㋒㋓㋔㋕゛ン'
 
 
 
@@ -1101,7 +1167,10 @@ This function converts kana into the "circled katakana" of Unicode,
 which have code points from 32D0 to 32FE. See also L</circled2kana>.
 
 There is no circled form of the ン kana, L</syllabic n>, so this is
-left untouched.
+left untouched. Dakuten and handakuten are split from the kana
+using L</split_sound_marks>.
+
+Circled katakana appear as Unicode code points U+32D0 to U+32FE.
 
 
 
@@ -1155,7 +1224,7 @@ Convert new-style (post-1949) kanji (Chinese characters) into old-style (pre-194
 
 =head3 Bugs
 
-The list of characters in this convertor may not contain every pair of
+The list of characters in this converter may not contain every pair of
 old/new kanji.
 
 It will not correctly convert 弁 since this has three different
@@ -1451,6 +1520,10 @@ Lingua::JA::Moji does not have it, Lingua::JA::NormalizeText may do.
 
 This is similar to the present module for Korean.
 
+=item L<Lingua::JA::Onbiki>
+
+=item L<Lingua::JA::Jtruncate>
+
 =back
 
 =head2 Kana/kanji conversion
@@ -1575,10 +1648,14 @@ generate this data.
 0.46 disallowed hyphens as the first character of a romaji string and
 added L</smallize_kana> and L</cleanup_kana>.
 
-0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and changed romanisation somewhat.
+0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and
+changed romanisation somewhat.
 
 0.48 changed kana2romaji to be consistent with the documentation for
 long vowel options wapuro and none.
+
+0.53 added L</join_sound_marks> and L</split_sound_marks> to the
+module.
 
 
 

@@ -234,7 +234,7 @@ sv_to_interface (GIArgInfo * arg_info,
 			dwarn ("  -> boxed: type=%s, name=%s, caller-allocates=%d, is-pointer=%d\n",
 			       g_type_name (type),
 			       g_base_info_get_name (interface),
-			       g_arg_info_is_caller_allocates (arg_info),
+			       (arg_info ? g_arg_info_is_caller_allocates (arg_info) : INT_MAX),
 			       g_type_info_is_pointer (type_info));
 			if (need_value_semantics) {
 				if (may_be_null && !gperl_sv_is_defined (sv)) {
@@ -380,8 +380,8 @@ interface_to_sv (GITypeInfo* info, GIArgument *arg, gboolean own, GPerlI11nInvoc
 		}
 
 		else if (g_type_is_a (type, G_TYPE_BOXED)) {
-			dwarn ("  -> boxed: type=%"G_GSIZE_FORMAT" (%s)\n",
-			       type, g_type_name (type));
+			dwarn ("  -> boxed: pointer=%p, type=%"G_GSIZE_FORMAT" (%s), own=%d\n",
+			       arg->v_pointer, type, g_type_name (type), own);
 			sv = gperl_new_boxed (arg->v_pointer, type, own);
 		}
 

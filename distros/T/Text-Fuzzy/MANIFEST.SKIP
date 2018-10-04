@@ -1,6 +1,7 @@
 pm_to_blib
 Fuzzy\.(bs|c|o)
 edit-distance-.*\.o
+ed-trans-.*\.o
 build\.pl
 cleanup\.pl
 MANIFEST\.bak
@@ -30,3 +31,9 @@ MYMETA\..*
 # Author tests
 ^xt/.*$
 ^examples/.*-out\.txt
+^text-fuzzy\.[ch]$
+^ed-trans-(char|int)\.[ch]$
+^edit-distance-(char|int)\.[ch]$
+^config\.h$
+^make-pod\.pl$
+^make-single\.pl$

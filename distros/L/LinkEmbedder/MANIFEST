@@ -3,11 +3,13 @@
 .travis.yml
 Changes
 cpanfile
+Dockerfile
 examples/embedder.pl
 lib/LinkEmbedder.pm
 lib/LinkEmbedder/Link.pm
 lib/LinkEmbedder/Link/AppearIn.pm
 lib/LinkEmbedder/Link/Basic.pm
+lib/LinkEmbedder/Link/Fpaste.pm
 lib/LinkEmbedder/Link/Github.pm
 lib/LinkEmbedder/Link/Google.pm
 lib/LinkEmbedder/Link/Imgur.pm
@@ -27,6 +29,8 @@ README
 t/00-basic.t
 t/appearin.t
 t/basic.t
+t/bitbucket.t
+t/fpaste.t
 t/gist.t
 t/github.t
 t/google-maps.t
@@ -39,9 +43,9 @@ t/metacpan.t
 t/mojopaste.t
 t/opensuse.t
 t/pastebin.t
+t/perlbot.t
 t/serve.t
 t/shadowcat.t
-t/shout-irc.t
 t/spotify.t
 t/ted.t
 t/travis.t

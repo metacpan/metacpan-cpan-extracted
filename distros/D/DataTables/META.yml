@@ -23,9 +23,9 @@ requires:
   Carp: '0'
   DBI: '1.611'
   ExtUtils::MakeMaker: '6.64'
+  JQuery::DataTables::Request: '0.109'
   JSON::XS: '2.32'
-  SQL::Abstract::Limit: '0'
   perl: '5.008008'
 resources:
   repository: https://github.com/srchulo/DataTables
-version: '0.06'
+version: '0.07'

@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/pod/String::Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+0.003006	2018-09-27
+
+ [ Bug Fixes ]
+ - Fix declare dependency on Number::Range at runtime (not only for tests).
+   Perl Ancar++
+
+ [ Other ]
+ - Tidy spaces.
+
 0.003005	2016-11-30
 
  [ Bug Fixes ]

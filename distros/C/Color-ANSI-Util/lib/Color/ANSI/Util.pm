@@ -1,7 +1,7 @@
 package Color::ANSI::Util;
 
-our $DATE = '2017-12-03'; # DATE
-our $VERSION = '0.160'; # VERSION
+our $DATE = '2018-09-26'; # DATE
+our $VERSION = '0.161'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,6 +33,8 @@ our @EXPORT_OK = qw(
                        ansifg
                        rgb_to_ansi_bg_code
                        ansibg
+
+                       ansi_reset
                );
 
 our %SPEC;
@@ -527,6 +529,8 @@ sub rgb_to_ansi_bg_code {
 
 sub ansibg { goto &rgb_to_ansi_bg_code }
 
+sub ansi_reset { "\e[0m" }
+
 1;
 # ABSTRACT: Routines for dealing with ANSI colors
 
@@ -542,7 +546,7 @@ Color::ANSI::Util - Routines for dealing with ANSI colors
 
 =head1 VERSION
 
-This document describes version 0.160 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2017-12-03.
+This document describes version 0.161 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2018-09-26.
 
 =head1 SYNOPSIS
 
@@ -883,6 +887,11 @@ Alias for rgb_to_ansi_fg_code().
 
 Alias for rgb_to_ansi_bg_code().
 
+=head2 ansi_reset
+
+Returns "\e[0m", which is the ANSI escape sequence to reset color. Normally you
+print this sequence after you print colored text.
+
 =head1 ENVIRONMENT
 
 =head2 COLOR => bool
@@ -904,7 +913,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Color-ANSI
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Color-ANSI-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Color-ANSI-Util>.
 
 =head1 BUGS
 
@@ -926,7 +935,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

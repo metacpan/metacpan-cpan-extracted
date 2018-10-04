@@ -1,4 +1,17 @@
-Revision history for Color-RGB-Util
+0.591   2018-10-04 (PERLANCAR)
+
+        - Add rgb_diff().
+
+
+0.590   2018-09-26 (PERLANCAR)
+
+	- Add functions: rgb_distance, rgb_is_dark, rgb_is_light.
+
+	- [refactor] Factor out the regex pattern to a variable, it's
+	  slower but cleaner.
+
+	- [doc] Format POD headings so they can be easily referred to.
+
 
 0.58    2015-01-03 (PERLANCAR)
 

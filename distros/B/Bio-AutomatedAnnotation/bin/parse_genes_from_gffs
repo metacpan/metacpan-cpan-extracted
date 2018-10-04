@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::AutomatedAnnotation::Main::ParseGenesFromGFFs;
-
+$Bio::AutomatedAnnotation::Main::ParseGenesFromGFFs::VERSION = '1.182770';
 # ABSTRACT: Parse genes out of gff files
 # PODNAME: parse_genes_from_gffs
 
@@ -25,7 +25,7 @@ parse_genes_from_gffs - Parse genes out of gff files
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

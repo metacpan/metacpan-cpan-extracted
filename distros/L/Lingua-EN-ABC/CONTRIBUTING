@@ -1,0 +1,44 @@
+REPORTING BUGS
+
+If you think this module is misbehaving, you can file a bug report
+here:
+
+    https://github.com/benkasminbullock/Lingua-EN-ABC/issues
+
+A working example of what the module is doing wrong is always a big
+help.
+
+CONTRIBUTING WORD PAIRS
+
+If you want to contribute new word pairs to the module, please edit
+the file "abc.txt" in the top of the github repository:
+
+    https://github.com/benkasminbullock/Lingua-EN-ABC/blob/master/abc.txt
+
+The format used is documented at the top of the file. It uses the
+format from my module Table::Readable. There are fields for each entry
+for the three dialects and various possibilities. If you cannot
+understand the format or aren't sure what to insert, just insert the
+word pairs using the b:/a: fields only, I will finish it.
+
+OTHER CONTRIBUTIONS
+
+This module uses an unusual build system, but you don't need that to
+build, test, and contribute to the module. Clone the repository from
+github and build and test the module using
+
+    perl Makefile.PL;make;make test
+
+Please ignore the file "build.pl" in the repository. That file may
+confuse cpan or cpanm, so I recommend sticking to the above.
+
+If you want to work on the documentation, edit the file
+lib/Lingua/EN/ABC.pod.tmpl in the repository. You won't be able to
+build the pod from the template, but a pod viewer should be able to
+handle the file.
+
+(If you decide not to follow my advice but to look at the file
+build.pl, please note the Perl::Build module it uses is not the one
+from CPAN. My module of the same name predates the CPAN thing. It used
+to be on github, but it is now not published anywhere, and probably
+never will be.)

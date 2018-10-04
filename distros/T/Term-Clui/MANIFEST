@@ -10,29 +10,11 @@ lib/Term/Clui/FileSelect.pm
 LICENSE
 maint/releaseprep
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST                       This list of files
+MANIFEST.SKIP
 py/TermClui.py
 py/test_script
 README
 t/term_clui.t
-Term-Clui-1.73/.travis.yml
-Term-Clui-1.73/Changes
-Term-Clui-1.73/examples/audio_stuff
-Term-Clui-1.73/examples/choose
-Term-Clui-1.73/examples/linux_admin
-Term-Clui-1.73/examples/login_shell
-Term-Clui-1.73/examples/test_script
-Term-Clui-1.73/lib/Term/Clui.pm
-Term-Clui-1.73/lib/Term/Clui/FileSelect.pm
-Term-Clui-1.73/LICENSE
-Term-Clui-1.73/maint/releaseprep
-Term-Clui-1.73/Makefile.PL
-Term-Clui-1.73/MANIFEST
-Term-Clui-1.73/META.json
-Term-Clui-1.73/META.yml
-Term-Clui-1.73/py/TermClui.py
-Term-Clui-1.73/py/test_script
-Term-Clui-1.73/README
-Term-Clui-1.73/t/term_clui.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

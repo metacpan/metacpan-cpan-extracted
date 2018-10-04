@@ -2,6 +2,7 @@ package Getopt::EX::Colormap;
 
 use strict;
 use warnings;
+use Graphics::ColorNames;
 
 use Exporter 'import';
 our @EXPORT      = qw();
@@ -28,8 +29,10 @@ sub ansi256_number {
 	$1 > 23 and die "Color spec error: $code";
 	$grey = 0 + $1;
     }
-    elsif ($code =~ /^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i) {
+    elsif ($code =~ m{^(?| \# ([0-9a-f])([0-9a-f])([0-9a-f])
+			 | \#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2}) )$}xi) {
 	my($rx, $gx, $bx) = map { hex } $1, $2, $3;
+	do { $_ *= 0x11 for $rx, $gx, $bx } if length $1 == 1;
 	if ($rx != 255 and $rx == $gx and $rx == $bx) {
 	    ##
 	    ## Divide area into 25 segments, and map to BLACK and 24 GREYS
@@ -76,12 +79,25 @@ my %numbers = (
     W => 37, w => 97,	# W : White
     );
 
+tie my %color_table, 'Graphics::ColorNames', qw(WWW);
+
 sub rgb24 {
     my $rgb = shift;
     if ($COLOR_RGB24) {
 	return (2,
 		map { hex $_ }
-		$rgb =~ /^([\da-f]{2})([\da-f]{2})([\da-f]{2})/i);
+		$rgb =~ /^\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i);
+    } else {
+	return (5, ansi256_number $rgb);
+    }
+}
+
+sub rgb12 {
+    my $rgb = shift;
+    if ($COLOR_RGB24) {
+	return (2,
+		map { 0x11 * hex }
+		$rgb =~ /^#([\da-f])([\da-f])([\da-f])/i);
     } else {
 	return (5, ansi256_number $rgb);
     }
@@ -101,8 +117,10 @@ sub ansi_numbers {
     while (m{\G
 	     (?:
 	       (?<slash> /)				# /
-	     | (?<h24>  [0-9a-f]{6} )			# 24bit hex
-	     | (?<c256> [0-5][0-5][0-5]			# 216 (6x6x6) colors
+	     | (?<h24>  \#?[0-9a-f]{6} )		# 24bit hex
+	     | (?<h12>  \# [0-9a-f]{3} )		# 12bit hex
+	     | (?<rgb>  \(\d+,\d+,\d+\) )		# 24bit decimal
+	     | (?<c256>   [0-5][0-5][0-5]		# 216 (6x6x6) colors
 		      | L(?:[01][0-9]|[2][0-3]) )	# 24 grey levels
 	     | (?<c16>  [KRGYBMCW] )			# 16 colors
 	     | (?<efct> [;XNZDPIUFQSVJ] )		# effects
@@ -112,6 +130,7 @@ sub ansi_numbers {
 			  (?(<P>) \) )			# closing )
 			}
 		      | (?<csi_abbr>[E]) )		# abbreviation
+	     | < (?<name> \w+ )	>			# <colorname>
 	     | (?<err>  .+ )				# error
 	     )
 	    }xig) {
@@ -120,6 +139,15 @@ sub ansi_numbers {
 	}
 	elsif ($+{h24}) {
 	    push @numbers, 38 + $xg->offset, rgb24($+{h24});
+	}
+	elsif ($+{h12}) {
+	    push @numbers, 38 + $xg->offset, rgb12($+{h12});
+	}
+	elsif (my $rgb = $+{rgb}) {
+	    my @rgb = $rgb =~ /(\d+)/g;
+	    die "Unexpected value: $rgb\n" if grep { $_ > 255 } @rgb;
+	    my $hex = sprintf "%02X%02X%02X", @rgb;
+	    push @numbers, 38 + $xg->offset, rgb24($hex);
 	}
 	elsif ($+{c256}) {
 	    push @numbers, 38 + $xg->offset, 5, ansi256_number $+{c256};
@@ -139,6 +167,13 @@ sub ansi_numbers {
 		    [ uc $+{csi_name}, $+{csi_param} =~ /\d+/g ];
 		}
 	    };
+	}
+	elsif ($+{name}) {
+	    if (my $rgb = $color_table{$+{name}}) {
+		push @numbers, 38 + $xg->offset, rgb24($rgb);
+	    } else {
+		die "Unknown color name: $+{name}\n";
+	    }
 	}
 	elsif (my $err = $+{err}) {
 	    die "Color spec error: \"$err\" in \"$_\".\n"
@@ -377,23 +412,33 @@ representing 8 colors :
     K  Black
     W  White
 
-and alternative (usually brighter) colors in lowercase:
+and alternative (usually brighter) colors in lowercase :
 
     r, g, b, c, m, y, k, w
 
 or RGB values and 24 grey levels if using ANSI 256 or full color
 terminal :
 
-    000000 .. FFFFFF : 24bit RGB colors
-    000 .. 555       : 6x6x6 RGB 216 colors
-    L00 .. L23       : 24 grey levels
+    (255,255,255)      : 24bit decimal RGB colors
+    #000000 .. #FFFFFF : 24bit hex RGB colors
+    #000    .. #FFF    : 12bit hex RGB 4096 colors
+    000 .. 555         : 6x6x6 RGB 216 colors
+    L00 .. L23         : 24 grey levels
 
 =over 4
 
-Note that, when values are all same in 24bit RGB, it is converted to
-24 grey level, otherwise 6x6x6 216 color.
+Begining # can be omitted in 24bit RGB notation.
+
+When values are all same in 24bit or 12bit RGB, it is converted to 24
+grey level, otherwise 6x6x6 216 color.
 
 =back
+
+or color names enclosed by angle bracket :
+
+    <red> <blue> <green> <cyan> <magenta> <yellow>
+    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <medium_aqua_marine>
 
 with other special effects :
 
@@ -424,20 +469,20 @@ effect, you can use them to improve readability, like C<SxD;K/544>.
 
 Samples:
 
-    RGB  6x6x6    24bit           color
-    ===  =======  =============   ==================
-    B    005      0000FF        : blue foreground
-     /M     /505        /FF00FF : magenta background
-    K/W  000/555  000000/FFFFFF : black on white
-    R/G  500/050  FF0000/00FF00 : red on green
-    W/w  L03/L20  303030/c6c6c6 : grey on grey
+    RGB  6x6x6    12bit      24bit           color name
+    ===  =======  =========  =============  ==================
+    B    005      #00F       (0,0,255)      <blue>
+     /M     /505      /#F0F   /(255,0,255)  /<magenta>
+    K/W  000/555  #000/#FFF  000000/FFFFFF  <black>/<white>
+    R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
+    W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
 
 24-bit RGB color sequence is supported but disabled by default.  Set
 C<$COLOR_RGB24> module variable to enable it.
 
-Character "E" is abbreviation for "{EL}", and it clears the line from
-cursor to the end of the line.  At this time, background color is set
-to the area.  When this code is found in the start sequence, it is
+Character "E" is an abbreviation for "{EL}", and it clears the line
+from cursor to the end of the line.  At this time, background color is
+set to the area.  When this code is found in the start sequence, it is
 copied to just before ending reset sequence, with preceding sequence
 if necessary, to keep the effect even when the text is wrapped to
 multiple lines.
@@ -466,6 +511,47 @@ These name accept following optional numerical parameters, using comma
 (',') or semicolon (';') to separate multiple ones, with optional
 braces.  For example, color spec C<DK/544> can be described as
 C<{SGR1;30;48;5;224}> or more readable C<{SGR(1,30,48,5,224)}>.
+
+=head1 COLOR NAMES
+
+Color names are experimentaly supported in this version.  Currently
+names are listed in L<Graphics::ColorNames::WWW> module.  Following
+colors are available.
+
+=over 4
+
+aliceblue antiquewhite aqua aquamarine azure beige bisque black
+blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse
+chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan
+darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta
+darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen
+darkslateblue darkslategray darkslategrey darkturquoise darkviolet
+deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite
+forestgreen fuchsia fuscia gainsboro ghostwhite gold goldenrod gray
+grey green greenyellow honeydew hotpink indianred indigo ivory khaki
+lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral
+lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey
+lightpink lightsalmon lightseagreen lightskyblue lightslategray
+lightslategrey lightsteelblue lightyellow lime limegreen linen magenta
+maroon mediumaquamarine mediumblue mediumorchid mediumpurple
+mediumseagreen mediumslateblue mediumspringgreen mediumturquoise
+mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite
+navy oldlace olive olivedrab orange orangered orchid palegoldenrod
+palegreen paleturquoise palevioletred papayawhip peachpuff peru pink
+plum powderblue purple red rosybrown royalblue saddlebrown salmon
+sandybrown seagreen seashell sienna silver skyblue slateblue slategray
+slategrey snow springgreen steelblue tan teal thistle tomato turquoise
+violet wheat white whitesmoke yellow yellowgreen
+
+=back
+
+Put colon (:) mark before each color names to use, like:
+
+    :deeppink/:lightyellow
+
+Although these colors are defined in 24bit value, they are mapped to
+6x6x6 216 colors by default.  Set C<$COLOR_RGB24> module variable to
+use 24bit color mode.
 
 =head1 FUNCTION SPEC
 

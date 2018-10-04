@@ -3,23 +3,39 @@ use v5.12;
 use warnings;
 
 package String::Tools;
-# ABSTRACT: Various tools for handling strings.
-our $VERSION = '0.14.163'; # VERSION
+# ABSTRACT: Various tools for manipulating strings.
+our $VERSION = 'v0.18.270'; # VERSION
 
 
 use Exporter 'import';
 
 our @EXPORT    = qw();
-our @EXPORT_OK = qw(define is_blank shrink stitch stitcher subst trim);
+our @EXPORT_OK = qw(
+    define
+    is_blank
+    shrink
+    stitch
+    stitcher
+    subst
+    trim
+    trim_lines
+);
 
-
-our $THREAD = ' ';
+### Variables ###
 
 
 our $BLANK  = '[[:cntrl:][:space:]]';
 
 
-sub define(_) { return $_[0] // '' }
+our $SUBST_VAR = qr/[[:alpha:]_]+\w*(?:[[:punct:]]\w+)*/;
+
+
+our $THREAD = ' ';
+
+### Functions ###
+
+
+sub define(_) { return $_[0] // !!undef }
 
 
 sub is_blank(_) {
@@ -72,8 +88,15 @@ sub subst {
 
     if (%subst) {
         local $_;
-        my $names = join( '|', map quotemeta, grep length, sort keys %subst );
-        $str =~ s[\$(?:\{\s*($names)\s*\}|($names)\b)]
+        my $names = '(?:'
+            . join( '|',
+                map quotemeta,
+                    sort { length($b) <=> length($a) || $a cmp $b }
+                        grep { length() && /\A$SUBST_VAR\z/ }
+                            keys %subst
+            )
+            . ')\b';
+        $str =~ s[\$(?:\{\s*($names)\s*\}|($names))]
                  [$subst{ $1 // $2 }]g;
     }
 
@@ -113,6 +136,39 @@ sub trim {
     return $_;
 }
 
+
+sub trim_lines {
+    local $_ = @_ ? shift : $_;
+    return $_ unless defined;
+
+    my ( $lead, $rear );
+    my $count = scalar @_;
+    if    ($count == 0) {}
+    elsif ($count == 1) { $lead = shift; }
+    else {
+        # Could be:
+        #   1. l => $value
+        #   2. r => $value
+        #   3. l => $value, r => $value
+        #   or r => $value, l => $value
+        #   4. $lead, $rear
+        my %lr = @_;
+        $lead = delete $lr{l} if exists $lr{l};
+        $rear = delete $lr{r} if exists $lr{r};
+        # At this point, there should be nothing in %lr,
+        # so if there is, then this must be case 4.
+        ( $lead, $rear ) = @_ if %lr;
+    }
+
+    $lead //= $BLANK . '+';
+    s/^$lead//gm if ( length $lead );
+
+    $rear //= $lead;
+    s/$rear$//gm if ( length $rear );
+
+    return $_;
+}
+
 1;
 
 __END__
@@ -123,15 +179,20 @@ __END__
 
 =head1 NAME
 
-String::Tools - Various tools for handling strings.
-
-=head1 VERSION
-
-version 0.14.163
+String::Tools - Various tools for manipulating strings.
 
 =head1 SYNOPSIS
 
- use String::Tools qw(define is_blank shrink stitch stitcher subst trim);
+ use String::Tools qw(
+    define
+    is_blank
+    shrink
+    stitch
+    stitcher
+    subst
+    trim
+    trim_lines
+ );
 
  my $val = define undef; # ''
 
@@ -183,12 +244,6 @@ C<String::Tools> is a collection of tools to manipulate strings.
 
 =head1 VARIABLES
 
-=head2 C<$THREAD>
-
-The default thread to use while stitching a string together.
-Defaults to a single space, C<' '>.
-Used in L</shrink( $string = $_ )> and L</stitch( @list )>.
-
 =head2 C<$BLANK>
 
 The default regular expression character class to determine if a string
@@ -201,11 +256,31 @@ L</stitch( @list )>,
 and
 L</trim( $string = $_ ; $l = qrE<sol>$BLANK+E<sol> ; $r = $l )>.
 
+=head2 C<$SUBST_VAR>
+
+The regular expression for the
+L<< /subst( $string ; %variables = ( _ => $_ ) ) >> function.
+Starts with an alphabetic or underscore character, continues with any number
+of word characters, and then is followed by any number of subpatterns that
+begin with a single punctuation character and is followed by one or more
+word characters.
+
+If you want to change it for a particular use, it is highly recomended
+that you C<local>'ize your change.
+
+=head2 C<$THREAD>
+
+The default thread to use while stitching a string together.
+Defaults to a single space, C<' '>.
+Used in L</shrink( $string = $_ )> and L</stitch( @list )>.
+
 =head1 FUNCTIONS
 
 =head2 C<define( $scalar = $_ )>
 
-Returns C<$scalar> if it is defined, or the empty string if it's undefined.
+Returns C<$scalar> if it is defined,
+or a defined but false value (which works in a numeric or string context)
+if it's undefined.
 Useful in avoiding the 'Use of uninitialized value' warnings.
 C<$scalar> defaults to C<$_> if not specified.
 
@@ -277,6 +352,9 @@ Only names which are in C<%variables> will be replaced.  This means that
 substitutions that are in C<$string> which are not mentioned in C<%variables>
 are simply ignored and left as is.
 
+The names in C<%variables> to be replaced in C<$string> must follow a pattern.
+The pattern is available in variable L</C<$SUBST_VAR>>.
+
 Returns the string with substitutions made.
 
 =head2 C<trim( $string = $_ ; $l = qr/$BLANK+/ ; $r = $l )>
@@ -293,7 +371,7 @@ matched at the end of the string.
 If you don't want to trim the start or end of a string, set the
 corresponding parameter to the empty string C<''>.
 
- say map trim, @strings;
+ say foreach map trim, @strings;
 
  say trim('  This is a test  ')
  # 'This is a test'
@@ -304,11 +382,24 @@ corresponding parameter to the empty string C<''>.
  say trim('  This is a test!!', r => qr/[.?!]+/, l => qr/\s+/);
  # 'This is a test'
 
+=head2 C<trim_lines( $string = $_ ; $l = qr/$BLANK+/ ; $r = $l )>
+
+Similar to L</trim( $string = $_ ; $l = qr/$BLANK+/ ; $r = $l )>,
+except it does it for each line in a string, not just the start
+and end of a string.
+
+ say trim_lines("\t This \n\n \t is \n\n \t a \n\n \t test \t\n\n")
+ # "This\nis\na\ntest"
+
+ say trim_lines( "\t\tThis\n\t\tis\n\t\ta\n\t\ttest", qr/\t/ );
+ # "\tThis\n\tis\n\ta\n\ttest"
+
+Since v0.18.270.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/rkleemann/String-Tools/issues or by email to
-bug-String-Tools@rt.cpan.org.
+L<https://github.com/rkleemann/String-Tools/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -322,13 +413,17 @@ Nothing?
 
 L<perlfunc/join>, Any templating system.
 
+=head1 VERSION
+
+version v0.18.270
+
 =head1 AUTHOR
 
 Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Bob Kleemann.
+This software is Copyright (c) 2014-2018 by Bob Kleemann.
 
 This is free software, licensed under:
 

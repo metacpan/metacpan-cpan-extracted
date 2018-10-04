@@ -2,17 +2,17 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'PREREQ_PM' => {
-                   'Test::More' => 0,
-                   'IPC::Run' => '0.99',
-                   'Browser::Open' => '0.04'
-                 },
-  'VERSION_FROM' => 'lib/EPFL/Service/Open.pm',
-  'NAME' => 'EPFL::Service::Open',
-  'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
                    'bin/epfl-service-open'
-                 ]
+                 ],
+  'INSTALLDIRS' => 'site',
+  'PREREQ_PM' => {
+                   'IPC::Run' => '0.99',
+                   'Browser::Open' => '0.04',
+                   'Test::More' => 0
+                 },
+  'VERSION_FROM' => 'lib/EPFL/Service/Open.pm',
+  'PL_FILES' => {},
+  'NAME' => 'EPFL::Service::Open'
 )
 ;

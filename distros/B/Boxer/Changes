@@ -7,6 +7,39 @@ Home page:    <https://wiki.debian.org/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v1.1.11	2018-10-04
+
+ [ Bug Fixes ]
+ - Fix propagate nonfree flag to skeleton files..
+
+v1.1.10	2018-09-27
+
+ [ Documentation ]
+ - Tidy changes to mark test-related entries as such.
+
+ [ Test Suite ]
+ - Add author-test pod-spell.
+ - Fix author-test SYNOPSIS without needing MANIFEST.
+ - Fix test miminum version without needing META.yml.
+
+ [ Packaging ]
+ - Fix explicitly depend on Class::XSAccessor: Optionally used by Moo, but
+   without it accessors with hyphens are not supported.
+
+v1.1.9	2018-09-27
+
+ [ Bug Fixes ]
+ - Fix resolve nonfree, auto-resolved, and to-be-avoided packages.
+
+ [ Documentation ]
+ - Update INSTALL file: Update git URL.
+
+ [ Test Suite ]
+ - Extend testsuite: Cover auto-resolved and to-be-avoided packages.
+
+ [ Other ]
+ - Tidy HEREDOC commands.
+
 v1.1.8	2018-07-13
 
  [ Bug Fixes ]
@@ -29,7 +62,7 @@ v1.1.7	2017-11-06
 
 v1.1.6	2017-11-05
 
- [ Bug Fixes ]
+ [ Test Suite ]
  - Fix testsuite to gracefully handle executable reclass unavailable.
 
  [ Packaging ]
@@ -44,9 +77,11 @@ v1.1.5	2017-01-24
  - Add some TODOs.
  - Fix usage description for compose subcommand.
 
- [ Packaging ]
+ [ Test Suite ]
  - Run perlcritic with tidyall, and test both (not only perlcritic) in
    TEST_AUTHOR mode.
+
+ [ Packaging ]
  - Use version with modern assignment. Extend copyright to current year.
 
  [ Other ]

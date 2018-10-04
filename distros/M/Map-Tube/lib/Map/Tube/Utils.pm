@@ -1,6 +1,6 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '3.56';
+$Map::Tube::Utils::VERSION   = '3.57';
 $Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 3.56
+Version 3.57
 
 =cut
 
@@ -21,7 +21,7 @@ use File::ShareDir ':ALL';
 use parent 'Exporter';
 
 our @EXPORT_OK   = qw(to_perl is_same trim common_lines filter get_method_map is_valid_color);
-our @COLOR_NAMES = _color_names();
+our $COLOR_NAMES = _color_names();
 
 =head1 DESCRIPTION
 
@@ -141,10 +141,11 @@ sub is_valid_color {
 
     return 0 unless defined $color;
 
-    if (($color =~ /^#[a-f0-9]{6}$/i)
-        ||
-        (grep { lc($color) eq $_ } @COLOR_NAMES)) {
-        return 1;
+    return $color if ($color =~ /^#[a-f0-9]{6}$/i);
+
+    my $hexcode = $COLOR_NAMES->{lc($color)};
+    if (defined $hexcode) {
+        return $hexcode;
     }
     else {
         return 0;
@@ -165,13 +166,18 @@ sub _is_number {
 sub _color_names {
 
     my $source = dist_file('Map-Tube', 'color-names.txt');
-    open (my $COLOR_NAMES, "<", $source)
+    open (my $SOURCE_COLOR, "<", $source)
         or die("ERROR: Can't open $source: $!\n");
-    my @color_names = <$COLOR_NAMES>;
-    chomp @color_names;
-    close ($COLOR_NAMES);
 
-    return @color_names;
+    my $color_names = {};
+    while (my $line = <$SOURCE_COLOR>) {
+        chomp $line;
+        my ($name, $hashcode) = split /\,/,$line,2;
+        $color_names->{lc($name)} = $hashcode;
+    }
+    close ($SOURCE_COLOR);
+
+    return $color_names;
 }
 
 =head1 AUTHOR

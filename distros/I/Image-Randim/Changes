@@ -1,3 +1,45 @@
+commit 200a7e7491d64bc362e5252097a40e215508340b
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Oct 1 16:32:24 2018 -0700
+
+    Text file with image source/credits gets saved along with image file now
+
+commit a237670876b24cf04928e78b67ab851a30580a7e
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Sep 23 13:27:29 2018 -0700
+
+    Version bump
+
+commit e3f6711e02642748e7567ce768d90a05a87e00ae
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Sep 23 13:17:38 2018 -0700
+
+    default image viewer is now 'feh' and fallback to 'eog'. gnome3 desktop wallpaper is taken from the main directory now rather than the directory you saved the desktop image to.
+
+commit 0eca0d9dd43f2d8534403d92c66c7be21f0830df
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Sep 23 12:42:54 2018 -0700
+
+    Added .gitignore file. 'randim' script will use default viewer unless setting desktop background with --gnome3 swtch
+
+commit 961a14d2a0b6730ddf8aeffa0dc7e6eea05c602d
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Sep 13 13:13:30 2017 -0700
+
+    Added some documentation for a desktop icon
+
+commit 18a86a7ec9cbc4bc3689957245ff5b87854b3bb2
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Sep 4 07:59:48 2017 -0700
+
+    Image information text is now saved along with the image file to provide artist credit
+
+commit a7f482e17b671dfa86f65e02df1bf49e59e15235
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Sep 3 18:53:24 2017 -0700
+
+    New option to delete images in directory after the new one is copied rather than before, since it can confuse KDE's automaticall wallpaper changer
+
 commit ac7e964f287e03f138cdc2630e9c2ac134948a01
 Author: Mark Rushing <mark@orbislumen.net>
 Date:   Sun Sep 3 04:45:47 2017 -0700

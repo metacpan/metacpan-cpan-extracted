@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.52
-corresponding to git commit L<56c50cb8279294bb1cdafd88b2a9d4339e643782|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/56c50cb8279294bb1cdafd88b2a9d4339e643782> made on Tue Sep 18 11:47:22 2018 +0900.
+This document describes Lingua::JA::Moji version 0.53
+corresponding to git commit L<4d331013d110c3c316c352bd2409a6b609e6e214|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4d331013d110c3c316c352bd2409a6b609e6e214> made on Wed Oct 3 15:41:13 2018 +0900.
 
 =head1 説明
 
@@ -407,7 +407,7 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 
 
 
-全角かたかな、ひらがな、半角かたかな、丸かたかななどあらゆる「仮名」を全角かたかなに変換します。
+全角かたかな、ひらがな、半角かたかな、丸かたかななどあらゆる「仮名」を全角かたかなに変換します。濁点と半濁点をL</join_sound_marks>により仮名に付けます。付けられない仮名は消します。
 
 
 
@@ -596,10 +596,8 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
-カタカナをシラブルにわける。たとえば、「ソーシャル」
-は'ソ', 'ー', 'シ', 'ャ', 'ル'という意味のない文字ではなく、日本語の
-「原子」の'ソー', 'シャ', 'ル'になります。撥音(ん)は前の仮名に付く。例えば、
-「フラナガン」は「フ」, 「ラ」, 「ナ」, 「ガン」となります。
+カタカナをシラブルニワケル。たとえば、「ソーシャル」
+ハ'ソ', 'ー', 'シ', 'ャ', 'ル'という意味のない文字ではなく、日本語の「原子」ノ'ソー', 'シャ', 'ル'になります。撥音(ん)は前の仮名と一つになります。例えば、「フラナガン」ハ「フ」, 「ラ」, 「ナ」, 「ガン」となります。
 
 
 
@@ -613,18 +611,18 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
     use Lingua::JA::Moji 'InKana';
 
-    $is_kana = ('あいうえお' =~ /^\p{InKana}+$/);
+    $is_kana = ('アイウエオ' =~ /^\p{InKana}+$/);
     # $is_kana = '1'
 
 
 
-正規表現に使うカタカナとひらがなにマッチします。
+正規表現に使うかたかなとひらがなにまっちします。
 
 詳しくいうと以下の正規表現
 
     qr/\p{Katakana}|\p{InKatakana}|\p{InHiragana}|ｰ|ﾞ|ﾟ>/
 
-と殆ど同じことにマッチしますが、C<\p{Katakana}>がマッチする未使用のコードポイントはマッチしません。「・」もマッチしません。変体仮名もマッチしません。
+と殆ど同じことにまっちしますが、C<\p{Katakana}>がマッチする未使用のコードポイントはマッチしません。「・」もマッチしません。変体仮名もマッチしません。
 
 
 
@@ -705,6 +703,48 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
+=head2 join_sound_marks 
+
+
+
+    use Lingua::JA::Moji 'join_sound_marks';
+
+    $joined = join_sound_marks ('か゛は゜つ゛');
+    # $joined = 'がぱづ'
+
+
+
+濁点、半濁点をできる限り仮名につけます。「カ゛」-> 「ガ」など。残っている濁点を消します。
+
+0.53カラ
+
+
+
+
+
+
+
+=head2 split_sound_marks 
+
+
+
+    use Lingua::JA::Moji 'split_sound_marks';
+
+    $split = split_sound_marks ('ガパヅ');
+    # $split = 'カ゛ハ゜ツ゛'
+
+
+
+濁点、半濁点を仮名からわけます。-> 「が」-> 「か゛」など。半濁点はU+309B、濁点はU+309Cとなります。
+
+0.53カラ
+
+
+
+
+
+
+
 
 
 =head1 変体仮名
@@ -776,11 +816,11 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
     use Lingua::JA::Moji 'kana2hentai';
 
     $hentai = kana2hentai ('ケンブ');
-    # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞ぶ'
+    # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞𛂰・𛂱・𛂲゛'
 
 
 
-あてはまる変体仮名があるかぎり、普通の仮名を変体仮名に変換します。複数の仮名があれば、「・」で分けます。
+あてはまる変体仮名があるかぎり、普通の仮名を変体仮名に変換します。複数の仮名があれば、「・」で分けます。濁点と半濁点はL</split_sound_marks>により仮名と分けてから変換します。
 
 
 
@@ -871,12 +911,12 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
     use Lingua::JA::Moji 'kana2morse';
 
-    $morse = kana2morse ('しょっちゅう');
+    $morse = kana2morse ('ショッチュウ');
     # $morse = '--.-. -- .--. ..-. -..-- ..-'
 
 
 
-かなをモースコードに変換します。日本語のモースコードは「っ」など小さいかなを表現できないので、仮名をモースコードにして、モースコードからまた仮名にする場合は「しょっちゅう」が「シヨツチユウ」になります。
+かなをもーすこーどに変換します。日本語のもーすこーどは「っ」など小さいかなを表現できないので、仮名をもーすこーどにして、もーすこーどからまた仮名にする場合は「しょっちゅう」が「シヨツチユウ」になります。
 
 
 
@@ -895,14 +935,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
-モースコードをかなに変換します。（本物のモースコードは分かち書きが必要です。）
+モースコードをかなに変換します。（本物のもーすこーどは分かち書きが必要です。）
 
 
-
-
-=head3 欠点
-
-テストが不十分です。
 
 
 
@@ -925,7 +960,7 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 =head3 欠点
 
-きちんとしたテストがありません。日本語を本物の点字に変換することはわたちがきが必要ですがこの関数はそれをしませんので、不十分な変換機能です。
+きちんとしたてすとがありません。日本語を本物の点字に変換することはわたちがきが必要ですがこの関数はそれをしませんので、不十分な変換機能です。
 
 
 
@@ -941,7 +976,7 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
-点字をカタカナに変換します。
+点字をかたかなに変換します。
 
 
 
@@ -955,12 +990,13 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
     use Lingua::JA::Moji 'kana2circled';
 
-    $circled = kana2circled ('あいうえお');
-    # $circled = '㋐㋑㋒㋓㋔'
+    $circled = kana2circled ('アイウエオガン');
+    # $circled = '㋐㋑㋒㋓㋔㋕゛ン'
 
 
 
-仮名を丸付けかたかなに変換します。丸付け「ン」がありませんので、「ン」はそのままとなります。
+仮名を丸付けかたかなに変換します。丸付け「ン」がありませんので、「ン」はそのままとなります。濁点・半濁点はL</split_sound_marks>により仮名から分けられてから変換されたので、「が」が「㋕゛」になります。
+
 丸付け片假名はユニコード32D0〜32FEにあります。
 
 
@@ -1287,6 +1323,10 @@ Lingua::JA::Moji does not have it, Lingua::JA::NormalizeText may do.
 
 This is similar to the present module for Korean.
 
+=item L<Lingua::JA::Onbiki>
+
+=item L<Lingua::JA::Jtruncate>
+
 =back
 
 =head2 漢字かな変換
@@ -1375,10 +1415,14 @@ generate this data.
 0.46 disallowed hyphens as the first character of a romaji string and
 added L</smallize_kana> and L</cleanup_kana>.
 
-0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and changed romanisation somewhat.
+0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and
+changed romanisation somewhat.
 
 0.48 changed kana2romaji to be consistent with the documentation for
 long vowel options wapuro and none.
+
+0.53 added L</join_sound_marks> and L</split_sound_marks> to the
+module.
 
 
 

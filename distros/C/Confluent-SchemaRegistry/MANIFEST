@@ -1,0 +1,9 @@
+Changes                             History of this package
+Makefile.PL                         Makefile generator
+MANIFEST                            This file
+META.json                           Module meta-data (added by MakeMaker)
+META.yml                            Module meta-data (added by MakeMaker)
+README                              Get you started with this package
+INSTALL
+lib/Confluent/SchemaRegistry.pm
+t/01_quick_start.t

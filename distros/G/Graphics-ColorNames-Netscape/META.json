@@ -1,0 +1,90 @@
+{
+   "abstract" : "Netscape 1.1 Color Names",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "color",
+      "Netscape",
+      "deprecated"
+   ],
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graphics-ColorNames-Netscape",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Graphics::ColorNames" : "0"
+         },
+         "requires" : {
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "Module::Metadata" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Types::Common::Numeric" : "1.004",
+            "Types::Standard" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::ColorNames::Netscape" : {
+         "file" : "lib/Graphics/ColorNames/Netscape.pm",
+         "version" : "v3.1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Graphics-ColorNames-Netscape/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Graphics-ColorNames-Netscape.git",
+         "web" : "https://github.com/robrwo/Graphics-ColorNames-Netscape"
+      }
+   },
+   "version" : "v3.1.2",
+   "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Magnus Cedergren <magnus@mbox604.swipnet.se>",
+      "Gary Vollink <gary@vollink.com>",
+      "Slaven Rezi\u0107 <slaven@rezic.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

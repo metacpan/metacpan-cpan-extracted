@@ -1,10 +1,12 @@
 package App::Prun;
 
+use 5.010;
+
 use Moo;
 use Storable qw( freeze );  # to support testing
 use namespace::clean;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 has pm => ( is => 'ro', required => 1 );
 has report_failed_procs => ( is => 'ro', default => 1 );
@@ -48,32 +50,9 @@ sub run_command {
     $self->pm->finish($rc >> 8);
 }
 
-sub _old_run_command {
-    my $self = shift;
-    my $cmd = shift;
-
-    chomp $cmd;
-    
-    # Skip blank lines and comments
-    return if (/^\s*(#|$)/);
-
-    $self->pm->start($cmd) and return;
-
-    # In the child now
-
-    my $fh;
-    open $fh, '|-', $self->shell.' -'
-        or die "Failed to execute shell ".$self->shell.": $!";
-
-    print $fh $cmd,"\n";
-    close $fh;
-    $self->pm->finish($? >> 8);
-}
-
 sub done { shift->pm->wait_all_children }
 
 sub _test_dump {
-    #print Dumper(shift);
     $Storable::forgive_me = 1;
     print freeze(shift);
     exit 255;
@@ -91,7 +70,7 @@ App::Prun - Provides the prun script as a command line interface to L<Parallel::
 
 =head1 VERSION
 
-Version 1.04
+Version 1.07
 
 =head1 SYNOPSYS
 

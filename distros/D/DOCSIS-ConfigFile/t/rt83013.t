@@ -1,5 +1,5 @@
 use Test::More;
-use DOCSIS::ConfigFile qw( encode_docsis );
+use DOCSIS::ConfigFile qw(encode_docsis);
 
 eval { encode_docsis {DownstreamFrequency => 88000000} };
 is + ($@ || ''), '', 'valid';

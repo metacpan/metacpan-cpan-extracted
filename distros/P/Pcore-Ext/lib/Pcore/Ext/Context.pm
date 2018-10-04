@@ -1,7 +1,7 @@
 package Pcore::Ext::Context;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[weaken];
+use Pcore::Util::Scalar qw[weaken is_plain_arrayref];
 use Pcore::Ext::Context::Raw;
 use Pcore::Ext::Context::Func;
 use Pcore::Ext::Context::L10N;
@@ -124,7 +124,7 @@ sub to_js ( $self ) {
         local *{"$self->{ctx}->{namespace}\::func"} = sub {
             return bless(
                 {   ctx       => $self,
-                    func_args => shift,
+                    func_args => is_plain_arrayref $_[0] ? shift : undef,
                     func_body => shift,
                 },
                 'Pcore::Ext::Context::Func'

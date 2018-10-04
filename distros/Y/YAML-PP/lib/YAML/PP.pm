@@ -4,7 +4,7 @@ use warnings;
 package YAML::PP;
 use B;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;
@@ -17,6 +17,7 @@ sub new {
     my $schemas = delete $args{schema} || ['Core'];
     my $cyclic_refs = delete $args{cyclic_refs} || 'allow';
     my $parser = delete $args{parser};
+    my $emitter = delete $args{emitter};
 
     my $schema = YAML::PP::Schema->new(
         boolean => $bool,
@@ -28,6 +29,7 @@ sub new {
         schema => $schema,
         cyclic_refs => $cyclic_refs,
         parser => $parser,
+        emitter => $emitter,
     }, $class;
     return $self;
 }
@@ -35,6 +37,7 @@ sub new {
 sub boolean { return $_[0]->{boolean} }
 sub cyclic_refs { return $_[0]->{cyclic_refs} }
 sub parser { return $_[0]->{parser} }
+sub emitter { return $_[0]->{emitter} }
 
 sub loader {
     if (@_ > 1) {
@@ -86,6 +89,8 @@ sub load_file {
         require YAML::PP::Loader;
         $loader = YAML::PP::Loader->new(
             schema => $self->schema,
+            cyclic_refs => $self->cyclic_refs,
+            parser => $self->parser,
         );
         $self->loader($loader);
     }
@@ -97,8 +102,10 @@ sub dump_string {
     my $dumper = $self->dumper;
     unless ($dumper) {
         require YAML::PP::Dumper;
+
         $dumper = YAML::PP::Dumper->new(
             schema => $self->schema,
+            emitter => $self->emitter,
         );
         $self->dumper($dumper);
     }
@@ -112,6 +119,7 @@ sub dump_file {
         require YAML::PP::Dumper;
         $dumper = YAML::PP::Dumper->new(
             schema => $self->schema,
+            emitter => $self->emitter,
         );
         $self->dumper($dumper);
     }
@@ -627,8 +635,10 @@ Here are a few examples of what you can do right now:
     use YAML::PP qw/ Load Dump LoadFile DumpFile /;
     my @documents = Load($yaml);
     my @documents = LoadFile($filename);
+    my @documents = LoadFile($filehandle);
     my $yaml = = Dump(@documents);
     DumpFile($filename, @documents);
+    DumpFile($filenhandle @documents);
 
 
 Some utility scripts:
@@ -936,6 +946,7 @@ No function is exported by default.
     use YAML::PP qw/ LoadFile /;
     my $doc = LoadFile($file);
     my @docs = LoadFile($file);
+    my @docs = LoadFile($filehandle);
 
 =item Dump
 
@@ -948,6 +959,7 @@ No function is exported by default.
     use YAML::PP qw/ DumpFile /;
     DumpFile($file, $doc);
     DumpFile($file, @docs);
+    DumpFile($filehandle, @docs);
 
 =back
 

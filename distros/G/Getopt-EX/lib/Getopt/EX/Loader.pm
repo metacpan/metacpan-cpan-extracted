@@ -277,21 +277,37 @@ sub expand {
 	    }->(), @s;
 
 	    @s = $bucket->expand_args(@s);
-
 	    if ($debug) {
-		printf STDERR
-		    "\@ARGV = %s\n",
-		    join(' ', @$argv, '<', @s, '>', @follow);
+		printf STDERR "Looking: %s\n", array_to_str(@s);
 	    }
 
 	    my @module = $obj->modopt(\@s);
 
-	    my @default = map { [ $_->default ] } @module;
+	    my @default = grep { @$_ } map { [ $_->default ] } @module;
+
+	    if ($debug) {
+		printf STDERR
+		    "\@ARGV = %s\n",
+		    array_to_str(@$argv,
+				 @default ? ( '(', @default, ')' ) : (),
+				 @s       ? ( '<', @s,       '>' ) : (),
+				 @follow);
+	    }
 	    push @$argv, @default, @s, @follow;
 
 	    redo ARGV if $i < @$argv;
 	}
     }
+}
+
+sub array_to_str {
+    join ' ', map {
+	if (ref eq 'ARRAY') {
+	    join ' ', '[', array_to_str(@$_), ']';
+	} else {
+	    $_;
+	}
+    } @_;
 }
 
 sub modules {

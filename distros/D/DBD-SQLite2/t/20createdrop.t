@@ -18,7 +18,7 @@ require DBI;
 $mdriver = "";
 my $file;
 foreach $file ("lib.pl", "t/lib.pl") {
-    do $file; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
+    do "./$file"; if ($@) { print STDERR "Error while executing lib.pl: $@\n";
 			   exit 10;
 		      }
     if ($mdriver ne '') {

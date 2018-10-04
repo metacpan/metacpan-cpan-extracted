@@ -5,7 +5,7 @@ package Signer::AWSv4;
   use Digest::SHA qw//;
   use URI::Escape qw//;
 
-  our $VERSION = '0.02';
+  our $VERSION = '0.03';
 
   has access_key => (is => 'ro', isa => Str, required => 1);
   has secret_key => (is => 'ro', isa => Str, required => 1);
@@ -297,11 +297,21 @@ L<WebService::Amazon::Signature::v4>
 
 L<https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html>
 
+=head1 CONTRIBUTIONS
+
+manwar: specify missing prereqs
+
 =head1 BUGS and SOURCE
 
 The source code is located here: L<https://github.com/pplu/AWSv4Signer>
 
 Please report bugs to: L<https://github.com/pplu/AWSv4Signer/issues>
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
 
 =head1 COPYRIGHT and LICENSE
 

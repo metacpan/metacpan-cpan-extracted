@@ -8,6 +8,7 @@ MANIFEST
 NEWS
 packdrake
 packdrake.pm
+rpmtools.pm
 t/01packdrake.t
 META.yml                                 Module meta-data (added by MakeMaker)
 README

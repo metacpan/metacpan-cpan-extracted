@@ -1,5 +1,12 @@
 Revision history for Datify.
 
+v0.18.270 2018-09-27
+
+ - Changed keyify to format numbers with numify, rather than as strings.
+ - Added Datify::Path, for outputting data like filesystem paths.
+ - Changed Datify encode to use "byte" and "wide" rather than 255 and 65_535.
+ - Added functionality to filter hash entries and object attributes.
+
 0.14.163  2014-06-12
 
  - Updated to use several Dist::Zilla features and plugins.

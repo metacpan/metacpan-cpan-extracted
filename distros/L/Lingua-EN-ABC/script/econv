@@ -1,7 +1,7 @@
 #!/home/ben/software/install/bin/perl
 use warnings;
 use strict;
-use lib '/home/ben/projects/Lingua-EN-ABC/lib';
+use lib '/home/ben/projects/lingua-en-abc/lib';
 use Lingua::EN::ABC ':all';
 use Getopt::Long;
 

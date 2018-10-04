@@ -1,16 +1,24 @@
 Revision history for Music-Duration
 
-0.0301    2014-08-30 09:33:39-04:00 America/New_York
-    - Improved abstract
-    - Fixed POD
+0.0500 2018-10-04 01:31:17
+    - Improved documentation.
+    - Added the tuple() function.
 
-0.03      2013-12-24 01:24:45 America/Los_Angeles
+0.0400 2018-10-04 00:06:35
+    - Improved documentation.
+    - Fixed the broken fractional() function.
+
+0.0301 2014-08-30 09:33:39-04:00 America/New_York
+    - Improved abstract.
+    - Fixed POD.
+
+0.03 2013-12-24 01:24:45 America/Los_Angeles
     - Enabled fractional length assignment.
 
-0.0201    2013-11-19 06:19:11 America/Los_Angeles
+0.0201 2013-11-19 06:19:11 America/Los_Angeles
     - Fixed github link in dist.ini.
 
-0.02      2013-02-05 19:30:37 America/Los_Angeles
+0.02 2013-02-05 19:30:37 America/Los_Angeles
     - Removed MIDI-Perl computational typo fix after resolving.
     - Made tests for each added duration.
 

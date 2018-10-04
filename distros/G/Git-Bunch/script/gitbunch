@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.622'; # VERSION
+our $DATE = '2018-09-27'; # DATE
+our $VERSION = '0.623'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.622 of gitbunch (from Perl distribution Git-Bunch), released on 2018-01-17.
+This document describes version 0.623 of gitbunch (from Perl distribution Git-Bunch), released on 2018-09-27.
 
 =head1 SYNOPSIS
 
@@ -135,13 +135,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -190,7 +188,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 

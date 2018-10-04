@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Lexer;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;

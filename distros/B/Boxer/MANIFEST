@@ -14,7 +14,6 @@ bin/boxer
 dist.ini
 doap.ttl
 doc/boxer.svg
-examples/README
 examples/classes/Admin/apt/auto/all.yml
 examples/classes/Admin/apt/auto/core.yml
 examples/classes/Admin/apt/auto/functions.yml

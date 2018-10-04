@@ -1,5 +1,5 @@
-use Test::More tests => 2;
-BEGIN { use_ok('DataTables') };
+use Test::More;
+use DataTables;
 use CGI::Simple;
 use DBI;
 use Data::Compare qw/Compare/;
@@ -7,6 +7,8 @@ use FindBin qw/$Bin/;
 
 eval "use DBD::SQLite";
 plan skip_all => "DBD::SQLite required for this test script." if $@;
+
+plan tests => 1;
 
 my @tests = (
     {

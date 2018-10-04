@@ -1,5 +1,10 @@
 See also the git repository.
 
+0.07    2018-09-28
+        Break interface, rand() now returns floats more like CORE::rand().
+        Add irand() which is what the old rand() was.
+        Add rand_elm(), rand_idx() for array element or index selection.
+
 0.05    2018-09-19
         Mostly build improvements.
 

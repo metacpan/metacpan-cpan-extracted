@@ -1,44 +1,10 @@
 package   Mandel::Collection;
-
-=head1 NAME
-
-Mandel::Collection - A collection of Mandel documents
-
-=head1 SYNOPSIS
-
-  my $connection = MyModel->connect("mongodb://localhost/my_db");
-  my $persons = $connection->collection("person");
-
-  $persons->count(sub {
-    my($persons, $err, $int) = @_;
-  });
-
-  # ...
-
-=head1 DESCRIPTION
-
-This class is used to describe a group of mongodb documents.
-
-=cut
-
 use Mojo::Base -base;
 use Mandel::Iterator;
 use Mango::BSON ':bson';
 use Scalar::Util 'blessed';
 use Carp 'confess';
 use constant DEBUG => $ENV{MANDEL_CURSOR_DEBUG} ? eval 'require Data::Dumper;1' : 0;
-
-=head1 ATTRIBUTES
-
-=head2 connection
-
-An object that inherit from L<Mandel>.
-
-=head2 model
-
-An object that inherit from L<Mandel::Model>.
-
-=cut
 
 has connection => sub { confess "connection required in constructor" };
 has model      => sub { confess "model required in constructor" };
@@ -48,21 +14,8 @@ has _storage_collection => sub {
   $self->connection->_storage_collection($self->model->collection_name);
 };
 
-=head1 METHODS
-
-=head2 all
-
-  $self = $self->all(sub { my($self, $err, $docs) = @_; });
-  $docs = $self->all;
-
-Retrieves all documents from the database that match the given L</search>
-query.
-
-=cut
-
 sub all {
   my ($self, $cb) = @_;
-
 
   my $c = $self->_new_cursor;
   return [map { $self->_new_document($_, 1) } @{$c->all}] unless $cb;
@@ -76,34 +29,12 @@ sub all {
   return $self;
 }
 
-=head2 create
-
-  $document = $self->create;
-  $document = $self->create(\%args);
-
-Returns a new object of a given type. This object is NOT inserted into the
-mongodb collection. You need to call L<Mandel::Document/save> for that to
-happen.
-
-C<%args> is used to set the fields in the new document, NOT the attributes.
-
-=cut
-
 sub create {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;
 
   $self->_new_document(shift || undef, 0);
 }
-
-=head2 count
-
-  $self = $self->count(sub { my($self, $err, $int) = @_; });
-  $int  = $self->count;
-
-Used to count how many documents the current L</search> query match.
-
-=cut
 
 sub count {
   my ($self, $cb) = @_;
@@ -115,15 +46,6 @@ sub count {
   return $self;
 }
 
-=head2 distinct
-
-  $self   = $self->distinct("field_name", sub { my($self, $err, $values) = @_; });
-  $values = $self->distinct("field_name");
-
-Get all distinct values for key in this collection.
-
-=cut
-
 sub distinct {
   my ($self, $field, $cb) = @_;
 
@@ -134,40 +56,9 @@ sub distinct {
   return $self;
 }
 
-=head2 iterator
-
-  $iterator = $self->iterator;
-
-Returns a L<Mandel::Iterator> object based on the L</search> performed.
-
-=cut
-
 sub iterator {
-  my $self = shift;
-
-  Mandel::Iterator->new(cursor => $self->_new_cursor, model => $self->model,);
+  return Mandel::Iterator->new(cursor => $_[0]->_new_cursor, model => $_[0]->model);
 }
-
-=head2 patch
-
-  $self = $self->patch(\%changes, sub { my($self, $err, $doc) = @_ });
-  $self = $self->patch(\%changes);
-
-This method can be used to add C<%changes> to multiple documents
-in the collection. Which documents to update will be decided by the
-C<%query> given to L</search>.
-
-C<%extra> arguments default to:
-
-=over 4
-
-=item * upsert: false
-
-=item * multi: true
-
-=back
-
-=cut
 
 sub patch {
   my ($self, $changes, $cb) = @_;
@@ -179,21 +70,12 @@ sub patch {
   $self->_storage_collection->update(
     $self->{query} || {},
     {'$set' => $changes},
-    {upsert => $extra->{upsert} // bson_false, multi => $extra->{multi} // bson_true,},
+    {upsert => $extra->{upsert} // bson_false, multi => $extra->{multi} // bson_true},
     $cb ? (sub { $self->$cb($_[1]) }) : (),
   );
 
   $self;
 }
-
-=head2 remove
-
-  $self = $self->remove(sub { my($self, $err) = @_; });
-  $self = $self->remove;
-
-Remove the documents that query given to L</search>.
-
-=cut
 
 sub remove {
   my $cb   = ref $_[-1] eq 'CODE' ? pop : undef;
@@ -209,15 +91,6 @@ sub remove {
   $c->remove(@args);
   $self;
 }
-
-=head2 save
-
-  $self = $self->save(\%document, sub { my($self, $err, $doc) = @_; );
-  $doc  = $self->save(\%document);
-
-Used to save a document. The callback receives a L<Mandel::Document>.
-
-=cut
 
 sub save {
   my ($self, $raw, $cb) = @_;
@@ -243,19 +116,6 @@ sub save {
   return $self;
 }
 
-=head2 search
-
-  $clone = $self->search(\%query, \%extra);
-
-Return a clone of the given collection, but with different C<%search> and
-C<%extra> parameters. You can chain these calls to make the query more
-precise.
-
-C<%extra> will be used to set extra parameters on the L<Mango::Cursor>, where
-all the keys need to match the L<Mango::Cursor/ATTRIBUTES>.
-
-=cut
-
 sub search {
   my ($self, $query, $extra) = @_;
   my $class = blessed $self;
@@ -265,16 +125,6 @@ sub search {
   @{$clone->{query}}{keys %$query} = values %$query if $query;
   $clone;
 }
-
-=head2 single
-
-  $self = $self->single(sub { my($self, $err, $doc) = @_; });
-  $doc  = $self->single;
-
-Will return the first object found in the callback, matching the given
-C<%search> query.
-
-=cut
 
 sub single {
   my ($self, $cb) = @_;
@@ -325,8 +175,134 @@ sub _new_document {
       ;
   }
 
-  $model->document_class->new(model => $model, in_storage => $from_storage, @extra,);
+  $model->document_class->new(model => $model, in_storage => $from_storage, @extra);
 }
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mandel::Collection - A collection of Mandel documents
+
+=head1 SYNOPSIS
+
+  my $connection = MyModel->connect("mongodb://localhost/my_db");
+  my $persons = $connection->collection("person");
+
+  $persons->count(sub {
+    my($persons, $err, $int) = @_;
+  });
+
+  # ...
+
+=head1 DESCRIPTION
+
+This class is used to describe a group of mongodb documents.
+
+=head1 ATTRIBUTES
+
+=head2 connection
+
+An object that inherit from L<Mandel>.
+
+=head2 model
+
+An object that inherit from L<Mandel::Model>.
+
+=head1 METHODS
+
+=head2 all
+
+  $self = $self->all(sub { my($self, $err, $docs) = @_; });
+  $docs = $self->all;
+
+Retrieves all documents from the database that match the given L</search>
+query.
+
+=head2 create
+
+  $document = $self->create;
+  $document = $self->create(\%args);
+
+Returns a new object of a given type. This object is NOT inserted into the
+mongodb collection. You need to call L<Mandel::Document/save> for that to
+happen.
+
+C<%args> is used to set the fields in the new document, NOT the attributes.
+
+=head2 count
+
+  $self = $self->count(sub { my($self, $err, $int) = @_; });
+  $int  = $self->count;
+
+Used to count how many documents the current L</search> query match.
+
+=head2 distinct
+
+  $self   = $self->distinct("field_name", sub { my($self, $err, $values) = @_; });
+  $values = $self->distinct("field_name");
+
+Get all distinct values for key in this collection.
+
+=head2 iterator
+
+  $iterator = $self->iterator;
+
+Returns a L<Mandel::Iterator> object based on the L</search> performed.
+
+=head2 patch
+
+  $self = $self->patch(\%changes, sub { my($self, $err, $doc) = @_ });
+  $self = $self->patch(\%changes);
+
+This method can be used to add C<%changes> to multiple documents
+in the collection. Which documents to update will be decided by the
+C<%query> given to L</search>.
+
+C<%extra> arguments default to:
+
+=over 4
+
+=item * upsert: false
+
+=item * multi: true
+
+=back
+
+=head2 remove
+
+  $self = $self->remove(sub { my($self, $err) = @_; });
+  $self = $self->remove;
+
+Remove the documents that query given to L</search>.
+
+=head2 save
+
+  $self = $self->save(\%document, sub { my($self, $err, $doc) = @_; );
+  $doc  = $self->save(\%document);
+
+Used to save a document. The callback receives a L<Mandel::Document>.
+
+=head2 search
+
+  $clone = $self->search(\%query, \%extra);
+
+Return a clone of the given collection, but with different C<%search> and
+C<%extra> parameters. You can chain these calls to make the query more
+precise.
+
+C<%extra> will be used to set extra parameters on the L<Mango::Cursor>, where
+all the keys need to match the L<Mango::Cursor/ATTRIBUTES>.
+
+=head2 single
+
+  $self = $self->single(sub { my($self, $err, $doc) = @_; });
+  $doc  = $self->single;
+
+Will return the first object found in the callback, matching the given
+C<%search> query.
 
 =head1 SEE ALSO
 
@@ -337,5 +313,3 @@ L<Mojolicious>, L<Mango>, L<Mandel>
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

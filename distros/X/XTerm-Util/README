@@ -2,8 +2,8 @@ NAME
     XTerm::Util - Utility routines for xterm-compatible terminal (emulator)s
 
 VERSION
-    This document describes version 0.001 of XTerm::Util (from Perl
-    distribution XTerm-Util), released on 2018-09-25.
+    This document describes version 0.003 of XTerm::Util (from Perl
+    distribution XTerm-Util), released on 2018-09-26.
 
 SYNOPSIS
      use XTerm::Util qw(
@@ -27,7 +27,9 @@ FUNCTIONS
   get_term_bgcolor
     Usage:
 
-     my $rgb = get_term_bgcolor();
+     get_term_bgcolor() -> any
+
+    Get terminal background color.
 
     Get the terminal's current background color, or undef if unavailable.
     This uses the following xterm control sequence:
@@ -52,26 +54,40 @@ FUNCTIONS
      LXTerminal (0.2.0)
      rxvt (2.7.10)
 
-    The function will return a 6-hexdigit RGB value, e.g.:
+    A 6-hexdigit RGB value will be returned, e.g.:
 
      000000
      310035
 
-    which you can feed to, e.g.: "set_term_bgcolor" to set background color
-    of terminal, or Color::ANSI::Util's "ansibg" to produce an appropriate
-    escape sequance to set background color of text.
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Return value: (any)
 
   set_term_bgcolor
     Usage:
 
-     set_term_bgcolor("000000");
+     set_term_bgcolor($rgb, $stderr) -> any
+
+    Set terminal background color.
 
     Set terminal background color. This prints the following xterm control
-    sequence to STDOUT:
+    sequence to STDOUT (or STDERR, if ~stderr~ is set to true:
 
      \e]11;#123456\a
 
-    where 123456 is the 6-hexdigit RGB color code.
+    where *123456* is the 6-hexdigit RGB color code.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $rgb* => *color::rgb24*
+
+    *   $stderr => *true*
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at

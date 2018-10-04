@@ -1,4 +1,13 @@
+0.360   2018-09-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Rebuild to update packed modules.
+
+
 0.35    2017-07-31 (PERLANCAR)
+
+	- No functional changes.
 
 	- Fix Rinci metadata: don't try to show result in example in
 	  Synopsis.

@@ -1,0 +1,74 @@
+NAME
+    Acme::CPANModules::CLI::Wrapper::UnixCommand - Various CLIs that wrap
+    (popular) Unix commands
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution
+    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2018-09-30.
+
+DESCRIPTION
+    Various CLIs that wrap (popular) Unix commands.
+
+    These CLI's usually are meant to be called as the Unix commands they
+    wrap, e.g.:
+
+     alias ssh=sshwrap-hostcolor
+
+    But they perform additional stuff.
+
+    If you know of others, please drop me a message.
+
+INCLUDED MODULES
+    *   App::sshwrap::hostcolor - Wraps ssh to remember the background
+        terminal color of each user+host you went to
+
+    *   App::manwrap::pm - Wraps man to search for (and tab-complete) Perl
+        module documentation
+
+    *   App::gitwrap - Wraps git to do additional stuff, e.g. set user+email
+        automatically
+
+    *   App::rsynccolor - Wraps rsync to add color to output, particularly
+        highlighting deletion
+
+    *   App::rsync::new2old - Wraps rsync to check that source is newer than
+        target
+
+    *   App::lcpan - Wraps cpanm to use local CPAN mirror and let you
+        specify script name to install instead of module name
+
+    *   App::diffwc - Wraps (or filters output of) diff to add colors and
+        highlight words
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-CLI-Wrapper-UnixCommand>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-CLI-Wrapper-UnixComm
+    and>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CLI-
+    Wrapper-UnixCommand>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

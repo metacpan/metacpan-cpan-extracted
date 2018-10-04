@@ -1,0 +1,328 @@
+[Previous](ch15.html) [Index](index.html) [Next](ch17.html)
+
+---
+
+#16 Axmud for visually-impaired users
+
+Axmud can be run with settings optimised for users with a visual impairment. These settings don't require JAWS, NVDA or any other screenreader, but they do require a text-to-speech engine of some kind.
+
+On Microsoft Windows, the Axmud installer includes a copy of the eSpeak engine. No further configuration is required. Simply run the installer, find Axmud in your system's Start menu, and open the menu item that's marked for visually-impaired users.
+
+Most modern Linux systems have the eSpeak engine installed 'out-of-the-box'. If not, you should install it yourself before starting Axmud.
+
+##16.1 Compatible speech engines
+
+Axmud supports other speech engines, too. (Not all of them are free.)
+
+On Microsoft Windows, Axmud also supports espeak-ng and Swift (which is a part of Cepstral). On Linux, Axmud supports espeak-ng, Flite, Festival and Swift.
+
+The rest of this section assumes that you're using optimised settings.
+
+##16.2 Connecting to a world
+
+When you start Axmud, a series of dialogue windows will appear, asking you to select a world, a character and a password.
+
+The first dialogue window asks you to select a world.  Axmud comes with numerous pre-configured worlds, so you can either choose one of those, or you can create a new world.
+
+If you create a new world and/or a new character, they are saved and will be available the next time you start Axmud.
+
+In the first dialogue window, you can use your UP and DOWN cursor keys to select a world.  When you find the world you want, press your TAB key to move to the OK button, and the press your ENTER key to 'click' that button.
+
+Many of the remaining windows will ask you to type something, such as a character name or a password.  After typing you can simply press the ENTER key to move to the next window.  (Using your TAB and ENTER keys to 'click' the OK button will also work, but is unnecessary.)
+
+If you specify a character name and a password, Axmud can usually login to the world on your behalf. If not, you'll have to type the name and password every time you connect to the world.
+
+##16.3 Playing the game
+
+Axmud normally runs with multiple windows. There is a main window, in which most of the text received from the world is displayed. There are task windows, which typically display information about your character's health, the current location, and so on.  There is also an automapper window and a great many edit windows used to modify Axmud's stored data.
+
+Axmud's optimised settings dispense with many of these windows (although they are available, if you want them).  Most of the time only the single main window will be open. When you connect to a world, everything is displayed in that main window (as well as being read out).
+
+You can type commands like **north** and **inventory** and **kill orc**.  When you press ENTER, these world commands are sent directly to the world.
+
+###16.3.1 Client commands
+
+Axmud provides its own commands, which we call *client commands*.  These client commands can be used to customise almost any aspect of Axmud's behaviour and to modify its stored data.
+
+If you're using optimised settings, most client commands won't be of much use. However, there are a number of client commands which have been designed specifically for you. We'll spend the rest of this Section discussing how to use them.
+
+All client commands begin with a semicolon.  The first command we normally teach generates a (very) long list of all client commands, so you should probably resist the temptation to type it now. That command is the **;help** command - typed as a semicolon, followed by the word **help**, with no spaces in between.
+
+Another useful client command is the **;save** command - typed as a semicolon, followed by the world **save**, with no spaces in between.  This command produces a single-line response, so it's safe to type it now and press your ENTER key.
+
+(By the way, Axmud's stored data is automatically saved whenever you disconnect from a world, and the autosave feature is turned on by default, so you probably don't need to save anything manually.)
+
+If you get disconnected, the main window will not close.  You can use the **;reconnect** command (a semicolon, followed by the world **reconnect**) to re-establish a connection to the same world.
+
+Alternatively, you can use the **;connect** command to connect to a different world. If you want to connect to *Discworld MUD*, you can type **;connect discworld**. If you have already set up a character profile called Gandalf, you can type **;connect discworld gandalf**.
+
+After disconnecting, you can halt Axmud by typing the **;stopclient** command. (**stopclient** is typed as a single word with no spaces.)
+
+You can use the **;speak** command to test Axmud's text-to-speech abilities. **;speak** will read out a test message, but you can specify your own message with a command like **;speak hello world**.
+
+##16.4 Enabling/disabling text-to-speech
+
+Text-to-speech is always enabled when using optimised settings, but for other users it's disabled by default.
+
+Those users can type **;speech on** to enable text-to-speech or **;speech off** to disable text-to-speech.
+
+##16.4.1 Customising text-to-speech
+
+By default, Axmud uses the eSpeak engine to read out everything in the same voice. However, Axmud supports multiple speech engines, and those engines often provide more than one voice. It's possible to configure Axmud to use different engines and voices in different situations.
+
+For example, Axmud can use a male voice to read out text received from the world, and a female voice to read out system messages.
+
+If you're using a pre-configured world, then Axmud is able to collect information about the state of the world. You can ask Axmud to read out this information whenever you need it (even if it's no longer visible in the main window).
+
+For example, Axmud can tell you about your character's current location or the number of health points they have left. And if you want this information read out in a unique voice, you can do that, too.
+
+The rest of this Section describes how to do all of those things. You can read it later, if you don't need those features yet.
+
+###16.4.2 Disabling some speech
+
+You can use the client command **;speech** to change what is read out, and what is not.
+
+For example, **;speech system off** will stop Axmud system messages from being read out. **;speech system on** will tell Axmud to start reading them again.
+
+**;speech error off** will stop system error messages from being read out.
+
+**;speech command off** will stop every world command you type from being read out.
+
+**;speech dialogue off** will stop dialogue windows from being read out.  (This includes the dialogue windows you see when you start Axmud, asking for a world, character name and password, so you should probably turn them on again before you quit using Axmud.)
+
+**;speech receive off** will stop text received from the world being read out.
+
+Usually, received text isn't read out until the login has been completed.  This is useful if the world displays a lot of graphics before asking for your name and password.  If you want to everything to be read out, you can type **;speech login off**.
+
+Speech generated by tasks is turned *off* by default.  You can turn it *on* by typing **;speech task on**.  In Section 16.6 we'll discuss how to tell each task what they should read out.
+
+###16.4.3 Configuring the Festival engine
+
+The **;speech** command is also used to change how Axmud uses the Festival engine (which is only available on Linux).
+
+You will probably never need to change anything.  However, if the Festival server on your system is running on a different port to the standard one, port 1314, you can change it by typing something like **;speech port 5000**.
+
+If you don't want Axmud to start the Festival server automatically, you can type **;speech auto off**.
+
+If Axmud doesn't start the Festival server automatically, you can either start it yourself, or you can type **;speech restart**.  If you start it yourself, you can type **;speech reconnect** to let Axmud connect to the server.
+
+###16.5 Text-to-speech configurations
+
+Axmud allows you to customise the sound of the speech produced by its supported speech engines.
+
+Depending on which engine you're using,  you can specify the engine, the voice used, the word speed, pitch and/or volume.
+
+When using the eSpeak engine, Axmud can change the voice, speed and pitch.  When using espeak-ng, everything can be changed. When using Flite, only the voice can be changed.  When using Festival, the voice, word rate (not speed) and volume can be changed. When using Swift, the voice, pitch and volume can be changed, as well as the word speed (on Microsoft Windows) and word rate (on Linux).
+
+We mentioned already that Axmud can use different engines and voices in different situations.
+
+Axmud has a number of text-to-speech configurations, one for each situation. If you modify a configuration, your changes are stored and will still apply the next time you use Axmud.
+
+###16.5.1 Configuring the 'receive' configuration
+
+The text-to-speech configuration called **receive** is used for text received from the world.
+
+The configuration stores your choice of speech engine, as well as your choice of voice, word speed (or word rate), word pitch and volume.
+
+To change any of these things, we use the client command **;modifyconfig** (a semicolon, followed by a single word without spaces).
+
+Actually, nearly all client commands have abbreviations, so this case you can type **;config** instead (a semicolon, followed by the word **config**).
+
+The **;config** command is always followed by the name of the configuration we want to modify, and then by the modifications we want to make.
+
+For example, text received from the world is read out using the eSpeak engine by default.  eSpeak is rather primitive, so if Festival, Flite or Swift are installed on your system, you might prefer to use one of them instead.
+
+The command to type is **;config receive engine festival**.
+
+To use the Flite engine, the command is **;config receive engine flite**.  To use the Swift engine, if you've purchased it, the command is **;config receive engine swift**.
+
+You can use the same command to change the voice.  The list of available voices varies from engine to engine and from system to system, so it's up to you to work out which voices are available on your system.
+
+To change the voice, first switch the engine back to eSpeak by typing **;config receive engine espeak**.
+
+Then, type **;config receive voice en-scottish**.  The last word is the letter E and N, followed by a hyphen, followed by the word **scottish**, all in lower-case letters and with no spaces.
+
+If you specify a voice that isn't available on your system (or if you misspell the voice), you won't hear anything.  In that case, you can use the **;config** command to return the configuration to its default settings, by using the same command you would use to change the engine. Type **;config receive engine espeak**.
+
+You can use the **;speak** command to test this configuration's new voice. The command to use is **;speak receive**.
+
+###16.5.2 Configuring the speed, pitch and volume
+
+Now we'll customise the rest of the configuration. Make sure you're using the eSpeak engine by typing the command **;config receive engine espeak**.
+
+To change the voice speed, type the command **;config receive speed 120**. This will slow down the voice. To speed it up, type **;config receive speed 180**. The speed can be anything between 10 and 200 words per minute.
+
+The Festival and Swift engines use a word rate, rather than a word speed. The 'normal' rate is 1.  To make the voice 50% slower, type **;config receive rate 0.5**. To make it 100% faster, type **;config receive rate 2**.  The rate can be any value between 0.5 and 2.
+
+To make the word pitch higher, type **;config receive pitch 80**. To make it lower, type **;config receive pitch 20**.  With the eSpeak engine, the pitch can be any value between 0 and 99.
+
+The Swift engine uses a different pitch scale.  To make the pitch 50% lower, type **;config receive pitch 0.5**. To make it 100% higher, type **;config receive pitch 2**. The value can be anything between 0.1 and 5.
+
+The eSpeak engine doesn't allow us to change the volume, but if you've modified the configuration to use the Festival or Swift engines, you can can increase the volume by typing
+**;config receive volume 2**. The volume can be any value between 0.33 and 6.
+
+Again, to reset the voice, speed, rate, pitch and volume to default values for this engine, type **;config receive engine espeak**.
+
+###16.5.3 Using different configurations
+
+The text-to-speech configuration called **receive** is used for text received from the world, but there are a number of other configurations ready for your use.
+
+The **system** configuration changes the sound of the speech used to read system messages. You might change this configuration's word speed by typing **;config system speed 200**.
+
+The **error** configuration is used to read system error messages. The **command** configuration is used to read out commands sent to the world.  The **dialogue** configuration is used to read out text from dialogue windows.
+
+##16.6 Configuring text-to-speech for tasks
+
+Axmud comes with a number of built-in tasks, some of which have text-to-speech capabilities.  The configuration called **attack**, **chat**, **divert**, **locator**, **status** and **watch** change the sound of the voice used by each of those tasks.
+
+Tasks often have their own task windows. When using optimised settings, these windows don't open (but the tasks are still running in the background).
+
+We'll discuss each task in turn.
+
+###16.6.1 The Locator task
+
+The Locator task captures information about the character's current room, including the room's title, description, list of exits and sometimes even its contents.
+
+The Locator task doesn't magically know how to interpret all possible worlds, so it's useful only when connected to one of Axmud's pre-configured worlds, or when connected to a world you've configured yourself (or which someone has configured for you).
+
+The client command **;read** will instruct the Locator to read out some of the information it has gathered.
+
+For example, type **;read title** to hear the current room's title (if known).
+
+Type **;read description** to hear the current room's description.  If it's a very long description, type **;read description 100** to hear the first 100 characters.
+
+Type **;read exit** to hear the exit list, and type **;read content** to hear the contents list.
+
+###16.6.2 Auto-reading the room title
+
+The Locator task is able to read out information about the current room automatically, every time the world sends that information.
+
+This is probably not very useful, since all text received from the world is already read out by default.  However, perhaps you want to limit the amount of text that gets read out, in which case you can stop Axmud reading out all received text by typing **;speech receive off**.
+
+You can then use the client command **;switch**.
+
+If you type **;switch title**, the Locator will start reading out the room title, every time it is received.  If you type **;switch title** again, the Locator will stop reading out the room title.
+
+To read out room descriptions automatically, type **;switch description**.
+
+To read out exit lists automatically, type **;switch exit**.
+
+To read out content lists automatically, type **;switch content**.
+
+###16.6.3 Auto-read the room title permanently
+
+The command **;switch title** will make the Locator task automatically read out room titles for the rest of the session.  However, the next time you start Axmud, a brand new Locator task will start, and it won't know that it's supposed to read out room titles.
+
+The client command **;permswitch** is the solution to this problem. (It's spelled with a semicolon, followed by perm and switch as a single word, without spaces.)
+
+To read out room titles in this session, and in all future sessions, type **;permswitch title**.
+
+###16.6.4 The Status task
+
+The Status task gathers information about your character, such as the their health points and experience points.
+
+Like the Locator task, the Status task doesn't magically know how to gather this information.  Both tasks work best when connected to a pre-configured world.
+
+The client command **;read** can be used to read out some of this information, as long as the world provides the information and Axmud knows how to collect it.
+
+Type **;read health** to read out the character's health points.  You can also type **;read energy**, **;read magic**, **;read guild**, **;read social**, **;read experience**, **;read level** and **;read lives**.
+
+**;read status** will read the character's life status - alive, dead, passed out or asleep.
+
+**;read alignment** will read the character's alignment (good or evil).
+
+**;read age** will read the character's age.
+
+**;read time** will read the game time.
+
+**;read bank** and **;read purse** will reveal information about your character's finances. Money is tracked by the Inventory task, so you will need to start that task before you can use it.
+
+The client commands **;starttask** and **;addinitialtask** are both typed as a semicolon followed by a single word with no spaces.
+
+To start the Inventory task, type **;starttask inventory**. To make the inventory task start in every session, type **;addinitialtask inventory**.
+
+###16.6.5 Status task alerts
+
+It would be very useful for the Status task to issue an audible warning when your character's health points fall to a certain level, and again when they recover.
+
+You can do this with the client command **;alert**.
+
+To get an audible warning when your character's health points fall to 20%, type **;alert health down 20**.
+
+To get a warning when they recover to 90%, type **;alert health up 90**.
+
+You can also use the **;alert** command to get audible warnings for your character's energy, magic, guild and social points, where available.
+
+The **;alert** command only affects the current session.  If you want these audible warnings every time you run Axmud, use the **;permalert** command. (It's spelled with a semicolon, followed by perm and alert as a single word, without spaces.)
+
+For example, to warn about low health points every time you play, type **;permalert health down 20**.
+
+By the way, you can use the **;switch** command to make the Status task read a notification when your character dies, falls asleep, passes out or recovers. Type **;switch life** to turn on these notifications, or to turn them off again.
+
+###16.6.6 The Attack task
+
+The Attack task keeps track of your fights.
+
+You can use **;switch** or **;permswitch** to get an audible notification of fights that have just finished (and, for some worlds, when they start).
+
+Type **;switch fight** to hear the results of fights, and the same command to stop hearing them. Type **;switch interaction** to hear the results of interactions. (Interactions - encounters that aren't a fight, but still result in a success or a failure - are not recognised by most pre-configured worlds.)
+
+###16.6.7 The Channels and Divert tasks
+
+The Channels and Diverts task are commonly used to divert certain lines of text from the main window into a separate task window. It's handy for making sure you don't miss an important messages in the heat of battle.
+
+Visually-impaired users can use either task to make sure that important messages are read out in a different voice, but the Divert task is probably more convenient.
+
+To turn on the reading of all diverted lines of text, type **;switch divert**. Use the same command to turn them off.  Use the **;permswitch** command to make this change in this and all future sessions.
+
+You can also turn on or off specific lines of text. The Divert task distinguishes between tells (private communications between players), social messages (public communication channels), custom messages (any other line of text that should be diverted) and warnings generated by some part of Axmud's code. Each type of message makes the task window turn a different colour and a sound effect is also heard.
+
+If you're using optimised settings then there is probably no task window open. To turn on the reading out of all tells, type **;switch tell**. You can also type **;switch social**, **;switch custom**, **;switch warning**.
+
+###16.6.8 The Chat task
+
+The Chat task allows players to communicate with each other directly, independent of the world in which they are playing.  It uses a standard protocol, so users of different MUD clients can talk to each other.
+
+This form of peer-to-peer communication isn't much used any more, but it's available if you need it.
+
+To read out all Chat task communications, type **;switch chat**. Use the same command again to turn it off.
+
+You might prefer to hear only incoming communications or only outgoing communications. For that, type **;switch chat in** or **;switch chat out**. To read out group communications, type **;switch chat echo**.
+
+To read out Chat system messages, type **;switch chat system** or **;switch chat remote**.
+
+So-called 'snooping' - the ability for your chat partner to see what's happening in your session - is turned off by default. If you've turned it on, you can make Axmud read out so-called *snooping* text by typing **;switch chat snoop**.
+
+###16.6.9 The Compass task
+
+The Compass task converts your keyboard's keypad - the collection of number keys usually found on the right-hand-side of the keyboard - into a device that can execute a whole command with a single key-press.
+
+Optimised settings start this task automatically, so if you press the keypad's 8 key, Axmud will send a **north** command to the world. The 2 key sends **south**, the 4 key sends **west** and the 6 key sends **east**. The 7, 9, 1 and 3 keys send **northwest**, **northeast**, **southwest** and **southeast** respectively. The plus key sends **up** and the minus key sends **down**.
+
+Don't forget that they keypad's keys can be turned on and off with the **Num lock** button found on most keyboards.
+
+The remaining keypad keys can be customised. Each key can either send a world command or execute a client command. For example, the 5 key sends the world command **look**. The 0 key executes the client command **;kill**, which attacks an NPC in the current room (if there are any).
+
+If you want to customise the 0 key, you can use the **;compass** command.
+
+To make the 0 key do something nicer, type **;compass 0 say hello**.
+
+To make the keypad ENTER key save Axmud's files, type **;compass enter ;save**.  In this command, both the words **compass** and **save** are preceded by a semicolon, with no space between a word and the semicolon before it.
+
+The keys that can be customised are the keypad 0, 5, multiply, divide, full stop or period and ENTER keys. The remaining keypad keys are used for standard movement commands and can't be customised directly.
+
+To disable the keypad, so that its keys behave normally, type **;compass off**. To reenable it, typing **;compass on**.
+
+Of course, the **;compass** command will only make changes for this session. If you want a Compass task to start every session, you have two choices.
+
+Firstly, you can create a task that starts in every session by typing the command **;addinitialtask compass**. Then you can customise the keypad for this and all future sessions using the **;permcompass** command.
+
+Secondly, you can create a task that starts whenever you connect to a particular world. For example, to create a task that starts every time you connect to *Discworld MUD*, type the command **;addinitialtask compass discworld**.  In this situation, the customisation is done with the **;worldcompass** command.
+
+The commands - **;worldcompass** and **;permcompass** behave in the same way as **;compass** does, so you use all three of them to disable or reenable they keypad and to set the commands for each key.
+
+That's the end of this Section for visually-impaired users.
+
+---
+
+[Previous](ch15.html) [Index](index.html) [Next](ch17.html)

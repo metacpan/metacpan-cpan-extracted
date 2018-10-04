@@ -20,6 +20,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/00-load.t
+t/01-identification_and_label.t
 t/01-setup.t.norun
 t/02-setup_wpi.t.norun
 t/03-setup_phys.t.norun
@@ -56,6 +57,7 @@ test/api_servo.pl
 test/baseline_setup.pl
 test/bmp.pl
 test/i2c.pl
+test/identify.pl
 test/registered_pins.pl
 test/rtc.pl
 test/sg90_servo.pl

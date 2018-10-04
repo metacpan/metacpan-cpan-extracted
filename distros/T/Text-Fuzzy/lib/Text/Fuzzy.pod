@@ -1,5 +1,3 @@
-
-
 =encoding UTF-8
 
 =head1 NAME
@@ -24,13 +22,12 @@ produces output
     Nearest array entry is brown
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/synopsis.pl> in the distribution.)
-
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents version 0.27 of Text::Fuzzy corresponding
-to git commit L<2f4e00c4e7a9c27917ba867c83886037ba17169c|https://github.com/benkasminbullock/Text-Fuzzy/commit/2f4e00c4e7a9c27917ba867c83886037ba17169c> released on Tue Aug 15 12:37:45 2017 +0900.
+This documents version 0.28 of Text::Fuzzy corresponding
+to git commit L<2b324ee39005d6c6670a6a41837fd2e43eda4d02|https://github.com/benkasminbullock/Text-Fuzzy/commit/2b324ee39005d6c6670a6a41837fd2e43eda4d02> released on Thu Oct 4 20:39:21 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -52,8 +49,7 @@ produces output
     2
 
 
-(This example is included as L<F<unicode.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/unicode.pl> in the distribution.)
-
+(This example is included as L<F<unicode.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/unicode.pl> in the distribution.)
 
 The default edit distance is the Levenshtein one, which counts each
 addition (C<cat> -> C<cart>), substitution (C<cat> -> C<cut>), and
@@ -64,7 +60,12 @@ L</trans> option.
 
 This module is particularly suited to searching for the nearest match
 to a term over a list of words, using the L</nearestv> or L</nearest>
-methods.
+methods. It studies the target string to be matched (the first
+argument to L</new>) to build information to rapidly reject mismatches
+in a list. Since computing the Levenshtein and Damerau-Levenshtein
+edit distances with the Wagner-Fischer algorithm is computationally
+expensive, the module offers a boost in performance for searching for
+a string in a list of words.
 
 =head1 METHODS
 
@@ -102,11 +103,9 @@ Note that this is the default, so there is hardly any point specifying
 it, except if you want to make self-documenting code, or you're
 worried that the module's default behaviour may suddenly change.
 
-Setting C<max> to zero makes C<$tf> only match exactly, which is also
-pointless, but you're very welcome to do it.
+Setting C<max> to zero makes C<$tf> only match exactly. 
 
-The method L</set_max_distance> also does the same thing as this
-parameter.
+The method L</set_max_distance> does the same thing as this parameter.
 
 =item no_exact
 
@@ -159,8 +158,7 @@ produces output
     5
 
 
-(This example is included as L<F<distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/distance.pl> in the distribution.)
-
+(This example is included as L<F<distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/distance.pl> in the distribution.)
 
 To know which edits are used to convert the words, use
 L</distance_edits>.
@@ -187,8 +185,7 @@ produces output
     who what
 
 
-(This example is included as L<F<nearestv.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/nearestv.pl> in the distribution.)
-
+(This example is included as L<F<nearestv.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/nearestv.pl> in the distribution.)
 
 The behaviour of the match can be controlled with L</no_exact> and
 L</set_max_distance> in exactly the same way as L</nearest>.
@@ -242,8 +239,7 @@ produces output
     Not found anywhere.
 
 
-(This example is included as L<F<check-return.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/check-return.pl> in the distribution.)
-
+(This example is included as L<F<check-return.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/check-return.pl> in the distribution.)
 
 If there is more than one word with the same edit distance in
 C<@words>, this returns the last one found, unless it is an exact
@@ -273,8 +269,7 @@ produces output
     The nearest words are nice, rice, lice, distance 1.
 
 
-(This example is included as L<F<list-context.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/list-context.pl> in the distribution.)
-
+(This example is included as L<F<list-context.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/list-context.pl> in the distribution.)
 
 =head2 last_distance
 
@@ -302,8 +297,7 @@ produces output
     3
 
 
-(This example is included as L<F<last-distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/last-distance.pl> in the distribution.)
-
+(This example is included as L<F<last-distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/last-distance.pl> in the distribution.)
 
 =head2 set_max_distance
 
@@ -344,8 +338,7 @@ produces output
     11
 
 
-(This example is included as L<F<max-dist.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/max-dist.pl> in the distribution.)
-
+(This example is included as L<F<max-dist.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/max-dist.pl> in the distribution.)
 
 Setting the maximum distance is a way to make a search more rapid. For
 example if you are searching over a dictionary of 100,000 or a million
@@ -403,8 +396,7 @@ produces output
     Without exact, nearest to boo is bobbity
 
 
-(This example is included as L<F<no-exact.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/no-exact.pl> in the distribution.)
-
+(This example is included as L<F<no-exact.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/no-exact.pl> in the distribution.)
 
 This is for the case of searching over an array which contains the
 searched-for item itself.
@@ -458,8 +450,7 @@ produces output
     kkdddk
 
 
-(This example is included as L<F<distance-edits.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/distance-edits.pl> in the distribution.)
-
+(This example is included as L<F<distance-edits.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/distance-edits.pl> in the distribution.)
 
 This does not handle transpositions. Unlike the rest of the module,
 this is pure Perl rather than XS, and not optimized for speed. The
@@ -492,8 +483,7 @@ practical problems.
 =head2 misspelt-web-page.cgi
 
 The file 
-L<F<examples/misspelt-web-page.cgi>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/misspelt-web-page.cgi>
- is an example of a CGI
+L<F<examples/misspelt-web-page.cgi>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/misspelt-web-page.cgi> is an example of a CGI
 script which does something similar to the Apache mod_speling module,
 offering spelling corrections for mistyped URLs and sending the user
 to a correct page.
@@ -601,8 +591,7 @@ set up F<.htaccess> to use the script.
 =head2 spell-check.pl
 
 The file 
-L<F<examples/spell-check.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/spell-check.pl>
- is a spell checker. It uses a
+L<F<examples/spell-check.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/spell-check.pl> is a spell checker. It uses a
 dictionary of words specified by a command-line option "-d":
 
     spell-check.pl -d /usr/dict/words file1.txt file2.txt
@@ -737,8 +726,7 @@ of verbs.
 =head2 extract-kana.pl
 
 The file 
-L<F<examples/extract-kana.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.27/examples/extract-kana.pl>
- extracts the kana entries
+L<F<examples/extract-kana.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/extract-kana.pl> extracts the kana entries
 from "edict", a freely-available Japanese to English electronic
 dictionary, and does some fuzzy searches on them. It requires a local
 copy of the file to run. This script demonstrates the use of Unicode
@@ -798,6 +786,10 @@ Japanese loanwords are the same word or not.
 
 The module CPAN::Nearest offers a search over the titles of CPAN
 modules using a fuzzy search to get the nearest match.
+
+=head1 DEPENDENCIES
+
+This module has no dependencies on other modules.
 
 =head1 SUPPORT
 
@@ -888,17 +880,22 @@ set with L</set_max_distance>.
 
 =head1 SEE ALSO
 
+=head2 Other CPAN modules
+
 Similar modules on CPAN include the following.
 
 =over
 
 =item L<String::Approx>
 
-Approximate matching (fuzzy matching).
+Approximate matching (fuzzy matching) using the Levenshtein edit
+distance. As a bonus, if you don't have a headache, you can get one
+easily trying to make head or tail out of this module's documentation.
 
 =item L<Text::EditTranscript>
 
-Determine the edit transcript between two strings.
+Determine the edit transcript between two strings. This is similar to
+what you get from L</distance_edits> in this module.
 
 =item L<Text::Fuzzy::PP>
 
@@ -912,15 +909,22 @@ Levenshtein-Damerau edit distance.
 
 =item L<Text::Levenshtein::Flexible>
 
-XS Levenshtein distance calculation with bounds and costs.
+XS Levenshtein distance calculation with bounds and adjustable costs
+(so the cost of deletion can be more than the cost of addition, etc.)
+See also L<Text::WagnerFischer> for a pure-Perl module which also
+allows altered costs.
 
 =item L<Text::Levenshtein::XS>
 
-An XS implementation of the Levenshtein edit distance.
+An XS implementation of the Levenshtein edit distance. It claims to be
+a drop-in replacement for Text::LevenshteinXS which does Unicode
+correctly.
 
 =item L<Text::LevenshteinXS>
 
-An XS implementation of the Levenshtein edit distance
+An XS implementation of the Levenshtein edit distance. Does not do
+Unicode very well. See
+L<https://rt.cpan.org/Public/Bug/Display.html?id=36685>.
 
 =item L<Text::Levenshtein::Edlib>
 
@@ -937,11 +941,56 @@ An implementation of the Brew edit distance.
 
 =item L<Text::WagnerFischer>
 
-Wagner-Fischer edit distance.
+Implements the L<Wagner-Fischer algorithm|/Wagner and Fischer> to
+calculate edit distances. This is generalised version of the
+Levenshtein edit distance. See also L<Text::Levenshtein::Flexible> for
+an XS version.
 
 =item L<Bencher::Scenario::LevenshteinModules>
 
 Some benchmarks of various modules including this one.
+
+=item L<Text::JaroWinkler>
+
+Another text similarity measure.
+
+=back
+
+=head2 About the algorithms
+
+This section contains some blog posts which I found useful in
+understanding the algorithms.
+
+L<Fuzzy substring matching with Levenshtein distance in
+Python|http://ginstrom.com/scribbles/2007/12/01/fuzzy-substring-matching-with-levenshtein-distance-in-python/>
+by Ryan Ginstrom explains the Levenshtein algorithm and its use in
+substring matching.
+
+L<Damerau-Levenshtein Edit Distance
+Explained|https://www.lemoda.net/text-fuzzy/damerau-levenshtein/index.html>
+by James M. Jensen II explains the Damerau-Levenshtein edit distance
+(the algorithm used with L</transpositions_ok>).
+
+I recommend steering fairly clear of the Wikipedia articles on these
+things, which are very poorly written indeed.
+
+=head2 References
+
+Here are the original research papers by the algorithms' discoverers.
+
+=over
+
+=item Damerau
+
+Damerau, Fred J. (March 1964), "A technique for computer detection and correction of spelling errors", Communications of the ACM, ACM, 7 (3): 171–176, doi:10.1145/363958.363994
+
+=item Levenshtein
+
+Levenshtein, Vladimir I. (February 1966), "Binary codes capable of correcting deletions, insertions, and reversals", Soviet Physics Doklady, 10 (8): 707–710
+
+=item Wagner and Fischer
+
+R. Wagner and M. Fischer (1974), "The string to string correction problem", Journal of the ACM, 21:168-178, doi:10.1145/321796.321811
 
 =back
 
@@ -969,14 +1018,41 @@ added as part of the documentation.
 
 =back
 
+=item 0.28
+
+=over
+
+=item
+
+The transposition code (the implementation of the Damerau-Levenshtein
+distance) was completely rewritten to make it more efficient. The
+back-indexing of strings to find transpositions was changed so that
+the index of the object's string (the first argument to L</new>) is
+preserved from one query to the next. A useless indexing of characters
+in the other string was removed. The structure used to hold the
+characters was changed from an unsorted allocated linked list to a
+sorted array in the case of Unicode strings, and a 256 character array
+in the case of non-Unicode strings. The oddly-named variables were
+renamed to more meaningful names.
+
+=item
+
+The transposition code now allows for a maximum distance to be set,
+beyond which no further matches will be allowed.
+
+=back
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 The edit distance including transpositions was contributed by Nick
-Logan (UGEXE). Some of the tests in F<t/trans.t> are taken from the
-L<Text::Levenshtein::Damerau::XS> module. Nils Boeffel reported a bug
-where strings may be overwritten in version 0.25.
+Logan (UGEXE). (This code was largely rewritten in version L</0.28>,
+so Nick Logan can no longer be held responsible for the Text::Fuzzy
+module's failings.) Some of the tests in F<t/trans.t> are taken from
+the L<Text::Levenshtein::Damerau::XS> module. Nils Boeffel reported a
+bug where strings may be overwritten in version 0.25.
+
 
 
 =head1 AUTHOR
@@ -986,7 +1062,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

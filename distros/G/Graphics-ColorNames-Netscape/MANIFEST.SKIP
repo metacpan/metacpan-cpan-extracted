@@ -1,0 +1,22 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+Graphics-ColorNames-Netscape-.*\.tar\.gz
+Graphics-ColorNames-Netscape-v\d+\.\d+\.\d+/
+
+^MYMETA\.*
+
+# Travis-CI
+
+\.travis\.yml
+
+# Distzilla etc
+
+\.build/

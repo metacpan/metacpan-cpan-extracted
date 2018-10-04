@@ -11,7 +11,7 @@ use Hash::Merge 'merge';
 use Moo;
 use App::Sqitch::Types qw(Sqitch Target);
 
-our $VERSION = '0.9997';
+our $VERSION = '0.9998';
 
 use constant ENGINES => qw(
     pg
@@ -21,6 +21,7 @@ use constant ENGINES => qw(
     firebird
     vertica
     exasol
+    snowflake
 );
 
 has sqitch => (
@@ -179,7 +180,7 @@ sub _pod2usage {
         '-verbose'  => 99,
         '-sections' => '(?i:(Usage|Synopsis|Options))',
         '-exitval'  => 2,
-        %params
+        %params,
     );
 }
 
@@ -328,6 +329,8 @@ Returns the list of supported engines, currently:
 =item * C<vertica>
 
 =item * C<exasol>
+
+=item * C<snowflake>
 
 =back
 

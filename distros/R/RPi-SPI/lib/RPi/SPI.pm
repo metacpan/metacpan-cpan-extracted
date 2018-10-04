@@ -5,7 +5,7 @@ use warnings;
 
 use WiringPi::API qw(:wiringPi);
 
-our $VERSION = '2.3608';
+our $VERSION = '2.3609';
 
 sub new {
     my ($class, $channel, $speed) = @_;
@@ -88,7 +88,7 @@ bus on Raspberry Pi
     my $buf = [0x01, 0x02];
     my $len = 2;
 
-    @$buf = $spi->rw($buf, $len);
+    my @data = $spi->rw($buf, $len);
 
     # use a GPIO pin to expand the number of SPI
     # channels. We'll bit-bang automatically. The
@@ -152,7 +152,7 @@ Mandatory: Integer, the number of array elements in the C<$buf> parameter sent
 in above.
 
 Return: The write buffer, after being re-populated with the read data, as a Perl
-array reference.
+array.
 
 Dies if we can't open the SPI bus.
 

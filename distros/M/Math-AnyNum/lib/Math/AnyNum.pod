@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =head1 SYNOPSIS
 
@@ -60,18 +60,23 @@ Additionally, each Math::AnyNum object is B<immutable>.
     falling_factorial(n,k)    falling factorial: (n)_k
     bell(n)                   n-th Bell number
     catalan(n)                n-th Catalan number
+    catalan(n,k)              C(n,k) entry in Catalan's triangle
     lucas(n)                  n-th Lucas number
+    lucasmod(n,m)             n-th Lucas number modulo m
+    lucasU(P,Q,n)             Lucas U_n(P, Q) function
+    lucasV(P,Q,n)             Lucas V_n(P, Q) function
+    lucasUmod(P,Q,n,m)        Lucas U_n(P, Q) modulo m
+    lucasVmod(P,Q,n,m)        Lucas V_n(P, Q) modulo m
     fibonacci(n)              n-th Fibonacci number
     fibonacci(n,k)            n-th Fibonacci number of k-th order
     fibmod(n,m)               n-th Fibonacci number modulo m
-    lucasmod(n,m)             n-th Lucas number modulo m
     polygonal(n,k)            n-th k-gonal number
     harmonic(n)               n-th harmonic numbers: 1+1/2+...+1/n
     secant_number(n)          n-th secant/zig number
     tangent_number(n)         n-th tangent/zag number
     euler(n)                  n-th Euler number: E_n
-    bernoulli(n)              n-th Bernoulli number: B_n
     euler(n,x)                Euler polynomials: E_n(x)
+    bernoulli(n)              n-th Bernoulli number: B_n
     bernoulli(n,x)            Bernoulli polynomials: B_n(x)
     laguerreL(n,x)            Laguerre polynomials: L_n(x)
     legendreP(n,x)            Legendre polynomials: P_n(x)
@@ -82,8 +87,9 @@ Additionally, each Math::AnyNum object is B<immutable>.
     faulhaber_sum(n,k)        sum of powers: 1^k + 2^k + ... + n^k
     geometric_sum(n,r)        geometric sum: r^0 + r^1 + ... + r^n
     kronecker(n,k)            Kronecker (Jacobi) symbol
-    gcd(@list)                greatest common divisor
     lcm(@list)                least common multiple
+    gcd(@list)                greatest common divisor
+    gcdext(n,k)               return (u,v,d) where u*n+v*k=d
     iadd(a,b)                 integer addition: a+b
     isub(a,b)                 integer subtraction: a-b
     imul(a,b)                 integer multiplication: a*b
@@ -156,7 +162,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     abs(x)                       absolute value of x
     agm(x,y)                     arithmetic-geometric mean
     hypot(x,y)                   hypotenuse: sqrt(x^2 + y^2)
-    norm(x,y)                    the norm function: x^2 + y^2
+    norm(x)                      normalized value of x: abs(x)^2
     lnbern(n)                    natural logarithm of bernoulli(n)
     bernreal(n)                  Bernoulli number as floating-point
     harmreal(n)                  Harmonic number as floating-point
@@ -209,8 +215,8 @@ Additionally, each Math::AnyNum object is B<immutable>.
     floor(x)            round x towards -Infinity
     ceil(x)             round x towards +Infinity
     round(x)            round x to the nearest integer
-    round(x,+k)         round x before the decimal point
-    round(x,-k)         round x after the decimal point
+    round(x,+k)         round x to k places before the decimal point
+    round(x,-k)         round x to k places after the decimal point
     acmp(a,b)           absolute comparison: abs(a) <=> abs(b)
     approx_cmp(a,b,k)   approximate comparison: round(a,k) <=> round(b,k)
     rat(x)              convert x into a rational number
@@ -232,10 +238,13 @@ Additionally, each Math::AnyNum object is B<immutable>.
     digits(n,b)         digits of n in base b
     sumdigits(n,b)      sum of digits of n in base b
     popcount(n)         number of 1's in binary representation of n
+    hamdist(n,k)        number of bit-positions where the bits differ
     getbit(n,k)         k-th bit of integer n (1 or 0)
-    setbit(n,k)         set the k-th bit of integer to 1
-    clearbit(n,k)       set the k-th bit of integer to 0
-    flipbit(n,k)        flip the k-th bit of integer
+    setbit(n,k)         set the k-th bit of integer n to 1
+    clearbit(n,k)       set the k-th bit of integer n to 0
+    flipbit(n,k)        flip the k-th bit of integer n
+    bit_scan0(n,k)      index of the first 0-bit of n with index >= k
+    bit_scan1(n,k)      index of the first 1-bit of n with index >= k
 
     sum(@list)          sum of a list of numbers
     prod(@list)         product of a list of numbers
@@ -271,6 +280,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     is_even(n)          return 1 if n is an integer divisible by 2
     is_odd(n)           return 1 if n is an integer not divisible by 2
     is_div(n,k)         return 1 if n is exactly divisible by k
+    is_congruent(n,k,m) return 1 if n is congruent to k mod m
 
 =head1 IMPORT / EXPORT
 
@@ -1177,17 +1187,25 @@ The integer part of the logarithm of C<n> to base C<2> or base C<10>, respective
 
 The bitwise integer operations.
 
+=head2 lcm
+
+    lcm(@list)                                    #=> Int
+
+The least common multiple of a list of integers.
+
 =head2 gcd
 
     gcd(@list)                                    #=> Int
 
 The greatest common divisor of a list of integers.
 
-=head2 lcm
+=head2 gcdext
 
-    lcm(@list)                                    #=> Int
+    gcdext(n, k)                                  #=> (Int, Int, Int)
 
-The least common multiple of a list of integers.
+The extended greatest common divisor of C<n> and C<k>, returning C<(u, v, d)>, where C<d> is
+the greatest common divisor of C<n> and C<k>, while C<u> and C<v> are the coefficients satisfying
+C<u*n + v*k = d>. The value of C<d> is always non-negative.
 
 =head2 valuation
 
@@ -1292,6 +1310,48 @@ When an additional argument is provided, it returns the the n-th Euler polynomia
 
 The n-th Lucas number. Returns NaN when C<n> is negative.
 
+=head2 lucasU
+
+    lucasU(P, Q, n)                               #=> Int | NaN
+
+The Lucas C<U_n(P, Q)> function.
+
+Example:
+
+    lucasU(1, -1, $n)       # the Fibonacci numbers
+    lucasU(2, -1, $n)       # the Pell numbers
+    lucasU(1, -2, $n)       # the Jacobsthal numbers
+
+=head2 lucasV
+
+    lucasV(P, Q, n)                               #=> Int | NaN
+
+The Lucas C<V_n(P, Q)> function.
+
+Example:
+
+    lucasV(1, -1, $n)       # the Lucas numbers
+    lucasV(2, -1, $n)       # the Pell-Lucas numbers
+    lucasV(1, -2, $n)       # the Jacobsthal-Lucas numbers
+
+=head2 lucasmod
+
+    lucasmod(n, m)                                #=> Int | NaN
+
+Efficiently compute the n-th Lucas number modulo m.
+
+=head2 lucasUmod
+
+    lucasUmod(P, Q, n, m)                         #=> Int | NaN
+
+Efficiently compute the Lucas C<U_n(P, Q)> function modulo m.
+
+=head2 lucasVmod
+
+    lucasVmod(P, Q, n, m)                         #=> Int | NaN
+
+Efficiently compute the Lucas C<V_n(P, Q)> function modulo m.
+
 =head2 fibonacci
 
     fibonacci(n)                                  #=> Int | NaN
@@ -1312,12 +1372,6 @@ Example:
     fibmod(n, m)                                  #=> Int | NaN
 
 Efficiently compute the n-th Fibonacci number modulo m.
-
-=head2 lucasmod
-
-    lucasmod(n, m)                                #=> Int | NaN
-
-Efficiently compute the n-th Lucas number modulo m.
 
 =head2 chebyshevT
 
@@ -1427,8 +1481,11 @@ Returns the n-th Bell number.
 =head2 catalan
 
     catalan(n)                                    #=> Int | NaN
+    catalan(n, k)                                 #=> Int | NaN
 
 Returns the n-th Catalan number.
+
+If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's triangle.
 
 =head2 binomial
 
@@ -1784,12 +1841,13 @@ When C<x> is a complex number, it computes the sign using the identity:
 
 =head2 length
 
-    $x->length                                    #=> Scalar
+    $n->length                                    #=> Scalar
 
-Returns the number of digits in the integer part of C<x>.
-Returns C<-1> when C<x> cannot be truncated to an integer.
+Returns the number of digits of the integer part of C<n>.
 
-For C<-1234.56>, it returns C<4>.
+Returns C<undef> when C<n> cannot be truncated to an integer.
+
+For C<-1234.56>, it returns C<4>, which is the length of C<1234>.
 
 =head2 inc
 
@@ -1818,17 +1876,29 @@ Returns a deep-copy of the self-object.
 Returns the population count of the positive integer part of C<x>, which is the number of 1's in
 its binary representation.
 
-This value is also known as the Hamming weight.
+Return C<undef> when C<n> cannot be truncated to an integer.
+
+This value is also known as the Hamming weight value.
 
 Example:
 
     popcount(0b1011) = 3
 
+=head2 hamdist
+
+    hamdist(n, k)                                 #=> Scalar
+
+Returns the Hamming distance (number of bit-positions where the bits differ) between integers C<n> and C<k>.
+
+Return C<undef> when C<n> or C<k> cannot be truncated to an integer.
+
 =head2 getbit
 
     getbit(n, k)                                  #=> Bool
 
-Verifies C<n>'s k-th bit and returns a true value if the bit is set to 1. False otherwise.
+Returns 1 if bit C<k> of C<n> is set, and 0 if it is not set.
+
+Return C<undef> when C<n> cannot be truncated to an integer or when C<k> is negative.
 
 Example:
 
@@ -1839,7 +1909,7 @@ Example:
 
     setbit(n, k)                                  #=> Int
 
-Sets C<n>'s k-th bit to 1 (without modifying C<n> in-place).
+Returns a copy of C<n> with bit C<k> set to 1.
 
 Example:
 
@@ -1850,7 +1920,7 @@ Example:
 
     flipbit(n, k)                                 #=> Int
 
-Flips C<n>'s k-th bit from 1 to 0, and viceversa (without modifying C<n> in-place).
+Returns a copy of C<n> with bit C<k> inverted.
 
 Example:
 
@@ -1861,12 +1931,24 @@ Example:
 
     clearbit(n, k)                                #=> Int
 
-Clears C<n>'s k-th bit, by setting it to 0 (without modifying C<n> in-place).
+Returns a copy of C<n> with bit C<k> set to 0.
 
 Example:
 
     clearbit(0b1001, 0) = 0b1000
     clearbit(0b1100, 2) = 0b1000
+
+=head2 bit_scan0
+=head2 bit_scan1
+
+    bit_scan0(n, k)                               #=> Scalar
+    bit_scan1(n, k)                               #=> Scalar
+
+Scan C<n>, starting from bit index C<k>, towards more significant bits, 0 or 1 bit (respectively) is found.
+
+When C<k> is omitted, C<k=0> is assumed.
+
+Returns C<undef> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
 =head1 * Introspection
 
@@ -1930,11 +2012,19 @@ Returns a true value when C<n> is a real integer not divisible by 2.
 
 =head2 is_div
 
-    is_div(x, y)                                  #=> Bool
+    is_div(n, k)                                  #=> Bool
 
-Returns a true value when C<x> is exactly divisible by C<y> (i.e.: when the remainder C<x % y> is zero).
+Returns a true value when C<n> is exactly divisible by C<k> (i.e.: when the remainder C<n % k> is zero).
 
-This is a generalized version of the above two methods and it also works with complex numbers.
+Also defined for rationals, floats and complex numbers.
+
+=head2 is_congruent
+
+    is_congruent(n, k, m)                         #=> Bool
+
+Returns a true value when C<n> is congruent to C<k> modulo C<m> (i.e.: when the remainder C<n % m> equals C<k % m>).
+
+Also defined for rationals, floats and complex numbers.
 
 =head2 is_pos
 

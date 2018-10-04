@@ -1,13 +1,8 @@
-wax
-===
-
 NAME
-----
 
 wax - webify your CLI
 
 SYNOPSIS
---------
 
     wax [OPTIONS] program [OPTIONS] ...
 
@@ -20,30 +15,20 @@ runs:
     $ vim -R /tmp/wax_abcd1234.tgz
 
 DESCRIPTION
------------
 
-wax is a command-line program which runs other command-line programs and
-converts their URL arguments to local file paths. By default, the files are
-removed after the command has exited.
+wax is a command-line program which runs other command-line programs and converts their URL arguments to local file paths. By default, the files are removed after the command has exited.
 
-As well as adding transparent support for remote resources to commands
-that don't support them natively, wax can be used to:
+As well as adding transparent support for remote resources to commands that don't support them natively, wax can be used to:
 
--   add support for HTTPS (and any other protocols supported by LWP) to
-    programs that only support HTTP
--   add a mirroring layer to network requests (remote resources are only
-    fetched if they've been updated)
--   add a caching layer to network requests (remote resources are only
-    fetched once)
+- add support for HTTPS (and any other protocols supported by LWP [1]) to programs that only support HTTP [2]
+- add a mirroring layer to network requests (remote resources are only fetched if they've been updated)
+- add a caching layer to network requests (remote resources are only fetched once)
 
 For more details, see the wax man page.
 
-INSTALLATION
-------------
-
 INSTALL
 
-Install cpanminus if it's not already installed, then:
+Install cpanminus [3] if it's not already installed, then:
 
     cpanm App::Wax
 
@@ -56,18 +41,17 @@ UNINSTALL
     cpanm --uninstall App::Wax
 
 EXAMPLES
---------
 
-espeak:
+espeak
 
     $ alias espeak="wax espeak"
     $ espeak -f http://www.setec.org/mel.txt
 
-grep:
+grep
 
     $ wax grep -B1 demons http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt
 
-jsview:
+jsview
 
 Browse files in Node module tarballs
 
@@ -76,7 +60,7 @@ Browse files in Node module tarballs
     # usage: jsview <module> e.g. jsview left-pad
     wax --cache view $(npm info --json "$@" | jq -r .dist.tarball)
 
-nman:
+nman
 
 Node.js man-page viewer
 
@@ -87,26 +71,36 @@ Node.js man-page viewer
     wax --cache -D pandoc --standalone --from markdown --to man "$docroot/$1.md" | man -l -
 
 VERSION
--------
 
-2.2.1
+2.3.0
 
 SEE ALSO
---------
 
--   rlwrap
--   sshfs
--   zsh completion script
+Tools
+
+- zsh completion script [4]
+
+Links
+
+- The Parrot Virtual File System [5] - a filesystem which provides transparent access to web resources
+- SSHFS [6] - a filesystem which provides transparent access to SSH shares
+- tmpin [7] - add stdin support to any CLI app that accepts file input
 
 AUTHOR
-------
 
-chocolateboy (chocolate@cpan.org)
+chocolateboy
 
 COPYRIGHT AND LICENSE
----------------------
 
 Copyright (c) 2010-2018 by chocolateboy.
 
-This is free software; you can redistribute it and/or modify it under the terms of the
-Artistic License 2.0.
+This is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. [8]
+
+[1] https://metacpan.org/pod/LWP
+[2] https://github.com/jgm/pandoc/issues/1266
+[3] https://github.com/miyagawa/cpanminus/tree/devel/App-cpanminus#readme
+[4] https://github.com/chocolateboy/App-Wax/wiki/Zsh-completion-script
+[5] http://ccl.cse.nd.edu/software/parrot/
+[6] https://github.com/libfuse/sshfs
+[7] https://github.com/sindresorhus/tmpin
+[8] http://www.opensource.org/licenses/artistic-license-2.0.php

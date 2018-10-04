@@ -49,7 +49,7 @@
       "runtime" : {
          "requires" : {
             "Test::More" : "0.96",
-            "Test::Time" : "0",
+            "Test::Time" : "0.07",
             "Time::HiRes" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -73,7 +73,7 @@
    "provides" : {
       "Test::Time::HiRes" : {
          "file" : "lib/Test/Time/HiRes.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,10 @@
          "web" : "https://github.com/mjemmeson/Test-Time-HiRes"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
+   "x_contributors" : [
+      "Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

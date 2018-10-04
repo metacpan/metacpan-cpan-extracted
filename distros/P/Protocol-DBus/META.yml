@@ -1,0 +1,37 @@
+---
+abstract: 'D-Bus in pure Perl'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  Test::Deep: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Protocol-DBus
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Call::Context: '0'
+  IO::Framed: '0'
+  Module::Load: '0'
+  Socket::MsgHdr: '0'
+  X::Tiny: '0'
+  parent: '0'
+  perl: '5.01'
+resources:
+  bugtracker: https://github.com/FGasper/p5-Protocol-DBus/issues
+  repository: git://github.com/FGasper/p5-Protocol-DBus.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

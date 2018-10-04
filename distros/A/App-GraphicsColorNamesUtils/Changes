@@ -1,0 +1,16 @@
+0.003   2018-10-04 (PERLANCAR)
+
+        - Add utilities: colorname2code, colorcode2name.
+
+        - Use lower-level interface to Graphics::ColorNames (NamesRgbTable())
+          because the tie interface breaks on me.
+
+
+0.002   2018-09-26 (PERLANCAR)
+
+	- Add utility: show-color-swatch.
+
+
+0.001   2018-09-26 (PERLANCAR)
+
+        - First release.

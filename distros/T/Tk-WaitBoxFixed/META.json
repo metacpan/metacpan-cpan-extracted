@@ -4,13 +4,13 @@
       "Rene Schickbauer <rene.schickbauer@magnapowertrain.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tk-WaitBoxFixed",
    "no_index" : {
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Tk" : "804"
+            "Tk" : "804",
+            "perl" : "5.01"
          }
       }
    },
@@ -40,9 +41,10 @@
    "resources" : {
       "repository" : {
          "type" : "hg",
-         "url" : "http://hg.code.sf.net/p/tk-waitboxfixed/code tk-waitboxfixed-code",
-         "web" : "https://sourceforge.net/p/tk-waitboxfixed/code/ci/default/tree/"
+         "url" : "https://cavac.at/public/mercurial/Tk-WaitBoxFixed/file/",
+         "web" : "https://cavac.at/public/mercurial/Tk-WaitBoxFixed/"
       }
    },
-   "version" : "1.6"
+   "version" : "1.8",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

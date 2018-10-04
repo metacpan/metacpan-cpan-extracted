@@ -76,8 +76,13 @@ sub new {
                                                                 $opts{format} eq 'html'));
     my $self = { document => $opts{document},
                  fmt => $opts{format} };
+    if (ref($self->{document}) and $self->{document}->can('language_code')) {
+        $self->{_lang} = $self->{document}->language_code;
+    }
     bless $self, $class;
 }
+
+sub _lang { shift->{_lang} };
 
 =head3 document
 
@@ -423,6 +428,7 @@ sub inline_elements {
                                                type => 'bigskip',
                                                last_position => length($string),
                                                fmt => $self->fmt,
+                                               lang => $self->_lang,
                                               );
     }
     pos($string) = 0;
@@ -462,12 +468,14 @@ sub inline_elements {
                                                         type => 'text',
                                                         last_position => $position - length($raw),
                                                         fmt => $self->fmt,
+                                                        lang => $self->_lang,
                                                        );
         }
         my %args = (
                     string => $raw,
                     last_position => $position,
                     fmt => $self->fmt,
+                    lang => $self->_lang,
                    );
 
         if (delete $captures{tag}) {
@@ -497,6 +505,7 @@ sub inline_elements {
     push @list, Text::Amuse::InlineElement->new(string => $last_chunk,
                                                 type => 'text',
                                                 fmt => $self->fmt,
+                                                lang => $self->_lang,
                                                 last_position => $offset + length($last_chunk),
                                                );
     die "Chunks lost during processing <$string>" unless $string eq join('', map { $_->string } @list);
@@ -548,6 +557,7 @@ sub manage_regular {
                 if ($dir ne $current_direction) {
                     push @processed, Text::Amuse::InlineElement->new(string => '',
                                                                      fmt => $self->fmt,
+                                                                     lang => $self->_lang,
                                                                      tag => $current_direction,
                                                                      type => 'close');
                     $current_direction = '';
@@ -561,6 +571,7 @@ sub manage_regular {
                 $current_direction = $dir;
                 push @processed, Text::Amuse::InlineElement->new(string => '',
                                                                  fmt => $self->fmt,
+                                                                 lang => $self->_lang,
                                                                  tag => $current_direction,
                                                                  type => 'open');
             }
@@ -572,6 +583,7 @@ sub manage_regular {
     if ($current_direction) {
         push @processed, Text::Amuse::InlineElement->new(string => '',
                                                          fmt => $self->fmt,
+                                                         lang => $self->_lang,
                                                          tag => $current_direction,
                                                          type => 'close');
         $current_direction = '';
@@ -755,6 +767,7 @@ sub manage_regular {
         warn "Found unclosed tag $unclosed in string <$string>, closing it\n";
         push @pieces, Text::Amuse::InlineElement->new(string => '',
                                                       fmt => $self->fmt,
+                                                      lang => $self->_lang,
                                                       tag => $unclosed,
                                                       type => 'close');
     }
@@ -849,6 +862,7 @@ format, to avoid command injection.
 sub safe {
     my ($self, $string) = @_;
     return Text::Amuse::InlineElement->new(fmt => $self->fmt,
+                                           lang => $self->_lang,
                                     string => $string,
                                     type => 'safe')->stringify;
 }
@@ -1945,6 +1959,7 @@ sub format_anchors {
     my $out = '';
     if (my @anchors = map { Text::Amuse::InlineElement->new(string => $_,
                                                             type => 'anchor',
+                                                            lang => $self->_lang,
                                                             fmt => $self->fmt)->stringify } $el->anchors) {
         return join('', @anchors);
     }

@@ -18,7 +18,7 @@ use URI::Split qw(uri_split);
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v3.0.0');
+use version; our $VERSION = version->declare('v3.1.0');
 
 # defaults
 use constant {
@@ -31,14 +31,20 @@ use constant {
     SEPARATOR  => '--',
     TEMPLATE   => 'XXXXXXXX',
     TIMEOUT    => 60,
-    USER_AGENT => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0',
+    USER_AGENT => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
     VERBOSE    => 0,
 };
 
 # RFC 2616: "If the media type remains unknown, the recipient SHOULD treat
 # it as type 'application/octet-stream'."
-use constant {
-    DEFAULT_CONTENT_TYPE => 'application/octet-stream',
+use constant DEFAULT_CONTENT_TYPE => 'application/octet-stream';
+
+# resources with these mime-types may have their extension inferred from the
+# path part of their URI
+use constant INFER_EXTENSION => {
+    'text/plain'               => 1,
+    'application/octet-stream' => 1,
+    'binary/octet-stream'      => 1,
 };
 
 # errors
@@ -278,7 +284,7 @@ method extension ($_url) {
 
     return $extension unless ($content_type); # won't be defined if the URL is invalid
 
-    if (($content_type eq 'text/plain') || ($content_type eq 'application/octet-stream')) {
+    if (INFER_EXTENSION->{$content_type}) {
         # try to get a more specific extension from the path
         if (not(defined $query) && $path && ($path =~ EXTENSION)) {
             $extension = $+;

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-10-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010;
 use strict;
@@ -16,11 +16,13 @@ my $cli = Perinci::CmdLine::Any->new(
     url => $prefix,
     log => 1,
     subcommands => {
-        'list-installed'  => {url=>"${prefix}list_installed"},
-        'list-downloaded' => {url=>"${prefix}list_downloaded"},
-        'download'        => {url=>"${prefix}download"},
-        'update'          => {url=>"${prefix}update"},
-        'update-all'      => {url=>"${prefix}update_all"},
+        'list-installed'           => {url=>"${prefix}list_installed"},
+        'list-installed-versions'  => {url=>"${prefix}list_installed_versions"},
+        'list-downloaded'          => {url=>"${prefix}list_downloaded"},
+        'download'                 => {url=>"${prefix}download"},
+        'update'                   => {url=>"${prefix}update"},
+        'cleanup'                  => {url=>"${prefix}cleanup"},
+        'update-all'               => {url=>"${prefix}update_all"},
     },
 );
 $cli->run;
@@ -40,7 +42,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.001 of instopt (from Perl distribution App-instopt), released on 2018-09-20.
+This document describes version 0.002 of instopt (from Perl distribution App-instopt), released on 2018-10-04.
 
 =head1 SYNOPSIS
 
@@ -67,8 +69,14 @@ Then:
  # List downloaded versions/archs of a software
  % instopt list-downloaded firefox
 
+ # List installed versions of a software in /opt
+ % instopt list-installed-versions firefox
+
  # Update (download + install) a software in /opt
  % instopt update firefox
+
+ # Cleanup (remove inactive versions)
+ % instopt cleanup
 
  # Update all software in /opt
  % instopt update-all
@@ -171,6 +179,10 @@ After that, install away.
 
 =head1 SUBCOMMANDS
 
+=head2 B<cleanup>
+
+Remove inactive versions.
+
 =head2 B<download>
 
 Download latest version of software.
@@ -182,6 +194,10 @@ List all downloaded software.
 =head2 B<list-installed>
 
 List all installed software.
+
+=head2 B<list-installed-versions>
+
+List all installed versions of a software.
 
 =head2 B<update>
 
@@ -316,6 +332,14 @@ Display program's version and exit.
 
 =back
 
+=head2 Options for subcommand list-installed-versions
+
+=over
+
+=item B<--software>=I<s>*
+
+=back
+
 =head2 Options for subcommand update
 
 =over
@@ -387,6 +411,9 @@ List of available configuration parameters:
  naked_res (see --naked-res)
  program_dir (see --program-dir)
 
+=head2 Configuration for subcommand cleanup
+
+
 =head2 Configuration for subcommand download
 
  arch (see --arch)
@@ -400,6 +427,10 @@ List of available configuration parameters:
 =head2 Configuration for subcommand list-installed
 
  detail (see --detail)
+
+=head2 Configuration for subcommand list-installed-versions
+
+ software (see --software)
 
 =head2 Configuration for subcommand update
 

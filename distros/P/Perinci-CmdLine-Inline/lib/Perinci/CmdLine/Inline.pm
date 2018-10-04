@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2018-09-11'; # DATE
-our $VERSION = '0.543'; # VERSION
+our $DATE = '2018-10-03'; # DATE
+our $VERSION = '0.544'; # VERSION
 
 # line 820, don't know how to turn off this warning?
 ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
@@ -32,7 +32,7 @@ sub _dsah_plc {
     $plc;
 }
 
-sub _add_module {
+sub _pack_module {
     my ($cd, $mod) = @_;
     return unless $cd->{gen_args}{pack_deps};
     return if $cd->{module_srcs}{$mod};
@@ -78,7 +78,7 @@ sub _gen_read_env {
 
     return "" unless $cd->{gen_args}{read_env};
 
-    _add_module($cd, "Complete::Bash");
+    _pack_module($cd, "Complete::Bash");
     push @l2, "{\n";
     push @l2, '  last unless $_pci_r->{read_env};', "\n";
     push @l2, '  my $env = $ENV{', dmp($cd->{gen_args}{env_name}), '};', "\n";
@@ -94,10 +94,10 @@ sub _gen_read_env {
 sub _gen_enable_log {
     my ($cd) = @_;
 
-    _add_module($cd, 'Log::ger');
-    _add_module($cd, 'Log::ger::Output');
-    _add_module($cd, 'Log::ger::Output::Screen');
-    _add_module($cd, 'Log::ger::Util');
+    _pack_module($cd, 'Log::ger');
+    _pack_module($cd, 'Log::ger::Output');
+    _pack_module($cd, 'Log::ger::Output::Screen');
+    _pack_module($cd, 'Log::ger::Util');
 
     my @l;
 
@@ -116,13 +116,13 @@ sub _gen_read_config {
     return "" unless $cd->{gen_args}{read_config};
 
     push @l2, 'if ($_pci_r->{read_config}) {', "\n";
-    _add_module($cd, "Perinci::CmdLine::Util::Config");
-    _add_module($cd, "Log::ger"); # required by Perinci::CmdLine::Util::Config
-    _add_module($cd, "Config::IOD::Reader"); # required by Perinci::CmdLine::Util::Config
-    _add_module($cd, "Config::IOD::Base"); # required by Config::IOD::Reader
-    _add_module($cd, "Data::Sah::Normalize"); # required by Perinci::CmdLine::Util::Config
-    _add_module($cd, "Perinci::Sub::Normalize"); # required by Perinci::CmdLine::Util::Config
-    _add_module($cd, "Sah::Schema::rinci::function_meta"); # required by Perinci::Sub::Normalize
+    _pack_module($cd, "Perinci::CmdLine::Util::Config");
+    _pack_module($cd, "Log::ger"); # required by Perinci::CmdLine::Util::Config
+    _pack_module($cd, "Config::IOD::Reader"); # required by Perinci::CmdLine::Util::Config
+    _pack_module($cd, "Config::IOD::Base"); # required by Config::IOD::Reader
+    _pack_module($cd, "Data::Sah::Normalize"); # required by Perinci::CmdLine::Util::Config
+    _pack_module($cd, "Perinci::Sub::Normalize"); # required by Perinci::CmdLine::Util::Config
+    _pack_module($cd, "Sah::Schema::rinci::function_meta"); # required by Perinci::Sub::Normalize
     push @l2, 'log_trace("Reading config file(s) ...");', "\n" if $cd->{gen_args}{log};
     push @l2, '  require Perinci::CmdLine::Util::Config;', "\n";
     push @l2, "\n";
@@ -348,7 +348,7 @@ sub _gen_pci_check_args {
                                            $_->{name} eq $mod_rec->{name} } @modules_for_all_args;
                         push @modules_for_all_args, $mod_rec;
                         if ($mod_rec->{name} =~ /\A(Scalar::Util::Numeric::PP)\z/) {
-                            _add_module($cd, $mod_rec->{name});
+                            _pack_module($cd, $mod_rec->{name});
                         }
                         my $mod_is_core = Module::CoreList::More->is_still_core($mod_rec->{name});
                         log_warn("Validation code requires non-core module '%s'", $mod_rec->{name})
@@ -499,13 +499,13 @@ sub _gen_get_args {
 
     push @l, 'my %mentioned_args;', "\n";
 
-    _add_module($cd, "Getopt::Long::EvenLess");
+    _pack_module($cd, "Getopt::Long::EvenLess");
     push @l, "require Getopt::Long::EvenLess;\n";
     push @l, 'log_trace("Parsing command-line arguments ...");', "\n" if $cd->{gen_args}{log};
 
     if ($cd->{gen_args}{subcommands}) {
 
-        _add_module($cd, "Getopt::Long::Subcommand");
+        _pack_module($cd, "Getopt::Long::Subcommand");
         push @l, "require Getopt::Long::Subcommand;\n";
         # we haven't added the Complete::* that Getopt::Long::Subcommand depends on
 
@@ -996,10 +996,11 @@ sub gen_inline_pericmd_script {
     my $cd = {
         gen_args => \%args,
         script_name => $args{script_name},
-        req_modules => {},
+        req_modules => {}, # modules which we will 'require' at the beginning of script. currently unused.
         vars => {},
         subs => {},
         module_srcs => {},
+        core_deps => {}, # core modules required by the generated script. so we can specify dependencies to it, in environments where not all core modules are available.
     };
 
   GET_META:
@@ -1100,7 +1101,7 @@ sub gen_inline_pericmd_script {
 
         @{ $args{include} // [] },
     ) {
-        _add_module($cd, $_);
+        _pack_module($cd, $_);
     }
 
   GEN_SCRIPT:
@@ -1219,8 +1220,8 @@ _
 _
 
         if ($args{with_debug}) {
-            _add_module($cd, "Data::Dmp");
-            _add_module($cd, "Regexp::Stringify"); # needed by Data::Dmp
+            _pack_module($cd, "Data::Dmp");
+            _pack_module($cd, "Regexp::Stringify"); # needed by Data::Dmp
             $cd->{sub_srcs}{_pci_debug} = <<'_';
     require Data::Dmp;
     print "DEBUG: ", Data::Dmp::dmp(@_), "\n";
@@ -1234,6 +1235,7 @@ _
     };
     $json;
 _
+        $cd->{sub_src_core_deps}{_pci_json}{'JSON::PP'} = 0;
 
         {
             last unless $args{use_cleanser};
@@ -1250,7 +1252,7 @@ _
             for my $mod (keys %{ $cleanser->{_cd}{modules} }) {
                 $src1 .= "require $mod; ";
                 next if Module::CoreList->is_core($mod);
-                _add_module($cd, $mod);
+                _pack_module($cd, $mod);
             }
             $cd->{module_srcs}{'Local::_pci_clean_json'} = "$src1 use feature 'state'; state \$cleanser = $src; \$cleanser->(shift) }\n1;\n";
         }
@@ -1498,8 +1500,16 @@ _
             (keys(%{$cd->{vars}}) ? "\n" : ""),
 
             "### declare subroutines\n\n",
-            (map {"sub $_" . (ref($cd->{sub_srcs}{$_}) eq 'ARRAY' ?
-                "($cd->{sub_srcs}{$_}[0]) {\n$cd->{sub_srcs}{$_}[1]}\n\n" : " {\n$cd->{sub_srcs}{$_}}\n\n")}
+            (map {
+                my $sub = $_;
+                if ($cd->{sub_src_core_deps}{$sub}) {
+                    for my $mod (keys %{ $cd->{sub_src_core_deps}{$sub} }) {
+                        $cd->{core_deps}{$mod} //=
+                            $cd->{sub_src_core_deps}{$sub}{$mod};
+                    }
+                }
+                "sub $sub" . (ref($cd->{sub_srcs}{$sub}) eq 'ARRAY' ?
+                "($cd->{sub_srcs}{$sub}[0]) {\n$cd->{sub_srcs}{$sub}[1]}\n\n" : " {\n$cd->{sub_srcs}{$sub}}\n\n")}
                 sort keys %{$cd->{sub_srcs}}),
 
             ("### code_before_parse_cmdline_options\n", $args{code_before_parse_cmdline_options}, "\n") x !!$args{code_before_parse_cmdline_options},
@@ -1533,7 +1543,6 @@ _
 
         if ($output_is_stdout) {
             return [200, "OK", $cd->{result}, {
-                'cmdline.skip_format' => 1,
                 'func.raw_result' => $cd,
             }];
         } else {
@@ -1564,7 +1573,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.543 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2018-09-11.
+This document describes version 0.544 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2018-10-03.
 
 =head1 SYNOPSIS
 

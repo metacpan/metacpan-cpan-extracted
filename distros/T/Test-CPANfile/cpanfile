@@ -1,7 +1,6 @@
 requires 'Exporter', '5.57';
 requires 'Module::CPANfile';
-requires 'Perl::PrereqScanner::NotQuiteLite', '0.91';
-requires 'Perl::PrereqScanner::NotQuiteLite::App';
+requires 'Perl::PrereqScanner::NotQuiteLite', '0.96';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker::CPANfile';
@@ -10,6 +9,7 @@ on configure => sub {
 on test => sub {
     requires 'Test::More', '0.88';
     requires 'Test::UseAllModules', '0.17';
+    requires 'CPAN::Common::Index';
 };
 
 on develop => sub {

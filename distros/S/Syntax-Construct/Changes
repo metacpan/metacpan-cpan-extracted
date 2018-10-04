@@ -1,9 +1,15 @@
 Revision history for Syntax-Construct
 
+1.008   2018-09-26
+
+        - Fix links to 5.26 delta
+        - Add aliases (thanks Branislav Zahradnik)
+
 1.007   2018-06-26
 
         - Workaround threaded 5.10.0 throwing "Modification of a
           read-only value attemted" for eval '?x?'
+        - Unicode delimiters hack doesn't work in 5.8.0
 
 1.006   2018-06-25
 

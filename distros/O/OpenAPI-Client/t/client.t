@@ -136,7 +136,6 @@ __DATA__
     "/pets/{type}": {
       "get": {
         "operationId": "listPets",
-        "x-mojo-to": "listPets",
         "parameters": [
           { "in": "path", "name": "type", "type": "string", "required": true },
           { "$ref": "#/parameters/p" }

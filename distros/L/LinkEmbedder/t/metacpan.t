@@ -17,7 +17,7 @@ my @tests = (
   {
     author_name   => 'Sebastian Riedel',
     html_re       => re(qr{Real-time web framework}),
-    thumbnail_url => re(qr{/4a49eb49e0b98ed1a1fb30b7d39baac3}),
+    thumbnail_url => re(qr{/bfa97d786f12ee3381f97bc909b88e11}),
     title         => 'Mojolicious',
     url           => 'https://metacpan.org/pod/Mojolicious',
   },
@@ -28,32 +28,31 @@ my @tests = (
     url           => 'https://metacpan.org/author/JHTHORSEN',
   },
   {
-    html_re       => re(qr{Multiuser IRC proxy with web interface}),
-    thumbnail_url => re(qr{https://secure\.gravatar\.com/avatar/\w+}),
-    title         => 'Convos',
-    url           => 'https://metacpan.org/release/Convos',
+    html_re       => re(qr{oEmbed resources and other URL}),
+    thumbnail_url => re(qr{https://www\.gravatar\.com/avatar/\w+}),
+    title         => 'LinkEmbedder',
+    url           => 'https://metacpan.org/release/LinkEmbedder',
   },
 );
 
 for my $test (@tests) {
-  my $link = $embedder->get($test->{url});
+  my $link;
+  $embedder->get_p($test->{url})->then(sub { $link = shift })->wait;
   isa_ok($link, 'LinkEmbedder::Link::Metacpan');
 
   cmp_deeply $link->TO_JSON,
-    subhashof(
-    {
-      author_name   => $test->{author_name},
-      cache_age     => 0,
-      html          => $test->{html_re},
-      provider_name => 'Metacpan',
-      provider_url  => 'https://metacpan.org',
-      thumbnail_url => $test->{thumbnail_url},
-      title         => $test->{title},
-      type          => 'rich',
-      url           => $test->{url},
-      version       => '1.0',
-    }
-    ),
+    subhashof({
+    author_name   => $test->{author_name},
+    cache_age     => 0,
+    html          => $test->{html_re},
+    provider_name => 'Metacpan',
+    provider_url  => 'https://metacpan.org',
+    thumbnail_url => $test->{thumbnail_url},
+    title         => $test->{title},
+    type          => 'rich',
+    url           => $test->{url},
+    version       => '1.0',
+    }),
     $test->{url}
     or note $link->_dump;
 }

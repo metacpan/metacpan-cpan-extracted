@@ -6,10 +6,9 @@ use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 has provider_name => 'GitHub';
 has provider_url => sub { Mojo::URL->new('https://github.com') };
 
-sub learn {
-  my ($self, $cb) = @_;
-  return $self->_learn_from_gist($1, $cb) if $self->url =~ m!gist\.github\.com/(.+)!;
-  return $self->SUPER::learn($cb);
+sub learn_p {
+  my $self = shift;
+  return $self->url =~ m!gist\.github\.com/(.+)! ? $self->_learn_from_gist($1) : $self->SUPER::learn_p;
 }
 
 sub _learn_from_dom {
@@ -39,21 +38,14 @@ sub _learn_from_dom {
 }
 
 sub _learn_from_gist {
-  my ($self, $gist_id, $cb) = @_;
+  my ($self, $gist_id) = @_;
   my @gist_id = split '/', $gist_id;
 
   $gist_id = $gist_id[1] if @gist_id >= 2;
   my $raw_url = sprintf 'https://api.github.com/gists/%s', $gist_id;
   warn "[LinkEmbedder] Gist URL $raw_url\n" if DEBUG;
 
-  if ($cb) {
-    $self->ua->get($raw_url => sub { $self->tap(_parse_gist => $_[1])->$cb });
-  }
-  else {
-    $self->_parse_gist($self->ua->get($raw_url));
-  }
-
-  return $self;
+  return $self->ua->get_p($raw_url)->then(sub { $self->_parse_gist(shift) });
 }
 
 sub _parse_gist {

@@ -109,6 +109,7 @@ if ($CoverRelation->{'TargetFullName'}) {
 push @Img, $FB3Package->RelationsByType( $BodyRelsPartName, RELATION_TYPE_FB3_IMAGES );
 
 my (%ImgRels, %ImgReverse);
+my (%LinkRels);
 foreach my $Img (@Img) {
   print "Processing img ".$Img->{'Id'}."\n" if $OPT{'verbose'};
   
@@ -188,6 +189,34 @@ if (@Preamble &&  (my $RootBody = $xc->findnodes("/fb3:fb3-body")->[0]) ){
   $RootBody->appendChild($PreambleElement);
   $BodyXML = $RootBody->toString();
 }
+
+## change span id
+#span нужно вынести в ближайший родительский block-level
+#span затем будет выкушен в xsl
+my $ChangedBySpan=0;
+foreach my $Span ($xc->findnodes("/fb3:fb3-body/fb3:section//fb3:p//fb3:span")) {
+  my $SpanID = $Span->getAttribute('id') || next;
+  my $Parent = $Span;
+  while ($Parent = $Parent->parentNode()) {
+    if (lc($Parent->nodeName()) eq 'p') { #вроде как кроме <p> нам некуда переехать?
+      my $ParentID = $Parent->getAttribute('id');
+      if ($ParentID) {
+        #уже есть id, придется менять линки в документе на него
+        $LinkRels{$SpanID} = $ParentID; 
+      } else {
+        $Parent->setAttribute('id' => $SpanID);
+        $ChangedBySpan = 1;
+      }
+      last;
+    }
+  }
+}
+
+if ($ChangedBySpan) {
+  my $RootForSpan = $xc->findnodes("/fb3:fb3-body")->[0];
+  $BodyXML = $RootForSpan->toString();
+}
+## /change span id
 
 my $FB2Body = TransformXML($BodyXML, XSL_FB3_TO_FB2_BODY);
 print "Transform Body ok\n" if $OPT{'verbose'};
@@ -270,11 +299,22 @@ sub TransformXML{
       my $Str  = shift;
       if ($Str =~ /^(#)?(.+)/) { # может попасться якорь "#", учитываем
         $Str = $1.$ImgRels{$2} if exists $ImgRels{$2};
+        $Str = $1.$LinkRels{$2} if exists $LinkRels{$2};
       }
       return $Str;
     }
   );
-	
+
+  $Xslt->register_function('LTR', 'RplLocalHref', sub {
+      my $Str    = shift;
+      my $Prefix = shift;
+      if ($Str =~ /^#(.+)/) {
+        $Str = '#'.$Prefix.$1;
+      }
+      return $Str;
+    }
+  );
+
   my $Source = $Parser->parse_string($XML);
 	my $StyleDoc = $Parser->parse_file($XSL);
 	my $Stylesheet = $Xslt->parse_stylesheet($StyleDoc);

@@ -1,7 +1,7 @@
 package String::Pad;
 
-our $DATE = '2014-12-10'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2018-09-26'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,19 +53,23 @@ String::Pad - String padding routines
 
 =head1 VERSION
 
-This document describes version 0.01 of String::Pad (from Perl distribution String-Pad), released on 2014-12-10.
+This document describes version 0.020 of String::Pad (from Perl distribution String-Pad), released on 2018-09-26.
 
 =head1 FUNCTIONS
 
 =head2 pad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
 
-Return C<$text> padded with C<$padchar> to C<$width> columns. C<$which> is
-either "r" or "right" for padding on the right (the default if not specified),
-"l" or "left" for padding on the right, or "c" or "center" or "centre" for
-left+right padding to center the text.
+Return C<$text> padded with C<$padchar> to C<$width> columns.
+
+C<$which> is either "r" or "right" for padding on the right (the default if not
+specified), "l" or "left" for padding on the right, or "c" or "center" or
+"centre" for left+right padding to center the text.
 
 C<$padchar> is whitespace if not specified. It should be string having the width
 of 1 column.
+
+C<$truncate> is boolean. When set to 1, then text will be truncated when it is
+longer than C<$width>.
 
 =head1 HOMEPAGE
 
@@ -89,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

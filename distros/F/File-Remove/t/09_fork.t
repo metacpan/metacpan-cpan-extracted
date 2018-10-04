@@ -4,8 +4,8 @@
 
 use strict;
 BEGIN {
-	$|  = 1;
-	$^W = 1;
+    $|  = 1;
+    $^W = 1;
 }
 
 use Test::More tests => 8;
@@ -25,13 +25,13 @@ ok( -d $parent, 'Directory exists' );
 # Fork the test
 my $pid = fork();
 unless ( $pid ) {
-	# Create a child-owned directory and flag for deletion
-	File::Remove::clear($child);
-	mkdir( $child, 0777 );
-	sleep(2);
+    # Create a child-owned directory and flag for deletion
+    File::Remove::clear($child);
+    mkdir( $child, 0777 );
+    sleep(2);
 
-	# Exit from the child to stimulate END-time code
-	exit(0);
+    # Exit from the child to stimulate END-time code
+    exit(0);
 }
 
 # In the parent, wait 1 second for process to spawn

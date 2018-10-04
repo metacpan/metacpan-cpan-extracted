@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Dumper;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use YAML::PP;
 use YAML::PP::Representer;
@@ -14,9 +14,11 @@ sub new {
         boolean => 'perl',
     );
 
+    my $emitter = delete $args{emitter} || YAML::PP::Emitter->new;
     my $self = bless {
         representer => YAML::PP::Representer->new(
             schema => $schema,
+            emitter => $emitter,
         ),
     }, $class;
     return $self;

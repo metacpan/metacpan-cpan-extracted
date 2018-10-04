@@ -28,17 +28,16 @@ lib/DOCSIS/ConfigFile/mibs/SNMPv2-MIB
 lib/DOCSIS/ConfigFile/mibs/SNMPv2-SMI
 lib/DOCSIS/ConfigFile/mibs/SNMPv2-TC
 lib/DOCSIS/ConfigFile/mibs/TOKEN-RING-RMON-MIB
-lib/DOCSIS/ConfigFile/Syminfo.pm
 local
 Makefile.PL
 MANIFEST			This list of files
-README
 script/docsis-configfile
 t/00-basic.t
 t/complex.t
 t/data/rt70882/encoded.cm.non_zero
 t/data/rt70882/encoded.cm.zero
 t/data/tos.bin
+t/data/ushort_list-missing.bin
 t/decode.t
 t/deprecated-rt70882.t
 t/deprecated-rt83013.t
@@ -54,5 +53,6 @@ t/symtree.t
 t/tlv-202.t
 t/tos.t
 t/tr069.t
+t/ushort_list-missing.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

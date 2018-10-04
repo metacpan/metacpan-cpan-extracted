@@ -1,0 +1,54 @@
+---
+abstract: 'Server-side client library for any Google App API. Based on Moose'
+author:
+  - 'Steve Dondley <s@dondley.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::File::ShareDir::Dist: '0'
+  Test::File::ShareDir::Module: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Warn: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Google-Client
+requires:
+  Config::JSON: '0'
+  Crypt::JWT: '0'
+  Data::Dumper: '0'
+  Data::Printer: '0'
+  Hash::Slice: '0'
+  List::Util: '0'
+  Log::Log4perl::Shortcuts: '0'
+  Mojo::UserAgent: '0'
+  Mojo::Util: '0'
+  Mojolicious::Commands: '0'
+  Mojolicious::Lite: '0'
+  Mojolicious::Plugin::OAuth2: '0'
+  Moo: '0'
+  MooX::Singleton: '0'
+  Moose: '0'
+  Net::EmptyPort: '0'
+  Tie::File: '0'
+  feature: '0'
+resources:
+  bugtracker: https://github.com/sdondley/WevService-Google-Client/issues
+  repository: git://github.com/sdondley/WevService-Google-Client.git
+version: '0.06'
+x_contributors:
+  - 'Pavel Serikov <pavelsr@cpan.org>'
+  - 'Pavel Serikov <pavel.p.serikov@gmail.com>'
+  - 'dafinder <mattdw@gmail.com>'
+x_generated_by_perl: v5.24.4
+x_serialization_backend: 'YAML::Tiny version 1.70'

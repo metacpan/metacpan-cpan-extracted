@@ -19,6 +19,7 @@
 package Games::Axmud::Obj::BinomialHeap;
 
 use strict;
+use warnings;
 use vars qw($VERSION);
 
 $VERSION = '0.80';

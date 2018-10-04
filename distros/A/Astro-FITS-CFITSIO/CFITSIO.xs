@@ -1634,6 +1634,21 @@ ffcpcl(infptr,outfptr,incolnum,outcolnum,create_col,status)
 		status
 
 int
+ffccls(infptr,outfptr,incolnum,outcolnum,ncols,create_col,status)
+	fitsfile * infptr
+	fitsfile * outfptr
+	int incolnum
+	int outcolnum
+	int ncols
+	int create_col
+	int &status
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_copy_cols = 1
+		fitsfilePtr::copy_cols = 2
+	OUTPUT:
+		status
+
+int
 ffcprw(infptr,outfptr,firstrow,nrows,status)
 	fitsfile * infptr
 	fitsfile * outfptr

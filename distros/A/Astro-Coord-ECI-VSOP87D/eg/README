@@ -1,0 +1,15 @@
+This directory contains the following specimen files:
+
+almanac
+    This script computes almanac data for the given bodies, date, and
+    location. These default to all bodies, the current date, and the
+    White House, Washington D.C. USA. The --help option gets you
+    documentation.
+
+quarters
+    This script computes conjunctions, elongations, oppositions, and
+    quadratures for specified bodies, for a specified number of days
+    after a specified time. The defaults are all bodies for 30 days
+    after the current time. The --help option gets you documentation.
+
+# ex: set filetype=text textwidth=72 autoindent :

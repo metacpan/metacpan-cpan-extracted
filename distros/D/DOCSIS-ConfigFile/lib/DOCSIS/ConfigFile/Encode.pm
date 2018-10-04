@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use bytes;
 use Carp 'confess';
-use DOCSIS::ConfigFile::Syminfo;
 use Math::BigInt;
 use Socket;
 
@@ -19,6 +18,89 @@ our %SNMP_TYPE = (
   OPAQUE    => [0x44, \&uint],
   COUNTER64 => [0x46, \&bigint],
 );
+
+sub bigint {
+  my $value = _test_value(bigint => $_[0]);
+  my $int64 = Math::BigInt->new($value);
+
+  $int64->is_nan and confess "$value is not a number";
+
+  my $negative = $int64 < 0;
+  my @bytes = $negative ? (0x80) : ();
+
+  while ($int64) {
+    my $value = $int64 & 0xff;
+    $int64 >>= 8;
+    $value ^= 0xff if ($negative);
+    unshift @bytes, $value;
+  }
+
+  return @bytes ? @bytes : (0);    # 0 is also a number ;-)
+}
+
+sub ether {
+  my $string = _test_value(ether => $_[0]);
+
+  if ($string =~ qr{^\+?[0-4294967295]$}) {    # numeric
+    return uint({value => $string});
+  }
+  elsif ($string =~ /^(?:0x)?([0-9a-f]+)$/i) {    # hex
+    return hexstr({value => $1});
+  }
+
+  confess "ether({ value => $string }) is invalid";
+}
+
+sub hexstr {
+  my $string = _test_value(hexstr => $_[0], qr{(?:0x)?([a-f0-9]+)}i);
+  my @bytes;
+
+  $string =~ s/^(?:0x)//;
+  unshift @bytes, hex $1 while $string =~ s/(\w{1,2})$//;
+  confess "hexstr({ value => ... }) is left with ($string) after decoding" if $string;
+  return @bytes;
+}
+
+sub ip { split /\./, _test_value(ip => $_[0], qr{^(?:\d{1,3}\.){3}\d{1,3}$}) }
+
+sub int {
+  my $obj      = $_[0];
+  my $int      = _test_value(int => $obj, qr{^[+-]?\d{1,10}$});
+  my $negative = $int < 0;
+  my @bytes;
+
+  # make sure we're working on 32bit
+  $int &= 0xffffffff;
+
+  while ($int) {
+    my $value = $int & 0xff;
+    $int >>= 8;
+    $value ^= 0xff if ($negative);
+    unshift @bytes, $value;
+  }
+
+  if (!$obj->{snmp}) {
+    $bytes[0] |= 0x80 if ($negative);
+    unshift @bytes, 0 for (1 .. 4 - @bytes);
+  }
+  if (@bytes == 0) {
+    @bytes = (0);
+  }
+  if ($obj->{snmp}) {
+    unshift @bytes, 0 if (!$negative and $bytes[0] > 0x79);
+  }
+
+  return @bytes;
+}
+
+sub mic      { }
+sub no_value { }
+
+sub objectid {
+  my $oid = _test_value(objectid => $_[0], qr{^\.?\d+(\.\d+)+$});
+  $oid =~ s/^\.//;
+  return _snmp_oid($oid);
+}
 
 sub snmp_object {
   my $obj = _test_value(snmp_object => $_[0]);
@@ -42,25 +124,114 @@ sub snmp_object {
   );
 }
 
+sub string {
+  my $string = _test_value(string => $_[0]);
+  return hexstr(@_) if $string =~ /^0x[a-f0-9]+$/i;
+  $string =~ s/%(\w\w)/{ chr hex $1 }/ge;
+  return map { ord $_ } split //, $string;
+}
+
+sub stringz {
+  my @bytes = string(@_);
+  push @bytes, 0 if (@bytes == 0 or $bytes[-1] ne "\0");
+  return @bytes;
+}
+
+sub uchar { _test_value(uchar => $_[0], qr/\+?\d{1,3}$/) }
+
+sub uint {
+  my $obj = $_[0];
+  my $uint = _test_value(uint => $obj, qr{^\+?\d{1,10}$});
+  my @bytes;
+
+  while ($uint) {
+    my $value = $uint & 0xff;
+    $uint >>= 8;
+    unshift @bytes, $value;
+  }
+
+  if (!$obj->{snmp}) {
+    unshift @bytes, 0 for (1 .. 4 - @bytes);
+  }
+  if (@bytes == 0) {
+    @bytes = (0);
+  }
+  if ($obj->{snmp}) {
+    unshift @bytes, 0 if ($bytes[0] > 0x79);
+  }
+
+  return @bytes;
+}
+
+sub ushort {
+  my $obj = $_[0];
+  my $ushort = _test_value(ushort => $obj, qr{^\+?\d{1,5}$});
+  my @bytes;
+
+  unshift @bytes, 0 if $obj->{snmp} and $ushort > 0x79;
+
+  while ($ushort) {
+    my $value = $ushort & 0xff;
+    $ushort >>= 8;
+    unshift @bytes, $value;
+  }
+
+  map { unshift @bytes, 0 } 1 .. 2 - @bytes unless $obj->{snmp};
+  return @bytes ? @bytes : (0);
+}
+
+sub ushort_list {
+  map { ushort({value => $_}) } @{$_[0]->{value} || []};
+}
+
+sub vendor {
+  my $options = $_[0]->{value}{options};
+  my @vendor  = ether({value => $_[0]->{value}{id}});
+  my @bytes   = (8, CORE::int(@vendor), @vendor);
+
+  for (my $i = 0; $i < @$options; $i += 2) {
+    my @value = hexstr({value => $options->[$i + 1]});
+    push @bytes, uchar({value => $options->[$i]});
+    push @bytes, CORE::int(@value);
+    push @bytes, @value;
+  }
+
+  return @bytes;
+}
+
+sub vendorspec {
+  my $obj = $_[0];
+  my (@vendor, @bytes);
+
+  confess "vendor({ nested => ... }) is not an array ref" unless ref $obj->{nested} eq 'ARRAY';
+
+  @vendor = ether($obj);                       # will extract value=>$hexstr. might confess
+  @bytes = (8, CORE::int(@vendor), @vendor);
+
+  for my $tlv (@{$obj->{nested}}) {
+    my @value = hexstr($tlv);                  # will extract value=>$hexstr. might confess
+    push @bytes, uchar({value => $tlv->{type}});
+    push @bytes, CORE::int(@value);
+    push @bytes, @value;
+  }
+
+  return @bytes;
+}
+
 sub _snmp_length {
   my $length = $_[0];
   my @bytes;
 
-  if ($length < 0x80) {
-    return $length;
-  }
-  elsif ($length < 0xff) {
-    return 0x81, $length;
-  }
-  elsif ($length < 0xffff) {
-    while ($length) {
-      unshift @bytes, $length & 0xff;
-      $length >>= 8;
-    }
-    return 0x82, @bytes;
+  return $length if $length < 0x80;
+  return 0x81, $length if $length < 0xff;
+  confess "Too long snmp length: ($length)" unless $length < 0xffff;
+
+  while ($length) {
+    unshift @bytes, $length & 0xff;
+    $length >>= 8;
   }
 
-  confess "Too long snmp length: ($length)";
+  return 0x82, @bytes;
 }
 
 sub _snmp_oid {
@@ -70,7 +241,7 @@ sub _snmp_oid {
 
   if ($_[0] =~ /[A-Za-z]/) {
     die "[DOCSIS] Need to install SNMP.pm http://www.net-snmp.org/ to encode non-numberic OID $oid"
-      unless DOCSIS::ConfigFile::Syminfo::CAN_TRANSLATE_OID;
+      unless DOCSIS::ConfigFile::CAN_TRANSLATE_OID;
     $oid = SNMP::translateObj($oid) or confess "Could not translate OID '$_[0]'";
   }
 
@@ -105,206 +276,6 @@ SUB_OID:
   return @encoded_oid;
 }
 
-sub bigint {
-  my $value = _test_value(bigint => $_[0]);
-  my $int64 = Math::BigInt->new($value);
-
-  $int64->is_nan and confess "$value is not a number";
-
-  my $negative = $int64 < 0;
-  my @bytes = $negative ? (0x80) : ();
-
-  while ($int64) {
-    my $value = $int64 & 0xff;
-    $int64 >>= 8;
-    $value ^= 0xff if ($negative);
-    unshift @bytes, $value;
-  }
-
-  return @bytes ? @bytes : (0);    # 0 is also a number ;-)
-}
-
-sub int {
-  my $obj      = $_[0];
-  my $int      = _test_value(int => $obj, qr{^[+-]?\d{1,10}$});
-  my $negative = $int < 0;
-  my @bytes;
-
-  # make sure we're working on 32bit
-  $int &= 0xffffffff;
-
-  while ($int) {
-    my $value = $int & 0xff;
-    $int >>= 8;
-    $value ^= 0xff if ($negative);
-    unshift @bytes, $value;
-  }
-
-  if (!$obj->{snmp}) {
-    $bytes[0] |= 0x80 if ($negative);
-    unshift @bytes, 0 for (1 .. 4 - @bytes);
-  }
-  if (@bytes == 0) {
-    @bytes = (0);
-  }
-  if ($obj->{snmp}) {
-    unshift @bytes, 0 if (!$negative and $bytes[0] > 0x79);
-  }
-
-  return @bytes;
-}
-
-sub uint {
-  my $obj = $_[0];
-  my $uint = _test_value(uint => $obj, qr{^\+?\d{1,10}$});
-  my @bytes;
-
-  while ($uint) {
-    my $value = $uint & 0xff;
-    $uint >>= 8;
-    unshift @bytes, $value;
-  }
-
-  if (!$obj->{snmp}) {
-    unshift @bytes, 0 for (1 .. 4 - @bytes);
-  }
-  if (@bytes == 0) {
-    @bytes = (0);
-  }
-  if ($obj->{snmp}) {
-    unshift @bytes, 0 if ($bytes[0] > 0x79);
-  }
-
-  return @bytes;
-}
-
-sub ushort {
-  my $obj = $_[0];
-  my $ushort = _test_value(ushort => $obj, qr{^\+?\d{1,5}$});
-  my @bytes;
-
-  if ($obj->{snmp}) {
-    unshift @bytes, 0 if ($ushort > 0x79);
-  }
-
-  while ($ushort) {
-    my $value = $ushort & 0xff;
-    $ushort >>= 8;
-    unshift @bytes, $value;
-  }
-
-  if (!$obj->{snmp}) {
-    unshift @bytes, 0 for (1 .. 2 - @bytes);
-  }
-  if (@bytes == 0) {
-    @bytes = (0);
-  }
-
-  return @bytes;
-}
-
-sub uchar {
-  return _test_value(uchar => $_[0], qr/\+?\d{1,3}$/);
-}
-
-sub vendorspec {
-  my $obj = $_[0];
-  my (@vendor, @bytes);
-
-  unless (ref $obj->{nested} eq 'ARRAY') {
-    confess "vendor({ nested => ... }) is not an array ref";
-  }
-
-  @vendor = ether($obj);                       # will extract value=>$hexstr. might confess
-  @bytes = (8, CORE::int(@vendor), @vendor);
-
-  for my $tlv (@{$obj->{nested}}) {
-    my @value = hexstr($tlv);                  # will extract value=>$hexstr. might confess
-    push @bytes, uchar({value => $tlv->{type}});
-    push @bytes, CORE::int(@value);
-    push @bytes, @value;
-  }
-
-  return @bytes;
-}
-
-sub ip {
-  return split /\./, _test_value(ip => $_[0], qr{^(?:\d{1,3}\.){3}\d{1,3}$});
-}
-
-sub ether {
-  my $string = _test_value(ether => $_[0]);
-
-  if ($string =~ qr{^\+?[0-4294967295]$}) {    # numeric
-    return uint({value => $string});
-  }
-  elsif ($string =~ /^(?:0x)?([0-9a-f]+)$/i) {    # hex
-    return hexstr({value => $1});
-  }
-
-  confess "ether({ value => $string }) is invalid";
-}
-
-sub objectid {
-  my $oid = _test_value(objectid => $_[0], qr{^\.?\d+(\.\d+)+$});
-  $oid =~ s/^\.//;
-  return _snmp_oid($oid);
-}
-
-sub string {
-  my $string = _test_value(string => $_[0]);
-
-  if ($string =~ /^0x[a-f0-9]+$/i) {
-    return hexstr(@_);
-  }
-  else {
-    $string =~ s/%(\w\w)/{ chr hex $1 }/ge;
-    return map { ord $_ } split //, $string;
-  }
-}
-
-sub stringz {
-  my @bytes = string(@_);
-  push @bytes, 0 if (@bytes == 0 or $bytes[-1] ne "\0");
-  return @bytes;
-}
-
-sub hexstr {
-  my $string = _test_value(hexstr => $_[0], qr{(?:0x)?([a-f0-9]+)}i);
-  my @bytes;
-
-  $string =~ s/^(?:0x)//;
-
-  while ($string =~ s/(\w{1,2})$//) {
-    unshift @bytes, hex $1;
-  }
-
-  if ($string) {
-    confess "hexstr({ value => ... }) is left with ($string) after decoding";
-  }
-
-  return @bytes;
-}
-
-sub mic { }
-
-sub no_value { }
-
-sub vendor {
-  my $options = $_[0]->{value}{options};
-  my @vendor  = ether({value => $_[0]->{value}{id}});
-  my @bytes   = (8, CORE::int(@vendor), @vendor);
-
-  for (my $i = 0; $i < @$options; $i += 2) {
-    my @value = hexstr({value => $options->[$i + 1]});
-    push @bytes, uchar({value => $options->[$i]});
-    push @bytes, CORE::int(@value);
-    push @bytes, @value;
-  }
-
-  return @bytes;
-}
-
 sub _test_value {
   my ($name, $obj, $test) = @_;
 
@@ -321,88 +292,20 @@ sub _test_value {
 
 DOCSIS::ConfigFile::Encode - Encode functions for a DOCSIS config-file.
 
-=head1 SYNOPSIS
-
-    @uchar = snmp_object({
-                 value => { oid => $str, type => $str, value => $str },
-             });
-    @uchar = bigint({ value => $bigint });
-    @uchar = int({ value => $int });
-    @uchar = uint({ value => $uint });
-    @uchar = ushort({ value => $ushort });
-    @uchar = uchar({ value => $char });
-    @uchar = vendorspec({
-                 value  => '0x001337', # vendors ID
-                 nested => [
-                     {
-                         type => $int, # vendor specific type
-                         value => $int, # vendor specific value
-                     },
-                 ],
-             });
-    @uchar = ip({ value => '1.2.3.4' });
-    @uchar = ether({ value => '0x0123456789abcdef' });
-    @uchar = ether({ value => $uint });
-    @uchar = string({ value => '0x0123456789abcdef' });
-    @uchar = string({ value => 'string containing percent: %25' });
-    @uchar = hexstr({ value => '0x0123456789abcdef' });
-    () = mic({ value => $any });
-
 =head1 DESCRIPTION
 
-This module has functions which is used to encode "human" data
-into list of unsigned characters (0-255) (refered to as "bytes")
-later in the pod. This list can then be encoded into binary data
-using:
+L<DOCSIS::ConfigFile::Encode> has functions which is used to encode "human"
+data into list of unsigned characters (0-255) (refered to as "bytes") later in
+the pod. This list can then be encoded into binary data using:
 
-    $bytestr = pack 'C*', @uchar;
+  $bytestr = pack 'C*', @uchar;
 
 =head1 FUNCTIONS
-
-=head2 snmp_object
-
-This function encodes a human-readable SNMP oid into a list of bytes:
-
-    @bytes = (
-      #-type---length---------value-----type---
-        0x30,  $total_length,         # object
-        0x06,  int(@oid),     @oid,   # oid
-        $type, int(@value),   @value, # value
-    );
 
 =head2 bigint
 
 Returns a list of bytes representing the C<$bigint>. This can be any
 number (negative or positive) which can be representing using 64 bits.
-
-=head2 int
-
-Returns a list of bytes representing the C<$int>. This can be any
-number (negative or positive) which can be representing using 32 bits.
-
-=head2 uint
-
-Returns a list of bytes representing the C<$uint>. This can be any
-positive number which can be representing using 32 bits.
-
-=head2 ushort
-
-Returns a list of bytes representing the C<$ushort>. This can be any
-positive number which can be representing using 16 bits.
-
-=head2 uchar
-
-Returns a list with one byte representing the C<$uchar>. This can be any
-positive number which can be representing using 8 bits.
-
-=head2 vendorspec
-
-Will byte-encode a complex vendorspec datastructure.
-
-=head2 ip
-
-Returns a list of four bytes representing the C<$ip>. The C<$ip> must
-be in in the format "1.2.3.4".
 
 =head2 ether
 
@@ -411,10 +314,46 @@ input value. It will figure out the function to use by checking
 the input for either integer value or a string looking like
 a hex-string.
 
+=head2 hexstr
+
+Will encode any hex encoded string into a list of bytes. The string
+can have an optional leading "0x".
+
+=head2 int
+
+Returns a list of bytes representing the C<$int>. This can be any
+number (negative or positive) which can be representing using 32 bits.
+
+=head2 ip
+
+Returns a list of four bytes representing the C<$ip>. The C<$ip> must
+be in in the format "1.2.3.4".
+
 =head2 objectid
 
 Encodes MIB number as value of C<OBJECTID>
 can be in format: 1.2.3.4, .1.2.3.4
+
+=head2 mic
+
+Cannot encode CM/CMTS mic without complete information about
+the config file, so this function returns an empty list.
+
+=head2 no_value
+
+This method will return an empty list. It is used by DOCSIS types, which
+has zero length.
+
+=head2 snmp_object
+
+This function encodes a human-readable SNMP oid into a list of bytes:
+
+  @bytes = (
+    #-type---length---------value-----type---
+    0x30,  $total_length,         # object
+    0x06,  int(@oid),     @oid,   # oid
+    $type, int(@value),   @value, # value
+  );
 
 =head2 string
 
@@ -432,30 +371,39 @@ Returns a list of bytes representing the C<$str> with a zero
 terminator at the end. The "\0" byte will be added unless
 seen as the last element in the list.
 
-Only ServiceClassName needs this, see L<DOCSIS::ConfigFile::Syminfo>
-for more details.
+Only ServiceClassName needs this, see C<$DOCSIS::ConfigFile::TREE> for more
+details.
 
-=head2 hexstr
+=head2 uchar
 
-Will encode any hex encoded string into a list of bytes. The string
-can have an optional leading "0x".
+Returns a list with one byte representing the C<$uchar>. This can be any
+positive number which can be representing using 8 bits.
 
-=head2 mic
+=head2 uint
 
-Cannot encode CM/CMTS mic without complete information about
-the config file, so this function returns an empty list.
+Returns a list of bytes representing the C<$uint>. This can be any
+positive number which can be representing using 32 bits.
 
-=head2 no_value
+=head2 ushort
 
-This method will return an empty list. It is used by DOCSIS types, which
-has zero length.
+Returns a list of bytes representing the C<$ushort>. This can be any
+positive number which can be representing using 16 bits.
+
+=head2 ushort_list
+
+Returns a list of bytes representing the C<$ushort>. This can be any
+positive number which can be representing using 16 bits.
 
 =head2 vendor
 
 Will byte-encode a complex vendorspec datastructure.
 
-=head1 AUTHOR
+=head2 vendorspec
 
-Jan Henning Thorsen - C<jhthorsen@cpan.org>
+Will byte-encode a complex vendorspec datastructure.
+
+=head1 SEE ALSO
+
+L<DOCSIS::ConfigFile>
 
 =cut

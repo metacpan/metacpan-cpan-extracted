@@ -4,11 +4,12 @@ use Mojo::Base -base;
 use LinkEmbedder::Link;
 use Mojo::JSON;
 use Mojo::Loader 'load_class';
+use Mojo::Promise;
 use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '0.05';
+our $VERSION = '1.01';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -16,30 +17,31 @@ has ua => sub { Mojo::UserAgent->new->max_redirects(3); };
 
 has url_to_link => sub {
   return {
-    'default'            => 'LinkEmbedder::Link::Basic',
-    'appear.in'          => 'LinkEmbedder::Link::AppearIn',
-    'git.io'             => 'LinkEmbedder::Link::Github',
-    'github.com'         => 'LinkEmbedder::Link::Github',
-    'google'             => 'LinkEmbedder::Link::Google',
-    'imgur.com'          => 'LinkEmbedder::Link::Imgur',
-    'ix.io'              => 'LinkEmbedder::Link::Ix',
-    'instagram.com'      => 'LinkEmbedder::Link::oEmbed',
-    'metacpan.org'       => 'LinkEmbedder::Link::Metacpan',
-    'paste.opensuse.org' => 'LinkEmbedder::Link::OpenSUSE',
-    'paste.scsys.co.uk'  => 'LinkEmbedder::Link::Shadowcat',
-    'pastebin.com'       => 'LinkEmbedder::Link::Pastebin',
-    'spotify'            => 'LinkEmbedder::Link::Spotify',
-    'ted.com'            => 'LinkEmbedder::Link::oEmbed',
-    'travis-ci.org'      => 'LinkEmbedder::Link::Travis',
-    'twitter.com'        => 'LinkEmbedder::Link::Twitter',
-    'vimeo.com'          => 'LinkEmbedder::Link::oEmbed',
-    'xkcd.com'           => 'LinkEmbedder::Link::Xkcd',
-    'youtube.com'        => 'LinkEmbedder::Link::oEmbed',
+    'default'                 => 'LinkEmbedder::Link::Basic',
+    'appear.in'               => 'LinkEmbedder::Link::AppearIn',
+    'git.io'                  => 'LinkEmbedder::Link::Github',
+    'github.com'              => 'LinkEmbedder::Link::Github',
+    'google'                  => 'LinkEmbedder::Link::Google',
+    'imgur.com'               => 'LinkEmbedder::Link::Imgur',
+    'ix.io'                   => 'LinkEmbedder::Link::Ix',
+    'instagram.com'           => 'LinkEmbedder::Link::oEmbed',
+    'metacpan.org'            => 'LinkEmbedder::Link::Metacpan',
+    'paste.fedoraproject.org' => 'LinkEmbedder::Link::Fpaste',
+    'paste.opensuse.org'      => 'LinkEmbedder::Link::OpenSUSE',
+    'paste.scsys.co.uk'       => 'LinkEmbedder::Link::Shadowcat',
+    'pastebin.com'            => 'LinkEmbedder::Link::Pastebin',
+    'spotify'                 => 'LinkEmbedder::Link::Spotify',
+    'ted.com'                 => 'LinkEmbedder::Link::oEmbed',
+    'travis-ci.org'           => 'LinkEmbedder::Link::Travis',
+    'twitter.com'             => 'LinkEmbedder::Link::Twitter',
+    'vimeo.com'               => 'LinkEmbedder::Link::oEmbed',
+    'xkcd.com'                => 'LinkEmbedder::Link::Xkcd',
+    'youtube.com'             => 'LinkEmbedder::Link::oEmbed',
   };
 };
 
-sub get {
-  my ($self, $args, $cb) = @_;
+sub get_p {
+  my ($self, $args) = @_;
   my ($e, $link);
 
   $args = ref $args eq 'HASH' ? {%$args} : {url => $args};
@@ -48,20 +50,15 @@ sub get {
 
   $link ||= delete $args->{class};
   $link ||= ucfirst $1 if $args->{url} =~ $PROTOCOL_RE;
-  return $self->_invalid_input($args, 'Invalid URL', $cb) unless $link or $args->{url}->host;
+  return $self->_invalid_input($args, 'Invalid URL') unless $link or $args->{url}->host;
 
   $link ||= _host_in_hash($args->{url}->host, $self->url_to_link);
   $link = $link =~ /::/ ? $link : "LinkEmbedder::Link::$link";
-  return $self->_invalid_input($args, "Could not find $link", $cb) unless _load($link);
+  return $self->_invalid_input($args, "Could not find $link") unless _load($link);
+
   warn "[LinkEmbedder] $link->new($args->{url})\n" if DEBUG;
   $link = $link->new($args);
-
-  # blocking
-  return $link->learn unless $cb;
-
-  # non-blocking
-  Mojo::IOLoop->delay(sub { $link->learn(shift->begin) }, sub { $self->$cb($link) });
-  return $self;
+  return $link->learn_p->then(sub { return $link });
 }
 
 sub serve {
@@ -72,25 +69,20 @@ sub serve {
   $args ||= {url => $c->param('url')};
   $log_level = delete $args->{log_level} || 'debug';
 
-  $c->delay(
-    sub { $self->get($args, shift->begin) },
-    sub {
-      my ($delay, $link) = @_;
-      my $err = $link->error;
+  $c->render_later;
+  $self->get_p($args)->then(sub {
+    my $link = shift;
+    my $err  = $link->error;
 
-      $c->stash(status => $err->{code} || 500) if $err;
-      return $c->render(data => $link->html) if $format eq 'html';
+    $c->stash(status => $err->{code} || 500) if $err;
+    return $c->render(data => $link->html) if $format eq 'html';
 
-      my $json = $err ? {err => $err->{code} || 500} : $link->TO_JSON;
-      if ($format eq 'jsonp') {
-        my $cb = $c->param('callback') || 'oembed';
-        $c->render(data => sprintf '%s(%s)', $cb, Mojo::JSON::to_json($json));
-      }
-      else {
-        $c->render(json => $json);
-      }
-    },
-  );
+    my $json = $err ? {err => $err->{code} || 500} : $link->TO_JSON;
+    $c->render(json => $json) unless $format eq 'jsonp';
+
+    my $name = $c->param('callback') || 'oembed';
+    $c->render(data => sprintf '%s(%s)', $name, Mojo::JSON::to_json($json));
+  })->catch(sub { $c->reply->exception(shift) });
 
   return $self;
 }
@@ -107,17 +99,9 @@ sub _host_in_hash {
 }
 
 sub _invalid_input {
-  my ($self, $args, $msg, $cb) = @_;
-
+  my ($self, $args, $msg) = @_;
   $args->{error} = {message => $msg, code => 400};
-  my $link = LinkEmbedder::Link->new($args);
-
-  # blocking
-  return $link unless $cb;
-
-  # non-blocking
-  Mojo::IOLoop->next_tick(sub { $self->$cb($link) });
-  return $self;
+  return Mojo::Promise->new->resolve(LinkEmbedder::Link->new($args));
 }
 
 sub _load {
@@ -140,8 +124,10 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
   use LinkEmbedder;
 
   my $embedder = LinkEmbedder->new;
-  my $link     = $embedder->get("http://xkcd.com/927");
-  print $link->html;
+  $embedder->get_p("http://xkcd.com/927")->then(sub {
+    my $link = shift;
+    print $link->html;
+  })->wait;
 
 =head1 DESCRIPTION
 
@@ -191,6 +177,10 @@ Example: L<http://home.thorsen.pm/demo/link-embedder?url=https%3A%2F%2Fwww.googl
 =item * L<https://metacpan.org>
 
 Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://metacpan.org/pod/Mojolicious>
+
+=item * L<https://paste.fedoraproject.org/>
+
+Example: L<http://home.thorsen.pm/demo/link-embedder?https://paste.fedoraproject.org/paste/9qkGGjN-D3fL2M-bimrwNQ>
 
 =item * L<http://paste.opensuse.org>
 
@@ -270,10 +260,9 @@ Holds a mapping between host names and L<link class|LinkEmbedder::Link> to use.
 
 =head1 METHODS
 
-=head2 get
+=head2 get_p
 
-  $self = $self->get($url, sub { my ($self, $link) = @_; });
-  $link = $self->get($url);
+  $promise = $self->get_p($url)->then(sub { my $link = shift });
 
 Used to construct a new L<LinkEmbedder::Link> object and retrieve information
 about the URL.

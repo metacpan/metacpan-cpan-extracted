@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-my $plan; BEGIN { $plan = 5 * 70 + 2 }; # Constructs + old
+my $plan; BEGIN { $plan = 5 * 70 + 2 + 5 * 64 }; # Constructs + old + alias
 
 use FindBin;
 use Test::More tests => $plan;
@@ -16,7 +16,7 @@ my %constructs;
 
 my $libfile = $INC{'Syntax/Construct.pm'};
 open my $IN, '<', $libfile or die $!;
-my $version;
+my ($version, $in_alias, %aliases);
 while (my $line = <$IN>) {
     if (my ($v) = $line =~ /^=head2 ([.0-9]+|old)/) {
         $version = $v;
@@ -26,6 +26,14 @@ while (my $line = <$IN>) {
             $constructs{$constr}{pod}++;
             $constructs{$constr}{version}{$version}++;
         }
+
+    } elsif (my ($aliases) = $line =~ /^Alias(?:es)?: (.*)$/) {
+        $aliases{$_}{doc}++ for split ' ', $aliases;
+
+    } elsif ($in_alias
+             and my ($alias, $name) = $line =~ /'(\S+)' => '(\S+)'/
+    ) {
+        $aliases{$alias}{alias}{$name}++;
 
     } elsif ($line =~ / (?:'(5\.[0-9]{3}(?:[0-9]{3})?)'|(old)) => \[qw\[$/) {
         my $v = $1 || $2;
@@ -39,7 +47,14 @@ while (my $line = <$IN>) {
              = $line =~ / '([^']*)' +=> '(5\.[0-9]{3}(?:[0-9]{3})?)',$/
     ) {
         $constructs{$removed_construct}{removed}{$rm_version}++;
+
+    } elsif ($line =~ /my %alias = \(/) {
+        $in_alias = 1;
+
+    } elsif ($in_alias && $line =~ /\);/) {
+        undef $in_alias;
     }
+
 }
 
 open my $TEST, '<', "$FindBin::Bin/02-constructs.t" or die $!;
@@ -67,6 +82,16 @@ for my $constr (sort keys %constructs) {
         is(keys %{ $constructs{$constr}{removed} }, 1, "$constr removed once");
     }
 
+}
+
+for my $alias (keys %aliases) {
+    ok(exists $aliases{$alias}{doc}, "$alias is documented");
+    is($aliases{$alias}{doc}, 1, "$alias is documented once");
+
+    ok(exists $aliases{$alias}{alias}, "$alias is declared");
+    is(keys %{ $aliases{$alias}{alias} }, 1, "$alias is unique");
+    is((values %{ $aliases{$alias}{alias} })[0], 1,
+       "$alias is declared once");
 }
 
 }

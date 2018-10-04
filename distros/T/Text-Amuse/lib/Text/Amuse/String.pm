@@ -21,9 +21,11 @@ Constructor
 =cut
 
 sub new {
-    my ($class, $string) = @_;
-    my $self;
-    $self->{_raw_string} = $string;
+    my ($class, $string, $lang) = @_;
+    my $self = {
+                _raw_string => $string,
+                _lang => $lang || 'en',
+               };
     bless $self, $class;
     return $self;
 };
@@ -64,6 +66,8 @@ They return nothing, but nevertheless the Output module won't complain.
 
 =item attachments
 
+=item language_code
+
 =back
 
 =cut
@@ -81,5 +85,8 @@ sub attachments {
     return;
 }
 
+sub language_code {
+    shift->{_lang};
+}
 
 1;

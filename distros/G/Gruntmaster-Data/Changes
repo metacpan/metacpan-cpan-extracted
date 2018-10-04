@@ -1,0 +1,85 @@
+Revision history for Perl extension Gruntmaster::Data.
+
+6000.001 2018-10-03T21:15+03:00
+ - First stable release
+ - Computation of standings now ignores jobs that are not finished
+ - Set search_path in dbinit to make it easy to put all gruntmaster
+   tables into their own schema.
+
+5999.000_016 2016-03-12T20:05+02:00
+ - Add gm edit command
+ - Make gm rerun also work with problems
+ - Purge standings in finish_job
+ - Purge problem/contest list after adding problem/contest
+
+5999.000_015 2015-10-10T14:36+03:00
+ - Make t/tools.t not crash when postgres is not running
+
+5999.000_014 2015-10-02T22:10+03:00
+ - Almost fit for a stable release (more real-world testing needed)
+ - Replace gruntmaster-* tools with an App::Cmd-based script
+ - Replace DBIx::Class with DBIx::Simple
+ - Add sample database and more tests
+ - Add gruntmaster-opener
+ - Many other smaller changes
+
+5999.000_013 2014-12-20T23:20+02:00
+ - Improve user_list performance
+ - Sort problem and contest lists in user_entry
+ - Add a purge sub and use it where needed.
+ - Add table and column comments
+ - Make job_list only return public jobs
+
+5999.000_012 2014-12-13T18:20+02:00
+ - Add solution to pb_entry
+ - Add {problem,contest}_status tables and a method that updates them
+ - Improve performance of standings, move it to Result/Contest.pm
+ - Add many new keys to us_entry
+ - Remove support for archive standings
+
+5999.000_011 2014-12-07T00:55+02:00
+ - Make problem value NOT NULL
+ - Add contest_start and contest_stop to pb_entry
+ - Use perlcritic
+ - Add a "solution" column to problem
+
+5999.000_010 2014-10-05T00:32+03:00
+ - Depend on PerlX::Maybe
+ - Switch from JSON.pm to JSON::MaybeXS
+
+5999.000_009 2014-09-28T00:02+03:00
+ - Add page information to job_list
+ - Prevent experimental reference usage warnings
+
+5999.000_008 2014-08-03T00:25+03:00
+ - Add a method for computing standings.
+ - Depend on Authen::Passphrase(::BlowfishCrypt)
+ - Fix bugs in user_list and set_passphrase
+
+5999.000_007 2014-07-20T01:38+03:00
+ - Add some utility functions.
+
+5999.000_006 2014-05-25T00:02+03:00
+ - Attempt to use correct perl in tools.t
+
+5999.000_005 2014-05-17T12:30+03:00
+ - Depend on DBIx::Class directly
+
+5999.000_004 2014-05-17T10:52+03:00
+ - Build-Depend on SQL::Translator
+ - Fix version
+
+5999.000_003 2014-05-16T19:31+03:00
+ - Use Postgres (via DBIx::Class) instead of Redis
+ - Change license to perl
+ - Improve tools
+ - Add tests
+
+5999.000_002 2014-02-28T18:07+02:00
+ - Move most problem attributes outside problem_meta
+ - Add the HGETALL Redis command
+ - Add functions for getting/setting the last submit time of a user.
+
+5999.000_001 2014-02-02T01:01+02:00
+ - Initial release
+

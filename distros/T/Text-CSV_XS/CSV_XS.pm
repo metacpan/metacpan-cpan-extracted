@@ -26,7 +26,7 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.36";
+$VERSION   = "1.37";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
 XSLoader::load "Text::CSV_XS", $VERSION;
@@ -829,6 +829,8 @@ sub header {
 	croak (q{usage: $csv->header ($fh, [ seps ], { options })});
 	}
 
+    defined $args{munge} && !defined $args{munge_column_names} and
+	$args{munge_column_names} = $args{munge}; # munge as alias
     defined $args{detect_bom}         or $args{detect_bom}         = 1;
     defined $args{set_column_names}   or $args{set_column_names}   = 1;
     defined $args{munge_column_names} or $args{munge_column_names} = "lc";
@@ -2292,8 +2294,8 @@ L</error_diag> will return a string like
 =head2 known_attributes
 X<known_attributes>
 
- @attr = Text::CSV_CS->known_attributes;
- @attr = Text::CSV_CS::known_attributes;
+ @attr = Text::CSV_XS->known_attributes;
+ @attr = Text::CSV_XS::known_attributes;
  @attr = $csv->known_attributes;
 
 This method will return an ordered list of all the supported  attributes as

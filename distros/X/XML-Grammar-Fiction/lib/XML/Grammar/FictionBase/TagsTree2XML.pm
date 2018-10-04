@@ -1,11 +1,9 @@
 package XML::Grammar::FictionBase::TagsTree2XML;
-
+$XML::Grammar::FictionBase::TagsTree2XML::VERSION = 'v0.15.0';
 use strict;
 use warnings;
 
 use MooX 'late';
-
-our $VERSION = 'v0.14.12';
 
 use XML::Writer;
 use HTML::Entities ();
@@ -435,11 +433,11 @@ to XML converters.
 
 =head1 VERSION
 
-version v0.14.12
+version v0.15.0
 
 =head1 VERSION
 
-Version 0.14.12
+version v0.15.0
 
 =head2 $self->convert({ source => { file => $path_to_file } })
 
@@ -481,7 +479,7 @@ feature.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc XML::Grammar::Fiction
+  perldoc XML::Grammar::FictionBase::TagsTree2XML
 
 =head2 Websites
 
@@ -496,7 +494,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/XML-Grammar-Fiction>
+L<https://metacpan.org/release/XML-Grammar-Fiction>
 
 =item *
 
@@ -532,14 +530,6 @@ L<http://cpanratings.perl.org/d/XML-Grammar-Fiction>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/XML-Grammar-Fiction>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -550,7 +540,7 @@ L<http://cpants.cpanauthors.org/dist/XML-Grammar-Fiction>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/X/XML-Grammar-Fiction>
 

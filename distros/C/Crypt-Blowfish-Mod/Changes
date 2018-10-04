@@ -1,13 +1,21 @@
-Sat Nov 14 09:19:19 CET 2009
+0.05 Mon Oct  1 19:55:46 CEST 2018
+  * fixed broken utf8 encoding
+  * WARNING: this is a breaking change!
+    If you are storing encrypted utf8 strings
+    but not decrypting them, if you try to compare
+    the output of encrypt() previous to 0.05 and the current (fixed)
+    encrypt() method the result will not match! Use encrypt_legacy()
+    for that purpose.
+0.04 Sat Nov 14 09:19:19 CET 2009
   * New methods in the api
   * Fixed error messages
   * More docs and tests
 
-Thu, 12 Nov 2009 10:00:00 +0100
+0.03 Thu, 12 Nov 2009 10:00:00 +0100
   * Fixed test errors on Linux
 
-Tue, 10 Nov 2009 08:34:10 +0100
+0.02 Tue, 10 Nov 2009 08:34:10 +0100
   * Fixed dependencies
 
-Mon, 09 Nov 2009 23:34:04 +0100
+0.01 Mon, 09 Nov 2009 23:34:04 +0100
   * Initial Release

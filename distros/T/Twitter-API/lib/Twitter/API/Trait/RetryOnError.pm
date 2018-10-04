@@ -1,6 +1,6 @@
 package Twitter::API::Trait::RetryOnError;
 # ABSTRACT: Automatically retry API calls on error
-$Twitter::API::Trait::RetryOnError::VERSION = '1.0003';
+$Twitter::API::Trait::RetryOnError::VERSION = '1.0005';
 use Moo::Role;
 use Time::HiRes;
 use namespace::clean;
@@ -113,7 +113,7 @@ Twitter::API::Trait::RetryOnError - Automatically retry API calls on error
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 

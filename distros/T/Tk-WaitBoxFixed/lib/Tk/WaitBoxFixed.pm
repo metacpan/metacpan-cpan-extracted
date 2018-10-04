@@ -27,6 +27,8 @@
 ## Ver 1.4 Cavac: Added some fixes
 ## Ver 1.5 Cavac: Added some fixes
 ## Ver 1.6 Cavac, ASB: fixes and cleanup of POD
+## Ver 1.7 Cavac, added use warnings, increased kwalitee
+## Ver 1.8 Cavac and Alex Becker, Updated documentation
 ##
 ###############################################################################
 ###############################################################################
@@ -34,13 +36,14 @@
 package Tk::WaitBoxFixed;
 
 use strict;
+use warnings;
 use Tk::Toplevel;
 
 @Tk::WaitBoxFixed::ISA = qw (Tk::Toplevel);
 
 Tk::Widget->Construct('WaitBoxFixed');
 
-$Tk::WaitBoxFixed::VERSION = '1.6';
+$Tk::WaitBoxFixed::VERSION = '1.8';
 
 ### A couple of convenience variables
 my(@wd_fullpack) = (-expand => 1, -fill => 'both');
@@ -315,12 +318,12 @@ Copyright(c) 1996-2000 Brent B. Powers. All rights reserved.
 This program is free software, you may redistribute it and/or modify
 it under the same terms as Perl itself.
 
-B<Rene Schickbauer> rene.schickbauer@magnapowertrain.com
+B<Rene Schickbauer> cavac@cpan.org
 
-(C) 2013, Rene Schickbauer, same license
+(C) 2013-2018, Rene Schickbauer, same license
 
 B<Alexander Becker>, asb@cpan.org
 
-(C) 2016 Alexander Becker, same license
+(C) 2016-2018 Alexander Becker, same license
 
 =cut

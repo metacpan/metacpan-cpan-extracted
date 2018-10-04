@@ -1,5 +1,5 @@
 {
-   "abstract" : "Render SQL statements templates by Mojo::Template",
+   "abstract" : "Render SQL statements by Mojo::Template",
    "author" : [
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Clone" : "0",
             "Hash::Merge" : "0.2",
-            "Mojolicious" : "6",
+            "Mojolicious" : "7",
             "perl" : "5.006"
          }
       }
@@ -47,6 +47,6 @@
          "web" : "https://github.com/mche/DBIx-Mojo-Template"
       }
    },
-   "version" : "0.056",
+   "version" : "0.060",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,16 +1,16 @@
-App/Sqitch version 0.9997
+App/Sqitch version 0.9998
 =========================
 
-[![CPAN version](https://badge.fury.io/pl/App-Sqitch.svg)](http://badge.fury.io/pl/App-Sqitch)
-[![Build Status](https://travis-ci.org/theory/sqitch.svg)](https://travis-ci.org/theory/sqitch)
-[![Coverage Status](https://coveralls.io/repos/theory/sqitch/badge.svg)](https://coveralls.io/r/theory/sqitch)
+[![CPAN version](https://badge.fury.io/pl/App-Sqitch.svg)](https://badge.fury.io/pl/App-Sqitch)
+[![Build Status](https://travis-ci.com/sqitchers/sqitch.svg)](https://travis-ci.com/sqitchers/sqitch)
+[![Coverage Status](https://coveralls.io/repos/sqitchers/sqitch/badge.svg)](https://coveralls.io/r/sqitchers/sqitch)
 
-[Sqitch](http://sqitch.org/) is a database change management application. It
+[Sqitch](https://sqitch.org/) is a database change management application. It
 currently supports PostgreSQL 8.4+, SQLite 3.7.11+, MySQL 5.0+, Oracle 10g+,
-Firebird 2.0+, Vertica 6.0+ and Exasol 6.0+.
+Firebird 2.0+, Vertica 6.0+, Exasol 6.0+ and Snowflake.
 
 What makes it different from your typical
-[migration](http://guides.rubyonrails.org/migrations.html) approaches? A few
+[migration](https://guides.rubyonrails.org/migrations.html) approaches? A few
 things:
 
 *   No opinions
@@ -22,11 +22,11 @@ things:
 *   Native scripting
 
     Changes are implemented as scripts native to your selected database
-    engine. Writing a [PostgreSQL](http://postgresql.org/) application? Write
+    engine. Writing a [PostgreSQL](https://postgresql.org/) application? Write
     SQL scripts for
-    [`psql`](http://www.postgresql.org/docs/current/static/app-psql.html).
-    Writing an [Oracle](http://www.oracle.com/us/products/database/)-backed app?
-    Write SQL scripts for [SQL\*Plus](http://www.orafaq.com/wiki/SQL*Plus).
+    [`psql`](https://www.postgresql.org/docs/current/static/app-psql.html).
+    Writing an [Oracle](https://www.oracle.com/database/)-backed app?
+    Write SQL scripts for [SQL\*Plus](https://www.orafaq.com/wiki/SQL*Plus).
 
 *   Dependency resolution
 
@@ -57,6 +57,7 @@ Want to learn more? The best place to start is in the tutorials:
 * [Introduction to Sqitch on Firebird](lib/sqitchtutorial-firebird.pod)
 * [Introduction to Sqitch on Vertica](lib/sqitchtutorial-vertica.pod)
 * [Introduction to Sqitch on Exasol](lib/sqitchtutorial-exasol.pod)
+* [Introduction to Sqitch on Snowflake](lib/sqitchtutorial-snowflake.pod)
 
 There have also been a number of presentations on Sqitch:
 
@@ -69,8 +70,8 @@ There have also been a number of presentations on Sqitch:
   September, 2012.
 
 * [Agile Database Development](https://speakerdeck.com/theory/agile-database-development-2ed):
-  Slides from a three-hour tutorial session on using [Git](http://git-scm.org),
-  test-driven development with [pgTAP](http://pgtap.org), and change
+  Slides from a three-hour tutorial session on using [Git](https://git-scm.org),
+  test-driven development with [pgTAP](https://pgtap.org), and change
   management with Sqitch, updated in January, 2014.
 
 Installation
@@ -84,22 +85,50 @@ To install Sqitch from a distribution download, type the following:
     ./Build test
     ./Build install
 
+To install Sqitch and all of its dependencies into a single directory named
+`sqitch_bundle`, install the Menlo CPAN client and build the bundle:
+
+    cpanm Menlo::CLI::Compat
+    ./Build bundle --install_base sqitch_bundle
+
+After which, Sqitch can be run from `./sqitch_bundle/bin/sqitch`. By default,
+no modules that are included in the core Perl distrituion are included. To
+require that dual-life modules also be bundled, pass `--dual_life 1`:
+
+    ./Build bundle --install_base sqitch_bundle --dual_life 1
+
+To include support for a feature in the bundle, pass the `--with` option
+naming the feature:
+
+    ./Build bundle --install_base sqitch_bundle --with postgres --with sqlite
+
+The feature names generally correspond to the supported engines. The currently
+supported features are:
+
+*   `--with postgres`:  Support for managing PostgreSQL databases
+*   `--with sqlite`:    Support for managing SQLite databases
+*   `--with mysql`:     Support for managing MySQL databases
+*   `--with firebird`:  Support for managing Firebird databases
+*   `--with oracle`:    Support for managing Oracle databases
+*   `--with vertica`:   Support for managing Vertica databases
+*   `--with exasol`:    Support for managing Exasol databases
+*   `--with snowflake`: Support for managing Snowflake databases
+*   `--with odbc`:      Include the ODBC driver
+
 To build from a Git clone, first install
 [Dist::Zilla](https://metacpan.org/module/Dist::Zilla), then use it to install
-Sqitch and its dependencies:
+Sqitch and all dependencies:
 
-    cpan Dist::Zilla
+    cpanm Dist::Zilla
+    dzil authordeps --missing | cpanm
+    dzil listdeps --missing | cpanm
     dzil install
 
-To run Sqitch directly from the Git clone execute `t/sqitch`. If you're doing
-development on Sqitch, you will need to install the authoring dependencies, as
-well:
-
-    dzil listdeps | xargs cpan
+To run Sqitch directly from the Git clone, execute `t/sqitch`.
 
 To install Sqitch on a specific platform, including Debian- and RedHat-derived
 Linux distributions and Windows, see the
-[Installation documentation](http://sqitch.org/#installation).
+[Installation documentation](https://sqitch.org/#installation).
 
 Licence
 -------

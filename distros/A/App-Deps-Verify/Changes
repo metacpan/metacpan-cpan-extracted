@@ -1,4 +1,11 @@
 Revision history for App-Deps-Verify
 
+0.2.1       2018-09-30
+    - Add the plinst sub command.
+        - p5inst was not detected by App-Cmd.
+
+0.2.0       2018-09-30
+    - Add the p5inst sub command.
+
 0.0.1       2018-09-17
     - First version, released on an unsuspecting world

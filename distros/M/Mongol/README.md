@@ -2,7 +2,7 @@
 
 ## Build status
 
-[![Build Status](https://travis-ci.org/marghidanu/mongol.svg?branch=master)](https://travis-ci.org/marghidanu/mongol)
+[![pipeline status](https://gitlab.com/marghidanu/mongol/badges/master/pipeline.svg)](https://gitlab.com/marghidanu/mongol/commits/master)
 
 ## Description
 

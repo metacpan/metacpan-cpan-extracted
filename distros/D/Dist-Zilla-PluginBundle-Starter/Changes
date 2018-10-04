@@ -1,3 +1,6 @@
+v3.0.1    2018-09-25 14:05:14 EDT
+  - Enable inherit_version in [MetaProvides::Package] when managed_versions is used to prevent a possible race condition.
+
 v3.0.0    2018-09-25 00:11:17 EDT
   - Bump [Test::ReportPrereqs] dependency to 0.027 to prevent
     t/00-report-prereqs.dd from being pruned.

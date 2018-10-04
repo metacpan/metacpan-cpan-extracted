@@ -1,9 +1,17 @@
+Overview of changes in Glib::Object::Introspection 0.046
+========================================================
+
+* Makefile.PL: changed location of Git repo/web page
+* perli11ndoc: add support for links in the results display
+* Fix a test failure in t/arrays.t on older versions of gobject-introspection
+* Improve some debug output
+* Hush two compiler warnings by adding missing 'break' statements
+
 Overview of changes in Glib::Object::Introspection 0.045
+========================================================
 
 * Correctly marshal arrays with length arguments in signal callbacks
 * Add some docs about overriding virtual functions
-
-========================================================
 
 Overview of changes in Glib::Object::Introspection 0.044
 ========================================================

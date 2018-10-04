@@ -3,23 +3,23 @@ package Text::CSV::Unicode;
 use strict;
 use warnings;
 
-use base qw(Text::CSV::Base);
+use base qw(Text::CSV);
 
-our $VERSION = '0.201';
+our $VERSION = '0.400';
 
 sub new {
     my ($self, $hash) = @_;
     if ( $hash and $hash -> {binary} ) {
         warnings::warnif("deprecated",
                 "binary is deprecated: use Text::CSV");
-	return Text::CSV::Base->new( $hash );
+	return Text::CSV->new( $hash );
     }
     return $self->SUPER::new( { binary => 1, %{ $hash || {} } } );
 }
 
 sub combine {
     my $self = shift;
-    for (grep defined, @_) { return unless _ok(); }
+    for (grep defined, @_) { return if _bad(); }
     return $self->SUPER::combine(@_);
 }
 
@@ -27,12 +27,12 @@ sub parse {
     my $self = shift;
     for (map +$_, grep defined, @_) {
 	    chomp;
-	    return unless _ok();
+	    return if _bad();
     }
     return $self->SUPER::parse( @_ );
 }
 
-sub _ok { m{\A [\t \P{Cntrl}]* \z}x; }	# test $_
+sub _bad { m{ [^\t\P{Cntrl}] }x; }	# test $_
 
 1;
 
@@ -48,7 +48,7 @@ Text::CSV::Unicode -	comma-separated values manipulation routines
 
     use Text::CSV::Unicode;
 
-    $csv = Text::CSV::Unicode->new( { binary => 1 } );
+    $csv = Text::CSV::Unicode->new();
 
     # then use methods from Text::CSV
 
@@ -70,9 +70,30 @@ Text::CSV::Unicode -	comma-separated values manipulation routines
 Text::CSV::Unicode provides facilities for the composition and
 decomposition of comma-separated values, based on Text::CSV.
 Text::CSV::Unicode allows for input with wide character data
-but does not permit control characters (by default).
+but does not permit control characters.
 
-=head1 FUNCTIONS
+=head1 Incompatible Changes
+
+=head2 Option always_quote=>1 (v0.300)
+
+Before v0.300, the module behaviour defaulted to 
+C<< always_quote => 1 >> in Text::CSV.  
+This behaviour was only needed in tests.
+
+To recreate the old behaviour:
+
+    $csv = Text::CSV::Unicode->new( { always_quote => 1 } );
+
+=head1 DEPRECATED
+
+The option C<< binary => 1 >> does not require this module.
+
+This code issues a 'deprecated' warning and creates a 
+Text::CSV object:
+
+    $csv = Text::CSV::Unicode->new( { binary => 1 } );
+
+=head1 METHODS
 
 =over 4
 
@@ -81,7 +102,7 @@ but does not permit control characters (by default).
 This function may be called as a class or an object method.
 As a class method, it returns the currrent module version.
 As an object method, it returns the version of the underlying
-::Base module.
+Text::CSV module.
 
 =item version
 
@@ -99,7 +120,6 @@ C<< binary => 0 >> allows the same ASCII input as Text::CSV.
 C<< binary => 1 >> allows for all Unicode
 characters in the input (including \r and \n):
 the same functionality as C<< Text::CSV->new( { binary => 1 } >>.
-This option is deprecated.
 
 =item combine
 
@@ -124,10 +144,6 @@ and C<error_input()> can be called to retrieve the invalid argument.
 
 =back
 
-=head1 SUBROUTINES/METHODS
-
-None
-
 =head1 DIAGNOSTICS
 
 None
@@ -139,12 +155,12 @@ See HASH option to C<< ->new >>.
 =head1 DEPENDENCIES
 
 perl 5.8.0
-Text::CSV
 
+Text::CSV 1.0
 
 =head1 VERSION
 
-0.200
+0.400
 
 =head1 AUTHOR
 
@@ -156,14 +172,14 @@ Text::CSV
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2007, 2008, 2010, 2011, 2012 Robin Barker.  
+Copyright (c) 2007, 2008, 2010, 2011, 2012, 2018 Robin Barker.  
 All rights reserved. 
 
-This program is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-The documentation of Text::CSV::Unicode methods that are inherited from
-Text::CSV::Base is taken from Text::CSV 0.01 (with some reformatting) 
+The documentation of Text::CSV::Unicode methods that are inherited 
+from Text::CSV is taken from Text::CSV 0.01 (with some reformatting) 
 and is Copyright (c) 1997 Alan Citterman.
 
 =cut

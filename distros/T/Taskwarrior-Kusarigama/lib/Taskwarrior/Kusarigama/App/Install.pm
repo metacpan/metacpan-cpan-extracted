@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::App::Install;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: install scripts and tweak config for Taskwarrior::Kusarigama
-$Taskwarrior::Kusarigama::App::Install::VERSION = '0.9.2';
+$Taskwarrior::Kusarigama::App::Install::VERSION = '0.9.3';
 
 use 5.10.0;
 
@@ -83,7 +83,7 @@ Taskwarrior::Kusarigama::App::Install - install scripts and tweak config for Tas
 
 =head1 VERSION
 
-version 0.9.2
+version 0.9.3
 
 =head1 SYNOPSIS
 

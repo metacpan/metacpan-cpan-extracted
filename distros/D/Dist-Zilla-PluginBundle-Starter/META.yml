@@ -31,10 +31,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Starter:
     file: lib/Dist/Zilla/MintingProfile/Starter.pm
-    version: v3.0.0
+    version: v3.0.1
   Dist::Zilla::PluginBundle::Starter:
     file: lib/Dist/Zilla/PluginBundle/Starter.pm
-    version: v3.0.0
+    version: v3.0.1
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::BumpVersionAfterRelease: '0'
@@ -83,7 +83,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Starter
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter.git
-version: v3.0.0
+version: v3.0.1
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -180,7 +180,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in:
             - /
-          commit_msg: v%v%n%n%c
+          commit_msg: '%v%n%n%c'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -205,9 +205,9 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: vv3.0.0
-          tag_format: v%v
-          tag_message: v%v
+          tag: v3.0.1
+          tag_format: '%v'
+          tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.14.4
           repo_root: .

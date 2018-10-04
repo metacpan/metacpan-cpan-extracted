@@ -23,7 +23,7 @@ my $bytes = encode_docsis($input);
 is length $bytes, 120, 'encode_docsis';
 
 my $output = decode_docsis($bytes);
-delete $output->{$_} for qw( CmtsMic CmMic GenericTLV );
+delete $output->{$_} for qw(CmtsMic CmMic GenericTLV);
 is_deeply $output, $input, 'decode_docsis';
 
 done_testing;

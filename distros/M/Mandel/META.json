@@ -3,14 +3,14 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mandel",
    "no_index" : {
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -36,6 +34,11 @@
             "Mojolicious" : "6.00",
             "Type::Tiny" : "1.00"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -45,8 +48,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/mandel",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/mandel.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mandel.git",
+         "web" : "https://github.com/jhthorsen/mandel"
       }
    },
-   "version" : "0.29"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

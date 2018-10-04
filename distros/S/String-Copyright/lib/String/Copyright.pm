@@ -14,11 +14,11 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003005
+Version 0.003006
 
 =cut
 
-our $VERSION = '0.003005';
+our $VERSION = '0.003006';
 
 # Dependencies
 use parent 'Exporter::Tiny';

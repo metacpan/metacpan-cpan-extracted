@@ -1,0 +1,41 @@
+Revision history for Perl extension HTML::Tidy5.
+
+The HTML::Tidy5 module is an HTML5-compatible upgrade from the HTML::Tidy
+module.
+
+
+1.04    Fri Apr 20 16:45:00 CDT 2018
+====================================
+[ENHANCEMENTS]
+Added html_fragment_tidy_ok() for running tidy checks against HTML that
+is not a full document.
+
+
+1.02    Wed Apr  4 15:06:44 CDT 2018
+====================================
+[FIXES]
+html_tidy_ok() now clears the messages in a passed-in HTML::Tidy5 object
+before using it to validate the HTML.
+
+
+1.01_01 Mon Mar 26 16:37:13 CDT 2018
+====================================
+[ENHANCEMENTS]
+Add Test::HTML::Tidy5 and the html_tidy_ok() function for testing HTML
+in your .t files.
+
+[FIXES]
+Fixed test failure.
+
+
+1.00    Tue Mar 20 16:51:52 CDT 2018
+====================================
+First production release.  HTML::Tidy5 relies on version 5.6.0 of the
+tidy-html5 library.  See http://html-tidy.org/ for information about
+the tidy-html5 library.
+
+
+[INCOMPATIBILITIES WITH HTML::Tidy]
+In HTML::Tidy, HTML::Tidy::Message objects had overloaded string context.
+In HTML::Tidy5, you must explicitly call the ->as_string method for
+HTML::Tidy5::Message.

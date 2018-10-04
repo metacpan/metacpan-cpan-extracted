@@ -1,6 +1,6 @@
 package Twitter::API::Trait::AppAuth;
 # ABSTRACT: App-only (OAuth2) Authentication
-$Twitter::API::Trait::AppAuth::VERSION = '1.0003';
+$Twitter::API::Trait::AppAuth::VERSION = '1.0005';
 use Moo::Role;
 use Carp;
 use URL::Encode qw/url_encode url_decode/;
@@ -34,7 +34,7 @@ my $add_consumer_auth_header = sub {
 #pod stored in Twitter::API's state. If you want that, set the C<access_token>
 #pod attribute with the returned token.
 #pod
-#pod See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
+#pod See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/token> for details.
 #pod
 #pod =cut
 
@@ -56,7 +56,7 @@ sub oauth2_token {
 #pod =method invalidate_token($token)
 #pod
 #pod Calls the C<oauth2/invalidate_token> endpoint to revoke a token. See
-#pod L<https://dev.twitter.com/oauth/reference/post/oauth2/invalidate/token> for
+#pod L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/invalidate_token> for
 #pod details.
 #pod
 #pod =cut
@@ -103,7 +103,7 @@ Twitter::API::Trait::AppAuth - App-only (OAuth2) Authentication
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 
@@ -137,12 +137,12 @@ Call the C<oauth2/token> endpoint to get a bearer token. The token is not
 stored in Twitter::API's state. If you want that, set the C<access_token>
 attribute with the returned token.
 
-See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/token> for details.
 
 =head2 invalidate_token($token)
 
 Calls the C<oauth2/invalidate_token> endpoint to revoke a token. See
-L<https://dev.twitter.com/oauth/reference/post/oauth2/invalidate/token> for
+L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/invalidate_token> for
 details.
 
 =head1 AUTHOR

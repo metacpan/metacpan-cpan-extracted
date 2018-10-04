@@ -66,7 +66,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.0';
+our $VERSION  = '8.02';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -503,6 +503,9 @@ L</"plugin"> method below if you want to load a plugin.
 Used to render content, defaults to a L<Mojolicious::Renderer> object. For more
 information about how to generate content see
 L<Mojolicious::Guides::Rendering>.
+
+  # Enable compression
+  $app->renderer->compress(1);
 
   # Add another "templates" directory
   push @{$app->renderer->paths}, '/home/sri/templates';

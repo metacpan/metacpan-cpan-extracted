@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart );
 
-$VERSION = '0.013';
+$VERSION = '0.015';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of gradients weighted proportionally to multidimensional distances.';
 
 #######################################################################
@@ -41,7 +41,7 @@ $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, m
 
 my $maxloops= 1000;
 my $sourcefile = "/home/luca/int/starcloud_micro.csv";
-my $newfile = $sourcefile . "_micro_cy_1_1_1_new.csv";
+my $newfile = $sourcefile . "_meta.csv";
 my $report = $newfile . "_report.txt";
 my @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
 #my @mode = ( "near" ); # "nea" means "nearest neighbour"

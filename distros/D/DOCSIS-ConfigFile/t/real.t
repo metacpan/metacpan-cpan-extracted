@@ -43,7 +43,7 @@ else {
   ok(0, 'cannot run diff without decoded binary');
 }
 
-unless ($ENV{'KEEP_DOCSIS_FILES'}) {
+unless ($ENV{KEEP_DOCSIS_FILES}) {
   unlink map {
     my $n = $_;
     map {"t/data/$n.$_"} qw/ bin hex c json /
@@ -74,8 +74,8 @@ sub hexdump {
 sub generate_binary {
   my $binary = '';
 
-  if ($ENV{'DOCSIS_INPUT_FILE'}) {
-    open my $FH, '<', $ENV{'DOCSIS_INPUT_FILE'};
+  if ($ENV{DOCSIS_INPUT_FILE}) {
+    open my $FH, '<', $ENV{DOCSIS_INPUT_FILE};
     local $/;
     $binary = <$FH>;
   }

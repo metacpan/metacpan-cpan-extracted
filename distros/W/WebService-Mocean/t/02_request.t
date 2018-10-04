@@ -11,12 +11,12 @@ my ($response, $expect) = ('', '');
 
 my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
 
-$response = $mocean_api->_request();
-$expect = {};
-is_deeply($response, $expect, 'expect empty request response');
+dies_ok {
+    $response = $mocean_api->_request();
+} 'expect die on missing command';
 
 dies_ok {
-    $mocean_api->_request(undef, undef, undef, 'gets')
+    $mocean_api->_request(undef, undef, 'gets')
 } 'expect die on invalid HTTP verb';
 
 done_testing;

@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary;
-$Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary - Parse AMEX Reconcilia
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

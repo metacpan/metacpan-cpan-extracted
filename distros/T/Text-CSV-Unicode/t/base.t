@@ -7,16 +7,11 @@
 # (It may become useful if the test is moved to ./t subdirectory.)
 
 use strict;
+use warnings;
 my $loaded;
-BEGIN { 
-    if( ! eval { require charnames } ) {
-	print "1..0 # SKIP charnames required\n"; 
-	exit; 
-    } 
-}
 BEGIN { $| = 1; print "1..20\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use Text::CSV::Base;
+use Text::CSV;
 $loaded = 1;
 print "ok 1\n";
 
@@ -27,19 +22,21 @@ print "ok 1\n";
 # of the test code):
 
 #
+# Test non-existent package Text::CSV::Base
+#
+@Text::CSV::Base::ISA = qw(Text::CSV);
+
+#
 # empty subclass test
 #
-package Empty_Subclass;
-our @ISA = qw(Text::CSV::Base);
-package main;
-my $empty = Empty_Subclass->new();
+my $empty = Text::CSV::Base->new();
 if ($empty->version() and $empty->parse('') and $empty->combine('')) {
   print "ok 2\n";
 } else {
   print "not ok 2\n";
 }
 
-my $csv = Text::CSV::Base->new();
+my $csv = Text::CSV::Base->new( { always_quote => 1 } );
 
 if (! $csv->combine()) {  # fail - missing argument
   print "ok 3\n";
@@ -137,5 +134,3 @@ if ($csv->status()) {  # success - test #19 should have succeeded
 } else {
   print "not ok 20\n";  
 }
-
-# $Id$

@@ -1,0 +1,21 @@
+Revision history for Graphics-ColorNames-Netscape:
+
+v3.1.2    2018-09-30 22:20:10+01:00 Europe/London
+  [Documentation]
+  - Fix typo in Changes.
+
+  [Tests]
+  - Removed prerequisite of Graphics::ColorNames for tests, #1.
+
+v3.1.1    2018-09-30 14:46:12+01:00 Europe/London
+  [Other]
+  - Changed licence to Creative Commons.
+
+v3.1.0    2018-09-30 13:24:34+01:00 Europe/London
+  [Incompatabilities]
+  - Split into separate distribution from Graphics-ColorNames
+
+  [Documentation]
+  - Use archive.org link to original web page.
+
+  - Updated contributor names.

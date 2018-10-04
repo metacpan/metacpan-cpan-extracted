@@ -23,4 +23,6 @@ requires:
   Carp: 0
   Scalar::Util: 0
   perl: 5.006
-version: 0.03
+resources:
+  repository: https://github.com/mr-mixas/Struct-Path-JsonPointer.pm
+version: 0.04

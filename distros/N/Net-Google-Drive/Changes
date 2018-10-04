@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Google::Drive.
+
+0.01  Tue Oct  2 16:38:01 2018
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.8 -XAn Net::Google::Drive
+

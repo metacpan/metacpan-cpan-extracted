@@ -14,7 +14,8 @@ my @urls = (
 );
 
 for my $url (@urls) {
-  my $link = $embedder->get($url);
+  my $link;
+  $embedder->get_p($url)->then(sub { $link = shift })->wait;
   isa_ok($link, 'LinkEmbedder::Link::OpenSUSE');
   cmp_deeply(
     $link->TO_JSON,

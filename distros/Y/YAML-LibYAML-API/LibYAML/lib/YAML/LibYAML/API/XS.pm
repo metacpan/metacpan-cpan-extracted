@@ -2,10 +2,14 @@ package YAML::LibYAML::API::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use XSLoader;
 XSLoader::load('YAML::LibYAML::API::XS', $VERSION);
+
+sub parse_events {
+    parse_string_events(@_);
+}
 
 1;
 

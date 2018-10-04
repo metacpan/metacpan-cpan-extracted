@@ -2,7 +2,7 @@ package Mojolicious::Plugin::ContextResources;
 use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions   qw(catfile);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Get current context path
 sub _context($) {
@@ -26,7 +26,7 @@ sub register {
 
     # Path
     $conf->{home}       //= $app->home;
-    $conf->{public}     //= '/public';
+    $conf->{public}     //= 'public';
     $conf->{js}         //= '/js';
     $conf->{css}        //= '/css';
 

@@ -1,0 +1,240 @@
+#!/usr/local/bin/perl
+
+# Display Sun and planet rise and set for a pre-programmed position. The
+# -help option gets you help.
+
+use 5.008;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::Utils qw{ deg2rad };
+use Getopt::Long 2.33;
+use Pod::Usage;
+use POSIX qw{ strftime };
+use Time::Local;
+
+our $VERSION = '0.001';
+
+my %opt;
+
+if ( $ENV{VSOP87D_ALMANAC_OPTIONS} ) {
+    require Text::ParseWords;
+    %opt = Text::ParseWords::shellwords( $ENV{VSOP87D_ALMANAC_OPTIONS} );
+}
+
+{
+    my %dflt = (
+	format		=> '%d-%b-%Y %H:%M:%S %Z',
+	height		=> 16.68,
+	latitude	=> 38.898748,
+	longitude	=> -77.037684,
+    );
+    foreach my $key ( keys %dflt ) {
+	defined $opt{$key}
+	    or $opt{$key} = $dflt{$key};
+    }
+}
+
+GetOptions( \%opt,
+    qw{ date=s format=s gmt!
+    height=f latitude=f longitude=f
+    model=s tomorrow! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+my @planets = @ARGV ? @ARGV : qw{
+    Sun Mercury Venus Mars Jupiter Saturn Uranus Neptune
+};
+
+# Start time is the previous midnight. Unless -tomorrow is set, in which
+# case it's the next midnight.
+
+my $start;
+if ( defined $opt{date} ) {
+    require Date::Manip;
+    $start = Date::Manip::UnixDate( $opt{date}, '%s' )
+	or die "Invalid date $opt{date}\n";
+} else {
+    my @t = $opt{gmt} ? gmtime : localtime;
+    $start = timelocal (0, 0, 0, @t[3 .. 5]);
+    $start += 86400 if $opt{tomorrow};
+}
+
+# The end time is the start time + 1 day.
+
+my $finish = $start + 86400;
+
+# Create an object representing our location. Remember that angles are
+# in radians, and distance in kilometers.
+
+my $loc = Astro::Coord::ECI->geodetic(
+    deg2rad( $opt{latitude} ),
+    deg2rad( $opt{longitude} ),
+    $opt{height}/1000,
+);
+
+# Generate the almanac data. We instantiate the body, call almanac() on
+# it, and then throw it away.
+
+my @almanac;
+
+foreach my $body ( @planets ) {
+    eval {
+	$body =~ m/ \A _ /smx
+	    and die "Invalid planet name '$body'\n";
+	my $class = "Astro::Coord::ECI::VSOP87D::\L\u$body";
+	( my $fn = "$class.pm" ) =~ s< :: ></>smxg;
+	require $fn;
+	push @almanac, $class->new(
+	    station	=> $loc,
+	)->set( model_cutoff => 'Meeus' )->almanac( $start, $finish );
+	1;
+    } or warn $@;
+}
+
+# Display the time and the text description of the events, in order of
+# increasing time.
+
+foreach (sort {$a->[0] <=> $b->[0]} @almanac) {
+    $opt{gmt}
+	and local $ENV{TZ} = 'GMT';
+    print strftime( $opt{format}, localtime $_->[0] ), '  ',
+	ucfirst $_->[3], "\n";
+}
+
+__END__
+
+=head1 TITLE
+
+almanac - Generate almanac data for a given location
+
+=head1 SYNOPSIS
+
+ almanac                        # The White House by default
+ almanac sun venus mars         # Only these bodies
+ almanac -latitude 52.07 -longitude 4.29 -height 4   # The Hague
+ almanac -help
+ almanac -version
+
+=head1 OPTIONS
+
+=head2 -date=date_string
+
+This option specifies the date as a string that can be parsed by
+L<Date::Manip|Date::Manip>. If L<Date::Manip|Date::Manip> can not be
+loaded an error occurs. If this option is specified, C<-tomorrow> is
+ignored.
+
+=head2 -format=strftime_format
+
+This option specifies the C<strftime> format used to display dates and
+times.
+
+The default is C<-format '%d-%b-%Y %H:%M:%S %Z'>.
+
+=head2 -gmt
+
+If asserted, this Boolean option attempts to display the time in GMT.
+All that it really does is
+
+ local $ENV{TZ} = 'GMT';
+
+which may or may not have the desired effect.
+
+The default is C<-nogmt>.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -latitude
+
+This option specifies the latitude of the observer north of the Equator,
+in degrees.
+
+The default is C<latitude 38.898748>.
+
+=head2 -longitude
+
+This option specifies the longitude of the observer east of Greenwich,
+in degrees.  West longitudes are negative.
+
+The default is C<longitude -77.037684>
+
+=head2 -tomorrow
+
+This Boolean option causes the date to be tomorrow rather than today. It
+is ignored if C<-date> is specified.
+
+The default is C<-notomorrow>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script displays today's solar and planetary almanac for the
+position given on the command line, in latitude north of the Equator,
+longitude east of the prime meridian, and meters above sea level. If no
+position is given on the command line, the contents of environment
+variable C<ALMANAC_POSITION> are broken on spaces and used as the
+posiiton. If this environment variable is not found, the position of the
+White House in Washington DC USA is used.
+
+You can look a day ahead by specifying C<-tomorrow>.
+
+B<Note> that unless C<-gmt> is asserted, displayed times are local to
+the system executing the script, B<not> to the location specified by the
+C<-latitude> and C<-longitude> options.
+
+=head1 ENVIRONMENT
+
+The operation of this script is affected by the following environment
+variables:
+
+=head2 VSOP87D_ALMANAC_OPTIONS
+
+This environment variable contains option names and values. These are
+parsed out using C<Text::QuoteWords::shellwords()>.
+
+Option names must be specified in full, without leading dashes.
+
+Option values must be separate tokens, and may not be specified with
+C<name=value> syntax.
+
+Boolean options must be specified with a value of C<1> (true) or C<0>
+(false).
+
+For example, the value
+
+ format '%Y-%m-%d %H:%M:%S' gmt 1
+
+is equivalent to specifying
+
+ -format '%Y-%m-%d %H:%M:%S' -gmt
+
+on the command line.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2018 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

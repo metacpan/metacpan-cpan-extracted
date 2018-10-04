@@ -1,0 +1,64 @@
+{
+   "abstract" : "Avro message producer for Apache Kafka.",
+   "author" : [
+      "Alvaro Livraghi"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Kafka-Producer-Avro",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Avro::BinaryEncoder" : "0",
+            "Avro::Schema" : "0",
+            "Confluent::SchemaRegistry" : "0.03",
+            "JSON::XS" : "3.02",
+            "Kafka::Producer" : "1.07",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::BigInt" : "1.89",
+            "Test::Exception" : "0.43"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alivraghi/Kafka-Producer-Avro/issues"
+      },
+      "homepage" : "https://github.com/alivraghi/Kafka-Producer-Avro",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/alivraghi/Kafka-Producer-Avro.git"
+      }
+   },
+   "version" : "0.01"
+}

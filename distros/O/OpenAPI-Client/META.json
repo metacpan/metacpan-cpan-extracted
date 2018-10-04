@@ -30,9 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "2.03",
-            "Mojolicious" : "7.53",
-            "Mojolicious::Plugin::OpenAPI" : "1.22"
+            "JSON::Validator" : "2.12",
+            "Mojolicious::Plugin::OpenAPI" : "2.00"
          }
       },
       "test" : {
@@ -53,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/openapi-client"
       }
    },
-   "version" : "0.18",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

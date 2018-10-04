@@ -11,7 +11,7 @@ use Carp;
 use JSON::Parse 'json_file_to_perl';
 use Convert::Moji 'make_regex';
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 # Load the data from the file.
 
@@ -62,7 +62,7 @@ for my $e (@$abc) {
 
 for my $k (keys %any2e) {
     my $e = $any2e{$k};
-    if ($e->{s}) {
+    if ($e->{s} && ! ($e->{bam} || $e->{aam})) {
 	push @as, $e->{a};
 	push @bs, $e->{b};
     }
@@ -87,7 +87,7 @@ sub a2b
     if ($options{s}) {
 	$re = $as_re;
     }
-    $text =~ s/\b($re)\b/$any2e{$1}{$out}/g;
+    $text =~ s/\b($re)(s?)\b/$any2e{$1}{$out}$3/g;
     return $text;
 }
 
@@ -98,7 +98,7 @@ sub b2a
     if ($options{s}) {
 	$re = $bs_re;
     }
-    $text =~ s/\b($re)\b/$any2e{$1}{ao}/g;
+    $text =~ s/\b($re)(s?)\b/$any2e{$1}{ao}$3/g;
     return $text;
 }
 
@@ -109,7 +109,7 @@ sub a2c
     if ($options{s}) {
 	$re = $as_re;
     }
-    $text =~ s/\b($re)\b/$any2e{$1}{co}/g;
+    $text =~ s/\b($re)(s?)\b/$any2e{$1}{co}$3/g;
     return $text;
 }
 
@@ -120,7 +120,7 @@ sub c2a
     if ($options{s}) {
 	$re = $bs_re;
     }
-    $text =~ s/\b($re)\b/$any2e{$1}{ao}/g;
+    $text =~ s/\b($re)(s?)\b/$any2e{$1}{ao}$3/g;
     return $text;
 }
 
@@ -135,7 +135,7 @@ sub c2b
     if ($options{s}) {
 	$re = $as_re;
     }
-    $text =~ s/\b($re)\b/$any2e{$1}{$type}/g;
+    $text =~ s/\b($re)(s?)\b/$any2e{$1}{$type}$3/g;
     return $text;
 }
 
@@ -146,7 +146,7 @@ sub b2c
     if ($options{s}) {
 	$re = $bs_re;
     }
-    $text =~ s/\b($re)\b/$any2e{$1}{co}/g;
+    $text =~ s/\b($re)(s?)\b/$any2e{$1}{co}$3/g;
     return $text;
 }
 

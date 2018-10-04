@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::WarpedNode;
-$Config::Model::WarpedNode::VERSION = '2.126';
+$Config::Model::WarpedNode::VERSION = '2.127';
 use Mouse;
 
 use Carp qw(cluck croak);
@@ -313,7 +313,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.126
+version 2.127
 
 =head1 SYNOPSIS
 

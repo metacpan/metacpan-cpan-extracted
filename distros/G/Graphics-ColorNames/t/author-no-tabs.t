@@ -1,0 +1,46 @@
+
+BEGIN {
+  unless ($ENV{AUTHOR_TESTING}) {
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
+  }
+}
+
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/Graphics/ColorNames.pm',
+    'lib/Graphics/ColorNames/HTML.pm',
+    'lib/Graphics/ColorNames/Windows.pm',
+    'lib/Graphics/ColorNames/X.pm',
+    't/00-report-prereqs.dd',
+    't/00-report-prereqs.t',
+    't/01-ColorNames.t',
+    't/02-X.t',
+    't/03-HTML.t',
+    't/04-Windows.t',
+    't/06-obj.t',
+    't/07-file.t',
+    't/08-filehandle.t',
+    't/09-colorlibrary.t',
+    't/10-sub.t',
+    't/author-eof.t',
+    't/author-eol.t',
+    't/author-no-tabs.t',
+    't/author-pod-linkcheck.t',
+    't/author-pod-syntax.t',
+    't/author-portability.t',
+    't/release-check-manifest.t',
+    't/release-fixme.t',
+    't/release-minimum-version.t',
+    't/release-trailing-space.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

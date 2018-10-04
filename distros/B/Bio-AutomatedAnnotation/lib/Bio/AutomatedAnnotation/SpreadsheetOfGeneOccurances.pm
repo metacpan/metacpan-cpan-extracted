@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::SpreadsheetOfGeneOccurances;
-
+$Bio::AutomatedAnnotation::SpreadsheetOfGeneOccurances::VERSION = '1.182770';
 # ABSTRACT: Output a spreadsheet with the gene occurances per file
 
 
@@ -94,7 +94,7 @@ Bio::AutomatedAnnotation::SpreadsheetOfGeneOccurances - Output a spreadsheet wit
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

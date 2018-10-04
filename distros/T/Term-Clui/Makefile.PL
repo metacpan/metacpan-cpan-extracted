@@ -31,8 +31,7 @@ WriteMakefile(
   MIN_PERL_VERSION => '5.006000',
   LICENSE          => 'perl',
   PREREQ_PM        => {
-    'Term::ReadKey'       => 0,
-    'Term::ReadLine::Gnu' => 0,
+    'Term::ReadLine'      => 0,
     'File::Copy'          => 0,
   },
   CONFIGURE_REQUIRES => {

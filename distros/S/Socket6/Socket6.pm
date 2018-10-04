@@ -1,4 +1,4 @@
-# Copyright (C) 2000-2016 Hajimu UMEMOTO <ume@mahoroba.org>.
+# Copyright (C) 2000-2018 Hajimu UMEMOTO <ume@mahoroba.org>.
 # All rights reserved.
 #
 # This module is based on perl5.005_55-v6-19990721 written by KAME
@@ -31,13 +31,13 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-# $Id: Socket6.pm 683 2016-07-11 05:45:26Z ume $
+# $Id: Socket6.pm 688 2018-09-30 04:22:53Z ume $
 
 package Socket6;
 
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
-$VERSION = "0.28";
+$VERSION = "0.29";
 
 =head1 NAME
 

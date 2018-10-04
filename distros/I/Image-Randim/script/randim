@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use v5.20;
 use strict;
 use Getopt::Long;
@@ -140,6 +140,7 @@ while (!$quit) {
 	if ($saveit) {
 	    say "saving $filename to $save_to_dir";
 	    copy($output_dir.$filename, $save_to_dir);
+	    copy($output_dir.$filename.'.txt', $save_to_dir);
 	}
     }
 

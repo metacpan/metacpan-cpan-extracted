@@ -1,0 +1,212 @@
+@  changeset:   40:f308b1387d48
+|  tag:         tip
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Thu Oct 04 14:13:46 2018 +0200
+|  summary:     Update version and copyright
+|
+o  changeset:   39:1234a3b6b15e
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Thu Oct 04 14:10:53 2018 +0200
+|  summary:     Better examples
+|
+o  changeset:   38:5943d65c8e03
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Wed Oct 03 14:24:03 2018 +0200
+|  summary:     Try to fix CPAN problems
+|
+o  changeset:   37:3256b573075b
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 02 08:12:16 2018 +0200
+|  summary:     Update some docs
+|
+o  changeset:   36:f71c4f5301c9
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 02 08:04:55 2018 +0200
+|  summary:     Fix examples
+|
+o  changeset:   35:fe403df2833c
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 02 07:28:58 2018 +0200
+|  summary:     CPAN docs update
+|
+o  changeset:   34:b34c82a87303
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Fri Sep 14 13:36:46 2018 +0200
+|  summary:     Start writing documentation
+|
+o  changeset:   33:49956237c44c
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Fri Sep 14 13:36:17 2018 +0200
+|  summary:     Remove unsupported Async module
+|
+o  changeset:   32:656624483073
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Fri Sep 14 11:50:10 2018 +0200
+|  summary:     Fix Perl::Critic
+|
+o  changeset:   31:262ba92abf13
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Aug 14 19:59:32 2018 +0200
+|  summary:     Updated version
+|
+o  changeset:   30:b47536f994ed
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Aug 14 19:56:35 2018 +0200
+|  summary:     Send DEBUG (in monitor mode) for connects and disconnects of clients
+|
+o    changeset:   29:de2e40d5c9c9
+|\   parent:      28:67039a1d96b3
+| |  parent:      27:af7bbe22c754
+| |  user:        Rene Schickbauer <cavac@illinsvdev01>
+| |  date:        Fri Nov 24 10:00:28 2017 +0100
+| |  summary:     Merge
+| |
+| o  changeset:   28:67039a1d96b3
+| |  parent:      26:cdda9b918c96
+| |  user:        Rene Schickbauer <cavac@illinsvdev01>
+| |  date:        Fri Nov 24 09:59:55 2017 +0100
+| |  summary:     Add clacks_keylist() function to ClacksCache, bump version to 4.5
+| |
+o |  changeset:   27:af7bbe22c754
+|/   user:        Rene Schickbauer <cavac@cables.cavac.at>
+|    date:        Sun Nov 12 14:11:56 2017 +0100
+|    summary:     dd missing requirements in Makefile.PL
+|
+o  changeset:   26:cdda9b918c96
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Fri Nov 10 12:59:01 2017 +0100
+|  summary:     Add "raw" functionality to Client lib
+|
+o  changeset:   25:843caf259404
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 24 12:25:25 2017 +0200
+|  summary:     BF shorter sleep time
+|
+o  changeset:   24:f85de513c912
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 24 12:18:37 2017 +0200
+|  summary:     For some (currently unknown) reason sysread only gives us a single line when using SSL. So try until we don't get any more data.
+|
+o  changeset:   23:aa0f34c5a0de
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Fri Oct 20 12:25:51 2017 +0200
+|  summary:     Start work on totally async client (unfinished)
+|
+o  changeset:   22:ab70763b26d2
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Fri Oct 20 12:07:03 2017 +0200
+|  summary:     Adapt keylist to new protocol, add clientlist function
+|
+o  changeset:   21:2153bd446f68
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Fri Oct 20 12:06:42 2017 +0200
+|  summary:     Change protocol slightly to have a defined start/end tag for lists
+|
+o  changeset:   20:4b4b44199296
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Thu Oct 19 15:19:54 2017 +0200
+|  summary:     BF (especially in interclacks mode)
+|
+o  changeset:   19:0a6f79c4ab4f
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Thu Oct 19 11:27:50 2017 +0200
+|  summary:     BF, Bump version to 4.3
+|
+o  changeset:   18:fe251303371a
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Thu Oct 19 10:11:13 2017 +0200
+|  summary:     Unify config names
+|
+o    changeset:   17:b992949d95d4
+|\   parent:      14:46ee74a615eb
+| |  parent:      16:232e7ae01cfe
+| |  user:        Rene Schickbauer <cavac@illinsvdev01>
+| |  date:        Tue Oct 17 15:23:30 2017 +0200
+| |  summary:     Merge from cavac.at
+| |
+| o  changeset:   16:232e7ae01cfe
+| |  user:        Rene Schickbauer <cavac@rosetta>
+| |  date:        Mon Oct 16 18:38:42 2017 +0200
+| |  summary:     GNU Ivy Bdubs
+| |
+| o  changeset:   15:9888848cfe91
+| |  parent:      12:478bba79a309
+| |  user:        Rene Schickbauer <cavac@rosetta>
+| |  date:        Mon Oct 16 18:36:43 2017 +0200
+| |  summary:     GNU Terry Pratchett
+| |
+o |  changeset:   14:46ee74a615eb
+| |  user:        Rene Schickbauer <cavac@illinsvdev01>
+| |  date:        Tue Oct 17 14:47:02 2017 +0200
+| |  summary:     Added mandatory authentication and lock-for-sync mode (for interclacks sync)
+| |
+o |  changeset:   13:675c4b7837e5
+|/   user:        Rene Schickbauer <cavac@illinsvdev01>
+|    date:        Tue Oct 17 09:42:43 2017 +0200
+|    summary:     Use SSL in Clacks
+|
+o  changeset:   12:478bba79a309
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 12:52:25 2017 +0200
+|  summary:     Actually make sure we flush the output buffer in memcached compat mode
+|
+o  changeset:   11:1fcf3d7f26c0
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 12:10:04 2017 +0200
+|  summary:     Bump version to 4.2 to show major overhaul of clacks
+|
+o  changeset:   10:c494e054d842
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 12:09:19 2017 +0200
+|  summary:     Fix pragmas
+|
+o  changeset:   9:ce229df4a417
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 12:07:47 2017 +0200
+|  summary:     Better timeout handling in clacks client
+|
+o  changeset:   8:160a55e8d89e
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 12:04:04 2017 +0200
+|  summary:     Add IO::Select to requirements in Makefile.PL
+|
+o  changeset:   7:7f2a9ac95c15
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 11:24:54 2017 +0200
+|  summary:     Better clacks performance
+|
+o  changeset:   6:710a9644028d
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Mon Oct 16 09:37:08 2017 +0200
+|  summary:     Phase out UDP mode of Clacks, move basic Memchached compat to Net::Clacks
+|
+o  changeset:   5:ead749d4b242
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 03 14:27:08 2017 +0200
+|  summary:     Add simple examples
+|
+o  changeset:   4:12e892f08f26
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 03 13:07:34 2017 +0200
+|  summary:     Doc
+|
+o  changeset:   3:e518b1dbbe4b
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 03 13:02:20 2017 +0200
+|  summary:     Code cleanup
+|
+o  changeset:   2:6e39ea8b0509
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 03 11:37:45 2017 +0200
+|  summary:     Rename some files
+|
+o  changeset:   1:d0b5949bf336
+|  user:        Rene Schickbauer <cavac@illinsvdev01>
+|  date:        Tue Oct 03 11:32:45 2017 +0200
+|  summary:     MANIFEST. Makefile.PL
+|
+o  changeset:   0:523069b7ee68
+   user:        Rene Schickbauer <cavac@illinsvdev01>
+   date:        Tue Oct 03 11:30:01 2017 +0200
+   summary:     Turn Clacks into its own module
+

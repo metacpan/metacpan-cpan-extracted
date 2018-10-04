@@ -6,7 +6,7 @@
 * git push
 * release (see "Release task" below)
 * build Debian package (see "Debian package" below)
-* upload package to repository
+* upload package to repository (see analizo.github.io/README.md for instructions)
 * update analizo.org site to point to the newer version
 
 ### Release task
@@ -25,4 +25,10 @@ Please install Dist::Zilla::Deb to build Debian package.
 
 ```console
 dzil debuild
+```
+
+To skip tests running during building package run:
+
+```console
+DEB_BUILD_OPTIONS=nocheck dzil debuild
 ```

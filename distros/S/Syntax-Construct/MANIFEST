@@ -9,6 +9,7 @@ t/02-constructs.t
 t/03-hooks.t
 t/04-extra.t
 t/05-functions.t
+t/06-alias.t
 t/changes.t
 t/completness.t
 t/manifest.t

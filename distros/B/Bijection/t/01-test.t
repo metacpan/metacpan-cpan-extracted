@@ -1,6 +1,5 @@
 use Test::More;
-use Bijection qw/all/;
-use feature qw/say/;
+use Bijection qw/biject inverse/;
 
 my %unique;
 for (0..5000) {

@@ -24,7 +24,8 @@ option str => group_by    => 'Group log output: --group-by day',    alias => 'g'
 documentation 'App::tt';
 version 'App::tt';
 
-$ENV{EDITOR} ||= 'nano';
+$ENV{EDITOR}         ||= 'nano';
+$ENV{TT_ROUND_UP_AT} ||= 30;
 $SIG{__DIE__} = sub { Carp::confess($_[0]) }
   if DEBUG;
 
@@ -73,6 +74,43 @@ sub cmd_edit {
   return 0;
 }
 
+sub cmd_export {
+  my $self = shift;
+  my $res  = $self->_log(@_);
+
+  $res->{rounded} = 0;
+  $self->_say('%s,%s,%s,%s,%s,%s', 'date', 'project', 'hours', 'rounded', 'tags', 'description');
+
+  for my $event (sort { $a->{start} <=> $b->{start} } @{$res->{log}}) {
+    my $seconds = $event->{seconds};
+    my ($hours, $minutes, $rounded);
+
+    $hours = int($seconds / 3600);
+    $seconds -= $hours * 3600;
+    $minutes = int($seconds / 60);
+    $rounded = $hours + ($minutes >= $ENV{TT_ROUND_UP_AT} ? 1 : 0);
+    $hours += sprintf '%.1f', $minutes / 60;
+    $res->{rounded} += $rounded;
+
+    $self->_say(
+      '%s,%s,%s,%s,%s,%s',
+      $event->{start}->ymd,
+      $event->{project} || 'unknown',
+      $hours, $rounded,
+      join(' ', grep {$_} map { split /[, ]/ } @{$event->{tags}}),
+      $event->{description} // ''
+    );
+  }
+
+  $self->_diag(
+    "\nExact hours: %s. Rounded hours: %s Events: %s",
+    $self->_hms_duration($res->{seconds}, 'hm'),
+    $res->{rounded}, $res->{events},
+  );
+
+  return 0;
+}
+
 sub cmd_help {
   my $self  = shift;
   my $for   = shift || 'app';
@@ -101,68 +139,28 @@ sub cmd_help {
 }
 
 sub cmd_log {
-  my $self       = shift;
-  my $seconds    = 0;
-  my $n_events   = 0;
-  my $tags       = join ',', @{$self->tag};
-  my @project_re = map {qr{^$_\b}} split /,/, $self->project || '.+';
-  my $group_by   = sprintf '_group_by_%s', $self->group_by || 'nothing';
-  my ($interval, $offset, $pl, $path, $when, $fill) = ('', 0, 0);
-  my @log;
+  my $self = shift;
+  my $res  = $self->_log(@_);
 
-  for (@_) {
-    $offset   ||= $_ if /^(-\d+)$/;
-    $interval ||= $_ if /^(?:month|year)/;
-    $fill     ||= 1  if /^--fill/;
-  }
-
-  if ($interval eq 'year') {
-    $when = $self->_tp(Y => $self->_now->year + $offset, m => 1, d => 1);
-    $path = File::Spec->catdir($self->_root, $when->year);
-  }
-  else {
-    $when = $self->_tp(m => $self->_now->mon + $offset, d => 1);
-    $path = File::Spec->catdir($self->_root, $when->year, sprintf '%02s', $when->mon);
-  }
-
-  -d $path and find {
-    no_chdir => 0,
-    wanted   => sub {
-      my ($date, $hms, $project) = /^(\d+)-(\d+)_(.*)\.trc$/ or return;
-      my $event = decode_json(_slurp($_));
-      $event->{tags} ||= [];
-      return if @project_re and !grep { $event->{project} =~ $_ } @project_re;
-      return if $tags       and !grep { $tags =~ /\b$_\b/ } @{$event->{tags}};
-      return unless $event->{seconds};
-      $event->{start} = $self->_from_iso_8601($event->{start});
-      push @log, $self->_fill_log_days(@log ? $log[-1]->{start} : $when, $event->{start}) if $fill;
-      pop @log if @log and !$log[-1]{project} and $log[-1]{start}->mday == $event->{start}->mday;
-      push @log, $event;
-      $pl = length $event->{project} if $pl < length $event->{project};
-      $n_events++;
-      $seconds += $event->{seconds};
-    }
-  }, $path;
-
-  if ($self->can($group_by)) {
-    ($pl, @log) = $self->$group_by(@log);
-  }
-
-  for my $event (sort { $a->{start} <=> $b->{start} } @log) {
+  for my $event (sort { $a->{start} <=> $b->{start} } @{$res->{log}}) {
     my $start = $event->{start};
     $self->_say(
-      "%3s %2s %02s:%02s  %5s  %-${pl}s  %s", $start->month,
-      $start->mday,                           $start->hour,
-      $start->minute, $self->_hms_duration($event->{seconds}, 'hm'),
-      $event->{project} || '---', join(',', @{$event->{tags}}),
+      "%3s %2s %02s:%02s  %5s  %-$res->{max_project_chr}s  %s",
+      $start->month,
+      $start->mday,
+      $start->hour,
+      $start->minute,
+      $self->_hms_duration($event->{seconds}, 'hm'),
+      $event->{project} || '---',
+      join(',', @{$event->{tags}}),
     );
   }
 
   $self->_diag(
     "\nTotal for %s events since %s: %s",
-    $n_events,
-    join(' ', $when->month, $when->year),
-    $self->_hms_duration($seconds, 'hms')
+    $res->{events},
+    join(' ', $res->{when}->month, $res->{when}->year),
+    $self->_hms_duration($res->{seconds}, 'hms')
   );
 
   return 0;
@@ -217,7 +215,7 @@ sub cmd_register {
 
   make_path(dirname($trc_file));
   _spurt(encode_json(\%event) => $trc_file);
-  $self->_say('Registered "%s" at %s with duration %s', @event{qw( project start duration )});
+  $self->_say('Registered "%s" at %s with duration %s', @event{qw(project start duration)});
   return 0;
 }
 
@@ -377,7 +375,7 @@ sub _from_iso_8601 {
   my ($self, $str) = @_;
   $str =~ s/(\d)\s(\d)/${1}T${2}/;
   $str =~ s/\.\d+$//;
-  Time::Piece->strptime($str, '%Y-%m-%dT%H:%M:%S');
+  return Time::Piece->strptime($str, '%Y-%m-%dT%H:%M:%S');
 }
 
 sub _get_previous_event {
@@ -394,25 +392,27 @@ sub _get_previous_event {
 }
 
 sub _group_by_day {
-  my $self = shift;
-  my $pl   = 0;
-  my (%log, @log);
+  my ($self, $res) = @_;
+  my $pl = 0;
+  my %log;
 
-  for my $e (@_) {
+  for my $e (@{$res->{log}}) {
     my $k = $e->{start}->ymd;
-    $log{$k} ||= $e;
+    $log{$k} ||= {%$e, seconds => 0};
     $log{$k}{seconds} += $e->{seconds};
     $log{$k}{_project}{$e->{project}} = 1;
     $log{$k}{_tags}{$_} = 1 for @{$e->{tags}};
   }
 
-  @log = map {
-    my $p = join ', ', keys %{$_->{_project}};
-    $pl = length $p if $pl < length $p;
-    +{%$_, project => $p, tags => [keys %{$_->{_tags}}]};
-  } map { $log{$_} } sort keys %log;
+  $res->{log} = [
+    map {
+      my $p = join ', ', keys %{$_->{_project}};
+      $pl = length $p if $pl < length $p;
+      +{%$_, project => $p, tags => [keys %{$_->{_tags}}]};
+    } map { $log{$_} } sort keys %log
+  ];
 
-  return $pl, @log;
+  $res->{max_project_chr} = $pl;
 }
 
 sub _hms_duration {
@@ -428,6 +428,72 @@ sub _hms_duration {
   return sprintf '%s:%02s:%02s', $hours, $minutes, $seconds if !$sep;
   return sprintf '%2s:%02s', $hours, $minutes if $sep eq 'hm';
   return sprintf '%sh %sm %ss', $hours, $minutes, $seconds;
+}
+
+sub _log {
+  my $self       = shift;
+  my $tags       = join ',', @{$self->tag};
+  my @project_re = map {qr{^$_\b}} split /,/, $self->project || '.+';
+
+  my $res = {
+    events          => 0,
+    fill            => 0,
+    interval        => 'month',
+    log             => [],
+    max_project_chr => 0,
+    seconds         => 0,
+    start_at        => 0,
+  };
+
+  for (@_) {
+    /^(-\d+)(m|y|month|year)$/ and ($res->{start_at} = $1 and $res->{interval} = $2);
+    /^(-\d+)$/      and $res->{start_at} ||= $1;
+    /^(month|year)/ and $res->{interval} ||= $1;
+    /^--fill/       and $res->{fill}     ||= 1;
+  }
+
+  if ($res->{interval} =~ m!^y!) {
+    $res->{when} = $self->_tp(Y => $self->_now->year + $res->{start_at}, m => 1, d => 1);
+    $res->{path} = File::Spec->catdir($self->_root, $res->{when}->year);
+  }
+  else {
+    $res->{when} = $self->_tp(m => $self->_now->mon + $res->{start_at}, d => 1);
+    $res->{path}
+      = File::Spec->catdir($self->_root, $res->{when}->year, sprintf '%02s', $res->{when}->mon);
+  }
+
+  -d $res->{path} and find {
+    no_chdir => 0,
+    wanted   => sub {
+      my ($date, $hms, $project) = /^(\d+)-(\d+)_(.*)\.trc$/ or return;
+      my $event = decode_json(_slurp($_));
+      $event->{tags} ||= [];
+      return if @project_re and !grep { $event->{project} =~ $_ } @project_re;
+      return if $tags       and !grep { $tags =~ /\b$_\b/ } @{$event->{tags}};
+      return unless $event->{seconds};
+      $event->{start} = $self->_from_iso_8601($event->{start});
+      push @{$res->{log}},
+        $self->_fill_log_days(@{$res->{log}} ? $res->{log}[-1]{start} : $res->{when},
+        $event->{start})
+        if $res->{fill};
+      pop @{$res->{log}}
+        if @{$res->{log}}
+        and !$res->{log}[-1]{project}
+        and $res->{log}[-1]{start}->mday == $event->{start}->mday;
+      push @{$res->{log}}, $event;
+      $res->{max_project_chr} = length $event->{project}
+        if $res->{max_project_chr} < length $event->{project};
+      $res->{events}++;
+      $res->{seconds} += $event->{seconds};
+    }
+    },
+    $res->{path};
+
+  if (my $method = $self->can(sprintf '_group_by_%s', $self->group_by || 'nothing')) {
+    $self->$method($res);
+  }
+
+  return $res;
 }
 
 sub _now { shift->{now} ||= localtime }

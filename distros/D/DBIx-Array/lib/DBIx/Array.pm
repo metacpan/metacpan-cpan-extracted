@@ -8,7 +8,7 @@ use List::Util qw(sum);
 use DBI;
 use DBIx::Array::Session::Action;
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -1598,7 +1598,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head2 The Competition
 
-L<DBIx::DWIW>, L<DBIx::Wrapper>, L<DBIx::Simple>, L<Data::Table::fromSQL>, L<DBIx::Wrapper::VerySimple>, L<DBIx::Raw>, L<Dancer::Plugin::Database> quick_*
+L<DBIx::DWIW>, L<DBIx::Wrapper>, L<DBIx::Simple>, L<Data::Table::fromSQL>, L<DBIx::Wrapper::VerySimple>, L<DBIx::Raw>, L<Dancer::Plugin::Database> quick_*, L<Mojo::Pg::Results> (arrays & hashes)
 
 =head2 The Building Blocks
 

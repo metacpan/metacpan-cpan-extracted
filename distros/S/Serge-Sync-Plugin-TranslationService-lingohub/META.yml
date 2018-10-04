@@ -1,0 +1,26 @@
+---
+abstract: 'Lingohub translation server (https://www.lingohub.com) synchronization plugin'
+author:
+  - 'Dragos Varovici <dvarovici.work@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Serge-Sync-Plugin-TranslationService-lingohub
+requires:
+  Serge: v1.3.2
+resources:
+  bugtracker: https://github.com/dragosv/serge-plugins/issues
+  repository: https://github.com/dragosv/serge-plugins.git
+version: 0.900.0
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,29 +1,28 @@
 package Kubectl::CLIWrapper {
-  use Moose;
-  use JSON::MaybeXS;
+  use Moo;
   use IPC::Open3;
+  use JSON::MaybeXS;
   use Kubectl::CLIWrapper::Result;
+  use Type::Tiny::Union;
+  use Types::Standard qw/Str CodeRef Bool/;
 
-  our $VERSION = '0.03';
+  our $VERSION = '0.06';
 
-  has kubeconfig => (is => 'ro', isa => 'Str', predicate => 'has_kubeconfig');
-  has kubectl => (is => 'ro', isa => 'Str', default => 'kubectl');
-  has namespace => (is => 'ro', isa => 'Str', predicate => 'has_namespace');
-  has password => (is => 'ro', isa => 'Str', predicate => 'has_password');
-  has server => (is => 'ro', isa => 'Str', predicate => 'has_server');
-  has token => (is => 'ro', isa => 'Str', predicate => 'has_token');
-  has username => (is => 'ro', isa => 'Str', predicate => 'has_username');
-
-  has insecure_tls => (is => 'ro', isa => 'Bool', default => 0);
-
-  has kube_options => (
-        is      => 'ro',
-        isa     => 'ArrayRef[Str]',
-        lazy    => 1,
-        builder => 'build_options',
+  my $TOKEN_TYPE = Type::Tiny::Union->new(
+      type_constraints => [Str, CodeRef]
   );
 
-  sub build_options {
+  has kubeconfig => (is => 'ro', isa => Str, predicate => 'has_kubeconfig');
+  has kubectl => (is => 'ro', isa => Str, default => 'kubectl');
+  has namespace => (is => 'ro', isa => Str, predicate => 'has_namespace');
+  has password => (is => 'ro', isa => Str, predicate => 'has_password');
+  has server => (is => 'ro', isa => Str, predicate => 'has_server');
+  has token => (is => 'ro', isa => $TOKEN_TYPE, predicate => 'has_token');
+  has username => (is => 'ro', isa => Str, predicate => 'has_username');
+
+  has insecure_tls => (is => 'ro', isa => Bool, default => 0);
+
+  sub kube_options {
     my $self = shift;
     my %options = ();
 
@@ -33,6 +32,12 @@ package Kubectl::CLIWrapper {
     $options{namespace}  = $self->namespace  if $self->has_namespace;
     $options{kubeconfig} = $self->kubeconfig if $self->has_kubeconfig;
     $options{'insecure-skip-tls-verify'} = 'true' if $self->insecure_tls;
+
+    if ($self->has_token) {
+      $options{token} = ref($self->token) eq 'CODE'
+        ? &{$self->token}()
+        : $self->token;
+    }
 
     return [ map { "--$_=$options{ $_ }" } keys %options ];
   }
@@ -166,7 +171,9 @@ The password for Basic Authentication
 
 =head2 token
 
-The Bearer token for authentication
+The Bearer token for authentication. If it's a scalar, that value will be used. If it's
+a coderef (sub {}), it will be invoked each time kubectl is called and it's return value
+used as the value of the --token option
 
 =head2 insecure_tls
 
@@ -208,7 +215,13 @@ L<Net::Kubernetes>
 
 =head1 CONTRIBUTORS
 
-waterkip: adding the possiblity to set a kubeconfig file
+waterkip: 
+ - adding the possiblity to set a kubeconfig file
+ - helping port to Moose
+
+ureesoriano:
+ - fix for token attribute being ignored
+ - dynamic generation of the "token" command-line option 
 
 =head1 AUTHOR
 

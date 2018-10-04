@@ -29,6 +29,7 @@ t/bundle.t
 t/coerce-args.t
 t/deep-mixed-ref.t
 t/definitions/age.json
+'t/definitions/space age.json'
 t/definitions/unit.json
 t/definitions/weight.json
 t/draft4-tests/additionalItems.json
@@ -105,9 +106,10 @@ t/remotes/integer.json
 t/remotes/subSchemas.json
 t/schema-as-attr.t
 t/spec/bundlecheck.json
-t/spec/invalid-ref.t
+t/spec/missing-ref.json
 t/spec/person.json
 t/spec/petstore.json
+'t/spec/space bundle.json'
 t/spec/with-deep-mixed-ref.json
 t/spec/with-relative-ref.json
 t/to-json.t

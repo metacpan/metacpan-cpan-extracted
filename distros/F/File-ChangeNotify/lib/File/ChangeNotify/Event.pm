@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Types::Standard qw( Str );
 use Type::Utils qw( enum );
@@ -41,7 +41,7 @@ File::ChangeNotify::Event - Class for file change events
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 

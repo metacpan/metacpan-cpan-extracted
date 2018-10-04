@@ -1,5 +1,79 @@
 Revision history for Perl extension App::Sqitch
 
+0.9998 2018-10-03T20:53:58Z
+     - Fixed an issue where Sqitch would sometimes truncate the registry
+       version number fetched from MySQL, most likely because the Perl runtime
+       was using 32-bit integers. Fixed by casting the version to CHAR in the
+       query, before Perl ever see it. Thanks to Allen Godfrey David for the
+       report.
+     - Added the Snowflake engine.
+     - Now require URI::db v0.19 for Snowflake URI support.
+     - The Vertica and Exasol engines now require DBD::ODBC 1.59, which fixes
+       a Unicode issue. Thanks to Martin J. Evans for the quick fix
+       (perl5-dbi/DBD-ODBC#8)!
+     - Added the `bundle` command to `./Build`. This command installs only the
+       runtime dependencies into the `--install_base` directory. This should
+       simplify building distribution packages, binary installs, Docker images,
+       and the like.
+     - Added the `--with` option to `./Build`, to require that Sqitch be build
+       with the specified engine. Pass once for each engine. See the README
+       for the list of supported engines.
+     - Added a check for Hash::Merge 0.298 during installation, since that
+       release has a fatal bug that breaks Sqitch. If it's installed, the
+       installer will issue a warning and added v0.299 to its list of
+       dependencies. Thanks to Slaven Rezić for the suggestion (#377).
+     - Fixed the PostgreSQL engine so it properly checks the `psql` client
+       version to determine whether or not the `:registry` variable is
+       supported. Previously it relied on the server version, which would fail
+       if the server version was greater than 8.4 but the `psql` client was
+       not. Thanks to multiple folks reporting issues with registry names and
+       search paths (#314).
+     - The plan parser will now complain if a change specifies a duplicate
+       dependency. This should be less confusing than a database unique
+       violation. Thanks to Eric Bréchemier for the suggestion (#344).
+     - Moved the project to its own GitHub organization:
+       https://github.com/sqitchers.
+     - Fixed likely cause of Oracle buffer allocation bug when selecting
+       timestamp strings. Thanks to @johannwilfling for the bug report and to
+       @nmaqsudov for the analysis and solution (#316).
+     - Changed the way the conninfo string is passed to `psql` to eliminate
+       argument ordering problems on Windows. Thanks to @highlowhighlow for
+       the report (#384).
+     - Added `$SQITCH_USERNAME` environment variable to complement
+       `$SQITCH_PASSWORD`. It can be used to override the username set in
+       for a target.
+     - Added the `$SQITCH_FULLNAME` and `$SQITCH_EMAIL` environment
+       variables, which take precedence over the values of the `user.name` and
+       `user.email` config variables.
+     - Added the `$SQITCH_ORIG_SYSUSER`, `$SQITCH_ORIG_FULLNAME` and
+       `$SQITCH_ORIG_EMAIL` environment variables. For those situations when
+       Sqitch attempts to read OS data for user information, These new
+       environment variables override these system-derived values. The
+       intention is to allow an originating host to set these values on
+       another host where Sqitch will actually execute.
+     - Fixed an error triggered by whitespace trailing an engine name in the
+       configuration. Thanks to Jeremy Simkins for the report (#400).
+     - Refactored the engine-specific username and password attributes to
+       support a consistent search for values. Sqitch searches first for one
+       of its own environment variables (`$SQITCH_USERNAME` and
+       `$SQITCH_PASSSWORD`), then the target URI, and finally any engine-
+       specific values, which might include additional environment variables,
+       configuration files, the system user, or none at all.
+     - Database engines that implicitly relied on username and/or password
+       environment variables or on the system username now explicitly rely on
+       them. These include the Firebird, MySQL, Postgres, and Vertical
+       engines. This change should exhibit no change in the behavior of these
+       engines.
+     - Added support for the `$MYSQL_HOST` and `$MYSQL_TCP_PORT` environment
+       variables to the MySQL engine.
+     - Documented all supported engine-specific environment variables in the
+       sqitch-environment guide.
+     - Renamed the sqitch-passwords guide to sqitch-authentication and added a
+       section on username specification.
+     - Updated all URLs to use the https scheme. Only exceptions are tt2.org,
+       which doesn't support TLS, and conferences.embarcadero.com, which
+       appears to be down.
+
 0.9997 2018-03-15T21:13:52Z
      - Fixed the Firebird engine to properly detect multiple instances of a
        change specified to `revert` and `verify`, matching the behavior of
@@ -73,7 +147,7 @@ Revision history for Perl extension App::Sqitch
        Hannah for the PR (#342).
      - Passing an engine name or plan file as the `<database>` parameter to
        the `log`, `status`, and `upgrade` commands now works correctly,
-       matching what the documention has said for some time (#324).
+       matching what the documentation has said for some time (#324).
      - Added the `--target` option to the `plan` and `show` commands.
      - Added the `<database>` parameter to the `plan` command.
      - Sqitch now loads targets from all config files, not just the local
@@ -85,7 +159,7 @@ Revision history for Perl extension App::Sqitch
        Please specify a tag-qualified change:", followed by a list of
        tag-qualified variants of the change.
      - Fixed a bug where the verify command would return a database error when
-       it finds no registory. Now it reports that the registry wasn't found in
+       it finds no registry. Now it reports that the registry wasn't found in
        the database.
 
 0.9995 2016-07-27T09:23:55Z
@@ -109,7 +183,7 @@ Revision history for Perl extension App::Sqitch
        environment variable still trumps all. Thanks to Jim Nasby for the pull
        request (#296).
      - Added detection of the `$VISUAL` environment variable to Editor
-       selection, prioritzed after the `core.editor` configuration variable
+       selection, prioritized after the `core.editor` configuration variable
        and before the `$EDITOR` environment variable. Thanks to Jim Nasby for
        the pull request (#296).
      - Updated the DateTime code to set the locale via `set_locale()` instead
@@ -140,7 +214,7 @@ Revision history for Perl extension App::Sqitch
        registry can be found. Thanks to Arnaldo Piccinelli for the spot (Issue
        #271).
      - Fixed the search for change IDs in engines to match the search for
-       changes. Specifically, change ID seaerch now properly handles the
+       changes. Specifically, change ID search now properly handles the
        offset characters `~` and `^`. This bug mainly affected the `verify`
        command, but it's good to address the inconsistency, done mainly by
        adding the `find_change_id` and `change_id_offset_from_id` methods to
@@ -240,7 +314,7 @@ Revision history for Perl extension App::Sqitch
 0.9992 2015-05-20T23:51:41Z
      - On PostgreSQL, Sqitch now sets the `client_encoding` parameter to
        `UTF8` for its own connection to the database. This ensures that data
-       sent to and from the databse should always be properly encoded and
+       sent to and from the database should always be properly encoded and
        decoded. Users should still set the proper encodings for change scripts
        as appropriate.
      - Fixed test failures due to path differences on Windows.
@@ -361,14 +435,14 @@ Revision history for Perl extension App::Sqitch
      - Improved MySQL missing table error detection by relying on error codes
        instead of matching a (possibly localized) error string.
      - Made the registry upgrade more transparent when deploying. Sqitch is
-       now is a little more vigilent in checking for things being out-of-date
+       now is a little more vigilant in checking for things being out-of-date
        and updating them.
      - Fixed an issue where the `status` command would return an error when
        run against a an older version of the registry.
      - Fixed a Postgres test failure when DBD::Pg is installed but psql is not
        in the path.
      - Now require Config::GitLike 1.15 to build on Windows in order to avoid
-       test failures when Cwd::abs_path dies on non-existant paths.
+       test failures when Cwd::abs_path dies on non-existent paths.
      - Clarified the behavior of each `deploy` reversion mode with regard to
        deploy script vs. verify script failures, and with the expectation that
        deploy scripts are atomic.
@@ -613,7 +687,7 @@ Revision history for Perl extension App::Sqitch
        that the server was not the right version of MySQL. Thanks to Luke
        Young for the report (Issue #158).
      - Made the `checkit()` MySQL function DETERMINISTIC, to improve
-       compatability with MariaDB. Thanks to Jesse Luehrs for the report
+       compatibility with MariaDB. Thanks to Jesse Luehrs for the report
        (Issue #158).
      - Fixed deployment to PostgreSQL 8.4 so that it no longer chokes on the
        `:tableopts`. Thanks to Justin Hawkins for the report!
@@ -627,7 +701,7 @@ Revision history for Perl extension App::Sqitch
 
 0.991  2014-01-16T23:24:33Z
      - Greatly simplified determining the Firebird ISQL client. It no longer
-       tries so hard to find a full path, but does seach through the path list
+       tries so hard to find a full path, but does search through the path list
        for a likely candidate between fbsql, isql-fb, and isql (or equivalents
        ending in .exe on Windows).
      - Removed a bunch of inappropriately pasted stuff from the Firebird

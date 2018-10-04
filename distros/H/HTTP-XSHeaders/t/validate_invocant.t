@@ -4,8 +4,9 @@ use warnings;
 use Test::More;
 plan tests => 44;
 
+use lib 't/lib';
 use HTTP::XSHeaders;
-use t::lib::Utils;
+use MyTestUtils;
 
 my $h = HTTP::XSHeaders->new;
 
@@ -87,13 +88,13 @@ EOS
 
 # test invalid call to scan
 like(
-    t::lib::Utils::_try(sub { $h->scan() }),
+    MyTestUtils::_try(sub { $h->scan() }),
     qr/Usage: HTTP::XSHeaders::scan/,
     'scan() without arguments',
 );
 
 like(
-    t::lib::Utils::_try(sub { $h->scan(undef) }),
+    MyTestUtils::_try(sub { $h->scan(undef) }),
     qr/Second argument must be a CODE reference/,
     'scan() without coderef',
 );
@@ -105,25 +106,25 @@ is(
 );
 
 like(
-    t::lib::Utils::_try(sub { HTTP::XSHeaders::init_header() }),
+    MyTestUtils::_try(sub { HTTP::XSHeaders::init_header() }),
     qr/Usage: HTTP::XSHeaders::init_header/,
     'HTTP::XSHeaders::init_header()'
     );
 
 like(
-    t::lib::Utils::_try(sub { $h->init_header() }),
+    MyTestUtils::_try(sub { $h->init_header() }),
     qr/init_header needs two arguments/,
     'init_header()'
 );
 
 like(
-    t::lib::Utils::_try(sub { $h->init_header(undef) }),
+    MyTestUtils::_try(sub { $h->init_header(undef) }),
     qr/init_header needs two arguments/,
     'init_header(undef)'
 );
 
 like(
-    t::lib::Utils::_try(sub { $h->init_header(undef, undef) }),
+    MyTestUtils::_try(sub { $h->init_header(undef, undef) }),
     qr/init_header not called with a first string argument/,
     'init_header(undef, undef)'
 );

@@ -2,8 +2,9 @@ package Analizo;
 use App::Cmd::Setup -app;
 use strict;
 use warnings;
+use local::lib;
 
-our $VERSION = '1.21.0';
+our $VERSION = '1.22.0';
 
 =head1 NAME
 

@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9997';
+our $VERSION = '0.9998';
 
 sub destination {
     my $self = shift;
@@ -28,14 +28,12 @@ sub destination {
     # Use the URI sans password, and with the database name added.
     my $uri = $self->target->uri->clone;
     $uri->password(undef) if $uri->password;
-    $uri->dbname(
-        $ENV{PGDATABASE}
-        || $self->username
-        || $ENV{PGUSER}
-        || $self->sqitch->sysuser
-    );
+    $uri->dbname( $ENV{PGDATABASE} || $self->username );
     return $uri->as_string;
 }
+
+sub _def_user { $ENV{PGUSER} || shift->sqitch->sysuser }
+sub _def_pass { $ENV{PGPASSWORD} }
 
 has _psql => (
     is         => 'ro',
@@ -55,8 +53,7 @@ has _psql => (
             [ port   => $uri->_port     ],
             map { [ $_ => $query_params{$_} ] }
                 sort keys %query_params,
-            )
-        {
+        ) {
             next unless defined $spec->[1] && length $spec->[1];
             if ($spec->[1] =~ /[ "'\\]/) {
                 $spec->[1] =~ s/([ "'\\])/\\$1/g;
@@ -64,7 +61,7 @@ has _psql => (
             push @conninfo, "$spec->[0]=$spec->[1]";
         }
 
-        push @ret => join ' ', @conninfo if @conninfo;
+        push @ret => '--dbname', join ' ', @conninfo if @conninfo;
 
         if (my %vars = $self->variables) {
             push @ret => map {; '--set', "$_=$vars{$_}" } sort keys %vars;
@@ -104,7 +101,7 @@ has dbh => (
 
         my $uri = $self->uri;
         local $ENV{PGCLIENTENCODING} = 'UTF8';
-        DBI->connect($uri->dbi_dsn, scalar $self->username, scalar $self->password, {
+        DBI->connect($uri->dbi_dsn, $self->username, $self->password, {
             PrintError        => 0,
             RaiseError        => 0,
             AutoCommit        => 1,
@@ -125,7 +122,7 @@ has dbh => (
                             'SET search_path = ?',
                             undef, $self->registry
                         );
-                        # http://www.nntp.perl.org/group/perl.dbi.dev/2013/11/msg7622.html
+                        # https://www.nntp.perl.org/group/perl.dbi.dev/2013/11/msg7622.html
                         $dbh->set_err(undef, undef) if $dbh->err;
                     };
                     return;
@@ -186,12 +183,21 @@ sub initialize {
     $self->_register_release;
 }
 
+sub _psql_major_version {
+    my $self = shift;
+    my $psql_version = $self->sqitch->probe($self->client, '--version');
+    my @parts = split /\s+/, $psql_version;
+    my ($maj) = $parts[-1] =~ /^(\d+)/;
+    return $maj || 0;
+}
+
 sub _run_registry_file {
     my ($self, $file) = @_;
     my $schema = $self->registry;
 
     # Fetch the client version. 8.4 == 80400
     my $version =  $self->_probe('-c', 'SHOW server_version_num');
+    my $psql_maj = $self->_psql_major_version;
 
     # Is this XC?
     my $opts =  $self->_probe('-c', q{
@@ -202,11 +208,14 @@ sub _run_registry_file {
            AND proname = 'pgxc_version';
     }) ? ' DISTRIBUTE BY REPLICATION' : '';
 
-    if ($version < 90300) {
-        # Need to write a temp file; no CREATE SCHEMA IF NOT EXISTS syntax.
-        (my $sql = scalar $file->slurp) =~ s/SCHEMA IF NOT EXISTS/SCHEMA/;
-        if ($version < 90000) {
-            # Also no :"registry" variable syntax.
+    if ($version < 90300 || $psql_maj < 9) {
+        # Need to transform the SQL and write it to a temp file.
+        my $sql = scalar $file->slurp;
+
+        # No CREATE SCHEMA IF NOT EXISTS syntax prior to 9.3.
+        $sql =~ s/SCHEMA IF NOT EXISTS/SCHEMA/ if $version < 90300;
+        if ($psql_maj < 9) {
+            # Also no :"registry" variable syntax prior to psql 9.0.s
             ($schema) = $self->dbh->selectrow_array(
                 'SELECT quote_ident(?)', undef, $schema
             );
@@ -353,11 +362,6 @@ sub log_revert_change {
 
     # Log it.
     return $self->_log_event( revert => $change, $del_tags, $req, $conf );
-}
-
-sub _ts2char($) {
-    my $col = shift;
-    return qq{to_char($col AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD:"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')};
 }
 
 sub _dt($) {

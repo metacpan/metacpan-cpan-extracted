@@ -5,7 +5,8 @@ use LinkEmbedder;
 plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 
 my $embedder = LinkEmbedder->new;
-my $link     = $embedder->get('http://xkcd.com/927');
+my $link;
+$embedder->get_p('http://xkcd.com/927')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Xkcd');
 is_deeply $link->TO_JSON,
   {

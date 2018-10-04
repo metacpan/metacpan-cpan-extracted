@@ -70,12 +70,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "JSON::PP" => 0,
     "Log::ger::Output::Screen" => "0.007",
     "Perinci::Examples" => "0.79",
     "Test::More" => "0.98",
     "Test::Perinci::CmdLine" => "1.47"
   },
-  "VERSION" => "0.543",
+  "VERSION" => "0.544",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -107,6 +108,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
+  "JSON::PP" => 0,
   "Log::ger" => "0.023",
   "Log::ger::Output::Screen" => "0.007",
   "Module::CoreList" => 0,

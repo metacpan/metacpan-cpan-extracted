@@ -6,6 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '1.000033'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -17,9 +18,15 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Bijection:
+    file: lib/Bijection.pm
+    version: '0.04'
 requires:
   Carp: '0'
   Import::Export: '0.08'
   perl: '5.006'
-version: '0.01'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Bijection.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

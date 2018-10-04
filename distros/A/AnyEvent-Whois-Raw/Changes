@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::Whois::Raw.
 
+0.08  Mon Oct  1 13:48:44 +07 2018
+	- Recursive queries fix, which could fail in some cases
+
 0.07  Tue Jan 20 23:10:09 NOVT 2015
 	- Fix: ip rotation mechanism didn't work when target server is specified
 

@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+PRODID:-//Mozilla.org/NONSGML Mozilla Calendar V1.1//EN
+VERSION:2.0
+BEGIN:VEVENT
+CREATED:20161106T221135Z
+DTSTAMP:20181001T142421Z
+UID:qhmffmyxnbdb@meetup.com
+SUMMARY:Frankfurt Perlmongers Social Meeting
+STATUS:TENTATIVE
+DTSTART:20181002T170000Z
+DTEND:20181002T170000Z
+SEQUENCE:4
+LOCATION:moschmosch
+URL:https://www.meetup.com/Perl-User-Groups-Rhein-Main/events/qhmffmyxnbdb
+ /
+END:VEVENT
+BEGIN:VEVENT
+CREATED:20161106T221135Z
+LAST-MODIFIED:20180808T160129Z
+DTSTAMP:20180808T160129Z
+UID:qhmffmyxmbgb@meetup.com
+SUMMARY:Frankfurt Perlmongers Social Meeting
+DTSTART:20180904T190000
+DTEND:20180904T190000
+LOCATION:Cafe Diesseits \nKonrad-Broßwitz-Str. 1 \nFrankfurt
+SEQUENCE:3
+TRANSP:OPAQUE
+URL:https://www.meetup.com/Perl-User-Groups-Rhein-Main/events/qhmffmyxmbgb
+ /
+END:VEVENT
+
+END:VCALENDAR

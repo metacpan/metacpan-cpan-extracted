@@ -1,28 +1,39 @@
 package Bijection;
-use 5.006; use strict; use warnings; our $VERSION = '0.01';
+use 5.006; use strict; use warnings; our $VERSION = '0.04';
 use Import::Export; use base qw/Import::Export/;
 use Carp qw/croak/;
-our %EX = (biject => [qw/all/], inverse => [qw/all/]);
+our %EX = (biject => [qw/all main/], inverse => [qw/all main/], bijection_set => [qw/all set/], offset_set => [qw/all set/]);
 
-our (@ALPHA, $COUNT, %INDEX);
+our (@ALPHA, $OFFSET, $COUNT, %INDEX);
 BEGIN {
-	@ALPHA = qw/b c d f g h j k l m n p q r s t v w x y z B C D F G H J K L M N P Q R S T V W X Y Z 0 1 2 3 4 5 6 7 8 9/;
-	$COUNT = @ALPHA;
-	my $index = -1;
-	%INDEX = map +( $_ => ++$index ), @ALPHA; 
+	sub bijection_set {
+		@ALPHA = @_;
+		$ALPHA[0] =~ m/^[1-9](?!$)\d+$/ ? offset_set(shift @ALPHA) : offset_set(scalar @ALPHA);
+		$COUNT = @ALPHA;
+		my $index = -1;
+		%INDEX = map +( $_ => ++$index ), @ALPHA;
+	}
+	sub offset_set {
+		$OFFSET = shift;
+	}
+	bijection_set(qw/b c d f g h j k l m n p q r s t v w x y z B C D F G H J K L M N P Q R S T V W X Y Z 0 1 2 3 4 5 6 7 8 9/);
 }
 
 sub biject {
 	my ($id, $out) = @_;
-	croak "id to encode must be an integer and non-negative" unless (($id =~ m/^\d+$/ || $id > 0) and $id += $COUNT);
-	do { $out .= $ALPHA[($id % $COUNT)]; 1} and $id = int($id/$COUNT) while ($id > 0);
-	reverse ($out || $ALPHA[0]);
+	croak "id to encode must be an integer and non-negative: $id" unless ($id =~ m/^\d+$/);
+	$id += $OFFSET;
+	do { $out .= $ALPHA[($id % $COUNT)]; $id = int($id/$COUNT); } while ($id > 0);
+	reverse $out;
 }
 
 sub inverse {
 	my ($out, $id) = (@_, 0);
-    defined $INDEX{$_} && do { $id = $id * $COUNT + $INDEX{$_}; 1; } or croak "invalid character $_ in $out" for (split //, $out);
-	$id - $COUNT;
+	$id = exists $INDEX{$_} 
+		? $id * $COUNT + $INDEX{$_} 
+		: croak "invalid character $_ in $out" 
+	for (split //, $out);
+	$id - $OFFSET;
 }
 
 1;
@@ -31,11 +42,16 @@ __END__
 
 =head1 NAME
 
-Bijection - Bijection.
+Bijection - Bijection of an integer.
+
+=for html
+<a href="https://travis-ci.org/ThisUsedToBeAnEmail/Bijection"><img src="https://travis-ci.org/ThisUsedToBeAnEmail/Bijection.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/r/ThisUsedToBeAnEmail/Bijection?branch=master"><img src="https://coveralls.io/repos/ThisUsedToBeAnEmail/Bijection/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="https://metacpan.org/pod/Bijection"><img src="https://badge.fury.io/pl/Bijection.svg" alt="CPAN version"></a>
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
@@ -45,11 +61,23 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-	use Bijection qw/all/;
+	use Bijection qw/biject inverse/;
 
 	my $int = 1;
 	my $string = biject($int);
 	inverse($string) == $int;
+
+	....
+
+	use Bijection qw/all/;
+
+	my $offset = 100000000; 
+	bijection_set($offset, reverse @Bijection::ALPHA[9 .. $#Bijection::ALPHA]);
+
+	my $int = 2;
+	my $string = biject($int);
+	inverse($string) == $int;
+
 
 =head1 EXPORT
 
@@ -58,6 +86,14 @@ Perhaps a little code snippet.
 =cut
 
 =head2 inverse
+
+=cut
+
+=head2 bijection_set
+
+=cut
+
+=head2 offset_set
 
 =cut
 

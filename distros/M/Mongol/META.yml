@@ -2,11 +2,14 @@
 abstract: 'Perl MongoDB wrapper for Moose objects'
 author:
   - 'Tudor Marghidanu'
-build_requires: {}
+build_requires:
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +18,7 @@ name: Mongol
 provides:
   Mongol:
     file: lib/Mongol.pm
-    version: '2.3'
+    version: '2.4'
   Mongol::Cursor:
     file: lib/Mongol/Cursor.pm
   Mongol::Model:
@@ -39,12 +42,9 @@ requires:
   MooseX::ClassAttribute: '0'
   MooseX::Storage: '0'
   MooseX::Storage::Base::SerializedClass: '0'
-  Test::More: '0'
-  Test::Pod: '0'
-  Test::Pod::Coverage: '0'
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: https://github.com/marghidanu/mongol
-version: '2.3'
+  repository: https://gitlab.com/marghidanu/mongol
+version: '2.4'
 x_contributors:
   - 'Tudor Marghidanu <tudor@marghidanu.com>'

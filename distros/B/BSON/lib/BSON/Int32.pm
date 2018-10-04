@@ -6,7 +6,7 @@ package BSON::Int32;
 # ABSTRACT: BSON type wrapper for Int32
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use Carp;
 use Moo;
@@ -91,7 +91,7 @@ BSON::Int32 - BSON type wrapper for Int32
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 SYNOPSIS
 

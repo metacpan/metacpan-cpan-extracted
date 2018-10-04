@@ -15,30 +15,18 @@ our %API = (
 
 has html => sub { shift->SUPER::html };
 
-sub learn {
-  my ($self, $cb) = @_;
-
-  unless ($self->url->path =~ /\w/) {
-    return $self->SUPER::learn($cb);
-  }
+sub learn_p {
+  my $self = shift;
+  return $self->SUPER::learn_p unless $self->url->path =~ /\w/;
 
   my $api_url = $self->_api_url;
   unless ($api_url) {
     $self->error({message => "Unknown oEmbed provider for @{[$self->url]}", code => 400});
-    $self->$cb if $cb;
     return $self;
   }
 
   warn "[LinkEmbedder] oembed URL $api_url\n" if DEBUG;
-
-  if ($cb) {
-    $self->ua->get($api_url => sub { $self->tap(_learn_from_json => $_[1])->$cb });
-  }
-  else {
-    $self->_learn_from_json($self->ua->get($api_url));
-  }
-
-  return $self;
+  return $self->ua->get_p($api_url)->then(sub { $self->_learn_from_json(shift) });
 }
 
 sub _api_url {

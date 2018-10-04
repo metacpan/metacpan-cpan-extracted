@@ -1,0 +1,11 @@
+Revision history for perl distribution Mojo-UserAgent-Role-Cache
+
+0.02 2018-09-28T21:29:01+0900
+ - Fix unique filename per cache entry
+ - Add attribute "cache_key"
+
+0.01 2018-09-26T15:52:00+0900
+ - Add basic caching through Mojo::UserAgent::Role::Cache::Driver::File
+ - Add attribute "cache_driver"
+ - Add attribute "cache_strategy"
+ - Add method "cache_driver_singleton"

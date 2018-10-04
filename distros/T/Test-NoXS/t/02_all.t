@@ -12,7 +12,7 @@ eval "use Test::NoXS ':all'";
 
 is( $@, q{}, "told Test::NoXS not to load any XS" );
 
-my $use_F = "use Fcntl qw( LOCK_EX )";
+my $use_F = "use Socket qw( AF_INET )";
 
 eval $use_F;
 

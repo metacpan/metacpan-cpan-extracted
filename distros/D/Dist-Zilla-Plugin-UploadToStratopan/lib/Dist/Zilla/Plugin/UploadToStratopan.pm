@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::UploadToStratopan;
 
-our $VERSION = '0.013';
+our $VERSION = '0.015';
 
 use Moose;
 use Mojo::UserAgent;
@@ -92,6 +92,10 @@ sub _login {
         }
     );
 
+    if ($tx->res->error) {
+        $self->log_fatal("Unable to login to Stratopan: " . $tx->res->error->{message});
+    }
+
     # stratopan redirects on a post (302)
     # and returns some div alert thing when posting - also returning a
     # 200
@@ -164,7 +168,7 @@ Dist::Zilla::Plugin::UploadToStratopan - Automate Stratopan releases with Dist::
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

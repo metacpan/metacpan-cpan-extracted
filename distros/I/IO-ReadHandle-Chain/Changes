@@ -1,5 +1,8 @@
 Revision history for IO-ReadHandle-Chain
 
+1.2.2   2018-09-30
+        Declare that Perl v5.14 is needed.
+
 1.2.1   2018-02-03
         - Improve documentation.
 

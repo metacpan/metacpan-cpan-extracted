@@ -1,0 +1,38 @@
+---
+abstract: 'Test module for MetaCPAN C</contributing-to>'
+author:
+  - 'Zak B. Elep <zakame@zakame.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Test-MetaCPAN-NoContributingDoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Test::MetaCPAN::NoContributingDoc:
+    file: lib/Acme/Test/MetaCPAN/NoContributingDoc.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/zakame/Acme-Test-MetaCPAN-NoContributingDoc/issues
+  homepage: https://github.com/zakame/Acme-Test-MetaCPAN-NoContributingDoc
+  repository: git://github.com/zakame/Acme-Test-MetaCPAN-NoContributingDoc.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

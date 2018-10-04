@@ -1,0 +1,54 @@
+image: ubuntu:16.04
+
+services:
+    - mongo:3.2
+
+stages:
+    - test
+    - release
+    - pack
+
+variables:
+    PERL_CPANM_OPT: '--notest --quiet'
+    MONGOL_URL: mongodb://mongo:27017
+
+before_script:
+    - apt-get update -qq
+    - apt-get install -y build-essential curl
+    - curl -sL http://cpanmin.us | perl - App::cpanminus
+    - cpanm Module::Build
+
+test:
+    stage: test
+    script:
+        - perl Build.PL
+        - ./Build installdeps --cpan_client 'cpanm'
+        - ./Build
+        - ./Build test
+    except:
+        - tags
+
+analysis:
+    stage: test
+    script:
+        - perl Build.PL
+        - ./Build installdeps --cpan_client 'cpanm'
+        - ./Build && prove -b xt/
+    allow_failure: true
+    except:
+        - tags
+
+release:
+    stage: release
+    script:
+        - sed -i "s/'0\.0\.0'/'${CI_COMMIT_TAG}'/" lib/Mongol.pm
+        - perl Build.PL
+        - ./Build installdeps --cpan_client 'cpanm'
+        - ./Build manifest
+        - ./Build
+        - ./Build test && ./Build dist
+    only:
+        - tags
+    artifacts:
+        paths:
+            - "*.tar.gz"

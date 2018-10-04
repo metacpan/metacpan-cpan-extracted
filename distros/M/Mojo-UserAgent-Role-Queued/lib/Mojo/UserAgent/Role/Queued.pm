@@ -1,7 +1,7 @@
 package Mojo::UserAgent::Role::Queued;
 use Mojo::Base '-role';
 
-our $VERSION = "1.11";
+our $VERSION = "1.13";
 use Mojo::UserAgent::Role::Queued::Queue;
 
 has max_active => sub { shift->max_connections };
@@ -15,6 +15,7 @@ around start => sub {
   $self->queue->callback(sub { $self->$orig(@_) })
     unless ($self->queue->callback);
   if ($cb) {
+    weaken $self;
     $tx->on(finish => sub { $self->queue->tx_finish(); });
     $self->queue->on(queue_empty => sub { $self->emit('queue_empty') });
     $self->queue->enqueue([$tx, $cb]);

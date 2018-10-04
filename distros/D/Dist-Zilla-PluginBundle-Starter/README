@@ -125,13 +125,17 @@ OPTIONS
 
     When using this option, you must have the distribution version set in
     your main module in a form like "our $VERSION = '1.234';", rather than
-    in dist.ini. Only modules and scripts which have similar version
-    declarations will be versioned in the build. You can set your
+    in dist.ini. Other modules and scripts must also have similar version
+    declarations to be updated appropriately. You can set your
     distribution's version manually by changing the version of your main
     module, or by setting the "V" environment variable when building or
     releasing. See the documentation for each plugin mentioned above for
     details on configuring them, which can be done in the usual
     config-slicing way as shown in "CONFIGURING".
+
+    This option also enables the "inherit_version" option for
+    [MetaProvides::Package] since all module versions are matched to the
+    main module in this configuration.
 
   regenerate
     Requires revision 3 or higher.

@@ -37,9 +37,12 @@ interface to function calls.
 
 =head1 FUNCTIONS
 
-=head2 muse_format_line ($format, $string)
+=head2 muse_format_line ($format, $string, [ $lang ])
 
 Output the given chunk in the desired format (C<html> or C<ltx>).
+
+Accepts a third parameter with the language code. This is usually not
+needed unless you're dealing with French.
 
 This is meant to be used for headers, or for on the fly escaping. So
 lists, footnotes, tables, blocks, etc. are not supported. Basically,
@@ -48,10 +51,10 @@ we process only one paragraph, without wrapping it in <p>.
 =cut
 
 sub muse_format_line {
-    my ($format, $line) = @_;
+    my ($format, $line, $lang) = @_;
     return "" unless defined $line;
     die unless ($format eq 'html' or $format eq 'ltx');
-    my $doc = Text::Amuse::String->new($line);
+    my $doc = Text::Amuse::String->new($line, $lang);
     my $out = Text::Amuse::Output->new(document => $doc,
                                        format => $format);
     return join("", @{ $out->process });
@@ -75,13 +78,14 @@ sub muse_fast_scan_header {
     my ($file, $format) = @_;
     die "No file provided!" unless defined($file) && length($file);
     die "$file is not a file!" unless -f $file;
-    my $directives = Text::Amuse::Document->new(file => $file)->parse_directives;
+    my $doc = Text::Amuse::Document->new(file => $file);
+    my $directives = $doc->parse_directives;
 
     if ($format) {
         die "Wrong format $format"
           unless ($format eq 'ltx' or $format eq 'html');
         foreach my $k (keys %$directives) {
-            $directives->{$k} = muse_format_line($format, $directives->{$k});
+            $directives->{$k} = muse_format_line($format, $directives->{$k}, $doc->language_code);
         }
     }
     return $directives;

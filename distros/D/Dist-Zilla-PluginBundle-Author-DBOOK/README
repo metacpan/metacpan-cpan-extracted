@@ -66,12 +66,15 @@ DESCRIPTION
      allow_dirty = CONTRIBUTING.md
      allow_dirty = META.json
      allow_dirty = Makefile.PL
+     commit_msg = %v%n%n%c
      [Git::Tag]
+     tag_format = %v
+     tag_message = %v
      [BumpVersionAfterRelease]
      munge_makefile_pl = 0
      munge_build_pl = 0
      [Git::Commit / Commit_Version_Bump]
-     allow_dirty_match = ^(?:lib|script|bin)/
+     allow_dirty_match = ^
      commit_msg = Bump version
      [Git::Push]
      

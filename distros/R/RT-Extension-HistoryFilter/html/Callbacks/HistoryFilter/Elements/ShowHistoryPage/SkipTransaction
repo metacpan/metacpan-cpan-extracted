@@ -2,7 +2,7 @@
 my $request_path = $HTML::Mason::Commands::r->path_info;
 $request_path =~ s!/{2,}!/!g;
 
-return if $request_path =~ m{^/Ticket/History\.html};
+return if $request_path =~ m{History\.html};
 
 my @types = RT->Config->Get('HistoryFilterTypes', $session{'CurrentUser'});
 return unless $types[0];

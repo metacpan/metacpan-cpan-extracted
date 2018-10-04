@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.35  2018-09-28T21:25:00+00:00
+      - Upgraded dependency on Map::Tube v3.57.
+
+0.34  2018-09-26T14:50:00+00:00
+      - Upgraded dependency on Map::Tube v3.56.
+
 0.33  2018-08-24T15:20:00+00:00
       - Upgraded dependency on Map::Tube v3.55.
 

@@ -1,5 +1,8 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.97 2018/09/30
+  - allow in-file parser package
+
 0.96 2018/09/16
   - exclude_core option now respects used perl version
   - ignore .pm files under t/ unless they are used in .t files

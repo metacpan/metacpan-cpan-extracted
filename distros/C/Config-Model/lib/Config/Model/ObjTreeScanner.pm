@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ObjTreeScanner;
-$Config::Model::ObjTreeScanner::VERSION = '2.126';
+$Config::Model::ObjTreeScanner::VERSION = '2.127';
 use strict;
 use Config::Model::Exception;
 use Scalar::Util qw/blessed/;
@@ -285,7 +285,7 @@ Config::Model::ObjTreeScanner - Scan config tree and perform call-backs for each
 
 =head1 VERSION
 
-version 2.126
+version 2.127
 
 =head1 SYNOPSIS
 
@@ -534,9 +534,9 @@ C<scan_list> are not required. This is done once the hook returns.
 C<check_list_element_cb>: Like C<list_element_cb>, but called on a
 check_list element.
 
- ($scanner, $data_ref,$node,$element_name,@check_items)
+ ($scanner, $data_ref,$node,$element_name, index, check_list_obj)
 
-C<@check_items> is a list containing all the items of the check_list.
+C<index> is always undef as a check_list cannot be contained in a hash or list (yet)
 
 =head2 Hash element callback
 

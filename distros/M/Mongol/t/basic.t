@@ -54,7 +54,7 @@ has_attribute_ok( $person, 'last_name' );
 has_attribute_ok( $person, 'age' );
 
 $person->save();
-isa_ok( $person->id(), 'MongoDB::OID' );
+isa_ok( $person->id(), 'BSON::OID' );
 
 $person->age( 37 );
 $person->save();

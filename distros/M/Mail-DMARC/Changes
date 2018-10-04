@@ -1,4 +1,10 @@
 
+1.20181001 2018-10-01 Australia/Melbourne
+ - Check author when saving a new report record
+ - Fix bug in RUA filtering when recipient had a size filter
+ - Fix TLS fails for report sending to certain domains
+ - Fix report sending loop problem
+
 1.20180125 2018-01-25 Australia/Melbourne
 
  - Allow domains listed in the public suffix list to align.

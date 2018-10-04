@@ -4,7 +4,7 @@ Apache2_4::AuthCookieMultiDBI - An AuthCookie module backed by a DBI database fo
 
 =head1 VERSION
 
-    This is version 0.01
+    This is version 0.4
 
 
 =head1 SYNOPSIS

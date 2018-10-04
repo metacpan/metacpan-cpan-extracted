@@ -19,7 +19,7 @@ sub new {
 
 sub build_requires {
     return +{
-	'Test::More'	=> 0.88,	# Because of done_testing().
+	'Test::More'	=> 0.96,	# For subtest().
     };
 }
 

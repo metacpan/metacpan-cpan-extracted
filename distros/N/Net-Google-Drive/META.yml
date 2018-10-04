@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - 'Pavel Andryushin<vrag867@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Google-Drive
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '2.85'
+  File::Spec: '3.48'
+  HTTP::Request: '6'
+  JSON::XS: '3.04'
+  LWP::Protocol::https: '6.06'
+  LWP::UserAgent: '6.27'
+  Net::Google::OAuth: '0.03'
+  URI: '1.64'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/vrag86/perl-net-google-drive/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/vrag86/perl-net-google-drive
+version: '0.01'

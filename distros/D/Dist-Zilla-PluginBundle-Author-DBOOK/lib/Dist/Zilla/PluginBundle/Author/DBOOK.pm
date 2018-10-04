@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 sub configure {
 	my $self = shift;
@@ -41,7 +41,6 @@ sub configure {
 	push @from_build, $install_with_makemaker ? 'Makefile.PL' : 'Build.PL';
 	my @ignore_files = qw(Build.PL Makefile.PL);
 	my @dirty_files = qw(dist.ini Changes README.pod);
-	my $versioned_match = '^(?:lib|script|bin)/';
 	
 	# @Git and versioning
 	$self->add_plugins(
@@ -50,10 +49,10 @@ sub configure {
 		'RewriteVersion',
 		[NextRelease => { format => '%-9v %{yyyy-MM-dd HH:mm:ss VVV}d%{ (TRIAL RELEASE)}T' }],
 		[CopyFilesFromRelease => { filename => \@from_build }],
-		['Git::Commit' => { allow_dirty => [@dirty_files, @from_build], add_files_in => '/' }],
-		'Git::Tag',
+		['Git::Commit' => { allow_dirty => [@dirty_files, @from_build], add_files_in => '/', commit_msg => '%v%n%n%c' }],
+		['Git::Tag' => { tag_format => '%v', tag_message => '%v' }],
 		[BumpVersionAfterRelease => { munge_makefile_pl => 0, munge_build_pl => 0 }],
-		['Git::Commit' => 'Commit_Version_Bump' => { allow_dirty_match => $versioned_match, commit_msg => 'Bump version' }],
+		['Git::Commit' => 'Commit_Version_Bump' => { allow_dirty_match => '^', commit_msg => 'Bump version' }],
 		'Git::Push');
 	
 	# Pod tests
@@ -68,7 +67,7 @@ sub configure {
 	
 	$self->add_plugins(
 		['Git::GatherDir' => { exclude_filename => [@ignore_files, @from_build] }],
-		['Regenerate::AfterReleasers' => { plugins => ['@Author::DBOOK/Readme_Github', '@Author::DBOOK/CopyFilesFromRelease'] }]);
+		['Regenerate::AfterReleasers' => { plugins => [$self->name . '/Readme_Github', $self->name . '/CopyFilesFromRelease'] }]);
 	# @Basic, with some modifications
 	$self->add_plugins(qw/PruneCruft ManifestSkip MetaYAML MetaJSON
 		License ReadmeAnyFromPod ExecDir ShareDir/);
@@ -149,12 +148,15 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  allow_dirty = CONTRIBUTING.md
  allow_dirty = META.json
  allow_dirty = Makefile.PL
+ commit_msg = %v%n%n%c
  [Git::Tag]
+ tag_format = %v
+ tag_message = %v
  [BumpVersionAfterRelease]
  munge_makefile_pl = 0
  munge_build_pl = 0
  [Git::Commit / Commit_Version_Bump]
- allow_dirty_match = ^(?:lib|script|bin)/
+ allow_dirty_match = ^
  commit_msg = Bump version
  [Git::Push]
  

@@ -16,15 +16,6 @@ sub empty_object : Tests {
   isa_ok($model->members, 'HASH', 'must have members');
 }
 
-sub declaring_project_eloc : Tests {
-  my $model = Analizo::Model->new;
-  is($model->{total_eloc}, 0, 'Project eLoc should be initialized');
-
-  $model->declare_total_eloc(28);
-  is($model->{total_eloc}, 28, 'Project eLoc should updated when declare_project_eloc is called');
-  is($model->total_eloc, 28, 'using the getter');
-}
-
 sub declaring_modules : Tests {
   my $model = Analizo::Model->new;
   $model->declare_module('Module1');
@@ -167,7 +158,7 @@ sub adding_abstract_class : Tests {
   is($model->abstract_classes, 1, 'model detects an abstract class');
 }
 
-sub build_graph_from_function_calls : Tests {
+sub build_graphs_from_function_calls : Tests {
   my $model = Analizo::Model->new;
   $model->declare_module('a', 'src/a.c');
   $model->declare_module('b', 'src/b.c');
@@ -177,47 +168,59 @@ sub build_graph_from_function_calls : Tests {
   $model->declare_function('c', 'c::name()');
   $model->add_call('a::name()', 'b::name()');
   $model->add_call('a::name()', 'c::name()');
-  my $g = $model->graph;
-  is("$g", 'src/a-src/b,src/a-src/c');
+  my $graph_modules = $model->modules_graph;
+  my $graph_files = $model->files_graph;
+  is("$graph_modules", 'a-b,a-c');
+  is("$graph_files", 'src/a-src/b,src/a-src/c');
 }
 
-sub build_graph_from_inheritance : Tests {
-  my $model = Analizo::Model->new;
-  $model->declare_module('a', 'src/a.c');
-  $model->declare_module('b', 'src/b.c');
-  $model->declare_module('c', 'src/c.c');
-  $model->add_inheritance('a', 'b');
-  $model->add_inheritance('a', 'c');
-  my $g = $model->graph;
-  is("$g", 'src/a-src/b,src/a-src/c');
-}
-
-sub build_graph_from_funcion_calls_and_inheritance : Tests {
+sub build_graphs_from_inheritance : Tests {
   my $model = Analizo::Model->new;
   $model->declare_module('a', 'src/a.c');
   $model->declare_module('b', 'src/b.c');
   $model->declare_module('c', 'src/c.c');
   $model->declare_module('d', 'src/d.c');
+  $model->add_inheritance('a', 'b');
+  $model->add_inheritance('a', 'c');
+  $model->add_inheritance('c', 'd');
+  my $graph_modules = $model->modules_graph;
+  my $graph_files = $model->files_graph;
+  is("$graph_modules", 'a-b,a-c,a-d,c-d');
+  is("$graph_files", 'src/a-src/b,src/a-src/c,src/a-src/d,src/c-src/d');
+}
+
+sub build_graphs_from_funcion_calls_and_inheritance : Tests {
+  my $model = Analizo::Model->new;
+  $model->declare_module('a', 'src/a.c');
+  $model->declare_module('b', 'src/b.c');
+  $model->declare_module('c', 'src/c.c');
+  $model->declare_module('d', 'src/d.c');
+  $model->declare_module('e', 'src/e.c');
   $model->add_inheritance('b', 'd');
+  $model->add_inheritance('d', 'e');
   $model->declare_function('a', 'a::name()');
   $model->declare_function('b', 'b::name()');
   $model->declare_function('c', 'c::name()');
   $model->add_call('a::name()', 'b::name()');
   $model->add_call('a::name()', 'c::name()');
-  my $g = $model->graph;
-  is("$g", 'src/a-src/b,src/a-src/c,src/b-src/d');
+  my $graph_modules = $model->modules_graph;
+  my $graph_files = $model->files_graph;
+  is("$graph_modules", 'a-b,a-c,b-d,b-e,d-e');
+  is("$graph_files", 'src/a-src/b,src/a-src/c,src/b-src/d,src/b-src/e,src/d-src/e');
 }
 
-sub use_file_as_vertices_in_graph : Tests {
+sub use_file_as_vertices_in_graphs : Tests {
   my $model = Analizo::Model->new;
   $model->declare_module('a', 'src/a.c');
   $model->declare_module('b', 'src/b.c');
   $model->declare_module('c', 'src/c.c');
-  my @vertices = sort $model->graph->vertices;
-  is_deeply(\@vertices, ['src/a', 'src/b', 'src/c']);
+  my @modules_vertices = sort $model->modules_graph->vertices;
+  my @files_vertices = sort $model->files_graph->vertices;
+  is_deeply(\@modules_vertices, ['a', 'b', 'c']);
+  is_deeply(\@files_vertices, ['src/a', 'src/b', 'src/c']);
 }
 
-sub group_files_when_build_graph : Tests {
+sub group_files_when_build_graphs : Tests {
   my $model = Analizo::Model->new;
   $model->declare_module('a', 'src/a.h');
   $model->declare_module('a', 'src/a.c');
@@ -225,8 +228,10 @@ sub group_files_when_build_graph : Tests {
   $model->declare_module('b', 'src/b.c');
   $model->declare_module('c', 'src/c.c');
   $model->declare_module('c', 'src/c.h');
-  my @vertices = sort $model->graph->vertices;
-  is_deeply(\@vertices, ['src/a', 'src/b', 'src/c']);
+  my @modules_vertices = sort $model->modules_graph->vertices;
+  my @files_vertices = sort $model->files_graph->vertices;
+  is_deeply(\@modules_vertices, ['a', 'b', 'c']);
+  is_deeply(\@files_vertices, ['src/a', 'src/b', 'src/c']);
 }
 
 sub empty_call_graph : Tests {

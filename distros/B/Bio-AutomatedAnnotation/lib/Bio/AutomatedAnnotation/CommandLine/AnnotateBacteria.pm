@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::CommandLine::AnnotateBacteria;
-
+$Bio::AutomatedAnnotation::CommandLine::AnnotateBacteria::VERSION = '1.182770';
 # ABSTRACT: provide a commandline interface to the annotation wrappers
 
 
@@ -152,7 +152,7 @@ Bio::AutomatedAnnotation::CommandLine::AnnotateBacteria - provide a commandline 
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

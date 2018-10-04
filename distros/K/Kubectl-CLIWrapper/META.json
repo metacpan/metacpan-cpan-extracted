@@ -4,13 +4,13 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Kubectl-CLIWrapper",
    "prereqs" : {
@@ -28,7 +28,9 @@
          "requires" : {
             "IPC::Open3" : "0",
             "JSON::MaybeXS" : "0",
-            "Moose" : "0",
+            "Moo" : "0",
+            "Type::Tiny::Union" : "0",
+            "Types::Standard" : "0",
             "perl" : "5.014"
          }
       },
@@ -49,8 +51,8 @@
          "web" : "https://github.com/pplu/kubectl-cliwrapper.git"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.22.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

@@ -1,0 +1,42 @@
+---
+abstract: 'Netscape 1.1 Color Names'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Types::Common::Numeric: '1.004'
+  Types::Standard: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - color
+  - Netscape
+  - deprecated
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graphics-ColorNames-Netscape
+provides:
+  Graphics::ColorNames::Netscape:
+    file: lib/Graphics/ColorNames/Netscape.pm
+    version: v3.1.2
+recommends:
+  Graphics::ColorNames: '0'
+requires:
+  perl: v5.6.0
+resources:
+  bugtracker: https://github.com/robrwo/Graphics-ColorNames-Netscape/issues
+  repository: git://github.com/robrwo/Graphics-ColorNames-Netscape.git
+version: v3.1.2
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Magnus Cedergren <magnus@mbox604.swipnet.se>'
+  - 'Gary Vollink <gary@vollink.com>'
+  - 'Slaven Rezić <slaven@rezic.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

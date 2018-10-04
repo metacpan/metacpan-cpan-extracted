@@ -143,7 +143,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
-my $b==0;
+my $b=1;
 if ($b==1) {
    if (-1==index `php -v`,'PHP') {
       ($stdout,$stderr)=$handle->cmd($sudo.

@@ -2,8 +2,8 @@
 
 use strict;
 BEGIN {
-	$|  = 1;
-	$^W = 1;
+    $|  = 1;
+    $^W = 1;
 }
 
 use Test::More tests => 13;
@@ -28,42 +28,42 @@ ok( -f $file, "$file file exists"     );
 
 # Test that _moveto behaves as expected
 SCOPE: {
-	is(
-		File::Remove::_moveto(
-			File::Spec->catdir($base, 't'), # remove
-			File::Spec->catdir($base), # cwd
-		),
-		'',
-		'_moveto returns correct for normal case',
-	);
+    is(
+        File::Remove::_moveto(
+            File::Spec->catdir($base, 't'), # remove
+            File::Spec->catdir($base), # cwd
+        ),
+        '',
+        '_moveto returns correct for normal case',
+    );
 
-	my $moveto1 = File::Remove::_moveto(
-		File::Spec->catdir($base, 't'), # remove
-		File::Spec->catdir($base, 't'), # cwd
-	);
-	$moveto1 =~ s/\\/\//g;
-	is( $moveto1, $base, '_moveto returns correct for normal case' );
+    my $moveto1 = File::Remove::_moveto(
+        File::Spec->catdir($base, 't'), # remove
+        File::Spec->catdir($base, 't'), # cwd
+    );
+    $moveto1 =~ s/\\/\//g;
+    is( $moveto1, $base, '_moveto returns correct for normal case' );
 
-	my $moveto2 = File::Remove::_moveto(
-		File::Spec->catdir($base, 't'),        # remove
-		File::Spec->catdir($base, 't', 'cwd'), # cwd
-	);
-	$moveto2 =~ s/\\/\//g;
-	is( $moveto2, $base, '_moveto returns correct for normal case' );
+    my $moveto2 = File::Remove::_moveto(
+        File::Spec->catdir($base, 't'),        # remove
+        File::Spec->catdir($base, 't', 'cwd'), # cwd
+    );
+    $moveto2 =~ s/\\/\//g;
+    is( $moveto2, $base, '_moveto returns correct for normal case' );
 
-	# Regression: _moveto generates false positives
-	# cwd:      /tmp/cpan2/PITA-Image/PITA-Image-0.50
-	# remove:   /tmp/eBtQxTPGHC
-	# moveto:   /tmp
-	# expected: ''
-	is(
-		File::Remove::_moveto(
-			File::Spec->catdir($base, 't'),           # remove
-			File::Spec->catdir($base, 'lib', 'File'), # cwd
-		),
-		'',
-		'_moveto returns null as expected',
-	);
+    # Regression: _moveto generates false positives
+    # cwd:      /tmp/cpan2/PITA-Image/PITA-Image-0.50
+    # remove:   /tmp/eBtQxTPGHC
+    # moveto:   /tmp
+    # expected: ''
+    is(
+        File::Remove::_moveto(
+            File::Spec->catdir($base, 't'),           # remove
+            File::Spec->catdir($base, 'lib', 'File'), # cwd
+        ),
+        '',
+        '_moveto returns null as expected',
+    );
 }
 
 # Change the current working directory into the first

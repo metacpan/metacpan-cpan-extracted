@@ -9,12 +9,12 @@
 # Tests can be run against the Developer Days VM with a bit of configuration.
 # Download the VM from:
 #
-#   http://www.oracle.com/technetwork/database/enterprise-edition/databaseappdev-vm-161299.html
+#   https://www.oracle.com/technetwork/database/enterprise-edition/databaseappdev-vm-161299.html
 #
 # Once the VM is imported into VirtualBox and started, login with the username
 # "oracle" and the password "oracle". Then, in VirtualBox, go to Settings ->
 # Network, select the NAT adapter, and add two port forwarding rules
-# (http://barrymcgillin.blogspot.com/2011/12/using-oracle-developer-days-virtualbox.html):
+# (https://barrymcgillin.blogspot.com/2011/12/using-oracle-developer-days-virtualbox.html):
 #
 #   Host Port | Guest Port
 #  -----------+------------
@@ -31,7 +31,7 @@
 #    ORA-21561: OID generation failed
 #
 # Make sure that your computer's hostname is on the localhost line of
-# /etc/hosts (http://sourceforge.net/p/tora/discussion/52737/thread/f68b89ad/):
+# /etc/hosts (https://sourceforge.net/p/tora/discussion/52737/thread/f68b89ad/):
 #
 #     > hostname
 #     stickywicket
@@ -104,7 +104,6 @@ $dest_uri->dbname(
         $ENV{TWO_TASK}
     || ($^O eq 'MSWin32' ? $ENV{LOCAL} : undef)
     || $ENV{ORACLE_SID}
-    || $sqitch->sysuser
 );
 is $ora->target->name, $ora->uri, 'Target name should be the uri stringified';
 is $ora->destination, $dest_uri->as_string,
@@ -242,16 +241,6 @@ ENV: {
         is $ora->registry_destination, $ora->destination,
            'Registry destination should be the same as destination';
     }
-
-    my $mocker = Test::MockModule->new('App::Sqitch');
-    $mocker->mock(sysuser => 'sysuser=whatever');
-    my $ora = $CLASS->new(sqitch => $sqitch, target => $target);
-    is $ora->target->name, 'db:oracle:',
-        'Target name should not fall back on sysuser';
-    is $ora->destination, 'db:oracle:sysuser=whatever',
-        'Destination should fall back on sysuser';
-    is $ora->registry_destination, $ora->destination,
-        'Registry destination should be the same as destination';
 
     $ENV{TWO_TASK} = 'mydb';
     $ora = $CLASS->new(sqitch => $sqitch, username => 'hi', target => $target);
@@ -426,10 +415,10 @@ $mock_ora->unmock_all;
 
 ##############################################################################
 # Test DateTime formatting stuff.
-ok my $ts2char = $CLASS->can('_ts2char'), "$CLASS->can('_ts2char')";
-is $ts2char->('foo'),
-    q{to_char(foo AT TIME ZONE 'UTC', 'YYYY:MM:DD:HH24:MI:SS')},
-    '_ts2char should work';
+ok my $ts2char = $CLASS->can('_ts2char_format'), "$CLASS->can('_ts2char_format')";
+is sprintf($ts2char->(), 'foo'),
+    q{CAST(to_char(foo AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD') AS VARCHAR2(100 byte)) || CAST(to_char(foo AT TIME ZONE 'UTC', ':"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')  AS VARCHAR2(168 byte))},
+    '_ts2char_format should work';
 
 ok my $dtfunc = $CLASS->can('_dt'), "$CLASS->can('_dt')";
 isa_ok my $dt = $dtfunc->(
@@ -442,6 +431,83 @@ is $dt->hour,   15, 'DateTime hour should be set';
 is $dt->minute,  7, 'DateTime minute should be set';
 is $dt->second,  1, 'DateTime second should be set';
 is $dt->time_zone->name, 'UTC', 'DateTime TZ should be set';
+is $CLASS->_char2ts($dt),
+    join(' ', $dt->ymd('-'), $dt->hms(':'), $dt->time_zone->name),
+    'Should have _char2ts';
+
+##############################################################################
+# Test SQL helpers.
+is $ora->_listagg_format, q{CAST(COLLECT(CAST(%s AS VARCHAR2(512))) AS sqitch_array)},
+    'Should have _listagg_format';
+is $ora->_regex_op, 'REGEXP_LIKE(%s, ?)', 'Should have _regex_op';
+is $ora->_simple_from, ' FROM dual', 'Should have _simple_from';
+is $ora->_limit_default, undef, 'Should have _limit_default';
+is $ora->_ts_default, 'current_timestamp', 'Should have _ts_default';
+is $ora->_can_limit, 0, 'Should have _can_limit false';
+
+is $ora->_multi_values(1, 'FOO'), 'SELECT FOO FROM dual',
+    'Should get single expression from _multi_values';
+is $ora->_multi_values(2, 'LOWER(?)'),
+    "SELECT LOWER(?) FROM dual\nUNION ALL SELECT LOWER(?) FROM dual",
+    'Should get double expression from _multi_values';
+is $ora->_multi_values(4, 'X'),
+    "SELECT X FROM dual\nUNION ALL SELECT X FROM dual\nUNION ALL SELECT X FROM dual\nUNION ALL SELECT X FROM dual",
+    'Should get quadrupal expression from _multi_values';
+
+DBI: {
+    local *DBI::err;
+    ok !$ora->_no_table_error, 'Should have no table error';
+    ok !$ora->_no_column_error, 'Should have no column error';
+
+    $DBI::err = 942;
+    ok $ora->_no_table_error, 'Should now have table error';
+    ok !$ora->_no_column_error, 'Still should have no column error';
+
+    $DBI::err = 904;
+    ok !$ora->_no_table_error, 'Should again have no table error';
+    ok $ora->_no_column_error, 'Should now have no column error';
+}
+
+# Test _log_tags_param.
+my $plan = App::Sqitch::Plan->new(
+    sqitch => $sqitch,
+    target => $target,
+    'project' => 'oracle',
+);
+my $change = App::Sqitch::Plan::Change->new(
+    name => 'oracle_test',
+    plan => $plan,
+);
+my @tags = map {
+    App::Sqitch::Plan::Tag->new(
+        plan   => $plan,
+        name   => $_,
+        change => $change,
+    )
+} qw(xxx yyy zzz);
+$change->add_tag($_) for @tags;
+is_deeply $ora->_log_tags_param($change), [qw(@xxx @yyy @zzz)],
+    '_log_tags_param should format tags';
+
+# Test _log_requires_param.
+my @req = map {
+    App::Sqitch::Plan::Depend->new(
+        %{ App::Sqitch::Plan::Depend->parse($_) },
+        plan => $plan,
+    )
+} qw(aaa bbb ccc);
+
+my $mock_change = Test::MockModule->new(ref $change);
+$mock_change->mock(requires => sub { @req });
+is_deeply $ora->_log_requires_param($change), [qw(aaa bbb ccc)],
+    '_log_requires_param should format prereqs';
+
+# Test _log_conflicts_param.
+$mock_change->mock(conflicts => sub { @req });
+is_deeply $ora->_log_conflicts_param($change), [qw(aaa bbb ccc)],
+    '_log_conflicts_param should format prereqs';
+
+$mock_change->unmock_all;
 
 ##############################################################################
 # Can we do live tests?

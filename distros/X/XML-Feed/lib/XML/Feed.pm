@@ -12,11 +12,11 @@ use Module::Pluggable search_path => "XML::Feed::Format",
                       require     => 1,
                       sub_name    => 'formatters';
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 our $MULTIPLE_ENCLOSURES = 0;
 our @formatters;
 BEGIN {
-	@formatters = __PACKAGE__->formatters;
+    @formatters = __PACKAGE__->formatters;
 }
 
 sub new {
@@ -54,7 +54,7 @@ sub parse {
             $xml .= $chunk;
         }
     } else {
-        open my $fh, $stream
+        open my $fh, '<', $stream
             or return $class->error("Can't open $stream: $!");
         while (read $fh, my($chunk), 8192) {
             $xml .= $chunk;
@@ -81,19 +81,19 @@ sub parse {
 sub identify_format {
     my $feed   = shift;
     my($xml)   = @_;
-	foreach my $class (@formatters) {
-		my ($name) = ($class =~ m!([^:]+)$!);
-		# TODO ugly
-		my $tmp = $$xml;
-		return $name if eval { $class->identify(\$tmp) };
-		return $feed->error($@) if $@;
-	} 
-	return $feed->error("Cannot detect feed type");
+    foreach my $class (@formatters) {
+        my ($name) = ($class =~ m!([^:]+)$!);
+        # TODO ugly
+        my $tmp = $$xml;
+        return $name if eval { $class->identify(\$tmp) };
+        return $feed->error($@) if $@;
+    }
+    return $feed->error("Cannot detect feed type");
 }
 
 sub _get_first_tag {
-	my $class  = shift;
-	my ($xml)  = @_;
+    my $class  = shift;
+    my ($xml)  = @_;
 
 
     ## Auto-detect feed type based on first element. This is prone
@@ -105,9 +105,9 @@ sub _get_first_tag {
         my $first = substr $t, 0, 1;
         $tag = $t, last unless $first eq '?' || $first eq '!';
     }
-	die ("Cannot find first element") unless $tag;
+    die ("Cannot find first element") unless $tag;
     $tag =~ s/^.*://;
-	return $tag;
+    return $tag;
 }
 
 sub find_feeds {
@@ -148,7 +148,7 @@ sub _convert_entry {
     my $feed_format  = ref($feed);   $feed_format  =~ s!^XML::Feed::Format::!!;
     my $entry_format = ref($entry);  $entry_format =~ s!^XML::Feed::Entry::Format::!!;
     return $entry if $entry_format eq $feed_format;
-    return $entry->convert($feed_format); 
+    return $entry->convert($feed_format);
 }
 
 sub base;
@@ -412,7 +412,7 @@ B<Note:> Only C<XML::RSS::LibXML> version 0.3004 is known to work at the moment.
 
 =item C<$XML::Feed::MULTIPLE_ENCLOSURES>
 
-Although the RSS specification states that there can be at most one enclosure per item 
+Although the RSS specification states that there can be at most one enclosure per item
 some feeds break this rule.
 
 If this variable is set then C<XML::Feed> captures all of them and makes them available as a list.
@@ -427,9 +427,9 @@ B<Note:> C<XML::RSS> version 1.44 is needed for this to work.
 
 =head1 VALID FEEDS
 
-For reference, this cgi script will create valid, albeit nonsensical feeds 
-(according to C<http://feedvalidator.org> anyway) for Atom 1.0 and RSS 0.90, 
-0.91, 1.0 and 2.0. 
+For reference, this cgi script will create valid, albeit nonsensical feeds
+(according to C<http://feedvalidator.org> anyway) for Atom 1.0 and RSS 0.90,
+0.91, 1.0 and 2.0.
 
     #!perl -w
 

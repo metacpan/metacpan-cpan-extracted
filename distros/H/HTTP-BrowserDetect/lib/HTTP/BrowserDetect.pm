@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 
 use vars qw(@ALL_TESTS);
 
@@ -200,6 +200,7 @@ our @ROBOT_TESTS = (
 
 our @MISC_TESTS = qw(
     dotnet      x11
+    webview
 );
 
 push @ALL_TESTS,
@@ -498,7 +499,7 @@ foreach my $test ( @ENGINE_TESTS, @MISC_TESTS ) {
 foreach my $test (
     @OS_TESTS,  @WINDOWS_TESTS, @MAC_TESTS, @UNIX_TESTS,
     @BSD_TESTS, @GAMING_TESTS
-    ) {
+) {
     no strict 'refs';
     *{$test} = sub {
         my ($self) = @_;
@@ -532,7 +533,7 @@ foreach my $test (@OLD_ROBOT_TESTS) {
 foreach my $test (
     @NETSCAPE_TESTS, @IE_TESTS, @AOL_TESTS,
     @OPERA_TESTS
-    ) {
+) {
     no strict 'refs';
     *{$test} = sub {
         my ($self) = @_;
@@ -670,7 +671,7 @@ sub _init_core {
     }
     elsif ( $ua
         =~ m{^mozilla/.+windows (?:nt|phone) \d{2}\.\d+;?.+ applewebkit/.+ chrome/.+ safari/.+ edge/[\d.]+$}
-        ) {
+    ) {
         $browser        = 'edge';
         $browser_string = 'Edge';
 
@@ -962,6 +963,13 @@ sub _init_core {
 
         # Realplayer plugin -- don't override browser but do set property
         $browser_tests->{realplayer} = 1;
+    }
+
+    # Details: https://developer.chrome.com/multidevice/user-agent#webview_user_agent
+    if (   ( $self->android && index( $ua, '; wv)' ) > 0 )
+        || ( $self->chrome && $self->android && $self->browser_major >= 30 ) )
+    {
+        $tests->{webview} = 1;
     }
 
 }
@@ -1294,7 +1302,7 @@ sub _init_robots {
                                        $robot_fragment  # Match the fragment
                                        [\w .:,\-\@\/]*) # Words after fragment
                                      }ix
-            ) {
+        ) {
             my $full_string = $1;
             $full_string =~ s/ *$//;    # Trim whitespace at end
             if (
@@ -1306,7 +1314,7 @@ sub _init_robots {
                                            (\/[\d\.]+)?        # Version
                                            [\w]*)              # Beta stuff
                                          }ix
-                ) {
+            ) {
                 # We matched the whole string, but it seems to
                 # make more sense as whitespace-separated
                 # 'thing/ver' tokens
@@ -1380,7 +1388,7 @@ sub _init_os {
         elsif (
             index( $ua, 'win 9x 4.90' ) != -1    # whatever
             || index( $ua, 'windows me' ) != -1
-            ) {
+        ) {
             $os        = 'windows';
             $os_string = 'WinME';
             $os_tests->{winme} = $os_tests->{win32} = 1;
@@ -1780,7 +1788,7 @@ sub _init_version {
     }
     elsif ( $ua
         =~ m{\b compatible; \s* [\w\-]* [/\s] ( [0-9]+ ) (?: .([0-9]+) (\S*) )? ;}x
-        ) {
+    ) {
         # MSIE and some others use a 'compatible' format
         ( $major, $minor, $beta ) = ( $1, $2, $3 );
     }
@@ -1804,7 +1812,7 @@ sub _init_version {
                 \.            # First dot
                 ( \d+ )?      # Minor version number follows dot
             }x
-            ) {
+        ) {
             # Safari starting with version 3.0 provides its own public version
             ( $major, $minor ) = ( $1, $2, undef );
         }
@@ -2155,7 +2163,7 @@ sub _init_device {
         || index( $ua, 'wap' ) == 0
         || index( $ua, 'wapper' ) != -1
         || index( $ua, 'zetor' ) != -1
-        ) {
+    ) {
         $device = 'wap';
         $device_tests->{$device} = 1;
     }
@@ -2253,7 +2261,7 @@ sub _init_device {
             =~ m{ucweb/2.0\s*\(([^\;\)]*\;){4}\s*([^\;\)]*?)\s*\)}i
             || $self->{user_agent}
             =~ m{ucweb/2.0\s*\(([^\;\)]*\;){3}\s*([^\;\)]*?)\s*\)}i )
-        ) {
+    ) {
         $device_string = $2;
     }
     elsif ( $ua =~ /^(\bmot-[^ \/]+)/ ) {
@@ -2274,7 +2282,7 @@ sub _init_device {
     }
     elsif ( $ua
         =~ /windows phone [^\)]+ iemobile\/[^;]+; arm; touch; ([^;]+; [^;\)]+)/g
-        ) {
+    ) {
         # windows phone 8.0
         $device_string = substr $self->{user_agent},
             pos($ua) - length $1, length $1;
@@ -2604,7 +2612,7 @@ sub _public {
                 ( \d+ )       # Major version number is everything before first dot
                 ( \. \d+ )?   # Minor version number is first dot and following digits
             }x
-            ) {
+        ) {
             return ( $1, $2, undef );
         }
 
@@ -2622,7 +2630,7 @@ sub _public {
                 for my $maybe_build (
                     sort { $self->_cmp_versions( $b, $a ) }
                     keys %safari_build_to_version
-                    ) {
+                ) {
                     $version = $safari_build_to_version{$maybe_build}, last
                         if $self->_cmp_versions( $build, $maybe_build ) >= 0;
                 }
@@ -2832,7 +2840,10 @@ sub _language_country {
     if ( $self->{user_agent} =~ m/\(([^)]+)\)/xms ) {
         my @parts = split( /;/, $1 );
         foreach my $part (@parts) {
-            if ( $part =~ /^\s*([a-z]{2})\s*$/ ) {
+
+            # 'vw' for WebView is not language code. Details here: https://developer.chrome.com/multidevice/user-agent#webview_user_agent
+            if ( $part =~ /^\s*([a-z]{2})\s*$/
+                && !( $self->webview && $1 eq 'wv' ) ) {
                 return { language => uc $1 };
             }
         }
@@ -2924,7 +2935,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.16
+version 3.17
 
 =head1 SYNOPSIS
 
@@ -3235,6 +3246,10 @@ winnt, which is a type of win32)
         winphone7 winphone7_5 winphone8 winphone10
 
 =head3 dotnet()
+
+=head3 x11()
+
+=head3 webview()
 
 =head3 chromeos()
 

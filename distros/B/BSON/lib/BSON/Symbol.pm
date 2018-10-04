@@ -6,7 +6,7 @@ package BSON::Symbol;
 
 # ABSTRACT: BSON type wrapper for symbol data (DEPRECATED)
 
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use Moo 2.002004;
 use namespace::clean -except => 'meta';
@@ -25,7 +25,7 @@ BSON::Symbol - BSON type wrapper for symbol data (DEPRECATED)
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 DESCRIPTION
 

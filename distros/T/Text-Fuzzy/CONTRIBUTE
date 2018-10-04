@@ -1,0 +1,16 @@
+How to contribute
+
+As a first step please use the "issues" on github to file an issue
+about what you want to do. The module's build process is very, very
+convoluted, including two preprocessing steps to build the C files
+from the source codes. Some of the tools for this preprocessing are
+not publicly available. I can try to reduce the amount of complexity
+to make it easier for other people to contribute, if you have some
+idea of what you want to achieve, so open the issue first before doing
+any work.
+
+If you're looking for some small job to do, useful small jobs would
+include adding tests of various features of the module, checking the
+documentation for correctness, adding an example to the "examples"
+directory, etc., but please don't reformat the source code or remove
+comments.

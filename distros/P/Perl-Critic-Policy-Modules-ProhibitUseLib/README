@@ -1,0 +1,24 @@
+DESCRIPTION
+
+    Perl::Critic::Policy::logicLAB::ProhibitUseLib prohibits the use of use
+    lib in all files. This policy limits this to only modules.
+
+    This policy is a derivation of
+    Perl::Critic::Policy::logicLAB::ProhibitUseLib, see it's documentation
+    for more information.
+
+    This policy puts itself into the portability theme.
+
+CONFIGURATION
+
+    There is no configuration option available for this policy.
+
+AFFILIATION
+
+    This is a standalone policy not part of a larger PerlCritic Policies
+    group.
+
+SEE ALSO
+
+      * Perl::Critic::Policy::logicLAB::ProhibitUseLib
+

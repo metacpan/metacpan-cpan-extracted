@@ -93,12 +93,20 @@ my $parms = {
     MIN_PERL_VERSION    => 5.010001,
     LICENSE             => 'artistic_2',
     META_MERGE => {
+        'meta-spec' => { version => 2 },
         resources => {
             license     => 'http://www.opensource.org/licenses/artistic-license-2.0.php',
             homepage    => 'http://github.com/shlomif/html-tidy5',
             bugtracker  => 'http://github.com/shlomif/html-tidy5/issues',
             repository  => 'http://github.com/shlomif/html-tidy5',
         },
+        x_contributors => [
+            'Andy Lester <andy@petdance.com>',
+            'Jonathan Rockway <jrockway@cpan.org>',
+            'Robert Bachmann <rbach@cpan.org>',
+            'Robert Rothenberg <rrwo@cpan.com>',
+            'Rufus Cable <cpan@threebytesfull.com>',
+        ],
     },
     @build,
     EXE_FILES           => [qw(bin/web-t5)],

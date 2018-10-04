@@ -19,12 +19,14 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
-    "Moose" => 0
+    "Moo" => 0,
+    "Type::Tiny::Union" => 0,
+    "Types::Standard" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,8 +36,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
-  "Moose" => 0,
-  "Test::More" => 0
+  "Moo" => 0,
+  "Test::More" => 0,
+  "Type::Tiny::Union" => 0,
+  "Types::Standard" => 0
 );
 
 

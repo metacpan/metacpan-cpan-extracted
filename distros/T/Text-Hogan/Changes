@@ -1,5 +1,11 @@
 Revision history for perl module Text::Hogan
 
+1.06 2018-09-30
+    * Update SEE ALSO section in POD (thanks Mohammad S Anwar :-))
+
+1.05 2018-09-29
+    * Bug fixes for as_string (thanks Tony Finch for catching 3 different bugs!)
+
 1.04 2016-11-02
     * Prefer array over arrayref (thanks Tom Hukins!)
     * Add copyright_holder to dist.ini (thanks Tom Hukins!)

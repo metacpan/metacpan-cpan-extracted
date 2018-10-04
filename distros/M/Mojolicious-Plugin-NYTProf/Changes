@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.21     2018-10-01
+        - Bump Devel::NYTProf version requirement to 6.06 for recent fixes
+
 0.20     2016-05-17
         - Transfer repo from G3S to Humanstate
 

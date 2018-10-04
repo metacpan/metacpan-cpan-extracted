@@ -1,7 +1,7 @@
 package Test::Script;
 
 # ABSTRACT: Basic cross-platform tests for scripts
-our $VERSION = '1.23'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 use 5.008001;
@@ -147,7 +147,7 @@ sub script_runs {
   my $opt    = _options(\@_);
   my $unix   = shift @$args;
   my $path   = path( $unix );
-  my $pargs  = _perl_args($path);
+  my $pargs  = [ @{ _perl_args($path) }, @{ $opt->{interpreter_options} } ];
   my $dir    = _preload_module();
   my $cmd    = [ perl, @$pargs, "-I$dir", '-M__TEST_SCRIPT__', $path, @$args ];
   $stdout = '';
@@ -331,6 +331,19 @@ sub _options {
   $options{stdout} = \$stdout unless defined $options{stdout};
   $options{stderr} = \$stderr unless defined $options{stderr};
 
+  if(defined $options{interpreter_options})
+  {
+    unless(ref $options{interpreter_options} eq 'ARRAY')
+    {
+      require Text::ParseWords;
+      $options{interpreter_options} = [ Text::ParseWords::shellwords($options{interpreter_options}) ];
+    }
+  }
+  else
+  {
+    $options{interpreter_options} = [];
+  }
+
   \%options;
 }
 
@@ -361,7 +374,7 @@ Test::Script - Basic cross-platform tests for scripts
 
 =head1 VERSION
 
-version 1.23
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -436,6 +449,12 @@ You may pass in options as a hash as the second argument.
 
 The expected exit value.  The default is to use whatever indicates success
 on your platform (usually 0).
+
+=item interpreter_options
+
+Array reference of Perl options to be passed to the interpreter.  Things
+like C<-w> or C<-x> can be passed this way.  This may be either a single
+string or an array reference.
 
 =item signal
 

@@ -18,6 +18,11 @@ my %skip = map +($_ => 1), (
     'contributees',           # deprecated
     'contributors',           # deprecated
     'create_media_metadata',  # described incorrectly in Net::Twitter
+    'destroy_direct_message', # deprecated
+    'direct_messages',        # deprecated
+    'new_direct_message',     # deprecated
+    'sent_direct_messages',   # deprecated
+    'show_direct_message',    # deprecated
     'similar_places',         # no longer documented
     'update_delivery_device', # no longer documented
     'update_profile_colors',  # no longer documented
@@ -37,7 +42,6 @@ my %override_required = (
     destroy_block      => [ ':ID' ],
     report_spam        => [ ':ID' ],
     update_friendship  => [ ':ID' ],
-    new_direct_message => [ qw/text :ID/ ],
     create_mute        => [ ':ID' ],
     destroy_mute       => [ ':ID' ],
 );

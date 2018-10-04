@@ -5,7 +5,7 @@
       "Adam Kennedy"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
             "IO::Handle" : "0",
             "Probe::Perl" : "0.01",
             "Test2::API" : "1.302015",
+            "Text::ParseWords" : "0",
             "perl" : "5.008001"
          }
       },
@@ -55,7 +56,7 @@
    "provides" : {
       "Test::Script" : {
          "file" : "lib/Test/Script.pm",
-         "version" : "1.23"
+         "version" : "1.25"
       }
    },
    "release_status" : "stable",
@@ -70,12 +71,14 @@
          "web" : "https://github.com/plicease/Test-Script"
       }
    },
-   "version" : "1.23",
+   "version" : "1.25",
    "x_contributors" : [
       "Adam Kennedy",
       "Graham Ollis <plicease@cpan.org>",
       "Brendan Byrd"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_generated_by_perl" : "v5.29.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.05",
+   "x_use_unsafe_inc" : 0
 }
 

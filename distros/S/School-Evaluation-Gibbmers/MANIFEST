@@ -8,8 +8,8 @@ Makefile.PL
 README
 bin/gibbmers
 dist.ini
-gibbmers.desktop
 lib/School/Evaluation/Gibbmers.pm
 lib/School/Evaluation/Gibbmers/Chart.pm
 share/gibbmers.conf.yml
+share/gibbmers_EN.conf.yml
 t/compile.t

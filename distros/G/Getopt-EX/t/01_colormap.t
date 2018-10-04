@@ -5,15 +5,34 @@ use Test::More;
 
 use Getopt::EX::Colormap qw(ansi_code);
 
+sub rgb24(&) {
+    my $sub = shift;
+    local $Getopt::EX::Colormap::COLOR_RGB24 = 1;
+    $sub->();
+}
+
 is(ansi_code("R"), "\e[31m", "color name");
 is(ansi_code("W/R"), "\e[37;41m", "background");
 is(ansi_code("RDPIUFSVJ"), "\e[31;1;2;3;4;5;7;8;9m", "effect");
 
-is(ansi_code("ABCDEF"), "\e[38;5;152m", "hex");
-{
-    local $Getopt::EX::Colormap::COLOR_RGB24 = 1;
-    is(ansi_code("ABCDEF"), "\e[38;2;171;205;239m", "hex 24bit");
-}
+is(ansi_code("ABCDEF"), "\e[38;5;152m", "hex24");
+rgb24 {
+    is(ansi_code("ABCDEF"), "\e[38;2;171;205;239m", "hex24 24bit");
+};
+
+is(ansi_code("#AABBCC"), "\e[38;5;146m", "hex24 with #");
+is(ansi_code("#ABC"),    "\e[38;5;146m", "hex12");
+rgb24 {
+    is(ansi_code("#AABBCC"), "\e[38;2;170;187;204m", "hex24 24bit");
+    is(ansi_code("#ABC"),    "\e[38;2;170;187;204m", "hex12 24bit");
+};
+
+is(ansi_code("(171,205,239)"), "\e[38;5;152m", "rgb");
+rgb24 {
+    is(ansi_code("(171,205,239)"), "\e[38;2;171;205;239m", "rgb 24bit");
+    is(ansi_code("(1,2,3)"), "\e[38;2;1;2;3m", "rgb 24bit");
+};
+
 
 is(ansi_code("DK/544"), "\e[1;30;48;5;224m", "256 color");
 is(ansi_code("//DK///544"), "\e[1;30;48;5;224m", "multiple /");
@@ -31,6 +50,12 @@ is(ansi_code("{SGR(1,30,48,5,224)}"), "\e[1;30;48;5;224m", "{SGR(...)}");
 
 like(ansi_end("DK/544E"), qr/^\e\[?K/, "E before RESET");
 like(ansi_end("DK/544{EL}"), qr/^\e\[?K/, "{EL} before RESET");
+
+
+is(ansi_code("<moccasin>"), "\e\[38;5;223m", "color name (<:moccasin>)");
+rgb24 {
+    is(ansi_code("<moccasin>"), "\e[38;2;255;228;181m", "<moccasin> 24bit");
+};
 
 done_testing;
 

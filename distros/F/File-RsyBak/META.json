@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,6 +22,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Rinci" : "0.01"
@@ -33,12 +34,12 @@
       "runtime" : {
          "requires" : {
             "Cwd" : "0",
-            "Exporter" : "0",
+            "Exporter" : "5.57",
             "File::Flock::Retry" : "0",
             "File::Path" : "2.08",
             "File::Which" : "0",
             "File::chdir" : "0",
-            "Log::ger" : "0.019",
+            "Log::ger" : "0.023",
             "POSIX" : "0",
             "String::ShellQuote" : "0",
             "Time::Local" : "0",
@@ -54,7 +55,7 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.98"
          }
       }
    },
@@ -66,11 +67,11 @@
       "homepage" : "https://metacpan.org/release/File-RsyBak",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/sharyanto/perl-File-RsyBak.git",
-         "web" : "https://github.com/sharyanto/perl-File-RsyBak"
+         "url" : "git://github.com/perlancar/perl-File-RsyBak.git",
+         "web" : "https://github.com/perlancar/perl-File-RsyBak"
       }
    },
-   "version" : "0.35",
+   "version" : "0.360",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -90,52 +91,52 @@
                }
             },
             "name" : "@Filter/@Filter/GatherDir",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/@Filter/PruneCruft",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/@Filter/ManifestSkip",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/@Filter/MetaYAML",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Filter/@Filter/License",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Filter/@Filter/PodCoverageTests",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/@Filter/PodSyntaxTests",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Filter/@Filter/ExtraTests",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/@Filter/ExecDir",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/@Filter/ShareDir",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -145,27 +146,27 @@
                }
             },
             "name" : "@Filter/@Filter/MakeMaker",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/@Filter/Manifest",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/@Filter/ConfirmRelease",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/ExecDir script",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.58"
+            "version" : "0.593"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -180,12 +181,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Filter/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.05"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Filter/PERLANCAR::MetaResources",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -196,6 +197,22 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Filter/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000031",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Filter/CheckSelfDependency",
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
@@ -210,12 +227,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -249,67 +266,67 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Author::PERLANCAR/Name",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Author::PERLANCAR/Version",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/prelude",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Author::PERLANCAR/Leftovers",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/postlude",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Completion::GetoptLongComplete",
@@ -344,12 +361,12 @@
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::PERLANCAR/Authors",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
@@ -369,7 +386,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Author::PERLANCAR/SingleEncoding",
-                        "version" : "4.013"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
@@ -385,7 +402,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Filter/PruneFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -430,6 +447,11 @@
             "version" : "2.054"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "@Filter/Test::Perl::Critic",
+            "version" : "3.001"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
             "name" : "@Filter/Test::Rinci",
             "version" : "0.03"
@@ -451,19 +473,19 @@
             "version" : "0.03"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Acme::CPANLists::Blacklist",
-            "name" : "@Filter/Acme::CPANLists::Blacklist",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
+            "name" : "@Filter/Acme::CPANModules::Blacklist",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
             "name" : "@Filter/Prereqs::EnsureVersion",
-            "version" : "0.04"
+            "version" : "0.050"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
             "name" : "@Filter/Prereqs::CheckCircular",
-            "version" : "0.005"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
@@ -484,7 +506,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -495,7 +517,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::Extras",
@@ -511,57 +533,57 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.008"
+            "version" : "6.009"
          }
       ],
       "zilla" : {
@@ -569,7 +591,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.008"
+         "version" : "6.009"
       }
    },
    "x_Dist_Zilla_Plugin_Depak" : {
@@ -600,7 +622,6 @@
          "Data-Sah-Normalize" : 0,
          "Data-Sah-Resolve" : 0,
          "Data-Sah-Util-Type" : 0,
-         "Encode-Locale" : 0,
          "File-Flock-Retry" : 0,
          "File-RsyBak" : 0,
          "File-ShareDir" : 0,
@@ -611,17 +632,14 @@
          "Function-Fallback-CoreOrPP" : 0,
          "Getopt-Long-Negate-EN" : 0,
          "Getopt-Long-Util" : 0,
-         "HTTP-Date" : 0,
-         "HTTP-Message" : 0,
          "HTTP-Tiny" : 0,
          "HTTP-Tiny-UNIX" : 0,
-         "IO-HTML" : 0,
          "IO-Tty" : 0,
          "IPC-Run" : 0,
          "IPC-System-Options" : 0,
          "JSON" : 0,
+         "JSON-MaybeXS" : 0,
          "JSON-PP" : 0,
-         "LWP-MediaTypes" : 0,
          "Lingua-EN-Numbers-Ordinate" : 0,
          "Lingua-EN-PluralToSingular" : 0,
          "Log-ger" : 0,
@@ -635,6 +653,7 @@
          "Module-Installed-Tiny" : 0,
          "Monkey-Patch-Action" : 0,
          "Nodejs-Util" : 0,
+         "Number-Format-BigFloat" : 0,
          "PERLANCAR-File-HomeDir" : 0,
          "PERLANCAR-Module-List" : 0,
          "Perinci-Access-Lite" : 0,
@@ -660,6 +679,7 @@
          "Role-Tiny" : 0,
          "Sah-Schemas-Rinci" : 0,
          "Scalar-Util-Numeric-PP" : 0,
+         "Sort-BySpec" : 0,
          "String-Elide-Parts" : 0,
          "String-LineNumber" : 0,
          "String-PerlQuote" : 0,
@@ -667,12 +687,12 @@
          "String-Wildcard-Bash" : 0,
          "Sub-Delete" : 0,
          "Text-ANSI-Util" : 0,
+         "Text-Table-ASV" : 0,
          "Text-Table-Any" : 0,
          "Text-Table-Tiny" : 0,
          "Text-sprintfn" : 0,
          "Tie-IxHash" : 0,
          "Time-Duration" : 0,
-         "URI" : 0,
          "YAML-Old" : 0,
          "experimental" : 0
       },
@@ -681,20 +701,20 @@
          "Class::Inspector" : "1.28",
          "Class::Inspector::Functions" : "1.28",
          "Clone::PP" : 1.06,
-         "Color::ANSI::Util" : "0.15",
+         "Color::ANSI::Util" : "0.160",
          "Complete::Bash" : "0.31",
          "Complete::Common" : "0.22",
-         "Complete::Env" : "0.39",
+         "Complete::Env" : "0.400",
          "Complete::File" : "0.43",
          "Complete::Fish" : "0.05",
          "Complete::Getopt::Long" : "0.46",
          "Complete::Path" : "0.24",
          "Complete::Tcsh" : "0.02",
-         "Complete::Util" : "0.59",
+         "Complete::Util" : "0.600",
          "Complete::Zsh" : "0.03",
-         "Config::IOD::Base" : "0.32",
-         "Config::IOD::Expr" : "0.32",
-         "Config::IOD::Reader" : "0.32",
+         "Config::IOD::Base" : "0.340",
+         "Config::IOD::Expr" : "0.340",
+         "Config::IOD::Reader" : "0.340",
          "Data::Check::Structure" : "0.04",
          "Data::Clean" : "0.49",
          "Data::Clean::FromJSON" : "0.38",
@@ -713,113 +733,112 @@
          "Data::ModeMerge::Mode::KEEP" : "0.35",
          "Data::ModeMerge::Mode::NORMAL" : "0.35",
          "Data::ModeMerge::Mode::SUBTRACT" : "0.35",
-         "Data::Sah" : "0.88",
-         "Data::Sah::Coerce" : "0.023",
-         "Data::Sah::Coerce::js::bool::float" : "0.023",
-         "Data::Sah::Coerce::js::bool::str" : "0.023",
-         "Data::Sah::Coerce::js::date::float_epoch" : "0.023",
-         "Data::Sah::Coerce::js::date::obj_Date" : "0.023",
-         "Data::Sah::Coerce::js::date::str" : "0.023",
-         "Data::Sah::Coerce::js::duration::float_secs" : "0.023",
-         "Data::Sah::Coerce::js::duration::str_iso8601" : "0.023",
-         "Data::Sah::Coerce::perl::bool::str" : "0.023",
-         "Data::Sah::Coerce::perl::date::float_epoch" : "0.023",
-         "Data::Sah::Coerce::perl::date::obj_DateTime" : "0.023",
-         "Data::Sah::Coerce::perl::date::obj_TimeMoment" : "0.023",
-         "Data::Sah::Coerce::perl::date::str_iso8601" : "0.023",
-         "Data::Sah::Coerce::perl::duration::float_secs" : "0.023",
-         "Data::Sah::Coerce::perl::duration::obj_DateTimeDuration" : "0.023",
-         "Data::Sah::Coerce::perl::duration::str_human" : "0.023",
-         "Data::Sah::Coerce::perl::duration::str_iso8601" : "0.023",
-         "Data::Sah::Coerce::perl::float::str_percent" : "0.023",
-         "Data::Sah::Coerce::perl::int::str_percent" : "0.023",
-         "Data::Sah::CoerceCommon" : "0.023",
-         "Data::Sah::CoerceJS" : "0.023",
-         "Data::Sah::Compiler" : "0.88",
-         "Data::Sah::Compiler::Prog" : "0.88",
-         "Data::Sah::Compiler::Prog::TH" : "0.88",
-         "Data::Sah::Compiler::Prog::TH::all" : "0.88",
-         "Data::Sah::Compiler::Prog::TH::any" : "0.88",
-         "Data::Sah::Compiler::TH" : "0.88",
-         "Data::Sah::Compiler::TextResultRole" : "0.88",
-         "Data::Sah::Compiler::human" : "0.88",
-         "Data::Sah::Compiler::human::TH" : "0.88",
-         "Data::Sah::Compiler::human::TH::Comparable" : "0.88",
-         "Data::Sah::Compiler::human::TH::HasElems" : "0.88",
-         "Data::Sah::Compiler::human::TH::Sortable" : "0.88",
-         "Data::Sah::Compiler::human::TH::all" : "0.88",
-         "Data::Sah::Compiler::human::TH::any" : "0.88",
-         "Data::Sah::Compiler::human::TH::array" : "0.88",
-         "Data::Sah::Compiler::human::TH::bool" : "0.88",
-         "Data::Sah::Compiler::human::TH::buf" : "0.88",
-         "Data::Sah::Compiler::human::TH::cistr" : "0.88",
-         "Data::Sah::Compiler::human::TH::code" : "0.88",
-         "Data::Sah::Compiler::human::TH::date" : "0.88",
-         "Data::Sah::Compiler::human::TH::duration" : "0.88",
-         "Data::Sah::Compiler::human::TH::float" : "0.88",
-         "Data::Sah::Compiler::human::TH::hash" : "0.88",
-         "Data::Sah::Compiler::human::TH::int" : "0.88",
-         "Data::Sah::Compiler::human::TH::num" : "0.88",
-         "Data::Sah::Compiler::human::TH::obj" : "0.88",
-         "Data::Sah::Compiler::human::TH::re" : "0.88",
-         "Data::Sah::Compiler::human::TH::str" : "0.88",
-         "Data::Sah::Compiler::human::TH::undef" : "0.88",
-         "Data::Sah::Compiler::perl" : "0.88",
-         "Data::Sah::Compiler::perl::TH" : "0.88",
-         "Data::Sah::Compiler::perl::TH::all" : "0.88",
-         "Data::Sah::Compiler::perl::TH::any" : "0.88",
-         "Data::Sah::Compiler::perl::TH::array" : "0.88",
-         "Data::Sah::Compiler::perl::TH::bool" : "0.88",
-         "Data::Sah::Compiler::perl::TH::buf" : "0.88",
-         "Data::Sah::Compiler::perl::TH::cistr" : "0.88",
-         "Data::Sah::Compiler::perl::TH::code" : "0.88",
-         "Data::Sah::Compiler::perl::TH::date" : "0.88",
-         "Data::Sah::Compiler::perl::TH::duration" : "0.88",
-         "Data::Sah::Compiler::perl::TH::float" : "0.88",
-         "Data::Sah::Compiler::perl::TH::hash" : "0.88",
-         "Data::Sah::Compiler::perl::TH::int" : "0.88",
-         "Data::Sah::Compiler::perl::TH::num" : "0.88",
-         "Data::Sah::Compiler::perl::TH::obj" : "0.88",
-         "Data::Sah::Compiler::perl::TH::re" : "0.88",
-         "Data::Sah::Compiler::perl::TH::str" : "0.88",
-         "Data::Sah::Compiler::perl::TH::undef" : "0.88",
-         "Data::Sah::Human" : "0.88",
-         "Data::Sah::Lang" : "0.88",
-         "Data::Sah::Lang::fr_FR" : "0.88",
-         "Data::Sah::Lang::id_ID" : "0.88",
-         "Data::Sah::Lang::zh_CN" : "0.88",
-         "Data::Sah::Normalize" : "0.04",
+         "Data::Sah" : "0.893",
+         "Data::Sah::Coerce" : "0.026",
+         "Data::Sah::Coerce::js::bool::float" : "0.026",
+         "Data::Sah::Coerce::js::bool::str" : "0.026",
+         "Data::Sah::Coerce::js::date::float_epoch" : "0.026",
+         "Data::Sah::Coerce::js::date::obj_Date" : "0.026",
+         "Data::Sah::Coerce::js::date::str" : "0.026",
+         "Data::Sah::Coerce::js::duration::float_secs" : "0.026",
+         "Data::Sah::Coerce::js::duration::str_iso8601" : "0.026",
+         "Data::Sah::Coerce::perl::bool::str" : "0.026",
+         "Data::Sah::Coerce::perl::date::float_epoch" : "0.026",
+         "Data::Sah::Coerce::perl::date::obj_DateTime" : "0.026",
+         "Data::Sah::Coerce::perl::date::obj_TimeMoment" : "0.026",
+         "Data::Sah::Coerce::perl::date::str_iso8601" : "0.026",
+         "Data::Sah::Coerce::perl::duration::float_secs" : "0.026",
+         "Data::Sah::Coerce::perl::duration::obj_DateTimeDuration" : "0.026",
+         "Data::Sah::Coerce::perl::duration::str_human" : "0.026",
+         "Data::Sah::Coerce::perl::duration::str_iso8601" : "0.026",
+         "Data::Sah::Coerce::perl::float::str_percent" : "0.026",
+         "Data::Sah::Coerce::perl::int::str_percent" : "0.026",
+         "Data::Sah::CoerceCommon" : "0.026",
+         "Data::Sah::CoerceJS" : "0.026",
+         "Data::Sah::Compiler" : "0.893",
+         "Data::Sah::Compiler::Prog" : "0.893",
+         "Data::Sah::Compiler::Prog::TH" : "0.893",
+         "Data::Sah::Compiler::Prog::TH::all" : "0.893",
+         "Data::Sah::Compiler::Prog::TH::any" : "0.893",
+         "Data::Sah::Compiler::TH" : "0.893",
+         "Data::Sah::Compiler::TextResultRole" : "0.893",
+         "Data::Sah::Compiler::human" : "0.893",
+         "Data::Sah::Compiler::human::TH" : "0.893",
+         "Data::Sah::Compiler::human::TH::Comparable" : "0.893",
+         "Data::Sah::Compiler::human::TH::HasElems" : "0.893",
+         "Data::Sah::Compiler::human::TH::Sortable" : "0.893",
+         "Data::Sah::Compiler::human::TH::all" : "0.893",
+         "Data::Sah::Compiler::human::TH::any" : "0.893",
+         "Data::Sah::Compiler::human::TH::array" : "0.893",
+         "Data::Sah::Compiler::human::TH::bool" : "0.893",
+         "Data::Sah::Compiler::human::TH::buf" : "0.893",
+         "Data::Sah::Compiler::human::TH::cistr" : "0.893",
+         "Data::Sah::Compiler::human::TH::code" : "0.893",
+         "Data::Sah::Compiler::human::TH::date" : "0.893",
+         "Data::Sah::Compiler::human::TH::duration" : "0.893",
+         "Data::Sah::Compiler::human::TH::float" : "0.893",
+         "Data::Sah::Compiler::human::TH::hash" : "0.893",
+         "Data::Sah::Compiler::human::TH::int" : "0.893",
+         "Data::Sah::Compiler::human::TH::num" : "0.893",
+         "Data::Sah::Compiler::human::TH::obj" : "0.893",
+         "Data::Sah::Compiler::human::TH::re" : "0.893",
+         "Data::Sah::Compiler::human::TH::str" : "0.893",
+         "Data::Sah::Compiler::human::TH::undef" : "0.893",
+         "Data::Sah::Compiler::perl" : "0.893",
+         "Data::Sah::Compiler::perl::TH" : "0.893",
+         "Data::Sah::Compiler::perl::TH::all" : "0.893",
+         "Data::Sah::Compiler::perl::TH::any" : "0.893",
+         "Data::Sah::Compiler::perl::TH::array" : "0.893",
+         "Data::Sah::Compiler::perl::TH::bool" : "0.893",
+         "Data::Sah::Compiler::perl::TH::buf" : "0.893",
+         "Data::Sah::Compiler::perl::TH::cistr" : "0.893",
+         "Data::Sah::Compiler::perl::TH::code" : "0.893",
+         "Data::Sah::Compiler::perl::TH::date" : "0.893",
+         "Data::Sah::Compiler::perl::TH::duration" : "0.893",
+         "Data::Sah::Compiler::perl::TH::float" : "0.893",
+         "Data::Sah::Compiler::perl::TH::hash" : "0.893",
+         "Data::Sah::Compiler::perl::TH::int" : "0.893",
+         "Data::Sah::Compiler::perl::TH::num" : "0.893",
+         "Data::Sah::Compiler::perl::TH::obj" : "0.893",
+         "Data::Sah::Compiler::perl::TH::re" : "0.893",
+         "Data::Sah::Compiler::perl::TH::str" : "0.893",
+         "Data::Sah::Compiler::perl::TH::undef" : "0.893",
+         "Data::Sah::Human" : "0.893",
+         "Data::Sah::Lang" : "0.893",
+         "Data::Sah::Lang::fr_FR" : "0.893",
+         "Data::Sah::Lang::id_ID" : "0.893",
+         "Data::Sah::Lang::zh_CN" : "0.893",
+         "Data::Sah::Normalize" : "0.050",
          "Data::Sah::Resolve" : "0.007",
-         "Data::Sah::Type::BaseType" : "0.88",
-         "Data::Sah::Type::Comparable" : "0.88",
-         "Data::Sah::Type::HasElems" : "0.88",
-         "Data::Sah::Type::Sortable" : "0.88",
-         "Data::Sah::Type::all" : "0.88",
-         "Data::Sah::Type::any" : "0.88",
-         "Data::Sah::Type::array" : "0.88",
-         "Data::Sah::Type::bool" : "0.88",
-         "Data::Sah::Type::buf" : "0.88",
-         "Data::Sah::Type::cistr" : "0.88",
-         "Data::Sah::Type::code" : "0.88",
-         "Data::Sah::Type::date" : "0.88",
-         "Data::Sah::Type::duration" : "0.88",
-         "Data::Sah::Type::float" : "0.88",
-         "Data::Sah::Type::hash" : "0.88",
-         "Data::Sah::Type::int" : "0.88",
-         "Data::Sah::Type::num" : "0.88",
-         "Data::Sah::Type::obj" : "0.88",
-         "Data::Sah::Type::re" : "0.88",
-         "Data::Sah::Type::str" : "0.88",
-         "Data::Sah::Type::undef" : "0.88",
-         "Data::Sah::Util::Func" : "0.88",
-         "Data::Sah::Util::Role" : "0.88",
+         "Data::Sah::Type::BaseType" : "0.893",
+         "Data::Sah::Type::Comparable" : "0.893",
+         "Data::Sah::Type::HasElems" : "0.893",
+         "Data::Sah::Type::Sortable" : "0.893",
+         "Data::Sah::Type::all" : "0.893",
+         "Data::Sah::Type::any" : "0.893",
+         "Data::Sah::Type::array" : "0.893",
+         "Data::Sah::Type::bool" : "0.893",
+         "Data::Sah::Type::buf" : "0.893",
+         "Data::Sah::Type::cistr" : "0.893",
+         "Data::Sah::Type::code" : "0.893",
+         "Data::Sah::Type::date" : "0.893",
+         "Data::Sah::Type::duration" : "0.893",
+         "Data::Sah::Type::float" : "0.893",
+         "Data::Sah::Type::hash" : "0.893",
+         "Data::Sah::Type::int" : "0.893",
+         "Data::Sah::Type::num" : "0.893",
+         "Data::Sah::Type::obj" : "0.893",
+         "Data::Sah::Type::re" : "0.893",
+         "Data::Sah::Type::str" : "0.893",
+         "Data::Sah::Type::undef" : "0.893",
+         "Data::Sah::Util::Func" : "0.893",
+         "Data::Sah::Util::Role" : "0.893",
          "Data::Sah::Util::Type" : "0.46",
-         "Data::Sah::Util::Type::Date" : "0.88",
-         "Data::Sah::Util::TypeX" : "0.88",
-         "Encode::Locale" : "1.05",
+         "Data::Sah::Util::Type::Date" : "0.893",
+         "Data::Sah::Util::TypeX" : "0.893",
          "File::Flock::Retry" : "0.62",
-         "File::RsyBak" : "0.35",
-         "File::RsyBak::Packed" : "0.35",
+         "File::RsyBak" : "0.360",
+         "File::RsyBak::Packed" : "0.360",
          "File::ShareDir" : "1.102",
          "File::ShareDir::Tarball" : "0.2.2",
          "File::Slurper" : "0.009",
@@ -827,21 +846,9 @@
          "File::chdir" : "0.1010",
          "Function::Fallback::CoreOrPP" : "0.08",
          "Getopt::Long::Negate::EN" : "0.05",
-         "Getopt::Long::Util" : "0.88",
-         "HTTP::Config" : "6.11",
-         "HTTP::Date" : "6.02",
-         "HTTP::Headers" : "6.11",
-         "HTTP::Headers::Auth" : "6.11",
-         "HTTP::Headers::ETag" : "6.11",
-         "HTTP::Headers::Util" : "6.11",
-         "HTTP::Message" : "6.11",
-         "HTTP::Request" : "6.11",
-         "HTTP::Request::Common" : "6.11",
-         "HTTP::Response" : "6.11",
-         "HTTP::Status" : "6.11",
-         "HTTP::Tiny" : "0.056",
-         "HTTP::Tiny::UNIX" : "0.04",
-         "IO::HTML" : "1.001",
+         "Getopt::Long::Util" : "0.890",
+         "HTTP::Tiny" : "0.070",
+         "HTTP::Tiny::UNIX" : "0.051",
          "IO::Pty" : "1.12",
          "IO::Tty" : "1.12",
          "IPC::Run" : "0.94",
@@ -851,31 +858,32 @@
          "IPC::Run::Win32Helper" : "0.90",
          "IPC::Run::Win32IO" : "0.90",
          "IPC::Run::Win32Pump" : "0.90",
-         "IPC::System::Options" : "0.32",
+         "IPC::System::Options" : "0.330",
          "JSON" : "2.90",
+         "JSON::MaybeXS" : "1.003007",
          "JSON::PP" : "2.27300",
          "JSON::PP::Boolean" : null,
-         "LWP::MediaTypes" : "6.02",
          "Lingua::EN::Numbers::Ordinate" : "1.04",
          "Lingua::EN::PluralToSingular" : "0.18",
-         "Log::ger" : "0.020",
-         "Log::ger::App" : "0.003",
-         "Log::ger::Format" : "0.020",
-         "Log::ger::Format::None" : "0.020",
-         "Log::ger::Heavy" : "0.020",
-         "Log::ger::Layout" : "0.020",
+         "Log::ger" : "0.023",
+         "Log::ger::App" : "0.006",
+         "Log::ger::Format" : "0.023",
+         "Log::ger::Format::None" : "0.023",
+         "Log::ger::Heavy" : "0.023",
+         "Log::ger::Layout" : "0.023",
          "Log::ger::Layout::Pattern" : "0.001",
-         "Log::ger::Output" : "0.020",
-         "Log::ger::Output::Array" : "0.020",
+         "Log::ger::Output" : "0.023",
+         "Log::ger::Output::Array" : "0.023",
+         "Log::ger::Output::ArrayML" : "0.023",
          "Log::ger::Output::Composite" : "0.007",
-         "Log::ger::Output::File" : "0.002",
-         "Log::ger::Output::Null" : "0.020",
-         "Log::ger::Output::Screen" : "0.005",
-         "Log::ger::Output::String" : "0.020",
+         "Log::ger::Output::File" : "0.006",
+         "Log::ger::Output::Null" : "0.023",
+         "Log::ger::Output::Screen" : "0.007",
+         "Log::ger::Output::String" : "0.023",
          "Log::ger::Output::Syslog" : "0.001",
-         "Log::ger::Plugin" : "0.020",
-         "Log::ger::Plugin::MultilevelLog" : "0.020",
-         "Log::ger::Util" : "0.020",
+         "Log::ger::Plugin" : "0.023",
+         "Log::ger::Plugin::MultilevelLog" : "0.023",
+         "Log::ger::Util" : "0.023",
          "Mo" : "0.40",
          "Mo::Golf" : "0.40",
          "Mo::Inline" : "0.40",
@@ -895,17 +903,18 @@
          "Mo::required" : "0.40",
          "Mo::xs" : "0.40",
          "Module::Installed::Tiny" : "0.003",
-         "Monkey::Patch::Action" : "0.05",
-         "Monkey::Patch::Action::Handle" : "0.05",
-         "Nodejs::Util" : "0.006",
+         "Monkey::Patch::Action" : "0.061",
+         "Monkey::Patch::Action::Handle" : "0.061",
+         "Nodejs::Util" : "0.012",
+         "Number::Format::BigFloat" : "0.001",
          "PERLANCAR::File::HomeDir" : "0.05",
          "PERLANCAR::Module::List" : "0.003005",
          "Perinci::Access::Lite" : "0.14",
          "Perinci::AccessUtil" : "0.06",
-         "Perinci::CmdLine::Base" : "1.77",
-         "Perinci::CmdLine::Help" : "0.16",
-         "Perinci::CmdLine::Lite" : "1.77",
-         "Perinci::CmdLine::Util::Config" : "1.71",
+         "Perinci::CmdLine::Base" : "1.815",
+         "Perinci::CmdLine::Help" : "0.170",
+         "Perinci::CmdLine::Lite" : "1.815",
+         "Perinci::CmdLine::Util::Config" : "1.721",
          "Perinci::Object" : "0.30",
          "Perinci::Object::EnvResult" : "0.30",
          "Perinci::Object::EnvResultMulti" : "0.30",
@@ -915,95 +924,54 @@
          "Perinci::Object::Package" : "0.30",
          "Perinci::Object::ResMeta" : "0.30",
          "Perinci::Object::Variable" : "0.30",
-         "Perinci::Result::Format::Lite" : "0.25",
-         "Perinci::Sub::Complete" : "0.92",
+         "Perinci::Result::Format::Lite" : "0.274",
+         "Perinci::Sub::Complete" : "0.931",
          "Perinci::Sub::ConvertArgs::Argv" : "0.10",
          "Perinci::Sub::ConvertArgs::Array" : "0.08",
          "Perinci::Sub::DepChecker" : "0.11",
-         "Perinci::Sub::GetArgs::Argv" : "0.82",
+         "Perinci::Sub::GetArgs::Argv" : "0.840",
          "Perinci::Sub::GetArgs::Array" : "0.16",
-         "Perinci::Sub::Normalize" : "0.19",
+         "Perinci::Sub::Normalize" : "0.200",
          "Perinci::Sub::To::CLIDocData" : "0.28",
          "Perinci::Sub::Util" : "0.46",
          "Perinci::Sub::Util::Args" : "0.46",
          "Perinci::Sub::Util::ResObj" : "0.46",
          "Perinci::Sub::Util::Sort" : "0.46",
          "Proc::ChildError" : "0.04",
-         "Progress::Any" : "0.20",
-         "Progress::Any::Output" : "0.20",
-         "Progress::Any::Output::Null" : "0.20",
-         "Progress::Any::Output::TermProgressBarColor" : "0.23",
+         "Progress::Any" : "0.214",
+         "Progress::Any::Output" : "0.214",
+         "Progress::Any::Output::Null" : "0.214",
+         "Progress::Any::Output::TermProgressBarColor" : "0.245",
          "Regexp::Stringify" : "0.06",
-         "Role::Tiny" : "2.000003",
-         "Role::Tiny::With" : "2.000003",
-         "Sah::Schema::rinci::function_meta" : "1.1.82.2",
-         "Sah::Schema::rinci::meta" : "1.1.82.2",
-         "Sah::Schema::rinci::result_meta" : "1.1.82.2",
-         "Sah::SchemaR::rinci::function_meta" : "1.1.82.2",
-         "Sah::SchemaR::rinci::meta" : "1.1.82.2",
-         "Sah::SchemaR::rinci::result_meta" : "1.1.82.2",
-         "Sah::Schemas::Rinci" : "1.1.82.2",
+         "Role::Tiny" : "2.000005",
+         "Role::Tiny::With" : "2.000005",
+         "Sah::Schema::rinci::function_meta" : "1.1.82.3",
+         "Sah::Schema::rinci::meta" : "1.1.82.3",
+         "Sah::Schema::rinci::result_meta" : "1.1.82.3",
+         "Sah::SchemaR::rinci::function_meta" : "1.1.82.3",
+         "Sah::SchemaR::rinci::meta" : "1.1.82.3",
+         "Sah::SchemaR::rinci::result_meta" : "1.1.82.3",
+         "Sah::Schemas::Rinci" : "1.1.82.3",
          "Scalar::Util::Numeric::PP" : "0.04",
+         "Sort::BySpec" : "0.03",
          "String::Elide::Parts" : "0.07",
          "String::LineNumber" : "0.01",
          "String::PerlQuote" : "0.02",
          "String::ShellQuote" : "1.04",
          "String::Wildcard::Bash" : "0.03",
          "Sub::Delete" : "1.00002",
-         "Test::Config::IOD::Common" : "0.32",
-         "Test::Data::Sah" : "0.88",
-         "Test::Data::Sah::Human" : "0.88",
-         "Test::Data::Sah::Perl" : "0.88",
+         "Test::Config::IOD::Common" : "0.340",
+         "Test::Data::Sah" : "0.893",
+         "Test::Data::Sah::Human" : "0.893",
+         "Test::Data::Sah::Perl" : "0.893",
          "Text::ANSI::BaseUtil" : "0.22",
          "Text::ANSI::Util" : "0.22",
-         "Text::Table::Any" : "0.08",
+         "Text::Table::ASV" : "0.001",
+         "Text::Table::Any" : "0.092",
          "Text::Table::Tiny" : "0.04",
          "Text::sprintfn" : "0.08",
          "Tie::IxHash" : "1.23",
          "Time::Duration" : "1.20",
-         "URI" : "1.71",
-         "URI::Escape" : "3.31",
-         "URI::Heuristic" : "4.20",
-         "URI::IRI" : "1.71",
-         "URI::QueryParam" : "1.71",
-         "URI::Split" : "1.71",
-         "URI::URL" : "5.04",
-         "URI::WithBase" : "2.20",
-         "URI::data" : "1.71",
-         "URI::file" : "4.21",
-         "URI::file::Base" : "1.71",
-         "URI::file::FAT" : "1.71",
-         "URI::file::Mac" : "1.71",
-         "URI::file::OS2" : "1.71",
-         "URI::file::QNX" : "1.71",
-         "URI::file::Unix" : "1.71",
-         "URI::file::Win32" : "1.71",
-         "URI::ftp" : "1.71",
-         "URI::gopher" : "1.71",
-         "URI::http" : "1.71",
-         "URI::https" : "1.71",
-         "URI::ldap" : "1.71",
-         "URI::ldapi" : "1.71",
-         "URI::ldaps" : "1.71",
-         "URI::mailto" : "1.71",
-         "URI::mms" : "1.71",
-         "URI::news" : "1.71",
-         "URI::nntp" : "1.71",
-         "URI::pop" : "1.71",
-         "URI::rlogin" : "1.71",
-         "URI::rsync" : "1.71",
-         "URI::rtsp" : "1.71",
-         "URI::rtspu" : "1.71",
-         "URI::sftp" : "1.71",
-         "URI::sip" : "1.71",
-         "URI::sips" : "1.71",
-         "URI::snews" : "1.71",
-         "URI::ssh" : "1.71",
-         "URI::telnet" : "1.71",
-         "URI::tn3270" : "1.71",
-         "URI::urn" : "1.71",
-         "URI::urn::isbn" : null,
-         "URI::urn::oid" : "1.71",
          "YAML::Old" : "1.07",
          "YAML::Old::Dumper" : null,
          "YAML::Old::Dumper::Base" : null,

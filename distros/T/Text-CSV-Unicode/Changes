@@ -81,3 +81,24 @@ Revision history for Perl extension Text::CSV::Unicode.
 	Use C<warnings::warnif()>
 	Better punctuation in the t/unicode.t tests
 	
+0.299_001   2018-09-27
+	Text::CSV::Base is redundant
+	Document always_quote in Text::CSV::Unicode
+	Drop charnames - not used
+
+0.300 2018-09-28
+	Text::CSV::Unicode does not use Text::CSV::Base
+	Text::CSV::Base is redundant
+	Text::CSV::Unicode does not set C<always_quote => 1>
+	Text::CSV::Unicode C<binary => 1> is deprecated
+
+0.399_001    2018-09-27
+	Removed Text::CSV::Base
+	t/base.t tests Text::CSV::Base as 'empty subclass'
+
+0.399_002    2018-10-01
+	Replace C<unless _ok()> with C<if _bad()>
+
+0.400 2018-10-02
+	Removed Text::CSV::Base - except from tests
+

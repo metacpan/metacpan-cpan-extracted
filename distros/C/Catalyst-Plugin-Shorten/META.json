@@ -1,0 +1,62 @@
+{
+   "abstract" : "The great ancient URI shortner!",
+   "author" : [
+      "LNATION <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-Shorten",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bijection" : "0.04",
+            "Catalyst::Runtime" : "5.80001",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Plugin::Shorten" : {
+         "file" : "lib/Catalyst/Plugin/Shorten.pm",
+         "version" : "0.02"
+      },
+      "Catalyst::Plugin::Shorten::Store::Dummy" : {
+         "file" : "lib/Catalyst/Plugin/Shorten/Store/Dummy.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Catalyst-Plugin-Shorten.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Catalyst-Plugin-Shorten"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

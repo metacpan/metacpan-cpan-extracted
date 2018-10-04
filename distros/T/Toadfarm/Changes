@@ -1,5 +1,8 @@
 Revision history for perl distribution Toadfarm
 
+0.79 2018-09-26T01:26:17+0900
+ - Compatible with Mojolicious 8.00
+
 0.78 2017-06-24T10:32:46+0200
  - Add missing "proxy_set_header Host" in BehindReverseProxy manual #23
 

@@ -1,0 +1,102 @@
+NAME
+
+    Mail::AuthenticationResults::SpamAssassin - SpamAssassin plugin for
+    parsing Authentication-Results headers via Mail::AuthenticationResults
+
+VERSION
+
+    version 1.20180927
+
+DESCRIPTION
+
+    Process Authentication-Results in Spam Assassin
+
+CONSTRUCTOR
+
+ new()
+
+    Create a SpamAssassin plugin which subclasses this class
+
+    package AuthenticationResults; use base
+    'Mail::AuthenticationResults::SpamAssassin'; 1;
+
+    Load that pluigin into SpamAssassin and set the authserv-id for the
+    headers we should be checking
+
+    loadplugin AuthenticationResults AuthenticationResults.pm
+    authentication_results_authserv_id .example.com
+
+METHODS
+
+ parse_config()
+
+    SpamAssassin plugin method to handle config entries
+
+ authentication_results_has_key_value( $key, $value )
+
+    eval method, returns true if there is an authentication-results entry
+    with the given key and value.
+
+    header PTR_FAIL
+    eval:authentication_results_has_key_value('x-ptr','fail') score
+    PTR_FAIL 1
+
+    header IPREV_FAIL
+    eval:authentication_results_has_key_value('iprev','fail') score
+    IPREV_FAIL 1
+
+    header RETURN_FAIL
+    eval:authentication_results_has_key_value('x-return-mx','fail')
+    RETURN_FAIL 2
+
+    header RETURN_WARN
+    eval:authentication_results_has_key_value('x-return-mx','warn')
+    RETURN_WARN 1
+
+    header __SPF_ERROR
+    eval:authentication_results_has_key_value('spf','error') header
+    __SPF_PERMERROR
+    eval:authentication_results_has_key_value('spf','permerror') header
+    __SPF_TEMPERROR
+    eval:authentication_results_has_key_value('spf','temperror') meta
+    SPF_ERROR __SPF_ERROR || __SPF_PERMERROR || __SPF_TEMPERROR score
+    SPF_ERROR 1
+
+ authentication_results_spf_fail()
+
+    eval method, returns true if there is an authentication-results entry
+    for an spf fail which does not also have a non fail entry for the same
+    domain (as for example, would happen when a trusted ARC forwarded adds
+    a pass).
+
+    header SPF_FAIL eval:authentication_results_spf_fail() score SPF_FAIL 1
+
+ authentication_results_dmarc_list_override()
+
+    eval method, returns true if there was a DMARC override for a failing
+    reject/quarantine policy due to detecting a list with a simple header
+    check? (not a whitelist or arc)
+
+    header DMARC_LIST_OVERRIDE
+    eval:authentication_results_dmarc_list_override() score
+    DMARC_LIST_OVERRIDE 2
+
+    DMARC Reject should be handled on the border, if not then we class this
+    as a local policy override to quarantine.
+
+    DMARC Quarantine is handled by the X-Disposition-Quarantine: header
+
+    header DMARC_QUARANTINE X-Disposition-Quarantine =~ /\S/ score
+    DMARC_QUARANTINE 10.0
+
+AUTHOR
+
+    Marc Bradshaw <marc@marcbradshaw.net>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by Marc Bradshaw.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

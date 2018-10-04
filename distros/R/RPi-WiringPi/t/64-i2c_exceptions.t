@@ -40,8 +40,16 @@ my $pi = $mod->new;
         "I2C read_block() croaks if the device has been detached";
 
     like $@, qr/has invalid return/, "...and error msg is sane";
+    
+    is
+        eval { $dev->read_block(2, 80); 1; },
+        undef,
+        "I2C read_block() croaks if speed may be the issue";
 
-    $ENV{I2C_TESTING} = 0;
+    like $@, qr/speed set correctly/, "...speed error msg is sane";
 }
+
+$ENV{I2C_TESTING} = 0;
+
 done_testing();
 

@@ -1,0 +1,33 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+0.004     2018-09-27 18:30:01 Europe/Berlin
+
+	[Changed]
+
+	The test violation_count.t failed on some systems.
+	Perl::Critic says it can't reload our module. Remove one
+	superfluous 'use_ok' check.
+
+0.003     2018-09-27 18:07:45 Europe/Berlin
+
+	[Added]
+
+	Added dependency Perl::Critic::Policy::logicLAB::ProhibitUseLib
+
+0.002     2018-09-27 17:23:25 Europe/Berlin
+
+	[Changed]
+
+	Dependencies are specified manually since AutoPrereqs won't
+	skip t/data.
+
+0.001     2018-09-27 16:54:53 Europe/Berlin
+
+	[Added]
+
+	Initial version.

@@ -38,11 +38,23 @@ my $to_compositions = new_ok(
 );
 $to_compositions->run;
 file_contents_like $outdir->child('preseed.cfg'),
-	qr/pkgsel\/include string acpi-support/,
-	'content of "preseed.cfg" seems ok';
+	qr/\nd-i pkgsel\/include string acpi-support-base /,
+	'preseed.cfg includes install of acpi-support-base';
+file_contents_like $outdir->child('preseed.cfg'),
+	qr/\nd-i pkgsel\/include string .*\n.* spamc-/,
+	'preseed.cfg includes avoidance of spamc';
+file_contents_like $outdir->child('preseed.cfg'),
+	qr/\nd-i preseed\/late_command string .*\\\n suite=\S+\\\n chroot \/target apt-mark auto \\\n  ciderwebmail/,
+	'preseed.cfg includes auto-marking of ciderwebmail';
 file_contents_like $outdir->child('script.sh'),
-	qr/apt-get install acpi-support/,
-	'content of "script.sh" seems ok';
+	qr/\napt-get install acpi-support-base /,
+	'script.sh includes install of acpi-support-base';
+file_contents_like $outdir->child('script.sh'),
+	qr/\napt-get install .*\n.* spamc-/,
+	'script.sh includes avoidance of spamc';
+file_contents_like $outdir->child('script.sh'),
+	qr/\nsuite=\S+\n\napt-mark auto \\\n  ciderwebmail/,
+	'script.sh includes auto-marking of ciderwebmail';
 
 my $from_root = new_ok( 'Boxer::Task::Classify' => [ datadir => path('.') ] );
 

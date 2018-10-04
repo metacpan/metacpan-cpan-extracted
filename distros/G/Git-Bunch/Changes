@@ -1,3 +1,9 @@
+0.623   2018-09-27 (PERLANCAR)
+
+	- [bugfix] Fix conditional ordering 'needs merging' before 'needs
+	  commit'.
+
+
 0.622   2018-01-17 (PERLANCAR)
 
 	- sync: Add action 'list-source-repos'.

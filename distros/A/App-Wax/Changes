@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Wax.
 
+2.3.0 - 2018-09-27
+
+    - improve tarball detection
+
 2.2.1 - 2018-06-01
 
     - make the version declaration(s) compatible with perl 5.8

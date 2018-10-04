@@ -1,0 +1,11 @@
+Revision history for Perl extension App-AsciiChart
+
+0.02 2018-10-03T17:41:17Z
+
+    - show the graph that is produced by the example in Synopsis (perlancar)
+    - correct legend
+    - remove unused vars
+
+0.01 2018-09-29T15:12:13Z
+
+    - original version

@@ -1,5 +1,12 @@
 Revision history for Perl module CPAN::Cpanorg::Auxiliary
 
+0.03 Wed Oct  3 12:03:09 EDT 2018
+    - Exclude from running on Windows; no other change in
+      functionality
+
+0.02 Mon Oct  1 22:07:53 2018
+    - Minor touch-ups; no change in functionality
+
 0.01 Thu Jun  7 15:18:02 2018
     - original version; created by ExtUtils::ModuleMaker 0.61
 

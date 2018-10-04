@@ -1,5 +1,13 @@
 Revision history for School-Evaluation-Gibbmers
  
+0.004     2018-09-28 12:02:44+02:00 Europe/Zurich
+ - fix minor documentation issues (formatting)
+
+0.003     2018-09-28 11:53:03+02:00 Europe/Zurich
+ - rephrased questions in german configuration file
+ - add option -c to specifiy a configuration file at start
+ - add an example configuration in gibbmers_EN.conf.yml for the english language
+
 0.002     2018-08-15 09:20:48+02:00 Europe/Zurich
  - use File::ShareDir to properly package configuration file
  - created stub School::Evaluation::Gibbmers for cpan indexing

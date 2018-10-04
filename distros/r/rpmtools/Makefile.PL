@@ -3,7 +3,7 @@
 use strict;
 use ExtUtils::MakeMaker;
 
-my $rpmtools_version = "7.06";
+my $rpmtools_version = "7.10";
 
 # where to find the rpm utility
 
@@ -28,6 +28,7 @@ WriteMakefile(
     },
     PM => {
         'packdrake.pm' => '$(INST_LIBDIR)/packdrake.pm',
+        'rpmtools.pm'  => '$(INST_LIBDIR)/rpmtools.pm',
     },
     EXE_FILES	    => [ qw(gendistrib genhdlist2 packdrake dumpdistribconf) ],
     C		    => [],
@@ -39,7 +40,7 @@ WriteMakefile(
     PREREQ_PM		=> {
 	'ExtUtils::MakeMaker'	=> '0',
 	'Getopt::Long'		=> '0',
-	'List::Util'		=> '0',
+	'List::Util'		=> '1.33',
 	'MDV::Distribconf'	=> '4.100',
 	'MDV::Packdrakeng'	=> '1.13',
 	'Pod::Usage'		=> '0',

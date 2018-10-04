@@ -1,10 +1,18 @@
 ---
 abstract: 'A nice and tiny OpenStack API client'
 author:
-  - 'Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>'
-build_requires: {}
+  - 'Alexandra Hrefna HilmisdÃ³ttir <xan@cpanel.net>'
+build_requires:
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  URI::Encode: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,5 +24,5 @@ no_index:
     - inc
 resources:
   repository: https://github.com/xantronix/openstack-client.git
-version: '1.0002'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '1.0003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

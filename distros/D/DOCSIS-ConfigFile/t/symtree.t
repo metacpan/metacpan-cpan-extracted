@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use DOCSIS::ConfigFile qw( encode_docsis );
+use DOCSIS::ConfigFile 'encode_docsis';
 use Test::More;
 
 my ($bytes, $input, $output);
@@ -32,6 +32,6 @@ done_testing;
 
 sub decode_docsis {
   my $output = DOCSIS::ConfigFile::decode_docsis($_[0]);
-  delete $output->{$_} for qw( CmtsMic CmMic GenericTLV );
+  delete $output->{$_} for qw(CmtsMic CmMic GenericTLV);
   $output;
 }

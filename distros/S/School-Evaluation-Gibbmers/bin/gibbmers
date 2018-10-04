@@ -17,7 +17,11 @@ use School::Evaluation::Gibbmers::Chart;
 
 # load config
 my $conf_file = '';
-if (-f 'gibbmers.conf.yml') {
+if (defined $ARGV[0] and $ARGV[0] eq '-c') {
+    # TODO: should be securely handled in a later release
+    $conf_file = defined $ARGV[1] ? $ARGV[1] : die 'missing path to config';
+}
+elsif (-f 'gibbmers.conf.yml') {
     $conf_file = 'gibbmers.conf.yml';
 }
 elsif (-f 'share/gibbmers.conf.yml') {
@@ -28,6 +32,8 @@ else {
     $conf_file = dist_file('School-Evaluation-Gibbmers',
                            'gibbmers.conf.yml');
 }
+
+app->log->info("loading configuration from $conf_file");
 my $yaml = YAML::Tiny->read( $conf_file );
 my $config = $yaml->[0];
 
@@ -252,7 +258,7 @@ gibbmers - create an evaluation poll over local network
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -264,6 +270,38 @@ If you start the script, a small webdeamon will run on your local machine:
 Depending on your network configuration, others and yourself should be able to connect to your local machine with a webbrowser on the url:
 
  http:$machine_ip:8443
+
+=head1 CONFIGURATION
+
+=head2 configuration file
+
+On the commandline you can define your own configuration file during the start of the application.
+Search your system for a file named C<gibbmers.conf.yml> to look at the default configuration.
+(The file is placed through L<File::ShareDir> during installation, its location may vary on different systems.)
+
+The behaviour is a follows:
+
+=over 4
+
+=item no options
+
+Use the default configuration C<gibbmers.conf.yml> from your installation.
+If your local directory contains a file named C<gibbmers.conf.yml>, load this instead.
+
+=item C<-c path/to/config>
+
+Load config, given by parameter.
+Look for a file C<gibbmers.conf.yml> in your installation for an example configuration.
+
+=back
+
+B<English support:> Currently, the default configuration is in German.
+There is an english version of the configuration file named C<gibbmers_EN.conf.yml>.
+But this will not affect the html template, which you currently will have to translate manually.
+
+=head2 html templates
+
+HTML templates are currently in the C<__DATA__> section at the end of this script.
 
 =head1 WARNINGS
 

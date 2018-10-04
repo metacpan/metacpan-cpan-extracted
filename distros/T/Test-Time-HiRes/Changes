@@ -1,5 +1,9 @@
 Revision history for Test-Time-HiRes
 
+0.04  2018-09-28 09:23:08 BST
+
+ - making import() work after unimport() - thanks: dakkar
+
 0.03  2018-07-03 16:36:54 BST
 
  - adding unimport()

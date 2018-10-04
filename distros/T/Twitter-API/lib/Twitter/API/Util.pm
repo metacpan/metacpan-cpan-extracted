@@ -1,6 +1,6 @@
 package Twitter::API::Util;
 # ABSTRACT: Utilities for working with the Twitter API
-$Twitter::API::Util::VERSION = '1.0003';
+$Twitter::API::Util::VERSION = '1.0005';
 use 5.14.1;
 use warnings;
 use Carp qw/croak/;
@@ -59,7 +59,7 @@ Twitter::API::Util - Utilities for working with the Twitter API
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 

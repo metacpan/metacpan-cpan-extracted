@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2018-09-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-10-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -174,27 +174,68 @@ sub list_installed {
     return [500, "Can't list known software: $res->[0] - $res->[1]"] if $res->[0] != 200;
     my $known = $res->[2];
 
-    my @rows;
+    if ($args{_software}) {
+        return [412, "Unknown software '$args{_software}'"] unless
+            grep { $_ eq $args{_software} } @$known;
+        $known = [$args{_software}];
+    }
+
+    my %active_versions;
+    my %all_versions;
     {
         local $CWD = $args{install_dir};
         for my $e (glob "*") {
-            next unless -l $e;
-            next unless grep { $e eq $_ } @$known;
-            my $v = readlink($e);
-            next unless $v =~ s/\A\Q$e\E-//;
-
-            push @rows, {
-                software => $e,
-                version => $v,
-            };
+            if (-l $e) {
+                next unless grep { $e eq $_ } @$known;
+                my $v = readlink($e);
+                next unless $v =~ s/\A\Q$e\E-//;
+                $active_versions{$e} = $v;
+            } elsif (-d $e) {
+                my ($n, $v) = $e =~ /(.+)-(.+)/ or next;
+                next unless grep { $n eq $_ } @$known;
+                $all_versions{$n} //= [];
+                push @{ $all_versions{$n} }, $v;
+            }
         }
     }
 
-    unless ($args{detail}) {
+    my @rows;
+    for my $sw (sort keys %all_versions) {
+        push @rows, {
+            software => $sw,
+            #version => $active_versions{$sw},
+            active_version => $active_versions{$sw},
+            inactive_versions => join(", ", grep { !defined($active_versions{$sw}) || $_ ne $active_versions{$sw} } @{ $all_versions{$sw} }),
+        };
+    }
+
+    my $resmeta = {};
+
+    if ($args{detail}) {
+        $resmeta->{'table.fields'} = [qw/software active_version inactive_versions/];
+    } else {
         @rows = map { $_->{software} } @rows;
     }
 
-    [200, "OK", \@rows];
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{list_installed_versions} = {
+    v => 1.1,
+    summary => 'List all installed versions of a software',
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+    },
+};
+sub list_installed_versions {
+    my %args = @_;
+
+    my $res = list_installed(%args, _software=>$args{software}, detail=>1);
+    return $res unless $res->[0] == 200;
+    my $row = $res->[2][0];
+    return [200, "OK (none installed)"] unless $row;
+    return [200, "OK", [map {(split /, /, $_)} grep {defined} ($row->{active_version}, $row->{inactive_versions})]];
 }
 
 $SPEC{list_downloaded} = {
@@ -272,6 +313,42 @@ sub download {
         'func.files' => \@files,
         'func.unwrap_tarball' => $dlurlres->[3]{'func.unwrap_tarball'} // 1,
     }];
+}
+
+$SPEC{cleanup} = {
+    v => 1.1,
+    summary => 'Remove inactive versions',
+    args => {
+        %args_common,
+        #%App::swcat::arg0_software,
+    },
+    # XXX add dry_run
+};
+sub cleanup {
+    require File::Path;
+
+    my %args = @_;
+
+    local $CWD = $args{install_dir};
+    my $res = list_installed(%args, _software=>$args{software}, detail=>1);
+    return $res unless $res->[0] == 200;
+    for my $row (@{ $res->[2] }) {
+        my $sw = $row->{software};
+        log_trace "Skipping software $sw because there is no active version"
+            unless defined $row->{active_version};
+        next unless defined $row->{inactive_versions};
+        log_trace "Cleaning up software $sw ...";
+        for my $v (split /, /, $row->{inactive_versions}) {
+            my $dir = "$sw-$v";
+            unless (-d $dir) {
+                log_trace "  Skipping version $v (directory does not exist)";
+                next;
+            }
+            log_trace "  Removing $dir ...";
+            File::Path::remove_tree($dir);
+        }
+    }
+    [200];
 }
 
 $SPEC{update} = {
@@ -408,13 +485,47 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.001 of App::instopt (from Perl distribution App-instopt), released on 2018-09-20.
+This document describes version 0.002 of App::instopt (from Perl distribution App-instopt), released on 2018-10-04.
 
 =head1 SYNOPSIS
 
 See L<instopt> script.
 
 =head1 FUNCTIONS
+
+
+=head2 cleanup
+
+Usage:
+
+ cleanup(%args) -> [status, msg, result, meta]
+
+Remove inactive versions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
 
 
 =head2 download
@@ -514,6 +625,42 @@ Arguments ('*' denotes required arguments):
 =item * B<install_dir> => I<dirname>
 
 =item * B<program_dir> => I<dirname>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 list_installed_versions
+
+Usage:
+
+ list_installed_versions(%args) -> [status, msg, result, meta]
+
+List all installed versions of a software.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=item * B<software>* => I<str>
 
 =back
 

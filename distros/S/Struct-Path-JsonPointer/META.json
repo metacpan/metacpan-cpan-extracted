@@ -41,5 +41,10 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/mr-mixas/Struct-Path-JsonPointer.pm"
+      }
+   },
+   "version" : "0.04"
 }

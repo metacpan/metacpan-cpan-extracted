@@ -36,14 +36,14 @@ has provider_name => sub {
 };
 
 has provider_url => sub { $_[0]->url->host ? $_[0]->url->clone->path('/') : undef };
-has template => sub { [__PACKAGE__, sprintf '%s.html.ep', $_[0]->type] };
+has template         => sub { [__PACKAGE__, sprintf '%s.html.ep', $_[0]->type] };
 has thumbnail_height => undef;
 has thumbnail_url    => undef;
 has thumbnail_width  => undef;
 has title            => undef;
 has type             => 'link';
-has ua               => undef;                                                # Mojo::UserAgent object
-has url              => undef;                                                # Mojo::URL
+has ua               => undef;                                                      # Mojo::UserAgent object
+has url              => undef;                                                      # Mojo::URL
 has version          => '1.0';
 has width            => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
 
@@ -55,18 +55,11 @@ sub html {
   return $output;
 }
 
-sub learn {
-  my ($self, $cb) = @_;
-  my $url = $self->url;
+sub learn_p {
+  my $self = shift;
+  my $url  = $self->url;
 
-  if ($cb) {
-    $self->ua->get($url => sub { $self->tap(_learn => $_[1])->$cb });
-  }
-  else {
-    $self->_learn($self->ua->get($url));
-  }
-
-  return $self;
+  return $self->ua->get_p($url)->then(sub { $self->_learn(shift) });
 }
 
 sub TO_JSON {
@@ -89,11 +82,13 @@ sub _el {
   my ($self, $dom, @sel) = @_;
   @sel = @{$DOM_SEL{$sel[0]}} if $DOM_SEL{$sel[0]};
 
-  for (@sel) {
-    my $e = $dom->at($_) or next;
-    my $val = trim($e->{content} || $e->{value} || $e->{href} || $e->text || '') or next;
-    return $val;
+  for my $sel (@sel) {
+    my $e = $dom->at($sel) or next;
+    my ($val) = grep {$_} map { trim($_ // '') } $e->{content}, $e->{value}, $e->{href}, $e->text, $e->all_text;
+    return $val if defined $val;
   }
+
+  return '';
 }
 
 sub _learn {
@@ -119,6 +114,8 @@ sub _learn_from_dom {
   $self->thumbnail_url($v)    if $v = $self->_el($dom, ':image');
   $self->thumbnail_width($v)  if $v = $self->_el($dom, 'meta[property="og:image:width"]');
   $self->title($v)            if $v = $self->_el($dom, ':title');
+
+  return $self;
 }
 
 sub _learn_from_json {
@@ -129,14 +126,15 @@ sub _learn_from_json {
   $self->{$_} ||= $json->{$_} for keys %$json;
   $self->{error} = {message => $self->{error}} if defined $self->{error} and !ref $self->{error};
   $self->{error}{code} = $self->{status} if $self->{status} and $self->{status} =~ /^\d+$/;
+
+  return $self;
 }
 
 sub _learn_from_url {
   my $self = shift;
   my $path = $self->url->path;
 
-  $self->title(@$path ? $path->[-1] : 'Image');
-  $self;
+  return $self->title(@$path ? $path->[-1] : 'Image');
 }
 
 1;
@@ -277,10 +275,9 @@ The width in pixels. Might be C<undef>.
 
 Returns the L</url> as rich markup, if possible.
 
-=head2 learn
+=head2 learn_p
 
-  $self = $self->learn;
-  $self = $self->learn(sub { my $self = shift; });
+  $promise = $self->learn_p->then(sub { my $self = shift; });
 
 Used to learn about the L</url>.
 

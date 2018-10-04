@@ -1,6 +1,6 @@
 package Twitter::API::Trait::Migration;
 # ABSTRACT: Migration support Net::Twitter/::Lite users
-$Twitter::API::Trait::Migration::VERSION = '1.0003';
+$Twitter::API::Trait::Migration::VERSION = '1.0005';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -117,7 +117,7 @@ Twitter::API::Trait::Migration - Migration support Net::Twitter/::Lite users
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 DESCRIPTION
 
@@ -207,7 +207,7 @@ L<Enchilada|Twitter::API::Trait::Enchilada>
 
 B<ApiMethods >is a direct replacement for Net::Twitter's API::RESTv1_1 trait.
 
-Net::Twitter's B<InflateObjects > trait will be released as a separate distribution
+Net::Twitter's B<InflateObjects> trait will be released as a separate distribution
 to minimize Twitter::API's dependencies.
 
 If you are using the Net::Twitter's B<WrapResults> trait, Twitter::API provides
@@ -332,7 +332,7 @@ during migration. It will be removed in a future release.
 
 The discussion, above applies for L<Net::Twitter::Lite> with a few exceptions.
 
-Net::Twitter::Lite does not use traits. Change your contructor call from:
+Net::Twitter::Lite does not use traits. Change your constructor call from:
 
     my $client = Net::Twitter::Lite::WithAPIv1_1->new(%args);
 

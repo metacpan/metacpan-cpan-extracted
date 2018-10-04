@@ -8,22 +8,15 @@ has thumbnail_url    => $ENV{LINK_EMBEDDER_TRAVIS_THUMBNAIL_URL}
   || 'https://cdn.travis-ci.org/images/logos/TravisCI-Mascot-1-20feeadb48fc2492ba741d89cb5a5c8a.png';
 has thumbnail_width => 497;
 
-sub learn {
-  my ($self, $cb) = @_;
+sub learn_p {
+  my $self     = shift;
   my $api_url  = $self->url->clone->host('api.travis-ci.org');
   my $api_path = $api_url->path;
 
-  return $self->SUPER::learn($cb) unless $api_path =~ m!^/(.*/builds/\d+)$!;
+  return $self->SUPER::learn_p unless $api_path =~ m!^/(.*/builds/\d+)$!;
   $api_url->path->parse("/repositories/$1");
 
-  if ($cb) {
-    $self->ua->get($api_url => sub { $self->tap(_learn_from_json => $_[1])->$cb });
-  }
-  else {
-    $self->_learn_from_json($self->ua->get($api_url));
-  }
-
-  return $self;
+  return $self->ua->get_p($api_url)->then(sub { $self->_learn_from_json(shift) });
 }
 
 sub _learn_from_json {
@@ -46,6 +39,8 @@ sub _learn_from_json {
   else {
     $self->title('Build has not been started.');
   }
+
+  return $self;
 }
 
 1;

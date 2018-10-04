@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing;
-$Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -66,7 +66,7 @@ Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing - Parse AMEX Tra
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -164,67 +164,158 @@ This field contains the Detail Record Type code that indicates the type of recor
 This field contains a Fee Code that corresponds to preceding ROC Detail Record. For valid ROC Level Pricing Record Fee
 Codes, see below.
 
- Sr. No.    Fee Code   Fee Description
- 1          CB         CHGBCK FEE
- 2          CC         CHARGE
- 3          CF         CREDIT FEE
- 4          CK         CHECK FEE
- 5          CN         NONSWIPED
- 6          CO         CORPORATE
- 7          CR         RET DSC CR
- 8          CS         CROC SBI
- 9          C1         RDR CAP
- 10         DB         DEBIT CARD
- 11         DC         D/C TERMNL
- 12         DD         DIRECT DEP
- 13         DF         DSPUTE FEE
- 14         E1         CPC EIPP
- 15         E2         CPC EIPP2
- 16         E3         CPC EIPP3
- 17         FF         FLAT FEE
- 18         GG         RET DSC GG
- 19         G1         HIROC CHG
- 20         G2         HIROC CHG2
- 21         G3         HIROC CHG3
- 22         HC         H-NONSWIPE
- 23         HI         HIGH ROC
- 24         JC         JCB CARD
- 25         MI         MICRO MRCH
- 26         MM         MONMIN FEE
- 27         MN         MNTHLY FEE
- 28         MR         MEMBERSHIP
- 29         NA         REGULAR SUBMISSION
- 30         NC         NONCOMPLIA
- 31         OP         REVOLVING
- 32         O1         HIROC COR
- 33         O2         HIROC COR2
- 34         O3         HIROC COR3
- 35         PA         PAPER(SOC)
- 36         PC         PURCH CARD
- 37         PI         APCD PRC
- 38         PL         PAYFLW LNK
- 39         PP         PAYFLW PRO
- 40         P1         HIROC PUR
- 41         P2         HIROC PUR2
- 42         P3         HIROC PUR3
- 43         QU         QUTRLY FEE
- 44         RD         RETAIN DSC
- 45         RO         RDR OPTOUT
- 46         R1         HIROC REG
- 47         R2         HIROC REG2
- 48         R3         HIROC REG3
- 49         SB         SBI
- 50         SE         SETUP FEE
- 51         SM         SM MERCHNT
- 52         ST         STATEMENT
- 53         SV         STORED VAL
- 54         TR         TRANS CNT
- 55         VA         VOICE AUTH
- 56         VG         GATEWAY
- 57         X1         CORP EIPP
- 58         X2         CORP EIPP2
- 59         X3         CORP EIPP3
- 60         YR         YEARLY FEE
+ Fee Code   Fee Description
+ AI         NS AUTHFEE (May 2018)
+ AP         CNP APP-IN (May 2018)
+ AS         ACCESS FEE (May 2018)
+ BC         RETURN FEE (May 2018)
+ B1         HVP PC CR1 (May 2018)
+ B2         HVP PC CR2 (May 2018)
+ B3         HVP PC CR3 (May 2018)
+ CB         CHGBCK FEE
+ CC         CHARGE
+ CF         CREDIT FEE
+ CK         CHECK FEE
+ CN         NONSWIPED
+ CO         CORPORATE
+ CP         RATE CAP (May 2018)
+ CR         RET DSC CR
+ CS         CROC SBI
+ CT         CREDIT FEE (May 2018)
+ C1         RDR CAP
+ DB         DEBIT CARD
+ DC         D/C TERMNL
+ DD         DIRECT DEP
+ DF         DSPUTE FEE
+ DP         DYNAMIC PRICING (May 2018)
+ DQ         DATA QUAL (May 2018)
+ E1         CPC EIPP
+ E2         CPC EIPP2
+ E3         CPC EIPP3
+ FF         FLAT FEE
+ F1         HVP RP CR1 (May 2018)
+ F2         HVP RP CR2 (May 2018)
+ F3         HVP RP CR3 (May 2018)
+ GA         CONSUMER 1 (May 2018)
+ GB         CORPORATE1 (May 2018)
+ GC         SMBUSINES1 (May 2018)
+ GD         CONSUMER 2 (May 2018)
+ GE         CORPORATE2 (May 2018)
+ GF         SMBUSINES2 (May 2018)
+ GG         RET DSC GG
+ GH         CONSUMER 3 (May 2018)
+ GI         CORPORATE3 (May 2018)
+ GJ         SMBUSINES3 (May 2018)
+ GK         CONSUMER 4 (May 2018)
+ GL         CORPORATE4 (May 2018)
+ GM         SMBUSINES4 (May 2018)
+ GN         CONSUMER 5 (May 2018)
+ GO         CORPORATE5 (May 2018)
+ GP         GROSS PAY (May 2018)
+ GQ         SMBUSINES5 (May 2018)
+ GS         CONSUMER 6 (May 2018)
+ GT         CORPORATE6 (May 2018)
+ GU         SMBUSINES6 (May 2018)
+ GV         CONSUMER 7 (May 2018)
+ GW         CORPORATE7 (May 2018)
+ GX         SMBUSINES7 (May 2018)
+ GZ         PREPAID (May 2018)
+ G1         HIROC CHG
+ G2         HIROC CHG2
+ G3         HIROC CHG3
+ HC         H-NONSWIPE
+ HI         HIGH ROC
+ IB         INBOUND (May 2018)
+ IP         PURCH IB (May 2018)
+ IR         RELOAD IB (May 2018)
+ IS         PREPAID IB (May 2018)
+ JC         JCB CARD
+ K1         HVP SV CR1 (May 2018)
+ K2         HVP SV CR2 (May 2018)
+ K3         HVP SV CR3 (May 2018)
+ MI         MICRO MRCH
+ MM         MONMIN FEE
+ MN         MNTHLY FEE
+ MR         MEMBERSHIP
+ NA         DISC COP (May 2018, previously REGULAR SUBMISSION)
+ NC         NONCOMPLIA
+ NF         NETWORK
+ NK         NON-COMPLIANCE (May 2018, effective October 2018)
+ OP         REVOLVING
+ O1         HIROC COR
+ O2         HIROC COR2
+ O3         HIROC COR3
+ PA         PAPER(SOC)
+ PC         PURCH CARD
+ PI         APCD PRC
+ PL         PAYFLW LNK
+ PP         PAYFLW PRO
+ P1         HIROC PUR
+ P2         HIROC PUR2
+ P3         HIROC PUR3
+ QU         QUTRLY FEE
+ RD         RETAIN DSC
+ RO         RDR OPTOUT
+ RP         RELOADABLE (May 2018)
+ R1         HIROC REG
+ R2         HIROC REG2
+ R3         HIROC REG3
+ SB         SBI
+ SE         SETUP FEE
+ SM         SM MERCHNT
+ ST         STATEMENT
+ SV         STORED VAL
+ TR         TRANS CNT
+ VA         VOICE AUTH
+ VG         GATEWAY
+ VP         VPAYMENT (May 2018)
+ V1         HVP REG C1 (May 2018)
+ V2         HVP REG C2 (May 2018)
+ V3         HVP REG C3 (May 2018)
+ WA         TBP PC AD1 (May 2018)
+ WB         TBP PC AD2 (May 2018)
+ WC         TBP PC AD3 (May 2018)
+ WD         TBP PC AD4 (May 2018)
+ WE         TBP PC AD5 (May 2018)
+ WI         TBP REGAD1 (May 2018)
+ WJ         TBP REGAD2 (May 2018)
+ WK         TBP REGAD3 (May 2018)
+ WL         TBP REGAD4 (May 2018)
+ WM         TBP REGAD5 (May 2018)
+ WO         TBP REGCD5 (May 2018)
+ W1         TBP PC CD1 (May 2018)
+ W2         TBP PC CD2 (May 2018)
+ W3         TBP PC CD3 (May 2018)
+ W4         TBP PC CD4 (May 2018)
+ W5         TBP PC CD5 (May 2018)
+ W6         TBP REGCD1 (May 2018)
+ W7         TBP REGCD2 (May 2018)
+ W8         TBP REGCD3 (May 2018)
+ W9         TBP REGCD4 (May 2018)
+ X1         CORP EIPP
+ X2         CORP EIPP2
+ X3         CORP EIPP3
+ YA         TBP SV AD1 (May 2018)
+ YB         TBP SV AD2 (May 2018)
+ YC         TBP SV AD3 (May 2018)
+ YD         TBP SV AD4 (May 2018)
+ YE         TBP SV AD5 (May 2018)
+ YF         TBP RP AD1 (May 2018)
+ YG         TBP RP AD2 (May 2018)
+ YH         TBP RP AD3 (May 2018)
+ YI         TBP RP AD4 (May 2018)
+ YJ         TBP RP AD5 (May 2018)
+ YR         YEARLY FEE
+ Y0         TBP RP CD5 (May 2018)
+ Y1         TBP SV CD1 (May 2018)
+ Y2         TBP SV CD2 (May 2018)
+ Y3         TBP SV CD3 (May 2018)
+ Y4         TBP SV CD4 (May 2018)
+ Y5         TBP SV CD5 (May 2018)
+ Y6         TBP RP CD1 (May 2018)
+ Y7         TBP RP CD2 (May 2018)
+ Y8         TBP RP CD3 (May 2018)
+ Y9         TBP RP CD4 (May 2018)
 
 =head2 FEE_DESCRIPTION
 

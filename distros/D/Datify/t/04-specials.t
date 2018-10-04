@@ -1,52 +1,60 @@
 #! /usr/bin/env perl
 
-use Test::More tests => 59;
+use strict;
+use warnings;
+
+use Test::More tests => 79;
 
 ok require Datify, 'Required Datify';
 
 no warnings 'qw';
 my $datify = join(' ', qw(
-    array_ref   => '[$_]',
-    assign      => '$var = $value;',
-    beautify    => undef,
-    body        => '...',
-    code        => 'sub {$_}',
-    dereference => '$referent->$place',
-    encode      =>   {0 => '\\\\0',  7 => '\\\\a',  9 => '\\\\t',
-                     10 => '\\\\n', 12 => '\\\\f', 13 => '\\\\r',
-                     27 => '\\\\e',
-                    255 => '\\\\x%02x', 65535 => '\\\\x{%04x}'},
-    false       => "''",
-    format      => "format UNKNOWN =\\n.\\n",
-    hash_ref    => '{$_}',
-    io          => '*UNKNOWN{IO}',
-    keysort     => sub {...},
-    keywords    => ['undef'],
-    list        => '($_)',
-    list_sep    => ', ',
-    longstr     => 1_000,
-    lvalue      => 'substr($lvalue, 0)',
-    name        => '$self',
-    nested      => '$referent$place',
-    null        => 'undef',
-    num_sep     => '_',
-    object      => 'bless($data, $class_str)',
-    overloads   => ['""', '0+'],
-    pair        => '$key => $value',
-    q1          => 'q',
-    q2          => 'qq',
-    q3          => 'qr',
-    qpairs      => ['()', '<>', '[]', '{}'],
-    qquotes     => ['!', '#', '%', '&', '*', '+', ',', '-', '.', '/',
-                    ':', ';', '=', '?', '^', '|', '~', '$', '@', '`'],
-    quote       => undef,
-    quote1      => "'",
-    quote2      => '"',
-    quote3      => '/',
-    reference   => '\\\\$_',
-    sigils      => '$@',
-    true        => 1,
-    vformat     => 'v%vd'
+    -infinite        => "'-inf'",
+    array_ref        => '[$_]',
+    assign           => '$var = $value;',
+    beautify         => undef,
+    body             => '...',
+    code             => 'sub {$_}',
+    dereference      => '$referent->$place',
+    encode           =>   {0 => '\\\\0',  7 => '\\\\a',  9 => '\\\\t',
+                          10 => '\\\\n', 12 => '\\\\f', 13 => '\\\\r',
+                          27 => '\\\\e',
+                          byte => '\\\\x%02x', wide => '\\\\x{%04x}'},
+    false            => "''",
+    format           => "format UNKNOWN =\\n.\\n",
+    hash_ref         => '{$_}',
+    infinite         => "'inf'",
+    io               => '*UNKNOWN{IO}',
+    keyfilter        => undef,
+    keyfilterdefault => 1,
+    keysort          => sub {...},
+    keywords         => ['undef'],
+    list             => '($_)',
+    list_sep         => ', ',
+    longstr          => 1_000,
+    lvalue           => 'substr($lvalue, 0)',
+    name             => '$self',
+    nested           => '$referent$place',
+    nonnumber        => "'nan'",
+    null             => 'undef',
+    num_sep          => '_',
+    object           => 'bless($data, $class_str)',
+    overloads        => ['""', '0+'],
+    pair             => '$key => $value',
+    q1               => 'q',
+    q2               => 'qq',
+    q3               => 'qr',
+    qpairs           => ['()', '<>', '[]', '{}'],
+    qquotes          => ['!', '#', '%', '&', '*', '+', ',', '-', '.', '/',
+                         ':', ';', '=', '?', '^', '|', '~', '$', '@', '`'],
+    quote            => undef,
+    quote1           => "'",
+    quote2           => '"',
+    quote3           => '/',
+    reference        => '\\\\$_',
+    sigils           => '$@',
+    true             => 1,
+    vformat          => 'v%vd'
 ));
 
 format EMPTY_FORMAT =
@@ -70,6 +78,20 @@ my @specials = (
 
     "format UNKNOWN =\n.\n" => *EMPTY_FORMAT{FORMAT} => 'format ref',
 );
+foreach my $stingified (qw( [] {} 'string' 123 456.78 )) {
+    my $thing = eval $stingified;
+    my $ref   = ref($thing);
+    my $repr  = $stingified;
+    if ( !$ref ) {
+        $thing = \do { 1; $thing };
+        $repr = '\\' . $repr;
+    }
+    push @specials,
+        qq!bless($repr, 'Test::${ref}::Object')!,
+        bless( $thing, "Test::${ref}::Object" ),
+        "a $ref object",
+        ;
+}
 
 for ( my $i = 0; $i < @specials - 1; $i += 3 ) {
     my ( $string, $special, $desc ) = @specials[ $i, $i + 1, $i + 2 ];

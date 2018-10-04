@@ -16,11 +16,11 @@ name: EPFL-Service-Open
 provides:
   EPFL::Service::Open:
     file: lib/EPFL/Service/Open.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Browser::Open: '0.04'
   IPC::Run: '0.99'
 resources:
   repository: https://github.com/epfl-devrun/epfl-service-open
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

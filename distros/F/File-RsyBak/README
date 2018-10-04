@@ -2,8 +2,8 @@ NAME
     File::RsyBak - Backup files/directories with histories, using rsync
 
 VERSION
-    This document describes version 0.35 of File::RsyBak (from Perl
-    distribution File-RsyBak), released on 2017-07-31.
+    This document describes version 0.360 of File::RsyBak (from Perl
+    distribution File-RsyBak), released on 2018-09-30.
 
 SYNOPSIS
     From your Perl program:
@@ -341,7 +341,7 @@ HOMEPAGE
     <https://metacpan.org/release/File-RsyBak>.
 
 SOURCE
-    Source repository is at <https://github.com/sharyanto/perl-File-RsyBak>.
+    Source repository is at <https://github.com/perlancar/perl-File-RsyBak>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -364,8 +364,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

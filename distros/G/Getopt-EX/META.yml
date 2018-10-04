@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Getopt::EX:
     file: lib/Getopt/EX.pm
-    version: v1.8.0
+    version: v1.9.0
   Getopt::EX::Colormap:
     file: lib/Getopt/EX/Colormap.pm
   Getopt::EX::Func:
@@ -44,13 +44,15 @@ provides:
   xg:
     file: lib/Getopt/EX/Colormap.pm
 requires:
+  Graphics::ColorNames: '0'
+  Graphics::ColorNames::WWW: '0'
   List::Util: '1.45'
-  perl: '5.016'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX
   repository: git://github.com/kaz-utashiro/Getopt-EX.git
-version: v1.8.0
+version: v1.9.0
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <utashiro@cpan.org>'

@@ -1,2 +1,12 @@
+0.003     2018-09-25 17:05:23-07:00 America/Los_Angeles
+          - Update documentation for Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing->FEE_CODE
+            to match May 2018 AMEX documentation
+          - Remove Dist::Zilla::Plugin::NextRelease
+          - Add Dist::Zilla plugins to match cpants recommendations
+
 0.002     2018-06-08 15:42:58-07:00 America/Los_Angeles
+          - Updated documentation
+
+0.001     2018-06-08 11:48:09-07:00 America/Los_Angeles
+          - Initial version
 

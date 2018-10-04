@@ -1,3 +1,13 @@
+0.003   2018-09-26 (PERLANCAR)
+
+	- Move Rinci metadata from App::XTermUtils.
+
+
+0.002   2018-09-26 (PERLANCAR)
+
+	- set_term_bgcolor(): Add option to print to STDERR.
+
+
 0.001   2018-09-25 (PERLANCAR)
 
         - First release.

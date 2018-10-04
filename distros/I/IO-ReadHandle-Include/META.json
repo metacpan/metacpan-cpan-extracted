@@ -33,11 +33,11 @@
       "runtime" : {
          "requires" : {
             "Path::Class" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1",
+   "version" : "v1.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

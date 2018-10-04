@@ -8,17 +8,10 @@ Setup
 -----
 
 ```bash
-$ git clone REPO
-$ cd epfl-service-open
-$ perl Build.PL
-$ perl Build installdeps
-```
-
-Lint
-----
-
-```bash
-$ perlcritic lib/ bin/
+git clone git@github.com:epfl-devrun/epfl-service-open.git
+cd epfl-service-open
+perl Build.PL
+perl Build installdeps
 ```
 
 Test
@@ -27,27 +20,33 @@ Test
 Unit and integration tests:
 
 ```bash
-$ perl Build test
+perl Build test
 ```
 
 Code coverage:
 
 ```bash
-$ perl Build testcover
+perl Build testcover
+```
+
+To enable Author tests:
+
+```bash
+export RELEASE_TESTING=1
 ```
 
 Run
 ---
 
 ```bash
-$ perl -Ilib bin/epfl-service-open
+perl -Ilib bin/epfl-service-open
 ```
 
 Package
 -------
 
 ```bash
-$ perl Build dist
+perl Build dist
 ```
 
 Release
@@ -57,7 +56,7 @@ Release
   2. Update the file [Changes](Changes)
   3. Package the module.
   4. Upload the package to https://pause.perl.org/
-  5. Create the tag (``git tag -a v<version> -m "Tagging the v<version> release"``) 
+  5. Create the tag (`git tag -a v<version> -m "Tagging the v<version> release"`) 
 
 License
 -------

@@ -28,7 +28,15 @@ has uri      => (
     },
 );
 
-sub username { scalar shift->uri->user }
+has username => (
+    is       => 'ro',
+    isa      => Maybe[Str],
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        $ENV{SQITCH_USERNAME} || $self->uri->user
+    },
+);
 
 has password => (
     is       => 'ro',
@@ -36,7 +44,7 @@ has password => (
     lazy    => 1,
     default => sub {
         $ENV{SQITCH_PASSWORD} || shift->uri->password
-    }
+    },
 );
 
 has sqitch => (
@@ -251,6 +259,7 @@ sub BUILDARGS {
                 ) or hurl target => __(
                     'No engine specified; use --engine or set core.engine'
                 );
+                $ekey =~ s/\s+$//;
             }
 
             # Find the name in the engine config, or fall back on a simple URI.
@@ -362,6 +371,7 @@ sub all_targets {
     # First, load the default target.
     my $core = $dump{'core.target'} || do {
         if ( my $engine = $sqitch->options->{engine} || $dump{'core.engine'} ) {
+            $engine =~ s/\s+$//;
             $dump{"engine.$engine.target"} || "db:$engine:";
         }
     };
@@ -386,6 +396,7 @@ sub all_targets {
     # Finally, load any engines for which no target name was specified.
     while ( my ($key, $val) = each %dump ) {
         my ($engine) = $key =~ /^engine[.]([^.]+)/ or next;
+        $engine =~ s/\s+$//;
         next if $seen{$engine}++;
         my $uri = URI->new("db:$engine:");
         push @targets => $seen{$uri} = $class->new(sqitch => $sqitch, uri => $uri)

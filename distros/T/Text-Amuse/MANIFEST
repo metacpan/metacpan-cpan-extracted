@@ -30,6 +30,7 @@ t/directives.t
 t/elements.t
 t/false-lists.t
 t/footnotes.t
+t/french.t
 t/functions.t
 t/header-defined.t
 t/headers.t

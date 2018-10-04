@@ -22,13 +22,14 @@ my %WriteMakefileArgs = (
   "NAME" => "App::sshwrap::hostcolor",
   "PREREQ_PM" => {
     "AppLib::sshwrap" => 0,
+    "Color::RGB::Util" => 0,
     "Complete::Util" => "0.57",
     "Getopt::Long" => 0,
     "Getopt::Long::Complete" => 0,
     "Log::ger" => "0.023",
     "PERLANCAR::File::HomeDir" => 0,
     "ShellCompleter::Util" => "0.030",
-    "XTerm::Util" => 0,
+    "XTerm::Util" => "0.002",
     "strict" => 0,
     "warnings" => 0
   },
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "AppLib::sshwrap" => 0,
+  "Color::RGB::Util" => 0,
   "Complete::Util" => "0.57",
   "File::Spec" => 0,
   "Getopt::Long" => 0,
@@ -57,7 +59,7 @@ my %FallbackPrereqs = (
   "PERLANCAR::File::HomeDir" => 0,
   "ShellCompleter::Util" => "0.030",
   "Test::More" => 0,
-  "XTerm::Util" => 0,
+  "XTerm::Util" => "0.002",
   "strict" => 0,
   "warnings" => 0
 );

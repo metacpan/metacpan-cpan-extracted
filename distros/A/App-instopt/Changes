@@ -1,3 +1,10 @@
+0.002   2018-10-04 (PERLANCAR)
+
+	- Add subcommands: cleanup, list-installed-versions.
+
+	- list-installed: show active & inactive versions.
+
+
 0.001   2018-09-13 (PERLANCAR)
 
         - First implementation of list-installed, download, update, update-all.

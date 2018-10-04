@@ -119,4 +119,10 @@ if (ExtUtils::PkgConfig->atleast_version ('glib-2.0', '2.24.0')) {
     newSVGVariantType
     newSVGVariantType_own);
 }
+if (ExtUtils::PkgConfig->atleast_version ('glib-2.0', '2.40.0')) {
+  push @exports, qw(
+    SvGVariantDict
+    newSVGVariantDict
+    newSVGVariantDict_own);
+}
 1;

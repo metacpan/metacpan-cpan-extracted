@@ -11,6 +11,18 @@ SYNOPSIS
         my $pi = RPi::WiringPi->new;
     
         #
+        # identification
+        #
+    
+        $pi->io_led(1);  # turn green disk IO LED on full-time
+        $pi->pwr_led(1); # turn red power LED off
+    
+        $pi->io_led;     # set green disk IO LED back to default status
+        $pi->pwr_led;    # set red power LED back to default
+    
+        $pi->label('pi-test-01'); # set a name/label for your Pi object
+    
+        #
         # pin
         #
     
@@ -104,7 +116,7 @@ SYNOPSIS
             cs      => $dac_cs_pin
         );
     
-        my ($dacA, $dacB) = (0, 0);
+        my ($dacA, $dacB) = (0, 1);
     
         $dac->set($dacA, 4095); # 100% output
         $dac->set($dacB, 0);    # 0% output
@@ -173,10 +185,10 @@ SYNOPSIS
     
         my $gps = $pi->gps;
     
-        print $gps->tpv('lat')   . "\n";
-        print $gps->tpv('lon')   . "\n";
-        print $gps->tpv('speed') . "\n";
-        print $gps->direction    . "\n";
+        print $gps->lat;
+        print $gps->lon;
+        print $gps->speed;
+        print $gps->direction;
     
         #
         # LCD
@@ -200,6 +212,64 @@ SYNOPSIS
         $pi->cleanup;
     
         #
+        # real time clock
+        #
+    
+        my $rtc = $pi->rtc;
+    
+        my $dt_string = $rtc->date_time;
+        my %dt_hash   = $rtc->dt_hash;
+    
+        # set an individual attribute
+    
+        $rtc->hour(22);
+    
+        # set 12/24 hour clock
+    
+        $rtc->clock_hours(12);
+    
+        # get AM or PM while in 12-hour clock mode
+    
+        my $meridien = $rtc->am_pm;
+    
+        #
+        # MCP23017 GPIO expander
+        #
+    
+        my $i2c_addr = 0x20;            # default
+    
+        my $exp = $pi->expander($addr); # param not required if using the default
+    
+        # pins are INPUT by default. Turn the first pin to OUTPUT
+    
+        $exp->mode(0, 0); # or MCP23017_OUTPUT if using RPi::Const
+    
+        # turn the pin on (HIGH)
+    
+        $exp->write(0, 1); # or HIGH
+    
+        # read the pin's status (HIGH or LOW)
+    
+        $exp->read(6);
+    
+        # turn the first bank (0) of pins (0-7) to OUTPUT, and make them live (HIGH)
+    
+        $exp->mode_bank(0, 0);  # bank A, OUTPUT
+        $exp->write_bank(0, 1); # bank A, HIGH
+    
+        # enable internal pullup resistors on the entire bank A (0)
+    
+        $exp->pullup_bank(0, 1); # bank A, pullup enabled
+    
+        # put all 16 pins as OUTPUT, and put them on (HIGH)
+    
+        $exp->mode_all(0);  # or OUTPUT
+        $exp->write_all(1); # or HIGH
+    
+        # cleanup all pins and reset them to default before exiting your program
+    
+        $exp->cleanup;
+    
         # ultrasonic distance sensor
         #
     
@@ -223,6 +293,17 @@ SYNOPSIS
         $servo->pwm(150); # centre position
         $servo->pwm(50);  # left position
         $servo->pwm(250); # right position
+    
+        #
+        # stepper motor
+        #
+    
+        my $sm = $pi->stepper_motor(
+            pins => [12, 16, 20, 21]
+        );
+    
+        $sm->cw(180);   # turn clockwise 180 degrees
+        $sm->ccw(240);  # turn counter-clockwise 240 degrees
 
 DESCRIPTION
 
@@ -235,8 +316,7 @@ DESCRIPTION
     wiringPi <http://wiringpi.com> must be installed prior to
     installing/using this module (v2.36+).
 
-    We always and only use the GPIO pin numbering scheme. These are the pin
-    numbers that are printed on the Pi board itself.
+    We always and only use the GPIO pin numbering scheme.
 
     This module is essentially a 'manager' for the sub-modules (ie.
     components). You can use the component modules directly, but retrieving
@@ -263,8 +343,7 @@ METHODS
  new([%args])
 
     Returns a new RPi::WiringPi object. We exclusively use the GPIO
-    (Broadcom (BCM) GPIO) pin numbering scheme. These pin numbers are
-    printed on the Pi's board itself.
+    (Broadcom (BCM) GPIO) pin numbering scheme.
 
     Parameters:
 
@@ -273,9 +352,15 @@ METHODS
     Optional: We trap all die() calls and clean up for safety reasons. If a
     call to die() is trapped, by default, we clean up, and then exit(). Set
     fatal_exit to false (0) to perform the cleanup, and then continue
-    running your script. This is for unit testing purposes only.
+    running your script.
 
- adc()
+    We recommend only disabling this feature if you're doing unit test
+    work, want to allow other exit traps to catch, allow the Pi to continue
+    on working after a fatal error etc. If disabled, you will be
+    responsible for doing your own cleanup of the Pi hardware configuration
+    on exit.
+
+ adc
 
     There are two different ADCs that you can select from. The default is
     the ADS1x15 series:
@@ -309,13 +394,13 @@ METHODS
     pin for the CS pin, and we'll do the bit-banging of the SPI bus
     automatically.
 
- bmp()
+ bmp
 
     Returns a RPi::BMP180 object, which allows you to return the current
     temperature in farenheit or celcius, along with the ability to retrieve
     the barometric pressure in kPa.
 
- dac(model => 'MCP4922')
+ dac
 
     Returns a RPi::DAC::MCP4922 object (supports all 49x2 series DACs).
     These chips provide analog output signals from the Pi's digital output.
@@ -333,7 +418,7 @@ METHODS
 
     Mandatory, Bool. The SPI channel to use.
 
-        cs => Integer
+        cs => $pin
 
     Mandatory, Integer. A valid GPIO pin that the DAC's Chip Select is
     connected to.
@@ -348,7 +433,7 @@ METHODS
     supported).
 
     See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+    RPi::WiringPi::FAQ for usage examples.
 
  gps
 
@@ -368,11 +453,11 @@ METHODS
 
         $trig
 
-    The trigger pin number, in GPIO numbering scheme.
+    Mandatory, Integer: The trigger pin number, in GPIO numbering scheme.
 
         $echo
 
-    The echo pin number, in GPIO numbering scheme.
+    Mandatory, Integer: The echo pin number, in GPIO numbering scheme.
 
  hygrometer($pin)
 
@@ -380,13 +465,19 @@ METHODS
     fetch the temperature (celcius or farenheit) as well as the current
     humidity level.
 
+    Parameters:
+
+        $pin
+
+    Mandatory, Integer: The GPIO pin the sensor is connected to.
+
  i2c($addr, [$device])
 
     Creates a new RPi::I2C device object which allows you to communicate
     with the devices on an I2C bus.
 
     See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+    RPi::WiringPi::FAQ for usage examples.
 
     Aruino note: If using I2C with an Arduino, the Pi may speak faster than
     the Arduino can. If this is the case, try lowering the I2C bus speed on
@@ -414,13 +505,47 @@ METHODS
 
     Mandatory, Integer: The pin number to attach to.
 
+ rtc
+
+    Creates a new RPi::RTC::DS3231 object which provides access to the
+    DS3231 or DS1307 real-time clock modules.
+
+    See the linked documentation for full documentation on usage, or the
+    RPi::WiringPi::FAQ for some usage examples.
+
+    Parameters:
+
+        $i2c_addr
+
+    Optional, Integer: The I2C address of the RTC module. Defaults to 0x68
+    for the DS3231 unit.
+
+ expander
+
+    Creates a new RPi::GPIOExpander::MCP23017 GPIO expander chip object.
+    This adds an additional 16 pins across two banks (8 pins per bank).
+
+    See the linked documentation for full documentation on usage, or the
+    RPi::WiringPi::FAQ for some usage examples.
+
+    Parameters:
+
+        $i2c_addr
+
+    Optional, Integer: The I2C address of the device. Defaults to 0x20.
+
+        $expander
+
+    Optional, String: The GPIO expander device type. Defaults to MCP23017,
+    and currently, this is the only option available.
+
  serial($device, $baud)
 
     Creates a new RPi::Serial object which allows basic read/write access
     to a serial bus.
 
     See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+    RPi::WiringPi::FAQ for usage examples.
 
     NOTE: Bluetooth on the Pi overlays the serial pins (14, 15) on the Pi.
     To use serial, you must disable bluetooth in the /boot/config.txt file:
@@ -441,6 +566,15 @@ METHODS
 
     Mandatory, Integer: The pin number (technically, this *must* be 18 on
     the Raspberry Pi 3, as that's the only hardware PWM pin.
+
+        %pwm_config
+
+    Optional, Hash. This parameter should only be used if you know what
+    you're doing and are having very specific issues.
+
+    Keys are clock with a value that coincides with the PWM clock speed. It
+    defaults to 192. The other key is range, the value being an integer
+    that sets the range of the PWM. Defaults to 2000.
 
     Example:
 
@@ -492,11 +626,43 @@ METHODS
     Serial Peripheral Interface (SPI) bus with attached devices.
 
     See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+    RPi::WiringPi::FAQ for usage examples.
+
+ stepper_motor($pins)
+
+    Creates a new RPi::StepperMotor object which allows you to drive a
+    28BYJ-48 stepper motor with a ULN2003 driver chip.
+
+    See the linked documentation for full usage instructions and the
+    optional parameters.
+
+    Parameters:
+
+        pins => $aref
+
+    Mandatory, Array Reference: The ULN2003 has four data pins, IN1, IN2,
+    IN3 and IN4. Send in the GPIO pin numbers in the array reference which
+    correlate to the driver pins in the listed order.
+
+        speed => 'half'|'full'
+
+    Optional, String: By default we run in "half speed" mode. Essentially,
+    in this mode we run through all eight steps. Send in 'full' to double
+    the speed of the motor. We do this by skipping every other step.
+
+        delay => Float|Int
+
+    Optional, Float or Int: By default, between each step, we delay by 0.01
+    seconds. Send in a float or integer for the number of seconds to delay
+    each step by. The smaller this number, the faster the motor will turn.
 
 RUNNING TESTS
 
     Please see RUNNING TESTS in the FAQ.
+
+TROUBLESHOOTING
+
+    Please read through the SETUP section in the FAQ.
 
 AUTHOR
 
@@ -504,7 +670,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2017 by Steve Bertrand
+    Copyright (C) 2017,2018 by Steve Bertrand
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.18.2 or, at

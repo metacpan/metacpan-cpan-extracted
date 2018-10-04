@@ -12,7 +12,7 @@
                        
 
 
-This is the README for Lingua::EN::ABC version 0.08.
+This is the README for Lingua::EN::ABC version 0.10.
 
 Lingua::EN::ABC is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -66,11 +66,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Lingua::EN::ABC
 
-To install the module from the source file, Lingua-EN-ABC-0.08.tar.gz,
+To install the module from the source file, Lingua-EN-ABC-0.10.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Lingua-EN-ABC-0.08.tar.gz
-    cd Lingua-EN-ABC-0.08
+    tar xfz Lingua-EN-ABC-0.10.tar.gz
+    cd Lingua-EN-ABC-0.10
     perl Makefile.PL
     make
     make install
@@ -95,6 +95,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sun Sep  9 11:01:35 2018.
+This README was written on Wed Sep 26 21:06:12 2018.
 
 -----------------------------------------------------------------------------

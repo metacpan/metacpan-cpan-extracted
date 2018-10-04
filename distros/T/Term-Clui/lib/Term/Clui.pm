@@ -8,7 +8,7 @@
 #########################################################################
 
 package Term::Clui;
-our $VERSION = '1.73';
+our $VERSION = '1.75';
 my $stupid_bloody_warning = $VERSION;  # circumvent -w warning
 require Exporter;
 @ISA = qw(Exporter);
@@ -427,7 +427,7 @@ sub ask_filename { my ($question, $default) = @_;  # 1.65 tab-completion
 	}
 	initscr(speakup_silent=>1);
 	endwin();
-	$term = new Term::ReadLine 'ProgramName';
+	$term = Term::ReadLine->new('ProgramName');
 	my $filename = $term->readline($question.' ');   # 1.70
 	print STDERR "\e[J";
 	$filename =~ s/ $//;   # 1.66
@@ -1678,6 +1678,6 @@ which were in turn based on some even older curses-based programs in I<C>.
 
 There is an equivalent Python3 module,
 with (as far as possible) the same calling interface, at
-http://cpansearch.perl.org/src/PJB/Term-Clui-1.71/py/TermClui.py
+https://fastapi.metacpan.org/source/PJB/Term-Clui-1.71/py/TermClui.py
 
 =cut

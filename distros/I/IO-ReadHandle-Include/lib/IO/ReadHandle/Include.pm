@@ -1,10 +1,11 @@
 package IO::ReadHandle::Include;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
 use Carp;
+use List::Util qw(none);
 use Path::Class qw(file);
 use Scalar::Util qw(blessed reftype);
 use Symbol qw(gensym);
@@ -18,11 +19,11 @@ facility
 
 =head1 VERSION
 
-Version 1.1
+Version 1.2
 
 =cut
 
-use version; our $VERSION = version->declare('v1.1');
+use version; our $VERSION = version->declare('v1.2');
 
 =head1 SYNOPSIS
 
@@ -75,6 +76,12 @@ file, if that include file exists.  This works recursively: The
 included file can itself include other files, using the same format
 for include directives.  If an include file does not exist, then the
 include directive naming that file is not replaced.
+
+An include file cannot recursively include itself, because that leads
+to an infinite loop.  If such an include directive detected, then it
+is not replaced.  It is not a problem if a particular file is included
+multiple times, as long as each next include of that file begins after
+the previous include has completed.
 
 The include file is identified by the text corresponding to a
 particular capture group (C<< (?<include>...) >> or C<$1>) of the
@@ -283,7 +290,8 @@ sub CLOSE {
   # close any included files
   1 while $self->_end_include;
 
-  if ( reftype( $self->_get('main_source') ) eq '' ) {
+  my $ms = $self->_get('main_source');
+  if ( defined( $ms ) && ( reftype( $ms ) // '' ) eq '' ) {
 
     # the main source was passed as a scalar, so we opened its
     # filehandle
@@ -484,19 +492,22 @@ sub READLINE {
         # including file
         $path = file( file( $self->_get('source') )->parent, $path );
       }
-      if ( CORE::open my $newifh, '<', "$path" ) {
-        my $suffix = substr( $line, $+[0] );    # text beyond the regex match
-        push @{ $self->_get('suffixes') }, $suffix;    # save for later
+      # avoid infinite recursion
+      my $sources = $self->_get('sources');
+      if ( none { $_ eq $path } @{ $sources } ) {
+        if ( CORE::open my $newifh, '<', "$path" ) {
+          my $suffix = substr( $line, $+[0] ); # text beyond the regex match
+          push @{ $self->_get('suffixes') }, $suffix; # save for later
 
-        push @{ $self->_get('ifhs') }, $self->_get('ifh');    # save for later
-        push @{ $self->_get('sources') },
-          $self->_get('source');                              # save for later
+          push @{ $self->_get('ifhs') }, $self->_get('ifh'); # save for later
+          push @{ $sources }, $self->_get('source'); # save for later
 
-        $self->_set( ifh => $newifh )    # current source is included file
-          ->_set( source => $path );     # current source
-        $line = substr( $line, 0, $-[0] )    # text before the regex match
-          . $self->READLINE;    # append first line from included file
-      }    # otherwise we leave the original text
+          $self->_set( ifh => $newifh ) # current source is included file
+            ->_set( source => $path );  # current source
+          $line = substr( $line, 0, $-[0] ) # text before the regex match
+            . $self->READLINE;  # append first line from included file
+        }                       # otherwise we leave the original text
+      }
     }
     return $line;
   }
@@ -551,7 +562,8 @@ sub open {
     or reftype($regex) ne 'REGEXP';
   croak "Transform, if set, must be a code reference"
     if $coderef and reftype($coderef) ne 'CODE';
-  $self->_set( source => $source )->_set( main_source => $source )
+  $self->_set( source => file($source)->absolute )
+    ->_set( main_source => $source )
     ->_set( include => $regex )->_set( transform => $coderef );
   return $self;
 }

@@ -1,9 +1,9 @@
 package Sah::SchemaR::color::rgb24;
 
-our $DATE = '2017-12-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["str",[{match=>qr(\A[0-9A-Fa-f]{6}\z),summary=>"RGB 24-digit color, a hexdigit e.g. ffcc00"}],["str"]];
+our $rschema = ["str",[{match=>qr(\A[0-9A-Fa-f]{6}\z),summary=>"RGB 24-digit color, a hexdigit e.g. ffcc00","x.completion"=>["colorname"],"x.perl.coerce_rules"=>["str_rgb24_from_colorname_X_or_code"]}],["str"]];
 
 1;
 # ABSTRACT: RGB 24-digit color, a hexdigit e.g. ffcc00
@@ -20,7 +20,7 @@ Sah::SchemaR::color::rgb24 - RGB 24-digit color, a hexdigit e.g. ffcc00
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2017-12-03.
+This document describes version 0.002 of Sah::SchemaR::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2018-09-26.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,20 @@
 Revision history for Date-Baha-i
 
+0.2100 2018-10-02 15:16:33
+    - Fixed as_string() short-numeric date output order.
+
+0.2001 2018-10-02 14:53:44
+    - Removed redundant NAME section.
+    - Fixed baha'i dates in the SYNOPSIS section.
+    - Fixed the DAY NAMES section.
+    - Fixed the SEE ALSO section.
+
+0.2000 2018-10-02 14:36:19
+    - Fixed SYNOPSIS section.
+    - Fixed short-numeric elsif condition.
+    - Added tests!
+    - Use the github Artistic 2.0 license.
+
 0.1903 2014-09-18
     - Removed documentation cruft.
     - Removed accidental example duplication.

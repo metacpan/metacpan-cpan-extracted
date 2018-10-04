@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Struct::Path::JsonPointer qw(str2path path2str);
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use lib 't';
 use _common qw(roundtrip t_dump);
@@ -37,6 +37,13 @@ like($@, qr/^Incorrect array index, step #0 /, "float for array index");
 
 eval { path2str(["garbage"]) };
 like($@, qr/^Unsupported thing in the path, step #0 /, "trash as path step");
+
+eval { str2path(undef) };
+like($@, qr/^Undefined JSON Pointer passed /, "undef as path");
+
+eval { str2path("garbage") };
+like($@, qr/^JSON Pointer should start with a slash or be empty /, "invalid path");
+
 
 # only non numeric and non hyphen keys explicitly converts to hash keys
 roundtrip(

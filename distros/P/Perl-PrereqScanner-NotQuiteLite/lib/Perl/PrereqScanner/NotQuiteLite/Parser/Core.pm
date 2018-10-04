@@ -113,7 +113,7 @@ sub parse_package {
   shift @$tokens; # drop "package"
   my $package;
   for my $token (@$tokens) {
-    if (ref $token && $token->[1] eq 'WORD') {
+    if (ref $token && $token->[1] && $token->[1] eq 'WORD') {
       $c->add_package($token->[0]);
       last;
     }

@@ -5,7 +5,7 @@
 
 #ifndef INTEL
 #include <unistd.h>
-#endif 
+#endif
 
 #include <time.h>
 #define MAXKEYBYTES 56 /* 448 bits */
@@ -28,26 +28,26 @@
 
 /* choose a byte order for your hardware */
 union aword_big {
-	UWORD_32bits word;
-	UBYTE_08bits byte [4];
-	struct {
-		unsigned int byte0:8;
-		unsigned int byte1:8;
-		unsigned int byte2:8;
-		unsigned int byte3:8;
-	} w;
+    UWORD_32bits word;
+    UBYTE_08bits byte [4];
+    struct {
+        unsigned int byte0:8;
+        unsigned int byte1:8;
+        unsigned int byte2:8;
+        unsigned int byte3:8;
+    } w;
 };
 
 /* DCBA - little endian - intel */
 union aword_little {
 UWORD_32bits word;
 UBYTE_08bits byte [4];
-	struct {
-		unsigned int byte3:8;
-		unsigned int byte2:8;
-		unsigned int byte1:8;
-		unsigned int byte0:8;
-	} w;
+    struct {
+        unsigned int byte3:8;
+        unsigned int byte2:8;
+        unsigned int byte1:8;
+        unsigned int byte0:8;
+    } w;
 };
 #endif
 
@@ -341,10 +341,10 @@ static UWORD_32bits initbf_S[4][256] = {
 #define ROUND(a,b,n) (a.word ^= bf_F(b) ^ bf_P[n])
 
 struct box_t {
-	UWORD_32bits *P;
-	UWORD_32bits **S;
-	char key[81];
-	char keybytes;
+    UWORD_32bits *P;
+    UWORD_32bits **S;
+    char key[81];
+    char keybytes;
 } box[BOXES];
 
 
@@ -354,306 +354,321 @@ UWORD_32bits **bf_S;
 
 void encipher_big (UWORD_32bits * xl, UWORD_32bits * xr)
 {
-	union aword_big check1;
-	union aword_big check2;
-	check1.word = *xl;
-	check2.word = *xr;
-	/* This is where the data is enciphered, it goes through 16 rounds of encipherment */
-	check1.word ^= bf_P[0];
-	ROUND(check2, check1, 1);
-	ROUND(check1, check2, 2);
-	ROUND(check2, check1, 3);
+    union aword_big check1;
+    union aword_big check2;
+    check1.word = *xl;
+    check2.word = *xr;
+    /* This is where the data is enciphered, it goes through 16 rounds of encipherment */
+    check1.word ^= bf_P[0];
+    ROUND(check2, check1, 1);
+    ROUND(check1, check2, 2);
+    ROUND(check2, check1, 3);
 
-	ROUND(check1, check2, 4);
-	ROUND(check2, check1, 5);
-	ROUND(check1, check2, 6);
-	ROUND(check2, check1, 7);
-	ROUND(check1, check2, 8);
-	ROUND(check2, check1, 9);
-	ROUND(check1, check2, 10);
-	ROUND(check2, check1, 11);
-	ROUND(check1, check2, 12);
-	ROUND(check2, check1, 13);
-	ROUND(check1, check2, 14);
-	ROUND(check2, check1, 15);
-	ROUND(check1, check2, 16);
-	check2.word ^= bf_P[17];
-	*xr = check1.word;
-	*xl = check2.word;
+    ROUND(check1, check2, 4);
+    ROUND(check2, check1, 5);
+    ROUND(check1, check2, 6);
+    ROUND(check2, check1, 7);
+    ROUND(check1, check2, 8);
+    ROUND(check2, check1, 9);
+    ROUND(check1, check2, 10);
+    ROUND(check2, check1, 11);
+    ROUND(check1, check2, 12);
+    ROUND(check2, check1, 13);
+    ROUND(check1, check2, 14);
+    ROUND(check2, check1, 15);
+    ROUND(check1, check2, 16);
+    check2.word ^= bf_P[17];
+    *xr = check1.word;
+    *xl = check2.word;
 }
 
 void encipher_little (UWORD_32bits * xl, UWORD_32bits * xr)
 {
-	union aword_little check1;
-	union aword_little check2;
-	check1.word = *xl;
-	check2.word = *xr;
-	/* This is where the data is enciphered, it goes through 16 rounds of encipherment */
-	check1.word ^= bf_P[0];
-	ROUND(check2, check1, 1);
-	ROUND(check1, check2, 2);
-	ROUND(check2, check1, 3);
+    union aword_little check1;
+    union aword_little check2;
+    check1.word = *xl;
+    check2.word = *xr;
+    /* This is where the data is enciphered, it goes through 16 rounds of encipherment */
+    check1.word ^= bf_P[0];
+    ROUND(check2, check1, 1);
+    ROUND(check1, check2, 2);
+    ROUND(check2, check1, 3);
 
-	ROUND(check1, check2, 4);
-	ROUND(check2, check1, 5);
-	ROUND(check1, check2, 6);
-	ROUND(check2, check1, 7);
-	ROUND(check1, check2, 8);
-	ROUND(check2, check1, 9);
-	ROUND(check1, check2, 10);
-	ROUND(check2, check1, 11);
-	ROUND(check1, check2, 12);
-	ROUND(check2, check1, 13);
-	ROUND(check1, check2, 14);
-	ROUND(check2, check1, 15);
-	ROUND(check1, check2, 16);
-	check2.word ^= bf_P[17];
-	*xr = check1.word;
-	*xl = check2.word;
+    ROUND(check1, check2, 4);
+    ROUND(check2, check1, 5);
+    ROUND(check1, check2, 6);
+    ROUND(check2, check1, 7);
+    ROUND(check1, check2, 8);
+    ROUND(check2, check1, 9);
+    ROUND(check1, check2, 10);
+    ROUND(check2, check1, 11);
+    ROUND(check1, check2, 12);
+    ROUND(check2, check1, 13);
+    ROUND(check1, check2, 14);
+    ROUND(check2, check1, 15);
+    ROUND(check1, check2, 16);
+    check2.word ^= bf_P[17];
+    *xr = check1.word;
+    *xl = check2.word;
 }
 
 void decipher_big (UWORD_32bits *xl, UWORD_32bits *xr)
 {
-	union aword_big check1;
-	union aword_big check2;
-	check1.word = *xl;
-	check2.word = *xr;
-	/* This is where data is deciphered, and it goes through 16 rounds of decipherment */
-	check1.word ^= bf_P[17];
-	ROUND(check2, check1, 16);
-	ROUND(check1, check2, 15);
-	ROUND(check2, check1, 14);
-	ROUND(check1, check2, 13);
-	ROUND(check2, check1, 12);
-	ROUND(check1, check2, 11);
-	ROUND(check2, check1, 10);
-	ROUND(check1, check2, 9);
-	ROUND(check2, check1, 8);
-	ROUND(check1, check2, 7);
-	ROUND(check2, check1, 6);
-	ROUND(check1, check2, 5);
-	ROUND(check2, check1, 4);
-	ROUND(check1, check2, 3);
-	ROUND(check2, check1, 2);
-	ROUND(check1, check2, 1);
-	check2.word ^= bf_P[0];
-	*xl = check2.word;
-	*xr = check1.word;
+    union aword_big check1;
+    union aword_big check2;
+    check1.word = *xl;
+    check2.word = *xr;
+    /* This is where data is deciphered, and it goes through 16 rounds of decipherment */
+    check1.word ^= bf_P[17];
+    ROUND(check2, check1, 16);
+    ROUND(check1, check2, 15);
+    ROUND(check2, check1, 14);
+    ROUND(check1, check2, 13);
+    ROUND(check2, check1, 12);
+    ROUND(check1, check2, 11);
+    ROUND(check2, check1, 10);
+    ROUND(check1, check2, 9);
+    ROUND(check2, check1, 8);
+    ROUND(check1, check2, 7);
+    ROUND(check2, check1, 6);
+    ROUND(check1, check2, 5);
+    ROUND(check2, check1, 4);
+    ROUND(check1, check2, 3);
+    ROUND(check2, check1, 2);
+    ROUND(check1, check2, 1);
+    check2.word ^= bf_P[0];
+    *xl = check2.word;
+    *xr = check1.word;
 }
 
 void decipher_little (UWORD_32bits *xl, UWORD_32bits *xr)
 {
-	union aword_little check1;
-	union aword_little check2;
-	check1.word = *xl;
-	check2.word = *xr;
-	/* This is where data is deciphered, and it goes through 16 rounds of decipherment */
-	check1.word ^= bf_P[17];
-	ROUND(check2, check1, 16);
-	ROUND(check1, check2, 15);
-	ROUND(check2, check1, 14);
-	ROUND(check1, check2, 13);
-	ROUND(check2, check1, 12);
-	ROUND(check1, check2, 11);
-	ROUND(check2, check1, 10);
-	ROUND(check1, check2, 9);
-	ROUND(check2, check1, 8);
-	ROUND(check1, check2, 7);
-	ROUND(check2, check1, 6);
-	ROUND(check1, check2, 5);
-	ROUND(check2, check1, 4);
-	ROUND(check1, check2, 3);
-	ROUND(check2, check1, 2);
-	ROUND(check1, check2, 1);
-	check2.word ^= bf_P[0];
-	*xl = check2.word;
-	*xr = check1.word;
+    union aword_little check1;
+    union aword_little check2;
+    check1.word = *xl;
+    check2.word = *xr;
+    /* This is where data is deciphered, and it goes through 16 rounds of decipherment */
+    check1.word ^= bf_P[17];
+    ROUND(check2, check1, 16);
+    ROUND(check1, check2, 15);
+    ROUND(check2, check1, 14);
+    ROUND(check1, check2, 13);
+    ROUND(check2, check1, 12);
+    ROUND(check1, check2, 11);
+    ROUND(check2, check1, 10);
+    ROUND(check1, check2, 9);
+    ROUND(check2, check1, 8);
+    ROUND(check1, check2, 7);
+    ROUND(check2, check1, 6);
+    ROUND(check1, check2, 5);
+    ROUND(check2, check1, 4);
+    ROUND(check1, check2, 3);
+    ROUND(check2, check1, 2);
+    ROUND(check1, check2, 1);
+    check2.word ^= bf_P[0];
+    *xl = check2.word;
+    *xr = check1.word;
 }
 
 void init (UBYTE_08bits * key, short keybytes, int bxtouse, short big)
 {
-	/* This function initializes the sub keys for the blowfish algorithm */
-	int i, j, bx;
-	time_t lowest;
-	UWORD_32bits data;
-	UWORD_32bits datal;
-	UWORD_32bits datar;
-	union aword_big temp_big;
-	union aword_little temp_little;
-	for (i = 0; i < BOXES; i++)
-	if (box[i].P != NULL) {
-		if ((box[i].keybytes == keybytes) &&
-		(memcmp((char *) (box[i].key), (char *) key, keybytes) == 0)) {
-			bf_P = box[i].P;
-			bf_S = box[i].S;
-			return;
-		}
-	}
-	bx = (-1);
+    /* This function initializes the sub keys for the blowfish algorithm */
+    int i, j, bx;
+    time_t lowest;
+    UWORD_32bits data;
+    UWORD_32bits datal;
+    UWORD_32bits datar;
+    union aword_big temp_big;
+    union aword_little temp_little;
+    for (i = 0; i < BOXES; i++)
+    if (box[i].P != NULL) {
+        if ((box[i].keybytes == keybytes) &&
+        (memcmp((char *) (box[i].key), (char *) key, keybytes) == 0)) {
+            bf_P = box[i].P;
+            bf_S = box[i].S;
+            return;
+        }
+    }
+    bx = (-1);
 
-	for (i = 0; i < BOXES; i++) {
-		if (box[i].P == NULL) {
-		bx = i;
-		i = BOXES + 1;
-		}
-	}
-	if (bx < 0) {
-		bx = bxtouse;
-		free(box[bx].P);
-		for (i = 0; i < 4; i++)
-		free(box[bx].S[i]);
-		free(box[bx].S);
-	}
-	box[bx].P = (UWORD_32bits *) malloc((bf_N + 2) * sizeof(UWORD_32bits));
-	box[bx].S = (UWORD_32bits **) malloc(4 * sizeof(UWORD_32bits *));
-	for (i = 0; i < 4; i++)
-	box[bx].S[i] = (UWORD_32bits *) malloc(256 * sizeof(UWORD_32bits));
-	bf_P = box[bx].P;
-	bf_S = box[bx].S;
-	box[bx].keybytes = keybytes;
-	memcpy(box[bx].key, key, keybytes);
-	for (i = 0; i < bf_N + 2; i++)
-	bf_P[i] = initbf_P[i];
-	for (i = 0; i < 4; i++)
-	for (j = 0; j < 256; j++)
-	bf_S[i][j] = initbf_S[i][j];
-	j = 0;
-	for (i = 0; i < bf_N + 2; ++i) {
-		if( big == 1 ) {
-			temp_big.word = 0;
-			temp_big.w.byte0 = key[j];
-			temp_big.w.byte1 = key[(j + 1) % keybytes];
-			temp_big.w.byte2 = key[(j + 2) % keybytes];
-			temp_big.w.byte3 = key[(j + 3) % keybytes];
-			data = temp_big.word;
-		} else {
-			temp_little.word = 0;
-			temp_little.w.byte0 = key[j];
-			temp_little.w.byte1 = key[(j + 1) % keybytes];
-			temp_little.w.byte2 = key[(j + 2) % keybytes];
-			temp_little.w.byte3 = key[(j + 3) % keybytes];
-			data = temp_little.word;
-		}
-		bf_P[i] = bf_P[i] ^ data;
-		j = (j + 4) % keybytes;
-	}
-	datal = 0x00000000;
-	datar = 0x00000000;
-	for (i = 0; i < bf_N + 2; i += 2) {
-		if( big == 1 ) 
-			encipher_big(&datal, &datar);
-		else
-			encipher_little(&datal, &datar);
-		bf_P[i] = datal;
-		bf_P[i + 1] = datar;
-	}
-	for (i = 0; i < 4; ++i) {
-		for (j = 0; j < 256; j += 2) {
-			if( big == 1 ) 
-				encipher_big(&datal, &datar);
-			else
-				encipher_little(&datal, &datar);
-			bf_S[i][j] = datal;
-			bf_S[i][j + 1] = datar;
-		}
-	}
+    for (i = 0; i < BOXES; i++) {
+        if (box[i].P == NULL) {
+        bx = i;
+        i = BOXES + 1;
+        }
+    }
+    if (bx < 0) {
+        bx = bxtouse;
+        free(box[bx].P);
+        for (i = 0; i < 4; i++)
+        free(box[bx].S[i]);
+        free(box[bx].S);
+    }
+    box[bx].P = (UWORD_32bits *) malloc((bf_N + 2) * sizeof(UWORD_32bits));
+    box[bx].S = (UWORD_32bits **) malloc(4 * sizeof(UWORD_32bits *));
+    for (i = 0; i < 4; i++)
+    box[bx].S[i] = (UWORD_32bits *) malloc(256 * sizeof(UWORD_32bits));
+    bf_P = box[bx].P;
+    bf_S = box[bx].S;
+    box[bx].keybytes = keybytes;
+    memcpy(box[bx].key, key, keybytes);
+    for (i = 0; i < bf_N + 2; i++)
+    bf_P[i] = initbf_P[i];
+    for (i = 0; i < 4; i++)
+    for (j = 0; j < 256; j++)
+    bf_S[i][j] = initbf_S[i][j];
+    j = 0;
+    for (i = 0; i < bf_N + 2; ++i) {
+        if( big == 1 ) {
+            temp_big.word = 0;
+            temp_big.w.byte0 = key[j];
+            temp_big.w.byte1 = key[(j + 1) % keybytes];
+            temp_big.w.byte2 = key[(j + 2) % keybytes];
+            temp_big.w.byte3 = key[(j + 3) % keybytes];
+            data = temp_big.word;
+        } else {
+            temp_little.word = 0;
+            temp_little.w.byte0 = key[j];
+            temp_little.w.byte1 = key[(j + 1) % keybytes];
+            temp_little.w.byte2 = key[(j + 2) % keybytes];
+            temp_little.w.byte3 = key[(j + 3) % keybytes];
+            data = temp_little.word;
+        }
+        bf_P[i] = bf_P[i] ^ data;
+        j = (j + 4) % keybytes;
+    }
+    datal = 0x00000000;
+    datar = 0x00000000;
+    for (i = 0; i < bf_N + 2; i += 2) {
+        if( big == 1 )
+            encipher_big(&datal, &datar);
+        else
+            encipher_little(&datal, &datar);
+        bf_P[i] = datal;
+        bf_P[i + 1] = datar;
+    }
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 256; j += 2) {
+            if( big == 1 )
+                encipher_big(&datal, &datar);
+            else
+                encipher_little(&datal, &datar);
+            bf_S[i][j] = datal;
+            bf_S[i][j + 1] = datar;
+        }
+    }
 }
 
-/* #define SALT1 0xdeadd061
-	#define SALT2 0x23f6b095  */
 /*   char *base64 = "./0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; */
 char *base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 int base64dec (char c)
 {
-	int i;
-	for (i = 0; i < 64; i++)
-		if (base64[i] == c)
-		return i;
-	return 0;
+    int i;
+    for (i = 0; i < 64; i++)
+        if (base64[i] == c)
+        return i;
+    return 0;
 }
 
-char *b_encrypt (UBYTE_08bits *key, char *str, short big)
+char *b_encrypt (UBYTE_08bits *key, char *str, short big, short b_signed)
 {
-	UWORD_32bits left, right;
-	char *p, *s, *dest, *d;
-	int i;
-	/* printf("Key is %s\nString: %s\n", key, str); */
-	dest = (char *) malloc((strlen(str) + 9) * 2);
-	s = (char *) malloc(strlen(str) + 9);
-	strcpy(s, str);
-	p = s;
-	while (*p)
-		p++;
-	for (i = 0; i < 8; i++)
-		*p++ = 0;
-	init(key, (short) strlen((char *) key), 0, big);
-	p = s;
-	d = dest;
-	while (*p) {
-		left = ((*p++) << 24);
-		left += ((*p++) << 16);
-		left += ((*p++) << 8);
-		left += (*p++);
-		right = ((*p++) << 24);
-		right += ((*p++) << 16);
-		right += ((*p++) << 8);
-		right += (*p++);
+    UWORD_32bits left, right;
+    char *p, *s, *dest, *d;
+    int i;
 
-		if( big == 1 ) 
-			encipher_big(&left, &right);
-		else
-			encipher_little(&left, &right);
+    if(!b_signed)
+        b_signed = 0;
 
-		for (i = 0; i < 6; i++) {
-			*d++ = base64[right & 0x3f];
-			right = (right >> 6);
-		}
-		for (i = 0; i < 6; i++) {
-			*d++ = base64[left & 0x3f];
-			left = (left >> 6);
-		}
-	}
-	*d = 0;
-	free(s);
-	return dest;
+    dest = (char *) malloc((strlen(str) + 9) * 2);
+    s = (char *) malloc(strlen(str) + 9);
+    strcpy(s, str);
+    p = s;
+
+    while (*p)
+        p++;
+
+    for (i = 0; i < 8; i++)
+        *p++ = 0;
+
+    init(key, (short) strlen((char *) key), 0, big);
+
+    p = s;
+    d = dest;
+
+    while (*p) {
+        left   = (( b_signed == 0 ? (unsigned char)(*p++) : (*p++) ) << 24);
+        left  += (( b_signed == 0 ? (unsigned char)(*p++) : (*p++) ) << 16);
+        left  += (( b_signed == 0 ? (unsigned char)(*p++) : (*p++) ) << 8);
+        left  +=  ( b_signed == 0 ? (unsigned char)(*p++) : (*p++) );
+
+        right  = (( b_signed == 0 ? (unsigned char)(*p++) : (*p++) ) << 24);
+        right += (( b_signed == 0 ? (unsigned char)(*p++) : (*p++) ) << 16);
+        right += (( b_signed == 0 ? (unsigned char)(*p++) : (*p++) ) << 8);
+        right +=  ( b_signed == 0 ? (unsigned char)(*p++) : (*p++) );
+
+        if( big == 1 )
+            encipher_big(&left, &right);
+        else
+            encipher_little(&left, &right);
+
+        for (i = 0; i < 6; i++) {
+            *d++ = base64[right & 0x3f];
+            right = (right >> 6);
+        }
+        for (i = 0; i < 6; i++) {
+            *d++ = base64[left & 0x3f];
+            left = (left >> 6);
+        }
+    }
+    *d = 0;
+    free(s);
+    return dest;
 }
 
 char *b_decrypt (UBYTE_08bits *key, char *str, short big)
 {
-	/* printf("input is %s %s: \n", key, str); */
-	UWORD_32bits left, right;
-	char *p, *s, *dest, *d;
-	int i;
-	dest = (char *) malloc(strlen(str) + 12);
-	s = (char *) malloc(strlen(str) + 12);
-	strcpy(s, str);
-	p = s;
-	while (*p)
-	p++;
-	for (i = 0; i < 12; i++)
-	*p++ = 0;
-	init(key, (short) strlen((char *) key), 0, big);
-	p = s;
-	d = dest;
-	while (*p) {
-		right = 0L;
-		left = 0L;
-		for (i = 0; i < 6; i++)
-		right |= (base64dec(*p++)) << (i * 6);
-		for (i = 0; i < 6; i++)
-		left |= (base64dec(*p++)) << (i * 6);
+    UWORD_32bits left, right;
 
-		if( big == 1 ) 
-			decipher_big(&left, &right);
-		else 
-			decipher_little(&left, &right);
-			
-		for (i = 0; i < 4; i++)
-			*d++ = (left & (0xff << ((3 - i) * 8))) >> ((3 - i) * 8);
-		for (i = 0; i < 4; i++)
-			*d++ = (right & (0xff << ((3 - i) * 8))) >> ((3 - i) * 8);
-	}
-	*d = 0;
-	free(s);
-	return dest;
+    char *p, *s, *dest, *d;
+    int i;
+    dest = (char *) malloc(strlen(str) + 12);
+    s = (char *) malloc(strlen(str) + 12);
+    strcpy(s, str);
+    p = s;
+
+    while (*p)
+        p++;
+
+    for (i = 0; i < 12; i++)
+        *p++ = 0;
+
+    init(key, (short) strlen((char *) key), 0, big);
+
+    p = s;
+    d = dest;
+
+    while (*p) {
+        right = 0L;
+        left = 0L;
+
+        for (i = 0; i < 6; i++)
+            right |= (base64dec(*p++)) << (i * 6);
+
+        for (i = 0; i < 6; i++)
+            left |= (base64dec(*p++)) << (i * 6);
+
+        if( big == 1 )
+            decipher_big(&left, &right);
+        else
+            decipher_little(&left, &right);
+
+        for (i = 0; i < 4; i++)
+            *d++ = (left & (0xff << ((3 - i) * 8))) >> ((3 - i) * 8);
+        for (i = 0; i < 4; i++)
+            *d++ = (right & (0xff << ((3 - i) * 8))) >> ((3 - i) * 8);
+    }
+    *d = 0;
+    free(s);
+    return dest;
 }

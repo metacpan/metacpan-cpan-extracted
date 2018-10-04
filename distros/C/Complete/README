@@ -1,46 +1,47 @@
-DESCRIPTION
+NAME
+    Complete - Convention for Complete::* modules family
 
-    The namespace Complete:: is used for the family of modules that deal
+VERSION
+    This document describes version 0.200 of Complete (from Perl
+    distribution Complete), released on 2018-09-26.
+
+DESCRIPTION
+    The namespace "Complete::" is used for the family of modules that deal
     with completion (including, but not limited to, shell tab completion,
-    tab completion feature in other CLI-based application, web
-    autocomplete, completion in GUI, etc). This (family of) modules try to
-    have a clear separation between general completion routine and
-    shell-/environment specific ones, for more reusability.
+    tab completion feature in other CLI-based application, web autocomplete,
+    completion in GUI, etc). This (family of) modules try to have a clear
+    separation between general completion routine and shell-/environment
+    specific ones, for more reusability.
 
     This POD page establishes convention and gives an overview of the
-    modules in Complete::*.
+    modules in "Complete::*".
 
- Modules
-
-  Common/shared settings and other stuffs
-
+  Modules
+   Common/shared settings and other stuffs
     Complete::Common
 
-  Generic (non-environment-specific) modules
-
+   Generic (non-environment-specific) modules
     Modules usually are named after the type of completion answer they
     provide. For example: Complete::Unix completes username/group name,
     Complete::Getopt::Long completes from Getopt::Long specification,
     Complete::Module completes Perl module names, and so on. A current
-    exception is Complete::Util which contains several generic routines,
-    the main one is complete_array_elem() which is used by most other
+    exception is Complete::Util which contains several generic routines, the
+    main one is "complete_array_elem()" which is used by most other
     completion routines.
 
-  Environment-specific modules
-
-    Complete::Bash::* modules are specific to bash shell. See
+   Environment-specific modules
+    "Complete::Bash::*" modules are specific to bash shell. See
     Complete::Bash on some of the ways to do bash tab completion with Perl.
     Other shells are also supported. For shell-specific information, please
-    refer to Complete::Zsh, Complete::Tcsh, Complete::Fish, as well as
-    their submodules.
+    refer to Complete::Zsh, Complete::Tcsh, Complete::Fish, as well as their
+    submodules.
 
-    Complete::* modules for non-shell environment (like browser or GUI)
+    "Complete::*" modules for non-shell environment (like browser or GUI)
     have not been developed. Please check again from time to time in the
     future.
 
- complete_*() functions
-
-    The main functions that do the actual completion are the complete_*()
+  "complete_*()" functions
+    The main functions that do the actual completion are the "complete_*()"
     functions. These functions are generic completion routines: they accept
     the word to be completed, zero or more other arguments, and return a
     completion answer structure (see "Completion answer structure").
@@ -49,93 +50,132 @@ DESCRIPTION
      my $ary = complete_array_elem(array=>[qw/apple apricot banana/], word=>'ap');
      # -> ['apple', 'apricot']
 
-    Convention for complete_* function:
+    Convention for "complete_*" function:
 
-      * Accept a hash argument
+    *   Accept a hash argument
 
-      Example:
+        Example:
 
-       complete_array_elem(%args)
+         complete_array_elem(%args)
 
-      Required arguments: word (the word to be completed). Sometimes, for
-      lower-level functions, you can accept words and cword instead of
-      word, For example, in function
-      Complete::Getopt::Long::complete_cli_arg.
+        Required arguments: "word" (the word to be completed). Sometimes,
+        for lower-level functions, you can accept "words" and "cword"
+        instead of "word", For example, in function
+        "Complete::Getopt::Long::complete_cli_arg".
 
-      You can define more arguments as you fit. Often there is at least one
-      argument to specify or customize the source of completion, for
-      example for the function Complete::Util::complete_array_elem there is
-      an array argument to specify the source array.
+        You can define more arguments as you see fit. Often there is at
+        least one argument to specify or customize the source of completion,
+        for example for the function "Complete::Util::complete_array_elem"
+        there is an "array" argument to specify the source array.
 
-      * Observe settings specified in Complete::Common
+    *   Observe settings specified in Complete::Common
 
-      Example settings in Complete::Common include whether search should be
-      case-insensitive, whether fuzzy searching should be done, etc. See
-      the module's documentation for more details.
+        Example settings in Complete::Common include whether search should
+        be case-insensitive, whether fuzzy searching should be done, etc.
+        See the module's documentation for more details.
 
-      * Return completion answer structure
+    *   Return completion answer structure
 
-      See "Completion answer structure".
+        See "Completion answer structure".
 
- Completion answer structure
-
-    complete_*() functions return completion answer structure. Completion
-    answer contains the completion entries as well as extra metadata to
-    give hints to formatters/tools. It is a hashref which can contain the
+  Completion answer structure
+    "complete_*()" functions return completion answer structure. Completion
+    answer contains the completion entries as well as extra metadata to give
+    hints to formatters/tools. It is a hashref which can contain the
     following keys:
 
-      * words => array
+    *   words => array
 
-      This key is required. Its value is an array of completion entries. A
-      completion entry can be a string or a hashref. Example:
+        This key is required. Its value is an array of completion entries. A
+        completion entry can be a string or a hashref. Example:
 
-       ['apple', 'apricot'] # array of strings
-      
-       [{word=>'apple', summary=>'A delicious fruit with thousands of varieties'},
-        {word=>'apricot', summary=>'Another delicious fruit'},] # array of hashes
+         ['apple', 'apricot'] # array of strings
 
-      As you can see from the above, each entry can contain description
-      (can be displayed in shells that support them, like fish and zsh).
+         [{word=>'apple', summary=>'A delicious fruit with thousands of varieties'},
+          {word=>'apricot', summary=>'Another delicious fruit'},] # array of hashes
 
-      * type => str
+        As you can see from the above, each entry specify the word and can
+        also contain additional information: summary (str, short one-line
+        description, can be displayed e.g. in shells that support them, like
+        fish and zsh), is_partial (bool, specify whether this is a partial
+        completion).
 
-      See Complete::Bash.
+         # example of digit-by-digit completion
+         [
+           {word=>'11', is_partial=>1},
+           {word=>'12', is_partial=>1},
+           ...
+           {word=>'19', is_partial=>1},
+         ],
 
-      * path_sep => str
+    *   is_partial => bool
 
-      See Complete::Bash.
+        If set to true, specifies that the entries in words are partial
+        completion entries. This is equivalent to setting "is_partial => 1"
+        to all the entries.
 
-      * esc_mode => str
+    *   type => str
 
-      See Complete::Bash.
+        See Complete::Bash.
 
-      * static => bool
+    *   path_sep => str
 
-      Specify that completion is "static", meaning that it does not depend
-      on external state (like filesystem) or a custom code which can return
-      different answer everytime completion is requested.
+        See Complete::Bash.
 
-      This can be useful for code that wants to generate completion code,
-      like bash completion or fish completion. Knowing that completion for
-      an option value is static means that completion for that option can
-      be answered from an array instead of having to call code/program
-      (faster).
+    *   esc_mode => str
+
+        See Complete::Bash.
+
+    *   static => bool
+
+        Specify that completion is "static", meaning that it does not depend
+        on external state (like filesystem) or a custom code which can
+        return different answer everytime completion is requested.
+
+        This can be useful for code that wants to generate completion code,
+        like bash completion or fish completion. Knowing that completion for
+        an option value is static means that completion for that option can
+        be answered from an array instead of having to call code/program
+        (faster).
 
     As a shortcut, completion answer can also be an arrayref (just the
-    words) without any metadata.
+    "words") without any metadata.
 
     Examples:
 
      # hash form
      {words=>[qw/apple apricot/]}
-    
+
      # another hash form. type=env instructs formatter not to escape '$'
      {words=>[qw/$HOME $ENV/], type=>'env'}
-    
+
      # array form
      ['apple', 'apricot']
-    
+
      # another array form, each entry is a hashref to include description
      [{word=>'apple', summary=>'A delicious fruit with thousands of varieties'},
       {word=>'apricot', summary=>'Another delicious fruit'},] # array of hashes
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Complete>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

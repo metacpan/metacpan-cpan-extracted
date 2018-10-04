@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'JSON::Validator' => '2.08',
-  'Mojolicious' => '7.82'
+  'Mojolicious' => '8.00'
 }
 ,
   META_MERGE     => {
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  test => {S => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
+  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {

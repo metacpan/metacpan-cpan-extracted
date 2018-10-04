@@ -13,6 +13,8 @@ config/app_optional_missing.yaml
 config/include.json
 config/libs.yaml
 config/merge.yaml
+config/recursion_1.yaml
+config/recursion_2.yaml
 cpanfile
 lib/Config/App.pm
 t/00-compile.t

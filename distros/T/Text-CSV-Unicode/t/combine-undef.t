@@ -1,12 +1,8 @@
 use strict;
-use Test::More; 
+use warnings;
+use Test::More tests => 4; 
 
-BEGIN{ 
-    plan skip_all => 'charnames required' 
-	unless eval{ require charnames }; 
-    plan tests => 3;
-}
-use Text::CSV::Base;
+require_ok( q(Text::CSV::Unicode) );
 
 my $warn = q{};
 $SIG{__WARN__} = sub { $warn .= $_[0]; };
@@ -15,7 +11,7 @@ my @array;
 $array[1] = 'hello'; 
 $array[3] = 'world'; 
 
-my $csv = Text::CSV::Base->new;
+my $csv = Text::CSV::Unicode->new( { always_quote => 1 } );
 ok $csv->combine(@array), "combine with undef values"; 
 is $csv->string, q{,"hello",,"world"}, 
 	"combine with undef values - output";

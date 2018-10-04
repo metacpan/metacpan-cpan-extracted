@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::GeneNameOccurances;
-
+$Bio::AutomatedAnnotation::GeneNameOccurances::VERSION = '1.182770';
 # ABSTRACT: Parse the gene names from multiple GFF files and provide a matrix of matches.
 
 
@@ -74,7 +74,7 @@ Bio::AutomatedAnnotation::GeneNameOccurances - Parse the gene names from multipl
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

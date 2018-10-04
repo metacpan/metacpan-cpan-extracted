@@ -4,7 +4,7 @@ use Module::Build;
 my $b = Module::Build->new(
   configure_requires   => {'Module::Build'=>0.4224},
   create_readme        =>  0,
-  dist_abstract        => 'Exchange files and update issues from your colleagues via an S3 bucket.',
+  dist_abstract        => 'Exchange files and update issues with your colleagues via an S3 bucket or rsync.',
   dist_author          => 'philiprbrenan@gmail.com',
   license              => 'perl',
   module_name          => 'Data::Exchange',
@@ -12,7 +12,7 @@ my $b = Module::Build->new(
   requires             => {
      Carp              => 0,
     'Data::Dump'       => 0,
-    'Data::Table::Text'=> '20180817',
+    'Data::Table::Text'=> q(20181001),
      Storable          => 0,
     'Test::More'       => 0,
     'Test2::API'       => 0,

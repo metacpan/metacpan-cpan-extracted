@@ -1,5 +1,16 @@
 Revision history for perl module Lingua::EN::ABC
 
+0.10 2018-09-26
+
+* Plurals ending in s also changed
+* CONTRIBUTING file
+
+0.09 2018-09-26
+
+* Some words removed from "same pronunciation, different spelling" category
+* New words "mould*", "colour*", "vapouris*"
+* Ambiguous words rejected in spelling-only changes (check/cheque)
+
 0.08 2018-09-09
 
 * Add "spelling-only" option

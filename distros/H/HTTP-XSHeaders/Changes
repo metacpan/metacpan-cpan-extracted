@@ -1,3 +1,6 @@
+0.400004    2018-10-01
+            * RT #127249: Remove dependency of dot in @INC.
+
 0.400003    2015-12-29
             * Add LICENSE file (MIT license).
             * Use C89 instead of C99.

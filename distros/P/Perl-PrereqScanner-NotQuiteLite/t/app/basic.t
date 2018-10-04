@@ -61,6 +61,16 @@ use Foo;
 END
 }, {exclude_core => 1}, { runtime => { requires => { Foo => 0 }}});
 
+test_app('do not ignore better core modules', sub {
+  my $tmpdir = shift;
+
+  test_file("$tmpdir/MyTest.pm", <<'END');
+use strict;
+use warnings;
+use Exporter 5.57;
+END
+}, {exclude_core => 1}, { runtime => { requires => { Exporter => '5.57' }}});
+
 test_app('ignore core modules for higher perl version', sub {
   my $tmpdir = shift;
 
@@ -82,6 +92,28 @@ use warnings;
 use Foo;
 END
 }, {});
+
+test_app('ignore .pm files under t unless they are used in .t files', sub {
+  my $tmpdir = shift;
+
+  test_file("$tmpdir/t/test.t", <<'END');
+use strict;
+use warnings;
+use t::lib::Util;
+END
+
+  test_file("$tmpdir/t/lib/Util.pm", <<'END');
+use strict;
+use warnings;
+use Foo;
+END
+
+  test_file("$tmpdir/t/lib/Corpus.pm", <<'END');
+use strict;
+use warnings;
+use Bar;
+END
+}, {}, { test => { requires => { strict => 0, warnings => 0, Foo => 0 }}});
 
 test_app('dedupe requires from recommends/suggests', sub {
   my $tmpdir = shift;

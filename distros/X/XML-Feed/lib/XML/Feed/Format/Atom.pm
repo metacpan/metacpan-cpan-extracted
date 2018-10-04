@@ -28,7 +28,7 @@ sub identify {
 sub init_empty {
     my ($feed, %args) = @_;
     $args{'Version'} ||= '1.0';
-    
+
     $feed->{atom} = XML::Atom::Feed->new(%args);
     $feed;
 }
@@ -64,7 +64,7 @@ sub _rel_link {
         my $uri = shift;
         $feed->{atom}->add_link({type => "application/atom+xml", rel => $rel, href => $uri});
         return $uri;
-    } 
+    }
     else
     {
         my $l;
@@ -73,12 +73,10 @@ sub _rel_link {
             $l = first
                 { !defined $_->rel || $_->rel eq 'self' }
                 $feed->{atom}->link;
-                ;
         } else {
             $l = first
                 { !defined $_->rel || $_->rel eq $rel }
                 $feed->{atom}->link;
-                ;
         }
 
         return $l ? $l->href : undef;
@@ -89,7 +87,7 @@ sub self_link   { shift->_rel_link( 'self', @_ ) }
 sub first_link  { shift->_rel_link( 'first', @_ ) }
 sub last_link   { shift->_rel_link( 'last', @_ ) }
 sub next_link   { shift->_rel_link( 'next', @_ ) }
-sub previous_link     { shift->_rel_link( 'previous', @_ ) };
+sub previous_link     { shift->_rel_link( 'previous', @_ ) }
 sub current_link      { shift->_rel_link( 'current', @_ ) }
 sub prev_archive_link { shift->_rel_link( 'prev-archive', @_ ) }
 sub next_archive_link { shift->_rel_link( 'next-archive', @_ ) }
@@ -99,7 +97,7 @@ sub copyright   { shift->{atom}->copyright(@_) }
 sub language    { shift->{atom}->language(@_) }
 sub generator   { shift->{atom}->generator(@_) }
 sub id          { shift->{atom}->id(@_) }
-sub updated     { shift->{atom}->updated(@_) }
+sub updated     { shift->modified(@_) }
 sub add_link    { shift->{atom}->add_link(@_) }
 sub base        { shift->{atom}->base(@_) }
 

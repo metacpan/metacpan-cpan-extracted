@@ -5,6 +5,9 @@ MANIFEST			This list of files
 README
 t/00-load.t
 t/01-test.t
+t/02-configure.t
+t/03-longer.t
+t/04-fails.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

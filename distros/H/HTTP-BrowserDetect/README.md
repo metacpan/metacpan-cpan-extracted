@@ -4,7 +4,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 # VERSION
 
-version 3.16
+version 3.17
 
 # SYNOPSIS
 
@@ -315,6 +315,10 @@ winnt, which is a type of win32)
         winphone7 winphone7_5 winphone8 winphone10
 
 ### dotnet()
+
+### x11()
+
+### webview()
 
 ### chromeos()
 

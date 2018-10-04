@@ -4,13 +4,13 @@
       "Joenio Marques da Costa <joenio@joenio.me>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Analizo",
    "prereqs" : {
@@ -25,8 +25,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Doxyparse" : "0.07",
-            "Alien::SLOCCount" : "0.05",
+            "Alien::Doxyparse" : "0.10",
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir::Install" : "0.06"
          }
@@ -53,7 +52,8 @@
             "Term::ProgressBar" : "0",
             "YAML" : "1.20",
             "YAML::XS" : "0",
-            "ZMQ::FFI" : "0"
+            "ZMQ::FFI" : "0",
+            "local::lib" : "0"
          }
       },
       "test" : {
@@ -80,7 +80,8 @@
          "web" : "https://github.com/analizo/analizo"
       }
    },
-   "version" : "1.21.0",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "1.22.0",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

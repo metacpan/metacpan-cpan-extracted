@@ -24,6 +24,11 @@ WriteMakefile(
         'Carp'          => 0,
         'Scalar::Util'  => 0,
     },
+    META_MERGE => {
+        resources => {
+            repository  => 'https://github.com/mr-mixas/Struct-Path-JsonPointer.pm',
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Struct-Path-JsonPointer-* cover_db' },
 );

@@ -268,7 +268,11 @@
         <span class=com># the "Struct" entry defines the structure fields</span>
         Struct =&gt; {
             <span class=com># optional namespace prefix and URI for structure fields
-            # (required only if different than NAMESPACE above)</span>
+            # (required only if different than NAMESPACE above)
+            # --> multiple entries may exist in this namespace lookup,
+            # with the last one alphabetically being the default for
+            # the fields, but each field may have a "Namespace"
+            # element to specify which prefix to use</span>
             NAMESPACE =&gt; { 'test' =&gt; 'http://x.y.z/test/' },
             <span class=com># optional structure name (used for warning messages only)</span>
             STRUCT_NAME =&gt; 'MyStruct',
@@ -354,6 +358,7 @@ use Image::ExifTool::MIE;
     CoordFormat =&gt; '%.6f',  <span class=com># change default GPS coordinate format</span>
     Duplicates =&gt; 1,        <span class=com># make -a default for the exiftool app</span>
     GeoMaxHDOP =&gt; 4,        <span class=com># ignore GPS fixes with HDOP &gt; 4</span>
+    RequestAll =&gt; 3,        <span class=com># request additional tags not normally generated</span>
 );
 
 <span class=com>#------------------------------------------------------------------------------</span>

@@ -4,7 +4,8 @@ use Test::More;
 use LinkEmbedder;
 
 my $embedder = LinkEmbedder->new;
-my $link     = $embedder->get('https://appear.in/your-room-name');
+my $link;
+$embedder->get_p('https://appear.in/your-room-name')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::AppearIn');
 cmp_deeply $link->TO_JSON,
   {

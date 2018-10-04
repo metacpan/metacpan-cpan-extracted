@@ -1,0 +1,20 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+0.002     2018-09-27 10:37:21 Europe/Berlin
+
+	[Changed]
+
+	Removed failing test I copied from DPT::NoTabs and tried to adapt.
+	Unlucklily I didn't succeed and the test still fails on some
+	systems (thanks to the CPAN Testers).
+
+0.001     2018-09-26 12:02:36 Europe/Berlin
+
+	[Added]
+
+	Initial version with first implementation.

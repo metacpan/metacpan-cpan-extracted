@@ -8,7 +8,7 @@
 #########################################################################
 
 package Term::Clui::FileSelect;
-our $VERSION = '1.73';
+our $VERSION = '1.75';
 import Term::Clui(':DEFAULT','back_up');
 require Exporter;
 @ISA = qw(Exporter);

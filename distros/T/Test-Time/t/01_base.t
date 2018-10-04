@@ -30,7 +30,12 @@ is_deeply \@localtime, [ 40, 1, 1, 1, 0, 70, 4, 0, 0 ],
 
 Test::Time->unimport();
 
-isnt time(), 1, "removed overwritten time()";
+isnt time(), 2, "removed overwritten time()";
 isnt scalar( localtime() ), "Thu Jan  1 01:00:02 1970", "removed overwritten localtime()";
+
+Test::Time->import();
+
+is time(), 2, "re-enabled overwritten time()";
+is scalar( localtime() ), "Thu Jan  1 01:00:02 1970", "re-enabled overwritten localtime()";
 
 done_testing;

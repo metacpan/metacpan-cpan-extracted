@@ -4,7 +4,7 @@
       "Jonas Smedegaard (JONASS) <jonass@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Licensing",
       "Sourcecode"
@@ -36,13 +36,13 @@
       "runtime" : {
          "requires" : {
             "Exporter::Tiny" : "0",
+            "Number::Range" : "0.04",
             "constant" : "0",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Number::Range" : "0.04",
             "Test::More" : "0",
             "utf8" : "0"
          }
@@ -51,7 +51,7 @@
    "provides" : {
       "String::Copyright" : {
          "file" : "lib/String/Copyright.pm",
-         "version" : "0.003005"
+         "version" : "0.003006"
       }
    },
    "release_status" : "stable",
@@ -69,10 +69,11 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/String-Copyright/project"
    },
-   "version" : "0.003005",
+   "version" : "0.003006",
    "x_help_wanted" : [
       "documenter",
       "tester"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

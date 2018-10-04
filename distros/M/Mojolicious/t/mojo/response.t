@@ -1,13 +1,13 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use IO::Compress::Gzip 'gzip';
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
+use Mojo::File 'tempdir';
 use Mojo::JSON 'encode_json';
 use Mojo::Message::Response;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode gzip);
 
 # Defaults
 my $res = Mojo::Message::Response->new;
@@ -494,6 +494,10 @@ ok !$res->content->parts->[1]->is_multipart, 'no multipart content';
 ok !$res->content->parts->[2]->is_multipart, 'no multipart content';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
+my $dir  = tempdir;
+my $file = $dir->child('multipart.html');
+eval { $res->save_to($file) };
+like $@, qr/^Multipart content cannot be saved to files/, 'right error';
 
 # Parse HTTP 1.1 chunked multipart response with leftovers (at once)
 $res = Mojo::Message::Response->new;
@@ -623,7 +627,7 @@ like $res->content->asset->slurp, qr/hallo welt/, 'right content';
 
 # Parse HTTP 1.1 gzip compressed response
 my $uncompressed = 'abc' x 1000;
-gzip \$uncompressed, \my $compressed;
+my $compressed   = gzip $uncompressed;
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
@@ -650,8 +654,8 @@ is $res->body, $uncompressed, 'right content';
 # Parse HTTP 1.1 chunked gzip compressed response
 $uncompressed = 'abc' x 1000;
 $compressed   = undef;
-gzip \$uncompressed, \$compressed;
-$res = Mojo::Message::Response->new;
+$compressed   = gzip $uncompressed;
+$res          = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Encoding: gzip\x0d\x0a");
@@ -1094,6 +1098,11 @@ is_deeply $res->dom('p > a')->map('text')->to_array, [qw(yada yada)],
 is_deeply \@text, [qw(test test)], 'right values';
 is_deeply $res->dom->find('p > a')->map('text')->to_array, [qw(test test)],
   'right values';
+$file = $dir->child('single.html');
+is $res->save_to($file)->body,
+  '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>', 'right content';
+is $file->slurp, '<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>',
+  'right content';
 
 # Build DOM from response with charset
 $res = Mojo::Message::Response->new;

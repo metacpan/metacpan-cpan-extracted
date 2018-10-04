@@ -2,8 +2,8 @@ NAME
     App::XTermUtils - Utilities related to XTerm
 
 VERSION
-    This document describes version 0.001 of App::XTermUtils (from Perl
-    distribution App-XTermUtils), released on 2018-09-25.
+    This document describes version 0.003 of App::XTermUtils (from Perl
+    distribution App-XTermUtils), released on 2018-09-26.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -11,53 +11,6 @@ DESCRIPTION
     *   get-term-bgcolor
 
     *   set-term-bgcolor
-
-FUNCTIONS
-  get_term_bgcolor
-    Usage:
-
-     get_term_bgcolor() -> [status, msg, result, meta]
-
-    Get terminal background color.
-
-    This function is not exported.
-
-    No arguments.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  set_term_bgcolor
-    Usage:
-
-     set_term_bgcolor(%args) -> [status, msg, result, meta]
-
-    Set terminal background color.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   rgb* => *color::rgb24*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at

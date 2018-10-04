@@ -1,5 +1,25 @@
 Revision history for Math-AnyNum
 
+0.28    2018-09-29
+
+        [ADDITIONS]
+
+        - lucasU(p, q, n)               Lucas U sequence
+        - lucasV(p, q, n)               Lucas V sequence
+        - lucasUmod(p, q, n, m)         Lucas U sequence mod m
+        - lucasVmod(p, q, n, m)         Lucas V sequence mod m
+        - bit_scan0(n, k)               index of the first 0-bit of n with index >= k
+        - bit_scan1(n, k)               index of the first 1-bit of n with index >= k
+        - hamdist(n, k)                 Hamming distance (number of bit-positions where the bits differ)
+        - gcdext(n, k)                  return (u,v,d) where `u*n + v*k = d`
+        - is_congruent(n, k, m)`        true if `n` is congruent to `k` mod `m`
+
+        [IMPROVEMENTS]
+
+        - More efficient algorithms in `fibmod(n, m)` and `lucasmod(n, m)`.
+        - Optimized the `div(Scalar, AnyNum)` case. It no longer converts the Scalar to a temporary object.
+        - Extended the `catalan()` function to accept an optional argument, computing the entries of Catalan's triangle `C(n,k)`.
+
 0.27    2018-07-04
 
         [ADDITIONS]
@@ -13,7 +33,7 @@ Revision history for Math-AnyNum
 
         [IMPROVEMENTS]
 
-        - Optimized the case `sub(Scalar, Object)` by using the `*_ui_sub()` functions from Math::{GMPz,MPFR,MPC}.
+        - Optimized the case `sub(Scalar, AnyNum)` by using the `*_ui_sub()` functions from Math::{GMPz,MPFR,MPC}.
         - Use `mpz_powm_ui()` in `powmod(n, k, m)` when `k` fits inside an unsigned native integer, as it is considerably faster than `mpz_powm()` for small `k`.
 
 0.26    2018-05-30

@@ -4,7 +4,7 @@ use warnings;
 
 use Test::More;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our $time = CORE::time();
 
 my $pkg = __PACKAGE__;
@@ -16,6 +16,7 @@ sub in_effect {
 
 sub import {
 	my ($class, %opts) = @_;
+	$in_effect = 1;
 	$time = $opts{time} if defined $opts{time};
 
 	*CORE::GLOBAL::time = sub() {

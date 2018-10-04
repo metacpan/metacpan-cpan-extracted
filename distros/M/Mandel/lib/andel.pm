@@ -1,38 +1,7 @@
 package andel;
-
-=head1 NAME
-
-andel - Oneliner Mandel magic
-
-=head1 SYNOPSIS
-
-  perl -Mandel=MyModel -E'say c("users", j shift)->in_storage' '{"name":"joe"}'
-  perl -Mandel=MyModel -E'say c("users", { name => "joe" })->in_storage'
-  perl -Mandel=MyModel,db_name -E'say c("users")->count'
-  perl -Mandel=MyModel,mongodb://hostname/db_name -E'say c("users")->count'
-
-=cut
-
 use Mojo::Base -strict;
 
 my $mandel;
-
-=head1 EXPORTED FUNCTIONS
-
-=head2 c
-
-  $collection = c("collection_name");
-  $obj = c("collection_name", \%create_args);
-
-Alias for
-
-  $mandel->collection("collection_name");
-
-Or
-
-  $mandel->collection("collection_name")->create(\%create_args)->save;
-
-=cut
 
 sub c {
   my $name = shift or die "Usage: c('collection_name')";
@@ -44,18 +13,6 @@ sub c {
 
   return $collection;
 }
-
-=head2 j
-
-See L<Mojo::JSON/j>.
-
-=head1 METHODS
-
-=head2 import
-
-See L</SYNOPSIS>.
-
-=cut
 
 sub import {
   my $class  = shift;
@@ -78,10 +35,48 @@ sub _setup {
   $mandel = $model->connect(@connect);
 }
 
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+andel - Oneliner Mandel magic
+
+=head1 SYNOPSIS
+
+  perl -Mandel=MyModel -E'say c("users", j shift)->in_storage' '{"name":"joe"}'
+  perl -Mandel=MyModel -E'say c("users", { name => "joe" })->in_storage'
+  perl -Mandel=MyModel,db_name -E'say c("users")->count'
+  perl -Mandel=MyModel,mongodb://hostname/db_name -E'say c("users")->count'
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 c
+
+  $collection = c("collection_name");
+  $obj = c("collection_name", \%create_args);
+
+Alias for
+
+  $mandel->collection("collection_name");
+
+Or
+
+  $mandel->collection("collection_name")->create(\%create_args)->save;
+
+=head2 j
+
+See L<Mojo::JSON/j>.
+
+=head1 METHODS
+
+=head2 import
+
+See L</SYNOPSIS>.
+
 =head1 AUTHOR
 
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

@@ -159,6 +159,40 @@ The board revision is the same as the GPIO pin layout on the board:
 
     my $revision = $pi->gpio_layout;
 
+=head2 Identifying which Raspberry Pi hardware you're working on
+
+We've got a couple of methods that are helpers that allow you to physically see
+which Raspberry Pi board you're currently working on.
+
+WARNING: These methods call system command line commands using C<sudo>
+internally!
+
+    # turn off the red power LED
+
+    $pi->pwr_led(1);
+
+    # turn the green disk IO activity light on full-time
+
+    $pi->io_led(1);
+
+    sleep 10;
+
+    # restore the red power LED back to normal operation
+
+    $pi->pwr_led;
+
+    # restore the green disk IO activity LED back to normal operation
+
+    $pi->io_led;
+
+=head2 Setting a label/name for your Pi object
+
+You can set, and then retrieve a label/name within your Pi object for easy
+identification within your scripts.
+
+    $pi->label('pi-test-01');
+    print $pi->label . "\n"; # pi-test-01
+
 =head1 PIN 
 
 =head2 Creating and using a GPIO pin object
@@ -702,39 +736,39 @@ usage information.
 
 =head2 Usage
 
-my $i2c_addr = 0x20;            # default
+    my $i2c_addr = 0x20;            # default
 
-my $exp = $pi->expander($addr); # param not required if using the default
+    my $exp = $pi->expander($i2c_addr); # param not required if using default
 
-# pins are INPUT by default. Turn the first pin to OUTPUT
+    # pins are INPUT by default. Turn the first pin to OUTPUT
 
-$exp->mode(0, 0); # or MCP23017_OUTPUT if using RPi::Const
+    $exp->mode(0, 0); # or MCP23017_OUTPUT if using RPi::Const
 
-# turn the pin on (HIGH)
+    # turn the pin on (HIGH)
 
-$exp->write(0, 1); # or HIGH
+    $exp->write(0, 1); # or HIGH
 
-# read the pin's status (HIGH or LOW)
+    # read the pin's status (HIGH or LOW)
 
-$exp->read(6);
+    $exp->read(6);
 
-# turn the first bank (0) of pins (0-7) to OUTPUT, and make them live (HIGH)
+    # turn the first bank (0) of pins (0-7) to OUTPUT, and make them live (HIGH)
 
-$exp->mode_bank(0, 0);  # bank A, OUTPUT
-$exp->write_bank(0, 1); # bank A, HIGH
+    $exp->mode_bank(0, 0);  # bank A, OUTPUT
+    $exp->write_bank(0, 1); # bank A, HIGH
 
-# enable internal pullup resistors on the entire bank A (0)
+    # enable internal pullup resistors on the entire bank A (0)
 
-$exp->pullup_bank(0, 1); # bank A, pullup enabled
+    $exp->pullup_bank(0, 1); # bank A, pullup enabled
 
-# put all 16 pins as OUTPUT, and put them on (HIGH)
+    # put all 16 pins as OUTPUT, and put them on (HIGH)
 
-$exp->mode_all(0);  # or OUTPUT
-$exp->write_all(1); # or HIGH
+    $exp->mode_all(0);  # or OUTPUT
+    $exp->write_all(1); # or HIGH
 
-# cleanup all pins and reset them to default before exiting your program
+    # cleanup all pins and reset them to default before exiting your program
 
-$exp->cleanup;
+    $exp->cleanup;
 
 =head1 SERVO
 
@@ -897,7 +931,7 @@ number of runs if desired.
     bbdispatch -t localhost -r stevieb9/rpi-wiringpi -a
 
 To use the LCD functionality which displays the last date/time that a test run
-succeeded, along with the last commit tested and it's result (PASS/FAIL), set
+succeeded, along with the last commit tested and its result (PASS/FAIL), set
 up an environment variable that contains a comma-separated list of GPIO pin
 numbers that the LCD is connected to (leave off the last two digits if all you
 have is a two row by 16 column LCD.

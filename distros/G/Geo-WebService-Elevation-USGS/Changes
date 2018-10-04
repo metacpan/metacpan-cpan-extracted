@@ -1,3 +1,12 @@
+0.110		2018-09-29	T. R. Wyant
+    Track change in service URL.
+
+    Make service URL an attribute so people can help themselves if this kind
+    of thing happens again.
+
+0.109		2018-09-28	T. R. Wyant
+    Warn on first setting of 'compatible' attribute.
+
 0.108		2018-03-24	T. R. Wyant
     Guard against undef in method is_valid().
 

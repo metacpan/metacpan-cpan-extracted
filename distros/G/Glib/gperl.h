@@ -378,6 +378,15 @@ const GVariantType * SvGVariantType (SV * sv);
 
 #endif /* 2.24.0 */
 
+#if GLIB_CHECK_VERSION (2, 40, 0)
+
+typedef GVariantDict GVariantDict_own;
+SV * newSVGVariantDict (GVariantDict * dict);
+SV * newSVGVariantDict_own (GVariantDict * dict);
+GVariantDict * SvGVariantDict (SV * sv);
+
+#endif /* 2.40.0 */
+
 /*
  * --- GBytes -----------------------------------------------------------------
  */

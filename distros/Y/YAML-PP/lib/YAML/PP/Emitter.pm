@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use constant DEBUG => $ENV{YAML_PP_EMIT_DEBUG} ? 1 : 0;
 

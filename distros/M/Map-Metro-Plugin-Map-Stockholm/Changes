@@ -1,5 +1,69 @@
 Revision history for Map-Metro-Plugin-Map-Stockholm
 
+0.1972 2018-09-30 10:02:19 UTC
+ [Map]
+ - Added station T-Centralen on Spårväg City.
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 4 insertions(+), 4 deletions(-)
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 6.012
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.008
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0200
+ - (dev req) + Dist::Zilla::Plugin::Git 2.045
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.014
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.055
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.034
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.057
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Kwalitee::Extra (any) --> v0.2.1
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.05
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::More (any) --> 0.88
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0322
+ - (dev sug) + Dist::Iller::Config::Author::CSSON::MapMetro 0.0322
+
 0.1971 2016-01-27T00:00:11Z UTC
  [Other Changes]
  - Rebuilt with current dzil plugins in
@@ -21,21 +85,21 @@ Revision history for Map-Metro-Plugin-Map-Stockholm
  - Added Nockebybanan and Tvärbanan tram lines.
 
 0.1967 2015-01-03T00:06:59Z CET
+ [Meta]
+ - Bumped Map::Metro requirement to 0.2000.
+
  [Enhancements]
  - Added colors to the lines
  - Includes graphviz generated image of the network
 
- [Meta]
- - Bumped Map::Metro requirement to 0.2000.
-
 0.1966 2014-12-30T22:33:31Z CET
- [Enhancements]
- - Adapted to Map::Metro 0.1900 map api.
-
  [Meta]
  - Bumped required Map::Metro to 0.1900.
  - Moose::Role is a prereq.
  - Lowered required Perl version to 5.14.
+
+ [Enhancements]
+ - Adapted to Map::Metro 0.1900 map api.
 
 0.1965 2014-12-13T19:14:34Z CET
  [Enhancements]
@@ -60,11 +124,11 @@ Revision history for Map-Metro-Plugin-Map-Stockholm
  - Required wrong version of Map::Metro
 
 0.1961 2014-12-12T02:33:40Z CET
- [Documentation]
- - Minimize description so that the Map::Metro documentation is canonical.
-
  [Enhancements]
  - Adapted to new Map::Metro api (do bumped requirement to 0.6000).
+
+ [Documentation]
+ - Minimize description so that the Map::Metro documentation is canonical.
 
 0.1960 2014-12-11T15:40:51Z CET
  [Enhancements]
@@ -72,4 +136,3 @@ Revision history for Map-Metro-Plugin-Map-Stockholm
 
 0.1950 2014-12-10T20:04:12Z CET
  - Initial release
-

@@ -14,7 +14,7 @@ use constant {
 };
 
 if (Glib->CHECK_VERSION (2, 24, 0)) {
-  plan tests => 211;
+  plan tests => 223;
 } else {
   plan skip_all => 'Need libglib >= 2.24';
 }
@@ -337,4 +337,34 @@ note ('convenience constructor and accessor');
     my $v3 = Glib::Variant->new ('a{si}', {'äöü' => 23, 'Perl' => 42, '💑' => 2342});
     is_deeply ($v2->get ('a{si}'), [['äöü', 23], ['Perl', 42], ['💑', 2342]]);
   }
+}
+
+note ('variant dict');
+SKIP: {
+  skip 'dict', 12
+    unless Glib->CHECK_VERSION (2, 40, 0);
+
+  my $v = Glib::Variant->new ('a{sv}', {
+    'äöü' => Glib::Variant->new_uint16 (23),
+    'Perl' => Glib::Variant->new_uint32 (42),
+    '💑' => Glib::Variant->new_uint64 (2342)});
+  my $d = Glib::VariantDict->new ($v);
+
+  ok ($d->contains ('äöü'));
+  ok ($d->contains ('Perl'));
+  ok ($d->contains ('💑'));
+
+  is ($d->lookup_value ('äöü', 'q')->get_uint16 (), $v->lookup_value ('äöü', 'q')->get_uint16 ());
+  is ($d->lookup_value ('Perl', 'u')->get_uint32 (), $v->lookup_value ('Perl', 'u')->get_uint32 ());
+  is ($d->lookup_value ('💑', 't')->get_uint64 (), $v->lookup_value ('💑', 't')->get_uint64 ());
+
+  $d->insert_value ('GNU', Glib::Variant->new_string ('RMS'));
+  ok ($d->contains ('GNU'));
+  ok ($d->remove ('GNU'));
+  ok (not $d->contains ('GNU'));
+
+  my $d_v = $d->end ();
+  is ($d_v->lookup_value ('äöü', 'q')->get_uint16 (), $v->lookup_value ('äöü', 'q')->get_uint16 ());
+  is ($d_v->lookup_value ('Perl', 'u')->get_uint32 (), $v->lookup_value ('Perl', 'u')->get_uint32 ());
+  is ($d_v->lookup_value ('💑', 't')->get_uint64 (), $v->lookup_value ('💑', 't')->get_uint64 ());
 }

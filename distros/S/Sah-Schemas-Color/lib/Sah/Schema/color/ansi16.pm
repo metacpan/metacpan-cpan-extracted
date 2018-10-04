@@ -1,7 +1,7 @@
 package Sah::Schema::color::ansi16;
 
-our $DATE = '2017-12-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $schema = [str => {
     summary => 'ANSI-16 color, either a number from 0-15 or color names like "black", "bold red", etc',
@@ -24,7 +24,7 @@ Sah::Schema::color::ansi16 - ANSI-16 color, either a number from 0-15 or color n
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2017-12-03.
+This document describes version 0.002 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2018-09-26.
 
 =head1 HOMEPAGE
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

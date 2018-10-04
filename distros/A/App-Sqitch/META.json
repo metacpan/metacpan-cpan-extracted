@@ -4,13 +4,13 @@
       "\"iovation Inc.\""
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Sqitch",
    "no_index" : {
@@ -18,8 +18,106 @@
          "priv"
       ]
    },
+   "optional_features" : {
+      "exasol" : {
+         "description" : "Support for managing Exasol databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::ODBC" : "1.59"
+               }
+            }
+         }
+      },
+      "firebird" : {
+         "description" : "Support for managing Firebird databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::Firebird" : "1.11",
+                  "Time::HiRes" : "0",
+                  "Time::Local" : "0"
+               }
+            }
+         }
+      },
+      "mysql" : {
+         "description" : "Support for managing MySQL databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::mysql" : "4.018",
+                  "MySQL::Config" : "0"
+               }
+            }
+         }
+      },
+      "odbc" : {
+         "description" : "Include the ODBC driver.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::ODBC" : "1.59"
+               }
+            }
+         }
+      },
+      "oracle" : {
+         "description" : "Support for managing Oracle databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::Oracle" : "1.23"
+               }
+            }
+         }
+      },
+      "postgres" : {
+         "description" : "Support for managing PostgreSQL databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::Pg" : "2.0"
+               }
+            }
+         }
+      },
+      "snowflake" : {
+         "description" : "Support for managing Snowflake databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::ODBC" : "1.59"
+               }
+            }
+         }
+      },
+      "sqlite" : {
+         "description" : "Support for managing SQLite databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::SQLite" : "1.37"
+               }
+            }
+         }
+      },
+      "vertica" : {
+         "description" : "Support for managing Vertica databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::ODBC" : "1.59"
+               }
+            }
+         }
+      }
+   },
    "prereqs" : {
       "build" : {
+         "recommends" : {
+            "Menlo::CLI::Compat" : "0"
+         },
          "requires" : {
             "Module::Build" : "0.35"
          }
@@ -32,13 +130,52 @@
       "develop" : {
          "recommends" : {
             "DBD::Firebird" : "1.11",
-            "DBD::ODBC" : "1.43",
+            "DBD::ODBC" : "1.59",
             "DBD::Pg" : "2.0",
             "DBD::SQLite" : "1.37",
             "DBD::mysql" : "4.018",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::LocaleTextDomain" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::ModuleBuild" : "0",
+            "Dist::Zilla::Plugin::OptionalFeature" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::Readme" : "0",
+            "Dist::Zilla::Plugin::ShareDir" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "MySQL::Config" : "0",
+            "Software::License::MIT" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0"
+            "Test::Spelling" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0"
+         },
+         "requires" : {
+            "DBD::Firebird" : "1.11",
+            "DBD::ODBC" : "1.59",
+            "DBD::Oracle" : "1.23",
+            "DBD::Pg" : "2.0",
+            "DBD::SQLite" : "1.37",
+            "DBD::mysql" : "4.018",
+            "MySQL::Config" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0"
          },
          "suggests" : {
             "DBD::Oracle" : "1.23"
@@ -48,6 +185,7 @@
          "recommends" : {
             "Class::XSAccessor" : "1.18",
             "Pod::Simple" : "1.41",
+            "Template" : "0",
             "Type::Tiny::XS" : "0.010"
          },
          "requires" : {
@@ -99,7 +237,8 @@
             "Type::Utils" : "0",
             "Types::Standard" : "0",
             "URI" : "0",
-            "URI::db" : "0.15",
+            "URI::QueryParam" : "0",
+            "URI::db" : "0.19",
             "User::pwent" : "0",
             "constant" : "0",
             "if" : "0",
@@ -110,6 +249,17 @@
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "DBD::Firebird" : "1.11",
+            "DBD::ODBC" : "1.59",
+            "DBD::Oracle" : "1.23",
+            "DBD::Pg" : "2.0",
+            "DBD::SQLite" : "1.37",
+            "DBD::mysql" : "4.018",
+            "MySQL::Config" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0"
          }
       },
       "test" : {
@@ -137,13 +287,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/theory/sqitch/issues/"
+         "web" : "https://github.com/sqitchers/sqitch/issues/"
       },
-      "homepage" : "http://sqitch.org/",
+      "homepage" : "https://sqitch.org/",
       "repository" : {
-         "url" : "http://github.com/theory/sqitch/"
+         "url" : "https://github.com/sqitchers/sqitch/"
       }
    },
-   "version" : "0.9997"
+   "version" : "0.9998",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

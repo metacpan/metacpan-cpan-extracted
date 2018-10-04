@@ -1,12 +1,12 @@
 package Array::Contains;
 
-use 5.020;
+use 5.010_001;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
 use English;
-our $VERSION = 2.7; # Based on Maplat version this was tested against
+our $VERSION = 2.8;
 use Carp;
 
 require Exporter;

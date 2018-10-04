@@ -2,7 +2,7 @@ BEGIN { $ENV{DOCSIS_CAN_TRANSLATE_OID} = 0; }
 use strict;
 use warnings;
 use Test::More;
-use DOCSIS::ConfigFile qw( decode_docsis encode_docsis );
+use DOCSIS::ConfigFile qw(decode_docsis encode_docsis);
 
 my $bytes;
 my $input = {
@@ -34,23 +34,21 @@ my $input = {
   VendorSpecific => {id => '0x0011ee', options => [30 => '0xff', 31 => '0x00', 32 => '0x28']},
 };
 
-{
-  $bytes = encode_docsis($input);
-  is length $bytes, 216, 'encode_docsis';
+$bytes = encode_docsis($input);
+is length $bytes, 216, 'encode_docsis';
 
-  local $input->{CmtsMic}    = '0xbedbbbc3a8ecd0f15a44092cc5b6c5bc';
-  local $input->{CmMic}      = '0x08481e28d2c97902fc6c52f547cbbcac';
-  local $input->{GenericTLV} = '';
+{
+  local $input->{CmtsMic} = '0xbedbbbc3a8ecd0f15a44092cc5b6c5bc';
+  local $input->{CmMic}   = '0x08481e28d2c97902fc6c52f547cbbcac';
   is_deeply decode_docsis($bytes), $input, 'decode_docsis';
 }
 
-{
-  $bytes = encode_docsis($input, {shared_secret => 's3cret'});
-  is length $bytes, 216, 'encode_docsis';
+$bytes = encode_docsis($input, {shared_secret => 's3cret'});
+is length $bytes, 216, 'encode_docsis';
 
-  local $input->{CmtsMic}    = '0xc5ab82b1738136be0a4a75badb454b4e';
-  local $input->{CmMic}      = '0x08481e28d2c97902fc6c52f547cbbcac';
-  local $input->{GenericTLV} = '';
+{
+  local $input->{CmtsMic} = '0xc5ab82b1738136be0a4a75badb454b4e';
+  local $input->{CmMic}   = '0x08481e28d2c97902fc6c52f547cbbcac';
   is_deeply decode_docsis($bytes), $input, 'decode_docsis';
 }
 

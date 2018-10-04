@@ -1,5 +1,8 @@
 #! /usr/bin/env perl
 
+use strict;
+use warnings;
+
 use Test::More tests => 25;
 
 ok require Datify, 'Required Datify';

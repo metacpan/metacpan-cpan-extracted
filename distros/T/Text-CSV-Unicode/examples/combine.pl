@@ -1,7 +1,7 @@
 use strict;
-use Text::CSV::Base;
+use Text::CSV::Unicode;
 
-my $csv = Text::CSV::Base->new;
+my $csv = Text::CSV::Unicode->new;
 
 my @data = (
 	[qw( Author	Organisation	Count	Comment)],

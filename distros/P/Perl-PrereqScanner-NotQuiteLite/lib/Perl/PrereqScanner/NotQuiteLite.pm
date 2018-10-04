@@ -6,7 +6,7 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
@@ -160,7 +160,10 @@ sub new {
   my @parsers = $class->_get_parsers($args{parsers});
   for my $parser (@parsers) {
     if (!exists $LOADED{$parser}) {
-      eval "require $parser; 1" or die "Parser Error: $@";
+      eval "require $parser; 1";
+      if (my $error = $@) {
+        $parser->can('register') or die "Parser Error: $error";
+      }
       $LOADED{$parser} = $parser->can('register') ? $parser->register(%args) : undef;
     }
     my $parser_mapping = $LOADED{$parser} or next;

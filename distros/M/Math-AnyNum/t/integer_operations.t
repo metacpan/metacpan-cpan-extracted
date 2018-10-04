@@ -20,15 +20,15 @@ use Math::AnyNum;
     is($z,           -43);
 
     my $c = Math::AnyNum->new_c('3', '4');
-    is($c->popcount, -1);        # complex cannot be converted to an integer
-    is($c,           '3+4i');    # make sure the object is intact
+    ok(!defined($c->popcount));    # complex cannot be converted to an integer
+    is($c, '3+4i');                # make sure the object is intact
 }
 
 {
     my $z  = Math::AnyNum->new_z('12');
     my $t1 = $z->factorial;
     is($t1, '479001600');
-    is($z,  '12');               # make sure factorial didn't change $z
+    is($z,  '12');                 # make sure factorial didn't change $z
     $z = $t1;
 
     $z = $z->isqrt;

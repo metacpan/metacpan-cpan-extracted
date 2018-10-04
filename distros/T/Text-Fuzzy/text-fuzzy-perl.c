@@ -128,7 +128,7 @@ sv_to_text_fuzzy (SV * text, text_fuzzy_t ** text_fuzzy_ptr)
     text_fuzzy->max_distance = NO_MAX_DISTANCE;
 
     /* Copy the string in "text" into "text_fuzzy". */
-    stuff = (unsigned char *) SvPV (text, length);
+    stuff = (const unsigned char *) SvPV (text, length);
     text_fuzzy->text.length = length;
     get_memory (text_fuzzy->text.text, length + 1, char);
     for (i = 0; i < (int) length; i++) {
@@ -213,11 +213,11 @@ free_text (text_fuzzy_t * text_fuzzy)
     }
 }
 
-/* The following palaver is related to the macros "FAIL" and
+/* The following definitions relate to the macros "FAIL" and
    "FAIL_MSG" in "text-fuzzy.c.in". */
 
-#undef FAIL_STATUS
-#define FAIL_STATUS -1
+#undef TEXT_FUZZY_USER_ERROR
+#define TEXT_FUZZY_USER_ERROR -1
 
 static int
 text_fuzzy_sv_distance (text_fuzzy_t * text_fuzzy, SV * word)

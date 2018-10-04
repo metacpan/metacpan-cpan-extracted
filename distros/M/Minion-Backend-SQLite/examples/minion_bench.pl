@@ -1,8 +1,7 @@
 use Mojo::Base -strict;
 
-use File::Spec::Functions 'catfile';
-use File::Temp;
 use Minion;
+use Mojo::File 'tempdir';
 use Mojo::URL;
 use Time::HiRes 'time';
 
@@ -16,8 +15,8 @@ my $REPAIR      = 100;
 my $LOCK        = 1000;
 my $UNLOCK      = 1000;
 
-my $tempdir = File::Temp->newdir;
-my $url = Mojo::URL->new->scheme('sqlite')->path(catfile $tempdir, 'temp.db');
+my $tempdir = tempdir;
+my $url = Mojo::URL->new->scheme('sqlite')->path($tempdir->child('temp.db'));
 
 { # XXX: Scope minion object for cleanup of tempdir
 

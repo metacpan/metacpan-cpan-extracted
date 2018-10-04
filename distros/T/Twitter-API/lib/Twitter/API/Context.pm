@@ -1,6 +1,6 @@
 package Twitter::API::Context;
 # ABSTRACT: Encapsulated state for a request/response
-$Twitter::API::Context::VERSION = '1.0003';
+$Twitter::API::Context::VERSION = '1.0005';
 use Moo;
 use namespace::clean;
 
@@ -57,7 +57,7 @@ Twitter::API::Context - Encapsulated state for a request/response
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Returns the result data for the API call.
 
 Every API endpoint has a rate limit. This method returns the rate limit for the
 endpoint of the API call. See
-L<https://dev.twitter.com/rest/public/rate-limiting> for details.
+L<https://developer.twitter.com/en/docs/basics/rate-limiting> for details.
 
 =head2 rate_limit_remaining
 

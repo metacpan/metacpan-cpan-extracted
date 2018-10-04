@@ -1,5 +1,11 @@
 Revision history for BSON
 
+v1.8.1    2018-10-01 16:28:47-04:00 America/New_York
+
+    [Bugs fixed]
+
+    - PERL-1000 Fixed ExtJSON conversions on 32-bit perls
+
 v1.8.0    2018-09-12 20:57:40-04:00 America/New_York
 
     [*** Deprecations ***]

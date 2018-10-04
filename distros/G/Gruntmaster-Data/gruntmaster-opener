@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use 5.014;
+use warnings;
+
+use Gruntmaster::Data;
+use Gruntmaster::Opener;
+
+dbinit $ENV{GRUNTMASTER_DSN} // 'dbi:Pg:';
+handle_line $_ while <>;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+gruntmaster-opener - Populate opens table from NCSA access logs
+
+=head1 SYNOPSIS
+
+  gruntmaster-opener /var/log/apache2/access.log
+  varnishncsa | gruntmaster-opener
+
+=head1 DESCRIPTION
+
+gruntmaster-opener reads a NCSA access log supplied via arguments or
+(if there are no arguments) stdin, finds lines that represent
+successful requests to problems during contests, extracts data from
+them and inserts it into the database.
+
+=head1 SEE ALSO
+
+L<Gruntmaster::Opener>
+
+=head1 AUTHOR
+
+Marius Gavrilescu E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

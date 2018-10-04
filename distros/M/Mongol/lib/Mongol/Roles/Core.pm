@@ -19,7 +19,7 @@ class_has 'collection' => (
 
 has 'id' => (
 	is => 'rw',
-	isa => 'Maybe[MongoDB::OID|Str|Num]',
+	isa => 'Maybe[BSON::OID|Str|Num]',
 	lazy_build => 1,
 );
 
@@ -73,7 +73,7 @@ sub count {
 		unless( defined( $class->collection() ) );
 
 	return $class->collection()
-		->count( $query, $options );
+		->count_documents( $query || {}, $options );
 }
 
 sub exists {

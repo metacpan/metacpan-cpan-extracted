@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+
+use 5.008;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI::Utils qw{ date2epoch };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.001';
+
+my %opt = (
+    body	=> 'Earth',
+);
+
+my %valid_model = map { $_ => 1 } qw{ A B C D E };
+
+GetOptions( \%opt,
+    qw{ body=s debug! model=s },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+$opt{body} = ucfirst lc $opt{body};
+
+my $dt = @ARGV ? $ARGV[0] : '2018-06-30:00:00:00';
+my $time = do {
+    my @t = split qr< [^0-9]+ >smx, $dt;
+    @t >= 3
+	or die "Incomplete date specified\n";
+    @t > 6
+	and die "Too many components of date specified\n";
+    push @t, 0 while @t < 6;
+    $t[1] -= 1;
+    $t[0] -= 1900;
+    date2epoch( reverse @t );
+};
+
+my $class = "Astro::Coord::ECI::VSOP87D::$opt{body}";
+$opt{body} eq 'Earth'
+    and $class = "Astro::Coord::ECI::VSOP87D";
+{
+    local $@ = undef;
+    eval "require $class; 1"
+	or die "Unable to load $class";
+}
+
+my @state_vec = $class->__model( $time,
+    debug	=> $opt{debug},
+    raw		=> 1,
+);
+
+my @names = qw{ Lon Lat R Lon' Lat' R' };
+
+print "VSOP87D $opt{body} $dt\n";
+printf "%3s: %18.14f\n", $names[$_], $state_vec[$_] for 0 .. 5;
+
+__END__
+
+=head1 TITLE
+
+reference - Produce output corresponding to VSOP87D reference implementation
+
+=head1 SYNOPSIS
+
+ reference
+ reference -body venus 2018-4-1T00:00:00
+ reference -help
+ reference -version
+
+=head1 OPTIONS
+
+=head2 -body
+
+ -body=Earth
+
+This option specifies the body whose state vector is to be computed.
+Possible values are class names in this package, with the leading
+C<Astro::Coord::ECI::VSOP87A::> stripped. C<'Earth'> is special-cased.
+Its model lives in
+L<Astro::Coord::ECI::VSOP87A|Astro::Coord::ECI::VSOP87A> itself, since
+VSOP87A is a Heliocentric model and we need to subtract the position of
+the Earth to get a geocentric position.
+
+The argument is case-insensitive, but only bodies actually implemented
+may be specified.
+
+The default is C<-body=Earth>.
+
+=head2 -debug
+
+This Boolean option causes the output of whatever debugging information
+the author finds helpful. Asserting it is unsupported in the sense that
+the author makes no representation what will happen if it is asserted --
+and whatever happens, the author reserves the right to change it without
+notice.
+
+The default is C<-nodebug>.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script attempts to reproduce the output of the reference
+implementation of the VSOP87D model, which is a Fortran program,
+F<example.f>, included with U. Strasbourg's download.
+
+The time to model is specified on the command line in punctuated
+ISO-8601 format: year-month-dayThour:minute:second. The parser is
+stupid, and accepts any non-digits as field delimiters.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

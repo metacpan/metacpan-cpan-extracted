@@ -1,13 +1,5 @@
 Changes
-config.h
-edit-distance-char-trans.c
-edit-distance-char-trans.h
-edit-distance-char.c
-edit-distance-char.h
-edit-distance-int-trans.c
-edit-distance-int-trans.h
-edit-distance-int.c
-edit-distance-int.h
+CONTRIBUTE
 examples/check-return.pl
 examples/distance-edits.pl
 examples/distance.pl
@@ -25,7 +17,6 @@ examples/unicode.pl
 Fuzzy.xs
 lib/Text/Fuzzy.pm
 lib/Text/Fuzzy.pod
-make-pod.pl
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -44,8 +35,7 @@ t/unicode-nearest.t
 t/unicode-no-unicode.t
 t/wakaba.t
 text-fuzzy-perl.c
-text-fuzzy.c
-text-fuzzy.h
+text-fuzzy-single.c
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

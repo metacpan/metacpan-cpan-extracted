@@ -13,11 +13,11 @@ HTML::T5 - HTML validation in a Perl object
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =cut
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 =head1 SYNOPSIS
 
@@ -365,7 +365,12 @@ __END__
 
 =head1 INSTALLING TIDY
 
-C<HTML::T5> requires that the C<html-tidy> be installed on your system.
+C<HTML::T5> requires that L<Alien::TidyHTML5>, which provides the C C<html-tidy>
+library or ascertains its presence, be installed on your system. Normally this
+happens by installing C<HTML::T5> from CPAN, but you may need to have a C
+compiler installed.
+
+
 You can probably obtain html-tidy through your distribution's package
 manager (make sure you install the development package with headers).  You
 can also check the html-tidy home page is L<http://www.html-tidy.org/>.

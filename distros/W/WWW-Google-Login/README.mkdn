@@ -1,0 +1,116 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/WWW-Google-Login.svg?branch=master)](https://travis-ci.org/Corion/WWW-Google-Login)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/WWW-Google-Login?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/WWW-Google-Login)
+
+CONTRIBUTING
+
+# NAME
+
+WWW::Google::Login - log a mechanize object into Google
+
+# SYNOPSIS
+
+    my $mech = WWW::Mechanize::Chrome->new(
+        headless => 1,
+        data_directory => tempdir(CLEANUP => 1),
+        user_agent => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36+',
+    );
+    $mech->viewport_size({ width => 480, height => 640 });
+
+    $mech->get('https://keep.google.com');
+
+    my $login = WWW::Google::Login->new(
+        mech => $mech,
+    );
+
+    if( $login->is_login_page()) {
+        my $res = $login->login(
+            user => 'a.u.thor@gmail.com',
+            password => 'my-secret-password',
+            headless => 1
+        );
+
+        if( $res->wrong_password ) {
+            # ?
+        } elsif( $res->logged_in ) {
+            # yay
+        } else {
+            # some other error
+        }
+    };
+
+# DESCRIPTION
+
+This module automates logging in a (Javascript capable) WWW::Mechanize
+object into Google. This is useful for scraping information from Google
+applications.
+
+Currently, this module only works in conjunction with [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW::Mechanize::Chrome),
+but ideally it will evolve to not requiring Javascript or Chrome at all.
+
+## `->is_password_page`
+
+    if( $login->is_password_page ) {
+        $login->login( user => $user, password => $password );
+    };
+
+## `->is_login_page`
+
+    if( $login->is_login_page ) {
+        $login->login( user => $user, password => $password );
+    };
+
+## `->is_login_page_headless`
+
+## `->is_login_page_headfull`
+
+## `->login`
+
+    my $res = $login->login(
+        user => 'example@gmail.com',
+        password => 'supersecret',
+    );
+    if( $res->logged_in ) {
+        # yay
+    }
+
+# FUTURE IMPROVEMENTS
+
+## API usage
+
+Ideally, this module would switch away from screen scraping to directly
+automating the API below [https://accounts.google.com/signin/v2/sl/pwd](https://accounts.google.com/signin/v2/sl/pwd).
+This would make it possible to switch away from [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW::Mechanize::Chrome)
+to a plain HTTP client like [HTTP::Tiny](https://metacpan.org/pod/HTTP::Tiny) or [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize).
+
+## Two-factor authentication
+
+Two-factor authentication is not supported at all.
+
+# SEE ALSO
+
+[https://developers.google.com/my-business/reference/rest/](https://developers.google.com/my-business/reference/rest/) - Google Business API
+
+This allows a more direct administration of (business) accounts without screen
+scraping.
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/WWW-Google-Login](https://github.com/Corion/WWW-Google-Login).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2016-2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

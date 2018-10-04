@@ -16,23 +16,23 @@ my %expected = (
 my $embedder = LinkEmbedder->new;
 my $link;
 
-$link = $embedder->get('https://twitter.com/jhthorsen');
+$embedder->get_p('https://twitter.com/jhthorsen')->then(sub { $link = shift })->wait;
 cmp_deeply(
   $link->TO_JSON,
   {
     %expected,
     cache_age     => 0,
-    author_name   => 'Jan Henning Thorsen',
+    author_name   => re(qr{Jan Henning Thorsen}),
     author_url    => 'https://twitter.com/jhthorsen',
     html          => re(qr{<h3>Jan Henning Thorsen}),
     thumbnail_url => re(qr{twimg\.com/profile_images/.*_400x400}),
-    title         => 'Jan Henning Thorsen (@jhthorsen) | Twitter',
+    title         => re(qr{Jan Henning Thorsen}),
     url           => 'https://twitter.com/jhthorsen',
   },
   'https://twitter.com/jhthorsen',
 ) or diag $link->_dump;
 
-$link = $embedder->get('https://twitter.com/jhthorsen/status/434045220116643843');
+$embedder->get_p('https://twitter.com/jhthorsen/status/434045220116643843')->then(sub { $link = shift })->wait;
 cmp_deeply(
   $link->TO_JSON,
   {
@@ -47,7 +47,7 @@ cmp_deeply(
   'https://twitter.com/jhthorsen/status/434045220116643843',
 ) or diag $link->_dump;
 
-$link = $embedder->get('https://twitter.com/mulligan/status/555050159189413888/');
+$embedder->get_p('https://twitter.com/mulligan/status/555050159189413888/')->then(sub { $link = shift })->wait;
 cmp_deeply(
   $link->TO_JSON,
   {
@@ -62,7 +62,7 @@ cmp_deeply(
   'https://twitter.com/mulligan/status/555050159189413888/',
 ) or diag $link->_dump;
 
-$link = $embedder->get('https://twitter.com/mulligan/status/555050159189413888/photo/1');
+$embedder->get_p('https://twitter.com/mulligan/status/555050159189413888/photo/1')->then(sub { $link = shift })->wait;
 cmp_deeply(
   $link->TO_JSON,
   {

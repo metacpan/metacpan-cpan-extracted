@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPPRC::Detail::RecordSummary;
-$Finance::AMEX::Transaction::EPPRC::Detail::RecordSummary::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPPRC::Detail::RecordSummary::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -100,7 +100,7 @@ Finance::AMEX::Transaction::EPPRC::Detail::RecordSummary - Parse AMEX Transactio
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

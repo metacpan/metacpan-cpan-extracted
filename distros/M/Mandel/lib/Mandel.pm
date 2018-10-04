@@ -1,4 +1,109 @@
 package Mandel;
+use Mojo::Base 'Mojo::Base';
+use Mojo::Loader qw(find_modules load_class);
+use Mojo::Util;
+use Mandel::Collection;
+use Mandel::Model;
+use Mango;
+use Carp 'confess';
+
+our $VERSION = '0.30';
+
+has model_class => sub { shift->_build_model_class };
+has namespaces  => sub { shift->_build_namespaces };
+has storage     => sub { shift->_build_storage };
+
+sub _build_model_class {'Mandel::Model'}
+sub _build_namespaces  { [ref $_[0]] }
+sub _build_storage     { Mango->new('mongodb://localhost/mandeltest') }
+
+sub connect {
+  my ($self, @args) = @_;
+  my $storage = Mango->new(@args);
+
+  if (my $class = ref $self) {
+    $self = $class->new(%$self, storage => $storage);
+  }
+  else {
+    $self = $self->new(storage => $storage);
+  }
+
+  $self;
+}
+
+sub all_document_names {
+  my $self = shift;
+  my %names = map { $_, 1 } keys %{$self->{model} || {}};
+
+  for my $ns (@{$self->namespaces}) {
+    for my $name (find_modules $ns) {
+      my $e = load_class $name;
+      next unless $name->isa('Mandel::Document');
+      $name =~ s/^${ns}:://;
+      $names{Mojo::Util::decamelize($name)} = 1;
+    }
+  }
+
+  keys %names;
+}
+
+sub class_for {
+  my ($self, $name) = @_;
+
+  if (my $class = $self->{loaded}{$name}) {
+    return $class;
+  }
+
+  for my $ns (@{$self->namespaces}) {
+    my $class = $ns . '::' . Mojo::Util::camelize($name);
+    my $e     = load_class $class;
+    die $e if ref $e;
+    next   if $e;
+    return $self->{loaded}{$name} = $class;
+  }
+
+  confess "Could not find class for $name";
+}
+
+sub collection {
+  my ($self, $name) = @_;
+
+  $self->model($name)->new_collection($self);
+}
+
+sub model {
+  my ($self, $name, $model) = @_;
+
+  if ($model) {
+    $model = $self->model_class->new($model) if ref $model eq 'HASH';
+    $model->name($name);
+    $self->{loaded}{$name} = $model->document_class;
+    $self->{model}{$name}  = $model;
+    return $self;
+  }
+  else {
+    return $self->{model}{$name} ||= $self->class_for($name)->model;
+  }
+}
+
+sub initialize {
+  my $args      = ref $_[-1] eq 'HASH' ? pop : {};
+  my $self      = shift;
+  my @documents = @_ ? @_ : $self->all_document_names;
+
+  for my $document (@documents) {
+    my $class = $self->class_for($document);
+    $class->initialize($self, $args);
+  }
+}
+
+sub _storage_collection {
+  $_[0]->storage->db->collection($_[1]);
+}
+
+1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -6,7 +111,7 @@ Mandel - Async model layer for MongoDB objects using Mango
 
 =head1 VERSION
 
-0.29
+0.30
 
 =head1 SYNOPSIS
 
@@ -28,7 +133,7 @@ Mandel - Async model layer for MongoDB objects using Mango
   package MyModel::Person;
   use Mandel::Document;
   use Types::Standard 'Int';
-  field [qw( name )];
+  field [qw(name)];
   field age => ( isa => Int );
   has_many cats => 'MyModel::Cat';
   has_one favorite_cat => 'MyModel::Cat';
@@ -94,18 +199,6 @@ A single MongoDB document with logic.
 
 =back
 
-=cut
-
-use Mojo::Base 'Mojo::Base';
-use Mojo::Loader qw( find_modules load_class );
-use Mojo::Util;
-use Mandel::Collection;
-use Mandel::Model;
-use Mango;
-use Carp 'confess';
-
-our $VERSION = '0.29';
-
 =head1 ATTRIBUTES
 
 L<Mandel> inherits all attributes from L<Mojo::Base> and implements the
@@ -125,16 +218,6 @@ Returns L<Mandel::Model>.
 An instance of L<Mango> which acts as the database connection. If not
 provided.
 
-=cut
-
-has model_class => sub { shift->_build_model_class };
-has namespaces  => sub { shift->_build_namespaces };
-has storage     => sub { shift->_build_storage };
-
-sub _build_model_class {'Mandel::Model'}
-sub _build_namespaces  { [ref $_[0]] }
-sub _build_storage     { Mango->new('mongodb://localhost/mandeltest') }
-
 =head1 METHODS
 
 L<Mandel> inherits all methods from L<Mojo::Base> and implements the following
@@ -151,45 +234,11 @@ as L</storage>.
 Calling this on an object will return a clone, but with a fresh L</storage>
 object.
 
-=cut
-
-sub connect {
-  my ($self, @args) = @_;
-  my $storage = Mango->new(@args);
-
-  if (my $class = ref $self) {
-    $self = $class->new(%$self, storage => $storage);
-  }
-  else {
-    $self = $self->new(storage => $storage);
-  }
-
-  $self;
-}
-
 =head2 all_document_names
 
   @names = $self->all_document_names;
 
 Returns a list of all the documents in the L</namespaces>.
-
-=cut
-
-sub all_document_names {
-  my $self = shift;
-  my %names = map { $_, 1 } keys %{$self->{model} || {}};
-
-  for my $ns (@{$self->namespaces}) {
-    for my $name (find_modules $ns) {
-      my $e = load_class $name;
-      next unless $name->isa('Mandel::Document');
-      $name =~ s/^${ns}:://;
-      $names{Mojo::Util::decamelize($name)} = 1;
-    }
-  }
-
-  keys %names;
-}
 
 =head2 class_for
 
@@ -198,39 +247,11 @@ sub all_document_names {
 Given a document name, find the related class name, ensure that it is loaded
 (or else die) and return it.
 
-=cut
-
-sub class_for {
-  my ($self, $name) = @_;
-
-  if (my $class = $self->{loaded}{$name}) {
-    return $class;
-  }
-
-  for my $ns (@{$self->namespaces}) {
-    my $class = $ns . '::' . Mojo::Util::camelize($name);
-    my $e     = load_class $class;
-    die $e if ref $e;
-    next   if $e;
-    return $self->{loaded}{$name} = $class;
-  }
-
-  confess "Could not find class for $name";
-}
-
 =head2 collection
 
   $collection_obj = $self->collection($name);
 
 Returns a L<Mango::Collection> object.
-
-=cut
-
-sub collection {
-  my ($self, $name) = @_;
-
-  $self->model($name)->new_collection($self);
-}
 
 =head2 model
 
@@ -241,23 +262,6 @@ sub collection {
 Define or returns a L<Mandel::Model> object. Will die unless a model is
 registered by that name or L</class_for> returns a class which has the
 C<model()> method defined.
-
-=cut
-
-sub model {
-  my ($self, $name, $model) = @_;
-
-  if ($model) {
-    $model = $self->model_class->new($model) if ref $model eq 'HASH';
-    $model->name($name);
-    $self->{loaded}{$name} = $model->document_class;
-    $self->{model}{$name}  = $model;
-    return $self;
-  }
-  else {
-    return $self->{model}{$name} ||= $self->class_for($name)->model;
-  }
-}
 
 =head2 initialize
 
@@ -273,23 +277,6 @@ C<%args> defaults to empty hash ref, unless specified as input.
 The C<initialize()> method will be called like this:
 
   $document_class->initialize($self, \%args);
-
-=cut
-
-sub initialize {
-  my $args      = ref $_[-1] eq 'HASH' ? pop : {};
-  my $self      = shift;
-  my @documents = @_ ? @_ : $self->all_document_names;
-
-  for my $document (@documents) {
-    my $class = $self->class_for($document);
-    $class->initialize($self, $args);
-  }
-}
-
-sub _storage_collection {
-  $_[0]->storage->db->collection($_[1]);
-}
 
 =head1 SEE ALSO
 
@@ -324,5 +311,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
-1;

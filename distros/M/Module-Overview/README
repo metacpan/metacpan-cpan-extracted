@@ -1,21 +1,24 @@
 NAME
+
     Module::Overview - print/graph module(s) information
 
 SYNOPSIS
+
         use Module::Overview;
-    
+        
             my $mo = Module::Overview->new({
                     'module_name' => 'Module::Overview',
             });
-    
+        
         print $mo->text_simpletable;
-    
+        
         my $graph = $mo->graph;    # Graph::Easy
         open my $DOT, '|dot -Tpng -o graph.png' or die ("Cannot open pipe to dot: $!");
         print $DOT $graph->as_graphviz;
         close $DOT;
 
 DESCRIPTION
+
         .------------------+--------------------------------------------------------------.
         | class            | Module::Overview                                             |
         +------------------+--------------------------------------------------------------+
@@ -62,31 +65,40 @@ DESCRIPTION
         '------------------+--------------------------------------------------------------'
 
 PROPERTIES
+
         module_name
         recursive
         recursion_filter
         hide_methods
 
 METHODS
-  new()
+
+ new()
+
     Object constructor.
 
-  get
+ get
+
     Return hash ref with module overview.
 
-  text_simpletable
-    Returns string with tabular text representation of get.
+ text_simpletable
 
-  graph
-    Returns Graph::Easy with representation of get.
+    Returns string with tabular text representation of "get".
+
+ graph
+
+    Returns Graph::Easy with representation of "get".
 
 SEE ALSO
+
     Class::Sniff, Module::ExtractUse
 
 AUTHOR
-    jozef@kutej.net, `<jkutej at cpan.org>'
+
+    jozef@kutej.net, <jkutej at cpan.org>
 
 LICENSE AND COPYRIGHT
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published
     by the Free Software Foundation; or the Artistic License.

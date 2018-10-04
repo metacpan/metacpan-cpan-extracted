@@ -1,71 +1,7 @@
 package Mandel::Relationship::HasOne;
-
-=head1 NAME
-
-Mandel::Relationship::HasOne - A field relates to another mongodb document
-
-=head1 DESCRIPTION
-
-L<Mandel::Relationship::HasOne> is a class used to describe the relationship
-between one document that has a relationship to one other documents.
-The connection between the documents is described in the database using
-L<DBRef|http://docs.mongodb.org/manual/reference/database-references/>.
-
-=head1 DATABASE STRUCTURE
-
-A "dinosaur" that I<has one> "cat" will look like this in the database:
-
-  mongodb# db.dinosaurs.find({ })
-  { "_id" : ObjectId("5352b4d8c5483e4502010000") }
-
-  mongodb# db.cats.find({ "dinosaur.$id": ObjectId("53529f28c5483e4977020000") })
-  {
-    "_id" : ObjectId("5352b4d8c5483e4502040000"),
-    "dinosaur" : DBRef("dinosaurs", ObjectId("5352b4d8c5483e4502010000"))
-  }
-
-=head1 SYNOPSIS
-
-=head2 Using DSL
-
-  package MyModel::Dinosaur;
-  use Mandel::Document;
-  has_one cat => 'MyModel::Cat';
-
-=head2 Using object oriented interface
-
-  MyModel::Dinosaur->model->relationship(
-    "has_one",
-    "cat",
-    "MyModel::Cat",
-  );
-
-=head2 Methods generated
-
-  $cat = MyModel::Dinosaur->new->cat(\%args, $cb);
-  $cat = MyModel::Dinosaur->new->cat($person_obj, $cb);
-
-  $person_obj = MyModel::Dinosaur->new->cat(\%args);
-  $person_obj = MyModel::Dinosaur->new->cat($person_obj);
-
-  $person = MyModel::Dinosaur->new->cat;
-  $self = MyModel::Dinosaur->new->cat(sub { my($self, $err, $person) = @_; });
-
-See also L<Mandel::Model/relationship>.
-
-=cut
-
 use Mojo::Base 'Mandel::Relationship';
 use Mojo::Util;
 use Mango::BSON 'bson_dbref';
-
-=head1 METHODS
-
-=head2 monkey_patch
-
-Add methods to L<Mandel::Relationship/document_class>.
-
-=cut
 
 sub monkey_patch {
   my $self          = shift;
@@ -135,6 +71,69 @@ sub monkey_patch {
   return $self;
 }
 
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mandel::Relationship::HasOne - A field relates to another mongodb document
+
+=head1 DESCRIPTION
+
+L<Mandel::Relationship::HasOne> is a class used to describe the relationship
+between one document that has a relationship to one other documents.
+The connection between the documents is described in the database using
+L<DBRef|http://docs.mongodb.org/manual/reference/database-references/>.
+
+=head1 DATABASE STRUCTURE
+
+A "dinosaur" that I<has one> "cat" will look like this in the database:
+
+  mongodb# db.dinosaurs.find({ })
+  { "_id" : ObjectId("5352b4d8c5483e4502010000") }
+
+  mongodb# db.cats.find({ "dinosaur.$id": ObjectId("53529f28c5483e4977020000") })
+  {
+    "_id" : ObjectId("5352b4d8c5483e4502040000"),
+    "dinosaur" : DBRef("dinosaurs", ObjectId("5352b4d8c5483e4502010000"))
+  }
+
+=head1 SYNOPSIS
+
+=head2 Using DSL
+
+  package MyModel::Dinosaur;
+  use Mandel::Document;
+  has_one cat => 'MyModel::Cat';
+
+=head2 Using object oriented interface
+
+  MyModel::Dinosaur->model->relationship(
+    "has_one",
+    "cat",
+    "MyModel::Cat",
+  );
+
+=head2 Methods generated
+
+  $cat = MyModel::Dinosaur->new->cat(\%args, $cb);
+  $cat = MyModel::Dinosaur->new->cat($person_obj, $cb);
+
+  $person_obj = MyModel::Dinosaur->new->cat(\%args);
+  $person_obj = MyModel::Dinosaur->new->cat($person_obj);
+
+  $person = MyModel::Dinosaur->new->cat;
+  $self = MyModel::Dinosaur->new->cat(sub { my($self, $err, $person) = @_; });
+
+See also L<Mandel::Model/relationship>.
+
+=head1 METHODS
+
+=head2 monkey_patch
+
+Add methods to L<Mandel::Relationship/document_class>.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mango>, L<Mandel::Relationship>
@@ -144,5 +143,3 @@ L<Mojolicious>, L<Mango>, L<Mandel::Relationship>
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

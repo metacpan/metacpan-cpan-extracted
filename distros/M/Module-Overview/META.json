@@ -1,0 +1,66 @@
+{
+   "abstract" : "print/graph module(s) information",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "keywords" : [
+      "module",
+      "methods",
+      "dump",
+      "overview"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Overview",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Class::Sniff" : "0",
+            "Graph::Easy" : "0",
+            "List::MoreUtils" : "0",
+            "Module::ExtractUse" : "0",
+            "Text::SimpleTable" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Overview" : {
+         "file" : "lib/Module/Overview.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Module-Overview/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/Module-Overview"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -19,7 +19,7 @@ sub Reaper {
   my %Args = @_;
   my $Source = $Args{'source'} || $X->Error("Source path not defined");
 	my $TmpDir;
-	if (-d $Source) {
+	if (!$X->{'src_type'} && -d $Source) {
 		$TmpDir = $Source;
 		opendir(DH, $Source);
 		for (readdir(DH)){
@@ -31,7 +31,7 @@ sub Reaper {
 		closedir(DH);
 	}
 
-	$X->Error("File '.fb2' not defined") unless (lc($Source) =~ /\.fb2$/);
+	$X->Error("File '.fb2' not defined") if (!$X->{'src_type'} && lc($Source) !~ /\.fb2$/);
 
   my $XC = XML::LibXML::XPathContext->new();
 	
@@ -114,6 +114,45 @@ sub Reaper {
 			}
 		}
 		CreateEpigraph($FB2Doc, $Cite->parentNode, @SetInEpigraph); # сбросим хвост
+	}
+
+	# приведём в порядок цитаты без текста, только с заголовками
+	for my $Cite ( $XPC->findnodes('//fb:section/fb:cite', $FB2Doc )) {
+
+		# <empty-line/> сразу после <subtitle/> недопустимы
+		for my $EmptyLine ( $XPC->findnodes('./fb:subtitle/following-sibling::fb:empty-line', $Cite) ) {
+
+			$EmptyLine->unbindNode();
+		}
+
+		# текст циаты найден, всё в порядке, идём дальше
+		next if scalar $XPC->findnodes('./fb:p|./fb:poem', $Cite);
+
+		# если не нашли ни заголовков ни текста -- удаляем цитату и идём дальше
+		my @Titles = $XPC->findnodes('./fb:subtitle', $Cite);
+		unless ( scalar @Titles ) {
+
+			$Cite->unbindNode();
+			next;
+		}
+
+		for my $Title ( @Titles ) {
+
+			for my $Node ( $XPC->findnodes('*', $Title) ) {
+
+				$Cite->appendChild($Node);
+			}
+
+			if ( my $Text = $Title->textContent ) {
+
+				my $PNode = $FB2Doc->createElement('p');
+				$PNode->appendTextNode($Text);
+
+				$Cite->appendChild($PNode);
+			}
+
+			$Title->unbindNode();
+		}
 	}
 
 	# Работаем с картинками, которые нужно выделить в div или section

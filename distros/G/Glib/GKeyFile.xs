@@ -289,7 +289,7 @@ g_key_file_get_groups (key_file)
     PPCODE:
     	groups = g_key_file_get_groups (key_file, &len);
 	if (len != 0) {
-		EXTEND(SP, len);
+		EXTEND(SP, (long) len);
 		for (i = 0; i < len; i++)
 			PUSHs (sv_2mortal (newSVGChar (groups[i])));
 	}
@@ -637,7 +637,7 @@ g_key_file_get_string_list (key_file, group_name, key)
 					&retlen,
 					&err);
 			CROAK_ON_GERROR (err);
-			EXTEND (sp, retlen);
+			EXTEND (sp, (long) retlen);
 			for (i = 0; i < retlen; i++)
 				PUSHs (sv_2mortal (newSVGChar (retlist[i])));
 			g_strfreev (retlist);
@@ -651,7 +651,7 @@ g_key_file_get_string_list (key_file, group_name, key)
 					&retlen,
 					&err);
 			CROAK_ON_GERROR (err);
-			EXTEND (sp, retlen);
+			EXTEND (sp, (long) retlen);
 			for (i = 0; i < retlen; i++)
 				PUSHs (sv_2mortal (boolSV (retlist[i])));
 			g_free (retlist);
@@ -665,7 +665,7 @@ g_key_file_get_string_list (key_file, group_name, key)
 					&retlen,
 					&err);
 			CROAK_ON_GERROR (err);
-			EXTEND (sp, retlen);
+			EXTEND (sp, (long) retlen);
 			for (i = 0; i < retlen; i++)
 				PUSHs (sv_2mortal (newSViv (retlist[i])));
 			g_free (retlist);
@@ -694,7 +694,7 @@ g_key_file_get_double_list (key_file, group_name, key)
 			&err);
 	if (err)
 		gperl_croak_gerror (NULL, err);
-	EXTEND (sp, retlen);
+	EXTEND (sp, (long) retlen);
 	for (i = 0; i < retlen; i++)
 		PUSHs (sv_2mortal (newSVnv (retlist[i])));
 	g_free (retlist);

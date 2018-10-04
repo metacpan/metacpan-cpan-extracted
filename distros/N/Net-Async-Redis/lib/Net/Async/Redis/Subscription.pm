@@ -3,7 +3,7 @@ package Net::Async::Redis::Subscription;
 use strict;
 use warnings;
 
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.009'; # VERSION
 
 =head1 NAME
 
@@ -42,6 +42,13 @@ sub events {
     };
 }
 
+sub cancel {
+    my ($self) = @_;
+    my $f = $self->events->completed;
+    $f->fail('cancelled') unless $f->is_ready;
+    $self
+}
+
 =head2 redis
 
 Accessor for the L<Net::Async::Redis> instance.
@@ -61,7 +68,7 @@ sub channel { shift->{channel} }
 sub DESTROY {
     my ($self) = @_;
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT' or not my $ev = $self->{events};
-    $ev->completion->done unless $ev->completion->is_ready;
+    $ev->completed->done unless $ev->completed->is_ready;
 }
 
 1;

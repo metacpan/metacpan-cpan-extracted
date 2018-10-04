@@ -141,6 +141,4 @@ See commit `005c3bff4e0809eae0340e7629678186d1621930` for an example.
 1) Install Doxyparse build dependencies: flex, bison, libqt4-dev, gcc, gcc-c++,
 python, and git (your operating system probably already has packages for these)
 
-2) Install Doxyparse (see [https://github.com/analizo/doxyparse/wiki][doxyparse])
-
-3) Install [SLOCCount](http://www.dwheeler.com/sloccount/sloccount.html)
+2) Install Doxyparse (see [Doxyparse](https://github.com/analizo/doxyparse/wiki))

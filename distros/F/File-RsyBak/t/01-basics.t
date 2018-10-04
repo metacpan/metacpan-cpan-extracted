@@ -3,9 +3,9 @@
 use 5.010;
 use strict;
 use warnings;
+use Test::More;
 
 use File::chdir;
-use Test::More;
 
 $ENV{PATH} = "/usr/local/bin:/usr/bin:/bin";
 if (!which("rsync")) {

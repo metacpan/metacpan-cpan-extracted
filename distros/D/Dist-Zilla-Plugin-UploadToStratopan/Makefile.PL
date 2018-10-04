@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "LWP::Protocol::https" => 0,
     "Mojo::DOM" => 0,
     "Mojo::UserAgent" => 0,
+    "Mojolicious" => 0,
     "Moose" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Mock::One" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "LWP::Protocol::https" => 0,
   "Mojo::DOM" => 0,
   "Mojo::UserAgent" => 0,
+  "Mojolicious" => 0,
   "Moose" => 0,
   "Test::Exception" => 0,
   "Test::Mock::One" => 0,

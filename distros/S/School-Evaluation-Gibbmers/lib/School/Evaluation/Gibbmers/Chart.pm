@@ -1,5 +1,5 @@
 package School::Evaluation::Gibbmers::Chart;
-$School::Evaluation::Gibbmers::Chart::VERSION = '0.002';
+$School::Evaluation::Gibbmers::Chart::VERSION = '0.004';
 # No guarantee given, use at own risk and will
 # ABSTRACT: render a chart
 use strict;
@@ -149,7 +149,7 @@ School::Evaluation::Gibbmers::Chart - render a chart
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

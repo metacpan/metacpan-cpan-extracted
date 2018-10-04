@@ -6,23 +6,14 @@ use Mojo::Util 'trim';
 my $PHOTO_RE = qr!\.(?:jpg|png|gif)\b!i;
 my $VIDEO_RE = qr!\.(?:mpg|mpeg|mov|mp4|ogv)\b!i;
 
-sub learn {
-  my ($self, $cb) = @_;
-  my $url = $self->url;
+sub learn_p {
+  my $self = shift;
+  my $url  = $self->url;
   my $type = $url =~ $PHOTO_RE ? 'photo' : $url =~ $VIDEO_RE ? 'video' : 'link';
 
   $self->type($type);
 
-  # Need to learn more from an http request
-  if ($type eq 'link') {
-    $self->SUPER::learn($cb);
-  }
-  else {
-    $self->_learn_from_url;
-    $self->$cb if $cb;
-  }
-
-  return $self;
+  return $type eq 'link' ? $self->SUPER::learn_p : Mojo::Promise->new->resolve($self->_learn_from_url);
 }
 
 sub _learn_from_dom {
@@ -31,8 +22,15 @@ sub _learn_from_dom {
 
   $self->SUPER::_learn_from_dom($dom);
 
-  # Mojopaste hack
-  $tmp = $dom->at('body > pre');
+  # Bitbucket hack
+  $tmp = $dom->at('div.codehilite');
+  if ($tmp) {
+    $self->{paste} = $tmp->all_text;
+    $self->template->[1] = 'paste.html.ep';
+  }
+
+  # Mojopaste and Perlbot hack
+  $tmp = $dom->at('body > pre') || $dom->at('pre#paste') || $dom->at('pre.paste');
   if ($tmp and !@{$tmp->children}) {
     $self->{paste} = $tmp->text;
     $self->template->[1] = 'paste.html.ep';
@@ -49,6 +47,8 @@ sub _learn_from_dom {
     $tmp =~ s!\s+! !g;
     $self->description(trim $tmp);
   }
+
+  return $self;
 }
 
 1;

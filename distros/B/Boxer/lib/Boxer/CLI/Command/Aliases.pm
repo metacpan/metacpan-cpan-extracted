@@ -17,11 +17,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.8
+Version v1.1.11
 
 =cut
 
-our $VERSION = version->declare("v1.1.8");
+our $VERSION = version->declare("v1.1.11");
 
 use constant {
 	abstract   => q[show aliases for boxer commands],
@@ -30,7 +30,7 @@ use constant {
 
 sub description
 {
-	<<'DESCRIPTION'
+	<<'DESCRIPTION';
 Some boxer commands can be invoked with shorter aliases.
 
 	boxer version

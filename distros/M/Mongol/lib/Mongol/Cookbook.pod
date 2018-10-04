@@ -52,11 +52,11 @@ Somewhere in the L<Mojolicious> world...
 
 		...
 
-		my $user = Models::User->retrieve(
-			$self->param( 'user_id' )
-		);
+		my $id = $self->param( 'user_id' );
+		my $user = Models::User->retrieve( $id )
+			->serialize();
 
-		return $self->render( json => $user->serialize() );
+		return $self->render( json => $user );
 	}
 
 =head2 Custom ids
@@ -66,13 +66,8 @@ Somewhere in the L<Mojolicious> world...
 
 		extends 'Mongol::Model';
 
-		use Data::UUID;
-
 		with 'Mongol::Roles::Core';
-
-		has '+id' => (
-			default => sub { Data::UUID->new()->create_b64() },
-		);
+		with 'Mongol::Roles::UUID';
 
 		has 'username' => (
 			is => 'ro',

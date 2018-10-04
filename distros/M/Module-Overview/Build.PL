@@ -8,6 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Jozef Kutej <jkutej@cpan.org>',
     dist_version_from => 'lib/Module/Overview.pm',
     
+    configure_requires => { 'Module::Build' => 0.36 },
     build_requires => {
         'Test::More'        => 0,
         'Test::Differences' => 0,
@@ -19,13 +20,13 @@ my $builder = Module::Build->new(
         'Module::ExtractUse'    => 0,
         'Graph::Easy'           => 0,
         'Carp'                  => 0,
+        'List::MoreUtils'       => 0,
     },
     script_files => [
     	'script/plmo'
     ],
     add_to_cleanup => [ 'Module-Overview-*' ],
     create_readme  => 1,
-    sign           => 1,
     meta_merge => {
         resources => {
             repository => 'http://github.com/jozef/Module-Overview',

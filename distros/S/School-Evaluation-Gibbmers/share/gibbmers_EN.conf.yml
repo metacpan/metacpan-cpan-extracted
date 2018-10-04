@@ -1,0 +1,13 @@
+---
+# System
+port: 8443
+encryption_key: 'This is not secure...'
+cache_slots: 30
+data_dir: '/tmp/Gibbmers'
+set_cookie: 1
+# Questions
+1personal_intrest_html: "How interested are you personally in the <b>subject</b> (independ from other factors, like documents or teacher)"
+2question_html: "How was <b>your commitment and dedication</b> for this subject (attention during class, privat research, homework, etc)"
+3question_html: "How helpful have you found the <b>official material/books</b> provided during the course? (Not including additional supporting material from the teacher)"
+4question_html: "Do you felt support from the class? Did you support others? Was there a <b>atmosphere conducive to learning in the class</b>? Where classmates respectfull?"
+5question_html: "Do you felt well supported through the <b>teacher</b> during your learning efforts? (Responses to questions, additional material provided, general guidance)"

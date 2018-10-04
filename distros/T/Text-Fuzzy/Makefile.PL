@@ -23,7 +23,7 @@ WriteMakefile (
 	    'Nick Logan <ugexe@cpan.org>',
         ],
     },
-    OBJECT => 'Fuzzy.o text-fuzzy.o edit-distance-char.o edit-distance-int.o edit-distance-char-trans.o edit-distance-int-trans.o',
+    OBJECT => 'Fuzzy.o',
 #    OPTIMIZE => '-Wall -O',
     MIN_PERL_VERSION => '5.008001',
 );

@@ -325,7 +325,6 @@ cmp_deeply delete $parsed->{pragmas}, {
     project        => 'dos',
 }, 'Should have captured the dos pragmas';
 
-
 # Try a plan with a bad change name.
 $file = file qw(t plans bad-change.plan);
 $fh = $file->open('<:utf8_strict');
@@ -555,7 +554,7 @@ is sorted, 1, 'Should have sorted changes once';
 # Try a plan with an invalid requirement.
 $fh = IO::File->new(\"\%project=foo\n\nfoo [^bar] $tsnp", '<:utf8_strict');
 throws_ok { $plan->_parse('badreq', $fh ) } 'App::Sqitch::X',
-    'Should die on invalid  dependency';
+    'Should die on invalid dependency';
 is $@->ident, 'parse', 'The invalid dependency error ident should be "parse"';
 is $@->message, __x(
     'Syntax error in {file} at line {lineno}: {error}',
@@ -566,6 +565,22 @@ is $@->message, __x(
         dep => '^bar',
     ),
 ), 'And the invalid dependency error message should be correct';
+is sorted, 0, 'Should have sorted changes nonce';
+
+# Try a plan with duplicate requirements.
+$fh = IO::File->new(\"\%project=foo\n\nfoo [bar baz bar] $tsnp", '<:utf8_strict');
+throws_ok { $plan->_parse('dupedep', $fh ) } 'App::Sqitch::X',
+    'Should die on dupe dependency';
+is $@->ident, 'parse', 'The dupe dependency error ident should be "parse"';
+is $@->message, __x(
+    'Syntax error in {file} at line {lineno}: {error}',
+    file => 'dupedep',
+    lineno => 3,
+    error => __x(
+        'Duplicate dependency "{dep}"',
+        dep => 'bar',
+    ),
+), 'And the dupe dependency error message should be correct';
 is sorted, 0, 'Should have sorted changes nonce';
 
 # Try a plan without a timestamp.
@@ -620,7 +635,7 @@ cmp_deeply delete $parsed->{pragmas}, {
     syntax_version => App::Sqitch::Plan::SYNTAX_VERSION,
     foo            => 'bar',
     project        => 'pragmata',
-    uri            => 'https://github.com/theory/sqitch/',
+    uri            => 'https://github.com/sqitchers/sqitch/',
     strict         => 1,
 }, 'Should have captured all of the pragmas';
 cmp_deeply $parsed, {
@@ -634,7 +649,7 @@ cmp_deeply $parsed, {
         prag( '', ' ', 'syntax-version', '', '=', '', App::Sqitch::Plan::SYNTAX_VERSION),
         prag( '  ', '', 'foo', ' ', '=', ' ', 'bar', '    ', 'lolz'),
         prag( '', ' ', 'project', '', '=', '', 'pragmata'),
-        prag( '', ' ', 'uri', '', '=', '', 'https://github.com/theory/sqitch/'),
+        prag( '', ' ', 'uri', '', '=', '', 'https://github.com/sqitchers/sqitch/'),
         prag( '', ' ', 'strict'),
         blank(),
         change { name => 'hey' },
@@ -2005,7 +2020,7 @@ is $plan->file, $target->plan_file, 'File should be coopied from Sqitch';
 is $plan->syntax_version, App::Sqitch::Plan::SYNTAX_VERSION,
     'syntax_version should be set';
 is $plan->project, 'pragmata', 'Project should be set';
-is $plan->uri, URI->new('https://github.com/theory/sqitch/'),
+is $plan->uri, URI->new('https://github.com/sqitchers/sqitch/'),
     'Should have URI from pragma';
 isa_ok $plan->uri, 'URI', 'It';
 

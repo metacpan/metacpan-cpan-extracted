@@ -1,5 +1,8 @@
 Revision history for perl distribution Mandel
 
+0.30 2018-09-30T10:25:12+0900
+ - Deleted too much from pause
+
 0.29 2016-01-07T10:05:22+0100
  - Fix all_document_names() will skip non-document classes
 

@@ -6,7 +6,7 @@
                                                 |___/ 
 
 
-This is the README for Text::Fuzzy version 0.27.
+This is the README for Text::Fuzzy version 0.28.
 
 Text::Fuzzy is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -52,7 +52,12 @@ also be selected with the "transpositions_ok" method or the
 
 This module is particularly suited to searching for the nearest match
 to a term over a list of words, using the "nearestv" or "nearest"
-methods.
+methods. It studies the target string to be matched (the first
+argument to "new") to build information to rapidly reject mismatches
+in a list. Since computing the Levenshtein and Damerau-Levenshtein
+edit distances with the Wagner-Fischer algorithm is computationally
+expensive, the module offers a boost in performance for searching for
+a string in a list of words.
 
 -----------------------------------------------------------------------------
 
@@ -85,11 +90,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Text::Fuzzy
 
-To install the module from the source file, Text-Fuzzy-0.27.tar.gz, follow
+To install the module from the source file, Text-Fuzzy-0.28.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Text-Fuzzy-0.27.tar.gz
-    cd Text-Fuzzy-0.27
+    tar xfz Text-Fuzzy-0.28.tar.gz
+    cd Text-Fuzzy-0.28
     perl Makefile.PL
     make
     make install
@@ -114,6 +119,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Aug 15 12:38:16 2017.
+This README was written on Thu Oct  4 20:40:00 2018.
 
 -----------------------------------------------------------------------------

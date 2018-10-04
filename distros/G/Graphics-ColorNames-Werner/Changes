@@ -1,0 +1,19 @@
+Revision history for Graphics-ColorNames-Werner:
+
+v1.0.2    2018-09-30 18:12:56+01:00 Europe/London
+  [Documentation]
+  - Fix typo in Changes.
+
+  - Specify Graphics::ColorNames as a recommendation.
+
+  [Tests]
+  - Specify minimum version of Types::Common::Numeric, #1.
+
+v1.0.1    2018-09-30 14:53:01+01:00 Europe/London
+  [Documentation]
+  - Fix Changes that was blindly copied from another module.
+
+  - Fix typo in abstract.
+
+v1.0.0    2018-09-30 14:41:45+01:00 Europe/London
+  -Initial Release

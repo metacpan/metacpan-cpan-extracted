@@ -36,19 +36,21 @@ include:
 
 =over
 
-=item * C<pg> - L<PostgreSQL|http://postgresql.org/> and L<Postgres-XC|http://sourceforge.net/>
+=item * C<pg> - L<PostgreSQL|https://postgresql.org/> and L<Postgres-XC|https://sourceforge.net/>
 
-=item * C<sqlite> - L<SQLite|http://sqlite.org/>
+=item * C<sqlite> - L<SQLite|https://sqlite.org/>
 
-=item * C<oracle> - L<Oracle|http://www.oracle.com/us/products/database/>
+=item * C<oracle> - L<Oracle|https://www.oracle.com/us/products/database/>
 
-=item * C<mysql> - L<MySQL|http://dev.mysql.com/> and L<MariaDB|https://mariadb.com/>
+=item * C<mysql> - L<MySQL|https://dev.mysql.com/> and L<MariaDB|https://mariadb.com/>
 
-=item * C<firebird> - L<Firebird|http://www.firebirdsql.org/>
+=item * C<firebird> - L<Firebird|https://www.firebirdsql.org/>
 
 =item * C<vertica> - L<Vertica|https://my.vertica.com/>
 
 =item * C<exasol> - L<Exasol|https://www.exasol.com/>
+
+=item * C<snowflake> - L<Snowflake|https://www.snowflake.net/>
 
 =back
 
@@ -102,7 +104,7 @@ Supported keys are:
 
   sqitch init widgets --target db:pg:widgets
 
-Specifies the name or L<URI|https://github.com/theory/uri-db/> of the default
+Specifies the name or L<URI|https://github.com/libwww-perl/uri-db/> of the default
 target database. If specified as a name, the default URI for the target will
 be C<db:$engine:>.
 

@@ -251,6 +251,8 @@ const char* SPVM_OP_get_var_name(SPVM_COMPILER* compiler, SPVM_OP* op_var);
 SPVM_OP* SPVM_OP_build_var(SPVM_COMPILER* compiler, SPVM_OP* op_var_name);
 
 int32_t SPVM_OP_get_my_var_id(SPVM_COMPILER* compiler, SPVM_OP* op_var);
+int32_t SPVM_OP_get_address_var_id(SPVM_COMPILER* compiler, SPVM_OP* op);
+int32_t SPVM_OP_get_numeric_var_id(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 void SPVM_OP_insert_to_most_left_deep_child(SPVM_COMPILER* compiler, SPVM_OP* op_parent, SPVM_OP* op_child);
 
@@ -373,5 +375,15 @@ SPVM_OP* SPVM_OP_new_op_void_type(SPVM_COMPILER* compiler, const char* file, int
 
 
 SPVM_OP* SPVM_OP_build_incdec(SPVM_COMPILER* compiler, SPVM_OP* op_incdec, SPVM_OP* op_first);
+
+SPVM_OP* SPVM_OP_new_op_var_clone_var_or_assign(SPVM_COMPILER* compiler, SPVM_OP* original_op_var_or_assign);
+SPVM_OP* SPVM_OP_new_op_field_access_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_field_access);
+SPVM_OP* SPVM_OP_new_op_array_access_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_array_access);
+SPVM_OP* SPVM_OP_new_op_array_field_access_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_array_field_access);
+SPVM_OP* SPVM_OP_new_op_package_var_access_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_package_var_access);
+SPVM_OP* SPVM_OP_new_op_deref_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_deref);
+SPVM_OP* SPVM_OP_new_op_term_mutable_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_term_mutable);
+
+SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_special_assign, SPVM_OP* op_term_dist, SPVM_OP* op_term_src);
 
 #endif

@@ -1,0 +1,12 @@
+language: perl
+perl:
+  - "5.26"
+  - "5.16"
+  - "5.10"
+env:
+  - "HARNESS_OPTIONS=j4"
+install:
+  - "cpanm -n Test::Pod Test::Pod::Coverage IO::Socket::SSL CHI"
+  - "cpanm -n --installdeps ."
+notifications:
+  email: false

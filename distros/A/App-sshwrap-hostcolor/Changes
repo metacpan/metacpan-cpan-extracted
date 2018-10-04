@@ -1,3 +1,29 @@
+0.005   2018-09-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc][bugfix] Misplaced the video links.
+
+
+0.004   2018-09-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add some YouTube video demonstration links.
+
+	- [doc] Mention SSHWRAP_HOSTCOLOR_AUTO in Synopsis.
+
+
+0.003   2018-09-26 (PERLANCAR)
+
+	- [Bugfix] Fix completion to set terminal background color.
+
+
+0.002   2018-09-26 (PERLANCAR)
+
+	- Observe SSHWRAP_HOSTCOLOR_AUTO.
+
+
 0.001   2018-09-25 (PERLANCAR)
 
         - First release.

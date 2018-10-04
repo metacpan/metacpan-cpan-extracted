@@ -1,0 +1,10 @@
+Revision history for Perl extension API-DeutscheBahn-Fahrplan
+
+0.02 2018-10-04T07:50:32Z
+
+	- Requires namespace::autoclean as dependency.
+
+0.01 2018-10-02T08:41:21Z
+
+    - Initial version
+

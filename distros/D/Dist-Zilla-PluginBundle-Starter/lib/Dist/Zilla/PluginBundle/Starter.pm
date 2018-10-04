@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v3.0.0';
+our $VERSION = 'v3.0.1';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -77,7 +77,7 @@ my %revisions = (
     sub { $_[0]->pluginset_releaser },
     'MetaConfig',
     ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
-    ['MetaProvides::Package' => { inherit_version => 0 }],
+    sub { $_[0]->pluginset_metaprovides },
     'ShareDir',
     sub { $_[0]->pluginset_execdir },
   ],
@@ -181,6 +181,15 @@ sub pluginset_release_management {
 sub pluginset_releaser {
   my ($self) = @_;
   return $ENV{FAKE_RELEASE} ? 'FakeRelease' : 'UploadToCPAN';
+}
+
+sub pluginset_metaprovides {
+  my ($self) = @_;
+  if ($self->managed_versions) {
+    return 'MetaProvides::Package';
+  } else {
+    return ['MetaProvides::Package' => { inherit_version => 0 }];
+  }
 }
 
 sub pluginset_execdir {
@@ -333,12 +342,16 @@ bump the versions in your module files after a release.
 
 When using this option, you B<must> have the distribution version set in your
 main module in a form like C<our $VERSION = '1.234';>, rather than in
-F<dist.ini>. Only modules and scripts which have similar version declarations
-will be versioned in the build. You can set your distribution's version
-manually by changing the version of your main module, or by setting the C<V>
-environment variable when building or releasing. See the documentation for each
-plugin mentioned above for details on configuring them, which can be done in
-the usual config-slicing way as shown in L</"CONFIGURING">.
+F<dist.ini>. Other modules and scripts must also have similar version
+declarations to be updated appropriately. You can set your distribution's
+version manually by changing the version of your main module, or by setting the
+C<V> environment variable when building or releasing. See the documentation for
+each plugin mentioned above for details on configuring them, which can be done
+in the usual config-slicing way as shown in L</"CONFIGURING">.
+
+This option also enables the C<inherit_version> option for
+L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package> since all
+module versions are matched to the main module in this configuration.
 
 =head2 regenerate
 

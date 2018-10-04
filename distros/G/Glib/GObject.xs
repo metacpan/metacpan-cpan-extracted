@@ -1608,7 +1608,7 @@ g_object_find_property (object_or_class_name, ...)
 			warn ("list_properties: %d properties\n", n_props);
 #endif
 			if (n_props) {
-				EXTEND (SP, n_props);
+				EXTEND (SP, (int) n_props);
 
 				for (i = 0; i < n_props; i++)
 					PUSHs (sv_2mortal (newSVGParamSpec (props[i])));
@@ -1642,7 +1642,7 @@ g_object_find_property (object_or_class_name, ...)
 			warn ("list_properties: %d properties\n", n_props);
 #endif
 			if (n_props) {
-				EXTEND (SP, n_props);
+				EXTEND (SP, (int) n_props);
 
 				for (i = 0; i < n_props; i++)
 					PUSHs (sv_2mortal (newSVGParamSpec (props[i])));

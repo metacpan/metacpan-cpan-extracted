@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::External::Cmscan;
-
+$Bio::AutomatedAnnotation::External::Cmscan::VERSION = '1.182770';
 # ABSTRACT: Run and parse the output of cmscan
 
 
@@ -120,7 +120,7 @@ Bio::AutomatedAnnotation::External::Cmscan - Run and parse the output of cmscan
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

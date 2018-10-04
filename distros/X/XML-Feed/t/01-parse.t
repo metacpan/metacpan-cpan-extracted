@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More tests => 75;
 use XML::Feed;
 use URI;
@@ -15,7 +16,7 @@ my $file = 't/samples/atom.xml';
 $feed = XML::Feed->parse($file);
 isa_ok($feed, 'XML::Feed::Format::Atom');
 is($feed->title, 'First Weblog');
-open my $fh, $file or die "Can't open $file: $!";
+open my $fh, '<', $file or die "Can't open $file: $!";
 $feed = XML::Feed->parse($fh);
 isa_ok($feed, 'XML::Feed::Format::Atom');
 is($feed->title, 'First Weblog');

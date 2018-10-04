@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Google::OAuth.
+
+0.01  Tue Oct  2 15:54:28 2018
+	- original version; created by h2xs 1.23 with options
+		-b 5.0.0.8 -XAn Net::Google::OAuth
+0.02  Tue Oct  2 22:16:00 2018
+    - Delete not using modules from tests
+

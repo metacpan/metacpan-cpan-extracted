@@ -1,4 +1,7 @@
 Revision history for Test-CPANfile
 
+0.02 2018/09/30
+  - add CPAN::Common::Index support
+
 0.01 2017/11/25
   - initial release

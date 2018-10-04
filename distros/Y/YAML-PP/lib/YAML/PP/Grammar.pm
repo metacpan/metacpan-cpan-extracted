@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Grammar;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use base 'Exporter';
 

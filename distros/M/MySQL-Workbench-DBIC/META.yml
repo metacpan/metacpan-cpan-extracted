@@ -20,10 +20,10 @@ name: MySQL-Workbench-DBIC
 provides:
   MySQL::Workbench::DBIC:
     file: lib/MySQL/Workbench/DBIC.pm
-    version: '1.01'
+    version: '1.07'
   MySQL::Workbench::DBIC::FakeDBIC:
     file: lib/MySQL/Workbench/DBIC/FakeDBIC.pm
-    version: '1.01'
+    version: '1.07'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -37,8 +37,10 @@ resources:
   bugtracker: http://github.com/reneeb/MySQL-Workbench-DBIC/issues
   homepage: http://github.com/reneeb/MySQL-Workbench-DBIC
   repository: git://github.com/reneeb/MySQL-Workbench-DBIC.git
-version: '1.01'
+version: '1.07'
 x_contributors:
+  - 'Mario Minati <mario.minati@minati.de>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Config;
 
 eval q{ require Test::More };
@@ -17,6 +17,7 @@ $modules{$_} = $_ for qw(
   Probe::Perl
   Test2::API
   Test2::V0
+  Text::ParseWords
 );
 
 

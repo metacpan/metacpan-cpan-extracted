@@ -40,35 +40,35 @@ my $role_class = $subpath . '/DBIC_Schema/Result/Test.pm';
 
 ok -e $role_class;
 
-my $check = q~__PACKAGE__->add_columns(
-    test_id => {
+my $check = q~__PACKAGE__->add_columns\\(
+    test_id => \\{
         data_type          => 'INT',
         is_auto_increment  => 1,
         is_numeric         => 1,
         retrieve_on_insert => 1,
-    },
-    passphrase => {
+    \\},
+    passphrase => \\{
         data_type          => 'VARCHAR',
         is_nullable        => 1,
         size               => 45,
         'passphrase' => 'rfc2307',
-        'passphrase_args' => {
+        'passphrase_args' => \\{
           'algorithm' => 'SHA-1',
-          'salt_random' => 20
-        },
+          'salt_random' => '?20'?
+        \\},
         'passphrase_check_method' => 'check_passphrase',
         'passphrase_class' => 'SaltedDigest'
-    },
-    another_phrase => {
+    \\},
+    another_phrase => \\{
         data_type          => 'VARCHAR',
         is_nullable        => 1,
         size               => 45,
-    },
+    \\},
 
-);~;
+\\);~;
 
 my $content = do{ local (@ARGV, $/) = $role_class; <> };
-like( $content, qr/\Q$check\E/ );
+like( $content, qr/$check/ );
 
 like $content, qr/__PACKAGE__->load_components\([^\)]+PassphraseColumn/;
 

@@ -40,6 +40,7 @@ t/Lingua-JA-Moji.t
 t/lingua-ja-regular-unicode.t
 t/new-old-kanji.t
 t/romaji2kana.t
+t/sound-marks.t
 t/square.t
 t/wanakana.t
 t/wide-ascii.t

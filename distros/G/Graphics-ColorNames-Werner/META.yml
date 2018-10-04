@@ -1,0 +1,39 @@
+---
+abstract: "RGB codes for Werner's Nomenclature of Colours"
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Types::Common::Numeric: '1.004'
+  Types::Standard: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - color
+  - Werner
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graphics-ColorNames-Werner
+provides:
+  Graphics::ColorNames::Werner:
+    file: lib/Graphics/ColorNames/Werner.pm
+    version: v1.0.2
+recommends:
+  Graphics::ColorNames: '0'
+requires:
+  perl: v5.6.0
+resources:
+  bugtracker: https://github.com/robrwo/Graphics-ColorNames-Werner/issues
+  repository: git://github.com/robrwo/Graphics-ColorNames-Werner.git
+version: v1.0.2
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Slaven Rezić <slaven@rezic.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,8 @@
 Revision history for Perl extension Array::Contains.
 
+2.8  Thu Oct 04 15:00:00 2018
+    - Tester reported we can use a lower minimum perl version.
+
 2.7  Wed Feb 22 09:40:00 2017
 	- initial public release
 

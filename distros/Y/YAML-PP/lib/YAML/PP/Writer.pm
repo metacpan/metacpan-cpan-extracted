@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Writer;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 sub output { return $_[0]->{output} }
 sub set_output { $_[0]->{output} = $_[1] }
@@ -22,6 +22,10 @@ sub write {
     $self->{output} .= $line;
 }
 
+sub init {
+    $_[0]->{output} = '';
+}
+
 sub finish {
     my ($self) = @_;
     $self->{output} = undef;
@@ -29,16 +33,18 @@ sub finish {
 
 package YAML::PP::Writer::File;
 
+use Scalar::Util qw/ openhandle /;
+
 our @ISA = qw/ YAML::PP::Writer /;
 
 use Carp qw/ croak /;
 
 sub open_handle {
-    my $fh;
-    unless ($fh) {
-        open $fh, '>:encoding(UTF-8)', $_[0]->{output}
-            or croak "Could not open '$_[0]->{output}' for writing: $!";
+    if (openhandle($_[0]->{output})) {
+        return $_[0]->{output};
     }
+    open my $fh, '>:encoding(UTF-8)', $_[0]->{output}
+        or croak "Could not open '$_[0]->{output}' for writing: $!";
     return $fh;
 }
 
@@ -46,6 +52,11 @@ sub write {
     my ($self, $line) = @_;
     my $fh = $self->{filehandle} ||= $self->open_handle;
     print $fh $line;
+}
+
+sub init {
+    my ($self) = @_;
+    my $fh = $self->{filehandle} ||= $self->open_handle;
 }
 
 sub finish {

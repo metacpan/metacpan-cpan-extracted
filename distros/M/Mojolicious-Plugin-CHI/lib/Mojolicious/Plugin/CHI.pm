@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Scalar::Util 'weaken';
 use CHI;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Register Plugin
 sub register {

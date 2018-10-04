@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 1.22
+Version 1.24
 
 =cut
 
-our $VERSION = '1.22';
+our $VERSION = '1.24';
 
 
 =head1 SYNOPSIS
@@ -439,55 +439,8 @@ Babel, Polyglossia, etc.
 =cut
 
 sub _language_mapping {
-    my $self = shift;
-    return {
-            ar => 'arabic', # R2L
-            bg => 'bulgarian',
-            ca => 'catalan',
-            cs => 'czech',
-            da => 'danish',
-            de => 'german',
-            el => 'greek',
-            en => 'english',
-            es => 'spanish',
-            et => 'estonian',
-            fa => 'farsi', # R2L
-            fi => 'finnish',
-            fr => 'french',
-            id => 'bahasai',
-            ga => 'irish',
-            gl => 'galician',
-            he => 'hebrew',  # R2L
-            hi => 'hindi',
-            hr => 'croatian',
-            hu => 'magyar',
-            is => 'icelandic',
-            it => 'italian',
-            lo => 'lao',
-            lv => 'latvian',
-            lt => 'lithuanian',
-            ml => 'malayalam',
-            mk => 'macedonian', # needs workaround
-            mr => 'marathi',
-            nl => 'dutch',
-            no => 'norsk',
-            nn => 'nynorsk',
-            oc => 'occitan',
-            sr => 'serbian',
-            ro => 'romanian',
-            ru => 'russian',
-            sk => 'slovak',
-            sl => 'slovenian',
-            pl => 'polish',
-            pt => 'portuges',
-            sq => 'albanian',
-            sv => 'swedish',
-            tr => 'turkish',
-            uk => 'ukrainian',
-            vi => 'vietnamese',
-           };
+    shift->document->_language_mapping;
 }
-
 
 =head3 header_defined
 
@@ -517,28 +470,10 @@ sub header_defined {
 
 
 sub language_code {
-    my $self = shift;
-    unless (defined $self->{_doc_language_code}) {
-        my %header = $self->document->raw_header;
-        my $lang = $header{lang} || $header{language} || "en";
-        my $real = "en";
-        # check if language exists;
-        if ($self->_language_mapping->{$lang}) {
-            $real = $lang;
-        }
-        $self->{_doc_language_code} = $real;
-    }
-    return $self->{_doc_language_code};
+    shift->document->language_code;
 }
-
 sub language {
-    my $self = shift;
-    unless (defined $self->{_doc_language}) {
-        my $lc = $self->language_code;
-        # guaranteed not to return undef
-        $self->{_doc_language} = $self->_language_mapping->{$lc};
-    }
-    return $self->{_doc_language};
+    shift->document->language;
 }
 
 =head3 other_language_codes

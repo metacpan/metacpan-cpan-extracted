@@ -1,7 +1,7 @@
 use strict;
 use Text::CSV::Unicode;
 
-my $csv = Text::CSV::Unicode->new( binary => 1 );
+my $csv = Text::CSV::Unicode->new();
 
 my @data;
 while( <DATA> ) {

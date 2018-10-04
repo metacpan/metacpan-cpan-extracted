@@ -11,5 +11,6 @@ t/Dict1.pm
 t/Dict2.pm
 t/pod-coverage.t
 t/pod.t
+t/extra.dict.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

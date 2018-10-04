@@ -11,26 +11,26 @@ access;
 
 foreach my $scheme ( qw{ http https } ) {
 
-    call set => scheme => $scheme;
+    subtest "Get release information under $scheme" => sub {
 
-    echo <<"EOD";
+	have_scheme $scheme
+	    or plan skip_all => "$scheme not installed";
 
-The following tests use the $scheme: URL scheme
+	call set => scheme => $scheme;
 
-EOD
+	TODO: {
 
-    TODO: {
+	    local $TODO = 'Release information missing as of September 6 2016';
 
-	local $TODO = 'Release information missing as of September 6 2016';
+	    call 'release';
+	    test qr{ \A SIMBAD4 \b }smxi, 'Scalar release()';
 
-	call 'release';
-	test qr{ \A SIMBAD4 \b }smxi, 'Scalar release()';
+	    call_a 'release';
+	    deref 0;
+	    test 4, 'Major version number';
 
-	call_a 'release';
-	deref 0;
-	test 4, 'Major version number';
-
-    }
+	}
+    };
 
 }
 

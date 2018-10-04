@@ -1,0 +1,31 @@
+This directory contains various tools for maintaining this package, to
+wit:
+
+* README
+  This file.
+
+* generate
+  This Perl script generates the Perl module and t/data/ test file for
+  planets named on the command line.
+
+* generate.data
+  This text file is input to ref-data to generate t/data/ files. See the
+  comments in ref-data.f for details.
+
+* ref-data.f
+  This Fortran 95 program is derived from example.f which is distributed
+  with the VSOP87 model data. It is used to generate the files in
+  t/data/ from the VSOP87 models and one or more time ranges.
+  Documentation is in comments at the beginning of the source.
+
+* reference
+  This Perl script attempts to mimic the output of example.f using Perl
+  classes. The --help option gets you documentation.
+
+* template.pm
+  This is a file suitable (perhaps!) for generating a complete planetary
+  (but not Solar!) class using
+  $ tools/decode -template tools/template.pm >...
+  and its home-grown (yukkk!) templating system.
+
+# ex: set filetype=text textwidth=72 autoindent :

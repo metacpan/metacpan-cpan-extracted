@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::GRRCN::Chargeback;
-$Finance::AMEX::Transaction::GRRCN::Chargeback::VERSION = '0.002';
+$Finance::AMEX::Transaction::GRRCN::Chargeback::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ Finance::AMEX::Transaction::GRRCN::Chargeback - Parse AMEX Global Reconciliation
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

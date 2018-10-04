@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::CommandLine::GeneNameOccurances;
-
+$Bio::AutomatedAnnotation::CommandLine::GeneNameOccurances::VERSION = '1.182770';
 # ABSTRACT: Create a spreadsheet with gene name occurances
 
 
@@ -103,7 +103,7 @@ Bio::AutomatedAnnotation::CommandLine::GeneNameOccurances - Create a spreadsheet
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

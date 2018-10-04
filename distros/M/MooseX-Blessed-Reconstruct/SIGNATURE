@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,27 +14,27 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 07d6e868efa297a3b0aff46dcbf2eed0b0604c3a Build.PL
-SHA1 ec2c04a1df729425f0d5fe5e386f1db13562d221 CONTRIBUTORS
-SHA1 7818827859fd01efd985d79fbde626ebcb42e3b9 Changes
-SHA1 1a436e7e1a8d13fe2eb2fb38fb51a5d6b27925ee INSTALL
-SHA1 77006c8a2d83c22187dcfcbe21c7735e42cb6dcd LICENSE
-SHA1 01c818d384fcef8ea036b83e9570c45bb39d2d71 MANIFEST
-SHA1 288de67628a9e7963fef31398751880627ac506b META.json
-SHA1 c5a5af47e07d5c1eae414f03e58c4cbbca8afe7e META.yml
-SHA1 9da93bd03ce7640f60e9b9f432b1352b4535be63 README
-SHA1 27c7884f88a8fb09c0fc586998ea9c86e17e73db README.mkdn
-SHA1 188e4d8966e0de32d8200666127978b958a94054 cpanfile
-SHA1 9d388c4dddd1fb62953604a58429d18f7e156fb8 doap.xml
-SHA1 1f22debe7a5f194f4111e8432b6d933d30521158 lib/MooseX/Blessed/Reconstruct.pm
-SHA1 6d9e59bfaf0482e8af98b1e6a8d5189f0ab1eec7 t/00-compile.t
-SHA1 1eb2815ebbcb38fa90f4d8749221e8b5f99ca0aa t/000-report-versions-tiny.t
+SHA1 f471b95861376202d65f53441c3a5398e78f736a CODE_OF_CONDUCT.md
+SHA1 373f31918c049f7a14663c75948bbb8445f2480a CONTRIBUTORS
+SHA1 69796af43ffa724300ea251319f9188f4b8fddd3 Changes
+SHA1 6dbe7ec37843f546f1774ac261a081b0af66ac7e INSTALL
+SHA1 47ddeaf5539efad195e1eedd211b785581ea0296 LICENSE
+SHA1 a35214c3327bcc0c5bc00329b43581b731aa6daa MANIFEST
+SHA1 7161e94c4d551ccca1234b45b7ebeed0b348cf55 META.json
+SHA1 52c0aff0a48fbf9886ca516c2399472fc82d57e1 META.yml
+SHA1 54c66c573834f31c24721861dae59e0cc84d96ee Makefile.PL
+SHA1 246eee5ba95648eea0804c7acd7d18cc3c6d3dfd README.mkdn
+SHA1 9429ddebbf3b997399d4a60992317e99dfda2794 cpanfile
+SHA1 f14505cb4fd210aa0077cb8a8ae3ca4deaaea876 doap.xml
+SHA1 2722e54cffba19cef963d75b282b8b175eb06102 lib/MooseX/Blessed/Reconstruct.pm
+SHA1 1dfef0bd1f3f6f3a0823079663679d2cc3b4fb46 t/00-compile.t
+SHA1 6bc0a8015594de53b8e797c8e271fbf171cbd9b8 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 a864e611614c3e25f55dd7174dc6f1f8922881a9 t/basic.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlRSbY8ACgkQ34Hwf+GwC4w/8ACeJKaplV6jI7dpUJLCCZzGyYD3
-cVsAoOZLYK1Ptn3AqSwG/TlzVbSTLWVv
-=S5Es
+iEYEARECAAYFAlurgPIACgkQ34Hwf+GwC4xl2wCgzr7R2PCOyJeGVs9ScnGfJP1B
+Cc0An08oSy7MGazQxMIZOACEgYS7mzQ9
+=o0Z1
 -----END PGP SIGNATURE-----

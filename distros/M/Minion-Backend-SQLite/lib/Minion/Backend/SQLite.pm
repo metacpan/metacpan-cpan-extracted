@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '4.001';
+our $VERSION = '4.002';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -285,11 +285,10 @@ sub repair {
   # Old jobs with no unresolved dependencies
   $db->query(
     q{delete from minion_jobs
-      where finished <= datetime('now', '-' || ? || ' seconds') and not exists (
-        select 1 from minion_jobs as child, json_each(child.parents) as parent_id
-        where minion_jobs.id = parent_id.value and child.state <> 'finished'
-      ) and state = 'finished'}, $minion->remove_after
-  );
+      where finished <= datetime('now', '-' || ? || ' seconds')
+      and state = 'finished' and id not in (select distinct parent_id.value
+        from minion_jobs as child, json_each(child.parents) as parent_id
+        where child.state <> 'finished')}, $minion->remove_after);
 }
 
 sub reset {
@@ -607,9 +606,9 @@ Queue to put job in, defaults to C<default>.
   my $bool = $backend->fail_job(
     $job_id, $retries, {msg => 'Something went wrong!'});
 
-Transition from C<active> to C<failed> state, and if there are attempts
-remaining, transition back to C<inactive> with an exponentially increasing
-delay based on L<Minion/"backoff">.
+Transition from C<active> to C<failed> state with or without a result, and if
+there are attempts remaining, transition back to C<inactive> with an
+exponentially increasing delay based on L<Minion/"backoff">.
 
 =head2 finish_job
 
@@ -617,7 +616,7 @@ delay based on L<Minion/"backoff">.
   my $bool = $backend->finish_job($job_id, $retries, 'All went well!');
   my $bool = $backend->finish_job($job_id, $retries, {msg => 'All went well!'});
 
-Transition from C<active> to C<finished> state.
+Transition from C<active> to C<finished> state with or without a result.
 
 =head2 history
 
@@ -645,6 +644,9 @@ Hourly counts for processed jobs from the past day.
 
 Returns the information about jobs in batches.
 
+  # Get the total number of results (without limit)
+  my $num = $backend->list_jobs(0, 100, {queues => ['important']})->{total};
+
   # Check job state
   my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
   my $state = $results->{jobs}[0]{state};
@@ -665,7 +667,7 @@ List only jobs with these ids.
 
 =item queues
 
-  queue => ['important', 'unimportant']
+  queues => ['important', 'unimportant']
 
 List only jobs in these queues.
 
@@ -722,6 +724,12 @@ Epoch time job was delayed to.
   finished => 784111777
 
 Epoch time job was finished.
+
+=item id
+
+  id => 10025
+
+Job id.
 
 =item notes
 
@@ -798,6 +806,9 @@ Id of worker that is processing the job.
 
 Returns information about locks in batches.
 
+  # Get the total number of results (without limit)
+  my $num = $backend->list_locks(0, 100, {names => ['bar']})->{total};
+
   # Check expiration time
   my $results = $backend->list_locks(0, 1, {names => ['foo']});
   my $expires = $results->{locks}[0]{expires};
@@ -839,6 +850,9 @@ Lock name.
 
 Returns information about workers in batches.
 
+  # Get the total number of results (without limit)
+  my $num = $backend->list_workers(0, 100)->{total};
+
   # Check worker host
   my $results = $backend->list_workers(0, 1, {ids => [$worker_id]});
   my $host    = $results->{workers}[0]{host};
@@ -858,6 +872,12 @@ List only workers with these ids.
 These fields are currently available:
 
 =over 2
+
+=item id
+
+  id => 22
+
+Worker id.
 
 =item host
 

@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::GeneNamesFromGFF;
-
+$Bio::AutomatedAnnotation::GeneNamesFromGFF::VERSION = '1.182770';
 # ABSTRACT: Parse a GFF and efficiently extract out the Gene Names
 
 
@@ -83,7 +83,7 @@ Bio::AutomatedAnnotation::GeneNamesFromGFF - Parse a GFF and efficiently extract
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

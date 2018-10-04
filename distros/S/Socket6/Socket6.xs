@@ -1,8 +1,8 @@
 /*
  * Socket6.xs
- * $Id: Socket6.xs 662 2016-03-22 16:03:49Z ume $
+ * $Id: Socket6.xs 688 2018-09-30 04:22:53Z ume $
  *
- * Copyright (C) 2000-2016 Hajimu UMEMOTO <ume@mahoroba.org>.
+ * Copyright (C) 2000-2018 Hajimu UMEMOTO <ume@mahoroba.org>.
  * All rights reserved.
  *
  * This moduled is besed on perl5.005_55-v6-19990721 written by KAME
@@ -62,9 +62,10 @@ const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 #ifdef __KAME__
 # include <sys/param.h>
 # include <net/route.h>
-# if defined(__FreeBSD__) && __FreeBSD_version >= 700048
+# if (defined(__FreeBSD__) && __FreeBSD_version >= 700048) || \
+     (defined(__NetBSD__) && __NetBSD_Version__ >= 899002500)
 #  include <netipsec/ipsec.h>
-# elif !defined(__OpenBSD__)
+# elif !defined(__OpenBSD__) && !defined(__DragonFly__)
 #  include <netinet6/ipsec.h>
 # endif
 #endif

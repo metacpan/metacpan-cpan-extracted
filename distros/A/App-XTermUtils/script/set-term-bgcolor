@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/XTermUtils/set_term_bgcolor
+# Note: This script is a CLI for Riap function /XTerm/Util/set_term_bgcolor
 # and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2018-09-25'; # DATE
+our $DATE = '2018-09-26'; # DATE
 our $DIST = 'App-XTermUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,8 +14,10 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/XTermUtils/set_term_bgcolor",
+    url => "/XTerm/Util/set_term_bgcolor",
     program_name => "set-term-bgcolor",
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -35,13 +37,22 @@ set-term-bgcolor - Set terminal background color
 
 =head1 VERSION
 
-This document describes version 0.001 of set-term-bgcolor (from Perl distribution App-XTermUtils), released on 2018-09-25.
+This document describes version 0.003 of set-term-bgcolor (from Perl distribution App-XTermUtils), released on 2018-09-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % set-term-bgcolor [options] <rgb>
+ % set-term-bgcolor [options] <rgb> [stderr]
+
+=head1 DESCRIPTION
+
+Set terminal background color. This prints the following xterm control sequence
+to STDOUT (or STDERR, if ~stderr~ is set to true:
+
+ \e]11;#123456\a
+
+where I<123456> is the 6-hexdigit RGB color code.
 
 =head1 OPTIONS
 
@@ -53,33 +64,7 @@ C<*> marks required options.
 
 =item B<--rgb>=I<s>*
 
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<filename>, B<-c>
-
-Set path to configuration file.
-
-=item B<--config-profile>=I<s>, B<-P>
-
-Set configuration profile to use.
-
-=item B<--no-config>, B<-C>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
+=item B<--stderr>
 
 =back
 
@@ -169,42 +154,6 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
-
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/set-term-bgcolor.conf>, F<~/set-term-bgcolor.conf>, or F</etc/set-term-bgcolor.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- format (see --format)
- naked_res (see --naked-res)
- rgb (see --rgb)
-
-=head1 ENVIRONMENT
-
-=head2 SET_TERM_BGCOLOR_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/set-term-bgcolor.conf>
-
-F<~/set-term-bgcolor.conf>
-
-F</etc/set-term-bgcolor.conf>
 
 =head1 HOMEPAGE
 

@@ -24,15 +24,14 @@ Module::Overview - print/graph module(s) information
 use warnings;
 use strict;
 
-our $VERSION = '0.01';
-
-use 5.010;
+our $VERSION = '0.02';
 
 use Class::Sniff;
 use Text::SimpleTable;
 use Module::ExtractUse;
 use Graph::Easy;
 use Carp 'confess';
+use List::MoreUtils qw(none);
 
 use base 'Class::Accessor::Fast';
 
@@ -72,15 +71,15 @@ sub get {
     #print join("\n", $sniff->methods), "\n";
     $overview{'class'} = $module_name;
     $overview{'parents'} = [
-        grep { not ($_ ~~ [qw(Exporter)]) }     # skip uninteresting
+        grep { $_ ne 'Exporter' }               # skip uninteresting
         grep { $_ !~ m{^[0-9._]+$} }            # skip perl versions
         $sniff->parents
     ];
     delete $overview{'parents'}
         if not @{$overview{'parents'}};
     $overview{'classes'} = [
-        grep { not ($_ ~~ $overview{'parents'}) }  # skip parents
-        grep { not ($_ ~~ [qw(Exporter)]) }        # skip uninteresting
+        grep { my $s = $_; none { $_ eq $s } @{$overview{'parents'}} }     # skip parents
+        grep { $_ ne 'Exporter' }                  # skip uninteresting
         grep { $_ !~ m{^[0-9._]+$} }               # skip perl versions
         grep { $_ ne $module_name }                # skip self
         $sniff->classes
@@ -93,10 +92,11 @@ sub get {
     if (exists $INC{$module_name_path} and (-r $INC{$module_name_path})) {
         $euse->extract_use($INC{$module_name_path});
         $DB::single=1;
+        my %skip_kw = map {$_ => 1} qw(strict warnings constant vars Exporter);
         $overview{'uses'} = [
             grep { (not $recursion_filter) or ($_ =~ m/$recursion_filter/) }   # filter modules
-            grep { not ($_ ~~ $overview{'parents'}) }                          # skip parents
-            grep { not ($_ ~~ [qw(strict warnings constant vars Exporter)]) }  # skip uninteresting
+            grep { my $s = $_; none { $_ eq $s } @{$overview{'parents'}} }     # skip parents
+            grep { !$skip_kw{$_} }                                             # skip uninteresting
             grep { $_ !~ m{^[0-9._]+$} }                                       # skip perl versions
             sort
             $euse->array

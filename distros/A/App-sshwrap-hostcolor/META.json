@@ -30,13 +30,14 @@
       "runtime" : {
          "requires" : {
             "AppLib::sshwrap" : "0",
+            "Color::RGB::Util" : "0",
             "Complete::Util" : "0.57",
             "Getopt::Long" : "0",
             "Getopt::Long::Complete" : "0",
             "Log::ger" : "0.023",
             "PERLANCAR::File::HomeDir" : "0",
             "ShellCompleter::Util" : "0.030",
-            "XTerm::Util" : "0",
+            "XTerm::Util" : "0.002",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-sshwrap-hostcolor"
       }
    },
-   "version" : "0.001",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

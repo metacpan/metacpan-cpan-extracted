@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPRAW::Unknown;
-$Finance::AMEX::Transaction::EPRAW::Unknown::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPRAW::Unknown::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Finance::AMEX::Transaction::EPRAW::Unknown - Parse AMEX Reconciliation Files (EP
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,24 @@
 package   Mandel::Relationship;
+use Mojo::Base -base;
+use Mojo::Loader 'load_class';
+
+has accessor       => '';
+has document_class => '';
+has foreign_field  => sub { shift->document_class->model->name };
+has related_class  => '';
+
+# is this a bad memory leak? $model => $rel_obj => $_related_model
+# i don't think so, since the number of objects are constant
+has _related_model => sub {
+  my $self = shift;
+  my $e    = load_class($self->related_class);
+  die $e if ref $e;
+  $self->related_class->model;
+};
+
+1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -17,11 +37,6 @@ L<Mandel::Relationship> is the base class for the following classes:
 =item * L<Mandel::Relationship::HasOne>
 
 =back
-
-=cut
-
-use Mojo::Base -base;
-use Mojo::Loader 'load_class';
 
 =head1 ATTRIBUTES
 
@@ -42,22 +57,6 @@ methods created.
 
 Holds the related document class name.
 
-=cut
-
-has accessor       => '';
-has document_class => '';
-has foreign_field  => sub { shift->document_class->model->name };
-has related_class  => '';
-
-# is this a bad memory leak? $model => $rel_obj => $_related_model
-# i don't think so, since the number of objects are constant
-has _related_model => sub {
-  my $self = shift;
-  my $e    = load_class($self->related_class);
-  die $e if ref $e;
-  $self->related_class->model;
-};
-
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mango>, L<Mandel>
@@ -67,5 +66,3 @@ L<Mojolicious>, L<Mango>, L<Mandel>
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

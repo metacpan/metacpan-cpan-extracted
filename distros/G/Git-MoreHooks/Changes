@@ -1,5 +1,7 @@
 Revision history for Git-MoreHooks
 
+0.006     2018-10-03 10:56:16+02:00 Europe/Stockholm
+
 0.005     2016-03-10 16:25:11+01:00 Europe/Stockholm TriggerJenkins:
               Fix compatibility with Gitlab.
           CheckIndent:

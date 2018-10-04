@@ -1,3 +1,8 @@
+0.002   2018-09-26 (PERLANCAR)
+
+	- [ux] color::rgb24: Coerce and complete from color names.
+
+
 0.001   2017-12-03 (PERLANCAR)
 
         - First release.

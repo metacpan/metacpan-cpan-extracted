@@ -1,5 +1,10 @@
 Revision history for Map::Tube
 
+3.57  2018-09-27T17:00:00+00:00
+      - Updated method is_valid_color() in the package Map::Tube::Utils to
+        return hexcode if it is valid color.
+      - Added more color names to the supported color name list.
+
 3.56  2018-09-04T09:15:00+00:00
       - Tidied up test scripts to use "namespace::autoclean".
 

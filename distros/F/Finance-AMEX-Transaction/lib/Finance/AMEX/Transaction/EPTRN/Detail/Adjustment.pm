@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPTRN::Detail::Adjustment;
-$Finance::AMEX::Transaction::EPTRN::Detail::Adjustment::VERSION = '0.002';
+$Finance::AMEX::Transaction::EPTRN::Detail::Adjustment::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -70,7 +70,7 @@ Finance::AMEX::Transaction::EPTRN::Detail::Adjustment - Parse AMEX Transaction/I
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

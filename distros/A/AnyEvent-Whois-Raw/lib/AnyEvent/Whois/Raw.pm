@@ -8,7 +8,7 @@ use AnyEvent::HTTP;
 use strict;
 no warnings 'redefine';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our @EXPORT = qw(whois get_whois);
 our $stash;
 
@@ -124,7 +124,7 @@ sub _get_whois {
 sub Net::Whois::Raw::whois_query {
 	my $call = $stash->{calls}{whois_query}++;
 	if ($call <= $#{$stash->{results}{whois_query}}) {
-		return $stash->{results}{whois_query}[$call];
+		return $stash->{results}{whois_query}[$call] || die $stash->{errors}{whois_query}[$call], "\n";
 	}
 	
 	whois_query_ae(@_);
@@ -143,7 +143,11 @@ sub whois_query_ae {
 	tcp_connect $srv, $port || 43, sub {
 		my $fh = shift;
 		unless ($fh) {
-			$stash_ref->{args}->[-1]->('', "Connection to $srv failed: $!");
+			local $stash = $stash_ref;
+			$stash->{calls}{whois_query} = 0;
+			my $i = push @{$stash->{results}{whois_query}}, undef;
+			$stash->{errors}{whois_query}[$i-1] = "Connection to $srv failed: $!";
+			$stash->{caller}->(@{$stash->{args}});
 			return;
 		}
 		
@@ -156,7 +160,11 @@ sub whois_query_ae {
 			cb => sub {
 				if ($handle && !$handle->destroyed) {
 					$handle->destroy();
-					$stash_ref->{args}->[-1]->('', "Connection to $srv timed out");
+					local $stash = $stash_ref;
+					$stash->{calls}{whois_query} = 0;
+					my $i = push @{$stash->{results}{whois_query}}, undef;
+					$stash->{errors}{whois_query}[$i-1] = "Connection to $srv timed out";
+					$stash->{caller}->(@{$stash->{args}});
 				}
 			}
 		);
@@ -173,7 +181,11 @@ sub whois_query_ae {
 			on_error => sub {
 				undef $timer;
 				$handle->destroy();
-				$stash_ref->{args}->[-1]->('', "Read error from $srv: $!");
+				local $stash = $stash_ref;
+				$stash->{calls}{whois_query} = 0;
+				my $i = push @{$stash->{results}{whois_query}}, undef;
+				$stash->{errors}{whois_query}[$i-1] = "Read error from $srv: $!";
+				$stash->{caller}->(@{$stash->{args}});
 			},
 			on_eof => sub {
 				undef $timer;

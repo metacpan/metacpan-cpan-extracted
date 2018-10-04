@@ -21,7 +21,7 @@ use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
 
-our $VERSION = '2.3628';
+our $VERSION = '2.3629';
 
 my $fatal_exit = 1;
 
@@ -260,6 +260,18 @@ various items
     use RPi::Const qw(:all);
 
     my $pi = RPi::WiringPi->new;
+
+    #
+    # identification
+    #
+
+    $pi->io_led(1);  # turn green disk IO LED on full-time
+    $pi->pwr_led(1); # turn red power LED off
+
+    $pi->io_led;     # set green disk IO LED back to default status
+    $pi->pwr_led;    # set red power LED back to default
+
+    $pi->label('pi-test-01'); # set a name/label for your Pi object
 
     #
     # pin

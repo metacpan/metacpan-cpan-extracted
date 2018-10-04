@@ -31,6 +31,8 @@ my $ele = _skip_it(eval {Geo::WebService::Elevation::USGS->new(
 	    places => 2 )},
     'Unable to instantiate Geo::WebService::Elevation::USGS');
 
+diag "Accessing @{[ $ele->get( 'usgs_url' ) ]}";
+
 {
     my $ua = _skip_it(eval {LWP::UserAgent->new()},
 	'Unable to instantiate LWP::UserAgent (should not happen)');

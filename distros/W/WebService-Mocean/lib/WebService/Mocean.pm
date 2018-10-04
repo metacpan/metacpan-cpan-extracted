@@ -3,14 +3,15 @@ package WebService::Mocean;
 use utf8;
 
 use Moo;
-use Types::Standard qw(Str);
+use Types::Standard qw(Str Ref);
+use Array::Utils qw(array_minus);
 
 use strictures 2;
 use namespace::clean;
 
 with 'Role::REST::Client';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 has api_url => (
     isa => Str,
@@ -30,6 +31,20 @@ has api_secret => (
     required => 1
 );
 
+has '_required_fields' => (
+    isa => Ref["HASH"],
+    is => 'ro',
+    init_arg => undef,
+    default => sub {{
+        sms => [qw(mocean-from mocean-to mocean-text)],
+        'verify/req' => [qw(mocean-to mocean-brand)],
+        'verify/check' => [qw(mocean-reqid mocean-code)],
+        'report/message' => [qw(mocean-msgid)],
+        'account/balance' => [],
+        'account/pricing' => [],
+    }}
+);
+
 sub BUILD {
     my ($self, $args) = @_;
 
@@ -43,34 +58,60 @@ sub BUILD {
     return $self;
 }
 
-sub send_mt_sms {
-    my ($self, $to, $from, $text) = @_;
+sub send_sms {
+    my ($self, $params) = @_;
 
-    my $params = {
-        'mocean-api-key' => $self->api_key,
-        'mocean-api-secret' => $self->api_secret,
-        'mocean-to' => $to,
-        'mocean-from' => $from,
-        'mocean-text' => $text,
-        'mocean-resp-format' => 'json',
-        'mocean-charset' => 'UTF-8',
-        'mocean-dlr-mask' => 1
-    };
+    return $self->_request('sms', $params, 'post');
+}
 
-    return $self->_request('sms', $params, undef, undef, 'post');
+sub send_verification_code {
+    my ($self, $params) = @_;
+
+    return $self->_request('verify/req', $params, 'post');
+}
+
+sub check_verification_code {
+    my ($self, $params) = @_;
+
+    return $self->_request('verify/check', $params, 'post');
+}
+
+sub get_account_balance {
+    my ($self) = @_;
+
+    return $self->_request('account/balance', undef, 'get');
+}
+
+sub get_account_pricing {
+    my ($self) = @_;
+
+    return $self->_request('account/pricing', undef, 'get');
+}
+
+sub get_message_status {
+    my ($self, $params) = @_;
+
+    return $self->_request('report/message', $params, 'get');
 }
 
 sub _request {
-    my ($self, $command, $queries, $format, $method) = @_;
+    my ($self, $command, $queries, $method) = @_;
 
     $command ||= q||;
     $queries ||= {};
-    $format ||= 'xml';
     $method ||= 'get';
+
+    $self->_check_required_params($command, $queries);
+
+    my $params = $self->_auth_params();
+    $queries = {%$queries, %$params};
 
     # In case the api_url was updated.
     $self->server($self->api_url);
-    $self->type(qq|application/$format|);
+
+    my $response_format = $queries->{'mocean-resp-format'} || 'xml';
+
+    $self->type(qq|application/$response_format|);
 
     # Do not append '/' at the end of URL. Otherwise you will get HTTP 406
     # error.
@@ -85,6 +126,28 @@ sub _request {
     }
 
     return $response->data;
+}
+
+sub _auth_params {
+    my ($self) = @_;
+
+    return {
+        'mocean-api-key' => $self->api_key,
+        'mocean-api-secret' => $self->api_secret,
+    };
+}
+
+sub _check_required_params {
+    my ($self, $command, $params) = @_;
+
+    my $required_fields = $self->_required_fields->{$command};
+
+    die "Missing or invalid command : $command" if (!defined $required_fields);
+
+    my @param_keys = keys %$params;
+    my @missing = array_minus(@$required_fields, @param_keys);
+
+    die "Missing required params: " . join(', ', @missing) if (scalar @missing);
 }
 
 
@@ -118,7 +181,7 @@ If you have Docker installed, you can build your Docker container for this
 project.
 
     $ docker build -t webservice-mocean .
-    $ docker run -it -v $(pwd):/root webservice-restcountries bash
+    $ docker run -it -v $(pwd):/root webservice-mocean bash
     # cpanm --installdeps --notest .
 
 =head2 Milla
@@ -169,14 +232,55 @@ The URL of the API resource.
     my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
     $mocean_api->api_url('http://example.com/api/');
 
-=head2 send_mt_sms($to, $from, $text)
+=head2 send_sms($params)
 
 Send Mobile Terminated (MT) message, which means the message is sent from
 mobile SMS provider and terminated at the to the mobile phone.
 
     # Send sample SMS.
-    my $mocean_api = WebService::Mocean->new(api_key => 'foo', api_secret => 'bar');
-    $mocean_api->send_mt_sms('0123456789', 'ACME Ltd.', 'Hello');
+    my $response = $mocean_api->send_sms({
+        'mocean-to' => '0123456789',
+        'mocean-from' => 'ACME Ltd.',
+        'mocean-text' => 'Hello'
+    });
+
+=head2 send_verification_code($params)
+
+Send a random code for verification to a mobile number.
+
+    my $response = $mocean_api->send_verification_code({
+        'mocean-to' => '0123456789',
+        'mocean-brand' => 'ACME Ltd.',
+    });
+
+=head2 check_verification_code($params)
+
+Check the verfication code received from your user.
+
+    my $response = $mocean_api->check_verification_code({
+        'mocean-reqid' => '395935',
+        'mocean-code' => '234839',
+    });
+
+=head2 get_account_balance()
+
+Get your Mocean account balance.
+
+    my $response = $mocean_api->get_account_balance();
+
+=head2 get_account_pricing()
+
+Get your Mocean account pricing and supported destination.
+
+    my $response = $mocean_api->get_account_pricing();
+
+=head2 get_message_status()
+
+Get the outbound SMS current status.
+
+    my $response = $mocean_api->get_message_status({
+        'mocean-msgid' => 123456
+    });
 
 =head1 COPYRIGHT AND LICENSE
 

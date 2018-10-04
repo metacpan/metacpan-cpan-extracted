@@ -4,45 +4,49 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "representation of text-based copyright statements",
-  "author"         => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010",
-  "keywords"       => ["Licensing", "Sourcecode"],
-  "license"        => ["gpl_3"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "String-Copyright",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => { "constant" => 0, "Exporter::Tiny" => 0, "perl" => 5.008001 },
+  "abstract"         => "representation of text-based copyright statements",
+  "author"           => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => ["Licensing", "Sourcecode"],
+  "license"          => ["gpl_3"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => {
-                          requires => { "Number::Range" => 0.04, "Test::More" => 0, "utf8" => 0 },
+  "name"             => "String-Copyright",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => {
+                              "constant" => 0,
+                              "Exporter::Tiny" => 0,
+                              "Number::Range" => 0.04,
+                              "perl" => 5.008001,
+                            },
+                          },
+                          test => { requires => { "Test::More" => 0, "utf8" => 0 } },
                         },
-                      },
-  "provides"       => {
-                        "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl",
-                                        },
-                        homepage     => "https://metacpan.org/release/String-Copyright",
-                        license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
-                        repository   => {
-                                          type => "git",
-                                          web  => "https://anonscm.debian.org/cgit/build-common/string-copyright.git",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/String-Copyright/project",
-                      },
-  "version"        => 0.003005,
-  "x_help_wanted"  => ["documenter", "tester"],
+  "provides"         => {
+                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003006 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl",
+                                          },
+                          homepage     => "https://metacpan.org/release/String-Copyright",
+                          license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
+                          repository   => {
+                                            type => "git",
+                                            web  => "https://anonscm.debian.org/cgit/build-common/string-copyright.git",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/String-Copyright/project",
+                        },
+  "version"          => 0.003006,
+  "x_help_wanted"    => ["documenter", "tester"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

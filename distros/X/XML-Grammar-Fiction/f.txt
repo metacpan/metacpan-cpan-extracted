@@ -1,0 +1,79 @@
+[DZ] building distribution under .build/SRYku3xLXM for installation
+[DZ] beginning to build XML-Grammar-Fiction
+[DZ] guessing dist's main_module is lib/XML/Grammar/Fiction.pm
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/App/FromProto.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/App/ToDocBook.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/App/ToHTML.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/Err.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/Comment.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/Description.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/Element.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/InnerDesc.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/List.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/Paragraph.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/Saying.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/Text.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Node/WithContent.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Parser.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/FromProto/Parser/QnD.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/Struct/Tag.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/ToDocBook.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Fiction/ToHTML.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/FictionBase/Event.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/FictionBase/FromProto/Parser/LineIterator.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/FictionBase/FromProto/Parser/XmlIterator.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/FictionBase/TagsTree2XML.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/FictionBase/XSLT/Converter.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/App/FromProto.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/App/ToDocBook.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/App/ToHTML.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/Base.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/FromProto.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/FromProto/Parser.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/FromProto/Parser/QnD.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/ToDocBook.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/ToHTML.pm: assigns to $VERSION
+[@Filter/PkgVersion] skipping lib/XML/Grammar/Screenplay/ToTEI.pm: assigns to $VERSION
+[@Filter/PodVersion] lib/XML/Grammar/Fiction.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/App/FromProto.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/App/ToDocBook.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/App/ToHTML.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/Err.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/FromProto.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/FromProto/Node.pm already has a VERSION section in POD
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/Comment.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/Description.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/InnerDesc.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/List.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/Paragraph.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/Saying.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] couldn't find '=head1 NAME' in lib/XML/Grammar/Fiction/FromProto/Node/Text.pm, not adding '=head1 VERSION'
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/FromProto/Node/WithContent.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/FromProto/Parser.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/FromProto/Parser/QnD.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/Struct/Tag.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/ToDocBook.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Fiction/ToHTML.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/FictionBase/Event.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/FictionBase/FromProto/Parser/LineIterator.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/FictionBase/FromProto/Parser/XmlIterator.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/FictionBase/TagsTree2XML.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/FictionBase/XSLT/Converter.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/App/FromProto.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/App/ToDocBook.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/App/ToHTML.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/Base.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/FromProto.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/FromProto/Parser.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/FromProto/Parser/QnD.pm already has a VERSIDuplication of element resources.repository.type at /usr/share/perl5/vendor_perl/Dist/Zilla.pm line 595.
+ON section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/ToDocBook.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/ToHTML.pm already has a VERSION section in POD
+[@Filter/PodVersion] lib/XML/Grammar/Screenplay/ToTEI.pm already has a VERSION section in POD
+[@Filter/MetaProvides::Package] 1 provide map entries did not map to .pm files and may not be loadable at install time: XML::Grammar::Fiction::Struct::Tag::Para
+[MetaProvides::Package] 1 provide map entries did not map to .pm files and may not be loadable at install time: XML::Grammar::Fiction::Struct::Tag::Para

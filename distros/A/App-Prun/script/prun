@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use 5.010; # for // operator
+
 use warnings;
 use strict;
 use Parallel::ForkManager;

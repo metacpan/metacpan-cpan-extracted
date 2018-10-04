@@ -1,17 +1,13 @@
 package Mongol::Roles::Relations;
 
 use Moose::Role;
-use Moose::Util qw( does_role );
+use Moose::Util qw( does_role find_meta );
 
 use Class::Load qw( load_class );
 
 use Lingua::EN::Inflect qw( PL );
 
-requires 'id';
-requires 'find';
-requires 'find_one';
-requires 'retrieve';
-requires 'delete';
+requires( qw( id find find_one retrieve delete ) );
 
 sub has_many {
 	my ( $class, $type, $foreign_key, $moniker ) = @_;
@@ -25,11 +21,11 @@ sub has_many {
 	$moniker = _get_moniker( $type )
 		unless( $moniker );
 
-	load_class( $type );
-	die( sprintf( '%s cannot do basic operations!', $type ) )
-		unless( does_role( $type, 'Mongol::Roles::Core' ) );
+	_load_class( $type );
 
-	$class->meta()->add_method( sprintf( 'add_%s', $moniker ) => sub {
+	my $meta = find_meta( $class );
+
+	$meta->add_method( sprintf( 'add_%s', $moniker ) => sub {
 			my ( $self, $data, $options ) = @_;
 
 			$data->{ $foreign_key } = $self->id();
@@ -39,7 +35,7 @@ sub has_many {
 		}
 	);
 
-	$class->meta()->add_method( sprintf( 'get_%s', PL( $moniker ) ) => sub {
+	$meta->add_method( sprintf( 'get_%s', PL( $moniker ) ) => sub {
 			my ( $self, $query, $options ) = @_;
 
 			$query ||= {};
@@ -49,7 +45,7 @@ sub has_many {
 		}
 	);
 
-	$class->meta()->add_method( sprintf( 'get_%s', $moniker ) => sub {
+	$meta->add_method( sprintf( 'get_%s', $moniker ) => sub {
 			my ( $self, $id ) = @_;
 
 			return $type->find_one(
@@ -61,7 +57,7 @@ sub has_many {
 		}
 	);
 
-	$class->meta()->add_method( sprintf( 'remove_%s', PL( $moniker ) ) => sub {
+	$meta->add_method( sprintf( 'remove_%s', PL( $moniker ) ) => sub {
 			my ( $self, $query ) = @_;
 
 			$query ||= {};
@@ -84,16 +80,24 @@ sub has_one {
 	$moniker = _get_moniker( $type )
 		unless( $moniker );
 
-	load_class( $type );
-	die( sprintf( '%s cannot do basic operations!', $type ) )
-		unless( does_role( $type, 'Mongol::Roles::Core' ) );
+	_load_class( $type );
 
-	$class->meta()->add_method( sprintf( 'get_%s', $moniker ) => sub {
+	my $meta = find_meta( $class );
+
+	$meta->add_method( sprintf( 'get_%s', $moniker ) => sub {
 			my $self = shift();
 
 			return $type->retrieve( $self->$foreign_key() );
 		}
 	);
+}
+
+sub _load_class {
+	my $type = shift();
+
+	load_class( $type );
+	die( sprintf( '%s cannot do basic operations!', $type ) )
+		unless( does_role( $type, 'Mongol::Roles::Core' ) );
 }
 
 sub _get_moniker {

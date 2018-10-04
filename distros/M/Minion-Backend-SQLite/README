@@ -176,9 +176,9 @@ METHODS
       my $bool = $backend->fail_job(
         $job_id, $retries, {msg => 'Something went wrong!'});
 
-    Transition from active to failed state, and if there are attempts
-    remaining, transition back to inactive with an exponentially increasing
-    delay based on "backoff" in Minion.
+    Transition from active to failed state with or without a result, and if
+    there are attempts remaining, transition back to inactive with an
+    exponentially increasing delay based on "backoff" in Minion.
 
  finish_job
 
@@ -186,7 +186,7 @@ METHODS
       my $bool = $backend->finish_job($job_id, $retries, 'All went well!');
       my $bool = $backend->finish_job($job_id, $retries, {msg => 'All went well!'});
 
-    Transition from active to finished state.
+    Transition from active to finished state with or without a result.
 
  history
 
@@ -210,6 +210,9 @@ METHODS
 
     Returns the information about jobs in batches.
 
+      # Get the total number of results (without limit)
+      my $num = $backend->list_jobs(0, 100, {queues => ['important']})->{total};
+    
       # Check job state
       my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
       my $state = $results->{jobs}[0]{state};
@@ -228,7 +231,7 @@ METHODS
 
     queues
 
-        queue => ['important', 'unimportant']
+        queues => ['important', 'unimportant']
 
       List only jobs in these queues.
 
@@ -281,6 +284,12 @@ METHODS
         finished => 784111777
 
       Epoch time job was finished.
+
+    id
+
+        id => 10025
+
+      Job id.
 
     notes
 
@@ -355,6 +364,9 @@ METHODS
 
     Returns information about locks in batches.
 
+      # Get the total number of results (without limit)
+      my $num = $backend->list_locks(0, 100, {names => ['bar']})->{total};
+    
       # Check expiration time
       my $results = $backend->list_locks(0, 1, {names => ['foo']});
       my $expires = $results->{locks}[0]{expires};
@@ -388,6 +400,9 @@ METHODS
 
     Returns information about workers in batches.
 
+      # Get the total number of results (without limit)
+      my $num = $backend->list_workers(0, 100)->{total};
+    
       # Check worker host
       my $results = $backend->list_workers(0, 1, {ids => [$worker_id]});
       my $host    = $results->{workers}[0]{host};
@@ -401,6 +416,12 @@ METHODS
       List only workers with these ids.
 
     These fields are currently available:
+
+    id
+
+        id => 22
+
+      Worker id.
 
     host
 

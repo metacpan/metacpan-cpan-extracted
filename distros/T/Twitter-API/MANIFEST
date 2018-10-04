@@ -35,6 +35,7 @@ t/error.t
 t/oauth.t
 t/role/request-args.t
 t/trait/api-methods/direct-messages.t
+t/trait/api-methods/invalidate-access-token.t
 t/trait/api-methods/net-twitter-compatibility.t
 t/trait/api-methods/update.t
 t/trait/api-methods/upload-media.t

@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Send::SMTP;
-our $VERSION = '1.20180125'; # VERSION
+our $VERSION = '1.20181001'; # VERSION
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ sub connect_smtp {
 
     my $smtp = Net::SMTP->new(
         [ $self->get_smtp_hosts($to) ],
-        Timeout         => 10,
+        Timeout         => 30,
         Port            => 25,
         Hello           => $self->get_helo_hostname,
         Debug           => $self->verbose ? 1 : 0,
@@ -61,10 +61,11 @@ sub connect_smtp_tls {
 
     my $smtp = Net::SMTPS->new(
         [ $self->get_smtp_hosts($to) ],
-        Timeout         => 12,
+        Timeout         => 32,
         Port            => $self->config->{smtp}{smarthost} ? 587 : 25,
         Hello           => $self->get_helo_hostname,
         Debug           => $self->verbose ? 1 : 0,
+        SSL_verify_mode => 0,
         )
         or do {
             warn "SSL connection failed\n"; ## no critic (Carp)
@@ -72,13 +73,17 @@ sub connect_smtp_tls {
         };
 
     my $tls_supported = $smtp->supports('STARTTLS');
-    if ( defined ( $tls_supported ) ) {
-        $smtp->starttls();
-    }
-    else {
+    if ( ! defined $tls_supported ) {
         warn "server does not support STARTTLS\n"; ## no critic (Carp)
         return;
     }
+
+    $smtp->starttls();
+    if ( $smtp->code =~ /^5/ ) {
+        warn "server failed STARTTLS upgrade\n"; ## no critic (Carp)
+        return;
+    }
+    $smtp->hello($self->get_helo_hostname);
 
     my $c = $self->config->{smtp};
     if ( $c->{smarthost} && $c->{smartuser} && $c->{smartpass} ) {
@@ -239,7 +244,7 @@ Mail::DMARC::Report::Send::SMTP - utility methods for sending reports via SMTP
 
 =head1 VERSION
 
-version 1.20180125
+version 1.20181001
 
 =head2 SUBJECT FIELD
 
@@ -317,7 +322,7 @@ Davide Migliavacca <shari@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matt Simerson.
+This software is copyright (c) 2018 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

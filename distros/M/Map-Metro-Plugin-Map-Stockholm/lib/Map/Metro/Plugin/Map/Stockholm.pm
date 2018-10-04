@@ -2,8 +2,9 @@ use 5.16.0;
 
 package Map::Metro::Plugin::Map::Stockholm;
 
-our $VERSION = '0.1971'; # VERSION
 # ABSTRACT: Map::Metro map for Stockholm
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1972';
 
 use Moose;
 with 'Map::Metro::Plugin::Map';
@@ -32,22 +33,21 @@ Map::Metro::Plugin::Map::Stockholm - Map::Metro map for Stockholm
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.16+-brightgreen.svg" alt="Requires Perl 5.16+" /> <a href="https://travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm"><img src="https://api.travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm.svg?branch=master" alt="Travis status" /></a> <img src="https://img.shields.io/badge/coverage-69.2%-red.svg" alt="coverage 69.2%" /></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.16+-blue.svg" alt="Requires Perl 5.16+" />
+<a href="https://travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm"><img src="https://api.travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm.svg?branch=master" alt="Travis status" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/Map-Metro-Plugin-Map-Stockholm-0.1972"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Map-Metro-Plugin-Map-Stockholm/0.1972" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Map-Metro-Plugin-Map-Stockholm%200.1972"><img src="http://badgedepot.code301.com/badge/cpantesters/Map-Metro-Plugin-Map-Stockholm/0.1972" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-69.2%-red.svg" alt="coverage 69.2%" />
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.16+](https://img.shields.io/badge/perl-5.16+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm.svg?branch=master)](https://travis-ci.org/Csson/p5-Map-Metro-Plugin-Map-Stockholm) ![coverage 69.2%](https://img.shields.io/badge/coverage-69.2%-red.svg)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.1971, released 2016-01-27.
+Version 0.1972, released 2018-09-30.
 
 =head1 SYNOPSIS
 

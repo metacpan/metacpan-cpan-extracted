@@ -4,3 +4,5 @@ Revision history for Text-PRN-Slurp
         First version, released on an unsuspecting world.
 1.04    14/12/2016
         Fix testcases and improvements
+1.05    04/10/2018
+        Code made more defensive and code improvements

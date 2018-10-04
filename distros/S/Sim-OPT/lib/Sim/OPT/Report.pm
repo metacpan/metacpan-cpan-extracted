@@ -2,7 +2,7 @@ package Sim::OPT::Report;
 # Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
- 
+
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -29,7 +29,7 @@ use Data::Dumper;
 #$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
-no strict; 
+no strict;
 no warnings;
 use warnings::unused;
 @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( retrieve report newretrieve newreport get_files );
 
-$VERSION = '0.57'; # our $VERSION = '';
+$VERSION = '0.59'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -47,62 +47,34 @@ $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulat
 
 
 sub newretrieve
-{  
-  my $swap = shift; 
-  my %dat = %$swap;
-  my @instances = @{ $dat{instances} }; 
-  my $countcase = $dat{countcase}; 
-  my $countblock = $dat{countblock}; 
-  
-  my $countinstance = $dat{countinstance}; 
-  my %datastruc = %{ $dat{datastruc} }; ######
-  my @rescontainer = @{ $dat{rescontainer} }; ######
-  my %dirfiles = %{ $dat{dirfiles} }; 
-  my @simcases = @{ $dat{simcases} }; ######
-  my @simstruct = @{ $dat{simstruct} }; ######
-  my $resfile = $dat{resfile}; ################ THIS IS PROVISIONAL!!!
-    
-  $configfile = $main::configfile; 
-  @varinumbers = @main::varinumbers; 
-  @mediumiters = @main::mediumiters;
-  @rootnames = @main::rootnames; 
-  %vals = %main::vals; 
-  
-  $mypath = $main::mypath;  
-  $exeonfiles = $main::exeonfiles; 
-  $generatechance = $main::generatechance; 
+{
+  $configfile = $main::configfile;
+  %vals = %main::vals;
+  $mypath = $main::mypath;
+  $exeonfiles = $main::exeonfiles;
+  $generatechance = $main::generatechance;
   $file = $main::file;
   $preventsim = $main::preventsim;
-  $fileconfig = $main::fileconfig; 
+  $fileconfig = $main::fileconfig;
   $outfile = $main::outfile;
   $tofile = $main::tofile;
   $report = $main::report;
   $simnetwork = $main::simnetwork;
   $max_processes = $main::max_processes;
-  
+
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
-  
-  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
-  
+
+
+  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
+
   say $tee "\n#Now in Sim::OPT::Report_newretrieve.\n";
-  
-  %dowhat = %main::dowhat;
-  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
-  my $precomputed = $dowhat{precomputed}; #NEW
-  my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
-  
+
   #my $evalfiletemp = $dowhat{evalfile};
   #my $evalfile;
-  #unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-  #{
-  #  $evalfile = $mypath . "/" . $evalfiletemp;
-  #}
-  #else
-  #{
-  #  $evalfile = $mypath . "\\" . $evalfiletemp;
-  #}
-  
+  # $evalfile = $mypath . "/" . $evalfiletemp;
+
+
   #
   #if ( -e $evalfile )
   #{
@@ -110,9 +82,9 @@ sub newretrieve
   #  say $tee `cat $evalfile`;
   #  eval { `cat $evalfile` };
   #}
-        
-  %simtitles = %main::simtitles; 
-  %retrievedata = %main::retrievedata; say $tee "dump(\%retrievedata): " . dump(%retrievedata);
+
+  %simtitles = %main::simtitles;
+  %retrievedata = %main::retrievedata; #say $tee "dump(\%retrievedata): " . dump(%retrievedata);
   @keepcolumns = @main::keepcolumns;
   @weights = @main::weights;
   @weightsaim = @main::weightsaim;
@@ -121,16 +93,42 @@ sub newretrieve
   @varthemes_steps = @main::varthemes_steps;
   @rankdata = @main::rankdata; # CUT ZZZ
   @rankcolumn = @main::rankcolumn;
-  %reportdata = %main::reportdata; 
+  %reportdata = %main::reportdata;
   @files_to_filter = @main::files_to_filter;
   @filter_reports = @main::filter_reports;
   @base_columns = @main::base_columns;
   @maketabledata = @main::maketabledata;
   @filter_columns = @main::filter_columns;
   %vals = %main::vals;
-  
-  my @simcases = @{ $dirfiles{simcases} }; 
-  my @simstruct = @{ $dirfiles{simstruct} }; 
+
+  my %d = %{ $_[0] };
+  my @instances = @{ $d{instances} };
+  my $countcase = $d{countcase};
+  my $countblock = $d{countblock};
+  my $countinstance = $d{countinstance};
+  my %datastruc = %{ $d{datastruc} }; ######
+  my %dirfiles = %{ $d{dirfiles} };
+
+  my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY NEWRETRIEVE \@varnumbers : " . dump( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "IN ENTRY NEWRETRIEVE \@varnumbers : " . dump( @varnumbers );
+  my @miditers = @{ $d{miditers} }; #say $tee "IN ENTRY NEWRETRIEVE \@miditers : " . dump( @miditers );
+  @miditers = Sim::OPT::washn( @miditers ); #say $tee "IN ENTRY NEWRETRIEVE \@miditers : " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} }; say $tee "IN ENTRY NEWRETRIEVE \@sweeps : " . dump( @sweeps );
+
+  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  {
+    exit(say $tee "#END RUN.");
+  }
+
+  my @rootnames = @{ $d{rootnames} }; ######
+  my %dowhat = %{ $d{dowhat} };
+
+  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
+  my $precomputed = $dowhat{precomputed}; #NEW
+  my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
+
+  my @simcases = @{ $dirfiles{simcases} }; ######
+  my @simstruct = @{ $dirfiles{simstruct} }; ######
   my @morphcases = @{ $dirfiles{morphcases} };
   my @morphstruct = @{ $dirfiles{morphstruct} };
   my @retcases = @{ $dirfiles{retcases} };
@@ -141,10 +139,10 @@ sub newretrieve
   my @mergestruct = @{ $dirfiles{mergestruct} };
   my @descendcases = @{ $dirfiles{descendcases} };
   my @descendstruct = @{ $dirfiles{descendstruct} };
-  
-  my $morphlist = $dirfiles{morphlist}; 
+
+  my $morphlist = $dirfiles{morphlist};
   my $morphblock = $dirfiles{morphblock};
-  my $simlist = $dirfiles{simlist}; 
+  my $simlist = $dirfiles{simlist};
   my $simblock = $dirfiles{simblock};
   my $retlist = $dirfiles{retlist};
   my $retblock = $dirfiles{retblock};
@@ -152,58 +150,50 @@ sub newretrieve
   my $repblock = $dirfiles{repblock};
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
-  
-  my $skipfile = $vals{skipfile}; 
-  my $skipsim = $vals{skipsim}; 
-  my $skipreport = $vals{skipreport}; 
+  my $repfile = $dirfiles{repfile}; say $tee "IN REPORT \$repfile: " . dump($repfile);
+
+  my $skipfile = $vals{skipfile};
+  my $skipsim = $vals{skipsim};
+  my $skipreport = $vals{skipreport};
   my %notecases;
-  
+
   #my $getpars = shift;
   #eval( $getpars );
 
   #if ( fileno (MORPHLIST)
 
   #say $tee "\$countinstance: " . dump($countinstance);
-  my $instance = $instances[ $countinstance ];  #say $tee "\$instance: " . dump($instance);
+  my $instance = $instances[$countinstance];  #say $tee "\$instance: " . dump($instance);
 
-  my %d = %{$instance};
-  my $countcase = $d{countcase}; #say $tee "dump(\$countcase): " . dump($countcase);
-  my $countblock = $d{countblock}; #say $tee "dump(\@countblock): " . dump($countblock);
-  my %datastruc = %{ $d{datastruc} }; #say $tee "dump(\%datastruc): " . dump(%datastruc);######
-  my @rescontainer = @{ $d{rescontainer} }; #say $tee "dump(\@rescontainer): " . dump(@rescontainer);######
-  my @miditers = @{ $d{miditers} }; #say $tee "dump(\@miditers): " . dump(@miditers);
-  my @winneritems = @{ $d{winneritems} }; #say $tee  "dumpIN( \@winneritems) " . dump(@winneritems);
-  my $countvar = $d{countvar}; #say $tee "dump(\$countvar): " . dump($countvar );
-  my $countstep = $d{countstep}; #say $tee "dump(\$countstep): " . dump($countstep);
-  my $to = $d{to}; #say $tee "dump(\$to): " . dump($to);
-  my $origin = $d{origin}; #say $tee "dump(\$origin): " . dump($origin);
-  my @uplift = @{ $d{uplift} }; #say $tee "dump(\@uplift): " . dump(@uplift);
-  my @backvalues = @{ $d{backvalues} }; #say $tee "IN RETRIEVE \@backvalues " . dump(@backvalues);
-  my @sweeps = @{ $d{sweeps} }; #say $tee "dump(\@sweeps): " . dump(@sweeps);
-  my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
-  
+  my %dat = %{$instance};
+  my @winneritems = @{ $dat{winneritems} }; #say $tee  "dumpIN( \@winneritems) " . dump(@winneritems);
+  my $countvar = $dat{countvar}; #say $tee "dump(\$countvar): " . dump($countvar );
+  my $countstep = $dat{countstep}; #say $tee "dump(\$countstep): " . dump($countstep);
+  my $to = $dat{to}; #say $tee "dump(\$to): " . dump($to);
+  my $origin = $dat{origin}; #say $tee "dump(\$origin): " . dump($origin);
+
   #eval($getparshere);
-  
-  my $skip = $vals{$countvar}{skip}; 
-  
+
+  my $skip = $vals{$countvar}{skip};
+
   my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase); #say $tee "dump(\$rootname): " . dump($rootname);
   my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); #say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
-  
+
   my $counttool = 1;
-  while ( $counttool <= $numberof_simtools ) 
-  {  
+  while ( $counttool <= $numberof_simtools )
+  {
     my $skip = $vals{$countvar}{$counttool}{skip}; #say $tee "INWHILE dump(\$skip): " . dump($skip);
     if ( not ( eval ( $skipsim{$counttool} )))
     {
       my $tooltype = $dowhat{simtools}{$counttool}; #say $tee "INWHILE dump(\$tooltype ): " . dump($tooltype );
 
-      sub retrieve_temperatures_results 
+      sub retrieve_temperatures_results
       {
         my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile ) = @_;
 
         #unless ( ( ( not ( $resfile ~~ @simcases ) ) or (-e "$retfile") ) or ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) ) )
         #{
-          my $printthis = 
+          my $printthis =
 "res -file $resfile -mode script<<YYY
 
 3
@@ -235,7 +225,7 @@ $retfile
 YYY
 ";
           if ($exeonfiles eq "y")
-          {   
+          {
             say $tee "#Retrieving temperature results.";
             print `$printthis`;
             say $tee "$printthis";
@@ -250,7 +240,7 @@ YYY
       sub retrieve_comfort_results
       {
         my ( $result, $resfile, $retrdata_ref, $reporttitle, $stripcheck, $themereport, $counttheme, $countreport, $retfile ) = @_;
-        
+
         my @retrdata = @$retrdata_ref;
 
         unless (-e "$retfile")
@@ -285,8 +275,8 @@ $retfile
 -
 ZZZ
 ";
-          if ($exeonfiles eq "y") 
-          { 
+          if ($exeonfiles eq "y")
+          {
             say $tee "Retrieving comfort results.";
             print `$printthis`;
             say $tee "$printthis";
@@ -298,13 +288,13 @@ ZZZ
       }
 
       sub retrieve_stats_results
-      { 
+      {
         my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
         #say $tee "IN retrieve_stats_results 1. " ;
-        
-        my @retrdata = @$retrdata_ref; 
+
+        my @retrdata = @$retrdata_ref;
         my $printthis;
-        
+
         if ( $themereport eq "loads" )
         {
           unless (-e "$retfile")
@@ -357,32 +347,32 @@ m
 TTT
 ";
           }
-          else 
+          else
           {
             say $tee "THERE ALREADY IS A RETFILE!";
           }
         }
-        if ($exeonfiles eq "y") 
+        if ($exeonfiles eq "y")
         {
-          
+
           say $tee "#Retrieving $themereport results.";
           print `$printthis`;
           say $tee "$printthis";
         }
-        print $tee " 
+        print $tee "
   #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n
   $printthis
   ";
 
       }
-      
+
       sub retrieve_adhoc
-      {  
+      {
         my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
         #my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines, $adhoclines ) = @_;
-        
-        
-        my @retrdata = @$retrdata_ref; 
+
+
+        my @retrdata = @$retrdata_ref;
         #my $insert = eval { $adhoclines }; say $tee "\$insert: $insert";
         my $printthis;
         unless (-e "$retfile")
@@ -413,15 +403,15 @@ $retfile
 -
 TTT
 ";
-    
-            print $tee " 
+
+            print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n
 $printthis
 ";
-        
-            if ($exeonfiles eq "y") 
+
+            if ($exeonfiles eq "y")
             {
-              
+
               say $tee "#Retrieving $themereport results.";
               print `$printthis`;
               say $tee "$printthis";
@@ -453,15 +443,15 @@ $retfile
 -
 TTT
 ";
-    
-          print $tee " 
+
+          print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n
 $printthis
 ";
-        
-            if ($exeonfiles eq "y") 
+
+            if ($exeonfiles eq "y")
             {
-              
+
               say $tee "#Retrieving $themereport results.";
               print `$printthis`;
               say $tee "$printthis";
@@ -493,15 +483,15 @@ $retfile
 -
 TTT
 ";
-    
-          print $tee " 
+
+          print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n
 $printthis
 ";
-        
-            if ($exeonfiles eq "y") 
+
+            if ($exeonfiles eq "y")
             {
-              
+
               say $tee "#Retrieving $themereport results.";
               print `$printthis`;
               say $tee "$printthis";
@@ -533,15 +523,15 @@ $retfile
 -
 TTT
 ";
-    
-          print $tee " 
+
+          print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n
 $printthis
 ";
-        
-            if ($exeonfiles eq "y") 
+
+            if ($exeonfiles eq "y")
             {
-              
+
               say $tee "#Retrieving $themereport results.";
               print `$printthis`;
               say $tee "$printthis";
@@ -573,22 +563,22 @@ $retfile
 -
 TTT
 ";
-    
-          print $tee " 
+
+          print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n
 $printthis
 ";
-        
-            if ($exeonfiles eq "y") 
+
+            if ($exeonfiles eq "y")
             {
-              
+
               say $tee "#Retrieving $themereport results.";
               print `$printthis`;
             }
           }
         }
       }
-      
+
       #say $tee "\@simstruct : ". dump( @simstruct );
       #say $tee "\@simcases : ". dump( @simcases );
       #say $tee "\$countcase : ". dump( $countcase );
@@ -596,29 +586,29 @@ $printthis
       #say $tee "\$counttool : ". dump( $counttool );
       #say $tee "\$countinstance : ". dump( $countinstance );
 
-      my @resfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] }; say $tee "\@resfiles" . "@resfiles";
-       
+      my @resfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] }; #say $tee "\@resfiles" . "@resfiles";
+
       if ( $retrievedata{$counttool} )
       {
         #say $tee "\$retrievedata{\$counttool}: yes.";
         if ( $tooltype eq "esp-r" )
         {
           #say $tee "\$tooltype eq esp-r: yes.";
-          
+
           my $counttheme = 0;
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
-          {  
+          {
             #say $tee " IN FOREACH: \$retrievedatum: " . dump( $retrievedatum ) ;
             my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; #say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
             my @retrievedatarefs = @{$retrievedatum}; #say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
             my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; #say $tee "\$simtitle : $simtitle .";
             my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; #say $tee "\@sims : ". dump( @sims );
-            
+
             #my $resfile = $resfiles[ $counttheme ]; ################ TURNING THIS OFF IS PROVISIONAL!!!
             #say $tee "\$resfile : $resfile .";
-            
+
             #if ( not ( eval ( $skipreport ) ) )
-            if ( -e $resfile ) 
+            if ( -e $resfile )
             {
               #say $tee "\$resfile EXIXTS, SO GOING ON .";
               my $countreport = 0;
@@ -630,7 +620,7 @@ $printthis
                 my $targetprov = $sim;
                 $targetprov =~ s/$mypath\///;
                 my $result = "$mypath" . "/$targetprov"; #say $tee "\$result : ". dump( $result );
-                
+
                 #if ( fileno (RETLIST) )
                 #if (not (-e $retlist ) )
                 #{
@@ -638,12 +628,12 @@ $printthis
                 #  {
                     open( RETLIST, ">>$retlist"); # or die;
                 #  }
-                #  else 
+                #  else
                 #  {
                 #    open( RETLIST, ">>$retlist"); # or die;
                 #  }
                 #}
-                
+
                 #if ( fileno (RETLIST) ) # SAME LEVEL OF RETLIST. JUST ANOTHER CONTAINER.
                 #if (not (-e $retblock ) )
                 #{
@@ -651,40 +641,40 @@ $printthis
                 #  {
                     open( RETBLOCK, ">>$retblock"); # or die;
                 #  }
-                #  else 
+                #  else
                 #  {
                 #    open( RETBLOCK, ">>$retblock"); # or die;
                 #  }
                 #}
-                
+
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport]; #say $tee "\$reportdata_ref : ". dump( $reportdata_ref );
-                my @reportdata = @$reportdata_ref;  
-                
+                my @reportdata = @$reportdata_ref;
+
                 my $countitem = 0;
                 foreach my $item ( @reportdata )
                 {
-                  say $tee "IN FOREACH 3 \$item : ". dump( $item );
-                  my %datarep = %$item;  say $tee "IN FOREACH 3 \%datarep : ". dump( %datarep);
-                  my $reporttitle = $datarep{reporttitle}; 
-                  my $themereport = $datarep{themereport}; 
-                  my $semaphorego1 = $datarep{semaphorego1}; 
-                  my $semaphorego2 = $datarep{semaphorego2}; 
-                  my $semaphorestop1 = $datarep{semaphorestop1}; 
-                  my $semaphorestop2 = $datarep{semaphorestop2}; 
-                  my $textpattern = $datarep{textpattern}; 
-                  my $afterlines = $datarep{afterlines}; 
-                  #my $adhoclines = $datarep{adhoclines}; say $tee "\$adhoclines " . dump($adhoclines); 
-                  my $retfile = "$resfile-$reporttitle-$themereport.grt"; 
-                  
+                  #say $tee "IN FOREACH 3 \$item : ". dump( $item );
+                  my %datarep = %$item;  #say $tee "IN FOREACH 3 \%datarep : ". dump( %datarep);
+                  my $reporttitle = $datarep{reporttitle};
+                  my $themereport = $datarep{themereport};
+                  my $semaphorego1 = $datarep{semaphorego1};
+                  my $semaphorego2 = $datarep{semaphorego2};
+                  my $semaphorestop1 = $datarep{semaphorestop1};
+                  my $semaphorestop2 = $datarep{semaphorestop2};
+                  my $textpattern = $datarep{textpattern};
+                  my $afterlines = $datarep{afterlines};
+                  #my $adhoclines = $datarep{adhoclines}; say $tee "\$adhoclines " . dump($adhoclines);
+                  my $retfile = "$resfile-$reporttitle-$themereport.grt";
+
                   $retstruct[$countcase][$countblock][ $countinstance ][$counttheme][$countreport][$countitem][$counttool] = $retfile;
                   print RETBLOCK "$retfile\n";
-                  
+
                   if ( not ($retfile ~~ @retcases ) )
                   {
                     push ( @retcases, $retfile );
                     say RETLIST "$retfile";
                   }
-                  
+
                   #say $tee "\$retfile : ". dump( $retfile );
                   if ( not ( $retfile ~~ @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
                   {
@@ -693,7 +683,7 @@ $printthis
                     #say $tee "\$countblock : ". dump( $countblock );
                     #say $tee "\$counttool : ". dump( $counttool );
                     #say $tee "\$countinstance : ". dump( $countinstance );
-                    push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } , 
+                    push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ,
                                       {
                                         retfile => $retfile,
                                         reporttitle => $reporttitle,
@@ -707,30 +697,30 @@ $printthis
                                         #adhoclines => $adhoclines,
                                       } );
                   }
-                  
+
                   unless ( ( $dowhat{inactivateres} eq "y" ) or ( -e $retfile ) )
                   {
                     say "#Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: going to write $retfile.\ ";
-                      
-                    if ( $themereport eq "temps" ) 
+
+                    if ( $themereport eq "temps" )
                     {
-                       retrieve_temperatures_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile ); 
+                       retrieve_temperatures_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
-                    elsif ( $themereport eq "comfort"  ) 
-                    { 
-                      retrieve_comfort_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile ); 
+                    elsif ( $themereport eq "comfort"  )
+                    {
+                      retrieve_comfort_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
                     elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) ) )
-                    { 
-                      retrieve_stats_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, 
-                            $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ); 
+                    {
+                      retrieve_stats_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme,
+                            $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines );
                     }
                     elsif ( ( $themereport eq "radent" ) or ( $themereport eq "radabs" ) or ( $themereport eq "airtemp" ) or ( $themereport eq "radtemp" ) or ( $themereport eq "restemp" ) )
-                    { 
-                      
-                      retrieve_adhoc( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, 
-                            $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ); 
-                            #$countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines, $adhoclines ); 
+                    {
+
+                      retrieve_adhoc( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme,
+                            $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines );
+                            #$countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines, $adhoclines );
                     }
                   }
                   $countitem++;
@@ -744,70 +734,70 @@ $printthis
         }
         elsif ( ( $tooltype eq "generic" ) or ( $tooltype eq "energyplus" ) )
         {  #use warnings; use strict;
-          
-          my @retfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] }; 
-          $retstruct[$countcase][$countblock][$countinstance][$counttool]  = $simstruct[$countcase][$countblock][$countinstance][$counttool] ; 
+
+          my @retfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] };
+          $retstruct[$countcase][$countblock][$countinstance][$counttool]  = $simstruct[$countcase][$countblock][$countinstance][$counttool] ;
           my $counttheme = 0;
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
           {
-            my $reportdata_ref_ref__ = $reportdata{$counttool}; 
-            my @retrievedatarefs = @{$retrievedatum}; 
-            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; 
-            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; 
-            
-            my $resfile = $resfiles[ $counttheme ]; 
-            
-            
+            my $reportdata_ref_ref__ = $reportdata{$counttool};
+            my @retrievedatarefs = @{$retrievedatum};
+            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0];
+            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4];
+
+            my $resfile = $resfiles[ $counttheme ];
+
+
             my $countpart = 0;
             foreach ( @$reportdata_ref_ref__ )
             {
               $reportdata_ref_ref = $reportdata{$counttool}->[$countpart];
-            
-            
-            
-              if ( -e $resfile ) 
-              {
-                
 
-                my @retrdata = @$retrievedataref; 
-        
+
+
+              if ( -e $resfile )
+              {
+
+
+                my @retrdata = @$retrievedataref;
+
                 open( RETLIST, ">>$retlist"); # or die;
                 open( RETBLOCK, ">>$retblock"); # or die;
-                                        
-                my $reportdata_ref = $reportdata_ref_ref->[$countreport]; 
-                my @reportdata = @$reportdata_ref;  
+
+                my $reportdata_ref = $reportdata_ref_ref->[$countreport];
+                my @reportdata = @$reportdata_ref;
                 @retcases = uniq( @retcases );
-                my $retfile = "$resfile"; 
+                my $retfile = "$resfile";
                 if ( not ($retfile ~~ @retcases ) )
                 {
                   push ( @retcases, $retfile );
                   say RETLIST "$retfile";
                 }
                 my @provbag;
-                
+
                 push ( @provbag, $retfile );
-                  
+
                 my $countitem = 0;
                 foreach my $item ( @reportdata )
                 {
-                  my %datarep = %$item; 
-                  my $reporttitle = $datarep{reporttitle}; 
-                  my $themereport = $datarep{themereport}; 
-                  my $semaphorego1 = $datarep{semaphorego1}; 
-                  my $semaphorego2 = $datarep{semaphorego2}; 
-                  my $semaphorestop1 = $datarep{semaphorestop1}; 
-                  my $semaphorestop2 = $datarep{semaphorestop2}; 
-                  my $textpattern = $datarep{textpattern}; 
-                  my $afterlines = $datarep{afterlines}; 
-                  
-                  
+                  my %datarep = %$item;
+                  my $reporttitle = $datarep{reporttitle};
+                  my $themereport = $datarep{themereport};
+                  my $semaphorego1 = $datarep{semaphorego1};
+                  my $semaphorego2 = $datarep{semaphorego2};
+                  my $semaphorestop1 = $datarep{semaphorestop1};
+                  my $semaphorestop2 = $datarep{semaphorestop2};
+                  my $textpattern = $datarep{textpattern};
+                  my $afterlines = $datarep{afterlines};
+
+
                   print RETBLOCK "$retfile\n";
-  
-                  
-                  #if ( not ( $retfile ~~ @provbag ) ) 
+
+
+                  #if ( not ( $retfile ~~ @provbag ) )
                   #{
-                    
-                    push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } , 
+
+                    push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ,
                                       {
                                         retfile => $retfile,
                                         reporttitle => $reporttitle,
@@ -825,89 +815,60 @@ $printthis
 
 
               }
-              else  
-              { 
+              else
+              {
                 say "A RESULT FILE NAMED $resfile DOES NOT EXIST. EXITING.";
               }
-              
-            
-            
+
+
+
               $countpart++;
             }
-            
-            
-            
+
+
+
             $counttheme++;
           }
           $counttool++;
         }
-      }  
+      }
     }
   }
-  
+
   `rm -f $mypath/*.par`;
   print $tee "rm -f $mypath/*.par\n";
   close OUTFILE;
   close TOFILE;
   close RETLIST;
   close RETBLOCK;
-  
-  
-  #say $tee "\@notecases " . dump( @notecases ); 
+
+
+  #say $tee "\@notecases " . dump( @notecases );
 
   if ( $dowhat{neweraseres} eq "y" )
   {
     `rm -f $resfile` ;
   }
-  
+
   return ( \@retcases, \@retstruct, \@notecases );
 }  # END SUB NEWRETRIEVE
 
 sub newreport # This function retrieves the results of interest from the texts files created by the "retrieve" function
 {
-  my $swap = shift; 
-  my %dat = %$swap;
-  my @instances = @{ $dat{instances} }; 
-  my $countcase = $dat{countcase}; 
-  my $countblock = $dat{countblock}; 
-  my $countinstance = $dat{countinstance}; 
-  my %datastruc = %{ $dat{datastruc} }; ######
-  my @rescontainer = @{ $dat{rescontainer} }; ######
-  my %dirfiles = %{ $dat{dirfiles} }; 
-  my @simcases = @{ $dat{simcases} }; ######
-  my @simstruct = @{ $dat{simstruct} }; ######
-  my $resfile = $dat{resfile}; 
-    
-  $configfile = $main::configfile; 
-  @varinumbers = @main::varinumbers; 
-  @mediumiters = @main::mediumiters;
-  @rootnames = @main::rootnames; 
-  %vals = %main::vals; 
-  
-  $mypath = $main::mypath;  
-  $exeonfiles = $main::exeonfiles; 
-  $generatechance = $main::generatechance; 
+  $configfile = $main::configfile;
+  %vals = %main::vals;
+  $mypath = $main::mypath;
+  $exeonfiles = $main::exeonfiles;
+  $generatechance = $main::generatechance;
   $file = $main::file;
   $preventsim = $main::preventsim;
-  $fileconfig = $main::fileconfig; 
+  $fileconfig = $main::fileconfig;
   $outfile = $main::outfile;
   $tofile = $main::tofile;
   $report = $main::report;
   $simnetwork = $main::simnetwork;
-  
-  $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
-  
-  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
-  say $tee "\nNow in Sim::OPT::Report::newreport.\n";
-  
-  
-  %dowhat = %main::dowhat;
-  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
-  my $precomputed = $dowhat{precomputed}; #NEW
-  my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
 
-  %simtitles = %main::simtitles; 
+  %simtitles = %main::simtitles;
   %retrievedata = %main::retrievedata;
   @keepcolumns = @main::keepcolumns;
   @weights = @main::weights;
@@ -917,381 +878,401 @@ sub newreport # This function retrieves the results of interest from the texts f
   @varthemes_steps = @main::varthemes_steps;
   @rankdata = @main::rankdata; # CUT ZZZ
   @rankcolumn = @main::rankcolumn;
-  %reportdata = %main::reportdata; 
+  %reportdata = %main::reportdata;
   @files_to_filter = @main::files_to_filter;
   @filter_reports = @main::filter_reports;
   @base_columns = @main::base_columns;
   @maketabledata = @main::maketabledata;
   @filter_columns = @main::filter_columns;
   %notecases = %main::notecases;
-  
-  my @simcases = @{ $dirfiles{simcases} }; 
-  my @simstruct = @{ $dirfiles{simstruct} }; 
+
+  $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
+
+  #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
+  say $tee "\nNow in Sim::OPT::Report::newreport.\n";
+
+  my %d = %{ $_[0] };
+  my @instances = @{ $d{instances} };
+  my $countcase = $d{countcase};
+  my $countblock = $d{countblock};
+  my $countinstance = $d{countinstance};
+  my %datastruc = %{ $d{datastruc} }; ######
+  my %dirfiles = %{ $d{dirfiles} };
+  my @simcases = @{ $d{simcases} }; ######
+  my @simstruct = @{ $d{simstruct} }; ######
+  my @varnumbers = @{ $d{varnumbers} }; ######
+
+  my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY NEWREPORT \@varnumbers : " . dump( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "IN ENTRY NEWREPORT \@varnumbers : " . dump( @varnumbers );
+  my @miditers = @{ $d{miditers} }; #say $tee "IN ENTRY NEWREPORT \@miditers : " . dump( @miditers );
+  @miditers = Sim::OPT::washn( @miditers ); #say $tee "IN ENTRY NEWREPORT \@miditers : " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} }; #say $tee "IN ENTRY NEWREPORT \@sweeps : " . dump( @sweeps );
+
+  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  {
+    exit(say $tee "#END RUN.");
+  }
+
+  my %dowhat = %{ $d{dowhat} }; #say $tee "DOWHAT IN NEWREPORT " . dump( %dowhat );
+  my $resfile = $d{resfile};
+
+
+  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
+  my $precomputed = $dowhat{precomputed}; #say $tee "PRECOMPUTED : " . dump( $precomputed );
+  my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
+
+  my @precomputeds;
+
+
+  if (not ( $precomputed eq "" ) ) ############################NEW. END. TAKE CARE.
+  {
+    open ( PRECOMPUTED, "$precomputed" ) or die;
+    @precomputeds = <PRECOMPUTED>;
+    close PRECOMPUTED;
+  }
+
+
+
+  my @simcases = @{ $dirfiles{simcases} };
+  my @simstruct = @{ $dirfiles{simstruct} };
   my @INREPORT = @{ $dirfiles{morphcases} };
   my @morphstruct = @{ $dirfiles{morphstruct} };
-  my @retcases = @{ $dirfiles{retcases} }; 
-  my @retstruct = @{ $dirfiles{retstruct} }; 
+  my @retcases = @{ $dirfiles{retcases} };
+  my @retstruct = @{ $dirfiles{retstruct} };
   my @repcases = @{ $dirfiles{repcases} };
   my @repstruct = @{ $dirfiles{repstruct} };
   my @mergecases = @{ $dirfiles{mergecases} };
   my @mergestruct = @{ $dirfiles{mergestruct} };
   my @descendcases = @{ $dirfiles{descendcases} };
   my @descendstruct = @{ $dirfiles{descendstruct} };
-  my @notecases = @{ $dirfiles{notecases} }; 
-  
-  my $morphlist = $dirfiles{morphlist}; 
+  my @notecases = @{ $dirfiles{notecases} };
+  my $repfile = $dirfiles{repfile};
+
+  my $morphlist = $dirfiles{morphlist};
   my $morphblock = $dirfiles{morphblock};
-  my $simlist = $dirfiles{simlist}; 
+  my $simlist = $dirfiles{simlist};
   my $simblock = $dirfiles{simblock};
-  my $retlist = $dirfiles{retlist}; 
+  my $retlist = $dirfiles{retlist};
   my $retblock = $dirfiles{retblock};
   my $replist = $dirfiles{replist};
   my $repblock = $dirfiles{repblock};
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
-  
+
   my @repfilemem;
   my @linecontent;
   $" = " ";
-  my $repfile;
   #my @convey;
 
-  my $instance = $instances[ $countinstance ];
+  my $instance = $instances[$countinstance];
 
-  my %d = %{$instance};
-  my $countcase = $d{countcase}; 
-  my $countblock = $d{countblock}; 
-  my %datastruc = %{ $d{datastruc} }; ######
-  my @rescontainer = @{ $d{rescontainer} }; ######
-  my @miditers = @{ $d{miditers} }; 
-  my @winneritems = @{ $d{winneritems} }; 
-  my $countvar = $d{countvar}; 
-  my $countstep = $d{countstep}; 
-  my $to = $d{to}; 
-  my $origin = $d{origin}; 
-  my @uplift = @{ $d{uplift} }; 
-  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase); 
-  my @blockelts = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock); 
-  my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);  
-  my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock); 
-  my $from = Sim::OPT::getline($toitem); 
-  my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
-  my %mids = Sim::OPT::getcase(\@miditers, $countcase); 
-  my @backvalues = @{ $d{backvalues} }; #say $tee "IN REPORT \@backvalues " . dump(@backvalues);
-  my @sweeps = @{ $d{sweeps} }; #say $tee "dump(\@sweeps): " . dump(@sweeps);
-  my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
-  
-  my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers); 
-  my $varnumber = $countvar; 
+  my %dat = %{$instance};
+  my @winneritems = @{ $dat{winneritems} };
+  my $countvar = $dat{countvar}; #say $tee "IN REPORT \$countvar " . dump( $countvar );
+  my $countstep = $dat{countstep}; #say $tee "IN REPORT \$countstep " . dump( $countstep );
+  my $to = $dat{to};
+  my $origin = $dat{origin};
+  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
+
+  ( my $blockelts_ref ) = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock );
+	my @blockelts = @{ $blockelts_ref }; #say $tee "IN REPORT \@blockelts : " . dump( @blockelts );
+
+  my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);
+  my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock);
+  my $from = Sim::OPT::getline($toitem);
+  my %varnums = Sim::OPT::getcase( \@varnumbers, $countcase ); #say $tee "IN CALLCASE \%varnums" . dump( %varnums );
+	my %mids = Sim::OPT::getcase( \@miditers, $countcase );
+
+  my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varnumbers );
+  my $varnumber = $countvar;
 
   say $tee "#Processing reports for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1);
-  
-  open( REPLIST, ">$replist" ) or die( "$!" ); 
-  open( REPBLOCK, ">>$repblock" ) or die( "$!" ); 
-  
-  unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-  {
-    $repfile = "$mypath/$file-report-$countcase-$countblock.txt";  
-  }
-  else
-  {
-    $repfile = "$mypath\\$file-report-$countcase-$countblock.txt";  
-  }
-  
-  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!";
+
+  open( REPLIST, ">$replist" ) or die( "$!" );
+  open( REPBLOCK, ">>$repblock" ) or die( "$!" );
+
+
+  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; #say $tee "#OPENED $repfile";
   @repcases = uniq( @repcases );
-  
+
   say REPBLOCK "$repfile";
   if ( not ( $repfile ~~ @repcases ) )
   {
     push ( @repcases, $repfile );
     say REPLIST "$repfile";
   }
-  
+
   if ( not ( $repfile ~~ @{ $repstruct[$countcase][$countblock] } ) )
   {
     push ( @{ $repstruct[$countcase][$countblock] }, $repfile );
   }
   my $signalnewinstance = 1;
-  
-  #open( REPFILE, ">>$repfile") or die "Can't open $repfile $!";
-  
-  
+
 
   if ( $precomputed eq "" ) #NEW, TAKE CARE.###########################àà
   {
 
-
-  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); 
-  #my @mergestruct;
-  my $counttool = 1;
-  while ( $counttool <= $numberof_simtools )
-  {  
-    #uniq( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } );
-    my $skip = $vals{$countvar}{$counttool}{skip}; 
-    if ( not ( eval ( $skipsim{$counttool} )))
+    my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
+    #my @mergestruct;
+    my $counttool = 1;
+    while ( $counttool <= $numberof_simtools )
     {
-      my $tooltype = $dowhat{simtools}{$counttool}; 
-      #@{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } = uniq( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] }  );
-      
-      
-      #foreach $ret_ref ( sort { $a->{retfile} <=> $b->{retfile} } ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
-      foreach $ret_ref ( ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
+      #uniq( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } );
+      my $skip = $vals{$countvar}{$counttool}{skip};
+      if ( not ( eval ( $skipsim{$counttool} )))
       {
-        
-        
-        %retitem = %$ret_ref; 
-        my $retfile = $retitem{retfile}; 
-        my $reporttitle = $retitem{reporttitle}; 
-        my $themereport = $retitem{themereport}; 
-        my $semaphorego1 = $retitem{semaphorego1}; 
-        my $semaphorego2 = $retitem{semaphorego2}; 
-        my $semaphorestop1 = $retitem{semaphorestop1}; 
-        my $semaphorestop2 = $retitem{semaphorestop2}; 
-        my $textpattern = $retitem{textpattern}; 
-        my $afterlines = $retitem{afterlines}; 
-        #my $adhoclines = $retitem{adhoclines}; 
-        
-        if ( $signalnewinstance == 1 )
+        my $tooltype = $dowhat{simtools}{$counttool};
+        #@{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } = uniq( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] }  );
+
+
+        #foreach $ret_ref ( sort { $a->{retfile} <=> $b->{retfile} } ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
+        foreach $ret_ref ( ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
         {
-          push ( @{ $mergestruct[$countcase][$countblock][$countinstance] }, "$retfile " );
-          $signalnewinstance--;
-        }
-        
-        my ( $semaphore1, $semaphore2 );
-        
-        if ( -e $retfile ) #if ( not ( eval ( $skipreport ) ) )
-        {  say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
-          open( RETFILE, "$retfile" ) or die( "$!" );
-          my @lines = <RETFILE>;
-          close RETFILE;
-          
-          my $countline = 0;
-          my $signalhit = 0;
-          my $foundhit = 0;
-          my $countlin = 0;
-          my $countli = 0;
-          foreach my $line ( @lines )
+
+
+          %retitem = %$ret_ref;
+          my $retfile = $retitem{retfile};
+          my $reporttitle = $retitem{reporttitle};
+          my $themereport = $retitem{themereport};
+          my $semaphorego1 = $retitem{semaphorego1};
+          my $semaphorego2 = $retitem{semaphorego2};
+          my $semaphorestop1 = $retitem{semaphorestop1};
+          my $semaphorestop2 = $retitem{semaphorestop2};
+          my $textpattern = $retitem{textpattern};
+          my $afterlines = $retitem{afterlines};
+          #my $adhoclines = $retitem{adhoclines};
+
+          if ( $signalnewinstance == 1 )
           {
-            $line =~ s/^\s+//;
-            chomp( $line ); 
-            #$line = $line . " ";
-            
-            
-            if ( ( not ( defined( $semaphorego1 ) ) ) or ( $semaphorego1 eq "" ) or ( $line =~ m/$semaphorego1/ ) )
+            push ( @{ $mergestruct[$countcase][$countblock][$countinstance] }, "$retfile " );
+            $signalnewinstance--;
+          }
+
+          my ( $semaphore1, $semaphore2 );
+
+          if ( -e $retfile ) #if ( not ( eval ( $skipreport ) ) )
+          {  say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
+            open( RETFILE, "$retfile" ) or die( "$!" );
+            my @lines = <RETFILE>;
+            close RETFILE;
+
+            my $countline = 0;
+            my $signalhit = 0;
+            my $foundhit = 0;
+            my $countlin = 0;
+            my $countli = 0;
+            foreach my $line ( @lines )
             {
-              $semaphore1 = "on";  
-            }
-            
-            if ( $semaphore1 eq "on" )
-            {
-              if ( ( not ( defined( $semaphorego2 ) ) ) or ( $semaphorego2 eq "" ) or ( $line =~ m/$semaphorego2/ ) )
+              $line =~ s/^\s+//;
+              #chomp( $line );
+              #$line = $line . " ";
+
+
+              if ( ( not ( defined( $semaphorego1 ) ) ) or ( $semaphorego1 eq "" ) or ( $line =~ m/$semaphorego1/ ) )
               {
-                $semaphore2 = "on"; 
+                $semaphore1 = "on";
               }
-            }
-                          
-            if ( ( $line =~ m/$semaphorestop1/ ) and ( defined( $semaphorestop1 ) ) and ( $semaphorestop1 ne "" ) )
-            {
-              $semaphore1 = "off"; 
-            }
-            
-            if ( ( $line =~ m/$semaphorestop2/ ) and ( defined( $semaphorestop2 ) ) and ( $semaphorestop2 ne "" ) )
-            {
-              $semaphore2 = "off"; 
-            }
-            
-            $line =~ s/^\s+// ;
-            #$line =~ s/\s+/ /g ;
-            #$line =~ s/ /,/ ;
-            chomp( $line ); chomp( $line ); 
-            #$line = $line . " ";
-            
-            if ( ( not ( defined ( $afterlines ) ) ) or ( $afterlines eq "" ) )
-            {
-              
-              if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
-              {  
-                chomp( $line ); chomp( $line ); 
-                if ( $foundhit == 0 )
-                {  
-                  push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
-                }
-                else
+
+              if ( $semaphore1 eq "on" )
+              {
+                if ( ( not ( defined( $semaphorego2 ) ) ) or ( $semaphorego2 eq "" ) or ( $line =~ m/$semaphorego2/ ) )
                 {
-                  push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                  $semaphore2 = "on";
                 }
-                $foundhit++;
               }
-            }
-            else
-            {
-              
-              if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
-              {  
-                $signalhit++;
-              }
-              
-              if ( ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) and ( $signalhit > 0 ) )
+
+              if ( ( $line =~ m/$semaphorestop1/ ) and ( defined( $semaphorestop1 ) ) and ( $semaphorestop1 ne "" ) )
               {
-                
-                if ( not ( ref( $afterlines ) ) )
-                {  
-                  if ( ( $afterlines ne "" ) and ( $countline == ( $afterlines - 1) ) )
-                  {  
-                    chomp( $line );
+                $semaphore1 = "off";
+              }
+
+              if ( ( $line =~ m/$semaphorestop2/ ) and ( defined( $semaphorestop2 ) ) and ( $semaphorestop2 ne "" ) )
+              {
+                $semaphore2 = "off";
+              }
+
+              $line =~ s/^\s+// ;
+              #$line =~ s/\s+/ /g ;
+              #$line =~ s/ /,/ ;
+              #chomp( $line );
+              #$line = $line . " ";
+
+              if ( ( not ( defined ( $afterlines ) ) ) or ( $afterlines eq "" ) )
+              {
+
+                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                {
+                  #chomp( $line )
+                  if ( $foundhit == 0 )
+                  {
                     push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
-                    $countli++;
                   }
+                  else
+                  {
+                    push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                  }
+                  $foundhit++;
                 }
-                else
-                {  
-                  my @afterlins = @$afterlines;  
-                  my @bringer;
-                  foreach my $afterlin ( @afterlins )
-                  {  
-                    if ( not ( $afterlin =~ /-/ ) )
+              }
+              else
+              {
+
+                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                {
+                  $signalhit++;
+                }
+
+                if ( ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) and ( $signalhit > 0 ) )
+                {
+
+                  if ( not ( ref( $afterlines ) ) )
+                  {
+                    if ( ( $afterlines ne "" ) and ( $countline == ( $afterlines - 1) ) )
                     {
-                        $line =~ s/^\s+// ;
-                        #$line =~ s/\s+/ /g ;
-                        #$line =~ s/ /,/ ;
-                        chomp( $line ); chomp( $line ); 
-                        #$line = $line . " ";
-                      push ( @bringer, $afterlin );
+                      #chomp( $line );
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
+                      $countli++;
                     }
-                    else
+                  }
+                  else
+                  {
+                    my @afterlins = @$afterlines;
+                    my @bringer;
+                    foreach my $afterlin ( @afterlins )
                     {
-                      
-                      my ( $count, $endel ) = split( /-/, $afterlin );
-                      while ( $count <= $endel )
+                      if ( not ( $afterlin =~ /-/ ) )
                       {
-                        push ( @bringer, $count );
-                        $count++;
+                          $line =~ s/^\s+// ;
+                          #$line =~ s/\s+/ /g ;
+                          #$line =~ s/ /,/ ;
+                          #chomp( $line );
+                          #$line = $line . " ";
+                        push ( @bringer, $afterlin );
                       }
-                    }
-                    
-                    my $countlocal = 0;
-                    foreach my $afterl ( @bringer )
-                    {
-                      
-                      if ( $countline == ( $afterl - 1 ) )
+                      else
                       {
-                        chomp( $line );
-                        if ( $countlocal == 0 )
+
+                        my ( $count, $endel ) = split( /-/, $afterlin );
+                        while ( $count <= $endel )
                         {
-                          push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
-                        }
-                        else
-                        {
-                          push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                          push ( @bringer, $count );
+                          $count++;
                         }
                       }
-                      $counlin++;
-                      $countlocal++;
+
+                      my $countlocal = 0;
+                      foreach my $afterl ( @bringer )
+                      {
+
+                        if ( $countline == ( $afterl - 1 ) )
+                        {
+                          #chomp( $line );
+                          if ( $countlocal == 0 )
+                          {
+                            push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
+                          }
+                          else
+                          {
+                            push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                          }
+                        }
+                        $counlin++;
+                        $countlocal++;
+                      }
                     }
                   }
                 }
               }
+              $countline++;
             }
-            $countline++; 
+          }
+          else
+          {
+            open ( NOTFOUND, ">./notfound.txt" ) or die $! ;
+            say NOTFOUND $retfile;
+
           }
         }
-        else 
-        { 
-          open ( NOTFOUND, ">./notfound.txt" ) or die $! ;
-          say NOTFOUND $retfile;
-          
-        }
       }
+      $counttool++;
     }
-    $counttool++;
-  } 
-  
-  unless ( $dowhat{inactivateret} eq "y" )
-  {
-    
-    foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
+
+    unless ( $dowhat{inactivateret} eq "y" )
     {
-      $thing =~ s/\n/ /g ; $thing =~ s/\n/ /g ; $thing =~ s/\r/ /g ; $thing =~ s/\r/ /g ;
-      $thing =~ s/\r\n/ /g; $thing =~ s/\r\n/ /g;
-      $thing =~ s/\s+/ /g ;
-      $thing =~ s/ ,/,/g ;
-      $thing =~ s/, /,/g ;
-      $thing =~ s/ /,/g ;
-      print REPFILE $thing;
-      print REPFILE ",";
+
+      foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
+      {
+        $thing =~ s/\n/ /g ; $thing =~ s/\n/ /g ; $thing =~ s/\r/ /g ; $thing =~ s/\r/ /g ;
+        $thing =~ s/\r\n/ /g; $thing =~ s/\r\n/ /g;
+        $thing =~ s/\s+/ /g ;
+        $thing =~ s/ ,/,/g ;
+        $thing =~ s/, /,/g ;
+        $thing =~ s/ /,/g ;
+        print REPFILE $thing;
+        print REPFILE ",";
+      }
+      print REPFILE "\n";
+
+    #my $lin;
+    #foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
+    #{
+    #  $thing =~ s/\n/ /g ;
+    #  $lin = $lin . $thing . " ";
+    #}
+    #push ( @{ $convey[ $countcase ][ $counblock ] }, $lin );
+      say "#Reporting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance: writing $repfile. ";
     }
-    print REPFILE "\n";
-  
-  #my $lin;
-  #foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
-  #{
-  #  $thing =~ s/\n/ /g ; 
-  #  $lin = $lin . $thing . " ";
-  #}
-  #push ( @{ $convey[ $countcase ][ $counblock ] }, $lin );
-    say "#Reporting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance: writing $repfile. ";
-  }
 
 
   } #END NEW. TAKE CARE.
-  
-  #if ( @repfilemem ~~ @mergecases ) 
-  #{ 
+
+  #if ( @repfilemem ~~ @mergecases )
+  #{
   #  push ( @mergecases,  @repfilemem );
   #}
-  
-  
+
+
   #foreach ( sort ( @{ $convey[ $countcase ][ $counblock ] } ) )
   #{
-  
+
 
   if (not ( $precomputed eq "" ) ) ############################NEW. END. TAKE CARE.
   {
-    open ( PRECOMPUTED, "$precomputed" ) or die;
-    my @lines = <PRECOMPUTED>;
-    close PRECOMPUTED;
-    
+    #say $tee "LOOKING.";
     my $touse = $to;
     $touse =~ s/$mypath\///;
-    print "TO: $touse\n";
-    foreach my $line ( @lines )
+    #say $tee "TOUSE: $touse\n";
+    foreach my $line ( @precomputeds )
     {
       if ( $line =~ /$touse/ )
       {
         push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
-        #print "FOUND!!! for $repfile\n";
-        print REPFILE "$line"; 
+        #say $tee "FOUND!!! for $repfile\n";
+        #say $tee "LINE! $line";
+        $line =~ s/\s+/ /g ;
+        $line =~ s/ ,/,/g ;
+        $line =~ s/, /,/g ;
+        $line =~ s/ /,/g ;
+        say REPFILE "$line";
       }
     }
   }
-  else
-  { 
-    print REPFILE "$_"; 
-    #}
-  }
+  #else
+  #{
+  #  print REPFILE "$_";
+  #  #}
+  #}
   close REPFILE;
 
-  my $repstore = $repfile . ".csv";
-  
+
   open ( REPFILE, "$repfile" ) or die "$!";
   my @lins = <REPFILE>;
   close  REPFILE;
 
-  open( REPSTORE, ">>$repstore" ) or die "$!";
-  foreach my $lin ( @lins )
-  {
-    $thing =~ s/\s+/ /g ;
-    $thing =~ s/ ,/,/g ;
-    $thing =~ s/, /,/g ;
-    $thing =~ s/ /,/g ;
-    print REPSTORE "$lin";
-  }
 
-  close REPSTORE;
+  #say $tee "HEREIS \@repcases " . dump(@repcases); say $tee "\@repstruct " . dump(@repstruct);
 
-  #say $tee "HEREIS \@repcases " . dump(@repcases); say $tee "\@repstruct " . dump(@repstruct); 
-  
   close TOFILE;
   close OUTFILE;
 
@@ -1300,50 +1281,49 @@ sub newreport # This function retrieves the results of interest from the texts f
     `rm -f $mypath/*.grt` ;
     print $tee "rm -f $mypath/*.grt";
   }
-  
-  return ( \@repcases, \@repstruct, \@mergestruct, \@mergecases, $repfile ); 
+  if (not( -e $repfile ) ){ die; };
+  return ( \@repcases, \@repstruct, $repfile, \@mergestruct, \@mergecases,  );
 } # END SUB NEWREPORT;
-
 
 
 
 sub get_files # UNUSED. LEGACY. CUT.
 {
   say $tee "Extracting statistics for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance: " . ( $countinstance + 1);
-  my ( $themereport, $countcase, $countblock, $counttheme, $countreport, $retfile, $repfile, 
+  my ( $themereport, $countcase, $countblock, $counttheme, $countreport, $retfile, $repfile,
     $simtitle, $reporttitle, $simdatum, $retrievsref, $countinstance, $swap, $loadsortemps ) = @_;
-    
-    
-  my @repfilemem = @$swap; 
+
+
+  my @repfilemem = @$swap;
   my @retrievs = @$retrievsref;
-  
-  my @measurements_to_report = $retrievs[0]; 
-  my $dates_to_report = $simtitle; 
-  
-  
+
+  my @measurements_to_report = $retrievs[0];
+  my $dates_to_report = $simtitle;
+
+
   open( RETFILE,  "$retfile" ) or die "Can't open $retfile $!";
-  my @lines_to_inspect = <RETFILE>; 
+  my @lines_to_inspect = <RETFILE>;
 
   my @countcolumns;
   my $countzones = 0;
   my $countlines = 0;
-  foreach my $line_to_inspect (@lines_to_inspect) 
+  foreach my $line_to_inspect (@lines_to_inspect)
   {
     if ( $line_to_inspect )
     {
-      
+
       $line_to_inspect =~ s/^\s+//g;### DO THIS? ZZZ
       $line_to_inspect =~ s/\s*$//;      #remove trailing whitespace
       #$line_to_inspect =~ s/\ {2,}/ /g;  #remove multiple literal spaces
-      $line_to_inspect =~ s/\t{2,}/\t/g; 
-      
+      $line_to_inspect =~ s/\t{2,}/\t/g;
+
       if ( $themereport eq "temps" ) # NEVER CHECKED IF IT STILL WORKS AFTER SOME USES
       {
         my @roww = split( /\s+/, $line_to_inspect );
         if ( $countlines == 1 )
         {
           $file_and_period = $roww[5];
-        } 
+        }
         elsif ( $countlines == 3 )
         {
           my $countcolumn = 0;
@@ -1367,7 +1347,7 @@ sub get_files # UNUSED. LEGACY. CUT.
             $countcolumn = $countcolumn + 1;
           }
           #push ( @{ $repfilemem[$countlines] }, "\n" );
-        } 
+        }
         elsif ( $countlines > 3 )
         {
           foreach $columnumber (@countcolumns)
@@ -1381,15 +1361,15 @@ sub get_files # UNUSED. LEGACY. CUT.
         }
         $countlines++;
       }
-      
+
       if ( $themereport eq "comfort" ) # NEVER CHECKED IF IT STILL WORKS AFTER SOME USES
-      {        
+      {
         my @roww = split( /\s+/, $line_to_inspect );
 
         if ( $countlines == 1 )
         {
           $file_and_period = $roww[5];
-        } 
+        }
         elsif ( $countlines == 3 )
         {
           my $countcolumn = 0;
@@ -1403,7 +1383,7 @@ sub get_files # UNUSED. LEGACY. CUT.
                 if ( $elt_of_row eq $columns_to_report[0] )
                 {
                   $title_of_column = "$elt_of_row";
-                } 
+                }
                 else
                 {
                   $title_of_column =
@@ -1415,7 +1395,7 @@ sub get_files # UNUSED. LEGACY. CUT.
             $countcolumn = $countcolumn + 1;
           }
           #push ( @{ $repfilemem[$countlines] }, "\n" );
-        } 
+        }
         elsif ( $countlines > 3 )
         {
           foreach $columnumber (@countcolumns)
@@ -1429,11 +1409,11 @@ sub get_files # UNUSED. LEGACY. CUT.
         }
         $countlines++;
       }
-      
+
       my $line_to_report;
-      
-      if ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats" ) ) 
-      {  
+
+      if ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats" ) )
+      {
         if ( $line_to_inspect =~ /^$loadsortemps/ )
         {
           $line_to_report = "$retfile " . " $themereport $reporttitle " . $line_to_inspect . " " ;
@@ -1446,8 +1426,8 @@ sub get_files # UNUSED. LEGACY. CUT.
       }
     }
   }
-  
-  return (@repfilemem); 
+
+  return (@repfilemem);
 } # END SUB get_files
 
 1;

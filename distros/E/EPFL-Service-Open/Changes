@@ -1,4 +1,10 @@
 Revision history for EPFL-Service-Open
 
+1.01    2018-10-03
+        Add new repositories
+        Criticise code in tests
+        Test against Perl 5.28
+        Clean README and CONTRIBUTING
+
 1.00    2018-04-18
         First version, released on an unsuspecting world.

@@ -1,0 +1,65 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/Meetup-API.svg?branch=master)](https://travis-ci.org/Corion/Meetup-API)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Meetup-API?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Meetup-API)
+
+# NAME
+
+Meetup::API - interface to the Meetup API
+
+# SYNOPSIS
+
+    use Meetup::API;
+    my $meetup = Meetup::API->new();
+    my $events = $meetup->group_events($groupname)->get;
+
+# METHODS
+
+## `Meetup::API->new %options`
+
+- **version**
+
+    Allows you to specify the API version. The current
+    default is `v3`, which corresponds to the
+    Meetup API version 3 as documented at
+    [http://www.meetup.com/en-EN/meetup\_api/docs/](http://www.meetup.com/en-EN/meetup_api/docs/).
+
+# SETUP
+
+- 0. Register with meetup.com
+- 1. Click on their verification email link
+- 2. Visit [https://secure.meetup.com/de-DE/meetup\_api/key/](https://secure.meetup.com/de-DE/meetup_api/key/)
+to get the API key
+- 4. Create a JSON file named `meetup.credentials`
+
+    This file should live in your
+    home directory
+    with the API key:
+
+        {
+          "applicationKey": ".............."
+        }
+
+# SEE ALSO
+
+[Meetup::API::v3](https://metacpan.org/pod/Meetup::API::v3)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Meetup-API](https://github.com/Corion/Meetup-API).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2016-2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

@@ -1,6 +1,6 @@
 package IO::ReadHandle::Chain;
 
-use v5.12.0;
+use v5.14;
 use strict;
 use warnings;
 
@@ -15,11 +15,11 @@ read handle
 
 =head1 VERSION
 
-Version 1.2.1
+Version 1.2.2
 
 =cut
 
-use version; our $VERSION = version->declare('v1.2.1');
+use version; our $VERSION = version->declare('v1.2.2');
 
 =head1 SYNOPSIS
 

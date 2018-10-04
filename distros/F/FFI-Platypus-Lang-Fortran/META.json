@@ -55,19 +55,19 @@
    "provides" : {
       "FFI::Build::File::Fortran" : {
          "file" : "lib/FFI/Build/File/Fortran.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "FFI::Platypus::Lang::Fortran" : {
          "file" : "lib/FFI/Platypus/Lang/Fortran.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Module::Build::FFI::Fortran" : {
          "file" : "lib/Module/Build/FFI/Fortran.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Module::Build::FFI::Fortran::ExtUtilsF77" : {
          "file" : "lib/Module/Build/FFI/Fortran/ExtUtilsF77.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -83,6 +83,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

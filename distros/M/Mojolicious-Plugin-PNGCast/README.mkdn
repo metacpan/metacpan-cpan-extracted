@@ -1,0 +1,99 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/Mojolicious-Plugin-PNGCast.svg?branch=master)](https://travis-ci.org/Corion/Mojolicious-Plugin-PNGCast)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Mojolicious-Plugin-PNGCast?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Mojolicious-Plugin-PNGCast)
+
+# NAME
+
+Mojolicious::Plugin::PNGCast - in-process server to display a screencast
+
+# DESCRIPTION
+
+Use this web application to display the screencast of a (headless) web browser
+or other arbitrary PNG data sent to it via websocket.
+
+The synopsis shows how to use this plugin to display
+a Chrome screencast using [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW::Mechanize::Chrome).
+
+# SYNOPSIS
+
+    use Mojolicious::Lite;
+    use Mojo::Server::Daemon;
+    use WWW::Mechanize::Chrome;
+    plugin 'PNGCast';
+
+    my $daemon_url = 'http://localhost:3000';
+
+    my $ws_monitor = Mojo::Server::Daemon->new(app => app());
+    $ws_monitor->listen([$daemon_url]);
+    $ws_monitor->start;
+
+    my $mech = WWW::Mechanize::Chrome->new( headless => 1 );
+    $mech->setScreenFrameCallback( sub {
+        app->send_frame( $_[1]->{data} )}
+    );
+
+    print "Watch progress at $daemon_url\n";
+    sleep 5;
+
+    $mech->get('https://example.com');
+
+# HELPERS
+
+## `app->send_frame`
+
+    app->send_frame( $png_data );
+
+Sends a frame to all connected clients. If a fresh client connects, it will
+receive the last frame handed to `send_frame`.
+
+# INTERNAL METHODS
+
+## `$plugin->notify_clients`
+
+    $plugin->notify_clients( $PNGframe )
+
+Notify all connected clients that they should display the new frame.
+
+# EXPORTED HTTP ENDPOINTS
+
+This plugin makes the following endpoints available
+
+- `/` - the index page
+
+    This is an HTML page that opens a websocket to the webserver and listens for
+    PNG images coming in over that websocket
+
+- `/ws` - the websocket
+
+    This is a websocket
+
+- `/stop` - stop the application
+
+    This stops the complete Mojolicious application
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Mojolicious-Plugin-PNGCast](https://github.com/Corion/Mojolicious-Plugin-PNGCast).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Mojolicious-Plugin-PNGCast](https://rt.cpan.org/Public/Dist/Display.html?Name=Mojolicious-Plugin-PNGCast)
+or via mail to [Mojolicious-Plugin-PNGCast-Bugs@rt.cpan.org](mailto:Mojolicious-Plugin-PNGCast-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2010-2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

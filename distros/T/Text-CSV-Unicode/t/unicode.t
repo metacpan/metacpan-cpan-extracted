@@ -7,19 +7,10 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 32;
 
-BEGIN{ 
-    unless( $ENV{TEST_CSV_UNICODE_SKIP_REQUIRES} ) {
-	no warnings qw(portable); 
-        plan skip_all => 'requires perl v5.8.0'
-                unless eval{ require 5.8.0 }; 
-        plan skip_all => 'charnames required'
-                unless eval{ require charnames }; 
-    }
-    plan tests => 29;
-    use_ok('Text::CSV::Unicode')
-}
+BEGIN { use_ok('Text::CSV::Unicode') }
+
 my $tester=Test::More->builder;
 
 #########################
@@ -27,7 +18,7 @@ my $tester=Test::More->builder;
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-my $csv = Text::CSV::Unicode->new();
+my $csv = Text::CSV::Unicode->new( { always_quote => 1 } );
 
 ok (! $csv->combine(),		'fail - missing argument');
 ok (! $csv->combine('abc', "def\n", 'ghi'),
@@ -77,11 +68,13 @@ ok (($csv->parse(qq("","I said,\t""Hi!""","")) and
 
 ok( $csv->version(), 'inheritted version() works');
 
-my $warning;
+ok( $csv->isa('Text::CSV::Unicode'), 'creates a Text::CSV::Unicode object' );
+
+my $warn;
 sub _warning(&) {
     my $sub = shift;
-    local $SIG{__WARN__} = sub { $warning .= shift; };
-    $warning = '';
+    local $SIG{__WARN__} = sub { $warn .= $_[0]; };
+    $warn = q{};
     return $sub->();
 }
 
@@ -89,13 +82,13 @@ _warning {
     no warnings qw(deprecated);
     Text::CSV::Unicode->new( { binary => 1 } )
 };
-diag $warning if $warning;
-ok (!$warning, q(no 'deprecated' warning) );
+diag $warn if $warn;
+ok (!$warn, q(no 'deprecated' warning) );
 
 my $csv1 = _warning { Text::CSV::Unicode->new( { binary => 1 } ) };
 {
-    my $warnok = $warning && $warning =~ /\bbinary\sis\sdeprecated\b/;
-    diag( $warning || '(no warning)' ) unless $warnok;
+    my $warnok = $warn && $warn =~ /\bbinary\sis\sdeprecated\b/;
+    diag( $warn || '(no warning)' ) unless $warnok;
     ok ( $warnok, q('binary is deprecated' warning) );
 }
 
@@ -118,15 +111,18 @@ ok( $csv1->version(), 'inheritted version() works - binary`');
 
 is( Text::CSV::Unicode->VERSION(), $Text::CSV::Unicode::VERSION,
 				'class version() works properly');
+
+ok( !$csv1->isa('Text::CSV::Unicode'), 
+	'binary=>1 does not create a Text::CSV::Unicode object' );
+
 #
 # empty subclass test
 #
-package Empty_Subclass;
-our @ISA = qw(Text::CSV::Unicode);
+@Text::CSV::Empty::ISA = qw(Text::CSV::Unicode);
 
-package main;
-my $empty = Empty_Subclass->new();
+my $empty = Text::CSV::Empty->new();
 ok (($empty->version() and $empty->parse('') and $empty->combine('')),
 				'empty subclass test');
 
-# $Id$
+ok( $empty->isa('Text::CSV::Unicode'),
+	'empty subclass creates a Text::CSV::Unicode object' );

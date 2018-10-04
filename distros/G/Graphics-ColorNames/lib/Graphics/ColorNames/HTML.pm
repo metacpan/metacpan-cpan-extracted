@@ -1,8 +1,51 @@
 package Graphics::ColorNames::HTML;
 
+# ABSTRACT: HTML color names and equivalent RGB values
+
+
+use strict;
+use warnings;
+
+our $VERSION = 'v3.2.0';
+
+sub NamesRgbTable() {
+    use integer;
+    return {
+        'black'   => 0x000000,
+        'blue'    => 0x0000ff,
+        'aqua'    => 0x00ffff,
+        'lime'    => 0x00ff00,
+        'fuchsia' => 0xff00ff,    # "fuscia" is incorrect but common
+        'fuscia'  => 0xff00ff,    # mis-spelling...
+        'red'     => 0xff0000,
+        'yellow'  => 0xffff00,
+        'white'   => 0xffffff,
+        'navy'    => 0x000080,
+        'teal'    => 0x008080,
+        'green'   => 0x008000,
+        'purple'  => 0x800080,
+        'maroon'  => 0x800000,
+        'olive'   => 0x808000,
+        'gray'    => 0x808080,
+        'silver'  => 0xc0c0c0,
+    };
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Graphics::ColorNames::HTML - HTML color names and equivalent RGB values
+
+=head1 VERSION
+
+version v3.2.0
 
 =head1 SYNOPSIS
 
@@ -16,7 +59,10 @@ Graphics::ColorNames::HTML - HTML color names and equivalent RGB values
 This module defines color names and their associated RGB values from the
 HTML 4.0 Specification.
 
-=head2 Note
+This module is deprecated, and will be split into a separate
+distribution.  You should use L<Graphics::ColorNames::WWW> instead.
+
+=head1 KNOWN ISSUES
 
 In versions prior to 1.1, "fuchsia" was misspelled "fuscia". This
 mispelling came from un unidentified HTML specification.  It also
@@ -25,52 +71,34 @@ proper spelling was added.
 
 =head1 SEE ALSO
 
-L<Graphics::ColorNames>,  HTML 4.0 Specificiation <http://www.w3.org>
+L<Graphics::ColorNames>
 
-L<Graphics::ColorNames::SVG>, which uses color names based on the SVG
-specification (which is more recent).
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Graphics-ColorNames>
+and may be cloned from L<git://github.com/robrwo/Graphics-ColorNames.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames> or
+by email to
+L<bug-Graphics-ColorNames@rt.cpan.org|mailto:bug-Graphics-ColorNames@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo at cpan.org>
+Robert Rothenberg <rrwo@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2001-2008 Robert Rothenberg. All rights reserved.
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This software is Copyright (c) 2001-2018 by Robert Rothenberg.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-use strict;
-use warnings;
-
-our $VERSION = '2.11';
-#$VERSION = eval $VERSION;
-
-sub NamesRgbTable() {
-  use integer;
-  return {
-    'black'	         => 0x000000,
-    'blue'	         => 0x0000ff,
-    'aqua'	         => 0x00ffff,
-    'lime'	         => 0x00ff00,
-    'fuchsia'	         => 0xff00ff, # "fuscia" is incorrect but common
-    'fuscia'             => 0xff00ff, # mis-spelling...
-    'red'	         => 0xff0000,
-    'yellow'	         => 0xffff00,
-    'white'	         => 0xffffff,
-    'navy'	         => 0x000080,
-    'teal'	         => 0x008080,
-    'green'	         => 0x008000,
-    'purple'	         => 0x800080,
-    'maroon'	         => 0x800000,
-    'olive' 	         => 0x808000,
-    'gray'	         => 0x808080,
-    'silver'	         => 0xc0c0c0,
-    };
-}
-
-1;
-
-__END__

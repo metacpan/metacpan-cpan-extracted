@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.0003
+    version 1.0005
 
 SYNOPSIS
 
@@ -103,9 +103,11 @@ DESCRIPTION
     additional dependencies most users won't want or need:
 
       * async support via subclass Twitter::API::AnyEvent
+      <https://github.com/semifor/Twitter-API-AnyEvent>
 
       * inflate API call results to objects via
       Twitter::API::Trait::InflateObjects
+      <https://github.com/semifor/Twitter-API-Trait-InflateObjects>
 
 OVERVIEW
 
@@ -196,7 +198,8 @@ METHODS
 
     Returns a hashref that includes oauth_token and oauth_token_secret.
 
-    See https://dev.twitter.com/oauth/reference/post/oauth/request_token.
+    See
+    https://developer.twitter.com/en/docs/basics/authentication/api-reference/request_token.
 
  oauth_authentication_url(\%args)
 
@@ -205,14 +208,16 @@ METHODS
     Optional arguments: force_login and screen_name to pre-fill Twitter's
     authentication form.
 
-    See https://dev.twitter.com/oauth/reference/get/oauth/authenticate.
+    See
+    https://developer.twitter.com/en/docs/basics/authentication/api-reference/authenticate.
 
  oauth_authorization_url(\%args)
 
     Identical to oauth_authentication_url, but uses authorization flow,
     rather than authentication flow.
 
-    See https://dev.twitter.com/oauth/reference/get/oauth/authorize.
+    See
+    https://developer.twitter.com/en/docs/basics/authentication/api-reference/authorize.
 
  oauth_access_token(\%ags)
 
@@ -222,7 +227,8 @@ METHODS
     in get_request_token or the verifier parameter returned in the web
     callback, as verfier.
 
-    See https://dev.twitter.com/oauth/reference/post/oauth/access_token.
+    See
+    https://developer.twitter.com/en/docs/basics/authentication/api-reference/access_token.
 
  xauth(\%args)
 

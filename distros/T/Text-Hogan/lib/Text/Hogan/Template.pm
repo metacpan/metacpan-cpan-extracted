@@ -1,5 +1,5 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '1.04';
+$Text::Hogan::Template::VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -402,7 +402,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
 =head1 SYNOPSIS
 

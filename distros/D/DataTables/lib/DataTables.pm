@@ -9,8 +9,9 @@ use CGI::Simple;
 use DBI;
 use JSON::XS;
 use SQL::Abstract::Limit;
+use JQuery::DataTables::Request;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Preloaded methods go here.
 
@@ -30,6 +31,9 @@ sub new {
     return bless $self, $class;
 }
 
+
+
+
 sub tables {
     my $self = shift;
     
@@ -40,6 +44,9 @@ sub tables {
     }
     return $self->{tables};
 }
+
+
+
 
 sub columns {
     my $self = shift;
@@ -52,6 +59,9 @@ sub columns {
     return $self->{columns};
 }
 
+
+
+
 sub dbh {
     my $self = shift;
     
@@ -62,6 +72,9 @@ sub dbh {
     }
     return $self->{dbh};
 }
+
+
+
 
 sub patterns {
     my $self = shift;
@@ -74,6 +87,9 @@ sub patterns {
     return $self->{patterns};
 }
 
+
+
+
 sub join_clause {
     my $self = shift;
     
@@ -83,6 +99,9 @@ sub join_clause {
     return $self->{join_clause};
 }
 
+
+
+
 sub where_clause {
     my $self = shift;
     
@@ -91,6 +110,9 @@ sub where_clause {
     }
     return $self->{where_clause};
 }
+
+
+
 
 sub _columns_arr { 
     my $self = shift;
@@ -139,6 +161,9 @@ sub _columns_arr {
     return ($aColumns,$regular_columns,$as_hash);
 }
 
+
+
+
 sub print_json { 
     my $self = shift;
     my $json = $self->json;
@@ -147,12 +172,17 @@ sub print_json {
     print $json;
 }
 
+
+
+
 sub table_data {
     my $self = shift;
-
-    # CGI OBJECT
-    my $q = $self->{query};
-
+    
+    my %all_query_parameters = $self->_get_query_parameters();
+    
+    # may croak if client_params isn't recognized as containing DataTables parameters
+    my $dt_req = $self->_create_datatables_request( \%all_query_parameters );
+    
     # DB HANDLE
     my $dbh = $self->{dbh};
     croak "Database handle not defined" unless defined $dbh;
@@ -164,14 +194,14 @@ sub table_data {
     croak "Tables must be provided for the FROM clause" unless $self->tables;
 
     #filtering
-    my $where_href = $self->_generate_where_clause($q);
+    my $where_href = $self->_generate_where_clause($dt_req);
     
     #ordering
-    my @order = $self->_generate_order_clause($q);
+    my @order = $self->_generate_order_clause($dt_req);
 
     #paging
-    my $limit = $q->param('iDisplayLength') || 10;
-    my $offset = $q->param('iDisplayStart') || 0;
+    my $limit = $dt_req->length || 10;
+    my $offset = $dt_req->start || 0;
 
     #join
     if($self->join_clause ne '') {
@@ -182,7 +212,8 @@ sub table_data {
     my $sql = SQL::Abstract::Limit->new( limit_dialect => $dbh );
     
     my ($sQuery, @bind) = $sql->select($self->tables, $aColumns, $where_href, \@order, $limit, $offset );
-
+    #die("SQL: " . $sQuery);
+	
     #get columns out of db with query we created
     my $result_sth = $dbh->prepare($sQuery);
     $result_sth->execute(@bind) or croak "error in mysql query: $!\n$sQuery";
@@ -207,13 +238,32 @@ sub table_data {
     my $iTotal = $aResultTotal[0];
 
     # output hash
-    my $sEcho = $q->param('sEcho');
-    my %output = (
-        "sEcho" => $sEcho,
-        "iTotalRecords" => $iTotal,
-        "iTotalDisplayRecords" => $iFilteredTotal,
-        "aaData" => [],
-    );
+    my %output = ();
+    my $sEcho = $dt_req->draw;
+    my $version = $dt_req->version( \%all_query_parameters );
+    
+    
+    if( $version eq '1.10' ) {
+        # new interface
+        
+        %output = (
+            "draw" => int($sEcho),
+            "recordsTotal" => int($iTotal),
+            "recordsFiltered" => int($iFilteredTotal),
+            "aaData" => [],
+        );
+        
+    }else{
+        # old interface
+        
+        %output = (
+            "sEcho" => int($sEcho),
+            "iTotalRecords" => int($iTotal),
+            "iTotalDisplayRecords" => int($iFilteredTotal),
+            "aaData" => [],
+        );
+        
+    }
 
     my $count = 0;
     my $patterns = $self->patterns;
@@ -241,7 +291,10 @@ sub table_data {
     }
 
     return \%output;
-}
+} # /table_data
+
+
+
 
 sub json {
     my $self = shift;
@@ -251,35 +304,49 @@ sub json {
     return encode_json $output_href;
 } # /json
 
+
+
+
+sub _create_datatables_request {
+    my $self = shift;
+    my $query_params = shift;
+    return JQuery::DataTables::Request->new( client_params => $query_params );
+}
+
+
+
+
 sub _generate_where_clause {
     my $self = shift;
-    my $q = shift;
+    my $dt_req = shift;
     
     my ($aColumns,undef,undef) = $self->_columns_arr;
     
     my $where_href = {};
     
-    if( $q->param('sSearch') ) {
-		my $search_string = $q->param('sSearch');
+    if( $dt_req->search && defined $dt_req->search->{value} ) {
+        my $search_string = $dt_req->search->{value}; # the global search value
         
+        # XXX: maybe use $dt_req->columns()?
 		for( my $i = 0; $i < @$aColumns; $i++ ) {
 			# Iterate over each column and check if it is searchable.
 			# If so, add a constraint to the where clause restricting the given
 			# column. In the query, the column is identified by it's index, we
 			# need to translates the index to the column name.
-			my $searchable_ident = 'bSearchable_'.$i;
-			if( $q->param($searchable_ident) and $q->param($searchable_ident) eq 'true' ) {
-				my $column = $aColumns->[$i];
+			if ( defined $dt_req->column($i) and $dt_req->column($i)->{searchable} ) {
+                # XXX: maybe use $dt_req->column($i)->{name}?
+                my $column = $aColumns->[$i];
 				push @{$where_href->{'-or'}}, { $column => {-like => '%'.$search_string.'%' } };
-			}
+            }
 		}
 	}
 
+    # XXX: merge with previous loop
     #individual column filtering
     for (my $i = 0; $i < @$aColumns; $i++) {
-        if( ($q->param('bSearchable_' . $i) and $q->param('bSearchable_' . $i) eq 'true')
-           and $q->param('sSearch_' . $i) ) {
-            my $individual_column_search = $q->param('sSearch_' . $i);
+        if( defined $dt_req->column($i) and $dt_req->column($i)->{searchable}
+           and ($dt_req->column($i)->{search}->{value} and $dt_req->column($i)->{search}->{value} ne '') ) {
+            my $individual_column_search = $dt_req->column($i)->{search}->{value};
             $where_href->{$aColumns->[$i]} = {-like => '%'.$individual_column_search.'%'};
         }
     }
@@ -293,15 +360,19 @@ sub _generate_where_clause {
 } # /_generate_where_clause
 
 
-# 
-# convert
-# \%where = {key => value, -or => \@ }
-# to
-# \%where = {-and => [{key => value, -or => \@ }, $plus]}
-# 
-# $plus can be a hashref for SQL::Abstract.
-# $plus can also be scalarref (deprecated).
-# 
+
+
+=comment
+
+convert
+\%where = {key => value, -or => \@ }
+to
+\%where = {-and => [{key => value, -or => \@ }, $plus]}
+
+$plus can be a hashref for SQL::Abstract.
+$plus can also be scalarref (deprecated).
+
+=cut
 
 sub _add_where_clause {
     my $self = shift;
@@ -333,33 +404,48 @@ sub _add_where_clause {
 
 sub _generate_order_clause {
     my $self = shift;
-    my $q = shift;
+    my $dt_req = shift;
     
     my ($aColumns,undef,undef) = $self->_columns_arr;
     
     my @order = ();
-    if($q->param('iSortCol_0')) {
+    
+    foreach my $order_instruction ( @{$dt_req->orders()} ) {
         
-        for(my $i = 0; $i < $q->param('iSortingCols'); $i++) {
-            my $sortable_column_nr = $q->param('iSortCol_'.$i);
-            my $sortable_flag = 'bSortable_' . $sortable_column_nr;
-            if($q->param($sortable_flag) eq "true") {
-                my $sort_col = $aColumns->[$sortable_column_nr];
-                my $sort_dir = '-' . $q->param('sSortDir_' . $i);
-                
-                push @order, {$sort_dir => $sort_col};
-            }
-        }
-
+        # build direction, must be '-asc' or '-desc' (cf. SQL::Abstract)
+        # we only get 'asc' or 'desc', so they have to be prefixed with '-'
+        my $sortable_column_nr = $order_instruction->{column};
+        my $direction =  '-' . $order_instruction->{dir};
+        
+        # We only get the column index (starting from 0), so we have to
+        # translate the index into a column name.
+        my $column_name = $aColumns->[$sortable_column_nr];
+        push @order, { $direction => $column_name };
+        
     }
     
     return @order;
 } # /_generate_order_clause
 
 
-1;
+
+
+sub _get_query_parameters {
+    my $self = shift;
+
+    # CGI OBJECT
+    my $q = $self->{query};
+
+    # TODO: available from Perl 5.20.0: get multiple key-value pairs in 1 request, e.g. my %new_hash = %hash{qw/a b/};
+    # XXX: encapsulate to make testing easier (re-use the encapsulated method in tests instead of custom code)
+    my %all_query_parameters = $q->Vars;
+    
+    return %all_query_parameters;
+} # /_get_query_parameters
+
+1; # /DataTables
+
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
@@ -431,7 +517,7 @@ DataTables - a server-side solution for the jQuery DataTables plugin
 =head1 DESCRIPTION
 
 This module is an easy way to integrate server-side with the jQuery L<DataTables|http://datatables.net/> plugin. 
-Currently this module is designed to work with legacy DataTables 1.9 and lower. 
+Currently this module is designed to work with legacy DataTables 1.9 and lower, and with DataTables 1.10. 
 It supports basic features like displaying columns
 from a single table, but also supports more advanced features such as:
 
@@ -507,7 +593,7 @@ Hashref:
     my %columns = (
                         0=>{"column1"=>"table1"},
                         1=>{"column2"=>"table1"},
-                           2=>{"column3"=>"table2", AS=>"new_col"},
+                        2=>{"column3"=>"table2", AS=>"new_col"},
                     );
     $dt->columns(\%columns);
 
@@ -583,6 +669,10 @@ so I suggest that you just use that.
 =item 2 L<JSON::XS>
 
 =item 3 L<CGI::Simple>
+
+=item 4 L<SQL::Abstract::Limit>
+
+=item 5 L<JQuery::DataTables::Request>
 
 =back
 

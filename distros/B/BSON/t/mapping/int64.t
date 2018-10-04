@@ -4,12 +4,12 @@ use warnings;
 
 use Test::More 0.96;
 use Math::BigInt;
-use JSON::MaybeXS;
 
 use lib 't/lib';
 use lib 't/pvtlib';
 use CleanEnv;
 use TestUtils;
+use JSON::MaybeXS;
 
 use Config;
 use BSON qw/encode decode/;

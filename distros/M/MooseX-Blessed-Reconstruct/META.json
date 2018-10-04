@@ -2,10 +2,11 @@
    "abstract" : "A L<Data::Visitor> for creating Moose objects from blessed placeholders",
    "author" : [
       "Yuval Kogman <nothingmuch@woobling.org>",
-      "Jonathan Rockway <jrockway@cpan.org>"
+      "Jonathan Rockway <jrockway@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,39 +16,38 @@
    },
    "name" : "MooseX-Blessed-Reconstruct",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Class::Load" : "0",
             "Class::MOP" : "0.93",
             "Data::Visitor" : "0.21",
+            "Module::Runtime" : "0",
             "Moose" : "1.05",
             "Scalar::Util" : "0",
-            "Test::use::ok" : "0",
             "namespace::clean" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "ok" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -58,7 +58,7 @@
    "provides" : {
       "MooseX::Blessed::Reconstruct" : {
          "file" : "lib/MooseX/Blessed/Reconstruct.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -66,18 +66,22 @@
       "bugtracker" : {
          "web" : "https://github.com/yanick/moosex-blessed-reconstruct/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/MooseX-Blessed-Reconstruct/",
+      "homepage" : "https://github.com/yanick/moosex-blessed-reconstruct",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/moosex-blessed-reconstruct.git",
          "web" : "https://github.com/yanick/moosex-blessed-reconstruct"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
-      "Jesse Luehrs <doy@tozt.net>",
-      "Yanick Champoux <yanick@babyl.dyndns.org>"
-   ]
+      "E. Choroba <choroba@matfyz.cz>",
+      "Jesse Luehrs <doy@tozt.net>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

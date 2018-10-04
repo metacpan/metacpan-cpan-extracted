@@ -3,8 +3,9 @@ use strict;
 use warnings;
 
 use Test::More 1.302 tests => 7;
-use Path::Tiny;
 use YAML::XS;
+use File::Share 'dist_dir';
+my $dir = dist_dir('Data-Pokemon-Go');
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
@@ -13,20 +14,17 @@ binmode $builder->todo_output,    ":utf8";
 binmode STDERR,                   ":utf8";
 
 use lib './lib';
-
 use Data::Pokemon::Go::Pokemon;
 my $pg = Data::Pokemon::Go::Pokemon->new();
 
 use_ok 'Data::Pokemon::Go::IV';                                         # 1
 my $IV = new_ok 'Data::Pokemon::Go::IV';                                # 2
 
-subtest 'Kanto' => sub{ IVs('Kanto') };                                 # 3
-subtest 'Johto' => sub{ IVs('Johto') };                                 # 4
-subtest 'Hoenn' => sub{ IVs('Hoenn') };                                 # 5
-subtest 'Alola' => sub{ IVs('Alola') };                                 # 6
-
-ok( 1, "Sinnoh region will be added soon" );
-#subtest 'Sinnoh' => sub{ IVs('Sinnoh') };                               # 7
+subtest 'Kanto'     => sub{ IVs('Kanto') };                             # 3
+subtest 'Johto'     => sub{ IVs('Johto') };                             # 4
+subtest 'Hoenn'     => sub{ IVs('Hoenn') };                             # 5
+subtest 'Alola'     => sub{ IVs('Alola') };                             # 6
+subtest 'Sinnoh'    => sub{ IVs('Sinnoh') };                            # 7
 
 done_testing();
 
@@ -34,8 +32,7 @@ exit;
 
 sub IVs {
     my $region = shift;
-    my $in_file = path( 'data', "$region.yaml" );
-    my $data = YAML::XS::LoadFile($in_file);
+    my $data = YAML::XS::LoadFile("$dir/$region.yaml");
     map{ $data->{$_}{'name'} = $_ } keys %$data;
     my @pokemons = map{ $_->{'name'} } sort{ $a->{'ID'} cmp $b->{'ID'} } values %$data;
     plan tests => scalar @pokemons * 2;

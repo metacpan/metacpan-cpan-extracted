@@ -1,0 +1,4 @@
+---
+default:
+    value: 1138
+    include: config/recursion_1.yaml

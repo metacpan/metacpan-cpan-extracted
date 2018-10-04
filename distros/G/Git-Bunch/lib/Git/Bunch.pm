@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.622'; # VERSION
+our $DATE = '2018-09-27'; # DATE
+our $VERSION = '0.623'; # VERSION
 
 use 5.010001;
 use strict;
@@ -188,6 +188,29 @@ our %target_args = (
         schema       => ['str*'],
         req          => 1,
         pos          => 1,
+    },
+);
+
+our %remote_ssh_args = (
+    ssh_user => {
+        summary      => 'Remote SSH user',
+        schema       => ['str*', match=>qr/\A[\w-]+\z/],
+        default      => 22,
+    },
+    ssh_host => {
+        summary      => 'Remote SSH host',
+        schema       => ['net::hostname*'],
+        req          => 1,
+    },
+    ssh_port => {
+        summary      => 'Remote SSH port',
+        schema       => ['net::port*'],
+        default      => 22,
+    },
+    ssh_path => {
+        summary      => 'Remote host path to the bunch directory',
+        schema       => ['pathname*'],
+        default      => 22,
     },
 );
 
@@ -455,7 +478,16 @@ sub check_bunch {
         }
 
         $has_unclean++;
-        if ($exit == 0 &&
+        if ($exit == 0 && $output =~ /^\s*Unmerged paths:/m) {
+            log_warn("$repo needs merging");
+            $res{$repo} = [500, "Needs merging"];
+        } elsif ($exit == 0 &&
+                     $output =~ /(
+                                     Untracked \s files
+                                 )/x) {
+            log_warn("$repo has untracked files");
+            $res{$repo} = [500, "Has untracked files"];
+        } elsif ($exit == 0 &&
                 $output =~ /(
                                 Changes \s to \s be \s committed |
                                 Changes \s not \s staged \s for \s commit |
@@ -463,15 +495,6 @@ sub check_bunch {
                             )/mx) {
             log_warn("$repo needs commit");
             $res{$repo} = [500, "Needs commit"];
-        } elsif ($exit == 0 &&
-                     $output =~ /(
-                                     Untracked \s files
-                                 )/x) {
-            log_warn("$repo has untracked files");
-            $res{$repo} = [500, "Has untracked files"];
-        } elsif ($exit == 0 && $output =~ /Unmerged paths:/) {
-            log_warn("$repo needs merging");
-            $res{$repo} = [500, "Needs merging"];
         } elsif ($exit == 128 && $output =~ /Not a git repository/) {
             log_warn("$repo is not a git repo (2)");
             $res{$repo} = [500, "Not a git repo (2)"];
@@ -1141,7 +1164,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.622 of Git::Bunch (from Perl distribution Git-Bunch), released on 2018-01-17.
+This document describes version 0.623 of Git::Bunch (from Perl distribution Git-Bunch), released on 2018-09-27.
 
 =head1 SYNOPSIS
 

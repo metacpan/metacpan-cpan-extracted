@@ -1,3 +1,15 @@
+0.544   2018-10-03 (PERLANCAR)
+
+	- [test] Specify test dependency to JSON::PP because this core module is
+	  require'd by the generated script [CT].
+
+	- Add core_deps to compilation result so module client can use this
+	  information to specify dependency to required core modules.
+
+	- When output-ing to stdout, remove cmdline.skip_format result metadata
+	  so it's easier to see raw result just by using --json.
+
+
 0.543   2018-09-11 (PERLANCAR)
 
 	- Add option: stripper.

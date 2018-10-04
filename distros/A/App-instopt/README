@@ -2,13 +2,41 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.001 of App::instopt (from Perl
-    distribution App-instopt), released on 2018-09-20.
+    This document describes version 0.002 of App::instopt (from Perl
+    distribution App-instopt), released on 2018-10-04.
 
 SYNOPSIS
     See instopt script.
 
 FUNCTIONS
+  cleanup
+    Usage:
+
+     cleanup(%args) -> [status, msg, result, meta]
+
+    Remove inactive versions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   download
     Usage:
 
@@ -91,6 +119,36 @@ FUNCTIONS
     *   install_dir => *dirname*
 
     *   program_dir => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_installed_versions
+    Usage:
+
+     list_installed_versions(%args) -> [status, msg, result, meta]
+
+    List all installed versions of a software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    *   software* => *str*
 
     Returns an enveloped result (an array).
 

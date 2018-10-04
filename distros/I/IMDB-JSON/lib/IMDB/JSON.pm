@@ -10,7 +10,7 @@ Search IMDB for a specific title, process the result and extract the JSON script
 
 package IMDB::JSON;
 
-$IMDB::JSON::VERSION = "0.01";
+$IMDB::JSON::VERSION = "0.02";
 
 use strict;
 use HTML::TokeParser;
@@ -134,7 +134,7 @@ sub _result {
 			# Grab the title and year
 			my $txt = $p->get_trimmed_text;
 
-			my $t = $p->get_tag('span');
+			$t = $p->get_tag('span');
 			my $yr = $p->get_trimmed_text;
 
 			# Check and see if they match

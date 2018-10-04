@@ -1,13 +1,14 @@
 ---
-abstract: 'Various tools for handling strings.'
+abstract: 'Various tools for manipulating strings.'
 author:
   - 'Bob Kleemann <bobk@cpan.org>'
 build_requires:
   Test::More: '0'
+  strict: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +20,8 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/rkleemann/String-Tools/issues
+  homepage: http://metacpan.org/release/String-Tools/
   repository: git://github.com/rkleemann/String-Tools.git
-version: 0.14.163
+version: v0.18.270
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

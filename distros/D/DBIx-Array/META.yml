@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               DBIx-Array
-version:            0.62
+version:            0.63
 abstract:           DBI Wrapper with Perl style data structure interfaces
 author:
     - Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)

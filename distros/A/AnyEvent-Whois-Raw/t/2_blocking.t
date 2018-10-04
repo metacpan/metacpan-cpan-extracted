@@ -40,6 +40,7 @@ delete $rules{'mail.com'};
 whois 'mail.com', "$host:$port", timeout => 3, sub {
 	my ($info, $srv) = @_;
 	is($info, '', 'mail.com timeout');
+	like($srv, qr/timed out/, 'right error message');
 	ok(time()-$start < 10, 'mail.com timed out');
 	$cv->end;
 };

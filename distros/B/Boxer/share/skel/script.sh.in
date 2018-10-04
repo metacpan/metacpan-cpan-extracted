@@ -12,6 +12,8 @@ apt-get install [% pkglist %][% END %]
 
 [% tweakdesc %]
 suite=[% suite %]
+[% IF nonfree %]
+nonfree=1[% END %]
 [% IF pkgautolist %]
  apt-mark auto \
   [% pkgautolist %] || true

@@ -149,6 +149,34 @@ SvGVariantType (SV * sv)
 	return gperl_get_boxed_check (sv, G_TYPE_VARIANT_TYPE);
 }
 
+/* --- GVariantDict ----------------------------------------------------------*/
+
+#if GLIB_CHECK_VERSION (2, 40, 0)
+
+/* --- typemap glue --- */
+
+SV *
+newSVGVariantDict (GVariantDict * dict)
+{
+	return gperl_new_boxed (dict, G_TYPE_VARIANT_DICT, FALSE);
+}
+
+SV *
+newSVGVariantDict_own (GVariantDict * dict)
+{
+	return gperl_new_boxed (dict, G_TYPE_VARIANT_DICT, TRUE);
+}
+
+GVariantDict *
+SvGVariantDict (SV * sv)
+{
+	if (!gperl_sv_is_defined (sv))
+		return NULL;
+	return gperl_get_boxed_check (sv, G_TYPE_VARIANT_DICT);
+}
+
+#endif
+
 /* -------------------------------------------------------------------------- */
 
 /* --- helpers ---*/
@@ -265,6 +293,9 @@ For a complete specification, see the documentation at
 =for see_also Glib::VariantType
 =cut
 
+=for see_also Glib::VariantDict
+=cut
+
 BOOT:
 	gperl_register_fundamental_full (G_TYPE_VARIANT, "Glib::Variant",
 	                                 &variant_wrapper_class);
@@ -273,6 +304,9 @@ BOOT:
 	variant_type_wrapper_class.unwrap = unwrap_variant_type;
 	gperl_register_boxed (G_TYPE_VARIANT_TYPE, "Glib::VariantType",
 	                      &variant_type_wrapper_class);
+#if GLIB_CHECK_VERSION (2, 40, 0)
+	gperl_register_boxed (G_TYPE_VARIANT_DICT, "Glib::VariantDict", NULL);
+#endif
 
 const GVariantType * g_variant_get_type (GVariant *value);
 
@@ -521,23 +555,6 @@ DESTROY (GVariant * variant)
 
 # --------------------------------------------------------------------------- #
 
-# GLIB_AVAILABLE_IN_2_40 {
-#   GVariantDict * g_variant_dict_new (GVariant *from_asv);
-#   void g_variant_dict_init (GVariantDict *dict, GVariant *from_asv);
-#   gboolean g_variant_dict_lookup (GVariantDict *dict, const gchar *key, const gchar *format_string, ...);
-#   GVariant * g_variant_dict_lookup_value (GVariantDict *dict, const gchar *key, const GVariantType *expected_type);
-#   gboolean g_variant_dict_contains (GVariantDict *dict, const gchar *key);
-#   void g_variant_dict_insert (GVariantDict *dict, const gchar *key, const gchar *format_string, ...);
-#   void g_variant_dict_insert_value (GVariantDict *dict, const gchar *key, GVariant *value);
-#   gboolean g_variant_dict_remove (GVariantDict *dict, const gchar *key);
-#   void g_variant_dict_clear (GVariantDict *dict);
-#   GVariant * g_variant_dict_end (GVariantDict *dict);
-#   GVariantDict * g_variant_dict_ref (GVariantDict *dict);
-#   void g_variant_dict_unref (GVariantDict *dict);
-# }
-
-# --------------------------------------------------------------------------- #
-
 # GVariantBuilder * g_variant_builder_new (const GVariantType *type);
 # void g_variant_builder_unref (GVariantBuilder *builder);
 # GVariantBuilder * g_variant_builder_ref (GVariantBuilder *builder);
@@ -684,3 +701,27 @@ GVariantType_own * g_variant_type_new_tuple (class, SV *items);
 GVariantType_own * g_variant_type_new_dict_entry (class, const GVariantType *key, const GVariantType *value);
     C_ARGS:
 	key, value
+
+# --------------------------------------------------------------------------- #
+
+#if GLIB_CHECK_VERSION (2, 40, 0)
+
+MODULE = Glib::Variant	PACKAGE = Glib::VariantDict	PREFIX = g_variant_dict_
+
+GVariantDict_own * g_variant_dict_new (class, GVariant *from_asv);
+    C_ARGS:
+	from_asv
+
+# gboolean g_variant_dict_lookup (GVariantDict *dict, const gchar *key, const gchar *format_string, ...);
+GVariant_noinc * g_variant_dict_lookup_value (GVariantDict *dict, const gchar *key, const GVariantType *expected_type);
+
+gboolean g_variant_dict_contains (GVariantDict *dict, const gchar *key);
+
+# void g_variant_dict_insert (GVariantDict *dict, const gchar *key, const gchar *format_string, ...);
+void g_variant_dict_insert_value (GVariantDict *dict, const gchar *key, GVariant *value);
+
+gboolean g_variant_dict_remove (GVariantDict *dict, const gchar *key);
+
+GVariant_noinc * g_variant_dict_end (GVariantDict *dict);
+
+#endif

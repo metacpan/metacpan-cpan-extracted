@@ -30606,7 +30606,9 @@ print $Net::FullAuto::FA_Core::LOG "FIRST_ELEVEN\n"
 
 print $Net::FullAuto::FA_Core::LOG "HERE WE ARE AT A PLACE3 and GO=$growoutput\n"
     if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*') && $loop_count<$loop_max;
-                              $appendout=$output;next
+                           $appendout=$output;
+                           $first=0;
+                           next
 
                         }
 

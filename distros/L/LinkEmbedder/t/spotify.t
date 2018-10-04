@@ -4,7 +4,8 @@ use Test::More;
 use LinkEmbedder;
 
 my $embedder = LinkEmbedder->new;
-my $link     = $embedder->get('spotify:track:5tv77MoS0TzE0sJ7RwTj34');
+my $link;
+$embedder->get_p('spotify:track:5tv77MoS0TzE0sJ7RwTj34')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Spotify');
 cmp_deeply(
   $link->TO_JSON,
@@ -22,7 +23,7 @@ cmp_deeply(
   'spotify:track:5tv77MoS0TzE0sJ7RwTj34'
 ) or note $link->_dump;
 
-$link = $embedder->get('http://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9');
+$embedder->get_p('http://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Spotify');
 cmp_deeply(
   $link->TO_JSON,

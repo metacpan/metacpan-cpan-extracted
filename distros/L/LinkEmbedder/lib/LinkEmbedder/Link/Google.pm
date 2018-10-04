@@ -4,8 +4,8 @@ use Mojo::Base 'LinkEmbedder::Link';
 has provider_name => 'Google';
 has provider_url => sub { Mojo::URL->new('https://google.com') };
 
-sub learn {
-  my ($self, $cb) = @_;
+sub learn_p {
+  my $self = shift;
   my $url  = $self->url;
   my @path = @{$url->path};
   my ($iframe_src, @query);
@@ -26,15 +26,15 @@ sub learn {
     }
   }
 
-  return $self->SUPER::learn($cb) unless @query;
+  return $self->SUPER::learn_p unless @query;
 
   $iframe_src = Mojo::URL->new('https://www.google.com/maps');
   $iframe_src->query->param(q => join ' ', @query);
   $self->{iframe_src} = $iframe_src;
   $self->template->[1] = 'iframe.html.ep';
   $self->type('rich');
-  $self->$cb if $cb;
-  $self;
+
+  return Mojo::Promise->new->resolve($self);
 }
 
 1;

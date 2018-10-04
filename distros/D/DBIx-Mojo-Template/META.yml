@@ -1,5 +1,5 @@
 ---
-abstract: 'Render SQL statements templates by Mojo::Template'
+abstract: 'Render SQL statements by Mojo::Template'
 author:
   - "Ð\x9CÐ¸Ñ\NÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
 build_requires:
@@ -20,9 +20,9 @@ no_index:
 requires:
   Clone: '0'
   Hash::Merge: '0.2'
-  Mojolicious: '6'
+  Mojolicious: '7'
   perl: '5.006'
 resources:
   repository: git://github.com/mche/DBIx-Mojo-Template.git
-version: '0.056'
+version: '0.060'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

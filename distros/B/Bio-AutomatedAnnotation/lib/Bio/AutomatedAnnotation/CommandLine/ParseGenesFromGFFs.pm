@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation::CommandLine::ParseGenesFromGFFs;
-
+$Bio::AutomatedAnnotation::CommandLine::ParseGenesFromGFFs::VERSION = '1.182770';
 # ABSTRACT: provide a commandline interface to pull out genes from multiple GFF files
 
 
@@ -147,7 +147,7 @@ Bio::AutomatedAnnotation::CommandLine::ParseGenesFromGFFs - provide a commandlin
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

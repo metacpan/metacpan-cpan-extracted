@@ -1,5 +1,9 @@
 Revision history for RT::Extension::HistoryFilter
 
+2.03 2018-09-30
+ - Fix affecting on Assets, User, Groups history page
+ - update Module::Install and friends
+
 2.02 2018-02-05
  - update Module::Install and friends
  - add a hint to this extension on the configuration widget

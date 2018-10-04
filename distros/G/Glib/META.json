@@ -78,12 +78,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.gnome.org/perl-Glib",
-         "web" : "http://git.gnome.org/browse/perl-Glib"
+         "web" : "https://gitlab.gnome.org/GNOME/perl-glib"
       },
       "x_IRC" : "irc://irc.gimp.org/#gtk-perl",
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "1.327",
+   "version" : "1.328",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

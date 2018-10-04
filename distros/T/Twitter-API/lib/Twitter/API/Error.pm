@@ -1,6 +1,6 @@
 package Twitter::API::Error;
 # ABSTRACT: Twitter API exception
-$Twitter::API::Error::VERSION = '1.0003';
+$Twitter::API::Error::VERSION = '1.0005';
 use Moo;
 use Ref::Util qw/is_arrayref is_hashref/;
 use Try::Tiny;
@@ -114,7 +114,7 @@ sub twitter_error_text {
 #pod =method twitter_error_code
 #pod
 #pod Returns the numeric error code returned by Twitter, or 0 if there is none. See
-#pod L<https://dev.twitter.com/overview/api/response-codes> for details.
+#pod L<https://developer.twitter.com/en/docs/basics/response-codes> for details.
 #pod
 #pod =cut
 
@@ -224,7 +224,7 @@ Twitter::API::Error - Twitter API exception
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 
@@ -238,7 +238,7 @@ version 1.0003
         my $r = $client->get('account/verify_credentials');
     }
     catch {
-        die $_ unless is_twitter_api_error;
+        die $_ unless is_twitter_api_error($_);
 
         warn "Twitter says: ", $_->twitter_error_text;
     };
@@ -288,7 +288,7 @@ When used in a string context, C<error> is called to stringify exception.
 =head2 twitter_error_code
 
 Returns the numeric error code returned by Twitter, or 0 if there is none. See
-L<https://dev.twitter.com/overview/api/response-codes> for details.
+L<https://developer.twitter.com/en/docs/basics/response-codes> for details.
 
 =head2 is_token_error
 

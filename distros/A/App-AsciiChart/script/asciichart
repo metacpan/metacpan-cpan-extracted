@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::AsciiChart;
+
+my $plot = App::AsciiChart->new->plot( \@ARGV );
+
+print $plot;

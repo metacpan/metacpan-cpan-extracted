@@ -1,0 +1,66 @@
+{
+   "abstract" : "in-process server to display a screencast",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-PNGCast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Mojo::Server::Daemon" : "8",
+            "Mojolicious::Lite" : "8",
+            "WWW::Mechanize::Chrome" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::signatures" : "0.13",
+            "Future::Mojo" : "0",
+            "Mojolicious::Plugin" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/Mojolicious-Plugin-PNGCast.git",
+         "web" : "https://github.com/Corion/Mojolicious-Plugin-PNGCast"
+      }
+   },
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27203",
+   "x_static_install" : 1
+}

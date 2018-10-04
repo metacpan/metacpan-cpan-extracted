@@ -2,6 +2,7 @@
 use 5.14.1;
 use warnings;
 use Test::Spec;
+use JSON::MaybeXS qw/decode_json/;
 
 use Twitter::API;
 
@@ -25,13 +26,70 @@ describe direct_messages => sub {
 
     it 'new_direct_messages_event' => sub {
         my $user_id_str = $client->verify_credentials()->{id_str};
-        my $context = $client->new_direct_messages_event('test message ' . time, $user_id_str);
+        my $text = 'test message ' . time;
+        my $context = $client->new_direct_messages_event($text, $user_id_str);
         if ($is_stub_test) {
-            ok $context->http_request->method eq 'POST' && $context->http_request->uri =~ m'/direct_messages/events/new\.json$' && $context->http_request->content;
+            ok $context->http_request->method eq 'POST'
+            && $context->http_request->uri =~ m'/direct_messages/events/new\.json$'
+            && eq_hash(decode_json($context->http_request->content), {
+                event => {
+                    type => 'message_create',
+                    message_create => {
+                        target => { recipient_id => $user_id_str },
+                        message_data => { text => $text },
+                    },
+                },
+            });
             $new_message_id = 'dummy';
         } else {
             ok(exists $context->{event});
             $new_message_id = $context->{event}->{id};
+        }
+    };
+    it 'new_direct_messages_event with synthetic args' => sub {
+        if ($is_stub_test) {
+            my $user_id_str = '666';
+            my $text = 'test message ' . time;
+            my $context = $client->new_direct_messages_event($text, $user_id_str, {
+                -token        => 'passed-token',
+                -token_secret => 'passed-secret',
+            });
+
+           ok $context->http_request->method eq 'POST'
+            && $context->http_request->uri =~ m'/direct_messages/events/new\.json$'
+            && eq_hash(decode_json($context->http_request->content), {
+                event => {
+                    type => 'message_create',
+                    message_create => {
+                        target => { recipient_id => $user_id_str },
+                        message_data => { text => $text },
+                    },
+                },
+            })
+            && $context->http_request->header('authorization')
+                =~ /oauth_token="passed-token"/;
+        }
+    };
+    it 'new_direct_messages_event with event paylod' => sub {
+        if ($is_stub_test) {
+            my $event =  {
+                type => 'message_create',
+                message_create => {
+                    target => { recipient_id => 666 },
+                    message_data => {
+                        text => 'test message ' . time,
+                        attachment => {
+                            type  => 'media',
+                            media => { id => 1234 },
+                        },
+                    },
+                },
+            };
+            my $context = $client->new_direct_messages_event($event);
+            ok $context->http_request->method eq 'POST'
+            && $context->http_request->uri =~ m'/direct_messages/events/new\.json$'
+            && eq_hash(decode_json($context->http_request->content), { event => $event });
+            $new_message_id = 'dummy';
         }
     };
     it 'direct_messages_events' => sub {

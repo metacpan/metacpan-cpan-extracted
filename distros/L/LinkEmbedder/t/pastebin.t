@@ -6,8 +6,8 @@ use LinkEmbedder;
 plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 
 my $embedder = LinkEmbedder->new;
-
-my $link = $embedder->get('https://pastebin.com/V5gZTzhy');
+my $link;
+$embedder->get_p('https://pastebin.com/V5gZTzhy')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Pastebin');
 cmp_deeply(
   $link->TO_JSON,

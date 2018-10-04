@@ -9,7 +9,11 @@ package Math::Random::PCG32;
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(irand rand rand_elm rand_idx);
+
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load( 'Math::Random::PCG32', $VERSION );
@@ -29,10 +33,15 @@ Math::Random::PCG32 - minimal PCG random number generator
   my $rng = Math::Random::PCG32->new( 42, 54 );
 
   $rng->rand;
+  $rng->rand(10);
+  $rng->irand;
+  $rng->rand_idx( \@some_array );
+  $rng->rand_elm( \@some_array );
 
 =head1 DESCRIPTION
 
-This is a minimal PCG random number generator.
+This is a minimal PCG random number generator with a few utility
+routines.
 
 L<http://www.pcg-random.org/>
 
@@ -56,15 +65,49 @@ the L<Benchmark> module on my somehow still functional 2009 macbook.
 
 =item B<new> I<initstate> I<initseq>
 
-Makes a new object. No peeking! The two seed values should be 64-bit
-unsigned integers.
+Makes a new object. No peeking! The two seed values must be 64-bit
+unsigned integers. These could be read off of C</dev/random>, e.g.
 
-=item B<rand>
+    use Fcntl;
+    my $raw;
+    sysopen( my $fh, "/dev/random", O_RDONLY ) or die ...;
+    ... = sysread $fh, $raw, 8;
+    my $seed = unpack "Q", $raw;
+
+or for a game one might use values from L<Time::HiRes> or provided by
+the user with the caveat that C<pcg32_srandom_r> may need to be checked
+that it is okay for users to provide whatever they want.
+
+=item B<irand>
 
 Returns a random number from an object constructed by B<new>. The return
-value should be in the range of a 32-bit unsigned integer.
+value is a 32-bit unsigned integer.
+
+Used to be called B<rand> in older versions of the module.
+
+=item B<rand> [ I<factor> ]
+
+Returns a floating point value in the range 0.0 <= n < 1.0, or in some
+other range if a number is given as a I<factor>.
+
+=item B<rand_elm> I<array-reference>
+
+Returns a random element from the given array, or C<undef> if the array
+is empty (or if that is what the array element contained).
+
+=item B<rand_idx> I<array-reference>
+
+Returns a random index from the given array, or C<undef> if the
+array is empty.
 
 =back
+
+=head1 MODULO BIAS
+
+B<rand_elm> and B<rand_idx> ignore modulo bias so will become
+increasingly unsound as the length of the array approaches
+C<UINT32_MAX>. If modulo bias is a concern this module is not
+what you need.
 
 =head1 BUGS
 
@@ -88,6 +131,12 @@ compiler for the C<stdint> types. Untested on older versions of Perl.
 L<https://github.com/imneme/pcg-c-basic>
 
 L<Math::Random::Secure> for good seed choice.
+
+L<http://xoshiro.di.unimi.it> for a different PRNG and tips on compiler
+flags for use during benchmarks.
+
+  "though I must say, those PRNG writers, it feels like they are in a
+  small scale war with each other at times" -- random chat comment
 
 =head1 AUTHOR
 

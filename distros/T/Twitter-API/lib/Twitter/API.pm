@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '1.0003';
+our $VERSION = '1.0005';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -215,7 +215,6 @@ sub mk_post_request {
 
     return $self->mk_form_urlencoded_post($c);
 }
-
 
 sub mk_multipart_post {
     my ( $self, $c ) = @_;
@@ -461,7 +460,7 @@ Twitter::API - A Twitter REST API library for Perl
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 
@@ -592,11 +591,11 @@ dependencies most users won't want or need:
 
 =item *
 
-async support via subclass L<Twitter::API::AnyEvent>
+async support via subclass L<Twitter::API::AnyEvent|https://github.com/semifor/Twitter-API-AnyEvent>
 
 =item *
 
-inflate API call results to objects via L<Twitter::API::Trait::InflateObjects>
+inflate API call results to objects via L<Twitter::API::Trait::InflateObjects|https://github.com/semifor/Twitter-API-Trait-InflateObjects>
 
 =back
 
@@ -688,7 +687,7 @@ applications will pass a callback URL.
 
 Returns a hashref that includes C<oauth_token> and C<oauth_token_secret>.
 
-See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/request_token>.
 
 =head2 oauth_authentication_url(\%args)
 
@@ -697,14 +696,14 @@ C<oauth_token>. Use the value returned by C<get_request_token>. Optional
 arguments: C<force_login> and C<screen_name> to pre-fill Twitter's
 authentication form.
 
-See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/authenticate>.
 
 =head2 oauth_authorization_url(\%args)
 
 Identical to C<oauth_authentication_url>, but uses authorization flow, rather
 than authentication flow.
 
-See L<https://dev.twitter.com/oauth/reference/get/oauth/authorize>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/authorize>.
 
 =head2 oauth_access_token(\%ags)
 
@@ -714,7 +713,7 @@ and either the PIN number if you used C<oob> for the callback value in
 C<get_request_token> or the C<verifier> parameter returned in the web callback,
 as C<verfier>.
 
-See L<https://dev.twitter.com/oauth/reference/post/oauth/access_token>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/access_token>.
 
 =head2 xauth(\%args)
 

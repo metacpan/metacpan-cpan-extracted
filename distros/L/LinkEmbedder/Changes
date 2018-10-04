@@ -1,5 +1,15 @@
 Revision history for perl distribution LinkEmbedder
 
+1.01 2018-09-26T13:44:46+0900
+ - Forgot to remove Carp::Always
+ - Add support for https://perlbot.pl #1
+ - Add support for https://paste.fedoraproject.org #2
+ - Add support for https://bitbucket.org #3
+
+1.00 2018-09-26T01:22:18+0900
+ - Compatible with Mojolicious 8.00
+ - Converted from delay to promises
+
 0.05 2017-05-01T22:35:47+0200
  - Fix terrible class names from provider_name()
  - Add support for using <link rel="icon" ...> for images

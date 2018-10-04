@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = 'v3.0.0';
+our $VERSION = 'v3.0.1';
 
 __PACKAGE__->meta->make_immutable;
 1;

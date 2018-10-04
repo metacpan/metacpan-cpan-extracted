@@ -166,7 +166,9 @@ SKIP: {
 
 # -----------------------------------------------------------------------------
 
-{
+SKIP: {
+  skip 'emit_sig_with_array_len_prop', 4
+    unless check_gi_version (1, 42, 92);
   my $obj = Regress::TestObj->constructor ();
   $obj->signal_connect ('sig-with-array-len-prop' => sub {
     my ($self, $array, $len, $data) = @_;

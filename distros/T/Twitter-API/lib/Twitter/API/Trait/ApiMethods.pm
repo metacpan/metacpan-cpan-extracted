@@ -1,6 +1,6 @@
 package Twitter::API::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
-$Twitter::API::Trait::ApiMethods::VERSION = '1.0003';
+$Twitter::API::Trait::ApiMethods::VERSION = '1.0005';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -14,7 +14,7 @@ with 'Twitter::API::Role::RequestArgs';
 
 #pod =method account_settings([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/account/settings>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-settings>
 #pod
 #pod =cut
 
@@ -26,7 +26,7 @@ sub account_settings {
 #pod
 #pod Aliases: blocks_list
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/blocks/list>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-blocks-list>
 #pod
 #pod =cut
 
@@ -39,7 +39,7 @@ alias blocks_list => 'blocking';
 #pod
 #pod Aliases: blocks_ids
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/blocks/ids>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-blocks-ids>
 #pod
 #pod =cut
 
@@ -50,7 +50,7 @@ alias blocks_ids => 'blocking_ids';
 
 #pod =method collection_entries([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/collections/entries>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/get-collections-entries>
 #pod
 #pod =cut
 
@@ -60,7 +60,7 @@ sub collection_entries {
 
 #pod =method collections([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/collections/list>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/get-collections-list>
 #pod
 #pod =cut
 
@@ -68,19 +68,11 @@ sub collections {
     shift->request_with_pos_args(':ID', get => 'collections/list', @_);
 }
 
-#pod =method direct_messages([ \%args ])
-#pod
-#pod L<https://dev.twitter.com/rest/reference/get/direct_messages>
-#pod
-#pod =cut
-
-sub direct_messages {
-    shift->request(get => 'direct_messages', @_);
-}
+sub direct_messages { croak 'DEPRECATED - use direct_messages_events instead' }
 
 #pod =method favorites([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/favorites/list>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-favorites-list>
 #pod
 #pod =cut
 
@@ -92,7 +84,7 @@ sub favorites {
 #pod
 #pod Aliases: followers_list
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/followers/list>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-followers-list>
 #pod
 #pod =cut
 
@@ -103,7 +95,7 @@ alias followers_list => 'followers';
 
 #pod =method followers_ids([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/followers/ids>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids>
 #pod
 #pod =cut
 
@@ -115,7 +107,7 @@ sub followers_ids {
 #pod
 #pod Aliases: friends_list
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friends/list>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friends-list>
 #pod
 #pod =cut
 
@@ -128,7 +120,7 @@ alias friends_list => 'friends';
 #pod
 #pod Aliases: following_ids
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friends/ids>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids>
 #pod
 #pod =cut
 
@@ -141,7 +133,7 @@ alias following_ids => 'friends_ids';
 #pod
 #pod Aliases: incoming_friendships
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friendships/incoming>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-incoming>
 #pod
 #pod =cut
 
@@ -154,7 +146,7 @@ alias incoming_friendships => 'friendships_incoming';
 #pod
 #pod Aliases: outgoing_friendships
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friendships/outgoing>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-outgoing>
 #pod
 #pod =cut
 
@@ -165,7 +157,7 @@ alias outgoing_friendships => 'friendships_outgoing';
 
 #pod =method geo_id([ $place_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/geo/id/:place_id>
+#pod L<https://developer.twitter.com/en/docs/geo/place-information/api-reference/get-geo-id-place_id>
 #pod
 #pod =cut
 
@@ -176,7 +168,7 @@ sub geo_id {
 
 #pod =method geo_search([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/geo/search>
+#pod L<https://developer.twitter.com/en/docs/geo/places-near-location/api-reference/get-geo-search>
 #pod
 #pod =cut
 
@@ -186,7 +178,7 @@ sub geo_search {
 
 #pod =method get_configuration([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/help/configuration>
+#pod L<https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration>
 #pod
 #pod =cut
 
@@ -196,7 +188,7 @@ sub get_configuration {
 
 #pod =method get_languages([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/help/languages>
+#pod L<https://developer.twitter.com/en/docs/developer-utilities/supported-languages/api-reference/get-help-languages>
 #pod
 #pod =cut
 
@@ -208,7 +200,7 @@ sub get_languages {
 #pod
 #pod Aliases: show_list
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/show>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-show>
 #pod
 #pod =cut
 
@@ -221,7 +213,7 @@ alias show_list => 'get_list';
 #pod
 #pod Aliases: list_lists, all_subscriptions
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/list>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-list>
 #pod
 #pod =cut
 
@@ -232,7 +224,7 @@ alias $_ => 'get_lists' for qw/list_lists all_subscriptions/;
 
 #pod =method get_privacy_policy([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/help/privacy>
+#pod L<https://developer.twitter.com/en/docs/developer-utilities/privacy-policy/api-reference/get-help-privacy>
 #pod
 #pod =cut
 
@@ -242,7 +234,7 @@ sub get_privacy_policy {
 
 #pod =method get_tos([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/help/tos>
+#pod L<https://developer.twitter.com/en/docs/developer-utilities/terms-of-service/api-reference/get-help-tos>
 #pod
 #pod =cut
 
@@ -252,7 +244,7 @@ sub get_tos {
 
 #pod =method home_timeline([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/home_timeline>
+#pod L<https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-home_timeline>
 #pod
 #pod =cut
 
@@ -262,7 +254,7 @@ sub home_timeline {
 
 #pod =method list_members([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/members>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-members>
 #pod
 #pod =cut
 
@@ -272,7 +264,7 @@ sub list_members {
 
 #pod =method list_memberships([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/memberships>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-memberships>
 #pod
 #pod =cut
 
@@ -282,7 +274,7 @@ sub list_memberships {
 
 #pod =method list_ownerships([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/ownerships>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships>
 #pod
 #pod =cut
 
@@ -292,7 +284,7 @@ sub list_ownerships {
 
 #pod =method list_statuses([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/statuses>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses>
 #pod
 #pod =cut
 
@@ -302,7 +294,7 @@ sub list_statuses {
 
 #pod =method list_subscribers([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/subscribers>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers>
 #pod
 #pod =cut
 
@@ -314,7 +306,7 @@ sub list_subscribers {
 #pod
 #pod Aliases: subscriptions
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/subscriptions>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-subscriptions>
 #pod
 #pod =cut
 
@@ -325,7 +317,7 @@ alias subscriptions => 'list_subscriptions';
 
 #pod =method lookup_friendships([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friendships/lookup>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup>
 #pod
 #pod =cut
 
@@ -335,7 +327,7 @@ sub lookup_friendships {
 
 #pod =method lookup_statuses([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/lookup>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-lookup>
 #pod
 #pod =cut
 
@@ -345,7 +337,7 @@ sub lookup_statuses {
 
 #pod =method lookup_users([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/lookup>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup>
 #pod
 #pod =cut
 
@@ -357,7 +349,7 @@ sub lookup_users {
 #pod
 #pod Aliases: replies, mentions_timeline
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/mentions_timeline>
+#pod L<https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-mentions_timeline>
 #pod
 #pod =cut
 
@@ -370,7 +362,7 @@ alias $_ => 'mentions' for qw/replies mentions_timeline/;
 #pod
 #pod Aliases: muting_ids, muted_ids
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/mutes/users/ids>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-ids>
 #pod
 #pod =cut
 
@@ -383,7 +375,7 @@ alias $_ => 'mutes' for qw/muting_ids muted_ids/;
 #pod
 #pod Aliases: mutes_list
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/mutes/users/list>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-list>
 #pod
 #pod =cut
 
@@ -396,7 +388,7 @@ alias mutes_list => 'muting';
 #pod
 #pod Aliases: no_retweets_ids
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friendships/no_retweets/ids>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-no_retweets-ids>
 #pod
 #pod =cut
 
@@ -407,7 +399,7 @@ alias no_retweets_ids => 'no_retweet_ids';
 
 #pod =method oembed([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/oembed>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed>
 #pod
 #pod =cut
 
@@ -417,7 +409,7 @@ sub oembed {
 
 #pod =method profile_banner([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/profile_banner>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-users-profile_banner>
 #pod
 #pod =cut
 
@@ -427,7 +419,7 @@ sub profile_banner {
 
 #pod =method rate_limit_status([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/application/rate_limit_status>
+#pod L<https://developer.twitter.com/en/docs/developer-utilities/rate-limit-status/api-reference/get-application-rate_limit_status>
 #pod
 #pod =cut
 
@@ -437,7 +429,7 @@ sub rate_limit_status {
 
 #pod =method retweeters_ids([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/retweeters/ids>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweeters-ids>
 #pod
 #pod =cut
 
@@ -447,7 +439,7 @@ sub retweeters_ids {
 
 #pod =method retweets([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/retweets/:id>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweets-id>
 #pod
 #pod =cut
 
@@ -459,7 +451,7 @@ sub retweets {
 #pod
 #pod Aliases: retweeted_of_me
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/retweets_of_me>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweets_of_me>
 #pod
 #pod =cut
 
@@ -470,7 +462,7 @@ alias retweeted_of_me => 'retweets_of_me';
 
 #pod =method reverse_geocode([ $lat, [ $long, ]][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/geo/reverse_geocode>
+#pod L<https://developer.twitter.com/en/docs/geo/places-near-location/api-reference/get-geo-reverse_geocode>
 #pod
 #pod =cut
 
@@ -480,7 +472,7 @@ sub reverse_geocode {
 
 #pod =method saved_searches([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/saved_searches/list>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-saved_searches-list>
 #pod
 #pod =cut
 
@@ -490,7 +482,7 @@ sub saved_searches {
 
 #pod =method search([ $q, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/search/tweets>
+#pod L<https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets>
 #pod
 #pod =cut
 
@@ -502,30 +494,20 @@ sub search {
 #pod
 #pod Aliases: direct_messages_sent
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/direct_messages/sent>
+#pod L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-sent-message>
 #pod
 #pod =cut
 
-sub sent_direct_messages {
-    shift->request(get => 'direct_messages/sent', @_);
-}
+sub sent_direct_messages { croak 'DEPRECATED - use direct_messages_events instead' }
 alias direct_messages_sent => 'sent_direct_messages';
 
-#pod =method show_direct_message([ $id, ][ \%args ])
-#pod
-#pod L<https://dev.twitter.com/rest/reference/get/direct_messages/show>
-#pod
-#pod =cut
-
-sub show_direct_message {
-    shift->request_with_pos_args(id => get => 'direct_messages/show', @_);
-}
+sub show_direct_message { croak 'DEPRECATED - show_direct_messages_event instead' }
 
 #pod =method show_friendship([ \%args ])
 #pod
 #pod Aliases: show_relationship
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/friendships/show>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-show>
 #pod
 #pod =cut
 
@@ -538,7 +520,7 @@ alias show_relationship => 'show_friendship';
 #pod
 #pod Aliases: is_list_member
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/members/show>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-members-show>
 #pod
 #pod =cut
 
@@ -551,7 +533,7 @@ alias is_list_member => 'show_list_member';
 #pod
 #pod Aliases: is_list_subscriber, is_subscriber_lists
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/lists/subscribers/show>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers-show>
 #pod
 #pod =cut
 
@@ -562,7 +544,7 @@ alias $_ => 'show_list_subscriber' for qw/is_list_subscriber is_subscriber_lists
 
 #pod =method show_saved_search([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/saved_searches/show/:id>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-saved_searches-show-id>
 #pod
 #pod =cut
 
@@ -572,7 +554,7 @@ sub show_saved_search {
 
 #pod =method show_status([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/show/:id>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id>
 #pod
 #pod =cut
 
@@ -582,7 +564,7 @@ sub show_status {
 
 #pod =method show_user([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/show>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-show>
 #pod
 #pod =cut
 
@@ -592,7 +574,7 @@ sub show_user {
 
 #pod =method suggestion_categories([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/suggestions>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-suggestions>
 #pod
 #pod =cut
 
@@ -602,7 +584,7 @@ sub suggestion_categories {
 
 #pod =method trends_available([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/trends/available>
+#pod L<https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available>
 #pod
 #pod =cut
 
@@ -616,7 +598,7 @@ sub trends_available {
 
 #pod =method trends_closest([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/trends/closest>
+#pod L<https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-closest>
 #pod
 #pod =cut
 
@@ -626,7 +608,7 @@ sub trends_closest {
 
 #pod =method trends_place([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/trends/place>
+#pod L<https://developer.twitter.com/en/docs/trends/trends-for-location/api-reference/get-trends-place>
 #pod
 #pod =cut
 
@@ -637,7 +619,7 @@ alias trends_location => 'trends_place';
 
 #pod =method user_suggestions([ $slug, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/suggestions/:slug/members>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-suggestions-slug-members>
 #pod
 #pod =cut
 
@@ -662,7 +644,7 @@ alias follow_suggestions => 'user_suggestions';
 #pod
 #pod Aliases: follow_suggestions
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/suggestions/:slug>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-suggestions-slug>
 #pod
 #pod =cut
 
@@ -676,7 +658,7 @@ alias follow_suggestions_for => 'user_suggestions_for';
 
 #pod =method user_timeline([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/statuses/user_timeline>
+#pod L<https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline>
 #pod
 #pod =cut
 
@@ -688,7 +670,7 @@ sub user_timeline {
 #pod
 #pod Aliases: find_people, search_users
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/users/search>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search>
 #pod
 #pod =cut
 
@@ -699,7 +681,7 @@ alias $_ => 'users_search' for qw/find_people search_users/;
 
 #pod =method verify_credentials([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/get/account/verify_credentials>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials>
 #pod
 #pod =cut
 
@@ -709,7 +691,7 @@ sub verify_credentials {
 
 #pod =method add_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/entries/add>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-add>
 #pod
 #pod =cut
 
@@ -720,7 +702,7 @@ sub add_collection_entry {
 
 #pod =method add_list_member([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/members/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create>
 #pod
 #pod =cut
 
@@ -736,7 +718,7 @@ sub add_place {
 
 #pod =method create_block([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/blocks/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-blocks-create>
 #pod
 #pod =cut
 
@@ -746,7 +728,7 @@ sub create_block {
 
 #pod =method create_collection([ $name, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/create>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-create>
 #pod
 #pod =cut
 
@@ -756,7 +738,7 @@ sub create_collection {
 
 #pod =method create_favorite([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/favorites/create>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-favorites-create>
 #pod
 #pod =cut
 
@@ -768,7 +750,7 @@ sub create_favorite {
 #pod
 #pod Aliases: follow, follow_new, create_friendship
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/friendships/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create>
 #pod
 #pod =cut
 
@@ -779,7 +761,7 @@ alias $_ => 'create_friend' for qw/follow follow_new create_friendship/;
 
 #pod =method create_list([ $name, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-create>
 #pod
 #pod =cut
 
@@ -789,7 +771,7 @@ sub create_list {
 
 #pod =method create_media_metadata([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/media/metadata/create>
+#pod L<https://developer.twitter.com/en/docs/media/upload-media/api-reference/post-media-metadata-create>
 #pod
 #pod =cut
 
@@ -808,7 +790,7 @@ sub create_media_metadata {
 
 #pod =method create_mute([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/mutes/users/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-mutes-users-create>
 #pod
 #pod Alias: mute
 #pod
@@ -821,7 +803,7 @@ alias mute => 'create_mute';
 
 #pod =method create_saved_search([ $query, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/saved_searches/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-saved_searches-create>
 #pod
 #pod =cut
 
@@ -831,7 +813,7 @@ sub create_saved_search {
 
 #pod =method curate_collection([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/entries/curate>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-curate>
 #pod
 #pod =cut
 
@@ -846,7 +828,7 @@ sub curate_collection {
 
 #pod =method delete_list([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/destroy>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy>
 #pod
 #pod =cut
 
@@ -856,7 +838,7 @@ sub delete_list {
 
 #pod =method delete_list_member([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/members/destroy>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy>
 #pod
 #pod =cut
 
@@ -867,7 +849,7 @@ alias remove_list_member => 'delete_list_member';
 
 #pod =method destroy_block([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/blocks/destroy>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-blocks-destroy>
 #pod
 #pod =cut
 
@@ -877,7 +859,7 @@ sub destroy_block {
 
 #pod =method destroy_collection([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/destroy>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-destroy>
 #pod
 #pod =cut
 
@@ -885,19 +867,11 @@ sub destroy_collection {
     shift->request_with_pos_args(id => post => 'collections/destroy', @_);
 }
 
-#pod =method destroy_direct_message([ $id, ][ \%args ])
-#pod
-#pod L<https://dev.twitter.com/rest/reference/post/direct_messages/destroy>
-#pod
-#pod =cut
-
-sub destroy_direct_message {
-    shift->request_with_pos_args(id => post => 'direct_messages/destroy', @_);
-}
+sub destroy_direct_message { croak 'DEPRECATED - use destroy_direct_messages_event instead' }
 
 #pod =method destroy_favorite([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/favorites/destroy>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-favorites-destroy>
 #pod
 #pod =cut
 
@@ -909,7 +883,7 @@ sub destroy_favorite {
 #pod
 #pod Aliases: unfollow, destroy_friendship
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/friendships/destroy>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy>
 #pod
 #pod =cut
 
@@ -920,7 +894,7 @@ alias $_ => 'destroy_friend' for qw/unfollow destroy_friendship/;
 
 #pod =method destroy_mute([ $screen_name | $user_id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/mutes/users/destroy>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-mutes-users-destroy>
 #pod
 #pod Alias: unmute
 #pod
@@ -935,7 +909,7 @@ alias unmute => 'destroy_mute';
 #pod
 #pod Aliases: delete_saved_search
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/saved_searches/destroy/:id>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-saved_searches-destroy-id>
 #pod
 #pod =cut
 
@@ -946,7 +920,7 @@ alias delete_saved_search => 'destroy_saved_search';
 
 #pod =method destroy_status([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/statuses/destroy/:id>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-destroy-id>
 #pod
 #pod =cut
 
@@ -958,7 +932,7 @@ sub destroy_status {
 #pod
 #pod Aliases: add_list_members
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/members/create_all>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create_all>
 #pod
 #pod =cut
 
@@ -971,7 +945,7 @@ alias add_list_members => 'members_create_all';
 #pod
 #pod Aliases: remove_list_members
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/members/destroy_all>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all>
 #pod
 #pod =cut
 
@@ -982,7 +956,7 @@ alias remove_list_members => 'members_destroy_all';
 
 #pod =method move_collection_entry([ $id, [ $tweet_id, [ $relative_to, ]]][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/entries/move>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-move>
 #pod
 #pod =cut
 
@@ -991,19 +965,11 @@ sub move_collection_entry {
         post => 'collections/entries/move', @_);
 }
 
-#pod =method new_direct_message([ $text, [ $screen_name | $user_id, ]][ \%args ])
-#pod
-#pod L<https://dev.twitter.com/rest/reference/post/direct_messages/new>
-#pod
-#pod =cut
-
-sub new_direct_message {
-    shift->request_with_pos_args([ qw/text :ID/ ], post => 'direct_messages/new', @_);
-}
+sub new_direct_message { croak 'DEPRECATED - use new_direct_messages_event instead' }
 
 #pod =method remove_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/entries/remove>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-remove>
 #pod
 #pod =cut
 
@@ -1014,7 +980,7 @@ sub remove_collection_entry {
 
 #pod =method remove_profile_banner([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/account/remove_profile_banner>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-remove_profile_banner>
 #pod
 #pod =cut
 
@@ -1024,7 +990,7 @@ sub remove_profile_banner {
 
 #pod =method report_spam([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/users/report_spam>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-users-report_spam>
 #pod
 #pod =cut
 
@@ -1034,7 +1000,7 @@ sub report_spam {
 
 #pod =method retweet([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/statuses/retweet/:id>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-retweet-id>
 #pod
 #pod =cut
 
@@ -1044,7 +1010,7 @@ sub retweet {
 
 #pod =method subscribe_list([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/subscribers/create>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-create>
 #pod
 #pod =cut
 
@@ -1054,7 +1020,7 @@ sub subscribe_list {
 
 #pod =method unretweet([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/statuses/unretweet/:id>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-unretweet-id>
 #pod
 #pod =cut
 
@@ -1064,7 +1030,7 @@ sub unretweet {
 
 #pod =method unsubscribe_list([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/subscribers/destroy>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-destroy>
 #pod
 #pod =cut
 
@@ -1074,7 +1040,7 @@ sub unsubscribe_list {
 
 #pod =method update([ $status, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/statuses/update>
+#pod L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update>
 #pod
 #pod =cut
 
@@ -1090,7 +1056,7 @@ sub update {
 
 #pod =method update_account_settings([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/account/settings>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-settings>
 #pod
 #pod =cut
 
@@ -1100,7 +1066,7 @@ sub update_account_settings {
 
 #pod =method update_collection([ $id, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/collections/update>
+#pod L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-update>
 #pod
 #pod =cut
 
@@ -1110,7 +1076,7 @@ sub update_collection {
 
 #pod =method update_friendship([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/friendships/update>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update>
 #pod
 #pod =cut
 
@@ -1120,7 +1086,7 @@ sub update_friendship {
 
 #pod =method update_list([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/lists/update>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-update>
 #pod
 #pod =cut
 
@@ -1130,7 +1096,7 @@ sub update_list {
 
 #pod =method update_profile([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/account/update_profile>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile>
 #pod
 #pod =cut
 
@@ -1140,7 +1106,7 @@ sub update_profile {
 
 #pod =method update_profile_background_image([ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/account/update_profile_background_image>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_background_image>
 #pod
 #pod =cut
 
@@ -1150,7 +1116,7 @@ sub update_profile_background_image {
 
 #pod =method update_profile_banner([ $banner, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/account/update_profile_banner>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_banner>
 #pod
 #pod =cut
 
@@ -1160,7 +1126,7 @@ sub update_profile_banner {
 
 #pod =method update_profile_image([ $image, ][ \%args ])
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/account/update_profile_image>
+#pod L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_image>
 #pod
 #pod =cut
 
@@ -1172,7 +1138,7 @@ sub update_profile_image {
 #pod
 #pod Aliases: upload
 #pod
-#pod L<https://dev.twitter.com/rest/reference/post/media/upload>
+#pod L<https://developer.twitter.com/en/docs/media/upload-media/api-reference/post-media-upload>
 #pod
 #pod =cut
 
@@ -1228,24 +1194,110 @@ sub destroy_direct_messages_event {
     shift->request_with_pos_args(id => delete => 'direct_messages/events/destroy', @_);
 }
 
-#pod =method new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+#pod =method new_direct_messages_event([$text, $recipient_id ] | [ \%event ], [ \%args ])
+#pod
+#pod For simple usage, pass text and recipient ID:
+#pod
+#pod     $client->new_dirrect_messages_event($text, $recipient_id)
+#pod
+#pod For more complex messages, pass a full event structure, for example:
+#pod
+#pod     $client->new_direct_massages_event({
+#pod         type => 'message_create',
+#pod         message_create => {
+#pod             target => { recipient_id => $user_id },
+#pod             message_data => {
+#pod                 text => $text,
+#pod                 attachment => {
+#pod                     type  => 'media',
+#pod                     media => { id => $media->{id} },
+#pod                 },
+#pod             },
+#pod         },
+#pod     })
 #pod
 #pod L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
 #pod
 #pod =cut
 
 sub new_direct_messages_event {
-    shift->request(post => 'direct_messages/events/new', {
-        -to_json => {
-            event => {
-                type => 'message_create',
-                message_create => {
-                    message_data => { text => shift },
-                    target => { recipient_id => shift },
-                }
-            },
-        }
-    }, @_);
+    my $self = shift;
+
+    # The first argument is either an event hashref, or we'll create one with
+    # the first two arguments: text and recipient_id.
+    my $event = ref $_[0] ? shift : {
+        type => 'message_create',
+        message_create => {
+            message_data => { text => shift },
+            target => { recipient_id => shift },
+        },
+    };
+
+    # only synthetic args are appropriate, here, e.g.
+    # { -token => '...', -token_secret => '...' }
+    my $args = shift // {};
+
+
+    $self->request(post => 'direct_messages/events/new', {
+        -to_json => { event => $event }, %$args
+    });
+}
+
+#pod =method invalidate_access_token([ \%args ])
+#pod
+#pod Calling this method has the same effect as a user revoking access to the
+#pod application via Twitter settings. The access token/secret pair will no longer
+#pod be valid.
+#pod
+#pod This method can be called with client that has been initialized with
+#pod C<access_token> and C<access_token_secret> attributes, by passing C<-token> and
+#pod C<-token_secret> parameters, or by passing C<access_token> and
+#pod C<access_token_secret> parameters.
+#pod
+#pod     $client->invalidate_access_token;
+#pod     $client->invalidate_access_token({ -token => $token, -token_secret => $secret });
+#pod     $client->invalidate_access_token({
+#pod         access_token        => $token,
+#pod         access_token_secret => $secret,
+#pod     });
+#pod
+#pod Twitter added this method to the API on 2018-09-20.
+#pod
+#pod See
+#pod L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/invalidate_access_token>
+#pod
+#pod =cut
+
+# We've already used invalidate_token for oauth2/invalidate_otkon in
+# Trait::AppAuth, so we'll name this method invalidate_acccess_token to avoid
+# any conflict.
+
+sub invalidate_access_token {
+    my ( $self, $args ) = @_;
+
+    $args //= {};
+
+    # For consistency with Twitter::API calling conventions:
+    # - accept -token/-token_secret synthetic arguments
+    # - or use access_token/access_token_secret attributes
+    #
+    # Or, allow passing access_token/access_token secrets parameters as
+    # specified in Twitter's API documentation.
+
+    my $access_token = $$args{'-token'} // $self->access_token
+        // ( $$args{'-token'} = delete $$args{access_token} )
+        // croak 'requires an oauth token';
+
+    my $access_token_secret = $$args{'-token_secret'}
+        // $self->access_token_secret
+        // ( $$args{'-token_secret'} = delete $$args{access_token_secret} )
+        // croak 'requires an oauth token secret';
+
+    return $self->request(post => 'oauth/invalidate_token', {
+        access_token        => $access_token,
+        access_token_secret => $access_token_secret,
+        %$args
+    });
 }
 
 1;
@@ -1262,14 +1314,14 @@ Twitter::API::Trait::ApiMethods - Convenient API Methods
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 DESCRIPTION
 
 This trait provides convenient methods for calling API endpoints. They are
 L<Net::Twitter> compatible, with the same names and calling conventions.
 
-Refer to L<Twitter's API documentation|https://dev.twitter.com/rest/reference>
+Refer to L<Twitter's API documentation|https://developer.twitter.com/en/docs/api-reference-index>
 for details about each method's parameters.
 
 These methods are simply shorthand forms of C<get> and C<post>.  All methods
@@ -1320,371 +1372,359 @@ L<Twitter::API> for details about return values and error handling.
 
 =head2 account_settings([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/account/settings>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-settings>
 
 =head2 blocking([ \%args ])
 
 Aliases: blocks_list
 
-L<https://dev.twitter.com/rest/reference/get/blocks/list>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-blocks-list>
 
 =head2 blocking_ids([ \%args ])
 
 Aliases: blocks_ids
 
-L<https://dev.twitter.com/rest/reference/get/blocks/ids>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-blocks-ids>
 
 =head2 collection_entries([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/collections/entries>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/get-collections-entries>
 
 =head2 collections([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/collections/list>
-
-=head2 direct_messages([ \%args ])
-
-L<https://dev.twitter.com/rest/reference/get/direct_messages>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/get-collections-list>
 
 =head2 favorites([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/favorites/list>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-favorites-list>
 
 =head2 followers([ \%args ])
 
 Aliases: followers_list
 
-L<https://dev.twitter.com/rest/reference/get/followers/list>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-followers-list>
 
 =head2 followers_ids([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/followers/ids>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids>
 
 =head2 friends([ \%args ])
 
 Aliases: friends_list
 
-L<https://dev.twitter.com/rest/reference/get/friends/list>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friends-list>
 
 =head2 friends_ids([ \%args ])
 
 Aliases: following_ids
 
-L<https://dev.twitter.com/rest/reference/get/friends/ids>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids>
 
 =head2 friendships_incoming([ \%args ])
 
 Aliases: incoming_friendships
 
-L<https://dev.twitter.com/rest/reference/get/friendships/incoming>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-incoming>
 
 =head2 friendships_outgoing([ \%args ])
 
 Aliases: outgoing_friendships
 
-L<https://dev.twitter.com/rest/reference/get/friendships/outgoing>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-outgoing>
 
 =head2 geo_id([ $place_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/geo/id/:place_id>
+L<https://developer.twitter.com/en/docs/geo/place-information/api-reference/get-geo-id-place_id>
 
 =head2 geo_search([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/geo/search>
+L<https://developer.twitter.com/en/docs/geo/places-near-location/api-reference/get-geo-search>
 
 =head2 get_configuration([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/help/configuration>
+L<https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration>
 
 =head2 get_languages([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/help/languages>
+L<https://developer.twitter.com/en/docs/developer-utilities/supported-languages/api-reference/get-help-languages>
 
 =head2 get_list([ \%args ])
 
 Aliases: show_list
 
-L<https://dev.twitter.com/rest/reference/get/lists/show>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-show>
 
 =head2 get_lists([ \%args ])
 
 Aliases: list_lists, all_subscriptions
 
-L<https://dev.twitter.com/rest/reference/get/lists/list>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-list>
 
 =head2 get_privacy_policy([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/help/privacy>
+L<https://developer.twitter.com/en/docs/developer-utilities/privacy-policy/api-reference/get-help-privacy>
 
 =head2 get_tos([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/help/tos>
+L<https://developer.twitter.com/en/docs/developer-utilities/terms-of-service/api-reference/get-help-tos>
 
 =head2 home_timeline([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/home_timeline>
+L<https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-home_timeline>
 
 =head2 list_members([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/lists/members>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-members>
 
 =head2 list_memberships([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/lists/memberships>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-memberships>
 
 =head2 list_ownerships([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/lists/ownerships>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships>
 
 =head2 list_statuses([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/lists/statuses>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses>
 
 =head2 list_subscribers([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/lists/subscribers>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers>
 
 =head2 list_subscriptions([ \%args ])
 
 Aliases: subscriptions
 
-L<https://dev.twitter.com/rest/reference/get/lists/subscriptions>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-subscriptions>
 
 =head2 lookup_friendships([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/friendships/lookup>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup>
 
 =head2 lookup_statuses([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/lookup>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-lookup>
 
 =head2 lookup_users([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/users/lookup>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup>
 
 =head2 mentions([ \%args ])
 
 Aliases: replies, mentions_timeline
 
-L<https://dev.twitter.com/rest/reference/get/statuses/mentions_timeline>
+L<https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-mentions_timeline>
 
 =head2 mutes([ \%args ])
 
 Aliases: muting_ids, muted_ids
 
-L<https://dev.twitter.com/rest/reference/get/mutes/users/ids>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-ids>
 
 =head2 muting([ \%args ])
 
 Aliases: mutes_list
 
-L<https://dev.twitter.com/rest/reference/get/mutes/users/list>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-list>
 
 =head2 no_retweet_ids([ \%args ])
 
 Aliases: no_retweets_ids
 
-L<https://dev.twitter.com/rest/reference/get/friendships/no_retweets/ids>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-no_retweets-ids>
 
 =head2 oembed([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/oembed>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed>
 
 =head2 profile_banner([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/users/profile_banner>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-users-profile_banner>
 
 =head2 rate_limit_status([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/application/rate_limit_status>
+L<https://developer.twitter.com/en/docs/developer-utilities/rate-limit-status/api-reference/get-application-rate_limit_status>
 
 =head2 retweeters_ids([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/retweeters/ids>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweeters-ids>
 
 =head2 retweets([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/retweets/:id>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweets-id>
 
 =head2 retweets_of_me([ \%args ])
 
 Aliases: retweeted_of_me
 
-L<https://dev.twitter.com/rest/reference/get/statuses/retweets_of_me>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweets_of_me>
 
 =head2 reverse_geocode([ $lat, [ $long, ]][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/geo/reverse_geocode>
+L<https://developer.twitter.com/en/docs/geo/places-near-location/api-reference/get-geo-reverse_geocode>
 
 =head2 saved_searches([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/saved_searches/list>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-saved_searches-list>
 
 =head2 search([ $q, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/search/tweets>
+L<https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets>
 
 =head2 sent_direct_messages([ \%args ])
 
 Aliases: direct_messages_sent
 
-L<https://dev.twitter.com/rest/reference/get/direct_messages/sent>
-
-=head2 show_direct_message([ $id, ][ \%args ])
-
-L<https://dev.twitter.com/rest/reference/get/direct_messages/show>
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-sent-message>
 
 =head2 show_friendship([ \%args ])
 
 Aliases: show_relationship
 
-L<https://dev.twitter.com/rest/reference/get/friendships/show>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-show>
 
 =head2 show_list_member([ \%args ])
 
 Aliases: is_list_member
 
-L<https://dev.twitter.com/rest/reference/get/lists/members/show>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-members-show>
 
 =head2 show_list_subscriber([ \%args ])
 
 Aliases: is_list_subscriber, is_subscriber_lists
 
-L<https://dev.twitter.com/rest/reference/get/lists/subscribers/show>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers-show>
 
 =head2 show_saved_search([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/saved_searches/show/:id>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-saved_searches-show-id>
 
 =head2 show_status([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/show/:id>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id>
 
 =head2 show_user([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/users/show>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-show>
 
 =head2 suggestion_categories([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/users/suggestions>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-suggestions>
 
 =head2 trends_available([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/trends/available>
+L<https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available>
 
 =head2 trends_closest([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/trends/closest>
+L<https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-closest>
 
 =head2 trends_place([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/trends/place>
+L<https://developer.twitter.com/en/docs/trends/trends-for-location/api-reference/get-trends-place>
 
 =head2 user_suggestions([ $slug, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/users/suggestions/:slug/members>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-suggestions-slug-members>
 
 =head2 user_suggestions_for([ $slug, ][ \%args ])
 
 Aliases: follow_suggestions
 
-L<https://dev.twitter.com/rest/reference/get/users/suggestions/:slug>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-suggestions-slug>
 
 =head2 user_timeline([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/statuses/user_timeline>
+L<https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline>
 
 =head2 users_search([ $q, ][ \%args ])
 
 Aliases: find_people, search_users
 
-L<https://dev.twitter.com/rest/reference/get/users/search>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search>
 
 =head2 verify_credentials([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/get/account/verify_credentials>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials>
 
 =head2 add_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/entries/add>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-add>
 
 =head2 add_list_member([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/members/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create>
 
 =head2 create_block([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/blocks/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-blocks-create>
 
 =head2 create_collection([ $name, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/create>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-create>
 
 =head2 create_favorite([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/favorites/create>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-favorites-create>
 
 =head2 create_friend([ $screen_name | $user_id, ][ \%args ])
 
 Aliases: follow, follow_new, create_friendship
 
-L<https://dev.twitter.com/rest/reference/post/friendships/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create>
 
 =head2 create_list([ $name, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-create>
 
 =head2 create_media_metadata([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/media/metadata/create>
+L<https://developer.twitter.com/en/docs/media/upload-media/api-reference/post-media-metadata-create>
 
 =head2 create_mute([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/mutes/users/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-mutes-users-create>
 
 Alias: mute
 
 =head2 create_saved_search([ $query, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/saved_searches/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-saved_searches-create>
 
 =head2 curate_collection([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/entries/curate>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-curate>
 
 =head2 delete_list([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/destroy>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy>
 
 =head2 delete_list_member([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/members/destroy>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy>
 
 =head2 destroy_block([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/blocks/destroy>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-blocks-destroy>
 
 =head2 destroy_collection([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/destroy>
-
-=head2 destroy_direct_message([ $id, ][ \%args ])
-
-L<https://dev.twitter.com/rest/reference/post/direct_messages/destroy>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-destroy>
 
 =head2 destroy_favorite([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/favorites/destroy>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-favorites-destroy>
 
 =head2 destroy_friend([ $screen_name | $user_id, ][ \%args ])
 
 Aliases: unfollow, destroy_friendship
 
-L<https://dev.twitter.com/rest/reference/post/friendships/destroy>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy>
 
 =head2 destroy_mute([ $screen_name | $user_id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/mutes/users/destroy>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-mutes-users-destroy>
 
 Alias: unmute
 
@@ -1692,101 +1732,97 @@ Alias: unmute
 
 Aliases: delete_saved_search
 
-L<https://dev.twitter.com/rest/reference/post/saved_searches/destroy/:id>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-saved_searches-destroy-id>
 
 =head2 destroy_status([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/statuses/destroy/:id>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-destroy-id>
 
 =head2 members_create_all([ \%args ])
 
 Aliases: add_list_members
 
-L<https://dev.twitter.com/rest/reference/post/lists/members/create_all>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create_all>
 
 =head2 members_destroy_all([ \%args ])
 
 Aliases: remove_list_members
 
-L<https://dev.twitter.com/rest/reference/post/lists/members/destroy_all>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all>
 
 =head2 move_collection_entry([ $id, [ $tweet_id, [ $relative_to, ]]][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/entries/move>
-
-=head2 new_direct_message([ $text, [ $screen_name | $user_id, ]][ \%args ])
-
-L<https://dev.twitter.com/rest/reference/post/direct_messages/new>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-move>
 
 =head2 remove_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/entries/remove>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-entries-remove>
 
 =head2 remove_profile_banner([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/account/remove_profile_banner>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-remove_profile_banner>
 
 =head2 report_spam([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/users/report_spam>
+L<https://developer.twitter.com/en/docs/accounts-and-users/mute-block-report-users/api-reference/post-users-report_spam>
 
 =head2 retweet([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/statuses/retweet/:id>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-retweet-id>
 
 =head2 subscribe_list([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/subscribers/create>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-create>
 
 =head2 unretweet([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/statuses/unretweet/:id>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-unretweet-id>
 
 =head2 unsubscribe_list([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/subscribers/destroy>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-destroy>
 
 =head2 update([ $status, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/statuses/update>
+L<https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update>
 
 =head2 update_account_settings([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/account/settings>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-settings>
 
 =head2 update_collection([ $id, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/collections/update>
+L<https://developer.twitter.com/en/docs/tweets/curate-a-collection/api-reference/post-collections-update>
 
 =head2 update_friendship([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/friendships/update>
+L<https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update>
 
 =head2 update_list([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/lists/update>
+L<https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-update>
 
 =head2 update_profile([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/account/update_profile>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile>
 
 =head2 update_profile_background_image([ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/account/update_profile_background_image>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_background_image>
 
 =head2 update_profile_banner([ $banner, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/account/update_profile_banner>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_banner>
 
 =head2 update_profile_image([ $image, ][ \%args ])
 
-L<https://dev.twitter.com/rest/reference/post/account/update_profile_image>
+L<https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_image>
 
 =head2 upload_media([ $media, ][ \%args ])
 
 Aliases: upload
 
-L<https://dev.twitter.com/rest/reference/post/media/upload>
+L<https://developer.twitter.com/en/docs/media/upload-media/api-reference/post-media-upload>
 
 =head2 direct_messages_events([ \%args ])
 
@@ -1800,9 +1836,52 @@ L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/ap
 
 L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message-event>
 
-=head2 new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+=head2 new_direct_messages_event([$text, $recipient_id ] | [ \%event ], [ \%args ])
+
+For simple usage, pass text and recipient ID:
+
+    $client->new_dirrect_messages_event($text, $recipient_id)
+
+For more complex messages, pass a full event structure, for example:
+
+    $client->new_direct_massages_event({
+        type => 'message_create',
+        message_create => {
+            target => { recipient_id => $user_id },
+            message_data => {
+                text => $text,
+                attachment => {
+                    type  => 'media',
+                    media => { id => $media->{id} },
+                },
+            },
+        },
+    })
 
 L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
+
+=head2 invalidate_access_token([ \%args ])
+
+Calling this method has the same effect as a user revoking access to the
+application via Twitter settings. The access token/secret pair will no longer
+be valid.
+
+This method can be called with client that has been initialized with
+C<access_token> and C<access_token_secret> attributes, by passing C<-token> and
+C<-token_secret> parameters, or by passing C<access_token> and
+C<access_token_secret> parameters.
+
+    $client->invalidate_access_token;
+    $client->invalidate_access_token({ -token => $token, -token_secret => $secret });
+    $client->invalidate_access_token({
+        access_token        => $token,
+        access_token_secret => $secret,
+    });
+
+Twitter added this method to the API on 2018-09-20.
+
+See
+L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/invalidate_access_token>
 
 =head1 AUTHOR
 

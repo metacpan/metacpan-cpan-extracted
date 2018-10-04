@@ -6,7 +6,7 @@ use File::Spec::Functions;
 use Data::Dumper;
 
 my $obj = Text::Amuse::Output->new(
-                                   document => [],
+                                   document => 1,
                                    format => "html",
                                   );
 

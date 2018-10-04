@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-our $VERSION = '1.20180125'; # VERSION 1.10
+our $VERSION = '1.20181001'; # VERSION 1.10
 
 use strict;
 use warnings;
@@ -476,7 +476,7 @@ install_deps.pl - install dependencies with package manager or CPAN
 
 =head1 VERSION
 
-version 1.20180125
+version 1.20181001
 
 =head1 AUTHORS
 
@@ -494,7 +494,7 @@ Davide Migliavacca <shari@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matt Simerson.
+This software is copyright (c) 2018 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

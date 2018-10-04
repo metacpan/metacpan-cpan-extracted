@@ -7,7 +7,8 @@ plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 
 my $embedder = LinkEmbedder->new;
 
-my $link = $embedder->get('http://ix.io/fpW');
+my $link;
+$embedder->get_p('http://ix.io/fpW')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Ix');
 cmp_deeply(
   $link->TO_JSON,

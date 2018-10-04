@@ -96,6 +96,9 @@ subtest unimport => sub {
     isnt Time::HiRes::time(), 123.456789, 'hires time unset';
 
     Test::Time::HiRes->import();
+
+    is time(), 123, "time set again";
+    is Time::HiRes::time(), 123.456789, 'hires time set again';
 };
 
 done_testing;

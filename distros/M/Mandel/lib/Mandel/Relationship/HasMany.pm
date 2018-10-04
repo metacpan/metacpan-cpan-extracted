@@ -1,113 +1,10 @@
 package Mandel::Relationship::HasMany;
-
-=head1 NAME
-
-Mandel::Relationship::HasMany - A field relates to many other mongodb document
-
-=head1 DESCRIPTION
-
-L<Mandel::Relationship::HasMany> is a class used to describe the relationship
-between one document that has a relationship to many other documents.
-The connection between the documents is described in the database using
-L<DBRef|http://docs.mongodb.org/manual/reference/database-references/>.
-
-=head1 DATABASE STRUCTURE
-
-A "person" that I<has many> "cats" will look like this in the database:
-
-  mongodb# db.persons.find();
-  { "_id" : ObjectId("53529f28c5483e4977020000") }
-
-  mongodb# db.cats.find({ "person.$id": ObjectId("53529f28c5483e4977020000") })
-  {
-    "_id" : ObjectId("53529f28c5483e5077040000"),
-    "person" : DBRef("persons", ObjectId("53529f28c5483e4977020000"))
-  }
-  {
-    "_id" : ObjectId("6432574384483e4978010000"),
-    "person" : DBRef("persons", ObjectId("53529f28c5483e4977020000"))
-  }
-
-A "has many" on one side is L<Mandel::Relationship::BelongsTo> on the other
-side.
-
-=head1 SYNOPSIS
-
-=head2 Using DSL
-
-  package MyModel::Person;
-  use Mandel::Document;
-  has_many cats => 'MyModel::Cat';
-
-=head2 Using object oriented interface
-
-  MyModel::Person->model->relationship(
-    "has_many",
-    "cats",
-    "MyModel::Cat",
-  );
-
-See also L<Mandel::Model/relationship>.
-
-=head2 Methods generated
-
-  # non-blocking
-  $person = MyModel::Person->new->add_cats(\%constructor_args, sub {
-              my($person, $err, $cat_obj) = @_;
-              # ...
-            });
-
-  $person = MyModel::Person->new->add_cats($cat_obj, sub {
-              my($person, $err, $cat_obj) = @_;
-              # ...
-            });
-
-  $person = MyModel::Cat->new->cats(sub {
-              my($self, $err, $array_of_cats) = @_;
-              # ...
-            });
-
-  # blocking
-  $cat_obj = MyModel::Person->new->add_cats(\%args);
-  $cat_obj = MyModel::Person->new->add_cats($cat_obj);
-  $array_of_cats = MyModel::Person->new->cats;
-
-  $cat_collection = MyModel::Person->new->search_cats;
-
-=cut
-
 use Mojo::Base 'Mandel::Relationship';
 use Mojo::Util;
 use Mango::BSON 'bson_dbref';
 
-=head1 ATTRIBUTES
-
-L<Mandel::Relationship::HasMany> inherits all attributes from
-L<Mandel::Relationship> and implements the following new ones.
-
-=head2 add_method_name
-
-The name of the method used to add another document to the relationship.
-
-=head2 search_method_name
-
-The name of the method used to search related documents.
-
-=cut
-
 has add_method_name    => sub { sprintf 'add_%s',    shift->accessor };
 has search_method_name => sub { sprintf 'search_%s', shift->accessor };
-
-=head1 METHODS
-
-L<Mandel::Relationship::HasMany> inherits all methods from
-L<Mandel::Relationship> and implements the following new ones.
-
-=head2 monkey_patch
-
-Add methods to L<Mandel::Relationship/document_class>.
-
-=cut
 
 sub monkey_patch {
   shift->_monkey_patch_all_method->_monkey_patch_add_method->_monkey_patch_search_method;
@@ -215,13 +112,113 @@ sub _monkey_patch_search_method {
       return $related_model->new_collection(
         $doc->connection,
         extra => $extra || {},
-        query => {%{$query || {}}, sprintf('%s.$id', $foreign_field) => $doc->id,},
+        query => {%{$query || {}}, sprintf('%s.$id', $foreign_field) => $doc->id},
       );
     }
   );
 
   return $self;
 }
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mandel::Relationship::HasMany - A field relates to many other mongodb document
+
+=head1 DESCRIPTION
+
+L<Mandel::Relationship::HasMany> is a class used to describe the relationship
+between one document that has a relationship to many other documents.
+The connection between the documents is described in the database using
+L<DBRef|http://docs.mongodb.org/manual/reference/database-references/>.
+
+=head1 DATABASE STRUCTURE
+
+A "person" that I<has many> "cats" will look like this in the database:
+
+  mongodb# db.persons.find();
+  { "_id" : ObjectId("53529f28c5483e4977020000") }
+
+  mongodb# db.cats.find({ "person.$id": ObjectId("53529f28c5483e4977020000") })
+  {
+    "_id" : ObjectId("53529f28c5483e5077040000"),
+    "person" : DBRef("persons", ObjectId("53529f28c5483e4977020000"))
+  }
+  {
+    "_id" : ObjectId("6432574384483e4978010000"),
+    "person" : DBRef("persons", ObjectId("53529f28c5483e4977020000"))
+  }
+
+A "has many" on one side is L<Mandel::Relationship::BelongsTo> on the other
+side.
+
+=head1 SYNOPSIS
+
+=head2 Using DSL
+
+  package MyModel::Person;
+  use Mandel::Document;
+  has_many cats => 'MyModel::Cat';
+
+=head2 Using object oriented interface
+
+  MyModel::Person->model->relationship(
+    "has_many",
+    "cats",
+    "MyModel::Cat",
+  );
+
+See also L<Mandel::Model/relationship>.
+
+=head2 Methods generated
+
+  # non-blocking
+  $person = MyModel::Person->new->add_cats(\%constructor_args, sub {
+              my($person, $err, $cat_obj) = @_;
+              # ...
+            });
+
+  $person = MyModel::Person->new->add_cats($cat_obj, sub {
+              my($person, $err, $cat_obj) = @_;
+              # ...
+            });
+
+  $person = MyModel::Cat->new->cats(sub {
+              my($self, $err, $array_of_cats) = @_;
+              # ...
+            });
+
+  # blocking
+  $cat_obj = MyModel::Person->new->add_cats(\%args);
+  $cat_obj = MyModel::Person->new->add_cats($cat_obj);
+  $array_of_cats = MyModel::Person->new->cats;
+
+  $cat_collection = MyModel::Person->new->search_cats;
+
+=head1 ATTRIBUTES
+
+L<Mandel::Relationship::HasMany> inherits all attributes from
+L<Mandel::Relationship> and implements the following new ones.
+
+=head2 add_method_name
+
+The name of the method used to add another document to the relationship.
+
+=head2 search_method_name
+
+The name of the method used to search related documents.
+
+=head1 METHODS
+
+L<Mandel::Relationship::HasMany> inherits all methods from
+L<Mandel::Relationship> and implements the following new ones.
+
+=head2 monkey_patch
+
+Add methods to L<Mandel::Relationship/document_class>.
 
 =head1 SEE ALSO
 
@@ -232,5 +229,3 @@ L<Mojolicious>, L<Mango>, L<Mandel::Relationship>
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

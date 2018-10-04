@@ -1,5 +1,5 @@
 package ETL::Yertl::InputSeries;
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 # ABSTRACT: Read a series of input streams
 
 #pod =head1 SYNOPSIS
@@ -128,7 +128,7 @@ ETL::Yertl::InputSeries - Read a series of input streams
 
 =head1 VERSION
 
-version 0.042
+version 0.043
 
 =head1 SYNOPSIS
 

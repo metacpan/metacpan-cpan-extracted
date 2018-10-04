@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::verify;
-$App::Deps::Verify::App::VerifyDeps::Command::verify::VERSION = '0.0.1';
+$App::Deps::Verify::App::VerifyDeps::Command::verify::VERSION = '0.2.1';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -52,7 +52,7 @@ App::Deps::Verify::App::VerifyDeps::Command::verify
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.1
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

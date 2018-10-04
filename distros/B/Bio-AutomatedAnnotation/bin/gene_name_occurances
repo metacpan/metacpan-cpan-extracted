@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::AutomatedAnnotation::Main::GeneNameOccurances;
-
+$Bio::AutomatedAnnotation::Main::GeneNameOccurances::VERSION = '1.182770';
 # ABSTRACT: Create a spreadsheet with gene name occurances
 # PODNAME: gene_name_occurances
 
@@ -25,7 +25,7 @@ gene_name_occurances - Create a spreadsheet with gene name occurances
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

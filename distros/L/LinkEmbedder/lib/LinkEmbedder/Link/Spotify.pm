@@ -6,9 +6,9 @@ has provider_url  => sub { Mojo::URL->new('https://spotify.com') };
 has theme         => 'white';
 has view          => '';                                              # list, coverart
 
-sub learn {
-  my ($self, $cb) = @_;
-  my $url = $self->url;
+sub learn_p {
+  my $self = shift;
+  my $url  = $self->url;
   my ($iframe_src, @path);
 
   if ($url =~ s!^spotify:!!) {                                        # spotify:track:5tv77MoS0TzE0sJ7RwTj34
@@ -18,15 +18,15 @@ sub learn {
     @path = @{$url->path};
   }
 
-  return $self->SUPER::learn($cb) unless @path;
+  return $self->SUPER::learn_p unless @path;
 
   $iframe_src = Mojo::URL->new('https://embed.spotify.com');
   $iframe_src->query(theme => $self->theme, uri => join(':', spotify => @path), view => $self->view);
   $self->{iframe_src} = $iframe_src;
   $self->template->[1] = 'iframe.html.ep';
   $self->type('rich');
-  $self->$cb if $cb;
-  $self;
+
+  return Mojo::Promise->new->resolve($self);
 }
 
 1;

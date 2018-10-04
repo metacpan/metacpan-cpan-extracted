@@ -1,6 +1,6 @@
 IO-ReadHandle-Include
 
-The current version is 1.0.0.
+The current version is 1.2.
 
 This module provides a filehandle for reading from a file with include
 files.  If an include file directive is recognized in the read text

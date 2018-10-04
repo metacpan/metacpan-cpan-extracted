@@ -1,5 +1,12 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.53 2018-10-03
+
+* Functions to join and split daku, handaku now exported
+* Documented kana2romaji option "passport"
+* Documented kana2romaji option "use_m"'s override behaviour
+* kana2hentai now splits out the daku, handaku
+
 0.52 2018-09-18
 
 * "smallize_kana" now converts burituji to burijji

@@ -8,7 +8,8 @@ d-i pkgsel/include string [% pkglist %][% END %]
 
 [% tweakdesc %]
 d-i preseed/late_command string set -e;\
- suite=[% suite %][% IF pkgautolist %];\
+ suite=[% suite %][% IF nonfree %];\
+ nonfree=1[% END %][% IF pkgautolist %];\
  chroot /target apt-mark auto \
   [% pkgautolist %] || true[% END %];\
  [% tweaklist %]

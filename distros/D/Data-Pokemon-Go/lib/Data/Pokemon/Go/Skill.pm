@@ -4,14 +4,13 @@ use utf8;
 
 use Moose;
 use Moose::Util::TypeConstraints;
+use YAML::XS;
+use File::Share 'dist_dir';
+my $dir = dist_dir('Data-Pokemon-Go');
 
 with 'Data::Pokemon::Go::Role::Types';
 
-use Path::Tiny;
-my $in_file = path( 'data', 'Skill.yaml' );
-
-use YAML::XS;
-my $data = YAML::XS::LoadFile($in_file);
+my $data = YAML::XS::LoadFile("$dir/Skill.yaml");
 map{ $data->{$_}{name} = $_ } keys %$data;
 our @All = map{ $_->{name} } sort{ $a->{type} cmp $b->{type} } values %$data;
 

@@ -37,15 +37,15 @@ $app->plugin('CHI');
 my $cmds = $app->commands;
 
 ok(grep/::CHI/, @{$cmds->namespaces}, 'Namespace is set');
-is(
-  $cmds->namespaces->[0],
-  'Mojolicious::Command',
+like(
+  join(' ', @{$cmds->namespaces}),
+  qr!Mojolicious::Command!,
   'Namespace is set'
 );
 
-is(
-  $cmds->namespaces->[-1],
-  'Mojolicious::Plugin::CHI',
+like(
+  join(' ', @{$cmds->namespaces}),
+  qr!Mojolicious::Plugin::CHI!,
   'Namespace is set'
 );
 
@@ -102,15 +102,15 @@ $app->plugin(CHI => {
 });
 
 $cmds = $app->commands;
-is(
-  $cmds->namespaces->[0],
-  'Mojolicious::Command',
+like(
+  join(' ', @{$cmds->namespaces}),
+  qr!Mojolicious::Command!,
   'Namespace is set only once'
 );
 
-is(
-  $cmds->namespaces->[-1],
-  'Mojolicious::Plugin::CHI',
+like(
+  join(' ', @{$cmds->namespaces}),
+  qr!Mojolicious::Plugin::CHI!,
   'Namespace is set only once'
 );
 

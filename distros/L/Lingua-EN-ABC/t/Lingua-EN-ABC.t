@@ -37,6 +37,14 @@ my $aluminium_in = 'aluminium aeroplane';
 my $aluminium_out = a2b ($aluminium_in, s => 1);
 is ($aluminium_out, $aluminium_in, "spelling-only does not change $aluminium_in"); 
 
+my $sc = 'somber-colored';
+my $sc_out = a2b ($sc);
+is ($sc_out, 'sombre-coloured', "coloured");
+
+my $vp = 'vaporized';
+my $vp_out = a2b ($vp);
+is ($vp_out, 'vapourised');
+
 # Github issue 1.
 
 TODO: {
@@ -57,6 +65,21 @@ TODO: {
     ok ($warning, "Got warning");
     like ($warning, qr/ambiguous/i, "Warning has correct form");
 };
+
+#TODO: {
+#    local $TODO = 'plurals';
+    my $behaviors = 'behaviors';
+    my $behaviours = a2b ($behaviors);
+    is ($behaviours, 'behaviours');
+    my $behaviorsround = b2a ($behaviours);
+    is ($behaviorsround, $behaviors);
+
+    my $colors = 'colors';
+    my $colours = a2b ($colors);
+    is ($colours, 'colours');
+    my $colorsround = b2a ($colours);
+    is ($colorsround, $colors);
+#};
 
 done_testing ();
 

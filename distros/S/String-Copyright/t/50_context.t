@@ -82,7 +82,7 @@ is copyright(
 	), '2016:Foo',
 	'chatter then copyright';
 
-is copyright( "Copyright ?1991-2012 Unicode, Inc." ),
+is copyright("Copyright ?1991-2012 Unicode, Inc."),
 	'1991-2012:Unicode, Inc.',
 	'broken copyright sign';
 

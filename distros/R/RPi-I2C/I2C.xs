@@ -15,7 +15,7 @@ int I2C__readI2CBlockData(int file, int command, SV* output){
     ret = i2c_smbus_read_i2c_block_data(file, command, len, buf);
 
     if (ret == -1){
-        croak("read_block() has invalid return. Is I2C device connected?\n");
+        croak("read_block() has invalid return. Is I2C device connected? Is the I2C bus speed set correctly?\n");
     }
     sv_setpvn(output, buf, ret);
 

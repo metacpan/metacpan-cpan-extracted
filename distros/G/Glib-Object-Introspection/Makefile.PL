@@ -71,9 +71,9 @@ my %meta_merge = (
                     mailto  => 'bug-Glib-Object-Introspection [at] rt.cpan.org',
             },
             repository  => {
-                    url     => 'git://git.gnome.org/perl-Glib-Object-Introspection',
+                    url     => 'git@gitlab.gnome.org:GNOME/perl-glib-object-introspection.git',
                     type    => 'git',
-                    web     => 'http://git.gnome.org/browse/perl-Glib-Object-Introspection',
+                    web     => 'https://gitlab.gnome.org/GNOME/perl-glib-object-introspection',
             },
         },
         prereqs => {

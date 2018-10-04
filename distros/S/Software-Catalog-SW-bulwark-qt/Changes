@@ -1,3 +1,8 @@
+0.002   2018-10-04 (PERLANCAR)
+
+	- bulwark-qt 2.0.0 now extracts to / instead of /bin.
+
+
 0.001   2018-09-20 (PERLANCAR)
 
         - First release.

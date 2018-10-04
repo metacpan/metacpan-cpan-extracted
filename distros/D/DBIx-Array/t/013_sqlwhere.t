@@ -6,14 +6,21 @@ use Test::More tests => 160 + 2;
 BEGIN { use_ok( 'DBIx::Array' ); }
 my $dba   = DBIx::Array->new;
 isa_ok($dba, 'DBIx::Array');
+
 local $@;
 eval "require DBD::SQLite";
-my $error    = $@;
+my $error_dbd    = $@;
+
+local $@;
+eval "require SQL::Abstract"; #RT127167
+my $error_abs    = $@;
+
 my $table    = "test_table";
 my $database = 'test_database';
 
 SKIP: {
-  skip "Database driver DBD::SQLite not available", 160 if $error;
+  skip "Database driver DBD::SQLite not available", 160 if $error_dbd;
+  skip "Package SQL::Abstract not available",      160 if $error_abs;
   $dba->connect("dbi:SQLite:dbname=$database", "", "", {RaiseError=>1, AutoCommit=>1});
   
   $dba->sqlexecute("DROP TABLE IF EXISTS $table");

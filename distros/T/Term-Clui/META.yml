@@ -20,12 +20,11 @@ no_index:
     - inc
 requires:
   File::Copy: '0'
-  Term::ReadKey: '0'
-  Term::ReadLine::Gnu: '0'
+  Term::ReadLine: '0'
   perl: '5.006000'
 resources:
   bugtracker: https://github.com/plicease/Term-Clui/issues
   homepage: https://metacpan.org/pod/Term-Clui
   repository: https://github.com/plicease/Term-Clui.git
-version: '1.73'
+version: '1.75'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

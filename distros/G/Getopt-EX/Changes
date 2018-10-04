@@ -1,5 +1,11 @@
 Revision history for Perl extension Getopt-EX
 
+v1.9.0 2018-10-04T08:42:55Z
+
+    - Accept (255,255,255) style decimal RGB color.
+    - Accept #FFF style 12bit/4096 color.
+    - Accept color names.
+
 v1.8.0 2018-06-26T06:08:06Z
 
     - Change FG/BG color switching implementation.

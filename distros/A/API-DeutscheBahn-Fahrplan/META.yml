@@ -1,0 +1,50 @@
+---
+abstract: 'Deutsche Bahn Fahrplan API Client'
+author:
+  - 'Edward Francis <edwardafrancis@gmail.com>'
+build_requires:
+  Test::Most: '0.35'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-DeutscheBahn-Fahrplan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  API::DeutscheBahn::Fahrplan:
+    file: lib/API/DeutscheBahn/Fahrplan.pm
+    version: '0.02'
+requires:
+  Carp: '1.50'
+  HTTP::Tiny: '0.076'
+  JSON::XS: '3.04'
+  Moose: '2.20'
+  URI: '1.74'
+  URI::Encode: v1.1.1
+  URI::QueryParam: '1.74'
+  namespace::autoclean: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Edward-Francis/API-DeutscheBahn-Fahrplan/issues
+  homepage: https://github.com/Edward-Francis/API-DeutscheBahn-Fahrplan
+  repository: git://github.com/Edward-Francis/API-DeutscheBahn-Fahrplan.git
+version: '0.02'
+x_contributors:
+  - 'Edward Francis <Edward-Francis@users.noreply.github.com>'
+  - 'Edward Francis <edward.francis@zpg.co.uk>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

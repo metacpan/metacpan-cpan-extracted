@@ -1,5 +1,5 @@
 ---
-abstract: 'Exchange files and update issues from your colleagues via an S3 bucket.'
+abstract: 'Exchange files and update issues with your colleagues via an S3 bucket or rsync.'
 author:
   - philiprbrenan@gmail.com
 build_requires: {}
@@ -15,11 +15,11 @@ name: Data-Exchange
 provides:
   Data::Exchange:
     file: lib/Data/Exchange.pm
-    version: '20180916'
+    version: '20181002'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20180817'
+  Data::Table::Text: '20181001'
   Storable: '0'
   Test2::API: '0'
   Test::More: '0'
@@ -27,5 +27,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180916'
+version: '20181002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

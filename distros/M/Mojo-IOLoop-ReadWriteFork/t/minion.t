@@ -10,8 +10,8 @@ use File::Temp 'tempdir';
 use Test::Mojo;
 use Test::More;
 
-plan skip_all => 'Minion::Backend::SQLite need to be installed to run this test'
-  unless eval 'require Minion::Backend::SQLite;1';
+plan skip_all => 'Minion::Backend::SQLite >=4.001 need to be installed to run this test'
+  unless eval 'require Minion::Backend::SQLite;Minion::Backend::SQLite->VERSION >= 4.001';
 plan skip_all => 'EV need to be installed to run this test'
   unless eval { Mojo::IOLoop->singleton->reactor->isa('Mojo::Reactor::EV') };
 

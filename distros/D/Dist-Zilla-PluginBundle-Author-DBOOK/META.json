@@ -113,11 +113,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::DBOOK" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm",
-         "version" : "0.037"
+         "version" : "0.038"
       },
       "Dist::Zilla::PluginBundle::Author::DBOOK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm",
-         "version" : "0.037"
+         "version" : "0.038"
       }
    },
    "release_status" : "stable",
@@ -133,7 +133,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#distzilla"
    },
-   "version" : "0.037",
+   "version" : "0.038",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -324,7 +324,7 @@
                   "add_files_in" : [
                      "/"
                   ],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "%v%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -358,9 +358,9 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.037",
-                  "tag_format" : "v%v",
-                  "tag_message" : "v%v"
+                  "tag" : "0.038",
+                  "tag_format" : "%v",
+                  "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
                   "git_version" : "2.14.4",
@@ -401,7 +401,7 @@
                      "dist.ini"
                   ],
                   "allow_dirty_match" : [
-                     "(?^:^(?:lib|script|bin)/)"
+                     "(?^:^)"
                   ],
                   "changelog" : "Changes"
                },

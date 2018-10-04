@@ -51,11 +51,11 @@
    "provides" : {
       "MySQL::Workbench::DBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC.pm",
-         "version" : "1.01"
+         "version" : "1.07"
       },
       "MySQL::Workbench::DBIC::FakeDBIC" : {
          "file" : "lib/MySQL/Workbench/DBIC/FakeDBIC.pm",
-         "version" : "1.01"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -70,8 +70,10 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC"
       }
    },
-   "version" : "1.01",
+   "version" : "1.07",
    "x_contributors" : [
+      "Mario Minati <mario.minati@minati.de>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],

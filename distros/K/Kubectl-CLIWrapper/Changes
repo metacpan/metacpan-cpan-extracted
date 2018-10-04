@@ -1,3 +1,14 @@
+0.06 2018-10-02
+ - Port from Moose to Moo + Types::Standard, as no Moose-specific 
+   features are needed. Should be backwards compatible (pplu + waterkip)
+
+0.05 2018-10-02
+ - token command-line option can now be dynamically generated 
+   on each invocation passing a CodeRef (ureesoriano)
+
+0.04 2018-10-01
+ - token attribute was being ignored (ureesoriano)
+
 0.03 2018-09-25
  - Ability to set a kubeconfig via an attribute (waterkip)
    The namespace parameter no longer gets a default value (if

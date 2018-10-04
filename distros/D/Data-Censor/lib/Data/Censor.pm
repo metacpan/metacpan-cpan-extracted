@@ -11,11 +11,11 @@ Data::Censor - censor sensitive stuff in a data structure
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -94,8 +94,9 @@ sub new {
     } else {
         $self->{is_sensitive_field} = {
             map { $_ => 1 } qw(
-                pass  password  secret  private_key
-                cardnum  card_number  pan  cvv cvv2 ccv
+                pass         password     old_password   secret
+                private_key  cardnum      card_number    pan
+                cvv          cvv2         ccv
             )
         };
     }
@@ -219,7 +220,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014 David Precious.
+Copyright 2018 David Precious.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

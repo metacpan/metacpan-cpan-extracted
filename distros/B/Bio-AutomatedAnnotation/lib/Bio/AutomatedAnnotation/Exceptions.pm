@@ -1,6 +1,6 @@
 package Bio::AutomatedAnnotation::Exceptions;
 # ABSTRACT: Exceptions for input data 
-
+$Bio::AutomatedAnnotation::Exceptions::VERSION = '1.182770';
 
 
 use Exception::Class (
@@ -23,7 +23,7 @@ Bio::AutomatedAnnotation::Exceptions - Exceptions for input data
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

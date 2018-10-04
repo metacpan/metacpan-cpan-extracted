@@ -1,5 +1,5 @@
 package Mail::DMARC::Policy;
-our $VERSION = '1.20180125'; # VERSION
+our $VERSION = '1.20181001'; # VERSION
 use strict;
 use warnings;
 
@@ -88,13 +88,13 @@ sub sp {
 
 sub adkim {
     return $_[0]->{adkim} if 1 == scalar @_;
-    croak "invalid adkim" if 0 == grep {/^$_[1]$/ix} qw/ r s /;
+    croak "invalid adkim" if 0 == grep {/^\Q$_[1]\E$/ix} qw/ r s /;
     return $_[0]->{adkim} = $_[1];
 }
 
 sub aspf {
     return $_[0]->{aspf} if 1 == scalar @_;
-    croak "invalid aspf" if 0 == grep {/^$_[1]$/ix} qw/ r s /;
+    croak "invalid aspf" if 0 == grep {/^\Q$_[1]\E$/ix} qw/ r s /;
     return $_[0]->{aspf} = $_[1];
 }
 
@@ -147,13 +147,13 @@ sub domain {
 
 sub is_valid_rf {
     my ( $self, $f ) = @_;
-    return ( grep {/^$f$/i} qw/ iodef afrf / ) ? 1 : 0;
+    return ( grep {/^\Q$f\E$/i} qw/ iodef afrf / ) ? 1 : 0;
 }
 
 sub is_valid_p {
     my ( $self, $p ) = @_;
     croak "unspecified p" if !defined $p;
-    return ( grep {/^$p$/i} qw/ none reject quarantine / ) ? 1 : 0;
+    return ( grep {/^\Q$p\E$/i} qw/ none reject quarantine / ) ? 1 : 0;
 }
 
 sub is_valid_uri_list {
@@ -194,7 +194,7 @@ Mail::DMARC::Policy - a DMARC policy in object format
 
 =head1 VERSION
 
-version 1.20180125
+version 1.20181001
 
 =head1 SYNOPSIS
 
@@ -445,7 +445,7 @@ Davide Migliavacca <shari@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matt Simerson.
+This software is copyright (c) 2018 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

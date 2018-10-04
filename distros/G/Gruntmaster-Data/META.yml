@@ -1,0 +1,38 @@
+---
+abstract: 'Gruntmaster 6000 Online Judge -- database interface and tools'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  Test::Deep: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gruntmaster-Data
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::Cmd: '0'
+  DBD::Pg: '0'
+  DBI: '0'
+  DBIx::Simple: '0'
+  Date::Parse: '0'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  IO::Prompter: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  PerlX::Maybe: '0'
+  SQL::Abstract: '0'
+  Term::ANSIColor: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=gruntmaster-data.git
+version: '6000.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

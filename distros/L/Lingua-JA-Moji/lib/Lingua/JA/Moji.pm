@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -67,6 +67,8 @@ our @EXPORT_OK = qw/
                     romaji_vowel_styles
                     wide2ascii
 		    yurei_moji
+		    join_sound_marks
+		    split_sound_marks
 		   /;
 
 our %EXPORT_TAGS = (
@@ -166,7 +168,7 @@ sub make_convertors
 
 	# Improvement: one way tr/// for the ambiguous case lhs/rhs only.
 
-	if (length_one(@values) && unambiguous($table)) {
+	if (length_one (@values) && unambiguous ($table)) {
 	    # can use tr///;
 	    my $rhs = join '', @values;
 	    $sub_in2out = "\$input =~ tr/$lhs/$rhs/;";
@@ -382,7 +384,6 @@ sub kana2romaji
         $options = {};
     }
     # Parse the options
-    my $debug = $options->{debug};
     my $kunrei;
     my $hepburn;
     my $passport;
@@ -485,7 +486,7 @@ sub kana2romaji
 	    $input =~ s/([$hep_vowel{$vowel}])[ー$vowel_kana]/$hepburn{$1}$ve/g;
 	}
 	$input =~ s/${vowel_kana}[ー$vowel_kana]/$ve/g;
-	$input =~ s/([$vowelclass])[ー$vowel_kana]/$siin{$1}$ve/g; 
+	$input =~ s/([$vowelclass])[ー$vowel_kana]/$siin{$1}$ve/g;
     }
     # 拗音 (きょ)
     if ($hepburn) {
@@ -693,7 +694,7 @@ sub is_romaji
 {
     my ($romaji) = @_;
     if (length ($romaji) == 0) {
-	return;
+	return undef;
     }
     # Test that $romaji contains only characters which may be
     # romanized Japanese.
@@ -712,7 +713,7 @@ sub is_romaji_semistrict
 {
     my ($romaji) = @_;
     if (! is_romaji ($romaji)) {
-	return;
+	return undef;
     }
     if ($romaji =~ /
 		       # Don't allow small vowels, small tsu, or fya,
@@ -745,7 +746,7 @@ sub is_romaji_semistrict
 		       # Don't allow 'thi'
 		       thi
 		   /ix) {
-        return;
+        return undef;
     }
     return 1;
 }
@@ -825,25 +826,6 @@ sub make_dak_list
     }
     return @dak_list;
 }
-
-my $strip_daku;
-
-sub load_strip_daku
-{
-    if (!$strip_daku) {
-	my %dakuten;
-	@dakuten{(make_dak_list (qw/g d z b/))} = 
-	    map {$_."゛"} (make_dak_list (qw/k t s h/));
-	@dakuten{(make_dak_list ('p'))} = map {$_."゜"} (make_dak_list ('h'));
-	my $dakuten = join '', keys %dakuten;
-	$strip_daku = make_convertors ("ten_joined", "ten_split", \%dakuten);
-    }
-}
-
-my %dakuten;
-@dakuten{(make_dak_list (qw/g d z b/))} = 
-    map {$_."゛"} (make_dak_list (qw/k t s h/));
-@dakuten{(make_dak_list ('p'))} = map {$_."゜"} (make_dak_list ('h'));
 
 sub load_kana2hw2
 {
@@ -952,8 +934,7 @@ sub kana2morse
     load_kana2morse;
     $input = hira2kata ($input);
     $input =~ tr/ァィゥェォャュョッ/アイウエオヤユヨツ/;
-    load_strip_daku;
-    $input = $strip_daku->convert ($input);
+    $input = split_sound_marks ($input);
     $input = join ' ', (split '', $input);
     $input = $kana2morse->convert ($input);
     return $input;
@@ -978,7 +959,7 @@ sub morse2kana
 	$_ = $kana2morse->invert ($_);
     }
     $input = join '', @input;
-    $input = $strip_daku->invert ($input);
+    $input = join_sound_marks ($input);
     return $input;
 }
 
@@ -1019,9 +1000,92 @@ sub is_hiragana
     return;
 }
 
+my %daku2not = (qw/
+が か
+ぎ き
+ぐ く
+げ け
+ご こ
+だ た
+ぢ ち
+づ つ
+で て
+ど と
+ざ さ
+じ し
+ず す
+ぜ せ
+ぞ そ
+ば は
+び ひ
+ぶ ふ
+べ へ
+ぼ ほ
+ガ カ
+ギ キ
+グ ク
+ゲ ケ
+ゴ コ
+ダ タ
+ヂ チ
+ヅ ツ
+デ テ
+ド ト
+ザ サ
+ジ シ
+ズ ス
+ゼ セ
+ゾ ソ
+バ ハ
+ビ ヒ
+ブ フ
+ベ ヘ
+ボ ホ
+/);
+
+my %not2daku = reverse %daku2not;
+my $daku = qr![がぎぐげごだぢづでどざじずぜぞばびぶべぼガギグゲゴダヂヅデドザジズゼゾバビブベボ]!;
+my $nodaku = qr![かきくけこたしつてとさしすせそはひふへほカキクケコタシツテトサシスセソハヒフヘホ]!;
+
+my %handaku2not = (qw!
+ぱ は
+ぴ ひ
+ぷ ふ
+ぺ へ
+ぽ ほ
+パ ハ
+ピ ヒ
+プ フ
+ペ ヘ
+ポ ホ
+!);
+
+my %not2handaku = reverse %handaku2not;
+my $handaku = qr![ぱぴぷぺぽパピプペポ]!;
+my $nohandaku = qr![はひふへほハヒフヘホ]!;
+
+sub join_sound_marks
+{
+    my ($input) = @_;
+    $input =~ s!($nohandaku)(゚|゜)!$not2handaku{$1}!g;
+    $input =~ s!($nodaku)(゙|゛)!$not2daku{$1}!g;
+    # Remove strays.
+    $input =~ s![゙゛゚゜]!!g;
+    return $input;
+}
+
+sub split_sound_marks
+{
+    my ($input) = @_;
+    $input =~ s!($handaku)!$handaku2not{$1}゜!g;
+    $input =~ s!($daku)!$daku2not{$1}゛!g;
+    return $input;
+}
+
 sub kana2katakana
 {
     my ($input) = @_;
+    $input = join_sound_marks ($input);
     $input = hira2kata($input);
     if ($input =~ /\p{InHankakuKatakana}/) {
 	$input = hw2katakana($input);
@@ -1034,8 +1098,7 @@ sub kana2braille
     my ($input) = @_;
     load_kana2braille;
     $input = kana2katakana ($input);
-    load_strip_daku;
-    $input = $strip_daku->convert ($input);
+    $input = split_sound_marks ($input);
     $input =~ s/([キシチヒ])゛([ャュョ])/'⠘'.$nippon2kana{$siin{$1}.$boin{$2}}/eg;
     $input =~ s/(ヒ)゜([ャュョ])/'⠨'.$nippon2kana{$siin{$1}.$boin{$2}}/eg;
     $input =~ s/([キシチニヒミリ])([ャュョ])/'⠈'.$nippon2kana{$siin{$1}.$boin{$2}}/eg;
@@ -1054,7 +1117,7 @@ sub braille2kana
     $input =~ s/⠘(.)/$nippon2kana{$siin{$1}.'i'}.'゛'.$youon{$boin{$1}}/eg;
     $input =~ s/⠨(.)/$nippon2kana{$siin{$1}.'i'}.'゜'.$youon{$boin{$1}}/eg;
     $input =~ s/⠈(.)/$nippon2kana{$siin{$1}.'i'}.$youon{$boin{$1}}/eg;
-    $input = $strip_daku->invert ($input);
+    $input = join_sound_marks ($input);
     return $input;
 }
 
@@ -1071,8 +1134,7 @@ sub kana2circled
 {
     my ($input) = @_;
     $input = kana2katakana($input);
-    load_strip_daku;
-    $input = $strip_daku->convert($input);
+    $input = split_sound_marks ($input);
     load_circled_conv;
     $input = $circled_conv->convert ($input);
     return $input;
@@ -1082,9 +1144,8 @@ sub circled2kana
 {
     my ($input) = @_;
     load_circled_conv;
-    load_strip_daku;
     $input = $circled_conv->invert ($input);
-    $input = $strip_daku->invert ($input);
+    $input = join_sound_marks ($input);
     return $input;
 }
 
@@ -1159,7 +1220,7 @@ sub cyrillic2katakana
         load_katakana2cyrillic ();
     }
     my $katakana = $katakana2cyrillic->invert ($cyrillic);
-    $katakana =~ s/м/ン/g; 
+    $katakana =~ s/м/ン/g;
     $katakana =~ s/ンъ([アイウエオヤユヨ])/ン$1/g;
     return $katakana;
 }
@@ -1443,6 +1504,7 @@ sub kana2hentai
 	load_hentai ();
     }
     # Make it all-hiragana.
+    $text = split_sound_marks ($text);
     $text = kata2hira ($text);
     $text =~ s/$hi2hen_re/join ('・', @{$hi2hen{$1}})/ge;
     return $text;
@@ -1470,15 +1532,16 @@ sub kanji2hentai
     return $text;
 }
 
+my %yayuyo = (qw/
+		    ヤ ャ
+		    ユ ュ
+		    ヨ ョ
+		/);
+
 sub smallize_kana
 {
     my ($kana) = @_;
     my $orig = $kana;
-    my %yayuyo = (qw/
-			ヤ ャ
-			ユ ュ
-			ヨ ョ
-		    /);
     $kana =~ s/([キギシジチヂニヒビピミリ])([ヤユヨ])/$1$yayuyo{$2}/g;
     $kana =~ s/ツ([カキクケコガギグゲゴサシスセソタチツテトパビプペポジ])/ッ$1/g;
     if ($kana ne $orig) {
@@ -1500,7 +1563,8 @@ sub cleanup_kana
     $kana = kana2katakana ($kana);
     # Translate kanjis into kana where "naive user" has inserted kanji
     # not kana.
-    $kana =~ tr/力二一/カニー/;
+    # LHS are all kanji, RHS are all kana/chouon
+    $kana =~ tr/八力二一/ハカニー/;
     return $kana;
 }
 
@@ -1530,5 +1594,4 @@ sub bad_kanji
     return load_kanji ('bad-kanji');
 }
 
-1; 
-
+1;

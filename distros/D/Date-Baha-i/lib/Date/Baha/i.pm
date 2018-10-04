@@ -1,11 +1,9 @@
 package Date::Baha::i;
-BEGIN {
-  $Date::Baha::i::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert to and from Baha'i dates
 
-our $VERSION = '0.1903';
+our $VERSION = '0.2100';
 
 
 use strict;
@@ -254,9 +252,9 @@ sub as_string {
             $date_hash->{cycle_name},
             num2en_ordinal($date_hash->{kull_i_shay});
     }
-    elsif (!$args{size} && $args{numeric}) {
+    elsif (!$args{size} && $args{numeric} && !$args{alpha}) {
         # short numeric
-        $date .= sprintf '%s/%s/%s', @$date_hash{qw(month day year)};
+        $date .= sprintf '%s/%s/%s', @$date_hash{qw(year month day)};
     }
     elsif ($args{size} && $args{numeric}) {
         # long numeric
@@ -468,15 +466,17 @@ Date::Baha::i - Convert to and from Baha'i dates
 
 =head1 VERSION
 
-version 0.1903
+version 0.2100
 
 =head1 SYNOPSIS
 
-  perl -MDate::Baha::i -le'print scalar from_bahai(epoch=>time)'
+  # perl -MDate::Baha::i -le'%d = to_bahai(); print as_string(\%d)'
 
   use Date::Baha'i;
 
-  $bahai_date = to_bahai();
+  my($year, $month, $day) = (2018, 10, 2);
+
+  my $bahai_date = to_bahai();
   $bahai_date = to_bahai(epoch => time);
   $bahai_date = to_bahai(
       year  => $year,
@@ -484,7 +484,7 @@ version 0.1903
       day   => $day,
   );
 
-  %bahai_date = to_bahai();
+  my %bahai_date = to_bahai();
   %bahai_date = to_bahai(epoch => time);
   %bahai_date = to_bahai(
       year  => $year,
@@ -492,7 +492,9 @@ version 0.1903
       day   => $day,
   );
 
-  $date = from_bahai(
+  my($bahai_year, $bahai_month, $bahai_day) = (175, 11, 6);
+
+  my $date = from_bahai(
       year  => $bahai_year,
       month => $bahai_month,
       day   => $bahai_day,
@@ -507,17 +509,17 @@ version 0.1903
   $day = next_holy_day();
   $day = next_holy_day($year, $month, $day);
 
-  @cycles = cycles();
-  @years = years();
-  @months = months();
-  @days = days();
+  my @cycles = cycles();
+  my @years = years();
+  my @months = months();
+  my @days = days();
   @days = days_of_the_week();
-  %days = holy_days();
+  my %days = holy_days();
 
 =head1 DESCRIPTION
 
 This package renders the Baha'i date from two standard date formats -
-epoch time and a (year, month, day) triple.  It also converts a Baha'i 
+epoch time and a (year, month, day) triple.  It also converts a Baha'i
 date to standard ymd format.
 
 =head2 CYCLES
@@ -525,7 +527,7 @@ date to standard ymd format.
 Each cycle of nineteen years is called a Vahid.  Nineteen cycles constitute a
 period called Kull-i-Shay.
 
-The names of the years in each cycle are: 
+The names of the years in each cycle are:
 
   1.  Alif   - The Letter "A"
   2.  Ba     - The letter "B"
@@ -581,6 +583,7 @@ Intercalary Days: Four (or five) days in a leap year, before the last month.
 =head2 DAY NAMES
 
 The days of the Baha'i week are:
+
   1. Jalal    - Glory (Saturday)
   2. Jamal    - Beauty (Sunday)
   3. Kaml     - Perfection (Monday)
@@ -624,10 +627,6 @@ since the Baha'i day begins at sunset.
 * Ayyam-i-Ha (the Intercalary Days) 26 February to 1 March
 
 * The Fast - 2-20 March in the month 'Ala - 19 days from sunrise to sunset
-
-=head1 NAME
-
-Date::Baha::i - Convert to and from Baha'i dates
 
 =head1 FUNCTIONS
 
@@ -730,7 +729,7 @@ representations on or off.  The defaults are as follows:
 Here are some handy examples (newlines added for readability):
 
   short numeric:
-  1/1/159
+  159/11/6  # year/month/day
 
   long numeric:
   7th day of the week, 1st day of the 1st month, year 159,
@@ -805,17 +804,15 @@ Dates are given in common, standard (non-Baha'i) format.
 
 L<Date::Calc>
 
+L<Exporter>
+
 L<Lingua::EN::Numbers>
 
 L<Lingua::EN::Numbers::Years>
 
-L<http://www.projectpluto.com/calendar.htm#bahai>
-
-L<http://www.moonwise.co.uk/year/160bahai.htm>
+L<http://calendar.bahaiq.com/>
 
 =head1 TO DO
-
-Re-create the missing 01-as_string.t, 03-misc.t & 04-to_bahai.t tests!
 
 Base the date computation on the time of day (Baha'i day begins at sunset).
 
@@ -831,7 +828,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Gene Boggs.
+This software is copyright (c) 2015 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

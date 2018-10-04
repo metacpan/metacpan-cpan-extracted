@@ -61,6 +61,9 @@ sub run {
       push @args, "bin", "script", "scripts";
     }
 
+    # extra libs
+    push @args, @{$self->{libs} || []};
+
     # for develop requires
     push @args, "xt", "author" if $self->{develop};
   }
@@ -91,7 +94,6 @@ sub run {
   $self->_exclude_local_modules;
 
   if ($self->{exclude_core}) {
-    eval { require Module::CoreList; Module::CoreList->VERSION('2.99') } or die "requires Module::CoreList 2.99";
     $self->_exclude_core_prereqs;
   }
 
@@ -156,24 +158,25 @@ sub _requirements {
 sub _exclude_local_modules {
   my $self = shift;
 
-  my $inc_dir = File::Spec->catdir($self->{base_dir}, "inc");
-  if (-d $inc_dir) {
+  my @local_dirs = ("inc", @{$self->{libs} || []});
+  for my $dir (@local_dirs) {
+    my $local_dir = File::Spec->catdir($self->{base_dir}, $dir);
+    next unless -d $local_dir;
     find({
       wanted => sub {
         my $file = $_;
         return unless -f $file;
-        my $relpath = File::Spec->abs2rel($file, $self->{base_dir});
+        my $relpath = File::Spec->abs2rel($file, $local_dir);
 
         return unless $relpath =~ /\.pm$/;
         my $module = $relpath;
         $module =~ s!\.pm$!!;
         $module =~ s![\\/]!::!g;
         $self->{possible_modules}{$module} = 1;
-        $module =~ s!^inc::!!g;
-        $self->{possible_modules}{$module} = 1;
+        $self->{possible_modules}{"inc::$module"} = 1 if $dir eq 'inc';
       },
       no_chdir => 1,
-    }, $inc_dir);
+    }, $local_dir);
   }
 
   for my $req ($self->_requirements) {
@@ -185,6 +188,8 @@ sub _exclude_local_modules {
 
 sub _exclude_core_prereqs {
   my $self = shift;
+
+  eval { require Module::CoreList; Module::CoreList->VERSION('2.99') } or die "requires Module::CoreList 2.99";
 
   my $perl_version = $self->{perl_version} || $self->_find_used_perl_version || '5.008001';
   if ($perl_version =~ /^v?5\.(0?[1-9][0-9]?)(?:\.([0-9]))?$/) {

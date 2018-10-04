@@ -16,15 +16,17 @@ my %WriteMakefileArgs = (
   "LICENSE" => "apache",
   "NAME" => "Signer::AWSv4",
   "PREREQ_PM" => {
+    "Digest::SHA" => 0,
     "JSON::MaybeXS" => 0,
     "Moo" => 0,
+    "Time::Piece" => 0,
     "Type::Tiny" => 0,
     "URI::Escape" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,9 +34,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Digest::SHA" => 0,
   "JSON::MaybeXS" => 0,
   "Moo" => 0,
   "Test::More" => 0,
+  "Time::Piece" => 0,
   "Type::Tiny" => 0,
   "URI::Escape" => 0
 );

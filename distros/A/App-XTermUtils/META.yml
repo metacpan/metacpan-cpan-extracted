@@ -17,19 +17,20 @@ meta-spec:
   version: '1.4'
 name: App-XTermUtils
 requires:
+  Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code: '0'
+  Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Base: '1.811'
   Perinci::CmdLine::Classic: '1.770'
   Sah::Schema::color::rgb24: '0'
-  XTerm::Util: '0'
-  strict: '0'
-  warnings: '0'
+  Sah::Schema::true: '0'
+  XTerm::Util: '0.003'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-XTermUtils
   homepage: https://metacpan.org/release/App-XTermUtils
   repository: git://github.com/perlancar/perl-App-XTermUtils.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -384,14 +385,6 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: x_spec
-      name: DevelopX_spec
       version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode

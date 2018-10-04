@@ -1,0 +1,29 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+examples/introspect.pl
+examples/introspect_nb.pl
+lib/Protocol/DBus.pm
+lib/Protocol/DBus/.Connection.pm.swp
+lib/Protocol/DBus/Authn.pm
+lib/Protocol/DBus/Authn/IO.pm
+lib/Protocol/DBus/Authn/Mechanism.pm
+lib/Protocol/DBus/Authn/Mechanism/EXTERNAL.pm
+lib/Protocol/DBus/Client.pm
+lib/Protocol/DBus/Connect.pm
+lib/Protocol/DBus/Marshal.pm
+lib/Protocol/DBus/Message.pm
+lib/Protocol/DBus/Message/Header.pm
+lib/Protocol/DBus/Pack.pm
+lib/Protocol/DBus/Parser.pm
+lib/Protocol/DBus/Path.pm
+lib/Protocol/DBus/Peer.pm
+lib/Protocol/DBus/Signature.pm
+t/Protocol-DBus-Marshal.t
+t/Protocol-DBus-Message.t
+t/Protocol-DBus-Signature.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,42 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
+                                      },
+                      'requires' => {
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::More' => '0.96',
+                                      'Test::Spelling' => '0.12'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Mojo::Base' => '0',
+                                      'Mojolicious::Plugin::Web::Auth' => '0.12',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

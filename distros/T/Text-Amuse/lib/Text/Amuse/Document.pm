@@ -153,6 +153,94 @@ sub set_bidi_document {
 }
 
 
+=head3 language_code
+
+The language code of the document. This method will looks into the
+header of the document, searching for the keys C<lang> or C<language>,
+defaulting to C<en>.
+
+=head3 language
+
+Same as above, but returns the human readable version, notably used by
+Babel, Polyglossia, etc.
+
+=cut
+
+sub _language_mapping {
+    my $self = shift;
+    return {
+            ar => 'arabic', # R2L
+            bg => 'bulgarian',
+            ca => 'catalan',
+            cs => 'czech',
+            da => 'danish',
+            de => 'german',
+            el => 'greek',
+            en => 'english',
+            es => 'spanish',
+            et => 'estonian',
+            fa => 'farsi', # R2L
+            fi => 'finnish',
+            fr => 'french',
+            id => 'bahasai',
+            ga => 'irish',
+            gl => 'galician',
+            he => 'hebrew',  # R2L
+            hi => 'hindi',
+            hr => 'croatian',
+            hu => 'magyar',
+            is => 'icelandic',
+            it => 'italian',
+            lo => 'lao',
+            lv => 'latvian',
+            lt => 'lithuanian',
+            ml => 'malayalam',
+            mk => 'macedonian', # needs workaround
+            mr => 'marathi',
+            nl => 'dutch',
+            no => 'norsk',
+            nn => 'nynorsk',
+            oc => 'occitan',
+            sr => 'serbian',
+            ro => 'romanian',
+            ru => 'russian',
+            sk => 'slovak',
+            sl => 'slovenian',
+            pl => 'polish',
+            pt => 'portuges',
+            sq => 'albanian',
+            sv => 'swedish',
+            tr => 'turkish',
+            uk => 'ukrainian',
+            vi => 'vietnamese',
+           };
+}
+
+sub language_code {
+    my $self = shift;
+    unless (defined $self->{_doc_language_code}) {
+        my %header = $self->raw_header;
+        my $lang = $header{lang} || $header{language} || "en";
+        my $real = "en";
+        # check if language exists;
+        if ($self->_language_mapping->{$lang}) {
+            $real = $lang;
+        }
+        $self->{_doc_language_code} = $real;
+    }
+    return $self->{_doc_language_code};
+}
+
+sub language {
+    my $self = shift;
+    unless (defined $self->{_doc_language}) {
+        my $lc = $self->language_code;
+        # guaranteed not to return undef
+        $self->{_doc_language} = $self->_language_mapping->{$lc};
+    }
+    return $self->{_doc_language};
+}
+
 =head3 parse_directives
 
 Return an hashref with the directives found in the document.

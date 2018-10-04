@@ -214,10 +214,11 @@ warn "DIFF = \"$DIFF\"\n" if $opt_d{f};
 my %func = do {
     my $col = $opt_color ? 0 : 1;
     pairmap { $a => $b->[$col] } (
-	DELETE => [ sub { color("DELETE",  @_) }, \&bd ],
-	APPEND => [ sub { color("APPEND",  @_) }, \&bd ],
-	OLD    => [ sub { color("OCHANGE", @_) }, \&ul ],
-	NEW    => [ sub { color("NCHANGE", @_) }, \&ul ],
+	DELETE  => [ sub { color("DELETE",  @_) }, \&bd ],
+	APPEND  => [ sub { color("APPEND",  @_) }, \&bd ],
+	OLD     => [ sub { color("OCHANGE", @_) }, \&ul ],
+	NEW     => [ sub { color("NCHANGE", @_) }, \&ul ],
+	UNKNOWN => [ sub { color("UNKNOWN", @_) }, undef ],
     );
 };
 
@@ -460,8 +461,8 @@ while (<DIFF>) {
     }
     else {
 	if ($opt_unknown) {
-	    if ($opt_color) {
-		print color $colormap{UNKNOWN}, $_;
+	    if (my $f = $func{UNKNOWN}) {
+		print $f->($_);
 	    } else {
 		print;
 	    }
@@ -611,50 +612,12 @@ sub normal_words {
     @words;
 }
 
+use App::cdif::Command::Mecab;
+
 sub mecab_words {
     my $text = shift;
-
-    state $tmpfile = new App::cdif::Tmpfile;
-
-    my $pid = open(MECAB, '|-');
-    return normal_words($text) if not defined $pid;
-
-    my $eos = "EOS" . "000";
-    $eos++ while $text =~ /$eos/;
-    if ($pid) {
-	binmode MECAB, ":encoding(utf8)";
-	print MECAB $text;
-    } else {
-	open(STDOUT, ">&", $tmpfile->reset->fh) or die;
-	for ("disabling unreach warning") {
-	    my @mecab = (
-		'mecab',
-		'--node-format', '%M\\n',
-		'--eos-format',  "$eos\\n",
-		);
-	    warn "EXEC: @mecab\n" if $opt_d{m};
-	    exec @mecab;
-	}
-	warn "Fail to exec mecab command.\n";
-	for my $w (normal_words($text)) {
-	    $w =~ s/^[ \t]*\n/$eos/;
-	    $tmpfile->write($w, "\n");
-	}
-	exit;
-    }
-    close MECAB;
-
-    my @words;
-    $tmpfile->rewind;
-    while (my $s = $tmpfile->fh->getline) {
-	warn "MECAB: $s" if $opt_d{m};
-	chomp $s;
-	$s =~ s/$eos/\n/;
-	$s =~ s/(\s+)(?=\S)// and push @words, $1;
-	push @words, $s;
-    }
-
-    return @words;
+    state $mecab = new App::cdif::Command::Mecab;
+    $mecab->wordlist($text);
 }
 
 sub maketmp {

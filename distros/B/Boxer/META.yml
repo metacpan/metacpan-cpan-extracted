@@ -38,61 +38,62 @@ optional_features: {}
 provides:
   Boxer:
     file: lib/Boxer.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::CLI:
     file: lib/Boxer/CLI.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::CLI::Command:
     file: lib/Boxer/CLI/Command.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::CLI::Command::About:
     file: lib/Boxer/CLI/Command/About.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::CLI::Command::Aliases:
     file: lib/Boxer/CLI/Command/Aliases.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::CLI::Command::Commands:
     file: lib/Boxer/CLI/Command/Commands.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::CLI::Command::Compose:
     file: lib/Boxer/CLI/Command/Compose.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::File::WithSkeleton:
     file: lib/Boxer/File/WithSkeleton.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Part:
     file: lib/Boxer/Part.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Part::Reclass:
     file: lib/Boxer/Part/Reclass.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Role::Interact:
     file: lib/Boxer/Role/Interact.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Task:
     file: lib/Boxer/Task.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Task::Classify:
     file: lib/Boxer/Task/Classify.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Task::Serialize:
     file: lib/Boxer/Task/Serialize.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::Types:
     file: lib/Boxer/Types.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::World:
     file: lib/Boxer/World.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::World::Flat:
     file: lib/Boxer/World/Flat.pm
-    version: v1.1.8
+    version: v1.1.11
   Boxer::World::Reclass:
     file: lib/Boxer/World/Reclass.pm
-    version: v1.1.8
+    version: v1.1.11
 requires:
   App::Cmd: '0'
   Capture::Tiny: '0'
+  Class::XSAccessor: '0'
   File::BaseDir: '0'
   File::ShareDir: '0'
   IPC::System::Simple: '0'
@@ -118,7 +119,7 @@ resources:
   homepage: https://metacpan.org/release/Boxer
   license: http://dev.perl.org/licenses/
   repository: https://anonscm.debian.org/cgit/boxer/Boxer.git
-version: v1.1.8
+version: v1.1.11
 x_help_wanted:
   - documenter
   - tester

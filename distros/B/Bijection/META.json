@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033"
          }
       },
       "runtime" : {
@@ -38,7 +39,20 @@
          }
       }
    },
+   "provides" : {
+      "Bijection" : {
+         "file" : "lib/Bijection.pm",
+         "version" : "0.04"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Bijection.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Bijection"
+      }
+   },
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

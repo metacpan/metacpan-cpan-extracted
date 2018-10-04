@@ -1,7 +1,8 @@
-#!perl -w
+#!perl
 
 use strict;
-use Test::More; 
+use warnings;
+use Test::More;
 use XML::Feed;
 use XML::Feed::Enclosure;
 

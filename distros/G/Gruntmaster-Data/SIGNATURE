@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 32d0a2fd611d4d896dee51fd3979f60854b8a04c Changes
+SHA1 82d3c2c72864e10aa01a8150477382c7b95a582f MANIFEST
+SHA1 b6851f0a55c6b605a31d5465287f6e2f6e1394ba META.json
+SHA1 e3bb8688b6c6339aa18a160ec564f179f9b8c78c META.yml
+SHA1 bf39b8e516c70bf4d0f9a4d9aed8eb760504bc95 Makefile.PL
+SHA1 a293ed44d614b94e77460ce80f57e7bd97c71b5d README
+SHA1 1f7c3aab39bdb86289f95384c33f7a836757f70e db.sql
+SHA1 5e17a963ab061217969d7006ab0ef457fa599709 gm
+SHA1 faba9bef7892724d18b802c735804c7132ac5e96 gruntmaster-opener
+SHA1 3d84c5ff6bc45bacb2c2bffdf086e758be3d892d lib/Gruntmaster/App.pm
+SHA1 21662b0f62f92c88ab17d82438f93f005c176a72 lib/Gruntmaster/App/Command.pm
+SHA1 30f74d25b86f99b9d5be6a9d57a6f325726dfc76 lib/Gruntmaster/App/Command/Add.pm
+SHA1 75d1ab6cb707f0ed02afffb61c6b03d1f642df18 lib/Gruntmaster/App/Command/Edit.pm
+SHA1 502966fba0bfdee3d0878f319305ce34f199228a lib/Gruntmaster/App/Command/Get.pm
+SHA1 350ca379eb7b30007e5427350d024c508175b5fc lib/Gruntmaster/App/Command/List.pm
+SHA1 7edacab03ac5f2ad6d65291d91e310ed05b2bb0e lib/Gruntmaster/App/Command/Rerun.pm
+SHA1 278a88fa47eba51ed72c91ea2c76e5867e4c7c72 lib/Gruntmaster/App/Command/Rm.pm
+SHA1 355eca5ec3369aa3f47a3779c1d7cde410d15a8e lib/Gruntmaster/App/Command/Set.pm
+SHA1 8d1823cc42463c58ba0fb2a5dc2ef1aa127450a0 lib/Gruntmaster/App/Command/Show.pm
+SHA1 763c06335814baa9cec1ea7ff82c3cbfdbd201fa lib/Gruntmaster/Data.pm
+SHA1 688a4aded5d9f14541ee4173b0ac4b543f822855 lib/Gruntmaster/Opener.pm
+SHA1 591f2c78cbc10f3034733ed4286906ed14d0e07a t/00-compile.t
+SHA1 e3b7b36a5eecae4c9855da17d2580888e582aae5 t/Gruntmaster-Data.t
+SHA1 6a632e3e37906ce17ef53d788e2a33cf8009e5ed t/Gruntmaster-Opener.t
+SHA1 7da2d3506440a1e813d6e947bfa3a3715c0e2424 t/perlcritic.t
+SHA1 dc489a38ce827f3e366d7b98af6e5ce17b4bc99c t/perlcriticrc
+SHA1 bb987dc2dcb10bd62ebb5a93c3d5b9abbe382a15 t/tools.t
+SHA1 d1733263aaf117fb81a013bb544396e8f4e471fd testdata.sql
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlu1B5EQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYmW+D/0Rczi4kaIo5kDecXRl/1GVQ2Q4co9an3+l
+5UC/HsKM7sS2ouRN398rUFrX4pzvYXUdVUUrHiFwN+gv4sANgNYXehXXPXWoeFmk
+eGV3/RGR52nk9CKuI8yUTOsgFtKtmPmV5OBWGKkLAo8skX0/QFP+IG7wWYy4m9ya
+Hkcf891IkRYMoWvgWxVzevou1bAWkGM58z3/I66+zs4F+2odR3soKxqzTc+BUXQU
+Z+Q+HD8PMlPirwich6NFbJ1DRVFi/lw+U6qYzg5ehysJUuWVKiqwREHQiRyjUCRh
+JpYfk8QWdEip3N1jkjzDIoy2Gv4K33hPLdBJvNCUpGHXEPIiKCZoVzeyiQOueTYC
+CNSIkUU53WWWYCYkYeEijZ1uFnzPKaTuGPZDSZsdT1CkYKAf3OrIlLI5PdViqhAf
+w94qPW+iNYbxF3L8x88nXYteOC8QfcsrCrLaUb/L+BqMNLAJQoSxX22ws4qFfsts
+zLEuZU4pIa/E3uPuWqxmND60gq7dyrPpCHSjB3l/P2Id+1kDhFAByNHJ+jbODnAy
+2cuguJTH2d2qDeAAo9wn1fWz/vfBJsIaisyC/0eNxMcIo7TalonODvKu50CCdd+R
+XkGLBkGvUkhEPGktnGO2ybiCUda/x0gBU3yH3iWVydDe/68o3b+dh+uEXUlSJfTB
+aNIgASEOhg==
+=k5Gl
+-----END PGP SIGNATURE-----

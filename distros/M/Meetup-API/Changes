@@ -1,0 +1,9 @@
+0.02 2018-10-03
+    * Fixed timezone when converting to ICal
+    * Need minimum prerequisite of v0.10 for Net::CalDAVTalk (MANWAR)
+    * Explicitly list JSON::PP and JSON::XS as prerequisites
+      (even if they are lazily loaded)
+    * Net::CardDAVTalk messes up the encoding of UTF-8 values :(
+
+0.01 2018-10-01
+    * Released on an unsuspecting world

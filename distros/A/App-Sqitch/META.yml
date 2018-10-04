@@ -24,7 +24,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.35'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,9 +33,50 @@ name: App-Sqitch
 no_index:
   directory:
     - priv
+optional_features:
+  exasol:
+    description: 'Support for managing Exasol databases'
+    requires:
+      DBD::ODBC: '1.59'
+  firebird:
+    description: 'Support for managing Firebird databases'
+    requires:
+      DBD::Firebird: '1.11'
+      Time::HiRes: '0'
+      Time::Local: '0'
+  mysql:
+    description: 'Support for managing MySQL databases'
+    requires:
+      DBD::mysql: '4.018'
+      MySQL::Config: '0'
+  odbc:
+    description: 'Include the ODBC driver.'
+    requires:
+      DBD::ODBC: '1.59'
+  oracle:
+    description: 'Support for managing Oracle databases'
+    requires:
+      DBD::Oracle: '1.23'
+  postgres:
+    description: 'Support for managing PostgreSQL databases'
+    requires:
+      DBD::Pg: '2.0'
+  snowflake:
+    description: 'Support for managing Snowflake databases'
+    requires:
+      DBD::ODBC: '1.59'
+  sqlite:
+    description: 'Support for managing SQLite databases'
+    requires:
+      DBD::SQLite: '1.37'
+  vertica:
+    description: 'Support for managing Vertica databases'
+    requires:
+      DBD::ODBC: '1.59'
 recommends:
   Class::XSAccessor: '1.18'
   Pod::Simple: '1.41'
+  Template: '0'
   Type::Tiny::XS: '0.010'
 requires:
   Clone: '0'
@@ -86,7 +127,8 @@ requires:
   Type::Utils: '0'
   Types::Standard: '0'
   URI: '0'
-  URI::db: '0.15'
+  URI::QueryParam: '0'
+  URI::db: '0.19'
   User::pwent: '0'
   constant: '0'
   if: '0'
@@ -98,7 +140,9 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: http://github.com/theory/sqitch/issues/
-  homepage: http://sqitch.org/
-  repository: http://github.com/theory/sqitch/
-version: '0.9997'
+  bugtracker: https://github.com/sqitchers/sqitch/issues/
+  homepage: https://sqitch.org/
+  repository: https://github.com/sqitchers/sqitch/
+version: '0.9998'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

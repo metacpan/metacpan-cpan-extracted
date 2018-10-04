@@ -23,17 +23,18 @@ name: Dist-Zilla-Plugin-UploadToStratopan
 provides:
   Dist::Zilla::Plugin::UploadToStratopan:
     file: lib/Dist/Zilla/Plugin/UploadToStratopan.pm
-    version: '0.013'
+    version: '0.015'
 requires:
   Dist::Zilla::Role::Releaser: '0'
   LWP::Protocol::https: '0'
   Mojo::DOM: '0'
   Mojo::UserAgent: '0'
+  Mojolicious: '0'
   Moose: '0'
   perl: '5.006'
 resources:
   repository: git://github.com/friedo/dzil-upload-to-stratopan.git
-version: '0.013'
+version: '0.015'
 x_contributors:
   - 'Wesley Schwengle <wesley@schwengle.net>'
   - 'Erik Carlsson <info@code301.com>'

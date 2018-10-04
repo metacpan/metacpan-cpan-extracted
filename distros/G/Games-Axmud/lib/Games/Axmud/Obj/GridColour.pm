@@ -124,5 +124,5 @@
         { $_[0]->{level} }
 }
 
-# Package must return true
+# Package must return a true value
 1

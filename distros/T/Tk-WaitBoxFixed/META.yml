@@ -3,22 +3,24 @@ abstract: 'An Object Oriented Wait Dialog for Perl/Tk, of the Please Wait variet
 author:
   - 'Rene Schickbauer <rene.schickbauer@magnapowertrain.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Tk-WaitBoxFixed
 no_index:
   directory:
     - t
     - inc
 requires:
-  Tk: 804
+  Tk: '804'
+  perl: '5.01'
 resources:
-  repository: 'http://hg.code.sf.net/p/tk-waitboxfixed/code tk-waitboxfixed-code'
-version: 1.6
+  repository: https://cavac.at/public/mercurial/Tk-WaitBoxFixed/file/
+version: '1.8'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

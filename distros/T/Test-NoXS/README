@@ -2,7 +2,7 @@ NAME
     Test::NoXS - Prevent a module from loading its XS code
 
 VERSION
-    version 1.03
+    version 1.04
 
 SYNOPSIS
         use Test::NoXS 'Class::Load::XS';
@@ -69,7 +69,7 @@ CONTRIBUTOR
     Sam Kaufman <sam@socialflow.com>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2014 by David Golden.
+    This software is Copyright (c) 2018 by David Golden.
 
     This is free software, licensed under:
 

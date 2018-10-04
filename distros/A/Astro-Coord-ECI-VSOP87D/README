@@ -1,0 +1,48 @@
+Astro-Coord-ECI-VSOP87A is Copyright (C) 2018 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+<<< Replace boiler plate >>>
+
+INSTALLATION
+
+This module is best installed using your favorite CPAN client: cpan,
+cpanp, or cpanm. ActivePerl users can try their ppm.
+
+Failing that, you can use one of the two usual incantations:
+
+    gunzip Astro-Coord-ECI-VSOP87A-9.999.tar.gz
+    tar -xf Astro-Coord-ECI-VSOP87A-9.999.tar
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or
+
+    gunzip Astro-Coord-ECI-VSOP87A-9.999.tar.gz
+    tar -xf Astro-Coord-ECI-VSOP87A-9.999.tar
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+SpaceTrack.pm and the SpaceTrack folder into the Astro directory
+(creating it if necessary) in the appropriate place in your @INC
+directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

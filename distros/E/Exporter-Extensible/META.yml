@@ -1,0 +1,30 @@
+---
+abstract: 'Create extensible modules which export things'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Scalar::Util: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exporter-Extensible
+no_index:
+  package:
+    - Exporter::Extensible::UnimportScopeGuard
+requires:
+  B: '0'
+  Carp: '0'
+  mro: '0'
+  perl: v5.12.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-Exporter-Extensible/issues
+  repository: https://github.com/nrdvana/perl-Exporter-Extensible.git
+version: '0.03'

@@ -19,6 +19,6 @@ no_index:
     - inc
 requires:
   Path::Class: '0'
-  perl: '5.006'
-version: v1.1
+  perl: '5.010'
+version: v1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

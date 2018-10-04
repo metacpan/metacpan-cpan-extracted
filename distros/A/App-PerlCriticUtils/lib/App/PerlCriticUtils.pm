@@ -1,7 +1,7 @@
 package App::PerlCriticUtils;
 
-our $DATE = '2017-08-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-09-30'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,6 +37,63 @@ our %arg_policy = (
         },
     },
 );
+
+our %argopt_detail = (
+    detail => {
+        schema => 'bool*',
+        cmdline_aliases => {l=>{}},
+    },
+);
+
+$SPEC{pcplist} = {
+    v => 1.1,
+    summary => 'List installed Perl::Critic policy modules',
+    args => {
+        %argopt_detail,
+    },
+    examples => [
+        {
+            summary => 'List installed policies',
+            argv => [],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'List installed policies (show details)',
+            argv => ['-l'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+};
+sub pcplist {
+    require PERLANCAR::Module::List;
+
+    my %args = @_;
+
+    my $mods = PERLANCAR::Module::List::list_modules(
+        'Perl::Critic::Policy::', {list_modules=>1, recurse=>1});
+    my @rows;
+    my $resmeta = {};
+    for my $mod (sort keys %$mods) {
+        (my $name = $mod) =~ s/^Perl::Critic::Policy:://;
+        if ($args{detail}) {
+            require Module::Path::More;
+            my $path = Module::Path::More::module_path(module => $mod);
+            open my $fh, "<", $path or die "Can't read $path: $!";
+            my $content = do { local $/; <$fh> };
+            $content =~ m{ =head1 \s+ Name \s* [\n] \s* $mod \s* [\-] \s* ([^\n]+) }imsx;
+            push @rows, {
+                name => $name,
+                abstract => $1,
+            };
+        } else {
+            push @rows, $name;
+        }
+    }
+    $resmeta->{'table.fields'} = [qw/name abstract/] if $args{detail};
+    [200, "OK", \@rows, $resmeta];
+}
 
 $SPEC{pcppath} = {
     v => 1.1,
@@ -225,7 +282,7 @@ App::PerlCriticUtils - Command-line utilities related to Perl::Critic
 
 =head1 VERSION
 
-This document describes version 0.001 of App::PerlCriticUtils (from Perl distribution App-PerlCriticUtils), released on 2017-08-02.
+This document describes version 0.002 of App::PerlCriticUtils (from Perl distribution App-PerlCriticUtils), released on 2018-09-30.
 
 =head1 SYNOPSIS
 
@@ -239,6 +296,8 @@ Perl::Critic:
 =item * L<pcpdoc>
 
 =item * L<pcpless>
+
+=item * L<pcplist>
 
 =item * L<pcpman>
 
@@ -369,6 +428,50 @@ that contains extra information.
 Return value:  (any)
 
 
+=head2 pcplist
+
+Usage:
+
+ pcplist(%args) -> [status, msg, result, meta]
+
+List installed Perl::Critic policy modules.
+
+Examples:
+
+=over
+
+=item * List installed policies:
+
+ pcplist();
+
+=item * List installed policies (show details):
+
+ pcplist( detail => 1);
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<detail> => I<bool>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
 =head2 pcpman
 
 Usage:
@@ -470,7 +573,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

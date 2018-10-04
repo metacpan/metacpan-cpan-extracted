@@ -1,5 +1,13 @@
 Revision history for Term-Clui
 
+1.75 2018-10-01 21:04:18 -0400
+  - Misc administrative fixes (gh#4, gh#5 manwar++)
+  - This release is functionally identical to 1.74_01.
+
+1.74_01 2018-07-08 13:15:59 -0400
+  - Remove Term::ReadKey and Term::ReadLine::Gnu as prereqs,
+    these should have been optional
+
 1.73 2018-07-08 13:06:33 -0400
   - Fixed bug where uparrow on the last choice of a
     2x2 choice of 30 chars each goes up left instead

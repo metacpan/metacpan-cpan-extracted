@@ -1,0 +1,352 @@
+{
+   "abstract" : "Debian Package Manager Perl modules",
+   "author" : [
+      "Dpkg Developers <debian-dpkg@lists.debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
+   "keywords" : [
+      "dpkg",
+      "debian",
+      "perl"
+   ],
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dpkg",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.20.2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "TAP::Harness" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dpkg" : {
+         "file" : "lib/Dpkg.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Arch" : {
+         "file" : "lib/Dpkg/Arch.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Build::Env" : {
+         "file" : "lib/Dpkg/Build/Env.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Build::Info" : {
+         "file" : "lib/Dpkg/Build/Info.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Build::Types" : {
+         "file" : "lib/Dpkg/Build/Types.pm",
+         "version" : "0.02"
+      },
+      "Dpkg::BuildFlags" : {
+         "file" : "lib/Dpkg/BuildFlags.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::BuildOptions" : {
+         "file" : "lib/Dpkg/BuildOptions.pm",
+         "version" : "1.02"
+      },
+      "Dpkg::BuildProfiles" : {
+         "file" : "lib/Dpkg/BuildProfiles.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Changelog" : {
+         "file" : "lib/Dpkg/Changelog.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Changelog::Debian" : {
+         "file" : "lib/Dpkg/Changelog/Debian.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Changelog::Entry" : {
+         "file" : "lib/Dpkg/Changelog/Entry.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Changelog::Entry::Debian" : {
+         "file" : "lib/Dpkg/Changelog/Entry/Debian.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Changelog::Parse" : {
+         "file" : "lib/Dpkg/Changelog/Parse.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Checksums" : {
+         "file" : "lib/Dpkg/Checksums.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Compression" : {
+         "file" : "lib/Dpkg/Compression.pm",
+         "version" : "1.02"
+      },
+      "Dpkg::Compression::FileHandle" : {
+         "file" : "lib/Dpkg/Compression/FileHandle.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Compression::Process" : {
+         "file" : "lib/Dpkg/Compression/Process.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Conf" : {
+         "file" : "lib/Dpkg/Conf.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Control" : {
+         "file" : "lib/Dpkg/Control.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::Control::Changelog" : {
+         "file" : "lib/Dpkg/Control/Changelog.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Control::Fields" : {
+         "file" : "lib/Dpkg/Control/Fields.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Control::FieldsCore" : {
+         "file" : "lib/Dpkg/Control/FieldsCore.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Control::Hash" : {
+         "file" : "lib/Dpkg/Control/Hash.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Control::HashCore" : {
+         "file" : "lib/Dpkg/Control/HashCore.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Control::HashCore::Tie" : {
+         "file" : "lib/Dpkg/Control/HashCore.pm"
+      },
+      "Dpkg::Control::Info" : {
+         "file" : "lib/Dpkg/Control/Info.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Control::Tests" : {
+         "file" : "lib/Dpkg/Control/Tests.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Control::Tests::Entry" : {
+         "file" : "lib/Dpkg/Control/Tests/Entry.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Control::Types" : {
+         "file" : "lib/Dpkg/Control/Types.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Deps" : {
+         "file" : "lib/Dpkg/Deps.pm",
+         "version" : "1.06"
+      },
+      "Dpkg::Deps::AND" : {
+         "file" : "lib/Dpkg/Deps/AND.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Deps::KnownFacts" : {
+         "file" : "lib/Dpkg/Deps/KnownFacts.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Deps::Multiple" : {
+         "file" : "lib/Dpkg/Deps/Multiple.pm",
+         "version" : "1.02"
+      },
+      "Dpkg::Deps::OR" : {
+         "file" : "lib/Dpkg/Deps/OR.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Deps::Simple" : {
+         "file" : "lib/Dpkg/Deps/Simple.pm",
+         "version" : "1.02"
+      },
+      "Dpkg::Deps::Union" : {
+         "file" : "lib/Dpkg/Deps/Union.pm",
+         "version" : "1.00"
+      },
+      "Dpkg::Dist::Files" : {
+         "file" : "lib/Dpkg/Dist/Files.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::ErrorHandling" : {
+         "file" : "lib/Dpkg/ErrorHandling.pm",
+         "version" : "0.02"
+      },
+      "Dpkg::Exit" : {
+         "file" : "lib/Dpkg/Exit.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::File" : {
+         "file" : "lib/Dpkg/File.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Getopt" : {
+         "file" : "lib/Dpkg/Getopt.pm",
+         "version" : "0.02"
+      },
+      "Dpkg::Gettext" : {
+         "file" : "lib/Dpkg/Gettext.pm",
+         "version" : "1.03"
+      },
+      "Dpkg::IPC" : {
+         "file" : "lib/Dpkg/IPC.pm",
+         "version" : "1.02"
+      },
+      "Dpkg::Index" : {
+         "file" : "lib/Dpkg/Index.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Interface::Storable" : {
+         "file" : "lib/Dpkg/Interface/Storable.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Lock" : {
+         "file" : "lib/Dpkg/Lock.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::OpenPGP" : {
+         "file" : "lib/Dpkg/OpenPGP.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Package" : {
+         "file" : "lib/Dpkg/Package.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Path" : {
+         "file" : "lib/Dpkg/Path.pm",
+         "version" : "1.04"
+      },
+      "Dpkg::Shlibs" : {
+         "file" : "lib/Dpkg/Shlibs.pm",
+         "version" : "0.03"
+      },
+      "Dpkg::Shlibs::Cppfilt" : {
+         "file" : "lib/Dpkg/Shlibs/Cppfilt.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Shlibs::Objdump" : {
+         "file" : "lib/Dpkg/Shlibs/Objdump.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Shlibs::Objdump::Object" : {
+         "file" : "lib/Dpkg/Shlibs/Objdump.pm"
+      },
+      "Dpkg::Shlibs::Symbol" : {
+         "file" : "lib/Dpkg/Shlibs/Symbol.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Shlibs::SymbolFile" : {
+         "file" : "lib/Dpkg/Shlibs/SymbolFile.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Archive" : {
+         "file" : "lib/Dpkg/Source/Archive.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Functions" : {
+         "file" : "lib/Dpkg/Source/Functions.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Package" : {
+         "file" : "lib/Dpkg/Source/Package.pm",
+         "version" : "1.02"
+      },
+      "Dpkg::Source::Package::V1" : {
+         "file" : "lib/Dpkg/Source/Package/V1.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Package::V2" : {
+         "file" : "lib/Dpkg/Source/Package/V2.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Package::V2::BinaryFiles" : {
+         "file" : "lib/Dpkg/Source/Package/V2.pm"
+      },
+      "Dpkg::Source::Package::V3::Bzr" : {
+         "file" : "lib/Dpkg/Source/Package/V3/Bzr.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Package::V3::Custom" : {
+         "file" : "lib/Dpkg/Source/Package/V3/Custom.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Package::V3::Git" : {
+         "file" : "lib/Dpkg/Source/Package/V3/Git.pm",
+         "version" : "0.02"
+      },
+      "Dpkg::Source::Package::V3::Native" : {
+         "file" : "lib/Dpkg/Source/Package/V3/Native.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Package::V3::Quilt" : {
+         "file" : "lib/Dpkg/Source/Package/V3/Quilt.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Patch" : {
+         "file" : "lib/Dpkg/Source/Patch.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Source::Quilt" : {
+         "file" : "lib/Dpkg/Source/Quilt.pm",
+         "version" : "0.02"
+      },
+      "Dpkg::Substvars" : {
+         "file" : "lib/Dpkg/Substvars.pm",
+         "version" : "1.06"
+      },
+      "Dpkg::Vars" : {
+         "file" : "lib/Dpkg/Vars.pm",
+         "version" : "0.03"
+      },
+      "Dpkg::Vendor" : {
+         "file" : "lib/Dpkg/Vendor.pm",
+         "version" : "1.01"
+      },
+      "Dpkg::Vendor::Debian" : {
+         "file" : "lib/Dpkg/Vendor/Debian.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Vendor::Default" : {
+         "file" : "lib/Dpkg/Vendor/Default.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Vendor::Ubuntu" : {
+         "file" : "lib/Dpkg/Vendor/Ubuntu.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Version" : {
+         "file" : "lib/Dpkg/Version.pm",
+         "version" : "1.02"
+      },
+      "Test::Dpkg" : {
+         "file" : "lib/Test/Dpkg.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://wiki.debian.org/Teams/Dpkg",
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ]
+   },
+   "version" : "v1.19.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -4,12 +4,14 @@ author:
   - 'Tina Müller <tinita@cpan.org>'
 build_requires:
   File::Spec: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.98'
+  YAML::PP: '0.008'
   YAML::PP::Parser: '0'
   blib: '1.01'
-  perl: v5.10.0
+  perl: v5.8.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -22,13 +24,14 @@ name: YAML-LibYAML-API
 provides:
   YAML::LibYAML::API:
     file: lib/YAML/LibYAML/API.pm
-    version: '0.001'
+    version: '0.003'
 requires:
-  perl: v5.10.0
+  constant: '0'
+  perl: v5.8.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/perlpunk/YAML-LibYAML-API-p5/issues
   repository: https://github.com/perlpunk/YAML-LibYAML-API-p5
-version: '0.001'
+version: '0.003'
 x_serialization_backend: 'YAML::Tiny version 1.73'

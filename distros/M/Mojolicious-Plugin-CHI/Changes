@@ -1,3 +1,6 @@
+0.19 2018-09-30
+        - Fix tests for Mojolicious > 8.01 compatibility.
+
 0.18 2018-09-18
         - Added support for CHI subclasses (rouzier++).
         - Remove unnecessary file permissions (manwar++).

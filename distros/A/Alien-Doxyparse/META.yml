@@ -4,11 +4,6 @@ author:
   - 'Joenio Costa <joenio@joenio.me>'
 build_requires:
   Alien::Build::MM: '0.25'
-  Alien::bison: '0'
-  Alien::cmake3: '0'
-  Alien::flex: '0'
-  Alien::m4: '0'
-  Config: '0'
 configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.25'
@@ -27,9 +22,9 @@ requires:
   Alien::Build: '0.25'
 resources:
   repository: http://github.com/joenio/alien-doxyparse
-version: '0.09'
+version: '0.10'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 1.39'
+  generated_by: 'Alien::Build::MM version 1.48'
   requires:
     share:
       Alien::bison: '0'

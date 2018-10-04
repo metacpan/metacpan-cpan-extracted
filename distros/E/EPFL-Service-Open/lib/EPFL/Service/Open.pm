@@ -11,11 +11,11 @@ Git repository.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -37,16 +37,18 @@ Git repository.
 my %REPOSITORY_LIST = (
 
   # IDevelop
-  'bill2myprint'                   => 'https://ofrf.epfl.ch',
-  'epfl-news'                      => 'https://actu.epfl.ch',
-  'homepage'                       => 'https://homepage.epfl.ch',
-  'homepage-archiveweb.epfl.ch'    => 'https://archiveweb.epfl.ch',
-  'kis-mobile'                     => 'http://m.epfl.ch',
-  'kis-bootstrap'                  => 'https://static.epfl.ch',
-  'memento'                        => 'https://memento.epfl.ch',
-  'polyblog'                       => 'https://blogs.epfl.ch',
-  'polywiki'                       => 'https://wiki.epfl.ch',
-  'press-release'                  => 'https://rdp.epfl.ch',
+  'bill2myprint'                => 'https://ofrf.epfl.ch',
+  'elements'                    => 'https://epfl-idevelop.github.io/elements',
+  'epfl-news'                   => 'https://actu.epfl.ch',
+  'epfl-theme-elements'         => 'https://web2018.epfl.ch',
+  'homepage'                    => 'https://homepage.epfl.ch',
+  'homepage-archiveweb.epfl.ch' => 'https://archiveweb.epfl.ch',
+  'kis-mobile'                  => 'http://m.epfl.ch',
+  'kis-bootstrap'               => 'https://static.epfl.ch',
+  'memento'                     => 'https://memento.epfl.ch',
+  'polyblog'                    => 'https://blogs.epfl.ch',
+  'polywiki'                    => 'https://wiki.epfl.ch',
+  'press-release'               => 'https://rdp.epfl.ch',
   'science-cruise-data-management' => 'https://scdm.epfl.ch',
   'site-diffusion-mediatheque'     => 'https://mediatheque.epfl.ch',
   'web2010'                        => 'https://www.epfl.ch',

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 my %introduces = ( '5.028' => [qw[
                                  delete% unicode10.0 state@=
@@ -60,6 +60,81 @@ my %removed = ( 'auto-deref'             => '5.024',
                 'for-qw'                 => '5.014',
               );
 
+my %alias = (
+    # 5.010
+    '\H' => '\h',
+    '\V' => '\v',
+    'defined-or' => '//',
+    'lexical-default-variable' => 'lexical-$_',
+    'readline-argv' => 'readline()',
+    'regex-generic-linebreak' => '\R',
+    'regex-horizontal-whitespace' => '\h',
+    'regex-keep-left' => '\K',
+    'regex-named-capture-group' => '?<>',
+    'regex-possessive-quantifier' => 'quant+',
+    'regex-possessive-match' => 'quant+',
+    'regex-preserve-match-captures' => '/p',
+    'regex-recursive-subpattern' => '?PARNO',
+    'regex-relative-backreference' => '\gN',
+    'regex-reset-branch' => '?|',
+    'regex-vertical-whitespace' => '\v',
+    # 5.012
+    'statement-ellipsis' => '...',
+    'yada-yada' => '...',
+    'triple-dot' => '...',
+    'regex-non-newline' => '\N',
+    # 5.014
+    'non-destructive-subst' => '/r',
+    'non-destructive-substitution' => '/r',
+    'regex-restrict-ascii-range' => '/a',
+    'regex-unicode-strings' => '/u',
+    'regex-use-default-modifiers' => '?^',
+    'regex-compile-as-default' => '/d',
+    'regex-compile-as-locale' => '/l',
+    'regex-compile-as-unicode-strings' => '/u',
+    'global-phase' => '^GLOBAL_PHASE',
+    'octal-escape' => '\o',
+    # 5.020
+    'hash-slice' => '%slice',
+    'attribute-prototype' => 'attr-prototype',
+    'regex-property-unicode' => '\p{Unicode}',
+    'wide-char-delimiters' => 's-utf8-delimiters',
+    'unicode-6.3' => 'unicode6.3',
+    # 5.022
+    'double-diamond' => '<<>>',
+    'operator-double-diamond' => '<<>>',
+    'regex-non-capturing' => '/n',
+    '\b{gcb}' => '\b{}',
+    '\b{wb}' => '\b{}',
+    '\b{sb}' => '\b{}',
+    'regex-unicode-boundary' => '\b{}',
+    'regex-unicode-grapheme-cluster-boundary' => '\b{}',
+    'regex-unicode-word-boundary' => '\b{}',
+    'regex-unicode-sentence-boundary' => '\b{}',
+    'attribute-const' => 'attr-const',
+    'list-repetition-assignment' => '()x=',
+    'hexadecimal-floating-numbers' => 'hexfloat',
+    'pack-inf' => 'chr-inf',
+    'regex-x-unicode' => '/x-unicode',
+    'regex-x-handles-unicode' => '/x-unicode',
+    'unicode-7.0' => 'unicode7.0',
+    # 5.024
+    'unicode-8.0' => 'unicode8.0',
+    'regex-unicode-line-break-boundary' => '\b{lb}',
+    'printf-precision-argument-reorder' => 'sprintf-reorder',
+    'sprintf-precision-argument-reorder' => 'sprintf-reorder',
+    # 5.026
+    'unicode-9.0' => 'unicode9.0',
+    'heredoc-indent' => '<<~',
+    'regex-xx' => '/xx',
+    'capture-variable' => '^CAPTURE',
+    # 5.028
+    'hash-delete-slice' => 'delete%',
+    'unicode-10.0' => 'unicode10.0',
+    'state-array' => 'state@=',
+    'state-hash' => 'state@=',
+);
+
 my %_introduced = map {
     my $version = $_;
     map { $_ => $version } @{ $introduces{$version} }
@@ -77,15 +152,22 @@ sub _hook {
     }
 }
 
+
 sub removed {
     my $construct = shift;
-    return $construct ? $removed{$construct} : keys %removed
+    return $construct
+        ? $removed{$construct}
+            || $alias{$construct} && $removed{ $alias{$construct} }
+        : keys %removed
 }
 
 
 sub introduced {
     my $construct = shift;
-    return $construct ? $introduced{$construct} : keys %introduced
+    return $construct
+        ? $introduced{$construct}
+            || $alias{$construct} && $introduced{ $alias{$construct} }
+        : keys %introduced
 }
 
 
@@ -100,16 +182,17 @@ sub import {
     my $max_version = 6;
     my ($constr, $d_constr);
     my @actions;
-    for (@_) {
+    for my $name (@_) {
+        local $_ = exists $alias{$name} ? $alias{$name} : $name;
         if ($introduced{$_}) {
-            ($min_version, $constr) = ($introduced{$_}, $_)
+            ($min_version, $constr) = ($introduced{$_}, $name)
                 if $introduced{$_} gt $min_version;
         } elsif (! $removed{$_}) {
-            die "Unknown construct `$_' at ", _position(), ".\n"
+            die "Unknown construct `$name' at ", _position(), ".\n"
         }
 
         if ($removed{$_}) {
-            ($max_version, $d_constr) = ($removed{$_}, $_)
+            ($max_version, $d_constr) = ($removed{$_}, $name)
                 if $removed{$_} lt $max_version;
         }
 
@@ -146,7 +229,7 @@ Syntax::Construct - Identify which non-feature constructs are used in the code.
 
 =head1 VERSION
 
-Version 1.007
+Version 1.008
 
 =head1 SYNOPSIS
 
@@ -277,25 +360,34 @@ L<perl5100delta/Recursive sort subs>.
 
 L<perl5100delta/Defined-or operator> or L<perlop/Logical Defined-Or>.
 
+Alias: defined-or
+
 =head3 ?PARNO
 
 "Recursive Patterns" under L<perl5100delta/Regular expressions> or
 L<perlre/"(?PARNO) (?-PARNO) (?+PARNO) (?R) (?0)">.
+
+Alias: regex-recursive-subpattern
 
 =head3 ?<>
 
 "Named Capture Buffers" under L<perl5100delta/Regular expressions> or
 L<perlre/"(?E<60>NAMEE<62>pattern)">.
 
+Alias: regex-named-capture-group
 
 =head3 ?|
 
 Not mentioned in any Delta. See B<(?|pattern)> in L<perlre/Extended Patterns>.
 
+Alias: regex-reset-branch
+
 =head3 quant+
 
 "Possessive Quantifiers" under L<perl5100delta/Regular expressions> or
 L<perlre/Quantifiers>.
+
+Aliases: regex-possessive-quantifier regex-possessive-match
 
 =head3 regex-verbs
 
@@ -308,20 +400,28 @@ expressions> or L<perlre/Special Backtracking Control Verbs>.
 "\K escape" under L<perl5100delta/Regular expressions> or
 L<perlre/Look-Around Assertions>.
 
+Alias: regex-keep-left
+
 =head3 \R \v \h
 
 Covers C<\V> and C<\H>, too. See "Vertical and horizontal whitespace,
 and linebreak" under L<perl5100delta/Regular expressions> or
 L<perlrebackslash/Misc>.
 
+Aliases: \H \V regex-generic-linebreak regex-horizontal-whitespace regex-vertical-whitespace
+
 =head3 \gN
 
 "Relative backreferences" under L<perl5100delta/Regular expressions> or
 L<perlre/Capture groups>.
 
+Alias: regex-relative-backreference
+
 =head3 readline()
 
 L<perl5100delta/Default argument for readline()>.
+
+Alias: readline-argv
 
 =head3 stack-file-test
 
@@ -333,9 +433,13 @@ C</p> (preserve) modifier and C<${^PREMATCH}>, C<${^MATCH}> and
 C<${^POSTMATCH}> variables. Not mentioned in any Delta. See
 L<perlvar/Variables related to regular expressions>.
 
+Alias: regex-preserve-match-captures
+
 =head3 lexical-$_
 
 L<perl5100delta/Lexical $_>.
+
+Alias: lexical-default-variable
 
 =head2 5.012
 
@@ -346,6 +450,8 @@ L<perl5120delta/New package NAME VERSION syntax>
 =head3 ...
 
 L<perl5120delta/The ... operator> or L<perlsyn/The Ellipsis Statement>
+
+Aliases: yada-yada triple-dot statement-ellipsis
 
 =head3 each-array
 
@@ -372,6 +478,8 @@ changes>.
 
 L<perl5120delta/\N experimental regex escape>.
 
+Alias: regex-non-newline
+
 =head3 while-readdir
 
 C<readdir> in a while-loop condition populates C<$_>. Not mentioned in
@@ -383,25 +491,37 @@ any delta, but see C<readdir> in L<perlfunc>.
 
 L<perl5140delta/Regular Expressions>.
 
+Alias: regex-use-default-modifiers
+
 =head3 /r
 
 L<perl5140delta/Regular Expressions> and L<perlre/Modifiers>.
+
+Aliases: non-destructive-subst non-destructive-substitution
 
 =head3 /d
 
 L<perl5140delta/Regular Expressions> and L<perlre/Modifiers>.
 
+Alias: regex-compile-as-default
+
 =head3 /l
 
 L<perl5140delta/Regular Expressions> and L<perlre/Modifiers>.
+
+Alias: regex-compile-as-locale
 
 =head3 /u
 
 L<perl5140delta/Regular Expressions> and L<perlre/Modifiers>.
 
+Aliases: regex-unicode-strings regex-compile-as-unicode-strings
+
 =head3 /a
 
 L<perl5140delta/Regular Expressions> and L<perlre/Modifiers>.
+
+Alias: regex-restrict-ascii-range
 
 =head3 auto-deref
 
@@ -414,9 +534,13 @@ C<splice>, C<keys>, C<values>, and C<each> in L<perlfunc>.
 See B<New global variable ${^GLOBAL_PHASE}> under
 L<perl5140delta/Other Enhancements>.
 
+Alias: global-phase
+
 =head3 \o
 
 L<perl5140delta/Regular Expressions>.
+
+Alias: octal-escape
 
 =head3 package-block
 
@@ -446,6 +570,8 @@ See in L<perl5180delta/Selected Bug Fixes> or C<each> in L<perlfunc>.
 
 L<perl5200delta/subs now take a prototype attribute>
 
+Alias: attribute-prototype
+
 =head3 drand48
 
 L<perl5200delta/rand now uses a consistent random number generator>.
@@ -456,14 +582,20 @@ unless seeded.
 
 L<perl5200delta/New slice syntax>
 
+Alias: hash-slice
+
 =head3 unicode6.3
 
 L<perl5200delta/Unicode 6.3 now supported>
+
+Alias: unicode-6.3
 
 =head3 \p{Unicode}
 
 See B<New \p{Unicode} regular expression pattern property> in
 L<perl5200delta/Core Enhancements>.
+
+Alias: regex-property-unicode
 
 =head3 utf8-locale
 
@@ -476,28 +608,40 @@ See L<perl5200delta/Regular Expressions>: in older Perl versions, a
 hack around was possible: to specify the delimiter twice in
 substitution. Use C<s-utf8-delimiters-hack> if your code uses it.
 
+Alias: wide-char-delimiters
+
 =head2 5.022
 
 =head3 <<>>
 
 L<perl5220delta/New double-diamond operator>
 
+Aliases: double-diamond operator-double-diamond
+
 =head3 \b{}
 
 L<perl5220delta/New \b boundaries in regular expressions>
 
+Aliases: regex-unicode-grapheme-cluster-boundary regex-unicode-boundary regex-unicode-word-boundary regex-unicode-sentence-boundary regex-unicode-line-break-boundary \b{sb} \b{wb} \b{gcb}
+
 =head3 /n
 
 L<perl5220delta/Non-Capturing Regular Expression Flag>
+
+Alias: regex-non-capturing
 
 =head3 unicode7.0
 
 See B<Unicode 7.0 (with correction) is now supported> in
 L<perl5220delta/Core Enhancements>.
 
+Alias: unicode-7.0
+
 =head3 attr-const
 
 L<perl5220delta/New :const subroutine attribute>
+
+Alias: attribute-const
 
 =head3 fileno-dir
 
@@ -507,13 +651,19 @@ L<perl5220delta/fileno now works on directory handles>
 
 L<perl5220delta/Assignment to list repetition>
 
+Alias: list-repetition-assignment
+
 =head3 hexfloat
 
 L<perl5220delta/Floating point parsing has been improved>
 
+Alias: hexadecimal-floating-numbers
+
 =head3 chr-inf
 
 L<perl5220delta/Packing infinity or not-a-number into a character is now fatal>
+
+Alias: pack-inf
 
 =head3 empty-slice
 
@@ -524,11 +674,15 @@ L<perl5220delta/List slices returning empty lists>
 See B<qr/foo/x now ignores all Unicode pattern white space> in
 L<perl5220delta/Incompatible Changes>.
 
+Aliases: regex-x-unicode regex-x-handles-unicode
+
 =head2 5.024
 
 =head3 unicode8.0
 
 L<perl5240delta/Unicode 8.0 is now supported>.
+
+Alias: unicode-8.0
 
 =head3 \b{lb}
 
@@ -538,28 +692,39 @@ L<perl5240delta/New \b{lb} boundary in regular expressions>.
 
 L<perl5240delta/printf and sprintf now allow reordered precision arguments>.
 
+Aliases: printf-precision-argument-reorder sprintf-precision-argument-reorder
+
 =head2 5.026
 
 =head3 <<~
 
-L<perl526delta/Indented Here documents>.
+L<perl5260delta/Indented Here documents>.
+
+Alias: heredoc-indent
 
 =head3 /xx
 
-L<perl526delta/New-regular-expression-modifier-/xx>.
+L<perl5260delta/New-regular-expression-modifier-/xx>.
+
+Alias: regex-xx
 
 =head3 ^CAPTURE
 
-See C<@{^CAPTURE}>, C<%{^CAPTURE}>, and C<%{^CAPTURE_ALL}> in L<perl526delta>.
+See C<@{^CAPTURE}>, C<%{^CAPTURE}>, and C<%{^CAPTURE_ALL}> in
+L<perl5260delta>.
+
+Alias: capture-variable
 
 =head3 unicode9.0
 
-L<perl526delta/Unicode 9.0 is now supported>.
+L<perl5260delta/Unicode 9.0 is now supported>.
+
+Alias: unicode-9.0
 
 =head3 unicode-scx
 
 See I<"Use of \p{script} uses the improved Script_Extensions property">
-in L<perl526delta>.
+in L<perl5260delta>.
 
 =head2 5.028
 
@@ -567,13 +732,19 @@ in L<perl526delta>.
 
 See L<perldelta/delete-on-key/value-hash-slices>.
 
+Alias: hash-delete-slice
+
 =head3 unicode10.0
 
 See L<perldelta/Unicode 10.0 is supported>.
 
+Alias: unicode-10.0
+
 =head3 state@=
 
 See L<perldelta/Initialisation-of-aggregate-state-variables>.
+
+Aliases: state-array state-hash
 
 =for completeness
 =head2 old

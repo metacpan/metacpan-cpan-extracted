@@ -7,6 +7,7 @@ examples/bernoulli_numbers_recursive.pl
 examples/bernoulli_seidel.pl
 examples/binary_arithmetic_coding.pl
 examples/binradix_arithmetic_coding.pl
+examples/BPSW_primality_test.pl
 examples/computing_pi.pl
 examples/faulhaber_s_formula.pl
 examples/fibonacci.pl
@@ -20,6 +21,7 @@ examples/mandelbrot_set.pl
 examples/miller_rabin_primality_test.pl
 examples/newton_s_method.pl
 examples/pi_machin.pl
+examples/PSW_primality_test.pl
 examples/rsa_algorithm.pl
 examples/solve_pell_equation.pl
 examples/tac-compressor.pl

@@ -1,0 +1,62 @@
+{
+   "abstract" : "A simple client for interacting with Confluent Schema Registry.",
+   "author" : [
+      "Alvaro Livraghi"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Confluent-SchemaRegistry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Aspect" : "1.04",
+            "Avro::Schema" : "0",
+            "JSON::XS" : "3.02",
+            "REST::Client" : "273",
+            "Try::Tiny" : "0.22",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::BigInt" : "1.89",
+            "Test::Exception" : "0.43"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alivraghi/Confluent-SchemaRegistry/issues"
+      },
+      "homepage" : "https://github.com/alivraghi/Confluent-SchemaRegistry",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/alivraghi/Confluent-SchemaRegistry.git"
+      }
+   },
+   "version" : "0.03"
+}

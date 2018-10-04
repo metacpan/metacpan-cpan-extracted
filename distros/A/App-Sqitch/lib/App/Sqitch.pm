@@ -22,7 +22,7 @@ use List::Util qw(first);
 use IPC::System::Simple 1.17 qw(runx capturex $EXITVAL);
 use namespace::autoclean 0.16;
 
-our $VERSION = '0.9997';
+our $VERSION = '0.9998';
 
 BEGIN {
     # Force Locale::TextDomain to encode in UTF-8 and to decode all messages.
@@ -55,17 +55,19 @@ has sysuser => (
     isa      => Maybe[Str],
     lazy     => 1,
     default  => sub {
-        # Adapted from User.pm.
-        require Encode::Locale;
-        return Encode::decode( locale => getlogin )
-            || Encode::decode( locale => scalar getpwuid( $< ) )
-            || $ENV{ LOGNAME }
-            || $ENV{ USER }
-            || $ENV{ USERNAME }
-            || try {
-                require Win32;
-                Encode::decode( locale => Win32::LoginName() )
-            };
+        $ENV{ SQITCH_ORIG_SYSUSER } || do {
+            # Adapted from User.pm.
+            require Encode::Locale;
+            return Encode::decode( locale => getlogin )
+                || Encode::decode( locale => scalar getpwuid( $< ) )
+                || $ENV{ LOGNAME }
+                || $ENV{ USER }
+                || $ENV{ USERNAME }
+                || try {
+                    require Win32;
+                    Encode::decode( locale => Win32::LoginName() )
+                };
+        };
     },
 );
 
@@ -75,7 +77,10 @@ has user_name => (
     isa     => UserName,
     default => sub {
         my $self = shift;
-        $self->config->get( key => 'user.name' ) || do {
+        $ENV{ SQITCH_FULLNAME }
+            || $self->config->get( key => 'user.name' )
+            || $ENV{ SQITCH_ORIG_FULLNAME }
+        || do {
             my $sysname = $self->sysuser || hurl user => __(
                     'Cannot find your name; run sqitch config --user user.name "YOUR NAME"'
             );
@@ -101,7 +106,10 @@ has user_email => (
     isa     => UserEmail,
     default => sub {
         my $self = shift;
-        $self->config->get( key => 'user.email' ) || do {
+         $ENV{ SQITCH_EMAIL }
+            || $self->config->get( key => 'user.email' )
+            || $ENV{ SQITCH_ORIG_EMAIL }
+        || do {
             my $sysname = $self->sysuser || hurl user => __(
                 'Cannot infer your email address; run sqitch config --user user.email you@host.com'
             );

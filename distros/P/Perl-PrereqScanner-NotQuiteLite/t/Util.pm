@@ -87,9 +87,7 @@ sub test_app {
 
   for my $phase (sort keys %$expected) {
     for my $type (sort keys %{$expected->{$phase}}) {
-      for my $module (sort keys %{$expected->{$phase}{$type}}) {
-        is $prereqs->{$phase}{$type}{$module} => $expected->{$phase}{$type}{$module}, "found $module as $phase $type";
-      }
+      is_deeply $prereqs->{$phase}{$type} => $expected->{$phase}{$type}, "$phase $type ok";
     }
   }
   note explain $prereqs;

@@ -26,7 +26,7 @@ use Data::Dumper;
 #$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
-no strict; 
+no strict;
 no warnings;
 
 use Sim::OPT;
@@ -42,7 +42,7 @@ our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 #@EXPORT_OK   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 @EXPORT = qw( parcoord3d ); # our @EXPORT = qw( );
-$VERSION = '0.01.3'; 
+$VERSION = '0.01.5';
 $ABSTRACT = 'Sim::OPT::Parcoord3d is a program that can process the CSV data for a bi-dimensional parallel coordinate plot and output an Autolisp file for a 3D parallel coordinate plot.';
 
 #########################################################################################
@@ -56,30 +56,30 @@ sub parcoord3d
 		$tofile = $main::tofile;
 		#$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
 		say $tee "\n#Now in Sim::OPT::Takechance.\n";
-		$configfile = $main::configfile; 
-		@sweeps = @main::sweeps; 
-		@sourcesweeps = @main::sourcesweeps; 
-		@varinumbers = @main::varinumbers; say $tee "dump(\@varinumbers): " . dump(@varinumbers);
-		@mediumiters = @main::mediumiters;
-		@rootnames = @main::rootnames; 
-		%vals = %main::vals; 
-		
-		$mypath = $main::mypath;  
-		$exeonfiles = $main::exeonfiles; 
-		$generatechance = $main::generatechance; 
+		$configfile = $main::configfile;
+		@sweeps = @main::sweeps;
+		@sourcesweeps = @main::sourcesweeps;
+		@varnumbers = @main::varnumbers; say $tee "dump(\@varnumbers): " . dump(@varnumbers);
+		@miditers = @main::miditers;
+		@rootnames = @main::rootnames;
+		%vals = %main::vals;
+
+		$mypath = $main::mypath;
+		$exeonfiles = $main::exeonfiles;
+		$generatechance = $main::generatechance;
 		$file = $main::file;
 		$preventsim = $main::preventsim;
-		$fileconfig = $main::fileconfig; 
+		$fileconfig = $main::fileconfig;
 		$outfile = $main::outfile;
 		$target = $main::target;
-		
+
 		$convertfile = $main::convertfile;
-		$pick = $main::pick; 
+		$pick = $main::pick;
 		$numof_pars = $main::numof_pars;
-		$xspacing = $main::xspacing; 
+		$xspacing = $main::xspacing;
 		$yspacing = $main::yspacing;
 		$zspacing = $main::zspacing;
-		$ob_column = $main::ob_column; 
+		$ob_column = $main::ob_column;
 		$numof_layers = $main::numof_layers;
 		$otherob_column = $main::otherob_column;
 		$cut_column = $main::cut_column;
@@ -105,7 +105,7 @@ sub parcoord3d
 	close CONVERTFILE;
 
 	if ($pick)
-	{ 
+	{
 		$convertedfile = "$convertfile" . "filtered.csv";
 		open ( CONVERTEDFILE, ">$convertedfile" ) or die;
 		my $countline = 0;
@@ -114,15 +114,15 @@ sub parcoord3d
 			print CONVERTEDFILE "$lines[$countline]";
 			$countline++;
 		}
-	
+
 		$countline = ($#lines - $pick) ;
-		while ( $countline  < $#lines ) 
+		while ( $countline  < $#lines )
 		{
 			print CONVERTEDFILE "$lines[$countline]";
 			$countline++;
 		}
 		close CONVERTEDFILE;
-	
+
 		open ( CONVERTEDFILE, "$convertedfile" );
 		@lines = <CONVERTEDFILE>;
 		close CONVERTEDFILE;
@@ -134,7 +134,7 @@ sub parcoord3d
 	sub makedata
 	{
 		my $swap = shift; my @lines = @$swap;
-	
+
 		my $countline = 0;
 		foreach my $line (@lines)
 		{
@@ -150,14 +150,14 @@ sub parcoord3d
 			{
 				$ob_fun = $rowelts[$#rowelts];
 			}
-		
+
 			my $otherob_fun = $rowelts[$otherob_column];
 			if ( $otherob_fun =~ /-/ )
 			{
 				my @thesedata = split( /-/ , $otherob_fun );
 				$otherob_fun = $thesedata[1];
 			}
-		
+
 			my $countvar = 0;
 			foreach my $rowelt (@rowelts)
 			{
@@ -166,7 +166,7 @@ sub parcoord3d
 					if ( $rowelt =~ /-/ )
 					{
 						my @vardata = split( /-/ , $rowelt );
-						
+
 						push ( @linedata, [ @vardata ] );
 					}
 					else
@@ -175,7 +175,7 @@ sub parcoord3d
 					}
 					$countvar++;
 				}
-			}		
+			}
 			push ( @newdata, [ @linedata, $otherob_fun, $ob_fun ] );
 			$countline++;
 		}
@@ -190,7 +190,7 @@ sub parcoord3d
 		{
 			chomp($line);
 			my @elts = @{$line};
-		
+
 			my $elm1 = pop(@elts);
 			push ( @obfun, $elm1 );
 			my $elm2 = pop(@elts);
@@ -203,14 +203,14 @@ sub parcoord3d
 				my $value = $pair[1];
 				push ( @{$pars[$count]}, $value );
 				$count++;
-			}	
+			}
 		}
-	
+
 		$maxobfun = max(@obfun);
-		$minobfun = min(@obfun);	
+		$minobfun = min(@obfun);
 		$maxotherobfun = max(@otherobfun);
 		$minotherobfun = min(@otherobfun);
-	
+
 		$countel = 0;
 		foreach my $e (@obfun)
 		{
@@ -224,7 +224,7 @@ sub parcoord3d
 			}
 			$countel++;
 		}
-	
+
 		my $countel2 = 0;
 		foreach my $e (@otherobfun)
 		{
@@ -269,13 +269,13 @@ sub parcoord3d
 		my $case_per_layer = ( scalar(@newdata) / $numof_layers );
 		$countcase = 0;
 		foreach my $el ( @{$pars[0]} )
-		{	
-			my @provbowl;	
+		{
+			my @provbowl;
 			my $scaled_zvalue = ( ( $newdata[$countcase][($#{$newdata[$countcase]}-1)] - $minotherobfun ) / ( $maxotherobfun - $minotherobfun ) );
 			my $countvar = 0;
 			while ($countvar < $numof_pars)
 			{
-				my $layer_num = ( int( $countcase / $case_per_layer ) + 1) ; 
+				my $layer_num = ( int( $countcase / $case_per_layer ) + 1) ;
 				my $scaled_xvalue = ( $countvar / $scale_xspacing );
 				my $scaled_yvalue = ( ( $pars[$countvar][$countcase] - $minpars[$countvar] ) / ( $maxpars[$countvar] - $minpars[$countvar] ) );
 				$scaled_yvalue = ($scaled_yvalue * $yspacing);
@@ -288,7 +288,7 @@ sub parcoord3d
 				{
 					push (@provbowl, [ $scaled_xvalue, $scaled_yvalue, 0, $layer_num ] );
 				}
-				$countvar++;			
+				$countvar++;
 			}
 			push (@plotdata, [ @provbowl ]);
 			$countcase++;
@@ -340,10 +340,10 @@ sub parcoord3d
 						my @cutelems = @elems[0..2]; # PUT ..2 IF ALSO THE THIRD AXIS HAS TO BE CHECKED FOR NON-REPETITIONS, PUT 1 OTHERWISE.
 						if (@cutelms ~~ @cutelems)
 						{
-							
+
 							$counthit++;
 							print "COUNTGROUP: $countgroup, HIT! $counthit\n";
-						
+
 							if ($counthit > 0)
 							{
 								print "COUNTHITNOW: $counthit\n";
@@ -362,9 +362,9 @@ sub parcoord3d
 								push(@newnewbag, [ nlowmult($round, $elms[0]), nlowmult($round, $elms[1]), nlowmult($round, $elms[2]), nlowmult($round, $elms[3]) ]);
 							}
 						}
-					}	
+					}
 				}
-			
+
 				$counter++
 			}
 			push( @newplotdata, [ @newnewbag ] );
@@ -391,26 +391,26 @@ sub parcoord3d
 			{
 				my @coords = @{$elt};
 				my @nextcoords = @{$elts[$countpar+1]};
-				
-				
+
+
 				my @newcoords;
 				push( @newcoords, [ @coords ] );
 				push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , $coords[2], $coords[3] ] );
 				push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
 				push( @newcoords, [ $coords[0], $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
 				push( @newplotdatabottom, [ @newcoords ] );
-				
-			
+
+
 				my @newcoords;
 				unless ($countpar == $#elts)
-				{			
+				{
 					push( @newcoords, [ @coords ] );
 					push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , $coords[2], $coords[3] ] );
 					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , $nextcoords[2], $nextcoords[3] ] );
 					push( @newcoords, [ @nextcoords] );
 					push( @newplotdatafront, [ @newcoords ] );
 				}
-				
+
 
 				my @newcoords;
 				unless ($countpar == $#elts)
@@ -421,7 +421,7 @@ sub parcoord3d
 					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , $nextcoords[2], $nextcoords[3] ] );
 					push( @newplotdataleft, [ @newcoords ] );
 				}
-				
+
 
 				my @newcoords;
 				unless ($countpar == $#elts)
@@ -432,7 +432,7 @@ sub parcoord3d
 					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , ( $nextcoords[2] - ($yspacing * $offset ) ) , $nextcoords[3] ] );
 					push( @newplotdataback, [ @newcoords ] );
 				}
-				
+
 
 				my @newcoords;
 				unless ($countpar == $#elts)
@@ -443,11 +443,11 @@ sub parcoord3d
 					push( @newcoords, [ $nextcoords[0], $nextcoords[1] , ( $nextcoords[2] - ($yspacing * $offset ) ) , $nextcoords[3] ] );
 					push( @newplotdataright, [ @newcoords ] );
 				}
-				
-	
+
+
 				$countpar++;
 			}
-		
+
 			if (@newplotdatafront)
 			{
 				push(@newnewdata, @newplotdatabottom , @newplotdatafront,  @newplotdataleft, @newplotdataback, @newplotdataright );
@@ -457,7 +457,7 @@ sub parcoord3d
 				push(@newnewdata, @newplotdatabottom );
 			}
 
-			
+
 			$countgroup++;
 		}
 		print TRANSITIONAL dump(@newnewdata);
@@ -508,7 +508,7 @@ The objective function to be represented through colours in the parallel coordin
 
 "Sim::OPT::Parcoord3d" can be called from Sim::OPT or directly from the command line (after issuing < re.pl > and < use Sim::OPT::Parcoord3d >) with the command < parcoord3d your_configuration_file.pl >.
 
-The variables to be specified in the configuration file are described in the comments in the "Sim::OPT" configuration file included in the "examples" folder in this distribution ("des.pl", for instance - then search for "Parcoord3d"). 
+The variables to be specified in the configuration file are described in the comments in the "Sim::OPT" configuration file included in the "examples" folder in this distribution ("des.pl", for instance - then search for "Parcoord3d").
 
 
 =head2 EXPORT
@@ -529,6 +529,3 @@ Copyright (C) 2015-2016 by Gian Luca Brunetti and Politecnico di Milano. This is
 
 
 =cut
-
-
-

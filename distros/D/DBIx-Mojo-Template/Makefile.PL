@@ -20,7 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Hash::Merge'=>0.200,
         'Clone'=>0,
-        'Mojolicious'=>6.00,
+        'Mojolicious'=>7.00,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

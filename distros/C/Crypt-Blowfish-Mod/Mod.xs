@@ -8,15 +8,14 @@ MODULE = Crypt::Blowfish::Mod PACKAGE = Crypt::Blowfish::Mod
 PROTOTYPES: DISABLE
 
 char *
-b_encrypt (key, str, big)
-    unsigned char *key 
-    char *str 
-	short big
+b_encrypt (key, str, big, b_signed)
+    unsigned char *key
+    char *str
+    short big
+    short b_signed
 
 char *
 b_decrypt (key, str, big)
-    unsigned char *key 
-    char *str 
-	short big
-
-
+    unsigned char *key
+    char *str
+    short big

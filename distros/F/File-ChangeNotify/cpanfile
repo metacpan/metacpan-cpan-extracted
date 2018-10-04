@@ -1,5 +1,4 @@
 requires "Carp" => "0";
-requires "Class::Load" => "0";
 requires "File::Find" => "0";
 requires "File::Spec" => "0";
 requires "Module::Pluggable::Object" => "0";

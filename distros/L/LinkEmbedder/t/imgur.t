@@ -5,7 +5,8 @@ use LinkEmbedder;
 plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 
 my $embedder = LinkEmbedder->new;
-my $link     = $embedder->get('http://imgur.com/2lXFJK0');
+my $link;
+$embedder->get_p('https://imgur.com/2lXFJK0')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Imgur');
 is_deeply $link->TO_JSON,
   {
@@ -13,9 +14,9 @@ is_deeply $link->TO_JSON,
   height           => 0,
   html             => photo_html(),
   provider_name    => 'Imgur',
-  provider_url     => 'http://imgur.com',
+  provider_url     => 'https://imgur.com',
   thumbnail_height => 315,
-  thumbnail_url    => 'http://i.imgur.com/2lXFJK0.png?fb',
+  thumbnail_url    => 'https://i.imgur.com/2lXFJK0.png?fb',
   thumbnail_width  => 600,
   title            => 'Yay Mojo!',
   type             => 'photo',

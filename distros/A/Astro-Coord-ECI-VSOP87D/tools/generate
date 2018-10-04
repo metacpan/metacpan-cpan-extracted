@@ -1,0 +1,550 @@
+#!/usr/bin/env perl
+
+use 5.008;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI::Utils qw{ SECSPERDAY TWOPI };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+use Storable qw{ dclone };
+
+our $VERSION = '0.001';
+
+my %opt = (
+    model	=> 'vsop87d',
+    template	=> 'tools/template.pm',
+);
+
+GetOptions( \%opt,
+    qw{ dumper! force! model=s template=s },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV
+    and $opt{model} =~ m/ \A vsop87[a-e]? \z /smxi
+    or pod2usage( { -verbose => 0 } );
+
+foreach my $name ( @ARGV ) {
+    $name =~ m/ \A (?: mercury | venus | earth | mars | jupiter |
+	saturn | uranus | neptune ) \z /smx
+	or die "'$name' is an invalid name\n";
+    $name = ucfirst lc $name;
+
+
+    my $model_file = model_file_name( $name, $opt{model} );
+    my $model_def = read_model( $model_file );
+
+    my $model;
+
+    if ( $opt{dumper} ) {
+	no warnings qw{ once };
+	require Data::Dumper;
+	local $Data::Dumper::Indent = 1;
+	local $Data::Dumper::Pad = '    ';
+	local $Data::Dumper::Quotekeys = 0;
+	local $Data::Dumper::Sortkeys = 1;
+	local $Data::Dumper::Trailingcomma = 1;
+	$model = Dumper( $model_def );
+	$model =~ s/ [^=]* = \s* //smx;
+	$model =~ s/ ; \s* \z /\n/smx
+    } else {
+	require Data::Dump;
+	$model = Data::Dump::dump( $model_def );
+	$model =~ s/ ^ /    /smxg;
+    }
+
+    if ( $opt{template} ) {
+	$model =~ s/ \A \s+ //smx;
+	$model =~ s/ \s+ \z //smx;
+	my $superclass = $model_def->{order} > 3 ?
+	    'Astro::Coord::ECI::VSOP87D::_Superior' :
+	    $model_def->{order} ?
+		'Astro::Coord::ECI::VSOP87D::_Inferior' :
+		'Astro::Coord::ECI::Sun';
+
+	my %subst = (
+	    body	=> $model_def->{body},
+	    model	=> $model,
+	    superclass	=> $superclass,
+	    year	=> ( localtime )[5] + 1900,
+	);
+
+	my $path =
+	"lib/Astro/Coord/ECI/$model_def->{name}/$model_def->{body}.pm";
+
+	if ( -e $path && ! $opt{force} ) {
+	    warn "Not generating $path; it exists and -force not specified\n";
+	} else {
+	    open my $out, '>:encoding(utf-8)', $path
+		or die "Unable to open $path: $!\n";
+
+	    open my $tplt, '<:encoding(utf-8)', $opt{template}
+		or die "Unable to open $opt{template}: $!\n";
+	    while ( <$tplt> ) {
+		s/ [[] % \s* ( \S+ ) \s* % []] / replace( \%subst, $1 ) /smxge;
+		print { $out } $_;
+	    }
+	    close $tplt;
+	    close $out;
+	}
+    } else {
+	print $model;
+    }
+
+    my $test_path = "t/data/\L$model_def->{name}\E.\L$model_def->{body}";
+    if ( -e $test_path && ! $opt{force} ) {
+	warn "Not generating $test_path; it exists and -force not specified\n";
+    } else {
+	system( "tools/ref-data $model_file <tools/generate.data >$test_path" );
+    }
+}
+
+BEGIN {
+
+    # Cutoff information for each series
+    my %cutoff = (
+	VSOP87D	=> {
+	    MERCURY	=> {
+		Meeus	=> {
+		    L0	=> 38,
+		    L1	=> 16,
+		    L2	=> 10,
+		    L3	=> 8,
+		    L4	=> 6,
+		    L5	=> 1,
+		    B0	=> 14,
+		    B1	=> 11,
+		    B2	=> 9,
+		    B3	=> 7,
+		    B4	=> 2,
+		    R0	=> 13,
+		    R1	=> 8,
+		    R2	=> 7,
+		    R3	=> 5,
+		},
+	    },
+	    VENUS	=> {
+		Meeus	=> {
+		    L0	=> 24,
+		    L1	=> 12,
+		    L2	=> 8,
+		    L3	=> 3,
+		    L4	=> 3,
+		    L5	=> 1,
+		    B0	=> 9,
+		    B1	=> 4,
+		    B2	=> 4,
+		    B3	=> 4,
+		    B4	=> 1,
+		    R0	=> 12,
+		    R1	=> 3,
+		    R2	=> 3,
+		    R3	=> 1,
+		    R4	=> 1,
+		},
+	    },
+	    EARTH	=> {
+		Meeus	=> {
+		    L0	=> 64,
+		    L1	=> 34,
+		    L2	=> 20,
+		    L3	=> 7,
+		    L4	=> 3,
+		    L5	=> 1,
+		    B0	=> 5,
+		    B1	=> 1,
+		    R0	=> 40,
+		    R1	=> 10,
+		    R2	=> 6,
+		    R3	=> 2,
+		    R4	=> 1,
+		},
+	    },
+	    MARS	=> {
+		Meeus	=> {
+		    L0	=> 69,
+		    L1	=> 46,
+		    L2	=> 33,
+		    L3	=> 12,
+		    L4	=> 8,
+		    L5	=> 2,
+		    B0	=> 16,
+		    B1	=> 9,
+		    B2	=> 7,
+		    B3	=> 4,
+		    B4	=> 3,
+		    R0	=> 45,
+		    R1	=> 27,
+		    R2	=> 11,
+		    R3	=> 6,
+		    R4	=> 4,
+		},
+	    },
+	    JUPITER	=> {
+		Meeus	=> {
+		    L0	=> 64,
+		    L1	=> 61,
+		    L2	=> 57,
+		    L3	=> 39,
+		    L4	=> 19,
+		    L5	=> 5,
+		    B0	=> 26,
+		    B1	=> 22,
+		    B2	=> 14,
+		    B3	=> 9,
+		    B4	=> 6,
+		    B5	=> 1,
+		    R0	=> 46,
+		    R1	=> 43,
+		    R2	=> 36,
+		    R3	=> 28,
+		    R4	=> 15,
+		    R5	=> 7,
+		},
+	    },
+	    SATURN	=> {
+		Meeus	=> {
+		    L0	=> 90,
+		    L1	=> 79,
+		    L2	=> 63,
+		    L3	=> 48,
+		    L4	=> 27,
+		    L5	=> 5,
+		    B0	=> 34,
+		    B1	=> 32,
+		    B2	=> 29,
+		    B3	=> 21,
+		    B4	=> 12,
+		    B5	=> 2,
+		    R0	=> 44,
+		    R1	=> 38,
+		    R2	=> 32,
+		    R3	=> 28,
+		    R4	=> 23,
+		    R5	=> 18,
+		},
+	    },
+	    URANUS	=> {
+		Meeus	=> {
+		    L0	=> 91,
+		    L1	=> 57,
+		    L2	=> 35,
+		    L3	=> 18,
+		    L4	=> 4,
+		    B0	=> 28,
+		    B1	=> 20,
+		    B2	=> 11,
+		    B3	=> 4,
+		    B4	=> 1,
+		    R0	=> 59,
+		    R1	=> 35,
+		    R2	=> 18,
+		    R3	=> 10,
+		    R4	=> 2,
+		},
+	    },
+	    NEPTUNE	=> {
+		Meeus	=> {
+		    L0	=> 38,
+		    L1	=> 18,
+		    L2	=> 7,
+		    L3	=> 4,
+		    L4	=> 1,
+		    B0	=> 17,
+		    B1	=> 13,
+		    B2	=> 6,
+		    B3	=> 4,
+		    B4	=> 1,
+		    R0	=> 32,
+		    R1	=> 15,
+		    R2	=> 5,
+		    R3	=> 1,
+		},
+	    },
+	},
+    );
+    
+    # from https://solarsystem.nasa.gov/planets/overview/ 18-Aug-2018
+    my %radius = (
+	MERCURY	=> 2_439.7,
+	VENUS	=> 6_052,
+	EARTH	=> 1_391_016,	# Sun, but we use Earth file.
+	MARS	=> 3_390,
+	JUPITER	=> 69_911,
+	SATURN	=> 58_232,
+	URANUS	=> 25_362,
+	NEPTUNE	=> 24_622,
+    );
+
+    # Theory index to name
+    my @theory = map { "VSOP87$_" } '', qw{ A B C D E };
+
+    # Build the series information structure. The arguments are:
+    # $iv = The model version number (index into @theory)
+    # $bo = The body name
+    # $sn = The series name
+    # $in = The number of terms in the series, used for the 'none'
+    # model cutoff.
+    sub initialize_series {
+	my ( $model_def, $iv, $bo, $sn, $in ) = @_;
+
+	$model_def->{default_model_cutoff}{none}{$sn} = ( $in || 0 ) + 0;
+
+	my $data = {
+	    series	=> $sn,
+	    terms	=> [],
+	};
+
+	return $data;
+    }
+
+    # Return initial model data as name/value pairs. Designed to be
+    # called in list context.  The arguments are:
+    # $iv = The model version number (index into @theory)
+    # $bo = The body name
+    sub initialize_model {
+	my ( $iv, $bo ) = @_;
+	my $cc = dclone( $cutoff{$theory[$iv]}{$bo} || {} );
+	$cc->{none} ||= {};
+	foreach my $key ( keys %{ $cc } ) {
+	    $cc->{$key}{name} ||= $key;
+	}
+	return (
+	    diameter		=> $radius{$bo} * 2,
+	    name		=> $theory[$iv],
+	    default_model_cutoff	=> $cc,
+	);
+    }
+
+}
+
+sub model_file_name {
+    my ( $name, $model ) = @_;
+    my $suffix = lc substr $name, 0, 3;
+    return "ref/VSOP87/\U$model\E.$suffix";
+}
+
+sub read_model {
+    my ( $fn ) = @_;
+    open my $fh, '<', $fn
+	or die "Unable to open model file $fn: $!\n";
+
+    my %model_def;
+    my @rslt;
+    while ( <$fh> ) {
+
+	# 17x,i1,4x,a7,12x,i1,17x,i1,i7
+	my ( $iv, $bo, $ic, $vn, $it, $in ) = unpack 'x17A1x4A7x12A1A17a1a7';
+	keys %model_def
+	    or %model_def = initialize_model( $iv, $bo );
+	$bo = ucfirst lc $bo;
+	$model_def{body} ||= { Earth => 'Sun' }->{$bo} || $bo;
+	$vn =~ s/ [^(]* . //smx; $vn =~ s/ [)] .* //smx;
+	$in =~ s/ \A \s+ //smx;
+	my $sn = sprintf '%s%d', substr( $vn, $ic - 1, 1 ), $it;
+	$opt{verbose} and warn <<"EOD";
+- iv : code of VSOP87 version               $iv
+- bo : name of body                         '$bo'
+- ic : index of coordinate                  $ic
+- it : degree alpha of time variable T      $it
+- sn : series name                          '$sn'
+- in : number of terms of series            $in
+EOD
+	my $tn = 0;
+	while ( <$fh> ) {
+	    my ( $ic, $it, $A, $B, $C ) = unpack 'x3A1A1x74A18A14A20';
+	    $tn++;
+	    {
+		local $_;
+		foreach ( $A, $B, $C ) {
+		    s/ \A \s+ //smx;
+		    $_ += 0;
+		}
+	    }
+	    $opt{verbose} and warn <<"EOD";
+ic : index of coordinate                    $ic
+it : degree alpha of time variable T        $it
+A  : amplitude A                            $A
+B  : phase     B                            $B
+C  : frequency C                            $C
+id : identity                               '$sn $tn'
+EOD
+	    $rslt[$ic][$it] ||= initialize_series(
+		\%model_def, $iv, $bo, $sn, $in );
+	    push @{ $rslt[$ic][$it]{terms} }, [ $A, $B, $C ];
+	    --$in
+		or last;
+	}
+    }
+
+    close $fh;
+
+    shift @rslt;
+    $model_def{model} = \@rslt;
+
+    $model_def{order} = {
+	Sun	=> 0,
+	Mercury	=> 1,
+	Venus	=> 2,
+	Earth	=> 3,	# But this will never be used
+	Mars	=> 4,
+	Jupiter	=> 5,
+	Saturn	=> 6,
+	Uranus	=> 7,
+	Neptune	=> 8,
+    }->{$model_def{body}};
+
+    if ( my $adj = { VSOP87B => -1, VSOP87D => 1 }->{$model_def{name}} ) {
+
+	my $model = $model_def{model};
+
+	# Defensive programming. The series are built this way, so we
+	# should always pass.
+	'L1' eq $model->[0][1]{series}
+	    or die sprintf '%s - %s is not the L1 series',
+		'Programming error',
+		'$model->[0][1]',
+		;
+	( $model->[0][1]{terms}[0][1] || $model->[0][1]{terms}[0][2] )
+	    and die '%s - %s is not the constant term of the L1 series',
+		'Programming error',
+		'$model->[0][1]{terms}[0]',
+		;
+
+	# IAU 2003 rate of precession in radians per second. The IAU
+	# gives it in radians per Julian century
+	use constant RATE_OF_PRECESSION_IAU_2003 => 0.024381750 / ( 36525 *
+	    SECSPERDAY );
+
+	my $ov =		# Orbital velocity, radians per second
+	    $model->[0][1]{terms}[0][0] /	# radians per Julian millennium
+	    ( 365250 *	# days per julian millennium
+	      SECSPERDAY );	# seconds per day
+
+	my $my = TWOPI / $ov;	# Model year. This is sidereal for
+				# VSOP87B, tropical for VSOP87D
+						# or tropical
+	my $oy = $my;		# Other year, tropical or sidereal
+
+	for ( 0 .. 9 ) {	# Iterate a few times;
+
+	    # Radians of precession
+	    my $delta = $oy * RATE_OF_PRECESSION_IAU_2003;
+
+	    $oy = $my + $adj * $delta / $ov;
+	}
+
+	$model_def{tropical_period} = 0 +
+	    sprintf '%.3f', $adj > 0 ? $my : $oy;
+	$model_def{sidereal_period} = 0 +
+	    sprintf '%.3f', $adj > 0 ? $oy : $my;
+    }
+
+    return \%model_def
+}
+
+sub replace {
+    my ( $subst, $name ) = @_;
+    defined $subst->{$name}
+	or die "Substitution $name not defined in $opt{template} line $.\n";
+    return $subst->{$name};
+}
+
+__END__
+
+=head1 TITLE
+
+generate - Generate code and test data for the specified planets
+
+=head1 SYNOPSIS
+
+ generate mars
+ generate -help
+ generate -version
+
+=head1 OPTIONS
+
+=head2 -dumper
+
+If this Boolean option is asserted, L<Data::Dumper|Data::Dumper> is used
+to stringify the model data. If not, L<Data::Dump|Data::Dump> is used.
+
+The default is C<-nodumper>.
+
+=head2 -force
+
+If this Boolean option is asserted, generated files that exist are
+overwritten. If not, generated files that exist are not overwritten, and
+a warning is generated.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -model
+
+ -model vsop87b
+
+This option specifies the model to build into the generated code. The
+value is not case-sensitive. Values other than the default are not
+supported.
+
+The default is C<-model vsop87d>.
+
+=head2 -template
+
+ -template fubar/vsop87d.pm
+
+This option specifies the template file to use to generate the planet's
+module. If a false value is specified, no module is generated, and the
+model is written to standard out.
+
+The default is C<-template tools/template.pm>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script generates modules and test data for the planets named
+on the command line. The planet names are case-insensitive.
+
+The modules are generated using a home-grown templating system more or
+less like a brain-dead C<Template-Toolkit>. Variable substitution occurs
+on the following names when enclosed in C<[% ... %]>:
+
+=over
+
+=item body - the name of the body
+
+=item model - the model parameters
+
+=item name - the name of the model, upper-case
+
+=item superclass - the name of the superclass
+
+=item year - the current year
+
+=back
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

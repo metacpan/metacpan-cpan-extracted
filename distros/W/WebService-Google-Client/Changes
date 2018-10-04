@@ -1,0 +1,27 @@
+0.06      2018-10-04 10:47:53-04:00 America/New_York
+  - Minor tweak to dist.ini to update the links on metacpan
+
+0.05      2018-10-03 23:46:53-04:00 America/New_York
+  - Very minor release. Last release overlooked the addition of new
+    documentation to weaver.ini. Correcting.
+
+0.04      2018-10-03 23:28:26-04:00 America/New_York
+  - Add some user-friendly documentation on getting started with the module
+  - Help set the stage for a more developer-friendly module with integration
+    with the `Log::Log4perl::Shortcuts` module
+  - Get rid of crufty tests
+  - Add some basic tests for Client.pm module
+  - Modest refinemenst to Dist::Zilla configuration
+
+0.03      2018-10-03 13:50:52-04:00 America/New_York
+  - This is a fork of Moo::Google v0.03 which appears to have been abandoned,
+    original author unresponsive since January, 2018. Many thanks for his work.
+  - Renamed module to WebService::Google::Client.
+  - Modified test directory locations so they'll run with properly with "dzil
+    test".
+  - Made cursory changes to tests so they will pass and removed event test that
+    was badly designed.
+  - General quality improvement of distribution and Dist::Zilla configuration
+    made.
+  - This is not a feature release but will help set stage for future
+    improvements.

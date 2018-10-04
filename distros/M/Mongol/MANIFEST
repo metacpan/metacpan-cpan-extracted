@@ -1,3 +1,4 @@
+.gitlab-ci.yml
 Build.PL
 lib/Mongol.pm
 lib/Mongol/Cookbook.pod
@@ -20,8 +21,8 @@ t/lib/Mongol/Models/Person.pm
 t/lib/Mongol/Test.pm
 t/model.t
 t/pagination.t
-t/pod.t
-t/pod_coverage.t
 t/relations.t
+xt/pod.t
+xt/pod_coverage.t
 META.yml
 META.json

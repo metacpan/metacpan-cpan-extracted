@@ -18,7 +18,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9997';
+our $VERSION = '0.9998';
 
 has registry_uri => (
     is       => 'ro',
@@ -58,6 +58,9 @@ sub registry_destination {
     }
     return $uri->as_string;
 }
+
+sub _def_user { $ENV{ISC_USER} }
+sub _def_pass { $ENV{ISC_PASSWORD} }
 
 has dbh => (
     is      => 'rw',
@@ -123,7 +126,7 @@ has tz_offset => (
     isa      => Maybe[Int],
     lazy     => 1,
     default => sub {
-        # From: http://stackoverflow.com/questions/2143528/whats-the-best-way-to-get-the-utc-offset-in-perl
+        # From: https://stackoverflow.com/questions/2143528/whats-the-best-way-to-get-the-utc-offset-in-perl
         my @t = localtime(time);
         my $gmt_offset_in_seconds = timegm(@t) - timelocal(@t);
         my $offset = -($gmt_offset_in_seconds / 3600);

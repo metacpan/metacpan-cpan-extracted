@@ -40,12 +40,12 @@
          "requires" : {
             "Exporter" : "5.57",
             "Module::CPANfile" : "0",
-            "Perl::PrereqScanner::NotQuiteLite" : "0.91",
-            "Perl::PrereqScanner::NotQuiteLite::App" : "0"
+            "Perl::PrereqScanner::NotQuiteLite" : "0.96"
          }
       },
       "test" : {
          "requires" : {
+            "CPAN::Common::Index" : "0",
             "Test::More" : "0.88",
             "Test::UseAllModules" : "0.17"
          }
@@ -53,6 +53,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

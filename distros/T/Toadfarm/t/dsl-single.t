@@ -21,7 +21,7 @@ is $t->app->moniker, 'Test', 'moniker';
 is $t->app->log->level, 'debug', 'log level';
 like $t->app->secrets->[0], qr/^\w{32}$/, 'random secrets';
 is_deeply $t->app->config->{hypnotoad}{listen}, ['http://*:5000'], 'listen';
-is_deeply $t->app->commands->namespaces, [qw( Mojolicious::Command Toadfarm::Command )], 'correct namespaces';
+is $t->app->commands->namespaces->[-1], 'Toadfarm::Command', 'correct namespaces';
 
 $t->get_ok('/info')->status_is(200)->json_is('/foo', 123);
 

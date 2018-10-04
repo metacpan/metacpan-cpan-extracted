@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use JSON;
 use Pod::Usage;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 my %opt;
 

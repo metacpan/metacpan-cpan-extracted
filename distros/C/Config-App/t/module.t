@@ -72,4 +72,10 @@ is_deeply(
     'Returned data is a copy; not a ref to original',
 );
 
+warning_like(
+    sub { $obj = MODULE->new( 'config/recursion_1.yaml', 1 ) },
+    [qr/^Configuration include recursion encountered/],
+    'Recursion of includes in singleton mode',
+);
+
 done_testing;

@@ -35,7 +35,6 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
-                                      'Class::Load' => '0',
                                       'File::Find' => '0',
                                       'File::Spec' => '0',
                                       'Module::Pluggable::Object' => '0',

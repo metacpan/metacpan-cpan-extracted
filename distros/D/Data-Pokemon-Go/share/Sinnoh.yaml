@@ -1,0 +1,1651 @@
+ナエトル:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 387
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 110
+    Attack: 119
+    Defense: 115
+    MAXCP:
+        Grown: 1066
+        Hatched:
+        Boosted:
+ハヤシガメ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 388
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 150
+    Attack: 157
+    Defense: 152
+    MAXCP:
+        Grown: 1783
+        Hatched:
+        Boosted:
+ドダイトス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 389
+    Types:
+        - くさ
+        - じめん
+    From:
+    To:
+    Stamina: 190
+    Attack: 202
+    Defense: 197
+    MAXCP:
+        Grown: 2825
+        Hatched:
+        Boosted:
+ヒコザル:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 390
+    Types:
+    - ほのお
+    From:
+    To:
+    Stamina: 88
+    Attack: 113
+    Defense: 86
+    MAXCP:
+        Grown: 815
+        Hatched:
+        Boosted:
+モウカザル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 391
+    Types:
+        - ほのお
+        - かくとう
+    From:
+    To:
+    Stamina: 128
+    Attack: 158
+    Defense: 105
+    MAXCP:
+        Grown: 1415
+        Hatched:
+        Boosted:
+ゴウカザル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 392
+    Types:
+        - ほのお
+        - かくとう
+    From:
+    To:
+    Stamina: 152
+    Attack: 222
+    Defense: 151
+    MAXCP:
+        Grown: 2464
+        Hatched:
+        Boosted:
+ポッチャマ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 393
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 106
+    Attack: 112
+    Defense: 103
+    MAXCP:
+        Grown: 947
+        Hatched:
+        Boosted:
+ポッタイシ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 394
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 128
+    Attack: 150
+    Defense: 143
+    MAXCP:
+        Grown: 1549
+        Hatched:
+        Boosted:
+エンペルト:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 395
+    Types:
+        - みず
+        - はがね
+    From:
+    To:
+    Stamina: 168
+    Attack: 210
+    Defense: 193
+    MAXCP:
+        Grown: 2741
+        Hatched:
+        Boosted:
+ムックル:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 396
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 80
+    Attack: 101
+    Defense: 58
+    MAXCP:
+        Grown: 603
+        Hatched:
+        Boosted:
+ムクバード:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 397
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 110
+    Attack: 142
+    Defense: 99
+    MAXCP:
+        Grown: 1170
+        Hatched:
+        Boosted:
+ムクホーク:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 398
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 170
+    Attack: 234
+    Defense: 145
+    MAXCP:
+        Grown: 2675
+        Hatched:
+        Boosted:
+ビッパ:    #-----------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 399
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 118
+    Attack: 80
+    Defense: 73
+    MAXCP:
+        Grown: 641
+        Hatched:
+        Boosted:
+ビーダル:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 400
+    Types:
+        - ノーマル
+        - みず
+    From:
+    To:
+    Stamina: 158
+    Attack: 162
+    Defense: 119
+    MAXCP:
+        Grown: 1683
+        Hatched:
+        Boosted:
+コロボーシ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 401
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 74
+    Attack: 45
+    Defense: 74
+    MAXCP:
+        Grown: 333
+        Hatched:
+        Boosted:
+コロトック:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 402
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 154
+    Attack: 160
+    Defense: 100
+    MAXCP:
+        Grown: 1523
+        Hatched:
+        Boosted:
+コリンク:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 403
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 90
+    Attack: 117
+    Defense: 64
+    MAXCP:
+        Grown: 750
+        Hatched:
+        Boosted:
+ルクシオ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 404
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 120
+    Attack: 159
+    Defense: 95
+    MAXCP:
+        Grown: 1324
+        Hatched:
+        Boosted:
+レントラー:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 405
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 160
+    Attack: 232
+    Defense: 156
+    MAXCP:
+        Grown: 2668
+        Hatched:
+        Boosted:
+スボミー:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 406
+    Types:
+        - くさ
+        - どく
+    From:
+    To:
+    Stamina: 80
+    Attack: 91
+    Defense: 126
+    MAXCP:
+        Grown: 766
+        Hatched:
+        Boosted:
+ロズレイド:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 407
+    Types:
+        - くさ
+        - どく
+    From:
+    To:
+    Stamina: 120
+    Attack: 243
+    Defense: 206
+    MAXCP:
+        Grown: 2783
+        Hatched:
+        Boosted:
+ズガイドス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 408
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 134
+    Attack: 218
+    Defense: 75
+    MAXCP:
+        Grown: 1685
+        Hatched:
+        Boosted:
+ラムバルド:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 409
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 194
+    Attack: 295
+    Defense: 114
+    MAXCP:
+        Grown: 3179
+        Hatched:
+        Boosted:
+タテトプス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 410
+    Types:
+        - いわ
+        - はがね
+    From:
+    To:
+    Stamina: 60
+    Attack: 76
+    Defense: 208
+    MAXCP:
+        Grown: 735
+        Hatched:
+        Boosted:
+トリデプス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 411
+    Types:
+        - いわ
+        - はがね
+    From:
+    To:
+    Stamina: 120
+    Attack: 94
+    Defense: 299
+    MAXCP:
+        Grown: 1401
+        Hatched:
+        Boosted:
+ミノムッチ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 412
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 80
+    Attack: 53
+    Defense: 83
+    MAXCP:
+        Grown: 409
+        Hatched:
+        Boosted:
+ミノマダム:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 413
+    Form: ゴミのミノ
+    Types:
+        - むし
+        - はがね
+    From:
+    To:
+    Stamina: 120
+    Attack: 127
+    Defense: 175
+    MAXCP:
+        Grown: 1420
+        Hatched:
+        Boosted:
+ミノマダム:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 413
+    Form: くさきのミノ
+    Types:
+        - むし
+        - くさ
+    From:
+    To:
+    Stamina: 120
+    Attack: 141
+    Defense: 189
+    MAXCP:
+        Grown: 1616
+        Hatched:
+        Boosted:
+ミノマダム:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 413
+    Form: すなちのミノ
+    Types:
+        - むし
+        - じめん
+    From:
+    To:
+    Stamina: 120
+    Attack: 141
+    Defense: 189
+    MAXCP:
+        Grown: 1616
+        Hatched:
+        Boosted:
+ガーメイル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 414
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 140
+    Attack: 185
+    Defense: 98
+    MAXCP:
+        Grown: 1653
+        Hatched:
+        Boosted:
+ミツハニー:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 415
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 60
+    Attack: 59
+    Defense: 83
+    MAXCP:
+        Grown: 396
+        Hatched:
+        Boosted:
+ビークイン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 416
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 140
+    Attack: 149
+    Defense: 190
+    MAXCP:
+        Grown: 1825
+        Hatched:
+        Boosted:
+パチリス:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 417
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 120
+    Attack: 94
+    Defense: 182
+    MAXCP:
+        Grown: 1110
+        Hatched:
+        Boosted:
+ブイゼル:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 418
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 110
+    Attack: 132
+    Defense: 70
+    MAXCP:
+        Grown: 946
+        Hatched:
+        Boosted:
+フローゼル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 419
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 170
+    Attack: 221
+    Defense: 118
+    MAXCP:
+        Grown: 2312
+        Hatched:
+        Boosted:
+チェリンボ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 420
+    Types:
+    - くさ
+    From:
+    To:
+    Stamina: 90
+    Attack: 108
+    Defense: 96
+    MAXCP:
+        Grown: 829
+        Hatched:
+        Boosted:
+チェリム:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 421
+    Form: ネガフォルム
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 140
+    Attack: 170
+    Defense: 157
+    MAXCP:
+        Grown: 1886
+        Hatched:
+        Boosted:
+チェリム:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 421
+    Form: ポジフォルム
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 140
+    Attack: 170
+    Defense: 157
+    MAXCP:
+        Grown: 1886
+        Hatched:
+        Boosted:
+カラナクシ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 422
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 152
+    Attack: 103
+    Defense: 111
+    MAXCP:
+        Grown: 1069
+        Hatched:
+        Boosted:
+トリトドン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 423
+    Form: にしのうみ
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 222
+    Attack: 169
+    Defense: 149
+    MAXCP:
+        Grown: 2265
+        Hatched:
+        Boosted:
+トリトドン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 423
+    Form: ひがしのうみ
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 222
+    Attack: 169
+    Defense: 149
+    MAXCP:
+        Grown: 2265
+        Hatched:
+        Boosted:
+エテボース:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 424
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 150
+    Attack: 205
+    Defense: 143
+    MAXCP:
+        Grown: 2218
+        Hatched:
+        Boosted:
+フワンテ:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 425
+    Types:
+        - ゴースト
+        - ひこう
+    From:
+    To:
+    Stamina: 180
+    Attack: 117
+    Defense: 85
+    MAXCP:
+        Grown: 1151
+        Hatched:
+        Boosted:
+フワライド:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 426
+    Types:
+        - ゴースト
+        - ひこう
+    From:
+    To:
+    Stamina: 300
+    Attack: 180
+    Defense: 107
+    MAXCP:
+        Grown: 2387
+        Hatched:
+        Boosted:
+ミミロル:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 427
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 110
+    Attack: 130
+    Defense: 111
+    MAXCP:
+        Grown: 1136
+        Hatched:
+        Boosted:
+ミミロップ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 428
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 130
+    Attack: 156
+    Defense: 200
+    MAXCP:
+        Grown: 1885
+        Hatched:
+        Boosted:
+ムウマージ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 429
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 120
+    Attack: 211
+    Defense: 211
+    MAXCP:
+        Grown: 2465
+        Hatched:
+        Boosted:
+ドンカラス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 430
+    Types:
+        - あく
+        - ひこう
+    From:
+    To:
+    Stamina: 200
+    Attack: 243
+    Defense: 103
+    MAXCP:
+        Grown: 2566
+        Hatched:
+        Boosted:
+ニャルマー:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 431
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 98
+    Attack: 109
+    Defense: 85
+    MAXCP:
+        Grown: 823
+        Hatched:
+        Boosted:
+ブニャット:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 432
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 142
+    Attack: 172
+    Defense: 136
+    MAXCP:
+        Grown: 1798
+        Hatched:
+        Boosted:
+リーシャン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 433
+    Types:
+    - エスパー
+    From:
+    To:
+    Stamina: 90
+    Attack: 114
+    Defense: 94
+    MAXCP:
+        Grown: 861
+        Hatched:
+        Boosted:
+スカンプー:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 434
+    Types:
+        - どく
+        - あく
+    From:
+    To:
+    Stamina: 126
+    Attack: 121
+    Defense: 93
+    MAXCP:
+        Grown: 1048
+        Hatched:
+        Boosted:
+スカタンク:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 435
+    Types:
+        - どく
+        - あく
+    From:
+    To:
+    Stamina: 206
+    Attack: 184
+    Defense: 135
+    MAXCP:
+        Grown: 2262
+        Hatched:
+        Boosted:
+ドーミラー:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 436
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 114
+    Attack: 43
+    Defense: 154
+    MAXCP:
+        Grown: 534
+        Hatched:
+        Boosted:
+ドータクン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 437
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 134
+    Attack: 161
+    Defense: 213
+    MAXCP:
+        Grown: 2026
+        Hatched:
+        Boosted:
+ウソハチ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 438
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 100
+    Attack: 124
+    Defense: 155
+    MAXCP:
+        Grown: 1213
+        Hatched:
+        Boosted:
+マネネ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 439
+    Types:
+        - エスパー
+        - フェアリー
+    From:
+    To:
+    Stamina: 40
+    Attack: 125
+    Defense: 164
+    MAXCP:
+        Grown: 867
+        Hatched:
+        Boosted:
+ピンプク:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 440
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 200
+    Attack: 25
+    Defense: 105
+    MAXCP:
+        Grown: 401
+        Hatched:
+        Boosted:
+ペラップ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 441
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 152
+    Attack: 183
+    Defense: 92
+    MAXCP:
+        Grown: 1653
+        Hatched:
+        Boosted:
+ミカルゲ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 442
+    Types:
+        - ゴースト
+        - あく
+    From:
+    To:
+    Stamina: 100
+    Attack: 169
+    Defense: 199
+    MAXCP:
+        Grown: 1802
+        Hatched:
+        Boosted:
+フカマル:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 443
+    Types:
+        - ドラゴン
+        - じめん
+    From:
+    To:
+    Stamina: 116
+    Attack: 124
+    Defense: 84
+    MAXCP:
+        Grown: 988
+        Hatched:
+        Boosted:
+ガバイド:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 444
+    Types:
+        - ドラゴン
+        - じめん
+    From:
+    To:
+    Stamina: 136
+    Attack: 172
+    Defense: 130
+    MAXCP:
+        Grown: 1728
+        Hatched:
+        Boosted:
+ガブリアス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 445
+    Types:
+        - ドラゴン
+        - じめん
+    From:
+    To:
+    Stamina: 216
+    Attack: 261
+    Defense: 198
+    MAXCP:
+        Grown: 3823
+        Hatched:
+        Boosted:
+ゴンベ:    #----------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 446
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 270
+    Attack: 137
+    Defense: 137
+    MAXCP:
+        Grown: 1975
+        Hatched:
+        Boosted:
+リオル:    #----------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 447
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 80
+    Attack: 127
+    Defense: 78
+    MAXCP:
+        Grown: 833
+        Hatched:
+        Boosted:
+ルカリオ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 448
+    Types:
+        - かくとう
+        - はがね
+    From:
+    To:
+    Stamina: 140
+    Attack: 236
+    Defense: 144
+    MAXCP:
+        Grown: 2461
+        Hatched:
+        Boosted:
+ヒポポタス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 449
+    Types:
+        - じめん
+    From:
+    To:
+    Stamina: 136
+    Attack: 124
+    Defense: 134
+    MAXCP:
+        Grown: 1302
+        Hatched:
+        Boosted:
+カバルドン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 450
+    Types:
+        - じめん
+    From:
+    To:
+    Stamina: 216
+    Attack: 201
+    Defense: 212
+    MAXCP:
+        Grown: 3089
+        Hatched:
+        Boosted:
+スコルピ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 451
+    Types:
+        - どく
+        - むし
+    From:
+    To:
+    Stamina: 80
+    Attack: 93
+    Defense: 168
+    MAXCP:
+        Grown: 889
+        Hatched:
+        Boosted:
+ドラピオン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 452
+    Types:
+        - どく
+        - あく
+    From:
+    To:
+    Stamina: 140
+    Attack: 180
+    Defense: 219
+    MAXCP:
+        Grown: 2319
+        Hatched:
+        Boosted:
+グレッグル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 453
+    Types:
+        - どく
+        - かくとう
+    From:
+    To:
+    Stamina: 96
+    Attack: 116
+    Defense: 76
+    MAXCP:
+        Grown: 822
+        Hatched:
+        Boosted:
+ドクロッグ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 454
+    Types:
+        - どく
+        - かくとう
+    From:
+    To:
+    Stamina: 166
+    Attack: 211
+    Defense: 133
+    MAXCP:
+        Grown: 2310
+        Hatched:
+        Boosted:
+マスキッパ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 455
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 148
+    Attack: 187
+    Defense: 136
+    MAXCP:
+        Grown: 1979
+        Hatched:
+        Boosted:
+ケイコウオ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 456
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 98
+    Attack: 96
+    Defense: 119
+    MAXCP:
+        Grown: 853
+        Hatched:
+        Boosted:
+ネオラント:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 457
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 138
+    Attack: 142
+    Defense: 175
+    MAXCP:
+        Grown: 1671
+        Hatched:
+        Boosted:
+タマンタ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 458
+    Types:
+        - みず
+        - ひこう
+    From:
+    To:
+    Stamina: 90
+    Attack: 105
+    Defense: 212
+    MAXCP:
+        Grown: 1157
+        Hatched:
+        Boosted:
+ユキカブリ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 459
+    Types:
+        - くさ
+        - こおり
+    From:
+    To:
+    Stamina: 120
+    Attack: 115
+    Defense: 110
+    MAXCP:
+        Grown: 1054
+        Hatched:
+        Boosted:
+ユキノオー:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 460
+    Types:
+        - くさ
+        - こおり
+    From:
+    To:
+    Stamina: 180
+    Attack: 178
+    Defense: 163
+    MAXCP:
+        Grown: 2245
+        Hatched:
+        Boosted:
+マニューラ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 461
+    Types:
+        - あく
+        - こおり
+    From:
+    To:
+    Stamina: 140
+    Attack: 243
+    Defense: 182
+    MAXCP:
+        Grown: 2815
+        Hatched:
+        Boosted:
+ジバコイル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 462
+    Types:
+        - でんき
+        - はがね
+    From:
+    To:
+    Stamina: 140
+    Attack: 238
+    Defense: 217
+    MAXCP:
+        Grown: 2996
+        Hatched:
+        Boosted:
+ベロベルト:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 463
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 220
+    Attack: 161
+    Defense: 181
+    MAXCP:
+        Grown: 2359
+        Hatched:
+        Boosted:
+ドサイドン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 464
+    Types:
+        - じめん
+        - いわ
+    From:
+    To:
+    Stamina: 230
+    Attack: 241
+    Defense: 224
+    MAXCP:
+        Grown: 3869
+        Hatched:
+        Boosted:
+モジャンボ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 465
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 200
+    Attack: 207
+    Defense: 219
+    MAXCP:
+        Grown: 3110
+        Hatched:
+        Boosted:
+エレキブル:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 466
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 150
+    Attack: 249
+    Defense: 173
+    MAXCP:
+        Grown: 2904
+        Hatched:
+        Boosted:
+ブーバーン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 467
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 150
+    Attack: 247
+    Defense: 186
+    MAXCP:
+        Grown: 2980
+        Hatched:
+        Boosted:
+トゲキッス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 468
+    Types:
+        - フェアリー
+        - ひこう
+    From:
+    To:
+    Stamina: 170
+    Attack: 225
+    Defense: 227
+    MAXCP:
+        Grown: 3171
+        Hatched:
+        Boosted:
+メガヤンマ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 469
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 172
+    Attack: 231
+    Defense: 172
+    MAXCP:
+        Grown: 2873
+        Hatched:
+        Boosted:
+リーフィア:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 470
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 130
+    Attack: 216
+    Defense: 254
+    MAXCP:
+        Grown: 2849
+        Hatched:
+        Boosted:
+グレイシア:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 471
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 130
+    Attack: 238
+    Defense: 212
+    MAXCP:
+        Grown: 2866
+        Hatched:
+        Boosted:
+グライオン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 472
+    Types:
+        - じめん
+        - ひこう
+    From:
+    To:
+    Stamina: 150
+    Attack: 185
+    Defense: 248
+    MAXCP:
+        Grown: 2602
+        Hatched:
+        Boosted:
+マンムー:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 473
+    Types:
+        - こおり
+        - じめん
+    From:
+    To:
+    Stamina: 220
+    Attack: 247
+    Defense: 157
+    MAXCP:
+        Grown: 3289
+        Hatched:
+        Boosted:
+ポリゴンZ:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 474
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 170
+    Attack: 264
+    Defense: 153
+    MAXCP:
+        Grown: 3072
+        Hatched:
+        Boosted:
+エルレイド:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 475
+    Types:
+        - エスパー
+        - かくとう
+    From:
+    To:
+    Stamina: 136
+    Attack: 237
+    Defense: 220
+    MAXCP:
+        Grown: 2964
+        Hatched:
+        Boosted:
+ダイノーズ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 476
+    Types:
+        - いわ
+        - はがね
+    From:
+    To:
+    Stamina: 120
+    Attack: 135
+    Defense: 278
+    MAXCP:
+        Grown: 1863
+        Hatched:
+        Boosted:
+ヨノワール:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 477
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 90
+    Attack: 180
+    Defense: 254
+    MAXCP:
+        Grown: 2046
+        Hatched:
+        Boosted:
+ユキメノコ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 478
+    Types:
+        - こおり
+        - ゴースト
+    From:
+    To:
+    Stamina: 140
+    Attack: 171
+    Defense: 150
+    MAXCP:
+        Grown: 1857
+        Hatched:
+        Boosted:
+ウォッシュロトム:    #--------------------------------------------------------
+    isNotAvailable: 1
+    ID: 479
+    Types:
+        - でんき
+        - みず
+    From:
+    To:
+    Stamina: 100
+    Attack: 204
+    Defense: 219
+    MAXCP:
+        Grown: 2243
+        Hatched:
+        Boosted:
+ユクシー:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 480
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 150
+    Attack: 156
+    Defense: 270
+    MAXCP:
+        Grown: 2316
+        Hatched:
+        Boosted:
+エムリット:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 481
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 160
+    Attack: 212
+    Defense: 212
+    MAXCP:
+        Grown: 2825
+        Hatched:
+        Boosted:
+アグノム:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 482
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 150
+    Attack: 270
+    Defense: 151
+    MAXCP:
+        Grown: 2945
+        Hatched:
+        Boosted:
+ディアルガ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 483
+    Types:
+        - はがね
+        - ドラゴン
+    From:
+    To:
+    Stamina: 200
+    Attack: 302
+    Defense: 242
+    MAXCP:
+        Grown: 4654
+        Hatched:
+        Boosted:
+パルキア:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 484
+    Types:
+        - みず
+        - ドラゴン
+    From:
+    To:
+    Stamina: 180
+    Attack: 308
+    Defense: 247
+    MAXCP:
+        Grown: 4559
+        Hatched:
+        Boosted:
+ヒードラン:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 485
+    Types:
+        - ほのお
+        - はがね
+    From:
+    To:
+    Stamina: 182
+    Attack: 251
+    Defense: 213
+    MAXCP:
+        Grown: 3521
+        Hatched:
+        Boosted:
+レジギガス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 486
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 220
+    Attack: 315
+    Defense: 231
+    MAXCP:
+        Grown: 4955
+        Hatched:
+        Boosted:
+ギラティナ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 487
+    Form: アナザーフォルム
+    Types:
+        - ゴースト
+        - ドラゴン
+    From:
+    To:
+    Stamina: 300
+    Attack: 206
+    Defense: 247
+    MAXCP:
+        Grown: 3965
+        Hatched:
+        Boosted:
+ギラティナ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 487
+    Form: オリジンフォルム
+    Types:
+        - ゴースト
+        - ドラゴン
+    From:
+    To:
+    Stamina: 300
+    Attack: 247
+    Defense: 206
+    MAXCP:
+        Grown: 4317
+        Hatched:
+        Boosted:
+クレセリア:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 488
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 240
+    Attack: 152
+    Defense: 263
+    MAXCP:
+        Grown: 2777
+        Hatched:
+        Boosted:
+フィオネ:    #--------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 489
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 160
+    Attack: 162
+    Defense: 162
+    MAXCP:
+        Grown: 1945
+        Hatched:
+        Boosted:
+マナフィ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 490
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 200
+    Attack: 210
+    Defense: 210
+    MAXCP:
+        Grown: 3090
+        Hatched:
+        Boosted:
+ダークライ:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 491
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 140
+    Attack: 285
+    Defense: 198
+    MAXCP:
+        Grown: 3404
+        Hatched:
+        Boosted:
+シェイミ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 492
+    Form: スカイフォルム
+    Types:
+        - くさ
+        - ひこう
+    From:
+    To:
+    Stamina: 200
+    Attack: 261
+    Defense: 166
+    MAXCP:
+        Grown: 3400
+        Hatched:
+        Boosted:
+シェイミ:    #---------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 492
+    Form: ランドフォルム
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 200
+    Attack: 210
+    Defense: 210
+    MAXCP:
+        Grown: 3090
+        Hatched:
+        Boosted:
+アルセウス:    #-------------------------------------------------------------
+    isNotAvailable: 1
+    ID: 493
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 240
+    Attack: 262
+    Defense: 262
+    MAXCP:
+        Grown: 4598
+        Hatched:
+        Boosted:

@@ -246,16 +246,6 @@ When specified and set to one of 'public', 'internal' or 'admin', return a
 client for the corresponding public, internal or admin endpoint.  The default
 endpoint is the public endpoint.
 
-=item * B<internal>
-
-When specified (and set to 1), a client is opened for the internal endpoint
-corresponding to service I<$type>.
-
-=item * B<admin>
-
-When specified (and set to 1), a client is opened for the administrative
-endpoint corresponding to service I<$type>.
-
 =back
 
 =cut

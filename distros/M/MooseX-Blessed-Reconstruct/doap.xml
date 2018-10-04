@@ -20,20 +20,26 @@
       <foaf:mbox rdf:resource="mailto:jrockway@cpan.org" />
     </foaf:Person>
   </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>E. Choroba</foaf:name>
+      <foaf:mbox rdf:resource="mailto:choroba@matfyz.cz" />
+    </foaf:Person>
+  </helper>
   <helper>
     <foaf:Person>
       <foaf:name>Jesse Luehrs</foaf:name>
       <foaf:mbox rdf:resource="mailto:doy@tozt.net" />
     </foaf:Person>
   </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Yanick Champoux</foaf:name>
-      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
-    </foaf:Person>
-  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
-  <homepage rdf:resource="http://search.cpan.org/dist/MooseX-Blessed-Reconstruct/" />
+  <homepage rdf:resource="https://github.com/yanick/moosex-blessed-reconstruct" />
   <bug-database rdf:resource="https://github.com/yanick/moosex-blessed-reconstruct/issues" />
   <repository>
     <GitRepository>
@@ -68,6 +74,12 @@
   <release>
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.5</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-10-30</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.00</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-10-30</dc:issued>
     </Version>
   </release>

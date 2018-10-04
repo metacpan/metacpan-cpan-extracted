@@ -73,12 +73,12 @@ is_deeply [$init->options], [qw(
 
 is_deeply $CLASS->configure({}, {}), { properties => {}},
     'Default config should contain empty properties';
-is_deeply $CLASS->configure({}, { uri => 'http://example.com' }), {
-    uri        => URI->new('http://example.com'),
+is_deeply $CLASS->configure({}, { uri => 'https://example.com' }), {
+    uri        => URI->new('https://example.com'),
     properties => {},
 }, 'Should accept a URI in options';
 ok my $config = $CLASS->configure({}, {
-    uri                 => 'http://example.com',
+    uri                 => 'https://example.com',
     engine              => 'pg',
     top_dir             => 'top',
     plan_file           => 'my.plan',
@@ -212,7 +212,7 @@ chdir $write_dir;
 END { chdir File::Spec->updir }
 my $conf_file = $sqitch->config->local_file;
 
-my $uri = URI->new('https://github.com/theory/sqitch/');
+my $uri = URI->new('https://github.com/sqitchers/sqitch/');
 
 $sqitch = App::Sqitch->new;
 ok $init = $CLASS->new(

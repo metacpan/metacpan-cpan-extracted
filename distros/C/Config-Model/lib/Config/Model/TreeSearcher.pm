@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::TreeSearcher;
-$Config::Model::TreeSearcher::VERSION = '2.126';
+$Config::Model::TreeSearcher::VERSION = '2.127';
 use Mouse;
 use Mouse::Util::TypeConstraints;
 
@@ -148,7 +148,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.126
+version 2.127
 
 =head1 SYNOPSIS
 
@@ -225,8 +225,8 @@ Search in all the items above
 =head2 search(keyword)
 
 Search the keyword or pattern in the tree. The search is done in a case
-insensitive manner. Returns a list of path pointing 
-to the matching tree element. See L<Config::Model::Role::Grab/grab> for details
+insensitive manner. Returns a list of path pointing
+to the matching tree elements. See L<Config::Model::Role::Grab/grab> for details
 on the path syntax.
 
 =head1 BUGS

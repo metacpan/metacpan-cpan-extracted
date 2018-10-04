@@ -120,6 +120,7 @@ Västertorp
 Fruängen
 
 # Tram Spårväg City
+T-Centralen
 Sergels torg
 Kungsträdgården
 Nybroplan
@@ -163,9 +164,6 @@ Mårtensdal
 Luma
 Sickla kaj
 Sickla udde
-
---transfers
-T-Centralen|Sergels torg|weight:4
 
 --lines
 10|T10|Blue line|color:#1c388c,width:6
@@ -289,6 +287,7 @@ T-Centralen|Sergels torg|weight:4
 14|Hägerstensåsen|Västertorp
 14|Västertorp|Fruängen
 
+7|T-Centralen|Sergels torg
 7|Sergels torg|Kungsträdgården
 7|Kungsträdgården|Nybroplan
 7|Nybroplan|Styrmansgatan

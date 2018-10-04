@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -202,6 +202,12 @@ use overload
         lucas     => \&lucas,
         fibonacci => \&fibonacci,
 
+        lucasU => \&lucasU,
+        lucasV => \&lucasV,
+
+        lucasUmod => \&lucasUmod,
+        lucasVmod => \&lucasVmod,
+
         fibmod   => \&fibmod,
         lucasmod => \&lucasmod,
 
@@ -230,8 +236,9 @@ use overload
         euler_polynomial     => \&euler_polynomial,
         bernoulli_polynomial => \&bernoulli_polynomial,
 
-        lcm => \&lcm,
-        gcd => \&gcd,
+        lcm    => \&lcm,
+        gcd    => \&gcd,
+        gcdext => \&gcdext,
 
         valuation => \&valuation,
         kronecker => \&kronecker,
@@ -297,6 +304,7 @@ use overload
         approx_cmp => \&approx_cmp,
 
         popcount => \&popcount,
+        hamdist  => \&hamdist,
 
         neg   => sub ($) { goto &neg },    # used in overloading
         inv   => \&inv,
@@ -334,6 +342,9 @@ use overload
         flipbit  => \&flipbit,
         clearbit => \&clearbit,
 
+        bit_scan0 => \&bit_scan0,
+        bit_scan1 => \&bit_scan1,
+
         rat_approx => \&rat_approx,
 
         is_inf     => \&is_inf,
@@ -350,9 +361,10 @@ use overload
         is_one     => \&is_one,
         is_mone    => \&is_mone,
 
-        is_odd  => \&is_odd,
-        is_even => \&is_even,
-        is_div  => \&is_div,
+        is_odd       => \&is_odd,
+        is_even      => \&is_even,
+        is_div       => \&is_div,
+        is_congruent => \&is_congruent,
                );
 
     sub import {
@@ -586,8 +598,8 @@ sub _str2obj {
         return $r;
     }
 
-    # Remove the plus sign
-    $s =~ s/^\+//;
+    # Remove the leading plus sign (if any)
+    $s =~ s/^\+// if substr($s, 0, 1) eq '+';
 
     # Fraction
     if (index($s, '/') != -1 and $s =~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
@@ -1025,6 +1037,9 @@ sub new {
         }
 
         $num = defined($num) ? "$num" : '0';
+
+        # Remove the leading plus sign (if any)
+        $num =~ s/^\+// if substr($num, 0, 1) eq '+';
 
         if (index($num, '/') != -1) {
             my $r = Math::GMPq::Rmpq_init();
@@ -2835,20 +2850,6 @@ sub __sub__ {
         Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
         return $r;
     }
-
-  Scalar__Scalar: {
-        my $r = (
-                 $x < 0
-                 ? Math::GMPz::Rmpz_init_set_si($x)
-                 : Math::GMPz::Rmpz_init_set_ui($x)
-                );
-
-        $y < 0
-          ? Math::GMPz::Rmpz_add_ui($r, $r, -$y)
-          : Math::GMPz::Rmpz_sub_ui($r, $r, $y);
-
-        return $r;
-    }
 }
 
 sub sub {    # used in overloading
@@ -3063,7 +3064,7 @@ sub mul {    # used in overloading
 
 sub __div__ {
     my ($x, $y) = @_;
-    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
 
     #
     ## GMPq
@@ -3116,6 +3117,29 @@ sub __div__ {
         return $r;
     }
 
+  Scalar__Math_GMPq: {
+
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($y) || do {
+            $y = _mpq2mpfr($y);
+            goto Scalar__Math_MPFR;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+
+        if ($x == 1 or $x == -1) {
+            Math::GMPq::Rmpq_inv($r, $y);
+            Math::GMPq::Rmpq_neg($r, $r) if $x < 0;
+            return $r;
+        }
+
+        $x < 0
+          ? Math::GMPq::Rmpq_set_si($r, $x, 1)
+          : Math::GMPq::Rmpq_set_ui($r, $x, 1);
+        Math::GMPq::Rmpq_div($r, $r, $y);
+        return $r;
+    }
+
     #
     ## GMPz
     #
@@ -3155,6 +3179,32 @@ sub __div__ {
         Math::GMPq::Rmpq_set_ui($r, 1, CORE::abs($y));
         Math::GMPq::Rmpq_set_num($r, $x);
         Math::GMPq::Rmpq_neg($r, $r) if $y < 0;
+        Math::GMPq::Rmpq_canonicalize($r);
+        return $r;
+    }
+
+  Scalar__Math_GMPz: {
+
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            $y = _mpz2mpfr($y);
+            goto Scalar__Math_MPFR;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+
+        if ($x == 1 or $x == -1) {
+            Math::GMPq::Rmpq_set_z($r, $y);
+            Math::GMPq::Rmpq_inv($r, $r);
+            Math::GMPq::Rmpq_neg($r, $r) if $x < 0;
+            return $r;
+        }
+
+        $x < 0
+          ? Math::GMPq::Rmpq_set_si($r, $x, 1)
+          : Math::GMPq::Rmpq_set_ui($r, $x, 1);
+
+        Math::GMPq::Rmpq_set_den($r, $y);
         Math::GMPq::Rmpq_canonicalize($r);
         return $r;
     }
@@ -3202,6 +3252,14 @@ sub __div__ {
         return $r;
     }
 
+  Scalar__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $x < 0
+          ? Math::MPFR::Rmpfr_si_div($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_ui_div($r, $x, $y, $ROUND);
+        return $r;
+    }
+
   Math_MPFR__Math_GMPq: {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_div_q($r, $x, $y, $ROUND);
@@ -3242,6 +3300,18 @@ sub __div__ {
         return $r;
     }
 
+  Scalar__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        if ($x < 0) {
+            Math::MPC::Rmpc_ui_div($r, -$x, $y, $ROUND);
+            Math::MPC::Rmpc_neg($r, $r, $ROUND);
+        }
+        else {
+            Math::MPC::Rmpc_ui_div($r, $x, $y, $ROUND);
+        }
+        return $r;
+    }
+
   Math_MPC__Math_MPFR: {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
@@ -3265,6 +3335,15 @@ sub __div__ {
 
 sub div {    # used in overloading
     my ($x, $y) = @_;
+
+    if (!ref($x) and CORE::int($x) eq $x and $x < ULONG_MAX and $x > LONG_MIN) {
+
+        if (ref($y) eq __PACKAGE__) {
+            return bless \__div__($x, $$y);
+        }
+
+        return bless \__div__($x, ref($y) ? _star2obj($y) : _str2obj($y));
+    }
 
     $x =
         ref($x) eq __PACKAGE__ ? $$x
@@ -4122,12 +4201,6 @@ sub __mod__ {
     #
   Math_GMPz__Math_GMPz: {
 
-        if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mod_ui($r, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
-            return $r;
-        }
-
         my $sgn_y = Math::GMPz::Rmpz_sgn($y) || goto &_nan;
 
         my $r = Math::GMPz::Rmpz_init();
@@ -4418,20 +4491,61 @@ sub divmod ($$) {
 #
 
 sub is_div ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    if (ref($x) eq __PACKAGE__ and ref($$x) eq 'Math::GMPz') {
-        if (ref($y)) {
-            if (ref($y) eq __PACKAGE__ and ref($$y) eq 'Math::GMPz') {
-                return (Math::GMPz::Rmpz_divisible_p($$x, $$y) && Math::GMPz::Rmpz_sgn($$y));
+    if (ref($n) eq __PACKAGE__ and ref($$n) eq 'Math::GMPz') {
+        if (ref($k)) {
+            if (ref($k) eq __PACKAGE__ and ref($$k) eq 'Math::GMPz') {
+                return (Math::GMPz::Rmpz_sgn($$k) && Math::GMPz::Rmpz_divisible_p($$n, $$k));
             }
         }
-        elsif (CORE::int($y) eq $y and $y and $y < ULONG_MAX and $y > LONG_MIN) {
-            return Math::GMPz::Rmpz_divisible_ui_p($$x, $y < 0 ? -$y : $y);
+        elsif (CORE::int($k) eq $k and $k and $k < ULONG_MAX and $k > LONG_MIN) {
+            return Math::GMPz::Rmpz_divisible_ui_p($$n, $k < 0 ? -$k : $k);
         }
     }
 
-    @_ = (${mod($x, $y)}, 0);
+    @_ = (${mod($n, $k)}, 0);
+    goto &__eq__;
+}
+
+#
+## is_congruent
+#
+
+sub is_congruent ($$$) {
+    my ($n, $k, $m) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+    $k = $$k if (ref($k) eq __PACKAGE__);
+    $m = $$m if (ref($m) eq __PACKAGE__);
+
+    if (ref($n) eq 'Math::GMPz') {
+
+        if (    !ref($k)
+            and !ref($m)
+            and CORE::int($k) eq $k
+            and $k >= 0
+            and $k < ULONG_MAX
+            and CORE::int($m) eq $m
+            and $m > 0
+            and $m < ULONG_MAX) {
+            return Math::GMPz::Rmpz_congruent_ui_p($n, $k, $m);
+        }
+
+        if (ref($k) eq 'Math::GMPz' and ref($m) eq 'Math::GMPz') {
+            return (Math::GMPz::Rmpz_sgn($m) && Math::GMPz::Rmpz_congruent_p($n, $k, $m));
+        }
+    }
+
+    $n = _star2obj($n) if !ref($n);
+    $k = _star2obj($k) if !ref($k);
+    $m = _star2obj($m) if !ref($m);
+
+    if (ref($n) eq 'Math::GMPz' and ref($k) eq 'Math::GMPz' and ref($m) eq 'Math::GMPz') {
+        return (Math::GMPz::Rmpz_sgn($m) && Math::GMPz::Rmpz_congruent_p($n, $k, $m));
+    }
+
+    @_ = (__mod__($n, $m), __mod__($k, $m));
     goto &__eq__;
 }
 
@@ -4685,7 +4799,7 @@ sub length ($) {
     $x = $$x if (ref($x) eq __PACKAGE__);
 
     if (ref($x) ne 'Math::GMPz') {
-        $x = _star2mpz($x) // return -1;
+        $x = _star2mpz($x) // return undef;
     }
 
     CORE::length(Math::GMPz::Rmpz_get_str($x, 10) =~ s/^-//r);
@@ -6659,61 +6773,282 @@ sub lucas ($) {
     bless \$r;
 }
 
-sub __fibmod__ {
-    my ($n, $m, $T1, $T2) = @_;
+sub __lucasV__ {
+    my ($P, $Q, $n) = @_;
 
-    # T1 = 0, T2 = 1 for Fibonacci numbers
-    # T1 = 2, T2 = 1 for Lucas numbers
+    my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
+    my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
 
-    $n = Math::GMPz::Rmpz_init_set($n);
+    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($n, 2))) {
 
-    state $t = Math::GMPz::Rmpz_init_nobless();
-    state $u = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
 
-    my $f = Math::GMPz::Rmpz_init_set_ui($T1 // 0);
-    my $g = Math::GMPz::Rmpz_init_set_ui($T2 // 1);
-
-    my $A = Math::GMPz::Rmpz_init_set_ui(0);
-    my $B = Math::GMPz::Rmpz_init_set_ui(1);
-
-    for (; ;) {
-
-        if (Math::GMPz::Rmpz_odd_p($n)) {
-
-            # (f, g) = (f*a + g*b, f*b + g*(a+b))  mod m
-
-            Math::GMPz::Rmpz_mul($u, $g, $B);
-            Math::GMPz::Rmpz_mul($t, $f, $A);
-            Math::GMPz::Rmpz_mul($g, $g, $A);
-
-            Math::GMPz::Rmpz_add($t, $t, $u);
-            Math::GMPz::Rmpz_add($g, $g, $u);
-
-            Math::GMPz::Rmpz_addmul($g, $f, $B);
-
-            Math::GMPz::Rmpz_mod($f, $t, $m);
-            Math::GMPz::Rmpz_mod($g, $g, $m);
+        if ($bit) {
+            Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+            Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+            Math::GMPz::Rmpz_mul($V2, $V2, $V2);
+            Math::GMPz::Rmpz_submul($V1, $P, $Q1);
+            Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
         }
-
-        # (a, b) = (a*a + b*b, a*b + b*(a+b))  mod m
-
-        Math::GMPz::Rmpz_div_2exp($n, $n, 1);
-        Math::GMPz::Rmpz_sgn($n) || last;
-
-        Math::GMPz::Rmpz_mul($t, $A, $A);
-        Math::GMPz::Rmpz_mul($u, $B, $B);
-        Math::GMPz::Rmpz_mul($B, $B, $A);
-
-        Math::GMPz::Rmpz_mul_2exp($B, $B, 1);
-
-        Math::GMPz::Rmpz_add($B, $B, $u);
-        Math::GMPz::Rmpz_add($t, $t, $u);
-
-        Math::GMPz::Rmpz_mod($A, $t, $m);
-        Math::GMPz::Rmpz_mod($B, $B, $m);
+        else {
+            Math::GMPz::Rmpz_set($Q2, $Q1);
+            Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+            Math::GMPz::Rmpz_mul($V1, $V1, $V1);
+            Math::GMPz::Rmpz_submul($V2, $P, $Q1);
+            Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+        }
     }
 
-    return $f;
+    return ($V1, $V2);
+}
+
+sub __lucasVmod__ {
+    my ($P, $Q, $n, $m) = @_;
+
+    my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
+    my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
+
+    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($n, 2))) {
+
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+        Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
+
+        if ($bit) {
+            Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+            Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+            Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $m);
+            Math::GMPz::Rmpz_submul($V1, $P, $Q1);
+            Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+            Math::GMPz::Rmpz_mod($V1, $V1, $m);
+        }
+        else {
+            Math::GMPz::Rmpz_set($Q2, $Q1);
+            Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+            Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $m);
+            Math::GMPz::Rmpz_submul($V2, $P, $Q1);
+            Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+            Math::GMPz::Rmpz_mod($V2, $V2, $m);
+        }
+    }
+
+    Math::GMPz::Rmpz_mod($V1, $V1, $m);
+
+    return ($V1, $V2);
+}
+
+sub __lucasUV__ {
+    my ($P, $Q, $n) = @_;
+
+    my $U1 = Math::GMPz::Rmpz_init_set_ui(1);
+
+    my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
+    my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
+
+    my $t = Math::GMPz::Rmpz_init_set_ui(2);
+    my $s = Math::GMPz::Rmpz_remove($t, $n, $t);
+
+    foreach my $bit (split(//, substr(Math::GMPz::Rmpz_get_str($t, 2), 0, -1))) {
+
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+
+        if ($bit) {
+            Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+            Math::GMPz::Rmpz_mul($U1, $U1, $V2);
+            Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+
+            Math::GMPz::Rmpz_mul($V2, $V2, $V2);
+            Math::GMPz::Rmpz_submul($V1, $Q1, $P);
+            Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+        }
+        else {
+            Math::GMPz::Rmpz_set($Q2, $Q1);
+            Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+            Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+            Math::GMPz::Rmpz_sub($U1, $U1, $Q1);
+            Math::GMPz::Rmpz_mul($V1, $V1, $V1);
+            Math::GMPz::Rmpz_submul($V2, $Q1, $P);
+            Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+        }
+    }
+
+    Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+    Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+    Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+    Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+    Math::GMPz::Rmpz_sub($U1, $U1, $Q1);
+    Math::GMPz::Rmpz_submul($V1, $Q1, $P);
+    Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+
+    for (1 .. $s) {
+        Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+        Math::GMPz::Rmpz_mul($V1, $V1, $V1);
+        Math::GMPz::Rmpz_submul_ui($V1, $Q1, 2);
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q1);
+    }
+
+    return ($U1, $V1);
+}
+
+sub __lucasUVmod__ {
+    my ($P, $Q, $n, $m) = @_;
+
+    my $U1 = Math::GMPz::Rmpz_init_set_ui(1);
+
+    my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
+    my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
+
+    my $t = Math::GMPz::Rmpz_init_set_ui(2);
+    my $s = Math::GMPz::Rmpz_remove($t, $n, $t);
+
+    foreach my $bit (split(//, substr(Math::GMPz::Rmpz_get_str($t, 2), 0, -1))) {
+
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+        Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
+
+        if ($bit) {
+            Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+            Math::GMPz::Rmpz_mul($U1, $U1, $V2);
+            Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+
+            Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $m);
+            Math::GMPz::Rmpz_submul($V1, $Q1, $P);
+            Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+
+            Math::GMPz::Rmpz_mod($V1, $V1, $m);
+            Math::GMPz::Rmpz_mod($U1, $U1, $m);
+        }
+        else {
+            Math::GMPz::Rmpz_set($Q2, $Q1);
+            Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+            Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+            Math::GMPz::Rmpz_sub($U1, $U1, $Q1);
+
+            Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $m);
+            Math::GMPz::Rmpz_submul($V2, $Q1, $P);
+            Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+
+            Math::GMPz::Rmpz_mod($V2, $V2, $m);
+            Math::GMPz::Rmpz_mod($U1, $U1, $m);
+        }
+    }
+
+    Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+    Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+    Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+    Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+    Math::GMPz::Rmpz_sub($U1, $U1, $Q1);
+    Math::GMPz::Rmpz_submul($V1, $Q1, $P);
+    Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+
+    for (1 .. $s) {
+        Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+        Math::GMPz::Rmpz_mod($U1, $U1, $m);
+        Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $m);
+        Math::GMPz::Rmpz_submul_ui($V1, $Q1, 2);
+        Math::GMPz::Rmpz_powm_ui($Q1, $Q1, 2, $m);
+    }
+
+    Math::GMPz::Rmpz_mod($U1, $U1, $m);
+    Math::GMPz::Rmpz_mod($V1, $V1, $m);
+
+    return ($U1, $V1);
+}
+
+sub lucasU ($$$) {
+    my ($P, $Q, $n) = @_;
+
+    $P = _star2mpz($P) // goto &nan;
+    $Q = _star2mpz($Q) // goto &nan;
+    $n = _star2mpz($n) // goto &nan;
+
+    # U_0(P, Q) = 0
+    Math::GMPz::Rmpz_sgn($n) || goto &zero;
+
+    my $D = Math::GMPz::Rmpz_init();
+
+    Math::GMPz::Rmpz_mul($D, $P, $P);
+    Math::GMPz::Rmpz_submul_ui($D, $Q, 4);
+
+    # When `P*P - 4*Q != 0`, we can use a faster algorithm
+    if (Math::GMPz::Rmpz_sgn($D)) {
+
+        my ($V1, $V2) = __lucasV__($P, $Q, $n);
+
+        Math::GMPz::Rmpz_mul_2exp($V2, $V2, 1);
+        Math::GMPz::Rmpz_submul($V2, $V1, $P);
+        Math::GMPz::Rmpz_divexact($V2, $V2, $D);
+
+        return bless \$V2;
+    }
+
+    my ($U) = __lucasUV__($P, $Q, $n);
+
+    bless \$U;
+}
+
+sub lucasUmod ($$$$) {
+    my ($P, $Q, $n, $m) = @_;
+
+    $P = _star2mpz($P) // goto &nan;
+    $Q = _star2mpz($Q) // goto &nan;
+    $n = _star2mpz($n) // goto &nan;
+    $m = _star2mpz($m) // goto &nan;
+
+    # undefined for m=0
+    Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+    # U_0(P, Q) = 0
+    Math::GMPz::Rmpz_sgn($n) || goto &zero;
+
+    my $D = Math::GMPz::Rmpz_init();
+
+    Math::GMPz::Rmpz_mul($D, $P, $P);
+    Math::GMPz::Rmpz_submul_ui($D, $Q, 4);
+
+    # When `gcd(P*P - 4*Q, m) = 1`, we can use a faster algorithm
+    if (Math::GMPz::Rmpz_invert($D, $D, $m)) {
+
+        my ($V1, $V2) = __lucasVmod__($P, $Q, $n, $m);
+
+        Math::GMPz::Rmpz_mul_2exp($V2, $V2, 1);
+        Math::GMPz::Rmpz_submul($V2, $V1, $P);
+        Math::GMPz::Rmpz_mul($V2, $V2, $D);
+        Math::GMPz::Rmpz_mod($V2, $V2, $m);
+
+        return bless \$V2;
+    }
+
+    my ($U) = __lucasUVmod__($P, $Q, $n, $m);
+
+    bless \$U;
+}
+
+sub lucasV ($$$) {
+    my ($P, $Q, $n) = @_;
+
+    $P = _star2mpz($P) // goto &nan;
+    $Q = _star2mpz($Q) // goto &nan;
+    $n = _star2mpz($n) // goto &nan;
+
+    my ($V) = __lucasV__($P, $Q, $n);
+
+    bless \$V;
+}
+
+sub lucasVmod ($$$$) {
+    my ($P, $Q, $n, $m) = @_;
+
+    $P = _star2mpz($P) // goto &nan;
+    $Q = _star2mpz($Q) // goto &nan;
+    $n = _star2mpz($n) // goto &nan;
+    $m = _star2mpz($m) // goto &nan;
+
+    # undefined for m=0
+    Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+    my ($V) = __lucasVmod__($P, $Q, $n, $m);
+
+    bless \$V;
 }
 
 #
@@ -6737,7 +7072,43 @@ sub fibmod ($$) {
     Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
-    bless \__fibmod__($n, $m, 0, 1);
+#<<<
+    my ($f, $g, $w) = (
+        Math::GMPz::Rmpz_init_set_ui(0),
+        Math::GMPz::Rmpz_init_set_ui(1),
+    );
+#>>>
+
+    my $t = Math::GMPz::Rmpz_init();
+
+    foreach my $bit (split(//, substr(Math::GMPz::Rmpz_get_str($n, 2), 1))) {
+
+        Math::GMPz::Rmpz_powm_ui($g, $g, 2, $m);
+        Math::GMPz::Rmpz_powm_ui($f, $f, 2, $m);
+
+        Math::GMPz::Rmpz_mul_2exp($t, $g, 2);
+        Math::GMPz::Rmpz_sub($t, $t, $f);
+
+        $w
+          ? Math::GMPz::Rmpz_add_ui($t, $t, 2)
+          : Math::GMPz::Rmpz_sub_ui($t, $t, 2);
+
+        Math::GMPz::Rmpz_add($f, $f, $g);
+
+        if ($bit) {
+            Math::GMPz::Rmpz_sub($f, $t, $f);
+            Math::GMPz::Rmpz_set($g, $t);
+            $w = 0;
+        }
+        else {
+            Math::GMPz::Rmpz_sub($g, $t, $f);
+            $w = 1;
+        }
+    }
+
+    Math::GMPz::Rmpz_mod($g, $g, $m);
+
+    return bless \$g;
 }
 
 #
@@ -6761,7 +7132,40 @@ sub lucasmod ($$) {
     Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
-    bless \__fibmod__($n, $m, 2, 1);
+#<<<
+    my ($f, $g, $w) = (
+        Math::GMPz::Rmpz_init_set_ui(3),
+        Math::GMPz::Rmpz_init_set_ui(1),
+    );
+#>>>
+
+    foreach my $bit (split(//, substr(Math::GMPz::Rmpz_get_str($n, 2), 1))) {
+
+        Math::GMPz::Rmpz_powm_ui($g, $g, 2, $m);
+        Math::GMPz::Rmpz_powm_ui($f, $f, 2, $m);
+
+        if ($w) {
+            Math::GMPz::Rmpz_sub_ui($g, $g, 2);
+            Math::GMPz::Rmpz_add_ui($f, $f, 2);
+        }
+        else {
+            Math::GMPz::Rmpz_add_ui($g, $g, 2);
+            Math::GMPz::Rmpz_sub_ui($f, $f, 2);
+        }
+
+        if ($bit) {
+            Math::GMPz::Rmpz_sub($g, $f, $g);
+            $w = 0;
+        }
+        else {
+            Math::GMPz::Rmpz_sub($f, $f, $g);
+            $w = 1;
+        }
+    }
+
+    Math::GMPz::Rmpz_mod($g, $g, $m);
+
+    bless \$g;
 }
 
 #
@@ -8030,6 +8434,21 @@ sub gcd {
     bless \$r;
 }
 
+sub gcdext ($$) {
+    my ($n, $k) = @_;
+
+    $n = _star2mpz($n) // return (nan(), nan());
+    $k = _star2mpz($k) // return (nan(), nan());
+
+    my $g = Math::GMPz::Rmpz_init();
+    my $u = Math::GMPz::Rmpz_init();
+    my $v = Math::GMPz::Rmpz_init();
+
+    Math::GMPz::Rmpz_gcdext($g, $u, $v, $n, $k);
+
+    ((bless \$u), (bless \$v), (bless \$g));
+}
+
 #
 ## Least common multiple
 #
@@ -8173,7 +8592,7 @@ sub is_coprime ($$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = ref($k) eq __PACKAGE__ ? $$k : _star2obj($k);
@@ -8799,7 +9218,7 @@ sub is_power ($;$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k < ULONG_MAX and $k > LONG_MIN) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = _any2si(ref($k) eq __PACKAGE__ ? $$k : _star2obj($k)) // return 0;
@@ -9059,8 +9478,37 @@ sub faulhaber_sum ($$) {
 ## Catalan numbers
 #
 
-sub catalan ($) {
-    my ($n) = @_;
+sub catalan ($;$) {
+    my ($n, $k) = @_;
+
+    # Catalan's triangle
+    # catalan(n, k) = binomial(n+k, k) - binomial(n+k, k-1)
+    if (scalar(@_) == 2) {
+
+        $n = _star2mpz($n) // goto &nan;
+
+        if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
+            ## `k` is a native unsigned integer
+        }
+        elsif (ref($k) eq __PACKAGE__) {
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = _any2ui(_star2obj($k)) // goto &nan;
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_add_ui($t, $n, $k);
+        Math::GMPz::Rmpz_bin_ui($u, $t, $k);
+        ($k > 0)
+          ? Math::GMPz::Rmpz_bin_ui($t, $t, $k - 1)
+          : Math::GMPz::Rmpz_bin_si($t, $t, $k - 1);
+        Math::GMPz::Rmpz_sub($u, $u, $t);
+
+        return bless \$u;
+    }
 
     if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
         ## `n` is a native unsigned integer
@@ -9144,7 +9592,7 @@ sub binomial ($$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = _any2si(ref($k) eq __PACKAGE__ ? $$k : _star2obj($k)) // goto &nan;
@@ -9309,7 +9757,7 @@ sub getbit ($$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // return undef;
@@ -9332,7 +9780,7 @@ sub setbit ($$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // goto &nan;
@@ -9357,7 +9805,7 @@ sub flipbit ($$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // goto &nan;
@@ -9386,7 +9834,7 @@ sub clearbit ($$) {
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // goto &nan;
@@ -9395,6 +9843,60 @@ sub clearbit ($$) {
     my $r = Math::GMPz::Rmpz_init_set($n);
     Math::GMPz::Rmpz_clrbit($r, $k);
     bless \$r;
+}
+
+#
+## Scan n starting from bit index k, towards more
+## significant bits, until the first 0 is found.
+#
+
+sub bit_scan0 ($;$) {
+    my ($n, $k) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    if (scalar(@_) == 1) {
+        $k = 0;
+    }
+    elsif (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
+        ## `k` is a native integer
+    }
+    else {
+        $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // return undef;
+    }
+
+    Math::GMPz::Rmpz_scan0($n, $k);
+}
+
+#
+## Scan n starting from bit index k, towards more
+## significant bits, until the first 1 is found.
+#
+
+sub bit_scan1 ($;$) {
+    my ($n, $k) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    if (scalar(@_) == 1) {
+        $k = 0;
+    }
+    elsif (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
+        ## `k` is a native integer
+    }
+    else {
+        $k = (ref($k) eq __PACKAGE__ ? _any2ui($$k) : _any2ui(_star2obj($k))) // return undef;
+    }
+
+    Math::GMPz::Rmpz_scan1($n, $k);
 }
 
 #
@@ -9411,7 +9913,7 @@ sub lsft {    # used in overloading
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = (ref($k) eq __PACKAGE__ ? _any2si($$k) : _any2si(_star2obj($k))) // goto &nan;
@@ -9440,7 +9942,7 @@ sub rsft {    # used in overloading
     }
 
     if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
-        ## `y` is a native integer
+        ## `k` is a native integer
     }
     else {
         $k = (ref($k) eq __PACKAGE__ ? _any2si($$k) : _any2si(_star2obj($k))) // goto &nan;
@@ -9465,7 +9967,7 @@ sub popcount ($) {
     $n = $$n if (ref($n) eq __PACKAGE__);
 
     if (ref($n) ne 'Math::GMPz') {
-        $n = _star2mpz($n) // return -1;
+        $n = _star2mpz($n) // return undef;
     }
 
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
@@ -9474,6 +9976,27 @@ sub popcount ($) {
     }
 
     Math::GMPz::Rmpz_popcount($n);
+}
+
+#
+## Hamming distance
+#
+
+sub hamdist ($$) {
+    my ($n, $k) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+    $k = $$k if (ref($k) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // return undef;
+    }
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _star2mpz($k) // return undef;
+    }
+
+    Math::GMPz::Rmpz_hamdist($n, $k);
 }
 
 #

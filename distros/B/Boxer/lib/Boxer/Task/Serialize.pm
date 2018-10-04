@@ -25,11 +25,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.8
+Version v1.1.11
 
 =cut
 
-our $VERSION = version->declare("v1.1.8");
+our $VERSION = version->declare("v1.1.11");
 
 has world => (
 	is       => 'ro',
@@ -106,6 +106,7 @@ sub run
 		tweakdesc   => $world->tweakdesc,
 		tweaklist   => $tweaklist,
 		pkgautolist => $pkgautolist,
+		nonfree     => $self->nonfree,
 	);
 
 	Boxer::File::WithSkeleton->new(

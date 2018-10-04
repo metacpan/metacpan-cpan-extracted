@@ -22,6 +22,7 @@ $test1->();
 
 use lib 't';
 require Dict1;
+
 my $ts1 = DBIx::Mojo::Template->singleton('Dict1');
 
 my $test2 = sub {is scalar keys %{ shift() }, shift, 'singleton';};
@@ -39,6 +40,10 @@ $test2->($ts1, 4);
 $ts1 = undef;
 $test2->($ts2, 4);
 
+#same and append extra dict
+$t = DBIx::Mojo::Template->new('Dict1', data=>['extra.dict.txt']);
+#~ $test1->();
+is $t->{'extra foo'}->render, "yada\n", 'right extra dict';
 
 done_testing();
 

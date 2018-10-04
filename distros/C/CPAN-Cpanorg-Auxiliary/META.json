@@ -4,13 +4,13 @@
       "James E Keenan (jkeenan@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CPAN-Cpanorg-Auxiliary",
    "no_index" : {
@@ -36,7 +36,6 @@
             "Cwd" : "0",
             "File::Copy::Recursive::Reduced" : "0",
             "File::Path" : "2.15",
-            "File::Slurp" : "9999.19",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "JSON" : "0",
@@ -47,6 +46,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Cpanorg-Auxiliary"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/CPAN-Cpanorg-Auxiliary/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/CPAN-Cpanorg-Auxiliary.git",
+         "web" : "https://github.com/jkeenan/CPAN-Cpanorg-Auxiliary"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

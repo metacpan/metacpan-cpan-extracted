@@ -1,7 +1,7 @@
 package Complete;
 
-our $DATE = '2015-12-17'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2018-09-26'; # DATE
+our $VERSION = '0.200'; # VERSION
 
 1;
 # ABSTRACT: Convention for Complete::* modules family
@@ -18,7 +18,7 @@ Complete - Convention for Complete::* modules family
 
 =head1 VERSION
 
-This document describes version 0.19 of Complete (from Perl distribution Complete), released on 2015-12-17.
+This document describes version 0.200 of Complete (from Perl distribution Complete), released on 2018-09-26.
 
 =head1 DESCRIPTION
 
@@ -81,10 +81,10 @@ Required arguments: C<word> (the word to be completed). Sometimes, for
 lower-level functions, you can accept C<words> and C<cword> instead of C<word>,
 For example, in function C<Complete::Getopt::Long::complete_cli_arg>.
 
-You can define more arguments as you fit. Often there is at least one argument
-to specify or customize the source of completion, for example for the function
-C<Complete::Util::complete_array_elem> there is an C<array> argument to specify
-the source array.
+You can define more arguments as you see fit. Often there is at least one
+argument to specify or customize the source of completion, for example for the
+function C<Complete::Util::complete_array_elem> there is an C<array> argument to
+specify the source array.
 
 =item * Observe settings specified in L<Complete::Common>
 
@@ -116,8 +116,24 @@ entry can be a string or a hashref. Example:
  [{word=>'apple', summary=>'A delicious fruit with thousands of varieties'},
   {word=>'apricot', summary=>'Another delicious fruit'},] # array of hashes
 
-As you can see from the above, each entry can contain description (can be
-displayed in shells that support them, like fish and zsh).
+As you can see from the above, each entry specify the B<word> and can also
+contain additional information: B<summary> (str, short one-line description, can
+be displayed e.g. in shells that support them, like fish and zsh), B<is_partial>
+(bool, specify whether this is a partial completion).
+
+ # example of digit-by-digit completion
+ [
+   {word=>'11', is_partial=>1},
+   {word=>'12', is_partial=>1},
+   ...
+   {word=>'19', is_partial=>1},
+ ],
+
+=item * is_partial => bool
+
+If set to true, specifies that the entries in B<words> are partial completion
+entries. This is equivalent to setting C<< is_partial => 1 >> to all the
+entries.
 
 =item * type => str
 
@@ -184,7 +200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

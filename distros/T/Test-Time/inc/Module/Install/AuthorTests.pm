@@ -10,7 +10,7 @@ use Carp ();
 
 use vars qw{$VERSION $ISCORE @ISA};
 BEGIN {
-  $VERSION = '0.06';
+  $VERSION = '0.07';
   $ISCORE  = 1;
   @ISA     = qw{Module::Install::Base};
 }

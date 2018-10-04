@@ -86,6 +86,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "JSON::PP" : "0",
             "Log::ger::Output::Screen" : "0.007",
             "Perinci::Examples" : "0.79",
             "Test::More" : "0.98",
@@ -105,7 +106,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Inline"
       }
    },
-   "version" : "0.543",
+   "version" : "0.544",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -225,7 +226,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.05"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",

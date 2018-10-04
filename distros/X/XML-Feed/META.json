@@ -4,13 +4,13 @@
       "Six Apart"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Feed",
    "prereqs" : {
@@ -41,14 +41,15 @@
             "URI::Fetch" : "0",
             "XML::Atom" : "0.38",
             "XML::LibXML" : "1.66",
-            "XML::RSS" : "1.47"
+            "XML::RSS" : "1.47",
+            "perl" : "5.008001"
          }
       }
    },
    "provides" : {
       "XML::Feed" : {
          "file" : "lib/XML/Feed.pm",
-         "version" : "0.53"
+         "version" : "0.54"
       },
       "XML::Feed::Content" : {
          "file" : "lib/XML/Feed/Content.pm",
@@ -88,7 +89,7 @@
          "url" : "https://github.com/davorg/xml-feed"
       }
    },
-   "version" : "0.53",
+   "version" : "0.54",
    "x_contributors" : [
       "Dave Cross <davecross@cpan.org>",
       "Jakob Voss <voss@gbv.de>",
@@ -99,5 +100,5 @@
       "Karen Etheridge <ether@cpan.org>",
       "Gerard Ribugent Navarro <ribugent@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

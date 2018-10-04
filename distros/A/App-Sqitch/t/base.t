@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 144;
+use Test::More tests => 156;
 #use Test::More 'no_plan';
 use Test::MockModule;
 use Path::Class;
@@ -52,6 +52,7 @@ is $sqitch->verbosity, 3, 'Verbosity option should override configuration';
 isa_ok $sqitch = $CLASS->new, $CLASS, 'A new object';
 
 is $sqitch->verbosity, 1, 'Default verbosity should be 1';
+ok $sqitch->sysuser, 'Should have default sysuser from system';
 ok $sqitch->user_name, 'Default user_name should be set from system';
 is $sqitch->user_email, do {
     require Sys::Hostname;
@@ -59,8 +60,37 @@ is $sqitch->user_email, do {
 }, 'Default user_email should be set from system';
 
 ##############################################################################
+# User environment variables.
+ENV: {
+    # Try originating host variables.
+    local $ENV{SQITCH_ORIG_SYSUSER} = "__kamala__";
+    local $ENV{SQITCH_ORIG_FULLNAME} = 'Kamala Harris';
+    local $ENV{SQITCH_ORIG_EMAIL} = 'kamala@whitehouse.gov';
+    isa_ok $sqitch = $CLASS->new, $CLASS, 'Another new object';
+    is $sqitch->sysuser, $ENV{SQITCH_ORIG_SYSUSER},
+        "SQITCH_ORIG_SYSUER should override system username";
+    is $sqitch->user_name, $ENV{SQITCH_ORIG_FULLNAME},
+        "SQITCH_ORIG_FULLNAME should override system user full name";
+    is $sqitch->user_email, $ENV{SQITCH_ORIG_EMAIL},
+        "SQITCH_ORIG_EMAIL should override system-derived email";
+
+    # Local variables take precedence over originating host variables.
+    local $ENV{SQITCH_FULLNAME} = 'Barack Obama';
+    local $ENV{SQITCH_EMAIL} = 'barack@whitehouse.gov';
+    isa_ok $sqitch = $CLASS->new, $CLASS, 'Another new object';
+    is $sqitch->user_name, $ENV{SQITCH_FULLNAME},
+        "SQITCH_FULLNAME should override originating host user full name";
+    is $sqitch->user_email, $ENV{SQITCH_EMAIL},
+        "SQITCH_EMAIL should override originating host email";
+}
+
+##############################################################################
 # Test go().
 GO: {
+    local $ENV{SQITCH_ORIG_SYSUSER} = "__barack__";
+    local $ENV{SQITCH_ORIG_FULLNAME} = 'Barack Obama';
+    local $ENV{SQITCH_ORIG_EMAIL} = 'barack@whitehouse.gov';
+
     my $mock = Test::MockModule->new('App::Sqitch::Command::help');
     my ($cmd, @params);
     my $ret = 1;
@@ -86,6 +116,16 @@ GO: {
     is $sqitch->user_email, 'michael@example.com',
         'Should have read user email from configuration';
     is_deeply $sqitch->options, { engine => 'sqlite' }, 'Should have options';
+
+    # Make sure USER_NAME and USER_EMAIL take precedence over configuration.
+    local $ENV{SQITCH_FULLNAME} = 'Michelle Obama';
+    local $ENV{SQITCH_EMAIL} = 'michelle@whitehouse.gov';
+    is +App::Sqitch->go, 0, 'Should get 0 from go() again';
+    isa_ok $sqitch = $cmd->sqitch, 'App::Sqitch';
+    is $sqitch->user_name, 'Michelle Obama',
+        'Should have read user name from environment';
+    is $sqitch->user_email, 'michelle@whitehouse.gov',
+        'Should have read user email from environment';
 
     # Now make it die.
     sub puke { App::Sqitch::X->new(@_) } # Ensures we have trace frames.

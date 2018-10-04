@@ -26,7 +26,7 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.08';
+our $VERSION = '2.12';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -76,7 +76,7 @@ sub bundle {
 
       if ($ref eq 'HASH' and my $tied = tied %$from) {
         my $ref_name = $tied->fqn;
-        return $from if $ref_name =~ m!^$self->{root_schema_url}\#!;
+        return $from if $ref_name =~ m!^\Q$self->{root_schema_url}\E\#!;
 
         if (-e $ref_name) {
           $ref_name = sprintf '%s-%s', substr(sha1_sum($ref_name), 0, 10),
@@ -250,9 +250,9 @@ sub _load_schema {
   if (-e $file) {
     $file = $file->realpath;
     warn "[JSON::Validator] Loading schema from file: $file\n" if DEBUG;
-    return $self->_load_schema_from_text(\$file->slurp), CASE_TOLERANT ? lc $file : $file;
+    return $self->_load_schema_from_text(\$file->slurp), CASE_TOLERANT ? path(lc $file) : $file;
   }
-  elsif ($file =~ m!^/!) {
+  elsif ($url =~ m!^/! and $self->ua->server->app) {
     warn "[JSON::Validator] Loading schema from URL $url\n" if DEBUG;
     return $self->_load_schema_from_url(Mojo::URL->new($url)->fragment(undef)), "$url";
   }
@@ -394,7 +394,7 @@ sub _resolve {
   $self->{level}++;
   $self->_register_schema($schema, $id);
 
-  my @topics = ([$schema, Mojo::URL->new($id)]);
+  my @topics = ([$schema, UNIVERSAL::isa($id, 'Mojo::File') ? $id : Mojo::URL->new($id)]);
   while (@topics) {
     my ($topic, $base) = @{shift @topics};
 
@@ -420,31 +420,42 @@ sub _resolve {
   return $schema;
 }
 
+sub _location_to_abs {
+  my ($location, $base) = @_;
+  my $location_as_url = Mojo::URL->new($location);
+  return $location_as_url if $location_as_url->is_abs;
+
+  # definitely relative now
+  if ($base->isa('Mojo::File')) {
+    return $base if !length $location;
+    return $base->sibling(split '/', $location)->realpath;
+  }
+  return $location_as_url->to_abs($base);
+}
+
 sub _resolve_ref {
   my ($self, $topic, $url) = @_;
   return if tied %$topic;
 
   my $other = $topic;
-  my ($base, $fqn, $pointer, $ref, @guard);
+  my ($location, $fqn, $pointer, $ref, @guard);
 
   while (1) {
     $ref = $other->{'$ref'};
     push @guard, $other->{'$ref'};
     confess "Seems like you have a circular reference: @guard" if @guard > RECURSION_LIMIT;
     last if !$ref or ref $ref;
-    $fqn = Mojo::URL->new($ref =~ m!^/! ? "#$ref" : $ref);
-    $fqn = $fqn->to_abs($url) unless $fqn->is_abs;
-    $url = $fqn;
-    $fqn = $fqn->to_string;
-    $fqn =~ s!(.)#$!$1!;
-    $fqn =~ s!#(.+)!{'#' . url_unescape $1}!e;
-
-    ($base, $pointer) = split /#/, $fqn, 2;
-    $other = $self->_resolve($base);
+    $fqn = $ref =~ m!^/! ? "#$ref" : $ref;
+    ($location, $pointer) = split /#/, $fqn, 2;
+    $url = $location = _location_to_abs($location, $url);
+    $pointer = undef if length $location and !length $pointer;
+    $pointer = url_unescape $pointer if defined $pointer;
+    $fqn = join '#', grep defined, $location, $pointer;
+    $other = $self->_resolve($location);
 
     if (defined $pointer and length $pointer) {
       $other = Mojo::JSON::Pointer->new($other)->get($pointer)
-        or confess qq[Possibly a typo in schema? Could not find "$pointer" in "$base" ($ref)];
+        or confess qq[Possibly a typo in schema? Could not find "$pointer" in "$location" ($ref)];
     }
   }
 
@@ -1017,7 +1028,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.08
+2.12
 
 =head1 SYNOPSIS
 
@@ -1446,6 +1457,8 @@ the terms of the Artistic License version 2.0.
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 Daniel Böhmer - C<post@daniel-boehmer.de>
+
+Ed J - C<mohawk2@users.noreply.github.com>
 
 Kevin Goess - C<cpan@goess.org>
 

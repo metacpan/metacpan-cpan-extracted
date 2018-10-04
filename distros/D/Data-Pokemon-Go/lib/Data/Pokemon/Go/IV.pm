@@ -1,16 +1,16 @@
 package Data::Pokemon::Go::IV;
 use 5.008001;
 use Carp;
-use Path::Tiny;
 use YAML::XS;
 use List::Util qw(first);
+use File::Share 'dist_dir';
+my $dir = dist_dir('Data-Pokemon-Go');
 
 use Moose;
 __PACKAGE__->meta->make_immutable;
 no Moose;
 
-my $in_file = path( 'data', 'LV.yaml' );
-my $data = YAML::XS::LoadFile($in_file);
+my $data = YAML::XS::LoadFile("$dir/LV.yaml");
 my %Dust = ();
 push @{ $Dust{ $_->{Dust} } }, { LV => $_->{LV}, Candy => $_->{Candy} } foreach @$data;
 

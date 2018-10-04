@@ -81,6 +81,7 @@ struct_to_sv (GIBaseInfo* info,
 
 	    case GI_INFO_TYPE_UNION:
 		ccroak ("%s: unions not handled yet", G_STRFUNC);
+		break;
 
 	    default:
 		ccroak ("%s: unhandled info type %d", G_STRFUNC, info_type);
@@ -187,6 +188,7 @@ sv_to_struct (GITransfer transfer,
 
 	    case GI_INFO_TYPE_UNION:
 		ccroak ("%s: unions not handled yet", G_STRFUNC);
+		break;
 
 	    default:
 		ccroak ("%s: unhandled info type %d", G_STRFUNC, info_type);

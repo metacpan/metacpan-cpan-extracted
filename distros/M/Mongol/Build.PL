@@ -13,7 +13,7 @@ my $builder = Module::Build->new(
 
 	meta_merge => {
 		resources => {
-			repository => 'https://github.com/marghidanu/mongol'
+			repository => 'https://gitlab.com/marghidanu/mongol'
 		},
 
 		x_contributors => [
@@ -33,12 +33,13 @@ my $builder = Module::Build->new(
 		'MooseX::ClassAttribute' => undef,
 		'MooseX::Storage::Base::SerializedClass' => undef,
 		'MooseX::Storage' => undef,
+	},
+
+	test_requires => {
 		'Test::More' => undef,
 		'Test::Pod::Coverage' => undef,
 		'Test::Pod' => undef,
 	},
-
-	optional => { },
 );
 
 $builder->create_build_script();

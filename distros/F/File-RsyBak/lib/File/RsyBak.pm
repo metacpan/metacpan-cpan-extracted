@@ -1,7 +1,7 @@
 package File::RsyBak;
 
-our $DATE = '2017-07-31'; # DATE
-our $VERSION = '0.35'; # VERSION
+our $DATE = '2018-09-30'; # DATE
+our $VERSION = '0.360'; # VERSION
 
 use 5.010001;
 use strict;
@@ -241,14 +241,14 @@ sub _backup {
     $cmd = join(
         "",
         "nice -n19 rsync ",
-        ($opts->{extra_rsync_opts} ? map { shell_quote($_), " " }
+        ($opts->{extra_rsync_opts} ? map { (shell_quote($_), " ") }
              @{$opts->{extra_rsync_opts}} : ()),
         "-a --del --force --ignore-errors --ignore-existing ",
         (log_is_debug() ? "-v " : ""),
         ((-e "$target->{abs_path}/current") ?
              "--link-dest ".shell_quote("$target->{abs_path}/current")." "
                  : ""),
-        map({ shell_quote($_->{raw}), ($opts->{extra_dir} ? "" : "/"), " " }
+        map({ (shell_quote($_->{raw}), ($opts->{extra_dir} ? "" : "/"), " ") }
                 @$sources),
         shell_quote("$target->{abs_path}/.tmp/"),
     );
@@ -379,7 +379,7 @@ File::RsyBak - Backup files/directories with histories, using rsync
 
 =head1 VERSION
 
-This document describes version 0.35 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-07-31.
+This document describes version 0.360 of File::RsyBak (from Perl distribution File-RsyBak), released on 2018-09-30.
 
 =head1 SYNOPSIS
 
@@ -738,7 +738,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-RsyBa
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-File-RsyBak>.
+Source repository is at L<https://github.com/perlancar/perl-File-RsyBak>.
 
 =head1 BUGS
 
@@ -764,7 +764,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

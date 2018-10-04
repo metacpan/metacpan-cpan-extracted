@@ -28,8 +28,7 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "0",
-            "Alien::TidyHTML5" : "0",
-            "Devel::CheckLib" : "0"
+            "Alien::TidyHTML5" : "0"
          }
       },
       "runtime" : {
@@ -48,17 +47,18 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "http://github.com/shlomif/html-tidy5/issues"
-      },
       "homepage" : "http://github.com/shlomif/html-tidy5",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0.php"
-      ],
-      "repository" : {
-         "url" : "http://github.com/shlomif/html-tidy5"
-      }
+      ]
    },
-   "version" : "0.004",
+   "version" : "0.005",
+   "x_contributors" : [
+      "Andy Lester <andy@petdance.com>",
+      "Jonathan Rockway <jrockway@cpan.org>",
+      "Robert Bachmann <rbach@cpan.org>",
+      "Robert Rothenberg <rrwo@cpan.com>",
+      "Rufus Cable <cpan@threebytesfull.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

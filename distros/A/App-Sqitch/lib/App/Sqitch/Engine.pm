@@ -9,12 +9,12 @@ use Locale::TextDomain qw(App-Sqitch);
 use Path::Class qw(file);
 use App::Sqitch::X qw(hurl);
 use List::Util qw(first max);
-use URI::db 0.15;
+use URI::db 0.19;
 use App::Sqitch::Types qw(Str Int Sqitch Plan Bool HashRef URI Maybe Target);
 use namespace::autoclean;
 use constant registry_release => '1.1';
 
-our $VERSION = '0.9997';
+our $VERSION = '0.9998';
 
 has sqitch => (
     is       => 'ro',
@@ -30,13 +30,34 @@ has target => (
     weak_ref => 1,
     handles => {
         uri         => 'uri',
-        username    => 'username',
-        password    => 'password',
         client      => 'client',
         registry    => 'registry',
         destination => 'name',
     }
 );
+
+has username => (
+    is      => 'ro',
+    isa     => Maybe[Str],
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        $self->target->username || $self->_def_user
+    },
+);
+
+has password => (
+    is      => 'ro',
+    isa     => Maybe[Str],
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        $self->target->password || $self->_def_pass
+    },
+);
+
+sub _def_user { }
+sub _def_pass { }
 
 sub registry_destination { shift->destination }
 
@@ -466,7 +487,7 @@ sub _verify_changes {
         $errcount += $errs;
     }
 
-    # List off any undeployed changes.
+    # List any undeployed changes.
     for my $idx ($from_idx..$to_idx) {
         next if defined first { $_ == $idx } @seen;
         my $change = $plan->change_at( $idx );
@@ -480,7 +501,7 @@ sub _verify_changes {
         $errcount++;
     }
 
-    # List off any pending changes.
+    # List any pending changes.
     if ($pending && $to_idx < ($plan->count - 1)) {
         if (my @pending = map {
             $plan->change_at($_)
@@ -1377,10 +1398,8 @@ The current Sqitch object.
 
 =head3 C<target>
 
-A string identifying the database target.
-
-Returns the name of the target database. This will usually be the name of
-target specified on the command-line, or the default.
+An L<App::Sqitch::Target> object identifying the database target, usually
+derived from the name of target specified on the command-line, or the default.
 
 =head3 C<uri>
 
@@ -1422,6 +1441,62 @@ A hash of engine client variables to be set. May be set and retrieved as a
 list.
 
 =head2 Instance Methods
+
+=head3 C<username>
+
+  my $username = $engine->username;
+
+The username to use to connect to the database, for engines that require
+authentication. The username is looked up in the following places, returning
+the first to have a value:
+
+=over
+
+=item 1.
+
+The C<$SQITCH_USERNAME> environment variable.
+
+=item 2.
+
+The username from the target URI.
+
+=item 3.
+
+An engine-specific default password, which may be derived from an environment
+variable, engine configuration file, the system user, or none at all.
+
+=back
+
+See L<sqitch-authentication> for details and best practices for Sqitch engine
+authentication.
+
+=head3 C<password>
+
+  my $password = $engine->password;
+
+The password to use to connect to the database, for engines that require
+authentication. The password is looked up in the following places, returning
+the first to have a value:
+
+=over
+
+=item 1.
+
+The C<$SQITCH_PASSWORD> environment variable.
+
+=item 2.
+
+The password from the target URI.
+
+=item 3.
+
+An engine-specific default password, which may be derived from an environment
+variable, engine configuration file, or none at all.
+
+=back
+
+See L<sqitch-authentication> for details and best practices for Sqitch engine
+authentication.
 
 =head3 C<registry_destination>
 

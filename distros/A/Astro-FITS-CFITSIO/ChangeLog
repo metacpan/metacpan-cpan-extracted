@@ -1,3 +1,10 @@
+2018-10-01  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '1.12';
+
+	* CFITSIO.pm: sync with cfitsio 3.45, added
+	fits_copy_cols / ffccls
+
 2016-08-23  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
 
 	* CFITSIO.pm: $VERSION = '1.11';

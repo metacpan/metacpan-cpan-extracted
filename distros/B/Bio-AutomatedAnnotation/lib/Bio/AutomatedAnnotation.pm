@@ -1,5 +1,5 @@
 package Bio::AutomatedAnnotation;
-
+$Bio::AutomatedAnnotation::VERSION = '1.182770';
 # ABSTRACT: Automated annotation of assemblies
 
 
@@ -113,7 +113,7 @@ Bio::AutomatedAnnotation - Automated annotation of assemblies
 
 =head1 VERSION
 
-version 1.182680
+version 1.182770
 
 =head1 SYNOPSIS
 

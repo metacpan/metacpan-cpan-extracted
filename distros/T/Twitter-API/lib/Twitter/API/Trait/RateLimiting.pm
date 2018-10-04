@@ -1,6 +1,6 @@
 package Twitter::API::Trait::RateLimiting;
 # ABSTRACT: Automatically sleep as needed to handle rate limiting
-$Twitter::API::Trait::RateLimiting::VERSION = '1.0003';
+$Twitter::API::Trait::RateLimiting::VERSION = '1.0005';
 use Moo::Role;
 use HTTP::Status qw(HTTP_TOO_MANY_REQUESTS);
 use namespace::clean;
@@ -51,7 +51,7 @@ Twitter::API::Trait::RateLimiting - Automatically sleep as needed to handle rate
 
 =head1 VERSION
 
-version 1.0003
+version 1.0005
 
 =head1 SYNOPSIS
 

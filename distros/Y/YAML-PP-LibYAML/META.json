@@ -1,0 +1,80 @@
+{
+   "abstract" : "Faster backend for YAML::PP",
+   "author" : [
+      "Tina M\u00fcller <tinita@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "YAML-PP-LibYAML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "YAML::LibYAML::API" : "0.003",
+            "YAML::LibYAML::API::XS" : "0",
+            "YAML::PP" : "0.009",
+            "YAML::PP::Emitter" : "0",
+            "YAML::PP::Parser" : "0",
+            "YAML::PP::Reader" : "0",
+            "YAML::PP::Writer" : "0",
+            "base" : "0",
+            "perl" : "v5.8.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.98",
+            "YAML::PP" : "0.009",
+            "blib" : "1.01",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "YAML::PP::LibYAML" : {
+         "file" : "lib/YAML/PP/LibYAML.pm",
+         "version" : "0.002"
+      },
+      "YAML::PP::LibYAML::Emitter" : {
+         "file" : "lib/YAML/PP/LibYAML/Emitter.pm",
+         "version" : "0.002"
+      },
+      "YAML::PP::LibYAML::Parser" : {
+         "file" : "lib/YAML/PP/LibYAML/Parser.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlpunk/YAML-PP-LibYAML-p5/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perlpunk/YAML-PP-LibYAML-p5",
+         "web" : "https://github.com/perlpunk/YAML-PP-LibYAML-p5"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

@@ -1,154 +1,11 @@
 package Mandel::Relationship::ListOf;
-
-=head1 NAME
-
-Mandel::Relationship::ListOf - A field points to many other MongoDB documents
-
-=head1 DESCRIPTION
-
-L<Mandel::Relationship::ListOf> is a class used to describe the relationship
-where one document has a list of DBRefs that point to other documents.
-The connection between the documents is described in the database using
-L<DBRef|http://docs.mongodb.org/manual/reference/database-references/>.
-
-This relationship is EXPERIMENTAL. Let me of you are using it or don't like it.
-
-=head1 DATABASE STRUCTURE
-
-A "person" that has I<list of> "cats" will look like this in the database:
-
-  mongodb> db.persons.find();
-  {
-    "_id" : ObjectId("5353ab13800fac3a0a8d5049"),
-    "kittens" : [
-      DBRef("cats", ObjectId("5353ab13c5483e16a1010000")),
-      DBRef("cats", ObjectId("5353ab13c5483e16a1020000"))
-    ]
-  }
-
-  mongodb> db.cats.find();
-  { "_id" : ObjectId("5353ab13c5483e16a1010000") }
-  { "_id" : ObjectId("5353ab13c5483e16a1020000") }
-
-=head1 SYNOPSIS
-
-=head2 Using DSL
-
-  package MyModel::Person;
-  use Mandel::Document;
-  list_of cats => 'MyModel::Cat';
-
-=head2 Using object oriented interface
-
-  MyModel::Person->model->relationship(
-    "list_of",
-    "cats",
-    "MyModel::Cat",
-  );
-
-See also L<Mandel::Model/relationship>.
-
-=head2 Methods generated
-
-  # non-blocking
-  $person = MyModel::Person->new->push_cats($bson_oid, $pos, sub {
-              my($person, $err, $cat_obj) = @_;
-              # Note! This $cat_obj has only "id()" set
-              # ...
-            });
-
-Add the C<$bson_oid> to the "cats" list in C<$person>.
-
-  $person = MyModel::Person->new->push_cats(\%constructor_args, $pos, sub {
-              my($person, $err, $cat_obj) = @_;
-              # ...
-            });
-
-Pushing a new cat with C<%constructor_args> will also insert a new cat object
-into the database.
-
-  $person = MyModel::Person->new->push_cats($cat_obj, $pos, sub {
-              my($person, $err, $cat_obj) = @_;
-              # ...
-            });
-
-C<$pos> is optional. When omitted, C<push_cats()> will add the new element
-to the end of list. See
-L<http://docs.mongodb.org/manual/reference/operator/update/position/#up._S_position>
-for details.
-
-  $person = MyModel::Cat->new->remove_cats($bson_oid, sub {
-              my($self, $err) = @_;
-              # Note! This $cat_obj has only "id()" set
-            });
-
-  $person = MyModel::Cat->new->remove_cats($cat_obj, sub {
-              my($self, $err) = @_;
-              # ...
-            });
-
-Calling C<remove_cats()> will only remove the link, and not the related
-object.
-
-  $person = MyModel::Cat->new->cats(sub {
-              my($self, $err, $array_of_cats) = @_;
-              # ...
-            });
-
-Retrieve all the related cat objects.
-
-  # blocking
-  $cat_obj = MyModel::Person->new->push_cats($bson_oid);
-  $cat_obj = MyModel::Person->new->push_cats(\%args);
-  $cat_obj = MyModel::Person->new->push_cats($cat_obj);
-  $person = MyModel::Person->new->remove_cats($bson_oid);
-  $person = MyModel::Person->new->remove_cats($cat_obj);
-  $array_of_cats = MyModel::Person->new->cats;
-
-  $cat_collection = MyModel::Person->new->search_cats;
-
-Note! C<search()> does not guaranty the order of the results, like C<cats()>
-does.
-
-=cut
-
 use Mojo::Base 'Mandel::Relationship';
 use Mojo::Util;
 use Mango::BSON 'bson_dbref';
 
-=head1 ATTRIBUTES
-
-L<Mandel::Relationship::ListOf> inherits all attributes from
-L<Mandel::Relationship> and implements the following new ones.
-
-=head2 push_method_name
-
-The name of the method used to add another document to the relationship.
-
-=head2 remove_method_name
-
-The name of the method used to remove an item from the list.
-
-=head2 search_method_name
-
-The name of the method used to search related documents.
-
-=cut
-
 has push_method_name   => sub { sprintf 'push_%s',   shift->accessor };
 has remove_method_name => sub { sprintf 'remove_%s', shift->accessor };
 has search_method_name => sub { sprintf 'search_%s', shift->accessor };
-
-=head1 METHODS
-
-L<Mandel::Relationship::ListOf> inherits all methods from
-L<Mandel::Relationship> and implements the following new ones.
-
-=head2 monkey_patch
-
-Add methods to L<Mandel::Relationship/document_class>.
-
-=cut
 
 sub monkey_patch {
   shift->_monkey_patch_all_method->_monkey_patch_push_method->_monkey_patch_remove_method->_monkey_patch_search_method;
@@ -338,6 +195,146 @@ sub _monkey_patch_search_method {
   return $self;
 }
 
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mandel::Relationship::ListOf - A field points to many other MongoDB documents
+
+=head1 DESCRIPTION
+
+L<Mandel::Relationship::ListOf> is a class used to describe the relationship
+where one document has a list of DBRefs that point to other documents.
+The connection between the documents is described in the database using
+L<DBRef|http://docs.mongodb.org/manual/reference/database-references/>.
+
+This relationship is EXPERIMENTAL. Let me of you are using it or don't like it.
+
+=head1 DATABASE STRUCTURE
+
+A "person" that has I<list of> "cats" will look like this in the database:
+
+  mongodb> db.persons.find();
+  {
+    "_id" : ObjectId("5353ab13800fac3a0a8d5049"),
+    "kittens" : [
+      DBRef("cats", ObjectId("5353ab13c5483e16a1010000")),
+      DBRef("cats", ObjectId("5353ab13c5483e16a1020000"))
+    ]
+  }
+
+  mongodb> db.cats.find();
+  { "_id" : ObjectId("5353ab13c5483e16a1010000") }
+  { "_id" : ObjectId("5353ab13c5483e16a1020000") }
+
+=head1 SYNOPSIS
+
+=head2 Using DSL
+
+  package MyModel::Person;
+  use Mandel::Document;
+  list_of cats => 'MyModel::Cat';
+
+=head2 Using object oriented interface
+
+  MyModel::Person->model->relationship(
+    "list_of",
+    "cats",
+    "MyModel::Cat",
+  );
+
+See also L<Mandel::Model/relationship>.
+
+=head2 Methods generated
+
+  # non-blocking
+  $person = MyModel::Person->new->push_cats($bson_oid, $pos, sub {
+              my($person, $err, $cat_obj) = @_;
+              # Note! This $cat_obj has only "id()" set
+              # ...
+            });
+
+Add the C<$bson_oid> to the "cats" list in C<$person>.
+
+  $person = MyModel::Person->new->push_cats(\%constructor_args, $pos, sub {
+              my($person, $err, $cat_obj) = @_;
+              # ...
+            });
+
+Pushing a new cat with C<%constructor_args> will also insert a new cat object
+into the database.
+
+  $person = MyModel::Person->new->push_cats($cat_obj, $pos, sub {
+              my($person, $err, $cat_obj) = @_;
+              # ...
+            });
+
+C<$pos> is optional. When omitted, C<push_cats()> will add the new element
+to the end of list. See
+L<http://docs.mongodb.org/manual/reference/operator/update/position/#up._S_position>
+for details.
+
+  $person = MyModel::Cat->new->remove_cats($bson_oid, sub {
+              my($self, $err) = @_;
+              # Note! This $cat_obj has only "id()" set
+            });
+
+  $person = MyModel::Cat->new->remove_cats($cat_obj, sub {
+              my($self, $err) = @_;
+              # ...
+            });
+
+Calling C<remove_cats()> will only remove the link, and not the related
+object.
+
+  $person = MyModel::Cat->new->cats(sub {
+              my($self, $err, $array_of_cats) = @_;
+              # ...
+            });
+
+Retrieve all the related cat objects.
+
+  # blocking
+  $cat_obj = MyModel::Person->new->push_cats($bson_oid);
+  $cat_obj = MyModel::Person->new->push_cats(\%args);
+  $cat_obj = MyModel::Person->new->push_cats($cat_obj);
+  $person = MyModel::Person->new->remove_cats($bson_oid);
+  $person = MyModel::Person->new->remove_cats($cat_obj);
+  $array_of_cats = MyModel::Person->new->cats;
+
+  $cat_collection = MyModel::Person->new->search_cats;
+
+Note! C<search()> does not guaranty the order of the results, like C<cats()>
+does.
+
+=head1 ATTRIBUTES
+
+L<Mandel::Relationship::ListOf> inherits all attributes from
+L<Mandel::Relationship> and implements the following new ones.
+
+=head2 push_method_name
+
+The name of the method used to add another document to the relationship.
+
+=head2 remove_method_name
+
+The name of the method used to remove an item from the list.
+
+=head2 search_method_name
+
+The name of the method used to search related documents.
+
+=head1 METHODS
+
+L<Mandel::Relationship::ListOf> inherits all methods from
+L<Mandel::Relationship> and implements the following new ones.
+
+=head2 monkey_patch
+
+Add methods to L<Mandel::Relationship/document_class>.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mango>, L<Mandel::Relationship>
@@ -347,5 +344,3 @@ L<Mojolicious>, L<Mango>, L<Mandel::Relationship>
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

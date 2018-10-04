@@ -1,11 +1,17 @@
 Revision history for Perl extension Mojo-UserAgent-Role-Queued
 
+1.13 2018-09-27T10:44:41Z
+    - make tests that depend on extra modules optional, to reduce CPANTesters fails
+
+1.12 2018-09-26T14:30:24Z
+    - fix memory leak (Vidar Tyldum)
+
 1.11 2018-09-12T14:09:24Z
     - change queue from state variable to attribute, fixes github issue #4
 
 1.10 2018-09-05T16:12:57Z
     - change internals to use helper class object
-    - fixes problems with synopsis example reported by tyldis via irc
+    - fixes problems with synopsis example reported by tyldis (Vidar Tyldum) via irc
 
 1.01 2018-06-26T15:33:43Z
     - use non-leaking version of private callback method

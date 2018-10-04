@@ -7,6 +7,13 @@ use Test::Spec;
 use Test::Warnings qw/warning/;
 use URL::Encode qw/url_decode/;
 
+# WWW::OAuth recommends WWW::Form::UrlEncoded::XS. If it is available, but its
+# version number is less than WWW::Form::UrlEncoded's version, it warns and
+# falls back to WWW::Form::UrlEncoded::PP. That warning causes test failures.
+# We can avoid that by forcing use of WWW::Form:UrlEncoded::PP, which is
+# sufficient for tests.
+BEGIN { $ENV{WWW_FORM_URLENCODED_PP} = 1 }
+
 use Twitter::API;
 
 sub new_client {
@@ -16,13 +23,6 @@ sub new_client {
         consumer_secret => 'secret',
     );
 }
-
-# WWW::OAuth recommends WWW::Form::UrlEncoded::XS. If it isn't available, it
-# falls back to WWW::Form::UrlEncoded::PP with a warning. Those warnings cause
-# test failures, here. We'll force the fallback and bypass the potential
-# warning. The tests shouldn't care whether the user has the recommended XS
-# module or not.
-$ENV{WWW_FORM_URLENCODED_PP} = 1;
 
 context 'Net::Twitter migration' => sub {
     my $client;

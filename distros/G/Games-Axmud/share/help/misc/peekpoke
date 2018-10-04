@@ -81,6 +81,12 @@ Peek / Poke list
          X - read-only scalar, list or hash (for JSON data structures)
 
 
+   S aard102.status
+        Current AARD102 status notification (GA::Session->aard102Status)
+   S aard102.tick
+        Time of last tick received via AARD102 (GA::Session->aard102TickTime)
+        
+   
    L atcp.list
         List of (all) ATCP packages received (from GA::Session->atcpDataHash)
    L atcp.list.PACKAGE
@@ -314,12 +320,16 @@ Peek / Poke list
         Show MXP comments (GA::Client->debugMxpCommentFlag)
    F debug.protocol.pueblo
         Show Pueblo errors (GA::Client->debugPuebloFlag)
-   F debug.protocol.peublo.comment
+   F debug.protocol.pueblo.comment
         Show Pueblo comments (GA::Client->debugPuebloCommentFlag)
+   f debug.protocol.zmp
+        Show ZMP errors (GA::Client->debugZmpFlag)        
    f debug.protocol.atcp
         Show ATCP data (GA::Client->debugAtcpFlag)
    f debug.protocol.gmcp
         Show GMCP data (GA::Client->debugGmcpFlag)
+   f debug.protocol.mcp
+        Show MCP errors (GA::Client->debugMcpFlag)
    F debug.line.numbers
         Show explicit line numbers (GA::Client->debugLineNumsFlag)
    F debug.line.tags
@@ -942,10 +952,16 @@ Peek / Poke list
         Current session's MXP mode (GA::Session->mxpMode)
    S protocol.mode.pueblo
         Current session's Pueblo mode (GA::Session->puebloMode)
+   S protocol.mode.zmp
+        Current session's ZMP mode (GA::Session->zmpMode)
+   S protocol.mode.aard102
+        Current session's AARD102 mode (GA::Session->aard102Mode)
    S protocol.mode.atcp
         Current session's ATCP mode (GA::Session->atcpMode)
    S protocol.mode.gmcp
         Current session's GMCP mode (GA::Session->gmcpMode)
+   S protocol.mode.mcp
+        Current session's MCP mode (GA::Session->mcpMode)
 
 
    o race.current
@@ -1087,8 +1103,6 @@ Peek / Poke list
         Current Compass task (GA::Session->compassTask)
    O task.current.condition
         Current Condition task (GA::Session->conditionTask)
-   O task.current.debugger
-        Current Debugger task (GA::Session->debuggerTask)
    O task.current.divert
         Current Divert task (GA::Session->divertTask)
    O task.current.inventory
@@ -1105,6 +1119,8 @@ Peek / Poke list
         Current RawToken task (GA::Session->rawTokenTask)
    O task.current.status
         Current Status task (GA::Session->statusTask)
+   O task.current.system
+        Current System task (GA::Session->systemTask)
    O task.current.tasklist
         Current TaskList task (GA::Session->taskListTask)
    O task.current.watch
@@ -1261,6 +1277,12 @@ Peek / Poke list
         Store connection history in world profile
            (GA::Client->connectHistoryFlag)
 
+
+   L zmp.list
+        List of (all) ZMP packages created by plugins
+   L zmp.list.PACKAGE[.SUBPACKAGE]
+        Value of supported commands in the ZMP package
+           
 
    O zonemap.NAME
         Zonemap object called 'NAME' (from GA::Client->zonemapHash)
