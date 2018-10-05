@@ -59,6 +59,10 @@ __DATA__
     label: # in-between "space"
       %x = ();
 ####
+    split /\s+/,;
+####
+    grep {exists $group_of{$_} };
+####
 # THESE SHOULD FAIL
 # THESE SHOULD FAIL
     { $a = /\}/; };

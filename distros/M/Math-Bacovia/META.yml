@@ -16,7 +16,7 @@ name: Math-Bacovia
 provides:
   Math::Bacovia:
     file: lib/Math/Bacovia.pm
-    version: '0.03'
+    version: '0.04'
   Math::Bacovia::Difference:
     file: lib/Math/Bacovia/Difference.pm
   Math::Bacovia::Exp:
@@ -37,7 +37,7 @@ provides:
     file: lib/Math/Bacovia/Symbol.pm
 requires:
   Class::Multimethods: '1.7'
-  List::UtilsBy::XS: '0'
+  List::UtilsBy: '0.06'
   Math::AnyNum: '0.14'
   Set::Product::XS: '0.04'
   perl: '5.014'
@@ -46,5 +46,5 @@ resources:
   homepage: https://github.com/trizen/Math-Bacovia
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Math-Bacovia
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use List::Util 'max';
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000003';
 
 # What the application is called...
 my $APP_NAME  = 'SlowQuitApps';
@@ -13,6 +13,7 @@ my $APP_ID = _get_id($APP_NAME) // die "Can't locate $APP_NAME\n";
 
 our ($DELAY, %SLOWQUIT, %FASTQUIT, $CONFIGURED);
 
+# This does the actual work, once all the calls set up what's to be done...
 END {
     _configure() if !$CONFIGURED;
 }
@@ -117,7 +118,7 @@ sub _get_id {
 sub _defaults {
     my ($command) = @_;
 
-    my $result = `defaults $command`;
+    my $result = `defaults $command >& /dev/null`;
     chomp $result;
 
     return if $result =~ m{does not exist\s*\Z};
@@ -135,7 +136,7 @@ App::SlowQuitApps - Simplify configuration of SlowQuitApps app on MacOS
 
 =head1 VERSION
 
-This document describes App::SlowQuitApps version 0.000002
+This document describes App::SlowQuitApps version 0.000003
 
 
 =head1 SYNOPSIS

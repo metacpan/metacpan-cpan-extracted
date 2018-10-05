@@ -1,0 +1,68 @@
+% my $a = shift;
+{
+  "swagger": "2.0",
+  %# See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#info-object
+  "info": {
+      "version": "1.0",
+      "title": "<%= $a->{api_title} %>",
+      "description": "This is the OpenAPI specification for <%= $a->{api_title} %>.",
+    %# See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#licenseObject 
+      "license": {
+          "name": "restricted"
+      },
+    %# See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#contactObject
+    "contact": {"name":"Company name here", "email":"company_api@example.com"}
+  },
+  "basePath": "/api",
+  %# See http://localhost:3000/perldoc/Mojolicious/Plugin/OpenAPI/Guides/Tutorial
+  %# These keys are currently not in use (schemes, consumes, produces). 
+  "schemes": ["http", "https"],
+  "consumes": ["application/json", "multipart/form-data", "application/x-www-form-urlencoded"],
+  "produces": ["application/json", "text/plain", "text/html"],
+  "definitions":{
+%# Here all the definitions will be put,
+%# already existing definitions in the api.json file will be replaced with
+%# new ones with the same name 
+
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "valid": { "type": "boolean" },
+          "errors:": { "$ref": "#/definitions/Errors" }
+        }
+      },
+      "Errors": { "items": { "$ref": "#/definitions/Error" }, "type": "array" },
+      "Error": {
+        "properties": { "path": { "type": "string" }, "message": { "type": "string" } },
+        "required": [ "message" ]
+      }
+
+      %# Here will be definitions for each resource, for example: Users,
+      %# GroupsItem, Blog, Product, etc.
+  }, 
+  %# end of definitions
+  "parameters": {
+%# Parameters that can be used across operations. This property does not
+%# define global parameters for all operations.
+    "limit": {
+      "default": 100,
+      "description": "How many, items to return at once (max: 100; min: 1)",
+      "in": "query",
+      "maximum": 100,
+      "minimum": 1,
+      "name": "limit",
+      "type": "integer"
+    },
+    "offset": {
+      "default": 0,
+      "description": "At what offset (min: 0)?",
+      "in": "query",
+      "minimum": 0,
+      "name": "offset",
+      "type": "integer"
+    }
+  },
+
+  "paths": <%= JSON::PP->new->utf8->encode($a->{api_paths}) %>
+}
+

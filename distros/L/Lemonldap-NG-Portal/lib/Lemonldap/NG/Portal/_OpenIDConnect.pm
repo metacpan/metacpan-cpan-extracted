@@ -461,7 +461,7 @@ sub checkTokenResponseValidity {
     my ( $self, $json ) = @_;
 
     # token_type MUST be Bearer
-    unless ( $json->{token_type} eq "Bearer" ) {
+    unless ( $json->{token_type} =~ /^Bearer$/i ) {
         $self->lmLog(
             "Token type is " . $json->{token_type} . " but must be Bearer",
             'error' );

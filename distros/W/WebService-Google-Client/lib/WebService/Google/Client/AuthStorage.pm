@@ -1,5 +1,5 @@
 package WebService::Google::Client::AuthStorage;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Provide universal methods to fetch tokens from different types of data sources. Default is jsonfile
 
@@ -82,7 +82,7 @@ WebService::Google::Client::AuthStorage - Provide universal methods to fetch tok
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

@@ -1,3 +1,15 @@
+0.003   2018-10-05 (PERLANCAR)
+
+	- [Bugfix] Forgot to make Versioning::Scheme::Dotted a Role::Tiny
+	  role.
+
+
+0.002   2018-10-05 (PERLANCAR)
+
+	- [Incompatible change] Rename methods (add _version) so the
+	  Versioning::Scheme::* become more suitable to be mixed in.
+
+
 0.001   2018-10-04 (PERLANCAR)
 
 	- First release.

@@ -17,7 +17,7 @@ use Module::Build;
 use strict;
 use warnings;
 
-my $libvirtver = "4.7.0";
+my $libvirtver = "4.8.0";
 my $stat = system "pkg-config --atleast-version=$libvirtver libvirt";
 die "cannot run pkg-config to check libvirt version" if $stat == -1;
 die "libvirt >= $libvirtver is required\n" unless $stat == 0;

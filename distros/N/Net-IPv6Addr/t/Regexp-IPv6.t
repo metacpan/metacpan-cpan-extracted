@@ -1,6 +1,6 @@
 # These tests of IPv6 addresses were poached from Regexp::IPv6.
 
-use Test::More tests => 198;
+use Test::More;
 
 #use Regexp::IPv6 qw($IPv6_re);
 
@@ -45,6 +45,9 @@ while (<DATA>) {
 	ok (! ipv6_chkip ($_), "bad $_");
     }
 }
+
+done_testing ();
+exit;
 
 # most of the samples below were taken from the validate_ipv6.rb
 # script by Christoph Petschnig (Michael Erickson pointed me there).
@@ -155,7 +158,6 @@ fe80::1
 # These are valid addresses, but the original Tony Monroe
 # Net::IPv6Addr did not recognise them, so I've moved them here.
 
-TODOGOOD:
 1:2:3:4:5:6:1.2.3.4
 1:2:3:4:5::1.2.3.4
 1:2:3:4::1.2.3.4

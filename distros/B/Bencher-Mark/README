@@ -1,0 +1,65 @@
+NAME
+    Bencher::Mark - Benchmark like Benchmark.pm
+
+VERSION
+    This document describes version 0.001 of Bencher::Mark (from Perl
+    distribution Bencher-Mark), released on 2018-10-05.
+
+SYNOPSIS
+     use Bencher::Mark qw(:all);
+
+     # You can specify undef for $count
+
+     timethis($count, $code);
+
+     timethese($count, {
+         Name1 => '... code ...', # specify code as string
+         Name2 => sub { ... }   , # or coderef
+     });
+
+     cmpthese($count, {
+         Name1 => '... code ...',
+         Name2 => sub { ... }   ,
+     });
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    This is an experiment to make writing benchmarks using Bencher easier.
+    This module offers an interface like Benchmark.pm, but internally it
+    constructs a scenario, feeds it to Bencher::Backend, then displays the
+    formatted result.
+
+FUNCTIONS
+  timethis
+  timethese
+  cmpthese
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Mark>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Mark>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Mark>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    bencher, Bencher, "Bencher::Manual::*"
+
+    Benchmark, Dumbbench
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -7,7 +7,7 @@ our @EXPORT_OK = qw/roman2hangul hangul2roman/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Convert::Moji 'make_regex';
 
 my $verbose;

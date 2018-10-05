@@ -21,4 +21,4 @@ requires:
   List::Util: '0'
   Test::More: '0'
   perl: '5.01'
-version: '0.000002'
+version: '0.000003'

@@ -4,25 +4,22 @@ use strict;
 use warnings;
 use 5.010;
 
+use ExtUtils::MakeMaker;
+
 if ( $^O eq 'MSWin32' || $^O eq 'solaris' ||  $^O eq 'cygwin' ) {
     print STDERR "OS unsupported: $^O\n";
     exit( 255 );
 }
 
-use ExtUtils::MakeMaker qw(
-    prompt
-);
-use File::Spec::Functions qw(
-    catdir
-);
+my $package = 'Confluent::SchemaRegistry';
+my $path_to_package = 'lib/Confluent/SchemaRegistry.pm';
 
-use Config;
-use inc::Module::Install;
-readme_from('lib/Confluent/SchemaRegistry.pm');
+`perldoc -uT $path_to_package | pod2text - README`;
+`perldoc -uT $path_to_package | pod2markdown - README.md`; # useful for GitHub repo home
 
 my %config = (
-    NAME                => 'Confluent::SchemaRegistry',
-    VERSION_FROM        => 'lib/Confluent/SchemaRegistry.pm',  # finds $VERSION
+    NAME                => $package,
+    VERSION_FROM        => $path_to_package,  # finds $VERSION
     MIN_PERL_VERSION    => '5.010',
     PREREQ_PM           => {            # more to the list $Module::CoreList::version{5.010}
 		'JSON::XS'		=> '3.02',
@@ -36,14 +33,12 @@ my %config = (
 		'Test::Exception'			=> '0.43'
     },
     META_MERGE          => {
-#        no_index                => {
-#            directory               => [
-#                't',
-#                'inc',
-#                'xt',
-#                'tools',
-#            ]
-#        },
+        no_index                => {
+            directory               => [
+                't',
+                'inc',
+            ]
+        },
         'meta-spec'             => { version => 2 },
         resources               => {
             bugtracker              => {
@@ -69,23 +64,4 @@ my %config = (
 #    NO_MYMETA           => 1,
 );
 
-#my @patterns = qw( t/*.t );
-#$config{test} = { TESTS => join ' ', map { glob } @patterns };
-#
-#if ( $ENV{AUTHOR_TESTS} ) {
-#    @patterns = qw( xt/author/*.t );
-#    $config{test}->{TESTS} .= ' '.join ' ', map { glob } @patterns;
-#}
-#
-#if ( $ENV{RELEASE_TESTS} ) {
-#    @patterns = qw( xt/release/*.t );
-#    $config{test}->{TESTS} .= ' '.join ' ', map { glob } @patterns;
-#}
-#
-#mkdir 't/data' unless -d 't/data';
-#mkdir 'inc' unless -d 'inc';
-
 ExtUtils::MakeMaker::WriteMakefile( %config );
-
-
-

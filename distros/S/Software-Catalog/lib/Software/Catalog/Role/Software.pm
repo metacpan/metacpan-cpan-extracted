@@ -1,12 +1,17 @@
 package Software::Catalog::Role::Software;
 
-our $DATE = '2018-09-13'; # DATE
-our $VERSION = '1.0.1'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '1.0.3'; # VERSION
 
 use Role::Tiny;
 
 requires 'canon2native_arch_map';
-#requires 'get_latest_version';
+requires 'get_latest_version';
+requires 'get_download_url';
+requires 'get_archive_info';
+
+# versioning scheme
+requires qw(is_valid_version cmp_version);
 
 sub _canon2native_arch {
     my ($self, $arch) = @_;
@@ -51,7 +56,7 @@ Software::Catalog::Role::Software - Role for software
 
 =head1 VERSION
 
-This document describes version 1.0.1 of Software::Catalog::Role::Software (from Perl distribution Software-Catalog), released on 2018-09-13.
+This document describes version 1.0.3 of Software::Catalog::Role::Software (from Perl distribution Software-Catalog), released on 2018-10-05.
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,9 @@
 Revision history for Perl module JSON::Repair
 
+0.07 2018-10-05
+
+- Fix broken links in documentation to "api.metacpan.org"
+
 0.06 2017-03-09
 
 - Extend the documentation

@@ -19,8 +19,9 @@ name: Software-Catalog-SW-zcoin-qt
 requires:
   PerlX::Maybe: '0'
   Role::Tiny::With: '0'
-  Software::Catalog::Role::Software: v1.0.0
+  Software::Catalog::Role::Software: v1.0.3
   Software::Catalog::Util: v1.0.0
+  Versioning::Scheme::Dotted: '0.003'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -28,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Catalog-SW-zcoin-qt
   homepage: https://metacpan.org/release/Software-Catalog-SW-zcoin-qt
   repository: git://github.com/perlancar/perl-Software-Catalog-SW-zcoin-qt.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -116,11 +117,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

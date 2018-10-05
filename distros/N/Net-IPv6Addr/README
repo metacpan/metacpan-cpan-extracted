@@ -1,32 +1,108 @@
-=========================
-Net::IPv6Addr Version 0.3
-=========================
+   _   _      _           ___ ____         __     _       _     _      
+  | \ | | ___| |_   _ _  |_ _|  _ \__   __/ /_   / \   __| | __| |_ __ 
+  |  \| |/ _ \ __| (_|_)  | || |_) \ \ / / '_ \ / _ \ / _` |/ _` | '__|
+  | |\  |  __/ |_   _ _   | ||  __/ \ V /| (_) / ___ \ (_| | (_| | |   
+  |_| \_|\___|\__| (_|_) |___|_|     \_/  \___/_/   \_\__,_|\__,_|_|   
+                                                                       
 
-Net::IPv6Addr provides functions for parsing IPv6 addresses in all
-formats described by RFC1884.  If Math::Base85 is installed, formats
-described in RFC1924 are also valid.  It will generate "IP6.INT."
-strings (as described in RFC1886) if you are inclined to play with
-DNS records.
 
-This module needs Net::IPv4Addr to function properly.
+This is the README for Net::IPv6Addr version 0.93.
 
-The usual installation instructions apply:
+Net::IPv6Addr is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
 
-    /path/to/perl Makefile.PL
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Net::IPv6Addr - Check validity of IPv6 addresses
+
+"Net::IPv6Addr" checks strings for valid IPv6 addresses, as specified
+in "RFC1884", and converts addresses into various formats. It
+is able to process addresses formatted in the following styles;
+
+preferred form: x:x:x:x:x:x:x:x
+
+zero-compressed form: the infamous double-colon.  
+
+Too many pattern matches to describe in this margin.
+
+mixed IPv4/IPv6 format: x:x:x:x:x:x:d.d.d.d
+
+mixed IPv4/IPv6 with compression: ::d.d.d.d or ::FFFF:d.d.d.d
+
+base-85-encoded: [0-9A-Za-z!#$%&()*+;<=>?@^_`{|}~-]{20}
+
+(This encoding was given in "RFC1924" as an April Fool's joke.)
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+website:
+
+    * http://metacpan.org/release/Net-IPv6Addr
+
+(This link goes to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Net::IPv6Addr
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.0 or later.
+
+To install the module from CPAN, use
+
+    cpan Net::IPv6Addr
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Net::IPv6Addr
+
+To install the module from the source file, Net-IPv6Addr-0.93.tar.gz,
+follow this sequence of commands:
+
+    tar xfz Net-IPv6Addr-0.93.tar.gz
+    cd Net-IPv6Addr-0.93
+    perl Makefile.PL
     make
-    make test
     make install
 
-Documentation is included in pod format.
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
 
----------------------
-Copyright and License
----------------------
+-----------------------------------------------------------------------------
 
-This distribution (with the exception of included RFC's) is copyright
-(c) 2001-2002 Tony Monroe.  All rights reserved.  This software is
-distributed under the same license terms as Perl itself.  This
-software comes with NO WARRANTIES WHATSOEVER, express, implied, or
-otherwise.
+4. HELP
 
-$Id: README,v 1.5 2002/08/06 21:35:26 tony Exp $
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr>,
+
+or if you want to alter the source code of Net::IPv6Addr, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/net-ipv6addr>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Fri Oct  5 11:53:52 2018.
+
+-----------------------------------------------------------------------------

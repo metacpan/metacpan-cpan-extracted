@@ -99,5 +99,20 @@ t/clear_actions.t
 t/ws_redefine.t
 t/pseudovars.t
 t/non_backtracking.t
+t/seplist_trailing__countedhash_0.t
+t/seplist_trailing__countedhash_0_.t
+t/seplist_trailing__countedhash_0_1.t
+t/seplist_trailing__countedhash_0_N.t
+t/seplist_trailing__countedhash_1.t
+t/seplist_trailing__countedhash_1_.t
+t/seplist_trailing__countedhash_1_N.t
+t/seplist_trailing__countedhash_M_.t
+t/seplist_trailing__countedhash_M_N.t
+t/seplist_trailing__countedhash_N.t
+t/seplist_trailing__greediness.t
+t/seplist_trailing__plushash.t
+t/seplist_trailing__questionmark.t
+t/seplist_trailing__rawhash.t
+t/seplist_trailing__starhash.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

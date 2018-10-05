@@ -13,7 +13,7 @@ use Carp;
 use 5.014;
 use JSON::Parse '0.49';
 use C::Tokenize '$comment_re';
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub repair_json
 {
@@ -55,7 +55,6 @@ sub repair_json
 	    # Everything after the bad byte.
 	    my $remaining = substr ($output, $bad_pos);
 	    if ($bad_char eq "'" && $valid_bytes->[ord ('"')]) {
-		my $string;
 		# Substitute a ' in the remaining stuff, if there is
 		# one, up to a comma or colon or an end-of marker.
 		if ($remaining =~ s/^([^,:\]\}]*)'(\s*[,:\]\}])/$1"$2/) {

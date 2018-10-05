@@ -8,7 +8,7 @@ package Net::Prometheus;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
@@ -145,7 +145,7 @@ sub unregister
 
    my $found;
    @{ $self->{collectors} } = grep {
-      not( $_ == $collector and $found++ )
+      not( $_ == $collector and ++$found )
    } @{ $self->{collectors} };
 
    $found or

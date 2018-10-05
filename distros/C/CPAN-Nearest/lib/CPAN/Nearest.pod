@@ -19,13 +19,13 @@ produces output
     Nearest to Lingua::Stop::Wars in /home/ben/.cpan/sources/modules/02packages.details.txt.gz is 'Lingua::StopWords'.
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/CPAN-Nearest-0.13/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/CPAN-Nearest-0.14/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents CPAN::Nearest version 0.13
-corresponding to git commit L<16243f456a77b2cd864ecc6243ce9eef74f89368|https://github.com/benkasminbullock/nearest-module/commit/16243f456a77b2cd864ecc6243ce9eef74f89368> released on Fri Jan 13 10:24:59 2017 +0900.
+This documents CPAN::Nearest version 0.14
+corresponding to git commit L<e5d10622fb2b0d42cc35557d36be2885583521fe|https://github.com/benkasminbullock/nearest-module/commit/e5d10622fb2b0d42cc35557d36be2885583521fe> released on Fri Oct 5 10:43:44 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -57,13 +57,7 @@ gives
     ! Couldn't find module or a distribution Lingua::Stopwords ()
 
 CPAN::Nearest supplies a spelling-mistake tolerant search for the most
-similar name, intended for people making tools like C<cpan>, C<cpanm>,
-C<pm-uninstall>, and anything else which needs to use the CPAN
-packages list. CPAN::Nearest was written to be fast enough for
-practical use.
-
-CPAN::Nearest was inspired by the helpful "git" version control
-system, which provides suggestions for spelling mistakes.
+similar name.
 
 =head1 FUNCTIONS
 
@@ -72,19 +66,61 @@ system, which provides suggestions for spelling mistakes.
     my $close_name = search ($file, $module_name);
 
 Search the package detail file C<$file> for a module named
-C<$module_name> and return the closest name. E.g. if you search for
-"Harry::Potter",
+C<$module_name> and return the closest name. For example, if you
+search for "Harry::Potter":
 
+    
+    use CPAN::Nearest 'search';
+    my $file = "$ENV{HOME}/.cpan/sources/modules/02packages.details.txt.gz";
     my $close_name = search ($file, 'Harry::Potter');
+    print "$close_name\n";
 
-the value in C<$close_name>, the closest CPAN module, is
-"Data::Lotter".
+
+produces output
+
+    Data::Lotter
+
+
+(This example is included as L<F<harry-potter.pl>|https://fastapi.metacpan.org/source/BKB/CPAN-Nearest-0.14/examples/harry-potter.pl> in the distribution.)
+
 
 The file specified by the first argument, C<$file> in the example, is
 usually found at F<~/.cpan/sources/modules/02packages.details.txt.gz>
-on a Unix-like system. This may be specified as the file name. This
-module can read either a compressed or uncompressed version. There is
-a speed increase of 10-20% when an uncompressed file is used.
+on a Unix-like system. See L</FILES> if you want to locate this
+file. This may be specified as the file name. This module can read
+either a compressed or uncompressed version.
+
+=head1 EXPORTS
+
+L</search> is exported on demand.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Carp>
+
+=item Text::Fuzzy
+
+L<Text::Fuzzy> is used to do the searches of the CPAN data. See
+L</HISTORY>.
+
+=item Gzip::Faster
+
+L<Gzip::Faster> is used to process compressed package files.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<fatfinger>
+
+This looks for similarly-named modules via
+L<Text::Levenshtein::Damerau>.
+
+=back
 
 =head1 FILES
 
@@ -93,29 +129,22 @@ listing the CPAN modules in
 F<~/.cpan/sources/modules/02packages.details.txt.gz>. Others can
 download the file from the directory F</modules/> of any CPAN mirror. 
 
-=head1 STANDALONE PROGRAM
+=head1 HISTORY
 
-The distribution includes a standalone program called "nearest-module"
-as shown in L<this blog
-entry|http://blogs.perl.org/users/ben_bullock/2012/06/find-a-misspelt-module-name.html>. To
-use this program, edit the file F<nearest-module.c> in the top level
-of the distribution to point to the name of the file
-F<02packages.details.txt> or F<02packages.details.txt.gz> on your
-system, and compile it with
+CPAN::Nearest was created as a module for people making tools like
+C<cpan>, C<cpanm>, C<pm-uninstall>, and anything else which needs to
+use the CPAN packages list. It was inspired by the helpful "git"
+version control system, which provides suggestions for spelling
+mistakes. CPAN::Nearest was written to be fast enough for practical
+use by writing it mostly in C with an XS binding to Perl.
 
-    make -f makeitfile nearest-module
+It was the precursor of L<Text::Fuzzy> by the same author (Ben
+Bullock). In version 0.13, all of the search functionality of
+CPAN::Nearest was moved to Text::Fuzzy and the XS parts of the module
+were removed, and the package-list reading part rewritten in Perl. The
+standalone C program was also removed from the distribution in version
+0.13, and its documentation was deleted in version 0.14.
 
-It is run with the name of a single module:
-
-    ./nearest-module Lingo::Jingo::Mojo
-    Closest to 'Lingo::Jingo::Mojo' is 'Lingua::JA::Moji'.
-
-There is a C<-v> option to view candidate modules:
-
-    $ ./nearest-module -v Lingo::Jingo::Mojo
-    Games::Bingo::Bot (9) is nearer than 10.
-    Lingua::JA::Moji (7) is nearer than 9.
-    Closest to 'Lingo::Jingo::Mojo' is 'Lingua::JA::Moji'.
 
 
 =head1 AUTHOR
@@ -125,7 +154,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -12,7 +12,9 @@ WriteMakefile(
     ABSTRACT_FROM  => 'lib/Number/Phone/JP.pm',
     PREREQ_PM      => +{
         'Test::More'         => 0,
+        'Test::Requires'     => 0,
         'UNIVERSAL::require' => 0,
+        'Number::Phone'      => 0,
     },
     ( $eumm_version >= 6.31 ? (LICENSE => 'perl_5') : () ),
     ( $eumm_version >= 6.46 ? (

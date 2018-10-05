@@ -1,10 +1,10 @@
 #!/home/ben/software/install/bin/perl
 use warnings;
 use strict;
-use FindBin;
+use FindBin '$Bin';
 use Deploy 'do_system';
 use IPC::Run3;
-my $program = "$FindBin::Bin/nearest-module";
+my $program = "$Bin/nearest-module";
 do_system ("make -f makeitfile nearest-module");
 my @strings = qw/
                     Lingo::Jingo::Mojo

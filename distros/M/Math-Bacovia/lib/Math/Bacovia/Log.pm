@@ -105,7 +105,7 @@ sub alternatives {
             }
         }
 
-        [List::UtilsBy::XS::uniq_by { $_->stringify } @alt];
+        [List::UtilsBy::uniq_by { $_->stringify } @alt];
     };
 
     @{$self->{_alt}};

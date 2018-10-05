@@ -1,3 +1,22 @@
+0.004   2018-10-05 (PERLANCAR)
+
+	- Add subcommand: download-all.
+
+	- update: Add option --no-download (-D).
+
+	- download: Check against downloaded version first.
+
+
+0.003   2018-10-04 (PERLANCAR)
+
+	- [Incompatible change] Rename subcommand cleanup ->
+          cleanup-install-dir.
+
+        - Add subcommands: list-downloaded-versions, cleanup-download-dir.
+
+        - Implement subcommand list-downloaded.
+
+
 0.002   2018-10-04 (PERLANCAR)
 
 	- Add subcommands: cleanup, list-installed-versions.

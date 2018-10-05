@@ -49,7 +49,7 @@ use Aspect;
 use Avro::Schema;
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $COMPATIBILITY_LEVELS = [ qw/NONE FULL FORWARD BACKWARD/ ];
 
@@ -583,7 +583,7 @@ Alvaro Livraghi, E<lt>alvarol@cpan.orgE<gt>
 
 L<https://github.com/alivraghi/Confluent-SchemaRegistry>
 
-=head1 BUG
+=head1 BUGS
 
 Please use GitHub project link above to report problems or contact authors.
 

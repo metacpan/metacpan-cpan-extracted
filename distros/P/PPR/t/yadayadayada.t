@@ -15,7 +15,7 @@ plan tests => 3;
 use PPR;
 
 my $Perl_document = qr{
-    ^ (?&PerlDocument) $  $PPR::GRAMMAR
+    \A (?&PerlDocument) \Z  $PPR::GRAMMAR
 }xms;
 
 ok 'sub foo {...}'                              =~ $Perl_document => 'Pure yada';

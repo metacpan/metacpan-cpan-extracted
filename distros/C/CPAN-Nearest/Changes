@@ -1,5 +1,10 @@
 Revision history for perl module CPAN::Nearest
 
+0.14 2018-10-05
+
+* Change bad links in documentation
+* Remove documentation of standalone program
+
 0.13 2017-01-13
 
 * Use "Text::Fuzzy"

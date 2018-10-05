@@ -6,7 +6,7 @@
                                             |_|                 
 
 
-This is the README for JSON::Repair version 0.06.
+This is the README for JSON::Repair version 0.07.
 
 JSON::Repair is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -62,11 +62,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm JSON::Repair
 
-To install the module from the source file, JSON-Repair-0.06.tar.gz, follow
+To install the module from the source file, JSON-Repair-0.07.tar.gz, follow
 this sequence of commands:
 
-    tar xfz JSON-Repair-0.06.tar.gz
-    cd JSON-Repair-0.06
+    tar xfz JSON-Repair-0.07.tar.gz
+    cd JSON-Repair-0.07
     perl Makefile.PL
     make
     make install
@@ -91,6 +91,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Mar  9 11:17:38 2017.
+This README was written on Fri Oct  5 10:05:45 2018.
 
 -----------------------------------------------------------------------------

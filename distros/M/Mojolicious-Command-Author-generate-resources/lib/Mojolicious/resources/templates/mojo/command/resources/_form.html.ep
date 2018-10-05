@@ -1,0 +1,5 @@
+% my $a = shift;
+%%= form_for $target => begin
+%= $a->{fields} 
+  %%= submit_button $caption
+%% end

@@ -1,5 +1,5 @@
 package WebService::Google::Client::Util;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Portable functions
 
@@ -76,7 +76,7 @@ WebService::Google::Client::Util - Portable functions
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

@@ -9,7 +9,6 @@ README
 dist.ini
 lib/Software/Catalog.pm
 lib/Software/Catalog/Role/Software.pm
-lib/Software/Catalog/Role/VersionScheme/SemVer.pm
 lib/Software/Catalog/Util.pm
 t/00-compile.t
 t/author-critic.t

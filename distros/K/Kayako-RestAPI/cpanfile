@@ -7,6 +7,7 @@ requires "common::sense" => "0";
 requires "utf8" => "0";
 
 on 'test' => sub {
+  requires "Test::Exception" => "0";
   requires "Test::More" => "0";
   requires "strict" => "0";
   requires "warnings" => "0";

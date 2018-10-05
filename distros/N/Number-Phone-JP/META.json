@@ -32,7 +32,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Number::Phone" : "0",
             "Test::More" : "0",
+            "Test::Requires" : "0",
             "UNIVERSAL::require" : "0"
          }
       }
@@ -41,6 +43,6 @@
    "resources" : {
       "X_twitter" : "https://twitter.com/nipotan"
    },
-   "version" : "0.20180904",
+   "version" : "0.20181001",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

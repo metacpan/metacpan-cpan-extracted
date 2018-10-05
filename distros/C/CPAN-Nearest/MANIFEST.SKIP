@@ -13,3 +13,4 @@
 ^lib/CPAN/Nearest\.pod\.tmpl$
 ^examples/.*-out\.txt$
 ^make-pod\.pl$
+^xt/.*$

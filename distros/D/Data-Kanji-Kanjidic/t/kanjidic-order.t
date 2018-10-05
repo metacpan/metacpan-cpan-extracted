@@ -1,10 +1,10 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use Data::Kanji::Kanjidic qw/parse_kanjidic kanjidic_order/;
 
-my $k = parse_kanjidic ("$FindBin::Bin/kanjidic-sample");
+my $k = parse_kanjidic ("$Bin/kanjidic-sample");
 my @order = kanjidic_order ($k);
 ok (@order == keys %$k);
 my $prev = -1;

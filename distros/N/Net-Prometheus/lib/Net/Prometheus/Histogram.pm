@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -108,7 +108,8 @@ sub new
 
 =head2 observe
 
-   $histogram->observe( [ @label_values ], $value )
+   $histogram->observe( @label_values, $value )
+   $histogram->observe( \%labels, $value )
 
    $child->observe( $value )
 

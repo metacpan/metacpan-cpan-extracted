@@ -31,7 +31,7 @@ exec return y s gt sin sort split
 END_SOURCE
 
 
-ok $JAPH =~ m{ \A (?&PerlOWS) (?&PerlDocument) (?&PerlOWS) \Z  $PPR::GRAMMAR }xms 
+ok $JAPH =~ m{ \A (?&PerlDocument) \Z  $PPR::GRAMMAR }xms
     => "matched blokhead's wonderful JAPH!";
 
 my $output = do {

@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Check validity of IPv6 addresses",
    "author" : [
-      "Tony Monroe"
+      "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,28 +35,29 @@
             "Carp" : "0",
             "Math::Base85" : "0.2",
             "Math::BigInt" : "0",
-            "Net::IPv4Addr" : "0.10"
+            "Net::IPv4Addr" : "0.10",
+            "perl" : "5.006000"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/benkasminbullock/net-ipv6addr.git",
          "web" : "https://github.com/benkasminbullock/net-ipv6addr"
       }
    },
-   "version" : "0.91",
-   "x_bugtracker" : {
-      "web" : "https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr"
-   },
+   "version" : "0.93",
    "x_contributors" : [
       "Jyrki Soini",
       "Joacim Haggmark",
       "Ben Bullock <bkb@cpan.org>",
       "Neil Bowers <neilb@cpan.org>",
-      "Salvador FandiÃ±o GarcÃ­a <salva@cpan.org>"
+      "Salvador Fandiño García <salva@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

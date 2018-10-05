@@ -1,5 +1,4 @@
 
-
 =encoding utf-8
 
 =head1 NAME
@@ -17,17 +16,15 @@ Lingua::KO::Munja - Korean letter conversion
 
 
 produces output
-
     yusaku 유사쿠
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-KO-Munja-0.07/examples/synopsis.pl> in the distribution.)
-
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-KO-Munja-0.08/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents Lingua::KO::Munja version 0.07
-corresponding to git commit L<867075cabf61c54296f7dce2da81fab473c4d52b|https://github.com/benkasminbullock/Lingua-KO-Munja/commit/867075cabf61c54296f7dce2da81fab473c4d52b> released on Wed Mar 1 18:15:26 2017 +0900.
+This documents Lingua::KO::Munja version 0.08
+corresponding to git commit L<4410ddcb7488a016bdef34b1699db70dd8316542|https://github.com/benkasminbullock/Lingua-KO-Munja/commit/4410ddcb7488a016bdef34b1699db70dd8316542> released on Fri Oct 5 11:07:49 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -69,7 +66,6 @@ Convert hangul to romanized Korean.
 
 
 produces output
-
     亜: 아
     唖: 아
     娃: 왜 와
@@ -83,8 +79,7 @@ produces output
     茜: 천
 
 
-(This example is included as L<F<kanji2hanja.pl>|https://api.metacpan.org/source/BKB/Lingua-KO-Munja-0.07/examples/kanji2hanja.pl> in the distribution.)
-
+(This example is included as L<F<kanji2hanja.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-KO-Munja-0.08/examples/kanji2hanja.pl> in the distribution.)
 
 =head1 SEE ALSO
 
@@ -142,4 +137,3 @@ The rest is by Ben Bullock.
 
 This program may be copied, used, modified and redistributed under the
 same terms as Perl itself.
-

@@ -1,5 +1,5 @@
 package WebService::Google::Client::AuthStorage::ConfigJSON;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Specific methods to fetch tokens from JSON data sources
 
@@ -64,7 +64,7 @@ WebService::Google::Client::AuthStorage::ConfigJSON - Specific methods to fetch 
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

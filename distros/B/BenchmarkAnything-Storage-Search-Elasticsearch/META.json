@@ -66,7 +66,7 @@
          "web" : "http://github.com/benchmarkanything/BenchmarkAnything-Storage-Search-Elasticsearch"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -447,7 +447,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.002",
+                  "tag" : "v0.004",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

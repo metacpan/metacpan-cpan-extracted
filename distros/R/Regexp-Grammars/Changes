@@ -446,3 +446,22 @@ Revision history for Regexp-Grammars
 
     * Hid use of Regexp package from CPAN
       (Thanks, Neil)
+
+
+1.049  Fri Oct  5 06:55:49 2018
+
+    * Modified documentation of problems with "non-backtracking"
+      constructs, to cover new cases that have been discovered.
+      (Sorry, Hugo)
+
+    * Extended documentation of rules vs tokens with a short
+      example demonstrating the explicit equivalence
+      (thanks, Stefan)
+
+    * Miscellaneous POD fixes (thanks, Hugo)
+
+    * Clarified behaviour of <[MATCH=subrule]>* on zero match
+      (Thanks, Alex)
+
+    * Added %% operator for separated lists
+      with optional trailing separator

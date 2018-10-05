@@ -1,9 +1,7 @@
 use strict;
-use Test;
-BEGIN { plan tests => 34; }
+use Test::More;
 
 use Net::IPv6Addr;
-ok(1);
 
 my $x;
 # Test ipv6_chkip with garbage.
@@ -137,3 +135,11 @@ ok(not defined $x);
 # Test ipv6_chkip with compressed ipv4 style.
 $x = Net::IPv6Addr::ipv6_chkip("::ffff:192.168.0.1"); 
 ok(ref $x, 'CODE');
+
+eval {
+    Net::IPv6Addr::ipv6_parse ('failburger');
+};
+ok ($@, "failed to parse nonsense");
+unlike ($@, qr!Net::IPv6Addr::Net::IPv6Addr!,
+	"Did not get Clement Freud output");
+done_testing ();

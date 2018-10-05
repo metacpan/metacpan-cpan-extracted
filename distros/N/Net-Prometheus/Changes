@@ -1,5 +1,15 @@
 Revision history for Net-Prometheus
 
+0.06    2018-10-05 13:52:41
+        [CHANGES]
+         * Allow $metric->labels to take a single HASH reference as
+           alternative to ordered list of strings
+
+        [BUGFIXES]
+         * Fix autovivification of gauge functions with labels (RT127284)
+         * Spelling fixes from Debian (RT120491)
+         * Make sure that ->unregister actually does so
+
 0.05    2016/10/28 20:56:35
         [CHANGES]
          * Allow setting name prefix and extra labels on a process exporter

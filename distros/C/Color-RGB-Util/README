@@ -2,12 +2,13 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.591 of Color::RGB::Util (from Perl
-    distribution Color-RGB-Util), released on 2018-10-04.
+    This document describes version 0.593 of Color::RGB::Util (from Perl
+    distribution Color-RGB-Util), released on 2018-10-05.
 
 SYNOPSIS
      use Color::RGB::Util qw(
          mix_2_rgb_colors
+         mix_rgb_colors
          rand_rgb_color
          rgb2grayscale
          rgb2sepia
@@ -22,6 +23,10 @@ SYNOPSIS
 
      say mix_2_rgb_colors('#ff0000', '#ffffff');     # pink (red + white)
      say mix_2_rgb_colors('ff0000', 'ffffff', 0.75); # pink with a whiter shade
+
+     say mix_rgb_colors('ff0000', 1, 'ffffff', 1);   # pink (red + white 1 : 1)
+     say mix_rgb_colors('ff0000', 1, 'ffffff', 3);   # pink with a whiter shade (red + white 1 : 3)
+     say mix_rgb_colors('ff0000', 1, 'ffffff', 1, '0000ff', 0.5);   # bluish pink
 
      say rand_rgb_color();
      say rand_rgb_color('000000', '333333');         # limit range
@@ -64,6 +69,13 @@ FUNCTIONS
 
     Mix 2 RGB colors. $pct is a number between 0 and 1, by default 0.5
     (halfway), the closer to 1 the closer the resulting color to $rgb2.
+
+  mix_rgb_colors
+    Usage:
+
+     my $mixed_rgb = mix_rgb_colors($color1, $weight1, $color2, $weight2, ...);
+
+    Mix several RGB colors.
 
   rand_rgb_color
     Usage:
@@ -170,7 +182,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
+    <https://github.com/perlancar/perl-Color-RGB-Util>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

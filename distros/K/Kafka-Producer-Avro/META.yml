@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/alivraghi/Kafka-Producer-Avro/issues
   homepage: https://github.com/alivraghi/Kafka-Producer-Avro
   repository: https://github.com/alivraghi/Kafka-Producer-Avro.git
-version: '0.01'
+version: '0.02'

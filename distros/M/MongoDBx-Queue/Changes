@@ -1,5 +1,15 @@
 Revision history for MongoDBx-Queue
 
+2.000     2018-10-04 15:44:27-04:00 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - Requires MongoDB driver version 2.0.0 and MooseX::Role::MongoDB
+      v1.0.0
+
+    - 'safe' option removed; all reads and writes now use 'majority' read
+      and write concerns
+
 1.002     2014-01-24 23:05:20-05:00 America/New_York
 
     [FIXES]

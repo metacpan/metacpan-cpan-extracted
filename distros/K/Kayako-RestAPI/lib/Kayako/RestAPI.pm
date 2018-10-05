@@ -1,5 +1,5 @@
 package Kayako::RestAPI;
-$Kayako::RestAPI::VERSION = '0.06';
+$Kayako::RestAPI::VERSION = '0.07';
 
 # ABSTRACT: Perl library for working with L<Kayako REST API|https://kayako.atlassian.net/wiki/display/DEV/Kayako+REST+API>. Tested with
 
@@ -13,6 +13,8 @@ use utf8;
 use Data::Dumper;
 
 my $xs = XML::LibXML::Simple->new();
+
+say "Load local lib";
 
 sub new {
     my $class = shift;
@@ -45,6 +47,20 @@ sub _prepare_request {
 
 sub xml2obj {
     my ( $self, $xml ) = @_;
+
+    local $SIG{__DIE__} = sub {
+        my $die_str = '';
+        if ( ref $_[0] eq 'XML::LibXML::Error' ) {
+            $die_str = "XML::LibXML::Error\n";
+            $die_str .= "Message : " . $_[0]->message();
+        }
+        else {
+            $die_str = $_[0] . "\n";
+        }
+        $die_str .= "Last res: \n" . $self->last_res;
+        die $die_str;
+    };
+
     $xs->XMLin($xml);
 }
 
@@ -53,11 +69,29 @@ sub _query {
     my ( $self, $method, $route, $params ) = @_;
     $params->{e} = $route;
     my %hash = ( %{ $self->_prepare_request }, %$params );
-    my $xml =
+
+    my $res =
       $self->{ua}->$method( $self->{auth_hash}{api_url} => form => \%hash )
-      ->res->body;
-    $xml =~ s/([\x00-\x09]+)|([\x0B-\x1F]+)//g;
-    return $xml;
+      ->res;
+
+    if ( $res->is_success ) {
+        my $xml = $res->body;
+        $self->{last_res} = $res;
+
+        # $xml =~  s/([\x00-\x09]+)|([\x0B-\x1F]+)//g;
+        return $xml;
+    }
+    elsif ( $res->code == 301 ) {
+        die "Moved Permanently: " . $res->headers->location;
+    }
+    else {
+        die "HTTP Error: " . $res->code;
+    }
+}
+
+
+sub last_res {
+    shift->{last_res};
 }
 
 sub get {
@@ -310,7 +344,7 @@ Kayako::RestAPI - Perl library for working with L<Kayako REST API|https://kayako
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -373,6 +407,10 @@ Convert xml API response to hash using XML::XML2JSON::xml2obj method
     my $hash = $kayako_api->xml2obj($xml);
 
 Can potentially crash is returned xml isn't valid (when XML::XML2JSON dies)
+
+=head2 last_res
+
+    Get latest result from user agent. For debug purpose
 
 =head2 get_hash
 

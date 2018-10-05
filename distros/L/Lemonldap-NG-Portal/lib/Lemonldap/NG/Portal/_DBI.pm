@@ -189,7 +189,7 @@ sub get_salt {
     my $dbsalt;
 
     # get rid of scheme ({sha256})
-    $dbhash =~ s/^\{[^}]+\}(.*)$/\1/;
+    $dbhash =~ s/^\{[^}]+\}(.*)$/$1/;
 
     # get binary hash
     my $decoded = &decode_base64($dbhash);
@@ -253,7 +253,7 @@ sub dynamic_hash_password {
 
     # Get the scheme
     $dbscheme = $dbhash;
-    $dbscheme =~ s/^\{([^}]+)\}.*/\1/;
+    $dbscheme =~ s/^\{([^}]+)\}.*/$1/;
     $dbscheme = "" if $dbscheme eq $dbhash;
 
     # no hash scheme => assume clear text

@@ -1,5 +1,5 @@
 package WebService::Google::Client::AuthStorage::MongoDB;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Specific methods to fetch tokens from MongoDB data source (not written yet)
 
@@ -15,7 +15,7 @@ WebService::Google::Client::AuthStorage::MongoDB - Specific methods to fetch tok
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

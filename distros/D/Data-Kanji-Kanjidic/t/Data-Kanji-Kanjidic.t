@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Test::More;
 use Data::Kanji::Kanjidic ':all';
-use FindBin;
+use FindBin '$Bin';
 use utf8;
 
 binmode STDOUT, ":utf8";
@@ -11,7 +11,7 @@ binmode $builder->output,         ":utf8";
 binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
 
-my $kanji = parse_kanjidic ("$FindBin::Bin/kanjidic-sample");
+my $kanji = parse_kanjidic ("$Bin/kanjidic-sample");
 ok ($kanji->{亜}, "Got entry for 亜");
 my $a = $kanji->{亜};
 cmp_ok ($a->{Q}->[0], '<', 100000, "Sane value for four corner code");

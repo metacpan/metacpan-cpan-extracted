@@ -7,10 +7,14 @@ use Test::Deep '!blessed';
 use MongoDB 0.45;
 use MongoDBx::Queue;
 
-my $conn = eval { MongoDB::Connection->new; };
+my $conn = eval {
+    my $mc = MongoDB::MongoClient->new;
+    $mc->get_database("admin")->run_command( [ ismaster => 1 ] );
+    $mc;
+};
 plan skip_all => "No MongoDB on localhost" unless $conn;
 
-my $cl_name = "mongodbx_queue_" . time;
+my $cl_name = "mongodbx_queue_" . time . $$;
 
 my ( $queue, $task, $task2 );
 

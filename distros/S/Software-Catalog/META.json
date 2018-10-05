@@ -36,7 +36,6 @@
             "Exporter" : "5.57",
             "LWP::UserAgent" : "0",
             "Role::Tiny" : "0",
-            "SemVer" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Software-Catalog"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -173,12 +172,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.05"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

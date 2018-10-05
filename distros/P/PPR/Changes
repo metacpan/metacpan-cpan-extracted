@@ -187,3 +187,12 @@ Revision history for PPR
 
     * Fixed edge case on POD/whitespace parsing
       (thanks, Adriano)
+
+
+0.000022  Fri Oct  5 07:10:33 2018
+
+    * Optimized calls to (?&PerlStatementSequence) and (?&PerlPodSequence)
+      (thanks, Adriano)
+
+    * Optimized several tests to remove unnecessary (?&PerlOWS) calls
+      (thanks, Adriano)

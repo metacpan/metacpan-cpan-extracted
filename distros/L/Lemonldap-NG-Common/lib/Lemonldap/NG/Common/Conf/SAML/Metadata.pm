@@ -288,7 +288,7 @@ sub toConf {
     my $data = Dumper($fields);
     $data =~ s/^\s*(.*?)\s*$/$1/;
     $data =~ s/'/&#39;/g;
-    $data =~ s/^\$data[0-9]*\s*=\s*({?\s*.+\s*}?)/$1/g;
+    $data =~ s/^\$data[0-9]*\s*=\s*(\{?\s*.+\s*\}?)/$1/g;
     return $data;
 }
 

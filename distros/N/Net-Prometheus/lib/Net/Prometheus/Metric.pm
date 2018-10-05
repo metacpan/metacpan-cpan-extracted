@@ -8,10 +8,12 @@ package Net::Prometheus::Metric;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 our @CARP_NOT = qw( Net::Prometheus );
+
+use Ref::Util qw( is_hashref );
 
 use Net::Prometheus::Types qw( Sample MetricSamples );
 
@@ -166,12 +168,18 @@ sub labelcount
 
    $child = $metric->labels( @values )
 
+   $child = $metric->labels( { name => $value, name => $value, ... } )
+
 Returns a child metric to represent the general one with the given set of
-labels. This object may be cached for efficiency.
+labels. The label values may be provided either in a list corresponding to the
+list of label names given at construction time, or by name in a single HASH
+reference.
 
 The child instance supports the same methods to control the value of the
 reported metric as the parent metric object, except that any label values are
 already provided.
+
+This object may be cached for efficiency.
 
 =cut
 
@@ -179,6 +187,16 @@ sub labels
 {
    my $self = shift;
    my @values = @_;
+
+   if( @values == 1 and is_hashref( $values[0] ) ) {
+      my $labels = $self->{labels};
+      my $href = $values[0];
+
+      defined $href->{$_} or croak "No value for $_ label given"
+         for @$labels;
+
+      @values = @{$href}{ @$labels };
+   }
 
    my $labelcount = $self->labelcount;
    @values >= $labelcount or
@@ -250,7 +268,9 @@ sub MAKE_child_method
    no strict 'refs';
    *{"${class}::${method}"} = sub {
       my $self = shift;
-      $self->labels( splice @_, 0, $self->labelcount )->$method( @_ );
+      my @values = splice @_, 0, is_hashref( $_[0] ) ? 1 : $self->labelcount;
+
+      $self->labels( @values )->$method( @_ );
    };
 
    my $childmethod = "_${method}_child";
@@ -303,7 +323,7 @@ sub collect
 
    @samples = $metric->samples
 
-An abstract method in this class, this method is intended to be overriden by
+An abstract method in this class, this method is intended to be overridden by
 subclasses.
 
 Called during the value collection process, this method should return a list

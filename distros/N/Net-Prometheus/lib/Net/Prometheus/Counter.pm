@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
@@ -41,7 +41,7 @@ C<Net::Prometheus::Counter> - a monotonically-increasing counter metric
 =head1 DESCRIPTION
 
 This class provides a counter metric - a value that monotonically increases,
-usually used to represent occurrances of some event that happens within the
+usually used to represent occurrences of some event that happens within the
 instrumented program. It is a subclass of L<Net::Prometheus::Metric>.
 
 =cut
@@ -77,7 +77,8 @@ sub new
 
 =head2 inc
 
-   $counter->inc( [ @label_values ], $delta )
+   $counter->inc( @label_values, $delta )
+   $counter->inc( \%labels, $delta )
 
    $child->inc( $delta )
 

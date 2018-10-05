@@ -1,0 +1,7 @@
+% my $a = shift;
+%% layout 'blog', title => 'Record from table <%= $a->{t} %> with id ' . $<%= $a->{t} %>->{id};
+<h2><%%= $<%= $a->{t} %>->{id} %></h2>
+% for my $col (@{$a->{columns}}) {
+<p><%%= $<%= $a->{t} %>->{'<%= $col %>'} %></p>
+% }
+%%= link_to 'Edit' => edit_<%= $a->{t} %> => {id => $<%= $a->{t} %>->{id}}

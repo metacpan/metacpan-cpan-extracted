@@ -1,0 +1,40 @@
+% my $a = shift;
+# Put the following code where convenienient
+# in your startup application method.
+# It may need slight modifications depending
+# on your specific naming conventions.
+
+# Helpers go after your already defined helpers.
+# Beware to not override some already defined helper.
+%= $a->{helpers};
+
+# If you use Slovo add the table names to your configuration file
+# and the above helpers will be automatically generated during startup
+# e.g.
+{MojoDBx =>{
+  #...
+  tables => [qw(<%= join(' ',@{$a->{tables}})%>)],
+}
+}
+# Routes go after your already defined routes
+# See below if you are using Mojolicious::Plugin::RoutesConfig.
+% for my $r (@{$a->{routes}}) {
+    % for my $via (@{$r->{via}}) {
+  $r-><%= lc $via %>('<%= $r->{route}
+    %>')->to('<%= $r->{to} %>')->name('<%= $r->{name} %>');
+    % }
+% }
+
+# If you use Mojolicious::Plugin::RoutesConfig.
+[
+% for my $r (@{$a->{routes}}) {
+    % for my $via (@{$r->{via}}) {
+  {<%= lc $via %> => '<%= $r->{route}%>', to => '<%= $r->{to} %>', name =>'<%= $r->{name} %>'},
+    % }
+% }
+]
+# To use the OpenAPI functionality, you have to add the following code to
+# your 'start' method.
+#
+$self->plugin("OpenAPI" => {url => $self->home->child("api/api.json")});
+

@@ -1,5 +1,14 @@
 Revision history for BenchmarkAnything-Storage-Search-Elasticsearch
 
+0.004     2018-10-05
+        - fix missing passthrough of node configuration
+
+0.003     2018-10-05
+        - bugfixes
+        - introduce new query operator 'is_empty'
+        - rename query operator 'is like' -> 'is_like'
+
+
 0.002     2017-02-03
         - support for 'select' in BenchmarkAnything query
 

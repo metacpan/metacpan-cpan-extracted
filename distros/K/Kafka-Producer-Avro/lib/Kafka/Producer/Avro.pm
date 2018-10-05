@@ -51,7 +51,7 @@ use Confluent::SchemaRegistry;
 
 use constant MAGIC_BYTE => 0; 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head2 CONSTRUCTOR
@@ -251,7 +251,7 @@ Sends a messages on a L<Kafka::Connection|Kafka::Connection> object.
 Returns a non-blank value (a reference to a hash with server response description)
 if the message is successfully sent.
 
-Despite L<Kafka::Producer|Kafka::Producer>C<->send()> method that expects positional arguments, 
+Despite L<Kafka::Producer|Kafka::Producer-E<gt>send()> method that expects positional arguments, 
 C<Kafka::Producer::Avro->send()> method looks for named parameters:
 
   $producer->send(
@@ -270,7 +270,7 @@ Extra arguments may be suggested:
 
 =item C<key_schema =E<gt> $key_schema> and C<value_schema =E<gt> $value_schema>
 
-Both C<$key_schema> and C<$value_schema> parametrs are optional and provide JSON strings that 
+Both C<$key_schema> and C<$value_schema> parameters are optional and provide JSON strings that 
 represent Avro schemas to use to validate and serialize key(s) and value(s).
 
 These schemas are validated against C<schema_registry> and, if compliant, they are added to the registry
@@ -377,7 +377,7 @@ sub send {
 
 Similar to C<send> but uses bulks to avoid memory leaking.
 
-Extra named parametrs are expected:
+Extra named parameters are expected:
 
 =over 3
 
@@ -546,7 +546,7 @@ Alvaro Livraghi, E<lt>alvarol@cpan.orgE<gt>
 
 L<https://github.com/alivraghi/Kafka-Producer-Avro>
 
-=head1 BUG
+=head1 BUGS
 
 Please use GitHub project link above to report problems or contact authors.
 

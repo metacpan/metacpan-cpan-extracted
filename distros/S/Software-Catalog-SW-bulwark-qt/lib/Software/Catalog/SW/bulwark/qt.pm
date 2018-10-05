@@ -1,7 +1,7 @@
 package Software::Catalog::SW::bulwark::qt;
 
-our $DATE = '2018-10-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,8 +10,8 @@ use warnings;
 use PerlX::Maybe;
 
 use Role::Tiny::With;
+with 'Versioning::Scheme::Dotted';
 with 'Software::Catalog::Role::Software';
-#with 'Software::Catalog::Role::VersionScheme::SemVer';
 
 use Software::Catalog::Util qw(extract_from_url);
 
@@ -79,13 +79,17 @@ sub get_download_url {
      }];
 }
 
-sub get_programs {
+# required arg: version
+sub get_archive_info {
     my ($self, %args) = @_;
-    [200, "OK", [
-        {name=>"bulwark-cli", path=>"/"},
-        {name=>"bulwark-qt", path=>"/"},
-        {name=>"bulwarkd", path=>"/"},
-    ]];
+    [200, "OK", {
+        programs => [
+            {name=>"bulwark-cli", path=>"/"},
+            {name=>"bulwark-qt", path=>"/"},
+            {name=>"bulwarkd", path=>"/"},
+        ],
+        unwrap => $self->cmp_version($args{version}, '2.0.0.0') == -1 ? 1:0,
+    }];
 }
 
 1;
@@ -103,7 +107,7 @@ Software::Catalog::SW::bulwark::qt - Bulwark desktop GUI client
 
 =head1 VERSION
 
-This document describes version 0.002 of Software::Catalog::SW::bulwark::qt (from Perl distribution Software-Catalog-SW-bulwark-qt), released on 2018-10-04.
+This document describes version 0.004 of Software::Catalog::SW::bulwark::qt (from Perl distribution Software-Catalog-SW-bulwark-qt), released on 2018-10-05.
 
 =for Pod::Coverage ^(.+)$
 

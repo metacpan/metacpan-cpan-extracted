@@ -3,49 +3,51 @@ abstract: 'A message queue implemented with MongoDB'
 author:
   - 'David Golden <dagolden@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-  File::Spec::Functions: 0
-  List::Util: 0
-  Test::Deep: 0
-  Test::More: 0.96
-  version: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Deep: '0'
+  Test::More: '0.96'
+  perl: '5.010'
 configure_requires:
-  ExtUtils::MakeMaker: 6.17
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MongoDBx-Queue
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   MongoDBx::Queue:
     file: lib/MongoDBx/Queue.pm
-    version: 1.002
+    version: '2.000'
 requires:
-  MongoDB: 0.702
-  Moose: 2
-  MooseX::AttributeShortcuts: 0
-  MooseX::Role::Logger: 0
-  MooseX::Role::MongoDB: 0.006
-  MooseX::Types::Moose: 0
-  Tie::IxHash: 0
-  boolean: 0
-  namespace::autoclean: 0
-  perl: 5.010
-  strict: 0
-  warnings: 0
+  MongoDB: '2'
+  Moose: '2'
+  MooseX::AttributeShortcuts: '0'
+  MooseX::Role::Logger: '0'
+  MooseX::Role::MongoDB: '1'
+  MooseX::Types::Moose: '0'
+  Tie::IxHash: '0'
+  boolean: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/dagolden/MongoDBx-Queue/issues
   homepage: https://github.com/dagolden/MongoDBx-Queue
   repository: https://github.com/dagolden/MongoDBx-Queue.git
-version: 1.002
+version: '2.000'
 x_authority: cpan:DAGOLDEN
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

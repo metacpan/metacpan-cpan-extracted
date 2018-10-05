@@ -212,8 +212,8 @@ say $expr->numeric;     #=> 197
 Math::Bacovia requires the following modules:
 
 * [Math::AnyNum](https://metacpan.org/pod/Math::AnyNum)
+* [List::UtilsBy](https://metacpan.org/pod/List::UtilsBy)
 * [Set::Product::XS](https://metacpan.org/pod/Set::Product::XS)
-* [List::UtilsBy::XS](https://metacpan.org/pod/List::UtilsBy::XS)
 
 # INSTALLATION
 

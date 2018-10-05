@@ -11,9 +11,18 @@ our @EXPORT_OK = qw(
 		       ipv6_chkip
 		       ipv6_parse
 		       is_ipv6
+		       to_string_preferred
+		       to_string_compressed
+		       to_bigint
+		       to_intarray
+		       to_array
+		       to_string_ip6_int
+		       to_string_base65
+		       to_string_ipv4
+		       to_string_ipv4_compressed
 	       );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.91';
+our $VERSION = '0.93';
 
 use Carp;
 use Net::IPv4Addr;
@@ -69,6 +78,20 @@ my %ipv6_patterns = (
 	qr/^::(?:ffff:)?$ipv4$/i,
 	\&ipv6_parse_ipv4_compressed,
     ],
+    'ipv6v4' => [
+	qr/^[a-f0-9]{0,4}::$ipv4$/i,
+	# ::1:2:3:4:1.2.3.4
+	qr/^::(?:$h:){1,5}$ipv4$/i,
+	qr/^(?:$h:):(?:$h:){1,4}$ipv4$/i,
+	qr/^(?:$h:){2}:(?:$h:){1,3}$ipv4$/i,
+	qr/^(?:$h:){3}:(?:$h:){1,2}$ipv4$/i,
+	qr/^(?:$h:){4}:(?:$h:){1}$ipv4$/i,
+	# 1:2:3:4:5::1.2.3.4
+	qr/^(?:$h:){1,5}:$ipv4$/i,
+	# 1:2:3:4:5:6:1.2.3.4
+	qr/^(?:$h:){6}$ipv4$/i,
+	\&parse_mixed_ipv6v4_compressed,
+    ],
     'base85' => [
 	qr/$x$n/,
 	\&ipv6_parse_base85,
@@ -89,7 +112,7 @@ sub mycroak
 {
     my ($message) = @_;
     my @caller = caller (1);
-    croak __PACKAGE__ . '::' . $caller[3] . ' -- ' . $message;
+    croak $caller[3] . ' -- ' . $message;
 }
 
 # Given one argument with a slash or two arguments, return them as two
@@ -115,8 +138,15 @@ sub getargs
 sub match_or_die
 {
     my ($ip, $type) = @_;
+    # Instead of trying to construct a gigantic regex which only
+    # allows two colons in a row, just check here.
+    if ($ip =~ /:::/) {
+	mycroak "invalid address $ip for type $type";
+    }
     my $patterns = $ipv6_patterns{$type};
     for my $p (@$patterns) {
+	# The last thing in the pattern is a code reference, so this
+	# match indicates no matches were found.
 	if (ref($p) eq 'CODE') {
 	    mycroak "invalid address $ip for type $type";
 	}
@@ -159,12 +189,35 @@ sub ipv6_parse_preferred
 sub ipv6_parse_compressed
 {
     my $ip = shift;
-    match_or_die ($ip, 'compressed');
+    my $type = 'compressed';
+    match_or_die ($ip, $type);
     my $colons = ($ip =~ tr/:/:/);
     my $expanded = ':' x (9 - $colons);
     $ip =~ s/::/$expanded/;
     my @pieces = split(/:/, $ip, 8);
     return map { hex } @pieces;
+}
+
+sub parse_mixed_ipv6v4_compressed
+{
+    my $ip = shift;
+    match_or_die ($ip, 'ipv6v4');
+    my @result;
+    my $v4addr;
+    my $colons;
+    $colons = ($ip =~ tr/:/:/);
+    my $expanded = ':' x (8 - $colons);
+    $ip =~ s/::/$expanded/;
+    my @v6pcs = split(/:/, $ip, 7);
+    $v4addr = $v6pcs[-1];
+    splice(@v6pcs, 6);
+    push @result, map { hex } @v6pcs;
+    Net::IPv4Addr::ipv4_parse($v4addr);
+    my @v4pcs = split(/\./, $v4addr);
+    splice(@v4pcs, 4);
+    push @result, unpack("n", pack("CC", @v4pcs[0,1]));
+    push @result, unpack("n", pack("CC", @v4pcs[2,3]));
+    return @result;
 }
 
 # Private parser

@@ -12,3 +12,5 @@
 ^xt/.*\.t$
 ^examples/.*-out\.txt$
 ^lib/Net/IPv6Addr\.pod\.tmpl$
+^research/.*$
+^cover_db/.*$

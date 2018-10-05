@@ -7,7 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Math/Bacovia.pm',
   'PREREQ_PM' => {
                    'Class::Multimethods' => '1.7',
-                   'List::UtilsBy::XS' => 0,
+                   'List::UtilsBy' => '0.06',
                    'Math::AnyNum' => '0.14',
                    'Set::Product::XS' => '0.04',
                    'Test::More' => 0

@@ -1,9 +1,9 @@
 package Music::Duration;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Add 32nd, 64th & odd fractional durations to MIDI-Perl
+# ABSTRACT: Add 32nd, 64th, fractional and tuple durations to MIDI-Perl
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0502';
 use strict;
 use warnings;
 
@@ -64,11 +64,11 @@ __END__
 
 =head1 NAME
 
-Music::Duration - Add 32nd, 64th & odd fractional durations to MIDI-Perl
+Music::Duration - Add 32nd, 64th, fractional and tuple durations to MIDI-Perl
 
 =head1 VERSION
 
-version 0.0500
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,9 @@ version 0.0500
   use Music::Duration;
   Music::Duration::fractional('z', 5);
   # Create and set up a new_score, then for example:
-  n('zsn', 'n38') for 1 .. 5;   # Add a snare sixteenth quintuplet
+  n('zsn', 'n38') for 1 .. 5;
+  Music::Duration::tuple( 'qn', 'z', 5 );
+  n('zqn', 'n38') for 1 .. 5;
 
 =head1 DESCRIPTION
 
@@ -89,7 +91,7 @@ This module adds thirty-second and sixty-fourth note divisions to
 L<MIDI::Simple>.  (These are 32nd: y, dy, ddy, ty and 64th: x, dx, ddx, tx.)
 
 Also, this module allows the addition of non-standard note divisions with the
-B<fractional> function, detailed below.
+B<fractional()> and B<tuple()> functions, detailed below.
 
 =head1 FUNCTIONS
 
@@ -103,8 +105,8 @@ hash.
 
 For the example of 5 divisions, this means that a whole note is 5 beats long.
 The duration for each division is "half as long as the last."  So a half note is
-2 beats long, and a quarter note is, you guessed it - 1.  See the distribution
-test for the full breakdown.
+2.5 beats long, and a quarter note is, you guessed it - 1.25.  See the
+distribution test for the full breakdown.
 
 =head2 tuple()
 

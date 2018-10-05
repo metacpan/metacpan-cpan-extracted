@@ -18,9 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Software::Catalog::SW::firefox",
   "PREREQ_PM" => {
     "Role::Tiny::With" => 0,
-    "Software::Catalog::Role::Software" => "1.0.0",
-    "Software::Catalog::Role::VersionScheme::SemVer" => 0,
+    "Software::Catalog::Role::Software" => "1.0.3",
     "Software::Catalog::Util" => "1.0.0",
+    "Versioning::Scheme::Dotted" => "0.003",
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,10 +42,10 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Role::Tiny::With" => 0,
-  "Software::Catalog::Role::Software" => "1.0.0",
-  "Software::Catalog::Role::VersionScheme::SemVer" => 0,
+  "Software::Catalog::Role::Software" => "1.0.3",
   "Software::Catalog::Util" => "1.0.0",
   "Test::More" => 0,
+  "Versioning::Scheme::Dotted" => "0.003",
   "strict" => 0,
   "warnings" => 0
 );

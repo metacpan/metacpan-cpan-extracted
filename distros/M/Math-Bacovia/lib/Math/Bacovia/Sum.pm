@@ -170,7 +170,7 @@ sub alternatives {
 
 #<<<
             @partial = (
-                List::UtilsBy::XS::nsort_by { $Math::Bacovia::HIERARCHY{ref($_)} }
+                List::UtilsBy::nsort_by { $Math::Bacovia::HIERARCHY{ref($_)} }
                 grep { ref($_) ne 'Math::Bacovia::Number' or $_->{value} != 0 } @partial
             );
 #>>>
@@ -185,7 +185,7 @@ sub alternatives {
         }
         map { [$_->alternatives(%opt)] } @{$x->{values}};
 
-        [List::UtilsBy::XS::uniq_by { $_->stringify } @alt];
+        [List::UtilsBy::uniq_by { $_->stringify } @alt];
     };
 
     @{$x->{_alt}};

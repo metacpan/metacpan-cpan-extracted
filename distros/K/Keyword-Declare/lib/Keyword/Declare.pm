@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001009';
+our $VERSION = '0.001010';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -324,8 +324,8 @@ sub _deprefix {
 
 # Generate the source code that actually installs a keyword...
 sub _build_keyword_code {
-    my ($keyword_name, $keyword_sig, $keyword_ID, $keyword_block, $block_location)
-        = @{shift()}{qw< keyword sig_desc ID block location >};
+    my ($keyword_name, $keyword_sig, $keyword_ID, $keyword_block, $block_location, $prefix_var)
+        = @{shift()}{qw< keyword sig_desc ID block location prefix >};
 
     # Generate the keyword definition and set up its unique lexical ID...
     return qq{
@@ -335,6 +335,22 @@ sub _build_keyword_code {
 #line $block_location
             { $keyword_impls[$keyword_ID]{sig_vars_unpack}  do $keyword_block });
     };
+}
+
+# Locate prefix code for keyword...
+sub _get_prefix {
+    state $source_cache = {};
+
+    my ($trail_ref, $keyword) = @_;
+
+    my $filename = (caller 2)[1];
+    my $source = $source_cache->{$filename} //= do { local (*ARGV, $/); @ARGV=$filename; <> };
+
+    my $trailing = $$trail_ref;
+    $trailing =~ s/\s+\z//;
+    $source =~ s{\b$keyword\s*\Q$trailing\E\s*\z}{};
+
+    return 'qq{' . quotemeta($source) . '}';
 }
 
 
@@ -774,6 +790,11 @@ sub _unpack_attrs {
             $keyword_info_ref->{desc} = $keyword_info_ref->{keyword};
         }
 
+        # Extract any :prefix(...) attr...
+        if ($keyword_info_ref->{attrs} =~ s{\bprefix\( \s* (\$[^\W\d]\w*) \s* \)}{}xms) {
+            $keyword_info_ref->{prefix} = $1;
+        }
+
         # Complain about anything else...
         croak ":then attribute specified too late (must come immediately after parameter list)"
             if $keyword_info_ref->{attrs} =~ s{\bthen\b}{}xms;
@@ -989,7 +1010,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001009
+This document describes Keyword::Declare version 0.001010
 
 
 =head1 STATUS
@@ -2087,7 +2108,7 @@ Keywords may only be specified with four attributes:
 C<:then>, C<:desc>, C<:prefer>, and C<:keepspace>.
 
 You specified some other attribute that the module doesn't know how to
-handle (or possibly misspelled one of the valid three).
+handle (or possibly misspelled one of the valid attribute names).
 
 
 =item C<< Missing » on interpolation «%s... >>

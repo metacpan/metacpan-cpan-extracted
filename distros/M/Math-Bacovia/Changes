@@ -1,5 +1,9 @@
 Revision history for Math-Bacovia
 
+0.04    2018-10-01
+
+        - Switched from `List::UtilsBy::XS` to `List::UtilsBy`, which has fewer build-time dependencies.
+
 0.03    2018-01-05
 
         - Fixed the result of the `atan2(x, y)` function, when `x` and `y` are non-positive numbers.

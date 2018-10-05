@@ -1,0 +1,32 @@
+---
+abstract: 'Generate MVC & OpenAPI RESTful API files from database tables'
+author:
+  - "Ð\x9AÑ\x80Ð°Ñ\x81Ð¸Ð¼Ð¸Ñ\x80 Ð\x91ÐµÑ\x80Ð¾Ð² (berov@cpan.org)"
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Mojo::SQLite: '3.000'
+  Mojolicious::Plugin::OpenAPI: '2.00'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-Author-generate-resources
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Mojolicious: '8.0'
+  perl: '5.020001'
+resources:
+  bugtracker: https://github.com/kberov/Mojolicious-Command-generate-resources/issues
+  homepage: https://github.com/kberov/Mojolicious-Command-generate-resources
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/kberov/Mojolicious-Command-generate-resources.git
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

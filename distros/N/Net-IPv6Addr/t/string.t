@@ -1,9 +1,8 @@
+use warnings;
 use strict;
-use Test;
-BEGIN { plan test => 35; }
+use Test::More;
 
 use Net::IPv6Addr;
-ok(1);
 
 my $w = new Net::IPv6Addr("ab:cd:ef:01:23:45:67:89");
 ok($w->to_string_preferred(), "ab:cd:ef:1:23:45:67:89");
@@ -48,9 +47,15 @@ ok($p->to_string_ipv4(), "0:0:0:0:0:ffff:10.0.0.1");
 ok($p->to_string_ipv4_compressed(), "::ffff:10.0.0.1");
 ok($p->to_string_ip6_int(), "1.0.0.0.0.0.a.0.f.f.f.f.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.INT.");
 
-my $q = new Net::IPv6Addr("0:0:0:0:0:0:10.0.0.1");
+my $q;
+#eval {
+    $q = new Net::IPv6Addr("0:0:0:0:0:0:10.0.0.1");
+#};
+#ok (! $@, "IPv4 as v6 parsed OK");
 ok($q->to_string_preferred(), "0:0:0:0:0:0:a00:1");
 ok($q->to_string_compressed(), "::a00:1");
 ok($q->to_string_ipv4(), "0:0:0:0:0:0:10.0.0.1");
 ok($q->to_string_ipv4_compressed(), "::10.0.0.1");
 ok($q->to_string_ip6_int(), "1.0.0.0.0.0.a.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.INT.");
+
+done_testing ();

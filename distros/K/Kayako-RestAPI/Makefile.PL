@@ -28,11 +28,12 @@ my %WriteMakefileArgs = (
     "utf8" => 0
   },
   "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/lib/Kayako/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "Digest::SHA" => 0,
   "File::Slurp" => 0,
   "Mojo::UserAgent" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "XML::LibXML::Simple" => 0,
   "common::sense" => 0,

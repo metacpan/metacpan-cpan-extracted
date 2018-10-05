@@ -60,7 +60,7 @@ _=<DATA>)){@camel1hum        p=split(//);}while(@dromeda
               57\156\056
 };
 
-ok $camelcode =~ m{ \A (?&PerlOWS) (?&PerlDocument) (?&PerlOWS) \Z  $PPR::GRAMMAR }xms  => "matched Erudil's camelcode";
+ok $camelcode =~ m{ \A (?&PerlDocument) \Z  $PPR::GRAMMAR }xms  => "matched Erudil's camelcode";
 
 done_testing();
 

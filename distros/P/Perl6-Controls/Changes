@@ -28,3 +28,10 @@ Revision history for Perl6-Controls
 
     * Now works with Perl 5.12 or greater
       (under Keyword::Declare 0.001003 or later)
+
+
+0.000007  Fri Oct  5 06:59:48 2018
+
+    * Added LEAVE blocks
+
+    * Added feed to simulate ==> pipelines

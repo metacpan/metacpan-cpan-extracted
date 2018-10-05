@@ -9,7 +9,7 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(perl_tokens);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =encoding utf8
 
@@ -19,7 +19,7 @@ Perl::Tokenizer - A tiny Perl code tokenizer.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -197,8 +197,7 @@ my $perl_keywords =
     ))|h(?:ift|m(?:(?:write|read|ctl|get))|utdown)|in|leep|o(?:cket(?:pair)?|rt)|p(?:li(?:(?:ce|t))|rintf)
     |qrt|rand|t(?:(?:ate?|udy))|ub(?:str)?|y(?:mlink|s(?:(?:write|call|open|read|seek|tem))))|t(?:ell(?:di
     r)?|i(?:(?:mes?|ed?))|runcate)|u(?:c(?:first)?|mask|n(?:def|l(?:(?:ess|ink))|pack|shift|ti[el])|se|tim
-    e)|v(?:(?:alues|ec))|w(?:a(?:it(?:pid)?|ntarray|rn)|h(?:ile|e(?:n|re(?:so|is)))|rite)|xor|BEGIN|END|IN
-    IT|CHECK))\b
+    e)|v(?:(?:alues|ec))|w(?:a(?:it(?:pid)?|ntarray|rn)|h(?:(?:ile|en))|rite)|xor|BEGIN|END|INIT|CHECK))\b
     /x;
 #>>>
 
@@ -277,7 +276,7 @@ sub perl_tokens(&$) {
             }
 
             if ($code =~ /\G\s+/cg) {
-                $callback->({other_space => [$-[0], $+[0]]});
+                $callback->('other_space', $-[0], $+[0]);
                 redo;
             }
         }

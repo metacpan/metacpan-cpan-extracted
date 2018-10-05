@@ -30,7 +30,7 @@ my $builder = Module::Build->new(
      requires => {
                   'perl'                => 5.014,
                   'Math::AnyNum'        => 0.14,
-                  'List::UtilsBy::XS'   => 0,
+                  'List::UtilsBy'       => 0.06,
                   'Set::Product::XS'    => 0.04,
                   'Class::Multimethods' => 1.70,
                  },

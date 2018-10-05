@@ -1,7 +1,7 @@
 package Color::RGB::Util;
 
-our $DATE = '2018-10-04'; # DATE
-our $VERSION = '0.591'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '0.593'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +13,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        mix_2_rgb_colors
+                       mix_rgb_colors
                        rand_rgb_color
                        reverse_rgb_color
                        rgb2grayscale
@@ -42,6 +43,32 @@ sub mix_2_rgb_colors {
                    $r1 + $pct*($r2-$r1),
                    $g1 + $pct*($g2-$g1),
                    $b1 + $pct*($b2-$b1),
+               );
+}
+
+sub mix_rgb_colors {
+
+    my (@weights, @r, @g, @b);
+
+    while (@_ >= 2) {
+        my ($rgb, $weight) = splice @_, 0, 2;
+        my ($r, $g, $b) = $rgb =~ $re_rgb
+            or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
+        push @r, hex $r;
+        push @g, hex $g;
+        push @b, hex $b;
+        push @weights, $weight;
+    }
+    my $tot_r = 0; for (0..$#r) { $tot_r += $r[$_]*$weights[$_] }
+    my $tot_g = 0; for (0..$#g) { $tot_g += $g[$_]*$weights[$_] }
+    my $tot_b = 0; for (0..$#b) { $tot_b += $b[$_]*$weights[$_] }
+    my $tot_weight = 0; $tot_weight += $_ for @weights;
+    die "Zero/negative total weight" unless $tot_weight > 0;
+
+    return sprintf("%02x%02x%02x",
+                   $tot_r / $tot_weight,
+                   $tot_g / $tot_weight,
+                   $tot_b / $tot_weight,
                );
 }
 
@@ -196,12 +223,13 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.591 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2018-10-04.
+This document describes version 0.593 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2018-10-05.
 
 =head1 SYNOPSIS
 
  use Color::RGB::Util qw(
      mix_2_rgb_colors
+     mix_rgb_colors
      rand_rgb_color
      rgb2grayscale
      rgb2sepia
@@ -216,6 +244,10 @@ This document describes version 0.591 of Color::RGB::Util (from Perl distributio
 
  say mix_2_rgb_colors('#ff0000', '#ffffff');     # pink (red + white)
  say mix_2_rgb_colors('ff0000', 'ffffff', 0.75); # pink with a whiter shade
+
+ say mix_rgb_colors('ff0000', 1, 'ffffff', 1);   # pink (red + white 1 : 1)
+ say mix_rgb_colors('ff0000', 1, 'ffffff', 3);   # pink with a whiter shade (red + white 1 : 3)
+ say mix_rgb_colors('ff0000', 1, 'ffffff', 1, '0000ff', 0.5);   # bluish pink
 
  say rand_rgb_color();
  say rand_rgb_color('000000', '333333');         # limit range
@@ -261,6 +293,14 @@ Usage:
 
 Mix 2 RGB colors. C<$pct> is a number between 0 and 1, by default 0.5 (halfway),
 the closer to 1 the closer the resulting color to C<$rgb2>.
+
+=head2 mix_rgb_colors
+
+Usage:
+
+ my $mixed_rgb = mix_rgb_colors($color1, $weight1, $color2, $weight2, ...);
+
+Mix several RGB colors.
 
 =head2 rand_rgb_color
 
@@ -375,7 +415,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Color-RGB-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Color-RGB-Util>.
 
 =head1 BUGS
 

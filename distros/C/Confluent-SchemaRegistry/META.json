@@ -16,6 +16,8 @@
    "no_index" : {
       "directory" : [
          "t",
+         "inc",
+         "t",
          "inc"
       ]
    },
@@ -58,5 +60,5 @@
          "web" : "https://github.com/alivraghi/Confluent-SchemaRegistry.git"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04"
 }

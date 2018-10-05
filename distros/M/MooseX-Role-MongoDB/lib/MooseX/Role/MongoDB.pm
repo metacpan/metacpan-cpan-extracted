@@ -5,13 +5,13 @@ use warnings;
 package MooseX::Role::MongoDB;
 # ABSTRACT: Provide MongoDB connections, databases and collections
 
-our $VERSION = '0.010';
+our $VERSION = '1.000';
 
 use Moose::Role 2;
 use MooseX::AttributeShortcuts;
 
 use Carp ();
-use MongoDB 1;
+use MongoDB 2;
 use MongoDB::MongoClient 1;
 use Socket 1.96 qw/:addrinfo SOCK_RAW/; # IPv6 capable
 use String::Flogger qw/flog/;
@@ -279,7 +279,7 @@ MooseX::Role::MongoDB - Provide MongoDB connections, databases and collections
 
 =head1 VERSION
 
-version 0.010
+version 1.000
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016,2018 -- leonerd@leonerd.org.uk
 
 package Net::Prometheus::Gauge;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
@@ -93,7 +93,8 @@ sub new
 
 =head2 set
 
-   $gauge->set( [ @label_values ], $value )
+   $gauge->set( @label_values, $value )
+   $gauge->set( \%labels, $value )
 
    $child->set( $value )
 
@@ -114,7 +115,8 @@ sub _set_child
 
 =head2 set_function
 
-   $gauge->set_function( [ @label_values ], $func )
+   $gauge->set_function( @label_values, $func )
+   $gauge->set_function( \%labels, $func )
 
    $child->set_function( $func )
 
@@ -134,12 +136,16 @@ sub _set_function_child
    my $self = shift;
    my ( $labelkey, $func ) = @_;
 
+   # Need to store some sort of value so we still iterate on this labelkey
+   # during ->samples
+   $self->{values}{$labelkey}    = undef;
    $self->{functions}{$labelkey} = $func;
 }
 
 =head2 inc
 
-   $gauge->inc( [ @label_values ], $delta )
+   $gauge->inc( @label_values, $delta )
+   $gauge->inc( \%labels, $delta )
 
    $child->inc( $delta )
 
@@ -160,7 +166,8 @@ sub _inc_child
 
 =head2 dec
 
-   $gauge->dec( [ @label_values ], $delta )
+   $gauge->dec( @label_values, $delta )
+   $gauge->dec( \%labels, $delta )
 
    $child->dec( $delta )
 

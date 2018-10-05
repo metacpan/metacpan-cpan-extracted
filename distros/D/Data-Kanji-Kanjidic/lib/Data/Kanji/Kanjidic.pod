@@ -11,18 +11,18 @@ Data::Kanji::Kanjidic - parse the "kanjidic" kanji data file
 =head1 SYNOPSIS
 
     use Data::Kanji::Kanjidic 'parse_kanjidic';
-    my $kanji = parse_kanjidic ('/path/to/kanjidic');
+    my $kanji = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
     for my $k (keys %$kanji) {
         print "$k has radical number $kanji->{$k}{radical}.\n";
     }
 
-(This example is included as L<F<example.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/example.pl> in the distribution.)
+(This example is included as L<F<example.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/example.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Data::Kanji::Kanjidic version 0.15
-corresponding to git commit L<6e3f60569b57b1a8254b10873437769812964c26|https://github.com/benkasminbullock/Data-Kanji-Kanjidic/commit/6e3f60569b57b1a8254b10873437769812964c26> released on Thu Feb 2 14:36:47 2017 +0900.
+This documents Data::Kanji::Kanjidic version 0.16
+corresponding to git commit L<fae7e516e66801df9d011eb61ac69dfca1ff55dd|https://github.com/benkasminbullock/Data-Kanji-Kanjidic/commit/fae7e516e66801df9d011eb61ac69dfca1ff55dd> released on Fri Oct 5 10:09:51 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -40,13 +40,14 @@ in the old format, rather than the new-format XML file.
 =head2 parse_kanjidic
 
     
+    use utf8;
     use Data::Kanji::Kanjidic 'parse_kanjidic';
-    my $kanjidic = parse_kanjidic ('/path/to/kanjidic');
+    my $kanjidic = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
     print "@{$kanjidic->{猫}{english}}\n";
     # This prints out "cat".
     
 
-(This example is included as L<F<parse-kanjidic.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/parse-kanjidic.pl> in the distribution.)
+(This example is included as L<F<parse-kanjidic.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/parse-kanjidic.pl> in the distribution.)
 
 
 The input is the file name where Kanjidic may be found. The return
@@ -172,7 +173,7 @@ frequently used.
 
     
     use Data::Kanji::Kanjidic 'parse_kanjidic';
-    my $kanji = parse_kanjidic ('/path/to/kanjidic');
+    my $kanji = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
     my @sorted;
     for my $k (keys %$kanji) {
         if ($kanji->{$k}->{F}) {
@@ -185,7 +186,7 @@ frequently used.
     }
     
 
-(This example is included as L<F<frequency.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/frequency.pl> in the distribution.)
+(This example is included as L<F<frequency.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/frequency.pl> in the distribution.)
 
 
 =item G
@@ -289,7 +290,7 @@ romanised. This example also requires L<Lingua::KO::Munja>.
         }
     }
 
-(This example is included as L<F<korean.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/korean.pl> in the distribution.)
+(This example is included as L<F<korean.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/korean.pl> in the distribution.)
 
 
 =item X
@@ -395,7 +396,7 @@ English-language meanings listed.
     }
     
 
-(This example is included as L<F<english-to-kanji.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/english-to-kanji.pl> in the distribution.)
+(This example is included as L<F<english-to-kanji.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/english-to-kanji.pl> in the distribution.)
 
 
 Given input like this,
@@ -422,6 +423,7 @@ Perl's internal Unicode encoding.
 The following example prints a list of kanji which have the same on'yomi:
 
     use Data::Kanji::Kanjidic 'parse_kanjidic';
+    use utf8;
     my $kanji = parse_kanjidic ($ARGV[0]);
     my %all_onyomi;
     for my $k (keys %$kanji) {
@@ -438,7 +440,7 @@ The following example prints a list of kanji which have the same on'yomi:
         }
     }
 
-(This example is included as L<F<onyomi-same.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/onyomi-same.pl> in the distribution.)
+(This example is included as L<F<onyomi-same.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/onyomi-same.pl> in the distribution.)
 
 
 =item kunyomi
@@ -484,7 +486,7 @@ For example, to print all the existing values,
 
     
     use Data::Kanji::Kanjidic 'parse_kanjidic';
-    my $kanji = parse_kanjidic ("/path/to/kanjidic");
+    my $kanji = parse_kanjidic ("/home/ben/data/edrdg/kanjidic");
     for my $k (sort keys %$kanji) {
         my $mo = $kanji->{$k}->{morohashi};
         if ($mo) {
@@ -493,7 +495,7 @@ For example, to print all the existing values,
     }
     
 
-(This example is included as L<F<morohashi.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/morohashi.pl> in the distribution.)
+(This example is included as L<F<morohashi.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/morohashi.pl> in the distribution.)
 
 
 =back
@@ -563,7 +565,7 @@ grade to standard output:
 
     
     use Data::Kanji::Kanjidic qw/parse_kanjidic grade/;
-    my $kanjidic = parse_kanjidic ('/path/to/kanjidic');
+    my $kanjidic = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
     for my $grade (1..6) {
         my $list = grade ($kanjidic, $grade);
         print "Grade $grade:\n\n";
@@ -579,7 +581,7 @@ grade to standard output:
     }
     
 
-(This example is included as L<F<grades.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/grades.pl> in the distribution.)
+(This example is included as L<F<grades.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/grades.pl> in the distribution.)
 
 
 =head1 SEE ALSO
@@ -646,6 +648,7 @@ exported by the module may be exported by using the export tag ":all":
     use Data::Kanji::Kanjidic ':all';
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -653,7 +656,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2017
+2011-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -1,7 +1,7 @@
 package Software::Catalog::SW::zotero;
 
-our $DATE = '2018-09-22'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,8 +11,8 @@ use PerlX::Maybe;
 use Software::Catalog::Util qw(extract_from_url);
 
 use Role::Tiny::With;
+with 'Versioning::Scheme::Dotted';
 with 'Software::Catalog::Role::Software';
-#with 'Software::Catalog::Role::VersionScheme::SemVer';
 
 our %SPEC;
 
@@ -82,13 +82,13 @@ sub get_download_url {
      }];
 }
 
-sub get_programs {
+sub get_archive_info {
     my ($self, %args) = @_;
-    [200, "OK", [
-        {name=>"zcoin-cli", path=>"/bin"},
-        {name=>"zcoin-qt", path=>"/bin"},
-        {name=>"zcoind", path=>"/bin"},
-    ]];
+    [200, "OK", {
+        programs => [
+            {name=>"zotero", path=>"/"},
+        ],
+    }];
 }
 
 1;
@@ -106,7 +106,7 @@ Software::Catalog::SW::zotero - Zotero
 
 =head1 VERSION
 
-This document describes version 0.002 of Software::Catalog::SW::zotero (from Perl distribution Software-Catalog-SW-zotero), released on 2018-09-22.
+This document describes version 0.004 of Software::Catalog::SW::zotero (from Perl distribution Software-Catalog-SW-zotero), released on 2018-10-05.
 
 =for Pod::Coverage ^(.+)$
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-os_unsupported if $^O ne 'darwin';
+die "OS unsupported\n" if $^O ne 'darwin';
 
 WriteMakefile(
     NAME                => 'App::SlowQuitApps',

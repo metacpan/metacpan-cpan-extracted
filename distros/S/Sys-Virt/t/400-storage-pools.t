@@ -60,7 +60,7 @@ my $xml = "<pool type='dir'>
   <name>wibble</name>
   <uuid>12341234-5678-5678-5678-123412341234</uuid>
   <target>
-    <path>/default-pool</path>
+    <path>/wibble</path>
   </target>
 </pool>";
 

@@ -6,12 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Software/Catalog.pm',
     'Software/Catalog/Role/Software.pm',
-    'Software/Catalog/Role/VersionScheme/SemVer.pm',
     'Software/Catalog/Util.pm'
 );
 

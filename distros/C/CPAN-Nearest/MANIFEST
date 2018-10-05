@@ -1,6 +1,6 @@
 Changes
+examples/harry-potter.pl
 examples/synopsis.pl
-inc/Devel/CheckLib.pm
 lib/CPAN/Nearest.pm
 lib/CPAN/Nearest.pod
 Makefile.PL
@@ -9,8 +9,5 @@ MANIFEST.SKIP
 README
 t/CPAN-Nearest.t
 time-performance.pl
-xt/checkpod.t
-xt/distro.t
-xt/git.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

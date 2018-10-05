@@ -3,6 +3,7 @@ abstract: 'Perl library for working with L<Kayako REST API|https://kayako.atlass
 author:
   - 'Pavel Serikov <pavelsr@cpan.org>'
 build_requires:
+  Test::Exception: '0'
   Test::More: '0'
   strict: '0'
   warnings: '0'
@@ -26,5 +27,5 @@ requires:
 resources:
   homepage: https://github.com/pavelsr/Kayako-RestAPI
   repository: https://github.com/pavelsr/Kayako-RestAPI.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'YAML::Tiny version 1.70'

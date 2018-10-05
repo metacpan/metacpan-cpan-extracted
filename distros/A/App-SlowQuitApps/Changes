@@ -7,3 +7,12 @@ Revision history for App-SlowQuitApps
 
 0.000002  Tue Jul 24 19:00:40 2018
           No changes logged
+
+
+0.000003  Fri Oct  5 06:35:26 2018
+
+    * Redirected error messages when reading/setting defaults
+      (silencing annoying "Does not exist" warnings)
+
+    * Eliminated requirement for recent version of
+      ExtUtils::MakeMaker (thanks, Slaven!)

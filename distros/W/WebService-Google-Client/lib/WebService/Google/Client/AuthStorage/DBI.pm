@@ -1,5 +1,5 @@
 package WebService::Google::Client::AuthStorage::DBI;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Specific methods to fetch tokens from DBI data source (not written yet)
 
@@ -15,7 +15,7 @@ WebService::Google::Client::AuthStorage::DBI - Specific methods to fetch tokens 
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

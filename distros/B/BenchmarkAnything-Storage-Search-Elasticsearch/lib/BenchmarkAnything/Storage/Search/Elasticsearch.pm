@@ -1,9 +1,9 @@
 package BenchmarkAnything::Storage::Search::Elasticsearch;
-# git description: v0.001-2-ge5f22bf
+# git description: v0.003-1-g92e43ff
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Utility functions to use Elasticsearch with BenchmarkAnything storage
-$BenchmarkAnything::Storage::Search::Elasticsearch::VERSION = '0.002';
+$BenchmarkAnything::Storage::Search::Elasticsearch::VERSION = '0.004';
 use 5.008;
 use strict;
 use warnings;
@@ -23,10 +23,12 @@ sub get_elasticsearch_client {
     die "benchmarkanything-storage-search-elasticsearch: missing config 'elasticsearch.type'"  unless $s_type;
 
     # Elasticsearch
-    my $or_es = Search::Elasticsearch->new
-     (client => ($cfg->{client} || "5_0::Direct"),
+    my %es_cfg =
+     (client => ($cfg->{client}               ||  "5_0::Direct"),
+      nodes  => ($cfg->{elasticsearch}{nodes} || ["localhost:9200"]),
       $opt->{ownjson} ? (serializer => "+BenchmarkAnything::Storage::Search::Elasticsearch::Serializer::JSON::DontTouchMyUTF8") : (),
      );
+    my $or_es = Search::Elasticsearch->new(%es_cfg);
 
     return wantarray ? ($or_es, $s_index, $s_type) : $or_es;
 }
@@ -83,13 +85,13 @@ sub get_elasticsearch_query
                           else
                           {
                               require Data::Dumper;
-                              print STDERR "_get_elasticsearch_query: unknown order_by clause: ".Data::Dumper::Dumper($_)."\n";
+                              warn "_get_elasticsearch_query: unknown order_by clause: ".Data::Dumper::Dumper($_)."\n";
                               return;
                           }
                           @e
                       } @{ $ar_ba_order_by || [] }
                   ]);
-    my %from = !$i_ba_offset ? () : ( from => $i_ba_offset+1 );
+    my %from = !$i_ba_offset ? () : ( from => $i_ba_offset );
     my %size = ( size => ($i_ba_limit || $default_max_size) );
 
     my %range_operator =
@@ -107,13 +109,18 @@ sub get_elasticsearch_query
      (
       '!=' => 1,
      );
+    my %empty_match_operator =
+     (
+      'is_empty' => 1,
+     );
     my %wildcard_match_operator =
      (
       'like' => 1,
      );
     my %wildcard_not_match_operator =
      (
-      'not like' => 1,
+      'not like' => 1, # deprecated
+      'not_like' => 1,
      );
     foreach my $w (@{ $ar_ba_where || [] })
     {
@@ -144,6 +151,28 @@ sub get_elasticsearch_query
             $es_v =~ s/%/*/g;
             push @must_matches,       { wildcard => { $k => $es_v } };
         }
+        elsif ($es_op = $empty_match_operator{$op})
+        {
+            if (@v and $v[0] == 0) {
+                # field is NOT EMPTY: [ "is_empty", "some_field_name", 0 ]
+                push @must_matches, { wildcard => { $k => '*' } };
+
+            } elsif (@v and $v[0] == 2) {
+                # field is EMPTY but exists (ie. not undefined): [ "is_empty", "some_field_name", 2 ]
+                push @must_not_matches, { wildcard => { $k => '*' } };
+                push @must_matches,     { exists   => { field => $k } };
+
+            } elsif (not @v or $v[0] == 1) {
+                # field is EMPTY or UNDEFINED/NULL: [ "is_empty", "some_field_name", 1 ] or [ "is_empty", "some_field_name" ]
+                push @must_not_matches, { wildcard => { $k => '*' } };
+
+            } else {
+                # we might invent other semantics so we better warn about
+                # what could once become meaningful.
+                warn "unclear 'is_empty' condition (".$v[0]."). Interpreting as 'is_empty' condition (1).";
+                push @must_not_matches, { wildcard => { $k => '*' } };
+            }
+        }
         elsif ($es_op = $wildcard_not_match_operator{$op})
         {
             my $es_v = $v[0];
@@ -152,7 +181,7 @@ sub get_elasticsearch_query
         }
         else
         {
-            print STDERR "_get_elasticsearch_query: Unsupported operator: $op\n";
+            warn "_get_elasticsearch_query: Unsupported operator: $op\n";
             return;
         }
     }
@@ -218,7 +247,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2018 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

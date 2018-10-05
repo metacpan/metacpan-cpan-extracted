@@ -1,7 +1,7 @@
 package Software::Catalog::SW::zcoin::qt;
 
-our $DATE = '2018-09-21'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,14 +10,15 @@ use warnings;
 use PerlX::Maybe;
 
 use Role::Tiny::With;
+with 'Versioning::Scheme::Dotted';
 with 'Software::Catalog::Role::Software';
-#with 'Software::Catalog::Role::VersionScheme::SemVer';
 
 use Software::Catalog::Util qw(extract_from_url);
 
 sub meta {
     return {
         homepage_url => "http://zcoin.io/",
+        versioning_scheme => "Dotted",
     };
 }
 
@@ -62,17 +63,20 @@ sub get_download_url {
          "",
          "https://github.com/zcoinofficial/zcoin/releases/download/$version/$filename",
      ), {
+         'func.version' => $version,
          'func.filename' => $filename,
      }];
 }
 
-sub get_programs {
+sub get_archive_info {
     my ($self, %args) = @_;
-    [200, "OK", [
-        {name=>"zcoin-cli", path=>"/bin"},
-        {name=>"zcoin-qt", path=>"/bin"},
-        {name=>"zcoind", path=>"/bin"},
-    ]];
+    [200, "OK", {
+        programs => [
+            {name=>"zcoin-cli", path=>"/bin"},
+            {name=>"zcoin-qt", path=>"/bin"},
+            {name=>"zcoind", path=>"/bin"},
+        ],
+    }];
 }
 
 1;
@@ -90,7 +94,7 @@ Software::Catalog::SW::zcoin::qt - Zcoin desktop GUI client
 
 =head1 VERSION
 
-This document describes version 0.001 of Software::Catalog::SW::zcoin::qt (from Perl distribution Software-Catalog-SW-zcoin-qt), released on 2018-09-21.
+This document describes version 0.003 of Software::Catalog::SW::zcoin::qt (from Perl distribution Software-Catalog-SW-zcoin-qt), released on 2018-10-05.
 
 =for Pod::Coverage ^(.+)$
 

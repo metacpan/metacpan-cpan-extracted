@@ -12,3 +12,4 @@ MYMETA.*
 ^examples/.*-out\.txt$
 ^make-pod\.pl$
 ^lib/Lingua/KO/Munja\.pod\.tmpl$
+^xt/.*\.t$

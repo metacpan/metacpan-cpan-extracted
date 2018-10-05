@@ -12,7 +12,7 @@
                     |__/       
 
 
-This is the README for Lingua::KO::Munja version 0.07.
+This is the README for Lingua::KO::Munja version 0.08.
 
 Lingua::KO::Munja is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -67,11 +67,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Lingua::KO::Munja
 
-To install the module from the source file, Lingua-KO-Munja-0.07.tar.gz,
+To install the module from the source file, Lingua-KO-Munja-0.08.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Lingua-KO-Munja-0.07.tar.gz
-    cd Lingua-KO-Munja-0.07
+    tar xfz Lingua-KO-Munja-0.08.tar.gz
+    cd Lingua-KO-Munja-0.08
     perl Makefile.PL
     make
     make install
@@ -96,6 +96,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Mar  1 18:15:46 2017.
+This README was written on Fri Oct  5 11:08:18 2018.
 
 -----------------------------------------------------------------------------

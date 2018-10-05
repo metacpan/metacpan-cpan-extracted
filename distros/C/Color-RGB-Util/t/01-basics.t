@@ -8,6 +8,7 @@ use Test::More 0.98;
 
 use Color::RGB::Util qw(
                            mix_2_rgb_colors
+                           mix_rgb_colors
                            rand_rgb_color
                            rgb2grayscale
                            rgb2sepia
@@ -27,6 +28,15 @@ subtest mix_2_rgb_colors => sub {
     is(mix_2_rgb_colors('FF8800', '0033CC', 1), '0033cc');
     is(mix_2_rgb_colors('0033CC', 'FF8800', 0.75), 'bf7233');
     is(mix_2_rgb_colors('0033CC', 'FF8800', 0.25), '3f4899');
+};
+
+subtest mix_rgb_colors => sub {
+    dies_ok { mix_rgb_colors('0', 1) } 'invalid rgb -> dies';
+    dies_ok { mix_rgb_colors('000000', 0) } 'total weight zero #1 -> dies';
+    dies_ok { mix_rgb_colors('000000', 0) } 'total weight zero #2 -> dies';
+    is(mix_rgb_colors('#ff8800', 1, '#0033cc', 1), '7f5d66');
+    is(mix_rgb_colors('#ff8800', 2, '#0033cc', 1), 'aa6b44');
+    is(mix_rgb_colors('#ff8800', 1, '#0033cc', 2, '000000', 3), '2a2744');
 };
 
 subtest rand_rgb_color => sub {

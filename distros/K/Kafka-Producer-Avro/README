@@ -57,9 +57,8 @@ DESCRIPTION
     Returns a non-blank value (a reference to a hash with server response
     description) if the message is successfully sent.
 
-    Despite Kafka::Producer"-"send()> method that expects positional
-    arguments, "Kafka::Producer::Avro-"send()> method looks for named
-    parameters:
+    Despite Kafka::Producer method that expects positional arguments,
+    "Kafka::Producer::Avro-"send()> method looks for named parameters:
 
       $producer->send(
             topic             => $topic,             # scalar 
@@ -74,9 +73,9 @@ DESCRIPTION
     Extra arguments may be suggested:
 
     "key_schema => $key_schema" and "value_schema => $value_schema"
-       Both $key_schema and $value_schema parametrs are optional and provide
-       JSON strings that represent Avro schemas to use to validate and
-       serialize key(s) and value(s).
+       Both $key_schema and $value_schema parameters are optional and
+       provide JSON strings that represent Avro schemas to use to validate
+       and serialize key(s) and value(s).
 
        These schemas are validated against "schema_registry" and, if
        compliant, they are added to the registry under the "$topic+'key'" or
@@ -88,7 +87,7 @@ DESCRIPTION
    "bulk_send( %params )"
     Similar to "send" but uses bulks to avoid memory leaking.
 
-    Extra named parametrs are expected:
+    Extra named parameters are expected:
 
     "size => $size"
        The size of the bulk
@@ -140,7 +139,7 @@ AUTHOR
 CONTRIBUTE
     <https://github.com/alivraghi/Kafka-Producer-Avro>
 
-BUG
+BUGS
     Please use GitHub project link above to report problems or contact
     authors.
 

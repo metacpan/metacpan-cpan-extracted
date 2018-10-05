@@ -105,3 +105,8 @@ Revision history for Keyword-Declare
       (Thanks, Slavin)
 
     * Added 'unkeyword' anti-meta-keyword to remove keywords
+
+
+0.001010  Fri Oct  5 07:09:40 2018
+
+    * Minor doc tweaks

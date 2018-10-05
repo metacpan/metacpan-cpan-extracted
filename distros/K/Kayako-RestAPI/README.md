@@ -4,7 +4,7 @@ Kayako::RestAPI - Perl library for working with [Kayako REST API](https://kayako
 
 # VERSION
 
-version 0.06
+version 0.07
 
 # SYNOPSIS
 
@@ -67,6 +67,10 @@ Convert xml API response to hash using XML::XML2JSON::xml2obj method
     my $hash = $kayako_api->xml2obj($xml);
 
 Can potentially crash is returned xml isn't valid (when XML::XML2JSON dies)
+
+## last\_res
+
+    Get latest result from user agent. For debug purpose
 
 ## get\_hash
 

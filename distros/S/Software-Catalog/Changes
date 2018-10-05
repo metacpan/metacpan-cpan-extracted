@@ -1,3 +1,15 @@
+1.0.3   2018-10-05 (PERLANCAR)
+
+	- SW:Role::Software: requires get_latest_version, get_download_url,
+	  get_archive_info, is_valid_version, cmp_version.
+
+
+1.0.2   2018-10-04 (PERLANCAR)
+
+	- Remove role: Software::Catalog::Role::VersionScheme::* (moved to
+	  Versioning::Scheme::* in their own distro).
+
+
 1.0.1   2018-09-13 (PERLANCAR)
 
 	- Add role: VersionScheme::SemVer.

@@ -77,7 +77,7 @@ my $hello_world = <<'END_SOURCE';
 
 END_SOURCE
 
-ok $hello_world =~ m{ \A (?&PerlOWS) (?&PerlDocument) (?&PerlOWS) \Z  $PPR::GRAMMAR }xms 
+ok $hello_world =~ m{ \A (?&PerlDocument)  \Z  $PPR::GRAMMAR }xms
     => "matched Acme::Eyedrops Hello, World!";
 
 done_testing();

@@ -1,3 +1,13 @@
+0.004   2018-10-05 (PERLANCAR)
+
+	- Update to Software::Catalog 1.0.3.
+
+
+0.003   2018-10-04 (PERLANCAR)
+
+	- merge.
+
+
 0.002   2018-09-22 (PERLANCAR)
 
 	- No functional changes.
@@ -5,6 +15,6 @@
 	- Fix Abstract.
 
 
-0.001   2018-09-21 (PERLANCAR) (unreleased)
+0.001   2018-09-21 (PERLANCAR)
 
         - First release.

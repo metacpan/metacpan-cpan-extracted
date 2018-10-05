@@ -261,7 +261,7 @@ sub tests {
               if ($@);
 
             # Create SMTP object
-            my $smtp = Net::SMTP->new( $conf->{SMTPServer} );
+            my $smtp = Net::SMTP->new( $conf->{SMTPServer}, Timeout => 5 );
             return ( 1,
                 "SMTP connection to " . $conf->{SMTPServer} . " failed" )
               unless ($smtp);

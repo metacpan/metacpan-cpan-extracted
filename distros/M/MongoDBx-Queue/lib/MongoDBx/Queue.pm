@@ -5,13 +5,14 @@ use warnings;
 package MongoDBx::Queue;
 
 # ABSTRACT: A message queue implemented with MongoDB
-our $VERSION = '1.002'; # VERSION
+
+our $VERSION = '2.000';
 
 use Moose 2;
 use MooseX::Types::Moose qw/:all/;
 use MooseX::AttributeShortcuts;
 
-use MongoDB 0.702 ();
+use MongoDB 2 ();
 use Tie::IxHash;
 use boolean;
 use namespace::autoclean;
@@ -20,19 +21,19 @@ my $ID       = '_id';
 my $RESERVED = '_r';
 my $PRIORITY = '_p';
 
-with 'MooseX::Role::Logger', 'MooseX::Role::MongoDB' => { -version => 0.006 };
+with 'MooseX::Role::Logger', 'MooseX::Role::MongoDB' => { -version => 1.000 };
 
 #--------------------------------------------------------------------------#
 # Public attributes
 #--------------------------------------------------------------------------#
 
-# =attr database_name
-#
-# A MongoDB database name.  Unless a C<db_name> is provided in the
-# C<client_options> attribute, this database will be the default for
-# authentication.  Defaults to 'test'
-#
-# =cut
+#pod =attr database_name
+#pod
+#pod A MongoDB database name.  Unless a C<db_name> is provided in the
+#pod C<client_options> attribute, this database will be the default for
+#pod authentication.  Defaults to 'test'
+#pod
+#pod =cut
 
 has database_name => (
     is      => 'ro',
@@ -40,12 +41,12 @@ has database_name => (
     default => 'test',
 );
 
-# =attr client_options
-#
-# A hash reference of L<MongoDB::MongoClient> options that will be passed to its
-# C<connect> method.
-#
-# =cut
+#pod =attr client_options
+#pod
+#pod A hash reference of L<MongoDB::MongoClient> options that will be passed to its
+#pod C<connect> method.
+#pod
+#pod =cut
 
 has client_options => (
     is      => 'ro',
@@ -53,12 +54,12 @@ has client_options => (
     default => sub { {} },
 );
 
-# =attr collection_name
-#
-# A collection name for the queue.  Defaults to 'queue'.  The collection must
-# only be used by MongoDBx::Queue or unpredictable awful things will happen.
-#
-# =cut
+#pod =attr collection_name
+#pod
+#pod A collection name for the queue.  Defaults to 'queue'.  The collection must
+#pod only be used by MongoDBx::Queue or unpredictable awful things will happen.
+#pod
+#pod =cut
 
 has collection_name => (
     is      => 'ro',
@@ -66,200 +67,181 @@ has collection_name => (
     default => 'queue',
 );
 
-# =attr safe
-#
-# Boolean that controls whether 'safe' inserts/updates are done.
-# Defaults to true.
-#
-# =cut
-
-has safe => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 1,
-);
-
 sub _build__mongo_default_database { $_[0]->database_name }
-sub _build__mongo_client_options   { $_[0]->client_options }
+
+sub _build__mongo_client_options {
+    return {
+        write_concern => { w     => "majority" },
+        read_concern  => { level => "majority" },
+        %{ $_[0]->client_options },
+    };
+}
 
 sub BUILD {
     my ($self) = @_;
     # ensure index on PRIORITY in the same order we use for reserving
     $self->_mongo_collection( $self->collection_name )
-      ->ensure_index( [ $PRIORITY => 1 ] );
+      ->indexes->create_one( [ $PRIORITY => 1 ] );
 }
 
 #--------------------------------------------------------------------------#
 # Public methods
 #--------------------------------------------------------------------------#
 
-# =method new
-#
-#    $queue = MongoDBx::Queue->new(
-#         database_name   => "my_app",
-#         client_options  => {
-#             host => "mongodb://example.net:27017",
-#             username => "willywonka",
-#             password => "ilovechocolate",
-#         },
-#    );
-#
-# Creates and returns a new queue object.
-#
-# =method add_task
-#
-#   $queue->add_task( \%message, \%options );
-#
-# Adds a task to the queue.  The C<\%message> hash reference will be shallow
-# copied into the task and not include objects except as described by
-# L<MongoDB::DataTypes>.  Top-level keys must not start with underscores, which are
-# reserved for MongoDBx::Queue.
-#
-# The C<\%options> hash reference is optional and may contain the following key:
-#
-# =for :list
-# * C<priority>: sets the priority for the task. Defaults to C<time()>.
-#
-# Note that setting a "future" priority may cause a task to be invisible
-# to C<reserve_task>.  See that method for more details.
-#
-# =cut
+#pod =method new
+#pod
+#pod    $queue = MongoDBx::Queue->new(
+#pod         database_name   => "my_app",
+#pod         client_options  => {
+#pod             host => "mongodb://example.net:27017",
+#pod             username => "willywonka",
+#pod             password => "ilovechocolate",
+#pod         },
+#pod    );
+#pod
+#pod Creates and returns a new queue object.
+#pod
+#pod =method add_task
+#pod
+#pod   $queue->add_task( \%message, \%options );
+#pod
+#pod Adds a task to the queue.  The C<\%message> hash reference will be shallow
+#pod copied into the task and not include objects except as described by
+#pod L<MongoDB::DataTypes>.  Top-level keys must not start with underscores, which are
+#pod reserved for MongoDBx::Queue.
+#pod
+#pod The C<\%options> hash reference is optional and may contain the following key:
+#pod
+#pod =for :list
+#pod * C<priority>: sets the priority for the task. Defaults to C<time()>.
+#pod
+#pod Note that setting a "future" priority may cause a task to be invisible
+#pod to C<reserve_task>.  See that method for more details.
+#pod
+#pod =cut
 
 sub add_task {
     my ( $self, $data, $opts ) = @_;
 
     $self->_mongo_collection( $self->collection_name )
-      ->insert( { %$data, $PRIORITY => $opts->{priority} // time(), },
-        { safe => $self->safe, } );
+      ->insert_one( { %$data, $PRIORITY => $opts->{priority} // time() } );
 }
 
-# =method reserve_task
-#
-#   $task = $queue->reserve_task;
-#   $task = $queue->reserve_task( \%options );
-#
-# Atomically marks and returns a task.  The task is marked in the queue as
-# "reserved" (in-progress) so it can not be reserved again unless is is
-# rescheduled or timed-out.  The task returned is a hash reference containing the
-# data added in C<add_task>, including private keys for use by MongoDBx::Queue
-# methods.
-#
-# Tasks are returned in priority order from lowest to highest.  If multiple tasks
-# have identical, lowest priorities, their ordering is undefined.  If no tasks
-# are available or visible, it will return C<undef>.
-#
-# The C<\%options> hash reference is optional and may contain the following key:
-#
-# =for :list
-# * C<max_priority>: sets the maximum priority for the task. Defaults to C<time()>.
-#
-# The C<max_priority> option controls whether "future" tasks are visible.  If
-# the lowest task priority is greater than the C<max_priority>, this method
-# returns C<undef>.
-#
-# =cut
+#pod =method reserve_task
+#pod
+#pod   $task = $queue->reserve_task;
+#pod   $task = $queue->reserve_task( \%options );
+#pod
+#pod Atomically marks and returns a task.  The task is marked in the queue as
+#pod "reserved" (in-progress) so it can not be reserved again unless is is
+#pod rescheduled or timed-out.  The task returned is a hash reference containing the
+#pod data added in C<add_task>, including private keys for use by MongoDBx::Queue
+#pod methods.
+#pod
+#pod Tasks are returned in priority order from lowest to highest.  If multiple tasks
+#pod have identical, lowest priorities, their ordering is undefined.  If no tasks
+#pod are available or visible, it will return C<undef>.
+#pod
+#pod The C<\%options> hash reference is optional and may contain the following key:
+#pod
+#pod =for :list
+#pod * C<max_priority>: sets the maximum priority for the task. Defaults to C<time()>.
+#pod
+#pod The C<max_priority> option controls whether "future" tasks are visible.  If
+#pod the lowest task priority is greater than the C<max_priority>, this method
+#pod returns C<undef>.
+#pod
+#pod =cut
 
 sub reserve_task {
     my ( $self, $opts ) = @_;
 
-    my $now    = time();
-    my $result = $self->_mongo_database->run_command(
-        [
-            findAndModify => $self->collection_name,
-            query         => {
-                $PRIORITY => { '$lte' => $opts->{max_priority} // $now },
-                $RESERVED => { '$exists' => boolean::false },
-            },
-            sort => { $PRIORITY => 1 },
-            update => { '$set' => { $RESERVED => $now } },
-        ]
+    my $now = time();
+    return $self->_mongo_collection( $self->collection_name )->find_one_and_update(
+        {
+            $PRIORITY => { '$lte'    => $opts->{max_priority} // $now },
+            $RESERVED => { '$exists' => boolean::false },
+        },
+        { '$set' => { $RESERVED => $now } },
+        { sort   => [ $PRIORITY => 1 ] },
     );
-
-    # XXX check get_last_error? -- xdg, 2012-08-29
-    if ( ref $result ) {
-        return $result->{value}; # could be undef if not found
-    }
-    else {
-        die "MongoDB error: $result"; # XXX docs unclear, but imply string error
-    }
 }
 
-# =method reschedule_task
-#
-#   $queue->reschedule_task( $task );
-#   $queue->reschedule_task( $task, \%options );
-#
-# Releases the reservation on a task so it can be reserved again.
-#
-# The C<\%options> hash reference is optional and may contain the following key:
-#
-# =for :list
-# * C<priority>: sets the priority for the task. Defaults to the task's original priority.
-#
-# Note that setting a "future" priority may cause a task to be invisible
-# to C<reserve_task>.  See that method for more details.
-#
-# =cut
+#pod =method reschedule_task
+#pod
+#pod   $queue->reschedule_task( $task );
+#pod   $queue->reschedule_task( $task, \%options );
+#pod
+#pod Releases the reservation on a task so it can be reserved again.
+#pod
+#pod The C<\%options> hash reference is optional and may contain the following key:
+#pod
+#pod =for :list
+#pod * C<priority>: sets the priority for the task. Defaults to the task's original priority.
+#pod
+#pod Note that setting a "future" priority may cause a task to be invisible
+#pod to C<reserve_task>.  See that method for more details.
+#pod
+#pod =cut
 
 sub reschedule_task {
     my ( $self, $task, $opts ) = @_;
-    $self->_mongo_collection( $self->collection_name )->update(
+    $self->_mongo_collection( $self->collection_name )->update_one(
         { $ID => $task->{$ID} },
         {
             '$unset' => { $RESERVED => 0 },
             '$set'   => { $PRIORITY => $opts->{priority} // $task->{$PRIORITY} },
         },
-        { safe => $self->safe }
     );
 }
 
-# =method remove_task
-#
-#   $queue->remove_task( $task );
-#
-# Removes a task from the queue (i.e. indicating the task has been processed).
-#
-# =cut
+#pod =method remove_task
+#pod
+#pod   $queue->remove_task( $task );
+#pod
+#pod Removes a task from the queue (i.e. indicating the task has been processed).
+#pod
+#pod =cut
 
 sub remove_task {
     my ( $self, $task ) = @_;
     $self->_mongo_collection( $self->collection_name )
-      ->remove( { $ID => $task->{$ID} } );
+      ->delete_one( { $ID => $task->{$ID} } );
 }
 
-# =method apply_timeout
-#
-#   $queue->apply_timeout( $seconds );
-#
-# Removes reservations that occurred more than C<$seconds> ago.  If no
-# argument is given, the timeout defaults to 120 seconds.  The timeout
-# should be set longer than the expected task processing time, so that
-# only dead/hung tasks are returned to the active queue.
-#
-# =cut
+#pod =method apply_timeout
+#pod
+#pod   $queue->apply_timeout( $seconds );
+#pod
+#pod Removes reservations that occurred more than C<$seconds> ago.  If no
+#pod argument is given, the timeout defaults to 120 seconds.  The timeout
+#pod should be set longer than the expected task processing time, so that
+#pod only dead/hung tasks are returned to the active queue.
+#pod
+#pod =cut
 
 sub apply_timeout {
     my ( $self, $timeout ) = @_;
     $timeout //= 120;
     my $cutoff = time() - $timeout;
-    $self->_mongo_collection( $self->collection_name )->update(
+    $self->_mongo_collection( $self->collection_name )->update_many(
         { $RESERVED => { '$lt'     => $cutoff } },
         { '$unset'  => { $RESERVED => 0 } },
-        { safe => $self->safe, multiple => 1 }
     );
 }
 
-# =method search
-#
-#   my @results = $queue->search( \%query, \%options );
-#
-# Returns a list of tasks in the queue based on search criteria.  The
-# query should be expressed in the usual MongoDB fashion.  In addition
-# to MongoDB options C<limit>, C<skip> and C<sort>, this method supports
-# a C<reserved> option.  If present, results will be limited to reserved
-# tasks if true or unreserved tasks if false.
-#
-# =cut
+#pod =method search
+#pod
+#pod   my @results = $queue->search( \%query, \%options );
+#pod
+#pod Returns a list of tasks in the queue based on search criteria.  The
+#pod query should be expressed in the usual MongoDB fashion.  In addition
+#pod to MongoDB options (e.g. C<limit>, C<skip> and C<sort>) as described
+#pod in the MongoDB documentation for L<MongoDB::Collection/find>, this method
+#pod supports a C<reserved> option.  If present, results will be limited to reserved
+#pod tasks if true or unreserved tasks if false.
+#pod
+#pod =cut
 
 sub search {
     my ( $self, $query, $opts ) = @_;
@@ -271,29 +253,22 @@ sub search {
         delete $opts->{reserved};
     }
     my $cursor =
-      $self->_mongo_collection( $self->collection_name )->query( $query, $opts );
-    if ( $opts->{fields} && ref $opts->{fields} ) {
-        my $spec =
-          ref $opts->{fields} eq 'HASH'
-          ? $opts->{fields}
-          : { map { $_ => 1 } @{ $opts->{fields} } };
-        $cursor->fields($spec);
-    }
+      $self->_mongo_collection( $self->collection_name )->find( $query, $opts );
     return $cursor->all;
 }
 
-# =method peek
-#
-#   $task = $queue->peek( $task );
-#
-# Retrieves a full copy of the task from the queue.  This is useful to retrieve all
-# fields from a partial-field result from C<search>.  It is equivalent to:
-#
-#   $self->search( { _id => $task->{_id} } );
-#
-# Returns undef if the task is not found.
-#
-# =cut
+#pod =method peek
+#pod
+#pod   $task = $queue->peek( $task );
+#pod
+#pod Retrieves a full copy of the task from the queue.  This is useful to retrieve all
+#pod fields from a projected result from C<search>.  It is equivalent to:
+#pod
+#pod   $self->search( { _id => $task->{_id} } );
+#pod
+#pod Returns undef if the task is not found.
+#pod
+#pod =cut
 
 sub peek {
     my ( $self, $task ) = @_;
@@ -301,31 +276,31 @@ sub peek {
     return wantarray ? @result : $result[0];
 }
 
-# =method size
-#
-#   $queue->size;
-#
-# Returns the number of tasks in the queue, including in-progress ones.
-#
-# =cut
+#pod =method size
+#pod
+#pod   $queue->size;
+#pod
+#pod Returns the number of tasks in the queue, including in-progress ones.
+#pod
+#pod =cut
 
 sub size {
     my ($self) = @_;
-    return $self->_mongo_collection( $self->collection_name )->count;
+    return $self->_mongo_collection( $self->collection_name )->count_documents( {} );
 }
 
-# =method waiting
-#
-#   $queue->waiting;
-#
-# Returns the number of tasks in the queue that have not been reserved.
-#
-# =cut
+#pod =method waiting
+#pod
+#pod   $queue->waiting;
+#pod
+#pod Returns the number of tasks in the queue that have not been reserved.
+#pod
+#pod =cut
 
 sub waiting {
     my ($self) = @_;
     return $self->_mongo_collection( $self->collection_name )
-      ->count( { $RESERVED => { '$exists' => boolean::false } } );
+      ->count_documents( { $RESERVED => { '$exists' => boolean::false } } );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -347,7 +322,7 @@ MongoDBx::Queue - A message queue implemented with MongoDB
 
 =head1 VERSION
 
-version 1.002
+version 2.000
 
 =head1 SYNOPSIS
 
@@ -454,11 +429,6 @@ C<connect> method.
 
 A collection name for the queue.  Defaults to 'queue'.  The collection must
 only be used by MongoDBx::Queue or unpredictable awful things will happen.
-
-=head2 safe
-
-Boolean that controls whether 'safe' inserts/updates are done.
-Defaults to true.
 
 =head1 METHODS
 
@@ -567,8 +537,9 @@ only dead/hung tasks are returned to the active queue.
 
 Returns a list of tasks in the queue based on search criteria.  The
 query should be expressed in the usual MongoDB fashion.  In addition
-to MongoDB options C<limit>, C<skip> and C<sort>, this method supports
-a C<reserved> option.  If present, results will be limited to reserved
+to MongoDB options (e.g. C<limit>, C<skip> and C<sort>) as described
+in the MongoDB documentation for L<MongoDB::Collection/find>, this method
+supports a C<reserved> option.  If present, results will be limited to reserved
 tasks if true or unreserved tasks if false.
 
 =head2 peek
@@ -576,7 +547,7 @@ tasks if true or unreserved tasks if false.
   $task = $queue->peek( $task );
 
 Retrieves a full copy of the task from the queue.  This is useful to retrieve all
-fields from a partial-field result from C<search>.  It is equivalent to:
+fields from a projected result from C<search>.  It is equivalent to:
 
   $self->search( { _id => $task->{_id} } );
 

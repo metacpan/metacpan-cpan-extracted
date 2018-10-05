@@ -40,7 +40,7 @@ q<#!/usr/bin/perl -sw
 
 END_SELFGOL
 
-ok $selfgol =~ m{ \A (?&PerlOWS) (?&PerlDocument) (?&PerlOWS) \Z  $PPR::GRAMMAR }xms  => 'matched selfgol';
+ok $selfgol =~ m{ \A (?&PerlDocument) \Z  $PPR::GRAMMAR }xms  => 'matched selfgol';
 
 done_testing();
 

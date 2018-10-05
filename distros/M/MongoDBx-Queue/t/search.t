@@ -7,10 +7,14 @@ use Test::Deep '!blessed';
 use MongoDB 0.45;
 use MongoDBx::Queue;
 
-my $conn = eval { MongoDB::Connection->new; };
+my $conn = eval {
+    my $mc = MongoDB::MongoClient->new;
+    $mc->get_database("admin")->run_command( [ ismaster => 1 ] );
+    $mc;
+};
 plan skip_all => "No MongoDB on localhost" unless $conn;
 
-my $cl_name = "mongodbx_queue_" . time;
+my $cl_name = "mongodbx_queue_" . time . $$;
 
 my ( $queue, $task, $task2 );
 
@@ -65,7 +69,8 @@ is( scalar @found, 1, "got correct number from search for reserved" );
 cmp_bag( \@got, [ $task_list[0] ], "search() got all tasks" )
   or diag explain \@got;
 
-@found = $queue->search( { last => "Smith" }, { fields => [qw/first tel/] } );
+@found = $queue->search( { last => "Smith" },
+    { projection => { map { $_ => 1 } qw/first tel/ } } );
 is( scalar @found,    1,      "got correct number from search on last name" );
 is( $found[0]{first}, 'John', "got first requested field" );
 is( $found[0]{tel},  '555-123-4567', "got next requested field" );

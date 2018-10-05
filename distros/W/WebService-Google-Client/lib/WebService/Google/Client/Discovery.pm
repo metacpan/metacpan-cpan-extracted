@@ -1,5 +1,5 @@
 package WebService::Google::Client::Discovery;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Methods for working with Google API discovery service
 
@@ -214,7 +214,7 @@ WebService::Google::Client::Discovery - Methods for working with Google API disc
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

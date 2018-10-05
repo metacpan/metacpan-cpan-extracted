@@ -19,6 +19,8 @@ no_index:
   directory:
     - t
     - inc
+    - t
+    - inc
 requires:
   Aspect: '1.04'
   Avro::Schema: '0'
@@ -30,4 +32,4 @@ resources:
   bugtracker: https://github.com/alivraghi/Confluent-SchemaRegistry/issues
   homepage: https://github.com/alivraghi/Confluent-SchemaRegistry
   repository: https://github.com/alivraghi/Confluent-SchemaRegistry.git
-version: '0.03'
+version: '0.04'

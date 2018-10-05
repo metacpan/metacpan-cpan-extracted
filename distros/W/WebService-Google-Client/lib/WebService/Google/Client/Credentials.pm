@@ -1,5 +1,5 @@
 package WebService::Google::Client::Credentials;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: Credentials for particular Client instance. You can use this module as singleton also if you need to share credentials between two or more modules
 
@@ -40,7 +40,7 @@ WebService::Google::Client::Credentials - Credentials for particular Client inst
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

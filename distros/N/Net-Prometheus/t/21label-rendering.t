@@ -66,6 +66,10 @@ my $client = Net::Prometheus->new(
    );
 
    $client->unregister( $metric );
+
+   is( $client->render, "",
+      'render after ->unregister'
+   );
 }
 
 {

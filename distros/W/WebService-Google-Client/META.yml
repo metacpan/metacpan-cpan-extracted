@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/sdondley/WevService-Google-Client/issues
   repository: git://github.com/sdondley/WevService-Google-Client.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Pavel Serikov <pavelsr@cpan.org>'
   - 'Pavel Serikov <pavel.p.serikov@gmail.com>'

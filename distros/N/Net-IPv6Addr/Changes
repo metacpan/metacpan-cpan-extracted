@@ -1,5 +1,16 @@
 Revision history for Perl module Net::IPv6Addr
 
+0.93 2018-10-05     Ben Bullock <bkb@cpan.org>
+	* Remove README and use generated one
+	* Fix bad links in documentation
+
+0.92 2018-10-05	    Ben Bullock <bkb@cpan.org>
+        * Documentation expanded with working examples
+	* UTF-8 in Makefile.PL marked
+	* to_* routines exported on demand
+	* Repetition in error messages removed
+	* Parsing of mixed IPv6/IPv4 now OK
+
 0.91 2017-10-06	    Ben Bullock <bkb@cpan.org>
 
 	* Documentation (esp. SEE ALSO, BUGS)

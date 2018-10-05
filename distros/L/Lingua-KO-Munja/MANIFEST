@@ -9,8 +9,5 @@ MANIFEST.SKIP
 README
 t/Lingua-KO-Munja.t
 t/romanize-korean.t
-xt/checkpod.t
-xt/distro.t
-xt/git.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,12 +4,10 @@ use strict;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/search/;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use Carp;
 use Text::Fuzzy '0.25';
-use Gzip::Faster '0.18', ':all';
-#use XSLoader;
-#XSLoader::load 'CPAN::Nearest', $VERSION;
+use Gzip::Faster '0.18', 'gunzip_file';
 
 sub search
 {
@@ -32,7 +30,6 @@ sub search
     # Skip to first line.
     $text =~ s/.*^\s*$//m;
     while ($text =~ /^(\S+)\s+(\S+)\s+(\S*)\s*$/gm) {
-#	print "$1\n";
 	push @modules, $1;
     }
     my $tf = Text::Fuzzy->new ($module, max => 10);

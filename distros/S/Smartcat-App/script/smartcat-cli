@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+BEGIN {
+    use Cwd qw(abs_path);
+    use File::Basename;
+    use File::Spec::Functions qw(catfile);
+    map { unshift(@INC, catfile(dirname(abs_path(__FILE__)), $_)) } qw(../lib);
+}
+
+use Smartcat::App;
+Smartcat::App->run;

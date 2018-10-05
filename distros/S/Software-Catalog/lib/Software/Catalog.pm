@@ -1,7 +1,7 @@
 package Software::Catalog;
 
-our $DATE = '2018-09-13'; # DATE
-our $VERSION = '1.0.1'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '1.0.3'; # VERSION
 
 1;
 # ABSTRACT: Software catalog
@@ -18,7 +18,7 @@ Software::Catalog - Software catalog
 
 =head1 VERSION
 
-This document describes version 1.0.1 of Software::Catalog (from Perl distribution Software-Catalog), released on 2018-09-13.
+This document describes version 1.0.3 of Software::Catalog (from Perl distribution Software-Catalog), released on 2018-10-05.
 
 =head1 SYNOPSIS
 

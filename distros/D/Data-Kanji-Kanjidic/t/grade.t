@@ -4,10 +4,10 @@
 use warnings;
 use strict;
 use utf8;
-use FindBin;
+use FindBin '$Bin';
 use Test::More;
 use Data::Kanji::Kanjidic qw/parse_kanjidic grade/;
-my $kanjidic = parse_kanjidic ("$FindBin::Bin/kanjidic-sample");
+my $kanjidic = parse_kanjidic ("$Bin/kanjidic-sample");
 my $grade_kanjis = grade ($kanjidic, 3);
 ok (@$grade_kanjis == 1);
 ok ($grade_kanjis->[0] eq '悪');

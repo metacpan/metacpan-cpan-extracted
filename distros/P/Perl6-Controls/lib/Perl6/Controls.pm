@@ -2,7 +2,7 @@ package Perl6::Controls;
 
 use 5.012; use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 
 use Keyword::Declare;
@@ -76,6 +76,11 @@ sub import {
 
     keytype Etc is / (?: (?&PerlOWS) (?&PerlStatement) )* (?&PerlOWS) \} /x;
 
+    keyword LEAVE (Block $code_block) :desc(LEAVE block) {
+        state $leave_var = '__LEAVE__00000000000000000000000001';
+        return qq{use Scope::Upper; Scope::Upper::reap $code_block;};
+    }
+
     keyword FIRST (Block $code_block) :then(Etc $rest_of_block) :desc(FIRST block) {
         state $FIRST_ID = 'FIRST000000'; $FIRST_ID++;
         qq{
@@ -118,6 +123,28 @@ sub import {
     keyword try (Block $block) {{{
         { my $P6C____CATCH; eval { <{$block}> 1 } // do{ my $error = $@; $P6C____CATCH && $P6C____CATCH->($error) }; }
     }}}
+
+
+    # Feed statement...
+
+    keytype FeedArg is / (?&PerlExpression) (?&PerlOWS) ==> /xs;
+
+    keyword feed (FeedArg @from, Expr $to) {
+
+        my @list = map { 
+            m{\A ( (?&PerlVariable) | (?&PerlVariableDeclaration) ) \Z  $PPR::GRAMMAR }xms
+                ? "($1) = "
+                : $_
+        }
+        ($to, reverse map { substr($_,0,-4) } @from);
+
+        while (@list > 1) {
+            my ($func, $data) = splice(@list, -2);
+            push @list, "($func $data)";
+        }
+
+        return $list[0];
+    }
 }
 
 1; # Magic true value required at end of module
@@ -131,7 +158,7 @@ Perl6::Controls - Add Perl 6 control structures as Perl 5 keywords
 
 =head1 VERSION
 
-This document describes Perl6::Controls version 0.000006
+This document describes Perl6::Controls version 0.000007
 
 
 =head1 SYNOPSIS
@@ -146,9 +173,10 @@ This document describes Perl6::Controls version 0.000006
 
             repeat while (!@animals) {
                 say 'Enter animals: ';
-                @animals = grep {exists $group_of{$_} }
-                           split /\s+/,
-                           scalar readline // die;
+                scalar readline // die
+                    ==> split /\s+/,
+                    ==> grep {exists $group_of{$_} }
+                    ==> @animals;
             }
 
             for (%group_of{@animals}) -> $animal, $group {
@@ -357,6 +385,12 @@ declared does not affect when they are called):
         print $elem;
     }
 
+=head2 C<< LEAVE  {...} >>
+
+A C<LEAVE> block is executed whenever control exits the surrounding
+block, either by falling out the bottom, or via a C<return>, or C<next>,
+or C<last>, or C<redo>, or C<goto>, or C<die>.
+
 
 =head2 C<< try { ... CATCH {...} ... } >>
 
@@ -385,6 +419,35 @@ For example:
 
 Note that the C<CATCH> block is always optional within a C<try>,
 and may be placed anywhere within the C<try> block.
+
+
+=head2 C<< feed EXPR ==> EXPR ==> ... ==> EXPR ; >>
+
+This simulates the Perl 6 feed operator (C<< ==> >>).
+
+Due to limitations in the Perl 5 extension mechanism, the
+keyword C<feed> is required at the start of the feed
+sequence.
+
+Each expression can be a Perl list operator or n-ary function or a
+simple variable or variable declaration. Any simple variable appearing
+in the sequence is assigned to (in list context). Anything else has
+the result of the preceding expression in the pipeline appended to
+its trailing argument list.
+
+For example:
+
+    feed readline() ==> my @input ==> sort ==> join ':', ==> $result;
+
+is equivalent to:
+
+    ($result) = join ':',
+                         sort
+                             (my @input) =
+                                          readline;
+
+Note that the C<join> step must end in a comma, so that appending
+the sorted input to it will create a syntactically correct expression.
 
 
 =head1 DIAGNOSTICS

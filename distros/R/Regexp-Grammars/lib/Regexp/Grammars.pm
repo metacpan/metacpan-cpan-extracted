@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -1266,6 +1266,10 @@ sub _translate_separated_list {
     # Translate meaningful whitespace...
     $ws = length($ws) ? q{(?&ws__implicit__)} : q{};
 
+    # Generate support for optional trailing separator...
+    my $opt_trailing = substr($op,-2) eq '%%' ? qq{$ws$sep_trans?}
+                     :                          q{};
+
     # Generate timeout test...
     my $timeout_test = $timeout ? q{(??{;Regexp::Grammars::_test_timeout()})} : q{};
 
@@ -1276,42 +1280,50 @@ sub _translate_separated_list {
             "   |...Treating $term $op $separator as:",
             "   |      |  repeatedly match the subrule $term",
             "   |       \\ as long as the matches are separated by matches of $separator",
+            (substr($op,-2) eq '%%' ?
+            "   |        \\ and allowing an optional trailing $separator"
+            : q{}
+            )
         );
     }
 
     #  One-or-more...
-    return qq{$timeout_test(?:$ws$CHECKPOINT$sep_trans$ws$term_trans)*$+}
-        if $op =~ m{ [*][*]() | [+]([+?]?) \s* % | \{ 1, \}([+?]?) \s* % }xms;
+    return qq{$timeout_test(?:$ws$CHECKPOINT$sep_trans$ws$term_trans)*$+$opt_trailing}
+        if $op =~ m{ [*][*]() | [+]([+?]?) \s* %%?+ | \{ 1, \}([+?]?) \s* %%?+ }xms;
 
     #  Zero-or-more...
-    return qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans)*$+)?$+}
-        if $op =~ m{ [*]([+?]?) \s* % | \{ 0, \}([+?]?) \s* % }xms;
+    return
+    qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans)*$+)?$+$opt_trailing}
+        if $op =~ m{ [*]([+?]?) \s* %%? | \{ 0, \}([+?]?) \s* %%? }xms;
 
     #  One-or-zero...
-    return qq{?$+}
-        if $op =~ m{ [?]([+?]?) \s* % | \{ 0,1 \}([+?]?) \s* % }xms;
+    return qq{?$+$opt_trailing}
+        if $op =~ m{ [?]([+?]?) \s* %%? | \{ 0,1 \}([+?]?) \s* %%? }xms;
 
     #  Zero exactly...
-    return qq{{0}$ws}
-        if $op =~ m{ \{ 0 \}[+?]? \s* % }xms;
+    return qq{{0}$ws$opt_trailing}
+        if $op =~ m{ \{ 0 \}[+?]? \s* %%? }xms;
 
     #  N exactly...
-    if ($op =~ m{ \{ (\d+) \}([+?]?) \s* % }xms ) {
+    if ($op =~ m{ \{ (\d+) \}([+?]?) \s* %%? }xms ) {
         my $min = $1-1;
-        return qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans){$min}$+)}
+        return
+        qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans){$min}$+$opt_trailing)}
     }
 
     #  Zero-to-N...
-    if ($op =~ m{ \{ 0,(\d+) \}([+?]?) \s* % }xms ) {
+    if ($op =~ m{ \{ 0,(\d+) \}([+?]?) \s* %%? }xms ) {
         my $max = $1-1;
-        return qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans){0,$max}$+)?$+}
+        return
+        qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans){0,$max}$+)?$+$opt_trailing}
     }
 
     #  M-to-N and M-to-whatever...
-    if ($op =~ m{ \{ (\d+),(\d*) \} ([+?]?) \s* % }xms ) {
+    if ($op =~ m{ \{ (\d+),(\d*) \} ([+?]?) \s* %%? }xms ) {
         my $min = $1-1;
         my $max = $2 ? $2-1 : q{};
-        return qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans){$min,$max}$+)}
+        return
+        qq{{0}$timeout_test$ws(?:$term_trans(?:$ws$CHECKPOINT$sep_trans$ws$term_trans){$min,$max}$+$opt_trailing)}
     }
 
     # Somehow we missed a case (this should never happen)...
@@ -1651,23 +1663,26 @@ sub _translate_subrule_calls {
     )
 
     (?(DEFINE)
-        (?<SEPLIST_OP> \*\* | [*+?][+?]?\s*% | \{ \d+(,\d*)? \} [+?]?\s*%                                          )
-        (?<PARENS>    \( (?:[?] (?: <[=!] | [:>] ))? (?: \\. | (?&PARENCODE) | (?&PARENS) | (?&CHARSET) | [^][()\\<>]++ )*+ \)   )
-        (?<BRACES>    \{     (?: \\. | (?&BRACES)    | [^{}\\]++   )*+                              \}   )
-        (?<PARENCODE> \(\?[{] (?: \\. | (?&BRACES)    | [^{}\\]++   )*+ [}]\)                            )
-        (?<HASH>      \% (?&IDENT) (?: :: (?&IDENT) )*                                                   )
-        (?<CHARSET>   \[ \^?+ \]?+ (?: \[:\w+:\] | \\. | [^]] )*+                                   \]   )
-        (?<IDENT>     [^\W\d]\w*+                                                                        )
-        (?<QUALIDENT> (?: [^\W\d]\w*+ :: )*  [^\W\d]\w*+                                                 )
-        (?<LITERAL>   (?&NUMBER) | (?&STRING) | (?&VAR)                                                  )
-        (?<NUMBER>    [+-]? \d++ (?:\. \d++)? (?:[eE] [+-]? \d++)?                                       )
-        (?<STRING>    ' [^\\']++ (?: \\. [^\\']++ )* '                                                   )
-        (?<ARGLIST>   (?&PARENCODE) | \( \s* (?&ARGS)? \s* \) | (?# NOTHING )                            )
-        (?<ARGS>      (?&ARG) \s* (?: , \s* (?&ARG) \s* )*  ,?                                           )
-        (?<ARG>       (?&VAR)  |  (?&KEY) \s* => \s* (?&LITERAL)                                         )
-        (?<VAR>       : (?&IDENT)                                                                        )
-        (?<KEY>       (?&IDENT) | (?&LITERAL)                                                            )
-        (?<QUANTIFIER> [*+?][+?]? | \{ \d+,?\d* \} [+?]?                                                 )
+        (?<SEPLIST_OP> \*\* | [*+?] [+?]? \s* %%? | \{ \d+(,\d*)? \} [+?]? \s* %%? )
+        (?<PARENS>    \( (?:[?] (?: <[=!] | [:>] ))?
+                         (?: \\. | (?&PARENCODE) | (?&PARENS) | (?&CHARSET) | [^][()\\<>]++ )*+
+                      \)
+        )
+        (?<BRACES>    \{      (?: \\. | (?&BRACES)    | [^{}\\]++   )*+  \}     )
+        (?<PARENCODE> \(\?[{] (?: \\. | (?&BRACES)    | [^{}\\]++   )*+  [}]\)  )
+        (?<HASH>      \% (?&IDENT) (?: :: (?&IDENT) )*                          )
+        (?<CHARSET>   \[ \^?+ \]?+ (?: \[:\w+:\] | \\. | [^]] )*+        \]     )
+        (?<IDENT>     [^\W\d]\w*+                                               )
+        (?<QUALIDENT> (?: [^\W\d]\w*+ :: )*  [^\W\d]\w*+                        )
+        (?<LITERAL>   (?&NUMBER) | (?&STRING) | (?&VAR)                         )
+        (?<NUMBER>    [+-]? \d++ (?:\. \d++)? (?:[eE] [+-]? \d++)?              )
+        (?<STRING>    ' [^\\']++ (?: \\. [^\\']++ )* '                          )
+        (?<ARGLIST>   (?&PARENCODE) | \( \s* (?&ARGS)? \s* \) | (?# NOTHING )   )
+        (?<ARGS>      (?&ARG) \s* (?: , \s* (?&ARG) \s* )*  ,?                  )
+        (?<ARG>       (?&VAR)  |  (?&KEY) \s* => \s* (?&LITERAL)                )
+        (?<VAR>       : (?&IDENT)                                               )
+        (?<KEY>       (?&IDENT) | (?&LITERAL)                                   )
+        (?<QUANTIFIER> [*+?][+?]? | \{ \d+,?\d* \} [+?]?                        )
     )
     }{
         my $curr_construct   = $+{construct};
@@ -1995,7 +2010,7 @@ sub _translate_subrule_calls {
             }
         };
 
-        # Handle the **/*%/+%/{n,m}%/etc operators...
+        # Handle the **/*%/*%%/+%/{n,m}%/etc operators...
         if ($list_marker) {
             my $ws = $magic_ws ? $+{ws1} . $+{ws2} : q{};
             my $op = $+{op};
@@ -2656,7 +2671,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.048
+This document describes Regexp::Grammars version 1.049
 
 
 =head1 SYNOPSIS
@@ -3067,6 +3082,16 @@ match optional whitespace (i.e. C<\s*>).
 Exceptions to this behaviour are whitespaces before a C<|> or a code
 block or an explicit space-matcher (such as C<< <ws> >> or C<\s>),
 or at the very end of the rule)
+
+In other words, a rule such as:
+
+    <rule: sentence>   <noun> <verb>
+                   |   <verb> <noun>
+
+is equivalent to a token with added non-capturing whitespace matching:
+
+    <token: sentence>  <.ws> <noun> <.ws> <verb>
+                    |  <.ws> <verb> <.ws> <noun>
 
 You can explicitly define a C<< <ws> >> token to change that default
 behaviour. For example, you could alter the definition of "whitespace" to
@@ -3961,7 +3986,7 @@ In some situations a grammar may need a rule that matches dozens,
 hundreds, or even thousands of one-word alternatives. For example, when
 matching command names, or valid userids, or English words. In such
 cases it is often impractical (and always inefficient) to list all the
-alternatives between C<|> alterators:
+alternatives between C<|> alternators:
 
     <rule: shell_cmd>
         a2p | ac | apply | ar | automake | awk | ...
@@ -4024,7 +4049,7 @@ immediately after the hash name. For example:
         <%cmds { [\w-/.]+ }>
 
     <rule: valid_word>
-        # Valid keyss contain only alphas or internal hyphen or apostrophe...
+        # Valid keys contain only alphas or internal hyphen or apostrophe...
         <%dict{ (?i: (?:[a-z]+[-'])* [a-z]+ ) }>
 
     <rule: DNA_sequence>
@@ -4269,7 +4294,7 @@ Like matchrefs, invertrefs come in the usual range of flavours:
     <[ALIAS=/ident]>    # Match inverse and push on @{$MATCH{ident}}
 
 The character pairs that are reversed during mirroring are: C<{> and C<}>,
-C<[> and C<]>, C<(> and C<)>, C<< < >> and C<< > >>, C<?> and C<?>,
+C<[> and C<]>, C<(> and C<)>, C<< < >> and C<< > >>, C<«> and C<»>,
 C<`> and C<'>.
 
 The following mnemonics may be useful in distinguishing inverserefs from
@@ -4767,6 +4792,30 @@ C<< <right_paren> >> I<are> captured to the result-hash, they are
 not returned, because the C<MATCH> alias overrides the normal "return
 the result-hash" semantics and returns only what its associated
 subrule (i.e. C<< <expr> >>) produces.
+
+Note also that the return value is only assigned, if the subrule call
+actually matches. For example:
+
+    <rule: optional_names>
+        <[MATCH=name]>*
+
+If the repeated subrule call to C<< <name> >> matches zero times,
+the return value of the C<optional_names> rule will not be an empty
+array, because the C<MATCH=> will not have executed at all. Instead,
+the default return value (an empty string) will be returned.
+If you had specifically wanted to return an empty array, you could
+use any of the following:
+
+    <rule: optional_names>
+        <MATCH=(?{ [] })>     # Set up empty array before first match attempt
+        <[MATCH=name]>*
+
+or:
+
+    <rule: optional_names>
+        <[MATCH=name]>+       # Match one or more times
+      |                       #          or
+        <MATCH=(?{ [] })>     # Set up empty array, if no match
 
 
 =head3 Programmatic result distillation
@@ -6187,6 +6236,31 @@ specified in some kind of matched parentheses. These may be capturing
 [C<(...)>], non-capturing [C<(?:...)>], non-backtracking [C<< (?>...) >>],
 or any other construct enclosed by an opening and closing paren.
 
+
+=item C<< <ANY_SUBRULE>+ %% <ANY_OTHER_SUBRULE> >>
+
+=item C<< <ANY_SUBRULE>* %% <ANY_OTHER_SUBRULE> >>
+
+=item C<< <ANY_SUBRULE>+ %% (PATTERN) >>
+
+=item C<< <ANY_SUBRULE>* %% (PATTERN) >>
+
+Repeatedly call the first subrule.
+Keep matching as long as the subrule matches, provided successive
+matches are separated by matches of the second subrule or the pattern.
+
+Also allow an optional final trailing instance of the second subrule
+or pattern (this is where C<%%> differs from C<%>).
+
+In other words, match a list of ANY_SUBRULE's separated by
+ANY_OTHER_SUBRULE's or PATTERN's, with a possible final separator.
+
+As for the single C<%> operator, if a pattern is used to specify the
+separator, it must be specified in some kind of matched parentheses.
+These may be capturing [C<(...)>], non-capturing [C<(?:...)>],
+non-backtracking [C<< (?>...) >>], or any other construct enclosed by an
+opening and closing paren.
+
 =back
 
 =head2 Special variables within grammar actions
@@ -6356,15 +6430,16 @@ construct instead:
 
 =item *
 
-Grammatical parsing with Regexp::Grammars can fail if your grammar
-places "non-backtracking" directives (i.e. the C<< (?>...) >> block or
-the C<?+>, C<*+>, or C<++> repetition specifiers) around a subrule call.
-The problem appears to be that preventing the regex from backtracking
-through the in-regex actions that Regexp::Grammars adds causes the
-module's internal stack to fall out of sync with the regex match.
+Grammatical parsing with Regexp::Grammars can fail if your grammar uses
+"non-backtracking" directives (i.e. the C<< (?>...) >> block or the
+C<?+>, C<*+>, or C<++> repetition specifiers). The problem appears to be
+that preventing the regex from backtracking through the in-regex actions
+that Regexp::Grammars adds causes the module's internal stack to fall
+out of sync with the regex match.
 
-For the time being, you need to make sure that grammar rules don't appear
-inside a "non-backtracking" directive.
+For the time being, if your grammar does not work as expected,
+you may need to replace one or more "non-backtracking" directives,
+with their regular (i.e. backtracking) equivalents.
 
 =item *
 

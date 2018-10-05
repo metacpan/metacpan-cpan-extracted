@@ -461,14 +461,16 @@ sub _scanNodes {
                         : {}
                     }
                   );
-                foreach my $cat (@listCatNew) {
-                    @listCatRef = grep { $_ ne $cat } @listCatRef;
-                }
-                if (@listCatRef) {
-                    $self->confChanged(1);
-                    foreach my $cat (@listCatRef) {
+                for ( my $i = 0 ; $i < @listCatNew; $i++ ) {
+                    if ( not( defined $listCatRef[$i] )
+                        or $listCatRef[$i] ne $listCatNew[$i] )
+                    {
                         push @{ $self->changes },
-                          { key => $leaf->{id}, old => $cat };
+                          {
+                            key => $leaf->{id},
+                            new => $listCatNew[$i],
+                            old => $listCatRef[$i]
+                          };
                     }
                 }
             }

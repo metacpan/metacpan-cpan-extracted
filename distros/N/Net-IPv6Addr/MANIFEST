@@ -1,6 +1,10 @@
-ChangeLog
 Changes
+examples/array.pl
+examples/bigint.pl
+examples/compressed.pl
+examples/intarray.pl
 examples/preferred.pl
+examples/string-ip6-int.pl
 examples/synopsis.pl
 lib/Net/IPv6Addr.pm
 lib/Net/IPv6Addr.pod
@@ -20,5 +24,6 @@ t/preferred.t
 t/Regexp-IPv6.t
 t/string.t
 t/synopsis.t
+t/vietnam.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

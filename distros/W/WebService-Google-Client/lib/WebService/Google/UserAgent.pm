@@ -1,5 +1,5 @@
 package WebService::Google::UserAgent;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
@@ -210,7 +210,7 @@ WebService::Google::UserAgent - User Agent wrapper for working with Google APIs
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

@@ -538,7 +538,8 @@ sub grant {
 # @return URL
 sub _buildUrl {
     my ( $class, $s ) = @_;
-    my $vhost = Lemonldap::NG::Handler::API->hostname;
+    my $realvhost = Lemonldap::NG::Handler::API->hostname;
+    my $vhost     = $class->resolveAlias;
     my $portString =
          $tsv->{port}->{$vhost}
       || $tsv->{port}->{_}
@@ -552,7 +553,7 @@ sub _buildUrl {
         ( $_https  && $portString == 443 ) ? ''
       : ( !$_https && $portString == 80 )  ? ''
       :                                      ':' . $portString;
-    my $url = "http" . ( $_https ? "s" : "" ) . "://$vhost$portString$s";
+    my $url = "http" . ( $_https ? "s" : "" ) . "://$realvhost$portString$s";
     Lemonldap::NG::Handler::Main::Logger->lmLog( "Build URL $url", 'debug' );
     return $url;
 }

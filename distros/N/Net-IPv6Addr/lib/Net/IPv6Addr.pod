@@ -7,8 +7,8 @@ Net::IPv6Addr - Check validity of IPv6 addresses
 
 =head1 VERSION
 
-This documents version 0.91 of Net::IPv6Addr corresponding to
-L<git commit c2d4788cdfc81b2f08562860e4cfe0a2373a35c2|https://github.com/benkasminbullock/net-ipv6addr/commit/c2d4788cdfc81b2f08562860e4cfe0a2373a35c2> released on Fri Oct 6 12:00:28 2017 +0900.
+This documents version 0.93 of Net::IPv6Addr corresponding to
+L<git commit 3f1eacc60429d669fe8460913e10d994915c6063|https://github.com/benkasminbullock/net-ipv6addr/commit/3f1eacc60429d669fe8460913e10d994915c6063> released on Fri Oct 5 11:53:08 2018 +0900.
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ produces output
     dead:beef:cafe:babe:0:0:0:f0ad
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Net-IPv6Addr-0.91/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/synopsis.pl> in the distribution.)
 
 
 =head1 DESCRIPTION
@@ -115,7 +115,7 @@ Identical to L</ipv6_parse>.
 
 This returns the return value of L</ipv6_parse>, called in scalar
 context, if it does parse out correctly, otherwise it returns
-C<undef>. Unlike L</ipv6_parse>, is_ipv6 does not throw exceptions.
+C<undef>. Unlike L</ipv6_parse>, C<is_ipv6> does not throw exceptions.
 
 =head2 ipv6_chkip
 
@@ -127,21 +127,20 @@ An IPv6 address string, without a prefix.
 
 =head3 Returns
 
-Something true if it's a valid address; something false otherwise.
-
+A true value if it's a valid address; a false value if not.
 
 =head2 to_string_preferred
 
     
-    use Net::IPv6Addr;
-    print Net::IPv6Addr::to_string_preferred ('dead:beef:cafe:babe::f0ad');
+    use Net::IPv6Addr 'to_string_preferred';
+    print to_string_preferred ('dead:beef:cafe:babe::f0ad');
 
 
 produces output
 
     dead:beef:cafe:babe:0:0:0:f0ad
 
-(This example is included as L<F<preferred.pl>|https://api.metacpan.org/source/BKB/Net-IPv6Addr-0.91/examples/preferred.pl> in the distribution.)
+(This example is included as L<F<preferred.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/preferred.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -160,6 +159,18 @@ Invalid input will generate an exception.
 
 =head2 to_string_compressed
 
+    
+    use Net::IPv6Addr 'to_string_compressed';
+    print to_string_compressed ('dead:beef:0000:0000:0000:0000:cafe:babe');
+
+
+produces output
+
+    dead:beef::cafe:babe
+
+(This example is included as L<F<compressed.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/compressed.pl> in the distribution.)
+
+
 =head3 Parameters
 
 If used as an object method, none; if used as a subroutine,
@@ -172,7 +183,6 @@ The IPv6 address in the "compressed" format detailed by L<RFC1884|/RFCs>.
 =head3 Notes
 
 Invalid input will generate an exception.
-
 
 =head2 to_string_ipv4
 
@@ -187,9 +197,8 @@ The IPv6 address in the IPv4 format detailed by L<RFC1884|/RFCs>.
 
 =head3 Notes
 
-Invalid input (such as an address that was not originally IPv4)
+Invalid input, such as an address that was not originally IPv4,
 will generate an exception.
-
 
 =head2 to_string_ipv4_compressed
 
@@ -207,7 +216,6 @@ L<RFC1884|/RFCs>.
 
 Invalid input (such as an address that was not originally IPv4)
 will generate an exception.
-
 
 =head2 to_string_base85
 
@@ -228,6 +236,26 @@ The base 85 encoding described in RFC1924 was an April Fool's joke.
 
 =head2 to_bigint
 
+    
+    use Net::IPv6Addr 'to_bigint';
+    my $int = to_bigint ('dead::beef');
+    my $ipobj = Net::IPv6Addr->new ('dead::beef');
+    my $int2 = $ipobj->to_bigint ();
+    print "$int\n$int2\n";
+
+
+produces output
+
+    295986882420777848964380943247191621359
+    295986882420777848964380943247191621359
+
+
+(This example is included as L<F<bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/bigint.pl> in the distribution.)
+
+
+Convert an IPv6 address into a L<Math::Bigint> object containing the
+IP address as a single number.
+
 =head3 Parameters
 
 If used as an object method, none; if used as a subroutine,
@@ -241,7 +269,28 @@ The BigInt representation of the given IPv6 address.
 
 Invalid input will generate an exception.
 
+See also L</to_intarray> and L</to_array>.
+
 =head2 to_array
+
+    
+    use Net::IPv6Addr 'to_array';
+    my @int = to_array ('dead::beef');
+    my $ipobj = Net::IPv6Addr->new ('dead::beef');
+    my @int2 = $ipobj->to_array ();
+    print "@int\n@int2\n";
+
+
+produces output
+
+    dead 0000 0000 0000 0000 0000 0000 beef
+    dead 0000 0000 0000 0000 0000 0000 beef
+
+
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/array.pl> in the distribution.)
+
+
+Convert an IPv6 address into an array of eight hexadecimal numbers.
 
 =head3 Parameters
 
@@ -256,7 +305,28 @@ An array [0..7] of 16-bit hexadecimal numbers (strings).
 
 Invalid input will generate an exception.
 
+See also L</to_intarray> and L</to_bigint>.
+
 =head2 to_intarray
+
+    
+    use Net::IPv6Addr 'to_array';
+    my @int = to_array ('dead::beef');
+    my $ipobj = Net::IPv6Addr->new ('dead::beef');
+    my @int2 = $ipobj->to_array ();
+    print "@int\n@int2\n";
+
+
+produces output
+
+    dead 0000 0000 0000 0000 0000 0000 beef
+    dead 0000 0000 0000 0000 0000 0000 beef
+
+
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/array.pl> in the distribution.)
+
+
+Convert an IPv6 address into an array of eight integer numbers.
 
 =head3 Parameters
 
@@ -271,7 +341,26 @@ An array [0..7] of numbers.
 
 Invalid input will generate an exception.
 
+See also L</to_array> and L</to_bigint>.
+
 =head2 to_string_ip6_int
+
+    
+    use Net::IPv6Addr 'to_string_ip6_int';
+    my $s = to_string_ip6_int ('dead::beef');
+    my $ipobj = Net::IPv6Addr->new ('dead::beef');
+    my $s2 = $ipobj->to_string_ip6_int ();
+    print "$s\n$s2\n";
+
+
+produces output
+
+    f.e.e.b.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.a.e.d.IP6.INT.
+    f.e.e.b.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.a.e.d.IP6.INT.
+
+
+(This example is included as L<F<string-ip6-int.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/string-ip6-int.pl> in the distribution.)
+
 
 =head3 Parameters
 
@@ -353,10 +442,9 @@ was a multiple of sixteen.
 
 =head1 EXPORTS
 
-As of version 0.91, L</in_network>, L</in_network_of_size>, L</ipv6_chkip>, L</ipv6_parse>, L</is_ipv6> may
-be exported on demand. The other routines need to be called in
-fully-qualified format, like C<Net::IPv6Addr::is_ipv6>. The exported
-functions may all be exported using
+As of version 0.93, L</in_network>, L</in_network_of_size>, L</ipv6_chkip>, L</ipv6_parse>, L</is_ipv6>, L</to_string_preferred>, L</to_string_compressed>, L</to_bigint>, L</to_intarray>, L</to_array>, L</to_string_ip6_int>, L</to_string_base65>, L</to_string_ipv4>, L</to_string_ipv4_compressed> may
+be exported on demand. All the exported functions may be exported
+using
 
     use Net::IPv6Addr ':all';
 
@@ -372,12 +460,6 @@ Many of the routines do not have any tests. This means that
 alterations to the code may have unintentionally altered the module's
 behaviour.
 
-=item Compressed + IPv4 are not accepted
-
-As of 0.91, the valid format consisting of a
-compressed-but-non-zero six-element IPv6 followed by an IPv4 is not
-accepted by the module. TODO tests are in F<t/Regexp-IPv6.t>.
-
 =back
 
 Report further bugs at
@@ -386,7 +468,20 @@ to C<bug-Net-IPv6Addr [at] rt.cpan.org>.
 
 =head1 DEPENDENCIES
 
-L<Net::IPv4Addr>, L<Math::Base85>, L<Math::BigInt>
+=over
+
+=item L<Net::IPv4Addr>
+
+This is used to parse IPv4 addresses.
+
+=item L<Math::Base85>
+
+This is used to parse RFC1924 (April Fool's) addresses.
+
+=item L<Math::BigInt>
+
+This is used by the RFC1924 (April Fool's) address routines and by
+L</to_bigint>.
 
 =head2 Reverse dependencies
 
@@ -420,9 +515,12 @@ Uses L</NetAddr::IP>.
 
 =item L<Data::Validate::IP>
 
-Uses L<Socket> to validate IP addresses.
+Uses L<Socket> to validate IP addresses. Offers a number of facilities
+for special-purpose sub networks.
 
 =item L<IPv6::Address>
+
+Adds functions to manipulate addresses.
 
 =item L<Net::IP>
 
@@ -432,16 +530,18 @@ Uses L<Socket> to validate IP addresses.
 
 =item L<Net::IPv6Address>
 
+This module is broken and strongly not recommended.
+
 =item L<NetAddr::IP>
 
 =item L<NetAddr::IP::Lite>
 
 =item L<Regexp::IPv6>
 
-Tests and one regex from C<Regexp::IPv6> are included in this
-module. Unlike C<Net::IPv6Addr>, this module disallows the valid C<::>
-IP address, which means "the unspecified addresses". See the module's
-documentation for details.
+Consists of a regex for validating IPv6s. Tests and one regex from
+C<Regexp::IPv6> are included in this module. Unlike C<Net::IPv6Addr>,
+C<Regexp::IPv6> disallows C<::>, "the unspecified addresses". See the
+module's documentation for details.
 
 =back
 
@@ -468,6 +568,10 @@ Exporting of some functions was added in version 0.8.
 
 For version 0.91, IPv6 validating tests and an IPv4 validating regexp
 were taken from L<Regexp::IPv6> by Salvador Fandiño García.
+
+From version 0.92, the valid format consisting of a
+compressed-but-non-zero six-element IPv6 followed by an IPv4, such as
+C<fe80::204:61ff:254.157.241.86>, is accepted by the module. 
 
 =head1 AUTHOR
 

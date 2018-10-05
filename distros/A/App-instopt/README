@@ -2,21 +2,23 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.002 of App::instopt (from Perl
-    distribution App-instopt), released on 2018-10-04.
+    This document describes version 0.004 of App::instopt (from Perl
+    distribution App-instopt), released on 2018-10-05.
 
 SYNOPSIS
     See instopt script.
 
 FUNCTIONS
-  cleanup
+  cleanup_download_dir
     Usage:
 
-     cleanup(%args) -> [status, msg, result, meta]
+     cleanup_download_dir(%args) -> [status, msg, result, meta]
 
-    Remove inactive versions.
+    Remove older versions of downloaded software.
 
     This function is not exported.
+
+    This function supports dry-run operation.
 
     Arguments ('*' denotes required arguments):
 
@@ -25,6 +27,48 @@ FUNCTIONS
     *   install_dir => *dirname*
 
     *   program_dir => *dirname*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  cleanup_install_dir
+    Usage:
+
+     cleanup_install_dir(%args) -> [status, msg, result, meta]
+
+    Remove inactive versions of installed software.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 
@@ -42,7 +86,7 @@ FUNCTIONS
 
      download(%args) -> [status, msg, result, meta]
 
-    Download latest version of software.
+    Download latest version of all software.
 
     This function is not exported.
 
@@ -69,6 +113,36 @@ FUNCTIONS
 
     Return value: (any)
 
+  download_all
+    Usage:
+
+     download_all(%args) -> [status, msg, result, meta]
+
+    Download latest version of all known software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_downloaded
     Usage:
 
@@ -81,6 +155,34 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   detail => *bool*
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_downloaded_versions
+    Usage:
+
+     list_downloaded_versions(%args) -> [status, msg, result, meta]
+
+    List all downloaded versions of a software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
 
     *   download_dir => *dirname*
 
@@ -171,6 +273,11 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   download => *bool* (default: 1)
+
+        Whether to download latest version from URLor just find from
+        download dir.
 
     *   download_dir => *dirname*
 

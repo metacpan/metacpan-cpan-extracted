@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use File::Slurp;
 
 BEGIN { use_ok('Kayako::RestAPI'); }
@@ -508,6 +509,49 @@ subtest "get_ticket_hash" => sub {
 
     # is_deeply $res, $expected, 'data is same as expected';
 
+};
+
+subtest "xml2obj" => sub {
+    my @good_files = map { $_->{sample_file} } @{ $kayako_api->_samples };
+
+    for my $f (@good_files) {
+        my $xml = read_file( 't/lib/Kayako/samples/' . $f );
+        lives_ok { $kayako_api->xml2obj($xml) } "$f - live";
+    }
+
+    my @bad_files = (
+        { file => 'empty.xml', error => "Document is empty\n" },
+        { file => 'bad.xml',   error => "StartTag: invalid element name\n" },
+
+  # { file => 'text.xml', error => "data source Hello world not found in .\n" },
+  # { file => 'html.xml', error => "1" },
+    );
+
+    for my $i (@bad_files) {
+        my $xml = read_file( 't/lib/Kayako/samples/' . $i->{file} );
+
+        # # my $last_error_msg;
+        # local $SIG{__DIE__} = sub {
+        #     if (ref $_[0] eq 'XML::LibXML::Error') {
+        #         $last_error_msg = $_[0]->message();
+        #     }
+        #     # else {
+        #     #     warn "Message: ".$_[0];
+        #     #     warn "Ref: ".ref $_[0];
+        #     # }
+        # };
+
+        dies_ok { $kayako_api->xml2obj($xml) } $i->{file} . '- dies ok';
+
+# throws_ok { $kayako_api->xml2obj($xml) } 'XML::LibXML::Error', $i->{file}.' XML::LibXML::Error thrown';
+# warn $last_error_msg;
+# is $last_error_msg, $i->{error}, $i->{file}." error msg ok";
+
+        # warn Dumper $kayako_api->xml2obj($xml);
+    }
+
+# quick check
+# warn Dumper $kayako_api->xml2obj( read_file( 't/lib/Kayako/samples/text.xml' ) );
 };
 
 # use Data::Dumper;

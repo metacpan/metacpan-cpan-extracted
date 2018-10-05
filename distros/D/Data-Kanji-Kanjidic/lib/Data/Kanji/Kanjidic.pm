@@ -19,7 +19,7 @@ our @EXPORT_OK = qw/parse_kanjidic
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 use strict;
 use warnings;
 use Encode;
@@ -115,7 +115,6 @@ sub parse_entry
 
 # Remove the English entries first.
 
-    my $counter;
     my @english;
     my @onyomi;
     my @kunyomi;

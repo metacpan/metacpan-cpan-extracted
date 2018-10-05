@@ -2,7 +2,7 @@ NAME
     MongoDBx::Queue - A message queue implemented with MongoDB
 
 VERSION
-    version 1.002
+    version 2.000
 
 SYNOPSIS
         use v5.10;
@@ -76,10 +76,6 @@ ATTRIBUTES
     A collection name for the queue. Defaults to 'queue'. The collection
     must only be used by MongoDBx::Queue or unpredictable awful things will
     happen.
-
-  safe
-    Boolean that controls whether 'safe' inserts/updates are done. Defaults
-    to true.
 
 METHODS
   new
@@ -168,15 +164,16 @@ METHODS
 
     Returns a list of tasks in the queue based on search criteria. The query
     should be expressed in the usual MongoDB fashion. In addition to MongoDB
-    options "limit", "skip" and "sort", this method supports a "reserved"
-    option. If present, results will be limited to reserved tasks if true or
-    unreserved tasks if false.
+    options (e.g. "limit", "skip" and "sort") as described in the MongoDB
+    documentation for "find" in MongoDB::Collection, this method supports a
+    "reserved" option. If present, results will be limited to reserved tasks
+    if true or unreserved tasks if false.
 
   peek
       $task = $queue->peek( $task );
 
     Retrieves a full copy of the task from the queue. This is useful to
-    retrieve all fields from a partial-field result from "search". It is
+    retrieve all fields from a projected result from "search". It is
     equivalent to:
 
       $self->search( { _id => $task->{_id} } );

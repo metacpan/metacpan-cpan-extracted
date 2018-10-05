@@ -76,7 +76,7 @@ sub HASHfromSample
    );
 
    $gauge->set( one => 1 );
-   $gauge->set( two => 2 );
+   $gauge->set( { lab => "two" }, 2 );
 
    # FRAGILE: depends on the current implementation sorting these
    my @samples = $gauge->samples;
@@ -102,6 +102,21 @@ sub HASHfromSample
    );
 }
 
+# Functions + label
+{
+   my $gauge = Net::Prometheus::Gauge->new(
+      name => "labeled_func_gauge",
+      help => "A gauge reporting a function with a label",
+      labels => [qw( lab )],
+   );
+
+   my $value;
+   $gauge->set_function( one => sub { $value } );
+
+   $value = 50;
+   is( ( $gauge->samples )[0]->value, 50, 'sample->value from function with label' );
+}
+
 # Two labels
 {
    my $gauge = Net::Prometheus::Gauge->new(
@@ -112,8 +127,9 @@ sub HASHfromSample
 
    $gauge->set( 0 => 0 => 10 );
    $gauge->set( 0 => 1 => 20 );
-   $gauge->set( 1 => 0 => 30 );
-   $gauge->set( 1 => 1 => 40 );
+
+   $gauge->set( { x => 1, y => 0 }, 30 );
+   $gauge->set( { x => 1, y => 1 }, 40 );
 
    is_deeply( [ map { HASHfromSample( $_ ) } $gauge->samples ],
       [

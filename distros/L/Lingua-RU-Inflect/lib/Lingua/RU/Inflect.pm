@@ -12,7 +12,7 @@ Lingua::RU::Inflect - Inflect russian names.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,8 @@ such as declension of given names (with some nouns and adjectives too),
 and gender detection by given name.
 
 Choosing of proper forms of varying prepositions
-which added in 0.02 now is unavailable because it moved to L<Lingua::RU::Preposition>.
+which added in 0.02 now is unavailable because it moved
+to L<Lingua::RU::Preposition>.
 
 =cut
 
@@ -37,7 +38,7 @@ BEGIN {
     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
     # set the version for version checking
-    $VERSION     = 0.05;
+    $VERSION     = 0.06;
 
     @ISA         = qw(Exporter);
     @EXPORT      = qw(
@@ -55,7 +56,6 @@ BEGIN {
     %EXPORT_TAGS = (
         'subs'    => [ qw(
             inflect_given_name detect_gender_by_given_name
-            choose_preposition_by_next_word
         ) ],
         'genders' => [ qw( MASCULINE  FEMININE ) ],
         'cases'   => [ qw(
@@ -83,7 +83,7 @@ my  @CASE_NAMES = qw(
 );
 my  @CASE_NUMBERS = ( -1 .. 4 );
 
-use List::MoreUtils 'mesh';
+use List::MoreUtils qw( any mesh );
 our %CASES = mesh @CASE_NAMES, @CASE_NUMBERS;
 
 # Gender
@@ -107,8 +107,15 @@ Perhaps a little code snippet.
     # $gender == FEMININE
 
     my @genitive = inflect_given_name(GENITIVE, @name);
-    # $genitive == qw/Петровой Любови Степановны/;
+    # @genitive == qw/Петровой Любови Степановны/;
     # Transliteration of above line is: Petrovoy Lyubovi Stepanovny
+
+One-liners also can be used
+
+    perl -Ilib -Mcommon::sense -MLingua::RU::Inflect=:all \
+    -E 'say join " ", inflect_given_name(GENITIVE, qw/Перец Лев Ильич/)'
+    # Перца Льва Ильича
+    # Transliteration of above line is: Pertsa L'va Il'icha
 
 =head1 TO DO
 
@@ -127,14 +134,10 @@ Or only subs and genders
 
     use Lingua::RU::Inflect qw/:subs :genders/;
 
-Or only short aliases for subs
-
-    use Lingua::RU::Inflect qw/:short/;
-
 Or everything: subs, aliases, genders and case names:
 
     use Lingua::RU::Inflect qw/:all/; # or
-    use Lingua::RU::Inflect qw/:cases :genders :subs :short/;
+    use Lingua::RU::Inflect qw/:cases :genders :subs/;
 
 =head1 FUNCTIONS
 
@@ -194,21 +197,23 @@ sub detect_gender_by_given_name {
     my $ambiguous = 0;
 
     # Detect by patronym
-    return FEMININE if $patronym =~ /на$/;
+    # Russian
+    return FEMININE  if $patronym =~ /на$/;
     return MASCULINE if $patronym =~ /[иы]ч$/;
+    # Tatar and Azerbaijani
+    return FEMININE  if $patronym =~ /\bкызы$/i;
+    return MASCULINE if $patronym =~ /\b(оглы|улы)$/i;
+    # Icelandic
+    return FEMININE  if $patronym =~ /доттир$/;
+    return MASCULINE if $patronym =~ /сон$/;
 
     # Detect by firstname
     # Drop all names except first
     $firstname =~ s/[\s\-].*//;
 
     # Process exceptions
-    map {
-        return MASCULINE if $firstname eq $_;
-    } ( &_MASCULINE_NAMES );
-
-    map {
-        return FEMININE if $firstname eq $_;
-    } ( &_FEMININE_NAMES );
+    return FEMININE  if any { $firstname eq $_ } ( &_FEMININE_NAMES  );
+    return MASCULINE if any { $firstname eq $_ } ( &_MASCULINE_NAMES );
 
     map {
         $ambiguous++ && last if $firstname eq $_;
@@ -271,6 +276,8 @@ sub _inflect_given_name {
         last unless $firstname;
 
         # Exceptions
+        $firstname =~ s/^Лев$/Льв/;
+        $firstname =~ s/^Павел$/Павл/;
         $firstname =~ s/^Пётр$/Петр/;
         $firstname =~ s/^Христос$/Христ/;
 
@@ -312,41 +319,64 @@ sub _inflect_given_name {
         last unless $lastname;
         last unless defined $gender;
 
-        # Exception
-        $lastname =~ s/^Христос$/Христ/;
-
         # Indeclinable
         last if $lastname =~ /[еёиоуыэю]$/i;
         last if $lastname =~ /[аеёиоуыэюя]а$/i;
         # Lastnames such as “Belaya” and “Sinyaya”
         #  which ends to “aya” and “yaya” must be inflected
         last if $lastname =~ /[ёоуыэю]я$/i;
-        last if $lastname =~ /[иы]х$/i;
+
+        # Undeclinable lastnames -ikh and -ykh
+        last
+            if $lastname =~ /ых$/i
+            && $lastname !~ /^(Булт|(|От|Пере|Роз)д|Жм|П)ых$/i;
+
+        last
+            if $lastname =~ /(кар|[гжкнхшщь])их$/i
+            && $lastname !~ /^(Мин|Мюнн)их$/;
+            # TODO Add more German exceptions
+            # See http://wiki-de.genealogy.net/Kategorie:Familienname_mit_gleicher_Endung
 
         # Feminine lastnames
         last
             if $lastname =~ /(ин|ын|ев|ёв|ов)а$/
             && $lastname =~ s/а$/qw(ой ой у ой ой)[$case]/e;
         # TODO Does not process usual worls: Podkova, Sova etc
-        # TODO Decide/search what can I do with ambigous names: Mashina, Vagina etc
-
-        # And masculine ones
-        last
-            if $lastname =~ /(ин|ын|ев|ёв|ов)$/
-            && ( $lastname .= qw(а у а ым е)[$case] );
-
-        # As adjectives
-        last if $lastname =~ s/ая$/qw(ой ой ую ой ой)[$case]/e;
-        last if $lastname =~ s/яя$/qw(ей ей юю ей ей)[$case]/e;
-        last if $lastname =~ s/кий$/qw(кого кому кого ким ком)[$case]/e;
-        last if $lastname =~ s/ий$/qw(его ему его им ем)[$case]/e;
-        last if $lastname =~ s/ый$/qw(ого ому ого ым ом)[$case]/e;
-        last if $lastname =~ s/ой$/qw(ого ому ого ым ом)[$case]/e;
+        # TODO Decide/search what can I do with ambigous names:
+        # Kalina, Mashina, Smorodina etc
 
         # Rest of masculine lastnames
-        if ( $gender == MASCULINE ) {
+        if ( $gender == FEMININE ) {
+            # As adjectives
+            last if $lastname =~ s/ая$/qw(ой ой ую ой ой)[$case]/e;
+            last if $lastname =~ s/яя$/qw(ей ей юю ей ей)[$case]/e;
+        }
+        else { # MASCULINE
+
+            # Exceptions
+            $lastname =~ s/^Христос$/Христ/;
+            $lastname =~ s/([аеёиоуыэюя]л)ец$/$1ьц/i;
+            $lastname =~ s/([аеёиоуыэюя][бвгджзкмнйпрстфхцчшщ])ец$/$1ц/i;
+            $lastname =~ s/([аеёиоуыэюя])ец$/$1йц/;
+            $lastname =~ s/(З)аяц$/$1айц/;
+
+            # Possessive
+            last
+                if $lastname =~ /(ин|ын|ев|ёв|ов)$/
+                && ( $lastname .= qw(а у а ым е)[$case] );
+
+            # Adjective
+            last if $lastname =~ s/кий$/qw(кого кому кого ким ком)[$case]/e;
+            last if $lastname =~ s/ий$/qw(его ему его им ем)[$case]/e;
+            last if $lastname =~ s/ый$/qw(ого ому ого ым ом)[$case]/e;
+            last if $lastname =~ s/ой$/qw(ого ому ого ым ом)[$case]/e;
+
+            # Other
+            last if $lastname =~ s/([гжйкхчшщ])а$/$1.qw(и е у ой е)[$case]/e;
             last if $lastname =~ s/а$/qw(ы е у ой е)[$case]/e;
             last if $lastname =~ s/мя$/qw(мени мени мя менем мени)[$case]/e;
+
+            last if $lastname =~ /ая$/;
             last if $lastname =~ s/я$/qw(и е ю ёй е)[$case]/e;
             last if $lastname =~ s/й$/qw(я ю й ем е)[$case]/e;
             last if $lastname =~ s/ь$/qw(я ю я ем е)[$case]/e;
@@ -387,41 +417,64 @@ sub inflect_given_name {
 # Masculine names which ends to vowels “a” and “ya”
 sub _MASCULINE_NAMES () {
     return qw(
-        Аба Азарья Акива Аккужа Аникита Алёша Андрюха Андрюша Аса Байгужа Боря
-        Вафа Ваня Вася Витя Вова Володя Габдулла Габидулла Гаврила Гадельша
-        Гайнулла Гайса Гайфулла Галиулла Гарри Гата Гдалья Гийора Гиля Гога Гоша Гошеа
-        Данила Джиханша Дима Жора Зайнулла Закария Зия Зосима Зхарья Зыя Идельгужа
-        Иешуа Изя Ильмурза Илья Иона Исайя Иуда Йегошуа Йегуда Йедидья Карагужа Коля
-        Костя Кузьма Лёва Лёха Лёша Лука Ларри Марданша Микола Мирза Миха Миша Мойша Моня
-        Муртаза Муса Мусса Мустафа Никита Нэта Нэхэмья Овадья Петя Птахья
-        Рахматулла Риза Рома Савва Сафа Серёга Серёжа Сила Симха Сэадья Товия
-        Толя Федя Фима Фока Фома Хамза Хананья Цфанья Шалва Шахна Шрага Эзра
-        Элиша Элькана Юмагужа Юра Ярулла Яхья Яша
+        Аба Азарья Акива Аккужа Аникита Алёша Али Альберто Андрюха Андрюша
+        Арчи Аса
+        Байгужа Боря Бруно Вафа Вано Ваня Вася Витя Вова Володя
+        Габдулла Габидулла Гаврила Гаврило Гадельша Гайнулла Гайса Гайфулла
+        Галилео Галимша Галиулла Гарри Гата Гдалья Гийора Гиля Гога Гоша Гошеа
+        Данила Данило Данко Дарко Джанни Джеффри Джонни Джордано Джошуа Джиханша Дима
+        Жора Зайнулла Закария Зия Зосима Зхарья Зыя Зяма
+        Идельгужа Иегуда Иехуда Иешуа Изя Илия Ильмурза Илья Илюха Илюша
+        Иона Исайя Иуда Иудушка Йегошуа Йегуда Йехуда Йедидья Йося
+        Карагужа Коля Коленька Костя Кузьма Кузенька Кузя
+        Лео Лёва Лёвушка Лёха Лёша Лёшенька Луи Лука Ларри
+        Марио Марданша Метью Микола Мирза Миха Михайло Миша Мишка Мойша Моня
+        Муртаза Муса Мусса Мустафа Мэтью Нафаня Никита Никола Николя Нэта
+        Нэхэмья Овадья Отто Петя Птахья Рахматулла Риза Рома
+        Савва Садко Сафа Серёга Серёжа Сила Симха Сэадья
+        Тао Тео Тоби Товия Толя Томми
+        Федя Фима Фока Фома Фредди
+        Хамза Хананья Харви Харли Хосе Хью Хьюго Цфанья Чарли
+        Шалва Шахна Шломо Шота Шрага
+        Эзра Элайджа Элиягу Элияху Элиша Элькана Энзо Энрике Энрико Эрнесто
+        Юмагужа Юра Ярулла Яхья Яша
     )
 }
 
 # Feminine names which ends to consonants
 sub _FEMININE_NAMES () {
     return qw(
-        Айгуль Айгюль Айзиряк Айрис Альфинур Асылгюль Бадар Бадиян Банат Бедер
-        Бибикамал Бибинур Гайниджамал Гайникамал Гаухар Гиффат Гулендем
-        Гульбадиян Гульдар Гульджамал Гульджихан Гульехан Гульзар Гулькей
-        Гульназ Гульнар Гульнур Гульсем Гульсесек Гульсибар Гульчачак Гульшат
-        Гульшаян Гульюзум Гульямал Гюзель Джамал Джаухар Джихан Дильбар Диляфруз
-        Зайнаб Зайнап Зейнаб Зубарджат Зуберьят Ильсёяр Камяр Карасес Кейт
-        Кэролайн Кэт Кэтрин Кямар Любовь Ляйсан Магинур Магруй Марьям Минджихан
-        Минлегюль Миньеган Наркас Нинель Нурджиган Райхан Раушан Рахель Рахиль
-        Рут Руфь Рэйчел Сагадат Сагдат Сарбиназ Сарвар Сафин Сахибджамал Сулпан
-        Сумбуль Сурур Сюмбель Сясак Тамар Тансулпан Умегульсум Уммегюльсем
-        Фарваз Фархинур Фирдаус Хаджар Хажар Хаят Хуршид Чечек Чулпан Шамсинур
-        Элис Энн Юдифь Юндуз Ямал
+        Абигейл Айгуль Айгюль Айзиряк Айнур Айрис Алсу
+        Альфинур Амели Анне Асылгюль
+        Бадар Бадиян Банат Бедер Бибикамал Бибинур Брижит Бриджит
+        Гайниджамал Гайникамал Гарриет Гаухар Гиффат Грейс
+        Гузель Гулендем Гульбадиян Гульдар Гульджамал Гульджихан Гульехан
+        Гульзар Гульжан Гулькей Гульназ Гульнар Гульнур Гульсем Гульсесек
+        Гульсибар Гульчачак Гульшат Гульшаян Гульюзум Гульямал Гюзель Гюльчатай
+        Дейзи Джамал Джанет Джаухар Дженет Джихан Дильбар Диляфруз Дэйзи
+        Жанет Жульет Жюльет
+        Зайнаб Зайнап Зейнаб Зубарджат Зуберьят Изабель Ильсёяр Ингрид
+        Камяр Карасес Карин Катрин Кейт Кэролайн Кэт Кэтрин Кямар
+        Лаурелин Лили Любовь Люси Ляйсан
+        Магинур Магруй Маргарет Марго Марлен Марьям Мери Мерилин Минджихан
+        Минлегюль Миньеган Мэри
+        Наркас Натали Нинель Нурджиган Нелли Нэлли Одри Патти Пэм
+        Райхан Раушан Рахель Рахиль Рейчел Рут Руфь Рэйчел
+        Сагадат Сагдат Сарбиназ Сарвар Сафин Сахибджамал Скарлет Софи Софико
+        Суваржат Сулпан Сумбуль Сурур Сюмбель Сясак Тамар Тансулпан
+        Умегульсум Уммегюльсем
+        Фарваз Фархинур Фиби Фирдаус Флоренс Хаджар Хажар Харриет Хаят Хуршид
+        Чечек Чулпан Шамсинур
+        Эбигейл Эбигейль Эвелин Эдит Элизабет Элен Элис Элли Эмили Энн
+        Эстер Эсфирь Этель
+        Юдифь Юдит Юндуз Ямал
     )
 }
 
 # Ambiguous names which can be masculine and feminine
 sub _AMBIGUOUS_NAMES () {
     return qw(
-        Валя Женя Мина Паша Саша Шура
+        Валя Женя Мина Мишель Паша Саша Шура
     )
 }
 
@@ -476,11 +529,15 @@ at F<RU/Lingua/RU/Inflect.pod>
 
 =head1 ACKNOWLEDGEMENTS
 
-L<http://www.imena.org/declension.html> (in Russian) for rules of declension.
+L<http://www.imena.org/declension.html>
+and L<http://new.gramota.ru/spravka/letters/71-rubric-482>
+(in Russian) for rules of declension.
+
+L<https://www.behindthename.com/> for directory of names.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2014 Alexander Sapozhnikov.
+Copyright 2009-2018 Alexander Sapozhnikov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

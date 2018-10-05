@@ -1,0 +1,68 @@
+---
+abstract: 'Smartcat cli application'
+author:
+  - 'Taras Semenenko <taras.semenenko@gmail.com>'
+build_requires:
+  File::Remove: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Smartcat-App
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  App::Cmd::Setup: '0'
+  Carp: '0'
+  Class::Load: '0'
+  Config::Tiny: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::HomeDir: '0'
+  File::Spec::Functions: '0'
+  IO::Uncompress::Unzip: '0'
+  JSON: '0'
+  List::Util: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::Log4perl: '0'
+  Log::Log4perl: '0'
+  Smartcat::Client::AccountApi: '0'
+  Smartcat::Client::DocumentApi: '0'
+  Smartcat::Client::DocumentExportApi: '0'
+  Smartcat::Client::Object::BilingualFileImportSetingsModel: '0'
+  Smartcat::Client::Object::CreateDocumentPropertyModel: '0'
+  Smartcat::Client::Object::UploadDocumentPropertiesModel: '0'
+  Smartcat::Client::ProjectApi: '0'
+  base: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ta2-1/smartcat-app-perl/issues
+  homepage: https://github.com/ta2-1/smartcat-app-perl
+  repository: https://github.com/ta2-1/smartcat-app-perl.git
+version: 0.0.1
+x_generated_by_perl: v5.20.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

@@ -1,17 +1,23 @@
 package Software::Catalog::SW::firefox;
 
-our $DATE = '2018-09-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Role::Tiny::With;
+with 'Versioning::Scheme::Dotted';
 with 'Software::Catalog::Role::Software';
-with 'Software::Catalog::Role::VersionScheme::SemVer';
 
 use Software::Catalog::Util qw(extract_from_url);
+
+sub meta {
+    return {
+        homepage_url => "https://mozilla.org/firefox",
+    };
+}
 
 sub get_latest_version {
     my ($self, %args) = @_;
@@ -48,11 +54,13 @@ sub get_download_url {
     # "https://archive.mozilla.org/pub/firefox/releases/62.0/source/"
 }
 
-sub get_programs {
+sub get_archive_info {
     my ($self, %args) = @_;
-    [200, "OK", [
-        {name=>"firefox", path=>"/"},
-    ]];
+    [200, "OK", {
+        programs => [
+            {name=>"firefox", path=>"/"},
+        ],
+    }];
 }
 
 1;
@@ -70,7 +78,7 @@ Software::Catalog::SW::firefox - Firefox
 
 =head1 VERSION
 
-This document describes version 0.002 of Software::Catalog::SW::firefox (from Perl distribution Software-Catalog-SW-firefox), released on 2018-09-20.
+This document describes version 0.004 of Software::Catalog::SW::firefox (from Perl distribution Software-Catalog-SW-firefox), released on 2018-10-05.
 
 =for Pod::Coverage ^(.+)$
 

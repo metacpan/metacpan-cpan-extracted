@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Exporter" => "5.57",
     "LWP::UserAgent" => 0,
     "Role::Tiny" => 0,
-    "SemVer" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.0.1",
+  "VERSION" => "1.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +43,6 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "LWP::UserAgent" => 0,
   "Role::Tiny" => 0,
-  "SemVer" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

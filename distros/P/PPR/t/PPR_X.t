@@ -51,7 +51,7 @@ ok q[ no!!! { say 'failed'; } ] =~ m{
 
 ok q[ use Discretion; no!!! { say 'failed'; }  sub foo { 'bar' }  ] =~ m{
 
-    \A (?&PerlOWS) (?&PerlDocument) (?&PerlOWS) \Z
+    \A (?&PerlDocument) \Z
 
     (?(DEFINE)
         (?<PerlStatement>

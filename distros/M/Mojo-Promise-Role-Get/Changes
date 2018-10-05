@@ -1,0 +1,5 @@
+v0.1.1    2018-10-04 19:59:11 EDT
+  - Prevent warnings when a promise was rejected with no reason
+
+v0.1.0    2018-10-04 19:39:24 EDT
+  - First release

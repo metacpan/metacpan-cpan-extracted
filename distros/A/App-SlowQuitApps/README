@@ -1,4 +1,4 @@
-App::SlowQuitApps version 0.000002
+App::SlowQuitApps version 0.000003
 
 This module makes it easier to configure the SlowQuitApps
 application (L<https://github.com/dteoh/SlowQuitApps>).

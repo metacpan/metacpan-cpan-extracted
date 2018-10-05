@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2018-10-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-10-05'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -174,10 +174,13 @@ sub list_installed {
     return [500, "Can't list known software: $res->[0] - $res->[1]"] if $res->[0] != 200;
     my $known = $res->[2];
 
+    my $swlist;
     if ($args{_software}) {
         return [412, "Unknown software '$args{_software}'"] unless
             grep { $_ eq $args{_software} } @$known;
-        $known = [$args{_software}];
+        $swlist = [$args{_software}];
+    } else {
+        $swlist = $known;
     }
 
     my %active_versions;
@@ -186,13 +189,13 @@ sub list_installed {
         local $CWD = $args{install_dir};
         for my $e (glob "*") {
             if (-l $e) {
-                next unless grep { $e eq $_ } @$known;
+                next unless grep { $e eq $_ } @$swlist;
                 my $v = readlink($e);
                 next unless $v =~ s/\A\Q$e\E-//;
                 $active_versions{$e} = $v;
             } elsif (-d $e) {
                 my ($n, $v) = $e =~ /(.+)-(.+)/ or next;
-                next unless grep { $n eq $_ } @$known;
+                next unless grep { $n eq $_ } @$swlist;
                 $all_versions{$n} //= [];
                 push @{ $all_versions{$n} }, $v;
             }
@@ -243,7 +246,6 @@ $SPEC{list_downloaded} = {
     summary => 'List all downloaded software',
     args => {
         %args_common,
-        %App::swcat::arg0_software,
         detail => {
             schema => ['bool*', is=>1],
             cmdline_aliases => {l=>{}},
@@ -251,12 +253,86 @@ $SPEC{list_downloaded} = {
     },
 };
 sub list_downloaded {
-    [501, "Not yet implemented"];
+    my %args = @_;
+    my $state = _init(\%args);
+
+    my $res = App::swcat::list();
+    return [500, "Can't list known software: $res->[0] - $res->[1]"] if $res->[0] != 200;
+    my $known = $res->[2];
+
+    my $swlist;
+    if ($args{_software}) {
+        return [412, "Unknown software '$args{_software}'"] unless
+            grep { $_ eq $args{_software} } @$known;
+        $swlist = [$args{_software}];
+    } else {
+        $swlist = $known;
+    }
+
+    my @rows;
+    {
+        local $CWD = $args{download_dir};
+      SW:
+        for my $sw (@$swlist) {
+            my $dir = sprintf "%s/%s", substr($sw, 0, 1), $sw;
+            unless (-d $dir) {
+                log_trace "Skipping software '$sw': directory doesn't exist";
+                next SW;
+            }
+            local $CWD = $dir;
+            my $mod = App::swcat::_load_swcat_mod($sw);
+            my @vers;
+          VER:
+            for my $e (glob "*") {
+                next unless -d $e;
+                next unless $mod->is_valid_version($e);
+                push @vers, $e;
+            }
+            unless (@vers) {
+                log_trace "Skipping software '$sw': no versions found";
+            }
+            @vers = sort { $mod->cmp_version($a, $b) } @vers;
+            log_trace "Found versions %s for software '%s'", \@vers, $sw;
+            push @rows, {
+                software => $sw,
+                latest_version => $vers[-1],
+                all_versions => join(", ", @vers),
+            };
+        }
+    }
+
+    my $resmeta = {};
+
+    if ($args{detail}) {
+        $resmeta->{'table.fields'} = [qw/software latest_version all_versions/];
+    } else {
+        @rows = map { $_->{software} } @rows;
+    }
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{list_downloaded_versions} = {
+    v => 1.1,
+    summary => 'List all downloaded versions of a software',
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+    },
+};
+sub list_downloaded_versions {
+    my %args = @_;
+
+    my $res = list_downloaded(%args, _software=>$args{software}, detail=>1);
+    return $res unless $res->[0] == 200;
+    my $row = $res->[2][0];
+    return [200, "OK (none downloaded)"] unless $row;
+    return [200, "OK", [map {(split /, /, $_)} grep {defined} $row->{all_versions}]];
 }
 
 $SPEC{download} = {
     v => 1.1,
-    summary => 'Download latest version of software',
+    summary => 'Download latest version of all software',
     args => {
         %args_common,
         %App::swcat::arg0_software,
@@ -272,17 +348,29 @@ sub download {
     my $mod = App::swcat::_load_swcat_mod($args{software});
     my $res;
 
-    $res = App::swcat::latest_version(%args);
+    $res = list_downloaded_versions(%args, software=>$args{software});
+    my $v0 = $res->[2] ? $res->[2][-1] : undef;
+
+    $res = App::swcat::latest_version(%args, software=>$args{software});
     return $res if $res->[0] != 200;
     my $v = $res->[2];
 
-    my $dlurlres = $mod->get_download_url(
-        arch => $args{arch},
-    );
-    return $dlurlres if $dlurlres->[0] != 200;
-    my @urls = ref($dlurlres->[2]) eq 'ARRAY' ? @{$dlurlres->[2]} : ($dlurlres->[2]);
-    my @filenames = _convert_download_urls_to_filenames(
-        res => $dlurlres, software => $args{software}, version => $v);
+    if (defined $v0 && $mod->cmp_version($v0, $v) >= 0) {
+        log_trace "Skipped downloading software '$args{software}': downloaded version ($v0) is already latest ($v)";
+        return [304, "OK"];
+    }
+
+    my (@urls, @filenames);
+  GET_DOWNLOAD_URL:
+    {
+        my $dlurlres = $mod->get_download_url(
+            arch => $args{arch},
+        );
+        return $dlurlres if $dlurlres->[0] != 200;
+        @urls = ref($dlurlres->[2]) eq 'ARRAY' ? @{$dlurlres->[2]} : ($dlurlres->[2]);
+        @filenames = _convert_download_urls_to_filenames(
+            res => $dlurlres, software => $args{software}, version => $v);
+    }
 
     my $target_dir = join(
         "",
@@ -311,44 +399,112 @@ sub download {
     [200, "OK", undef, {
         'func.version' => $v,
         'func.files' => \@files,
-        'func.unwrap_tarball' => $dlurlres->[3]{'func.unwrap_tarball'} // 1,
     }];
 }
 
-$SPEC{cleanup} = {
+$SPEC{download_all} = {
     v => 1.1,
-    summary => 'Remove inactive versions',
+    summary => 'Download latest version of all known software',
     args => {
         %args_common,
-        #%App::swcat::arg0_software,
+        %argopt_arch,
     },
-    # XXX add dry_run
 };
-sub cleanup {
+sub download_all {
+    my %args = @_;
+    my $state = _init(\%args);
+
+    my $res = App::swcat::list();
+    return [500, "Can't list known software: $res->[0] - $res->[1]"] if $res->[0] != 200;
+    my $known = $res->[2];
+
+    my $envresmulti = envresmulti();
+    for my $sw (@$known) {
+        $res = download(%args, software=>$sw);
+        $envresmulti->add_result($res->[0], $res->[1], {item_id=>$sw});
+    }
+
+    $envresmulti->as_struct;
+}
+
+$SPEC{cleanup_install_dir} = {
+    v => 1.1,
+    summary => 'Remove inactive versions of installed software',
+    args => {
+        %args_common,
+    },
+    features => { dry_run=>1 },
+};
+sub cleanup_install_dir {
     require File::Path;
 
     my %args = @_;
 
     local $CWD = $args{install_dir};
-    my $res = list_installed(%args, _software=>$args{software}, detail=>1);
+    my $res = list_installed(%args, detail=>1);
     return $res unless $res->[0] == 200;
     for my $row (@{ $res->[2] }) {
         my $sw = $row->{software};
         log_trace "Skipping software $sw because there is no active version"
             unless defined $row->{active_version};
         next unless defined $row->{inactive_versions};
-        log_trace "Cleaning up software $sw ...";
+        #log_trace "Cleaning up software $sw ...";
         for my $v (split /, /, $row->{inactive_versions}) {
             my $dir = "$sw-$v";
             unless (-d $dir) {
-                log_trace "  Skipping version $v (directory does not exist)";
+                log_trace "Skipping version $v of software $sw (directory does not exist)";
                 next;
             }
-            log_trace "  Removing $dir ...";
-            File::Path::remove_tree($dir);
+            if ($args{-dry_run}) {
+                log_trace "[DRY-RUN] Removing $dir ...";
+            } else {
+                log_trace "Removing $dir ...";
+                File::Path::remove_tree($dir);
+            }
         }
     }
-    [200];
+    $args{-dry_run} ? [304, "Dry-run"] : [200];
+}
+
+$SPEC{cleanup_download_dir} = {
+    v => 1.1,
+    summary => 'Remove older versions of downloaded software',
+    args => {
+        %args_common,
+    },
+    features => { dry_run=>1 },
+};
+sub cleanup_download_dir {
+    require File::Path;
+
+    my %args = @_;
+
+    local $CWD = $args{download_dir};
+    my $res = list_downloaded(%args, detail=>1);
+    return $res unless $res->[0] == 200;
+  SW:
+    for my $row (@{ $res->[2] }) {
+        my $sw = $row->{software};
+        next unless $row->{all_versions};
+        my @vers = split /, /, $row->{all_versions};
+        unless (@vers > 1) {
+            log_trace "Skipping software $sw (<2 versions)";
+            next SW;
+        }
+        pop @vers; # remove latest version
+        my $dir = sprintf "%s/%s", substr($sw, 0, 1), $sw;
+        local $CWD = $dir;
+      VER:
+        for my $v (@vers) {
+            if ($args{-dry_run}) {
+                log_trace "[DRY-RUN] Cleaning up $sw-$v ...";
+            } else {
+                log_trace "Cleaning up software $sw-$v ...";
+                File::Path::remove_tree($v);
+            }
+        }
+    }
+    $args{-dry_run} ? [304, "Dry-run"] : [200];
 }
 
 $SPEC{update} = {
@@ -357,7 +513,15 @@ $SPEC{update} = {
     args => {
         %args_common,
         %App::swcat::arg0_software,
-        # XXX --no-download option
+        download => {
+            summary => 'Whether to download latest version from URL'.
+                'or just find from download dir',
+            schema => 'bool*',
+            default => 1,
+            cmdline_aliases => {
+                D => {is_flag=>1, summary => 'Shortcut for --no-download', code=>sub {$_[0]{download} = 0}},
+            },
+        },
     },
 };
 sub update {
@@ -372,17 +536,61 @@ sub update {
     my $mod = App::swcat::_load_swcat_mod($args{software});
 
   UPDATE: {
-        log_info "Updating software %s ...", $args{software};
+        my $res = list_installed_versions(%args);
+        my $v0 = $res->[2] ? $res->[2][-1] : undef;
 
-        my $dlres = download(%args);
-        return $dlres if $dlres->[0] != 200;
-
+        my $v;
         my ($filepath, $filename);
-        if (@{ $dlres->[3]{'func.files'} } != 1) {
-            return [412, "Currently cannot handle software that has multiple downloaded files"];
+      DOWNLOAD_OR_GET_DOWNLOADED: {
+            if ($args{download}) {
+              DOWNLOAD: {
+                    my $dlres = download(%args);
+                    if ($dlres->[0] == 304) {
+                        goto GET_DOWNLOADED;
+                    }
+                    return [500, "Can't download: $dlres->[0] - $dlres->[1]"]
+                        unless $dlres->[0] == 200;
+                    $v = $dlres->[3]{'func.version'};
+                    if (@{ $dlres->[3]{'func.files'} } != 1) {
+                        return [412, "Currently cannot handle software that has multiple downloaded files"];
+                    }
+                    $filepath = $filename = $dlres->[3]{'func.files'}[0];
+                    $filename =~ s!.+/!!;
+                }
+                last DOWNLOAD_OR_GET_DOWNLOADED;
+            }
+          GET_DOWNLOADED: {
+                my $res = list_downloaded_versions(%args);
+                $v = $res->[2] ? $res->[2][-1] : undef;
+                if (!defined $v) {
+                    return [412, "No downloaded version of software '$args{software}' is available"];
+                }
+                {
+                    local $CWD = sprintf(
+                        "%s/%s/%s/%s/%s",
+                        $args{download_dir},
+                        substr($args{software}, 0, 1),
+                        $args{software},
+                        $v,
+                        $args{arch});
+                    my @filenames = glob "*";
+                    if (!@filenames) {
+                        return [412, "There are no files in download dir $CWD"];
+                    } elsif (@filenames != 1) {
+                        return [412, "Currently cannot handle software that has multiple downloaded files: ".join(", ", @filenames)];
+                    }
+                    $filename = $filenames[0];
+                    $filepath = "$CWD/$filename";
+                }
+            }
+        } # DOWNLOAD_OR_GET_DOWNLOADED
+
+        if (defined $v0 && $mod->cmp_version($v0, $v) >= 0) {
+            log_trace "Skipped updating software '$args{software}': installed version ($v0) is already latest ($v)";
+            return [304, "OK"];
         }
-        $filepath = $filename = $dlres->[3]{'func.files'}[0];
-        $filename =~ s!.+/!!;
+
+        log_info "Updating software %s to version %s ...", $args{software}, $v;
 
         my $cafres = Filename::Archive::check_archive_filename(
             filename => $filename);
@@ -392,13 +600,16 @@ sub update {
 
         my $target_name = join(
             "",
-            $args{software}, "-", $dlres->[3]{'func.version'},
+            $args{software}, "-", $v,
         );
         my $target_dir = join(
             "",
             $args{install_dir},
             "/", $target_name,
         );
+
+        my $aires = $mod->get_archive_info(%args, version => $v);
+        return [500, "Can't get archive info: $aires->[0] - $aires->[1]"] unless $aires->[0] == 200;
 
       EXTRACT: {
             if (-d $target_dir) {
@@ -412,7 +623,7 @@ sub update {
             my $ar = Archive::Any->new($filepath);
             $ar->extract($target_dir);
 
-            _unwrap($target_dir) if $dlres->[3]{'func.unwrap_tarball'};
+            _unwrap($target_dir) if $aires->[2]{unwrap};
         } # EXTRACT
 
       SYMLINK_DIR: {
@@ -427,8 +638,8 @@ sub update {
       SYMLINK_PROGRAMS: {
             local $CWD = $args{program_dir};
             log_trace "Creating/updating program symlinks ...";
-            my $res = $mod->get_programs;
-            for my $e (@{ $res->[2] }) {
+            my $programs = $aires->[2]{programs} // [];
+            for my $e (@$programs) {
                 if ((-l $e->{name}) || !File::MoreUtil::file_exists($e->{name})) {
                     unlink $e->{name};
                     my $target = "$args{install_dir}/$args{software}$e->{path}/$e->{name}";
@@ -485,7 +696,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.002 of App::instopt (from Perl distribution App-instopt), released on 2018-10-04.
+This document describes version 0.004 of App::instopt (from Perl distribution App-instopt), released on 2018-10-05.
 
 =head1 SYNOPSIS
 
@@ -494,15 +705,18 @@ See L<instopt> script.
 =head1 FUNCTIONS
 
 
-=head2 cleanup
+=head2 cleanup_download_dir
 
 Usage:
 
- cleanup(%args) -> [status, msg, result, meta]
+ cleanup_download_dir(%args) -> [status, msg, result, meta]
 
-Remove inactive versions.
+Remove older versions of downloaded software.
 
 This function is not exported.
+
+This function supports dry-run operation.
+
 
 Arguments ('*' denotes required arguments):
 
@@ -513,6 +727,63 @@ Arguments ('*' denotes required arguments):
 =item * B<install_dir> => I<dirname>
 
 =item * B<program_dir> => I<dirname>
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 cleanup_install_dir
+
+Usage:
+
+ cleanup_install_dir(%args) -> [status, msg, result, meta]
+
+Remove inactive versions of installed software.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
 
 =back
 
@@ -534,7 +805,7 @@ Usage:
 
  download(%args) -> [status, msg, result, meta]
 
-Download latest version of software.
+Download latest version of all software.
 
 This function is not exported.
 
@@ -566,6 +837,42 @@ that contains extra information.
 Return value:  (any)
 
 
+=head2 download_all
+
+Usage:
+
+ download_all(%args) -> [status, msg, result, meta]
+
+Download latest version of all known software.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arch> => I<software::arch>
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
 =head2 list_downloaded
 
 Usage:
@@ -581,6 +888,40 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 list_downloaded_versions
+
+Usage:
+
+ list_downloaded_versions(%args) -> [status, msg, result, meta]
+
+List all downloaded versions of a software.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
 
 =item * B<download_dir> => I<dirname>
 
@@ -689,6 +1030,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<download> => I<bool> (default: 1)
+
+Whether to download latest version from URLor just find from download dir.
 
 =item * B<download_dir> => I<dirname>
 

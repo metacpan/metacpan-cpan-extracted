@@ -5,10 +5,10 @@ use strict;
 use warnings;
 
 BEGIN {
-    $Math::Bacovia::VERSION = '0.03';
+    $Math::Bacovia::VERSION = '0.04';
 }
 
-use List::UtilsBy::XS qw();
+use List::UtilsBy qw();
 use Class::Multimethods qw();
 use Math::AnyNum qw();
 
@@ -550,12 +550,12 @@ sub acsch {
 
 sub simple {
     my ($x, %opt) = @_;
-    $x->{_simple} //= ((List::UtilsBy::XS::min_by { length($_->pretty) } ($x->alternatives(%opt)))[0]);
+    $x->{_simple} //= ((List::UtilsBy::min_by { length($_->pretty) } ($x->alternatives(%opt)))[0]);
 }
 
 sub expand {
     my ($x, %opt) = @_;
-    $x->{_expand} //= ((List::UtilsBy::XS::max_by { length($_->pretty) } ($x->alternatives(%opt)))[0]);
+    $x->{_expand} //= ((List::UtilsBy::max_by { length($_->pretty) } ($x->alternatives(%opt)))[0]);
 }
 
 sub alternatives {
